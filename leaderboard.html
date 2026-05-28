@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard — hotkey.gg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49;
+    --accent:#2ea36f; --accent-dim:#1d6647; --accent-glow:rgba(46,163,111,.22);
+    --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Hanken Grotesk',system-ui,sans-serif;
+    --maxw:880px;
+  }
+  *{margin:0; padding:0; box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6; -webkit-font-smoothing:antialiased}
+  body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:42px 30px; opacity:.13;
+    mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 0%,transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 0%,transparent 75%);}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:1}
+  a{color:inherit; text-decoration:none}
+
+  nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(10px); background:rgba(12,13,14,.72); border-bottom:1px solid var(--line)}
+  .nav-in{display:flex; align-items:center; justify-content:space-between; height:62px; max-width:1080px; margin:0 auto; padding:0 28px}
+  .brand{font-family:var(--mono); font-weight:700; font-size:19px; letter-spacing:-.5px}
+  .brand b{color:var(--accent)}
+  .nav-links{display:flex; align-items:center; gap:30px}
+  .nav-links a{font-family:var(--mono); font-size:13px; color:var(--muted); transition:color .15s}
+  .nav-links a:hover, .nav-links a.on{color:var(--text)}
+  .nav-links a.on{color:var(--accent)}
+  .btn{font-family:var(--mono); font-size:13px; font-weight:700; cursor:pointer; border-radius:8px; padding:8px 15px; background:var(--accent); color:#06120c; transition:all .15s}
+  .btn:hover{background:#37b97e; box-shadow:0 0 24px var(--accent-glow)}
+  .menu-btn{display:none}
+
+  header.head{padding:64px 0 30px; position:relative; z-index:1}
+  .eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin-bottom:14px}
+  h1{font-size:clamp(32px,5vw,46px); font-weight:700; letter-spacing:-1.2px; margin-bottom:12px}
+  .sub{font-size:16px; color:var(--muted); max-width:520px}
+
+  main{padding-bottom:80px; position:relative; z-index:1}
+  .board{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-bottom:20px}
+  .board-cap{display:flex; align-items:baseline; justify-content:space-between; padding:16px 22px; border-bottom:1px solid var(--line)}
+  .board-cap h2{font-size:17px; font-weight:600; letter-spacing:-.3px}
+  .board-cap .lvl{font-family:var(--mono); font-size:11px; color:var(--faint); text-transform:uppercase; letter-spacing:1px}
+  .row{display:grid; grid-template-columns:54px 1fr 96px; align-items:center; padding:13px 22px; border-bottom:1px solid var(--line); font-size:15px}
+  .row:last-child{border-bottom:none}
+  .rk{font-family:var(--mono); font-weight:700; color:var(--muted)}
+  .row.top .rk{color:var(--accent)}
+  .nm{font-weight:500}
+  .tm{font-family:var(--mono); text-align:right; font-weight:500}
+  .empty{padding:22px; color:var(--faint); font-family:var(--mono); font-size:13px; text-align:center}
+  .state{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:40px 30px; text-align:center}
+  .state h2{font-size:19px; font-weight:600; margin-bottom:10px}
+  .state p{font-size:14px; color:var(--muted); max-width:440px; margin:0 auto 18px; line-height:1.6}
+  .state code{font-family:var(--mono); font-size:12px; color:var(--warn); background:var(--surface2); padding:2px 7px; border-radius:5px}
+  .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
+
+  footer{border-top:1px solid var(--line); padding:34px 0; position:relative; z-index:1}
+  .foot-in{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px}
+  .foot-tag{font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .foot-fine{font-family:var(--mono); font-size:11px; color:var(--faint); max-width:340px; text-align:right}
+  @media(max-width:640px){ .nav-links{gap:18px} .nav-links a:not(.on):not(.btn){display:none} .foot-fine{text-align:left} }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a href="index.html" class="brand">hotkey<b>.gg</b></a>
+    <div class="nav-links">
+      <a href="index.html#how">How it works</a>
+      <a href="leaderboard.html" class="on">Leaderboard</a>
+      <a href="app.html">Train</a>
+      <a href="app.html" class="btn">Start training</a>
+    </div>
+  </div>
+</nav>
+
+<header class="head">
+  <div class="wrap">
+    <div class="eyebrow">The board</div>
+    <h1>Fastest hands win.</h1>
+    <p class="sub">Best clean time per person, per exercise. Mouse runs don't count. Beat a time and you take the spot.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div id="boards"><div class="loading">loading times…</div></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <a href="index.html" class="brand" style="font-size:16px">hotkey<b>.gg</b></a>
+    <div class="foot-fine">Microsoft Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with Microsoft.</div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   SUPABASE — paste the SAME two values you used in app.html.
+   Leave blank and the page shows a friendly "not connected" note.
+   ============================================================ */
+const SUPABASE_URL      = '';   // ← your Project URL
+const SUPABASE_ANON_KEY = '';   // ← your anon / public key
+const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+const CH = [
+  { key:'drill',    label:'Hardcode it',        lvl:'drill' },
+  { key:'combo',    label:'Clean the paste',    lvl:'combo' },
+  { key:'gauntlet', label:'Make it model-ready', lvl:'gauntlet' },
+];
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmt(ms){ return (ms/1000).toFixed(2)+'s'; }
+
+function boardHtml(c, rows, names){
+  let body;
+  if(!rows.length){ body='<div class="empty">no times yet — be the first</div>'; }
+  else body = rows.map((r,i)=>
+    `<div class="row${i===0?' top':''}"><span class="rk">${i+1}</span>`+
+    `<span class="nm">${esc(names[r.user_id]||'anon')}</span>`+
+    `<span class="tm">${fmt(r.time_ms)}</span></div>`).join('');
+  return `<div class="board"><div class="board-cap"><h2>${esc(c.label)}</h2><span class="lvl">${esc(c.lvl)}</span></div>${body}</div>`;
+}
+
+async function load(){
+  const root=document.getElementById('boards');
+  if(!sb){
+    root.innerHTML='<div class="state"><h2>Leaderboard not connected yet</h2>'+
+      '<p>Paste your Supabase <code>Project URL</code> and <code>anon key</code> into the config block at the top of <code>leaderboard.html</code> and <code>app.html</code>, then re-deploy. Times will appear here automatically.</p>'+
+      '<a href="app.html" class="btn">Go train</a></div>';
+    return;
+  }
+  let profs=[], runs=[];
+  try{
+    const p=await sb.from('profiles').select('id,handle');
+    profs=p.data||[];
+    const r=await sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
+    runs=r.data||[];
+  }catch(e){
+    root.innerHTML='<div class="state"><h2>Couldn’t load times</h2><p>The database isn’t reachable right now. Check the keys and that the tables exist, then refresh.</p></div>';
+    return;
+  }
+  const names={}; profs.forEach(p=>{ names[p.id]=p.handle||'anon'; });
+  let html='';
+  CH.forEach(c=>{
+    const seen={}, best=[];
+    runs.filter(x=>x.challenge===c.key).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });
+    html += boardHtml(c, best.slice(0,10), names);
+  });
+  root.innerHTML=html;
+}
+load();
+</script>
+</body>
+</html>
