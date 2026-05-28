@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard — hotkey.gg</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -47,7 +48,9 @@
   .sub{font-size:16px; color:var(--muted); max-width:520px}
 
   main{padding-bottom:80px; position:relative; z-index:1}
-  .board{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-bottom:20px}
+  #boards{display:grid; grid-template-columns:repeat(2,1fr); gap:20px; align-items:start}
+  @media(max-width:680px){ #boards{grid-template-columns:1fr} }
+  .board{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden}
   .board-cap{display:flex; align-items:baseline; justify-content:space-between; padding:16px 22px; border-bottom:1px solid var(--line)}
   .board-cap h2{font-size:17px; font-weight:600; letter-spacing:-.3px}
   .board-cap .lvl{font-family:var(--mono); font-size:11px; color:var(--faint); text-transform:uppercase; letter-spacing:1px}
@@ -111,15 +114,24 @@
    SUPABASE — paste the SAME two values you used in app.html.
    Leave blank and the page shows a friendly "not connected" note.
    ============================================================ */
-const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';   // ← your Project URL
-const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';   // ← your anon / public key
+const SUPABASE_URL      = '';   // ← your Project URL
+const SUPABASE_ANON_KEY = '';   // ← your anon / public key
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 const CH = [
-  { key:'drill',    label:'Hardcode it',        lvl:'drill' },
-  { key:'combo',    label:'Clean the paste',    lvl:'combo' },
-  { key:'gauntlet', label:'Make it model-ready', lvl:'gauntlet' },
+  { key:'copyover', label:'Copy it over',        lvl:'Foundations' },
+  { key:'polish',   label:'Polish the Header',   lvl:'Formatting' },
+  { key:'combo',    label:'Clean the paste',     lvl:'Formatting' },
+  { key:'format',   label:'Fix the formats',     lvl:'Formatting' },
+  { key:'gauntlet', label:'Make it model-ready', lvl:'Formatting' },
+  { key:'drill',    label:'Hardcode it',         lvl:'Values' },
+  { key:'margin',   label:'Build the margin',    lvl:'Formulas' },
+  { key:'foot',     label:'Total it both ways',  lvl:'Formulas' },
+  { key:'percent',  label:'Common-size it',      lvl:'Formulas' },
+  { key:'schedule', label:'Roll it forward',     lvl:'Formulas' },
+  { key:'comps',    label:'Line up the comps',   lvl:'Formulas' },
+  { key:'lookup',   label:'Look it up',          lvl:'Lookups' },
 ];
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmt(ms){ return (ms/1000).toFixed(2)+'s'; }
