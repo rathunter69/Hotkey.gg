@@ -82,8 +82,8 @@
     <div class="nav-links">
       <a href="index.html#how">How it works</a>
       <a href="leaderboard.html" class="on">Leaderboard</a>
-      <a href="app.html">Train</a>
-      <a href="app.html" class="btn">Start training</a>
+      <a href="index.html">Train</a>
+      <a href="index.html" class="btn">Start training</a>
     </div>
   </div>
 </nav>
@@ -111,7 +111,7 @@
 
 <script>
 /* ============================================================
-   SUPABASE — paste the SAME two values you used in app.html.
+   SUPABASE — paste the SAME two values you used in index.html.
    Leave blank and the page shows a friendly "not connected" note.
    ============================================================ */
 const SUPABASE_URL      = '';   // ← your Project URL
@@ -150,8 +150,8 @@ async function load(){
   const root=document.getElementById('boards');
   if(!sb){
     root.innerHTML='<div class="state"><h2>Leaderboard not connected yet</h2>'+
-      '<p>Paste your Supabase <code>Project URL</code> and <code>anon key</code> into the config block at the top of <code>leaderboard.html</code> and <code>app.html</code>, then re-deploy. Times will appear here automatically.</p>'+
-      '<a href="app.html" class="btn">Go train</a></div>';
+      '<p>Paste your Supabase <code>Project URL</code> and <code>anon key</code> into the config block at the top of <code>leaderboard.html</code> and <code>index.html</code>, then re-deploy. Times will appear here automatically.</p>'+
+      '<a href="index.html" class="btn">Go train</a></div>';
     return;
   }
   let profs=[], runs=[];

@@ -243,6 +243,22 @@
   .rm-key kbd{color:var(--muted); margin-right:6px; font-size:10px}
   .rm-key:hover kbd{color:var(--accent)}
 
+  /* first-run guided intro */
+  .onboard-modal{position:fixed; inset:0; background:rgba(0,0,0,.62); display:none;
+    align-items:center; justify-content:center; z-index:60}
+  .onboard-modal.show{display:flex}
+  .ob-card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:28px 30px; width:380px; max-width:88vw; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55)}
+  .ob-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
+    letter-spacing:1px; margin-bottom:12px}
+  .ob-body{font-size:13.5px; color:var(--text); line-height:1.65; margin-bottom:22px}
+  .ob-opts{display:flex; flex-direction:column; gap:9px}
+  .ob-key{font-family:var(--mono); font-size:13px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:9px; padding:11px 14px; cursor:pointer; transition:.15s}
+  .ob-key:hover{border-color:var(--accent); color:var(--accent)}
+  .ob-key.primary{background:var(--accent-dim); border-color:var(--accent); color:var(--text)}
+  .ob-key.primary:hover{background:var(--accent); color:#0c0d0e}
+
   .help-toggle{font-family:var(--mono); font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer; padding:0}
   .help-toggle:hover{color:var(--accent)}
   .help-toggle kbd{font-family:var(--mono); color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin-right:5px}
@@ -371,25 +387,13 @@
   </div>
   <div class="checklist" id="checklist"></div>
 
-  <div class="bar">
+  <div class="bar" style="display:none">
     <div class="stat">time par <b id="par">—</b> · best <b id="pb">—</b><br>keys <b id="keyN">0</b> · optimal ~<b id="keyPar">—</b></div>
     <div class="spacer"></div>
     <div class="badge" id="mouseBadge" style="display:none">mouse used</div>
   </div>
 
-  <div class="result" id="result">go — first keystroke starts the clock</div>
-
-  <div class="foot"><button class="help-toggle" id="helpToggle"><kbd>?</kbd> hints &amp; shortcuts</button></div>
-
-  <div class="help" id="help">
-    <div class="help-sec"><h4>solving this one</h4><div id="helpReq"></div></div>
-    <div class="help-sec"><h4>move &amp; select</h4>
-      <div><kbd>↑↓←→</kbd> move &nbsp; <kbd>ctrl+→</kbd> jump to edge &nbsp; <kbd>shift+→</kbd> select &nbsp; <kbd>ctrl+shift+→</kbd> select to edge &nbsp; <kbd>shift+space</kbd> row &nbsp; <kbd>ctrl+space</kbd> column</div></div>
-    <div class="help-sec"><h4>commands</h4>
-      <div><kbd>ctrl+c</kbd> copy &nbsp; <kbd>ctrl+b</kbd> bold &nbsp; <kbd>ctrl+z</kbd> undo &nbsp; <kbd>alt</kbd> opens the ribbon — pick a tab, then its keys (e.g. <kbd>h v s</kbd> or legacy <kbd>e s</kbd> for paste special; <kbd>h u s</kbd> for AutoSum)</div></div>
-    <div class="help-sec"><h4>flow</h4>
-      <div>switch drills with the <kbd>sheet tabs</kbd> below the grid, the <kbd>‹ ›</kbd> arrows, or <kbd>1</kbd>–<kbd>9</kbd> &nbsp; <kbd>shift+f11</kbd> restart &nbsp; <kbd>esc</kbd> cancel ribbon &nbsp; on the results card: <kbd>enter</kbd> again · <kbd>space</kbd> next</div></div>
-  </div>
+  <div class="result" id="result"></div>
 </div>
 
 <div class="pd-backdrop" id="pasteDialog">
@@ -402,6 +406,16 @@
 
 <div class="keyflash" id="keyflash"></div>
 <div class="results-modal" id="resultsModal"></div>
+<div class="onboard-modal" id="onboard">
+  <div class="ob-card">
+    <div class="ob-title">welcome to hotkey.gg</div>
+    <div class="ob-body">New here? Take a 20-second guided run — we’ll switch on step-by-step hints and play the first solution for you. Or jump straight in.</div>
+    <div class="ob-opts">
+      <button class="ob-key primary" id="obStart">▶ Show me how it works</button>
+      <button class="ob-key" id="obSkip">Skip — I’ll dive in</button>
+    </div>
+  </div>
+</div>
 <div class="auth-modal" id="authModal"></div>
 <div class="landing" id="landing">
   <div class="landing-inner">
@@ -1486,6 +1500,8 @@ document.addEventListener('keydown',e=>{
   if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
   // landing overlay is up (and no modal over it): swallow grid keys; Enter starts training
   if(landingOpen && !authOpen && !gateOpen){ if(k==='Enter'){ e.preventDefault(); tryEnter(); } return; }
+  // first-run intro prompt is up: ignore grid keys until the user picks
+  if(onboardOpen){ return; }
   // during the demo, ignore real user input (synthetic demo keys are not trusted, so they pass)
   if(demoPlaying && e.isTrusted){ e.preventDefault(); if(k==='Escape') cancelDemo(); return; }
   // while the sign-in modal is open, the trainer ignores keys (esc closes it)
@@ -1542,9 +1558,6 @@ document.addEventListener('keydown',e=>{
     if(ch){ logKey(ch); applyRibbon(ch); }
     return;
   }
-
-  // HINTS PANEL — '?' toggles, doesn't touch the clock or keystroke count
-  if(k==='?'){ e.preventDefault(); toggleHelp(); return; }
 
   // GUIDED MODE — 'g' toggles paint-by-numbers (meta key; no clock, no keystroke count)
   if((k==='g'||k==='G')&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
@@ -1603,9 +1616,6 @@ $('result').addEventListener('click',e=>{ const b=e.target.closest('.rc-key'); i
   const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
 $('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-key'); if(!b)return;
   const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
-// hints panel toggle (button mirrors the '?' key)
-function toggleHelp(){ $('help').classList.toggle('show'); }
-$('helpToggle').addEventListener('click',toggleHelp);
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
@@ -1651,7 +1661,7 @@ async function playDemo(){
   if(kf) kf.classList.remove('demo');
   demoPlaying=false; updateDemoBtn();
   loadChallenge(cur);
-  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — first keystroke starts the clock'; }
+  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn'; }
 }
 $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo(); });
 
@@ -1670,11 +1680,10 @@ function loadChallenge(key){
   $('mouseBadge').style.display='none';
   $('timer').textContent='0.00'; $('timer').classList.remove('run');
   $('prompt').innerHTML=C.prompt;
-  $('helpReq').innerHTML=C.req;
   $('par').textContent=C.par+'s';
   $('keyPar').textContent=C.parKeys;
   $('pb').textContent = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
-  $('result').className='result'; $('result').innerHTML='go — first keystroke starts the clock';
+  $('result').className='result'; $('result').innerHTML='';
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
 }
 /* ---- drill picker: short descriptions + skill groupings ---- */
@@ -1736,6 +1745,7 @@ async function savePB(){
   if(/type=recovery/.test(location.hash)){ recoveryMode=true; enterRequested=true; }
   else if(/access_token|refresh_token|error_code|error_description/.test(location.hash)) enterRequested=true;
   await loadPB();
+  await loadOnboard();
   buildSheetTabs();
   loadChallenge(MENU_ORDER[0]);
   initAuth();
@@ -1913,8 +1923,35 @@ async function saveHandle(){
 function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 
 /* ---------- landing → app entry ---------- */
-function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone'); }
+function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone'); maybeOnboard(); }
 function tryEnter(){ enterRequested=true; if(!sb){ dismissLanding(); return; } advanceAccess(); }
+
+/* ---------- first-run guided intro ---------- */
+let onboarded=false, onboardOpen=false;
+async function loadOnboard(){
+  try{ if(window.storage){ const r=await window.storage.get('hotkey_onboarded'); if(r&&r.value) onboarded=true; } }catch(e){}
+}
+function markOnboarded(){ onboarded=true; try{ if(window.storage) window.storage.set('hotkey_onboarded','1'); }catch(e){} }
+function maybeOnboard(){
+  if(onboarded||onboardOpen||demoPlaying) return;
+  setTimeout(showOnboard, 620);   // let the landing finish fading first
+}
+function showOnboard(){
+  if(onboarded) return;
+  const o=$('onboard'); if(!o) return;
+  onboardOpen=true; o.classList.add('show');
+  const s=$('obStart'); if(s) s.onclick=startGuidedIntro;
+  const k=$('obSkip'); if(k) k.onclick=skipOnboard;
+}
+function closeOnboard(){ onboardOpen=false; const o=$('onboard'); if(o) o.classList.remove('show'); }
+function skipOnboard(){ markOnboarded(); closeOnboard(); }
+function startGuidedIntro(){
+  markOnboarded(); closeOnboard();
+  loadChallenge(MENU_ORDER[0]);          // Foundations — "Copy it over"
+  guided=true; updateGuideBtn(); if(S) render();
+  // play the solution once; flag the run guided afterward so the practice solve won't post a time
+  playDemo().then(()=>{ guidedUsed=true; });
+}
 
 /* ---------- access gate (invite code, enforced server-side) ---------- */
 function advanceAccess(){
