@@ -376,6 +376,78 @@
     padding-top:12px; margin-top:4px; text-align:center}
   .pk-foot kbd{color:var(--muted); background:var(--surface2); border:1px solid var(--line);
     border-radius:4px; padding:1px 5px; font-size:10px; margin:0 1px}
+
+  /* ---- marathon mode ---- */
+  body.marathon .drillbar{display:none}
+  body.marathon .mode-ctrls{display:none}
+  .marathonHud{display:none; align-items:center; gap:16px; margin-bottom:14px; padding:9px 14px;
+    background:var(--surface); border:1px solid var(--accent-dim); border-radius:10px}
+  body.marathon .marathonHud{display:flex}
+  .mh-left{display:flex; align-items:center; gap:16px; flex:1 1 auto; min-width:0}
+  .mh-time{font-family:var(--mono); font-size:21px; font-weight:700; color:var(--accent); letter-spacing:-.5px;
+    min-width:64px}
+  .mh-time.low{color:var(--warn)}
+  .mh-stat{font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .mh-stat b{color:var(--text); font-weight:600; font-size:14px; margin-right:3px}
+  .mh-stop{font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface2);
+    border:1px solid var(--line); border-radius:7px; padding:6px 12px; cursor:pointer; transition:.13s; flex:none}
+  .mh-stop:hover{color:var(--bad); border-color:var(--bad)}
+
+  /* mode launcher */
+  .modes-modal{position:fixed; inset:0; background:rgba(0,0,0,.62); display:none;
+    align-items:center; justify-content:center; z-index:58; padding:24px}
+  .modes-modal.show{display:flex}
+  .mm-card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    width:400px; max-width:92vw; padding:26px 28px; text-align:center; box-shadow:0 24px 70px rgba(0,0,0,.6)}
+  .mm-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
+    letter-spacing:1px; margin-bottom:10px}
+  .mm-body{font-size:13.5px; color:var(--text); line-height:1.6; margin-bottom:20px}
+  .mm-durs{display:flex; gap:9px; justify-content:center; margin-bottom:18px}
+  .mm-dur{flex:1; font-family:var(--mono); font-size:14px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:10px; padding:14px 6px; cursor:pointer; transition:.14s}
+  .mm-dur:hover{border-color:var(--accent); color:var(--accent); background:var(--accent-glow)}
+  .mm-dur b{display:block; font-size:19px; font-weight:700; margin-bottom:2px}
+  .mm-foot a{font-family:var(--mono); font-size:12px; color:var(--muted); cursor:pointer}
+  .mm-foot a:hover{color:var(--text)}
+
+  /* session summary */
+  .session-modal{position:fixed; inset:0; background:rgba(0,0,0,.62); display:none;
+    align-items:center; justify-content:center; z-index:60; padding:24px}
+  .session-modal.show{display:flex}
+  .ss-card{background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    width:560px; max-width:94vw; max-height:90vh; overflow:auto; padding:26px 30px 22px;
+    box-shadow:0 28px 80px rgba(0,0,0,.65)}
+  .ss-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
+    letter-spacing:1px; margin-bottom:4px; text-align:center}
+  .ss-big{text-align:center; font-family:var(--mono); font-size:52px; font-weight:700; color:var(--text);
+    line-height:1; letter-spacing:-2px}
+  .ss-big span{font-size:16px; color:var(--muted); font-weight:400; margin-left:4px}
+  .ss-sub{text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:6px}
+  .ss-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:20px 0 6px}
+  .ss-stat{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:11px 8px; text-align:center}
+  .ss-stat .v{font-family:var(--mono); font-size:18px; font-weight:600; color:var(--text)}
+  .ss-stat .l{font-family:var(--mono); font-size:9.5px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.5px; margin-top:3px}
+  .ss-graphwrap{margin:16px 0 4px}
+  .ss-graphlabel{font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.6px; margin-bottom:4px}
+  .ss-opts{display:flex; gap:8px; justify-content:center; margin-top:18px; flex-wrap:wrap}
+  .ss-key{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:8px; padding:9px 15px; cursor:pointer; transition:.15s}
+  .ss-key:hover{border-color:var(--accent); color:var(--accent)}
+  .ss-key.primary{background:var(--accent-dim); border-color:var(--accent)}
+  .ss-key.primary:hover{background:var(--accent); color:#0c0d0e}
+  .ss-key kbd{color:var(--muted); margin-right:6px; font-size:10px}
+  .ss-key:hover kbd{color:inherit}
+  /* progress graph */
+  .sg-svg{width:100%; height:auto; display:block}
+  .sg-grid{stroke:var(--line); stroke-width:1}
+  .sg-axis{fill:var(--muted); font-family:var(--mono); font-size:9px}
+  .sg-area{fill:var(--accent-glow); stroke:none}
+  .sg-line{fill:none; stroke:var(--accent); stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+  .sg-avg{stroke:var(--muted); stroke-width:1; stroke-dasharray:3 3; fill:none}
+  .sg-dot{fill:var(--accent); stroke:var(--surface); stroke-width:1.5}
+  .sg-empty{font-family:var(--mono); font-size:12px; color:var(--muted); text-align:center; padding:20px}
   /* ---- landing overlay (fades to the app on start) ---- */
   .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
     background:rgba(11,12,13,.90); backdrop-filter:blur(7px); padding:28px; overflow-y:auto;
@@ -396,6 +468,8 @@
   .landing .modes{display:flex; gap:7px; align-items:center}
   .mode-chip{font-family:var(--mono); font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:8px 14px}
   .mode-chip.soon{opacity:.45}
+  .mode-chip.pick{cursor:pointer; color:var(--text); border-color:var(--accent-dim); transition:.15s}
+  .mode-chip.pick:hover{color:var(--accent); border-color:var(--accent); background:var(--accent-glow)}
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
@@ -421,9 +495,19 @@
     <button class="db-nav" id="nextDrill" title="next drill (›)">›</button>
   </div>
 
+  <div class="marathonHud" id="marathonHud">
+    <div class="mh-left">
+      <span class="mh-time" id="mhTime">5:00</span>
+      <span class="mh-stat"><b id="mhDrills">0</b>drills</span>
+      <span class="mh-stat"><b id="mhKeys">0</b>keys</span>
+    </div>
+    <button class="mh-stop" id="mhStop">end session</button>
+  </div>
+
   <div class="exrow">
     <div class="prompt" id="prompt"></div>
     <div class="mode-ctrls">
+      <button class="guide-toggle" id="marathonBtn">⏱ marathon</button>
       <button class="guide-toggle" id="demoBtn">▶ watch solution</button>
       <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
     </div>
@@ -468,6 +552,19 @@
     <div class="pk-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>↵</kbd> open · <kbd>1</kbd>–<kbd>9</kbd> jump · <kbd>esc</kbd> close</div>
   </div>
 </div>
+<div class="modes-modal" id="modesModal">
+  <div class="mm-card">
+    <div class="mm-title">⏱ marathon</div>
+    <div class="mm-body">Random drills, back to back, against the clock. The timer starts on your first keystroke — clear as many as you can.</div>
+    <div class="mm-durs">
+      <button class="mm-dur" data-min="3"><b>3</b>min</button>
+      <button class="mm-dur" data-min="5"><b>5</b>min</button>
+      <button class="mm-dur" data-min="10"><b>10</b>min</button>
+    </div>
+    <div class="mm-foot"><a id="mmCancel">cancel</a></div>
+  </div>
+</div>
+<div class="session-modal" id="sessionModal"></div>
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
@@ -487,9 +584,9 @@
     <p class="lede">A speedrun trainer for the keystrokes and modeling moves that fill an analyst's day — <b>the exact Windows shortcuts, timed to the hundredth</b>, drilled until they're reflex.</p>
     <div class="landing-cta">
       <button class="start-btn" id="startBtn">Start training →</button>
-      <span class="modes"><span class="mode-chip">Classic</span><span class="mode-chip soon">Rapid-fire · soon</span></span>
+      <span class="modes"><span class="mode-chip">Classic</span><span class="mode-chip pick" id="chipMarathon">⏱ Marathon</span><span class="mode-chip soon">Rapid-fire · soon</span></span>
     </div>
-    <div class="micro"><b>Invite-only beta.</b> Runs in the browser — no install. Pick any drill from the tabs once you're in.</div>
+    <div class="micro"><b>Invite-only beta.</b> Runs in the browser — no install. Pick any drill once you're in, or run a timed <b>Marathon</b>.</div>
   </div>
 </div>
 
@@ -508,6 +605,7 @@ const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
 let enterRequested = false, landingOpen = true, recoveryMode = false;
+let pendingMarathon = false;
 
 /* ============================================================
    CONFIG — tweak challenges, par times, and grid here.
@@ -1057,6 +1155,9 @@ let guided=false, guidedUsed=false;
 let demoPlaying=false;
 let editing=false, editBuf='';
 let undoStack=[], redoStack=[], keyLog=[];
+let gameMode='classic';   // 'classic' | 'marathon'
+let marathon=null;        // active marathon session state
+let lastKey=null;         // last drill key, to avoid back-to-back repeats in marathon
 let PB = {};
 
 const $ = id => document.getElementById(id);
@@ -1324,6 +1425,8 @@ function drawRibbon(){
    ACTIONS
    ============================================================ */
 function startClock(){ if(running||done)return; running=true; started=performance.now();
+  if(gameMode==='marathon' && marathon && marathon.active && !marathon.endAt){
+    marathon.startAt=started; marathon.endAt=started+marathon.dur*1000; }
   $('timer').classList.add('run'); tickH=setInterval(updateTimer,40); }
 function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); }
 function stopClock(){ running=false; clearInterval(tickH); finished=performance.now();
@@ -1331,16 +1434,17 @@ function stopClock(){ running=false; clearInterval(tickH); finished=performance.
 
 function checkWin(){
   if(done||demoPlaying) return;
-  if(gradePass()){
-    const t=(performance.now()-started)/1000;
-    stopClock(); done=true; $('timer').textContent=t.toFixed(2);
-    const C=CHALLENGES[cur]; let pb=false;
-    if(!mouseUsed && !guidedUsed){ const prev=PB[cur];
-      if(prev===undefined||t<prev){ PB[cur]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
-    showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
-    if(sb && me_user && !mouseUsed && !guidedUsed){
-      recordRun(t).then(ok=>{ const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); } });
-    }
+  if(!gradePass()) return;
+  const t=(performance.now()-started)/1000;
+  stopClock(); done=true; $('timer').textContent=t.toFixed(2);
+  const C=CHALLENGES[cur];
+  if(gameMode==='marathon' && marathon && marathon.active){ marathonSolved(t, C); return; }
+  let pb=false;
+  if(!mouseUsed && !guidedUsed){ const prev=PB[cur];
+    if(prev===undefined||t<prev){ PB[cur]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
+  showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
+  if(sb && me_user && !mouseUsed && !guidedUsed){
+    recordRun(t).then(ok=>{ const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); } });
   }
 }
 function showResults(o){
@@ -1573,6 +1677,15 @@ document.addEventListener('keydown',e=>{
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
   if(gateOpen){ return; }
 
+  // session summary (marathon end): enter = run again, esc = back to drills
+  if(sessionOpen){ e.preventDefault();
+    if(k==='Enter'){ if(marathon) startMarathon(marathon.dur); }
+    else if(k==='Escape'){ exitMarathon(); }
+    return;
+  }
+  // mode launcher open
+  if(modesOpen){ e.preventDefault(); if(k==='Escape') closeModes(); return; }
+
   // DRILL PICKER overlay — arrows move, enter opens, 1-9 jump, esc/backslash close
   if(pickerOpen){
     e.preventDefault();
@@ -1583,14 +1696,14 @@ document.addEventListener('keydown',e=>{
     if(/^[1-9]$/.test(k)){ const key=MENU_ORDER[+k-1]; if(key){ closePicker(); loadChallenge(key); } return; }
     return;
   }
-  // open the picker with backslash (ignored while typing a formula)
-  if(k==='\\' && !editing && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); openPicker(); return; }
+  // open the picker with backslash (ignored while typing a formula or mid-marathon)
+  if(k==='\\' && !editing && gameMode!=='marathon' && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); openPicker(); return; }
 
   // AUTHENTIC sheet-switch (Ctrl+PgUp / Ctrl+PgDn) — only in installed/standalone app mode,
   // where there are no browser tabs to fight over. In a normal tab the browser owns these keys.
   if(IS_STANDALONE && (e.ctrlKey||e.metaKey) && (k==='PageUp'||k==='PageDown')){
     e.preventDefault();
-    if(!demoPlaying && !editing){ k==='PageDown' ? nextChallenge() : prevChallenge(); }
+    if(!demoPlaying && !editing && gameMode!=='marathon'){ k==='PageDown' ? nextChallenge() : prevChallenge(); }
     return;
   }
 
@@ -1617,6 +1730,7 @@ document.addEventListener('keydown',e=>{
 
   // RESULTS SCREEN — enter: again · space: next · esc: menu
   if(done){
+    if(gameMode==='marathon'){ e.preventDefault(); return; }   // marathon auto-advances; ignore input briefly
     if(k==='Enter'){ e.preventDefault(); loadChallenge(cur); return; }
     if(k===' '){ e.preventDefault(); nextChallenge(); return; }
     if(k==='Escape'){ e.preventDefault(); toMenu(); return; }
@@ -1637,11 +1751,11 @@ document.addEventListener('keydown',e=>{
     return;
   }
 
-  // GUIDED MODE — 'g' toggles paint-by-numbers (meta key; no clock, no keystroke count)
-  if((k==='g'||k==='G')&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
+  // GUIDED MODE — 'g' toggles paint-by-numbers (disabled during a marathon)
+  if((k==='g'||k==='G')&&gameMode!=='marathon'&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
 
-  // CHALLENGE SELECT (no-mouse): 1 / 2 / 3
-  if(!e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
+  // CHALLENGE SELECT (no-mouse): 1 / 2 / 3 — disabled during a marathon (drills are random)
+  if(gameMode!=='marathon' && !e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
     const keys=MENU_ORDER, idx=+k-1;
     if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); return; }
   }
@@ -1698,6 +1812,7 @@ function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
 $('startBtn').addEventListener('click', tryEnter);
+{ const cm=$('chipMarathon'); if(cm) cm.addEventListener('click', ()=>{ pendingMarathon=true; tryEnter(); }); }
 $('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
 $('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge(); });
 
@@ -1715,6 +1830,133 @@ function movePk(d){ const rows=pkRows(); if(!rows.length) return;
 function choosePk(){ const rows=pkRows(); const r=rows[pkSel]; if(r){ closePicker(); loadChallenge(r.dataset.key); } }
 $('drillPick').addEventListener('click', ()=>{ pickerOpen?closePicker():openPicker(); });
 $('picker').addEventListener('click', e=>{ if(e.target===$('picker')) closePicker(); });
+
+/* ============================================================
+   MARATHON MODE — random drills back-to-back against a clock
+   ============================================================ */
+let modesOpen=false, sessionOpen=false;
+
+function openModes(){ if(demoPlaying) return; modesOpen=true; $('modesModal').classList.add('show'); }
+function closeModes(){ modesOpen=false; const m=$('modesModal'); if(m) m.classList.remove('show'); }
+[...document.querySelectorAll('.mm-dur')].forEach(b=>{
+  b.addEventListener('click', ()=>{ const min=+b.dataset.min||5; closeModes(); startMarathon(min*60); });
+});
+$('mmCancel').addEventListener('click', closeModes);
+$('modesModal').addEventListener('click', e=>{ if(e.target===$('modesModal')) closeModes(); });
+$('marathonBtn').addEventListener('click', ()=>{ if(!demoPlaying) openModes(); });
+$('mhStop').addEventListener('click', ()=>{ endMarathon(); });
+
+function loadRandomDrill(){
+  const pool=MENU_ORDER.filter(k=>k!==lastKey);
+  const key=pool.length ? pool[Math.floor(Math.random()*pool.length)] : MENU_ORDER[0];
+  lastKey=key; loadChallenge(key);
+}
+function startMarathon(durSec){
+  closeModes(); closePicker(); hideResults(); hideSessionSummary();
+  gameMode='marathon';
+  guided=false; guidedUsed=false; updateGuideBtn();
+  marathon={ dur:durSec, startAt:0, endAt:0, splits:[], keys:0, checks:0, optimal:0, active:true, tickH:null };
+  lastKey=null;
+  document.body.classList.add('marathon');
+  marathon.tickH=setInterval(marathonTick, 200);
+  loadRandomDrill();
+  updateMarathonHud();
+}
+function marathonTick(){
+  if(!marathon || !marathon.active) return;
+  if(!marathon.endAt){ updateMarathonHud(); return; }   // not started until first keystroke
+  if(performance.now() >= marathon.endAt){ endMarathon(); return; }
+  updateMarathonHud();
+}
+function fmtClock(sec){ sec=Math.max(0,Math.ceil(sec)); const m=Math.floor(sec/60), s=sec%60;
+  return m+':'+String(s).padStart(2,'0'); }
+function updateMarathonHud(){
+  if(!marathon) return;
+  const left = marathon.endAt ? (marathon.endAt-performance.now())/1000 : marathon.dur;
+  const te=$('mhTime'); if(te){ te.textContent=fmtClock(left); te.classList.toggle('low', !!marathon.endAt && left<=10); }
+  const de=$('mhDrills'); if(de) de.textContent=marathon.splits.length;
+  const extra=(gameMode==='marathon' && !done)?keyLog.length:0;   // live keys for the in-progress drill
+  const ke=$('mhKeys'); if(ke) ke.textContent=marathon.keys+extra;
+}
+function marathonSolved(t, C){
+  marathon.splits.push({ key:cur, label:C.label||C.name||cur, t:+t.toFixed(2),
+    keys:keyLog.length, optimal:C.parKeys });
+  marathon.keys += keyLog.length;
+  marathon.checks += C.checks(S).length;
+  marathon.optimal += C.parKeys;
+  updateMarathonHud();
+  // out of time? end now. otherwise flash a quick confirm and auto-advance.
+  if(marathon.endAt && performance.now() >= marathon.endAt){ endMarathon(); return; }
+  const r=$('result'); if(r){ r.className='result win'; r.innerHTML='✓ '+t.toFixed(2)+'s — next…'; }
+  setTimeout(()=>{ if(gameMode==='marathon' && marathon && marathon.active) loadRandomDrill(); }, 480);
+}
+function endMarathon(){
+  if(!marathon) return;
+  marathon.active=false;
+  clearInterval(marathon.tickH); clearInterval(tickH); running=false;
+  $('timer').classList.remove('run');
+  marathon.elapsed = marathon.startAt ? Math.min((performance.now()-marathon.startAt)/1000, marathon.dur) : 0;
+  showSessionSummary();
+}
+function exitMarathon(){
+  if(marathon){ clearInterval(marathon.tickH); }
+  marathon=null; gameMode='classic';
+  document.body.classList.remove('marathon');
+  hideSessionSummary();
+  loadChallenge(MENU_ORDER[0]);
+}
+function hideSessionSummary(){ sessionOpen=false; const m=$('sessionModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
+function showSessionSummary(){
+  const s=marathon; const n=s.splits.length;
+  const avg = n ? (s.splits.reduce((a,b)=>a+b.t,0)/n) : 0;
+  const fastest = n ? s.splits.reduce((a,b)=>b.t<a.t?b:a) : null;
+  const eff = s.keys ? Math.round(s.optimal/s.keys*100) : 0;
+  const m=$('sessionModal');
+  m.innerHTML=`<div class="ss-card">`+
+    `<div class="ss-title">session complete</div>`+
+    `<div class="ss-big">${n}<span>drills</span></div>`+
+    `<div class="ss-sub">${fmtClock(s.dur)} marathon · ${avg?avg.toFixed(2)+'s avg':'—'}${fastest?' · fastest '+fastest.t.toFixed(2)+'s ('+escHtml(fastest.label)+')':''}</div>`+
+    `<div class="ss-stats">`+
+      `<div class="ss-stat"><div class="v">${n}</div><div class="l">drills</div></div>`+
+      `<div class="ss-stat"><div class="v">${s.checks}</div><div class="l">tasks cleared</div></div>`+
+      `<div class="ss-stat"><div class="v">${s.keys}</div><div class="l">keystrokes</div></div>`+
+      `<div class="ss-stat"><div class="v">${eff?eff+'%':'—'}</div><div class="l">key efficiency</div></div>`+
+    `</div>`+
+    (n ? `<div class="ss-graphwrap"><div class="ss-graphlabel">seconds per drill</div>${renderSessionGraph(s.splits)}</div>` : `<div class="sg-empty">no drills finished — give it another go</div>`)+
+    `<div class="ss-opts">`+
+      `<button class="ss-key primary" data-act="again"><kbd>↵</kbd>run again</button>`+
+      `<button class="ss-key" data-act="exit"><kbd>esc</kbd>back to drills</button>`+
+    `</div></div>`;
+  m.classList.add('show'); sessionOpen=true;
+  m.querySelectorAll('.ss-key').forEach(b=>b.addEventListener('click', ()=>{
+    if(b.dataset.act==='again') startMarathon(s.dur); else exitMarathon();
+  }));
+}
+function renderSessionGraph(splits){
+  const n=splits.length; if(!n) return '<div class="sg-empty">no drills completed</div>';
+  const W=500,H=160,padL=32,padR=12,padT=12,padB=22;
+  const ys=splits.map(s=>s.t);
+  const maxY=Math.max(...ys,1)*1.18;
+  const avg=ys.reduce((a,b)=>a+b,0)/n;
+  const X=i=> n===1 ? padL+(W-padL-padR)/2 : padL+(W-padL-padR)*(i/(n-1));
+  const Y=v=> padT+(H-padT-padB)*(1-v/maxY);
+  let grid='', ylab='';
+  for(let g=0; g<=3; g++){ const v=maxY*g/3, y=Y(v);
+    grid+=`<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}" class="sg-grid"/>`;
+    ylab+=`<text x="${padL-6}" y="${(y+3).toFixed(1)}" class="sg-axis" text-anchor="end">${v.toFixed(0)}s</text>`;
+  }
+  const pts=splits.map((s,i)=>`${X(i).toFixed(1)},${Y(s.t).toFixed(1)}`);
+  let body='';
+  if(n>=2){
+    const area=`M${X(0).toFixed(1)},${Y(0).toFixed(1)} L${pts.join(' L')} L${X(n-1).toFixed(1)},${Y(0).toFixed(1)} Z`;
+    body+=`<path d="${area}" class="sg-area"/><path d="M${pts.join(' L')}" class="sg-line"/>`;
+    const ay=Y(avg);
+    body+=`<line x1="${padL}" y1="${ay.toFixed(1)}" x2="${W-padR}" y2="${ay.toFixed(1)}" class="sg-avg"/>`;
+  }
+  const dots=splits.map((s,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(s.t).toFixed(1)}" r="3.2" class="sg-dot"><title>${escHtml(s.label)} — ${s.t}s, ${s.keys} keys</title></circle>`).join('');
+  const xlab=splits.map((s,i)=> (n<=10 || i%2===0) ? `<text x="${X(i).toFixed(1)}" y="${H-6}" class="sg-axis" text-anchor="middle">${i+1}</text>`:'').join('');
+  return `<svg viewBox="0 0 ${W} ${H}" class="sg-svg" preserveAspectRatio="xMidYMid meet">${grid}${ylab}${body}${dots}${xlab}</svg>`;
+}
 
 /* ---- guided demo player: replays the optimal keystrokes through the real engine ---- */
 const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
@@ -2032,7 +2274,9 @@ async function saveHandle(){
 function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 
 /* ---------- landing → app entry ---------- */
-function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone'); maybeOnboard(); }
+function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone');
+  if(pendingMarathon){ pendingMarathon=false; markOnboarded(); setTimeout(openModes, 640); return; }
+  maybeOnboard(); }
 function tryEnter(){ enterRequested=true; if(!sb){ dismissLanding(); return; } advanceAccess(); }
 
 /* ---------- first-run guided intro ---------- */
