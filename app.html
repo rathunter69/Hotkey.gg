@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Train — hotkey.gg</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -94,13 +95,17 @@
   td.bt.bb{box-shadow:inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent)}
   td.ball{box-shadow:inset 0 0 0 1.5px var(--accent)}
 
-  .ribbon{margin-top:12px; min-height:34px; display:flex; align-items:center; gap:7px;
-    font-family:var(--mono); font-size:12px; flex-wrap:wrap; opacity:0; transition:opacity .12s}
+  .ribbon{margin-top:12px; min-height:46px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:12px; opacity:0; transition:opacity .12s;
+    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:7px 11px}
   .ribbon.show{opacity:1}
-  .ribbon .path{color:var(--accent); margin-right:4px}
+  .ribbon .path{color:var(--accent); font-weight:500; margin-right:6px; letter-spacing:.2px}
+  .ribbon .rtab, .ribbon .opt{display:inline-flex; align-items:center; gap:6px; color:var(--text);
+    background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:5px 9px}
   .ribbon .opt{color:var(--muted)}
-  .ribbon .opt k{color:var(--text); background:var(--surface2); border:1px solid var(--line);
-    border-radius:4px; padding:1px 5px; margin-right:3px}
+  .ribbon .rtab k, .ribbon .opt k{display:inline-grid; place-items:center; min-width:18px; height:18px;
+    color:#06120c; background:var(--accent); border:none; border-radius:4px; padding:0 4px;
+    font-weight:700; font-size:11px}
 
   .bar{display:flex; align-items:center; gap:20px; margin-top:18px}
   .timer{font-family:var(--mono); font-size:38px; font-weight:700; letter-spacing:-1px;
@@ -122,12 +127,9 @@
   @keyframes flash{0%{background:var(--accent-glow)}100%{background:transparent}}
   .gridwrap.solved{animation:flash .5s ease-out}
 
-  .ribbon .rtab{color:var(--text); margin-right:2px}
-  .ribbon .rtab k{color:var(--text); background:var(--surface2); border:1px solid var(--line);
-    border-radius:4px; padding:1px 5px; margin-right:3px}
-  .ribbon .rtab.dim{color:var(--faint)}
-  .ribbon .rtab.dim k{color:var(--faint); background:transparent}
-  .ribbon .rnote{color:var(--warn); margin-left:8px}
+  .ribbon .rtab.dim{color:var(--faint); background:transparent; border-color:transparent}
+  .ribbon .rtab.dim k{color:var(--faint); background:var(--surface2)}
+  .ribbon .rnote{color:var(--warn); margin-left:6px}
 
   .pd-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none;
     align-items:center; justify-content:center; z-index:50}
@@ -269,7 +271,7 @@
   <header>
     <div class="brand">hotkey<b>.gg</b><span> / trainer</span></div>
     <div class="hdr-right">
-      <span class="hint-top"><kbd>alt</kbd> ribbon &nbsp;·&nbsp; <kbd>esc</kbd> restart</span>
+      <span class="hint-top"><kbd>alt</kbd> ribbon &nbsp;·&nbsp; <kbd>shift+f11</kbd> restart</span>
       <div class="auth-slot" id="authSlot"></div>
     </div>
   </header>
@@ -299,11 +301,11 @@
   <div class="help" id="help">
     <div class="help-sec"><h4>solving this one</h4><div id="helpReq"></div></div>
     <div class="help-sec"><h4>move &amp; select</h4>
-      <div><kbd>↑↓←→</kbd> move &nbsp; <kbd>ctrl+→</kbd> jump to edge &nbsp; <kbd>shift+→</kbd> select &nbsp; <kbd>ctrl+shift+→</kbd> select to edge</div></div>
+      <div><kbd>↑↓←→</kbd> move &nbsp; <kbd>ctrl+→</kbd> jump to edge &nbsp; <kbd>shift+→</kbd> select &nbsp; <kbd>ctrl+shift+→</kbd> select to edge &nbsp; <kbd>shift+space</kbd> row &nbsp; <kbd>ctrl+space</kbd> column</div></div>
     <div class="help-sec"><h4>commands</h4>
       <div><kbd>ctrl+c</kbd> copy &nbsp; <kbd>ctrl+b</kbd> bold &nbsp; <kbd>ctrl+z</kbd> undo &nbsp; <kbd>alt</kbd> opens the ribbon — pick a tab, then its keys (e.g. <kbd>h v s</kbd> or legacy <kbd>e s</kbd> for paste special; <kbd>h u s</kbd> for AutoSum)</div></div>
     <div class="help-sec"><h4>flow</h4>
-      <div><kbd>1/2/3</kbd> switch exercise &nbsp; <kbd>esc</kbd> restart &nbsp; on the results card: <kbd>enter</kbd> again · <kbd>space</kbd> next</div></div>
+      <div><kbd>1/2/3</kbd> switch exercise &nbsp; <kbd>shift+f11</kbd> restart &nbsp; <kbd>esc</kbd> cancel ribbon &nbsp; on the results card: <kbd>enter</kbd> again · <kbd>space</kbd> next</div></div>
   </div>
 </div>
 
@@ -327,8 +329,8 @@
    accounts, no leaderboard) — everything else works the same.
    The anon key is meant to be public; never paste the service key.
    ============================================================ */
-const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';   // ← your Project URL, e.g. https://abcd1234.supabase.co
-const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';   // ← your anon / public key
+const SUPABASE_URL      = '';   // ← your Project URL, e.g. https://abcd1234.supabase.co
+const SUPABASE_ANON_KEY = '';   // ← your anon / public key
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
@@ -818,6 +820,8 @@ function move(dr,dc,shift,ctrl){
   S.active={r:nr,c:nc};
   render();
 }
+function selectRow(){ S.sel={r:S.active.r,c:1}; S.active={r:S.active.r,c:COLS}; render(); }
+function selectCol(){ S.sel={r:1,c:S.active.c}; S.active={r:S.ROWS,c:S.active.c}; render(); }
 
 function codeToChar(code,k){
   if(/^Key[A-Z]$/.test(code)) return code.slice(3);
@@ -843,8 +847,10 @@ document.addEventListener('keydown',e=>{
     if(k==='Escape'){ e.preventDefault(); toMenu(); return; }
     e.preventDefault(); return;
   }
-  // ESC restarts the current run
-  if(k==='Escape'){ e.preventDefault(); if(mode==='ribbon'){exitRibbon(false);return;} loadChallenge(cur); return; }
+  // SHIFT+F11 restarts the run (Excel: "insert new sheet" — fresh start). ESC no longer restarts.
+  if(k==='F11' && e.shiftKey){ e.preventDefault(); loadChallenge(cur); return; }
+  // ESC only backs out of the ribbon now (matches Excel; frees Esc for normal use)
+  if(k==='Escape'){ e.preventDefault(); if(mode==='ribbon'){ exitRibbon(false); } return; }
 
   // RIBBON MODE — read physical key code so Mac Option / non-US layouts still work
   if(mode==='ribbon'){
@@ -871,6 +877,12 @@ document.addEventListener('keydown',e=>{
     if(lk==='z'&&e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+Y'); redoAct(); return; }
     if(lk==='z'){ e.preventDefault(); startClock(); logKey('Ctrl+Z'); undoAct(); return; }
     if(lk==='y'){ e.preventDefault(); startClock(); logKey('Ctrl+Y'); redoAct(); return; }
+  }
+
+  // ROW / COLUMN SELECTION — Excel: shift+space (row), ctrl+space (column)
+  if(k===' '){
+    if(e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); startClock(); logKey('Shift+Space'); selectRow(); return; }
+    if(e.ctrlKey || e.metaKey){ e.preventDefault(); startClock(); logKey('Ctrl+Space'); selectCol(); return; }
   }
 
   // ENTER ribbon
