@@ -182,6 +182,7 @@
   .guide-toggle{font-family:var(--mono); font-size:11px; color:var(--muted); background:none;
     border:1px solid var(--line); border-radius:7px; padding:5px 10px; cursor:pointer; transition:.15s; margin-right:8px}
   .toprow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:2px}
+  .mode-ctrls{display:flex; align-items:center; gap:8px}
   .toprow .guide-toggle{margin-right:0; font-size:12px; padding:6px 12px}
   .guide-toggle:hover{color:var(--text); border-color:var(--faint)}
   .guide-toggle.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
@@ -298,7 +299,10 @@
 
   <div class="toprow">
     <div class="tabs" id="tabs"></div>
-    <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
+    <div class="mode-ctrls">
+      <button class="guide-toggle" id="demoBtn">▶ watch solution</button>
+      <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
+    </div>
   </div>
   <div class="prompt" id="prompt"></div>
   <div class="fbar">
@@ -381,6 +385,10 @@ const CHALLENGES = {
     req:'<em>keyboard only</em> · select B, <em>ctrl c</em>, then <em>alt e s v ↵</em> — don\'t move the cursor before pasting, so the values land back on B',
     guide:['on B2, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> to grab the column · copy <kbd>ctrl</kbd>+<kbd>c</kbd> · paste values <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd>'],
     targets:[function(){return 'B2:B'+(this._n+1);}],
+    demo(){ const last='B'+(this._n+1); return [
+      {sel:'B2:'+last, keys:[Kb.copy]},
+      {sel:'B2:'+last, keys:[Kb.alt,L('E'),L('S'),L('V'),Kb.enter]},
+    ]; },
     build(){
       const n = rnd(8,11);
       const cells = {};
@@ -426,6 +434,12 @@ const CHALLENGES = {
       'select B:D · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
     ],
     targets:['A1:E1','B2:D6','E2:E6','B2:D6'],
+    demo(){ return [
+      {sel:'A1:E1', keys:[Kb.bold]},
+      {sel:'B2:D6', keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:'E2:E6', keys:[Kb.alt,L('H'),L('W')]},
+      {sel:'B2:D6', keys:[Kb.alt,L('H'),L('O'),L('I')]},
+    ]; },
     build(){
       const cells={};
       const heads=['name','rev','ebitda','debt','notes'];
@@ -467,6 +481,13 @@ const CHALLENGES = {
       'select column B · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
     ],
     targets:['B2:B4','B5','B5','B2:B5','B2:B5'],
+    demo(){ return [
+      {sel:'B2:B4', keys:[Kb.alt,L('H'),L('H')]},
+      {sel:'B5', keys:[Kb.eq]},
+      {sel:'B5', keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
+      {sel:'B2:B5', keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:'B2:B5', keys:[Kb.alt,L('H'),L('O'),L('I')]},
+    ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:'Sources',txt:true,bold:true};
@@ -508,6 +529,12 @@ const CHALLENGES = {
       'select the share count · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>!</kbd> · drop decimals <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
     ],
     targets:['B2:B3','B4:B5','B6'],
+    demo(){ return [
+      {sel:'B2:B3', keys:[Kb.pct]},
+      {sel:'B3', keys:[Kb.alt,L('H'),D(0)]},
+      {sel:'B4:B5', keys:[Kb.cur,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:'B6', keys:[Kb.com,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+    ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:'Metric',txt:true,bold:true};
@@ -545,6 +572,7 @@ const CHALLENGES = {
 let S, cur='drill', colW=[], started=0, finished=0, running=false, tickH=null;
 let mouseUsed=false, mode='normal', path=[], dialog=null, done=false, pasteKind=null, pendingFlash=null;
 let guided=false, guidedUsed=false;
+let demoPlaying=false;
 let undoStack=[], redoStack=[], keyLog=[];
 let PB = {};
 
@@ -763,7 +791,7 @@ function stopClock(){ running=false; clearInterval(tickH); finished=performance.
   $('timer').classList.remove('run'); }
 
 function checkWin(){
-  if(done) return;
+  if(done||demoPlaying) return;
   if(gradePass()){
     const t=(performance.now()-started)/1000;
     stopClock(); done=true; $('timer').textContent=t.toFixed(2);
@@ -936,6 +964,8 @@ document.addEventListener('keydown',e=>{
   const k=e.key;
   // let text fields (auth email/handle) receive their own keystrokes
   if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+  // during the demo, ignore real user input (synthetic demo keys are not trusted, so they pass)
+  if(demoPlaying && e.isTrusted){ e.preventDefault(); if(k==='Escape') cancelDemo(); return; }
   // while the sign-in modal is open, the trainer ignores keys (esc closes it)
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
   if(gateOpen){ return; }
@@ -1024,8 +1054,46 @@ $('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-ke
 function toggleHelp(){ $('help').classList.toggle('show'); }
 $('helpToggle').addEventListener('click',toggleHelp);
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
-function toggleGuided(){ guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
+function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
+
+/* ---- guided demo player: replays the optimal keystrokes through the real engine ---- */
+const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
+  copy:{key:'c',ctrl:true}, bold:{key:'b',ctrl:true},
+  pct:{key:'%',ctrl:true,shift:true}, cur:{key:'$',ctrl:true,shift:true}, com:{key:'!',ctrl:true,shift:true},
+  eq:{key:'=',alt:true,code:'Equal'} };
+function L(ch){ return {key:ch.toLowerCase(), code:'Key'+ch.toUpperCase()}; }
+function D(n){ return {key:String(n), code:'Digit'+n}; }
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function setDemoSel(str){ const r=resolveRange(str); if(!r) return;
+  if(r.r1===r.r2&&r.c1===r.c2){ S.active={r:r.r1,c:r.c1}; S.sel=null; }
+  else { S.sel={r:r.r1,c:r.c1}; S.active={r:r.r2,c:r.c2}; }
+  render(); }
+function demoKey(spec){ document.dispatchEvent(new KeyboardEvent('keydown',{
+  key:spec.key, code:spec.code||'', ctrlKey:!!spec.ctrl, shiftKey:!!spec.shift, altKey:!!spec.alt,
+  bubbles:true, cancelable:true })); }
+function updateDemoBtn(){ const b=$('demoBtn'); if(b){ b.classList.toggle('on',demoPlaying);
+  b.innerHTML=demoPlaying?'<kbd>esc</kbd> stop demo':'▶ watch solution'; } }
+function cancelDemo(){ demoPlaying=false; }
+async function playDemo(){
+  if(demoPlaying||!S) return;
+  loadChallenge(cur);
+  const C=CHALLENGES[cur]; const moves = typeof C.demo==='function'?C.demo.call(C):C.demo;
+  if(!moves) return;
+  demoPlaying=true; updateDemoBtn();
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='▶ watch the optimal keystrokes — then it’s your turn'; }
+  await sleep(550);
+  for(const mv of moves){ if(!demoPlaying) break;
+    setDemoSel(mv.sel); await sleep(620);
+    for(const k of mv.keys){ if(!demoPlaying) break; demoKey(k); await sleep(360); }
+    await sleep(220);
+  }
+  await sleep(demoPlaying?1100:150);
+  demoPlaying=false; updateDemoBtn();
+  loadChallenge(cur);
+  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — first keystroke starts the clock'; }
+}
+$('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo(); });
 
 /* ============================================================
    LOAD / RESET
@@ -1056,7 +1124,7 @@ function buildTabs(){
     const C=CHALLENGES[key];
     const b=document.createElement('button'); b.className='tab'+(key===cur?' on':'');
     b.innerHTML=`<span class="lvl">${String(i).padStart(2,'0')}</span>${C.label}`;
-    b.onclick=()=>{ [...t.children].forEach(x=>x.classList.remove('on')); b.classList.add('on'); loadChallenge(key); };
+    b.onclick=()=>{ if(demoPlaying) return; [...t.children].forEach(x=>x.classList.remove('on')); b.classList.add('on'); loadChallenge(key); };
     t.appendChild(b); i++;
   }
 }
