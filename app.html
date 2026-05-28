@@ -327,8 +327,8 @@
    accounts, no leaderboard) — everything else works the same.
    The anon key is meant to be public; never paste the service key.
    ============================================================ */
-const SUPABASE_URL      = '';   // ← your Project URL, e.g. https://abcd1234.supabase.co
-const SUPABASE_ANON_KEY = '';   // ← your anon / public key
+const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co/rest/v1/';   // ← your Project URL, e.g. https://abcd1234.supabase.co
+const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';   // ← your anon / public key
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
