@@ -70,6 +70,7 @@
   td.bold{font-weight:700}
   td.fill-blue{background:#16344e !important; color:#9fd0f4}
   td.over{color:var(--warn); letter-spacing:1px}
+  td.editing{text-align:left; color:var(--text); box-shadow:inset 0 0 0 2px var(--accent); background:var(--bg)}
   @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
   td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
   td.active{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow); z-index:2}
@@ -563,6 +564,50 @@ const CHALLENGES = {
         {label:'share count → comma, 0 dec', ok: com('B6')},
       ];
     }
+  },
+  margin:{
+    name:'Formula', label:'Build the margin', par:42, parKeys:34,
+    prompt:'Calculate each company\'s EBITDA margin with a live formula — EBITDA ÷ revenue — typed into the Margin column, then format that column as a percentage to one decimal.',
+    req:'<em>type the formula</em> · in each margin cell type <em>=C2/B2</em> then <em>↵</em> · then select the column, <em>ctrl+shift+%</em>, and <em>alt h 0</em> for one decimal',
+    guide:[
+      'in D2 type <kbd>=</kbd> <kbd>C</kbd> <kbd>2</kbd> <kbd>/</kbd> <kbd>B</kbd> <kbd>2</kbd> <kbd>↵</kbd> — then the same down the column (D3 =C3/B3, D4 =C4/B4)',
+      'select the margin column · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
+    ],
+    targets:['D2:D4','D2:D4'],
+    demo(){ return [
+      {sel:'D2', keys:[...T('=C2/B2'), Kb.enter]},
+      {sel:'D3', keys:[...T('=C3/B3'), Kb.enter]},
+      {sel:'D4', keys:[...T('=C4/B4'), Kb.enter]},
+      {sel:'D2:D4', keys:[Kb.pct, Kb.alt, L('H'), D(0)]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Company',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'Revenue',txt:true,bold:true};
+      cells['C1']={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells['D1']={...blankCell(),value:'Margin',txt:true,bold:true};
+      const names=['Atlas Co','Borealis','Cygnus Ltd'];
+      for(let r=2;r<=4;r++){
+        const rev=rnd(400,1800)*1000;
+        const eb=Math.round(rev*(rnd(15,38)/100));
+        cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
+        cells['B'+r]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),value:eb,fmtStyle:'comma',decimals:0};
+      }
+      return {ROWS:4, cells, active:{r:2,c:4}, sel:null, colW:{1:120,2:96,3:96,4:96}};
+    },
+    checks(S){
+      const fOk=(r)=>{ const c=S.cells['D'+r]; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        const refOk=f.includes('C'+r)&&f.includes('B'+r)&&f.includes('/');
+        const B=S.cells['B'+r].value, C=S.cells['C'+r].value;
+        return refOk && B!==0 && Math.abs(c.value-(C/B))<1e-6; };
+      const fmtOk=(r)=>{ const c=S.cells['D'+r]; return !!(c&&c.fmtStyle==='percent'&&c.decimals===1); };
+      return [
+        {label:'margin = EBITDA ÷ revenue (live formula, all rows)', ok: fOk(2)&&fOk(3)&&fOk(4)},
+        {label:'format the margins as % to 1 decimal', ok: fmtOk(2)&&fmtOk(3)&&fmtOk(4)},
+      ];
+    }
   }
 };
 
@@ -573,6 +618,7 @@ let S, cur='drill', colW=[], started=0, finished=0, running=false, tickH=null;
 let mouseUsed=false, mode='normal', path=[], dialog=null, done=false, pasteKind=null, pendingFlash=null;
 let guided=false, guidedUsed=false;
 let demoPlaying=false;
+let editing=false, editBuf='';
 let undoStack=[], redoStack=[], keyLog=[];
 let PB = {};
 
@@ -637,6 +683,42 @@ function evalSum(expr){
   let s=0; for(let r=Math.min(r1,r2);r<=Math.max(r1,r2);r++){ const x=get(r,c1); if(typeof x.value==='number') s+=x.value; }
   return s;
 }
+function rangeRefs(a,b){ const pa=parseRef(a),pb=parseRef(b); const out=[]; if(!pa||!pb) return out;
+  for(let r=Math.min(pa.r,pb.r);r<=Math.max(pa.r,pb.r);r++)
+    for(let c=Math.min(pa.c,pb.c);c<=Math.max(pa.c,pb.c);c++) out.push(colLetter(c)+r);
+  return out; }
+function cellNum(ref){ const c=S.cells[ref]; return c&&typeof c.value==='number'?c.value:0; }
+function evalFormula(expr){
+  let s=String(expr).replace(/^=/,''), i=0;
+  const skip=()=>{ while(s[i]===' ') i++; };
+  const flat=args=>args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellNum):[a.val]).flat();
+  function fn(name,args){ const xs=flat(args);
+    switch(name){
+      case 'SUM': return xs.reduce((a,b)=>a+b,0);
+      case 'AVERAGE': case 'AVG': return xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:0;
+      case 'MIN': return Math.min(...xs);
+      case 'MAX': return Math.max(...xs);
+      case 'ABS': return Math.abs(xs[0]);
+      case 'ROUND': return Math.round(xs[0]*Math.pow(10,xs[1]||0))/Math.pow(10,xs[1]||0);
+      default: throw new Error('fn '+name);
+    } }
+  function expr_(){ let v=term(); skip(); while(s[i]==='+'||s[i]==='-'){ const o=s[i++]; const t=term(); v=o==='+'?v+t:v-t; skip(); } return v; }
+  function term(){ let v=fac(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=fac(); v=o==='*'?v*f:v/f; skip(); } return v; }
+  function fac(){ skip();
+    if(s[i]==='('){ i++; const v=expr_(); skip(); if(s[i]!==')') throw new Error('paren'); i++; return v; }
+    if(s[i]==='-'){ i++; return -fac(); }
+    if(s[i]==='+'){ i++; return fac(); }
+    let m=/^\d*\.?\d+/.exec(s.slice(i)); if(m){ i+=m[0].length; return parseFloat(m[0]); }
+    let id=/^[A-Za-z]+\d*/.exec(s.slice(i)); if(id){ const tok=id[0]; i+=tok.length; skip();
+      if(s[i]==='('){ i++; const a=argList(); skip(); if(s[i]!==')') throw new Error('fnparen'); i++; return fn(tok.toUpperCase(),a); }
+      return cellNum(tok.toUpperCase()); }
+    throw new Error('unexpected'); }
+  function argList(){ const a=[]; skip(); if(s[i]===')') return a; a.push(arg()); skip(); while(s[i]===','){ i++; a.push(arg()); skip(); } return a; }
+  function arg(){ skip(); const rng=/^([A-Za-z]+\d+)\s*:\s*([A-Za-z]+\d+)/.exec(s.slice(i));
+    if(rng){ i+=rng[0].length; return {range:[rng[1].toUpperCase(),rng[2].toUpperCase()]}; }
+    return {val:expr_()}; }
+  const r=expr_(); skip(); if(i<s.length) throw new Error('trailing'); return r;
+}
 function autoSum(){
   const {r,c}=S.active;
   let top=r-1; while(top>=1 && typeof get(top,c).value==='number') top--; top++;
@@ -681,7 +763,8 @@ function render(){
       if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2) cls.push('gtarget');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
       let txt=dispText(cell);
-      if(isNum(cell)&&!cell.wrap){
+      if(editing && isActive){ txt=editBuf+'▏'; cls.push('editing'); }
+      else if(isNum(cell)&&!cell.wrap){
         const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals).length*CHARPX+12;
         if(tw>colW[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(colW[c]/8))); }
       }
@@ -712,6 +795,8 @@ function positionMarquee(){
   m.style.height=(br.bottom-ar.top)+'px';
 }
 function updateFormulaBar(){
+  if(editing){ $('nameBox').textContent=ck(S.active.r,S.active.c);
+    const fc=$('fContent'); fc.className='fcontent isfx'; fc.textContent=editBuf; return; }
   const cell=get(S.active.r,S.active.c);
   $('nameBox').textContent=ck(S.active.r,S.active.c);
   const fc=$('fContent');
@@ -836,6 +921,21 @@ function syncTabs(){ const keys=Object.keys(CHALLENGES); const t=$('tabs'); if(!
   [...t.children].forEach((b,i)=>b.classList.toggle('on', keys[i]===cur)); }
 
 function commitAction(){ render(); checkWin(); }
+
+function startEdit(initial){ if(done) return; startClock(); editing=true; editBuf=initial; render(); }
+function cancelEdit(){ editing=false; editBuf=''; render(); }
+function commitEdit(dr,dc){
+  const buf=editBuf.trim(); editing=false; editBuf='';
+  if(buf!==''){
+    pushUndo();
+    const cell=ensure(S.active.r,S.active.c);
+    if(buf[0]==='='){ cell.formula=buf; let v; try{ v=evalFormula(buf); }catch(_){ v=NaN; } cell.value=isFinite(v)?v:0; cell.txt=false; }
+    else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf); cell.txt=false; }
+    else { cell.formula=null; cell.value=buf; cell.txt=true; }
+  }
+  if(dr||dc){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
+  commitAction();
+}
 
 function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
 function updateChecklist(){
@@ -971,6 +1071,25 @@ document.addEventListener('keydown',e=>{
   if(gateOpen){ return; }
   // never let browser zoom combos (ctrl/cmd +/-/0) collide with the grid
   if((e.ctrlKey||e.metaKey)&&(k==='='||k==='+'||k==='-'||k==='_'||k==='0')){ e.preventDefault(); return; }
+
+  // CELL EDITING — captures all typing until commit/cancel
+  if(editing){
+    e.preventDefault();
+    if(k==='Enter'){ commitEdit(1,0); return; }
+    if(k==='Tab'){ commitEdit(0,1); return; }
+    if(k==='Escape'){ cancelEdit(); return; }
+    if(k==='Backspace'){ editBuf=editBuf.slice(0,-1); logKey('⌫'); render(); return; }
+    const EARR={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+    if(EARR[k]){ commitEdit(EARR[k][0],EARR[k][1]); return; }
+    if(k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey){ editBuf+=k; logKey(k); render(); return; }
+    return;
+  }
+  // start editing: '=' begins a formula, F2 edits existing content (letters/digits stay as shortcuts)
+  if(mode==='normal' && !done){
+    if(k==='=' && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); startEdit('='); logKey('='); render(); return; }
+    if(k==='F2'){ e.preventDefault(); const c=get(S.active.r,S.active.c); startEdit(c.formula||(c.value!=null&&c.value!==''?String(c.value):'')); render(); return; }
+  }
+
   // RESULTS SCREEN — enter: again · space: next · esc: menu
   if(done){
     if(k==='Enter'){ e.preventDefault(); loadChallenge(cur); return; }
@@ -1064,6 +1183,7 @@ const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
   eq:{key:'=',alt:true,code:'Equal'} };
 function L(ch){ return {key:ch.toLowerCase(), code:'Key'+ch.toUpperCase()}; }
 function D(n){ return {key:String(n), code:'Digit'+n}; }
+function T(str){ return [...str].map(ch=>({key:ch})); }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function setDemoSel(str){ const r=resolveRange(str); if(!r) return;
   if(r.r1===r.r2&&r.c1===r.c2){ S.active={r:r.r1,c:r.c1}; S.sel=null; }
