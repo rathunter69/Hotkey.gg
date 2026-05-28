@@ -608,6 +608,57 @@ const CHALLENGES = {
         {label:'format the margins as % to 1 decimal', ok: fmtOk(2)&&fmtOk(3)&&fmtOk(4)},
       ];
     }
+  },
+  schedule:{
+    name:'Schedule', label:'Roll it forward', par:60, parKeys:52,
+    prompt:'Complete this four-year PP&E roll-forward. Each year\'s ending balance is beginning minus depreciation — and each new year must begin where the prior year ended. Build it with live formulas, not hardcoded numbers.',
+    req:'<em>type formulas</em> · ending = beginning − depreciation (e.g. <em>=B2-B3</em>) · then link each year\'s beginning to the prior year\'s ending (e.g. <em>=B4</em> in C2)',
+    guide:[
+      'fill the Ending row: in B4 type <kbd>=</kbd><kbd>B</kbd><kbd>2</kbd><kbd>-</kbd><kbd>B</kbd><kbd>3</kbd> <kbd>↵</kbd>, then C4 =C2-C3, D4 =D2-D3, E4 =E2-E3',
+      'link each Beginning to the prior Ending: in C2 type <kbd>=</kbd><kbd>B</kbd><kbd>4</kbd> <kbd>↵</kbd>, then D2 =C4, E2 =D4',
+    ],
+    targets:['B4:E4','C2:E2'],
+    demo(){ return [
+      {sel:'B4', keys:[...T('=B2-B3'), Kb.enter]},
+      {sel:'C2', keys:[...T('=B4'), Kb.enter]},
+      {sel:'C4', keys:[...T('=C2-C3'), Kb.enter]},
+      {sel:'D2', keys:[...T('=C4'), Kb.enter]},
+      {sel:'D4', keys:[...T('=D2-D3'), Kb.enter]},
+      {sel:'E2', keys:[...T('=D4'), Kb.enter]},
+      {sel:'E4', keys:[...T('=E2-E3'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      const num=(v)=>({...blankCell(),value:v,fmtStyle:'comma',decimals:0});
+      const blankNum=()=>({...blankCell(),fmtStyle:'comma',decimals:0});
+      cells['A1']={...blankCell(),value:'PP&E roll-forward',txt:true,bold:true};
+      ['Yr 1','Yr 2','Yr 3','Yr 4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true});
+      cells['A2']={...blankCell(),value:'Beginning',txt:true};
+      cells['A3']={...blankCell(),value:'Depreciation',txt:true};
+      cells['A4']={...blankCell(),value:'Ending',txt:true};
+      const begin=rnd(50,90)*100;                 // 5,000–9,000
+      const dep=Math.round(begin/rnd(8,12)/50)*50; // straight-line, clean to nearest 50
+      cells['B2']=num(begin);
+      for(let c=2;c<=5;c++) cells[colLetter(c)+3]=num(dep);   // depreciation given each year
+      // answer cells start empty but pre-formatted so results display cleanly
+      cells['B4']=blankNum();
+      for(let c=3;c<=5;c++){ cells[colLetter(c)+2]=blankNum(); cells[colLetter(c)+4]=blankNum(); }
+      return {ROWS:4, cells, active:{r:4,c:2}, sel:null, colW:{1:126,2:74,3:74,4:74,5:74}};
+    },
+    checks(S){
+      const COL=['B','C','D','E'];
+      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
+      const endOk=i=>{ const col=COL[i], c=S.cells[col+'4']; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        return f.includes(col+'2')&&f.includes(col+'3')&&f.includes('-')&&Math.abs(c.value-(val(col+'2')-val(col+'3')))<1e-6; };
+      const begOk=i=>{ const col=COL[i], prev=COL[i-1], c=S.cells[col+'2']; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        return f.includes(prev+'4')&&Math.abs(c.value-val(prev+'4'))<1e-6; };
+      return [
+        {label:'ending = beginning − depreciation (all 4 years, formulas)', ok: endOk(0)&&endOk(1)&&endOk(2)&&endOk(3)},
+        {label:'each year begins where the prior year ended', ok: begOk(1)&&begOk(2)&&begOk(3)},
+      ];
+    }
   }
 };
 
@@ -920,7 +971,17 @@ function toMenu(){ loadChallenge(cur); const r=$('result'); r.className='result'
 function syncTabs(){ const keys=Object.keys(CHALLENGES); const t=$('tabs'); if(!t) return;
   [...t.children].forEach((b,i)=>b.classList.toggle('on', keys[i]===cur)); }
 
-function commitAction(){ render(); checkWin(); }
+function recalc(){
+  for(let pass=0; pass<8; pass++){
+    let changed=false;
+    for(const k in S.cells){ const c=S.cells[k]; if(c && c.formula){
+      let v; try{ v=evalFormula(c.formula); }catch(_){ v=c.value; }
+      if(isFinite(v) && v!==c.value){ c.value=v; changed=true; }
+    }}
+    if(!changed) break;
+  }
+}
+function commitAction(){ recalc(); render(); checkWin(); }
 
 function startEdit(initial){ if(done) return; startClock(); editing=true; editBuf=initial; render(); }
 function cancelEdit(){ editing=false; editBuf=''; render(); }
