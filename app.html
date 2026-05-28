@@ -287,50 +287,23 @@
   .gate-brand{font-family:var(--mono); font-weight:700; font-size:22px; letter-spacing:-.5px; margin-bottom:16px}
   .gate-brand b{color:var(--accent)}
   .gate .auth-card p b{color:var(--text)}
-  /* ---- drill bar + picker overlay ---- */
-  .drillbar{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:12px}
-  .drill-menu-btn{display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-size:13px;
-    color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:9px;
-    padding:8px 13px; cursor:pointer; transition:.15s; max-width:100%}
-  .drill-menu-btn:hover{border-color:var(--accent-dim); background:var(--accent-glow)}
-  .drill-menu-btn .dm-ico{color:var(--accent); font-size:13px}
-  .drill-menu-btn .dm-num{color:var(--muted); font-size:11px}
-  .drill-menu-btn .dm-name{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .drill-menu-btn .dm-caret{color:var(--muted); font-size:10px; margin-left:1px}
-  .drill-step{display:flex; gap:4px}
-  .drill-step .step{font-family:var(--mono); font-size:16px; line-height:1; color:var(--muted); background:var(--surface);
-    border:1px solid var(--line); border-radius:8px; width:32px; height:35px; cursor:pointer; transition:.15s}
-  .drill-step .step:hover{color:var(--text); border-color:var(--accent-dim)}
-  .drillbar .spacer{flex:1 1 auto}
-  .nav-hint{font-family:var(--mono); font-size:10.5px; color:var(--faint); white-space:nowrap}
+  /* ---- top exercise row + bottom sheet tabs ---- */
+  .exrow{display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px}
+  .exrow .prompt{flex:1 1 320px; margin:0}
+  .mode-ctrls{display:flex; align-items:center; gap:8px; flex:none}
 
-  .drill-overlay{position:fixed; inset:0; z-index:80; display:none; align-items:flex-start; justify-content:center;
-    background:rgba(6,7,8,.66); backdrop-filter:blur(3px); padding:6vh 16px 16px; overflow-y:auto}
-  .drill-overlay.show{display:flex; animation:doFade .16s ease}
-  @keyframes doFade{from{opacity:0}to{opacity:1}}
-  .do-panel{width:100%; max-width:560px; background:var(--surface); border:1px solid var(--line); border-radius:16px;
-    box-shadow:0 24px 80px rgba(0,0,0,.5); overflow:hidden; animation:doRise .2s cubic-bezier(.2,.7,.2,1)}
-  @keyframes doRise{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
-  .do-head{display:flex; align-items:center; justify-content:space-between; padding:16px 18px 11px}
-  .do-title{font-family:var(--mono); font-size:15px; font-weight:700; letter-spacing:-.3px}
-  .do-close{font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface2);
-    border:1px solid var(--line); border-radius:7px; padding:6px 10px; cursor:pointer; transition:.15s}
-  .do-close:hover{color:var(--text); border-color:var(--accent-dim)}
-  .do-hint{font-family:var(--mono); font-size:11px; color:var(--muted); padding:0 18px 13px; border-bottom:1px solid var(--line)}
-  .do-hint kbd{font-family:var(--mono); color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px}
-  .do-body{padding:8px 10px 14px; max-height:62vh; overflow-y:auto}
-  .do-group{font-family:var(--mono); font-size:10px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); padding:13px 11px 6px}
-  .do-item{display:flex; align-items:center; gap:13px; width:100%; text-align:left; background:none; border:1px solid transparent;
-    border-radius:10px; padding:10px 11px; cursor:pointer; transition:.12s; color:var(--text)}
-  .do-item:hover{background:var(--surface2); border-color:var(--line)}
-  .do-item.on{background:var(--accent-glow); border-color:var(--accent-dim)}
-  .di-num{font-family:var(--mono); font-size:11px; color:var(--muted); flex:none; width:20px; text-align:right}
-  .do-item.on .di-num{color:var(--accent)}
-  .di-main{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
-  .di-name{font-family:var(--sans); font-size:14px; font-weight:600}
-  .di-desc{font-family:var(--sans); font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .di-meta{font-family:var(--mono); font-size:10.5px; color:var(--faint); flex:none; white-space:nowrap}
-  @media(max-width:560px){ .di-meta{display:none} .di-desc{white-space:normal} }
+  .sheets{display:flex; align-items:stretch; gap:2px; margin-top:12px; border-bottom:1px solid var(--line)}
+  .sheet-nav{font-family:var(--mono); font-size:15px; line-height:1; color:var(--muted); background:none; border:none;
+    cursor:pointer; padding:0 7px 7px; transition:color .13s; align-self:flex-end}
+  .sheet-nav:hover{color:var(--accent)}
+  .sheet-tabs{display:flex; gap:3px; overflow-x:auto; flex:1 1 auto; padding-top:6px; scrollbar-width:none}
+  .sheet-tabs::-webkit-scrollbar{display:none}
+  .sheet{font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
+    border:1px solid var(--line); border-bottom:none; border-radius:7px 7px 0 0; padding:7px 13px;
+    white-space:nowrap; cursor:pointer; transition:.13s; position:relative; top:1px}
+  .sheet:hover{color:var(--text); background:var(--surface2)}
+  .sheet.on{color:var(--accent); background:var(--surface2); border-color:var(--accent-dim);
+    box-shadow:inset 0 2px 0 var(--accent); top:0; font-weight:600}
 </style>
 </head>
 <body>
@@ -343,31 +316,24 @@
     </div>
   </header>
 
-  <div class="drillbar">
-    <button class="drill-menu-btn" id="drillMenuBtn" title="browse all drills">
-      <span class="dm-ico">▦</span>
-      <span class="dm-num" id="dmNum">01</span>
-      <span class="dm-name" id="dmName">—</span>
-      <span class="dm-caret">▾</span>
-    </button>
-    <div class="drill-step">
-      <button class="step" id="prevDrill" title="previous drill">‹</button>
-      <button class="step" id="nextDrill" title="next drill">›</button>
-    </div>
-    <span class="nav-hint">click for all · <kbd>1</kbd>–<kbd>9</kbd> jump</span>
-    <div class="spacer"></div>
+  <div class="exrow">
+    <div class="prompt" id="prompt"></div>
     <div class="mode-ctrls">
       <button class="guide-toggle" id="demoBtn">▶ watch solution</button>
       <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
     </div>
   </div>
-  <div class="prompt" id="prompt"></div>
   <div class="fbar">
     <span class="namebox" id="nameBox">A1</span>
     <span class="fx"><i>fx</i></span>
     <span class="fcontent empty" id="fContent">empty</span>
   </div>
   <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
+  <div class="sheets">
+    <button class="sheet-nav" id="prevDrill" title="previous drill">‹</button>
+    <div class="sheet-tabs" id="sheetTabs"></div>
+    <button class="sheet-nav" id="nextDrill" title="next drill">›</button>
+  </div>
   <div class="checklist" id="checklist"></div>
   <div class="ribbon" id="ribbon"></div>
 
@@ -389,18 +355,7 @@
     <div class="help-sec"><h4>commands</h4>
       <div><kbd>ctrl+c</kbd> copy &nbsp; <kbd>ctrl+b</kbd> bold &nbsp; <kbd>ctrl+z</kbd> undo &nbsp; <kbd>alt</kbd> opens the ribbon — pick a tab, then its keys (e.g. <kbd>h v s</kbd> or legacy <kbd>e s</kbd> for paste special; <kbd>h u s</kbd> for AutoSum)</div></div>
     <div class="help-sec"><h4>flow</h4>
-      <div><kbd>▦ drills</kbd> menu (top-left) or <kbd>1</kbd>–<kbd>9</kbd> jump &nbsp; <kbd>‹ ›</kbd> prev/next &nbsp; <kbd>shift+f11</kbd> restart &nbsp; <kbd>esc</kbd> cancel ribbon &nbsp; on the results card: <kbd>enter</kbd> again · <kbd>space</kbd> next<br><span style="color:var(--faint)">in the installed app: <kbd>ctrl+pgup</kbd> / <kbd>ctrl+pgdn</kbd> switch drills like Excel sheets (browser tabs block these in a normal tab)</span></div></div>
-  </div>
-</div>
-
-<div class="drill-overlay" id="drillOverlay">
-  <div class="do-panel">
-    <div class="do-head">
-      <div class="do-title">Choose a drill</div>
-      <button class="do-close" id="drillClose">close · esc</button>
-    </div>
-    <div class="do-hint">Click any drill to start &nbsp;·&nbsp; press <kbd>1</kbd>–<kbd>9</kbd> to jump &nbsp;·&nbsp; <kbd>esc</kbd> to close</div>
-    <div class="do-body" id="drillList"></div>
+      <div>switch drills with the <kbd>sheet tabs</kbd> below the grid, the <kbd>‹ ›</kbd> arrows, or <kbd>1</kbd>–<kbd>9</kbd> &nbsp; <kbd>shift+f11</kbd> restart &nbsp; <kbd>esc</kbd> cancel ribbon &nbsp; on the results card: <kbd>enter</kbd> again · <kbd>space</kbd> next</div></div>
   </div>
 </div>
 
@@ -1293,12 +1248,10 @@ function prevChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_OR
 function toMenu(){ loadChallenge(cur); const r=$('result'); r.className='result';
   const menu=Object.keys(CHALLENGES).map((key,i)=>`<kbd>${i+1}</kbd> ${CHALLENGES[key].name}`).join(' · ');
   r.innerHTML='menu — '+menu+' · or start typing to play this one'; }
-function syncTabs(){ const C=CHALLENGES[cur]; if(!C) return;
-  const n=MENU_ORDER.indexOf(cur)+1;
-  const num=$('dmNum'), nm=$('dmName');
-  if(num) num.textContent=String(n).padStart(2,'0');
-  if(nm) nm.textContent=C.label;
-  const list=$('drillList'); if(list) [...list.querySelectorAll('.do-item')].forEach(b=>b.classList.toggle('on', b.dataset.key===cur)); }
+function syncTabs(){ const strip=$('sheetTabs'); if(!strip) return;
+  let active=null;
+  [...strip.children].forEach(b=>{ const on=b.dataset.key===cur; b.classList.toggle('on',on); if(on) active=b; });
+  if(active && active.scrollIntoView) active.scrollIntoView({block:'nearest', inline:'center'}); }
 
 function recalc(){
   for(let pass=0; pass<8; pass++){
@@ -1489,17 +1442,6 @@ document.addEventListener('keydown',e=>{
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
   if(gateOpen){ return; }
 
-  // DRILL PICKER overlay is modal: esc closes, 1-9 jumps + closes, everything else swallowed
-  if($('drillOverlay') && $('drillOverlay').classList.contains('show')){
-    if(k==='Escape'){ e.preventDefault(); closeDrillMenu(); return; }
-    if(!e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
-      const keys=MENU_ORDER, idx=+k-1;
-      if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); closeDrillMenu(); }
-      return;
-    }
-    e.preventDefault(); return;
-  }
-
   // AUTHENTIC sheet-switch (Ctrl+PgUp / Ctrl+PgDn) — only in installed/standalone app mode,
   // where there are no browser tabs to fight over. In a normal tab the browser owns these keys.
   if(IS_STANDALONE && (e.ctrlKey||e.metaKey) && (k==='PageUp'||k==='PageDown')){
@@ -1617,9 +1559,6 @@ $('helpToggle').addEventListener('click',toggleHelp);
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
-$('drillMenuBtn').addEventListener('click', openDrillMenu);
-$('drillClose').addEventListener('click', closeDrillMenu);
-$('drillOverlay').addEventListener('click', e=>{ if(e.target.id==='drillOverlay') closeDrillMenu(); });
 $('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
 $('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge(); });
 
@@ -1711,33 +1650,24 @@ const DRILL_GROUPS = [
 const MENU_ORDER = (()=>{ const g=DRILL_GROUPS.flatMap(x=>x.keys).filter(k=>CHALLENGES[k]);
   const extra=Object.keys(CHALLENGES).filter(k=>!g.includes(k)); return [...g,...extra]; })();
 
-function buildDrillMenu(){
-  const list=$('drillList'); if(!list) return;
-  const keys=Object.keys(CHALLENGES);
-  const numOf=k=>MENU_ORDER.indexOf(k)+1;
-  list.innerHTML='';
-  const groups=DRILL_GROUPS.map(g=>({name:g.name, keys:g.keys.filter(k=>CHALLENGES[k])}));
-  const grouped=new Set(DRILL_GROUPS.flatMap(g=>g.keys));
-  const extra=keys.filter(k=>!grouped.has(k));
-  if(extra.length) groups.push({name:'More', keys:extra});
-  groups.forEach(g=>{
-    if(!g.keys.length) return;
-    const h=document.createElement('div'); h.className='do-group'; h.textContent=g.name; list.appendChild(h);
-    g.keys.forEach(key=>{
-      const C=CHALLENGES[key]; const n=numOf(key);
-      const best = PB[key]!==undefined ? PB[key].toFixed(1)+'s' : '—';
-      const b=document.createElement('button'); b.className='do-item'+(key===cur?' on':''); b.dataset.key=key;
-      b.innerHTML=`<span class="di-num">${String(n).padStart(2,'0')}</span>`+
-        `<span class="di-main"><span class="di-name">${C.label}</span>`+
-        `<span class="di-desc">${DRILL_DESC[key]||''}</span></span>`+
-        `<span class="di-meta">par ${C.par}s · best ${best}</span>`;
-      b.onclick=()=>{ if(demoPlaying) return; loadChallenge(key); closeDrillMenu(); };
-      list.appendChild(b);
-    });
+const TAB_LABEL = {
+  copyover:'Basics', polish:'Header', combo:'Cleanup', format:'Formats', gauntlet:'Model',
+  drill:'Hardcode', margin:'Margin', foot:'Cross-foot', percent:'Common-size',
+  schedule:'Schedule', comps:'Comps', lookup:'Lookup',
+};
+function buildSheetTabs(){
+  const strip=$('sheetTabs'); if(!strip) return;
+  strip.innerHTML='';
+  MENU_ORDER.forEach(key=>{
+    const C=CHALLENGES[key]; if(!C) return;
+    const b=document.createElement('button');
+    b.className='sheet'+(key===cur?' on':''); b.dataset.key=key;
+    b.textContent=TAB_LABEL[key]||C.name||C.label;
+    b.title=C.label+(DRILL_DESC[key]?' — '+DRILL_DESC[key]:'');
+    b.onclick=()=>{ if(demoPlaying) return; loadChallenge(key); };
+    strip.appendChild(b);
   });
 }
-function openDrillMenu(){ if(demoPlaying) return; buildDrillMenu(); const o=$('drillOverlay'); if(o) o.classList.add('show'); }
-function closeDrillMenu(){ const o=$('drillOverlay'); if(o) o.classList.remove('show'); }
 
 /* ---- PB persistence (window.storage in-artifact, falls back to memory) ---- */
 async function loadPB(){
@@ -1751,7 +1681,7 @@ async function savePB(){
 (async function init(){
   if(sb){ gateOpen=true; const g=$('gate'); if(g){ g.innerHTML='<div class="auth-card"><div class="gate-brand">hotkey<b>.gg</b></div><h3>Checking access…</h3></div>'; g.classList.add('show'); } }
   await loadPB();
-  buildDrillMenu();
+  buildSheetTabs();
   loadChallenge(MENU_ORDER[0]);
   initAuth();
 })();
