@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hotkey.gg — Excel shortcut reference</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --accent:#2ea36f; --accent-dim:#1d6647;
+    --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+    background-image:
+      radial-gradient(900px 500px at 78% -8%, rgba(46,163,111,.10), transparent 60%),
+      radial-gradient(700px 420px at 8% 4%, rgba(46,163,111,.05), transparent 55%);
+    background-attachment:fixed;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 22px;}
+
+  /* ---------- header ---------- */
+  header{padding:46px 0 22px;}
+  .brand{font-family:var(--mono); font-weight:700; font-size:19px; letter-spacing:-.5px; display:inline-flex; align-items:center; gap:1px;}
+  .brand .gg{color:var(--accent);}
+  .brand .slash{color:var(--muted);}
+  h1{font-size:clamp(30px,5vw,46px); font-weight:800; letter-spacing:-1.4px; margin:18px 0 8px; line-height:1.04;}
+  h1 .em{color:var(--accent);}
+  .sub{color:var(--muted); font-size:16px; max-width:60ch;}
+  .legend{display:flex; gap:18px; flex-wrap:wrap; margin-top:18px; font-size:12.5px; color:var(--muted); font-family:var(--mono);}
+  .legend .dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent-glow); margin-right:6px; vertical-align:middle;}
+  .legend .ch{color:var(--accent); font-weight:700;}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{position:sticky; top:0; z-index:20; padding:14px 0; margin:14px 0 6px;
+    background:linear-gradient(180deg,var(--bg) 70%,rgba(12,13,14,.0)); backdrop-filter:blur(2px);}
+  .searchrow{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .search{flex:1; min-width:230px; position:relative;}
+  .search input{width:100%; background:var(--surface); border:1px solid var(--line); color:var(--text);
+    font-family:var(--mono); font-size:14px; padding:12px 14px 12px 38px; border-radius:10px; outline:none; transition:border-color .15s,box-shadow .15s;}
+  .search input:focus{border-color:var(--accent-dim); box-shadow:0 0 0 3px var(--accent-glow);}
+  .search input::placeholder{color:var(--muted);}
+  .search svg{position:absolute; left:13px; top:50%; transform:translateY(-50%); opacity:.5;}
+  .count{font-family:var(--mono); font-size:12.5px; color:var(--muted); white-space:nowrap;}
+  .count b{color:var(--accent);}
+  .chips{display:flex; gap:7px; flex-wrap:wrap; margin-top:12px;}
+  .chip{font-family:var(--mono); font-size:12px; color:var(--muted); background:var(--surface);
+    border:1px solid var(--line); padding:6px 11px; border-radius:999px; cursor:pointer; transition:all .14s; user-select:none;}
+  .chip:hover{color:var(--text); border-color:#34373c;}
+  .chip.on{color:var(--bg); background:var(--accent); border-color:var(--accent); font-weight:700;}
+
+  /* ---------- grid of cards ---------- */
+  .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; padding:8px 0 60px;}
+  @media(max-width:760px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:6px 0 8px; overflow:hidden;
+    opacity:0; transform:translateY(8px); animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards;}
+  @keyframes rise{to{opacity:1; transform:none;}}
+  .card.hide{display:none;}
+  .card h2{font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--muted); padding:16px 18px 10px; display:flex; align-items:center; gap:9px;}
+  .card h2 .ic{color:var(--accent);}
+  .card h2 .n{margin-left:auto; color:#4a4c48; font-size:11px; letter-spacing:0;}
+
+  .row{display:flex; align-items:center; gap:14px; padding:9px 18px; border-top:1px solid rgba(38,40,44,.55); transition:background .12s;}
+  .row:hover{background:var(--surface2);}
+  .row.drilled{position:relative;}
+  .row.drilled::before{content:""; position:absolute; left:0; top:8px; bottom:8px; width:2px; background:var(--accent); border-radius:2px; box-shadow:0 0 8px var(--accent-glow);}
+  .row.hide{display:none;}
+  .keys{flex:0 0 auto; display:flex; align-items:center; gap:5px; flex-wrap:wrap; min-width:0;}
+  .desc{flex:1; font-size:13.5px; color:#cfcfca; min-width:0;}
+  .desc .dr{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:7px; vertical-align:middle; box-shadow:0 0 6px var(--accent-glow);}
+
+  /* ---------- keycaps ---------- */
+  .cap{display:inline-flex; align-items:center; justify-content:center; min-width:29px; height:29px; padding:0 9px;
+    font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap;
+    background:linear-gradient(180deg,#25272c,#191b1e); border:1px solid #313438; border-radius:7px;
+    box-shadow:0 2px 0 #0a0b0c, inset 0 1px 0 rgba(255,255,255,.06);}
+  .sep{color:var(--muted); font-family:var(--mono); font-size:12px; padding:0 1px;}
+  .sep.arrow{color:var(--accent); font-weight:700;}
+  .alt{color:#4a4c48; font-size:11px; padding:0 1px;}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line); padding:26px 0 50px; color:var(--muted); font-size:13px; display:flex; gap:20px; flex-wrap:wrap; align-items:center;}
+  footer a{color:var(--text); text-decoration:none; font-family:var(--mono); font-size:13px; border-bottom:1px solid var(--accent-dim); padding-bottom:1px; transition:color .14s;}
+  footer a:hover{color:var(--accent);}
+  footer .mut{font-size:11.5px; color:#56584f; max-width:46ch; line-height:1.5;}
+  .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-family:var(--mono); font-size:14px; padding:50px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="brand">hotkey<span class="slash">.</span><span class="gg">gg</span></span>
+    <h1>The <span class="em">keyboard</span> cheat sheet.</h1>
+    <p class="sub">Every shortcut the trainer drills, plus the rest of the keyboard-only Excel kit. Windows / US layout. Ribbon chains read left&nbsp;to&nbsp;right — tap each key in turn.</p>
+    <div class="legend">
+      <span><span class="dot"></span>drilled in the trainer</span>
+      <span><span class="ch">→</span> press in sequence (release between)</span>
+      <span><span style="color:var(--text);font-family:var(--mono);font-weight:700">+</span> hold together</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="searchrow">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="text" placeholder="Search — try 'border', 'percent', 'fill'…" autocomplete="off" spellcheck="false">
+      </div>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <footer>
+    <a href="app.html">↳ open the trainer</a>
+    <a href="leaderboard.html">leaderboard</a>
+    <span class="mut">Not affiliated with or endorsed by Microsoft. Excel is a trademark of Microsoft Corporation. Shortcuts reflect Excel for Windows, US keyboard.</span>
+  </footer>
+</div>
+
+<script>
+/* spec syntax:  '+' = hold together · '>' = press in sequence · '/' = alternatives within one cap */
+const DATA = [
+  {cat:'Navigate', ic:'⤢', items:[
+    {k:'↑/↓/←/→', d:'Move one cell', dr:true},
+    {k:'Ctrl+↑/↓/←/→', d:'Jump to the edge of the data region', dr:true},
+    {k:'Ctrl+Home', d:'Go to A1'},
+    {k:'Ctrl+End', d:'Go to the last used cell'},
+    {k:'Tab', d:'Move right (Shift+Tab to move left)', dr:true},
+    {k:'Enter', d:'Move down (Shift+Enter to move up)', dr:true},
+    {k:'Page Up/Page Down', d:'Scroll one screen up / down'},
+    {k:'Ctrl+Page Up/Page Down', d:'Previous / next worksheet'},
+  ]},
+  {cat:'Select', ic:'▦', items:[
+    {k:'Shift+↑/↓/←/→', d:'Extend selection one cell', dr:true},
+    {k:'Ctrl+Shift+↑/↓/←/→', d:'Extend selection to the edge of data', dr:true},
+    {k:'Shift+Space', d:'Select the entire row', dr:true},
+    {k:'Ctrl+Space', d:'Select the entire column', dr:true},
+    {k:'Ctrl+A', d:'Select the current region, then the whole sheet'},
+    {k:'Ctrl+Shift+End', d:'Select from here to the last used cell'},
+  ]},
+  {cat:'Edit & enter', ic:'✎', items:[
+    {k:'F2', d:'Edit the active cell (cursor at the end)', dr:true},
+    {k:'=', d:'Start a formula', dr:true},
+    {k:'Enter', d:'Commit and move down', dr:true},
+    {k:'Tab', d:'Commit and move right', dr:true},
+    {k:'Esc', d:'Cancel the edit', dr:true},
+    {k:'Delete', d:'Clear cell contents'},
+    {k:'Alt+Enter', d:'Line break inside a cell'},
+    {k:'F4', d:'Cycle absolute / relative refs ($) while editing', dr:true},
+  ]},
+  {cat:'Formulas & fill', ic:'∑', items:[
+    {k:'Alt+=', d:'AutoSum the adjacent range', dr:true},
+    {k:'Ctrl+D', d:'Fill down from the cell above', dr:true},
+    {k:'Ctrl+R', d:'Fill right from the cell to the left', dr:true},
+    {k:'F4', d:'Repeat the last action (when not editing)'},
+    {k:'F9', d:'Recalculate all workbooks'},
+    {k:'Ctrl+`', d:'Toggle show formulas / values'},
+  ]},
+  {cat:'Number formats', ic:'#', items:[
+    {k:'Ctrl+Shift+$', d:'Currency, 2 decimals', dr:true},
+    {k:'Ctrl+Shift+%', d:'Percent, 0 decimals', dr:true},
+    {k:'Ctrl+Shift+!', d:'Comma (thousands), 2 decimals', dr:true},
+    {k:'Ctrl+Shift+~', d:'General format'},
+    {k:'Ctrl+Shift+#', d:'Date format'},
+    {k:'Alt>H>0', d:'Add a decimal place', dr:true},
+    {k:'Alt>H>9', d:'Remove a decimal place', dr:true},
+    {k:'Alt>H>K', d:'Apply comma style', dr:true},
+  ]},
+  {cat:'Style & font', ic:'B', items:[
+    {k:'Ctrl+B', d:'Bold', dr:true},
+    {k:'Ctrl+I', d:'Italic'},
+    {k:'Ctrl+U', d:'Underline'},
+    {k:'Ctrl+1', d:'Open the Format Cells dialog'},
+    {k:'Alt>H>H', d:'Fill (cell shading) color', dr:true},
+    {k:'Alt>H>F>C', d:'Font color'},
+  ]},
+  {cat:'Borders', ic:'▢', items:[
+    {k:'Alt>H>B>B', d:'Bottom border', dr:true},
+    {k:'Alt>H>B>T', d:'Top border', dr:true},
+    {k:'Alt>H>B>A', d:'All borders', dr:true},
+    {k:'Alt>H>B>O', d:'Outside border'},
+    {k:'Alt>H>B>N', d:'No border'},
+  ]},
+  {cat:'Copy & paste', ic:'⧉', items:[
+    {k:'Ctrl+C', d:'Copy', dr:true},
+    {k:'Ctrl+X', d:'Cut'},
+    {k:'Ctrl+V', d:'Paste', dr:true},
+    {k:'Ctrl+Alt+V', d:'Paste Special dialog', dr:true},
+    {k:'Alt>E>S>V', d:'Paste values (legacy chain)', dr:true},
+    {k:'Alt>H>V>S', d:'Paste Special (ribbon chain)', dr:true},
+  ]},
+  {cat:'Rows & columns', ic:'⊞', items:[
+    {k:'Ctrl+Shift++', d:'Insert rows / columns'},
+    {k:'Ctrl+-', d:'Delete rows / columns'},
+    {k:'Alt>H>O>I', d:'Autofit column width', dr:true},
+    {k:'Alt>H>O>A', d:'Autofit row height'},
+    {k:'Ctrl+9', d:'Hide rows (Ctrl+0 hides columns)'},
+  ]},
+  {cat:'Workbook', ic:'◳', items:[
+    {k:'Ctrl+Z', d:'Undo', dr:true},
+    {k:'Ctrl+Y', d:'Redo', dr:true},
+    {k:'Ctrl+S', d:'Save'},
+    {k:'Ctrl+F', d:'Find'},
+    {k:'Ctrl+H', d:'Find & replace'},
+    {k:'Ctrl+P', d:'Print'},
+  ]},
+];
+
+function renderCombo(spec){
+  const seq = spec.includes('>');
+  const parts = spec.split(seq?'>':'+').filter(p=>p!=='');
+  // handle the literal '+' key (Ctrl+Shift++)
+  if(!seq && spec.endsWith('+') && parts.length){ parts.push('+'); }
+  const caps = parts.map(p=>{
+    const alts = p.split('/').map(a=>`<span class="cap">${a}</span>`).join('<span class="alt">/</span>');
+    return alts;
+  });
+  const sep = seq ? '<span class="sep arrow">→</span>' : '<span class="sep">+</span>';
+  return caps.join(sep);
+}
+
+const grid = document.getElementById('grid');
+const chipsEl = document.getElementById('chips');
+const countEl = document.getElementById('count');
+const qEl = document.getElementById('q');
+let activeCat = 'all';
+let totalCount = 0;
+
+DATA.forEach((sec,si)=>{
+  totalCount += sec.items.length;
+  const card = document.createElement('section');
+  card.className='card'; card.dataset.cat=sec.cat;
+  card.style.animationDelay=(si*45)+'ms';
+  card.innerHTML = `<h2><span class="ic">${sec.ic}</span>${sec.cat}<span class="n">${sec.items.length}</span></h2>` +
+    sec.items.map(it=>{
+      const txt=(it.k+' '+it.d).toLowerCase();
+      return `<div class="row${it.dr?' drilled':''}" data-s="${txt.replace(/"/g,'')}">
+        <span class="keys">${renderCombo(it.k)}</span>
+        <span class="desc">${it.d}${it.dr?'<span class="dr" title="drilled in the trainer"></span>':''}</span>
+      </div>`;
+    }).join('');
+  grid.appendChild(card);
+});
+
+// category chips
+const cats = ['all', ...DATA.map(d=>d.cat)];
+cats.forEach(c=>{
+  const chip=document.createElement('span');
+  chip.className='chip'+(c==='all'?' on':''); chip.textContent=(c==='all'?'all':c);
+  chip.onclick=()=>{ activeCat=c; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); chip.classList.add('on'); apply(); };
+  chipsEl.appendChild(chip);
+});
+
+function apply(){
+  const q=qEl.value.trim().toLowerCase();
+  let shown=0;
+  document.querySelectorAll('.card').forEach(card=>{
+    const catMatch = activeCat==='all' || card.dataset.cat===activeCat;
+    let any=false;
+    card.querySelectorAll('.row').forEach(row=>{
+      const hit = catMatch && (q==='' || row.dataset.s.includes(q));
+      row.classList.toggle('hide', !hit);
+      if(hit){ any=true; shown++; }
+    });
+    card.classList.toggle('hide', !any);
+  });
+  countEl.innerHTML = `<b>${shown}</b> / ${totalCount} shortcuts`;
+  let emp=document.getElementById('emptyMsg');
+  if(shown===0){ if(!emp){ emp=document.createElement('div'); emp.id='emptyMsg'; emp.className='empty'; emp.textContent='No shortcuts match that.'; grid.appendChild(emp);} }
+  else if(emp){ emp.remove(); }
+}
+qEl.addEventListener('input', apply);
+apply();
+</script>
+</body>
+</html>

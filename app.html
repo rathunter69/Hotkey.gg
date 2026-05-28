@@ -34,8 +34,8 @@
   .hint-top kbd{font-family:var(--mono); color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:5px; padding:1px 6px; font-size:11.5px}
 
-  .tabs{display:flex; gap:4px; margin-bottom:18px}
-  .tab{font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
+  .tabs{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:18px}
+  .tab{white-space:nowrap; font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
     border:1px solid transparent; border-radius:7px; padding:7px 13px; cursor:pointer; transition:.15s}
   .tab:hover{color:var(--text)}
   .tab.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
@@ -182,7 +182,8 @@
   .cl-item.next .cl-keys kbd{color:#06120c; background:var(--accent); border-color:var(--accent); font-weight:600}
   .guide-toggle{font-family:var(--mono); font-size:11px; color:var(--muted); background:none;
     border:1px solid var(--line); border-radius:7px; padding:5px 10px; cursor:pointer; transition:.15s; margin-right:8px}
-  .toprow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:2px}
+  .toprow{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:2px}
+  .toprow .tabs{flex:1 1 auto; min-width:0; margin-bottom:0}
   .mode-ctrls{display:flex; align-items:center; gap:8px}
   .toprow .guide-toggle{margin-right:0; font-size:12px; padding:6px 12px}
   .guide-toggle:hover{color:var(--text); border-color:var(--faint)}
@@ -659,6 +660,245 @@ const CHALLENGES = {
         {label:'each year begins where the prior year ended', ok: begOk(1)&&begOk(2)&&begOk(3)},
       ];
     }
+  },
+  percent:{
+    name:'% of rev', label:'Common-size it', par:34, parKeys:24,
+    prompt:'Express each line item as a percentage of revenue. Write the formula once with an absolute reference to revenue, fill it down the column, then format as a percentage — the $ keeps revenue locked as the formula fills.',
+    req:'<em>absolute reference + fill</em> · in C2 type <em>=B2/$B$2</em> (the $ locks revenue) · select C2:C6 and <em>ctrl+d</em> to fill down · then <em>ctrl+shift+%</em> and <em>alt h 0</em>',
+    guide:[
+      'in C2 type <kbd>=</kbd><kbd>B</kbd><kbd>2</kbd><kbd>/</kbd><kbd>$</kbd><kbd>B</kbd><kbd>$</kbd><kbd>2</kbd> <kbd>↵</kbd> — the $ locks revenue — then select C2:C6 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill down',
+      'select the % column · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
+    ],
+    targets:['C2:C6','C2:C6'],
+    demo(){ return [
+      {sel:'C2', keys:[...T('=B2/$B$2'), Kb.enter]},
+      {sel:'C2:C6', keys:[Kb.fillD]},
+      {sel:'C2:C6', keys:[Kb.pct, Kb.alt, L('H'), D(0)]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Common-size',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'$mm',txt:true,bold:true};
+      cells['C1']={...blankCell(),value:'% of rev',txt:true,bold:true};
+      const rev=rnd(9,18)*100;
+      const rows=[
+        ['Revenue', rev],
+        ['COGS', Math.round(rev*rnd(52,64)/100)],
+        ['SG&A', Math.round(rev*rnd(10,18)/100)],
+        ['R&D', Math.round(rev*rnd(4,9)/100)],
+        ['D&A', Math.round(rev*rnd(3,7)/100)],
+      ];
+      rows.forEach((row,i)=>{ const r=i+2;
+        cells['A'+r]={...blankCell(),value:row[0],txt:true};
+        cells['B'+r]={...blankCell(),value:row[1],fmtStyle:'comma',decimals:0};
+      });
+      return {ROWS:6, cells, active:{r:2,c:3}, sel:null, colW:{1:120,2:84,3:88}};
+    },
+    checks(S){
+      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
+      const pctOk=r=>{ const c=S.cells['C'+r]; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/[\s$]/g,''); const rev=val('B2');
+        return f.includes('B'+r)&&f.includes('B2')&&f.includes('/')&&rev!==0&&Math.abs(c.value-(val('B'+r)/rev))<1e-6; };
+      const fmtOk=r=>{ const c=S.cells['C'+r]; return !!(c&&c.fmtStyle==='percent'&&c.decimals===1); };
+      let f=true,m=true; for(let r=2;r<=6;r++){ if(!pctOk(r)) f=false; if(!fmtOk(r)) m=false; }
+      return [
+        {label:'each line ÷ revenue, anchored formula (all rows)', ok: f},
+        {label:'format the % column to 1 decimal', ok: m},
+      ];
+    }
+  },
+  lookup:{
+    name:'Lookup', label:'Look it up', par:50, parKeys:38,
+    prompt:'Pull a figure out of the table with INDEX/MATCH. The query panel names a company and a metric — return that number into the Answer cell. The metric columns are shuffled every round, so read the headers and aim INDEX at the right column.',
+    req:'<em>INDEX + MATCH</em> · MATCH(G2, A2:A6, 0) finds the company\'s row, then INDEX that metric\'s column · e.g. <em>=INDEX(C2:C6, MATCH(G2,A2:A6,0))</em> — or two-way <em>=INDEX(B2:D6, MATCH(G2,A2:A6,0), MATCH(G3,B1:D1,0))</em>',
+    guide:[
+      'in G4 type <kbd>=INDEX(</kbd> the queried metric\'s column, e.g. C2:C6 <kbd>, MATCH(G2,A2:A6,0))</kbd> — MATCH locates the company row, INDEX pulls from that column',
+      'if the number looks wrong, INDEX is pointed at the wrong column — match it to the Metric named in G3',
+    ],
+    targets:['G4','G4'],
+    demo(){ const col=this._mcol; return [
+      {sel:'G4', keys:[...T('=INDEX('+col+'2:'+col+'6,MATCH(G2,A2:A6,0))'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      const metrics=['Revenue','EBITDA','Net debt'];
+      for(let k=metrics.length-1;k>0;k--){ const j=rnd(0,k); [metrics[k],metrics[j]]=[metrics[j],metrics[k]]; }
+      cells['A1']={...blankCell(),value:'Company',txt:true,bold:true};
+      metrics.forEach((mn,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:mn,txt:true,bold:true});
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox'];
+      const data={};
+      names.forEach((nm,r0)=>{ const r=r0+2; cells['A'+r]={...blankCell(),value:nm,txt:true}; data[nm]={};
+        metrics.forEach((mn,i)=>{ const v=rnd(2,90)*10; data[nm][mn]=v; cells[colLetter(i+2)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; }); });
+      const qName=names[rnd(0,names.length-1)], qMetric=metrics[rnd(0,metrics.length-1)];
+      cells['F1']={...blankCell(),value:'Query',txt:true,bold:true};
+      cells['F2']={...blankCell(),value:'Company',txt:true}; cells['G2']={...blankCell(),value:qName,txt:true};
+      cells['F3']={...blankCell(),value:'Metric',txt:true};  cells['G3']={...blankCell(),value:qMetric,txt:true};
+      cells['F4']={...blankCell(),value:'Answer',txt:true,bold:true}; cells['G4']={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._mcol=colLetter(metrics.indexOf(qMetric)+2);
+      return {ROWS:6, cells, active:{r:4,c:7}, sel:null, colW:{1:104,2:82,3:82,4:86,6:80,7:98}};
+    },
+    checks(S){
+      const company=S.cells['G2'].value, metric=S.cells['G3'].value;
+      let rowIdx=-1; for(let r=2;r<=6;r++){ if(eqLoose(S.cells['A'+r].value,company)) rowIdx=r; }
+      let mcol=-1; for(let c=2;c<=4;c++){ if(eqLoose(S.cells[colLetter(c)+1].value,metric)) mcol=c; }
+      const expected=(rowIdx>0&&mcol>0)?S.cells[colLetter(mcol)+rowIdx].value:null;
+      const g=S.cells['G4']; const f=(g&&g.formula)?g.formula.toUpperCase().replace(/\s/g,''):'';
+      const usesIM=f.includes('INDEX(')&&f.includes('MATCH(');
+      const valOk=!!(g&&g.formula)&&expected!=null&&Math.abs(g.value-expected)<1e-6;
+      return [
+        {label:'pull the figure with INDEX + MATCH', ok: usesIM},
+        {label:'answer matches the queried company × metric', ok: valOk},
+      ];
+    }
+  },
+  copyover:{
+    name:'Basics', label:'Copy it over', par:18, parKeys:10,
+    prompt:'Fundamentals rep: copy the block of numbers on the left and paste it into the outlined area on the right. Select, copy, move, paste — all on the keyboard, no mouse.',
+    req:'<em>select B2:C4</em> · <em>ctrl c</em> copy · arrow over to E2 · <em>ctrl v</em> paste',
+    guide:[
+      'select B2:C4 with <kbd>shift</kbd>+arrows, copy with <kbd>ctrl</kbd>+<kbd>c</kbd>, move to E2, then <kbd>ctrl</kbd>+<kbd>v</kbd> to paste',
+    ],
+    targets:['E2:F4'],
+    demo(){ return [
+      {sel:'B2:C4', keys:[Kb.copy]},
+      {sel:'E2', keys:[Kb.paste]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Source',txt:true,bold:true};
+      cells['E1']={...blankCell(),value:'Paste here',txt:true,bold:true};
+      for(let r=2;r<=4;r++)for(let c=2;c<=3;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(10,99)*10,fmtStyle:'comma',decimals:0};
+      for(let r=2;r<=4;r++)for(let c=5;c<=6;c++) cells[colLetter(c)+r]={...blankCell(),ball:true,fmtStyle:'comma',decimals:0};
+      return {ROWS:4, cells, active:{r:2,c:2}, sel:null, colW:{1:70,5:96}};
+    },
+    checks(S){
+      let ok=true;
+      for(let i=0;i<3;i++)for(let j=0;j<2;j++){
+        const src=S.cells[colLetter(2+j)+(2+i)], dst=S.cells[colLetter(5+j)+(2+i)];
+        if(!dst||!src||dst.value!==src.value) ok=false;
+      }
+      return [{label:'copy the block into the outlined target', ok}];
+    }
+  },
+  polish:{
+    name:'Header', label:'Polish the Header', par:24, parKeys:14,
+    prompt:'Dress up the header row so it reads as a header: make it bold, give it a bottom border to split it off from the data, and shade it. Header is A1:E1.',
+    req:'<em>select A1:E1</em> · <em>ctrl b</em> bold · <em>alt h b b</em> bottom border · <em>alt h h</em> shade',
+    guide:[
+      'select the header A1:E1 · <kbd>ctrl</kbd>+<kbd>b</kbd> bold',
+      'still selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> for a bottom border',
+      'shade it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd>',
+    ],
+    targets:['A1:E1','A1:E1','A1:E1'],
+    demo(){ return [
+      {sel:'A1:E1', keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('B'), Kb.alt,L('H'),L('H')]},
+    ]; },
+    build(){
+      const cells={};
+      ['Company','Revenue','EBITDA','Margin','Rank'].forEach((h,i)=>cells[colLetter(i+1)+1]={...blankCell(),value:h,txt:true});
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc'];
+      for(let r=2;r<=5;r++){ cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
+        cells['B'+r]={...blankCell(),value:rnd(4,18)*100,fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),value:rnd(1,6)*100,fmtStyle:'comma',decimals:0};
+        cells['D'+r]={...blankCell(),value:rnd(10,40)/100,fmtStyle:'percent',decimals:0};
+        cells['E'+r]={...blankCell(),value:r-1};
+      }
+      return {ROWS:5, cells, active:{r:1,c:1}, sel:null, colW:{1:104,2:80,3:80,4:74,5:60}};
+    },
+    checks(S){
+      const all=test=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+1]; if(!x||!test(x)) return false; } return true; };
+      return [
+        {label:'bold the header row', ok: all(x=>x.bold)},
+        {label:'bottom border under the header', ok: all(x=>x.bb)},
+        {label:'shade the header', ok: all(x=>x.fill==='blue')},
+      ];
+    }
+  },
+  foot:{
+    name:'Totals', label:'Total it both ways', par:55, parKeys:46,
+    prompt:'Foot and cross-foot the table: total each segment across into column E, total each quarter down into row 5, and tie it off with a grand total in the corner. SUM both directions.',
+    req:'<em>SUM both ways</em> · row totals in E (=SUM(B2:D2)) · column totals in row 5 (=SUM(B2:B4)) · grand total E5 · fill to repeat',
+    guide:[
+      'row totals: in E2 type <kbd>=SUM(B2:D2)</kbd> <kbd>↵</kbd>, then select E2:E4 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill down',
+      'column totals: in B5 type <kbd>=SUM(B2:B4)</kbd> <kbd>↵</kbd>, then select B5:D5 and <kbd>ctrl</kbd>+<kbd>r</kbd> to fill right',
+      'grand total: in E5 type <kbd>=SUM(E2:E4)</kbd> — it should tie to the column totals',
+    ],
+    targets:['E2:E4','B5:D5','E5'],
+    demo(){ return [
+      {sel:'E2', keys:[...T('=SUM(B2:D2)'), Kb.enter]},
+      {sel:'E2:E4', keys:[Kb.fillD]},
+      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
+      {sel:'B5:D5', keys:[Kb.fillR]},
+      {sel:'E5', keys:[...T('=SUM(E2:E4)'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Segment',txt:true,bold:true};
+      ['Q1','Q2','Q3','Total'].forEach((h,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:h,txt:true,bold:true});
+      const segs=['North','EMEA','APAC'];
+      for(let r=2;r<=4;r++){ cells['A'+r]={...blankCell(),value:segs[r-2],txt:true};
+        for(let c=2;c<=4;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(20,90)*10,fmtStyle:'comma',decimals:0};
+        cells['E'+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+      }
+      cells['A5']={...blankCell(),value:'Total',txt:true,bold:true};
+      for(let c=2;c<=5;c++) cells[colLetter(c)+5]={...blankCell(),fmtStyle:'comma',decimals:0};
+      return {ROWS:5, cells, active:{r:2,c:5}, sel:null, colW:{1:96,2:74,3:74,4:74,5:84}};
+    },
+    checks(S){
+      const val=k=>{const c=S.cells[k];return c&&typeof c.value==='number'?c.value:0;};
+      const rowOk=r=>{const c=S.cells['E'+r];return !!(c&&c.formula)&&Math.abs(c.value-(val('B'+r)+val('C'+r)+val('D'+r)))<1e-6;};
+      const colOk=cc=>{const L2=colLetter(cc);const c=S.cells[L2+5];return !!(c&&c.formula)&&Math.abs(c.value-(val(L2+2)+val(L2+3)+val(L2+4)))<1e-6;};
+      const grand=S.cells['E5']; let total=0; for(let r=2;r<=4;r++) total+=val('B'+r)+val('C'+r)+val('D'+r);
+      const grandOk=!!(grand&&grand.formula)&&Math.abs(grand.value-total)<1e-6;
+      return [
+        {label:'row totals down column E (SUM across)', ok: rowOk(2)&&rowOk(3)&&rowOk(4)},
+        {label:'column totals along row 5 (SUM down)', ok: colOk(2)&&colOk(3)&&colOk(4)},
+        {label:'grand total in E5 ties it out', ok: grandOk},
+      ];
+    }
+  },
+  comps:{
+    name:'Comps', label:'Line up the comps', par:40, parKeys:32,
+    prompt:'Finish the comp set: compute each company\'s EV/EBITDA multiple with a formula, fill it down the column, then add the average multiple at the bottom.',
+    req:'<em>multiple = EV ÷ EBITDA</em> · in D2 type <em>=B2/C2</em>, fill down · then <em>=AVERAGE(D2:D5)</em> for the mean',
+    guide:[
+      'in D2 type <kbd>=B2/C2</kbd> <kbd>↵</kbd>, then select D2:D5 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill the multiple down',
+      'in D6 type <kbd>=AVERAGE(D2:D5)</kbd> <kbd>↵</kbd> for the mean multiple',
+    ],
+    targets:['D2:D5','D6'],
+    demo(){ return [
+      {sel:'D2', keys:[...T('=B2/C2'), Kb.enter]},
+      {sel:'D2:D5', keys:[Kb.fillD]},
+      {sel:'D6', keys:[...T('=AVERAGE(D2:D5)'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Comp set',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'EV',txt:true,bold:true};
+      cells['C1']={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells['D1']={...blankCell(),value:'EV/EBITDA',txt:true,bold:true};
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc'];
+      for(let r=2;r<=5;r++){ const eb=rnd(8,40)*10; const mult=rnd(60,140)/10; const ev=Math.round(eb*mult);
+        cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
+        cells['B'+r]={...blankCell(),value:ev,fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),value:eb,fmtStyle:'comma',decimals:0};
+        cells['D'+r]={...blankCell(),fmtStyle:'comma',decimals:1};
+      }
+      cells['A6']={...blankCell(),value:'Average',txt:true,bold:true};
+      cells['D6']={...blankCell(),fmtStyle:'comma',decimals:1};
+      return {ROWS:6, cells, active:{r:2,c:4}, sel:null, colW:{1:104,2:80,3:80,4:92}};
+    },
+    checks(S){
+      const val=k=>{const c=S.cells[k];return c&&typeof c.value==='number'?c.value:0;};
+      const multOk=r=>{const c=S.cells['D'+r];return !!(c&&c.formula)&&val('C'+r)!==0&&Math.abs(c.value-(val('B'+r)/val('C'+r)))<1e-6;};
+      let mult=true; for(let r=2;r<=5;r++) if(!multOk(r)) mult=false;
+      const avg=S.cells['D6']; let sum=0; for(let r=2;r<=5;r++) sum+=val('B'+r)/val('C'+r); const mean=sum/4;
+      const avgOk=!!(avg&&avg.formula)&&Math.abs(avg.value-mean)<1e-6;
+      return [
+        {label:'EV/EBITDA multiple for each comp (formula)', ok: mult},
+        {label:'average multiple at the bottom', ok: avgOk},
+      ];
+    }
   }
 };
 
@@ -739,11 +979,27 @@ function rangeRefs(a,b){ const pa=parseRef(a),pb=parseRef(b); const out=[]; if(!
     for(let c=Math.min(pa.c,pb.c);c<=Math.max(pa.c,pb.c);c++) out.push(colLetter(c)+r);
   return out; }
 function cellNum(ref){ const c=S.cells[ref]; return c&&typeof c.value==='number'?c.value:0; }
+function cellRaw(ref){ const c=S.cells[ref]; return c?c.value:null; }
+function eqLoose(a,b){ return (typeof a==='number'&&typeof b==='number')?a===b:String(a).trim().toLowerCase()===String(b).trim().toLowerCase(); }
 function evalFormula(expr){
   let s=String(expr).replace(/^=/,''), i=0;
   const skip=()=>{ while(s[i]===' ') i++; };
   const flat=args=>args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellNum):[a.val]).flat();
-  function fn(name,args){ const xs=flat(args);
+  const rawOf=a=>a.ref!==undefined?cellRaw(a.ref):(a.val!==undefined?a.val:null);
+  function fn(name,args){
+    if(name==='MATCH'){ const lk=rawOf(args[0]); if(!args[1].range) throw new Error('m-range');
+      const refs=rangeRefs(args[1].range[0],args[1].range[1]);
+      for(let p=0;p<refs.length;p++){ if(eqLoose(cellRaw(refs[p]),lk)) return p+1; } throw new Error('MATCH#N/A'); }
+    if(name==='INDEX'){ if(!args[0].range) throw new Error('i-range');
+      const a=parseRef(args[0].range[0]), b=parseRef(args[0].range[1]);
+      const r1=Math.min(a.r,b.r), c1=Math.min(a.c,b.c), r2=Math.max(a.r,b.r), c2=Math.max(a.c,b.c);
+      const toN=v=>typeof v==='number'?v:(parseFloat(v)||0);
+      if(args.length>=3){ const rn=Math.round(args[1].val), cn=Math.round(args[2].val); return toN(cellRaw(colLetter(c1+cn-1)+(r1+rn-1))); }
+      const rn=Math.round(args[1].val);
+      if(c1===c2) return toN(cellRaw(colLetter(c1)+(r1+rn-1)));
+      if(r1===r2) return toN(cellRaw(colLetter(c1+rn-1)+r1));
+      return toN(rangeRefs(args[0].range[0],args[0].range[1]).map(cellRaw)[rn-1]); }
+    const xs=flat(args);
     switch(name){
       case 'SUM': return xs.reduce((a,b)=>a+b,0);
       case 'AVERAGE': case 'AVG': return xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:0;
@@ -760,14 +1016,15 @@ function evalFormula(expr){
     if(s[i]==='-'){ i++; return -fac(); }
     if(s[i]==='+'){ i++; return fac(); }
     let m=/^\d*\.?\d+/.exec(s.slice(i)); if(m){ i+=m[0].length; return parseFloat(m[0]); }
-    let id=/^[A-Za-z]+\d*/.exec(s.slice(i)); if(id){ const tok=id[0]; i+=tok.length; skip();
-      if(s[i]==='('){ i++; const a=argList(); skip(); if(s[i]!==')') throw new Error('fnparen'); i++; return fn(tok.toUpperCase(),a); }
-      return cellNum(tok.toUpperCase()); }
+    let f=/^([A-Za-z]+)\s*\(/.exec(s.slice(i)); if(f){ i+=f[1].length; skip(); i++; const a=argList(); skip(); if(s[i]!==')') throw new Error('fnparen'); i++; return fn(f[1].toUpperCase(),a); }
+    let cr=/^\$?[A-Za-z]+\$?\d+/.exec(s.slice(i)); if(cr){ i+=cr[0].length; return cellNum(cr[0].replace(/\$/g,'').toUpperCase()); }
     throw new Error('unexpected'); }
   function argList(){ const a=[]; skip(); if(s[i]===')') return a; a.push(arg()); skip(); while(s[i]===','){ i++; a.push(arg()); skip(); } return a; }
-  function arg(){ skip(); const rng=/^([A-Za-z]+\d+)\s*:\s*([A-Za-z]+\d+)/.exec(s.slice(i));
+  function arg(){ skip(); const rng=/^(\$?[A-Za-z]+\$?\d+)\s*:\s*(\$?[A-Za-z]+\$?\d+)/.exec(s.slice(i));
     if(rng){ i+=rng[0].length; return {range:[rng[1].toUpperCase(),rng[2].toUpperCase()]}; }
-    return {val:expr_()}; }
+    const st=i; const v=expr_(); const cons=s.slice(st,i).trim();
+    if(/^\$?[A-Za-z]+\$?\d+$/.test(cons)) return {val:v, ref:cons.replace(/\$/g,'').toUpperCase()};
+    return {val:v}; }
   const r=expr_(); skip(); if(i<s.length) throw new Error('trailing'); return r;
 }
 function autoSum(){
@@ -782,7 +1039,7 @@ function autoSum(){
 /* ============================================================
    RENDER
    ============================================================ */
-function parseRef(ref){ const m=ref.match(/^([A-Z]+)(\d+)$/i); if(!m) return null; return {c:m[1].toUpperCase().charCodeAt(0)-64, r:+m[2]}; }
+function parseRef(ref){ const m=ref.replace(/\$/g,'').match(/^([A-Z]+)(\d+)$/i); if(!m) return null; return {c:m[1].toUpperCase().charCodeAt(0)-64, r:+m[2]}; }
 function resolveRange(str){ if(!str) return null; const parts=str.split(':'); const a=parseRef(parts[0]); const b=parts[1]?parseRef(parts[1]):a; if(!a||!b) return null;
   return {r1:Math.min(a.r,b.r),r2:Math.max(a.r,b.r),c1:Math.min(a.c,b.c),c2:Math.max(a.c,b.c)}; }
 function currentGuideTarget(){
@@ -982,6 +1239,35 @@ function recalc(){
   }
 }
 function commitAction(){ recalc(); render(); checkWin(); }
+
+function translateFormula(f, dr, dc){
+  return f.replace(/(\$?)([A-Za-z]+)(\$?)(\d+)/g, (m, ad, col, ar, row)=>{
+    let c=col.toUpperCase().charCodeAt(0)-64, r=parseInt(row,10);
+    if(!ad) c=Math.max(1,Math.min(COLS,c+dc));
+    if(!ar) r=Math.max(1,Math.min(ROWS_MAX,r+dr));
+    return ad+colLetter(c)+ar+r;
+  });
+}
+function fillFrom(dir){ // dir 'down' or 'right'
+  const r=selRange();
+  const vertical = dir==='down';
+  if(vertical && r.r1===r.r2) return;
+  if(!vertical && r.c1===r.c2) return;
+  pushUndo();
+  const copyFmt=(dst,src)=>{ dst.bold=src.bold;dst.fill=src.fill;dst.wrap=src.wrap;dst.fmtStyle=src.fmtStyle;dst.decimals=src.decimals;dst.bt=src.bt;dst.bb=src.bb;dst.ball=src.ball;dst.txt=src.txt; };
+  if(vertical){
+    for(let c=r.c1;c<=r.c2;c++){ const src=get(r.r1,c);
+      for(let rr=r.r1+1;rr<=r.r2;rr++){ const cell=ensure(rr,c); copyFmt(cell,src);
+        if(src.formula){ cell.formula=translateFormula(src.formula, rr-r.r1, 0); cell.value=0; }
+        else { cell.formula=null; cell.value=src.value; } } }
+  } else {
+    for(let rr=r.r1;rr<=r.r2;rr++){ const src=get(rr,r.c1);
+      for(let c=r.c1+1;c<=r.c2;c++){ const cell=ensure(rr,c); copyFmt(cell,src);
+        if(src.formula){ cell.formula=translateFormula(src.formula, 0, c-r.c1); cell.value=0; }
+        else { cell.formula=null; cell.value=src.value; } } }
+  }
+  commitAction();
+}
 
 function startEdit(initial){ if(done) return; startClock(); editing=true; editBuf=initial; render(); }
 function cancelEdit(){ editing=false; editBuf=''; render(); }
@@ -1209,7 +1495,10 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)){
     const lk=k.toLowerCase();
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
+    if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
+    if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
+    if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
     if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
     if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
     if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
@@ -1239,8 +1528,9 @@ $('guideToggle').addEventListener('click',toggleGuided);
 
 /* ---- guided demo player: replays the optimal keystrokes through the real engine ---- */
 const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
-  copy:{key:'c',ctrl:true}, bold:{key:'b',ctrl:true},
+  copy:{key:'c',ctrl:true}, paste:{key:'v',ctrl:true}, bold:{key:'b',ctrl:true},
   pct:{key:'%',ctrl:true,shift:true}, cur:{key:'$',ctrl:true,shift:true}, com:{key:'!',ctrl:true,shift:true},
+  fillD:{key:'d',ctrl:true}, fillR:{key:'r',ctrl:true},
   eq:{key:'=',alt:true,code:'Equal'} };
 function L(ch){ return {key:ch.toLowerCase(), code:'Key'+ch.toUpperCase()}; }
 function D(n){ return {key:String(n), code:'Digit'+n}; }
