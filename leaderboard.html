@@ -58,6 +58,10 @@
   .row:last-child{border-bottom:none}
   .rk{font-family:var(--mono); font-weight:700; color:var(--muted)}
   .row.top .rk{color:var(--accent)}
+  .row.me{background:var(--accent-glow)}
+  .row.me .nm::after{content:" · you"; color:var(--accent); font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.3px}
+  .row.you-extra{border-top:1px dashed var(--line)}
+  .you-gap{padding:5px 22px; font-family:var(--mono); font-size:13px; color:var(--faint); text-align:center; letter-spacing:2px}
   .nm{font-weight:500}
   .tm{font-family:var(--mono); text-align:right; font-weight:500}
   .empty{padding:22px; color:var(--faint); font-family:var(--mono); font-size:13px; text-align:center}
@@ -136,13 +140,21 @@ const CH = [
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmt(ms){ return (ms/1000).toFixed(2)+'s'; }
 
-function boardHtml(c, rows, names){
-  let body;
-  if(!rows.length){ body='<div class="empty">no times yet — be the first</div>'; }
-  else body = rows.map((r,i)=>
-    `<div class="row${i===0?' top':''}"><span class="rk">${i+1}</span>`+
+function rowHtml(r,i,names,meId,extra){
+  const me = meId && r.user_id===meId;
+  return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
+    `<span class="rk">${i+1}</span>`+
     `<span class="nm">${esc(names[r.user_id]||'anon')}</span>`+
-    `<span class="tm">${fmt(r.time_ms)}</span></div>`).join('');
+    `<span class="tm">${fmt(r.time_ms)}</span></div>`;
+}
+function boardHtml(c, best, names, meId){
+  let body;
+  if(!best.length){ body='<div class="empty">no times yet — be the first</div>'; }
+  else {
+    body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId)).join('');
+    const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
+    if(myIdx>=10){ body += '<div class="you-gap">···</div>' + rowHtml(best[myIdx], myIdx, names, meId, true); }
+  }
   return `<div class="board"><div class="board-cap"><h2>${esc(c.label)}</h2><span class="lvl">${esc(c.lvl)}</span></div>${body}</div>`;
 }
 
@@ -154,8 +166,9 @@ async function load(){
       '<a href="index.html" class="btn">Go train</a></div>';
     return;
   }
-  let profs=[], runs=[];
+  let profs=[], runs=[], meId=null;
   try{
+    try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null; }catch(e){}
     const p=await sb.from('profiles').select('id,handle');
     profs=p.data||[];
     const r=await sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
@@ -169,7 +182,7 @@ async function load(){
   CH.forEach(c=>{
     const seen={}, best=[];
     runs.filter(x=>x.challenge===c.key).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });
-    html += boardHtml(c, best.slice(0,10), names);
+    html += boardHtml(c, best, names, meId);
   });
   root.innerHTML=html;
 }

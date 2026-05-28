@@ -448,6 +448,46 @@
   .sg-avg{stroke:var(--muted); stroke-width:1; stroke-dasharray:3 3; fill:none}
   .sg-dot{fill:var(--accent); stroke:var(--surface); stroke-width:1.5}
   .sg-empty{font-family:var(--mono); font-size:12px; color:var(--muted); text-align:center; padding:20px}
+
+  /* ---- profile / career card ---- */
+  .profile-modal{position:fixed; inset:0; background:rgba(0,0,0,.66); display:none;
+    align-items:flex-start; justify-content:center; z-index:62; padding:38px 22px; overflow:auto}
+  .profile-modal.show{display:flex}
+  .pc-card{background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    width:640px; max-width:96vw; padding:26px 30px 22px; box-shadow:0 28px 80px rgba(0,0,0,.65); margin:auto}
+  .pc-head{display:flex; align-items:center; justify-content:space-between; gap:16px}
+  .pc-name{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--text); letter-spacing:-.5px}
+  .pc-tier{font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+    padding:7px 14px; border-radius:999px; border:1px solid; white-space:nowrap}
+  .tier-unranked{color:var(--muted); border-color:var(--line); background:var(--surface2)}
+  .tier-bronze{color:#c08457; border-color:#7a5638; background:rgba(192,132,87,.12)}
+  .tier-silver{color:#c3c8cf; border-color:#717880; background:rgba(195,200,207,.10)}
+  .tier-gold{color:#e0b341; border-color:#8a6d20; background:rgba(224,179,65,.12)}
+  .tier-platinum{color:#5fd6c2; border-color:#2f7d72; background:rgba(95,214,194,.12)}
+  .tier-diamond{color:#7db8ff; border-color:#3a6196; background:rgba(125,184,255,.14)}
+  .pc-sub{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin:6px 0 18px}
+  .pc-career{display:flex; gap:22px; flex-wrap:wrap; background:var(--surface2); border:1px solid var(--line);
+    border-radius:12px; padding:14px 18px; margin-bottom:8px}
+  .pc-cstat .v{font-family:var(--mono); font-size:18px; font-weight:600; color:var(--text)}
+  .pc-cstat .l{font-family:var(--mono); font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-top:2px}
+  .pc-grouphdr{font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.8px; margin:16px 0 4px}
+  .pc-row{display:grid; grid-template-columns:1fr auto auto; gap:14px; align-items:baseline;
+    padding:8px 10px; border-radius:8px; font-family:var(--mono); font-size:12.5px}
+  .pc-row.me{background:var(--accent-glow)}
+  .pc-row .d-name{color:var(--text)}
+  .pc-row .d-rank{color:var(--accent); text-align:right; white-space:nowrap}
+  .pc-rank1 .d-rank{color:var(--warn)}
+  .pc-row .d-pct{color:var(--muted); font-size:11px; text-align:right; white-space:nowrap; min-width:118px}
+  .pc-row.untried{opacity:.6}
+  .pc-row.untried .d-name{color:var(--muted)}
+  .pc-row.untried .d-rank{color:var(--muted)}
+  .pc-foot{display:flex; gap:8px; justify-content:space-between; align-items:center; margin-top:20px}
+  .pc-foot a{font-family:var(--mono); font-size:12px; color:var(--muted); cursor:pointer; text-decoration:none}
+  .pc-foot a:hover{color:var(--accent)}
+  .pc-loading,.pc-msg{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:30px 10px; line-height:1.6}
+  .who-name{cursor:pointer; color:var(--text)}
+  .who-name:hover{color:var(--accent)}
   /* ---- landing overlay (fades to the app on start) ---- */
   .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
     background:rgba(11,12,13,.90); backdrop-filter:blur(7px); padding:28px; overflow-y:auto;
@@ -555,6 +595,7 @@
 </div>
 <div class="modes-modal" id="modesModal"></div>
 <div class="session-modal" id="sessionModal"></div>
+<div class="profile-modal" id="profileModal"></div>
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
@@ -1676,6 +1717,8 @@ document.addEventListener('keydown',e=>{
   }
   // mode launcher open
   if(modesOpen){ e.preventDefault(); if(k==='Escape') closeModes(); return; }
+  // career card open
+  if(profileOpen){ e.preventDefault(); if(k==='Escape') closeProfile(); return; }
 
   // DRILL PICKER overlay — arrows move, enter opens, 1-9 jump, esc/backslash close
   if(pickerOpen){
@@ -2018,6 +2061,92 @@ function renderSessionGraph(splits){
   return `<svg viewBox="0 0 ${W} ${H}" class="sg-svg" preserveAspectRatio="xMidYMid meet">${grid}${ylab}${body}${dots}${xlab}</svg>`;
 }
 
+/* ============================================================
+   CAREER CARD — your bests + where you rank vs the field
+   ============================================================ */
+let profileOpen=false;
+function closeProfile(){ profileOpen=false; const m=$('profileModal'); if(m) m.classList.remove('show'); }
+function wireProfileClose(m){ const c=m.querySelector('#pcClose'); if(c) c.onclick=closeProfile;
+  m.addEventListener('click', e=>{ if(e.target===m) closeProfile(); }, {once:true}); }
+async function openProfile(){
+  const m=$('profileModal'); if(!m) return;
+  profileOpen=true; m.classList.add('show');
+  if(!sb || !me_user){
+    m.innerHTML='<div class="pc-card"><div class="pc-msg">Sign in with your school email to see your card and where you rank against the field.</div>'+
+      '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
+    wireProfileClose(m); return;
+  }
+  m.innerHTML='<div class="pc-card"><div class="pc-loading">loading your card…</div></div>';
+  try{ const data=await loadProfileData(); renderProfile(m, data); }
+  catch(e){
+    m.innerHTML='<div class="pc-card"><div class="pc-msg">Couldn’t load the rankings right now — check your connection and try again.</div>'+
+      '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
+    wireProfileClose(m);
+  }
+}
+async function loadProfileData(){
+  const p=await sb.from('profiles').select('id,handle');
+  const r=await sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
+  const profs=p.data||[], runs=r.data||[];
+  const names={}; profs.forEach(x=>names[x.id]=x.handle||'anon');
+  const per={}; MENU_ORDER.forEach(k=>per[k]=[]);
+  const seen={};
+  runs.forEach(x=>{ if(per[x.challenge]===undefined) return;       // ascending → first seen per user is their best
+    const key=x.challenge+'|'+x.user_id; if(!seen[key]){ seen[key]=true; per[x.challenge].push(x); } });
+  const drills=MENU_ORDER.map(k=>{
+    const best=per[k], total=best.length;
+    const idx=best.findIndex(b=>b.user_id===me_user.id);
+    const mine=idx>=0?best[idx]:null;
+    return { key:k, label:(CHALLENGES[k]&&CHALLENGES[k].label)||k, group:GROUP_OF[k]||'',
+      total, rank:idx>=0?idx+1:null, time:mine?mine.time_ms:null, leader:total?best[0].time_ms:null,
+      pct: idx>=0 ? idx/total : null };           // 0 = top of field
+  });
+  const attempted=drills.filter(d=>d.rank!==null);
+  const avgPct=attempted.length ? attempted.reduce((a,d)=>a+d.pct,0)/attempted.length : null;
+  const firsts=attempted.filter(d=>d.rank===1).length;
+  const bestRank=attempted.length ? Math.min(...attempted.map(d=>d.rank)) : null;
+  const players=new Set(runs.map(r=>r.user_id)).size;
+  return { drills, attempted:attempted.length, avgPct, firsts, bestRank, players };
+}
+function tierOf(avgPct){
+  if(avgPct===null) return {name:'Unranked', cls:'tier-unranked'};
+  if(avgPct<=0.05) return {name:'Diamond',  cls:'tier-diamond'};
+  if(avgPct<=0.15) return {name:'Platinum', cls:'tier-platinum'};
+  if(avgPct<=0.30) return {name:'Gold',     cls:'tier-gold'};
+  if(avgPct<=0.55) return {name:'Silver',   cls:'tier-silver'};
+  return {name:'Bronze', cls:'tier-bronze'};
+}
+function renderProfile(m, d){
+  const tier=tierOf(d.avgPct);
+  const fmtMs=ms=>(ms/1000).toFixed(2)+'s';
+  const standing = d.avgPct===null ? '—' : 'top '+Math.max(1,Math.round(d.avgPct*100))+'%';
+  let body='', lastG=null;
+  d.drills.forEach(x=>{
+    if(x.group!==lastG){ body+=`<div class="pc-grouphdr">${escHtml(x.group)}</div>`; lastG=x.group; }
+    if(x.rank===null){
+      body+=`<div class="pc-row untried"><span class="d-name">${escHtml(x.label)}</span><span class="d-rank">untried</span><span class="d-pct">—</span></div>`;
+    } else {
+      const pct = x.total>1 ? 'top '+Math.max(1,Math.round(x.rank/x.total*100))+'%' : 'only you so far';
+      const gap = (x.rank>1 && x.leader!=null) ? ' · +'+((x.time-x.leader)/1000).toFixed(2)+'s off #1' : (x.rank===1?' · you lead':'');
+      body+=`<div class="pc-row me${x.rank===1?' pc-rank1':''}"><span class="d-name">${escHtml(x.label)} · <b>${fmtMs(x.time)}</b></span>`+
+        `<span class="d-rank">#${x.rank} of ${x.total}</span><span class="d-pct">${pct}${gap}</span></div>`;
+    }
+  });
+  m.innerHTML=`<div class="pc-card">`+
+    `<div class="pc-head"><div class="pc-name">${escHtml(me_handle||'set a name')}</div><div class="pc-tier ${tier.cls}">${tier.name}</div></div>`+
+    `<div class="pc-sub">${escHtml((me_user&&me_user.email)||'')} · ${d.attempted}/${MENU_ORDER.length} drills attempted · field of ${d.players} player${d.players===1?'':'s'}</div>`+
+    `<div class="pc-career">`+
+      `<div class="pc-cstat"><div class="v">${tier.name}</div><div class="l">career rank</div></div>`+
+      `<div class="pc-cstat"><div class="v">${d.bestRank?('#'+d.bestRank):'—'}</div><div class="l">best finish</div></div>`+
+      `<div class="pc-cstat"><div class="v">${d.firsts}</div><div class="l">#1 finishes</div></div>`+
+      `<div class="pc-cstat"><div class="v">${standing}</div><div class="l">avg standing</div></div>`+
+    `</div>`+
+    body+
+    `<div class="pc-foot"><a href="leaderboard.html">full leaderboard ↗</a><a id="pcClose">close</a></div>`+
+    `</div>`;
+  wireProfileClose(m);
+}
+
 /* ---- guided demo player: replays the optimal keystrokes through the real engine ---- */
 const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
   copy:{key:'c',ctrl:true}, paste:{key:'v',ctrl:true}, bold:{key:'b',ctrl:true},
@@ -2196,7 +2325,8 @@ function refreshAuthUI(){
   const slot=$('authSlot'); if(!slot) return;
   if(!sb){ slot.innerHTML=''; return; }
   if(me_user){
-    slot.innerHTML='<span class="auth-who"><b>'+escHtml(me_handle||'set a name')+'</b> &nbsp;<a id="signOut">sign out</a></span>';
+    slot.innerHTML='<a class="who-name" id="openCard" title="your card & rank">'+escHtml(me_handle||'set a name')+'</a> &nbsp;<a id="signOut">sign out</a>';
+    const oc=$('openCard'); if(oc) oc.onclick=openProfile;
     const so=$('signOut'); if(so) so.onclick=()=>{ sb.auth.signOut(); };
   } else {
     slot.innerHTML='<button class="auth-btn" id="authBtn">sign in</button>';
