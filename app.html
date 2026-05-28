@@ -58,11 +58,11 @@
   .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
 
   .gridwrap{background:var(--surface); border:1px solid var(--line); border-radius:12px;
-    padding:12px; overflow:auto; position:relative}
+    padding:16px; overflow:auto; position:relative; min-height:470px; min-width:530px}
   table{border-collapse:collapse; font-family:var(--mono); font-size:13px}
-  th,td{border:1px solid var(--line); height:26px; text-align:right; position:relative; overflow:hidden}
+  th,td{border:1px solid var(--line); height:34px; text-align:right; position:relative; overflow:hidden}
   th{background:var(--surface2); color:var(--muted); font-weight:500; text-align:center;
-    min-width:30px; height:22px; font-size:11px}
+    min-width:30px; height:28px; font-size:11px}
   .rowhdr{min-width:26px}
   td{padding:0 7px; color:var(--text); white-space:nowrap; vertical-align:middle; transition:background .08s}
   td.txt{text-align:left}
@@ -368,8 +368,8 @@ let me_user = null, me_handle = null, me_member = false, authOpen = false, gateO
    returns {ROWS, COLS, cells, sel, active, inputs?}, a grade(),
    and a par (seconds).
    ============================================================ */
-const ROWS_MAX = 12, COLS = 5;            // A..E
-const COLW_DEFAULT = 58;                   // px; autofit widens beyond this
+const ROWS_MAX = 12, COLS = 8;            // A..H
+const COLW_DEFAULT = 66;                   // px; autofit widens beyond this
 const CHARPX = 8.0;                        // approx mono char width at 13px
 
 const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
@@ -415,7 +415,7 @@ const CHALLENGES = {
     hint(S){
       let bDone=true; for(let r=2;r<=this._n+1;r++){ const c=S.cells['B'+r]; if(!c||c.formula!==null) bDone=false; }
       if(bDone) return '';
-      for(let col=3;col<=5;col++){ let match=0;
+      for(let col=3;col<=COLS;col++){ let match=0;
         for(let r=2;r<=this._n+1;r++){ const c=S.cells[colLetter(col)+r]; if(c&&c.formula===null&&Number(c.value)===this._targets['B'+r]) match++; }
         if(match>=2) return 'Those values landed in column '+colLetter(col)+' — they need to replace column B in place. Copy B, then paste-special-values <em>without moving the cursor first</em>.';
       }
@@ -631,7 +631,7 @@ function overflowsCol(St,c){
 
 /* ---- formula (only =SUM needed) ---- */
 function evalSum(expr){
-  const m=expr.match(/=SUM\(([A-E])(\d+):([A-E])(\d+)\)/i);
+  const m=expr.match(/=SUM\(([A-Z])(\d+):([A-Z])(\d+)\)/i);
   if(!m) return 0;
   const c1=m[1].charCodeAt(0)-64, r1=+m[2], r2=+m[4];
   let s=0; for(let r=Math.min(r1,r2);r<=Math.max(r1,r2);r++){ const x=get(r,c1); if(typeof x.value==='number') s+=x.value; }
@@ -1101,7 +1101,7 @@ $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo();
 function loadChallenge(key){
   cur=key; const C=CHALLENGES[key];
   const built=C.build();
-  S={ROWS:built.ROWS, cells:built.cells, active:built.active, sel:null, clipboard:null};
+  S={ROWS:Math.max(built.ROWS, ROWS_MAX), cells:built.cells, active:built.active, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
