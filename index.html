@@ -488,6 +488,33 @@
   .pc-loading,.pc-msg{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:30px 10px; line-height:1.6}
   .who-name{cursor:pointer; color:var(--text)}
   .who-name:hover{color:var(--accent)}
+
+  /* ---- rapid-fire: single-cell card (one instruction, one cell, one chord) ---- */
+  #rapidStage{display:none}
+  body.rapidfire #rapidStage{display:block}
+  body.rapidfire .stage{display:none}
+  body.rapidfire .exrow{display:none}
+  .rf-card{background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:30px 30px 34px; max-width:460px; margin:28px auto 0; text-align:center;
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.7)}
+  .rf-instr{font-family:var(--mono); font-size:15px; color:var(--accent); letter-spacing:.3px; margin-bottom:22px; min-height:20px}
+  .rf-sheet{border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--bg); margin-bottom:26px}
+  .rf-srow{display:grid; grid-template-columns:44px 1fr}
+  .rf-rownum{font-family:var(--mono); font-size:12px; color:var(--faint); background:var(--surface2);
+    display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line)}
+  .rf-cell{font-family:var(--mono); font-size:18px; padding:18px; color:var(--text); min-height:58px;
+    display:flex; align-items:center; box-shadow:inset 0 0 0 2px var(--accent); transition:background .2s, color .2s, font-weight .1s}
+  .rf-cell.bold{font-weight:700}
+  .rf-cell.fx{color:var(--accent)}
+  .rf-cell.flash{background:var(--accent-glow)}
+  .rf-keys{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; min-height:40px}
+  .rf-keycap{font-family:var(--mono); font-size:13px; color:var(--muted); background:var(--surface2);
+    border:1px solid var(--line); border-bottom-width:2px; border-radius:7px; padding:8px 13px; min-width:36px; transition:all .12s}
+  .rf-keycap.lit{color:#0c0d0e; background:var(--accent); border-color:var(--accent); box-shadow:0 0 16px var(--accent-glow); transform:translateY(1px)}
+  .rf-keycap.sep{border:none; background:none; color:var(--faint); padding:8px 0; min-width:0}
+  .rf-keys.miss{animation:rfshake .3s}
+  .rf-keys.miss .rf-keycap:not(.sep){border-color:var(--bad); color:var(--bad)}
+  @keyframes rfshake{0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
   /* ---- landing overlay (fades to the app on start) ---- */
   .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
     background:rgba(11,12,13,.90); backdrop-filter:blur(7px); padding:28px; overflow-y:auto;
@@ -567,6 +594,14 @@
       <div class="result" id="result"></div>
     </div>
     <aside class="checklist" id="checklist"></aside>
+  </div>
+
+  <div id="rapidStage">
+    <div class="rf-card">
+      <div class="rf-instr" id="rfInstr">—</div>
+      <div class="rf-sheet"><div class="rf-srow"><div class="rf-rownum" id="rfCellLabel">B4</div><div class="rf-cell" id="rfCell"></div></div></div>
+      <div class="rf-keys" id="rfKeys"></div>
+    </div>
   </div>
 
   <div class="bar" style="display:none">
@@ -1465,8 +1500,7 @@ function stopClock(){ running=false; clearInterval(tickH); finished=performance.
 
 function checkWin(){
   if(done||demoPlaying) return;
-  const pass = (gameMode==='rapidfire') ? !!(rfTask && rfTask.check(S)) : gradePass();
-  if(!pass) return;
+  if(!gradePass()) return;
   const t=(performance.now()-started)/1000;
   stopClock(); done=true; $('timer').textContent=t.toFixed(2);
   if(marathon && marathon.active){ sessionSolved(t); return; }
@@ -1719,6 +1753,8 @@ document.addEventListener('keydown',e=>{
   if(modesOpen){ e.preventDefault(); if(k==='Escape') closeModes(); return; }
   // career card open
   if(profileOpen){ e.preventDefault(); if(k==='Escape') closeProfile(); return; }
+  // rapid-fire runs on its own single-cell handler (grid engine is bypassed)
+  if(gameMode==='rapidfire' && marathon && marathon.active){ rapidKey(e); return; }
 
   // DRILL PICKER overlay — arrows move, enter opens, 1-9 jump, esc/backslash close
   if(pickerOpen){
@@ -1878,50 +1914,82 @@ const SESSION_CFG = {
     body:'Random drills, back to back, against the clock. The timer starts on your first keystroke — clear as many as you can.',
     durs:[[180,'3','min'],[300,'5','min'],[600,'10','min']], advance:480 },
   rapidfire: { title:'⚡ rapid-fire', unit:'rounds', noun:'rapid-fire',
-    body:'One shortcut at a time, as fast as you can recall it. The clock starts on your first keystroke.',
-    durs:[[30,'30','sec'],[60,'60','sec'],[90,'90','sec']], advance:170 },
+    body:'One cell, one instruction, one shortcut — fire it as fast as you can. Next, next, next.',
+    durs:[[30,'30','sec'],[60,'60','sec'],[90,'90','sec']], advance:300 },
 };
 
-/* rapid-fire micro-tasks: each is one cell + one shortcut, checked on a single property */
-const rpC=()=>2+(Math.random()*4|0), rpR=()=>2+(Math.random()*3|0), rpV=()=>(2+(Math.random()*8|0));
-const RAPID = [
-  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV()*100;
-    return { label:'Bold', par:1, prompt:`Make <b>${ref}</b> bold`,
-      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v,fmtStyle:'comma'}}, active:{r,c}}),
-      check:S=>{const x=S.cells[ref]; return !!(x&&x.bold);} }; },
-  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV();
-    return { label:'Percent', par:1, prompt:`Percent-format <b>${ref}</b>`,
-      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v}}, active:{r,c}}),
-      check:S=>{const x=S.cells[ref]; return !!(x&&x.fmtStyle==='percent');} }; },
-  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV()*1000;
-    return { label:'Currency', par:1, prompt:`Currency-format <b>${ref}</b>`,
-      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v}}, active:{r,c}}),
-      check:S=>{const x=S.cells[ref]; return !!(x&&x.fmtStyle==='currency');} }; },
-  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV()*1000;
-    return { label:'Comma', par:1, prompt:`Comma-format <b>${ref}</b>`,
-      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v}}, active:{r,c}}),
-      check:S=>{const x=S.cells[ref]; return !!(x&&x.fmtStyle==='comma');} }; },
-  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV()*100;
-    return { label:'Bottom border', par:4, prompt:`Give <b>${ref}</b> a bottom border`,
-      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v,fmtStyle:'comma'}}, active:{r,c}}),
-      check:S=>{const x=S.cells[ref]; return !!(x&&x.bb);} }; },
-  ()=>{ const c=2+(Math.random()*3|0),r=rpR(),ref=colLetter(c)+r;
-    return { label:'Wrap text', par:3, prompt:`Turn on wrap text in <b>${ref}</b>`,
-      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:'cost of goods sold',txt:true}}, active:{r,c}}),
-      check:S=>{const x=S.cells[ref]; return !!(x&&x.wrap);} }; },
+/* rapid-fire = the homepage "live drill" card: one instruction, one cell, one chord.
+   Decoupled from the grid engine — it runs on its own minimal key handler. */
+const RF_HEADERS=['Revenue','EBITDA','Gross profit','Total assets','Net income','Cost of goods','Free cash flow','Headcount'];
+const rfBig=()=>{ const base=[12,34,56,78,91,128,245][Math.floor(Math.random()*7)]; return base*1000+Math.floor(Math.random()*900); };
+const rfRatio=()=>(Math.floor(Math.random()*900)+40)/1000;          // 0.04–0.94
+const RF_OPS=[
+  { op:'bold', label:'Bold', instr:'Bold the header', keys:['Ctrl','B'],
+    make:()=>({text:RF_HEADERS[Math.floor(Math.random()*RF_HEADERS.length)]}),
+    show:c=>({text:c.text}), solved:c=>({text:c.text, bold:true}) },
+  { op:'currency', label:'Currency', instr:'Format as currency', keys:['Ctrl','Shift','$'],
+    make:()=>({num:rfBig()}),
+    show:c=>({text:String(c.num)}), solved:c=>({text:'$'+c.num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}) },
+  { op:'percent', label:'Percent', instr:'Format as percent', keys:['Ctrl','Shift','%'],
+    make:()=>({num:rfRatio()}),
+    show:c=>({text:String(c.num)}), solved:c=>({text:(c.num*100).toFixed(1)+'%'}) },
+  { op:'comma', label:'Comma', instr:'Comma-format the number', keys:['Ctrl','Shift','!'],
+    make:()=>({num:rfBig()}),
+    show:c=>({text:String(c.num)}), solved:c=>({text:c.num.toLocaleString('en-US')}) },
 ];
-function loadRapid(task){
-  rfTask=task;
-  const built=task.build();
-  S={ROWS:built.ROWS||5, cells:built.cells, active:built.active, sel:built.sel||null, clipboard:null};
-  colW=new Array(COLS+1).fill(COLW_DEFAULT);
-  if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
-  started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
-  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[];
-  $('timer').textContent='0.00'; $('timer').classList.remove('run');
-  $('prompt').innerHTML=task.prompt;
-  $('result').className='result'; $('result').innerHTML='';
-  drawRibbon(); render(); resetFlash(); hideResults();
+let rfBusy=false;
+function loadRapidCard(){
+  let op, guard=0;
+  do{ op=RF_OPS[Math.floor(Math.random()*RF_OPS.length)]; guard++; } while(RF_OPS.length>1 && op.op===lastRapid && guard<8);
+  lastRapid=op.op;
+  rfTask={ def:op, op:op.op, label:op.label, instr:op.instr, keys:op.keys, data:op.make(),
+    cellLabel: colLetter(2+(Math.random()*4|0))+(2+(Math.random()*6|0)), shownAt:performance.now() };
+  rfBusy=false; renderRfCard('show');
+}
+function renderRfCard(state){
+  if(!rfTask) return;
+  const view = state==='solved' ? rfTask.def.solved(rfTask.data) : rfTask.def.show(rfTask.data);
+  const ie=$('rfInstr'); if(ie) ie.textContent=rfTask.instr;
+  const le=$('rfCellLabel'); if(le) le.textContent=rfTask.cellLabel;
+  const cell=$('rfCell'); if(cell){ cell.textContent=view.text||'\u00A0';
+    cell.className='rf-cell'+(view.bold?' bold':'')+(view.fx?' fx':'')+(state==='solved'?' flash':''); }
+  const keys=$('rfKeys'); if(keys){ keys.className='rf-keys'; keys.innerHTML='';
+    rfTask.keys.forEach((k,i)=>{
+      if(i>0){ const s=document.createElement('span'); s.className='rf-keycap sep'; s.textContent='+'; keys.appendChild(s); }
+      const el=document.createElement('span'); el.className='rf-keycap'+(state==='solved'?' lit':''); el.textContent=k; keys.appendChild(el);
+    }); }
+}
+function rapidKey(e){
+  const k=e.key;
+  if(k==='Escape'){ e.preventDefault(); return; }            // session ends via the HUD button
+  if(rfBusy || !rfTask){ if(e.ctrlKey||e.altKey) e.preventDefault(); return; }
+  let op=null;
+  if(e.ctrlKey && !e.altKey && !e.metaKey){
+    if(!e.shiftKey && (k==='b'||k==='B')) op='bold';
+    else if(e.shiftKey){
+      if(k==='$'||k==='4') op='currency';
+      else if(k==='%'||k==='5') op='percent';
+      else if(k==='!'||k==='1') op='comma';
+    }
+  }
+  if(!op) return;                                            // ignore unrelated keys — no penalty
+  e.preventDefault();
+  if(marathon && marathon.active && !marathon.endAt){ marathon.startAt=performance.now(); marathon.endAt=marathon.startAt+marathon.dur*1000; }
+  if(op===rfTask.op) rfSolve(); else rfMiss();
+}
+function rfSolve(){
+  rfBusy=true;
+  const t=(performance.now()-rfTask.shownAt)/1000;
+  const par=rfTask.keys.length;
+  marathon.splits.push({ label:rfTask.label, t:+t.toFixed(2), keys:par, optimal:par });
+  marathon.keys+=par; marathon.hits+=1;
+  renderRfCard('solved'); updateMarathonHud();
+  if(marathon.endAt && performance.now() >= marathon.endAt){ setTimeout(endSession, marathon.advance); return; }
+  setTimeout(()=>{ if(marathon && marathon.active) loadNext(); }, marathon.advance);
+}
+function rfMiss(){
+  marathon.misses+=1;
+  const keys=$('rfKeys'); if(keys){ keys.classList.remove('miss'); void keys.offsetWidth; keys.classList.add('miss'); }
 }
 
 function openModes(mode){ if(demoPlaying) return; modesMode=mode||'marathon';
@@ -1945,13 +2013,7 @@ function loadRandomDrill(){
   const key=pool.length ? pool[Math.floor(Math.random()*pool.length)] : MENU_ORDER[0];
   lastKey=key; loadChallenge(key);
 }
-function loadRandomRapid(){
-  let task, guard=0;
-  do{ task=RAPID[Math.floor(Math.random()*RAPID.length)](); guard++; }
-  while(RAPID.length>1 && task.label===lastRapid && guard<8);
-  lastRapid=task.label; loadRapid(task);
-}
-function loadNext(){ if(gameMode==='rapidfire') loadRandomRapid(); else loadRandomDrill(); }
+function loadNext(){ if(gameMode==='rapidfire') loadRapidCard(); else loadRandomDrill(); }
 
 function startSession(mode, durSec){
   closeModes(); closePicker(); hideResults(); hideSessionSummary();
@@ -1959,9 +2021,10 @@ function startSession(mode, durSec){
   guided=false; guidedUsed=false; updateGuideBtn();
   const cfg=SESSION_CFG[mode];
   marathon={ mode, dur:durSec, startAt:0, endAt:0, splits:[], keys:0, checks:0, optimal:0,
-    active:true, tickH:null, unit:cfg.unit, advance:cfg.advance };
+    hits:0, misses:0, active:true, tickH:null, unit:cfg.unit, advance:cfg.advance };
   lastKey=null; lastRapid=null;
   document.body.classList.add('session');
+  if(mode==='rapidfire') document.body.classList.add('rapidfire');
   const ue=$('mhUnit'); if(ue) ue.textContent=cfg.unit;
   marathon.tickH=setInterval(sessionTick, 200);
   loadNext();
@@ -1980,15 +2043,13 @@ function updateMarathonHud(){
   const left = marathon.endAt ? (marathon.endAt-performance.now())/1000 : marathon.dur;
   const te=$('mhTime'); if(te){ te.textContent=fmtClock(left); te.classList.toggle('low', !!marathon.endAt && left<=10); }
   const de=$('mhDrills'); if(de) de.textContent=marathon.splits.length;
-  const extra=(marathon.active && !done)?keyLog.length:0;   // live keys for the in-progress task
+  const extra=(gameMode==='marathon' && !done)?keyLog.length:0;   // live keys for the in-progress drill
   const ke=$('mhKeys'); if(ke) ke.textContent=marathon.keys+extra;
 }
 function sessionSolved(t){
-  let label, par, nChecks;
-  if(gameMode==='rapidfire'){ label=rfTask?rfTask.label:'round'; par=rfTask?(rfTask.par||1):1; nChecks=1; }
-  else { const C=CHALLENGES[cur]; label=C.label||C.name||cur; par=C.parKeys; nChecks=C.checks(S).length; }
-  marathon.splits.push({ label, t:+t.toFixed(2), keys:keyLog.length, optimal:par });
-  marathon.keys += keyLog.length; marathon.checks += nChecks; marathon.optimal += par;
+  const C=CHALLENGES[cur]; const par=C.parKeys;
+  marathon.splits.push({ label:C.label||C.name||cur, t:+t.toFixed(2), keys:keyLog.length, optimal:par });
+  marathon.keys += keyLog.length; marathon.checks += C.checks(S).length; marathon.optimal += par;
   updateMarathonHud();
   if(marathon.endAt && performance.now() >= marathon.endAt){ endSession(); return; }
   const r=$('result'); if(r){ r.className='result win'; r.innerHTML='✓ '+t.toFixed(2)+'s'; }
@@ -2006,6 +2067,7 @@ function exitSession(){
   if(marathon){ clearInterval(marathon.tickH); }
   marathon=null; rfTask=null; gameMode='classic';
   document.body.classList.remove('session');
+  document.body.classList.remove('rapidfire');
   hideSessionSummary();
   loadChallenge(MENU_ORDER[0]);
 }
@@ -2016,8 +2078,9 @@ function showSessionSummary(){
   const fastest = n ? s.splits.reduce((a,b)=>b.t<a.t?b:a) : null;
   const eff = s.keys ? Math.round(s.optimal/s.keys*100) : 0;
   const rapid = s.mode==='rapidfire';
+  const acc = rapid ? ((s.hits+s.misses)>0 ? Math.round(s.hits/(s.hits+s.misses)*100) : 100) : 0;
   const cards = rapid
-    ? [[n,'rounds'],[s.keys,'keystrokes'],[eff?eff+'%':'—','key efficiency'],[fastest?fastest.t.toFixed(2)+'s':'—','fastest']]
+    ? [[n,'rounds'],[acc+'%','accuracy'],[fastest?fastest.t.toFixed(2)+'s':'—','fastest'],[avg?avg.toFixed(2)+'s':'—','avg round']]
     : [[n,'drills'],[s.checks,'tasks cleared'],[s.keys,'keystrokes'],[eff?eff+'%':'—','key efficiency']];
   const m=$('sessionModal');
   m.innerHTML=`<div class="ss-card">`+
