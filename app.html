@@ -70,6 +70,8 @@
   td.bold{font-weight:700}
   td.fill-blue{background:#16344e !important; color:#9fd0f4}
   td.over{color:var(--warn); letter-spacing:1px}
+  @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
+  td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
   td.active{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow); z-index:2}
   td.sel{background:rgba(46,163,111,.15)}
   td.sel-t{border-top:2px solid var(--accent)}
@@ -179,6 +181,8 @@
   .cl-item.next .cl-keys kbd{color:#06120c; background:var(--accent); border-color:var(--accent); font-weight:600}
   .guide-toggle{font-family:var(--mono); font-size:11px; color:var(--muted); background:none;
     border:1px solid var(--line); border-radius:7px; padding:5px 10px; cursor:pointer; transition:.15s; margin-right:8px}
+  .toprow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:2px}
+  .toprow .guide-toggle{margin-right:0; font-size:12px; padding:6px 12px}
   .guide-toggle:hover{color:var(--text); border-color:var(--faint)}
   .guide-toggle.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
   .guide-toggle kbd{font-family:var(--mono); font-size:10px; opacity:.8}
@@ -292,7 +296,10 @@
     </div>
   </header>
 
-  <div class="tabs" id="tabs"></div>
+  <div class="toprow">
+    <div class="tabs" id="tabs"></div>
+    <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
+  </div>
   <div class="prompt" id="prompt"></div>
   <div class="fbar">
     <span class="namebox" id="nameBox">A1</span>
@@ -312,7 +319,7 @@
 
   <div class="result" id="result">go — first keystroke starts the clock</div>
 
-  <div class="foot"><button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button><button class="help-toggle" id="helpToggle"><kbd>?</kbd> hints &amp; shortcuts</button></div>
+  <div class="foot"><button class="help-toggle" id="helpToggle"><kbd>?</kbd> hints &amp; shortcuts</button></div>
 
   <div class="help" id="help">
     <div class="help-sec"><h4>solving this one</h4><div id="helpReq"></div></div>
@@ -373,6 +380,7 @@ const CHALLENGES = {
     prompt:'Hardcode column B in place — turn its formulas into plain values. Select B, copy, then paste-special-values right back onto the same cells.',
     req:'<em>keyboard only</em> · select B, <em>ctrl c</em>, then <em>alt e s v ↵</em> — don\'t move the cursor before pasting, so the values land back on B',
     guide:['on B2, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> to grab the column · copy <kbd>ctrl</kbd>+<kbd>c</kbd> · paste values <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd>'],
+    targets:[function(){return 'B2:B'+(this._n+1);}],
     build(){
       const n = rnd(8,11);
       const cells = {};
@@ -417,6 +425,7 @@ const CHALLENGES = {
       'select the notes column E · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd> wrap',
       'select B:D · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
     ],
+    targets:['A1:E1','B2:D6','E2:E6','B2:D6'],
     build(){
       const cells={};
       const heads=['name','rev','ebitda','debt','notes'];
@@ -457,6 +466,7 @@ const CHALLENGES = {
       'select B2:B5 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
       'select column B · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
     ],
+    targets:['B2:B4','B5','B5','B2:B5','B2:B5'],
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:'Sources',txt:true,bold:true};
@@ -485,6 +495,45 @@ const CHALLENGES = {
         {label:'bold + top border on total', ok:tot},
         {label:'comma-format column B', ok:cf},
         {label:'autofit — no ####', ok:af},
+      ];
+    }
+  },
+  format:{
+    name:'Format', label:'Fix the formats', par:35, parKeys:28,
+    prompt:'These outputs came in unformatted. Cast each number to the right type — the margins as percentages, the dollar figures as currency, the share count with comma separators — and trim every stray decimal.',
+    req:'<em>keyboard only</em> · <em>ctrl+shift+%</em> percent · <em>ctrl+shift+$</em> currency · <em>ctrl+shift+!</em> comma · <em>alt h 0</em> / <em>alt h 9</em> add or drop decimals',
+    guide:[
+      'select the two margins · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · on the EBITDA margin add one decimal <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>',
+      'select the two dollar rows · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> · drop decimals <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
+      'select the share count · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>!</kbd> · drop decimals <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
+    ],
+    targets:['B2:B3','B4:B5','B6'],
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Metric',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'Value',txt:true,bold:true};
+      const gross=rnd(36,55)/100, ebitda=rnd(150,290)/1000;
+      const rows=[
+        ['Gross margin', gross],
+        ['EBITDA margin', ebitda],
+        ['Revenue', rnd(38,72)*1000000 + rnd(1,99)*10000],
+        ['Net debt', rnd(8,24)*1000000 + rnd(1,99)*10000],
+        ['Share count', rnd(42,140)*100000],
+      ];
+      rows.forEach((row,i)=>{ const r=i+2;
+        cells['A'+r]={...blankCell(),value:row[0],txt:true};
+        cells['B'+r]={...blankCell(),value:row[1]};
+      });
+      return {ROWS:6, cells, active:{r:2,c:2}, sel:null, colW:{1:132,2:138}};
+    },
+    checks(S){
+      const pc=(k,dec)=>{const c=S.cells[k]; return !!(c&&c.fmtStyle==='percent'&&c.decimals===dec);};
+      const dol=(k)=>{const c=S.cells[k]; return !!(c&&c.fmtStyle==='currency'&&c.decimals===0);};
+      const com=(k)=>{const c=S.cells[k]; return !!(c&&c.fmtStyle==='comma'&&c.decimals===0);};
+      return [
+        {label:'margins → percent (EBITDA to 1 decimal)', ok: pc('B2',0)&&pc('B3',1)},
+        {label:'dollar figures → currency, 0 dec', ok: dol('B4')&&dol('B5')},
+        {label:'share count → comma, 0 dec', ok: com('B6')},
       ];
     }
   }
@@ -527,6 +576,8 @@ function eachSel(fn){ const r=selRange(); for(let rr=r.r1;rr<=r.r2;rr++) for(let
 
 function fmtNum(n,style,dec){
   if(style==='comma') return Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  if(style==='currency') return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  if(style==='percent') return Number(n*100).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'%';
   return String(n);
 }
 function dispText(cell){
@@ -570,10 +621,21 @@ function autoSum(){
 /* ============================================================
    RENDER
    ============================================================ */
+function parseRef(ref){ const m=ref.match(/^([A-Z]+)(\d+)$/i); if(!m) return null; return {c:m[1].toUpperCase().charCodeAt(0)-64, r:+m[2]}; }
+function resolveRange(str){ if(!str) return null; const parts=str.split(':'); const a=parseRef(parts[0]); const b=parts[1]?parseRef(parts[1]):a; if(!a||!b) return null;
+  return {r1:Math.min(a.r,b.r),r2:Math.max(a.r,b.r),c1:Math.min(a.c,b.c),c2:Math.max(a.c,b.c)}; }
+function currentGuideTarget(){
+  if(!guided||!S||done) return null;
+  const C=CHALLENGES[cur]; if(!C.targets) return null;
+  const items=C.checks(S);
+  for(let i=0;i<items.length;i++){ if(!items[i].ok){ let t=C.targets[i]; if(typeof t==='function') t=t.call(C); return resolveRange(t); } }
+  return null;
+}
 function render(){
   S._colW = colW;
   const g=$('grid'); g.innerHTML='';
   const sr=selRange();
+  const gt=currentGuideTarget();
   // header row
   let head='<tr><th class="rowhdr"></th>';
   for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${colW[c]}px">${colLetter(c)}</th>`;
@@ -588,6 +650,7 @@ function render(){
       const isActive=(r===S.active.r&&c===S.active.c);
       const inSel=(r>=sr.r1&&r<=sr.r2&&c>=sr.c1&&c<=sr.c2);
       if(isActive)cls.push('active'); else if(inSel&&S.sel)cls.push('sel');
+      if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2) cls.push('gtarget');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
       let txt=dispText(cell);
       if(isNum(cell)&&!cell.wrap){
@@ -739,7 +802,8 @@ function showResults(o){
 function hideResults(){ const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 function nextChallenge(){ const keys=Object.keys(CHALLENGES); const i=keys.indexOf(cur); loadChallenge(keys[(i+1)%keys.length]); }
 function toMenu(){ loadChallenge(cur); const r=$('result'); r.className='result';
-  r.innerHTML='menu — <kbd>1</kbd> drill · <kbd>2</kbd> combo · <kbd>3</kbd> gauntlet · or start typing to play this one'; }
+  const menu=Object.keys(CHALLENGES).map((key,i)=>`<kbd>${i+1}</kbd> ${CHALLENGES[key].name}`).join(' · ');
+  r.innerHTML='menu — '+menu+' · or start typing to play this one'; }
 function syncTabs(){ const keys=Object.keys(CHALLENGES); const t=$('tabs'); if(!t) return;
   [...t.children].forEach((b,i)=>b.classList.toggle('on', keys[i]===cur)); }
 
@@ -906,7 +970,7 @@ document.addEventListener('keydown',e=>{
   if((k==='g'||k==='G')&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
 
   // CHALLENGE SELECT (no-mouse): 1 / 2 / 3
-  if(!e.ctrlKey&&!e.altKey&&!e.metaKey&&(k==='1'||k==='2'||k==='3')){
+  if(!e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
     const keys=Object.keys(CHALLENGES), idx=+k-1;
     if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); return; }
   }
@@ -936,6 +1000,9 @@ document.addEventListener('keydown',e=>{
     const lk=k.toLowerCase();
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
+    if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
+    if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
+    if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
   }
 },{capture:true});
 
@@ -957,7 +1024,7 @@ $('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-ke
 function toggleHelp(){ $('help').classList.toggle('show'); }
 $('helpToggle').addEventListener('click',toggleHelp);
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
-function toggleGuided(){ guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); updateChecklist(); }
+function toggleGuided(){ guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
 
 /* ============================================================
@@ -968,6 +1035,7 @@ function loadChallenge(key){
   const built=C.build();
   S={ROWS:built.ROWS, cells:built.cells, active:built.active, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
+  if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[];
   updateGuideBtn();
