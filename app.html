@@ -287,6 +287,50 @@
   .gate-brand{font-family:var(--mono); font-weight:700; font-size:22px; letter-spacing:-.5px; margin-bottom:16px}
   .gate-brand b{color:var(--accent)}
   .gate .auth-card p b{color:var(--text)}
+  /* ---- drill bar + picker overlay ---- */
+  .drillbar{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:12px}
+  .drill-menu-btn{display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-size:13px;
+    color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:9px;
+    padding:8px 13px; cursor:pointer; transition:.15s; max-width:100%}
+  .drill-menu-btn:hover{border-color:var(--accent-dim); background:var(--accent-glow)}
+  .drill-menu-btn .dm-ico{color:var(--accent); font-size:13px}
+  .drill-menu-btn .dm-num{color:var(--muted); font-size:11px}
+  .drill-menu-btn .dm-name{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .drill-menu-btn .dm-caret{color:var(--muted); font-size:10px; margin-left:1px}
+  .drill-step{display:flex; gap:4px}
+  .drill-step .step{font-family:var(--mono); font-size:16px; line-height:1; color:var(--muted); background:var(--surface);
+    border:1px solid var(--line); border-radius:8px; width:32px; height:35px; cursor:pointer; transition:.15s}
+  .drill-step .step:hover{color:var(--text); border-color:var(--accent-dim)}
+  .drillbar .spacer{flex:1 1 auto}
+  .nav-hint{font-family:var(--mono); font-size:10.5px; color:var(--faint); white-space:nowrap}
+
+  .drill-overlay{position:fixed; inset:0; z-index:80; display:none; align-items:flex-start; justify-content:center;
+    background:rgba(6,7,8,.66); backdrop-filter:blur(3px); padding:6vh 16px 16px; overflow-y:auto}
+  .drill-overlay.show{display:flex; animation:doFade .16s ease}
+  @keyframes doFade{from{opacity:0}to{opacity:1}}
+  .do-panel{width:100%; max-width:560px; background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 24px 80px rgba(0,0,0,.5); overflow:hidden; animation:doRise .2s cubic-bezier(.2,.7,.2,1)}
+  @keyframes doRise{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+  .do-head{display:flex; align-items:center; justify-content:space-between; padding:16px 18px 11px}
+  .do-title{font-family:var(--mono); font-size:15px; font-weight:700; letter-spacing:-.3px}
+  .do-close{font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface2);
+    border:1px solid var(--line); border-radius:7px; padding:6px 10px; cursor:pointer; transition:.15s}
+  .do-close:hover{color:var(--text); border-color:var(--accent-dim)}
+  .do-hint{font-family:var(--mono); font-size:11px; color:var(--muted); padding:0 18px 13px; border-bottom:1px solid var(--line)}
+  .do-hint kbd{font-family:var(--mono); color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px}
+  .do-body{padding:8px 10px 14px; max-height:62vh; overflow-y:auto}
+  .do-group{font-family:var(--mono); font-size:10px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); padding:13px 11px 6px}
+  .do-item{display:flex; align-items:center; gap:13px; width:100%; text-align:left; background:none; border:1px solid transparent;
+    border-radius:10px; padding:10px 11px; cursor:pointer; transition:.12s; color:var(--text)}
+  .do-item:hover{background:var(--surface2); border-color:var(--line)}
+  .do-item.on{background:var(--accent-glow); border-color:var(--accent-dim)}
+  .di-num{font-family:var(--mono); font-size:11px; color:var(--muted); flex:none; width:20px; text-align:right}
+  .do-item.on .di-num{color:var(--accent)}
+  .di-main{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
+  .di-name{font-family:var(--sans); font-size:14px; font-weight:600}
+  .di-desc{font-family:var(--sans); font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .di-meta{font-family:var(--mono); font-size:10.5px; color:var(--faint); flex:none; white-space:nowrap}
+  @media(max-width:560px){ .di-meta{display:none} .di-desc{white-space:normal} }
 </style>
 </head>
 <body>
@@ -299,8 +343,19 @@
     </div>
   </header>
 
-  <div class="toprow">
-    <div class="tabs" id="tabs"></div>
+  <div class="drillbar">
+    <button class="drill-menu-btn" id="drillMenuBtn" title="browse all drills">
+      <span class="dm-ico">▦</span>
+      <span class="dm-num" id="dmNum">01</span>
+      <span class="dm-name" id="dmName">—</span>
+      <span class="dm-caret">▾</span>
+    </button>
+    <div class="drill-step">
+      <button class="step" id="prevDrill" title="previous drill">‹</button>
+      <button class="step" id="nextDrill" title="next drill">›</button>
+    </div>
+    <span class="nav-hint">click for all · <kbd>1</kbd>–<kbd>9</kbd> jump</span>
+    <div class="spacer"></div>
     <div class="mode-ctrls">
       <button class="guide-toggle" id="demoBtn">▶ watch solution</button>
       <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
@@ -334,7 +389,18 @@
     <div class="help-sec"><h4>commands</h4>
       <div><kbd>ctrl+c</kbd> copy &nbsp; <kbd>ctrl+b</kbd> bold &nbsp; <kbd>ctrl+z</kbd> undo &nbsp; <kbd>alt</kbd> opens the ribbon — pick a tab, then its keys (e.g. <kbd>h v s</kbd> or legacy <kbd>e s</kbd> for paste special; <kbd>h u s</kbd> for AutoSum)</div></div>
     <div class="help-sec"><h4>flow</h4>
-      <div><kbd>1/2/3</kbd> switch exercise &nbsp; <kbd>shift+f11</kbd> restart &nbsp; <kbd>esc</kbd> cancel ribbon &nbsp; on the results card: <kbd>enter</kbd> again · <kbd>space</kbd> next</div></div>
+      <div><kbd>▦ drills</kbd> menu (top-left) or <kbd>1</kbd>–<kbd>9</kbd> jump &nbsp; <kbd>‹ ›</kbd> prev/next &nbsp; <kbd>shift+f11</kbd> restart &nbsp; <kbd>esc</kbd> cancel ribbon &nbsp; on the results card: <kbd>enter</kbd> again · <kbd>space</kbd> next<br><span style="color:var(--faint)">in the installed app: <kbd>ctrl+pgup</kbd> / <kbd>ctrl+pgdn</kbd> switch drills like Excel sheets (browser tabs block these in a normal tab)</span></div></div>
+  </div>
+</div>
+
+<div class="drill-overlay" id="drillOverlay">
+  <div class="do-panel">
+    <div class="do-head">
+      <div class="do-title">Choose a drill</div>
+      <button class="do-close" id="drillClose">close · esc</button>
+    </div>
+    <div class="do-hint">Click any drill to start &nbsp;·&nbsp; press <kbd>1</kbd>–<kbd>9</kbd> to jump &nbsp;·&nbsp; <kbd>esc</kbd> to close</div>
+    <div class="do-body" id="drillList"></div>
   </div>
 </div>
 
@@ -906,6 +972,7 @@ const CHALLENGES = {
    STATE + ENGINE
    ============================================================ */
 let S, cur='drill', colW=[], started=0, finished=0, running=false, tickH=null;
+const IS_STANDALONE = !!(window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone));
 let mouseUsed=false, mode='normal', path=[], dialog=null, done=false, pasteKind=null, pendingFlash=null;
 let guided=false, guidedUsed=false;
 let demoPlaying=false;
@@ -1221,12 +1288,17 @@ function showResults(o){
   $('result').innerHTML='';
 }
 function hideResults(){ const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
-function nextChallenge(){ const keys=Object.keys(CHALLENGES); const i=keys.indexOf(cur); loadChallenge(keys[(i+1)%keys.length]); }
+function nextChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i+1)%MENU_ORDER.length]); }
+function prevChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i-1+MENU_ORDER.length)%MENU_ORDER.length]); }
 function toMenu(){ loadChallenge(cur); const r=$('result'); r.className='result';
   const menu=Object.keys(CHALLENGES).map((key,i)=>`<kbd>${i+1}</kbd> ${CHALLENGES[key].name}`).join(' · ');
   r.innerHTML='menu — '+menu+' · or start typing to play this one'; }
-function syncTabs(){ const keys=Object.keys(CHALLENGES); const t=$('tabs'); if(!t) return;
-  [...t.children].forEach((b,i)=>b.classList.toggle('on', keys[i]===cur)); }
+function syncTabs(){ const C=CHALLENGES[cur]; if(!C) return;
+  const n=MENU_ORDER.indexOf(cur)+1;
+  const num=$('dmNum'), nm=$('dmName');
+  if(num) num.textContent=String(n).padStart(2,'0');
+  if(nm) nm.textContent=C.label;
+  const list=$('drillList'); if(list) [...list.querySelectorAll('.do-item')].forEach(b=>b.classList.toggle('on', b.dataset.key===cur)); }
 
 function recalc(){
   for(let pass=0; pass<8; pass++){
@@ -1416,6 +1488,26 @@ document.addEventListener('keydown',e=>{
   // while the sign-in modal is open, the trainer ignores keys (esc closes it)
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
   if(gateOpen){ return; }
+
+  // DRILL PICKER overlay is modal: esc closes, 1-9 jumps + closes, everything else swallowed
+  if($('drillOverlay') && $('drillOverlay').classList.contains('show')){
+    if(k==='Escape'){ e.preventDefault(); closeDrillMenu(); return; }
+    if(!e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
+      const keys=MENU_ORDER, idx=+k-1;
+      if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); closeDrillMenu(); }
+      return;
+    }
+    e.preventDefault(); return;
+  }
+
+  // AUTHENTIC sheet-switch (Ctrl+PgUp / Ctrl+PgDn) — only in installed/standalone app mode,
+  // where there are no browser tabs to fight over. In a normal tab the browser owns these keys.
+  if(IS_STANDALONE && (e.ctrlKey||e.metaKey) && (k==='PageUp'||k==='PageDown')){
+    e.preventDefault();
+    if(!demoPlaying && !editing){ k==='PageDown' ? nextChallenge() : prevChallenge(); }
+    return;
+  }
+
   // never let browser zoom combos (ctrl/cmd +/-/0) collide with the grid
   if((e.ctrlKey||e.metaKey)&&(k==='='||k==='+'||k==='-'||k==='_'||k==='0')){ e.preventDefault(); return; }
 
@@ -1467,7 +1559,7 @@ document.addEventListener('keydown',e=>{
 
   // CHALLENGE SELECT (no-mouse): 1 / 2 / 3
   if(!e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
-    const keys=Object.keys(CHALLENGES), idx=+k-1;
+    const keys=MENU_ORDER, idx=+k-1;
     if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); return; }
   }
 
@@ -1525,6 +1617,11 @@ $('helpToggle').addEventListener('click',toggleHelp);
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
+$('drillMenuBtn').addEventListener('click', openDrillMenu);
+$('drillClose').addEventListener('click', closeDrillMenu);
+$('drillOverlay').addEventListener('click', e=>{ if(e.target.id==='drillOverlay') closeDrillMenu(); });
+$('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
+$('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge(); });
 
 /* ---- guided demo player: replays the optimal keystrokes through the real engine ---- */
 const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
@@ -1588,17 +1685,59 @@ function loadChallenge(key){
   $('result').className='result'; $('result').innerHTML='go — first keystroke starts the clock';
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
 }
-function buildTabs(){
-  const t=$('tabs'); t.innerHTML='';
-  let i=1;
-  for(const key in CHALLENGES){
-    const C=CHALLENGES[key];
-    const b=document.createElement('button'); b.className='tab'+(key===cur?' on':'');
-    b.innerHTML=`<span class="lvl">${String(i).padStart(2,'0')}</span>${C.label}`;
-    b.onclick=()=>{ if(demoPlaying) return; [...t.children].forEach(x=>x.classList.remove('on')); b.classList.add('on'); loadChallenge(key); };
-    t.appendChild(b); i++;
-  }
+/* ---- drill picker: short descriptions + skill groupings ---- */
+const DRILL_DESC = {
+  copyover:'Select, copy, and paste a block — all keyboard',
+  drill:'Paste-special values to strip the formulas',
+  combo:'Bold, comma, wrap and autofit a pasted table',
+  format:'Triage the units — percent, currency, comma',
+  polish:'Bold + bottom border + shade a header row',
+  gauntlet:'A full model-ready formatting pass',
+  margin:'Build a margin formula down the column',
+  schedule:'Roll a PP&E schedule forward with links',
+  percent:'Common-size with an anchored ($) formula',
+  foot:'SUM across and down, tie out the corner',
+  comps:'EV/EBITDA multiples, then the average',
+  lookup:'Pull a value out of a table with INDEX/MATCH',
+};
+const DRILL_GROUPS = [
+  {name:'Foundations', keys:['copyover']},
+  {name:'Formatting',  keys:['polish','combo','format','gauntlet']},
+  {name:'Values',      keys:['drill']},
+  {name:'Formulas',    keys:['margin','foot','percent','schedule','comps']},
+  {name:'Lookups',     keys:['lookup']},
+];
+// flat sequence used everywhere (badges, 1-9 keys, steppers, Ctrl+PgUp/Dn) so numbering reads 01→N top-to-bottom
+const MENU_ORDER = (()=>{ const g=DRILL_GROUPS.flatMap(x=>x.keys).filter(k=>CHALLENGES[k]);
+  const extra=Object.keys(CHALLENGES).filter(k=>!g.includes(k)); return [...g,...extra]; })();
+
+function buildDrillMenu(){
+  const list=$('drillList'); if(!list) return;
+  const keys=Object.keys(CHALLENGES);
+  const numOf=k=>MENU_ORDER.indexOf(k)+1;
+  list.innerHTML='';
+  const groups=DRILL_GROUPS.map(g=>({name:g.name, keys:g.keys.filter(k=>CHALLENGES[k])}));
+  const grouped=new Set(DRILL_GROUPS.flatMap(g=>g.keys));
+  const extra=keys.filter(k=>!grouped.has(k));
+  if(extra.length) groups.push({name:'More', keys:extra});
+  groups.forEach(g=>{
+    if(!g.keys.length) return;
+    const h=document.createElement('div'); h.className='do-group'; h.textContent=g.name; list.appendChild(h);
+    g.keys.forEach(key=>{
+      const C=CHALLENGES[key]; const n=numOf(key);
+      const best = PB[key]!==undefined ? PB[key].toFixed(1)+'s' : '—';
+      const b=document.createElement('button'); b.className='do-item'+(key===cur?' on':''); b.dataset.key=key;
+      b.innerHTML=`<span class="di-num">${String(n).padStart(2,'0')}</span>`+
+        `<span class="di-main"><span class="di-name">${C.label}</span>`+
+        `<span class="di-desc">${DRILL_DESC[key]||''}</span></span>`+
+        `<span class="di-meta">par ${C.par}s · best ${best}</span>`;
+      b.onclick=()=>{ if(demoPlaying) return; loadChallenge(key); closeDrillMenu(); };
+      list.appendChild(b);
+    });
+  });
 }
+function openDrillMenu(){ if(demoPlaying) return; buildDrillMenu(); const o=$('drillOverlay'); if(o) o.classList.add('show'); }
+function closeDrillMenu(){ const o=$('drillOverlay'); if(o) o.classList.remove('show'); }
 
 /* ---- PB persistence (window.storage in-artifact, falls back to memory) ---- */
 async function loadPB(){
@@ -1612,8 +1751,8 @@ async function savePB(){
 (async function init(){
   if(sb){ gateOpen=true; const g=$('gate'); if(g){ g.innerHTML='<div class="auth-card"><div class="gate-brand">hotkey<b>.gg</b></div><h3>Checking access…</h3></div>'; g.classList.add('show'); } }
   await loadPB();
-  buildTabs();
-  loadChallenge('drill');
+  buildDrillMenu();
+  loadChallenge(MENU_ORDER[0]);
   initAuth();
 })();
 
