@@ -166,6 +166,22 @@
   .cl-item.ok .cl-box{border-color:var(--accent); background:var(--accent-glow)}
   .cl-hint{margin-top:9px; font-size:12.5px; color:var(--warn); line-height:1.5}
   .cl-hint em{font-style:normal; color:var(--accent)}
+  /* guided / paint-by-numbers */
+  .cl-item{flex-wrap:wrap}
+  .cl-label{flex:1; min-width:0}
+  .cl-keys{flex-basis:100%; margin:3px 0 5px 28px; font-size:11.5px; color:var(--muted); line-height:1.9}
+  .cl-keys kbd{font-family:var(--mono); color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10.5px; margin:0 1px}
+  .cl-item.ok .cl-keys{opacity:.35}
+  .cl-item.next{color:var(--text)}
+  .cl-item.next .cl-box{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow)}
+  .cl-item.next .cl-keys{color:var(--accent)}
+  .cl-item.next .cl-keys kbd{color:#06120c; background:var(--accent); border-color:var(--accent); font-weight:600}
+  .guide-toggle{font-family:var(--mono); font-size:11px; color:var(--muted); background:none;
+    border:1px solid var(--line); border-radius:7px; padding:5px 10px; cursor:pointer; transition:.15s; margin-right:8px}
+  .guide-toggle:hover{color:var(--text); border-color:var(--faint)}
+  .guide-toggle.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+  .guide-toggle kbd{font-family:var(--mono); font-size:10px; opacity:.8}
   .keylog{display:flex; gap:5px; flex-wrap:wrap; margin-top:10px; min-height:24px; align-items:center}
   .kchip{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:5px; padding:2px 7px}
@@ -296,7 +312,7 @@
 
   <div class="result" id="result">go — first keystroke starts the clock</div>
 
-  <div class="foot"><button class="help-toggle" id="helpToggle"><kbd>?</kbd> hints &amp; shortcuts</button></div>
+  <div class="foot"><button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button><button class="help-toggle" id="helpToggle"><kbd>?</kbd> hints &amp; shortcuts</button></div>
 
   <div class="help" id="help">
     <div class="help-sec"><h4>solving this one</h4><div id="helpReq"></div></div>
@@ -356,6 +372,7 @@ const CHALLENGES = {
     name:'Drill', label:'Hardcode it', par:13, parKeys:9,
     prompt:'Hardcode column B in place — turn its formulas into plain values. Select B, copy, then paste-special-values right back onto the same cells.',
     req:'<em>keyboard only</em> · select B, <em>ctrl c</em>, then <em>alt e s v ↵</em> — don\'t move the cursor before pasting, so the values land back on B',
+    guide:['on B2, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> to grab the column · copy <kbd>ctrl</kbd>+<kbd>c</kbd> · paste values <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd>'],
     build(){
       const n = rnd(8,11);
       const cells = {};
@@ -394,6 +411,12 @@ const CHALLENGES = {
     name:'Combo', label:'Clean the paste', par:32, parKeys:20,
     prompt:'A raw paste landed messy. Make it presentable: bold the header row, comma-format the number columns to 0 decimals, wrap the notes column, and autofit so nothing shows ####.',
     req:'<em>keyboard only</em> · alt h o i autofit · alt h w wrap · ctrl b bold · alt h k comma then alt h 9 to drop decimals',
+    guide:[
+      'on the header row, <kbd>shift</kbd>+<kbd>space</kbd> to select it · <kbd>ctrl</kbd>+<kbd>b</kbd> bold',
+      'select B2:D6 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> comma · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice to drop decimals',
+      'select the notes column E · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd> wrap',
+      'select B:D · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
+    ],
     build(){
       const cells={};
       const heads=['name','rev','ebitda','debt','notes'];
@@ -427,6 +450,13 @@ const CHALLENGES = {
     name:'Gauntlet', label:'Make it model-ready', par:75, parKeys:30,
     prompt:'Finish this mini build to house style: shade the three input cells blue, add a SUM total, make the total bold with a top border, comma-format column B to 0 decimals, and autofit so nothing clips.',
     req:'<em>keyboard only</em> · alt h h fill · alt = sum · ctrl b bold · alt h b t top border · alt h k / alt h 9 format · alt h o i autofit',
+    guide:[
+      'select B2:B4 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> fill · pick blue',
+      'go to B5 · <kbd>alt</kbd>+<kbd>=</kbd> autosum · <kbd>↵</kbd>',
+      'on B5 · <kbd>ctrl</kbd>+<kbd>b</kbd> bold · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> top border',
+      'select B2:B5 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
+      'select column B · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
+    ],
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:'Sources',txt:true,bold:true};
@@ -465,6 +495,7 @@ const CHALLENGES = {
    ============================================================ */
 let S, cur='drill', colW=[], started=0, finished=0, running=false, tickH=null;
 let mouseUsed=false, mode='normal', path=[], dialog=null, done=false, pasteKind=null, pendingFlash=null;
+let guided=false, guidedUsed=false;
 let undoStack=[], redoStack=[], keyLog=[];
 let PB = {};
 
@@ -674,10 +705,10 @@ function checkWin(){
     const t=(performance.now()-started)/1000;
     stopClock(); done=true; $('timer').textContent=t.toFixed(2);
     const C=CHALLENGES[cur]; let pb=false;
-    if(!mouseUsed){ const prev=PB[cur];
+    if(!mouseUsed && !guidedUsed){ const prev=PB[cur];
       if(prev===undefined||t<prev){ PB[cur]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
-    showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed});
-    if(sb && me_user && !mouseUsed){
+    showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
+    if(sb && me_user && !mouseUsed && !guidedUsed){
       recordRun(t).then(ok=>{ const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); } });
     }
   }
@@ -686,6 +717,7 @@ function showResults(o){
   const best = PB[cur]!==undefined ? PB[cur].toFixed(2)+'s' : '—';
   let postRow;
   if(o.mouse)       postRow='<span class="rm-soon">not posted — mouse used</span>';
+  else if(o.guided) postRow='<span class="rm-soon">practice run (guided) — not posted</span>';
   else if(!sb)      postRow='<span class="rm-soon">global leaderboard coming soon</span>';
   else if(!me_user) postRow='<span class="rm-post-cta" id="rmSignin">sign in to post your time →</span>';
   else              postRow='<span class="rm-posted" id="rmPost">posting to the leaderboard…</span>';
@@ -716,11 +748,16 @@ function commitAction(){ render(); checkWin(); }
 function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
 function updateChecklist(){
   const el=$('checklist'); if(!el||!S) return;
-  const items=CHALLENGES[cur].checks(S);
-  const n=items.filter(i=>i.ok).length;
-  let html=`<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
-  items.forEach(i=>{ html+=`<div class="cl-item${i.ok?' ok':''}"><span class="cl-box">${i.ok?'✓':''}</span>${i.label}</div>`; });
   const C=CHALLENGES[cur];
+  const items=C.checks(S);
+  const n=items.filter(i=>i.ok).length;
+  let nextDone=false;
+  let html=`<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
+  items.forEach((i,idx)=>{
+    const isNext = guided && !i.ok && !nextDone; if(isNext) nextDone=true;
+    const keys = (guided && C.guide && C.guide[idx]) ? `<div class="cl-keys">${C.guide[idx]}</div>` : '';
+    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
+  });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
   el.innerHTML=html;
 }
@@ -865,6 +902,9 @@ document.addEventListener('keydown',e=>{
   // HINTS PANEL — '?' toggles, doesn't touch the clock or keystroke count
   if(k==='?'){ e.preventDefault(); toggleHelp(); return; }
 
+  // GUIDED MODE — 'g' toggles paint-by-numbers (meta key; no clock, no keystroke count)
+  if((k==='g'||k==='G')&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
+
   // CHALLENGE SELECT (no-mouse): 1 / 2 / 3
   if(!e.ctrlKey&&!e.altKey&&!e.metaKey&&(k==='1'||k==='2'||k==='3')){
     const keys=Object.keys(CHALLENGES), idx=+k-1;
@@ -916,6 +956,9 @@ $('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-ke
 // hints panel toggle (button mirrors the '?' key)
 function toggleHelp(){ $('help').classList.toggle('show'); }
 $('helpToggle').addEventListener('click',toggleHelp);
+function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
+function toggleGuided(){ guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); updateChecklist(); }
+$('guideToggle').addEventListener('click',toggleGuided);
 
 /* ============================================================
    LOAD / RESET
@@ -926,7 +969,8 @@ function loadChallenge(key){
   S={ROWS:built.ROWS, cells:built.cells, active:built.active, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
-  mouseUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[];
+  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[];
+  updateGuideBtn();
   $('mouseBadge').style.display='none';
   $('timer').textContent='0.00'; $('timer').classList.remove('run');
   $('prompt').innerHTML=C.prompt;
@@ -1107,7 +1151,7 @@ async function redeemCode(){
 }
 
 async function recordRun(t){
-  if(!sb || !me_user || mouseUsed) return false;
+  if(!sb || !me_user || mouseUsed || guidedUsed) return false;
   try{
     const { error } = await sb.from('runs').insert({
       user_id: me_user.id, challenge: cur,
