@@ -19,14 +19,16 @@
     --sans:'Hanken Grotesk',system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
+  html{height:100%}
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
-    display:flex; align-items:center; justify-content:center;
-    min-height:100vh; padding:28px 16px; user-select:none; -webkit-user-select:none;
+    display:flex; flex-direction:column; align-items:center;
+    min-height:100vh; padding:20px 16px; user-select:none; -webkit-user-select:none;
   }
-  .app{width:100%; max-width:760px}
-  header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:22px}
+  /* auto top/bottom margins center the app when the viewport is tall enough, and collapse to a
+     top-aligned, scrollable layout when it isn't — so the header/ribbon never clip on laptops */
+  .app{width:100%; max-width:880px; margin:auto 0}
+  header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px}
   .brand{font-family:var(--mono); font-weight:700; font-size:19px; letter-spacing:-.5px}
   .brand b{color:var(--accent)}
   .brand span{color:var(--faint); font-weight:400}
@@ -42,7 +44,7 @@
   .tab .lvl{color:var(--faint); margin-right:7px}
   .tab.on .lvl{color:var(--accent-dim)}
 
-  .prompt{font-size:15px; line-height:1.55; margin-bottom:16px; min-height:46px}
+  .prompt{font-size:15px; line-height:1.5; margin-bottom:14px; min-height:38px}
   .prompt .req{display:block; margin-top:5px; font-size:12.5px; color:var(--muted)}
   .prompt .req em{color:var(--warn); font-style:normal}
 
@@ -58,7 +60,7 @@
   .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
 
   .gridwrap{background:var(--surface); border:1px solid var(--line); border-radius:12px;
-    padding:16px; overflow:auto; position:relative; min-height:470px; min-width:530px}
+    padding:16px; overflow:auto; position:relative; min-height:418px; min-width:0}
   table{border-collapse:collapse; font-family:var(--mono); font-size:13px}
   th,td{border:1px solid var(--line); height:34px; text-align:right; position:relative; overflow:hidden}
   th{background:var(--surface2); color:var(--muted); font-weight:500; text-align:center;
@@ -315,22 +317,65 @@
   .gate-brand b{color:var(--accent)}
   .gate .auth-card p b{color:var(--text)}
   /* ---- top exercise row + bottom sheet tabs ---- */
-  .exrow{display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px}
+  .exrow{display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:8px}
   .exrow .prompt{flex:1 1 320px; margin:0}
   .mode-ctrls{display:flex; align-items:center; gap:8px; flex:none}
 
-  .sheets{display:flex; align-items:stretch; gap:2px; margin-top:12px; border-bottom:1px solid var(--line)}
-  .sheet-nav{font-family:var(--mono); font-size:15px; line-height:1; color:var(--muted); background:none; border:none;
-    cursor:pointer; padding:0 7px 7px; transition:color .13s; align-self:flex-end}
-  .sheet-nav:hover{color:var(--accent)}
-  .sheet-tabs{display:flex; gap:3px; overflow-x:auto; flex:1 1 auto; padding-top:6px; scrollbar-width:none}
-  .sheet-tabs::-webkit-scrollbar{display:none}
-  .sheet{font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
-    border:1px solid var(--line); border-bottom:none; border-radius:7px 7px 0 0; padding:7px 13px;
-    white-space:nowrap; cursor:pointer; transition:.13s; position:relative; top:1px}
-  .sheet:hover{color:var(--text); background:var(--surface2)}
-  .sheet.on{color:var(--accent); background:var(--surface2); border-color:var(--accent-dim);
-    box-shadow:inset 0 2px 0 var(--accent); top:0; font-weight:600}
+  /* two-column workspace: grid on the left, checklist rail on the right */
+  .stage{display:flex; align-items:flex-start; gap:20px}
+  .stage-main{flex:1 1 auto; min-width:0}
+  .checklist{flex:0 0 240px; align-self:stretch; background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; padding:15px 16px; margin-top:0}
+  @media(max-width:840px){
+    .stage{flex-direction:column}
+    .checklist{flex-basis:auto; width:100%; align-self:auto}
+  }
+
+  /* compact drill selector (replaces the bottom sheet-tab strip) */
+  .drillbar{display:flex; align-items:center; gap:6px; margin-bottom:14px}
+  .db-nav{font-family:var(--mono); font-size:15px; line-height:1; color:var(--muted); background:var(--surface);
+    border:1px solid var(--line); border-radius:8px; padding:8px 11px; cursor:pointer; transition:.13s}
+  .db-nav:hover{color:var(--accent); border-color:var(--accent-dim)}
+  .db-current{flex:1 1 auto; min-width:0; display:flex; align-items:center; gap:11px; text-align:left;
+    font-family:var(--sans); background:var(--surface); border:1px solid var(--line); border-radius:8px;
+    padding:8px 13px; cursor:pointer; transition:.13s; color:var(--text)}
+  .db-current:hover{border-color:var(--accent-dim); background:var(--surface2)}
+  .db-cat{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.6px;
+    color:var(--accent); flex:none}
+  .db-name{font-size:13.5px; font-weight:600; flex:1 1 auto; min-width:0; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap}
+  .db-pos{font-family:var(--mono); font-size:11px; color:var(--muted); flex:none}
+  .db-more{font-family:var(--mono); font-size:11px; color:var(--faint); flex:none}
+  .db-more kbd{font-family:var(--mono); color:var(--muted); background:var(--surface2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px}
+
+  /* drill picker overlay */
+  .picker-modal{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none;
+    align-items:center; justify-content:center; z-index:55; padding:24px}
+  .picker-modal.show{display:flex}
+  .pk-card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    width:520px; max-width:94vw; max-height:84vh; overflow:auto; padding:22px 22px 16px;
+    box-shadow:0 24px 70px rgba(0,0,0,.6)}
+  .pk-title{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:1px; margin-bottom:14px}
+  .pk-group{margin-bottom:14px}
+  .pk-glabel{font-family:var(--mono); font-size:10px; color:var(--accent); text-transform:uppercase;
+    letter-spacing:.8px; margin-bottom:6px; padding-left:2px}
+  .pk-row{display:flex; align-items:center; gap:12px; padding:8px 11px; border-radius:9px;
+    border:1px solid transparent; cursor:pointer; transition:.1s}
+  .pk-row:hover{background:var(--surface2)}
+  .pk-row.sel{background:var(--surface2); border-color:var(--accent-dim)}
+  .pk-row.cur .pk-name{color:var(--accent)}
+  .pk-num{font-family:var(--mono); font-size:11px; color:var(--faint); width:18px; flex:none; text-align:right}
+  .pk-info{flex:1 1 auto; min-width:0}
+  .pk-name{font-size:13.5px; font-weight:600; color:var(--text)}
+  .pk-desc{font-size:11.5px; color:var(--muted); margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .pk-best{font-family:var(--mono); font-size:11px; color:var(--muted); flex:none}
+  .pk-best b{color:var(--accent); font-weight:500}
+  .pk-foot{font-family:var(--mono); font-size:11px; color:var(--faint); border-top:1px solid var(--line);
+    padding-top:12px; margin-top:4px; text-align:center}
+  .pk-foot kbd{color:var(--muted); background:var(--surface2); border:1px solid var(--line);
+    border-radius:4px; padding:1px 5px; font-size:10px; margin:0 1px}
   /* ---- landing overlay (fades to the app on start) ---- */
   .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
     background:rgba(11,12,13,.90); backdrop-filter:blur(7px); padding:28px; overflow-y:auto;
@@ -358,12 +403,23 @@
 <body>
 <div class="app">
   <header>
-    <div class="brand">hotkey<b>.gg</b><span> / trainer</span></div>
+    <div class="brand">hotkey<b>.gg</b><span> / excel trainer</span></div>
     <div class="hdr-right">
       <span class="hint-top"><kbd>alt</kbd> ribbon &nbsp;·&nbsp; <kbd>shift+f11</kbd> restart</span>
       <div class="auth-slot" id="authSlot"></div>
     </div>
   </header>
+
+  <div class="drillbar">
+    <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
+    <button class="db-current" id="drillPick" title="all drills">
+      <span class="db-cat" id="dbCat">—</span>
+      <span class="db-name" id="dbName">—</span>
+      <span class="db-pos" id="dbPos"></span>
+      <span class="db-more"><kbd>\</kbd> all</span>
+    </button>
+    <button class="db-nav" id="nextDrill" title="next drill (›)">›</button>
+  </div>
 
   <div class="exrow">
     <div class="prompt" id="prompt"></div>
@@ -372,28 +428,27 @@
       <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
     </div>
   </div>
-  <div class="ribbon" id="ribbon"></div>
-  <div class="fbar">
-    <span class="namebox" id="nameBox">A1</span>
-    <span class="fx"><i>fx</i></span>
-    <span class="fcontent empty" id="fContent">empty</span>
-    <span class="ftimer" id="timer">0.00</span>
+
+  <div class="stage">
+    <div class="stage-main">
+      <div class="ribbon" id="ribbon"></div>
+      <div class="fbar">
+        <span class="namebox" id="nameBox">A1</span>
+        <span class="fx"><i>fx</i></span>
+        <span class="fcontent empty" id="fContent">empty</span>
+        <span class="ftimer" id="timer">0.00</span>
+      </div>
+      <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
+      <div class="result" id="result"></div>
+    </div>
+    <aside class="checklist" id="checklist"></aside>
   </div>
-  <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
-  <div class="sheets">
-    <button class="sheet-nav" id="prevDrill" title="previous drill">‹</button>
-    <div class="sheet-tabs" id="sheetTabs"></div>
-    <button class="sheet-nav" id="nextDrill" title="next drill">›</button>
-  </div>
-  <div class="checklist" id="checklist"></div>
 
   <div class="bar" style="display:none">
     <div class="stat">time par <b id="par">—</b> · best <b id="pb">—</b><br>keys <b id="keyN">0</b> · optimal ~<b id="keyPar">—</b></div>
     <div class="spacer"></div>
     <div class="badge" id="mouseBadge" style="display:none">mouse used</div>
   </div>
-
-  <div class="result" id="result"></div>
 </div>
 
 <div class="pd-backdrop" id="pasteDialog">
@@ -406,6 +461,13 @@
 
 <div class="keyflash" id="keyflash"></div>
 <div class="results-modal" id="resultsModal"></div>
+<div class="picker-modal" id="picker">
+  <div class="pk-card">
+    <div class="pk-title">choose a drill</div>
+    <div id="pkGroups"></div>
+    <div class="pk-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>↵</kbd> open · <kbd>1</kbd>–<kbd>9</kbd> jump · <kbd>esc</kbd> close</div>
+  </div>
+</div>
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
@@ -1307,13 +1369,16 @@ function showResults(o){
 function hideResults(){ const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 function nextChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i+1)%MENU_ORDER.length]); }
 function prevChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i-1+MENU_ORDER.length)%MENU_ORDER.length]); }
-function toMenu(){ loadChallenge(cur); const r=$('result'); r.className='result';
-  const menu=Object.keys(CHALLENGES).map((key,i)=>`<kbd>${i+1}</kbd> ${CHALLENGES[key].name}`).join(' · ');
-  r.innerHTML='menu — '+menu+' · or start typing to play this one'; }
-function syncTabs(){ const strip=$('sheetTabs'); if(!strip) return;
-  let active=null;
-  [...strip.children].forEach(b=>{ const on=b.dataset.key===cur; b.classList.toggle('on',on); if(on) active=b; });
-  if(active && active.scrollIntoView) active.scrollIntoView({block:'nearest', inline:'center'}); }
+function toMenu(){ loadChallenge(cur); openPicker(); }
+function syncTabs(){
+  const C=CHALLENGES[cur]; if(!C) return;
+  const idx=MENU_ORDER.indexOf(cur);
+  const cel=$('dbCat'); if(cel) cel.textContent=(GROUP_OF[cur]||'Drill');
+  const nel=$('dbName'); if(nel) nel.textContent=C.label||C.name||cur;
+  const pel=$('dbPos'); if(pel) pel.textContent=String(idx+1).padStart(2,'0')+' / '+MENU_ORDER.length;
+  const host=$('pkGroups');
+  if(host){ [...host.querySelectorAll('.pk-row')].forEach(r=>r.classList.toggle('cur', r.dataset.key===cur)); }
+}
 
 function recalc(){
   for(let pass=0; pass<8; pass++){
@@ -1508,6 +1573,19 @@ document.addEventListener('keydown',e=>{
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
   if(gateOpen){ return; }
 
+  // DRILL PICKER overlay — arrows move, enter opens, 1-9 jump, esc/backslash close
+  if(pickerOpen){
+    e.preventDefault();
+    if(k==='Escape'||k==='\\'){ closePicker(); return; }
+    if(k==='ArrowDown'){ movePk(1); return; }
+    if(k==='ArrowUp'){ movePk(-1); return; }
+    if(k==='Enter'){ choosePk(); return; }
+    if(/^[1-9]$/.test(k)){ const key=MENU_ORDER[+k-1]; if(key){ closePicker(); loadChallenge(key); } return; }
+    return;
+  }
+  // open the picker with backslash (ignored while typing a formula)
+  if(k==='\\' && !editing && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); openPicker(); return; }
+
   // AUTHENTIC sheet-switch (Ctrl+PgUp / Ctrl+PgDn) — only in installed/standalone app mode,
   // where there are no browser tabs to fight over. In a normal tab the browser owns these keys.
   if(IS_STANDALONE && (e.ctrlKey||e.metaKey) && (k==='PageUp'||k==='PageDown')){
@@ -1623,6 +1701,21 @@ $('startBtn').addEventListener('click', tryEnter);
 $('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
 $('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge(); });
 
+/* ---------- drill picker overlay ---------- */
+let pickerOpen=false, pkSel=0;
+function pkRows(){ const h=$('pkGroups'); return h ? [...h.querySelectorAll('.pk-row')] : []; }
+function highlightPk(){ const rows=pkRows(); rows.forEach((r,i)=>r.classList.toggle('sel', i===pkSel));
+  const s=rows[pkSel]; if(s && s.scrollIntoView) s.scrollIntoView({block:'nearest'}); }
+function openPicker(){ if(demoPlaying) return; buildSheetTabs();
+  const rows=pkRows(); pkSel=Math.max(0, rows.findIndex(r=>r.dataset.key===cur));
+  pickerOpen=true; $('picker').classList.add('show'); highlightPk(); }
+function closePicker(){ pickerOpen=false; const p=$('picker'); if(p) p.classList.remove('show'); }
+function movePk(d){ const rows=pkRows(); if(!rows.length) return;
+  pkSel=(pkSel+d+rows.length)%rows.length; highlightPk(); }
+function choosePk(){ const rows=pkRows(); const r=rows[pkSel]; if(r){ closePicker(); loadChallenge(r.dataset.key); } }
+$('drillPick').addEventListener('click', ()=>{ pickerOpen?closePicker():openPicker(); });
+$('picker').addEventListener('click', e=>{ if(e.target===$('picker')) closePicker(); });
+
 /* ---- guided demo player: replays the optimal keystrokes through the real engine ---- */
 const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
   copy:{key:'c',ctrl:true}, paste:{key:'v',ctrl:true}, bold:{key:'b',ctrl:true},
@@ -1717,17 +1810,33 @@ const TAB_LABEL = {
   drill:'Hardcode', margin:'Margin', foot:'Cross-foot', percent:'Common-size',
   schedule:'Schedule', comps:'Comps', lookup:'Lookup',
 };
-function buildSheetTabs(){
-  const strip=$('sheetTabs'); if(!strip) return;
-  strip.innerHTML='';
-  MENU_ORDER.forEach(key=>{
-    const C=CHALLENGES[key]; if(!C) return;
-    const b=document.createElement('button');
-    b.className='sheet'+(key===cur?' on':''); b.dataset.key=key;
-    b.textContent=TAB_LABEL[key]||C.name||C.label;
-    b.title=C.label+(DRILL_DESC[key]?' — '+DRILL_DESC[key]:'');
-    b.onclick=()=>{ if(demoPlaying) return; loadChallenge(key); };
-    strip.appendChild(b);
+const GROUP_OF = (()=>{ const m={}; DRILL_GROUPS.forEach(g=>g.keys.forEach(k=>{ m[k]=g.name; })); return m; })();
+
+function buildSheetTabs(){   // renders the drill picker overlay, grouped by skill
+  const host=$('pkGroups'); if(!host) return;
+  host.innerHTML='';
+  const groups=DRILL_GROUPS.map(g=>({name:g.name, keys:g.keys.filter(k=>CHALLENGES[k])}))
+    .filter(g=>g.keys.length);
+  // catch any drill not assigned to a group
+  const extra=MENU_ORDER.filter(k=>!(k in GROUP_OF));
+  if(extra.length) groups.push({name:'More', keys:extra});
+  groups.forEach(g=>{
+    const sec=document.createElement('div'); sec.className='pk-group';
+    sec.innerHTML='<div class="pk-glabel">'+g.name+'</div>';
+    g.keys.forEach(key=>{
+      const C=CHALLENGES[key]; if(!C) return;
+      const n=MENU_ORDER.indexOf(key)+1;
+      const row=document.createElement('div');
+      row.className='pk-row'+(key===cur?' cur':''); row.dataset.key=key;
+      const best = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
+      row.innerHTML='<span class="pk-num">'+(n<=9?n:'')+'</span>'+
+        '<span class="pk-info"><div class="pk-name">'+escHtml(C.label||C.name||key)+'</div>'+
+        '<div class="pk-desc">'+escHtml(DRILL_DESC[key]||'')+'</div></span>'+
+        '<span class="pk-best">best <b>'+best+'</b></span>';
+      row.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
+      sec.appendChild(row);
+    });
+    host.appendChild(sec);
   });
 }
 
