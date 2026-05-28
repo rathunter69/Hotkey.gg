@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hotkey.gg — speedrun the Excel that gets you hired</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="description" content="A keyboard-only Excel speedrun trainer. Drill the keystrokes and modeling moves analysts use all day — timed, scored, and built into muscle memory before your internship.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49;
+    --accent:#2ea36f; --accent-dim:#1d6647; --accent-glow:rgba(46,163,111,.22);
+    --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Hanken Grotesk',system-ui,sans-serif;
+    --maxw:1080px;
+  }
+  *{margin:0; padding:0; box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  /* faint spreadsheet-grid atmosphere */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:42px 30px; opacity:.13;
+    mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 0%,transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 0%,transparent 75%);
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:1}
+  a{color:inherit; text-decoration:none}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky; top:0; z-index:50; backdrop-filter:blur(10px);
+    background:rgba(12,13,14,.72); border-bottom:1px solid var(--line);
+  }
+  .nav-in{display:flex; align-items:center; justify-content:space-between; height:62px}
+  .brand{font-family:var(--mono); font-weight:700; font-size:19px; letter-spacing:-.5px}
+  .brand b{color:var(--accent); font-weight:700}
+  .nav-links{display:flex; align-items:center; gap:30px}
+  .nav-links a{font-family:var(--mono); font-size:13px; color:var(--muted); transition:color .15s}
+  .nav-links a:hover{color:var(--text)}
+  .btn{
+    font-family:var(--mono); font-size:13px; font-weight:500; cursor:pointer;
+    border-radius:8px; padding:9px 17px; transition:all .15s; display:inline-block; border:1px solid transparent;
+  }
+  .btn-primary{background:var(--accent); color:#06120c; font-weight:700}
+  .btn-primary:hover{background:#37b97e; box-shadow:0 0 24px var(--accent-glow); transform:translateY(-1px)}
+  .btn-ghost{border-color:var(--line); color:var(--text)}
+  .btn-ghost:hover{border-color:var(--accent-dim); color:var(--accent)}
+  .nav-cta{padding:8px 15px}
+  .menu-btn{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:20px; cursor:pointer}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:88px 0 60px; position:relative}
+  .hero-glow{
+    position:absolute; top:-80px; left:50%; transform:translateX(-50%);
+    width:760px; height:520px; background:radial-gradient(ellipse at center,var(--accent-glow),transparent 65%);
+    z-index:0; pointer-events:none; filter:blur(8px);
+  }
+  .hero-grid{
+    display:grid; grid-template-columns:1.05fr .95fr; gap:54px; align-items:center;
+    position:relative; z-index:1;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:1.6px; text-transform:uppercase;
+    color:var(--accent); margin-bottom:22px; opacity:0;
+  }
+  h1{
+    font-size:clamp(40px,6.2vw,68px); line-height:1.02; font-weight:700; letter-spacing:-1.8px;
+    margin-bottom:22px;
+  }
+  h1 .dim{color:var(--muted); font-weight:600}
+  .lede{font-size:18px; color:var(--muted); max-width:520px; margin-bottom:34px; line-height:1.55}
+  .lede b{color:var(--text); font-weight:600}
+  .hero-cta{display:flex; gap:13px; align-items:center; flex-wrap:wrap}
+  .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:18px}
+  .micro b{color:var(--muted); font-weight:400}
+
+  .fade{opacity:0; transform:translateY(14px); animation:rise .7s cubic-bezier(.2,.7,.3,1) forwards}
+  @keyframes rise{to{opacity:1; transform:translateY(0)}}
+  .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.27s}.d4{animation-delay:.4s}.d5{animation-delay:.52s}
+
+  /* ---------- HERO DEMO PANEL ---------- */
+  .demo{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:24px;
+    box-shadow:0 30px 70px -30px rgba(0,0,0,.7); position:relative; overflow:hidden;
+  }
+  .demo-bar{display:flex; align-items:center; gap:7px; margin-bottom:18px}
+  .demo-dot{width:10px; height:10px; border-radius:50%; background:var(--line)}
+  .demo-tag{margin-left:auto; font-family:var(--mono); font-size:11px; color:var(--faint)}
+  .demo-action{font-family:var(--mono); font-size:12.5px; color:var(--accent); height:18px; letter-spacing:.3px; margin-bottom:14px}
+  .sheet{
+    border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--bg); margin-bottom:20px;
+  }
+  .sheet-row{display:grid; grid-template-columns:34px 1fr; border-bottom:1px solid var(--line)}
+  .sheet-row:last-child{border-bottom:none}
+  .sheet-h{
+    font-family:var(--mono); font-size:11px; color:var(--faint); background:var(--surface2);
+    display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);
+  }
+  .cell{
+    font-family:var(--mono); font-size:14px; padding:11px 14px; color:var(--text);
+    min-height:42px; display:flex; align-items:center; transition:background .25s;
+  }
+  .cell.active{box-shadow:inset 0 0 0 2px var(--accent)}
+  .cell.fx{color:var(--accent)}
+  .cell.bold{font-weight:700}
+  .cell.flash{background:var(--accent-glow)}
+  .keys{display:flex; gap:7px; flex-wrap:wrap; min-height:38px; align-items:center}
+  .keycap{
+    font-family:var(--mono); font-size:12.5px; color:var(--muted); background:var(--surface2);
+    border:1px solid var(--line); border-bottom-width:2px; border-radius:7px; padding:7px 12px;
+    transition:all .12s; min-width:34px; text-align:center;
+  }
+  .keycap.lit{color:#06120c; background:var(--accent); border-color:var(--accent); box-shadow:0 0 16px var(--accent-glow); transform:translateY(1px)}
+  .keycap.sep{border:none; background:none; color:var(--faint); padding:7px 0; min-width:0}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:74px 0; position:relative; z-index:1}
+  .sec-eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin-bottom:14px}
+  .sec-title{font-size:clamp(28px,4vw,40px); font-weight:700; letter-spacing:-1px; margin-bottom:14px; line-height:1.08}
+  .sec-sub{font-size:16.5px; color:var(--muted); max-width:560px; margin-bottom:46px}
+
+  .features{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px 24px;
+    transition:border-color .2s, transform .2s;
+  }
+  .card:hover{border-color:var(--accent-dim); transform:translateY(-3px)}
+  .card-num{font-family:var(--mono); font-size:12px; color:var(--accent-dim); margin-bottom:16px; letter-spacing:1px}
+  .card h3{font-size:18.5px; font-weight:600; margin-bottom:9px; letter-spacing:-.3px}
+  .card p{font-size:14.5px; color:var(--muted); line-height:1.6}
+  .card kbd{
+    font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:5px; padding:1px 6px;
+  }
+
+  /* ---------- LEADERBOARD TEASER ---------- */
+  .board-wrap{position:relative; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--surface)}
+  .board-head, .board-row{
+    display:grid; grid-template-columns:54px 1fr 1.2fr 88px; align-items:center;
+    padding:14px 22px; font-size:14px;
+  }
+  .board-head{
+    font-family:var(--mono); font-size:11px; letter-spacing:1px; text-transform:uppercase;
+    color:var(--faint); border-bottom:1px solid var(--line);
+  }
+  .board-row{border-bottom:1px solid var(--line)}
+  .board-row:last-child{border-bottom:none}
+  .board-rank{font-family:var(--mono); color:var(--accent); font-weight:700}
+  .board-row:nth-child(n+4) .board-rank{color:var(--muted)}
+  .board-name{font-weight:500}
+  .board-ex{color:var(--muted); font-size:13px; font-family:var(--mono)}
+  .board-time{font-family:var(--mono); color:var(--text); text-align:right; font-weight:500}
+  .board-veil{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:16px; text-align:center; padding:20px;
+    background:linear-gradient(to bottom,rgba(20,21,23,.35) 0%,rgba(20,21,23,.92) 70%);
+  }
+  .board-veil p{font-size:16px; color:var(--text); font-weight:500}
+  .board-veil .sub{font-family:var(--mono); font-size:12px; color:var(--muted); font-weight:400}
+
+  /* ---------- FINAL CTA ---------- */
+  .final{text-align:center; padding:84px 0}
+  .final h2{font-size:clamp(30px,4.5vw,46px); font-weight:700; letter-spacing:-1.2px; margin-bottom:16px}
+  .final p{font-family:var(--mono); font-size:13.5px; color:var(--muted); margin-bottom:30px}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--line); padding:38px 0; position:relative; z-index:1}
+  .foot-in{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px}
+  .foot-tag{font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .foot-fine{font-family:var(--mono); font-size:11px; color:var(--faint); max-width:340px; text-align:right}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:860px){
+    .hero-grid{grid-template-columns:1fr; gap:40px}
+    .demo{max-width:440px}
+    .features{grid-template-columns:1fr}
+    .nav-links{
+      display:none; position:absolute; top:62px; left:0; right:0; flex-direction:column;
+      gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:8px 0;
+    }
+    .nav-links.open{display:flex}
+    .nav-links a{padding:14px 28px; width:100%}
+    .nav-links .btn{margin:10px 28px; text-align:center}
+    .menu-btn{display:block}
+    .board-head, .board-row{grid-template-columns:40px 1fr 78px}
+    .board-ex{display:none}
+    .foot-fine{text-align:left}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a href="#top" class="brand">hotkey<b>.gg</b></a>
+    <div class="nav-links" id="navLinks">
+      <a href="#how">How it works</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="app.html">Train</a>
+      <a href="app.html" class="btn btn-primary nav-cta">Start training</a>
+    </div>
+    <button class="menu-btn" id="menuBtn" aria-label="menu">≡</button>
+  </div>
+</nav>
+
+<a id="top"></a>
+<header class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow fade d1">Keyboard-only Excel · timed · scored</div>
+      <h1 class="fade d2">Get fast at Excel.<br><span class="dim">No mouse. Just reps.</span></h1>
+      <p class="lede fade d3">hotkey.gg is a speedrun trainer for the keystrokes and modeling moves that fill an analyst's day. <b>Real tasks, the exact Windows shortcuts, timed to the hundredth of a second</b> — drilled until they're reflex.</p>
+      <div class="hero-cta fade d4">
+        <a href="app.html" class="btn btn-primary">Start your first run</a>
+        <a href="#how" class="btn btn-ghost">See how it works</a>
+      </div>
+      <div class="micro fade d5">No install. Runs in the browser. <b>Invite-only beta</b> — built for the summer before the internship.</div>
+    </div>
+
+    <div class="demo fade d3" aria-hidden="true">
+      <div class="demo-bar">
+        <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
+        <span class="demo-tag">live drill</span>
+      </div>
+      <div class="demo-action" id="demoAction"></div>
+      <div class="sheet">
+        <div class="sheet-row"><div class="sheet-h">B4</div><div class="cell active" id="demoCell"></div></div>
+      </div>
+      <div class="keys" id="demoKeys"></div>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-eyebrow">How it works</div>
+    <h2 class="sec-title">Drills, not lessons.</h2>
+    <p class="sec-sub">You don't read about shortcuts here. You execute them, against the clock, until they stop being something you think about.</p>
+    <div class="features">
+      <div class="card">
+        <div class="card-num">01</div>
+        <h3>Real tasks, real keystrokes</h3>
+        <p>Exercises mirror what first-years actually do — paste-special values, clean a formatting mess, AutoSum, make a tab model-ready — using the exact Windows Excel shortcuts. The muscle memory transfers one-to-one.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">02</div>
+        <h3>Scored like a speedrun</h3>
+        <p>Every run is timed, and your keystrokes are counted against the optimal path. You can watch your times drop as the moves turn into reflex — the same loop that makes typing tests addictive.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">03</div>
+        <h3>Keyboard or nothing</h3>
+        <p>Reach for the mouse and the run gets flagged. The whole point is to work the way fast modelers work — hands on the home row, ribbon driven by <kbd>Alt</kbd> key tips, never hunting for a button.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="leaderboard">
+  <div class="wrap">
+    <div class="sec-eyebrow">The board</div>
+    <h2 class="sec-title">Fastest hands win.</h2>
+    <p class="sec-sub">Every run posts a time. Climb the board against your class — and find out who actually deserves the bragging rights before anyone sets foot on a desk.</p>
+    <div class="board-wrap">
+      <div class="board-head">
+        <span>#</span><span>Analyst</span><span>Exercise</span><span style="text-align:right">Time</span>
+      </div>
+      <div class="board-row"><span class="board-rank">1</span><span class="board-name">you, hopefully</span><span class="board-ex">hardcode it</span><span class="board-time">—</span></div>
+      <div class="board-row"><span class="board-rank">2</span><span class="board-name">classmate</span><span class="board-ex">clean the paste</span><span class="board-time">—</span></div>
+      <div class="board-row"><span class="board-rank">3</span><span class="board-name">classmate</span><span class="board-ex">model-ready</span><span class="board-time">—</span></div>
+      <div class="board-row"><span class="board-rank">4</span><span class="board-name">classmate</span><span class="board-ex">hardcode it</span><span class="board-time">—</span></div>
+      <div class="board-veil">
+        <p>The leaderboard goes live with accounts.</p>
+        <span class="sub">sign in · post a time · take your spot</span>
+        <a href="app.html" class="btn btn-primary">Start training</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Your first run takes thirty seconds.</h2>
+    <p>Three exercises. One clock. No mouse.</p>
+    <a href="app.html" class="btn btn-primary">Start training</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>
+      <a href="#top" class="brand" style="font-size:16px">hotkey<b>.gg</b></a>
+      <div class="foot-tag" style="margin-top:6px">An Excel speedrun trainer.</div>
+    </div>
+    <div class="foot-fine">Microsoft Excel is a registered trademark of Microsoft Corporation. hotkey.gg is an independent training tool and is not affiliated with or endorsed by Microsoft.</div>
+  </div>
+</footer>
+
+<script>
+// mobile nav
+document.getElementById('menuBtn').addEventListener('click',function(){
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('#navLinks a').forEach(function(a){
+  a.addEventListener('click',function(){ document.getElementById('navLinks').classList.remove('open'); });
+});
+
+// ---- looping keystroke-chord demo ----
+var CHORDS=[
+  {action:'paste special → values', keys:['Alt','H','V','S','↵'], before:'=B3*1.08', beforeFx:true, after:'14,231', afterFx:false, bold:false},
+  {action:'bold the header',          keys:['Ctrl','B'],             before:'Revenue', beforeFx:false, after:'Revenue', afterFx:false, bold:true},
+  {action:'autosum the column',       keys:['Alt','=','↵'],          before:'',        beforeFx:false, after:'=SUM(B3:B11)', afterFx:true, bold:false},
+];
+var elAction=document.getElementById('demoAction'),
+    elCell=document.getElementById('demoCell'),
+    elKeys=document.getElementById('demoKeys');
+
+function setCell(text,fx,bold){
+  elCell.textContent=text||'\u00A0';
+  elCell.className='cell active'+(fx?' fx':'')+(bold?' bold':'');
+}
+function renderKeys(keys){
+  elKeys.innerHTML='';
+  keys.forEach(function(k,i){
+    if(i>0){ var s=document.createElement('span'); s.className='keycap sep'; s.textContent='+'; elKeys.appendChild(s); }
+    var el=document.createElement('span'); el.className='keycap'; el.textContent=k; el.dataset.i=i; elKeys.appendChild(el);
+  });
+}
+function delay(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+
+async function runChord(c){
+  elAction.textContent=c.action;
+  setCell(c.before,c.beforeFx,false);
+  renderKeys(c.keys);
+  await delay(650);
+  var caps=elKeys.querySelectorAll('.keycap:not(.sep)');
+  for(var i=0;i<caps.length;i++){
+    caps[i].classList.add('lit');
+    await delay(230);
+    caps[i].classList.remove('lit');
+  }
+  await delay(90);
+  setCell(c.after,c.afterFx,c.bold);
+  elCell.classList.add('flash');
+  await delay(260);
+  elCell.classList.remove('flash');
+  await delay(1500);
+}
+async function loop(){
+  var i=0;
+  while(true){
+    await runChord(CHORDS[i%CHORDS.length]);
+    i++;
+  }
+}
+loop();
+</script>
+</body>
+</html>

@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hotkey.gg — speedrun the Excel that gets you hired</title>
+<title>Train — hotkey.gg</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<meta name="description" content="A keyboard-only Excel speedrun trainer. Drill the keystrokes and modeling moves analysts use all day — timed, scored, and built into muscle memory before your internship.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
@@ -17,355 +17,1955 @@
     --warn:#d9a441; --bad:#c8533f;
     --mono:'JetBrains Mono',ui-monospace,monospace;
     --sans:'Hanken Grotesk',system-ui,sans-serif;
-    --maxw:1080px;
   }
-  *{margin:0; padding:0; box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
-    line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh; padding:28px 16px; user-select:none; -webkit-user-select:none;
   }
-  /* faint spreadsheet-grid atmosphere */
-  body::before{
-    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
-    background-image:linear-gradient(var(--line) 1px,transparent 1px),
-      linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size:42px 30px; opacity:.13;
-    mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 0%,transparent 75%);
-    -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 0%,transparent 75%);
-  }
-  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:1}
-  a{color:inherit; text-decoration:none}
-
-  /* ---------- NAV ---------- */
-  nav{
-    position:sticky; top:0; z-index:50; backdrop-filter:blur(10px);
-    background:rgba(12,13,14,.72); border-bottom:1px solid var(--line);
-  }
-  .nav-in{display:flex; align-items:center; justify-content:space-between; height:62px}
+  .app{width:100%; max-width:760px}
+  header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:22px}
   .brand{font-family:var(--mono); font-weight:700; font-size:19px; letter-spacing:-.5px}
-  .brand b{color:var(--accent); font-weight:700}
-  .nav-links{display:flex; align-items:center; gap:30px}
-  .nav-links a{font-family:var(--mono); font-size:13px; color:var(--muted); transition:color .15s}
-  .nav-links a:hover{color:var(--text)}
-  .btn{
-    font-family:var(--mono); font-size:13px; font-weight:500; cursor:pointer;
-    border-radius:8px; padding:9px 17px; transition:all .15s; display:inline-block; border:1px solid transparent;
-  }
-  .btn-primary{background:var(--accent); color:#06120c; font-weight:700}
-  .btn-primary:hover{background:#37b97e; box-shadow:0 0 24px var(--accent-glow); transform:translateY(-1px)}
-  .btn-ghost{border-color:var(--line); color:var(--text)}
-  .btn-ghost:hover{border-color:var(--accent-dim); color:var(--accent)}
-  .nav-cta{padding:8px 15px}
-  .menu-btn{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:20px; cursor:pointer}
+  .brand b{color:var(--accent)}
+  .brand span{color:var(--faint); font-weight:400}
+  .hint-top{font-size:12.5px; color:var(--muted)}
+  .hint-top kbd{font-family:var(--mono); color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:5px; padding:1px 6px; font-size:11.5px}
 
-  /* ---------- HERO ---------- */
-  .hero{padding:88px 0 60px; position:relative}
-  .hero-glow{
-    position:absolute; top:-80px; left:50%; transform:translateX(-50%);
-    width:760px; height:520px; background:radial-gradient(ellipse at center,var(--accent-glow),transparent 65%);
-    z-index:0; pointer-events:none; filter:blur(8px);
-  }
-  .hero-grid{
-    display:grid; grid-template-columns:1.05fr .95fr; gap:54px; align-items:center;
-    position:relative; z-index:1;
-  }
-  .eyebrow{
-    font-family:var(--mono); font-size:11.5px; letter-spacing:1.6px; text-transform:uppercase;
-    color:var(--accent); margin-bottom:22px; opacity:0;
-  }
-  h1{
-    font-size:clamp(40px,6.2vw,68px); line-height:1.02; font-weight:700; letter-spacing:-1.8px;
-    margin-bottom:22px;
-  }
-  h1 .dim{color:var(--muted); font-weight:600}
-  .lede{font-size:18px; color:var(--muted); max-width:520px; margin-bottom:34px; line-height:1.55}
-  .lede b{color:var(--text); font-weight:600}
-  .hero-cta{display:flex; gap:13px; align-items:center; flex-wrap:wrap}
-  .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:18px}
-  .micro b{color:var(--muted); font-weight:400}
+  .tabs{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:18px}
+  .tab{white-space:nowrap; font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
+    border:1px solid transparent; border-radius:7px; padding:7px 13px; cursor:pointer; transition:.15s}
+  .tab:hover{color:var(--text)}
+  .tab.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+  .tab .lvl{color:var(--faint); margin-right:7px}
+  .tab.on .lvl{color:var(--accent-dim)}
 
-  .fade{opacity:0; transform:translateY(14px); animation:rise .7s cubic-bezier(.2,.7,.3,1) forwards}
-  @keyframes rise{to{opacity:1; transform:translateY(0)}}
-  .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.27s}.d4{animation-delay:.4s}.d5{animation-delay:.52s}
+  .prompt{font-size:15px; line-height:1.55; margin-bottom:16px; min-height:46px}
+  .prompt .req{display:block; margin-top:5px; font-size:12.5px; color:var(--muted)}
+  .prompt .req em{color:var(--warn); font-style:normal}
 
-  /* ---------- HERO DEMO PANEL ---------- */
-  .demo{
-    background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:24px;
-    box-shadow:0 30px 70px -30px rgba(0,0,0,.7); position:relative; overflow:hidden;
-  }
-  .demo-bar{display:flex; align-items:center; gap:7px; margin-bottom:18px}
-  .demo-dot{width:10px; height:10px; border-radius:50%; background:var(--line)}
-  .demo-tag{margin-left:auto; font-family:var(--mono); font-size:11px; color:var(--faint)}
-  .demo-action{font-family:var(--mono); font-size:12.5px; color:var(--accent); height:18px; letter-spacing:.3px; margin-bottom:14px}
-  .sheet{
-    border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--bg); margin-bottom:20px;
-  }
-  .sheet-row{display:grid; grid-template-columns:34px 1fr; border-bottom:1px solid var(--line)}
-  .sheet-row:last-child{border-bottom:none}
-  .sheet-h{
-    font-family:var(--mono); font-size:11px; color:var(--faint); background:var(--surface2);
-    display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line);
-  }
-  .cell{
-    font-family:var(--mono); font-size:14px; padding:11px 14px; color:var(--text);
-    min-height:42px; display:flex; align-items:center; transition:background .25s;
-  }
-  .cell.active{box-shadow:inset 0 0 0 2px var(--accent)}
-  .cell.fx{color:var(--accent)}
-  .cell.bold{font-weight:700}
-  .cell.flash{background:var(--accent-glow)}
-  .keys{display:flex; gap:7px; flex-wrap:wrap; min-height:38px; align-items:center}
-  .keycap{
-    font-family:var(--mono); font-size:12.5px; color:var(--muted); background:var(--surface2);
-    border:1px solid var(--line); border-bottom-width:2px; border-radius:7px; padding:7px 12px;
-    transition:all .12s; min-width:34px; text-align:center;
-  }
-  .keycap.lit{color:#06120c; background:var(--accent); border-color:var(--accent); box-shadow:0 0 16px var(--accent-glow); transform:translateY(1px)}
-  .keycap.sep{border:none; background:none; color:var(--faint); padding:7px 0; min-width:0}
+  .fbar{display:flex; align-items:stretch; margin-bottom:9px; font-family:var(--mono);
+    font-size:13px; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--surface)}
+  .namebox{min-width:56px; padding:7px 10px; color:var(--accent); background:var(--surface2);
+    border-right:1px solid var(--line); text-align:center; font-weight:500}
+  .fx{padding:7px 11px; color:var(--faint); font-style:italic; font-family:var(--sans);
+    border-right:1px solid var(--line); display:flex; align-items:center}
+  .fcontent{flex:1; padding:7px 13px; color:var(--text); white-space:nowrap; overflow:hidden;
+    text-overflow:ellipsis; display:flex; align-items:center; min-width:0}
+  .fcontent.isfx{color:var(--accent)}
+  .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
 
-  /* ---------- SECTIONS ---------- */
-  section{padding:74px 0; position:relative; z-index:1}
-  .sec-eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin-bottom:14px}
-  .sec-title{font-size:clamp(28px,4vw,40px); font-weight:700; letter-spacing:-1px; margin-bottom:14px; line-height:1.08}
-  .sec-sub{font-size:16.5px; color:var(--muted); max-width:560px; margin-bottom:46px}
+  .gridwrap{background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:16px; overflow:auto; position:relative; min-height:470px; min-width:530px}
+  table{border-collapse:collapse; font-family:var(--mono); font-size:13px}
+  th,td{border:1px solid var(--line); height:34px; text-align:right; position:relative; overflow:hidden}
+  th{background:var(--surface2); color:var(--muted); font-weight:500; text-align:center;
+    min-width:30px; height:28px; font-size:11px}
+  .rowhdr{min-width:26px}
+  td{padding:0 7px; color:var(--text); white-space:nowrap; vertical-align:middle; transition:background .08s}
+  td.txt{text-align:left}
+  td.wrap{white-space:normal; line-height:1.15; font-size:11px}
+  td.bold{font-weight:700}
+  td.fill-blue{background:#16344e !important; color:#9fd0f4}
+  td.over{color:var(--warn); letter-spacing:1px}
+  td.editing{text-align:left; color:var(--text); box-shadow:inset 0 0 0 2px var(--accent); background:var(--bg)}
+  @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
+  td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
+  td.active{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow); z-index:2}
+  td.sel{background:rgba(46,163,111,.15)}
+  td.sel-t{border-top:2px solid var(--accent)}
+  td.sel-b{border-bottom:2px solid var(--accent)}
+  td.sel-l{border-left:2px solid var(--accent)}
+  td.sel-r{border-right:2px solid var(--accent)}
+  @keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
+  td.pasted{animation:pasteflash .5s ease-out}
+  .marquee{position:absolute; display:none; pointer-events:none; z-index:6;
+    background-color:rgba(46,163,111,.10);
+    background-image:
+      linear-gradient(90deg,var(--accent) 50%,transparent 50%),
+      linear-gradient(90deg,var(--accent) 50%,transparent 50%),
+      linear-gradient(0deg,var(--accent) 50%,transparent 50%),
+      linear-gradient(0deg,var(--accent) 50%,transparent 50%);
+    background-repeat:repeat-x,repeat-x,repeat-y,repeat-y;
+    background-size:8px 2px,8px 2px,2px 8px,2px 8px;
+    background-position:0 0,0 100%,0 0,100% 0;
+    animation:ants .5s linear infinite}
+  @keyframes ants{to{background-position:8px 0,-8px 100%,0 -8px,100% 8px}}
+  td.bt{box-shadow:inset 0 2px 0 -0px var(--accent)}
+  td.bb{box-shadow:inset 0 -2px 0 -0px var(--accent)}
+  td.bt.bb{box-shadow:inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent)}
+  td.ball{box-shadow:inset 0 0 0 1.5px var(--accent)}
 
-  .features{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
-  .card{
-    background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px 24px;
-    transition:border-color .2s, transform .2s;
-  }
-  .card:hover{border-color:var(--accent-dim); transform:translateY(-3px)}
-  .card-num{font-family:var(--mono); font-size:12px; color:var(--accent-dim); margin-bottom:16px; letter-spacing:1px}
-  .card h3{font-size:18.5px; font-weight:600; margin-bottom:9px; letter-spacing:-.3px}
-  .card p{font-size:14.5px; color:var(--muted); line-height:1.6}
-  .card kbd{
-    font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2);
-    border:1px solid var(--line); border-radius:5px; padding:1px 6px;
-  }
+  .ribbon{margin-top:12px; min-height:46px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:12px; opacity:0; transition:opacity .12s;
+    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:7px 11px}
+  .ribbon.show{opacity:1}
+  .ribbon .path{color:var(--accent); font-weight:500; margin-right:6px; letter-spacing:.2px}
+  .ribbon .rtab, .ribbon .opt{display:inline-flex; align-items:center; gap:6px; color:var(--text);
+    background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:5px 9px}
+  .ribbon .opt{color:var(--muted)}
+  .ribbon .rtab k, .ribbon .opt k{display:inline-grid; place-items:center; min-width:18px; height:18px;
+    color:#06120c; background:var(--accent); border:none; border-radius:4px; padding:0 4px;
+    font-weight:700; font-size:11px}
 
-  /* ---------- LEADERBOARD TEASER ---------- */
-  .board-wrap{position:relative; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--surface)}
-  .board-head, .board-row{
-    display:grid; grid-template-columns:54px 1fr 1.2fr 88px; align-items:center;
-    padding:14px 22px; font-size:14px;
-  }
-  .board-head{
-    font-family:var(--mono); font-size:11px; letter-spacing:1px; text-transform:uppercase;
-    color:var(--faint); border-bottom:1px solid var(--line);
-  }
-  .board-row{border-bottom:1px solid var(--line)}
-  .board-row:last-child{border-bottom:none}
-  .board-rank{font-family:var(--mono); color:var(--accent); font-weight:700}
-  .board-row:nth-child(n+4) .board-rank{color:var(--muted)}
-  .board-name{font-weight:500}
-  .board-ex{color:var(--muted); font-size:13px; font-family:var(--mono)}
-  .board-time{font-family:var(--mono); color:var(--text); text-align:right; font-weight:500}
-  .board-veil{
-    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:16px; text-align:center; padding:20px;
-    background:linear-gradient(to bottom,rgba(20,21,23,.35) 0%,rgba(20,21,23,.92) 70%);
-  }
-  .board-veil p{font-size:16px; color:var(--text); font-weight:500}
-  .board-veil .sub{font-family:var(--mono); font-size:12px; color:var(--muted); font-weight:400}
+  .bar{display:flex; align-items:center; gap:20px; margin-top:18px}
+  .timer{font-family:var(--mono); font-size:38px; font-weight:700; letter-spacing:-1px;
+    color:var(--text); line-height:1; min-width:150px}
+  .timer.run{color:var(--accent)}
+  .stat{font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.5}
+  .stat b{color:var(--text); font-weight:500}
+  .badge{font-family:var(--mono); font-size:11px; color:var(--warn);
+    border:1px solid var(--warn); border-radius:5px; padding:2px 7px; opacity:.85}
+  .spacer{flex:1}
 
-  /* ---------- FINAL CTA ---------- */
-  .final{text-align:center; padding:84px 0}
-  .final h2{font-size:clamp(30px,4.5vw,46px); font-weight:700; letter-spacing:-1.2px; margin-bottom:16px}
-  .final p{font-family:var(--mono); font-size:13.5px; color:var(--muted); margin-bottom:30px}
+  .result{margin-top:16px; font-family:var(--mono); font-size:13.5px; color:var(--muted);
+    min-height:22px; transition:.2s}
+  .result.win{color:var(--accent)}
+  .result.win b{color:var(--text)}
+  .result .pb{color:var(--warn); margin-left:8px}
+  .foot{margin-top:22px; font-size:11.5px; color:var(--faint); line-height:1.7}
+  .foot kbd{font-family:var(--mono); color:var(--muted)}
+  @keyframes flash{0%{background:var(--accent-glow)}100%{background:transparent}}
+  .gridwrap.solved{animation:flash .5s ease-out}
 
-  /* ---------- FOOTER ---------- */
-  footer{border-top:1px solid var(--line); padding:38px 0; position:relative; z-index:1}
-  .foot-in{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px}
-  .foot-tag{font-family:var(--mono); font-size:12px; color:var(--muted)}
-  .foot-fine{font-family:var(--mono); font-size:11px; color:var(--faint); max-width:340px; text-align:right}
+  .ribbon .rtab.dim{color:var(--faint); background:transparent; border-color:transparent}
+  .ribbon .rtab.dim k{color:var(--faint); background:var(--surface2)}
+  .ribbon .rnote{color:var(--warn); margin-left:6px}
 
-  /* ---------- RESPONSIVE ---------- */
-  @media(max-width:860px){
-    .hero-grid{grid-template-columns:1fr; gap:40px}
-    .demo{max-width:440px}
-    .features{grid-template-columns:1fr}
-    .nav-links{
-      display:none; position:absolute; top:62px; left:0; right:0; flex-direction:column;
-      gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:8px 0;
-    }
-    .nav-links.open{display:flex}
-    .nav-links a{padding:14px 28px; width:100%}
-    .nav-links .btn{margin:10px 28px; text-align:center}
-    .menu-btn{display:block}
-    .board-head, .board-row{grid-template-columns:40px 1fr 78px}
-    .board-ex{display:none}
-    .foot-fine{text-align:left}
-  }
+  .pd-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none;
+    align-items:center; justify-content:center; z-index:50}
+  .pd-box{background:var(--surface); border:1px solid var(--line); border-radius:12px; width:312px;
+    box-shadow:0 18px 56px rgba(0,0,0,.55); overflow:hidden}
+  .pd-title{padding:12px 16px; border-bottom:1px solid var(--line); font-size:14px; font-weight:600;
+    display:flex; justify-content:space-between; align-items:center}
+  .pd-title .x{color:var(--muted); font-family:var(--mono); font-size:11px; font-weight:400}
+  .pd-group{padding:11px 14px}
+  .pd-group h4{font-size:10.5px; color:var(--muted); font-weight:500; margin:0 0 6px 4px;
+    text-transform:uppercase; letter-spacing:.6px}
+  .pd-opt{display:flex; align-items:center; gap:9px; padding:5px 8px; border-radius:7px; font-size:13px; color:var(--text)}
+  .pd-opt.on{background:var(--accent-glow); color:var(--accent)}
+  .pd-radio{font-family:var(--mono); width:12px; text-align:center; color:var(--faint)}
+  .pd-opt.on .pd-radio{color:var(--accent)}
+  .pd-key{font-family:var(--mono); font-size:11px; background:var(--surface2); border:1px solid var(--line);
+    border-radius:4px; padding:0 6px; color:var(--muted)}
+  .pd-opt.on .pd-key{border-color:var(--accent); color:var(--accent)}
+  .pd-foot{display:flex; justify-content:flex-end; gap:8px; padding:11px 14px; border-top:1px solid var(--line)}
+  .pd-btn{font-family:var(--mono); font-size:12px; padding:6px 13px; border-radius:7px;
+    border:1px solid var(--line); background:var(--surface2); color:var(--muted)}
+  .pd-btn kbd{font-size:10px}
+  .pd-btn.ok{border-color:var(--accent); color:var(--accent)}
+
+  .checklist{margin-top:14px; font-family:var(--sans); font-size:13px}
+  .cl-head{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.6px; margin-bottom:8px; display:flex; gap:8px; align-items:center}
+  .cl-head span{color:var(--accent); font-weight:500}
+  .cl-item{display:flex; align-items:center; gap:10px; padding:3px 0; color:var(--muted); transition:color .15s}
+  .cl-item.ok{color:var(--text)}
+  .cl-box{width:18px; height:18px; border:1.5px solid var(--line); border-radius:5px; flex:none;
+    display:inline-flex; align-items:center; justify-content:center; font-family:var(--mono);
+    font-size:11px; color:var(--accent); transition:.15s}
+  .cl-item.ok .cl-box{border-color:var(--accent); background:var(--accent-glow)}
+  .cl-hint{margin-top:9px; font-size:12.5px; color:var(--warn); line-height:1.5}
+  .cl-hint em{font-style:normal; color:var(--accent)}
+  /* guided / paint-by-numbers */
+  .cl-item{flex-wrap:wrap}
+  .cl-label{flex:1; min-width:0}
+  .cl-keys{flex-basis:100%; margin:3px 0 5px 28px; font-size:11.5px; color:var(--muted); line-height:1.9}
+  .cl-keys kbd{font-family:var(--mono); color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10.5px; margin:0 1px}
+  .cl-item.ok .cl-keys{opacity:.35}
+  .cl-item.next{color:var(--text)}
+  .cl-item.next .cl-box{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow)}
+  .cl-item.next .cl-keys{color:var(--accent)}
+  .cl-item.next .cl-keys kbd{color:#06120c; background:var(--accent); border-color:var(--accent); font-weight:600}
+  .guide-toggle{font-family:var(--mono); font-size:11px; color:var(--muted); background:none;
+    border:1px solid var(--line); border-radius:7px; padding:5px 10px; cursor:pointer; transition:.15s; margin-right:8px}
+  .toprow{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:2px}
+  .toprow .tabs{flex:1 1 auto; min-width:0; margin-bottom:0}
+  .mode-ctrls{display:flex; align-items:center; gap:8px}
+  .toprow .guide-toggle{margin-right:0; font-size:12px; padding:6px 12px}
+  .guide-toggle:hover{color:var(--text); border-color:var(--faint)}
+  .guide-toggle.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+  .guide-toggle kbd{font-family:var(--mono); font-size:10px; opacity:.8}
+  .keylog{display:flex; gap:5px; flex-wrap:wrap; margin-top:10px; min-height:24px; align-items:center}
+  .kchip{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:5px; padding:2px 7px}
+  .kchip.empty{color:var(--faint); background:transparent; border:none}
+  .kchip:last-child:not(.empty){border-color:var(--accent); color:var(--accent)}
+  .keyflash{position:fixed; right:18px; bottom:18px; display:flex; gap:5px; align-items:center;
+    opacity:0; transition:opacity .4s; pointer-events:none; z-index:60}
+  .keyflash.show{opacity:1}
+  .keyflash .kchip{font-size:13px; padding:3px 9px; box-shadow:0 2px 12px rgba(0,0,0,.35)}
+  .keyflash .kchip.new{border-color:var(--accent); color:var(--accent)}
+
+  .rc-stats{font-size:14px; margin-bottom:11px}
+  .result .par{color:var(--muted)}
+  .rc-opts{display:flex; gap:8px; flex-wrap:wrap}
+  .rc-key{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:8px; padding:7px 13px; cursor:pointer; transition:.15s}
+  .rc-key:hover{border-color:var(--accent); color:var(--accent)}
+  .rc-key kbd{color:var(--muted); margin-right:6px; font-size:11px}
+  .rc-key:hover kbd{color:var(--accent)}
+
+  .results-modal{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none;
+    align-items:center; justify-content:center; z-index:40}
+  .results-modal.show{display:flex}
+  .rm-card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:26px 30px; width:340px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55)}
+  .rm-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
+    letter-spacing:1px; margin-bottom:8px}
+  .rm-time{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--text);
+    line-height:1; letter-spacing:-1.5px}
+  .rm-time span{font-size:18px; color:var(--muted); font-weight:400; margin-left:2px}
+  .rm-stats{display:flex; justify-content:center; gap:24px; margin:20px 0; font-family:var(--mono);
+    font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  .rm-stats b{display:block; color:var(--text); font-size:17px; font-weight:500; margin-top:4px;
+    letter-spacing:0; text-transform:none}
+  .rm-note{font-family:var(--mono); font-size:11px; color:var(--warn); margin:-8px 0 14px}
+  .rm-scores{border-top:1px solid var(--line); padding-top:14px; margin-bottom:18px;
+    display:flex; flex-direction:column; gap:3px}
+  .rm-scores-h{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
+  .rm-soon{font-size:12px; color:var(--faint)}
+  .rm-opts{display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
+  .rm-key{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:8px; padding:8px 13px; cursor:pointer; transition:.15s}
+  .rm-key:hover{border-color:var(--accent); color:var(--accent)}
+  .rm-key kbd{color:var(--muted); margin-right:6px; font-size:10px}
+  .rm-key:hover kbd{color:var(--accent)}
+
+  .help-toggle{font-family:var(--mono); font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer; padding:0}
+  .help-toggle:hover{color:var(--accent)}
+  .help-toggle kbd{font-family:var(--mono); color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin-right:5px}
+  .help-toggle:hover kbd{color:var(--accent); border-color:var(--accent)}
+  .help{display:none; background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:15px 17px; margin-top:14px; font-size:12.5px; color:var(--text); line-height:1.7}
+  .help.show{display:block}
+  .help-sec{margin-bottom:12px}
+  .help-sec:last-child{margin-bottom:0}
+  .help-sec h4{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.6px; margin:0 0 5px}
+  .help kbd{font-family:var(--mono); color:var(--text); background:var(--surface2); border:1px solid var(--line);
+    border-radius:4px; padding:1px 5px; font-size:11px}
+  .help em{font-style:normal; color:var(--warn)}
+
+  .hdr-right{display:flex; align-items:center; gap:15px}
+  .auth-slot{display:flex; align-items:center}
+  .auth-btn{font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
+    border:1px solid var(--line); border-radius:7px; padding:6px 13px; cursor:pointer; transition:all .15s}
+  .auth-btn:hover{color:var(--accent); border-color:var(--accent-dim)}
+  .auth-who{font-family:var(--mono); font-size:12.5px; color:var(--muted)}
+  .auth-who b{color:var(--accent); font-weight:500}
+  .auth-who a{color:var(--faint); cursor:pointer}
+  .auth-who a:hover{color:var(--muted); text-decoration:underline}
+  .auth-modal{position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center;
+    background:rgba(8,9,10,.74); backdrop-filter:blur(3px)}
+  .auth-modal.show{display:flex}
+  .auth-card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px;
+    width:344px; max-width:90vw; box-shadow:0 30px 70px -20px rgba(0,0,0,.7)}
+  .auth-card h3{font-size:18px; font-weight:600; margin-bottom:7px; letter-spacing:-.3px}
+  .auth-card p{font-size:13px; color:var(--muted); line-height:1.5; margin-bottom:16px}
+  .auth-card input{width:100%; font-family:var(--mono); font-size:13.5px; color:var(--text);
+    background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:11px 12px; margin-bottom:12px; outline:none}
+  .auth-card input:focus{border-color:var(--accent-dim)}
+  .auth-go{width:100%; font-family:var(--mono); font-weight:700; font-size:13px; color:#06120c;
+    background:var(--accent); border:none; border-radius:8px; padding:11px; cursor:pointer; transition:background .15s}
+  .auth-go:hover{background:#37b97e}
+  .auth-x{margin-top:13px; text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); cursor:pointer}
+  .auth-x:hover{color:var(--muted)}
+  .auth-msg{font-family:var(--mono); font-size:12.5px; line-height:1.5; color:var(--accent)}
+  .auth-alt{margin-top:14px; display:flex; justify-content:space-between; gap:12px; font-family:var(--mono); font-size:11.5px}
+  .auth-alt a{color:var(--muted); cursor:pointer; text-decoration:none}
+  .auth-alt a:hover{color:var(--accent)}
+  .rm-posted{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:2px}
+  .rm-posted.ok{color:var(--accent)}
+  .rm-post-cta{font-family:var(--mono); font-size:12px; color:var(--accent); cursor:pointer; margin-top:2px}
+  .rm-post-cta:hover{text-decoration:underline}
+
+  .gate{position:fixed; inset:0; z-index:150; display:none; align-items:center; justify-content:center; background:var(--bg)}
+  .gate.show{display:flex}
+  .gate .auth-card{text-align:center}
+  .gate .auth-card input{text-align:center}
+  .gate-brand{font-family:var(--mono); font-weight:700; font-size:22px; letter-spacing:-.5px; margin-bottom:16px}
+  .gate-brand b{color:var(--accent)}
+  .gate .auth-card p b{color:var(--text)}
+  /* ---- top exercise row + bottom sheet tabs ---- */
+  .exrow{display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px}
+  .exrow .prompt{flex:1 1 320px; margin:0}
+  .mode-ctrls{display:flex; align-items:center; gap:8px; flex:none}
+
+  .sheets{display:flex; align-items:stretch; gap:2px; margin-top:12px; border-bottom:1px solid var(--line)}
+  .sheet-nav{font-family:var(--mono); font-size:15px; line-height:1; color:var(--muted); background:none; border:none;
+    cursor:pointer; padding:0 7px 7px; transition:color .13s; align-self:flex-end}
+  .sheet-nav:hover{color:var(--accent)}
+  .sheet-tabs{display:flex; gap:3px; overflow-x:auto; flex:1 1 auto; padding-top:6px; scrollbar-width:none}
+  .sheet-tabs::-webkit-scrollbar{display:none}
+  .sheet{font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
+    border:1px solid var(--line); border-bottom:none; border-radius:7px 7px 0 0; padding:7px 13px;
+    white-space:nowrap; cursor:pointer; transition:.13s; position:relative; top:1px}
+  .sheet:hover{color:var(--text); background:var(--surface2)}
+  .sheet.on{color:var(--accent); background:var(--surface2); border-color:var(--accent-dim);
+    box-shadow:inset 0 2px 0 var(--accent); top:0; font-weight:600}
+  /* ---- landing overlay (fades to the app on start) ---- */
+  .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
+    background:rgba(11,12,13,.90); backdrop-filter:blur(7px); padding:28px; overflow-y:auto;
+    transition:opacity .55s ease, visibility .55s}
+  .landing.gone{opacity:0; visibility:hidden; pointer-events:none}
+  .landing-inner{max-width:600px; width:100%}
+  .landing .lbrand{font-family:var(--mono); font-weight:700; font-size:17px; letter-spacing:-.5px; margin-bottom:34px}
+  .landing .lbrand b{color:var(--accent)}
+  .landing .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.8px; color:var(--accent); margin-bottom:16px}
+  .landing h1{font-family:var(--sans); font-size:clamp(42px,7.5vw,70px); font-weight:800; letter-spacing:-2.2px; line-height:.98; margin-bottom:20px}
+  .landing h1 .dim{color:var(--muted)}
+  .landing .lede{font-size:17px; color:var(--muted); line-height:1.55; max-width:52ch; margin-bottom:30px}
+  .landing .lede b{color:var(--text); font-weight:600}
+  .landing-cta{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+  .start-btn{font-family:var(--mono); font-size:15px; font-weight:700; color:#06120c; background:var(--accent);
+    border:none; border-radius:10px; padding:14px 26px; cursor:pointer; transition:.16s}
+  .start-btn:hover{background:#37b97e; box-shadow:0 10px 34px var(--accent-glow); transform:translateY(-1px)}
+  .landing .modes{display:flex; gap:7px; align-items:center}
+  .mode-chip{font-family:var(--mono); font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:8px 14px}
+  .mode-chip.soon{opacity:.45}
+  .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
+  .landing .micro b{color:var(--muted)}
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="wrap nav-in">
-    <a href="#top" class="brand">hotkey<b>.gg</b></a>
-    <div class="nav-links" id="navLinks">
-      <a href="#how">How it works</a>
-      <a href="leaderboard.html">Leaderboard</a>
-      <a href="app.html">Train</a>
-      <a href="app.html" class="btn btn-primary nav-cta">Start training</a>
+<div class="app">
+  <header>
+    <div class="brand">hotkey<b>.gg</b><span> / trainer</span></div>
+    <div class="hdr-right">
+      <span class="hint-top"><kbd>alt</kbd> ribbon &nbsp;·&nbsp; <kbd>shift+f11</kbd> restart</span>
+      <div class="auth-slot" id="authSlot"></div>
     </div>
-    <button class="menu-btn" id="menuBtn" aria-label="menu">≡</button>
-  </div>
-</nav>
+  </header>
 
-<a id="top"></a>
-<header class="hero">
-  <div class="hero-glow"></div>
-  <div class="wrap hero-grid">
-    <div>
-      <div class="eyebrow fade d1">Keyboard-only Excel · timed · scored</div>
-      <h1 class="fade d2">Get fast at Excel.<br><span class="dim">No mouse. Just reps.</span></h1>
-      <p class="lede fade d3">hotkey.gg is a speedrun trainer for the keystrokes and modeling moves that fill an analyst's day. <b>Real tasks, the exact Windows shortcuts, timed to the hundredth of a second</b> — drilled until they're reflex.</p>
-      <div class="hero-cta fade d4">
-        <a href="app.html" class="btn btn-primary">Start your first run</a>
-        <a href="#how" class="btn btn-ghost">See how it works</a>
-      </div>
-      <div class="micro fade d5">No install. Runs in the browser. <b>Invite-only beta</b> — built for the summer before the internship.</div>
-    </div>
-
-    <div class="demo fade d3" aria-hidden="true">
-      <div class="demo-bar">
-        <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
-        <span class="demo-tag">live drill</span>
-      </div>
-      <div class="demo-action" id="demoAction"></div>
-      <div class="sheet">
-        <div class="sheet-row"><div class="sheet-h">B4</div><div class="cell active" id="demoCell"></div></div>
-      </div>
-      <div class="keys" id="demoKeys"></div>
+  <div class="exrow">
+    <div class="prompt" id="prompt"></div>
+    <div class="mode-ctrls">
+      <button class="guide-toggle" id="demoBtn">▶ watch solution</button>
+      <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
     </div>
   </div>
-</header>
+  <div class="fbar">
+    <span class="namebox" id="nameBox">A1</span>
+    <span class="fx"><i>fx</i></span>
+    <span class="fcontent empty" id="fContent">empty</span>
+  </div>
+  <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
+  <div class="sheets">
+    <button class="sheet-nav" id="prevDrill" title="previous drill">‹</button>
+    <div class="sheet-tabs" id="sheetTabs"></div>
+    <button class="sheet-nav" id="nextDrill" title="next drill">›</button>
+  </div>
+  <div class="checklist" id="checklist"></div>
+  <div class="ribbon" id="ribbon"></div>
 
-<section id="how">
-  <div class="wrap">
-    <div class="sec-eyebrow">How it works</div>
-    <h2 class="sec-title">Drills, not lessons.</h2>
-    <p class="sec-sub">You don't read about shortcuts here. You execute them, against the clock, until they stop being something you think about.</p>
-    <div class="features">
-      <div class="card">
-        <div class="card-num">01</div>
-        <h3>Real tasks, real keystrokes</h3>
-        <p>Exercises mirror what first-years actually do — paste-special values, clean a formatting mess, AutoSum, make a tab model-ready — using the exact Windows Excel shortcuts. The muscle memory transfers one-to-one.</p>
-      </div>
-      <div class="card">
-        <div class="card-num">02</div>
-        <h3>Scored like a speedrun</h3>
-        <p>Every run is timed, and your keystrokes are counted against the optimal path. You can watch your times drop as the moves turn into reflex — the same loop that makes typing tests addictive.</p>
-      </div>
-      <div class="card">
-        <div class="card-num">03</div>
-        <h3>Keyboard or nothing</h3>
-        <p>Reach for the mouse and the run gets flagged. The whole point is to work the way fast modelers work — hands on the home row, ribbon driven by <kbd>Alt</kbd> key tips, never hunting for a button.</p>
-      </div>
+  <div class="bar">
+    <div class="timer" id="timer">0.00</div>
+    <div class="stat">time par <b id="par">—</b> · best <b id="pb">—</b><br>keys <b id="keyN">0</b> · optimal ~<b id="keyPar">—</b></div>
+    <div class="spacer"></div>
+    <div class="badge" id="mouseBadge" style="display:none">mouse used</div>
+  </div>
+
+  <div class="result" id="result">go — first keystroke starts the clock</div>
+
+  <div class="foot"><button class="help-toggle" id="helpToggle"><kbd>?</kbd> hints &amp; shortcuts</button></div>
+
+  <div class="help" id="help">
+    <div class="help-sec"><h4>solving this one</h4><div id="helpReq"></div></div>
+    <div class="help-sec"><h4>move &amp; select</h4>
+      <div><kbd>↑↓←→</kbd> move &nbsp; <kbd>ctrl+→</kbd> jump to edge &nbsp; <kbd>shift+→</kbd> select &nbsp; <kbd>ctrl+shift+→</kbd> select to edge &nbsp; <kbd>shift+space</kbd> row &nbsp; <kbd>ctrl+space</kbd> column</div></div>
+    <div class="help-sec"><h4>commands</h4>
+      <div><kbd>ctrl+c</kbd> copy &nbsp; <kbd>ctrl+b</kbd> bold &nbsp; <kbd>ctrl+z</kbd> undo &nbsp; <kbd>alt</kbd> opens the ribbon — pick a tab, then its keys (e.g. <kbd>h v s</kbd> or legacy <kbd>e s</kbd> for paste special; <kbd>h u s</kbd> for AutoSum)</div></div>
+    <div class="help-sec"><h4>flow</h4>
+      <div>switch drills with the <kbd>sheet tabs</kbd> below the grid, the <kbd>‹ ›</kbd> arrows, or <kbd>1</kbd>–<kbd>9</kbd> &nbsp; <kbd>shift+f11</kbd> restart &nbsp; <kbd>esc</kbd> cancel ribbon &nbsp; on the results card: <kbd>enter</kbd> again · <kbd>space</kbd> next</div></div>
+  </div>
+</div>
+
+<div class="pd-backdrop" id="pasteDialog">
+  <div class="pd-box">
+    <div class="pd-title">Paste Special <span class="x">esc to cancel</span></div>
+    <div class="pd-group"><h4>Paste</h4><div id="pdOpts"></div></div>
+    <div class="pd-foot"><span class="pd-btn">Cancel <kbd>esc</kbd></span><span class="pd-btn ok">OK <kbd>↵</kbd></span></div>
+  </div>
+</div>
+
+<div class="keyflash" id="keyflash"></div>
+<div class="results-modal" id="resultsModal"></div>
+<div class="auth-modal" id="authModal"></div>
+<div class="landing" id="landing">
+  <div class="landing-inner">
+    <div class="lbrand">hotkey<b>.gg</b></div>
+    <div class="eyebrow">Keyboard-only Excel · timed · scored</div>
+    <h1>Drills, <span class="dim">not lessons.</span></h1>
+    <p class="lede">A speedrun trainer for the keystrokes and modeling moves that fill an analyst's day — <b>the exact Windows shortcuts, timed to the hundredth</b>, drilled until they're reflex.</p>
+    <div class="landing-cta">
+      <button class="start-btn" id="startBtn">Start training →</button>
+      <span class="modes"><span class="mode-chip">Classic</span><span class="mode-chip soon">Rapid-fire · soon</span></span>
     </div>
+    <div class="micro"><b>Invite-only beta.</b> Runs in the browser — no install. Pick any drill from the tabs once you're in.</div>
   </div>
-</section>
+</div>
 
-<section id="leaderboard">
-  <div class="wrap">
-    <div class="sec-eyebrow">The board</div>
-    <h2 class="sec-title">Fastest hands win.</h2>
-    <p class="sec-sub">Every run posts a time. Climb the board against your class — and find out who actually deserves the bragging rights before anyone sets foot on a desk.</p>
-    <div class="board-wrap">
-      <div class="board-head">
-        <span>#</span><span>Analyst</span><span>Exercise</span><span style="text-align:right">Time</span>
-      </div>
-      <div class="board-row"><span class="board-rank">1</span><span class="board-name">you, hopefully</span><span class="board-ex">hardcode it</span><span class="board-time">—</span></div>
-      <div class="board-row"><span class="board-rank">2</span><span class="board-name">classmate</span><span class="board-ex">clean the paste</span><span class="board-time">—</span></div>
-      <div class="board-row"><span class="board-rank">3</span><span class="board-name">classmate</span><span class="board-ex">model-ready</span><span class="board-time">—</span></div>
-      <div class="board-row"><span class="board-rank">4</span><span class="board-name">classmate</span><span class="board-ex">hardcode it</span><span class="board-time">—</span></div>
-      <div class="board-veil">
-        <p>The leaderboard goes live with accounts.</p>
-        <span class="sub">sign in · post a time · take your spot</span>
-        <a href="app.html" class="btn btn-primary">Start training</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="final">
-  <div class="wrap">
-    <h2>Your first run takes thirty seconds.</h2>
-    <p>Three exercises. One clock. No mouse.</p>
-    <a href="app.html" class="btn btn-primary">Start training</a>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap foot-in">
-    <div>
-      <a href="#top" class="brand" style="font-size:16px">hotkey<b>.gg</b></a>
-      <div class="foot-tag" style="margin-top:6px">An Excel speedrun trainer.</div>
-    </div>
-    <div class="foot-fine">Microsoft Excel is a registered trademark of Microsoft Corporation. hotkey.gg is an independent training tool and is not affiliated with or endorsed by Microsoft.</div>
-  </div>
-</footer>
+<div class="gate" id="gate"></div>
 
 <script>
-// mobile nav
-document.getElementById('menuBtn').addEventListener('click',function(){
-  document.getElementById('navLinks').classList.toggle('open');
-});
-document.querySelectorAll('#navLinks a').forEach(function(a){
-  a.addEventListener('click',function(){ document.getElementById('navLinks').classList.remove('open'); });
-});
+/* ============================================================
+   SUPABASE — paste your two values below, then re-deploy.
+   Leave both blank to run the trainer fully offline (no
+   accounts, no leaderboard) — everything else works the same.
+   The anon key is meant to be public; never paste the service key.
+   ============================================================ */
+const SUPABASE_URL      = '';   // ← your Project URL, e.g. https://abcd1234.supabase.co
+const SUPABASE_ANON_KEY = '';   // ← your anon / public key
+const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
+let enterRequested = false, landingOpen = true, recoveryMode = false;
 
-// ---- looping keystroke-chord demo ----
-var CHORDS=[
-  {action:'paste special → values', keys:['Alt','H','V','S','↵'], before:'=B3*1.08', beforeFx:true, after:'14,231', afterFx:false, bold:false},
-  {action:'bold the header',          keys:['Ctrl','B'],             before:'Revenue', beforeFx:false, after:'Revenue', afterFx:false, bold:true},
-  {action:'autosum the column',       keys:['Alt','=','↵'],          before:'',        beforeFx:false, after:'=SUM(B3:B11)', afterFx:true, bold:false},
-];
-var elAction=document.getElementById('demoAction'),
-    elCell=document.getElementById('demoCell'),
-    elKeys=document.getElementById('demoKeys');
+/* ============================================================
+   CONFIG — tweak challenges, par times, and grid here.
+   Each challenge has: prompt, requirement line, a build() that
+   returns {ROWS, COLS, cells, sel, active, inputs?}, a grade(),
+   and a par (seconds).
+   ============================================================ */
+const ROWS_MAX = 12, COLS = 8;            // A..H
+const COLW_DEFAULT = 66;                   // px; autofit widens beyond this
+const CHARPX = 8.0;                        // approx mono char width at 13px
 
-function setCell(text,fx,bold){
-  elCell.textContent=text||'\u00A0';
-  elCell.className='cell active'+(fx?' fx':'')+(bold?' bold':'');
+const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const colLetter = c => String.fromCharCode(64+c);
+
+function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:false,
+  fmtStyle:'general',decimals:0,bt:false,bb:false,ball:false,txt:false};}
+
+const CHALLENGES = {
+  drill:{
+    name:'Drill', label:'Hardcode it', par:13, parKeys:9,
+    prompt:'Hardcode column B in place — turn its formulas into plain values. Select B, copy, then paste-special-values right back onto the same cells.',
+    req:'<em>keyboard only</em> · select B, <em>ctrl c</em>, then <em>alt e s v ↵</em> — don\'t move the cursor before pasting, so the values land back on B',
+    guide:['on B2, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> to grab the column · copy <kbd>ctrl</kbd>+<kbd>c</kbd> · paste values <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd>'],
+    targets:[function(){return 'B2:B'+(this._n+1);}],
+    demo(){ const last='B'+(this._n+1); return [
+      {sel:'B2:'+last, keys:[Kb.copy]},
+      {sel:'B2:'+last, keys:[Kb.alt,L('E'),L('S'),L('V'),Kb.enter]},
+    ]; },
+    build(){
+      const n = rnd(8,11);
+      const cells = {};
+      const targets = {};
+      for(let r=2;r<=n+1;r++){
+        const a = rnd(120,990);
+        const mult = [1.5,2,3,0.5][rnd(0,3)];
+        cells['A'+r] = {...blankCell(), value:a, txt:false};
+        const val = Math.round(a*mult);
+        cells['B'+r] = {...blankCell(), formula:'=A'+r+'*'+mult, value:val};
+        targets['B'+r] = val;
+      }
+      cells['A1']={...blankCell(),value:'src',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'calc',txt:true,bold:true};
+      this._n=n; this._targets=targets;
+      return {ROWS:n+1, cells, active:{r:2,c:2}, sel:null};
+    },
+    checks(S){
+      let conv=0;
+      for(let r=2;r<=this._n+1;r++){ const c=S.cells['B'+r];
+        if(c&&c.formula===null&&Number(c.value)===this._targets['B'+r]) conv++; }
+      return [{label:`hardcode B-column to values (${conv}/${this._n})`, ok:conv===this._n}];
+    },
+    hint(S){
+      let bDone=true; for(let r=2;r<=this._n+1;r++){ const c=S.cells['B'+r]; if(!c||c.formula!==null) bDone=false; }
+      if(bDone) return '';
+      for(let col=3;col<=COLS;col++){ let match=0;
+        for(let r=2;r<=this._n+1;r++){ const c=S.cells[colLetter(col)+r]; if(c&&c.formula===null&&Number(c.value)===this._targets['B'+r]) match++; }
+        if(match>=2) return 'Those values landed in column '+colLetter(col)+' — they need to replace column B in place. Copy B, then paste-special-values <em>without moving the cursor first</em>.';
+      }
+      return '';
+    }
+  },
+
+  combo:{
+    name:'Combo', label:'Clean the paste', par:32, parKeys:20,
+    prompt:'A raw paste landed messy. Make it presentable: bold the header row, comma-format the number columns to 0 decimals, wrap the notes column, and autofit so nothing shows ####.',
+    req:'<em>keyboard only</em> · alt h o i autofit · alt h w wrap · ctrl b bold · alt h k comma then alt h 9 to drop decimals',
+    guide:[
+      'on the header row, <kbd>shift</kbd>+<kbd>space</kbd> to select it · <kbd>ctrl</kbd>+<kbd>b</kbd> bold',
+      'select B2:D6 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> comma · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice to drop decimals',
+      'select the notes column E · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd> wrap',
+      'select B:D · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
+    ],
+    targets:['A1:E1','B2:D6','E2:E6','B2:D6'],
+    demo(){ return [
+      {sel:'A1:E1', keys:[Kb.bold]},
+      {sel:'B2:D6', keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:'E2:E6', keys:[Kb.alt,L('H'),L('W')]},
+      {sel:'B2:D6', keys:[Kb.alt,L('H'),L('O'),L('I')]},
+    ]; },
+    build(){
+      const cells={};
+      const heads=['name','rev','ebitda','debt','notes'];
+      heads.forEach((h,i)=>cells[colLetter(i+1)+1]={...blankCell(),value:h,txt:true,bold:false});
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox'];
+      const notes=['flagged for review by deal team','pending QoE adjustments','clean — comp set anchor','stub period, annualize','carve-out, normalize'];
+      for(let r=2;r<=6;r++){
+        cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
+        cells['B'+r]={...blankCell(),value:rnd(800,9800)*1000};
+        cells['C'+r]={...blankCell(),value:rnd(120,2400)*1000};
+        cells['D'+r]={...blankCell(),value:rnd(200,5600)*1000};
+        cells['E'+r]={...blankCell(),value:notes[r-2],txt:true};
+      }
+      return {ROWS:6, cells, active:{r:1,c:1}, sel:null};
+    },
+    checks(S){
+      let hb=true; for(let c=1;c<=5;c++){ const h=S.cells[colLetter(c)+1]; if(!h||!h.bold) hb=false; }
+      let cf=true; for(let c=2;c<=4;c++)for(let r=2;r<=6;r++){ const cell=S.cells[colLetter(c)+r]; if(!cell||cell.fmtStyle!=='comma'||cell.decimals!==0) cf=false; }
+      let wr=true; for(let r=2;r<=6;r++){ const e=S.cells['E'+r]; if(!e||!e.wrap) wr=false; }
+      let af=true; for(let c=2;c<=4;c++){ if(overflowsCol(S,c)) af=false; }
+      return [
+        {label:'bold the header row', ok:hb},
+        {label:'comma-format B:D, 0 dec', ok:cf},
+        {label:'wrap the notes column', ok:wr},
+        {label:'autofit — no ####', ok:af},
+      ];
+    }
+  },
+
+  gauntlet:{
+    name:'Gauntlet', label:'Make it model-ready', par:75, parKeys:30,
+    prompt:'Finish this mini build to house style: shade the three input cells blue, add a SUM total, make the total bold with a top border, comma-format column B to 0 decimals, and autofit so nothing clips.',
+    req:'<em>keyboard only</em> · alt h h fill · alt = sum · ctrl b bold · alt h b t top border · alt h k / alt h 9 format · alt h o i autofit',
+    guide:[
+      'select B2:B4 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> fill · pick blue',
+      'go to B5 · <kbd>alt</kbd>+<kbd>=</kbd> autosum · <kbd>↵</kbd>',
+      'on B5 · <kbd>ctrl</kbd>+<kbd>b</kbd> bold · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> top border',
+      'select B2:B5 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
+      'select column B · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
+    ],
+    targets:['B2:B4','B5','B5','B2:B5','B2:B5'],
+    demo(){ return [
+      {sel:'B2:B4', keys:[Kb.alt,L('H'),L('H')]},
+      {sel:'B5', keys:[Kb.eq]},
+      {sel:'B5', keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
+      {sel:'B2:B5', keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:'B2:B5', keys:[Kb.alt,L('H'),L('O'),L('I')]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Sources',txt:true,bold:true};
+      const labels=['Senior debt','Mezzanine','Sponsor equity'];
+      const inputs=[];
+      for(let r=2;r<=4;r++){
+        cells['A'+r]={...blankCell(),value:labels[r-2],txt:true};
+        cells['B'+r]={...blankCell(),value:rnd(40,260)*1000000};
+        inputs.push('B'+r);
+      }
+      cells['A5']={...blankCell(),value:'Total sources',txt:true};
+      // B5 left empty for the SUM
+      this._inputs=inputs; this._total='B5'; this._sumRange='B2:B4';
+      return {ROWS:5, cells, active:{r:2,c:2}, sel:null};
+    },
+    checks(S){
+      let fill=true; for(const k of this._inputs){ const c=S.cells[k]; if(!c||c.fill!=='blue') fill=false; }
+      const t=S.cells['B5'];
+      const sum=!!(t&&t.formula&&/^=SUM\(/i.test(t.formula));
+      const tot=!!(t&&t.bold&&t.bt);
+      let cf=true; for(let r=2;r<=5;r++){ const c=S.cells['B'+r]; if(!c||c.fmtStyle!=='comma'||c.decimals!==0) cf=false; }
+      const af=!overflowsCol(S,2);
+      return [
+        {label:'shade inputs blue', ok:fill},
+        {label:'SUM the total', ok:sum},
+        {label:'bold + top border on total', ok:tot},
+        {label:'comma-format column B', ok:cf},
+        {label:'autofit — no ####', ok:af},
+      ];
+    }
+  },
+  format:{
+    name:'Format', label:'Fix the formats', par:35, parKeys:28,
+    prompt:'These outputs came in unformatted. Cast each number to the right type — the margins as percentages, the dollar figures as currency, the share count with comma separators — and trim every stray decimal.',
+    req:'<em>keyboard only</em> · <em>ctrl+shift+%</em> percent · <em>ctrl+shift+$</em> currency · <em>ctrl+shift+!</em> comma · <em>alt h 0</em> / <em>alt h 9</em> add or drop decimals',
+    guide:[
+      'select the two margins · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · on the EBITDA margin add one decimal <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>',
+      'select the two dollar rows · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> · drop decimals <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
+      'select the share count · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>!</kbd> · drop decimals <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
+    ],
+    targets:['B2:B3','B4:B5','B6'],
+    demo(){ return [
+      {sel:'B2:B3', keys:[Kb.pct]},
+      {sel:'B3', keys:[Kb.alt,L('H'),D(0)]},
+      {sel:'B4:B5', keys:[Kb.cur,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:'B6', keys:[Kb.com,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Metric',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'Value',txt:true,bold:true};
+      const gross=rnd(36,55)/100, ebitda=rnd(150,290)/1000;
+      const rows=[
+        ['Gross margin', gross],
+        ['EBITDA margin', ebitda],
+        ['Revenue', rnd(38,72)*1000000 + rnd(1,99)*10000],
+        ['Net debt', rnd(8,24)*1000000 + rnd(1,99)*10000],
+        ['Share count', rnd(42,140)*100000],
+      ];
+      rows.forEach((row,i)=>{ const r=i+2;
+        cells['A'+r]={...blankCell(),value:row[0],txt:true};
+        cells['B'+r]={...blankCell(),value:row[1]};
+      });
+      return {ROWS:6, cells, active:{r:2,c:2}, sel:null, colW:{1:132,2:138}};
+    },
+    checks(S){
+      const pc=(k,dec)=>{const c=S.cells[k]; return !!(c&&c.fmtStyle==='percent'&&c.decimals===dec);};
+      const dol=(k)=>{const c=S.cells[k]; return !!(c&&c.fmtStyle==='currency'&&c.decimals===0);};
+      const com=(k)=>{const c=S.cells[k]; return !!(c&&c.fmtStyle==='comma'&&c.decimals===0);};
+      return [
+        {label:'margins → percent (EBITDA to 1 decimal)', ok: pc('B2',0)&&pc('B3',1)},
+        {label:'dollar figures → currency, 0 dec', ok: dol('B4')&&dol('B5')},
+        {label:'share count → comma, 0 dec', ok: com('B6')},
+      ];
+    }
+  },
+  margin:{
+    name:'Formula', label:'Build the margin', par:42, parKeys:34,
+    prompt:'Calculate each company\'s EBITDA margin with a live formula — EBITDA ÷ revenue — typed into the Margin column, then format that column as a percentage to one decimal.',
+    req:'<em>type the formula</em> · in each margin cell type <em>=C2/B2</em> then <em>↵</em> · then select the column, <em>ctrl+shift+%</em>, and <em>alt h 0</em> for one decimal',
+    guide:[
+      'in D2 type <kbd>=</kbd> <kbd>C</kbd> <kbd>2</kbd> <kbd>/</kbd> <kbd>B</kbd> <kbd>2</kbd> <kbd>↵</kbd> — then the same down the column (D3 =C3/B3, D4 =C4/B4)',
+      'select the margin column · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
+    ],
+    targets:['D2:D4','D2:D4'],
+    demo(){ return [
+      {sel:'D2', keys:[...T('=C2/B2'), Kb.enter]},
+      {sel:'D3', keys:[...T('=C3/B3'), Kb.enter]},
+      {sel:'D4', keys:[...T('=C4/B4'), Kb.enter]},
+      {sel:'D2:D4', keys:[Kb.pct, Kb.alt, L('H'), D(0)]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Company',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'Revenue',txt:true,bold:true};
+      cells['C1']={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells['D1']={...blankCell(),value:'Margin',txt:true,bold:true};
+      const names=['Atlas Co','Borealis','Cygnus Ltd'];
+      for(let r=2;r<=4;r++){
+        const rev=rnd(400,1800)*1000;
+        const eb=Math.round(rev*(rnd(15,38)/100));
+        cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
+        cells['B'+r]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),value:eb,fmtStyle:'comma',decimals:0};
+      }
+      return {ROWS:4, cells, active:{r:2,c:4}, sel:null, colW:{1:120,2:96,3:96,4:96}};
+    },
+    checks(S){
+      const fOk=(r)=>{ const c=S.cells['D'+r]; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        const refOk=f.includes('C'+r)&&f.includes('B'+r)&&f.includes('/');
+        const B=S.cells['B'+r].value, C=S.cells['C'+r].value;
+        return refOk && B!==0 && Math.abs(c.value-(C/B))<1e-6; };
+      const fmtOk=(r)=>{ const c=S.cells['D'+r]; return !!(c&&c.fmtStyle==='percent'&&c.decimals===1); };
+      return [
+        {label:'margin = EBITDA ÷ revenue (live formula, all rows)', ok: fOk(2)&&fOk(3)&&fOk(4)},
+        {label:'format the margins as % to 1 decimal', ok: fmtOk(2)&&fmtOk(3)&&fmtOk(4)},
+      ];
+    }
+  },
+  schedule:{
+    name:'Schedule', label:'Roll it forward', par:60, parKeys:52,
+    prompt:'Complete this four-year PP&E roll-forward. Each year\'s ending balance is beginning minus depreciation — and each new year must begin where the prior year ended. Build it with live formulas, not hardcoded numbers.',
+    req:'<em>type formulas</em> · ending = beginning − depreciation (e.g. <em>=B2-B3</em>) · then link each year\'s beginning to the prior year\'s ending (e.g. <em>=B4</em> in C2)',
+    guide:[
+      'fill the Ending row: in B4 type <kbd>=</kbd><kbd>B</kbd><kbd>2</kbd><kbd>-</kbd><kbd>B</kbd><kbd>3</kbd> <kbd>↵</kbd>, then C4 =C2-C3, D4 =D2-D3, E4 =E2-E3',
+      'link each Beginning to the prior Ending: in C2 type <kbd>=</kbd><kbd>B</kbd><kbd>4</kbd> <kbd>↵</kbd>, then D2 =C4, E2 =D4',
+    ],
+    targets:['B4:E4','C2:E2'],
+    demo(){ return [
+      {sel:'B4', keys:[...T('=B2-B3'), Kb.enter]},
+      {sel:'C2', keys:[...T('=B4'), Kb.enter]},
+      {sel:'C4', keys:[...T('=C2-C3'), Kb.enter]},
+      {sel:'D2', keys:[...T('=C4'), Kb.enter]},
+      {sel:'D4', keys:[...T('=D2-D3'), Kb.enter]},
+      {sel:'E2', keys:[...T('=D4'), Kb.enter]},
+      {sel:'E4', keys:[...T('=E2-E3'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      const num=(v)=>({...blankCell(),value:v,fmtStyle:'comma',decimals:0});
+      const blankNum=()=>({...blankCell(),fmtStyle:'comma',decimals:0});
+      cells['A1']={...blankCell(),value:'PP&E roll-forward',txt:true,bold:true};
+      ['Yr 1','Yr 2','Yr 3','Yr 4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true});
+      cells['A2']={...blankCell(),value:'Beginning',txt:true};
+      cells['A3']={...blankCell(),value:'Depreciation',txt:true};
+      cells['A4']={...blankCell(),value:'Ending',txt:true};
+      const begin=rnd(50,90)*100;                 // 5,000–9,000
+      const dep=Math.round(begin/rnd(8,12)/50)*50; // straight-line, clean to nearest 50
+      cells['B2']=num(begin);
+      for(let c=2;c<=5;c++) cells[colLetter(c)+3]=num(dep);   // depreciation given each year
+      // answer cells start empty but pre-formatted so results display cleanly
+      cells['B4']=blankNum();
+      for(let c=3;c<=5;c++){ cells[colLetter(c)+2]=blankNum(); cells[colLetter(c)+4]=blankNum(); }
+      return {ROWS:4, cells, active:{r:4,c:2}, sel:null, colW:{1:126,2:74,3:74,4:74,5:74}};
+    },
+    checks(S){
+      const COL=['B','C','D','E'];
+      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
+      const endOk=i=>{ const col=COL[i], c=S.cells[col+'4']; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        return f.includes(col+'2')&&f.includes(col+'3')&&f.includes('-')&&Math.abs(c.value-(val(col+'2')-val(col+'3')))<1e-6; };
+      const begOk=i=>{ const col=COL[i], prev=COL[i-1], c=S.cells[col+'2']; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        return f.includes(prev+'4')&&Math.abs(c.value-val(prev+'4'))<1e-6; };
+      return [
+        {label:'ending = beginning − depreciation (all 4 years, formulas)', ok: endOk(0)&&endOk(1)&&endOk(2)&&endOk(3)},
+        {label:'each year begins where the prior year ended', ok: begOk(1)&&begOk(2)&&begOk(3)},
+      ];
+    }
+  },
+  percent:{
+    name:'% of rev', label:'Common-size it', par:34, parKeys:24,
+    prompt:'Express each line item as a percentage of revenue. Write the formula once with an absolute reference to revenue, fill it down the column, then format as a percentage — the $ keeps revenue locked as the formula fills.',
+    req:'<em>absolute reference + fill</em> · in C2 type <em>=B2/$B$2</em> (the $ locks revenue) · select C2:C6 and <em>ctrl+d</em> to fill down · then <em>ctrl+shift+%</em> and <em>alt h 0</em>',
+    guide:[
+      'in C2 type <kbd>=</kbd><kbd>B</kbd><kbd>2</kbd><kbd>/</kbd><kbd>$</kbd><kbd>B</kbd><kbd>$</kbd><kbd>2</kbd> <kbd>↵</kbd> — the $ locks revenue — then select C2:C6 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill down',
+      'select the % column · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
+    ],
+    targets:['C2:C6','C2:C6'],
+    demo(){ return [
+      {sel:'C2', keys:[...T('=B2/$B$2'), Kb.enter]},
+      {sel:'C2:C6', keys:[Kb.fillD]},
+      {sel:'C2:C6', keys:[Kb.pct, Kb.alt, L('H'), D(0)]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Common-size',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'$mm',txt:true,bold:true};
+      cells['C1']={...blankCell(),value:'% of rev',txt:true,bold:true};
+      const rev=rnd(9,18)*100;
+      const rows=[
+        ['Revenue', rev],
+        ['COGS', Math.round(rev*rnd(52,64)/100)],
+        ['SG&A', Math.round(rev*rnd(10,18)/100)],
+        ['R&D', Math.round(rev*rnd(4,9)/100)],
+        ['D&A', Math.round(rev*rnd(3,7)/100)],
+      ];
+      rows.forEach((row,i)=>{ const r=i+2;
+        cells['A'+r]={...blankCell(),value:row[0],txt:true};
+        cells['B'+r]={...blankCell(),value:row[1],fmtStyle:'comma',decimals:0};
+      });
+      return {ROWS:6, cells, active:{r:2,c:3}, sel:null, colW:{1:120,2:84,3:88}};
+    },
+    checks(S){
+      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
+      const pctOk=r=>{ const c=S.cells['C'+r]; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/[\s$]/g,''); const rev=val('B2');
+        return f.includes('B'+r)&&f.includes('B2')&&f.includes('/')&&rev!==0&&Math.abs(c.value-(val('B'+r)/rev))<1e-6; };
+      const fmtOk=r=>{ const c=S.cells['C'+r]; return !!(c&&c.fmtStyle==='percent'&&c.decimals===1); };
+      let f=true,m=true; for(let r=2;r<=6;r++){ if(!pctOk(r)) f=false; if(!fmtOk(r)) m=false; }
+      return [
+        {label:'each line ÷ revenue, anchored formula (all rows)', ok: f},
+        {label:'format the % column to 1 decimal', ok: m},
+      ];
+    }
+  },
+  lookup:{
+    name:'Lookup', label:'Look it up', par:50, parKeys:38,
+    prompt:'Pull a figure out of the table with INDEX/MATCH. The query panel names a company and a metric — return that number into the Answer cell. The metric columns are shuffled every round, so read the headers and aim INDEX at the right column.',
+    req:'<em>INDEX + MATCH</em> · MATCH(G2, A2:A6, 0) finds the company\'s row, then INDEX that metric\'s column · e.g. <em>=INDEX(C2:C6, MATCH(G2,A2:A6,0))</em> — or two-way <em>=INDEX(B2:D6, MATCH(G2,A2:A6,0), MATCH(G3,B1:D1,0))</em>',
+    guide:[
+      'in G4 type <kbd>=INDEX(</kbd> the queried metric\'s column, e.g. C2:C6 <kbd>, MATCH(G2,A2:A6,0))</kbd> — MATCH locates the company row, INDEX pulls from that column',
+      'if the number looks wrong, INDEX is pointed at the wrong column — match it to the Metric named in G3',
+    ],
+    targets:['G4','G4'],
+    demo(){ const col=this._mcol; return [
+      {sel:'G4', keys:[...T('=INDEX('+col+'2:'+col+'6,MATCH(G2,A2:A6,0))'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      const metrics=['Revenue','EBITDA','Net debt'];
+      for(let k=metrics.length-1;k>0;k--){ const j=rnd(0,k); [metrics[k],metrics[j]]=[metrics[j],metrics[k]]; }
+      cells['A1']={...blankCell(),value:'Company',txt:true,bold:true};
+      metrics.forEach((mn,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:mn,txt:true,bold:true});
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox'];
+      const data={};
+      names.forEach((nm,r0)=>{ const r=r0+2; cells['A'+r]={...blankCell(),value:nm,txt:true}; data[nm]={};
+        metrics.forEach((mn,i)=>{ const v=rnd(2,90)*10; data[nm][mn]=v; cells[colLetter(i+2)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; }); });
+      const qName=names[rnd(0,names.length-1)], qMetric=metrics[rnd(0,metrics.length-1)];
+      cells['F1']={...blankCell(),value:'Query',txt:true,bold:true};
+      cells['F2']={...blankCell(),value:'Company',txt:true}; cells['G2']={...blankCell(),value:qName,txt:true};
+      cells['F3']={...blankCell(),value:'Metric',txt:true};  cells['G3']={...blankCell(),value:qMetric,txt:true};
+      cells['F4']={...blankCell(),value:'Answer',txt:true,bold:true}; cells['G4']={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._mcol=colLetter(metrics.indexOf(qMetric)+2);
+      return {ROWS:6, cells, active:{r:4,c:7}, sel:null, colW:{1:104,2:82,3:82,4:86,6:80,7:98}};
+    },
+    checks(S){
+      const company=S.cells['G2'].value, metric=S.cells['G3'].value;
+      let rowIdx=-1; for(let r=2;r<=6;r++){ if(eqLoose(S.cells['A'+r].value,company)) rowIdx=r; }
+      let mcol=-1; for(let c=2;c<=4;c++){ if(eqLoose(S.cells[colLetter(c)+1].value,metric)) mcol=c; }
+      const expected=(rowIdx>0&&mcol>0)?S.cells[colLetter(mcol)+rowIdx].value:null;
+      const g=S.cells['G4']; const f=(g&&g.formula)?g.formula.toUpperCase().replace(/\s/g,''):'';
+      const usesIM=f.includes('INDEX(')&&f.includes('MATCH(');
+      const valOk=!!(g&&g.formula)&&expected!=null&&Math.abs(g.value-expected)<1e-6;
+      return [
+        {label:'pull the figure with INDEX + MATCH', ok: usesIM},
+        {label:'answer matches the queried company × metric', ok: valOk},
+      ];
+    }
+  },
+  copyover:{
+    name:'Basics', label:'Copy it over', par:18, parKeys:10,
+    prompt:'Fundamentals rep: copy the block of numbers on the left and paste it into the outlined area on the right. Select, copy, move, paste — all on the keyboard, no mouse.',
+    req:'<em>select B2:C4</em> · <em>ctrl c</em> copy · arrow over to E2 · <em>ctrl v</em> paste',
+    guide:[
+      'select B2:C4 with <kbd>shift</kbd>+arrows, copy with <kbd>ctrl</kbd>+<kbd>c</kbd>, move to E2, then <kbd>ctrl</kbd>+<kbd>v</kbd> to paste',
+    ],
+    targets:['E2:F4'],
+    demo(){ return [
+      {sel:'B2:C4', keys:[Kb.copy]},
+      {sel:'E2', keys:[Kb.paste]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Source',txt:true,bold:true};
+      cells['E1']={...blankCell(),value:'Paste here',txt:true,bold:true};
+      for(let r=2;r<=4;r++)for(let c=2;c<=3;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(10,99)*10,fmtStyle:'comma',decimals:0};
+      for(let r=2;r<=4;r++)for(let c=5;c<=6;c++) cells[colLetter(c)+r]={...blankCell(),ball:true,fmtStyle:'comma',decimals:0};
+      return {ROWS:4, cells, active:{r:2,c:2}, sel:null, colW:{1:70,5:96}};
+    },
+    checks(S){
+      let ok=true;
+      for(let i=0;i<3;i++)for(let j=0;j<2;j++){
+        const src=S.cells[colLetter(2+j)+(2+i)], dst=S.cells[colLetter(5+j)+(2+i)];
+        if(!dst||!src||dst.value!==src.value) ok=false;
+      }
+      return [{label:'copy the block into the outlined target', ok}];
+    }
+  },
+  polish:{
+    name:'Header', label:'Polish the Header', par:24, parKeys:14,
+    prompt:'Dress up the header row so it reads as a header: make it bold, give it a bottom border to split it off from the data, and shade it. Header is A1:E1.',
+    req:'<em>select A1:E1</em> · <em>ctrl b</em> bold · <em>alt h b b</em> bottom border · <em>alt h h</em> shade',
+    guide:[
+      'select the header A1:E1 · <kbd>ctrl</kbd>+<kbd>b</kbd> bold',
+      'still selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> for a bottom border',
+      'shade it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd>',
+    ],
+    targets:['A1:E1','A1:E1','A1:E1'],
+    demo(){ return [
+      {sel:'A1:E1', keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('B'), Kb.alt,L('H'),L('H')]},
+    ]; },
+    build(){
+      const cells={};
+      ['Company','Revenue','EBITDA','Margin','Rank'].forEach((h,i)=>cells[colLetter(i+1)+1]={...blankCell(),value:h,txt:true});
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc'];
+      for(let r=2;r<=5;r++){ cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
+        cells['B'+r]={...blankCell(),value:rnd(4,18)*100,fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),value:rnd(1,6)*100,fmtStyle:'comma',decimals:0};
+        cells['D'+r]={...blankCell(),value:rnd(10,40)/100,fmtStyle:'percent',decimals:0};
+        cells['E'+r]={...blankCell(),value:r-1};
+      }
+      return {ROWS:5, cells, active:{r:1,c:1}, sel:null, colW:{1:104,2:80,3:80,4:74,5:60}};
+    },
+    checks(S){
+      const all=test=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+1]; if(!x||!test(x)) return false; } return true; };
+      return [
+        {label:'bold the header row', ok: all(x=>x.bold)},
+        {label:'bottom border under the header', ok: all(x=>x.bb)},
+        {label:'shade the header', ok: all(x=>x.fill==='blue')},
+      ];
+    }
+  },
+  foot:{
+    name:'Totals', label:'Total it both ways', par:55, parKeys:46,
+    prompt:'Foot and cross-foot the table: total each segment across into column E, total each quarter down into row 5, and tie it off with a grand total in the corner. SUM both directions.',
+    req:'<em>SUM both ways</em> · row totals in E (=SUM(B2:D2)) · column totals in row 5 (=SUM(B2:B4)) · grand total E5 · fill to repeat',
+    guide:[
+      'row totals: in E2 type <kbd>=SUM(B2:D2)</kbd> <kbd>↵</kbd>, then select E2:E4 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill down',
+      'column totals: in B5 type <kbd>=SUM(B2:B4)</kbd> <kbd>↵</kbd>, then select B5:D5 and <kbd>ctrl</kbd>+<kbd>r</kbd> to fill right',
+      'grand total: in E5 type <kbd>=SUM(E2:E4)</kbd> — it should tie to the column totals',
+    ],
+    targets:['E2:E4','B5:D5','E5'],
+    demo(){ return [
+      {sel:'E2', keys:[...T('=SUM(B2:D2)'), Kb.enter]},
+      {sel:'E2:E4', keys:[Kb.fillD]},
+      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
+      {sel:'B5:D5', keys:[Kb.fillR]},
+      {sel:'E5', keys:[...T('=SUM(E2:E4)'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Segment',txt:true,bold:true};
+      ['Q1','Q2','Q3','Total'].forEach((h,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:h,txt:true,bold:true});
+      const segs=['North','EMEA','APAC'];
+      for(let r=2;r<=4;r++){ cells['A'+r]={...blankCell(),value:segs[r-2],txt:true};
+        for(let c=2;c<=4;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(20,90)*10,fmtStyle:'comma',decimals:0};
+        cells['E'+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+      }
+      cells['A5']={...blankCell(),value:'Total',txt:true,bold:true};
+      for(let c=2;c<=5;c++) cells[colLetter(c)+5]={...blankCell(),fmtStyle:'comma',decimals:0};
+      return {ROWS:5, cells, active:{r:2,c:5}, sel:null, colW:{1:96,2:74,3:74,4:74,5:84}};
+    },
+    checks(S){
+      const val=k=>{const c=S.cells[k];return c&&typeof c.value==='number'?c.value:0;};
+      const rowOk=r=>{const c=S.cells['E'+r];return !!(c&&c.formula)&&Math.abs(c.value-(val('B'+r)+val('C'+r)+val('D'+r)))<1e-6;};
+      const colOk=cc=>{const L2=colLetter(cc);const c=S.cells[L2+5];return !!(c&&c.formula)&&Math.abs(c.value-(val(L2+2)+val(L2+3)+val(L2+4)))<1e-6;};
+      const grand=S.cells['E5']; let total=0; for(let r=2;r<=4;r++) total+=val('B'+r)+val('C'+r)+val('D'+r);
+      const grandOk=!!(grand&&grand.formula)&&Math.abs(grand.value-total)<1e-6;
+      return [
+        {label:'row totals down column E (SUM across)', ok: rowOk(2)&&rowOk(3)&&rowOk(4)},
+        {label:'column totals along row 5 (SUM down)', ok: colOk(2)&&colOk(3)&&colOk(4)},
+        {label:'grand total in E5 ties it out', ok: grandOk},
+      ];
+    }
+  },
+  comps:{
+    name:'Comps', label:'Line up the comps', par:40, parKeys:32,
+    prompt:'Finish the comp set: compute each company\'s EV/EBITDA multiple with a formula, fill it down the column, then add the average multiple at the bottom.',
+    req:'<em>multiple = EV ÷ EBITDA</em> · in D2 type <em>=B2/C2</em>, fill down · then <em>=AVERAGE(D2:D5)</em> for the mean',
+    guide:[
+      'in D2 type <kbd>=B2/C2</kbd> <kbd>↵</kbd>, then select D2:D5 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill the multiple down',
+      'in D6 type <kbd>=AVERAGE(D2:D5)</kbd> <kbd>↵</kbd> for the mean multiple',
+    ],
+    targets:['D2:D5','D6'],
+    demo(){ return [
+      {sel:'D2', keys:[...T('=B2/C2'), Kb.enter]},
+      {sel:'D2:D5', keys:[Kb.fillD]},
+      {sel:'D6', keys:[...T('=AVERAGE(D2:D5)'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Comp set',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'EV',txt:true,bold:true};
+      cells['C1']={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells['D1']={...blankCell(),value:'EV/EBITDA',txt:true,bold:true};
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc'];
+      for(let r=2;r<=5;r++){ const eb=rnd(8,40)*10; const mult=rnd(60,140)/10; const ev=Math.round(eb*mult);
+        cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
+        cells['B'+r]={...blankCell(),value:ev,fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),value:eb,fmtStyle:'comma',decimals:0};
+        cells['D'+r]={...blankCell(),fmtStyle:'comma',decimals:1};
+      }
+      cells['A6']={...blankCell(),value:'Average',txt:true,bold:true};
+      cells['D6']={...blankCell(),fmtStyle:'comma',decimals:1};
+      return {ROWS:6, cells, active:{r:2,c:4}, sel:null, colW:{1:104,2:80,3:80,4:92}};
+    },
+    checks(S){
+      const val=k=>{const c=S.cells[k];return c&&typeof c.value==='number'?c.value:0;};
+      const multOk=r=>{const c=S.cells['D'+r];return !!(c&&c.formula)&&val('C'+r)!==0&&Math.abs(c.value-(val('B'+r)/val('C'+r)))<1e-6;};
+      let mult=true; for(let r=2;r<=5;r++) if(!multOk(r)) mult=false;
+      const avg=S.cells['D6']; let sum=0; for(let r=2;r<=5;r++) sum+=val('B'+r)/val('C'+r); const mean=sum/4;
+      const avgOk=!!(avg&&avg.formula)&&Math.abs(avg.value-mean)<1e-6;
+      return [
+        {label:'EV/EBITDA multiple for each comp (formula)', ok: mult},
+        {label:'average multiple at the bottom', ok: avgOk},
+      ];
+    }
+  }
+};
+
+/* ============================================================
+   STATE + ENGINE
+   ============================================================ */
+let S, cur='drill', colW=[], started=0, finished=0, running=false, tickH=null;
+const IS_STANDALONE = !!(window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone));
+let mouseUsed=false, mode='normal', path=[], dialog=null, done=false, pasteKind=null, pendingFlash=null;
+let guided=false, guidedUsed=false;
+let demoPlaying=false;
+let editing=false, editBuf='';
+let undoStack=[], redoStack=[], keyLog=[];
+let PB = {};
+
+const $ = id => document.getElementById(id);
+const ck = (r,c)=>colLetter(c)+r;
+function get(r,c){ return S.cells[ck(r,c)] || blankCell(); }
+function ensure(r,c){ const k=ck(r,c); if(!S.cells[k]) S.cells[k]=blankCell(); return S.cells[k]; }
+
+function nonEmpty(r,c){ const x=get(r,c); return (x.value!==null&&x.value!=='')||!!x.formula; }
+function inb(r,c){ return r>=1&&r<=S.ROWS&&c>=1&&c<=COLS; }
+
+function ctrlJump(r,c,dr,dc){
+  let nr=r+dr,nc=c+dc;
+  if(!inb(nr,nc)) return {r,c};
+  if(nonEmpty(r,c)&&nonEmpty(nr,nc)){
+    while(inb(nr+dr,nc+dc)&&nonEmpty(nr+dr,nc+dc)){nr+=dr;nc+=dc;}
+  } else {
+    while(inb(nr,nc)&&!nonEmpty(nr,nc)){ if(!inb(nr+dr,nc+dc))break; nr+=dr;nc+=dc;}
+  }
+  return {r:nr,c:nc};
 }
-function renderKeys(keys){
-  elKeys.innerHTML='';
-  keys.forEach(function(k,i){
-    if(i>0){ var s=document.createElement('span'); s.className='keycap sep'; s.textContent='+'; elKeys.appendChild(s); }
-    var el=document.createElement('span'); el.className='keycap'; el.textContent=k; el.dataset.i=i; elKeys.appendChild(el);
+
+function selRange(){
+  if(!S.sel) return {r1:S.active.r,c1:S.active.c,r2:S.active.r,c2:S.active.c};
+  return {r1:Math.min(S.sel.r,S.active.r),r2:Math.max(S.sel.r,S.active.r),
+          c1:Math.min(S.sel.c,S.active.c),c2:Math.max(S.sel.c,S.active.c)};
+}
+function eachSel(fn){ const r=selRange(); for(let rr=r.r1;rr<=r.r2;rr++) for(let cc=r.c1;cc<=r.c2;cc++) fn(ensure(rr,cc),rr,cc); }
+
+function fmtNum(n,style,dec){
+  if(style==='comma') return Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  if(style==='currency') return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  if(style==='percent') return Number(n*100).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'%';
+  return String(n);
+}
+function dispText(cell){
+  if(cell.value===null||cell.value==='') return '';
+  if(typeof cell.value==='number') return fmtNum(cell.value,cell.fmtStyle,cell.decimals);
+  return String(cell.value);
+}
+function isNum(cell){ return typeof cell.value==='number'; }
+
+function neededWidth(c){
+  let w=COLW_DEFAULT;
+  for(let r=1;r<=S.ROWS;r++){ const cell=get(r,c); if(cell.wrap) continue;
+    const t=dispText(cell); w=Math.max(w, t.length*CHARPX+16); }
+  return Math.ceil(w);
+}
+function overflowsCol(St,c){
+  for(let r=1;r<=St.ROWS;r++){ const cell=St.cells[ck(r,c)]||blankCell();
+    if(!isNum(cell)||cell.wrap) continue;
+    const t=fmtNum(cell.value,cell.fmtStyle,cell.decimals);
+    if(t.length*CHARPX+12 > (St._colW?St._colW[c]:COLW_DEFAULT)) return true; }
+  return false;
+}
+
+/* ---- formula (only =SUM needed) ---- */
+function evalSum(expr){
+  const m=expr.match(/=SUM\(([A-Z])(\d+):([A-Z])(\d+)\)/i);
+  if(!m) return 0;
+  const c1=m[1].charCodeAt(0)-64, r1=+m[2], r2=+m[4];
+  let s=0; for(let r=Math.min(r1,r2);r<=Math.max(r1,r2);r++){ const x=get(r,c1); if(typeof x.value==='number') s+=x.value; }
+  return s;
+}
+function rangeRefs(a,b){ const pa=parseRef(a),pb=parseRef(b); const out=[]; if(!pa||!pb) return out;
+  for(let r=Math.min(pa.r,pb.r);r<=Math.max(pa.r,pb.r);r++)
+    for(let c=Math.min(pa.c,pb.c);c<=Math.max(pa.c,pb.c);c++) out.push(colLetter(c)+r);
+  return out; }
+function cellNum(ref){ const c=S.cells[ref]; return c&&typeof c.value==='number'?c.value:0; }
+function cellRaw(ref){ const c=S.cells[ref]; return c?c.value:null; }
+function eqLoose(a,b){ return (typeof a==='number'&&typeof b==='number')?a===b:String(a).trim().toLowerCase()===String(b).trim().toLowerCase(); }
+function evalFormula(expr){
+  let s=String(expr).replace(/^=/,''), i=0;
+  const skip=()=>{ while(s[i]===' ') i++; };
+  const flat=args=>args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellNum):[a.val]).flat();
+  const rawOf=a=>a.ref!==undefined?cellRaw(a.ref):(a.val!==undefined?a.val:null);
+  function fn(name,args){
+    if(name==='MATCH'){ const lk=rawOf(args[0]); if(!args[1].range) throw new Error('m-range');
+      const refs=rangeRefs(args[1].range[0],args[1].range[1]);
+      for(let p=0;p<refs.length;p++){ if(eqLoose(cellRaw(refs[p]),lk)) return p+1; } throw new Error('MATCH#N/A'); }
+    if(name==='INDEX'){ if(!args[0].range) throw new Error('i-range');
+      const a=parseRef(args[0].range[0]), b=parseRef(args[0].range[1]);
+      const r1=Math.min(a.r,b.r), c1=Math.min(a.c,b.c), r2=Math.max(a.r,b.r), c2=Math.max(a.c,b.c);
+      const toN=v=>typeof v==='number'?v:(parseFloat(v)||0);
+      if(args.length>=3){ const rn=Math.round(args[1].val), cn=Math.round(args[2].val); return toN(cellRaw(colLetter(c1+cn-1)+(r1+rn-1))); }
+      const rn=Math.round(args[1].val);
+      if(c1===c2) return toN(cellRaw(colLetter(c1)+(r1+rn-1)));
+      if(r1===r2) return toN(cellRaw(colLetter(c1+rn-1)+r1));
+      return toN(rangeRefs(args[0].range[0],args[0].range[1]).map(cellRaw)[rn-1]); }
+    const xs=flat(args);
+    switch(name){
+      case 'SUM': return xs.reduce((a,b)=>a+b,0);
+      case 'AVERAGE': case 'AVG': return xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:0;
+      case 'MIN': return Math.min(...xs);
+      case 'MAX': return Math.max(...xs);
+      case 'ABS': return Math.abs(xs[0]);
+      case 'ROUND': return Math.round(xs[0]*Math.pow(10,xs[1]||0))/Math.pow(10,xs[1]||0);
+      default: throw new Error('fn '+name);
+    } }
+  function expr_(){ let v=term(); skip(); while(s[i]==='+'||s[i]==='-'){ const o=s[i++]; const t=term(); v=o==='+'?v+t:v-t; skip(); } return v; }
+  function term(){ let v=fac(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=fac(); v=o==='*'?v*f:v/f; skip(); } return v; }
+  function fac(){ skip();
+    if(s[i]==='('){ i++; const v=expr_(); skip(); if(s[i]!==')') throw new Error('paren'); i++; return v; }
+    if(s[i]==='-'){ i++; return -fac(); }
+    if(s[i]==='+'){ i++; return fac(); }
+    let m=/^\d*\.?\d+/.exec(s.slice(i)); if(m){ i+=m[0].length; return parseFloat(m[0]); }
+    let f=/^([A-Za-z]+)\s*\(/.exec(s.slice(i)); if(f){ i+=f[1].length; skip(); i++; const a=argList(); skip(); if(s[i]!==')') throw new Error('fnparen'); i++; return fn(f[1].toUpperCase(),a); }
+    let cr=/^\$?[A-Za-z]+\$?\d+/.exec(s.slice(i)); if(cr){ i+=cr[0].length; return cellNum(cr[0].replace(/\$/g,'').toUpperCase()); }
+    throw new Error('unexpected'); }
+  function argList(){ const a=[]; skip(); if(s[i]===')') return a; a.push(arg()); skip(); while(s[i]===','){ i++; a.push(arg()); skip(); } return a; }
+  function arg(){ skip(); const rng=/^(\$?[A-Za-z]+\$?\d+)\s*:\s*(\$?[A-Za-z]+\$?\d+)/.exec(s.slice(i));
+    if(rng){ i+=rng[0].length; return {range:[rng[1].toUpperCase(),rng[2].toUpperCase()]}; }
+    const st=i; const v=expr_(); const cons=s.slice(st,i).trim();
+    if(/^\$?[A-Za-z]+\$?\d+$/.test(cons)) return {val:v, ref:cons.replace(/\$/g,'').toUpperCase()};
+    return {val:v}; }
+  const r=expr_(); skip(); if(i<s.length) throw new Error('trailing'); return r;
+}
+function autoSum(){
+  const {r,c}=S.active;
+  let top=r-1; while(top>=1 && typeof get(top,c).value==='number') top--; top++;
+  if(top>r-1) return;
+  const cell=ensure(r,c);
+  cell.formula='=SUM('+ck(top,c)+':'+ck(r-1,c)+')';
+  cell.value=evalSum(cell.formula);
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function parseRef(ref){ const m=ref.replace(/\$/g,'').match(/^([A-Z]+)(\d+)$/i); if(!m) return null; return {c:m[1].toUpperCase().charCodeAt(0)-64, r:+m[2]}; }
+function resolveRange(str){ if(!str) return null; const parts=str.split(':'); const a=parseRef(parts[0]); const b=parts[1]?parseRef(parts[1]):a; if(!a||!b) return null;
+  return {r1:Math.min(a.r,b.r),r2:Math.max(a.r,b.r),c1:Math.min(a.c,b.c),c2:Math.max(a.c,b.c)}; }
+function currentGuideTarget(){
+  if(!guided||!S||done) return null;
+  const C=CHALLENGES[cur]; if(!C.targets) return null;
+  const items=C.checks(S);
+  for(let i=0;i<items.length;i++){ if(!items[i].ok){ let t=C.targets[i]; if(typeof t==='function') t=t.call(C); return resolveRange(t); } }
+  return null;
+}
+function render(){
+  S._colW = colW;
+  const g=$('grid'); g.innerHTML='';
+  const sr=selRange();
+  const gt=currentGuideTarget();
+  // header row
+  let head='<tr><th class="rowhdr"></th>';
+  for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${colW[c]}px">${colLetter(c)}</th>`;
+  head+='</tr>'; g.innerHTML+=head;
+  for(let r=1;r<=S.ROWS;r++){
+    let row=`<tr><th class="rowhdr">${r}</th>`;
+    for(let c=1;c<=COLS;c++){
+      const cell=get(r,c);
+      let cls=[]; if(cell.bold)cls.push('bold'); if(cell.txt&&!isNum(cell))cls.push('txt');
+      if(cell.wrap)cls.push('wrap'); if(cell.fill==='blue')cls.push('fill-blue');
+      if(cell.bt)cls.push('bt'); if(cell.bb)cls.push('bb'); if(cell.ball)cls.push('ball');
+      const isActive=(r===S.active.r&&c===S.active.c);
+      const inSel=(r>=sr.r1&&r<=sr.r2&&c>=sr.c1&&c<=sr.c2);
+      if(isActive)cls.push('active'); else if(inSel&&S.sel)cls.push('sel');
+      if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2) cls.push('gtarget');
+      if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
+      let txt=dispText(cell);
+      if(editing && isActive){ txt=editBuf+'▏'; cls.push('editing'); }
+      else if(isNum(cell)&&!cell.wrap){
+        const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals).length*CHARPX+12;
+        if(tw>colW[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(colW[c]/8))); }
+      }
+      row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${colW[c]}px;max-width:${colW[c]}px">${txt}</td>`;
+    }
+    row+='</tr>'; g.innerHTML+=row;
+  }
+  positionMarquee();
+  if(pendingFlash){ const f=pendingFlash; pendingFlash=null;
+    for(let r=f.r1;r<=f.r2;r++)for(let c=f.c1;c<=f.c2;c++){
+      const td=document.querySelector(`td[data-r="${r}"][data-c="${c}"]`); if(td)td.classList.add('pasted'); } }
+  updateChecklist();
+  updateFormulaBar();
+}
+function positionMarquee(){
+  const m=document.getElementById('marquee'); if(!m) return;
+  const rect=S.clipboard&&S.clipboard.rect;
+  if(!rect){ m.style.display='none'; return; }
+  const a=document.querySelector(`td[data-r="${rect.r1}"][data-c="${rect.c1}"]`);
+  const b=document.querySelector(`td[data-r="${rect.r2}"][data-c="${rect.c2}"]`);
+  if(!a||!b){ m.style.display='none'; return; }
+  const wrap=document.getElementById('gridwrap');
+  const wr=wrap.getBoundingClientRect(), ar=a.getBoundingClientRect(), br=b.getBoundingClientRect();
+  m.style.display='block';
+  m.style.left=(ar.left-wr.left+wrap.scrollLeft)+'px';
+  m.style.top=(ar.top-wr.top+wrap.scrollTop)+'px';
+  m.style.width=(br.right-ar.left)+'px';
+  m.style.height=(br.bottom-ar.top)+'px';
+}
+function updateFormulaBar(){
+  if(editing){ $('nameBox').textContent=ck(S.active.r,S.active.c);
+    const fc=$('fContent'); fc.className='fcontent isfx'; fc.textContent=editBuf; return; }
+  const cell=get(S.active.r,S.active.c);
+  $('nameBox').textContent=ck(S.active.r,S.active.c);
+  const fc=$('fContent');
+  if(cell.formula){ fc.className='fcontent isfx'; fc.textContent=cell.formula; }
+  else if(cell.value!==null&&cell.value!==''){ fc.className='fcontent'; fc.textContent=String(cell.value); }
+  else { fc.className='fcontent empty'; fc.textContent='empty'; }
+}
+
+/* ============================================================
+   RIBBON (Alt KeyTip emulation)
+   ============================================================ */
+const TABS = [
+  {k:'H',name:'Home',live:true},
+  {k:'N',name:'Insert',live:false},
+  {k:'P',name:'Page Layout',live:false},
+  {k:'M',name:'Formulas',live:true},
+  {k:'A',name:'Data',live:false},
+  {k:'R',name:'Review',live:false},
+  {k:'W',name:'View',live:false},
+];
+const MENUS = {
+  'H':  [['V','Paste'],['1','Bold'],['H','Fill'],['B','Borders'],['W','Wrap'],['K','Comma'],['9','Dec −'],['0','Dec +'],['O','Cells'],['U','Σ Sum']],
+  'HV': [['S','Paste special…']],
+  'HO': [['I','Autofit width'],['A','Autofit height']],
+  'HB': [['T','Top'],['B','Bottom'],['A','All'],['O','Outside']],
+  'HU': [['S','Sum']],
+  'M':  [['U','Σ AutoSum']],
+  'MU': [['S','Sum']],
+  'E':  [['S','Paste special…']],
+};
+const PASTE_OPTS = [
+  ['A','All','all'],['F','Formulas','formulas'],['V','Values','values'],
+  ['T','Formats','formats'],['U','Values & number formats','valuesnum'],['W','Column widths','colwidths'],
+];
+let ribbonNote='';
+const tabName = k => (TABS.find(t=>t.k===k)||{name:k}).name;
+
+function drawDialog(){
+  const d=$('pasteDialog'); if(!d) return;
+  if(dialog!=='paste'){ d.style.display='none'; return; }
+  d.style.display='flex';
+  let rows='';
+  PASTE_OPTS.forEach(([k,lbl,kind])=>{
+    const on=pasteKind===kind;
+    rows+=`<div class="pd-opt${on?' on':''}"><span class="pd-radio">${on?'●':'○'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`;
+  });
+  $('pdOpts').innerHTML=rows;
+}
+function drawRibbon(){
+  drawDialog();
+  const el=$('ribbon');
+  if(mode!=='ribbon'){ el.className='ribbon'; el.innerHTML=''; return; }
+  if(dialog==='paste'){ el.className='ribbon show';
+    el.innerHTML='<span class="path">paste special →</span><span class="opt">press a letter, ↵ apply, esc cancel</span>'; return; }
+  el.className='ribbon show';
+  let html='';
+  if(path.length===0){
+    html+='<span class="path">alt →</span>';
+    TABS.forEach(t=>{ html+=`<span class="rtab${t.live?'':' dim'}"><k>${t.k.toLowerCase()}</k>${t.name}</span>`; });
+    if(ribbonNote) html+=`<span class="rnote">${ribbonNote}</span>`;
+  } else {
+    html+=`<span class="path">${tabName(path[0])}${path.length>1?' '+path.slice(1).join(' '):''} →</span>`;
+    const opts=MENUS[path.join('')];
+    if(opts) opts.forEach(([k,lbl])=>html+=`<span class="opt"><k>${k.toLowerCase()}</k>${lbl}</span>`);
+    else html+='<span class="opt">…</span>';
+  }
+  el.innerHTML=html;
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+function startClock(){ if(running||done)return; running=true; started=performance.now();
+  $('timer').classList.add('run'); tickH=setInterval(updateTimer,40); }
+function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); }
+function stopClock(){ running=false; clearInterval(tickH); finished=performance.now();
+  $('timer').classList.remove('run'); }
+
+function checkWin(){
+  if(done||demoPlaying) return;
+  if(gradePass()){
+    const t=(performance.now()-started)/1000;
+    stopClock(); done=true; $('timer').textContent=t.toFixed(2);
+    const C=CHALLENGES[cur]; let pb=false;
+    if(!mouseUsed && !guidedUsed){ const prev=PB[cur];
+      if(prev===undefined||t<prev){ PB[cur]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
+    showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
+    if(sb && me_user && !mouseUsed && !guidedUsed){
+      recordRun(t).then(ok=>{ const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); } });
+    }
+  }
+}
+function showResults(o){
+  const best = PB[cur]!==undefined ? PB[cur].toFixed(2)+'s' : '—';
+  let postRow;
+  if(o.mouse)       postRow='<span class="rm-soon">not posted — mouse used</span>';
+  else if(o.guided) postRow='<span class="rm-soon">practice run (guided) — not posted</span>';
+  else if(!sb)      postRow='<span class="rm-soon">global leaderboard coming soon</span>';
+  else if(!me_user) postRow='<span class="rm-post-cta" id="rmSignin">sign in to post your time →</span>';
+  else              postRow='<span class="rm-posted" id="rmPost">posting to the leaderboard…</span>';
+  const m=$('resultsModal');
+  m.innerHTML=`<div class="rm-card">`+
+    `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
+    `<div class="rm-time">${o.t}<span>s</span></div>`+
+    `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
+    `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
+    `<div class="rm-opts">`+
+    `<button class="rm-key" data-act="again"><kbd>↵ enter</kbd>again</button>`+
+    `<button class="rm-key" data-act="next"><kbd>space</kbd>next</button>`+
+    `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
+    `</div></div>`;
+  m.classList.add('show');
+  const si=$('rmSignin'); if(si) si.onclick=openAuth;
+  $('result').innerHTML='';
+}
+function hideResults(){ const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
+function nextChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i+1)%MENU_ORDER.length]); }
+function prevChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i-1+MENU_ORDER.length)%MENU_ORDER.length]); }
+function toMenu(){ loadChallenge(cur); const r=$('result'); r.className='result';
+  const menu=Object.keys(CHALLENGES).map((key,i)=>`<kbd>${i+1}</kbd> ${CHALLENGES[key].name}`).join(' · ');
+  r.innerHTML='menu — '+menu+' · or start typing to play this one'; }
+function syncTabs(){ const strip=$('sheetTabs'); if(!strip) return;
+  let active=null;
+  [...strip.children].forEach(b=>{ const on=b.dataset.key===cur; b.classList.toggle('on',on); if(on) active=b; });
+  if(active && active.scrollIntoView) active.scrollIntoView({block:'nearest', inline:'center'}); }
+
+function recalc(){
+  for(let pass=0; pass<8; pass++){
+    let changed=false;
+    for(const k in S.cells){ const c=S.cells[k]; if(c && c.formula){
+      let v; try{ v=evalFormula(c.formula); }catch(_){ v=c.value; }
+      if(isFinite(v) && v!==c.value){ c.value=v; changed=true; }
+    }}
+    if(!changed) break;
+  }
+}
+function commitAction(){ recalc(); render(); checkWin(); }
+
+function translateFormula(f, dr, dc){
+  return f.replace(/(\$?)([A-Za-z]+)(\$?)(\d+)/g, (m, ad, col, ar, row)=>{
+    let c=col.toUpperCase().charCodeAt(0)-64, r=parseInt(row,10);
+    if(!ad) c=Math.max(1,Math.min(COLS,c+dc));
+    if(!ar) r=Math.max(1,Math.min(ROWS_MAX,r+dr));
+    return ad+colLetter(c)+ar+r;
   });
 }
-function delay(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function fillFrom(dir){ // dir 'down' or 'right'
+  const r=selRange();
+  const vertical = dir==='down';
+  if(vertical && r.r1===r.r2) return;
+  if(!vertical && r.c1===r.c2) return;
+  pushUndo();
+  const copyFmt=(dst,src)=>{ dst.bold=src.bold;dst.fill=src.fill;dst.wrap=src.wrap;dst.fmtStyle=src.fmtStyle;dst.decimals=src.decimals;dst.bt=src.bt;dst.bb=src.bb;dst.ball=src.ball;dst.txt=src.txt; };
+  if(vertical){
+    for(let c=r.c1;c<=r.c2;c++){ const src=get(r.r1,c);
+      for(let rr=r.r1+1;rr<=r.r2;rr++){ const cell=ensure(rr,c); copyFmt(cell,src);
+        if(src.formula){ cell.formula=translateFormula(src.formula, rr-r.r1, 0); cell.value=0; }
+        else { cell.formula=null; cell.value=src.value; } } }
+  } else {
+    for(let rr=r.r1;rr<=r.r2;rr++){ const src=get(rr,r.c1);
+      for(let c=r.c1+1;c<=r.c2;c++){ const cell=ensure(rr,c); copyFmt(cell,src);
+        if(src.formula){ cell.formula=translateFormula(src.formula, 0, c-r.c1); cell.value=0; }
+        else { cell.formula=null; cell.value=src.value; } } }
+  }
+  commitAction();
+}
 
-async function runChord(c){
-  elAction.textContent=c.action;
-  setCell(c.before,c.beforeFx,false);
-  renderKeys(c.keys);
-  await delay(650);
-  var caps=elKeys.querySelectorAll('.keycap:not(.sep)');
-  for(var i=0;i<caps.length;i++){
-    caps[i].classList.add('lit');
-    await delay(230);
-    caps[i].classList.remove('lit');
+function startEdit(initial){ if(done) return; startClock(); editing=true; editBuf=initial; render(); }
+function cancelEdit(){ editing=false; editBuf=''; render(); }
+function commitEdit(dr,dc){
+  const buf=editBuf.trim(); editing=false; editBuf='';
+  if(buf!==''){
+    pushUndo();
+    const cell=ensure(S.active.r,S.active.c);
+    if(buf[0]==='='){ cell.formula=buf; let v; try{ v=evalFormula(buf); }catch(_){ v=NaN; } cell.value=isFinite(v)?v:0; cell.txt=false; }
+    else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf); cell.txt=false; }
+    else { cell.formula=null; cell.value=buf; cell.txt=true; }
   }
-  await delay(90);
-  setCell(c.after,c.afterFx,c.bold);
-  elCell.classList.add('flash');
-  await delay(260);
-  elCell.classList.remove('flash');
-  await delay(1500);
+  if(dr||dc){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
+  commitAction();
 }
-async function loop(){
-  var i=0;
-  while(true){
-    await runChord(CHORDS[i%CHORDS.length]);
-    i++;
+
+function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
+function updateChecklist(){
+  const el=$('checklist'); if(!el||!S) return;
+  const C=CHALLENGES[cur];
+  const items=C.checks(S);
+  const n=items.filter(i=>i.ok).length;
+  let nextDone=false;
+  let html=`<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
+  items.forEach((i,idx)=>{
+    const isNext = guided && !i.ok && !nextDone; if(isNext) nextDone=true;
+    const keys = (guided && C.guide && C.guide[idx]) ? `<div class="cl-keys">${C.guide[idx]}</div>` : '';
+    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
+  });
+  if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
+  el.innerHTML=html;
+}
+const ARROWSYM={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
+function arrowLabel(k,shift,ctrl){ return (ctrl?'Ctrl+':'')+(shift?'Shift+':'')+ARROWSYM[k]; }
+let flashTimer=null, flashChips=[];
+function logKey(t){ keyLog.push(t); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); }
+function flashKey(t){
+  const el=$('keyflash'); if(!el) return;
+  flashChips.push(t); if(flashChips.length>6) flashChips.shift();
+  el.innerHTML=flashChips.map((x,i)=>`<span class="kchip${i===flashChips.length-1?' new':''}">${x}</span>`).join('');
+  el.classList.add('show');
+  clearTimeout(flashTimer);
+  flashTimer=setTimeout(()=>{ el.classList.remove('show'); flashChips=[]; }, 1400);
+}
+function resetFlash(){ flashChips=[]; clearTimeout(flashTimer);
+  const el=$('keyflash'); if(el){ el.classList.remove('show'); el.innerHTML=''; }
+  const kn=$('keyN'); if(kn) kn.textContent='0'; }
+function snapshot(){ return {cells:JSON.parse(JSON.stringify(S.cells)), colW:colW.slice()}; }
+function restore(s){ S.cells=JSON.parse(JSON.stringify(s.cells)); colW=s.colW.slice(); }
+function pushUndo(){ undoStack.push(snapshot()); if(undoStack.length>60) undoStack.shift(); redoStack=[]; }
+function undoAct(){ if(!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); commitAction(); }
+function redoAct(){ if(!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); commitAction(); }
+
+function applyRibbon(key){
+  // paste special dialog
+  if(dialog==='paste'){
+    const opt=PASTE_OPTS.find(o=>o[0]===key);
+    if(opt){ pasteKind=opt[2]; drawRibbon(); return; }
+    if(key==='ENTER'){ doPaste(pasteKind||'all'); exitRibbon(true); return; }
+    return;
+  }
+  // top level: pick a ribbon tab (or legacy / chord)
+  if(path.length===0){
+    if(key==='='){ autoSum(); return exitRibbon(true); }              // alt = chord
+    if(key==='E'){ path=['E']; ribbonNote=''; drawRibbon(); return; } // legacy alt e s
+    const t=TABS.find(x=>x.k===key);
+    if(t&&t.live){ path=[key]; ribbonNote=''; drawRibbon(); return; }
+    if(t){ ribbonNote=t.name+' — no drills wired here yet'; drawRibbon(); return; }
+    return; // unknown key: ignore
+  }
+  // inside a tab/menu
+  const np=path.join('')+key;
+  if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; drawRibbon(); return; }
+  const RUN={
+    'H1':c=>c.bold=!c.bold, 'HH':c=>c.fill='blue', 'HW':c=>c.wrap=!c.wrap,
+    'HK':c=>{c.fmtStyle='comma';c.decimals=2;}, 'H9':c=>c.decimals=Math.max(0,c.decimals-1),
+    'H0':c=>c.decimals=Math.min(6,c.decimals+1), 'HBT':c=>c.bt=true, 'HBB':c=>c.bb=true,
+    'HBA':c=>c.ball=true, 'HBO':c=>c.ball=true,
+  };
+  if(RUN[np]){ pushUndo(); eachSel(RUN[np]); return exitRibbon(true); }
+  if(np==='HOI'){ pushUndo(); autofitCols(); return exitRibbon(true); }
+  if(np==='HOA'){ return exitRibbon(true); }
+  if(np==='HUS'||np==='MUS'){ pushUndo(); autoSum(); return exitRibbon(true); }
+  if(MENUS[np]!==undefined){ path.push(key); drawRibbon(); return; }
+  // invalid step: back to the tab strip
+  path=[]; ribbonNote=''; drawRibbon();
+}
+function autofitCols(){ const r=selRange(); for(let c=r.c1;c<=r.c2;c++) colW[c]=neededWidth(c); }
+function doPaste(kind){
+  if(!S.clipboard) return;
+  pushUndo();
+  const sr=selRange(); const cb=S.clipboard, r0=sr.r1, c0=sr.c1;
+  for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
+    const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
+    const fmt=()=>{cell.bold=s.bold;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.ball=s.ball;};
+    if(kind==='values'){ cell.formula=null; cell.value=s.value; }
+    else if(kind==='formulas'){ cell.formula=s.formula; cell.value=s.value; }
+    else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; }
+    else if(kind==='formats'){ fmt(); }
+    else if(kind==='colwidths'){ colW[c0+j]=cb.cols[j]; }
+    else { cell.formula=s.formula; cell.value=s.value; fmt(); }   // all
+  }
+  pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
+  S.clipboard=null;
+}
+function exitRibbon(act){ mode='normal'; path=[]; dialog=null; pasteKind=null; ribbonNote=''; drawRibbon(); if(act) commitAction(); }
+function enterRibbon(){ if(done)return; startClock(); mode='ribbon'; path=[]; dialog=null; ribbonNote=''; drawRibbon(); }
+
+function copySel(){
+  const r=selRange(); const data=[];
+  for(let rr=r.r1;rr<=r.r2;rr++){ const row=[]; for(let cc=r.c1;cc<=r.c2;cc++){ const c=get(rr,cc);
+    row.push({value:c.value,formula:c.formula,bold:c.bold,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,ball:c.ball}); } data.push(row); }
+  const cols=[]; for(let cc=r.c1;cc<=r.c2;cc++) cols.push(colW[cc]);
+  S.clipboard={data,cols,h:r.r2-r.r1+1,w:r.c2-r.c1+1,rect:{r1:r.r1,c1:r.c1,r2:r.r2,c2:r.c2}};
+}
+
+/* ============================================================
+   KEY HANDLING
+   ============================================================ */
+function move(dr,dc,shift,ctrl){
+  let nr,nc;
+  if(ctrl){ const j=ctrlJump(S.active.r,S.active.c,dr,dc); nr=j.r; nc=j.c; }
+  else { nr=Math.min(S.ROWS,Math.max(1,S.active.r+dr)); nc=Math.min(COLS,Math.max(1,S.active.c+dc)); }
+  if(shift){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; }
+  else S.sel=null;
+  S.active={r:nr,c:nc};
+  render();
+}
+function selectRow(){ S.sel={r:S.active.r,c:1}; S.active={r:S.active.r,c:COLS}; render(); }
+function selectCol(){ S.sel={r:1,c:S.active.c}; S.active={r:S.ROWS,c:S.active.c}; render(); }
+
+function codeToChar(code,k){
+  if(/^Key[A-Z]$/.test(code)) return code.slice(3);
+  if(/^Digit[0-9]$/.test(code)) return code.slice(5);
+  if(code==='Equal') return '=';
+  const up=(k&&k.length===1)?k.toUpperCase():'';
+  return /^[A-Z0-9=]$/.test(up)?up:'';
+}
+
+document.addEventListener('keydown',e=>{
+  const k=e.key;
+  // let text fields (auth email/handle) receive their own keystrokes
+  if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+  // landing overlay is up (and no modal over it): swallow grid keys; Enter starts training
+  if(landingOpen && !authOpen && !gateOpen){ if(k==='Enter'){ e.preventDefault(); tryEnter(); } return; }
+  // during the demo, ignore real user input (synthetic demo keys are not trusted, so they pass)
+  if(demoPlaying && e.isTrusted){ e.preventDefault(); if(k==='Escape') cancelDemo(); return; }
+  // while the sign-in modal is open, the trainer ignores keys (esc closes it)
+  if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
+  if(gateOpen){ return; }
+
+  // AUTHENTIC sheet-switch (Ctrl+PgUp / Ctrl+PgDn) — only in installed/standalone app mode,
+  // where there are no browser tabs to fight over. In a normal tab the browser owns these keys.
+  if(IS_STANDALONE && (e.ctrlKey||e.metaKey) && (k==='PageUp'||k==='PageDown')){
+    e.preventDefault();
+    if(!demoPlaying && !editing){ k==='PageDown' ? nextChallenge() : prevChallenge(); }
+    return;
+  }
+
+  // never let browser zoom combos (ctrl/cmd +/-/0) collide with the grid
+  if((e.ctrlKey||e.metaKey)&&(k==='='||k==='+'||k==='-'||k==='_'||k==='0')){ e.preventDefault(); return; }
+
+  // CELL EDITING — captures all typing until commit/cancel
+  if(editing){
+    e.preventDefault();
+    if(k==='Enter'){ commitEdit(1,0); return; }
+    if(k==='Tab'){ commitEdit(0,1); return; }
+    if(k==='Escape'){ cancelEdit(); return; }
+    if(k==='Backspace'){ editBuf=editBuf.slice(0,-1); logKey('⌫'); render(); return; }
+    const EARR={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+    if(EARR[k]){ commitEdit(EARR[k][0],EARR[k][1]); return; }
+    if(k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey){ editBuf+=k; logKey(k); render(); return; }
+    return;
+  }
+  // start editing: '=' begins a formula, F2 edits existing content (letters/digits stay as shortcuts)
+  if(mode==='normal' && !done){
+    if(k==='=' && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); startEdit('='); logKey('='); render(); return; }
+    if(k==='F2'){ e.preventDefault(); const c=get(S.active.r,S.active.c); startEdit(c.formula||(c.value!=null&&c.value!==''?String(c.value):'')); render(); return; }
+  }
+
+  // RESULTS SCREEN — enter: again · space: next · esc: menu
+  if(done){
+    if(k==='Enter'){ e.preventDefault(); loadChallenge(cur); return; }
+    if(k===' '){ e.preventDefault(); nextChallenge(); return; }
+    if(k==='Escape'){ e.preventDefault(); toMenu(); return; }
+    e.preventDefault(); return;
+  }
+  // SHIFT+F11 restarts the run (Excel: "insert new sheet" — fresh start). ESC no longer restarts.
+  if(k==='F11' && e.shiftKey){ e.preventDefault(); loadChallenge(cur); return; }
+  // ESC only backs out of the ribbon now (matches Excel; frees Esc for normal use)
+  if(k==='Escape'){ e.preventDefault(); if(mode==='ribbon'){ exitRibbon(false); } return; }
+
+  // RIBBON MODE — read physical key code so Mac Option / non-US layouts still work
+  if(mode==='ribbon'){
+    e.preventDefault();
+    if(k==='Enter'){ logKey('↵'); applyRibbon('ENTER'); return; }
+    if(k==='Alt'){ return; }
+    const ch=codeToChar(e.code,k);
+    if(ch){ logKey(ch); applyRibbon(ch); }
+    return;
+  }
+
+  // HINTS PANEL — '?' toggles, doesn't touch the clock or keystroke count
+  if(k==='?'){ e.preventDefault(); toggleHelp(); return; }
+
+  // GUIDED MODE — 'g' toggles paint-by-numbers (meta key; no clock, no keystroke count)
+  if((k==='g'||k==='G')&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
+
+  // CHALLENGE SELECT (no-mouse): 1 / 2 / 3
+  if(!e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
+    const keys=MENU_ORDER, idx=+k-1;
+    if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); return; }
+  }
+
+  // UNDO / REDO — authentic Excel hotkeys (ctrl+z / ctrl+y / ctrl+shift+z)
+  if(e.ctrlKey||e.metaKey){
+    const lk=k.toLowerCase();
+    if(lk==='z'&&e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+Y'); redoAct(); return; }
+    if(lk==='z'){ e.preventDefault(); startClock(); logKey('Ctrl+Z'); undoAct(); return; }
+    if(lk==='y'){ e.preventDefault(); startClock(); logKey('Ctrl+Y'); redoAct(); return; }
+  }
+
+  // ROW / COLUMN SELECTION — Excel: shift+space (row), ctrl+space (column)
+  if(k===' '){
+    if(e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); startClock(); logKey('Shift+Space'); selectRow(); return; }
+    if(e.ctrlKey || e.metaKey){ e.preventDefault(); startClock(); logKey('Ctrl+Space'); selectCol(); return; }
+  }
+
+  // ENTER ribbon
+  if(k==='Alt'){ e.preventDefault(); logKey('Alt'); enterRibbon(); return; }
+  if(e.altKey){ e.preventDefault(); if(k==='='){ startClock(); logKey('Alt'); logKey('='); pushUndo(); autoSum(); commitAction(); } return; }
+
+  const dirs={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
+  if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey); return; }
+
+  if((e.ctrlKey||e.metaKey)){
+    const lk=k.toLowerCase();
+    if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
+    if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
+    if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
+    if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
+    if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
+    if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
+    if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
+    if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
+  }
+},{capture:true});
+
+// stop Alt keyup from focusing the browser menu bar
+document.addEventListener('keyup',e=>{ if(e.key==='Alt') e.preventDefault(); },{capture:true});
+
+// mouse: usable, but flagged (does not block per scoring default)
+$('grid').addEventListener('mousedown',e=>{
+  const td=e.target.closest('td'); if(!td)return;
+  mouseUsed=true; $('mouseBadge').style.display='block';
+  startClock(); S.active={r:+td.dataset.r,c:+td.dataset.c}; S.sel=null; render();
+});
+// results-card buttons (mouse path mirrors the keyboard options)
+$('result').addEventListener('click',e=>{ const b=e.target.closest('.rc-key'); if(!b)return;
+  const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
+$('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-key'); if(!b)return;
+  const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
+// hints panel toggle (button mirrors the '?' key)
+function toggleHelp(){ $('help').classList.toggle('show'); }
+$('helpToggle').addEventListener('click',toggleHelp);
+function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
+function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
+$('guideToggle').addEventListener('click',toggleGuided);
+$('startBtn').addEventListener('click', tryEnter);
+$('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
+$('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge(); });
+
+/* ---- guided demo player: replays the optimal keystrokes through the real engine ---- */
+const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
+  copy:{key:'c',ctrl:true}, paste:{key:'v',ctrl:true}, bold:{key:'b',ctrl:true},
+  pct:{key:'%',ctrl:true,shift:true}, cur:{key:'$',ctrl:true,shift:true}, com:{key:'!',ctrl:true,shift:true},
+  fillD:{key:'d',ctrl:true}, fillR:{key:'r',ctrl:true},
+  eq:{key:'=',alt:true,code:'Equal'} };
+function L(ch){ return {key:ch.toLowerCase(), code:'Key'+ch.toUpperCase()}; }
+function D(n){ return {key:String(n), code:'Digit'+n}; }
+function T(str){ return [...str].map(ch=>({key:ch})); }
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function setDemoSel(str){ const r=resolveRange(str); if(!r) return;
+  if(r.r1===r.r2&&r.c1===r.c2){ S.active={r:r.r1,c:r.c1}; S.sel=null; }
+  else { S.sel={r:r.r1,c:r.c1}; S.active={r:r.r2,c:r.c2}; }
+  render(); }
+function demoKey(spec){ document.dispatchEvent(new KeyboardEvent('keydown',{
+  key:spec.key, code:spec.code||'', ctrlKey:!!spec.ctrl, shiftKey:!!spec.shift, altKey:!!spec.alt,
+  bubbles:true, cancelable:true })); }
+function updateDemoBtn(){ const b=$('demoBtn'); if(b){ b.classList.toggle('on',demoPlaying);
+  b.innerHTML=demoPlaying?'<kbd>esc</kbd> stop demo':'▶ watch solution'; } }
+function cancelDemo(){ demoPlaying=false; }
+async function playDemo(){
+  if(demoPlaying||!S) return;
+  loadChallenge(cur);
+  const C=CHALLENGES[cur]; const moves = typeof C.demo==='function'?C.demo.call(C):C.demo;
+  if(!moves) return;
+  demoPlaying=true; updateDemoBtn();
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='▶ watch the optimal keystrokes — then it’s your turn'; }
+  await sleep(550);
+  for(const mv of moves){ if(!demoPlaying) break;
+    setDemoSel(mv.sel); await sleep(620);
+    for(const k of mv.keys){ if(!demoPlaying) break; demoKey(k); await sleep(360); }
+    await sleep(220);
+  }
+  await sleep(demoPlaying?1100:150);
+  demoPlaying=false; updateDemoBtn();
+  loadChallenge(cur);
+  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — first keystroke starts the clock'; }
+}
+$('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo(); });
+
+/* ============================================================
+   LOAD / RESET
+   ============================================================ */
+function loadChallenge(key){
+  cur=key; const C=CHALLENGES[key];
+  const built=C.build();
+  S={ROWS:Math.max(built.ROWS, ROWS_MAX), cells:built.cells, active:built.active, sel:null, clipboard:null};
+  colW=new Array(COLS+1).fill(COLW_DEFAULT);
+  if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
+  started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
+  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[];
+  updateGuideBtn();
+  $('mouseBadge').style.display='none';
+  $('timer').textContent='0.00'; $('timer').classList.remove('run');
+  $('prompt').innerHTML=C.prompt;
+  $('helpReq').innerHTML=C.req;
+  $('par').textContent=C.par+'s';
+  $('keyPar').textContent=C.parKeys;
+  $('pb').textContent = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
+  $('result').className='result'; $('result').innerHTML='go — first keystroke starts the clock';
+  drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
+}
+/* ---- drill picker: short descriptions + skill groupings ---- */
+const DRILL_DESC = {
+  copyover:'Select, copy, and paste a block — all keyboard',
+  drill:'Paste-special values to strip the formulas',
+  combo:'Bold, comma, wrap and autofit a pasted table',
+  format:'Triage the units — percent, currency, comma',
+  polish:'Bold + bottom border + shade a header row',
+  gauntlet:'A full model-ready formatting pass',
+  margin:'Build a margin formula down the column',
+  schedule:'Roll a PP&E schedule forward with links',
+  percent:'Common-size with an anchored ($) formula',
+  foot:'SUM across and down, tie out the corner',
+  comps:'EV/EBITDA multiples, then the average',
+  lookup:'Pull a value out of a table with INDEX/MATCH',
+};
+const DRILL_GROUPS = [
+  {name:'Foundations', keys:['copyover']},
+  {name:'Formatting',  keys:['polish','combo','format','gauntlet']},
+  {name:'Values',      keys:['drill']},
+  {name:'Formulas',    keys:['margin','foot','percent','schedule','comps']},
+  {name:'Lookups',     keys:['lookup']},
+];
+// flat sequence used everywhere (badges, 1-9 keys, steppers, Ctrl+PgUp/Dn) so numbering reads 01→N top-to-bottom
+const MENU_ORDER = (()=>{ const g=DRILL_GROUPS.flatMap(x=>x.keys).filter(k=>CHALLENGES[k]);
+  const extra=Object.keys(CHALLENGES).filter(k=>!g.includes(k)); return [...g,...extra]; })();
+
+const TAB_LABEL = {
+  copyover:'Basics', polish:'Header', combo:'Cleanup', format:'Formats', gauntlet:'Model',
+  drill:'Hardcode', margin:'Margin', foot:'Cross-foot', percent:'Common-size',
+  schedule:'Schedule', comps:'Comps', lookup:'Lookup',
+};
+function buildSheetTabs(){
+  const strip=$('sheetTabs'); if(!strip) return;
+  strip.innerHTML='';
+  MENU_ORDER.forEach(key=>{
+    const C=CHALLENGES[key]; if(!C) return;
+    const b=document.createElement('button');
+    b.className='sheet'+(key===cur?' on':''); b.dataset.key=key;
+    b.textContent=TAB_LABEL[key]||C.name||C.label;
+    b.title=C.label+(DRILL_DESC[key]?' — '+DRILL_DESC[key]:'');
+    b.onclick=()=>{ if(demoPlaying) return; loadChallenge(key); };
+    strip.appendChild(b);
+  });
+}
+
+/* ---- PB persistence (window.storage in-artifact, falls back to memory) ---- */
+async function loadPB(){
+  try{ if(window.storage){ const r=await window.storage.get('hotkey_pb'); if(r&&r.value) PB=JSON.parse(r.value); } }
+  catch(e){ PB = PB||{}; }
+}
+async function savePB(){
+  try{ if(window.storage) await window.storage.set('hotkey_pb', JSON.stringify(PB)); }catch(e){}
+}
+
+(async function init(){
+  // returning from an email link? recovery → set-password form; otherwise advance past the landing once the session resolves
+  if(/type=recovery/.test(location.hash)){ recoveryMode=true; enterRequested=true; }
+  else if(/access_token|refresh_token|error_code|error_description/.test(location.hash)) enterRequested=true;
+  await loadPB();
+  buildSheetTabs();
+  loadChallenge(MENU_ORDER[0]);
+  initAuth();
+})();
+
+/* ============================================================
+   AUTH + LEADERBOARD WRITES (magic-link via Supabase).
+   All no-ops when SUPABASE_URL / KEY are blank.
+   ============================================================ */
+function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function initAuth(){
+  if(!sb){ refreshAuthUI(); return; }
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    await onSession(session);
+    sb.auth.onAuthStateChange((evt, s)=>{ if(evt==='PASSWORD_RECOVERY') recoveryMode=true; onSession(s); });
+  }catch(e){ refreshAuthUI(); }
+}
+async function onSession(session){
+  me_user = session ? session.user : null;
+  if(me_user){
+    try{
+      const { data } = await sb.from('profiles').select('handle').eq('id', me_user.id).maybeSingle();
+      me_handle = (data && data.handle) ? data.handle : null;
+    }catch(e){ me_handle=null; }
+    try{
+      const { data:mem } = await sb.from('members').select('user_id').eq('user_id', me_user.id).maybeSingle();
+      me_member = !!mem;
+    }catch(e){ me_member=false; }
+  } else { me_handle=null; me_member=false; }
+  refreshAuthUI();
+  if(recoveryMode && me_user){ openAuth('newpassword'); return; }
+  advanceAccess();
+}
+function refreshAuthUI(){
+  const slot=$('authSlot'); if(!slot) return;
+  if(!sb){ slot.innerHTML=''; return; }
+  if(me_user){
+    slot.innerHTML='<span class="auth-who"><b>'+escHtml(me_handle||'set a name')+'</b> &nbsp;<a id="signOut">sign out</a></span>';
+    const so=$('signOut'); if(so) so.onclick=()=>{ sb.auth.signOut(); };
+  } else {
+    slot.innerHTML='<button class="auth-btn" id="authBtn">sign in</button>';
+    const b=$('authBtn'); if(b) b.onclick=openAuth;
   }
 }
-loop();
+let authMode='signin';
+function isEduEmail(email){ const at=email.lastIndexOf('@'); const d=at>=0?email.slice(at+1):''; return /(\.edu|\.edu\.[a-z]{2,}|\.ac\.[a-z]{2,})$/i.test(d); }
+const EDU_MSG='<h3>School email required</h3><p>The beta is open to students — please use your university email (a <b style="color:var(--text)">.edu</b>, <b style="color:var(--text)">.edu.xx</b>, or <b style="color:var(--text)">.ac.xx</b> address). If your school uses a different domain, let us know.</p><div class="auth-x" id="authClose">close</div>';
+function showEduMsg(){ const m=$('authModal').querySelector('.auth-card'); m.innerHTML=EDU_MSG; const c=$('authClose'); if(c) c.onclick=closeAuth; }
+function authErr(msg){ const e=$('authErr'); if(e) e.textContent=msg||''; }
+
+function openAuth(mode){ if(!sb) return; authMode=mode||'signin'; authOpen=true; renderAuth(); }
+function renderAuth(){
+  const m=$('authModal');
+  if(authMode==='newpassword'){
+    m.innerHTML='<div class="auth-card">'+
+      '<h3>Set a password</h3>'+
+      '<p>Pick a password (8+ characters) \u2014 you\u2019ll use it to sign in from now on.</p>'+
+      '<input id="authPass" type="password" placeholder="new password" autocomplete="new-password">'+
+      '<button class="auth-go" id="authGo" style="margin-top:12px">Save password</button>'+
+      '<div class="auth-msg" id="authErr" style="color:var(--bad); min-height:14px; margin-top:9px"></div>'+
+      '</div>';
+    m.classList.add('show'); $('authGo').onclick=doSetPassword;
+    const p=$('authPass'); if(p){ p.focus(); p.onkeydown=e=>{ if(e.key==='Enter') doSetPassword(); }; }
+    return;
+  }
+  if(authMode==='reset'){
+    m.innerHTML='<div class="auth-card">'+
+      '<h3>Reset your password</h3>'+
+      '<p>Enter your school email and we\u2019ll send a link to set a new one.</p>'+
+      '<input id="authEmail" type="email" placeholder="you@school.edu" autocomplete="email">'+
+      '<button class="auth-go" id="authGo" style="margin-top:12px">Send reset link</button>'+
+      '<div class="auth-msg" id="authErr" style="color:var(--bad); min-height:14px; margin-top:9px"></div>'+
+      '<div class="auth-alt"><a id="toSignin">\u2190 back to sign in</a></div>'+
+      '<div class="auth-x" id="authClose">cancel</div></div>';
+    m.classList.add('show'); $('authGo').onclick=doReset; $('authClose').onclick=closeAuth;
+    $('toSignin').onclick=()=>openAuth('signin');
+    const inp=$('authEmail'); if(inp){ inp.focus(); inp.onkeydown=e=>{ if(e.key==='Enter') doReset(); }; }
+    return;
+  }
+  const signup = authMode==='signup';
+  m.innerHTML='<div class="auth-card">'+
+    '<h3>'+(signup?'Create your account':'Sign in')+'</h3>'+
+    '<p>'+(signup?'Use your university email and a password you\u2019ll remember.':'Welcome back \u2014 email and password.')+'</p>'+
+    '<input id="authEmail" type="email" placeholder="you@school.edu" autocomplete="email">'+
+    '<input id="authPass" type="password" placeholder="password" autocomplete="'+(signup?'new-password':'current-password')+'" style="margin-top:9px">'+
+    '<button class="auth-go" id="authGo" style="margin-top:12px">'+(signup?'Create account':'Sign in')+'</button>'+
+    '<div class="auth-msg" id="authErr" style="color:var(--bad); min-height:14px; margin-top:9px"></div>'+
+    '<div class="auth-alt">'+(signup
+        ? '<a id="toSignin">Have an account? Sign in</a>'
+        : '<a id="toSignup">Create an account</a><a id="toReset">Forgot password?</a>')+'</div>'+
+    '<div class="auth-x" id="authClose">cancel</div></div>';
+  m.classList.add('show');
+  $('authGo').onclick = signup ? doSignUp : doSignIn;
+  $('authClose').onclick = closeAuth;
+  if($('toSignup')) $('toSignup').onclick=()=>openAuth('signup');
+  if($('toSignin')) $('toSignin').onclick=()=>openAuth('signin');
+  if($('toReset')) $('toReset').onclick=()=>openAuth('reset');
+  const em=$('authEmail'), pw=$('authPass'); if(em) em.focus();
+  const submit = signup ? doSignUp : doSignIn;
+  [em,pw].forEach(el=>{ if(el) el.onkeydown=e=>{ if(e.key==='Enter') submit(); }; });
+}
+async function doSignIn(){
+  const email=($('authEmail')?$('authEmail').value:'').trim().toLowerCase();
+  const pass=$('authPass')?$('authPass').value:'';
+  if(!email||!pass){ authErr('Enter your email and password.'); return; }
+  authErr('');
+  try{
+    const { error } = await sb.auth.signInWithPassword({ email, password:pass });
+    if(error){ authErr(/confirm/i.test(error.message)?'Confirm your email first \u2014 check your inbox.':'Wrong email or password.'); return; }
+    closeAuth();
+  }catch(e){ authErr('Something went wrong \u2014 try again.'); }
+}
+async function doSignUp(){
+  const email=($('authEmail')?$('authEmail').value:'').trim().toLowerCase();
+  const pass=$('authPass')?$('authPass').value:'';
+  if(!isEduEmail(email)){ showEduMsg(); return; }
+  if(pass.length<8){ authErr('Password needs at least 8 characters.'); return; }
+  authErr('');
+  try{
+    const { data, error } = await sb.auth.signUp({ email, password:pass });
+    if(error){ authErr(/registered|already/i.test(error.message)?'That email already has an account \u2014 try signing in.':error.message); return; }
+    if(data && data.session){ closeAuth(); }
+    else { const m=$('authModal').querySelector('.auth-card'); m.innerHTML='<h3>Confirm your email</h3><p>We sent a confirmation link to <b style="color:var(--text)">'+escHtml(email)+'</b>. Click it, then sign in with your password.</p><div class="auth-x" id="authClose">close</div>'; const c=$('authClose'); if(c) c.onclick=closeAuth; }
+  }catch(e){ authErr('Something went wrong \u2014 try again.'); }
+}
+async function doReset(){
+  const email=($('authEmail')?$('authEmail').value:'').trim().toLowerCase();
+  if(!isEduEmail(email)){ showEduMsg(); return; }
+  authErr('');
+  try{
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href });
+    if(error){ authErr(error.message); return; }
+    const m=$('authModal').querySelector('.auth-card');
+    m.innerHTML='<h3>Check your email</h3><p>We sent a reset link to <b style="color:var(--text)">'+escHtml(email)+'</b>. Open it on this device to set a new password.</p><div class="auth-x" id="authClose">close</div>';
+    const c=$('authClose'); if(c) c.onclick=closeAuth;
+  }catch(e){ authErr('Something went wrong \u2014 try again.'); }
+}
+async function doSetPassword(){
+  const pass=$('authPass')?$('authPass').value:'';
+  if(pass.length<8){ authErr('Password needs at least 8 characters.'); return; }
+  authErr('');
+  try{
+    const { error } = await sb.auth.updateUser({ password: pass });
+    if(error){ authErr(error.message); return; }
+    recoveryMode=false; closeAuth();
+    const { data:{ session } } = await sb.auth.getSession();
+    await onSession(session);
+  }catch(e){ authErr('Something went wrong \u2014 try again.'); }
+}
+function promptHandle(){
+  if(!sb||!me_user) return;
+  authOpen=true;
+  const m=$('authModal');
+  m.innerHTML='<div class="auth-card">'+
+    '<h3>Pick a name</h3>'+
+    '<p>This is how you\u2019ll show up on the leaderboard.</p>'+
+    '<input id="handleInput" type="text" maxlength="24" placeholder="e.g. first name + last initial">'+
+    '<button class="auth-go" id="handleSave">Save</button>'+
+    '</div>';
+  m.classList.add('show');
+  const inp=$('handleInput'); if(inp){ inp.focus(); inp.onkeydown=e=>{ if(e.key==='Enter') saveHandle(); }; }
+  $('handleSave').onclick=saveHandle;
+}
+async function saveHandle(){
+  const inp=$('handleInput'); if(!inp||!me_user) return;
+  const h=inp.value.trim().slice(0,24); if(!h) return;
+  try{
+    const { error } = await sb.from('profiles').upsert({ id: me_user.id, handle: h, updated_at: new Date().toISOString() });
+    if(!error) me_handle=h;
+  }catch(e){}
+  refreshAuthUI(); closeAuth(); advanceAccess();
+}
+function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
+
+/* ---------- landing → app entry ---------- */
+function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone'); }
+function tryEnter(){ enterRequested=true; if(!sb){ dismissLanding(); return; } advanceAccess(); }
+
+/* ---------- access gate (invite code, enforced server-side) ---------- */
+function advanceAccess(){
+  if(!sb){ closeGate(); return; }
+  if(!enterRequested){ return; }            // hold at the landing until the user hits Start
+  if(!me_user){ openAuth(); return; }        // need a (.edu) sign-in
+  if(!me_member){ showGate('code'); return; }// need an invite code
+  if(!me_handle){ closeGate(); promptHandle(); return; }
+  closeGate(); dismissLanding();             // fully in → fade the landing away
+}
+function showGate(step){
+  const g=$('gate'); if(!g) return;
+  gateOpen=true;
+  let inner;
+  if(step==='signin'){
+    inner='<div class="auth-card">'+
+      '<div class="gate-brand">hotkey<b>.gg</b></div>'+
+      '<h3>Invite-only beta</h3>'+
+      '<p>Open to invited testers right now. Sign in to continue.</p>'+
+      '<button class="auth-go" id="gateSignin">Sign in</button>'+
+      '</div>';
+  } else { // 'code'
+    inner='<div class="auth-card">'+
+      '<div class="gate-brand">hotkey<b>.gg</b></div>'+
+      '<h3>Enter your invite code</h3>'+
+      '<p>Signed in as <b>'+escHtml((me_user&&me_user.email)||'')+'</b>. Drop the code a friend gave you.</p>'+
+      '<input id="gateCode" type="text" placeholder="invite code" autocomplete="off">'+
+      '<button class="auth-go" id="gateRedeem">Unlock</button>'+
+      '<div class="auth-msg" id="gateMsg" style="color:var(--bad); min-height:15px; margin-top:9px"></div>'+
+      '<div class="auth-x" id="gateOut">sign out</div>'+
+      '</div>';
+  }
+  g.innerHTML=inner; g.classList.add('show');
+  const si=$('gateSignin'); if(si) si.onclick=openAuth;
+  const rd=$('gateRedeem'); if(rd) rd.onclick=redeemCode;
+  const ci=$('gateCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter') redeemCode(); }; }
+  const out=$('gateOut'); if(out) out.onclick=()=>{ sb.auth.signOut(); };
+}
+function closeGate(){ gateOpen=false; const g=$('gate'); if(g){ g.classList.remove('show'); g.innerHTML=''; } }
+async function redeemCode(){
+  const inp=$('gateCode'); if(!inp) return;
+  const code=inp.value.trim(); if(!code) return;
+  const msg=$('gateMsg'); if(msg) msg.textContent='';
+  try{
+    const { data, error } = await sb.rpc('redeem_code', { p_code: code });
+    if(!error && data===true){ me_member=true; advanceAccess(); }
+    else if(msg){ msg.textContent='That code didn\u2019t work. Check with whoever invited you.'; }
+  }catch(e){ if(msg) msg.textContent='Couldn\u2019t check the code right now \u2014 try again.'; }
+}
+
+async function recordRun(t){
+  if(!sb || !me_user || mouseUsed || guidedUsed) return false;
+  try{
+    const { error } = await sb.from('runs').insert({
+      user_id: me_user.id, challenge: cur,
+      time_ms: Math.round(t*1000), keystrokes: keyLog.length,
+      optimal: CHALLENGES[cur].parKeys, mouse_used: false, trace: keyLog
+    });
+    return !error;
+  }catch(e){ return false; }
+}
 </script>
 </body>
 </html>
