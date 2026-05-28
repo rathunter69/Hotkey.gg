@@ -378,11 +378,11 @@
     border-radius:4px; padding:1px 5px; font-size:10px; margin:0 1px}
 
   /* ---- marathon mode ---- */
-  body.marathon .drillbar{display:none}
-  body.marathon .mode-ctrls{display:none}
+  body.session .drillbar{display:none}
+  body.session .mode-ctrls{display:none}
   .marathonHud{display:none; align-items:center; gap:16px; margin-bottom:14px; padding:9px 14px;
     background:var(--surface); border:1px solid var(--accent-dim); border-radius:10px}
-  body.marathon .marathonHud{display:flex}
+  body.session .marathonHud{display:flex}
   .mh-left{display:flex; align-items:center; gap:16px; flex:1 1 auto; min-width:0}
   .mh-time{font-family:var(--mono); font-size:21px; font-weight:700; color:var(--accent); letter-spacing:-.5px;
     min-width:64px}
@@ -498,7 +498,7 @@
   <div class="marathonHud" id="marathonHud">
     <div class="mh-left">
       <span class="mh-time" id="mhTime">5:00</span>
-      <span class="mh-stat"><b id="mhDrills">0</b>drills</span>
+      <span class="mh-stat"><b id="mhDrills">0</b><span id="mhUnit">drills</span></span>
       <span class="mh-stat"><b id="mhKeys">0</b>keys</span>
     </div>
     <button class="mh-stop" id="mhStop">end session</button>
@@ -508,6 +508,7 @@
     <div class="prompt" id="prompt"></div>
     <div class="mode-ctrls">
       <button class="guide-toggle" id="marathonBtn">⏱ marathon</button>
+      <button class="guide-toggle" id="rapidBtn">⚡ rapid-fire</button>
       <button class="guide-toggle" id="demoBtn">▶ watch solution</button>
       <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
     </div>
@@ -552,18 +553,7 @@
     <div class="pk-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>↵</kbd> open · <kbd>1</kbd>–<kbd>9</kbd> jump · <kbd>esc</kbd> close</div>
   </div>
 </div>
-<div class="modes-modal" id="modesModal">
-  <div class="mm-card">
-    <div class="mm-title">⏱ marathon</div>
-    <div class="mm-body">Random drills, back to back, against the clock. The timer starts on your first keystroke — clear as many as you can.</div>
-    <div class="mm-durs">
-      <button class="mm-dur" data-min="3"><b>3</b>min</button>
-      <button class="mm-dur" data-min="5"><b>5</b>min</button>
-      <button class="mm-dur" data-min="10"><b>10</b>min</button>
-    </div>
-    <div class="mm-foot"><a id="mmCancel">cancel</a></div>
-  </div>
-</div>
+<div class="modes-modal" id="modesModal"></div>
 <div class="session-modal" id="sessionModal"></div>
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
@@ -584,7 +574,7 @@
     <p class="lede">A speedrun trainer for the keystrokes and modeling moves that fill an analyst's day — <b>the exact Windows shortcuts, timed to the hundredth</b>, drilled until they're reflex.</p>
     <div class="landing-cta">
       <button class="start-btn" id="startBtn">Start training →</button>
-      <span class="modes"><span class="mode-chip">Classic</span><span class="mode-chip pick" id="chipMarathon">⏱ Marathon</span><span class="mode-chip soon">Rapid-fire · soon</span></span>
+      <span class="modes"><span class="mode-chip">Classic</span><span class="mode-chip pick" id="chipMarathon">⏱ Marathon</span><span class="mode-chip pick" id="chipRapid">⚡ Rapid-fire</span></span>
     </div>
     <div class="micro"><b>Invite-only beta.</b> Runs in the browser — no install. Pick any drill once you're in, or run a timed <b>Marathon</b>.</div>
   </div>
@@ -605,7 +595,7 @@ const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
 let enterRequested = false, landingOpen = true, recoveryMode = false;
-let pendingMarathon = false;
+let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
 
 /* ============================================================
    CONFIG — tweak challenges, par times, and grid here.
@@ -1425,7 +1415,7 @@ function drawRibbon(){
    ACTIONS
    ============================================================ */
 function startClock(){ if(running||done)return; running=true; started=performance.now();
-  if(gameMode==='marathon' && marathon && marathon.active && !marathon.endAt){
+  if(marathon && marathon.active && !marathon.endAt){
     marathon.startAt=started; marathon.endAt=started+marathon.dur*1000; }
   $('timer').classList.add('run'); tickH=setInterval(updateTimer,40); }
 function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); }
@@ -1434,11 +1424,12 @@ function stopClock(){ running=false; clearInterval(tickH); finished=performance.
 
 function checkWin(){
   if(done||demoPlaying) return;
-  if(!gradePass()) return;
+  const pass = (gameMode==='rapidfire') ? !!(rfTask && rfTask.check(S)) : gradePass();
+  if(!pass) return;
   const t=(performance.now()-started)/1000;
   stopClock(); done=true; $('timer').textContent=t.toFixed(2);
+  if(marathon && marathon.active){ sessionSolved(t); return; }
   const C=CHALLENGES[cur];
-  if(gameMode==='marathon' && marathon && marathon.active){ marathonSolved(t, C); return; }
   let pb=false;
   if(!mouseUsed && !guidedUsed){ const prev=PB[cur];
     if(prev===undefined||t<prev){ PB[cur]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
@@ -1679,8 +1670,8 @@ document.addEventListener('keydown',e=>{
 
   // session summary (marathon end): enter = run again, esc = back to drills
   if(sessionOpen){ e.preventDefault();
-    if(k==='Enter'){ if(marathon) startMarathon(marathon.dur); }
-    else if(k==='Escape'){ exitMarathon(); }
+    if(k==='Enter'){ if(marathon) startSession(marathon.mode, marathon.dur); }
+    else if(k==='Escape'){ exitSession(); }
     return;
   }
   // mode launcher open
@@ -1697,13 +1688,13 @@ document.addEventListener('keydown',e=>{
     return;
   }
   // open the picker with backslash (ignored while typing a formula or mid-marathon)
-  if(k==='\\' && !editing && gameMode!=='marathon' && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); openPicker(); return; }
+  if(k==='\\' && !editing && gameMode==='classic' && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); openPicker(); return; }
 
   // AUTHENTIC sheet-switch (Ctrl+PgUp / Ctrl+PgDn) — only in installed/standalone app mode,
   // where there are no browser tabs to fight over. In a normal tab the browser owns these keys.
   if(IS_STANDALONE && (e.ctrlKey||e.metaKey) && (k==='PageUp'||k==='PageDown')){
     e.preventDefault();
-    if(!demoPlaying && !editing && gameMode!=='marathon'){ k==='PageDown' ? nextChallenge() : prevChallenge(); }
+    if(!demoPlaying && !editing && gameMode==='classic'){ k==='PageDown' ? nextChallenge() : prevChallenge(); }
     return;
   }
 
@@ -1730,7 +1721,7 @@ document.addEventListener('keydown',e=>{
 
   // RESULTS SCREEN — enter: again · space: next · esc: menu
   if(done){
-    if(gameMode==='marathon'){ e.preventDefault(); return; }   // marathon auto-advances; ignore input briefly
+    if(gameMode!=='classic'){ e.preventDefault(); return; }   // sessions auto-advance; ignore input briefly
     if(k==='Enter'){ e.preventDefault(); loadChallenge(cur); return; }
     if(k===' '){ e.preventDefault(); nextChallenge(); return; }
     if(k==='Escape'){ e.preventDefault(); toMenu(); return; }
@@ -1752,10 +1743,10 @@ document.addEventListener('keydown',e=>{
   }
 
   // GUIDED MODE — 'g' toggles paint-by-numbers (disabled during a marathon)
-  if((k==='g'||k==='G')&&gameMode!=='marathon'&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
+  if((k==='g'||k==='G')&&gameMode==='classic'&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
 
   // CHALLENGE SELECT (no-mouse): 1 / 2 / 3 — disabled during a marathon (drills are random)
-  if(gameMode!=='marathon' && !e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
+  if(gameMode==='classic' && !e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
     const keys=MENU_ORDER, idx=+k-1;
     if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); return; }
   }
@@ -1812,7 +1803,8 @@ function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
 $('startBtn').addEventListener('click', tryEnter);
-{ const cm=$('chipMarathon'); if(cm) cm.addEventListener('click', ()=>{ pendingMarathon=true; tryEnter(); }); }
+{ const cm=$('chipMarathon'); if(cm) cm.addEventListener('click', ()=>{ pendingMode='marathon'; tryEnter(); });
+  const cr=$('chipRapid');    if(cr) cr.addEventListener('click', ()=>{ pendingMode='rapidfire'; tryEnter(); }); }
 $('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
 $('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge(); });
 
@@ -1832,40 +1824,110 @@ $('drillPick').addEventListener('click', ()=>{ pickerOpen?closePicker():openPick
 $('picker').addEventListener('click', e=>{ if(e.target===$('picker')) closePicker(); });
 
 /* ============================================================
-   MARATHON MODE — random drills back-to-back against a clock
+   SESSION MODES — marathon (random full drills) and rapid-fire
+   (one shortcut per round), both timed against a clock
    ============================================================ */
-let modesOpen=false, sessionOpen=false;
+let modesOpen=false, sessionOpen=false, modesMode='marathon';
+let rfTask=null, lastRapid=null;
 
-function openModes(){ if(demoPlaying) return; modesOpen=true; $('modesModal').classList.add('show'); }
+const SESSION_CFG = {
+  marathon:  { title:'⏱ marathon', unit:'drills', noun:'marathon',
+    body:'Random drills, back to back, against the clock. The timer starts on your first keystroke — clear as many as you can.',
+    durs:[[180,'3','min'],[300,'5','min'],[600,'10','min']], advance:480 },
+  rapidfire: { title:'⚡ rapid-fire', unit:'rounds', noun:'rapid-fire',
+    body:'One shortcut at a time, as fast as you can recall it. The clock starts on your first keystroke.',
+    durs:[[30,'30','sec'],[60,'60','sec'],[90,'90','sec']], advance:170 },
+};
+
+/* rapid-fire micro-tasks: each is one cell + one shortcut, checked on a single property */
+const rpC=()=>2+(Math.random()*4|0), rpR=()=>2+(Math.random()*3|0), rpV=()=>(2+(Math.random()*8|0));
+const RAPID = [
+  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV()*100;
+    return { label:'Bold', par:1, prompt:`Make <b>${ref}</b> bold`,
+      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v,fmtStyle:'comma'}}, active:{r,c}}),
+      check:S=>{const x=S.cells[ref]; return !!(x&&x.bold);} }; },
+  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV();
+    return { label:'Percent', par:1, prompt:`Percent-format <b>${ref}</b>`,
+      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v}}, active:{r,c}}),
+      check:S=>{const x=S.cells[ref]; return !!(x&&x.fmtStyle==='percent');} }; },
+  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV()*1000;
+    return { label:'Currency', par:1, prompt:`Currency-format <b>${ref}</b>`,
+      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v}}, active:{r,c}}),
+      check:S=>{const x=S.cells[ref]; return !!(x&&x.fmtStyle==='currency');} }; },
+  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV()*1000;
+    return { label:'Comma', par:1, prompt:`Comma-format <b>${ref}</b>`,
+      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v}}, active:{r,c}}),
+      check:S=>{const x=S.cells[ref]; return !!(x&&x.fmtStyle==='comma');} }; },
+  ()=>{ const c=rpC(),r=rpR(),ref=colLetter(c)+r,v=rpV()*100;
+    return { label:'Bottom border', par:4, prompt:`Give <b>${ref}</b> a bottom border`,
+      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:v,fmtStyle:'comma'}}, active:{r,c}}),
+      check:S=>{const x=S.cells[ref]; return !!(x&&x.bb);} }; },
+  ()=>{ const c=2+(Math.random()*3|0),r=rpR(),ref=colLetter(c)+r;
+    return { label:'Wrap text', par:3, prompt:`Turn on wrap text in <b>${ref}</b>`,
+      build:()=>({ROWS:5, cells:{[ref]:{...blankCell(),value:'cost of goods sold',txt:true}}, active:{r,c}}),
+      check:S=>{const x=S.cells[ref]; return !!(x&&x.wrap);} }; },
+];
+function loadRapid(task){
+  rfTask=task;
+  const built=task.build();
+  S={ROWS:built.ROWS||5, cells:built.cells, active:built.active, sel:built.sel||null, clipboard:null};
+  colW=new Array(COLS+1).fill(COLW_DEFAULT);
+  if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
+  started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
+  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[];
+  $('timer').textContent='0.00'; $('timer').classList.remove('run');
+  $('prompt').innerHTML=task.prompt;
+  $('result').className='result'; $('result').innerHTML='';
+  drawRibbon(); render(); resetFlash(); hideResults();
+}
+
+function openModes(mode){ if(demoPlaying) return; modesMode=mode||'marathon';
+  const cfg=SESSION_CFG[modesMode]; const m=$('modesModal');
+  m.innerHTML=`<div class="mm-card"><div class="mm-title">${cfg.title}</div>`+
+    `<div class="mm-body">${cfg.body}</div>`+
+    `<div class="mm-durs">`+cfg.durs.map(d=>`<button class="mm-dur" data-sec="${d[0]}"><b>${d[1]}</b>${d[2]}</button>`).join('')+`</div>`+
+    `<div class="mm-foot"><a id="mmCancel">cancel</a></div></div>`;
+  m.classList.add('show'); modesOpen=true;
+  m.querySelectorAll('.mm-dur').forEach(b=>b.onclick=()=>{ closeModes(); startSession(modesMode, +b.dataset.sec); });
+  $('mmCancel').onclick=closeModes;
+}
 function closeModes(){ modesOpen=false; const m=$('modesModal'); if(m) m.classList.remove('show'); }
-[...document.querySelectorAll('.mm-dur')].forEach(b=>{
-  b.addEventListener('click', ()=>{ const min=+b.dataset.min||5; closeModes(); startMarathon(min*60); });
-});
-$('mmCancel').addEventListener('click', closeModes);
 $('modesModal').addEventListener('click', e=>{ if(e.target===$('modesModal')) closeModes(); });
-$('marathonBtn').addEventListener('click', ()=>{ if(!demoPlaying) openModes(); });
-$('mhStop').addEventListener('click', ()=>{ endMarathon(); });
+$('marathonBtn').addEventListener('click', ()=>{ if(!demoPlaying) openModes('marathon'); });
+$('rapidBtn').addEventListener('click', ()=>{ if(!demoPlaying) openModes('rapidfire'); });
+$('mhStop').addEventListener('click', ()=>{ endSession(); });
 
 function loadRandomDrill(){
   const pool=MENU_ORDER.filter(k=>k!==lastKey);
   const key=pool.length ? pool[Math.floor(Math.random()*pool.length)] : MENU_ORDER[0];
   lastKey=key; loadChallenge(key);
 }
-function startMarathon(durSec){
+function loadRandomRapid(){
+  let task, guard=0;
+  do{ task=RAPID[Math.floor(Math.random()*RAPID.length)](); guard++; }
+  while(RAPID.length>1 && task.label===lastRapid && guard<8);
+  lastRapid=task.label; loadRapid(task);
+}
+function loadNext(){ if(gameMode==='rapidfire') loadRandomRapid(); else loadRandomDrill(); }
+
+function startSession(mode, durSec){
   closeModes(); closePicker(); hideResults(); hideSessionSummary();
-  gameMode='marathon';
+  gameMode=mode;
   guided=false; guidedUsed=false; updateGuideBtn();
-  marathon={ dur:durSec, startAt:0, endAt:0, splits:[], keys:0, checks:0, optimal:0, active:true, tickH:null };
-  lastKey=null;
-  document.body.classList.add('marathon');
-  marathon.tickH=setInterval(marathonTick, 200);
-  loadRandomDrill();
+  const cfg=SESSION_CFG[mode];
+  marathon={ mode, dur:durSec, startAt:0, endAt:0, splits:[], keys:0, checks:0, optimal:0,
+    active:true, tickH:null, unit:cfg.unit, advance:cfg.advance };
+  lastKey=null; lastRapid=null;
+  document.body.classList.add('session');
+  const ue=$('mhUnit'); if(ue) ue.textContent=cfg.unit;
+  marathon.tickH=setInterval(sessionTick, 200);
+  loadNext();
   updateMarathonHud();
 }
-function marathonTick(){
+function sessionTick(){
   if(!marathon || !marathon.active) return;
-  if(!marathon.endAt){ updateMarathonHud(); return; }   // not started until first keystroke
-  if(performance.now() >= marathon.endAt){ endMarathon(); return; }
+  if(!marathon.endAt){ updateMarathonHud(); return; }   // clock idle until first keystroke
+  if(performance.now() >= marathon.endAt){ endSession(); return; }
   updateMarathonHud();
 }
 function fmtClock(sec){ sec=Math.max(0,Math.ceil(sec)); const m=Math.floor(sec/60), s=sec%60;
@@ -1875,22 +1937,21 @@ function updateMarathonHud(){
   const left = marathon.endAt ? (marathon.endAt-performance.now())/1000 : marathon.dur;
   const te=$('mhTime'); if(te){ te.textContent=fmtClock(left); te.classList.toggle('low', !!marathon.endAt && left<=10); }
   const de=$('mhDrills'); if(de) de.textContent=marathon.splits.length;
-  const extra=(gameMode==='marathon' && !done)?keyLog.length:0;   // live keys for the in-progress drill
+  const extra=(marathon.active && !done)?keyLog.length:0;   // live keys for the in-progress task
   const ke=$('mhKeys'); if(ke) ke.textContent=marathon.keys+extra;
 }
-function marathonSolved(t, C){
-  marathon.splits.push({ key:cur, label:C.label||C.name||cur, t:+t.toFixed(2),
-    keys:keyLog.length, optimal:C.parKeys });
-  marathon.keys += keyLog.length;
-  marathon.checks += C.checks(S).length;
-  marathon.optimal += C.parKeys;
+function sessionSolved(t){
+  let label, par, nChecks;
+  if(gameMode==='rapidfire'){ label=rfTask?rfTask.label:'round'; par=rfTask?(rfTask.par||1):1; nChecks=1; }
+  else { const C=CHALLENGES[cur]; label=C.label||C.name||cur; par=C.parKeys; nChecks=C.checks(S).length; }
+  marathon.splits.push({ label, t:+t.toFixed(2), keys:keyLog.length, optimal:par });
+  marathon.keys += keyLog.length; marathon.checks += nChecks; marathon.optimal += par;
   updateMarathonHud();
-  // out of time? end now. otherwise flash a quick confirm and auto-advance.
-  if(marathon.endAt && performance.now() >= marathon.endAt){ endMarathon(); return; }
-  const r=$('result'); if(r){ r.className='result win'; r.innerHTML='✓ '+t.toFixed(2)+'s — next…'; }
-  setTimeout(()=>{ if(gameMode==='marathon' && marathon && marathon.active) loadRandomDrill(); }, 480);
+  if(marathon.endAt && performance.now() >= marathon.endAt){ endSession(); return; }
+  const r=$('result'); if(r){ r.className='result win'; r.innerHTML='✓ '+t.toFixed(2)+'s'; }
+  setTimeout(()=>{ if(marathon && marathon.active) loadNext(); }, marathon.advance);
 }
-function endMarathon(){
+function endSession(){
   if(!marathon) return;
   marathon.active=false;
   clearInterval(marathon.tickH); clearInterval(tickH); running=false;
@@ -1898,38 +1959,37 @@ function endMarathon(){
   marathon.elapsed = marathon.startAt ? Math.min((performance.now()-marathon.startAt)/1000, marathon.dur) : 0;
   showSessionSummary();
 }
-function exitMarathon(){
+function exitSession(){
   if(marathon){ clearInterval(marathon.tickH); }
-  marathon=null; gameMode='classic';
-  document.body.classList.remove('marathon');
+  marathon=null; rfTask=null; gameMode='classic';
+  document.body.classList.remove('session');
   hideSessionSummary();
   loadChallenge(MENU_ORDER[0]);
 }
 function hideSessionSummary(){ sessionOpen=false; const m=$('sessionModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 function showSessionSummary(){
-  const s=marathon; const n=s.splits.length;
+  const s=marathon; const n=s.splits.length; const cfg=SESSION_CFG[s.mode]||SESSION_CFG.marathon;
   const avg = n ? (s.splits.reduce((a,b)=>a+b.t,0)/n) : 0;
   const fastest = n ? s.splits.reduce((a,b)=>b.t<a.t?b:a) : null;
   const eff = s.keys ? Math.round(s.optimal/s.keys*100) : 0;
+  const rapid = s.mode==='rapidfire';
+  const cards = rapid
+    ? [[n,'rounds'],[s.keys,'keystrokes'],[eff?eff+'%':'—','key efficiency'],[fastest?fastest.t.toFixed(2)+'s':'—','fastest']]
+    : [[n,'drills'],[s.checks,'tasks cleared'],[s.keys,'keystrokes'],[eff?eff+'%':'—','key efficiency']];
   const m=$('sessionModal');
   m.innerHTML=`<div class="ss-card">`+
     `<div class="ss-title">session complete</div>`+
-    `<div class="ss-big">${n}<span>drills</span></div>`+
-    `<div class="ss-sub">${fmtClock(s.dur)} marathon · ${avg?avg.toFixed(2)+'s avg':'—'}${fastest?' · fastest '+fastest.t.toFixed(2)+'s ('+escHtml(fastest.label)+')':''}</div>`+
-    `<div class="ss-stats">`+
-      `<div class="ss-stat"><div class="v">${n}</div><div class="l">drills</div></div>`+
-      `<div class="ss-stat"><div class="v">${s.checks}</div><div class="l">tasks cleared</div></div>`+
-      `<div class="ss-stat"><div class="v">${s.keys}</div><div class="l">keystrokes</div></div>`+
-      `<div class="ss-stat"><div class="v">${eff?eff+'%':'—'}</div><div class="l">key efficiency</div></div>`+
-    `</div>`+
-    (n ? `<div class="ss-graphwrap"><div class="ss-graphlabel">seconds per drill</div>${renderSessionGraph(s.splits)}</div>` : `<div class="sg-empty">no drills finished — give it another go</div>`)+
+    `<div class="ss-big">${n}<span>${s.unit}</span></div>`+
+    `<div class="ss-sub">${fmtClock(s.dur)} ${cfg.noun} · ${avg?avg.toFixed(2)+'s avg':'—'}${(!rapid&&fastest)?' · fastest '+fastest.t.toFixed(2)+'s ('+escHtml(fastest.label)+')':''}</div>`+
+    `<div class="ss-stats">`+cards.map(c=>`<div class="ss-stat"><div class="v">${c[0]}</div><div class="l">${c[1]}</div></div>`).join('')+`</div>`+
+    (n ? `<div class="ss-graphwrap"><div class="ss-graphlabel">seconds per ${rapid?'round':'drill'}</div>${renderSessionGraph(s.splits)}</div>` : `<div class="sg-empty">nothing finished — give it another go</div>`)+
     `<div class="ss-opts">`+
       `<button class="ss-key primary" data-act="again"><kbd>↵</kbd>run again</button>`+
       `<button class="ss-key" data-act="exit"><kbd>esc</kbd>back to drills</button>`+
     `</div></div>`;
   m.classList.add('show'); sessionOpen=true;
   m.querySelectorAll('.ss-key').forEach(b=>b.addEventListener('click', ()=>{
-    if(b.dataset.act==='again') startMarathon(s.dur); else exitMarathon();
+    if(b.dataset.act==='again') startSession(s.mode, s.dur); else exitSession();
   }));
 }
 function renderSessionGraph(splits){
@@ -2275,7 +2335,7 @@ function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList
 
 /* ---------- landing → app entry ---------- */
 function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone');
-  if(pendingMarathon){ pendingMarathon=false; markOnboarded(); setTimeout(openModes, 640); return; }
+  if(pendingMode){ const mo=pendingMode; pendingMode=null; markOnboarded(); setTimeout(()=>openModes(mo), 640); return; }
   maybeOnboard(); }
 function tryEnter(){ enterRequested=true; if(!sb){ dismissLanding(); return; } advanceAccess(); }
 
@@ -2298,12 +2358,29 @@ function showOnboard(){
 }
 function closeOnboard(){ onboardOpen=false; const o=$('onboard'); if(o) o.classList.remove('show'); }
 function skipOnboard(){ markOnboarded(); closeOnboard(); }
-function startGuidedIntro(){
+async function startGuidedIntro(){
   markOnboarded(); closeOnboard();
   loadChallenge(MENU_ORDER[0]);          // Foundations — "Copy it over"
   guided=true; updateGuideBtn(); if(S) render();
-  // play the solution once; flag the run guided afterward so the practice solve won't post a time
-  playDemo().then(()=>{ guidedUsed=true; });
+  await playDemo();                      // part 1: watch the copy/paste solution
+  await introRibbonPeek();               // part 2: a quick look at the ribbon
+  guidedUsed=true;                        // practice run — won't post a time
+  const r=$('result'); if(r){ r.className='result';
+    r.innerHTML="you're set — <kbd>\\</kbd> all drills · <kbd>shift+f11</kbd> restart · <kbd>g</kbd> hints · type to start"; }
+}
+async function introRibbonPeek(){
+  if(!S || demoPlaying) return;
+  loadChallenge(cur);
+  demoPlaying=true; updateDemoBtn();
+  const kf=$('keyflash'); if(kf) kf.classList.add('demo');
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='▶ <kbd>alt</kbd> opens the ribbon — formatting, borders, paste special'; }
+  await sleep(1000);
+  demoKey(Kb.alt);          await sleep(1200);   // open the ribbon
+  demoKey(L('h'));          await sleep(1300);   // Home tab reveals its keys
+  demoKey({key:'Escape'});  await sleep(650);    // back out
+  if(kf) kf.classList.remove('demo');
+  demoPlaying=false; updateDemoBtn();
+  loadChallenge(cur);                            // clean board for the user
 }
 
 /* ---------- access gate (invite code, enforced server-side) ---------- */
