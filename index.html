@@ -1319,6 +1319,20 @@ let undoStack=[], redoStack=[], keyLog=[];
 let gameMode='classic';   // 'classic' | 'marathon'
 let marathon=null;        // active marathon session state
 let lastKey=null;         // last drill key, to avoid back-to-back repeats in marathon
+/* Persistent KV storage — localStorage on real deploys (production), window.storage as
+   fallback for the in-Claude.ai artifact preview. Either works; localStorage wins when both. */
+const KV = {
+  async get(key){
+    try{ const v = localStorage.getItem(key); if(v!==null) return v; }catch(e){}
+    try{ if(window.storage){ const r = await window.storage.get(key); return (r && r.value) ? r.value : null; } }catch(e){}
+    return null;
+  },
+  async set(key, value){
+    let ok = false;
+    try{ localStorage.setItem(key, value); ok = true; }catch(e){}
+    if(!ok){ try{ if(window.storage) await window.storage.set(key, value); }catch(e){} }
+  },
+};
 let PB = {};
 
 const $ = id => document.getElementById(id);
@@ -2210,10 +2224,8 @@ const RF_OPS = [
 ];
 let rfBusy=false;
 let hardoMode=false;
-async function loadHardo(){
-  try{ if(window.storage){ const r=await window.storage.get('hotkey_hardo'); if(r&&r.value) hardoMode = r.value==='1'; } }catch(e){}
-}
-function saveHardo(){ try{ if(window.storage) window.storage.set('hotkey_hardo', hardoMode?'1':'0'); }catch(e){} }
+async function loadHardo(){ const v = await KV.get('hotkey_hardo'); if(v==='1') hardoMode = true; }
+function saveHardo(){ KV.set('hotkey_hardo', hardoMode?'1':'0'); }
 
 /* ============================================================
    THEMES — 11 curated palettes, Monkeytype-style picker
@@ -2282,9 +2294,8 @@ function applyTheme(name){
   currentTheme = name;
 }
 let currentTheme = 'default';
-function loadTheme(){
-  let saved=null;
-  try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
+async function loadTheme(){
+  const saved = await KV.get('hotkey_theme');
   if(saved && THEMES[saved]){ applyTheme(saved); return; }
   // first visit: respect prefers-color-scheme
   try{
@@ -2292,7 +2303,7 @@ function loadTheme(){
     applyTheme(prefersLight ? 'light' : 'default');
   }catch(e){ applyTheme('default'); }
 }
-function saveTheme(name){ try{ localStorage.setItem('hotkey_theme', name); }catch(e){} }
+function saveTheme(name){ KV.set('hotkey_theme', name); }
 
 let themesOpen=false;
 function closeThemes(){ themesOpen=false; const m=$('themesModal'); if(m) m.classList.remove('show'); }
@@ -2773,14 +2784,12 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
   });
 }
 
-/* ---- PB persistence (window.storage in-artifact, falls back to memory) ---- */
+/* ---- PB persistence — survives across sessions on production deploys ---- */
 async function loadPB(){
-  try{ if(window.storage){ const r=await window.storage.get('hotkey_pb'); if(r&&r.value) PB=JSON.parse(r.value); } }
-  catch(e){ PB = PB||{}; }
+  const v = await KV.get('hotkey_pb');
+  if(v){ try{ PB = JSON.parse(v); }catch(e){ PB = {}; } }
 }
-async function savePB(){
-  try{ if(window.storage) await window.storage.set('hotkey_pb', JSON.stringify(PB)); }catch(e){}
-}
+async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
 
 (async function init(){
   // returning from an email link? recovery → set-password form; otherwise advance past the landing once the session resolves
@@ -2789,7 +2798,7 @@ async function savePB(){
   await loadPB();
   await loadOnboard();
   await loadHardo();
-  loadTheme();
+  await loadTheme();
   buildSheetTabs();
   loadChallenge(MENU_ORDER[0]);
   initAuth();
@@ -2976,9 +2985,9 @@ function tryEnter(){ enterRequested=true; if(!sb){ dismissLanding(); return; } a
 /* ---------- first-run guided intro ---------- */
 let onboarded=false, onboardOpen=false;
 async function loadOnboard(){
-  try{ if(window.storage){ const r=await window.storage.get('hotkey_onboarded'); if(r&&r.value) onboarded=true; } }catch(e){}
+  const v = await KV.get('hotkey_onboarded'); if(v) onboarded = true;
 }
-function markOnboarded(){ onboarded=true; try{ if(window.storage) window.storage.set('hotkey_onboarded','1'); }catch(e){} }
+function markOnboarded(){ onboarded = true; KV.set('hotkey_onboarded','1'); }
 function maybeOnboard(){
   if(onboarded||onboardOpen||demoPlaying) return;
   setTimeout(showOnboard, 620);   // let the landing finish fading first
