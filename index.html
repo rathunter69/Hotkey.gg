@@ -346,9 +346,24 @@
   .gate-brand b{color:var(--accent)}
   .gate .auth-card p b{color:var(--text)}
   /* ---- top exercise row + bottom sheet tabs ---- */
-  .exrow{display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:8px}
-  .exrow .prompt{flex:1 1 320px; margin:0}
-  .mode-ctrls{display:flex; align-items:center; gap:8px; flex:none}
+  .exrow{margin-bottom:10px}
+
+  /* In-trainer mode switcher — Monkeytype-style: labels + duration chips, one click to launch */
+  .mode-bar{display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-family:var(--mono); font-size:12.5px}
+  .mb-group{display:flex; align-items:center; gap:3px}
+  .mb-label{color:var(--muted); margin-right:6px; letter-spacing:.3px; display:inline-flex; align-items:center; gap:5px}
+  .mb-icon{font-size:13px; opacity:.85}
+  .mb-dur{background:none; border:1px solid transparent; color:var(--muted); font-family:var(--mono); font-size:12.5px;
+    padding:4px 10px; border-radius:6px; cursor:pointer; transition:.13s; letter-spacing:.2px}
+  .mb-dur:hover{color:var(--text); background:var(--surface)}
+  .mb-sep{width:1px; height:18px; background:var(--line); margin:0 4px}
+  .mb-spacer{flex:1}
+  .mb-tool{background:none; border:1px solid var(--line); color:var(--muted); font-family:var(--mono); font-size:11.5px;
+    padding:4px 10px; border-radius:6px; cursor:pointer; transition:.13s}
+  .mb-tool:hover{color:var(--text); border-color:var(--muted)}
+  .mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+  .mb-tool kbd{font-family:var(--mono); background:var(--surface2); border:1px solid var(--line);
+    border-radius:3px; padding:0 4px; font-size:10px; margin-right:4px; color:inherit}
 
   /* two-column workspace: grid on the left, checklist rail on the right */
   .stage{display:flex; align-items:flex-start; gap:20px}
@@ -408,7 +423,7 @@
 
   /* ---- marathon mode ---- */
   body.session .drillbar{display:none}
-  body.session .mode-ctrls{display:none}
+  body.session .exrow{display:none}
   .marathonHud{display:none; align-items:center; gap:16px; margin-bottom:14px; padding:9px 14px;
     background:var(--surface); border:1px solid var(--accent-dim); border-radius:10px}
   body.session .marathonHud{display:flex}
@@ -683,12 +698,23 @@
   </div>
 
   <div class="exrow">
-    <div class="prompt" id="prompt"></div>
-    <div class="mode-ctrls">
-      <button class="guide-toggle" id="marathonBtn">⏱ marathon</button>
-      <button class="guide-toggle" id="rapidBtn">⚡ rapid-fire</button>
-      <button class="guide-toggle" id="demoBtn">▶ watch solution</button>
-      <button class="guide-toggle" id="guideToggle"><kbd>g</kbd> guided: off</button>
+    <div class="mode-bar">
+      <span class="mb-group">
+        <span class="mb-label"><span class="mb-icon">⏱</span>marathon</span>
+        <button class="mb-dur" data-mode="marathon" data-dur="300">5m</button>
+        <button class="mb-dur" data-mode="marathon" data-dur="600">10m</button>
+        <button class="mb-dur" data-mode="marathon" data-dur="900">15m</button>
+      </span>
+      <span class="mb-sep"></span>
+      <span class="mb-group">
+        <span class="mb-label"><span class="mb-icon">⚡</span>rapid-fire</span>
+        <button class="mb-dur" data-mode="rapidfire" data-dur="30">30s</button>
+        <button class="mb-dur" data-mode="rapidfire" data-dur="60">60s</button>
+        <button class="mb-dur" data-mode="rapidfire" data-dur="120">120s</button>
+      </span>
+      <span class="mb-spacer"></span>
+      <button class="mb-tool" id="demoBtn">▶ demo</button>
+      <button class="mb-tool" id="guideToggle"><kbd>g</kbd> guided: off</button>
     </div>
   </div>
 
@@ -2554,8 +2580,15 @@ function openModes(mode){ if(demoPlaying) return; modesMode=mode||'marathon';
 }
 function closeModes(){ modesOpen=false; const m=$('modesModal'); if(m) m.classList.remove('show'); }
 $('modesModal').addEventListener('click', e=>{ if(e.target===$('modesModal')) closeModes(); });
-$('marathonBtn').addEventListener('click', ()=>{ if(!demoPlaying) openModes('marathon'); });
-$('rapidBtn').addEventListener('click', ()=>{ if(!demoPlaying) openModes('rapidfire'); });
+// in-trainer mode bar: clicking any duration launches that session immediately
+document.querySelectorAll('.mb-dur').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    if(demoPlaying) return;
+    const mode = b.dataset.mode;
+    const dur  = +b.dataset.dur;
+    startSession(mode, dur);
+  });
+});
 $('mhStop').addEventListener('click', ()=>{ endSession(); });
 
 function loadRandomDrill(){
@@ -2826,7 +2859,6 @@ function loadChallenge(key){
   updateGuideBtn();
   $('mouseBadge').style.display='none';
   $('timer').textContent='0.00'; $('timer').classList.remove('run');
-  $('prompt').innerHTML=C.prompt;
   $('par').textContent=C.par+'s';
   $('keyPar').textContent=C.parKeys;
   $('pb').textContent = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
