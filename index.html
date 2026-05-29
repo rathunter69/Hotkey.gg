@@ -465,7 +465,6 @@
   .mh-hints{font-family:var(--mono); font-size:10.5px; color:var(--faint); letter-spacing:.3px; margin-left:auto; margin-right:14px}
   .mh-hints kbd{color:var(--muted); background:var(--surface2); border:1px solid var(--line);
     border-radius:4px; padding:1px 5px; font-size:10px; margin:0 2px}
-  body.rapidfire .mh-hints{display:none}
   .mh-stop{font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface2);
     border:1px solid var(--line); border-radius:7px; padding:6px 12px; cursor:pointer; transition:.13s; flex:none}
   .mh-stop:hover{color:var(--bad); border-color:var(--bad)}
@@ -613,7 +612,42 @@
   .rf-cell.fx{color:var(--accent)}
   .rf-cell.link{color:var(--accent); text-decoration:underline}
   .rf-cell.border{box-shadow:inset 0 0 0 2px var(--accent), inset 0 0 0 5px var(--surface), inset 0 0 0 7px var(--text)}
-  .rf-cell.flash{background:var(--accent-glow)}
+  /* success pulse on the rf-cell — sharp flash then quick fade. Faster than transition: feels like the chord SNAPPED into place */
+  @keyframes rfCellFlash {
+    0%   { background:var(--accent); color:#000; transform:scale(1.04); box-shadow:inset 0 0 0 2px var(--accent), 0 0 0 0 var(--accent-glow); }
+    35%  { background:var(--accent); color:#000; transform:scale(1.025); box-shadow:inset 0 0 0 2px var(--accent), 0 0 22px 4px var(--accent-glow); }
+    100% { background:var(--accent-glow); color:var(--text); transform:scale(1.0); box-shadow:inset 0 0 0 2px var(--accent), 0 0 0 0 transparent; }
+  }
+  .rf-cell.flash{ animation: rfCellFlash .42s cubic-bezier(.2,.9,.3,1) both; }
+  /* celebratory outer halo on the card so success registers in peripheral vision too */
+  @keyframes rfCardCelebrate {
+    0%   { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 0 0 var(--accent-glow); }
+    25%  { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 36px 6px var(--accent-glow); }
+    100% { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 0 0 transparent; }
+  }
+  .rf-card.celebrate{ animation: rfCardCelebrate .55s ease-out both; }
+
+  /* streak counter — appears at ×3, escalates through 5 tiers. Sits above the card so it fills the sparse area
+     without competing with the cell content. Hidden by default; the JS adds .show + a tier class. */
+  .rf-streak{ font-family:var(--mono); font-size:13px; text-align:center; color:transparent;
+    margin:0 auto 12px; min-height:24px; letter-spacing:1.5px; transition:color .25s, font-size .2s, text-shadow .25s; user-select:none }
+  .rf-streak.show{ color:var(--muted); }
+  .rf-streak .num{ font-weight:700 }
+  .rf-streak.t1{ color:var(--accent); font-size:14px; }
+  .rf-streak.t2{ color:#67e8f9; font-size:16px; }                                                       /* cyan */
+  .rf-streak.t3{ color:#c084fc; font-size:18px; font-weight:600;
+    text-shadow:0 0 14px rgba(192,132,252,.4); }                                                         /* purple */
+  .rf-streak.t4{ color:#fb923c; font-size:21px; font-weight:700;
+    text-shadow:0 0 20px rgba(251,146,60,.55); }                                                         /* orange */
+  .rf-streak.t5{ color:#fbbf24; font-size:24px; font-weight:700;
+    text-shadow:0 0 26px rgba(251,191,36,.7); }                                                          /* gold */
+  /* re-pulse per solve so the streak feels alive between rounds */
+  @keyframes rfStreakBump {
+    0%   { transform:scale(1.0); }
+    35%  { transform:scale(1.18); }
+    100% { transform:scale(1.0); }
+  }
+  .rf-streak.bump{ animation: rfStreakBump .32s cubic-bezier(.2,.9,.3,1) both; }
   /* multi-cell layouts (autosum, fill-down, fill-right) */
   .rf-cell-multi{padding:8px; min-height:58px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; box-shadow:none}
   .rf-stack{display:flex; flex-direction:column; align-items:stretch; gap:0; min-width:130px}
@@ -754,6 +788,7 @@
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn">▶ demo</button>
       <button class="mb-tool" id="guideToggle"><kbd>g</kbd> guided: off</button>
+      <button class="mb-tool" id="soundToggle" title="success sound on rapid-fire solves">🔊 sound</button>
     </div>
   </div>
 
@@ -773,6 +808,7 @@
   </div>
 
   <div id="rapidStage">
+    <div class="rf-streak" id="rfStreak"></div>
     <div class="rf-card">
       <div class="rf-instr" id="rfInstr">—</div>
       <div class="rf-sheet"><div class="rf-srow"><div class="rf-rownum" id="rfCellLabel">B4</div><div class="rf-cell" id="rfCell"></div></div></div>
@@ -2255,6 +2291,9 @@ $('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-ke
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
+function updateSoundBtn(){ const b=$('soundToggle'); if(b){ b.classList.toggle('on',soundOn); b.innerHTML=(soundOn?'🔊':'🔇')+' sound'; } }
+function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soundOn) playSuccessBlip(); /* preview */ }
+$('soundToggle').addEventListener('click',toggleSound);
 $('startBtn').addEventListener('click', tryEnter);
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
@@ -2465,6 +2504,67 @@ let rfBusy=false;
 let hardoMode=false;
 async function loadHardo(){ const v = await KV.get('hotkey_hardo'); if(v==='1') hardoMode = true; }
 function saveHardo(){ KV.set('hotkey_hardo', hardoMode?'1':'0'); }
+
+// ----- success sound: short, synthesized; user-toggleable, persisted in KV -----
+let soundOn = true;
+async function loadSound(){ const v = await KV.get('hotkey_sound'); if(v==='0') soundOn = false; }
+function saveSound(){ KV.set('hotkey_sound', soundOn?'1':'0'); }
+let _audioCtx = null;
+function audioCtx(){
+  if(_audioCtx) return _audioCtx;
+  try{ _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+  catch(e){ return null; }
+  return _audioCtx;
+}
+// Two-note ascending blip (perfect-fourth-ish) — short, sharp, in-game-feeling, ~120ms total.
+// Sine waves so it's never abrasive; fast attack + exp-decay envelope so it never lingers.
+// `tier` (0-4) raises the pitch by ~2 semitones per step so streak escalation is audible.
+// Tier 4 (streak ≥ 20) adds an octave-below bass note for chordal heft.
+function playSuccessBlip(tier){
+  if(!soundOn) return;
+  const ctx = audioCtx(); if(!ctx) return;
+  // Some browsers suspend the context until a user gesture — the rapid-fire keypress IS a gesture, so this is safe.
+  if(ctx.state === 'suspended'){ try{ ctx.resume(); }catch(e){} }
+  const t0 = ctx.currentTime;
+  const t = Math.max(0, Math.min(4, tier|0));
+  // 2-semitone shift per tier → ratio ≈ 2^(2/12) = 1.1225 per step
+  const pitch = Math.pow(1.1225, t);
+  const tone = (freq, start, dur, gain) => {
+    const osc = ctx.createOscillator(); const g = ctx.createGain();
+    osc.type = 'sine'; osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0 + start);
+    g.gain.exponentialRampToValueAtTime(gain, t0 + start + 0.006);  // 6ms attack
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + start + dur);  // exp decay to silence
+    osc.connect(g).connect(ctx.destination);
+    osc.start(t0 + start); osc.stop(t0 + start + dur + 0.02);
+  };
+  tone(880  * pitch, 0,    0.09, 0.16);   // main note
+  tone(1175 * pitch, 0.06, 0.11, 0.14);   // overlapping fourth — chord-feel, not melody
+  if(t === 4){ tone(440 * pitch, 0, 0.18, 0.10); }  // tier-4 bass octave below the main note → "you're cooking" feel
+}
+
+// Streak tier: 0 = hidden, 1-5 are visible escalation levels.
+// Thresholds: 0-2 hidden, 3-4 t1, 5-9 t2, 10-14 t3, 15-19 t4, 20+ t5.
+function streakTier(n){
+  if(n < 3)  return 0;
+  if(n < 5)  return 1;
+  if(n < 10) return 2;
+  if(n < 15) return 3;
+  if(n < 20) return 4;
+  return 5;
+}
+// Render the streak indicator. n=0 hides; otherwise apply tier classes + bump animation.
+function updateStreakUI(n){
+  const el = $('rfStreak'); if(!el) return;
+  const t = streakTier(n);
+  el.className = 'rf-streak';   // clear all state classes
+  if(t === 0){ el.textContent = ''; return; }
+  el.textContent = '× ' + n;
+  el.classList.add('show', 't'+t);
+  // force reflow so the bump animation re-triggers on consecutive solves
+  void el.offsetWidth;
+  el.classList.add('bump');
+}
 
 /* ============================================================
    THEMES — palettes + picker (inlined for robustness across envs).
@@ -2725,12 +2825,23 @@ function rfSolve(){
   const par=rfTask.keys.length;
   marathon.splits.push({ label:rfTask.label, t:+t.toFixed(2), keys:par, optimal:par });
   marathon.keys+=par; marathon.hits+=1; marathon.optimal=(marathon.optimal||0)+par;
+  // streak: bump, track best, escalate audio/visual together
+  marathon.streak = (marathon.streak||0) + 1;
+  if(marathon.streak > (marathon.bestStreak||0)) marathon.bestStreak = marathon.streak;
+  const tier = streakTier(marathon.streak);
+  updateStreakUI(marathon.streak);
   renderRfCard('solved'); updateMarathonHud();
+  // dopamine: sound (tier-shifted) + outer-card halo. The rf-cell flash is already wired in renderRfCard('solved').
+  playSuccessBlip(tier);
+  const card = document.querySelector('.rf-card');
+  if(card){ card.classList.remove('celebrate'); void card.offsetWidth; card.classList.add('celebrate'); }
   if(marathon.endAt && performance.now() >= marathon.endAt){ setTimeout(endSession, marathon.advance); return; }
   setTimeout(()=>{ if(marathon && marathon.active) loadNext(); }, marathon.advance);
 }
 function rfMiss(){
   marathon.misses+=1;
+  marathon.streak = 0;            // streak breaks immediately on a miss
+  updateStreakUI(0);              // hide the counter so the user sees+hears the reset together
   const keys=$('rfKeys'); if(keys){ keys.classList.remove('miss'); void keys.offsetWidth; keys.classList.add('miss'); }
 }
 
@@ -2798,11 +2909,17 @@ function startSession(mode, durSec){
   guided=false; guidedUsed=false; updateGuideBtn();
   const cfg=SESSION_CFG[mode];
   marathon={ mode, dur:durSec, startAt:0, endAt:0, splits:[], keys:0, checks:0, optimal:0,
-    hits:0, misses:0, active:true, tickH:null, unit:cfg.unit, advance:cfg.advance };
+    hits:0, misses:0, streak:0, bestStreak:0, active:true, tickH:null, unit:cfg.unit, advance:cfg.advance };
   lastKey=null; lastRapid=null;
   document.body.classList.add('session');
   if(mode==='rapidfire') document.body.classList.add('rapidfire');
+  updateStreakUI(0);  // reset visual to hidden at the start of every session
   const ue=$('mhUnit'); if(ue) ue.textContent=cfg.unit;
+  const hh=$('mhHints'); if(hh){
+    hh.innerHTML = (mode==='rapidfire')
+      ? '<kbd>shift+esc</kbd> end'
+      : '<kbd>s</kbd> skip · <kbd>g</kbd> hints · <kbd>shift+esc</kbd> end';
+  }
   marathon.tickH=setInterval(sessionTick, 200);
   loadNext();
   updateMarathonHud();
@@ -2859,7 +2976,7 @@ function showSessionSummary(){
   const eff = s.keys ? Math.round(s.optimal/s.keys*100) : 0;
   const rapid = s.mode==='rapidfire';
   const cards = rapid
-    ? [[n,'rounds'],[s.keys||0,'keystrokes'],[fastest?fastest.t.toFixed(2)+'s':'—','fastest'],[avg?avg.toFixed(2)+'s':'—','avg round']]
+    ? [[n,'rounds'],['×'+(s.bestStreak||0),'best streak'],[fastest?fastest.t.toFixed(2)+'s':'—','fastest'],[avg?avg.toFixed(2)+'s':'—','avg round']]
     : [[n,'drills'],[s.skipped||0,'skipped'],[s.keys,'keystrokes'],[eff?eff+'%':'—','key efficiency']];
   const m=$('sessionModal');
   m.innerHTML=`<div class="ss-card">`+
@@ -3129,6 +3246,8 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadPB();
   await loadOnboard();
   await loadHardo();
+  await loadSound();
+  updateSoundBtn();
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
   if(onboarded){ enterRequested = true; landingOpen = false; }
