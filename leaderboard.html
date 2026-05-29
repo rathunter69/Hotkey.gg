@@ -51,6 +51,9 @@
   #boards{display:grid; grid-template-columns:repeat(2,1fr); gap:20px; align-items:start}
   @media(max-width:680px){ #boards{grid-template-columns:1fr} }
   .board{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden}
+  .section-title{font-family:var(--mono); font-size:13px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:1.5px; margin:18px 0 6px; padding-bottom:6px; border-bottom:1px solid var(--line)}
+  .section-title:first-child{margin-top:0}
   .board-cap{display:flex; align-items:baseline; justify-content:space-between; padding:16px 22px; border-bottom:1px solid var(--line)}
   .board-cap h2{font-size:17px; font-weight:600; letter-spacing:-.3px}
   .board-cap .lvl{font-family:var(--mono); font-size:11px; color:var(--faint); text-transform:uppercase; letter-spacing:1px}
@@ -159,6 +162,48 @@ function boardHtml(c, best, names, meId){
   return `<div class="board"><div class="board-cap"><h2>${esc(c.label)}</h2><span class="lvl">${esc(c.lvl)}</span></div>${body}</div>`;
 }
 
+/* Session boards (marathon + rapid-fire) share rendering but format the score column differently. */
+function sessionRowHtml(r,i,names,meId,labelFn,extra){
+  const me = meId && r.user_id===meId;
+  return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
+    `<span class="rk">${i+1}</span>`+
+    `<span class="nm">${esc(names[r.user_id]||'anon')}</span>`+
+    `<span class="tm">${labelFn(r)}</span></div>`;
+}
+function sessionBoardHtml(title, sublabel, best, names, meId, labelFn){
+  let body;
+  if(!best.length){ body='<div class="empty">no runs yet — be the first</div>'; }
+  else {
+    body = best.slice(0,10).map((r,i)=>sessionRowHtml(r,i,names,meId,labelFn)).join('');
+    const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
+    if(myIdx>=10){ body += '<div class="you-gap">···</div>' + sessionRowHtml(best[myIdx], myIdx, names, meId, labelFn, true); }
+  }
+  return `<div class="board"><div class="board-cap"><h2>${esc(title)}</h2><span class="lvl">${esc(sublabel)}</span></div>${body}</div>`;
+}
+function bestPerUser(rows, mode, dur){
+  const seen={}, best=[];
+  rows.filter(r=>r.mode===mode && r.duration_sec===dur)
+      .sort((a,b)=>{
+        // primary: more score is better
+        if(b.score !== a.score) return b.score - a.score;
+        // secondary: closer to par — fewer keystrokes-over-optimal wins
+        const aOver = (a.keystrokes||0) - (a.optimal||0);
+        const bOver = (b.keystrokes||0) - (b.optimal||0);
+        if(aOver !== bOver) return aOver - bOver;
+        // tertiary: fewer misses (mostly rapid-fire)
+        if((a.misses||0) !== (b.misses||0)) return (a.misses||0) - (b.misses||0);
+        // quaternary: who got there first
+        return new Date(a.created_at||0) - new Date(b.created_at||0);
+      })
+      .forEach(r=>{ if(!seen[r.user_id]){ seen[r.user_id]=true; best.push(r); } });
+  return best;
+}
+const MARATHON_DURS = [{sec:300, label:'5-minute marathon'}, {sec:600, label:'10-minute marathon'}, {sec:900, label:'15-minute marathon'}];
+const RAPID_DURS    = [{sec:30,  label:'30-second rapid-fire'}, {sec:60, label:'60-second rapid-fire'}, {sec:120, label:'120-second rapid-fire'}];
+const marathonScore = r => `${r.score} drill${r.score===1?'':'s'} · ${r.keystrokes} keys`;
+const rapidScore    = r => { const t=r.score+(r.misses||0); const a=t?Math.round(100*r.score/t):100;
+                             return `${r.score} hit${r.score===1?'':'s'} · ${a}%`; };
+
 async function load(){
   const root=document.getElementById('boards');
   if(!sb){
@@ -167,19 +212,31 @@ async function load(){
       '<a href="index.html" class="btn">Go train</a></div>';
     return;
   }
-  let profs=[], runs=[], meId=null;
+  let profs=[], runs=[], sessions=[], meId=null;
   try{
     try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null; }catch(e){}
-    const p=await sb.from('profiles').select('id,handle');
-    profs=p.data||[];
-    const r=await sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
-    runs=r.data||[];
+    const [p, r, s] = await Promise.all([
+      sb.from('profiles').select('id,handle'),
+      sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true}),
+      sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
+    ]);
+    profs=p.data||[]; runs=r.data||[]; sessions=s.data||[];
   }catch(e){
     root.innerHTML='<div class="state"><h2>Couldn’t load times</h2><p>The database isn’t reachable right now. Check the keys and that the tables exist, then refresh.</p></div>';
     return;
   }
   const names={}; profs.forEach(p=>{ names[p.id]=p.handle||'anon'; });
-  let html='';
+
+  // Build the page: sessions first (the competitive boards), then per-drill bests
+  let html='<h3 class="section-title">Marathon</h3>';
+  MARATHON_DURS.forEach(d=>{
+    html += sessionBoardHtml(d.label, 'Session', bestPerUser(sessions,'marathon',d.sec), names, meId, marathonScore);
+  });
+  html += '<h3 class="section-title">Rapid-fire</h3>';
+  RAPID_DURS.forEach(d=>{
+    html += sessionBoardHtml(d.label, 'Session', bestPerUser(sessions,'rapidfire',d.sec), names, meId, rapidScore);
+  });
+  html += '<h3 class="section-title">Per-drill bests</h3>';
   CH.forEach(c=>{
     const seen={}, best=[];
     runs.filter(x=>x.challenge===c.key).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });

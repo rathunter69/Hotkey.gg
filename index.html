@@ -2426,7 +2426,7 @@ function rfSolve(){
   const t=(performance.now()-rfTask.shownAt)/1000;
   const par=rfTask.keys.length;
   marathon.splits.push({ label:rfTask.label, t:+t.toFixed(2), keys:par, optimal:par });
-  marathon.keys+=par; marathon.hits+=1;
+  marathon.keys+=par; marathon.hits+=1; marathon.optimal=(marathon.optimal||0)+par;
   renderRfCard('solved'); updateMarathonHud();
   if(marathon.endAt && performance.now() >= marathon.endAt){ setTimeout(endSession, marathon.advance); return; }
   setTimeout(()=>{ if(marathon && marathon.active) loadNext(); }, marathon.advance);
@@ -2516,7 +2516,7 @@ function endSession(){
   marathon.elapsed = marathon.startAt ? Math.min((performance.now()-marathon.startAt)/1000, marathon.dur) : 0;
   // post to leaderboard (fire-and-forget). Marathon score = drills completed; rapid-fire score = hits.
   const score = (marathon.mode === 'rapidfire') ? (marathon.hits||0) : (marathon.splits ? marathon.splits.length : 0);
-  recordSession(marathon.mode, marathon.dur, score, marathon.keys||0, marathon.misses||0);
+  recordSession(marathon.mode, marathon.dur, score, marathon.keys||0, marathon.misses||0, marathon.optimal||0);
   showSessionSummary();
 }
 function exitSession(){
@@ -3155,13 +3155,13 @@ async function recordRun(t){
   }catch(e){ return false; }
 }
 
-async function recordSession(mode, durationSec, score, keystrokes, misses){
+async function recordSession(mode, durationSec, score, keystrokes, misses, optimal){
   if(!sb || !me_user || !me_member) return false;
   if(!Number.isFinite(score) || score < 1) return false;        // don't post empty sessions
   try{
     const { error } = await sb.from('sessions').insert({
       user_id: me_user.id, mode, duration_sec: durationSec,
-      score, keystrokes: keystrokes||0, misses: misses||0
+      score, keystrokes: keystrokes||0, misses: misses||0, optimal: optimal||0
     });
     if(error) console.warn('session record failed:', error.message);
     return !error;
