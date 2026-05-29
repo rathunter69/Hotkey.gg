@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hotkey.gg — Excel shortcut reference</title>
+<title>reference · hotkey.gg</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,14 +30,15 @@
   /* ---------- top nav (site-wide) ---------- */
   .topnav{position:sticky; top:0; z-index:90; background:rgba(12,13,14,.82); backdrop-filter:blur(8px);
     -webkit-backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
-  .topnav-in{max-width:1180px; margin:0 auto; padding:0 22px; height:48px; display:flex; align-items:center; gap:22px;}
+  .topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:52px; display:flex; align-items:center; gap:18px;}
   .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none;}
   .topnav-brand b{color:var(--accent); font-weight:700;}
-  .topnav-links{display:flex; align-items:center; gap:2px; flex:1;}
-  .topnav-link{font-family:var(--mono); font-size:12.5px; color:var(--muted); text-decoration:none;
-    padding:7px 12px; border-radius:6px; transition:.13s; letter-spacing:.2px;}
+  .topnav-links{display:flex; align-items:center; gap:6px; margin:0 auto;}
+  .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
+    padding:8px 14px; border-radius:6px; transition:.13s; letter-spacing:.2px;}
   .topnav-link:hover{color:var(--text); background:var(--surface);}
   .topnav-link.active{color:var(--accent); background:var(--surface);}
+  @media(max-width:760px){ .topnav-in{padding:0 16px} }
 
   /* ---------- header (page heading) ---------- */
   header{padding:32px 0 22px;}

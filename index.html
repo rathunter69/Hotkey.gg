@@ -30,24 +30,32 @@
      top-aligned, scrollable layout when it isn't — so the header/ribbon never clip on laptops */
   .app{width:100%; max-width:1040px; margin:auto 0}
 
-  /* ---------- TOP NAV (sticky, site-wide) ---------- */
+  /* ---------- TOP NAV (sticky, three sections: brand · pages · tools) ---------- */
   .topnav{position:sticky; top:0; z-index:90; background:rgba(12,13,14,.82); backdrop-filter:blur(8px);
     -webkit-backdrop-filter:blur(8px); border-bottom:1px solid var(--line); margin-bottom:22px}
-  .topnav-in{max-width:1180px; margin:0 auto; padding:0 22px; height:48px; display:flex; align-items:center; gap:22px}
+  .topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:52px; display:flex; align-items:center; gap:18px}
   .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
   .topnav-brand b{color:var(--accent); font-weight:700}
-  .topnav-links{display:flex; align-items:center; gap:2px; flex:1}
-  .topnav-link{font-family:var(--mono); font-size:12.5px; color:var(--muted); text-decoration:none;
-    padding:7px 12px; border-radius:6px; cursor:pointer; transition:.13s; letter-spacing:.2px}
+  .topnav-pages{display:flex; align-items:center; gap:6px; margin:0 auto}
+  .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
+    padding:8px 14px; border-radius:6px; cursor:pointer; transition:.13s; letter-spacing:.2px}
   .topnav-link:hover{color:var(--text); background:var(--surface)}
   .topnav-link.active{color:var(--accent); background:var(--surface)}
-  .topnav-right{display:flex; align-items:center; gap:10px; margin-left:auto}
-  .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:20px; cursor:pointer; padding:4px 10px}
-  @media (max-width: 720px){
-    .topnav-links{display:none; position:absolute; top:48px; left:0; right:0; flex-direction:column; gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0}
-    .topnav-links.open{display:flex}
+  .topnav-tools{display:flex; align-items:center; gap:2px}
+  .topnav-icon{background:none; border:none; color:var(--muted); cursor:pointer; padding:8px;
+    border-radius:6px; display:flex; align-items:center; justify-content:center; transition:.13s}
+  .topnav-icon:hover{color:var(--text); background:var(--surface)}
+  .topnav-icon svg{display:block}
+  .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
+  .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
+  @media (max-width:760px){
+    .topnav-in{padding:0 16px; gap:10px}
+    .topnav-pages{display:none; position:absolute; top:52px; left:0; right:0; flex-direction:column;
+      gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0}
+    .topnav-pages.open{display:flex}
     .topnav-link{padding:12px 22px; border-radius:0; width:100%}
-    .topnav-burger{display:block}
+    .topnav-tools .auth-slot{display:none}
+    .topnav-burger{display:block; margin-left:auto}
   }
 
   .tabs{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:18px}
@@ -612,14 +620,18 @@
 <nav class="topnav">
   <div class="topnav-in">
     <a class="topnav-brand" href="/" title="hotkey.gg — excel trainer">hotkey<b>.gg</b></a>
-    <div class="topnav-links">
+    <div class="topnav-pages">
       <a class="topnav-link active" href="/">trainer</a>
       <a class="topnav-link" href="leaderboard.html">leaderboard</a>
       <a class="topnav-link" href="reference.html">reference</a>
-      <a class="topnav-link" id="navCareer" title="your card and rank">career</a>
-      <a class="topnav-link" id="navThemes" title="pick a theme">themes</a>
     </div>
-    <div class="topnav-right">
+    <div class="topnav-tools">
+      <button class="topnav-icon" id="navShortcuts" title="keyboard shortcuts (?)" aria-label="keyboard shortcuts">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+      <button class="topnav-icon" id="navThemes" title="themes" aria-label="themes">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.83-.44-1.12-.29-.29-.44-.65-.44-1.12a1.64 1.64 0 0 1 1.67-1.67h1.99c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2z"/></svg>
+      </button>
       <div class="auth-slot" id="authSlot"></div>
     </div>
     <button class="topnav-burger" id="navBurger" aria-label="menu">≡</button>
@@ -2012,9 +2024,9 @@ $('guideToggle').addEventListener('click',toggleGuided);
 $('startBtn').addEventListener('click', tryEnter);
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
-{ const nc=$('navCareer'); if(nc) nc.addEventListener('click', e=>{ e.preventDefault(); openProfile(); });
-  const nt=$('navThemes'); if(nt) nt.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
-  const nb=$('navBurger'); if(nb) nb.addEventListener('click', ()=>{ const l=document.querySelector('.topnav-links'); if(l) l.classList.toggle('open'); }); }
+{ const ns=$('navShortcuts'); if(ns) ns.addEventListener('click', e=>{ e.preventDefault(); openKbd(); });
+  const nt=$('navThemes');    if(nt) nt.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
+  const nb=$('navBurger');    if(nb) nb.addEventListener('click', ()=>{ const l=document.querySelector('.topnav-pages'); if(l) l.classList.toggle('open'); }); }
 
 // guest-mode banner when Supabase isn't configured (no leaderboard, no saves)
 if(!sb){

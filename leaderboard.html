@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leaderboard — hotkey.gg</title>
+<title>leaderboard · hotkey.gg</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,13 +31,14 @@
   a{color:inherit; text-decoration:none}
 
   nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(10px); background:rgba(12,13,14,.82); border-bottom:1px solid var(--line)}
-  .nav-in{display:flex; align-items:center; gap:22px; height:48px; max-width:1180px; margin:0 auto; padding:0 22px}
+  .nav-in{display:flex; align-items:center; gap:18px; height:52px; max-width:1240px; margin:0 auto; padding:0 28px}
   .brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
   .brand b{color:var(--accent)}
-  .nav-links{display:flex; align-items:center; gap:2px; flex:1}
-  .nav-links a{font-family:var(--mono); font-size:12.5px; color:var(--muted); padding:7px 12px; border-radius:6px; transition:.13s; text-decoration:none; letter-spacing:.2px}
+  .nav-links{display:flex; align-items:center; gap:6px; margin:0 auto}
+  .nav-links a{font-family:var(--mono); font-size:13px; color:var(--muted); padding:8px 14px; border-radius:6px; transition:.13s; text-decoration:none; letter-spacing:.2px}
   .nav-links a:hover{color:var(--text); background:var(--surface)}
   .nav-links a.on{color:var(--accent); background:var(--surface)}
+  @media(max-width:760px){ .nav-in{padding:0 16px} }
   .brand b{color:var(--accent)}
   .menu-btn{display:none}
 
@@ -138,8 +139,8 @@
    SUPABASE — paste the SAME two values you used in index.html.
    Leave blank and the page shows a friendly "not connected" note.
    ============================================================ */
-const SUPABASE_URL      = '';   // ← your Project URL
-const SUPABASE_ANON_KEY = '';   // ← your anon / public key
+const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
