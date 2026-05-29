@@ -27,15 +27,19 @@
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
     display:flex; flex-direction:column; align-items:center;
-    min-height:100vh; padding:0 0 20px; user-select:none; -webkit-user-select:none;
+    /* Monkeytype-style breathing room: nav doesn't kiss the top of the viewport, content floats with vertical
+       centering when the viewport is tall enough. The flex column + margin:auto on .app does the centering. */
+    min-height:100vh; padding:36px 0 40px; user-select:none; -webkit-user-select:none;
   }
   .app{padding:6px 16px 0}
   /* auto top/bottom margins center the app when the viewport is tall enough, and collapse to a
      top-aligned, scrollable layout when it isn't — so the header/ribbon never clip on laptops */
   .app{width:100%; max-width:1040px; margin:auto 0}
 
-  /* ---------- TOP NAV (sticky, three sections: brand · pages · tools) ---------- */
-  .topnav{position:sticky; top:0; z-index:90; background:var(--bg); margin-bottom:22px}
+  /* ---------- TOP NAV (three sections: brand · pages · tools) ----------
+     Not sticky — Monkeytype-style, the nav scrolls with the page so users in focused-trainer mode aren't
+     looking at a header occupying the top of their viewport while they're trying to read a drill grid. */
+  .topnav{width:100%; background:var(--bg); margin-bottom:44px; position:relative}
   .topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:52px; display:flex; align-items:center; gap:18px}
   .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
   .topnav-brand b{color:var(--accent); font-weight:700}
@@ -4097,18 +4101,29 @@ async function loadProfileData(){
   const players=new Set(runs.map(r=>r.user_id)).size;
   return { drills, attempted:attempted.length, avgPct, firsts, bestRank, players };
 }
-function tierOf(avgPct){
-  if(avgPct===null) return {name:'Unranked', cls:'tier-unranked'};
-  if(avgPct<=0.05) return {name:'Diamond',  cls:'tier-diamond'};
-  if(avgPct<=0.15) return {name:'Platinum', cls:'tier-platinum'};
-  if(avgPct<=0.30) return {name:'Gold',     cls:'tier-gold'};
-  if(avgPct<=0.55) return {name:'Silver',   cls:'tier-silver'};
+/* Tier assignment is intentionally punitive — Unranked is the default and the only way out is breadth + placement.
+   Without a minimum drill floor, the first person to touch a drill is #1 of 1 and gets Diamond. We require at least
+   5 drills attempted before any tier appears, and each tier above Bronze compounds an attempted-drill threshold
+   onto a placement percentile. Diamond demands both deep play (15/18 drills) AND elite placement (top 5%) —
+   making it actually rare. The placement axis (avgPct) already averages this user's rank-percentage across drills
+   so a single fluke "#1 of 2" run can't carry the rest. The remaining edge case — a player who does 5 drills all
+   blazingly fast — caps at Silver here, since Gold needs 10+ drills. */
+function tierOf(avgPct, attemptedCount){
+  if(avgPct===null || (attemptedCount||0) < 5) return {name:'Unranked', cls:'tier-unranked'};
+  if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Diamond',  cls:'tier-diamond'};
+  if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Platinum', cls:'tier-platinum'};
+  if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'Gold',     cls:'tier-gold'};
+  if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Silver',   cls:'tier-silver'};
   return {name:'Bronze', cls:'tier-bronze'};
 }
 function renderProfile(m, d){
-  const tier=tierOf(d.avgPct);
+  const tier=tierOf(d.avgPct, d.attempted);
+  // Standing is meaningless before the threshold — show progress toward Bronze instead so the user knows what to do.
+  // After threshold, show "top X%" (the same average-percentile measure that feeds the tier).
   const fmtMs=ms=>(ms/1000).toFixed(2)+'s';
-  const standing = d.avgPct===null ? '—' : 'top '+Math.max(1,Math.round(d.avgPct*100))+'%';
+  const standing = (d.attempted < 5)
+    ? d.attempted+'/5 drills toward Bronze'
+    : (d.avgPct===null ? '—' : 'top '+Math.max(1,Math.round(d.avgPct*100))+'%');
   let body='', lastG=null;
   d.drills.forEach(x=>{
     if(x.group!==lastG){ body+=`<div class="pc-grouphdr">${escHtml(x.group)}</div>`; lastG=x.group; }
