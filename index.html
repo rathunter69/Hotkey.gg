@@ -1693,25 +1693,31 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation tour', par:12, parKeys:4,
-    prompt:'Four core navigation chords back to back. Tour the edges with Ctrl+Home, Ctrl+→, Ctrl+↓ — then grab the whole used range with Ctrl+Shift+Home. No End key required.',
-    req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em> &rarr; <em>ctrl+shift+home</em>',
+    name:'Navigate', label:'Navigation tour', par:20, parKeys:7,
+    prompt:'Full obstacle course: navigate the edges with four Ctrl-arrow chords, then drill the structural ops that reshape banking models — Shift+Space to grab entire rows, Ctrl+Shift+= to insert above, Ctrl+- to delete. No End key required.',
+    req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em> &rarr; <em>ctrl+shift+home</em> &rarr; <em>shift+space</em> &rarr; <em>ctrl+shift+=</em> &rarr; <em>ctrl+&minus;</em>',
     guide:[
       '<kbd>ctrl</kbd>+<kbd>home</kbd>',
       '<kbd>ctrl</kbd>+<kbd>&rarr;</kbd>',
       '<kbd>ctrl</kbd>+<kbd>&darr;</kbd>',
-      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>home</kbd>'
+      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>home</kbd>',
+      '<kbd>shift</kbd>+<kbd>space</kbd>',
+      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>=</kbd>',
+      '<kbd>ctrl</kbd>+<kbd>&minus;</kbd>'
     ],
-    targets:['A1','E1','E7','A1:E7'],
+    targets:['A1','E1','E7','A1:E7','A1:H7','A1:H7','A1:H7'],
     demo(){ return [
-      {sel:'A1',    keys:[Kb.ctrlHome]},
-      {sel:'E1',    keys:[Kb.ctrlRight]},
-      {sel:'E7',    keys:[Kb.ctrlDown]},
-      {sel:'A1:E7', active:'A1', keys:[{key:'Home', ctrl:true, shift:true}]}
+      {sel:'C4',    keys:[Kb.ctrlHome]},
+      {sel:'A1',    keys:[Kb.ctrlRight]},
+      {sel:'E1',    keys:[Kb.ctrlDown]},
+      {sel:'E7',    keys:[{key:'Home', ctrl:true, shift:true}]},
+      {sel:'A1:E7', keys:[{key:' ',    shift:true}]},
+      {sel:'A1:H7', keys:[{key:'=',    ctrl:true, shift:true}]},
+      {sel:'A1:H7', keys:[{key:'-',    ctrl:true}]},
     ]; },
     build(){
       // 7×5 block of an income-statement-style table; cursor placed deliberately in the middle so plain arrows
-      // would take many presses but the Ctrl-arrow tour visits A1 → E1 → E7 → (whole range) in four chords.
+      // would take many presses but the chord tour visits A1 → E1 → E7 → whole range → reshape ops in seven chords.
       const cells={};
       cells['A1']={...blankCell(),value:'Model',txt:true,bold:true};
       const labels=['Revenue','COGS','SG&A','Opex','D&A','EBIT'];
@@ -1720,25 +1726,40 @@ const CHALLENGES = {
       for(let r=2;r<=7;r++) for(let c=2;c<=5;c++){
         cells[colLetter(c)+r]={...blankCell(),value:rnd(20,99)*10,fmtStyle:'comma',decimals:0};
       }
-      // Start at C4 — middle of the data, surrounded on all sides so the chord jumps are visually meaningful.
       return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74}};
     },
-    // Sequential progression: each step only counts once the previous one is done. We mutate state on S
-    // because checks(S) is called on every render — once a target is reached, the flag latches true.
-    // Step 4: Ctrl+Shift+Home — extends selection from E7 (current) back up to A1. Check: cursor at A1
-    // AND a selection exists with the opposite corner at E7.
+    // Sequential progression: each step latches once and only once the previous one has — out-of-order presses
+    // don't satisfy later checks. We snapshot the initial ROWS count on first call so the insert/delete checks
+    // can compare against it (insert grows ROWS; delete brings it back).
     checks(S){
-      if(!S.navProgress) S.navProgress = {home:false, right:false, down:false, selAll:false};
-      if(!S.navProgress.home   && S.active.r===1 && S.active.c===1) S.navProgress.home  = true;
-      if( S.navProgress.home   && !S.navProgress.right  && S.active.r===1 && S.active.c===5) S.navProgress.right  = true;
-      if( S.navProgress.right  && !S.navProgress.down   && S.active.r===7 && S.active.c===5) S.navProgress.down   = true;
-      if( S.navProgress.down   && !S.navProgress.selAll && S.active.r===1 && S.active.c===1
-          && S.sel && S.sel.r===7 && S.sel.c===5) S.navProgress.selAll = true;
+      if(!S.navProgress) S.navProgress = {
+        home:false, right:false, down:false, selAll:false, rowSel:false, rowIns:false, rowDel:false,
+        initialRows: S.ROWS
+      };
+      const np = S.navProgress;
+      if(!np.home   && S.active.r===1 && S.active.c===1) np.home  = true;
+      if( np.home   && !np.right  && S.active.r===1 && S.active.c===5) np.right  = true;
+      if( np.right  && !np.down   && S.active.r===7 && S.active.c===5) np.down   = true;
+      if( np.down   && !np.selAll && S.active.r===1 && S.active.c===1
+          && S.sel && S.sel.r===7 && S.sel.c===5) np.selAll = true;
+      // Step 5: Shift+Space extended the selection to all columns (rows 1-7 × cols 1..COLS)
+      if(np.selAll && !np.rowSel && S.sel){
+        const r1=Math.min(S.active.r,S.sel.r), r2=Math.max(S.active.r,S.sel.r);
+        const c1=Math.min(S.active.c,S.sel.c), c2=Math.max(S.active.c,S.sel.c);
+        if(r1===1 && r2===7 && c1===1 && c2===8) np.rowSel = true;
+      }
+      // Step 6: rows inserted — sheet has grown beyond its starting row count.
+      if(np.rowSel && !np.rowIns && S.ROWS > np.initialRows) np.rowIns = true;
+      // Step 7: rows deleted — sheet has shrunk back to (or below) the starting row count.
+      if(np.rowIns && !np.rowDel && S.ROWS <= np.initialRows) np.rowDel = true;
       return [
-        {label:'Ctrl+Home \u2192 A1',                            ok: S.navProgress.home},
-        {label:'Ctrl+\u2192 to end of header row (E1)',          ok: S.navProgress.right},
-        {label:'Ctrl+\u2193 to bottom of column (E7)',           ok: S.navProgress.down},
-        {label:'Ctrl+Shift+Home \u2192 select the whole range',  ok: S.navProgress.selAll},
+        {label:'Ctrl+Home \u2192 A1',                                ok: np.home},
+        {label:'Ctrl+\u2192 to end of header row (E1)',              ok: np.right},
+        {label:'Ctrl+\u2193 to bottom of column (E7)',               ok: np.down},
+        {label:'Ctrl+Shift+Home \u2192 select the whole range',      ok: np.selAll},
+        {label:'Shift+Space \u2192 select entire rows full width',   ok: np.rowSel},
+        {label:'Ctrl+Shift+= \u2192 insert rows above',              ok: np.rowIns},
+        {label:'Ctrl+\u2212 \u2192 delete the inserted rows',        ok: np.rowDel},
       ];
     }
   }
@@ -2612,8 +2633,74 @@ function move(dr,dc,shift,ctrl){
   // which is why the old dropbottom drill silently "didn't complete" even when the cursor landed correctly.
   checkWin();
 }
-function selectRow(){ S.sel={r:S.active.r,c:1}; S.active={r:S.active.r,c:COLS}; render(); }
-function selectCol(){ S.sel={r:1,c:S.active.c}; S.active={r:S.ROWS,c:S.active.c}; render(); }
+function selectRow(){
+  // Excel parity: Shift+Space extends the selection to full width WHILE preserving the row range.
+  // If a multi-row selection already exists, expand each row to all columns instead of collapsing to a single row.
+  if(S.sel){
+    const r1 = Math.min(S.active.r, S.sel.r);
+    const r2 = Math.max(S.active.r, S.sel.r);
+    S.sel    = {r:r1, c:1};
+    S.active = {r:r2, c:COLS};
+  } else {
+    S.sel={r:S.active.r,c:1}; S.active={r:S.active.r,c:COLS};
+  }
+  render();
+}
+function selectCol(){
+  // Same as selectRow but for columns — Ctrl+Space preserves column span and extends to all rows.
+  if(S.sel){
+    const c1 = Math.min(S.active.c, S.sel.c);
+    const c2 = Math.max(S.active.c, S.sel.c);
+    S.sel    = {r:1, c:c1};
+    S.active = {r:S.ROWS, c:c2};
+  } else {
+    S.sel={r:1,c:S.active.c}; S.active={r:S.ROWS,c:S.active.c};
+  }
+  render();
+}
+// ============================================================
+// ROW / COLUMN INSERT + DELETE
+// Shifts all cells whose row (or column) index falls at/after `at` by `delta` positions.
+// delta > 0 = insert (shift things down/right); delta < 0 = delete (shift things up/left).
+// Cells that get deleted are dropped. Formula reference translation is NOT done in this pass —
+// the navigation drill data has no formulas, and translating refs across an insert/delete is a
+// separate engine concern (Excel's #REF! behavior). Worth adding when a drill needs it.
+// ============================================================
+function shiftCellsRows(atRow, delta){
+  const newCells = {};
+  for(const key in S.cells){
+    const m = key.match(/^([A-Z]+)(\d+)$/); if(!m) continue;
+    const col = m[1]; const row = +m[2];
+    if(delta > 0){
+      if(row >= atRow) newCells[col + (row + delta)] = S.cells[key];
+      else             newCells[key] = S.cells[key];
+    } else {
+      const count = -delta;
+      if(row >= atRow && row < atRow + count){ /* dropped */ }
+      else if(row >= atRow + count) newCells[col + (row - count)] = S.cells[key];
+      else                          newCells[key] = S.cells[key];
+    }
+  }
+  return newCells;
+}
+function shiftCellsCols(atCol, delta){
+  const newCells = {};
+  const letterToCol = ls => { let n=0; for(let i=0;i<ls.length;i++) n = n*26 + (ls.charCodeAt(i)-64); return n; };
+  for(const key in S.cells){
+    const m = key.match(/^([A-Z]+)(\d+)$/); if(!m) continue;
+    const col = letterToCol(m[1]); const row = m[2];
+    if(delta > 0){
+      if(col >= atCol) newCells[colLetter(col + delta) + row] = S.cells[key];
+      else             newCells[key] = S.cells[key];
+    } else {
+      const count = -delta;
+      if(col >= atCol && col < atCol + count){ /* dropped */ }
+      else if(col >= atCol + count) newCells[colLetter(col - count) + row] = S.cells[key];
+      else                          newCells[key] = S.cells[key];
+    }
+  }
+  return newCells;
+}
 
 function codeToChar(code,k){
   if(/^Key[A-Z]$/.test(code)) return code.slice(3);
@@ -2700,6 +2787,37 @@ document.addEventListener('keydown',e=>{
     e.preventDefault();
     if(!demoPlaying && !editing && gameMode==='classic'){ k==='PageDown' ? nextChallenge() : prevChallenge(); }
     return;
+  }
+
+  // INSERT / DELETE — Ctrl+Shift+= (insert) and Ctrl+- (delete). They operate when the selection
+  // covers entire rows or columns; otherwise no-op (Excel would show a dialog, which we skip).
+  // Must come BEFORE the browser-zoom block below, which swallows the same Ctrl+=/+/- keystrokes.
+  if((e.ctrlKey||e.metaKey) && !demoPlaying && !done){
+    const isInsert = e.shiftKey && (k==='+' || k==='=');
+    const isDelete = !e.shiftKey && k==='-';
+    if(isInsert || isDelete){
+      const r = selRange();
+      const isFullRow = r.c1===1 && r.c2===COLS;
+      const isFullCol = r.r1===1 && r.r2===S.ROWS;
+      if(isFullRow || isFullCol){
+        e.preventDefault(); startClock();
+        logKey(isInsert ? 'Ctrl+Shift+=' : 'Ctrl+-');
+        pushUndo();
+        if(isFullRow){
+          const count = r.r2 - r.r1 + 1;
+          S.cells = shiftCellsRows(r.r1, isInsert ? count : -count);
+          S.ROWS = isInsert ? S.ROWS + count : Math.max(1, S.ROWS - count);
+          // After insert, the selection (rows r1..r2) now points to the new empty rows — keep it.
+          // After delete, collapse to the row that absorbed the position.
+          if(isDelete){ S.sel=null; S.active={r:r.r1, c:1}; }
+        } else {
+          const count = r.c2 - r.c1 + 1;
+          S.cells = shiftCellsCols(r.c1, isInsert ? count : -count);
+          if(isDelete){ S.sel=null; S.active={r:1, c:r.c1}; }
+        }
+        commitAction(); return;
+      }
+    }
   }
 
   // never let browser zoom combos (ctrl/cmd +/-/0) collide with the grid
@@ -4162,7 +4280,7 @@ const DRILL_DESC = {
   lookup:'Pull a value out of a table with INDEX/MATCH',
   sort:'Sort a deal table descending — Alt A S D',
   series:'Fill a year header across — Alt H F I S',
-  navigation:'Ctrl+Home → Ctrl+→ → Ctrl+↓ → Ctrl+Shift+Home — four nav chords + select-all',
+  navigation:'Full obstacle course: 4 nav chords + select rows + insert/delete',
 };
 const DRILL_GROUPS = [
   {name:'Foundations', keys:['navigation','copyover']},
