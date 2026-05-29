@@ -632,6 +632,13 @@
   .rf-cell.fx{color:var(--accent)}
   .rf-cell.link{color:var(--accent); text-decoration:underline}
   .rf-cell.border{box-shadow:inset 0 0 0 2px var(--accent), inset 0 0 0 5px var(--surface), inset 0 0 0 7px var(--text)}
+  /* Single-edge border variants — banker-style subtotal/total lines */
+  .rf-cell.border-top   {box-shadow:inset 0  2px 0 0 var(--accent), inset 0  5px 0 0 var(--surface), inset 0  7px 0 0 var(--text)}
+  .rf-cell.border-bottom{box-shadow:inset 0 -2px 0 0 var(--accent), inset 0 -5px 0 0 var(--surface), inset 0 -7px 0 0 var(--text)}
+  /* Comment marker — Excel's red triangle in the top-right corner of a commented cell */
+  .rf-cell.comment{position:relative}
+  .rf-cell.comment::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
+    border-top:9px solid var(--bad); border-left:9px solid transparent}
   /* success pulse on the rf-cell — sharp flash then quick fade. Faster than transition: feels like the chord SNAPPED into place */
   @keyframes rfCellFlash {
     0%   { background:var(--accent); color:#000; transform:scale(1.04); box-shadow:inset 0 0 0 2px var(--accent), 0 0 0 0 var(--accent-glow); }
@@ -895,9 +902,9 @@
     <div class="landing-cta">
       <button class="start-btn" id="startBtn">Start training <kbd class="kbd-cta">↵</kbd></button>
       <span class="modes">
+        <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
         <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
         <span class="mode-chip pick" id="chipMarathon" title="random drills against a clock">⏱ Marathon</span>
-        <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
       </span>
     </div>
     <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · everything keyboard</span></div>
@@ -2925,7 +2932,20 @@ $('picker').addEventListener('click', e=>{ if(e.target===$('picker')) closePicke
    (one shortcut per round), both timed against a clock
    ============================================================ */
 let modesOpen=false, sessionOpen=false, modesMode='marathon';
-let rfTask=null, lastRapid=null;
+let rfTask=null, lastRapid=null, rfShuffleBag=[];
+// Fisher-Yates shuffle for the rapid-fire bag — every op appears exactly once per cycle before any repeat,
+// and the first op of a new cycle is swapped if it would match the last op served (no cross-cycle dupes).
+function rfReshuffleBag(){
+  const bag = [...RF_OPS];
+  for(let i = bag.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+  if(lastRapid && bag.length > 1 && bag[0].op === lastRapid){
+    [bag[0], bag[1]] = [bag[1], bag[0]];
+  }
+  rfShuffleBag = bag;
+}
 
 const SESSION_CFG = {
   marathon:  { title:'⏱ marathon', unit:'drills', noun:'marathon',
@@ -3052,7 +3072,8 @@ const RF_OPS = [
     show: c=>({text:c.formatted}),
     solved: c=>({text:String(c.num)}) },
 
-  // — BORDERS —
+  // — BORDERS — high-value for banking models (subtotal/total lines).
+  // Each has both the chord and the ribbon path where one exists; new variants are ribbon-only.
   { op:'border', label:'Outline border', keys:['Ctrl','Shift','&'], match: RFM.ctrlShift('&','7'),
     alts:[ { keys:['Alt','H','B','S'], matchSeq: RFM.altSeq(['h','b','s']) } ],
     make: ()=> ({text:pickHeader()}),
@@ -3060,10 +3081,21 @@ const RF_OPS = [
     show: c=>({text:c.text}),
     solved: c=>({text:c.text, border:true}) },
   { op:'noborder', label:'Remove borders', keys:['Ctrl','Shift','_'], match: RFM.ctrlShift('_','-'),
+    alts:[ { keys:['Alt','H','B','N'], matchSeq: RFM.altSeq(['h','b','n']) } ],
     make: ()=> ({text:pickHeader()}),
     instr: ()=>'Strip the borders off',
     show: c=>({text:c.text, border:true}),
     solved: c=>({text:c.text, border:false}) },
+  { op:'border_top', label:'Top border', keys:['Alt','H','B','T'], matchSeq: RFM.altSeq(['h','b','t']),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Add a top border (subtotal line)',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text, borderTop:true}) },
+  { op:'border_bottom', label:'Bottom border', keys:['Alt','H','B','B'], matchSeq: RFM.altSeq(['h','b','b']),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Add a bottom border (subtotal line)',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text, borderBottom:true}) },
   // Filter activation — pure muscle-memory drill for Ctrl+Shift+L. No filter engine; the ▼ caret
   // on solve signals "filter dropdown now available" the same way Excel's header changes after activation.
   { op:'filter', label:'Filter', keys:['Ctrl','Shift','L'], match: RFM.ctrlShift('L','l'),
@@ -3241,7 +3273,39 @@ const RF_OPS = [
     instr: ()=>'Copy this cell',
     show: c=>({text:c.text}),
     solved: c=>({text:c.text+'  \u2713', italic:true}) },
+  // Paste values — the most-used paste-special variant in banking models (kills the formula, keeps the number).
+  { op:'paste_values', label:'Paste values', keys:['Alt','H','V','V'], matchSeq: RFM.altSeq(['h','v','v']),
+    make: ()=> { const ref=rfFormulaRef(); const v=rfBig(); return {ref, formula:'='+ref+'*1.05', val:v.toLocaleString('en-US')}; },
+    instr: ()=>'Paste as values only',
+    show: c=>({text:c.formula, fx:true}),
+    solved: c=>({text:c.val}) },
+  // Add comment — Shift+F2 stamps Excel's red-triangle indicator in the top-right of the cell.
+  { op:'add_comment', label:'Add comment', keys:['Shift','F2'],
+    match: e=>e.shiftKey&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&e.key==='F2',
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Drop a comment on this cell',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text, comment:true}) },
 ];
+// Category map for RF_OPS. Lookup by op key. Used by future features (banking-focus filter,
+// per-category cycling, settings UI). Kept separate from RF_OPS so updates don't touch op definitions.
+// Categories chosen for banking workflow relevance: 'styling' / 'alignment' / 'numbers' / 'borders'
+// 'editing' / 'navigation' / 'formulas' / 'data' / 'stamps' / 'workflow'.
+const RF_CAT = {
+  bold:'styling', italic:'styling', underline:'styling', strike:'styling', blue_input:'styling',
+  align_center:'alignment', align_left:'alignment', align_right:'alignment',
+  currency:'numbers', percent:'numbers', comma:'numbers', date:'numbers',
+  time:'numbers', scientific:'numbers', general:'numbers',
+  border:'borders', noborder:'borders', border_top:'borders', border_bottom:'borders',
+  filter:'data', sort:'data',
+  snaphome:'navigation', find:'navigation', goto:'navigation', replace:'navigation',
+  today:'stamps', now:'stamps', add_comment:'stamps',
+  hyperlink:'editing', clear_contents:'editing', clear_all:'editing', clear_formats:'editing',
+  copy:'editing', paste_values:'editing', select_all:'editing',
+  abs:'formulas', autosum:'formulas', fill_down:'formulas', fill_right:'formulas',
+  insert_function:'formulas', show_formulas:'formulas', trace_precedents:'formulas', format_cells:'formulas',
+  save:'workflow', new_sheet:'workflow', freeze_panes:'workflow',
+};
 const rfMid = () => Math.floor(Math.random()*900) + 100;     // 100–999, fits cleanly in a mini cell
 let rfBusy=false;
 let hardoMode=false;
@@ -3502,9 +3566,10 @@ function openThemes(){
   m.addEventListener('click', e=>{ if(e.target===m) closeThemes(); }, {once:true});
 }
 function loadRapidCard(){
-  let op, guard=0;
-  do{ op=RF_OPS[Math.floor(Math.random()*RF_OPS.length)]; guard++; } while(RF_OPS.length>1 && op.op===lastRapid && guard<8);
-  lastRapid=op.op;
+  // Draw from the shuffle bag — refill (Fisher-Yates) when empty so every op appears once per cycle.
+  if(rfShuffleBag.length === 0) rfReshuffleBag();
+  const op = rfShuffleBag.shift();
+  lastRapid = op.op;
   const data = op.make();
   // Build a unified matchers list: primary + each alt. Stateful sequence matchers are instantiated fresh per task.
   // Each entry: {keys, type:'chord'|'seq', test: fn(e) -> bool (chord) or 'match'|'partial'|'no' (seq)}
@@ -3533,7 +3598,10 @@ function renderRfCard(state){
       // single-cell render: text + visual flags on the cell itself
       cell.innerHTML = '';
       cell.textContent = view.text||'\u00A0';
-      const flags=['bold','italic','underline','strike','fx','link','border'].filter(f=>view[f]).join(' ');
+      const flags=['bold','italic','underline','strike','fx','link','border','comment']
+        .filter(f=>view[f]).join(' ')
+        + (view.borderTop ? ' border-top' : '')
+        + (view.borderBottom ? ' border-bottom' : '');
       cell.className='rf-cell'+(flags?' '+flags:'')+(state==='solved'?' flash':'');
       // alignment override (for the center/right-align RF ops) — flex-based since rf-cell is display:flex
       cell.style.justifyContent = view.align==='c' ? 'center' : view.align==='r' ? 'flex-end' : '';
@@ -3582,6 +3650,11 @@ function renderRfCard(state){
 function rapidKey(e){
   const k=e.key;
   if(k==='Escape'){ e.preventDefault(); return; }
+  // 's' (bare, no modifiers) skips the current task — same convention as marathon's drill skip.
+  // Ctrl+S still routes to the save op since the ctrl check above excludes the chord path.
+  if((k==='s'||k==='S') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey){
+    e.preventDefault(); rfSkip(); return;
+  }
   // Keys that browsers love to steal — Alt+Home (homepage), Ctrl+Home (scroll-to-top in some configs),
   // Ctrl+T (new tab), F5 (refresh), etc. Block defaults for ANY modifier-plus-key, navigation key, or function
   // key inside rapid-fire — the session has full keyboard ownership regardless of whether it matches an op.
@@ -3645,6 +3718,15 @@ function rfMiss(){
   marathon.streak = 0;            // streak breaks immediately on a miss
   updateStreakUI(0);              // hide the counter so the user sees+hears the reset together
   const keys=$('rfKeys'); if(keys){ keys.classList.remove('miss'); void keys.offsetWidth; keys.classList.add('miss'); }
+}
+// Skip: user opts to bypass the current task. No time recorded, streak resets, skip counter increments.
+// No visual fanfare — they chose to move on, no need to flash.
+function rfSkip(){
+  if(rfBusy || !rfTask) return;
+  marathon.skipped = (marathon.skipped||0) + 1;
+  marathon.streak = 0;
+  updateStreakUI(0);
+  loadNext();
 }
 
 function openModes(mode){ if(demoPlaying) return; modesMode=mode||'marathon';
@@ -3712,14 +3794,14 @@ function startSession(mode, durSec){
   const cfg=SESSION_CFG[mode];
   marathon={ mode, dur:durSec, startAt:0, endAt:0, splits:[], keys:0, checks:0, optimal:0,
     hits:0, misses:0, streak:0, bestStreak:0, active:true, tickH:null, unit:cfg.unit, advance:cfg.advance };
-  lastKey=null; lastRapid=null;
+  lastKey=null; lastRapid=null; rfShuffleBag=[];
   document.body.classList.add('session');
   if(mode==='rapidfire') document.body.classList.add('rapidfire');
   updateStreakUI(0);  // reset visual to hidden at the start of every session
   const ue=$('mhUnit'); if(ue) ue.textContent=cfg.unit;
   const hh=$('mhHints'); if(hh){
     hh.innerHTML = (mode==='rapidfire')
-      ? '<kbd>g</kbd> hints · <kbd>shift+esc</kbd> end'
+      ? '<kbd>s</kbd> skip · <kbd>g</kbd> hints · <kbd>shift+esc</kbd> end'
       : '<kbd>s</kbd> skip · <kbd>g</kbd> hints · <kbd>shift+esc</kbd> end';
   }
   marathon.tickH=setInterval(sessionTick, 200);
