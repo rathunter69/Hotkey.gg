@@ -1674,66 +1674,49 @@ const CHALLENGES = {
       ];
     }
   },
-  snaphome:{
-    name:'Home', label:'Snap to A1', par:3, parKeys:1,
-    prompt:'Get back to A1 from wherever the cursor lands. Ctrl+Home is the universal "back to top" — works from anywhere on any sheet.',
-    req:'<em>ctrl+home</em> — cursor jumps to A1 instantly',
-    guide:['<kbd>ctrl</kbd>+<kbd>home</kbd>'],
-    targets:['A1'],
-    demo(){ return [{sel:'A1', keys:[Kb.ctrlHome]}]; },
+  navigation:{
+    name:'Navigate', label:'Navigation tour', par:8, parKeys:3,
+    prompt:'Tour the edges of a data block with three Ctrl-arrow chords back to back: Ctrl+Home to A1, Ctrl+→ to the end of the row, Ctrl+↓ to the bottom of the column. Avoids the End key (not on every keyboard) and teaches the three navigation patterns you reach for constantly.',
+    req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em>',
+    guide:[
+      '<kbd>ctrl</kbd>+<kbd>home</kbd>',
+      '<kbd>ctrl</kbd>+<kbd>&rarr;</kbd>',
+      '<kbd>ctrl</kbd>+<kbd>&darr;</kbd>'
+    ],
+    targets:['A1','E1','E7'],
+    demo(){ return [
+      {sel:'A1', keys:[Kb.ctrlHome]},
+      {sel:'E1', keys:[Kb.ctrlRight]},
+      {sel:'E7', keys:[Kb.ctrlDown]}
+    ]; },
     build(){
-      // 6×4 mini income-statement-style block of numbers; cursor placed deliberately in the middle
+      // 7×5 block of an income-statement-style table; cursor placed deliberately in the middle so plain arrows
+      // would take many presses but the Ctrl-arrow tour visits A1 → E1 → E7 in three chords.
       const cells={};
+      cells['A1']={...blankCell(),value:'Model',txt:true,bold:true};
       const labels=['Revenue','COGS','SG&A','Opex','D&A','EBIT'];
       labels.forEach((lbl,i)=>cells['A'+(i+2)]={...blankCell(),value:lbl,txt:true});
       ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       for(let r=2;r<=7;r++) for(let c=2;c<=5;c++){
         cells[colLetter(c)+r]={...blankCell(),value:rnd(20,99)*10,fmtStyle:'comma',decimals:0};
       }
-      // start at C4 — deep in the middle of the data, so plain arrows would take many presses
+      // Start at C4 — middle of the data, surrounded on all sides so the chord jumps are visually meaningful.
       return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74}};
     },
-    checks(S){ return [{label:'cursor at A1', ok: S.active.r===1 && S.active.c===1}]; }
-  },
-  snapend:{
-    name:'End', label:'Snap to last cell', par:3, parKeys:1,
-    prompt:'Find the bottom-right corner of the data. Ctrl+End jumps to the last cell of the used range — the fastest way to gauge how big a model is.',
-    req:'<em>ctrl+end</em> — cursor jumps to the bottom-right of the used range',
-    guide:['<kbd>ctrl</kbd>+<kbd>end</kbd>'],
-    targets:['E7'],
-    demo(){ return [{sel:'E7', keys:[Kb.ctrlEnd]}]; },
-    build(){
-      const cells={};
-      const labels=['Revenue','COGS','SG&A','Opex','D&A','EBIT'];
-      labels.forEach((lbl,i)=>cells['A'+(i+2)]={...blankCell(),value:lbl,txt:true});
-      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
-      for(let r=2;r<=7;r++) for(let c=2;c<=5;c++){
-        cells[colLetter(c)+r]={...blankCell(),value:rnd(20,99)*10,fmtStyle:'comma',decimals:0};
-      }
-      // start at A1 — Excel's classic Ctrl+End trick to see the model's extent
-      return {ROWS:7, cells, active:{r:1,c:1}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74}};
-    },
-    checks(S){ return [{label:'cursor at E7 (bottom-right of used range)', ok: S.active.r===7 && S.active.c===5}]; }
-  },
-  dropbottom:{
-    name:'Drop', label:'Drop to the total', par:3, parKeys:1,
-    prompt:'Jump from the top of a column straight to the total at the bottom. Ctrl+↓ stops at the last cell with data — no need to know how many rows.',
-    req:'<em>ctrl+↓</em> — cursor jumps to the bottom of the contiguous data run',
-    guide:['<kbd>ctrl</kbd>+<kbd>↓</kbd>'],
-    targets:['B10'],
-    demo(){ return [{sel:'B10', keys:[Kb.ctrlDown]}]; },
-    build(){
-      const cells={};
-      // single column of line items, 8 rows of values + a SUM total at row 10
-      cells['B1']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
-      for(let r=2;r<=9;r++) cells['B'+r]={...blankCell(),value:rnd(20,99)*10,fmtStyle:'comma',decimals:0};
-      cells['B10']={...blankCell(),formula:'=SUM(B2:B9)',fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      // compute the SUM so the cell displays a real total
-      let sum=0; for(let r=2;r<=9;r++) sum+=cells['B'+r].value;
-      cells['B10'].value=sum;
-      return {ROWS:10, cells, active:{r:1,c:2}, sel:null, colW:{2:100}};
-    },
-    checks(S){ return [{label:'cursor at B10 (the total)', ok: S.active.r===10 && S.active.c===2}]; }
+    // Sequential progression: each step only counts once the previous one is done. We mutate state on S
+    // because checks(S) is called on every render — once a target is reached, the flag latches true.
+    // Without ordering, the cursor could pass through E7 first (via plain End-of-data) and falsely pass.
+    checks(S){
+      if(!S.navProgress) S.navProgress = {home:false, right:false, down:false};
+      if(!S.navProgress.home  && S.active.r===1 && S.active.c===1) S.navProgress.home  = true;
+      if( S.navProgress.home  && !S.navProgress.right && S.active.r===1 && S.active.c===5) S.navProgress.right = true;
+      if( S.navProgress.right && !S.navProgress.down  && S.active.r===7 && S.active.c===5) S.navProgress.down  = true;
+      return [
+        {label:'Ctrl+Home \u2192 A1',                       ok: S.navProgress.home},
+        {label:'Ctrl+\u2192 to the end of the row (E1)',     ok: S.navProgress.right},
+        {label:'Ctrl+\u2193 to the bottom of the column (E7)', ok: S.navProgress.down},
+      ];
+    }
   }
 };
 
@@ -2598,6 +2581,10 @@ function move(dr,dc,shift,ctrl){
   else S.sel=null;
   S.active={r:nr,c:nc};
   render();
+  // Cursor-only drills (the navigation tour) need a win check after every Ctrl+arrow jump.
+  // Home/End handlers already call commitAction; plain & Ctrl arrow keys went through move() without it,
+  // which is why the old dropbottom drill silently "didn't complete" even when the cursor landed correctly.
+  checkWin();
 }
 function selectRow(){ S.sel={r:S.active.r,c:1}; S.active={r:S.active.r,c:COLS}; render(); }
 function selectCol(){ S.sel={r:1,c:S.active.c}; S.active={r:S.ROWS,c:S.active.c}; render(); }
@@ -4085,13 +4072,11 @@ const DRILL_DESC = {
   lookup:'Pull a value out of a table with INDEX/MATCH',
   sort:'Sort a deal table descending — Alt A S D',
   series:'Fill a year header across — Alt H F I S',
-  snaphome:'Ctrl+Home from anywhere — back to A1',
-  snapend:'Ctrl+End — find the bottom-right of the model',
-  dropbottom:'Ctrl+↓ — jump to the bottom of the data',
+  navigation:'Ctrl+Home → Ctrl+→ → Ctrl+↓ — three nav chords back-to-back',
 };
 const DRILL_GROUPS = [
   {name:'Foundations', keys:['copyover']},
-  {name:'Navigate',    keys:['snaphome','snapend','dropbottom']},
+  {name:'Navigate',    keys:['navigation']},
   {name:'Formatting',  keys:['polish','combo','format','center','blue','gauntlet']},
   {name:'Values',      keys:['drill','series']},
   {name:'Data',        keys:['sort']},
@@ -4109,7 +4094,7 @@ const TAB_LABEL = {
   sort:'Sort',
   margin:'Margin', bridge:'Bridge', foot:'Cross-foot', percent:'Common-size',
   schedule:'Schedule', comps:'Comps', lookup:'Lookup',
-  snaphome:'Home', snapend:'End', dropbottom:'Drop',
+  navigation:'Nav',
 };
 const GROUP_OF = (()=>{ const m={}; DRILL_GROUPS.forEach(g=>g.keys.forEach(k=>{ m[k]=g.name; })); return m; })();
 
