@@ -238,6 +238,10 @@
     display:flex; flex-direction:column; gap:3px}
   .rm-scores-h{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
   .rm-soon{font-size:12px; color:var(--faint)}
+  .rm-rank{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; margin-bottom:14px; min-height:18px}
+  .rm-rank b{color:var(--text); font-weight:700}
+  .rm-rank.lead{color:var(--warn)}
+  .rm-rank.lead b{color:var(--warn)}
   .rm-opts{display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
   .rm-key{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:8px; padding:8px 13px; cursor:pointer; transition:.15s}
@@ -389,6 +393,10 @@
   .mh-time.low{color:var(--warn)}
   .mh-stat{font-family:var(--mono); font-size:12px; color:var(--muted)}
   .mh-stat b{color:var(--text); font-weight:600; font-size:14px; margin-right:3px}
+  .mh-hints{font-family:var(--mono); font-size:10.5px; color:var(--faint); letter-spacing:.3px; margin-left:auto; margin-right:14px}
+  .mh-hints kbd{color:var(--muted); background:var(--surface2); border:1px solid var(--line);
+    border-radius:4px; padding:1px 5px; font-size:10px; margin:0 2px}
+  body.rapidfire .mh-hints{display:none}
   .mh-stop{font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface2);
     border:1px solid var(--line); border-radius:7px; padding:6px 12px; cursor:pointer; transition:.13s; flex:none}
   .mh-stop:hover{color:var(--bad); border-color:var(--bad)}
@@ -514,6 +522,14 @@
   .rf-keycap.sep{border:none; background:none; color:var(--faint); padding:8px 0; min-width:0}
   .rf-keys.miss{animation:rfshake .3s}
   .rf-keys.miss .rf-keycap:not(.sep){border-color:var(--bad); color:var(--bad)}
+  .rf-hardo-hint{font-family:var(--mono); font-size:11.5px; color:var(--faint); letter-spacing:.5px; text-transform:uppercase}
+  .rf-keys.hardo{min-height:40px}
+  .mm-hardo{display:flex; align-items:center; gap:10px; padding:11px 13px; margin-bottom:14px;
+    background:var(--surface2); border:1px solid var(--line); border-radius:10px; cursor:pointer; transition:.14s; text-align:left}
+  .mm-hardo:hover{border-color:var(--accent-dim)}
+  .mm-hardo input{accent-color:var(--accent); width:15px; height:15px; cursor:pointer; margin:0; flex:none}
+  .mm-hardo-l{font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.4}
+  .mm-hardo-l b{color:var(--text); font-weight:700}
   @keyframes rfshake{0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
   /* ---- landing overlay (fades to the app on start) ---- */
   .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
@@ -537,6 +553,13 @@
   .mode-chip.soon{opacity:.45}
   .mode-chip.pick{cursor:pointer; color:var(--text); border-color:var(--accent-dim); transition:.15s}
   .mode-chip.pick:hover{color:var(--accent); border-color:var(--accent); background:var(--accent-glow)}
+  .mode-chip.selected{color:#0c0d0e; background:var(--accent); border-color:var(--accent); font-weight:700}
+  .mode-chip.selected:hover{color:#0c0d0e; background:var(--accent); border-color:var(--accent)}
+  #guestBanner{position:fixed; bottom:14px; left:50%; transform:translateX(-50%); z-index:200;
+    background:var(--surface); border:1px solid var(--warn); border-radius:8px; padding:8px 14px;
+    font-family:var(--mono); font-size:11.5px; color:var(--warn); box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  #guestBanner b{color:var(--text); font-weight:700}
+  #guestBanner a{color:var(--accent); margin-left:8px}
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
@@ -568,6 +591,7 @@
       <span class="mh-stat"><b id="mhDrills">0</b><span id="mhUnit">drills</span></span>
       <span class="mh-stat"><b id="mhKeys">0</b>keys</span>
     </div>
+    <div class="mh-hints" id="mhHints"><kbd>s</kbd> skip · <kbd>g</kbd> hints · <kbd>shift+esc</kbd> end</div>
     <button class="mh-stop" id="mhStop">end session</button>
   </div>
 
@@ -650,9 +674,13 @@
     <p class="lede">A speedrun trainer for the keystrokes and modeling moves that fill an analyst's day — <b>the exact Windows shortcuts, timed to the hundredth</b>, drilled until they're reflex.</p>
     <div class="landing-cta">
       <button class="start-btn" id="startBtn">Start training →</button>
-      <span class="modes"><span class="mode-chip">Classic</span><span class="mode-chip pick" id="chipMarathon">⏱ Marathon</span><span class="mode-chip pick" id="chipRapid">⚡ Rapid-fire</span></span>
+      <span class="modes">
+        <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
+        <span class="mode-chip pick" id="chipMarathon" title="random drills against a clock">⏱ Marathon</span>
+        <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
+      </span>
     </div>
-    <div class="micro"><b>Invite-only beta.</b> Runs in the browser — no install. Pick any drill once you're in, or run a timed <b>Marathon</b>.</div>
+    <div class="micro" id="landingMicro"><b>Classic mode selected.</b> Solve drills at your own pace · the timer's just feedback.</div>
   </div>
 </div>
 
@@ -1342,11 +1370,20 @@ function evalFormula(expr){
 }
 function autoSum(){
   const {r,c}=S.active;
+  // prefer vertical (numbers above)
   let top=r-1; while(top>=1 && typeof get(top,c).value==='number') top--; top++;
-  if(top>r-1) return;
-  const cell=ensure(r,c);
-  cell.formula='=SUM('+ck(top,c)+':'+ck(r-1,c)+')';
-  cell.value=evalSum(cell.formula);
+  if(top<=r-1){
+    const cell=ensure(r,c);
+    cell.formula='=SUM('+ck(top,c)+':'+ck(r-1,c)+')';
+    cell.value=evalSum(cell.formula); return;
+  }
+  // fall back to horizontal (numbers to the left) — Excel does this for cross-footing
+  let left=c-1; while(left>=1 && typeof get(r,left).value==='number') left--; left++;
+  if(left<=c-1){
+    const cell=ensure(r,c);
+    cell.formula='=SUM('+ck(r,left)+':'+ck(r,c-1)+')';
+    cell.value=evalSum(cell.formula);
+  }
 }
 
 /* ============================================================
@@ -1510,8 +1547,30 @@ function checkWin(){
     if(prev===undefined||t<prev){ PB[cur]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
   showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
   if(sb && me_user && !mouseUsed && !guidedUsed){
-    recordRun(t).then(ok=>{ const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); } });
+    recordRun(t).then(async ok=>{
+      const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); }
+      if(ok){ const rk=await fetchRank(cur, t*1000); if(rk) showRankBadge(rk); }
+    });
   }
+}
+async function fetchRank(challenge, timeMs){
+  try{
+    const r=await sb.from('runs').select('user_id,time_ms').eq('challenge',challenge).eq('mouse_used',false).order('time_ms',{ascending:true});
+    const runs=r.data||[]; const seen={}, best=[];
+    runs.forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });
+    const total=best.length;
+    if(!total) return null;
+    // find this run's position in the best list (treat as the user's current best)
+    let rank = best.findIndex(b=>b.user_id===me_user.id && b.time_ms<=timeMs)+1;
+    if(rank<=0){ rank = best.filter(b=>b.time_ms<=timeMs).length || total; }
+    const leader = best[0].time_ms;
+    return { rank, total, leader, isFirst: rank===1, gap: rank>1 ? (timeMs-leader)/1000 : 0 };
+  }catch(e){ return null; }
+}
+function showRankBadge(rk){
+  const el=$('rmRank'); if(!el) return;
+  if(rk.isFirst){ el.innerHTML='👑 <b>#1</b> on this drill — you lead'; el.className='rm-rank lead'; }
+  else { el.innerHTML='<b>#'+rk.rank+' of '+rk.total+'</b> · +'+rk.gap.toFixed(2)+'s off #1'; el.className='rm-rank'; }
 }
 function showResults(o){
   const best = PB[cur]!==undefined ? PB[cur].toFixed(2)+'s' : '—';
@@ -1527,6 +1586,7 @@ function showResults(o){
     `<div class="rm-time">${o.t}<span>s</span></div>`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
+    `<div class="rm-rank" id="rmRank"></div>`+
     `<div class="rm-opts">`+
     `<button class="rm-key" data-act="again"><kbd>↵ enter</kbd>again</button>`+
     `<button class="rm-key" data-act="next"><kbd>space</kbd>next</button>`+
@@ -1754,6 +1814,13 @@ document.addEventListener('keydown',e=>{
   // career card open
   if(profileOpen){ e.preventDefault(); if(k==='Escape') closeProfile(); return; }
   // rapid-fire runs on its own single-cell handler (grid engine is bypassed)
+  // session-wide hotkeys (marathon or rapid-fire): Shift+Esc ends, 's' skips drill
+  if(marathon && marathon.active){
+    if(k==='Escape' && e.shiftKey){ e.preventDefault(); endSession(); return; }
+    if(gameMode==='marathon' && (k==='s'||k==='S') && !e.ctrlKey && !e.altKey && !e.metaKey && !editing){
+      e.preventDefault(); skipMarathonDrill(); return;
+    }
+  }
   if(gameMode==='rapidfire' && marathon && marathon.active){ rapidKey(e); return; }
 
   // DRILL PICKER overlay — arrows move, enter opens, 1-9 jump, esc/backslash close
@@ -1821,8 +1888,8 @@ document.addEventListener('keydown',e=>{
     return;
   }
 
-  // GUIDED MODE — 'g' toggles paint-by-numbers (disabled during a marathon)
-  if((k==='g'||k==='G')&&gameMode==='classic'&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
+  // GUIDED MODE — 'g' toggles paint-by-numbers (disabled only during rapid-fire)
+  if((k==='g'||k==='G')&&gameMode!=='rapidfire'&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
 
   // CHALLENGE SELECT (no-mouse): 1 / 2 / 3 — disabled during a marathon (drills are random)
   if(gameMode==='classic' && !e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
@@ -1882,8 +1949,28 @@ function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn(); if(S) render(); else updateChecklist(); }
 $('guideToggle').addEventListener('click',toggleGuided);
 $('startBtn').addEventListener('click', tryEnter);
-{ const cm=$('chipMarathon'); if(cm) cm.addEventListener('click', ()=>{ pendingMode='marathon'; tryEnter(); });
-  const cr=$('chipRapid');    if(cr) cr.addEventListener('click', ()=>{ pendingMode='rapidfire'; tryEnter(); }); }
+
+// guest-mode banner when Supabase isn't configured (no leaderboard, no saves)
+if(!sb){
+  const ban=document.createElement('div'); ban.id='guestBanner';
+  ban.innerHTML='⚠ <b>Guest mode</b> — Supabase not configured, runs won\'t save and there\'s no login. <a href="https://supabase.com/docs/guides/auth" target="_blank">setup →</a>';
+  document.body.appendChild(ban);
+}
+{ const MODE_BLURBS = {
+    classic:   "Solve drills at your own pace · the timer's just feedback.",
+    marathon:  "Random drills, back to back, against the clock · pick a duration when you start.",
+    rapidfire: "One cell, one chord, one transform · go as fast as you can recall.",
+  };
+  function pickMode(m){
+    pendingMode = (m==='classic') ? null : m;
+    ['Classic','Marathon','Rapid'].forEach(id=>{ const el=$('chip'+id); if(el) el.classList.remove('selected'); });
+    const sel=$('chip'+(m==='rapidfire'?'Rapid':(m==='marathon'?'Marathon':'Classic'))); if(sel) sel.classList.add('selected');
+    const mc=$('landingMicro'); if(mc) mc.innerHTML='<b>'+(m==='rapidfire'?'Rapid-fire':(m[0].toUpperCase()+m.slice(1)))+' mode selected.</b> '+MODE_BLURBS[m];
+  }
+  const cc=$('chipClassic');  if(cc) cc.addEventListener('click', ()=>pickMode('classic'));
+  const cm=$('chipMarathon'); if(cm) cm.addEventListener('click', ()=>pickMode('marathon'));
+  const cr=$('chipRapid');    if(cr) cr.addEventListener('click', ()=>pickMode('rapidfire'));
+}
 $('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
 $('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge(); });
 
@@ -1938,6 +2025,11 @@ const RF_OPS=[
     show:c=>({text:String(c.num)}), solved:c=>({text:c.num.toLocaleString('en-US')}) },
 ];
 let rfBusy=false;
+let hardoMode=false;
+async function loadHardo(){
+  try{ if(window.storage){ const r=await window.storage.get('hotkey_hardo'); if(r&&r.value) hardoMode = r.value==='1'; } }catch(e){}
+}
+function saveHardo(){ try{ if(window.storage) window.storage.set('hotkey_hardo', hardoMode?'1':'0'); }catch(e){} }
 function loadRapidCard(){
   let op, guard=0;
   do{ op=RF_OPS[Math.floor(Math.random()*RF_OPS.length)]; guard++; } while(RF_OPS.length>1 && op.op===lastRapid && guard<8);
@@ -1953,11 +2045,17 @@ function renderRfCard(state){
   const le=$('rfCellLabel'); if(le) le.textContent=rfTask.cellLabel;
   const cell=$('rfCell'); if(cell){ cell.textContent=view.text||'\u00A0';
     cell.className='rf-cell'+(view.bold?' bold':'')+(view.fx?' fx':'')+(state==='solved'?' flash':''); }
-  const keys=$('rfKeys'); if(keys){ keys.className='rf-keys'; keys.innerHTML='';
-    rfTask.keys.forEach((k,i)=>{
-      if(i>0){ const s=document.createElement('span'); s.className='rf-keycap sep'; s.textContent='+'; keys.appendChild(s); }
-      const el=document.createElement('span'); el.className='rf-keycap'+(state==='solved'?' lit':''); el.textContent=k; keys.appendChild(el);
-    }); }
+  const keys=$('rfKeys'); if(keys){ keys.className='rf-keys'+(hardoMode?' hardo':''); keys.innerHTML='';
+    const showKeys = !hardoMode || state==='solved';
+    if(showKeys){
+      rfTask.keys.forEach((k,i)=>{
+        if(i>0){ const s=document.createElement('span'); s.className='rf-keycap sep'; s.textContent='+'; keys.appendChild(s); }
+        const el=document.createElement('span'); el.className='rf-keycap'+(state==='solved'?' lit':''); el.textContent=k; keys.appendChild(el);
+      });
+    } else {
+      const ph=document.createElement('span'); ph.className='rf-hardo-hint'; ph.textContent='no hints · go from memory'; keys.appendChild(ph);
+    }
+  }
 }
 function rapidKey(e){
   const k=e.key;
@@ -1993,13 +2091,15 @@ function rfMiss(){
 }
 
 function openModes(mode){ if(demoPlaying) return; modesMode=mode||'marathon';
-  const cfg=SESSION_CFG[modesMode]; const m=$('modesModal');
+  const cfg=SESSION_CFG[modesMode]; const m=$('modesModal'); const isRapid=modesMode==='rapidfire';
   m.innerHTML=`<div class="mm-card"><div class="mm-title">${cfg.title}</div>`+
     `<div class="mm-body">${cfg.body}</div>`+
     `<div class="mm-durs">`+cfg.durs.map(d=>`<button class="mm-dur" data-sec="${d[0]}"><b>${d[1]}</b>${d[2]}</button>`).join('')+`</div>`+
+    (isRapid ? `<label class="mm-hardo" id="mmHardo"><input type="checkbox" id="mmHardoBox"${hardoMode?' checked':''}> <span class="mm-hardo-l"><b>Hardo mode</b> · no keycap hints, pure recall</span></label>` : '')+
     `<div class="mm-foot"><a id="mmCancel">cancel</a></div></div>`;
   m.classList.add('show'); modesOpen=true;
   m.querySelectorAll('.mm-dur').forEach(b=>b.onclick=()=>{ closeModes(); startSession(modesMode, +b.dataset.sec); });
+  if(isRapid){ const box=$('mmHardoBox'); if(box) box.onchange=()=>{ hardoMode=box.checked; saveHardo(); }; }
   $('mmCancel').onclick=closeModes;
 }
 function closeModes(){ modesOpen=false; const m=$('modesModal'); if(m) m.classList.remove('show'); }
@@ -2014,6 +2114,13 @@ function loadRandomDrill(){
   lastKey=key; loadChallenge(key);
 }
 function loadNext(){ if(gameMode==='rapidfire') loadRapidCard(); else loadRandomDrill(); }
+
+function skipMarathonDrill(){
+  if(!marathon || !marathon.active || gameMode!=='marathon') return;
+  marathon.skipped = (marathon.skipped||0) + 1;
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⏭ skipped — next…'; }
+  setTimeout(()=>{ if(marathon && marathon.active) loadNext(); }, 300);
+}
 
 function startSession(mode, durSec){
   closeModes(); closePicker(); hideResults(); hideSessionSummary();
@@ -2081,7 +2188,7 @@ function showSessionSummary(){
   const acc = rapid ? ((s.hits+s.misses)>0 ? Math.round(s.hits/(s.hits+s.misses)*100) : 100) : 0;
   const cards = rapid
     ? [[n,'rounds'],[acc+'%','accuracy'],[fastest?fastest.t.toFixed(2)+'s':'—','fastest'],[avg?avg.toFixed(2)+'s':'—','avg round']]
-    : [[n,'drills'],[s.checks,'tasks cleared'],[s.keys,'keystrokes'],[eff?eff+'%':'—','key efficiency']];
+    : [[n,'drills'],[s.skipped||0,'skipped'],[s.keys,'keystrokes'],[eff?eff+'%':'—','key efficiency']];
   const m=$('sessionModal');
   m.innerHTML=`<div class="ss-card">`+
     `<div class="ss-title">session complete</div>`+
@@ -2349,6 +2456,7 @@ async function savePB(){
   else if(/access_token|refresh_token|error_code|error_description/.test(location.hash)) enterRequested=true;
   await loadPB();
   await loadOnboard();
+  await loadHardo();
   buildSheetTabs();
   loadChallenge(MENU_ORDER[0]);
   initAuth();
