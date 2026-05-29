@@ -116,6 +116,9 @@
   @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
   td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
   td.active{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow); z-index:2}
+  /* Formula pointer — appears on the cell whose reference is currently being inserted into the formula bar.
+     Dashed border reads distinct from the solid active-cell outline, and the warn color marks "this is where the formula is grabbing from". */
+  td.point{outline:2px dashed var(--warn); outline-offset:-2px; background:rgba(224,175,104,.12); z-index:3}
   td.sel{background:rgba(46,163,111,.15)}
   td.sel-t{border-top:2px solid var(--accent)}
   td.sel-b{border-bottom:2px solid var(--accent)}
@@ -1581,17 +1584,20 @@ const CHALLENGES = {
     }
   },
   bridge:{
-    name:'Bridge', label:'Stretch the profit row', par:24, parKeys:14,
-    prompt:'Build the profit formula in Y1, then fill it across all four years. Revenue × Margin = Profit — one formula, four years. Operating row at B4. Hardcoded inputs are pre-styled in blue (modeling convention); your formula in black.',
-    req:'<em>=B2*B3</em> in B4 · then select B4:E4 and <em>ctrl+r</em> to stretch the formula right · profit appears for all four years',
+    name:'Bridge', label:'Stretch the profit row', par:22, parKeys:12,
+    prompt:'Build the profit formula at B4 by POINTING — the way bankers do it. Press = (or + on the numpad) to start, arrow up to grab revenue, type * for multiply, arrow up again for margin, Enter to commit. Then fill it across all four years.',
+    req:'<em>=</em> (or <em>+</em>) starts the formula · <em>↑↑</em> grabs revenue (B2) · <em>*</em> · <em>↑</em> grabs margin (B3) · <em>↵</em> · then select B4:E4 and <em>ctrl+r</em>',
     guide:[
-      'in B4 type <kbd>=</kbd><kbd>B</kbd><kbd>2</kbd><kbd>*</kbd><kbd>B</kbd><kbd>3</kbd> <kbd>↵</kbd>',
+      'at B4 press <kbd>=</kbd> to start the formula (or <kbd>+</kbd> on the numpad — bankers love the big key)',
+      'arrow to revenue · <kbd>↑</kbd> <kbd>↑</kbd> — the pointer cell highlights and <b>B2</b> appears in the formula',
+      'multiply · <kbd>*</kbd> · then arrow back up to margin · <kbd>↑</kbd> — <b>B3</b> appears',
+      'commit · <kbd>↵</kbd>',
       'back up to B4 (<kbd>↑</kbd>), then extend selection right · <kbd>shift</kbd>+<kbd>→</kbd> three times to reach E4',
       'fill right · <kbd>ctrl</kbd>+<kbd>r</kbd>',
     ],
     targets:['B4','B4:E4','B4:E4'],
     demo(){ return [
-      {sel:'B4', keys:[...T('=B2*B3'), Kb.enter]},
+      {sel:'B4', keys:[{key:'='}, {key:'ArrowUp'}, {key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
       {sel:'B4:E4', keys:[Kb.fillR]},
     ]; },
     build(){
@@ -1635,6 +1641,67 @@ const CHALLENGES = {
         {label:'profit = revenue × margin, all 4 years (formulas, not hardcoded)', ok: formulaOk},
       ];
     }
+  },
+  snaphome:{
+    name:'Home', label:'Snap to A1', par:3, parKeys:1,
+    prompt:'Get back to A1 from wherever the cursor lands. Ctrl+Home is the universal "back to top" — works from anywhere on any sheet.',
+    req:'<em>ctrl+home</em> — cursor jumps to A1 instantly',
+    guide:['<kbd>ctrl</kbd>+<kbd>home</kbd>'],
+    targets:['A1'],
+    demo(){ return [{sel:'A1', keys:[Kb.ctrlHome]}]; },
+    build(){
+      // 6×4 mini income-statement-style block of numbers; cursor placed deliberately in the middle
+      const cells={};
+      const labels=['Revenue','COGS','SG&A','Opex','D&A','EBIT'];
+      labels.forEach((lbl,i)=>cells['A'+(i+2)]={...blankCell(),value:lbl,txt:true});
+      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      for(let r=2;r<=7;r++) for(let c=2;c<=5;c++){
+        cells[colLetter(c)+r]={...blankCell(),value:rnd(20,99)*10,fmtStyle:'comma',decimals:0};
+      }
+      // start at C4 — deep in the middle of the data, so plain arrows would take many presses
+      return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74}};
+    },
+    checks(S){ return [{label:'cursor at A1', ok: S.active.r===1 && S.active.c===1}]; }
+  },
+  snapend:{
+    name:'End', label:'Snap to last cell', par:3, parKeys:1,
+    prompt:'Find the bottom-right corner of the data. Ctrl+End jumps to the last cell of the used range — the fastest way to gauge how big a model is.',
+    req:'<em>ctrl+end</em> — cursor jumps to the bottom-right of the used range',
+    guide:['<kbd>ctrl</kbd>+<kbd>end</kbd>'],
+    targets:['E7'],
+    demo(){ return [{sel:'E7', keys:[Kb.ctrlEnd]}]; },
+    build(){
+      const cells={};
+      const labels=['Revenue','COGS','SG&A','Opex','D&A','EBIT'];
+      labels.forEach((lbl,i)=>cells['A'+(i+2)]={...blankCell(),value:lbl,txt:true});
+      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      for(let r=2;r<=7;r++) for(let c=2;c<=5;c++){
+        cells[colLetter(c)+r]={...blankCell(),value:rnd(20,99)*10,fmtStyle:'comma',decimals:0};
+      }
+      // start at A1 — Excel's classic Ctrl+End trick to see the model's extent
+      return {ROWS:7, cells, active:{r:1,c:1}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74}};
+    },
+    checks(S){ return [{label:'cursor at E7 (bottom-right of used range)', ok: S.active.r===7 && S.active.c===5}]; }
+  },
+  dropbottom:{
+    name:'Drop', label:'Drop to the total', par:3, parKeys:1,
+    prompt:'Jump from the top of a column straight to the total at the bottom. Ctrl+↓ stops at the last cell with data — no need to know how many rows.',
+    req:'<em>ctrl+↓</em> — cursor jumps to the bottom of the contiguous data run',
+    guide:['<kbd>ctrl</kbd>+<kbd>↓</kbd>'],
+    targets:['B10'],
+    demo(){ return [{sel:'B10', keys:[Kb.ctrlDown]}]; },
+    build(){
+      const cells={};
+      // single column of line items, 8 rows of values + a SUM total at row 10
+      cells['B1']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
+      for(let r=2;r<=9;r++) cells['B'+r]={...blankCell(),value:rnd(20,99)*10,fmtStyle:'comma',decimals:0};
+      cells['B10']={...blankCell(),formula:'=SUM(B2:B9)',fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      // compute the SUM so the cell displays a real total
+      let sum=0; for(let r=2;r<=9;r++) sum+=cells['B'+r].value;
+      cells['B10'].value=sum;
+      return {ROWS:10, cells, active:{r:1,c:2}, sel:null, colW:{2:100}};
+    },
+    checks(S){ return [{label:'cursor at B10 (the total)', ok: S.active.r===10 && S.active.c===2}]; }
   }
 };
 
@@ -1647,6 +1714,14 @@ let mouseUsed=false, mode='normal', path=[], dialog=null, done=false, pasteKind=
 let guided=false, guidedUsed=false;
 let demoPlaying=false;
 let editing=false, editBuf='';
+// Formula-pointer state: when editing a formula AND arrow keys point to insert cell refs (Excel's "build by clicking" behavior).
+// editAnchor   = the cell where the formula lives (its target row/col)
+// editPointer  = the currently-pointed-at cell (null when not in pointer mode)
+// editPointerStart = index in editBuf where the current reference begins (so arrows can rewrite it)
+let editAnchor=null, editPointer=null, editPointerStart=-1;
+// Last char of editBuf is one of these → arrows enter pointer mode (insert new reference).
+// = + - * / ^ ( , — Excel's standard operator/separator boundaries.
+const OPERATOR_BOUNDARY = /[=+\-*/^(,]$/;
 let undoStack=[], redoStack=[], keyLog=[];
 let gameMode='classic';   // 'classic' | 'marathon'
 let marathon=null;        // active marathon session state
@@ -1684,6 +1759,23 @@ function ctrlJump(r,c,dr,dc){
     while(inb(nr,nc)&&!nonEmpty(nr,nc)){ if(!inb(nr+dr,nc+dc))break; nr+=dr;nc+=dc;}
   }
   return {r:nr,c:nc};
+}
+
+// Bottom-right of the "used range" — Excel's Ctrl+End target.
+// Counts any cell in S.cells (formatted-but-empty cells still count, mirroring Excel).
+// Falls back to (1,1) if the sheet is completely empty.
+function usedRange(){
+  let maxR=1, maxC=1;
+  for(const k in S.cells){
+    const m = k.match(/^([A-Z]+)(\d+)$/);
+    if(m){
+      const col = m[1].charCodeAt(0) - 64;
+      const row = +m[2];
+      if(row > maxR) maxR = row;
+      if(col > maxC) maxC = col;
+    }
+  }
+  return {r:maxR, c:maxC};
 }
 
 function selRange(){
@@ -1910,6 +2002,7 @@ function render(){
       const inSel=(r>=sr.r1&&r<=sr.r2&&c>=sr.c1&&c<=sr.c2);
       if(isActive)cls.push('active'); else if(inSel&&S.sel)cls.push('sel');
       if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2) cls.push('gtarget');
+      if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
       let txt=dispText(cell);
       if(editing && isActive){ txt=editBuf+'▏'; cls.push('editing'); }
@@ -2178,10 +2271,22 @@ function fillFrom(dir){ // dir 'down' or 'right'
   commitAction();
 }
 
-function startEdit(initial){ if(done) return; startClock(); editing=true; editBuf=initial; render(); }
-function cancelEdit(){ editing=false; editBuf=''; render(); }
+function startEdit(initial){
+  if(done) return; startClock();
+  editing=true; editBuf=initial;
+  editAnchor={r:S.active.r, c:S.active.c};
+  editPointer=null; editPointerStart=-1;
+  render();
+}
+function cancelEdit(){
+  editing=false; editBuf='';
+  editAnchor=null; editPointer=null; editPointerStart=-1;
+  render();
+}
 function commitEdit(dr,dc){
-  const buf=editBuf.trim(); editing=false; editBuf='';
+  const buf=editBuf.trim();
+  editing=false; editBuf='';
+  editAnchor=null; editPointer=null; editPointerStart=-1;
   if(buf!==''){
     pushUndo();
     const cell=ensure(S.active.r,S.active.c);
@@ -2191,6 +2296,27 @@ function commitEdit(dr,dc){
   }
   if(dr||dc){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
   commitAction();
+}
+
+// Pointer helpers: arrow keys during formula edit drop or move a cell reference into editBuf.
+// startPointerFromArrow → first arrow after `=` or after an operator: pointer = anchor + arrow direction.
+// movePointer → subsequent arrows while a reference is active: move the pointer, rewrite the ref in editBuf.
+function startPointerFromArrow(dr, dc){
+  const r = Math.min(S.ROWS, Math.max(1, editAnchor.r + dr));
+  const c = Math.min(COLS,   Math.max(1, editAnchor.c + dc));
+  if(r===editAnchor.r && c===editAnchor.c) return false;     // arrow blocked at boundary
+  editPointerStart = editBuf.length;
+  editPointer = {r, c};
+  editBuf += ck(r, c);
+  return true;
+}
+function movePointer(dr, dc){
+  const r = Math.min(S.ROWS, Math.max(1, editPointer.r + dr));
+  const c = Math.min(COLS,   Math.max(1, editPointer.c + dc));
+  if(r===editPointer.r && c===editPointer.c) return false;
+  editPointer = {r, c};
+  editBuf = editBuf.slice(0, editPointerStart) + ck(r, c);
+  return true;
 }
 
 function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
@@ -2422,15 +2548,47 @@ document.addEventListener('keydown',e=>{
     if(k==='Enter'){ commitEdit(1,0); return; }
     if(k==='Tab'){ commitEdit(0,1); return; }
     if(k==='Escape'){ cancelEdit(); return; }
-    if(k==='Backspace'){ editBuf=editBuf.slice(0,-1); logKey('⌫'); render(); return; }
+    if(k==='Backspace'){
+      // If we're in pointer mode, Backspace removes the whole reference at once (Excel parity).
+      if(editPointer){
+        editBuf = editBuf.slice(0, editPointerStart);
+        editPointer = null; editPointerStart = -1;
+      } else {
+        editBuf = editBuf.slice(0, -1);
+      }
+      logKey('⌫'); render(); return;
+    }
     const EARR={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
-    if(EARR[k]){ commitEdit(EARR[k][0],EARR[k][1]); return; }
-    if(k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey){ editBuf+=k; logKey(k); render(); return; }
+    if(EARR[k]){
+      const [dr,dc] = EARR[k];
+      // POINTER MODE: arrow inserts/updates a cell reference instead of committing.
+      // (1) Already in pointer mode → move the pointer, rewrite the reference in editBuf.
+      if(editPointer){
+        if(movePointer(dr, dc)){ logKey(ARROWSYM[k]); render(); }
+        return;
+      }
+      // (2) editBuf ends in an operator boundary (=, +, -, *, /, ^, (, ,) → start a new pointer.
+      if(editAnchor && OPERATOR_BOUNDARY.test(editBuf)){
+        if(startPointerFromArrow(dr, dc)){ logKey(ARROWSYM[k]); render(); }
+        return;
+      }
+      // (3) Otherwise — typing-mode arrow committing the edit (existing behavior for non-formula entries).
+      commitEdit(dr, dc);
+      return;
+    }
+    if(k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey){
+      // Any char-type input exits pointer mode (Excel: typing breaks the picker).
+      editPointer = null; editPointerStart = -1;
+      editBuf += k; logKey(k); render(); return;
+    }
     return;
   }
-  // start editing: '=' begins a formula, F2 edits existing content (letters/digits stay as shortcuts)
+  // start editing: '=' OR '+' begins a formula (numpad + is a banker classic; Excel normalizes both to =).
+  // F2 edits existing cell content. Letters/digits remain as shortcuts when not editing.
   if(mode==='normal' && !done){
-    if(k==='=' && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); startEdit('='); logKey('='); render(); return; }
+    if((k==='=' || k==='+') && !e.ctrlKey && !e.altKey && !e.metaKey){
+      e.preventDefault(); startEdit('='); logKey(k==='+' ? '+' : '='); render(); return;
+    }
     if(k==='F2'){ e.preventDefault(); const c=get(S.active.r,S.active.c); startEdit(c.formula||(c.value!=null&&c.value!==''?String(c.value):'')); render(); return; }
   }
 
@@ -2493,6 +2651,25 @@ document.addEventListener('keydown',e=>{
 
   const dirs={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
   if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey); return; }
+
+  // Home / End — navigation primitives. Ctrl+Home → A1, Ctrl+End → last cell of used range, Home → col A.
+  // Shift modifier extends the selection (Excel parity). Plain "End" is no-op (Excel's End mode is too obscure).
+  if(k==='Home'){
+    e.preventDefault(); startClock();
+    const ctrl = e.ctrlKey||e.metaKey;
+    logKey(ctrl ? (e.shiftKey?'Ctrl+Shift+Home':'Ctrl+Home') : (e.shiftKey?'Shift+Home':'Home'));
+    if(e.shiftKey){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; } else S.sel = null;
+    S.active = ctrl ? {r:1, c:1} : {r:S.active.r, c:1};
+    render(); commitAction(); return;
+  }
+  if(k==='End' && (e.ctrlKey||e.metaKey)){
+    e.preventDefault(); startClock();
+    logKey(e.shiftKey?'Ctrl+Shift+End':'Ctrl+End');
+    const u = usedRange();
+    if(e.shiftKey){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; } else S.sel = null;
+    S.active = {r:u.r, c:u.c};
+    render(); commitAction(); return;
+  }
 
   if((e.ctrlKey||e.metaKey)){
     const lk=k.toLowerCase();
@@ -2727,6 +2904,17 @@ const RF_OPS = [
     instr: ()=>'Activate filter on this column',
     show: c=>({text:c.text, bold:true}),
     solved: c=>({text:c.text+'   ▼', bold:true}) },
+  // — NAVIGATION (cellLabel is the target coordinate; cell content confirms arrival on solve) —
+  { op:'snaphome', label:'Snap home', keys:['Ctrl','Home'], match: RFM.ctrl('Home'),
+    make: ()=> ({cellLabel:'A1'}),
+    instr: ()=>'Snap back to A1',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'A1', fx:true}) },
+  { op:'snapend', label:'Snap to end', keys:['Ctrl','End'], match: RFM.ctrl('End'),
+    make: ()=> { const col=colLetter(rnd(5,8)); const row=rnd(10,30); const coord=col+row; return {cellLabel:coord, target:coord}; },
+    instr: c=>'Snap to the bottom-right ('+c.target+')',
+    show: ()=>({text:''}),
+    solved: c=>({text:c.target, fx:true}) },
 
   // — STAMPS (one chord drops a value into an empty cell) —
   { op:'today', label:'Insert today', keys:['Ctrl',';'], match: RFM.ctrl(';'),
@@ -3052,10 +3240,12 @@ function loadRapidCard(){
   let op, guard=0;
   do{ op=RF_OPS[Math.floor(Math.random()*RF_OPS.length)]; guard++; } while(RF_OPS.length>1 && op.op===lastRapid && guard<8);
   lastRapid=op.op;
-  rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data:op.make(),
+  const data = op.make();
+  rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data,
     // sequence ops get a fresh stateful matcher per task; chord ops get null and use the chord-find path
     matcher: op.matchSeq ? op.matchSeq() : null,
-    cellLabel: colLetter(2+(Math.random()*4|0))+(2+(Math.random()*6|0)), shownAt:performance.now() };
+    // navigation ops set data.cellLabel to express their target; everything else gets a random label
+    cellLabel: data.cellLabel || (colLetter(2+(Math.random()*4|0))+(2+(Math.random()*6|0))), shownAt:performance.now() };
   rfBusy=false; renderRfCard('show');
 }
 function renderRfCard(state){
@@ -3424,7 +3614,10 @@ const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
   copy:{key:'c',ctrl:true}, paste:{key:'v',ctrl:true}, bold:{key:'b',ctrl:true},
   pct:{key:'%',ctrl:true,shift:true}, cur:{key:'$',ctrl:true,shift:true}, com:{key:'!',ctrl:true,shift:true},
   fillD:{key:'d',ctrl:true}, fillR:{key:'r',ctrl:true},
-  eq:{key:'=',alt:true,code:'Equal'} };
+  eq:{key:'=',alt:true,code:'Equal'},
+  ctrlHome:{key:'Home',ctrl:true}, ctrlEnd:{key:'End',ctrl:true}, home:{key:'Home'},
+  ctrlDown:{key:'ArrowDown',ctrl:true}, ctrlUp:{key:'ArrowUp',ctrl:true},
+  ctrlRight:{key:'ArrowRight',ctrl:true}, ctrlLeft:{key:'ArrowLeft',ctrl:true} };
 function L(ch){ return {key:ch.toLowerCase(), code:'Key'+ch.toUpperCase()}; }
 function D(n){ return {key:String(n), code:'Digit'+n}; }
 function T(str){ return [...str].map(ch=>({key:ch})); }
@@ -3500,9 +3693,13 @@ const DRILL_DESC = {
   lookup:'Pull a value out of a table with INDEX/MATCH',
   sort:'Sort a deal table descending — Alt A S D',
   series:'Fill a year header across — Alt H F I S',
+  snaphome:'Ctrl+Home from anywhere — back to A1',
+  snapend:'Ctrl+End — find the bottom-right of the model',
+  dropbottom:'Ctrl+↓ — jump to the bottom of the data',
 };
 const DRILL_GROUPS = [
   {name:'Foundations', keys:['copyover']},
+  {name:'Navigate',    keys:['snaphome','snapend','dropbottom']},
   {name:'Formatting',  keys:['polish','combo','format','center','blue','gauntlet']},
   {name:'Values',      keys:['drill','series']},
   {name:'Data',        keys:['sort']},
@@ -3520,6 +3717,7 @@ const TAB_LABEL = {
   sort:'Sort',
   margin:'Margin', bridge:'Bridge', foot:'Cross-foot', percent:'Common-size',
   schedule:'Schedule', comps:'Comps', lookup:'Lookup',
+  snaphome:'Home', snapend:'End', dropbottom:'Drop',
 };
 const GROUP_OF = (()=>{ const m={}; DRILL_GROUPS.forEach(g=>g.keys.forEach(k=>{ m[k]=g.name; })); return m; })();
 
