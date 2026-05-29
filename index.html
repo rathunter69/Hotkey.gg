@@ -870,7 +870,7 @@
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
-    <div class="ob-body">New here? Take a 20-second guided run — we’ll switch on step-by-step hints and play the first solution for you. Or jump straight in.</div>
+    <div class="ob-body">First time here? Quick 20-second walkthrough.</div>
     <div class="ob-opts">
       <button class="ob-key primary" id="obStart">▶ Show me how it works</button>
       <button class="ob-key" id="obSkip">Skip — I’ll dive in</button>
@@ -881,9 +881,9 @@
 <div class="landing" id="landing">
   <div class="landing-inner">
     <div class="lbrand">hotkey<b>.gg</b></div>
-    <div class="eyebrow">Keyboard-only Excel · timed · scored</div>
+    <div class="eyebrow">Keyboard-only Excel</div>
     <h1>Drills, <span class="dim">not lessons.</span></h1>
-    <p class="lede">A speedrun trainer for the Excel keystrokes you'll use every day. <b>Real shortcuts, real tasks — build the muscle memory.</b></p>
+    <p class="lede">Real shortcuts, real tasks. Built for the keystrokes you use every day.</p>
     <div class="landing-cta">
       <button class="start-btn" id="startBtn">Start training <kbd class="kbd-cta">↵</kbd></button>
       <span class="modes">
@@ -892,7 +892,7 @@
         <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
       </span>
     </div>
-    <div class="micro" id="landingMicro"><b>Classic mode.</b> Solve drills at your own pace · the timer's just feedback. <span class="micro-hint">press <kbd>↵</kbd> to begin — the whole app runs on the keyboard</span></div>
+    <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · everything keyboard</span></div>
   </div>
 </div>
 
@@ -4162,24 +4162,22 @@ function showGate(step){
     inner='<div class="auth-card">'+
       '<div class="gate-brand">hotkey<b>.gg</b></div>'+
       '<h3>Invite-only beta</h3>'+
-      '<p>Drop the access code a friend gave you, pick a handle, and go.</p>'+
       '<input id="betaCode" type="text" placeholder="access code" autocomplete="off" autocapitalize="characters" spellcheck="false">'+
-      '<input id="betaHandle" type="text" placeholder="display name (shown on leaderboard)" autocomplete="off" maxlength="20" style="margin-top:8px">'+
+      '<input id="betaHandle" type="text" placeholder="display name" autocomplete="off" maxlength="20" style="margin-top:8px">'+
       '<button class="auth-go" id="betaGo">Enter</button>'+
       '<div class="auth-msg" id="betaMsg" style="min-height:15px; margin-top:9px"></div>'+
       '</div>';
   } else if(step==='signin'){
     inner='<div class="auth-card">'+
       '<div class="gate-brand">hotkey<b>.gg</b></div>'+
-      '<h3>Invite-only beta</h3>'+
-      '<p>Open to invited testers right now. Sign in to continue.</p>'+
+      '<h3>Sign in</h3>'+
       '<button class="auth-go" id="gateSignin">Sign in</button>'+
       '</div>';
   } else { // 'code'
     inner='<div class="auth-card">'+
       '<div class="gate-brand">hotkey<b>.gg</b></div>'+
-      '<h3>Enter your invite code</h3>'+
-      '<p>Signed in as <b>'+escHtml((me_user&&me_user.email)||'')+'</b>. Drop the code a friend gave you.</p>'+
+      '<h3>Invite code</h3>'+
+      '<p>Signed in as <b>'+escHtml((me_user&&me_user.email)||'')+'</b>.</p>'+
       '<input id="gateCode" type="text" placeholder="invite code" autocomplete="off">'+
       '<button class="auth-go" id="gateRedeem">Unlock</button>'+
       '<div class="auth-msg" id="gateMsg" style="color:var(--bad); min-height:15px; margin-top:9px"></div>'+
@@ -4212,7 +4210,7 @@ async function submitBetaCode(){
   if(!ci||!hi) return;
   const code=ci.value.trim(); const handle=hi.value.trim();
   const setMsg=(t,bad)=>{ if(msg){ msg.textContent=t; msg.style.color=bad?'var(--bad)':'var(--muted)'; } };
-  if(!code){ setMsg('Enter the access code your friend sent you.', true); ci.focus(); return; }
+  if(!code){ setMsg('Enter an access code.', true); ci.focus(); return; }
   if(!handle){ setMsg('Pick a display name — this is what shows on the leaderboard.', true); hi.focus(); return; }
   if(handle.length<2 || handle.length>20){ setMsg('Handle should be 2–20 characters.', true); return; }
   setMsg('Checking…', false);
