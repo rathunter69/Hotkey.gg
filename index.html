@@ -3112,15 +3112,28 @@ const RF_OPS = [
     show: c=>({layout:'row', context:[c.val], text:''}),
     solved: c=>({layout:'row', context:[c.val], text:c.val}) },
   // — RIBBON SEQUENCES (multi-keystroke Alt paths via the new altSeq matcher) —
+  // For each align op, the cell starts in a non-target alignment so the solve produces a visible jump.
   { op:'align_center', label:'Center', keys:['Alt','H','A','C'], matchSeq: RFM.altSeq(['h','a','c']),
     make: ()=> ({text:pickHeader()}),
     instr: ()=>'Center this header',
-    show: c=>({text:c.text}),
+    show: c=>({text:c.text}),                     // default left
     solved: c=>({text:c.text, align:'c'}) },
-  { op:'blue_input', label:'Blue input', keys:['Alt','H','F','C','→','→','→','→','↵'],
-    matchSeq: RFM.altSeq(['h','f','c','arrowright','arrowright','arrowright','arrowright','enter']),
+  { op:'align_left', label:'Left align', keys:['Alt','H','A','L'], matchSeq: RFM.altSeq(['h','a','l']),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Left-align this',
+    show: c=>({text:c.text, align:'r'}),          // starts right → jumps left on solve
+    solved: c=>({text:c.text, align:'l'}) },
+  { op:'align_right', label:'Right align', keys:['Alt','H','A','R'], matchSeq: RFM.altSeq(['h','a','r']),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Right-align this',
+    show: c=>({text:c.text}),                     // default left → jumps right on solve
+    solved: c=>({text:c.text, align:'r'}) },
+  // Shortened from the full Alt+H+F+C+→→→→+Enter sequence — RF has no actual font color picker UI,
+  // so the 4 blind arrow presses had no feedback and were a UX dead zone. Drilling the ENTRY (Alt+H+F+C)
+  // is the muscle memory that matters; in real Excel the picker is visual once you're inside.
+  { op:'blue_input', label:'Blue input', keys:['Alt','H','F','C'], matchSeq: RFM.altSeq(['h','f','c']),
     make: ()=> ({val:rfBig().toLocaleString('en-US')}),
-    instr: ()=>'Blue this hardcoded input',
+    instr: ()=>'Open font color (blue this input)',
     show: c=>({text:c.val}),
     solved: c=>({text:c.val, fontColor:'blue'}) },
 ];
