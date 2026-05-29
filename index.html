@@ -1500,6 +1500,80 @@ const CHALLENGES = {
         {label:'formulas (B7, B8) left alone', ok: formulaUnchanged('B7')&&formulaUnchanged('B8')&&!isBlue('B7')&&!isBlue('B8')},
       ];
     }
+  },
+  sort:{
+    name:'Sort', label:'Sort the league table', par:18, parKeys:6,
+    prompt:'Sort the deal table by size, largest first. Select the data rows including the size column, then use the Data tab Sort shortcut.',
+    req:'<em>select A2:B5</em> (with active cell in column B) · <em>alt a s d</em> — Data → Sort → Z→A · rows reorder by size',
+    guide:[
+      'cursor to B2, then <kbd>shift</kbd>+<kbd>↓</kbd> <kbd>↓</kbd> <kbd>↓</kbd> to extend down through B5 (active stays at B2 = column B)',
+      'extend left one column · <kbd>shift</kbd>+<kbd>←</kbd>',
+      'sort largest first · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd>',
+    ],
+    targets:['A2:B5','A2:B5','A2:B5'],
+    demo(){ return [
+      {sel:'A2:B5', active:'B2', keys:[Kb.alt,L('A'),L('S'),L('D')]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Deal',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'Size ($M)',txt:true,bold:true,align:'r'};
+      // pre-shuffled order so the user can see they need to sort. Sizes are distinct so order is unambiguous.
+      const deals=[['TechCo',420],['HealthCo',180],['EnergyCo',640],['RetailCo',310]];
+      for(let i=0;i<deals.length;i++){
+        cells['A'+(i+2)]={...blankCell(),value:deals[i][0],txt:true};
+        cells['B'+(i+2)]={...blankCell(),value:deals[i][1],fmtStyle:'comma',decimals:0};
+      }
+      return {ROWS:5, cells, active:{r:2,c:2}, sel:null, colW:{1:100,2:88}};
+    },
+    checks(S){
+      const sizes=[2,3,4,5].map(r=>S.cells['B'+r] && S.cells['B'+r].value);
+      const sortedDesc = sizes.every((v,i)=> i===0 || sizes[i-1]>=v);
+      // also verify deal column moved with size column (deal names align with sizes)
+      const expectedNames = ['EnergyCo','TechCo','RetailCo','HealthCo'];   // matches build() order when sorted desc by size
+      const actualNames   = [2,3,4,5].map(r=>S.cells['A'+r] && S.cells['A'+r].value);
+      const aligned = expectedNames.every((n,i)=>n===actualNames[i]);
+      return [
+        {label:'sizes in descending order', ok: sortedDesc},
+        {label:'deal names moved with their sizes', ok: aligned},
+      ];
+    }
+  },
+  series:{
+    name:'Years', label:'Stub the year header', par:14, parKeys:8,
+    prompt:'Extend the year header across the table. B1 has 2024 and C1 has 2025 (the seed). Select B1:F1 and fill the series across.',
+    req:'<em>select B1:F1</em> · <em>alt h f i s ↵</em> — Home → Fill → Series → apply · years fill across (2026, 2027, 2028)',
+    guide:[
+      'cursor to B1, then <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>→</kbd> to extend through F1',
+      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> opens the Series dialog',
+      'apply defaults · <kbd>↵</kbd>',
+    ],
+    targets:['B1:F1','B1:F1','B1:F1'],
+    demo(){ return [
+      {sel:'B1:F1', active:'B1', keys:[Kb.alt,L('H'),L('F'),L('I'),L('S'),Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'',txt:true};
+      cells['B1']={...blankCell(),value:2024,fmtStyle:'general',decimals:0,bold:true,align:'r'};
+      cells['C1']={...blankCell(),value:2025,fmtStyle:'general',decimals:0,bold:true,align:'r'};
+      // D1, E1, F1 left empty for the user to fill
+      cells['A2']={...blankCell(),value:'Revenue',txt:true};
+      cells['A3']={...blankCell(),value:'COGS',txt:true};
+      cells['A4']={...blankCell(),value:'Gross profit',txt:true};
+      return {ROWS:4, cells, active:{r:1,c:2}, sel:null, colW:{1:100,2:78,3:78,4:78,5:78,6:78}};
+    },
+    checks(S){
+      const wanted = {D1:2026, E1:2027, F1:2028};
+      const got = Object.keys(wanted).map(k=>({k, want:wanted[k], have:S.cells[k] && S.cells[k].value}));
+      const allMatch = got.every(g=>g.have===g.want);
+      // B1 and C1 should remain untouched as the seeds
+      const seedsIntact = S.cells.B1 && S.cells.B1.value===2024 && S.cells.C1 && S.cells.C1.value===2025;
+      return [
+        {label:'series filled across D1:F1 (2026, 2027, 2028)', ok: allMatch},
+        {label:'seed cells B1, C1 unchanged', ok: seedsIntact},
+      ];
+    }
   }
 };
 
@@ -1664,6 +1738,82 @@ function autoSum(){
   }
 }
 
+// Sort the selected range by the active cell's column.
+// dir='asc' or 'desc'. Sorts whole rows together so values stay aligned across columns.
+// All cell properties (format, font color, etc) move with the value — we sort by deep-cloning rows.
+function sortRange(dir){
+  const r = selRange(); if(!r) return;
+  const sortCol = S.active.c;
+  if(sortCol < r.c1 || sortCol > r.c2) return;       // sort column must be inside the selection
+  if(r.r1 === r.r2) return;                          // single row — nothing to sort
+  // Gather rows as arrays of cloned cell objects
+  const rows = [];
+  for(let rr=r.r1; rr<=r.r2; rr++){
+    const row=[];
+    for(let cc=r.c1; cc<=r.c2; cc++){
+      row.push(JSON.parse(JSON.stringify(get(rr,cc))));
+    }
+    rows.push(row);
+  }
+  // Sort key = value in sortCol (offset within the row array)
+  const colOff = sortCol - r.c1;
+  const cmp = (a,b) => {
+    const va=a[colOff].value, vb=b[colOff].value;
+    // null/undefined sort to the end regardless of direction (Excel behavior)
+    if(va==null && vb==null) return 0;
+    if(va==null) return 1;
+    if(vb==null) return -1;
+    if(typeof va==='number' && typeof vb==='number') return va-vb;
+    return String(va).localeCompare(String(vb));
+  };
+  rows.sort(cmp);
+  if(dir==='desc') rows.reverse();
+  // Write back
+  let i=0;
+  for(let rr=r.r1; rr<=r.r2; rr++){
+    let j=0;
+    for(let cc=r.c1; cc<=r.c2; cc++){
+      S.cells[ck(rr,cc)] = rows[i][j];
+      j++;
+    }
+    i++;
+  }
+}
+
+// Fill series across the selection. Detects the step from the first 1-2 cells with values.
+// If exactly one numeric seed → step=1 (Excel default for single-cell series). Two seeds → step = b-a.
+// Walks the selection by row, then by column, filling empty cells with the projected value.
+// Conservative: only fills empty cells, only operates on numeric seeds.
+function fillSeries(){
+  const r = selRange(); if(!r) return;
+  // Determine fill direction: prefer horizontal (single-row), else vertical.
+  const isRow = (r.r1 === r.r2);
+  const isCol = (r.c1 === r.c2);
+  if(!isRow && !isCol) return;        // 2D selections: skip (would need to pick a direction)
+  // Walk in fill direction collecting seeds
+  const cells = [];
+  if(isRow){ for(let cc=r.c1; cc<=r.c2; cc++) cells.push({r:r.r1, c:cc}); }
+  else     { for(let rr=r.r1; rr<=r.r2; rr++) cells.push({r:rr,    c:r.c1}); }
+  // Find numeric seeds at the start of the run
+  const seedVals = [];
+  for(const p of cells){
+    const v = get(p.r, p.c).value;
+    if(typeof v === 'number') seedVals.push(v);
+    else break;
+  }
+  if(seedVals.length === 0) return;
+  const step = seedVals.length >= 2 ? (seedVals[1] - seedVals[0]) : 1;
+  // Fill from seed end onward
+  let nextVal = seedVals[seedVals.length-1] + step;
+  for(let i=seedVals.length; i<cells.length; i++){
+    const p = cells[i];
+    const cell = ensure(p.r, p.c);
+    cell.value = nextVal;
+    cell.formula = null;
+    nextVal += step;
+  }
+}
+
 /* ============================================================
    RENDER
    ============================================================ */
@@ -1751,7 +1901,7 @@ const TABS = [
   {k:'N',name:'Insert',live:false},
   {k:'P',name:'Page Layout',live:false},
   {k:'M',name:'Formulas',live:true},
-  {k:'A',name:'Data',live:false},
+  {k:'A',name:'Data',live:true},
   {k:'R',name:'Review',live:false},
   {k:'W',name:'View',live:false},
 ];
@@ -1762,9 +1912,12 @@ const MENUS = {
   'HB': [['T','Top'],['B','Bottom'],['A','All'],['O','Outside']],
   'HU': [['S','Sum']],
   'HA': [['L','Left'],['C','Center'],['R','Right']],
-  'HF': [['C','Font color']],
+  'HF': [['C','Font color'],['I','Fill']],
+  'HFI':[['S','Series…'],['D','Down'],['R','Right']],
   'M':  [['U','Σ AutoSum']],
   'MU': [['S','Sum']],
+  'A':  [['S','Sort']],
+  'AS': [['A','Sort A→Z'],['D','Sort Z→A']],
   'E':  [['S','Paste special…']],
 };
 const PASTE_OPTS = [
@@ -1816,6 +1969,11 @@ function drawRibbon(){
     html += `<span class="fc-name">${FONT_SWATCHES[fontColorIdx].name}</span>`;
     html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
     el.innerHTML = html; return;
+  }
+  if(dialog==='series'){
+    el.className='ribbon show';
+    el.innerHTML='<span class="path">series →</span><span class="opt">linear, step from selection · <kbd>↵</kbd> apply · <kbd>esc</kbd> cancel</span>';
+    return;
   }
   el.className='ribbon show';
   let html='';
@@ -2028,6 +2186,11 @@ function applyRibbon(key){
     }
     return;
   }
+  // fill-series dialog — Excel opens a "Series" dialog from Alt H F I S; Enter applies defaults
+  if(dialog==='series'){
+    if(key==='ENTER'){ pushUndo(); fillSeries(); return exitRibbon(true); }
+    return;
+  }
   // top level: pick a ribbon tab (or legacy / chord)
   if(path.length===0){
     if(key==='='){ autoSum(); return exitRibbon(true); }              // alt = chord
@@ -2041,6 +2204,11 @@ function applyRibbon(key){
   const np=path.join('')+key;
   if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; drawRibbon(); return; }
   if(np==='HFC'){ dialog='fontcolor'; fontColorIdx=0; drawRibbon(); return; }
+  if(np==='HFIS'){ dialog='series'; drawRibbon(); return; }
+  if(np==='ASA'){ pushUndo(); sortRange('asc'); return exitRibbon(true); }
+  if(np==='ASD'){ pushUndo(); sortRange('desc'); return exitRibbon(true); }
+  if(np==='HFID'){ pushUndo(); fillFrom('down');  return exitRibbon(true); }    // mirror of Ctrl+D, available from the Fill submenu
+  if(np==='HFIR'){ pushUndo(); fillFrom('right'); return exitRibbon(true); }    // mirror of Ctrl+R
   const RUN={
     'H1':c=>c.bold=!c.bold, 'HH':c=>c.fill='blue', 'HW':c=>c.wrap=!c.wrap,
     'HK':c=>{c.fmtStyle='comma';c.decimals=2;}, 'H9':c=>c.decimals=Math.max(0,c.decimals-1),
@@ -2376,6 +2544,40 @@ const RFM = {
   ctrlShift: (...ks) => e=>(e.ctrlKey||e.metaKey)&&e.shiftKey&&!e.altKey&&ks.includes(e.key),
   alt: k => e=>e.altKey&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&e.key===k,
   bare: k => e=>!e.ctrlKey&&!e.altKey&&!e.metaKey&&!e.shiftKey&&e.key===k,
+  // Stateful matcher for Alt-prefixed ribbon sequences (e.g. ['h','a','c'] for Alt H A C).
+  // Returns a factory: each call to the factory creates a FRESH matcher with its own state.
+  // The matcher takes a KeyboardEvent and returns one of: 'match' | 'partial' | 'no'.
+  //   'match'   — full sequence complete (op fires)
+  //   'partial' — keystroke advanced into the sequence; event should be consumed without penalty
+  //   'no'      — unrelated keystroke (dispatcher checks other ops)
+  // Tokens are lowercased event.key strings: 'h', 'enter', 'arrowright', etc. Handles both
+  // Excel patterns: holding Alt while typing AND tap-Alt-then-type.
+  altSeq: (tokens) => () => {
+    const seq = tokens.map(s=>s.toLowerCase());
+    let pos = 0;          // next letter index expected
+    let altLatched = false;
+    return (e) => {
+      const k = e.key;
+      const lowerK = k.toLowerCase();
+      // pressing Alt alone (tap pattern) — enter ribbon mode, reset progress
+      if(k==='Alt'){ altLatched = true; pos = 0; return 'partial'; }
+      // ignore lone modifier presses without resetting state
+      if(k==='Control' || k==='Shift' || k==='Meta') return 'no';
+      // hold-Alt pattern (first key): altKey held, no other modifiers
+      const heldAltOk = e.altKey && !e.ctrlKey && !e.metaKey;
+      const inRibbon = altLatched || pos > 0 || heldAltOk;
+      if(!inRibbon){ pos = 0; altLatched = false; return 'no'; }
+      // expected token check — case-insensitive, no ctrl/meta
+      if(!e.ctrlKey && !e.metaKey && lowerK === seq[pos]){
+        pos++;
+        if(pos === seq.length){ pos = 0; altLatched = false; return 'match'; }
+        return 'partial';
+      }
+      // wrong key mid-sequence — reset state but report 'no' so dispatcher can check chord ops
+      pos = 0; altLatched = false;
+      return 'no';
+    };
+  },
 };
 
 const RF_OPS = [
@@ -2498,6 +2700,24 @@ const RF_OPS = [
     instr: ()=>'Fill the value right',
     show: c=>({layout:'row', context:[c.val], text:''}),
     solved: c=>({layout:'row', context:[c.val], text:c.val}) },
+  // — RIBBON SEQUENCES (multi-keystroke Alt paths via the new altSeq matcher) —
+  { op:'align_center', label:'Center', keys:['Alt','H','A','C'], matchSeq: RFM.altSeq(['h','a','c']),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Center this header',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text, align:'c'}) },
+  { op:'fill_series', label:'Fill series', keys:['Alt','H','F','I','S','↵'],
+    matchSeq: RFM.altSeq(['h','f','i','s','enter']),
+    make: ()=> { const y=2020+Math.floor(Math.random()*6); return {y1:y, y2:y+1}; },
+    instr: ()=>'Fill the years across',
+    show: c=>({layout:'row', context:[c.y1, c.y2], text:''}),
+    solved: c=>({layout:'row', context:[c.y1, c.y2], text:String(c.y2+1)}) },
+  { op:'blue_input', label:'Blue input', keys:['Alt','H','F','C','→','→','→','→','↵'],
+    matchSeq: RFM.altSeq(['h','f','c','arrowright','arrowright','arrowright','arrowright','enter']),
+    make: ()=> ({val:rfBig().toLocaleString('en-US')}),
+    instr: ()=>'Blue this hardcoded input',
+    show: c=>({text:c.val}),
+    solved: c=>({text:c.val, fontColor:'blue'}) },
 ];
 const rfMid = () => Math.floor(Math.random()*900) + 100;     // 100–999, fits cleanly in a mini cell
 let rfBusy=false;
@@ -2763,6 +2983,8 @@ function loadRapidCard(){
   do{ op=RF_OPS[Math.floor(Math.random()*RF_OPS.length)]; guard++; } while(RF_OPS.length>1 && op.op===lastRapid && guard<8);
   lastRapid=op.op;
   rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data:op.make(),
+    // sequence ops get a fresh stateful matcher per task; chord ops get null and use the chord-find path
+    matcher: op.matchSeq ? op.matchSeq() : null,
     cellLabel: colLetter(2+(Math.random()*4|0))+(2+(Math.random()*6|0)), shownAt:performance.now() };
   rfBusy=false; renderRfCard('show');
 }
@@ -2780,6 +3002,13 @@ function renderRfCard(state){
       cell.textContent = view.text||'\u00A0';
       const flags=['bold','italic','underline','strike','fx','link','border'].filter(f=>view[f]).join(' ');
       cell.className='rf-cell'+(flags?' '+flags:'')+(state==='solved'?' flash':'');
+      // alignment override (for the center/right-align RF ops) — flex-based since rf-cell is display:flex
+      cell.style.justifyContent = view.align==='c' ? 'center' : view.align==='r' ? 'flex-end' : '';
+      // font color override (for the blue-input RF op) — look up the swatch hex
+      if(view.fontColor){
+        const sw = FONT_SWATCHES.find(s=>s.k===view.fontColor);
+        cell.style.color = sw ? sw.hex : '';
+      } else cell.style.color = '';
     } else {
       // multi-cell: container holds context mini-cells + the target
       cell.className = 'rf-cell-multi';
@@ -2812,11 +3041,20 @@ function rapidKey(e){
   const k=e.key;
   if(k==='Escape'){ e.preventDefault(); return; }
   if(rfBusy || !rfTask){ if(e.ctrlKey||e.altKey) e.preventDefault(); return; }
-  // does this keystroke match ANY rapid op?
-  const matched = RF_OPS.find(o => o.match(e));
+  // first-keystroke timer kick — any matched/partial keystroke counts as session start
+  const kickTimer = () => { if(marathon && marathon.active && !marathon.endAt){ marathon.startAt=performance.now(); marathon.endAt=marathon.startAt+marathon.dur*1000; } };
+  // STATEFUL MATCHER PATH — only for the current task, if it's a sequence op
+  if(rfTask.matcher){
+    const res = rfTask.matcher(e);
+    if(res === 'match'){ e.preventDefault(); kickTimer(); rfSolve(); return; }
+    if(res === 'partial'){ e.preventDefault(); kickTimer(); return; }
+    // 'no' falls through to chord-op check below
+  }
+  // CHORD PATH — does this keystroke match any chord op?
+  const matched = RF_OPS.find(o => o.match && o.match(e));
   if(!matched) return;                                       // unrelated key — no penalty
   e.preventDefault();
-  if(marathon && marathon.active && !marathon.endAt){ marathon.startAt=performance.now(); marathon.endAt=marathon.startAt+marathon.dur*1000; }
+  kickTimer();
   if(matched.op === rfTask.op) rfSolve(); else rfMiss();
 }
 function rfSolve(){
@@ -3184,11 +3422,14 @@ const DRILL_DESC = {
   foot:'SUM across and down, tie out the corner',
   comps:'EV/EBITDA multiples, then the average',
   lookup:'Pull a value out of a table with INDEX/MATCH',
+  sort:'Sort a deal table descending — Alt A S D',
+  series:'Fill a year header across — Alt H F I S',
 };
 const DRILL_GROUPS = [
   {name:'Foundations', keys:['copyover']},
   {name:'Formatting',  keys:['polish','combo','format','center','blue','gauntlet']},
-  {name:'Values',      keys:['drill']},
+  {name:'Values',      keys:['drill','series']},
+  {name:'Data',        keys:['sort']},
   {name:'Formulas',    keys:['margin','foot','percent','schedule','comps']},
   {name:'Lookups',     keys:['lookup']},
 ];
@@ -3199,7 +3440,9 @@ const MENU_ORDER = (()=>{ const g=DRILL_GROUPS.flatMap(x=>x.keys).filter(k=>CHAL
 const TAB_LABEL = {
   copyover:'Basics', polish:'Header', combo:'Cleanup', format:'Formats',
   center:'Align', blue:'Inputs', gauntlet:'Model',
-  drill:'Hardcode', margin:'Margin', foot:'Cross-foot', percent:'Common-size',
+  drill:'Hardcode', series:'Years',
+  sort:'Sort',
+  margin:'Margin', foot:'Cross-foot', percent:'Common-size',
   schedule:'Schedule', comps:'Comps', lookup:'Lookup',
 };
 const GROUP_OF = (()=>{ const m={}; DRILL_GROUPS.forEach(g=>g.keys.forEach(k=>{ m[k]=g.name; })); return m; })();
