@@ -1107,18 +1107,20 @@ const CHALLENGES = {
     }
   },
   margin:{
-    name:'Formula', label:'Build the margin', par:42, parKeys:34,
-    prompt:'Calculate each company\'s EBITDA margin with a live formula — EBITDA ÷ revenue — typed into the Margin column, then format that column as a percentage to one decimal.',
-    req:'<em>type the formula</em> · in each margin cell type <em>=C2/B2</em> then <em>↵</em> · then select the column, <em>ctrl+shift+%</em>, and <em>alt h 0</em> for one decimal',
+    name:'Formula', label:'Build the margin', par:22, parKeys:14,
+    prompt:'Compute each company\'s EBITDA margin — EBITDA ÷ revenue. Build the formula once at D2 by pointing, fill it down the column, then format as a percentage to 1 decimal.',
+    req:'<em>=</em> at D2 · <em>←</em> grabs EBITDA · <em>/</em> · <em>←←</em> grabs revenue · <em>↵</em> · then select D2:D4, <em>ctrl+d</em> to fill · <em>ctrl+shift+%</em> · <em>alt h 0</em>',
     guide:[
-      'in D2 type <kbd>=</kbd> <kbd>C</kbd> <kbd>2</kbd> <kbd>/</kbd> <kbd>B</kbd> <kbd>2</kbd> <kbd>↵</kbd> — then the same down the column (D3 =C3/B3, D4 =C4/B4)',
-      'select the margin column · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
+      'at D2 start the formula · <kbd>=</kbd>',
+      'arrow to EBITDA · <kbd>←</kbd> · pointer lands on C2 — formula reads <b>=C2</b>',
+      'divide · <kbd>/</kbd> · then <kbd>←</kbd> <kbd>←</kbd> to grab revenue B2 — formula reads <b>=C2/B2</b> · commit <kbd>↵</kbd>',
+      'back up to D2 (<kbd>↑</kbd>), select D2:D4 with <kbd>shift</kbd>+<kbd>↓</kbd> <kbd>↓</kbd>, then <kbd>ctrl</kbd>+<kbd>d</kbd> to fill the formula down',
+      'format the margin column · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
     ],
     targets:['D2:D4','D2:D4'],
     demo(){ return [
-      {sel:'D2', keys:[...T('=C2/B2'), Kb.enter]},
-      {sel:'D3', keys:[...T('=C3/B3'), Kb.enter]},
-      {sel:'D4', keys:[...T('=C4/B4'), Kb.enter]},
+      {sel:'D2', keys:[{key:'='}, {key:'ArrowLeft'}, {key:'/'}, {key:'ArrowLeft'}, {key:'ArrowLeft'}, Kb.enter]},
+      {sel:'D2:D4', keys:[Kb.fillD]},
       {sel:'D2:D4', keys:[Kb.pct, Kb.alt, L('H'), D(0)]},
     ]; },
     build(){
@@ -1151,22 +1153,23 @@ const CHALLENGES = {
     }
   },
   schedule:{
-    name:'Schedule', label:'Roll it forward', par:60, parKeys:52,
-    prompt:'Complete this four-year PP&E roll-forward. Each year\'s ending balance is beginning minus depreciation — and each new year must begin where the prior year ended. Build it with live formulas, not hardcoded numbers.',
-    req:'<em>type formulas</em> · ending = beginning − depreciation (e.g. <em>=B2-B3</em>) · then link each year\'s beginning to the prior year\'s ending (e.g. <em>=B4</em> in C2)',
+    name:'Schedule', label:'Roll it forward', par:50, parKeys:54,
+    prompt:'Complete this four-year PP&E roll-forward by pointing. Each year\'s Ending = Beginning − Depreciation; each next year\'s Beginning links to the prior Ending. Live formulas everywhere, no hardcoded numbers.',
+    req:'<em>endings</em> · at each Ending cell · <em>=</em> · <em>↑↑</em> Beginning · <em>−</em> · <em>↑</em> Depreciation · <em>↵</em> · <em>links</em> · at each new-year Beginning · <em>=</em> · navigate down-left to the prior Ending · <em>↵</em>',
     guide:[
-      'fill the Ending row: in B4 type <kbd>=</kbd><kbd>B</kbd><kbd>2</kbd><kbd>-</kbd><kbd>B</kbd><kbd>3</kbd> <kbd>↵</kbd>, then C4 =C2-C3, D4 =D2-D3, E4 =E2-E3',
-      'link each Beginning to the prior Ending: in C2 type <kbd>=</kbd><kbd>B</kbd><kbd>4</kbd> <kbd>↵</kbd>, then D2 =C4, E2 =D4',
+      'at B4 build the Y1 ending · <kbd>=</kbd> <kbd>↑</kbd> <kbd>↑</kbd> grabs B2 · <kbd>−</kbd> · <kbd>↑</kbd> grabs B3 · <kbd>↵</kbd> · formula reads <b>=B2-B3</b>',
+      'navigate to C2 and link to last year\'s ending · <kbd>=</kbd> <kbd>↓</kbd> <kbd>↓</kbd> <kbd>←</kbd> · <kbd>↵</kbd> · formula reads <b>=B4</b>',
+      'repeat the pattern across years: ending = beginning − depreciation, beginning = prior ending',
     ],
     targets:['B4:E4','C2:E2'],
     demo(){ return [
-      {sel:'B4', keys:[...T('=B2-B3'), Kb.enter]},
-      {sel:'C2', keys:[...T('=B4'), Kb.enter]},
-      {sel:'C4', keys:[...T('=C2-C3'), Kb.enter]},
-      {sel:'D2', keys:[...T('=C4'), Kb.enter]},
-      {sel:'D4', keys:[...T('=D2-D3'), Kb.enter]},
-      {sel:'E2', keys:[...T('=D4'), Kb.enter]},
-      {sel:'E4', keys:[...T('=E2-E3'), Kb.enter]},
+      {sel:'B4', keys:[{key:'='}, {key:'ArrowUp'}, {key:'ArrowUp'}, {key:'-'}, {key:'ArrowUp'}, Kb.enter]},
+      {sel:'C2', keys:[{key:'='}, {key:'ArrowDown'}, {key:'ArrowDown'}, {key:'ArrowLeft'}, Kb.enter]},
+      {sel:'C4', keys:[{key:'='}, {key:'ArrowUp'}, {key:'ArrowUp'}, {key:'-'}, {key:'ArrowUp'}, Kb.enter]},
+      {sel:'D2', keys:[{key:'='}, {key:'ArrowDown'}, {key:'ArrowDown'}, {key:'ArrowLeft'}, Kb.enter]},
+      {sel:'D4', keys:[{key:'='}, {key:'ArrowUp'}, {key:'ArrowUp'}, {key:'-'}, {key:'ArrowUp'}, Kb.enter]},
+      {sel:'E2', keys:[{key:'='}, {key:'ArrowDown'}, {key:'ArrowDown'}, {key:'ArrowLeft'}, Kb.enter]},
+      {sel:'E4', keys:[{key:'='}, {key:'ArrowUp'}, {key:'ArrowUp'}, {key:'-'}, {key:'ArrowUp'}, Kb.enter]},
     ]; },
     build(){
       const cells={};
@@ -1202,16 +1205,18 @@ const CHALLENGES = {
     }
   },
   percent:{
-    name:'% of rev', label:'Common-size it', par:34, parKeys:24,
-    prompt:'Express each line item as a percentage of revenue. Write the formula once with an absolute reference to revenue, fill it down the column, then format as a percentage — the $ keeps revenue locked as the formula fills.',
-    req:'<em>absolute reference + fill</em> · in C2 type <em>=B2/$B$2</em> (the $ locks revenue) · select C2:C6 and <em>ctrl+d</em> to fill down · then <em>ctrl+shift+%</em> and <em>alt h 0</em>',
+    name:'% of rev', label:'Common-size it', par:30, parKeys:18,
+    prompt:'Express each line item as a percentage of revenue. Build the formula once with an absolute reference to revenue (the $ keeps it locked as you fill down), then format the column as a percentage. F4 is the trick — point at revenue, then F4 cycles in the $ anchors.',
+    req:'<em>=</em> · <em>←</em> grabs the line item · <em>/</em> · <em>←</em> grabs revenue · <em>F4</em> cycles to <em>$B$2</em> · <em>↵</em> · fill down C2:C6 with <em>ctrl+d</em> · then <em>ctrl+shift+%</em> + <em>alt h 0</em>',
     guide:[
-      'in C2 type <kbd>=</kbd><kbd>B</kbd><kbd>2</kbd><kbd>/</kbd><kbd>$</kbd><kbd>B</kbd><kbd>$</kbd><kbd>2</kbd> <kbd>↵</kbd> — the $ locks revenue — then select C2:C6 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill down',
-      'select the % column · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
+      'at C2 · <kbd>=</kbd> · <kbd>←</kbd> grabs B2 (the line item itself) · <kbd>/</kbd>',
+      '<kbd>←</kbd> grabs B2 (revenue, this same row) · <kbd>F4</kbd> cycles in the $ anchor → <b>$B$2</b> — now it stays locked when filling down',
+      'commit · <kbd>↵</kbd> · back to C2 (<kbd>↑</kbd>), select C2:C6 with <kbd>shift</kbd>+<kbd>↓</kbd>×4, then <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'format the % column · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
     ],
     targets:['C2:C6','C2:C6'],
     demo(){ return [
-      {sel:'C2', keys:[...T('=B2/$B$2'), Kb.enter]},
+      {sel:'C2', keys:[{key:'='}, {key:'ArrowLeft'}, {key:'/'}, {key:'ArrowLeft'}, {key:'F4'}, Kb.enter]},
       {sel:'C2:C6', keys:[Kb.fillD]},
       {sel:'C2:C6', keys:[Kb.pct, Kb.alt, L('H'), D(0)]},
     ]; },
@@ -1398,16 +1403,17 @@ const CHALLENGES = {
     }
   },
   comps:{
-    name:'Comps', label:'Line up the comps', par:40, parKeys:32,
-    prompt:'Finish the comp set: compute each company\'s EV/EBITDA multiple with a formula, fill it down the column, then add the average multiple at the bottom.',
-    req:'<em>multiple = EV ÷ EBITDA</em> · in D2 type <em>=B2/C2</em>, fill down · then <em>=AVERAGE(D2:D5)</em> for the mean',
+    name:'Comps', label:'Line up the comps', par:32, parKeys:24,
+    prompt:'Finish the comp set: build each EV/EBITDA multiple by pointing, fill down, then drop in the average at the bottom (AVERAGE function — function name is typed, range is pointed or typed).',
+    req:'<em>=</em> at D2 · <em>←←</em> grabs EV · <em>/</em> · <em>←</em> grabs EBITDA · <em>↵</em> · fill D2:D5 with <em>ctrl+d</em> · at D6 type <em>=AVERAGE(D2:D5)</em>',
     guide:[
-      'in D2 type <kbd>=B2/C2</kbd> <kbd>↵</kbd>, then select D2:D5 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill the multiple down',
-      'in D6 type <kbd>=AVERAGE(D2:D5)</kbd> <kbd>↵</kbd> for the mean multiple',
+      'at D2 · <kbd>=</kbd> · <kbd>←</kbd> <kbd>←</kbd> grabs EV (B2) · <kbd>/</kbd> · <kbd>←</kbd> grabs EBITDA (C2) · <kbd>↵</kbd> · formula reads <b>=B2/C2</b>',
+      'back up (<kbd>↑</kbd>), select D2:D5 with <kbd>shift</kbd>+<kbd>↓</kbd>×3, then <kbd>ctrl</kbd>+<kbd>d</kbd> to fill the multiple down',
+      'at D6 type <kbd>=AVERAGE(D2:D5)</kbd> <kbd>↵</kbd> — function names get typed, range gets typed (or pointed if you want)',
     ],
     targets:['D2:D5','D6'],
     demo(){ return [
-      {sel:'D2', keys:[...T('=B2/C2'), Kb.enter]},
+      {sel:'D2', keys:[{key:'='}, {key:'ArrowLeft'}, {key:'ArrowLeft'}, {key:'/'}, {key:'ArrowLeft'}, Kb.enter]},
       {sel:'D2:D5', keys:[Kb.fillD]},
       {sel:'D6', keys:[...T('=AVERAGE(D2:D5)'), Kb.enter]},
     ]; },
@@ -1985,6 +1991,14 @@ function render(){
   const g=$('grid'); g.innerHTML='';
   const sr=selRange();
   const gt=currentGuideTarget();
+  // Color refs: while editing → from editBuf; otherwise → from the active cell's formula (Excel's "F2 to inspect" behavior).
+  // Same code path serves both contexts.
+  let refColors = {};
+  if(editing){ refColors = parseFormulaRefs(editBuf).cellColors; }
+  else {
+    const ac = get(S.active.r, S.active.c);
+    if(ac.formula) refColors = parseFormulaRefs(ac.formula).cellColors;
+  }
   // header row
   let head='<tr><th class="rowhdr"></th>';
   for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${colW[c]}px">${colLetter(c)}</th>`;
@@ -2005,12 +2019,25 @@ function render(){
       if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
       let txt=dispText(cell);
-      if(editing && isActive){ txt=editBuf+'▏'; cls.push('editing'); }
+      if(editing && isActive){
+        // Editing cell: show formula buffer with colored refs (matches what's in the formula bar)
+        const {refs} = parseFormulaRefs(editBuf);
+        cls.push('editing');
+        txt = buildFormulaHTML(editBuf, refs) + '▏';
+      }
       else if(isNum(cell)&&!cell.wrap){
         const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals).length*CHARPX+12;
         if(tw>colW[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(colW[c]/8))); }
       }
-      row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${colW[c]}px;max-width:${colW[c]}px">${txt}</td>`;
+      // Ref color overlay: when this cell is referenced by the active formula, outline it in that ref's color.
+      // Skip the active cell itself (would conflict with the active outline) and the pointer cell (point class wins).
+      const refKey = colLetter(c)+r;
+      const refColor = refColors[refKey];
+      let extraStyle = '';
+      if(refColor && !isActive && !(editing && editPointer && r===editPointer.r && c===editPointer.c)){
+        extraStyle = `;outline:2px solid ${refColor};outline-offset:-2px;z-index:2`;
+      }
+      row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${colW[c]}px;max-width:${colW[c]}px${extraStyle}">${txt}</td>`;
     }
     row+='</tr>'; g.innerHTML+=row;
   }
@@ -2036,13 +2063,69 @@ function positionMarquee(){
   m.style.width=(br.right-ar.left)+'px';
   m.style.height=(br.bottom-ar.top)+'px';
 }
+// Color palette for formula reference highlighting (Excel "trace at a glance" style).
+// Six saturated mid-tones, legible on both dark and light themes. Same ref reuses the same color.
+const REF_PALETTE = ['#4f9ee8','#d97560','#a48cd3','#65c19f','#d8a951','#8b9bbe'];
+const REF_RX = /(\$?[A-Z]+\$?\d+)(?::(\$?[A-Z]+\$?\d+))?/g;
+// Parse a formula buffer into a list of refs with assigned colors.
+// Returns { refs:[{raw,r1,c1,r2,c2,color,start,end}], cellColors:{[ck]:color} }.
+// Color assignment is by ORDER OF FIRST APPEARANCE — duplicate refs share their color.
+function parseFormulaRefs(buf){
+  const refs = [];
+  const cellColors = {};
+  const refToColor = {};
+  if(!buf || buf[0] !== '=') return {refs, cellColors};
+  let m, ix = 0;
+  const re = new RegExp(REF_RX.source, 'g');
+  while((m = re.exec(buf))){
+    const raw = m[0];
+    const a = parseRef(m[1]); if(!a) continue;
+    const b = m[2] ? parseRef(m[2]) : a;
+    if(!b) continue;
+    const r1 = Math.min(a.r,b.r), r2 = Math.max(a.r,b.r);
+    const c1 = Math.min(a.c,b.c), c2 = Math.max(a.c,b.c);
+    // Key the color cache by COORDINATE, not raw text — so B2 and $B$2 share a color (same cell, different anchor style)
+    const coordKey = r1+','+c1+','+r2+','+c2;
+    let color = refToColor[coordKey];
+    if(!color){ color = REF_PALETTE[ix++ % REF_PALETTE.length]; refToColor[coordKey] = color; }
+    refs.push({raw, r1, c1, r2, c2, color, start:m.index, end:m.index+raw.length});
+    for(let rr=r1; rr<=r2; rr++) for(let cc=c1; cc<=c2; cc++){
+      // first-color-wins on overlaps so the visual stays stable
+      const k = colLetter(cc)+rr;
+      if(!cellColors[k]) cellColors[k] = color;
+    }
+  }
+  return {refs, cellColors};
+}
+// Build the formula bar HTML with refs wrapped in colored spans. Safe — escapes < > & first.
+function buildFormulaHTML(buf, refs){
+  const escape = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if(!refs.length) return escape(buf);
+  let out = '', last = 0;
+  for(const r of refs){
+    out += escape(buf.slice(last, r.start));
+    out += `<span style="color:${r.color};font-weight:600">${escape(buf.slice(r.start, r.end))}</span>`;
+    last = r.end;
+  }
+  out += escape(buf.slice(last));
+  return out;
+}
 function updateFormulaBar(){
-  if(editing){ $('nameBox').textContent=ck(S.active.r,S.active.c);
-    const fc=$('fContent'); fc.className='fcontent isfx'; fc.textContent=editBuf; return; }
+  if(editing){
+    $('nameBox').textContent=ck(S.active.r,S.active.c);
+    const fc=$('fContent'); fc.className='fcontent isfx';
+    const {refs} = parseFormulaRefs(editBuf);
+    fc.innerHTML = buildFormulaHTML(editBuf, refs);
+    return;
+  }
   const cell=get(S.active.r,S.active.c);
   $('nameBox').textContent=ck(S.active.r,S.active.c);
   const fc=$('fContent');
-  if(cell.formula){ fc.className='fcontent isfx'; fc.textContent=cell.formula; }
+  if(cell.formula){
+    fc.className='fcontent isfx';
+    const {refs} = parseFormulaRefs(cell.formula);
+    fc.innerHTML = buildFormulaHTML(cell.formula, refs);
+  }
   else if(cell.value!==null&&cell.value!==''){ fc.className='fcontent'; fc.textContent=String(cell.value); }
   else { fc.className='fcontent empty'; fc.textContent='empty'; }
 }
@@ -2319,6 +2402,25 @@ function movePointer(dr, dc){
   return true;
 }
 
+// F4 cycles the anchor on the current pointer reference: B2 → $B$2 → B$2 → $B2 → B2.
+// Only acts while editPointer is set (the most-recent reference, still "live" for tweaking).
+function cycleAnchor(){
+  if(!editPointer || editPointerStart < 0) return false;
+  const curRef = editBuf.slice(editPointerStart);
+  // Match the four cycle states by current text
+  const m = curRef.match(/^(\$?)([A-Z]+)(\$?)(\d+)$/);
+  if(!m) return false;
+  const [, dolC, col, dolR, row] = m;
+  // Cycle: none → both → row → col → none
+  let next;
+  if(!dolC && !dolR)      next = '$'+col+'$'+row;
+  else if(dolC && dolR)   next = col+'$'+row;
+  else if(!dolC && dolR)  next = '$'+col+row;
+  else                    next = col+row;
+  editBuf = editBuf.slice(0, editPointerStart) + next;
+  return true;
+}
+
 function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
 function updateChecklist(){
   const el=$('checklist'); if(!el||!S) return;
@@ -2548,6 +2650,12 @@ document.addEventListener('keydown',e=>{
     if(k==='Enter'){ commitEdit(1,0); return; }
     if(k==='Tab'){ commitEdit(0,1); return; }
     if(k==='Escape'){ cancelEdit(); return; }
+    if(k==='F4'){
+      // F4 cycles anchor styles on the current pointer reference (B2 → $B$2 → B$2 → $B2 → B2).
+      // No-op if no live pointer (mirrors Excel: only the most-recent ref cycles).
+      if(cycleAnchor()){ logKey('F4'); render(); }
+      return;
+    }
     if(k==='Backspace'){
       // If we're in pointer mode, Backspace removes the whole reference at once (Excel parity).
       if(editPointer){
