@@ -2720,6 +2720,13 @@ const RF_OPS = [
     instr: ()=>'Strip the borders off',
     show: c=>({text:c.text, border:true}),
     solved: c=>({text:c.text, border:false}) },
+  // Filter activation — pure muscle-memory drill for Ctrl+Shift+L. No filter engine; the ▼ caret
+  // on solve signals "filter dropdown now available" the same way Excel's header changes after activation.
+  { op:'filter', label:'Filter', keys:['Ctrl','Shift','L'], match: RFM.ctrlShift('L','l'),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Activate filter on this column',
+    show: c=>({text:c.text, bold:true}),
+    solved: c=>({text:c.text+'   ▼', bold:true}) },
 
   // — STAMPS (one chord drops a value into an empty cell) —
   { op:'today', label:'Insert today', keys:['Ctrl',';'], match: RFM.ctrl(';'),
