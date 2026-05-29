@@ -680,6 +680,8 @@
     border:1px solid var(--line); border-bottom-width:2px; border-radius:7px; padding:8px 13px; min-width:36px; transition:all .12s}
   .rf-keycap.lit{color:#0c0d0e; background:var(--accent); border-color:var(--accent); box-shadow:0 0 16px var(--accent-glow); transform:translateY(1px)}
   .rf-keycap.sep{border:none; background:none; color:var(--faint); padding:8px 0; min-width:0}
+  .rf-or-sep{font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:1.5px;
+    text-transform:uppercase; padding:0 14px; align-self:center}
   .rf-keys.miss{animation:rfshake .3s}
   .rf-keys.miss .rf-keycap:not(.sep){border-color:var(--bad); color:var(--bad)}
   .rf-hardo-hint{font-family:var(--mono); font-size:11.5px; color:var(--faint); letter-spacing:.5px; text-transform:uppercase}
@@ -3040,6 +3042,7 @@ const RF_OPS = [
 
   // — BORDERS —
   { op:'border', label:'Outline border', keys:['Ctrl','Shift','&'], match: RFM.ctrlShift('&','7'),
+    alts:[ { keys:['Alt','H','B','S'], matchSeq: RFM.altSeq(['h','b','s']) } ],
     make: ()=> ({text:pickHeader()}),
     instr: ()=>'Add an outline border',
     show: c=>({text:c.text}),
@@ -3081,9 +3084,10 @@ const RF_OPS = [
     instr: ()=>'Convert to a hyperlink',
     show: c=>({text:c.text}),
     solved: c=>({text:c.text, link:true}) },
-  { op:'delete', label:'Delete', keys:['Del'], match: RFM.bare('Delete'),
+  { op:'clear_contents', label:'Clear contents', keys:['Del'], match: RFM.bare('Delete'),
+    alts:[ { keys:['Alt','H','E','C'], matchSeq: RFM.altSeq(['h','e','c']) } ],
     make: ()=> ({text:pickHeader()}),
-    instr: ()=>'Wipe this cell',
+    instr: ()=>'Clear the contents',
     show: c=>({text:c.text}),
     solved: ()=>({text:''}) },
 
@@ -3137,6 +3141,94 @@ const RF_OPS = [
     instr: ()=>'Open font color (blue this input)',
     show: c=>({text:c.val}),
     solved: c=>({text:c.val, fontColor:'blue'}) },
+
+  // — CLEAR FAMILY (ribbon-only Alt+H+E+_ paths) —
+  { op:'clear_all', label:'Clear all', keys:['Alt','H','E','A'], matchSeq: RFM.altSeq(['h','e','a']),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Clear everything (text + formatting)',
+    show: c=>({text:c.text, bold:true, border:true}),
+    solved: ()=>({text:''}) },
+  { op:'clear_formats', label:'Clear formats', keys:['Alt','H','E','F'], matchSeq: RFM.altSeq(['h','e','f']),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Strip the formatting (keep the text)',
+    show: c=>({text:c.text, bold:true, italic:true, border:true}),
+    solved: c=>({text:c.text}) },
+
+  // — DIALOG MUSCLE-MEMORY (chord opens a dialog; cell shows a confirmation badge on solve) —
+  { op:'find', label:'Find', keys:['Ctrl','F'], match: RFM.ctrl('f'),
+    make: ()=> ({}),
+    instr: ()=>'Open Find',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'Find  \u25be'}) },
+  { op:'replace', label:'Replace', keys:['Ctrl','H'], match: RFM.ctrl('h'),
+    make: ()=> ({}),
+    instr: ()=>'Open Find & Replace',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'Replace  \u25be'}) },
+  // Two-chord example: Ctrl+G and F5 are both valid Excel shortcuts for Go To.
+  { op:'goto', label:'Go to', keys:['Ctrl','G'], match: RFM.ctrl('g'),
+    alts:[ { keys:['F5'], match: RFM.bare('F5') } ],
+    make: ()=> ({}),
+    instr: ()=>'Open Go To',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'Go To  \u2192'}) },
+  { op:'format_cells', label:'Format cells', keys:['Ctrl','1'], match: RFM.ctrl('1'),
+    make: ()=> ({}),
+    instr: ()=>'Open Format Cells',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'Format Cells\u2026'}) },
+  { op:'insert_function', label:'Insert function', keys:['Shift','F3'],
+    match: e=>e.shiftKey&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&e.key==='F3',
+    make: ()=> ({}),
+    instr: ()=>'Open Insert Function',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'fx  \u25be', fx:true}) },
+
+  // — WORKFLOW BADGES (pure muscle memory for global actions) —
+  { op:'save', label:'Save', keys:['Ctrl','S'], match: RFM.ctrl('s'),
+    make: ()=> ({}),
+    instr: ()=>'Save the workbook',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'Saved  \u2713'}) },
+  { op:'new_sheet', label:'New sheet', keys:['Shift','F11'],
+    match: e=>e.shiftKey&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&e.key==='F11',
+    make: ()=> ({}),
+    instr: ()=>'Insert a new sheet',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'+ Sheet'}) },
+  { op:'freeze_panes', label:'Freeze panes', keys:['Alt','W','F','F'], matchSeq: RFM.altSeq(['w','f','f']),
+    make: ()=> ({}),
+    instr: ()=>'Freeze panes here',
+    show: ()=>({text:''}),
+    solved: ()=>({text:'Frozen'}) },
+
+  // — SELECTION —
+  { op:'select_all', label:'Select all', keys:['Ctrl','A'], match: RFM.ctrl('a'),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Select the whole sheet',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text+'  (selected)', bold:true}) },
+
+  // — VIEW TOGGLE —
+  { op:'show_formulas', label:'Show formulas', keys:['Ctrl','`'], match: RFM.ctrl('`'),
+    make: ()=> { const ref=rfFormulaRef(); const v=rfBig(); return {ref, val:v.toLocaleString('en-US')}; },
+    instr: ()=>'Toggle formula view',
+    show: c=>({text:c.val}),
+    solved: c=>({text:'=B2*'+c.ref, fx:true}) },
+
+  // — FORMULA AUDIT —
+  { op:'trace_precedents', label:'Trace precedents', keys:['Alt','M','P'], matchSeq: RFM.altSeq(['m','p']),
+    make: ()=> { const a=rfFormulaRef(), b=rfFormulaRef(); return {a, b, formula:'='+a+'+'+b}; },
+    instr: ()=>'Trace precedents',
+    show: c=>({text:c.formula, fx:true}),
+    solved: c=>({text:c.formula+'  \u2190', fx:true}) },
+
+  // — CLIPBOARD —
+  { op:'copy', label:'Copy', keys:['Ctrl','C'], match: RFM.ctrl('c'),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Copy this cell',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text+'  \u2713', italic:true}) },
 ];
 const rfMid = () => Math.floor(Math.random()*900) + 100;     // 100–999, fits cleanly in a mini cell
 let rfBusy=false;
@@ -3402,10 +3494,18 @@ function loadRapidCard(){
   do{ op=RF_OPS[Math.floor(Math.random()*RF_OPS.length)]; guard++; } while(RF_OPS.length>1 && op.op===lastRapid && guard<8);
   lastRapid=op.op;
   const data = op.make();
-  rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data,
-    // sequence ops get a fresh stateful matcher per task; chord ops get null and use the chord-find path
-    matcher: op.matchSeq ? op.matchSeq() : null,
-    // navigation ops set data.cellLabel to express their target; everything else gets a random label
+  // Build a unified matchers list: primary + each alt. Stateful sequence matchers are instantiated fresh per task.
+  // Each entry: {keys, type:'chord'|'seq', test: fn(e) -> bool (chord) or 'match'|'partial'|'no' (seq)}
+  const solutions = [
+    { keys: op.keys, match: op.match, matchSeq: op.matchSeq },
+    ...(op.alts || []),
+  ];
+  const matchers = solutions.map(s => ({
+    keys: s.keys,
+    type: s.matchSeq ? 'seq' : 'chord',
+    test: s.matchSeq ? s.matchSeq() : s.match,
+  }));
+  rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data, matchers,
     cellLabel: data.cellLabel || (colLetter(2+(Math.random()*4|0))+(2+(Math.random()*6|0))), shownAt:performance.now() };
   rfBusy=false; renderRfCard('show');
 }
@@ -3450,9 +3550,17 @@ function renderRfCard(state){
     // Default rapid-fire = no keycaps shown (hardo). Pressing `g` reveals them but flags the run as a practice run.
     const showKeys = guided || state==='solved';
     if(showKeys){
-      rfTask.keys.forEach((k,i)=>{
-        if(i>0){ const s=document.createElement('span'); s.className='rf-keycap sep'; s.textContent='+'; keys.appendChild(s); }
-        const el=document.createElement('span'); el.className='rf-keycap'+(state==='solved'?' lit':''); el.textContent=k; keys.appendChild(el);
+      // Collect every solution path (primary + alts) so users can see all valid keystrokes.
+      const paths = [rfTask.keys, ...(rfTask.def.alts || []).map(a=>a.keys)];
+      paths.forEach((path, pathIdx) => {
+        if(pathIdx > 0){
+          const orSep = document.createElement('span'); orSep.className='rf-or-sep'; orSep.textContent='or';
+          keys.appendChild(orSep);
+        }
+        path.forEach((k,i)=>{
+          if(i>0){ const s=document.createElement('span'); s.className='rf-keycap sep'; s.textContent='+'; keys.appendChild(s); }
+          const el=document.createElement('span'); el.className='rf-keycap'+(state==='solved'?' lit':''); el.textContent=k; keys.appendChild(el);
+        });
       });
     } else {
       const ph=document.createElement('span'); ph.className='rf-hardo-hint'; ph.textContent='no hints · press g to reveal · or recall from memory'; keys.appendChild(ph);
@@ -3471,24 +3579,40 @@ function rapidKey(e){
   if(couldHijack) e.preventDefault();
   // first-keystroke timer kick — any matched/partial keystroke counts as session start
   const kickTimer = () => { if(marathon && marathon.active && !marathon.endAt){ marathon.startAt=performance.now(); marathon.endAt=marathon.startAt+marathon.dur*1000; } };
-  // STATEFUL MATCHER PATH — only for the current task, if it's a sequence op
-  if(rfTask.matcher){
-    const res = rfTask.matcher(e);
-    if(res === 'match'){ e.preventDefault(); kickTimer(); rfSolve(); return; }
-    if(res === 'partial'){ e.preventDefault(); kickTimer(); return; }
-    // 'no' falls through to chord-op check below
+  // STATEFUL MATCHER PATH — run every sequence matcher for the current task (primary + alts)
+  // and accept the FIRST 'match'. If any returns 'partial', the keystroke is consumed without penalty.
+  let sawPartial = false;
+  for(const m of rfTask.matchers){
+    if(m.type !== 'seq') continue;
+    const res = m.test(e);
+    if(res === 'match'){ e.preventDefault(); kickTimer(); rfSolve(m); return; }
+    if(res === 'partial') sawPartial = true;
   }
-  // CHORD PATH — does this keystroke match any chord op?
-  const matched = RF_OPS.find(o => o.match && o.match(e));
-  if(!matched) return;                                       // unrelated key — no penalty (but preventDefault already fired if hijackable)
+  if(sawPartial){ e.preventDefault(); kickTimer(); return; }
+  // CURRENT-TASK CHORD CHECK — match against any chord solution (primary or alt) of this task.
+  for(const m of rfTask.matchers){
+    if(m.type === 'chord' && m.test(e)){ e.preventDefault(); kickTimer(); rfSolve(m); return; }
+  }
+  // WRONG-CHORD MISS CHECK — does this keystroke match a chord solution of some OTHER op? If so, that's a miss.
+  let wrongOp = null;
+  for(const o of RF_OPS){
+    if(o.op === rfTask.op) continue;                              // skip self (handled above)
+    if(o.match && o.match(e)){ wrongOp = o; break; }
+    for(const a of (o.alts || [])){
+      if(a.match && a.match(e)){ wrongOp = o; break; }
+    }
+    if(wrongOp) break;
+  }
+  if(!wrongOp) return;                                            // unrelated keystroke — no penalty
   e.preventDefault();
   kickTimer();
-  if(matched.op === rfTask.op) rfSolve(); else rfMiss();
+  rfMiss();
 }
-function rfSolve(){
+function rfSolve(matched){
   rfBusy=true;
   const t=(performance.now()-rfTask.shownAt)/1000;
-  const par=rfTask.keys.length;
+  // par = keys.length of the solution path the user actually took (chord vs ribbon may differ in length)
+  const par=(matched && matched.keys ? matched.keys.length : rfTask.keys.length);
   marathon.splits.push({ label:rfTask.label, t:+t.toFixed(2), keys:par, optimal:par });
   marathon.keys+=par; marathon.hits+=1; marathon.optimal=(marathon.optimal||0)+par;
   // streak: bump, track best, escalate audio/visual together
