@@ -573,6 +573,8 @@
   .pc-loading,.pc-msg{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:30px 10px; line-height:1.6}
   .who-name{cursor:pointer; color:var(--text)}
   .who-name:hover{color:var(--accent)}
+  .save-cta{cursor:pointer; color:var(--accent); font-weight:600; text-decoration:none; transition:.12s}
+  .save-cta:hover{color:var(--text); text-shadow:0 0 12px var(--accent-glow)}
 
   /* ---- theme picker ---- */
   .th-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0 4px}
@@ -2675,6 +2677,15 @@ document.addEventListener('keydown',e=>{
     if(k==='Enter'){ commitEdit(1,0); return; }
     if(k==='Tab'){ commitEdit(0,1); return; }
     if(k==='Escape'){ cancelEdit(); return; }
+    if(k==='Delete'){
+      // Delete in edit mode = cancel the in-progress edit AND clear the underlying cell's contents.
+      // Excel parity: Delete always means "clear contents," whether you're editing or not.
+      editing=false; editBuf='';
+      editAnchor=null; editPointer=null; editPointerStart=-1;
+      logKey('Delete'); pushUndo();
+      const c = ensure(S.active.r, S.active.c); c.value = null; c.formula = null;
+      commitAction(); return;
+    }
     if(k==='F4'){
       // F4 cycles anchor styles on the current pointer reference (B2 → $B$2 → B$2 → $B2 → B2).
       // No-op if no live pointer (mirrors Excel: only the most-recent ref cycles).
@@ -2723,6 +2734,14 @@ document.addEventListener('keydown',e=>{
       e.preventDefault(); startEdit('='); logKey(k==='+' ? '+' : '='); render(); return;
     }
     if(k==='F2'){ e.preventDefault(); const c=get(S.active.r,S.active.c); startEdit(c.formula||(c.value!=null&&c.value!==''?String(c.value):'')); render(); return; }
+    // Delete / Backspace in normal mode → clear contents on the selection (Excel parity: value + formula gone, formatting preserved).
+    // Backspace in Excel actually enters edit mode and clears; we treat it the same as Delete since it's the more useful behavior.
+    if((k==='Delete' || k==='Backspace') && !e.ctrlKey && !e.altKey && !e.metaKey){
+      e.preventDefault(); startClock(); logKey(k==='Delete' ? 'Delete' : '⌫');
+      pushUndo();
+      eachSel(c => { c.value = null; c.formula = null; });
+      commitAction(); return;
+    }
   }
 
   // RESULTS SCREEN — enter: again · space: next · esc: menu
@@ -3941,18 +3960,23 @@ function refreshAuthUI(){
   const slot=$('authSlot'); if(!slot) return;
   if(!sb){ slot.innerHTML=''; return; }
   if(me_user){
-    slot.innerHTML='<a class="who-name" id="openCard" title="your card & rank">'+escHtml(me_handle||'set a name')+'</a> &nbsp;<a id="signOut">sign out</a>';
+    // Anon users see a prominent "save progress" CTA between handle and sign-out — clear path to upgrade.
+    // Permanent users (verified email) see just handle + sign-out.
+    const upgradeCta = isAnonUser()
+      ? ' &middot; <a id="saveProgress" class="save-cta" title="add an email + password to your guest account">save progress</a>'
+      : '';
+    slot.innerHTML='<a class="who-name" id="openCard" title="your card & rank">'+escHtml(me_handle||'set a name')+'</a>'+upgradeCta+' &middot; <a id="signOut">sign out</a>';
     const oc=$('openCard'); if(oc) oc.onclick=openProfile;
     const so=$('signOut'); if(so) so.onclick=()=>{ sb.auth.signOut(); };
+    const sp=$('saveProgress'); if(sp) sp.onclick=()=>openAuth('signup');
   } else {
     slot.innerHTML='<button class="auth-btn" id="authBtn">sign in</button>';
     const b=$('authBtn'); if(b) b.onclick=openAuth;
   }
 }
 let authMode='signin';
-function isEduEmail(email){ const at=email.lastIndexOf('@'); const d=at>=0?email.slice(at+1):''; return /(\.edu|\.edu\.[a-z]{2,}|\.ac\.[a-z]{2,})$/i.test(d); }
-const EDU_MSG='<h3>School email required</h3><p>The beta is open to students — please use your university email (a <b style="color:var(--text)">.edu</b>, <b style="color:var(--text)">.edu.xx</b>, or <b style="color:var(--text)">.ac.xx</b> address). If your school uses a different domain, let us know.</p><div class="auth-x" id="authClose">close</div>';
-function showEduMsg(){ const m=$('authModal').querySelector('.auth-card'); m.innerHTML=EDU_MSG; const c=$('authClose'); if(c) c.onclick=closeAuth; }
+// Is the current session an anonymous (guest) user? Drives upgrade UX everywhere.
+function isAnonUser(){ return !!(me_user && me_user.is_anonymous); }
 function authErr(msg){ const e=$('authErr'); if(e) e.textContent=msg||''; }
 
 function openAuth(mode){ if(!sb) return; authMode=mode||'signin'; authOpen=true; renderAuth(); }
@@ -3973,8 +3997,8 @@ function renderAuth(){
   if(authMode==='reset'){
     m.innerHTML='<div class="auth-card">'+
       '<h3>Reset your password</h3>'+
-      '<p>Enter your school email and we\u2019ll send a link to set a new one.</p>'+
-      '<input id="authEmail" type="email" placeholder="you@school.edu" autocomplete="email">'+
+      '<p>Enter your email and we\u2019ll send a link to set a new one.</p>'+
+      '<input id="authEmail" type="email" placeholder="email" autocomplete="email">'+
       '<button class="auth-go" id="authGo" style="margin-top:12px">Send reset link</button>'+
       '<div class="auth-msg" id="authErr" style="color:var(--bad); min-height:14px; margin-top:9px"></div>'+
       '<div class="auth-alt"><a id="toSignin">\u2190 back to sign in</a></div>'+
@@ -3985,12 +4009,29 @@ function renderAuth(){
     return;
   }
   const signup = authMode==='signup';
+  // When the user is an anonymous guest, "signup" becomes an UPGRADE — adding email+password to their
+  // existing user_id so all their runs/times stay attached. Copy reflects that.
+  const upgrade = signup && isAnonUser();
+  let h3, blurb, submitLbl;
+  if(upgrade){
+    h3 = 'Save your progress';
+    blurb = 'Add an email and password to your guest account. All your runs and times stay attached.';
+    submitLbl = 'Save account';
+  } else if(signup){
+    h3 = 'Create your account';
+    blurb = 'Email and a password you\u2019ll remember.';
+    submitLbl = 'Create account';
+  } else {
+    h3 = 'Sign in';
+    blurb = 'Welcome back \u2014 email and password.';
+    submitLbl = 'Sign in';
+  }
   m.innerHTML='<div class="auth-card">'+
-    '<h3>'+(signup?'Create your account':'Sign in')+'</h3>'+
-    '<p>'+(signup?'Use your university email and a password you\u2019ll remember.':'Welcome back \u2014 email and password.')+'</p>'+
-    '<input id="authEmail" type="email" placeholder="you@school.edu" autocomplete="email">'+
+    '<h3>'+h3+'</h3>'+
+    '<p>'+blurb+'</p>'+
+    '<input id="authEmail" type="email" placeholder="email" autocomplete="email">'+
     '<input id="authPass" type="password" placeholder="password" autocomplete="'+(signup?'new-password':'current-password')+'" style="margin-top:9px">'+
-    '<button class="auth-go" id="authGo" style="margin-top:12px">'+(signup?'Create account':'Sign in')+'</button>'+
+    '<button class="auth-go" id="authGo" style="margin-top:12px">'+submitLbl+'</button>'+
     '<div class="auth-msg" id="authErr" style="color:var(--bad); min-height:14px; margin-top:9px"></div>'+
     '<div class="auth-alt">'+(signup
         ? '<a id="toSignin">Have an account? Sign in</a>'
@@ -4020,10 +4061,30 @@ async function doSignIn(){
 async function doSignUp(){
   const email=($('authEmail')?$('authEmail').value:'').trim().toLowerCase();
   const pass=$('authPass')?$('authPass').value:'';
-  if(!isEduEmail(email)){ showEduMsg(); return; }
+  if(!email || !/.+@.+\..+/.test(email)){ authErr('Enter a valid email.'); return; }
   if(pass.length<8){ authErr('Password needs at least 8 characters.'); return; }
   authErr('');
   try{
+    if(isAnonUser()){
+      // UPGRADE path: add email+password to the existing guest user_id (preserves all their runs/times).
+      // Supabase sends a verification email; the user's session stays valid as anon-with-pending-email
+      // until they click the link, at which point they become permanent.
+      const { error } = await sb.auth.updateUser({ email, password: pass });
+      if(error){
+        authErr(/already|registered|taken|in use/i.test(error.message)
+          ? 'That email already has an account \u2014 sign in instead (your guest progress will reset).'
+          : (error.message || 'Couldn\u2019t save the account.'));
+        return;
+      }
+      const m=$('authModal').querySelector('.auth-card');
+      m.innerHTML='<h3>Check your email</h3>'+
+        '<p>We sent a link to <b style="color:var(--text)">'+escHtml(email)+'</b>. Click it to confirm \u2014 your progress is already saved to this account.</p>'+
+        '<p style="color:var(--muted); font-size:12.5px">You can keep playing in the meantime. From now on, your email and password will sign you in from any device.</p>'+
+        '<div class="auth-x" id="authClose">close</div>';
+      const c=$('authClose'); if(c) c.onclick=closeAuth;
+      return;
+    }
+    // NEW ACCOUNT path: brand-new user (no existing session).
     const { data, error } = await sb.auth.signUp({ email, password:pass });
     if(error){ authErr(/registered|already/i.test(error.message)?'That email already has an account \u2014 try signing in.':error.message); return; }
     if(data && data.session){ closeAuth(); }
@@ -4032,7 +4093,7 @@ async function doSignUp(){
 }
 async function doReset(){
   const email=($('authEmail')?$('authEmail').value:'').trim().toLowerCase();
-  if(!isEduEmail(email)){ showEduMsg(); return; }
+  if(!email || !/.+@.+\..+/.test(email)){ authErr('Enter a valid email.'); return; }
   authErr('');
   try{
     const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href });
