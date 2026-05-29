@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Train — hotkey.gg</title>
+<title>hotkey.gg</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -725,7 +725,7 @@
     <div class="lbrand">hotkey<b>.gg</b></div>
     <div class="eyebrow">Keyboard-only Excel · timed · scored</div>
     <h1>Drills, <span class="dim">not lessons.</span></h1>
-    <p class="lede">A speedrun trainer for the keystrokes and modeling moves that fill an analyst's day — <b>the exact Windows shortcuts, timed to the hundredth</b>, drilled until they're reflex.</p>
+    <p class="lede">A speedrun trainer for the keystrokes and modeling moves that fill an analyst's day. <b>Real shortcuts, real tasks — build the muscle memory.</b></p>
     <div class="landing-cta">
       <button class="start-btn" id="startBtn">Start training →</button>
       <span class="modes">
@@ -2988,7 +2988,7 @@ async function startGuidedIntro(){
   await introRibbonPeek();               // part 2: a quick look at the ribbon
   guidedUsed=true;                        // practice run — won't post a time
   const r=$('result'); if(r){ r.className='result';
-    r.innerHTML="you're set — <kbd>\\</kbd> all drills · <kbd>shift+f11</kbd> restart · <kbd>g</kbd> hints · type to start"; }
+    r.innerHTML="you're set — <kbd>\\</kbd> all drills · <kbd>shift+f11</kbd> restart · <kbd>g</kbd> hints · <kbd>?</kbd> shortcuts · type to start"; }
 }
 async function introRibbonPeek(){
   if(!S || demoPlaying) return;
