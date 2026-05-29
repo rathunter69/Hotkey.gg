@@ -1903,6 +1903,17 @@ function copySel(){
    KEY HANDLING
    ============================================================ */
 function move(dr,dc,shift,ctrl){
+  // Excel quirk: when a multi-cell selection is active and you press a plain arrow key
+  // (no Shift, no Ctrl), the first press just COLLAPSES the selection to the anchor cell
+  // — it doesn't move. The next press then moves normally from there. Matches Excel's
+  // "exit selection mode" behavior so users who Ctrl+Shift+Right'd to format don't end up
+  // teleported off the edge of where they expected.
+  if(!shift && !ctrl && S.sel && (S.sel.r !== S.active.r || S.sel.c !== S.active.c)){
+    S.active = {r: S.sel.r, c: S.sel.c};
+    S.sel = null;
+    render();
+    return;
+  }
   let nr,nc;
   if(ctrl){ const j=ctrlJump(S.active.r,S.active.c,dr,dc); nr=j.r; nc=j.c; }
   else { nr=Math.min(S.ROWS,Math.max(1,S.active.r+dr)); nc=Math.min(COLS,Math.max(1,S.active.c+dc)); }
