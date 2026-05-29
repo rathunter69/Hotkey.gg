@@ -23,18 +23,32 @@
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
     display:flex; flex-direction:column; align-items:center;
-    min-height:100vh; padding:20px 16px; user-select:none; -webkit-user-select:none;
+    min-height:100vh; padding:0 0 20px; user-select:none; -webkit-user-select:none;
   }
+  .app{padding:6px 16px 0}
   /* auto top/bottom margins center the app when the viewport is tall enough, and collapse to a
      top-aligned, scrollable layout when it isn't — so the header/ribbon never clip on laptops */
-  .app{width:100%; max-width:880px; margin:auto 0}
-  header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px}
-  .brand{font-family:var(--mono); font-weight:700; font-size:19px; letter-spacing:-.5px}
-  .brand b{color:var(--accent)}
-  .brand span{color:var(--faint); font-weight:400}
-  .hint-top{font-size:12.5px; color:var(--muted)}
-  .hint-top kbd{font-family:var(--mono); color:var(--text); background:var(--surface2);
-    border:1px solid var(--line); border-radius:5px; padding:1px 6px; font-size:11.5px}
+  .app{width:100%; max-width:1040px; margin:auto 0}
+
+  /* ---------- TOP NAV (sticky, site-wide) ---------- */
+  .topnav{position:sticky; top:0; z-index:90; background:rgba(12,13,14,.82); backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px); border-bottom:1px solid var(--line); margin-bottom:22px}
+  .topnav-in{max-width:1180px; margin:0 auto; padding:0 22px; height:48px; display:flex; align-items:center; gap:22px}
+  .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
+  .topnav-brand b{color:var(--accent); font-weight:700}
+  .topnav-links{display:flex; align-items:center; gap:2px; flex:1}
+  .topnav-link{font-family:var(--mono); font-size:12.5px; color:var(--muted); text-decoration:none;
+    padding:7px 12px; border-radius:6px; cursor:pointer; transition:.13s; letter-spacing:.2px}
+  .topnav-link:hover{color:var(--text); background:var(--surface)}
+  .topnav-link.active{color:var(--accent); background:var(--surface)}
+  .topnav-right{display:flex; align-items:center; gap:10px; margin-left:auto}
+  .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:20px; cursor:pointer; padding:4px 10px}
+  @media (max-width: 720px){
+    .topnav-links{display:none; position:absolute; top:48px; left:0; right:0; flex-direction:column; gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0}
+    .topnav-links.open{display:flex}
+    .topnav-link{padding:12px 22px; border-radius:0; width:100%}
+    .topnav-burger{display:block}
+  }
 
   .tabs{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:18px}
   .tab{white-space:nowrap; font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
@@ -60,15 +74,15 @@
   .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
 
   .gridwrap{background:var(--surface); border:1px solid var(--line); border-radius:12px;
-    padding:16px; overflow:auto; position:relative; min-height:418px; min-width:0}
-  table{border-collapse:collapse; font-family:var(--mono); font-size:13px}
-  th,td{border:1px solid var(--line); height:34px; text-align:right; position:relative; overflow:hidden}
+    padding:18px; overflow:auto; position:relative; min-height:480px; min-width:0}
+  table{border-collapse:collapse; font-family:var(--mono); font-size:14px}
+  th,td{border:1px solid var(--line); height:38px; text-align:right; position:relative; overflow:hidden}
   th{background:var(--surface2); color:var(--muted); font-weight:500; text-align:center;
-    min-width:30px; height:28px; font-size:11px}
-  .rowhdr{min-width:26px}
-  td{padding:0 7px; color:var(--text); white-space:nowrap; vertical-align:middle; transition:background .08s}
+    min-width:34px; height:30px; font-size:11px}
+  .rowhdr{min-width:30px}
+  td{padding:0 9px; color:var(--text); white-space:nowrap; vertical-align:middle; transition:background .08s}
   td.txt{text-align:left}
-  td.wrap{white-space:normal; line-height:1.15; font-size:11px}
+  td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
   td.fill-blue{background:#16344e !important; color:#9fd0f4}
   td.over{color:var(--warn); letter-spacing:1px}
@@ -497,6 +511,29 @@
   .who-name{cursor:pointer; color:var(--text)}
   .who-name:hover{color:var(--accent)}
 
+  /* ---- theme picker ---- */
+  .th-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0 4px}
+  .th-card{border:1px solid var(--line); border-radius:10px; padding:14px 14px 12px; cursor:pointer;
+    text-align:left; transition:.15s; font-family:var(--mono); position:relative}
+  .th-card:hover{transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,.35)}
+  .th-card.sel{box-shadow:0 0 0 2px var(--accent), 0 8px 20px rgba(0,0,0,.35)}
+  .th-card.sel::after{content:'✓'; position:absolute; top:6px; right:9px; font-size:12px; color:var(--accent); font-weight:700}
+  .th-name{font-size:13px; font-weight:600; margin-bottom:10px; letter-spacing:.2px}
+  .th-bars{display:flex; gap:4px}
+  .th-bars span{display:block; width:24px; height:6px; border-radius:3px}
+  @media(max-width:560px){ .th-grid{grid-template-columns:repeat(2,1fr)} }
+
+  /* ---- ? shortcuts overlay ---- */
+  .kb-grid{display:flex; flex-direction:column; gap:14px; margin:6px 0 4px}
+  .kb-section{}
+  .kb-h{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px}
+  .kb-row{display:flex; gap:14px; align-items:baseline; padding:4px 0; font-size:13px}
+  .kb-keys{font-family:var(--mono); white-space:nowrap; flex:0 0 130px; text-align:right; color:var(--muted)}
+  .kb-keys kbd{font-family:var(--mono); color:var(--text); background:var(--surface2); border:1px solid var(--line);
+    border-radius:5px; padding:1px 6px; font-size:11.5px; font-weight:500; margin:0 1px}
+  .kb-desc{color:var(--text); font-family:var(--sans); font-size:13.5px}
+  #kbClose kbd{color:inherit; background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px; margin:0 2px}
+
   /* ---- rapid-fire: single-cell card (one instruction, one cell, one chord) ---- */
   #rapidStage{display:none}
   body.rapidfire #rapidStage{display:block}
@@ -513,7 +550,14 @@
   .rf-cell{font-family:var(--mono); font-size:18px; padding:18px; color:var(--text); min-height:58px;
     display:flex; align-items:center; box-shadow:inset 0 0 0 2px var(--accent); transition:background .2s, color .2s, font-weight .1s}
   .rf-cell.bold{font-weight:700}
+  .rf-cell.italic{font-style:italic}
+  .rf-cell.underline{text-decoration:underline}
+  .rf-cell.strike{text-decoration:line-through; color:var(--muted)}
+  .rf-cell.bold.underline{text-decoration:underline}
+  .rf-cell.italic.underline{text-decoration:underline}
   .rf-cell.fx{color:var(--accent)}
+  .rf-cell.link{color:var(--accent); text-decoration:underline}
+  .rf-cell.border{box-shadow:inset 0 0 0 2px var(--accent), inset 0 0 0 5px var(--surface), inset 0 0 0 7px var(--text)}
   .rf-cell.flash{background:var(--accent-glow)}
   .rf-keys{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; min-height:40px}
   .rf-keycap{font-family:var(--mono); font-size:13px; color:var(--muted); background:var(--surface2);
@@ -565,15 +609,23 @@
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div class="brand">hotkey<b>.gg</b><span> / excel trainer</span></div>
-    <div class="hdr-right">
-      <span class="hint-top"><kbd>alt</kbd> ribbon &nbsp;·&nbsp; <kbd>shift+f11</kbd> restart</span>
+<nav class="topnav">
+  <div class="topnav-in">
+    <a class="topnav-brand" href="/" title="hotkey.gg — excel trainer">hotkey<b>.gg</b></a>
+    <div class="topnav-links">
+      <a class="topnav-link active" href="/">trainer</a>
+      <a class="topnav-link" href="leaderboard.html">leaderboard</a>
+      <a class="topnav-link" href="reference.html">reference</a>
+      <a class="topnav-link" id="navCareer" title="your card and rank">career</a>
+      <a class="topnav-link" id="navThemes" title="pick a theme">themes</a>
+    </div>
+    <div class="topnav-right">
       <div class="auth-slot" id="authSlot"></div>
     </div>
-  </header>
-
+    <button class="topnav-burger" id="navBurger" aria-label="menu">≡</button>
+  </div>
+</nav>
+<div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
     <button class="db-current" id="drillPick" title="all drills">
@@ -655,6 +707,8 @@
 <div class="modes-modal" id="modesModal"></div>
 <div class="session-modal" id="sessionModal"></div>
 <div class="profile-modal" id="profileModal"></div>
+<div class="profile-modal" id="themesModal"></div>
+<div class="profile-modal" id="kbdModal"></div>
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
@@ -680,7 +734,7 @@
         <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
       </span>
     </div>
-    <div class="micro" id="landingMicro"><b>Classic mode selected.</b> Solve drills at your own pace · the timer's just feedback.</div>
+    <div class="micro" id="landingMicro"><b>Classic mode.</b> Solve drills at your own pace · the timer's just feedback.</div>
   </div>
 </div>
 
@@ -693,8 +747,9 @@
    accounts, no leaderboard) — everything else works the same.
    The anon key is meant to be public; never paste the service key.
    ============================================================ */
-const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';   // ← your Project URL, e.g. https://abcd1234.supabase.co
-const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';   // ← your anon / public key
+const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+const BETA_MODE         = true; // ← access-code-only sign-up for the beta. Flip to false for full email/password auth.
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
@@ -708,8 +763,8 @@ let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
    and a par (seconds).
    ============================================================ */
 const ROWS_MAX = 12, COLS = 8;            // A..H
-const COLW_DEFAULT = 66;                   // px; autofit widens beyond this
-const CHARPX = 8.0;                        // approx mono char width at 13px
+const COLW_DEFAULT = 78;                   // px; autofit widens beyond this
+const CHARPX = 8.6;                        // approx mono char width at 14px
 
 const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const colLetter = c => String.fromCharCode(64+c);
@@ -1813,6 +1868,12 @@ document.addEventListener('keydown',e=>{
   if(modesOpen){ e.preventDefault(); if(k==='Escape') closeModes(); return; }
   // career card open
   if(profileOpen){ e.preventDefault(); if(k==='Escape') closeProfile(); return; }
+  // themes picker open
+  if(themesOpen){ e.preventDefault(); if(k==='Escape') closeThemes(); return; }
+  // shortcuts overlay open — ? or Esc closes
+  if(kbdOpen){ e.preventDefault(); if(k==='Escape' || k==='?') closeKbd(); return; }
+  // open shortcuts with ? (Shift+/), as long as we're not mid-edit and no other modal is up
+  if(k==='?' && !editing && !demoPlaying){ e.preventDefault(); openKbd(); return; }
   // rapid-fire runs on its own single-cell handler (grid engine is bypassed)
   // session-wide hotkeys (marathon or rapid-fire): Shift+Esc ends, 's' skips drill
   if(marathon && marathon.active){
@@ -1950,6 +2011,11 @@ function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guid
 $('guideToggle').addEventListener('click',toggleGuided);
 $('startBtn').addEventListener('click', tryEnter);
 
+// top-nav: career link opens the profile card; burger toggles links on mobile
+{ const nc=$('navCareer'); if(nc) nc.addEventListener('click', e=>{ e.preventDefault(); openProfile(); });
+  const nt=$('navThemes'); if(nt) nt.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
+  const nb=$('navBurger'); if(nb) nb.addEventListener('click', ()=>{ const l=document.querySelector('.topnav-links'); if(l) l.classList.toggle('open'); }); }
+
 // guest-mode banner when Supabase isn't configured (no leaderboard, no saves)
 if(!sb){
   const ban=document.createElement('div'); ban.id='guestBanner';
@@ -1965,7 +2031,7 @@ if(!sb){
     pendingMode = (m==='classic') ? null : m;
     ['Classic','Marathon','Rapid'].forEach(id=>{ const el=$('chip'+id); if(el) el.classList.remove('selected'); });
     const sel=$('chip'+(m==='rapidfire'?'Rapid':(m==='marathon'?'Marathon':'Classic'))); if(sel) sel.classList.add('selected');
-    const mc=$('landingMicro'); if(mc) mc.innerHTML='<b>'+(m==='rapidfire'?'Rapid-fire':(m[0].toUpperCase()+m.slice(1)))+' mode selected.</b> '+MODE_BLURBS[m];
+    const mc=$('landingMicro'); if(mc) mc.innerHTML='<b>'+(m==='rapidfire'?'Rapid-fire':(m[0].toUpperCase()+m.slice(1)))+' mode.</b> '+MODE_BLURBS[m];
   }
   const cc=$('chipClassic');  if(cc) cc.addEventListener('click', ()=>pickMode('classic'));
   const cm=$('chipMarathon'); if(cm) cm.addEventListener('click', ()=>pickMode('marathon'));
@@ -2007,22 +2073,128 @@ const SESSION_CFG = {
 
 /* rapid-fire = the homepage "live drill" card: one instruction, one cell, one chord.
    Decoupled from the grid engine — it runs on its own minimal key handler. */
-const RF_HEADERS=['Revenue','EBITDA','Gross profit','Total assets','Net income','Cost of goods','Free cash flow','Headcount'];
-const rfBig=()=>{ const base=[12,34,56,78,91,128,245][Math.floor(Math.random()*7)]; return base*1000+Math.floor(Math.random()*900); };
-const rfRatio=()=>(Math.floor(Math.random()*900)+40)/1000;          // 0.04–0.94
-const RF_OPS=[
-  { op:'bold', label:'Bold', instr:'Bold the header', keys:['Ctrl','B'],
-    make:()=>({text:RF_HEADERS[Math.floor(Math.random()*RF_HEADERS.length)]}),
-    show:c=>({text:c.text}), solved:c=>({text:c.text, bold:true}) },
-  { op:'currency', label:'Currency', instr:'Format as currency', keys:['Ctrl','Shift','$'],
-    make:()=>({num:rfBig()}),
-    show:c=>({text:String(c.num)}), solved:c=>({text:'$'+c.num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}) },
-  { op:'percent', label:'Percent', instr:'Format as percent', keys:['Ctrl','Shift','%'],
-    make:()=>({num:rfRatio()}),
-    show:c=>({text:String(c.num)}), solved:c=>({text:(c.num*100).toFixed(1)+'%'}) },
-  { op:'comma', label:'Comma', instr:'Comma-format the number', keys:['Ctrl','Shift','!'],
-    make:()=>({num:rfBig()}),
-    show:c=>({text:String(c.num)}), solved:c=>({text:c.num.toLocaleString('en-US')}) },
+const RF_HEADERS=['Revenue','EBITDA','Gross profit','Total assets','Net income','Cost of goods','Free cash flow','Headcount','Operating income','SG&A','Inventory','Dividends','Working capital','Liabilities'];
+const rfBig=()=>{ const base=[12,34,56,78,91,128,245,567,1024,2056][Math.floor(Math.random()*10)]; return base*1000+Math.floor(Math.random()*900); };
+const rfRatio=()=>(Math.floor(Math.random()*900)+40)/1000;
+const rfFormulaRef=()=>{ const c=String.fromCharCode(65+Math.floor(Math.random()*5)+1); const r=Math.floor(Math.random()*8)+2; return c+r; };
+const pickHeader=()=>RF_HEADERS[Math.floor(Math.random()*RF_HEADERS.length)];
+const fmtUSDate=serial=>{ const d=new Date(Date.UTC(1899,11,30)+serial*86400000); return d.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit',timeZone:'UTC'}); };
+const fmtUSTime=frac=>{ let h=Math.floor(frac*24); const m=Math.floor((frac*24*60)%60); const pm=h>=12; const h12=((h+11)%12)+1; return h12+':'+String(m).padStart(2,'0')+' '+(pm?'PM':'AM'); };
+const todayStr=()=>new Date().toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'});
+const nowStr=()=>new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+const sciNot=n=>{ const e=n.toExponential(2); return e.replace('e+','E+').replace('e-','E-'); };
+
+// match helpers — these turn each op into a self-contained chord predicate
+const RFM = {
+  ctrl: k => e=>(e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&e.key.toLowerCase()===k.toLowerCase(),
+  ctrlKey: k => e=>(e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&e.key===k,
+  ctrlShift: (...ks) => e=>(e.ctrlKey||e.metaKey)&&e.shiftKey&&!e.altKey&&ks.includes(e.key),
+  alt: k => e=>e.altKey&&!e.ctrlKey&&!e.metaKey&&e.key===k,
+  bare: k => e=>!e.ctrlKey&&!e.altKey&&!e.metaKey&&!e.shiftKey&&e.key===k,
+};
+
+const RF_OPS = [
+  // — TEXT STYLING (toggle-aware: random chance the cell starts already styled, instr adapts) —
+  { op:'bold', label:'Bold', keys:['Ctrl','B'], match: RFM.ctrl('b'),
+    make: ()=> ({text:pickHeader(), bold:Math.random()<.4}),
+    instr: c=> c.bold?'Remove the bold':'Bold this label',
+    show: c=>({text:c.text, bold:c.bold}),
+    solved: c=>({text:c.text, bold:!c.bold}) },
+  { op:'italic', label:'Italic', keys:['Ctrl','I'], match: RFM.ctrl('i'),
+    make: ()=> ({text:pickHeader(), italic:Math.random()<.3}),
+    instr: c=> c.italic?'Remove the italic':'Italicize this',
+    show: c=>({text:c.text, italic:c.italic}),
+    solved: c=>({text:c.text, italic:!c.italic}) },
+  { op:'underline', label:'Underline', keys:['Ctrl','U'], match: RFM.ctrl('u'),
+    make: ()=> ({text:pickHeader(), underline:Math.random()<.3}),
+    instr: c=> c.underline?'Remove the underline':'Underline this',
+    show: c=>({text:c.text, underline:c.underline}),
+    solved: c=>({text:c.text, underline:!c.underline}) },
+  { op:'strike', label:'Strikethrough', keys:['Ctrl','5'], match: RFM.ctrlKey('5'),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Strike through this line item',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text, strike:true}) },
+
+  // — NUMBER FORMATTING —
+  { op:'currency', label:'Currency', keys:['Ctrl','Shift','$'], match: RFM.ctrlShift('$','4'),
+    make: ()=> ({num:rfBig()}),
+    instr: ()=>'Format as currency',
+    show: c=>({text:String(c.num)}),
+    solved: c=>({text:'$'+c.num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}) },
+  { op:'percent', label:'Percent', keys:['Ctrl','Shift','%'], match: RFM.ctrlShift('%','5'),
+    make: ()=> ({num:rfRatio()}),
+    instr: ()=>'Format as percent',
+    show: c=>({text:String(c.num)}),
+    solved: c=>({text:(c.num*100).toFixed(1)+'%'}) },
+  { op:'comma', label:'Comma', keys:['Ctrl','Shift','!'], match: RFM.ctrlShift('!','1'),
+    make: ()=> ({num:rfBig()}),
+    instr: ()=>'Comma-format the number',
+    show: c=>({text:String(c.num)}),
+    solved: c=>({text:c.num.toLocaleString('en-US')}) },
+  { op:'date', label:'Date', keys:['Ctrl','Shift','#'], match: RFM.ctrlShift('#','3'),
+    make: ()=> ({serial:45000+Math.floor(Math.random()*2000)}),
+    instr: ()=>'Format as a date',
+    show: c=>({text:String(c.serial)}),
+    solved: c=>({text:fmtUSDate(c.serial)}) },
+  { op:'time', label:'Time', keys:['Ctrl','Shift','@'], match: RFM.ctrlShift('@','2'),
+    make: ()=> { const frac=Math.random(); return {frac, raw:'0.'+String(Math.floor(frac*10000)).padStart(4,'0')}; },
+    instr: ()=>'Format as a time',
+    show: c=>({text:c.raw}),
+    solved: c=>({text:fmtUSTime(c.frac)}) },
+  { op:'scientific', label:'Scientific', keys:['Ctrl','Shift','^'], match: RFM.ctrlShift('^','6'),
+    make: ()=> ({num:rfBig()*100}),
+    instr: ()=>'Use scientific notation',
+    show: c=>({text:String(c.num)}),
+    solved: c=>({text:sciNot(c.num)}) },
+  { op:'general', label:'General', keys:['Ctrl','Shift','~'], match: RFM.ctrlShift('~','`'),
+    make: ()=> { const n=rfBig(); return {num:n, formatted:'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}; },
+    instr: ()=>'Reset to general format',
+    show: c=>({text:c.formatted}),
+    solved: c=>({text:String(c.num)}) },
+
+  // — BORDERS —
+  { op:'border', label:'Outline border', keys:['Ctrl','Shift','&'], match: RFM.ctrlShift('&','7'),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Add an outline border',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text, border:true}) },
+  { op:'noborder', label:'Remove borders', keys:['Ctrl','Shift','_'], match: RFM.ctrlShift('_','-'),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Strip the borders off',
+    show: c=>({text:c.text, border:true}),
+    solved: c=>({text:c.text, border:false}) },
+
+  // — STAMPS (one chord drops a value into an empty cell) —
+  { op:'today', label:'Insert today', keys:['Ctrl',';'], match: RFM.ctrl(';'),
+    make: ()=> ({}),
+    instr: ()=>"Stamp today's date here",
+    show: ()=>({text:''}),
+    solved: ()=>({text:todayStr()}) },
+  { op:'now', label:'Insert time', keys:['Ctrl','Shift',';'], match: RFM.ctrlShift(';',':'),
+    make: ()=> ({}),
+    instr: ()=>'Stamp the current time',
+    show: ()=>({text:''}),
+    solved: ()=>({text:nowStr()}) },
+
+  // — LINKS & EDITING —
+  { op:'hyperlink', label:'Hyperlink', keys:['Ctrl','K'], match: RFM.ctrl('k'),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Convert to a hyperlink',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text, link:true}) },
+  { op:'delete', label:'Delete', keys:['Del'], match: RFM.bare('Delete'),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Wipe this cell',
+    show: c=>({text:c.text}),
+    solved: ()=>({text:''}) },
+
+  // — FORMULA —
+  { op:'abs', label:'Cycle absolute', keys:['F4'], match: RFM.bare('F4'),
+    make: ()=> { const ref=rfFormulaRef(); return {ref, formula:'='+ref}; },
+    instr: c=>'Lock the reference (absolute)',
+    show: c=>({text:c.formula, fx:true}),
+    solved: c=>({text:'=$'+c.ref[0]+'$'+c.ref.slice(1), fx:true}) },
 ];
 let rfBusy=false;
 let hardoMode=false;
@@ -2030,21 +2202,176 @@ async function loadHardo(){
   try{ if(window.storage){ const r=await window.storage.get('hotkey_hardo'); if(r&&r.value) hardoMode = r.value==='1'; } }catch(e){}
 }
 function saveHardo(){ try{ if(window.storage) window.storage.set('hotkey_hardo', hardoMode?'1':'0'); }catch(e){} }
+
+/* ============================================================
+   THEMES — 11 curated palettes, Monkeytype-style picker
+   ============================================================ */
+const THEMES = {
+  default: { name:'Default', dark:true, vars:{
+    bg:'#0c0d0e', surface:'#141517', surface2:'#1c1d20', line:'#26282c',
+    text:'#e9e8e3', muted:'#7c7d77', faint:'#4c4d49',
+    accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.22)',
+    warn:'#d9a441', bad:'#c8533f' }},
+  light: { name:'Light', dark:false, vars:{
+    bg:'#f7f7f4', surface:'#ffffff', surface2:'#eeeeea', line:'#d8d8d2',
+    text:'#1a1a1a', muted:'#6a6a6a', faint:'#a8a8a4',
+    accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.18)',
+    warn:'#b8860b', bad:'#a83232' }},
+  serika: { name:'Serika', dark:false, vars:{
+    bg:'#e1e1e3', surface:'#f5f5f7', surface2:'#d0d0d2', line:'#b8b8bb',
+    text:'#323437', muted:'#646669', faint:'#9a9a9c',
+    accent:'#e2b714', 'accent-dim':'#a07f0a', 'accent-glow':'rgba(226,183,20,.25)',
+    warn:'#ca4754', bad:'#ca4754' }},
+  dracula: { name:'Dracula', dark:true, vars:{
+    bg:'#282a36', surface:'#383a48', surface2:'#44475a', line:'#5d5f6e',
+    text:'#f8f8f2', muted:'#a8a8a0', faint:'#6272a4',
+    accent:'#bd93f9', 'accent-dim':'#8a68c4', 'accent-glow':'rgba(189,147,249,.25)',
+    warn:'#f1fa8c', bad:'#ff5555' }},
+  nord: { name:'Nord', dark:true, vars:{
+    bg:'#2e3440', surface:'#3b4252', surface2:'#434c5e', line:'#4c566a',
+    text:'#eceff4', muted:'#d8dee9', faint:'#7e8a9a',
+    accent:'#88c0d0', 'accent-dim':'#5e81ac', 'accent-glow':'rgba(136,192,208,.25)',
+    warn:'#ebcb8b', bad:'#bf616a' }},
+  tokyo: { name:'Tokyo Night', dark:true, vars:{
+    bg:'#1a1b26', surface:'#24283b', surface2:'#2f334d', line:'#414868',
+    text:'#c0caf5', muted:'#a9b1d6', faint:'#565f89',
+    accent:'#bb9af7', 'accent-dim':'#9a7bd0', 'accent-glow':'rgba(187,154,247,.22)',
+    warn:'#e0af68', bad:'#f7768e' }},
+  gruvbox: { name:'Gruvbox', dark:true, vars:{
+    bg:'#282828', surface:'#3c3836', surface2:'#504945', line:'#665c54',
+    text:'#ebdbb2', muted:'#a89984', faint:'#7c6f64',
+    accent:'#fabd2f', 'accent-dim':'#d79921', 'accent-glow':'rgba(250,189,47,.22)',
+    warn:'#fe8019', bad:'#cc241d' }},
+  carbon: { name:'Carbon', dark:true, vars:{
+    bg:'#161616', surface:'#262626', surface2:'#393939', line:'#525252',
+    text:'#f4f4f4', muted:'#a8a8a8', faint:'#6f6f6f',
+    accent:'#0f62fe', 'accent-dim':'#0043ce', 'accent-glow':'rgba(15,98,254,.22)',
+    warn:'#f1c21b', bad:'#da1e28' }},
+  solarized: { name:'Solarized', dark:true, vars:{
+    bg:'#002b36', surface:'#073642', surface2:'#0d4757', line:'#586e75',
+    text:'#fdf6e3', muted:'#93a1a1', faint:'#657b83',
+    accent:'#268bd2', 'accent-dim':'#1a5e8f', 'accent-glow':'rgba(38,139,210,.22)',
+    warn:'#b58900', bad:'#dc322f' }},
+  catppuccin: { name:'Catppuccin', dark:true, vars:{
+    bg:'#1e1e2e', surface:'#313244', surface2:'#45475a', line:'#585b70',
+    text:'#cdd6f4', muted:'#bac2de', faint:'#7f849c',
+    accent:'#a6e3a1', 'accent-dim':'#7eb87a', 'accent-glow':'rgba(166,227,161,.22)',
+    warn:'#f9e2af', bad:'#f38ba8' }},
+  bloomberg: { name:'Bloomberg', dark:true, vars:{
+    bg:'#000000', surface:'#0a0a0a', surface2:'#161616', line:'#2a2a2a',
+    text:'#ff9933', muted:'#cc7700', faint:'#704400',
+    accent:'#ff9933', 'accent-dim':'#cc7700', 'accent-glow':'rgba(255,153,51,.25)',
+    warn:'#ffd700', bad:'#ff3344' }},
+};
+function applyTheme(name){
+  const t = THEMES[name] || THEMES.default;
+  const root = document.documentElement;
+  for(const [k,v] of Object.entries(t.vars)) root.style.setProperty('--'+k, v);
+  currentTheme = name;
+}
+let currentTheme = 'default';
+function loadTheme(){
+  let saved=null;
+  try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
+  if(saved && THEMES[saved]){ applyTheme(saved); return; }
+  // first visit: respect prefers-color-scheme
+  try{
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    applyTheme(prefersLight ? 'light' : 'default');
+  }catch(e){ applyTheme('default'); }
+}
+function saveTheme(name){ try{ localStorage.setItem('hotkey_theme', name); }catch(e){} }
+
+let themesOpen=false;
+function closeThemes(){ themesOpen=false; const m=$('themesModal'); if(m) m.classList.remove('show'); }
+
+/* ============================================================
+   APP KEYBOARD SHORTCUTS — ? overlay
+   ============================================================ */
+const APP_SHORTCUTS = [
+  { title:'navigating drills', rows: [
+    ['\\',         'open the drill picker'],
+    ['1 – 9',      'jump straight to drill # (classic only)'],
+    ['Shift + F11','restart the current drill'],
+  ]},
+  { title:'while training', rows: [
+    ['type',       'start the clock (first keystroke begins the run)'],
+    ['g',          'toggle guided hints (paint-by-numbers walkthrough)'],
+    ['F2',         'edit the active cell'],
+  ]},
+  { title:'in a session (marathon / rapid-fire)', rows: [
+    ['s',          'skip the current drill (marathon)'],
+    ['g',          'toggle guided hints (marathon)'],
+    ['Shift + Esc','end the session early'],
+  ]},
+  { title:'after solving', rows: [
+    ['Enter',      'run it again'],
+    ['Space',      'next drill (classic)'],
+    ['Esc',        'back to the menu'],
+  ]},
+  { title:'anywhere', rows: [
+    ['?',          'open this shortcut sheet'],
+    ['Esc',        'close menus & modals'],
+  ]},
+];
+let kbdOpen=false;
+function closeKbd(){ kbdOpen=false; const m=$('kbdModal'); if(m) m.classList.remove('show'); }
+function openKbd(){
+  const m=$('kbdModal'); if(!m) return;
+  kbdOpen=true; m.classList.add('show');
+  const sections = APP_SHORTCUTS.map(g=>{
+    const rows = g.rows.map(([k,d])=>
+      `<div class="kb-row"><span class="kb-keys">${k.split('+').map(p=>'<kbd>'+escHtml(p.trim())+'</kbd>').join(' + ')}</span><span class="kb-desc">${escHtml(d)}</span></div>`
+    ).join('');
+    return `<div class="kb-section"><div class="kb-h">${escHtml(g.title)}</div>${rows}</div>`;
+  }).join('');
+  m.innerHTML='<div class="pc-card" style="width:560px">'+
+    '<div class="pc-head"><div class="pc-name">shortcuts</div></div>'+
+    '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
+    '<div class="kb-grid">'+sections+'</div>'+
+    '<div class="pc-foot"><span></span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
+    '</div>';
+  const c=$('kbClose'); if(c) c.onclick=closeKbd;
+  m.addEventListener('click', e=>{ if(e.target===m) closeKbd(); }, {once:true});
+}
+function openThemes(){
+  const m=$('themesModal'); if(!m) return;
+  themesOpen=true; m.classList.add('show');
+  const swatches = Object.entries(THEMES).map(([key,t])=>{
+    const v=t.vars; const isSel = key===currentTheme;
+    return `<button class="th-card${isSel?' sel':''}" data-key="${key}" style="background:${v.bg}; color:${v.text}; border-color:${isSel?v.accent:v.line}">`+
+      `<div class="th-name">${escHtml(t.name)}</div>`+
+      `<div class="th-bars"><span style="background:${v.accent}"></span><span style="background:${v.warn}"></span><span style="background:${v.bad}"></span></div>`+
+      `</button>`;
+  }).join('');
+  m.innerHTML='<div class="pc-card" style="width:600px">'+
+    '<div class="pc-head"><div class="pc-name">themes</div></div>'+
+    '<div class="pc-sub">Click a theme to apply. Your pick saves across sessions.</div>'+
+    '<div class="th-grid">'+swatches+'</div>'+
+    '<div class="pc-foot"><span></span><a id="thClose">close</a></div>'+
+    '</div>';
+  m.querySelectorAll('.th-card').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.key; applyTheme(k); saveTheme(k); openThemes();   // re-render to update selection
+  });
+  const c=$('thClose'); if(c) c.onclick=closeThemes;
+  m.addEventListener('click', e=>{ if(e.target===m) closeThemes(); }, {once:true});
+}
 function loadRapidCard(){
   let op, guard=0;
   do{ op=RF_OPS[Math.floor(Math.random()*RF_OPS.length)]; guard++; } while(RF_OPS.length>1 && op.op===lastRapid && guard<8);
   lastRapid=op.op;
-  rfTask={ def:op, op:op.op, label:op.label, instr:op.instr, keys:op.keys, data:op.make(),
+  rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data:op.make(),
     cellLabel: colLetter(2+(Math.random()*4|0))+(2+(Math.random()*6|0)), shownAt:performance.now() };
   rfBusy=false; renderRfCard('show');
 }
 function renderRfCard(state){
   if(!rfTask) return;
   const view = state==='solved' ? rfTask.def.solved(rfTask.data) : rfTask.def.show(rfTask.data);
-  const ie=$('rfInstr'); if(ie) ie.textContent=rfTask.instr;
+  const ie=$('rfInstr'); if(ie) ie.textContent = (typeof rfTask.def.instr==='function') ? rfTask.def.instr(rfTask.data) : rfTask.def.instr;
   const le=$('rfCellLabel'); if(le) le.textContent=rfTask.cellLabel;
   const cell=$('rfCell'); if(cell){ cell.textContent=view.text||'\u00A0';
-    cell.className='rf-cell'+(view.bold?' bold':'')+(view.fx?' fx':'')+(state==='solved'?' flash':''); }
+    const flags=['bold','italic','underline','strike','fx','link','border'].filter(f=>view[f]).join(' ');
+    cell.className='rf-cell'+(flags?' '+flags:'')+(state==='solved'?' flash':''); }
   const keys=$('rfKeys'); if(keys){ keys.className='rf-keys'+(hardoMode?' hardo':''); keys.innerHTML='';
     const showKeys = !hardoMode || state==='solved';
     if(showKeys){
@@ -2059,21 +2386,14 @@ function renderRfCard(state){
 }
 function rapidKey(e){
   const k=e.key;
-  if(k==='Escape'){ e.preventDefault(); return; }            // session ends via the HUD button
+  if(k==='Escape'){ e.preventDefault(); return; }
   if(rfBusy || !rfTask){ if(e.ctrlKey||e.altKey) e.preventDefault(); return; }
-  let op=null;
-  if(e.ctrlKey && !e.altKey && !e.metaKey){
-    if(!e.shiftKey && (k==='b'||k==='B')) op='bold';
-    else if(e.shiftKey){
-      if(k==='$'||k==='4') op='currency';
-      else if(k==='%'||k==='5') op='percent';
-      else if(k==='!'||k==='1') op='comma';
-    }
-  }
-  if(!op) return;                                            // ignore unrelated keys — no penalty
+  // does this keystroke match ANY rapid op?
+  const matched = RF_OPS.find(o => o.match(e));
+  if(!matched) return;                                       // unrelated key — no penalty
   e.preventDefault();
   if(marathon && marathon.active && !marathon.endAt){ marathon.startAt=performance.now(); marathon.endAt=marathon.startAt+marathon.dur*1000; }
-  if(op===rfTask.op) rfSolve(); else rfMiss();
+  if(matched.op === rfTask.op) rfSolve(); else rfMiss();
 }
 function rfSolve(){
   rfBusy=true;
@@ -2457,6 +2777,7 @@ async function savePB(){
   await loadPB();
   await loadOnboard();
   await loadHardo();
+  loadTheme();
   buildSheetTabs();
   loadChallenge(MENU_ORDER[0]);
   initAuth();
@@ -2687,17 +3008,32 @@ async function introRibbonPeek(){
 /* ---------- access gate (invite code, enforced server-side) ---------- */
 function advanceAccess(){
   if(!sb){ closeGate(); return; }
-  if(!enterRequested){ return; }            // hold at the landing until the user hits Start
-  if(!me_user){ openAuth(); return; }        // need a (.edu) sign-in
-  if(!me_member){ showGate('code'); return; }// need an invite code
+  if(!enterRequested){ return; }                       // hold at the landing until Start
+  if(BETA_MODE){
+    // beta: anonymous + invite code + handle in one gate
+    if(!me_user || !me_member || !me_handle){ showGate('beta'); return; }
+    closeGate(); dismissLanding(); return;
+  }
+  if(!me_user){ openAuth(); return; }                  // full auth: email+password
+  if(!me_member){ showGate('code'); return; }          // then invite code
   if(!me_handle){ closeGate(); promptHandle(); return; }
-  closeGate(); dismissLanding();             // fully in → fade the landing away
+  closeGate(); dismissLanding();
 }
 function showGate(step){
   const g=$('gate'); if(!g) return;
   gateOpen=true;
   let inner;
-  if(step==='signin'){
+  if(step==='beta'){
+    inner='<div class="auth-card">'+
+      '<div class="gate-brand">hotkey<b>.gg</b></div>'+
+      '<h3>Invite-only beta</h3>'+
+      '<p>Drop the access code a friend gave you, pick a handle, and go.</p>'+
+      '<input id="betaCode" type="text" placeholder="access code" autocomplete="off" autocapitalize="characters" spellcheck="false">'+
+      '<input id="betaHandle" type="text" placeholder="display name (shown on leaderboard)" autocomplete="off" maxlength="20" style="margin-top:8px">'+
+      '<button class="auth-go" id="betaGo">Enter</button>'+
+      '<div class="auth-msg" id="betaMsg" style="min-height:15px; margin-top:9px"></div>'+
+      '</div>';
+  } else if(step==='signin'){
     inner='<div class="auth-card">'+
       '<div class="gate-brand">hotkey<b>.gg</b></div>'+
       '<h3>Invite-only beta</h3>'+
@@ -2716,6 +3052,9 @@ function showGate(step){
       '</div>';
   }
   g.innerHTML=inner; g.classList.add('show');
+  const bg=$('betaGo'); if(bg) bg.onclick=submitBetaCode;
+  const bc=$('betaCode'); if(bc){ bc.focus(); bc.onkeydown=e=>{ if(e.key==='Enter'){ const h=$('betaHandle'); if(h&&!h.value){ h.focus(); } else submitBetaCode(); } }; }
+  const bh=$('betaHandle'); if(bh){ bh.onkeydown=e=>{ if(e.key==='Enter') submitBetaCode(); }; }
   const si=$('gateSignin'); if(si) si.onclick=openAuth;
   const rd=$('gateRedeem'); if(rd) rd.onclick=redeemCode;
   const ci=$('gateCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter') redeemCode(); }; }
@@ -2731,6 +3070,48 @@ async function redeemCode(){
     if(!error && data===true){ me_member=true; advanceAccess(); }
     else if(msg){ msg.textContent='That code didn\u2019t work. Check with whoever invited you.'; }
   }catch(e){ if(msg) msg.textContent='Couldn\u2019t check the code right now \u2014 try again.'; }
+}
+
+async function submitBetaCode(){
+  const ci=$('betaCode'), hi=$('betaHandle'), msg=$('betaMsg');
+  if(!ci||!hi) return;
+  const code=ci.value.trim(); const handle=hi.value.trim();
+  const setMsg=(t,bad)=>{ if(msg){ msg.textContent=t; msg.style.color=bad?'var(--bad)':'var(--muted)'; } };
+  if(!code){ setMsg('Enter the access code your friend sent you.', true); ci.focus(); return; }
+  if(!handle){ setMsg('Pick a display name — this is what shows on the leaderboard.', true); hi.focus(); return; }
+  if(handle.length<2 || handle.length>20){ setMsg('Handle should be 2–20 characters.', true); return; }
+  setMsg('Checking…', false);
+  try{
+    // 1. anonymous sign-in if not already signed in
+    if(!me_user){
+      if(!sb.auth.signInAnonymously){ setMsg('Anonymous sign-in not supported by this Supabase client version.', true); return; }
+      const { data: signRes, error: signErr } = await sb.auth.signInAnonymously();
+      if(signErr){
+        if(/disabled|not enabled|not allowed/i.test(signErr.message||'')){
+          setMsg('Anonymous sign-in is disabled in this project. Enable it in Supabase → Authentication → Providers → Anonymous.', true);
+        } else setMsg('Sign-in failed: '+(signErr.message||'unknown error'), true);
+        return;
+      }
+      me_user = signRes && signRes.user ? signRes.user : null;
+      if(!me_user){
+        const { data:{ session } } = await sb.auth.getSession();
+        me_user = session ? session.user : null;
+      }
+      if(!me_user){ setMsg('Couldn\u2019t establish a session — try again.', true); return; }
+    }
+    // 2. redeem the invite code (server-side RPC enforces validity)
+    const { data: rdData, error: rdErr } = await sb.rpc('redeem_code', { p_code: code });
+    if(rdErr || rdData!==true){
+      setMsg('That code didn\u2019t work. Check with whoever invited you.', true); return;
+    }
+    me_member = true;
+    // 3. save handle to profiles (upsert by user id)
+    const { error: upErr } = await sb.from('profiles').upsert({ id: me_user.id, handle });
+    if(upErr){ setMsg('Couldn\u2019t save your handle: '+(upErr.message||''), true); return; }
+    me_handle = handle;
+    // 4. in
+    closeGate(); dismissLanding();
+  }catch(e){ setMsg('Something went wrong — try again.', true); }
 }
 
 async function recordRun(t){
