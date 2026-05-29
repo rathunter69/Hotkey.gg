@@ -361,6 +361,12 @@
   .user-dropdown a.um-accent{color:var(--accent)}
   .user-dropdown a.um-accent:hover{color:var(--text); background:var(--accent-dim)}
   .user-dropdown .um-divider{height:1px; background:var(--line); margin:5px 4px}
+  /* Settings modal — key/value rows for email + section headings + dividers */
+  .st-row{display:flex; align-items:center; justify-content:space-between; padding:10px 4px; font-family:var(--mono); font-size:13px}
+  .st-label{color:var(--muted); letter-spacing:.3px; text-transform:uppercase; font-size:11px}
+  .st-value{color:var(--text)}
+  .st-divider{height:1px; background:var(--line); margin:6px 0 14px}
+  .st-section-h{font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase; margin-bottom:10px}
   .auth-who{font-family:var(--mono); font-size:12.5px; color:var(--muted)}
   .auth-who b{color:var(--accent); font-weight:500}
   .auth-who a{color:var(--faint); cursor:pointer}
@@ -891,6 +897,7 @@
 <div class="modes-modal" id="modesModal"></div>
 <div class="session-modal" id="sessionModal"></div>
 <div class="profile-modal" id="profileModal"></div>
+<div class="profile-modal" id="settingsModal"></div>
 <div class="profile-modal" id="themesModal"></div>
 <div class="profile-modal" id="kbdModal"></div>
 <div class="onboard-modal" id="onboard">
@@ -1686,23 +1693,25 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation tour', par:8, parKeys:3,
-    prompt:'Tour the edges of a data block with three Ctrl-arrow chords back to back: Ctrl+Home to A1, Ctrl+→ to the end of the row, Ctrl+↓ to the bottom of the column. Avoids the End key (not on every keyboard) and teaches the three navigation patterns you reach for constantly.',
-    req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em>',
+    name:'Navigate', label:'Navigation tour', par:12, parKeys:4,
+    prompt:'Four core navigation chords back to back. Tour the edges with Ctrl+Home, Ctrl+→, Ctrl+↓ — then grab the whole used range with Ctrl+Shift+Home. No End key required.',
+    req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em> &rarr; <em>ctrl+shift+home</em>',
     guide:[
       '<kbd>ctrl</kbd>+<kbd>home</kbd>',
       '<kbd>ctrl</kbd>+<kbd>&rarr;</kbd>',
-      '<kbd>ctrl</kbd>+<kbd>&darr;</kbd>'
+      '<kbd>ctrl</kbd>+<kbd>&darr;</kbd>',
+      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>home</kbd>'
     ],
-    targets:['A1','E1','E7'],
+    targets:['A1','E1','E7','A1:E7'],
     demo(){ return [
-      {sel:'A1', keys:[Kb.ctrlHome]},
-      {sel:'E1', keys:[Kb.ctrlRight]},
-      {sel:'E7', keys:[Kb.ctrlDown]}
+      {sel:'A1',    keys:[Kb.ctrlHome]},
+      {sel:'E1',    keys:[Kb.ctrlRight]},
+      {sel:'E7',    keys:[Kb.ctrlDown]},
+      {sel:'A1:E7', active:'A1', keys:[{key:'Home', ctrl:true, shift:true}]}
     ]; },
     build(){
       // 7×5 block of an income-statement-style table; cursor placed deliberately in the middle so plain arrows
-      // would take many presses but the Ctrl-arrow tour visits A1 → E1 → E7 in three chords.
+      // would take many presses but the Ctrl-arrow tour visits A1 → E1 → E7 → (whole range) in four chords.
       const cells={};
       cells['A1']={...blankCell(),value:'Model',txt:true,bold:true};
       const labels=['Revenue','COGS','SG&A','Opex','D&A','EBIT'];
@@ -1716,16 +1725,20 @@ const CHALLENGES = {
     },
     // Sequential progression: each step only counts once the previous one is done. We mutate state on S
     // because checks(S) is called on every render — once a target is reached, the flag latches true.
-    // Without ordering, the cursor could pass through E7 first (via plain End-of-data) and falsely pass.
+    // Step 4: Ctrl+Shift+Home — extends selection from E7 (current) back up to A1. Check: cursor at A1
+    // AND a selection exists with the opposite corner at E7.
     checks(S){
-      if(!S.navProgress) S.navProgress = {home:false, right:false, down:false};
-      if(!S.navProgress.home  && S.active.r===1 && S.active.c===1) S.navProgress.home  = true;
-      if( S.navProgress.home  && !S.navProgress.right && S.active.r===1 && S.active.c===5) S.navProgress.right = true;
-      if( S.navProgress.right && !S.navProgress.down  && S.active.r===7 && S.active.c===5) S.navProgress.down  = true;
+      if(!S.navProgress) S.navProgress = {home:false, right:false, down:false, selAll:false};
+      if(!S.navProgress.home   && S.active.r===1 && S.active.c===1) S.navProgress.home  = true;
+      if( S.navProgress.home   && !S.navProgress.right  && S.active.r===1 && S.active.c===5) S.navProgress.right  = true;
+      if( S.navProgress.right  && !S.navProgress.down   && S.active.r===7 && S.active.c===5) S.navProgress.down   = true;
+      if( S.navProgress.down   && !S.navProgress.selAll && S.active.r===1 && S.active.c===1
+          && S.sel && S.sel.r===7 && S.sel.c===5) S.navProgress.selAll = true;
       return [
-        {label:'Ctrl+Home \u2192 A1',                       ok: S.navProgress.home},
-        {label:'Ctrl+\u2192 to the end of the row (E1)',     ok: S.navProgress.right},
-        {label:'Ctrl+\u2193 to the bottom of the column (E7)', ok: S.navProgress.down},
+        {label:'Ctrl+Home \u2192 A1',                            ok: S.navProgress.home},
+        {label:'Ctrl+\u2192 to end of header row (E1)',          ok: S.navProgress.right},
+        {label:'Ctrl+\u2193 to bottom of column (E7)',           ok: S.navProgress.down},
+        {label:'Ctrl+Shift+Home \u2192 select the whole range',  ok: S.navProgress.selAll},
       ];
     }
   }
@@ -2269,7 +2282,7 @@ function checkWin(){
   if(!mouseUsed && !guidedUsed){ const prev=PB[cur];
     if(prev===undefined||t<prev){ PB[cur]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
   showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
-  if(sb && me_user && !mouseUsed && !guidedUsed){
+  if(sb && me_user && !isAnonUser() && !mouseUsed && !guidedUsed){
     recordRun(t).then(async ok=>{
       const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); }
       if(ok){ const rk=await fetchRank(cur, t*1000); if(rk) showRankBadge(rk); }
@@ -2298,15 +2311,16 @@ function showRankBadge(rk){
 function showResults(o){
   const best = PB[cur]!==undefined ? PB[cur].toFixed(2)+'s' : '—';
   let postRow;
-  if(o.mouse)       postRow='<span class="rm-soon">not posted — mouse used</span>';
-  else if(o.guided) postRow='<span class="rm-soon">practice run (guided) — not posted</span>';
-  else if(!sb)      postRow='<span class="rm-soon">global leaderboard coming soon</span>';
-  else if(!me_user) postRow='<span class="rm-post-cta" id="rmSignin">sign in to post your time →</span>';
-  else              postRow='<span class="rm-posted" id="rmPost">posting to the leaderboard…</span>';
+  if(o.mouse)         postRow='<span class="rm-soon">not posted — mouse used</span>';
+  else if(o.guided)   postRow='<span class="rm-soon">practice run (guided) — not posted</span>';
+  else if(!sb)        postRow='<span class="rm-soon">global leaderboard coming soon</span>';
+  else if(!me_user)   postRow='<span class="rm-post-cta" id="rmSignin">sign in to post your time →</span>';
+  else if(isAnonUser()) postRow='<span class="rm-post-cta" id="rmSaveProgInline">scores not saved as guest — save your progress →</span>';
+  else                postRow='<span class="rm-posted" id="rmPost">posting to the leaderboard…</span>';
   // Anon-only nudge: small footer link that opens the upgrade flow. Appears AFTER the user has solved
   // a drill, so the prompt lands as "save what you just did" rather than a headline ask.
   const guestPrompt = isAnonUser()
-    ? `<div class="guest-cta">playing as guest · <a id="rmSaveProg">save your progress</a></div>`
+    ? `<div class="guest-cta">playing as guest \u2014 nothing saved · <a id="rmSaveProg">save your progress</a></div>`
     : '';
   const m=$('resultsModal');
   m.innerHTML=`<div class="rm-card">`+
@@ -2325,6 +2339,7 @@ function showResults(o){
   m.classList.add('show');
   const si=$('rmSignin'); if(si) si.onclick=openAuth;
   const sp=$('rmSaveProg'); if(sp) sp.onclick=()=>openAuth('signup');
+  const spi=$('rmSaveProgInline'); if(spi) spi.onclick=()=>openAuth('signup');
   $('result').innerHTML='';
 }
 function hideResults(){ const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
@@ -3865,14 +3880,18 @@ function showSessionSummary(){
     ? [[n,'rounds'],['×'+(s.bestStreak||0),'best streak'],[fastest?fastest.t.toFixed(2)+'s':'—','fastest'],[avg?avg.toFixed(2)+'s':'—','avg round']]
     : [[n,'drills'],[s.skipped||0,'skipped'],[s.keys,'keystrokes'],[eff?eff+'%':'—','key efficiency']];
   const m=$('sessionModal');
-  // Same anon-only guest nudge as on the classic results card — appears after a full session so users who like the game have a path to onboard.
+  // Make it explicit on the session summary too: guests don't have their results posted, just like the classic results card.
+  // The guest-cta footer below repeats the upgrade path; the sub-line above warns the user inline so it lands sooner.
+  const anonNotice = (isAnonUser() && !s.practice)
+    ? ' · <span style="color:var(--warn)">guest session — not posted</span>'
+    : '';
   const guestPrompt = isAnonUser()
-    ? `<div class="guest-cta">playing as guest · <a id="ssSaveProg">save your progress</a></div>`
+    ? `<div class="guest-cta">playing as guest \u2014 nothing saved · <a id="ssSaveProg">save your progress</a></div>`
     : '';
   m.innerHTML=`<div class="ss-card">`+
     `<div class="ss-title">session complete${s.practice?' · practice run':''}</div>`+
     `<div class="ss-big">${n}<span>${s.unit}</span></div>`+
-    `<div class="ss-sub">${fmtClock(s.dur)} ${cfg.noun} · ${avg?avg.toFixed(2)+'s avg':'—'}${(!rapid&&fastest)?' · fastest '+fastest.t.toFixed(2)+'s ('+escHtml(fastest.label)+')':''}${s.practice?' · <span style="color:var(--warn)">hints used — not posted to leaderboard</span>':''}</div>`+
+    `<div class="ss-sub">${fmtClock(s.dur)} ${cfg.noun} · ${avg?avg.toFixed(2)+'s avg':'—'}${(!rapid&&fastest)?' · fastest '+fastest.t.toFixed(2)+'s ('+escHtml(fastest.label)+')':''}${s.practice?' · <span style="color:var(--warn)">hints used — not posted to leaderboard</span>':''}${anonNotice}</div>`+
     `<div class="ss-stats">`+cards.map(c=>`<div class="ss-stat"><div class="v">${c[0]}</div><div class="l">${c[1]}</div></div>`).join('')+`</div>`+
     (n ? `<div class="ss-graphwrap"><div class="ss-graphlabel">seconds per ${rapid?'round':'drill'}</div>${renderSessionGraph(s.splits)}</div>` : `<div class="sg-empty">nothing finished — give it another go</div>`)+
     `<div class="ss-opts">`+
@@ -3999,6 +4018,66 @@ function renderProfile(m, d){
   wireProfileClose(m);
 }
 
+/* ============================================================
+   ACCOUNT SETTINGS — in-app password change (bypasses email reset).
+   Uses sb.auth.updateUser({password}) which works on the already-signed-in session.
+   Anon users don't have a password yet, so the modal shows "Save your progress" instead.
+   ============================================================ */
+let settingsOpen=false;
+function closeSettings(){ settingsOpen=false; const m=$('settingsModal'); if(m) m.classList.remove('show'); }
+function openSettings(){
+  if(!sb || !me_user) return;
+  const m=$('settingsModal'); if(!m) return;
+  settingsOpen=true; m.classList.add('show');
+  if(isAnonUser()){
+    // Anon users don't have an account to change settings on yet — redirect to the upgrade flow.
+    m.innerHTML='<div class="pc-card" style="width:420px">'+
+      '<div class="pc-head"><div class="pc-name">Account</div></div>'+
+      '<div class="pc-msg">You\u2019re playing as a guest \u2014 add an email and password to your account first, then come back here to change it later.</div>'+
+      '<div class="pc-foot"><a id="stSaveProg" style="color:var(--accent)">Save your progress \u2192</a><a id="stClose">close</a></div>'+
+      '</div>';
+    const sp=$('stSaveProg'); if(sp) sp.onclick=()=>{ closeSettings(); openAuth('signup'); };
+    const cl=$('stClose'); if(cl) cl.onclick=closeSettings;
+    return;
+  }
+  const email=(me_user&&me_user.email)||'';
+  m.innerHTML='<div class="pc-card" style="width:420px">'+
+    '<div class="pc-head"><div class="pc-name">Account</div></div>'+
+    '<div class="st-row"><div class="st-label">Email</div><div class="st-value">'+escHtml(email)+'</div></div>'+
+    '<div class="st-divider"></div>'+
+    '<div class="st-section-h">Change password</div>'+
+    '<input id="stPass1" type="password" placeholder="new password (8+ characters)" autocomplete="new-password">'+
+    '<input id="stPass2" type="password" placeholder="confirm new password" autocomplete="new-password" style="margin-top:8px">'+
+    '<button class="auth-go" id="stSave" style="margin-top:12px; width:100%">Save password</button>'+
+    '<div class="auth-msg" id="stMsg" style="min-height:14px; margin-top:9px"></div>'+
+    '<div class="pc-foot"><a id="stClose">close</a></div>'+
+    '</div>';
+  const cl=$('stClose'); if(cl) cl.onclick=closeSettings;
+  const sv=$('stSave'); if(sv) sv.onclick=doChangePassword;
+  // Enter submits from either password field
+  ['stPass1','stPass2'].forEach(id=>{ const el=$(id); if(el) el.onkeydown=e=>{ if(e.key==='Enter') doChangePassword(); }; });
+  const p1=$('stPass1'); if(p1) p1.focus();
+}
+async function doChangePassword(){
+  const p1=($('stPass1')||{}).value||'';
+  const p2=($('stPass2')||{}).value||'';
+  const msg=$('stMsg');
+  const setMsg=(t,bad)=>{ if(msg){ msg.textContent=t; msg.style.color=bad?'var(--bad)':'var(--accent)'; } };
+  if(p1.length<8){ setMsg('Password needs at least 8 characters.', true); return; }
+  if(p1!==p2){ setMsg('Passwords don\u2019t match.', true); return; }
+  setMsg('Saving\u2026', false);
+  try{
+    const { error } = await sb.auth.updateUser({ password: p1 });
+    if(error){ setMsg(error.message || 'Couldn\u2019t update password.', true); return; }
+    setMsg('Password updated \u2713', false);
+    // Close after a beat so the user sees the success state
+    setTimeout(closeSettings, 900);
+  }catch(e){ setMsg('Something went wrong \u2014 try again.', true); }
+}
+// Close settings on outside click / Esc (mirrors profile modal behavior)
+document.addEventListener('click', (e)=>{ const m=$('settingsModal'); if(m && m.classList.contains('show') && e.target===m) closeSettings(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && settingsOpen) closeSettings(); });
+
 /* ---- guided demo player: replays the optimal keystrokes through the real engine ---- */
 const Kb={ alt:{key:'Alt'}, enter:{key:'Enter'},
   copy:{key:'c',ctrl:true}, paste:{key:'v',ctrl:true}, bold:{key:'b',ctrl:true},
@@ -4083,11 +4162,10 @@ const DRILL_DESC = {
   lookup:'Pull a value out of a table with INDEX/MATCH',
   sort:'Sort a deal table descending — Alt A S D',
   series:'Fill a year header across — Alt H F I S',
-  navigation:'Ctrl+Home → Ctrl+→ → Ctrl+↓ — three nav chords back-to-back',
+  navigation:'Ctrl+Home → Ctrl+→ → Ctrl+↓ → Ctrl+Shift+Home — four nav chords + select-all',
 };
 const DRILL_GROUPS = [
-  {name:'Foundations', keys:['copyover']},
-  {name:'Navigate',    keys:['navigation']},
+  {name:'Foundations', keys:['navigation','copyover']},
   {name:'Formatting',  keys:['polish','combo','format','center','blue','gauntlet']},
   {name:'Values',      keys:['drill','series']},
   {name:'Data',        keys:['sort']},
@@ -4211,6 +4289,7 @@ function refreshAuthUI(){
         '<div class="user-dropdown" id="userDropdown" role="menu">'+
           '<a id="umProfile">Profile &amp; stats</a>'+
           saveItem +
+          '<a id="umSettings">Account settings</a>'+
           '<a id="umSignout">Sign out</a>'+
         '</div>'+
       '</div>';
@@ -4233,6 +4312,7 @@ function bindUserMenu(){
   const wire = (id, fn) => { const el=$(id); if(el) el.onclick = (e)=>{ e.preventDefault(); closeUserMenu(); fn(); }; };
   wire('umProfile',  openProfile);
   wire('umSaveProg', ()=>openAuth('signup'));
+  wire('umSettings', openSettings);
   wire('umSignout',  ()=>{ sb.auth.signOut(); });
 }
 function closeUserMenu(){
@@ -4585,7 +4665,9 @@ async function submitBetaCode(){
 }
 
 async function recordRun(t){
-  if(!sb || !me_user || mouseUsed || guidedUsed) return false;
+  // Anon sessions don't post to the leaderboard — scores need a permanent account behind them.
+  // This keeps the leaderboard clean (no ghost/disposable entries) and creates a real value prop for signing up.
+  if(!sb || !me_user || isAnonUser() || mouseUsed || guidedUsed) return false;
   try{
     const { error } = await sb.from('runs').insert({
       user_id: me_user.id, challenge: cur,
@@ -4597,7 +4679,8 @@ async function recordRun(t){
 }
 
 async function recordSession(mode, durationSec, score, keystrokes, misses, optimal){
-  if(!sb || !me_user || !me_member) return false;
+  // Same anon gate — marathon and rapid-fire sessions don't post unless the user has a real account.
+  if(!sb || !me_user || !me_member || isAnonUser()) return false;
   if(!Number.isFinite(score) || score < 1) return false;        // don't post empty sessions
   try{
     const { error } = await sb.from('sessions').insert({
