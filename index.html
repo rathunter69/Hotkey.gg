@@ -3112,21 +3112,22 @@ const RF_OPS = [
     show: c=>({layout:'row', context:[c.val], text:''}),
     solved: c=>({layout:'row', context:[c.val], text:c.val}) },
   // — RIBBON SEQUENCES (multi-keystroke Alt paths via the new altSeq matcher) —
-  // For each align op, the cell starts in a non-target alignment so the solve produces a visible jump.
+  // For each align op, the cell starts in a random non-target alignment (picked once per drill in `make`,
+  // not re-rolled per render), so every solve produces a visible jump.
   { op:'align_center', label:'Center', keys:['Alt','H','A','C'], matchSeq: RFM.altSeq(['h','a','c']),
-    make: ()=> ({text:pickHeader()}),
+    make: ()=> ({text:pickHeader(), startAlign: Math.random()<.5 ? 'l' : 'r'}),
     instr: ()=>'Center this header',
-    show: c=>({text:c.text}),                     // default left
+    show: c=>({text:c.text, align:c.startAlign}),
     solved: c=>({text:c.text, align:'c'}) },
   { op:'align_left', label:'Left align', keys:['Alt','H','A','L'], matchSeq: RFM.altSeq(['h','a','l']),
-    make: ()=> ({text:pickHeader()}),
+    make: ()=> ({text:pickHeader(), startAlign: Math.random()<.5 ? 'c' : 'r'}),
     instr: ()=>'Left-align this',
-    show: c=>({text:c.text, align:'r'}),          // starts right → jumps left on solve
+    show: c=>({text:c.text, align:c.startAlign}),
     solved: c=>({text:c.text, align:'l'}) },
   { op:'align_right', label:'Right align', keys:['Alt','H','A','R'], matchSeq: RFM.altSeq(['h','a','r']),
-    make: ()=> ({text:pickHeader()}),
+    make: ()=> ({text:pickHeader(), startAlign: Math.random()<.5 ? 'l' : 'c'}),
     instr: ()=>'Right-align this',
-    show: c=>({text:c.text}),                     // default left → jumps right on solve
+    show: c=>({text:c.text, align:c.startAlign}),
     solved: c=>({text:c.text, align:'r'}) },
   // Shortened from the full Alt+H+F+C+→→→→+Enter sequence — RF has no actual font color picker UI,
   // so the 4 blind arrow presses had no feedback and were a UX dead zone. Drilling the ENTRY (Alt+H+F+C)
