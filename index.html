@@ -2514,6 +2514,9 @@ function endSession(){
   clearInterval(marathon.tickH); clearInterval(tickH); running=false;
   $('timer').classList.remove('run');
   marathon.elapsed = marathon.startAt ? Math.min((performance.now()-marathon.startAt)/1000, marathon.dur) : 0;
+  // post to leaderboard (fire-and-forget). Marathon score = drills completed; rapid-fire score = hits.
+  const score = (marathon.mode === 'rapidfire') ? (marathon.hits||0) : (marathon.splits ? marathon.splits.length : 0);
+  recordSession(marathon.mode, marathon.dur, score, marathon.keys||0, marathon.misses||0);
   showSessionSummary();
 }
 function exitSession(){
@@ -3150,6 +3153,19 @@ async function recordRun(t){
     });
     return !error;
   }catch(e){ return false; }
+}
+
+async function recordSession(mode, durationSec, score, keystrokes, misses){
+  if(!sb || !me_user || !me_member) return false;
+  if(!Number.isFinite(score) || score < 1) return false;        // don't post empty sessions
+  try{
+    const { error } = await sb.from('sessions').insert({
+      user_id: me_user.id, mode, duration_sec: durationSec,
+      score, keystrokes: keystrokes||0, misses: misses||0
+    });
+    if(error) console.warn('session record failed:', error.message);
+    return !error;
+  }catch(e){ console.warn('session record exception:', e); return false; }
 }
 </script>
 </body>
