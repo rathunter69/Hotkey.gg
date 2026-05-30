@@ -29,7 +29,7 @@
     display:flex; flex-direction:column; align-items:center;
     /* Monkeytype-style breathing room: nav doesn't kiss the top of the viewport, content floats with vertical
        centering when the viewport is tall enough. The flex column + margin:auto on .app does the centering. */
-    min-height:100vh; padding:36px 0 40px; user-select:none; -webkit-user-select:none;
+    min-height:100vh; padding:72px 0 56px; user-select:none; -webkit-user-select:none;
   }
   .app{padding:6px 16px 0}
   /* auto top/bottom margins center the app when the viewport is tall enough, and collapse to a
@@ -39,8 +39,8 @@
   /* ---------- TOP NAV (three sections: brand · pages · tools) ----------
      Not sticky — Monkeytype-style, the nav scrolls with the page so users in focused-trainer mode aren't
      looking at a header occupying the top of their viewport while they're trying to read a drill grid. */
-  .topnav{width:100%; background:var(--bg); margin-bottom:44px; position:relative}
-  .topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:52px; display:flex; align-items:center; gap:18px}
+  .topnav{width:100%; background:var(--bg); margin-bottom:64px; position:relative}
+  .topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:60px; display:flex; align-items:center; gap:18px}
   .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
   .topnav-brand b{color:var(--accent); font-weight:700}
   .topnav-pages{display:flex; align-items:center; gap:6px; margin:0 auto}
@@ -57,7 +57,7 @@
   .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
   @media (max-width:760px){
     .topnav-in{padding:0 16px; gap:10px}
-    .topnav-pages{display:none; position:absolute; top:52px; left:0; right:0; flex-direction:column;
+    .topnav-pages{display:none; position:absolute; top:60px; left:0; right:0; flex-direction:column;
       gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0}
     .topnav-pages.open{display:flex}
     .topnav-link{padding:12px 22px; border-radius:0; width:100%}
@@ -774,6 +774,7 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
+<script src="drills.js"></script>
 </head>
 <body>
 <nav class="topnav">
@@ -4276,49 +4277,36 @@ function loadChallenge(key){
   $('result').className='result'; $('result').innerHTML='';
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
 }
-/* ---- drill picker: short descriptions + skill groupings ---- */
-const DRILL_DESC = {
-  copyover:'Select, copy, and paste a block — all keyboard',
-  drill:'Paste-special values to strip the formulas',
-  combo:'Bold, comma, wrap and autofit a pasted table',
-  format:'Triage the units — percent, currency, comma',
-  polish:'Bold + bottom border + shade a header row',
-  center:'Center the column-header row — Alt H A C',
-  blue:'Blue the hardcoded inputs — Alt H F C',
-  gauntlet:'A full model-ready formatting pass',
-  margin:'Build a margin formula down the column',
-  bridge:'Profit = revenue × margin, fill it across years',
-  schedule:'Roll a PP&E schedule forward with links',
-  percent:'Common-size with an anchored ($) formula',
-  foot:'SUM across and down, tie out the corner',
-  comps:'EV/EBITDA multiples, then the average',
-  lookup:'Pull a value out of a table with INDEX/MATCH',
-  sort:'Sort a deal table descending — Alt A S D',
-  series:'Fill a year header across — Alt H F I S',
-  navigation:'Full obstacle course: 4 nav chords + select rows + insert/delete',
-};
-const DRILL_GROUPS = [
-  {name:'Foundations', keys:['navigation','copyover']},
-  {name:'Formatting',  keys:['polish','combo','format','center','blue','gauntlet']},
-  {name:'Values',      keys:['drill','series']},
-  {name:'Data',        keys:['sort']},
-  {name:'Formulas',    keys:['margin','bridge','foot','percent','schedule','comps']},
-  {name:'Lookups',     keys:['lookup']},
-];
-// flat sequence used everywhere (badges, 1-9 keys, steppers, Ctrl+PgUp/Dn) so numbering reads 01→N top-to-bottom
-const MENU_ORDER = (()=>{ const g=DRILL_GROUPS.flatMap(x=>x.keys).filter(k=>CHALLENGES[k]);
-  const extra=Object.keys(CHALLENGES).filter(k=>!g.includes(k)); return [...g,...extra]; })();
+/* ---- drill picker: catalog comes from drills.js (single source of truth across the app) ----
+   All the maps below are thin aliases. If you're adding a new drill, edit drills.js — not here.
+   We also inject name/label from drills.js into each CHALLENGES entry (further down) so the
+   trainer never reads a stale value. */
+const DRILL_DESC   = window.HOTKEY_DRILLS.descOf;
+const DRILL_GROUPS = window.HOTKEY_DRILLS.groups;
+const TAB_LABEL    = window.HOTKEY_DRILLS.tabOf;
+const GROUP_OF     = window.HOTKEY_DRILLS.groupOf;
+// MENU_ORDER preserves the original behavior of falling back through CHALLENGES for any keys
+// that exist in the engine but aren't yet listed in drills.js (defensive — shouldn't happen
+// in normal use but prevents a missing drills.js entry from making a drill un-launchable).
+const MENU_ORDER = (()=>{
+  const g = window.HOTKEY_DRILLS.menuOrder.filter(k => CHALLENGES[k]);
+  const extra = Object.keys(CHALLENGES).filter(k => !g.includes(k));
+  if(extra.length) console.warn('Drills in engine but not drills.js:', extra);
+  return [...g, ...extra];
+})();
 
-const TAB_LABEL = {
-  copyover:'Basics', polish:'Header', combo:'Cleanup', format:'Formats',
-  center:'Align', blue:'Inputs', gauntlet:'Model',
-  drill:'Hardcode', series:'Years',
-  sort:'Sort',
-  margin:'Margin', bridge:'Bridge', foot:'Cross-foot', percent:'Common-size',
-  schedule:'Schedule', comps:'Comps', lookup:'Lookup',
-  navigation:'Nav',
-};
-const GROUP_OF = (()=>{ const m={}; DRILL_GROUPS.forEach(g=>g.keys.forEach(k=>{ m[k]=g.name; })); return m; })();
+// Sync drill metadata from drills.js INTO CHALLENGES so the trainer reads from one place.
+// If a CHALLENGES entry still has inline label/name strings, this overrides them — drills.js wins.
+// Devs can remove the inline label/name fields from CHALLENGES gradually; nothing breaks if both exist.
+(function syncDrillMeta(){
+  const meta = window.HOTKEY_DRILLS.meta;
+  for(const k in CHALLENGES){
+    if(meta[k]){
+      CHALLENGES[k].label = meta[k].label;
+      CHALLENGES[k].name  = meta[k].name;
+    }
+  }
+})();
 
 function buildSheetTabs(){   // renders the drill picker overlay, grouped by skill
   const host=$('pkGroups'); if(!host) return;
@@ -4697,12 +4685,30 @@ function advanceAccess(){
   if(BETA_MODE){
     // beta: anonymous + invite code + handle in one gate
     if(!me_user || !me_member || !me_handle){ showGate('beta'); return; }
-    closeGate(); dismissLanding(); return;
+    closeGate(); dismissLanding(); handleDeepLink(); return;
   }
   if(!me_user){ openAuth(); return; }                  // full auth: email+password
   if(!me_member){ showGate('code'); return; }          // then invite code
   if(!me_handle){ closeGate(); promptHandle(); return; }
-  closeGate(); dismissLanding();
+  closeGate(); dismissLanding(); handleDeepLink();
+}
+// Deep-link helper — leaderboard/reference pages link here with ?openProfile=1 or ?openAuth=signup
+// to trigger the right modal once the user has cleared the gate. Reads the param, opens the modal,
+// then strips the param from the URL so a refresh doesn't re-trigger.
+function handleDeepLink(){
+  try{
+    const p = new URLSearchParams(location.search);
+    let consumed = false;
+    if(p.get('openProfile') === '1'){ openProfile(); consumed = true; }
+    const authMode = p.get('openAuth');
+    if(authMode === 'signin' || authMode === 'signup'){ openAuth(authMode); consumed = true; }
+    if(consumed){
+      // Strip the consumed params so a page refresh doesn't reopen the modal.
+      p.delete('openProfile'); p.delete('openAuth');
+      const q = p.toString();
+      history.replaceState({}, '', location.pathname + (q ? '?' + q : '') + location.hash);
+    }
+  }catch(e){}
 }
 function showGate(step){
   const g=$('gate'); if(!g) return;
