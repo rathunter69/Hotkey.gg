@@ -116,10 +116,13 @@
   td.fc-green     {color:#1f8a4d !important}
   td.fc-purple    {color:#7030a0 !important}
   td.over{color:var(--warn); letter-spacing:1px}
-  td.editing{text-align:left; color:var(--text); box-shadow:inset 0 0 0 2px var(--accent); background:var(--bg)}
+  td.editing{text-align:left; color:var(--text); box-shadow:inset 0 0 0 2px var(--accent); background:var(--accent-glow)}
   @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
   td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
-  td.active{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow); z-index:2}
+  td.active{box-shadow:inset 0 0 0 2px var(--accent); background:var(--accent-glow); position:relative; z-index:4}
+  /* While building a formula the home cell carries .active.editing — keep it the most prominent thing
+     on the grid (thicker ring, top z-index) so the reference (.point) cell never visually outranks it. */
+  td.active.editing{box-shadow:inset 0 0 0 3px var(--accent); position:relative; z-index:6}
   /* Formula pointer — appears on the cell whose reference is currently being inserted into the formula bar.
      Dashed border reads distinct from the solid active-cell outline, and the warn color marks "this is where the formula is grabbing from". */
   td.point{outline:2px dashed var(--warn); outline-offset:-2px; background:rgba(224,175,104,.12); z-index:3}
@@ -930,7 +933,7 @@
         <span class="mode-chip pick" id="chipMarathon" title="random drills against a clock">⏱ Marathon</span>
       </span>
     </div>
-    <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · everything keyboard</span></div>
+    <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · <kbd>?</kbd> for shortcuts · everything keyboard</span></div>
   </div>
 </div>
 
