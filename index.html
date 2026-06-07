@@ -84,6 +84,8 @@
   .kbp-seg.locked{color:var(--faint)}
   .kbp-seg.locked:hover{color:var(--muted); background:var(--surface2)}
   .kbp-lock{opacity:.85}
+  .pro-go{background:var(--accent); color:#06120c; font-weight:700; font-family:var(--mono); font-size:13px; padding:9px 16px; border-radius:8px; cursor:pointer; text-decoration:none; transition:filter .15s}
+  .pro-go:hover{filter:brightness(1.08)}
   @media (max-width:980px){ .kbp-toggle{display:none} }
   .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
   .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
@@ -3567,13 +3569,53 @@ function setKbProfile(p){
 function promptProUpgrade(){
   const m=$('proModal'); if(!m) return;
   m.classList.add('show');
-  m.innerHTML='<div class="pc-card" style="width:430px">'+
-    '<div class="pc-head"><div class="pc-name">Pro feature</div></div>'+
-    '<div class="pc-msg">The <b>Macabacus</b> and <b>FactSet</b> keyboard profiles layer your plugin\u2019s real shortcuts on top of native Excel \u2014 part of <b>hotkey.gg Pro</b>. Native shortcuts stay free for everyone.</div>'+
-    '<div class="pc-foot"><span></span><a id="proClose">close</a></div>'+
+  m.innerHTML='<div class="pc-card" style="width:440px">'+
+    '<div class="pc-head"><div class="pc-name">Upgrade to Pro</div></div>'+
+    '<div class="pc-msg">Keyboard profiles let you train with <b>Macabacus</b> and <b>FactSet</b> shortcut sets layered on native Excel \u2014 the chords you\u2019ll actually use on the desk. Pro also unlocks every mode and your full stats history. Native shortcuts stay free for everyone.</div>'+
+    '<div class="pc-foot"><a id="proUpgrade" class="pro-go">Upgrade \u2014 billed monthly</a><a id="proClose">maybe later</a></div>'+
     '</div>';
   const c=$('proClose'); if(c) c.onclick=()=>m.classList.remove('show');
+  const u=$('proUpgrade'); if(u) u.onclick=startCheckout;
   m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('show'); }, {once:true});
+}
+// Kick off Stripe Checkout via the create-checkout Edge Function. Guests must make a real account
+// first so their Pro access can't be lost with their anonymous session.
+async function startCheckout(){
+  if(!sb || !me_user || isAnonUser()){
+    try{ $('proModal').classList.remove('show'); }catch(e){}
+    openAuth('signup'); return;
+  }
+  const u=$('proUpgrade'); if(u){ u.textContent='Redirecting\u2026'; u.style.pointerEvents='none'; }
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    const res = await fetch(SUPABASE_URL + '/functions/v1/create-checkout', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+(session?session.access_token:'') }
+    });
+    const j = await res.json();
+    if(j && j.url){ window.location.href = j.url; return; }
+    throw new Error((j && j.error) || 'no checkout url');
+  }catch(e){
+    if(u){ u.textContent='Upgrade \u2014 billed monthly'; u.style.pointerEvents=''; }
+    alert('Could not start checkout right now. Please try again in a moment.');
+  }
+}
+// After returning from Stripe, the webhook may take a moment to flip the flag — poll a few times.
+async function recheckPro(tries){
+  if(!sb || !me_user) return;
+  try{
+    const { data:pr } = await sb.from('entitlements').select('pro').eq('user_id', me_user.id).maybeSingle();
+    if(pr && pr.pro){ me_pro=true; renderKbpToggle(); if(kbdOpen) openKbd(); proToast('Pro unlocked \u2014 keyboard profiles are live.'); return; }
+  }catch(e){}
+  if(tries>0) setTimeout(()=>recheckPro(tries-1), 1500);
+}
+function proToast(msg){
+  let t=document.getElementById('proToast');
+  if(!t){ t=document.createElement('div'); t.id='proToast';
+    t.style.cssText='position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--surface);color:var(--text);border:1px solid var(--accent);border-radius:10px;padding:12px 18px;font-family:var(--mono);font-size:13px;z-index:9999;box-shadow:0 10px 34px rgba(0,0,0,.35);opacity:0;transition:opacity .25s';
+    document.body.appendChild(t); }
+  t.textContent=msg; requestAnimationFrame(()=>{ t.style.opacity='1'; });
+  setTimeout(()=>{ t.style.opacity='0'; }, 4200);
 }
 // Prominent segmented toggle in the top nav. Non-Pro users see the plugin profiles locked.
 function renderKbpToggle(){
@@ -4399,6 +4441,8 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadSound();
   await loadKbProfile();
   renderKbpToggle();
+  try{ const _tn=document.getElementById('navThemeName');
+    if(_tn && window.THEMES && window.THEMES[window.currentTheme]) _tn.textContent=window.THEMES[window.currentTheme].name; }catch(e){}
   updateSoundBtn();
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
@@ -4442,6 +4486,10 @@ async function onSession(session){
   } else { me_handle=null; me_member=false; me_pro=false; }
   refreshAuthUI();
   renderKbpToggle();
+  if(me_user && /[?&]upgraded=1/.test(location.search)){
+    try{ history.replaceState({}, '', location.pathname); }catch(e){}
+    if(!me_pro) recheckPro(6); else proToast('Pro unlocked \u2014 keyboard profiles are live.');
+  }
   if(recoveryMode && me_user){ openAuth('newpassword'); return; }
   advanceAccess();
 }

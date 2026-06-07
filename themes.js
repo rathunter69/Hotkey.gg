@@ -8,6 +8,11 @@ window.THEMES = {
     text:'#e9e8e3', muted:'#7c7d77', faint:'#4c4d49',
     accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.22)',
     warn:'#d9a441', bad:'#c8533f' }},
+  daylight: { name:'Daylight', dark:false, vars:{
+    bg:'#e8eaed', surface:'#f8f9fb', surface2:'#edeff2', line:'#ccd0d6',
+    text:'#1f2328', muted:'#5c636e', faint:'#99a0ab',
+    accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.14)',
+    warn:'#9a6700', bad:'#b3261e' }},
   light: { name:'Light', dark:false, vars:{
     bg:'#f7f7f4', surface:'#ffffff', surface2:'#eeeeea', line:'#d8d8d2',
     text:'#1a1a1a', muted:'#6a6a6a', faint:'#a8a8a4',
@@ -117,14 +122,12 @@ window.applyTheme = function(name){
   window.syncThemeLabels();
 };
 
-// On script load: apply the saved theme (or prefers-color-scheme default) before any render.
+// On script load: apply the saved theme, else default to Daylight (soft light, Excel-like) so new
+// visitors land in light mode the way Excel opens. Anyone who picks another theme keeps it.
 (function(){
   let saved = null;
   try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
-  if(!saved || !window.THEMES[saved]){
-    try{ saved = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'default'; }
-    catch(e){ saved = 'default'; }
-  }
+  if(!saved || !window.THEMES[saved]) saved = 'daylight';
   window.applyTheme(saved);
 })();
 
