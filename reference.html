@@ -78,14 +78,14 @@
   .row.drilled::before{content:""; position:absolute; left:0; top:8px; bottom:8px; width:2px; background:var(--accent); border-radius:2px; box-shadow:0 0 8px var(--accent-glow);}
   .row.hide{display:none;}
   .keys{flex:0 0 auto; display:flex; align-items:center; gap:5px; flex-wrap:wrap; min-width:0;}
-  .desc{flex:1; font-size:13.5px; color:#cfcfca; min-width:0;}
+  .desc{flex:1; font-size:13.5px; color:var(--text); min-width:0;}
   .desc .dr{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:7px; vertical-align:middle; box-shadow:0 0 6px var(--accent-glow);}
 
   /* ---------- keycaps ---------- */
   .cap{display:inline-flex; align-items:center; justify-content:center; min-width:29px; height:29px; padding:0 9px;
     font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap;
-    background:linear-gradient(180deg,#25272c,#191b1e); border:1px solid #313438; border-radius:7px;
-    box-shadow:0 2px 0 #0a0b0c, inset 0 1px 0 rgba(255,255,255,.06);}
+    background:linear-gradient(180deg,var(--surface2),var(--surface)); border:1px solid var(--line); border-radius:7px;
+    box-shadow:0 2px 0 rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.05);}
   .sep{color:var(--muted); font-family:var(--mono); font-size:12px; padding:0 1px;}
   .sep.arrow{color:var(--accent); font-weight:700;}
   .alt{color:#4a4c48; font-size:11px; padding:0 1px;}
