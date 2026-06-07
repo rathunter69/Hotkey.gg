@@ -46,7 +46,10 @@
   .topnav-brand b{color:var(--accent); font-weight:700}
   .topnav-pages{display:flex; align-items:center; gap:6px; margin:0 auto}
   .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
-    padding:8px 14px; border-radius:6px; cursor:pointer; transition:.13s; letter-spacing:.2px}
+    padding:8px 12px; border-radius:6px; cursor:pointer; transition:.13s; letter-spacing:.2px;
+    display:inline-flex; align-items:center; gap:8px}
+  .topnav-link svg{width:19px; height:19px; display:block; flex:none}
+  .tl-label{display:none}
   .topnav-link:hover{color:var(--text); background:var(--surface)}
   .topnav-link.active{color:var(--accent); background:var(--surface)}
   .topnav-tools{display:flex; align-items:center; gap:2px}
@@ -86,6 +89,11 @@
   .kbp-lock{opacity:.85}
   .pro-go{background:var(--accent); color:#06120c; font-weight:700; font-family:var(--mono); font-size:13px; padding:9px 16px; border-radius:8px; cursor:pointer; text-decoration:none; transition:filter .15s}
   .pro-go:hover{filter:brightness(1.08)}
+  .gopro{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent); background:none; border:1px solid var(--accent-dim); border-radius:7px; padding:5px 10px; cursor:pointer; letter-spacing:.3px; transition:all .15s; white-space:nowrap}
+  .gopro:hover{background:var(--accent); color:#06120c; border-color:var(--accent)}
+  .gopro.is-pro{color:var(--accent); background:var(--surface); cursor:default}
+  .gopro.is-pro:hover{background:var(--surface); color:var(--accent)}
+  @media (max-width:760px){ .gopro{display:none} }
   @media (max-width:980px){ .kbp-toggle{display:none} }
   .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
   .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
@@ -95,6 +103,7 @@
       gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0}
     .topnav-pages.open{display:flex}
     .topnav-link{padding:12px 22px; border-radius:0; width:100%}
+    .tl-label{display:inline}
     .topnav-tools .auth-slot{display:none}
     .topnav-theme-name{display:none}
     .topnav-burger{display:block; margin-left:auto}
@@ -819,9 +828,9 @@
   <div class="topnav-in">
     <a class="topnav-brand" href="/" title="hotkey.gg — excel trainer">hotkey<b>.gg</b></a>
     <div class="topnav-pages">
-      <a class="topnav-link active" href="/">trainer</a>
-      <a class="topnav-link" href="leaderboard.html">leaderboard</a>
-      <a class="topnav-link" href="reference.html">reference</a>
+      <a class="topnav-link active" href="/" data-page="trainer" title="trainer" aria-label="trainer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="tl-label">trainer</span></a>
+      <a class="topnav-link" href="leaderboard.html" data-page="leaderboard" title="leaderboard" aria-label="leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg><span class="tl-label">leaderboard</span></a>
+      <a class="topnav-link" href="reference.html" data-page="reference" title="reference" aria-label="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.6-1-4-1.5-6-1.5S2 5 2 5v13s2-.5 4-.5 4.4.5 6 1.5c1.6-1 4-1.5 6-1.5s4 .5 4 .5V5s-2-.5-4-.5-4.4.5-6 1.5Z"/><path d="M12 6v13"/></svg><span class="tl-label">reference</span></a>
     </div>
     <div class="topnav-tools">
       <div class="kbp-toggle" id="kbpToggle" title="keyboard profile"></div>
@@ -832,6 +841,7 @@
         <svg width="16" height="16" viewBox="0 0 18 18"><circle cx="5" cy="5" r="3.4" fill="#e74c3c"/><circle cx="13" cy="5" r="3.4" fill="#f39c12"/><circle cx="5" cy="13" r="3.4" fill="#27ae60"/><circle cx="13" cy="13" r="3.4" fill="#3498db"/></svg>
       </button>
       <span class="topnav-theme-name" id="navThemeName" data-theme-label title="theme"></span>
+      <button class="gopro" id="goPro" type="button"></button>
       <div class="auth-slot" id="authSlot"></div>
     </div>
     <button class="topnav-burger" id="navBurger" aria-label="menu">≡</button>
@@ -3630,6 +3640,12 @@ function renderKbpToggle(){
   el.innerHTML = seg('native','native')+seg('macabacus','macabacus')+seg('factset','factset');
   el.querySelectorAll('.kbp-seg').forEach(b=>{ b.onclick=()=>setKbProfile(b.dataset.kbp); });
 }
+// The "=PRO()" header button by the account. Becomes a quiet PRO badge once entitled.
+function renderGoPro(){
+  const el=$('goPro'); if(!el) return;
+  if(isPro()){ el.classList.add('is-pro'); el.textContent='PRO \u2713'; el.title='hotkey.gg Pro'; el.onclick=null; }
+  else { el.classList.remove('is-pro'); el.textContent='=PRO()'; el.title='Upgrade to Pro'; el.onclick=promptProUpgrade; }
+}
 let _audioCtx = null;
 function audioCtx(){
   if(_audioCtx) return _audioCtx;
@@ -4441,6 +4457,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadSound();
   await loadKbProfile();
   renderKbpToggle();
+  renderGoPro();
   try{ const _tn=document.getElementById('navThemeName');
     if(_tn && window.THEMES && window.THEMES[window.currentTheme]) _tn.textContent=window.THEMES[window.currentTheme].name; }catch(e){}
   updateSoundBtn();
@@ -4486,6 +4503,7 @@ async function onSession(session){
   } else { me_handle=null; me_member=false; me_pro=false; }
   refreshAuthUI();
   renderKbpToggle();
+  renderGoPro();
   if(me_user && /[?&]upgraded=1/.test(location.search)){
     try{ history.replaceState({}, '', location.pathname); }catch(e){}
     if(!me_pro) recheckPro(6); else proToast('Pro unlocked \u2014 keyboard profiles are live.');

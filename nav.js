@@ -73,9 +73,9 @@
       <div class="topnav-in">
         <a class="topnav-brand" href="index.html" title="hotkey.gg — excel trainer">hotkey<b>.gg</b></a>
         <div class="topnav-pages" id="navPages">
-          <a class="topnav-link" data-page="trainer"     href="index.html">trainer</a>
-          <a class="topnav-link" data-page="leaderboard" href="leaderboard.html">leaderboard</a>
-          <a class="topnav-link" data-page="reference"   href="reference.html">reference</a>
+          <a class="topnav-link" data-page="trainer"     href="index.html" title="trainer" aria-label="trainer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="tl-label">trainer</span></a>
+          <a class="topnav-link" data-page="leaderboard" href="leaderboard.html" title="leaderboard" aria-label="leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg><span class="tl-label">leaderboard</span></a>
+          <a class="topnav-link" data-page="reference"   href="reference.html" title="reference" aria-label="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.6-1-4-1.5-6-1.5S2 5 2 5v13s2-.5 4-.5 4.4.5 6 1.5c1.6-1 4-1.5 6-1.5s4 .5 4 .5V5s-2-.5-4-.5-4.4.5-6 1.5Z"/><path d="M12 6v13"/></svg><span class="tl-label">reference</span></a>
         </div>
         <div class="topnav-tools">
           <button class="topnav-icon" id="navShortcuts" title="keyboard shortcuts (?)" aria-label="keyboard shortcuts">

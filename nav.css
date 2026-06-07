@@ -12,7 +12,10 @@
 .topnav-brand b{color:var(--accent); font-weight:700}
 .topnav-pages{display:flex; align-items:center; gap:6px; margin:0 auto}
 .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
-  padding:7px 14px; border-radius:7px; transition:all .15s; letter-spacing:.2px}
+  padding:7px 12px; border-radius:7px; transition:all .15s; letter-spacing:.2px;
+  display:inline-flex; align-items:center; gap:8px}
+.topnav-link svg{width:19px; height:19px; display:block; flex:none}
+.tl-label{display:none}
 .topnav-link:hover{color:var(--text); background:var(--surface)}
 .topnav-link.active{color:var(--accent); background:var(--surface)}
 .topnav-tools{display:flex; align-items:center; gap:2px}
@@ -30,6 +33,7 @@
     gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0}
   .topnav-pages.open{display:flex}
   .topnav-link{padding:12px 22px; border-radius:0; width:100%}
+  .tl-label{display:inline}
   .topnav-tools .auth-slot{display:none}
   .topnav-theme-name{display:none}
   .topnav-burger{display:block; margin-left:auto}
