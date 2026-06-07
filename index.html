@@ -35,7 +35,7 @@
   .app{padding:6px 16px 0}
   /* auto top/bottom margins center the app when the viewport is tall enough, and collapse to a
      top-aligned, scrollable layout when it isn't — so the header/ribbon never clip on laptops */
-  .app{width:100%; max-width:1040px; margin:auto 0}
+  .app{width:100%; max-width:1200px; margin:auto 0}
 
   /* ---------- TOP NAV (three sections: brand · pages · tools) ----------
      Not sticky — Monkeytype-style, the nav scrolls with the page so users in focused-trainer mode aren't
@@ -94,6 +94,15 @@
   .gopro.is-pro{color:var(--accent); background:var(--surface); cursor:default}
   .gopro.is-pro:hover{background:var(--surface); color:var(--accent)}
   @media (max-width:760px){ .gopro{display:none} }
+  .rm-mouse-note{font-family:var(--mono); font-size:11.5px; color:var(--warn); background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:7px 11px; margin:2px 0 6px; line-height:1.4}
+  .pf-row{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:13px 0; border-bottom:1px solid var(--line)}
+  .pf-row:last-of-type{border-bottom:none}
+  .pf-l{font-family:var(--sans); font-size:14px; color:var(--text); font-weight:600}
+  .pf-d{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:2px}
+  .pf-toggle{flex:none; width:42px; height:24px; border-radius:13px; border:1px solid var(--line); background:var(--surface2); cursor:pointer; position:relative; transition:all .16s; padding:0}
+  .pf-toggle.on{background:var(--accent); border-color:var(--accent)}
+  .pf-knob{position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--muted); transition:left .16s}
+  .pf-toggle.on .pf-knob{left:20px; background:#06120c}
   @media (max-width:980px){ .kbp-toggle{display:none} }
   .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
   .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
@@ -273,6 +282,11 @@
     display:inline-flex; align-items:center; justify-content:center; font-family:var(--mono);
     font-size:11px; color:var(--accent); transition:.15s}
   .cl-item.ok .cl-box{border-color:var(--accent); background:var(--accent-glow)}
+  .cl-item.next{background:var(--accent-glow); border-radius:6px; padding-left:8px; box-shadow:inset 3px 0 0 var(--accent)}
+  .cl-item.next .cl-label{color:var(--text); font-weight:600}
+  .cl-item.next .cl-box{border-color:var(--accent)}
+  .cl-item.just{animation:clPop .42s ease}
+  @keyframes clPop{0%{transform:scale(1)}28%{transform:scale(1.045)}100%{transform:scale(1)}}
   .cl-hint{margin-top:9px; font-size:12.5px; color:var(--warn); line-height:1.5}
   .cl-hint em{font-style:normal; color:var(--accent)}
   /* guided / paint-by-numbers */
@@ -840,6 +854,9 @@
       <button class="topnav-icon topnav-themes" id="navThemes" title="themes" aria-label="themes">
         <svg width="16" height="16" viewBox="0 0 18 18"><circle cx="5" cy="5" r="3.4" fill="#e74c3c"/><circle cx="13" cy="5" r="3.4" fill="#f39c12"/><circle cx="5" cy="13" r="3.4" fill="#27ae60"/><circle cx="13" cy="13" r="3.4" fill="#3498db"/></svg>
       </button>
+      <button class="topnav-icon" id="navPrefs" title="preferences" aria-label="preferences">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
       <span class="topnav-theme-name" id="navThemeName" data-theme-label title="theme"></span>
       <button class="gopro" id="goPro" type="button"></button>
       <div class="auth-slot" id="authSlot"></div>
@@ -956,6 +973,7 @@
 <div class="profile-modal" id="themesModal"></div>
 <div class="profile-modal" id="kbdModal"></div>
 <div class="profile-modal" id="proModal"></div>
+<div class="profile-modal" id="prefsModal"></div>
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
@@ -1009,8 +1027,8 @@ let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
    returns {ROWS, COLS, cells, sel, active, inputs?}, a grade(),
    and a par (seconds).
    ============================================================ */
-const ROWS_MAX = 12, COLS = 8;            // A..H
-const COLW_DEFAULT = 78;                   // px; autofit widens beyond this
+const ROWS_MAX = 14, COLS = 10;           // A..J — roomier canvas
+const COLW_DEFAULT = 88;                   // px ≈ Excel column width 12; autofit widens beyond this
 const CHARPX = 8.6;                        // approx mono char width at 14px
 
 const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
@@ -2400,8 +2418,12 @@ function showResults(o){
     ? `<div class="guest-cta">playing as guest \u2014 nothing saved · <a id="rmSaveProg">save your progress</a></div>`
     : '';
   const m=$('resultsModal');
+  const mouseNote = o.mouse
+    ? `<div class="rm-mouse-note">🖱️ mouse detected — somewhere, a VP felt a disturbance. keys only next time.</div>`
+    : '';
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
+    mouseNote+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
@@ -2414,6 +2436,7 @@ function showResults(o){
     guestPrompt+
     `</div>`;
   m.classList.add('show');
+  if(!o.mouse) burstConfetti();
   const si=$('rmSignin'); if(si) si.onclick=openAuth;
   const sp=$('rmSaveProg'); if(sp) sp.onclick=()=>openAuth('signup');
   const spi=$('rmSaveProgInline'); if(spi) spi.onclick=()=>openAuth('signup');
@@ -2542,17 +2565,25 @@ function cycleAnchor(){
 }
 
 function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
+let _clPrevOk=null;
 function updateChecklist(){
   const el=$('checklist'); if(!el||!S) return;
   const C=CHALLENGES[cur];
   const items=C.checks(S);
   const n=items.filter(i=>i.ok).length;
+  // Completion feedback: detect items that flipped to done since the last render.
+  const okSet=new Set(items.filter(i=>i.ok).map(i=>i.label));
+  let newly=[];
+  if(_clPrevOk){ newly=[...okSet].filter(l=>!_clPrevOk.has(l)); }
+  _clPrevOk=okSet;
+  if(newly.length && !done && soundOn) playTaskChime();
   let nextDone=false;
   let html=`<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
   items.forEach((i,idx)=>{
-    const isNext = guided && !i.ok && !nextDone; if(isNext) nextDone=true;
+    const isNext = !i.ok && !nextDone; if(isNext) nextDone=true;
     const keys = (guided && C.guide && C.guide[idx]) ? `<div class="cl-keys">${C.guide[idx]}</div>` : '';
-    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
+    const just = (feedbackOn && newly.indexOf(i.label)>=0) ? ' just' : '';
+    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${just}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
   el.innerHTML=html;
@@ -3060,6 +3091,7 @@ document.addEventListener('keyup',e=>{ if(e.key==='Alt') e.preventDefault(); },{
 // mouse: usable, but flagged (does not block per scoring default)
 $('grid').addEventListener('mousedown',e=>{
   const td=e.target.closest('td'); if(!td)return;
+  if(!mouseUsed && !done){ gameToast('🖱️ mouse used — keys only on the desk. this run won\u2019t post.', 'var(--warn)'); }
   mouseUsed=true; $('mouseBadge').style.display='block';
   startClock(); S.active={r:+td.dataset.r,c:+td.dataset.c}; S.sel=null; render();
 });
@@ -3083,6 +3115,7 @@ $('startBtn').addEventListener('click', tryEnter);
 // top-nav: career link opens the profile card; burger toggles links on mobile
 { const ns=$('navShortcuts'); if(ns) ns.addEventListener('click', e=>{ e.preventDefault(); openKbd(); });
   const ft=$('navThemes'); if(ft) ft.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
+  const npf=$('navPrefs');  if(npf) npf.addEventListener('click', e=>{ e.preventDefault(); openPrefs(); });
   const ftn=$('navThemeName'); if(ftn) ftn.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
   const nb=$('navBurger');    if(nb) nb.addEventListener('click', ()=>{ const l=document.querySelector('.topnav-pages'); if(l) l.classList.toggle('open'); }); }
 
@@ -3514,6 +3547,9 @@ function saveHardo(){ KV.set('hotkey_hardo', hardoMode?'1':'0'); }
 let soundOn = true;
 async function loadSound(){ const v = await KV.get('hotkey_sound'); if(v==='0') soundOn = false; }
 function saveSound(){ KV.set('hotkey_sound', soundOn?'1':'0'); }
+let feedbackOn = true;
+async function loadFeedback(){ const v = await KV.get('hotkey_feedback'); if(v==='0') feedbackOn = false; }
+function saveFeedback(){ KV.set('hotkey_feedback', feedbackOn?'1':'0'); }
 
 /* ============================================================
    KEYBOARD PROFILES (additive) — 'native' | 'macabacus' | 'factset'.
@@ -3646,6 +3682,22 @@ function renderGoPro(){
   if(isPro()){ el.classList.add('is-pro'); el.textContent='PRO \u2713'; el.title='hotkey.gg Pro'; el.onclick=null; }
   else { el.classList.remove('is-pro'); el.textContent='=PRO()'; el.title='Upgrade to Pro'; el.onclick=promptProUpgrade; }
 }
+// Standalone preferences popover (sound + completion feedback). Works for everyone, signed in or not.
+function openPrefs(){
+  const m=$('prefsModal'); if(!m) return;
+  m.classList.add('show');
+  const row=(id,label,desc,on)=>`<div class="pf-row"><div><div class="pf-l">${label}</div><div class="pf-d">${desc}</div></div><button class="pf-toggle${on?' on':''}" id="${id}" role="switch" aria-checked="${on}"><span class="pf-knob"></span></button></div>`;
+  m.innerHTML='<div class="pc-card" style="width:420px">'+
+    '<div class="pc-head"><div class="pc-name">Preferences</div></div>'+
+    row('pfSound','Sound','chimes on task complete + streaks', soundOn)+
+    row('pfFeedback','Completion feedback','pulse + confetti when you finish', feedbackOn)+
+    '<div class="pc-foot"><a id="pfClose">close</a></div>'+
+    '</div>';
+  const sb_=$('pfSound'); if(sb_) sb_.onclick=()=>{ soundOn=!soundOn; saveSound(); updateSoundBtn(); sb_.classList.toggle('on',soundOn); sb_.setAttribute('aria-checked',soundOn); if(soundOn) playTaskChime(); };
+  const fb=$('pfFeedback'); if(fb) fb.onclick=()=>{ feedbackOn=!feedbackOn; saveFeedback(); fb.classList.toggle('on',feedbackOn); fb.setAttribute('aria-checked',feedbackOn); if(feedbackOn) burstConfetti(); };
+  const c=$('pfClose'); if(c) c.onclick=()=>m.classList.remove('show');
+  m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('show'); }, {once:true});
+}
 let _audioCtx = null;
 function audioCtx(){
   if(_audioCtx) return _audioCtx;
@@ -3678,6 +3730,58 @@ function playSuccessBlip(tier){
   tone(880  * pitch, 0,    0.09, 0.16);   // main note
   tone(1175 * pitch, 0.06, 0.11, 0.14);   // overlapping fourth — chord-feel, not melody
   if(t === 4){ tone(440 * pitch, 0, 0.18, 0.10); }  // tier-4 bass octave below the main note → "you're cooking" feel
+}
+
+// Gentle, single-shot "task done" chime — deliberately softer and distinct from the streak blip,
+// so completing a checklist item feels rewarding without the rapid-fire escalation feel.
+function playTaskChime(){
+  if(!soundOn) return;
+  const ctx = audioCtx(); if(!ctx) return;
+  if(ctx.state === 'suspended'){ try{ ctx.resume(); }catch(e){} }
+  const t0 = ctx.currentTime;
+  const tone = (freq, start, dur, gain) => {
+    const osc = ctx.createOscillator(); const g = ctx.createGain();
+    osc.type = 'sine'; osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0 + start);
+    g.gain.exponentialRampToValueAtTime(gain, t0 + start + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + start + dur);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(t0 + start); osc.stop(t0 + start + dur + 0.02);
+  };
+  tone(659, 0, 0.10, 0.11); tone(988, 0.05, 0.13, 0.09);  // soft rising tick → "done"
+}
+
+// Lightweight confetti burst on drill completion (no library). Gated on the visual-feedback setting.
+function burstConfetti(){
+  if(!feedbackOn) return;
+  const colors=['#2ea36f','#e2b714','#5aa0ff','#ff6b6b','#ffffff'];
+  const wrap=document.createElement('div');
+  wrap.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:10000;overflow:hidden';
+  for(let i=0;i<42;i++){
+    const d=document.createElement('div');
+    const x=50+(Math.random()*38-19);
+    d.style.cssText=`position:absolute;top:40%;left:${x}%;width:8px;height:8px;background:${colors[i%colors.length]};border-radius:1px;transform:translate(-50%,-50%)`;
+    wrap.appendChild(d);
+    const ang=Math.random()*Math.PI*2, dist=130+Math.random()*230;
+    const dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist+140;
+    d.animate([{transform:'translate(-50%,-50%) rotate(0)',opacity:1},
+               {transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) rotate(${Math.random()*720-360}deg)`,opacity:0}],
+              {duration:900+Math.random()*700,easing:'cubic-bezier(.2,.6,.3,1)',fill:'forwards'});
+  }
+  document.body.appendChild(wrap);
+  setTimeout(()=>wrap.remove(), 1800);
+}
+
+// Small in-game toast (mouse warning, etc.). Pass a CSS color for the accent border.
+function gameToast(msg, color){
+  let t=document.getElementById('gameToast');
+  if(!t){ t=document.createElement('div'); t.id='gameToast';
+    t.style.cssText='position:fixed;left:50%;top:80px;transform:translateX(-50%);font-family:var(--mono);font-size:12.5px;padding:9px 15px;border-radius:9px;z-index:9999;opacity:0;transition:opacity .2s;background:var(--surface);color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.3)';
+    document.body.appendChild(t); }
+  t.style.border='1px solid '+(color||'var(--accent)');
+  t.textContent=msg;
+  requestAnimationFrame(()=>{ t.style.opacity='1'; });
+  clearTimeout(t._h); t._h=setTimeout(()=>{ t.style.opacity='0'; }, 3200);
 }
 
 // Streak tier: 0 = hidden, 1-5 are visible escalation levels.
@@ -4371,7 +4475,7 @@ function loadChallenge(key){
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
-  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[];
+  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[]; _clPrevOk=null;
   updateGuideBtn();
   $('mouseBadge').style.display='none';
   $('timer').textContent='0.00'; $('timer').classList.remove('run');
@@ -4455,6 +4559,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadOnboard();
   await loadHardo();
   await loadSound();
+  await loadFeedback();
   await loadKbProfile();
   renderKbpToggle();
   renderGoPro();
