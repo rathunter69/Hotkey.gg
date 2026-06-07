@@ -84,6 +84,7 @@
           <button class="topnav-icon" id="navThemes" title="themes" aria-label="themes">
             <svg width="16" height="16" viewBox="0 0 18 18"><circle cx="5" cy="5" r="3.4" fill="#e74c3c"/><circle cx="13" cy="5" r="3.4" fill="#f39c12"/><circle cx="5" cy="13" r="3.4" fill="#27ae60"/><circle cx="13" cy="13" r="3.4" fill="#3498db"/></svg>
           </button>
+          <span class="topnav-theme-name" id="navThemeName" data-theme-label title="theme"></span>
           <div class="auth-slot" id="authSlot"></div>
         </div>
         <button class="topnav-burger" id="navBurger" aria-label="menu">&#8801;</button>
@@ -390,6 +391,7 @@
     const mount = $('navMount');
     if(!mount){ console.warn('nav.js: no #navMount found on this page'); return; }
     mount.innerHTML = NAV_HTML;
+    if(window.syncThemeLabels) window.syncThemeLabels();
 
     // Mark the active page link based on what the page declared.
     const active = window.NAV_ACTIVE || 'trainer';
@@ -400,6 +402,7 @@
     // Wire the static tool buttons (always present regardless of auth).
     const sb_btn = $('navShortcuts'); if(sb_btn) sb_btn.onclick = () => kbdOpen ? closeKbd() : openKbd();
     const th_btn = $('navThemes');    if(th_btn) th_btn.onclick = () => themesOpen ? closeThemes() : openThemes();
+    const th_name = $('navThemeName'); if(th_name) th_name.onclick = () => themesOpen ? closeThemes() : openThemes();
 
     // Mobile burger toggles the .topnav-pages list open/closed.
     const bg = $('navBurger');

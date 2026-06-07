@@ -20,6 +20,8 @@
   border-radius:6px; transition:all .15s; display:inline-flex; align-items:center; justify-content:center}
 .topnav-icon:hover{color:var(--text); background:var(--surface)}
 .topnav-icon svg{display:block}
+.topnav-theme-name{font-family:var(--mono); font-size:12px; color:var(--muted); cursor:pointer; letter-spacing:.3px; text-transform:lowercase; white-space:nowrap; padding:0 4px; transition:color .15s}
+.topnav-theme-name:hover{color:var(--accent)}
 .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
 .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
 @media (max-width:760px){
@@ -29,6 +31,7 @@
   .topnav-pages.open{display:flex}
   .topnav-link{padding:12px 22px; border-radius:0; width:100%}
   .topnav-tools .auth-slot{display:none}
+  .topnav-theme-name{display:none}
   .topnav-burger{display:block; margin-left:auto}
 }
 

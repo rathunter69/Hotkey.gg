@@ -102,11 +102,19 @@ window.THEMES = {
 
 window.currentTheme = 'default';
 
+// Update any theme-name labels on the page (Monkeytype-style text next to the theme selector).
+// Elements opt in with a data-theme-label attribute; we set their text to the active theme's name.
+window.syncThemeLabels = function(){
+  const t = window.THEMES[window.currentTheme] || window.THEMES.default;
+  try{ document.querySelectorAll('[data-theme-label]').forEach(function(el){ el.textContent = t.name; }); }catch(e){}
+};
+
 window.applyTheme = function(name){
   const t = window.THEMES[name] || window.THEMES.default;
   const root = document.documentElement;
   for(const k in t.vars) root.style.setProperty('--' + k, t.vars[k]);
   window.currentTheme = name;
+  window.syncThemeLabels();
 };
 
 // On script load: apply the saved theme (or prefers-color-scheme default) before any render.
@@ -119,3 +127,8 @@ window.applyTheme = function(name){
   }
   window.applyTheme(saved);
 })();
+
+// Theme-name labels live in the page body, which doesn't exist yet when this runs in <head>.
+// Populate them once the DOM is ready; applyTheme keeps them in sync on every change after that.
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', window.syncThemeLabels);
+else window.syncThemeLabels();

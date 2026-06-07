@@ -54,6 +54,8 @@
     border-radius:6px; display:flex; align-items:center; justify-content:center; transition:.13s}
   .topnav-icon:hover{color:var(--text); background:var(--surface)}
   .topnav-icon svg{display:block}
+  .topnav-theme-name{font-family:var(--mono); font-size:12px; color:var(--muted); cursor:pointer; letter-spacing:.3px; text-transform:lowercase; white-space:nowrap; padding:0 4px; transition:color .15s}
+  .topnav-theme-name:hover{color:var(--accent)}
   .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
   .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
   @media (max-width:760px){
@@ -63,6 +65,7 @@
     .topnav-pages.open{display:flex}
     .topnav-link{padding:12px 22px; border-radius:0; width:100%}
     .topnav-tools .auth-slot{display:none}
+    .topnav-theme-name{display:none}
     .topnav-burger{display:block; margin-left:auto}
   }
 
@@ -796,6 +799,7 @@
       <button class="topnav-icon topnav-themes" id="navThemes" title="themes" aria-label="themes">
         <svg width="16" height="16" viewBox="0 0 18 18"><circle cx="5" cy="5" r="3.4" fill="#e74c3c"/><circle cx="13" cy="5" r="3.4" fill="#f39c12"/><circle cx="5" cy="13" r="3.4" fill="#27ae60"/><circle cx="13" cy="13" r="3.4" fill="#3498db"/></svg>
       </button>
+      <span class="topnav-theme-name" id="navThemeName" data-theme-label title="theme"></span>
       <div class="auth-slot" id="authSlot"></div>
     </div>
     <button class="topnav-burger" id="navBurger" aria-label="menu">≡</button>
@@ -3026,6 +3030,7 @@ $('startBtn').addEventListener('click', tryEnter);
 // top-nav: career link opens the profile card; burger toggles links on mobile
 { const ns=$('navShortcuts'); if(ns) ns.addEventListener('click', e=>{ e.preventDefault(); openKbd(); });
   const ft=$('navThemes'); if(ft) ft.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
+  const ftn=$('navThemeName'); if(ftn) ftn.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
   const nb=$('navBurger');    if(nb) nb.addEventListener('click', ()=>{ const l=document.querySelector('.topnav-pages'); if(l) l.classList.toggle('open'); }); }
 
 // guest-mode banner when Supabase isn't configured (no leaderboard, no saves)
