@@ -73,6 +73,18 @@
   .kbp-btn:hover{color:var(--text); border-color:var(--accent-dim)}
   .kbp-btn.on{color:#06120c; background:var(--accent); border-color:var(--accent); font-weight:700}
   .kbp-hint{font-family:var(--mono); font-size:11.5px; line-height:1.5; color:var(--faint)}
+  .kbp-btn.locked{color:var(--faint)}
+  .kbp-btn .kbp-lock{margin-left:5px; vertical-align:-1px}
+  .kbp-protag{font-size:9px; letter-spacing:1px; color:var(--accent); border:1px solid var(--accent-dim); border-radius:4px; padding:1px 5px; margin-left:7px; vertical-align:1px}
+  .kbp-toggle{display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--surface)}
+  .kbp-seg{font-family:var(--mono); font-size:11.5px; color:var(--muted); background:none; border:none; border-right:1px solid var(--line); padding:6px 10px; cursor:pointer; transition:all .14s; text-transform:lowercase; display:inline-flex; align-items:center; gap:4px; white-space:nowrap}
+  .kbp-seg:last-child{border-right:none}
+  .kbp-seg:hover{color:var(--text); background:var(--surface2)}
+  .kbp-seg.on{color:#06120c; background:var(--accent); font-weight:700}
+  .kbp-seg.locked{color:var(--faint)}
+  .kbp-seg.locked:hover{color:var(--muted); background:var(--surface2)}
+  .kbp-lock{opacity:.85}
+  @media (max-width:980px){ .kbp-toggle{display:none} }
   .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
   .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
   @media (max-width:760px){
@@ -810,6 +822,7 @@
       <a class="topnav-link" href="reference.html">reference</a>
     </div>
     <div class="topnav-tools">
+      <div class="kbp-toggle" id="kbpToggle" title="keyboard profile"></div>
       <button class="topnav-icon" id="navShortcuts" title="keyboard shortcuts (?)" aria-label="keyboard shortcuts">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </button>
@@ -930,6 +943,7 @@
 <div class="profile-modal" id="settingsModal"></div>
 <div class="profile-modal" id="themesModal"></div>
 <div class="profile-modal" id="kbdModal"></div>
+<div class="profile-modal" id="proModal"></div>
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
@@ -973,7 +987,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
 const BETA_MODE         = true; // ← access-code-only sign-up for the beta. Flip to false for full email/password auth.
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
+let me_user = null, me_handle = null, me_member = false, me_pro = false, authOpen = false, gateOpen = false;
 let enterRequested = false, landingOpen = true, recoveryMode = false;
 let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
 
@@ -2850,11 +2864,12 @@ document.addEventListener('keydown',e=>{
     }
   }
 
-  // KEYBOARD PROFILES — additive Macabacus/FactSet chords. Placed before the zoom guard below so
-  // the No Border chord (Ctrl+Shift+-) isn't swallowed by it. Falls through when no profile chord
-  // matches, so native shortcuts keep working unchanged.
-  if(kbProfile!=='native' && (e.ctrlKey||e.metaKey) && !editing && !demoPlaying && !done){
-    const binds = PROFILE_BINDINGS[kbProfile];
+  // KEYBOARD PROFILES — additive Macabacus/FactSet chords, gated behind Pro. Placed before the zoom
+  // guard below so the No Border chord (Ctrl+Shift+-) isn't swallowed. Falls through when no profile
+  // chord matches, so native shortcuts keep working unchanged.
+  const _prof = isPro() ? kbProfile : 'native';
+  if(_prof!=='native' && (e.ctrlKey||e.metaKey) && !editing && !demoPlaying && !done){
+    const binds = PROFILE_BINDINGS[_prof];
     const hit = binds && binds[chordOf(e)];
     if(hit){ e.preventDefault(); startClock(); logKey(hit[0]); hit[1](); return; }
   }
@@ -3542,6 +3557,37 @@ const KBP_HINTS = {
   macabacus: 'Layers Macabacus chords on top of native: Fast Fill (Ctrl+Shift+D / R), decimals (Ctrl+, / Ctrl+.), wrap (Ctrl+Alt+Shift+W), no border (Ctrl+Shift+-).',
   factset:   'Layers FactSet chords on top of native: Smart Copy (Ctrl+Shift+D / R), decimals (Ctrl+Shift+, / Ctrl+Shift+.), wrap (Ctrl+Shift+W).',
 };
+function isPro(){ return !!me_pro; }
+
+// Switch profile. The plugin profiles are gated behind Pro; free users get an upgrade prompt.
+function setKbProfile(p){
+  if((p==='macabacus'||p==='factset') && !isPro()){ promptProUpgrade(p); return; }
+  kbProfile = p; saveKbProfile(); renderKbpToggle(); if(kbdOpen) openKbd();
+}
+function promptProUpgrade(){
+  const m=$('proModal'); if(!m) return;
+  m.classList.add('show');
+  m.innerHTML='<div class="pc-card" style="width:430px">'+
+    '<div class="pc-head"><div class="pc-name">Pro feature</div></div>'+
+    '<div class="pc-msg">The <b>Macabacus</b> and <b>FactSet</b> keyboard profiles layer your plugin\u2019s real shortcuts on top of native Excel \u2014 part of <b>hotkey.gg Pro</b>. Native shortcuts stay free for everyone.</div>'+
+    '<div class="pc-foot"><span></span><a id="proClose">close</a></div>'+
+    '</div>';
+  const c=$('proClose'); if(c) c.onclick=()=>m.classList.remove('show');
+  m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('show'); }, {once:true});
+}
+// Prominent segmented toggle in the top nav. Non-Pro users see the plugin profiles locked.
+function renderKbpToggle(){
+  const el=$('kbpToggle'); if(!el) return;
+  const pro=isPro();
+  const active = pro ? kbProfile : 'native';
+  const lock='<svg class="kbp-lock" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  const seg=(key,label)=>{
+    const locked = !pro && (key==='macabacus'||key==='factset');
+    return `<button class="kbp-seg${active===key?' on':''}${locked?' locked':''}" data-kbp="${key}" title="${locked?'Pro feature':label}">${label}${locked?lock:''}</button>`;
+  };
+  el.innerHTML = seg('native','native')+seg('macabacus','macabacus')+seg('factset','factset');
+  el.querySelectorAll('.kbp-seg').forEach(b=>{ b.onclick=()=>setKbProfile(b.dataset.kbp); });
+}
 let _audioCtx = null;
 function audioCtx(){
   if(_audioCtx) return _audioCtx;
@@ -3659,11 +3705,15 @@ function openKbd(){
     ).join('');
     return `<div class="kb-section"><div class="kb-h">${escHtml(g.title)}</div>${rows}</div>`;
   }).join('');
-  const kbpBtn=(key,label)=>`<button class="kbp-btn${kbProfile===key?' on':''}" data-kbp="${key}">${label}</button>`;
+  const _pro=isPro();
+  const _active=_pro?kbProfile:'native';
+  const _lk='<svg class="kbp-lock" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  const kbpBtn=(key,label)=>{ const locked=!_pro&&(key==='macabacus'||key==='factset');
+    return `<button class="kbp-btn${_active===key?' on':''}${locked?' locked':''}" data-kbp="${key}">${label}${locked?_lk:''}</button>`; };
   const profileSel=
-    '<div class="kbp"><div class="kbp-h">keyboard profile</div>'+
+    '<div class="kbp"><div class="kbp-h">keyboard profile'+(_pro?'':' <span class="kbp-protag">pro</span>')+'</div>'+
     '<div class="kbp-row">'+kbpBtn('native','native')+kbpBtn('macabacus','macabacus')+kbpBtn('factset','factset')+'</div>'+
-    '<div class="kbp-hint">'+KBP_HINTS[kbProfile]+'</div></div>';
+    '<div class="kbp-hint">'+KBP_HINTS[_active]+'</div></div>';
   m.innerHTML='<div class="pc-card" style="width:560px">'+
     '<div class="pc-head"><div class="pc-name">shortcuts</div></div>'+
     '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
@@ -3672,7 +3722,7 @@ function openKbd(){
     '<div class="pc-foot"><span></span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
     '</div>';
   const c=$('kbClose'); if(c) c.onclick=closeKbd;
-  m.querySelectorAll('.kbp-btn').forEach(b=>{ b.onclick=()=>{ kbProfile=b.dataset.kbp; saveKbProfile(); openKbd(); }; });
+  m.querySelectorAll('.kbp-btn').forEach(b=>{ b.onclick=()=>setKbProfile(b.dataset.kbp); });
   m.addEventListener('click', e=>{ if(e.target===m) closeKbd(); }, {once:true});
 }
 function openThemes(){
@@ -4348,6 +4398,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadHardo();
   await loadSound();
   await loadKbProfile();
+  renderKbpToggle();
   updateSoundBtn();
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
@@ -4382,8 +4433,15 @@ async function onSession(session){
       const { data:mem } = await sb.from('members').select('user_id').eq('user_id', me_user.id).maybeSingle();
       me_member = !!mem;
     }catch(e){ me_member=false; }
-  } else { me_handle=null; me_member=false; }
+    // Pro entitlement — read from a dedicated, write-locked table (see the SQL in chat). Separate
+    // guarded query so its absence (before the migration) can't break the handle/member load.
+    try{
+      const { data:pr } = await sb.from('entitlements').select('pro').eq('user_id', me_user.id).maybeSingle();
+      me_pro = !!(pr && pr.pro);
+    }catch(e){ me_pro=false; }
+  } else { me_handle=null; me_member=false; me_pro=false; }
   refreshAuthUI();
+  renderKbpToggle();
   if(recoveryMode && me_user){ openAuth('newpassword'); return; }
   advanceAccess();
 }
