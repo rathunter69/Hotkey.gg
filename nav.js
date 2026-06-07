@@ -97,6 +97,29 @@
   `;
 
   // ---------------------------------------------------------------
+  // FOOTER HTML — injected into #siteFooter on DOMContentLoaded (shared across
+  // leaderboard, reference, and the legal pages). index.html carries its own inline copy.
+  // NOTE: replace hello@hotkey.gg with the real support address once it exists.
+  // ---------------------------------------------------------------
+  const FOOTER_HTML = `
+    <footer class="site-footer">
+      <div class="sf-in">
+        <div class="sf-left">
+          <a href="index.html" class="sf-brand">hotkey<b>.gg</b></a>
+          <span class="sf-fine">Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.</span>
+        </div>
+        <nav class="sf-links" aria-label="footer">
+          <a href="mailto:hello@hotkey.gg">contact</a>
+          <a href="mailto:hello@hotkey.gg?subject=Bug%20report%20%E2%80%94%20hotkey.gg">report a bug</a>
+          <a href="terms.html">terms</a>
+          <a href="privacy.html">privacy</a>
+          <a href="security.html">security</a>
+        </nav>
+      </div>
+    </footer>
+  `;
+
+  // ---------------------------------------------------------------
   // SHORTCUTS MODAL — static content. Mostly app navigation; for Excel chords, point to reference.html.
   // ---------------------------------------------------------------
   const APP_SHORTCUTS = [
@@ -392,6 +415,7 @@
     if(!mount){ console.warn('nav.js: no #navMount found on this page'); return; }
     mount.innerHTML = NAV_HTML;
     if(window.syncThemeLabels) window.syncThemeLabels();
+    const fmount = $('siteFooter'); if(fmount) fmount.innerHTML = FOOTER_HTML;
 
     // Mark the active page link based on what the page declared.
     const active = window.NAV_ACTIVE || 'trainer';

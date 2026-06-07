@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>privacy · hotkey.gg</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49; --accent:#2ea36f; --accent-dim:#1d6647;
+    --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; line-height:1.5; padding-bottom:40px}
+</style>
+<link rel="stylesheet" href="nav.css">
+<script src="drills.js"></script>
+<script>
+  const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+  window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  window.NAV_ACTIVE='';
+</script>
+<script src="themes.js"></script>
+<script src="nav.js"></script>
+</head>
+<body>
+<div id="navMount"></div>
+
+<div class="legal-wrap">
+  <article class="legal-doc">
+    <h1>Privacy Policy</h1>
+    <div class="updated">Draft &middot; last updated <span class="legal-ph">[DATE]</span></div>
+
+    <div class="legal-draft">&#9888; Draft for review. This template reflects how hotkey.gg currently works, but it is not legal advice. Have a qualified attorney review it before you rely on it, and replace every <span class="legal-ph">[bracketed]</span> placeholder with your real details.</div>
+
+    <p>This policy explains what information hotkey.gg ("hotkey.gg", "we", "us" &mdash; operated by <span class="legal-ph">[LEGAL ENTITY / OPERATOR]</span>) collects when you use the trainer at <span class="legal-ph">[hotkey.gg domain]</span>, and what we do with it. Questions: <a href="mailto:hello@hotkey.gg">hello@hotkey.gg</a>.</p>
+
+    <h2>What we collect</h2>
+    <ul>
+      <li><strong>Account information.</strong> If you create an account, we store your email address and the display handle you choose. Much of the trainer can be used anonymously, without an account.</li>
+      <li><strong>Gameplay data.</strong> Your drill times, scores, session results, and personal bests, so we can track your progress and rank you on public leaderboards (shown under your handle, not your email).</li>
+      <li><strong>Browser local storage.</strong> We keep your theme choice, onboarding status, and personal-best times in your browser's local storage, and your sign-in session token is stored locally by our authentication provider. These are not advertising or cross-site tracking cookies.</li>
+      <li><strong>Technical data.</strong> Our infrastructure providers automatically log standard technical information (such as IP address and browser type) to keep the Service secure and reliable. Web fonts are served by Google Fonts, which may receive your IP address as part of delivering them.</li>
+    </ul>
+
+    <h2>How we use it</h2>
+    <p>We use this information to run the trainer, show your progress and leaderboards, secure accounts, respond to you, and improve the product. <strong>We do not sell your personal data, and the trainer does not display ads.</strong></p>
+
+    <h2>Service providers</h2>
+    <p>We rely on a small number of providers that process data on our behalf: <strong>Supabase</strong> for authentication and database hosting, <span class="legal-ph">[hosting provider]</span> to serve the site, and <strong>Google Fonts</strong> for typography. We share only what each provider needs to perform its function.</p>
+
+    <h2>Retention &amp; deletion</h2>
+    <p>We keep account and gameplay data while your account is active. You can ask us to delete your account and its associated data at <a href="mailto:hello@hotkey.gg">hello@hotkey.gg</a>; deleting an account removes the gameplay records tied to it.</p>
+
+    <h2>Your rights</h2>
+    <p>Depending on where you live, you may have rights to access, correct, delete, export, or object to the processing of your personal data &mdash; for example under the GDPR (EEA/UK) or the CCPA (California). To make a request, contact <a href="mailto:hello@hotkey.gg">hello@hotkey.gg</a>. <span class="legal-ph">[Counsel to confirm which frameworks apply to you and add the required disclosures.]</span></p>
+
+    <h2>Children</h2>
+    <p>The trainer is not directed to children under <span class="legal-ph">[13/16]</span>, and we do not knowingly collect their personal data.</p>
+
+    <h2>International users</h2>
+    <p>We operate from <span class="legal-ph">[country]</span>, and your data may be processed there and in the countries where our providers operate. <span class="legal-ph">[Counsel to confirm transfer mechanisms if you serve EEA/UK users.]</span></p>
+
+    <h2>Changes</h2>
+    <p>We may update this policy as the product evolves. Material changes will be posted here with a new date.</p>
+
+    <h2>Contact</h2>
+    <p>Privacy questions or requests: <a href="mailto:hello@hotkey.gg">hello@hotkey.gg</a>.</p>
+  </article>
+</div>
+
+<div id="siteFooter"></div>
+</body>
+</html>

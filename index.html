@@ -56,6 +56,16 @@
   .topnav-icon svg{display:block}
   .topnav-theme-name{font-family:var(--mono); font-size:12px; color:var(--muted); cursor:pointer; letter-spacing:.3px; text-transform:lowercase; white-space:nowrap; padding:0 4px; transition:color .15s}
   .topnav-theme-name:hover{color:var(--accent)}
+  .site-footer{border-top:1px solid var(--line); margin-top:64px; padding:30px 0 40px}
+  .site-footer .sf-in{max-width:1240px; margin:0 auto; padding:0 28px; display:flex; align-items:flex-start; justify-content:space-between; gap:24px; flex-wrap:wrap}
+  .sf-left{display:flex; flex-direction:column; gap:8px; max-width:520px}
+  .sf-brand{font-family:var(--mono); font-weight:700; font-size:15px; letter-spacing:-.4px; color:var(--text); text-decoration:none}
+  .sf-brand b{color:var(--accent)}
+  .sf-fine{font-family:var(--mono); font-size:11px; line-height:1.55; color:var(--faint)}
+  .sf-links{display:flex; flex-wrap:wrap; gap:6px 18px; align-items:center}
+  .sf-links a{font-family:var(--mono); font-size:12.5px; color:var(--muted); text-decoration:none; letter-spacing:.2px; transition:color .15s}
+  .sf-links a:hover{color:var(--accent)}
+  @media (max-width:640px){ .site-footer .sf-in{flex-direction:column; gap:18px} }
   .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
   .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
   @media (max-width:760px){
@@ -4739,5 +4749,20 @@ async function recordSession(mode, durationSec, score, keystrokes, misses, optim
   }catch(e){ console.warn('session record exception:', e); return false; }
 }
 </script>
+<footer class="site-footer">
+  <div class="sf-in">
+    <div class="sf-left">
+      <a href="index.html" class="sf-brand">hotkey<b>.gg</b></a>
+      <span class="sf-fine">Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.</span>
+    </div>
+    <nav class="sf-links" aria-label="footer">
+      <a href="mailto:hello@hotkey.gg">contact</a>
+      <a href="mailto:hello@hotkey.gg?subject=Bug%20report%20%E2%80%94%20hotkey.gg">report a bug</a>
+      <a href="terms.html">terms</a>
+      <a href="privacy.html">privacy</a>
+      <a href="security.html">security</a>
+    </nav>
+  </div>
+</footer>
 </body>
 </html>

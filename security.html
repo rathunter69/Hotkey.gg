@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>security · hotkey.gg</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49; --accent:#2ea36f; --accent-dim:#1d6647;
+    --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; line-height:1.5; padding-bottom:40px}
+</style>
+<link rel="stylesheet" href="nav.css">
+<script src="drills.js"></script>
+<script>
+  const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+  window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  window.NAV_ACTIVE='';
+</script>
+<script src="themes.js"></script>
+<script src="nav.js"></script>
+</head>
+<body>
+<div id="navMount"></div>
+
+<div class="legal-wrap">
+  <article class="legal-doc">
+    <h1>Security</h1>
+    <div class="updated">Draft &middot; last updated <span class="legal-ph">[DATE]</span></div>
+
+    <div class="legal-draft">&#9888; Draft for review. Confirm every statement below matches your actual deployment before publishing &mdash; an overstated security claim is worse than none. This is a public posture summary, not a compliance attestation.</div>
+
+    <p>We take the security of your account and your data seriously. This page summarizes our current practices and how to report a vulnerability. The Service is in beta and these practices will continue to evolve.</p>
+
+    <h2>How we protect your data</h2>
+    <ul>
+      <li><strong>Encryption in transit.</strong> The Service is served over HTTPS/TLS, so traffic between your browser and our servers is encrypted.</li>
+      <li><strong>Authentication.</strong> Accounts are handled by Supabase Auth. Passwords are stored only as salted hashes &mdash; never in plain text &mdash; and we never see your raw password.</li>
+      <li><strong>Access controls.</strong> Data is stored in Supabase's managed PostgreSQL with row-level security, so records are readable and writable only according to defined policies rather than being open to any user.</li>
+      <li><strong>Encryption at rest.</strong> Our database provider encrypts stored data at rest.</li>
+      <li><strong>Least privilege.</strong> The public app uses a restricted, publishable key scoped to what the browser needs; privileged operations run server-side and are not exposed to the client.</li>
+    </ul>
+
+    <h2>Reporting a vulnerability</h2>
+    <p>If you believe you've found a security issue, please email <a href="mailto:hello@hotkey.gg?subject=Security%20report%20%E2%80%94%20hotkey.gg">hello@hotkey.gg</a> with a description and steps to reproduce. Please give us a reasonable chance to address it before any public disclosure, and don't access, modify, or delete other users' data while testing. We'll acknowledge valid reports and work to resolve them. <span class="legal-ph">[Note whether you offer a bug bounty &mdash; "no monetary bounty at this time" is fine to state.]</span></p>
+
+    <h2>For organizations</h2>
+    <p>If you're evaluating hotkey.gg for cohort or pre-onboarding training and need more detail for a security review, contact <a href="mailto:hello@hotkey.gg">hello@hotkey.gg</a>. <span class="legal-ph">[As the enterprise offering matures, list what you can provide &mdash; e.g., a security questionnaire response, SSO, a data-processing agreement &mdash; and don't claim certifications such as SOC 2 until they actually exist.]</span></p>
+  </article>
+</div>
+
+<div id="siteFooter"></div>
+</body>
+</html>
