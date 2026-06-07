@@ -66,6 +66,13 @@
   .sf-links a{font-family:var(--mono); font-size:12.5px; color:var(--muted); text-decoration:none; letter-spacing:.2px; transition:color .15s}
   .sf-links a:hover{color:var(--accent)}
   @media (max-width:640px){ .site-footer .sf-in{flex-direction:column; gap:18px} }
+  .kbp{border:1px solid var(--line); border-radius:10px; padding:13px 14px; margin-bottom:14px; background:var(--surface2)}
+  .kbp-h{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:9px}
+  .kbp-row{display:flex; gap:7px; margin-bottom:9px; flex-wrap:wrap}
+  .kbp-btn{font-family:var(--mono); font-size:12.5px; color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:7px; padding:7px 14px; cursor:pointer; transition:all .14s; text-transform:lowercase}
+  .kbp-btn:hover{color:var(--text); border-color:var(--accent-dim)}
+  .kbp-btn.on{color:#06120c; background:var(--accent); border-color:var(--accent); font-weight:700}
+  .kbp-hint{font-family:var(--mono); font-size:11.5px; line-height:1.5; color:var(--faint)}
   .topnav-tools .auth-slot{margin-left:8px; padding-left:14px; border-left:1px solid var(--line)}
   .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
   @media (max-width:760px){
@@ -2843,6 +2850,15 @@ document.addEventListener('keydown',e=>{
     }
   }
 
+  // KEYBOARD PROFILES — additive Macabacus/FactSet chords. Placed before the zoom guard below so
+  // the No Border chord (Ctrl+Shift+-) isn't swallowed by it. Falls through when no profile chord
+  // matches, so native shortcuts keep working unchanged.
+  if(kbProfile!=='native' && (e.ctrlKey||e.metaKey) && !editing && !demoPlaying && !done){
+    const binds = PROFILE_BINDINGS[kbProfile];
+    const hit = binds && binds[chordOf(e)];
+    if(hit){ e.preventDefault(); startClock(); logKey(hit[0]); hit[1](); return; }
+  }
+
   // never let browser zoom combos (ctrl/cmd +/-/0) collide with the grid
   if((e.ctrlKey||e.metaKey)&&(k==='='||k==='+'||k==='-'||k==='_'||k==='0')){ e.preventDefault(); return; }
 
@@ -3471,6 +3487,61 @@ function saveHardo(){ KV.set('hotkey_hardo', hardoMode?'1':'0'); }
 let soundOn = true;
 async function loadSound(){ const v = await KV.get('hotkey_sound'); if(v==='0') soundOn = false; }
 function saveSound(){ KV.set('hotkey_sound', soundOn?'1':'0'); }
+
+/* ============================================================
+   KEYBOARD PROFILES (additive) — 'native' | 'macabacus' | 'factset'.
+   When a profile is active, the keydown handler recognizes that plugin's chords and runs the
+   SAME state mutation the native path uses (eachSel/fillFrom). Because drills validate end-state,
+   existing drills accept these alternate input paths automatically. Shipped ungated in beta.
+   Bucket 1 only (the operations the engine already models); cycles/colors/autocolor are a later push.
+   ============================================================ */
+let kbProfile = 'native';
+async function loadKbProfile(){ const v = await KV.get('hotkey_kbprofile'); if(v==='macabacus'||v==='factset') kbProfile = v; }
+function saveKbProfile(){ KV.set('hotkey_kbprofile', kbProfile); }
+
+// Normalize a keyboard event to a layout-independent chord string, e.g. "ctrl+shift+d",
+// "ctrl+comma", "ctrl+alt+shift+w". Uses e.code so Shift+',' (which yields '<') still maps to comma.
+function chordOf(e){
+  const parts=[];
+  if(e.ctrlKey||e.metaKey) parts.push('ctrl');
+  if(e.altKey) parts.push('alt');
+  if(e.shiftKey) parts.push('shift');
+  let key='';
+  const cm={Comma:'comma', Period:'period', Minus:'minus'};
+  if(cm[e.code]) key=cm[e.code];
+  else if(/^Key([A-Z])$/.test(e.code)) key=e.code.slice(3).toLowerCase();
+  else key=(e.key||'').toLowerCase();
+  parts.push(key);
+  return parts.join('+');
+}
+// Mutate-and-commit helper for the formatting chords (fillFrom self-commits, so it's not used there).
+function fmtMut(mut){ pushUndo(); eachSel(mut); commitAction(); }
+
+// chord -> [log label, action]. FactSet and Macabacus share the fill chords; they diverge on the
+// decimal chords (FactSet adds Shift) and wrap (FactSet drops Alt). No Border is Macabacus-only here
+// (FactSet's border is a smart-cycle — Bucket 2).
+const PROFILE_BINDINGS = {
+  macabacus: {
+    'ctrl+shift+d':     ['Ctrl+Shift+D',     ()=>fillFrom('down')],
+    'ctrl+shift+r':     ['Ctrl+Shift+R',     ()=>fillFrom('right')],
+    'ctrl+comma':       ['Ctrl+,',           ()=>fmtMut(c=>c.decimals=Math.min(6,(c.decimals||0)+1))],
+    'ctrl+period':      ['Ctrl+.',           ()=>fmtMut(c=>c.decimals=Math.max(0,(c.decimals||0)-1))],
+    'ctrl+alt+shift+w': ['Ctrl+Alt+Shift+W', ()=>fmtMut(c=>c.wrap=!c.wrap)],
+    'ctrl+shift+minus': ['Ctrl+Shift+-',     ()=>fmtMut(c=>{c.bt=false;c.bb=false;c.ball=false;})],
+  },
+  factset: {
+    'ctrl+shift+d':      ['Ctrl+Shift+D',  ()=>fillFrom('down')],
+    'ctrl+shift+r':      ['Ctrl+Shift+R',  ()=>fillFrom('right')],
+    'ctrl+shift+comma':  ['Ctrl+Shift+,',  ()=>fmtMut(c=>c.decimals=Math.min(6,(c.decimals||0)+1))],
+    'ctrl+shift+period': ['Ctrl+Shift+.',  ()=>fmtMut(c=>c.decimals=Math.max(0,(c.decimals||0)-1))],
+    'ctrl+shift+w':      ['Ctrl+Shift+W',  ()=>fmtMut(c=>c.wrap=!c.wrap)],
+  },
+};
+const KBP_HINTS = {
+  native:    'Standard Excel shortcuts only.',
+  macabacus: 'Layers Macabacus chords on top of native: Fast Fill (Ctrl+Shift+D / R), decimals (Ctrl+, / Ctrl+.), wrap (Ctrl+Alt+Shift+W), no border (Ctrl+Shift+-).',
+  factset:   'Layers FactSet chords on top of native: Smart Copy (Ctrl+Shift+D / R), decimals (Ctrl+Shift+, / Ctrl+Shift+.), wrap (Ctrl+Shift+W).',
+};
 let _audioCtx = null;
 function audioCtx(){
   if(_audioCtx) return _audioCtx;
@@ -3588,13 +3659,20 @@ function openKbd(){
     ).join('');
     return `<div class="kb-section"><div class="kb-h">${escHtml(g.title)}</div>${rows}</div>`;
   }).join('');
+  const kbpBtn=(key,label)=>`<button class="kbp-btn${kbProfile===key?' on':''}" data-kbp="${key}">${label}</button>`;
+  const profileSel=
+    '<div class="kbp"><div class="kbp-h">keyboard profile</div>'+
+    '<div class="kbp-row">'+kbpBtn('native','native')+kbpBtn('macabacus','macabacus')+kbpBtn('factset','factset')+'</div>'+
+    '<div class="kbp-hint">'+KBP_HINTS[kbProfile]+'</div></div>';
   m.innerHTML='<div class="pc-card" style="width:560px">'+
     '<div class="pc-head"><div class="pc-name">shortcuts</div></div>'+
     '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
+    profileSel+
     '<div class="kb-grid">'+sections+'</div>'+
     '<div class="pc-foot"><span></span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
     '</div>';
   const c=$('kbClose'); if(c) c.onclick=closeKbd;
+  m.querySelectorAll('.kbp-btn').forEach(b=>{ b.onclick=()=>{ kbProfile=b.dataset.kbp; saveKbProfile(); openKbd(); }; });
   m.addEventListener('click', e=>{ if(e.target===m) closeKbd(); }, {once:true});
 }
 function openThemes(){
@@ -4269,6 +4347,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadOnboard();
   await loadHardo();
   await loadSound();
+  await loadKbProfile();
   updateSoundBtn();
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
