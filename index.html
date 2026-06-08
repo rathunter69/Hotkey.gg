@@ -205,9 +205,12 @@
 
   .ribbon{display:flex; align-items:center; gap:7px; flex-wrap:wrap; min-height:40px;
     font-family:var(--mono); font-size:13px; margin-bottom:9px;
-    background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:7px 12px;
+    background:var(--surface2); border:1px solid var(--line); border-radius:9px; padding:7px 12px;
     transition:border-color .14s, background .14s}
   .ribbon.show{border-color:var(--accent-dim); background:linear-gradient(180deg, rgba(46,163,111,.13), var(--surface))}
+  .ribbon.cue{border-color:var(--accent-dim); background:linear-gradient(180deg, var(--accent-glow), var(--surface2))}
+  .rcue{display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-size:13px; color:var(--text)}
+  .rcue-l{font-size:9.5px; text-transform:uppercase; letter-spacing:.6px; color:#06120c; background:var(--accent); border-radius:4px; padding:2px 7px; font-weight:700}
   .ribbon .rhint{color:var(--muted); font-size:12px; display:inline-flex; align-items:center}
   .ribbon .rhint k{display:inline-grid; place-items:center; min-width:18px; height:18px; margin-right:7px;
     color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:11px; font-weight:600}
@@ -287,6 +290,10 @@
   .cl-item.next .cl-box{border-color:var(--accent)}
   .cl-item.just{animation:clPop .42s ease}
   @keyframes clPop{0%{transform:scale(1)}28%{transform:scale(1.045)}100%{transform:scale(1)}}
+  .cl-help{margin-top:14px; padding-top:11px; border-top:1px solid var(--line); font-family:var(--mono); font-size:10.5px; color:var(--faint); letter-spacing:.2px}
+  .cl-help kbd{font-family:var(--mono); background:var(--surface); border:1px solid var(--line); border-radius:3px; padding:0 5px; color:var(--muted); margin:0 1px}
+  td.active.gpulse{animation:cellPulse 1.3s ease-in-out infinite}
+  @keyframes cellPulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)}50%{box-shadow:inset 0 0 0 3px var(--accent)}}
   .cl-hint{margin-top:9px; font-size:12.5px; color:var(--warn); line-height:1.5}
   .cl-hint em{font-style:normal; color:var(--accent)}
   /* guided / paint-by-numbers */
@@ -499,7 +506,7 @@
   /* two-column workspace: grid on the left, checklist rail on the right */
   .stage{display:flex; align-items:flex-start; gap:20px}
   .stage-main{flex:1 1 auto; min-width:0}
-  .checklist{flex:0 0 240px; align-self:stretch; background:var(--surface); border:1px solid var(--line);
+  .checklist{flex:0 0 240px; align-self:stretch; background:var(--surface2); border:1px solid var(--line);
     border-radius:12px; padding:15px 16px; margin-top:0}
   @media(max-width:840px){
     .stage{flex-direction:column}
@@ -2142,7 +2149,7 @@ function render(){
       if(cell.fontColor)cls.push('fc-'+cell.fontColor);
       const isActive=(r===S.active.r&&c===S.active.c);
       const inSel=(r>=sr.r1&&r<=sr.r2&&c>=sr.c1&&c<=sr.c2);
-      if(isActive)cls.push('active'); else if(inSel&&S.sel)cls.push('sel');
+      if(isActive){ cls.push('active'); if(guided && !done && !editing) cls.push('gpulse'); } else if(inSel&&S.sel)cls.push('sel');
       if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2) cls.push('gtarget');
       if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
@@ -2322,7 +2329,18 @@ function drawDialog(){
 function drawRibbon(){
   drawDialog();
   const el=$('ribbon');
-  if(mode!=='ribbon'){ el.className='ribbon'; el.innerHTML='<span class="rhint"><k>alt</k>ribbon — formatting, borders, AutoSum, paste special</span>'; return; }
+  if(mode!=='ribbon'){
+    el.className='ribbon';
+    let cue='';
+    const C=CHALLENGES[cur];
+    if(guided && S && C && C.guide && !done){
+      const items=C.checks(S); const idx=items.findIndex(i=>!i.ok);
+      if(idx>=0 && C.guide[idx]) cue=`<span class="rcue"><span class="rcue-l">next</span>${C.guide[idx]}</span>`;
+    }
+    if(cue){ el.className='ribbon cue'; el.innerHTML=cue; }
+    else el.innerHTML='<span class="rhint"><k>alt</k>ribbon — formatting, borders, AutoSum, paste special</span>';
+    return;
+  }
   if(dialog==='paste'){ el.className='ribbon show';
     el.innerHTML='<span class="path">paste special →</span><span class="opt">press a letter, ↵ apply, esc cancel</span>'; return; }
   if(dialog==='fontcolor'){
@@ -2586,6 +2604,7 @@ function updateChecklist(){
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${just}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
+  html+=`<div class="cl-help">stuck? <kbd>g</kbd> guided · <kbd>?</kbd> shortcuts</div>`;
   el.innerHTML=html;
 }
 const ARROWSYM={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
