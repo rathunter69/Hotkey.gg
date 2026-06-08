@@ -4329,28 +4329,28 @@ async function loadProfileData(){
   const players=new Set(runs.map(r=>r.user_id)).size;
   return { drills, attempted:attempted.length, avgPct, firsts, bestRank, players };
 }
-/* Tier assignment is intentionally punitive — Unranked is the default and the only way out is breadth + placement.
-   Without a minimum drill floor, the first person to touch a drill is #1 of 1 and gets Diamond. We require at least
-   5 drills attempted before any tier appears, and each tier above Bronze compounds an attempted-drill threshold
-   onto a placement percentile. Diamond demands both deep play (15/18 drills) AND elite placement (top 5%) —
+/* Tier assignment is intentionally punitive — Candidate is the default and the only way out is breadth + placement.
+   Without a minimum drill floor, the first person to touch a drill is #1 of 1 and tops out. We require at least
+   5 drills attempted before any tier appears, and each tier above Summer Analyst compounds an attempted-drill
+   threshold onto a placement percentile. Second-Year Analyst demands both deep play (15/18 drills) AND top 5% —
    making it actually rare. The placement axis (avgPct) already averages this user's rank-percentage across drills
    so a single fluke "#1 of 2" run can't carry the rest. The remaining edge case — a player who does 5 drills all
-   blazingly fast — caps at Silver here, since Gold needs 10+ drills. */
+   blazingly fast — caps at Incoming Analyst here, since First-Year needs 10+ drills. */
 function tierOf(avgPct, attemptedCount){
-  if(avgPct===null || (attemptedCount||0) < 5) return {name:'Unranked', cls:'tier-unranked'};
-  if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Diamond',  cls:'tier-diamond'};
-  if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Platinum', cls:'tier-platinum'};
-  if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'Gold',     cls:'tier-gold'};
-  if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Silver',   cls:'tier-silver'};
-  return {name:'Bronze', cls:'tier-bronze'};
+  if(avgPct===null || (attemptedCount||0) < 5) return {name:'Candidate', cls:'tier-unranked'};
+  if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
+  if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst',  cls:'tier-platinum'};
+  if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'First-Year Analyst',  cls:'tier-gold'};
+  if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Incoming Analyst',    cls:'tier-silver'};
+  return {name:'Summer Analyst', cls:'tier-bronze'};
 }
 function renderProfile(m, d){
   const tier=tierOf(d.avgPct, d.attempted);
-  // Standing is meaningless before the threshold — show progress toward Bronze instead so the user knows what to do.
+  // Standing is meaningless before the threshold — show progress toward Summer Analyst instead so the user knows what to do.
   // After threshold, show "top X%" (the same average-percentile measure that feeds the tier).
   const fmtMs=ms=>(ms/1000).toFixed(2)+'s';
   const standing = (d.attempted < 5)
-    ? d.attempted+'/5 drills toward Bronze'
+    ? d.attempted+'/5 drills toward Summer Analyst'
     : (d.avgPct===null ? '—' : 'top '+Math.max(1,Math.round(d.avgPct*100))+'%');
   let body='', lastG=null;
   d.drills.forEach(x=>{
