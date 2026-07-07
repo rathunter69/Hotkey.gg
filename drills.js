@@ -27,7 +27,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Formatting',  keys: ['polish', 'combo', 'format', 'center', 'blue', 'gauntlet'] },
     { name: 'Values',      keys: ['drill', 'series'] },
     { name: 'Data',        keys: ['sort'] },
-    { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'percent', 'revolver', 'cagr', 'sumif', 'schedule', 'comps'] },
+    { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'audit', 'percent', 'revolver', 'cagr', 'sumif', 'schedule', 'comps'] },
     { name: 'Lookups',     keys: ['lookup', 'lookup2'] },
   ],
 
@@ -68,6 +68,7 @@ window.HOTKEY_DRILLS = {
     sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'Anchored SUMIF rollup — $-lock the ranges, fill down' },
     bridge:     { name:'Bridge',   label:'Stretch the profit row', tab:'Bridge',   desc:'Profit = revenue × margin, fill it across years' },
     foot:       { name:'Foot',     label:'Total it both ways',  tab:'Cross-foot',  desc:'SUM across and down, tie out the corner' },
+    audit:      { name:'Audit',    label:'Fix the broken ref',  tab:'Audit',       desc:'One formula reads the wrong row — find it, F2, repair' },
     percent:    { name:'% of rev', label:'Common-size it',      tab:'Common-size', desc:'Common-size with an anchored ($) formula' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'Roll a PP&E schedule forward with links' },
     comps:      { name:'Comps',    label:'Line up the comps',   tab:'Comps',       desc:'EV/EBITDA multiples, then the average' },

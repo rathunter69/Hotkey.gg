@@ -310,3 +310,20 @@ mode='gauntlet', duration_sec=week number. Attempt-once enforced client-side fir
   leaderboard per-drill section gains "show team only" toggle when you have a team.
 - Supabase GitHub integration (Wolf connected it directly): fine — if both it and our
   Action run migrations, they're idempotent; disable the Action later if redundant.
+
+---
+# ROUND 9 — pace ghost, weekly gauntlet, RF aliases, audit drill
+- PB PACE GHOST: live "−1.24 vs pb" next to the clock, green ahead / red behind.
+  Ghost-replay foundation: keyLog traces now TIMESTAMPED ({k,t} in runs.trace);
+  true cursor-ghost replays become possible on data recorded from today forward.
+- WEEKLY GAUNTLET (🏁 HUD button): 5 seeded drills per ISO week, deterministic
+  layouts per leg, results screen chains legs; runs post per-leg as
+  'wk-YYYY-WW-<drill>'; leaderboard computes the combined board (users with all
+  5 legs, summed time, asc). Best-of stands (no one-attempt lock in v1).
+- RF PROFILE ALIASES: rapid-fire fill_right accepts Macabacus Ctrl+Shift+R and
+  FactSet Ctrl+Alt+Shift+K; fill_down accepts FactSet Ctrl+Alt+Shift+D (verified
+  bindings only, active profile only).
+- AUDIT DRILL (24 total, Formulas): one revenue formula reads the wrong row —
+  scan, F2, repair. The 2am rep. par 32 / 20 keys.
+- Incident note: a python surrogate-escape write zeroed index.html mid-edit;
+  git checkout restored it instantly. Lesson: emoji via \\U escapes + io.open utf-8.

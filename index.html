@@ -302,6 +302,11 @@
   .rm-key:hover kbd{color:var(--accent)}
 
   /* first-run guided intro */
+  /* ---- PB pace ghost next to the clock ---- */
+  .ghost{font-family:var(--mono); font-size:12px; margin-left:10px; padding:3px 9px; border-radius:6px;
+    background:var(--surface2); color:var(--muted); letter-spacing:.3px; vertical-align:middle}
+  .ghost.ahead{color:var(--accent); background:var(--accent-glow)}
+  .ghost.behind{color:var(--bad); background:rgba(200,83,63,.14)}
   /* ---- rank pill in the HUD: progression, always visible ---- */
   .rank-pill{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:1px;
     text-transform:uppercase; border-radius:999px !important; padding:6px 13px !important;
@@ -875,6 +880,7 @@
       <button class="mb-tool" id="soundToggle" title="success sound on rapid-fire solves">🔊 sound</button>
       <button class="mb-tool" id="profileToggle" title="keyboard profile — native Excel, Macabacus, or FactSet chords also accepted">⌨ native</button>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
+      <button class="mb-tool" id="weeklyBtn" title="the weekly gauntlet — five seeded drills, combined time on the board">🏁 weekly</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <button class="mb-tool rank-pill tier-unranked" id="rankPill" style="display:none" title="your rank — the ladder runs Candidate \u2192 Second-Year Analyst. Click for your card.">Candidate</button>
     </div>
@@ -888,7 +894,7 @@
         <span class="namebox" id="nameBox">A1</span>
         <span class="fx"><i>fx</i></span>
         <span class="fcontent empty" id="fContent">empty</span>
-        <span class="ftimer" id="timer">0.00</span>
+        <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span>
       </div>
       <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
       <div class="result" id="result"></div>
@@ -1002,6 +1008,21 @@ function dailyDateStr(){ return new Date().toISOString().slice(0,10); }
 function dailyKey(){ return 'daily-'+dailyDateStr(); }
 function dailySeed(){ const s=dailyDateStr(); let x=0; for(const ch of s) x=(x*31+ch.charCodeAt(0))>>>0; return x; }
 let dailyMode=false;
+// ---- weekly gauntlet: 5 seeded drills, combined time. Runs post per-drill under
+// 'wk-<isoweek>-<drill>'; the leaderboard sums users who completed all five. ----
+let weeklyMode=false, weeklyIdx=0, weeklyList=[];
+function weekStr(){ const d=new Date(); const onejan=new Date(d.getUTCFullYear(),0,1);
+  const wk=Math.ceil((((d-onejan)/864e5)+onejan.getUTCDay()+1)/7);
+  return d.getUTCFullYear()+'-'+String(wk).padStart(2,'0'); }
+function weekSeed(){ let x=0; for(const ch of weekStr()) x=(x*31+ch.charCodeAt(0))>>>0; return x; }
+function weeklyDrillList(){ const rng=mulberry32(weekSeed()); const bag=MENU_ORDER.slice();
+  for(let i=bag.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [bag[i],bag[j]]=[bag[j],bag[i]]; }
+  return bag.slice(0,5); }
+function startWeekly(){ weeklyList=weeklyDrillList(); weeklyIdx=0;
+  loadChallenge(weeklyList[0], {weekly:true}); }
+function weeklyNext(){ if(weeklyIdx+1>=weeklyList.length){ weeklyMode=false; updateWeeklyBtn(); return; }
+  weeklyIdx++; loadChallenge(weeklyList[weeklyIdx], {weekly:true}); }
+function updateWeeklyBtn(){ const b=$('weeklyBtn'); if(b) b.classList.toggle('on', weeklyMode); }
 const colLetter = c => String.fromCharCode(64+c);
 
 function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:false,
@@ -1910,6 +1931,53 @@ const CHALLENGES = {
       ];
     }
   },
+  audit:{
+    name:'Audit', label:'Fix the broken ref', par:32, parKeys:20,
+    prompt:'One of these revenue formulas is pointing at the wrong row \u2014 the number that looks off IS off. Find it, F2 into the cell, repair the reference, commit. This is the rep that saves you at 2am: reading a column and spotting the break.',
+    req:'<em>scan column C</em> for the row that doesn\u2019t tie \u00b7 <em>F2</em> opens the formula in place \u00b7 fix the row number \u00b7 <em>\u21b5</em>',
+    guide:[
+      'read down column C \u2014 one row\u2019s revenue doesn\u2019t match its units \u00d7 price',
+      'on the broken cell \u00b7 <kbd>F2</kbd> \u2014 the formula opens with the cursor at the end',
+      'backspace the wrong row number, type the right one \u00b7 <kbd>\u21b5</kbd>',
+    ],
+    targets:[function(){return this._badCell;}],
+    demo(){ const bad=this._badCell, row=bad.slice(1);
+      return [ {sel:bad, keys:[{key:'F2'}, {key:'Backspace'}, {key:'Backspace'}, ...T('B'+row), Kb.enter]} ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Item',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'Units',txt:true,bold:true};
+      cells['C1']={...blankCell(),value:'Revenue',txt:true,bold:true};
+      cells['E1']={...blankCell(),value:'Price',txt:true,bold:true};
+      const price=rnd(3,9)*5;
+      cells['E2']={...blankCell(),value:price,fontColor:'blue'};
+      const n=6, items=['Widgets','Gadgets','Sprockets','Flanges','Gears','Bolts'];
+      const badRow=rnd(3,n+1);   // never the first row \u2014 the pattern must establish itself first
+      for(let i=0;i<n;i++){
+        const r=i+2, u=rnd(20,400)*5;
+        cells['A'+r]={...blankCell(),value:items[i],txt:true};
+        cells['B'+r]={...blankCell(),value:u,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        const ref = (r===badRow) ? 'B'+(r-1) : 'B'+r;   // the plant: one formula reads the row above
+        cells['C'+r]={...blankCell(),formula:'=$E$2*'+ref,fmtStyle:'comma',decimals:0};
+      }
+      // pre-compute displayed values (including the wrong one \u2014 that's the tell)
+      for(let i=0;i<n;i++){ const r=i+2; const f=cells['C'+r].formula;
+        const refRow=parseInt(f.slice(f.indexOf('B')+1),10);
+        cells['C'+r].value = price * cells['B'+refRow].value; }
+      this._badCell='C'+badRow; this._price=price; this._n=n;
+      return {ROWS:n+1, cells, active:{r:2,c:3}, sel:null, colW:{1:96,2:80,3:96,5:70}};
+    },
+    checks(S){
+      let allOk=true;
+      for(let i=0;i<this._n;i++){ const r=i+2;
+        const c=S.cells['C'+r]; if(!c||!c.formula){ allOk=false; continue; }
+        const f=c.formula.toUpperCase().replace(/[\s$]/g,'');
+        const u=S.cells['B'+r] ? S.cells['B'+r].value : 0;
+        if(!f.includes('B'+r) || Math.abs(c.value-this._price*u)>1e-6) allOk=false;
+      }
+      return [{label:'every revenue formula reads its OWN row \u2014 column ties out', ok: allOk}];
+    }
+  },
   sumif:{
     name:'SUMIF', label:'Roll up the segments', par:52, parKeys:44,
     prompt:'Roll the ledger up by segment. Seven line items, three segments — build one SUMIF with anchored ranges at E2, then fill it down for the other two. $-lock the ranges so the fill doesn\'t walk them.',
@@ -2113,7 +2181,7 @@ let editAnchor=null, editPointer=null, editPointerStart=-1;
 // Last char of editBuf is one of these → arrows enter pointer mode (insert new reference).
 // = + - * / ^ ( , — Excel's standard operator/separator boundaries.
 const OPERATOR_BOUNDARY = /[=+\-*/^(,]$/;
-let undoStack=[], redoStack=[], keyLog=[];
+let undoStack=[], redoStack=[], keyLog=[], keyTimes=[];
 let gameMode='classic';   // 'classic' | 'marathon'
 let marathon=null;        // active marathon session state
 let lastKey=null;         // last drill key, to avoid back-to-back repeats in marathon
@@ -2631,7 +2699,16 @@ function startClock(){ if(running||done)return; running=true; started=performanc
   if(marathon && marathon.active && !marathon.endAt){
     marathon.startAt=started; marathon.endAt=started+marathon.dur*1000; }
   $('timer').classList.add('run'); tickH=setInterval(updateTimer,40); }
-function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); }
+function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); ghostTick(t); }
+/* PB pace ghost: while you run, the gap to your own best counts down beside the clock.
+   Green while you're ahead of the PB, red the instant it slips away. */
+let ghostPB=null;
+function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null;
+  const el=$('ghostDelta'); if(el){ el.style.display=ghostPB?'inline':'none'; el.className='ghost'; el.textContent=ghostPB?('pb '+ghostPB.toFixed(2)):''; } }
+function ghostTick(t){ if(ghostPB==null) return; const el=$('ghostDelta'); if(!el) return;
+  const d=ghostPB-t;
+  el.textContent=(d>=0?'\u2212':'+')+Math.abs(d).toFixed(2)+' vs pb';
+  el.className='ghost '+(d>=0?'ahead':'behind'); }
 function stopClock(){ running=false; clearInterval(tickH); finished=performance.now();
   $('timer').classList.remove('run'); }
 
@@ -2744,6 +2821,18 @@ function showResults(o){
       v.style.cssText='font-family:var(--mono);font-size:14px;color:var(--warn);margin:10px 0 2px;font-weight:700;letter-spacing:.4px';
       v.textContent='\ud83c\udfaf placement: '+placementVerdict(parseFloat(o.t), CHALLENGES[cur].par);
       if(card) card.insertBefore(v, card.children[1]||null);
+    }
+    if(weeklyMode && weeklyIdx+1<weeklyList.length){
+      const nx=document.createElement('button');
+      nx.className='ob-key primary'; nx.style.cssText='margin-top:10px;width:100%';
+      nx.textContent='🏁 gauntlet leg '+(weeklyIdx+2)+' of 5 \u2192';
+      nx.onclick=()=>{ hideResults(); weeklyNext(); };
+      if(card) card.appendChild(nx);
+    } else if(weeklyMode){
+      const fin=document.createElement('div');
+      fin.style.cssText='font-family:var(--mono);font-size:13px;color:var(--accent);margin-top:10px;font-weight:700';
+      fin.textContent='🏁 gauntlet complete — combined time is on the weekly board';
+      if(card) card.appendChild(fin);
     }
     if(!o.mouse && !o.guided){
       const sh=document.createElement('button');
@@ -2950,7 +3039,7 @@ function updateChecklist(){
 const ARROWSYM={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
 function arrowLabel(k,shift,ctrl){ return (ctrl?'Ctrl+':'')+(shift?'Shift+':'')+ARROWSYM[k]; }
 let flashTimer=null, flashChips=[];
-function logKey(t){ keyLog.push(t); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); }
+function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); }
 function flashKey(t){
   const el=$('keyflash'); if(!el) return;
   flashChips.push(t); if(flashChips.length>6) flashChips.shift();
@@ -3494,6 +3583,7 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
 $('soundToggle').addEventListener('click',toggleSound);
 $('profileToggle').addEventListener('click',cycleProfile);
 $('dailyBtn').addEventListener('click',startDaily);
+$('weeklyBtn').addEventListener('click',startWeekly);
 $('startBtn').addEventListener('click', tryEnter);
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
@@ -3762,12 +3852,14 @@ const RF_OPS = [
     show: c=>({layout:'column', context:c.vals.map(v=>v.toLocaleString('en-US')), text:''}),
     solved: c=>({layout:'column', context:c.vals.map(v=>v.toLocaleString('en-US')),
                  text:`=SUM(B2:B${1+c.n})`, fx:true}) },
-  { op:'fill_down', label:'Fill down', keys:['Ctrl','D'], match: RFM.ctrl('d'),
+  { op:'fill_down', label:'Fill down', keys:['Ctrl','D'],
+    match: e=> RFM.ctrl('d')(e) || (keyProfile==='factset'&&e.ctrlKey&&e.altKey&&e.shiftKey&&e.key.toLowerCase()==='d'),
     make: ()=> ({val:rfBig().toLocaleString('en-US')}),
     instr: ()=>'Fill the value down',
     show: c=>({layout:'column', context:[c.val], text:''}),
     solved: c=>({layout:'column', context:[c.val], text:c.val}) },
-  { op:'fill_right', label:'Fill right', keys:['Ctrl','R'], match: RFM.ctrl('r'),
+  { op:'fill_right', label:'Fill right', keys:['Ctrl','R'],
+    match: e=> RFM.ctrl('r')(e) || (keyProfile==='macabacus'&&e.ctrlKey&&e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='r') || (keyProfile==='factset'&&e.ctrlKey&&e.altKey&&e.shiftKey&&e.key.toLowerCase()==='k'),
     make: ()=> ({val:rfBig().toLocaleString('en-US')}),
     instr: ()=>'Fill the value right',
     show: c=>({layout:'row', context:[c.val], text:''}),
@@ -4752,29 +4844,32 @@ function renderStreak(){ const el=$('streakBadge'); if(!el) return;
   el.style.display = streak.n>0 ? 'inline-flex' : 'none';
   el.innerHTML='\ud83d\udd25 '+streak.n; el.title=streak.n+'-day streak — solve a drill every day to keep it alive'; }
 
-function scoreKey(){ return dailyMode ? dailyKey() : cur; }
+function scoreKey(){ if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return dailyMode ? dailyKey() : cur; }
 function drillOfDay(){ return MENU_ORDER[dailySeed() % MENU_ORDER.length]; }
 function startDaily(){ loadChallenge(drillOfDay(), {daily:true}); updateDailyBtn(); }
 function updateDailyBtn(){ const b=$('dailyBtn'); if(b) b.classList.toggle('on', dailyMode); }
 function loadChallenge(key, opts){
   dailyMode = !!(opts && opts.daily);
-  updateDailyBtn();
+  weeklyMode = !!(opts && opts.weekly);
+  updateDailyBtn(); updateWeeklyBtn();
   cur=key; const C=CHALLENGES[key];
   if(dailyMode){ _rand = mulberry32(dailySeed()); }                 // deterministic build for the day
-  try{ if(!dailyMode) KV.set('hotkey_last_drill', key); }catch(e){}  // resume point (daily doesn't override it)
+  if(weeklyMode){ _rand = mulberry32(weekSeed() + weeklyIdx*7919); } // deterministic per gauntlet leg
+  try{ if(!dailyMode && !weeklyMode) KV.set('hotkey_last_drill', key); }catch(e){}  // resume point (daily doesn't override it)
   const built=C.build();
   _rand = Math.random;                                              // seeded only for the daily build
   S={ROWS:Math.max(built.ROWS, ROWS_MAX), cells:built.cells, active:built.active, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
-  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[];
+  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[]; keyTimes=[];
   updateGuideBtn();
   $('mouseBadge').style.display='none';
   $('timer').textContent='0.00'; $('timer').classList.remove('run');
   $('par').textContent=C.par+'s';
   $('keyPar').textContent=C.parKeys;
-  $('pb').textContent = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
+  $('pb').textContent = PB[scoreKey()]!==undefined ? PB[scoreKey()].toFixed(2)+'s' : '—';
+  armGhost();
   $('result').className='result'; $('result').innerHTML='';
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
 }
@@ -5385,7 +5480,8 @@ async function recordRun(t){
     const { error } = await sb.from('runs').insert({
       user_id: me_user.id, challenge: scoreKey(),
       time_ms: Math.round(t*1000), keystrokes: keyLog.length,
-      optimal: CHALLENGES[cur].parKeys, mouse_used: false, trace: keyLog
+      optimal: CHALLENGES[cur].parKeys, mouse_used: false,
+      trace: keyLog.map((k,i)=>({k, t: keyTimes[i]||0}))   // timestamped — ghost-replay ready
     });
     return !error;
   }catch(e){ return false; }

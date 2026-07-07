@@ -87,8 +87,13 @@ secret SUPABASE_ACCESS_TOKEN — see supabase/README.md; migrations idempotent).
 Deploy set += stats.html, supabase/, .github/. Round 8: placement onboarding (nav-tour + pace verdict; tour demoted), share cards
 (canvas PNG from results), team codes (profiles.team_code migration + settings UI +
 leaderboard team-only toggle), index nav icons + stats link, rank pill always-on.
-Queue: weekly gauntlet, ghost replays, drillgen engine integration, RF profile
-aliases, F2-audit + transpose drills, streak server-sync, campaign mode.
+Round 9: PB pace ghost (live vs-pb delta at the clock; traces now timestamped
+{k,t} — true ghost replays unlocked for future data), weekly gauntlet (🏁 button,
+5 seeded legs, combined-time board, keys 'wk-YYYY-WW-<drill>'), RF plugin-chord
+aliases (verified only), audit drill (24 total). Supabase deploys confirmed
+working via GitHub integration (team_code applied). Queue: true ghost replays,
+drillgen engine integration, transpose drill, streak server-sync, campaign mode,
+gauntlet one-attempt lock.
 Weekly gauntlet shelled in dev/AUDIT.md.
 
 ## Curriculum v2 (current focus)
