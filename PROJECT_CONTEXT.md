@@ -1,5 +1,5 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Verified 2026-07-06 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+_Verified 2026-07-07 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
 Upload this file to the Claude project after review._
 
 ## What this is
@@ -21,9 +21,20 @@ IB associate, restructuring) is founder; Claude is sole developer.
   Push to main = deploy. Tokens never stored in repo or this file.
 - **Coupled deploy set:** index.html (4,835 lines), drills.js, themes.js, nav.js,
   nav.css, leaderboard.html, reference.html, About.html, privacy/terms/security.html,
-  favicon.svg. supabase/functions/ are NOT in the repo (deployed separately via
-  Supabase dashboard/CLI).
+  favicon.svg. supabase/ IS in the repo: migrations/ deploy
+  automatically on push via the Supabase GitHub integration (VERIFIED working —
+  never paste SQL in the dashboard again). stats.html is part of the deploy set.
 - Never put secret/service-role/Stripe secret keys in client code.
+
+## Conventions (bugs earned these)
+- **CACHE-BUSTING (round 16):** every shared-asset reference uses ?v=N
+  (nav.js, nav.css, themes.js, drills.js across all pages). BUMP N on any shared-file
+  change or GitHub Pages serves stale JS — this caused the "missing stats icon" and
+  earlier "invisible rank pill" reports.
+- Emoji in python edits: \U escapes + io.open utf-8 (surrogate write once zeroed index.html).
+- Duplicated-code sync sets: tier/level math (index+nav.js+leaderboard TIERS) ·
+  applyTheme/data-dark (themes.js+index inline) · rankEmblem (themes.js+index inline) ·
+  XP v2 formula (nav.js+leaderboard).
 
 ## Architecture notes
 - drills.js = canonical drill catalog (groups, names, labels, tabs, desc, difficulty).

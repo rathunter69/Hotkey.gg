@@ -139,15 +139,32 @@ else window.syncThemeLabels();
 
 /* ---- rank emblems: military-style insignia per tier, glow via currentColor ----
    Single source of truth for every page (themes.js loads everywhere). */
+
+/* ---- rank emblems: LoL-style layered crests, single source for all pages ---- */
 window.RANK_EMBLEM_IDX = {'Candidate':0,'Summer Analyst':1,'Incoming Analyst':2,
   'First-Year Analyst':3,'Top-Bucket Analyst':4,'Second-Year Analyst':5};
-window.rankEmblem = function(tierName){
+window.rankEmblem = function(tierName, size){
   const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
-  const chev = (y)=>'<path d="M3 '+(y+4)+' L8 '+y+' L13 '+(y+4)+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+  size = size || 16;
+  // Layered crest in currentColor with opacity depth — no gradient ids, safe to repeat on a page.
+  const shield = '<path d="M12 2.6 L19 5.4 V12 C19 16.6 15.9 20 12 21.6 C8.1 20 5 16.6 5 12 V5.4 Z" fill="currentColor" opacity=".16"/>'+
+                 '<path d="M12 2.6 L19 5.4 V12 C19 16.6 15.9 20 12 21.6 C8.1 20 5 16.6 5 12 V5.4 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>';
+  const gem    = '<path d="M12 8 L15 11.2 L12 15.4 L9 11.2 Z" fill="currentColor"/>'+
+                 '<path d="M12 8 L15 11.2 L12 15.4 Z" fill="currentColor" opacity=".55"/>';
+  const laurelL= '<path d="M4.4 8 C2.6 10.8 2.6 14.6 4.6 17.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>'+
+                 '<path d="M4.1 10.4 L2.4 9.8 M3.8 12.6 L2 12.4 M4.1 14.8 L2.4 15.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>';
+  const laurelR= '<path d="M19.6 8 C21.4 10.8 21.4 14.6 19.4 17.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>'+
+                 '<path d="M19.9 10.4 L21.6 9.8 M20.2 12.6 L22 12.4 M19.9 14.8 L21.6 15.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>';
+  const wings  = '<path d="M5 7.2 C2.8 6.4 1.6 4.6 1.2 3 C3.6 3.4 5.4 4.4 6.4 5.8" fill="currentColor" opacity=".8"/>'+
+                 '<path d="M19 7.2 C21.2 6.4 22.4 4.6 22.8 3 C20.4 3.4 18.6 4.4 17.6 5.8" fill="currentColor" opacity=".8"/>';
+  const crown  = '<path d="M8.4 3.4 L9.6 1.4 L12 2.8 L14.4 1.4 L15.6 3.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>';
+  const star   = '<path d="M12 9 L13 11.4 L15.6 11.6 L13.7 13.3 L14.3 15.9 L12 14.5 L9.7 15.9 L10.3 13.3 L8.4 11.6 L11 11.4 Z" fill="currentColor"/>';
   let body='';
-  if(i===0) body='<circle cx="8" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".8"/>';
-  else if(i<=3){ for(let n=0;n<i;n++) body+=chev(3+n*4); }
-  else if(i===4){ body=chev(2)+chev(6)+chev(10)+'<rect x="3" y="14" width="10" height="1.8" rx=".9" fill="currentColor"/>'; }
-  else body='<path d="M8 1.5 L9.8 5.6 L14.2 6 L10.9 9 L11.9 13.4 L8 11.1 L4.1 13.4 L5.1 9 L1.8 6 L6.2 5.6 Z" fill="currentColor"/>';
-  return '<svg class="rank-emblem'+(i===5?' emblem-max':'')+'" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">'+body+'</svg>';
+  if(i===0)      body = '<path d="M12 2.6 L19 5.4 V12 C19 16.6 15.9 20 12 21.6 C8.1 20 5 16.6 5 12 V5.4 Z" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".7"/>';
+  else if(i===1) body = shield + gem;
+  else if(i===2) body = shield + gem + laurelL + laurelR;
+  else if(i===3) body = shield + gem + laurelL + laurelR + crown;
+  else if(i===4) body = shield + gem + laurelL + laurelR + crown + wings;
+  else           body = shield.replace('.16','.28') + star + laurelL + laurelR + crown + wings;
+  return '<svg class="rank-emblem'+(i>=4?' emblem-max':'')+'" viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true">'+body+'</svg>';
 };

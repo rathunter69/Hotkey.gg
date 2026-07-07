@@ -388,7 +388,7 @@
       ? d.attempted + '/5 drills toward Summer Analyst'
       : (d.avgPct === null ? '\u2014' : 'top ' + Math.max(1, Math.round(d.avgPct*100)) + '%');
     m.innerHTML = '<div class="pc-card">' +
-      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + (window.rankEmblem?window.rankEmblem(tier.name):'') + '<span>' + tier.name + '</span></div></div>' +
+      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + (window.rankEmblem?window.rankEmblem(tier.name,22):'') + '<span>' + tier.name + '</span></div></div>' +
       '<div class="pc-sub">' + d.attempted + ' / ' + MENU_ORDER.length + ' drills attempted \u00b7 ' + standing + '</div>' +
       (function(){
         const xp = computeXP(d, d.myRuns);
@@ -446,7 +446,8 @@
           '<svg class="um-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</button>' +
         '<div class="user-dropdown" id="userDropdown" role="menu">' +
-          '<a id="umProfile">Profile &amp; stats</a>' +
+          '<a id="umProfile">Player card</a>' +
+          '<a href="stats.html">Your numbers</a>' +
           saveItem +
           '<a id="umSettings">Account settings</a>' +
           '<a id="umSignout">Sign out</a>' +

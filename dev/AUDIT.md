@@ -455,3 +455,15 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - REVOLVER DRILL (26): LBO cash sweep — draw =MAX(0,min−cash), paydown
   =MIN(balance, excess). The DCF/LBO drill line continues; next up per Wolf:
   debt schedule roll-forward, WACC build, working capital, exit bridge.
+
+---
+# ROUND 16 — cache-busting, LoL crests, menu fix
+- STATS-ICON BUG ROOT CAUSE: GitHub Pages cached stale nav.js on other pages — the
+  link existed in code but users got the old file. Fix: ?v=16 on every shared-asset
+  reference (all 7 pages). CONVENTION: bump the version on any shared-file change.
+  This same cache also explains the earlier "can't see the rank pill" report.
+- RANK EMBLEMS v2 (LoL-grade): layered crests in currentColor (no gradient-id
+  collisions): Candidate hollow shield → +gem (Summer) → +laurels (Incoming) →
+  +crown (First-Year) → +wings (Top-Bucket) → crowned star crest with pulse
+  (Second-Year). rankEmblem(name, size); card renders 22px. Sync themes.js + index inline.
+- User menu: 'Profile & stats' → 'Player card' + direct 'Your numbers' → stats.html.
