@@ -1,0 +1,51 @@
+  comps:{
+    name:'Comps', label:'Run the comps', par:62, parKeys:54,
+    prompt:'A real comps page in miniature: average the peer multiples, apply the mean to the target\u2019s EBITDA for implied EV, walk down to implied equity and per-share value, and land the premium to the current price. Five formulas \u2014 the whole valuation chain.',
+    req:'<em>B7</em> mean <em>=AVERAGE(B2:B5)</em> \u00b7 <em>B8</em> EV <em>=B7*B9</em> \u00b7 <em>B10</em> equity <em>=B8-B11</em> \u00b7 <em>B12</em> per share <em>=B10/B13</em> \u00b7 <em>B14</em> premium <em>=B12/B15-1</em>',
+    guide:[
+      'mean multiple at B7 \u00b7 <kbd>=AVERAGE(B2:B5)</kbd> <kbd>\u21b5</kbd>',
+      'implied EV at B8 \u00b7 <kbd>=B7*B9</kbd> \u2014 mean \u00d7 target EBITDA',
+      'implied equity at B10 \u00b7 <kbd>=B8-B11</kbd> \u2014 back out net debt',
+      'per share at B12 \u00b7 <kbd>=B10/B13</kbd> \u00b7 premium at B14 \u00b7 <kbd>=B12/B15-1</kbd>',
+    ],
+    targets:['B7','B8','B10','B12','B14'],
+    demo(){ return [
+      {sel:'B7', keys:[...T('=AVERAGE(B2:B5)'), Kb.enter]},
+      {sel:'B8', keys:[...T('=B7*B9'), Kb.enter]},
+      {sel:'B10', keys:[...T('=B8-B11'), Kb.enter]},
+      {sel:'B12', keys:[...T('=B10/B13'), Kb.enter]},
+      {sel:'B14', keys:[...T('=B12/B15-1'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'EV/EBITDA comps',txt:true,bold:true};
+      const peers=['Peer A','Peer B','Peer C','Peer D']; const mults=[];
+      peers.forEach((p,i)=>{ const m=rnd(70,130)/10; mults.push(m);
+        cells['A'+(2+i)]={...blankCell(),value:p,txt:true};
+        cells['B'+(2+i)]={...blankCell(),value:m,fontColor:'blue',decimals:1}; });
+      cells['A7']={...blankCell(),value:'Mean multiple',txt:true,bold:true};   cells['B7']={...blankCell(),decimals:1,bold:true};
+      cells['A8']={...blankCell(),value:'Implied EV',txt:true};                cells['B8']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A9']={...blankCell(),value:'Target EBITDA',txt:true};             cells['B9']={...blankCell(),value:rnd(20,60)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['A10']={...blankCell(),value:'Implied equity',txt:true};           cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A11']={...blankCell(),value:'Net debt',txt:true};                 cells['B11']={...blankCell(),value:rnd(5,25)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['A12']={...blankCell(),value:'Per share',txt:true};                cells['B12']={...blankCell(),fmtStyle:'currency',decimals:2};
+      cells['A13']={...blankCell(),value:'Shares out',txt:true};               cells['B13']={...blankCell(),value:rnd(8,40),fontColor:'blue',decimals:0};
+      cells['A14']={...blankCell(),value:'Premium to mkt',txt:true,bold:true}; cells['B14']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
+      cells['A15']={...blankCell(),value:'Current price',txt:true};            cells['B15']={...blankCell(),value:rnd(10,80),fontColor:'blue',fmtStyle:'currency',decimals:2};
+      const mean=mults.reduce((a,b)=>a+b,0)/4;
+      this._mean=mean; this._ev=mean*cells['B9'].value; this._eq=this._ev-cells['B11'].value;
+      this._ps=this._eq/cells['B13'].value; this._prem=this._ps/cells['B15'].value-1;
+      return {ROWS:15, cells, active:{r:7,c:2}, sel:null, colW:{1:132,2:96}};
+    },
+    checks(S){
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.05,Math.abs(exp)*1e-3); };
+      return [
+        {label:'mean of the four peer multiples \u2014 live AVERAGE', ok: near('B7',this._mean) && String((S.cells['B7']||{}).formula||'').toUpperCase().includes('AVERAGE')},
+        {label:'implied EV = mean \u00d7 target EBITDA', ok: near('B8',this._ev)},
+        {label:'implied equity = EV \u2212 net debt', ok: near('B10',this._eq)},
+        {label:'implied per-share value', ok: near('B12',this._ps)},
+        {label:'premium to the current price', ok: near('B14',this._prem)},
+      ];
+    }
+  },

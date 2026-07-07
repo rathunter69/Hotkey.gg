@@ -910,3 +910,28 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   retry loop + window.navRefreshAuth() kick (index calls it right after sb exists);
   __navAuthKick refreshes session + profile handle then re-renders.
 - v33.
+
+---
+# ROUND 34 — CURRICULUM DEPTH: Full Builds tier, deepened Models, dup excised
+- DEPTH AUDIT FINDING: check-count ≈ enforced work. Models drills had only 2 graded
+  cells despite 60-75s pars — 6-7s clears were legitimate. Depth = coverage.
+- FULL BUILDS (new group + campaign v8, the WSP-style flagships, all graders
+  headless-verified incl. wrong-answer rejection):
+  · isbuild (par 115): 3-yr income statement — anchored COGS %, GP, EBIT, anchored
+    tax NI; 4 formulas × fills = 12 graded cells, per-year value+ref checks.
+  · cfslink (120): net-change SUM + the CASH CORKSCREW — beginning cash must
+    REFERENCE prior ending (link is ref-checked, hardcodes rejected).
+  · debtsched (140, the crown): revolver corkscrew — anchored amort, capped sweep
+    (MIN/MAX), ending balance, interest on AVERAGE balance, and THE LINK across
+    3 years. Fake links rejected by the grader.
+- DEEPENED: dcf 70→100 (adds Gordon TV, PV of TV, Enterprise Value — 4 checks);
+  comps 32→62 (full chain: mean multiple → implied EV → equity → per-share →
+  premium, 5 checks). wacc/lbo/schedule queued for the same treatment next round.
+- STALE DUPLICATE revolver (pre-r30 draw version, sitting AFTER cagr) excised by
+  span surgery. INCIDENT LOG: a naive index()-based excision earlier in the session
+  deleted cagr as collateral (the dup sat on both sides of it) and a comps rewrite
+  matched a non-drill 'comps:{' object — both caught by asserts before any push.
+  RULE: drill-block surgery uses ^-anchored span maps with a label:' content
+  signature, asserts the key list before/after, and writes ATOMICALLY at the end.
+- 40 drills. Campaign = 8 versions (v8 · Full Builds, gold family color, sheets
+  medal glyph in hkBadge c8 — themes.js + index inline, sync). PARS regenerated.

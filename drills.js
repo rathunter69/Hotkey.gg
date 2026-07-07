@@ -29,6 +29,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Data',        keys: ['sort'] },
     { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'percent', 'cagr', 'sumif'] },
     { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps'] },
+    { name: 'Full Builds', keys: ['isbuild', 'cfslink', 'debtsched'] },
     { name: 'Lookups',     keys: ['lookup', 'lookup2'] },
   ],
 
@@ -92,6 +93,9 @@ window.HOTKEY_DRILLS = {
     comps:      { name:'Comps',    label:'Line up the comps',   tab:'Comps',       desc:'EV/EBITDA multiples, then the average' },
 
     // Lookups
+    isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'COGS, GP, EBIT, NI — four formulas, twelve cells' },
+    cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'Net change, then the cash corkscrew ties out' },
+    debtsched:  { name:'Debt Sched.',label:'Run the debt schedule',      tab:'Debt',     desc:'Amort, sweep, average-balance interest — the corkscrew' },
     lookup:     { name:'Lookup',   label:'Look it up',          tab:'Lookup',      desc:'Pull a value out of a table with INDEX/MATCH' },
     lookup2:    { name:'2-way',    label:'Two-way lookup',      tab:'2-way',       desc:'INDEX with two MATCHes — row and column at once' },
   },
@@ -145,12 +149,13 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c5', name:'v5 \u00b7 Formulas II',  badge:'\ud83e\uddee', keys:['bridge','audit','balance','revolver','cagr','sumif'] },
     { id:'c6', name:'v6 \u00b7 Models',       badge:'\ud83c\udfe6', keys:['wacc','dcf','lbo','schedule','comps'] },
     { id:'c7', name:'v7 \u00b7 Lookups',      badge:'\ud83d\udd0e', keys:['lookup','lookup2'] },
+    { id:'c8', name:'v8 \u00b7 Full Builds',  badge:'\ud83c\udfd7', keys:['isbuild','cfslink','debtsched'] },
   ],
   finisher: { badge:'\u2b50', name:'Model complete' },
 };
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":65,"percent":30,"lookup":50,"ribbon":30,"pastes":38,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":32,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":58,"dcf":70,"lbo":75,"revolver":50,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":65,"percent":30,"lookup":50,"ribbon":30,"pastes":38,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":62,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":58,"dcf":100,"lbo":75,"revolver":52,"isbuild":115,"debtsched":140,"cfslink":120,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
@@ -185,7 +190,7 @@ window.HOTKEY_ACHIEVEMENTS = [
    (left borders, label tints, badge strokes) — never full fills. ---- */
 window.HOTKEY_GROUP_COLORS = {
   'Foundations':'#8ab4ff', 'Formatting':'#d9a441', 'Values':'#2ea36f',
-  'Data':'#b9c2cf', 'Formulas':'#e0879e', 'Models':'#c9a2e8', 'Lookups':'#7fd4c1', 'More':'#8b8e94'
+  'Data':'#b9c2cf', 'Formulas':'#e0879e', 'Models':'#c9a2e8', 'Full Builds':'#e3b341', 'Lookups':'#7fd4c1', 'More':'#8b8e94'
 };
 
 /* ---- PLUGIN KEY LAYERS: curated Macabacus + FactSet defaults for IB workflows.
