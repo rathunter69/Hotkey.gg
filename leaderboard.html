@@ -247,7 +247,19 @@ async function load(){
   } else {
     html += `<div class="standing cta">Every drill is an open race. <a href="index.html">Post a time</a> with a real account and your name goes on the board — anonymous runs don't count.</div>`;
   }
-  // Sessions first (the competitive boards), then per-drill bests
+  // Today's challenge — same drill, same seed, everyone, all day (UTC). Key must match the trainer's.
+  const dailyDate = new Date().toISOString().slice(0,10);
+  const dailyKey = 'daily-' + dailyDate;
+  let dSeed=0; for(const ch of dailyDate) dSeed=(dSeed*31+ch.charCodeAt(0))>>>0;
+  const dailyDrillKey = (window.HOTKEY_DRILLS ? window.HOTKEY_DRILLS.menuOrder : [])[dSeed % (window.HOTKEY_DRILLS ? window.HOTKEY_DRILLS.menuOrder.length : 1)];
+  const dailyLabel = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.labelOf[dailyDrillKey]) || 'Daily';
+  {
+    const seen={}, best=[];
+    runs.filter(x=>x.challenge===dailyKey).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });
+    html += '<h3 class="section-title">Today\u2019s challenge</h3>';
+    html += boardHtml({label:'\u26a1 '+dailyLabel, lvl:dailyDate}, best, names, meId);
+  }
+  // Sessions (the competitive boards), then per-drill bests
   html += '<h3 class="section-title">Marathon</h3>';
   MARATHON_DURS.forEach(d=>{
     html += sessionBoardHtml(d.label, 'Session', bestPerUser(sessions,'marathon',d.sec), names, meId, marathonScore);

@@ -302,6 +302,11 @@
   .rm-key:hover kbd{color:var(--accent)}
 
   /* first-run guided intro */
+  /* ---- checklist progress + step states ---- */
+  .cl-bar{height:4px; background:var(--surface2); border-radius:99px; margin:6px 0 10px; overflow:hidden}
+  .cl-bar-fill{height:100%; background:var(--accent); border-radius:99px; transition:width .35s cubic-bezier(.2,.7,.2,1); box-shadow:0 0 8px var(--accent-glow)}
+  .cl-item.ok .cl-label{color:var(--muted); text-decoration:line-through; text-decoration-color:var(--faint)}
+  .cl-item.next{border-left:2px solid var(--accent); padding-left:8px; margin-left:-10px; background:linear-gradient(90deg,var(--accent-glow),transparent 70%); border-radius:0 6px 6px 0}
   /* ---- welcome-back strip (returning users, once per session) ---- */
   .wb{display:none; align-items:center; gap:9px; flex-wrap:wrap; margin:0 0 14px;
     padding:10px 15px; background:var(--surface); border:1px solid var(--accent-dim);
@@ -863,6 +868,8 @@
       <button class="mb-tool" id="guideToggle"><kbd>g</kbd> guided: off</button>
       <button class="mb-tool" id="soundToggle" title="success sound on rapid-fire solves">🔊 sound</button>
       <button class="mb-tool" id="profileToggle" title="keyboard profile — native Excel, Macabacus, or FactSet chords also accepted">⌨ native</button>
+      <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
+      <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
     </div>
   </div>
 
@@ -978,7 +985,16 @@ const ROWS_MAX = 12, COLS = 8;            // A..H
 const COLW_DEFAULT = 78;                   // px; autofit widens beyond this
 const CHARPX = 8.6;                        // approx mono char width at 14px
 
-const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+let _rand = Math.random;   // rebindable so the daily challenge can build a SEEDED instance
+const rnd = (a,b)=>Math.floor(_rand()*(b-a+1))+a;
+function mulberry32(a){ return function(){ a|=0; a=(a+0x6D2B79F5)|0;
+  let t=Math.imul(a^(a>>>15),1|a); t=(t+Math.imul(t^(t>>>7),61|t))^t;
+  return ((t^(t>>>14))>>>0)/4294967296; }; }
+// ---- daily challenge: same drill, same seed, for everyone, everywhere, all day (UTC) ----
+function dailyDateStr(){ return new Date().toISOString().slice(0,10); }
+function dailyKey(){ return 'daily-'+dailyDateStr(); }
+function dailySeed(){ const s=dailyDateStr(); let x=0; for(const ch of s) x=(x*31+ch.charCodeAt(0))>>>0; return x; }
+let dailyMode=false;
 const colLetter = c => String.fromCharCode(64+c);
 
 function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:false,
@@ -1887,6 +1903,92 @@ const CHALLENGES = {
       ];
     }
   },
+  sumif:{
+    name:'SUMIF', label:'Roll up the segments', par:52, parKeys:44,
+    prompt:'Roll the ledger up by segment. Seven line items, three segments — build one SUMIF with anchored ranges at E2, then fill it down for the other two. $-lock the ranges so the fill doesn\'t walk them.',
+    req:'<em>at E2</em> type <em>=SUMIF($A$2:$A$8,D2,$B$2:$B$8)</em> · <em>↵</em> · back up, select E2:E4, <em>ctrl+d</em>',
+    guide:[
+      'at E2 type <kbd>=SUMIF($A$2:$A$8,D2,$B$2:$B$8)</kbd> <kbd>↵</kbd> — criteria range, this row\'s segment, sum range',
+      'the $ anchors matter: only D2 should walk when you fill down',
+      'back up (<kbd>↑</kbd>), <kbd>shift</kbd>+<kbd>↓</kbd>&times;2, then <kbd>ctrl</kbd>+<kbd>d</kbd>',
+    ],
+    targets:['E2','E2:E4'],
+    demo(){ return [
+      {sel:'E2', keys:[...T('=SUMIF($A$2:$A$8,D2,$B$2:$B$8)'), Kb.enter]},
+      {sel:'E2:E4', keys:[Kb.fillD]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'Amount',txt:true,bold:true};
+      cells['D1']={...blankCell(),value:'Rollup',txt:true,bold:true};
+      cells['E1']={...blankCell(),value:'Total',txt:true,bold:true};
+      const cats=['NA','EMEA','APAC'];
+      const sums={NA:0,EMEA:0,APAC:0};
+      for(let i=0;i<7;i++){
+        const cat = i<3 ? cats[i] : cats[rnd(0,2)];      // each segment appears at least once
+        const v = rnd(10,240)*10;
+        sums[cat]+=v;
+        cells['A'+(i+2)]={...blankCell(),value:cat,txt:true};
+        cells['B'+(i+2)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      }
+      cats.forEach((c,i)=>{ cells['D'+(i+2)]={...blankCell(),value:c,txt:true};
+        cells['E'+(i+2)]={...blankCell(),fmtStyle:'comma',decimals:0}; });
+      this._sums=sums; this._cats=cats;
+      return {ROWS:9, cells, active:{r:2,c:5}, sel:null, colW:{1:86,2:84,4:80,5:88}};
+    },
+    checks(S){
+      const ok=i=>{ const c=S.cells['E'+(i+2)]; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        return f.includes('SUMIF')&&f.includes('D'+(i+2))&&Math.abs(c.value-this._sums[this._cats[i]])<1e-6; };
+      let anchored=true; const c0=S.cells['E3'];   // filled rows prove the anchors held
+      return [
+        {label:'SUMIF per segment, criteria pointing at column D (all 3)', ok: ok(0)&&ok(1)&&ok(2)},
+      ];
+    }
+  },
+  lookup2:{
+    name:'2-way', label:'Two-way lookup', par:60, parKeys:52,
+    prompt:'The query names a company AND a metric — and the metric columns shuffle every round. One formula, two MATCHes: INDEX the whole data block, MATCH the company down the rows, MATCH the metric across the headers.',
+    req:'<em>at G4</em> type <em>=INDEX(B2:D6,MATCH(G2,A2:A6,0),MATCH(G3,B1:D1,0))</em> · <em>↵</em> — row match, then column match',
+    guide:[
+      'in G4 type <kbd>=INDEX(B2:D6,</kbd> the whole data block',
+      'row: <kbd>MATCH(G2,A2:A6,0),</kbd> finds the company · column: <kbd>MATCH(G3,B1:D1,0))</kbd> finds the metric',
+      'commit <kbd>↵</kbd> — if the number is wrong, one of your MATCH ranges is off by a row or column',
+    ],
+    targets:['G4','G4'],
+    demo(){ return [
+      {sel:'G4', keys:[...T('=INDEX(B2:D6,MATCH(G2,A2:A6,0),MATCH(G3,B1:D1,0))'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      const metrics=['Revenue','EBITDA','Net debt'];
+      for(let k=metrics.length-1;k>0;k--){ const j=rnd(0,k); [metrics[k],metrics[j]]=[metrics[j],metrics[k]]; }
+      cells['A1']={...blankCell(),value:'Company',txt:true,bold:true};
+      metrics.forEach((mn,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:mn,txt:true,bold:true});
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox'];
+      const data={};
+      names.forEach((nm,r0)=>{ const r=r0+2; cells['A'+r]={...blankCell(),value:nm,txt:true}; data[nm]={};
+        metrics.forEach((mn,i)=>{ const v=rnd(2,90)*10; data[nm][mn]=v;
+          cells[colLetter(i+2)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }); });
+      const qName=names[rnd(0,4)], qMetric=metrics[rnd(0,2)];
+      cells['F1']={...blankCell(),value:'Query',txt:true,bold:true};
+      cells['F2']={...blankCell(),value:'Company',txt:true}; cells['G2']={...blankCell(),value:qName,txt:true};
+      cells['F3']={...blankCell(),value:'Metric',txt:true};  cells['G3']={...blankCell(),value:qMetric,txt:true};
+      cells['F4']={...blankCell(),value:'Answer',txt:true,bold:true}; cells['G4']={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._expect=data[qName][qMetric];
+      return {ROWS:6, cells, active:{r:4,c:7}, sel:null, colW:{1:104,2:82,3:82,4:86,6:80,7:98}};
+    },
+    checks(S){
+      const g=S.cells['G4']; const f=(g&&g.formula)?g.formula.toUpperCase().replace(/\s/g,''):'';
+      const twoMatches = (f.match(/MATCH\(/g)||[]).length >= 2 && f.includes('INDEX(');
+      const valOk = !!(g&&g.formula) && Math.abs(g.value-this._expect)<1e-6;
+      return [
+        {label:'INDEX with TWO MATCHes — row and column', ok: twoMatches},
+        {label:'answer matches the queried company \u00d7 metric', ok: valOk},
+      ];
+    }
+  },
   navigation:{
     name:'Navigate', label:'Navigation tour', par:30, parKeys:12,
     prompt:'The full obstacle course — twelve chords, in order. Lap the edges with all four Ctrl-arrows, select to the edges with Ctrl+Shift, grab full rows and columns, insert and delete rows, and land back home. This is how analysts move: never one cell at a time.',
@@ -2127,6 +2229,15 @@ function evalFormula(expr){
       if(c1===c2) return toN(cellRaw(colLetter(c1)+(r1+rn-1)));
       if(r1===r2) return toN(cellRaw(colLetter(c1+rn-1)+r1));
       return toN(rangeRefs(args[0].range[0],args[0].range[1]).map(cellRaw)[rn-1]); }
+    if(name==='SUMIF'){
+      if(!args[0].range || !args[2] || !args[2].range) throw new Error('sumif-args');
+      const crit = rawOf(args[1]);
+      const critRefs = rangeRefs(args[0].range[0], args[0].range[1]);
+      const sumRefs  = rangeRefs(args[2].range[0], args[2].range[1]);
+      let s=0; for(let p=0;p<critRefs.length;p++){
+        if(eqLoose(cellRaw(critRefs[p]), crit)) s += cellNum(sumRefs[p]||''); }
+      return s;
+    }
     const xs=flat(args);
     switch(name){
       case 'SUM': return xs.reduce((a,b)=>a+b,0);
@@ -2151,6 +2262,8 @@ function evalFormula(expr){
   function argList(){ const a=[]; skip(); if(s[i]===')') return a; a.push(arg()); skip(); while(s[i]===','){ i++; a.push(arg()); skip(); } return a; }
   function arg(){ skip(); const rng=/^(\$?[A-Za-z]+\$?\d+)\s*:\s*(\$?[A-Za-z]+\$?\d+)/.exec(s.slice(i));
     if(rng){ i+=rng[0].length; return {range:[rng[1].toUpperCase(),rng[2].toUpperCase()]}; }
+    const str=/^"([^"]*)"/.exec(s.slice(i));   // quoted text criteria, e.g. SUMIF(A:A,"NA",B:B)
+    if(str){ i+=str[0].length; return {val:str[1]}; }
     const st=i; const v=expr_(); const cons=s.slice(st,i).trim();
     if(/^\$?[A-Za-z]+\$?\d+$/.test(cons)) return {val:v, ref:cons.replace(/\$/g,'').toUpperCase()};
     return {val:v}; }
@@ -2523,8 +2636,10 @@ function checkWin(){
   if(marathon && marathon.active){ sessionSolved(t); return; }
   const C=CHALLENGES[cur];
   let pb=false;
-  if(!mouseUsed && !guidedUsed){ const prev=PB[cur];
-    if(prev===undefined||t<prev){ PB[cur]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
+  const sk=scoreKey();
+  if(!mouseUsed && !guidedUsed){ const prev=PB[sk];
+    if(prev===undefined||t<prev){ PB[sk]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
+  updateStreak();
   showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
   if(sb && me_user && !isAnonUser() && !mouseUsed && !guidedUsed){
     recordRun(t).then(async ok=>{
@@ -2767,8 +2882,11 @@ function updateChecklist(){
   const n=items.filter(i=>i.ok).length;
   let nextDone=false;
   let html=`<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
+  html+=`<div class="cl-bar"><div class="cl-bar-fill" style="width:${items.length?Math.round(100*n/items.length):0}%"></div></div>`;
   items.forEach((i,idx)=>{
-    const isNext = guided && !i.ok && !nextDone; if(isNext) nextDone=true;
+    // The next incomplete task is ALWAYS highlighted (not just in guided mode) —
+    // the player should never wonder what to do next. Guided adds the key hints on top.
+    const isNext = !i.ok && !nextDone; if(isNext) nextDone=true;
     const keys = (guided && C.guide && C.guide[idx]) ? `<div class="cl-keys">${C.guide[idx]}</div>` : '';
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
@@ -3100,8 +3218,8 @@ document.addEventListener('keydown',e=>{
   // CELL EDITING — captures all typing until commit/cancel
   if(editing){
     e.preventDefault();
-    if(k==='Enter'){ commitEdit(1,0); return; }
-    if(k==='Tab'){ commitEdit(0,1); return; }
+    if(k==='Enter'){ commitEdit(e.shiftKey?-1:1,0); return; }   // Shift+Enter commits and moves UP (Excel parity)
+    if(k==='Tab'){ commitEdit(0,e.shiftKey?-1:1); return; }      // Shift+Tab commits and moves LEFT
     if(k==='Escape'){ cancelEdit(); return; }
     if(k==='Delete'){
       // Delete in edit mode = cancel the in-progress edit AND clear the underlying cell's contents.
@@ -3229,6 +3347,13 @@ document.addEventListener('keydown',e=>{
 
   const dirs={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
   if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey); return; }
+  // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
+  if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey){
+    e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+↵':'↵');
+    move(e.shiftKey?-1:1, 0, false, false); return; }
+  if(k==='Tab' && !e.ctrlKey && !e.altKey && !e.metaKey){
+    e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+Tab':'Tab');
+    move(0, e.shiftKey?-1:1, false, false); return; }
 
   // Home / End — navigation primitives. Ctrl+Home → A1, Ctrl+End → last cell of used range, Home → col A.
   // Shift modifier extends the selection (Excel parity). Plain "End" is no-op (Excel's End mode is too obscure).
@@ -3298,6 +3423,7 @@ function updateSoundBtn(){ const b=$('soundToggle'); if(b){ b.classList.toggle('
 function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soundOn) playSuccessBlip(); /* preview */ }
 $('soundToggle').addEventListener('click',toggleSound);
 $('profileToggle').addEventListener('click',cycleProfile);
+$('dailyBtn').addEventListener('click',startDaily);
 $('startBtn').addEventListener('click', tryEnter);
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
@@ -4541,10 +4667,33 @@ $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo();
 /* ============================================================
    LOAD / RESET
    ============================================================ */
-function loadChallenge(key){
+/* ---- daily streak: any completed drill keeps the fire alive (local, per device) ---- */
+let streak={d:'',n:0};
+async function loadStreak(){ try{ const v=await KV.get('hotkey_streak'); if(v){ streak=JSON.parse(v); } }catch(e){}
+  // streak dies quietly if a day was missed — shown as 0 until the next solve
+  const today=dailyDateStr(), yd=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  if(streak.d!==today && streak.d!==yd) streak.n=0;
+  renderStreak(); }
+function updateStreak(){ const today=dailyDateStr(); if(streak.d===today){ renderStreak(); return; }
+  const yd=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  streak.n = (streak.d===yd) ? streak.n+1 : 1; streak.d=today;
+  KV.set('hotkey_streak', JSON.stringify(streak)); renderStreak(); }
+function renderStreak(){ const el=$('streakBadge'); if(!el) return;
+  el.style.display = streak.n>0 ? 'inline-flex' : 'none';
+  el.innerHTML='\ud83d\udd25 '+streak.n; el.title=streak.n+'-day streak — solve a drill every day to keep it alive'; }
+
+function scoreKey(){ return dailyMode ? dailyKey() : cur; }
+function drillOfDay(){ return MENU_ORDER[dailySeed() % MENU_ORDER.length]; }
+function startDaily(){ loadChallenge(drillOfDay(), {daily:true}); updateDailyBtn(); }
+function updateDailyBtn(){ const b=$('dailyBtn'); if(b) b.classList.toggle('on', dailyMode); }
+function loadChallenge(key, opts){
+  dailyMode = !!(opts && opts.daily);
+  updateDailyBtn();
   cur=key; const C=CHALLENGES[key];
-  try{ KV.set('hotkey_last_drill', key); }catch(e){}   // resume point for the next visit
+  if(dailyMode){ _rand = mulberry32(dailySeed()); }                 // deterministic build for the day
+  try{ if(!dailyMode) KV.set('hotkey_last_drill', key); }catch(e){}  // resume point (daily doesn't override it)
   const built=C.build();
+  _rand = Math.random;                                              // seeded only for the daily build
   S={ROWS:Math.max(built.ROWS, ROWS_MAX), cells:built.cells, active:built.active, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
@@ -4636,6 +4785,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   updateSoundBtn();
   await loadProfile();
   updateProfileBtn();
+  await loadStreak();
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
   if(onboarded){ enterRequested = true; landingOpen = false; }
@@ -4665,6 +4815,7 @@ function showWelcomeBack(key){
     '<span class="wb-sep">·</span> resuming <b>'+escHtml(label)+'</b>'+
     (best ? '<span class="wb-sep">·</span> PB <b>'+best+'</b>' : '')+
     (pbCount ? '<span class="wb-sep">·</span> '+pbCount+' drill'+(pbCount===1?'':'s')+' on the board' : '')+
+    (streak.n>1 ? '<span class="wb-sep">·</span> \ud83d\udd25 '+streak.n+'-day streak' : '')+
     '<span class="wb-keys"><kbd>\\</kbd> drill picker &nbsp;<kbd>1</kbd>–<kbd>9</kbd> jump &nbsp;any key to go</span>';
   el.classList.add('show');
   const hide = ()=>{ el.classList.remove('show'); };
@@ -5122,7 +5273,7 @@ async function recordRun(t){
   if(!sb || !me_user || isAnonUser() || mouseUsed || guidedUsed) return false;
   try{
     const { error } = await sb.from('runs').insert({
-      user_id: me_user.id, challenge: cur,
+      user_id: me_user.id, challenge: scoreKey(),
       time_ms: Math.round(t*1000), keystrokes: keyLog.length,
       optimal: CHALLENGES[cur].parKeys, mouse_used: false, trace: keyLog
     });

@@ -213,3 +213,52 @@ added; reference.html gains a "Plugin profiles" category. AutoColor legitimately
 speedruns the blue drill in macabacus profile — authentic, allowed.
 Not implemented (unverified defaults, deliberately): Macabacus Fast Fill Down,
 Blue-Black Toggle (Ctrl+; conflicts with native today-stamp), FactSet AutoColor.
+
+---
+# ROUND 6 (2026-07-06) — engine parity, checklist UX, daily, streaks, advanced drills
+
+## Engine validation (the coloring/highlighting/enter complaints)
+- **FIXED — Shift+Enter/Shift+Tab missing in edit mode**: commit now moves up/left.
+- **FIXED — Enter/Tab didn't move the cursor outside edit mode** (Excel parity: Enter
+  down, Shift+Enter up, Tab right, Shift+Tab left). This was likely THE "hitting
+  enter" bug: Enter simply did nothing on a plain cell.
+- Fontcolor dialog (Alt H F C → arrows → ↵) and fill path reviewed statically: sound.
+  Selection-highlight rendering unchanged. Remaining coloring/highlight complaints
+  need browser repro — report specifics and they get fixed same-day.
+- **FIXED — evaluator rejected quoted text** ("NA") — string literals now parse;
+  =SUMIF(A:A,"NA",B:B) works in both literal and cell-ref criterion forms (unit-tested
+  + regressions on ^ and INDEX/MATCH).
+
+## Ribbon / next-steps UX
+- Checklist now ALWAYS highlights the next incomplete task (accent left-bar + glow) —
+  previously only in guided mode, which is why task flow felt unclear. Completed
+  tasks strike through; a progress bar fills per task. Guided mode still adds key
+  hints on top. Ribbon idle-hint + Alt-path breadcrumb reviewed: sound as designed.
+
+## Shortcut-standards check (WSP/BIWS/desk canon)
+Catalog covers the canon: Ctrl+arrows/Shift selects, Alt E S V, Alt H O I, Alt+=,
+Ctrl+D/R, F4 anchors + pointing, Alt H B borders, Alt H F C blue, Alt H K/9/0,
+Ctrl+Shift+%/$/!, Alt A S D, Alt H F I S, Alt H A C/L/R, INDEX/MATCH — plus plugin
+profiles. No gaps vs standard IB prep courses at this drill count.
+
+## Shipped features
+- **Daily Challenge**: seeded per UTC date (drill-of-day from menuOrder hash; build
+  runs on mulberry32(dateSeed) so every player gets the identical layout). ⚡ daily
+  HUD button; runs post as challenge='daily-YYYY-MM-DD' (no schema change needed);
+  PB tracked per daily key; leaderboard shows "Today's challenge" board on top.
+- **Streaks**: 🔥 n-day badge in HUD (any completed drill keeps it alive; local per
+  device via KV), shown in welcome-back strip from 2 days up.
+- **Advanced drills** (23 total): sumif (anchored SUMIF rollup, par 52) and lookup2
+  (two-way INDEX/MATCH with shuffled metric columns, par 60). SUMIF added to the
+  evaluator with criteria-range/sum-range pairing.
+
+## Approved queue (next passes, in order)
+5 stats page → 6 placement test → 7 share cards → 8 team codes (design: profiles
+gains team_code text column; setting in account menu "join a team" with private
+code; leaderboard gains team filter — prompt at signup optional later).
+
+## #10 Weekly Gauntlet — shell (not built)
+Fixed 5-drill sequence per ISO week (seeded like daily), ONE attempt per account,
+combined time posted to a weekly board; sessions table reused with
+mode='gauntlet', duration_sec=week number. Attempt-once enforced client-side first
+(KV) then via unique index (user_id, mode, duration_sec) when it matters.

@@ -75,6 +75,14 @@ Stripe/Pro, keyboard-profile toggle, and banking-ladder tiers were never saved f
 past chat sessions; they're roadmap rebuilds if still wanted. Theme note: new
 visitors default to Daylight via themes.js fallback (THEMES.default itself is dark).
 
+## Shipped 2026-07-06 (round 6)
+Engine parity: Shift+Enter/Tab + non-edit Enter/Tab movement; string literals in
+evaluator; SUMIF fn. Checklist: always-on next-task highlight + progress bar.
+Daily Challenge (seeded UTC, challenge='daily-YYYY-MM-DD', leaderboard board).
+Streaks (KV hotkey_streak, HUD 🔥). Drills: 23 (added sumif, lookup2).
+Approved queue: stats page → placement test → share cards → team codes.
+Weekly gauntlet shelled in dev/AUDIT.md.
+
 ## Curriculum v2 (current focus)
 - CURRICULUM.md: 28 new drills across 5 tracks, tiered T1/T2/T3 (batch plan inside).
   Dedupe vs live catalog done in AUDIT.md §5 — 8 generator names collide with live
