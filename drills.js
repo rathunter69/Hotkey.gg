@@ -23,7 +23,7 @@ window.HOTKEY_DRILLS = {
   // Group order here is the order in the drill picker.
   // ---------------------------------------------------------------
   groups: [
-    { name: 'Foundations', keys: ['navigation', 'copyover'] },
+    { name: 'Foundations', keys: ['navigation', 'ribbon', 'editfix', 'undo', 'pastes', 'saves', 'copyover'] },
     { name: 'Formatting',  keys: ['polish', 'combo', 'format', 'center', 'blue', 'gauntlet'] },
     { name: 'Values',      keys: ['drill', 'series'] },
     { name: 'Data',        keys: ['sort'] },
@@ -44,6 +44,11 @@ window.HOTKEY_DRILLS = {
   meta: {
     // Foundations
     navigation: { name:'Navigate', label:'Navigation tour',     tab:'Nav',         desc:'The full obstacle course — 12 chords: edges, selections, rows, columns' },
+    ribbon:     { name:'Ribbon',   label:'Learn the ribbon',        tab:'Ribbon',   desc:'Alt is a menu — walk H 1, H K, H A C' },
+    editfix:    { name:'Edit',     label:'Fix the typo in place',   tab:'Edit',     desc:'F2 in, arrow to the mistake, fix, commit' },
+    undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete, Ctrl+Z it back, bold it instead' },
+    pastes:     { name:'Paste Sp.',label:'Alt E S everything',      tab:'Paste Sp.',desc:'One copy, two pastes — values then formats' },
+    saves:      { name:'Save',     label:'Save like you mean it',   tab:'Save',     desc:'Work, Ctrl+S. More work, Ctrl+S again' },
     copyover:   { name:'Copyover', label:'Copy it over',        tab:'Basics',      desc:'Select, copy, and paste a block — all keyboard' },
 
     // Formatting
@@ -129,7 +134,7 @@ window.HOTKEY_DRILLS = {
 window.HOTKEY_CAMPAIGN = {
   GATE: 1.5,
   chapters: [
-    { id:'c1', name:'Ch. 1 \u00b7 Foundations',  badge:'\ud83c\udf93', keys:['navigation','copyover'] },
+    { id:'c1', name:'Ch. 1 \u00b7 Foundations',  badge:'\ud83c\udf93', keys:['navigation','ribbon','editfix','undo','pastes','saves','copyover'] },
     { id:'c2', name:'Ch. 2 \u00b7 Formatting',   badge:'\ud83c\udfa8', keys:['polish','combo','format','center','blue','gauntlet'] },
     { id:'c3', name:'Ch. 3 \u00b7 Values & Data',badge:'\ud83d\udccb', keys:['drill','series','sort'] },
     { id:'c4', name:'Ch. 4 \u00b7 Formulas I',   badge:'\u2797',        keys:['margin','growth','foot','percent'] },
@@ -141,7 +146,7 @@ window.HOTKEY_CAMPAIGN = {
 };
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":65,"percent":30,"lookup":50,"copyover":18,"polish":24,"foot":55,"comps":32,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":58,"dcf":70,"lbo":75,"revolver":50,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":65,"percent":30,"lookup":50,"ribbon":30,"pastes":38,"saves":26,"editfix":22,"undo":28,"copyover":18,"polish":24,"foot":55,"comps":32,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":58,"dcf":70,"lbo":75,"revolver":50,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

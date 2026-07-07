@@ -363,9 +363,8 @@
   .ghost.ahead{color:var(--accent); background:var(--accent-glow)}
   .ghost.behind{color:var(--bad); background:rgba(200,83,63,.14)}
   /* ---- rank pill in the HUD: progression, always visible ---- */
-  .rank-emblem{filter:drop-shadow(0 1px 4px rgba(0,0,0,.5)); margin-right:7px; flex:none}
-  @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 9px currentColor)}}
-  .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
+  .rank-emblem{margin-right:7px; flex:none}
+  .emblem-max{/* flat by design — the radiant cap carries its own drama */}
   .rank-pill{display:inline-flex; align-items:center; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:1px;
     text-transform:uppercase; border-radius:999px !important; padding:6px 13px !important;
     border:1px solid; transition:transform .12s, box-shadow .12s}
@@ -867,10 +866,10 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=24"></script>
-<link rel="stylesheet" href="nav.css?v=24">
-<script src="themes.js?v=24"></script>
-<script src="nav.js?v=24" defer></script>
+<script src="drills.js?v=25"></script>
+<link rel="stylesheet" href="nav.css?v=25">
+<script src="themes.js?v=25"></script>
+<script src="nav.js?v=25" defer></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -1455,6 +1454,158 @@ const CHALLENGES = {
       return [
         {label:'pull the figure with INDEX + MATCH', ok: usesIM},
         {label:'answer matches the queried company × metric', ok: valOk},
+      ];
+    }
+  },
+  ribbon:{
+    name:'Ribbon', label:'Learn the ribbon', par:30, parKeys:16,
+    prompt:'Alt is a menu, not a chord: press it, read the letters, walk the path. Three formats, three ribbon walks \u2014 bold the header, comma the number, center the label. Watch the breadcrumb at the bottom as you go.',
+    req:'<em>A1</em> \u00b7 <em>alt h 1</em> bold \u00b7 <em>B2</em> \u00b7 <em>alt h k</em> comma \u00b7 <em>A4</em> \u00b7 <em>alt h a c</em> center',
+    guide:[
+      'on A1 \u00b7 <kbd>alt</kbd> then <kbd>h</kbd> then <kbd>1</kbd> \u2014 Home, Bold. Read the ribbon as it opens',
+      'to B2 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 comma format',
+      'to A4 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> \u2014 Alignment, Center',
+    ],
+    targets:['A1','B2','A4'],
+    demo(){ return [
+      {sel:'A1', keys:[Kb.alt, {key:'h'}, {key:'1'}]},
+      {sel:'B2', keys:[Kb.alt, {key:'h'}, {key:'k'}]},
+      {sel:'A4', keys:[Kb.alt, {key:'h'}, {key:'a'}, {key:'c'}]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Summary',txt:true};
+      cells['A2']={...blankCell(),value:'Total',txt:true};
+      cells['B2']={...blankCell(),value:rnd(1200,98000),fontColor:'blue'};
+      cells['A4']={...blankCell(),value:'Status',txt:true};
+      return {ROWS:5, cells, active:{r:1,c:1}, sel:null, colW:{1:96,2:96}};
+    },
+    checks(S){
+      const c=k=>S.cells[k]||{};
+      return [
+        {label:'A1 bold \u2014 Alt H 1', ok: !!c('A1').bold},
+        {label:'B2 comma format \u2014 Alt H K', ok: c('B2').fmtStyle==='comma'},
+        {label:'A4 centered \u2014 Alt H A C', ok: c('A4').align==='c'},
+      ];
+    }
+  },
+  pastes:{
+    name:'Paste Sp.', label:'Alt E S everything', par:38, parKeys:26,
+    prompt:'One copied cell, two different pastes. Alt E S opens the paste-special dialog the way twenty years of desks have opened it: V for values only, T for formats only. Copy B2 once \u2014 it stays on the clipboard for both.',
+    req:'<em>B2</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>D2</em> \u00b7 <em>alt e s v \u21b5</em> values \u00b7 <em>D4</em> \u00b7 <em>alt e s t \u21b5</em> formats',
+    guide:[
+      'on B2 \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u2014 one copy serves both pastes',
+      'to D2 \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>\u21b5</kbd> \u2014 the number, none of the styling',
+      'to D4 \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> <kbd>\u21b5</kbd> \u2014 the styling, none of the number',
+    ],
+    targets:['B2','D2','D4'],
+    demo(){ return [
+      {sel:'B2', keys:[Kb.copy]},
+      {sel:'D2', keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'v'}, Kb.enter]},
+      {sel:'D4', keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'t'}, Kb.enter]},
+    ]; },
+    build(){
+      const v=rnd(40,900)*10;
+      const cells={};
+      cells['A2']={...blankCell(),value:'Source',txt:true};
+      cells['B2']={...blankCell(),value:v,bold:true,fill:'blue',fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells['C2']={...blankCell(),value:'\u2192 values',txt:true};
+      cells['C4']={...blankCell(),value:'\u2192 formats',txt:true};
+      cells['D4']={...blankCell(),value:rnd(1,9)*7};
+      this._v=v; this._d4=cells['D4'].value;
+      return {ROWS:5, cells, active:{r:2,c:2}, sel:null, colW:{1:80,2:96,3:92,4:96}};
+    },
+    checks(S){
+      const d2=S.cells['D2']||{}, d4=S.cells['D4']||{};
+      return [
+        {label:'D2 has the VALUE only \u2014 no bold, no fill', ok: d2.value===this._v && !d2.bold && d2.fill!=='blue'},
+        {label:'D4 kept its number but wears B2\u2019s FORMATS', ok: d4.value===this._d4 && !!d4.bold && d4.fill==='blue'},
+      ];
+    }
+  },
+  saves:{
+    name:'Save', label:'Save like you mean it', par:26, parKeys:14, usesSave:true,
+    prompt:'The habit that has saved more models than any backup system: Ctrl+S after every block of work. Make the edit, save. Make the next edit, save again. Two saves minimum \u2014 the reflex is the drill.',
+    req:'<em>B2</em> \u00b7 type <em>done \u21b5</em> \u00b7 <em>ctrl+s</em> \u00b7 <em>B3</em> \u00b7 type <em>done \u21b5</em> \u00b7 <em>ctrl+s</em>',
+    guide:[
+      'at B2 type <kbd>done</kbd> <kbd>\u21b5</kbd> \u00b7 then <kbd>ctrl</kbd>+<kbd>s</kbd> \u2014 work, then save',
+      'at B3 type <kbd>done</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>s</kbd> again \u2014 every block of work ends with a save',
+    ],
+    targets:['B2','B3'],
+    demo(){ return [
+      {sel:'B2', keys:[...T('done'), Kb.enter, {key:'s',ctrl:true}]},
+      {sel:'B3', keys:[...T('done'), Kb.enter, {key:'s',ctrl:true}]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Checklist',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Update assumptions',txt:true};
+      cells['A3']={...blankCell(),value:'Refresh outputs',txt:true};
+      return {ROWS:4, cells, active:{r:2,c:2}, sel:null, colW:{1:170,2:80}};
+    },
+    checks(S){
+      const done=k=>{ const c=S.cells[k]; return !!(c&&String(c.value).toLowerCase()==='done'); };
+      return [
+        {label:'both tasks marked done', ok: done('B2')&&done('B3')},
+        {label:'saved at least twice \u2014 Ctrl+S (in this drill, S saves)', ok: (S.saveN||0)>=2},
+      ];
+    }
+  },
+  editfix:{
+    name:'Edit', label:'Fix the typo in place', par:22, parKeys:14,
+    prompt:'Someone typed "Reveune". Do not retype the whole word \u2014 F2 into the cell, arrow the cursor to the mistake, fix the two swapped letters, commit. Edit mode is how you touch a cell without destroying it.',
+    req:'<em>on A2</em> \u00b7 <em>F2</em> \u00b7 <em>\u2190</em> to the typo \u00b7 fix <em>un \u2192 nu</em> \u00b7 <em>\u21b5</em>',
+    guide:[
+      'on A2 \u00b7 <kbd>F2</kbd> \u2014 the cursor lands at the END of the text',
+      '<kbd>\u2190</kbd> until the cursor sits after the swapped letters \u00b7 <kbd>\u232b</kbd><kbd>\u232b</kbd> \u00b7 type <kbd>ne</kbd>? No \u2014 fix it YOUR way; only the final word is graded',
+      'commit with <kbd>\u21b5</kbd> \u2014 the cell should read Revenue',
+    ],
+    targets:['A2'],
+    demo(){ return [
+      {sel:'A2', keys:[{key:'F2'}, {key:'ArrowLeft'}, {key:'Backspace'}, {key:'Backspace'}, ...T('nu'), {key:'ArrowRight'}, Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Line items',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Reveune',txt:true};
+      cells['A3']={...blankCell(),value:'COGS',txt:true};
+      return {ROWS:4, cells, active:{r:2,c:1}, sel:null, colW:{1:120}};
+    },
+    checks(S){
+      const c=S.cells['A2'];
+      return [{label:'A2 reads exactly "Revenue" \u2014 fixed in place', ok: !!(c&&c.value==='Revenue')}];
+    }
+  },
+  undo:{
+    name:'Undo', label:'Undo is a tool, not a panic', par:28, parKeys:12,
+    prompt:'Delete the flagged row\u2019s value, realize it was needed, bring it back with undo, then bold it instead. Ctrl+Z is not an apology \u2014 it is a first-class move you should make without flinching.',
+    req:'<em>B4</em> \u00b7 <em>delete</em> \u00b7 <em>ctrl+z</em> brings it back \u00b7 <em>ctrl+b</em> bold it',
+    guide:[
+      'on B4 \u00b7 <kbd>delete</kbd> \u2014 gone',
+      '<kbd>ctrl</kbd>+<kbd>z</kbd> \u2014 back, exactly as it was',
+      '<kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 what you actually wanted: flag it bold',
+    ],
+    targets:['B4','B4','B4'],
+    demo(){ return [
+      {sel:'B4', keys:[{key:'Delete'}, {key:'z',ctrl:true}, {key:'b',ctrl:true}]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Item',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'Amount',txt:true,bold:true};
+      for(let i=0;i<4;i++){
+        cells['A'+(2+i)]={...blankCell(),value:['Rent','Payroll','Software','Legal'][i],txt:true};
+        cells['B'+(2+i)]={...blankCell(),value:rnd(10,90)*100,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      }
+      this._b4=cells['B4'].value;
+      return {ROWS:5, cells, active:{r:4,c:2}, sel:null, colW:{1:100,2:96}};
+    },
+    checks(S){
+      const c=S.cells['B4']||{};
+      return [
+        {label:'B4 value intact \u2014 the delete was undone', ok: c.value===this._b4},
+        {label:'used undo at least once \u2014 Ctrl+Z', ok: (S.undoN||0)>=1},
+        {label:'B4 bold \u2014 the change you meant to make', ok: !!c.bold},
       ];
     }
   },
@@ -3388,10 +3539,10 @@ function snapshot(){ return {cells:JSON.parse(JSON.stringify(S.cells)), colW:col
 function restore(s){ S.cells=JSON.parse(JSON.stringify(s.cells)); colW=s.colW.slice(); }
 function pushUndo(){ undoStack.push(snapshot()); if(undoStack.length>60) undoStack.shift(); redoStack=[]; }
 function undoAct(){ if(!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop());
-  if(S) S.lastRowOp=null;   // undo/redo never count as row actions
+  if(S){ S.lastRowOp=null; S.undoN=(S.undoN||0)+1; }
   commitAction(); }
 function redoAct(){ if(!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop());
-  if(S) S.lastRowOp=null;
+  if(S){ S.lastRowOp=null; S.redoN=(S.redoN||0)+1; }
   commitAction(); }
 
 function applyRibbon(key){
@@ -3846,7 +3997,11 @@ document.addEventListener('keydown',e=>{
   // UNDO / REDO — authentic Excel hotkeys (ctrl+z / ctrl+y / ctrl+shift+z)
   if(e.ctrlKey||e.metaKey){
     const lk=k.toLowerCase();
-    if(lk==='s' && !e.altKey){ e.preventDefault();   // Ctrl+S — the banker save reflex = instant restart
+    if(lk==='s' && !e.altKey && !e.shiftKey){ e.preventDefault();
+      // Ctrl+S: inside a save-training drill it SAVES (action-latched); everywhere else it restarts.
+      if(CHALLENGES[cur] && CHALLENGES[cur].usesSave && !done){
+        startClock(); logKey('Ctrl+S'); S.saveN=(S.saveN||0)+1; commitAction();
+        showToast('saved ('+S.saveN+')'); return; }
       logKey('Ctrl+S'); restartDrill(); showToast('drill restarted \u2014 Ctrl+S works here'); return; }
     if(lk==='z'&&e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+Y'); redoAct(); return; }
     if(lk==='z'){ e.preventDefault(); startClock(); logKey('Ctrl+Z'); undoAct(); return; }
@@ -3940,6 +4095,18 @@ document.addEventListener('keydown',e=>{
     if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
   }
 },{capture:true});
+
+// UNIVERSAL modal-close delegation: any .modal-x / .pc-x click closes its overlay.
+// Capture phase + delegation = immune to re-renders and missed per-instance wiring
+// (the recurring dead-\u00d7 class ends here).
+document.addEventListener('click', e=>{
+  const x = e.target.closest && e.target.closest('.modal-x, .pc-x');
+  if(!x) return;
+  const ov = x.closest('.onboard-modal, .profile-modal, [id$="Modal"]');
+  if(ov){ e.preventDefault(); e.stopPropagation();
+    ov.classList.remove('show');
+    if(!ov.classList.contains('onboard-modal') && !ov.classList.contains('profile-modal')) ov.remove(); }
+}, true);
 
 // stop Alt keyup from focusing the browser menu bar
 document.addEventListener('keyup',e=>{ if(e.key==='Alt') e.preventDefault(); },{capture:true});

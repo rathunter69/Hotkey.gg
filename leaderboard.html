@@ -112,7 +112,7 @@
   .section-title{margin-top:30px}
   .tabrow{margin-top:16px}
   .chips{margin-top:2px}
-  .rank-emblem{filter:drop-shadow(0 1px 4px rgba(0,0,0,.5)); margin-right:6px; flex:none; vertical-align:-2px}
+  .rank-emblem{margin-right:6px; flex:none; vertical-align:-2px}
   @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 9px currentColor)}}
   .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
   .yc-top .pc-tier{font-size:10px; padding:6px 13px}
@@ -142,11 +142,11 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=24">
-<script src="drills.js?v=24"></script>
+<link rel="stylesheet" href="nav.css?v=25">
+<script src="drills.js?v=25"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=24"></script>
-<script src="nav.js?v=24"></script>
+<script src="themes.js?v=25"></script>
+<script src="nav.js?v=25"></script>
 </head>
 <body>
 
@@ -404,7 +404,7 @@ function rankedInfographic(){
   const T=[{name:'Candidate',cls:'tier-unranked'},...TIERS];
   let rows='';
   T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:12px;padding:7px 4px;font-family:var(--mono);font-size:12.5px">'+
-    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;filter:drop-shadow(0 0 5px currentColor)">'+(window.rankEmblem?window.rankEmblem(t.name,20):'')+'</span>'+
+    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,20):'')+'</span>'+
     '<span>'+t.name+'</span><span style="margin-left:auto;color:var(--faint);font-size:10.5px">'+(t.att?t.att+' drills \u00b7 top '+Math.round(Math.min(1,t.pct)*100)+'%':'start here')+'</span></div>'; });
   m.innerHTML='<div class="panel" style="max-width:460px;width:100%">'+
     '<h4>welcome to ranked</h4>'+

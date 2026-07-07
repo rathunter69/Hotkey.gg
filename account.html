@@ -40,9 +40,8 @@
   .tc-bar{flex:1; min-width:130px; height:7px; background:var(--surface2); border-radius:99px; overflow:hidden}
   .tc-bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
   .tc-sub{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:10px}
-  .rank-emblem{filter:drop-shadow(0 0 6px currentColor)}
-  @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 10px currentColor)}}
-  .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
+  .rank-emblem{}
+  .emblem-max{}
   /* form bits */
   label{display:block; font-family:var(--mono); font-size:11px; color:var(--muted); margin:12px 0 6px; letter-spacing:.6px}
   input{width:100%; font-family:var(--mono); font-size:13.5px; color:var(--text); background:var(--bg);
@@ -60,8 +59,8 @@
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
 </style>
-<link rel="stylesheet" href="nav.css?v=24">
-<script src="drills.js?v=24"></script>
+<link rel="stylesheet" href="nav.css?v=25">
+<script src="drills.js?v=25"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -69,8 +68,8 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=24"></script>
-<script src="nav.js?v=24"></script>
+<script src="themes.js?v=25"></script>
+<script src="nav.js?v=25"></script>
 </head>
 <body>
 <div id="navMount"></div>

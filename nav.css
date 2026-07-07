@@ -171,11 +171,11 @@
 .pc-x:hover{color:var(--text); background:var(--surface2)}
 .pc-scroll{overflow-y:auto; margin-top:4px; padding-right:8px; flex:1; min-height:0}
 .pc-badges{display:flex; gap:8px; margin:2px 0 12px; flex-wrap:wrap}
-.pc-badge{font-size:19px; filter:drop-shadow(0 0 5px var(--accent-glow)); cursor:default}
+.pc-badge{font-size:19px; cursor:default}
 .pc-badge.off{opacity:.22; filter:grayscale(1)}
 
 /* ---- achievement medals + card legend ---- */
-.hk-badge.earned{filter:drop-shadow(0 0 6px var(--warn))}
+.hk-badge.earned{/* flat */}
 .hk-badge.off{opacity:.5}
 .pc-badge{cursor:default; display:inline-flex}
 .pc-legend-t{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--muted);

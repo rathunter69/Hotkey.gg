@@ -652,3 +652,29 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   deliberate steps required to ever go live. No real money possible today.
 - v24. NOTE: this was major surgery on index.html — browser-test the full flow
   (landing → sign-in → nav → card → drill) and report anything weird immediately.
+
+---
+# ROUND 25 — Foundations expansion (33 drills), the × killer, flat pass
+- FOUNDATIONS ×5 (Wolf's "robust basics" mandate — the mouse-quitting motions):
+  · ribbon (par 30): three ribbon walks — Alt H 1 bold, Alt H K comma, Alt H A C
+    center. Teaches reading Alt as a menu.
+  · editfix (22): "Reveune" → F2, arrow in, fix in place. The Edit-mode primer.
+  · undo (28): delete → Ctrl+Z back → Ctrl+B instead. Action-latched via S.undoN
+    (undoAct/redoAct now count); "undo is a tool, not a panic."
+  · pastes (38): one copy, Alt E S V values then Alt E S T formats (engine's
+    PASTE_OPTS supports both). The legacy-menu muscle.
+  · saves (26): work → Ctrl+S → work → Ctrl+S. CONTEXT-AWARE Ctrl+S: drills with
+    usesSave:true make Ctrl+S save (S.saveN latch); everywhere else it restarts.
+    Esc still restarts inside the save drill.
+  Foundations = 7 drills; campaign Ch1 updated; PARS regenerated (33).
+- THE × KILLER: a capture-phase DELEGATED close handler — any .modal-x/.pc-x click
+  closes its nearest overlay. Immune to re-renders and missed per-instance wiring;
+  the recurring dead-× class is structurally dead. Per-instance handlers remain as
+  harmless redundancy.
+- VISUAL FLAT PASS (Monkeytype discipline): ALL emblem/badge drop-shadows removed
+  (index, nav.css, leaderboard, account, stats); emblem-max pulse removed — the
+  radiant diamond cap carries its own drama flat. Hex badges keep their borders
+  (Wolf likes), lose the glow. Card-flair glows retained (opt-in cosmetics).
+- FAVICON: reverted to the original cell-selection mark (grid outline + active
+  cell) from commit e736427 — the F4 keycap judged cheesy; keycap art lives on in
+  the rank emblems where it earns its keep.
