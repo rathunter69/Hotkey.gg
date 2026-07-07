@@ -396,3 +396,35 @@ are label-only and skipped silently. Next: visual ghost cursor on the grid itsel
   early players grandfathered"), inert startCheckout() stub pointing at the future
   TEST-mode create-checkout function. BETA_MODE unlocks everything; flipping to paid
   later = flip BETA_MODE + wire Stripe, no rebuild. NOTHING charges money today.
+
+---
+# ROUND 14 — the freedom/rigidity doctrine (engine design principles)
+Wolf's report: off-path = frozen cells, undo desyncs navigation, alternate hotkeys
+rejected, recovery unclear. Root causes found and fixed; principles now doctrine:
+
+## THE FIVE PRINCIPLES (apply to every current and future drill)
+1. END-STATE GRADING IS THE FREEDOM MECHANISM. Any path that reaches the target
+   state passes. Never grade the route (navigation-style tours are the only
+   exception, and they latch on actions — see 3).
+2. INPUT COMPLETENESS. Every ACTION must accept every Excel-legal input for it:
+   chord variants (Shift+= AND numpad +), ribbon paths (Alt H I R et al.), and
+   legacy menus (Alt E S V). A rejected legal input reads as a frozen sheet.
+3. SEQUENTIAL DRILLS LATCH ON ACTIONS, NOT STATE-DIFFS. Undo/redo clear action
+   flags; they can never fake or un-fake a step.
+4. RECOVERY IS ONE VISIBLE KEY, ZERO PENALTY BEYOND TIME. Esc restarts the drill
+   (fresh build + clock); the affordance is printed under every checklist.
+5. GUIDED MODE TEACHES ONE CANONICAL PATH BUT NEVER BLOCKS OTHERS.
+
+## Fixes shipped
+- Ctrl+NumpadAdd now inserts (insert demanded shiftKey — numpad users' key was
+  silently eaten by the zoom-guard = the "freeze"). Label now says "Ctrl and the
+  + key (numpad + or Shift+=)".
+- Undo faked navigation's delete step (latched on row-count). Now: insert/delete
+  handlers set S.lastRowOp; navigation latches on it; undo/redo clear it.
+- Ribbon grew Alt H I R / H D R / H I C / H D C (work on PARTIAL selections, like
+  real Excel — the chord still requires full rows). Ctrl+Alt+V opens the same
+  paste-special dialog as Alt E S V. Alt H 1 bold already existed.
+- Esc was swallowed UNCONDITIONALLY by the ribbon handler (dead outside ribbon —
+  that's why it never felt like an option). Now: ribbon-Esc closes ribbon;
+  grid-Esc cancels copy ants (Excel parity) or restarts the drill; "stuck? esc
+  restarts" printed under every checklist.

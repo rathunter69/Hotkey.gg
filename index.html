@@ -239,6 +239,9 @@
     display:inline-flex; align-items:center; justify-content:center; font-family:var(--mono);
     font-size:11px; color:var(--accent); transition:.15s}
   .cl-item.ok .cl-box{border-color:var(--accent); background:var(--accent-glow)}
+  .cl-esc{margin-top:10px; padding-top:8px; border-top:1px dashed var(--line);
+    font-family:var(--mono); font-size:10.5px; color:var(--faint)}
+  .cl-esc kbd{background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:9.5px}
   .cl-hint{margin-top:9px; font-size:12.5px; color:var(--warn); line-height:1.5}
   .cl-hint em{font-style:normal; color:var(--accent)}
   /* guided / paint-by-numbers */
@@ -2212,10 +2215,11 @@ const CHALLENGES = {
       // Step 8: Shift+Space — full rows (1..7 across every column)
       if(np.selAll && !np.rowSel){ const b=selBounds();
         if(b && b.r1===1 && b.r2===7 && b.c1===1 && b.c2===COLS) np.rowSel = true; }
-      // Step 9: rows inserted — sheet grew past its starting row count.
-      if(np.rowSel && !np.rowIns && S.ROWS > np.initialRows) np.rowIns = true;
-      // Step 10: rows deleted — back to (or below) the start.
-      if(np.rowIns && !np.rowDel && S.ROWS <= np.initialRows) np.rowDel = true;
+      // Steps 9/10 latch on the ACTION (insert/delete handlers set S.lastRowOp), not on
+      // row-count diffs — undo restores the count but doesn't set the flag, so undoing an
+      // insert can no longer fake the delete step. Any input path (chord, numpad, ribbon) counts.
+      if(np.rowSel && !np.rowIns && S.lastRowOp==='ins' && S.ROWS > np.initialRows) np.rowIns = true;
+      if(np.rowIns && !np.rowDel && S.lastRowOp==='del' && S.ROWS <= np.initialRows) np.rowDel = true;
       // Step 11: Ctrl+Space — a full column (single column, top to bottom; guards against
       // the leftover full-row selection from the delete step auto-satisfying this).
       if(np.rowDel && !np.colSel){ const b=selBounds();
@@ -2231,7 +2235,7 @@ const CHALLENGES = {
         {label:'Ctrl+Shift+\u2192 \u2192 select across the header',    ok: np.selRow},
         {label:'Ctrl+Shift+\u2193 \u2192 select the whole table',      ok: np.selAll},
         {label:'Shift+Space \u2192 full rows, edge to edge',           ok: np.rowSel},
-        {label:'Ctrl+Shift+= \u2192 insert rows above',                ok: np.rowIns},
+        {label:'Ctrl and the + key \u2192 insert rows (numpad + or Shift+=)', ok: np.rowIns},
         {label:'Ctrl+\u2212 \u2192 delete the inserted rows',          ok: np.rowDel},
         {label:'Ctrl+Space \u2192 grab the entire column',             ok: np.colSel},
         {label:'Ctrl+Home \u2192 finish where you started',            ok: np.finish},
@@ -2684,8 +2688,10 @@ const TABS = [
   {k:'W',name:'View',live:false},
 ];
 const MENUS = {
-  'H':  [['V','Paste'],['1','Bold'],['F','Font'],['A','Align'],['H','Fill'],['B','Borders'],['W','Wrap'],['K','Comma'],['9','Dec −'],['0','Dec +'],['O','Cells'],['U','Σ Sum']],
+  'H':  [['V','Paste'],['1','Bold'],['F','Font'],['A','Align'],['H','Fill'],['B','Borders'],['W','Wrap'],['K','Comma'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['U','Σ Sum']],
   'HV': [['S','Paste special…']],
+  'HI': [['R','Insert rows'],['C','Insert columns']],
+  'HD': [['R','Delete rows'],['C','Delete columns']],
   'HO': [['I','Autofit width'],['A','Autofit height']],
   'HB': [['T','Top'],['B','Bottom'],['A','All'],['O','Outside']],
   'HU': [['S','Sum']],
@@ -3130,6 +3136,7 @@ function updateChecklist(){
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
+  html+=`<div class="cl-esc">stuck or off the rails? <kbd>esc</kbd> restarts the drill</div>`;
   el.innerHTML=html;
 }
 const ARROWSYM={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
@@ -3150,8 +3157,12 @@ function resetFlash(){ flashChips=[]; clearTimeout(flashTimer);
 function snapshot(){ return {cells:JSON.parse(JSON.stringify(S.cells)), colW:colW.slice()}; }
 function restore(s){ S.cells=JSON.parse(JSON.stringify(s.cells)); colW=s.colW.slice(); }
 function pushUndo(){ undoStack.push(snapshot()); if(undoStack.length>60) undoStack.shift(); redoStack=[]; }
-function undoAct(){ if(!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop()); commitAction(); }
-function redoAct(){ if(!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop()); commitAction(); }
+function undoAct(){ if(!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop());
+  if(S) S.lastRowOp=null;   // undo/redo never count as row actions
+  commitAction(); }
+function redoAct(){ if(!redoStack.length) return; undoStack.push(snapshot()); restore(redoStack.pop());
+  if(S) S.lastRowOp=null;
+  commitAction(); }
 
 function applyRibbon(key){
   // paste special dialog
@@ -3201,6 +3212,24 @@ function applyRibbon(key){
     'HAL':c=>c.align='l', 'HAC':c=>c.align='c', 'HAR':c=>c.align='r',
   };
   if(RUN[np]){ pushUndo(); eachSel(RUN[np]); return exitRibbon(true); }
+  // Alt H I R / Alt H D R — ribbon route to row insert/delete. Unlike the Ctrl chord,
+  // Excel's ribbon path works on PARTIAL selections (inserts/deletes the touched rows).
+  if(np==='HIR'||np==='HDR'||np==='HIC'||np==='HDC'){
+    const ins = np[1]==='I', rows = np[2]==='R';
+    const r = selRange(); pushUndo();
+    if(rows){
+      const count=r.r2-r.r1+1;
+      S.cells=shiftCellsRows(r.r1, ins?count:-count);
+      S.ROWS = ins ? S.ROWS+count : Math.max(1,S.ROWS-count);
+      S.lastRowOp = ins?'ins':'del';
+      if(!ins){ S.sel=null; S.active={r:r.r1, c:S.active.c}; }
+    } else {
+      const count=r.c2-r.c1+1;
+      S.cells=shiftCellsCols(r.c1, ins?count:-count);
+      if(!ins){ S.sel=null; S.active={r:S.active.r, c:r.c1}; }
+    }
+    return exitRibbon(true);
+  }
   if(np==='HOI'){ pushUndo(); autofitCols(); return exitRibbon(true); }
   if(np==='HOA'){ return exitRibbon(true); }
   if(np==='HUS'||np==='MUS'){ pushUndo(); autoSum(); return exitRibbon(true); }
@@ -3424,7 +3453,9 @@ document.addEventListener('keydown',e=>{
   // covers entire rows or columns; otherwise no-op (Excel would show a dialog, which we skip).
   // Must come BEFORE the browser-zoom block below, which swallows the same Ctrl+=/+/- keystrokes.
   if((e.ctrlKey||e.metaKey) && !demoPlaying && !done){
-    const isInsert = e.shiftKey && (k==='+' || k==='=');
+    // Input completeness: '+' means insert whether it came from Shift+= or the numpad
+    // (Excel accepts both; requiring shift made numpad users feel the grid had frozen).
+    const isInsert = (k==='+') || (e.shiftKey && k==='=');
     const isDelete = !e.shiftKey && k==='-';
     if(isInsert || isDelete){
       const r = selRange();
@@ -3432,8 +3463,9 @@ document.addEventListener('keydown',e=>{
       const isFullCol = r.r1===1 && r.r2===S.ROWS;
       if(isFullRow || isFullCol){
         e.preventDefault(); startClock();
-        logKey(isInsert ? 'Ctrl+Shift+=' : 'Ctrl+-');
+        logKey(isInsert ? (e.shiftKey?'Ctrl+Shift+=':'Ctrl++') : 'Ctrl+-');
         pushUndo();
+        S.lastRowOp = isInsert ? 'ins' : 'del';   // action-sourced: drills latch on THIS, not on row-count diffs
         if(isFullRow){
           const count = r.r2 - r.r1 + 1;
           S.cells = shiftCellsRows(r.r1, isInsert ? count : -count);
@@ -3538,7 +3570,7 @@ document.addEventListener('keydown',e=>{
   // SHIFT+F11 restarts the run (Excel: "insert new sheet" — fresh start). ESC no longer restarts.
   if(k==='F11' && e.shiftKey){ e.preventDefault(); loadChallenge(cur); return; }
   // ESC only backs out of the ribbon now (matches Excel; frees Esc for normal use)
-  if(k==='Escape'){ e.preventDefault(); if(mode==='ribbon'){ exitRibbon(false); } return; }
+  if(k==='Escape' && mode==='ribbon'){ e.preventDefault(); exitRibbon(false); return; }   // normal-mode Esc falls through to marquee-cancel / restart below
 
   // RIBBON MODE — read physical key code so Mac Option / non-US layouts still work
   if(mode==='ribbon'){
@@ -3586,6 +3618,14 @@ document.addEventListener('keydown',e=>{
 
   const dirs={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
   if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey); return; }
+  // ESC on the grid: first press cancels an active copy (Excel's marching ants), otherwise
+  // it restarts the drill — fresh build, fresh clock. Recovery is always one visible key;
+  // the worst mistake costs you a restart, never a stuck sheet.
+  if(k==='Escape' && !e.ctrlKey && !e.altKey){
+    e.preventDefault();
+    if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); return; }
+    restartDrill(); return;
+  }
   // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+↵':'↵');
@@ -3643,6 +3683,8 @@ document.addEventListener('keydown',e=>{
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
       const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
+    if(e.altKey && lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+V');
+      mode='ribbon'; path=['E','S']; dialog='paste'; pasteKind='all'; ribbonNote=''; drawRibbon(); return; }
     if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
@@ -4950,6 +4992,9 @@ function renderStreak(){ const el=$('streakBadge'); if(!el) return;
   el.style.display = streak.n>0 ? 'inline-flex' : 'none';
   el.innerHTML='\ud83d\udd25 '+streak.n; el.title=streak.n+'-day streak — solve a drill every day to keep it alive'; }
 
+function restartDrill(){
+  loadChallenge(cur, {daily:dailyMode, weekly:weeklyMode});   // same drill, same mode; daily/weekly reseed identically
+}
 function scoreKey(){ if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return dailyMode ? dailyKey() : cur; }
 function drillOfDay(){ return MENU_ORDER[dailySeed() % MENU_ORDER.length]; }
 function startDaily(){ loadChallenge(drillOfDay(), {daily:true}); updateDailyBtn(); }

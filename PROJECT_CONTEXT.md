@@ -100,7 +100,12 @@ nav icon-only desktop, guides teach Ctrl+Shift-edge selection. Round 13: leaderb
 overall ranking, featured daily/weekly, tab+chip drill browser; tier math now in 3
 files — sync index/nav.js/leaderboard). Pro scaffold: entitlements table (RLS),
 isPro()/requirePro() gate, PRO badge, upgrade modal, inert startCheckout(); BETA_MODE
-unlocks all. Queue: true ghost replays,
+unlocks all. Round 14 (freedom/rigidity doctrine — see dev/AUDIT.md r14 for the 5 principles):
+input completeness (numpad + inserts; Alt H I R/H D R/H I C/H D C; Ctrl+Alt+V paste
+special), navigation latches action-sourced via S.lastRowOp (undo can't fake steps;
+undo/redo clear it), Esc unswallowed → cancels copy ants else restarts drill
+(restartDrill preserves daily/weekly), checklist prints the esc affordance. ALL new
+drills must satisfy the 5 principles. Queue: true ghost replays,
 drillgen engine integration, transpose drill, streak server-sync, campaign mode,
 gauntlet one-attempt lock.
 Weekly gauntlet shelled in dev/AUDIT.md.
