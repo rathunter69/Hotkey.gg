@@ -302,6 +302,11 @@
   .rm-key:hover kbd{color:var(--accent)}
 
   /* first-run guided intro */
+  /* ---- rank pill in the HUD: progression, always visible ---- */
+  .rank-pill{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:1px;
+    text-transform:uppercase; border-radius:999px !important; padding:6px 13px !important;
+    border:1px solid; transition:transform .12s, box-shadow .12s}
+  .rank-pill:hover{transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.3)}
   /* ---- checklist progress + step states ---- */
   .cl-bar{height:4px; background:var(--surface2); border-radius:99px; margin:6px 0 10px; overflow:hidden}
   .cl-bar-fill{height:100%; background:var(--accent); border-radius:99px; transition:width .35s cubic-bezier(.2,.7,.2,1); box-shadow:0 0 8px var(--accent-glow)}
@@ -870,6 +875,7 @@
       <button class="mb-tool" id="profileToggle" title="keyboard profile — native Excel, Macabacus, or FactSet chords also accepted">⌨ native</button>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
+      <button class="mb-tool rank-pill tier-unranked" id="rankPill" style="display:none" title="your rank — the ladder runs Candidate \u2192 Second-Year Analyst. Click for your card.">Candidate</button>
     </div>
   </div>
 
@@ -3354,6 +3360,20 @@ document.addEventListener('keydown',e=>{
   if(k==='Tab' && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+Tab':'Tab');
     move(0, e.shiftKey?-1:1, false, false); return; }
+  // Delete clears the WHOLE selection's contents (Excel parity — not just the active cell)
+  if(k==='Delete' && !e.ctrlKey && !e.altKey && !e.metaKey){
+    e.preventDefault(); startClock(); logKey('Delete'); pushUndo();
+    eachSel(c=>{ c.value=null; c.formula=null; c.txt=false; }); commitAction(); return; }
+  // Backspace clears the active cell and drops you into edit mode (Excel parity)
+  if(k==='Backspace' && !e.ctrlKey && !e.altKey && !e.metaKey){
+    e.preventDefault(); startClock(); logKey('\u232b'); pushUndo();
+    const bc=ensure(S.active.r,S.active.c); bc.value=null; bc.formula=null; bc.txt=false;
+    startEdit(''); return; }
+  // F2 edits the active cell with its existing contents (formula if present) — THE banker key
+  if(k==='F2' && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey){
+    e.preventDefault(); startClock(); logKey('F2');
+    const fc=S.cells[ck(S.active.r,S.active.c)];
+    startEdit(fc ? (fc.formula || (fc.value!=null ? String(fc.value) : '')) : ''); return; }
 
   // Home / End — navigation primitives. Ctrl+Home → A1, Ctrl+End → last cell of used range, Home → col A.
   // Shift modifier extends the selection (Excel parity). Plain "End" is no-op (Excel's End mode is too obscure).
@@ -3387,6 +3407,8 @@ document.addEventListener('keydown',e=>{
       if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+D'); fillFrom('down'); return; }
       if(lk==='u'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+U'); fillFrom('up'); return; }
     }
+    if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
+      const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
     if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
@@ -4798,7 +4820,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   }
   loadChallenge(startKey);
   if(onboarded) showWelcomeBack(startKey);
-  initAuth();
+  initAuth().then(()=>{ updateRankPill(); });
 })();
 
 /* ---- welcome-back strip: returning users get a one-glance "you're on the game page" cue.
@@ -4830,6 +4852,31 @@ function showWelcomeBack(key){
    ============================================================ */
 function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
+/* Rank pill on the game page — the ladder should be in your face while you train.
+   Mirrors nav.js: 10-min sessionStorage cache, compact standing fetch, tierOf. */
+async function updateRankPill(){
+  const el=$('rankPill'); if(!el) return;
+  const show=(t)=>{ el.textContent=t.name; el.className='mb-tool rank-pill '+t.cls; el.style.display='inline-flex';
+    el.onclick=()=>{ try{ openProfile(); }catch(e){} }; };
+  try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null');
+    if(c && c.exp>Date.now()){ show({name:c.n, cls:c.c}); return; } }catch(e){}
+  if(!sb || !me_user || isAnonUser()) return;
+  try{
+    const [p,r] = await Promise.all([
+      sb.from('profiles').select('id'),
+      sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true})
+    ]);
+    const runs=r.data||[]; const per={}; MENU_ORDER.forEach(k=>per[k]=[]); const seen={};
+    runs.forEach(x=>{ if(per[x.challenge]===undefined) return; const key=x.challenge+'|'+x.user_id;
+      if(!seen[key]){ seen[key]=true; per[x.challenge].push(x); } });
+    let att=0, sum=0;
+    MENU_ORDER.forEach(k=>{ const best=per[k]; const idx=best.findIndex(b=>b.user_id===me_user.id);
+      if(idx>=0){ att++; sum+=idx/best.length; } });
+    const t=tierOf(att?sum/att:null, att);
+    show(t);
+    try{ sessionStorage.setItem('hk_rank', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
+  }catch(e){}
+}
 async function initAuth(){
   if(!sb){ refreshAuthUI(); return; }
   try{

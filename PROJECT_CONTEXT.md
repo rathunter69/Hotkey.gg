@@ -80,7 +80,12 @@ Engine parity: Shift+Enter/Tab + non-edit Enter/Tab movement; string literals in
 evaluator; SUMIF fn. Checklist: always-on next-task highlight + progress bar.
 Daily Challenge (seeded UTC, challenge='daily-YYYY-MM-DD', leaderboard board).
 Streaks (KV hotkey_streak, HUD 🔥). Drills: 23 (added sumif, lookup2).
-Approved queue: stats page → placement test → share cards → team codes.
+Round 7: parity sweep (Delete-range/Backspace-edit/F2/Ctrl+A), rank pill on all
+pages (hk_rank sessionStorage cache; tierOf duplicated index↔nav.js — sync both),
+stats.html (in shared nav), supabase/ folder + GitHub Action deploy (needs repo
+secret SUPABASE_ACCESS_TOKEN — see supabase/README.md; migrations idempotent).
+Deploy set += stats.html, supabase/, .github/. Queue: placement test → share
+cards → team codes.
 Weekly gauntlet shelled in dev/AUDIT.md.
 
 ## Curriculum v2 (current focus)

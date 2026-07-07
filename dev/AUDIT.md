@@ -262,3 +262,35 @@ Fixed 5-drill sequence per ISO week (seeded like daily), ONE attempt per account
 combined time posted to a weekly board; sessions table reused with
 mode='gauntlet', duration_sec=week number. Attempt-once enforced client-side first
 (KV) then via unique index (user_id, mode, duration_sec) when it matters.
+
+---
+# ROUND 7 (2026-07-06) — parity sweep, rank prominence, supabase-in-repo, stats
+
+## Excel-parity sweep (generalized beyond the reported chords, per Wolf)
+- FIXED: Delete now clears the WHOLE selection (was: nothing outside edit mode).
+- FIXED: Backspace clears active cell and enters edit mode (Excel behavior).
+- FIXED: F2 edits the active cell with existing contents/formula — THE banker key
+  was entirely missing from the grid.
+- FIXED: Ctrl+A selects the used region.
+- Already correct: Esc paths, Ctrl+Space/Shift+Space, Home/End, undo/redo.
+
+## Rank prominence
+- Rank pill on EVERY page: game-page HUD (tier-colored, next to streak) + shared
+  nav on leaderboard/reference/stats/legal. Click → full profile card. Standing
+  cached 10 min in sessionStorage (key hk_rank) shared across pages; tierOf and
+  the standing math remain duplicated index.html↔nav.js — keep in sync.
+
+## Supabase-in-repo (no more dashboard pasting)
+- supabase/migrations/ holds the schema (existing SQL folded in, idempotent);
+  supabase/config.toml; .github/workflows/supabase-deploy.yml runs `db push` +
+  functions deploy on any push touching supabase/.
+- ONE-TIME SETUP FOR WOLF: add repo secret SUPABASE_ACCESS_TOKEN (see
+  supabase/README.md). Until then the Action fails harmlessly.
+
+## Stats page (queue item #5 — SHIPPED)
+- stats.html: drills-on-board, peak keys/sec, avg efficiency vs par, streak;
+  per-drill PB + efficiency bar + live rank. Anon users see local PBs with a
+  sign-in nudge. Added to shared nav (chart icon).
+
+## Queue: #6 placement test → #7 share cards → #8 team codes. Deploy set now also
+## includes stats.html + supabase/ + .github/.
