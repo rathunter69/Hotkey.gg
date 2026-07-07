@@ -327,3 +327,24 @@ mode='gauntlet', duration_sec=week number. Attempt-once enforced client-side fir
   scan, F2, repair. The 2am rep. par 32 / 20 keys.
 - Incident note: a python surrogate-escape write zeroed index.html mid-edit;
   git checkout restored it instantly. Lesson: emoji via \\U escapes + io.open utf-8.
+
+---
+# ROUND 10 — progression system + make-it-balance
+- XP & LEVELS: XP = 15/clean solve + 50/distinct drill + 25/top-10 + 100/podium +
+  250/crown. Level curve triangular (level n costs 150×n more): fast early hook,
+  breadth+placement demanded late. Tier ladder stays the COMPETITIVE rank; level is
+  personal progress. Both on the card.
+- PLAYER CARD v2 (nav.js): LVL + XP bar + 4 stat tiles (clean solves, drills x/25,
+  crowns, streak) above the per-drill placement list — the card now reads as a real
+  representation of skill (tier/crowns), progress (level/solves), and breadth (drills).
+- HUD LVL chip on the game page — computed locally (solves counter KV hotkey_solves
+  + PB breadth) so even anon users feel the ladder from solve #1; full XP math on
+  the signed-in card.
+- MAKE IT BALANCE (25 drills): foot assets, plug retained earnings, foot L&E,
+  CHECK cell = A − L&E must read 0. Trains the zero-check reflex. 200-run sim:
+  always ties, plug always positive.
+- Progression logic summary (the "does it make sense" answer):
+  tier = where you PLACE (percentile, decays as others improve) ·
+  level = what you've DONE (monotonic, never lost) ·
+  crowns/podiums = what you HOLD (defensible) · streak = showing up.
+  Four axes, no double-counting, each visible.

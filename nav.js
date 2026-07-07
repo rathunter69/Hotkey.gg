@@ -338,8 +338,23 @@
     });
     const attempted = drills.filter(d => d.rank !== null);
     const avgPct = attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null;
-    return { drills, attempted: attempted.length, avgPct };
+    const mySolves = runs.filter(x => x.user_id === me_id).length;
+    return { drills, attempted: attempted.length, avgPct, mySolves };
   }
+  /* ---- XP & LEVELS ----
+     XP = 15/clean solve + 50/distinct drill + 25/top-10 + 100/podium + 250/crown.
+     Level n needs 150*n more XP than n-1 (triangular curve): fast early, grindy late.
+     The tier (Candidate → Second-Year Analyst) stays the COMPETITIVE rank; the level
+     is personal progress — both live on the card. */
+  function computeXP(d, mySolves){
+    let crowns=0, podiums=0, top10s=0;
+    d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; if(x.rank!==null&&x.rank<=10) top10s++; });
+    return 15*(mySolves||0) + 50*d.attempted + 25*top10s + 100*podiums + 250*crowns;
+  }
+  function levelOf(xp){ let lvl=1, need=150, floor=0;
+    while(xp >= floor+need){ floor+=need; lvl++; need=150*lvl; }
+    return { lvl, into: xp-floor, need, pct: Math.min(100, Math.round(100*(xp-floor)/need)) }; }
+
   function renderProfile(m, d){
     const tier = tierOf(d.avgPct, d.attempted);
     const fmtMs = ms => (ms/1000).toFixed(2) + 's';
@@ -361,6 +376,24 @@
     m.innerHTML = '<div class="pc-card">' +
       '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + tier.name + '</div></div>' +
       '<div class="pc-sub">' + d.attempted + ' / ' + MENU_ORDER.length + ' drills attempted \u00b7 ' + standing + '</div>' +
+      (function(){
+        const xp = computeXP(d, d.mySolves);
+        const L = levelOf(xp);
+        let crowns=0, podiums=0; d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; });
+        let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+        return '<div style="display:flex;gap:14px;align-items:center;margin:4px 0 14px;flex-wrap:wrap;font-family:var(--mono)">'+
+          '<span style="font-size:20px;font-weight:700;color:var(--accent)">LVL '+L.lvl+'</span>'+
+          '<span style="flex:1;min-width:140px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden">'+
+            '<span style="display:block;height:100%;width:'+L.pct+'%;background:var(--accent);border-radius:99px"></span></span>'+
+          '<span style="font-size:11px;color:var(--muted)">'+L.into+' / '+L.need+' xp</span>'+
+        '</div>'+
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;font-family:var(--mono);text-align:center">'+
+          '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+(d.mySolves||0)+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">clean solves</div></div>'+
+          '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+d.attempted+'/'+MENU_ORDER.length+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">drills</div></div>'+
+          '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:'+(crowns?'var(--warn)':'var(--text)')+'">'+crowns+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">crowns</div></div>'+
+          '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+(streakN?'\ud83d\udd25 '+streakN:'\u2014')+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">streak</div></div>'+
+        '</div>';
+      })() +
       body +
       '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcClose">close</a></div>' +
       '</div>';

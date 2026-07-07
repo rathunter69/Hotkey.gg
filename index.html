@@ -882,6 +882,7 @@
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
       <button class="mb-tool" id="weeklyBtn" title="the weekly gauntlet — five seeded drills, combined time on the board">🏁 weekly</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
+      <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
       <button class="mb-tool rank-pill tier-unranked" id="rankPill" style="display:none" title="your rank — the ladder runs Candidate \u2192 Second-Year Analyst. Click for your card.">Candidate</button>
     </div>
   </div>
@@ -1931,6 +1932,62 @@ const CHALLENGES = {
       ];
     }
   },
+  balance:{
+    name:'Balance', label:'Make it balance', par:55, parKeys:46,
+    prompt:'Assets = Liabilities + Equity, or nothing else matters. Foot the assets, plug retained earnings so the sheet ties, foot the L&E side, then build the CHECK cell \u2014 total assets minus total L&E. A model without a zero check is a model you can\u2019t trust.',
+    req:'<em>B6</em> \u00b7 <em>alt+=</em> foots assets \u00b7 <em>B12 plug</em> \u00b7 <em>=B6-B9-B10-B11</em> \u00b7 <em>B13</em> \u00b7 <em>=SUM(B9:B12)</em> \u00b7 <em>B14 check</em> \u00b7 <em>=B6-B13</em> \u2192 must show 0',
+    guide:[
+      'foot the assets \u00b7 at B6 \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> \u00b7 <kbd>\u21b5</kbd>',
+      'plug retained earnings at B12 \u00b7 <kbd>=B6-B9-B10-B11</kbd> \u00b7 <kbd>\u21b5</kbd> \u2014 whatever makes it tie',
+      'foot L&E at B13 \u00b7 <kbd>=SUM(B9:B12)</kbd> \u00b7 <kbd>\u21b5</kbd>',
+      'the check at B14 \u00b7 <kbd>=B6-B13</kbd> \u2014 reads 0 or you\u2019re not done',
+    ],
+    targets:['B6','B12','B13','B14'],
+    demo(){ return [
+      {sel:'B6',  keys:[Kb.eq, Kb.enter]},
+      {sel:'B12', keys:[...T('=B6-B9-B10-B11'), Kb.enter]},
+      {sel:'B13', keys:[...T('=SUM(B9:B12)'), Kb.enter]},
+      {sel:'B14', keys:[...T('=B6-B13'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      const num=v=>({...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'});
+      const blankNum=()=>({...blankCell(),fmtStyle:'comma',decimals:0});
+      cells['A1']={...blankCell(),value:'Balance sheet',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Assets',txt:true,bold:true};
+      const aL=['Cash','Receivables','PP&E'];
+      const aV=aL.map(()=>rnd(20,200)*10);
+      aL.forEach((l,i)=>{ cells['A'+(3+i)]={...blankCell(),value:l,txt:true}; cells['B'+(3+i)]=num(aV[i]); });
+      cells['A6']={...blankCell(),value:'Total assets',txt:true,bold:true}; cells['B6']=blankNum();
+      cells['A8']={...blankCell(),value:'Liabilities & equity',txt:true,bold:true};
+      const totalA=aV.reduce((s,v)=>s+v,0);
+      const debt=Math.round(totalA*rnd(25,45)/100/10)*10;
+      const ap=Math.round(totalA*rnd(8,18)/100/10)*10;
+      const stock=Math.round(totalA*rnd(10,20)/100/10)*10;
+      cells['A9']={...blankCell(),value:'Debt',txt:true};            cells['B9']=num(debt);
+      cells['A10']={...blankCell(),value:'Payables',txt:true};       cells['B10']=num(ap);
+      cells['A11']={...blankCell(),value:'Common stock',txt:true};   cells['B11']=num(stock);
+      cells['A12']={...blankCell(),value:'Retained earnings (plug)',txt:true}; cells['B12']=blankNum();
+      cells['A13']={...blankCell(),value:'Total L&E',txt:true,bold:true};      cells['B13']=blankNum();
+      cells['A14']={...blankCell(),value:'CHECK (must be 0)',txt:true,bold:true}; cells['B14']=blankNum();
+      this._totalA=totalA; this._plug=totalA-debt-ap-stock;
+      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:186,2:96}};
+    },
+    checks(S){
+      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
+      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?c.formula.toUpperCase().replace(/\s/g,''):''; };
+      const aOk = !!f('B6') && /SUM/.test(f('B6')) && Math.abs(val('B6')-this._totalA)<1e-6;
+      const pOk = !!f('B12') && f('B12').includes('B6') && Math.abs(val('B12')-this._plug)<1e-6;
+      const lOk = !!f('B13') && Math.abs(val('B13')-this._totalA)<1e-6;
+      const cOk = !!f('B14') && f('B14').includes('B6') && f('B14').includes('B13') && Math.abs(val('B14'))<1e-6;
+      return [
+        {label:'foot the assets \u2014 SUM at B6', ok: aOk},
+        {label:'plug retained earnings so the sheet ties', ok: pOk},
+        {label:'foot Liabilities & Equity at B13', ok: lOk},
+        {label:'CHECK cell reads 0 \u2014 assets minus L&E', ok: cOk},
+      ];
+    }
+  },
   audit:{
     name:'Audit', label:'Fix the broken ref', par:32, parKeys:20,
     prompt:'One of these revenue formulas is pointing at the wrong row \u2014 the number that looks off IS off. Find it, F2 into the cell, repair the reference, commit. This is the rep that saves you at 2am: reading a column and spotting the break.',
@@ -2724,6 +2781,8 @@ function checkWin(){
   if(!mouseUsed && !guidedUsed){ const prev=PB[sk];
     if(prev===undefined||t<prev){ PB[sk]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
   updateStreak();
+  try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
+    KV.set('hotkey_solves', String(nsol)); renderLvl(nsol); }); }catch(e){}
   showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
   if(sb && me_user && !isAnonUser() && !mouseUsed && !guidedUsed){
     recordRun(t).then(async ok=>{
@@ -4840,6 +4899,15 @@ function updateStreak(){ const today=dailyDateStr(); if(streak.d===today){ rende
   const yd=new Date(Date.now()-864e5).toISOString().slice(0,10);
   streak.n = (streak.d===yd) ? streak.n+1 : 1; streak.d=today;
   KV.set('hotkey_streak', JSON.stringify(streak)); renderStreak(); }
+/* Local level chip: anon-friendly progress (solves + PB breadth). Signed-in players
+   see the full XP math on their card; this keeps the loop visible from solve #1. */
+function localXP(nsol){ return 15*(nsol||0) + 50*Object.keys(PB).length; }
+function lvlOf(xp){ let lvl=1, need=150, floor=0;
+  while(xp >= floor+need){ floor+=need; lvl++; need=150*lvl; } return lvl; }
+function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
+  const l=lvlOf(localXP(nsol));
+  el.style.display='inline-flex'; el.textContent='LVL '+l;
+  el.title='level '+l+' \u2014 every clean solve and new drill feeds it. Full XP math on your player card.'; }
 function renderStreak(){ const el=$('streakBadge'); if(!el) return;
   el.style.display = streak.n>0 ? 'inline-flex' : 'none';
   el.innerHTML='\ud83d\udd25 '+streak.n; el.title=streak.n+'-day streak — solve a drill every day to keep it alive'; }
@@ -4951,6 +5019,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadProfile();
   updateProfileBtn();
   await loadStreak();
+  try{ const v=await KV.get('hotkey_solves'); renderLvl(parseInt(v||'0',10)||0); }catch(e){}
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
   if(onboarded){ enterRequested = true; landingOpen = false; }
