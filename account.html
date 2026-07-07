@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>account · hotkey.gg</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49;
+    --accent:#2ea36f; --accent-dim:#1d6647; --accent-glow:rgba(46,163,111,.22);
+    --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Hanken Grotesk',system-ui,sans-serif;
+    --maxw:760px;
+  }
+  *{margin:0; padding:0; box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px; position:relative; z-index:1}
+  a{color:inherit; text-decoration:none}
+  header.head{padding:52px 0 20px}
+  h1{font-size:clamp(28px,5vw,40px); font-weight:700; letter-spacing:-1.1px}
+  main{padding-bottom:90px}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px 26px; margin-bottom:16px}
+  .card h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:14px}
+  /* title card */
+  .tc{border-color:var(--accent-dim); background:linear-gradient(135deg, var(--accent-glow), var(--surface) 55%)}
+  .tc-top{display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .tc-emblem{display:inline-flex}
+  .tc-name{font-size:24px; font-weight:700; letter-spacing:-.5px}
+  .tc-team{font-family:var(--mono); font-size:10.5px; color:var(--warn); border:1px solid var(--warn);
+    border-radius:999px; padding:3px 11px; letter-spacing:1px; text-transform:uppercase}
+  .tc-meta{display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-top:12px; font-family:var(--mono)}
+  .tc-lvl{font-size:19px; font-weight:700; color:var(--accent)}
+  .tc-bar{flex:1; min-width:130px; height:7px; background:var(--surface2); border-radius:99px; overflow:hidden}
+  .tc-bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
+  .tc-sub{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:10px}
+  .rank-emblem{filter:drop-shadow(0 0 6px currentColor)}
+  @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 10px currentColor)}}
+  .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
+  /* form bits */
+  label{display:block; font-family:var(--mono); font-size:11px; color:var(--muted); margin:12px 0 6px; letter-spacing:.6px}
+  input{width:100%; font-family:var(--mono); font-size:13.5px; color:var(--text); background:var(--bg);
+    border:1px solid var(--line); border-radius:9px; padding:11px 13px; outline:none}
+  input:focus{border-color:var(--accent-dim)}
+  .btn{display:inline-block; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--bg);
+    background:var(--accent); border:none; border-radius:9px; padding:11px 20px; margin-top:12px; cursor:pointer}
+  .btn.ghost{background:transparent; color:var(--muted); border:1px solid var(--line)}
+  .btn.danger{background:transparent; color:var(--bad); border:1px solid var(--bad)}
+  .msg{font-family:var(--mono); font-size:12px; min-height:16px; margin-top:8px}
+  .rowline{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--mono); font-size:13px; padding:6px 0; border-bottom:1px dashed var(--line)}
+  .rowline:last-child{border-bottom:none}
+  .rowline .k{color:var(--muted); font-size:11.5px}
+  .state{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:38px 28px; text-align:center;
+    font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
+  .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
+</style>
+<link rel="stylesheet" href="nav.css?v=17">
+<script src="drills.js?v=17"></script>
+<script>
+const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+window.NAV_ACTIVE = '';
+</script>
+<script src="themes.js?v=17"></script>
+<script src="nav.js?v=17"></script>
+</head>
+<body>
+<div id="navMount"></div>
+
+<header class="head"><div class="wrap"><h1>Your account.</h1></div></header>
+
+<main><div class="wrap" id="root">
+  <div class="state">loading…</div>
+</div></main>
+
+<div id="siteFooter"></div>
+
+<script>
+const R = window.HK_RANK, D = window.HOTKEY_DRILLS;
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function load(){
+  const root=document.getElementById('root');
+  let me=null;
+  try{ const { data:{ session } } = await sb.auth.getSession(); me = session ? session.user : null; }catch(e){}
+  const isAnon = me && (!me.email || (me.app_metadata&&me.app_metadata.provider==='anonymous'));
+  if(!me || isAnon){
+    root.innerHTML='<div class="state">You\u2019re playing as a guest \u2014 your times live only on this device.<br><br>'+
+      '<a href="index.html?openAuth=signup">Create an account</a> to claim a handle, post to the boards, and start the climb.</div>';
+    return;
+  }
+
+  let prof={handle:'',team_code:null}, runs=[];
+  try{
+    const [p,r] = await Promise.all([
+      sb.from('profiles').select('handle,team_code').eq('id',me.id).single(),
+      sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
+    ]);
+    if(p.data) prof=p.data; runs=r.data||[];
+  }catch(e){}
+
+  const st = R.standing(runs, me.id, D.menuOrder);
+  const tier = R.tierOf(st.avgPct, st.att);
+  const mine = runs.filter(x=>x.user_id===me.id);
+  const xp = R.computeXP(mine, st);
+  const L = R.levelOf(xp);
+  const joined = me.created_at ? new Date(me.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—';
+
+  root.innerHTML = `
+    <div class="card tc">
+      <div class="tc-top">
+        <span class="tc-emblem ${tier.cls}" style="color:inherit">${window.rankEmblem?window.rankEmblem(tier.name,42):''}</span>
+        <div>
+          <div class="tc-name">${esc(prof.handle||'set a handle')}</div>
+          <span class="pc-tier ${tier.cls}" style="display:inline-flex;align-items:center;margin-top:4px">${window.rankEmblem?window.rankEmblem(tier.name,13):''}<span>${tier.name}</span></span>
+        </div>
+        ${prof.team_code?`<span class="tc-team">${esc(prof.team_code)}</span>`:''}
+      </div>
+      <div class="tc-meta">
+        <span class="tc-lvl">LVL ${L.lvl}</span>
+        <span class="tc-bar"><i style="width:${L.pct}%"></i></span>
+        <span style="font-size:11px;color:var(--muted)">${L.into}/${L.need} xp</span>
+      </div>
+      <div class="tc-sub">${st.crowns} crown${st.crowns===1?'':'s'} · ${st.pod} podiums · ${st.att}/${D.menuOrder.length} drills · ${mine.length} clean solves · member since ${joined}</div>
+    </div>
+
+    <div class="card"><h4>Profile</h4>
+      <label>handle — how you appear on every board</label>
+      <input id="acHandle" maxlength="24" value="${esc(prof.handle||'')}" placeholder="e.g. spreads_hard">
+      <button class="btn" id="acHandleSave">Save handle</button><div class="msg" id="acHandleMsg"></div>
+      <div class="rowline" style="margin-top:14px"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
+    </div>
+
+    <div class="card"><h4>Team</h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px">Share a private code with your analyst class or club — the leaderboard gets a team-only view.</div>
+      <label>team code</label>
+      <input id="acTeam" maxlength="32" value="${esc(prof.team_code||'')}" placeholder="e.g. GS-IBD-2026" style="text-transform:uppercase">
+      <button class="btn" id="acTeamSave">Save team</button><div class="msg" id="acTeamMsg"></div>
+    </div>
+
+    <div class="card"><h4>Security</h4>
+      <label>new password (8+ characters)</label>
+      <input id="acP1" type="password" autocomplete="new-password">
+      <label>confirm</label>
+      <input id="acP2" type="password" autocomplete="new-password">
+      <button class="btn" id="acPassSave">Update password</button><div class="msg" id="acPassMsg"></div>
+    </div>
+
+    <div class="card"><h4>Session</h4>
+      <div class="rowline"><span class="k">pro status</span><span style="color:var(--accent)">beta — everything unlocked</span></div>
+      <button class="btn danger" id="acSignout">Sign out</button>
+    </div>`;
+
+  const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--bad)':'var(--accent)'; } };
+  document.getElementById('acHandleSave').onclick=async()=>{
+    const v=document.getElementById('acHandle').value.trim().slice(0,24);
+    if(v.length<2){ say('acHandleMsg','Handle needs at least 2 characters.',true); return; }
+    try{ const {error}=await sb.from('profiles').update({handle:v}).eq('id',me.id);
+      if(error){ say('acHandleMsg',error.message||'Couldn\u2019t save.',true); return; }
+      say('acHandleMsg','Saved \u2713 — the boards update on next load'); }catch(e){ say('acHandleMsg','Something went wrong.',true); }
+  };
+  document.getElementById('acTeamSave').onclick=async()=>{
+    const v=document.getElementById('acTeam').value.trim().toUpperCase().slice(0,32);
+    try{ const {error}=await sb.from('profiles').update({team_code:v||null}).eq('id',me.id);
+      if(error){ say('acTeamMsg',error.message||'Couldn\u2019t save.',true); return; }
+      say('acTeamMsg', v?'Team set \u2713 — check the leaderboard':'Left the team \u2713'); }catch(e){ say('acTeamMsg','Something went wrong.',true); }
+  };
+  document.getElementById('acPassSave').onclick=async()=>{
+    const p1=document.getElementById('acP1').value, p2=document.getElementById('acP2').value;
+    if(p1.length<8){ say('acPassMsg','Password needs at least 8 characters.',true); return; }
+    if(p1!==p2){ say('acPassMsg','Passwords don\u2019t match.',true); return; }
+    try{ const {error}=await sb.auth.updateUser({password:p1});
+      if(error){ say('acPassMsg',error.message||'Couldn\u2019t update.',true); return; }
+      say('acPassMsg','Password updated \u2713'); }catch(e){ say('acPassMsg','Something went wrong.',true); }
+  };
+  document.getElementById('acSignout').onclick=async()=>{ try{ await sb.auth.signOut(); }catch(e){} location.href='index.html'; };
+}
+load();
+</script>
+</body>
+</html>

@@ -17,7 +17,7 @@
     --warn:#d9a441; --bad:#c8533f;
     --mono:'JetBrains Mono',ui-monospace,monospace;
     --sans:'Hanken Grotesk',system-ui,sans-serif;
-    --maxw:880px;
+    --maxw:1180px;
   }
   *{margin:0; padding:0; box-sizing:border-box}
   html{scroll-behavior:smooth}
@@ -64,8 +64,15 @@
   .tm{font-family:var(--mono); text-align:right; font-weight:500}
   .empty{padding:22px; color:var(--faint); font-family:var(--mono); font-size:13px; text-align:center}
   /* ---- dashboard panels ---- */
-  .hero{display:grid; grid-template-columns:1.2fr 1fr; gap:16px; margin-bottom:18px}
+  .hero{display:grid; grid-template-columns:1.15fr .85fr 1fr; gap:16px; margin-bottom:18px}
+  @media(max-width:1080px){ .hero{grid-template-columns:1fr 1fr} }
   @media(max-width:820px){ .hero{grid-template-columns:1fr} }
+  .ld-row{display:flex; align-items:center; gap:11px; padding:7.5px 8px; border-radius:9px;
+    font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .ld-row .ld-req{margin-left:auto; font-size:10px; color:var(--faint); text-align:right}
+  .ld-row.here{background:var(--accent-glow); color:var(--text); border:1px solid var(--accent-dim)}
+  .ld-row.here .ld-req{color:var(--muted)}
+  .ld-row.locked{opacity:.55}
   .panel{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px 24px}
   .panel.me{border-color:var(--accent-dim); background:linear-gradient(135deg, var(--accent-glow), var(--surface) 60%)}
   .panel h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; margin:0 0 12px}
@@ -81,6 +88,8 @@
   .tp-row:last-child{border-bottom:none}
   .tp-row .pct{color:var(--muted); font-size:12px}
   .tp-row.me{background:var(--accent-glow); border-radius:8px; padding-left:8px; padding-right:8px}
+  .row.open{opacity:.42}
+  .row.open .nm{color:var(--faint); font-style:italic; letter-spacing:.4px}
   .tp-tier{font-size:8.5px; padding:3px 8px; margin-left:8px; vertical-align:2px}
   .featured{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px}
   @media(max-width:820px){ .featured{grid-template-columns:1fr} }
@@ -133,11 +142,11 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=16">
-<script src="drills.js?v=16"></script>
+<link rel="stylesheet" href="nav.css?v=17">
+<script src="drills.js?v=17"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=16"></script>
-<script src="nav.js?v=16"></script>
+<script src="themes.js?v=17"></script>
+<script src="nav.js?v=17"></script>
 </head>
 <body>
 
@@ -195,6 +204,7 @@ function boardHtml(c, best, names, meId){
   else {
     const leaderMs = best[0].time_ms;
     body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId,false,leaderMs)).join('');
+    for(let k=best.length;k<5;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';
     const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
     if(myIdx>=10){ body += '<div class="you-gap">···</div>' + rowHtml(best[myIdx], myIdx, names, meId, true, leaderMs); }
   }
@@ -342,6 +352,23 @@ function heroHtml(){
     nextHtml+'</div>';
 }
 
+function ladderHtml(){
+  const {userStat,meId}=DATA;
+  const me=(meId&&userStat[meId])||{att:0,sum:0};
+  const avg=me.att?me.sum/me.att:null;
+  const cur=tierOf(avg, me.att);
+  const T=[{name:'Candidate',cls:'tier-unranked',req:'take the placement'},
+    ...TIERS.map(t=>({name:t.name,cls:t.cls,req:(t.att?t.att+' drills':'')+(t.pct<=1?' \u00b7 top '+Math.round(t.pct*100)+'%':' \u00b7 any placement')}))];
+  let rows='';
+  T.forEach((t,i)=>{
+    const here=t.name===cur.name;
+    const locked=i>(cur.i??-1)+1 && !here;
+    rows+='<div class="ld-row'+(here?' here':'')+(locked&&!here?' locked':'')+'">'+
+      '<span class="'+t.cls+'" style="display:inline-flex;color:inherit">'+(window.rankEmblem?window.rankEmblem(t.name,17):'')+'</span>'+
+      '<span>'+t.name+(here?' \u2014 you':'')+'</span><span class="ld-req">'+t.req+'</span></div>';
+  });
+  return '<div class="panel"><h4>the ladder</h4>'+rows+'</div>';
+}
 function topPlayersHtml(){
   const {userStat,names,meId}=DATA;
   const ranked=Object.keys(userStat).map(u=>({u, ...userStat[u], avg:userStat[u].sum/userStat[u].att}))
@@ -424,7 +451,7 @@ function browserHtml(){
 function renderAll(){
   const root=document.getElementById('boards');
   root.innerHTML =
-    '<div class="hero">'+heroHtml()+topPlayersHtml()+'</div>'+
+    '<div class="hero">'+heroHtml()+ladderHtml()+topPlayersHtml()+'</div>'+
     featuredHtml()+
     '<h3 class="section-title">Browse the boards</h3>'+browserHtml();
   wire();

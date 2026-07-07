@@ -168,3 +168,45 @@ window.rankEmblem = function(tierName, size){
   else           body = shield.replace('.16','.28') + star + laurelL + laurelR + crown + wings;
   return '<svg class="rank-emblem'+(i>=4?' emblem-max':'')+'" viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true">'+body+'</svg>';
 };
+
+/* ---- shared rank/level math for account.html + stats.html (older pages keep
+   their documented duplicates — sync all on threshold changes) ---- */
+window.HK_RANK = {
+  TIERS:[
+    {name:'Candidate',           cls:'tier-unranked', att:0,  pct:9,    req:'take the placement — everyone starts here'},
+    {name:'Summer Analyst',      cls:'tier-bronze',   att:5,  pct:1.01, req:'5 drills attempted, any placement'},
+    {name:'Incoming Analyst',    cls:'tier-silver',   att:8,  pct:0.55, req:'8 drills \u00b7 top 55% avg placement'},
+    {name:'First-Year Analyst',  cls:'tier-gold',     att:10, pct:0.30, req:'10 drills \u00b7 top 30%'},
+    {name:'Top-Bucket Analyst',  cls:'tier-platinum', att:13, pct:0.15, req:'13 drills \u00b7 top 15%'},
+    {name:'Second-Year Analyst', cls:'tier-diamond',  att:15, pct:0.05, req:'15 drills \u00b7 top 5% \u2014 the summit'},
+  ],
+  tierOf(avgPct, att){
+    const T=this.TIERS;
+    if(avgPct===null || (att||0)<5) return {...T[0], i:0};
+    for(let i=T.length-1;i>=1;i--){ if(att>=T[i].att && avgPct<=T[i].pct) return {...T[i], i}; }
+    return {...T[1], i:1};
+  },
+  levelOf(xp){ let lvl=1, need=150, floor=0;
+    while(xp>=floor+need){ floor+=need; lvl++; need=150*lvl; }
+    return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; },
+  computeXP(myRuns, pl){
+    const perD={}; let xp=0;
+    (myRuns||[]).forEach(r=>{ const ch=r.challenge||'';
+      if(ch.indexOf('daily-')===0){ xp+=30; return; }
+      if(ch.indexOf('wk-')===0){ xp+=25; return; }
+      const nth=(perD[ch]=(perD[ch]||0)+1);
+      xp += nth===1 ? 50 : (nth<=10 ? 15 : 3); });
+    return xp + 25*(pl.t10||0) + 100*(pl.pod||0) + 250*(pl.crowns||0);
+  },
+  // per-user placements from a full best-sorted runs list (mouse_used=false, time asc)
+  standing(runs, meId, menuOrder){
+    const per={}; menuOrder.forEach(k=>per[k]=[]);
+    const seen={};
+    runs.forEach(x=>{ if(per[x.challenge]===undefined) return; const key=x.challenge+'|'+x.user_id;
+      if(!seen[key]){ seen[key]=true; per[x.challenge].push(x); } });
+    let att=0,sum=0,crowns=0,pod=0,t10=0;
+    menuOrder.forEach(k=>{ const b=per[k]; const idx=b.findIndex(r=>r.user_id===meId);
+      if(idx>=0){ att++; sum+=idx/b.length; if(idx===0)crowns++; if(idx<3)pod++; if(idx<10)t10++; } });
+    return {att, avgPct:att?sum/att:null, crowns, pod, t10, per};
+  }
+};

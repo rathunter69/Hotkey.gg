@@ -23,8 +23,18 @@ IB associate, restructuring) is founder; Claude is sole developer.
   nav.css, leaderboard.html, reference.html, About.html, privacy/terms/security.html,
   favicon.svg. supabase/ IS in the repo: migrations/ deploy
   automatically on push via the Supabase GitHub integration (VERIFIED working —
-  never paste SQL in the dashboard again). stats.html is part of the deploy set.
+  never paste SQL in the dashboard again). stats.html AND account.html are part of the deploy set. Shared asset version: v17.
 - Never put secret/service-role/Stripe secret keys in client code.
+
+## Structural pipeline (assessed 2026-07-07, priority order)
+S1 DONE account.html + stats refinement (r17) · S2 ghost cursor on the grid (traces
+ready) · S3 campaign mode — ordered curriculum path w/ unlocks (the Duolingo half;
+biggest structural lift, biggest retention) · S4 drillgen engine integration ·
+S5 onboarding funnel v2 (signup→placement→first PB→share card prompt) · S6 PWA
+install (app feel + unlocks Ctrl+PgUp/PgDn) · S7 server streaks + re-engagement
+email (needs Edge Function) · S8 usage-analytics admin view (the B2B evidence
+story) · S9 team spaces v2 (invite links, team pages) · S10 rank-math
+consolidation onto HK_RANK (5 copies today).
 
 ## Conventions (bugs earned these)
 - **CACHE-BUSTING (round 16):** every shared-asset reference uses ?v=N

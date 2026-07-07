@@ -467,3 +467,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   +crown (First-Year) → +wings (Top-Bucket) → crowned star crest with pulse
   (Second-Year). rankEmblem(name, size); card renders 22px. Sync themes.js + index inline.
 - User menu: 'Profile & stats' → 'Player card' + direct 'Your numbers' → stats.html.
+
+---
+# ROUND 17 — ladder overview, desktop fit, account page, stats refinement
+- LEADERBOARD: maxw 880→1180 (the desktop blank-space complaint); hero is now
+  3 panels ≥1080px: Your Card | THE LADDER (new rank-overview: all 6 tiers with
+  emblems + requirements, your rung glowing) | Top Players. Boards with <5 entries
+  render faint "open lane" filler rows — kills whitespace AND invites competition.
+- SHARED HELPERS: window.HK_RANK in themes.js (TIERS+req text, tierOf, levelOf,
+  computeXP, standing). New pages use it; index/nav.js/leaderboard keep documented
+  duplicates — 5-way sync on threshold changes (consolidation queued).
+- ACCOUNT.HTML (new page, in deploy set): title card (42px emblem, tier pill,
+  LVL+XP bar, team tag, crowns/podiums/solves, member-since), handle rename,
+  team code, password change, pro status, sign out. Anon users get a claim-your-
+  handle CTA. User menu "Account settings" → this page (modal retired from menu).
+- STATS.HTML: title-card strip on top (emblem+tier+LVL+account link), group
+  headers in the per-drill list, Recent Runs (last 10 with keys + date).
+- Cache version v17 everywhere.

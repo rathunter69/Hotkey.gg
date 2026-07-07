@@ -449,7 +449,7 @@
           '<a id="umProfile">Player card</a>' +
           '<a href="stats.html">Your numbers</a>' +
           saveItem +
-          '<a id="umSettings">Account settings</a>' +
+          '<a href="account.html">Account</a>' +
           '<a id="umSignout">Sign out</a>' +
         '</div>' +
       '</div>';

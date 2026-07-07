@@ -52,8 +52,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=16">
-<script src="drills.js?v=16"></script>
+<link rel="stylesheet" href="nav.css?v=17">
+<script src="drills.js?v=17"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -61,8 +61,8 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=16"></script>
-<script src="nav.js?v=16"></script>
+<script src="themes.js?v=17"></script>
+<script src="nav.js?v=17"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -116,7 +116,20 @@ async function load(){
 
   let streakN=0; try{ const s=JSON.parse(localStorage.getItem('hotkey_streak')||'{}'); streakN=s.n||0; }catch(e){}
 
-  let html = `<div class="cards">
+  // title-card strip: emblem + tier + level, from shared HK_RANK helpers
+  let tcHtml='';
+  if(me && window.HK_RANK){
+    const st = window.HK_RANK.standing(all, me.id, D.menuOrder);
+    const tier = window.HK_RANK.tierOf(st.avgPct, st.att);
+    const xp = window.HK_RANK.computeXP(mine, st);
+    const L = window.HK_RANK.levelOf(xp);
+    tcHtml = `<div class="stat hero" style="grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap">`+
+      `<span class="${tier.cls}" style="display:inline-flex;color:inherit;filter:drop-shadow(0 0 6px currentColor)">${window.rankEmblem?window.rankEmblem(tier.name,34):''}</span>`+
+      `<div><div style="font-family:var(--mono);font-weight:700;font-size:15px">${tier.name}</div>`+
+      `<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">LVL ${L.lvl} \u00b7 ${L.into}/${L.need} xp \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`+
+      `<span style="flex:1;min-width:120px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${L.pct}%;background:var(--accent)"></span></span></div>`;
+  }
+  let html = tcHtml + `<div class="cards">
     <div class="stat hero"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
     <div class="stat"><div class="big">${bestKps?bestKps.toFixed(1):'—'}</div><div class="lbl">peak keys / sec</div></div>
     <div class="stat"><div class="big">${avgEff!==null?avgEff+'<em>%</em>':'—'}</div><div class="lbl">avg efficiency vs par</div></div>
@@ -131,6 +144,7 @@ async function load(){
   let lastG=null;
   D.menuOrder.forEach(k=>{
     const grp = D.groupOf[k]||'';
+    if(grp!==lastG){ html+=`<div style="font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin:18px 0 8px">${esc(grp)}</div>`; lastG=grp; }
     const label = D.labelOf[k]||k;
     // my best posted run for this drill (mine[] is time-sorted)
     const best = mine.find(x=>x.challenge===k) || null;
@@ -157,6 +171,15 @@ async function load(){
       `</div>`;
   });
 
+  if(mine.length){
+    const recent = mine.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,10);
+    html += `<h3 class="section-title">Recent runs</h3>`;
+    recent.forEach(r=>{
+      const label = (D.labelOf[r.challenge]) || (r.challenge.indexOf('daily-')===0?'\u26a1 daily':(r.challenge.indexOf('wk-')===0?'\ud83c\udfc1 gauntlet leg':r.challenge));
+      const when = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+      html += `<div class="drow"><span class="nm">${esc(label)}</span><span class="pb">${fmtS(r.time_ms)}</span><span class="eff">${r.keystrokes||'\u2014'} keys</span><span class="eff">${when}</span></div>`;
+    });
+  }
   root.innerHTML = html;
 }
 load();
