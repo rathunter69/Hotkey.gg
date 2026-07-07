@@ -211,7 +211,7 @@ async function load(){
   try{
     try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null; }catch(e){}
     const [p, r, s] = await Promise.all([
-      sb.from('profiles').select('id,handle'),
+      sb.from('profiles').select('id,handle,team_code'),
       sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
     ]);
@@ -221,6 +221,13 @@ async function load(){
     return;
   }
   const names={}; profs.forEach(p=>{ names[p.id]=p.handle||'anon'; });
+  // team view: if I have a team_code, offer a filter to just my cohort
+  let teamIds=null, myTeam=null;
+  if(meId){ const me=profs.find(p=>p.id===meId);
+    if(me && me.team_code){ myTeam=me.team_code;
+      teamIds=new Set(profs.filter(p=>p.team_code===me.team_code).map(p=>p.id)); } }
+  const teamOnly = myTeam && sessionStorage.getItem('hk_teamview')==='1';
+  const fRuns = teamOnly ? runs.filter(r=>teamIds.has(r.user_id)) : runs;
 
   // Your standing across every per-drill board — the scoreboard of scoreboards.
   let html='';
@@ -268,13 +275,17 @@ async function load(){
   RAPID_DURS.forEach(d=>{
     html += sessionBoardHtml(d.label, 'Session', bestPerUser(sessions,'rapidfire',d.sec), names, meId, rapidScore);
   });
-  html += '<h3 class="section-title">Per-drill bests</h3>';
+  html += '<h3 class="section-title">Per-drill bests'+(myTeam
+    ? ' <a id="teamToggle" style="float:right;cursor:pointer;font-size:11px;letter-spacing:.5px;color:'+(teamOnly?'var(--accent)':'var(--muted)')+';border:1px solid '+(teamOnly?'var(--accent-dim)':'var(--line)')+';border-radius:999px;padding:4px 12px;text-transform:none">'+(teamOnly?'\u25c9 team: '+myTeam:'\u25cb show team only')+'</a>'
+    : '')+'</h3>';
   CH.forEach(c=>{
     const seen={}, best=[];
-    runs.filter(x=>x.challenge===c.key).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });
+    fRuns.filter(x=>x.challenge===c.key).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });
     html += boardHtml(c, best, names, meId);
   });
   root.innerHTML=html;
+  const tt=document.getElementById('teamToggle');
+  if(tt) tt.onclick=()=>{ sessionStorage.setItem('hk_teamview', teamOnly?'0':'1'); load(); };
 }
 load();
 </script>

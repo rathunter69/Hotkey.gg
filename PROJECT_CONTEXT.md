@@ -84,8 +84,11 @@ Round 7: parity sweep (Delete-range/Backspace-edit/F2/Ctrl+A), rank pill on all
 pages (hk_rank sessionStorage cache; tierOf duplicated index↔nav.js — sync both),
 stats.html (in shared nav), supabase/ folder + GitHub Action deploy (needs repo
 secret SUPABASE_ACCESS_TOKEN — see supabase/README.md; migrations idempotent).
-Deploy set += stats.html, supabase/, .github/. Queue: placement test → share
-cards → team codes.
+Deploy set += stats.html, supabase/, .github/. Round 8: placement onboarding (nav-tour + pace verdict; tour demoted), share cards
+(canvas PNG from results), team codes (profiles.team_code migration + settings UI +
+leaderboard team-only toggle), index nav icons + stats link, rank pill always-on.
+Queue: weekly gauntlet, ghost replays, drillgen engine integration, RF profile
+aliases, F2-audit + transpose drills, streak server-sync, campaign mode.
 Weekly gauntlet shelled in dev/AUDIT.md.
 
 ## Curriculum v2 (current focus)

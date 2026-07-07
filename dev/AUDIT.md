@@ -294,3 +294,19 @@ mode='gauntlet', duration_sec=week number. Attempt-once enforced client-side fir
 
 ## Queue: #6 placement test → #7 share cards → #8 team codes. Deploy set now also
 ## includes stats.html + supabase/ + .github/.
+
+---
+# ROUND 8 (final Fable pass) — placement, share cards, team codes, polish
+- Rank pill fix: it required a signed-in non-anon user — that's why Wolf saw nothing.
+  Now always shows (Candidate default). Also: GitHub Pages caches hard — Ctrl+Shift+R.
+- Index nav now matches shared nav: icons + stats link (was text-only, missing stats).
+- PLACEMENT (replaces the clunky tour as primary onboarding): "60-second placement —
+  find your rung" runs the navigation tour; results show a pace verdict mapped to the
+  ladder (t/par ratio: ≤1 Top-Bucket … >3 Candidate). Tour still exists via guided mode.
+- SHARE CARDS: results modal gains "download share card" — 1000×524 canvas PNG,
+  theme-colored, drill/time/keys/rank/branding. Client-side only.
+- TEAM CODES: profiles.team_code (migration 20260707000000, auto-deploys via the
+  Supabase integration/Action); Account settings gains team section (set/leave);
+  leaderboard per-drill section gains "show team only" toggle when you have a team.
+- Supabase GitHub integration (Wolf connected it directly): fine — if both it and our
+  Action run migrations, they're idempotent; disable the Action later if redundant.

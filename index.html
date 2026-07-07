@@ -805,9 +805,10 @@
   <div class="topnav-in">
     <a class="topnav-brand" href="/" title="hotkey.gg — excel trainer">hotkey<b>.gg</b></a>
     <div class="topnav-pages">
-      <a class="topnav-link active" href="/">trainer</a>
-      <a class="topnav-link" href="leaderboard.html">leaderboard</a>
-      <a class="topnav-link" href="reference.html">reference</a>
+      <a class="topnav-link active" href="/" title="trainer"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="tl-label">trainer</span></a>
+      <a class="topnav-link" href="leaderboard.html" title="leaderboard"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg><span class="tl-label">leaderboard</span></a>
+      <a class="topnav-link" href="stats.html" title="stats"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 5-8"/></svg><span class="tl-label">stats</span></a>
+      <a class="topnav-link" href="reference.html" title="reference"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.6-1-4-1.5-6-1.5S2 5 2 5v13s2-.5 4-.5 4.4.5 6 1.5c1.6-1 4-1.5 6-1.5s4 .5 4 .5V5s-2-.5-4-.5-4.4.5-6 1.5Z"/><path d="M12 6v13"/></svg><span class="tl-label">reference</span></a>
     </div>
     <div class="topnav-tools">
       <button class="topnav-icon" id="navShortcuts" title="keyboard shortcuts (?)" aria-label="keyboard shortcuts">
@@ -937,9 +938,9 @@
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
-    <div class="ob-body">First time here? Quick 20-second walkthrough.</div>
+    <div class="ob-body">The ladder runs Candidate → Second-Year Analyst. One drill tells you where you start.</div>
     <div class="ob-opts">
-      <button class="ob-key primary" id="obStart">▶ Show me how it works</button>
+      <button class="ob-key primary" id="obStart">🎯 60-second placement — find your rung</button>
       <button class="ob-key" id="obSkip">Skip — I’ll dive in</button>
     </div>
   </div>
@@ -2673,6 +2674,34 @@ function showRankBadge(rk){
   if(rk.isFirst){ el.innerHTML='👑 <b>#1</b> on this drill — you lead'; el.className='rm-rank lead'; }
   else { el.innerHTML='<b>#'+rk.rank+' of '+rk.total+'</b> · +'+rk.gap.toFixed(2)+'s off #1'; el.className='rm-rank'; }
 }
+function makeShareCard(o){
+  // 1000x524 PNG — brand, drill, time, rank; downloads locally, no server involved.
+  const cv=document.createElement('canvas'); cv.width=1000; cv.height=524;
+  const x=cv.getContext('2d');
+  const css=getComputedStyle(document.documentElement);
+  const col=v=>css.getPropertyValue(v).trim()||'#000';
+  x.fillStyle=col('--bg'); x.fillRect(0,0,1000,524);
+  x.fillStyle=col('--surface'); x.fillRect(28,28,944,468);
+  x.strokeStyle=col('--accent'); x.lineWidth=2; x.strokeRect(28,28,944,468);
+  x.fillStyle=col('--accent'); x.font='700 30px "JetBrains Mono", monospace';
+  x.fillText('hotkey.gg', 64, 92);
+  x.fillStyle=col('--muted'); x.font='500 20px "JetBrains Mono", monospace';
+  x.fillText('keyboard-only excel · no mouse allowed', 64, 126);
+  const label=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.labelOf[cur])||cur;
+  x.fillStyle=col('--text'); x.font='700 44px "Hanken Grotesk", sans-serif';
+  x.fillText(label, 64, 214);
+  x.fillStyle=col('--accent'); x.font='700 120px "JetBrains Mono", monospace';
+  x.fillText(o.t+'s', 64, 350);
+  x.fillStyle=col('--muted'); x.font='500 24px "JetBrains Mono", monospace';
+  x.fillText(o.keys+' keys · par '+o.par, 64, 400);
+  let rank=''; try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null'); if(c) rank=c.n; }catch(e){}
+  if(rank){ x.fillStyle=col('--warn'); x.font='700 22px "JetBrains Mono", monospace';
+    x.fillText(rank.toUpperCase(), 64, 452); }
+  x.fillStyle=col('--faint'); x.font='500 18px "JetBrains Mono", monospace';
+  x.fillText('think you\u2019re faster? hotkey.gg', 620, 452);
+  const a=document.createElement('a');
+  a.download='hotkey-'+cur+'-'+o.t+'s.png'; a.href=cv.toDataURL('image/png'); a.click();
+}
 function showResults(o){
   const best = PB[cur]!==undefined ? PB[cur].toFixed(2)+'s' : '—';
   let postRow;
@@ -2706,6 +2735,25 @@ function showResults(o){
   const sp=$('rmSaveProg'); if(sp) sp.onclick=()=>openAuth('signup');
   const spi=$('rmSaveProgInline'); if(spi) spi.onclick=()=>openAuth('signup');
   $('result').innerHTML='';
+  // placement verdict + share card (appended post-render; independent of the modal template)
+  try{
+    const card = m.querySelector('.pc-card, .res-card, div');
+    if(placementMode){
+      placementMode=false;
+      const v=document.createElement('div');
+      v.style.cssText='font-family:var(--mono);font-size:14px;color:var(--warn);margin:10px 0 2px;font-weight:700;letter-spacing:.4px';
+      v.textContent='\ud83c\udfaf placement: '+placementVerdict(parseFloat(o.t), CHALLENGES[cur].par);
+      if(card) card.insertBefore(v, card.children[1]||null);
+    }
+    if(!o.mouse && !o.guided){
+      const sh=document.createElement('button');
+      sh.className='ob-key'; sh.style.cssText='margin-top:10px;width:100%';
+      sh.textContent='\u2b07 download share card';
+      sh.onclick=()=>makeShareCard(o);
+      if(card) card.appendChild(sh);
+    }
+  }catch(e){}
+
 }
 function hideResults(){ const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 function nextChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i+1)%MENU_ORDER.length]); }
@@ -3124,7 +3172,7 @@ document.addEventListener('keydown',e=>{
     }
     if(k==='Enter'){
       e.preventDefault();
-      if(onboardChoice===0) startGuidedIntro(); else skipOnboard();
+      if(onboardChoice===0) startPlacement(); else skipOnboard();
       return;
     }
     if(k==='Escape'){ e.preventDefault(); skipOnboard(); return; }
@@ -4860,7 +4908,7 @@ async function updateRankPill(){
     el.onclick=()=>{ try{ openProfile(); }catch(e){} }; };
   try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null');
     if(c && c.exp>Date.now()){ show({name:c.n, cls:c.c}); return; } }catch(e){}
-  if(!sb || !me_user || isAnonUser()) return;
+  if(!sb || !me_user || isAnonUser()){ show({name:'Candidate', cls:'tier-unranked'}); return; }
   try{
     const [p,r] = await Promise.all([
       sb.from('profiles').select('id'),
@@ -5158,12 +5206,27 @@ function showOnboard(){
   if(onboarded) return;
   const o=$('onboard'); if(!o) return;
   onboardOpen=true; onboardChoice=0; o.classList.add('show');
-  const s=$('obStart'); if(s) s.onclick=startGuidedIntro;
+  const s=$('obStart'); if(s) s.onclick=startPlacement;
   const k=$('obSkip'); if(k) k.onclick=skipOnboard;
   paintOnboard();
 }
 function closeOnboard(){ onboardOpen=false; const o=$('onboard'); if(o) o.classList.remove('show'); }
 function skipOnboard(){ markOnboarded(); closeOnboard(); }
+let placementMode=false;
+function startPlacement(){
+  markOnboarded(); closeOnboard();
+  placementMode=true;
+  loadChallenge('navigation');   // the 12-chord tour IS the placement — pure movement skill
+}
+// time-vs-par → starting-rung verdict (display only; the real ladder is earned on the boards)
+function placementVerdict(t, par){
+  const r = t/Math.max(1,par);
+  if(r<=1.0) return 'Top-Bucket Analyst pace';
+  if(r<=1.5) return 'First-Year Analyst pace';
+  if(r<=2.2) return 'Incoming Analyst pace';
+  if(r<=3.0) return 'Summer Analyst pace';
+  return 'Candidate — the ladder starts here';
+}
 async function startGuidedIntro(){
   markOnboarded(); closeOnboard();
   loadChallenge(MENU_ORDER[0]);          // Foundations — "Copy it over"
