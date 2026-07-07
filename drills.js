@@ -42,23 +42,23 @@ window.HOTKEY_DRILLS = {
   // ---------------------------------------------------------------
   meta: {
     // Foundations
-    navigation: { name:'Navigate', label:'Navigation tour',     tab:'Nav',         desc:'Full obstacle course: 4 nav chords + select rows + insert/delete' },
+    navigation: { name:'Navigate', label:'Navigation tour',     tab:'Nav',         desc:'The full obstacle course — 12 chords: edges, selections, rows, columns' },
     copyover:   { name:'Copyover', label:'Copy it over',        tab:'Basics',      desc:'Select, copy, and paste a block — all keyboard' },
 
     // Formatting
     polish:     { name:'Polish',   label:'Polish the Header',   tab:'Header',      desc:'Bold + bottom border + shade a header row' },
     combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Bold, comma, wrap and autofit a pasted table' },
     format:     { name:'Format',   label:'Fix the formats',     tab:'Formats',     desc:'Triage the units — percent, currency, comma' },
-    center:     { name:'Center',   label:'Center the headers',  tab:'Align',       desc:'Center the column-header row — Alt H A C' },
+    center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Center, left, right — three alignment passes, house style' },
     blue:       { name:'Blue',     label:'Blue the inputs',     tab:'Inputs',      desc:'Blue the hardcoded inputs — Alt H F C' },
     gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Model',       desc:'A full model-ready formatting pass' },
 
     // Values
     drill:      { name:'Drill',    label:'Hardcode it',         tab:'Hardcode',    desc:'Paste-special values to strip the formulas' },
-    series:     { name:'Series',   label:'Stub the year header',tab:'Years',       desc:'Fill a year header across — Alt H F I S' },
+    series:     { name:'Series',   label:'Stub the year header',tab:'Years',       desc:'Fill the year header, then bold + right-align it' },
 
     // Data
-    sort:       { name:'Sort',     label:'Sort the league table',tab:'Sort',       desc:'Sort a deal table descending — Alt A S D' },
+    sort:       { name:'Sort',     label:'Sort the league table',tab:'Sort',       desc:'Sort the league table, foot it, bold the total' },
 
     // Formulas
     margin:     { name:'Formula',  label:'Build the margin',    tab:'Margin',      desc:'Build a margin formula down the column' },

@@ -1511,29 +1511,44 @@ const CHALLENGES = {
     }
   },
   center:{
-    name:'Center', label:'Center the headers', par:14, parKeys:8,
-    prompt:'Center the column-header row across the table. Headers are A1:E1 (the labels in row 1). Select the row, then center it with the ribbon.',
-    req:'<em>select A1:E1</em> · <em>alt h a c</em> — Home tab → Align → Center · headers center together',
+    name:'Center', label:'Set the alignment', par:38, parKeys:26,
+    prompt:'Three alignment passes, house style: center the column headers, left-align the row labels (they pasted in centered), and right-align the total row (numbers never sit left). Alt H A C / L / R — same door, three rooms.',
+    req:'<em>headers</em> A1:E1 &rarr; <em>alt h a c</em> · <em>labels</em> A2:A5 &rarr; <em>alt h a l</em> · <em>totals</em> B6:E6 &rarr; <em>alt h a r</em>',
     guide:[
-      'pop the cursor to the header row, then <kbd>shift</kbd>+<kbd>space</kbd> to grab the whole row (or arrow + <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>→</kbd> to A1:E1)',
-      'center it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd>',
+      'from A1, <kbd>shift</kbd>+<kbd>&rarr;</kbd>&times;4 grabs the headers · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> centers them',
+      'down to A2, <kbd>shift</kbd>+<kbd>&darr;</kbd>&times;3 grabs the labels · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd> pins them left',
+      'over to B6, <kbd>shift</kbd>+<kbd>&rarr;</kbd>&times;3 grabs the total row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> pushes the numbers right',
     ],
-    targets:['A1:E1','A1:E1'],
+    targets:['A1:E1','A2:A5','B6:E6'],
     demo(){ return [
       {sel:'A1:E1', keys:[Kb.alt,L('H'),L('A'),L('C')]},
+      {sel:'A2:A5', keys:[Kb.alt,L('H'),L('A'),L('L')]},
+      {sel:'B6:E6', keys:[Kb.alt,L('H'),L('A'),L('R')]},
     ]; },
     build(){
       const cells={};
       ['Sector','Q1','Q2','Q3','Q4'].forEach((h,i)=>cells[colLetter(i+1)+1]={...blankCell(),value:h,txt:true,bold:true});
       const sectors=['Tech','Health','Energy','Retail'];
-      for(let r=2;r<=5;r++){ cells['A'+r]={...blankCell(),value:sectors[r-2],txt:true};
-        for(let c=2;c<=5;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(12,48)*100,fmtStyle:'comma',decimals:0};
+      const colSums=[0,0,0,0];
+      for(let r=2;r<=5;r++){
+        cells['A'+r]={...blankCell(),value:sectors[r-2],txt:true,align:'c'};   // wrong on purpose — user fixes to left
+        for(let c=2;c<=5;c++){ const v=rnd(12,48)*100; colSums[c-2]+=v;
+          cells[colLetter(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0};
+        }
       }
-      return {ROWS:5, cells, active:{r:1,c:1}, sel:null, colW:{1:84,2:72,3:72,4:72,5:72}};
+      cells['A6']={...blankCell(),value:'Total',txt:true,bold:true};
+      for(let c=2;c<=5;c++) cells[colLetter(c)+6]={...blankCell(),value:colSums[c-2],fmtStyle:'comma',decimals:0,bold:true,align:'l'};  // wrong on purpose — user fixes to right
+      return {ROWS:6, cells, active:{r:1,c:1}, sel:null, colW:{1:84,2:72,3:72,4:72,5:72}};
     },
     checks(S){
-      const allCentered=()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+1]; if(!x||x.align!=='c') return false; } return true; };
-      return [{label:'center the header row (A1:E1)', ok: allCentered()}];
+      const hOk=()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+1]; if(!x||x.align!=='c') return false; } return true; };
+      const lOk=()=>{ for(let r=2;r<=5;r++){ const x=S.cells['A'+r]; if(!x||x.align!=='l') return false; } return true; };
+      const rOk=()=>{ for(let c=2;c<=5;c++){ const x=S.cells[colLetter(c)+6]; if(!x||x.align!=='r') return false; } return true; };
+      return [
+        {label:'center the header row (Alt H A C)', ok: hOk()},
+        {label:'left-align the row labels (Alt H A L)', ok: lOk()},
+        {label:'right-align the total row (Alt H A R)', ok: rOk()},
+      ];
     }
   },
   blue:{
@@ -1580,28 +1595,31 @@ const CHALLENGES = {
     }
   },
   sort:{
-    name:'Sort', label:'Sort the league table', par:18, parKeys:6,
-    prompt:'Sort the deal table by size, largest first. Select the data rows including the size column, then use the Data tab Sort shortcut.',
-    req:'<em>select A2:B5</em> (with active cell in column B) · <em>alt a s d</em> — Data → Sort → Z→A · rows reorder by size',
+    name:'Sort', label:'Sort the league table', par:33, parKeys:21,
+    prompt:'League-table workflow, start to finish: sort the six deals by size, largest first, then foot the column with AutoSum and bold the total. Sort, foot, bold — the whole rep.',
+    req:'<em>select A2:B7</em> (active in column B) · <em>alt a s d</em> sorts Z&rarr;A · drop to B8 · <em>alt+=</em> &rarr; <em>↵</em> foots it · back up, <em>ctrl+b</em>',
     guide:[
-      'cursor to B2, then <kbd>shift</kbd>+<kbd>↓</kbd> <kbd>↓</kbd> <kbd>↓</kbd> to extend down through B5 (active stays at B2 = column B)',
-      'extend left one column · <kbd>shift</kbd>+<kbd>←</kbd>',
+      'cursor to B2 · <kbd>shift</kbd>+<kbd>&darr;</kbd>&times;5 down through B7 · <kbd>shift</kbd>+<kbd>&larr;</kbd> pulls in the deal names',
       'sort largest first · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd>',
+      'drop to B8 · <kbd>alt</kbd>+<kbd>=</kbd> proposes SUM(B2:B7) · commit <kbd>↵</kbd>',
+      'back up to B8 (<kbd>↑</kbd>) · <kbd>ctrl</kbd>+<kbd>b</kbd> bolds the total',
     ],
-    targets:['A2:B5','A2:B5','A2:B5'],
+    targets:['A2:B7','A2:B7','B8','B8'],
     demo(){ return [
-      {sel:'A2:B5', active:'B2', keys:[Kb.alt,L('A'),L('S'),L('D')]},
+      {sel:'A2:B7', active:'B2', keys:[Kb.alt,L('A'),L('S'),L('D')]},
+      {sel:'B8', keys:[Kb.eq, Kb.enter]},
+      {sel:'B8', keys:[Kb.bold]},
     ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:'Deal',txt:true,bold:true};
       cells['B1']={...blankCell(),value:'Size ($M)',txt:true,bold:true,align:'r'};
-      // Randomized every run: pick 4 names and 4 DISTINCT sizes, then shuffle the
-      // start order (re-rolling if it lands already sorted, so there's always work to do).
+      // Randomized every run: 6 names, 6 DISTINCT sizes, start order shuffled
+      // (re-rolling if it lands already sorted, so there is always work to do).
       const pool=['TechCo','HealthCo','EnergyCo','RetailCo','MediaCo','FinCo','AeroCo','ShipCo'];
       for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const names=pool.slice(0,4);
-      const sizes=new Set(); while(sizes.size<4) sizes.add(rnd(12,68)*10);
+      const names=pool.slice(0,6);
+      const sizes=new Set(); while(sizes.size<6) sizes.add(rnd(12,68)*10);
       let deals=names.map((n,i)=>[n,[...sizes][i]]);
       const isSortedDesc=d=>d.every((p,i)=>i===0||d[i-1][1]>=p[1]);
       do{ for(let k=deals.length-1;k>0;k--){ const j=rnd(0,k); [deals[k],deals[j]]=[deals[j],deals[k]]; } }while(isSortedDesc(deals));
@@ -1609,45 +1627,56 @@ const CHALLENGES = {
         cells['A'+(i+2)]={...blankCell(),value:deals[i][0],txt:true};
         cells['B'+(i+2)]={...blankCell(),value:deals[i][1],fmtStyle:'comma',decimals:0};
       }
+      cells['A8']={...blankCell(),value:'Total',txt:true,bold:true};
+      cells['B8']={...blankCell(),fmtStyle:'comma',decimals:0};
       // Expected end-state computed from THIS run's data — never hardcode answers in checks.
       this._sorted=deals.slice().sort((a,b)=>b[1]-a[1]);
-      return {ROWS:5, cells, active:{r:2,c:2}, sel:null, colW:{1:100,2:88}};
+      this._total=deals.reduce((s,d)=>s+d[1],0);
+      return {ROWS:8, cells, active:{r:2,c:2}, sel:null, colW:{1:100,2:88}};
     },
     checks(S){
-      const sizes=[2,3,4,5].map(r=>S.cells['B'+r] && S.cells['B'+r].value);
+      const rows=[2,3,4,5,6,7];
+      const sizes=rows.map(r=>S.cells['B'+r] && S.cells['B'+r].value);
       const sortedDesc = sizes.every((v,i)=> i===0 || sizes[i-1]>=v);
-      // deal names must move with their sizes — compare against the per-run expected order
       const exp=this._sorted||[];
-      const aligned = exp.length===4 && exp.every((p,i)=>{
+      const aligned = exp.length===6 && exp.every((p,i)=>{
         const nm=S.cells['A'+(i+2)] && S.cells['A'+(i+2)].value;
         const sz=S.cells['B'+(i+2)] && S.cells['B'+(i+2)].value;
         return nm===p[0] && sz===p[1];
       });
+      const t=S.cells['B8'];
+      const footOk=!!(t&&t.formula&&/SUM/i.test(t.formula))&&Math.abs((t.value||0)-this._total)<1e-6;
+      const boldOk=!!(t&&t.bold);
       return [
-        {label:'Size column sorted largest to smallest (descending)', ok: sortedDesc},
+        {label:'Size column sorted largest to smallest', ok: sortedDesc},
         {label:'Deal names follow their sizes', ok: aligned},
+        {label:'foot the column — AutoSum at B8', ok: footOk},
+        {label:'bold the total', ok: boldOk},
       ];
     }
   },
   series:{
-    name:'Years', label:'Stub the year header', par:14, parKeys:8,
-    prompt:'Extend the year header across the table. B1 has 2024 and C1 has 2025 (the seed). Select B1:F1 and fill the series across.',
-    req:'<em>select B1:F1</em> · <em>alt h f i s ↵</em> — Home → Fill → Series → apply · years fill across (2026, 2027, 2028)',
+    name:'Years', label:'Stub the year header', par:25, parKeys:13,
+    prompt:'Extend and dress the year header in one pass. B1 has 2024, C1 has 2025 — select B1:F1, fill the series across, then bold the whole header and right-align it so the years sit over their number columns.',
+    req:'<em>select B1:F1</em> · <em>alt h f i s ↵</em> fills 2026-2028 · selection holds &rarr; <em>ctrl+b</em> bold · <em>alt h a r</em> right-align',
     guide:[
-      'cursor to B1, then <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>→</kbd> to extend through F1',
-      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> opens the Series dialog',
-      'apply defaults · <kbd>↵</kbd>',
+      'cursor to B1, then <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&rarr;</kbd>... stops at C1 — tap <kbd>shift</kbd>+<kbd>&rarr;</kbd> to F1 (or shift-arrow the whole way)',
+      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> opens Series · apply with <kbd>↵</kbd>',
+      'selection is still live — <kbd>ctrl</kbd>+<kbd>b</kbd> bolds the run',
+      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> right-aligns the years over their columns',
     ],
-    targets:['B1:F1','B1:F1','B1:F1'],
+    targets:['B1:F1','B1:F1','B1:F1','B1:F1'],
     demo(){ return [
       {sel:'B1:F1', active:'B1', keys:[Kb.alt,L('H'),L('F'),L('I'),L('S'),Kb.enter]},
+      {sel:'B1:F1', keys:[Kb.bold, Kb.alt,L('H'),L('A'),L('R')]},
     ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:'',txt:true};
-      cells['B1']={...blankCell(),value:2024,fmtStyle:'general',decimals:0,bold:true,align:'r'};
-      cells['C1']={...blankCell(),value:2025,fmtStyle:'general',decimals:0,bold:true,align:'r'};
-      // D1, E1, F1 left empty for the user to fill
+      // seeds arrive plain — bolding and right-aligning the header is part of the drill
+      cells['B1']={...blankCell(),value:2024,fmtStyle:'general',decimals:0};
+      cells['C1']={...blankCell(),value:2025,fmtStyle:'general',decimals:0};
+      // D1, E1, F1 left empty for the fill
       cells['A2']={...blankCell(),value:'Revenue',txt:true};
       cells['A3']={...blankCell(),value:'COGS',txt:true};
       cells['A4']={...blankCell(),value:'Gross profit',txt:true};
@@ -1655,13 +1684,14 @@ const CHALLENGES = {
     },
     checks(S){
       const wanted = {D1:2026, E1:2027, F1:2028};
-      const got = Object.keys(wanted).map(k=>({k, want:wanted[k], have:S.cells[k] && S.cells[k].value}));
-      const allMatch = got.every(g=>g.have===g.want);
-      // B1 and C1 should remain untouched as the seeds
+      const filled = Object.keys(wanted).every(k=>S.cells[k] && S.cells[k].value===wanted[k]);
       const seedsIntact = S.cells.B1 && S.cells.B1.value===2024 && S.cells.C1 && S.cells.C1.value===2025;
+      const dressed = ()=>{ for(const k of ['B1','C1','D1','E1','F1']){ const c=S.cells[k];
+        if(!c||!c.bold||c.align!=='r') return false; } return true; };
       return [
-        {label:'series filled across D1:F1 (2026, 2027, 2028)', ok: allMatch},
+        {label:'series filled across D1:F1 (2026, 2027, 2028)', ok: filled},
         {label:'seed cells B1, C1 unchanged', ok: seedsIntact},
+        {label:'header bolded and right-aligned, B1:F1', ok: dressed()},
       ];
     }
   },
@@ -1857,31 +1887,41 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation tour', par:20, parKeys:7,
-    prompt:'Full obstacle course: navigate the edges with four Ctrl-arrow chords, then drill the structural ops that reshape banking models — Shift+Space to grab entire rows, Ctrl+Shift+= to insert above, Ctrl+- to delete. No End key required.',
-    req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em> &rarr; <em>ctrl+shift+home</em> &rarr; <em>shift+space</em> &rarr; <em>ctrl+shift+=</em> &rarr; <em>ctrl+&minus;</em>',
+    name:'Navigate', label:'Navigation tour', par:30, parKeys:12,
+    prompt:'The full obstacle course — twelve chords, in order. Lap the edges with all four Ctrl-arrows, select to the edges with Ctrl+Shift, grab full rows and columns, insert and delete rows, and land back home. This is how analysts move: never one cell at a time.',
+    req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em> &rarr; <em>ctrl+&larr;</em> &rarr; <em>ctrl+&uarr;</em> &rarr; <em>ctrl+shift+&rarr;</em> &rarr; <em>ctrl+shift+&darr;</em> &rarr; <em>shift+space</em> &rarr; <em>ctrl+shift+=</em> &rarr; <em>ctrl+&minus;</em> &rarr; <em>ctrl+space</em> &rarr; <em>ctrl+home</em>',
     guide:[
-      '<kbd>ctrl</kbd>+<kbd>home</kbd>',
-      '<kbd>ctrl</kbd>+<kbd>&rarr;</kbd>',
-      '<kbd>ctrl</kbd>+<kbd>&darr;</kbd>',
-      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>home</kbd>',
-      '<kbd>shift</kbd>+<kbd>space</kbd>',
-      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>=</kbd>',
-      '<kbd>ctrl</kbd>+<kbd>&minus;</kbd>'
+      '<kbd>ctrl</kbd>+<kbd>home</kbd> — snap to A1',
+      '<kbd>ctrl</kbd>+<kbd>&rarr;</kbd> — jump to the end of the header row',
+      '<kbd>ctrl</kbd>+<kbd>&darr;</kbd> — dive to the bottom of the column',
+      '<kbd>ctrl</kbd>+<kbd>&larr;</kbd> — jump back to the start of the row',
+      '<kbd>ctrl</kbd>+<kbd>&uarr;</kbd> — climb back to the top',
+      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&rarr;</kbd> — select across the header',
+      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&darr;</kbd> — extend down: whole table selected',
+      '<kbd>shift</kbd>+<kbd>space</kbd> — blow the selection out to full rows',
+      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>=</kbd> — insert rows above',
+      '<kbd>ctrl</kbd>+<kbd>&minus;</kbd> — delete them again',
+      '<kbd>ctrl</kbd>+<kbd>space</kbd> — grab the entire column',
+      '<kbd>ctrl</kbd>+<kbd>home</kbd> — finish where you started',
     ],
-    targets:['A1','E1','E7','A1:E7','A1:H7','A1:H7','A1:H7'],
+    targets:['A1','E1','E7','A7','A1','A1:E1','A1:E7','A1:H7','A1:H7','A1:H7','A1:A7','A1'],
     demo(){ return [
       {sel:'C4',    keys:[Kb.ctrlHome]},
       {sel:'A1',    keys:[Kb.ctrlRight]},
       {sel:'E1',    keys:[Kb.ctrlDown]},
-      {sel:'E7',    keys:[{key:'Home', ctrl:true, shift:true}]},
+      {sel:'E7',    keys:[Kb.ctrlLeft]},
+      {sel:'A7',    keys:[{key:'ArrowUp', ctrl:true}]},
+      {sel:'A1',    keys:[{key:'ArrowRight', ctrl:true, shift:true}]},
+      {sel:'A1:E1', keys:[{key:'ArrowDown',  ctrl:true, shift:true}]},
       {sel:'A1:E7', keys:[{key:' ',    shift:true}]},
       {sel:'A1:H7', keys:[{key:'=',    ctrl:true, shift:true}]},
       {sel:'A1:H7', keys:[{key:'-',    ctrl:true}]},
+      {sel:'A1:H7', keys:[{key:' ',    ctrl:true}]},
+      {sel:'A1:A7', keys:[Kb.ctrlHome]},
     ]; },
     build(){
-      // 7×5 block of an income-statement-style table; cursor placed deliberately in the middle so plain arrows
-      // would take many presses but the chord tour visits A1 → E1 → E7 → whole range → reshape ops in seven chords.
+      // 7×5 income-statement-style table; cursor starts mid-grid so plain arrows would be slow —
+      // the chord tour laps the whole thing in twelve presses.
       const cells={};
       cells['A1']={...blankCell(),value:'Model',txt:true,bold:true};
       const labels=['Revenue','COGS','SG&A','Opex','D&A','EBIT'];
@@ -1892,38 +1932,55 @@ const CHALLENGES = {
       }
       return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74}};
     },
-    // Sequential progression: each step latches once and only once the previous one has — out-of-order presses
-    // don't satisfy later checks. We snapshot the initial ROWS count on first call so the insert/delete checks
-    // can compare against it (insert grows ROWS; delete brings it back).
+    // Sequential progression: each step latches once, and only after the previous one has.
+    // Out-of-order presses don't satisfy later checks. ROWS snapshot lets insert/delete compare.
     checks(S){
       if(!S.navProgress) S.navProgress = {
-        home:false, right:false, down:false, selAll:false, rowSel:false, rowIns:false, rowDel:false,
-        initialRows: S.ROWS
+        home:false, right:false, down:false, left:false, up:false,
+        selRow:false, selAll:false, rowSel:false, rowIns:false, rowDel:false,
+        colSel:false, finish:false, initialRows: S.ROWS
       };
       const np = S.navProgress;
-      if(!np.home   && S.active.r===1 && S.active.c===1) np.home  = true;
-      if( np.home   && !np.right  && S.active.r===1 && S.active.c===5) np.right  = true;
-      if( np.right  && !np.down   && S.active.r===7 && S.active.c===5) np.down   = true;
-      if( np.down   && !np.selAll && S.active.r===1 && S.active.c===1
-          && S.sel && S.sel.r===7 && S.sel.c===5) np.selAll = true;
-      // Step 5: Shift+Space extended the selection to all columns (rows 1-7 × cols 1..COLS)
-      if(np.selAll && !np.rowSel && S.sel){
-        const r1=Math.min(S.active.r,S.sel.r), r2=Math.max(S.active.r,S.sel.r);
-        const c1=Math.min(S.active.c,S.sel.c), c2=Math.max(S.active.c,S.sel.c);
-        if(r1===1 && r2===7 && c1===1 && c2===8) np.rowSel = true;
-      }
-      // Step 6: rows inserted — sheet has grown beyond its starting row count.
+      const selBounds = ()=>{ if(!S.sel) return null;
+        return { r1:Math.min(S.active.r,S.sel.r), r2:Math.max(S.active.r,S.sel.r),
+                 c1:Math.min(S.active.c,S.sel.c), c2:Math.max(S.active.c,S.sel.c) }; };
+      if(!np.home   && S.active.r===1 && S.active.c===1 && !S.sel) np.home  = true;
+      if( np.home   && !np.right && S.active.r===1 && S.active.c===5) np.right = true;
+      if( np.right  && !np.down  && S.active.r===7 && S.active.c===5) np.down  = true;
+      if( np.down   && !np.left  && S.active.r===7 && S.active.c===1) np.left  = true;
+      if( np.left   && !np.up    && S.active.r===1 && S.active.c===1 && !S.sel) np.up = true;
+      // Step 6: Ctrl+Shift+→ from A1 — header row A1:E1 selected
+      if(np.up && !np.selRow){ const b=selBounds();
+        if(b && b.r1===1 && b.r2===1 && b.c1===1 && b.c2===5) np.selRow = true; }
+      // Step 7: Ctrl+Shift+↓ — extend to the whole table A1:E7
+      if(np.selRow && !np.selAll){ const b=selBounds();
+        if(b && b.r1===1 && b.r2===7 && b.c1===1 && b.c2===5) np.selAll = true; }
+      // Step 8: Shift+Space — full rows (1..7 across every column)
+      if(np.selAll && !np.rowSel){ const b=selBounds();
+        if(b && b.r1===1 && b.r2===7 && b.c1===1 && b.c2===COLS) np.rowSel = true; }
+      // Step 9: rows inserted — sheet grew past its starting row count.
       if(np.rowSel && !np.rowIns && S.ROWS > np.initialRows) np.rowIns = true;
-      // Step 7: rows deleted — sheet has shrunk back to (or below) the starting row count.
+      // Step 10: rows deleted — back to (or below) the start.
       if(np.rowIns && !np.rowDel && S.ROWS <= np.initialRows) np.rowDel = true;
+      // Step 11: Ctrl+Space — a full column (single column, top to bottom; guards against
+      // the leftover full-row selection from the delete step auto-satisfying this).
+      if(np.rowDel && !np.colSel){ const b=selBounds();
+        if(b && b.c1===b.c2 && b.r1===1 && b.r2>=7) np.colSel = true; }
+      // Step 12: Ctrl+Home — land back on A1, selection collapsed.
+      if(np.colSel && !np.finish && S.active.r===1 && S.active.c===1 && !S.sel) np.finish = true;
       return [
-        {label:'Ctrl+Home \u2192 A1',                                ok: np.home},
-        {label:'Ctrl+\u2192 to end of header row (E1)',              ok: np.right},
-        {label:'Ctrl+\u2193 to bottom of column (E7)',               ok: np.down},
-        {label:'Ctrl+Shift+Home \u2192 select the whole range',      ok: np.selAll},
-        {label:'Shift+Space \u2192 select entire rows full width',   ok: np.rowSel},
-        {label:'Ctrl+Shift+= \u2192 insert rows above',              ok: np.rowIns},
-        {label:'Ctrl+\u2212 \u2192 delete the inserted rows',        ok: np.rowDel},
+        {label:'Ctrl+Home \u2192 A1',                                  ok: np.home},
+        {label:'Ctrl+\u2192 to the end of the header row',             ok: np.right},
+        {label:'Ctrl+\u2193 to the bottom of the column',              ok: np.down},
+        {label:'Ctrl+\u2190 back to the start of the row',             ok: np.left},
+        {label:'Ctrl+\u2191 back to the top',                          ok: np.up},
+        {label:'Ctrl+Shift+\u2192 \u2192 select across the header',    ok: np.selRow},
+        {label:'Ctrl+Shift+\u2193 \u2192 select the whole table',      ok: np.selAll},
+        {label:'Shift+Space \u2192 full rows, edge to edge',           ok: np.rowSel},
+        {label:'Ctrl+Shift+= \u2192 insert rows above',                ok: np.rowIns},
+        {label:'Ctrl+\u2212 \u2192 delete the inserted rows',          ok: np.rowDel},
+        {label:'Ctrl+Space \u2192 grab the entire column',             ok: np.colSel},
+        {label:'Ctrl+Home \u2192 finish where you started',            ok: np.finish},
       ];
     }
   }

@@ -50,7 +50,12 @@
   .row{display:grid; grid-template-columns:54px 1fr 96px; align-items:center; padding:13px 22px; border-bottom:1px solid var(--line); font-size:15px}
   .row:last-child{border-bottom:none}
   .rk{font-family:var(--mono); font-weight:700; color:var(--muted)}
-  .row.top .rk{color:var(--accent)}
+  .rk.r1{color:#e0b341; text-shadow:0 0 12px rgba(224,179,65,.45)}
+  .rk.r2{color:#c3c8cf}
+  .rk.r3{color:#c08457}
+  .row.top{background:linear-gradient(90deg, rgba(224,179,65,.07), transparent 60%)}
+  .row.top .nm{font-weight:700}
+  .tm .gap{color:var(--faint); font-size:11.5px; margin-left:7px}
   .row.me{background:var(--accent-glow)}
   .row.me .nm::after{content:" · you"; color:var(--accent); font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.3px}
   .row.you-extra{border-top:1px dashed var(--line)}
@@ -58,6 +63,18 @@
   .nm{font-weight:500}
   .tm{font-family:var(--mono); text-align:right; font-weight:500}
   .empty{padding:22px; color:var(--faint); font-family:var(--mono); font-size:13px; text-align:center}
+  .empty b{color:var(--accent); font-weight:700}
+  /* your-standing strip — the scoreboard of scoreboards */
+  .standing{grid-column:1/-1; background:var(--surface); border:1px solid var(--accent-dim);
+    border-left:3px solid var(--accent); border-radius:14px; padding:16px 22px;
+    display:flex; gap:26px; flex-wrap:wrap; align-items:baseline}
+  .standing .st-big{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--text)}
+  .standing .st-lbl{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-left:7px}
+  .standing .st-chase{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-left:auto}
+  .standing .st-chase b{color:var(--accent)}
+  .standing.cta{color:var(--muted); font-family:var(--mono); font-size:13px; line-height:1.6}
+  .standing.cta a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
+  @media(max-width:640px){ .standing .st-chase{margin-left:0} }
   .state{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:40px 30px; text-align:center}
   .state h2{font-size:19px; font-weight:600; margin-bottom:10px}
   .state p{font-size:14px; color:var(--muted); max-width:440px; margin:0 auto 18px; line-height:1.6}
@@ -117,20 +134,24 @@ const CH = (window.HOTKEY_DRILLS ? window.HOTKEY_DRILLS.menuOrder : []).map(key 
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmt(ms){ return (ms/1000).toFixed(2)+'s'; }
 
-function rowHtml(r,i,names,meId,extra){
+function rowHtml(r,i,names,meId,extra,leaderMs){
   const me = meId && r.user_id===meId;
+  const medal = i<3 ? ' r'+(i+1) : '';
+  // the chase: show your gap to the leader right on your row — the number to beat
+  const gap = (me && i>0 && leaderMs) ? `<span class="gap">+${((r.time_ms-leaderMs)/1000).toFixed(2)}</span>` : '';
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
-    `<span class="rk">${i+1}</span>`+
+    `<span class="rk${medal}">${i+1}</span>`+
     `<span class="nm">${esc(names[r.user_id]||'anon')}</span>`+
-    `<span class="tm">${fmt(r.time_ms)}</span></div>`;
+    `<span class="tm">${fmt(r.time_ms)}${gap}</span></div>`;
 }
 function boardHtml(c, best, names, meId){
   let body;
-  if(!best.length){ body='<div class="empty">no times yet — be the first</div>'; }
+  if(!best.length){ body='<div class="empty">no times yet — <b>claim this board</b></div>'; }
   else {
-    body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId)).join('');
+    const leaderMs = best[0].time_ms;
+    body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId,false,leaderMs)).join('');
     const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
-    if(myIdx>=10){ body += '<div class="you-gap">···</div>' + rowHtml(best[myIdx], myIdx, names, meId, true); }
+    if(myIdx>=10){ body += '<div class="you-gap">···</div>' + rowHtml(best[myIdx], myIdx, names, meId, true, leaderMs); }
   }
   return `<div class="board"><div class="board-cap"><h2>${esc(c.label)}</h2><span class="lvl">${esc(c.lvl)}</span></div>${body}</div>`;
 }
@@ -138,14 +159,15 @@ function boardHtml(c, best, names, meId){
 /* Session boards (marathon + rapid-fire) share rendering but format the score column differently. */
 function sessionRowHtml(r,i,names,meId,labelFn,extra){
   const me = meId && r.user_id===meId;
+  const medal = i<3 ? ' r'+(i+1) : '';
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
-    `<span class="rk">${i+1}</span>`+
+    `<span class="rk${medal}">${i+1}</span>`+
     `<span class="nm">${esc(names[r.user_id]||'anon')}</span>`+
     `<span class="tm">${labelFn(r)}</span></div>`;
 }
 function sessionBoardHtml(title, sublabel, best, names, meId, labelFn){
   let body;
-  if(!best.length){ body='<div class="empty">no runs yet — be the first</div>'; }
+  if(!best.length){ body='<div class="empty">no runs yet — <b>claim this board</b></div>'; }
   else {
     body = best.slice(0,10).map((r,i)=>sessionRowHtml(r,i,names,meId,labelFn)).join('');
     const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
@@ -200,8 +222,33 @@ async function load(){
   }
   const names={}; profs.forEach(p=>{ names[p.id]=p.handle||'anon'; });
 
-  // Build the page: sessions first (the competitive boards), then per-drill bests
-  let html='<h3 class="section-title">Marathon</h3>';
+  // Your standing across every per-drill board — the scoreboard of scoreboards.
+  let html='';
+  if(meId){
+    let crowns=0, podiums=0, top10s=0, chase=null;
+    CH.forEach(c=>{
+      const seen={}, best=[];
+      runs.filter(x=>x.challenge===c.key).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });
+      const idx = best.findIndex(r=>r.user_id===meId);
+      if(idx===0) crowns++;
+      if(idx>=0 && idx<3) podiums++;
+      if(idx>=0 && idx<10) top10s++;
+      if(idx>0){ const gap=(best[idx].time_ms-best[0].time_ms)/1000;
+        if(!chase || gap<chase.gap) chase={gap, label:c.label}; }
+    });
+    const chaseHtml = chase
+      ? `<span class="st-chase">closest crown: <b>${esc(chase.label)}</b> — ${chase.gap.toFixed(2)}s behind</span>`
+      : (crowns ? `<span class="st-chase">nothing to chase — <b>defend your boards</b></span>` : '');
+    html += `<div class="standing">`+
+      `<span><span class="st-big">${crowns}</span><span class="st-lbl">board${crowns===1?'':'s'} led</span></span>`+
+      `<span><span class="st-big">${podiums}</span><span class="st-lbl">podiums</span></span>`+
+      `<span><span class="st-big">${top10s}</span><span class="st-lbl">top 10s</span></span>`+
+      chaseHtml+`</div>`;
+  } else {
+    html += `<div class="standing cta">Every drill is an open race. <a href="index.html">Post a time</a> with a real account and your name goes on the board — anonymous runs don't count.</div>`;
+  }
+  // Sessions first (the competitive boards), then per-drill bests
+  html += '<h3 class="section-title">Marathon</h3>';
   MARATHON_DURS.forEach(d=>{
     html += sessionBoardHtml(d.label, 'Session', bestPerUser(sessions,'marathon',d.sec), names, meId, marathonScore);
   });

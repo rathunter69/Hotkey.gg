@@ -174,3 +174,28 @@ text) — intentionally kept. No palette changes needed.
   Leaderboard now matches the trainer configs (comment added to keep in sync).
 - Tone review: prompts/desc copy is desk-authentic (comp sets, sweeps, roll-
   forwards, "the way bankers do it") — consistent with the applicant-prep frame.
+
+---
+# AUDIT ROUND 4 (2026-07-06) — beefy drills + leaderboard loop
+
+## Thin-drill fixes (per Wolf: "beefy, ~30s even if you're quick")
+| drill | was (par/keys) | now (par/keys) | what changed |
+|---|---|---|---|
+| navigation | 20s / 7 | 30s / 12 | Full 12-chord tour: all four Ctrl-arrows, Ctrl+Shift selects (header → table), Shift+Space rows, insert/delete, Ctrl+Space column, Ctrl+Home finish. Sequential latching extended; colSel guarded against leftover row-selection auto-latch. |
+| center | 14s / 8 | 38s / 26 | "Set the alignment": center headers + left-align labels (arrive centered) + right-align total row (arrives left). Alt H A C/L/R — same door, three rooms. |
+| series | 14s / 8 | 25s / 13 | Fill the series, then bold + right-align the whole header while the selection is still live. Seeds now arrive undressed. |
+| sort | 18s / 6 | 33s / 21 | League-table full rep: 6 deals (up from 4), sort desc, AutoSum the total at B8, bold it. Randomization + computed checks kept. |
+Still thin, deliberately left as quick-reps: copyover (10), drill (9) — Foundations
+warmups; revisit only if Wolf wants them beefed too.
+
+## Leaderboard (addictive pass)
+- Medal colors on ranks 1-3 (gold glow on #1), leader-row gradient + bold name.
+- "The chase": your row shows your gap to #1 (+0.42s) — the number to beat.
+- Your-standing strip on top: boards led / podiums / top 10s, plus "closest crown:
+  <drill> — 0.42s behind" (or "defend your boards" when you lead). Signed-out view
+  gets race-framed CTA copy; empty boards read "claim this board".
+- Session boards get medals too.
+
+## Left open (consequential — asked Wolf)
+- "Centered on racing in PowerPoint tasks": conflicts with the entire Excel engine,
+  brand, and catalog. Not built on a guess — see chat.

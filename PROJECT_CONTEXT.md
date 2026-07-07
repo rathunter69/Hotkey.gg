@@ -60,8 +60,10 @@ Engine supports: font color, alignment, sort, fill series, wrap, autofit, border
 fill shade. Evaluator: + - * / ^ (left-assoc), SUM/AVERAGE/MIN/MAX/ABS/ROUND/
 INDEX/MATCH. Cell shape: {value, formula, txt, bold, fill, fontColor, align, wrap,
 bb, bt, fmtStyle, decimals}. checks(S) → [{label,ok}]; navigation checks stateful.
-Game modes audited clean (dev/AUDIT.md round 2): marathon 5/10/15min, rapid-fire
-46-op pool 30/60/120s, guided mode. Next drill gaps: SUMIF (needs evaluator fn),
+Game modes audited clean: marathon 3/5/10min, rapid-fire 46-op pool 30/60/90s,
+guided mode. Beefed drills (round 4): navigation 12-chord tour (par 30/12),
+center=alignment triple (38/26), series fill+dress (25/13), sort+foot+bold (33/21).
+Leaderboard: medals, chase gaps, your-standing strip (crowns/podiums/top10s). Next drill gaps: SUMIF (needs evaluator fn),
 F2-audit drill, paste-special transpose/formats as full drills.
 
 ## Repo-lag question: RESOLVED (2026-07-06)
