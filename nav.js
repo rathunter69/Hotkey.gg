@@ -346,7 +346,10 @@
     const attempted = drills.filter(d => d.rank !== null);
     const avgPct = attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null;
     const myRuns = runs.filter(x => x.user_id === me_id);
-    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs };
+    const _perBoard={}; MENU_ORDER.forEach(k=>{ _perBoard[k]=[]; const seenB={};
+      runs.forEach(x=>{ if(x.challenge===k && !seenB[x.user_id]){ seenB[x.user_id]=true; _perBoard[k].push(x.user_id); } }); });
+    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs, _allRuns: runs, _perBoard,
+      wsum: drills.reduce((a,x)=>a+(x.rank!==null?Math.min(1,Math.log2((x.total||1)+1)/Math.log2(9)):0),0) };
   }
   /* ---- XP & LEVELS ----
      XP = 15/clean solve + 50/distinct drill + 25/top-10 + 100/podium + 250/crown.
@@ -420,22 +423,47 @@
             const ctx={ pb:PBl, pars:window.HOTKEY_PARS||{}, runs:d.myRuns||[], streak:streakN, solves:solvesN,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(),
               att:d.attempted, menuOrder:MENU_ORDER };
+            // STEAM-STYLE GLOBAL RARITY: evaluate run-derivable achievements for every
+            // player from the same runs dataset → "% of players have this".
+            const globalPct=(function(){
+              try{
+                const byUser={};
+                (d._allRuns||[]).forEach(r=>{ (byUser[r.user_id]=byUser[r.user_id]||[]).push(r); });
+                const uids=Object.keys(byUser); if(uids.length<2) return {};
+                const PARS2=window.HOTKEY_PARS||{};
+                const out={};
+                uids.forEach(u=>{
+                  const runs=byUser[u];
+                  const best={}; const days=new Set();
+                  runs.forEach(r=>{ const ch=r.challenge;
+                    if(best[ch]===undefined||r.time_ms<best[ch]) best[ch]=r.time_ms;
+                    if(r.created_at) days.add(String(r.created_at).slice(0,10)); });
+                  const pbU={}; Object.keys(best).forEach(k=>pbU[k]=best[k]/1000);
+                  // streak: longest consecutive-day run
+                  const ds=[...days].sort(); let streakU=ds.length?1:0, cur=1;
+                  for(let i=1;i<ds.length;i++){ const gap=(new Date(ds[i])-new Date(ds[i-1]))/86400000;
+                    cur = gap===1 ? cur+1 : 1; if(cur>streakU) streakU=cur; }
+                  let crownsU=0; MENU_ORDER.forEach(k=>{ const b=(d._perBoard&&d._perBoard[k])||[]; if(b.length&&b[0]===u) crownsU++; });
+                  const attU=MENU_ORDER.filter(k=>pbU[k]!==undefined).length;
+                  const ctxU={ pb:pbU, pars:PARS2, runs, streak:streakU, solves:runs.length, crowns:crownsU, att:attU, menuOrder:MENU_ORDER };
+                  AC.forEach(a=>{ let ru; try{ ru=a.test(ctxU); }catch(e){ ru={done:false}; }
+                    if(ru.done) out[a.id]=(out[a.id]||0)+1; });
+                });
+                Object.keys(out).forEach(k=>out[k]=Math.round(100*out[k]/uids.length));
+                AC.forEach(a=>{ if(out[a.id]===undefined) out[a.id]=0; });
+                return out;
+              }catch(e){ return {}; }
+            })();
             let out='<div class="pc-ach-h">achievements</div><div class="pc-ach">';
             AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
-              out+='<span class="pc-ach-i'+(r.done?' got':'')+'" title="'+a.name+' \u2014 '+a.desc+(r.done?' \u2713':' ('+r.prog+'/'+r.goal+')')+'">'+
-                (window.hkBadge?window.hkBadge(a.glyph, r.done, 24):'')+
-                '<i>'+(r.done?'\u2713':Math.min(99,Math.round(100*r.prog/r.goal))+'%')+'</i></span>'; });
+              const gp=globalPct[a.id];
+              const rare=(gp!==undefined)?(' \u00b7 '+gp+'% of players have this'):'';
+              out+='<span class="pc-ach-i'+(r.done?' got':'')+'" title="'+a.name+' \u2014 '+a.desc+(r.done?' \u2713 EARNED':' \u00b7 '+r.prog+'/'+r.goal)+rare+'">'+
+                (window.hkBadge?window.hkBadge(a.glyph, r.done, 34):'')+
+                (r.done?'':'<i>'+Math.min(99,Math.round(100*r.prog/r.goal))+'%</i>')+'</span>'; });
             return out+'</div>';
           })() +
-          '<a class="pc-legend-t" id="pcLegendT">what am I looking at?</a>'+
-          '<div class="pc-legend" id="pcLegend">'+
-            '<b>rank</b> \u2014 your average placement across every board you\u2019ve entered; buckets split each tier in thirds<br>'+
-            '<b>lvl / xp</b> \u2014 lifetime progress that only goes up; solves, dailies, gauntlets, sessions and placements all feed it<br>'+
-            '<b>clean solves</b> \u2014 completed drills with zero mouse and no guided hints<br>'+
-            '<b>crowns</b> \u2014 boards you lead RIGHT NOW (#1); they can be taken from you<br>'+
-            '<b>streak</b> \u2014 consecutive days with at least one clean solve; miss a day, lose the fire<br>'+
-            '<b>medals</b> \u2014 campaign chapters cleared (every drill under par \u00d7 '+CAMP.GATE+')'+
-          '</div>';
+          '';
       }
     }catch(e){}
     let myFlair=null;

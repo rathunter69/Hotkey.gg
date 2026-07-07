@@ -8,9 +8,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=28" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=28">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=28">
+<link rel="icon" href="favicon.ico?v=29" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=29">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=29">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -858,10 +858,10 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=28"></script>
-<link rel="stylesheet" href="nav.css?v=28">
-<script src="themes.js?v=28"></script>
-<script src="nav.js?v=28" defer></script>
+<script src="drills.js?v=29"></script>
+<link rel="stylesheet" href="nav.css?v=29">
+<script src="themes.js?v=29"></script>
+<script src="nav.js?v=29" defer></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -1001,6 +1001,7 @@
     <p class="lede">Real shortcuts, real tasks. Built for the keystrokes you use every day.</p>
     <div class="landing-cta">
       <button class="start-btn" id="startBtn">Start training <kbd class="kbd-cta">↵</kbd></button>
+      <button class="start-btn ghosted" id="loginBtn" style="background:transparent;border:1px solid var(--line);color:var(--muted)">Log in</button>
       <span class="modes">
         <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
         <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
@@ -3451,8 +3452,8 @@ function toMenu(){ loadChallenge(cur); openPicker(); }
 function syncTabs(){
   const C=CHALLENGES[cur]; if(!C) return;
   const idx=MENU_ORDER.indexOf(cur);
-  const cel=$('dbCat'); if(cel){ cel.textContent=(GROUP_OF[cur]||'Drill');
-    cel.style.color=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||''; }
+  const cel=$('dbCat'); if(cel){ const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]];
+    cel.innerHTML=(gc?'<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+gc+';margin-right:6px;vertical-align:1px"></span>':'')+(GROUP_OF[cur]||'Drill'); }
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
   { let xc=$('dbXp');
     if(!xc && nel){ xc=document.createElement('span'); xc.id='dbXp'; xc.className='db-xp'; nel.after(xc); }
@@ -4198,6 +4199,11 @@ document.addEventListener('keydown',e=>{
     const lk=k.toLowerCase();
     // ---- keyboard-profile chords (checked first; native chords still work below) ----
     if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+R'); smartFill('right'); return; }
+    if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+D'); fillFrom('down'); render(); return; }
+    if(keyProfile==='macabacus' && e.altKey && e.shiftKey && (e.key==='1'||e.key==='!')){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+1'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
+    if(keyProfile==='macabacus' && e.altKey && e.shiftKey && (e.key==='4'||e.key==='$')){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+4'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
+    if(keyProfile==='macabacus' && e.altKey && e.shiftKey && (e.key==='5'||e.key==='%')){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+5'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=1;}); commitAction(); return; }
+    if(keyProfile==='factset' && e.altKey && !e.shiftKey && lk==='e'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+E'); autoColor('sel'); return; }
     if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='l'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+L'); smartFill('left'); return; }
     if(keyProfile==='macabacus' && e.altKey && !e.shiftKey && lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+A'); autoColor('sel'); return; }
     if(keyProfile==='macabacus' && e.altKey && !e.shiftKey && lk==='s'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+S'); autoColor('sheet'); return; }
@@ -4221,6 +4227,9 @@ document.addEventListener('keydown',e=>{
     if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
     if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
     if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
+    if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
+    if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=1;}); commitAction(); return; }
+    if(k==='~'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+~'); pushUndo(); eachSel(c=>{c.fmtStyle=null;c.decimals=0;}); commitAction(); return; }
   }
 },{capture:true});
 
@@ -4286,7 +4295,8 @@ $('dailyBtn').addEventListener('click',startDaily);
 $('weeklyBtn').addEventListener('click',startWeekly);
 $('campaignBtn').addEventListener('click',openCampaign);
 $('startBtn').addEventListener('click', tryEnter);
-{ const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); }; }
+{ const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); };
+  const lb=$('loginBtn'); if(lb) lb.onclick=()=>{ openAuth('signin'); }; }
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
 { const ns=$('navShortcuts'); if(ns) ns.addEventListener('click', e=>{ e.preventDefault(); openKbd(); });
@@ -5695,7 +5705,7 @@ function openCampaign(){
   let rows='';
   st.forEach(c=>{
     const cCol=(window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]||'var(--line)';
-    rows+='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'" style="border-left:3px solid '+cCol+'">'+
+    rows+='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'">'+
       '<div class="camp-hd"><span class="camp-badge">'+(window.hkBadge?window.hkBadge(c.id, c.done, 20):(c.done?c.badge:'\u25b8'))+'</span>'+
       '<b>'+c.name+'</b><span class="camp-n">'+c.clearedN+'/'+c.keys.length+'</span></div>';
     if(c.unlocked){
@@ -5817,13 +5827,13 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
   groups.forEach(g=>{
     const gcol=(window.HOTKEY_GROUP_COLORS||{})[g.name]||'var(--muted)';
     const sec=document.createElement('div'); sec.className='pk-group';
-    sec.innerHTML='<div class="pk-glabel" style="color:'+gcol+'">'+g.name+'</div>';
+    sec.innerHTML='<div class="pk-glabel"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+gcol+';margin-right:8px;vertical-align:1px"></span>'+g.name+'</div>';
     g.keys.forEach(key=>{
       const C=CHALLENGES[key]; if(!C) return;
       const n=MENU_ORDER.indexOf(key)+1;
       const row=document.createElement('div');
       row.className='pk-row'+(key===cur?' cur':''); row.dataset.key=key;
-      row.style.borderLeft='3px solid '+gcol; row.style.paddingLeft='11px';
+
       const best = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
       row.innerHTML='<span class="pk-num">'+(n<=9?n:'')+'</span>'+
         '<span class="pk-info"><div class="pk-name">'+escHtml(C.label||C.name||key)+

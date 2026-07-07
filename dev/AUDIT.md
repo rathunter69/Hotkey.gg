@@ -771,3 +771,36 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - RESERVED NEXT TURN (Wolf-approved big one): full Macabacus + FactSet layers —
   research verified default bindings, curate for IB workflows, distinct colored
   entries on reference.html, profile toggle already in ⚙. Do NOT half-ship.
+
+---
+# ROUND 29 — PLUGIN LAYERS SHIPPED, achievements v2, card/QoL pass
+- MACABACUS + FACTSET LAYERS (the reserved buildout, researched this session):
+  · Sources: Macabacus official shortcuts cheat-sheet PDF + Quick Start Guide;
+    FactSet published hot-key sheet (felix.fe.training mirror) + practitioner
+    confirmation (WSO: Ctrl+Shift+3/4/5/8/Y number formats, Ctrl+Alt+E autocolor,
+    Ctrl+Alt+,/. ref copy/paste).
+  · Data: HOTKEY_PLUGIN_LAYERS in drills.js — 24 Macabacus + 14 FactSet curated
+    entries, categorized (Modeling/Numbers/Colors/Fonts/Alignment/Borders/Auditing/
+    Paste/View/Utilities), each with remap caveats from the vendors' own docs.
+  · reference.html: new "Plugin layers" PRO section — each plugin in its own accent
+    (Macabacus #8ab4ff, FactSet #e0879e), colored keycaps, ● = live in the trainer.
+  · ENGINE: new native Excel parity Ctrl+Shift+$/%/~ (currency/percent/general —
+    joins existing Ctrl+Shift+!). Macabacus profile adds Ctrl+Shift+D fill-down +
+    Ctrl+Alt+Shift+1/4/5 number cycles (simplified to apply). FactSet profile adds
+    Ctrl+Alt+E autocolor. All behind the existing ⚙ profile toggle (Pro-gated,
+    beta-open).
+- ACHIEVEMENTS v2 (Steam-style): 34px medals; hover title = name + desc + progress
+  + "N% of players have this" — global rarity computed by re-running every
+  achievement test per-user from the shared runs dataset (best-times vs PARS,
+  daily/gauntlet counts, created_at day-streaks, crowns from board leads). The
+  "what am I looking at" legend is REMOVED per Wolf.
+- COLOR IDENTITY restyle: left-border strips out; 7px dot before picker group
+  labels + 6px dot in the drill-bar chip; campaign card borders back to neutral
+  (chapter medals carry the hue).
+- LANDING: real "Log in" button beside Start (link retained).
+- BETA TOOLS (account.html, testing only): "Unlock ranked gate (test)" sets
+  hk_dev_unlock + hk_ranked; leaderboard eligibility honors it; Reset reverts.
+  Cosmetic gate bypass only — ratings/boards untouched. REMOVE AT LAUNCH.
+- nav.js wsum now computed from the card's own placements (fixes r28's undefined
+  pass-through) → provisional tags show correctly on the card.
+- v29.

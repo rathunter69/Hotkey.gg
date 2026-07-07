@@ -179,3 +179,56 @@ window.HOTKEY_GROUP_COLORS = {
   'Foundations':'#8ab4ff', 'Formatting':'#d9a441', 'Values':'#2ea36f',
   'Data':'#b9c2cf', 'Formulas':'#e0879e', 'Models':'#c9a2e8', 'Lookups':'#7fd4c1', 'More':'#8b8e94'
 };
+
+/* ---- PLUGIN KEY LAYERS: curated Macabacus + FactSet defaults for IB workflows.
+   Sources: Macabacus official shortcuts cheat sheet + Quick Start Guide (defaults;
+   remappable in their Shortcut Manager — add-in conflicts are common per their docs);
+   FactSet published hot-key sheet + desk convention (remappable: FactSet ribbon →
+   Settings → Manage Hotkeys). inEngine:true = the trainer accepts it under that
+   keyboard profile today. ---- */
+window.HOTKEY_PLUGIN_LAYERS = {
+  macabacus: { name:'Macabacus', color:'#8ab4ff', note:'Defaults from the official cheat sheet \u2014 most desks remap some of these in Shortcut Manager.',
+    keys:[
+      {k:'Ctrl+Shift+R', a:'Fast Fill Right \u2014 fills to the data edge from one cell', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Shift+D', a:'Fast Fill Down', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Shift+L', a:'Fast Fill Left', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Alt+A', a:'AutoColor Selection \u2014 inputs blue, formulas black', cat:'Colors', inEngine:true},
+      {k:'Ctrl+Alt+S', a:'AutoColor Sheet', cat:'Colors', inEngine:true},
+      {k:'Ctrl+Alt+W', a:'AutoColor Workbook', cat:'Colors'},
+      {k:'Ctrl+Shift+V', a:'Paste Values', cat:'Paste', inEngine:true},
+      {k:'Ctrl+Alt+Shift+1', a:'General Number Cycle', cat:'Numbers', inEngine:true},
+      {k:'Ctrl+Alt+Shift+2', a:'Date Cycle', cat:'Numbers'},
+      {k:'Ctrl+Alt+Shift+4', a:'Local Currency Cycle', cat:'Numbers', inEngine:true},
+      {k:'Ctrl+Alt+Shift+5', a:'Percent Cycle', cat:'Numbers', inEngine:true},
+      {k:'Ctrl+Alt+Shift+8', a:'Multiple Cycle (x)', cat:'Numbers'},
+      {k:'Ctrl+Alt+Shift+.', a:'Increase Decimals', cat:'Numbers'},
+      {k:'Ctrl+Alt+Shift+,', a:'Decrease Decimals', cat:'Numbers'},
+      {k:'Ctrl+Alt+Shift+B', a:'Blue-Black font toggle', cat:'Fonts'},
+      {k:'Ctrl+Alt+Shift+U', a:'Underline Cycle (single \u2192 accounting)', cat:'Fonts'},
+      {k:'Ctrl+Alt+Shift+C', a:'Center Cycle (incl. center-across-selection)', cat:'Alignment'},
+      {k:'Ctrl+Alt+Shift+7', a:'Outside Border Cycle', cat:'Borders'},
+      {k:'Ctrl+Alt+Shift+-', a:'Bottom Border Cycle', cat:'Borders'},
+      {k:'Ctrl+Shift+[', a:'Pro Precedents \u2014 step through formula inputs, across tabs', cat:'Auditing'},
+      {k:'Ctrl+Shift+]', a:'Pro Dependents', cat:'Auditing'},
+      {k:'Ctrl+Alt+G', a:'Toggle gridlines', cat:'View'},
+      {k:'Ctrl+Alt+=', a:'Zoom in (5% steps)', cat:'View'},
+      {k:'Ctrl+Alt+-', a:'Zoom out', cat:'View'},
+    ]},
+  factset: { name:'FactSet', color:'#e0879e', note:'From FactSet\u2019s published hot-key sheet + desk convention \u2014 remappable via FactSet ribbon \u2192 Settings \u2192 Manage Hotkeys.',
+    keys:[
+      {k:'Ctrl+Alt+Shift+K', a:'Fill right', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Alt+Shift+J', a:'Fill left', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Alt+Shift+D', a:'Fill down', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Alt+Shift+U', a:'Fill up', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Alt+E', a:'AutoColor by content \u2014 blue inputs, green links, black formulas', cat:'Colors', inEngine:true},
+      {k:'Ctrl+Shift+3', a:'Number format: date', cat:'Numbers'},
+      {k:'Ctrl+Shift+4', a:'Number format: currency', cat:'Numbers', inEngine:true},
+      {k:'Ctrl+Shift+5', a:'Number format: percent', cat:'Numbers', inEngine:true},
+      {k:'Ctrl+Shift+8', a:'Number format: multiple (x)', cat:'Numbers'},
+      {k:'Ctrl+Shift+Y', a:'Number format cycle', cat:'Numbers'},
+      {k:'Ctrl+Shift+:', a:'Cell color cycle', cat:'Colors'},
+      {k:'Ctrl+Alt+,', a:'Copy formula refs + formatting', cat:'Paste'},
+      {k:'Ctrl+Alt+.', a:'Paste formula refs + formatting', cat:'Paste'},
+      {k:'Ctrl+Alt+Shift+!', a:'Apply captured row/column layout to selection', cat:'Utilities'},
+    ]},
+};

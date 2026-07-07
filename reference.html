@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the cheat sheet · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=28" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=28">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=28">
+<link rel="icon" href="favicon.ico?v=29" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=29">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=29">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -100,8 +100,8 @@
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-family:var(--mono); font-size:14px; padding:50px 0;}
 </style>
 
-<link rel="stylesheet" href="nav.css?v=28">
-<script src="drills.js?v=28"></script>
+<link rel="stylesheet" href="nav.css?v=29">
+<script src="drills.js?v=29"></script>
 <script>
 // Supabase init (kept light — reference doesn't post data, but nav.js needs window.sb for the user menu)
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -110,8 +110,8 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'reference';
 </script>
-<script src="themes.js?v=28"></script>
-<script src="nav.js?v=28"></script>
+<script src="themes.js?v=29"></script>
+<script src="nav.js?v=29"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -304,6 +304,34 @@ function apply(){
 }
 qEl.addEventListener('input', apply);
 apply();
+</script>
+<script>
+/* ---- plugin layers: Macabacus + FactSet sections, each in its own accent ---- */
+(function(){
+  const host=document.querySelector('.wrap')||document.body;
+  const L=window.HOTKEY_PLUGIN_LAYERS; if(!L) return;
+  const sec=document.createElement('div');
+  let html='<h2 style="font-family:var(--mono);font-size:15px;margin:44px 0 6px">Plugin layers <span style="font-size:9px;color:var(--warn);letter-spacing:1px;vertical-align:2px">PRO \u00b7 free in beta</span></h2>'+
+    '<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:18px">Switch your keyboard profile in the trainer (\u2699 \u2192 \u2328) and the engine accepts these chords. Entries marked \u25cf are live in the trainer today; the rest are on the desk-reference for real Excel.</div>';
+  Object.values(L).forEach(p=>{
+    html+='<div style="border:1px solid '+p.color+'33;border-radius:14px;padding:18px 20px;margin-bottom:18px">'+
+      '<div style="font-family:var(--mono);font-weight:700;font-size:14px;color:'+p.color+';margin-bottom:4px">'+p.name+'</div>'+
+      '<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-bottom:14px">'+p.note+'</div>';
+    let lastCat=null;
+    p.keys.forEach(x=>{
+      if(x.cat!==lastCat){ lastCat=x.cat;
+        html+='<div style="font-family:var(--mono);font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:'+p.color+'aa;margin:12px 0 6px">'+x.cat+'</div>'; }
+      const keys=x.k.split('+').map(t=>'<kbd style="font-family:var(--mono);font-size:10.5px;background:var(--surface2);border:1px solid '+p.color+'55;border-bottom-width:2px;border-radius:5px;padding:2px 7px">'+t+'</kbd>').join('<span style="color:var(--faint)">+</span>');
+      html+='<div style="display:flex;align-items:center;gap:12px;padding:5px 0;font-family:var(--mono);font-size:12px">'+
+        '<span style="min-width:250px;display:flex;gap:3px;align-items:center;flex-wrap:wrap">'+keys+'</span>'+
+        '<span style="color:var(--text);flex:1">'+x.a+'</span>'+
+        (x.inEngine?'<span title="live in the trainer under this profile" style="color:'+p.color+'">\u25cf</span>':'')+
+        '</div>';
+    });
+    html+='</div>';
+  });
+  sec.innerHTML=html; host.appendChild(sec);
+})();
 </script>
 </body>
 </html>
