@@ -27,7 +27,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Formatting',  keys: ['polish', 'combo', 'format', 'center', 'blue', 'gauntlet'] },
     { name: 'Values',      keys: ['drill', 'series'] },
     { name: 'Data',        keys: ['sort'] },
-    { name: 'Formulas',    keys: ['margin', 'bridge', 'foot', 'percent', 'schedule', 'comps'] },
+    { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'percent', 'revolver', 'cagr', 'schedule', 'comps'] },
     { name: 'Lookups',     keys: ['lookup'] },
   ],
 
@@ -62,6 +62,9 @@ window.HOTKEY_DRILLS = {
 
     // Formulas
     margin:     { name:'Formula',  label:'Build the margin',    tab:'Margin',      desc:'Build a margin formula down the column' },
+    growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'YoY growth row — point it, fill right, format %' },
+    revolver:   { name:'Revolver', label:'Sweep the cash',      tab:'Revolver',    desc:'Revolver draw = MAX(0, −cash) across the years' },
+    cagr:       { name:'CAGR',     label:'Compound it',         tab:'CAGR',        desc:'One-cell CAGR with the ^ power key' },
     bridge:     { name:'Bridge',   label:'Stretch the profit row', tab:'Bridge',   desc:'Profit = revenue × margin, fill it across years' },
     foot:       { name:'Foot',     label:'Total it both ways',  tab:'Cross-foot',  desc:'SUM across and down, tie out the corner' },
     percent:    { name:'% of rev', label:'Common-size it',      tab:'Common-size', desc:'Common-size with an anchored ($) formula' },

@@ -302,6 +302,20 @@
   .rm-key:hover kbd{color:var(--accent)}
 
   /* first-run guided intro */
+  /* ---- welcome-back strip (returning users, once per session) ---- */
+  .wb{display:none; align-items:center; gap:9px; flex-wrap:wrap; margin:0 0 14px;
+    padding:10px 15px; background:var(--surface); border:1px solid var(--accent-dim);
+    border-left:3px solid var(--accent); border-radius:10px;
+    font-family:var(--mono); font-size:12.5px; color:var(--muted);
+    opacity:0; transform:translateY(-4px); transition:opacity .28s ease, transform .28s ease}
+  .wb.show{display:flex; opacity:1; transform:none}
+  .wb b{color:var(--text); font-weight:700}
+  .wb .wb-hi{color:var(--accent); font-weight:700; letter-spacing:.4px}
+  .wb .wb-sep{color:var(--faint)}
+  .wb .wb-keys{margin-left:auto; color:var(--faint); white-space:nowrap}
+  .wb kbd{font-family:var(--mono); font-size:10.5px; padding:2px 6px; background:var(--surface2);
+    border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; color:var(--text)}
+  @media(max-width:640px){ .wb .wb-keys{display:none} }
   .onboard-modal{position:fixed; inset:0; background:rgba(0,0,0,.62); display:none;
     align-items:center; justify-content:center; z-index:60}
   .onboard-modal.show{display:flex}
@@ -851,6 +865,7 @@
     </div>
   </div>
 
+  <div class="wb" id="welcomeBack" role="status"></div>
   <div class="stage">
     <div class="stage-main">
       <div class="ribbon" id="ribbon"></div>
@@ -1202,7 +1217,7 @@ const CHALLENGES = {
     }
   },
   schedule:{
-    name:'Schedule', label:'Roll it forward', par:50, parKeys:54,
+    name:'Schedule', label:'Roll it forward', par:65, parKeys:54,
     prompt:'Complete this four-year PP&E roll-forward by pointing. Each year\'s Ending = Beginning − Depreciation; each next year\'s Beginning links to the prior Ending. Live formulas everywhere, no hardcoded numbers.',
     req:'<em>endings</em> · at each Ending cell · <em>=</em> · <em>↑↑</em> Beginning · <em>−</em> · <em>↑</em> Depreciation · <em>↵</em> · <em>links</em> · at each new-year Beginning · <em>=</em> · navigate down-left to the prior Ending · <em>↵</em>',
     guide:[
@@ -1581,21 +1596,33 @@ const CHALLENGES = {
       const cells={};
       cells['A1']={...blankCell(),value:'Deal',txt:true,bold:true};
       cells['B1']={...blankCell(),value:'Size ($M)',txt:true,bold:true,align:'r'};
-      // pre-shuffled order so the user can see they need to sort. Sizes are distinct so order is unambiguous.
-      const deals=[['TechCo',420],['HealthCo',180],['EnergyCo',640],['RetailCo',310]];
+      // Randomized every run: pick 4 names and 4 DISTINCT sizes, then shuffle the
+      // start order (re-rolling if it lands already sorted, so there's always work to do).
+      const pool=['TechCo','HealthCo','EnergyCo','RetailCo','MediaCo','FinCo','AeroCo','ShipCo'];
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const names=pool.slice(0,4);
+      const sizes=new Set(); while(sizes.size<4) sizes.add(rnd(12,68)*10);
+      let deals=names.map((n,i)=>[n,[...sizes][i]]);
+      const isSortedDesc=d=>d.every((p,i)=>i===0||d[i-1][1]>=p[1]);
+      do{ for(let k=deals.length-1;k>0;k--){ const j=rnd(0,k); [deals[k],deals[j]]=[deals[j],deals[k]]; } }while(isSortedDesc(deals));
       for(let i=0;i<deals.length;i++){
         cells['A'+(i+2)]={...blankCell(),value:deals[i][0],txt:true};
         cells['B'+(i+2)]={...blankCell(),value:deals[i][1],fmtStyle:'comma',decimals:0};
       }
+      // Expected end-state computed from THIS run's data — never hardcode answers in checks.
+      this._sorted=deals.slice().sort((a,b)=>b[1]-a[1]);
       return {ROWS:5, cells, active:{r:2,c:2}, sel:null, colW:{1:100,2:88}};
     },
     checks(S){
       const sizes=[2,3,4,5].map(r=>S.cells['B'+r] && S.cells['B'+r].value);
       const sortedDesc = sizes.every((v,i)=> i===0 || sizes[i-1]>=v);
-      // also verify deal column moved with size column (deal names align with sizes)
-      const expectedNames = ['EnergyCo','TechCo','RetailCo','HealthCo'];   // matches build() order when sorted desc by size
-      const actualNames   = [2,3,4,5].map(r=>S.cells['A'+r] && S.cells['A'+r].value);
-      const aligned = expectedNames.every((n,i)=>n===actualNames[i]);
+      // deal names must move with their sizes — compare against the per-run expected order
+      const exp=this._sorted||[];
+      const aligned = exp.length===4 && exp.every((p,i)=>{
+        const nm=S.cells['A'+(i+2)] && S.cells['A'+(i+2)].value;
+        const sz=S.cells['B'+(i+2)] && S.cells['B'+(i+2)].value;
+        return nm===p[0] && sz===p[1];
+      });
       return [
         {label:'Size column sorted largest to smallest (descending)', ok: sortedDesc},
         {label:'Deal names follow their sizes', ok: aligned},
@@ -1694,6 +1721,138 @@ const CHALLENGES = {
       for(let i=0;i<4;i++) if(!profitOk(i)) formulaOk=false;
       return [
         {label:'profit = revenue × margin, all 4 years (formulas, not hardcoded)', ok: formulaOk},
+      ];
+    }
+  },
+  growth:{
+    name:'Growth', label:'Run the growth rates', par:28, parKeys:17,
+    prompt:'Build the YoY growth row — the most-typed formula in banking. At C3, point the formula together: this year ÷ last year − 1. Fill it across, then format the row as a percentage to 1 decimal.',
+    req:'<em>=</em> at C3 · <em>↑</em> grabs C2 · <em>/</em> · <em>←↑</em> grabs B2 · type <em>-1</em> · <em>↵</em> · fill C3:F3 with <em>ctrl+r</em> · <em>ctrl+shift+%</em> · <em>alt h 0</em>',
+    guide:[
+      'at C3 · <kbd>=</kbd> · <kbd>↑</kbd> grabs this year (C2) · <kbd>/</kbd>',
+      '<kbd>←</kbd> <kbd>↑</kbd> grabs last year (B2) · type <kbd>-</kbd><kbd>1</kbd> · commit <kbd>↵</kbd> — formula reads <b>=C2/B2-1</b>',
+      'back up (<kbd>↑</kbd>), extend right with <kbd>shift</kbd>+<kbd>→</kbd>×3, then <kbd>ctrl</kbd>+<kbd>r</kbd> to fill',
+      'format the row · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
+    ],
+    targets:['C3','C3:F3','C3:F3'],
+    demo(){ return [
+      {sel:'C3', keys:[{key:'='}, {key:'ArrowUp'}, {key:'/'}, {key:'ArrowLeft'}, {key:'ArrowUp'}, {key:'-'}, D(1), Kb.enter]},
+      {sel:'C3:F3', keys:[Kb.fillR]},
+      {sel:'C3:F3', keys:[Kb.pct, Kb.alt, L('H'), D(0)]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Revenue build',txt:true,bold:true};
+      ['Y1','Y2','Y3','Y4','Y5'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      cells['A2']={...blankCell(),value:'Revenue',txt:true};
+      cells['A3']={...blankCell(),value:'Growth %',txt:true};
+      let rev=rnd(80,160)*10;                       // 800–1,600 start
+      for(let i=0;i<5;i++){
+        if(i>0) rev=Math.round(rev*(100+rnd(3,19))/100);   // 3–19% YoY, varies per year
+        cells[colLetter(i+2)+'2']={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      }
+      // answer cells pre-formatted comma so raw decimals don't render ugly pre-format
+      for(let c=3;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),fmtStyle:'comma',decimals:0};
+      return {ROWS:3, cells, active:{r:3,c:3}, sel:null, colW:{1:110,2:76,3:76,4:76,5:76,6:76}};
+    },
+    checks(S){
+      const COL=['C','D','E','F'];
+      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
+      const gOk=i=>{ const col=COL[i], prev=String.fromCharCode(col.charCodeAt(0)-1);
+        const c=S.cells[col+'3']; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        const refOk=f.includes(col+'2')&&f.includes(prev+'2')&&f.includes('/');
+        const p=val(prev+'2'); if(p===0) return false;
+        return refOk && Math.abs(c.value-(val(col+'2')/p-1))<1e-6; };
+      const fmtOk=i=>{ const c=S.cells[COL[i]+'3']; return !!(c&&c.fmtStyle==='percent'&&c.decimals===1); };
+      let f=true,m=true; for(let i=0;i<4;i++){ if(!gOk(i)) f=false; if(!fmtOk(i)) m=false; }
+      return [
+        {label:'growth = this year ÷ last year − 1 (live formulas, all 4)', ok: f},
+        {label:'format the growth row as % to 1 decimal', ok: m},
+      ];
+    }
+  },
+  revolver:{
+    name:'Revolver', label:'Sweep the cash', par:28, parKeys:17,
+    prompt:'Cash sweep logic — the heart of every debt schedule. Where free cash flow is negative, the revolver funds the gap; where it\'s positive, the draw is zero. At B3 build the draw with MAX: =MAX(0,-B2), then fill it across the years.',
+    req:'<em>at B3</em> type <em>=MAX(0,-B2)</em> · <em>↵</em> · then select B3:E3 and <em>ctrl+r</em> to fill — negative cash becomes a draw, positive cash floors at zero',
+    guide:[
+      'at B3 type <kbd>=MAX(0,-B2)</kbd> <kbd>↵</kbd> — flip the sign of cash, floor it at zero',
+      'back up (<kbd>↑</kbd>), extend right with <kbd>shift</kbd>+<kbd>→</kbd>×3, then <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'sanity-check: draws appear only under the negative cash years',
+    ],
+    targets:['B3','B3:E3'],
+    demo(){ return [
+      {sel:'B3', keys:[...T('=MAX(0,-B2)'), Kb.enter]},
+      {sel:'B3:E3', keys:[Kb.fillR]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Cash sweep',txt:true,bold:true};
+      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      cells['A2']={...blankCell(),value:'Free cash flow',txt:true};
+      cells['A3']={...blankCell(),value:'Revolver draw',txt:true};
+      // two shortfall years + two surplus years, shuffled — so the MAX floor visibly matters
+      const flows=[ -rnd(8,40)*10, -rnd(8,40)*10, rnd(8,40)*10, rnd(8,40)*10 ];
+      for(let k=flows.length-1;k>0;k--){ const j=rnd(0,k); [flows[k],flows[j]]=[flows[j],flows[k]]; }
+      for(let i=0;i<4;i++){
+        cells[colLetter(i+2)+'2']={...blankCell(),value:flows[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[colLetter(i+2)+'3']={...blankCell(),fmtStyle:'comma',decimals:0};
+      }
+      return {ROWS:3, cells, active:{r:3,c:2}, sel:null, colW:{1:126,2:76,3:76,4:76,5:76}};
+    },
+    checks(S){
+      const COL=['B','C','D','E'];
+      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
+      const dOk=i=>{ const col=COL[i], c=S.cells[col+'3']; if(!c||!c.formula) return false;
+        const f=c.formula.toUpperCase().replace(/\s/g,'');
+        return f.includes('MAX')&&f.includes(col+'2')&&Math.abs(c.value-Math.max(0,-val(col+'2')))<1e-6; };
+      let ok=true; for(let i=0;i<4;i++) if(!dOk(i)) ok=false;
+      return [
+        {label:'draw = MAX(0, −cash) across all 4 years (live formulas)', ok},
+      ];
+    }
+  },
+  cagr:{
+    name:'CAGR', label:'Compound it', par:34, parKeys:22,
+    prompt:'One clean formula: the compound annual growth rate between two revenue points. (End ÷ Begin) raised to (1 ÷ Years), minus 1 — then format it as a percentage to 1 decimal. The ^ key does the compounding.',
+    req:'<em>at B5</em> type <em>=(B3/B2)^(1/B4)-1</em> · <em>↵</em> · then <em>ctrl+shift+%</em> and <em>alt h 0</em> for one decimal',
+    guide:[
+      'at B5 type <kbd>=(B3/B2)^(1/B4)-1</kbd> <kbd>↵</kbd> — parens matter: ratio first, then the fractional power',
+      'back up (<kbd>↑</kbd>) · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for one decimal',
+    ],
+    targets:['B5','B5'],
+    demo(){ return [
+      {sel:'B5', keys:[...T('=(B3/B2)^(1/B4)-1'), Kb.enter]},
+      {sel:'B5', keys:[Kb.pct, Kb.alt, L('H'), D(0)]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'CAGR check',txt:true,bold:true};
+      const yrs=rnd(3,7);
+      const beg=rnd(50,300)*10;
+      const g=(100+rnd(4,20))/100;
+      const end=Math.round(beg*Math.pow(g,yrs));
+      cells['A2']={...blankCell(),value:'Revenue, Yr 0',txt:true};
+      cells['B2']={...blankCell(),value:beg,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells['A3']={...blankCell(),value:'Revenue, Yr '+yrs,txt:true};
+      cells['B3']={...blankCell(),value:end,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells['A4']={...blankCell(),value:'Years',txt:true};
+      cells['B4']={...blankCell(),value:yrs,fontColor:'blue'};
+      cells['A5']={...blankCell(),value:'CAGR',txt:true,bold:true};
+      cells['B5']={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._expect=Math.pow(end/beg,1/yrs)-1;
+      return {ROWS:5, cells, active:{r:5,c:2}, sel:null, colW:{1:126,2:88}};
+    },
+    checks(S){
+      const c=S.cells['B5'];
+      const f=(c&&c.formula)?c.formula.toUpperCase().replace(/\s/g,''):'';
+      const refOk=f.includes('B3')&&f.includes('B2')&&f.includes('B4')&&f.includes('^');
+      const valOk=!!(c&&c.formula)&&Math.abs(c.value-this._expect)<1e-6;
+      const fmtOk=!!(c&&c.fmtStyle==='percent'&&c.decimals===1);
+      return [
+        {label:'CAGR = (end ÷ begin) ^ (1 ÷ years) − 1, live formula', ok: refOk&&valOk},
+        {label:'format as % to 1 decimal', ok: fmtOk},
       ];
     }
   },
@@ -1921,7 +2080,8 @@ function evalFormula(expr){
       default: throw new Error('fn '+name);
     } }
   function expr_(){ let v=term(); skip(); while(s[i]==='+'||s[i]==='-'){ const o=s[i++]; const t=term(); v=o==='+'?v+t:v-t; skip(); } return v; }
-  function term(){ let v=fac(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=fac(); v=o==='*'?v*f:v/f; skip(); } return v; }
+  function term(){ let v=pow_(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=pow_(); v=o==='*'?v*f:v/f; skip(); } return v; }
+  function pow_(){ let v=fac(); skip(); while(s[i]==='^'){ i++; const e=fac(); v=Math.pow(v,e); skip(); } return v; }
   function fac(){ skip();
     if(s[i]==='('){ i++; const v=expr_(); skip(); if(s[i]!==')') throw new Error('paren'); i++; return v; }
     if(s[i]==='-'){ i++; return -fac(); }
@@ -4103,27 +4263,27 @@ async function loadProfileData(){
   return { drills, attempted:attempted.length, avgPct, firsts, bestRank, players };
 }
 /* Tier assignment is intentionally punitive — Unranked is the default and the only way out is breadth + placement.
-   Without a minimum drill floor, the first person to touch a drill is #1 of 1 and gets Diamond. We require at least
-   5 drills attempted before any tier appears, and each tier above Bronze compounds an attempted-drill threshold
-   onto a placement percentile. Diamond demands both deep play (15/18 drills) AND elite placement (top 5%) —
+   Without a minimum drill floor, the first person to touch a drill is #1 of 1 and tops the ladder. We require at least
+   5 drills attempted before any tier appears, and each rung above Summer Analyst compounds an attempted-drill threshold
+   onto a placement percentile. Second-Year Analyst demands both deep play (15+ drills) AND elite placement (top 5%) —
    making it actually rare. The placement axis (avgPct) already averages this user's rank-percentage across drills
    so a single fluke "#1 of 2" run can't carry the rest. The remaining edge case — a player who does 5 drills all
    blazingly fast — caps at Silver here, since Gold needs 10+ drills. */
 function tierOf(avgPct, attemptedCount){
-  if(avgPct===null || (attemptedCount||0) < 5) return {name:'Unranked', cls:'tier-unranked'};
-  if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Diamond',  cls:'tier-diamond'};
-  if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Platinum', cls:'tier-platinum'};
-  if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'Gold',     cls:'tier-gold'};
-  if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Silver',   cls:'tier-silver'};
-  return {name:'Bronze', cls:'tier-bronze'};
+  if(avgPct===null || (attemptedCount||0) < 5) return {name:'Candidate', cls:'tier-unranked'};
+  if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
+  if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst', cls:'tier-platinum'};
+  if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'First-Year Analyst', cls:'tier-gold'};
+  if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Incoming Analyst', cls:'tier-silver'};
+  return {name:'Summer Analyst', cls:'tier-bronze'};
 }
 function renderProfile(m, d){
   const tier=tierOf(d.avgPct, d.attempted);
-  // Standing is meaningless before the threshold — show progress toward Bronze instead so the user knows what to do.
+  // Standing is meaningless before the threshold — show progress toward Summer Analyst instead so the user knows what to do.
   // After threshold, show "top X%" (the same average-percentile measure that feeds the tier).
   const fmtMs=ms=>(ms/1000).toFixed(2)+'s';
   const standing = (d.attempted < 5)
-    ? d.attempted+'/5 drills toward Bronze'
+    ? d.attempted+'/5 drills toward Summer Analyst'
     : (d.avgPct===null ? '—' : 'top '+Math.max(1,Math.round(d.avgPct*100))+'%');
   let body='', lastG=null;
   d.drills.forEach(x=>{
@@ -4262,6 +4422,7 @@ $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo();
    ============================================================ */
 function loadChallenge(key){
   cur=key; const C=CHALLENGES[key];
+  try{ KV.set('hotkey_last_drill', key); }catch(e){}   // resume point for the next visit
   const built=C.build();
   S={ROWS:Math.max(built.ROWS, ROWS_MAX), cells:built.cells, active:built.active, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
@@ -4356,9 +4517,38 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
   if(onboarded){ enterRequested = true; landingOpen = false; }
   buildSheetTabs();
-  loadChallenge(MENU_ORDER[0]);
+  // Resume where they left off: returning users land on their last drill, not the first one.
+  let startKey = MENU_ORDER[0];
+  if(onboarded){
+    try{ const last = await KV.get('hotkey_last_drill');
+      if(last && CHALLENGES[last]) startKey = last; }catch(e){}
+  }
+  loadChallenge(startKey);
+  if(onboarded) showWelcomeBack(startKey);
   initAuth();
 })();
+
+/* ---- welcome-back strip: returning users get a one-glance "you're on the game page" cue.
+   Passive by design — fades on the first keydown WITHOUT swallowing it, so zero friction:
+   the key that dismisses it is already your first rep. Shows once per browser session. ---- */
+function showWelcomeBack(key){
+  try{ if(sessionStorage.getItem('hk_wb')) return; sessionStorage.setItem('hk_wb','1'); }catch(e){}
+  const el = document.getElementById('welcomeBack'); if(!el) return;
+  const label = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.labelOf[key]) || key;
+  const best = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : null;
+  const pbCount = Object.keys(PB).length;
+  el.innerHTML =
+    '<span class="wb-hi">welcome back</span>'+
+    '<span class="wb-sep">·</span> resuming <b>'+escHtml(label)+'</b>'+
+    (best ? '<span class="wb-sep">·</span> PB <b>'+best+'</b>' : '')+
+    (pbCount ? '<span class="wb-sep">·</span> '+pbCount+' drill'+(pbCount===1?'':'s')+' on the board' : '')+
+    '<span class="wb-keys"><kbd>\\</kbd> drill picker &nbsp;<kbd>1</kbd>–<kbd>9</kbd> jump &nbsp;any key to go</span>';
+  el.classList.add('show');
+  const hide = ()=>{ el.classList.remove('show'); };
+  document.addEventListener('keydown', hide, { once:true, capture:true });  // passive: never preventDefault
+  el.addEventListener('click', hide, { once:true });
+  setTimeout(hide, 8000);
+}
 
 /* ============================================================
    AUTH + LEADERBOARD WRITES (magic-link via Supabase).

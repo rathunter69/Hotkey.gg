@@ -36,12 +36,12 @@
 
   // Same tier function as index.html. Kept in sync — if thresholds change there, change here.
   function tierOf(avgPct, attemptedCount){
-    if(avgPct===null || (attemptedCount||0) < 5) return {name:'Unranked', cls:'tier-unranked'};
-    if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Diamond',  cls:'tier-diamond'};
-    if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Platinum', cls:'tier-platinum'};
-    if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'Gold',     cls:'tier-gold'};
-    if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Silver',   cls:'tier-silver'};
-    return {name:'Bronze', cls:'tier-bronze'};
+    if(avgPct===null || (attemptedCount||0) < 5) return {name:'Candidate', cls:'tier-unranked'};
+    if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
+    if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst', cls:'tier-platinum'};
+    if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'First-Year Analyst', cls:'tier-gold'};
+    if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Incoming Analyst', cls:'tier-silver'};
+    return {name:'Summer Analyst', cls:'tier-bronze'};
   }
 
   // ---------------------------------------------------------------
@@ -322,7 +322,7 @@
       }
     });
     const standing = (d.attempted < 5)
-      ? d.attempted + '/5 drills toward Bronze'
+      ? d.attempted + '/5 drills toward Summer Analyst'
       : (d.avgPct === null ? '\u2014' : 'top ' + Math.max(1, Math.round(d.avgPct*100)) + '%');
     m.innerHTML = '<div class="pc-card">' +
       '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + tier.name + '</div></div>' +

@@ -171,8 +171,8 @@ function bestPerUser(rows, mode, dur){
       .forEach(r=>{ if(!seen[r.user_id]){ seen[r.user_id]=true; best.push(r); } });
   return best;
 }
-const MARATHON_DURS = [{sec:300, label:'5-minute marathon'}, {sec:600, label:'10-minute marathon'}, {sec:900, label:'15-minute marathon'}];
-const RAPID_DURS    = [{sec:30,  label:'30-second rapid-fire'}, {sec:60, label:'60-second rapid-fire'}, {sec:120, label:'120-second rapid-fire'}];
+const MARATHON_DURS = [{sec:180, label:'3-minute marathon'}, {sec:300, label:'5-minute marathon'}, {sec:600, label:'10-minute marathon'}];  // must match the trainer's duration configs
+const RAPID_DURS    = [{sec:30,  label:'30-second rapid-fire'}, {sec:60, label:'60-second rapid-fire'}, {sec:90, label:'90-second rapid-fire'}];  // must match the trainer's duration configs
 const marathonScore = r => `${r.score} drill${r.score===1?'':'s'} · ${r.keystrokes} keys`;
 const rapidScore    = r => { const t=r.score+(r.misses||0); const a=t?Math.round(100*r.score/t):100;
                              return `${r.score} hit${r.score===1?'':'s'} · ${a}%`; };
