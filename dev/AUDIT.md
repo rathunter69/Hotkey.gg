@@ -348,3 +348,9 @@ mode='gauntlet', duration_sec=week number. Attempt-once enforced client-side fir
   level = what you've DONE (monotonic, never lost) ·
   crowns/podiums = what you HOLD (defensible) · streak = showing up.
   Four axes, no double-counting, each visible.
+
+# ROUND 11 — true ghost v1
+Ghost display now races KEYSTROKES too: fetches your PB run's timestamped trace on
+drill load and shows 'keys 9/12' (you vs the ghost at this instant) beside the time
+delta. Only works on PBs recorded after timestamps shipped (round 9) — older traces
+are label-only and skipped silently. Next: visual ghost cursor on the grid itself.

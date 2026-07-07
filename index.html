@@ -2759,12 +2759,30 @@ function startClock(){ if(running||done)return; running=true; started=performanc
 function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); ghostTick(t); }
 /* PB pace ghost: while you run, the gap to your own best counts down beside the clock.
    Green while you're ahead of the PB, red the instant it slips away. */
-let ghostPB=null;
-function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null;
-  const el=$('ghostDelta'); if(el){ el.style.display=ghostPB?'inline':'none'; el.className='ghost'; el.textContent=ghostPB?('pb '+ghostPB.toFixed(2)):''; } }
+let ghostPB=null, ghostTrace=null;
+function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null; ghostTrace=null;
+  const el=$('ghostDelta'); if(el){ el.style.display=ghostPB?'inline':'none'; el.className='ghost'; el.textContent=ghostPB?('pb '+ghostPB.toFixed(2)):''; }
+  // true ghost v1: pull the PB run's timestamped trace so the ghost's keystrokes
+  // race yours in real time. Old traces (pre-timestamps) are label-only — skipped.
+  if(sb && me_user && !isAnonUser()){
+    const k=scoreKey();
+    sb.from('runs').select('trace,time_ms').eq('user_id',me_user.id).eq('challenge',k)
+      .eq('mouse_used',false).order('time_ms',{ascending:true}).limit(1)
+      .then(r=>{ if(cur!==k && scoreKey()!==k) return;   // drill changed mid-fetch
+        const row=r.data&&r.data[0];
+        if(row && Array.isArray(row.trace) && row.trace.length && typeof row.trace[0]==='object' && row.trace[0].t!=null){
+          ghostTrace = row.trace.map(x=>x.t).sort((a,b)=>a-b);
+        } });
+  } }
 function ghostTick(t){ if(ghostPB==null) return; const el=$('ghostDelta'); if(!el) return;
   const d=ghostPB-t;
-  el.textContent=(d>=0?'\u2212':'+')+Math.abs(d).toFixed(2)+' vs pb';
+  let keysBit='';
+  if(ghostTrace){
+    const ms=t*1000; let g=0;
+    while(g<ghostTrace.length && ghostTrace[g]<=ms) g++;   // ghost's key count at this instant
+    keysBit=' \u00b7 keys '+keyLog.length+'/'+g;
+  }
+  el.textContent=(d>=0?'\u2212':'+')+Math.abs(d).toFixed(2)+' vs pb'+keysBit;
   el.className='ghost '+(d>=0?'ahead':'behind'); }
 function stopClock(){ running=false; clearInterval(tickH); finished=performance.now();
   $('timer').classList.remove('run'); }
