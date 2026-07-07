@@ -8,9 +8,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=30" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=30">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=30">
+<link rel="icon" href="favicon.ico?v=31" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=31">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=31">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -858,14 +858,14 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=30"></script>
-<link rel="stylesheet" href="nav.css?v=30">
-<script src="themes.js?v=30"></script>
+<script src="drills.js?v=31"></script>
+<link rel="stylesheet" href="nav.css?v=31">
+<script src="themes.js?v=31"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=30"></script>
+<script src="nav.js?v=31"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -916,11 +916,6 @@
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn">▶ demo</button>
       <button class="mb-tool" id="guideToggle"><kbd>g</kbd> guided: off</button>
-      <button class="mb-tool" id="prefsBtn" title="preferences — sound pack + keyboard profile (Macabacus / FactSet chords)">⚙</button>
-      <div class="prefs-pop" id="prefsPop">
-        <button class="mb-tool" id="soundToggle" title="sound pack — click to cycle">🔊 sound</button>
-        <button class="mb-tool" id="profileToggle" title="keyboard profile — native Excel, Macabacus, or FactSet chords also accepted">⌨ native</button>
-      </div>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
       <button class="mb-tool" id="weeklyBtn" title="the weekly gauntlet — five seeded drills, combined time on the board">🏁 weekly</button>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
@@ -4290,8 +4285,9 @@ function soundStateLabel(){
   return '\ud83d\udd0a '+soundPack;
 }
 function updateSoundBtn(){ const b=$('soundToggle'); if(b){ b.classList.toggle('on',soundOn);
-  b.innerHTML=soundStateLabel();
-  b.title='sound pack \u2014 click to cycle: classic \u2192 arcade \u2192 thock (key ticks) \u2192 off'; } }
+  b.style.fontFamily='var(--mono)'; b.style.fontSize='13px';
+  b.textContent = !soundOn ? '\ud83d\udd07' : (keyTicks ? '\ud83d\udd0a\u2328' : (soundPack==='arcade'?'\ud83d\udd0a\u2191':'\ud83d\udd0a'));
+  b.setAttribute('data-tip','sound: '+soundStateLabel().replace(/^\S+ /,'')+' \u2014 click to cycle'); } }
 function cycleSound(){
   // classic → arcade → thock → off → classic
   if(soundOn && soundPack==='classic' && !keyTicks){ soundPack='arcade'; }
@@ -4303,10 +4299,16 @@ function cycleSound(){
 }
 function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soundOn) playSuccessBlip(); /* preview */ }
 $('soundToggle').addEventListener('click',cycleSound);
-{ const pb=$('prefsBtn'), pp=$('prefsPop');
-  if(pb&&pp){ pb.parentElement.style.position='relative';
-    pb.addEventListener('click',e=>{ e.stopPropagation(); pp.classList.toggle('show'); });
-    document.addEventListener('click',e=>{ if(!pp.contains(e.target)&&e.target!==pb) pp.classList.remove('show'); }); } }
+// sound + keyboard-profile icons live in the shared nav tools, next to ? (nav mounts
+// synchronously right above, so the tools node exists by the time this runs)
+{ const tools=document.querySelector('.topnav-tools');
+  if(tools){
+    const mk=(id,tip)=>{ const b=document.createElement('button'); b.className='topnav-icon'; b.id=id; b.setAttribute('data-tip',tip); return b; };
+    const sBtn=mk('soundToggle','sound pack \u2014 click to cycle: classic \u2192 arcade \u2192 thock \u2192 off');
+    const pBtn=mk('profileToggle','keyboard profile \u2014 native Excel, Macabacus, or FactSet chords');
+    const anchor=document.getElementById('navShortcuts');
+    if(anchor){ anchor.after(pBtn); anchor.after(sBtn); } else { tools.prepend(pBtn); tools.prepend(sBtn); }
+  } }
 $('profileToggle').addEventListener('click',cycleProfile);
 $('dailyBtn').addEventListener('click',startDaily);
 $('weeklyBtn').addEventListener('click',startWeekly);
@@ -5648,11 +5650,14 @@ async function playDemo(){
   demoPlaying=true; updateDemoBtn();
   const kf=$('keyflash'); if(kf) kf.classList.add('demo');
   const r=$('result'); if(r){ r.className='result'; r.innerHTML='▶ watch the optimal keystrokes — then it’s your turn'; }
-  await sleep(900);
+  await sleep(450);
   for(const mv of moves){ if(!demoPlaying) break;
-    setDemoSel(mv.sel); await sleep(1100);
-    for(const k of mv.keys){ if(!demoPlaying) break; demoKey(k); await sleep(720); }
-    await sleep(450);
+    setDemoSel(mv.sel); await sleep(520);
+    for(const k of mv.keys){ if(!demoPlaying) break; demoKey(k);
+      // plain character typing plays fast; chords/navigation keep a readable beat
+      const plain = k && k.key && k.key.length===1 && !k.ctrl && !k.alt && !k.shift;
+      await sleep(plain?110:330); }
+    await sleep(240);
   }
   await sleep(demoPlaying?1400:150);
   if(kf) kf.classList.remove('demo');
@@ -5723,7 +5728,8 @@ function openCampaign(){
   st.forEach(c=>{
     const cCol=(window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]||'var(--line)';
     rows+='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'">'+
-      '<div class="camp-hd"><span class="camp-badge">'+(window.hkBadge?window.hkBadge(c.id, c.done, 20):(c.done?c.badge:'\u25b8'))+'</span>'+
+      '<div class="camp-hd"><span class="camp-badge">'+(window.hkBadge?window.hkBadge(c.id, c.done, 20, cCol):(c.done?c.badge:'\u25b8'))+'</span>'+
+      '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cCol+';margin-right:2px"></span>'+
       '<b>'+c.name+'</b><span class="camp-n">'+c.clearedN+'/'+c.keys.length+'</span></div>';
     if(c.unlocked){
       c.keys.forEach(k=>{
@@ -5731,7 +5737,7 @@ function openCampaign(){
         const gate=(C.par*G).toFixed(0);
         const ok=campCleared(k);
         rows+='<div class="camp-drill'+(ok?' ok':'')+'" data-key="'+k+'">'+
-          '<span>'+(ok?'\u2713 ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
+          '<span><span style="color:var(--faint)">\u2013</span> '+(ok?'\u2713 ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
           '<span class="camp-gate">'+(ok?PB[k].toFixed(2)+'s':'beat '+gate+'s')+'</span></div>';
       });
     }

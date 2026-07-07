@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>your numbers · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=30" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=30">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=30">
+<link rel="icon" href="favicon.ico?v=31" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=31">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=31">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -54,8 +54,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=30">
-<script src="drills.js?v=30"></script>
+<link rel="stylesheet" href="nav.css?v=31">
+<script src="drills.js?v=31"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -63,11 +63,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=30"></script>
+<script src="themes.js?v=31"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=30"></script>
+<script src="nav.js?v=31"></script>
 
 <header class="head">
   <div class="wrap">
@@ -181,9 +181,28 @@ async function load(){
     let traces=[];
     try{ const tr=await sb.from('runs').select('trace').eq('user_id',me.id).eq('mouse_used',false)
       .order('created_at',{ascending:false}).limit(40); traces=(tr.data||[]).map(x=>x.trace).filter(Boolean); }catch(e){}
-    const freq={};
-    traces.forEach(t=>{ (Array.isArray(t)?t:[]).forEach(k=>{ const key=(k&&k.k)||k; if(typeof key==='string') freq[key]=(freq[key]||0)+1; }); });
-    const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,12);
+    const freq={}, chordFreq={};
+    traces.forEach(t=>{ (Array.isArray(t)?t:[]).forEach(k=>{ const key=(k&&k.k)||k; if(typeof key!=='string') return;
+      freq[key]=(freq[key]||0)+1;
+      // a "shortcut" = a chord or command key, not plain typing/arrows
+      if(/\+|^Alt$|^F\d+$|^Esc/.test(key)) chordFreq[key]=(chordFreq[key]||0)+1; });
+    });
+    const top=Object.entries(chordFreq).sort((a,b)=>b[1]-a[1]).slice(0,12);
+    // lifetime tiles from the full posted-run history
+    {
+      const totKeys=mine.reduce((a,r)=>a+(r.keystrokes||0),0);
+      const totMs=mine.reduce((a,r)=>a+(r.time_ms||0),0);
+      const distinctChords=Object.keys(chordFreq).length;
+      const perDay={}; mine.forEach(r=>{ const d=String(r.created_at||'').slice(0,10); if(d) perDay[d]=(perDay[d]||0)+1; });
+      const busiest=Object.entries(perDay).sort((a,b)=>b[1]-a[1])[0];
+      const fmtT=ms=>{ const m=Math.floor(ms/60000); return m>=60? (Math.floor(m/60)+'h '+(m%60)+'m') : (m+'m '+Math.floor(ms%60000/1000)+'s'); };
+      html += `<h3 class="section-title">Lifetime</h3><div class="grid" style="margin-bottom:6px">`+
+        `<div class="stat"><div class="num">${totKeys.toLocaleString()}</div><div class="lbl">total keystrokes (posted runs)</div></div>`+
+        `<div class="stat"><div class="num">${fmtT(totMs)}</div><div class="lbl">time on the grid</div></div>`+
+        `<div class="stat"><div class="num">${distinctChords}</div><div class="lbl">distinct shortcuts used \u00b7 last ${traces.length} runs</div></div>`+
+        `<div class="stat"><div class="num">${busiest?busiest[1]:0}</div><div class="lbl">busiest day \u00b7 ${busiest?busiest[0]:'\u2014'}</div></div>`+
+        `</div>`;
+    }
     const maxF=top.length?top[0][1]:1;
     // fastest drills by keys/sec (best run per drill)
     const kps={};
@@ -192,7 +211,7 @@ async function load(){
     const kpsTop=Object.entries(kps).filter(([k])=>D.meta[k]).sort((a,b)=>b[1]-a[1]).slice(0,5);
     html += `<h3 class="section-title">Analytics <span style="float:right;font-size:9px;color:var(--warn);letter-spacing:1px">PRO \u00b7 free in beta</span></h3>`;
     if(top.length){
-      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:10px"><div class="lbl" style="margin:0 0 10px">your most-hit keys \u00b7 last ${traces.length} posted runs</div>`;
+      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:10px"><div class="lbl" style="margin:0 0 10px">your most-used shortcuts \u00b7 last ${traces.length} posted runs</div>`;
       top.forEach(([k,n])=>{ html += `<div style="display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px;margin-bottom:5px">`+
         `<span style="min-width:86px;color:var(--text)">${esc(k)}</span>`+
         `<span style="flex:1;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${Math.round(100*n/maxF)}%;background:var(--accent);border-radius:99px"></span></span>`+

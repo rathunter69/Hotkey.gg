@@ -601,6 +601,20 @@
     // universal modal-× delegation (all pages): closes the overlay AND syncs nav's flags
     if(!window.__hkModalDelegated){ window.__hkModalDelegated = true;
       document.addEventListener('click', e => {
+        // BACKDROP CLICK-AWAY: clicking the dimmed area around any overlay closes it.
+        // ({once:true} per-instance listeners kept dying after one inner click — this
+        // delegation is permanent and flag-synced.)
+        const t=e.target;
+        if(t && t.classList && t.classList.contains('show') &&
+           (t.classList.contains('profile-modal') || t.classList.contains('onboard-modal') || /Modal$/.test(t.id||''))){
+          t.classList.remove('show');
+          if(t.id==='themesModal') themesOpen=false;
+          if(t.id==='kbdModal') kbdOpen=false;
+          if(t.id==='settingsModal') settingsOpen=false;
+          if(t.id==='profileModal') profileOpen=false;
+          if(t.id==='rankedModal') t.remove();
+          return;
+        }
         const x = e.target.closest && e.target.closest('.modal-x, .pc-x');
         if(!x) return;
         const ov = x.closest('.onboard-modal, .profile-modal, [id$="Modal"]');

@@ -835,3 +835,25 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - FEATURED BOARDS: min-height 290px flex columns (no more squeezed look when
   empty/thin); empty copy now confident: "open board — first run sets the bar."
 - v30.
+
+---
+# ROUND 31 — click-away, faster demo, nav-native settings, lifetime analytics
+- CLICK-AWAY FIXED (root cause): every backdrop listener used {once:true} — one
+  inner click consumed it and the backdrop went dead. Universal backdrop close now
+  lives in nav.js's capture delegation (flag-synced, permanent); per-instance
+  listeners remain as harmless redundancy. RULE: never wire overlay closers with
+  {once:true}.
+- DEMO ~2.2x FASTER: cell-select beat 1100→520ms, key beat 720→330ms, and plain
+  character typing plays at 110ms bursts (chords keep the readable beat).
+- SETTINGS RELOCATED: HUD ⚙ popover deleted; sound-cycle (🔊/🔊↑/🔊⌨/🔇) and
+  keyboard-profile (⌨) now sit as nav tool icons beside ?, injected by index after
+  the synchronous nav mount. data-tips explain each state.
+- ANALYTICS (stats): "most-used shortcuts" now counts CHORDS/commands (Ctrl+…,
+  Alt, F-keys) rather than raw keys; new Lifetime tiles — total keystrokes, time on
+  the grid, distinct shortcuts used, busiest day.
+- BULLET DESIGN LANGUAGE (Wolf-endorsed, now standing): colored family DOT for
+  top-level items, en-dash (–) for subordinate rows — banker note-taking hierarchy.
+  Applied: picker groups (dot), drill-bar chip (dot), campaign version headers
+  (dot + family-colored medal), campaign drill rows (– prefix). Use this pattern
+  for any future list UI.
+- v31.
