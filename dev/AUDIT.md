@@ -601,3 +601,24 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   client-side and maps server errors to friendly messages. Legacy-duplicate-safe
   (index creation logged + skipped if dupes exist).
 - v22.
+
+---
+# ROUND 23 — XP made simple, achievements grind set, tools-smush fix, plugin gating
+- TOOLS SMUSHED LEFT: r21's absolute page-centering removed .topnav-pages from flex
+  flow, so tools lost their push and collapsed next to the brand. Fix:
+  .topnav-tools{margin-left:auto} in BOTH nav.css and index inline. Index dropdown
+  given min-width to stop squish.
+- XP, SIMPLIFIED IN THE UI (math unchanged): LVL chip now carries a mini XP bar
+  (hover = exact numbers); every picker row and the drill bar show "+50 xp"/"+15 xp"
+  for what the NEXT clean solve pays; explainer cut to 4 lines.
+- ACHIEVEMENTS (15 defs in drills.js HOTKEY_ACHIEVEMENTS): speed (Under Par /
+  Metronome ×10 / Untouchable = par on ALL drills), volume (100/500/2000 clean
+  solves), streak (7/30/100 days), crowns (1/5 held at once), dailies (10/50),
+  gauntlet (all 5 legs one week), Everywhere (every board). Card renders a medal
+  grid with % progress chips; tooltips give name+desc+progress. Category glyphs
+  added to hkBadge (spd/vol/str/crn/day/gnt) in themes.js + index inline.
+- PLUGIN LAYERS: cycling to Macabacus/FactSet now passes through requirePro (beta
+  unlocks; the gate exists for launch). Added verified Macabacus Ctrl+Shift+V paste-
+  values. NOTE: Wolf's original curated hotkey/macro list is NOT in the repo —
+  request it; the full layer wires in same-session when provided.
+- v23.

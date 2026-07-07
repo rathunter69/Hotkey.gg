@@ -411,6 +411,21 @@
           chs.map(c=>'<span class="pc-badge" title="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'">'+(window.hkBadge?window.hkBadge(c.id, c.done):c.badge)+'</span>').join('')+
           '<span class="pc-badge" title="Campaign Complete \u2014 every chapter cleared">'+(window.hkBadge?window.hkBadge('fin', allDone):CAMP.finisher.badge)+'</span>'+
           '</div>'+
+          (function(){
+            const AC=window.HOTKEY_ACHIEVEMENTS;
+            if(!AC) return '';
+            let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+            let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
+            const ctx={ pb:PBl, pars:window.HOTKEY_PARS||{}, runs:d.myRuns||[], streak:streakN, solves:solvesN,
+              crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(),
+              att:d.attempted, menuOrder:MENU_ORDER };
+            let out='<div class="pc-ach-h">achievements</div><div class="pc-ach">';
+            AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
+              out+='<span class="pc-ach-i'+(r.done?' got':'')+'" title="'+a.name+' \u2014 '+a.desc+(r.done?' \u2713':' ('+r.prog+'/'+r.goal+')')+'">'+
+                (window.hkBadge?window.hkBadge(a.glyph, r.done, 24):'')+
+                '<i>'+(r.done?'\u2713':Math.min(99,Math.round(100*r.prog/r.goal))+'%')+'</i></span>'; });
+            return out+'</div>';
+          })() +
           '<a class="pc-legend-t" id="pcLegendT">what am I looking at?</a>'+
           '<div class="pc-legend" id="pcLegend">'+
             '<b>rank</b> \u2014 your average placement across every board you\u2019ve entered; buckets split each tier in thirds<br>'+

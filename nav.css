@@ -23,7 +23,7 @@
 .tl-label{display:none}
 .topnav-link:hover{color:var(--text); background:var(--surface)}
 .topnav-link.active{color:var(--accent); background:var(--surface)}
-.topnav-tools{display:flex; align-items:center; gap:2px}
+.topnav-tools{display:flex; align-items:center; gap:2px; margin-left:auto}
 .topnav-icon{background:none; border:none; color:var(--muted); cursor:pointer; padding:8px;
   border-radius:6px; transition:all .15s; display:inline-flex; align-items:center; justify-content:center}
 .topnav-icon:hover{color:var(--text); background:var(--surface)}
@@ -185,3 +185,11 @@
   background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:0 0 14px}
 .pc-legend.show{display:block}
 .pc-legend b{color:var(--text)}
+
+/* ---- achievements grid ---- */
+.pc-ach-h{font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin:2px 0 6px}
+.pc-ach{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:12px}
+.pc-ach-i{position:relative; display:inline-flex; cursor:default}
+.pc-ach-i i{position:absolute; bottom:-4px; right:-4px; font-style:normal; font-family:var(--mono); font-size:7.5px;
+  background:var(--surface2); border:1px solid var(--line); border-radius:99px; padding:1px 4px; color:var(--muted)}
+.pc-ach-i.got i{color:var(--warn); border-color:var(--warn)}

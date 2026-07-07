@@ -57,7 +57,7 @@
   .tl-label{display:none}   /* desktop: icon-only (labels return in the mobile menu) */
   @media (max-width:760px){ .tl-label{display:inline} }
   .topnav-link.active{color:var(--accent); background:var(--surface)}
-  .topnav-tools{display:flex; align-items:center; gap:2px}
+  .topnav-tools{display:flex; align-items:center; gap:2px; margin-left:auto}
   .topnav-icon{background:none; border:none; color:var(--muted); cursor:pointer; padding:8px;
     border-radius:6px; display:flex; align-items:center; justify-content:center; transition:.13s}
   .topnav-icon:hover{color:var(--text); background:var(--surface)}
@@ -274,6 +274,12 @@
   .db-hint{margin-left:auto; font-size:10.5px; color:var(--faint)}
   .db-hint kbd{background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:9.5px}
   @media(max-width:700px){ .db-hint{display:none} }
+  .lvl-bar{display:inline-block; width:44px; height:5px; background:var(--surface2); border-radius:99px;
+    overflow:hidden; margin-left:7px; vertical-align:middle}
+  .lvl-bar span{display:block; height:100%; background:var(--accent); border-radius:99px}
+  .pk-xp{font-family:var(--mono); font-size:10px; color:var(--accent); background:var(--accent-glow);
+    border-radius:6px; padding:2px 7px; margin-left:8px; white-space:nowrap}
+  .db-xp{font-size:10px; color:var(--accent); background:var(--accent-glow); border-radius:6px; padding:2px 7px}
   .prefs-pop{display:none; position:absolute; top:calc(100% + 6px); right:0; z-index:60;
     background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px;
     flex-direction:column; gap:8px; box-shadow:0 14px 40px rgba(0,0,0,.4); min-width:170px}
@@ -439,6 +445,7 @@
   .auth-btn:hover{color:var(--accent); border-color:var(--accent-dim)}
   /* User menu: dropdown anchored to a topnav-styled button so the username matches the rest of the header. */
   .user-menu{position:relative; display:inline-flex; align-items:center}
+  .um-menu{min-width:190px}
   .user-btn{font-family:var(--mono); font-size:13px; color:var(--muted); background:none;
     border:none; padding:8px 12px; border-radius:6px; cursor:pointer; transition:.13s;
     display:inline-flex; align-items:center; gap:7px; letter-spacing:.2px}
@@ -873,7 +880,7 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=22"></script>
+<script src="drills.js?v=23"></script>
 </head>
 <body>
 <nav class="topnav">
@@ -3267,7 +3274,11 @@ let keyProfile='native';
 async function loadProfile(){ const v=await KV.get('hotkey_profile'); if(v==='macabacus'||v==='factset') keyProfile=v; }
 function saveProfile(){ KV.set('hotkey_profile', keyProfile); }
 function updateProfileBtn(){ const b=$('profileToggle'); if(b){ b.innerHTML='\u2328 '+keyProfile; b.classList.toggle('on', keyProfile!=='native'); } }
-function cycleProfile(){ keyProfile = keyProfile==='native'?'macabacus':(keyProfile==='macabacus'?'factset':'native'); saveProfile(); updateProfileBtn(); }
+function cycleProfile(){
+  const next = keyProfile==='native'?'macabacus':(keyProfile==='macabacus'?'factset':'native');
+  if(next!=='native' && !requirePro('Plugin keyboard layers (Macabacus / FactSet)')) return;
+  keyProfile = next; saveProfile(); updateProfileBtn();
+}
 
 // Macabacus Fast Fill: from a single cell, extend to the data extent of the guide row
 // (the row above if it has data, else the row below), then fill. Multi-cell selection
@@ -3949,6 +3960,8 @@ document.addEventListener('keydown',e=>{
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
       const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
+    if(keyProfile==='macabacus' && e.shiftKey && !e.altKey && lk==='v'){
+      e.preventDefault(); startClock(); logKey('Ctrl+Shift+V'); doPaste('values'); commitAction(); return; }  // Macabacus paste values (documented default)
     if(e.altKey && lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+V');
       mode='ribbon'; path=['E','S']; dialog='paste'; pasteKind='all'; ribbonNote=''; drawRibbon(); return; }
     if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
@@ -4646,6 +4659,12 @@ window.hkBadge = window.hkBadge || function(id, earned, size){
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
   const G={
+    spd:'<path d="M14 8l-4 6h4l-2 6 6-8h-4l2-4z"/>',
+    vol:'<path d="M8.5 17.5h9 M8.5 14h9 M8.5 10.5h9"/>',
+    str:'<path d="M13 7c2.6 2 4.4 4.2 4.4 7a4.4 4.4 0 0 1-8.8 0c0-1.4.6-2.6 1.5-3.7.2 1 .8 1.8 1.7 2.2-.3-2 .2-4 1.2-5.5z"/>',
+    crn:'<path d="M8 17l-1-6 3.4 2.4L13 9.5l2.6 3.9L19 11l-1 6z"/>',
+    day:'<circle cx="13" cy="13" r="4.4"/><path d="M13 5.6v1.8 M13 18.6v1.8 M5.6 13h1.8 M18.6 13h1.8"/>',
+    gnt:'<path d="M8 8v10 M8 8h8l-2 2.5 2 2.5H8"/>',
     c1:'<path d="M13 8v10 M8 13h10 M13 8l-2.4 2.4 M13 8l2.4 2.4 M13 18l-2.4-2.4 M13 18l2.4-2.4" />',                       // navigation arrows
     c2:'<rect x="8.5" y="8.5" width="9" height="9" rx="1"/><rect x="10.7" y="10.7" width="4.6" height="4.6" rx=".6"/>',    // formatting frames
     c3:'<path d="M9 17v-3 M13 17v-6 M17 17v-9"/>',                                                                          // data bars
@@ -5374,9 +5393,15 @@ function updateStreak(){ const today=dailyDateStr(); if(streak.d===today){ rende
 function localXP(nsol){ return 15*(nsol||0) + 50*Object.keys(PB).length; }
 function lvlOf(xp){ let lvl=1, need=150, floor=0;
   while(xp >= floor+need){ floor+=need; lvl++; need=150*lvl; } return lvl; }
+function lvlDetail(xp){ let lvl=1, need=150, floor=0;
+  while(xp>=floor+need){ floor+=need; lvl++; need=150*lvl; }
+  return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; }
 function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
-  const l=lvlOf(localXP(nsol));
-  el.style.display='inline-flex'; el.textContent='LVL '+l; el.style.cursor='pointer'; el.onclick=openXpInfo;
+  const L=lvlDetail(localXP(nsol));
+  el.style.display='inline-flex';
+  el.innerHTML='LVL '+L.lvl+' <span class="lvl-bar"><span style="width:'+L.pct+'%"></span></span>';
+  el.style.cursor='pointer'; el.onclick=openXpInfo;
+  el.title=L.into+' / '+L.need+' xp to LVL '+(L.lvl+1)+' \u2014 click for the full breakdown';
   el.title='level '+l+' \u2014 every clean solve and new drill feeds it. Full XP math on your player card.'; }
 function renderStreak(){ const el=$('streakBadge'); if(!el) return;
   el.style.display = streak.n>0 ? 'inline-flex' : 'none';
@@ -5441,22 +5466,29 @@ function openXpInfo(){
     '<a class="modal-x" id="xpX">\u00d7</a>'+
     '<div class="ob-title">how xp works</div>'+
     '<div class="ob-body" style="text-align:left;font-size:12.5px;line-height:2">'+
-    '<b style="color:var(--accent)">+50</b> first clean clear of a drill <span style="color:var(--faint)">(+15 if par \u2265 55s \u2014 advanced)</span><br>'+
-    '<b style="color:var(--accent)">+15</b> clean solves 2\u201310 of that drill \u00b7 <b>+3</b> beyond ten <span style="color:var(--faint)">(grinding one drill decays)</span><br>'+
-    '<b style="color:var(--accent)">+30</b> daily challenge \u00b7 <b>+25</b> per gauntlet leg<br>'+
-    '<b style="color:var(--accent)">+20</b> marathon session \u00b7 <b>+10</b> rapid-fire session<br>'+
-    '<b style="color:var(--warn)">+25</b> per top-10 board \u00b7 <b>+100</b> per podium \u00b7 <b>+250</b> per crown<br>'+
-    '<span style="color:var(--muted);font-size:11px">Levels cost 150 \u00d7 level more each time \u2014 breadth and showing up beat repetition. Only posted (signed-in, mouse-free) runs count toward the server total.</span>'+
+    '<b style="color:var(--accent)">new drill</b> +50 (advanced +65) \u00b7 <b>repeat</b> +15<br>'+
+    '<b style="color:var(--accent)">daily</b> +30 \u00b7 <b>gauntlet leg</b> +25 \u00b7 <b>marathon</b> +20 \u00b7 <b>rapid-fire</b> +10<br>'+
+    '<b style="color:var(--warn)">boards</b>: top-10 +25 \u00b7 podium +100 \u00b7 crown +250<br>'+
+    '<span style="color:var(--muted);font-size:11px">Each level costs a bit more than the last. New drills and showing up daily are the fastest climb.</span>'+
     '</div><div class="ob-opts"><button class="ob-key primary" id="xpClose">got it</button></div></div>';
   m.classList.add('show');
   $('xpClose').onclick=()=>m.classList.remove('show');
   $('xpX').onclick=()=>m.classList.remove('show');
   m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
 }
+function xpEarnFor(key){
+  // what the NEXT clean solve of this drill pays (client estimate; repeat decay not shown)
+  if(PB[key]===undefined) return 50 + ((CHALLENGES[key]&&CHALLENGES[key].par>=55)?15:0);
+  return 15;
+}
 function updateDrillBar(){
   const g=$('dbGroup'), l=$('dbLabel'); if(!g||!l) return;
   g.textContent=(window.HOTKEY_DRILLS.groupOf[cur]||'')+' \u00b7 ';
   l.textContent=(window.HOTKEY_DRILLS.labelOf[cur]||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
+  let xc=$('dbXp');
+  if(!xc){ xc=document.createElement('span'); xc.id='dbXp'; xc.className='db-xp'; l.parentElement.appendChild(xc); }
+  xc.textContent='+'+xpEarnFor(cur)+' xp';
+  xc.title='what your next clean solve of this drill earns';
 }
 function stepDrill(dir){
   const i=MENU_ORDER.indexOf(cur);
@@ -5544,7 +5576,8 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
       row.className='pk-row'+(key===cur?' cur':''); row.dataset.key=key;
       const best = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
       row.innerHTML='<span class="pk-num">'+(n<=9?n:'')+'</span>'+
-        '<span class="pk-info"><div class="pk-name">'+escHtml(C.label||C.name||key)+'</div>'+
+        '<span class="pk-info"><div class="pk-name">'+escHtml(C.label||C.name||key)+
+        '<span class="pk-xp">+'+xpEarnFor(key)+' xp</span></div>'+
         '<div class="pk-desc">'+escHtml(DRILL_DESC[key]||'')+'</div></span>'+
         '<span class="pk-best">best <b>'+best+'</b></span>';
       row.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };

@@ -241,6 +241,12 @@ window.hkBadge = function(id, earned, size){
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
   const G={
+    spd:'<path d="M14 8l-4 6h4l-2 6 6-8h-4l2-4z"/>',
+    vol:'<path d="M8.5 17.5h9 M8.5 14h9 M8.5 10.5h9"/>',
+    str:'<path d="M13 7c2.6 2 4.4 4.2 4.4 7a4.4 4.4 0 0 1-8.8 0c0-1.4.6-2.6 1.5-3.7.2 1 .8 1.8 1.7 2.2-.3-2 .2-4 1.2-5.5z"/>',
+    crn:'<path d="M8 17l-1-6 3.4 2.4L13 9.5l2.6 3.9L19 11l-1 6z"/>',
+    day:'<circle cx="13" cy="13" r="4.4"/><path d="M13 5.6v1.8 M13 18.6v1.8 M5.6 13h1.8 M18.6 13h1.8"/>',
+    gnt:'<path d="M8 8v10 M8 8h8l-2 2.5 2 2.5H8"/>',
     c1:'<path d="M13 8v10 M8 13h10 M13 8l-2.4 2.4 M13 8l2.4 2.4 M13 18l-2.4-2.4 M13 18l2.4-2.4" />',                       // navigation arrows
     c2:'<rect x="8.5" y="8.5" width="9" height="9" rx="1"/><rect x="10.7" y="10.7" width="4.6" height="4.6" rx=".6"/>',    // formatting frames
     c3:'<path d="M9 17v-3 M13 17v-6 M17 17v-9"/>',                                                                          // data bars
