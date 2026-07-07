@@ -141,20 +141,23 @@ else window.syncThemeLabels();
    Single source of truth for every page (themes.js loads everywhere). */
 
 /* ---- rank emblems: LoL-style layered crests, single source for all pages ---- */
-window.RANK_EMBLEM_IDX = {'Candidate':0,'Summer Analyst':1,'Incoming Analyst':2,
-  'First-Year Analyst':3,'Top-Bucket Analyst':4,'Second-Year Analyst':5};
+window.RANK_EMBLEM_IDX = {'MBA Associate':0,'Candidate':1,'Summer Analyst':2,
+  'First-Year Analyst':3,'Associate':4,'VP':5,'MD':6,'Second-Year Analyst':7};
 window.rankEmblem = function(tierName, size, bucket){
   const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
   size = size || 16;
-  /* THE KEYCAP LADDER — the keyboard gets nicer as you climb.
-     Per-tier palette (rim / face / legend / fx). Layered flat colors, no gradient ids. */
+  /* THE KEYCAP LADDER, desk edition. MBA Associate's cap bears a MOUSE (they still
+     reach for it). MD is crimson power with a crown but no F4 — never touches Excel.
+     Second-Year Analyst is the radiant final boss. Layered flats, no gradient ids. */
   const P=[
-    {rim:'#5a5d63', face:'#2a2c30', top:'#34373c', leg:'#8b8e94', fx:null},                     // Candidate — plain plastic
+    {rim:'#8a8271', face:'#25231e', top:'#2f2d26', leg:'#a89e88', fx:'mouse'},                  // MBA — dusty plastic + mouse
+    {rim:'#5a5d63', face:'#2a2c30', top:'#34373c', leg:'#8b8e94', fx:null},                     // Candidate — plain
     {rim:'#b0793f', face:'#2e2418', top:'#3d3020', leg:'#e0a35c', fx:null},                     // Summer — bronze
-    {rim:'#b9c2cf', face:'#23262b', top:'#31353c', leg:'#dde4ee', fx:'ticks'},                  // Incoming — silver, machined
-    {rim:'#e3b341', face:'#2b2413', top:'#3a301a', leg:'#ffd769', fx:'laurel'},                 // First-Year — gold, laureled
-    {rim:'#7fd4c1', face:'#132a26', top:'#1a3833', leg:'#a9f0e0', fx:'wings'},                  // Top-Bucket — platinum ice, winged
-    {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},                // Second-Year — diamond, radiant
+    {rim:'#b9c2cf', face:'#23262b', top:'#31353c', leg:'#dde4ee', fx:'ticks'},                  // First-Year — machined silver
+    {rim:'#e3b341', face:'#2b2413', top:'#3a301a', leg:'#ffd769', fx:'laurel'},                 // Associate — gold, laureled
+    {rim:'#7fd4c1', face:'#132a26', top:'#1a3833', leg:'#a9f0e0', fx:'wings'},                  // VP — platinum ice, winged
+    {rim:'#e06a55', face:'#2d1512', top:'#3c1d18', leg:'#ffb3a3', fx:'crown'},                  // MD — crimson corner office
+    {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},                // Second-Year — radiant diamond
   ];
   const p=P[i];
   let fx1='', fx2='';
@@ -162,25 +165,30 @@ window.rankEmblem = function(tierName, size, bucket){
   if(p.fx==='laurel') fx1='<path d="M7 26c-2.4-2-3.4-5-3-8 M27 26c2.4-2 3.4-5 3-8" fill="none" stroke="'+p.rim+'" stroke-width="1.6" stroke-linecap="round"/>'+
                           '<path d="M4.6 21.5l-2-.4 M5 18.6l-1.9-1 M29.4 21.5l2-.4 M29 18.6l1.9-1" stroke="'+p.rim+'" stroke-width="1.3" stroke-linecap="round"/>';
   if(p.fx==='wings')  fx1='<path d="M5 12C2.2 11 .8 8.6.4 6.4 3.4 7 5.6 8.4 6.8 10.4Z M29 12c2.8-1 4.2-3.4 4.6-5.6-3 .6-5.2 2-6.4 4Z" fill="'+p.rim+'" opacity=".9"/>';
+  if(p.fx==='crown')  fx1='<path d="M11 5.6l2.2 2.6L17 4.6l3.8 3.6L23 5.6l-1 4.4H12z" fill="'+p.rim+'"/>';
   if(p.fx==='radiant'){
     fx1='<path d="M17 .8l1 3.2 M17 .8l-1 3.2 M6.5 3.5l2.2 2.4 M27.5 3.5l-2.2 2.4 M2 11h3.2 M32 11h-3.2" stroke="'+p.rim+'" stroke-width="1.5" stroke-linecap="round" opacity=".85"/>'+
         '<path d="M12.6 4.6L14 1.8l3 1.7 3-1.7 1.4 2.8" fill="none" stroke="'+p.leg+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
     fx2='<path d="M17 12.2l1.1 2.6 2.8.3-2.1 1.8.7 2.7-2.5-1.5-2.5 1.5.7-2.7-2.1-1.8 2.8-.3z" fill="'+p.leg+'"/>';
   }
-  const legend = (i===0) ? '' :
-    (p.fx==='radiant' ? fx2 :
-    '<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="9.5" fill="'+p.leg+'">F4</text>');
-  // bucket pips (optional third arg): 1=Bottom, 2=Middle, 3=Top
+  let legend;
+  if(p.fx==='mouse'){
+    legend='<g fill="none" stroke="'+p.leg+'" stroke-width="1.4" stroke-linecap="round">'+
+      '<rect x="13.4" y="11.5" width="7.2" height="10.5" rx="3.6"/><path d="M17 11.5v3.6"/></g>';
+  } else if(p.fx==='radiant'){ legend=fx2; }
+  else if(i===1){ legend=''; }
+  else if(p.fx==='crown'){ legend='<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="8.5" fill="'+p.leg+'">MD</text>'; }
+  else { legend='<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="9.5" fill="'+p.leg+'">F4</text>'; }
   let pips='';
   if(bucket){
     const n = bucket==='Top Bucket'?3:(bucket==='Middle Bucket'?2:1);
     for(let k=0;k<3;k++) pips+='<circle cx="'+(13+k*4)+'" cy="31.4" r="1.5" fill="'+(k<n?p.rim:'#3a3d42')+'"/>';
   }
-  return '<svg class="rank-emblem'+(i===5?' emblem-max':'')+'" viewBox="0 0 34 34" width="'+size+'" height="'+size+'" aria-hidden="true">'+
+  return '<svg class="rank-emblem'+(i===7?' emblem-max':'')+'" viewBox="0 0 34 34" width="'+size+'" height="'+size+'" aria-hidden="true">'+
     fx1+
-    '<rect x="6" y="8" width="22" height="20" rx="5" fill="#0a0b0c"/>'+                      /* key base */
+    '<rect x="6" y="8" width="22" height="20" rx="5" fill="#0a0b0c"/>'+
     '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="'+p.face+'" stroke="'+p.rim+'" stroke-width="1.8"/>'+
-    '<rect x="9.4" y="8.4" width="15.2" height="6" rx="3" fill="'+p.top+'"/>'+               /* top-face light */
+    '<rect x="9.4" y="8.4" width="15.2" height="6" rx="3" fill="'+p.top+'"/>'+
     legend + pips +
     '</svg>';
 };
@@ -188,20 +196,24 @@ window.rankEmblem = function(tierName, size, bucket){
 /* ---- shared rank/level math for account.html + stats.html (older pages keep
    their documented duplicates — sync all on threshold changes) ---- */
 window.HK_RANK = {
+  /* THE LADDER, desk-culture edition. MBA Associate is the floor (they mean well),
+     the MD can't use Excel, and the Second-Year Analyst is the true final boss.
+     pct thresholds live on the SHRUNK rating scale (see ratingOf): each equals the
+     advertised raw performance at that tier's gate att: rating=(att*raw+K/2)/(att+K). */
   TIERS:[
-    {name:'Candidate',           cls:'tier-unranked', att:0,  pct:9,    req:'take the placement — everyone starts here'},
-    {name:'Summer Analyst',      cls:'tier-bronze',   att:5,  pct:1.01, req:'5 drills attempted, any placement'},
-    /* pct thresholds live on the SHRUNK rating scale (see ratingOf). Each equals the
-       advertised raw performance at that tier's gate att: rating=(att*raw+K/2)/(att+K). */
-    {name:'Incoming Analyst',    cls:'tier-silver',   att:8,  pct:0.53, req:'8 drills \u00b7 top 55% avg placement'},
-    {name:'First-Year Analyst',  cls:'tier-gold',     att:10, pct:0.375, req:'10 drills \u00b7 top 30%'},
-    {name:'Top-Bucket Analyst',  cls:'tier-platinum', att:13, pct:0.26, req:'13 drills \u00b7 top 15%'},
-    {name:'Second-Year Analyst', cls:'tier-diamond',  att:15, pct:0.18, req:'15 drills \u00b7 top 5% \u2014 the summit'},
+    {name:'MBA Associate',       cls:'tier-mba',      att:0,  pct:9,    req:'everyone starts here \u2014 yes, everyone'},
+    {name:'Candidate',           cls:'tier-unranked', att:5,  pct:1.01, req:'5 drills attempted, any placement'},
+    {name:'Summer Analyst',      cls:'tier-bronze',   att:8,  pct:0.53, req:'8 drills \u00b7 top 55% avg placement'},
+    {name:'First-Year Analyst',  cls:'tier-silver',   att:10, pct:0.375, req:'10 drills \u00b7 top 30%'},
+    {name:'Associate',           cls:'tier-gold',     att:12, pct:0.31, req:'12 drills \u00b7 top 22%'},
+    {name:'VP',                  cls:'tier-platinum', att:14, pct:0.255, req:'14 drills \u00b7 top 15%'},
+    {name:'MD',                  cls:'tier-crimson',  att:16, pct:0.195, req:'16 drills \u00b7 top 8% \u2014 the corner office'},
+    {name:'Second-Year Analyst', cls:'tier-diamond',  att:18, pct:0.15, req:'18 drills \u00b7 top 3% \u2014 the true final boss'},
   ],
-  PROVISIONAL_W: 6,   // weighted-board exposure needed before ranks above Silver unlock
+  PROVISIONAL_W: 6,   // weighted-board exposure needed before ranks above Summer Analyst unlock
   tierOf(avgPct, att, wsum){
     const T=this.TIERS;
-    if(avgPct===null || (att||0)<5) return {...T[0], i:0, bucket:null, full:T[0].name, provisional:false};
+    if(avgPct===null || (att||0)<5) return {...T[0], i:0, bucket:null, full:T[0].name, provisional:false};   // MBA Associate — the floor
     let t={...T[1], i:1};
     for(let i=T.length-1;i>=1;i--){ if(att>=T[i].att && avgPct<=T[i].pct){ t={...T[i], i}; break; } }
     // PLACEMENT SEASON-ZERO RULE: until you've faced enough real competition
@@ -210,7 +222,7 @@ window.HK_RANK = {
     // EARNS altitude as the field fills in — no day-one Second-Years off 3-player boards.
     let provisional=false;
     if(wsum!==undefined && wsum!==null && wsum < this.PROVISIONAL_W && t.i>2){
-      t={...T[2], i:2}; provisional=true;
+      t={...T[2], i:2}; provisional=true;   // capped at Summer Analyst until real exposure
     } else if(wsum!==undefined && wsum!==null && wsum < this.PROVISIONAL_W){ provisional=true; }
     t.provisional=provisional;
     // BUCKETS — comp-review language. Your position inside the tier's percentile band,

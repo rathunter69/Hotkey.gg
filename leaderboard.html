@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the boards · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=32" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=32">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=32">
+<link rel="icon" href="favicon.ico?v=33" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=33">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=33">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -118,7 +118,8 @@
   .chip.on{color:var(--text); border-color:var(--accent); background:var(--accent-glow)}
   .chip .cg{color:var(--faint); font-size:9px; text-transform:uppercase; letter-spacing:.6px; display:block}
   /* fit & rhythm polish */
-  .featured .board{height:100%; box-sizing:border-box; margin:0; min-height:290px; display:flex; flex-direction:column}
+  .featured .board{height:100%; box-sizing:border-box; margin:0; min-height:230px; display:flex; flex-direction:column; min-width:0}
+  .featured .board h4{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .featured .board .empty{padding:16px 18px 4px}
   .hero .panel{display:flex; flex-direction:column}
   .hero .panel > :last-child{margin-top:auto}
@@ -157,15 +158,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=32">
-<script src="drills.js?v=32"></script>
+<link rel="stylesheet" href="nav.css?v=33">
+<script src="drills.js?v=33"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=32"></script>
+<script src="themes.js?v=33"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=32"></script>
+<script src="nav.js?v=33"></script>
 
 <header class="head">
   <div class="wrap">
@@ -274,16 +275,10 @@ const rapidScore    = r => { const t=r.score+(r.misses||0); const a=t?Math.round
                              return `${r.score} hit${r.score===1?'':'s'} · ${a}%`; };
 
 /* ---- tier + level math (mirrors index.html/nav.js — keep the three in sync) ---- */
-const TIERS=[
-  {name:'Summer Analyst',      cls:'tier-bronze',   att:5,  pct:1.01},
-  {name:'Incoming Analyst',    cls:'tier-silver',   att:8,  pct:0.55},
-  {name:'First-Year Analyst',  cls:'tier-gold',     att:10, pct:0.30},
-  {name:'Top-Bucket Analyst',  cls:'tier-platinum', att:13, pct:0.15},
-  {name:'Second-Year Analyst', cls:'tier-diamond',  att:15, pct:0.05},
-];
+const TIERS = window.HK_RANK.TIERS.slice(1);   // ranked tiers (floor 'MBA Associate' excluded from requirement lists)
 function tierOf(avgPct, att){
   if(window.HK_RANK){ const t=window.HK_RANK.tierOf(avgPct, att); return {...t, i:t.i-1}; }  // HK_RANK indexes incl. Candidate; local TIERS excludes it
-  if(avgPct===null || (att||0)<5) return {name:'Candidate', cls:'tier-unranked', i:-1};
+  return window.HK_RANK.tierOf(avgPct, att);
   for(let i=TIERS.length-1;i>=0;i--){ if(att>=TIERS[i].att && avgPct<=TIERS[i].pct) return {...TIERS[i], i}; }
   return {...TIERS[0], i:0};
 }
@@ -322,10 +317,12 @@ async function load(){
     const seen={}, best=[];
     fRuns.filter(x=>x.challenge===c.key).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; best.push(x); } });
     perDrill[c.key]=best;
-    best.forEach((r,i)=>{ const u=userStat[r.user_id]=userStat[r.user_id]||{att:0,sum:0,crowns:0,pod:0,t10:0};
-      u.att++; u.sum+=i/best.length;
+    best.forEach((r,i)=>{ const u=userStat[r.user_id]=userStat[r.user_id]||{att:0,entries:[],crowns:0,pod:0,t10:0};
+      u.att++; u.entries.push({pct: best.length>1 ? i/(best.length-1) : 0, n:best.length});
       if(i===0)u.crowns++; if(i<3)u.pod++; if(i<10)u.t10++; });
   });
+  Object.values(userStat).forEach(st=>{ st.avg = window.HK_RANK.ratingOf(st.entries);
+    st.wsum = st.entries.reduce((a,e)=>a+Math.min(1, Math.log2((e.n||1)+1)/Math.log2(9)),0); });
   const mySolves = meId ? fRuns.filter(x=>x.user_id===meId).length : 0;
   DATA={profs,runs,sessions,fRuns,fSessions,names,meId,teamIds,myTeam,teamOnly,perDrill,userStat,mySolves};
   renderAll();
@@ -374,7 +371,7 @@ function heroHtml(){
         '</div>';
     }
   }
-  const avg=me.att?me.sum/me.att:null;
+  const avg=me.att?me.avg:null;
   const t=tierOf(avg, me.att);
   // XP v2 — mirror of nav.js computeXP (anti-grind decay + challenge bonuses)
   const perD={}; let xp=0;
@@ -418,7 +415,7 @@ function rankedInfographic(){
   if(!m){ m=document.createElement('div'); m.id='rankedModal';
     m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px';
     document.body.appendChild(m); }
-  const T=[{name:'Candidate',cls:'tier-unranked'},...TIERS];
+  const T=window.HK_RANK.TIERS;
   let rows='';
   T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:12px;padding:7px 4px;font-family:var(--mono);font-size:12.5px">'+
     '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,20):'')+'</span>'+
@@ -441,7 +438,7 @@ function rankedInfographic(){
 function ladderHtml(){
   const {userStat,meId}=DATA;
   const me=(meId&&userStat[meId])||{att:0,sum:0};
-  const avg=me.att?me.sum/me.att:null;
+  const avg=me.att?me.avg:null;
   const cur=tierOf(avg, me.att);
   const T=[{name:'Candidate',cls:'tier-unranked',req:'take the placement'},
     ...TIERS.map(t=>({name:t.name,cls:t.cls,req:(t.att?t.att+' drills':'')+(t.pct<=1?' \u00b7 top '+Math.round(t.pct*100)+'%':' \u00b7 any placement')}))];
@@ -457,7 +454,7 @@ function ladderHtml(){
 }
 function topPlayersHtml(){
   const {userStat,names,meId}=DATA;
-  const ranked=Object.keys(userStat).map(u=>({u, ...userStat[u], avg:userStat[u].sum/userStat[u].att}))
+  const ranked=Object.keys(userStat).map(u=>({u, ...userStat[u]}))
     .filter(x=>x.att>=5).sort((a,b)=>a.avg-b.avg || b.att-a.att);
   let rows='';
   ranked.slice(0,8).forEach((x,i)=>{
@@ -518,7 +515,7 @@ function rosterHtml(){
   if(!users.length) return '';
   const myTier = meId && users.find(x=>x.u===meId) ? users.find(x=>x.u===meId).tier.name : null;
   if(rosterTier===null) rosterTier = myTier || TIERS[0].name;
-  const tierNames=['Candidate',...TIERS.map(t=>t.name)];
+  const tierNames=window.HK_RANK.TIERS.map(t=>t.name);
   const inTier=users.filter(x=>x.tier.name===rosterTier).sort((a,b)=>a.av-b.av);
   let rows=inTier.map((x,i)=>'<div class="ros-row'+(x.u===meId?' me':'')+'">'+
     '<span class="ros-n">'+(i+1)+'</span>'+
@@ -565,9 +562,10 @@ function renderAll(){
   root.innerHTML =
     '<div class="hero">'+heroHtml()+ladderHtml()+topPlayersHtml()+'</div>'+
     featuredHtml()+
+    rosterHtml()+
     '<h3 class="section-title">Browse the boards</h3>'+browserHtml();
   wire();
-  document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; render(); });
+  document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; renderAll(); });
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
   const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ try{ localStorage.setItem('hk_ranked','0'); }catch(e){} load(); };

@@ -37,7 +37,8 @@
   // Same tier function as index.html. Kept in sync — if thresholds change there, change here.
   function tierOf(avgPct, attemptedCount){
     if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);   // consolidated source
-    if(avgPct===null || (attemptedCount||0) < 5) return {name:'Candidate', cls:'tier-unranked'};
+    if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);
+    if(avgPct===null || (attemptedCount||0) < 5) return {name:'MBA Associate', cls:'tier-mba'};
     if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
     if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst', cls:'tier-platinum'};
     if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'First-Year Analyst', cls:'tier-gold'};
@@ -300,7 +301,7 @@
   // Rank pill: fetch standing once per session (10-min cache shared with index.html via sessionStorage)
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
-    try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null');
+    try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
       if(c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n):'')+'<span>'+c.n+'</span>';
         el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
     if(!window.sb || !window._navUser) return;
@@ -309,7 +310,7 @@
       const t = tierOf(d.avgPct, d.attempted);
       el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span>';
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
-      try{ sessionStorage.setItem('hk_rank', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
+      try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
     }catch(e){}
   }
   // user state lands async — poll briefly, then give up quietly
@@ -508,9 +509,29 @@
     if(btn) btn.classList.remove('open');
     if(dd)  dd.classList.remove('open');
   }
+  window.__navAuthKick = async function(){
+    try{
+      if(window.sb){
+        const { data } = await window.sb.auth.getSession();
+        window._navUser = data && data.session ? data.session.user : null;
+        if(window._navUser){
+          try{ const p = await window.sb.from('profiles').select('handle,flair').eq('id', window._navUser.id).maybeSingle();
+            window._navProfile = p && p.data ? p.data : null; }catch(e){}
+        }
+      }
+    }catch(e){}
+    try{ renderAuthBar(); }catch(e){}
+  };
   function renderAuthBar(){
     const slot = $('authSlot'); if(!slot) return;
-    if(!window.sb){ slot.innerHTML = ''; return; }
+    if(!window.sb){
+      // nav.js runs at body-top; pages create window.sb in their bottom scripts.
+      // Retry briefly instead of rendering an empty slot forever (the "no username
+      // on the game/boards pages" bug), and pages can force it via navRefreshAuth().
+      slot.innerHTML = '';
+      if((window.__navSbTries=(window.__navSbTries||0)+1) < 40) setTimeout(()=>{ try{ if(window.__navAuthKick) window.__navAuthKick(); else renderAuthBar(); }catch(e){} }, 150);
+      return;
+    }
     if(!window._navUser){
       // Not signed in at all — show a "sign in" button that routes through the trainer's auth modal.
       slot.innerHTML = '<button class="auth-btn" id="authSignInBtn">sign in</button>';
@@ -558,6 +579,7 @@
   // Anything nav owns that's currently covering the page (game code checks this
   // to pause its own keyboard handling under our overlays).
   window.navOverlayOpen = () => !!(themesOpen || kbdOpen || settingsOpen || profileOpen);
+  window.navRefreshAuth = function(){ try{ if(window.__navAuthKick) window.__navAuthKick(); }catch(e){} };
   document.addEventListener('keydown', e => {
     const onTrainer = window.NAV_ACTIVE === 'trainer';
     if(e.key === 'Escape'){

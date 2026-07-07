@@ -5,12 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg — no mouse allowed</title>
 <script>
+  // BOOT BEACON: if anything fatal happens while the game loads, paint the error on
+  // screen instead of failing silent ("all the elements are gone" must never be a mystery).
+  window.addEventListener('error', function(e){
+    try{
+      var b=document.getElementById('hkBootErr');
+      if(!b){ b=document.createElement('div'); b.id='hkBootErr';
+        b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#7c2318;color:#ffd9d1;font:12px ui-monospace,monospace;padding:10px 16px;white-space:pre-wrap';
+        (document.body||document.documentElement).appendChild(b); }
+      b.textContent='boot error: '+(e.message||e.type)+(e.filename?('  @ '+e.filename.split('/').pop()+':'+e.lineno):'')+'  — screenshot this for the dev';
+    }catch(_){}
+  }, true);
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=32" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=32">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=32">
+<link rel="icon" href="favicon.ico?v=33" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=33">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=33">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -657,6 +668,8 @@
   .tier-gold{color:#e0b341; border-color:#8a6d20; background:rgba(224,179,65,.12)}
   .tier-platinum{color:#5fd6c2; border-color:#2f7d72; background:rgba(95,214,194,.12)}
   .tier-diamond{color:#7db8ff; border-color:#3a6196; background:rgba(125,184,255,.14)}
+  .tier-crimson{color:#e06a55; border-color:#7c3328; background:rgba(224,106,85,.13)}
+  .tier-mba{color:#a89e88; border-color:#4c473c; background:rgba(168,158,136,.10)}
   .pc-sub{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin:6px 0 18px}
   .pc-career{display:flex; gap:22px; flex-wrap:wrap; background:var(--surface2); border:1px solid var(--line);
     border-radius:12px; padding:14px 18px; margin-bottom:8px}
@@ -857,14 +870,14 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=32"></script>
-<link rel="stylesheet" href="nav.css?v=32">
-<script src="themes.js?v=32"></script>
+<script src="drills.js?v=33"></script>
+<link rel="stylesheet" href="nav.css?v=33">
+<script src="themes.js?v=33"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=32"></script>
+<script src="nav.js?v=33"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1033,6 +1046,7 @@ window.NAV_ACTIVE='trainer';
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.sb = sb;   // shared nav (nav.js) drives the nav bar, user menu, and player card
+if(window.navRefreshAuth) setTimeout(window.navRefreshAuth, 0);
 let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
 let enterRequested = false, landingOpen = true, recoveryMode = false;
 let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
@@ -3362,7 +3376,7 @@ function makeShareCard(o){
   x.fillText(o.t+'s', 64, 350);
   x.fillStyle=col('--muted'); x.font='500 24px "JetBrains Mono", monospace';
   x.fillText(o.keys+' keys · par '+o.par, 64, 400);
-  let rank=''; try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null'); if(c) rank=c.n; }catch(e){}
+  let rank=''; try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null'); if(c) rank=c.n; }catch(e){}
   if(rank){ x.fillStyle=col('--warn'); x.font='700 22px "JetBrains Mono", monospace';
     x.fillText(rank.toUpperCase(), 64, 452); }
   x.fillStyle=col('--faint'); x.font='500 18px "JetBrains Mono", monospace';
@@ -4971,20 +4985,23 @@ window.hkBadge = window.hkBadge || function(id, earned, size, color){
     '<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(G[id]||G.fin)+'</g>'+
     '</svg>';
 };
-window.RANK_EMBLEM_IDX = {'Candidate':0,'Summer Analyst':1,'Incoming Analyst':2,
-  'First-Year Analyst':3,'Top-Bucket Analyst':4,'Second-Year Analyst':5};
+window.RANK_EMBLEM_IDX = {'MBA Associate':0,'Candidate':1,'Summer Analyst':2,
+  'First-Year Analyst':3,'Associate':4,'VP':5,'MD':6,'Second-Year Analyst':7};
 window.rankEmblem = window.rankEmblem || function(tierName, size, bucket){
   const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
   size = size || 16;
-  /* THE KEYCAP LADDER — the keyboard gets nicer as you climb.
-     Per-tier palette (rim / face / legend / fx). Layered flat colors, no gradient ids. */
+  /* THE KEYCAP LADDER, desk edition. MBA Associate's cap bears a MOUSE (they still
+     reach for it). MD is crimson power with a crown but no F4 — never touches Excel.
+     Second-Year Analyst is the radiant final boss. Layered flats, no gradient ids. */
   const P=[
-    {rim:'#5a5d63', face:'#2a2c30', top:'#34373c', leg:'#8b8e94', fx:null},                     // Candidate — plain plastic
+    {rim:'#8a8271', face:'#25231e', top:'#2f2d26', leg:'#a89e88', fx:'mouse'},                  // MBA — dusty plastic + mouse
+    {rim:'#5a5d63', face:'#2a2c30', top:'#34373c', leg:'#8b8e94', fx:null},                     // Candidate — plain
     {rim:'#b0793f', face:'#2e2418', top:'#3d3020', leg:'#e0a35c', fx:null},                     // Summer — bronze
-    {rim:'#b9c2cf', face:'#23262b', top:'#31353c', leg:'#dde4ee', fx:'ticks'},                  // Incoming — silver, machined
-    {rim:'#e3b341', face:'#2b2413', top:'#3a301a', leg:'#ffd769', fx:'laurel'},                 // First-Year — gold, laureled
-    {rim:'#7fd4c1', face:'#132a26', top:'#1a3833', leg:'#a9f0e0', fx:'wings'},                  // Top-Bucket — platinum ice, winged
-    {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},                // Second-Year — diamond, radiant
+    {rim:'#b9c2cf', face:'#23262b', top:'#31353c', leg:'#dde4ee', fx:'ticks'},                  // First-Year — machined silver
+    {rim:'#e3b341', face:'#2b2413', top:'#3a301a', leg:'#ffd769', fx:'laurel'},                 // Associate — gold, laureled
+    {rim:'#7fd4c1', face:'#132a26', top:'#1a3833', leg:'#a9f0e0', fx:'wings'},                  // VP — platinum ice, winged
+    {rim:'#e06a55', face:'#2d1512', top:'#3c1d18', leg:'#ffb3a3', fx:'crown'},                  // MD — crimson corner office
+    {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},                // Second-Year — radiant diamond
   ];
   const p=P[i];
   let fx1='', fx2='';
@@ -4992,25 +5009,30 @@ window.rankEmblem = window.rankEmblem || function(tierName, size, bucket){
   if(p.fx==='laurel') fx1='<path d="M7 26c-2.4-2-3.4-5-3-8 M27 26c2.4-2 3.4-5 3-8" fill="none" stroke="'+p.rim+'" stroke-width="1.6" stroke-linecap="round"/>'+
                           '<path d="M4.6 21.5l-2-.4 M5 18.6l-1.9-1 M29.4 21.5l2-.4 M29 18.6l1.9-1" stroke="'+p.rim+'" stroke-width="1.3" stroke-linecap="round"/>';
   if(p.fx==='wings')  fx1='<path d="M5 12C2.2 11 .8 8.6.4 6.4 3.4 7 5.6 8.4 6.8 10.4Z M29 12c2.8-1 4.2-3.4 4.6-5.6-3 .6-5.2 2-6.4 4Z" fill="'+p.rim+'" opacity=".9"/>';
+  if(p.fx==='crown')  fx1='<path d="M11 5.6l2.2 2.6L17 4.6l3.8 3.6L23 5.6l-1 4.4H12z" fill="'+p.rim+'"/>';
   if(p.fx==='radiant'){
     fx1='<path d="M17 .8l1 3.2 M17 .8l-1 3.2 M6.5 3.5l2.2 2.4 M27.5 3.5l-2.2 2.4 M2 11h3.2 M32 11h-3.2" stroke="'+p.rim+'" stroke-width="1.5" stroke-linecap="round" opacity=".85"/>'+
         '<path d="M12.6 4.6L14 1.8l3 1.7 3-1.7 1.4 2.8" fill="none" stroke="'+p.leg+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
     fx2='<path d="M17 12.2l1.1 2.6 2.8.3-2.1 1.8.7 2.7-2.5-1.5-2.5 1.5.7-2.7-2.1-1.8 2.8-.3z" fill="'+p.leg+'"/>';
   }
-  const legend = (i===0) ? '' :
-    (p.fx==='radiant' ? fx2 :
-    '<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="9.5" fill="'+p.leg+'">F4</text>');
-  // bucket pips (optional third arg): 1=Bottom, 2=Middle, 3=Top
+  let legend;
+  if(p.fx==='mouse'){
+    legend='<g fill="none" stroke="'+p.leg+'" stroke-width="1.4" stroke-linecap="round">'+
+      '<rect x="13.4" y="11.5" width="7.2" height="10.5" rx="3.6"/><path d="M17 11.5v3.6"/></g>';
+  } else if(p.fx==='radiant'){ legend=fx2; }
+  else if(i===1){ legend=''; }
+  else if(p.fx==='crown'){ legend='<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="8.5" fill="'+p.leg+'">MD</text>'; }
+  else { legend='<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="9.5" fill="'+p.leg+'">F4</text>'; }
   let pips='';
   if(bucket){
     const n = bucket==='Top Bucket'?3:(bucket==='Middle Bucket'?2:1);
     for(let k=0;k<3;k++) pips+='<circle cx="'+(13+k*4)+'" cy="31.4" r="1.5" fill="'+(k<n?p.rim:'#3a3d42')+'"/>';
   }
-  return '<svg class="rank-emblem'+(i===5?' emblem-max':'')+'" viewBox="0 0 34 34" width="'+size+'" height="'+size+'" aria-hidden="true">'+
+  return '<svg class="rank-emblem'+(i===7?' emblem-max':'')+'" viewBox="0 0 34 34" width="'+size+'" height="'+size+'" aria-hidden="true">'+
     fx1+
-    '<rect x="6" y="8" width="22" height="20" rx="5" fill="#0a0b0c"/>'+                      /* key base */
+    '<rect x="6" y="8" width="22" height="20" rx="5" fill="#0a0b0c"/>'+
     '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="'+p.face+'" stroke="'+p.rim+'" stroke-width="1.8"/>'+
-    '<rect x="9.4" y="8.4" width="15.2" height="6" rx="3" fill="'+p.top+'"/>'+               /* top-face light */
+    '<rect x="9.4" y="8.4" width="15.2" height="6" rx="3" fill="'+p.top+'"/>'+
     legend + pips +
     '</svg>';
 };
@@ -5516,7 +5538,8 @@ async function loadProfileData(){
    blazingly fast — caps at Silver here, since Gold needs 10+ drills. */
 function tierOf(avgPct, attemptedCount){
   if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);
-  if(avgPct===null || (attemptedCount||0) < 5) return {name:'Candidate', cls:'tier-unranked'};
+  if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);
+  if(avgPct===null || (attemptedCount||0) < 5) return {name:'MBA Associate', cls:'tier-mba'};
   if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
   if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst', cls:'tier-platinum'};
   if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'First-Year Analyst', cls:'tier-gold'};
@@ -5945,9 +5968,9 @@ async function updateRankPill(){
     el.title=(t.full||t.name)+' \u2014 the ladder runs Candidate \u2192 Second-Year Analyst. Click for your card.';
     el.className='mb-tool rank-pill '+t.cls; el.style.display='inline-flex';
     el.onclick=()=>{ try{ openProfile(); }catch(e){} }; };
-  try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null');
+  try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
     if(c && c.exp>Date.now()){ show({name:c.n, cls:c.c}); return; } }catch(e){}
-  if(!sb || !me_user || isAnonUser()){ show({name:'Candidate', cls:'tier-unranked'}); return; }
+  if(!sb || !me_user || isAnonUser()){ show({name:'MBA Associate', cls:'tier-mba'}); return; }
   try{
     const [p,r] = await Promise.all([
       sb.from('profiles').select('id'),
@@ -5961,7 +5984,7 @@ async function updateRankPill(){
       if(idx>=0){ att++; sum+=idx/best.length; } });
     const t=tierOf(att?sum/att:null, att);
     show(t);
-    try{ sessionStorage.setItem('hk_rank', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
+    try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
   }catch(e){}
 }
 /* ============================================================

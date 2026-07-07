@@ -878,3 +878,35 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   family-color dots on stats per-drill rows and leaderboard drill chips (CH entries
   now carry group). Dots + en-dashes remain the list hierarchy everywhere.
 - v32.
+
+---
+# ROUND 33 — desk-culture ladder, leaderboard pipeline unification, boot beacon
+- "GAME NOT LOADING" INVESTIGATION: v31→v32 index diff is provably CSS-only; all
+  shared JS + every inline index script runs clean under a full runtime stub harness.
+  Cannot reproduce a blank page statically → prime suspect is stale cache mixing
+  asset versions. RESPONSE: BOOT BEACON shipped — window error listener paints a
+  red banner with the exact message + file:line. The page can never fail silent
+  again; if it recurs, the banner text is the bug report.
+- THE LADDER v4 (Wolf's tongue-in-cheek order): MBA Associate (floor — "everyone
+  starts here, yes everyone") → Candidate → Summer Analyst → First-Year Analyst →
+  Associate → VP → MD (crimson, crown, no F4 on the cap — never touches Excel) →
+  Second-Year Analyst (radiant final boss). 8 tiers; thresholds recalibrated on the
+  shrunk scale (.53/.375/.31/.255/.195/.15 at att 8/10/12/14/16/18); summit verified
+  reachable; provisional caps at Summer Analyst. MBA Associate's keycap bears a
+  MOUSE glyph (the shame mouse). tier-mba + tier-crimson CSS added (index+nav.css).
+- SYNC-SET DISEASE EXCISED: found THREE stale duplicate tier tables (index ×2,
+  leaderboard ×1 — still carrying the old unreachable .05 summit!). All tier math
+  now delegates to window.HK_RANK (themes.js). hk_rank session cache key bumped →
+  hk_rank3. RULE: no file may define its own tier table again.
+- LEADERBOARD PIPELINE UNIFIED (the NaN + jank): a second userStat builder still
+  used .sum while consumers were mixed → "top NaN%" on Your Card and NaN-sorted top
+  players. One pipeline now: entries + HK_RANK.ratingOf + wsum everywhere.
+  rosterHtml was defined but NEVER RENDERED (r27 injection missed) — now in
+  renderAll after featured; its tier tabs call renderAll (render() was undefined).
+  Featured: auto-fit minmax(340px) columns, min-height 230, h4 ellipsis (the
+  squeezed skinny boards from Wolf's screenshot).
+- AUTH SLOT (no username on game/boards): nav.js runs at body-top; pages create
+  window.sb in bottom scripts → slot rendered empty once and never retried. Now:
+  retry loop + window.navRefreshAuth() kick (index calls it right after sb exists);
+  __navAuthKick refreshes session + profile handle then re-renders.
+- v33.
