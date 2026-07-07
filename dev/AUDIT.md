@@ -354,3 +354,25 @@ Ghost display now races KEYSTROKES too: fetches your PB run's timestamped trace 
 drill load and shows 'keys 9/12' (you vs the ghost at this instant) beside the time
 delta. Only works on PBs recorded after timestamps shipped (round 9) — older traces
 are label-only and skipped silently. Next: visual ghost cursor on the grid itself.
+
+---
+# ROUND 12 — Monkeytype pass: scale, contrast, nav, guide best-practices
+- SCALE (the "tiny boxed-game" fix): .app 1040→1280px; sheet zooms 1.18x at ≥1280px
+  viewports and 1.34x at ≥1600px via css zoom on .gridwrap — cells/fonts/borders all
+  grow, engine px math untouched (it reasons pre-zoom). Timer 16.5→19px.
+- CONTRAST (theme-safe cells): fc-* font swatches and fill-blue were HARDCODED —
+  blue inputs near-invisible on dark themes. Now themes set html[data-dark] (both
+  themes.js AND index's inline applyTheme — they're duplicated, keep in sync) and
+  dark variants kick in: blue #6db1ff, black→var(--text), red/green/purple/yellow
+  brightened; fill-blue gets a light-theme variant. Selection highlight + copy
+  marquee now use var(--accent-glow) — they follow every theme's accent instead of
+  hardcoded green (the "messed up by highlights" complaint on non-green themes).
+- NAV: index desktop nav was showing icon+label doubled (missing .tl-label rule) —
+  now icon-only on desktop, labels return under 760px. Matches shared nav.
+- GUIDE BEST-PRACTICES SWEEP: guides now teach edge-jumping over arrow-tapping
+  wherever the data is contiguous (copyover, sort, center → Ctrl+Shift+edge;
+  polish → Shift+Space row grab). Shift+↓×n retained ONLY where the target range is
+  empty (fill drills) — Ctrl+Shift+↓ would overshoot there; that's correct Excel,
+  not an inconsistency.
+- Default scheme: new visitors already land on Daylight (light). Left as-is;
+  changing the 'default' dark palette would orphan saved preferences.

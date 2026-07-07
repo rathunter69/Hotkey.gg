@@ -118,6 +118,7 @@ window.applyTheme = function(name){
   const t = window.THEMES[name] || window.THEMES.default;
   const root = document.documentElement;
   for(const k in t.vars) root.style.setProperty('--' + k, t.vars[k]);
+  root.setAttribute('data-dark', t.dark ? '1' : '0');   // drives cell-color visibility overrides
   window.currentTheme = name;
   window.syncThemeLabels();
 };

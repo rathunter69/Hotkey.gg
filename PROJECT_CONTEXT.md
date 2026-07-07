@@ -93,7 +93,10 @@ Round 9: PB pace ghost (live vs-pb delta at the clock; traces now timestamped
 aliases (verified only), audit drill (24 total). Supabase deploys confirmed
 working via GitHub integration (team_code applied). Round 10: XP+level system (formula in dev/AUDIT.md r10), player card v2 (LVL bar
 + stat tiles in nav.js), HUD LVL chip (local, anon-friendly, KV hotkey_solves),
-balance drill (25 total). Queue: true ghost replays,
+balance drill (25 total). Round 12 (Monkeytype pass): sheet zoom-scales on wide screens (.gridwrap zoom),
+app 1280px, theme-aware cell colors via html[data-dark] (applyTheme duplicated in
+themes.js AND index inline — sync both), selection/marquee on accent-glow, index
+nav icon-only desktop, guides teach Ctrl+Shift-edge selection. Queue: true ghost replays,
 drillgen engine integration, transpose drill, streak server-sync, campaign mode,
 gauntlet one-attempt lock.
 Weekly gauntlet shelled in dev/AUDIT.md.

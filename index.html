@@ -34,7 +34,7 @@
   .app{padding:6px 16px 0}
   /* auto top/bottom margins center the app when the viewport is tall enough, and collapse to a
      top-aligned, scrollable layout when it isn't — so the header/ribbon never clip on laptops */
-  .app{width:100%; max-width:1040px; margin:auto 0}
+  .app{width:100%; max-width:1280px; margin:auto 0}
 
   /* ---------- TOP NAV (three sections: brand · pages · tools) ----------
      Not sticky — Monkeytype-style, the nav scrolls with the page so users in focused-trainer mode aren't
@@ -47,6 +47,9 @@
   .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
     padding:8px 14px; border-radius:6px; cursor:pointer; transition:.13s; letter-spacing:.2px}
   .topnav-link:hover{color:var(--text); background:var(--surface)}
+  .topnav-link svg{display:block; flex:none}
+  .tl-label{display:none}   /* desktop: icon-only (labels return in the mobile menu) */
+  @media (max-width:760px){ .tl-label{display:inline} }
   .topnav-link.active{color:var(--accent); background:var(--surface)}
   .topnav-tools{display:flex; align-items:center; gap:2px}
   .topnav-icon{background:none; border:none; color:var(--muted); cursor:pointer; padding:8px;
@@ -99,7 +102,8 @@
   td.txt{text-align:left}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
-  td.fill-blue{background:#16344e !important; color:#9fd0f4}
+  td.fill-blue{background:#dbeafe !important; color:#1e50a2}
+  html[data-dark="1"] td.fill-blue{background:#16344e !important; color:#9fd0f4}
   /* explicit alignment overrides (Excel Alt H A L/C/R) — use !important to beat .txt and num defaults */
   td.align-l{text-align:left !important}
   td.align-c{text-align:center !important}
@@ -109,12 +113,21 @@
   td.fc-darkgray  {color:#404040 !important}
   td.fc-gray      {color:#7f7f7f !important}
   td.fc-white     {color:#ffffff !important}
-  td.fc-blue      {color:#1f6bb8 !important}
+  td.fc-blue      {color:#1c62d6 !important}
   td.fc-red       {color:#c00000 !important}
   td.fc-orange    {color:#ed7d31 !important}
   td.fc-yellow    {color:#d4a017 !important}
   td.fc-green     {color:#1f8a4d !important}
   td.fc-purple    {color:#7030a0 !important}
+  /* dark-theme variants: every swatch stays VISIBLE on dark sheets (blue inputs
+     especially — the banking convention can't be invisible). themes.js sets data-dark. */
+  html[data-dark="1"] td.fc-black    {color:var(--text) !important}
+  html[data-dark="1"] td.fc-darkgray {color:#b9bcc2 !important}
+  html[data-dark="1"] td.fc-blue     {color:#6db1ff !important}
+  html[data-dark="1"] td.fc-red      {color:#ff7b66 !important}
+  html[data-dark="1"] td.fc-green    {color:#5fd68a !important}
+  html[data-dark="1"] td.fc-purple   {color:#c08bff !important}
+  html[data-dark="1"] td.fc-yellow   {color:#ffd75e !important}
   td.over{color:var(--warn); letter-spacing:1px}
   td.editing{text-align:left; color:var(--text); box-shadow:inset 0 0 0 2px var(--accent); background:var(--bg)}
   @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
@@ -123,7 +136,7 @@
   /* Formula pointer — appears on the cell whose reference is currently being inserted into the formula bar.
      Dashed border reads distinct from the solid active-cell outline, and the warn color marks "this is where the formula is grabbing from". */
   td.point{outline:2px dashed var(--warn); outline-offset:-2px; background:rgba(224,175,104,.12); z-index:3}
-  td.sel{background:rgba(46,163,111,.15)}
+  td.sel{background:var(--accent-glow)}
   td.sel-t{border-top:2px solid var(--accent)}
   td.sel-b{border-bottom:2px solid var(--accent)}
   td.sel-l{border-left:2px solid var(--accent)}
@@ -131,7 +144,7 @@
   @keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
   td.pasted{animation:pasteflash .5s ease-out}
   .marquee{position:absolute; display:none; pointer-events:none; z-index:6;
-    background-color:rgba(46,163,111,.10);
+    background-color:var(--accent-glow);
     background-image:
       linear-gradient(90deg,var(--accent) 50%,transparent 50%),
       linear-gradient(90deg,var(--accent) 50%,transparent 50%),
@@ -165,7 +178,7 @@
     font-weight:700; font-size:12px}
 
   .bar{display:flex; align-items:center; gap:20px; margin-top:16px}
-  .ftimer{font-family:var(--mono); font-size:16.5px; font-weight:700; letter-spacing:-.3px; color:var(--muted);
+  .ftimer{font-family:var(--mono); font-size:19px; font-weight:700; letter-spacing:-.3px; color:var(--muted);
     padding:7px 13px; border-left:1px solid var(--line); display:flex; align-items:center; justify-content:flex-end; min-width:62px}
   .ftimer.run{color:var(--accent)}
   .stat{font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.5}
@@ -465,7 +478,12 @@
     border-radius:3px; padding:0 4px; font-size:10px; margin-right:4px; color:inherit}
 
   /* two-column workspace: grid on the left, checklist rail on the right */
-  .stage{display:flex; align-items:flex-start; gap:20px}
+  .stage{display:flex; align-items:flex-start; gap:24px}
+  /* Monkeytype-scale: the sheet grows into the screen instead of sitting in a box.
+     zoom scales the whole grid (cells, fonts, borders) without touching the engine's
+     px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */
+  @media(min-width:1280px){ .gridwrap{zoom:1.18} }
+  @media(min-width:1600px){ .gridwrap{zoom:1.34} }
   .stage-main{flex:1 1 auto; min-width:0}
   .checklist{flex:0 0 240px; align-self:stretch; background:var(--surface); border:1px solid var(--line);
     border-radius:12px; padding:15px 16px; margin-top:0}
@@ -1411,7 +1429,7 @@ const CHALLENGES = {
     prompt:'Fundamentals rep: copy the block of numbers on the left and paste it into the outlined area on the right. Select, copy, move, paste — all on the keyboard, no mouse.',
     req:'<em>select B2:C4</em> · <em>ctrl c</em> copy · arrow over to E2 · <em>ctrl v</em> paste',
     guide:[
-      'select B2:C4 with <kbd>shift</kbd>+arrows, copy with <kbd>ctrl</kbd>+<kbd>c</kbd>, move to E2, then <kbd>ctrl</kbd>+<kbd>v</kbd> to paste',
+      'on B2 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> then <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2192</kbd> grabs the block \u2014 jump to edges, never tap \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 arrow to E2 \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd>',
     ],
     targets:['E2:F4'],
     demo(){ return [
@@ -1440,7 +1458,7 @@ const CHALLENGES = {
     prompt:'Dress up the header row so it reads as a header: make it bold, give it a bottom border to split it off from the data, and shade it. Header is A1:E1.',
     req:'<em>select A1:E1</em> · <em>ctrl b</em> bold · <em>alt h b b</em> bottom border · <em>alt h h</em> shade',
     guide:[
-      'select the header A1:E1 · <kbd>ctrl</kbd>+<kbd>b</kbd> bold',
+      'on A1 · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row — the desk habit · <kbd>ctrl</kbd>+<kbd>b</kbd> bold',
       'still selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> for a bottom border',
       'shade it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd>',
     ],
@@ -1561,7 +1579,7 @@ const CHALLENGES = {
     prompt:'Three alignment passes, house style: center the column headers, left-align the row labels (they pasted in centered), and right-align the total row (numbers never sit left). Alt H A C / L / R — same door, three rooms.',
     req:'<em>headers</em> A1:E1 &rarr; <em>alt h a c</em> · <em>labels</em> A2:A5 &rarr; <em>alt h a l</em> · <em>totals</em> B6:E6 &rarr; <em>alt h a r</em>',
     guide:[
-      'from A1, <kbd>shift</kbd>+<kbd>&rarr;</kbd>&times;4 grabs the headers · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> centers them',
+      'from A1, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&rarr;</kbd> jumps the selection to the header edge · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> centers them',
       'down to A2, <kbd>shift</kbd>+<kbd>&darr;</kbd>&times;3 grabs the labels · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd> pins them left',
       'over to B6, <kbd>shift</kbd>+<kbd>&rarr;</kbd>&times;3 grabs the total row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> pushes the numbers right',
     ],
@@ -1645,7 +1663,7 @@ const CHALLENGES = {
     prompt:'League-table workflow, start to finish: sort the six deals by size, largest first, then foot the column with AutoSum and bold the total. Sort, foot, bold — the whole rep.',
     req:'<em>select A2:B7</em> (active in column B) · <em>alt a s d</em> sorts Z&rarr;A · drop to B8 · <em>alt+=</em> &rarr; <em>↵</em> foots it · back up, <em>ctrl+b</em>',
     guide:[
-      'cursor to B2 · <kbd>shift</kbd>+<kbd>&darr;</kbd>&times;5 down through B7 · <kbd>shift</kbd>+<kbd>&larr;</kbd> pulls in the deal names',
+      'cursor to B2 · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&darr;</kbd> grabs the size column in one chord · <kbd>shift</kbd>+<kbd>&larr;</kbd> pulls in the deal names',
       'sort largest first · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd>',
       'drop to B8 · <kbd>alt</kbd>+<kbd>=</kbd> proposes SUM(B2:B7) · commit <kbd>↵</kbd>',
       'back up to B8 (<kbd>↑</kbd>) · <kbd>ctrl</kbd>+<kbd>b</kbd> bolds the total',
@@ -4261,6 +4279,7 @@ function applyTheme(name){
   const t = THEMES[name] || THEMES.default;
   const root = document.documentElement;
   for(const k in t.vars) root.style.setProperty('--' + k, t.vars[k]);
+  root.setAttribute('data-dark', t.dark ? '1' : '0');   // drives cell-color visibility overrides
   currentTheme = name;
 }
 async function loadTheme(){
