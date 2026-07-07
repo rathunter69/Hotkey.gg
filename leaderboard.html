@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the boards · hotkey.gg</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=27">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -93,7 +93,19 @@
   .tp-tier{font-size:8.5px; padding:3px 8px; margin-left:8px; vertical-align:2px}
   .featured{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px}
   @media(max-width:820px){ .featured{grid-template-columns:1fr} }
-  .tabrow{display:flex; gap:8px; margin:22px 0 12px; flex-wrap:wrap; align-items:center}
+  .ros-tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px}
+  .ros-tabs .tab{font-size:11px; padding:6px 13px}
+  .ros-list{max-height:340px; overflow-y:auto; padding-right:6px}
+  .ros-row{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.5px;
+    padding:8px 10px; border-radius:8px; color:var(--muted)}
+  .ros-row.me{background:var(--accent-glow); color:var(--text); border:1px solid var(--accent-dim)}
+  .ros-n{min-width:22px; color:var(--faint); font-size:11px}
+  .ros-nm{color:var(--text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis}
+  .ros-b{font-size:10px; color:var(--faint)}
+  .ros-r{font-size:11px; color:var(--accent); min-width:86px; text-align:right}
+  .ros-a{font-size:10.5px; color:var(--faint); min-width:70px; text-align:right}
+  .tabrow{display:flex; gap:8px; margin:26px 0 12px; flex-wrap:wrap; align-items:stretch}
+  .tabrow .tab{display:inline-flex; align-items:center; line-height:1}
   .tab{font-family:var(--mono); font-size:12.5px; padding:8px 18px; border-radius:999px; cursor:pointer;
     border:1px solid var(--line); color:var(--muted); background:var(--surface); transition:all .12s}
   .tab:hover{color:var(--text)} .tab.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
@@ -142,11 +154,11 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=26">
-<script src="drills.js?v=26"></script>
+<link rel="stylesheet" href="nav.css?v=27">
+<script src="drills.js?v=27"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=26"></script>
-<script src="nav.js?v=26"></script>
+<script src="themes.js?v=27"></script>
+<script src="nav.js?v=27"></script>
 </head>
 <body>
 
@@ -409,7 +421,9 @@ function rankedInfographic(){
   m.innerHTML='<div class="panel" style="max-width:460px;width:100%">'+
     '<h4>welcome to ranked</h4>'+
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.8;margin-bottom:12px">'+
-    'Your rank = your <b>average placement</b> across every board you\u2019ve entered. Attempt more drills and place higher, and you climb.<br><br>'+
+    'Your rank = your <b>average placement</b> across the boards you\u2019ve entered \u2014 stabilized two ways: '+
+    'with only a few boards, your rating starts near the middle and your results pull it toward your true level (so two fast drills alone can\u2019t crown you); '+
+    'and small fields count for less than big ones (1st of 2 says less than 4th of 40). Breadth + placement is the climb.<br><br>'+
     'Each tier splits into three <b>buckets</b> by where you sit inside that tier\u2019s band: '+
     'you enter at <b>Bottom Bucket</b>, pass through <b>Middle</b>, and reach <b>Top Bucket</b> as your average placement improves \u2014 clear the band and you promote to the next tier.</div>'+rows+
     '<div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:10px">Ranks are live: they can fall as well as rise when other players improve.</div>'+
@@ -489,11 +503,37 @@ function featuredHtml(){
 /* ---- drill browser: tabs + chips + one detail board ---- */
 let browseTab = sessionStorage.getItem('hk_lb_tab') || 'drills';
 let browseKey = sessionStorage.getItem('hk_lb_key') || null;
+let rosterTier = null;
+function rosterHtml(){
+  const {userStat,names,meId}=DATA;
+  const users=Object.entries(userStat).map(([u,st])=>{
+    const av=st.att?st.avg:null;
+    return {u, st, av, tier:TIER_OF(av, st.att)};
+  }).filter(x=>x.av!==null);
+  if(!users.length) return '';
+  const myTier = meId && users.find(x=>x.u===meId) ? users.find(x=>x.u===meId).tier.name : null;
+  if(rosterTier===null) rosterTier = myTier || TIERS[0].name;
+  const tierNames=['Candidate',...TIERS.map(t=>t.name)];
+  const inTier=users.filter(x=>x.tier.name===rosterTier).sort((a,b)=>a.av-b.av);
+  let rows=inTier.map((x,i)=>'<div class="ros-row'+(x.u===meId?' me':'')+'">'+
+    '<span class="ros-n">'+(i+1)+'</span>'+
+    (window.rankEmblem?window.rankEmblem(x.tier.name,18,x.tier.bucket):'')+
+    '<span class="ros-nm">'+esc(names[x.u]||'anon')+'</span>'+
+    '<span class="ros-b">'+(x.tier.bucket||'')+'</span>'+
+    '<span class="ros-r">rating '+(x.av*100).toFixed(1)+'</span>'+
+    '<span class="ros-a">'+x.st.att+' boards</span></div>').join('');
+  if(!inTier.length) rows='<div class="empty">nobody holds this tier yet \u2014 it\u2019s open</div>';
+  return '<div class="panel" style="margin-top:18px"><h4>the field \u00b7 by tier</h4>'+
+    '<div class="ros-tabs">'+tierNames.map(tn=>'<span class="tab ros-t'+(tn===rosterTier?' on':'')+'" data-tier="'+tn+'">'+tn.replace(' Analyst','')+'</span>').join('')+'</div>'+
+    '<div class="ros-list">'+rows+'</div>'+
+    '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">rating = stabilized average placement (lower is better) \u00b7 your row is highlighted</div></div>';
+}
+function TIER_OF(av,att){ return window.HK_RANK.tierOf(av,att); }
 function browserHtml(){
   const {perDrill,meId,myTeam,teamOnly}=DATA;
   const tabs=[['drills','\u2328 drills'],['marathon','\u23f1 marathon'],['rapidfire','\u26a1 rapid-fire']];
   let html='<div class="tabrow">'+tabs.map(t=>'<span class="tab'+(browseTab===t[0]?' on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</span>').join('');
-  if(myTeam) html+='<span class="tab'+(teamOnly?' on':'')+'" id="teamToggle" style="margin-left:auto">'+(teamOnly?'\u25c9 team: '+esc(myTeam):'\u25cb show team only')+'</span>';
+  if(myTeam) html+='<span class="tab'+(teamOnly?' on':'')+'" id="teamToggle">'+(teamOnly?'\u25c9 team: '+esc(myTeam):'\u25cb show team only')+'</span>';
   html+='</div>';
   if(browseTab==='drills'){
     if(!browseKey || !perDrill[browseKey]) browseKey = (meId && CH.find(c=>perDrill[c.key].some(r=>r.user_id===meId)) || CH[0]).key;
@@ -522,6 +562,7 @@ function renderAll(){
     featuredHtml()+
     '<h3 class="section-title">Browse the boards</h3>'+browserHtml();
   wire();
+  document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; render(); });
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
   const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ try{ localStorage.setItem('hk_ranked','0'); }catch(e){} load(); };

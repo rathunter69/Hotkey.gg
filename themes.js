@@ -191,10 +191,12 @@ window.HK_RANK = {
   TIERS:[
     {name:'Candidate',           cls:'tier-unranked', att:0,  pct:9,    req:'take the placement — everyone starts here'},
     {name:'Summer Analyst',      cls:'tier-bronze',   att:5,  pct:1.01, req:'5 drills attempted, any placement'},
-    {name:'Incoming Analyst',    cls:'tier-silver',   att:8,  pct:0.55, req:'8 drills \u00b7 top 55% avg placement'},
-    {name:'First-Year Analyst',  cls:'tier-gold',     att:10, pct:0.30, req:'10 drills \u00b7 top 30%'},
-    {name:'Top-Bucket Analyst',  cls:'tier-platinum', att:13, pct:0.15, req:'13 drills \u00b7 top 15%'},
-    {name:'Second-Year Analyst', cls:'tier-diamond',  att:15, pct:0.05, req:'15 drills \u00b7 top 5% \u2014 the summit'},
+    /* pct thresholds live on the SHRUNK rating scale (see ratingOf). Each equals the
+       advertised raw performance at that tier's gate att: rating=(att*raw+K/2)/(att+K). */
+    {name:'Incoming Analyst',    cls:'tier-silver',   att:8,  pct:0.53, req:'8 drills \u00b7 top 55% avg placement'},
+    {name:'First-Year Analyst',  cls:'tier-gold',     att:10, pct:0.375, req:'10 drills \u00b7 top 30%'},
+    {name:'Top-Bucket Analyst',  cls:'tier-platinum', att:13, pct:0.26, req:'13 drills \u00b7 top 15%'},
+    {name:'Second-Year Analyst', cls:'tier-diamond',  att:15, pct:0.18, req:'15 drills \u00b7 top 5% \u2014 the summit'},
   ],
   tierOf(avgPct, att){
     const T=this.TIERS;
@@ -223,21 +225,45 @@ window.HK_RANK = {
       xp += nth===1 ? 50 : (nth<=10 ? 15 : 3); });
     return xp + 25*(pl.t10||0) + 100*(pl.pod||0) + 250*(pl.crowns||0);
   },
+  /* RATING v2 — a shrunk, size-weighted average placement.
+     Fixes two exploits of the naive average:
+     1. FEW-BOARDS SNIPING: someone fast on 1-2 boards shouldn't outrank a broad
+        competitor. Every rating starts from a prior of 0.5 (middle of the field,
+        weight K=6 "virtual boards") and your real boards pull it toward your true
+        level. Two crowns alone → (2*0 + 6*0.5)/(2+6) = 0.375, solidly mid — you
+        EARN the summit by being good in many places.
+     2. TINY-FIELD NOISE: placing 1st of 2 says less than 4th of 40. Each board's
+        weight scales with field size: w = log2(N+1)/log2(9), capped at 1 (full
+        weight at 8+ players). The system self-adapts as the player count grows —
+        no thresholds to retune at 10 vs 10,000 users.
+     Percentile itself is also small-field-fair: idx/(N-1) when N>1 (best=0,
+     worst=1), so 1st of 2 = 0.0 but carries little weight. */
+  RATING_K: 6,
+  ratingOf(entries){
+    // entries: [{pct, n}] — placement percentile + field size per board
+    const K=this.RATING_K; let wsum=0, s=0;
+    (entries||[]).forEach(e=>{ const w=Math.min(1, Math.log2((e.n||1)+1)/Math.log2(9));
+      wsum+=w; s+=w*e.pct; });
+    return (s + K*0.5) / (wsum + K);
+  },
   // per-user placements from a full best-sorted runs list (mouse_used=false, time asc)
   standing(runs, meId, menuOrder){
     const per={}; menuOrder.forEach(k=>per[k]=[]);
     const seen={};
     runs.forEach(x=>{ if(per[x.challenge]===undefined) return; const key=x.challenge+'|'+x.user_id;
       if(!seen[key]){ seen[key]=true; per[x.challenge].push(x); } });
-    let att=0,sum=0,crowns=0,pod=0,t10=0;
+    let att=0,crowns=0,pod=0,t10=0; const entries=[];
     menuOrder.forEach(k=>{ const b=per[k]; const idx=b.findIndex(r=>r.user_id===meId);
-      if(idx>=0){ att++; sum+=idx/b.length; if(idx===0)crowns++; if(idx<3)pod++; if(idx<10)t10++; } });
-    return {att, avgPct:att?sum/att:null, crowns, pod, t10, per};
+      if(idx>=0){ att++; entries.push({pct: b.length>1 ? idx/(b.length-1) : 0, n:b.length});
+        if(idx===0)crowns++; if(idx<3)pod++; if(idx<10)t10++; } });
+    const rating = att ? this.ratingOf(entries) : null;
+    return {att, avgPct:rating, rawAvg:att?entries.reduce((a,e)=>a+e.pct,0)/att:null,
+            crowns, pod, t10, per, entries};
   }
 };
 
 /* ---- achievement badges: hex medals, single source (inline copy in index — sync) ---- */
-window.hkBadge = function(id, earned, size){
+window.hkBadge = function(id, earned, size, color){
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
   const G={
@@ -257,7 +283,7 @@ window.hkBadge = function(id, earned, size){
     fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
   };
   const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
-  const col = earned ? 'var(--warn)' : 'var(--faint)';
+  const col = earned ? (color||'var(--warn)') : 'var(--faint)';
   return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+'">'+
     '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?'.14':'.05')+'"/>'+
     '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.6"/>'+

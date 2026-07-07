@@ -165,7 +165,7 @@
     m.innerHTML='<div class="pc-card" style="width:560px"><a class="modal-x">\u00d7</a>'+
       '<div class="pc-head"><div class="pc-name">shortcuts</div></div>'+
       '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
-      '<div class="kb-grid">'+sections+'</div>'+
+      '<div class="kb-grid" style="max-height:56vh;overflow-y:auto;padding-right:8px">'+sections+'</div>'+
       '<div class="pc-foot"><span></span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
       '</div>';
     const c=$('kbClose'); if(c) c.onclick=closeKbd;
@@ -409,7 +409,7 @@
         const allDone=earned.length===chs.length;
         const gateTxt=' \u2014 clear every drill under par \u00d7 '+CAMP.GATE+' to earn it';
         badgesHtml='<div class="pc-badges">'+
-          chs.map(c=>'<span class="pc-badge" title="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'">'+(window.hkBadge?window.hkBadge(c.id, c.done):c.badge)+'</span>').join('')+
+          chs.map(c=>'<span class="pc-badge" title="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'">'+(window.hkBadge?window.hkBadge(c.id, c.done, 26, (window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]):c.badge)+'</span>').join('')+
           '<span class="pc-badge" title="Campaign Complete \u2014 every chapter cleared">'+(window.hkBadge?window.hkBadge('fin', allDone):CAMP.finisher.badge)+'</span>'+
           '</div>'+
           (function(){

@@ -8,7 +8,7 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=27">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -83,8 +83,10 @@
   .tab.on .lvl{color:var(--accent-dim)}
 
   .prompt{font-size:15px; line-height:1.5; margin-bottom:14px; min-height:38px}
-  .prompt .req{display:block; margin-top:5px; font-size:12.5px; color:var(--muted)}
-  .prompt .req em{color:var(--warn); font-style:normal}
+  .prompt .req{display:block; margin-top:7px; font-size:12.5px; color:var(--muted); line-height:2.1}
+  .prompt .req em{font-style:normal; font-family:var(--mono); font-size:12px; color:var(--text);
+    background:var(--surface2); border:1px solid var(--accent-dim); border-bottom-width:2.5px;
+    border-radius:6px; padding:2.5px 8px; margin:0 1px; white-space:nowrap; display:inline-block}
 
   .fbar{display:flex; align-items:stretch; margin-bottom:9px; font-family:var(--mono);
     font-size:13px; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--surface)}
@@ -870,10 +872,10 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=26"></script>
-<link rel="stylesheet" href="nav.css?v=26">
-<script src="themes.js?v=26"></script>
-<script src="nav.js?v=26" defer></script>
+<script src="drills.js?v=27"></script>
+<link rel="stylesheet" href="nav.css?v=27">
+<script src="themes.js?v=27"></script>
+<script src="nav.js?v=27" defer></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -3328,7 +3330,8 @@ function toMenu(){ loadChallenge(cur); openPicker(); }
 function syncTabs(){
   const C=CHALLENGES[cur]; if(!C) return;
   const idx=MENU_ORDER.indexOf(cur);
-  const cel=$('dbCat'); if(cel) cel.textContent=(GROUP_OF[cur]||'Drill');
+  const cel=$('dbCat'); if(cel){ cel.textContent=(GROUP_OF[cur]||'Drill');
+    cel.style.color=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||''; }
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
   { let xc=$('dbXp');
     if(!xc && nel){ xc=document.createElement('span'); xc.id='dbXp'; xc.className='db-xp'; nel.after(xc); }
@@ -4792,7 +4795,7 @@ window.HK_RANK = window.HK_RANK || { TIERS:[
     t.bucket=pos<=1/3?'Top Bucket':(pos<=2/3?'Middle Bucket':'Bottom Bucket');
     t.full=t.name+' \u00b7 '+t.bucket; return t; }
 };
-window.hkBadge = window.hkBadge || function(id, earned, size){
+window.hkBadge = window.hkBadge || function(id, earned, size, color){
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
   const G={
@@ -4812,7 +4815,7 @@ window.hkBadge = window.hkBadge || function(id, earned, size){
     fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
   };
   const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
-  const col = earned ? 'var(--warn)' : 'var(--faint)';
+  const col = earned ? (color||'var(--warn)') : 'var(--faint)';
   return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+'">'+
     '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?'.14':'.05')+'"/>'+
     '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.6"/>'+
@@ -5570,7 +5573,8 @@ function openCampaign(){
   const allDone=st.every(c=>c.done);
   let rows='';
   st.forEach(c=>{
-    rows+='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'">'+
+    const cCol=(window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]||'var(--line)';
+    rows+='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'" style="border-left:3px solid '+cCol+'">'+
       '<div class="camp-hd"><span class="camp-badge">'+(window.hkBadge?window.hkBadge(c.id, c.done, 20):(c.done?c.badge:'\u25b8'))+'</span>'+
       '<b>'+c.name+'</b><span class="camp-n">'+c.clearedN+'/'+c.keys.length+'</span></div>';
     if(c.unlocked){
@@ -5690,13 +5694,15 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
   const extra=MENU_ORDER.filter(k=>!(k in GROUP_OF));
   if(extra.length) groups.push({name:'More', keys:extra});
   groups.forEach(g=>{
+    const gcol=(window.HOTKEY_GROUP_COLORS||{})[g.name]||'var(--muted)';
     const sec=document.createElement('div'); sec.className='pk-group';
-    sec.innerHTML='<div class="pk-glabel">'+g.name+'</div>';
+    sec.innerHTML='<div class="pk-glabel" style="color:'+gcol+'">'+g.name+'</div>';
     g.keys.forEach(key=>{
       const C=CHALLENGES[key]; if(!C) return;
       const n=MENU_ORDER.indexOf(key)+1;
       const row=document.createElement('div');
       row.className='pk-row'+(key===cur?' cur':''); row.dataset.key=key;
+      row.style.borderLeft='3px solid '+gcol; row.style.paddingLeft='11px';
       const best = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
       row.innerHTML='<span class="pk-num">'+(n<=9?n:'')+'</span>'+
         '<span class="pk-info"><div class="pk-name">'+escHtml(C.label||C.name||key)+

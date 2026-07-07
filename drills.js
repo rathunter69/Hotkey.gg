@@ -168,3 +168,10 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'gnt1', glyph:'gnt', name:'Gauntlet Runner',  desc:'Post all 5 legs of a weekly gauntlet',  test:c=>{ const wk={}; c.runs.forEach(r=>{ const m=/^wk-(\d{4}-\d{2})-/.exec(r.challenge||''); if(m){ (wk[m[1]]=wk[m[1]]||new Set()).add(r.challenge); } }); const best=Math.max(0,...Object.values(wk).map(s=>s.size)); return {done:best>=5, prog:Math.min(best,5), goal:5}; } },
   { id:'brd1', glyph:'vol', name:'Everywhere',       desc:'Post a time on every board',            test:c=>({done:c.att>=c.menuOrder.length, prog:c.att, goal:c.menuOrder.length}) },
 ];
+
+/* ---- group color identity: one muted hue per skill family. Used as accents only
+   (left borders, label tints, badge strokes) — never full fills. ---- */
+window.HOTKEY_GROUP_COLORS = {
+  'Foundations':'#8ab4ff', 'Formatting':'#d9a441', 'Values':'#2ea36f',
+  'Data':'#b9c2cf', 'Formulas':'#e0879e', 'Models':'#c9a2e8', 'Lookups':'#7fd4c1', 'More':'#8b8e94'
+};

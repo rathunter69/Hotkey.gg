@@ -707,3 +707,31 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   edit/undo/paste-special/save/copy-paste — paste-special is 1 of 7, not overweighted.
   Next wave queued: number-format cycling, borders, autofit, insert/delete rows,
   F4 repeat-last-action (needs engine op-recording — real feature).
+
+---
+# ROUND 27 — rating v2, tier roster, chapter colors, moderation, polish
+- RATING v2 (game-design math, tested headlessly): rank = Bayesian-shrunk,
+  size-weighted average placement. Prior 0.5 with K=6 virtual boards kills the
+  1-2-drill sniper (2 crowns alone → 0.42, Candidate); board weight
+  log2(N+1)/log2(9) capped at 1 makes tiny fields count less (1st of 2 ≪ 4th of
+  40) — self-adapts from 3 users to 10,000 with no retuning. Percentile is
+  idx/(N-1). RECALIBRATION: old tier pcts were unreachable on the shrunk scale
+  (perfect on all 33 boards = 0.077 > 0.05); thresholds now derived so each tier
+  gate ≡ its advertised raw performance at the gate att: silver .53 / gold .375 /
+  plat .26 / diamond .18. Balance tests: summit reachable (18 boards @ top-2% →
+  Second-Year), sniper stays Candidate, early-small-site grinder lands Gold.
+  Displays relabeled "placement rating (lower is better)".
+- TIER ROSTER (League-style): "the field · by tier" panel — tier tabs, scrollable
+  roster with emblem+bucket+rating+boards, your row highlighted.
+- CHAPTER COLOR IDENTITY: HOTKEY_GROUP_COLORS (drills.js) — one muted hue per
+  family; applied as accents only: picker group labels + 3px row borders, drill-bar
+  category chip, campaign card left borders, chapter medals (hkBadge gained a color
+  param — themes.js + index inline, sync).
+- MODERATION (migration 20260707400000): expanded server blocklist incl. slurs,
+  with leetspeak folding (strips _0134578 before matching); 7-day cooldown +
+  uniqueness unchanged; light client pre-check mirrors reserved words.
+- POLISH: kbd shortcuts modal scrolls (56vh) instead of spilling; help-bar tokens
+  are real keycaps (bordered, theme-aware, bigger); favicon link cache-busted on
+  every page (?v=27 — kills the stale-F4 revert); leaderboard tab pills uniform,
+  team toggle inline (the right-side misalignment).
+- v27.
