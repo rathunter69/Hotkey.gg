@@ -123,12 +123,12 @@ window.applyTheme = function(name){
   window.syncThemeLabels();
 };
 
-// On script load: apply the saved theme, else default to Daylight (soft light, Excel-like) so new
-// visitors land in light mode the way Excel opens. Anyone who picks another theme keeps it.
+// On script load: apply the saved theme, else the dark default — the SAME fallback the trainer
+// uses, so navigating between pages never flips light/dark on a fresh browser.
 (function(){
   let saved = null;
   try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
-  if(!saved || !window.THEMES[saved]) saved = 'daylight';
+  if(!saved || !window.THEMES[saved]) saved = 'default';   // dark, matching the trainer — no light flash between pages
   window.applyTheme(saved);
 })();
 

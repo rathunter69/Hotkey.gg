@@ -315,7 +315,7 @@
   { let tries=0; const iv=setInterval(()=>{ if(window._navUser){ clearInterval(iv); navRank(); } else if(++tries>12) clearInterval(iv); }, 700); }
 
   async function loadProfileData(){
-    const p = await window.sb.from('profiles').select('id,handle');
+    const p = await window.sb.from('profiles').select('id,handle,flair');
     const r = await window.sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
     let mySessions=[];
     try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', window._navUser.id);
@@ -345,7 +345,7 @@
     const attempted = drills.filter(d => d.rank !== null);
     const avgPct = attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null;
     const myRuns = runs.filter(x => x.user_id === me_id);
-    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions };
+    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs };
   }
   /* ---- XP & LEVELS ----
      XP = 15/clean solve + 50/distinct drill + 25/top-10 + 100/podium + 250/crown.
@@ -437,7 +437,9 @@
           '</div>';
       }
     }catch(e){}
-    m.innerHTML = '<div class="pc-card">' +
+    let myFlair=null;
+    try{ const meP=(d._profs||[]).find(x=>x.id===window._navUser.id); myFlair=meP&&meP.flair; }catch(e){}
+    m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + (window.rankEmblem?window.rankEmblem(tier.name,22):'') + '<span>' + tier.name + '</span></div></div>' +
       '<div class="pc-sub">' + d.attempted + ' / ' + MENU_ORDER.length + ' drills attempted \u00b7 ' + standing + '</div>' +

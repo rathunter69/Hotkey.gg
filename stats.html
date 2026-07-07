@@ -52,8 +52,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=23">
-<script src="drills.js?v=23"></script>
+<link rel="stylesheet" href="nav.css?v=24">
+<script src="drills.js?v=24"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -61,8 +61,8 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=23"></script>
-<script src="nav.js?v=23"></script>
+<script src="themes.js?v=24"></script>
+<script src="nav.js?v=24"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -173,6 +173,35 @@ async function load(){
       `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block">`+
       `<polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`+
       `</svg></div>`;
+  }
+  // ---- Analytics (PRO \u00b7 free in beta): key frequency + speed by drill ----
+  if(me && mine.length>=3){
+    let traces=[];
+    try{ const tr=await sb.from('runs').select('trace').eq('user_id',me.id).eq('mouse_used',false)
+      .order('created_at',{ascending:false}).limit(40); traces=(tr.data||[]).map(x=>x.trace).filter(Boolean); }catch(e){}
+    const freq={};
+    traces.forEach(t=>{ (Array.isArray(t)?t:[]).forEach(k=>{ const key=(k&&k.k)||k; if(typeof key==='string') freq[key]=(freq[key]||0)+1; }); });
+    const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,12);
+    const maxF=top.length?top[0][1]:1;
+    // fastest drills by keys/sec (best run per drill)
+    const kps={};
+    mine.forEach(r=>{ if(r.time_ms>0&&r.keystrokes>0){ const v=r.keystrokes/(r.time_ms/1000);
+      if(!kps[r.challenge]||v>kps[r.challenge]) kps[r.challenge]=v; } });
+    const kpsTop=Object.entries(kps).filter(([k])=>D.meta[k]).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    html += `<h3 class="section-title">Analytics <span style="float:right;font-size:9px;color:var(--warn);letter-spacing:1px">PRO \u00b7 free in beta</span></h3>`;
+    if(top.length){
+      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:10px"><div class="lbl" style="margin:0 0 10px">your most-hit keys \u00b7 last ${traces.length} posted runs</div>`;
+      top.forEach(([k,n])=>{ html += `<div style="display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px;margin-bottom:5px">`+
+        `<span style="min-width:86px;color:var(--text)">${esc(k)}</span>`+
+        `<span style="flex:1;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${Math.round(100*n/maxF)}%;background:var(--accent);border-radius:99px"></span></span>`+
+        `<span style="color:var(--muted);min-width:36px;text-align:right">${n}</span></div>`; });
+      html += `</div>`;
+    }
+    if(kpsTop.length){
+      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:10px"><div class="lbl" style="margin:0 0 10px">fastest hands \u00b7 keys per second by drill</div>`;
+      kpsTop.forEach(([k,v])=>{ html += `<div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;padding:4px 0"><span>${esc(D.labelOf[k]||k)}</span><b style="color:var(--accent)">${v.toFixed(1)} k/s</b></div>`; });
+      html += `</div>`;
+    }
   }
   html += `<h3 class="section-title">Per-drill</h3>`;
   let lastG=null;

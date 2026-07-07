@@ -261,19 +261,6 @@
   .camp-drill:hover{color:var(--text); background:var(--surface2)}
   .camp-drill.ok{color:var(--accent)}
   .camp-gate{font-size:10.5px; color:var(--faint)}
-  .drillbar{display:flex; align-items:center; gap:8px; margin:0 0 12px; font-family:var(--mono)}
-  .db-arrow{background:var(--surface); border:1px solid var(--line); color:var(--muted); border-radius:8px;
-    font-size:16px; padding:4px 12px; cursor:pointer; line-height:1.3}
-  .db-arrow:hover{color:var(--text); border-color:var(--accent-dim)}
-  .db-name{background:var(--surface); border:1px solid var(--line); border-radius:8px; cursor:pointer;
-    padding:6px 14px; display:inline-flex; align-items:center; gap:9px; font-family:var(--mono)}
-  .db-name:hover{border-color:var(--accent-dim)}
-  .db-name #dbGroup{font-size:9.5px; color:var(--faint); text-transform:uppercase; letter-spacing:.8px}
-  .db-name b{font-size:13px; color:var(--text); font-weight:600}
-  .db-caret{color:var(--muted); font-size:10px}
-  .db-hint{margin-left:auto; font-size:10.5px; color:var(--faint)}
-  .db-hint kbd{background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:9.5px}
-  @media(max-width:700px){ .db-hint{display:none} }
   .lvl-bar{display:inline-block; width:44px; height:5px; background:var(--surface2); border-radius:99px;
     overflow:hidden; margin-left:7px; vertical-align:middle}
   .lvl-bar span{display:block; height:100%; background:var(--accent); border-radius:99px}
@@ -880,30 +867,13 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=23"></script>
+<script src="drills.js?v=24"></script>
+<link rel="stylesheet" href="nav.css?v=24">
+<script src="themes.js?v=24"></script>
+<script src="nav.js?v=24" defer></script>
 </head>
 <body>
-<nav class="topnav">
-  <div class="topnav-in">
-    <a class="topnav-brand" href="/" title="hotkey.gg — excel trainer">hotkey<b>.gg</b></a>
-    <div class="topnav-pages">
-      <a class="topnav-link active" href="/" title="trainer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="tl-label">trainer</span></a>
-      <a class="topnav-link" href="leaderboard.html" title="leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg><span class="tl-label">leaderboard</span></a>
-      <a class="topnav-link" href="stats.html" title="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 5-8"/></svg><span class="tl-label">stats</span></a>
-      <a class="topnav-link" href="reference.html" title="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.6-1-4-1.5-6-1.5S2 5 2 5v13s2-.5 4-.5 4.4.5 6 1.5c1.6-1 4-1.5 6-1.5s4 .5 4 .5V5s-2-.5-4-.5-4.4.5-6 1.5Z"/><path d="M12 6v13"/></svg><span class="tl-label">reference</span></a>
-    </div>
-    <div class="topnav-tools">
-      <button class="topnav-icon" id="navShortcuts" title="keyboard shortcuts (?)" aria-label="keyboard shortcuts">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      </button>
-      <button class="topnav-icon topnav-themes" id="navThemes" title="themes" aria-label="themes">
-        <svg width="16" height="16" viewBox="0 0 18 18"><circle cx="5" cy="5" r="3.4" fill="#e74c3c"/><circle cx="13" cy="5" r="3.4" fill="#f39c12"/><circle cx="5" cy="13" r="3.4" fill="#27ae60"/><circle cx="13" cy="13" r="3.4" fill="#3498db"/></svg>
-      </button>
-      <div class="auth-slot" id="authSlot"></div>
-    </div>
-    <button class="topnav-burger" id="navBurger" aria-label="menu">≡</button>
-  </div>
-</nav>
+<div id="navMount"></div>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -965,7 +935,6 @@
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
       <span class="mb-tool" id="proBadge" style="display:none; cursor:default; color:var(--warn); font-weight:700; border-color:var(--warn)"></span>
-      <button class="mb-tool rank-pill tier-unranked" id="rankPill" style="display:none" title="your rank — the ladder runs Candidate \u2192 Second-Year Analyst. Click for your card.">Candidate</button>
     </div>
   </div>
 
@@ -978,12 +947,6 @@
         <span class="fx"><i>fx</i></span>
         <span class="fcontent empty" id="fContent">empty</span>
         <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span>
-      </div>
-      <div class="drillbar" id="drillbar">
-        <button class="db-arrow" id="dbPrev" title="previous drill">‹</button>
-        <button class="db-name" id="dbName" title="browse all drills (or press \\)"><span id="dbGroup"></span><b id="dbLabel"></b><span class="db-caret">▾</span></button>
-        <button class="db-arrow" id="dbNext" title="next drill">›</button>
-        <span class="db-hint"><kbd>\\</kbd> browse · <kbd>n</kbd> next after a solve</span>
       </div>
       <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
       <div class="result" id="result"></div>
@@ -1026,8 +989,6 @@
 </div>
 <div class="modes-modal" id="modesModal"></div>
 <div class="session-modal" id="sessionModal"></div>
-<div class="profile-modal" id="profileModal"></div>
-<div class="profile-modal" id="settingsModal"></div>
 <div class="profile-modal" id="themesModal"></div>
 <div class="profile-modal" id="kbdModal"></div>
 <div class="onboard-modal" id="onboard">
@@ -1056,6 +1017,7 @@
       </span>
     </div>
     <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · everything keyboard</span></div>
+    <div class="micro" style="margin-top:14px">Been here before? <a id="landingSignin" style="color:var(--accent);cursor:pointer;border-bottom:1px solid var(--accent-dim)">Sign in</a> to pick up your rank, level, and boards.</div>
   </div>
 </div>
 
@@ -1071,8 +1033,10 @@
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
 const BETA_MODE         = true; // ← access-code-only sign-up for the beta. Flip to false for full email/password auth.
+window.NAV_ACTIVE='trainer';
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+window.sb = sb;   // shared nav (nav.js) drives the nav bar, user menu, and player card
 let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
 let enterRequested = false, landingOpen = true, recoveryMode = false;
 let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
@@ -3210,7 +3174,10 @@ function syncTabs(){
   const C=CHALLENGES[cur]; if(!C) return;
   const idx=MENU_ORDER.indexOf(cur);
   const cel=$('dbCat'); if(cel) cel.textContent=(GROUP_OF[cur]||'Drill');
-  const nel=$('dbName'); if(nel) nel.textContent=C.label||C.name||cur;
+  const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
+  { let xc=$('dbXp');
+    if(!xc && nel){ xc=document.createElement('span'); xc.id='dbXp'; xc.className='db-xp'; nel.after(xc); }
+    if(xc){ xc.textContent='+'+xpEarnFor(cur)+' xp'; xc.title='what your next clean solve of this drill earns'; } }
   const pel=$('dbPos'); if(pel) pel.textContent=String(idx+1).padStart(2,'0')+' / '+MENU_ORDER.length;
   const host=$('pkGroups');
   if(host){ [...host.querySelectorAll('.pk-row')].forEach(r=>r.classList.toggle('cur', r.dataset.key===cur)); }
@@ -4020,12 +3987,10 @@ $('soundToggle').addEventListener('click',cycleSound);
     document.addEventListener('click',e=>{ if(!pp.contains(e.target)&&e.target!==pb) pp.classList.remove('show'); }); } }
 $('profileToggle').addEventListener('click',cycleProfile);
 $('dailyBtn').addEventListener('click',startDaily);
-$('dbPrev').addEventListener('click',()=>stepDrill(-1));
-$('dbNext').addEventListener('click',()=>stepDrill(1));
-$('dbName').addEventListener('click',openPicker);
 $('weeklyBtn').addEventListener('click',startWeekly);
 $('campaignBtn').addEventListener('click',openCampaign);
 $('startBtn').addEventListener('click', tryEnter);
+{ const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); }; }
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
 { const ns=$('navShortcuts'); if(ns) ns.addEventListener('click', e=>{ e.preventDefault(); openKbd(); });
@@ -5481,19 +5446,6 @@ function xpEarnFor(key){
   if(PB[key]===undefined) return 50 + ((CHALLENGES[key]&&CHALLENGES[key].par>=55)?15:0);
   return 15;
 }
-function updateDrillBar(){
-  const g=$('dbGroup'), l=$('dbLabel'); if(!g||!l) return;
-  g.textContent=(window.HOTKEY_DRILLS.groupOf[cur]||'')+' \u00b7 ';
-  l.textContent=(window.HOTKEY_DRILLS.labelOf[cur]||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
-  let xc=$('dbXp');
-  if(!xc){ xc=document.createElement('span'); xc.id='dbXp'; xc.className='db-xp'; l.parentElement.appendChild(xc); }
-  xc.textContent='+'+xpEarnFor(cur)+' xp';
-  xc.title='what your next clean solve of this drill earns';
-}
-function stepDrill(dir){
-  const i=MENU_ORDER.indexOf(cur);
-  loadChallenge(MENU_ORDER[(i+dir+MENU_ORDER.length)%MENU_ORDER.length]);
-}
 function restartDrill(){
   loadChallenge(cur, {daily:dailyMode, weekly:weeklyMode});   // same drill, same mode; daily/weekly reseed identically
 }
@@ -5523,7 +5475,6 @@ function loadChallenge(key, opts){
   $('keyPar').textContent=C.parKeys;
   $('pb').textContent = PB[scoreKey()]!==undefined ? PB[scoreKey()].toFixed(2)+'s' : '—';
   armGhost();
-  updateDrillBar();
   $('result').className='result'; $('result').innerHTML='';
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
 }
@@ -5720,7 +5671,16 @@ function openUpgrade(featureName){
 }
 // startCheckout(): future entry point — calls the create-checkout Edge Function in
 // STRIPE TEST MODE only. Deliberately inert until post-internship.
-async function startCheckout(){ openUpgrade(); }
+async function startCheckout(){
+  // TEST-mode scaffold: tries the Edge Function; falls back to the info modal when
+  // it isn't deployed. The function itself refuses non-test Stripe keys.
+  if(!sb || !me_user || isAnonUser()){ openUpgrade(); return; }
+  try{
+    const { data, error } = await sb.functions.invoke('create-checkout', { body:{ user_id: me_user.id } });
+    if(!error && data && data.url){ location.href = data.url; return; }
+  }catch(e){}
+  openUpgrade();
+}
 
 async function initAuth(){
   if(!sb){ refreshAuthUI(); return; }
@@ -5747,6 +5707,7 @@ async function onSession(session){
   advanceAccess();
 }
 function refreshAuthUI(){
+  return;   // nav.js owns the auth slot / user menu now (shared across all pages)
   const slot=$('authSlot'); if(!slot) return;
   if(!sb){ slot.innerHTML=''; return; }
   if(me_user){

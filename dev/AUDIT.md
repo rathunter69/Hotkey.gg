@@ -622,3 +622,33 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   values. NOTE: Wolf's original curated hotkey/macro list is NOT in the repo —
   request it; the full layer wires in same-session when provided.
 - v23.
+
+---
+# ROUND 24 — THE UNIFICATION: shared nav on the trainer, one theme, one drill bar
+- STRUCTURAL FIX (ends the header-jank class): index.html now mounts the SHARED nav
+  (navMount + nav.js + nav.css), like every other page. Its inline nav markup is
+  deleted; nav.js owns links, rank pill, theme picker, auth slot, user menu, player
+  card, settings. Index's own auth-slot renderer neutered (early return); its
+  profileModal/settingsModal divs removed (nav.js mounts them); HUD rankPill removed
+  (nav pill covers all pages). Index's legacy openProfile remains only for the
+  ?openProfile=1 param (edge case, noted).
+- THEME FLIP FIXED: themes.js fell back to 'daylight' while the trainer fell back
+  dark — the white flash between pages on fresh browsers. Both now fall back to
+  'default' (dark). themes.js applies synchronously in <head> — no flash.
+- DUPLICATE DRILL BAR: a legacy header switcher (prevDrill/drillPick/dbName) predated
+  r20's bar — BOTH rendered, with a duplicate dbName id cross-wiring click handlers.
+  r20's bar deleted; the legacy bar (header position) kept and given the +xp chip
+  and daily/weekly markers.
+- LANDING: "Been here before? Sign in" added for returning users on fresh browsers —
+  no more forced anonymous entry. Invite gate unchanged (lift post-beta).
+- FLAIR (cosmetic prestige): profiles.flair (migration 20260707300000); account page
+  selector (none/gold/emerald/holo, PRO-tagged, free in beta); player card renders
+  the border+glow.
+- ANALYTICS (stats, PRO-tagged): most-hit keys heatmap from your last 40 posted
+  traces + fastest-hands keys/sec by drill.
+- PAYWALL SCAFFOLD: supabase/functions/create-checkout (Stripe TEST ONLY — hard
+  refuses non-sk_test_ keys); startCheckout() invokes it with graceful fallback to
+  the modal when undeployed; STRIPE_SETUP.md documents the safe test path and the
+  deliberate steps required to ever go live. No real money possible today.
+- v24. NOTE: this was major surgery on index.html — browser-test the full flow
+  (landing → sign-in → nav → card → drill) and report anything weird immediately.

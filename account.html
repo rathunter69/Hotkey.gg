@@ -60,8 +60,8 @@
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
 </style>
-<link rel="stylesheet" href="nav.css?v=23">
-<script src="drills.js?v=23"></script>
+<link rel="stylesheet" href="nav.css?v=24">
+<script src="drills.js?v=24"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -69,8 +69,8 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=23"></script>
-<script src="nav.js?v=23"></script>
+<script src="themes.js?v=24"></script>
+<script src="nav.js?v=24"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -101,7 +101,7 @@ async function load(){
   let prof={handle:'',team_code:null}, runs=[];
   try{
     const [p,r] = await Promise.all([
-      sb.from('profiles').select('handle,team_code').eq('id',me.id).single(),
+      sb.from('profiles').select('handle,team_code,flair').eq('id',me.id).single(),
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
     ]);
     if(p.data) prof=p.data; runs=r.data||[];
@@ -146,6 +146,13 @@ async function load(){
       <button class="btn" id="acTeamSave">Save team</button><div class="msg" id="acTeamMsg"></div>
     </div>
 
+    <div class="card"><h4>Card flair <span style="color:var(--warn);font-size:9px;letter-spacing:1px">PRO · free in beta</span></h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">A border style for your player card, shown wherever your card appears.</div>
+      <div id="flairRow" style="display:flex;gap:10px;flex-wrap:wrap">
+        ${['none','gold','emerald','holo'].map(f=>`<button class="btn ghost flair-opt${(prof.flair||'none')===f?' on':''}" data-flair="${f}" style="text-transform:capitalize${f==='gold'?';border-color:#e3b341;color:#e3b341':f==='emerald'?';border-color:#2ea36f;color:#2ea36f':f==='holo'?';border-color:#8ab4ff;color:#8ab4ff':''}">${f}</button>`).join('')}
+      </div><div class="msg" id="flairMsg"></div>
+    </div>
+
     <div class="card"><h4>Security</h4>
       <label>new password (8+ characters)</label>
       <input id="acP1" type="password" autocomplete="new-password">
@@ -188,6 +195,13 @@ async function load(){
       if(error){ say('acPassMsg',error.message||'Couldn\u2019t update.',true); return; }
       say('acPassMsg','Password updated \u2713'); }catch(e){ say('acPassMsg','Something went wrong.',true); }
   };
+  document.querySelectorAll('.flair-opt').forEach(b=>b.onclick=async()=>{
+    const f=b.dataset.flair==='none'?null:b.dataset.flair;
+    try{ const {error}=await sb.from('profiles').update({flair:f}).eq('id',me.id);
+      if(error){ say('flairMsg','Couldn\u2019t save \u2014 try again.',true); return; }
+      document.querySelectorAll('.flair-opt').forEach(x=>x.classList.toggle('on',x===b));
+      say('flairMsg','Flair set \u2713'); }catch(e){ say('flairMsg','Something went wrong.',true); }
+  });
   document.getElementById('acSignout').onclick=async()=>{ try{ await sb.auth.signOut(); }catch(e){} location.href='index.html'; };
 }
 load();

@@ -193,3 +193,9 @@
 .pc-ach-i i{position:absolute; bottom:-4px; right:-4px; font-style:normal; font-family:var(--mono); font-size:7.5px;
   background:var(--surface2); border:1px solid var(--line); border-radius:99px; padding:1px 4px; color:var(--muted)}
 .pc-ach-i.got i{color:var(--warn); border-color:var(--warn)}
+
+/* ---- card flair borders ---- */
+.pc-card.flair-gold{border:2px solid #e3b341; box-shadow:0 0 24px rgba(227,179,65,.28), 0 20px 60px rgba(0,0,0,.55)}
+.pc-card.flair-emerald{border:2px solid #2ea36f; box-shadow:0 0 24px rgba(46,163,111,.3), 0 20px 60px rgba(0,0,0,.55)}
+.pc-card.flair-holo{border:2px solid #8ab4ff; box-shadow:0 0 14px rgba(138,180,255,.35), 0 0 34px rgba(196,140,255,.22), 0 20px 60px rgba(0,0,0,.55)}
+.flair-opt.on{border-width:2px !important; font-weight:700}
