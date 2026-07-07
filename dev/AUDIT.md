@@ -555,3 +555,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - HOTKEY_PARS snapshot shipped in drills.js (auto-extracted from CHALLENGES; regen
   when pars change) → player-card badge gating is now exact (closes r19 gap).
 - v20.
+
+---
+# ROUND 21 — nav centering root cause, achievement medals, card legend
+- ICON BOUNCE, ACTUAL ROOT CAUSE: .topnav-pages{margin:0 auto} centers links BETWEEN
+  brand and tools — and the tools cluster differs per page (rank pill/theme/auth vs
+  index's set), so the flex center shifts. Fix: desktop (≥761px) uses absolute
+  geometric centering (left:50%, translate(-50%,-50%)) in BOTH nav.css and index
+  inline — identical position on every page regardless of siblings. Mobile burger
+  untouched. (Round 19's padding match was necessary but not sufficient.)
+- ACHIEVEMENT MEDALS (badges v2): emoji out, window.hkBadge in — hexagonal medal
+  SVGs with per-chapter glyphs (nav arrows / frames / data bars / sigma / percent /
+  bank columns / lens / star finisher). Earned = gold + glow; locked = ghost
+  outline at 50%. Single source themes.js + inline index copy (sync). Used on the
+  player card AND campaign modal chapter headers; tooltips explain HOW to earn.
+- CARD LEGEND: "what am I looking at?" toggle explains rank/buckets, lvl/xp, clean
+  solves, crowns ("boards you lead RIGHT NOW — they can be taken"), streak, medals.
+- v21. Ready for curriculum shells whenever Wolf sends them.

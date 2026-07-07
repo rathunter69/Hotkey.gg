@@ -219,3 +219,26 @@ window.HK_RANK = {
     return {att, avgPct:att?sum/att:null, crowns, pod, t10, per};
   }
 };
+
+/* ---- achievement badges: hex medals, single source (inline copy in index — sync) ---- */
+window.hkBadge = function(id, earned, size){
+  size=size||26;
+  // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
+  const G={
+    c1:'<path d="M13 8v10 M8 13h10 M13 8l-2.4 2.4 M13 8l2.4 2.4 M13 18l-2.4-2.4 M13 18l2.4-2.4" />',                       // navigation arrows
+    c2:'<rect x="8.5" y="8.5" width="9" height="9" rx="1"/><rect x="10.7" y="10.7" width="4.6" height="4.6" rx=".6"/>',    // formatting frames
+    c3:'<path d="M9 17v-3 M13 17v-6 M17 17v-9"/>',                                                                          // data bars
+    c4:'<path d="M9.5 8.5h7l-5 4.5 5 4.5h-7"/>',                                                                            // sigma
+    c5:'<circle cx="10" cy="10" r="1.7"/><circle cx="16" cy="16" r="1.7"/><path d="M17 9 9 17"/>',                          // percent
+    c6:'<path d="M8 11l5-3.4L18 11 M9 12v5 M13 12v5 M17 12v5 M7.5 17.5h11"/>',                                              // bank columns
+    c7:'<circle cx="12" cy="12" r="3.6"/><path d="M15 15l3.4 3.4"/>',                                                       // lookup lens
+    fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
+  };
+  const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
+  const col = earned ? 'var(--warn)' : 'var(--faint)';
+  return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+'">'+
+    '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?'.14':'.05')+'"/>'+
+    '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.6"/>'+
+    '<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(G[id]||G.fin)+'</g>'+
+    '</svg>';
+};

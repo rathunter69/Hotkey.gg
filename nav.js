@@ -406,9 +406,19 @@
         const chs=CAMP.chapters.map(c=>({...c, done:c.keys.every(cleared)}));
         const earned=chs.filter(c=>c.done);
         const allDone=earned.length===chs.length;
+        const gateTxt=' \u2014 clear every drill under par \u00d7 '+CAMP.GATE+' to earn it';
         badgesHtml='<div class="pc-badges">'+
-          chs.map(c=>'<span class="pc-badge'+(c.done?'':' off')+'" title="'+c.name+(c.done?' \u2014 cleared':' \u2014 locked')+'">'+c.badge+'</span>').join('')+
-          '<span class="pc-badge'+(allDone?'':' off')+'" title="Campaign Complete">'+CAMP.finisher.badge+'</span>'+
+          chs.map(c=>'<span class="pc-badge" title="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'">'+(window.hkBadge?window.hkBadge(c.id, c.done):c.badge)+'</span>').join('')+
+          '<span class="pc-badge" title="Campaign Complete \u2014 every chapter cleared">'+(window.hkBadge?window.hkBadge('fin', allDone):CAMP.finisher.badge)+'</span>'+
+          '</div>'+
+          '<a class="pc-legend-t" id="pcLegendT">what am I looking at?</a>'+
+          '<div class="pc-legend" id="pcLegend">'+
+            '<b>rank</b> \u2014 your average placement across every board you\u2019ve entered; buckets split each tier in thirds<br>'+
+            '<b>lvl / xp</b> \u2014 lifetime progress that only goes up; solves, dailies, gauntlets, sessions and placements all feed it<br>'+
+            '<b>clean solves</b> \u2014 completed drills with zero mouse and no guided hints<br>'+
+            '<b>crowns</b> \u2014 boards you lead RIGHT NOW (#1); they can be taken from you<br>'+
+            '<b>streak</b> \u2014 consecutive days with at least one clean solve; miss a day, lose the fire<br>'+
+            '<b>medals</b> \u2014 campaign chapters cleared (every drill under par \u00d7 '+CAMP.GATE+')'+
           '</div>';
       }
     }catch(e){}

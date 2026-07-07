@@ -44,6 +44,11 @@
   .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
   .topnav-brand b{color:var(--accent); font-weight:700}
   .topnav-pages{display:flex; align-items:center; gap:6px; margin:0 auto}
+  @media(min-width:761px){
+    .topnav-in{position:relative}
+    .topnav-pages{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0}
+  }
+
   .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
     padding:7px 12px; border-radius:7px; cursor:pointer; transition:all .15s; letter-spacing:.2px;
     display:inline-flex; align-items:center; gap:8px}
@@ -865,7 +870,7 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=20"></script>
+<script src="drills.js?v=21"></script>
 </head>
 <body>
 <nav class="topnav">
@@ -4634,6 +4639,27 @@ window.HK_RANK = window.HK_RANK || { TIERS:[
     t.bucket=pos<=1/3?'Top Bucket':(pos<=2/3?'Middle Bucket':'Bottom Bucket');
     t.full=t.name+' \u00b7 '+t.bucket; return t; }
 };
+window.hkBadge = window.hkBadge || function(id, earned, size){
+  size=size||26;
+  // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
+  const G={
+    c1:'<path d="M13 8v10 M8 13h10 M13 8l-2.4 2.4 M13 8l2.4 2.4 M13 18l-2.4-2.4 M13 18l2.4-2.4" />',                       // navigation arrows
+    c2:'<rect x="8.5" y="8.5" width="9" height="9" rx="1"/><rect x="10.7" y="10.7" width="4.6" height="4.6" rx=".6"/>',    // formatting frames
+    c3:'<path d="M9 17v-3 M13 17v-6 M17 17v-9"/>',                                                                          // data bars
+    c4:'<path d="M9.5 8.5h7l-5 4.5 5 4.5h-7"/>',                                                                            // sigma
+    c5:'<circle cx="10" cy="10" r="1.7"/><circle cx="16" cy="16" r="1.7"/><path d="M17 9 9 17"/>',                          // percent
+    c6:'<path d="M8 11l5-3.4L18 11 M9 12v5 M13 12v5 M17 12v5 M7.5 17.5h11"/>',                                              // bank columns
+    c7:'<circle cx="12" cy="12" r="3.6"/><path d="M15 15l3.4 3.4"/>',                                                       // lookup lens
+    fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
+  };
+  const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
+  const col = earned ? 'var(--warn)' : 'var(--faint)';
+  return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+'">'+
+    '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?'.14':'.05')+'"/>'+
+    '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.6"/>'+
+    '<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(G[id]||G.fin)+'</g>'+
+    '</svg>';
+};
 window.RANK_EMBLEM_IDX = {'Candidate':0,'Summer Analyst':1,'Incoming Analyst':2,
   'First-Year Analyst':3,'Top-Bucket Analyst':4,'Second-Year Analyst':5};
 window.rankEmblem = window.rankEmblem || function(tierName, size){
@@ -5364,7 +5390,7 @@ function openCampaign(){
   let rows='';
   st.forEach(c=>{
     rows+='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'">'+
-      '<div class="camp-hd"><span class="camp-badge">'+(c.done?c.badge:(c.unlocked?'\u25b8':'\ud83d\udd12'))+'</span>'+
+      '<div class="camp-hd"><span class="camp-badge">'+(window.hkBadge?window.hkBadge(c.id, c.done, 20):(c.done?c.badge:'\u25b8'))+'</span>'+
       '<b>'+c.name+'</b><span class="camp-n">'+c.clearedN+'/'+c.keys.length+'</span></div>';
     if(c.unlocked){
       c.keys.forEach(k=>{

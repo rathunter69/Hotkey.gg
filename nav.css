@@ -11,6 +11,11 @@
 .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
 .topnav-brand b{color:var(--accent); font-weight:700}
 .topnav-pages{display:flex; align-items:center; gap:6px; margin:0 auto}
+@media(min-width:761px){
+  .topnav-in{position:relative}
+  .topnav-pages{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0}
+}
+
 .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
   padding:7px 12px; border-radius:7px; transition:all .15s; letter-spacing:.2px;
   display:inline-flex; align-items:center; gap:8px}
@@ -168,3 +173,15 @@
 .pc-badges{display:flex; gap:8px; margin:2px 0 12px; flex-wrap:wrap}
 .pc-badge{font-size:19px; filter:drop-shadow(0 0 5px var(--accent-glow)); cursor:default}
 .pc-badge.off{opacity:.22; filter:grayscale(1)}
+
+/* ---- achievement medals + card legend ---- */
+.hk-badge.earned{filter:drop-shadow(0 0 6px var(--warn))}
+.hk-badge.off{opacity:.5}
+.pc-badge{cursor:default; display:inline-flex}
+.pc-legend-t{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--muted);
+  cursor:pointer; text-decoration:underline dotted; margin:-4px 0 10px}
+.pc-legend-t:hover{color:var(--accent)}
+.pc-legend{display:none; font-family:var(--mono); font-size:11px; color:var(--muted); line-height:2;
+  background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:0 0 14px}
+.pc-legend.show{display:block}
+.pc-legend b{color:var(--text)}
