@@ -678,3 +678,32 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - FAVICON: reverted to the original cell-selection mark (grid outline + active
   cell) from commit e736427 — the F4 keycap judged cheesy; keycap art lives on in
   the rank emblems where it earns its keep.
+
+---
+# ROUND 26 — trainer/nav peace treaty, anon linking, sleek pass
+- HEADER BREAKING THE GAME (root causes, both in nav.js's global keydown):
+  · '?' hotkey opened the shortcuts modal — but the game grid isn't an INPUT, so
+    typing ? in a cell hijacked mid-drill. Now disabled on NAV_ACTIVE==='trainer'.
+  · Esc closed nav overlays AND fell through to the game (= drill restart while
+    closing a modal). Now: overlay open on trainer → close + stopImmediatePropagation;
+    nothing open → nav stays silent, game owns Esc.
+  · Game side: index keydown wrapper checks window.navOverlayOpen() and pauses all
+    game keys while the player card / themes / shortcuts are up.
+- NICKNAME BUG = ONBOARDING BUG: signup used sb.auth.signUp → brand-new user id →
+  every run posted as a guest stayed orphaned under the anon id ('anon' on boards).
+  Fix: anonymous LINKING — if the session is anon, signup calls
+  sb.auth.updateUser({email,password}): same uid, all guest runs/PBs retained; then
+  profiles row is UPSERTED. account.html handle save switched update→upsert (update
+  was a silent no-op when the profile row never existed — second nickname path).
+  Existing orphaned runs from earlier signups are NOT migrated (would need admin SQL).
+- × EVERYWHERE: modal-× delegation moved INTO nav.js (guarded by
+  window.__hkModalDelegated; index keeps a fallback copy) so ALL pages have it, and
+  it syncs nav's open-flags. themesModal/kbdModal/settings/card fallback states all
+  gained a × (.modal-x shared style in nav.css).
+- SLEEK PASS: mb-tools are quiet text buttons (transparent border until hover) —
+  Monkeytype config-bar feel, less chrome, same tools; badges keep a hairline.
+  Header→content gap cut 64→30px on every page (nav.css + index inline — sync).
+- v26. Foundations breadth reviewed on request: current 7 cover navigate/ribbon/
+  edit/undo/paste-special/save/copy-paste — paste-special is 1 of 7, not overweighted.
+  Next wave queued: number-format cycling, borders, autofit, insert/delete rows,
+  F4 repeat-last-action (needs engine op-recording — real feature).

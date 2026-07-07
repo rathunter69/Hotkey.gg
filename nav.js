@@ -162,7 +162,7 @@
       ).join('');
       return `<div class="kb-section"><div class="kb-h">${escHtml(g.title)}</div>${rows}</div>`;
     }).join('');
-    m.innerHTML='<div class="pc-card" style="width:560px">'+
+    m.innerHTML='<div class="pc-card" style="width:560px"><a class="modal-x">\u00d7</a>'+
       '<div class="pc-head"><div class="pc-name">shortcuts</div></div>'+
       '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
       '<div class="kb-grid">'+sections+'</div>'+
@@ -180,6 +180,7 @@
   function openThemes(){
     const m=$('themesModal'); if(!m) return;
     themesOpen=true; m.classList.add('show');
+    // × is injected per-open (innerHTML below rebuilds content) — see append after build
     const swatches = Object.entries(THEMES).map(([key,t])=>{
       const v=t.vars; const isSel = key===currentTheme;
       return `<button class="th-card${isSel?' sel':''}" data-key="${key}" style="background:${v.bg}; color:${v.text}; border-color:${isSel?v.accent:v.line}">`+
@@ -187,7 +188,7 @@
         `<div class="th-bars"><span style="background:${v.accent}"></span><span style="background:${v.warn}"></span><span style="background:${v.bad}"></span></div>`+
         `</button>`;
     }).join('');
-    m.innerHTML='<div class="pc-card" style="width:600px">'+
+    m.innerHTML='<div class="pc-card" style="width:600px"><a class="modal-x">\u00d7</a>'+
       '<div class="pc-head"><div class="pc-name">themes</div></div>'+
       '<div class="pc-sub">Click a theme to apply. Your pick saves across sessions.</div>'+
       '<div class="th-grid">'+swatches+'</div>'+
@@ -211,7 +212,7 @@
     const m=$('settingsModal'); if(!m) return;
     settingsOpen=true; m.classList.add('show');
     if(isAnonUser()){
-      m.innerHTML='<div class="pc-card" style="width:420px">'+
+      m.innerHTML='<div class="pc-card" style="width:420px"><a class="modal-x">\u00d7</a>'+
         '<div class="pc-head"><div class="pc-name">Account</div></div>'+
         '<div class="pc-msg">You\u2019re playing as a guest \u2014 add an email and password to your account first, then come back here to change it later.</div>'+
         '<div class="pc-foot"><a id="stSaveProg" style="color:var(--accent)">Save your progress \u2192</a><a id="stClose">close</a></div>'+
@@ -221,7 +222,7 @@
       return;
     }
     const email=(window._navUser&&window._navUser.email)||'';
-    m.innerHTML='<div class="pc-card" style="width:420px">'+
+    m.innerHTML='<div class="pc-card" style="width:420px"><a class="modal-x">\u00d7</a>'+
       '<div class="pc-head"><div class="pc-name">Account</div></div>'+
       '<div class="st-row"><div class="st-label">Email</div><div class="st-value">'+escHtml(email)+'</div></div>'+
       '<div class="st-divider"></div>'+
@@ -280,7 +281,7 @@
     const m=$('profileModal'); if(!m) return;
     profileOpen=true; m.classList.add('show');
     if(!window.sb || !window._navUser){
-      m.innerHTML='<div class="pc-card"><div class="pc-msg">Sign in to see your card and where you rank against the field.</div>'+
+      m.innerHTML='<div class="pc-card"><a class="modal-x">\u00d7</a><div class="pc-msg">Sign in to see your card and where you rank against the field.</div>'+
         '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
       const c=$('pcClose'); if(c) c.onclick=closeProfile;
       m.addEventListener('click', e=>{ if(e.target===m) closeProfile(); }, {once:true});
@@ -291,7 +292,7 @@
       const data = await loadProfileData();
       renderProfile(m, data);
     } catch(e){
-      m.innerHTML='<div class="pc-card"><div class="pc-msg">Couldn\u2019t load the rankings right now \u2014 check your connection and try again.</div>'+
+      m.innerHTML='<div class="pc-card"><a class="modal-x">\u00d7</a><div class="pc-msg">Couldn\u2019t load the rankings right now \u2014 check your connection and try again.</div>'+
         '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
       const c=$('pcClose'); if(c) c.onclick=closeProfile;
     }
@@ -526,22 +527,31 @@
     const menu = document.querySelector('.user-menu');
     if(menu && !menu.contains(e.target)) closeUserMenu();
   });
+  // Anything nav owns that's currently covering the page (game code checks this
+  // to pause its own keyboard handling under our overlays).
+  window.navOverlayOpen = () => !!(themesOpen || kbdOpen || settingsOpen || profileOpen);
   document.addEventListener('keydown', e => {
+    const onTrainer = window.NAV_ACTIVE === 'trainer';
     if(e.key === 'Escape'){
+      const anyOpen = window.navOverlayOpen();
       closeUserMenu();
       if(themesOpen)   closeThemes();
       if(kbdOpen)      closeKbd();
       if(settingsOpen) closeSettings();
       if(profileOpen)  closeProfile();
+      // On the trainer, Esc-with-an-overlay-open must ONLY close the overlay —
+      // never fall through to the game (where Esc restarts the drill).
+      if(onTrainer && anyOpen){ e.preventDefault(); e.stopImmediatePropagation(); }
+      return;
     }
     if(e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey){
-      // Don't trigger if user is typing in an input
+      if(onTrainer) return;   // the game owns raw keys — grid cells aren't inputs
       const t = e.target;
       if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
       e.preventDefault();
       kbdOpen ? closeKbd() : openKbd();
     }
-  });
+  }, true);
 
   // ---------------------------------------------------------------
   // INIT — runs on DOMContentLoaded. Injects nav, wires buttons, kicks off auth state listener.
@@ -560,6 +570,22 @@
     });
 
     // Wire the static tool buttons (always present regardless of auth).
+    // universal modal-× delegation (all pages): closes the overlay AND syncs nav's flags
+    if(!window.__hkModalDelegated){ window.__hkModalDelegated = true;
+      document.addEventListener('click', e => {
+        const x = e.target.closest && e.target.closest('.modal-x, .pc-x');
+        if(!x) return;
+        const ov = x.closest('.onboard-modal, .profile-modal, [id$="Modal"]');
+        if(!ov) return;
+        e.preventDefault(); e.stopPropagation();
+        ov.classList.remove('show');
+        if(ov.id==='themesModal') themesOpen=false;
+        if(ov.id==='kbdModal') kbdOpen=false;
+        if(ov.id==='settingsModal') settingsOpen=false;
+        if(ov.id==='profileModal') profileOpen=false;
+        if(!ov.classList.contains('onboard-modal') && !ov.classList.contains('profile-modal')) ov.remove();
+      }, true);
+    }
     const sb_btn = $('navShortcuts'); if(sb_btn) sb_btn.onclick = () => kbdOpen ? closeKbd() : openKbd();
     const th_btn = $('navThemes');    if(th_btn) th_btn.onclick = () => themesOpen ? closeThemes() : openThemes();
     const th_name = $('navThemeName'); if(th_name) th_name.onclick = () => themesOpen ? closeThemes() : openThemes();

@@ -6,7 +6,7 @@
    ============================================================ */
 
 /* ---------- TOP NAV (three sections: brand · pages · tools) ---------- */
-.topnav{width:100%; background:var(--bg); margin-bottom:64px; position:relative}
+.topnav{width:100%; background:var(--bg); margin-bottom:30px; position:relative}
 .topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:60px; display:flex; align-items:center; gap:18px}
 .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
 .topnav-brand b{color:var(--accent); font-weight:700}
@@ -199,3 +199,9 @@
 .pc-card.flair-emerald{border:2px solid #2ea36f; box-shadow:0 0 24px rgba(46,163,111,.3), 0 20px 60px rgba(0,0,0,.55)}
 .pc-card.flair-holo{border:2px solid #8ab4ff; box-shadow:0 0 14px rgba(138,180,255,.35), 0 0 34px rgba(196,140,255,.22), 0 20px 60px rgba(0,0,0,.55)}
 .flair-opt.on{border-width:2px !important; font-weight:700}
+
+/* ---- modal × (shared) ---- */
+.modal-x{position:absolute; top:10px; right:14px; font-family:var(--mono); font-size:20px;
+  color:var(--muted); cursor:pointer; line-height:1; padding:4px 8px; border-radius:8px; z-index:5}
+.modal-x:hover{color:var(--text); background:var(--surface2)}
+.pc-card{position:relative}

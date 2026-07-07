@@ -39,7 +39,7 @@
   /* ---------- TOP NAV (three sections: brand · pages · tools) ----------
      Not sticky — Monkeytype-style, the nav scrolls with the page so users in focused-trainer mode aren't
      looking at a header occupying the top of their viewport while they're trying to read a drill grid. */
-  .topnav{width:100%; background:var(--bg); margin-bottom:64px; position:relative}
+  .topnav{width:100%; background:var(--bg); margin-bottom:30px; position:relative}
   .topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:60px; display:flex; align-items:center; gap:18px}
   .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
   .topnav-brand b{color:var(--accent); font-weight:700}
@@ -273,6 +273,9 @@
   .prefs-pop.show{display:flex}
   .prefs-pop .mb-tool{width:100%; justify-content:flex-start}
   #prefsBtn{font-size:15px}
+  .mb-tool:hover{border-color:var(--line)}
+  #streakBadge,#lvlBadge,#proBadge{border-color:var(--line)}
+
   #hkToast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(8px);
     background:var(--surface2); color:var(--text); border:1px solid var(--accent-dim);
     font-family:var(--mono); font-size:12.5px; padding:9px 18px; border-radius:999px;
@@ -515,7 +518,8 @@
     font-family:var(--mono); font-size:12.5px; padding:7px 12px; border-radius:6px; cursor:pointer; transition:.1s}
   .mb-popover .mb-dur:hover{color:var(--accent); background:var(--accent-glow)}
   .mb-spacer{flex:1}
-  .mb-tool{background:none; border:1px solid var(--line); color:var(--muted); font-family:var(--mono); font-size:11.5px;
+  /* Monkeytype-style config bar: quiet text buttons, borders only on hover — less chrome, same tools */
+  .mb-tool{background:none; border:1px solid transparent; color:var(--muted); font-family:var(--mono); font-size:11px;
     padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s}
   .mb-tool:hover{color:var(--text); border-color:var(--muted)}
   .mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
@@ -866,10 +870,10 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=25"></script>
-<link rel="stylesheet" href="nav.css?v=25">
-<script src="themes.js?v=25"></script>
-<script src="nav.js?v=25" defer></script>
+<script src="drills.js?v=26"></script>
+<link rel="stylesheet" href="nav.css?v=26">
+<script src="themes.js?v=26"></script>
+<script src="nav.js?v=26" defer></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -4096,17 +4100,18 @@ document.addEventListener('keydown',e=>{
   }
 },{capture:true});
 
-// UNIVERSAL modal-close delegation: any .modal-x / .pc-x click closes its overlay.
-// Capture phase + delegation = immune to re-renders and missed per-instance wiring
-// (the recurring dead-\u00d7 class ends here).
-document.addEventListener('click', e=>{
-  const x = e.target.closest && e.target.closest('.modal-x, .pc-x');
-  if(!x) return;
-  const ov = x.closest('.onboard-modal, .profile-modal, [id$="Modal"]');
-  if(ov){ e.preventDefault(); e.stopPropagation();
-    ov.classList.remove('show');
-    if(!ov.classList.contains('onboard-modal') && !ov.classList.contains('profile-modal')) ov.remove(); }
-}, true);
+// Modal-× delegation lives in nav.js (window.__hkModalDelegated) — shared on all pages.
+// Fallback here only if nav.js somehow didn't load:
+if(!window.__hkModalDelegated){ window.__hkModalDelegated = true;
+  document.addEventListener('click', e=>{
+    const x = e.target.closest && e.target.closest('.modal-x, .pc-x');
+    if(!x) return;
+    const ov = x.closest('.onboard-modal, .profile-modal, [id$="Modal"]');
+    if(ov){ e.preventDefault(); e.stopPropagation();
+      ov.classList.remove('show');
+      if(!ov.classList.contains('onboard-modal') && !ov.classList.contains('profile-modal')) ov.remove(); }
+  }, true);
+}
 
 // stop Alt keyup from focusing the browser menu bar
 document.addEventListener('keyup',e=>{ if(e.key==='Alt') e.preventDefault(); },{capture:true});
@@ -6046,6 +6051,15 @@ async function doSignUp(){
       return;
     }
     // NEW ACCOUNT path: brand-new user (no existing session).
+    if(me_user && isAnonUser()){
+      // LINK the anonymous session instead of creating a new account: same user id,
+      // so every run and PB posted as a guest stays yours.
+      const { error } = await sb.auth.updateUser({ email, password:pass });
+      if(error){ authErr(/registered|already/i.test(error.message)?'That email already has an account \u2014 sign in instead (guest scores can\u2019t merge into it).':error.message); return; }
+      try{ await sb.from('profiles').upsert({ id: me_user.id }, { onConflict:'id' }); }catch(e){}
+      closeAuth(); showToast('account saved \u2014 your guest runs are yours now. Set a handle on the Account page.');
+      return;
+    }
     const { data, error } = await sb.auth.signUp({ email, password:pass });
     if(error){ authErr(/registered|already/i.test(error.message)?'That email already has an account \u2014 try signing in.':error.message); return; }
     if(data && data.session){ closeAuth(); }
