@@ -832,7 +832,7 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=17"></script>
+<script src="drills.js?v=18"></script>
 </head>
 <body>
 <nav class="topnav">
@@ -1875,6 +1875,128 @@ const CHALLENGES = {
       return [
         {label:'growth = this year ÷ last year − 1 (live formulas, all 4)', ok: f},
         {label:'format the growth row as % to 1 decimal', ok: m},
+      ];
+    }
+  },
+  wacc:{
+    name:'WACC', label:'Build the discount rate', par:58, parKeys:48,
+    prompt:'Cost of capital, the desk way: total the cap structure, then weight each side \u2014 equity at its cost, debt at its AFTER-TAX cost. One V cell, one WACC cell, parentheses where they belong.',
+    req:'<em>B4</em> \u00b7 <em>=B2+B3</em> \u00b7 <em>B8</em> \u00b7 <em>=B2/B4*B5+B3/B4*B6*(1-B7)</em>',
+    guide:[
+      'total capital at B4 \u00b7 <kbd>=B2+B3</kbd> <kbd>\u21b5</kbd>',
+      'WACC at B8 \u00b7 <kbd>=B2/B4*B5+B3/B4*B6*(1-B7)</kbd> <kbd>\u21b5</kbd> \u2014 the (1-t) is where careless models die',
+    ],
+    targets:['B4','B8'],
+    demo(){ return [
+      {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
+      {sel:'B8', keys:[...T('=B2/B4*B5+B3/B4*B6*(1-B7)'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'WACC build',txt:true,bold:true};
+      const E=rnd(30,90)*10, Dd=rnd(10,60)*10;
+      const re=rnd(9,14)/100, rd=rnd(4,8)/100, tax=rnd(21,28)/100;
+      const put=(r,l,v,pct)=>{ cells['A'+r]={...blankCell(),value:l,txt:true};
+        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:pct?'percent':'comma',decimals:pct?1:0}; };
+      put(2,'Equity value',E); put(3,'Net debt',Dd);
+      cells['A4']={...blankCell(),value:'Total capital',txt:true,bold:true}; cells['B4']={...blankCell(),fmtStyle:'comma',decimals:0};
+      put(5,'Cost of equity',re,1); put(6,'Cost of debt',rd,1); put(7,'Tax rate',tax,1);
+      cells['A8']={...blankCell(),value:'WACC',txt:true,bold:true}; cells['B8']={...blankCell(),fmtStyle:'percent',decimals:1};
+      this._V=E+Dd; this._wacc=E/(E+Dd)*re + Dd/(E+Dd)*rd*(1-tax);
+      return {ROWS:8, cells, active:{r:4,c:2}, sel:null, colW:{1:130,2:96}};
+    },
+    checks(S){
+      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?c.formula.toUpperCase().replace(/\s/g,''):''; };
+      const v=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:null; };
+      return [
+        {label:'total capital = equity + debt (formula)', ok: !!f('B4')&&Math.abs((v('B4')??0)-this._V)<1e-6},
+        {label:'WACC weights both sides \u00b7 debt is AFTER-TAX (1-t)', ok: f('B8').includes('(1-B7)')&&Math.abs((v('B8')??0)-this._wacc)<1e-6},
+      ];
+    }
+  },
+  dcf:{
+    name:'DCF', label:'Discount the cash flows', par:70, parKeys:56,
+    prompt:'Three years of FCF, one discount rate. Build the PV formula ONCE with the rate $-locked and the year exponent pointed at row 2, fill it right, then sum the PVs. If your anchors are right, the fill does the work.',
+    req:'<em>B4</em> \u00b7 <em>=B3/(1+$B$6)^B2</em> \u00b7 select B4:D4 \u00b7 <em>ctrl+r</em> \u00b7 <em>B7</em> \u00b7 <em>=SUM(B4:D4)</em>',
+    guide:[
+      'PV at B4 \u00b7 <kbd>=B3/(1+$B$6)^B2</kbd> <kbd>\u21b5</kbd> \u2014 rate anchored, year and FCF walking',
+      'back on B4 \u00b7 <kbd>shift</kbd>+<kbd>\u2192</kbd>\u00d72 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> fills the row',
+      'sum of PVs at B7 \u00b7 <kbd>=SUM(B4:D4)</kbd> <kbd>\u21b5</kbd>',
+    ],
+    targets:['B4','B4:D4','B7'],
+    demo(){ return [
+      {sel:'B4', keys:[...T('=B3/(1+$B$6)^B2'), Kb.enter]},
+      {sel:'B4:D4', keys:[Kb.fillR]},
+      {sel:'B7', keys:[...T('=SUM(B4:D4)'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Mini-DCF',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Year',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'FCF',txt:true};
+      cells['A4']={...blankCell(),value:'PV of FCF',txt:true,bold:true};
+      cells['A6']={...blankCell(),value:'Discount rate',txt:true};
+      cells['A7']={...blankCell(),value:'Sum of PVs',txt:true,bold:true};
+      const r=rnd(8,12)/100; const fcfs=[];
+      for(let y=1;y<=3;y++){ const col=colLetter(y+1);
+        cells[col+2]={...blankCell(),value:y,fontColor:'blue'};
+        const f=rnd(8,30)*10; fcfs.push(f);
+        cells[col+3]={...blankCell(),value:f,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:1}; }
+      cells['B6']={...blankCell(),value:r,fontColor:'blue',fmtStyle:'percent',decimals:1};
+      cells['B7']={...blankCell(),fmtStyle:'comma',decimals:1};
+      this._pv = fcfs.map((f,i)=>f/Math.pow(1+r,i+1));
+      this._sum = this._pv.reduce((a,b)=>a+b,0);
+      return {ROWS:7, cells, active:{r:4,c:2}, sel:null, colW:{1:110,2:82,3:82,4:82}};
+    },
+    checks(S){
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const pvOk=[0,1,2].every(i=>{ const val=v(colLetter(i+2)+4); return val!==null&&Math.abs(val-this._pv[i])<1e-4; });
+      const f7=(S.cells['B7']&&S.cells['B7'].formula)?S.cells['B7'].formula.toUpperCase():'';
+      return [
+        {label:'PV formula anchored on the rate, filled across all 3 years', ok: pvOk},
+        {label:'sum of PVs \u2014 SUM over the row', ok: f7.includes('SUM')&&Math.abs((v('B7')??0)-this._sum)<1e-4},
+      ];
+    }
+  },
+  lbo:{
+    name:'LBO', label:'Run the LBO math', par:75, parKeys:60,
+    prompt:'Entry to exit in three formulas: equity check at entry (EV minus debt), equity at exit (exit EBITDA \u00d7 exit multiple, less remaining debt), and the number the whole deal answers to \u2014 MOIC.',
+    req:'<em>B5</em> \u00b7 <em>=B2*B3-B4</em> \u00b7 <em>B9</em> \u00b7 <em>=B6*B7-B8</em> \u00b7 <em>B10</em> \u00b7 <em>=B9/B5</em>',
+    guide:[
+      'entry equity at B5 \u00b7 <kbd>=B2*B3-B4</kbd> <kbd>\u21b5</kbd> \u2014 EBITDA \u00d7 multiple, less debt',
+      'exit equity at B9 \u00b7 <kbd>=B6*B7-B8</kbd> <kbd>\u21b5</kbd>',
+      'MOIC at B10 \u00b7 <kbd>=B9/B5</kbd> <kbd>\u21b5</kbd> \u2014 the only number the IC remembers',
+    ],
+    targets:['B5','B9','B10'],
+    demo(){ return [
+      {sel:'B5', keys:[...T('=B2*B3-B4'), Kb.enter]},
+      {sel:'B9', keys:[...T('=B6*B7-B8'), Kb.enter]},
+      {sel:'B10', keys:[...T('=B9/B5'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'LBO returns',txt:true,bold:true};
+      const eb=rnd(8,25)*10, mult=rnd(14,22)/2, debt=Math.round(eb*mult*rnd(45,65)/100/10)*10;
+      const ebX=Math.round(eb*rnd(115,160)/100/10)*10, multX=mult+rnd(-2,2)/2;
+      const debtX=Math.round(debt*rnd(30,70)/100/10)*10;
+      const put=(r,l,v,st,dec)=>{ cells['A'+r]={...blankCell(),value:l,txt:true};
+        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:st||'comma',decimals:dec??0}; };
+      put(2,'Entry EBITDA',eb); put(3,'Entry multiple',mult,'general',1); put(4,'Debt at entry',debt);
+      cells['A5']={...blankCell(),value:'Entry equity',txt:true,bold:true}; cells['B5']={...blankCell(),fmtStyle:'comma',decimals:0};
+      put(6,'Exit EBITDA',ebX); put(7,'Exit multiple',multX,'general',1); put(8,'Debt at exit',debtX);
+      cells['A9']={...blankCell(),value:'Exit equity',txt:true,bold:true}; cells['B9']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A10']={...blankCell(),value:'MOIC',txt:true,bold:true}; cells['B10']={...blankCell(),fmtStyle:'general',decimals:1};
+      this._entry=eb*mult-debt; this._exit=ebX*multX-debtX; this._moic=this._exit/this._entry;
+      return {ROWS:10, cells, active:{r:5,c:2}, sel:null, colW:{1:126,2:96}};
+    },
+    checks(S){
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?c.formula.toUpperCase().replace(/\s/g,''):''; };
+      return [
+        {label:'entry equity = EBITDA \u00d7 multiple \u2212 debt', ok: v('B5')!==null&&Math.abs(v('B5')-this._entry)<1e-6},
+        {label:'exit equity, same build at exit terms', ok: v('B9')!==null&&Math.abs(v('B9')-this._exit)<1e-6},
+        {label:'MOIC = exit / entry (formula, not typed)', ok: f('B10').includes('B9')&&f('B10').includes('B5')&&Math.abs((v('B10')??0)-this._moic)<1e-4},
       ];
     }
   },
@@ -4394,6 +4516,22 @@ const THEMES = {
     warn:'#e6c384', bad:'#c34043' }},
 };
 let currentTheme = 'default';
+window.HK_RANK = window.HK_RANK || { TIERS:[
+  {name:'Candidate',cls:'tier-unranked',att:0,pct:9},
+  {name:'Summer Analyst',cls:'tier-bronze',att:5,pct:1.01},
+  {name:'Incoming Analyst',cls:'tier-silver',att:8,pct:0.55},
+  {name:'First-Year Analyst',cls:'tier-gold',att:10,pct:0.30},
+  {name:'Top-Bucket Analyst',cls:'tier-platinum',att:13,pct:0.15},
+  {name:'Second-Year Analyst',cls:'tier-diamond',att:15,pct:0.05}],
+  tierOf(avgPct, att){ const T=this.TIERS;
+    if(avgPct===null||(att||0)<5) return {...T[0],i:0,bucket:null,full:T[0].name};
+    let t={...T[1],i:1};
+    for(let i=T.length-1;i>=1;i--){ if(att>=T[i].att&&avgPct<=T[i].pct){ t={...T[i],i}; break; } }
+    const hi=t.pct>1?1:t.pct, lo=t.i+1<T.length?T[t.i+1].pct:0, span=Math.max(1e-9,hi-lo);
+    const pos=Math.min(1,Math.max(0,(avgPct-lo)/span));
+    t.bucket=pos<=1/3?'Top Bucket':(pos<=2/3?'Middle Bucket':'Bottom Bucket');
+    t.full=t.name+' \u00b7 '+t.bucket; return t; }
+};
 window.RANK_EMBLEM_IDX = {'Candidate':0,'Summer Analyst':1,'Incoming Analyst':2,
   'First-Year Analyst':3,'Top-Bucket Analyst':4,'Second-Year Analyst':5};
 window.rankEmblem = window.rankEmblem || function(tierName, size){
@@ -4922,6 +5060,7 @@ async function loadProfileData(){
    so a single fluke "#1 of 2" run can't carry the rest. The remaining edge case — a player who does 5 drills all
    blazingly fast — caps at Silver here, since Gold needs 10+ drills. */
 function tierOf(avgPct, attemptedCount){
+  if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);
   if(avgPct===null || (attemptedCount||0) < 5) return {name:'Candidate', cls:'tier-unranked'};
   if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
   if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst', cls:'tier-platinum'};
@@ -5263,6 +5402,7 @@ function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 async function updateRankPill(){
   const el=$('rankPill'); if(!el) return;
   const show=(t)=>{ el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span>';
+    el.title=(t.full||t.name)+' \u2014 the ladder runs Candidate \u2192 Second-Year Analyst. Click for your card.';
     el.className='mb-tool rank-pill '+t.cls; el.style.display='inline-flex';
     el.onclick=()=>{ try{ openProfile(); }catch(e){} }; };
   try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null');

@@ -142,11 +142,11 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=17">
-<script src="drills.js?v=17"></script>
+<link rel="stylesheet" href="nav.css?v=18">
+<script src="drills.js?v=18"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=17"></script>
-<script src="nav.js?v=17"></script>
+<script src="themes.js?v=18"></script>
+<script src="nav.js?v=18"></script>
 </head>
 <body>
 
@@ -263,6 +263,7 @@ const TIERS=[
   {name:'Second-Year Analyst', cls:'tier-diamond',  att:15, pct:0.05},
 ];
 function tierOf(avgPct, att){
+  if(window.HK_RANK){ const t=window.HK_RANK.tierOf(avgPct, att); return {...t, i:t.i-1}; }  // HK_RANK indexes incl. Candidate; local TIERS excludes it
   if(avgPct===null || (att||0)<5) return {name:'Candidate', cls:'tier-unranked', i:-1};
   for(let i=TIERS.length-1;i>=0;i--){ if(att>=TIERS[i].att && avgPct<=TIERS[i].pct) return {...TIERS[i], i}; }
   return {...TIERS[0], i:0};
@@ -344,7 +345,7 @@ function heroHtml(){
     nextHtml='<div class="yc-next"><b>Top of the ladder.</b> Now defend it \u2014 crowns decay the moment someone hungrier shows up.</div>';
   }
   return '<div class="panel me"><h4>your card</h4>'+
-    '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span></span>'+
+    '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+(t.full||t.name)+'</span></span>'+
     '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
     '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+L.into+'/'+L.need+' xp</span></div>'+
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">'+

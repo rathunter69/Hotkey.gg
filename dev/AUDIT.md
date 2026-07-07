@@ -484,3 +484,24 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - STATS.HTML: title-card strip on top (emblem+tier+LVL+account link), group
   headers in the per-drill list, Recent Runs (last 10 with keys + date).
 - Cache version v17 everywhere.
+
+---
+# ROUND 18 — bucket subtiers, Models set (WACC/DCF/LBO), rank-math consolidation
+- BUCKETS: every ranked tier now subdivides by position within its percentile band:
+  Top / Middle / Bottom Bucket — comp-review language, exactly the audience's own
+  vocabulary. Shown on the player card, leaderboard hero, and ladder ("you are here
+  (middle bucket)"); the HUD pill stays short (bucket in tooltip). Math unit-tested.
+- CONSOLIDATION (S10 largely done): HK_RANK.tierOf is now the single implementation;
+  nav.js + leaderboard delegate to it (themes.js loads first on those pages), and
+  index.html carries an inline HK_RANK copy (same pattern as rankEmblem — sync the
+  two on changes). 5 copies → 2.
+- MODELS GROUP (28 drills, dupe revolver in menuOrder found & removed): schedule +
+  comps moved in; three new, specced to desk convention within evaluator limits
+  (no NPV/IRR fns — deliberate: bankers build PVs by hand anyway):
+  · WACC (par 58): total capital, then weighted formula — the (1-t) after-tax debt
+    check is explicitly graded.
+  · DCF (par 70): ONE anchored PV formula =FCF/(1+$rate)^year, fill right, SUM —
+    trains anchoring discipline where it actually pays.
+  · LBO (par 75): entry equity, exit equity, MOIC as a formula (typing the number
+    fails the check).
+- v18.

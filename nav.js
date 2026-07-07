@@ -36,6 +36,7 @@
 
   // Same tier function as index.html. Kept in sync — if thresholds change there, change here.
   function tierOf(avgPct, attemptedCount){
+    if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);   // consolidated source
     if(avgPct===null || (attemptedCount||0) < 5) return {name:'Candidate', cls:'tier-unranked'};
     if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
     if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst', cls:'tier-platinum'};

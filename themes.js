@@ -182,9 +182,18 @@ window.HK_RANK = {
   ],
   tierOf(avgPct, att){
     const T=this.TIERS;
-    if(avgPct===null || (att||0)<5) return {...T[0], i:0};
-    for(let i=T.length-1;i>=1;i--){ if(att>=T[i].att && avgPct<=T[i].pct) return {...T[i], i}; }
-    return {...T[1], i:1};
+    if(avgPct===null || (att||0)<5) return {...T[0], i:0, bucket:null, full:T[0].name};
+    let t={...T[1], i:1};
+    for(let i=T.length-1;i>=1;i--){ if(att>=T[i].att && avgPct<=T[i].pct){ t={...T[i], i}; break; } }
+    // BUCKETS — comp-review language. Your position inside the tier's percentile band,
+    // split in thirds: Top / Middle / Bottom Bucket. The summit tier buckets within 0–5%.
+    const hi = t.pct>1 ? 1 : t.pct;                      // band ceiling (worse pct)
+    const lo = t.i+1 < T.length ? T[t.i+1].pct : 0;       // band floor (better pct)
+    const span = Math.max(1e-9, hi-lo);
+    const pos = Math.min(1, Math.max(0, (avgPct-lo)/span));  // 0 = best in band
+    t.bucket = pos<=1/3 ? 'Top Bucket' : (pos<=2/3 ? 'Middle Bucket' : 'Bottom Bucket');
+    t.full = t.name+' \u00b7 '+t.bucket;
+    return t;
   },
   levelOf(xp){ let lvl=1, need=150, floor=0;
     while(xp>=floor+need){ floor+=need; lvl++; need=150*lvl; }
