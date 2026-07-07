@@ -8,9 +8,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=29" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=29">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=29">
+<link rel="icon" href="favicon.ico?v=30" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=30">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=30">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -858,13 +858,14 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=29"></script>
-<link rel="stylesheet" href="nav.css?v=29">
-<script src="themes.js?v=29"></script>
-<script src="nav.js?v=29" defer></script>
+<script src="drills.js?v=30"></script>
+<link rel="stylesheet" href="nav.css?v=30">
+<script src="themes.js?v=30"></script>
+
 </head>
 <body>
 <div id="navMount"></div>
+<script src="nav.js?v=30"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1700,11 +1701,14 @@ const CHALLENGES = {
       return {ROWS:8, cells, active:{r:3,c:2}, sel:null, colW:{1:90,2:88,3:88,4:88}};
     },
     checks(S){
-      const f=k=>{ const c=S.cells[k]; return c&&c.formula?String(c.formula).replace(/\s/g,''):''; };
-      const gs='(1+'+this._g.toFixed(2)+')';
+      // value + ref checks — any equivalent formula the fill produces (or you write) passes
+      const cel=k=>S.cells[k]||{};
+      const vOk=(k,exp,ref)=>{ const c=cel(k); return !!(c.formula && String(c.formula).toUpperCase().includes(ref) && Math.abs((c.value||0)-exp)<0.5); };
+      const g=this._g;
+      const b3=1000*(1+g), b4=b3*(1+g), b5=b4*(1+g);
       return [
-        {label:'B4 and B5 carry the growth formula (Ctrl+D)', ok: f('B4')==='=B3*'+gs && f('B5')==='=B4*'+gs},
-        {label:'C7 and D7 carry the total (Ctrl+R, refs shifted)', ok: f('C7')==='=C2+C3' && f('D7')==='=D2+D3'},
+        {label:'B4 and B5 carry live growth formulas (Ctrl+D)', ok: vOk('B4',b4,'B3') && vOk('B5',b5,'B4')},
+        {label:'C7 and D7 carry the shifted totals (Ctrl+R)', ok: vOk('C7',1020,'C2') && vOk('D7',530,'D2')},
       ];
     }
   },
@@ -2302,43 +2306,56 @@ const CHALLENGES = {
     }
   },
   revolver:{
-    name:'Revolver', label:'Sweep the cash', par:28, parKeys:17,
-    prompt:'Cash sweep logic — the heart of every debt schedule. Where free cash flow is negative, the revolver funds the gap; where it\'s positive, the draw is zero. At B3 build the draw with MAX: =MAX(0,-B2), then fill it across the years.',
-    req:'<em>at B3</em> type <em>=MAX(0,-B2)</em> · <em>↵</em> · then select B3:E3 and <em>ctrl+r</em> to fill — negative cash becomes a draw, positive cash floors at zero',
+    name:'Revolver', label:'Sweep the revolver', par:52, parKeys:40,
+    prompt:'The end-of-year cash sweep: pay the revolver down with whatever cash you can spare. Sweep = the LESSER of the outstanding balance and the cash you have above the minimum \u2014 and never negative. Canonical form: =MIN(B3, MAX(0, B2-B4)) \u2014 but any formula that produces the right sweep from these inputs is accepted.',
+    req:'<em>at B5</em> \u00b7 sweep = min(balance, cash available \u2212 min cash), floored at 0 \u00b7 fill across <em>ctrl+r</em>',
     guide:[
-      'at B3 type <kbd>=MAX(0,-B2)</kbd> <kbd>↵</kbd> — flip the sign of cash, floor it at zero',
-      'back up (<kbd>↑</kbd>), extend right with <kbd>shift</kbd>+<kbd>→</kbd>×3, then <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'sanity-check: draws appear only under the negative cash years',
+      'at B5 type <kbd>=MIN(B3,MAX(0,B2-B4))</kbd> <kbd>\u21b5</kbd> \u2014 can\u2019t sweep more than the balance, can\u2019t dip below minimum cash',
+      'back to B5 \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd><kbd>\u2192</kbd><kbd>\u2192</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 one formula sweeps all four years',
     ],
-    targets:['B3','B3:E3'],
+    targets:['B5','B5'],
     demo(){ return [
-      {sel:'B3', keys:[...T('=MAX(0,-B2)'), Kb.enter]},
-      {sel:'B3:E3', keys:[Kb.fillR]},
+      {sel:'B5', keys:[...T('=MIN(B3,MAX(0,B2-B4))'), Kb.enter]},
+      {sel:'B5', keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'r',ctrl:true}]},
     ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:'Cash sweep',txt:true,bold:true};
       ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
-      cells['A2']={...blankCell(),value:'Free cash flow',txt:true};
-      cells['A3']={...blankCell(),value:'Revolver draw',txt:true};
-      // two shortfall years + two surplus years, shuffled — so the MAX floor visibly matters
-      const flows=[ -rnd(8,40)*10, -rnd(8,40)*10, rnd(8,40)*10, rnd(8,40)*10 ];
-      for(let k=flows.length-1;k>0;k--){ const j=rnd(0,k); [flows[k],flows[j]]=[flows[j],flows[k]]; }
+      cells['A2']={...blankCell(),value:'Cash available',txt:true};
+      cells['A3']={...blankCell(),value:'Revolver balance',txt:true};
+      cells['A4']={...blankCell(),value:'Minimum cash',txt:true};
+      cells['A5']={...blankCell(),value:'Cash sweep',txt:true,bold:true};
+      // engineered mix: one full paydown, one partial, one zero (cash below minimum)
+      const scenarios=[
+        ()=>({cash:rnd(30,60)*10, bal:rnd(5,15)*10, minc:rnd(5,10)*10}),   // full: spare > balance
+        ()=>({cash:rnd(20,40)*10, bal:rnd(35,60)*10, minc:rnd(5,10)*10}),  // partial: spare < balance
+        ()=>({cash:rnd(4,8)*10,  bal:rnd(20,40)*10, minc:rnd(10,15)*10}),  // zero: cash under minimum
+        ()=>({cash:rnd(15,50)*10, bal:rnd(10,45)*10, minc:rnd(5,12)*10}),  // wildcard
+      ];
+      for(let k=scenarios.length-1;k>0;k--){ const j=rnd(0,k); [scenarios[k],scenarios[j]]=[scenarios[j],scenarios[k]]; }
+      this._exp=[];
       for(let i=0;i<4;i++){
-        cells[colLetter(i+2)+'2']={...blankCell(),value:flows[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[colLetter(i+2)+'3']={...blankCell(),fmtStyle:'comma',decimals:0};
+        const sc=scenarios[i](); const col=colLetter(i+2);
+        cells[col+'2']={...blankCell(),value:sc.cash,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[col+'3']={...blankCell(),value:sc.bal,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[col+'4']={...blankCell(),value:sc.minc,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[col+'5']={...blankCell(),fmtStyle:'comma',decimals:0};
+        this._exp.push(Math.max(0, Math.min(sc.bal, sc.cash-sc.minc)));
       }
-      return {ROWS:3, cells, active:{r:3,c:2}, sel:null, colW:{1:126,2:76,3:76,4:76,5:76}};
+      return {ROWS:5, cells, active:{r:5,c:2}, sel:null, colW:{1:128,2:76,3:76,4:76,5:76}};
     },
     checks(S){
+      // END-STATE grading: live formula + right sweep VALUE. No function-name policing —
+      // MIN/MAX, IF chains, whatever produces the correct sweep from these inputs passes.
       const COL=['B','C','D','E'];
-      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
-      const dOk=i=>{ const col=COL[i], c=S.cells[col+'3']; if(!c||!c.formula) return false;
-        const f=c.formula.toUpperCase().replace(/\s/g,'');
-        return f.includes('MAX')&&f.includes(col+'2')&&Math.abs(c.value-Math.max(0,-val(col+'2')))<1e-6; };
+      const dOk=i=>{ const col=COL[i], c=S.cells[col+'5']; if(!c||!c.formula) return false;
+        const f=String(c.formula).toUpperCase();
+        const refs=[col+'2',col+'3',col+'4'].filter(r=>f.includes(r)).length;
+        return refs>=2 && Math.abs(c.value-this._exp[i])<0.5; };
       let ok=true; for(let i=0;i<4;i++) if(!dOk(i)) ok=false;
       return [
-        {label:'draw = MAX(0, −cash) across all 4 years (live formulas)', ok},
+        {label:'sweep = min(balance, cash above minimum), never negative \u2014 all 4 years, live formulas', ok},
       ];
     }
   },
@@ -5721,8 +5738,8 @@ function openCampaign(){
     rows+='</div>';
   });
   m.innerHTML='<div class="ob-card camp-card"><a class="modal-x" id="campX">\u00d7</a><div class="ob-title">the campaign'+(allDone?' \u2b50':'')+'</div>'+
-    '<div class="ob-body" style="text-align:left;font-size:12.5px">Clear every drill in a chapter under its time gate (par \u00d7 '+G+', clean run) to unlock the next. Badges land on your player card.'+
-    (allDone?'<br><br><b style="color:var(--warn)">\u2b50 Campaign complete \u2014 the star is yours.</b>':'')+'</div>'+
+    '<div class="ob-body" style="text-align:left;font-size:12.5px">Ship the model version by version: clear every drill in a version under its time gate (par \u00d7 '+G+', clean run) and the next unlocks. Each shipped version stamps a medal on your player card.'+
+    (allDone?'<br><br><b style="color:var(--warn)">\u2b50 Model complete \u2014 every version shipped.</b>':'')+'</div>'+
     '<div class="camp-list">'+rows+'</div>'+
     '<div class="ob-opts"><button class="ob-key" id="campClose">close</button></div></div>';
   m.classList.add('show');

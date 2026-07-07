@@ -804,3 +804,34 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - nav.js wsum now computed from the card's own placements (fixes r28's undefined
   pass-through) → provisional tags show correctly on the card.
 - v29.
+
+---
+# ROUND 30 — revolver redesign, grader-freedom audit, instant nav, achievements 23
+- REVOLVER WAS A DESIGN BUG, NOT A VALIDATION BUG: framed as a "cash sweep" but
+  graded as a MAX(0,−FCF) draw via function-name string matching — Wolf's correct
+  MIN(balance, cash available − min cash) rightly failed. REBUILT as a true sweep:
+  rows cash available / revolver balance / minimum cash (engineered mix: one full
+  paydown, one partial, one zero-sweep year); graded on VALUE + input refs, zero
+  function-name policing. Headless-verified: canonical MIN/MAX ✓, IF-chain
+  alternative ✓, wrong value rejected ✓. Par 52.
+- GRADER-FREEDOM AUDIT (all 37 drills): inventoried every formula check. Most were
+  already value+ref (compliant). Fixed: filldr's exact-string equality → value+ref.
+  Kept deliberately: INDEX/MATCH + SUMIF pattern checks (the function IS the skill),
+  cagr's '^' (no POWER() in the evaluator). RULE: checks() may never require a
+  function name unless teaching that function is the drill's stated purpose.
+- NAV POP-IN KILLED: nav.js script tag now sits immediately after #navMount in the
+  BODY of every page (no defer) and nav.js mounts the instant it parses — no
+  DOMContentLoaded wait, no layout drop, no icon resize flash. nav.css icon sizing
+  got !important specificity against index's global svg rules.
+- INSTANT TOOLTIPS: title → data-tip + CSS ::after (native title has ~1s OS delay).
+  Applied to achievement medals + campaign medals.
+- CAMPAIGN → THE BUILD: chapters renamed to model versions (v1 Foundations … v7
+  Lookups), finisher "Model complete". Modal copy: "ship the model version by
+  version". Progression now speaks Excel.
+- ACHIEVEMENTS 15→23: Deal Sprint (10/day), Live Deal (25/day), After Hours
+  (midnight–5am run), Weekend Warrior (Sat+Sun same weekend), Solid Foundation /
+  Model Citizen (par on whole group), Half-Par Club, Season Ticket (gauntlets in 4
+  weeks). ctx gained groups; global-rarity calc updated to match.
+- FEATURED BOARDS: min-height 290px flex columns (no more squeezed look when
+  empty/thin); empty copy now confident: "open board — first run sets the bar."
+- v30.

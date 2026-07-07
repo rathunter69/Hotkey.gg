@@ -15,7 +15,7 @@
 .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
   padding:7px 12px; border-radius:7px; transition:all .15s; letter-spacing:.2px;
   display:inline-flex; align-items:center; gap:8px}
-.topnav-link svg{width:19px; height:19px; display:block; flex:none}
+.topnav .topnav-link svg{width:19px !important; height:19px !important; display:block; flex:none}
 .tl-label{display:none}
 .topnav-link:hover{color:var(--text); background:var(--surface)}
 .topnav-link.active{color:var(--accent); background:var(--surface)}
@@ -201,3 +201,11 @@
   color:var(--muted); cursor:pointer; line-height:1; padding:4px 8px; border-radius:8px; z-index:5}
 .modal-x:hover{color:var(--text); background:var(--surface2)}
 .pc-card{position:relative}
+
+/* ---- instant tooltips (native title has a ~1s OS delay) ---- */
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip); position:absolute; bottom:calc(100% + 8px); left:50%;
+  transform:translateX(-50%); background:var(--surface2); color:var(--text); border:1px solid var(--line);
+  font-family:var(--mono); font-size:10.5px; line-height:1.5; padding:7px 11px; border-radius:8px;
+  white-space:normal; width:max-content; max-width:240px; z-index:50; pointer-events:none;
+  box-shadow:0 8px 22px rgba(0,0,0,.4); text-align:left}

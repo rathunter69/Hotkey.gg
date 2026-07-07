@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the boards · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=29" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=29">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=29">
+<link rel="icon" href="favicon.ico?v=30" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=30">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=30">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -118,7 +118,8 @@
   .chip.on{color:var(--text); border-color:var(--accent); background:var(--accent-glow)}
   .chip .cg{color:var(--faint); font-size:9px; text-transform:uppercase; letter-spacing:.6px; display:block}
   /* fit & rhythm polish */
-  .featured .board{height:100%; box-sizing:border-box; margin:0}
+  .featured .board{height:100%; box-sizing:border-box; margin:0; min-height:290px; display:flex; flex-direction:column}
+  .featured .board .empty{padding:16px 18px 4px}
   .hero .panel{display:flex; flex-direction:column}
   .hero .panel > :last-child{margin-top:auto}
   .tp-row .rk{text-align:center}
@@ -156,15 +157,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=29">
-<script src="drills.js?v=29"></script>
+<link rel="stylesheet" href="nav.css?v=30">
+<script src="drills.js?v=30"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=29"></script>
-<script src="nav.js?v=29"></script>
+<script src="themes.js?v=30"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
+<script src="nav.js?v=30"></script>
 
 <header class="head">
   <div class="wrap">
@@ -215,7 +216,7 @@ function rowHtml(r,i,names,meId,extra,leaderMs){
 function boardHtml(c, best, names, meId){
   let body;
   if(!best.length){
-    body='<div class="empty" style="padding:14px 18px 6px">nobody has run it yet \u2014 <b>first time sets the bar</b></div>';
+    body='<div class="empty" style="padding:14px 18px 6px">open board \u2014 <b>first run sets the bar</b></div>';
     for(let k=0;k<5;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';
   }
   else {

@@ -412,8 +412,8 @@
         const allDone=earned.length===chs.length;
         const gateTxt=' \u2014 clear every drill under par \u00d7 '+CAMP.GATE+' to earn it';
         badgesHtml='<div class="pc-badges">'+
-          chs.map(c=>'<span class="pc-badge" title="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'">'+(window.hkBadge?window.hkBadge(c.id, c.done, 26, (window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]):c.badge)+'</span>').join('')+
-          '<span class="pc-badge" title="Campaign Complete \u2014 every chapter cleared">'+(window.hkBadge?window.hkBadge('fin', allDone):CAMP.finisher.badge)+'</span>'+
+          chs.map(c=>'<span class="pc-badge" data-tip="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'">'+(window.hkBadge?window.hkBadge(c.id, c.done, 26, (window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]):c.badge)+'</span>').join('')+
+          '<span class="pc-badge" data-tip="Model complete \u2014 every version shipped">'+(window.hkBadge?window.hkBadge('fin', allDone):CAMP.finisher.badge)+'</span>'+
           '</div>'+
           (function(){
             const AC=window.HOTKEY_ACHIEVEMENTS;
@@ -421,7 +421,7 @@
             let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
             let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
             const ctx={ pb:PBl, pars:window.HOTKEY_PARS||{}, runs:d.myRuns||[], streak:streakN, solves:solvesN,
-              crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(),
+              crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
             // STEAM-STYLE GLOBAL RARITY: evaluate run-derivable achievements for every
             // player from the same runs dataset → "% of players have this".
@@ -445,7 +445,7 @@
                     cur = gap===1 ? cur+1 : 1; if(cur>streakU) streakU=cur; }
                   let crownsU=0; MENU_ORDER.forEach(k=>{ const b=(d._perBoard&&d._perBoard[k])||[]; if(b.length&&b[0]===u) crownsU++; });
                   const attU=MENU_ORDER.filter(k=>pbU[k]!==undefined).length;
-                  const ctxU={ pb:pbU, pars:PARS2, runs, streak:streakU, solves:runs.length, crowns:crownsU, att:attU, menuOrder:MENU_ORDER };
+                  const ctxU={ pb:pbU, pars:PARS2, runs, streak:streakU, solves:runs.length, crowns:crownsU, att:attU, menuOrder:MENU_ORDER, groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })() };
                   AC.forEach(a=>{ let ru; try{ ru=a.test(ctxU); }catch(e){ ru={done:false}; }
                     if(ru.done) out[a.id]=(out[a.id]||0)+1; });
                 });
@@ -458,7 +458,7 @@
             AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
               const gp=globalPct[a.id];
               const rare=(gp!==undefined)?(' \u00b7 '+gp+'% of players have this'):'';
-              out+='<span class="pc-ach-i'+(r.done?' got':'')+'" title="'+a.name+' \u2014 '+a.desc+(r.done?' \u2713 EARNED':' \u00b7 '+r.prog+'/'+r.goal)+rare+'">'+
+              out+='<span class="pc-ach-i'+(r.done?' got':'')+'" data-tip="'+a.name+' \u2014 '+a.desc+(r.done?' \u2713 EARNED':' \u00b7 '+r.prog+'/'+r.goal)+rare+'">'+
                 (window.hkBadge?window.hkBadge(a.glyph, r.done, 34):'')+
                 (r.done?'':'<i>'+Math.min(99,Math.round(100*r.prog/r.goal))+'%</i>')+'</span>'; });
             return out+'</div>';
@@ -656,7 +656,7 @@
   }
 
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
+    if($('navMount')) init(); else document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
