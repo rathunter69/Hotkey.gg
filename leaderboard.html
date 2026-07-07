@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the boards · hotkey.gg</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=27">
+<link rel="icon" href="favicon.ico?v=28" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=28">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=28">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -154,11 +156,11 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=27">
-<script src="drills.js?v=27"></script>
+<link rel="stylesheet" href="nav.css?v=28">
+<script src="drills.js?v=28"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=27"></script>
-<script src="nav.js?v=27"></script>
+<script src="themes.js?v=28"></script>
+<script src="nav.js?v=28"></script>
 </head>
 <body>
 
@@ -423,7 +425,7 @@ function rankedInfographic(){
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.8;margin-bottom:12px">'+
     'Your rank = your <b>average placement</b> across the boards you\u2019ve entered \u2014 stabilized two ways: '+
     'with only a few boards, your rating starts near the middle and your results pull it toward your true level (so two fast drills alone can\u2019t crown you); '+
-    'and small fields count for less than big ones (1st of 2 says less than 4th of 40). Breadth + placement is the climb.<br><br>'+
+    'and small fields count for less than big ones (1st of 2 says less than 4th of 40). Until you\u2019ve faced enough real competition, your rank is capped and tagged <b>provisional</b> \u2014 everyone starts low and earns altitude. Breadth + placement is the climb.<br><br>'+
     'Each tier splits into three <b>buckets</b> by where you sit inside that tier\u2019s band: '+
     'you enter at <b>Bottom Bucket</b>, pass through <b>Middle</b>, and reach <b>Top Bucket</b> as your average placement improves \u2014 clear the band and you promote to the next tier.</div>'+rows+
     '<div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:10px">Ranks are live: they can fall as well as rise when other players improve.</div>'+
@@ -508,7 +510,7 @@ function rosterHtml(){
   const {userStat,names,meId}=DATA;
   const users=Object.entries(userStat).map(([u,st])=>{
     const av=st.att?st.avg:null;
-    return {u, st, av, tier:TIER_OF(av, st.att)};
+    return {u, st, av, tier:TIER_OF(av, st.att, st.wsum)};
   }).filter(x=>x.av!==null);
   if(!users.length) return '';
   const myTier = meId && users.find(x=>x.u===meId) ? users.find(x=>x.u===meId).tier.name : null;
@@ -528,7 +530,7 @@ function rosterHtml(){
     '<div class="ros-list">'+rows+'</div>'+
     '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">rating = stabilized average placement (lower is better) \u00b7 your row is highlighted</div></div>';
 }
-function TIER_OF(av,att){ return window.HK_RANK.tierOf(av,att); }
+function TIER_OF(av,att,w){ return window.HK_RANK.tierOf(av,att,w); }
 function browserHtml(){
   const {perDrill,meId,myTeam,teamOnly}=DATA;
   const tabs=[['drills','\u2328 drills'],['marathon','\u23f1 marathon'],['rapidfire','\u26a1 rapid-fire']];

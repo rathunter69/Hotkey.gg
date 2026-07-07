@@ -735,3 +735,39 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   every page (?v=27 — kills the stale-F4 revert); leaderboard tab pills uniform,
   team toggle inline (the right-side misalignment).
 - v27.
+
+---
+# ROUND 28 — foundations wave 2 (37 drills), landing-gate merge, header simplification
+- FOUNDATIONS +4 (breadth, engine-verified ops only): autofit (Alt H O I on #####
+  columns), rowops (Alt H I R insert / H D R delete around a placeholder), filldr
+  (Ctrl+D down + Ctrl+R right, formula-ref checks), blocksel (Ctrl+Shift+↓ then
+  Ctrl+B). Foundations = 11 drills, ordered easy→hard; campaign Ch1 + PARS regen
+  (37 total). Deferred pending engine features: F4 repeat-last-action (op
+  recording), number-format cycling + borders (no main-grid ops yet).
+- LANDING-GATE MERGE: beta gate now renders INSIDE the landing card (same betaCode/
+  betaHandle/betaGo ids, so submitBetaCode was reused untouched); backdrop dropped
+  to rgba .66 + blur 5px — the live grid ghosts through. REQUIRE_INVITE=true const
+  next to BETA_MODE: flip false → code field hides, entry auto-redeems
+  INVITE_AUTO_CODE ('HAGS') so members stays consistent. Old #gate overlay retained
+  for the non-beta auth path + landing-already-gone edge.
+- HEADER (Monkeytype-ization): index's dead inline .topnav CSS block DELETED (it
+  was cascading against nav.css on the game page = the drop-down breakage);
+  absolute centering removed in nav.css — page icons now sit in a LEFT cluster
+  beside the brand, tools stay right via margin-left:auto. One layout, no math.
+- FAVICON, properly: real favicon.ico (16/32/48, PIL-drawn to match the svg mark) +
+  apple-touch-icon.png + svg, all ?v=28. Safari ignores SVG favicons — that was the
+  "revert": Safari/legacy paths fell back to a stale cached icon. NOTE: browsers
+  cache /favicon.ico aggressively; may take a day to flip everywhere.
+- PROVISIONAL RANK (season-zero rule): tierOf(avg, att, wsum) — until weighted
+  exposure wsum ≥ 6 (small fields count fractionally), rank caps at Incoming and
+  tags "provisional". Tested: day-one crusher on 3-player boards = Summer ·
+  provisional; grown-site elite = Second-Year. Infographic explains it.
+- LISTENER/BROWSER-KEY AUDIT (verified by grep, r26 fixes intact):
+  NOT intercepted: Ctrl+T/N/W (tabs/windows), F5, Ctrl+L, Ctrl+Tab, Cmd+R.
+  Intercepted BY DESIGN (Excel parity, documented tradeoffs): Ctrl+R (fill right —
+  reload stays on F5/Cmd+R), Ctrl+S (save/restart), Ctrl+D (fill down vs bookmark),
+  F11 (swallowed), Alt keyup (menu-bar suppression). '?' and Esc are nav-safe on
+  the trainer; game pauses under nav overlays via window.navOverlayOpen.
+- RESERVED NEXT TURN (Wolf-approved big one): full Macabacus + FactSet layers —
+  research verified default bindings, curate for IB workflows, distinct colored
+  entries on reference.html, profile toggle already in ⚙. Do NOT half-ship.

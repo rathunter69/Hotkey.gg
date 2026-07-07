@@ -23,7 +23,7 @@ window.HOTKEY_DRILLS = {
   // Group order here is the order in the drill picker.
   // ---------------------------------------------------------------
   groups: [
-    { name: 'Foundations', keys: ['navigation', 'ribbon', 'editfix', 'undo', 'pastes', 'saves', 'copyover'] },
+    { name: 'Foundations', keys: ['navigation', 'blocksel', 'ribbon', 'editfix', 'undo', 'filldr', 'pastes', 'rowops', 'autofit', 'saves', 'copyover'] },
     { name: 'Formatting',  keys: ['polish', 'combo', 'format', 'center', 'blue', 'gauntlet'] },
     { name: 'Values',      keys: ['drill', 'series'] },
     { name: 'Data',        keys: ['sort'] },
@@ -44,6 +44,10 @@ window.HOTKEY_DRILLS = {
   meta: {
     // Foundations
     navigation: { name:'Navigate', label:'Navigation tour',     tab:'Nav',         desc:'The full obstacle course — 12 chords: edges, selections, rows, columns' },
+    autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — Alt H O I fits the columns' },
+    rowops:     { name:'Rows',     label:'Insert and delete rows',  tab:'Rows',     desc:'Alt H I R opens a row, Alt H D R kills one' },
+    filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Ctrl+D and Ctrl+R — one formula, whole block' },
+    blocksel:   { name:'Block Sel.',label:'Grab the whole block',   tab:'Block',    desc:'Ctrl+Shift+arrow rides to the end of the data' },
     ribbon:     { name:'Ribbon',   label:'Learn the ribbon',        tab:'Ribbon',   desc:'Alt is a menu — walk H 1, H K, H A C' },
     editfix:    { name:'Edit',     label:'Fix the typo in place',   tab:'Edit',     desc:'F2 in, arrow to the mistake, fix, commit' },
     undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete, Ctrl+Z it back, bold it instead' },
@@ -134,7 +138,7 @@ window.HOTKEY_DRILLS = {
 window.HOTKEY_CAMPAIGN = {
   GATE: 1.5,
   chapters: [
-    { id:'c1', name:'Ch. 1 \u00b7 Foundations',  badge:'\ud83c\udf93', keys:['navigation','ribbon','editfix','undo','pastes','saves','copyover'] },
+    { id:'c1', name:'Ch. 1 \u00b7 Foundations',  badge:'\ud83c\udf93', keys:['navigation','blocksel','ribbon','editfix','undo','filldr','pastes','rowops','autofit','saves','copyover'] },
     { id:'c2', name:'Ch. 2 \u00b7 Formatting',   badge:'\ud83c\udfa8', keys:['polish','combo','format','center','blue','gauntlet'] },
     { id:'c3', name:'Ch. 3 \u00b7 Values & Data',badge:'\ud83d\udccb', keys:['drill','series','sort'] },
     { id:'c4', name:'Ch. 4 \u00b7 Formulas I',   badge:'\u2797',        keys:['margin','growth','foot','percent'] },
@@ -146,7 +150,7 @@ window.HOTKEY_CAMPAIGN = {
 };
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":65,"percent":30,"lookup":50,"ribbon":30,"pastes":38,"saves":26,"editfix":22,"undo":28,"copyover":18,"polish":24,"foot":55,"comps":32,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":58,"dcf":70,"lbo":75,"revolver":50,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":65,"percent":30,"lookup":50,"ribbon":30,"pastes":38,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":32,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":58,"dcf":70,"lbo":75,"revolver":50,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

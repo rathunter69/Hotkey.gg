@@ -198,11 +198,21 @@ window.HK_RANK = {
     {name:'Top-Bucket Analyst',  cls:'tier-platinum', att:13, pct:0.26, req:'13 drills \u00b7 top 15%'},
     {name:'Second-Year Analyst', cls:'tier-diamond',  att:15, pct:0.18, req:'15 drills \u00b7 top 5% \u2014 the summit'},
   ],
-  tierOf(avgPct, att){
+  PROVISIONAL_W: 6,   // weighted-board exposure needed before ranks above Silver unlock
+  tierOf(avgPct, att, wsum){
     const T=this.TIERS;
-    if(avgPct===null || (att||0)<5) return {...T[0], i:0, bucket:null, full:T[0].name};
+    if(avgPct===null || (att||0)<5) return {...T[0], i:0, bucket:null, full:T[0].name, provisional:false};
     let t={...T[1], i:1};
     for(let i=T.length-1;i>=1;i--){ if(att>=T[i].att && avgPct<=T[i].pct){ t={...T[i], i}; break; } }
+    // PLACEMENT SEASON-ZERO RULE: until you've faced enough real competition
+    // (weighted boards \u2265 PROVISIONAL_W — small fields count fractionally), rank is
+    // capped at Incoming Analyst and tagged provisional. Everyone starts low and
+    // EARNS altitude as the field fills in — no day-one Second-Years off 3-player boards.
+    let provisional=false;
+    if(wsum!==undefined && wsum!==null && wsum < this.PROVISIONAL_W && t.i>2){
+      t={...T[2], i:2}; provisional=true;
+    } else if(wsum!==undefined && wsum!==null && wsum < this.PROVISIONAL_W){ provisional=true; }
+    t.provisional=provisional;
     // BUCKETS — comp-review language. Your position inside the tier's percentile band,
     // split in thirds: Top / Middle / Bottom Bucket. The summit tier buckets within 0–5%.
     const hi = t.pct>1 ? 1 : t.pct;                      // band ceiling (worse pct)
@@ -210,7 +220,7 @@ window.HK_RANK = {
     const span = Math.max(1e-9, hi-lo);
     const pos = Math.min(1, Math.max(0, (avgPct-lo)/span));  // 0 = best in band
     t.bucket = pos<=1/3 ? 'Top Bucket' : (pos<=2/3 ? 'Middle Bucket' : 'Bottom Bucket');
-    t.full = t.name+' \u00b7 '+t.bucket;
+    t.full = t.name+' \u00b7 '+t.bucket+(provisional?' \u00b7 provisional':'');
     return t;
   },
   levelOf(xp){ let lvl=1, need=150, floor=0;
@@ -257,8 +267,9 @@ window.HK_RANK = {
       if(idx>=0){ att++; entries.push({pct: b.length>1 ? idx/(b.length-1) : 0, n:b.length});
         if(idx===0)crowns++; if(idx<3)pod++; if(idx<10)t10++; } });
     const rating = att ? this.ratingOf(entries) : null;
+    const wsum = entries.reduce((a,e)=>a+Math.min(1, Math.log2((e.n||1)+1)/Math.log2(9)),0);
     return {att, avgPct:rating, rawAvg:att?entries.reduce((a,e)=>a+e.pct,0)/att:null,
-            crowns, pod, t10, per, entries};
+            crowns, pod, t10, per, entries, wsum};
   }
 };
 
