@@ -239,6 +239,11 @@
     display:inline-flex; align-items:center; justify-content:center; font-family:var(--mono);
     font-size:11px; color:var(--accent); transition:.15s}
   .cl-item.ok .cl-box{border-color:var(--accent); background:var(--accent-glow)}
+  #hkToast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(8px);
+    background:var(--surface2); color:var(--text); border:1px solid var(--accent-dim);
+    font-family:var(--mono); font-size:12.5px; padding:9px 18px; border-radius:999px;
+    opacity:0; pointer-events:none; transition:all .18s; z-index:220; box-shadow:0 8px 30px rgba(0,0,0,.35)}
+  #hkToast.show{opacity:1; transform:translateX(-50%) translateY(0)}
   .cl-esc{margin-top:10px; padding-top:8px; border-top:1px dashed var(--line);
     font-family:var(--mono); font-size:10.5px; color:var(--faint)}
   .cl-esc kbd{background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:9.5px}
@@ -324,7 +329,10 @@
   .ghost.ahead{color:var(--accent); background:var(--accent-glow)}
   .ghost.behind{color:var(--bad); background:rgba(200,83,63,.14)}
   /* ---- rank pill in the HUD: progression, always visible ---- */
-  .rank-pill{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:1px;
+  .rank-emblem{filter:drop-shadow(0 0 4px currentColor); margin-right:7px; flex:none}
+  @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 9px currentColor)}}
+  .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
+  .rank-pill{display:inline-flex; align-items:center; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:1px;
     text-transform:uppercase; border-radius:999px !important; padding:6px 13px !important;
     border:1px solid; transition:transform .12s, box-shadow .12s}
   .rank-pill:hover{transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.3)}
@@ -1954,6 +1962,40 @@ const CHALLENGES = {
       ];
     }
   },
+  revolver:{
+    name:'Revolver', label:'Sweep the revolver', par:50, parKeys:40,
+    prompt:'End of the LBO year: cash wants to pay down the revolver, but never below the minimum balance. Draw if you\u2019re short, pay down if you\u2019re long \u2014 two formulas, MAX and MIN, the exact pair every debt schedule runs on.',
+    req:'<em>B6 draw</em> \u00b7 <em>=MAX(0,B3-B2)</em> \u00b7 <em>B7 paydown</em> \u00b7 <em>=MIN(B4,MAX(0,B2-B3))</em>',
+    guide:[
+      'draw at B6 \u00b7 <kbd>=MAX(0,B3-B2)</kbd> <kbd>\u21b5</kbd> \u2014 only draw if cash is below the minimum',
+      'paydown at B7 \u00b7 <kbd>=MIN(B4,MAX(0,B2-B3))</kbd> <kbd>\u21b5</kbd> \u2014 excess cash, capped at the balance',
+    ],
+    targets:['B6','B7'],
+    demo(){ return [
+      {sel:'B6', keys:[...T('=MAX(0,B3-B2)'), Kb.enter]},
+      {sel:'B7', keys:[...T('=MIN(B4,MAX(0,B2-B3))'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:'Revolver sweep',txt:true,bold:true};
+      const cash=rnd(4,30)*10, minc=rnd(6,20)*10, bal=rnd(5,25)*10;
+      cells['A2']={...blankCell(),value:'Cash available',txt:true};   cells['B2']={...blankCell(),value:cash,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells['A3']={...blankCell(),value:'Minimum cash',txt:true};     cells['B3']={...blankCell(),value:minc,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells['A4']={...blankCell(),value:'Revolver balance',txt:true}; cells['B4']={...blankCell(),value:bal,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells['A6']={...blankCell(),value:'Revolver draw',txt:true,bold:true};      cells['B6']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A7']={...blankCell(),value:'Revolver paydown',txt:true,bold:true};   cells['B7']={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._draw=Math.max(0,minc-cash); this._pay=Math.min(bal,Math.max(0,cash-minc));
+      return {ROWS:7, cells, active:{r:6,c:2}, sel:null, colW:{1:150,2:96}};
+    },
+    checks(S){
+      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?c.formula.toUpperCase():''; };
+      const v=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:null; };
+      return [
+        {label:'draw = MAX(0, min cash \u2212 cash)', ok: f('B6').includes('MAX')&&v('B6')===this._draw},
+        {label:'paydown = MIN(balance, excess cash)', ok: f('B7').includes('MIN')&&f('B7').includes('MAX')&&v('B7')===this._pay},
+      ];
+    }
+  },
   balance:{
     name:'Balance', label:'Make it balance', par:55, parKeys:46,
     prompt:'Assets = Liabilities + Equity, or nothing else matters. Foot the assets, plug retained earnings so the sheet ties, foot the L&E side, then build the CHECK cell \u2014 total assets minus total L&E. A model without a zero check is a model you can\u2019t trust.',
@@ -2258,6 +2300,7 @@ let editing=false, editBuf='';
 // editPointer  = the currently-pointed-at cell (null when not in pointer mode)
 // editPointerStart = index in editBuf where the current reference begins (so arrows can rewrite it)
 let editAnchor=null, editPointer=null, editPointerStart=-1;
+let editMode='enter', editCaret=0;   // Excel distinction: F2 = Edit mode (arrows move the CARET); typing = Enter mode (arrows commit)
 // Last char of editBuf is one of these → arrows enter pointer mode (insert new reference).
 // = + - * / ^ ( , — Excel's standard operator/separator boundaries.
 const OPERATOR_BOUNDARY = /[=+\-*/^(,]$/;
@@ -2568,7 +2611,9 @@ function render(){
         // Editing cell: show formula buffer with colored refs (matches what's in the formula bar)
         const {refs} = parseFormulaRefs(editBuf);
         cls.push('editing');
-        txt = buildFormulaHTML(editBuf, refs) + '▏';
+        txt = (editMode==='edit' && editCaret < editBuf.length)
+          ? buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '▏' + buildFormulaHTML(editBuf.slice(editCaret), refs)
+          : buildFormulaHTML(editBuf, refs) + '▏';
       }
       else if(isNum(cell)&&!cell.wrap){
         const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals).length*CHARPX+12;
@@ -2881,7 +2926,17 @@ function makeShareCard(o){
   const a=document.createElement('a');
   a.download='hotkey-'+cur+'-'+o.t+'s.png'; a.href=cv.toDataURL('image/png'); a.click();
 }
+let resultsChainKeys=null;
+function nextDrillKey(){ const i=MENU_ORDER.indexOf(cur); return MENU_ORDER[(i+1)%MENU_ORDER.length]; }
 function showResults(o){
+  // Monkeytype loop: from the results card, Enter = run it again, N = next drill.
+  resultsChainKeys = (ev)=>{
+    if(ev.key==='Enter'){ ev.preventDefault(); hideResults(); restartDrill(); return; }
+    if(ev.key==='n'||ev.key==='N'){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
+  };
+  return _showResults(o);
+}
+function _showResults(o){
   const best = PB[cur]!==undefined ? PB[cur].toFixed(2)+'s' : '—';
   let postRow;
   if(o.mouse)         postRow='<span class="rm-soon">not posted — mouse used</span>';
@@ -2943,10 +2998,14 @@ function showResults(o){
       sh.onclick=()=>makeShareCard(o);
       if(card) card.appendChild(sh);
     }
+    const chain=document.createElement('div');
+    chain.style.cssText='font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:12px;text-align:center';
+    chain.innerHTML='<kbd style="background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:1px 6px">\u21b5</kbd> run it again \u00b7 <kbd style="background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:1px 6px">n</kbd> next drill';
+    if(card) card.appendChild(chain);
   }catch(e){}
 
 }
-function hideResults(){ const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
+function hideResults(){ resultsChainKeys=null; const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 function nextChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i+1)%MENU_ORDER.length]); }
 function prevChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i-1+MENU_ORDER.length)%MENU_ORDER.length]); }
 function toMenu(){ loadChallenge(cur); openPicker(); }
@@ -3052,9 +3111,11 @@ function autoColor(scope){
   commitAction();
 }
 
-function startEdit(initial){
+function startEdit(initial, mode){
   if(done) return; startClock();
   editing=true; editBuf=initial;
+  editMode = mode || 'enter';
+  editCaret = initial.length;
   editAnchor={r:S.active.r, c:S.active.c};
   editPointer=null; editPointerStart=-1;
   render();
@@ -3089,6 +3150,7 @@ function startPointerFromArrow(dr, dc){
   editPointerStart = editBuf.length;
   editPointer = {r, c};
   editBuf += ck(r, c);
+  editCaret = editBuf.length;
   return true;
 }
 function movePointer(dr, dc){
@@ -3489,6 +3551,15 @@ document.addEventListener('keydown',e=>{
   // CELL EDITING — captures all typing until commit/cancel
   if(editing){
     e.preventDefault();
+    if(k==='F2'){ editMode = editMode==='edit' ? 'enter' : 'edit'; logKey('F2'); render(); return; }   // Excel: F2 toggles Edit/Enter while editing
+    if(editMode==='edit'){
+      // EDIT MODE: arrows navigate the text, exactly like pressing F2 in Excel
+      if(k==='ArrowLeft'){ editCaret=Math.max(0,editCaret-1); render(); return; }
+      if(k==='ArrowRight'){ editCaret=Math.min(editBuf.length,editCaret+1); render(); return; }
+      if(k==='Home'){ editCaret = editBuf[0]==='=' ? 1 : 0; render(); return; }
+      if(k==='End'){ editCaret=editBuf.length; render(); return; }
+      if(k==='Delete'){ if(editCaret<editBuf.length){ editBuf=editBuf.slice(0,editCaret)+editBuf.slice(editCaret+1); logKey('Delete'); render(); } return; }
+    }
     if(k==='Enter'){ commitEdit(e.shiftKey?-1:1,0); return; }   // Shift+Enter commits and moves UP (Excel parity)
     if(k==='Tab'){ commitEdit(0,e.shiftKey?-1:1); return; }      // Shift+Tab commits and moves LEFT
     if(k==='Escape'){ cancelEdit(); return; }
@@ -3512,8 +3583,9 @@ document.addEventListener('keydown',e=>{
       if(editPointer){
         editBuf = editBuf.slice(0, editPointerStart);
         editPointer = null; editPointerStart = -1;
-      } else {
-        editBuf = editBuf.slice(0, -1);
+      } else if(editCaret>0){
+        editBuf = editBuf.slice(0, editCaret-1) + editBuf.slice(editCaret);
+        editCaret--;
       }
       logKey('⌫'); render(); return;
     }
@@ -3538,7 +3610,9 @@ document.addEventListener('keydown',e=>{
     if(k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey){
       // Any char-type input exits pointer mode (Excel: typing breaks the picker).
       editPointer = null; editPointerStart = -1;
-      editBuf += k; logKey(k); render(); return;
+      editBuf = editBuf.slice(0,editCaret) + k + editBuf.slice(editCaret);
+      editCaret++;
+      logKey(k); render(); return;
     }
     return;
   }
@@ -3548,7 +3622,10 @@ document.addEventListener('keydown',e=>{
     if((k==='=' || k==='+') && !e.ctrlKey && !e.altKey && !e.metaKey){
       e.preventDefault(); startEdit('='); logKey(k==='+' ? '+' : '='); render(); return;
     }
-    if(k==='F2'){ e.preventDefault(); const c=get(S.active.r,S.active.c); startEdit(c.formula||(c.value!=null&&c.value!==''?String(c.value):'')); render(); return; }
+    if(k==='F2'){ e.preventDefault(); startClock(); logKey('F2');
+      const c=get(S.active.r,S.active.c);
+      startEdit(c.formula||(c.value!=null&&c.value!==''?String(c.value):''), 'edit');   // Edit mode: arrows move the caret, not the cell
+      return; }
     // Delete / Backspace in normal mode → clear contents on the selection (Excel parity: value + formula gone, formatting preserved).
     // Backspace in Excel actually enters edit mode and clears; we treat it the same as Delete since it's the more useful behavior.
     if((k==='Delete' || k==='Backspace') && !e.ctrlKey && !e.altKey && !e.metaKey){
@@ -3601,6 +3678,8 @@ document.addEventListener('keydown',e=>{
   // UNDO / REDO — authentic Excel hotkeys (ctrl+z / ctrl+y / ctrl+shift+z)
   if(e.ctrlKey||e.metaKey){
     const lk=k.toLowerCase();
+    if(lk==='s' && !e.altKey){ e.preventDefault();   // Ctrl+S — the banker save reflex = instant restart
+      logKey('Ctrl+S'); restartDrill(); showToast('\ud83d\udcbe muscle memory \u2713 \u2014 drill restarted'); return; }
     if(lk==='z'&&e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+Y'); redoAct(); return; }
     if(lk==='z'){ e.preventDefault(); startClock(); logKey('Ctrl+Z'); undoAct(); return; }
     if(lk==='y'){ e.preventDefault(); startClock(); logKey('Ctrl+Y'); redoAct(); return; }
@@ -3621,10 +3700,11 @@ document.addEventListener('keydown',e=>{
   // ESC on the grid: first press cancels an active copy (Excel's marching ants), otherwise
   // it restarts the drill — fresh build, fresh clock. Recovery is always one visible key;
   // the worst mistake costs you a restart, never a stuck sheet.
+  if(k==='F11'){ e.preventDefault(); return; }   // fullscreen sits next to F2 — swallow it; too costly a misfire mid-drill
   if(k==='Escape' && !e.ctrlKey && !e.altKey){
     e.preventDefault();
     if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); return; }
-    restartDrill(); return;
+    restartDrill(); showToast('drill restarted'); return;
   }
   // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey){
@@ -3642,11 +3722,7 @@ document.addEventListener('keydown',e=>{
     e.preventDefault(); startClock(); logKey('\u232b'); pushUndo();
     const bc=ensure(S.active.r,S.active.c); bc.value=null; bc.formula=null; bc.txt=false;
     startEdit(''); return; }
-  // F2 edits the active cell with its existing contents (formula if present) — THE banker key
-  if(k==='F2' && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey){
-    e.preventDefault(); startClock(); logKey('F2');
-    const fc=S.cells[ck(S.active.r,S.active.c)];
-    startEdit(fc ? (fc.formula || (fc.value!=null ? String(fc.value) : '')) : ''); return; }
+
 
   // Home / End — navigation primitives. Ctrl+Home → A1, Ctrl+End → last cell of used range, Home → col A.
   // Shift modifier extends the selection (Excel parity). Plain "End" is no-op (Excel's End mode is too obscure).
@@ -4318,6 +4394,18 @@ const THEMES = {
     warn:'#e6c384', bad:'#c34043' }},
 };
 let currentTheme = 'default';
+window.RANK_EMBLEM_IDX = {'Candidate':0,'Summer Analyst':1,'Incoming Analyst':2,
+  'First-Year Analyst':3,'Top-Bucket Analyst':4,'Second-Year Analyst':5};
+window.rankEmblem = window.rankEmblem || function(tierName){
+  const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
+  const chev = (y)=>'<path d="M3 '+(y+4)+' L8 '+y+' L13 '+(y+4)+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+  let body='';
+  if(i===0) body='<circle cx="8" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".8"/>';
+  else if(i<=3){ for(let n=0;n<i;n++) body+=chev(3+n*4); }
+  else if(i===4){ body=chev(2)+chev(6)+chev(10)+'<rect x="3" y="14" width="10" height="1.8" rx=".9" fill="currentColor"/>'; }
+  else body='<path d="M8 1.5 L9.8 5.6 L14.2 6 L10.9 9 L11.9 13.4 L8 11.1 L4.1 13.4 L5.1 9 L1.8 6 L6.2 5.6 Z" fill="currentColor"/>';
+  return '<svg class="rank-emblem'+(i===5?' emblem-max':'')+'" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">'+body+'</svg>';
+};
 function applyTheme(name){
   const t = THEMES[name] || THEMES.default;
   const root = document.documentElement;
@@ -4493,6 +4581,7 @@ function renderRfCard(state){
 }
 function rapidKey(e){
   const k=e.key;
+  if(resultsChainKeys){ resultsChainKeys(e); if(e.defaultPrevented) return; }
   if(k==='Escape'){ e.preventDefault(); return; }
   // 's' (bare, no modifiers) skips the current task — same convention as marathon's drill skip.
   // Ctrl+S still routes to the save op since the ctrl check above excludes the chord path.
@@ -4992,6 +5081,13 @@ function renderStreak(){ const el=$('streakBadge'); if(!el) return;
   el.style.display = streak.n>0 ? 'inline-flex' : 'none';
   el.innerHTML='\ud83d\udd25 '+streak.n; el.title=streak.n+'-day streak — solve a drill every day to keep it alive'; }
 
+let _toastT=null;
+function showToast(msg){
+  let el=$('hkToast');
+  if(!el){ el=document.createElement('div'); el.id='hkToast'; document.body.appendChild(el); }
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(_toastT); _toastT=setTimeout(()=>el.classList.remove('show'), 1600);
+}
 function restartDrill(){
   loadChallenge(cur, {daily:dailyMode, weekly:weeklyMode});   // same drill, same mode; daily/weekly reseed identically
 }
@@ -5151,7 +5247,8 @@ function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
    Mirrors nav.js: 10-min sessionStorage cache, compact standing fetch, tierOf. */
 async function updateRankPill(){
   const el=$('rankPill'); if(!el) return;
-  const show=(t)=>{ el.textContent=t.name; el.className='mb-tool rank-pill '+t.cls; el.style.display='inline-flex';
+  const show=(t)=>{ el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span>';
+    el.className='mb-tool rank-pill '+t.cls; el.style.display='inline-flex';
     el.onclick=()=>{ try{ openProfile(); }catch(e){} }; };
   try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null');
     if(c && c.exp>Date.now()){ show({name:c.n, cls:c.c}); return; } }catch(e){}

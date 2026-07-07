@@ -428,3 +428,30 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   that's why it never felt like an option). Now: ribbon-Esc closes ribbon;
   grid-Esc cancels copy ants (Excel parity) or restarts the drill; "stuck? esc
   restarts" printed under every checklist.
+
+---
+# ROUND 15 — F2 Edit mode, Monkeytype loop, emblems, XP v2, revolver
+- F2 ROOT CAUSE: the engine only had Excel's ENTER mode — after F2 opened a formula,
+  the first arrow key COMMITTED and walked away instead of moving the text caret.
+  Built true EDIT mode: F2 opens with caret at end; ←/→/Home/End move the caret;
+  Delete removes at caret; Backspace before it; typing inserts at caret; F2 toggles
+  Edit/Enter while editing (Excel parity). Enter-mode pointer logic untouched.
+  (Also removed a dead duplicate F2 handler from round 7.)
+- GAMEPLAY LOOP (Monkeytype-ized): Ctrl+S = instant restart with a toast
+  ("muscle memory ✓") — the banker save reflex, weaponized. Esc restart still works
+  and now toasts. F11 swallowed (fullscreen misfire next to F2 was too costly).
+  Results screen chains: ↵ = run it again, N = next drill; hints printed on the card.
+- RANK EMBLEMS (now actually built — previously discussed only): military-style
+  insignia per tier (circle → 1-3 chevrons → chevrons+bar → star), currentColor glow
+  via drop-shadow, star pulses. Single source window.rankEmblem in themes.js +
+  inline copy in index.html (keep in sync). Wired: HUD pill, nav pill, player card,
+  leaderboard hero.
+- XP v2 (return-visit > grind): first solve of a drill 50 · solves 2-10 of that
+  drill 15 · 11+ only 3 (decay kills single-drill farming) · daily runs 30 ·
+  weekly legs 25 · placement unchanged (25/100/250). Mirrored in nav.js +
+  leaderboard hero — sync both. Triangular level curve unchanged (already non-flat).
+- LEADERBOARD FIT POLISH: featured boards equal-height, hero panels flex-column with
+  bottom-anchored last row, rk centering, section rhythm normalized.
+- REVOLVER DRILL (26): LBO cash sweep — draw =MAX(0,min−cash), paydown
+  =MIN(balance, excess). The DCF/LBO drill line continues; next up per Wolf:
+  debt schedule roll-forward, WACC build, working capital, exit bridge.

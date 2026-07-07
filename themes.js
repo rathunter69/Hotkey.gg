@@ -136,3 +136,18 @@ window.applyTheme = function(name){
 // Populate them once the DOM is ready; applyTheme keeps them in sync on every change after that.
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', window.syncThemeLabels);
 else window.syncThemeLabels();
+
+/* ---- rank emblems: military-style insignia per tier, glow via currentColor ----
+   Single source of truth for every page (themes.js loads everywhere). */
+window.RANK_EMBLEM_IDX = {'Candidate':0,'Summer Analyst':1,'Incoming Analyst':2,
+  'First-Year Analyst':3,'Top-Bucket Analyst':4,'Second-Year Analyst':5};
+window.rankEmblem = function(tierName){
+  const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
+  const chev = (y)=>'<path d="M3 '+(y+4)+' L8 '+y+' L13 '+(y+4)+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+  let body='';
+  if(i===0) body='<circle cx="8" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".8"/>';
+  else if(i<=3){ for(let n=0;n<i;n++) body+=chev(3+n*4); }
+  else if(i===4){ body=chev(2)+chev(6)+chev(10)+'<rect x="3" y="14" width="10" height="1.8" rx=".9" fill="currentColor"/>'; }
+  else body='<path d="M8 1.5 L9.8 5.6 L14.2 6 L10.9 9 L11.9 13.4 L8 11.1 L4.1 13.4 L5.1 9 L1.8 6 L6.2 5.6 Z" fill="currentColor"/>';
+  return '<svg class="rank-emblem'+(i===5?' emblem-max':'')+'" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">'+body+'</svg>';
+};

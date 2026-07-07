@@ -105,7 +105,13 @@ input completeness (numpad + inserts; Alt H I R/H D R/H I C/H D C; Ctrl+Alt+V pa
 special), navigation latches action-sourced via S.lastRowOp (undo can't fake steps;
 undo/redo clear it), Esc unswallowed → cancels copy ants else restarts drill
 (restartDrill preserves daily/weekly), checklist prints the esc affordance. ALL new
-drills must satisfy the 5 principles. Queue: true ghost replays,
+drills must satisfy the 5 principles. Round 15: F2 EDIT MODE (caret editing — arrows move caret not commit; F2 toggles
+Edit/Enter; editMode/editCaret vars), Monkeytype loop (Ctrl+S restart + toast, F11
+swallowed, results ↵=retry N=next via resultsChainKeys), rank emblems
+(window.rankEmblem in themes.js + inline index copy — sync), XP v2 anti-grind
+(50/15/3 decay per drill + 30 daily + 25 weekly; in nav.js AND leaderboard — sync),
+leaderboard fit polish, revolver drill (26). DCF/LBO drill pack queued: debt
+schedule roll, WACC, working capital, exit bridge. Queue: true ghost replays,
 drillgen engine integration, transpose drill, streak server-sync, campaign mode,
 gauntlet one-attempt lock.
 Weekly gauntlet shelled in dev/AUDIT.md.

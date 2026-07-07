@@ -299,12 +299,14 @@
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
     try{ const c=JSON.parse(sessionStorage.getItem('hk_rank')||'null');
-      if(c && c.exp>Date.now()){ el.textContent=c.n; el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
+      if(c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n):'')+'<span>'+c.n+'</span>';
+        el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
     if(!window.sb || !window._navUser) return;
     try{
       const d = await loadProfileData();
       const t = tierOf(d.avgPct, d.attempted);
-      el.textContent=t.name; el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
+      el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span>';
+      el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
       try{ sessionStorage.setItem('hk_rank', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
     }catch(e){}
   }
@@ -338,18 +340,30 @@
     });
     const attempted = drills.filter(d => d.rank !== null);
     const avgPct = attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null;
-    const mySolves = runs.filter(x => x.user_id === me_id).length;
-    return { drills, attempted: attempted.length, avgPct, mySolves };
+    const myRuns = runs.filter(x => x.user_id === me_id);
+    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns };
   }
   /* ---- XP & LEVELS ----
      XP = 15/clean solve + 50/distinct drill + 25/top-10 + 100/podium + 250/crown.
      Level n needs 150*n more XP than n-1 (triangular curve): fast early, grindy late.
      The tier (Candidate → Second-Year Analyst) stays the COMPETITIVE rank; the level
      is personal progress — both live on the card. */
-  function computeXP(d, mySolves){
+  /* XP v2 — built so coming back is worth more than grinding one drill:
+     first solve of a drill 50 · solves 2-10 of that drill 15 each · beyond 10, 3 each
+     (repeat-grinding decays) · daily runs 30 · weekly gauntlet legs 25 ·
+     placement: 25/top-10, 100/podium, 250/crown. */
+  function computeXP(d, myRuns){
     let crowns=0, podiums=0, top10s=0;
     d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; if(x.rank!==null&&x.rank<=10) top10s++; });
-    return 15*(mySolves||0) + 50*d.attempted + 25*top10s + 100*podiums + 250*crowns;
+    const perDrill={}; let xp=0;
+    (myRuns||[]).forEach(r=>{
+      const ch=r.challenge||'';
+      if(ch.indexOf('daily-')===0){ xp+=30; return; }
+      if(ch.indexOf('wk-')===0){ xp+=25; return; }
+      const nth=(perDrill[ch]=(perDrill[ch]||0)+1);
+      xp += nth===1 ? 50 : (nth<=10 ? 15 : 3);
+    });
+    return xp + 25*top10s + 100*podiums + 250*crowns;
   }
   function levelOf(xp){ let lvl=1, need=150, floor=0;
     while(xp >= floor+need){ floor+=need; lvl++; need=150*lvl; }
@@ -374,10 +388,10 @@
       ? d.attempted + '/5 drills toward Summer Analyst'
       : (d.avgPct === null ? '\u2014' : 'top ' + Math.max(1, Math.round(d.avgPct*100)) + '%');
     m.innerHTML = '<div class="pc-card">' +
-      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + tier.name + '</div></div>' +
+      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + (window.rankEmblem?window.rankEmblem(tier.name):'') + '<span>' + tier.name + '</span></div></div>' +
       '<div class="pc-sub">' + d.attempted + ' / ' + MENU_ORDER.length + ' drills attempted \u00b7 ' + standing + '</div>' +
       (function(){
-        const xp = computeXP(d, d.mySolves);
+        const xp = computeXP(d, d.myRuns);
         const L = levelOf(xp);
         let crowns=0, podiums=0; d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; });
         let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}

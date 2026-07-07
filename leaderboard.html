@@ -94,6 +94,19 @@
   .chip:hover{color:var(--text); transform:translateY(-1px)}
   .chip.on{color:var(--text); border-color:var(--accent); background:var(--accent-glow)}
   .chip .cg{color:var(--faint); font-size:9px; text-transform:uppercase; letter-spacing:.6px; display:block}
+  /* fit & rhythm polish */
+  .featured .board{height:100%; box-sizing:border-box; margin:0}
+  .hero .panel{display:flex; flex-direction:column}
+  .hero .panel > :last-child{margin-top:auto}
+  .tp-row .rk{text-align:center}
+  .board{margin-bottom:0}
+  .section-title{margin-top:30px}
+  .tabrow{margin-top:16px}
+  .chips{margin-top:2px}
+  .rank-emblem{filter:drop-shadow(0 0 4px currentColor); margin-right:6px; flex:none; vertical-align:-2px}
+  @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 9px currentColor)}}
+  .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
+  .yc-top .pc-tier{font-size:10px; padding:6px 13px}
   .chip.mine::after{content:'\u2713'; color:var(--accent); margin-left:6px}
   .empty b{color:var(--accent); font-weight:700}
   /* your-standing strip — the scoreboard of scoreboards */
@@ -298,7 +311,16 @@ function heroHtml(){
   const me=userStat[meId]||{att:0,sum:0,crowns:0,pod:0,t10:0};
   const avg=me.att?me.sum/me.att:null;
   const t=tierOf(avg, me.att);
-  const xp=15*mySolves+50*me.att+25*me.t10+100*me.pod+250*me.crowns;
+  // XP v2 — mirror of nav.js computeXP (anti-grind decay + challenge bonuses)
+  const perD={}; let xp=0;
+  DATA.fRuns.filter(x=>x.user_id===meId).forEach(r=>{
+    const ch=r.challenge||'';
+    if(ch.indexOf('daily-')===0){ xp+=30; return; }
+    if(ch.indexOf('wk-')===0){ xp+=25; return; }
+    const nth=(perD[ch]=(perD[ch]||0)+1);
+    xp += nth===1 ? 50 : (nth<=10 ? 15 : 3);
+  });
+  xp += 25*me.t10+100*me.pod+250*me.crowns;
   const L=levelOf(xp);
   // NEXT RANK: first tier above the current with concrete unmet requirements
   let nextHtml='';
@@ -312,7 +334,7 @@ function heroHtml(){
     nextHtml='<div class="yc-next"><b>Top of the ladder.</b> Now defend it \u2014 crowns decay the moment someone hungrier shows up.</div>';
   }
   return '<div class="panel me"><h4>your card</h4>'+
-    '<div class="yc-top"><span class="pc-tier '+t.cls+'">'+t.name+'</span>'+
+    '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span></span>'+
     '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
     '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+L.into+'/'+L.need+' xp</span></div>'+
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">'+
