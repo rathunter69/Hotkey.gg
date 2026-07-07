@@ -572,3 +572,32 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - CARD LEGEND: "what am I looking at?" toggle explains rank/buckets, lvl/xp, clean
   solves, crowns ("boards you lead RIGHT NOW — they can be taken"), streak, medals.
 - v21. Ready for curriculum shells whenever Wolf sends them.
+
+---
+# ROUND 22 — dead ×s, ranked rework, keycap emblems v3, handle integrity
+- DEAD × BUG: pcX rendered on the player card but was NEVER wired (r19 patch missed
+  the render path) — hence "only close works." Fixed + × added and wired on campaign,
+  XP, and Pro modals (.modal-x standard). RULE: wire every × in the same pass that
+  renders it.
+- RANKED REWORK: gate raised to LVL 10 OR campaign complete (two intuitive routes);
+  ineligible users see a progress bar to LVL 10; the infographic gained "Not yet";
+  the eligible card gained "Not yet"; ranked users gained a quiet "leave ranked"
+  link. Copy explains that entering shows placements on boards already run.
+- EMBLEMS v3 — THE KEYCAP LADDER (Wolf's concept): the keyboard gets nicer as you
+  climb. Per-tier palettes: plain plastic → bronze → machined silver (ticks) →
+  laureled gold → winged platinum ice → radiant diamond (crown + rays + star cap,
+  pulses). F4 legend on ranked caps. Bucket pips (1-3 dots) render under the cap on
+  the player card + ladder via rankEmblem(name, size, bucket). themes.js + index
+  inline — sync both.
+- BUCKET/PROGRESSION CLARITY: infographic explains bottom→middle→top→promote; Your
+  Card next-rank gained a placement progress bar through the current tier's band
+  with a bucket caption; ladder pips show current bucket.
+- LANGUAGE PASS: removed "you know how buckets work", "Defend or drop", "ghosts
+  don't rank", spreads_hard placeholder, speedrunner-splits line; Ctrl+S toast
+  toned down. Brand-level winks (title, F4) retained deliberately.
+- HANDLE INTEGRITY (migration 20260707200000, server-enforced): case-insensitive
+  unique index, format constraint (2-24, [A-Za-z0-9_]), reserved-substring block,
+  7-day change cooldown via trigger (sets handle_changed_at). Account page validates
+  client-side and maps server errors to friendly messages. Legacy-duplicate-safe
+  (index creation logged + skipped if dupes exist).
+- v22.
