@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the cheat sheet · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=31" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=31">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=31">
+<link rel="icon" href="favicon.ico?v=32" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=32">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -14,7 +14,8 @@
 <style>
   :root{
     --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
-    --text:#e9e8e3; --muted:#7c7d77; --accent:#2ea36f; --accent-dim:#1d6647;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49;
+    --accent:#2ea36f; --accent-dim:#1d6647;
     --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
     --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
   }
@@ -23,12 +24,9 @@
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
     -webkit-font-smoothing:antialiased; line-height:1.5;
-    background-image:
-      radial-gradient(900px 500px at 78% -8%, rgba(46,163,111,.10), transparent 60%),
-      radial-gradient(700px 420px at 8% 4%, rgba(46,163,111,.05), transparent 55%);
     background-attachment:fixed;
   }
-  .wrap{max-width:1080px; margin:0 auto; padding:0 22px;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
 
   /* nav styles come from nav.css */
 
@@ -100,8 +98,8 @@
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-family:var(--mono); font-size:14px; padding:50px 0;}
 </style>
 
-<link rel="stylesheet" href="nav.css?v=31">
-<script src="drills.js?v=31"></script>
+<link rel="stylesheet" href="nav.css?v=32">
+<script src="drills.js?v=32"></script>
 <script>
 // Supabase init (kept light — reference doesn't post data, but nav.js needs window.sb for the user menu)
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -110,11 +108,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'reference';
 </script>
-<script src="themes.js?v=31"></script>
+<script src="themes.js?v=32"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=31"></script>
+<script src="nav.js?v=32"></script>
 <div class="wrap">
   <header>
     <h1>The <span class="em">keyboard</span> cheat sheet.</h1>

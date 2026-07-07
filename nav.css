@@ -5,6 +5,14 @@
    Theme CSS variables (--bg, --surface, --accent, etc.) come from each page's own :root.
    ============================================================ */
 
+/* ---------- CANONICAL PAGE CHROME (single authority for every page) ----------
+   One theme, everywhere: flat var(--bg) background (no per-page gradients),
+   top-aligned flow, 14px breathing room above the nav, stable scrollbar gutter
+   (no horizontal shifts when content height changes), 1180px content column. */
+html{scrollbar-gutter:stable}
+body{padding-top:14px}
+.wrap{max-width:1180px; margin:0 auto; padding:0 24px}
+
 /* ---------- TOP NAV (three sections: brand · pages · tools) ---------- */
 .topnav{width:100%; background:var(--bg); margin-bottom:30px; position:relative}
 .topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:60px; display:flex; align-items:center; gap:18px}

@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the boards · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=31" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=31">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=31">
+<link rel="icon" href="favicon.ico?v=32" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=32">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -157,15 +157,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=31">
-<script src="drills.js?v=31"></script>
+<link rel="stylesheet" href="nav.css?v=32">
+<script src="drills.js?v=32"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=31"></script>
+<script src="themes.js?v=32"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=31"></script>
+<script src="nav.js?v=32"></script>
 
 <header class="head">
   <div class="wrap">
@@ -197,6 +197,7 @@ window.sb = sb;   // expose for nav.js (shared user-menu / auth state)
 // sort, bridge). Building it from HOTKEY_DRILLS.menuOrder + meta gets all 18 automatically.
 const CH = (window.HOTKEY_DRILLS ? window.HOTKEY_DRILLS.menuOrder : []).map(key => ({
   key,
+  group: window.HOTKEY_DRILLS.groupOf ? window.HOTKEY_DRILLS.groupOf[key] : null,
   label: window.HOTKEY_DRILLS.labelOf[key] || key,
   lvl:   window.HOTKEY_DRILLS.groupOf[key] || 'More',
 }));

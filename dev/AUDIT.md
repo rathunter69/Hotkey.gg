@@ -857,3 +857,24 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   (dot + family-colored medal), campaign drill rows (– prefix). Use this pattern
   for any future list UI.
 - v31.
+
+---
+# ROUND 32 — THE JUMP, root-caused; one canonical chrome
+- MENU-JUMPS-DOWN, ACTUAL ROOT CAUSE (at last): index's body used flex vertical
+  centering (align-items:center + .app{margin:auto} + 72px top padding) — the nav's
+  Y-position depended on CONTENT HEIGHT, so dismissing the landing / loading a drill
+  re-centered the column and the menu visibly dropped. Every other page top-aligns.
+  Index is now top-aligned like the rest. This was the last structural divergence.
+- CANONICAL CHROME (nav.css is the single authority):
+  · html{scrollbar-gutter:stable} — no shifts when scrollbars appear
+  · body{padding-top:14px} — identical breathing room on every page
+  · .wrap 1180px / index .app 1180px / reference 1080→1180 — one content column
+  · reference's rogue green radial-gradient background REMOVED; flat var(--bg)
+    everywhere (variety lives in accents, never backgrounds)
+  · reference :root synced to the canonical palette (was missing --faint)
+  RULE: no page defines its own background, wrapper width, or body layout — nav.css
+  owns chrome; pages own content.
+- VISUAL VARIETY FOR CLARITY (accents per the banker-notes design language):
+  family-color dots on stats per-drill rows and leaderboard drill chips (CH entries
+  now carry group). Dots + en-dashes remain the list hierarchy everywhere.
+- v32.

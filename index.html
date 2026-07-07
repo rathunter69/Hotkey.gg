@@ -8,9 +8,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=31" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=31">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=31">
+<link rel="icon" href="favicon.ico?v=32" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=32">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -28,15 +28,14 @@
   html{height:100%}
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
-    display:flex; flex-direction:column; align-items:center;
-    /* Monkeytype-style breathing room: nav doesn't kiss the top of the viewport, content floats with vertical
-       centering when the viewport is tall enough. The flex column + margin:auto on .app does the centering. */
-    min-height:100vh; padding:72px 0 56px; user-select:none; -webkit-user-select:none;
+    /* TOP-ALIGNED like every other page — the old flex vertical-centering made the nav's
+       position depend on content height (the "menu jumps down entering the game" bug). */
+    min-height:100vh; padding:0 0 56px; user-select:none; -webkit-user-select:none;
   }
   .app{padding:6px 16px 0}
   /* auto top/bottom margins center the app when the viewport is tall enough, and collapse to a
      top-aligned, scrollable layout when it isn't — so the header/ribbon never clip on laptops */
-  .app{width:100%; max-width:1280px; margin:auto 0}
+  .app{width:100%; max-width:1180px; margin:0 auto; padding:0 24px}
 
   /* ---------- TOP NAV (three sections: brand · pages · tools) ----------
      Not sticky — Monkeytype-style, the nav scrolls with the page so users in focused-trainer mode aren't
@@ -858,14 +857,14 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=31"></script>
-<link rel="stylesheet" href="nav.css?v=31">
-<script src="themes.js?v=31"></script>
+<script src="drills.js?v=32"></script>
+<link rel="stylesheet" href="nav.css?v=32">
+<script src="themes.js?v=32"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=31"></script>
+<script src="nav.js?v=32"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
