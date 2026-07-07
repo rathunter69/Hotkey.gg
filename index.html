@@ -901,6 +901,7 @@
       <button class="mb-tool" id="weeklyBtn" title="the weekly gauntlet — five seeded drills, combined time on the board">🏁 weekly</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
+      <span class="mb-tool" id="proBadge" style="display:none; cursor:default; color:var(--warn); font-weight:700; border-color:var(--warn)"></span>
       <button class="mb-tool rank-pill tier-unranked" id="rankPill" style="display:none" title="your rank — the ladder runs Candidate \u2192 Second-Year Analyst. Click for your card.">Candidate</button>
     </div>
   </div>
@@ -5069,7 +5070,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   }
   loadChallenge(startKey);
   if(onboarded) showWelcomeBack(startKey);
-  initAuth().then(()=>{ updateRankPill(); });
+  initAuth().then(()=>{ updateRankPill(); loadEntitlement(); });
 })();
 
 /* ---- welcome-back strip: returning users get a one-glance "you're on the game page" cue.
@@ -5126,6 +5127,44 @@ async function updateRankPill(){
     try{ sessionStorage.setItem('hk_rank', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
   }catch(e){}
 }
+/* ============================================================
+   PRO — monetization scaffold. During BETA_MODE everything is unlocked;
+   the gate, badge, and upgrade surface exist so flipping the switch later
+   is a config change, not a rebuild. Entitlements written server-side only
+   (future stripe-webhook in TEST mode). requirePro() is the single gate.
+   ============================================================ */
+let _pro=false;
+async function loadEntitlement(){
+  if(!sb || !me_user || isAnonUser()) return;
+  try{ const r=await sb.from('entitlements').select('pro').eq('user_id',me_user.id).single();
+    _pro=!!(r.data&&r.data.pro); }catch(e){}
+  updateProBadge();
+}
+function isPro(){ return BETA_MODE || _pro; }
+function updateProBadge(){ const el=$('proBadge'); if(!el) return;
+  if(_pro){ el.style.display='inline-flex'; el.textContent='PRO \u2713'; } }
+function requirePro(featureName){
+  if(isPro()) return true;
+  openUpgrade(featureName); return false;
+}
+function openUpgrade(featureName){
+  let m=$('upgradeModal');
+  if(!m){ m=document.createElement('div'); m.id='upgradeModal'; m.className='onboard-modal'; document.body.appendChild(m); }
+  m.innerHTML='<div class="ob-card" style="max-width:440px">'+
+    '<div class="ob-title">hotkey.gg <span style="color:var(--warn)">pro</span></div>'+
+    '<div class="ob-body" style="text-align:left;line-height:1.7">'+
+      (featureName?('<b>'+featureName+'</b> is a Pro feature.<br><br>'):'')+
+      'Pro unlocks plugin keyboard profiles, advanced analytics, and priority on new drills.'+
+      '<br><br><span style="color:var(--accent);font-family:var(--mono);font-size:12.5px">Beta: everything is free while we build. Pro pricing lands at launch \u2014 early players get grandfathered perks.</span></div>'+
+    '<div class="ob-opts"><button class="ob-key primary" id="upClose">Back to training</button></div></div>';
+  m.classList.add('show');
+  $('upClose').onclick=()=>m.classList.remove('show');
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
+}
+// startCheckout(): future entry point — calls the create-checkout Edge Function in
+// STRIPE TEST MODE only. Deliberately inert until post-internship.
+async function startCheckout(){ openUpgrade(); }
+
 async function initAuth(){
   if(!sb){ refreshAuthUI(); return; }
   try{

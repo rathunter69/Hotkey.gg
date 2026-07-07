@@ -96,7 +96,11 @@ working via GitHub integration (team_code applied). Round 10: XP+level system (f
 balance drill (25 total). Round 12 (Monkeytype pass): sheet zoom-scales on wide screens (.gridwrap zoom),
 app 1280px, theme-aware cell colors via html[data-dark] (applyTheme duplicated in
 themes.js AND index inline — sync both), selection/marquee on accent-glow, index
-nav icon-only desktop, guides teach Ctrl+Shift-edge selection. Queue: true ghost replays,
+nav icon-only desktop, guides teach Ctrl+Shift-edge selection. Round 13: leaderboard = dashboard (your card + NEXT RANK requirements, top-players
+overall ranking, featured daily/weekly, tab+chip drill browser; tier math now in 3
+files — sync index/nav.js/leaderboard). Pro scaffold: entitlements table (RLS),
+isPro()/requirePro() gate, PRO badge, upgrade modal, inert startCheckout(); BETA_MODE
+unlocks all. Queue: true ghost replays,
 drillgen engine integration, transpose drill, streak server-sync, campaign mode,
 gauntlet one-attempt lock.
 Weekly gauntlet shelled in dev/AUDIT.md.

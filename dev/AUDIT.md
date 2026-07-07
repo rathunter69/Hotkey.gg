@@ -376,3 +376,23 @@ are label-only and skipped silently. Next: visual ghost cursor on the grid itsel
   not an inconsistency.
 - Default scheme: new visitors already land on Daylight (light). Left as-is;
   changing the 'default' dark palette would orphan saved preferences.
+
+---
+# ROUND 13 — leaderboard dashboard + Pro scaffold
+- LEADERBOARD REWRITTEN as a dashboard: (1) YOUR CARD hero — tier pill, LVL + XP bar,
+  crowns/podiums/solves, and NEXT RANK with concrete unmet requirements
+  ("○ 10 drills attempted (you: 8) · ✓ top 30%"); signed-out gets a race-framed CTA.
+  (2) TOP PLAYERS — first true overall ranking: all users with 5+ drills, sorted by
+  avg placement, tier pills inline, your row surfaced if outside top 8.
+  (3) FEATURED — daily + weekly gauntlet side by side. (4) BROWSE — tabs
+  (drills/marathon/rapid) + chips (✓ marks boards you're on); one detail board at a
+  time instead of 25 stacked. Tab/chip selection persists per session. Team toggle
+  lives in the tab row and filters everything.
+- TIER/LEVEL MATH now lives in THREE places (index, nav.js, leaderboard TIERS) —
+  change all three together. Headless smoke test passed on tier boundaries.
+- PRO SCAFFOLD: entitlements table (RLS: read own; writes service-role only —
+  migration 20260707100000, deploys via the pipeline); index gains isPro()/
+  requirePro() single gate, PRO ✓ badge, upgrade modal ("Beta: everything free —
+  early players grandfathered"), inert startCheckout() stub pointing at the future
+  TEST-mode create-checkout function. BETA_MODE unlocks everything; flipping to paid
+  later = flip BETA_MODE + wire Stripe, no rebuild. NOTHING charges money today.
