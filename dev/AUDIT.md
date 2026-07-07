@@ -505,3 +505,31 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   · LBO (par 75): entry equity, exit equity, MOIC as a formula (typing the number
     fails the check).
 - v18.
+
+---
+# ROUND 19 — campaign, ranked opt-in, player card v3, identity pass
+- NAV BOUNCE FIX: index link CSS differed from nav.css (8/14px vs 7/12px padding,
+  missing inline-flex+gap) → icons shifted per page. Now byte-matched; svg sizing
+  via CSS only. RULE: index nav CSS mirrors nav.css exactly.
+- CAMPAIGN MODE (📈 HUD button): 7 ordered chapters over all 28 drills; a drill
+  clears when local PB ≤ par × 1.5 (progress derives from PBs — ZERO new storage);
+  chapters unlock sequentially; modal lists gates + jumps into drills. Badges:
+  7 chapter emoji + ⭐ finisher, rendered on the player card (earned = glow,
+  locked = grayscale). CAMPAIGN def lives in drills.js (window.HOTKEY_CAMPAIGN).
+- PLAYER CARD v3: fixed height (82vh), pinned × close (no more scroll-to-close),
+  badges row, per-drill list scrolls inside the card.
+- RANKED OPT-IN: unranked until LVL 3 + explicit "Enter Ranked" → season-start
+  infographic (full ladder, buckets explained, "Lock in ⚔") → localStorage
+  hk_ranked. Placements compute regardless; the gate is presentational by design.
+- IDENTITY: favicon = F4 keycap ($ tick) — the anchor key IS the brand; tab titles
+  rebranded (no mouse allowed / the boards / your numbers / the cheat sheet /
+  your card). Featured boards never render thin: empty boards show "first time
+  sets the bar" + 5 open lanes.
+- SOUND PACK: sound button cycles classic → arcade (brighter/higher) → thock
+  (classic + 14ms filtered-noise key ticks on every counted keystroke) → off,
+  with an audible preview per state.
+- STATS: weakest-board nudge (deep-links index.html?drill=k — param support added),
+  strongest-board line, pace sparkline (last 15 runs).
+- KNOWN GAP: nav.js badge gate uses window.HOTKEY_PARS which is NOT shipped yet —
+  falls back to PB-presence (badge earned on any PB). Ship a pars snapshot next
+  round for exact gating on the card; campaign modal itself gates exactly.

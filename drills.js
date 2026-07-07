@@ -122,3 +122,20 @@ window.HOTKEY_DRILLS = {
     if(!D.meta[k]) console.warn('drills.js: drill key "'+k+'" listed in groups but missing from meta');
   });
 })();
+
+/* ---- CAMPAIGN: ordered chapters with time gates. A drill is 'cleared' when the
+   local PB beats par * GATE (clean run). Chapter N unlocks when N-1 is fully cleared.
+   Badges derive from cleared chapters — rendered on the player card. ---- */
+window.HOTKEY_CAMPAIGN = {
+  GATE: 1.5,
+  chapters: [
+    { id:'c1', name:'Ch. 1 \u00b7 Foundations',  badge:'\ud83c\udf93', keys:['navigation','copyover'] },
+    { id:'c2', name:'Ch. 2 \u00b7 Formatting',   badge:'\ud83c\udfa8', keys:['polish','combo','format','center','blue','gauntlet'] },
+    { id:'c3', name:'Ch. 3 \u00b7 Values & Data',badge:'\ud83d\udccb', keys:['drill','series','sort'] },
+    { id:'c4', name:'Ch. 4 \u00b7 Formulas I',   badge:'\u2797',        keys:['margin','growth','foot','percent'] },
+    { id:'c5', name:'Ch. 5 \u00b7 Formulas II',  badge:'\ud83e\uddee', keys:['bridge','audit','balance','revolver','cagr','sumif'] },
+    { id:'c6', name:'Ch. 6 \u00b7 Models',       badge:'\ud83c\udfe6', keys:['wacc','dcf','lbo','schedule','comps'] },
+    { id:'c7', name:'Ch. 7 \u00b7 Lookups',      badge:'\ud83d\udd0e', keys:['lookup','lookup2'] },
+  ],
+  finisher: { badge:'\u2b50', name:'Campaign Complete' },
+};

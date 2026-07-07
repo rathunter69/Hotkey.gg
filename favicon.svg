@@ -1,5 +1,20 @@
-<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <rect x="1" y="1" width="62" height="62" rx="15" fill="#141517"/>
-  <path d="M18 18 L32 32 L18 46" fill="none" stroke="#2ea36f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M33 18 L47 32 L33 46" fill="none" stroke="#2ea36f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- hotkey.gg — the F4 keycap. F4 anchors your refs; the whole product in one key. -->
+  <defs>
+    <linearGradient id="keyface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#23262b"/><stop offset="1" stop-color="#15171a"/>
+    </linearGradient>
+  </defs>
+  <!-- key base (side/depth) -->
+  <rect x="4" y="8" width="56" height="52" rx="12" fill="#0a0b0c"/>
+  <!-- key top face -->
+  <rect x="7" y="6" width="50" height="46" rx="10" fill="url(#keyface)" stroke="#2ea36f" stroke-width="2.5"/>
+  <!-- subtle top-edge highlight -->
+  <path d="M14 10 h36 a6 6 0 0 1 6 6 v2 h-48 v-2 a6 6 0 0 1 6-6" fill="#ffffff" opacity=".05"/>
+  <!-- legend -->
+  <text x="32" y="38" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace"
+        font-weight="700" font-size="24" fill="#2ea36f" letter-spacing="-1">F4</text>
+  <!-- anchor tick: the $ this key exists for -->
+  <text x="47" y="20" text-anchor="middle" font-family="ui-monospace, monospace"
+        font-weight="700" font-size="11" fill="#d9a441">$</text>
 </svg>

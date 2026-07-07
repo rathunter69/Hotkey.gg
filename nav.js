@@ -388,9 +388,30 @@
     const standing = (d.attempted < 5)
       ? d.attempted + '/5 drills toward Summer Analyst'
       : (d.avgPct === null ? '\u2014' : 'top ' + Math.max(1, Math.round(d.avgPct*100)) + '%');
+    // badges: campaign chapters cleared (PB-derived, local)
+    let badgesHtml='';
+    try{
+      const PBl=JSON.parse(localStorage.getItem('hotkey_pb')||'{}');
+      const CAMP=window.HOTKEY_CAMPAIGN;
+      if(CAMP){
+        // gate uses drills.js pars? pars live in index CHALLENGES — approximate with PB presence + stored par map unavailable here,
+        // so nav badges use a shipped par table snapshot:
+        const PARS=window.HOTKEY_PARS||{};
+        const cleared=k=>PBl[k]!==undefined && (!PARS[k] || PBl[k]<=PARS[k]*CAMP.GATE);
+        const chs=CAMP.chapters.map(c=>({...c, done:c.keys.every(cleared)}));
+        const earned=chs.filter(c=>c.done);
+        const allDone=earned.length===chs.length;
+        badgesHtml='<div class="pc-badges">'+
+          chs.map(c=>'<span class="pc-badge'+(c.done?'':' off')+'" title="'+c.name+(c.done?' \u2014 cleared':' \u2014 locked')+'">'+c.badge+'</span>').join('')+
+          '<span class="pc-badge'+(allDone?'':' off')+'" title="Campaign Complete">'+CAMP.finisher.badge+'</span>'+
+          '</div>';
+      }
+    }catch(e){}
     m.innerHTML = '<div class="pc-card">' +
+      '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + (window.rankEmblem?window.rankEmblem(tier.name,22):'') + '<span>' + tier.name + '</span></div></div>' +
       '<div class="pc-sub">' + d.attempted + ' / ' + MENU_ORDER.length + ' drills attempted \u00b7 ' + standing + '</div>' +
+      badgesHtml +
       (function(){
         const xp = computeXP(d, d.myRuns);
         const L = levelOf(xp);
@@ -409,7 +430,7 @@
           '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+(streakN?'\ud83d\udd25 '+streakN:'\u2014')+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">streak</div></div>'+
         '</div>';
       })() +
-      body +
+      '<div class="pc-scroll">' + body + '</div>' +
       '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;

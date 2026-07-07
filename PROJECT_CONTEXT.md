@@ -23,7 +23,7 @@ IB associate, restructuring) is founder; Claude is sole developer.
   nav.css, leaderboard.html, reference.html, About.html, privacy/terms/security.html,
   favicon.svg. supabase/ IS in the repo: migrations/ deploy
   automatically on push via the Supabase GitHub integration (VERIFIED working —
-  never paste SQL in the dashboard again). stats.html AND account.html are part of the deploy set. Shared asset version: v18. Drills: 28 in 7 groups (Models group added r18: wacc/dcf/lbo/schedule/comps). Tiers now have Top/Middle/Bottom BUCKET subtiers (HK_RANK.tierOf returns .bucket/.full).
+  never paste SQL in the dashboard again). stats.html AND account.html are part of the deploy set. Shared asset version: v19. Campaign mode live (HOTKEY_CAMPAIGN in drills.js, PB-derived progress, badges on player card — nav.js exact gating needs a HOTKEY_PARS snapshot, see AUDIT r19). Ranked opt-in at LVL 3 (localStorage hk_ranked). Sound cycles classic/arcade/thock/off. Favicon = F4 keycap. Drills: 28 in 7 groups (Models group added r18: wacc/dcf/lbo/schedule/comps). Tiers now have Top/Middle/Bottom BUCKET subtiers (HK_RANK.tierOf returns .bucket/.full).
 - Never put secret/service-role/Stripe secret keys in client code.
 
 ## Structural pipeline (assessed 2026-07-07, priority order)

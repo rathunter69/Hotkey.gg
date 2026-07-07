@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>leaderboard · hotkey.gg</title>
+<title>the boards · hotkey.gg</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -142,11 +142,11 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=18">
-<script src="drills.js?v=18"></script>
+<link rel="stylesheet" href="nav.css?v=19">
+<script src="drills.js?v=19"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=18"></script>
-<script src="nav.js?v=18"></script>
+<script src="themes.js?v=19"></script>
+<script src="nav.js?v=19"></script>
 </head>
 <body>
 
@@ -200,7 +200,10 @@ function rowHtml(r,i,names,meId,extra,leaderMs){
 }
 function boardHtml(c, best, names, meId){
   let body;
-  if(!best.length){ body='<div class="empty">no times yet — <b>claim this board</b></div>'; }
+  if(!best.length){
+    body='<div class="empty" style="padding:14px 18px 6px">nobody has run it yet \u2014 <b>first time sets the bar</b></div>';
+    for(let k=0;k<5;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';
+  }
   else {
     const leaderMs = best[0].time_ms;
     body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId,false,leaderMs)).join('');
@@ -312,6 +315,8 @@ async function load(){
   renderAll();
 }
 
+const RANKED_MIN_LVL = 3;
+function rankedOptedIn(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } }
 function heroHtml(){
   const {userStat,meId,mySolves,perDrill}=DATA;
   if(!meId){
@@ -320,6 +325,26 @@ function heroHtml(){
       '<a href="index.html" style="color:var(--accent)">Sign in and post a time</a>; your rank, level, and the road to Second-Year Analyst all light up.</div></div>';
   }
   const me=userStat[meId]||{att:0,sum:0,crowns:0,pod:0,t10:0};
+  // RANKED GATE: level 3 unlocks Ranked; entering it shows the season-start infographic.
+  {
+    const perD0={}; let xp0=0;
+    DATA.fRuns.filter(x=>x.user_id===meId).forEach(r=>{ const ch=r.challenge||'';
+      if(ch.indexOf('daily-')===0){ xp0+=30; return; } if(ch.indexOf('wk-')===0){ xp0+=25; return; }
+      const nth=(perD0[ch]=(perD0[ch]||0)+1); xp0 += nth===1?50:(nth<=10?15:3); });
+    xp0 += 25*me.t10+100*me.pod+250*me.crowns;
+    const lvl0=levelOf(xp0).lvl;
+    if(!rankedOptedIn()){
+      const eligible = lvl0>=RANKED_MIN_LVL;
+      return '<div class="panel me"><h4>your card</h4>'+
+        '<div style="font-family:var(--mono);font-size:13px;color:var(--muted);line-height:1.8">'+
+        (eligible
+          ? 'You\u2019ve hit <b style="color:var(--accent)">LVL '+lvl0+'</b> \u2014 Ranked is unlocked.<br>Placements go live the moment you enter.'
+          : 'You\u2019re <b>LVL '+lvl0+'</b>. Ranked unlocks at <b style="color:var(--warn)">LVL '+RANKED_MIN_LVL+'</b> \u2014 keep solving; every clean run and new drill counts.')+
+        '</div>'+
+        (eligible?'<button class="tab on" id="enterRanked" style="margin-top:14px;font-size:13px;padding:10px 22px">\u2694 Enter Ranked</button>':'')+
+        '</div>';
+    }
+  }
   const avg=me.att?me.sum/me.att:null;
   const t=tierOf(avg, me.att);
   // XP v2 — mirror of nav.js computeXP (anti-grind decay + challenge bonuses)
@@ -353,6 +378,26 @@ function heroHtml(){
     nextHtml+'</div>';
 }
 
+function rankedInfographic(){
+  let m=document.getElementById('rankedModal');
+  if(!m){ m=document.createElement('div'); m.id='rankedModal';
+    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px';
+    document.body.appendChild(m); }
+  const T=[{name:'Candidate',cls:'tier-unranked'},...TIERS];
+  let rows='';
+  T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:12px;padding:7px 4px;font-family:var(--mono);font-size:12.5px">'+
+    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;filter:drop-shadow(0 0 5px currentColor)">'+(window.rankEmblem?window.rankEmblem(t.name,20):'')+'</span>'+
+    '<span>'+t.name+'</span><span style="margin-left:auto;color:var(--faint);font-size:10.5px">'+(t.att?t.att+' drills \u00b7 top '+Math.round(Math.min(1,t.pct)*100)+'%':'start here')+'</span></div>'; });
+  m.innerHTML='<div class="panel" style="max-width:460px;width:100%">'+
+    '<h4>welcome to ranked</h4>'+
+    '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.8;margin-bottom:12px">'+
+    'Your rank = your <b>average placement</b> across every board you\u2019ve entered. More drills, better placements, higher rank. '+
+    'Each tier splits into <b>Top / Middle / Bottom Bucket</b> \u2014 you know how buckets work.</div>'+rows+
+    '<div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:10px">Ranks are live \u2014 they move when the field moves. Defend or drop.</div>'+
+    '<button class="tab on" id="rankedGo" style="margin-top:16px;width:100%;text-align:center;font-size:13px;padding:11px">Lock in \u2694</button></div>';
+  document.getElementById('rankedGo').onclick=()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){} m.remove(); load(); };
+  m.addEventListener('click',e=>{ if(e.target===m) m.remove(); },{once:true});
+}
 function ladderHtml(){
   const {userStat,meId}=DATA;
   const me=(meId&&userStat[meId])||{att:0,sum:0};
@@ -456,6 +501,7 @@ function renderAll(){
     featuredHtml()+
     '<h3 class="section-title">Browse the boards</h3>'+browserHtml();
   wire();
+  const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
 }
 function wire(){
   document.querySelectorAll('.tab[data-tab]').forEach(t=>t.onclick=()=>{

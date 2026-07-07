@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hotkey.gg</title>
+<title>hotkey.gg — no mouse allowed</title>
 <script>
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
@@ -45,9 +45,10 @@
   .topnav-brand b{color:var(--accent); font-weight:700}
   .topnav-pages{display:flex; align-items:center; gap:6px; margin:0 auto}
   .topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
-    padding:8px 14px; border-radius:6px; cursor:pointer; transition:.13s; letter-spacing:.2px}
+    padding:7px 12px; border-radius:7px; cursor:pointer; transition:all .15s; letter-spacing:.2px;
+    display:inline-flex; align-items:center; gap:8px}
   .topnav-link:hover{color:var(--text); background:var(--surface)}
-  .topnav-link svg{display:block; flex:none}
+  .topnav-link svg{width:19px; height:19px; display:block; flex:none}
   .tl-label{display:none}   /* desktop: icon-only (labels return in the mobile menu) */
   @media (max-width:760px){ .tl-label{display:inline} }
   .topnav-link.active{color:var(--accent); background:var(--surface)}
@@ -239,6 +240,19 @@
     display:inline-flex; align-items:center; justify-content:center; font-family:var(--mono);
     font-size:11px; color:var(--accent); transition:.15s}
   .cl-item.ok .cl-box{border-color:var(--accent); background:var(--accent-glow)}
+  .camp-card{max-width:520px; text-align:left}
+  .camp-list{max-height:56vh; overflow-y:auto; margin:8px 0 4px; padding-right:6px}
+  .camp-ch{border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:10px}
+  .camp-ch.done{border-color:var(--accent-dim); background:var(--accent-glow)}
+  .camp-ch.locked{opacity:.45}
+  .camp-hd{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:13px}
+  .camp-badge{font-size:16px}
+  .camp-n{margin-left:auto; color:var(--muted); font-size:11px}
+  .camp-drill{display:flex; justify-content:space-between; font-family:var(--mono); font-size:12px;
+    color:var(--muted); padding:6px 4px 6px 26px; cursor:pointer; border-radius:6px}
+  .camp-drill:hover{color:var(--text); background:var(--surface2)}
+  .camp-drill.ok{color:var(--accent)}
+  .camp-gate{font-size:10.5px; color:var(--faint)}
   #hkToast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(8px);
     background:var(--surface2); color:var(--text); border:1px solid var(--accent-dim);
     font-family:var(--mono); font-size:12.5px; padding:9px 18px; border-radius:999px;
@@ -832,17 +846,17 @@
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
 </style>
-<script src="drills.js?v=18"></script>
+<script src="drills.js?v=19"></script>
 </head>
 <body>
 <nav class="topnav">
   <div class="topnav-in">
     <a class="topnav-brand" href="/" title="hotkey.gg — excel trainer">hotkey<b>.gg</b></a>
     <div class="topnav-pages">
-      <a class="topnav-link active" href="/" title="trainer"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="tl-label">trainer</span></a>
-      <a class="topnav-link" href="leaderboard.html" title="leaderboard"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg><span class="tl-label">leaderboard</span></a>
-      <a class="topnav-link" href="stats.html" title="stats"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 5-8"/></svg><span class="tl-label">stats</span></a>
-      <a class="topnav-link" href="reference.html" title="reference"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.6-1-4-1.5-6-1.5S2 5 2 5v13s2-.5 4-.5 4.4.5 6 1.5c1.6-1 4-1.5 6-1.5s4 .5 4 .5V5s-2-.5-4-.5-4.4.5-6 1.5Z"/><path d="M12 6v13"/></svg><span class="tl-label">reference</span></a>
+      <a class="topnav-link active" href="/" title="trainer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="tl-label">trainer</span></a>
+      <a class="topnav-link" href="leaderboard.html" title="leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg><span class="tl-label">leaderboard</span></a>
+      <a class="topnav-link" href="stats.html" title="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 5-8"/></svg><span class="tl-label">stats</span></a>
+      <a class="topnav-link" href="reference.html" title="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.6-1-4-1.5-6-1.5S2 5 2 5v13s2-.5 4-.5 4.4.5 6 1.5c1.6-1 4-1.5 6-1.5s4 .5 4 .5V5s-2-.5-4-.5-4.4.5-6 1.5Z"/><path d="M12 6v13"/></svg><span class="tl-label">reference</span></a>
     </div>
     <div class="topnav-tools">
       <button class="topnav-icon" id="navShortcuts" title="keyboard shortcuts (?)" aria-label="keyboard shortcuts">
@@ -910,6 +924,7 @@
       <button class="mb-tool" id="profileToggle" title="keyboard profile — native Excel, Macabacus, or FactSet chords also accepted">⌨ native</button>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
       <button class="mb-tool" id="weeklyBtn" title="the weekly gauntlet — five seeded drills, combined time on the board">🏁 weekly</button>
+      <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
       <span class="mb-tool" id="proBadge" style="display:none; cursor:default; color:var(--warn); font-weight:700; border-color:var(--warn)"></span>
@@ -3326,7 +3341,7 @@ function updateChecklist(){
 const ARROWSYM={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
 function arrowLabel(k,shift,ctrl){ return (ctrl?'Ctrl+':'')+(shift?'Shift+':'')+ARROWSYM[k]; }
 let flashTimer=null, flashChips=[];
-function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); }
+function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0); playTick(); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); }
 function flashKey(t){
   const el=$('keyflash'); if(!el) return;
   flashChips.push(t); if(flashChips.length>6) flashChips.shift();
@@ -3914,12 +3929,29 @@ function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guid
   else if(!S) updateChecklist();
 }
 $('guideToggle').addEventListener('click',toggleGuided);
-function updateSoundBtn(){ const b=$('soundToggle'); if(b){ b.classList.toggle('on',soundOn); b.innerHTML=(soundOn?'🔊':'🔇')+' sound'; } }
+function soundStateLabel(){
+  if(!soundOn) return '\ud83d\udd07 off';
+  if(keyTicks) return '\ud83d\udd0a thock';
+  return '\ud83d\udd0a '+soundPack;
+}
+function updateSoundBtn(){ const b=$('soundToggle'); if(b){ b.classList.toggle('on',soundOn);
+  b.innerHTML=soundStateLabel();
+  b.title='sound pack \u2014 click to cycle: classic \u2192 arcade \u2192 thock (key ticks) \u2192 off'; } }
+function cycleSound(){
+  // classic → arcade → thock → off → classic
+  if(soundOn && soundPack==='classic' && !keyTicks){ soundPack='arcade'; }
+  else if(soundOn && soundPack==='arcade' && !keyTicks){ soundPack='classic'; keyTicks=true; }
+  else if(soundOn && keyTicks){ soundOn=false; keyTicks=false; }
+  else { soundOn=true; soundPack='classic'; keyTicks=false; }
+  saveSound(); saveSoundPrefs(); updateSoundBtn();
+  if(soundOn) playSuccessBlip(0);   // audible preview of the state you just picked
+}
 function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soundOn) playSuccessBlip(); /* preview */ }
-$('soundToggle').addEventListener('click',toggleSound);
+$('soundToggle').addEventListener('click',cycleSound);
 $('profileToggle').addEventListener('click',cycleProfile);
 $('dailyBtn').addEventListener('click',startDaily);
 $('weeklyBtn').addEventListener('click',startWeekly);
+$('campaignBtn').addEventListener('click',openCampaign);
 $('startBtn').addEventListener('click', tryEnter);
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
@@ -4357,6 +4389,23 @@ function saveHardo(){ KV.set('hotkey_hardo', hardoMode?'1':'0'); }
 let soundOn = true;
 async function loadSound(){ const v = await KV.get('hotkey_sound'); if(v==='0') soundOn = false; }
 function saveSound(){ KV.set('hotkey_sound', soundOn?'1':'0'); }
+let soundPack='classic', keyTicks=false;
+async function loadSoundPrefs(){ try{ soundPack=(await KV.get('hotkey_soundpack'))||'classic';
+  keyTicks=(await KV.get('hotkey_keyticks'))==='1'; }catch(e){} }
+function saveSoundPrefs(){ KV.set('hotkey_soundpack', soundPack); KV.set('hotkey_keyticks', keyTicks?'1':'0'); }
+/* key tick: a 12ms filtered-noise 'thock' — the Monkeytype signature. Cheap, per-keystroke. */
+let _tickBuf=null;
+function playTick(){
+  if(!soundOn || !keyTicks) return;
+  const ctx=audioCtx(); if(!ctx) return;
+  if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
+  if(!_tickBuf){ const n=ctx.sampleRate*0.014|0; _tickBuf=ctx.createBuffer(1,n,ctx.sampleRate);
+    const d=_tickBuf.getChannelData(0); for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.4); }
+  const src=ctx.createBufferSource(); src.buffer=_tickBuf;
+  const f=ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value= soundPack==='arcade'? 2600 : 1200;
+  const g=ctx.createGain(); g.gain.value= soundPack==='arcade'? .22 : .3;
+  src.connect(f); f.connect(g); g.connect(ctx.destination); src.start();
+}
 let _audioCtx = null;
 function audioCtx(){
   if(_audioCtx) return _audioCtx;
@@ -4370,13 +4419,14 @@ function audioCtx(){
 // Tier 4 (streak ≥ 20) adds an octave-below bass note for chordal heft.
 function playSuccessBlip(tier){
   if(!soundOn) return;
+  // 'arcade' pack: brighter square-ish timbre, slight upward pitch bias
   const ctx = audioCtx(); if(!ctx) return;
   // Some browsers suspend the context until a user gesture — the rapid-fire keypress IS a gesture, so this is safe.
   if(ctx.state === 'suspended'){ try{ ctx.resume(); }catch(e){} }
   const t0 = ctx.currentTime;
   const t = Math.max(0, Math.min(4, tier|0));
   // 2-semitone shift per tier → ratio ≈ 2^(2/12) = 1.1225 per step
-  const pitch = Math.pow(1.1225, t);
+  const pitch = Math.pow(1.1225, t) * (soundPack==='arcade' ? 1.19 : 1);
   const tone = (freq, start, dur, gain) => {
     const osc = ctx.createOscillator(); const g = ctx.createGain();
     osc.type = 'sine'; osc.frequency.value = freq;
@@ -5242,6 +5292,50 @@ function showToast(msg){
   el.textContent=msg; el.classList.add('show');
   clearTimeout(_toastT); _toastT=setTimeout(()=>el.classList.remove('show'), 1600);
 }
+/* ---- CAMPAIGN: progress derives from PBs (par * GATE); chapters unlock in order ---- */
+function campCleared(k){ const C=CHALLENGES[k]; if(!C) return false;
+  return PB[k]!==undefined && PB[k] <= C.par * window.HOTKEY_CAMPAIGN.GATE; }
+function campState(){
+  const ch=window.HOTKEY_CAMPAIGN.chapters;
+  return ch.map((c,i)=>{
+    const cleared=c.keys.filter(campCleared);
+    const done=cleared.length===c.keys.length;
+    const unlocked = i===0 || ch.slice(0,i).every(p=>p.keys.every(campCleared));
+    return {...c, clearedN:cleared.length, done, unlocked};
+  });
+}
+function openCampaign(){
+  let m=$('campaignModal');
+  if(!m){ m=document.createElement('div'); m.id='campaignModal'; m.className='onboard-modal'; document.body.appendChild(m); }
+  const st=campState(); const G=window.HOTKEY_CAMPAIGN.GATE;
+  const allDone=st.every(c=>c.done);
+  let rows='';
+  st.forEach(c=>{
+    rows+='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'">'+
+      '<div class="camp-hd"><span class="camp-badge">'+(c.done?c.badge:(c.unlocked?'\u25b8':'\ud83d\udd12'))+'</span>'+
+      '<b>'+c.name+'</b><span class="camp-n">'+c.clearedN+'/'+c.keys.length+'</span></div>';
+    if(c.unlocked){
+      c.keys.forEach(k=>{
+        const C=CHALLENGES[k]; if(!C) return;
+        const gate=(C.par*G).toFixed(0);
+        const ok=campCleared(k);
+        rows+='<div class="camp-drill'+(ok?' ok':'')+'" data-key="'+k+'">'+
+          '<span>'+(ok?'\u2713 ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
+          '<span class="camp-gate">'+(ok?PB[k].toFixed(2)+'s':'beat '+gate+'s')+'</span></div>';
+      });
+    }
+    rows+='</div>';
+  });
+  m.innerHTML='<div class="ob-card camp-card"><div class="ob-title">the campaign'+(allDone?' \u2b50':'')+'</div>'+
+    '<div class="ob-body" style="text-align:left;font-size:12.5px">Clear every drill in a chapter under its time gate (par \u00d7 '+G+', clean run) to unlock the next. Badges land on your player card.'+
+    (allDone?'<br><br><b style="color:var(--warn)">\u2b50 Campaign complete \u2014 the star is yours.</b>':'')+'</div>'+
+    '<div class="camp-list">'+rows+'</div>'+
+    '<div class="ob-opts"><button class="ob-key" id="campClose">close</button></div></div>';
+  m.classList.add('show');
+  $('campClose').onclick=()=>m.classList.remove('show');
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
+  m.querySelectorAll('.camp-drill').forEach(d=>d.onclick=()=>{ m.classList.remove('show'); loadChallenge(d.dataset.key); });
+}
 function restartDrill(){
   loadChallenge(cur, {daily:dailyMode, weekly:weeklyMode});   // same drill, same mode; daily/weekly reseed identically
 }
@@ -5352,6 +5446,8 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadProfile();
   updateProfileBtn();
   await loadStreak();
+  await loadSoundPrefs();
+  updateSoundBtn();
   try{ const v=await KV.get('hotkey_solves'); renderLvl(parseInt(v||'0',10)||0); }catch(e){}
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
@@ -5363,6 +5459,8 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
     try{ const last = await KV.get('hotkey_last_drill');
       if(last && CHALLENGES[last]) startKey = last; }catch(e){}
   }
+  try{ const qd=new URLSearchParams(location.search).get('drill');
+    if(qd && CHALLENGES[qd]) startKey=qd; }catch(e){}
   loadChallenge(startKey);
   if(onboarded) showWelcomeBack(startKey);
   initAuth().then(()=>{ updateRankPill(); loadEntitlement(); });
