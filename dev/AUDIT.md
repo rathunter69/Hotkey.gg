@@ -199,3 +199,17 @@ warmups; revisit only if Wolf wants them beefed too.
 ## Left open (consequential — asked Wolf)
 - "Centered on racing in PowerPoint tasks": conflicts with the entire Excel engine,
   brand, and catalog. Not built on a guess — see chat.
+
+---
+# ROUND 5 (2026-07-06) — keyboard profiles shipped
+Toggle in the HUD (⌨ native/macabacus/factset, persisted). Native chords work in
+every profile (true on the desk). VERIFIED defaults only:
+- Macabacus: Ctrl+Shift+R Fast Fill Right with smart extent (single cell → fills to
+  the guide row's data edge), Ctrl+Shift+L Fast Fill Left, Ctrl+Alt+A AutoColor
+  selection (numeric hardcodes → blue, formulas → default), Ctrl+Alt+S AutoColor sheet.
+- FactSet: Ctrl+Alt+Shift+K/J/D/U — FDS Fill Right/Left/Down/Up.
+Engine: fillFrom generalized to all four directions; smartFill + autoColor actions
+added; reference.html gains a "Plugin profiles" category. AutoColor legitimately
+speedruns the blue drill in macabacus profile — authentic, allowed.
+Not implemented (unverified defaults, deliberately): Macabacus Fast Fill Down,
+Blue-Black Toggle (Ctrl+; conflicts with native today-stamp), FactSet AutoColor.

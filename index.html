@@ -862,6 +862,7 @@
       <button class="mb-tool" id="demoBtn">▶ demo</button>
       <button class="mb-tool" id="guideToggle"><kbd>g</kbd> guided: off</button>
       <button class="mb-tool" id="soundToggle" title="success sound on rapid-fire solves">🔊 sound</button>
+      <button class="mb-tool" id="profileToggle" title="keyboard profile — native Excel, Macabacus, or FactSet chords also accepted">⌨ native</button>
     </div>
   </div>
 
@@ -2619,24 +2620,75 @@ function translateFormula(f, dr, dc){
     return ad+colLetter(c)+ar+r;
   });
 }
-function fillFrom(dir){ // dir 'down' or 'right'
+function fillFrom(dir){ // 'down' | 'up' | 'right' | 'left'
   const r=selRange();
-  const vertical = dir==='down';
+  const vertical = dir==='down'||dir==='up';
   if(vertical && r.r1===r.r2) return;
   if(!vertical && r.c1===r.c2) return;
   pushUndo();
   const copyFmt=(dst,src)=>{ dst.bold=src.bold;dst.fill=src.fill;dst.wrap=src.wrap;dst.fmtStyle=src.fmtStyle;dst.decimals=src.decimals;dst.bt=src.bt;dst.bb=src.bb;dst.ball=src.ball;dst.txt=src.txt;dst.align=src.align;dst.fontColor=src.fontColor; };
-  if(vertical){
+  const stamp=(cell,src,dr,dc)=>{ copyFmt(cell,src);
+    if(src.formula){ cell.formula=translateFormula(src.formula, dr, dc); cell.value=0; }
+    else { cell.formula=null; cell.value=src.value; } };
+  if(dir==='down'){
     for(let c=r.c1;c<=r.c2;c++){ const src=get(r.r1,c);
-      for(let rr=r.r1+1;rr<=r.r2;rr++){ const cell=ensure(rr,c); copyFmt(cell,src);
-        if(src.formula){ cell.formula=translateFormula(src.formula, rr-r.r1, 0); cell.value=0; }
-        else { cell.formula=null; cell.value=src.value; } } }
-  } else {
+      for(let rr=r.r1+1;rr<=r.r2;rr++) stamp(ensure(rr,c), src, rr-r.r1, 0); }
+  } else if(dir==='up'){
+    for(let c=r.c1;c<=r.c2;c++){ const src=get(r.r2,c);
+      for(let rr=r.r2-1;rr>=r.r1;rr--) stamp(ensure(rr,c), src, rr-r.r2, 0); }
+  } else if(dir==='right'){
     for(let rr=r.r1;rr<=r.r2;rr++){ const src=get(rr,r.c1);
-      for(let c=r.c1+1;c<=r.c2;c++){ const cell=ensure(rr,c); copyFmt(cell,src);
-        if(src.formula){ cell.formula=translateFormula(src.formula, 0, c-r.c1); cell.value=0; }
-        else { cell.formula=null; cell.value=src.value; } } }
+      for(let c=r.c1+1;c<=r.c2;c++) stamp(ensure(rr,c), src, 0, c-r.c1); }
+  } else {
+    for(let rr=r.r1;rr<=r.r2;rr++){ const src=get(rr,r.c2);
+      for(let c=r.c2-1;c>=r.c1;c--) stamp(ensure(rr,c), src, 0, c-r.c2); }
   }
+  commitAction();
+}
+
+/* ============================================================
+   KEYBOARD PROFILES — native Excel / Macabacus / FactSet.
+   Verified default bindings only (macabacus.com cheatsheet + FactSet hot-keys PDF):
+     Macabacus:  Ctrl+Shift+R Fast Fill Right (smart extent) · Ctrl+Shift+L Fast Fill Left
+                 Ctrl+Alt+A AutoColor selection · Ctrl+Alt+S AutoColor sheet
+     FactSet:    Ctrl+Alt+Shift+K/J/D/U — FDS Fill Right/Left/Down/Up
+   Native chords keep working in every profile (true on the desk too).
+   ============================================================ */
+let keyProfile='native';
+async function loadProfile(){ const v=await KV.get('hotkey_profile'); if(v==='macabacus'||v==='factset') keyProfile=v; }
+function saveProfile(){ KV.set('hotkey_profile', keyProfile); }
+function updateProfileBtn(){ const b=$('profileToggle'); if(b){ b.innerHTML='\u2328 '+keyProfile; b.classList.toggle('on', keyProfile!=='native'); } }
+function cycleProfile(){ keyProfile = keyProfile==='native'?'macabacus':(keyProfile==='macabacus'?'factset':'native'); saveProfile(); updateProfileBtn(); }
+
+// Macabacus Fast Fill: from a single cell, extend to the data extent of the guide row
+// (the row above if it has data, else the row below), then fill. Multi-cell selection
+// behaves like a plain directional fill.
+function smartFill(dir){
+  const r=selRange();
+  const single = r.r1===r.r2 && r.c1===r.c2;
+  if(single){
+    const row=S.active.r, col=S.active.c;
+    const has=(rr,cc)=>{ if(rr<1||rr>S.ROWS||cc<1||cc>COLS) return false;
+      const c=S.cells[ck(rr,cc)]; return !!(c&&((c.value!==null&&c.value!=='')||c.formula)); };
+    const guide = has(row-1,col) ? row-1 : (has(row+1,col) ? row+1 : 0);
+    if(!guide) return;
+    if(dir==='right'){ let c2=col; while(c2+1<=COLS && has(guide,c2+1)) c2++;
+      if(c2===col) return; S.sel={r:row,c:col}; S.active={r:row,c:c2}; }
+    else { let c1=col; while(c1-1>=1 && has(guide,c1-1)) c1--;
+      if(c1===col) return; S.sel={r:row,c:col}; S.active={r:row,c:c1}; }
+  }
+  fillFrom(dir);
+  render();
+}
+
+// Macabacus AutoColor — the desk standard: hardcoded numeric inputs blue, formulas default.
+function autoColor(scope){
+  pushUndo();
+  const paint=c=>{ if(!c) return;
+    if(c.formula) c.fontColor=null;
+    else if(!c.txt && typeof c.value==='number') c.fontColor='blue'; };
+  if(scope==='sheet'){ for(const key in S.cells) paint(S.cells[key]); }
+  else eachSel(paint);
   commitAction();
 }
 
@@ -3199,6 +3251,17 @@ document.addEventListener('keydown',e=>{
 
   if((e.ctrlKey||e.metaKey)){
     const lk=k.toLowerCase();
+    // ---- keyboard-profile chords (checked first; native chords still work below) ----
+    if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+R'); smartFill('right'); return; }
+    if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='l'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+L'); smartFill('left'); return; }
+    if(keyProfile==='macabacus' && e.altKey && !e.shiftKey && lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+A'); autoColor('sel'); return; }
+    if(keyProfile==='macabacus' && e.altKey && !e.shiftKey && lk==='s'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+S'); autoColor('sheet'); return; }
+    if(keyProfile==='factset' && e.altKey && e.shiftKey){
+      if(lk==='k'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+K'); fillFrom('right'); return; }
+      if(lk==='j'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+J'); fillFrom('left'); return; }
+      if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+D'); fillFrom('down'); return; }
+      if(lk==='u'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+U'); fillFrom('up'); return; }
+    }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
     if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
@@ -3234,6 +3297,7 @@ $('guideToggle').addEventListener('click',toggleGuided);
 function updateSoundBtn(){ const b=$('soundToggle'); if(b){ b.classList.toggle('on',soundOn); b.innerHTML=(soundOn?'🔊':'🔇')+' sound'; } }
 function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soundOn) playSuccessBlip(); /* preview */ }
 $('soundToggle').addEventListener('click',toggleSound);
+$('profileToggle').addEventListener('click',cycleProfile);
 $('startBtn').addEventListener('click', tryEnter);
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
@@ -4570,6 +4634,8 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadHardo();
   await loadSound();
   updateSoundBtn();
+  await loadProfile();
+  updateProfileBtn();
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
   if(onboarded){ enterRequested = true; landingOpen = false; }

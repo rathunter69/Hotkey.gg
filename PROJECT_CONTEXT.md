@@ -45,6 +45,9 @@ IB associate, restructuring) is founder; Claude is sole developer.
   + compounding attempt thresholds, 5-attempt floor. tierOf duplicated in index.html
   AND nav.js — change both. Leaderboard session boards: marathon 3/5/10 min, rapid
   30/60/90s (must match trainer duration configs).
+- Keyboard profiles: HUD toggle native/macabacus/factset (KV hotkey_profile).
+  Verified chords only — Macabacus Ctrl+Shift+R/L smart fills + Ctrl+Alt+A/S
+  AutoColor; FactSet Ctrl+Alt+Shift+K/J/D/U FDS fills. Native always works.
 - Returning-user flow: last drill persisted (hotkey_last_drill) and resumed on
   revisit; welcome-back strip (once/session, passive dismiss on first keydown).
 - Payments: NOT in deployed code (see repo-lag question above).
