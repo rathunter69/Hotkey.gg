@@ -533,3 +533,25 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - KNOWN GAP: nav.js badge gate uses window.HOTKEY_PARS which is NOT shipped yet —
   falls back to PB-presence (badge earned on any PB). Ship a pars snapshot next
   round for exact gating on the card; campaign modal itself gates exactly.
+
+---
+# ROUND 20 — XP transparency, drill bar, HUD consolidation, menu repair
+- XP v3 (transparent + complete): sessions now earn XP (marathon +20, rapid +10);
+  advanced drills (par ≥ 55) pay a +15 first-clear bonus. Mirrored nav.js +
+  leaderboard (2 spots). FRONTEND: results card shows "+50 xp · first clear ·
+  advanced bonus" per run (client estimate; server canonical); "how xp works"
+  explainer modal from the results link AND by clicking the LVL chip.
+- DRILL BAR: always-visible switcher above the grid — ‹ [GROUP · Drill name ▾] › —
+  click name = full picker, arrows step the catalog, hint shows \ and n. No more
+  hunting for the dropdown.
+- HUD FIX (the "missing" Macabacus/FactSet toggle): the toolbar had 10+ items and
+  the ⌨ profile toggle wrapped/clipped on laptop widths. Sound + keyboard profile
+  now live in a ⚙ preferences popover (both still click-to-cycle). Freedom pass
+  re-verified: profile chords precede generic Ctrl ops; Ctrl+S restart guards
+  !altKey so FactSet Ctrl+Alt+Shift chords are untouched.
+- INDEX USER MENU repaired to nav.js parity: Player card / Your numbers
+  (stats.html) / Account (account.html) / sign out; dead umSettings wire removed —
+  this was the broken-dropdown report.
+- HOTKEY_PARS snapshot shipped in drills.js (auto-extracted from CHALLENGES; regen
+  when pars change) → player-card badge gating is now exact (closes r19 gap).
+- v20.

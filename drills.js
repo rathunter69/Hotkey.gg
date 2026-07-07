@@ -139,3 +139,6 @@ window.HOTKEY_CAMPAIGN = {
   ],
   finisher: { badge:'\u2b50', name:'Campaign Complete' },
 };
+
+/* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":65,"percent":30,"lookup":50,"copyover":18,"polish":24,"foot":55,"comps":32,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":58,"dcf":70,"lbo":75,"revolver":50,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};

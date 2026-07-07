@@ -142,11 +142,11 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=19">
-<script src="drills.js?v=19"></script>
+<link rel="stylesheet" href="nav.css?v=20">
+<script src="drills.js?v=20"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=19"></script>
-<script src="nav.js?v=19"></script>
+<script src="themes.js?v=20"></script>
+<script src="nav.js?v=20"></script>
 </head>
 <body>
 
@@ -330,7 +330,8 @@ function heroHtml(){
     const perD0={}; let xp0=0;
     DATA.fRuns.filter(x=>x.user_id===meId).forEach(r=>{ const ch=r.challenge||'';
       if(ch.indexOf('daily-')===0){ xp0+=30; return; } if(ch.indexOf('wk-')===0){ xp0+=25; return; }
-      const nth=(perD0[ch]=(perD0[ch]||0)+1); xp0 += nth===1?50:(nth<=10?15:3); });
+      const nth=(perD0[ch]=(perD0[ch]||0)+1); xp0 += nth===1?(50+(((window.HOTKEY_PARS||{})[ch]||0)>=55?15:0)):(nth<=10?15:3); });
+    DATA.fSessions.filter(x=>x.user_id===meId).forEach(x=>{ xp0 += x.mode==='marathon'?20:10; });
     xp0 += 25*me.t10+100*me.pod+250*me.crowns;
     const lvl0=levelOf(xp0).lvl;
     if(!rankedOptedIn()){
@@ -354,8 +355,9 @@ function heroHtml(){
     if(ch.indexOf('daily-')===0){ xp+=30; return; }
     if(ch.indexOf('wk-')===0){ xp+=25; return; }
     const nth=(perD[ch]=(perD[ch]||0)+1);
-    xp += nth===1 ? 50 : (nth<=10 ? 15 : 3);
+    xp += nth===1 ? (50 + (((window.HOTKEY_PARS||{})[ch]||0)>=55?15:0)) : (nth<=10 ? 15 : 3);
   });
+  DATA.fSessions.filter(x=>x.user_id===meId).forEach(x=>{ xp += x.mode==='marathon'?20:10; });
   xp += 25*me.t10+100*me.pod+250*me.crowns;
   const L=levelOf(xp);
   // NEXT RANK: first tier above the current with concrete unmet requirements

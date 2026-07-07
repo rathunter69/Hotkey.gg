@@ -317,6 +317,9 @@
   async function loadProfileData(){
     const p = await window.sb.from('profiles').select('id,handle');
     const r = await window.sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
+    let mySessions=[];
+    try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', window._navUser.id);
+      mySessions=se.data||[]; }catch(e){}
     const profs = p.data || [], runs = r.data || [];
     const names = {}; profs.forEach(x => names[x.id] = x.handle || 'anon');
     const per = {}; MENU_ORDER.forEach(k => per[k] = []);
@@ -342,7 +345,7 @@
     const attempted = drills.filter(d => d.rank !== null);
     const avgPct = attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null;
     const myRuns = runs.filter(x => x.user_id === me_id);
-    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns };
+    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions };
   }
   /* ---- XP & LEVELS ----
      XP = 15/clean solve + 50/distinct drill + 25/top-10 + 100/podium + 250/crown.
@@ -353,17 +356,19 @@
      first solve of a drill 50 · solves 2-10 of that drill 15 each · beyond 10, 3 each
      (repeat-grinding decays) · daily runs 30 · weekly gauntlet legs 25 ·
      placement: 25/top-10, 100/podium, 250/crown. */
-  function computeXP(d, myRuns){
+  function computeXP(d, myRuns, mySessions){
     let crowns=0, podiums=0, top10s=0;
     d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; if(x.rank!==null&&x.rank<=10) top10s++; });
+    const PARS=window.HOTKEY_PARS||{};
     const perDrill={}; let xp=0;
     (myRuns||[]).forEach(r=>{
       const ch=r.challenge||'';
       if(ch.indexOf('daily-')===0){ xp+=30; return; }
       if(ch.indexOf('wk-')===0){ xp+=25; return; }
       const nth=(perDrill[ch]=(perDrill[ch]||0)+1);
-      xp += nth===1 ? 50 : (nth<=10 ? 15 : 3);
+      xp += nth===1 ? (50 + ((PARS[ch]||0)>=55?15:0)) : (nth<=10 ? 15 : 3);   // advanced-drill first-clear bonus
     });
+    (mySessions||[]).forEach(s=>{ xp += s.mode==='marathon' ? 20 : 10; });
     return xp + 25*top10s + 100*podiums + 250*crowns;
   }
   function levelOf(xp){ let lvl=1, need=150, floor=0;
@@ -413,7 +418,7 @@
       '<div class="pc-sub">' + d.attempted + ' / ' + MENU_ORDER.length + ' drills attempted \u00b7 ' + standing + '</div>' +
       badgesHtml +
       (function(){
-        const xp = computeXP(d, d.myRuns);
+        const xp = computeXP(d, d.myRuns, d.mySessions);
         const L = levelOf(xp);
         let crowns=0, podiums=0; d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; });
         let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
