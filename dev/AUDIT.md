@@ -1005,3 +1005,23 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   football-field summary (min/max bands per method), 13-week cash flow
   (restructuring desk flavor — Wolf's home turf).
 - v37.
+
+---
+# ROUND 38 — OPTIMAL-STROKE RECALIBRATION (Wolf's editfix report, systematized)
+- Wolf: editfix claimed 14 optimal strokes, solvable in ~5. AUDIT METHOD: replay
+  every drill's demo() keyboard-only — chords count 1 (matching the in-game
+  counter), navigation costed as arrow-manhattan between targets, Enter advances
+  the active cell. Deterministic-rnd stub hung builds with retry-until-distinct
+  loops (real Math.random in the harness now — noted for future harnesses).
+- FINDING: hand-estimated parKeys were inflated nearly everywhere — worst on
+  small drills (undo 12→3, blocksel 10→2, audit 20→8, editfix 14→8) and on
+  fill-powered builds where one Ctrl+R does twelve cells (cfslink 96→40,
+  isbuild 100→57, threestmt 126→82, lbo 82→49).
+- POLICY: parKeys := min(current, computed). 27 drills recalibrated. Two computed
+  HIGH and were left alone: navigation (12 vs 96) and foot (46 vs 53) — their
+  demos tour cells single-step while optimal play ctrl-jumps; the manhattan model
+  overcounts there. parKeys is display/aspiration only (results card + drill bar);
+  time pars and XP unaffected.
+- Audit script pattern preserved at /tmp level in transcript; rerun after any
+  demo() change. RULE: when a drill's demo changes, recompute its parKeys.
+- v38.

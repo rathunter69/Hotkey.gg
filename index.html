@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=37" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=37">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=37">
+<link rel="icon" href="favicon.ico?v=38" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=38">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=38">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -883,14 +883,14 @@
   #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
   #grid th{font-size:10.5px}
 </style>
-<script src="drills.js?v=37"></script>
-<link rel="stylesheet" href="nav.css?v=37">
-<script src="themes.js?v=37"></script>
+<script src="drills.js?v=38"></script>
+<link rel="stylesheet" href="nav.css?v=38">
+<script src="themes.js?v=38"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=37"></script>
+<script src="nav.js?v=38"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1338,7 +1338,7 @@ const CHALLENGES = {
     }
   },
   schedule:{
-    name:'Schedule', label:'Roll the PP&E forward', par:98, parKeys:84,
+    name:'Schedule', label:'Roll the PP&E forward', par:98, parKeys:39,
     prompt:'The full PP&E roll: each year opens at the prior close, capex adds, depreciation takes its anchored cut of the OPENING balance, and the ending balance walks forward. Build year 1, link year 2\u2019s opening, fill everything right \u2014 the corkscrew does years 2 and 3 for you.',
     req:'<em>B4</em> dep <em>=-B2*$B$8</em> \u00b7 <em>B5</em> end <em>=B2+B3+B4</em> \u00b7 <em>C2</em> \u00b7 <em>=B5</em> \u00b7 fill C2:D2 \u2192 \u00b7 fill B4:D5 \u2192',
     guide:[
@@ -1440,7 +1440,7 @@ const CHALLENGES = {
     }
   },
   lookup:{
-    name:'Lookup', label:'Look it up', par:50, parKeys:38,
+    name:'Lookup', label:'Look it up', par:50, parKeys:32,
     prompt:'Pull a figure out of the table with INDEX/MATCH. The query panel names a company and a metric — return that number into the Answer cell. The metric columns are shuffled every round, so read the headers and aim INDEX at the right column.',
     req:'<em>INDEX + MATCH</em> · MATCH(G2, A2:A6, 0) finds the company\'s row, then INDEX that metric\'s column · e.g. <em>=INDEX(C2:C6, MATCH(G2,A2:A6,0))</em> — or two-way <em>=INDEX(B2:D6, MATCH(G2,A2:A6,0), MATCH(G3,B1:D1,0))</em>',
     guide:[
@@ -1484,7 +1484,7 @@ const CHALLENGES = {
     }
   },
   ribbon:{
-    name:'Ribbon', label:'Learn the ribbon', par:30, parKeys:16,
+    name:'Ribbon', label:'Learn the ribbon', par:30, parKeys:15,
     prompt:'Alt is a menu, not a chord: press it, read the letters, walk the path. Three formats, three ribbon walks \u2014 bold the header, comma the number, center the label. Watch the breadcrumb at the bottom as you go.',
     req:'<em>A1</em> \u00b7 <em>alt h 1</em> bold \u00b7 <em>B2</em> \u00b7 <em>alt h k</em> comma \u00b7 <em>A4</em> \u00b7 <em>alt h a c</em> center',
     guide:[
@@ -1516,7 +1516,7 @@ const CHALLENGES = {
     }
   },
   pastes:{
-    name:'Paste Sp.', label:'Alt E S everything', par:38, parKeys:26,
+    name:'Paste Sp.', label:'Alt E S everything', par:38, parKeys:14,
     prompt:'One copied cell, two different pastes. Alt E S opens the paste-special dialog the way twenty years of desks have opened it: V for values only, T for formats only. Copy B2 once \u2014 it stays on the clipboard for both.',
     req:'<em>B2</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>D2</em> \u00b7 <em>alt e s v \u21b5</em> values \u00b7 <em>D4</em> \u00b7 <em>alt e s t \u21b5</em> formats',
     guide:[
@@ -1550,7 +1550,7 @@ const CHALLENGES = {
     }
   },
   saves:{
-    name:'Save', label:'Save like you mean it', par:26, parKeys:14, usesSave:true,
+    name:'Save', label:'Save like you mean it', par:26, parKeys:13, usesSave:true,
     prompt:'The habit that has saved more models than any backup system: Ctrl+S after every block of work. Make the edit, save. Make the next edit, save again. Two saves minimum \u2014 the reflex is the drill.',
     req:'<em>B2</em> \u00b7 type <em>done \u21b5</em> \u00b7 <em>ctrl+s</em> \u00b7 <em>B3</em> \u00b7 type <em>done \u21b5</em> \u00b7 <em>ctrl+s</em>',
     guide:[
@@ -1578,7 +1578,7 @@ const CHALLENGES = {
     }
   },
   editfix:{
-    name:'Edit', label:'Fix the typo in place', par:22, parKeys:14,
+    name:'Edit', label:'Fix the typo in place', par:22, parKeys:8,
     prompt:'Someone typed "Reveune". Do not retype the whole word \u2014 F2 into the cell, arrow the cursor to the mistake, fix the two swapped letters, commit. Edit mode is how you touch a cell without destroying it.',
     req:'<em>on A2</em> \u00b7 <em>F2</em> \u00b7 <em>\u2190</em> to the typo \u00b7 fix <em>un \u2192 nu</em> \u00b7 <em>\u21b5</em>',
     guide:[
@@ -1603,7 +1603,7 @@ const CHALLENGES = {
     }
   },
   undo:{
-    name:'Undo', label:'Undo is a tool, not a panic', par:28, parKeys:12,
+    name:'Undo', label:'Undo is a tool, not a panic', par:28, parKeys:3,
     prompt:'Delete the flagged row\u2019s value, realize it was needed, bring it back with undo, then bold it instead. Ctrl+Z is not an apology \u2014 it is a first-class move you should make without flinching.',
     req:'<em>B4</em> \u00b7 <em>delete</em> \u00b7 <em>ctrl+z</em> brings it back \u00b7 <em>ctrl+b</em> bold it',
     guide:[
@@ -1636,7 +1636,7 @@ const CHALLENGES = {
     }
   },
   autofit:{
-    name:'Autofit', label:'Fix the squeezed columns', par:20, parKeys:10,
+    name:'Autofit', label:'Fix the squeezed columns', par:20, parKeys:5,
     prompt:'Two columns are too narrow \u2014 numbers are showing as ##### and labels are clipped. Select across both columns and autofit with one ribbon walk: Alt H O I. Fitting columns by dragging is a habit worth killing today.',
     req:'select <em>A1:B1</em> (\u21e7+\u2192) \u00b7 <em>alt h o i</em> autofit',
     guide:[
@@ -1664,7 +1664,7 @@ const CHALLENGES = {
     }
   },
   rowops:{
-    name:'Rows', label:'Insert and delete rows', par:26, parKeys:12,
+    name:'Rows', label:'Insert and delete rows', par:26, parKeys:11,
     prompt:'The schedule is missing a row for D&A and carries a stale "PLACEHOLDER" line. Insert a row where D&A belongs (Alt H I R or Ctrl +) and delete the junk (Alt H D R or Ctrl -). Structural edits, zero mouse.',
     req:'on <em>row 3</em> \u00b7 <em>alt h i r</em> insert \u00b7 then on the <em>PLACEHOLDER row</em> \u00b7 <em>alt h d r</em> delete',
     guide:[
@@ -1696,7 +1696,7 @@ const CHALLENGES = {
     }
   },
   filldr:{
-    name:'Fill', label:'Fill down, fill right', par:24, parKeys:12,
+    name:'Fill', label:'Fill down, fill right', par:24, parKeys:10,
     prompt:'One formula, a whole block. Growth is written once in B3 \u2014 fill it DOWN the column with Ctrl+D, then select the totals row and fill RIGHT with Ctrl+R. The two keys that turn one cell of work into twenty.',
     req:'select <em>B3:B5</em> \u00b7 <em>ctrl+d</em> \u00b7 select <em>B7:D7</em> \u00b7 <em>ctrl+r</em>',
     guide:[
@@ -1736,7 +1736,7 @@ const CHALLENGES = {
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Grab the whole block', par:22, parKeys:10,
+    name:'Block Sel.', label:'Grab the whole block', par:22, parKeys:2,
     prompt:'Bold the entire data column in two moves: Ctrl+Shift+\u2193 rides from the header to the last filled cell in one keystroke \u2014 no arrow-mashing \u2014 then Ctrl+B. Selection speed IS Excel speed.',
     req:'on <em>B2</em> \u00b7 <em>ctrl+\u21e7+\u2193</em> select to the end \u00b7 <em>ctrl+b</em>',
     guide:[
@@ -1765,7 +1765,7 @@ const CHALLENGES = {
     }
   },
   copyover:{
-    name:'Basics', label:'Copy it over', par:18, parKeys:10,
+    name:'Basics', label:'Copy it over', par:18, parKeys:8,
     prompt:'Fundamentals rep: copy the block of numbers on the left and paste it into the outlined area on the right. Select, copy, move, paste — all on the keyboard, no mouse.',
     req:'<em>select B2:C4</em> · <em>ctrl c</em> copy · arrow over to E2 · <em>ctrl v</em> paste',
     guide:[
@@ -2107,7 +2107,7 @@ const CHALLENGES = {
     }
   },
   bridge:{
-    name:'Bridge', label:'Stretch the profit row', par:22, parKeys:12,
+    name:'Bridge', label:'Stretch the profit row', par:22, parKeys:11,
     prompt:'Build the profit formula at B4 by POINTING — the way bankers do it. Press = (or + on the numpad) to start, arrow up to grab revenue, type * for multiply, arrow up again for margin, Enter to commit. Then fill it across all four years.',
     req:'<em>=</em> (or <em>+</em>) starts the formula · <em>↑↑</em> grabs revenue (B2) · <em>*</em> · <em>↑</em> grabs margin (B3) · <em>↵</em> · then select B4:E4 and <em>ctrl+r</em>',
     guide:[
@@ -2214,7 +2214,7 @@ const CHALLENGES = {
     }
   },
   wacc:{
-    name:'WACC', label:'Build the discount rate', par:78, parKeys:66,
+    name:'WACC', label:'Build the discount rate', par:78, parKeys:48,
     prompt:'Cost of capital, the full desk build: weight both sides of the cap structure off one total, tax-effect the debt side, then assemble WACC. Four formulas \u2014 and the E/V, D/V pair should share a denominator, not a hardcode.',
     req:'<em>B7</em> E/V <em>=B2/(B2+B3)</em> \u00b7 <em>B8</em> D/V <em>=B3/(B2+B3)</em> \u00b7 <em>B9</em> after-tax Kd <em>=B5*(1-B6)</em> \u00b7 <em>B10</em> WACC <em>=B7*B4+B8*B9</em>',
     guide:[
@@ -2255,7 +2255,7 @@ const CHALLENGES = {
     }
   },
   dcf:{
-    name:'DCF', label:'Discount the cash flows', par:100, parKeys:88,
+    name:'DCF', label:'Discount the cash flows', par:100, parKeys:77,
     prompt:'Three years of FCF, one discount rate. Build the PV formula ONCE with the rate $-locked and the year exponent pointed at row 2, fill it right, then sum the PVs. If your anchors are right, the fill does the work.',
     req:'<em>B4</em> \u00b7 <em>=B3/(1+$B$6)^B2</em> \u00b7 fill right \u00b7 <em>B8</em> TV <em>=D3*(1+B9)/($B$6-B9)</em> \u00b7 <em>B10</em> PV of TV \u00b7 <em>B11</em> EV <em>=SUM(B4:D4)+B10</em>',
     guide:[
@@ -2316,7 +2316,7 @@ const CHALLENGES = {
     }
   },
   lbo:{
-    name:'LBO', label:'Run the LBO math', par:98, parKeys:82,
+    name:'LBO', label:'Run the LBO math', par:98, parKeys:49,
     prompt:'Entry to exit, the whole chain: build enterprise value at entry, lever it, check the equity, mark the exit at the same multiple, and land MOIC \u2014 the number the whole deal answers to. Six formulas; the multiple stays anchored so entry and exit agree.',
     req:'<em>B6</em> entry EV <em>=B2*$B$4</em> \u00b7 <em>B7</em> debt <em>=B6*B5</em> \u00b7 <em>B8</em> entry equity <em>=B6-B7</em> \u00b7 <em>B9</em> exit EV <em>=B3*$B$4</em> \u00b7 <em>B11</em> exit equity <em>=B9-B10</em> \u00b7 <em>B12</em> MOIC <em>=B11/B8</em>',
     guide:[
@@ -2366,7 +2366,7 @@ const CHALLENGES = {
     }
   },
   revolver:{
-    name:'Revolver', label:'Sweep the revolver', par:52, parKeys:40,
+    name:'Revolver', label:'Sweep the revolver', par:52, parKeys:27,
     prompt:'The end-of-year cash sweep: pay the revolver down with whatever cash you can spare. Sweep = the LESSER of the outstanding balance and the cash you have above the minimum \u2014 and never negative. Canonical form: =MIN(B3, MAX(0, B2-B4)) \u2014 but any formula that produces the right sweep from these inputs is accepted.',
     req:'<em>at B5</em> \u00b7 sweep = min(balance, cash available \u2212 min cash), floored at 0 \u00b7 fill across <em>ctrl+r</em>',
     guide:[
@@ -2420,7 +2420,7 @@ const CHALLENGES = {
     }
   },
   isbuild:{
-    name:'IS Build', label:'Build the income statement', par:115, parKeys:100,
+    name:'IS Build', label:'Build the income statement', par:115, parKeys:57,
     prompt:'A three-year income statement from assumptions, the way the training program made you do it: COGS off an anchored margin, gross profit, EBIT after fixed SG&A, and net income after an anchored tax rate. Build each formula ONCE in year 1 and fill it right \u2014 four formulas become twelve cells.',
     req:'<em>B3</em> \u00b7 <em>=-B2*$B$8</em> fill \u2192 \u00b7 <em>B4</em> \u00b7 <em>=B2+B3</em> fill \u2192 \u00b7 <em>B6</em> \u00b7 <em>=B4-B5</em> fill \u2192 \u00b7 <em>B7</em> \u00b7 <em>=B6*(1-$B$9)</em> fill \u2192',
     guide:[
@@ -2477,7 +2477,7 @@ const CHALLENGES = {
     }
   },
   debtsched:{
-    name:'Debt Sched.', label:'Run the debt schedule', par:140, parKeys:118,
+    name:'Debt Sched.', label:'Run the debt schedule', par:140, parKeys:83,
     prompt:'The corkscrew \u2014 the exercise every training program ends on. Year 1\u2019s beginning balance is given; every later year BEGINS where the prior year ENDED (that link is the whole trick). Mandatory amort off an anchored rate, sweep what cash allows, compute the ending balance, and charge interest on the average balance.',
     req:'<em>B4</em> amort <em>=-B2*$B$9</em> \u00b7 <em>B5</em> sweep <em>=-MIN(B2+B4,MAX(0,B3))</em> \u00b7 <em>B6</em> end <em>=B2+B4+B5</em> \u00b7 <em>B7</em> int <em>=$B$10*(B2+B6)/2</em> \u00b7 <em>C2</em> \u00b7 <em>=B6</em> \u00b7 fill \u2192',
     guide:[
@@ -2543,7 +2543,7 @@ const CHALLENGES = {
     }
   },
   cfslink:{
-    name:'CFS Link', label:'Link the cash flow statement', par:120, parKeys:96,
+    name:'CFS Link', label:'Link the cash flow statement', par:120, parKeys:40,
     prompt:'Close the loop: net change in cash from the operating and investing lines, then the cash corkscrew \u2014 each year\u2019s beginning cash is last year\u2019s ending cash. One SUM, one addition, one link, three fills. When D8 ties out, the statement is linked.',
     req:'<em>B6</em> \u00b7 <em>=SUM(B2:B5)</em> fill \u2192 \u00b7 <em>B8</em> \u00b7 <em>=B7+B6</em> fill \u2192 \u00b7 <em>C7</em> \u00b7 <em>=B8</em> \u00b7 fill \u2192',
     guide:[
@@ -2599,7 +2599,7 @@ const CHALLENGES = {
     }
   },
   bsbuild:{
-    name:'BS Build', label:'Balance the balance sheet', par:125, parKeys:104,
+    name:'BS Build', label:'Balance the balance sheet', par:125, parKeys:78,
     prompt:'Two years of balance sheet: total both sides, roll retained earnings forward (prior RE + net income \u2212 dividends \u2014 the link that ties the statements), and prove it balances with a check row that must land on ZERO. If the check isn\u2019t 0.0, something upstream is broken \u2014 exactly like the real thing.',
     req:'<em>B5</em> \u00b7 <em>=SUM(B2:B4)</em> fill \u2192 \u00b7 <em>B8</em> \u00b7 <em>=SUM(B6:B7)</em> fill \u2192 \u00b7 <em>C10</em> RE roll <em>=B10+C12-C13</em> \u00b7 <em>B11</em> \u00b7 <em>=B8+B9+B10</em> fill \u2192 \u00b7 <em>B14</em> check <em>=B5-B11</em> fill \u2192',
     guide:[
@@ -2668,7 +2668,7 @@ const CHALLENGES = {
     }
   },
   nwcsched:{
-    name:'NWC Sched.', label:'Roll working capital', par:118, parKeys:98,
+    name:'NWC Sched.', label:'Roll working capital', par:118, parKeys:82,
     prompt:'Driver-based working capital, the way models actually do it: AR off DSO, inventory off DIO, payables off DPO \u2014 each driver ANCHORED, each line filled across three years \u2014 then net working capital and the year-over-year swing that feeds the cash flow statement.',
     req:'<em>B4</em> AR <em>=B2/365*$B$9</em> fill \u2192 \u00b7 <em>B5</em> inv <em>=B3/365*$B$10</em> fill \u2192 \u00b7 <em>B6</em> AP <em>=B3/365*$B$11</em> fill \u2192 \u00b7 <em>B7</em> NWC <em>=B4+B5-B6</em> fill \u2192 \u00b7 <em>C8</em> \u0394 <em>=C7-B7</em> fill \u2192',
     guide:[
@@ -2731,7 +2731,7 @@ const CHALLENGES = {
     }
   },
   threestmt:{
-    name:'3-Statement', label:'Tie the three statements', par:155, parKeys:126,
+    name:'3-Statement', label:'Tie the three statements', par:155, parKeys:82,
     prompt:'The capstone: cash walks from the CFS into the balance sheet, retained earnings absorbs net income, and the check row proves the whole machine ties. Three different LINKS \u2014 the cash corkscrew, the CFS\u2192BS cash line, and the RE roll \u2014 plus the sums. When both check cells read zero, you\u2019ve tied a three-statement model.',
     req:'<em>B5</em> \u00b7 <em>=B2+B3-B4</em> fill \u2192 \u00b7 <em>B7</em> \u00b7 <em>=B6+B5</em> fill \u2192 \u00b7 <em>C6</em> \u00b7 <em>=B7</em> \u00b7 <em>B9</em> \u00b7 <em>=B7</em> fill \u2192 \u00b7 <em>B11</em> \u00b7 <em>=B9+B10</em> fill \u2192 \u00b7 <em>C13</em> \u00b7 <em>=B13+C2</em> \u00b7 <em>B14</em> \u00b7 <em>=B11-B12-B13</em> fill \u2192',
     guide:[
@@ -2847,7 +2847,7 @@ const CHALLENGES = {
     }
   },
   balance:{
-    name:'Balance', label:'Make it balance', par:55, parKeys:46,
+    name:'Balance', label:'Make it balance', par:55, parKeys:43,
     prompt:'Assets = Liabilities + Equity, or nothing else matters. Foot the assets, plug retained earnings so the sheet ties, foot the L&E side, then build the CHECK cell \u2014 total assets minus total L&E. A model without a zero check is a model you can\u2019t trust.',
     req:'<em>B6</em> \u00b7 <em>alt+=</em> foots assets \u00b7 <em>B12 plug</em> \u00b7 <em>=B6-B9-B10-B11</em> \u00b7 <em>B13</em> \u00b7 <em>=SUM(B9:B12)</em> \u00b7 <em>B14 check</em> \u00b7 <em>=B6-B13</em> \u2192 must show 0',
     guide:[
@@ -2903,7 +2903,7 @@ const CHALLENGES = {
     }
   },
   audit:{
-    name:'Audit', label:'Fix the broken ref', par:32, parKeys:20,
+    name:'Audit', label:'Fix the broken ref', par:32, parKeys:8,
     prompt:'One of these revenue formulas is pointing at the wrong row \u2014 the number that looks off IS off. Find it, F2 into the cell, repair the reference, commit. This is the rep that saves you at 2am: reading a column and spotting the break.',
     req:'<em>scan column C</em> for the row that doesn\u2019t tie \u00b7 <em>F2</em> opens the formula in place \u00b7 fix the row number \u00b7 <em>\u21b5</em>',
     guide:[
@@ -2950,7 +2950,7 @@ const CHALLENGES = {
     }
   },
   sumif:{
-    name:'SUMIF', label:'Roll up the segments', par:52, parKeys:44,
+    name:'SUMIF', label:'Roll up the segments', par:52, parKeys:35,
     prompt:'Roll the ledger up by segment. Seven line items, three segments — build one SUMIF with anchored ranges at E2, then fill it down for the other two. $-lock the ranges so the fill doesn\'t walk them.',
     req:'<em>at E2</em> type <em>=SUMIF($A$2:$A$8,D2,$B$2:$B$8)</em> · <em>↵</em> · back up, select E2:E4, <em>ctrl+d</em>',
     guide:[
@@ -2994,7 +2994,7 @@ const CHALLENGES = {
     }
   },
   lookup2:{
-    name:'2-way', label:'Two-way lookup', par:60, parKeys:52,
+    name:'2-way', label:'Two-way lookup', par:60, parKeys:50,
     prompt:'The query names a company AND a metric — and the metric columns shuffle every round. One formula, two MATCHes: INDEX the whole data block, MATCH the company down the rows, MATCH the metric across the headers.',
     req:'<em>at G4</em> type <em>=INDEX(B2:D6,MATCH(G2,A2:A6,0),MATCH(G3,B1:D1,0))</em> · <em>↵</em> — row match, then column match',
     guide:[
