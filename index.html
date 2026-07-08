@@ -22,15 +22,15 @@
       if(!b){ b=document.createElement('div'); b.id='hkBootErr';
         b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#7c2318;color:#ffd9d1;font:12px ui-monospace,monospace;padding:10px 16px;white-space:pre-wrap';
         (document.body||document.documentElement).appendChild(b); }
-      b.textContent='boot error (async): '+((e.reason&&(e.reason.message||e.reason))||'unknown')+'  \u2014 screenshot this for the dev';
+      b.textContent='boot error (async): '+((e.reason&&(e.reason.message||e.reason))||'unknown')+((e.reason&&e.reason.stack)?('  |  '+String(e.reason.stack).split('\n').slice(0,2).join(' \u00b7 ').slice(0,220)):'')+'  \u2014 screenshot this for the dev';
     }catch(_){}
   });
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=35" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=35">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=35">
+<link rel="icon" href="favicon.ico?v=36" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=36">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=36">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -878,15 +878,19 @@
   /* floating themes button — discoverable but out of the way */
   .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
   .landing .micro b{color:var(--muted)}
+
+  /* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
+  #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
+  #grid th{font-size:10.5px}
 </style>
-<script src="drills.js?v=35"></script>
-<link rel="stylesheet" href="nav.css?v=35">
-<script src="themes.js?v=35"></script>
+<script src="drills.js?v=36"></script>
+<link rel="stylesheet" href="nav.css?v=36">
+<script src="themes.js?v=36"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=35"></script>
+<script src="nav.js?v=36"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1066,7 +1070,7 @@ let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
    returns {ROWS, COLS, cells, sel, active, inputs?}, a grade(),
    and a par (seconds).
    ============================================================ */
-const ROWS_MAX = 12, COLS = 8;            // A..H
+const ROWS_MAX = 14, COLS = 10;           // A..J — density pass r36: more sheet, real-zoom feel
 const COLW_DEFAULT = 78;                   // px; autofit widens beyond this
 const CHARPX = 8.6;                        // approx mono char width at 14px
 
@@ -3094,20 +3098,26 @@ function evalFormula(expr){
 }
 function autoSum(){
   const {r,c}=S.active;
-  // prefer vertical (numbers above)
+  // adaptive proposal: contiguous numbers ABOVE first (Excel prefers vertical),
+  // then contiguous numbers to the LEFT (cross-footing)
+  let a=null,b=null;
   let top=r-1; while(top>=1 && typeof get(top,c).value==='number') top--; top++;
-  if(top<=r-1){
-    const cell=ensure(r,c);
-    cell.formula='=SUM('+ck(top,c)+':'+ck(r-1,c)+')';
-    cell.value=evalSum(cell.formula); return;
+  if(top<=r-1){ a={r:top,c:c}; b={r:r-1,c:c}; }
+  else{ let left=c-1; while(left>=1 && typeof get(r,left).value==='number') left--; left++;
+    if(left<=c-1){ a={r:r,c:left}; b={r:r,c:c-1}; } }
+  // EXCEL PARITY: Alt+= PROPOSES — it opens the editor with the range live in
+  // pointer state, so arrows / shift+arrows re-point it before Enter commits.
+  startEdit('=SUM(', 'enter');
+  if(a){
+    editPointerStart = editBuf.length;
+    editAnchor = {r:a.r, c:a.c};
+    editPointer = {r:b.r, c:b.c};
+    editBuf += (a.r===b.r && a.c===b.c) ? ck(a.r,a.c) : ck(a.r,a.c)+':'+ck(b.r,b.c);
+    editCaret = editBuf.length;
+    render();
   }
-  // fall back to horizontal (numbers to the left) — Excel does this for cross-footing
-  let left=c-1; while(left>=1 && typeof get(r,left).value==='number') left--; left++;
-  if(left<=c-1){
-    const cell=ensure(r,c);
-    cell.formula='=SUM('+ck(r,left)+':'+ck(r,c-1)+')';
-    cell.value=evalSum(cell.formula);
-  }
+  // no adjacent numbers: '=SUM(' sits at an operator boundary, so the native
+  // pointer flow arms on the first arrow press
 }
 
 // Sort the selected range by the active cell's column.
@@ -3214,7 +3224,7 @@ function render(){
   }
   // header row
   let head='<tr><th class="rowhdr"></th>';
-  for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${colW[c]}px">${colLetter(c)}</th>`;
+  for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${colW[c]||72}px">${colLetter(c)}</th>`;
   head+='</tr>'; g.innerHTML+=head;
   for(let r=1;r<=S.ROWS;r++){
     let row=`<tr><th class="rowhdr">${r}</th>`;
@@ -3776,6 +3786,10 @@ function cancelEdit(){
   render();
 }
 function commitEdit(dr,dc){
+  if(editBuf && editBuf[0]==='='){
+    const opens=(editBuf.match(/\(/g)||[]).length, closes=(editBuf.match(/\)/g)||[]).length;
+    if(opens>closes) editBuf += ')'.repeat(opens-closes);   // Excel parity: auto-close
+  }
   const buf=editBuf.trim();
   editing=false; editBuf='';
   editAnchor=null; editPointer=null; editPointerStart=-1;
@@ -3900,7 +3914,7 @@ function applyRibbon(key){
   }
   // top level: pick a ribbon tab (or legacy / chord)
   if(path.length===0){
-    if(key==='='){ autoSum(); return exitRibbon(true); }              // alt = chord
+    if(key==='='){ autoSum(); return exitRibbon(true); }              // alt = chord — proposes, Enter commits
     if(key==='E'){ path=['E']; ribbonNote=''; drawRibbon(); return; } // legacy alt e s
     const t=TABS.find(x=>x.k===key);
     if(t&&t.live){ path=[key]; ribbonNote=''; drawRibbon(); return; }
@@ -3944,7 +3958,7 @@ function applyRibbon(key){
   }
   if(np==='HOI'){ pushUndo(); autofitCols(); return exitRibbon(true); }
   if(np==='HOA'){ return exitRibbon(true); }
-  if(np==='HUS'||np==='MUS'){ pushUndo(); autoSum(); return exitRibbon(true); }
+  if(np==='HUS'||np==='MUS'){ autoSum(); return exitRibbon(true); }   // proposes in editor; commit happens on Enter
   if(MENUS[np]!==undefined){ path.push(key); drawRibbon(); return; }
   // invalid step: back to the tab strip
   path=[]; ribbonNote=''; drawRibbon();

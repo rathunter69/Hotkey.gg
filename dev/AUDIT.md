@@ -955,3 +955,27 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - Beacon upgraded: also catches unhandledrejection (async boot failures banner as
   "boot error (async)").
 - v35.
+
+---
+# ROUND 36 — Alt+= Excel parity, density pass, beacon v2
+- ALT+= AUTOSUM v2 (Wolf's report: committed instantly, shift-adjust dead): now
+  PROPOSES like Excel — opens the editor with '=SUM(range)' and arms the pointer
+  state (editAnchor/editPointer/editPointerStart) on the proposed range, so
+  arrows / shift+arrows re-point it before Enter commits. Proposal is adaptive:
+  contiguous numbers ABOVE preferred, LEFT as cross-footing fallback; with no
+  neighbors it opens '=SUM(' and the native operator-boundary pointer flow arms
+  on first arrow. Ribbon HUS/MUS paths no longer pushUndo around it (nothing
+  commits until Enter). commitEdit hardened: unbalanced '(' auto-closed on
+  commit — =SUM(A1:A3 <Enter> works, Excel-style.
+- DENSITY PASS: COLS 8→10 (A..J), ROWS_MAX 12→14, grid cells 12px/21px rows
+  (#grid override block; th 10.5px; colW fallback 72px for new columns).
+  Rationale: the grid read like Excel at ~140% zoom; drills now have room for
+  4-5 year models and left/right smart-fill patterns.
+- BEACON v2: async banner now appends the top stack line (file:line) — the next
+  "(async): 1 is not defined" screenshot self-identifies. Could not reproduce it
+  headless (evaluator is a hand-rolled parser, no eval/new Function anywhere in
+  boot); the stack line is the designed path to it.
+- QUEUED (Wolf-endorsed direction — more Full Builds-style tight banking modules):
+  balance-sheet build, working-capital schedule, 3-statement mini-link; deepen
+  wacc/lbo/schedule to flagship coverage; use the wider grid for 4-5yr spans.
+- v36.
