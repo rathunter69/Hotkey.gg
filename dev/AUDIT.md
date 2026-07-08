@@ -935,3 +935,23 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   signature, asserts the key list before/after, and writes ATOMICALLY at the end.
 - 40 drills. Campaign = 8 versions (v8 · Full Builds, gold family color, sheets
   medal glyph in hkBadge c8 — themes.js + index inline, sync). PARS regenerated.
+
+---
+# ROUND 35 — THE BOOT ERROR: wire-before-create, live since v31, beacon vindicated
+- Wolf's beacon screenshot: "Cannot read properties of null (reading
+  'addEventListener') @ :4482". Document line 4482 = $('soundToggle')
+  .addEventListener(...) executing BEFORE the r31 block that CREATES the button in
+  the nav tools. Sibling bug one screen down: $('profileToggle') listener, same
+  class. Both listeners now live INSIDE the creation block (sBtn.onclick /
+  pBtn.onclick) — wire-with-render, same rule as modal ×.
+- THIS WAS THE v32 "ALL ELEMENTS GONE" MYSTERY: the TypeError aborted the remainder
+  of that boot script from v31 onward; the game never finished wiring. The beacon
+  (v33) existed precisely to catch it — first real fire, exact file:line, one-shot
+  fix. Not supabase, not git, not cache.
+- WHY THE HARNESS MISSED IT: the runtime stub faked getElementById for ALL ids, so
+  null-element crashes were invisible. NEW REGRESSION HARNESS: null-strict boot —
+  getElementById returns null unless the id exists in markup or was dynamically
+  created via createElement. The v31 bug class is now testable; current boot passes.
+- Beacon upgraded: also catches unhandledrejection (async boot failures banner as
+  "boot error (async)").
+- v35.
