@@ -979,3 +979,29 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   balance-sheet build, working-capital schedule, 3-statement mini-link; deepen
   wacc/lbo/schedule to flagship coverage; use the wider grid for 4-5yr spans.
 - v36.
+
+---
+# ROUND 37 — the queued curriculum: 43 drills, Full Builds at 6
+- NEW FULL BUILDS (all graders headless-verified, ties engineered, fake links rejected):
+  · bsbuild (par 125): two-year balance sheet — SUM totals both sides, THE RE ROLL
+    (prior RE + NI − dividends, ref-checked to year 1), and a check row that must
+    read ZERO both years (assets engineered to tie via cash).
+  · nwcsched (118): driver-based working capital — AR/inv/AP off anchored
+    DSO/DIO/DPO ÷365 lines filled across 3 years, NWC, and ΔNWC ref-checked to
+    the prior year.
+  · threestmt (155, THE CAPSTONE): three distinct links in one drill — the cash
+    corkscrew, the CFS→BS cash pull (ref-checked both years), and the RE roll —
+    plus sums, ending in TWO zero check cells. Values engineered so the model
+    genuinely ties (yr-2 capex set equal to D&A so ΔRE=ΔTA holds).
+- DEEPENED to flagship coverage: wacc 58→78 (E/V + D/V off one total, after-tax
+  Kd, assembled WACC — 3 dense checks), lbo 75→98 (entry EV → leverage → equity
+  check → exit at the SAME anchored multiple → MOIC — 5 checks), schedule 65→98
+  (PP&E roll gains capex row; dep off OPENING balance; corkscrew link enforced).
+- Campaign v8 now gates on all six Full Builds. PARS regenerated (43 drills).
+- IDEA QUEUE (next candidates, roughly in build order): sources & uses table
+  (deal funding both sides tie), accretion/dilution mini (EPS bridge), DCF
+  sensitivity row (WACC stepped across columns — exploits the A..J grid),
+  returns attribution bridge (EBITDA growth vs multiple vs deleveraging),
+  football-field summary (min/max bands per method), 13-week cash flow
+  (restructuring desk flavor — Wolf's home turf).
+- v37.

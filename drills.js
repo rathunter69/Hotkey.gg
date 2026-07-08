@@ -29,7 +29,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Data',        keys: ['sort'] },
     { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'percent', 'cagr', 'sumif'] },
     { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps'] },
-    { name: 'Full Builds', keys: ['isbuild', 'cfslink', 'debtsched'] },
+    { name: 'Full Builds', keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'debtsched', 'threestmt'] },
     { name: 'Lookups',     keys: ['lookup', 'lookup2'] },
   ],
 
@@ -94,6 +94,9 @@ window.HOTKEY_DRILLS = {
 
     // Lookups
     isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'COGS, GP, EBIT, NI — four formulas, twelve cells' },
+    bsbuild:    { name:'BS Build',  label:'Balance the balance sheet',  tab:'BS Build',  desc:'Totals, the RE roll, and a check row that must read zero' },
+    nwcsched:   { name:'NWC Sched.',label:'Roll working capital',       tab:'NWC',       desc:'AR/inv/AP off anchored DSO·DIO·DPO, then the swing' },
+    threestmt:  { name:'3-Statement',label:'Tie the three statements',  tab:'3-Stmt',    desc:'Three links — corkscrew, CFS→BS cash, RE roll — until it ties' },
     cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'Net change, then the cash corkscrew ties out' },
     debtsched:  { name:'Debt Sched.',label:'Run the debt schedule',      tab:'Debt',     desc:'Amort, sweep, average-balance interest — the corkscrew' },
     lookup:     { name:'Lookup',   label:'Look it up',          tab:'Lookup',      desc:'Pull a value out of a table with INDEX/MATCH' },
@@ -149,13 +152,13 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c5', name:'v5 \u00b7 Formulas II',  badge:'\ud83e\uddee', keys:['bridge','audit','balance','revolver','cagr','sumif'] },
     { id:'c6', name:'v6 \u00b7 Models',       badge:'\ud83c\udfe6', keys:['wacc','dcf','lbo','schedule','comps'] },
     { id:'c7', name:'v7 \u00b7 Lookups',      badge:'\ud83d\udd0e', keys:['lookup','lookup2'] },
-    { id:'c8', name:'v8 \u00b7 Full Builds',  badge:'\ud83c\udfd7', keys:['isbuild','cfslink','debtsched'] },
+    { id:'c8', name:'v8 \u00b7 Full Builds',  badge:'\ud83c\udfd7', keys:['isbuild','bsbuild','cfslink','nwcsched','debtsched','threestmt'] },
   ],
   finisher: { badge:'\u2b50', name:'Model complete' },
 };
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":65,"percent":30,"lookup":50,"ribbon":30,"pastes":38,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":62,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":58,"dcf":100,"lbo":75,"revolver":52,"isbuild":115,"debtsched":140,"cfslink":120,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":98,"percent":30,"lookup":50,"ribbon":30,"pastes":38,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":62,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":78,"dcf":100,"lbo":98,"revolver":52,"isbuild":115,"debtsched":140,"cfslink":120,"bsbuild":125,"nwcsched":118,"threestmt":155,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
