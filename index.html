@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=69" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=69">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=69">
+<link rel="icon" href="favicon.ico?v=70" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=70">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=70">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -538,6 +538,7 @@
   .mb-popover .mb-dur:hover{color:var(--accent); background:var(--accent-glow)}
   .mb-spacer{flex:1}
   /* Monkeytype-style config bar: quiet text buttons, borders only on hover — less chrome, same tools */
+  .modebar [data-tip]:hover::after, .drillbar [data-tip]:hover::after{bottom:auto !important; top:calc(100% + 8px)}   /* r70: don't clip past the viewport top */
   .mb-tool{background:var(--surface2); border:1px solid color-mix(in srgb, var(--line) 75%, transparent);
     color:var(--muted); font-family:var(--mono); font-size:11px;
     padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s}   /* r58: border + fill carry the affordance — flat, no shadow */
@@ -929,7 +930,8 @@
   .landing .lbrand b{color:var(--accent)}
   .landing .eyebrow, .landing h1, .landing .lede, .landing .landing-cta, .landing .landing-gate, .landing #landingMicro{
     margin-left:26px; margin-right:26px}
-  .landing h1{font-size:30px}
+  .landing h1{font-size:23px}
+  .landing .lede{font-size:14px}
   .lg-title{font-family:var(--mono); font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); margin-bottom:10px}
   .landing-gate input{width:100%; background:var(--surface); border:1px solid var(--line); border-radius:9px;
     color:var(--text); font-family:var(--mono); font-size:13.5px; padding:11px 14px; margin-bottom:8px; outline:none}
@@ -978,14 +980,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=69"></script>
-<link rel="stylesheet" href="nav.css?v=69">
-<script src="themes.js?v=69"></script>
+<script src="drills.js?v=70"></script>
+<link rel="stylesheet" href="nav.css?v=70">
+<script src="themes.js?v=70"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=69"></script>
+<script src="nav.js?v=70"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -7124,6 +7126,8 @@ async function onSession(session){
         if(h1) h1.innerHTML='Welcome back<span class="dim">.</span>';
         if(le) le.textContent='Signed in and ready — one ↵ drops you on the sheet.';
         if(lb2) lb2.style.display='none';
+        if(typeof authOpen!=='undefined' && authOpen) closeAuth();      // r70: the sign-in bubble closes itself
+        try{ (window.navRefreshAuth||window.__navAuthKick||function(){})(); }catch(e){} // r70: nav shows the user without a refresh
         // landing sign-in satisfies the gate — advance AFTER member/handle fetch settles (onSession loads them async)
         setTimeout(()=>{ try{ if(!isAnonUser() && me_member && me_handle) advanceAccess(); }catch(e){} }, 700);
       }
@@ -7189,7 +7193,7 @@ function bindUserMenu(){
   const wire = (id, fn) => { const el=$(id); if(el) el.onclick = (e)=>{ e.preventDefault(); closeUserMenu(); fn(); }; };
   wire('umProfile',  openProfile);
   wire('umSaveProg', ()=>openAuth('signup'));
-  wire('umSignout',  ()=>{ sb.auth.signOut(); });
+  wire('umSignout',  ()=>{ sb.auth.signOut().finally(()=>location.reload()); });   // r70: fresh landing, sign-in visible
 }
 function closeUserMenu(){
   const btn=$('userBtn'), dd=$('userDropdown');
@@ -7537,7 +7541,7 @@ function showGate(step){
   const si=$('gateSignin'); if(si) si.onclick=openAuth;
   const rd=$('gateRedeem'); if(rd) rd.onclick=redeemCode;
   const ci=$('gateCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter') redeemCode(); }; }
-  const out=$('gateOut'); if(out) out.onclick=()=>{ sb.auth.signOut(); };
+  const out=$('gateOut'); if(out) out.onclick=()=>{ sb.auth.signOut().finally(()=>location.reload()); };
 }
 function closeGate(){ gateOpen=false; const g=$('gate'); if(g){ g.classList.remove('show'); g.innerHTML=''; } }
 async function redeemCode(){

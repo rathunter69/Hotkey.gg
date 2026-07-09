@@ -466,12 +466,23 @@
                 return out;
               }catch(e){ return {}; }
             })();
-            let out='<div class="pc-ach-h">achievements</div><div class="pc-ach">';
+            // r70: header shows earned/possible; top-3 rarest EARNED featured large
+            let earnedList=[]; AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
+              if(r.done) earnedList.push({a, gp:(globalPct[a.id]!==undefined?globalPct[a.id]:100)}); });
+            earnedList.sort((x,y)=>x.gp-y.gp);
+            let out='<div class="pc-ach-h">achievements <span style="color:var(--faint)">'+earnedList.length+' / '+AC.length+'</span></div>';
+            if(earnedList.length){
+              out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+earnedList.slice(0,3).map(e=>
+                '<span style="display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;max-width:76px">'+
+                (window.hkBadge?window.hkBadge(e.a.glyph,true,46):'')+e.a.name+
+                '</span>').join('')+'</div>';
+            }
+            out+='<div class="pc-ach">';
             AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
               const gp=globalPct[a.id];
               const rare=(gp!==undefined)?(' \u00b7 '+gp+'% of players have this'):'';
               out+='<span class="pc-ach-i'+(r.done?' got':'')+'" data-tip="'+a.name+' \u2014 '+a.desc+(r.done?' \u2713 EARNED':' \u00b7 '+r.prog+'/'+r.goal)+rare+'">'+
-                (window.hkBadge?window.hkBadge(a.glyph, r.done, 34):'')+
+                (window.hkBadge?window.hkBadge(a.glyph, r.done, 40):'')+
                 (r.done?'':'<i>'+Math.min(99,Math.round(100*r.prog/r.goal))+'%</i>')+'</span>'; });
             out+='</div>';
             // ---- most-used shortcuts + coach's notes (directional, never prescriptive) ----
@@ -503,8 +514,13 @@
     try{ const meP=(d._profs||[]).find(x=>x.id===window._navUser.id); myFlair=meP&&meP.flair; }catch(e){}
     m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
-      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + (window.rankEmblem?window.rankEmblem(tier.name,30):'') + '<span>' + tier.name + '</span></div></div>' +
-      '<div class="pc-sub">' + d.attempted + ' / ' + MENU_ORDER.length + ' drills attempted \u00b7 ' + standing + '</div>' +
+      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div></div>' +
+      /* r70: RANK HERO — the crest gets real estate */
+      '<div style="display:flex;align-items:center;gap:16px;margin:6px 0 14px;padding:14px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
+        '<span class="'+tier.cls+'" style="display:inline-flex;color:inherit">'+(window.rankEmblem?window.rankEmblem(tier.name,72,tier.bucket):'')+'</span>' +
+        '<div><div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:14px">'+tier.name+'</div>' +
+        '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px">'+standing+'</div></div>' +
+      '</div>' +
       badgesHtml +
       (function(){
         const xp = computeXP(d, d.myRuns, d.mySessions);
@@ -517,14 +533,13 @@
             '<span style="display:block;height:100%;width:'+L.pct+'%;background:var(--accent);border-radius:99px"></span></span>'+
           '<span style="font-size:11px;color:var(--muted)">'+L.into+' / '+L.need+' xp</span>'+
         '</div>'+
-        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;font-family:var(--mono);text-align:center">'+
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;font-family:var(--mono);text-align:center">'+
           '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+(d.mySolves||0)+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">clean solves</div></div>'+
-          '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+d.attempted+'/'+MENU_ORDER.length+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">drills</div></div>'+
           '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:'+(crowns?'var(--warn)':'var(--text)')+'">'+crowns+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">crowns</div></div>'+
           '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+(streakN?'\ud83d\udd25 '+streakN:'\u2014')+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">streak</div></div>'+
         '</div>';
       })() +
-      '<div class="pc-scroll">' + body + '</div>' +
+      /* r70: drill-by-drill list retired from the card — stats page carries it */
       '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;

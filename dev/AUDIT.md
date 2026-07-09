@@ -1653,3 +1653,21 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   (40-46px clamps) with 24px pads; now 22px titles, 12/10 pads — first content
   box sits where the frame sits.
 - v69.
+
+---
+# ROUND 70 — player card v2, session polish, tooltip clipping, font unify
+- LEVEL FONT: hkLevelChip + emblem legends now name "JetBrains Mono" first in
+  the SVG font stack (was bare ui-monospace — the "slightly different font").
+- PLAYER CARD v2 (Wolf's spec): name header \u00b7 RANK HERO block (72px crest on a
+  surface2 plate + tier + standing) \u00b7 level row \u00b7 THREE stat tiles (solves,
+  crowns, streak) \u00b7 achievements section now headed "achievements N / 23" with
+  the TOP-3 RAREST EARNED featured at 46px + names, grid icons 34\u219240. The
+  drill-by-drill list is RETIRED from the card (stats page carries it).
+- TOOLTIP CLIPPING: tips inside the top nav / modebar / drillbar flip BELOW
+  the element (they clipped past the viewport top by the bookmark bar).
+- SIGN-OUT: signOut().finally(reload) — fresh landing with the sign-in button
+  (the stale hidden-login landing was the "no option to sign in" report).
+- SESSION POLISH: onSession also closes an open auth modal (stale "sign in"
+  bubble) and kicks navRefreshAuth() so the username appears WITHOUT a refresh.
+- Landing dialog type: h1 30\u219223, lede 14 (Wolf: "text looks a little tall").
+- v70.

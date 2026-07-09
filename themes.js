@@ -195,8 +195,8 @@ window.rankEmblem = function(tierName, size, bucket){
   } else if(p.fx==='radiant'){
     legend='<path d="M17 12.2l1.1 2.6 2.8.3-2.1 1.8.7 2.7-2.5-1.5-2.5 1.5.7-2.7-2.1-1.8 2.8-.3z" fill="'+p.leg+'"/>';
   } else if(i===1){ legend=''; }
-  else if(p.fx==='crown'){ legend='<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="8.5" fill="'+p.leg+'">MD</text>'; }
-  else { legend='<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="9.5" fill="'+p.leg+'">F4</text>'; }
+  else if(p.fx==='crown'){ legend='<text x="17" y="21.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="8.5" fill="'+p.leg+'">MD</text>'; }
+  else { legend='<text x="17" y="21.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="9.5" fill="'+p.leg+'">F4</text>'; }
   let pips='';
   if(bucket){
     const n = bucket==='Top Bucket'?3:(bucket==='Middle Bucket'?2:1);
@@ -219,7 +219,7 @@ window.hkLevelChip = function(lvl, size){
   return '<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true" style="vertical-align:-4px">'+
     '<rect x="2.5" y="4" width="19" height="17" rx="4.5" fill="rgba(0,0,0,.5)"/>'+
     '<rect x="3.5" y="2.8" width="17" height="15.6" rx="4" fill="#2a2d34" stroke="'+m[0]+'" stroke-width="1.6"/>'+
-    '<text x="12" y="14.6" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="'+(String(lvl).length>2?8:9.5)+'" fill="'+m[1]+'">'+lvl+'</text></svg>';
+    '<text x="12" y="14.6" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="'+(String(lvl).length>2?8:9.5)+'" fill="'+m[1]+'">'+lvl+'</text></svg>';
 };
 
 /* ---- shared rank/level math for account.html + stats.html (older pages keep
