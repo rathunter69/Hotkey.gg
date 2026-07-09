@@ -1349,3 +1349,13 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   LoL gaudiness); they sit natively on the desk palette. No blind restyle;
   targeted tweaks on request.
 - v52.
+
+---
+# ROUND 53 — checklist head twinned with the formula bar
+- The \u2713 colhdr strip removed; .cl-head ("\u2713 checklist n/x") is now the rail's
+  top bar — 34px, var(--surface), hairline bottom — exactly matching the formula
+  bar's height/surface, so the frame's second row reads as ONE continuous strip:
+  A1 \u00b7 timer \u00b7 fx \u00b7 formula ||| \u2713 checklist 3/5. First item another block
+  higher. (Old .cl-head margin/typography folded into the strip; .cl-colhdr CSS
+  retired.)
+- v53.
