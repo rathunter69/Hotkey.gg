@@ -1895,3 +1895,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   ring 56 + tier/LVL/xp/solves) and Data card (export local JSON / clear local
   cache — PBs+streak kept, server untouched).
 - v83.
+
+---
+# ROUND 84 — leaderboard rhythm pass (and a recon correction)
+- RECON CORRECTION: the "duplicated .row/.hero blocks" I reported mid-round
+  were a misread — a piped grep -n | grep -n double-numbered its output and I
+  took the pipe's counter for file lines. Each selector exists ONCE. The set -e
+  script caught the false premise BEFORE anything shipped (assert on the dup
+  count failed) — the ship-as-script rule paying for itself.
+- THE 14px RHYTHM: rows sat at 22px side padding while every caption strip
+  sits at 14 — the "left edges don't quite agree" look. Rows now 9/14 pad,
+  min-height 42 (kills emblem wobble), mono 13.5px (the game's voice), columns
+  48/1fr/92; you-gap/empty/panels/section-titles/chips all pulled onto the
+  same 14px line.
+- QUEUE RECONCILIATION: "number-format cycling" retired (the live 'format'
+  drill covers ctrl+shift+%/$/!); borders drill pending an engine border-op
+  audit; streak server-sync parked on a migration path.
+- v84.
