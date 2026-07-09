@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=79" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=79">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=79">
+<link rel="icon" href="favicon.ico?v=80" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=80">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=80">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -648,10 +648,22 @@
   .pk-card::-webkit-scrollbar{width:6px}
   .pk-card::-webkit-scrollbar-track{background:transparent}
   .pk-card::-webkit-scrollbar-thumb{background:var(--line); border-radius:99px}
-  #pkGroups{column-count:3; column-gap:26px}
-  @media(max-width:980px){ #pkGroups{column-count:2} }
-  @media(max-width:640px){ #pkGroups{column-count:1} }
-  .pk-group{break-inside:avoid}
+  /* r80: SECTION BLOCKS — group card w/ colored cap, byline cloud of drills inside */
+  #pkGroups{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  .pk-group{background:color-mix(in srgb, var(--surface) 72%, transparent); border:1px solid var(--line);
+    border-radius:12px; overflow:hidden; margin-bottom:0}
+  .pk-group .pk-glabel{min-height:32px; display:flex; align-items:center; padding:5px 13px; margin:0;
+    background:var(--surface2); border-bottom:1px solid var(--line)}
+  .pk-cloud{display:flex; flex-wrap:wrap; gap:6px 7px; padding:11px 13px 13px}
+  .pk-byline{font-family:var(--mono); font-size:11.5px; color:var(--muted); cursor:pointer;
+    padding:3px 9px; border:1px solid color-mix(in srgb, var(--line) 70%, transparent); border-radius:6px;
+    transition:.12s; white-space:nowrap}
+  .pk-byline:hover{color:var(--text); border-color:var(--line); background:var(--surface2)}
+  .pk-byline.cur{color:var(--accent); border-color:var(--accent-dim); font-weight:700}
+  .pk-byline.held i{color:var(--accent); font-style:normal; font-size:10px}
+  .pk-byline i{color:var(--faint); font-style:normal}
+  @media(max-width:980px){ #pkGroups{grid-template-columns:1fr 1fr} }
+  @media(max-width:640px){ #pkGroups{grid-template-columns:1fr} }
   .pk-row{background:color-mix(in srgb, var(--surface) 55%, transparent)}
   .pk-row:hover{background:var(--surface)}
   .pk-title{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase;
@@ -1003,14 +1015,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=79"></script>
-<link rel="stylesheet" href="nav.css?v=79">
-<script src="themes.js?v=79"></script>
+<script src="drills.js?v=80"></script>
+<link rel="stylesheet" href="nav.css?v=80">
+<script src="themes.js?v=80"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=79"></script>
+<script src="nav.js?v=80"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4368,6 +4380,7 @@ function checkWin(){
     }
   }
   lastXpGain={n:xpGain, note:xpNote};
+  logRunLite(t); __achPending=true;   // r80: sweep fires when the player MOVES ON, never over the results box
   // r79: achievement flags — anti-achievements and time-of-day feats
   try{
     const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
@@ -4591,6 +4604,7 @@ function syncTabs(){
   C.__gCache=null;   // site-driven drills re-randomize per load; guide text must follow
   requestAnimationFrame(()=>{ try{ render(); }catch(e){} });   // r56: second pass re-measures the laid-out box for exact row fit
   renderSheetTabs();
+  if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450); }   // r80: between drills — gameplay moment, zero overlap
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
@@ -4606,7 +4620,7 @@ function syncTabs(){
     if(xc){ xc.textContent='+'+xpEarnFor(cur)+' xp'; xc.title='what your next clean solve of this drill earns'; } }
   const pel=$('dbPos'); if(pel) pel.textContent=String(idx+1).padStart(2,'0')+' / '+MENU_ORDER.length;
   const host=$('pkGroups');
-  if(host){ [...host.querySelectorAll('.pk-row')].forEach(r=>r.classList.toggle('cur', r.dataset.key===cur)); }
+  if(host){ [...host.querySelectorAll('.pk-byline')].forEach(r=>r.classList.toggle('cur', r.dataset.key===cur)); }
 }
 
 function recalc(){
@@ -6992,21 +7006,20 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
     const __adv=(window.HOTKEY_PREMIUM&&window.HOTKEY_PREMIUM.groups||[]).includes(g.name);
     const sec=document.createElement('div'); sec.className='pk-group'+(__adv?' pk-adv':'');
     sec.innerHTML='<div class="pk-glabel"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+gcol+';margin-right:8px;vertical-align:1px"></span>'+g.name+(__adv?' <span class="pk-advtag">\u25c6 advanced</span>':'')+'</div>';
+    // r80: the block body is a byline cloud — small clickable drill names,
+    // one line each, PB tick when held. Detail lives in the game; this is a map.
+    const cloud=document.createElement('div'); cloud.className='pk-cloud';
     g.keys.forEach(key=>{
       const C=CHALLENGES[key]; if(!C) return;
-      const n=MENU_ORDER.indexOf(key)+1;
-      const row=document.createElement('div');
-      row.className='pk-row'+(key===cur?' cur':''); row.dataset.key=key;
-
-      const best = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : '—';
-      row.innerHTML='<span class="pk-num">'+(n<=9?n:'')+'</span>'+
-        '<span class="pk-info"><div class="pk-name">'+escHtml(C.label||C.name||key)+
-        '<span class="pk-xp">+'+xpEarnFor(key)+' xp</span></div>'+
-        '<div class="pk-desc">'+escHtml(DRILL_DESC[key]||'')+'</div></span>'+
-        '<span class="pk-best">best <b>'+best+'</b></span>';
-      row.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
-      sec.appendChild(row);
+      const chip=document.createElement('span');
+      chip.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'');
+      chip.dataset.key=key;
+      chip.innerHTML=escHtml(C.name||key)+(PB[key]!==undefined?' <i>\u2713</i>':'');
+      chip.title=(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'');
+      chip.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
+      cloud.appendChild(chip);
     });
+    sec.appendChild(cloud);
     host.appendChild(sec);
   });
 }
@@ -7654,6 +7667,40 @@ async function submitBetaCode(){
   }catch(e){ setMsg('Something went wrong — try again.', true); }
 }
 
+// r80: lite local run ledger — feeds in-game achievement checks (server runs stay canonical)
+function logRunLite(t){
+  try{
+    const a=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]');
+    a.push({time_ms:Math.round(t*1000), keystrokes:keyLog.length, optimal:CHALLENGES[cur].parKeys});
+    while(a.length>400) a.shift();
+    localStorage.setItem('hk_runs_lite', JSON.stringify(a));
+  }catch(e){}
+}
+let __achPending=false;
+function achSweepInGame(){
+  try{
+    const AC=window.HOTKEY_ACHIEVEMENTS; if(!AC||!window.hkCelebrate) return;
+    let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+    let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
+    let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+    let lite=[]; try{ lite=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){}
+    const groups={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
+    const ctx={ pb:PB, pars:window.HOTKEY_PARS||{}, runs:lite, streak:streakN, solves:solvesN,
+      crowns:0, groups, att:Object.keys(PB).length, menuOrder:MENU_ORDER,
+      mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
+      nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin };
+    const seen=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]');
+    const fresh=[];
+    AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
+      if(r&&r.done&&!seen.includes(a.id)) fresh.push(a); });
+    if(fresh.length){
+      window.hkCelebrate({cap:'achievement unlocked', title:fresh[0].name,
+        sub:fresh[0].desc+(fresh.length>1?' \u00b7 +'+(fresh.length-1)+' more unlocked':''),
+        iconHtml:(window.hkBadge?window.hkBadge(fresh[0].glyph,true,60):'')});
+      localStorage.setItem('hk_ach_seen', JSON.stringify(seen.concat(fresh.map(a=>a.id))));
+    }
+  }catch(e){}
+}
 async function recordRun(t){
   // Anon sessions don't post to the leaderboard — scores need a permanent account behind them.
   // This keeps the leaderboard clean (no ghost/disposable entries) and creates a real value prop for signing up.

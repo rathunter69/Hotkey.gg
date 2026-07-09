@@ -1815,3 +1815,19 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - TOP-LEFT FLUSH: gridwrap padding 14→0 on top/left — the corner box and
   headers sit against the formula bar and frame edge, like the real thing.
 - v79.
+
+---
+# ROUND 80 — picker declutter (section blocks + bylines); achievements pop IN gameplay
+- CORRECTION from r79's log: achievement total is 43 (23 + 20), not 51.
+- PICKER v3 (Wolf: cluttered, loved the vibe): per-drill rows (desc/xp/best)
+  retired. Now SECTION BLOCKS — a 3-col grid of group cards (colored 32px cap
+  strip) each holding a BYLINE CLOUD: small mono chips, one per drill, \u2713 when
+  a PB is held, tooltip carries label+best. Detail lives in the game; the
+  picker is a map. Tabs/arrows remain the in-group navigators.
+- ACHIEVEMENTS IN GAMEPLAY: unlocks were only detected at player-card render
+  (Wolf saw the pop on card open). Now index keeps a lite local run ledger
+  (hk_runs_lite, cap 400) + builds a local ctx (pb/pars/flags/streak/solves)
+  and SWEEPS ON THE NEXT DRILL LOAD after a win (+450ms) — the moment lands
+  between drills, never over the results box. Crown-dependent achievements
+  still resolve card-side (need server data); hk_ach_seen shared, no doubles.
+- v80.
