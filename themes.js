@@ -3,11 +3,11 @@
    Exposes: window.THEMES (the dict), window.applyTheme(name), window.currentTheme. */
 
 window.THEMES = {
-  default: { name:'Default', dark:false, vars:{
-    bg:'#d8dade', surface:'#e9eaed', surface2:'#dfe1e5', line:'#b6b9c2',
-    text:'#2b2e36', muted:'#5f6471', faint:'#8d919b',
-    accent:'#3f9873', 'accent-dim':'#2a6b50', 'accent-glow':'rgba(63,152,115,.18)',
-    warn:'#8a6a1f', bad:'#a84a40' }},
+  default: { name:'Default', dark:true, vars:{
+    bg:'#24272e', surface:'#2c3038', surface2:'#353a44', line:'#454c59',
+    text:'#e4e8ee', muted:'#9aa4b2', faint:'#69727f',
+    accent:'#4fb286', 'accent-dim':'#357a5c', 'accent-glow':'rgba(79,178,134,.18)',
+    warn:'#dcb45f', bad:'#d96c60' }},
   terminal: { name:'Terminal', dark:true, vars:{
     bg:'#0c0d0e', surface:'#141517', surface2:'#1c1d20', line:'#26282c',
     text:'#e9e8e3', muted:'#7c7d77', faint:'#4c4d49',

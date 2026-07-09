@@ -1496,3 +1496,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   height ceiling 36→42px — the adaptive rows scale UP into the bigger box.
   Page container 1180→1280px (nav.css — all pages).
 - v60.
+
+---
+# ROUND 61 — Default rolled back to desk dark (agreed); next-set tab; leaderboard rows
+- THEME ROLLBACK per Wolf (+my assessment agrees): the pastel light Default
+  fought the blue input convention, tier metals, and cell-color contrast. The
+  r52 palette is BACK as Default (dark:true): bg #24272e, surfaces #2c3038/
+  #353a44, line #454c59, grey-green accent #4fb286. themes.js + all 5 pages'
+  :root synced. Terminal (matrix) and Daylight untouched. THIS is the look —
+  treat as locked absent explicit revisit.
+- NEXT-SET TAB: right end of the strip shows the NEXT group's name in ITS group
+  color ("LOOKUPS \u00bb") — click hops to that group's first drill and the strip
+  re-inks. stepGroup() added; \u2630 all stays rightmost.
+- LEADERBOARD: section-leader rows normalized flex\u2192grid (auto 1fr auto,
+  min-height 38px) — mixed emblem/flair heights were the likely wobble. Wolf's
+  "weird behavior" report is UNSPECIFIED — asked for a concrete symptom; watch
+  next session.
+- v61.
