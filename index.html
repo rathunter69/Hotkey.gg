@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=54" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=54">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=54">
+<link rel="icon" href="favicon.ico?v=55" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=55">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=55">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -107,7 +107,7 @@
   th{background:var(--surface2); color:var(--muted); font-weight:500; text-align:center;
     min-width:34px; height:30px; font-size:11px}
   .rowhdr{min-width:30px}
-  td{padding:0 9px; color:var(--text); white-space:nowrap; vertical-align:middle; transition:background .08s}
+  td{padding:0 9px; height:var(--cellh, 24px); color:var(--text); white-space:nowrap; vertical-align:middle; transition:background .08s}
   td.txt{text-align:left}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
@@ -930,14 +930,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=54"></script>
-<link rel="stylesheet" href="nav.css?v=54">
-<script src="themes.js?v=54"></script>
+<script src="drills.js?v=55"></script>
+<link rel="stylesheet" href="nav.css?v=55">
+<script src="themes.js?v=55"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=54"></script>
+<script src="nav.js?v=55"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3798,7 +3798,19 @@ function currentTargetRange(){
   return null;
 }
 function render(){
-  S._colW = colW;
+  // ELASTIC FIT (r55): distribute the gridwrap's spare width across all columns and
+  // scale row height to the drill's row count — the sheet fills its box on any
+  // screen without cutting playable columns (G-I are load-bearing for the
+  // site-driven drills). Effective widths feed BOTH display and the #### logic,
+  // so overflow behavior stays consistent with what the eye sees.
+  const __gw=$('gridwrap');
+  const __availW=__gw ? (__gw.clientWidth-28-30) : 0;      // padding 14×2 + row header
+  let __base=0; for(let c=1;c<=COLS;c++) __base+=(colW[c]||72);
+  const __per=(__availW>__base) ? Math.floor((__availW-__base)/COLS) : 0;
+  const __ew={}; for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72)+__per;
+  const __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));
+  if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
+  S._colW = __ew;
   const g=$('grid'); g.innerHTML='';
   const sr=selRange();
   const gt=currentTargetRange();
@@ -3812,7 +3824,7 @@ function render(){
   }
   // header row
   let head='<tr><th class="rowhdr"></th>';
-  for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${colW[c]||72}px">${colLetter(c)}</th>`;
+  for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${__ew[c]}px">${colLetter(c)}</th>`;
   head+='</tr>'; g.innerHTML+=head;
   for(let r=1;r<=S.ROWS;r++){
     let row=`<tr><th class="rowhdr">${r}</th>`;
@@ -3840,7 +3852,7 @@ function render(){
       }
       else if(isNum(cell)&&!cell.wrap){
         const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals).length*CHARPX+12;
-        if(tw>colW[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(colW[c]/8))); }
+        if(tw>__ew[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(__ew[c]/8))); }
       }
       // Ref color overlay: when this cell is referenced by the active formula, outline it in that ref's color.
       // Skip the active cell itself (would conflict with the active outline) and the pointer cell (point class wins).
@@ -3850,7 +3862,7 @@ function render(){
       if(refColor && !isActive && !(editing && editPointer && r===editPointer.r && c===editPointer.c)){
         extraStyle = `;outline:2px solid ${refColor};outline-offset:-2px;z-index:2`;
       }
-      row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${colW[c]}px;max-width:${colW[c]}px${extraStyle}">${txt}</td>`;
+      row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${__ew[c]}px;max-width:${__ew[c]}px${extraStyle}">${txt}</td>`;
     }
     row+='</tr>'; g.innerHTML+=row;
   }

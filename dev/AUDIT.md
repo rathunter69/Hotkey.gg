@@ -1372,3 +1372,19 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   light-grey theme (dark:false): bg #b9bcc3, surfaces #cdcfd5/#c0c3ca, slate
   inks, grey-green accent #3f9873. Same default slot.
 - v54.
+
+---
+# ROUND 55 — ELASTIC FIT (column cut declined; goal delivered)
+- PUSHBACK: Wolf floated dropping cols G+ to fit the box. Declined with reasons:
+  the spread doctrine (his own r42 ask) made G-I load-bearing — margin comp set B
+  (G:I), growth segment (→I), cagr pool (I), percent statement B (F:H), blue
+  rates (G/H), dcfsens (C:H), plus site pools. Cutting them breaks 8+ drills and
+  shrinks the randomization space.
+- DELIVERED THE GOAL INSTEAD — elastic fit in render(): spare gridwrap width is
+  distributed evenly across ALL columns (effective widths feed both display and
+  the #### overflow logic, so what the eye sees stays consistent); row height
+  scales with the drill's row count (≤8 rows → 32px, ≤10 → 29, ≤12 → 26,
+  else 24) via a --cellh CSS var. The sheet now fills its box on any screen with
+  zero curriculum damage. Engine colW (autofit grading, paste widths) untouched;
+  S._colW now carries effective widths so overflow helpers match the display.
+- v55.
