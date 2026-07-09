@@ -1308,3 +1308,22 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   48 drills.
 - Queue: DCF sensitivity row, returns bridge, football field.
 - v50.
+
+---
+# ROUND 51 — rail render fix (root-caused) + DCF sensitivity row
+- RAIL TEXT INVISIBLE (Wolf report; style otherwise loved — KEEP THIS STYLE):
+  r49's height:0 + min-height:100% collapsed the rail's content box whenever the
+  stage-row height was indefinite (min-height:100% resolves to 0 there) — header
+  strip survived, body text vanished. FIX: absolute-inset .cl-inner wrapper —
+  rail content sits OUT of the height calculation (grid still rules the frame),
+  body scrolls internally, text renders unconditionally. Mobile media query
+  reverts to static flow (absolute inside an auto-height parent would collapse).
+  RULE: never rely on min-height:100% inside an indefinite-height flex row.
+- NEW DRILL dcfsens (par 74, parKeys replay-computed, Models — now 10): the
+  sensitivity row. ONE formula with MIXED anchoring (=$B$2/(C3-$B$3): FCF and g
+  absolute, the WACC header relative) filled across six columns with ctrl+r.
+  Grader enforces the anchors — an unanchored =B2/(C3-B3) build REJECTS even
+  when the first value matches. Exploits the full-width grid; teaches the exact
+  skill sensitivity tables run on. 49 drills.
+- Queue: returns bridge, football field.
+- v51.
