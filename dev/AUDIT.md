@@ -1849,3 +1849,11 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   heredoc (lone surrogates never match real emoji) — anchors rebuilt as
   whitespace/emoji-safe regexes with count asserts; nav.js reset before rerun.
 - v81.
+
+# r81 HOTFIX — unguarded weeklyBtn listener shipped as a boot TypeError
+- The post-ship grep flagged 2 remaining weeklyBtn refs; one was an UNGUARDED
+  addEventListener on the removed element — a boot-time TypeError live for one
+  commit. Guarded; null-strict boot harness re-run WITH weeklyBtn absent from
+  markup (the harness previously always saw the id present, which is why it
+  never caught removed-element listeners). LESSON: after removing markup, boot
+  the harness against the NEW markup id-set before shipping.
