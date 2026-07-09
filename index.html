@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=39" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=39">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=39">
+<link rel="icon" href="favicon.ico?v=40" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=40">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=40">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -889,14 +889,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=39"></script>
-<link rel="stylesheet" href="nav.css?v=39">
-<script src="themes.js?v=39"></script>
+<script src="drills.js?v=40"></script>
+<link rel="stylesheet" href="nav.css?v=40">
+<script src="themes.js?v=40"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=39"></script>
+<script src="nav.js?v=40"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3894,6 +3894,10 @@ function syncTabs(){
   const cel=$('dbCat'); if(cel){ const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]];
     cel.innerHTML=(gc?'<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+gc+';margin-right:6px;vertical-align:1px"></span>':'')+(GROUP_OF[cur]||'Drill'); }
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
+  { const tl=$('taskLine'); if(tl){
+      const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
+      tl.innerHTML='<span class="tl-dot" style="background:'+gc+'"></span>'+(C.req||C.prompt||'');
+  } }
   { let xc=$('dbXp');
     if(!xc && nel){ xc=document.createElement('span'); xc.id='dbXp'; xc.className='db-xp'; nel.after(xc); }
     if(xc){ xc.textContent='+'+xpEarnFor(cur)+' xp'; xc.title='what your next clean solve of this drill earns'; } }

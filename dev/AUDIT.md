@@ -1051,3 +1051,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - NEXT-DRILL DISCOVERABILITY: results card gains a primary "next drill → (n)"
   button; the data-act='next'→nextChallenge() wiring already existed.
 - v39.
+
+---
+# ROUND 40 — type-to-replace + task clarity (Wolf: "unclear what the tasks are")
+- TYPE-TO-REPLACE WAS ABSENT ENTIRELY: only '='/'+', F2, and Backspace started
+  edits — typing a letter on a selected cell did NOTHING (Excel's most basic entry
+  behavior). Now: any printable char (outside app hotkeys — '\' picker keeps
+  priority) starts an Enter-mode edit seeded with that char, replacing the cell.
+- TASK LINE: C.req was rendered NOWHERE in-game — the task text existed only in
+  drill definitions. New #taskLine bar above the drillbar: 13px mono, family-color
+  dot, <em> refs in accent bold, populated on every loadChallenge (req, prompt
+  fallback). The single biggest clarity fix available.
+- ALWAYS-ON TARGET HIGHLIGHT: currentGuideTarget (first FAILING check's target
+  range) was guided-mode-only. Renamed currentTargetRange, computed always:
+  guided keeps the strong pulsing ring; clean runs get a soft dashed accent
+  outline (td.ttarget) on the next cell(s) to change — advances as checks pass.
+  No more squinting at "B5" and hunting.
+- v40.
