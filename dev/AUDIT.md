@@ -1730,3 +1730,14 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   vertical alignment across the hero. hkLevelChip retained for compact spots
   (stats/account).
 - v74.
+
+---
+# ROUND 75 — the orange plate (tier pill CSS leak) + hero alignment
+- Wolf's screenshot: the crest sat on a tinted rounded plate and the tier name
+  wore a highlight box. ROOT: tier.cls classes carry PILL styling (background/
+  border) for leaderboard chips; the hero applied that class to the emblem
+  wrapper and name div, inheriting the tint. FIX: class dropped from the
+  wrapper (raw crest on the surface2 plate), background/box-shadow nulled on
+  the name, bucket pips omitted at hero size (the floating "accoutrements" —
+  standing text already says top n%). Ring column align-self:center.
+- v75.
