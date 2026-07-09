@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>your numbers · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=67" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=67">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=67">
+<title>Stats · hotkey.gg</title>
+<link rel="icon" href="favicon.ico?v=68" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=68">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=68">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+  html{scrollbar-gutter:stable}   /* r68: content filters change page height — without this the centered wrap jumps horizontally */
   :root{
     --bg:#292b31; --surface:#383b42; --surface2:#43474f; --line:#5a5e68;
     --text:#f0f1ec; --muted:#a8adb3; --faint:#767d87;
@@ -54,8 +55,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=67">
-<script src="drills.js?v=67"></script>
+<link rel="stylesheet" href="nav.css?v=68">
+<script src="drills.js?v=68"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -63,15 +64,15 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=67"></script>
+<script src="themes.js?v=68"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=67"></script>
+<script src="nav.js?v=68"></script>
 
 <header class="head">
   <div class="wrap">
-    <h1>Your numbers.</h1>
+    <h1>Stats</h1>
     <div class="sub">Speed, efficiency, and where every drill stands \u2014 your complete performance picture.</div>
   </div>
 </header>
@@ -126,9 +127,9 @@ async function load(){
     const xp = window.HK_RANK.computeXP(mine, st);
     const L = window.HK_RANK.levelOf(xp);
     tcHtml = `<div class="stat hero" style="grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap">`+
-      `<span class="${tier.cls}" style="display:inline-flex;color:inherit;">${window.rankEmblem?window.rankEmblem(tier.name,34):''}</span>`+
+      `<span class="${tier.cls}" style="display:inline-flex;color:inherit;">${window.rankEmblem?window.rankEmblem(tier.name,46):''}</span>`+
       `<div><div style="font-family:var(--mono);font-weight:700;font-size:15px">${tier.name}</div>`+
-      `<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">LVL ${L.lvl} \u00b7 ${L.into}/${L.need} xp \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`+
+      `<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${window.hkLevelChip?window.hkLevelChip(L.lvl,20):''} LVL ${L.lvl} \u00b7 ${L.into}/${L.need} xp \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`+
       `<span style="flex:1;min-width:120px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${L.pct}%;background:var(--accent)"></span></span></div>`;
   }
   let html = tcHtml + `<div class="cards">

@@ -302,13 +302,13 @@
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
     try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
-      if(c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n):'')+'<span>'+c.n+'</span>';
+      if(c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n,20):'')+'<span>'+c.n+'</span>';
         el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
     if(!window.sb || !window._navUser) return;
     try{
       const d = await loadProfileData();
       const t = tierOf(d.avgPct, d.attempted);
-      el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span>';
+      el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name,20):'')+'<span>'+t.name+'</span>';
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
       try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
     }catch(e){}
@@ -503,7 +503,7 @@
     try{ const meP=(d._profs||[]).find(x=>x.id===window._navUser.id); myFlair=meP&&meP.flair; }catch(e){}
     m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
-      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + (window.rankEmblem?window.rankEmblem(tier.name,22):'') + '<span>' + tier.name + '</span></div></div>' +
+      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div><div class="pc-tier ' + tier.cls + '">' + (window.rankEmblem?window.rankEmblem(tier.name,30):'') + '<span>' + tier.name + '</span></div></div>' +
       '<div class="pc-sub">' + d.attempted + ' / ' + MENU_ORDER.length + ' drills attempted \u00b7 ' + standing + '</div>' +
       badgesHtml +
       (function(){
@@ -512,7 +512,7 @@
         let crowns=0, podiums=0; d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; });
         let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
         return '<div style="display:flex;gap:14px;align-items:center;margin:4px 0 14px;flex-wrap:wrap;font-family:var(--mono)">'+
-          '<span style="font-size:20px;font-weight:700;color:var(--accent)">LVL '+L.lvl+'</span>'+
+          (window.hkLevelChip?window.hkLevelChip(L.lvl,26):'')+'<span style="font-size:18px;font-weight:700;color:var(--accent)">LVL '+L.lvl+'</span>'+
           '<span style="flex:1;min-width:140px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden">'+
             '<span style="display:block;height:100%;width:'+L.pct+'%;background:var(--accent);border-radius:99px"></span></span>'+
           '<span style="font-size:11px;color:var(--muted)">'+L.into+' / '+L.need+' xp</span>'+

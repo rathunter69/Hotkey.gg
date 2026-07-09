@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>the boards · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=67" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=67">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=67">
+<title>Leaderboard · hotkey.gg</title>
+<link rel="icon" href="favicon.ico?v=68" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=68">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=68">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
     --maxw:1180px;   /* r66: = game space */
   }
   *{margin:0; padding:0; box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scrollbar-gutter:stable; scroll-behavior:smooth}
   body{background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6; -webkit-font-smoothing:antialiased}
   /* r62: texture retired — the game page is flat; these pages match it */
   .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px; position:relative; z-index:1}
@@ -119,7 +119,7 @@
   .chips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px}
   .chip{font-family:var(--mono); font-size:11.5px; padding:6px 13px; border-radius:8px; cursor:pointer;
     border:1px solid var(--line); color:var(--muted); background:var(--surface); transition:all .1s}
-  .chip:hover{color:var(--text); transform:translateY(-1px)}
+  .chip:hover{color:var(--text)}   /* r68: no lift — bubbles stay on the shared baseline */
   .chip.on{color:var(--text); border-color:var(--accent); background:var(--accent-glow)}
   .chip .cg{color:var(--faint); font-size:9px; text-transform:uppercase; letter-spacing:.6px; display:block}
   /* fit & rhythm polish */
@@ -163,19 +163,19 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=67">
-<script src="drills.js?v=67"></script>
+<link rel="stylesheet" href="nav.css?v=68">
+<script src="drills.js?v=68"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=67"></script>
+<script src="themes.js?v=68"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=67"></script>
+<script src="nav.js?v=68"></script>
 
 <header class="head">
   <div class="wrap">
-    <h1>Fastest hands win.</h1>
+    <h1>Leaderboard</h1>
   </div>
 </header>
 
@@ -428,7 +428,7 @@ function heroHtml(){
     nextHtml='<div class="yc-next"><b>Top of the ladder.</b> Rankings stay live \u2014 keep placing to hold it. <a id="leaveRanked" style="font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
   }
   return '<div class="panel me"><h4>your card</h4>'+
-    '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name,22,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+
+    '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name,28,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+
     '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
     '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+L.into+'/'+L.need+' xp</span></div>'+
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">'+
@@ -444,7 +444,7 @@ function rankedInfographic(){
   const T=window.HK_RANK.TIERS;
   let rows='';
   T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:12px;padding:7px 4px;font-family:var(--mono);font-size:12.5px">'+
-    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,20):'')+'</span>'+
+    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,24):'')+'</span>'+
     '<span>'+t.name+'</span><span style="margin-left:auto;color:var(--faint);font-size:10.5px">'+(t.att?t.att+' drills \u00b7 top '+Math.round(Math.min(1,t.pct)*100)+'%':'start here')+'</span></div>'; });
   m.innerHTML='<div class="panel" style="max-width:460px;width:100%">'+
     '<h4>welcome to ranked</h4>'+
@@ -473,7 +473,7 @@ function ladderHtml(){
     const here=t.name===cur.name;
     const locked=i>(cur.i??-1)+1 && !here;
     rows+='<div class="ld-row'+(here?' here':'')+(locked&&!here?' locked':'')+'">'+
-      '<span class="'+t.cls+'" style="display:inline-flex;color:inherit">'+(window.rankEmblem?window.rankEmblem(t.name,19):'')+'</span>'+
+      '<span class="'+t.cls+'" style="display:inline-flex;color:inherit">'+(window.rankEmblem?window.rankEmblem(t.name,22):'')+'</span>'+
       '<span>'+t.name+(here?' \u2014 you':'')+'</span><span class="ld-req">'+t.req+'</span></div>';
   });
   return '<div class="panel"><h4>the ladder</h4>'+rows+'</div>';
@@ -545,7 +545,7 @@ function rosterHtml(){
   const inTier=users.filter(x=>x.tier.name===rosterTier).sort((a,b)=>a.av-b.av);
   let rows=inTier.map((x,i)=>'<div class="ros-row'+(x.u===meId?' me':'')+'">'+
     '<span class="ros-n">'+(i+1)+'</span>'+
-    (window.rankEmblem?window.rankEmblem(x.tier.name,18,x.tier.bucket):'')+
+    (window.rankEmblem?window.rankEmblem(x.tier.name,22,x.tier.bucket):'')+
     '<span class="ros-nm">'+esc(names[x.u]||'anon')+'</span>'+
     '<span class="ros-b">'+(x.tier.bucket||'')+'</span>'+
     '<span class="ros-r">rating '+(x.av*100).toFixed(1)+'</span>'+

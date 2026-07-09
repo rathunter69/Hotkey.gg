@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hotkey.gg — no mouse allowed</title>
+<title>hotkey.gg — keyboard Excel trainer</title>
 <script>
   // BOOT BEACON: if anything fatal happens while the game loads, paint the error on
   // screen instead of failing silent ("all the elements are gone" must never be a mystery).
@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=67" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=67">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=67">
+<link rel="icon" href="favicon.ico?v=68" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=68">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=68">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -46,7 +46,7 @@
     --sans:'Hanken Grotesk',system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{height:100%}
+  html{scrollbar-gutter:stable; height:100%}
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
     /* TOP-ALIGNED like every other page — the old flex vertical-centering made the nav's
@@ -896,6 +896,21 @@
   .mm-hardo-l b{color:var(--text); font-weight:700}
   @keyframes rfshake{0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
   /* ---- landing overlay (fades to the app on start) ---- */
+  /* r68: mobile gate — the game needs a physical keyboard */
+  .mobile-gate{display:none}
+  @media (max-width:740px), (pointer:coarse) and (max-width:1024px){
+    .mobile-gate{display:flex; position:fixed; inset:0; z-index:400; align-items:center; justify-content:center;
+      background:var(--bg); padding:22px}
+    .mg-card{background:var(--surface); border:1px solid var(--line); border-radius:12px; max-width:420px; overflow:hidden}
+    .mg-cap{min-height:34px; display:flex; align-items:center; padding:6px 16px; background:var(--surface2);
+      border-bottom:1px solid var(--line); font-family:var(--mono); font-size:12px; letter-spacing:.12em;
+      text-transform:uppercase; color:var(--muted)}
+    .mg-cap b{color:var(--accent)}
+    .mg-body{padding:20px 22px 24px}
+    .mg-body h2{font-size:21px; margin-bottom:10px}
+    .mg-body p{color:var(--muted); font-size:14px; line-height:1.55; margin-bottom:10px}
+    .mg-note b{color:var(--accent)}
+  }
   .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
     background:rgba(11,12,13,.66); backdrop-filter:blur(5px); padding:28px; overflow-y:auto;
     transition:opacity .55s ease, visibility .55s}
@@ -962,14 +977,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=67"></script>
-<link rel="stylesheet" href="nav.css?v=67">
-<script src="themes.js?v=67"></script>
+<script src="drills.js?v=68"></script>
+<link rel="stylesheet" href="nav.css?v=68">
+<script src="themes.js?v=68"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=67"></script>
+<script src="nav.js?v=68"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1097,6 +1112,16 @@
   </div>
 </div>
 <div class="auth-modal" id="authModal"></div>
+<div class="mobile-gate" aria-hidden="true">
+  <div class="mg-card">
+    <div class="mg-cap">hotkey<b>.gg</b></div>
+    <div class="mg-body">
+      <h2>This one needs a real keyboard.</h2>
+      <p>hotkey.gg trains Excel keyboard shortcuts — F-keys, Ctrl chords, Alt ribbon walks — and none of that exists on a touchscreen.</p>
+      <p class="mg-note">Open <b>hotkey.gg</b> on a computer and start drilling.</p>
+    </div>
+  </div>
+</div>
 <div class="landing" id="landing">
   <div class="landing-inner">
     <div class="lbrand">hotkey<b>.gg</b></div>

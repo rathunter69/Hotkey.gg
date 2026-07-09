@@ -1614,3 +1614,22 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   desk); (C) medal-ribbon style (cap hanging from a tier ribbon). Can prototype
   B/C on request.
 - v67.
+
+---
+# ROUND 68 — sober titles, the leaderboard shift bug, level chips wired, mobile gate
+- TITLES DE-WINKED (copy rule): "no mouse allowed"\u2192"keyboard Excel trainer",
+  "the boards / Fastest hands win."\u2192"Leaderboard", "your numbers"\u2192"Stats",
+  "the cheat sheet"\u2192"Shortcut reference", "your card"\u2192"Account", About retitled.
+- LEADERBOARD SHIFT BUG root-caused: filtering to a drill changes page height;
+  the scrollbar appears/disappears and the CENTERED wrap jumps horizontally.
+  FIX: html{scrollbar-gutter:stable} on ALL pages. Chip hover translateY lift
+  also removed (bubbles drifted off the shared baseline — Wolf's "rounded
+  bubbles misaligned" report).
+- LEVEL CHIPS WIRED: hkLevelChip now renders beside LVL in the nav player card
+  (26px), stats hero (20px), account (24px where present).
+- REGALIA VISIBILITY (it WAS live, just small): emblem sizes bumped — nav
+  button 16\u219220, player card 22\u219230, leaderboard your-card 22\u219228 / rows
+  18-20\u219222-24, stats hero 34\u219246, account 42\u219254.
+- MOBILE GATE: \u2264740px or coarse-pointer tablets get a frame-language card —
+  "This one needs a real keyboard" — over the game (z 400, bg full).
+- v68.
