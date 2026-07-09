@@ -1633,3 +1633,23 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - MOBILE GATE: \u2264740px or coarse-pointer tablets get a frame-language card —
   "This one needs a real keyboard" — over the game (z 400, bg full).
 - v68.
+
+---
+# ROUND 69 — welcome-back landing, gate double-sign-in, table flex fill, punchier crests, headers to the line
+- WELCOME BACK: a live session rewrites the landing dialog — "Welcome back." +
+  "one \u21b5 drops you on the sheet", login button hidden. If the user signed in
+  FROM the landing, the gate auto-advances once member+handle settle (700ms
+  defer — onSession loads them async; advancing immediately re-prompted the
+  code, which WAS the double-sign-in bug).
+- SHEET TO TABS, STRUCTURAL FIX: r65's measured rowH was CAPPED (48px), so tall
+  frames w/ few rows still left a gap under the table. Now .gridwrap table
+  {flex:1} — the table itself stretches to the strip and table layout
+  distributes the surplus across rows (--cellh acts as the floor). Zero gap at
+  any geometry.
+- CRESTS, PUNCH PASS: 16.6r halo disc in the tier metal (op .12) behind every
+  crest — pops on any surface; rims 1.8\u21922.3; regalia ring default weight
+  1.4\u21921.7 and +.25 opacity.
+- SATELLITE HEADERS TO THE GAME LINE: h1s were still display-size
+  (40-46px clamps) with 24px pads; now 22px titles, 12/10 pads — first content
+  box sits where the frame sits.
+- v69.

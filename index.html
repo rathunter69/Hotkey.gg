@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=68" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=68">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=68">
+<link rel="icon" href="favicon.ico?v=69" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=69">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=69">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -99,7 +99,8 @@
 
   .gridwrap{background:var(--surface); border:0; border-radius:0;
     padding:14px 14px 3px; overflow:visible; position:relative; min-width:0;
-    align-self:stretch; display:flex; flex-direction:column}   /* r65: sheet runs to the tab strip's edge */
+    align-self:stretch; display:flex; flex-direction:column}
+  .gridwrap table{flex:1 1 auto}   /* r69: the table FLEXES to the tab strip; row heights distribute the surplus (--cellh is a floor in table layout) */
   table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}   /* r65: Calibri renders smaller — sized up */
   .edcaret{color:var(--accent); font-weight:700; animation:edblink 1s steps(1) infinite; margin:0 -2px}
   @keyframes edblink{50%{opacity:0}}
@@ -977,14 +978,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=68"></script>
-<link rel="stylesheet" href="nav.css?v=68">
-<script src="themes.js?v=68"></script>
+<script src="drills.js?v=69"></script>
+<link rel="stylesheet" href="nav.css?v=69">
+<script src="themes.js?v=69"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=68"></script>
+<script src="nav.js?v=69"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -7113,7 +7114,21 @@ async function initAuth(){
 async function onSession(session){
   if(arguments[0]){ window.__hkHasSession=true;
     try{ localStorage.setItem('hotkey_onboarded','1'); }catch(e){}
-    if(typeof onboardOpen!=='undefined' && onboardOpen) closeOnboard(); }
+    if(typeof onboardOpen!=='undefined' && onboardOpen) closeOnboard();
+    // r69: greet returning users on the landing dialog + let one ↵ carry them in —
+    // and if they just signed in from the landing, don't gate them AGAIN inside.
+    try{
+      const l=$('landing');
+      if(l && !l.classList.contains('gone')){
+        const h1=l.querySelector('h1'), le=l.querySelector('.lede'), lb2=$('loginBtn');
+        if(h1) h1.innerHTML='Welcome back<span class="dim">.</span>';
+        if(le) le.textContent='Signed in and ready — one ↵ drops you on the sheet.';
+        if(lb2) lb2.style.display='none';
+        // landing sign-in satisfies the gate — advance AFTER member/handle fetch settles (onSession loads them async)
+        setTimeout(()=>{ try{ if(!isAnonUser() && me_member && me_handle) advanceAccess(); }catch(e){} }, 700);
+      }
+    }catch(e){}
+  }
   me_user = session ? session.user : null;
   if(me_user){
     try{

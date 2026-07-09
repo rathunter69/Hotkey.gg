@@ -166,7 +166,8 @@ window.rankEmblem = function(tierName, size, bucket){
     {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},
   ];
   const p=P[i];
-  const ring=(r,op,w)=>'<circle cx="17" cy="17" r="'+r+'" fill="none" stroke="'+p.rim+'" stroke-width="'+(w||1.4)+'" opacity="'+op+'"/>';
+  const halo='<circle cx="17" cy="17" r="16.6" fill="'+p.rim+'" opacity=".12"/>';   // r69: contrast disc — the crest pops on ANY surface
+  const ring=(r,op,w)=>'<circle cx="17" cy="17" r="'+r+'" fill="none" stroke="'+p.rim+'" stroke-width="'+(w||1.7)+'" opacity="'+Math.min(1,op+.25)+'"/>';
   const spokes=(n,r1,r2,w,op)=>{ let s=''; for(let k=0;k<n;k++){ const a=(Math.PI*2*k)/n - Math.PI/2;
       s+='<path d="M'+(17+r1*Math.cos(a)).toFixed(1)+' '+(17+r1*Math.sin(a)).toFixed(1)+
          'L'+(17+r2*Math.cos(a)).toFixed(1)+' '+(17+r2*Math.sin(a)).toFixed(1)+
@@ -202,9 +203,9 @@ window.rankEmblem = function(tierName, size, bucket){
     for(let k=0;k<3;k++) pips+='<circle cx="'+(13+k*4)+'" cy="31.4" r="1.5" fill="'+(k<n?p.rim:'rgba(120,124,134,.5)')+'"/>';
   }
   return '<svg class="rank-emblem'+(i===7?' emblem-max':'')+'" viewBox="0 0 34 34" width="'+size+'" height="'+size+'" aria-hidden="true">'+
-    plate + fx1 +
+    halo + plate + fx1 +
     '<rect x="6" y="8" width="22" height="20" rx="5" fill="rgba(0,0,0,.5)"/>'+
-    '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="'+p.face+'" stroke="'+p.rim+'" stroke-width="1.8"/>'+
+    '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="'+p.face+'" stroke="'+p.rim+'" stroke-width="2.3"/>'+
     '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="3.2" style="paint-order:stroke" opacity=".35"/>'+
     '<rect x="9.4" y="8.4" width="15.2" height="6" rx="3" fill="'+p.top+'"/>'+
     '<path d="M10.5 9.6h13" stroke="rgba(255,255,255,.13)" stroke-width="1" stroke-linecap="round"/>'+
