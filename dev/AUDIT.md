@@ -1558,3 +1558,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - RULE: no inlined copies of shared dictionaries. One source or it will drift —
   it DID drift, for eleven rounds.
 - v64.
+
+---
+# ROUND 65 — landing as dialog, sheet to the tabs' edge, Calibri cells
+- LANDING \u2192 DIALOG: the splash structure is gone; .landing-inner is now a
+  600px frame-language card (surface, hairline, 12px radius) with a strip cap
+  (the brand line rides the 34px surface2 strip), floating over a blurred game.
+  Gate/CTA content unchanged, left-aligned inside the card.
+- SHEET TO THE EDGE: gridwrap bottom pad 14\u21923px; measured rowH ceiling 42\u219248
+  and recalibrated to the new padding — rows now eat the box down to the tab
+  strip's border.
+- CALIBRI CELLS (Wolf wanted arial/calibri or "something softer, less matrix"):
+  cells now render in Calibri/Segoe/Arial (Excel's OWN default face — softer
+  exactly where the eyes live, and MORE authentic, 13.5px), while all interface
+  chrome keeps JetBrains Mono (the brand). Formula bar stays mono. If Wolf wants
+  the softness pushed into the chrome too, that's a --mono/--sans swap away —
+  offered, not assumed.
+- v65.
