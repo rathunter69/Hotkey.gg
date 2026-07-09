@@ -151,51 +151,74 @@ window.RANK_EMBLEM_IDX = {'MBA Associate':0,'Candidate':1,'Summer Analyst':2,
 window.rankEmblem = function(tierName, size, bucket){
   const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
   size = size || 16;
-  /* THE KEYCAP LADDER, desk edition. MBA Associate's cap bears a MOUSE (they still
-     reach for it). MD is crimson power with a crown but no F4 — never touches Excel.
-     Second-Year Analyst is the radiant final boss. Layered flats, no gradient ids. */
+  /* THE KEYCAP LADDER v2 (r67): same crest, escalating LoL-style regalia.
+     Transparent ground; layered flats only (crisp at 16px); tier metals are
+     doctrine. Contrast armor for light themes: a dark under-stroke on every
+     rim + rgba under-shadow instead of near-black hex. */
   const P=[
-    {rim:'#8a8271', face:'#25231e', top:'#2f2d26', leg:'#a89e88', fx:'mouse'},                  // MBA — dusty plastic + mouse
-    {rim:'#5a5d63', face:'#2a2c30', top:'#34373c', leg:'#8b8e94', fx:null},                     // Candidate — plain
-    {rim:'#b0793f', face:'#2e2418', top:'#3d3020', leg:'#e0a35c', fx:null},                     // Summer — bronze
-    {rim:'#b9c2cf', face:'#23262b', top:'#31353c', leg:'#dde4ee', fx:'ticks'},                  // First-Year — machined silver
-    {rim:'#e3b341', face:'#2b2413', top:'#3a301a', leg:'#ffd769', fx:'laurel'},                 // Associate — gold, laureled
-    {rim:'#7fd4c1', face:'#132a26', top:'#1a3833', leg:'#a9f0e0', fx:'wings'},                  // VP — platinum ice, winged
-    {rim:'#e06a55', face:'#2d1512', top:'#3c1d18', leg:'#ffb3a3', fx:'crown'},                  // MD — crimson corner office
-    {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},                // Second-Year — radiant diamond
+    {rim:'#8a8271', face:'#25231e', top:'#2f2d26', leg:'#a89e88', fx:'mouse'},
+    {rim:'#5a5d63', face:'#2a2c30', top:'#34373c', leg:'#8b8e94', fx:null},
+    {rim:'#b0793f', face:'#2e2418', top:'#3d3020', leg:'#e0a35c', fx:'ring'},
+    {rim:'#b9c2cf', face:'#23262b', top:'#31353c', leg:'#dde4ee', fx:'studs'},
+    {rim:'#e3b341', face:'#2b2413', top:'#3a301a', leg:'#ffd769', fx:'laurel'},
+    {rim:'#7fd4c1', face:'#132a26', top:'#1a3833', leg:'#a9f0e0', fx:'wings'},
+    {rim:'#e06a55', face:'#2d1512', top:'#3c1d18', leg:'#ffb3a3', fx:'crown'},
+    {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},
   ];
   const p=P[i];
-  let fx1='', fx2='';
-  if(p.fx==='ticks')  fx1='<path d="M9 25.5h4 M15 25.5h4 M21 25.5h4" stroke="'+p.rim+'" stroke-width="1.4" stroke-linecap="round"/>';
-  if(p.fx==='laurel') fx1='<path d="M7 26c-2.4-2-3.4-5-3-8 M27 26c2.4-2 3.4-5 3-8" fill="none" stroke="'+p.rim+'" stroke-width="1.6" stroke-linecap="round"/>'+
-                          '<path d="M4.6 21.5l-2-.4 M5 18.6l-1.9-1 M29.4 21.5l2-.4 M29 18.6l1.9-1" stroke="'+p.rim+'" stroke-width="1.3" stroke-linecap="round"/>';
-  if(p.fx==='wings')  fx1='<path d="M5 12C2.2 11 .8 8.6.4 6.4 3.4 7 5.6 8.4 6.8 10.4Z M29 12c2.8-1 4.2-3.4 4.6-5.6-3 .6-5.2 2-6.4 4Z" fill="'+p.rim+'" opacity=".9"/>';
-  if(p.fx==='crown')  fx1='<path d="M11 5.6l2.2 2.6L17 4.6l3.8 3.6L23 5.6l-1 4.4H12z" fill="'+p.rim+'"/>';
-  if(p.fx==='radiant'){
-    fx1='<path d="M17 .8l1 3.2 M17 .8l-1 3.2 M6.5 3.5l2.2 2.4 M27.5 3.5l-2.2 2.4 M2 11h3.2 M32 11h-3.2" stroke="'+p.rim+'" stroke-width="1.5" stroke-linecap="round" opacity=".85"/>'+
-        '<path d="M12.6 4.6L14 1.8l3 1.7 3-1.7 1.4 2.8" fill="none" stroke="'+p.leg+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
-    fx2='<path d="M17 12.2l1.1 2.6 2.8.3-2.1 1.8.7 2.7-2.5-1.5-2.5 1.5.7-2.7-2.1-1.8 2.8-.3z" fill="'+p.leg+'"/>';
-  }
+  const ring=(r,op,w)=>'<circle cx="17" cy="17" r="'+r+'" fill="none" stroke="'+p.rim+'" stroke-width="'+(w||1.4)+'" opacity="'+op+'"/>';
+  const spokes=(n,r1,r2,w,op)=>{ let s=''; for(let k=0;k<n;k++){ const a=(Math.PI*2*k)/n - Math.PI/2;
+      s+='<path d="M'+(17+r1*Math.cos(a)).toFixed(1)+' '+(17+r1*Math.sin(a)).toFixed(1)+
+         'L'+(17+r2*Math.cos(a)).toFixed(1)+' '+(17+r2*Math.sin(a)).toFixed(1)+
+         '" stroke="'+p.rim+'" stroke-width="'+w+'" stroke-linecap="round" opacity="'+op+'"/>'; } return s; };
+  const dots=(n,r,rr,op)=>{ let s=''; for(let k=0;k<n;k++){ const a=(Math.PI*2*k)/n - Math.PI/2 + Math.PI/n;
+      s+='<circle cx="'+(17+r*Math.cos(a)).toFixed(1)+'" cy="'+(17+r*Math.sin(a)).toFixed(1)+'" r="'+rr+'" fill="'+p.leg+'" opacity="'+op+'"/>'; } return s; };
+  // ---- regalia (escalates hard) ----
+  let plate='', fx1='';
+  if(p.fx==='ring')   plate = ring(15.2,.55);
+  if(p.fx==='studs')  plate = ring(15.2,.6) + dots(8,15.2,1.1,.85);
+  if(p.fx==='laurel'){ plate = ring(15.5,.5,1.2)+ring(13.9,.3,1);
+    fx1='<path d="M7 26c-2.4-2-3.4-5-3-8 M27 26c2.4-2 3.4-5 3-8" fill="none" stroke="'+p.rim+'" stroke-width="1.6" stroke-linecap="round"/>'+
+        '<path d="M4.6 21.5l-2-.4 M5 18.6l-1.9-1 M29.4 21.5l2-.4 M29 18.6l1.9-1" stroke="'+p.rim+'" stroke-width="1.3" stroke-linecap="round"/>'; }
+  if(p.fx==='wings'){ plate = ring(15.5,.5,1.2) + dots(2,15.5,1.4,.9);
+    fx1='<path d="M5 12C2.2 11 .8 8.6 .4 6.4 3.4 7 5.6 8.4 6.8 10.4Z M29 12c2.8-1 4.2-3.4 4.6-5.6-3 .6-5.2 2-6.4 4Z" fill="'+p.rim+'" opacity=".9"/>'; }
+  if(p.fx==='crown'){ plate = ring(15.6,.55,1.3)+ring(13.9,.35,1) + spokes(4,13.5,16.4,1.5,.7);
+    fx1='<path d="M11 5.6l2.2 2.6L17 4.6l3.8 3.6L23 5.6l-1 4.4H12z" fill="'+p.rim+'"/>'; }
+  if(p.fx==='radiant'){ plate = spokes(12,14.2,16.8,1.4,.8) + ring(13.6,.5,1.1) + dots(6,15.6,1,.9);
+    fx1='<path d="M12.6 4.6L14 1.8l3 1.7 3-1.7 1.4 2.8" fill="none" stroke="'+p.leg+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'; }
+  // ---- legend ----
   let legend;
   if(p.fx==='mouse'){
     legend='<g fill="none" stroke="'+p.leg+'" stroke-width="1.4" stroke-linecap="round">'+
       '<rect x="13.4" y="11.5" width="7.2" height="10.5" rx="3.6"/><path d="M17 11.5v3.6"/></g>';
-  } else if(p.fx==='radiant'){ legend=fx2; }
-  else if(i===1){ legend=''; }
+  } else if(p.fx==='radiant'){
+    legend='<path d="M17 12.2l1.1 2.6 2.8.3-2.1 1.8.7 2.7-2.5-1.5-2.5 1.5.7-2.7-2.1-1.8 2.8-.3z" fill="'+p.leg+'"/>';
+  } else if(i===1){ legend=''; }
   else if(p.fx==='crown'){ legend='<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="8.5" fill="'+p.leg+'">MD</text>'; }
   else { legend='<text x="17" y="21.5" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="9.5" fill="'+p.leg+'">F4</text>'; }
   let pips='';
   if(bucket){
     const n = bucket==='Top Bucket'?3:(bucket==='Middle Bucket'?2:1);
-    for(let k=0;k<3;k++) pips+='<circle cx="'+(13+k*4)+'" cy="31.4" r="1.5" fill="'+(k<n?p.rim:'#3a3d42')+'"/>';
+    for(let k=0;k<3;k++) pips+='<circle cx="'+(13+k*4)+'" cy="31.4" r="1.5" fill="'+(k<n?p.rim:'rgba(120,124,134,.5)')+'"/>';
   }
   return '<svg class="rank-emblem'+(i===7?' emblem-max':'')+'" viewBox="0 0 34 34" width="'+size+'" height="'+size+'" aria-hidden="true">'+
-    fx1+
-    '<rect x="6" y="8" width="22" height="20" rx="5" fill="#0a0b0c"/>'+
+    plate + fx1 +
+    '<rect x="6" y="8" width="22" height="20" rx="5" fill="rgba(0,0,0,.5)"/>'+
     '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="'+p.face+'" stroke="'+p.rim+'" stroke-width="1.8"/>'+
+    '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="3.2" style="paint-order:stroke" opacity=".35"/>'+
     '<rect x="9.4" y="8.4" width="15.2" height="6" rx="3" fill="'+p.top+'"/>'+
+    '<path d="M10.5 9.6h13" stroke="rgba(255,255,255,.13)" stroke-width="1" stroke-linecap="round"/>'+
     legend + pips +
     '</svg>';
+};
+
+window.hkLevelChip = function(lvl, size){
+  size=size||22;
+  const m = lvl>=20?['#8ab4ff','#c4d7ff'] : lvl>=15?['#e3b341','#ffd769'] : lvl>=10?['#b9c2cf','#dde4ee'] : lvl>=5?['#b0793f','#e0a35c'] : ['#6f7480','#a8adb6'];
+  return '<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true" style="vertical-align:-4px">'+
+    '<rect x="2.5" y="4" width="19" height="17" rx="4.5" fill="rgba(0,0,0,.5)"/>'+
+    '<rect x="3.5" y="2.8" width="17" height="15.6" rx="4" fill="#2a2d34" stroke="'+m[0]+'" stroke-width="1.6"/>'+
+    '<text x="12" y="14.6" text-anchor="middle" font-family="ui-monospace,monospace" font-weight="700" font-size="'+(String(lvl).length>2?8:9.5)+'" fill="'+m[1]+'">'+lvl+'</text></svg>';
 };
 
 /* ---- shared rank/level math for account.html + stats.html (older pages keep
@@ -312,10 +335,16 @@ window.hkBadge = function(id, earned, size, color){
     fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
   };
   const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
+  const hexIn='M13 5.1 L19.7 9 V17 L13 20.9 L6.3 17 V9 Z';
   const col = earned ? (color||'var(--warn)') : 'var(--faint)';
+  // r67: earned medals wear the regalia — double ring + apex notches; locked stays a ghost.
+  const crown = earned ? '<path d="M13 .8v1.6 M5.2 5.4l1.3.9 M20.8 5.4l-1.3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>' : '';
   return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+'">'+
-    '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?'.14':'.05')+'"/>'+
+    crown+
+    '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?'.16':'.05')+'"/>'+
     '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.6"/>'+
+    '<path d="'+hex+'" fill="none" stroke="rgba(0,0,0,.3)" stroke-width="3" style="paint-order:stroke" opacity=".3"/>'+
+    (earned?'<path d="'+hexIn+'" fill="none" stroke="currentColor" stroke-width=".9" opacity=".55"/>':'')+
     '<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(G[id]||G.fin)+'</g>'+
     '</svg>';
 };

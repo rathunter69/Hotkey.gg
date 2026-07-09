@@ -1588,3 +1588,29 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   misalignment), leaderboard pads 28\u219224, stats 880\u21921180, account 760\u21921180,
   About 1080\u21921180, all pads 24. Titles start at the same x on every page.
 - v66.
+
+---
+# ROUND 67 — the regalia pass: emblems v2, badges v2, favicon, level chip; page tops flush
+- RANK EMBLEMS v2 (full devoted pass per Wolf): the keycap crest keeps its
+  identity; each tier now earns ESCALATING REGALIA behind it — Summer: bronze
+  ring \u00b7 First-Year: machined ring + 8 studs \u00b7 Associate: gold double-ring +
+  laurels \u00b7 VP: platinum ring + wings + ice studs \u00b7 MD: crimson double-ring +
+  corner rays + crown \u00b7 Second-Year: full 12-spoke starburst + orbit sparks.
+  All transparent-ground, layered flats (crisp at 16px). CROSS-THEME ARMOR:
+  rgba(0,0,0,.5) under-shadow (was near-black hex), a .35 dark paint-order
+  under-stroke on the rim, and a white bevel hairline — reads on Daylight and
+  Terminal alike. Neutral pip color de-hardcoded.
+- BADGES v2: earned hex medals gain apex crown-notches, an inner ring, and the
+  same dark under-stroke; locked stays a ghost outline.
+- window.hkLevelChip(lvl): keycap chip w/ metal band by level (grey<5, bronze,
+  silver, gold, radiant 20+) — available for account/stats/nav wiring next turn
+  (display sites not blind-wired).
+- FAVICON: the crest in grey-dracula (#292b31 tile, sage rim, F4).
+- PAGE TOPS FLUSH (Wolf: content shifted down from prior iterations): header
+  padding unified to 24/16 (was 64/56/52/32) — first content box now sits at
+  the game frame's line on every page.
+- Direction options if Wolf wants a different vector: (A) shipped — regalia
+  behind the cap; (B) shields containing the cap (heavier, more LoL, less
+  desk); (C) medal-ribbon style (cap hanging from a tier ribbon). Can prototype
+  B/C on request.
+- v67.
