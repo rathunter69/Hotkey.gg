@@ -1857,3 +1857,24 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   markup (the harness previously always saw the id present, which is why it
   never caught removed-element listeners). LESSON: after removing markup, boot
   the harness against the NEW markup id-set before shipping.
+
+---
+# ROUND 82 — rapid-fire ops, version-medal artwork, density III, flagship blocks
+- RECORD CORRECTION: the "empty" prior turn actually SHIPPED (repo log: beta
+  brand tag, weekly retired from UI, analyst-#### identity fallback, account
+  Security+Appearance cards, + a boot-TypeError hotfix) — only the chat reply
+  was lost. That work is v81; this round is v82.
+- RAPID-FIRE +3 Group-B ops (9 ribbon ops): comma format (Alt H K), percent
+  format (Alt H P), bold-the-ribbon-way (Alt H 1).
+- VERSION MEDALS: c1-c8 glyphs tell the build's story — statement lines,
+  balance scale, waterfall steps, chain links, debt corkscrew, NWC gears,
+  three-statement triangle, rocket for v8 SHIP IT.
+- DENSITY III: audit 6→8 rows; sumif 7→9 (ranges → $10 incl. req/guide);
+  lookup 5→7 companies. VERIFICATION CATCH: lookup's checks held a HARDCODED
+  r<=6 loop the range-swap missed — companies in rows 7-8 would've been
+  invisible to the grader; set -e stopped the ship, bound fixed to r<=8,
+  40-seed deep verify. RULE: range swaps must sweep numeric loop bounds too.
+- FLAGSHIP BLOCKS: 'Full Builds' breaks formation — full-width picker row,
+  accent frame, ◆ FLAGSHIP tag, larger bylines w/ par chips. Free play stays
+  ungated (doctrine): prominence over locks.
+- v82.

@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=81" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=81">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=81">
+<link rel="icon" href="favicon.ico?v=82" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=82">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=82">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -662,6 +662,14 @@
   .pk-byline.cur{color:var(--accent); border-color:var(--accent-dim); font-weight:700}
   .pk-byline.held i{color:var(--accent); font-style:normal; font-size:10px}
   .pk-byline i{color:var(--faint); font-style:normal}
+  /* r81: FLAGSHIPS break formation — full-width block, accent frame, par shown */
+  .pk-flagship{grid-column:1/-1; border-color:var(--accent-dim); background:color-mix(in srgb, var(--accent-glow) 45%, transparent)}
+  .pk-flagship .pk-glabel{background:color-mix(in srgb, var(--accent-glow) 60%, var(--surface2))}
+  .pk-flagtag{margin-left:auto; font-family:var(--mono); font-size:9px; letter-spacing:.16em; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:5px; padding:2px 7px; text-transform:uppercase}
+  .pk-flagship .pk-byline{font-size:12.5px; padding:6px 12px; border-color:var(--accent-dim); color:var(--text)}
+  .pk-flagship .pk-byline:hover{background:var(--accent-glow)}
+  .pk-flagship .pk-byline .pk-par{color:var(--muted); font-size:10px; margin-left:7px}
   @media(max-width:980px){ #pkGroups{grid-template-columns:1fr 1fr} }
   @media(max-width:640px){ #pkGroups{grid-template-columns:1fr} }
   .pk-row{background:color-mix(in srgb, var(--surface) 55%, transparent)}
@@ -1015,14 +1023,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=81"></script>
-<link rel="stylesheet" href="nav.css?v=81">
-<script src="themes.js?v=81"></script>
+<script src="drills.js?v=82"></script>
+<link rel="stylesheet" href="nav.css?v=82">
+<script src="themes.js?v=82"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=81"></script>
+<script src="nav.js?v=82"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1589,14 +1597,14 @@ const CHALLENGES = {
   lookup:{
     name:'Lookup', label:'Look it up', par:50, parKeys:32,
     prompt:'Pull a figure out of the table with INDEX/MATCH. The query panel names a company and a metric — return that number into the Answer cell. The metric columns are shuffled every round, so read the headers and aim INDEX at the right column.',
-    req:'<em>INDEX + MATCH</em> · MATCH(G2, A2:A6, 0) finds the company\'s row, then INDEX that metric\'s column · e.g. <em>=INDEX(C2:C6, MATCH(G2,A2:A6,0))</em> — or two-way <em>=INDEX(B2:D6, MATCH(G2,A2:A6,0), MATCH(G3,B1:D1,0))</em>',
+    req:'<em>INDEX + MATCH</em> · MATCH(G2, A2:A8, 0) finds the company\'s row, then INDEX that metric\'s column · e.g. <em>=INDEX(C2:C8, MATCH(G2,A2:A8,0))</em> — or two-way <em>=INDEX(B2:D8, MATCH(G2,A2:A8,0), MATCH(G3,B1:D1,0))</em>',
     guide:[
-      'in G4 type <kbd>=INDEX(</kbd> the queried metric\'s column, e.g. C2:C6 <kbd>, MATCH(G2,A2:A6,0))</kbd> — MATCH locates the company row, INDEX pulls from that column',
+      'in G4 type <kbd>=INDEX(</kbd> the queried metric\'s column, e.g. C2:C8 <kbd>, MATCH(G2,A2:A8,0))</kbd> — MATCH locates the company row, INDEX pulls from that column',
       'if the number looks wrong, INDEX is pointed at the wrong column — match it to the Metric named in G3',
     ],
     targets:['G4','G4'],
     demo(){ const col=this._mcol; return [
-      {sel:'G4', keys:[...T('=INDEX('+col+'2:'+col+'6,MATCH(G2,A2:A6,0))'), Kb.enter]},
+      {sel:'G4', keys:[...T('=INDEX('+col+'2:'+col+'6,MATCH(G2,A2:A8,0))'), Kb.enter]},
     ]; },
     build(){
       const cells={};
@@ -1604,7 +1612,7 @@ const CHALLENGES = {
       for(let k=metrics.length-1;k>0;k--){ const j=rnd(0,k); [metrics[k],metrics[j]]=[metrics[j],metrics[k]]; }
       cells['A1']={...blankCell(),value:'Company',txt:true,bold:true};
       metrics.forEach((mn,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:mn,txt:true,bold:true});
-      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox'];
+      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox','Foxtrot Cap','Gemini Grp'];
       const data={};
       names.forEach((nm,r0)=>{ const r=r0+2; cells['A'+r]={...blankCell(),value:nm,txt:true}; data[nm]={};
         metrics.forEach((mn,i)=>{ const v=rnd(2,90)*10; data[nm][mn]=v; cells[colLetter(i+2)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; }); });
@@ -1618,7 +1626,7 @@ const CHALLENGES = {
     },
     checks(S){
       const company=S.cells['G2'].value, metric=S.cells['G3'].value;
-      let rowIdx=-1; for(let r=2;r<=6;r++){ if(eqLoose(S.cells['A'+r].value,company)) rowIdx=r; }
+      let rowIdx=-1; for(let r=2;r<=8;r++){ if(eqLoose(S.cells['A'+r].value,company)) rowIdx=r; }
       let mcol=-1; for(let c=2;c<=4;c++){ if(eqLoose(S.cells[colLetter(c)+1].value,metric)) mcol=c; }
       const expected=(rowIdx>0&&mcol>0)?S.cells[colLetter(mcol)+rowIdx].value:null;
       const g=S.cells['G4']; const f=(g&&g.formula)?g.formula.toUpperCase().replace(/\s/g,''):'';
@@ -3540,7 +3548,7 @@ const CHALLENGES = {
       cells['E1']={...blankCell(),value:'Price',txt:true,bold:true};
       const price=rnd(3,9)*5;
       cells['E2']={...blankCell(),value:price,fontColor:'blue'};
-      const n=6, items=['Widgets','Gadgets','Sprockets','Flanges','Gears','Bolts'];
+      const n=8, items=['Widgets','Gadgets','Sprockets','Flanges','Gears','Bolts','Rivets','Pipes'];
       const badRow=rnd(3,n+1);   // never the first row \u2014 the pattern must establish itself first
       for(let i=0;i<n;i++){
         const r=i+2, u=rnd(20,400)*5;
@@ -3570,15 +3578,15 @@ const CHALLENGES = {
   sumif:{
     name:'SUMIF', label:'Roll up the segments', par:52, parKeys:35,
     prompt:'Roll the ledger up by segment. Seven line items, three segments — build one SUMIF with anchored ranges at E2, then fill it down for the other two. $-lock the ranges so the fill doesn\'t walk them.',
-    req:'<em>at E2</em> type <em>=SUMIF($A$2:$A$8,D2,$B$2:$B$8)</em> · <em>↵</em> · back up, select E2:E4, <em>ctrl+d</em>',
+    req:'<em>at E2</em> type <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> · <em>↵</em> · back up, select E2:E4, <em>ctrl+d</em>',
     guide:[
-      'at E2 type <kbd>=SUMIF($A$2:$A$8,D2,$B$2:$B$8)</kbd> <kbd>↵</kbd> — criteria range, this row\'s segment, sum range',
+      'at E2 type <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>↵</kbd> — criteria range, this row\'s segment, sum range',
       'the $ anchors matter: only D2 should walk when you fill down',
       'back up (<kbd>↑</kbd>), <kbd>shift</kbd>+<kbd>↓</kbd>&times;2, then <kbd>ctrl</kbd>+<kbd>d</kbd>',
     ],
     targets:['E2','E2:E4'],
     demo(){ return [
-      {sel:'E2', keys:[...T('=SUMIF($A$2:$A$8,D2,$B$2:$B$8)'), Kb.enter]},
+      {sel:'E2', keys:[...T('=SUMIF($A$2:$A$10,D2,$B$2:$B$10)'), Kb.enter]},
       {sel:'E2:E4', keys:[Kb.fillD]},
     ]; },
     build(){
@@ -3589,8 +3597,8 @@ const CHALLENGES = {
       cells['E1']={...blankCell(),value:'Total',txt:true,bold:true};
       const cats=['NA','EMEA','APAC'];
       const sums={NA:0,EMEA:0,APAC:0};
-      for(let i=0;i<7;i++){
-        const cat = i<3 ? cats[i] : cats[rnd(0,2)];      // each segment appears at least once
+      for(let i=0;i<9;i++){
+        const cat = i<3 ? cats[i] : cats[rnd(0,2)];   // r81: 9 data rows      // each segment appears at least once
         const v = rnd(10,240)*10;
         sums[cat]+=v;
         cells['A'+(i+2)]={...blankCell(),value:cat,txt:true};
@@ -5675,6 +5683,18 @@ const RF_OPS = [
     make: ()=> ({text:String(rfBig())}),
     instr: ()=>'It\u2019s a hardcode \u2014 blue the font',
     show: c=>({text:c.text}), solved: c=>({text:c.text, color:'#3b6fd4'}) },
+  { op:'num_comma', label:'Comma format', keys:['Alt','H','K'], matchSeq: RFM.altSeq(['h','k']),
+    make: ()=> { const v=rnd(48,980)*1000; return {text:String(v), fmt:v.toLocaleString('en-US')}; },
+    instr: ()=>'Raw thousands \u2014 comma format it',
+    show: c=>({text:c.text}), solved: c=>({text:c.fmt}) },
+  { op:'num_pct', label:'Percent format', keys:['Alt','H','P'], matchSeq: RFM.altSeq(['h','p']),
+    make: ()=> { const p=rnd(4,96); return {text:'0.'+String(p).padStart(2,'0'), fmt:p+'%'}; },
+    instr: ()=>'It\u2019s a rate \u2014 percent format',
+    show: c=>({text:c.text}), solved: c=>({text:c.fmt}) },
+  { op:'bold_ribbon', label:'Bold (ribbon)', keys:['Alt','H','1'], matchSeq: RFM.altSeq(['h','1']),
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Bold it \u2014 the ribbon way',
+    show: c=>({text:c.text}), solved: c=>({text:c.text, bold:true}) },
   { op:'autofit', label:'Autofit', keys:['Alt','H','O','I'], matchSeq: RFM.altSeq(['h','o','i']),
     make: ()=> ({text:pickHeader()+' \u2014 cut off\u2026'}),
     instr: ()=>'Column\u2019s too narrow \u2014 autofit it',
@@ -7003,8 +7023,9 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
   groups.forEach(g=>{
     const gcol=(window.HOTKEY_GROUP_COLORS||{})[g.name]||'var(--muted)';
     const __adv=(window.HOTKEY_PREMIUM&&window.HOTKEY_PREMIUM.groups||[]).includes(g.name);
-    const sec=document.createElement('div'); sec.className='pk-group'+(__adv?' pk-adv':'');
-    sec.innerHTML='<div class="pk-glabel"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+gcol+';margin-right:8px;vertical-align:1px"></span>'+g.name+(__adv?' <span class="pk-advtag">\u25c6 advanced</span>':'')+'</div>';
+    const __flag = g.name==='Full Builds';
+    const sec=document.createElement('div'); sec.className='pk-group'+(__adv?' pk-adv':'')+(__flag?' pk-flagship':'');
+    sec.innerHTML='<div class="pk-glabel"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+gcol+';margin-right:8px;vertical-align:1px"></span>'+g.name+(__adv?' <span class="pk-advtag">\u25c6 advanced</span>':'')+(__flag?'<span class="pk-flagtag">\u25c6 flagship</span>':'')+'</div>';
     // r80: the block body is a byline cloud — small clickable drill names,
     // one line each, PB tick when held. Detail lives in the game; this is a map.
     const cloud=document.createElement('div'); cloud.className='pk-cloud';
@@ -7013,7 +7034,9 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
       const chip=document.createElement('span');
       chip.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'');
       chip.dataset.key=key;
-      chip.innerHTML=escHtml(C.name||key)+(PB[key]!==undefined?' <i>\u2713</i>':'');
+      chip.innerHTML=escHtml(C.name||key)+
+        (GROUP_OF[key]==='Full Builds'?'<span class="pk-par">par '+(C.par||'')+'s</span>':'')+
+        (PB[key]!==undefined?' <i>\u2713</i>':'');
       chip.title=(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'');
       chip.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
       cloud.appendChild(chip);

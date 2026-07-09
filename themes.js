@@ -332,14 +332,14 @@ window.hkBadge = function(id, earned, size, color){
     crn:'<path d="M8 17l-1-6 3.4 2.4L13 9.5l2.6 3.9L19 11l-1 6z"/>',
     day:'<circle cx="13" cy="13" r="4.4"/><path d="M13 5.6v1.8 M13 18.6v1.8 M5.6 13h1.8 M18.6 13h1.8"/>',
     gnt:'<path d="M8 8v10 M8 8h8l-2 2.5 2 2.5H8"/>',
-    c1:'<path d="M13 8v10 M8 13h10 M13 8l-2.4 2.4 M13 8l2.4 2.4 M13 18l-2.4-2.4 M13 18l2.4-2.4" />',                       // navigation arrows
-    c2:'<rect x="8.5" y="8.5" width="9" height="9" rx="1"/><rect x="10.7" y="10.7" width="4.6" height="4.6" rx=".6"/>',    // formatting frames
-    c3:'<path d="M9 17v-3 M13 17v-6 M17 17v-9"/>',                                                                          // data bars
-    c4:'<path d="M9.5 8.5h7l-5 4.5 5 4.5h-7"/>',                                                                            // sigma
-    c5:'<circle cx="10" cy="10" r="1.7"/><circle cx="16" cy="16" r="1.7"/><path d="M17 9 9 17"/>',                          // percent
-    c6:'<path d="M8 11l5-3.4L18 11 M9 12v5 M13 12v5 M17 12v5 M7.5 17.5h11"/>',                                              // bank columns
-    c7:'<circle cx="12" cy="12" r="3.6"/><path d="M15 15l3.4 3.4"/>',
-    c8:'<path d="M9 9h6l3 3v6H9z M15 9v3h3 M11 20h8 M13 22.5h6"/>',                                                       // lookup lens
+    c1:'<path d="M8 9.5h10 M8 13h10 M8 16.5h6"/>',                                                         // v1 — the statement takes shape
+    c2:'<path d="M13 7v3 M13 10c-3 0-5 1.4-5 3.2 0 1.6 1.4 2.8 3.2 2.8H14.8c1.8 0 3.2 1.2 3.2 2.8"/><path d="M8 19h10"/>',  // v2 — balance
+    c3:'<path d="M7 9h4v3h4v3h4v3H7z"/>',                                                                   // v3 — the waterfall steps down
+    c4:'<path d="M10.5 15.5a3 3 0 0 1 0-4.2l1.8-1.8a3 3 0 0 1 4.2 4.2 M15.5 10.5a3 3 0 0 1 0 4.2l-1.8 1.8a3 3 0 0 1-4.2-4.2"/>',  // v4 — the statements link
+    c5:'<path d="M16.5 8c-4 0-7 1.4-7 3s2.6 3 6 3-5.6 1.2-5.6 2.6 2 2.4 4.6 2.4"/>',                        // v5 — the debt corkscrew
+    c6:'<circle cx="13" cy="13" r="3"/><path d="M13 7.5v2 M13 16.5v2 M7.5 13h2 M16.5 13h2 M9.2 9.2l1.4 1.4 M15.4 15.4l1.4 1.4 M16.8 9.2l-1.4 1.4 M9.6 15.4l-1.4 1.4"/>',  // v6 — working capital gears
+    c7:'<path d="M13 7.5l5.5 9.5h-11z"/><circle cx="13" cy="14" r="1.2"/>',                                 // v7 — three statements, one triangle
+    c8:'<path d="M13 6.5c2.4 2 3.4 4.6 3.4 7.4l-1.6 2.6h-3.6l-1.6-2.6c0-2.8 1-5.4 3.4-7.4z M11.6 16.5l-1.6 3 M14.4 16.5l1.6 3 M13 10.5v2"/>',  // v8 — ship it
     fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
   };
   const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
