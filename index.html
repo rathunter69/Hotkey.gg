@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=78" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=78">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=78">
+<link rel="icon" href="favicon.ico?v=79" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=79">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=79">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -98,7 +98,7 @@
   .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
 
   .gridwrap{background:var(--surface); border:0; border-radius:0;
-    padding:14px 14px 3px; overflow:visible; position:relative; min-width:0;
+    padding:0 10px 3px 0; overflow:visible; position:relative; min-width:0;   /* r79: sheet flush to the frame's top-left, like the real thing */
     align-self:stretch; display:flex; flex-direction:column}
   .gridwrap table{flex:1 1 auto; height:100%}   /* r70b: flex-basis alone doesn't stretch display:table in all engines — height:100% against the resolved gridwrap height does. Rows share the surplus; --cellh is the floor. */
   table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}   /* r65: Calibri renders smaller — sized up */
@@ -637,12 +637,23 @@
     border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px}
 
   /* drill picker overlay */
-  .picker-modal{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none;
-    align-items:center; justify-content:center; z-index:55; padding:24px}
+  /* r79: the picker floats OVER the game — translucent, blurred, "still in the game" */
+  .picker-modal{position:fixed; inset:0; background:color-mix(in srgb, var(--bg) 62%, transparent);
+    backdrop-filter:blur(6px); display:none;
+    align-items:flex-start; justify-content:center; z-index:55; padding:48px 24px 24px}
   .picker-modal.show{display:flex}
-  .pk-card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
-    width:520px; max-width:94vw; max-height:84vh; overflow:auto; padding:22px 22px 16px;
-    box-shadow:0 24px 70px rgba(0,0,0,.6)}
+  .pk-card{background:transparent; border:0; border-radius:0;
+    width:1080px; max-width:96vw; max-height:86vh; overflow:auto; padding:6px 10px 16px;
+    scrollbar-width:thin; scrollbar-color:var(--line) transparent}
+  .pk-card::-webkit-scrollbar{width:6px}
+  .pk-card::-webkit-scrollbar-track{background:transparent}
+  .pk-card::-webkit-scrollbar-thumb{background:var(--line); border-radius:99px}
+  #pkGroups{column-count:3; column-gap:26px}
+  @media(max-width:980px){ #pkGroups{column-count:2} }
+  @media(max-width:640px){ #pkGroups{column-count:1} }
+  .pk-group{break-inside:avoid}
+  .pk-row{background:color-mix(in srgb, var(--surface) 55%, transparent)}
+  .pk-row:hover{background:var(--surface)}
   .pk-title{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase;
     letter-spacing:1px; margin-bottom:14px}
   .pk-group{margin-bottom:14px}
@@ -655,7 +666,7 @@
   .pk-row.cur .pk-name{color:var(--accent)}
   .pk-num{font-family:var(--mono); font-size:11px; color:var(--faint); width:18px; flex:none; text-align:right}
   .pk-info{flex:1 1 auto; min-width:0}
-  .pk-name{font-size:13.5px; font-weight:600; color:var(--text)}
+  .pk-name{font-family:var(--mono); font-size:12.5px; font-weight:600; color:var(--text)}   /* r79: same voice as the rest of the game */
   .pk-desc{font-size:11.5px; color:var(--muted); margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .pk-best{font-family:var(--mono); font-size:11px; color:var(--muted); flex:none}
   .pk-best b{color:var(--accent); font-weight:500}
@@ -992,14 +1003,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=78"></script>
-<link rel="stylesheet" href="nav.css?v=78">
-<script src="themes.js?v=78"></script>
+<script src="drills.js?v=79"></script>
+<link rel="stylesheet" href="nav.css?v=79">
+<script src="themes.js?v=79"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=78"></script>
+<script src="nav.js?v=79"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4357,6 +4368,19 @@ function checkWin(){
     }
   }
   lastXpGain={n:xpGain, note:xpNote};
+  // r79: achievement flags — anti-achievements and time-of-day feats
+  try{
+    const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+    if(mouseUsed) fl.mouseRuns=(fl.mouseRuns||0)+1;
+    if(!mouseUsed && !guidedUsed){
+      if(t>60) fl.slowWins=(fl.slowWins||0)+1;
+      const hr=new Date().getHours(), dy=new Date().getDay();
+      if(hr>=0&&hr<4) fl.nightWin=true;
+      if(hr>=5&&hr<7) fl.dawnWin=true;
+      if(dy===0||dy===6) fl.weekendWin=true;
+    }
+    localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+  }catch(e){}
   // r77: local level estimate — cross a threshold, get the ding (canonical XP reprices
   // server-side from runs; this drives the in-game moment only)
   if(xpGain>0){ try{

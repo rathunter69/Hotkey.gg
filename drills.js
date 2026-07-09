@@ -178,6 +178,27 @@ window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":5
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
    and returns {done, prog, goal}. Rendered as medals on the player card. ---- */
 window.HOTKEY_ACHIEVEMENTS = [
+  /* ---- r79: the creative twenty (incl. anti-achievements — mouse slips, slow burns) ---- */
+  { id:'x_tour',   glyph:'c1', name:'Tourist',            desc:'Attempt 10 different drills',            test:c=>({done:c.att>=10, prog:Math.min(c.att,10), goal:10}) },
+  { id:'x_comp',   glyph:'c1', name:'Completionist',      desc:'Attempt every drill on the board',       test:c=>({done:c.att>=c.menuOrder.length, prog:c.att, goal:c.menuOrder.length}) },
+  { id:'x_sub5',   glyph:'spd', name:'Blink',             desc:'Finish any drill in under 5 seconds',    test:c=>{ const ok=(c.runs||[]).some(r=>r.time_ms<5000); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'x_zero',   glyph:'gnt', name:'No Wasted Keys',    desc:'Match the optimal keystroke count exactly', test:c=>{ const ok=(c.runs||[]).some(r=>r.optimal&&r.keystrokes===r.optimal); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'x_econ',   glyph:'gnt', name:'Economist',         desc:'10 runs at or under optimal keys',       test:c=>{ const n=(c.runs||[]).filter(r=>r.optimal&&r.keystrokes<=r.optimal).length; return {done:n>=10, prog:Math.min(n,10), goal:10}; } },
+  { id:'x_slow',   glyph:'day', name:'Thorough',          desc:'Take over a minute on a single solve',   test:c=>({done:(c.slowWins||0)>=1, prog:Math.min(c.slowWins||0,1), goal:1}) },
+  { id:'x_mouse1', glyph:'c7', name:'Old Habits',         desc:'Ruin a run with the mouse',              test:c=>({done:(c.mouseRuns||0)>=1, prog:Math.min(c.mouseRuns||0,1), goal:1}) },
+  { id:'x_mouse10',glyph:'c7', name:'The Mouse Is a Lifestyle', desc:'Ruin 10 runs with the mouse',      test:c=>({done:(c.mouseRuns||0)>=10, prog:Math.min(c.mouseRuns||0,10), goal:10}) },
+  { id:'x_night',  glyph:'day', name:'Night Shift',       desc:'Clean solve between midnight and 4am',   test:c=>({done:!!c.nightWin, prog:c.nightWin?1:0, goal:1}) },
+  { id:'x_dawn',   glyph:'day', name:'Dawn Patrol',       desc:'Clean solve between 5 and 7am',          test:c=>({done:!!c.dawnWin, prog:c.dawnWin?1:0, goal:1}) },
+  { id:'x_wknd',   glyph:'day', name:'Weekend Warrior',   desc:'Clean solve on a Saturday or Sunday',    test:c=>({done:!!c.weekendWin, prog:c.weekendWin?1:0, goal:1}) },
+  { id:'x_run200', glyph:'vol', name:'Volume Business',   desc:'200 recorded runs',                      test:c=>{ const n=(c.runs||[]).length; return {done:n>=200, prog:Math.min(n,200), goal:200}; } },
+  { id:'x_found',  glyph:'c6', name:'Foundations Poured', desc:'PB on every Foundations drill',          test:c=>{ const ks=(c.groups['Foundations']||[]); const n=ks.filter(k=>c.pb[k]!==undefined).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
+  { id:'x_models', glyph:'c6', name:'Model Citizen',      desc:'Beat par on every Models drill',         test:c=>{ const ks=(c.groups['Models']||[]); const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
+  { id:'x_stack',  glyph:'c3', name:'Full Stack',         desc:'At least one PB in every group',         test:c=>{ const gs=Object.keys(c.groups); const n=gs.filter(g=>(c.groups[g]||[]).some(k=>c.pb[k]!==undefined)).length; return {done:n>=gs.length, prog:n, goal:gs.length}; } },
+  { id:'x_par25',  glyph:'spd', name:'Par Machine',       desc:'Beat par on 25 different drills',        test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=25, prog:Math.min(n,25), goal:25}; } },
+  { id:'x_pb40',   glyph:'c3', name:'Collector',          desc:'Hold a PB on 40 different drills',       test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined).length; return {done:n>=40, prog:Math.min(n,40), goal:40}; } },
+  { id:'x_strk7',  glyph:'str', name:'Business Week',     desc:'7-day streak',                           test:c=>({done:c.streak>=7, prog:Math.min(c.streak,7), goal:7}) },
+  { id:'x_strk30', glyph:'str', name:'Quarter Close',     desc:'30-day streak',                          test:c=>({done:c.streak>=30, prog:Math.min(c.streak,30), goal:30}) },
+  { id:'x_crown5', glyph:'crn', name:'Corner Office',     desc:'Hold 5 leaderboard crowns at once',      test:c=>({done:c.crowns>=5, prog:Math.min(c.crowns,5), goal:5}) },
   { id:'spd1', glyph:'spd', name:'Under Par',        desc:'Beat par on any drill',                 test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=1, prog:Math.min(n,1), goal:1}; } },
   { id:'spd2', glyph:'spd', name:'Metronome',        desc:'Beat par on 10 different drills',       test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=10, prog:Math.min(n,10), goal:10}; } },
   { id:'spd3', glyph:'spd', name:'Untouchable',      desc:'Beat par on EVERY drill',               test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=c.menuOrder.length, prog:n, goal:c.menuOrder.length}; } },

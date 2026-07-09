@@ -436,7 +436,10 @@
             if(!AC) return '';
             let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
             let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
+            let __xflags={}; try{ __xflags=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
             const ctx={ pb:PBl, pars:window.HOTKEY_PARS||{}, runs:d.myRuns||[], streak:streakN, solves:solvesN,
+              mouseRuns:__xflags.mouseRuns||0, slowWins:__xflags.slowWins||0,
+              nightWin:!!__xflags.nightWin, dawnWin:!!__xflags.dawnWin, weekendWin:!!__xflags.weekendWin,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
             // STEAM-STYLE GLOBAL RARITY: evaluate run-derivable achievements for every

@@ -1795,3 +1795,23 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - Balance after true excise: verified equal (printed above in CI log).
 - STANDING RULE, now enforced structurally: every ship runs as one set -e
   script through the push. Narrative in AUDIT.md may not precede verification.
+
+---
+# ROUND 79 — twenty creative achievements, picker over the game, flush corner, pk font
+- ACHIEVEMENTS +20 (51 total): Tourist/Completionist (attempts), Blink (<5s),
+  No Wasted Keys (keystrokes===optimal) + Economist (10 at/under), Thorough
+  (>60s solve), OLD HABITS + THE MOUSE IS A LIFESTYLE (1/10 mouse-ruined runs —
+  Wolf's anti-achievements), Night Shift / Dawn Patrol / Weekend Warrior
+  (time-of-day flags), Volume Business (200 runs), Foundations Poured, Model
+  Citizen, Full Stack, Par Machine (25), Collector (40 PBs), Business Week /
+  Quarter Close (streaks), Corner Office (5 crowns). Signals: run rows already
+  in ctx + NEW hk_ach_flags localStorage (index writes mouseRuns/slowWins/
+  night/dawn/weekend at run end; nav.js feeds ctx). Rarity pipeline unchanged
+  (localStorage-signal achievements simply have no global %).
+- PICKER, "STILL IN THE GAME": overlay = blurred translucent bg (game visible),
+  card chrome dropped (transparent, full-width 1080px, 3-column masonry,
+  responsive 2/1), rows semi-transparent surfacing to solid on hover, 6px
+  themed scrollbar. pk-name now speaks mono 12.5px like the rest of the game.
+- TOP-LEFT FLUSH: gridwrap padding 14→0 on top/left — the corner box and
+  headers sit against the formula bar and frame edge, like the real thing.
+- v79.
