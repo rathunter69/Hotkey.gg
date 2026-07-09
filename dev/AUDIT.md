@@ -1244,3 +1244,16 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - session CSS: body.session hides the taskline like the drillbar (frame stays
   coherent in marathon/rapid-fire).
 - v47.
+
+---
+# ROUND 48 — sheet-skinned checklist rail (Wolf: "checklist within the grid?")
+- DESIGN CALL (pushback given, alternative shipped): real grid cells for the
+  checklist would (a) collide with arrow/ctrl-arrow/ctrl-shift-arrow navigation —
+  players would traverse INTO the instructions, (b) permanently eat 2-3 playable
+  columns against the r42-44 spread doctrine, (c) require a fake "mega-cell"
+  since wrapping sentences don't fit 12.5px cells. Instead: the rail WEARS the
+  sheet's language — faux \u2713 column header matched to the grid's 30px th strip
+  (same surface2/height/typography), hairline row rules between checklist items,
+  radius 0. Reads as one more column of the sheet; stays non-addressable.
+- Checklist markup now renders .cl-colhdr + .cl-body wrapper.
+- v48.

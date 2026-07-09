@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=47" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=47">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=47">
+<link rel="icon" href="favicon.ico?v=48" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=48">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=48">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -251,7 +251,9 @@
   .cl-head{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase;
     letter-spacing:.6px; margin-bottom:8px; display:flex; gap:8px; align-items:center}
   .cl-head span{color:var(--accent); font-weight:500}
-  .cl-item{display:flex; align-items:center; gap:10px; padding:3px 0; color:var(--muted); transition:color .15s}
+  .cl-item{display:flex; align-items:center; gap:10px; padding:6px 0; color:var(--muted); transition:color .15s;
+    border-bottom:1px solid color-mix(in srgb, var(--line) 45%, transparent)}  /* hairline row rules — sheet texture */
+  .cl-item:last-of-type{border-bottom:0}
   .cl-item.ok{color:var(--text)}
   .cl-box{width:18px; height:18px; border:1.5px solid var(--line); border-radius:5px; flex:none;
     display:inline-flex; align-items:center; justify-content:center; font-family:var(--mono);
@@ -554,8 +556,14 @@
      px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */
   /* zoom multipliers removed r39 — they were re-inflating the density pass */
   .stage-main{flex:1 1 auto; min-width:0}
-  .checklist{flex:0 0 240px; align-self:stretch; background:var(--surface); border:0; border-left:1px solid var(--line);
-    border-radius:12px; padding:15px 16px; margin-top:0}
+  .checklist{flex:0 0 250px; align-self:stretch; background:var(--surface); border:0; border-left:1px solid var(--line);
+    border-radius:0; padding:0 0 12px; margin-top:0}
+  /* faux column header — same 30px strip as the grid's th row, so the rail
+     reads as one more column of the sheet (r48, Wolf's "checklist in the grid") */
+  .cl-colhdr{height:30px; line-height:30px; background:var(--surface2); color:var(--muted);
+    font-family:var(--mono); font-size:11px; text-align:center; font-weight:500;
+    border-bottom:1px solid var(--line); letter-spacing:.12em}
+  .cl-body{padding:11px 16px 0}
   @media(max-width:840px){
     .stage{flex-direction:column}
     .checklist{flex-basis:auto; width:100%; align-self:auto}
@@ -908,14 +916,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=47"></script>
-<link rel="stylesheet" href="nav.css?v=47">
-<script src="themes.js?v=47"></script>
+<script src="drills.js?v=48"></script>
+<link rel="stylesheet" href="nav.css?v=48">
+<script src="themes.js?v=48"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=47"></script>
+<script src="nav.js?v=48"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3859,7 +3867,7 @@ function drawRibbon(){
     });
     html += `<span class="fc-name">${FONT_SWATCHES[fontColorIdx].name}</span>`;
     html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
-    el.innerHTML = html + __altFooter; return;
+    el.innerHTML = html + __altFooter + '</div>'; return;
   }
   if(dialog==='series'){
     el.className='ribbon show';
@@ -4315,7 +4323,8 @@ function updateChecklist(){
   const items=C.checks(S);
   const n=items.filter(i=>i.ok).length;
   let nextDone=false;
-  let html=`<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
+  let html=`<div class="cl-colhdr">\u2713</div><div class="cl-body">`+
+    `<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
   const __altFooter = guided ? '<div class="cl-alt">many chords, one sheet \u2014 the grader only checks the result. live alternates: fills <b>ctrl+r/d</b> \u21d4 <b>alt h f i r/d</b> \u00b7 autosum <b>alt+=</b> \u21d4 <b>alt h u s</b> \u00b7 paste special <b>ctrl+alt+v</b> \u21d4 <b>alt e s</b> \u00b7 rows/cols <b>ctrl+\u00b1</b> \u21d4 <b>alt h i r / h d r</b> \u00b7 plugin profiles (\u2328) add Macabacus / FactSet chords</div>' : '';
   html+=`<div class="cl-bar"><div class="cl-bar-fill" style="width:${items.length?Math.round(100*n/items.length):0}%"></div></div>`;
   items.forEach((i,idx)=>{
