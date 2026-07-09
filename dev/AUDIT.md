@@ -1140,3 +1140,26 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   in desk English. RULE: check labels read like a person explaining, not a
   grader asserting — say what the ACTION is, not what the cell "has".
 - v43.
+
+---
+# ROUND 44 — models look like MODELS + remaining site conversions
+- MODEL DRESSING: MODEL_CODENAMES pool + codename() helper — every model-tier
+  drill's A1 title now reads like a real tab ("Northwind Industrial — income
+  statement ($mm)"), randomized per run. 12 titles dressed (all Full Builds +
+  wacc/lbo/schedule/revolver/comps).
+- FOUR FULL BUILDS EXTENDED 3→4 YEARS (isbuild 115→128, cfslink 120→132,
+  debtsched 140→155, nwcsched 118→132): loops, checks, demos, fills, colW all
+  widened to cols B-E; label column widened to 196px so statement names read
+  like a real model. Verified 8 seeds each; corkscrew fake-links still reject.
+- THREE MORE SITE CONVERSIONS (center, sort, series): tables draw origins from
+  slot pools; center = 5-col alignment table (headers/labels/totals in three
+  passes), sort = league table anywhere on the page, series = year header with a
+  RANDOM starting year (2021-2026) at a random spot. 20 layouts each verified.
+  Site-driven now covers 8 drills.
+- parKeys recomputed for all 7 changed drills via the replay tool (best-of-12
+  layouts): isbuild 61, cfslink 43, debtsched 84, nwcsched 85, center 28,
+  sort 22, series 24.
+- STILL QUEUED from prior rounds: per-step guide alternates (needs chord→op
+  map); format/pastes conversions; rapid-fire Group B engine; new drill ideas
+  (sources & uses, accretion/dilution, DCF sensitivity row, 13-week RX cash flow).
+- v44.

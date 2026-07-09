@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=43" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=43">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=43">
+<link rel="icon" href="favicon.ico?v=44" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=44">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=44">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -898,14 +898,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=43"></script>
-<link rel="stylesheet" href="nav.css?v=43">
-<script src="themes.js?v=43"></script>
+<script src="drills.js?v=44"></script>
+<link rel="stylesheet" href="nav.css?v=44">
+<script src="themes.js?v=44"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=43"></script>
+<script src="nav.js?v=44"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1364,12 +1364,12 @@ const CHALLENGES = {
       {sel:'B4', keys:[...T('=-B2*$B$8'), Kb.enter]},
       {sel:'B5', keys:[...T('=B2+B3+B4'), Kb.enter]},
       {sel:'C2', keys:[...T('=B5'), Kb.enter]},
-      {sel:'C2:D2', keys:[Kb.fillR]},
+      {sel:'C2:E2', keys:[Kb.fillR]},
       {sel:'B4:D5', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'PP&E roll-forward',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 PP&E roll ($mm)',txt:true,bold:true};
       ['Y1','Y2','Y3'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       const rows=[[2,'Beginning PP&E'],[3,'Capex'],[4,'Depreciation'],[5,'Ending PP&E']];
       rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===5)});
@@ -1393,8 +1393,8 @@ const CHALLENGES = {
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
       const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*5e-3); };
-      const COL=['B','C','D'];
-      const linkOk=[1,2].every(i=>{ const c=S.cells[COL[i]+'2'];
+      const COL=['B','C','D','E'];
+      const linkOk=[1,2,3].every(i=>{ const c=S.cells[COL[i]+'2'];
         return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(COL[i-1]+'5')&&near(COL[i]+'2',this._exp[i].beg)); });
       return [
         {label:'depreciation off the anchored rate against the OPENING balance, all years', ok: [0,1,2].every(i=>near(COL[i]+'4',this._exp[i].dep))},
@@ -1859,7 +1859,7 @@ const CHALLENGES = {
       {sel:'E2', keys:[...T('=SUM(B2:D2)'), Kb.enter]},
       {sel:'E2:E4', keys:[Kb.fillD]},
       {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
-      {sel:'B5:D5', keys:[Kb.fillR]},
+      {sel:'B5:E5', keys:[Kb.fillR]},
       {sel:'E5', keys:[...T('=SUM(E2:E4)'), Kb.enter]},
     ]; },
     build(){
@@ -1908,7 +1908,7 @@ const CHALLENGES = {
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'EV/EBITDA comps',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 EV/EBITDA comps',txt:true,bold:true};
       const peers=['Peer A','Peer B','Peer C','Peer D']; const mults=[];
       peers.forEach((p,i)=>{ const m=rnd(70,130)/10; mults.push(m);
         cells['A'+(2+i)]={...blankCell(),value:p,txt:true};
@@ -1940,43 +1940,48 @@ const CHALLENGES = {
     }
   },
   center:{
-    name:'Center', label:'Set the alignment', par:38, parKeys:26,
-    prompt:'Three alignment passes, house style: center the column headers, left-align the row labels (they pasted in centered), and right-align the total row (numbers never sit left). Alt H A C / L / R — same door, three rooms.',
-    req:'<em>headers</em> A1:E1 &rarr; <em>alt h a c</em> · <em>labels</em> A2:A5 &rarr; <em>alt h a l</em> · <em>totals</em> B6:E6 &rarr; <em>alt h a r</em>',
-    guide:[
-      'from A1, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&rarr;</kbd> jumps the selection to the header edge · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> centers them',
-      'down to A2, <kbd>shift</kbd>+<kbd>&darr;</kbd>&times;3 grabs the labels · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd> pins them left',
-      'over to B6, <kbd>shift</kbd>+<kbd>&rarr;</kbd>&times;3 grabs the total row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> pushes the numbers right',
-    ],
-    targets:['A1:E1','A2:A5','B6:E6'],
-    demo(){ return [
-      {sel:'A1:E1', keys:[Kb.alt,L('H'),L('A'),L('C')]},
-      {sel:'A2:A5', keys:[Kb.alt,L('H'),L('A'),L('L')]},
-      {sel:'B6:E6', keys:[Kb.alt,L('H'),L('A'),L('R')]},
+    name:'Center', label:'Set the alignment', par:44, parKeys:28,
+    prompt:'Three alignment passes, house style: center the column headers, left-align the row labels (they pasted in centered), and right-align the total row. The table lands somewhere new each run \u2014 Alt H A C / L / R, same door, three rooms.',
+    req(){ const o=this._o; return '<em>headers</em> '+o.hdr+' \u2192 <em>alt h a c</em> \u00b7 <em>labels</em> '+o.lab+' \u2192 <em>alt h a l</em> \u00b7 <em>totals</em> '+o.tot+' \u2192 <em>alt h a r</em>'; },
+    guide(){ const o=this._o; return [
+      'from '+o.h1+', <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2192</kbd> jumps to the header edge \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> centers them',
+      'labels at '+o.lab+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd> pins them left',
+      'totals at '+o.tot+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> \u2014 numbers never sit left',
+    ]; },
+    targets(){ const o=this._o; return [o.hdr,o.lab,o.tot]; },
+    demo(){ const o=this._o; return [
+      {sel:o.hdr, keys:[Kb.alt,L('H'),L('A'),L('C')]},
+      {sel:o.lab, keys:[Kb.alt,L('H'),L('A'),L('L')]},
+      {sel:o.tot, keys:[Kb.alt,L('H'),L('A'),L('R')]},
     ]; },
     build(){
       const cells={};
-      ['Sector','Q1','Q2','Q3','Q4'].forEach((h,i)=>cells[colLetter(i+1)+1]={...blankCell(),value:h,txt:true,bold:true});
-      const sectors=['Tech','Health','Energy','Retail'];
-      const colSums=[0,0,0,0];
-      for(let r=2;r<=5;r++){
-        cells['A'+r]={...blankCell(),value:sectors[r-2],txt:true,align:'c'};   // wrong on purpose — user fixes to left
-        for(let c=2;c<=5;c++){ const v=rnd(12,48)*100; colSums[c-2]+=v;
-          cells[colLetter(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0};
-        }
+      const spots=[{r:1,c:1},{r:2,c:4},{r:6,c:2},{r:5,c:5},{r:8,c:1}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const r0=sp.r, c0=sp.c;
+      const heads=['Deal','Q1','Q2','Q3','Q4'];
+      heads.forEach((t,i)=>cells[colLetter(c0+i)+r0]={...blankCell(),value:t,txt:true,bold:true,align:(i===0?'l':'r')});
+      const names=['Falcon','Atlas','Copper','Summit'];
+      for(let i=0;i<4;i++){
+        cells[colLetter(c0)+(r0+1+i)]={...blankCell(),value:names[i],txt:true,align:'c'};   // pasted-in wrong
+        for(let j=1;j<5;j++) cells[colLetter(c0+j)+(r0+1+i)]={...blankCell(),value:rnd(5,90)*10,fmtStyle:'comma',decimals:0};
       }
-      cells['A6']={...blankCell(),value:'Total',txt:true,bold:true};
-      for(let c=2;c<=5;c++) cells[colLetter(c)+6]={...blankCell(),value:colSums[c-2],fmtStyle:'comma',decimals:0,bold:true,align:'l'};  // wrong on purpose — user fixes to right
-      return {ROWS:6, cells, active:{r:1,c:1}, sel:null, colW:{1:84,2:72,3:72,4:72,5:72}};
+      cells[colLetter(c0)+(r0+5)]={...blankCell(),value:'Total',txt:true,bold:true};
+      for(let j=1;j<5;j++) cells[colLetter(c0+j)+(r0+5)]={...blankCell(),value:rnd(100,400)*10,fmtStyle:'comma',decimals:0,bold:true,align:'l'};  // wrong: numbers left
+      this._o={ h1:colLetter(c0)+r0,
+        hdr:colLetter(c0)+r0+':'+colLetter(c0+4)+r0,
+        lab:colLetter(c0)+(r0+1)+':'+colLetter(c0)+(r0+4),
+        tot:colLetter(c0+1)+(r0+5)+':'+colLetter(c0+4)+(r0+5),
+        r0:r0, c0:c0 };
+      return {ROWS:Math.max(9,r0+6), cells, active:{r:r0,c:c0}, sel:null, colW:{}};
     },
     checks(S){
-      const hOk=()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+1]; if(!x||x.align!=='c') return false; } return true; };
-      const lOk=()=>{ for(let r=2;r<=5;r++){ const x=S.cells['A'+r]; if(!x||x.align!=='l') return false; } return true; };
-      const rOk=()=>{ for(let c=2;c<=5;c++){ const x=S.cells[colLetter(c)+6]; if(!x||x.align!=='r') return false; } return true; };
+      const o=this._o;
+      const al=(col,row,want)=>{ const c=S.cells[colLetter(col)+row]; return !!(c&&c.align===want); };
       return [
-        {label:'center the header row (Alt H A C)', ok: hOk()},
-        {label:'left-align the row labels (Alt H A L)', ok: lOk()},
-        {label:'right-align the total row (Alt H A R)', ok: rOk()},
+        {label:'center the headers ('+o.hdr+')', ok: [0,1,2,3,4].every(j=>al(o.c0+j,o.r0,'c'))},
+        {label:'pin the row labels left ('+o.lab+')', ok: [1,2,3,4].every(i=>al(o.c0,o.r0+i,'l'))},
+        {label:'push the totals right ('+o.tot+')', ok: [1,2,3,4].every(j=>al(o.c0+j,o.r0+5,'r'))},
       ];
     }
   },
@@ -2043,103 +2048,87 @@ const CHALLENGES = {
     }
   },
   sort:{
-    name:'Sort', label:'Sort the league table', par:33, parKeys:21,
-    prompt:'League-table workflow, start to finish: sort the six deals by size, largest first, then foot the column with AutoSum and bold the total. Sort, foot, bold — the whole rep.',
-    req:'<em>select A2:B7</em> (active in column B) · <em>alt a s d</em> sorts Z&rarr;A · drop to B8 · <em>alt+=</em> &rarr; <em>↵</em> foots it · back up, <em>ctrl+b</em>',
-    guide:[
-      'cursor to B2 · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&darr;</kbd> grabs the size column in one chord · <kbd>shift</kbd>+<kbd>&larr;</kbd> pulls in the deal names',
-      'sort largest first · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd>',
-      'drop to B8 · <kbd>alt</kbd>+<kbd>=</kbd> proposes SUM(B2:B7) · commit <kbd>↵</kbd>',
-      'back up to B8 (<kbd>↑</kbd>) · <kbd>ctrl</kbd>+<kbd>b</kbd> bolds the total',
-    ],
-    targets:['A2:B7','A2:B7','B8','B8'],
-    demo(){ return [
-      {sel:'A2:B7', active:'B2', keys:[Kb.alt,L('A'),L('S'),L('D')]},
-      {sel:'B8', keys:[Kb.eq, Kb.enter]},
-      {sel:'B8', keys:[Kb.bold]},
+    name:'Sort', label:'Sort the league table', par:40, parKeys:22,
+    prompt:'League-table workflow wherever the table lands: sort the six deals by size, largest first, foot the column with AutoSum, bold the total. Sort, foot, bold \u2014 the whole rep.',
+    req(){ const o=this._o; return 'select <em>'+o.range+'</em> (active in the size column) \u00b7 <em>alt a s d</em> sorts Z\u2192A \u00b7 drop to <em>'+o.foot+'</em> \u00b7 <em>alt+=</em> \u2192 <em>\u21b5</em> \u00b7 <em>ctrl+b</em>'; },
+    guide(){ const o=this._o; return [
+      'cursor to '+o.b2+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs the size column \u00b7 <kbd>shift</kbd>+<kbd>\u2190</kbd> pulls in the names',
+      'sort largest first \u00b7 <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd>',
+      'drop to '+o.foot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> proposes the SUM \u00b7 <kbd>\u21b5</kbd>',
+      'back up \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> bolds the total',
+    ]; },
+    targets(){ const o=this._o; return [o.range,o.range,o.foot,o.foot]; },
+    demo(){ const o=this._o; return [
+      {sel:o.range, active:o.b2, keys:[Kb.alt,L('A'),L('S'),L('D')]},
+      {sel:o.foot, keys:[Kb.eq, Kb.enter]},
+      {sel:o.foot, keys:[Kb.bold]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Deal',txt:true,bold:true};
-      cells['B1']={...blankCell(),value:'Size ($M)',txt:true,bold:true,align:'r'};
-      // Randomized every run: 6 names, 6 DISTINCT sizes, start order shuffled
-      // (re-rolling if it lands already sorted, so there is always work to do).
-      const pool=['TechCo','HealthCo','EnergyCo','RetailCo','MediaCo','FinCo','AeroCo','ShipCo'];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const names=pool.slice(0,6);
-      const sizes=new Set(); while(sizes.size<6) sizes.add(rnd(12,68)*10);
-      let deals=names.map((n,i)=>[n,[...sizes][i]]);
-      const isSortedDesc=d=>d.every((p,i)=>i===0||d[i-1][1]>=p[1]);
-      do{ for(let k=deals.length-1;k>0;k--){ const j=rnd(0,k); [deals[k],deals[j]]=[deals[j],deals[k]]; } }while(isSortedDesc(deals));
-      for(let i=0;i<deals.length;i++){
-        cells['A'+(i+2)]={...blankCell(),value:deals[i][0],txt:true};
-        cells['B'+(i+2)]={...blankCell(),value:deals[i][1],fmtStyle:'comma',decimals:0};
-      }
-      cells['A8']={...blankCell(),value:'Total',txt:true,bold:true};
-      cells['B8']={...blankCell(),fmtStyle:'comma',decimals:0};
-      // Expected end-state computed from THIS run's data — never hardcode answers in checks.
-      this._sorted=deals.slice().sort((a,b)=>b[1]-a[1]);
-      this._total=deals.reduce((s,d)=>s+d[1],0);
-      return {ROWS:8, cells, active:{r:2,c:2}, sel:null, colW:{1:100,2:88}};
+      const spots=[{r:2,c:1},{r:2,c:5},{r:4,c:3},{r:3,c:7}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const r0=sp.r, c0=sp.c, NC=colLetter(c0), SC=colLetter(c0+1);
+      cells[NC+(r0-1)]={...blankCell(),value:'League table ($mm)',txt:true,bold:true};
+      cells[NC+r0]={...blankCell(),value:'Deal',txt:true,bold:true};
+      cells[SC+r0]={...blankCell(),value:'Size',txt:true,bold:true,align:'r'};
+      const names=['Falcon','Atlas','Copper','Summit','Ridge','Delta'];
+      const sizes=[]; while(sizes.length<6){ const v=rnd(5,95)*10; if(!sizes.includes(v)) sizes.push(v); }
+      this._sizes=sizes.slice();
+      names.forEach((n,i)=>{
+        cells[NC+(r0+1+i)]={...blankCell(),value:n,txt:true};
+        cells[SC+(r0+1+i)]={...blankCell(),value:sizes[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      });
+      cells[SC+(r0+7)]={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._o={ b2:SC+(r0+1), range:NC+(r0+1)+':'+SC+(r0+6), foot:SC+(r0+7), sc:SC, r0:r0 };
+      this._sum=sizes.reduce((a,b)=>a+b,0);
+      return {ROWS:Math.max(10,r0+8), cells, active:{r:r0+1,c:c0+1}, sel:null, colW:{}};
     },
     checks(S){
-      const rows=[2,3,4,5,6,7];
-      const sizes=rows.map(r=>S.cells['B'+r] && S.cells['B'+r].value);
-      const sortedDesc = sizes.every((v,i)=> i===0 || sizes[i-1]>=v);
-      const exp=this._sorted||[];
-      const aligned = exp.length===6 && exp.every((p,i)=>{
-        const nm=S.cells['A'+(i+2)] && S.cells['A'+(i+2)].value;
-        const sz=S.cells['B'+(i+2)] && S.cells['B'+(i+2)].value;
-        return nm===p[0] && sz===p[1];
-      });
-      const t=S.cells['B8'];
-      const footOk=!!(t&&t.formula&&/SUM/i.test(t.formula))&&Math.abs((t.value||0)-this._total)<1e-6;
-      const boldOk=!!(t&&t.bold);
+      const o=this._o;
+      const vals=[0,1,2,3,4,5].map(i=>{ const c=S.cells[o.sc+(o.r0+1+i)]; return c?c.value:null; });
+      const sorted=vals.every(v=>typeof v==='number') && vals.every((v,i)=>i===0||vals[i-1]>=v);
+      const f=S.cells[o.foot];
       return [
-        {label:'Size column sorted largest to smallest', ok: sortedDesc},
-        {label:'Deal names follow their sizes', ok: aligned},
-        {label:'foot the column — AutoSum at B8', ok: footOk},
-        {label:'bold the total', ok: boldOk},
+        {label:'six deals sorted largest-first ('+o.range+')', ok: sorted},
+        {label:'foot the size column \u2014 live SUM at '+o.foot, ok: !!(f&&f.formula&&String(f.formula).toUpperCase().includes('SUM')&&Math.abs((f.value||0)-this._sum)<0.5)},
+        {label:'total bolded', ok: !!(f&&f.bold)},
       ];
     }
   },
   series:{
-    name:'Years', label:'Stub the year header', par:25, parKeys:13,
-    prompt:'Extend and dress the year header in one pass. B1 has 2024, C1 has 2025 — select B1:F1, fill the series across, then bold the whole header and right-align it so the years sit over their number columns.',
-    req:'<em>select B1:F1</em> · <em>alt h f i s ↵</em> fills 2026-2028 · selection holds &rarr; <em>ctrl+b</em> bold · <em>alt h a r</em> right-align',
-    guide:[
-      'cursor to B1, then <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&rarr;</kbd>... stops at C1 — tap <kbd>shift</kbd>+<kbd>&rarr;</kbd> to F1 (or shift-arrow the whole way)',
-      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> opens Series · apply with <kbd>↵</kbd>',
-      'selection is still live — <kbd>ctrl</kbd>+<kbd>b</kbd> bolds the run',
-      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> right-aligns the years over their columns',
-    ],
-    targets:['B1:F1','B1:F1','B1:F1','B1:F1'],
-    demo(){ return [
-      {sel:'B1:F1', active:'B1', keys:[Kb.alt,L('H'),L('F'),L('I'),L('S'),Kb.enter]},
-      {sel:'B1:F1', keys:[Kb.bold, Kb.alt,L('H'),L('A'),L('R')]},
+    name:'Years', label:'Stub the year header', par:30, parKeys:24,
+    prompt:'Extend and dress a year header wherever it starts this run: two seed years are in, three more to fill with Series, then bold the whole run and right-align it so the years sit over their number columns.',
+    req(){ const o=this._o; return 'select <em>'+o.range+'</em> \u00b7 <em>alt h f i s \u21b5</em> fills the missing years \u00b7 selection holds \u2192 <em>ctrl+b</em> \u00b7 <em>alt h a r</em>'; },
+    guide(){ const o=this._o; return [
+      'the seed years start at '+o.a+' this run \u2014 select '+o.range+' with <kbd>shift</kbd>+<kbd>\u2192</kbd>',
+      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> opens Series \u00b7 apply with <kbd>\u21b5</kbd>',
+      'selection is still live \u2014 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
+    ]; },
+    targets(){ const o=this._o; return [o.range,o.range,o.range,o.range]; },
+    demo(){ const o=this._o; return [
+      {sel:o.range, active:o.a, keys:[Kb.alt,L('H'),L('F'),L('I'),L('S'),Kb.enter]},
+      {sel:o.range, keys:[Kb.bold]},
+      {sel:o.range, keys:[Kb.alt,L('H'),L('A'),L('R')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'',txt:true};
-      // seeds arrive plain — bolding and right-aligning the header is part of the drill
-      cells['B1']={...blankCell(),value:2024,fmtStyle:'general',decimals:0};
-      cells['C1']={...blankCell(),value:2025,fmtStyle:'general',decimals:0};
-      // D1, E1, F1 left empty for the fill
-      cells['A2']={...blankCell(),value:'Revenue',txt:true};
-      cells['A3']={...blankCell(),value:'COGS',txt:true};
-      cells['A4']={...blankCell(),value:'Gross profit',txt:true};
-      return {ROWS:4, cells, active:{r:1,c:2}, sel:null, colW:{1:100,2:78,3:78,4:78,5:78,6:78}};
+      const spots=[{r:1,c:2},{r:2,c:3},{r:3,c:2},{r:1,c:4},{r:5,c:3}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const y0=rnd(2021,2026);
+      cells[colLetter(sp.c-1)+(sp.r+1)]={...blankCell(),value:'Revenue',txt:true};
+      for(let j=0;j<5;j++) cells[colLetter(sp.c+j)+(sp.r+1)]={...blankCell(),value:rnd(40,160)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells[colLetter(sp.c)+sp.r]={...blankCell(),value:y0,decimals:0};
+      cells[colLetter(sp.c+1)+sp.r]={...blankCell(),value:y0+1,decimals:0};
+      for(let j=2;j<5;j++) cells[colLetter(sp.c+j)+sp.r]={...blankCell(),decimals:0};
+      this._o={ a:colLetter(sp.c)+sp.r, range:colLetter(sp.c)+sp.r+':'+colLetter(sp.c+4)+sp.r, r:sp.r, c:sp.c, y0:y0 };
+      return {ROWS:Math.max(8,sp.r+3), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{}};
     },
     checks(S){
-      const wanted = {D1:2026, E1:2027, F1:2028};
-      const filled = Object.keys(wanted).every(k=>S.cells[k] && S.cells[k].value===wanted[k]);
-      const seedsIntact = S.cells.B1 && S.cells.B1.value===2024 && S.cells.C1 && S.cells.C1.value===2025;
-      const dressed = ()=>{ for(const k of ['B1','C1','D1','E1','F1']){ const c=S.cells[k];
-        if(!c||!c.bold||c.align!=='r') return false; } return true; };
+      const o=this._o;
+      const cellsOK=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r];
+        return !!(c&&c.value===o.y0+j&&c.bold&&c.align==='r'); });
       return [
-        {label:'series filled across D1:F1 (2026, 2027, 2028)', ok: filled},
-        {label:'seed cells B1, C1 unchanged', ok: seedsIntact},
-        {label:'header bolded and right-aligned, B1:F1', ok: dressed()},
+        {label:'five sequential years across '+o.range+' \u2014 filled, bolded, right-aligned', ok: cellsOK},
       ];
     }
   },
@@ -2277,7 +2266,7 @@ const CHALLENGES = {
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'WACC build',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 WACC build',txt:true,bold:true};
       const E=rnd(40,90)*10, D=rnd(20,60)*10, Ke=rnd(9,14)/100, Kd=rnd(5,8)/100, Tx=rnd(21,28)/100;
       const rows=[[2,'Equity value',E,'comma',0],[3,'Debt value',D,'comma',0],[4,'Cost of equity',Ke,'percent',1],[5,'Cost of debt',Kd,'percent',1],[6,'Tax rate',Tx,'percent',0]];
       rows.forEach(([r,n,v,f,d])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
@@ -2313,7 +2302,7 @@ const CHALLENGES = {
     targets:['B4','B4:D4','B8','B10','B11'],
     demo(){ return [
       {sel:'B4', keys:[...T('=B3/(1+$B$6)^B2'), Kb.enter]},
-      {sel:'B4:D4', keys:[Kb.fillR]},
+      {sel:'B4:E4', keys:[Kb.fillR]},
       {sel:'B8', keys:[...T('=D3*(1+B9)/($B$6-B9)'), Kb.enter]},
       {sel:'B10', keys:[...T('=B8/(1+$B$6)^3'), Kb.enter]},
       {sel:'B11', keys:[...T('=SUM(B4:D4)+B10'), Kb.enter]},
@@ -2381,7 +2370,7 @@ const CHALLENGES = {
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'LBO returns',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 LBO returns ($mm)',txt:true,bold:true};
       const e0=rnd(15,40)*10, e1=Math.round(e0*(1+rnd(15,45)/100)), mult=rnd(70,110)/10, lev=rnd(45,65)/100;
       const rows=[[2,'Entry EBITDA',e0,'comma',0],[3,'Exit EBITDA',e1,'comma',0],[4,'EV / EBITDA',mult,null,1],[5,'Debt % of EV',lev,'percent',0]];
       rows.forEach(([r,n,v,f,d])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
@@ -2425,7 +2414,7 @@ const CHALLENGES = {
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Cash sweep',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 cash sweep ($mm)',txt:true,bold:true};
       ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       cells['A2']={...blankCell(),value:'Cash available',txt:true};
       cells['A3']={...blankCell(),value:'Revolver balance',txt:true};
@@ -2465,8 +2454,8 @@ const CHALLENGES = {
     }
   },
   isbuild:{
-    name:'IS Build', label:'Build the income statement', par:115, parKeys:57,
-    prompt:'A three-year income statement from assumptions, the way the training program made you do it: COGS off an anchored margin, gross profit, EBIT after fixed SG&A, and net income after an anchored tax rate. Build each formula ONCE in year 1 and fill it right \u2014 four formulas become twelve cells.',
+    name:'IS Build', label:'Build the income statement', par:128, parKeys:61,
+    prompt:'A three-year income statement from assumptions, the way the training program made you do it: COGS off an anchored margin, gross profit, EBIT after fixed SG&A, and net income after an anchored tax rate. Build each formula ONCE in year 1 and fill it right \u2014 four formulas become sixteen cells.',
     req:'<em>B3</em> \u00b7 <em>=-B2*$B$8</em> fill \u2192 \u00b7 <em>B4</em> \u00b7 <em>=B2+B3</em> fill \u2192 \u00b7 <em>B6</em> \u00b7 <em>=B4-B5</em> fill \u2192 \u00b7 <em>B7</em> \u00b7 <em>=B6*(1-$B$9)</em> fill \u2192',
     guide:[
       'COGS at B3 \u00b7 <kbd>=-B2*$B$8</kbd> <kbd>\u21b5</kbd> \u2014 margin anchored, revenue walking \u00b7 fill right with <kbd>ctrl</kbd>+<kbd>r</kbd>',
@@ -2477,18 +2466,18 @@ const CHALLENGES = {
     targets:['B3','B4','B6','B7'],
     demo(){ return [
       {sel:'B3', keys:[...T('=-B2*$B$8'), Kb.enter]},
-      {sel:'B3:D3', keys:[Kb.fillR]},
+      {sel:'B3:E3', keys:[Kb.fillR]},
       {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
-      {sel:'B4:D4', keys:[Kb.fillR]},
+      {sel:'B4:E4', keys:[Kb.fillR]},
       {sel:'B6', keys:[...T('=B4-B5'), Kb.enter]},
-      {sel:'B6:D6', keys:[Kb.fillR]},
+      {sel:'B6:E6', keys:[Kb.fillR]},
       {sel:'B7', keys:[...T('=B6*(1-$B$9)'), Kb.enter]},
-      {sel:'B7:D7', keys:[Kb.fillR]},
+      {sel:'B7:E7', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Income statement',txt:true,bold:true};
-      ['Y1','Y2','Y3'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      cells['A1']={...blankCell(),value:codename()+' \u2014 income statement ($mm)',txt:true,bold:true};
+      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       const rows=[[2,'Revenue'],[3,'COGS'],[4,'Gross profit'],[5,'SG&A'],[6,'EBIT'],[7,'Net income']];
       rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===4||r===7)});
       cells['A8']={...blankCell(),value:'COGS % of rev',txt:true};
@@ -2497,7 +2486,7 @@ const CHALLENGES = {
       cells['B8']={...blankCell(),value:cog,fontColor:'blue',fmtStyle:'percent',decimals:0};
       cells['B9']={...blankCell(),value:tax,fontColor:'blue',fmtStyle:'percent',decimals:0};
       this._rev=[]; this._sga=[];
-      for(let i=0;i<3;i++){ const col=colLetter(i+2);
+      for(let i=0;i<4;i++){ const col=colLetter(i+2);
         const rv=Math.floor(rnd(80,140)*10*(1+i*0.1)); this._rev.push(rv);
         cells[col+2]={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
         const sg=rnd(10,20)*10; this._sga.push(sg);
@@ -2507,22 +2496,22 @@ const CHALLENGES = {
       this._cog=cog; this._tax=tax;
       this._exp = this._rev.map((rv,i)=>{ const c=-rv*cog, gp=rv+c, eb=gp-this._sga[i], ni=eb*(1-tax);
         return {c,gp,eb,ni}; });
-      return {ROWS:9, cells, active:{r:3,c:2}, sel:null, colW:{1:128,2:84,3:84,4:84}};
+      return {ROWS:9, cells, active:{r:3,c:2}, sel:null, colW:{1:196,2:80,3:80,4:80,5:80}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const rowOk=(r,pick)=>[0,1,2].every(i=>{ const val=v(colLetter(i+2)+r); const exp=pick(this._exp[i]);
+      const rowOk=(r,pick)=>[0,1,2,3].every(i=>{ const val=v(colLetter(i+2)+r); const exp=pick(this._exp[i]);
         return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); });
       return [
-        {label:'COGS \u2014 anchored margin \u00d7 revenue, all 3 years live', ok: rowOk(3,e=>e.c)},
-        {label:'gross profit, all 3 years', ok: rowOk(4,e=>e.gp)},
-        {label:'EBIT after SG&A, all 3 years', ok: rowOk(6,e=>e.eb)},
-        {label:'net income after the anchored tax rate, all 3 years', ok: rowOk(7,e=>e.ni)},
+        {label:'COGS \u2014 anchored margin \u00d7 revenue, all 4 years live', ok: rowOk(3,e=>e.c)},
+        {label:'gross profit, all 4 years', ok: rowOk(4,e=>e.gp)},
+        {label:'EBIT after SG&A, all 4 years', ok: rowOk(6,e=>e.eb)},
+        {label:'net income after the anchored tax rate, all 4 years', ok: rowOk(7,e=>e.ni)},
       ];
     }
   },
   debtsched:{
-    name:'Debt Sched.', label:'Run the debt schedule', par:140, parKeys:83,
+    name:'Debt Sched.', label:'Run the debt schedule', par:155, parKeys:84,
     prompt:'The corkscrew \u2014 the exercise every training program ends on. Year 1\u2019s beginning balance is given; every later year BEGINS where the prior year ENDED (that link is the whole trick). Mandatory amort off an anchored rate, sweep what cash allows, compute the ending balance, and charge interest on the average balance.',
     req:'<em>B4</em> amort <em>=-B2*$B$9</em> \u00b7 <em>B5</em> sweep <em>=-MIN(B2+B4,MAX(0,B3))</em> \u00b7 <em>B6</em> end <em>=B2+B4+B5</em> \u00b7 <em>B7</em> int <em>=$B$10*(B2+B6)/2</em> \u00b7 <em>C2</em> \u00b7 <em>=B6</em> \u00b7 fill \u2192',
     guide:[
@@ -2539,12 +2528,12 @@ const CHALLENGES = {
       {sel:'B7', keys:[...T('=$B$10*(B2+B6)/2'), Kb.enter]},
       {sel:'C2', keys:[...T('=B6'), Kb.enter]},
       {sel:'C2:D2', keys:[Kb.fillR]},
-      {sel:'B4:D7', keys:[Kb.fillR]},
+      {sel:'B4:E7', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Revolver corkscrew',txt:true,bold:true};
-      ['Y1','Y2','Y3'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      cells['A1']={...blankCell(),value:codename()+' \u2014 revolver corkscrew ($mm)',txt:true,bold:true};
+      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       const rows=[[2,'Beginning debt'],[3,'Cash for sweep'],[4,'Mandatory amort'],[5,'Cash sweep'],[6,'Ending debt'],[7,'Interest expense']];
       rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===6)});
       cells['A9']={...blankCell(),value:'Amort rate',txt:true};
@@ -2554,14 +2543,14 @@ const CHALLENGES = {
       cells['B10']={...blankCell(),value:intR,fontColor:'blue',fmtStyle:'percent',decimals:1};
       const beg0=rnd(60,120)*10;
       cells['B2']={...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      const cash=[rnd(8,25)*10, rnd(8,25)*10, rnd(8,25)*10];
-      for(let i=0;i<3;i++){ const col=colLetter(i+2);
+      const cash=[rnd(8,25)*10, rnd(8,25)*10, rnd(8,25)*10, rnd(8,25)*10];
+      for(let i=0;i<4;i++){ const col=colLetter(i+2);
         cells[col+3]={...blankCell(),value:cash[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
         [4,5,6,7].forEach(r=>cells[col+r]={...blankCell(),fmtStyle:'comma',decimals:1,bold:(r===6)});
         if(i>0) cells[col+2]={...blankCell(),fmtStyle:'comma',decimals:1};
       }
       this._exp=[]; let beg=beg0;
-      for(let i=0;i<3;i++){
+      for(let i=0;i<4;i++){
         const am=-beg*amortR;
         const sw=-Math.min(beg+am, Math.max(0,cash[i]));
         const end=beg+am+sw;
@@ -2569,7 +2558,7 @@ const CHALLENGES = {
         this._exp.push({beg:beg,am:am,sw:sw,end:end,inx:inx});
         beg=end;
       }
-      return {ROWS:10, cells, active:{r:4,c:2}, sel:null, colW:{1:138,2:86,3:86,4:86}};
+      return {ROWS:10, cells, active:{r:4,c:2}, sel:null, colW:{1:196,2:80,3:80,4:80,5:80}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
@@ -2577,7 +2566,7 @@ const CHALLENGES = {
       const COL=['B','C','D'];
       const linkOk=[1,2].every(i=>{ const c=S.cells[COL[i]+'2'];
         return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(COL[i-1]+'6')&&near(COL[i]+'2',this._exp[i].beg)); });
-      const rowOk=(r,pick)=>[0,1,2].every(i=>near(COL[i]+r, pick(this._exp[i])));
+      const rowOk=(r,pick)=>[0,1,2,3].every(i=>near(COL[i]+r, pick(this._exp[i])));
       return [
         {label:'THE LINK \u2014 each year begins at the prior year\u2019s ending balance', ok: linkOk},
         {label:'mandatory amort off the anchored rate, all years', ok: rowOk(4,e=>e.am)},
@@ -2588,7 +2577,7 @@ const CHALLENGES = {
     }
   },
   cfslink:{
-    name:'CFS Link', label:'Link the cash flow statement', par:120, parKeys:40,
+    name:'CFS Link', label:'Link the cash flow statement', par:132, parKeys:43,
     prompt:'Close the loop: net change in cash from the operating and investing lines, then the cash corkscrew \u2014 each year\u2019s beginning cash is last year\u2019s ending cash. One SUM, one addition, one link, three fills. When D8 ties out, the statement is linked.',
     req:'<em>B6</em> \u00b7 <em>=SUM(B2:B5)</em> fill \u2192 \u00b7 <em>B8</em> \u00b7 <em>=B7+B6</em> fill \u2192 \u00b7 <em>C7</em> \u00b7 <em>=B8</em> \u00b7 fill \u2192',
     guide:[
@@ -2599,22 +2588,22 @@ const CHALLENGES = {
     targets:['B6','B8','C7'],
     demo(){ return [
       {sel:'B6', keys:[...T('=SUM(B2:B5)'), Kb.enter]},
-      {sel:'B6:D6', keys:[Kb.fillR]},
+      {sel:'B6:E6', keys:[Kb.fillR]},
       {sel:'B8', keys:[...T('=B7+B6'), Kb.enter]},
       {sel:'C7', keys:[...T('=B8'), Kb.enter]},
-      {sel:'C7:D7', keys:[Kb.fillR]},
-      {sel:'B8:D8', keys:[Kb.fillR]},
+      {sel:'C7:E7', keys:[Kb.fillR]},
+      {sel:'B8:E8', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Cash flow linkage',txt:true,bold:true};
-      ['Y1','Y2','Y3'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      cells['A1']={...blankCell(),value:codename()+' \u2014 cash flow linkage ($mm)',txt:true,bold:true};
+      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       const rows=[[2,'Net income'],[3,'D&A'],[4,'\u0394 NWC'],[5,'Capex'],[6,'Net change in cash'],[7,'Beginning cash'],[8,'Ending cash']];
       rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===8)});
       const beg0=rnd(10,40)*10;
       cells['B7']={...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
       this._rows=[];
-      for(let i=0;i<3;i++){ const col=colLetter(i+2);
+      for(let i=0;i<4;i++){ const col=colLetter(i+2);
         const ni=rnd(15,45)*10, da=rnd(5,15)*10, nwc=-rnd(2,10)*10, cx=-rnd(8,20)*10;
         this._rows.push({ni:ni,da:da,nwc:nwc,cx:cx});
         cells[col+2]={...blankCell(),value:ni,fontColor:'blue',fmtStyle:'comma',decimals:0};
@@ -2628,18 +2617,18 @@ const CHALLENGES = {
       let beg=beg0; this._exp=[];
       this._rows.forEach(r=>{ const ch=r.ni+r.da+r.nwc+r.cx; const end=beg+ch;
         this._exp.push({ch:ch,beg:beg,end:end}); beg=end; });
-      return {ROWS:8, cells, active:{r:6,c:2}, sel:null, colW:{1:150,2:84,3:84,4:84}};
+      return {ROWS:8, cells, active:{r:6,c:2}, sel:null, colW:{1:196,2:80,3:80,4:80,5:80}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
       const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); };
-      const COL=['B','C','D'];
-      const linkOk=[1,2].every(i=>{ const c=S.cells[COL[i]+'7'];
+      const COL=['B','C','D','E'];
+      const linkOk=[1,2,3].every(i=>{ const c=S.cells[COL[i]+'7'];
         return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(COL[i-1]+'8')&&near(COL[i]+'7',this._exp[i].beg)); });
       return [
-        {label:'net change in cash \u2014 one SUM over the four lines, all years', ok: [0,1,2].every(i=>near(COL[i]+'6',this._exp[i].ch))},
+        {label:'net change in cash \u2014 one SUM over the four lines, all years', ok: [0,1,2,3].every(i=>near(COL[i]+'6',this._exp[i].ch))},
         {label:'THE LINK \u2014 beginning cash = prior year\u2019s ending cash', ok: linkOk},
-        {label:'ending cash ties out through year 3', ok: [0,1,2].every(i=>near(COL[i]+'8',this._exp[i].end))},
+        {label:'ending cash ties out through year 4', ok: [0,1,2,3].every(i=>near(COL[i]+'8',this._exp[i].end))},
       ];
     }
   },
@@ -2667,7 +2656,7 @@ const CHALLENGES = {
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Balance sheet',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 balance sheet ($mm)',txt:true,bold:true};
       ['Y1','Y2'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       const rows=[[2,'Cash'],[3,'Receivables'],[4,'PP&E'],[5,'Total assets'],[6,'Payables'],[7,'Debt'],[8,'Total liabilities'],[9,'Common stock'],[10,'Retained earnings'],[11,'Total liabs & equity'],[12,'Net income'],[13,'Dividends'],[14,'Check']];
       rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===5||r===8||r===11||r===14)});
@@ -2713,7 +2702,7 @@ const CHALLENGES = {
     }
   },
   nwcsched:{
-    name:'NWC Sched.', label:'Roll working capital', par:118, parKeys:82,
+    name:'NWC Sched.', label:'Roll working capital', par:132, parKeys:85,
     prompt:'Driver-based working capital, the way models actually do it: AR off DSO, inventory off DIO, payables off DPO \u2014 each driver ANCHORED, each line filled across three years \u2014 then net working capital and the year-over-year swing that feeds the cash flow statement.',
     req:'<em>B4</em> AR <em>=B2/365*$B$9</em> fill \u2192 \u00b7 <em>B5</em> inv <em>=B3/365*$B$10</em> fill \u2192 \u00b7 <em>B6</em> AP <em>=B3/365*$B$11</em> fill \u2192 \u00b7 <em>B7</em> NWC <em>=B4+B5-B6</em> fill \u2192 \u00b7 <em>C8</em> \u0394 <em>=C7-B7</em> fill \u2192',
     guide:[
@@ -2729,16 +2718,16 @@ const CHALLENGES = {
       {sel:'B5', keys:[...T('=B3/365*$B$10'), Kb.enter]},
       {sel:'B5:D5', keys:[Kb.fillR]},
       {sel:'B6', keys:[...T('=B3/365*$B$11'), Kb.enter]},
-      {sel:'B6:D6', keys:[Kb.fillR]},
+      {sel:'B6:E6', keys:[Kb.fillR]},
       {sel:'B7', keys:[...T('=B4+B5-B6'), Kb.enter]},
-      {sel:'B7:D7', keys:[Kb.fillR]},
+      {sel:'B7:E7', keys:[Kb.fillR]},
       {sel:'C8', keys:[...T('=C7-B7'), Kb.enter]},
-      {sel:'C8:D8', keys:[Kb.fillR]},
+      {sel:'C8:E8', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Working capital',txt:true,bold:true};
-      ['Y1','Y2','Y3'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      cells['A1']={...blankCell(),value:codename()+' \u2014 working capital ($mm)',txt:true,bold:true};
+      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       const rows=[[2,'Revenue'],[3,'COGS'],[4,'Receivables'],[5,'Inventory'],[6,'Payables'],[7,'Net working capital'],[8,'\u0394 NWC']];
       rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===7)});
       cells['A9']={...blankCell(),value:'DSO (days)',txt:true};
@@ -2750,7 +2739,7 @@ const CHALLENGES = {
       cells['B11']={...blankCell(),value:dpo,fontColor:'blue',decimals:0};
       this._exp=[];
       let prevN=null;
-      for(let i=0;i<3;i++){ const col=colLetter(i+2);
+      for(let i=0;i<4;i++){ const col=colLetter(i+2);
         const rev=Math.round(rnd(80,140)*10*(1+i*0.08)), cogs=Math.round(rev*rnd(45,60)/100);
         cells[col+2]={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells[col+3]={...blankCell(),value:cogs,fontColor:'blue',fmtStyle:'comma',decimals:0};
@@ -2760,17 +2749,17 @@ const CHALLENGES = {
         this._exp.push({ar:ar,inv:inv,ap:ap,nwc:nwc,d:prevN===null?null:nwc-prevN});
         prevN=nwc;
       }
-      return {ROWS:11, cells, active:{r:4,c:2}, sel:null, colW:{1:158,2:86,3:86,4:86}};
+      return {ROWS:11, cells, active:{r:4,c:2}, sel:null, colW:{1:196,2:80,3:80,4:80,5:80}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
       const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*5e-3); };
-      const COL=['B','C','D'];
+      const COL=['B','C','D','E'];
       return [
-        {label:'AR off anchored DSO, all years', ok: [0,1,2].every(i=>near(COL[i]+'4',this._exp[i].ar))},
-        {label:'inventory and payables off anchored DIO / DPO, all years', ok: [0,1,2].every(i=>near(COL[i]+'5',this._exp[i].inv)&&near(COL[i]+'6',this._exp[i].ap))},
-        {label:'net working capital, all years', ok: [0,1,2].every(i=>near(COL[i]+'7',this._exp[i].nwc))},
-        {label:'\u0394NWC references the prior year, years 2-3', ok: [1,2].every(i=>{ const c=S.cells[COL[i]+'8'];
+        {label:'AR off anchored DSO, all years', ok: [0,1,2,3].every(i=>near(COL[i]+'4',this._exp[i].ar))},
+        {label:'inventory and payables off anchored DIO / DPO, all years', ok: [0,1,2,3].every(i=>near(COL[i]+'5',this._exp[i].inv)&&near(COL[i]+'6',this._exp[i].ap))},
+        {label:'net working capital, all years', ok: [0,1,2,3].every(i=>near(COL[i]+'7',this._exp[i].nwc))},
+        {label:'\u0394NWC references the prior year, years 2-4', ok: [1,2,3].every(i=>{ const c=S.cells[COL[i]+'8'];
           return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(COL[i-1]+'7')&&near(COL[i]+'8',this._exp[i].d)); })},
       ];
     }
@@ -2802,7 +2791,7 @@ const CHALLENGES = {
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Three statements',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 three statements ($mm)',txt:true,bold:true};
       ['Y1','Y2'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
       const rows=[[2,'Net income'],[3,'D&A'],[4,'Capex'],[5,'Net change in cash'],[6,'Beginning cash'],[7,'Ending cash'],[9,'Cash (BS)'],[10,'Other assets'],[11,'Total assets'],[12,'Debt'],[13,'Retained earnings'],[14,'Check']];
       rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===7||r===11||r===14)});
@@ -3197,6 +3186,8 @@ let editAnchor=null, editPointer=null, editPointerStart=-1, editPointerBase=null
 let editMode='enter', editCaret=0;   // Excel distinction: F2 = Edit mode (arrows move the CARET); typing = Enter mode (arrows commit)
 // Last char of editBuf is one of these → arrows enter pointer mode (insert new reference).
 // = + - * / ^ ( , — Excel's standard operator/separator boundaries.
+const MODEL_CODENAMES=['Project Falcon','Project Atlas','Northwind Industrial','Bluepeak Foods','Ironline Logistics','Cascade Materials','Halcyon Health','Redrock Energy','Project Copper','Summit Retail'];
+function codename(){ return MODEL_CODENAMES[rnd(0,MODEL_CODENAMES.length-1)]; }
 const OPERATOR_BOUNDARY = /[=+\-*/^(,]$/;
 let undoStack=[], redoStack=[], keyLog=[], keyTimes=[];
 let gameMode='classic';   // 'classic' | 'marathon'
