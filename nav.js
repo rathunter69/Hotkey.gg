@@ -379,7 +379,10 @@
       if(ch.indexOf('daily-')===0){ xp+=30; return; }
       if(ch.indexOf('wk-')===0){ xp+=25; return; }
       const nth=(perDrill[ch]=(perDrill[ch]||0)+1);
-      xp += nth===1 ? (50 + ((PARS[ch]||0)>=55?15:0)) : (nth<=10 ? 15 : 3);   // advanced-drill first-clear bonus
+      // r60: smooth diminishing repeats (Wolf: adaptive XP) — grinding one drill decays
+      // instead of paying flat-15 nine times then cliffing. Reprices history in beta.
+      const rep=[0,0,15,10,7,5][Math.min(nth,5)] ?? 0;
+      xp += nth===1 ? (50 + ((PARS[ch]||0)>=55?15:0)) : (nth<=5 ? rep : (nth<=10 ? 3 : 1));
     });
     (mySessions||[]).forEach(s=>{ xp += s.mode==='marathon' ? 20 : 10; });
     return xp + 25*top10s + 100*podiums + 250*crowns;

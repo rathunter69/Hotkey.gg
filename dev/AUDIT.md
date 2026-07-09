@@ -1474,3 +1474,25 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - Pass III remaining (visual density only — graders already strong): audit,
   sumif, lookup, drill. undo stays exempt (end-state grading).
 - v59.
+
+---
+# ROUND 60 — workbook tabs, flat pass II, adaptive XP (canonical), taller frame
+- SHEET TABS, WORKBOOK EDITION: group lead chip ("MODELS \u00bb") opens the strip;
+  every tab wears the GROUP COLOR (2.5px top edge + lead text via --gcol from
+  HOTKEY_GROUP_COLORS) — one family of sheets, one color, like a real deck of
+  tabs. Taller (38px strip, 8/15px padding, 11.5px type), flat.
+- FLAT PASS II: dialog/popover/tooltip drop shadows removed (modal 18px/56px,
+  paste dock, tooltips); focus glows (fc-swatch, guided cl-box) converted to
+  outlines. Landing inherits the flattened modal chrome. td inset "shadows"
+  retained — those are cell borders/selection, function not chrome.
+- ADAPTIVE XP — THE CANONICAL MATH (found in nav.js computeXP, which reprices
+  ALL history from the runs table at read time; the results-card number is an
+  estimate): repeat schedule was flat 15 for runs 2-10 then cliff to 3. Now
+  smooth decay: 1st 50(+15 adv) \u00b7 2nd 15 \u00b7 3rd 10 \u00b7 4th 7 \u00b7 5th 5 \u00b7 6-10th 3 \u00b7
+  11+ 1. Client estimate mirrors it via a local clear counter (hk_clears).
+  NOTE: levels reprice slightly in beta (history is re-scored) — acceptable now,
+  NOT after launch.
+- TALLER FRAME: stage-row min-height clamp(400px, 60vh, 680px); measured row
+  height ceiling 36→42px — the adaptive rows scale UP into the bigger box.
+  Page container 1180→1280px (nav.css — all pages).
+- v60.
