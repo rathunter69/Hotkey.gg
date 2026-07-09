@@ -1671,3 +1671,17 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   bubble) and kicks navRefreshAuth() so the username appears WITHOUT a refresh.
 - Landing dialog type: h1 30\u219223, lede 14 (Wolf: "text looks a little tall").
 - v70.
+
+---
+# ROUND 71 — grid fill (engine-proof), the 'set a name' identity split
+- GRID FILL: flex-basis alone does not stretch display:table in all engines —
+  .gridwrap table now ALSO gets height:100% against the resolved gridwrap
+  height; rows share the surplus natively (--cellh stays the floor). Measured
+  cap 48\u219256 as a comfort bound. A1:J14 reaches the tab strip; no compression.
+- 'SET A NAME' DIAGNOSED: the beta gate signs users in ANONYMOUSLY and hangs
+  the handle on that anon identity's profile; when Wolf later signed in with a
+  real account, its profile had NO handle — leaderboard/card/account correctly
+  showed the empty state. FIX: on session settle, a real account with
+  membership but no handle gets promptHandle() in-game, once. (Handle migration
+  from anon identities left as a manual/Supabase concern — flagged.)
+- v71.

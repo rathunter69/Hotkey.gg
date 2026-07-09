@@ -395,6 +395,8 @@
     const tier = tierOf(d.avgPct, d.attempted);
     const fmtMs = ms => (ms/1000).toFixed(2) + 's';
     const handle = (window._navProfile && window._navProfile.handle) || 'set a name';
+    // r70b: 'set a name' is a real state (profile without a handle) — make it actionable
+    window.__hkNoHandle = !(window._navProfile && window._navProfile.handle);
     let body = '', lastG = null;
     d.drills.forEach(x => {
       if(x.group !== lastG){ body += `<div class="pc-grouphdr" style="font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin:16px 0 4px">${escHtml(x.group)}</div>`; lastG = x.group; }

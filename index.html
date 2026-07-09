@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=70" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=70">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=70">
+<link rel="icon" href="favicon.ico?v=71" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=71">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=71">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -100,7 +100,7 @@
   .gridwrap{background:var(--surface); border:0; border-radius:0;
     padding:14px 14px 3px; overflow:visible; position:relative; min-width:0;
     align-self:stretch; display:flex; flex-direction:column}
-  .gridwrap table{flex:1 1 auto}   /* r69: the table FLEXES to the tab strip; row heights distribute the surplus (--cellh is a floor in table layout) */
+  .gridwrap table{flex:1 1 auto; height:100%}   /* r70b: flex-basis alone doesn't stretch display:table in all engines — height:100% against the resolved gridwrap height does. Rows share the surplus; --cellh is the floor. */
   table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}   /* r65: Calibri renders smaller — sized up */
   .edcaret{color:var(--accent); font-weight:700; animation:edblink 1s steps(1) infinite; margin:0 -2px}
   @keyframes edblink{50%{opacity:0}}
@@ -980,14 +980,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=70"></script>
-<link rel="stylesheet" href="nav.css?v=70">
-<script src="themes.js?v=70"></script>
+<script src="drills.js?v=71"></script>
+<link rel="stylesheet" href="nav.css?v=71">
+<script src="themes.js?v=71"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=70"></script>
+<script src="nav.js?v=71"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4031,7 +4031,7 @@ function render(){
   let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));
   if(__gw && __gw.clientHeight>100){                       // measured: fill the box exactly
     const __availH = __gw.clientHeight - 28 - 31;          // padding 14×2 + header row
-    __rowH = Math.max(22, Math.min(48, Math.floor((__gw.clientHeight - 17 - 31) / S.ROWS)));   // r65: pad now 14+3; ceiling 48 — rows eat the box to the tabs
+    __rowH = Math.max(22, Math.min(56, Math.floor((__gw.clientHeight - 17 - 31) / S.ROWS)));   // r70b: ceiling 56 — with height:100% distribution the cap is a comfort bound, not the fill mechanism
   }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
   S._colW = colW;                                          // ENGINE widths — graders (autofit) read these; r55 wrongly pointed this at __ew
@@ -7129,7 +7129,10 @@ async function onSession(session){
         if(typeof authOpen!=='undefined' && authOpen) closeAuth();      // r70: the sign-in bubble closes itself
         try{ (window.navRefreshAuth||window.__navAuthKick||function(){})(); }catch(e){} // r70: nav shows the user without a refresh
         // landing sign-in satisfies the gate — advance AFTER member/handle fetch settles (onSession loads them async)
-        setTimeout(()=>{ try{ if(!isAnonUser() && me_member && me_handle) advanceAccess(); }catch(e){} }, 700);
+        setTimeout(()=>{ try{
+          if(!isAnonUser() && me_member && me_handle) advanceAccess();
+          else if(!isAnonUser() && me_member && !me_handle) promptHandle();   // r70b: real account, membership, NO handle (e.g. handle lives on an old anon identity) — ask once, here
+        }catch(e){} }, 700);
       }
     }catch(e){}
   }
