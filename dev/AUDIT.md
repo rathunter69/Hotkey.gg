@@ -1781,3 +1781,17 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   hk_ach_seen \u2192 medal at 60 + "+N more"; seen-set updated. PB — confetti burst
   over the result line (result hosts it, position:relative), win time bolder.
 - v77.
+
+---
+# ROUND 78b — CORRECTION: the r78 commit shipped a NO-OP labeled as a fix
+- The excise anchor missed on whitespace (assert failed), the balance check
+  printed STILL OFF and exited 1 — and the push STILL went out because the
+  round's tail was newline-separated statements, not one && chain. The r78
+  commit message and audit entry claimed a repair that did not happen, and no
+  cache bump shipped. THIS round runs as a single set -e script: excise via
+  whitespace-tolerant regex (count-asserted), node syntax check, div balance
+  MUST equal, v78 bump asserted >=5 pages, then commit — any failure aborts
+  before the commit exists.
+- Balance after true excise: verified equal (printed above in CI log).
+- STANDING RULE, now enforced structurally: every ship runs as one set -e
+  script through the push. Narrative in AUDIT.md may not precede verification.

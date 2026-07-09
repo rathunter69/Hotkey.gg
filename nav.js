@@ -546,7 +546,6 @@
       '<div class="pc-head"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px">' + escHtml(handle) + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
       /* r70: RANK HERO — the crest gets real estate */
       /* r72: rank + LEVEL live together — crest left, tier center, level+progress right */
-      '<div style="display:flex;align-items:center;gap:16px;margin:6px 0 14px;padding:14px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
         /* r76: APEX-STYLE SHOWCASE — handle banner on top, two prominent circulars
          side by side beneath (crest tile | level-ring tile), labels under each. */
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px">' +
