@@ -166,8 +166,8 @@ window.rankEmblem = function(tierName, size, bucket){
     {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},
   ];
   const p=P[i];
-  const halo='<circle cx="17" cy="17" r="16.6" fill="'+p.rim+'" opacity=".12"/>';   // r69: contrast disc — the crest pops on ANY surface
-  const ring=(r,op,w)=>'<circle cx="17" cy="17" r="'+r+'" fill="none" stroke="'+p.rim+'" stroke-width="'+(w||1.7)+'" opacity="'+Math.min(1,op+.25)+'"/>';
+  // r74: FLAT crests — halo disc retired (it read as a tinted background), regalia at full strength
+  const ring=(r,op,w)=>'<circle cx="17" cy="17" r="'+r+'" fill="none" stroke="'+p.rim+'" stroke-width="'+(w||1.7)+'" opacity="'+Math.min(1,op+.35)+'"/>';
   const spokes=(n,r1,r2,w,op)=>{ let s=''; for(let k=0;k<n;k++){ const a=(Math.PI*2*k)/n - Math.PI/2;
       s+='<path d="M'+(17+r1*Math.cos(a)).toFixed(1)+' '+(17+r1*Math.sin(a)).toFixed(1)+
          'L'+(17+r2*Math.cos(a)).toFixed(1)+' '+(17+r2*Math.sin(a)).toFixed(1)+
@@ -203,16 +203,23 @@ window.rankEmblem = function(tierName, size, bucket){
     for(let k=0;k<3;k++) pips+='<circle cx="'+(13+k*4)+'" cy="31.4" r="1.5" fill="'+(k<n?p.rim:'rgba(120,124,134,.5)')+'"/>';
   }
   return '<svg class="rank-emblem'+(i===7?' emblem-max':'')+'" viewBox="0 0 34 34" width="'+size+'" height="'+size+'" aria-hidden="true">'+
-    halo + plate + fx1 +
-    '<rect x="6" y="8" width="22" height="20" rx="5" fill="rgba(0,0,0,.5)"/>'+
-    '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="'+p.face+'" stroke="'+p.rim+'" stroke-width="2.3"/>'+
-    '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="3.2" style="paint-order:stroke" opacity=".35"/>'+
+    plate + fx1 +
+    '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="'+p.face+'" stroke="'+p.rim+'" stroke-width="2.2"/>'+
     '<rect x="9.4" y="8.4" width="15.2" height="6" rx="3" fill="'+p.top+'"/>'+
-    '<path d="M10.5 9.6h13" stroke="rgba(255,255,255,.13)" stroke-width="1" stroke-linecap="round"/>'+
     legend + pips +
     '</svg>';
 };
 
+window.hkLevelRing = function(lvl, pct, size){
+  size=size||56;
+  const r=24, C=2*Math.PI*r, off=C*(1-Math.max(0,Math.min(100,pct))/100);
+  return '<svg viewBox="0 0 56 56" width="'+size+'" height="'+size+'" aria-hidden="true">'+
+    '<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="var(--surface)" stroke-width="5"/>'+
+    '<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" '+
+      'stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 28 28)"/>'+
+    '<text x="28" y="26.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="14" fill="var(--text)">'+lvl+'</text>'+
+    '<text x="28" y="38" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-size="6.5" letter-spacing="1.5" fill="var(--muted)">LVL</text></svg>';
+};
 window.hkLevelChip = function(lvl, size){
   size=size||22;
   const m = lvl>=20?['#8ab4ff','#c4d7ff'] : lvl>=15?['#e3b341','#ffd769'] : lvl>=10?['#b9c2cf','#dde4ee'] : lvl>=5?['#b0793f','#e0a35c'] : ['#6f7480','#a8adb6'];
@@ -344,7 +351,6 @@ window.hkBadge = function(id, earned, size, color){
     crown+
     '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?'.16':'.05')+'"/>'+
     '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.6"/>'+
-    '<path d="'+hex+'" fill="none" stroke="rgba(0,0,0,.3)" stroke-width="3" style="paint-order:stroke" opacity=".3"/>'+
     (earned?'<path d="'+hexIn+'" fill="none" stroke="currentColor" stroke-width=".9" opacity=".55"/>':'')+
     '<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(G[id]||G.fin)+'</g>'+
     '</svg>';

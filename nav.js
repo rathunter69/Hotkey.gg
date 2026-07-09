@@ -527,10 +527,9 @@
         '<span class="'+tier.cls+'" style="display:inline-flex;color:inherit">'+(window.rankEmblem?window.rankEmblem(tier.name,72,tier.bucket):'')+'</span>' +
         '<div><div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:14px">'+tier.name+'</div>' +
         '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px">'+standing+'</div></div>' +
-        '<div style="margin-left:auto;text-align:right;font-family:var(--mono);min-width:150px">' +
-          '<div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">'+(window.hkLevelChip?window.hkLevelChip(__L.lvl,24):'')+'<span style="font-size:15px;font-weight:700;color:var(--accent)">LVL '+__L.lvl+'</span></div>' +
-          '<div style="height:5px;background:var(--surface);border-radius:99px;overflow:hidden;margin:7px 0 4px"><span style="display:block;height:100%;width:'+__L.pct+'%;background:var(--accent)"></span></div>' +
-          '<div style="font-size:10px;color:var(--muted)">'+__L.into+' / '+__L.need+' xp</div>' +
+        '<div style="margin-left:auto;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono)">' +
+          (window.hkLevelRing?window.hkLevelRing(__L.lvl, __L.pct, 58):'') +
+          '<div style="font-size:9.5px;color:var(--muted)">'+__L.into+' / '+__L.need+' xp</div>' +
         '</div>' +
       '</div>' +
       badgesHtml +

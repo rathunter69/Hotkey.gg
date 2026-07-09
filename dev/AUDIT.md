@@ -1713,3 +1713,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   runs frame\u2192stage-row\u2192stage-main\u2192gridwrap\u2192table and rows natively
   distribute every pixel down to the tab strip. Larger cells for free.
 - v73.
+
+---
+# ROUND 74 — flat crests (contrast armor retired), fitness-ring level
+- CRESTS DE-SHADED per Wolf: the r69 "contrast armor" (halo disc, rgba
+  under-shadow rect, paint-order dark under-stroke, bevel hairline) read as
+  tinted backgrounds and shading against the flat doctrine — ALL retired.
+  Crests are now pure flats: regalia strokes (+.35 opacity), cap face + metal
+  rim (2.2), legend, pips. Badges lose their under-stroke too.
+- PLATFORM QUESTION answered honestly: hand-coded SVG is the right medium for
+  flat, theme-aware, multi-size marks; commissioned raster art only makes sense
+  if the direction changes to painterly/illustrated crests (it hasn't).
+- LEVEL = FITNESS RING: window.hkLevelRing(lvl,pct,size) — flat circular track
+  (surface) + accent progress arc, level number centered, LVL caption. The
+  player-card hero's right column is now the ring + xp caption — cleaner
+  vertical alignment across the hero. hkLevelChip retained for compact spots
+  (stats/account).
+- v74.
