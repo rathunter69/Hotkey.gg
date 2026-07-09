@@ -28,17 +28,17 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=58" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=58">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=58">
+<link rel="icon" href="favicon.ico?v=59" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=59">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=59">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --bg:#b9bcc3; --surface:#cdcfd5; --surface2:#c0c3ca; --line:#999da7;
-    --text:#26282e; --muted:#565a64; --faint:#82868f;
+    --bg:#d8dade; --surface:#e9eaed; --surface2:#dfe1e5; --line:#b6b9c2;
+    --text:#2b2e36; --muted:#5f6471; --faint:#8d919b;
     --accent:#3f9873; --accent-dim:#2a6b50; --accent-glow:rgba(63,152,115,.18);
     --warn:#d9a441; --bad:#c8533f;
     --mono:'JetBrains Mono',ui-monospace,monospace;
@@ -943,14 +943,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=58"></script>
-<link rel="stylesheet" href="nav.css?v=58">
-<script src="themes.js?v=58"></script>
+<script src="drills.js?v=59"></script>
+<link rel="stylesheet" href="nav.css?v=59">
+<script src="themes.js?v=59"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=58"></script>
+<script src="nav.js?v=59"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1550,34 +1550,40 @@ const CHALLENGES = {
     }
   },
   ribbon:{
-    name:'Ribbon', label:'Learn the ribbon', par:30, parKeys:15,
-    prompt:'Alt is a menu, not a chord: press it, read the letters, walk the path. Three formats, three ribbon walks \u2014 bold the header, comma the number, center the label. Watch the breadcrumb at the bottom as you go.',
-    req:'<em>A1</em> \u00b7 <em>alt h 1</em> bold \u00b7 <em>B2</em> \u00b7 <em>alt h k</em> comma \u00b7 <em>A4</em> \u00b7 <em>alt h a c</em> center',
-    guide:[
-      'on A1 \u00b7 <kbd>alt</kbd> then <kbd>h</kbd> then <kbd>1</kbd> \u2014 Home, Bold. Read the ribbon as it opens',
-      'to B2 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 comma format',
-      'to A4 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> \u2014 Alignment, Center',
-    ],
-    targets:['A1','B2','A4'],
-    demo(){ return [
-      {sel:'A1', keys:[Kb.alt, {key:'h'}, {key:'1'}]},
-      {sel:'B2', keys:[Kb.alt, {key:'h'}, {key:'k'}]},
-      {sel:'A4', keys:[Kb.alt, {key:'h'}, {key:'a'}, {key:'c'}]},
+    name:'Ribbon', label:'Walk the ribbon', par:42, parKeys:14,
+    prompt:'Three formatting jobs scattered across a working page \u2014 different cells every run \u2014 and every one of them is a ribbon walk: Alt H 1 bold, Alt H K comma, Alt H A C center. The ribbon is a keyboard surface; walk it.',
+    req(){ const o=this._o; return '<em>'+o.b+'</em> \u00b7 <em>alt h 1</em> bold \u00b7 <em>'+o.k+'</em> \u00b7 <em>alt h k</em> comma \u00b7 <em>'+o.c+'</em> \u00b7 <em>alt h a c</em> center'; },
+    guide(){ const o=this._o; return [
+      'bold the title at <b>'+o.b+'</b> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd>',
+      'comma format the figure at <b>'+o.k+'</b> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd>',
+      'center the header at <b>'+o.c+'</b> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd>',
+    ]; },
+    targets(){ const o=this._o; return [o.b,o.k,o.c]; },
+    demo(){ const o=this._o; return [
+      {sel:o.b, keys:[Kb.alt,{key:'h'},{key:'1'}]},
+      {sel:o.k, keys:[Kb.alt,{key:'h'},{key:'k'}]},
+      {sel:o.c, keys:[Kb.alt,{key:'h'},{key:'a'},{key:'c'}]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Summary',txt:true};
-      cells['A2']={...blankCell(),value:'Total',txt:true};
-      cells['B2']={...blankCell(),value:rnd(1200,98000),fontColor:'blue'};
-      cells['A4']={...blankCell(),value:'Status',txt:true};
-      return {ROWS:5, cells, active:{r:1,c:1}, sel:null, colW:{1:96,2:96}};
+      const labs=['Revenue','COGS','Gross profit','SG&A','EBITDA','D&A','EBIT','Interest'];
+      [[1,2],[5,2],[1,8],[5,8]].forEach(([c,r0],t)=>{ for(let i=0;i<3;i++){
+        cells[colLetter(c)+(r0+i)]={...blankCell(),value:labs[(t*2+i)%8],txt:true};
+        cells[colLetter(c+1)+(r0+i)]={...blankCell(),value:rnd(1000,99999)*10,fontColor:'blue',decimals:0}; } });
+      const titleSpots=[[1,1],[5,1],[1,7],[5,7]], numSpots=[[2,3],[6,3],[2,9],[6,9]], hdrSpots=[[3,1],[8,1],[3,7],[8,7]];
+      const pick=arr=>arr[rnd(0,arr.length-1)];
+      const T0=pick(titleSpots), N0=pick(numSpots), H0=pick(hdrSpots);
+      cells[colLetter(T0[0])+T0[1]]={...blankCell(),value:codename().split(' \u2014')[0]+' detail',txt:true};
+      cells[colLetter(H0[0])+H0[1]]={...blankCell(),value:'FY'+rnd(24,28)+'E',txt:true};
+      this._o={ b:colLetter(T0[0])+T0[1], k:colLetter(N0[0])+N0[1], c:colLetter(H0[0])+H0[1] };
+      return {ROWS:11, cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{1:104,5:104}};
     },
     checks(S){
-      const c=k=>S.cells[k]||{};
+      const o=this._o, c=k=>S.cells[k]||{};
       return [
-        {label:'A1 bold \u2014 Alt H 1', ok: !!c('A1').bold},
-        {label:'B2 comma format \u2014 Alt H K', ok: c('B2').fmtStyle==='comma'},
-        {label:'A4 centered \u2014 Alt H A C', ok: c('A4').align==='c'},
+        {label:'the title at '+o.b+' is bold \u2014 Alt H 1', ok: !!c(o.b).bold},
+        {label:'the figure at '+o.k+' wears commas \u2014 Alt H K', ok: c(o.k).fmtStyle==='comma'},
+        {label:'the header at '+o.c+' sits centered \u2014 Alt H A C', ok: c(o.c).align==='c'},
       ];
     }
   },
@@ -1968,79 +1974,85 @@ const CHALLENGES = {
     }
   },
   polish:{
-    name:'Header', label:'Polish the Header', par:24, parKeys:14,
-    prompt:'Dress up the header row so it reads as a header: make it bold, give it a bottom border to split it off from the data, and shade it. Header is A1:E1.',
-    req:'<em>select A1:E1</em> · <em>ctrl b</em> bold · <em>alt h b b</em> bottom border · <em>alt h h</em> shade',
-    guide:[
-      'on A1 · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row — the desk habit · <kbd>ctrl</kbd>+<kbd>b</kbd> bold',
-      'still selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> for a bottom border',
-      'shade it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd>',
-    ],
-    targets:['A1:E1','A1:E1','A1:E1'],
-    demo(){ return [
-      {sel:'A1:E1', keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('B'), Kb.alt,L('H'),L('H')]},
+    name:'Polish', label:'Dress the header row', par:38, parKeys:11,
+    prompt:'Two tables on the page. Dress the TARGET table\u2019s header \u2014 bold, bottom border, shaded \u2014 and leave the other one alone. Print-ready means knowing where the formatting stops.',
+    req(){ const o=this._o; return 'select <em>'+o.h1+':'+o.h2+'</em> \u00b7 <em>ctrl b</em> \u00b7 <em>alt h b b</em> border \u00b7 <em>alt h h</em> shade \u00b7 the table at '+o.d1+' stays plain'; },
+    guide(){ const o=this._o; return [
+      'on '+o.h1+' \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00d73 across the header \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 bottom border under the row',
+      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u2014 shade it \u00b7 the OTHER table\u2019s header stays untouched',
+    ]; },
+    targets(){ const o=this._o; return [o.h1+':'+o.h2]; },
+    demo(){ const o=this._o; return [
+      {sel:o.h1+':'+o.h2, keys:[{key:'b',ctrl:true}, Kb.alt,{key:'h'},{key:'b'},{key:'b'}, Kb.alt,{key:'h'},{key:'h'}]},
     ]; },
     build(){
       const cells={};
-      ['Company','Revenue','EBITDA','Margin','Rank'].forEach((h,i)=>cells[colLetter(i+1)+1]={...blankCell(),value:h,txt:true});
-      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc'];
-      for(let r=2;r<=5;r++){ cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
-        cells['B'+r]={...blankCell(),value:rnd(4,18)*100,fmtStyle:'comma',decimals:0};
-        cells['C'+r]={...blankCell(),value:rnd(1,6)*100,fmtStyle:'comma',decimals:0};
-        cells['D'+r]={...blankCell(),value:rnd(10,40)/100,fmtStyle:'percent',decimals:0};
-        cells['E'+r]={...blankCell(),value:r-1};
-      }
-      return {ROWS:5, cells, active:{r:1,c:1}, sel:null, colW:{1:104,2:80,3:80,4:74,5:60}};
+      const hdr=['Segment','FY1','FY2','FY3'];
+      const mk=(c0,r0)=>{ const keys=[];
+        hdr.forEach((t,j)=>{ const k=colLetter(c0+j)+r0; cells[k]={...blankCell(),value:t,txt:true}; keys.push(k); });
+        for(let i=1;i<=3;i++){ cells[colLetter(c0)+(r0+i)]={...blankCell(),value:['Industrial','Consumer','Services'][i-1],txt:true};
+          for(let j=1;j<4;j++) cells[colLetter(c0+j)+(r0+i)]={...blankCell(),value:rnd(10,90)*10,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+        return keys; };
+      const spots=[[1,2],[6,2],[1,8],[6,8]];
+      for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
+      const A=spots[0], B=spots.find(p=>p[0]!==A[0]||Math.abs(p[1]-A[1])>=6)||spots[1];
+      this._hk=mk(A[0],A[1]); this._dk=mk(B[0],B[1]);
+      this._o={ h1:this._hk[0], h2:this._hk[3], d1:this._dk[0] };
+      return {ROWS:12, cells, active:{r:A[1],c:A[0]}, sel:null, colW:{}};
     },
     checks(S){
-      const all=test=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+1]; if(!x||!test(x)) return false; } return true; };
+      const c=k=>S.cells[k]||{};
       return [
-        {label:'bold the header row', ok: all(x=>x.bold)},
-        {label:'bottom border under the header', ok: all(x=>x.bb)},
-        {label:'shade the header', ok: all(x=>x.fill==='blue')},
+        {label:'target header bold, all four cells', ok: this._hk.every(k=>c(k).bold)},
+        {label:'bottom border runs under the whole header', ok: this._hk.every(k=>c(k).bb)},
+        {label:'header shaded', ok: this._hk.every(k=>c(k).fill==='blue')},
+        {label:'the other table stays plain \u2014 formatting has edges', ok: this._dk.every(k=>!c(k).bold&&!c(k).bb&&!c(k).fill)},
       ];
     }
   },
   foot:{
-    name:'Totals', label:'Total it both ways', par:55, parKeys:46,
-    prompt:'Foot and cross-foot the table: total each segment across into column E, total each quarter down into row 5, and tie it off with a grand total in the corner. SUM both directions.',
-    req:'<em>SUM both ways</em> · row totals in E (=SUM(B2:D2)) · column totals in row 5 (=SUM(B2:B4)) · grand total E5 · fill to repeat',
+    name:'Foot', label:'Foot the table both ways', par:72, parKeys:34,
+    prompt:'A 4\u00d74 block of figures: total every row, total every column, and land the grand total where they meet \u2014 then prove it: the grand total must equal the row totals AND the column totals. One SUM, filled both directions.',
+    req:'<em>F2</em> \u00b7 <em>=SUM(B2:E2)</em> \u00b7 fill F2:F5 \u2193 \u00b7 <em>B7</em> \u00b7 <em>=SUM(B2:B5)</em> \u00b7 fill B7:E7 \u2192 \u00b7 <em>F7</em> grand <em>=SUM(B2:E5)</em>',
     guide:[
-      'row totals: in E2 type <kbd>=SUM(B2:D2)</kbd> <kbd>↵</kbd>, then select E2:E4 and <kbd>ctrl</kbd>+<kbd>d</kbd> to fill down',
-      'column totals: in B5 type <kbd>=SUM(B2:B4)</kbd> <kbd>↵</kbd>, then select B5:D5 and <kbd>ctrl</kbd>+<kbd>r</kbd> to fill right',
-      'grand total: in E5 type <kbd>=SUM(E2:E4)</kbd> — it should tie to the column totals',
+      'row totals: F2 \u00b7 <kbd>=SUM(B2:E2)</kbd> <kbd>\u21b5</kbd> \u00b7 select F2:F5 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'column totals: B7 \u00b7 <kbd>=SUM(B2:B5)</kbd> <kbd>\u21b5</kbd> \u00b7 select B7:E7 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'the grand total at F7 \u00b7 <kbd>=SUM(B2:E5)</kbd> \u2014 it must agree with both edges',
     ],
-    targets:['E2:E4','B5:D5','E5'],
+    targets:['F2:F5','B7:E7','F7'],
     demo(){ return [
-      {sel:'E2', keys:[...T('=SUM(B2:D2)'), Kb.enter]},
-      {sel:'E2:E4', keys:[Kb.fillD]},
-      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
-      {sel:'B5:E5', keys:[Kb.fillR]},
-      {sel:'E5', keys:[...T('=SUM(E2:E4)'), Kb.enter]},
+      {sel:'F2', keys:[...T('=SUM(B2:E2)'), Kb.enter]},
+      {sel:'F2:F5', keys:[Kb.fillD]},
+      {sel:'B7', keys:[...T('=SUM(B2:B5)'), Kb.enter]},
+      {sel:'B7:E7', keys:[Kb.fillR]},
+      {sel:'F7', keys:[...T('=SUM(B2:E5)'), Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Segment',txt:true,bold:true};
-      ['Q1','Q2','Q3','Total'].forEach((h,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:h,txt:true,bold:true});
-      const segs=['North','EMEA','APAC'];
-      for(let r=2;r<=4;r++){ cells['A'+r]={...blankCell(),value:segs[r-2],txt:true};
-        for(let c=2;c<=4;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(20,90)*10,fmtStyle:'comma',decimals:0};
-        cells['E'+r]={...blankCell(),fmtStyle:'comma',decimals:0};
-      }
-      cells['A5']={...blankCell(),value:'Total',txt:true,bold:true};
-      for(let c=2;c<=5;c++) cells[colLetter(c)+5]={...blankCell(),fmtStyle:'comma',decimals:0};
-      return {ROWS:5, cells, active:{r:2,c:5}, sel:null, colW:{1:96,2:74,3:74,4:74,5:84}};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 segment \u00d7 quarter ($mm)',txt:true,bold:true};
+      const segs=['Industrial','Consumer','Services','Energy'];
+      ['Q1','Q2','Q3','Q4'].forEach((q,j)=>cells[colLetter(2+j)+1]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
+      cells['F1']={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
+      this._g=0;
+      for(let i=0;i<4;i++){ cells['A'+(2+i)]={...blankCell(),value:segs[i],txt:true};
+        for(let j=0;j<4;j++){ const v=rnd(10,90)*10; this._g+=v;
+          cells[colLetter(2+j)+(2+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+        cells['F'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0}; }
+      cells['A7']={...blankCell(),value:'Total',txt:true,bold:true};
+      for(let j=0;j<4;j++) cells[colLetter(2+j)+7]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['F7']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      return {ROWS:8, cells, active:{r:2,c:6}, sel:null, colW:{1:104}};
     },
     checks(S){
-      const val=k=>{const c=S.cells[k];return c&&typeof c.value==='number'?c.value:0;};
-      const rowOk=r=>{const c=S.cells['E'+r];return !!(c&&c.formula)&&Math.abs(c.value-(val('B'+r)+val('C'+r)+val('D'+r)))<1e-6;};
-      const colOk=cc=>{const L2=colLetter(cc);const c=S.cells[L2+5];return !!(c&&c.formula)&&Math.abs(c.value-(val(L2+2)+val(L2+3)+val(L2+4)))<1e-6;};
-      const grand=S.cells['E5']; let total=0; for(let r=2;r<=4;r++) total+=val('B'+r)+val('C'+r)+val('D'+r);
-      const grandOk=!!(grand&&grand.formula)&&Math.abs(grand.value-total)<1e-6;
+      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:NaN; };
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula); };
+      const rowOk=r=>live('F'+r)&&Math.abs(val('F'+r)-(val('B'+r)+val('C'+r)+val('D'+r)+val('E'+r)))<1e-6;
+      const colOk=cc=>{ const L2=colLetter(cc); return live(L2+'7')&&Math.abs(val(L2+'7')-(val(L2+'2')+val(L2+'3')+val(L2+'4')+val(L2+'5')))<1e-6; };
       return [
-        {label:'row totals down column E (SUM across)', ok: rowOk(2)&&rowOk(3)&&rowOk(4)},
-        {label:'column totals along row 5 (SUM down)', ok: colOk(2)&&colOk(3)&&colOk(4)},
-        {label:'grand total in E5 ties it out', ok: grandOk},
+        {label:'four live row totals down column F', ok: [2,3,4,5].every(rowOk)},
+        {label:'four live column totals across row 7', ok: [2,3,4,5].every(colOk)},
+        {label:'the grand total agrees with BOTH edges', ok: live('F7')&&Math.abs(val('F7')-this._g)<1e-6},
       ];
     }
   },
@@ -2289,61 +2301,48 @@ const CHALLENGES = {
     }
   },
   bridge:{
-    name:'Bridge', label:'Stretch the profit row', par:22, parKeys:11,
-    prompt:'Build the profit formula at B4 by POINTING — the way bankers do it. Press = (or + on the numpad) to start, arrow up to grab revenue, type * for multiply, arrow up again for margin, Enter to commit. Then fill it across all four years.',
-    req:'<em>=</em> (or <em>+</em>) starts the formula · <em>↑↑</em> grabs revenue (B2) · <em>*</em> · <em>↑</em> grabs margin (B3) · <em>↵</em> · then select B4:E4 and <em>ctrl+r</em>',
+    name:'Point Mode', label:'Point, don\u2019t type', par:40, parKeys:12,
+    prompt:'Build profit = revenue \u00d7 margin by POINTING \u2014 = then arrow up to grab each reference, never typing a cell address \u2014 and fill it across five years. Point mode is the fastest formula entry there is; the fill proves your references were relative.',
+    req:'<em>B4</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs B2 \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs B3 \u00b7 <em>\u21b5</em> \u00b7 select B4:F4 \u00b7 <em>ctrl+r</em>',
     guide:[
-      'at B4 press <kbd>=</kbd> to start the formula (or <kbd>+</kbd> on the numpad — bankers love the big key)',
-      'arrow to revenue · <kbd>↑</kbd> <kbd>↑</kbd> — the pointer cell highlights and <b>B2</b> appears in the formula',
-      'multiply · <kbd>*</kbd> · then arrow back up to margin · <kbd>↑</kbd> — <b>B3</b> appears',
-      'commit · <kbd>↵</kbd>',
-      'back up to B4 (<kbd>↑</kbd>), then extend selection right · <kbd>shift</kbd>+<kbd>→</kbd> three times to reach E4',
-      'fill right · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'at B4 \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
+      '<kbd>\u2191</kbd> \u2014 one hop to margin \u00b7 <kbd>\u21b5</kbd>',
+      'select B4:F4 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 five years from one pointed formula',
     ],
-    targets:['B4','B4:E4','B4:E4'],
+    targets:['B4','B4:F4'],
     demo(){ return [
-      {sel:'B4', keys:[{key:'='}, {key:'ArrowUp'}, {key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
-      {sel:'B4:E4', keys:[Kb.fillR]},
+      {sel:'B4', keys:[Kb.eq, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
+      {sel:'B4:F4', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
-      const num=(v)=>({...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'});
-      const pct=(v)=>({...blankCell(),value:v,fmtStyle:'percent',decimals:0,fontColor:'blue'});
-      const blankNum=()=>({...blankCell(),fmtStyle:'comma',decimals:0});
-      cells['A1']={...blankCell(),value:'Profit bridge',txt:true,bold:true};
-      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      cells['A1']={...blankCell(),value:codename()+' \u2014 profit build ($mm)',txt:true,bold:true};
       cells['A2']={...blankCell(),value:'Revenue',txt:true};
-      cells['A3']={...blankCell(),value:'Margin %',txt:true};
-      cells['A4']={...blankCell(),value:'Operating profit',txt:true};
-      // Revenue grows year over year; margin expands too — a realistic-feeling story
-      const rev0 = rnd(10,14)*100;            // 1000–1400
-      const growth = rnd(8,18)/100;           // 8–18% growth
-      const margin0 = rnd(14,22)/100;         // 14–22% starting margin
-      const marginStep = rnd(1,3)/100;        // +1–3 pp per year
-      for(let i=0;i<4;i++){
-        const r = Math.round(rev0 * Math.pow(1+growth, i) / 10) * 10;
-        const m = +(margin0 + i*marginStep).toFixed(2);
-        cells[colLetter(i+2)+'2'] = num(r);
-        cells[colLetter(i+2)+'3'] = pct(m);
-        cells[colLetter(i+2)+'4'] = blankNum();   // pre-formatted but empty for formula
+      cells['A3']={...blankCell(),value:'EBITDA margin',txt:true};
+      cells['A4']={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells['A6']={...blankCell(),value:'Memo: growth',txt:true};
+      this._exp=[];
+      let rev=rnd(40,90)*10;
+      for(let j=0;j<5;j++){
+        const m=rnd(18,34)/100;
+        cells[colLetter(2+j)+1]={...blankCell(),value:'FY'+(24+j),txt:true,bold:true,align:'r'};
+        cells[colLetter(2+j)+2]={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[colLetter(2+j)+3]={...blankCell(),value:m,fontColor:'blue',fmtStyle:'percent',decimals:1};
+        cells[colLetter(2+j)+4]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+        if(j<4) cells[colLetter(3+j)+6]={...blankCell(),value:rnd(3,9)/100,fmtStyle:'percent',decimals:1};
+        this._exp.push({rev:rev, m:m});
+        rev=Math.round(rev*(1+rnd(3,9)/100));
       }
-      return {ROWS:4, cells, active:{r:4,c:2}, sel:null, colW:{1:140,2:78,3:78,4:78,5:78}};
+      return {ROWS:7, cells, active:{r:4,c:2}, sel:null, colW:{1:118}};
     },
     checks(S){
-      const COL=['B','C','D','E'];
-      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
-      // Each profit cell must be a formula referencing the same column's revenue × margin (or vice versa).
-      // Accept either order (=B2*B3 or =B3*B2) — both are correct.
-      const profitOk = i=>{ const col=COL[i], c=S.cells[col+'4']; if(!c||!c.formula) return false;
-        const f=c.formula.toUpperCase().replace(/\s/g,'');
-        const refRev=col+'2', refMgn=col+'3';
-        if(!f.includes(refRev) || !f.includes(refMgn) || !f.includes('*')) return false;
-        return Math.abs(c.value - (val(refRev)*val(refMgn))) < 1e-6;
-      };
-      let formulaOk=true;
-      for(let i=0;i<4;i++) if(!profitOk(i)) formulaOk=false;
+      const okCol=j=>{ const L2=colLetter(2+j), c=S.cells[L2+'4']; if(!c||!c.formula) return false;
+        const f=String(c.formula).toUpperCase().replace(/[\s$]/g,'');
+        const refs=f.includes(L2+'2')&&f.includes(L2+'3');
+        return refs && typeof c.value==='number' && Math.abs(c.value-this._exp[j].rev*this._exp[j].m)<0.5; };
       return [
-        {label:'profit = revenue × margin, all 4 years (formulas, not hardcoded)', ok: formulaOk},
+        {label:'EBITDA at B4 \u2014 revenue \u00d7 margin, both refs pointed in-column', ok: okCol(0)},
+        {label:'filled across all five years \u2014 relative refs walked with the fill', ok: [1,2,3,4].every(okCol)},
       ];
     }
   },

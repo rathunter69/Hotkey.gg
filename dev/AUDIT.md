@@ -1455,3 +1455,22 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - REMAINING sparse cohort for pass II: ribbon, polish, foot, bridge, audit,
   sumif, lookup, drill (undo exempt — end-state grading can't see it).
 - v58.
+
+---
+# ROUND 59 — lighter Default; density pass II (ribbon, polish, foot, bridge)
+- DEFAULT LIGHTENED AGAIN (Wolf: "even lighter — dracula with green"): bg
+  #b9bcc3 → #d8dade, surfaces #e9eaed/#dfe1e5, lines #b6b9c2 — pastel dracula
+  greys, same grey-green accent. themes.js + all 5 pages' :root kept in sync.
+- DENSITY PASS II (site-driven rebuilds):
+  * ribbon (par 42) — the three ribbon-walk jobs (bold/comma/center) land at
+    RANDOM cells across a populated four-table page.
+  * polish (par 38) — TWO tables; dress the target header (bold/border/shade),
+    the other must stay plain (formatting-has-edges check).
+  * foot (par 72) — full 4×4 segment×quarter block: four row totals, four
+    column totals, grand total must agree with BOTH edges.
+  * bridge → "Point Mode" (par 40) — profit=rev×margin pointed (never typed)
+    across FIVE years; per-column ref check (wrong-column refs reject).
+- parKeys replay worst-of-30, min-policy: ribbon 14, polish 12, foot 34, bridge 16.
+- Pass III remaining (visual density only — graders already strong): audit,
+  sumif, lookup, drill. undo stays exempt (end-state grading).
+- v59.
