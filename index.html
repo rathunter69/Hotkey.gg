@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=76" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=76">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=76">
+<link rel="icon" href="favicon.ico?v=77" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=77">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=77">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -205,7 +205,8 @@
   .spacer{flex:1}
 
   .result{margin-top:10px; font-family:var(--mono); font-size:13.5px; color:var(--muted);
-    min-height:0; transition:.2s}
+    min-height:0; transition:.2s; position:relative}   /* r77: hosts the PB confetti */
+  .result.win b{font-size:15px}
   .result.win{color:var(--accent)}
   .result.win b{color:var(--text)}
   .result .pb{color:var(--warn); margin-left:8px}
@@ -991,14 +992,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=76"></script>
-<link rel="stylesheet" href="nav.css?v=76">
-<script src="themes.js?v=76"></script>
+<script src="drills.js?v=77"></script>
+<link rel="stylesheet" href="nav.css?v=77">
+<script src="themes.js?v=77"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=76"></script>
+<script src="nav.js?v=77"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4356,8 +4357,22 @@ function checkWin(){
     }
   }
   lastXpGain={n:xpGain, note:xpNote};
+  // r77: local level estimate — cross a threshold, get the ding (canonical XP reprices
+  // server-side from runs; this drives the in-game moment only)
+  if(xpGain>0){ try{
+    const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+    const nxt=est+xpGain;
+    localStorage.setItem('hk_xp_est', String(nxt));
+    const lv=x=>{ let l=1,need=150,fl=0; while(x>=fl+need){ fl+=need; l++; need=150*l; } return l; };
+    if(lv(nxt)>lv(est) && window.hkCelebrate){
+      window.hkCelebrate({cap:'level up', title:'LEVEL '+lv(nxt),
+        sub:'+'+xpGain+' xp \u00b7 keep stacking',
+        iconHtml:(window.hkLevelRing?window.hkLevelRing(lv(nxt), 4, 84):'')});
+    }
+  }catch(e){} }
   if(!mouseUsed && !guidedUsed){ const prev=PB[sk];
-    if(prev===undefined||t<prev){ PB[sk]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s'; } }
+    if(prev===undefined||t<prev){ PB[sk]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s';
+      try{ if(window.hkConfetti) window.hkConfetti($('result')); }catch(e){} } }
   updateStreak();
   try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
     KV.set('hotkey_solves', String(nsol)); renderLvl(nsol); }); }catch(e){}

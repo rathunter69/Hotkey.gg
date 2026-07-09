@@ -1763,3 +1763,21 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   must hard-stop the round; keep every statement in ONE && chain through the
   push.
 - v76.
+
+---
+# ROUND 77 — celebrations: level ding, rank-up, achievement unlocks, PB confetti
+- FOSSIL SCAN (Wolf asked re: navigation-class bugs engine-wide): all drill
+  sel/target ranges scanned for 8-col-era edges — ONLY dcfsens C4:H4 surfaced,
+  which is intentional (six WACC columns). Checks use COLS dynamically.
+  Navigation was the sole victim. CLEAN.
+- CELEBRATION ENGINE (nav.js/nav.css, shared): hkCelebrate({cap,title,sub,
+  iconHtml,colors}) — frame-language dialog (strip cap) with hkPop spring,
+  hkDing number pulse, 38-particle CSS confetti; click/\u21b5/esc or 4.2s dismiss;
+  queued when several fire. hkConfetti(host) standalone.
+- WIRED: LEVEL UP — local xp estimate ladder (hk_xp_est) crosses a threshold on
+  a win \u2192 ding dialog w/ level ring at 84 (canonical XP stays server-priced;
+  this drives the moment). RANK UP — tier index climbed since last card view \u2192
+  new crest at 84, "the desk noticed". ACHIEVEMENTS — fresh unlocks vs
+  hk_ach_seen \u2192 medal at 60 + "+N more"; seen-set updated. PB — confetti burst
+  over the result line (result hosts it, position:relative), win time bolder.
+- v77.

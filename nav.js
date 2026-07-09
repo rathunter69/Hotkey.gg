@@ -474,6 +474,18 @@
             let earnedList=[]; AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
               if(r.done) earnedList.push({a, gp:(globalPct[a.id]!==undefined?globalPct[a.id]:100)}); });
             earnedList.sort((x,y)=>x.gp-y.gp);
+            // r77: NEW unlocks since last look → celebrate (queued if several)
+            try{
+              const seen=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]');
+              const fresh=earnedList.filter(e=>!seen.includes(e.a.id));
+              if(fresh.length && window.hkCelebrate){
+                window.hkCelebrate({cap:'achievement unlocked',
+                  title:fresh[0].a.name,
+                  sub:fresh[0].a.desc+(fresh.length>1?' \u00b7 +'+(fresh.length-1)+' more unlocked':''),
+                  iconHtml:(window.hkBadge?window.hkBadge(fresh[0].a.glyph,true,60):'')});
+              }
+              localStorage.setItem('hk_ach_seen', JSON.stringify(earnedList.map(e=>e.a.id)));
+            }catch(e){}
             let out='<div class="pc-ach-h">achievements <span style="color:var(--faint)">'+earnedList.length+' / '+AC.length+'</span></div>';
             if(earnedList.length){
               out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+earnedList.slice(0,3).map(e=>
@@ -518,6 +530,17 @@
     try{ const meP=(d._profs||[]).find(x=>x.id===window._navUser.id); myFlair=meP&&meP.flair; }catch(e){}
     const __xp = computeXP(d, d.myRuns, d.mySessions);
     const __L  = levelOf(__xp);
+    // r77: RANK-UP — tier climbed since last look → celebrate with the new crest
+    try{
+      const ti=(window.RANK_EMBLEM_IDX||{})[tier.name] ?? 0;
+      const prev=parseInt(localStorage.getItem('hk_seen_tier')||'-1',10);
+      if(prev>=0 && ti>prev && window.hkCelebrate){
+        window.hkCelebrate({cap:'rank up', title:tier.name,
+          sub:'the desk noticed \u00b7 '+standing,
+          iconHtml:(window.rankEmblem?window.rankEmblem(tier.name,84):'')});
+      }
+      if(ti>=0) localStorage.setItem('hk_seen_tier', String(ti));
+    }catch(e){}
     m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-head"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px">' + escHtml(handle) + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
@@ -758,3 +781,44 @@
     init();
   }
 })();
+
+
+/* ---- r77: celebration engine (shared by every page) ---- */
+window.hkConfetti = function(host, colors){
+  if(!host) return;
+  colors = colors && colors.length ? colors : ['#6ec9a0','#e3b341','#8ab4ff','#e0879e','#7fd4c1','#e0cf7a'];
+  const box=document.createElement('div'); box.className='hk-confetti';
+  let bits='';
+  for(let i=0;i<38;i++){
+    bits+='<i style="left:'+(Math.random()*100).toFixed(1)+'%;background:'+colors[i%colors.length]+
+      ';--rz:'+(360+Math.random()*540).toFixed(0)+'deg;animation-duration:'+(1.1+Math.random()*.9).toFixed(2)+
+      's;animation-delay:'+(Math.random()*.35).toFixed(2)+'s"></i>';
+  }
+  box.innerHTML=bits; host.appendChild(box);
+  setTimeout(()=>{ try{ box.remove(); }catch(e){} }, 2400);
+};
+window.__hkCelQ=[]; window.__hkCelOpen=false;
+window.hkCelebrate = function(o){
+  if(window.__hkCelOpen){ window.__hkCelQ.push(o); return; }
+  window.__hkCelOpen=true;
+  const w=document.createElement('div'); w.className='hk-cel-wrap';
+  w.innerHTML='<div class="hk-cel">'+
+    '<div class="hk-cel-cap">'+(o.cap||'nice')+'</div>'+
+    '<div class="hk-cel-body">'+
+      (o.iconHtml?'<div class="hk-cel-icon">'+o.iconHtml+'</div>':'')+
+      '<div class="hk-cel-title">'+(o.title||'')+'</div>'+
+      (o.sub?'<div class="hk-cel-sub">'+o.sub+'</div>':'')+
+      '<div class="hk-cel-hint">click or \u21b5 to continue</div>'+
+    '</div></div>';
+  document.body.appendChild(w);
+  window.hkConfetti(w.querySelector('.hk-cel-body'), o.colors);
+  let done=false;
+  const close=()=>{ if(done) return; done=true;
+    try{ w.remove(); }catch(e){}
+    window.__hkCelOpen=false;
+    const nx=window.__hkCelQ.shift(); if(nx) setTimeout(()=>window.hkCelebrate(nx), 220); };
+  w.addEventListener('click', close);
+  const key=(e)=>{ if(e.key==='Enter'||e.key==='Escape'){ e.preventDefault(); close(); document.removeEventListener('keydown',key,true);} };
+  document.addEventListener('keydown', key, true);
+  setTimeout(close, 4200);
+};
