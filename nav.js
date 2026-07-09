@@ -425,9 +425,11 @@
         const earned=chs.filter(c=>c.done);
         const allDone=earned.length===chs.length;
         const gateTxt=' \u2014 clear every drill under par \u00d7 '+CAMP.GATE+' to earn it';
-        badgesHtml='<div class="pc-badges">'+
-          chs.map(c=>'<span class="pc-badge" data-tip="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'">'+(window.hkBadge?window.hkBadge(c.id, c.done, 26, (window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]):c.badge)+'</span>').join('')+
-          '<span class="pc-badge" data-tip="Model complete \u2014 every version shipped">'+(window.hkBadge?window.hkBadge('fin', allDone):CAMP.finisher.badge)+'</span>'+
+        /* r72: chapter medals read as MODEL VERSIONS — a labeled strip, v-numbers under each */
+        badgesHtml='<div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:2px 0 6px">the build \u00b7 '+earned.length+' / '+chs.length+' versions</div>'+
+          '<div class="pc-badges" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;margin-bottom:14px">'+
+          chs.map((c,ci)=>'<span class="pc-badge" data-tip="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;color:'+(c.done?'var(--muted)':'var(--faint)')+'">'+(window.hkBadge?window.hkBadge(c.id, c.done, 30, (window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]):c.badge)+'v'+(ci+1)+'</span>').join('')+
+          '<span class="pc-badge" data-tip="Model complete \u2014 every version shipped" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;color:var(--faint);margin-left:auto">'+(window.hkBadge?window.hkBadge('fin', allDone, 30):CAMP.finisher.badge)+'ship</span>'+
           '</div>'+
           (function(){
             const AC=window.HOTKEY_ACHIEVEMENTS;
@@ -514,14 +516,22 @@
     }catch(e){}
     let myFlair=null;
     try{ const meP=(d._profs||[]).find(x=>x.id===window._navUser.id); myFlair=meP&&meP.flair; }catch(e){}
+    const __xp = computeXP(d, d.myRuns, d.mySessions);
+    const __L  = levelOf(__xp);
     m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div></div>' +
       /* r70: RANK HERO — the crest gets real estate */
+      /* r72: rank + LEVEL live together — crest left, tier center, level+progress right */
       '<div style="display:flex;align-items:center;gap:16px;margin:6px 0 14px;padding:14px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
         '<span class="'+tier.cls+'" style="display:inline-flex;color:inherit">'+(window.rankEmblem?window.rankEmblem(tier.name,72,tier.bucket):'')+'</span>' +
         '<div><div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:14px">'+tier.name+'</div>' +
         '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px">'+standing+'</div></div>' +
+        '<div style="margin-left:auto;text-align:right;font-family:var(--mono);min-width:150px">' +
+          '<div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">'+(window.hkLevelChip?window.hkLevelChip(__L.lvl,24):'')+'<span style="font-size:15px;font-weight:700;color:var(--accent)">LVL '+__L.lvl+'</span></div>' +
+          '<div style="height:5px;background:var(--surface);border-radius:99px;overflow:hidden;margin:7px 0 4px"><span style="display:block;height:100%;width:'+__L.pct+'%;background:var(--accent)"></span></div>' +
+          '<div style="font-size:10px;color:var(--muted)">'+__L.into+' / '+__L.need+' xp</div>' +
+        '</div>' +
       '</div>' +
       badgesHtml +
       (function(){
@@ -529,12 +539,7 @@
         const L = levelOf(xp);
         let crowns=0, podiums=0; d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; });
         let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
-        return '<div style="display:flex;gap:14px;align-items:center;margin:4px 0 14px;flex-wrap:wrap;font-family:var(--mono)">'+
-          (window.hkLevelChip?window.hkLevelChip(L.lvl,26):'')+'<span style="font-size:18px;font-weight:700;color:var(--accent)">LVL '+L.lvl+'</span>'+
-          '<span style="flex:1;min-width:140px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden">'+
-            '<span style="display:block;height:100%;width:'+L.pct+'%;background:var(--accent);border-radius:99px"></span></span>'+
-          '<span style="font-size:11px;color:var(--muted)">'+L.into+' / '+L.need+' xp</span>'+
-        '</div>'+
+        return ''+   /* r72: level row moved into the rank hero */
         '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;font-family:var(--mono);text-align:center">'+
           '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+(d.mySolves||0)+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">clean solves</div></div>'+
           '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:'+(crowns?'var(--warn)':'var(--text)')+'">'+crowns+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">crowns</div></div>'+

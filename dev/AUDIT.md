@@ -1685,3 +1685,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   membership but no handle gets promptHandle() in-game, once. (Handle migration
   from anon identities left as a manual/Supabase concern — flagged.)
 - v71.
+
+---
+# ROUND 72 — level joins the rank hero; version strip; font doctrine settled
+- LEVEL \u2192 RANK HERO: chip + LVL + progress bar + xp now sit on the RIGHT of
+  the crest inside the hero plate (crest | tier+standing | level column). The
+  standalone level row below achievements is gone — rank and progression read
+  as ONE identity block (Wolf: "rank, achievements... then level was jarring").
+- MODEL VERSIONS STRIP: campaign chapter medals re-presented as a labeled,
+  framed strip — "THE BUILD \u00b7 n/8 VERSIONS" header, 30px medals with v1..v8
+  under each, the ship medal right-aligned. Reads as a versioned deliverable,
+  not a loose badge row.
+- FONT DOCTRINE (settled): ARIAL leads the cell stack (Wolf's explicit call;
+  Calibri/Segoe fallbacks); EVERYTHING outside the grid keeps the original
+  system — JetBrains Mono chrome, Hanken sans. Nothing else changed; r65-70
+  never touched non-grid fonts, so no rollback was actually needed — stated to
+  Wolf for clarity.
+- v72.

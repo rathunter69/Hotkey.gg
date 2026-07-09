@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=71" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=71">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=71">
+<link rel="icon" href="favicon.ico?v=72" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=72">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=72">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@
     --accent:#6ec9a0; --accent-dim:#4a8f72; --accent-glow:rgba(110,201,160,.2);
     --warn:#d9a441; --bad:#c8533f;
     --mono:'JetBrains Mono',ui-monospace,monospace;
-    --cellfont:'Calibri','Segoe UI',Arial,system-ui,sans-serif;   /* r65: Excel's default face, in the cells where you stare */
+    --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* r72 doctrine: ARIAL leads in the sheet cells (Wolf's call); everything outside the grid = JetBrains Mono / Hanken, unchanged */
     --sans:'Hanken Grotesk',system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -980,14 +980,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=71"></script>
-<link rel="stylesheet" href="nav.css?v=71">
-<script src="themes.js?v=71"></script>
+<script src="drills.js?v=72"></script>
+<link rel="stylesheet" href="nav.css?v=72">
+<script src="themes.js?v=72"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=71"></script>
+<script src="nav.js?v=72"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
