@@ -1163,3 +1163,32 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   map); format/pastes conversions; rapid-fire Group B engine; new drill ideas
   (sources & uses, accretion/dilution, DCF sensitivity row, 13-week RX cash flow).
 - v44.
+
+---
+# ROUND 45 — the whole queue: conversions, transpose, alternates, Group B, new models
+- ENGINE — TRANSPOSE: PASTE_OPTS gains ['E','Transpose'] (the real Alt E S E) and
+  doPaste grows a transpose branch (rows land as columns; values + core formats
+  ride along, formulas dropped like real paste-special transpose).
+- NEW DRILL transpose (par 40, Values group): copy a year row, Alt E S E drops it
+  down a column at a randomized destination. Site-driven from birth.
+- CONVERSIONS format (35→42) + pastes (38→44): both site-driven; format's metric
+  table and pastes' source/destination cells relocate per run. Site-driven: 10.
+- PER-STEP GUIDE ALTERNATES: guideAltNote() appends engine-verified equivalences
+  inline per step (ctrl+d ⇄ alt h f i d, ctrl+r ⇄ alt h f i r, alt+= ⇄ alt h u s,
+  ctrl+alt+v ⇄ alt e s, both directions) — max two notes per step, truthful pairs
+  only. Queue item closed.
+- RAPID-FIRE GROUP B (queue item closed): six altSeq ops added — align center/
+  right/left, blue-the-font (full h f c →×4 ↵ walk), autofit h o i, paste-values
+  e s v ↵. The altSeq dispatcher already existed (borders); Group B is live.
+- NEW MODELS (Wolf's picks; 13-week CF skipped by request):
+  · waterfall (par 118): strict-seniority paydown — FCF, MIN-rationed TL paydown
+    (MIN + both refs ENFORCED), surviving cash, MIN again on the revolver, both
+    ending balances. Builds randomize whether the TL binds on cash or balance.
+  · txncomps (par 110): five precedent deals — multiple paid per deal filled
+    down, average off one live SUM, implied EV at the average, implied equity
+    after net debt. Codenamed title.
+- Models tier now 7 drills; 46 total. PARS regenerated; parKeys via replay tool
+  (format 24, pastes 14, transpose 14, waterfall 63, txncomps 54).
+- Remaining queue: sources & uses, accretion/dilution, DCF sensitivity row,
+  returns bridge, football field; onboarding v2; number-format cycling drill.
+- v45.

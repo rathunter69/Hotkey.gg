@@ -25,10 +25,10 @@ window.HOTKEY_DRILLS = {
   groups: [
     { name: 'Foundations', keys: ['navigation', 'blocksel', 'ribbon', 'editfix', 'undo', 'filldr', 'pastes', 'rowops', 'autofit', 'saves', 'copyover'] },
     { name: 'Formatting',  keys: ['polish', 'combo', 'format', 'center', 'blue', 'gauntlet'] },
-    { name: 'Values',      keys: ['drill', 'series'] },
+    { name: 'Values',      keys: ['drill', 'series', 'transpose'] },
     { name: 'Data',        keys: ['sort'] },
     { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'percent', 'cagr', 'sumif'] },
-    { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps'] },
+    { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'txncomps'] },
     { name: 'Full Builds', keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'debtsched', 'threestmt'] },
     { name: 'Lookups',     keys: ['lookup', 'lookup2'] },
   ],
@@ -53,6 +53,9 @@ window.HOTKEY_DRILLS = {
     editfix:    { name:'Edit',     label:'Fix the typo in place',   tab:'Edit',     desc:'F2 in, arrow to the mistake, fix, commit' },
     undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete, Ctrl+Z it back, bold it instead' },
     pastes:     { name:'Paste Sp.',label:'Alt E S everything',      tab:'Paste Sp.',desc:'One copy, two pastes — values then formats' },
+    transpose:  { name:'Transpose', label:'Flip it on its side',        tab:'Transpose', desc:'Copy a row, Alt E S E drops it in as a column' },
+    waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'Strict seniority: MIN rations cash down two tranches' },
+    txncomps:   { name:'Txn Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the average, and the implied equity' },
     saves:      { name:'Save',     label:'Save like you mean it',   tab:'Save',     desc:'Work, Ctrl+S. More work, Ctrl+S again' },
     copyover:   { name:'Copyover', label:'Copy it over',        tab:'Basics',      desc:'Select, copy, and paste a block — all keyboard' },
 
@@ -158,7 +161,7 @@ window.HOTKEY_CAMPAIGN = {
 };
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":35,"margin":22,"schedule":98,"percent":30,"lookup":50,"ribbon":30,"pastes":38,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":62,"center":38,"blue":34,"sort":33,"series":25,"bridge":22,"growth":28,"wacc":78,"dcf":100,"lbo":98,"revolver":52,"isbuild":115,"debtsched":140,"cfslink":120,"bsbuild":125,"nwcsched":118,"threestmt":155,"cagr":34,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":98,"percent":64,"lookup":50,"ribbon":30,"pastes":44,"transpose":40,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":62,"center":44,"blue":62,"sort":40,"series":30,"bridge":22,"growth":58,"wacc":78,"dcf":100,"lbo":98,"revolver":52,"isbuild":128,"debtsched":155,"cfslink":132,"bsbuild":125,"nwcsched":132,"threestmt":155,"waterfall":118,"txncomps":110,"cagr":72,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
