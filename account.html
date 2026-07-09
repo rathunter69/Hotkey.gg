@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Account · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=80" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=80">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=80">
+<link rel="icon" href="favicon.ico?v=81" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=81">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=81">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -62,8 +62,8 @@
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
 </style>
-<link rel="stylesheet" href="nav.css?v=80">
-<script src="drills.js?v=80"></script>
+<link rel="stylesheet" href="nav.css?v=81">
+<script src="drills.js?v=81"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -71,11 +71,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=80"></script>
+<script src="themes.js?v=81"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=80"></script>
+<script src="nav.js?v=81"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -141,6 +141,17 @@ async function load(){
       <div class="rowline" style="margin-top:14px"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
     </div>
 
+    <div class="card"><h4>Security</h4>
+      <div class="rowline"><span class="k">password</span><span><button class="btn" id="acPwReset" style="margin:0">Email me a reset link</button></span></div>
+      <div class="msg" id="acPwMsg"></div>
+      <div class="rowline" style="margin-top:12px"><span class="k">session</span><span><button class="btn" id="acSignout" style="margin:0">Sign out</button></span></div>
+    </div>
+
+    <div class="card"><h4>Appearance</h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px">Theme applies everywhere, instantly.</div>
+      <div id="acThemes" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+
     <div class="card"><h4>Team</h4>
       <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px">Share a private code with your analyst class or club — the leaderboard gets a team-only view.</div>
       <label>team code</label>
@@ -176,6 +187,19 @@ async function load(){
     </div>`;
 
   const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--bad)':'var(--accent)'; } };
+  // r81: security + appearance wiring
+  const pw=document.getElementById('acPwReset');
+  if(pw) pw.onclick=async()=>{ try{
+    const {error}=await sb.auth.resetPasswordForEmail(me.email,{redirectTo:location.origin+'/index.html'});
+    say('acPwMsg', error?('Could not send: '+error.message):'Reset link sent \u2014 check your inbox.', !!error);
+  }catch(e){ say('acPwMsg','Could not send the reset email.',true); } };
+  const so=document.getElementById('acSignout');
+  if(so) so.onclick=async()=>{ try{ await sb.auth.signOut(); }finally{ location.href='index.html'; } };
+  const th=document.getElementById('acThemes');
+  if(th && window.THEMES){ Object.entries(window.THEMES).forEach(([k,t])=>{
+    const b=document.createElement('button'); b.className='btn'; b.style.margin='0'; b.textContent=t.name||k;
+    b.onclick=()=>{ try{ window.applyTheme(k); }catch(e){} };
+    th.appendChild(b); }); }
   document.getElementById('acHandleSave').onclick=async()=>{
     const v=document.getElementById('acHandle').value.trim().slice(0,24);
     if(!/^[A-Za-z0-9_]{2,24}$/.test(v)){ say('acHandleMsg','2\u201324 characters \u2014 letters, numbers, and underscores only.',true); return; }
@@ -184,6 +208,7 @@ async function load(){
       if(['admin','hotkey','moderator','staff','official'].some(b=>v.toLowerCase().includes(b)||folded.includes(b))){
         say('acHandleMsg','That handle is reserved \u2014 pick another.',true); return; } }
     try{ const {error}=await sb.from('profiles').upsert({id:me.id, handle:v},{onConflict:'id'});
+      if(!error){ try{ (window.navRefreshAuth||function(){})(); }catch(e){} }   // r81: nav shows the new handle immediately
       if(error){
         const msg=String(error.message||'');
         if(msg.indexOf('HANDLE_COOLDOWN')>=0){ const d=msg.split(':')[1]||''; say('acHandleMsg','Handles can change once every 7 days \u2014 next change available '+d+'.',true); return; }

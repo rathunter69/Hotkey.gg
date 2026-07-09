@@ -1831,3 +1831,21 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   between drills, never over the results box. Crown-dependent achievements
   still resolve card-side (need server data); hk_ach_seen shared, no doubles.
 - v80.
+
+---
+# ROUND 81 — beta tag, weekly retired, identity fallback, account hardening
+- BETA TAG: brand reads hotkey.gg [BETA] — mono chip, accent-dim border,
+  palette-adaptive like the wordmark.
+- WEEKLY RETIRED (Wolf: clutters boards + button space; daily is the keeper):
+  weekly button removed from the mode bar; leaderboard featured slot is
+  daily-only. Engine code left dormant (weeklyMode never set). JS references to
+  the button are null-guarded by the existing wire() pattern.
+- IDENTITY FALLBACK: leaderboard 'anon' placeholders → deterministic
+  analyst-#### (uid prefix) via Proxy default + per-profile fallback.
+- ACCOUNT HARDENED: Security card (password reset email, sign out) +
+  Appearance card (live theme buttons from window.THEMES); handle save kicks
+  navRefreshAuth() — the nav shows the new name instantly.
+- PROCESS: first attempt aborted on \\ud83c\\udfc1 surrogate escapes in a python
+  heredoc (lone surrogates never match real emoji) — anchors rebuilt as
+  whitespace/emoji-safe regexes with count asserts; nav.js reset before rerun.
+- v81.

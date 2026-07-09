@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=80" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=80">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=80">
+<link rel="icon" href="favicon.ico?v=81" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=81">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=81">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -163,15 +163,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=80">
-<script src="drills.js?v=80"></script>
+<link rel="stylesheet" href="nav.css?v=81">
+<script src="drills.js?v=81"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=80"></script>
+<script src="themes.js?v=81"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=80"></script>
+<script src="nav.js?v=81"></script>
 
 <header class="head">
   <div class="wrap">
@@ -217,7 +217,7 @@ function rowHtml(r,i,names,meId,extra,leaderMs){
   const gap = (me && i>0 && leaderMs) ? `<span class="gap">+${((r.time_ms-leaderMs)/1000).toFixed(2)}</span>` : '';
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
     `<span class="rk${medal}">${i+1}</span>`+
-    `<span class="nm">${esc(names[r.user_id]||'anon')}</span>`+
+    `<span class="nm">${esc(names[r.user_id])}</span>`+
     `<span class="tm">${fmt(r.time_ms)}${gap}</span></div>`;
 }
 function boardHtml(c, best, names, meId){
@@ -242,7 +242,7 @@ function sessionRowHtml(r,i,names,meId,labelFn,extra){
   const medal = i<3 ? ' r'+(i+1) : '';
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
     `<span class="rk${medal}">${i+1}</span>`+
-    `<span class="nm">${esc(names[r.user_id]||'anon')}</span>`+
+    `<span class="nm">${esc(names[r.user_id])}</span>`+
     `<span class="tm">${labelFn(r)}</span></div>`;
 }
 function sessionBoardHtml(title, sublabel, best, names, meId, labelFn){
@@ -307,7 +307,8 @@ async function load(){
   }catch(e){
     root.innerHTML='<div class="state"><h2>Couldn\u2019t load times</h2><p>Database unreachable \u2014 refresh in a moment.</p></div>'; return;
   }
-  const names={}; profs.forEach(p=>{ names[p.id]=p.handle||'anon'; });
+  const names=new Proxy({},{get:(t,k)=>t[k]||( typeof k==='string'&&k.length>6 ? 'analyst-'+k.slice(0,4) : 'analyst')});
+  profs.forEach(p=>{ names[p.id]=p.handle||('analyst-'+String(p.id).slice(0,4)); });
   // section leaders: fastest clean run on each advanced section's flagship.
   // runs arrive time-sorted asc, so first hit per drill IS the leader.
   const SECTION_FLAGSHIPS=[['Full Builds','threestmt','tie the three statements'],
@@ -486,13 +487,13 @@ function topPlayersHtml(){
   ranked.slice(0,8).forEach((x,i)=>{
     const t=tierOf(x.avg,x.att);
     rows+='<div class="tp-row'+(x.u===meId?' me':'')+'"><span class="rk'+(i<3?' r'+(i+1):'')+'">'+(i+1)+'</span>'+
-      '<span>'+esc(names[x.u]||'anon')+'<span class="pc-tier tp-tier '+t.cls+'">'+t.name+'</span></span>'+
+      '<span>'+esc(names[x.u])+'<span class="pc-tier tp-tier '+t.cls+'">'+t.name+'</span></span>'+
       '<span class="pct">top '+Math.max(1,Math.round(x.avg*100))+'% \u00b7 '+x.att+' drills</span></div>';
   });
   const myIdx=meId?ranked.findIndex(x=>x.u===meId):-1;
   if(myIdx>=8){ const x=ranked[myIdx]; const t=tierOf(x.avg,x.att);
     rows+='<div class="you-gap">\u00b7\u00b7\u00b7</div><div class="tp-row me"><span class="rk">'+(myIdx+1)+'</span>'+
-      '<span>'+esc(names[x.u]||'anon')+'<span class="pc-tier tp-tier '+t.cls+'">'+t.name+'</span></span>'+
+      '<span>'+esc(names[x.u])+'<span class="pc-tier tp-tier '+t.cls+'">'+t.name+'</span></span>'+
       '<span class="pct">top '+Math.max(1,Math.round(x.avg*100))+'% \u00b7 '+x.att+' drills</span></div>'; }
   if(!rows) rows='<div class="empty">nobody has placed yet (5+ drills) \u2014 <b>be the first name here</b></div>';
   return '<div class="panel"><h4>top players \u00b7 the field</h4>'+rows+'</div>';
@@ -524,7 +525,6 @@ function featuredHtml(){
     .map(u=>({user_id:u, time_ms:legs.reduce((s,k)=>s+per[u][k],0)})).sort((a,b)=>a.time_ms-b.time_ms);
   return '<div class="featured">'+
     boardHtml({label:'\u26a1 today \u00b7 '+dl, lvl:dailyDate}, bestD, names, meId)+
-    boardHtml({label:'\ud83c\udfc1 weekly gauntlet', lvl:'week '+wkStr+' \u00b7 5 legs'}, combined, names, meId)+
     '</div>';
 }
 
@@ -546,7 +546,7 @@ function rosterHtml(){
   let rows=inTier.map((x,i)=>'<div class="ros-row'+(x.u===meId?' me':'')+'">'+
     '<span class="ros-n">'+(i+1)+'</span>'+
     (window.rankEmblem?window.rankEmblem(x.tier.name,22,x.tier.bucket):'')+
-    '<span class="ros-nm">'+esc(names[x.u]||'anon')+'</span>'+
+    '<span class="ros-nm">'+esc(names[x.u])+'</span>'+
     '<span class="ros-b">'+(x.tier.bucket||'')+'</span>'+
     '<span class="ros-r">rating '+(x.av*100).toFixed(1)+'</span>'+
     '<span class="ros-a">'+x.st.att+' boards</span></div>').join('');

@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=80" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=80">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=80">
+<link rel="icon" href="favicon.ico?v=81" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=81">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=81">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1015,14 +1015,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=80"></script>
-<link rel="stylesheet" href="nav.css?v=80">
-<script src="themes.js?v=80"></script>
+<script src="drills.js?v=81"></script>
+<link rel="stylesheet" href="nav.css?v=81">
+<script src="themes.js?v=81"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=80"></script>
+<script src="nav.js?v=81"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1075,7 +1075,6 @@
       <button class="mb-tool" id="demoBtn">▶ demo</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
-      <button class="mb-tool" id="weeklyBtn" title="the weekly gauntlet — five seeded drills, combined time on the board">🏁 weekly</button>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>

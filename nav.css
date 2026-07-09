@@ -243,3 +243,8 @@ body{padding-top:14px}
 .hk-confetti i{position:absolute; top:-12px; width:7px; height:11px; border-radius:1.5px; opacity:.95;
   animation:hkFall linear both}
 @keyframes hkFall{0%{transform:translateY(-10px) rotate(0)} 100%{transform:translateY(340px) rotate(var(--rz,540deg)); opacity:0}}
+
+/* r81: beta tag on the brand — inherits the adaptive palette */
+.brand-beta{font-family:var(--mono); font-size:8.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); border:1px solid var(--accent-dim); border-radius:5px; padding:1.5px 5px;
+  margin-left:8px; vertical-align:3px}
