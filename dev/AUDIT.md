@@ -1543,3 +1543,18 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   bg #292b31, surfaces #383b42/#43474f, line #5a5e68, grey inks; sage accent
   #6ec9a0 unchanged. :root synced \u00d75. This supersedes v62's tint inside the
   same LOCKED doctrine — structure/chrome untouched.
+
+---
+# ROUND 64 — THE theme bug, finally: index's inline THEMES shadowed themes.js
+- Wolf's observation cracked it: theme updates showed on leaderboard/stats/
+  reference but NOT the main game. index.html carried its own inlined
+  `const THEMES = {...}` ("for robustness") that SHADOWED themes.js — every
+  palette dial from r52 through r63 reached only the satellite pages; the game
+  page read a stale inline copy the whole time. This also explains the earlier
+  "default doesn't look like you described" rounds.
+- FIX: inline dict (5.7KB) deleted; `const THEMES = window.THEMES;` — themes.js
+  (already loaded at line ~955, BEFORE the main script) is the single source of
+  truth. Boot harness asserts THEMES.default.bg === #292b31 on the game page.
+- RULE: no inlined copies of shared dictionaries. One source or it will drift —
+  it DID drift, for eleven rounds.
+- v64.
