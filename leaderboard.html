@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the boards · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=45" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=45">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=45">
+<link rel="icon" href="favicon.ico?v=46" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=46">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=46">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -94,6 +94,13 @@
   .row.open .nm{color:var(--faint); font-style:italic; letter-spacing:.4px}
   .tp-tier{font-size:8.5px; padding:3px 8px; margin-left:8px; vertical-align:2px}
   .featured{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px}
+  .seclead{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:18px}
+  .seclead .sl{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px}
+  .seclead .sl .sl-sec{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:5px}
+  .seclead .sl .sl-sec .dia{margin-right:5px}
+  .seclead .sl .sl-name{font-weight:700; font-size:14px}
+  .seclead .sl .sl-t{font-family:var(--mono); color:var(--muted); font-size:12px; margin-top:2px}
+  .seclead .sl .sl-lab{font-size:10.5px; color:var(--faint); margin-top:4px}
   @media(max-width:820px){ .featured{grid-template-columns:1fr} }
   .ros-tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px}
   .ros-tabs .tab{font-size:11px; padding:6px 13px}
@@ -158,15 +165,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=45">
-<script src="drills.js?v=45"></script>
+<link rel="stylesheet" href="nav.css?v=46">
+<script src="drills.js?v=46"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=45"></script>
+<script src="themes.js?v=46"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=45"></script>
+<script src="nav.js?v=46"></script>
 
 <header class="head">
   <div class="wrap">
@@ -303,11 +310,32 @@ async function load(){
     root.innerHTML='<div class="state"><h2>Couldn\u2019t load times</h2><p>Database unreachable \u2014 refresh in a moment.</p></div>'; return;
   }
   const names={}; profs.forEach(p=>{ names[p.id]=p.handle||'anon'; });
+  // section leaders: fastest clean run on each advanced section's flagship.
+  // runs arrive time-sorted asc, so first hit per drill IS the leader.
+  const SECTION_FLAGSHIPS=[['Full Builds','threestmt','tie the three statements'],
+                           ['Models \u00b7 LBO','lbo','run the LBO math'],
+                           ['Models \u00b7 RX','waterfall','the paydown waterfall'],
+                           ['Models \u00b7 Comps','txncomps','precedent transactions']];
+  window.__sectionLeaders = SECTION_FLAGSHIPS.map(([sec,key,lab])=>{
+    const r=runs.find(x=>x.challenge===key);
+    return {sec:sec, key:key, lab:lab, name:r?names[r.user_id]:null, t:r?(r.time_ms/1000).toFixed(2):null};
+  });
   let teamIds=null, myTeam=null;
   if(meId){ const me=profs.find(p=>p.id===meId);
     if(me && me.team_code){ myTeam=me.team_code;
       teamIds=new Set(profs.filter(p=>p.team_code===me.team_code).map(p=>p.id)); } }
   const teamOnly = myTeam && sessionStorage.getItem('hk_teamview')==='1';
+  // render the section-leaders strip into its mount (added below the featured grid)
+  setTimeout(()=>{ try{
+    let host=document.getElementById('secleadMount');
+    if(!host){ const feat=document.querySelector('.featured'); if(!feat) return;
+      host=document.createElement('div'); host.id='secleadMount'; feat.parentNode.insertBefore(host, feat); }
+    host.innerHTML='<div class="section-title">\u25c6 section leaders</div><div class="seclead">'+
+      window.__sectionLeaders.map(s=>'<div class="sl"><div class="sl-sec"><span class="dia">\u25c6</span>'+s.sec+'</div>'+
+        (s.name?('<div class="sl-name">'+s.name+'</div><div class="sl-t">'+s.t+'s clean</div>')
+               :'<div class="sl-name" style="color:var(--faint)">unclaimed</div><div class="sl-t">be first</div>')+
+        '<div class="sl-lab">'+s.lab+'</div></div>').join('')+'</div>';
+  }catch(e){} }, 0);
   const fRuns = teamOnly ? runs.filter(r=>teamIds.has(r.user_id)) : runs;
   const fSessions = teamOnly ? sessions.filter(r=>teamIds.has(r.user_id)) : sessions;
 

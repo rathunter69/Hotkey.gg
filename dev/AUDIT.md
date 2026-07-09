@@ -1192,3 +1192,28 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - Remaining queue: sources & uses, accretion/dilution, DCF sensitivity row,
   returns bridge, football field; onboarding v2; number-format cycling drill.
 - v45.
+
+---
+# ROUND 46 — advanced tier scaffold, section leaders, banner + flush fixes
+- PAYWALL POSITION (pushback given, infrastructure shipped OFF):
+  window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] }.
+  Advanced groups get the \u25c6 treatment NOW (hierarchy, badges, section leaders);
+  entitlement gating is one switch AWAY but stays off: (a) Wolf previously ruled
+  drills out as paywall candidates — flagged the reversal; (b) gating the flagship
+  content mid-beta with near-zero users kills the growth loop the B2B thesis
+  needs; (c) Stripe must stay TEST-mode during the internship regardless, so
+  nothing could be charged anyway. Revisit at launch.
+- SECTION LEADERS (leaderboard): \u25c6 strip above the featured grid — fastest clean
+  run on each advanced section's flagship (3-Statement, LBO, RX waterfall, Txn
+  comps), 'unclaimed / be first' when empty. Computed from the existing time-
+  sorted runs fetch (first hit per drill = leader; zero new queries). Mount is
+  created dynamically (first insert attempt hit a JS template string containing
+  the .featured markup — repaired; grep-verify caught it).
+- PICKER: advanced groups get the \u25c6 advanced tag + dashed section rule.
+- RIBBON BANNER KILLED WHEN IDLE: .ribbon{display:none} at rest; Alt-mode
+  restores the full bar. (The permanent 40px bordered hint WAS the "weird big
+  banner".)
+- FLUSH, ACTUALLY: .stage had align-items:flex-start, silently overriding both
+  children's stretch — the real reason r42's gridwrap stretch never showed.
+  Now align-items:stretch.
+- v46.

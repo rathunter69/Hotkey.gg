@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=45" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=45">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=45">
+<link rel="icon" href="favicon.ico?v=46" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=46">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=46">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -175,11 +175,12 @@
   td.bt.bb{box-shadow:inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent)}
   td.ball{box-shadow:inset 0 0 0 1.5px var(--accent)}
 
-  .ribbon{display:flex; align-items:center; gap:7px; flex-wrap:wrap; min-height:40px;
+  .ribbon{display:none}   /* idle: no banner — Alt-mode brings it back (r46, Wolf: "weird big banner") */
+  .ribbon.show{display:flex; align-items:center; gap:7px; flex-wrap:wrap; min-height:40px;
     font-family:var(--mono); font-size:13px; margin-bottom:9px;
-    background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:7px 12px;
-    transition:border-color .14s, background .14s}
+    background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:7px 12px}
   .ribbon.show{border-color:var(--accent-dim); background:linear-gradient(180deg, rgba(46,163,111,.13), var(--surface))}
+  .ribbon.show.idlehint{border-color:var(--line); background:var(--surface)}
   .ribbon .rhint{color:var(--muted); font-size:12px; display:inline-flex; align-items:center}
   .ribbon .rhint k{display:inline-grid; place-items:center; min-width:18px; height:18px; margin-right:7px;
     color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:11px; font-weight:600}
@@ -301,6 +302,9 @@
   .cl-keys{flex-basis:100%; margin:3px 0 5px 28px; font-size:11.5px; color:var(--muted); line-height:1.9}
   .cl-alt{margin-top:12px; padding-top:10px; border-top:1px dashed var(--line); font-size:10.5px; color:var(--faint); line-height:1.8}
   .cl-altstep{color:var(--faint); font-size:10px; font-family:var(--mono); white-space:nowrap}
+  .pk-advtag{font-size:9px; letter-spacing:.12em; color:var(--accent); border:1px solid var(--accent-dim);
+    border-radius:5px; padding:1px 6px; margin-left:8px; vertical-align:1px}
+  .pk-adv .pk-glabel{border-bottom:1px dashed var(--accent-dim); padding-bottom:4px}
   .cl-alt b{color:var(--muted); font-family:var(--mono)}
   .cl-keys kbd{font-family:var(--mono); color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10.5px; margin:0 1px}
@@ -539,7 +543,7 @@
     border-radius:3px; padding:0 4px; font-size:10px; margin-right:4px; color:inherit}
 
   /* two-column workspace: grid on the left, checklist rail on the right */
-  .stage{display:flex; align-items:flex-start; gap:24px}
+  .stage{display:flex; align-items:stretch; gap:24px}   /* stretch = gridwrap bottom flush with the checklist rail */
   /* Monkeytype-scale: the sheet grows into the screen instead of sitting in a box.
      zoom scales the whole grid (cells, fonts, borders) without touching the engine's
      px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */
@@ -899,14 +903,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=45"></script>
-<link rel="stylesheet" href="nav.css?v=45">
-<script src="themes.js?v=45"></script>
+<script src="drills.js?v=46"></script>
+<link rel="stylesheet" href="nav.css?v=46">
+<script src="themes.js?v=46"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=45"></script>
+<script src="nav.js?v=46"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3839,7 +3843,7 @@ function drawDialog(){
 function drawRibbon(){
   drawDialog();
   const el=$('ribbon');
-  if(mode!=='ribbon'){ el.className='ribbon'; el.innerHTML='<span class="rhint"><k>alt</k>ribbon — formatting, borders, AutoSum, paste special</span>'; return; }
+  if(mode!=='ribbon'){ el.className='ribbon'; el.innerHTML=''; return; }
   if(dialog==='paste'){ el.className='ribbon show';
     el.innerHTML='<span class="path">paste special →</span><span class="opt">press a letter, ↵ apply, esc cancel</span>'; return; }
   if(dialog==='fontcolor'){
@@ -6573,8 +6577,9 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
   if(extra.length) groups.push({name:'More', keys:extra});
   groups.forEach(g=>{
     const gcol=(window.HOTKEY_GROUP_COLORS||{})[g.name]||'var(--muted)';
-    const sec=document.createElement('div'); sec.className='pk-group';
-    sec.innerHTML='<div class="pk-glabel"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+gcol+';margin-right:8px;vertical-align:1px"></span>'+g.name+'</div>';
+    const __adv=(window.HOTKEY_PREMIUM&&window.HOTKEY_PREMIUM.groups||[]).includes(g.name);
+    const sec=document.createElement('div'); sec.className='pk-group'+(__adv?' pk-adv':'');
+    sec.innerHTML='<div class="pk-glabel"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+gcol+';margin-right:8px;vertical-align:1px"></span>'+g.name+(__adv?' <span class="pk-advtag">\u25c6 advanced</span>':'')+'</div>';
     g.keys.forEach(key=>{
       const C=CHALLENGES[key]; if(!C) return;
       const n=MENU_ORDER.indexOf(key)+1;
