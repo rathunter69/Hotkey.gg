@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=49" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=49">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=49">
+<link rel="icon" href="favicon.ico?v=50" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=50">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=50">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -921,14 +921,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=49"></script>
-<link rel="stylesheet" href="nav.css?v=49">
-<script src="themes.js?v=49"></script>
+<script src="drills.js?v=50"></script>
+<link rel="stylesheet" href="nav.css?v=50">
+<script src="themes.js?v=50"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=49"></script>
+<script src="nav.js?v=50"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3068,6 +3068,56 @@ const CHALLENGES = {
       ];
     }
   },
+  accdil:{
+    name:'Acc/Dil', label:'Run accretion / dilution', par:104, parKeys:50,
+    prompt:'The question every board asks: does the deal ADD to EPS? Combine the income, combine the share count, compute both EPS figures, and land the accretion percentage \u2014 positive means the deal earns its keep.',
+    req:'<em>B5</em> pro forma NI <em>=SUM(B2:B4)</em> \u00b7 <em>B9</em> pro forma shares <em>=B7+B8</em> \u00b7 <em>B11</em> standalone EPS <em>=B2/B7</em> \u00b7 <em>B12</em> pro forma EPS <em>=B5/B9</em> \u00b7 <em>B13</em> accretion <em>=B12/B11-1</em> \u00b7 <em>ctrl+shift+%</em>',
+    guide:[
+      'pro forma net income at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 acquirer + target + synergies',
+      'pro forma shares at B9 \u00b7 <kbd>=B7+B8</kbd> \u2014 old count plus what you issued',
+      'both EPS lines: B11 \u00b7 <kbd>=B2/B7</kbd> \u00b7 B12 \u00b7 <kbd>=B5/B9</kbd>',
+      'accretion at B13 \u00b7 <kbd>=B12/B11-1</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 positive = accretive',
+    ],
+    targets:['B5','B9','B11','B12','B13'],
+    demo(){ return [
+      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
+      {sel:'B9', keys:[...T('=B7+B8'), Kb.enter]},
+      {sel:'B11', keys:[...T('=B2/B7'), Kb.enter]},
+      {sel:'B12', keys:[...T('=B5/B9'), Kb.enter]},
+      {sel:'B13', keys:[...T('=B12/B11-1'), Kb.enter]},
+      {sel:'B13', keys:[Kb.pct]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 accretion / dilution ($mm)',txt:true,bold:true};
+      const aNI=rnd(40,120)*10, tNI=rnd(8,40)*10, syn=rnd(1,8)*10;
+      const aSh=rnd(30,90)*10, newSh=rnd(4,25)*10;
+      const rows=[[2,'Acquirer net income',aNI],[3,'Target net income',tNI],[4,'After-tax synergies',syn]];
+      rows.forEach(([r,n,v])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
+        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; });
+      cells['A5']={...blankCell(),value:'Pro forma net income',txt:true,bold:true}; cells['B5']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['A7']={...blankCell(),value:'Acquirer shares',txt:true}; cells['B7']={...blankCell(),value:aSh,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['A8']={...blankCell(),value:'New shares issued',txt:true}; cells['B8']={...blankCell(),value:newSh,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['A9']={...blankCell(),value:'Pro forma shares',txt:true,bold:true}; cells['B9']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['A11']={...blankCell(),value:'Standalone EPS',txt:true}; cells['B11']={...blankCell(),decimals:2};
+      cells['A12']={...blankCell(),value:'Pro forma EPS',txt:true};  cells['B12']={...blankCell(),decimals:2};
+      cells['A13']={...blankCell(),value:'Accretion / (dilution)',txt:true,bold:true}; cells['B13']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
+      const pfNI=aNI+tNI+syn, pfSh=aSh+newSh;
+      this._exp={ni:pfNI, sh:pfSh, e0:aNI/aSh, e1:pfNI/pfSh, acc:(pfNI/pfSh)/(aNI/aSh)-1};
+      return {ROWS:13, cells, active:{r:5,c:2}, sel:null, colW:{1:168,2:88}};
+    },
+    checks(S){
+      const near=(k,exp,tol)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<(tol||0.5)); };
+      const e=this._exp;
+      return [
+        {label:'pro forma net income \u2014 income plus income plus synergies', ok: near('B5',e.ni)},
+        {label:'pro forma share count', ok: near('B9',e.sh)},
+        {label:'standalone and pro forma EPS, both live', ok: near('B11',e.e0,0.005)&&near('B12',e.e1,0.005)},
+        {label:'accretion percentage \u2014 formatted as a percent', ok: (()=>{ const c=S.cells['B13'];
+          return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-e.acc)<0.001&&c.fmtStyle==='percent'); })()},
+      ];
+    }
+  },
   cagr:{
     name:'CAGR', label:'Compound it, three times', par:72, parKeys:79,
     prompt:'Three CAGR checks scattered where a real page would leave them \u2014 and they move every run. Same clean formula each time: (End \u00f7 Begin) ^ (1 \u00f7 Years) \u2212 1, percent to 1 decimal. The refs change with the block; the shape never does.',
@@ -3111,58 +3161,52 @@ const CHALLENGES = {
     }
   },
   balance:{
-    name:'Balance', label:'Make it balance', par:55, parKeys:43,
-    prompt:'Assets = Liabilities + Equity, or nothing else matters. Foot the assets, plug retained earnings so the sheet ties, foot the L&E side, then build the CHECK cell \u2014 total assets minus total L&E. A model without a zero check is a model you can\u2019t trust.',
-    req:'<em>B6</em> \u00b7 <em>alt+=</em> foots assets \u00b7 <em>B12 plug</em> \u00b7 <em>=B6-B9-B10-B11</em> \u00b7 <em>B13</em> \u00b7 <em>=SUM(B9:B12)</em> \u00b7 <em>B14 check</em> \u00b7 <em>=B6-B13</em> \u2192 must show 0',
+    name:'Balance', label:'Make it balance', par:55, parKeys:18,
+    prompt:'Assets = Liabilities + Equity \u2014 and retained earnings is NEVER a plug; it\u2019s earned. Foot both sides independently with AutoSum, then build the check cell. The check is a DIAGNOSTIC: it reads zero because the sheet is right, not because you forced it.',
+    req:'<em>B6</em> \u00b7 <em>alt+=</em> foots assets \u00b7 <em>B13</em> \u00b7 <em>alt+=</em> foots L&E (retained earnings is a given, not a plug) \u00b7 <em>B14 check</em> \u00b7 <em>=B6-B13</em> \u2192 reads 0 because both sides are honest',
     guide:[
       'foot the assets \u00b7 at B6 \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> \u00b7 <kbd>\u21b5</kbd>',
-      'plug retained earnings at B12 \u00b7 <kbd>=B6-B9-B10-B11</kbd> \u00b7 <kbd>\u21b5</kbd> \u2014 whatever makes it tie',
-      'foot L&E at B13 \u00b7 <kbd>=SUM(B9:B12)</kbd> \u00b7 <kbd>\u21b5</kbd>',
-      'the check at B14 \u00b7 <kbd>=B6-B13</kbd> \u2014 reads 0 or you\u2019re not done',
+      'foot L&E at B13 \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> \u00b7 <kbd>\u21b5</kbd> \u2014 all four lines are real inputs; nothing gets backed into',
+      'the check at B14 \u00b7 <kbd>=B6-B13</kbd> \u2014 a diagnostic, not a construction. Zero means the sheet is right.',
     ],
-    targets:['B6','B12','B13','B14'],
+    targets:['B6','B13','B14'],
     demo(){ return [
       {sel:'B6',  keys:[Kb.eq, Kb.enter]},
-      {sel:'B12', keys:[...T('=B6-B9-B10-B11'), Kb.enter]},
-      {sel:'B13', keys:[...T('=SUM(B9:B12)'), Kb.enter]},
+      {sel:'B13', keys:[Kb.eq, Kb.enter]},
       {sel:'B14', keys:[...T('=B6-B13'), Kb.enter]},
     ]; },
     build(){
       const cells={};
       const num=v=>({...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'});
-      const blankNum=()=>({...blankCell(),fmtStyle:'comma',decimals:0});
-      cells['A1']={...blankCell(),value:'Balance sheet',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 balance sheet ($mm)',txt:true,bold:true};
       cells['A2']={...blankCell(),value:'Assets',txt:true,bold:true};
       const aL=['Cash','Receivables','PP&E'];
       const aV=aL.map(()=>rnd(20,200)*10);
       aL.forEach((l,i)=>{ cells['A'+(3+i)]={...blankCell(),value:l,txt:true}; cells['B'+(3+i)]=num(aV[i]); });
-      cells['A6']={...blankCell(),value:'Total assets',txt:true,bold:true}; cells['B6']=blankNum();
+      cells['A6']={...blankCell(),value:'Total assets',txt:true,bold:true};
+      cells['B6']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
       cells['A8']={...blankCell(),value:'Liabilities & equity',txt:true,bold:true};
-      const totalA=aV.reduce((s,v)=>s+v,0);
-      const debt=Math.round(totalA*rnd(25,45)/100/10)*10;
-      const ap=Math.round(totalA*rnd(8,18)/100/10)*10;
-      const stock=Math.round(totalA*rnd(10,20)/100/10)*10;
-      cells['A9']={...blankCell(),value:'Debt',txt:true};            cells['B9']=num(debt);
-      cells['A10']={...blankCell(),value:'Payables',txt:true};       cells['B10']=num(ap);
-      cells['A11']={...blankCell(),value:'Common stock',txt:true};   cells['B11']=num(stock);
-      cells['A12']={...blankCell(),value:'Retained earnings (plug)',txt:true}; cells['B12']=blankNum();
-      cells['A13']={...blankCell(),value:'Total L&E',txt:true,bold:true};      cells['B13']=blankNum();
-      cells['A14']={...blankCell(),value:'CHECK (must be 0)',txt:true,bold:true}; cells['B14']=blankNum();
-      this._totalA=totalA; this._plug=totalA-debt-ap-stock;
-      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:186,2:96}};
+      const totalA=aV.reduce((a,b)=>a+b,0);
+      // three L&E lines given; the FOURTH (retained earnings) is ALSO given —
+      // the build engineers the values to tie, so the player's check is honest.
+      const ap=rnd(10,60)*10, debt=rnd(20,120)*10, cs=rnd(10,50)*10;
+      const re=totalA-ap-debt-cs;
+      const lL=[['Payables',ap],['Debt',debt],['Common stock',cs],['Retained earnings',re]];
+      lL.forEach(([l,v],i)=>{ cells['A'+(9+i)]={...blankCell(),value:l,txt:true}; cells['B'+(9+i)]=num(v); });
+      cells['A13']={...blankCell(),value:'Total L&E',txt:true,bold:true};
+      cells['B13']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['A14']={...blankCell(),value:'Check',txt:true,bold:true};
+      cells['B14']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+      this._exp={a:totalA};
+      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:150,2:88}};
     },
     checks(S){
-      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:0; };
-      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?c.formula.toUpperCase().replace(/\s/g,''):''; };
-      const aOk = !!f('B6') && /SUM/.test(f('B6')) && Math.abs(val('B6')-this._totalA)<1e-6;
-      const pOk = !!f('B12') && f('B12').includes('B6') && Math.abs(val('B12')-this._plug)<1e-6;
-      const lOk = !!f('B13') && Math.abs(val('B13')-this._totalA)<1e-6;
-      const cOk = !!f('B14') && f('B14').includes('B6') && f('B14').includes('B13') && Math.abs(val('B14'))<1e-6;
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
+      const sumRef=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&String(c.formula).toUpperCase().includes('SUM')); };
       return [
-        {label:'foot the assets \u2014 SUM at B6', ok: aOk},
-        {label:'plug retained earnings so the sheet ties', ok: pOk},
-        {label:'foot Liabilities & Equity at B13', ok: lOk},
-        {label:'CHECK cell reads 0 \u2014 assets minus L&E', ok: cOk},
+        {label:'assets footed with a live SUM', ok: near('B6',this._exp.a)&&sumRef('B6')},
+        {label:'L&E footed with a live SUM \u2014 retained earnings stays a GIVEN, never a plug', ok: near('B13',this._exp.a)&&sumRef('B13')},
+        {label:'the check reads zero \u2014 diagnostic, not construction', ok: near('B14',0)},
       ];
     }
   },

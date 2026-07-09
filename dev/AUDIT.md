@@ -1282,3 +1282,29 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   sources, check row must read zero. Codenamed title. 47 drills.
 - Queue: accretion/dilution, DCF sensitivity row, returns bridge, football field.
 - v49.
+
+---
+# ROUND 50 — PEDAGOGY RULE: no bad-habit plugs; balance rewritten; acc/dil ships
+- WOLF'S CATCH: the legacy 'balance' drill taught retained earnings AS A PLUG
+  ("=B6-B9-B10-B11 — whatever makes it tie") and then graded a check row that
+  was ZERO BY CONSTRUCTION — a fake diagnostic reinforcing exactly the habit a
+  desk beats out of first-years.
+- FULL-CURRICULUM PLUG AUDIT: every drill's req/formulas scanned. Clean:
+  comps/lbo equity =EV−debt (definitional), S&U sponsor plug (the legitimate
+  deal convention — the math genuinely solves for it), RE rolls (earned, not
+  plugged), waterfall MIN rationing. Sole offender: balance.
+- BALANCE REWRITTEN: retained earnings is now a GIVEN input; both sides foot
+  independently via AutoSum (SUM ref-enforced — a lazy =B6 tie-by-reference
+  REJECTS); the check row is a genuine diagnostic (build engineers the data to
+  tie, invisible to the player). The prompt teaches the correction explicitly:
+  "retained earnings is NEVER a plug; the check reads zero because the sheet is
+  right, not because you forced it."
+- NEW PEDAGOGY RULE (standing): checks must be DIAGNOSTICS, never constructions.
+  A player formula may only be a residual when the underlying finance genuinely
+  defines it as one (S&U sponsor equity, equity = EV − net debt). Nothing that
+  backs into a balance.
+- NEW DRILL accdil (par 104, parKeys 50, Models — now 9): pro forma NI, pro
+  forma shares, both EPS lines, accretion % (percent-formatted, ref-live).
+  48 drills.
+- Queue: DCF sensitivity row, returns bridge, football field.
+- v50.
