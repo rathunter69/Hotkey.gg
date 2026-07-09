@@ -11,7 +11,7 @@
    (no horizontal shifts when content height changes), 1180px content column. */
 html{scrollbar-gutter:stable}
 body{padding-top:14px}
-.wrap{max-width:1280px; margin:0 auto; padding:0 24px}
+.wrap{max-width:1180px; margin:0 auto; padding:0 24px}   /* r66: nav aligns to the game space — deck-flip alignment */
 
 /* ---------- TOP NAV (three sections: brand · pages · tools) ---------- */
 .topnav{width:100%; background:var(--bg); margin-bottom:30px; position:relative}

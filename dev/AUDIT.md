@@ -1575,3 +1575,16 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   the softness pushed into the chrome too, that's a --mono/--sans swap away —
   offered, not assumed.
 - v65.
+
+---
+# ROUND 66 — tab strip refined; the deck-flip width doctrine
+- "\u2630 all" tab RETIRED (picker lives on \\ and the drill bar). NEXT chip
+  vertically centered (align-self:center, zero v-padding) so the text always
+  fits the 38px strip; lead chip now reads "\u00ab GROUP" and CLICK WALKS BACK a
+  set (stepGroup(-1)) — left is back, right is forward, like a workbook.
+- WIDTH DOCTRINE (Wolf: MD deck-flip alignment): the GAME SPACE (1180px /
+  24px pads, index .app) is the reference. Everything now aligns to it:
+  nav.css .wrap 1280\u21921180 (r60 had widened nav alone — that WAS the
+  misalignment), leaderboard pads 28\u219224, stats 880\u21921180, account 760\u21921180,
+  About 1080\u21921180, all pads 24. Titles start at the same x on every page.
+- v66.
