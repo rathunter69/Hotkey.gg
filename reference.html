@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>the cheat sheet · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=61" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=61">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=61">
+<link rel="icon" href="favicon.ico?v=62" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=62">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=62">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -39,17 +39,17 @@
   h1 .em{color:var(--accent);}
   .sub{color:var(--muted); font-size:16px; max-width:60ch;}
   .legend{display:flex; gap:18px; flex-wrap:wrap; margin-top:18px; font-size:12.5px; color:var(--muted); font-family:var(--mono);}
-  .legend .dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent-glow); margin-right:6px; vertical-align:middle;}
+  .legend .dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent); margin-right:6px; vertical-align:middle;}
   .legend .ch{color:var(--accent); font-weight:700;}
 
   /* ---------- toolbar ---------- */
   .toolbar{position:sticky; top:0; z-index:20; padding:14px 0; margin:14px 0 6px;
-    background:linear-gradient(180deg,var(--bg) 70%,rgba(12,13,14,.0)); backdrop-filter:blur(2px);}
+    background:var(--bg); border-bottom:1px solid var(--line);}   /* r62 flat sticky */
   .searchrow{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
   .search{flex:1; min-width:230px; position:relative;}
   .search input{width:100%; background:var(--surface); border:1px solid var(--line); color:var(--text);
     font-family:var(--mono); font-size:14px; padding:12px 14px 12px 38px; border-radius:10px; outline:none; transition:border-color .15s,box-shadow .15s;}
-  .search input:focus{border-color:var(--accent-dim); box-shadow:0 0 0 3px var(--accent-glow);}
+  .search input:focus{border-color:var(--accent-dim); outline:3px solid var(--accent-glow);}
   .search input::placeholder{color:var(--muted);}
   .search svg{position:absolute; left:13px; top:50%; transform:translateY(-50%); opacity:.5;}
   .count{font-family:var(--mono); font-size:12.5px; color:var(--muted); white-space:nowrap;}
@@ -63,23 +63,22 @@
   /* ---------- grid of cards ---------- */
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; padding:8px 0 60px;}
   @media(max-width:760px){.grid{grid-template-columns:1fr;}}
-  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:6px 0 8px; overflow:hidden;
-    opacity:0; transform:translateY(8px); animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards;}
-  @keyframes rise{to{opacity:1; transform:none;}}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0 0 8px; overflow:hidden;}
   .card.hide{display:none;}
-  .card h2{font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
-    color:var(--muted); padding:16px 18px 10px; display:flex; align-items:center; gap:9px;}
+  .card h2{font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); min-height:34px; padding:6px 14px; margin-bottom:8px; display:flex; align-items:center; gap:9px;
+    background:var(--surface2); border-bottom:1px solid var(--line);}   /* r62: the frame's strip language */
   .card h2 .ic{color:var(--accent);}
   .card h2 .n{margin-left:auto; color:#4a4c48; font-size:11px; letter-spacing:0;}
 
   .row{display:flex; align-items:center; gap:14px; padding:9px 18px; border-top:1px solid rgba(38,40,44,.55); transition:background .12s;}
   .row:hover{background:var(--surface2);}
   .row.drilled{position:relative;}
-  .row.drilled::before{content:""; position:absolute; left:0; top:8px; bottom:8px; width:2px; background:var(--accent); border-radius:2px; box-shadow:0 0 8px var(--accent-glow);}
+  .row.drilled::before{content:""; position:absolute; left:0; top:8px; bottom:8px; width:2px; background:var(--accent); border-radius:2px;}
   .row.hide{display:none;}
   .keys{flex:0 0 auto; display:flex; align-items:center; gap:5px; flex-wrap:wrap; min-width:0;}
   .desc{flex:1; font-size:13.5px; color:var(--text); min-width:0;}
-  .desc .dr{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:7px; vertical-align:middle; box-shadow:0 0 6px var(--accent-glow);}
+  .desc .dr{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:7px; vertical-align:middle;}
 
   /* ---------- keycaps ---------- */
   .cap{display:inline-flex; align-items:center; justify-content:center; min-width:29px; height:29px; padding:0 9px;
@@ -98,8 +97,8 @@
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-family:var(--mono); font-size:14px; padding:50px 0;}
 </style>
 
-<link rel="stylesheet" href="nav.css?v=61">
-<script src="drills.js?v=61"></script>
+<link rel="stylesheet" href="nav.css?v=62">
+<script src="drills.js?v=62"></script>
 <script>
 // Supabase init (kept light — reference doesn't post data, but nav.js needs window.sb for the user menu)
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -108,11 +107,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'reference';
 </script>
-<script src="themes.js?v=61"></script>
+<script src="themes.js?v=62"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=61"></script>
+<script src="nav.js?v=62"></script>
 <div class="wrap">
   <header>
     <h1>The <span class="em">keyboard</span> cheat sheet.</h1>

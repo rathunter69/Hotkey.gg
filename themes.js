@@ -4,10 +4,10 @@
 
 window.THEMES = {
   default: { name:'Default', dark:true, vars:{
-    bg:'#24272e', surface:'#2c3038', surface2:'#353a44', line:'#454c59',
-    text:'#e4e8ee', muted:'#9aa4b2', faint:'#69727f',
-    accent:'#4fb286', 'accent-dim':'#357a5c', 'accent-glow':'rgba(79,178,134,.18)',
-    warn:'#dcb45f', bad:'#d96c60' }},
+    bg:'#282a36', surface:'#363948', surface2:'#414459', line:'#575b70',
+    text:'#f2f2ec', muted:'#a9adb8', faint:'#6f7590',
+    accent:'#6ec9a0', 'accent-dim':'#4a8f72', 'accent-glow':'rgba(110,201,160,.2)',
+    warn:'#e0cf7a', bad:'#e07a6e' }},
   terminal: { name:'Terminal', dark:true, vars:{
     bg:'#0c0d0e', surface:'#141517', surface2:'#1c1d20', line:'#26282c',
     text:'#e9e8e3', muted:'#7c7d77', faint:'#4c4d49',

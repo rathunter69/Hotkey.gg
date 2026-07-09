@@ -1513,3 +1513,19 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   "weird behavior" report is UNSPECIFIED — asked for a concrete symptom; watch
   next session.
 - v61.
+
+---
+# ROUND 62 — dracula-green Default; leaderboard/stats/reference matched to the game frame
+- THEME (third dial this arc — Wolf converging): Default = TRUE dracula base
+  (bg #282a36, surfaces #363948/#414459, dracula-warm inks) with a SAGE green
+  accent #6ec9a0 replacing the purple (dim #4a8f72). Soft dracula warn/bad
+  (#e0cf7a/#e07a6e). :root synced \u00d75.
+- SATELLITE PAGES MATCHED TO THE GAME FRAME (Wolf: "no longer match"):
+  * leaderboard — body grid-texture RETIRED (game page is flat), .board-cap \u2192
+    34px surface2 caption strip (mono 11-12px uppercase — the ribbon/\u2713 row
+    language), podium + "me" panel gradients \u2192 flat tints, radius 16\u219212.
+  * stats — hero gradient \u2192 flat, radius 14\u219212.
+  * reference — sticky search backdrop-gradient \u2192 solid + hairline, focus/dot/
+    drilled glows \u2192 flat (outline for focus), card h2 \u2192 surface2 strip caps,
+    entrance animation removed, radius 14\u219212.
+- v62.
