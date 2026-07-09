@@ -1404,3 +1404,24 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   'terminal'; 'desk' key retired (saved 'desk' falls through the fallback to
   default — same look).
 - v56.
+
+---
+# ROUND 57 — sheet tabs, the REAL theme culprit, editfix rebuilt; sparse list opened
+- SHEET TABS (Wolf's idea — very on-brand): Excel-style tab strip along the
+  frame's bottom edge showing the current GROUP's drills (name + PB), active tab
+  accent-topped, click to load, "\u2630 all" opens the picker. Keyboard: Alt+PgUp/
+  PgDn walks the group (Ctrl+PgUp/Dn is RESERVED by browsers for their own tabs
+  — bound opportunistically, fires only where the browser lets it through; same
+  wall as the early shelved item, honestly restated).
+- THEME CULPRIT FOUND: the :root fallback vars in every page's <style> were
+  hardcoded MATRIX (#0c0d0e...) — they paint before/without JS and were what
+  Wolf kept seeing. All 5 pages' :root now carry the grey Default palette.
+- EDITFIX REBUILT (Wolf: "2 items, whole grid empty"): now site-driven — THREE
+  typos from an 8-word pool scattered across two label columns among clean
+  labels + blue figures (18+ cells), different words/spots per run; one check
+  per typo; par 22→44. Verified 20 layouts.
+- SPARSE LIST OPENED (audit heuristic, needs eyeballing since loops undercount):
+  true candidates for a foundations density pass — saves, undo, autofit,
+  blocksel, copyover, drill, ribbon, polish, foot, bridge, audit, sumif, lookup.
+  Queue for coming rounds alongside returns bridge + football field.
+- v57.

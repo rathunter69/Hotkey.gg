@@ -28,18 +28,18 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=56" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=56">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=56">
+<link rel="icon" href="favicon.ico?v=57" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=57">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=57">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
-    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49;
-    --accent:#2ea36f; --accent-dim:#1d6647; --accent-glow:rgba(46,163,111,.22);
+    --bg:#b9bcc3; --surface:#cdcfd5; --surface2:#c0c3ca; --line:#999da7;
+    --text:#26282e; --muted:#565a64; --faint:#82868f;
+    --accent:#3f9873; --accent-dim:#2a6b50; --accent-glow:rgba(63,152,115,.18);
     --warn:#d9a441; --bad:#c8533f;
     --mono:'JetBrains Mono',ui-monospace,monospace;
     --sans:'Hanken Grotesk',system-ui,sans-serif;
@@ -551,6 +551,20 @@
   .stage{display:flex; flex-direction:column; gap:0; background:var(--surface);
     border:1px solid var(--line); border-radius:12px; overflow:hidden}
   .stage-row{display:flex; align-items:stretch; gap:0; flex:1; min-height:0}
+  /* r57: Excel sheet tabs — the current GROUP's drills along the frame's bottom edge */
+  .sheettabs{display:flex; align-items:flex-end; gap:2px; padding:0 10px; height:30px;
+    background:var(--surface2); border-top:1px solid var(--line); overflow-x:auto; scrollbar-width:none}
+  .sheettabs::-webkit-scrollbar{display:none}
+  .st-tab{font-family:var(--mono); font-size:10.5px; color:var(--muted); background:var(--surface);
+    border:1px solid var(--line); border-bottom:0; border-radius:6px 6px 0 0;
+    padding:4px 11px 5px; cursor:pointer; white-space:nowrap; transition:.12s; position:relative; top:1px}
+  .st-tab:hover{color:var(--text)}
+  .st-tab.cur{color:var(--accent); background:var(--bg); font-weight:700; border-color:var(--accent-dim);
+    box-shadow:inset 0 2px 0 var(--accent)}
+  .st-tab .st-pb{color:var(--faint); margin-left:6px; font-size:9.5px}
+  .st-all{margin-left:auto; font-family:var(--mono); font-size:10px; color:var(--faint);
+    padding:4px 8px 5px; cursor:pointer; flex:none}
+  .st-all:hover{color:var(--accent)}
   /* Monkeytype-scale: the sheet grows into the screen instead of sitting in a box.
      zoom scales the whole grid (cells, fonts, borders) without touching the engine's
      px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */
@@ -930,14 +944,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=56"></script>
-<link rel="stylesheet" href="nav.css?v=56">
-<script src="themes.js?v=56"></script>
+<script src="drills.js?v=57"></script>
+<link rel="stylesheet" href="nav.css?v=57">
+<script src="themes.js?v=57"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=56"></script>
+<script src="nav.js?v=57"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1013,6 +1027,7 @@
       </div>
       <aside class="checklist" id="checklist"></aside>
     </div>
+    <div class="sheettabs" id="sheetTabs"></div>
   </div>
   <div class="result" id="result"></div>
 
@@ -1678,28 +1693,41 @@ const CHALLENGES = {
     }
   },
   editfix:{
-    name:'Edit', label:'Fix the typo in place', par:22, parKeys:8,
-    prompt:'Someone typed "Reveune". Do not retype the whole word \u2014 F2 into the cell, arrow the cursor to the mistake, fix the two swapped letters, commit. Edit mode is how you touch a cell without destroying it.',
-    req:'<em>on A2</em> \u00b7 <em>F2</em> \u00b7 <em>\u2190</em> to the typo \u00b7 fix <em>un \u2192 nu</em> \u00b7 <em>\u21b5</em>',
-    guide:[
-      'on A2 \u00b7 <kbd>F2</kbd> \u2014 the cursor lands at the END of the text',
-      '<kbd>\u2190</kbd> until the cursor sits after the swapped letters \u00b7 <kbd>\u232b</kbd><kbd>\u232b</kbd> \u00b7 type <kbd>ne</kbd>? No \u2014 fix it YOUR way; only the final word is graded',
-      'commit with <kbd>\u21b5</kbd> \u2014 the cell should read Revenue',
-    ],
-    targets:['A2'],
-    demo(){ return [
-      {sel:'A2', keys:[{key:'F2'}, {key:'ArrowLeft'}, {key:'Backspace'}, {key:'Backspace'}, ...T('nu'), {key:'ArrowRight'}, Kb.enter]},
-    ]; },
+    name:'Edit', label:'Fix the typos in place', par:44, parKeys:8,
+    prompt:'A pasted-in schedule with THREE typos scattered through the labels \u2014 different words, different spots, every run. Do not retype whole cells: F2 in, arrow the cursor to the mistake, fix it, commit. Edit mode is how you touch a cell without destroying it.',
+    req(){ return this._sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 '); },
+    guide(){ return this._sites.map((s,i)=>['first typo','second typo','third typo'][i]+' at <b>'+s.cell+'</b> \u00b7 <kbd>F2</kbd> \u00b7 <kbd>\u2190</kbd> to the mistake \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d \u00b7 <kbd>\u21b5</kbd> \u2014 only the final word is graded'); },
+    targets(){ return this._sites.map(s=>s.cell); },
+    demo(){ return this._sites.map(s=>({sel:s.cell, keys:[{key:'F2'},{key:'ArrowLeft'},{key:'Backspace'},{key:'Backspace'},...T(s.good.slice(-2)),Kb.enter]})); },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Line items',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Reveune',txt:true};
-      cells['A3']={...blankCell(),value:'COGS',txt:true};
-      return {ROWS:4, cells, active:{r:2,c:1}, sel:null, colW:{1:120}};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 schedule review',txt:true,bold:true};
+      const TYPOS=[['Reveune','Revenue'],['Grwoth','Growth'],['Recievables','Receivables'],['Depriciation','Depreciation'],['Intrest','Interest'],['Payabels','Payables'],['Inventroy','Inventory'],['Divdends','Dividends']];
+      const CLEAN=['EBITDA','Capex','Cash','Taxes','SG&A','Margin','Debt','Equity','COGS','Fees'];
+      for(let k=TYPOS.length-1;k>0;k--){ const j=rnd(0,k); [TYPOS[k],TYPOS[j]]=[TYPOS[j],TYPOS[k]]; }
+      for(let k=CLEAN.length-1;k>0;k--){ const j=rnd(0,k); [CLEAN[k],CLEAN[j]]=[CLEAN[j],CLEAN[k]]; }
+      // label columns at A and E; rows 2-8 each; three random slots get typos
+      const slots=[];
+      for(const c of [1,5]) for(let r=2;r<=8;r++) slots.push({c,r});
+      for(let k=slots.length-1;k>0;k--){ const j=rnd(0,k); [slots[k],slots[j]]=[slots[j],slots[k]]; }
+      this._sites=[];
+      slots.forEach((sl,i)=>{
+        const key=colLetter(sl.c)+sl.r;
+        if(i<3){ const [bad,good]=TYPOS[i];
+          cells[key]={...blankCell(),value:bad,txt:true};
+          cells[colLetter(sl.c+1)+sl.r]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          this._sites.push({cell:key, bad:bad, good:good});
+        } else if(i<12){ cells[key]={...blankCell(),value:CLEAN[i-3]||'Other',txt:true};
+          cells[colLetter(sl.c+1)+sl.r]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      });
+      this._sites.sort((a,b)=>(a.cell<b.cell?-1:1));
+      return {ROWS:9, cells, active:{r:2,c:1}, sel:null, colW:{1:118,5:118}};
     },
     checks(S){
-      const c=S.cells['A2'];
-      return [{label:'A2 reads exactly "Revenue" \u2014 fixed in place', ok: !!(c&&c.value==='Revenue')}];
+      return this._sites.map(s=>({
+        label:'\u201c'+s.bad+'\u201d reads \u201c'+s.good+'\u201d at '+s.cell+' \u2014 fixed in place',
+        ok: (()=>{ const c=S.cells[s.cell]; return !!(c&&String(c.value)===s.good); })()
+      }));
     }
   },
   undo:{
@@ -4264,6 +4292,28 @@ function _showResults(o){
 
 }
 function hideResults(){ resultsChainKeys=null; const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
+function renderSheetTabs(){
+  const host=$('sheetTabs'); if(!host) return;
+  const gname=GROUP_OF[cur];
+  const g=DRILL_GROUPS.find(x=>x.name===gname);
+  const keys=(g?g.keys:MENU_ORDER).filter(k=>CHALLENGES[k]);
+  host.innerHTML = keys.map(k=>{
+    const C=CHALLENGES[k];
+    const pb = PB[k]!==undefined ? '<span class="st-pb">'+PB[k].toFixed(1)+'s</span>' : '';
+    return '<span class="st-tab'+(k===cur?' cur':'')+'" data-key="'+k+'">'+escHtml(C.name||k)+pb+'</span>';
+  }).join('') + '<span class="st-all" title="all drills (\\)">\u2630 all</span>';
+  host.querySelectorAll('.st-tab').forEach(el=>el.onclick=()=>{ if(!demoPlaying) loadChallenge(el.dataset.key); });
+  const all=host.querySelector('.st-all'); if(all) all.onclick=()=>{ if(!demoPlaying) openPicker(); };
+}
+// Alt+PgUp/PgDn walks the current group's tabs (Ctrl+Pg is reserved by browsers
+// for THEIR tabs — attempted below, but Alt is the dependable chord).
+function stepSheetTab(dir){
+  const gname=GROUP_OF[cur];
+  const g=DRILL_GROUPS.find(x=>x.name===gname);
+  const keys=(g?g.keys:MENU_ORDER).filter(k=>CHALLENGES[k]);
+  const i=keys.indexOf(cur);
+  loadChallenge(keys[(i+dir+keys.length)%keys.length]);
+}
 function nextChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i+1)%MENU_ORDER.length]); }
 function prevChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i-1+MENU_ORDER.length)%MENU_ORDER.length]); }
 function toMenu(){ loadChallenge(cur); openPicker(); }
@@ -4274,6 +4324,7 @@ function syncTabs(){
     cel.innerHTML=(gc?'<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+gc+';margin-right:6px;vertical-align:1px"></span>':'')+(GROUP_OF[cur]||'Drill'); }
   C.__gCache=null;   // site-driven drills re-randomize per load; guide text must follow
   requestAnimationFrame(()=>{ try{ render(); }catch(e){} });   // r56: second pass re-measures the laid-out box for exact row fit
+  renderSheetTabs();
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
@@ -5007,6 +5058,8 @@ document.addEventListener('keydown',e=>{
 
   // HINTS — 'g' toggles guided in classic mode. (The session-mode g handler runs earlier and catches it during marathon/rapid-fire.)
   if(k==='F1'){ e.preventDefault(); toggleGuided(); return; }   // r49: 'g' now types into cells (type-to-replace); F1 = Excel's help key
+  if((k==='PageUp'||k==='PageDown') && (e.altKey||e.ctrlKey) && !editing){
+    e.preventDefault(); stepSheetTab(k==='PageDown'?1:-1); return; }   // r57: sheet-tab walk (Ctrl+Pg fires only if the browser lets it through)
 
   // CHALLENGE SELECT (no-mouse): 1 / 2 / 3 — disabled during a marathon (drills are random)
   if(gameMode==='classic' && !e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
