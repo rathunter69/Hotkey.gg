@@ -4,8 +4,8 @@
 
 window.THEMES = {
   default: { name:'Default', dark:true, vars:{
-    bg:'#282a36', surface:'#363948', surface2:'#414459', line:'#575b70',
-    text:'#f2f2ec', muted:'#a9adb8', faint:'#6f7590',
+    bg:'#292b31', surface:'#383b42', surface2:'#43474f', line:'#5a5e68',
+    text:'#f0f1ec', muted:'#a8adb3', faint:'#767d87',
     accent:'#6ec9a0', 'accent-dim':'#4a8f72', 'accent-glow':'rgba(110,201,160,.2)',
     warn:'#e0cf7a', bad:'#e07a6e' }},
   terminal: { name:'Terminal', dark:true, vars:{

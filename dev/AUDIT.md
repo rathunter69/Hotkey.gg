@@ -1535,3 +1535,11 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - Wolf confirms v62 is THE look. Dracula-green Default + flat strip-cap language
   across all pages = LOCKED DOCTRINE. No palette or chrome changes absent an
   explicit "revisit the theme" from Wolf.
+
+---
+# ROUND 63 — the final tint: grey-dracula
+- Wolf: dracula looks best, wants "a grey and greenish variant." Kept dracula's
+  LIGHTNESS layering (its softness is the point) and drained the purple cast:
+  bg #292b31, surfaces #383b42/#43474f, line #5a5e68, grey inks; sage accent
+  #6ec9a0 unchanged. :root synced \u00d75. This supersedes v62's tint inside the
+  same LOCKED doctrine — structure/chrome untouched.
