@@ -1741,3 +1741,25 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   the name, bucket pips omitted at hero size (the floating "accoutrements" —
   standing text already says top n%). Ring column align-self:center.
 - v75.
+
+---
+# ROUND 76 — navigation demo fossil, Apex card, global name prompt, sleek scroll
+- NAVIGATION DEMO BUG (Wolf watched the solution stall): demo/targets still said
+  A1:H7 from the 8-COLUMN ERA — playback forced that partial-row selection
+  before the insert step (full rows now end at J), the row-insert never fired,
+  and every later check stalled. All A1:H7 → A1:J7 (demo + targets).
+- PLAYER CARD, APEX SHOWCASE: handle banner (20px) on top; beneath it TWO equal
+  showcase tiles side by side — crest (84px) + tier + standing | level ring
+  (84px) + LEVEL n + xp. The two circulars are the card's centerpiece.
+- 'SET A NAME', ACTUALLY FIXED: the r71 prompt only fired while the LANDING was
+  visible. Now onSession prompts any real member without a handle after 900ms,
+  anywhere; the card's empty state shows an actionable "set your name" link
+  (promptHandle exported to window for nav.js).
+- CHECKLIST SCROLL: 6px themed thumb, transparent track, thin width.
+- PROCESS NOTE: the parKeys replay script crashed on the last-drill slice edge
+  case and the && chain silently skipped the v-bump + this audit entry while
+  the (newline-separated) push still ran — v75-tagged assets shipped for one
+  commit. Caught and completed here. RULE REINFORCED: verification failures
+  must hard-stop the round; keep every statement in ONE && chain through the
+  push.
+- v76.
