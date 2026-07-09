@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=42" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=42">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=42">
+<link rel="icon" href="favicon.ico?v=43" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=43">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=43">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -552,7 +552,7 @@
   }
 
   /* compact drill selector (replaces the bottom sheet-tab strip) */
-  .drillbar{display:flex; align-items:center; gap:6px; margin-bottom:14px}
+  .drillbar{display:flex; align-items:center; gap:6px; margin-bottom:8px}
   .db-nav{font-family:var(--mono); font-size:15px; line-height:1; color:var(--muted); background:var(--surface);
     border:1px solid var(--line); border-radius:8px; padding:8px 11px; cursor:pointer; transition:.13s}
   .db-nav:hover{color:var(--accent); border-color:var(--accent-dim)}
@@ -898,16 +898,15 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=42"></script>
-<link rel="stylesheet" href="nav.css?v=42">
-<script src="themes.js?v=42"></script>
+<script src="drills.js?v=43"></script>
+<link rel="stylesheet" href="nav.css?v=43">
+<script src="themes.js?v=43"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=42"></script>
+<script src="nav.js?v=43"></script>
 <div class="app">
-  <div class="taskline" id="taskLine"></div>
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
     <button class="db-current" id="drillPick" title="all drills">
@@ -918,6 +917,7 @@
     </button>
     <button class="db-nav" id="nextDrill" title="next drill (›)">›</button>
   </div>
+  <div class="taskline" id="taskLine"></div>
 
   <div class="marathonHud" id="marathonHud">
     <div class="mh-left">
@@ -1309,53 +1309,44 @@ const CHALLENGES = {
   },
   margin:{
     name:'Formula', label:'Margins across the page', par:52, parKeys:48,
-    prompt:'Three comp tables, one skill: EBITDA \u00f7 revenue, built by pointing, filled down, formatted as a percent. Same motion in three different neighborhoods of the sheet \u2014 your hands should stop caring where the table lives.',
-    req:'<em>D3</em> \u00b7 <em>=C3/B3</em> \u00b7 fill D3:D5 \u00b7 <em>ctrl+shift+%</em> \u00b7 repeat at <em>I3</em> (=H3/G3, fill I3:I5) \u00b7 and at <em>F10</em> (=E10/D10, fill F10:F12)',
-    guide:[
-      'table one: at D3 point <kbd>=C3/B3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D5 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'table two lives at G:I \u2014 jump with <kbd>ctrl</kbd>+<kbd>\u2192</kbd> \u00b7 same build at I3, fill I3:I5, percent it',
-      'table three sits low at D10:F12 \u00b7 same build at F10, fill down, percent \u2014 three tables, one muscle',
-    ],
-    targets:['D3:D5','I3:I5','F10:F12'],
-    demo(){ return [
-      {sel:'D3', keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowLeft'},Kb.enter]},
-      {sel:'D3:D5', keys:[Kb.fillD, Kb.pct]},
-      {sel:'I3', keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowLeft'},Kb.enter]},
-      {sel:'I3:I5', keys:[Kb.fillD, Kb.pct]},
-      {sel:'F10', keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowLeft'},Kb.enter]},
-      {sel:'F10:F12', keys:[Kb.fillD, Kb.pct]},
-    ]; },
+    prompt:'Three comp tables, one skill: EBITDA \u00f7 revenue, built by pointing, filled down, formatted as a percent. The tables land somewhere new every run \u2014 your hands should stop caring where the table lives.',
+    req(){ return this._sites.map((s,i)=>'<em>'+s.m+s.r0+'</em> \u00b7 ='+s.e+s.r0+'/'+s.v+s.r0+' \u00b7 fill '+s.m+s.r0+':'+s.m+(s.r0+2)+' \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then '); },
+    guide(){ return this._sites.map((s,i)=>['table one','table two','table three'][i]+' at <b>'+s.m+s.r0+'</b> \u00b7 point <kbd>='+s.e+s.r0+'/'+s.v+s.r0+'</kbd> <kbd>\u21b5</kbd> \u00b7 fill down \u00d72 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>'+(i===0?' \u2014 <kbd>ctrl</kbd>+arrows jump between tables':'')); },
+    targets(){ return this._sites.map(s=>s.m+s.r0+':'+s.m+(s.r0+2)); },
+    demo(){ return this._sites.flatMap(s=>[
+      {sel:s.m+s.r0, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowLeft'},Kb.enter]},
+      {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[Kb.fillD, Kb.pct]},
+    ]); },
     build(){
       const cells={};
-      const mkTable=(r0,c0,title)=>{
-        cells[colLetter(c0)+r0]={...blankCell(),value:title,txt:true,bold:true};
-        cells[colLetter(c0)+(r0+1)]={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
-        cells[colLetter(c0+1)+(r0+1)]={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
-        cells[colLetter(c0+2)+(r0+1)]={...blankCell(),value:'Margin',txt:true,bold:true,align:'r'};
+      const slots=[{r:1,c:2},{r:1,c:7},{r:8,c:2},{r:8,c:7}];
+      for(let k=slots.length-1;k>0;k--){ const j=rnd(0,k); [slots[k],slots[j]]=[slots[j],slots[k]]; }
+      this._sites=[];
+      slots.slice(0,3).forEach((sl,t)=>{
+        const V=colLetter(sl.c), E=colLetter(sl.c+1), M=colLetter(sl.c+2);
+        cells[V+sl.r]={...blankCell(),value:'Comp set '+'ABC'[t],txt:true,bold:true};
+        cells[V+(sl.r+1)]={...blankCell(),value:'Rev',txt:true,bold:true,align:'r'};
+        cells[E+(sl.r+1)]={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
+        cells[M+(sl.r+1)]={...blankCell(),value:'Margin',txt:true,bold:true,align:'r'};
         const exps=[];
         for(let i=0;i<3;i++){
           const rev=rnd(40,180)*10, ebd=Math.round(rev*rnd(12,38)/100);
-          cells[colLetter(c0)+(r0+2+i)]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          cells[colLetter(c0+1)+(r0+2+i)]={...blankCell(),value:ebd,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          cells[colLetter(c0+2)+(r0+2+i)]={...blankCell()};
+          cells[V+(sl.r+2+i)]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          cells[E+(sl.r+2+i)]={...blankCell(),value:ebd,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          cells[M+(sl.r+2+i)]={...blankCell()};
           exps.push(ebd/rev);
         }
-        return exps;
-      };
-      // headers land on row r0+1; data rows r0+2..r0+4 — three neighborhoods
-      this._t1=mkTable(1,2,'Comp set A');    // B1 title, data rows 3-5, margin col D
-      this._t2=mkTable(1,7,'Comp set B');    // G1, margin col I
-      this._t3=mkTable(8,4,'Comp set C');    // D8, margin col F rows 10-12
-      return {ROWS:12, cells, active:{r:3,c:4}, sel:null, colW:{1:30,2:76,3:76,4:70,5:30,6:76,7:76,8:76,9:70,10:30}};
+        this._sites.push({v:V,e:E,m:M,r0:sl.r+2,exps:exps});
+      });
+      const s0=this._sites[0];
+      return {ROWS:12, cells, active:{r:s0.r0, c:s0.m.charCodeAt(0)-64}, sel:null, colW:{1:64}};
     },
     checks(S){
-      const ok=(col,r0,exps)=>[0,1,2].every(i=>{ const c=S.cells[col+(r0+i)];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exps[i])<1e-4&&c.fmtStyle==='percent'); });
-      return [
-        {label:'comp set A \u2014 margins live and percent-formatted (D3:D5)', ok: ok('D',3,this._t1)},
-        {label:'comp set B \u2014 same build across the page (I3:I5)', ok: ok('I',3,this._t2)},
-        {label:'comp set C \u2014 and down the sheet (F10:F12)', ok: ok('F',10,this._t3)},
-      ];
+      return this._sites.map((s,i)=>({
+        label:'comp set '+'ABC'[i]+' \u2014 margins live and percent-formatted ('+s.m+s.r0+':'+s.m+(s.r0+2)+')',
+        ok:[0,1,2].every(j=>{ const c=S.cells[s.m+(s.r0+j)];
+          return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-s.exps[j])<1e-4&&c.fmtStyle==='percent'); })
+      }));
     }
   },
   schedule:{
@@ -1414,49 +1405,55 @@ const CHALLENGES = {
   },
   percent:{
     name:'% of rev', label:'Common-size both statements', par:64, parKeys:32,
-    prompt:'Two statements on one page, both common-sized. The anchor is the whole lesson: each block\u2019s divisor is ITS OWN revenue \u2014 $B$2 on the left, $G$2 on the right \u2014 locked with F4 so the fill can\u2019t drag it. Build once per block, fill down, percent.',
-    req:'<em>C2</em> \u00b7 <em>=B2/$B$2</em> (F4 locks it) \u00b7 fill C2:C6 \u00b7 <em>ctrl+shift+%</em> \u00b7 then the right block: <em>H2</em> \u00b7 <em>=G2/$G$2</em> \u00b7 fill H2:H7 \u00b7 percent',
-    guide:[
+    prompt:'Two statements on one page, both common-sized \u2014 and the second one moves and deepens between runs. The anchor is the whole lesson: each block\u2019s divisor is ITS OWN revenue, locked with F4 so the fill can\u2019t drag it.',
+    req(){ const R=this._R; return '<em>C2</em> \u00b7 =B2/$B$2 (F4 locks it) \u00b7 fill C2:C6 \u00b7 <em>ctrl+shift+%</em> \u00b7 then: <em>'+R.pc+R.r0+'</em> \u00b7 ='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0+' \u00b7 fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent'; },
+    guide(){ const R=this._R; return [
       'left block: at C2 \u00b7 <kbd>=</kbd> <kbd>\u2190</kbd> <kbd>/</kbd> <kbd>\u2190</kbd> <kbd>F4</kbd> \u2192 <b>$B$2</b> \u00b7 <kbd>\u21b5</kbd> \u00b7 fill C2:C6 \u00b7 percent',
-      'the right statement anchors on ITS revenue \u2014 at H2: <kbd>=</kbd> <kbd>\u2190</kbd> <kbd>/</kbd> <kbd>\u2190</kbd> <kbd>F4</kbd> \u2192 <b>$G$2</b>',
-      'fill H2:H7 (one row deeper) \u00b7 percent \u00b7 two anchors, two blocks, zero dragged divisors',
-    ],
-    targets:['C2:C6','H2:H7'],
-    demo(){ return [
+      'the second statement landed at '+R.vc+R.r0+':'+R.pc+R.rN+' \u2014 anchor on ITS revenue: <kbd>F4</kbd> \u2192 <b>$'+R.vc+'$'+R.r0+'</b>',
+      'fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent \u00b7 two anchors, two blocks, zero dragged divisors',
+    ]; },
+    targets(){ const R=this._R; return ['C2:C6', R.pc+R.r0+':'+R.pc+R.rN]; },
+    demo(){ const R=this._R; return [
       {sel:'C2', keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
       {sel:'C2:C6', keys:[Kb.fillD, Kb.pct]},
-      {sel:'H2', keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
-      {sel:'H2:H7', keys:[Kb.fillD, Kb.pct]},
+      {sel:R.pc+R.r0, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
+      {sel:R.pc+R.r0+':'+R.pc+R.rN, keys:[Kb.fillD, Kb.pct]},
     ]; },
     build(){
       const cells={};
-      const block=(labCol,valCol,pctCol,rows,title)=>{
-        cells[colLetter(labCol)+1]={...blankCell(),value:title,txt:true,bold:true};
-        const names=['Revenue','COGS','Gross profit','SG&A','R&D','EBIT','Other'];
+      const names=['Revenue','COGS','Gross profit','SG&A','R&D','EBIT','Other'];
+      const block=(labC,valC,pctC,r0,rows,title)=>{
+        cells[colLetter(labC)+(r0-1)]={...blankCell(),value:title,txt:true,bold:true};
         const vals=[]; const rev=rnd(80,160)*10;
         for(let i=0;i<rows;i++){
           const v=i===0?rev:Math.round(rev*rnd(5,55)/100);
           vals.push(v);
-          cells[colLetter(labCol)+(2+i)]={...blankCell(),value:names[i],txt:true};
-          cells[colLetter(valCol)+(2+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          cells[colLetter(pctCol)+(2+i)]={...blankCell()};
+          cells[colLetter(labC)+(r0+i)]={...blankCell(),value:names[i],txt:true};
+          cells[colLetter(valC)+(r0+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          cells[colLetter(pctC)+(r0+i)]={...blankCell()};
         }
         return vals.map(v=>v/rev);
       };
-      this._L=block(1,2,3,5,'Statement A');   // A/B/C rows 2-6
-      this._R=block(6,7,8,6,'Statement B');   // F/G/H rows 2-7
-      return {ROWS:9, cells, active:{r:2,c:3}, sel:null, colW:{1:92,2:74,3:64,4:26,5:26,6:92,7:74,8:64,9:26,10:26}};
+      this._L=block(1,2,3,2,5,'Statement A');
+      const spots=[{c:6,r:2},{c:6,r:5},{c:7,r:3},{c:5,r:8}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const depth=rnd(5,7);
+      const r0=Math.min(sp.r, 14-depth+1);
+      this._Rexp=block(sp.c, sp.c+1, sp.c+2, r0, depth, 'Statement B');
+      this._R={ lc:colLetter(sp.c), vc:colLetter(sp.c+1), pc:colLetter(sp.c+2), r0:r0, rN:r0+depth-1, n:depth };
+      return {ROWS:Math.max(9,this._R.rN+1), cells, active:{r:2,c:3}, sel:null, colW:{1:92,6:92}};
     },
     checks(S){
-      const ok=(col,n,exps,anchor)=>{
-        for(let i=0;i<n;i++){ const c=S.cells[col+(2+i)];
+      const R=this._R;
+      const ok=(col,r0,n,exps,anchor)=>{
+        for(let i=0;i<n;i++){ const c=S.cells[col+(r0+i)];
           if(!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exps[i])<1e-4&&c.fmtStyle==='percent')) return false;
           if(!String(c.formula).includes(anchor)) return false; }
         return true;
       };
       return [
-        {label:'Statement A common-sized \u2014 every row anchored on $B$2', ok: ok('C',5,this._L,'$B$2')},
-        {label:'Statement B common-sized \u2014 anchored on ITS revenue, $G$2', ok: ok('H',6,this._R,'$G$2')},
+        {label:'Statement A common-sized \u2014 every row anchored on $B$2', ok: ok('C',2,5,this._L,'$B$2')},
+        {label:'Statement B \u2014 anchored on ITS revenue, $'+R.vc+'$'+R.r0, ok: ok(R.pc,R.r0,R.n,this._Rexp,'$'+R.vc+'$'+R.r0)},
       ];
     }
   },
@@ -1565,7 +1562,7 @@ const CHALLENGES = {
     checks(S){
       const d2=S.cells['D2']||{}, d4=S.cells['D4']||{};
       return [
-        {label:'D2 has the VALUE only \u2014 no bold, no fill', ok: d2.value===this._v && !d2.bold && d2.fill!=='blue'},
+        {label:'paste just the VALUE into D2 \u2014 leave the bold and the fill behind', ok: d2.value===this._v && !d2.bold && d2.fill!=='blue'},
         {label:'D4 kept its number but wears B2\u2019s FORMATS', ok: d4.value===this._d4 && !!d4.bold && d4.fill==='blue'},
       ];
     }
@@ -1751,8 +1748,8 @@ const CHALLENGES = {
       const g=this._g;
       const b3=1000*(1+g), b4=b3*(1+g), b5=b4*(1+g);
       return [
-        {label:'B4 and B5 carry live growth formulas (Ctrl+D)', ok: vOk('B4',b4,'B3') && vOk('B5',b5,'B4')},
-        {label:'C7 and D7 carry the shifted totals (Ctrl+R)', ok: vOk('C7',1020,'C2') && vOk('D7',530,'D2')},
+        {label:'fill the growth formula down through B4 and B5 (ctrl+d)', ok: vOk('B4',b4,'B3') && vOk('B5',b5,'B4')},
+        {label:'fill the total right \u2014 C7 and D7 pick up shifted refs (ctrl+r)', ok: vOk('C7',1020,'C2') && vOk('D7',530,'D2')},
       ];
     }
   },
@@ -1985,50 +1982,63 @@ const CHALLENGES = {
   },
   blue:{
     name:'Inputs', label:'Blue the inputs, everywhere', par:62, parKeys:61,
-    prompt:'A model page the way you actually inherit one: hardcodes scattered across four spots. Color EVERY hardcode blue \u2014 the two blocks and the two loose singles \u2014 and leave the formula cells alone. The grader checks both directions: inputs blue, formulas untouched.',
-    req:'<em>B3:B5</em> \u00b7 <em>alt h f c</em> \u00b7 \u2192\u00d74 \u00b7 <em>\u21b5</em> \u00b7 repeat for <em>G2:G4</em>, then the singles <em>D9</em> and <em>H11</em> \u00b7 formulas at D6 / I5 stay default',
-    guide:[
-      'block one: B3, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs B3:B5 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 \u2192\u00d74 \u00b7 <kbd>\u21b5</kbd>',
-      'block two at G2:G4 \u2014 <kbd>ctrl</kbd>+<kbd>\u2192</kbd> gets you across \u00b7 same chord',
-      'the loose singles: D9, then H11 \u2014 real pages hide hardcodes in corners',
-      'D6 and I5 are FORMULAS \u2014 they stay default; blueing them fails the drill',
-    ],
-    targets:['B3:B5','G2:G4','D9','H11'],
-    demo(){ return [
-      {sel:'B3:B5', keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
-      {sel:'G2:G4', keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
-      {sel:'D9', keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
-      {sel:'H11', keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+    prompt:'A model page the way you actually inherit one: hardcodes scattered across four spots \u2014 different spots every run \u2014 plus formula cells that must stay untouched. Color every hardcode blue; leave the formulas alone. The grader checks both directions.',
+    req(){ const s=this._scatter; return 'blue these: <em>'+s.b1.a+':'+s.b1.b+'</em> \u00b7 <em>'+s.b2.a+':'+s.b2.b+'</em> \u00b7 singles <em>'+s.s1+'</em> and <em>'+s.s2+'</em> (alt h f c \u00b7 \u2192\u00d74 \u00b7 \u21b5) \u00b7 formulas at '+s.d1+' / '+s.d2+' stay default'; },
+    guide(){ const s=this._scatter; return [
+      'block one: '+s.b1.a+', <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs it \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 \u2192\u00d74 \u00b7 <kbd>\u21b5</kbd>',
+      'block two at '+s.b2.a+':'+s.b2.b+' \u2014 <kbd>ctrl</kbd>+arrows across \u00b7 same chord',
+      'the loose singles this run: '+s.s1+' and '+s.s2+' \u2014 real pages hide hardcodes in corners',
+      s.d1+' and '+s.d2+' are FORMULAS \u2014 blueing them fails the drill',
     ]; },
+    targets(){ const s=this._scatter; return [s.b1.a+':'+s.b1.b, s.b2.a+':'+s.b2.b, s.s1, s.s2]; },
+    demo(){ const s=this._scatter; const chord=[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter];
+      return [
+        {sel:s.b1.a+':'+s.b1.b, keys:chord},
+        {sel:s.b2.a+':'+s.b2.b, keys:chord},
+        {sel:s.s1, keys:chord},
+        {sel:s.s2, keys:chord},
+      ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Assumptions',txt:true,bold:true};
-      ['Volume','Price','Growth'].forEach((n,i)=>{
-        cells['A'+(3+i)]={...blankCell(),value:n,txt:true};
-        cells['B'+(3+i)]={...blankCell(),value:rnd(5,95)*10,fmtStyle:'comma',decimals:0}; });
-      cells['F1']={...blankCell(),value:'Rates',txt:true,bold:true};
-      ['Tax','Discount','Terminal g'].forEach((n,i)=>{
-        cells['F'+(2+i)]={...blankCell(),value:n,txt:true};
-        cells['G'+(2+i)]={...blankCell(),value:rnd(2,30)/100,fmtStyle:'percent',decimals:1}; });
-      cells['C9']={...blankCell(),value:'Shares',txt:true};
-      cells['D9']={...blankCell(),value:rnd(8,60),decimals:0};
-      cells['G11']={...blankCell(),value:'Min cash',txt:true};
-      cells['H11']={...blankCell(),value:rnd(3,20)*10,fmtStyle:'comma',decimals:0};
-      // decoy FORMULAS that must stay default
-      cells['C6']={...blankCell(),value:'Revenue',txt:true};
-      cells['D6']={...blankCell(),formula:'=B3*B4',value:0,fmtStyle:'comma',decimals:0};
-      cells['H5']={...blankCell(),value:'After-tax',txt:true};
-      cells['I5']={...blankCell(),formula:'=1-G2',value:0,fmtStyle:'percent',decimals:1};
-      return {ROWS:11, cells, active:{r:3,c:2}, sel:null, colW:{1:82,2:72,3:66,4:64,5:26,6:88,7:70,8:76,9:70,10:26}};
+      const b1pool=[{c:2,r:3},{c:3,r:2},{c:2,r:8}], b2pool=[{c:7,r:2},{c:8,r:4},{c:6,r:9}];
+      const b1=b1pool[rnd(0,2)], b2=b2pool[rnd(0,2)];
+      const names1=['Volume','Price','Growth'], names2=['Tax','Discount','Terminal g'];
+      const B1=colLetter(b1.c), B2=colLetter(b2.c);
+      cells[colLetter(b1.c-1)+(b1.r-1)]={...blankCell(),value:'Assumptions',txt:true,bold:true};
+      names1.forEach((n,i)=>{ cells[colLetter(b1.c-1)+(b1.r+i)]={...blankCell(),value:n,txt:true};
+        cells[B1+(b1.r+i)]={...blankCell(),value:rnd(5,95)*10,fmtStyle:'comma',decimals:0}; });
+      cells[colLetter(b2.c-1)+(b2.r-1)]={...blankCell(),value:'Rates',txt:true,bold:true};
+      names2.forEach((n,i)=>{ cells[colLetter(b2.c-1)+(b2.r+i)]={...blankCell(),value:n,txt:true};
+        cells[B2+(b2.r+i)]={...blankCell(),value:rnd(2,30)/100,fmtStyle:'percent',decimals:1}; });
+      // two loose singles + two formula decoys from a spot pool, non-colliding
+      const taken=new Set();
+      const key=(c,r)=>colLetter(c)+r;
+      [b1,b2].forEach(b=>{ for(let i=-1;i<3;i++){ taken.add(key(b.c,b.r+i)); taken.add(key(b.c-1,b.r+i)); } });
+      const pool=[{c:4,r:11},{c:9,r:11},{c:5,r:6},{c:9,r:7},{c:3,r:12},{c:7,r:12}].filter(p=>!taken.has(key(p.c,p.r))&&!taken.has(key(p.c-1,p.r)));
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const singles=[['Shares',rnd(8,60),0],['Min cash',rnd(3,20)*10,0]];
+      const sp=[pool[0],pool[1]], dp=[pool[2],pool[3]];
+      singles.forEach(([n,v,d],i)=>{ cells[key(sp[i].c-1,sp[i].r)]={...blankCell(),value:n,txt:true};
+        cells[key(sp[i].c,sp[i].r)]={...blankCell(),value:v,fmtStyle:'comma',decimals:d}; });
+      cells[key(dp[0].c-1,dp[0].r)]={...blankCell(),value:'Revenue',txt:true};
+      cells[key(dp[0].c,dp[0].r)]={...blankCell(),formula:'='+B1+b1.r+'*'+B1+(b1.r+1),value:0,fmtStyle:'comma',decimals:0};
+      cells[key(dp[1].c-1,dp[1].r)]={...blankCell(),value:'After-tax',txt:true};
+      cells[key(dp[1].c,dp[1].r)]={...blankCell(),formula:'=1-'+B2+b2.r,value:0,fmtStyle:'percent',decimals:1};
+      this._scatter={ b1:{a:B1+b1.r, b:B1+(b1.r+2), keys:[0,1,2].map(i=>B1+(b1.r+i))},
+                      b2:{a:B2+b2.r, b:B2+(b2.r+2), keys:[0,1,2].map(i=>B2+(b2.r+i))},
+                      s1:key(sp[0].c,sp[0].r), s2:key(sp[1].c,sp[1].r),
+                      d1:key(dp[0].c,dp[0].r), d2:key(dp[1].c,dp[1].r) };
+      return {ROWS:12, cells, active:{r:b1.r, c:b1.c}, sel:null, colW:{1:78}};
     },
     checks(S){
+      const s=this._scatter;
       const blue=k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); };
       const notBlue=k=>{ const c=S.cells[k]; return !(c&&c.fontColor==='blue'); };
       return [
-        {label:'assumptions block blue (B3:B5)', ok: blue('B3')&&blue('B4')&&blue('B5')},
-        {label:'rates block blue (G2:G4)', ok: blue('G2')&&blue('G3')&&blue('G4')},
-        {label:'the loose hardcodes too \u2014 D9 and H11', ok: blue('D9')&&blue('H11')},
-        {label:'formula cells (D6, I5) left DEFAULT \u2014 convention cuts both ways', ok: notBlue('D6')&&notBlue('I5')},
+        {label:'assumptions block blue ('+s.b1.a+':'+s.b1.b+')', ok: s.b1.keys.every(blue)},
+        {label:'rates block blue ('+s.b2.a+':'+s.b2.b+')', ok: s.b2.keys.every(blue)},
+        {label:'the loose hardcodes too \u2014 '+s.s1+' and '+s.s2, ok: blue(s.s1)&&blue(s.s2)},
+        {label:'formula cells ('+s.d1+', '+s.d2+') left DEFAULT \u2014 convention cuts both ways', ok: notBlue(s.d1)&&notBlue(s.d2)},
       ];
     }
   },
@@ -2194,19 +2204,19 @@ const CHALLENGES = {
   },
   growth:{
     name:'Growth', label:'Run the growth rates', par:58, parKeys:37,
-    prompt:'Two revenue builds on one page \u2014 the top one runs Y1\u2013Y5 across the top rows, the second sits lower and further right, the way a second segment always does. YoY growth = this year \u00f7 last year \u2212 1, filled across, percent to 1 decimal. Both rows.',
-    req:'<em>C3</em> \u00b7 <em>=C2/B2-1</em> \u00b7 fill C3:F3 \u00b7 <em>ctrl+shift+%</em> \u00b7 then the segment block: <em>G9</em> \u00b7 <em>=G8/F8-1</em> \u00b7 fill G9:I9 \u00b7 percent',
-    guide:[
+    prompt:'Two revenue builds on one page \u2014 the consolidated line runs across the top; the segment block moves around every run, the way a second segment always does. YoY growth = this year \u00f7 last year \u2212 1, filled across, percent to 1 decimal. Both rows.',
+    req(){ const s=this._seg; return '<em>C3</em> \u00b7 =C2/B2-1 \u00b7 fill C3:F3 \u00b7 <em>ctrl+shift+%</em> \u00b7 then the segment: <em>'+s.c1+s.gr+'</em> \u00b7 ='+s.c1+s.rr+'/'+s.c0+s.rr+'-1 \u00b7 fill '+s.c1+s.gr+':'+s.cN+s.gr+' \u00b7 percent'; },
+    guide(){ const s=this._seg; return [
       'top build: at C3 \u00b7 <kbd>=</kbd> <kbd>\u2191</kbd> <kbd>/</kbd> <kbd>\u2190</kbd><kbd>\u2191</kbd> <kbd>-</kbd><kbd>1</kbd> <kbd>\u21b5</kbd> \u00b7 fill C3:F3 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'the segment lives at F7:I9 \u2014 <kbd>ctrl</kbd>+<kbd>\u2192</kbd>/<kbd>\u2193</kbd> jumps you there',
-      'same formula shape at G9, fill G9:I9, percent \u2014 growth is growth wherever the block sits',
-    ],
-    targets:['C3:F3','G9:I9'],
-    demo(){ return [
+      'the segment landed at '+s.c0+s.hr+':'+s.cN+s.gr+' this run \u2014 <kbd>ctrl</kbd>+arrows jump you there',
+      'same shape at <b>'+s.c1+s.gr+'</b>, fill to '+s.cN+s.gr+', percent \u2014 growth is growth wherever the block sits',
+    ]; },
+    targets(){ const s=this._seg; return ['C3:F3', s.c1+s.gr+':'+s.cN+s.gr]; },
+    demo(){ const s=this._seg; return [
       {sel:'C3', keys:[{key:'='},{key:'ArrowUp'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowUp'},{key:'-'},D(1),Kb.enter]},
       {sel:'C3:F3', keys:[Kb.fillR, Kb.pct]},
-      {sel:'G9', keys:[{key:'='},{key:'ArrowUp'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowUp'},{key:'-'},D(1),Kb.enter]},
-      {sel:'G9:I9', keys:[Kb.fillR, Kb.pct]},
+      {sel:s.c1+s.gr, keys:[{key:'='},{key:'ArrowUp'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowUp'},{key:'-'},D(1),Kb.enter]},
+      {sel:s.c1+s.gr+':'+s.cN+s.gr, keys:[Kb.fillR, Kb.pct]},
     ]; },
     build(){
       const cells={};
@@ -2219,24 +2229,32 @@ const CHALLENGES = {
         cells[colLetter(i+2)+2]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
         if(i>0) this._g1.push(v/prev-1);
         prev=v; }
-      [3,4,5,6].forEach(c=>cells[colLetter(c)+3]={...blankCell()});   // growth cells C3:F3
-      cells['E7']={...blankCell(),value:'Segment B',txt:true,bold:true};
-      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+6)+7]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
-      cells['E8']={...blankCell(),value:'Revenue',txt:true};
-      cells['E9']={...blankCell(),value:'Growth',txt:true};
+      [3,4,5,6].forEach(c=>cells[colLetter(c)+3]={...blankCell()});
+      // segment block: position AND width vary per run
+      const spots=[{r:7,c:5},{r:7,c:2},{r:9,c:4},{r:8,c:6}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const yrs=rnd(3,4);
+      const lab=colLetter(sp.c);
+      cells[lab+sp.r]={...blankCell(),value:'Segment B',txt:true,bold:true};
+      for(let i=0;i<yrs;i++) cells[colLetter(sp.c+1+i)+sp.r]={...blankCell(),value:'Y'+(i+1),txt:true,bold:true,align:'r'};
+      cells[lab+(sp.r+1)]={...blankCell(),value:'Revenue',txt:true};
+      cells[lab+(sp.r+2)]={...blankCell(),value:'Growth',txt:true};
       this._g2=[]; prev=null;
-      for(let i=0;i<4;i++){ const v=Math.round(rnd(20,60)*10*Math.pow(1+rnd(2,25)/100,i));
-        cells[colLetter(i+6)+8]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      for(let i=0;i<yrs;i++){ const v=Math.round(rnd(20,60)*10*Math.pow(1+rnd(2,25)/100,i));
+        cells[colLetter(sp.c+1+i)+(sp.r+1)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
         if(i>0) this._g2.push(v/prev-1);
         prev=v; }
-      return {ROWS:10, cells, active:{r:3,c:3}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74}};
+      this._seg={ hr:sp.r, rr:sp.r+1, gr:sp.r+2, c0:colLetter(sp.c+1), c1:colLetter(sp.c+2), cN:colLetter(sp.c+yrs), cols:[] };
+      for(let i=1;i<yrs;i++) this._seg.cols.push(colLetter(sp.c+1+i));
+      return {ROWS:12, cells, active:{r:3,c:3}, sel:null, colW:{1:96}};
     },
     checks(S){
       const ok=(cols,row,exps)=>cols.every((cl,i)=>{ const c=S.cells[cl+row];
         return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exps[i])<1e-4&&c.fmtStyle==='percent'); });
+      const s=this._seg;
       return [
         {label:'consolidated growth row \u2014 live, filled, percent (C3:F3)', ok: ok(['C','D','E','F'],3,this._g1)},
-        {label:'segment growth row \u2014 same build, different neighborhood (G9:I9)', ok: ok(['G','H','I'],9,this._g2)},
+        {label:'segment growth row \u2014 wherever it landed ('+s.c1+s.gr+':'+s.cN+s.gr+')', ok: ok(s.cols,s.gr,this._g2)},
       ];
     }
   },
@@ -2442,7 +2460,7 @@ const CHALLENGES = {
         return refs>=2 && Math.abs(c.value-this._exp[i])<0.5; };
       let ok=true; for(let i=0;i<4;i++) if(!dOk(i)) ok=false;
       return [
-        {label:'sweep = min(balance, cash above minimum), never negative \u2014 all 4 years, live formulas', ok},
+        {label:'sweep each year: the lesser of the balance and the cash above minimum \u2014 never negative, all 4 years live', ok},
       ];
     }
   },
@@ -2832,51 +2850,44 @@ const CHALLENGES = {
   },
   cagr:{
     name:'CAGR', label:'Compound it, three times', par:72, parKeys:79,
-    prompt:'Three CAGR checks scattered where a real page would leave them. Same clean formula each time \u2014 (End \u00f7 Begin) ^ (1 \u00f7 Years) \u2212 1 \u2014 percent to 1 decimal. The refs change with the block; the shape never does.',
-    req:'<em>B5</em> \u00b7 <em>=(B3/B2)^(1/B4)-1</em> \u00b7 <em>ctrl+shift+%</em> \u00b7 then <em>G6</em> \u00b7 <em>=(G4/G3)^(1/G5)-1</em> \u00b7 then <em>D13</em> \u00b7 <em>=(D11/D10)^(1/D12)-1</em> \u00b7 percent each',
-    guide:[
-      'block one at B5 \u00b7 <kbd>=(B3/B2)^(1/B4)-1</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'block two sits at G3:G6 \u2014 same shape, refs shift: <kbd>=(G4/G3)^(1/G5)-1</kbd>',
-      'block three at D10:D13, low on the page \u00b7 <kbd>=(D11/D10)^(1/D12)-1</kbd> \u00b7 percent all three',
-    ],
-    targets:['B5','G6','D13'],
-    demo(){ return [
-      {sel:'B5', keys:[...T('=(B3/B2)^(1/B4)-1'), Kb.enter]},
-      {sel:'B5', keys:[Kb.pct]},
-      {sel:'G6', keys:[...T('=(G4/G3)^(1/G5)-1'), Kb.enter]},
-      {sel:'G6', keys:[Kb.pct]},
-      {sel:'D13', keys:[...T('=(D11/D10)^(1/D12)-1'), Kb.enter]},
-      {sel:'D13', keys:[Kb.pct]},
-    ]; },
+    prompt:'Three CAGR checks scattered where a real page would leave them \u2014 and they move every run. Same clean formula each time: (End \u00f7 Begin) ^ (1 \u00f7 Years) \u2212 1, percent to 1 decimal. The refs change with the block; the shape never does.',
+    req(){ return this._sites.map(s=>'<em>'+s.col+s.ans+'</em> \u00b7 =('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1 \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then '); },
+    guide(){ return this._sites.map((s,i)=>['block one','block two','block three'][i]+' \u2014 at <b>'+s.col+s.ans+'</b> type <kbd>=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>'); },
+    targets(){ return this._sites.map(s=>s.col+s.ans); },
+    demo(){ return this._sites.flatMap(s=>[
+      {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'), Kb.enter]},
+      {sel:s.col+s.ans, keys:[Kb.pct]},
+    ]); },
     build(){
       const cells={};
-      const site=(col,r0,title,ansRow)=>{
-        cells[colLetter(col)+r0]={...blankCell(),value:title,txt:true,bold:true};
+      const pool=[{c:2,r:2},{c:7,r:2},{c:4,r:9},{c:9,r:8},{c:5,r:3}];
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const picked=pool.slice(0,3).sort((a,b)=>(a.r-b.r)||(a.c-b.c));
+      this._sites=[];
+      picked.forEach((p,t)=>{
+        const col=colLetter(p.c), lab=colLetter(p.c-1);
+        cells[col+(p.r-1)]={...blankCell(),value:'Deal '+'ABC'[t],txt:true,bold:true};
         const yrs=rnd(3,7), beg=rnd(50,300)*10, g=(100+rnd(4,20))/100;
         const end=Math.round(beg*Math.pow(g,yrs));
-        cells[colLetter(col)+(r0+1)]={...blankCell(),value:beg,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[colLetter(col)+(r0+2)]={...blankCell(),value:end,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[colLetter(col)+(r0+3)]={...blankCell(),value:yrs,fontColor:'blue',decimals:0};
-        cells[colLetter(col)+ansRow]={...blankCell()};
-        cells[colLetter(col-1)+(r0+1)]={...blankCell(),value:'Begin',txt:true};
-        cells[colLetter(col-1)+(r0+2)]={...blankCell(),value:'End',txt:true};
-        cells[colLetter(col-1)+(r0+3)]={...blankCell(),value:'Years',txt:true};
-        cells[colLetter(col-1)+ansRow]={...blankCell(),value:'CAGR',txt:true,bold:true};
-        return Math.pow(end/beg,1/yrs)-1;
-      };
-      this._e1=site(2,1,'Deal A',5);     // B2:B4 data, B5 answer
-      this._e2=site(7,2,'Deal B',6);     // G3:G5 data, G6 answer
-      this._e3=site(4,9,'Deal C',13);    // D10:D12 data, D13 answer
-      return {ROWS:13, cells, active:{r:5,c:2}, sel:null, colW:{1:58,2:80,3:58,4:80,5:30,6:58,7:80,8:30,9:30,10:30}};
+        cells[col+p.r]={...blankCell(),value:beg,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[col+(p.r+1)]={...blankCell(),value:end,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[col+(p.r+2)]={...blankCell(),value:yrs,fontColor:'blue',decimals:0};
+        cells[col+(p.r+3)]={...blankCell()};
+        cells[lab+p.r]={...blankCell(),value:'Begin',txt:true};
+        cells[lab+(p.r+1)]={...blankCell(),value:'End',txt:true};
+        cells[lab+(p.r+2)]={...blankCell(),value:'Years',txt:true};
+        cells[lab+(p.r+3)]={...blankCell(),value:'CAGR',txt:true,bold:true};
+        this._sites.push({col:col, r0:p.r, ans:p.r+3, exp:Math.pow(end/beg,1/yrs)-1});
+      });
+      const s0=this._sites[0];
+      return {ROWS:13, cells, active:{r:s0.ans, c:s0.col.charCodeAt(0)-64}, sel:null, colW:{1:58}};
     },
     checks(S){
-      const ok=(k,exp)=>{ const c=S.cells[k];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<1e-4&&c.fmtStyle==='percent'); };
-      return [
-        {label:'Deal A CAGR at B5 \u2014 live, percent', ok: ok('B5',this._e1)},
-        {label:'Deal B CAGR at G6 \u2014 refs shifted with the block', ok: ok('G6',this._e2)},
-        {label:'Deal C CAGR at D13 \u2014 low on the page, same shape', ok: ok('D13',this._e3)},
-      ];
+      return this._sites.map((s,i)=>({
+        label:'Deal '+'ABC'[i]+' CAGR at '+s.col+s.ans+' \u2014 live, percent',
+        ok:(()=>{ const c=S.cells[s.col+s.ans];
+          return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-s.exp)<1e-4&&c.fmtStyle==='percent'); })()
+      }));
     }
   },
   balance:{
@@ -3458,8 +3469,9 @@ function resolveRange(str){ if(!str) return null; const parts=str.split(':'); co
 function currentTargetRange(){
   if(!S||done) return null;
   const C=CHALLENGES[cur]; if(!C.targets) return null;
+  const T2=(typeof C.targets==='function') ? C.targets.call(C) : C.targets;
   const items=C.checks(S);
-  for(let i=0;i<items.length;i++){ if(!items[i].ok){ let t=C.targets[i]; if(typeof t==='function') t=t.call(C); return resolveRange(t); } }
+  for(let i=0;i<items.length;i++){ if(!items[i].ok){ let t=T2[i]; if(typeof t==='function') t=t.call(C); return resolveRange(t); } }
   return null;
 }
 function render(){
@@ -3920,10 +3932,12 @@ function syncTabs(){
   const idx=MENU_ORDER.indexOf(cur);
   const cel=$('dbCat'); if(cel){ const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]];
     cel.innerHTML=(gc?'<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+gc+';margin-right:6px;vertical-align:1px"></span>':'')+(GROUP_OF[cur]||'Drill'); }
+  C.__gCache=null;   // site-driven drills re-randomize per load; guide text must follow
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
-      tl.innerHTML='<span class="tl-dot" style="background:'+gc+'"></span>'+(C.req||C.prompt||'');
+      const reqTxt=(typeof C.req==='function') ? C.req.call(C) : (C.req||C.prompt||'');
+      tl.innerHTML='<span class="tl-dot" style="background:'+gc+'"></span>'+reqTxt;
   } }
   { const tl=$('taskLine'); if(tl){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
@@ -4146,7 +4160,8 @@ function updateChecklist(){
     // The next incomplete task is ALWAYS highlighted (not just in guided mode) —
     // the player should never wonder what to do next. Guided adds the key hints on top.
     const isNext = !i.ok && !nextDone; if(isNext) nextDone=true;
-    const keys = (guided && C.guide && C.guide[idx]) ? `<div class="cl-keys">${C.guide[idx]}</div>` : '';
+    const __g = (typeof C.guide==='function') ? (C.__gCache || (C.__gCache=C.guide.call(C))) : C.guide;
+    const keys = (guided && __g && __g[idx]) ? `<div class="cl-keys">${__g[idx]}</div>` : '';
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }

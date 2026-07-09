@@ -1114,3 +1114,29 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   natural fast path (guides call it out).
 - gridwrap align-self:stretch — bottom flush with the checklist rail.
 - v42.
+
+---
+# ROUND 43 — SITE-DRIVEN RANDOMIZATION (structural replayability, not just new numbers)
+- NEW ENGINE CAPABILITY: req, guide, and targets may be FUNCTIONS — resolved per
+  load (guide cached per run via C.__gCache, invalidated in loadChallenge). Drills
+  can now randomize STRUCTURE, and every piece of surrounding text/highlighting
+  follows the layout.
+- FIVE DRILLS CONVERTED to site-driven builds (margin, growth, cagr, percent,
+  blue): tables/blocks/singles draw positions from shuffled slot pools each run —
+  the segment block moves, statement B moves AND deepens (5-7 rows), the CAGR
+  deals scatter differently, blue's hardcodes and decoy formulas relocate with
+  collision avoidance. Same skill, new page every run. VERIFIED across 25 random
+  layouts per drill (solutions derived from site data; decoys still reject).
+- DOCTRINE ADDENDUM: new drills should randomize structure (site pools), not just
+  values. parKeys unchanged (motion counts are layout-invariant to first order).
+- LAYOUT: taskline moved BELOW the drillbar — instructions now hug the grid
+  instead of floating at the page top (Wolf: "too much space for eyes to wander").
+  drillbar margin tightened. Skinny filler columns dropped from spread colW maps
+  (they read as broken stripes); label columns keep explicit widths, data columns
+  use the 72px fallback.
+- COPY PASS (de-robotization): "D2 has the VALUE only" → "paste just the VALUE
+  into D2 — leave the bold and the fill behind"; "carry live growth formulas" →
+  "fill the growth formula down through…"; revolver + copyover labels rewritten
+  in desk English. RULE: check labels read like a person explaining, not a
+  grader asserting — say what the ACTION is, not what the cell "has".
+- v43.
