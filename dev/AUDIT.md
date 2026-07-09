@@ -1025,3 +1025,29 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - Audit script pattern preserved at /tmp level in transcript; rerun after any
   demo() change. RULE: when a drill's demo changes, recompute its parKeys.
 - v38.
+
+---
+# ROUND 39 — Wolf's eight-bug batch, root causes
+- ZOOM MYSTERY CLOSED: .gridwrap had literal CSS zoom:1.18/1.34 media rules
+  re-inflating the r36 density pass — deleted. gridwrap overflow:visible, no
+  min-height (the useless scrollbar), table 12.5px. Grid fits its box.
+- F4 WAS GATED ON A LIVE POINTER ONLY — typed refs or typing-after-pointing left
+  it dead ("cuts off half the drills"). cycleAnchor now falls back to the ref
+  immediately behind the caret (regex, full 4-state cycle, caret preserved).
+  Logic loop-verified standalone.
+- SUM RANGES: autoSum had hijacked editAnchor as range base while movePointer
+  writes single refs — first arrow collapsed the proposal, shift did nothing.
+  New editPointerBase state: shift+arrow EXTENDS (anchor fixed, corner walks,
+  writes A1:A3), plain arrow re-points single (Excel semantics). autoSum uses it.
+- CARET: was rendered ONLY in F2-mode mid-string — invisible at end-of-buffer
+  (i.e., nearly always). Now always rendered, themed accent, 1s blink (.edcaret).
+- HOVER GLOW: td:hover background neutralized — keyboard game, the mouse-hover
+  cell highlight confused F2/selector work.
+- SIGN-IN DEAD PRE-CONNECTION: openAuth() had `if(!sb) return` — clicking Log in
+  before the async client existed silently no-oped. Modal now opens immediately,
+  shows "connecting…", re-renders when sb lands.
+- PASTE DIALOG: was a center-screen flex slab; now a compact bottom-right dock
+  (300px, shadowed) inside the gridwrap.
+- NEXT-DRILL DISCOVERABILITY: results card gains a primary "next drill → (n)"
+  button; the data-act='next'→nextChallenge() wiring already existed.
+- v39.

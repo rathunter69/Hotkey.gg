@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=38" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=38">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=38">
+<link rel="icon" href="favicon.ico?v=39" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=39">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=39">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -97,8 +97,11 @@
   .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
 
   .gridwrap{background:var(--surface); border:1px solid var(--line); border-radius:12px;
-    padding:18px; overflow:auto; position:relative; min-height:480px; min-width:0}
-  table{border-collapse:collapse; font-family:var(--mono); font-size:14px}
+    padding:14px; overflow:visible; position:relative; min-width:0}
+  table{border-collapse:collapse; font-family:var(--mono); font-size:12.5px}
+  .edcaret{color:var(--accent); font-weight:700; animation:edblink 1s steps(1) infinite; margin:0 -2px}
+  @keyframes edblink{50%{opacity:0}}
+  td:hover{background:inherit}   /* keyboard game — no mouse-hover cell glow (r39) */
   th,td{border:1px solid var(--line); height:38px; text-align:right; position:relative; overflow:hidden}
   th{background:var(--surface2); color:var(--muted); font-weight:500; text-align:center;
     min-width:34px; height:30px; font-size:11px}
@@ -530,8 +533,7 @@
   /* Monkeytype-scale: the sheet grows into the screen instead of sitting in a box.
      zoom scales the whole grid (cells, fonts, borders) without touching the engine's
      px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */
-  @media(min-width:1280px){ .gridwrap{zoom:1.18} }
-  @media(min-width:1600px){ .gridwrap{zoom:1.34} }
+  /* zoom multipliers removed r39 — they were re-inflating the density pass */
   .stage-main{flex:1 1 auto; min-width:0}
   .checklist{flex:0 0 240px; align-self:stretch; background:var(--surface); border:1px solid var(--line);
     border-radius:12px; padding:15px 16px; margin-top:0}
@@ -882,15 +884,19 @@
   /* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
   #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
   #grid th{font-size:10.5px}
+  #pasteDialog{position:absolute; right:16px; bottom:16px; z-index:30;
+    background:var(--surface2); border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=38"></script>
-<link rel="stylesheet" href="nav.css?v=38">
-<script src="themes.js?v=38"></script>
+<script src="drills.js?v=39"></script>
+<link rel="stylesheet" href="nav.css?v=39">
+<script src="themes.js?v=39"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=38"></script>
+<script src="nav.js?v=39"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3149,7 +3155,7 @@ let editing=false, editBuf='';
 // editAnchor   = the cell where the formula lives (its target row/col)
 // editPointer  = the currently-pointed-at cell (null when not in pointer mode)
 // editPointerStart = index in editBuf where the current reference begins (so arrows can rewrite it)
-let editAnchor=null, editPointer=null, editPointerStart=-1;
+let editAnchor=null, editPointer=null, editPointerStart=-1, editPointerBase=null;
 let editMode='enter', editCaret=0;   // Excel distinction: F2 = Edit mode (arrows move the CARET); typing = Enter mode (arrows commit)
 // Last char of editBuf is one of these → arrows enter pointer mode (insert new reference).
 // = + - * / ^ ( , — Excel's standard operator/separator boundaries.
@@ -3331,10 +3337,9 @@ function autoSum(){
   startEdit('=SUM(', 'enter');
   if(a){
     editPointerStart = editBuf.length;
-    editAnchor = {r:a.r, c:a.c};
     editPointer = {r:b.r, c:b.c};
-    editBuf += (a.r===b.r && a.c===b.c) ? ck(a.r,a.c) : ck(a.r,a.c)+':'+ck(b.r,b.c);
-    editCaret = editBuf.length;
+    editPointerBase = (a.r===b.r && a.c===b.c) ? null : {r:a.r, c:a.c};
+    writePointerRef();
     render();
   }
   // no adjacent numbers: '=SUM(' sits at an operator boundary, so the native
@@ -3467,8 +3472,8 @@ function render(){
         // Editing cell: show formula buffer with colored refs (matches what's in the formula bar)
         const {refs} = parseFormulaRefs(editBuf);
         cls.push('editing');
-        txt = (editMode==='edit' && editCaret < editBuf.length)
-          ? buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '▏' + buildFormulaHTML(editBuf.slice(editCaret), refs)
+        txt = true
+          ? buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '<span class="edcaret">\u258f</span>' + buildFormulaHTML(editBuf.slice(editCaret), refs)
           : buildFormulaHTML(editBuf, refs) + '▏';
       }
       else if(isNum(cell)&&!cell.wrap){
@@ -3825,6 +3830,7 @@ function _showResults(o){
     `<div class="rm-rank" id="rmRank"></div>`+
     `<div class="rm-opts">`+
     `<button class="rm-key" data-act="again"><kbd>↵ enter</kbd>again</button>`+
+    `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next drill \u2192</button>`+
     `<button class="rm-key" data-act="next"><kbd>space</kbd>next</button>`+
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
     `</div>`+
@@ -4003,7 +4009,7 @@ function startEdit(initial, mode){
 }
 function cancelEdit(){
   editing=false; editBuf='';
-  editAnchor=null; editPointer=null; editPointerStart=-1;
+  editAnchor=null; editPointer=null; editPointerStart=-1; editPointerBase=null;
   render();
 }
 function commitEdit(dr,dc){
@@ -4013,7 +4019,7 @@ function commitEdit(dr,dc){
   }
   const buf=editBuf.trim();
   editing=false; editBuf='';
-  editAnchor=null; editPointer=null; editPointerStart=-1;
+  editAnchor=null; editPointer=null; editPointerStart=-1; editPointerBase=null;
   if(buf!==''){
     pushUndo();
     const cell=ensure(S.active.r,S.active.c);
@@ -4034,23 +4040,48 @@ function startPointerFromArrow(dr, dc){
   if(r===editAnchor.r && c===editAnchor.c) return false;     // arrow blocked at boundary
   editPointerStart = editBuf.length;
   editPointer = {r, c};
+  editPointerBase = null;                                    // single-ref pointer
   editBuf += ck(r, c);
   editCaret = editBuf.length;
   return true;
 }
-function movePointer(dr, dc){
+function writePointerRef(){
+  editBuf = editBuf.slice(0, editPointerStart) +
+    (editPointerBase ? ck(editPointerBase.r,editPointerBase.c)+':'+ck(editPointer.r,editPointer.c)
+                     : ck(editPointer.r, editPointer.c));
+  editCaret = editBuf.length;
+}
+function movePointer(dr, dc, extend){
+  // shift+arrow EXTENDS into a range (Excel: anchor stays, active corner walks)
+  if(extend && !editPointerBase) editPointerBase = {r:editPointer.r, c:editPointer.c};
+  if(!extend) editPointerBase = null;                        // plain arrow re-points a single ref
   const r = Math.min(S.ROWS, Math.max(1, editPointer.r + dr));
   const c = Math.min(COLS,   Math.max(1, editPointer.c + dc));
   if(r===editPointer.r && c===editPointer.c) return false;
   editPointer = {r, c};
-  editBuf = editBuf.slice(0, editPointerStart) + ck(r, c);
+  writePointerRef();
   return true;
 }
 
 // F4 cycles the anchor on the current pointer reference: B2 → $B$2 → B$2 → $B2 → B2.
 // Only acts while editPointer is set (the most-recent reference, still "live" for tweaking).
 function cycleAnchor(){
-  if(!editPointer || editPointerStart < 0) return false;
+  // FALLBACK (r39): no live pointer (typed refs, or typing cleared it) — cycle the
+  // reference sitting immediately behind the caret instead. F4 must always work.
+  if(!editPointer || editPointerStart < 0){
+    const head = editBuf.slice(0, editCaret);
+    const m = /(\$?)([A-J])(\$?)(\d+)$/.exec(head);
+    if(!m) return false;
+    const [full, d1, col, d2, row] = m;
+    const states = [ ['',''], ['$','$'], ['','$'], ['$',''] ];
+    const idx = states.findIndex(s=>s[0]===d1 && s[1]===d2);
+    const nx = states[(idx+1)%4];
+    const rep = nx[0]+col+nx[1]+row;
+    const start = editCaret - full.length;
+    editBuf = editBuf.slice(0,start) + rep + editBuf.slice(editCaret);
+    editCaret = start + rep.length;
+    return true;
+  }
   const curRef = editBuf.slice(editPointerStart);
   // Match the four cycle states by current text
   const m = curRef.match(/^(\$?)([A-Z]+)(\$?)(\d+)$/);
@@ -4452,7 +4483,7 @@ document.addEventListener('keydown',e=>{
       // Delete in edit mode = cancel the in-progress edit AND clear the underlying cell's contents.
       // Excel parity: Delete always means "clear contents," whether you're editing or not.
       editing=false; editBuf='';
-      editAnchor=null; editPointer=null; editPointerStart=-1;
+      editAnchor=null; editPointer=null; editPointerStart=-1; editPointerBase=null;
       logKey('Delete'); pushUndo();
       const c = ensure(S.active.r, S.active.c); c.value = null; c.formula = null;
       commitAction(); return;
@@ -4467,7 +4498,7 @@ document.addEventListener('keydown',e=>{
       // If we're in pointer mode, Backspace removes the whole reference at once (Excel parity).
       if(editPointer){
         editBuf = editBuf.slice(0, editPointerStart);
-        editPointer = null; editPointerStart = -1;
+        editPointer = null; editPointerStart = -1; editPointerBase = null;
       } else if(editCaret>0){
         editBuf = editBuf.slice(0, editCaret-1) + editBuf.slice(editCaret);
         editCaret--;
@@ -4480,7 +4511,7 @@ document.addEventListener('keydown',e=>{
       // POINTER MODE: arrow inserts/updates a cell reference instead of committing.
       // (1) Already in pointer mode → move the pointer, rewrite the reference in editBuf.
       if(editPointer){
-        if(movePointer(dr, dc)){ logKey(ARROWSYM[k]); render(); }
+        if(movePointer(dr, dc, e.shiftKey)){ logKey((e.shiftKey?'\u21e7+':'')+ARROWSYM[k]); render(); }
         return;
       }
       // (2) editBuf ends in an operator boundary (=, +, -, *, /, ^, (, ,) → start a new pointer.
@@ -6540,7 +6571,8 @@ let authMode='signin';
 function isAnonUser(){ return !!(me_user && me_user.is_anonymous); }
 function authErr(msg){ const e=$('authErr'); if(e) e.textContent=msg||''; }
 
-function openAuth(mode){ if(!sb) return; authMode=mode||'signin'; authOpen=true; renderAuth(); }
+function openAuth(mode){ authMode=mode||'signin'; authOpen=true; renderAuth();
+  if(!sb){ const msg=$('authMsg'); if(msg) msg.textContent='connecting\u2026 one moment'; setTimeout(()=>{ if(sb) renderAuth(); }, 800); } }
 function renderAuth(){
   const m=$('authModal');
   if(authMode==='newpassword'){
