@@ -1091,3 +1091,26 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   heavy → ctrl+arrow nudge; no paste-special → rotation nudge). Never prescriptive,
   banker dot/dash styling.
 - v41.
+
+---
+# ROUND 42 — SPREAD PASS: the sheet gets used (Wolf: "underutilizing 80% of the screen")
+- LAYOUT DOCTRINE (new standing rule): a drill should either occupy a meaningful
+  footprint (≥6 cols / ≥9 rows) or place its task at MULTIPLE SITES across the
+  sheet. Corner-clustered single-site drills are legacy; new drills follow this.
+- FIVE MULTI-SITE REWRITES (graders verified incl. wrong-answer/decoy rejection;
+  parKeys recomputed per the r38 rule):
+  · margin (par 22→52): three comp tables in three neighborhoods (B:D top-left,
+    G:I top-right, D:F low) — same point-build/fill/percent motion, three homes.
+  · growth (28→58): consolidated Y1-Y5 build up top + a segment block low-right —
+    growth row built twice, refs shift with the block.
+  · cagr (34→72): three deal blocks scattered (B2:B5, G3:G6, D10:D13) — same
+    formula shape, three ref sets, percent each.
+  · percent (30→64): TWO statements common-sized, each anchored on ITS OWN
+    revenue ($B$2 vs $G$2, anchor ref-checked) — the F4 lesson taught twice.
+  · blue (34→62): hardcodes scattered across four sites (two blocks, two loose
+    singles) + DECOY FORMULA CELLS that must stay default — the grader checks
+    both directions of the convention.
+- Ctrl+arrow jumping becomes load-bearing: multi-site layouts make edge-jumps the
+  natural fast path (guides call it out).
+- gridwrap align-self:stretch — bottom flush with the checklist rail.
+- v42.
