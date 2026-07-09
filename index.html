@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=51" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=51">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=51">
+<link rel="icon" href="favicon.ico?v=52" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=52">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=52">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -193,8 +193,8 @@
     font-weight:700; font-size:12px}
 
   .bar{display:flex; align-items:center; gap:20px; margin-top:16px}
-  .ftimer{font-family:var(--mono); font-size:19px; font-weight:700; letter-spacing:-.3px; color:var(--muted);
-    padding:7px 13px; border-left:1px solid var(--line); display:flex; align-items:center; justify-content:flex-end; min-width:62px}
+  .ftimer{font-family:var(--mono); font-size:16px; font-weight:700; letter-spacing:-.3px; color:var(--muted);
+    padding:7px 13px; border-right:1px solid var(--line); display:flex; align-items:center; justify-content:flex-start; min-width:58px}
   .ftimer.run{color:var(--accent)}
   .stat{font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.5}
   .stat b{color:var(--text); font-weight:500}
@@ -536,8 +536,10 @@
   .mb-popover .mb-dur:hover{color:var(--accent); background:var(--accent-glow)}
   .mb-spacer{flex:1}
   /* Monkeytype-style config bar: quiet text buttons, borders only on hover — less chrome, same tools */
-  .mb-tool{background:none; border:1px solid transparent; color:var(--muted); font-family:var(--mono); font-size:11px;
-    padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s}
+  .mb-tool{background:var(--surface2); border:1px solid color-mix(in srgb, var(--line) 75%, transparent);
+    color:var(--muted); font-family:var(--mono); font-size:11px;
+    padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s;
+    box-shadow:0 1px 0 color-mix(in srgb, var(--line) 40%, transparent)}   /* r52: buttons must READ as buttons in every theme */
   .mb-tool:hover{color:var(--text); border-color:var(--muted)}
   .mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
   .mb-tool kbd{font-family:var(--mono); background:var(--surface2); border:1px solid var(--line);
@@ -564,7 +566,7 @@
   .cl-inner{position:absolute; inset:0; display:flex; flex-direction:column}
   /* faux column header — same 30px strip as the grid's th row, so the rail
      reads as one more column of the sheet (r48, Wolf's "checklist in the grid") */
-  .cl-colhdr{flex:0 0 auto; height:30px; line-height:30px; margin-top:14px; border-top:1px solid var(--line);  /* aligns with the grid's th strip (gridwrap pads 14px) */
+  .cl-colhdr{flex:0 0 auto; height:34px; line-height:34px;  /* r52: rail flush to frame top — header pairs with the formula bar row */
     background:var(--surface2); color:var(--muted);
     font-size:11px; text-align:center; font-weight:500;
     border-bottom:1px solid var(--line); letter-spacing:.12em}
@@ -927,14 +929,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=51"></script>
-<link rel="stylesheet" href="nav.css?v=51">
-<script src="themes.js?v=51"></script>
+<script src="drills.js?v=52"></script>
+<link rel="stylesheet" href="nav.css?v=52">
+<script src="themes.js?v=52"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=51"></script>
+<script src="nav.js?v=52"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -998,14 +1000,14 @@
   <div class="wb" id="welcomeBack" role="status"></div>
   <div class="stage">
     <div class="ribbon" id="ribbon"></div>
-    <div class="fbar">
-      <span class="namebox" id="nameBox">A1</span>
-      <span class="fx"><i>fx</i></span>
-      <span class="fcontent empty" id="fContent">empty</span>
-      <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span>
-    </div>
     <div class="stage-row">
       <div class="stage-main">
+        <div class="fbar">
+          <span class="namebox" id="nameBox">A1</span>
+          <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span>
+          <span class="fx"><i>fx</i></span>
+          <span class="fcontent empty" id="fContent">empty</span>
+        </div>
         <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
         <div class="result" id="result"></div>
       </div>

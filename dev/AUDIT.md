@@ -1327,3 +1327,25 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   skill sensitivity tables run on. 49 drills.
 - Queue: returns bridge, football field.
 - v51.
+
+---
+# ROUND 52 — 'Desk' default theme, flush rail, timer left, buttons, favicon
+- NEW THEME 'desk' (DEFAULT): dark \u00d7 dracula blend on Wolf's spec — grey slate
+  surfaces (#24272e/#2c3038/#353a44), soft grey-green accent (#4fb286), warm
+  warn/bad. Fallback swapped default→desk in themes.js. Daylight remains for
+  light lovers.
+- RAIL FLUSH TO TOP: fbar moved back inside stage-main, so the checklist column
+  now spans from the frame's second row — the \u2713 header (34px) PAIRS with the
+  formula bar row and the first checklist item reads at eye level with A1.
+  Timer relocated LEFT (namebox \u00b7 timer \u00b7 fx \u00b7 content), 16px, border-right.
+- BUTTONS READ AS BUTTONS: .mb-tool gains resting surface2 fill, 75% line
+  border, 1px bottom shadow — visible affordance in every theme (was borderless
+  ghost text). Hover accents unchanged.
+- FAVICON REDONE IN THE HOUSE LANGUAGE: the rank-emblem keycap crest itself —
+  desk slate cap, grey-green rim, F4 legend. One identity from favicon to MD
+  crown.
+- BADGES/RANK CARDS: audited — hkBadge hex medals (earned-gold/locked-ghost) and
+  the keycap crest ladder ARE the locked style already (tier metals are doctrine,
+  LoL gaudiness); they sit natively on the desk palette. No blind restyle;
+  targeted tweaks on request.
+- v52.

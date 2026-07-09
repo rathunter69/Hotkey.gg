@@ -23,6 +23,11 @@ window.THEMES = {
     text:'#323437', muted:'#646669', faint:'#9a9a9c',
     accent:'#e2b714', 'accent-dim':'#a07f0a', 'accent-glow':'rgba(226,183,20,.25)',
     warn:'#ca4754', bad:'#ca4754' }},
+  desk: { name:'Desk', dark:true, vars:{
+    bg:'#24272e', surface:'#2c3038', surface2:'#353a44', line:'#454c59',
+    text:'#e4e8ee', muted:'#9aa4b2', faint:'#69727f',
+    accent:'#4fb286', 'accent-dim':'#357a5c', 'accent-glow':'rgba(79,178,134,.18)',
+    warn:'#dcb45f', bad:'#d96c60' }},
   dracula: { name:'Dracula', dark:true, vars:{
     bg:'#282a36', surface:'#383a48', surface2:'#44475a', line:'#5d5f6e',
     text:'#f8f8f2', muted:'#a8a8a0', faint:'#6272a4',
@@ -128,7 +133,7 @@ window.applyTheme = function(name){
 (function(){
   let saved = null;
   try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
-  if(!saved || !window.THEMES[saved]) saved = 'default';   // dark, matching the trainer — no light flash between pages
+  if(!saved || !window.THEMES[saved]) saved = 'desk';   // r52 default: grey-green desk dark (dark × dracula blend) — no light flash between pages
   window.applyTheme(saved);
 })();
 
