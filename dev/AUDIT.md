@@ -1388,3 +1388,19 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   zero curriculum damage. Engine colW (autofit grading, paste widths) untouched;
   S._colW now carries effective widths so overflow helpers match the display.
 - v55.
+
+---
+# ROUND 56 — the half-inch found (.result inside the frame); Default = the grey look
+- THE HALF-INCH: .result (win line) lived INSIDE stage-main below the grid —
+  margin 16 + min-height 22 reserved ~38px of frame under the sheet. Moved
+  OUTSIDE the frame (renders under it); grid now bottoms the frame exactly.
+- TRUE ADAPTIVE ROWS: render() now measures gridwrap.clientHeight when laid out
+  (rowH = clamp(22..36, avail/ROWS)); loadChallenge schedules a one-frame
+  re-render so the second pass sees real box dimensions. ROWS heuristic remains
+  the pre-layout fallback.
+- THEME CONFUSION RESOLVED: Wolf picked "Default" and got matrix — Desk was a
+  separate entry and his saved theme predated it. Now: 'default' IS the
+  windows-grey desk-light palette (dark:false); the old matrix dark lives on as
+  'terminal'; 'desk' key retired (saved 'desk' falls through the fallback to
+  default — same look).
+- v56.

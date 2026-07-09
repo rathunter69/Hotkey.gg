@@ -3,7 +3,12 @@
    Exposes: window.THEMES (the dict), window.applyTheme(name), window.currentTheme. */
 
 window.THEMES = {
-  default: { name:'Default', dark:true, vars:{
+  default: { name:'Default', dark:false, vars:{
+    bg:'#b9bcc3', surface:'#cdcfd5', surface2:'#c0c3ca', line:'#999da7',
+    text:'#26282e', muted:'#565a64', faint:'#82868f',
+    accent:'#3f9873', 'accent-dim':'#2a6b50', 'accent-glow':'rgba(63,152,115,.18)',
+    warn:'#8a6a1f', bad:'#a84a40' }},
+  terminal: { name:'Terminal', dark:true, vars:{
     bg:'#0c0d0e', surface:'#141517', surface2:'#1c1d20', line:'#26282c',
     text:'#e9e8e3', muted:'#7c7d77', faint:'#4c4d49',
     accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.22)',
@@ -23,11 +28,6 @@ window.THEMES = {
     text:'#323437', muted:'#646669', faint:'#9a9a9c',
     accent:'#e2b714', 'accent-dim':'#a07f0a', 'accent-glow':'rgba(226,183,20,.25)',
     warn:'#ca4754', bad:'#ca4754' }},
-  desk: { name:'Desk', dark:false, vars:{
-    bg:'#b9bcc3', surface:'#cdcfd5', surface2:'#c0c3ca', line:'#999da7',
-    text:'#26282e', muted:'#565a64', faint:'#82868f',
-    accent:'#3f9873', 'accent-dim':'#2a6b50', 'accent-glow':'rgba(63,152,115,.18)',
-    warn:'#8a6a1f', bad:'#a84a40' }},
   dracula: { name:'Dracula', dark:true, vars:{
     bg:'#282a36', surface:'#383a48', surface2:'#44475a', line:'#5d5f6e',
     text:'#f8f8f2', muted:'#a8a8a0', faint:'#6272a4',
@@ -133,7 +133,7 @@ window.applyTheme = function(name){
 (function(){
   let saved = null;
   try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
-  if(!saved || !window.THEMES[saved]) saved = 'desk';   // r52 default: grey-green desk dark (dark × dracula blend) — no light flash between pages
+  if(!saved || !window.THEMES[saved]) saved = 'default';   // r56: Default IS the windows-grey desk look; saved 'desk' falls through here too
   window.applyTheme(saved);
 })();
 

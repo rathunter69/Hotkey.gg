@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=55" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=55">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=55">
+<link rel="icon" href="favicon.ico?v=56" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=56">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=56">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -202,8 +202,8 @@
     border:1px solid var(--warn); border-radius:5px; padding:2px 7px; opacity:.85}
   .spacer{flex:1}
 
-  .result{margin-top:16px; font-family:var(--mono); font-size:13.5px; color:var(--muted);
-    min-height:22px; transition:.2s}
+  .result{margin-top:10px; font-family:var(--mono); font-size:13.5px; color:var(--muted);
+    min-height:0; transition:.2s}
   .result.win{color:var(--accent)}
   .result.win b{color:var(--text)}
   .result .pb{color:var(--warn); margin-left:8px}
@@ -930,14 +930,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=55"></script>
-<link rel="stylesheet" href="nav.css?v=55">
-<script src="themes.js?v=55"></script>
+<script src="drills.js?v=56"></script>
+<link rel="stylesheet" href="nav.css?v=56">
+<script src="themes.js?v=56"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=55"></script>
+<script src="nav.js?v=56"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1010,11 +1010,11 @@
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
         <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
-        <div class="result" id="result"></div>
       </div>
       <aside class="checklist" id="checklist"></aside>
     </div>
   </div>
+  <div class="result" id="result"></div>
 
   <div id="rapidStage">
     <div class="rf-streak" id="rfStreak"></div>
@@ -3808,7 +3808,11 @@ function render(){
   let __base=0; for(let c=1;c<=COLS;c++) __base+=(colW[c]||72);
   const __per=(__availW>__base) ? Math.floor((__availW-__base)/COLS) : 0;
   const __ew={}; for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72)+__per;
-  const __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));
+  let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));
+  if(__gw && __gw.clientHeight>100){                       // measured: fill the box exactly
+    const __availH = __gw.clientHeight - 28 - 31;          // padding 14×2 + header row
+    __rowH = Math.max(22, Math.min(36, Math.floor(__availH / S.ROWS)));
+  }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
   S._colW = __ew;
   const g=$('grid'); g.innerHTML='';
@@ -4269,6 +4273,7 @@ function syncTabs(){
   const cel=$('dbCat'); if(cel){ const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]];
     cel.innerHTML=(gc?'<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+gc+';margin-right:6px;vertical-align:1px"></span>':'')+(GROUP_OF[cur]||'Drill'); }
   C.__gCache=null;   // site-driven drills re-randomize per load; guide text must follow
+  requestAnimationFrame(()=>{ try{ render(); }catch(e){} });   // r56: second pass re-measures the laid-out box for exact row fit
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
