@@ -9,8 +9,8 @@ window.THEMES = {
     accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.22)',
     warn:'#d9a441', bad:'#c8533f' }},
   daylight: { name:'Daylight', dark:false, vars:{
-    bg:'#e8eaed', surface:'#f8f9fb', surface2:'#edeff2', line:'#ccd0d6',
-    text:'#1f2328', muted:'#5c636e', faint:'#99a0ab',
+    bg:'#dbd8d1', surface:'#ecebe6', surface2:'#e1dfd8', line:'#c6c2b8',
+    text:'#26241f', muted:'#6b665d', faint:'#a09a8f',
     accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.14)',
     warn:'#9a6700', bad:'#b3261e' }},
   light: { name:'Light', dark:false, vars:{

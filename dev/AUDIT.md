@@ -1217,3 +1217,30 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   children's stretch — the real reason r42's gridwrap stretch never showed.
   Now align-items:stretch.
 - v46.
+
+---
+# ROUND 47 — the unified Excel frame + returning-user fix + soft Daylight + favicon
+- UNIFIED BLOCK: taskline (12px top radii, no bottom border) caps a single framed
+  component; .stage carries the one border (0 0 12px 12px), gap:0, overflow
+  hidden; fbar and gridwrap lose their own borders (hairline separators only);
+  checklist becomes an internal right rail (border-left hairline). Reads as one
+  application window — taskbar, ribbon, formula bar, sheet, rail.
+- RIBBON, FINALLY RIGHT: it "kept popping" because r46 hid it idle and Alt-mode
+  re-inserted a 40px banner (layout shift on every Alt tap — bankers tap Alt
+  constantly). Now a PERMANENT 34px strip inside the frame: faint 'alt ribbon'
+  ghost at rest, accent-lit in Alt-mode, fixed height, zero layout shift —
+  mirrors the actual application, per Wolf's instinct.
+- RETURNING USERS: showOnboard now consults window.__hkHasSession, set inside
+  onSession() for BOTH restored sessions and fresh sign-ins (also persists
+  hotkey_onboarded + closes an open prompt). An account = returning; the
+  tutorial/jump-in choice only greets true first-timers. (r33-era logic only
+  checked localStorage, so existing users on a new device were re-prompted.)
+- DAYLIGHT RETUNED: cool near-white (#e8eaed bg / #f8f9fb surface) → warm paper
+  (#dbd8d1 / #ecebe6, warm lines + inks). The glare was the blank bg expanse
+  around the frame; warm + darker kills it while staying a light theme.
+- FAVICON: fresh keycap mark (dark key, accent face, HK) in favicon.svg; ?v=47
+  busts the links. .ico/.png retained as fallbacks (svg link wins in modern
+  browsers).
+- session CSS: body.session hides the taskline like the drillbar (frame stays
+  coherent in marathon/rapid-fire).
+- v47.
