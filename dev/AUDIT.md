@@ -1529,3 +1529,9 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
     drilled glows \u2192 flat (outline for focus), card h2 \u2192 surface2 strip caps,
     entrance animation removed, radius 14\u219212.
 - v62.
+
+---
+# ROUND 62b — LOCKED
+- Wolf confirms v62 is THE look. Dracula-green Default + flat strip-cap language
+  across all pages = LOCKED DOCTRINE. No palette or chrome changes absent an
+  explicit "revisit the theme" from Wolf.
