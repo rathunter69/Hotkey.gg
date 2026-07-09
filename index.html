@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=82" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=82">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=82">
+<link rel="icon" href="favicon.ico?v=83" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=83">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=83">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -643,7 +643,7 @@
     align-items:flex-start; justify-content:center; z-index:55; padding:48px 24px 24px}
   .picker-modal.show{display:flex}
   .pk-card{background:transparent; border:0; border-radius:0;
-    width:1080px; max-width:96vw; max-height:86vh; overflow:auto; padding:6px 10px 16px;
+    width:1180px; max-width:96vw; max-height:86vh; overflow:auto; padding:6px 10px 16px;
     scrollbar-width:thin; scrollbar-color:var(--line) transparent}
   .pk-card::-webkit-scrollbar{width:6px}
   .pk-card::-webkit-scrollbar-track{background:transparent}
@@ -660,6 +660,7 @@
     transition:.12s; white-space:nowrap}
   .pk-byline:hover{color:var(--text); border-color:var(--line); background:var(--surface2)}
   .pk-byline.cur{color:var(--accent); border-color:var(--accent-dim); font-weight:700}
+  .pk-byline.focus{outline:2px solid var(--accent); outline-offset:1px; color:var(--text)}   /* r83: the keyboard cursor */
   .pk-byline.held i{color:var(--accent); font-style:normal; font-size:10px}
   .pk-byline i{color:var(--faint); font-style:normal}
   /* r81: FLAGSHIPS break formation — full-width block, accent frame, par shown */
@@ -1023,14 +1024,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=82"></script>
-<link rel="stylesheet" href="nav.css?v=82">
-<script src="themes.js?v=82"></script>
+<script src="drills.js?v=83"></script>
+<link rel="stylesheet" href="nav.css?v=83">
+<script src="themes.js?v=83"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=82"></script>
+<script src="nav.js?v=83"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -5166,8 +5167,10 @@ document.addEventListener('keydown',e=>{
   if(pickerOpen){
     e.preventDefault();
     if(k==='Escape'||k==='\\'){ closePicker(); return; }
-    if(k==='ArrowDown'){ movePk(1); return; }
-    if(k==='ArrowUp'){ movePk(-1); return; }
+    if(k==='ArrowDown'){ movePkDir(0,1); return; }
+    if(k==='ArrowUp'){ movePkDir(0,-1); return; }
+    if(k==='ArrowRight'){ movePkDir(1,0); return; }
+    if(k==='ArrowLeft'){ movePkDir(-1,0); return; }
     if(k==='Enter'){ choosePk(); return; }
     if(/^[1-9]$/.test(k)){ const key=MENU_ORDER[+k-1]; if(key){ closePicker(); loadChallenge(key); } return; }
     return;
@@ -5567,10 +5570,25 @@ $('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge();
 
 /* ---------- drill picker overlay ---------- */
 let pickerOpen=false, pkSel=0;
-function pkRows(){ const h=$('pkGroups'); return h ? [...h.querySelectorAll('.pk-row')] : []; }
-function highlightPk(){ const rows=pkRows(); rows.forEach((r,i)=>r.classList.toggle('sel', i===pkSel));
+function pkRows(){ const h=$('pkGroups'); return h ? [...h.querySelectorAll('.pk-byline')] : []; }   // r83: rows died in the v80 redesign — arrows now walk the bylines
+function highlightPk(){ const rows=pkRows(); rows.forEach((r,i)=>r.classList.toggle('focus', i===pkSel));
   const s=rows[pkSel]; if(s && s.scrollIntoView) s.scrollIntoView({block:'nearest'}); }
+function movePkDir(dx, dy){
+  const rows=pkRows(); if(!rows.length) return;
+  if(dy===0){ pkSel=(pkSel+dx+rows.length)%rows.length; highlightPk(); return; }
+  // vertical: nearest chip by x in the closest offsetTop band above/below
+  const me=rows[pkSel]; const mr=me.getBoundingClientRect(); const mx=mr.left+mr.width/2;
+  let best=-1, bestDy=1e9, bestDx=1e9;
+  rows.forEach((r,i)=>{ if(i===pkSel) return; const rr=r.getBoundingClientRect();
+    const ddy=(rr.top-mr.top)*dy; if(ddy<=4) return;
+    const ddx=Math.abs(rr.left+rr.width/2-mx);
+    if(ddy<bestDy-2 || (Math.abs(ddy-bestDy)<=2 && ddx<bestDx)){ best=i; bestDy=ddy; bestDx=ddx; } });
+  if(best>=0){ pkSel=best; highlightPk(); }
+}
 function openPicker(){ if(demoPlaying) return; buildSheetTabs();
+  // r83: the overlay's content top-aligns with the game frame (Wolf: categories floated high)
+  try{ const st=document.querySelector('.stage'); const p=$('picker');
+    if(st&&p){ p.style.paddingTop=Math.max(24, Math.round(st.getBoundingClientRect().top))+'px'; } }catch(e){}
   const rows=pkRows(); pkSel=Math.max(0, rows.findIndex(r=>r.dataset.key===cur));
   pickerOpen=true; $('picker').classList.add('show'); highlightPk(); }
 function closePicker(){ pickerOpen=false; const p=$('picker'); if(p) p.classList.remove('show'); }
@@ -7203,6 +7221,7 @@ async function onSession(session){
     // r76: a real account with membership but NO handle gets the prompt wherever it is
     // (the r71 version only fired while the landing was visible — Wolf still saw 'set a name')
     setTimeout(()=>{ try{ if(!isAnonUser() && me_member && !me_handle) promptHandle(); }catch(e){} }, 900);
+    setTimeout(()=>{ try{ hydratePBFromServer(); }catch(e){} }, 1200);   // r83: bests follow the account
     try{ localStorage.setItem('hotkey_onboarded','1'); }catch(e){}
     if(typeof onboardOpen!=='undefined' && onboardOpen) closeOnboard();
     // r69: greet returning users on the landing dialog + let one ↵ carry them in —
@@ -7721,6 +7740,21 @@ function achSweepInGame(){
         iconHtml:(window.hkBadge?window.hkBadge(fresh[0].glyph,true,60):'')});
       localStorage.setItem('hk_ach_seen', JSON.stringify(seen.concat(fresh.map(a=>a.id))));
     }
+  }catch(e){}
+}
+// r83: STAT RETENTION — local PBs hydrate from server runs on login, so a new
+// device/browser shows your real bests (server stays canonical; min-merge local).
+async function hydratePBFromServer(){
+  try{
+    if(!sb || !me_user || isAnonUser()) return;
+    const { data } = await sb.from('runs').select('challenge,time_ms')
+      .eq('user_id', me_user.id).eq('mouse_used', false)
+      .order('time_ms', {ascending:true}).limit(2000);
+    if(!data || !data.length) return;
+    let changed=false;
+    data.forEach(r=>{ const t=r.time_ms/1000;
+      if(PB[r.challenge]===undefined || t<PB[r.challenge]){ PB[r.challenge]=t; changed=true; } });
+    if(changed){ await savePB(); renderSheetTabs(); }
   }catch(e){}
 }
 async function recordRun(t){

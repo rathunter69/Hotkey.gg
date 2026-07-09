@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Account · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=82" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=82">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=82">
+<link rel="icon" href="favicon.ico?v=83" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=83">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=83">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -62,8 +62,8 @@
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
 </style>
-<link rel="stylesheet" href="nav.css?v=82">
-<script src="drills.js?v=82"></script>
+<link rel="stylesheet" href="nav.css?v=83">
+<script src="drills.js?v=83"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -71,11 +71,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=82"></script>
+<script src="themes.js?v=83"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=82"></script>
+<script src="nav.js?v=83"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -141,10 +141,23 @@ async function load(){
       <div class="rowline" style="margin-top:14px"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
     </div>
 
-    <div class="card"><h4>Security</h4>
-      <div class="rowline"><span class="k">password</span><span><button class="btn" id="acPwReset" style="margin:0">Email me a reset link</button></span></div>
-      <div class="msg" id="acPwMsg"></div>
-      <div class="rowline" style="margin-top:12px"><span class="k">session</span><span><button class="btn" id="acSignout" style="margin:0">Sign out</button></span></div>
+    <div class="card"><h4>Progress</h4>
+      <div style="display:flex;align-items:center;gap:16px">
+        <span style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,56):''}</span>
+        ${window.hkLevelRing?window.hkLevelRing(L.lvl, L.pct, 56):''}
+        <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.7">
+          <div style="color:var(--text);font-weight:700">${tier.name}</div>
+          <div>LVL ${L.lvl} \u00b7 ${xp.toLocaleString()} xp</div>
+          <div>${(st&&st.solves)||0} clean solves</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card"><h4>Data</h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Your runs live on the server under this account. Local device data (PBs cache, streak, achievement flags) can be exported or cleared.</div>
+      <button class="btn ghost" id="acExport">Export local data</button>
+      <button class="btn ghost" id="acClearLocal" style="margin-left:8px">Clear local cache</button>
+      <div class="msg" id="acDataMsg"></div>
     </div>
 
     <div class="card"><h4>Appearance</h4>
@@ -174,6 +187,9 @@ async function load(){
     </div>
 
     <div class="card"><h4>Security</h4>
+      <div class="rowline"><span class="k">password</span><span><button class="btn" id="acPwReset" style="margin:0">Email me a reset link</button></span></div>
+      <div class="msg" id="acPwMsg"></div>
+      <div class="rowline" style="margin-top:10px;margin-bottom:12px"><span class="k">session</span><span><button class="btn" id="acSignout" style="margin:0">Sign out</button></span></div>
       <label>new password (8+ characters)</label>
       <input id="acP1" type="password" autocomplete="new-password">
       <label>confirm</label>
@@ -193,6 +209,19 @@ async function load(){
     const {error}=await sb.auth.resetPasswordForEmail(me.email,{redirectTo:location.origin+'/index.html'});
     say('acPwMsg', error?('Could not send: '+error.message):'Reset link sent \u2014 check your inbox.', !!error);
   }catch(e){ say('acPwMsg','Could not send the reset email.',true); } };
+  const ex=document.getElementById('acExport');
+  if(ex) ex.onclick=()=>{ try{
+    const dump={}; ['hotkey_pb','hotkey_streak','hotkey_solves','hk_ach_flags','hk_ach_seen','hk_xp_est','hk_runs_lite','hk_clears'].forEach(k=>dump[k]=localStorage.getItem(k));
+    const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
+    const u=URL.createObjectURL(blob); const aEl=document.createElement('a');
+    aEl.href=u; aEl.download='hotkey-local-data.json'; aEl.click(); URL.revokeObjectURL(u);
+    document.getElementById('acDataMsg').textContent='exported.';
+  }catch(e){ document.getElementById('acDataMsg').textContent='export failed.'; } };
+  const cl=document.getElementById('acClearLocal');
+  if(cl) cl.onclick=()=>{ try{
+    ['hk_ach_flags','hk_xp_est','hk_runs_lite','hk_clears'].forEach(k=>localStorage.removeItem(k));
+    document.getElementById('acDataMsg').textContent='local cache cleared (PBs + streak kept; server runs untouched).';
+  }catch(e){} };
   const so=document.getElementById('acSignout');
   if(so) so.onclick=async()=>{ try{ await sb.auth.signOut(); }finally{ location.href='index.html'; } };
   const th=document.getElementById('acThemes');

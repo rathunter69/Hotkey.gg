@@ -1878,3 +1878,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   accent frame, ◆ FLAGSHIP tag, larger bylines w/ par chips. Free play stays
   ungated (doctrine): prominence over locks.
 - v82.
+
+---
+# ROUND 83 — picker keys rewired + aligned; PB server hydration; account matured
+- PICKER ARROWS DEAD, root: pkRows() still queried '.pk-row' — a class the v80
+  byline redesign deleted; nav code was walking an empty list. Rewired to
+  .pk-byline with 2D movement (←→ linear, ↑↓ nearest chip in the adjacent
+  visual row by rect), a visible .focus outline cursor, Enter selects. Overlay
+  content now TOP-ALIGNS with the game frame at open (measured stage top) and
+  widened to the 1180 doctrine width — the "categories float high" report.
+- STAT RETENTION: hydratePBFromServer() on login — min-merges your server runs
+  (clean only, capped 2000) into local PBs, so a new device/browser shows real
+  bests. Server stays canonical; tabs re-render on merge.
+- ACCOUNT PAGE: duplicate Security card MERGED into one (reset-link + session
+  rows folded above the password form); NEW Progress card (crest 56 + level
+  ring 56 + tier/LVL/xp/solves) and Data card (export local JSON / clear local
+  cache — PBs+streak kept, server untouched).
+- v83.
