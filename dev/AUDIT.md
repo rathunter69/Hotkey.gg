@@ -1425,3 +1425,33 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   blocksel, copyover, drill, ribbon, polish, foot, bridge, audit, sumif, lookup.
   Queue for coming rounds alongside returns bridge + football field.
 - v57.
+
+---
+# ROUND 58 — density pass I, returns bridge + football field, flat pass, autofit regression fixed
+- AUTOFIT GRADER REGRESSION (found in recon, r55's doing): elastic fit pointed
+  S._colW at inflated EFFECTIVE widths; autofit's checks read S._colW, so the
+  drill could auto-pass. FIX: S._colW = engine colW again; effective widths live
+  in S._ew; render th/td/#### + formulaOverflow read S._ew||S._colW. Verified:
+  squeezed start now FAILS all checks, post-autofit passes.
+- DENSITY REBUILDS (4 of the sparse cohort — all site-driven, populated pages):
+  * saves — 3 scattered review cells + saveN>=3 (par 44)
+  * autofit — TWO squeezed column pairs at random sites (par 34)
+  * blocksel — bold the target island ENTIRELY, decoy island must stay plain
+    (precision check; par 30)
+  * copyover — one source block, TWO destinations, one copy two pastes (par 36);
+    r58 collision fix: destination rects enforced disjoint from source and each
+    other (overlapping pastes clobbered each other — 200-seed verified)
+- NEW DRILLS (Models — now 12; 51 total):
+  * retbridge (par 112) — returns attribution: growth at entry multiple,
+    expansion on exit EBITDA, deleveraging, total, and a check that ties the
+    bridge ALGEBRAICALLY to the actual equity change (identity exact).
+  * football (par 92) — midpoints per method, MIN floor / MAX ceiling
+    (ref-enforced; =B3 hardcode-by-reference rejects), range width.
+- FLAT PASS (Wolf: loved the flat simple vibe): .ribbon.show shadow+gradient →
+  plain accent-glow tint; .mb-tool micro-shadow removed (border+fill carry the
+  affordance). Modal shadows retained (functional depth, not chrome).
+- parKeys: replay-computed worst-of-30, min-policy applied (saves 20, autofit 10,
+  blocksel 3, copyover 14, retbridge 70, football 52).
+- REMAINING sparse cohort for pass II: ribbon, polish, foot, bridge, audit,
+  sumif, lookup, drill (undo exempt — end-state grading can't see it).
+- v58.

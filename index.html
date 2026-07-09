@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=57" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=57">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=57">
+<link rel="icon" href="favicon.ico?v=58" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=58">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=58">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -179,7 +179,7 @@
     font-family:var(--mono); font-size:12px; margin:0; border:0; border-bottom:1px solid var(--line);
     background:var(--surface2); border-radius:0; padding:0 12px}
   .ribbon .rhint{color:var(--faint); font-size:11px}
-  .ribbon.show{background:linear-gradient(180deg, rgba(46,163,111,.13), var(--surface2)); box-shadow:inset 0 -1px 0 var(--accent-dim)}
+  .ribbon.show{background:var(--accent-glow)}   /* r58 flat pass: no shadows, no gradients — a quiet tint is enough */
   .ribbon .rhint{color:var(--muted); font-size:12px; display:inline-flex; align-items:center}
   .ribbon .rhint k{display:inline-grid; place-items:center; min-width:18px; height:18px; margin-right:7px;
     color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:11px; font-weight:600}
@@ -538,8 +538,7 @@
   /* Monkeytype-style config bar: quiet text buttons, borders only on hover — less chrome, same tools */
   .mb-tool{background:var(--surface2); border:1px solid color-mix(in srgb, var(--line) 75%, transparent);
     color:var(--muted); font-family:var(--mono); font-size:11px;
-    padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s;
-    box-shadow:0 1px 0 color-mix(in srgb, var(--line) 40%, transparent)}   /* r52: buttons must READ as buttons in every theme */
+    padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s}   /* r58: border + fill carry the affordance — flat, no shadow */
   .mb-tool:hover{color:var(--text); border-color:var(--muted)}
   .mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
   .mb-tool kbd{font-family:var(--mono); background:var(--surface2); border:1px solid var(--line);
@@ -944,14 +943,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=57"></script>
-<link rel="stylesheet" href="nav.css?v=57">
-<script src="themes.js?v=57"></script>
+<script src="drills.js?v=58"></script>
+<link rel="stylesheet" href="nav.css?v=58">
+<script src="themes.js?v=58"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=57"></script>
+<script src="nav.js?v=58"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1665,30 +1664,31 @@ const CHALLENGES = {
     }
   },
   saves:{
-    name:'Save', label:'Save like you mean it', par:26, parKeys:13, usesSave:true,
-    prompt:'The habit that has saved more models than any backup system: Ctrl+S after every block of work. Make the edit, save. Make the next edit, save again. Two saves minimum \u2014 the reflex is the drill.',
-    req:'<em>B2</em> \u00b7 type <em>done \u21b5</em> \u00b7 <em>ctrl+s</em> \u00b7 <em>B3</em> \u00b7 type <em>done \u21b5</em> \u00b7 <em>ctrl+s</em>',
-    guide:[
-      'at B2 type <kbd>done</kbd> <kbd>\u21b5</kbd> \u00b7 then <kbd>ctrl</kbd>+<kbd>s</kbd> \u2014 work, then save',
-      'at B3 type <kbd>done</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>s</kbd> again \u2014 every block of work ends with a save',
-    ],
-    targets:['B2','B3'],
-    demo(){ return [
-      {sel:'B2', keys:[...T('done'), Kb.enter, {key:'s',ctrl:true}]},
-      {sel:'B3', keys:[...T('done'), Kb.enter, {key:'s',ctrl:true}]},
-    ]; },
+    name:'Save', label:'Save like you mean it', par:44, parKeys:20, usesSave:true,
+    prompt:'A page of work in progress, three review cells scattered through it \u2014 different spots each run. Mark each one done, and Ctrl+S after EVERY block of work. The reflex is the drill: work, save, work, save.',
+    req(){ return this._sites.map(s=>'<em>'+s+'</em> \u00b7 done \u21b5 \u00b7 <em>ctrl+s</em>').join(' \u00b7 then '); },
+    guide(){ return this._sites.map((s,i)=>['first','second','third'][i]+' review cell at <b>'+s+'</b> \u00b7 type <kbd>done</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>s</kbd> \u2014 every block of work ends with a save'); },
+    targets(){ return this._sites.slice(); },
+    demo(){ return this._sites.map(s=>({sel:s, keys:[...T('done'), Kb.enter, {key:'s',ctrl:true}]})); },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Checklist',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Update assumptions',txt:true};
-      cells['A3']={...blankCell(),value:'Refresh outputs',txt:true};
-      return {ROWS:4, cells, active:{r:2,c:2}, sel:null, colW:{1:170,2:80}};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 working file',txt:true,bold:true};
+      const labs=['Revenue','COGS','EBITDA','Capex','Interest','Taxes','NWC','Debt'];
+      for(let k=labs.length-1;k>0;k--){ const j=rnd(0,k); [labs[k],labs[j]]=[labs[j],labs[k]]; }
+      [[1,2],[5,2]].forEach(([c,r0],t)=>{ for(let i=0;i<4;i++){
+        cells[colLetter(c)+(r0+i)]={...blankCell(),value:labs[t*4+i],txt:true};
+        cells[colLetter(c+1)+(r0+i)]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'}; } });
+      const spots=[[4,3],[8,4],[3,8],[7,8],[9,2],[2,7]];
+      for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
+      this._sites=spots.slice(0,3).map(([c,r])=>{ cells[colLetter(c-1)+r]={...blankCell(),value:'Review \u2192',txt:true};
+        return colLetter(c)+r; }).sort();
+      return {ROWS:9, cells, active:{r:2,c:2}, sel:null, colW:{1:96,5:96}};
     },
     checks(S){
       const done=k=>{ const c=S.cells[k]; return !!(c&&String(c.value).toLowerCase()==='done'); };
       return [
-        {label:'both tasks marked done', ok: done('B2')&&done('B3')},
-        {label:'saved at least twice \u2014 Ctrl+S (in this drill, S saves)', ok: (S.saveN||0)>=2},
+        {label:'all three review cells marked done ('+this._sites.join(', ')+')', ok: this._sites.every(done)},
+        {label:'saved at least three times \u2014 Ctrl+S after each block', ok: (S.saveN||0)>=3},
       ];
     }
   },
@@ -1764,30 +1764,41 @@ const CHALLENGES = {
     }
   },
   autofit:{
-    name:'Autofit', label:'Fix the squeezed columns', par:20, parKeys:5,
-    prompt:'Two columns are too narrow \u2014 numbers are showing as ##### and labels are clipped. Select across both columns and autofit with one ribbon walk: Alt H O I. Fitting columns by dragging is a habit worth killing today.',
-    req:'select <em>A1:B1</em> (\u21e7+\u2192) \u00b7 <em>alt h o i</em> autofit',
-    guide:[
-      'on A1 \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u2014 stretch the selection across both tight columns',
-      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 Home \u2192 Format \u2192 AutoFit column width',
-    ],
-    targets:['A1','B1'],
-    demo(){ return [
-      {sel:'A1', keys:[{key:'ArrowRight',shift:true}, Kb.alt, {key:'h'}, {key:'o'}, {key:'i'}]},
+    name:'Autofit', label:'Fix the squeezed columns', par:34, parKeys:10,
+    prompt:'TWO squeezed spots this time \u2014 a pair of columns on each side of the page, labels clipped and numbers reading #####. Select across each tight pair, Alt H O I. Fitting columns by dragging is a habit worth killing today.',
+    req(){ const o=this._o; return 'select <em>'+o.a1+':'+o.a2+'</em> \u00b7 <em>alt h o i</em> \u00b7 then <em>'+o.b1+':'+o.b2+'</em> \u00b7 <em>alt h o i</em>'; },
+    guide(){ const o=this._o; return [
+      'first pair: on '+o.a1+' \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd>',
+      'second pair sits at '+o.b1+':'+o.b2+' \u2014 same walk, other side of the page',
+    ]; },
+    targets(){ const o=this._o; return [o.a1+':'+o.a2, o.b1+':'+o.b2]; },
+    demo(){ const o=this._o; return [
+      {sel:o.a1, keys:[{key:'ArrowRight',shift:true}, Kb.alt, {key:'h'}, {key:'o'}, {key:'i'}]},
+      {sel:o.b1, keys:[{key:'ArrowRight',shift:true}, Kb.alt, {key:'h'}, {key:'o'}, {key:'i'}]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Consolidated revenue',txt:true,bold:true};
-      cells['B1']={...blankCell(),value:'FY2026E',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'North America segment',txt:true};
-      cells['B2']={...blankCell(),value:rnd(1000000,9000000),fmtStyle:'comma',decimals:0};
-      return {ROWS:4, cells, active:{r:1,c:1}, sel:null, colW:{1:58,2:52}};
+      const mk=(c,r0)=>{
+        cells[colLetter(c)+r0]={...blankCell(),value:['Consolidated revenue','Adjusted EBITDA build','Working capital detail','Precedent transactions'][rnd(0,3)],txt:true,bold:true};
+        cells[colLetter(c+1)+r0]={...blankCell(),value:'FY202'+rnd(4,8)+'E',txt:true,bold:true};
+        for(let i=1;i<=3;i++){ cells[colLetter(c)+(r0+i)]={...blankCell(),value:['Northwind Industrial','Cascade Materials','Ironline Logistics','Halcyon Health'][i-1+rnd(0,0)],txt:true};
+          cells[colLetter(c+1)+(r0+i)]={...blankCell(),value:rnd(100000,999999)*100,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      };
+      const pairs=[[1,1],[1,6],[6,1],[6,6],[4,3]];
+      for(let k=pairs.length-1;k>0;k--){ const j=rnd(0,k); [pairs[k],pairs[j]]=[pairs[j],pairs[k]]; }
+      const A=pairs[0], B=pairs.find(p=>Math.abs(p[0]-A[0])>=3)||pairs[1];
+      mk(A[0],A[1]); mk(B[0],B[1]);
+      const colw={}; [A[0],A[0]+1,B[0],B[0]+1].forEach(c=>colw[c]=44);   // squeezed
+      this._o={ a1:colLetter(A[0])+A[1], a2:colLetter(A[0]+1)+A[1], b1:colLetter(B[0])+B[1], b2:colLetter(B[0]+1)+B[1],
+        ac:[A[0],A[0]+1], bc:[B[0],B[0]+1] };
+      return {ROWS:10, cells, active:{r:A[1],c:A[0]}, sel:null, colW:colw};
     },
     checks(S){
-      const w=S._colW||{}; const need=c=>neededWidth(c);
+      const w=S._colW||{}; 
+      const fit=c=>(w[c]||0)>=neededWidth(c)-1;
       return [
-        {label:'column A fits its longest label', ok: (w[1]||0)>=neededWidth(1)-1},
-        {label:'column B fits the number \u2014 no more #####', ok: (w[2]||0)>=neededWidth(2)-1},
+        {label:'first pair fits its content \u2014 no clipped labels, no #####', ok: this._o.ac.every(fit)},
+        {label:'second pair too \u2014 the other side of the page', ok: this._o.bc.every(fit)},
       ];
     }
   },
@@ -1864,61 +1875,96 @@ const CHALLENGES = {
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Grab the whole block', par:22, parKeys:2,
-    prompt:'Bold the entire data column in two moves: Ctrl+Shift+\u2193 rides from the header to the last filled cell in one keystroke \u2014 no arrow-mashing \u2014 then Ctrl+B. Selection speed IS Excel speed.',
-    req:'on <em>B2</em> \u00b7 <em>ctrl+\u21e7+\u2193</em> select to the end \u00b7 <em>ctrl+b</em>',
-    guide:[
-      'on B2 \u00b7 <kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2193</kbd> \u2014 the selection rides the data to its last row',
-      '<kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 the whole block, bold, two keystrokes total',
-    ],
-    targets:['B2'],
-    demo(){ return [
-      {sel:'B2', keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'b',ctrl:true}]},
+    name:'Block Sel.', label:'Grab the whole block', par:30, parKeys:3,
+    prompt:'TWO data islands on the page \u2014 bold the target one, entirely, and leave the other untouched. Ctrl+Shift+arrows ride the data edges; the grader checks both islands. Selection speed IS Excel speed \u2014 and precision is the other half.',
+    req(){ const o=this._o; return 'on <em>'+o.t0+'</em> \u00b7 <em>ctrl+\u21e7+\u2193</em> then <em>ctrl+\u21e7+\u2192</em> grabs the island \u00b7 <em>ctrl+b</em> \u00b7 the '+o.dName+' block stays plain'; },
+    guide(){ const o=this._o; return [
+      'the target island starts at <b>'+o.t0+'</b> \u2014 <kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2193</kbd> rides to its last row',
+      '<kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2192</kbd> pulls in the second column \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      'the decoy at '+o.d0+' stays UNBOLD \u2014 grabbing too much fails the drill',
+    ]; },
+    targets(){ const o=this._o; return [o.t0]; },
+    demo(){ const o=this._o; return [
+      {sel:o.t0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'b',ctrl:true}]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Case',txt:true,bold:true}; cells['B1']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      const n=rnd(5,7);
-      for(let i=0;i<n;i++){
-        cells['A'+(2+i)]={...blankCell(),value:'Case '+(i+1),txt:true};
-        cells['B'+(2+i)]={...blankCell(),value:rnd(40,300)*10,fmtStyle:'comma',decimals:0};
-      }
-      this._n=n;
-      return {ROWS:n+3, cells, active:{r:2,c:2}, sel:null, colW:{1:80,2:96}};
+      const island=(c,r0,n,title)=>{
+        cells[colLetter(c)+(r0-1)]={...blankCell(),value:title,txt:true};
+        const keys=[];
+        for(let i=0;i<n;i++){ for(let j=0;j<2;j++){
+          const key=colLetter(c+j)+(r0+i);
+          cells[key]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          keys.push(key); } }
+        return keys;
+      };
+      const spots=[[2,3],[6,3],[2,9],[6,9],[4,6]];
+      for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
+      const T0=spots[0], D0=spots.find(p=>Math.abs(p[0]-T0[0])>=3||Math.abs(p[1]-T0[1])>=5)||spots[1];
+      const n=rnd(4,6);
+      this._tk=island(T0[0],T0[1],n,'Target \u2193');
+      this._dk=island(D0[0],D0[1],rnd(3,5),'Decoy');
+      this._o={ t0:colLetter(T0[0])+T0[1], d0:colLetter(D0[0])+D0[1], dName:'decoy' };
+      return {ROWS:Math.max(12,T0[1]+n,D0[1]+5), cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{}};
     },
     checks(S){
-      let ok=true;
-      for(let i=0;i<this._n;i++){ const c=S.cells['B'+(2+i)]; if(!c||!c.bold){ ok=false; break; } }
-      return [{label:'every EBITDA value is bold \u2014 one block selection', ok}];
+      const bold=k=>{ const c=S.cells[k]; return !!(c&&c.bold); };
+      return [
+        {label:'the whole target island is bold \u2014 both columns, every row', ok: this._tk.every(bold)},
+        {label:'the decoy island stays plain \u2014 precision, not just speed', ok: this._dk.every(k=>!bold(k))},
+      ];
     }
   },
   copyover:{
-    name:'Basics', label:'Copy it over', par:18, parKeys:8,
-    prompt:'Fundamentals rep: copy the block of numbers on the left and paste it into the outlined area on the right. Select, copy, move, paste — all on the keyboard, no mouse.',
-    req:'<em>select B2:C4</em> · <em>ctrl c</em> copy · arrow over to E2 · <em>ctrl v</em> paste',
-    guide:[
-      'on B2 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> then <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2192</kbd> grabs the block \u2014 jump to edges, never tap \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 arrow to E2 \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd>',
-    ],
-    targets:['E2:F4'],
-    demo(){ return [
-      {sel:'B2:C4', keys:[Kb.copy]},
-      {sel:'E2', keys:[Kb.paste]},
+    name:'Basics', label:'Copy it over, twice', par:36, parKeys:14,
+    prompt:'One source block, TWO outlined destinations across the page \u2014 spots shuffle each run. Select the block, copy ONCE, paste at both targets. The clipboard survives the first paste; the second one is free.',
+    req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 to <em>'+o.d1+'</em> \u00b7 <em>ctrl+v</em> \u00b7 to <em>'+o.d2+'</em> \u00b7 <em>ctrl+v</em>'; },
+    guide(){ const o=this._o; return [
+      'on '+o.src.split(':')[0]+' \u00b7 <kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2193</kbd> <kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd>',
+      'first target '+o.d1+' \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd>',
+      'second target '+o.d2+' \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd> \u2014 one copy, two pastes',
+    ]; },
+    targets(){ const o=this._o; return [o.src, o.d1, o.d2]; },
+    demo(){ const o=this._o; return [
+      {sel:o.src, keys:[Kb.copy]},
+      {sel:o.d1, keys:[{key:'v',ctrl:true}]},
+      {sel:o.d2, keys:[{key:'v',ctrl:true}]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Source',txt:true,bold:true};
-      cells['E1']={...blankCell(),value:'Paste here',txt:true,bold:true};
-      for(let r=2;r<=4;r++)for(let c=2;c<=3;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(10,99)*10,fmtStyle:'comma',decimals:0};
-      for(let r=2;r<=4;r++)for(let c=5;c<=6;c++) cells[colLetter(c)+r]={...blankCell(),ball:true,fmtStyle:'comma',decimals:0};
-      return {ROWS:4, cells, active:{r:2,c:2}, sel:null, colW:{1:70,5:96}};
+      cells['A1']={...blankCell(),value:'Source block',txt:true,bold:true};
+      const srcSpots=[[2,2],[2,7],[3,4]];
+      const sp=srcSpots[rnd(0,2)];
+      this._vals=[];
+      for(let i=0;i<3;i++){ const row=[];
+        for(let j=0;j<2;j++){ const v=rnd(10,90)*10;
+          cells[colLetter(sp[0]+j)+(sp[1]+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; row.push(v); }
+        this._vals.push(row); }
+      // rects: block is 2 wide x 3 tall with a label row above; destinations must be
+      // disjoint from the source AND from each other (r58 fix: overlapping pastes
+      // clobbered each other — F10 collision class)
+      const rect=(c,r)=>({c1:c,c2:c+1,r1:r-1,r2:r+2});
+      const hits=(a,b)=>!(a.c2<b.c1||b.c2<a.c1||a.r2<b.r1||b.r2<a.r1);
+      const srcRect={c1:sp[0],c2:sp[0]+1,r1:sp[1],r2:sp[1]+2};
+      const dSpots=[[6,2],[9,2],[6,8],[9,7],[5,10]].filter(d=>!hits(rect(d[0],d[1]),srcRect));
+      for(let k=dSpots.length-1;k>0;k--){ const j=rnd(0,k); [dSpots[k],dSpots[j]]=[dSpots[j],dSpots[k]]; }
+      const D1=dSpots[0];
+      const D2=dSpots.slice(1).find(d=>!hits(rect(d[0],d[1]),rect(D1[0],D1[1])))||dSpots[1];
+      cells[colLetter(D1[0])+(D1[1]-1)]={...blankCell(),value:'Paste 1 \u2193',txt:true};
+      cells[colLetter(D2[0])+(D2[1]-1)]={...blankCell(),value:'Paste 2 \u2193',txt:true};
+      this._o={ src:colLetter(sp[0])+sp[1]+':'+colLetter(sp[0]+1)+(sp[1]+2),
+        d1:colLetter(D1[0])+D1[1], d2:colLetter(D2[0])+D2[1], D1:D1, D2:D2 };
+      return {ROWS:12, cells, active:{r:sp[1],c:sp[0]}, sel:null, colW:{}};
     },
     checks(S){
-      let ok=true;
-      for(let i=0;i<3;i++)for(let j=0;j<2;j++){
-        const src=S.cells[colLetter(2+j)+(2+i)], dst=S.cells[colLetter(5+j)+(2+i)];
-        if(!dst||!src||dst.value!==src.value) ok=false;
-      }
-      return [{label:'copy the block into the outlined target', ok}];
+      const blockOk=(c0,r0)=>{ for(let i=0;i<3;i++)for(let j=0;j<2;j++){
+        const c=S.cells[colLetter(c0+j)+(r0+i)];
+        if(!c||c.value!==this._vals[i][j]) return false; } return true; };
+      const o=this._o;
+      return [
+        {label:'first destination carries the block ('+o.d1+')', ok: blockOk(o.D1[0],o.D1[1])},
+        {label:'second destination too \u2014 one copy served both ('+o.d2+')', ok: blockOk(o.D2[0],o.D2[1])},
+      ];
     }
   },
   polish:{
@@ -3203,6 +3249,105 @@ const CHALLENGES = {
       ];
     }
   },
+  retbridge:{
+    name:'Ret. Bridge', label:'Attribute the returns', par:112, parKeys:70,
+    prompt:'Where did the equity gain COME from? Decompose it: EBITDA growth at the entry multiple, multiple expansion on exit EBITDA, and deleveraging \u2014 then prove the bridge ties to the actual equity change with a zero check. The page every LP meeting turns to.',
+    req:'<em>B9</em> growth <em>=(B3-B2)*B4</em> \u00b7 <em>B10</em> multiple <em>=(B5-B4)*B3</em> \u00b7 <em>B11</em> delever <em>=B6-B7</em> \u00b7 <em>B12</em> total <em>=SUM(B9:B11)</em> \u00b7 <em>B14</em> check <em>=B12-((B3*B5-B7)-(B2*B4-B6))</em> \u2192 0',
+    guide:[
+      'EBITDA growth effect at B9 \u00b7 <kbd>=(B3-B2)*B4</kbd> \u2014 growth priced at the ENTRY multiple',
+      'multiple expansion at B10 \u00b7 <kbd>=(B5-B4)*B3</kbd> \u2014 rerating on EXIT EBITDA',
+      'deleveraging at B11 \u00b7 <kbd>=B6-B7</kbd> \u00b7 total at B12 \u00b7 <kbd>=SUM(B9:B11)</kbd>',
+      'the check at B14 \u00b7 <kbd>=B12-((B3*B5-B7)-(B2*B4-B6))</kbd> \u2014 the bridge must tie to the real equity change',
+    ],
+    targets:['B9','B10','B11','B12','B14'],
+    demo(){ return [
+      {sel:'B9', keys:[...T('=(B3-B2)*B4'), Kb.enter]},
+      {sel:'B10', keys:[...T('=(B5-B4)*B3'), Kb.enter]},
+      {sel:'B11', keys:[...T('=B6-B7'), Kb.enter]},
+      {sel:'B12', keys:[...T('=SUM(B9:B11)'), Kb.enter]},
+      {sel:'B14', keys:[...T('=B12-((B3*B5-B7)-(B2*B4-B6))'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 returns attribution ($mm)',txt:true,bold:true};
+      const e0=rnd(15,40)*10, e1=Math.round(e0*(1+rnd(15,50)/100));
+      const m0=rnd(70,100)/10, m1=m0+rnd(-8,15)/10;
+      const d0=rnd(30,80)*10, d1=Math.max(0, d0-rnd(5,30)*10);
+      const rows=[[2,'Entry EBITDA',e0,'comma',0],[3,'Exit EBITDA',e1,'comma',0],[4,'Entry multiple',m0,null,1],[5,'Exit multiple',m1,null,1],[6,'Debt at entry',d0,'comma',0],[7,'Debt at exit',d1,'comma',0]];
+      rows.forEach(([r,n,v,f,dd])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
+        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:f,decimals:dd}; });
+      [[9,'EBITDA growth'],[10,'Multiple expansion'],[11,'Deleveraging']].forEach(([r,n])=>{
+        cells['A'+r]={...blankCell(),value:n,txt:true}; cells['B'+r]={...blankCell(),fmtStyle:'comma',decimals:0}; });
+      cells['A12']={...blankCell(),value:'Total equity gain',txt:true,bold:true}; cells['B12']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['A14']={...blankCell(),value:'Check vs actual',txt:true,bold:true}; cells['B14']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+      this._exp={ g:(e1-e0)*m0, m:(m1-m0)*e1, d:d0-d1 };
+      this._exp.tot=this._exp.g+this._exp.m+this._exp.d;
+      return {ROWS:14, cells, active:{r:9,c:2}, sel:null, colW:{1:158,2:88}};
+    },
+    checks(S){
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<Math.max(0.5,Math.abs(exp)*1e-3)); };
+      const e=this._exp;
+      return [
+        {label:'growth effect \u2014 \u0394EBITDA at the ENTRY multiple', ok: near('B9',e.g)},
+        {label:'multiple expansion \u2014 \u0394multiple on EXIT EBITDA', ok: near('B10',e.m)},
+        {label:'deleveraging \u2014 debt paid down', ok: near('B11',e.d)},
+        {label:'the three effects total the equity gain', ok: near('B12',e.tot)},
+        {label:'the bridge TIES \u2014 check vs actual reads zero', ok: near('B14',0)},
+      ];
+    }
+  },
+  football:{
+    name:'Football', label:'Build the football field', par:92, parKeys:52,
+    prompt:'Three methodologies, three ranges, one summary: midpoint per method, then the widest view \u2014 the lowest low and the highest high across all three. MIN and MAX earn their keep; the last page of every valuation section.',
+    req:'<em>D3</em> mid <em>=(B3+C3)/2</em> \u00b7 fill D3:D5 \u2193 \u00b7 <em>B7</em> floor <em>=MIN(B3:B5)</em> \u00b7 <em>B8</em> ceiling <em>=MAX(C3:C5)</em> \u00b7 <em>B9</em> width <em>=B8-B7</em>',
+    guide:[
+      'midpoint, comps: D3 \u00b7 <kbd>=(B3+C3)/2</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D5 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'the floor at B7 \u00b7 <kbd>=MIN(B3:B5)</kbd> \u2014 lowest low across methods',
+      'the ceiling at B8 \u00b7 <kbd>=MAX(C3:C5)</kbd> \u00b7 the width at B9 \u00b7 <kbd>=B8-B7</kbd>',
+    ],
+    targets:['D3:D5','B7','B8','B9'],
+    demo(){ return [
+      {sel:'D3', keys:[...T('=(B3+C3)/2'), Kb.enter]},
+      {sel:'D3:D5', keys:[Kb.fillD]},
+      {sel:'B7', keys:[...T('=MIN(B3:B5)'), Kb.enter]},
+      {sel:'B8', keys:[...T('=MAX(C3:C5)'), Kb.enter]},
+      {sel:'B9', keys:[...T('=B8-B7'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 valuation summary ($/sh)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Method',txt:true,bold:true};
+      cells['B2']={...blankCell(),value:'Low',txt:true,bold:true,align:'r'};
+      cells['C2']={...blankCell(),value:'High',txt:true,bold:true,align:'r'};
+      cells['D2']={...blankCell(),value:'Mid',txt:true,bold:true,align:'r'};
+      const methods=['Trading comps','Precedent txns','DCF'];
+      this._mids=[]; const lows=[], highs=[];
+      methods.forEach((m,i)=>{
+        const lo=rnd(20,45), hi=lo+rnd(6,25);
+        cells['A'+(3+i)]={...blankCell(),value:m,txt:true};
+        cells['B'+(3+i)]={...blankCell(),value:lo,fontColor:'blue',decimals:0};
+        cells['C'+(3+i)]={...blankCell(),value:hi,fontColor:'blue',decimals:0};
+        cells['D'+(3+i)]={...blankCell(),decimals:1};
+        this._mids.push((lo+hi)/2); lows.push(lo); highs.push(hi);
+      });
+      cells['A7']={...blankCell(),value:'Range floor',txt:true,bold:true};  cells['B7']={...blankCell(),decimals:0,bold:true};
+      cells['A8']={...blankCell(),value:'Range ceiling',txt:true,bold:true}; cells['B8']={...blankCell(),decimals:0,bold:true};
+      cells['A9']={...blankCell(),value:'Range width',txt:true};             cells['B9']={...blankCell(),decimals:0};
+      this._exp={ lo:Math.min(...lows), hi:Math.max(...highs) };
+      this._exp.w=this._exp.hi-this._exp.lo;
+      return {ROWS:9, cells, active:{r:3,c:4}, sel:null, colW:{1:132,2:64,3:64,4:64}};
+    },
+    checks(S){
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.05); };
+      const fRef=(k,fn)=>{ const c=S.cells[k]; return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(fn)); };
+      return [
+        {label:'midpoints live for all three methods (D3:D5)', ok: [0,1,2].every(i=>near('D'+(3+i),this._mids[i]))},
+        {label:'the floor \u2014 a live MIN across the lows', ok: near('B7',this._exp.lo)&&fRef('B7','MIN')},
+        {label:'the ceiling \u2014 a live MAX across the highs', ok: near('B8',this._exp.hi)&&fRef('B8','MAX')},
+        {label:'range width ties the two', ok: near('B9',this._exp.w)},
+      ];
+    }
+  },
   cagr:{
     name:'CAGR', label:'Compound it, three times', par:72, parKeys:79,
     prompt:'Three CAGR checks scattered where a real page would leave them \u2014 and they move every run. Same clean formula each time: (End \u00f7 Begin) ^ (1 \u00f7 Years) \u2212 1, percent to 1 decimal. The refs change with the block; the shape never does.',
@@ -3635,7 +3780,7 @@ function overflowsCol(St,c){
   for(let r=1;r<=St.ROWS;r++){ const cell=St.cells[ck(r,c)]||blankCell();
     if(!isNum(cell)||cell.wrap) continue;
     const t=fmtNum(cell.value,cell.fmtStyle,cell.decimals);
-    if(t.length*CHARPX+12 > (St._colW?St._colW[c]:COLW_DEFAULT)) return true; }
+    if(t.length*CHARPX+12 > ((St._ew||St._colW)?(St._ew||St._colW)[c]:COLW_DEFAULT)) return true; }
   return false;
 }
 
@@ -3836,13 +3981,14 @@ function render(){
   let __base=0; for(let c=1;c<=COLS;c++) __base+=(colW[c]||72);
   const __per=(__availW>__base) ? Math.floor((__availW-__base)/COLS) : 0;
   const __ew={}; for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72)+__per;
+  S._ew=__ew;                                              // display widths (elastic)
   let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));
   if(__gw && __gw.clientHeight>100){                       // measured: fill the box exactly
     const __availH = __gw.clientHeight - 28 - 31;          // padding 14×2 + header row
     __rowH = Math.max(22, Math.min(36, Math.floor(__availH / S.ROWS)));
   }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
-  S._colW = __ew;
+  S._colW = colW;                                          // ENGINE widths — graders (autofit) read these; r55 wrongly pointed this at __ew
   const g=$('grid'); g.innerHTML='';
   const sr=selRange();
   const gt=currentTargetRange();
