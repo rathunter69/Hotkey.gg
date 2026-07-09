@@ -1702,3 +1702,14 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   never touched non-grid fonts, so no rollback was actually needed — stated to
   Wolf for clarity.
 - v72.
+
+---
+# ROUND 73 — the grid gap, closed for real (screenshot diagnosis)
+- Wolf's screenshot showed the band under row 14. ROOT: .stage-main was a plain
+  BLOCK — it received the stretched height from stage-row but gridwrap inside
+  it sized to content, so the table's height:100% (r71) resolved against an
+  indefinite height. FIX: stage-main{display:flex;flex-direction:column;
+  min-height:0}, fbar flex:0, gridwrap flex:1 min-height:0 — the flex chain now
+  runs frame\u2192stage-row\u2192stage-main\u2192gridwrap\u2192table and rows natively
+  distribute every pixel down to the tab strip. Larger cells for free.
+- v73.
