@@ -520,20 +520,22 @@
     const __L  = levelOf(__xp);
     m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
-      '<div class="pc-head"><div class="pc-name">' + escHtml(handle) + '</div></div>' +
+      '<div class="pc-head"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px">' + escHtml(handle) + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
       /* r70: RANK HERO — the crest gets real estate */
       /* r72: rank + LEVEL live together — crest left, tier center, level+progress right */
       '<div style="display:flex;align-items:center;gap:16px;margin:6px 0 14px;padding:14px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
-        /* r75: tier.cls carries PILL styling (bg/border) — the "orange plate" in Wolf's
-           screenshot. The hero wants the raw crest: class dropped from the wrapper,
-           pill background nulled on the name, bucket pips omitted at hero size
-           (standing text already carries the bucket). */
-        '<span style="display:inline-flex;line-height:0">'+(window.rankEmblem?window.rankEmblem(tier.name,72):'')+'</span>' +
-        '<div><div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:14px;background:none;box-shadow:none">'+tier.name+'</div>' +
-        '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px">'+standing+'</div></div>' +
-        '<div style="margin-left:auto;align-self:center;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono)">' +
-          (window.hkLevelRing?window.hkLevelRing(__L.lvl, __L.pct, 58):'') +
-          '<div style="font-size:9.5px;color:var(--muted)">'+__L.into+' / '+__L.need+' xp</div>' +
+        /* r76: APEX-STYLE SHOWCASE — handle banner on top, two prominent circulars
+         side by side beneath (crest tile | level-ring tile), labels under each. */
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px">' +
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
+          '<span style="display:inline-flex;line-height:0">'+(window.rankEmblem?window.rankEmblem(tier.name,84):'')+'</span>' +
+          '<div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:13px;background:none;box-shadow:none">'+tier.name+'</div>' +
+          '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+standing+'</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
+          (window.hkLevelRing?window.hkLevelRing(__L.lvl, __L.pct, 84):'') +
+          '<div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)">LEVEL '+__L.lvl+'</div>' +
+          '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+__L.into+' / '+__L.need+' xp</div>' +
         '</div>' +
       '</div>' +
       badgesHtml +
@@ -553,6 +555,8 @@
       '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;
+    const sn=$('pcSetName'); if(sn) sn.onclick=()=>{ closeProfile();
+      if(window.promptHandle) window.promptHandle(); else location.href='index.html'; };
     m.addEventListener('click', e => { if(e.target === m) closeProfile(); }, { once: true });
   }
 
