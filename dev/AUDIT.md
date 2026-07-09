@@ -1257,3 +1257,28 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   radius 0. Reads as one more column of the sheet; stays non-addressable.
 - Checklist markup now renders .cl-colhdr + .cl-body wrapper.
 - v48.
+
+---
+# ROUND 49 — full-width strips, adaptive rail, unified type, F1 guide, S&U drill
+- FRAME RESTRUCTURE: ribbon + formula bar are now FULL-WIDTH rows of the frame
+  (DOM: stage is a column — ribbon, fbar, then a stage-row holding grid + rail).
+  The rough edges were the strips ending at the rail boundary; now every
+  horizontal line runs the full frame. ✓ column header aligns with the grid's
+  th strip (margin-top matches gridwrap's 14px pad).
+- ADAPTIVE RAIL: .checklist height:0 + min-height:100% — the GRID rules the
+  frame height; long checklists scroll inside .cl-body instead of stretching
+  the page. 'dense' class (auto when ≥5 checks or guided) tightens paddings
+  and steps type down a notch.
+- UNIFIED TYPE: rail speaks mono at the grid's 12.5px; dense 11.5px.
+- TASKLINE RETIRED (Wolf: redundant vs embedded guide) — checklist labels +
+  the always-on target highlight carry the task; frame regains full 12px radii.
+  req text still lives in drill data (picker, future surfaces).
+- GUIDE TOGGLE g → F1: type-to-replace made bare 'g' a typing key ('gross',
+  'growth'...). F1 = Excel's help key, zero collision. Button, help sheet, and
+  post-onboard hint updated; session-mode 'g' (marathon/rapid) unaffected —
+  those bypass cell typing.
+- NEW DRILL sourcesuses (par 96, parKeys 52, Models — now 8): total the uses,
+  SPONSOR EQUITY IS THE PLUG (=uses−debt−rollover, wrong plug rejects), total
+  sources, check row must read zero. Codenamed title. 47 drills.
+- Queue: accretion/dilution, DCF sensitivity row, returns bridge, football field.
+- v49.

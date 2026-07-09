@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=48" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=48">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=48">
+<link rel="icon" href="favicon.ico?v=49" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=49">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=49">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -142,10 +142,7 @@
   @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
   td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
   td.ttarget{outline:1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:-2px}
-  .taskline{font-family:var(--mono); font-size:13px; line-height:1.6; color:var(--text);
-    background:var(--surface); border:1px solid var(--line); border-bottom:0;
-    border-radius:12px 12px 0 0; padding:9px 14px; margin-bottom:0}
-  body.session .taskline{display:none}
+  .taskline{display:none}   /* retired r49 — the sheet-skinned checklist carries the task; req text lives in the picker */
   .taskline em{font-style:normal; color:var(--accent); font-weight:700}
   .taskline .tl-dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:9px; vertical-align:1px}
   td.active{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow); z-index:2}
@@ -549,21 +546,29 @@
   /* two-column workspace: grid on the left, checklist rail on the right */
   /* ONE UNIFIED BLOCK (r47): taskline caps it, ribbon + formula bar run as permanent
      strips (like the actual application), grid and the checklist rail share the border. */
-  .stage{display:flex; align-items:stretch; gap:0; background:var(--surface);
-    border:1px solid var(--line); border-radius:0 0 12px 12px; overflow:hidden}
+  .stage{display:flex; flex-direction:column; gap:0; background:var(--surface);
+    border:1px solid var(--line); border-radius:12px; overflow:hidden}
+  .stage-row{display:flex; align-items:stretch; gap:0; flex:1; min-height:0}
   /* Monkeytype-scale: the sheet grows into the screen instead of sitting in a box.
      zoom scales the whole grid (cells, fonts, borders) without touching the engine's
      px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */
   /* zoom multipliers removed r39 — they were re-inflating the density pass */
   .stage-main{flex:1 1 auto; min-width:0}
-  .checklist{flex:0 0 250px; align-self:stretch; background:var(--surface); border:0; border-left:1px solid var(--line);
-    border-radius:0; padding:0 0 12px; margin-top:0}
+  .checklist{flex:0 0 250px; align-self:stretch; height:0; min-height:100%;   /* grid rules the frame height; rail scrolls internally */
+    background:var(--surface); border:0; border-left:1px solid var(--line);
+    border-radius:0; padding:0; margin-top:0; display:flex; flex-direction:column; overflow:hidden;
+    font-family:var(--mono)}   /* unified type: the rail speaks the grid's language */
   /* faux column header — same 30px strip as the grid's th row, so the rail
      reads as one more column of the sheet (r48, Wolf's "checklist in the grid") */
-  .cl-colhdr{height:30px; line-height:30px; background:var(--surface2); color:var(--muted);
-    font-family:var(--mono); font-size:11px; text-align:center; font-weight:500;
+  .cl-colhdr{flex:0 0 auto; height:30px; line-height:30px; margin-top:14px; border-top:1px solid var(--line);  /* aligns with the grid's th strip (gridwrap pads 14px) */
+    background:var(--surface2); color:var(--muted);
+    font-size:11px; text-align:center; font-weight:500;
     border-bottom:1px solid var(--line); letter-spacing:.12em}
-  .cl-body{padding:11px 16px 0}
+  .cl-body{flex:1 1 auto; min-height:0; overflow-y:auto; padding:10px 14px 12px}
+  .checklist .cl-label{font-size:12.5px}                       /* match the grid's 12.5px */
+  .checklist.dense .cl-item{padding:3px 0}
+  .checklist.dense .cl-label{font-size:11.5px}
+  .checklist.dense .cl-keys{font-size:10.5px; line-height:1.7}
   @media(max-width:840px){
     .stage{flex-direction:column}
     .checklist{flex-basis:auto; width:100%; align-self:auto}
@@ -916,14 +921,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=48"></script>
-<link rel="stylesheet" href="nav.css?v=48">
-<script src="themes.js?v=48"></script>
+<script src="drills.js?v=49"></script>
+<link rel="stylesheet" href="nav.css?v=49">
+<script src="themes.js?v=49"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=48"></script>
+<script src="nav.js?v=49"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -974,7 +979,7 @@
       </div>
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn">▶ demo</button>
-      <button class="mb-tool" id="guideToggle"><kbd>g</kbd> guided: off</button>
+      <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
       <button class="mb-tool" id="weeklyBtn" title="the weekly gauntlet — five seeded drills, combined time on the board">🏁 weekly</button>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
@@ -986,18 +991,20 @@
 
   <div class="wb" id="welcomeBack" role="status"></div>
   <div class="stage">
-    <div class="stage-main">
-      <div class="ribbon" id="ribbon"></div>
-      <div class="fbar">
-        <span class="namebox" id="nameBox">A1</span>
-        <span class="fx"><i>fx</i></span>
-        <span class="fcontent empty" id="fContent">empty</span>
-        <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span>
-      </div>
-      <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
-      <div class="result" id="result"></div>
+    <div class="ribbon" id="ribbon"></div>
+    <div class="fbar">
+      <span class="namebox" id="nameBox">A1</span>
+      <span class="fx"><i>fx</i></span>
+      <span class="fcontent empty" id="fContent">empty</span>
+      <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span>
     </div>
-    <aside class="checklist" id="checklist"></aside>
+    <div class="stage-row">
+      <div class="stage-main">
+        <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
+        <div class="result" id="result"></div>
+      </div>
+      <aside class="checklist" id="checklist"></aside>
+    </div>
   </div>
 
   <div id="rapidStage">
@@ -3015,6 +3022,52 @@ const CHALLENGES = {
       ];
     }
   },
+  sourcesuses:{
+    name:'S&U', label:'Balance sources and uses', par:96, parKeys:52,
+    prompt:'The first page of every deal book. Total the uses, stack the committed sources, and let sponsor equity be THE PLUG \u2014 whatever the deal still needs. When the check row reads zero, the deal is funded.',
+    req:'<em>B5</em> total uses <em>=SUM(B2:B4)</em> \u00b7 <em>B9</em> sponsor equity <em>=B5-B7-B8</em> (the plug) \u00b7 <em>B10</em> total sources <em>=SUM(B7:B9)</em> \u00b7 <em>B12</em> check <em>=B10-B5</em> \u2192 must read 0',
+    guide:[
+      'total uses at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 equity purchase, refi, fees',
+      'THE PLUG: sponsor equity at B9 \u00b7 <kbd>=B5-B7-B8</kbd> \u2014 uses less what debt covers',
+      'total sources at B10 \u00b7 <kbd>=SUM(B7:B9)</kbd>',
+      'the check at B12 \u00b7 <kbd>=B10-B5</kbd> \u2014 zero or the deal doesn\u2019t close',
+    ],
+    targets:['B5','B9','B10','B12'],
+    demo(){ return [
+      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
+      {sel:'B9', keys:[...T('=B5-B7-B8'), Kb.enter]},
+      {sel:'B10', keys:[...T('=SUM(B7:B9)'), Kb.enter]},
+      {sel:'B12', keys:[...T('=B10-B5'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 sources & uses ($mm)',txt:true,bold:true};
+      const eq=rnd(30,90)*10, refi=rnd(10,40)*10, fees=rnd(2,8)*10;
+      const uses=eq+refi+fees;
+      const tl=Math.round(uses*rnd(35,55)/100/10)*10, roll=Math.round(uses*rnd(5,15)/100/10)*10;
+      const rows=[[2,'Purchase of equity',eq],[3,'Refinance existing debt',refi],[4,'Fees & expenses',fees]];
+      rows.forEach(([r,n,v])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
+        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; });
+      cells['A5']={...blankCell(),value:'Total uses',txt:true,bold:true}; cells['B5']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['A7']={...blankCell(),value:'New term loan',txt:true};   cells['B7']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['A8']={...blankCell(),value:'Rollover equity',txt:true}; cells['B8']={...blankCell(),value:roll,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['A9']={...blankCell(),value:'Sponsor equity',txt:true,bold:true}; cells['B9']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['A10']={...blankCell(),value:'Total sources',txt:true,bold:true}; cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['A12']={...blankCell(),value:'Check',txt:true,bold:true}; cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+      this._exp={uses:uses, plug:uses-tl-roll};
+      return {ROWS:12, cells, active:{r:5,c:2}, sel:null, colW:{1:172,2:88}};
+    },
+    checks(S){
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
+      const e=this._exp;
+      return [
+        {label:'total uses \u2014 one live SUM over the three lines', ok: near('B5',e.uses)},
+        {label:'sponsor equity is THE PLUG \u2014 uses less debt less rollover', ok: near('B9',e.plug)},
+        {label:'total sources sums the stack', ok: near('B10',e.uses)},
+        {label:'the check reads ZERO \u2014 the deal is funded', ok: near('B12',0)},
+      ];
+    }
+  },
   cagr:{
     name:'CAGR', label:'Compound it, three times', par:72, parKeys:79,
     prompt:'Three CAGR checks scattered where a real page would leave them \u2014 and they move every run. Same clean formula each time: (End \u00f7 Begin) ^ (1 \u00f7 Years) \u2212 1, percent to 1 decimal. The refs change with the block; the shape never does.',
@@ -4319,6 +4372,7 @@ function cycleAnchor(){
 function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
 function updateChecklist(){
   const el=$('checklist'); if(!el||!S) return;
+  el.classList.toggle('dense', (CHALLENGES[cur].checks(S)||[]).length>=5 || guided);
   const C=CHALLENGES[cur];
   const items=C.checks(S);
   const n=items.filter(i=>i.ok).length;
@@ -4834,7 +4888,7 @@ document.addEventListener('keydown',e=>{
   }
 
   // HINTS — 'g' toggles guided in classic mode. (The session-mode g handler runs earlier and catches it during marathon/rapid-fire.)
-  if((k==='g'||k==='G')&&!e.ctrlKey&&!e.altKey&&!e.metaKey){ e.preventDefault(); toggleGuided(); return; }
+  if(k==='F1'){ e.preventDefault(); toggleGuided(); return; }   // r49: 'g' now types into cells (type-to-replace); F1 = Excel's help key
 
   // CHALLENGE SELECT (no-mouse): 1 / 2 / 3 — disabled during a marathon (drills are random)
   if(gameMode==='classic' && !e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
@@ -4979,7 +5033,7 @@ $('result').addEventListener('click',e=>{ const b=e.target.closest('.rc-key'); i
   const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
 $('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-key'); if(!b)return;
   const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
-function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>g</kbd> guided: '+(guided?'on':'off'); } }
+function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>F1</kbd> guided: '+(guided?'on':'off'); } }
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn();
   if(S) render();
   if(gameMode==='rapidfire' && rfTask) renderRfCard('show');
@@ -5787,7 +5841,7 @@ const APP_SHORTCUTS = [
   ]},
   { title:'while training', rows: [
     ['type',       'start the clock (first keystroke begins the run)'],
-    ['g',          'toggle guided hints (paint-by-numbers walkthrough)'],
+    ['F1',         'toggle guided hints (paint-by-numbers walkthrough)'],
     ['F2',         'edit the active cell'],
   ]},
   { title:'in a session (marathon / rapid-fire)', rows: [
@@ -7082,7 +7136,7 @@ async function startGuidedIntro(){
   await introRibbonPeek();               // part 2: a quick look at the ribbon
   guidedUsed=true;                        // practice run — won't post a time
   const r=$('result'); if(r){ r.className='result';
-    r.innerHTML="you're set — <kbd>\\</kbd> all drills · <kbd>shift+f11</kbd> restart · <kbd>g</kbd> hints · <kbd>?</kbd> shortcuts · type to start"; }
+    r.innerHTML="you're set — <kbd>\\</kbd> all drills · <kbd>shift+f11</kbd> restart · <kbd>F1</kbd> hints · <kbd>?</kbd> shortcuts · type to start"; }
 }
 async function introRibbonPeek(){
   if(!S || demoPlaying) return;

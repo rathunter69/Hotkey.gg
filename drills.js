@@ -28,7 +28,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Values',      keys: ['drill', 'series', 'transpose'] },
     { name: 'Data',        keys: ['sort'] },
     { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'percent', 'cagr', 'sumif'] },
-    { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'txncomps'] },
+    { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'txncomps', 'sourcesuses'] },
     { name: 'Full Builds', keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'debtsched', 'threestmt'] },
     { name: 'Lookups',     keys: ['lookup', 'lookup2'] },
   ],
@@ -56,6 +56,7 @@ window.HOTKEY_DRILLS = {
     transpose:  { name:'Transpose', label:'Flip it on its side',        tab:'Transpose', desc:'Copy a row, Alt E S E drops it in as a column' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'Strict seniority: MIN rations cash down two tranches' },
     txncomps:   { name:'Txn Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the average, and the implied equity' },
+    sourcesuses:{ name:'S&U',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total the uses, plug sponsor equity, check reads zero' },
     saves:      { name:'Save',     label:'Save like you mean it',   tab:'Save',     desc:'Work, Ctrl+S. More work, Ctrl+S again' },
     copyover:   { name:'Copyover', label:'Copy it over',        tab:'Basics',      desc:'Select, copy, and paste a block — all keyboard' },
 
@@ -167,7 +168,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":98,"percent":64,"lookup":50,"ribbon":30,"pastes":44,"transpose":40,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":62,"center":44,"blue":62,"sort":40,"series":30,"bridge":22,"growth":58,"wacc":78,"dcf":100,"lbo":98,"revolver":52,"isbuild":128,"debtsched":155,"cfslink":132,"bsbuild":125,"nwcsched":132,"threestmt":155,"waterfall":118,"txncomps":110,"cagr":72,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":98,"percent":64,"lookup":50,"ribbon":30,"pastes":44,"transpose":40,"saves":26,"editfix":22,"undo":28,"autofit":20,"rowops":26,"filldr":24,"blocksel":22,"copyover":18,"polish":24,"foot":55,"comps":62,"center":44,"blue":62,"sort":40,"series":30,"bridge":22,"growth":58,"wacc":78,"dcf":100,"lbo":98,"revolver":52,"isbuild":128,"debtsched":155,"cfslink":132,"bsbuild":125,"nwcsched":132,"threestmt":155,"waterfall":118,"txncomps":110,"sourcesuses":96,"cagr":72,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
