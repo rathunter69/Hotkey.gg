@@ -1068,3 +1068,26 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   outline (td.ttarget) on the next cell(s) to change — advances as checks pass.
   No more squinting at "B5" and hunting.
 - v40.
+
+---
+# ROUND 41 — banker '+', guide alternates, profile coach; r40 REPLAY (process incident)
+- PROCESS INCIDENT (own goal): r40's feature pass FAILED SILENTLY — the heredoc
+  python aborted at a bad anchor mid-block, bash wasn't &&-chained, the version
+  bump still shipped, and the round was reported as delivered. Type-to-replace,
+  the task line, and target highlights never reached prod. NEW RULE: every python
+  surgery block ends with an explicit success echo AND a per-feature grep verify
+  (grep -cF per landmark, exit nonzero on miss) before commit. Applied this round;
+  all r40 features replayed and verified landed.
+- '+' STARTS A FORMULA seeded as '=+' — what Excel stores when bankers type
+  +B2+B3; '=+' ends at an operator boundary so the first arrow points immediately.
+- GUIDE ALTERNATES (no pigeonholing): guided checklist gains a footer listing the
+  engine-live equivalences (fills ctrl+r/d ⇔ alt h f i r/d, autosum alt+= ⇔
+  alt h u s, paste special ctrl+alt+v ⇔ alt e s, rows/cols ctrl+± ⇔ alt h i r /
+  h d r, plugin profiles) + the principle: many chords, one sheet — the grader
+  only checks the result. Per-step inline alternates queued (needs a chord→op map).
+- PROFILE COACH: player card now shows most-used shortcut chips (top 5, last 40
+  clean-run traces) + up to two directional "coach's notes" from rule scans of
+  the chord mix (no F4 → anchor nudge; no Alt walks → ribbon nudge; single-arrow
+  heavy → ctrl+arrow nudge; no paste-special → rotation nudge). Never prescriptive,
+  banker dot/dash styling.
+- v41.

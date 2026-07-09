@@ -347,9 +347,17 @@
     const attempted = drills.filter(d => d.rank !== null);
     const avgPct = attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null;
     const myRuns = runs.filter(x => x.user_id === me_id);
+    let _chordFreq={}, _totKeys=0;
+    try{
+      const tr=await window.sb.from('runs').select('trace,keystrokes').eq('user_id', meId)
+        .eq('mouse_used',false).order('created_at',{ascending:false}).limit(40);
+      (tr.data||[]).forEach(row=>{ _totKeys+=(row.keystrokes||0);
+        (Array.isArray(row.trace)?row.trace:[]).forEach(k=>{ const key=(k&&k.k)||k;
+          if(typeof key==='string' && /\+|^Alt$|^F\d+$/.test(key)) _chordFreq[key]=(_chordFreq[key]||0)+1; }); });
+    }catch(e){}
     const _perBoard={}; MENU_ORDER.forEach(k=>{ _perBoard[k]=[]; const seenB={};
       runs.forEach(x=>{ if(x.challenge===k && !seenB[x.user_id]){ seenB[x.user_id]=true; _perBoard[k].push(x.user_id); } }); });
-    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs, _allRuns: runs, _perBoard,
+    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs, _allRuns: runs, _perBoard, _chordFreq, _totKeys,
       wsum: drills.reduce((a,x)=>a+(x.rank!==null?Math.min(1,Math.log2((x.total||1)+1)/Math.log2(9)):0),0) };
   }
   /* ---- XP & LEVELS ----
@@ -462,7 +470,28 @@
               out+='<span class="pc-ach-i'+(r.done?' got':'')+'" data-tip="'+a.name+' \u2014 '+a.desc+(r.done?' \u2713 EARNED':' \u00b7 '+r.prog+'/'+r.goal)+rare+'">'+
                 (window.hkBadge?window.hkBadge(a.glyph, r.done, 34):'')+
                 (r.done?'':'<i>'+Math.min(99,Math.round(100*r.prog/r.goal))+'%</i>')+'</span>'; });
-            return out+'</div>';
+            out+='</div>';
+            // ---- most-used shortcuts + coach's notes (directional, never prescriptive) ----
+            try{
+              const cf=d._chordFreq||{};
+              const top=Object.entries(cf).sort((a,b)=>b[1]-a[1]).slice(0,5);
+              if(top.length){
+                out+='<div class="pc-ach-h">most-used shortcuts <span style="color:var(--faint)">\u00b7 last 40 clean runs</span></div>'+
+                  '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 2px">'+
+                  top.map(([k,c])=>'<span style="font-family:var(--mono);font-size:10.5px;background:var(--surface2);border:1px solid var(--line);border-radius:7px;padding:3px 8px">'+k+' <span style="color:var(--faint)">\u00d7'+c+'</span></span>').join('')+'</div>';
+                const tips=[];
+                const hasAny=re=>Object.keys(cf).some(k=>re.test(k));
+                if(!hasAny(/^F4$/)) tips.push('F4 barely shows up in your play \u2014 the Models and Full Builds tiers lean on anchor cycling');
+                if(!hasAny(/^Alt$|^Alt\+/) && !hasAny(/^H/)) tips.push('no Alt-ribbon walks in your recent runs \u2014 alt h o i (autofit) and alt e s (paste special) are desk staples');
+                if(!hasAny(/Ctrl\+(\u2192|\u2190|\u2191|\u2193|Shift)/)) tips.push('mostly single arrows \u2014 ctrl+arrows jump to data edges, ctrl+shift+arrows grab whole ranges');
+                if(!hasAny(/Ctrl\+Alt\+V/)) tips.push('paste special (ctrl+alt+v) is missing from your rotation \u2014 values-only paste is everywhere in real models');
+                if(tips.length){
+                  out+='<div class="pc-ach-h" style="margin-top:10px">coach\u2019s notes</div>'+
+                    tips.slice(0,2).map(t=>'<div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6;margin:3px 0"><span style="color:var(--faint)">\u2013</span> '+t+'</div>').join('');
+                }
+              }
+            }catch(e){}
+            return out;
           })() +
           '';
       }
