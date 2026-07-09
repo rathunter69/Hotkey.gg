@@ -1359,3 +1359,16 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   higher. (Old .cl-head margin/typography folded into the strip; .cl-colhdr CSS
   retired.)
 - v53.
+
+---
+# ROUND 54 — rail to the frame top (the quarter inch, decoded); Desk goes windows-grey
+- MISREAD CORRECTED: r53 merged the wrong strips. Wolf wanted the v52 structure
+  intact, shifted UP one row — the ✓ strip pairing with the RIBBON (both 34px
+  surface2 = the color match he meant). DONE: ribbon moved inside stage-main;
+  the rail spans to the frame top; frame row 1 = [alt ribbon ... ||| ✓], one
+  continuous surface2 strip. cl-head reverts to its compact in-body form (r53's
+  duplicate .cl-head strip rule removed).
+- DESK RETUNED PER SPEC ("not even dark — windows grey \u00d7 dracula"): now a
+  light-grey theme (dark:false): bg #b9bcc3, surfaces #cdcfd5/#c0c3ca, slate
+  inks, grey-green accent #3f9873. Same default slot.
+- v54.

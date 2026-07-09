@@ -23,11 +23,11 @@ window.THEMES = {
     text:'#323437', muted:'#646669', faint:'#9a9a9c',
     accent:'#e2b714', 'accent-dim':'#a07f0a', 'accent-glow':'rgba(226,183,20,.25)',
     warn:'#ca4754', bad:'#ca4754' }},
-  desk: { name:'Desk', dark:true, vars:{
-    bg:'#24272e', surface:'#2c3038', surface2:'#353a44', line:'#454c59',
-    text:'#e4e8ee', muted:'#9aa4b2', faint:'#69727f',
-    accent:'#4fb286', 'accent-dim':'#357a5c', 'accent-glow':'rgba(79,178,134,.18)',
-    warn:'#dcb45f', bad:'#d96c60' }},
+  desk: { name:'Desk', dark:false, vars:{
+    bg:'#b9bcc3', surface:'#cdcfd5', surface2:'#c0c3ca', line:'#999da7',
+    text:'#26282e', muted:'#565a64', faint:'#82868f',
+    accent:'#3f9873', 'accent-dim':'#2a6b50', 'accent-glow':'rgba(63,152,115,.18)',
+    warn:'#8a6a1f', bad:'#a84a40' }},
   dracula: { name:'Dracula', dark:true, vars:{
     bg:'#282a36', surface:'#383a48', surface2:'#44475a', line:'#5d5f6e',
     text:'#f8f8f2', muted:'#a8a8a0', faint:'#6272a4',
