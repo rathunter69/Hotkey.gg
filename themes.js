@@ -216,7 +216,11 @@ window.hkLevelRing = function(lvl, pct, size){
   return '<svg viewBox="0 0 56 56" width="'+size+'" height="'+size+'" aria-hidden="true">'+
     '<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="var(--surface)" stroke-width="5"/>'+
     '<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" '+
-      'stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 28 28)"/>'+
+      'stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 28 28)">'+
+      /* r85: the fitness-app sweep — SMIL animates on mount, no wiring anywhere */
+      '<animate attributeName="stroke-dashoffset" from="'+C.toFixed(1)+'" to="'+off.toFixed(1)+'" dur="0.9s" '+
+        'calcMode="spline" keySplines="0.2 0.8 0.2 1" fill="freeze"/>'+
+      '</circle>'+
     '<text x="28" y="26.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="14" fill="var(--text)">'+lvl+'</text>'+
     '<text x="28" y="38" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-size="6.5" letter-spacing="1.5" fill="var(--muted)">LVL</text></svg>';
 };

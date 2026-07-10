@@ -1912,3 +1912,25 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   drill covers ctrl+shift+%/$/!); borders drill pending an engine border-op
   audit; streak server-sync parked on a migration path.
 - v84.
+
+---
+# ROUND 85 — the ribbon crash, paste-special inline, ring sweeps
+- RIBBON ROOT CAUSE (Wolf: "ribbon seems broken, can't see subordinate
+  options"): drawRibbon's font-color branch referenced __altFooter — a const
+  scoped INSIDE the guided-checklist renderer — so any walk touching font
+  color threw a ReferenceError mid-paint and the strip died until reload;
+  stray '</div></div>' rode along. Reference removed. The adaptive strip
+  (TABS at root, MENUS per path) was alive underneath the crash.
+- PASTE SPECIAL, INLINE: the options lived only in a floating side dialog; the
+  strip now lists every PASTE_OPTS key inline (<k>v</k>Values …) with the
+  active kind lit accent — see it and execute it in one place. Dialog stays.
+- MENUS: the r82 percent walk (Alt H P) was executable but INVISIBLE in the
+  strip — added to H's menu. Audit rule: new altSeq ops must ship with their
+  MENUS entry.
+- RING SWEEP: hkLevelRing now carries an SMIL <animate> — every level ring
+  site-wide sweeps from zero to your progress on mount (0.9s spline), no
+  wiring. First taste of the animation pass; count-ups and bar fills queued.
+- NAMES: display-site sweep found leaderboard (fallback ✓), nav (retry+CTA ✓),
+  stats/account (self-render post-session ✓) — need Wolf's specific pages to
+  chase the remaining misses.
+- v85.
