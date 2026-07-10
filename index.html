@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=85" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=85">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=85">
+<link rel="icon" href="favicon.ico?v=86" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=86">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=86">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1026,14 +1026,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=85"></script>
-<link rel="stylesheet" href="nav.css?v=85">
-<script src="themes.js?v=85"></script>
+<script src="drills.js?v=86"></script>
+<link rel="stylesheet" href="nav.css?v=86">
+<script src="themes.js?v=86"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=85"></script>
+<script src="nav.js?v=86"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4288,14 +4288,21 @@ function drawDialog(){
   });
   $('pdOpts').innerHTML=rows;
 }
-function drawRibbon(){
+function drawRibbon(){ try{ __drawRibbon(); }catch(err){
+  // r86: paint armor — a rendering bug must NEVER strand the player in an
+  // invisible ribbon mode (the v85 __altFooter crash class). Paint a minimal
+  // strip, log, and leave input handling alive.
+  try{ const el=$('ribbon'); if(el){ el.className='ribbon show'; el.innerHTML='<span class="path">'+(path.length?path.join(' '):'alt')+' \u2192</span><span class="opt">\u2026 \u00b7 esc backs out</span>'; } }catch(e2){}
+  try{ console.error('ribbon paint:', err); }catch(e3){}
+} }
+function __drawRibbon(){
   drawDialog();
   const el=$('ribbon');
   if(mode!=='ribbon'){ el.className='ribbon'; el.innerHTML='<span class="rhint"><k>alt</k> ribbon</span>'; return; }
   if(dialog==='paste'){ el.className='ribbon show';
     let ph='<span class="path">paste special →</span>';
     PASTE_OPTS.forEach(([k,lbl,kind])=>{ ph+='<span class="opt'+(pasteKind===kind?' on':'')+'"><k>'+k.toLowerCase()+'</k>'+lbl+'</span>'; });
-    ph+='<span class="opt">↵ apply · esc cancel</span>';
+    ph+='<span class="opt">\u2191\u2193 or letters \u00b7 \u21b5 apply \u00b7 esc cancel</span>';
     el.innerHTML=ph; return; }
   if(dialog==='fontcolor'){
     el.className='ribbon show';
@@ -5337,6 +5344,13 @@ document.addEventListener('keydown',e=>{
   // RIBBON MODE — read physical key code so Mac Option / non-US layouts still work
   if(mode==='ribbon'){
     e.preventDefault();
+    // paste special: arrows cycle the options (they used to be swallowed — "arrows dead")
+    if(dialog==='paste'){
+      if(k==='ArrowDown'||k==='ArrowRight'){ logKey('\u2193'); const i=PASTE_OPTS.findIndex(o=>o[2]===(pasteKind||'all'));
+        pasteKind=PASTE_OPTS[(i+1)%PASTE_OPTS.length][2]; drawRibbon(); return; }
+      if(k==='ArrowUp'||k==='ArrowLeft'){ logKey('\u2191'); const i=PASTE_OPTS.findIndex(o=>o[2]===(pasteKind||'all'));
+        pasteKind=PASTE_OPTS[(i-1+PASTE_OPTS.length)%PASTE_OPTS.length][2]; drawRibbon(); return; }
+    }
     // font color picker: arrow keys cycle swatches, Enter commits, anything else (except Esc) ignored
     if(dialog==='fontcolor'){
       if(k==='ArrowLeft'){  logKey('←'); fontColorIdx=(fontColorIdx-1+FONT_SWATCHES.length)%FONT_SWATCHES.length; drawRibbon(); return; }

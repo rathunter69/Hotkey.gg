@@ -1934,3 +1934,21 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   stats/account (self-render post-session ✓) — need Wolf's specific pages to
   chase the remaining misses.
 - v85.
+
+---
+# ROUND 86 — paste-dialog arrows + paint armor
+- ARROWS IN PASTE SPECIAL: in ribbon mode the dialog swallowed arrow keys
+  (preventDefault, no handler) — "arrows dead" while the dialog was open, and
+  if the strip wasn't painting (the v85 crash class), the mode was INVISIBLE:
+  a player stuck in silent ribbon mode with dead arrows everywhere. Arrows now
+  cycle the paste options (\u2191\u2193\u2190\u2192, Excel-style), banner says so.
+- PAINT ARMOR: drawRibbon wrapped — a rendering error now paints a minimal
+  "path \u2192 \u2026 esc backs out" strip and logs, instead of stranding input in an
+  invisible mode. The __altFooter class of bug can no longer kill the game.
+- LIKELY CACHE NOTE for Wolf: v85's ribbon fix shipped minutes before his
+  report; GitHub Pages HTML caches briefly — symptoms may have been the PRE-
+  fix build. v86 verifies with the armor either way.
+- Monetization decision (Wolf): SUBSCRIPTION over one-time. Direction agreed:
+  free spine = level-gated progression; sub unlocks full track from L1 +
+  cosmetics; one robust pathway, no live-service treadmill. Stripe stays TEST.
+- v86.
