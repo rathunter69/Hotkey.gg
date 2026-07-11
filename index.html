@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=86" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=86">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=86">
+<link rel="icon" href="favicon.ico?v=87" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=87">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=87">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -566,7 +566,8 @@
     color:var(--gcol, var(--accent)); padding:0 12px 0 4px; align-self:center; white-space:nowrap; flex:none;
     cursor:pointer; opacity:.9}
   .st-lead:hover{opacity:1}
-  .st-tab{font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
+  .st-tab{flex:0 1 auto; min-width:52px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;   /* r88: dense groups compress gracefully */
+    font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
     border:1px solid var(--line); border-bottom:0; border-top:2.5px solid var(--gcol, var(--line));
     border-radius:7px 7px 0 0; padding:8px 15px 9px; cursor:pointer; white-space:nowrap; transition:.12s}
   .st-tab:hover{color:var(--text)}
@@ -1026,14 +1027,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=86"></script>
-<link rel="stylesheet" href="nav.css?v=86">
-<script src="themes.js?v=86"></script>
+<script src="drills.js?v=87"></script>
+<link rel="stylesheet" href="nav.css?v=87">
+<script src="themes.js?v=87"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=86"></script>
+<script src="nav.js?v=87"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4494,7 +4495,8 @@ function showResults(o){
   // Monkeytype loop: from the results card, Enter = run it again, N = next drill.
   resultsChainKeys = (ev)=>{
     if(ev.key==='Enter'){ ev.preventDefault(); hideResults(); restartDrill(); return; }
-    if(ev.key==='n'||ev.key==='N'){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
+    if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
+    if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
   };
   return _showResults(o);
 }
@@ -4528,6 +4530,13 @@ function _showResults(o){
     guestPrompt+
     `</div>`;
   m.classList.add('show');
+  // r88: the rm-key buttons rendered but had NO click wiring — keyboard-only card.
+  m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
+    const a=b.dataset.act;
+    if(a==='again'){ hideResults(); restartDrill(); }
+    else if(a==='next'){ hideResults(); loadChallenge(nextDrillKey()); }
+    else if(a==='menu'){ hideResults(); openPicker(); }
+  }; });
   const si=$('rmSignin'); if(si) si.onclick=openAuth;
   const sp=$('rmSaveProg'); if(sp) sp.onclick=()=>openAuth('signup');
   const spi=$('rmSaveProgInline'); if(spi) spi.onclick=()=>openAuth('signup');
@@ -4835,6 +4844,9 @@ function cycleAnchor(){
   else if(!dolC && dolR)  next = '$'+col+row;
   else                    next = col+row;
   editBuf = editBuf.slice(0, editPointerStart) + next;
+  editCaret = editBuf.length;   /* r88: THE F4 BUG — cycling $ made the buffer longer but left the
+     caret behind, so the next typed char or pointer-write landed INSIDE the reference
+     ("=$B*$2"). The typed-ref fallback synced its caret; the pointer branch forgot. */
   return true;
 }
 
@@ -7419,7 +7431,21 @@ async function doSignIn(){
   authErr('');
   try{
     const { error } = await sb.auth.signInWithPassword({ email, password:pass });
-    if(error){ authErr(/confirm/i.test(error.message)?'Confirm your email first \u2014 check your inbox.':'Wrong email or password.'); return; }
+    if(error){
+      authErr(/confirm/i.test(error.message)?'Confirm your email first \u2014 check your inbox.':'Wrong email or password.');
+      // r88: dead-end fix — offer the reset path right where the failure happened
+      const eEl=$('authErr');
+      if(eEl && !/confirm/i.test(error.message)){
+        eEl.innerHTML='Wrong email or password. <a id="authForgot" style="color:var(--accent);cursor:pointer;text-decoration:underline">forgot password?</a>';
+        const fg=$('authForgot'); if(fg) fg.onclick=async()=>{
+          const em=($('authEmail')?$('authEmail').value:'').trim().toLowerCase();
+          if(!em || !/.+@.+\..+/.test(em)){ authErr('Type your email above first, then click forgot password.'); return; }
+          try{ await sb.auth.resetPasswordForEmail(em, { redirectTo: location.href });
+            authErr('Reset link sent \u2014 check your inbox.');
+          }catch(e2){ authErr('Could not send the reset email \u2014 try again.'); }
+        };
+      }
+      return; }
     closeAuth();
   }catch(e){ authErr('Something went wrong \u2014 try again.'); }
 }

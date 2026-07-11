@@ -1952,3 +1952,22 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   free spine = level-gated progression; sub unlocks full track from L1 +
   cosmetics; one robust pathway, no live-service treadmill. Stripe stays TEST.
 - v86.
+
+---
+# ROUND 88 — WAVE 1 opens: F4 caret desync, dead results buttons, forgot-password, tab shrink
+- F4 BUG (engine-wide, Wolf's repro): cycleAnchor's POINTER branch rewrote the
+  ref ($ made it longer) but never moved editCaret — the typed-ref fallback
+  did. Next char/pointer-write landed INSIDE the reference ("=$B*$2"). One
+  line: editCaret=editBuf.length. Unit-simmed: =B2 → F4 → * → =$B$2* ✓.
+  Arrow-repoint after F4 resetting the lock is CORRECT Excel behavior (kept).
+- RESULTS BUTTONS: .rm-key buttons rendered with data-act but were NEVER
+  wired — keyboard-only card. Click delegation added (again/next/menu);
+  space + esc now honor their printed labels in the key chain too.
+- WRONG PASSWORD dead end: failed sign-in now offers an inline "forgot
+  password?" link that fires resetPasswordForEmail on the typed email — no
+  more bounce with nowhere to go. (Landing-dump repro couldn't be reproduced
+  from code — modal path never closes on error; watch for Wolf's exact path.)
+- TAB CLUMPING (pre-screenshot mitigation): .st-tab now flex-shrinks with
+  ellipsis (min 52px) so dense groups compress instead of colliding;
+  horizontal scroll remains.
+- v87.
