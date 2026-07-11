@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=92" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=92">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=92">
+<link rel="icon" href="favicon.ico?v=93" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=93">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=93">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1053,14 +1053,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=92"></script>
-<link rel="stylesheet" href="nav.css?v=92">
-<script src="themes.js?v=92"></script>
+<script src="drills.js?v=93"></script>
+<link rel="stylesheet" href="nav.css?v=93">
+<script src="themes.js?v=93"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=92"></script>
+<script src="nav.js?v=93"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2041,7 +2041,6 @@ const CHALLENGES = {
       const bold=k=>{ const c=S.cells[k]; return !!(c&&c.bold); };
       return [
         {label:'Bold the whole target island \u2014 both columns, every row', ok: this._tk.every(bold)},
-        {label:'the decoy island stays plain \u2014 precision, not just speed', ok: this._dk.every(k=>!bold(k))},
       ];
     }
   },
@@ -2131,7 +2130,6 @@ const CHALLENGES = {
         {label:'target header bold, all four cells', ok: this._hk.every(k=>c(k).bold)},
         {label:'bottom border runs under the whole header', ok: this._hk.every(k=>c(k).bb)},
         {label:'header shaded', ok: this._hk.every(k=>c(k).fill==='blue')},
-        {label:'the other table stays plain \u2014 formatting has edges', ok: this._dk.every(k=>!c(k).bold&&!c(k).bb&&!c(k).fill)},
       ];
     }
   },
@@ -3564,52 +3562,94 @@ const CHALLENGES = {
     }
   },
   audit:{
-    name:'Audit', label:'Fix the broken ref', par:32, parKeys:8,
-    prompt:'One of these revenue formulas is pointing at the wrong row \u2014 the number that looks off IS off. Find it, F2 into the cell, repair the reference, commit. This is the rep that saves you at 2am: reading a column and spotting the break.',
-    req:'<em>scan column C</em> for the row that doesn\u2019t tie \u00b7 <em>F2</em> opens the formula in place \u00b7 fix the row number \u00b7 <em>\u21b5</em>',
+    name:'The 4am pass', label:'The 4am pass \u2014 find what\u2019s broken', par:75, parKeys:36,
+    prompt:'A divisional P&L someone else built, and three things are wrong with it: one division\u2019s five-year Total stops a column short, one EBITDA is a stale hardcode, and one EBITDA reads the wrong year\u2019s opex. Nobody tells you which \u2014 read the tab like you\u2019ll have to defend it. This is the pass your associate does at 4am; learn to do it at 4pm.',
+    req(){ return '<em>scan the Total column</em> \u00b7 one SUM stops at FY4 \u2014 <em>F2</em>, extend it \u00b7 one EBITDA is a typed number \u2014 rebuild it live \u00b7 one EBITDA crosses columns \u2014 repoint it'; },
     guide:[
-      'read down column C \u2014 one row\u2019s revenue doesn\u2019t match its units \u00d7 price',
-      'on the broken cell \u00b7 <kbd>F2</kbd> \u2014 the formula opens with the cursor at the end',
-      'backspace the wrong row number, type the right one \u00b7 <kbd>\u21b5</kbd>',
+      'read the Total column (G) \u2014 one division\u2019s SUM ends a year early \u00b7 <kbd>F2</kbd>, extend the range to column F, <kbd>\u21b5</kbd>',
+      'read the EBITDA row \u2014 one year is a hardcoded number (nothing in the formula bar) \u00b7 retype it live: <kbd>=</kbd> total rev <kbd>\u2212</kbd> opex <kbd>\u21b5</kbd>',
+      'one EBITDA computes but reads the NEIGHBOR column\u2019s opex \u00b7 <kbd>F2</kbd>, repoint the column, <kbd>\u21b5</kbd>',
     ],
-    targets:[function(){return this._badCell;}],
-    demo(){ const bad=this._badCell, row=bad.slice(1);
-      return [ {sel:bad, keys:[{key:'F2'}, {key:'Backspace'}, {key:'Backspace'}, ...T('B'+row), Kb.enter]} ]; },
+    targets:[function(){return this._t1;}, function(){return this._t2;}, function(){return this._t3;}],
+    demo(){
+      const c1=this._t1, c2=this._t2, c3=this._t3;
+      const col2=c2[0], col3=c3[0];
+      return [
+        {sel:c1, keys:[{key:'F2'}, {key:'Backspace'}, {key:'Backspace'}, {key:'Backspace'}, ...T('F'+c1.slice(1)+')'), Kb.enter]},
+        {sel:c2, keys:[...T('='+col2+'10-'+col2+'12'), Kb.enter]},
+        {sel:c3, keys:[{key:'F2'}, ...Array.from({length:9},()=>({key:'Backspace'})), ...T('='+col3+'10-'+col3+'12'), Kb.enter]},
+      ];
+    },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Item',txt:true,bold:true};
-      cells['B1']={...blankCell(),value:'Units',txt:true,bold:true};
-      cells['C1']={...blankCell(),value:'Revenue',txt:true,bold:true};
-      cells['E1']={...blankCell(),value:'Price',txt:true,bold:true};
-      const price=rnd(3,9)*5;
-      cells['E2']={...blankCell(),value:price,fontColor:'blue'};
-      const n=8, items=['Widgets','Gadgets','Sprockets','Flanges','Gears','Bolts','Rivets','Pipes'];
-      const badRow=rnd(3,n+1);   // never the first row \u2014 the pattern must establish itself first
-      for(let i=0;i<n;i++){
-        const r=i+2, u=rnd(20,400)*5;
-        cells['A'+r]={...blankCell(),value:items[i],txt:true};
-        cells['B'+r]={...blankCell(),value:u,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        const ref = (r===badRow) ? 'B'+(r-1) : 'B'+r;   // the plant: one formula reads the row above
-        cells['C'+r]={...blankCell(),formula:'=$E$2*'+ref,fmtStyle:'comma',decimals:0};
+      const co=codename();
+      cells['A1']={...blankCell(),value:co+' \u2014 Divisional P&L ($000s)',txt:true,bold:true};
+      const divs=['Freight','Brokerage','Warehousing','Last-mile','Intermodal','Cold chain'];
+      const y0=22+rnd(0,2);
+      cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
+      for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
+      cells['G3']={...blankCell(),value:'Total',txt:true,bold:true};
+      const badDivRow=4+rnd(1,5);   // never the first division — the pattern establishes itself
+      for(let i=0;i<6;i++){
+        const r=4+i;
+        cells['A'+r]={...blankCell(),value:divs[i],txt:true};
+        let rowSum=0;
+        for(let c=2;c<=6;c++){ const v=rnd(40,400)*5; rowSum+=v;
+          cells[colLetter(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+        const short=(r===badDivRow);
+        cells['G'+r]={...blankCell(),formula:'=SUM(B'+r+':'+(short?'E':'F')+r+')',fmtStyle:'comma',decimals:0,bold:true,
+          value: short ? rowSum - cells['F'+r].value : rowSum };
       }
-      // pre-compute displayed values (including the wrong one \u2014 that's the tell)
-      for(let i=0;i<n;i++){ const r=i+2; const f=cells['C'+r].formula;
-        const refRow=parseInt(f.slice(f.indexOf('B')+1),10);
-        cells['C'+r].value = price * cells['B'+refRow].value; }
-      this._badCell='C'+badRow; this._price=price; this._n=n;
-      return {ROWS:n+1, cells, active:{r:2,c:3}, sel:null, colW:{1:96,2:80,3:96,5:70}};
+      cells['A10']={...blankCell(),value:'Total revenue',txt:true,bold:true};
+      cells['A12']={...blankCell(),value:'Opex',txt:true};
+      cells['A13']={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      const shuffled=[2,3,4,5,6].sort(()=>Math.random()-.5);
+      const cHard=shuffled[0], cCross=shuffled[1];
+      for(let c=2;c<=6;c++){
+        const L=colLetter(c);
+        let t=0; for(let r=4;r<=9;r++) t+=cells[L+r].value;
+        cells[L+'10']={...blankCell(),formula:'=SUM('+L+'4:'+L+'9)',value:t,fmtStyle:'comma',decimals:0,bold:true};
+        cells[L+'12']={...blankCell(),value:rnd(60,240)*5,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      }
+      for(let c=2;c<=6;c++){
+        const L=colLetter(c);
+        const rev=cells[L+'10'].value, ox=cells[L+'12'].value;
+        if(c===cHard){
+          cells[L+'13']={...blankCell(),value:rev-ox+rnd(2,9)*5,fmtStyle:'comma',decimals:0};
+        } else if(c===cCross){
+          const N=colLetter(c===6?5:c+1);
+          cells[L+'13']={...blankCell(),formula:'='+L+'10-'+N+'12',value:rev-cells[N+'12'].value,fmtStyle:'comma',decimals:0};
+        } else {
+          cells[L+'13']={...blankCell(),formula:'='+L+'10-'+L+'12',value:rev-ox,fmtStyle:'comma',decimals:0};
+        }
+      }
+      this._t1='G'+badDivRow; this._t2=colLetter(cHard)+'13'; this._t3=colLetter(cCross)+'13';
+      return {ROWS:13, cells, active:{r:4,c:7}, sel:null, colW:{1:118,7:86}};
     },
     checks(S){
-      let allOk=true;
-      for(let i=0;i<this._n;i++){ const r=i+2;
-        const c=S.cells['C'+r]; if(!c||!c.formula){ allOk=false; continue; }
-        const f=c.formula.toUpperCase().replace(/[\s$]/g,'');
-        const u=S.cells['B'+r] ? S.cells['B'+r].value : 0;
-        if(!f.includes('B'+r) || Math.abs(c.value-this._price*u)>1e-6) allOk=false;
+      let totOk=true, liveOk=true, ownOk=true;
+      for(let r=4;r<=9;r++){
+        const g=S.cells['G'+r];
+        let want=0; for(let c=2;c<=6;c++){ const x=S.cells[colLetter(c)+r]; want+=(x&&typeof x.value==='number')?x.value:0; }
+        if(!g||!g.formula||!/B\d+:F\d+\)?$/.test(g.formula.replace(/\$/g,''))||Math.abs((g.value||0)-want)>1e-6) totOk=false;
       }
-      return [{label:'Find and fix the broken formula \u2014 every revenue line must read its OWN row', ok: allOk}];
+      for(let c=2;c<=6;c++){
+        const L=colLetter(c);
+        const tot=S.cells[L+'10'], eb=S.cells[L+'13'];
+        const ox=S.cells[L+'12']?S.cells[L+'12'].value:0;
+        if(!eb||!eb.formula){ liveOk=false; continue; }
+        const f=eb.formula.toUpperCase().replace(/[\s$]/g,'');
+        // self-consistent: judged against the DISPLAYED total (no recalc engine)
+        if(!f.includes(L+'12') || Math.abs((eb.value||0)-(((tot&&tot.value)||0)-ox))>1e-6) ownOk=false;
+      }
+      return [
+        {label:'Every division\u2019s five-year Total spans B through F \u2014 one row stops a year short (column G)', ok:totOk},
+        {label:'EBITDA is a LIVE formula in every year \u2014 one is a stale typed number (row 13)', ok:liveOk},
+        {label:'Every EBITDA reads its OWN year\u2019s opex \u2014 one column crossed wires (row 13)', ok:ownOk},
+      ];
     }
   },
+
   sumif:{
     name:'SUMIF', label:'Roll up the segments', par:52, parKeys:35,
     prompt:'Roll the ledger up by segment. Seven line items, three segments — build one SUMIF with anchored ranges at E2, then fill it down for the other two. $-lock the ranges so the fill doesn\'t walk them.',

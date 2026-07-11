@@ -2061,3 +2061,23 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - Wave 2 remainder Ctrl+PgUp/PgDn stays parked on PWA (browser-reserved).
   WAVE 2 IS CLOSED. Wave 3 (content/density arc) is next.
 - v92.
+
+---
+# ROUND 94 — WAVE 3 opens: Density Doctrine v2 + "The 4am Pass"
+- DOCTRINE v2 in PROJECT_CONTEXT (incl. the new NO-RECALC RULE below).
+- AUDIT REBUILT: "The 4am pass" — titled divisional P&L (6 divisions × 5 FY
+  cols + cross-foot Total column G, Total revenue row, Opex, EBITDA), THREE
+  planted defects: a division Total short a year (col G), a stale hardcoded
+  EBITDA, an EBITDA reading the neighbor's opex. Associate-voice diagnostic
+  checks. par 75 / parKeys 36.
+- HARNESS CATCH (the reason this took two designs): the first version put
+  the short-SUM on Total revenue, which EBITDA reads — and the engine has NO
+  dependency recalc, so fixing the SUM stranded that column's EBITDA at a
+  stale value: UNSOLVABLE. 40-seed solved-state verification caught it
+  pre-ship. Redesign: defect 1 moved to the cross-foot column (nothing reads
+  it); EBITDA judged against DISPLAYED totals. 60-seed order-independent
+  solve now passes. NO-RECALC RULE added to doctrine; recalc engine queued
+  with the IF/comparator evaluator turn.
+- PSEUDO-CHECK CULL: blocksel decoy + polish decoy checks REMOVED; both
+  drills verified still grading.
+- v93.

@@ -95,7 +95,7 @@ window.HOTKEY_DRILLS = {
     lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — the IC number' },
     revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'LBO cash sweep — MAX the draw, MIN the paydown' },
     balance:    { name:'Balance',  label:'Make it balance',     tab:'Balance',     desc:'Foot both sides, plug the equity, CHECK cell must read 0' },
-    audit:      { name:'Audit',    label:'Fix the broken ref',  tab:'Audit',       desc:'One formula reads the wrong row — find it, F2, repair' },
+    audit:      { name:'The 4am pass', label:'The 4am pass \u2014 find what\u2019s broken', tab:'Audit', desc:'Three planted breaks in a real P&L \u2014 find them all' },
     percent:    { name:'% of rev', label:'Common-size it',      tab:'Common-size', desc:'Common-size with an anchored ($) formula' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'Roll a PP&E schedule forward with links' },
     comps:      { name:'Comps',    label:'Line up the comps',   tab:'Comps',       desc:'EV/EBITDA multiples, then the average' },
