@@ -183,3 +183,96 @@ Ship-first, batch outputs, minimal questions, honest pushback, node --check befo
 shipping, deliverables via present_files, concise replies, remind which files to
 redeploy. Bugs reported post-hoc. This file wins over memory summaries — keep it
 updated and uploaded to project knowledge.
+
+====================================================================
+# PIPELINE v2 — Wolf's full list, triaged (r87, 2026-07-10)
+This section is the ROADMAP OF RECORD. Decisions here are settled; do
+not re-litigate in future chats without Wolf explicitly reopening them.
+====================================================================
+
+## WAVE 1 — P0 GAMEPLAY-BREAKING BUGS (next turns, in order)
+1. RIBBON TYPES LETTERS: alt+letter walks broken — hypothesis: the
+   type-to-replace feature (r49: letters type into cells) captures keys
+   before/despite ribbon mode. Trace keydown ordering vs mode==='ribbon'.
+2. CURSOR + F4 LOCK not Excel-faithful ("cursor throwing things off").
+   NEED FROM WOLF: exact repro (which drill, keys pressed, expected vs got).
+3. DRILL-COMPLETION BUTTONS dead on the results card.
+4. WRONG PASSWORD dumps to landing — must show inline error + "forgot
+   password?" reset flow instead.
+5. LOGIN STILL NEEDS REFRESH to show name (navRefreshAuth kick shipped r70
+   but symptom persists — re-diagnose end to end).
+6. SHEET-TAB CLUMPING at some browser widths (overflow, next-group chip
+   hidden). NEED FROM WOLF: approx window width / screenshot.
+7. ESC AUDIT: Esc must NEVER restart a drill (Shift+F11 owns restart since
+   r49) — verify no residual Esc-restart path; Esc = back out only.
+
+## WAVE 2 — CORE UX / GAMEPLAY LOOP
+8. GAMEPLAY LOOP REDESIGN: seamless fast next-drill flow (advance is slow/
+   unintuitive today). Includes rethinking the post-win rhythm.
+9. ONBOARDING WALKTHROUGH: one-time, semi-transparent overlay highlighting
+   the main loop (Wolf's buddy bounced — "no idea what to do").
+10. LEARN-FROM-ZERO layer: something gentler than guided mode for true
+    beginners (elegant solution TBD — Claude proposes).
+11. FORMULA BAR AUDIT: text cuts off (must read across like Excel) + typing
+    helpers (=IF( shows condition/if_true/if_false signature hints).
+12. CHECKLIST LANGUAGE PASS: read like an associate's instructions to an
+    intern ("take revenue and change XYZ" not bare cell refs).
+13. Demo/"watch solution" naming consistency across drills (artifact).
+14. Guided-mode visual feedback (more obvious when on).
+15. Ctrl+PgUp/PgDn + some Alt codes browser-reserved: fold into gameplay-
+    look redesign; PWA remains the real unlock (queued).
+
+## WAVE 3 — CONTENT QUALITY (the drill rework arc)
+16. DENSITY DOCTRINE v2: kill offset-block randomization; sheets must read
+    like a real model tab. Randomize CONTENT within realistic layouts.
+17. CUT "leave-untouched" pseudo-checks everywhere — not a drill.
+18. MODEL DRILLS too thin (solvable with two SUMs) — deepen.
+19. FORMATTING REWORK: robust randomized formatting exercises; lighter grid
+    surface to showcase bold/borders/colors (POLISH #39 folded in); add font
+    size ribbon ops + color/highlight dropdowns.
+20. AUDIT FAMILY: find broken formulas, formatting errors, balance breaks —
+    multiple drills, the training value is diagnosis.
+21. ERROR-TRIAGE drill: rework broken-ref into a series (#REF!, #DIV/0!...).
+22. NEW DRILL — STICKY IFs: build, copy across/down, flip cases.
+23. NEW DRILL — VERSION-UP/RESILIENCE: de-hardcode a bad model so it rolls
+    forward cleanly; linking exercises fold in.
+24. COMMENTS/CITATIONS habits: needs engine comment functionality first —
+    design question open.
+25. DRILL TITLES: row 1 = exercise-relevant title (like a real tab), fix
+    cut-off company names; clearer drill names in the picker.
+26. Growth-formula drill: fill down/right steps unclear — rework.
+
+## WAVE 4 — SYSTEMS & FEATURES
+27. TEAMS/CLUBS/SCHOOLS as a central onboarding channel + corporate
+    training angle. BIG ARC — gets its own design turn before code.
+28. PUBLIC PLAYER CARDS: click a leaderboard name → their card.
+29. RANK CONSISTENCY: same tier everywhere (card/header/pages) — audit.
+30. USERNAME: profanity/impersonation filter + random generator in
+    banking/Excel theme (xbox-style suggestions).
+31. REFERRAL system (design open; ties into accounts rework).
+32. LEVEL IN TOP BAR (or more prominent account-linked display).
+33. RANDOM DRILL MODE; promote rapid-fire; rethink/possibly retire
+    marathon as model drills deepen.
+34. MOUSE-USE feedback beyond achievements (fun, LATER — after bug waves).
+35. CERTIFICATES: retire per-drill PDFs concept; instead exportable/
+    LinkedIn-shareable player card + completion badges for flagships/top-%.
+36. PRO PLACEHOLDER surface (Claude's judgement on placement).
+37. Pop-out/under-game dialog area: better uses, light touch, don't overdo.
+38. RANK ART: Wolf commissioning professional images — player card v3
+    redesign (LoL-grade) BLOCKS ON ASSETS. SVG system stays until then.
+
+## MONETIZATION (DECIDED)
+- SUBSCRIPTION (not one-time). Free spine = level-gated progression path;
+  sub unlocks full track from L1 + all cosmetics. One robust pathway, no
+  live-service treadmill. Stripe stays TEST MODE until Wolf's internship
+  ends — no live payments, no entity formation.
+
+## STANDING CONSTRAINTS & RULES (summary — full detail below)
+- Ship-as-script: one set -euo pipefail script through push; any failed
+  check aborts before commit. Narrative never precedes verification.
+- Div-balance check after any innerHTML surgery.
+- Range swaps must sweep numeric loop bounds (lookup r<=6 incident).
+- New altSeq ops ship WITH their MENUS entry (r85 rule).
+- Whitespace-exact anchors; prefer regex+count asserts for risky excises.
+- No inlined copies of shared dicts (THEMES shadow incident).
+- Every round: cache-bump all pages, AUDIT.md entry, verify HEAD==FETCH_HEAD.
