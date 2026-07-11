@@ -2124,3 +2124,20 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - Doctrine compliance: tab title, labeled sections, content randomized
   (growth rates, base revenue, FY start), 3 motions, associate checklists.
 - v95.
+
+---
+# ROUND 97 — formatting rework flagship + error triage; COUNTIF
+- NEW DRILL "Dress the tab" (dress, after format): a finished-but-naked
+  analysis dressed book-ready in one pass — title bold+ruled (alt h b o),
+  inputs painted BLUE (alt h f c), margins percent+1dec, dollars comma'd.
+  Four formatting muscles, randomized geometry (segment count, rows),
+  associate checklists. 30-seed plant+solve. par 110/keys 58.
+- NEW DRILL "Error triage" (triage, after audit): #REF!/# DIV/0!/#VALUE!
+  planted as the real artifacts they are (text remnants of breaks); read
+  the error, infer the intent, rebuild the formula. Third check depends on
+  the first (fix B8 before growth can compute) — deliberate: triage has an
+  order. 30-seed verified incl. the dependency. par 85/keys 40.
+- ENGINE +COUNTIF (pairs w/ SUMIF; eqLoose criteria).
+- 54 drills total. Center-across-selection still queued (needs an engine
+  alignment-span mode + renderer support — logged, not forgotten).
+- v96.

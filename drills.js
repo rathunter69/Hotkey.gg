@@ -24,10 +24,10 @@ window.HOTKEY_DRILLS = {
   // ---------------------------------------------------------------
   groups: [
     { name: 'Foundations', keys: ['navigation', 'blocksel', 'ribbon', 'editfix', 'undo', 'filldr', 'pastes', 'rowops', 'autofit', 'saves', 'copyover'] },
-    { name: 'Formatting',  keys: ['polish', 'combo', 'format', 'center', 'blue', 'gauntlet'] },
+    { name: 'Formatting',  keys: ['polish', 'combo', 'format', 'dress', 'center', 'blue', 'gauntlet'] },
     { name: 'Values',      keys: ['drill', 'series', 'transpose'] },
     { name: 'Data',        keys: ['sort'] },
-    { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'percent', 'cagr', 'sumif', 'cases'] },
+    { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'triage', 'percent', 'cagr', 'sumif', 'cases'] },
     { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'txncomps', 'sourcesuses', 'accdil', 'dcfsens', 'retbridge', 'football'] },
     { name: 'Full Builds', keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'debtsched', 'threestmt'] },
     { name: 'Lookups',     keys: ['lookup', 'lookup2'] },
@@ -68,6 +68,8 @@ window.HOTKEY_DRILLS = {
     polish:     { name:'Polish',   label:'Polish the Header',   tab:'Header',      desc:'Bold + bottom border + shade a header row' },
     combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Bold, comma, wrap and autofit a pasted table' },
     format:     { name:'Format',   label:'Fix the formats',     tab:'Formats',     desc:'Triage the units — percent, currency, comma' },
+    dress:      { name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', tab:'Dress', desc:'Title ruled, inputs blue, percents, commas \u2014 book-ready' },
+    triage:     { name:'Error triage', label:'Error triage \u2014 #REF! #DIV/0! #VALUE!', tab:'Triage', desc:'Three classic breaks \u2014 read the error, rebuild the intent' },
     center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Center, left, right — three alignment passes, house style' },
     blue:       { name:'Blue',     label:'Blue the inputs',     tab:'Inputs',      desc:'Blue the hardcoded inputs — Alt H F C' },
     gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Model',       desc:'A full model-ready formatting pass' },

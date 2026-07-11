@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=95" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=95">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=95">
+<link rel="icon" href="favicon.ico?v=96" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=96">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=96">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1053,14 +1053,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=95"></script>
-<link rel="stylesheet" href="nav.css?v=95">
-<script src="themes.js?v=95"></script>
+<script src="drills.js?v=96"></script>
+<link rel="stylesheet" href="nav.css?v=96">
+<script src="themes.js?v=96"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=95"></script>
+<script src="nav.js?v=96"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1479,6 +1479,66 @@ const CHALLENGES = {
       ];
     }
   },
+  dress:{
+    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:110, parKeys:58,
+    prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, inputs in blue, margins as clean percents, dollars with commas. Four different formatting muscles, one pass, and the sites move every run.',
+    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em>'; },
+    guide:[
+      'A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 the title carries the rule',
+      'select the input block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u2014 blue means typed, black means computed',
+      'select the margins row \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> \u2014 one decimal',
+      'select the dollar figures \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 commas, zero decimals',
+    ],
+    targets:[function(){return 'A1';}, function(){return this._R.inpRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}],
+    demo(){ const R=this._R;
+      return [
+        {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('o')]},
+        {sel:R.inpRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), Kb.enter]},
+        {sel:R.mRowRange, keys:[Kb.pct, {key:'Alt'}, L('h'), D(0)]},
+        {sel:R.fRange, keys:[{key:'Alt'}, L('h'), L('k')]},
+      ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Segment margins ($000s)',txt:true};
+      const y0=24+rnd(0,1);
+      cells['A3']={...blankCell(),value:'Item',txt:true};
+      for(let c=2;c<=5;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true};
+      const nSeg=3+rnd(0,1);
+      const segs=['Freight','Brokerage','Warehousing','Intermodal'];
+      let r=4;
+      for(let i2=0;i2<nSeg;i2++){ cells['A'+r]={...blankCell(),value:segs[i2]+' revenue',txt:true};
+        for(let c=2;c<=5;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(80,400)*5};
+        r++; }
+      const cRow=r; cells['A'+cRow]={...blankCell(),value:'Costs',txt:true};
+      for(let c=2;c<=5;c++) cells[colLetter(c)+cRow]={...blankCell(),value:-rnd(50,200)*5};
+      const mRow=cRow+2;
+      cells['A'+mRow]={...blankCell(),value:'EBITDA margin',txt:true};
+      for(let c=2;c<=5;c++){ const L2=colLetter(c);
+        let rev=0; for(let rr=4;rr<cRow;rr++) rev+=cells[L2+rr].value;
+        cells[L2+mRow]={...blankCell(),formula:'=('+L2+'4+'+L2+cRow+')/'+L2+'4',value:(rev/nSeg+cells[L2+cRow].value)/(rev/nSeg)}; }
+      this._R={ inpRange:'B4:E'+cRow, mRow:mRow, mRowRange:'B'+mRow+':E'+mRow, fRange:'B4:E'+cRow, lastInp:cRow };
+      return {ROWS:mRow, cells, active:{r:1,c:1}, sel:null, colW:{1:150}};
+    },
+    checks(S){
+      const R=this._R;
+      const a1=S.cells['A1'];
+      const titleOk=!!(a1&&a1.bold&&a1.bb);
+      let blueOk=true, pctOk=true, comOk=true;
+      for(let c=2;c<=5;c++){ const L2=colLetter(c);
+        for(let rr=4;rr<=R.lastInp;rr++){ const x=S.cells[L2+rr];
+          if(!x||x.fontColor!=='blue') blueOk=false;
+          if(!x||x.fmtStyle!=='comma') comOk=false; }
+        const m=S.cells[L2+R.mRow];
+        if(!m||m.fmtStyle!=='percent'||m.decimals!==1) pctOk=false; }
+      return [
+        {label:'Bold the title and rule it off \u2014 A1 gets bold + a bottom border', ok:titleOk},
+        {label:'Paint every typed input BLUE ('+R.inpRange+') \u2014 blue means hardcode', ok:blueOk},
+        {label:'Margins read as percents, ONE decimal (row '+R.mRow+')', ok:pctOk},
+        {label:'Comma-format the dollar figures ('+R.fRange+'), zero decimals', ok:comOk},
+      ];
+    }
+  },
+
   margin:{
     name:'Formula', label:'Margins across the page', par:52, parKeys:48,
     prompt:'Three comp tables, one skill: EBITDA \u00f7 revenue, built by pointing, filled down, formatted as a percent. The tables land somewhere new every run \u2014 your hands should stop caring where the table lives.',
@@ -3650,6 +3710,69 @@ const CHALLENGES = {
     }
   },
 
+  triage:{
+    name:'Error triage', label:'Error triage \u2014 #REF!, #DIV/0!, #VALUE!', par:85, parKeys:40,
+    prompt:'Three classic breaks on one tab: a #REF! where a deleted row took the SUM with it, a #DIV/0! where the denominator points at nothing, and a #VALUE! where a formula grabbed text. Triage all three \u2014 read the error, find the intent, rebuild the formula. The error message is the diagnosis; you\u2019re the fix.',
+    req(){ const R=this._R; return '<em>'+R.refCell+'</em> #REF! \u2192 rebuild =SUM('+R.refFix+') \u00b7 <em>'+R.divCell+'</em> #DIV/0! \u2192 denominator is '+R.divFix+' \u00b7 <em>'+R.valCell+'</em> #VALUE! \u2192 point at the NUMBER ('+R.valFix+')'; },
+    guide:[
+      'the #REF! total lost its range to a deleted row \u00b7 retype it: <kbd>=</kbd>SUM over the block <kbd>\u21b5</kbd>',
+      'the #DIV/0! margin divides by an EMPTY cell \u00b7 <kbd>F2</kbd>, repoint the denominator at revenue <kbd>\u21b5</kbd>',
+      'the #VALUE! growth grabbed the LABEL, not the number \u00b7 <kbd>F2</kbd>, walk the ref one column right <kbd>\u21b5</kbd>',
+    ],
+    targets:[function(){return this._R.refCell;}, function(){return this._R.divCell;}, function(){return this._R.valCell;}],
+    demo(){ const R=this._R;
+      return [
+        {sel:R.refCell, keys:[...T('=SUM('+R.refFix+')'), Kb.enter]},
+        {sel:R.divCell, keys:[...T('='+R.divNum+'/'+R.divFix), Kb.enter]},
+        {sel:R.valCell, keys:[...T('='+R.valFix+'/'+R.valBase+'-1'), Kb.enter]},
+      ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Quarterly bridge (broken \u2014 fix before send)',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
+      cells['B3']={...blankCell(),value:'Q1',txt:true,bold:true};
+      cells['C3']={...blankCell(),value:'Q2',txt:true,bold:true};
+      const rows=['Product','Services','Licenses','Other'];
+      for(let i2=0;i2<4;i2++){ const r=4+i2;
+        cells['A'+r]={...blankCell(),value:rows[i2],txt:true};
+        cells['B'+r]={...blankCell(),value:rnd(40,300)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),value:rnd(40,300)*5,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      cells['A8']={...blankCell(),value:'Total',txt:true,bold:true};
+      cells['B8']={...blankCell(),value:'#REF!',txt:true};
+      let c8=0; for(let r=4;r<=7;r++) c8+=cells['C'+r].value;
+      cells['C8']={...blankCell(),formula:'=SUM(C4:C7)',value:c8};
+      cells['A10']={...blankCell(),value:'Svc margin (Q2)',txt:true};
+      cells['B10']={...blankCell(),value:'#DIV/0!',txt:true};
+      cells['A11']={...blankCell(),value:'Total growth Q2/Q1',txt:true};
+      cells['B11']={...blankCell(),value:'#VALUE!',txt:true};
+      const svc=cells['C5'].value, svcCost=rnd(20,120)*5;
+      cells['D5']={...blankCell(),value:svcCost,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['D3']={...blankCell(),value:'Cost',txt:true,bold:true};
+      this._R={ refCell:'B8', refFix:'B4:B7',
+                divCell:'B10', divNum:'D5', divFix:'C5',
+                valCell:'B11', valFix:'C8', valBase:'B8' };
+      this._svc=svc; this._svcCost=svcCost;
+      return {ROWS:11, cells, active:{r:8,c:2}, sel:null, colW:{1:150}};
+    },
+    checks(S){
+      let b8=0; for(let r=4;r<=7;r++){ const x=S.cells['B'+r]; b8+=(x&&typeof x.value==='number')?x.value:0; }
+      const ref=S.cells['B8'];
+      const refOk=!!(ref&&ref.formula&&/SUM\(B4:B7\)/i.test(ref.formula.replace(/\$/g,''))&&Math.abs((ref.value||0)-b8)<1e-6);
+      const div=S.cells['B10'];
+      const wantDiv=this._svcCost/this._svc;
+      const divOk=!!(div&&div.formula&&/C5/i.test(div.formula)&&isFinite(div.value)&&Math.abs((div.value||0)-wantDiv)<1e-6);
+      const val=S.cells['B11'];
+      let c8=0; for(let r=4;r<=7;r++){ const x=S.cells['C'+r]; c8+=(x&&typeof x.value==='number')?x.value:0; }
+      const wantVal=refOk? c8/b8-1 : null;
+      const valOk=!!(val&&val.formula&&/C8/i.test(val.formula)&&/B8/i.test(val.formula)&&refOk&&isFinite(val.value)&&Math.abs((val.value||0)-wantVal)<1e-4);
+      return [
+        {label:'Rebuild the #REF! total \u2014 =SUM over the Q1 block (B8)', ok:refOk},
+        {label:'Fix the #DIV/0! margin \u2014 the denominator is Services revenue, C5 (B10)', ok:divOk},
+        {label:'Fix the #VALUE! growth \u2014 totals, not labels: C8 over B8 (B11; fix B8 first)', ok:valOk},
+      ];
+    }
+  },
+
   sumif:{
     name:'SUMIF', label:'Roll up the segments', par:52, parKeys:35,
     prompt:'Roll the ledger up by segment. Seven line items, three segments — build one SUMIF with anchored ranges at E2, then fill it down for the other two. $-lock the ranges so the fill doesn\'t walk them.',
@@ -4049,6 +4172,11 @@ function evalFormula(expr){
       let s=0; for(let p=0;p<critRefs.length;p++){
         if(eqLoose(cellRaw(critRefs[p]), crit)) s += cellNum(sumRefs[p]||''); }
       return s;
+    }
+    if(name==='COUNTIF'){   /* r97 */
+      if(!args[0].range) throw new Error('countif-args');
+      const crit = rawOf(args[1]);
+      return rangeRefs(args[0].range[0], args[0].range[1]).filter(rf=>eqLoose(cellRaw(rf),crit)).length;
     }
     const xs=flat(args);
     switch(name){
