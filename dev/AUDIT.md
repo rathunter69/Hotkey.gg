@@ -1990,3 +1990,17 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - PIPELINE SUGGESTIONS (per Wolf's invite): (a) Esc-habit micro-drill; (b)
   session-resume (reopen tab → last drill); (c) keystroke heatmap on stats.
 - v88.
+
+---
+# ROUND 90 — F4 range cycling + keystroke heatmap; Wave 2 confirmed next
+- F4 ALREADY cycled all four anchor states on single refs (none→both→row→col,
+  Excel order) — the caret bug had just made it look broken. The REAL gap:
+  RANGE references (pointed B2:D4 or typed) didn't cycle at all (single-ref
+  regex failed → F4 dead). Both branches now cycle both ends together like
+  Excel: B2:D4 → $B$2:$D$4 → B$2:D$4 → $B2:$D4 → B2:D4. Unit-simmed ✓.
+- KEYSTROKE HEATMAP shipped: each clean run folds its keyLog into a
+  persistent hk_key_counts tally (top-80 chords kept); stats page renders
+  "Your keyboard" — top-12 chord bars (accent fill, counts).
+- WAVE 2 CONFIRMED as the next arc: gameplay-loop redesign/refinement
+  (seamless advance, onboarding walkthrough, learn-from-zero, formula bar).
+- v89.

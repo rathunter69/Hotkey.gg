@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=88" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=88">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=88">
+<link rel="icon" href="favicon.ico?v=89" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=89">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=89">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1027,14 +1027,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=88"></script>
-<link rel="stylesheet" href="nav.css?v=88">
-<script src="themes.js?v=88"></script>
+<script src="drills.js?v=89"></script>
+<link rel="stylesheet" href="nav.css?v=89">
+<script src="themes.js?v=89"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=88"></script>
+<script src="nav.js?v=89"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4820,6 +4820,19 @@ function cycleAnchor(){
   // reference sitting immediately behind the caret instead. F4 must always work.
   if(!editPointer || editPointerStart < 0){
     const head = editBuf.slice(0, editCaret);
+    // r90: typed RANGE behind the caret cycles both ends together
+    const mr = /(\$?)([A-J])(\$?)(\d+):(\$?)([A-J])(\$?)(\d+)$/.exec(head);
+    if(mr){
+      const [full, d1, c1, d2, r1, , c2, , r2] = mr;
+      const states = [ ['',''], ['$','$'], ['','$'], ['$',''] ];
+      const idx = states.findIndex(s=>s[0]===d1 && s[1]===d2);
+      const nx = states[(idx+1)%4];
+      const rep = nx[0]+c1+nx[1]+r1 + ':' + nx[0]+c2+nx[1]+r2;
+      const start = editCaret - full.length;
+      editBuf = editBuf.slice(0,start) + rep + editBuf.slice(editCaret);
+      editCaret = start + rep.length;
+      return true;
+    }
     const m = /(\$?)([A-J])(\$?)(\d+)$/.exec(head);
     if(!m) return false;
     const [full, d1, col, d2, row] = m;
@@ -4833,6 +4846,19 @@ function cycleAnchor(){
     return true;
   }
   const curRef = editBuf.slice(editPointerStart);
+  // r90: RANGE pointers cycle too (Excel: F4 anchors BOTH ends together)
+  const mr = curRef.match(/^(\$?)([A-Z]+)(\$?)(\d+):(\$?)([A-Z]+)(\$?)(\d+)$/);
+  if(mr){
+    const [, d1, c1, d2, r1, , c2, , r2] = mr;
+    let a, b;
+    if(!d1 && !d2)      { a='$'+c1+'$'+r1; b='$'+c2+'$'+r2; }
+    else if(d1 && d2)   { a=c1+'$'+r1;     b=c2+'$'+r2; }
+    else if(!d1 && d2)  { a='$'+c1+r1;     b='$'+c2+r2; }
+    else                { a=c1+r1;          b=c2+r2; }
+    editBuf = editBuf.slice(0, editPointerStart) + a + ':' + b;
+    editCaret = editBuf.length;
+    return true;
+  }
   // Match the four cycle states by current text
   const m = curRef.match(/^(\$?)([A-Z]+)(\$?)(\d+)$/);
   if(!m) return false;
@@ -7763,6 +7789,14 @@ function logRunLite(t){
   try{
     const a=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]');
     a.push({time_ms:Math.round(t*1000), keystrokes:keyLog.length, optimal:CHALLENGES[cur].parKeys});
+    // r90: keystroke heatmap feed — tally the chords this run actually used
+    try{
+      const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+      keyLog.forEach(kk=>{ if(kk && kk.length<=16){ kc[kk]=(kc[kk]||0)+1; } });
+      const ks=Object.keys(kc);
+      if(ks.length>80){ ks.sort((x,y)=>kc[x]-kc[y]).slice(0,ks.length-80).forEach(k2=>delete kc[k2]); }
+      localStorage.setItem('hk_key_counts', JSON.stringify(kc));
+    }catch(e){}
     while(a.length>400) a.shift();
     localStorage.setItem('hk_runs_lite', JSON.stringify(a));
   }catch(e){}
