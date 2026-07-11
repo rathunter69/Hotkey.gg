@@ -2104,3 +2104,23 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   auto-close. KNOWN SHORTCUTS queued: silent 0 on eval failure (needs a
   #VALUE! state), no circular-ref detection, text-in-SUM counts 0.
 - v94.
+
+---
+# ROUND 96 — THE EVALUATOR TURN: comparators + IF; the Sticky Switch drill
+- EVALUATOR UPGRADE: cmp_() level added BELOW +/- (Excel's lowest
+  precedence) — =, <>, <, <=, >, >= all land as 1/0; IF(cond,a,b) in fn()
+  (eager branches). Args and the top-level parse route through cmp_ so IF
+  conditions work anywhere. Unit-proven on EXTRACTED evaluator code:
+  precedence, all six comparators, nested IF, and the full sticky pattern
+  =B10*(1+IF(B3=1,B5,IF(B3=2,C5,D5))) flipping with the switch.
+- NEW DRILL — "Sticky switch" (cases, Formulas group): a titled revenue
+  build with a scenario switch (1/2/3), a growth-by-case block, five FY
+  columns. Build the F4-anchored sticky IF in C10, ctrl+R it across, then
+  FLIP THE SWITCH to Downside — the recalc engine repopulates the whole row
+  from one cell (the r95 finding made this drill possible as designed).
+  Checks: anchored live IF / filled with walking year refs / switch at 3
+  with the row recomputed. 40-seed verified under the harness recalc rule.
+  par 95 / parKeys 62.
+- Doctrine compliance: tab title, labeled sections, content randomized
+  (growth rates, base revenue, FY start), 3 motions, associate checklists.
+- v95.

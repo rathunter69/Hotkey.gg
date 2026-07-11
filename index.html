@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=94" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=94">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=94">
+<link rel="icon" href="favicon.ico?v=95" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=95">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=95">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1053,14 +1053,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=94"></script>
-<link rel="stylesheet" href="nav.css?v=94">
-<script src="themes.js?v=94"></script>
+<script src="drills.js?v=95"></script>
+<link rel="stylesheet" href="nav.css?v=95">
+<script src="themes.js?v=95"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=94"></script>
+<script src="nav.js?v=95"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3694,6 +3694,67 @@ const CHALLENGES = {
       ];
     }
   },
+  cases:{
+    name:'Sticky switch', label:'Sticky IFs \u2014 one switch runs the model', par:95, parKeys:62,
+    prompt:'Every real model has a scenario switch: one cell that flips Base / Upside / Downside and repopulates the whole tab. Build the sticky IF once \u2014 anchored so hard it can\u2019t drift \u2014 fill it across five years, then FLIP THE SWITCH and watch the row obey. This is how you make one sheet answer three questions.',
+    req(){ return '<em>C10</em> \u00b7 =B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5))) \u2014 F4 every anchor \u00b7 fill C10:F10 with <em>ctrl+r</em> \u00b7 then set the switch: <em>B3</em> \u2192 3 \u00b7 the row repopulates itself'; },
+    guide:[
+      'C10 \u00b7 type the sticky IF: <kbd>=</kbd>B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5))) \u2014 <kbd>F4</kbd> locks every case ref \u00b7 <kbd>\u21b5</kbd>',
+      'select C10:F10 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the anchors hold, the year refs walk',
+      'B3 \u00b7 type <kbd>3</kbd> <kbd>\u21b5</kbd> \u2014 the switch flips to Downside and every year recomputes',
+    ],
+    targets:['C10','C10:F10','B3'],
+    demo(){
+      return [
+        {sel:'C10', keys:[...T('=B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5)))'), Kb.enter]},
+        {sel:'C10:F10', keys:[Kb.fillR]},
+        {sel:'B3', keys:[...T('3'), Kb.enter]},
+      ];
+    },
+    build(){
+      const cells={};
+      const co=codename();
+      cells['A1']={...blankCell(),value:co+' \u2014 Revenue build, scenario-driven ($000s)',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Scenario (1=Base 2=Up 3=Down)',txt:true};
+      cells['B3']={...blankCell(),value:1,fontColor:'blue',ball:true};
+      cells['A5']={...blankCell(),value:'Growth by case',txt:true,bold:true};
+      const gB=rnd(3,7), gU=gB+rnd(3,6), gD=gB-rnd(4,8);
+      cells['B5']={...blankCell(),value:gB/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
+      cells['C5']={...blankCell(),value:gU/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
+      cells['D5']={...blankCell(),value:gD/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
+      cells['B6']={...blankCell(),value:'Base',txt:true}; cells['C6']={...blankCell(),value:'Upside',txt:true}; cells['D6']={...blankCell(),value:'Downside',txt:true};
+      const y0=24+rnd(0,2);
+      cells['A9']={...blankCell(),value:'Item',txt:true,bold:true};
+      for(let c=2;c<=6;c++) cells[colLetter(c)+'9']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
+      cells['A10']={...blankCell(),value:'Revenue',txt:true,bold:true};
+      cells['B10']={...blankCell(),value:rnd(120,400)*5,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      this._g=[gB/100,gU/100,gD/100];
+      return {ROWS:11, cells, active:{r:10,c:3}, sel:null, colW:{1:150}};
+    },
+    checks(S){
+      const g=this._g;
+      const sw=S.cells['B3'] ? Math.round(S.cells['B3'].value) : 1;
+      const gi=(sw>=1&&sw<=3)?g[sw-1]:g[0];
+      let liveOk=true, valOk=true;
+      let prev=S.cells['B10']?S.cells['B10'].value:0;
+      for(let c=3;c<=6;c++){
+        const L=colLetter(c), P=colLetter(c-1);
+        const cell=S.cells[L+'10'];
+        if(!cell||!cell.formula){ liveOk=false; valOk=false; continue; }
+        const f=cell.formula.toUpperCase().replace(/\s/g,'');
+        if(!f.includes('IF(') || !f.includes('$B$3') || !f.includes('$B$5') || !f.includes('$D$5') || !f.includes(P+'10')) liveOk=false;
+        const want=prev*(1+gi);
+        if(Math.abs((cell.value||0)-want)>Math.max(1e-6,Math.abs(want)*1e-9)) valOk=false;
+        prev=want;
+      }
+      return [
+        {label:'Build the sticky IF in C10 \u2014 switch and case refs F4-anchored, prior year relative', ok:liveOk && !!(S.cells['C10']&&S.cells['C10'].formula)},
+        {label:'Fill it across C10:F10 \u2014 anchors hold, each year compounds off the prior', ok:liveOk},
+        {label:'Flip the switch to Downside (B3 = 3) \u2014 the whole row repopulates from ONE cell', ok: sw===3 && valOk},
+      ];
+    }
+  },
+
   lookup2:{
     name:'2-way', label:'Two-way lookup', par:60, parKeys:50,
     prompt:'The query names a company AND a metric — and the metric columns shuffle every round. One formula, two MATCHes: INDEX the whole data block, MATCH the company down the rows, MATCH the metric across the headers.',
@@ -3997,13 +4058,22 @@ function evalFormula(expr){
       case 'MAX': return Math.max(...xs);
       case 'ABS': return Math.abs(xs[0]);
       case 'ROUND': return Math.round(xs[0]*Math.pow(10,xs[1]||0))/Math.pow(10,xs[1]||0);
+      case 'IF': return (args[0]&&args[0].val) ? (args[1]?args[1].val:0) : (args[2]?args[2].val:0);   /* r96: eager IF — branches pre-evaluated */
       default: throw new Error('fn '+name);
     } }
+  /* r96: comparators — Excel's lowest precedence; TRUE/FALSE land as 1/0 */
+  function cmp_(){ let v=expr_(); skip();
+    while(s[i]==='<'||s[i]==='>'||s[i]==='='){
+      let op=s[i++]; if((op==='<'&&(s[i]==='='||s[i]==='>'))||(op==='>'&&s[i]==='=')) op+=s[i++];
+      const r=expr_();
+      v = (op==='='? (v===r) : op==='<>'? (v!==r) : op==='<'? (v<r) : op==='<='? (v<=r) : op==='>'? (v>r) : (v>=r)) ? 1 : 0;
+      skip(); }
+    return v; }
   function expr_(){ let v=term(); skip(); while(s[i]==='+'||s[i]==='-'){ const o=s[i++]; const t=term(); v=o==='+'?v+t:v-t; skip(); } return v; }
   function term(){ let v=pow_(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=pow_(); v=o==='*'?v*f:v/f; skip(); } return v; }
   function pow_(){ let v=fac(); skip(); while(s[i]==='^'){ i++; const e=fac(); v=Math.pow(v,e); skip(); } return v; }
   function fac(){ skip();
-    if(s[i]==='('){ i++; const v=expr_(); skip(); if(s[i]!==')') throw new Error('paren'); i++; return v; }
+    if(s[i]==='('){ i++; const v=cmp_(); skip(); if(s[i]!==')') throw new Error('paren'); i++; return v; }   /* r96: parens admit comparisons */
     if(s[i]==='-'){ i++; return -fac(); }
     if(s[i]==='+'){ i++; return fac(); }
     let m=/^\d*\.?\d+/.exec(s.slice(i)); if(m){ i+=m[0].length; return parseFloat(m[0]); }
@@ -4015,10 +4085,10 @@ function evalFormula(expr){
     if(rng){ i+=rng[0].length; return {range:[rng[1].toUpperCase(),rng[2].toUpperCase()]}; }
     const str=/^"([^"]*)"/.exec(s.slice(i));   // quoted text criteria, e.g. SUMIF(A:A,"NA",B:B)
     if(str){ i+=str[0].length; return {val:str[1]}; }
-    const st=i; const v=expr_(); const cons=s.slice(st,i).trim();
+    const st=i; const v=cmp_(); const cons=s.slice(st,i).trim();   /* r96: args parse comparisons (IF conditions) */
     if(/^\$?[A-Za-z]+\$?\d+$/.test(cons)) return {val:v, ref:cons.replace(/\$/g,'').toUpperCase()};
     return {val:v}; }
-  const r=expr_(); skip(); if(i<s.length) throw new Error('trailing'); return r;
+  const r=cmp_(); skip(); if(i<s.length) throw new Error('trailing'); return r;
 }
 function autoSum(){
   const {r,c}=S.active;
