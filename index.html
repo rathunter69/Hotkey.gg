@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=89" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=89">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=89">
+<link rel="icon" href="favicon.ico?v=90" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=90">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=90">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -88,11 +88,16 @@
 
   .fbar{display:flex; align-items:stretch; margin-bottom:0; border:0!important; border-bottom:1px solid var(--line)!important; border-radius:0!important; font-family:var(--mono);
     font-size:13px; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--surface)}
+  .fx-hint{display:none; position:absolute; top:100%; left:120px; z-index:24; margin-top:4px;
+    background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:5px 11px;
+    font-family:var(--mono); font-size:11.5px; color:var(--muted); white-space:nowrap}
+  .fx-hint b{color:var(--accent); font-weight:700}
+  .fx-hint.show{display:block}
   .namebox{min-width:56px; padding:7px 10px; color:var(--accent); background:var(--surface2);
     border-right:1px solid var(--line); text-align:center; font-weight:500}
   .fx{padding:7px 11px; color:var(--faint); font-style:italic; font-family:var(--sans);
     border-right:1px solid var(--line); display:flex; align-items:center}
-  .fcontent{flex:1; padding:7px 13px; color:var(--text); white-space:nowrap; overflow:hidden;
+  .fcontent{flex:1; padding:7px 13px; color:var(--text); white-space:nowrap; overflow-x:auto; scrollbar-width:none;   /* r91: long formulas scroll, caret kept in view */
     text-overflow:ellipsis; display:flex; align-items:center; min-width:0}
   .fcontent.isfx{color:var(--accent)}
   .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
@@ -945,7 +950,23 @@
   .mm-hardo-l b{color:var(--text); font-weight:700}
   @keyframes rfshake{0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
   /* ---- landing overlay (fades to the app on start) ---- */
-  /* r68: mobile gate — the game needs a physical keyboard */
+  /* r91: first-run tour — spotlight ring + frame-language caption card */
+  .tour-wrap{display:none; position:fixed; inset:0; z-index:340}
+  .tour-wrap.on{display:block}
+  .tour-wrap::before{content:''; position:absolute; inset:0; background:rgba(16,17,21,.55)}
+  .tour-ring{position:absolute; border:2px solid var(--accent); border-radius:10px;
+    box-shadow:0 0 0 9999px rgba(16,17,21,.55); transition:all .28s cubic-bezier(.2,.8,.2,1)}
+  .tour-card{position:absolute; width:330px; background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; overflow:hidden; transition:all .28s cubic-bezier(.2,.8,.2,1)}
+  .tour-cap{min-height:32px; display:flex; align-items:center; justify-content:space-between; padding:5px 13px;
+    background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono);
+    font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+  .tour-body{padding:13px 15px 15px; font-family:var(--mono); font-size:12.5px; color:var(--muted); line-height:1.6}
+  .tour-body b{color:var(--text)}
+  .tour-foot{display:flex; gap:8px; padding:0 15px 14px; font-family:var(--mono); font-size:11px}
+  .tour-next{color:var(--accent); cursor:pointer; border:1px solid var(--accent-dim); border-radius:6px; padding:4px 12px}
+  .tour-skip{color:var(--faint); cursor:pointer; padding:4px 8px}
+    /* r68: mobile gate — the game needs a physical keyboard */
   .mobile-gate{display:none}
   @media (max-width:740px), (pointer:coarse) and (max-width:1024px){
     .mobile-gate{display:flex; position:fixed; inset:0; z-index:400; align-items:center; justify-content:center;
@@ -1027,14 +1048,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=89"></script>
-<link rel="stylesheet" href="nav.css?v=89">
-<script src="themes.js?v=89"></script>
+<script src="drills.js?v=90"></script>
+<link rel="stylesheet" href="nav.css?v=90">
+<script src="themes.js?v=90"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=89"></script>
+<script src="nav.js?v=90"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1099,7 +1120,8 @@
     <div class="stage-row">
       <div class="stage-main">
         <div class="ribbon" id="ribbon"></div>
-        <div class="fbar">
+        <div class="fbar" style="position:relative">
+          <div id="fxHint" class="fx-hint"></div>
           <span class="namebox" id="nameBox">A1</span>
           <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span>
           <span class="fx"><i>fx</i></span>
@@ -1161,6 +1183,10 @@
   </div>
 </div>
 <div class="auth-modal" id="authModal"></div>
+<div id="tourWrap" class="tour-wrap">
+  <div class="tour-ring" id="tourRing"></div>
+  <div class="tour-card" id="tourCard"></div>
+</div>
 <div class="mobile-gate" aria-hidden="true">
   <div class="mg-card">
     <div class="mg-cap">hotkey<b>.gg</b></div>
@@ -4523,7 +4549,7 @@ function _showResults(o){
     `<div class="rm-rank" id="rmRank"></div>`+
     `<div class="rm-opts">`+
     `<button class="rm-key" data-act="again"><kbd>↵ enter</kbd>again</button>`+
-    `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next drill \u2192</button>`+
+    `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
     `<button class="rm-key" data-act="next"><kbd>space</kbd>next</button>`+
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
     `</div>`+
@@ -4632,7 +4658,7 @@ function syncTabs(){
     cel.innerHTML=(gc?'<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+gc+';margin-right:6px;vertical-align:1px"></span>':'')+(GROUP_OF[cur]||'Drill'); }
   C.__gCache=null;   // site-driven drills re-randomize per load; guide text must follow
   requestAnimationFrame(()=>{ try{ render(); }catch(e){} });   // r56: second pass re-measures the laid-out box for exact row fit
-  renderSheetTabs();
+  renderSheetTabs(); rememberDrill();
   if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450); }   // r80: between drills — gameplay moment, zero overlap
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
@@ -4877,6 +4903,8 @@ function cycleAnchor(){
 }
 
 function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
+(function(){ const _r=render; render=function(){ _r.apply(this,arguments);
+  try{ updateFxHint(); const fc=document.querySelector('.fcontent'); if(fc && editing) fc.scrollLeft=fc.scrollWidth; }catch(e){} }; })();   // r91
 function updateChecklist(){
   const el=$('checklist'); if(!el||!S) return;
   el.classList.toggle('dense', (CHALLENGES[cur].checks(S)||[]).length>=5 || guided);
@@ -4917,6 +4945,33 @@ function guideAltNote(stepHtml){
 const ARROWSYM={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
 function arrowLabel(k,shift,ctrl){ return (ctrl?'Ctrl+':'')+(shift?'Shift+':'')+ARROWSYM[k]; }
 let flashTimer=null, flashChips=[];
+const FN_SIGS={ IF:['condition','if_true','if_false'], SUM:['range'], SUMIF:['range','criteria','sum_range'],
+  AVERAGE:['range'], MIN:['range'], MAX:['range'], COUNT:['range'], COUNTA:['range'],
+  INDEX:['array','row_num','col_num'], MATCH:['lookup_value','lookup_array','0'],
+  VLOOKUP:['value','table','col_index','FALSE'], HLOOKUP:['value','table','row_index','FALSE'],
+  IFERROR:['value','value_if_error'], ROUND:['number','digits'], ABS:['number'], EOMONTH:['start','months'] };
+function updateFxHint(){
+  const el=$('fxHint'); if(!el) return;
+  if(!editing || !editBuf.startsWith('=')){ el.classList.remove('show'); return; }
+  // innermost open function call before the caret
+  const head=editBuf.slice(0, editCaret);
+  let depth=0, fn=null, argIdx=0;
+  for(let i=head.length-1;i>=0;i--){
+    const ch=head[i];
+    if(ch===')') depth++;
+    else if(ch===','){ if(depth===0) argIdx++; }
+    else if(ch==='('){
+      if(depth>0){ depth--; continue; }
+      const m=/([A-Za-z]+)$/.exec(head.slice(0,i));
+      if(m && FN_SIGS[m[1].toUpperCase()]){ fn=m[1].toUpperCase(); }
+      break;
+    }
+  }
+  if(!fn){ el.classList.remove('show'); return; }
+  const args=FN_SIGS[fn];
+  el.innerHTML=fn+'( '+args.map((a,i2)=>i2===Math.min(argIdx,args.length-1)?'<b>'+a+'</b>':a).join(', ')+' )';
+  el.classList.add('show');
+}
 function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0); playTick(); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); }
 function flashKey(t){
   const el=$('keyflash'); if(!el) return;
@@ -5378,6 +5433,9 @@ document.addEventListener('keydown',e=>{
     e.preventDefault(); return;
   }
   // SHIFT+F11 restarts the run (Excel: "insert new sheet" — fresh start). ESC no longer restarts.
+  if(__tourI>=0){ e.preventDefault();
+    if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourShow(TOUR_STEPS.length); }
+    return; }
   if(k==='F11' && e.shiftKey){ e.preventDefault(); loadChallenge(cur); return; }
   // ESC only backs out of the ribbon now (matches Excel; frees Esc for normal use)
   if(k==='Escape' && mode==='ribbon'){ e.preventDefault(); exitRibbon(false); return; }   // normal-mode Esc falls through to marquee-cancel / restart below
@@ -5438,6 +5496,13 @@ document.addEventListener('keydown',e=>{
   }
 
   // ENTER ribbon
+  if(e.altKey && (k==='ArrowRight'||k==='ArrowLeft') && !editing && mode!=='ribbon'){
+    // r91 seamless loop: Alt+→/← hops drills without the picker (Alt+PgUp/Dn still walks groups)
+    e.preventDefault();
+    const i=MENU_ORDER.indexOf(cur), n=MENU_ORDER.length;
+    loadChallenge(MENU_ORDER[(i+(k==='ArrowRight'?1:n-1))%n]);
+    return;
+  }
   if(k==='Alt'){ e.preventDefault(); logKey('Alt'); enterRibbon(); return; }
   if(e.altKey){ e.preventDefault(); if(k==='='){ startClock(); logKey('Alt'); logKey('='); pushUndo(); autoSum(); commitAction(); } return; }
 
@@ -6646,7 +6711,7 @@ function exitSession(){
   document.body.classList.remove('session');
   document.body.classList.remove('rapidfire');
   hideSessionSummary();
-  loadChallenge(MENU_ORDER[0]);
+  loadChallenge((()=>{ try{ const d=localStorage.getItem('hk_last_drill'); if(d && CHALLENGES[d]) return d; }catch(e){} return MENU_ORDER[0]; })());   // r91: resume where you left off
 }
 function hideSessionSummary(){ sessionOpen=false; const m=$('sessionModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 function showSessionSummary(){
@@ -7649,7 +7714,7 @@ async function introRibbonPeek(){
 }
 
 /* ---------- access gate (invite code, enforced server-side) ---------- */
-function advanceAccess(){
+function advanceAccess(){ try{ setTimeout(maybeStartTour, 900); }catch(e){}
   if(!sb){ closeGate(); return; }
   if(!enterRequested){ return; }                       // hold at the landing until Start
   if(BETA_MODE){
@@ -7841,6 +7906,40 @@ async function hydratePBFromServer(){
     if(changed){ await savePB(); renderSheetTabs(); }
   }catch(e){}
 }
+/* r91: one-time first-run tour — the buddy-bounce fix */
+const TOUR_STEPS=[
+  {sel:'.gridwrap',   cap:'the sheet',     body:'This is <b>Excel without the mouse</b>. Arrows move. Type to enter. <b>=</b> starts a formula. Everything is graded on the END STATE \u2014 any keystroke path that gets there counts.'},
+  {sel:'.cl-inner',   cap:'your instructions', body:'The <b>checklist</b> is the ask \u2014 like an associate\u2019s markup. Green means done. Finish every line and the clock stops.'},
+  {sel:'.fbar',       cap:'formula bar',   body:'Watch your formula build here. <b>F4</b> cycles $-locks on the reference you\u2019re pointing at. <b>Esc</b> backs out of a cell safely \u2014 it will never restart your run.'},
+  {sel:'.drillbar',   cap:'the trainer',   body:'<b>\\</b> opens the drill map. <b>Alt+\u2190/\u2192</b> hops drills. <b>F1</b> toggles guided mode when you\u2019re lost \u2014 it walks you key by key.'},
+];
+let __tourI=-1;
+function tourShow(i){
+  const w=$('tourWrap'), ring=$('tourRing'), card=$('tourCard');
+  if(!w||!ring||!card) return;
+  if(i>=TOUR_STEPS.length){ w.classList.remove('on'); try{ localStorage.setItem('hk_tour_done','1'); }catch(e){} __tourI=-1; return; }
+  __tourI=i;
+  const st=TOUR_STEPS[i];
+  const el=document.querySelector(st.sel);
+  if(!el){ tourShow(i+1); return; }
+  w.classList.add('on');
+  const r=el.getBoundingClientRect();
+  ring.style.left=(r.left-6)+'px'; ring.style.top=(r.top-6)+'px';
+  ring.style.width=(r.width+12)+'px'; ring.style.height=(r.height+12)+'px';
+  const below=r.bottom+14+170<window.innerHeight;
+  card.style.left=Math.max(12, Math.min(window.innerWidth-346, r.left))+'px';
+  card.style.top=(below? r.bottom+14 : Math.max(12, r.top-190))+'px';
+  card.innerHTML='<div class="tour-cap"><span>'+st.cap+'</span><span style="color:var(--faint)">'+(i+1)+' / '+TOUR_STEPS.length+'</span></div>'+
+    '<div class="tour-body">'+st.body+'</div>'+
+    '<div class="tour-foot"><span class="tour-next" id="tourNext">'+(i===TOUR_STEPS.length-1?'start drilling':'next \u00b7 \u21b5')+'</span><span class="tour-skip" id="tourSkip">skip tour \u00b7 esc</span></div>';
+  const nx=$('tourNext'); if(nx) nx.onclick=()=>tourShow(__tourI+1);
+  const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(TOUR_STEPS.length);
+}
+function maybeStartTour(){
+  try{ if(localStorage.getItem('hk_tour_done')) return; }catch(e){}
+  setTimeout(()=>tourShow(0), 650);
+}
+function rememberDrill(){ try{ localStorage.setItem('hk_last_drill', cur); }catch(e){} }
 async function recordRun(t){
   // Anon sessions don't post to the leaderboard — scores need a permanent account behind them.
   // This keeps the leaderboard clean (no ghost/disposable entries) and creates a real value prop for signing up.

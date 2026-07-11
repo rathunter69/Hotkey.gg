@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stats · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=89" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=89">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=89">
+<link rel="icon" href="favicon.ico?v=90" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=90">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=90">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -55,8 +55,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=89">
-<script src="drills.js?v=89"></script>
+<link rel="stylesheet" href="nav.css?v=90">
+<script src="drills.js?v=90"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -64,11 +64,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=89"></script>
+<script src="themes.js?v=90"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=89"></script>
+<script src="nav.js?v=90"></script>
 
 <header class="head">
   <div class="wrap">
@@ -211,11 +211,18 @@ async function load(){
       if(!kps[r.challenge]||v>kps[r.challenge]) kps[r.challenge]=v; } });
     const kpsTop=Object.entries(kps).filter(([k])=>D.meta[k]).sort((a,b)=>b[1]-a[1]).slice(0,5);
     html += `<h3 class="section-title">Analytics <span style="float:right;font-size:9px;color:var(--warn);letter-spacing:1px">PRO \u00b7 free in beta</span></h3>`;
-    if(top.length){
-      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:10px"><div class="lbl" style="margin:0 0 10px">your most-used shortcuts \u00b7 last ${traces.length} posted runs</div>`;
-      top.forEach(([k,n])=>{ html += `<div style="display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px;margin-bottom:5px">`+
+    // r91 MERGED PANEL: local tally (every clean run) is the primary source; posted-run
+    // traces retired as a display source (kept for distinct-shortcut stat above).
+    let tally={};
+    try{ tally=JSON.parse(localStorage.getItem('hk_key_counts')||'{}'); }catch(e){}
+    let tEnts=Object.entries(tally).filter(([k])=>k.length>1||/[=+\u21b5\u232b]/.test(k)).sort((a,b)=>b[1]-a[1]).slice(0,12);
+    if(!tEnts.length) tEnts=top;   // fresh device: fall back to posted traces
+    if(tEnts.length){
+      const mxT=tEnts[0][1];
+      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:10px"><div class="lbl" style="margin:0 0 10px">your most-used shortcuts \u00b7 all clean runs on this device</div>`;
+      tEnts.forEach(([k,n])=>{ html += `<div style="display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px;margin-bottom:5px">`+
         `<span style="min-width:86px;color:var(--text)">${esc(k)}</span>`+
-        `<span style="flex:1;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${Math.round(100*n/maxF)}%;background:var(--accent);border-radius:99px"></span></span>`+
+        `<span style="flex:1;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${Math.round(100*n/mxT)}%;background:var(--accent);border-radius:99px"></span></span>`+
         `<span style="color:var(--muted);min-width:36px;text-align:right">${n}</span></div>`; });
       html += `</div>`;
     }
@@ -225,22 +232,6 @@ async function load(){
       html += `</div>`;
     }
   }
-  // r90: keystroke heatmap — which chords your hands actually drill
-  try{
-    const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
-    const ents=Object.entries(kc).filter(([k])=>k.length>1||/[=+↵⌫]/.test(k)).sort((a,b)=>b[1]-a[1]).slice(0,12);
-    if(ents.length){
-      const mx=ents[0][1];
-      html += `<h3 class="section-title">Your keyboard</h3><div class="panel" style="margin-bottom:18px">`;
-      ents.forEach(([k,n])=>{
-        html += `<div style="display:grid;grid-template-columns:120px 1fr 48px;gap:10px;align-items:center;font-family:var(--mono);font-size:12px;padding:3px 0">`+
-          `<span style="color:var(--text)">${k.replace(/</g,'&lt;')}</span>`+
-          `<span style="height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${Math.max(3,Math.round(n/mx*100))}%;background:var(--accent)"></span></span>`+
-          `<span style="color:var(--muted);text-align:right">${n}</span></div>`;
-      });
-      html += `</div>`;
-    }
-  }catch(e){}
   html += `<h3 class="section-title">Per-drill</h3>`;
   let lastG=null;
   D.menuOrder.forEach(k=>{

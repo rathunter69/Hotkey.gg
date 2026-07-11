@@ -2004,3 +2004,24 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - WAVE 2 CONFIRMED as the next arc: gameplay-loop redesign/refinement
   (seamless advance, onboarding walkthrough, learn-from-zero, formula bar).
 - v89.
+
+---
+# ROUND 91 — WAVE 2a: seamless loop, first-run tour, formula bar, panel merge
+- SEAMLESS LOOP: Alt+←/→ hops prev/next drill from anywhere (no picker
+  round-trip); session RESUME (hk_last_drill — reopening the tab restores your
+  drill, not the default); results card's Next button now names its
+  destination ("next: Margins →").
+- FIRST-RUN TOUR (the buddy-bounce fix): one-time 4-step spotlight — grid
+  (arrows/=/end-state grading), checklist (the associate's markup), formula
+  bar (F4 locks, Esc is safe), trainer (\\ map, Alt+←/→, F1 guided). Accent
+  ring + frame-language caption card, ↵ next / esc skip, hk_tour_done.
+  Triggered 900ms after access advances.
+- FORMULA BAR: long formulas now SCROLL (caret kept in view via render wrap);
+  FUNCTION HINTS live — =IF( floats "IF( condition, if_true, if_false )"
+  under the bar with the CURRENT ARG bolded; parser tracks the innermost open
+  call through nesting (unit-proven: nested MATCH inside INDEX, arg
+  advancement after closing). 16 signatures seeded.
+- STATS PANELS MERGED per Wolf: one "most-used shortcuts" block in Analytics
+  fed by the local tally (all clean runs on device; posted traces only as a
+  fresh-device fallback); the r90 standalone panel removed.
+- v90.
