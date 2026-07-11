@@ -2025,3 +2025,19 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   fed by the local tally (all clean runs on device; posted traces only as a
   fresh-device fallback); the r90 standalone panel removed.
 - v90.
+
+---
+# ROUND 92 — WAVE 2b: checklist voice (tranche 1), tour meta steps, learn-from-zero
+- CHECKLIST LANGUAGE tranche 1 (11 labels: combo/foot/lookup/sumif/audit/
+  blocksel): associate voice — verb-first, the ITEM named, refs kept where
+  templated ("Total every row down column F — live SUMs, not typed numbers").
+  Tranche 2 rides the Wave-3 density rework (labels churn there anyway).
+  ANCHOR LESSON: labels mix literal em-dashes and \u2014 escapes — the label
+  patcher now tries both encodings (first attempt aborted correctly on it).
+- TOUR +3 META STEPS (7 total, one line each): game modes (#mbRapidBtn, rapid
+  fire pitched), your card (#authSlot — xp, levels, the rank ladder, player
+  card), the boards (crowns, "the desk is watching"). Orientation in ~20s.
+- LEARN FROM ZERO: first-ever player (no runs, no PBs) starts drill #1 with
+  guided ON + toast ("follow the highlighted keys · F1 turns it off").
+  One-shot (hk_learn_done); veterans never see it.
+- v91.

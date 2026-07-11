@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=90" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=90">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=90">
+<link rel="icon" href="favicon.ico?v=91" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=91">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=91">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1048,14 +1048,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=90"></script>
-<link rel="stylesheet" href="nav.css?v=90">
-<script src="themes.js?v=90"></script>
+<script src="drills.js?v=91"></script>
+<link rel="stylesheet" href="nav.css?v=91">
+<script src="themes.js?v=91"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=90"></script>
+<script src="nav.js?v=91"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1371,10 +1371,10 @@ const CHALLENGES = {
       let wr=true; for(let r=2;r<=6;r++){ const e=S.cells['E'+r]; if(!e||!e.wrap) wr=false; }
       let af=true; for(let c=2;c<=4;c++){ if(overflowsCol(S,c)) af=false; }
       return [
-        {label:'bold the header row', ok:hb},
-        {label:'comma-format B:D, 0 dec', ok:cf},
-        {label:'wrap the notes column', ok:wr},
-        {label:'autofit — no ####', ok:af},
+        {label:'Bold the header row \u2014 row 1, every filled cell', ok:hb},
+        {label:'Comma-format the figures in B:D \u2014 zero decimals', ok:cf},
+        {label:'Wrap the notes column so nothing spills into the sheet', ok:wr},
+        {label:'Autofit the columns \u2014 no #### left anywhere', ok:af},
       ];
     }
   },
@@ -1425,7 +1425,7 @@ const CHALLENGES = {
         {label:'SUM the total', ok:sum},
         {label:'bold + top border on total', ok:tot},
         {label:'comma-format column B', ok:cf},
-        {label:'autofit — no ####', ok:af},
+        {label:'Autofit the columns \u2014 no #### left anywhere', ok:af},
       ];
     }
   },
@@ -1663,7 +1663,7 @@ const CHALLENGES = {
       const usesIM=f.includes('INDEX(')&&f.includes('MATCH(');
       const valOk=!!(g&&g.formula)&&expected!=null&&Math.abs(g.value-expected)<1e-6;
       return [
-        {label:'pull the figure with INDEX + MATCH', ok: usesIM},
+        {label:'Pull the queried figure with INDEX + MATCH \u2014 no eyeballing, no hardcode', ok: usesIM},
         {label:'answer matches the queried company × metric', ok: valOk},
       ];
     }
@@ -2035,7 +2035,7 @@ const CHALLENGES = {
     checks(S){
       const bold=k=>{ const c=S.cells[k]; return !!(c&&c.bold); };
       return [
-        {label:'the whole target island is bold \u2014 both columns, every row', ok: this._tk.every(bold)},
+        {label:'Bold the whole target island \u2014 both columns, every row', ok: this._tk.every(bold)},
         {label:'the decoy island stays plain \u2014 precision, not just speed', ok: this._dk.every(k=>!bold(k))},
       ];
     }
@@ -2169,9 +2169,9 @@ const CHALLENGES = {
       const rowOk=r=>live('F'+r)&&Math.abs(val('F'+r)-(val('B'+r)+val('C'+r)+val('D'+r)+val('E'+r)))<1e-6;
       const colOk=cc=>{ const L2=colLetter(cc); return live(L2+'7')&&Math.abs(val(L2+'7')-(val(L2+'2')+val(L2+'3')+val(L2+'4')+val(L2+'5')))<1e-6; };
       return [
-        {label:'four live row totals down column F', ok: [2,3,4,5].every(rowOk)},
-        {label:'four live column totals across row 7', ok: [2,3,4,5].every(colOk)},
-        {label:'the grand total agrees with BOTH edges', ok: live('F7')&&Math.abs(val('F7')-this._g)<1e-6},
+        {label:'Total every row down column F \u2014 live SUMs, not typed numbers', ok: [2,3,4,5].every(rowOk)},
+        {label:'Total every column across row 7 \u2014 live SUMs', ok: [2,3,4,5].every(colOk)},
+        {label:'Land the grand total \u2014 it has to tie to BOTH the row and column edges', ok: live('F7')&&Math.abs(val('F7')-this._g)<1e-6},
       ];
     }
   },
@@ -3602,7 +3602,7 @@ const CHALLENGES = {
         const u=S.cells['B'+r] ? S.cells['B'+r].value : 0;
         if(!f.includes('B'+r) || Math.abs(c.value-this._price*u)>1e-6) allOk=false;
       }
-      return [{label:'every revenue formula reads its OWN row \u2014 column ties out', ok: allOk}];
+      return [{label:'Find and fix the broken formula \u2014 every revenue line must read its OWN row', ok: allOk}];
     }
   },
   sumif:{
@@ -3645,7 +3645,7 @@ const CHALLENGES = {
         return f.includes('SUMIF')&&f.includes('D'+(i+2))&&Math.abs(c.value-this._sums[this._cats[i]])<1e-6; };
       let anchored=true; const c0=S.cells['E3'];   // filled rows prove the anchors held
       return [
-        {label:'SUMIF per segment, criteria pointing at column D (all 3)', ok: ok(0)&&ok(1)&&ok(2)},
+        {label:'Roll each segment up with SUMIF \u2014 criteria pointing at column D (all 3)', ok: ok(0)&&ok(1)&&ok(2)},
       ];
     }
   },
@@ -4659,6 +4659,16 @@ function syncTabs(){
   C.__gCache=null;   // site-driven drills re-randomize per load; guide text must follow
   requestAnimationFrame(()=>{ try{ render(); }catch(e){} });   // r56: second pass re-measures the laid-out box for exact row fit
   renderSheetTabs(); rememberDrill();
+  // r92: LEARN FROM ZERO — a genuinely new player (no runs, no PBs) gets guided ON
+  // for their very first drill, with a gentle note. One time; F1 hands over control.
+  try{
+    if(!localStorage.getItem('hk_learn_done')){
+      const fresh = !localStorage.getItem('hk_runs_lite') && Object.keys(PB||{}).length===0;
+      if(fresh && !guided){ toggleGuided();
+        setTimeout(()=>showToast('guided mode is on for your first run \u2014 follow the highlighted keys \u00b7 F1 turns it off'), 800); }
+      localStorage.setItem('hk_learn_done','1');
+    }
+  }catch(e){}
   if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450); }   // r80: between drills — gameplay moment, zero overlap
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
@@ -7912,6 +7922,9 @@ const TOUR_STEPS=[
   {sel:'.cl-inner',   cap:'your instructions', body:'The <b>checklist</b> is the ask \u2014 like an associate\u2019s markup. Green means done. Finish every line and the clock stops.'},
   {sel:'.fbar',       cap:'formula bar',   body:'Watch your formula build here. <b>F4</b> cycles $-locks on the reference you\u2019re pointing at. <b>Esc</b> backs out of a cell safely \u2014 it will never restart your run.'},
   {sel:'.drillbar',   cap:'the trainer',   body:'<b>\\</b> opens the drill map. <b>Alt+\u2190/\u2192</b> hops drills. <b>F1</b> toggles guided mode when you\u2019re lost \u2014 it walks you key by key.'},
+  {sel:'#mbRapidBtn', cap:'game modes',    body:'<b>Rapid fire</b>: ribbon ops against the clock. Marathon chains drills back to back. Different muscles, same grader.'},
+  {sel:'#authSlot',   cap:'your card',     body:'Every clean solve earns <b>xp</b>. Levels climb, and your <b>rank crest</b> evolves from Summer Analyst up the banking ladder \u2014 crest, level ring, and achievements all live on your <b>player card</b>, right here.'},
+  {sel:'.nav a[href*="leaderboard"]', cap:'the boards', body:'Clean, mouseless runs post to the <b>leaderboard</b> \u2014 per-drill boards, crowns for first place. The desk is watching.'},
 ];
 let __tourI=-1;
 function tourShow(i){
