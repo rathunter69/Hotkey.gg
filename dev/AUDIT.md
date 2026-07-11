@@ -1971,3 +1971,22 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   ellipsis (min 52px) so dense groups compress instead of colliding;
   horizontal scroll remains.
 - v87.
+
+---
+# ROUND 89 — Wave 1 continues: the ribbon regression, Esc-restart removed, handle-save repaint
+- RIBBON TYPES LETTERS, root-caused (Wolf's "text writing feature" theory was
+  RIGHT): type-to-replace (any bare letter starts an Enter-mode edit, ~5207)
+  sits ~130 lines BEFORE the mode==='ribbon' branch. Excel alt-walks are
+  tap-Alt-RELEASE-then-letters, so walk letters arrive bare and got eaten as
+  cell input. Fix: mode!=='ribbon' added to the type-to-replace guard.
+- ESC RESTART REMOVED: despite r49 comments claiming otherwise, Escape on the
+  grid still called restartDrill(). Esc now cancels marching ants, otherwise
+  NOTHING. Restart = Shift+F11 + results card. Comment rewritten to match.
+- LOGIN-REFRESH residual: nav repaint fired on session (r70) but NOT after the
+  handle upserts (promptHandle + beta gate) — first-time namers stayed
+  nameless until reload. navRefreshAuth() kicks the moment either saves.
+- PROCESS: 89b's tail check used an over-narrow regex and aborted a correct
+  build (set -e as designed); completed here after verifying worktree state.
+- PIPELINE SUGGESTIONS (per Wolf's invite): (a) Esc-habit micro-drill; (b)
+  session-resume (reopen tab → last drill); (c) keystroke heatmap on stats.
+- v88.

@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=87" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=87">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=87">
+<link rel="icon" href="favicon.ico?v=88" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=88">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=88">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1027,14 +1027,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=87"></script>
-<link rel="stylesheet" href="nav.css?v=87">
-<script src="themes.js?v=87"></script>
+<script src="drills.js?v=88"></script>
+<link rel="stylesheet" href="nav.css?v=88">
+<script src="themes.js?v=88"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=87"></script>
+<script src="nav.js?v=88"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -5204,7 +5204,10 @@ document.addEventListener('keydown',e=>{
   // TYPE-TO-REPLACE (r41): typing any printable char on a selected cell starts an
   // Enter-mode edit seeded with it — Excel's most basic entry behavior. Sits after
   // the app hotkeys above; '=' and '+' fall through to the formula starter below.
-  if(!editing && k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey && k!=='=' && k!=='+'){
+  if(!editing && mode!=='ribbon' && k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey && k!=='=' && k!=='+'){
+    /* r89: THE RIBBON REGRESSION — Excel alt-walks are tap-Alt-RELEASE-then-letters, so the
+       walk letters arrive bare; without the mode guard, type-to-replace ate them before the
+       ribbon branch (which sits ~130 lines below) ever saw them. */
     e.preventDefault(); startClock(); startEdit(k, 'enter'); logKey(k); render(); return; }
 
   // AUTHENTIC sheet-switch (Ctrl+PgUp / Ctrl+PgDn) — only in installed/standalone app mode,
@@ -5414,14 +5417,14 @@ document.addEventListener('keydown',e=>{
 
   const dirs={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
   if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey); return; }
-  // ESC on the grid: first press cancels an active copy (Excel's marching ants), otherwise
-  // it restarts the drill — fresh build, fresh clock. Recovery is always one visible key;
-  // the worst mistake costs you a restart, never a stuck sheet.
+  // r89: ESC NEVER RESTARTS. Excel muscle memory hammers Esc to back out of cells/formulas;
+  // a stray Esc nuking a run is exactly the wrong punishment. Esc = cancel marching ants,
+  // otherwise nothing. Restart lives on Shift+F11 and the results card.
   if(k==='F11'){ e.preventDefault(); return; }   // fullscreen sits next to F2 — swallow it; too costly a misfire mid-drill
   if(k==='Escape' && !e.ctrlKey && !e.altKey){
     e.preventDefault();
-    if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); return; }
-    restartDrill(); showToast('drill restarted'); return;
+    if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); }
+    return;
   }
   // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey){
@@ -7535,6 +7538,7 @@ async function saveHandle(){
   const h=inp.value.trim().slice(0,24); if(!h) return;
   try{
     const { error } = await sb.from('profiles').upsert({ id: me_user.id, handle: h, updated_at: new Date().toISOString() });
+      try{ (window.navRefreshAuth||function(){})(); }catch(e2){}   // r89: the nav learns your name the moment it exists
     if(!error) me_handle=h;
   }catch(e){}
   refreshAuthUI(); closeAuth(); advanceAccess();
@@ -7746,6 +7750,7 @@ async function submitBetaCode(){
     me_member = true;
     // 3. save handle to profiles (upsert by user id)
     const { error: upErr } = await sb.from('profiles').upsert({ id: me_user.id, handle });
+      try{ (window.navRefreshAuth||function(){})(); }catch(e2){}   // r89: the nav learns your name the moment it exists
     if(upErr){ setMsg('Couldn\u2019t save your handle: '+(upErr.message||''), true); return; }
     me_handle = handle;
     // 4. in
