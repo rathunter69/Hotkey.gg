@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=93" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=93">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=93">
+<link rel="icon" href="favicon.ico?v=94" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=94">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=94">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1053,14 +1053,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=93"></script>
-<link rel="stylesheet" href="nav.css?v=93">
-<script src="themes.js?v=93"></script>
+<script src="drills.js?v=94"></script>
+<link rel="stylesheet" href="nav.css?v=94">
+<script src="themes.js?v=94"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=93"></script>
+<script src="nav.js?v=94"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4856,6 +4856,10 @@ function commitEdit(dr,dc){
     const cell=ensure(S.active.r,S.active.c);
     if(buf[0]==='='){ cell.formula=buf; let v; try{ v=evalFormula(buf); }catch(_){ v=NaN; } cell.value=isFinite(v)?v:0; cell.txt=false; }
     else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf); cell.txt=false; }
+    /* r95 audit (Excel parity): bankers type these — they must land as NUMBERS, not text */
+    else if(/^-?[\d,]+\.?\d*$/.test(buf) && /,/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf.replace(/,/g,'')); cell.txt=false; cell.fmtStyle=cell.fmtStyle||'comma'; if(cell.decimals===undefined) cell.decimals=0; }
+    else if(/^-?\d*\.?\d+%$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf)/100; cell.txt=false; cell.fmtStyle='percent'; if(cell.decimals===undefined) cell.decimals=/\./.test(buf)?1:0; }
+    else if(/^\([\d,]+\.?\d*\)$/.test(buf)){ cell.formula=null; cell.value=-parseFloat(buf.replace(/[(),]/g,'')); cell.txt=false; }
     else { cell.formula=null; cell.value=buf; cell.txt=true; }
   }
   if(dr||dc){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
@@ -5039,8 +5043,8 @@ function flashKey(t){
 function resetFlash(){ flashChips=[]; clearTimeout(flashTimer);
   const el=$('keyflash'); if(el){ el.classList.remove('show'); el.innerHTML=''; }
   const kn=$('keyN'); if(kn) kn.textContent='0'; }
-function snapshot(){ return {cells:JSON.parse(JSON.stringify(S.cells)), colW:colW.slice()}; }
-function restore(s){ S.cells=JSON.parse(JSON.stringify(s.cells)); colW=s.colW.slice(); }
+function snapshot(){ return {cells:JSON.parse(JSON.stringify(S.cells)), colW:colW.slice(), ROWS:S.ROWS}; }   /* r95 audit: ROWS was missing — undo after a row insert/delete corrupted the sheet's geometry */
+function restore(s){ S.cells=JSON.parse(JSON.stringify(s.cells)); colW=s.colW.slice(); if(s.ROWS!==undefined) S.ROWS=s.ROWS; }
 function pushUndo(){ undoStack.push(snapshot()); if(undoStack.length>60) undoStack.shift(); redoStack=[]; }
 function undoAct(){ if(!undoStack.length) return; redoStack.push(snapshot()); restore(undoStack.pop());
   if(S){ S.lastRowOp=null; S.undoN=(S.undoN||0)+1; }
@@ -5425,6 +5429,7 @@ document.addEventListener('keydown',e=>{
       // If we're in pointer mode, Backspace removes the whole reference at once (Excel parity).
       if(editPointer){
         editBuf = editBuf.slice(0, editPointerStart);
+        editCaret = editBuf.length;   /* r95 audit: same caret-desync class as the F4 bug */
         editPointer = null; editPointerStart = -1; editPointerBase = null;
       } else if(editCaret>0){
         editBuf = editBuf.slice(0, editCaret-1) + editBuf.slice(editCaret);

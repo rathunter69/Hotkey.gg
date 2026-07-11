@@ -2081,3 +2081,26 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - PSEUDO-CHECK CULL: blocksel decoy + polish decoy checks REMOVED; both
   drills verified still grading.
 - v93.
+
+---
+# ROUND 95 — ENGINE AUDIT (Wolf-directed) + a correction that matters
+- THE HEADLINE CORRECTION: r94's "no-recalc" finding was WRONG. commitAction
+  runs recalc() — an 8-pass fixed-point recompute over every formula cell.
+  The engine (Opus-built) was BETTER than I credited; the "unsolvable drill"
+  was my harness mutating cells directly and bypassing recalc. Doctrine rule
+  retracted; replaced with the HARNESS RULE (simulated solves must run a
+  recalc-equivalent before judging). The shipped 4am-pass design stays — the
+  cross-foot defect is better pedagogy anyway — but the reasoning is fixed.
+- REAL BUGS FOUND & FIXED by the audit:
+  (1) snapshot()/restore() omitted S.ROWS — undo after a row insert/delete
+      restored cells but kept the mutated row count: ghost rows / hidden
+      data. Geometry now snapshots.
+  (2) pointer-Backspace left editCaret beyond the truncated buffer — the
+      F4 caret-desync's sibling (edit-mode arrows then misbehaved).
+  (3) NUMBER-ENTRY PARITY: '1,000', '50%', '(500)' were stored as TEXT.
+      They now land as numbers (comma fmt / percent fmt / negative) — the
+      inputs bankers actually type.
+- VERIFIED SOLID: fill's translateFormula ($-aware), F4 range cycle, paren
+  auto-close. KNOWN SHORTCUTS queued: silent 0 on eval failure (needs a
+  #VALUE! state), no circular-ref detection, text-in-SUM counts 0.
+- v94.
