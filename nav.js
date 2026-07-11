@@ -556,11 +556,13 @@
           '<span style="display:inline-flex;line-height:0">'+(window.rankEmblem?window.rankEmblem(tier.name,84):'')+'</span>' +
           '<div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:13px;background:none;box-shadow:none">'+tier.name+'</div>' +
           '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+standing+'</div>' +
+          '<div style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:4px">rank \u00b7 speed vs the field</div>' +
         '</div>' +
         '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
           (window.hkLevelRing?window.hkLevelRing(__L.lvl, __L.pct, 84):'') +
           '<div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)">LEVEL '+__L.lvl+'</div>' +
           '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+__L.into+' / '+__L.need+' xp</div>' +
+          '<div style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:4px">level \u00b7 earned from reps</div>' +
         '</div>' +
       '</div>' +
       badgesHtml +

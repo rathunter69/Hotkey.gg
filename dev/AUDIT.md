@@ -2041,3 +2041,23 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   guided ON + toast ("follow the highlighted keys · F1 turns it off").
   One-shot (hk_learn_done); veterans never see it.
 - v91.
+
+---
+# ROUND 93 — Wave 2 CLOSED: guided visibility, demo naming, the two-ladders doctrine
+- GUIDED MODE VISIBLE: body.guided-on — accent seam on the frame border, a
+  live "● guided · practice" chip in the checklist cap, and the F1 toggle lit
+  accent. Practice state (doesn't post to boards) is never a surprise now.
+- DEMO NAMING unified: the toolbar button is "▶ watch solution" (was "▶ demo")
+  with a tooltip; matches the language used in drill copy. Single source of
+  the term going forward.
+- TWO LADDERS DOCTRINE (Wolf's clarification, now visible in product):
+  LEVEL = reps (xp from clean solves, volume-driven, never decays).
+  RANK = competition (drills beaten + speed percentile vs the field).
+  Tour "your card" step rewritten around the split; player card showcase
+  tiles now captioned "rank · speed vs the field" / "level · earned from
+  reps". Logged as doctrine in PROJECT_CONTEXT.
+- PIPELINE +1 (Wolf): CENTER ACROSS SELECTION drill — fold into the Wave-3
+  formatting rework (Ctrl+1 alignment path; the classic no-merge doctrine).
+- Wave 2 remainder Ctrl+PgUp/PgDn stays parked on PWA (browser-reserved).
+  WAVE 2 IS CLOSED. Wave 3 (content/density arc) is next.
+- v92.

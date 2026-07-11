@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=91" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=91">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=91">
+<link rel="icon" href="favicon.ico?v=92" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=92">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=92">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -258,6 +258,11 @@
   .cl-head{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase;
     letter-spacing:.6px; margin-bottom:8px; display:flex; gap:8px; align-items:center}
   .cl-head span{color:var(--accent); font-weight:500}
+  /* r93: guided mode is VISIBLE — accent seam on the frame, live chip in the rail cap,
+     lit toggle. Practice state should never be a surprise (it doesn't post to boards). */
+  body.guided-on .frame{border-color:var(--accent-dim)}
+  body.guided-on .cl-head::after{content:'\25CF guided \u00b7 practice'; color:var(--accent); margin-left:auto; letter-spacing:.08em}
+  body.guided-on #guideToggle{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
   .cl-item{display:flex; align-items:center; gap:10px; padding:6px 0; color:var(--muted); transition:color .15s;
     border-bottom:1px solid color-mix(in srgb, var(--line) 45%, transparent)}  /* hairline row rules — sheet texture */
   .cl-item:last-of-type{border-bottom:0}
@@ -1048,14 +1053,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=91"></script>
-<link rel="stylesheet" href="nav.css?v=91">
-<script src="themes.js?v=91"></script>
+<script src="drills.js?v=92"></script>
+<link rel="stylesheet" href="nav.css?v=92">
+<script src="themes.js?v=92"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=91"></script>
+<script src="nav.js?v=92"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1105,7 +1110,7 @@
         </div>
       </div>
       <span class="mb-spacer"></span>
-      <button class="mb-tool" id="demoBtn">▶ demo</button>
+      <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">\u25b6 watch solution</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
@@ -5631,6 +5636,7 @@ $('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-ke
   const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>F1</kbd> guided: '+(guided?'on':'off'); } }
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn();
+  try{ document.body.classList.toggle('guided-on', guided); }catch(e){}   // r93: the whole frame says so
   if(S) render();
   if(gameMode==='rapidfire' && rfTask) renderRfCard('show');
   else if(!S) updateChecklist();
@@ -7923,7 +7929,7 @@ const TOUR_STEPS=[
   {sel:'.fbar',       cap:'formula bar',   body:'Watch your formula build here. <b>F4</b> cycles $-locks on the reference you\u2019re pointing at. <b>Esc</b> backs out of a cell safely \u2014 it will never restart your run.'},
   {sel:'.drillbar',   cap:'the trainer',   body:'<b>\\</b> opens the drill map. <b>Alt+\u2190/\u2192</b> hops drills. <b>F1</b> toggles guided mode when you\u2019re lost \u2014 it walks you key by key.'},
   {sel:'#mbRapidBtn', cap:'game modes',    body:'<b>Rapid fire</b>: ribbon ops against the clock. Marathon chains drills back to back. Different muscles, same grader.'},
-  {sel:'#authSlot',   cap:'your card',     body:'Every clean solve earns <b>xp</b>. Levels climb, and your <b>rank crest</b> evolves from Summer Analyst up the banking ladder \u2014 crest, level ring, and achievements all live on your <b>player card</b>, right here.'},
+  {sel:'#authSlot',   cap:'your card',     body:'Two ladders: <b>LEVEL</b> is your reps \u2014 every clean solve earns xp. <b>RANK</b> is the competition \u2014 how many drills you\u2019ve beaten and how fast, against everyone else. Crest, ring, and achievements live on your <b>player card</b>, right here.'},
   {sel:'.nav a[href*="leaderboard"]', cap:'the boards', body:'Clean, mouseless runs post to the <b>leaderboard</b> \u2014 per-drill boards, crowns for first place. The desk is watching.'},
 ];
 let __tourI=-1;
