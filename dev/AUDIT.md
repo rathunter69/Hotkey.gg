@@ -2323,3 +2323,30 @@ statement layouts, named companies, FY headers, associate-voice checklists.
   hardcode-fail assertion (dress: no formulas to strip). 40 seeds × 7 pass;
   tranche-2 + r100 drills re-verified under v2.
 - v102.
+
+---
+# ROUND 104 — ESCAPE-LEAK CLASS KILLED + FULL-CATALOG HARNESS DRAGNET
+- Wolf: "watch solution shows \\u25b6" + "we still have latent bugs I can't
+  audit by hand." Both answered systematically this round.
+- ESCAPE-LEAK CLASS: \\uXXXX written where it isn't JS (markup/CSS renders it
+  literally). Swept ALL pages (script-stripped regex). FOUR user-visible hits:
+  demoBtn markup (\\u25b6 watch solution), guided chip CSS content (showed
+  'u00b7'), leaderboard your-row checkmark CSS content (showed 'u2713'),
+  stats subtitle markup (showed 'u2014'). Fixed via HTML entities / proper
+  CSS escapes (\\00B7, \\2713). RULE: \\uXXXX escapes are JS-STRING-ONLY;
+  markup gets &#x...;, CSS content gets \\XXXX. Sweep is repeatable.
+- DRAGNET: harness v2 ran ALL 55 drills (25 seeds sweep mode). Classifier
+  distinguishes real fails from replayer limits (r95 harness rule — no
+  false alarms). RESULT: 33/55 MACHINE-VERIFIED (28 full triple-assert incl
+  lookup after exposing eqLoose to the sandbox; 5 formatting drills
+  solve+fresh verified, hardcode N/A). ZERO new content bugs found.
+- NOT YET MACHINE-VERIFIABLE (the residual latent-bug pool): pointer-mode
+  demos (margin/percent/growth/bridge/balance/revolver...), F2/audit/editfix,
+  copy-paste family, sort, series/rowops dialogs, navigation (stateful).
+  QUEUED (the big lever): DEMO-REPLAY E2E — Playwright drives each drill's
+  own demo() through the REAL engine and asserts the win screen; that
+  verifies all 55 end-to-end incl input handling, no simulator gap. Next
+  infra round.
+- Sweep classifier fix: unknown alt-walk terminals now throw UNSUPPORTED
+  instead of silently no-oping (rowops/series were misreported as fails).
+- v103.

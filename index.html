@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=102" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=102">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=102">
+<link rel="icon" href="favicon.ico?v=103" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=103">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=103">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -261,7 +261,7 @@
   /* r93: guided mode is VISIBLE — accent seam on the frame, live chip in the rail cap,
      lit toggle. Practice state should never be a surprise (it doesn't post to boards). */
   body.guided-on .frame{border-color:var(--accent-dim)}
-  body.guided-on .cl-head::after{content:'\25CF guided \u00b7 practice'; color:var(--accent); margin-left:auto; letter-spacing:.08em}
+  body.guided-on .cl-head::after{content:'\25CF guided \00B7  practice'; color:var(--accent); margin-left:auto; letter-spacing:.08em}
   body.guided-on #guideToggle{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
   .cl-item{display:flex; align-items:center; gap:10px; padding:6px 0; color:var(--muted); transition:color .15s;
     border-bottom:1px solid color-mix(in srgb, var(--line) 45%, transparent)}  /* hairline row rules — sheet texture */
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=102"></script>
-<link rel="stylesheet" href="nav.css?v=102">
-<script src="themes.js?v=102"></script>
+<script src="drills.js?v=103"></script>
+<link rel="stylesheet" href="nav.css?v=103">
+<script src="themes.js?v=103"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=102"></script>
+<script src="nav.js?v=103"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1133,7 +1133,7 @@
         </div>
       </div>
       <span class="mb-spacer"></span>
-      <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">\u25b6 watch solution</button>
+      <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
