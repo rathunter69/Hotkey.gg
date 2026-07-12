@@ -2110,7 +2110,7 @@ const CHALLENGES = {
   },
   blocksel:{
     name:'Block Sel.', label:'Grab the whole block', par:30, parKeys:3,
-    prompt:'TWO data islands on the page \u2014 bold the target one, entirely, and leave the other untouched. Ctrl+Shift+arrows ride the data edges; the grader checks both islands. Selection speed IS Excel speed \u2014 and precision is the other half.',
+    prompt:'TWO data islands on the page \u2014 and your brief is only ONE of them. Ctrl+Shift+arrows ride the data edges: land on the target island, take the whole thing in two chords, bold it. The second island is there to test your aim \u2014 the grader wants the entire target, nothing less',
     req(){ const o=this._o; return 'on <em>'+o.t0+'</em> \u00b7 <em>ctrl+\u21e7+\u2193</em> then <em>ctrl+\u21e7+\u2192</em> grabs the island \u00b7 <em>ctrl+b</em> \u00b7 the '+o.dName+' block stays plain'; },
     guide(){ const o=this._o; return [
       'the target island starts at <b>'+o.t0+'</b> \u2014 <kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2193</kbd> rides to its last row',

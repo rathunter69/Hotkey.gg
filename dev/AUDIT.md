@@ -2439,3 +2439,28 @@ statement layouts, named companies, FY headers, associate-voice checklists.
   wear blue. Checks: links BROKEN + values exact, column blue. 66/30
   (was 13/9). e2e 8/8 WIN.
 - v106.
+
+---
+# ROUND 109 — T6 AUDIT (clean, one copy lie fixed) + TEAMS DESIGN TURN (Wave 4 #27)
+- T6 audit-first: format/center/blue/combo/polish/dress + navigation/copyover/
+  blocksel/autofit/filldr/saves/undo/rowops all reviewed against Specificity +
+  Mix. Verdict: surfaces and graders at bar (dress is the flagship template;
+  micro-reps keep tight surfaces by design; all e2e-verified). NO rebuilds —
+  no-churn doctrine.
+- ONE FIX: blocksel's prompt claimed "the grader checks both islands" — false
+  since the r94 decoy-check cull (grader is target-only). Prompt rewritten:
+  the second island tests your AIM; grader wants the entire target. (polish's
+  'know where formatting stops' copy makes no grader claim — kept.)
+- TEAMS/CLUBS/SCHOOLS design doc SHIPPED (dev/TEAMS_DESIGN.md) — the design
+  turn #27 required before code: thesis (teams = distribution; captain =
+  10-150 players), personas, v1 joinable-team schema (teams + team_members,
+  RLS, one-team-per-player, ?team=CODE join link into the landing gate),
+  v2 captain assignments (the corporate primitive dressed as a club
+  feature), v3 corporate gated on internship end, anti-goals, and 4 open
+  questions for Wolf (Desks naming, size cap, single-team rule, seeding).
+  BUILD BLOCKS ON WOLF'S ANSWERS.
+- WAVE 3 CONTENT ARC COMPLETE as of this round: T2 (r102) T3 (r103) T4a
+  (r105) T4b (r107) T5 (r108) T6 (r109) + e2e verification lever (r106).
+  Remaining Wave 3 stragglers ride later rounds: comments/citations design,
+  center-across-selection (needs alignment-span render), growth #26 CLOSED.
+- No shared-asset change (index prompt + dev/ doc) — ?v stays 106.
