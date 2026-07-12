@@ -299,7 +299,7 @@
 
   async function loadProfileData(){
     const p = await window.sb.from('profiles').select('id,handle,flair');
-    const r = await window.sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
+    const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true});
     let mySessions=[];
     try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', window._navUser.id);
       mySessions=se.data||[]; }catch(e){}
@@ -356,22 +356,11 @@
      (repeat-grinding decays) · daily runs 30 · weekly gauntlet legs 25 ·
      placement: 25/top-10, 100/podium, 250/crown. */
   function computeXP(d, myRuns, mySessions){
+    // r116: XP v4 lives in HK_RANK.computeXP (themes.js) ONLY — this wrapper just
+    // shapes the board bonuses. Four drifted copies died in this consolidation.
     let crowns=0, podiums=0, top10s=0;
     d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; if(x.rank!==null&&x.rank<=10) top10s++; });
-    const PARS=window.HOTKEY_PARS||{};
-    const perDrill={}; let xp=0;
-    (myRuns||[]).forEach(r=>{
-      const ch=r.challenge||'';
-      if(ch.indexOf('daily-')===0){ xp+=30; return; }
-      if(ch.indexOf('wk-')===0){ xp+=25; return; }
-      const nth=(perDrill[ch]=(perDrill[ch]||0)+1);
-      // r60: smooth diminishing repeats (Wolf: adaptive XP) — grinding one drill decays
-      // instead of paying flat-15 nine times then cliffing. Reprices history in beta.
-      const rep=[0,0,15,10,7,5][Math.min(nth,5)] ?? 0;
-      xp += nth===1 ? (50 + ((PARS[ch]||0)>=55?15:0)) : (nth<=5 ? rep : (nth<=10 ? 3 : 1));
-    });
-    (mySessions||[]).forEach(s=>{ xp += s.mode==='marathon' ? 20 : 10; });
-    return xp + 25*top10s + 100*podiums + 250*crowns;
+    return window.HK_RANK ? window.HK_RANK.computeXP(myRuns, {t10:top10s, pod:podiums, crowns:crowns}, mySessions) : 0;
   }
   function levelOf(xp){ let lvl=1, need=150, floor=0;
     while(xp >= floor+need){ floor+=need; lvl++; need=150*lvl; }

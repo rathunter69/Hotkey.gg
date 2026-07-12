@@ -278,14 +278,32 @@ window.HK_RANK = {
   levelOf(xp){ let lvl=1, need=150, floor=0;
     while(xp>=floor+need){ floor+=need; lvl++; need=150*lvl; }
     return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; },
-  computeXP(myRuns, pl){
-    const perD={}; let xp=0;
-    (myRuns||[]).forEach(r=>{ const ch=r.challenge||'';
+  /* XP v4 (r116, Wolf-approved — "the trading day"): first-ever solve keeps the big
+     spine (50, +15 advanced); repeat decay runs PER DRILL PER UTC DAY (15/10/7/5,
+     floor 2) and RESETS at midnight — the catalog is renewable, breadth beats spam;
+     +25 warm-up for the first solve of each active day. Lifetime decay (v2/v3)
+     RETIRED: it paid loyal players worst. ONE implementation — every page delegates
+     here (r116 killed four drifted copies). Runs need created_at for day buckets;
+     legacy rows without it share one bucket (history reprices in beta). */
+  computeXP(myRuns, pl, mySessions){
+    const PARS=(typeof window!=='undefined'&&window.HOTKEY_PARS)||{};
+    const LADDER=[15,10,7,5];
+    const buckets={}, firstEver={}, days={};
+    let xp=0;
+    (myRuns||[]).forEach(r=>{
+      const ch=r.challenge||'';
+      const day=String(r.created_at||'').slice(0,10)||'x';
+      days[day]=1;
       if(ch.indexOf('daily-')===0){ xp+=30; return; }
       if(ch.indexOf('wk-')===0){ xp+=25; return; }
-      const nth=(perD[ch]=(perD[ch]||0)+1);
-      xp += nth===1 ? 50 : (nth<=10 ? 15 : 3); });
-    return xp + 25*(pl.t10||0) + 100*(pl.pod||0) + 250*(pl.crowns||0);
+      const k=day+'|'+ch;
+      const nthToday=(buckets[k]=(buckets[k]||0)+1);
+      xp += nthToday<=LADDER.length ? LADDER[nthToday-1] : 2;
+      if(!firstEver[ch]){ firstEver[ch]=1; xp += (50+((PARS[ch]||0)>=55?15:0)) - LADDER[0]; }
+    });
+    xp += 25*Object.keys(days).length;
+    (mySessions||[]).forEach(s=>{ xp += (s&&s.mode==='marathon')?20:10; });
+    return xp + 25*((pl&&pl.t10)||0) + 100*((pl&&pl.pod)||0) + 250*((pl&&pl.crowns)||0);
   },
   /* RATING v2 — a shrunk, size-weighted average placement.
      Fixes two exploits of the naive average:

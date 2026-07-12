@@ -1,5 +1,5 @@
-# XP v4 — "THE TRADING DAY" (design pass, r113 — Wolf review, NOT implemented)
-_Wolf's prompt: is lifetime decay right? First solve, then progressive solves,
+# XP v4 — "THE TRADING DAY" (designed r113, Wolf-approved, SHIPPED r116)
+_Status: LIVE as of r116 (v112). Wolf's prompt: is lifetime decay right? First solve, then progressive solves,
 plus a daily reset to encourage return users. This doc is the pass; nothing
 ships until he nods._
 

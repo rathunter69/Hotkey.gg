@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=111" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=111">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=111">
+<link rel="icon" href="favicon.ico?v=112" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=112">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=112">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1079,14 +1079,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=111"></script>
-<link rel="stylesheet" href="nav.css?v=111">
-<script src="themes.js?v=111"></script>
+<script src="drills.js?v=112"></script>
+<link rel="stylesheet" href="nav.css?v=112">
+<script src="themes.js?v=112"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=111"></script>
+<script src="nav.js?v=112"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4988,15 +4988,24 @@ function checkWin(){
   if(!mouseUsed && !guidedUsed){
     if(dailyMode){ xpGain=30; xpNote='daily challenge'; }
     else if(weeklyMode){ xpGain=25; xpNote='gauntlet leg'; }
-    else if(PB[sk]===undefined){ const adv=(CHALLENGES[cur].par>=55);
-      xpGain=50+(adv?15:0); xpNote='first clear'+(adv?' \u00b7 advanced bonus':''); }
     else {
-      // r60: mirrors nav.js computeXP's diminishing schedule (canonical math reprices
-      // from the runs table; this local estimate tracks it via a clear counter)
-      let clears={}; try{ clears=JSON.parse(localStorage.getItem('hk_clears')||'{}'); }catch(e){}
-      const nth=(clears[cur]||1)+1;   // this clear's ordinal (counter increments above, pre-estimate)
-      xpGain = nth<=5 ? [0,0,15,10,7,5][nth] : (nth<=10 ? 3 : 1);
-      xpNote = nth>10 ? 'clean solve \u00b7 well-worn drill' : (nth>2 ? 'clean solve \u00b7 diminishing' : 'clean solve');
+      // r116 XP v4: the decay ladder is DAILY now (hk_clears_day) — resets at midnight,
+      // breadth beats spam; +25 warm-up on the first solve of each day. Canonical math
+      // reprices from the runs table (HK_RANK.computeXP); this estimate mirrors it.
+      let cd={d:'',counts:{}}; try{ cd=JSON.parse(localStorage.getItem('hk_clears_day')||'{}')||cd; }catch(e){}
+      const today=new Date().toISOString().slice(0,10);
+      if(cd.d!==today){ cd={d:today, counts:{}}; }
+      const warm = Object.keys(cd.counts).length===0 && Object.values(cd.counts).reduce((a,b)=>a+b,0)===0;
+      const nthToday=(cd.counts[cur]=(cd.counts[cur]||0)+1);
+      try{ localStorage.setItem('hk_clears_day', JSON.stringify(cd)); }catch(e){}
+      if(PB[sk]===undefined){ const adv=(CHALLENGES[cur].par>=55);
+        xpGain=50+(adv?15:0); xpNote='first clear'+(adv?' \u00b7 advanced bonus':''); }
+      else {
+        const LAD=[15,10,7,5];
+        xpGain = nthToday<=LAD.length ? LAD[nthToday-1] : 2;
+        xpNote = nthToday===1 ? 'clean solve \u00b7 fresh today' : (nthToday<=4 ? 'clean solve \u00b7 diminishing today' : 'clean solve \u00b7 worn for today \u2014 fresh tomorrow');
+      }
+      if(warm){ xpGain+=25; xpNote+=' \u00b7 +25 warm-up'; }
     }
   }
   lastXpGain={n:xpGain, note:xpNote};
@@ -7715,9 +7724,14 @@ function openXpInfo(){
   m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
 }
 function xpEarnFor(key){
-  // what the NEXT clean solve of this drill pays (client estimate; repeat decay not shown)
-  if(PB[key]===undefined) return 50 + ((CHALLENGES[key]&&CHALLENGES[key].par>=55)?15:0);
-  return 15;
+  // r116 XP v4: what the NEXT clean solve pays TODAY (daily ladder + warm-up aware)
+  let cd={d:'',counts:{}}; try{ cd=JSON.parse(localStorage.getItem('hk_clears_day')||'{}')||cd; }catch(e){}
+  const today=new Date().toISOString().slice(0,10);
+  const counts=(cd.d===today && cd.counts)||{};
+  const warm=Object.values(counts).reduce((a,b)=>a+b,0)===0 ? 25 : 0;
+  if(PB[key]===undefined) return 50 + ((CHALLENGES[key]&&CHALLENGES[key].par>=55)?15:0) + warm;
+  const LAD=[15,10,7,5]; const nth=(counts[key]||0)+1;
+  return (nth<=LAD.length ? LAD[nth-1] : 2) + warm;
 }
 function restartDrill(){
   loadChallenge(cur, {daily:dailyMode, weekly:weeklyMode});   // same drill, same mode; daily/weekly reseed identically

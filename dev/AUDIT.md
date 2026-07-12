@@ -2604,3 +2604,24 @@ Wolf's #29 ("same tier everywhere — audit") turned out to be FIVE live defects
   overflow), 3 chips + reroll render, click fills, reroll changes, format
   regex holds; zero page errors; node --check all; e2e green.
 - v111.
+
+---
+# ROUND 116 — XP v4 SHIPPED ("the trading day") + FOUR-COPY CONSOLIDATION
+- Wolf approved the r113 design ("run xp pass"). LIVE: first-ever solve keeps
+  the 50(+15 adv) spine; repeat decay is PER DRILL PER UTC DAY (15/10/7/5,
+  floor 2) and resets at midnight; +25 warm-up on each day's first solve;
+  daily 30 / wk 25 / sessions 20/10 / board bonuses unchanged. History
+  reprices (levels generally go UP — old 1-xp runs reprice daily-fresh).
+- CONSOLIDATION: audit found FOUR drifted computeXP copies pricing xp three
+  different ways (nav r60 decay · themes flat 50/15/3 · leaderboard flat
+  50/15/3 variant · index local estimate) — account/stats already disagreed
+  with the nav card TODAY. Now: HK_RANK.computeXP (themes.js) is the ONLY
+  implementation; nav + leaderboard delegate; index keeps a day-aware local
+  ESTIMATE (hk_clears_day) for the +xp chip/celebrations, xpEarnFor predicts
+  today's ladder + warm-up.
+- runs selects gained created_at (nav + leaderboard; account already had it)
+  — day buckets need it; legacy rows share one bucket.
+- VERIFY: canonical math unit-proven on extracted code (composite scenario
+  =307 exact; breadth 525 vs grind 109; two-day reset 115); node --check all;
+  e2e ALL GREEN (solve path exercises the new estimate); boot clean.
+- v112.

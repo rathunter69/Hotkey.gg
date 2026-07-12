@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=111" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=111">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=111">
+<link rel="icon" href="favicon.ico?v=112" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=112">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=112">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -184,15 +184,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=111">
-<script src="drills.js?v=111"></script>
+<link rel="stylesheet" href="nav.css?v=112">
+<script src="drills.js?v=112"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=111"></script>
+<script src="themes.js?v=112"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=111"></script>
+<script src="nav.js?v=112"></script>
 
 <header class="head">
   <div class="wrap">
@@ -321,7 +321,7 @@ async function load(){
     try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null; }catch(e){}
     const [p, r, se, tm, tt] = await Promise.all([
       sb.from('profiles').select('id,handle,team_code'),
-      sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true}),
+      sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
       sb.from('team_members').select('team_id,user_id'),
       sb.from('teams').select('id,name,slug'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
@@ -495,17 +495,11 @@ function heroHtml(){
   }
   const avg=me.att?me.avg:null;
   const t=tierOf(avg, me.att, me.wsum);
-  // XP v2 — mirror of nav.js computeXP (anti-grind decay + challenge bonuses)
-  const perD={}; let xp=0;
-  DATA.fRuns.filter(x=>x.user_id===meId).forEach(r=>{
-    const ch=r.challenge||'';
-    if(ch.indexOf('daily-')===0){ xp+=30; return; }
-    if(ch.indexOf('wk-')===0){ xp+=25; return; }
-    const nth=(perD[ch]=(perD[ch]||0)+1);
-    xp += nth===1 ? (50 + (((window.HOTKEY_PARS||{})[ch]||0)>=55?15:0)) : (nth<=10 ? 15 : 3);
-  });
-  DATA.fSessions.filter(x=>x.user_id===meId).forEach(x=>{ xp += x.mode==='marathon'?20:10; });
-  xp += 25*me.t10+100*me.pod+250*me.crowns;
+  // r116: XP v4 — ONE implementation (HK_RANK.computeXP); the old inline mirror had drifted
+  const xp = window.HK_RANK.computeXP(
+    DATA.fRuns.filter(x=>x.user_id===meId),
+    {t10:me.t10||0, pod:me.pod||0, crowns:me.crowns||0},
+    DATA.fSessions.filter(x=>x.user_id===meId));
   const L=levelOf(xp);
   // NEXT RANK: first tier above the current with concrete unmet requirements
   let nextHtml='';
