@@ -3067,3 +3067,36 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   on www.hotkey.gg post-deploy (chrome address-bar install icon).
 - No shared-asset change; ?v stays 120. NEXT STRUCTURAL: S2 ghost cursor
   (PB-trace replay on the grid; traces timestamped since r9), then S4/S7/S8.
+
+---
+# ROUND 135 — MEDAL ITERATION 4 (Wolf's三 notes) + EGRESS RE-CHECK
+- EGRESS: still policy-blocked in this container (google/jsdelivr/supabase all
+  403 at the proxy gateway). The session continued in the SAME container, so
+  the env's new network policy never stamped. Smoke test needs a genuinely
+  fresh conversation w/ supabase.co (+cdn.jsdelivr.net, fonts.googleapis.com)
+  allowed. Told Wolf.
+- VOL-BAR VANISHING BUG (Wolf's catch) ROOT-CAUSED: iteration-3 volume bars
+  (and flag pole / watch hands / calendar straps) are pure straight lines —
+  ZERO-AREA bboxes, and objectBoundingBox gradients paint zero-area elements
+  as NOTHING per SVG spec. Glyph gradient now gradientUnits=userSpaceOnUse
+  (fixed 100-space coords). RULE for the port: any gradient that may land on
+  a straight-line element must be userSpaceOnUse.
+- SIX GRADES, DISTINCT TOP (Wolf: silver-vs-top too close, wants real hue
+  jumps): G1 slate → G2 bronze → G3 silver → G4 gold → G5 MYTHIC platinum
+  (teal) → G6 LEGENDARY diamond IGNITED. Reuses the rank-emblem palettes the
+  players already order instinctively. G5 wears crest studs, G6 full ignition.
+  Alternates row rendered for Wolf's pick on G5 (platinum rec. / crimson /
+  amethyst-minted).
+- G6 IS ALIVE (Wolf: "actually on fire — maybe out of scope" — it isn't):
+  SMIL sparks flicker on offset clocks, aura breathes, apex jewel glints,
+  base ember pulses. hkLevelRing precedent (r85). Playwright-PROVEN: two
+  frames of a G6 differ, two frames of a G1 identical. PORT RULE: animation
+  gates behind prefers-reduced-motion (render without animate tags).
+- Proposed mapping: G6 = Untouchable / Institution / Ten Thousand Keys;
+  G5 = Corner Office / Blink / Completionist. AWAITING WOLF on iteration 4.
+- STRUCTURAL DEPENDENCY FOUND while scoping S2: TRUE ghost-cursor replay is
+  INCOHERENT under randomized builds — a PB trace recorded on build A means
+  nothing replayed on build B. Full S2 therefore BLOCKS on the S4 seeded-RNG
+  slice (record seed per run; race mode reloads the PB's build). S2-lite
+  (ghost keystroke ticker + pace delta, build-agnostic) can ship first.
+- Proto only — no shared-asset change; ?v stays 120.
