@@ -2812,3 +2812,23 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - SUN enlarged (~15%): rays 20/16.5, disc r9.2 — fills the bronze shield.
 - VERIFY: node --check extracted script, Playwright fullPage clean, light
   + 22px chip rows legible.
+
+---
+# ROUND 126 — RANK ART ITERATION 7 (unranked/MBA split restored, gold rebalance, League colors)
+- Wolf caught a ladder regression: iterations 4-6 had merged UNRANKED and
+  MBA ASSOCIATE into one badge. Split restored to match HK_RANK: UNRANKED
+  is the generic pre-placement plate (empty cell + dashed selection
+  marquee, no buckets, no pips); MBA ASSOCIATE is the IRON floor TIER —
+  #REF! engraved identity + full bucket ladder (corner rivets at middle,
+  peak jewel + sparks + hot rim at top). TIERS array now renders all 8
+  ranked tiers; chip row is 9 (unranked + 8).
+- GOLD CREST rebalanced: hips widened (32..68 at y78), drop shortened
+  (point 90->88, taper starts y46) — horizontal/vertical mass now matches
+  the neighboring frames.
+- LEAGUE-COLOR EXPERIMENTS (Wolf: "experiment freely, League as central
+  iconography"): VP top bucket gains a platinum aura (first aura below
+  MD — makes plat feel like the door to the high ladder); SUMMIT goes
+  CHALLENGER — 4 major rays now gold + gold 4-point peak star over the
+  diamond frame (League Challenger's gold-over-blue read).
+- VERIFY: node --check extracted script, Playwright fullPage clean, light
+  + 22px chip rows legible.

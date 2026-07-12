@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 6</title>
+<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 7</title>
 <style>
   body{margin:0;font-family:'JetBrains Mono',monospace;background:#141519;color:#cdd0d6;padding:28px}
   h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 4px} .sub{font-size:11px;color:#666a72;margin-bottom:22px;max-width:980px;line-height:1.5}
@@ -17,13 +17,13 @@
   @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
   @keyframes pipglow{from{filter:brightness(1)}to{filter:brightness(1.7)}}
 </style></head><body>
-<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 6</h1>
-<div class="sub">Job-tied glyphs: gold Associate carries the BRIEFCASE, the Second-Year Analyst summit is the ROCKET (buyside exit, escape velocity). UNRANKED re-cut: chamfered iron plate, engraved steel #REF! (alarm-red dropped). Sun enlarged. Bucket escalation unchanged from iteration 5 &mdash; bottom clean / middle ornamented / top ignited, pips as the tiny-size read.</div>
+<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 7</h1>
+<div class="sub">UNRANKED and MBA ASSOCIATE split back out: unranked is the generic empty-cell plate (dashed selection marquee, placement pending), MBA ASSOCIATE is the IRON floor TIER &mdash; #REF! identity, full bucket ladder (rivets at middle, jewel + sparks at top). Gold crest rebalanced (wider hips, shorter drop). League-color experiments: VP top-bucket gains a platinum aura, the summit goes CHALLENGER &mdash; gold major rays + gold peak star over the diamond frame.</div>
 <div id="grid"></div>
 <div class="band"><div class="bandcap">LIGHT-THEME SANITY · TOP BUCKET</div><div class="row" id="light"></div></div>
 <div class="band"><div class="bandcap">SILHOUETTE TEST · 22px CHIP ROW (top bucket)</div><div class="chips" id="chips"></div></div>
 <script>
-/* Iteration 6. Canvas 100x114: emblem art in 0..100, division pips on 100..114.
+/* Iteration 7. Canvas 100x114: emblem art in 0..100, division pips on 100..114.
    BUCKET ESCALATION (the LoL read): bk1 = frame+glyph only, bk2 = +ornaments,
    bk3 = +jewel/sparks/hot rim/max glow. Pips remain the small-size language.
    Animation layers: .aura .frame .glyph .ornament .jewel .pips .sparks */
@@ -133,11 +133,27 @@ function t_unranked(sz){ const id='e'+(UID++), P=IRON;
   const sq='M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z';
   return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,0)}
     ${frame(id,P,sq,0,3.2)}
+    <path d="M21 42 L79 42 M21 60 L79 60 M41 21 L41 79 M61 21 L61 79" stroke="${P.mid}" stroke-width=".8" opacity=".22"/>
+    <path d="M28.5 22.8 L71.5 22.8" stroke="#ffffff" stroke-width="1.2" opacity=".4"/>
+    <rect x="36" y="36" width="28" height="28" fill="none" stroke="${P.mid}" stroke-width="1.6" stroke-dasharray="4.2 3.2" opacity=".85"/>
+    <rect x="36" y="36" width="28" height="28" fill="${P.core}" opacity=".07"/>
+  </svg>`; }
+function t_mba(sz,bk){ const id='e'+(UID++), P=IRON, o2=bk>=2, hot=bk===3, gl=[0,0,.35,.8][bk];
+  const sq='M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z';
+  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    ${o2?`<g class="ornament">
+      <circle cx="25.5" cy="25.5" r="2.1" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
+      <circle cx="74.5" cy="25.5" r="2.1" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
+      <circle cx="25.5" cy="74.5" r="2.1" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
+      <circle cx="74.5" cy="74.5" r="2.1" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/></g>`:''}
+    ${frame(id,P,sq,gl,3.2,hot)}
     <path d="M21 42 L79 42 M21 60 L79 60 M41 21 L41 79 M61 21 L61 79" stroke="${P.mid}" stroke-width=".8" opacity=".28"/>
     <path d="M34 16 L55 43 L45 51 L64 84" fill="none" stroke="${P.deep}" stroke-width="1.8" opacity=".75"/>
     <path d="M28.5 22.8 L71.5 22.8" stroke="#ffffff" stroke-width="1.2" opacity=".5"/>
+    ${hot?`<g class="jewel"><path d="M46.8 21 L50 14.5 L53.2 21 L50 24 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".7"/></g>`:''}
     <text x="50" y="55.8" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="14" fill="${P.deep}">#REF!</text>
     <text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="14" fill="${P.hi}">#REF!</text>
+    ${hot?sparks(P,[[21,17,3],[79,17,3]]):''}${pips(id,P,bk)}
   </svg>`; }
 function t_candidate(sz,bk){ const id='e'+(UID++), P=SLATE, o2=bk>=2, hot=bk===3, gl=[0,0,.4,.9][bk];
   let notch=''; if(o2) for(let i=0;i<8;i++){ const a=i*45*Math.PI/180;
@@ -177,7 +193,7 @@ function t_firstyear(sz,bk){ const id='e'+(UID++), P=SILVER, o2=bk>=2, hot=bk===
     ${GLY.keycap(id,P)}${hot?sparks(P,[[10,20,3.2],[90,20,3.2]]):''}${pips(id,P,bk)}
   </svg>`; }
 function t_associate(sz,bk){ const id='e'+(UID++), P=GOLD, o2=bk>=2, hot=bk===3, gl=[0,.7,1.1,1.6][bk];
-  const cr='M50 11 L63 21 L84 16 L79 44 L66 82 L50 90 L34 82 L21 44 L16 16 L37 21 Z';
+  const cr='M50 11 L63 21 L84 16 L80 46 L68 78 L50 88 L32 78 L20 46 L16 16 L37 21 Z';
   let lr=''; if(o2) for(let s of [-1,1]){
     lr+=`<path d="M${50+s*31} 78 q ${s*17} -12 ${s*18} -38" fill="none" stroke="url(#${id}m)" stroke-width="2.5" stroke-linecap="round"/>`;
     for(let l=0;l<5;l++){ const t2=l/4.4, x=50+s*(31+16*t2*(2-t2)*0.95), y=77-38*t2;
@@ -193,6 +209,7 @@ function t_associate(sz,bk){ const id='e'+(UID++), P=GOLD, o2=bk>=2, hot=bk===3,
 function t_vp(sz,bk){ const id='e'+(UID++), P=PLAT, o2=bk>=2, hot=bk===3, gl=[0,1,1.5,2][bk];
   const cr='M50 10 L60 20 L84 14 L78 40 L82 52 L62 84 L50 92 L38 84 L18 52 L22 40 L16 14 L40 20 Z';
   return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    ${hot?`<g class="aura" opacity=".7"><circle cx="50" cy="50" r="48" fill="url(#${id}a)"/></g>`:''}
     <circle cx="50" cy="48" r="33" fill="url(#${id}core)" opacity="${hot?1:o2?.8:.55}"/>
     ${o2?`<g class="ornament">
       <path d="M16 14 L4 8 L14 26 L8 24 L18 38" fill="none" stroke="url(#${id}m)" stroke-width="2.8" stroke-linejoin="round"/>
@@ -224,7 +241,7 @@ function t_summit(sz,bk){ const id='e'+(UID++), P=DIAM, o2=bk>=2, hot=bk===3, gl
   const sp='M50 2 L64 18 L86 22 L74 46 L78 62 L58 88 L50 98 L42 88 L22 62 L26 46 L14 22 L36 18 Z';
   const rop=o2?1:.45;
   let rays=''; for(let i=0;i<20;i++){ const a=(i*18-90)*Math.PI/180, big=i%5===0;
-    rays+=`<line x1="${50+Math.cos(a)*(big?39:42)}" y1="${50+Math.sin(a)*(big?39:42)}" x2="${50+Math.cos(a)*(big?50:46.5)}" y2="${50+Math.sin(a)*(big?50:46.5)}" stroke="${P.hi}" stroke-width="${big?2.6:0.9}" stroke-linecap="round" opacity="${(big?0.95:0.5)*rop}"/>`; }
+    rays+=`<line x1="${50+Math.cos(a)*(big?39:42)}" y1="${50+Math.sin(a)*(big?39:42)}" x2="${50+Math.cos(a)*(big?50:46.5)}" y2="${50+Math.sin(a)*(big?50:46.5)}" stroke="${big?'#ffd968':P.hi}" stroke-width="${big?2.6:0.9}" stroke-linecap="round" opacity="${(big?0.95:0.5)*rop}"/>`; }
   let shards=''; for(let s of [-1,1]){
     shards+=`<path d="M${50+s*40} 30 L${50+s*47} 24 L${50+s*44} 34 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
       <path d="M${50+s*44} 52 L${50+s*52} 50 L${50+s*46} 60 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
@@ -235,9 +252,11 @@ function t_summit(sz,bk){ const id='e'+(UID++), P=DIAM, o2=bk>=2, hot=bk===3, gl
     ${o2?`<g class="ornament">${shards}</g>`:''}
     ${frame(id,P,sp,gl,3.6,hot)}
     <path d="M36 18.8 L50 3.5 L64 18.8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".85"/>
+    ${hot?`<g class="jewel"><path d="M50 -3 L51.6 1.4 L56 3 L51.6 4.6 L50 9 L48.4 4.6 L44 3 L48.4 1.4 Z" fill="#ffd968" stroke="#523a05" stroke-width=".6"/></g>`:''}
     ${GLY.rocket(id,P)}${hot?sparks(P,[[14,22,3.8],[86,22,3.8],[50,-2,3.2]]):''}${pips(id,P,bk)}
   </svg>`; }
 const TIERS=[
+  {n:'MBA Associate', f:t_mba},
   {n:'Candidate', f:t_candidate},
   {n:'Summer Analyst', f:t_summer},
   {n:'First-Year Analyst', f:t_firstyear},
@@ -249,8 +268,8 @@ const TIERS=[
 const BK=['BOTTOM BUCKET','MIDDLE BUCKET','TOP BUCKET'];
 const grid=document.getElementById('grid');
 grid.insertAdjacentHTML('beforeend',
-  `<div class="band"><div class="bandcap">UNRANKED · standardized (no buckets)</div>
-   <div class="row"><div class="tile">${t_unranked(104)}<div class="nm">MBA Associate</div><div class="bk">UNRANKED</div></div></div></div>`);
+  `<div class="band"><div class="bandcap">UNRANKED · generic (placement pending, no buckets)</div>
+   <div class="row"><div class="tile">${t_unranked(104)}<div class="nm">Unranked</div><div class="bk">PLACEMENT PENDING</div></div></div></div>`);
 for(const t of TIERS){
   let row='';
   for(let b=1;b<=3;b++) row+=`<div class="tile">${t.f(104,b)}<div class="nm">${t.n}</div><div class="bk">${BK[b-1]}</div></div>`;
