@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 5</title>
+<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 6</title>
 <style>
   body{margin:0;font-family:'JetBrains Mono',monospace;background:#141519;color:#cdd0d6;padding:28px}
   h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 4px} .sub{font-size:11px;color:#666a72;margin-bottom:22px;max-width:980px;line-height:1.5}
@@ -17,13 +17,13 @@
   @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
   @keyframes pipglow{from{filter:brightness(1)}to{filter:brightness(1.7)}}
 </style></head><body>
-<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 5</h1>
-<div class="sub">LoL-style bucket escalation: the EMBLEM ITSELF builds with each bucket &mdash; BOTTOM is the clean frame + glyph, MIDDLE bolts on the tier's ornaments (notches, fins, blades, laurels, wings, horns), TOP ignites (crest jewel, sparks, hot rim, brighter glow). Pips stay as the tiny-size read. Summer Analyst glyph is now a SUN. Gold crest widened + glyphs rescaled so glyph-to-frame proportion is consistent across tiers.</div>
+<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 6</h1>
+<div class="sub">Job-tied glyphs: gold Associate carries the BRIEFCASE, the Second-Year Analyst summit is the ROCKET (buyside exit, escape velocity). UNRANKED re-cut: chamfered iron plate, engraved steel #REF! (alarm-red dropped). Sun enlarged. Bucket escalation unchanged from iteration 5 &mdash; bottom clean / middle ornamented / top ignited, pips as the tiny-size read.</div>
 <div id="grid"></div>
 <div class="band"><div class="bandcap">LIGHT-THEME SANITY · TOP BUCKET</div><div class="row" id="light"></div></div>
 <div class="band"><div class="bandcap">SILHOUETTE TEST · 22px CHIP ROW (top bucket)</div><div class="chips" id="chips"></div></div>
 <script>
-/* Iteration 5. Canvas 100x114: emblem art in 0..100, division pips on 100..114.
+/* Iteration 6. Canvas 100x114: emblem art in 0..100, division pips on 100..114.
    BUCKET ESCALATION (the LoL read): bk1 = frame+glyph only, bk2 = +ornaments,
    bk3 = +jewel/sparks/hot rim/max glow. Pips remain the small-size language.
    Animation layers: .aura .frame .glyph .ornament .jewel .pips .sparks */
@@ -75,18 +75,22 @@ const GLY={
     <path d="M0 5 L0 -8.5" stroke="${P.deep}" stroke-width="1.1"/>
     <path d="M-9 -3.5 Q -5 -5.5 -2.5 -4.5 M-9 0 Q -5 -2 -2.5 -1 M2.5 -4.5 Q 5 -5.5 9 -3.5 M2.5 -1 Q 5 -2 9 0" stroke="${P.plateLo}" stroke-width=".9" fill="none"/></g>`,
   sun:(id,P)=>{ let rays='';
-    for(let i=0;i<8;i++){ const a=i*Math.PI/4, L=(i%2?14.5:17.5), w=.21, R=9.6;
+    for(let i=0;i<8;i++){ const a=i*Math.PI/4, L=(i%2?16.5:20), w=.21, R=11;
       rays+=`<path d="M${(Math.cos(a-w)*R).toFixed(1)} ${(Math.sin(a-w)*R).toFixed(1)} L${(Math.cos(a)*L).toFixed(1)} ${(Math.sin(a)*L).toFixed(1)} L${(Math.cos(a+w)*R).toFixed(1)} ${(Math.sin(a+w)*R).toFixed(1)} Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".7"/>`; }
     return `<g transform="translate(50 48)">${rays}
-      <circle r="8" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
-      <circle r="4.5" fill="${P.hi}" opacity=".65"/></g>`; },
+      <circle r="9.2" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
+      <circle r="5.2" fill="${P.hi}" opacity=".65"/></g>`; },
   keycap:(id,P)=>`<g transform="translate(50 50)">
     <rect x="-13" y="-12.5" width="26" height="25" rx="4.5" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/>
     <rect x="-9.5" y="-9.5" width="19" height="17" rx="3" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
     <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="10.5" fill="${P.hi}">F4</text></g>`,
-  sigma:(id,P)=>`<g transform="translate(50 49) scale(1.2)">
-    <path d="M-9.5 -13 L10.5 -13 L10.5 -7.6 L-2.2 -7.6 L5.8 0 L-2.2 7.6 L10.5 7.6 L10.5 13 L-9.5 13 L-9.5 8.6 L0.4 0 L-9.5 -8.6 Z"
-      fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1"/></g>`,
+  briefcase:(id,P)=>`<g transform="translate(50 50.5)">
+    <path d="M-5 -9.5 L-5 -12 Q-5 -13.8 -3.2 -13.8 L3.2 -13.8 Q5 -13.8 5 -12 L5 -9.5" fill="none" stroke="${P.deep}" stroke-width="2.4"/>
+    <rect x="-14" y="-9.5" width="28" height="21" rx="2.5" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/>
+    <path d="M-14 -2.8 L14 -2.8" stroke="${P.deep}" stroke-width="1"/>
+    <rect x="-3.2" y="-5" width="6.4" height="4.8" rx="1" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
+    <path d="M-10.5 -2.8 L-10.5 .5 M10.5 -2.8 L10.5 .5" stroke="${P.deep}" stroke-width="1.4"/>
+    <path d="M-12.5 -8 L12.5 -8" stroke="${P.hi}" stroke-width=".9" opacity=".6"/></g>`,
   chart:(id,P)=>`<g transform="translate(50 53)">
     <rect x="-12" y="3" width="5.2" height="10" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
     <rect x="-3.5" y="-2" width="5.2" height="15" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
@@ -104,9 +108,16 @@ const GLY={
     <path d="M-7.5 5 Q0 8 7.5 5 L5 13 Q0 15.2 -5 13 Z" fill="${P.lo}" stroke="${P.deep}" stroke-width=".9"/>
     <ellipse cx="-3.1" cy="9.6" rx="1.5" ry="2" fill="${P.deep}"/>
     <ellipse cx="3.1" cy="9.6" rx="1.5" ry="2" fill="${P.deep}"/></g>`,
-  bolt:(id,P)=>`<g transform="translate(50 49.5) scale(1.1)">
-    <path d="M-1.5 -17 L9.5 -17 L2.5 -3.5 L10.5 -3.5 L-7 18 L-1 1.5 L-9.5 1.5 Z" fill="#ffffff" stroke="${P.lo}" stroke-width="1"/>
-    <path d="M-1.5 -17 L9.5 -17 L2.5 -3.5 L-1.8 -3.5 Z" fill="${P.hi}" opacity=".7"/></g>`,
+  rocket:(id,P)=>`<g transform="translate(50 48.5)">
+    <path d="M-7.2 3 L-13.5 12.5 L-6 9.8 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+    <path d="M7.2 3 L13.5 12.5 L6 9.8 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+    <path d="M-2.8 10.5 L0 19.5 L2.8 10.5 Z" fill="${P.hi}"/>
+    <path d="M-1.3 10.5 L0 15.5 L1.3 10.5 Z" fill="#ffffff"/>
+    <path d="M0 -18.5 Q7.2 -9.5 7.2 .5 Q7.2 6.5 5.2 10.5 L-5.2 10.5 Q-7.2 6.5 -7.2 .5 Q-7.2 -9.5 0 -18.5 Z"
+      fill="#f6feff" stroke="${P.lo}" stroke-width="1.1"/>
+    <path d="M0 -18.5 Q-7.2 -9.5 -7.2 .5 Q-7.2 6.5 -5.2 10.5 L-2 10.5 Q-3.6 5 -3.6 -1 Q-3.6 -11 0 -18.5 Z" fill="${P.mid}" opacity=".35"/>
+    <circle cx="0" cy="-4.5" r="3.1" fill="${P.plateLo}" stroke="${P.deep}" stroke-width="1"/>
+    <circle cx="0" cy="-4.5" r="1.4" fill="${P.hi}" opacity=".8"/></g>`,
 };
 /* ---------- palettes ---------- */
 const IRON ={hi:'#a9aeb9',mid:'#7c828e',lo:'#525761',deep:'#26282e',plateHi:'#33363d',plateLo:'#1f2126',core:'#8b919d'};
@@ -119,13 +130,14 @@ const CRIM ={hi:'#ffb3a1',mid:'#e65843',lo:'#9c2a1c',deep:'#3a0f0b',plateHi:'#3b
 const DIAM ={hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',plateHi:'#21404f',plateLo:'#12232c',core:'#a8ecff'};
 /* ---------- tiers (bucket-escalating: bk1 clean / bk2 +ornaments / bk3 ignited) ---------- */
 function t_unranked(sz){ const id='e'+(UID++), P=IRON;
-  const sq='M22 22 L78 22 L78 78 L22 78 Z';
+  const sq='M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z';
   return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,0)}
-    ${frame(id,P,sq,0,3)}
-    <path d="M22 40 L78 40 M22 60 L78 60 M40 22 L40 78 M62 22 L62 78" stroke="${P.mid}" stroke-width=".8" opacity=".35"/>
-    <path d="M32 16 L56 42 L44 50 L68 84" fill="none" stroke="${P.deep}" stroke-width="2.2"/>
-    <path d="M23.5 23.5 L76.5 23.5" stroke="#ffffff" stroke-width="1.2" opacity=".55"/>
-    <text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="15" fill="#e0523d">#REF!</text>
+    ${frame(id,P,sq,0,3.2)}
+    <path d="M21 42 L79 42 M21 60 L79 60 M41 21 L41 79 M61 21 L61 79" stroke="${P.mid}" stroke-width=".8" opacity=".28"/>
+    <path d="M34 16 L55 43 L45 51 L64 84" fill="none" stroke="${P.deep}" stroke-width="1.8" opacity=".75"/>
+    <path d="M28.5 22.8 L71.5 22.8" stroke="#ffffff" stroke-width="1.2" opacity=".5"/>
+    <text x="50" y="55.8" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="14" fill="${P.deep}">#REF!</text>
+    <text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="14" fill="${P.hi}">#REF!</text>
   </svg>`; }
 function t_candidate(sz,bk){ const id='e'+(UID++), P=SLATE, o2=bk>=2, hot=bk===3, gl=[0,0,.4,.9][bk];
   let notch=''; if(o2) for(let i=0;i<8;i++){ const a=i*45*Math.PI/180;
@@ -176,7 +188,7 @@ function t_associate(sz,bk){ const id='e'+(UID++), P=GOLD, o2=bk>=2, hot=bk===3,
     ${frame(id,P,cr,gl,3.4,hot)}
     <path d="M37 21.6 L50 12 L63 21.6" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".7"/>
     ${hot?`<g class="jewel"><circle cx="50" cy="16.5" r="2.4" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/><circle cx="50" cy="16.5" r="1" fill="#ffffff" opacity=".9"/></g>`:''}
-    ${GLY.sigma(id,P)}${hot?sparks(P,[[16,13,3.4],[84,13,3.4]]):''}${pips(id,P,bk)}
+    ${GLY.briefcase(id,P)}${hot?sparks(P,[[16,13,3.4],[84,13,3.4]]):''}${pips(id,P,bk)}
   </svg>`; }
 function t_vp(sz,bk){ const id='e'+(UID++), P=PLAT, o2=bk>=2, hot=bk===3, gl=[0,1,1.5,2][bk];
   const cr='M50 10 L60 20 L84 14 L78 40 L82 52 L62 84 L50 92 L38 84 L18 52 L22 40 L16 14 L40 20 Z';
@@ -223,7 +235,7 @@ function t_summit(sz,bk){ const id='e'+(UID++), P=DIAM, o2=bk>=2, hot=bk===3, gl
     ${o2?`<g class="ornament">${shards}</g>`:''}
     ${frame(id,P,sp,gl,3.6,hot)}
     <path d="M36 18.8 L50 3.5 L64 18.8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".85"/>
-    ${GLY.bolt(id,P)}${hot?sparks(P,[[14,22,3.8],[86,22,3.8],[50,-2,3.2]]):''}${pips(id,P,bk)}
+    ${GLY.rocket(id,P)}${hot?sparks(P,[[14,22,3.8],[86,22,3.8],[50,-2,3.2]]):''}${pips(id,P,bk)}
   </svg>`; }
 const TIERS=[
   {n:'Candidate', f:t_candidate},

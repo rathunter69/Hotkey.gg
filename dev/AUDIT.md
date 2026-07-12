@@ -2797,3 +2797,18 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   normalized (book x1.12, sigma x1.2, bolt x1.1).
 - VERIFY: node --check extracted script, Playwright fullPage render clean
   (no console/page errors), light-theme + 22px chip rows legible.
+
+---
+# ROUND 125 — RANK ART ITERATION 6 (job-tied glyphs, unranked re-cut, sun sized up)
+- Wolf on iteration 5: sun good but small; unranked #REF! red "feels weird";
+  wants job-tied glyphs for gold + summit (briefcase/tie/buyside-exit ideas).
+- GOLD ASSOCIATE glyph: sigma -> BRIEFCASE (handle, lid seam, clasp,
+  corner straps) — the banker read, instant at chip size.
+- SUMMIT (Second-Year Analyst) glyph: bolt -> ROCKET (capsule, porthole,
+  swept fins, white-hot exhaust) — "the buyside exit, escape velocity."
+- UNRANKED re-cut: chamfered iron plate (corner-cut octagon), crack
+  thinned, #REF! now ENGRAVED STEEL (deep shadow + steel face, alarm-red
+  dropped), subtler gridlines.
+- SUN enlarged (~15%): rays 20/16.5, disc r9.2 — fills the bronze shield.
+- VERIFY: node --check extracted script, Playwright fullPage clean, light
+  + 22px chip rows legible.
