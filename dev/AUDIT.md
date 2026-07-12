@@ -2952,3 +2952,48 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   reviewed: emblem crisp w/ pips, ring pct correct, handle shrink works,
   emoji streak renders; e2e demo-replay ALL GREEN (55 drills x3).
 - CACHE v117 -> v118 (all 9 pages).
+
+---
+# ROUND 132 — VERSIONUP FIN-FIDELITY FIX (Wolf's report) + ACHIEVEMENT MEDAL LAB
+- WOLF'S CALL CONFIRMED (playing the drill live): versionup built
+  'EBITDA = GP − Opex' with no D&A anywhere — only honest if Opex excludes
+  D&A, and the sheet never said so; no reconciliation below EBITDA. FIXED:
+  Opex relabeled 'SG&A (excl. D&A)' (the label that makes the subtotal
+  defensible), and the walk now continues — D&A input row → EBIT derived row
+  (=B9-B10, hardcoded in v1 like the others, resurrected + filled). Margin
+  moves to row 12. 5 checks. par 135→150, parKeys 82→91 (r40 rule: demo
+  changed → pars recomputed).
+- ALSO FIXED IN THE SAME PASS: inputs were independent rnds (rev 750-2100,
+  cogs ≤800, opex ≤550) — EBITDA could randomize NEGATIVE. Inputs now draw
+  as revenue fractions (COGS 35-55%, SG&A 18-32%, D&A 4-9%) — GP/EBITDA/EBIT
+  positive at every seed, margins land in real ranges. And a PARS fossil:
+  versionup never got its HOTKEY_PARS entry (shipped r97) — no advanced
+  first-clear XP bonus ever. Added (150).
+- VERIFY: node --check all; e2e demo-replay versionup WIN 12/12 (elevated
+  reps on the changed drill); full-suite e2e unchanged elsewhere.
+- FINANCE-FIDELITY AUDIT (T7) QUEUED — Wolf's directive: audit the portfolio
+  for financial-best-practice correctness, not just logical correctness.
+  DEFECT TAXONOMY (sweep against every drill, Models/Full Builds first):
+  (1) mislabeled aggregates — subtotal math the line labels don't support
+      (the versionup class: EBITDA over opex incl-or-excl D&A);
+  (2) unbounded randomization → impossible financials (negative EBITDA,
+      margins >100%, absurd growth) — bound inputs as ratios;
+  (3) wrong-base ratios (margins/percent-of-total off the wrong denominator);
+  (4) identity violations (BS balance by construction, sources=uses, CF ties);
+  (5) sign-convention drift within a sheet;
+  (6) finance order-of-operations (sweep order, D&A placement, WACC weights);
+  (7) enterprise-vs-equity consistency in comps/multiples;
+  (8) the standing pedagogy rule (no fake plugs) re-checked under (1)-(7).
+- ACHIEVEMENT MEDAL LAB (ART_SPEC deliverable 3): art/ach-proto.html,
+  iterations 1-2. SPEC DELTA: live data uses 9 categories, not 8 — spd vol
+  str crn day gnt + campaign c-glyphs moonlighting as breadth/models/anti;
+  proto mints dedicated brd/mdl/mse. System: hex plate KEPT (the achievement
+  silhouette vs tier crests), emblem-grade layered gradients + engraved
+  two-pass glyphs, earned=gold regalia / locked=ghost linework; iteration 2
+  drops the tier-ring idea (illegible next to gold frame) for WHOLE-MEDAL
+  tier metals (bronze/silver/gold — the LoL read) + volume ream→ascending
+  bars. Glyphs: stopwatch/bars/flame/crown/calendar-check/pennant/4-tab-
+  workbook/linked-statements/struck-mouse. Verified 30/40/46/64px dark+light,
+  zero page errors. AWAITING WOLF — port to hkBadge (API grows optional tier
+  param) only after approval, then cache-bump.
+- CACHE v118 -> v119 (drills.js PARS change; all 9 pages).

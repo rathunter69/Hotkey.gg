@@ -4,7 +4,7 @@ New sessions: the repo IS the handover — read this file, dev/AUDIT.md (newest 
 at the bottom), and the dev/ design docs. No manual doc upload needed when the
 session has the GitHub integration (repo clones automatically)._
 
-## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r131)
+## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r132)
 - **Where we are**: content deepening arc DONE (T2-T6, Mix Rule) · demo-replay e2e
   DONE (dev/e2e-demo-replay.js, all drills green) · Desks v1 + surfaces + protected
   names + seeds/claim-the-desk + school tags v1.5 DONE · XP v4 daily-reset DONE ·
@@ -16,7 +16,13 @@ session has the GitHub integration (repo clones automatically)._
   (LinkedIn rank card: themes.js hkRankCard/hkRankCardShare 1200x627 brand PNG,
   buttons on player-card modal + account Progress; PRO placeholder card on
   account; upgrade-modal copy aligned to the decided subscription model).
-  Cache v118.
+  Cache v119. r132: versionup FIN-FIDELITY fix (Wolf's report — SG&A excl. D&A
+  label, D&A→EBIT reconciliation rows, ratio-bounded inputs, par 150/91, PARS
+  fossil added) · ACHIEVEMENT MEDAL LAB art/ach-proto.html iteration 2 (9
+  categories, tier-metal medals) AWAITING WOLF approval before hkBadge port ·
+  FINANCE-FIDELITY AUDIT (T7) QUEUED — taxonomy in AUDIT r132, Models/Full
+  Builds first · then structural items: S2 ghost cursor, S6 PWA (offline-
+  buildable) / S7 streak email, S8 admin analytics (need egress session).
 - **PENDING — live smoke test**: desks/school-tags/assignments RPCs + 8 seeded desk
   codes have NEVER been exercised against live Supabase (sessions have lacked
   network egress to supabase.co). FIRST PRIORITY in any fresh session WITH egress:
@@ -24,8 +30,9 @@ session has the GitHub integration (repo clones automatically)._
   rotate code, refresh_school_tag, join_home_desk, set/clear_assignment), write
   dev/SMOKE_REPORT.md, fix what breaks. Seeded desk codes are in migration
   20260712400000 — Wolf distributes them only after smoke is green.
-- **Agreed next pipeline items**: monetization surfaces DONE r131 (PRO placeholder +
-  LinkedIn rank card) · next up parked items: referrals design,
+- **Agreed next pipeline items**: T7 finance-fidelity audit (taxonomy AUDIT r132) ·
+  medal port on Wolf approval · structural: S2 ghost cursor, S6 PWA, S4 drillgen,
+  S7 streaks+email, S8 admin analytics · parked: referrals design,
   marathon rethink, PWA, comments/citations engine turn, T&S launch items (verified-
   desk granting, admin powers), achievement art pass (dev/ART_SPEC.md deliverable 3).
 - **Art**: art/rank-proto.html is the emblem design lab (iteration 8). The GAME

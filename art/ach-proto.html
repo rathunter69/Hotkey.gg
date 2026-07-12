@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>hotkey.gg — achievement medal lab (iteration 2)</title>
+<style>
+  body{background:#292b31; color:#f0f1ec; font-family:'JetBrains Mono',ui-monospace,monospace; padding:34px}
+  h1{font-size:16px; letter-spacing:.06em; margin-bottom:4px}
+  .sub{font-size:11px; color:#a8adb3; margin-bottom:26px}
+  .row{display:flex; gap:26px; flex-wrap:wrap; align-items:flex-end; margin-bottom:30px}
+  .cell{display:flex; flex-direction:column; align-items:center; gap:8px}
+  .cell b{font-size:10px; color:#a8adb3; font-weight:500; text-align:center; max-width:110px}
+  .cell i{font-size:9px; color:#767d87; font-style:normal}
+  .light{background:#e9eaed; border-radius:14px; padding:22px 26px}
+  .light b{color:#5a5e68}
+  h2{font-size:12px; color:#d9a441; letter-spacing:.1em; margin:34px 0 14px; text-transform:uppercase}
+</style>
+</head>
+<body>
+<h1>ACHIEVEMENT MEDALS — category glyph system, iteration 2</h1>
+<div class="sub">9 live categories (spec said 8 — live data uses 9: the campaign c-glyphs were moonlighting as breadth/models/anti). Hex plate kept — it IS the achievement silhouette vs the tier crests. Earned = gold regalia · locked = ghost · laddered achievements wear the whole medal in tier metal — bronze/silver/gold (spd1/2/3 etc.).</div>
+<div id="root"></div>
+<script>
+/* Medal system v3 proto — same craft as rank emblems iteration 8:
+   layered gradients, deep understrokes, engraved glyphs, unique ids per render.
+   API target: hkBadge(id, earned, size, color, tier) — tier optional 1/2/3. */
+let UID=0;
+const GOLD ={hi:'#ffefb3',mid:'#f4c754',lo:'#bf8e20',deep:'#523a05'};
+const BRONZE={hi:'#f4c088',mid:'#cf8e4c',lo:'#95602c',deep:'#432a12'};
+const SILVER={hi:'#f4f7fc',mid:'#c9d0dc',lo:'#8e96a5',deep:'#454c59'};
+const PLATE={hi:'#3d4047',lo:'#212328'};
+const GHOST='#767d87';
+
+/* glyphs drawn in a 100x100 space, centered ~ (50,52), engraved two-pass:
+   deep outline under, gradient face over. Each returns inner markup. */
+const GLYPHS = {
+  // SPEED — the stopwatch, hand slammed past 12: time is the whole game
+  spd(id,face,deep){ return g(face,deep,
+    '<circle cx="50" cy="55" r="21" fill="none" stroke-width="5"/>'+
+    '<path d="M50 55 L61 41" stroke-width="5" stroke-linecap="round"/>'+
+    '<path d="M43 28 L57 28" stroke-width="6" stroke-linecap="round"/>'+
+    '<path d="M50 28 L50 34" stroke-width="5"/>'+
+    '<path d="M67 39 L72 34" stroke-width="5" stroke-linecap="round"/>');},
+  // VOLUME — the tally: ascending bars on a baseline (reps stack up)
+  vol(id,face,deep){ return g(face,deep,
+    '<path d="M28 72 L72 72" stroke-width="4.5" stroke-linecap="round"/>'+
+    '<path d="M35 65 L35 54" stroke-width="7" stroke-linecap="round"/>'+
+    '<path d="M50 65 L50 42" stroke-width="7" stroke-linecap="round"/>'+
+    '<path d="M65 65 L65 30" stroke-width="7" stroke-linecap="round"/>');},
+  // STREAK — the flame with a live core
+  str(id,face,deep){ return g(face,deep,
+    '<path d="M50 26 C58 36 64 44 64 54 A14 14 0 0 1 36 54 C36 47 40 41 44 37 C44 42 46 45 49 46 C47 39 48 32 50 26 Z" stroke-width="4.5"/>'+
+    '<path d="M50 68 C45 65 44 60 47 56 C48 59 50 60 52 60 C54 63 53 66 50 68 Z" stroke-width="3"/>');},
+  // CROWNS — the board crown, five points, band jewels
+  crn(id,face,deep){ return g(face,deep,
+    '<path d="M30 64 L27 40 L38 49 L50 33 L62 49 L73 40 L70 64 Z" stroke-width="4.5" stroke-linejoin="round"/>'+
+    '<path d="M31 70 L69 70" stroke-width="5" stroke-linecap="round"/>'+
+    '<circle cx="50" cy="56" r="2.6" stroke-width="3"/>');},
+  // DAILY — the desk calendar, one day struck done
+  day(id,face,deep){ return g(face,deep,
+    '<rect x="30" y="34" width="40" height="38" rx="4" stroke-width="4.5"/>'+
+    '<path d="M30 45 L70 45" stroke-width="4"/>'+
+    '<path d="M39 28 L39 38 M61 28 L61 38" stroke-width="4.5" stroke-linecap="round"/>'+
+    '<path d="M41 58 L47 64 L59 52" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>');},
+  // GAUNTLET — the race pennant, planted
+  gnt(id,face,deep){ return g(face,deep,
+    '<path d="M36 26 L36 74" stroke-width="5" stroke-linecap="round"/>'+
+    '<path d="M36 28 L68 34 L58 42 L68 50 L36 56" stroke-width="4.5" stroke-linejoin="round"/>');},
+  // BREADTH — the workbook: four sheet tabs, every one visited
+  brd(id,face,deep){ return g(face,deep,
+    '<rect x="29" y="31" width="18" height="18" rx="3" stroke-width="4"/>'+
+    '<rect x="53" y="31" width="18" height="18" rx="3" stroke-width="4"/>'+
+    '<rect x="29" y="55" width="18" height="18" rx="3" stroke-width="4"/>'+
+    '<rect x="53" y="55" width="18" height="18" rx="3" stroke-width="4"/>'+
+    '<path d="M58 63 L61 67 L67 59" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>');},
+  // MODELS — three statements, linked: the corkscrew chain
+  mdl(id,face,deep){ return g(face,deep,
+    '<rect x="28" y="28" width="20" height="13" rx="2.5" stroke-width="4"/>'+
+    '<rect x="40" y="44" width="20" height="13" rx="2.5" stroke-width="4"/>'+
+    '<rect x="52" y="60" width="20" height="13" rx="2.5" stroke-width="4"/>'+
+    '<path d="M38 41 L38 50 L40 50 M50 57 L50 66 L52 66" stroke-width="3.4" fill="none"/>');},
+  // ANTI — the mouse, struck through: old habits
+  mse(id,face,deep){ return g(face,deep,
+    '<rect x="38" y="32" width="24" height="38" rx="12" stroke-width="4.5"/>'+
+    '<path d="M50 32 L50 48" stroke-width="4"/>'+
+    '<path d="M30 74 L70 26" stroke-width="5.5" stroke-linecap="round"/>');},
+};
+function g(face,deep,body){
+  // engraved two-pass: fat deep understroke, gradient face over
+  return '<g fill="none" stroke="'+deep+'" stroke-width="0">'+
+    body.replace(/stroke-width="([\d.]+)"/g,(m,w)=>'stroke-width="'+(parseFloat(w)+3)+'"').replace(/<g[^>]*>|<\/g>/g,'')+
+    '</g><g fill="none" stroke="'+face+'">'+body+'</g>';
+}
+const HEX='M50 5 L88 27 V73 L50 95 L12 73 V27 Z';
+const HEXIN='M50 12.5 L81.5 30.8 V69.2 L50 87.5 L18.5 69.2 V30.8 Z';
+function medal(glyphId, opts){
+  // opts: {earned, size, tier:0|1|2|3} — tier recolors the WHOLE medal in its
+  // metal (bronze/silver/gold), the LoL read: the rung is the medal, not a ring.
+  const o=opts||{}, sz=o.size||46, id='am'+(UID++);
+  const M=[GOLD,BRONZE,SILVER,GOLD][o.tier||0];
+  if(!o.earned){
+    // locked: ghost line-work only — reads as "slot to fill"
+    return '<svg viewBox="0 0 100 100" width="'+sz+'" height="'+sz+'">'+
+      '<path d="'+HEX+'" fill="'+GHOST+'" opacity=".06"/>'+
+      '<path d="'+HEX+'" fill="none" stroke="'+GHOST+'" stroke-width="3" opacity=".55"/>'+
+      '<g opacity=".5">'+GLYPHS[glyphId](id,GHOST,'transparent')+'</g></svg>';
+  }
+  return '<svg viewBox="0 0 100 100" width="'+sz+'" height="'+sz+'">'+
+    '<defs>'+
+    '<linearGradient id="'+id+'g" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="'+M.hi+'"/><stop offset=".45" stop-color="'+M.mid+'"/>'+
+      '<stop offset=".55" stop-color="'+M.lo+'"/><stop offset="1" stop-color="'+M.deep+'"/></linearGradient>'+
+    '<linearGradient id="'+id+'p" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="'+PLATE.hi+'"/><stop offset="1" stop-color="'+PLATE.lo+'"/></linearGradient>'+
+    '</defs>'+
+    // plate + metal frame (deep understroke first — the emblem armor)
+    '<path d="'+HEX+'" fill="none" stroke="'+M.deep+'" stroke-width="7" stroke-linejoin="round"/>'+
+    '<path d="'+HEX+'" fill="url(#'+id+'p)" stroke="url(#'+id+'g)" stroke-width="3.4" stroke-linejoin="round"/>'+
+    '<path d="'+HEXIN+'" fill="none" stroke="url(#'+id+'g)" stroke-width="1" opacity=".5"/>'+
+    // top-light: the upper facet catches light
+    '<path d="M50 5 L88 27 L50 22 L12 27 Z" fill="#ffffff" opacity=".07"/>'+
+    // crown notches at the shoulders (earned regalia, r67 language kept)
+    '<path d="M50 .5 L50 4 M9 24 L12.5 26 M91 24 L87.5 26" stroke="url(#'+id+'g)" stroke-width="2.6" stroke-linecap="round"/>'+
+    GLYPHS[glyphId](id,'url(#'+id+'g)',M.deep)+
+    '</svg>';
+}
+const CATS=[
+  ['spd','SPEED','under par, blink, half-par club'],
+  ['vol','VOLUME','warm hands → ten thousand keys'],
+  ['str','STREAK','habit · ritual · institution'],
+  ['crn','CROWNS','first blood, corner office'],
+  ['day','DAILY','regular, fixture, deal sprint'],
+  ['gnt','GAUNTLET','weekly legs, season ticket'],
+  ['brd','BREADTH','tourist, collector, full stack'],
+  ['mdl','MODELS','model citizen, foundations'],
+  ['mse','ANTI','old habits (the mouse slip)'],
+];
+let h='<h2>earned — 64px</h2><div class="row">'+CATS.map(c=>
+  '<span class="cell">'+medal(c[0],{earned:true,size:64})+'<b>'+c[1]+'</b><i>'+c[2]+'</i></span>').join('')+'</div>';
+h+='<h2>tier metals (laddered achievements: bronze → silver → gold medals)</h2><div class="row">'+
+  [1,2,3].map(t=>'<span class="cell">'+medal('str',{earned:true,size:64,tier:t})+'<b>'+['','BRONZE — Habit','SILVER — Ritual','GOLD — Institution'][t]+'</b></span>').join('')+
+  '<span class="cell">'+medal('spd',{earned:true,size:64,tier:1})+'<b>Under Par</b></span>'+
+  '<span class="cell">'+medal('spd',{earned:true,size:64,tier:2})+'<b>Metronome</b></span>'+
+  '<span class="cell">'+medal('spd',{earned:true,size:64,tier:3})+'<b>Untouchable</b></span>'+
+  '</div>';
+h+='<h2>locked (ghost) — 46px card grid</h2><div class="row">'+CATS.map(c=>
+  '<span class="cell">'+medal(c[0],{size:46})+'<b>'+c[1]+'</b></span>').join('')+'</div>';
+h+='<h2>small sizes — 30px (player-card strip) · 40px (grid)</h2><div class="row">'+
+  CATS.map(c=>'<span class="cell">'+medal(c[0],{earned:true,size:30})+'</span>').join('')+
+  CATS.map(c=>'<span class="cell">'+medal(c[0],{earned:true,size:40})+'</span>').join('')+'</div>';
+h+='<h2>light theme check</h2><div class="row light">'+CATS.map(c=>
+  '<span class="cell">'+medal(c[0],{earned:true,size:52})+'<b>'+c[1]+'</b></span>').join('')+
+  CATS.slice(0,4).map(c=>'<span class="cell">'+medal(c[0],{size:52})+'<b>locked</b></span>').join('')+'</div>';
+document.getElementById('root').innerHTML=h;
+</script>
+</body>
+</html>
