@@ -2734,3 +2734,25 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   reaffirmed: shared dicts/fns live in ONE file; fallbacks may not carry
   implementations, only graceful empties.
 - v114.
+
+---
+# ROUND 122 — SCHOOL TAGS v1.5 SHIPPED (.edu auto-identity + home-desk one-tap)
+- MIGRATION: profiles.school_domain/school_tag (SERVER-DERIVED via
+  refresh_school_tag() from auth.email — subdomain-walks a 50-school map,
+  falls back to the registrable label for unmapped academic domains) +
+  show_school OPT-IN (Wolf's call). Column grants tightened: profiles
+  insert/update re-granted on user-editable columns only — a client can no
+  longer self-claim a tag (or any future server-derived column).
+- HOME DESK: home_desk_for_me() matches your school domain to a desk's
+  edu_domain; join_home_desk() joins as MEMBER ONLY — captaincy still
+  travels exclusively through invite codes (code = captaincy, domain =
+  membership; keeps Wolf's president-handoff intact while students
+  self-serve). Account desk card grows a one-tap join button; the game
+  nudges once per session via toast.
+- SURFACES: opt-in school chips on leaderboard rows (drill + session
+  boards) and public player cards; account Profile card shows the tag +
+  the opt-in checkbox.
+- The cold-start loop is CLOSED: seeded desk + edu_domain + first .edu
+  signup -> one-tap membership -> boards fill -> president claims with the
+  code. VERIFY: boot clean x3, chip renders in rowHtml, node --check all,
+  e2e green. Live RPC verification rides the next fresh-session smoke.

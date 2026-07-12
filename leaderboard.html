@@ -77,6 +77,8 @@
   .ld-row.locked{opacity:.55}
   /* r114: public player cards */
   [data-uid]{cursor:pointer}
+  .sch{font-family:var(--mono); font-size:9px; color:var(--muted); border:1px solid var(--line);
+    border-radius:6px; padding:1px 5px; margin-left:7px; letter-spacing:.4px; vertical-align:middle}
   .nm[data-uid]:hover, .ros-nm[data-uid]:hover, span[data-uid]:hover{text-decoration:underline; text-underline-offset:3px}
   .pub-wrap{position:fixed; inset:0; z-index:220; background:color-mix(in srgb, var(--bg) 55%, transparent);
     backdrop-filter:blur(5px); display:flex; align-items:flex-start; justify-content:center; padding-top:12vh}
@@ -238,8 +240,12 @@ function rowHtml(r,i,names,meId,extra,leaderMs){
   const gap = (me && i>0 && leaderMs) ? `<span class="gap">+${((r.time_ms-leaderMs)/1000).toFixed(2)}</span>` : '';
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
     `<span class="rk${medal}">${i+1}</span>`+
-    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}</span>`+
+    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChip(r.user_id)}</span>`+
     `<span class="tm">${fmt(r.time_ms)}${gap}</span></div>`;
+}
+function schoolChip(uid){
+  const t=(window.__schoolOf||{})[uid];
+  return t ? '<span class="sch">'+esc(t)+'</span>' : '';
 }
 function boardHtml(c, best, names, meId){
   let body;
@@ -263,7 +269,7 @@ function sessionRowHtml(r,i,names,meId,labelFn,extra){
   const medal = i<3 ? ' r'+(i+1) : '';
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
     `<span class="rk${medal}">${i+1}</span>`+
-    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}</span>`+
+    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChip(r.user_id)}</span>`+
     `<span class="tm">${labelFn(r)}</span></div>`;
 }
 function sessionBoardHtml(title, sublabel, best, names, meId, labelFn){
@@ -320,7 +326,7 @@ async function load(){
   try{
     try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null; }catch(e){}
     const [p, r, se, tm, tt] = await Promise.all([
-      sb.from('profiles').select('id,handle,team_code'),
+      sb.from('profiles').select('id,handle,team_code,school_tag,show_school'),
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
       sb.from('team_members').select('team_id,user_id'),
@@ -333,6 +339,8 @@ async function load(){
   }
   const names=new Proxy({},{get:(t,k)=>t[k]||( typeof k==='string'&&k.length>6 ? 'analyst-'+k.slice(0,4) : 'analyst')});
   profs.forEach(p=>{ names[p.id]=p.handle||('analyst-'+String(p.id).slice(0,4)); });
+  // r122: opt-in school chips (v1.5) — tag derives server-side from the auth email
+  window.__schoolOf={}; profs.forEach(p=>{ if(p.show_school&&p.school_tag) window.__schoolOf[p.id]=p.school_tag; });
   // section leaders: fastest clean run on each advanced section's flagship.
   // runs arrive time-sorted asc, so first hit per drill IS the leader.
   const SECTION_FLAGSHIPS=[['Full Builds','threestmt','tie the three statements'],
@@ -433,7 +441,8 @@ function showPublicCard(uid){
       '<div><div class="pub-nm">'+esc(names[uid])+(uid===meId?' <span class="pub-you">(you)</span>':'')+'</div>'+
       '<div class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center;margin-top:4px">'+
         (window.rankEmblem?window.rankEmblem(t.name,13,t.bucket):'')+'<span>'+(t.full||t.name)+(t.provisional?' \u00b7 provisional':'')+'</span></div>'+
-      (deskNm?'<div class="pub-desk">\u25c6 '+esc(deskNm)+'</div>':'')+'</div></div>'+
+      (deskNm?'<div class="pub-desk">\u25c6 '+esc(deskNm)+'</div>':'')+
+      ((window.__schoolOf||{})[uid]?'<div class="pub-desk" style="color:var(--muted)">'+esc(window.__schoolOf[uid])+'</div>':'')+'</div></div>'+
     '<div class="pub-tiles">'+
       '<span><b>'+((st&&st.crowns)||0)+'</b> crowns</span><span><b>'+((st&&st.pod)||0)+'</b> podiums</span>'+
       '<span><b>'+((st&&st.t10)||0)+'</b> top-10s</span><span><b>'+((st&&st.att)||0)+'</b> boards</span></div>'+

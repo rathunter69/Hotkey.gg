@@ -103,7 +103,7 @@ async function load(){
   let prof={handle:'',team_code:null}, runs=[];
   try{
     const [p,r] = await Promise.all([
-      sb.from('profiles').select('handle,team_code,flair').eq('id',me.id).single(),
+      sb.from('profiles').select('handle,team_code,flair,show_school,school_tag').eq('id',me.id).single(),
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
     ]);
     if(p.data) prof=p.data; runs=r.data||[];
@@ -140,6 +140,7 @@ async function load(){
       <button class="btn" id="acHandleSave">Save handle</button>
       <a id="acHandleSugg" style="font-family:var(--mono);font-size:11.5px;color:var(--accent);cursor:pointer;margin-left:10px">&#x2684; suggest one</a>
       <div class="msg" id="acHandleMsg"></div>
+      <div id="schoolRow" style="margin-top:10px"></div>
       <div class="rowline" style="margin-top:14px"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
     </div>
 
@@ -317,6 +318,33 @@ async function load(){
     }
   }
   renderDesk();
+  // r122 SCHOOL TAG (v1.5): derived server-side from the auth email — the domain IS
+  // the verification. Display is opt-in per Wolf.
+  (async()=>{ try{
+    const {data:tag}=await sb.rpc('refresh_school_tag');
+    const row=document.getElementById('schoolRow'); if(!row) return;
+    if(!tag){ row.innerHTML=''; return; }
+    row.innerHTML='<div class="rowline"><span class="k">school</span><span style="display:flex;gap:10px;align-items:center">'+
+      '<b style="font-family:var(--mono);font-size:12.5px">'+esc(tag)+'</b>'+
+      '<label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px">'+
+      '<input type="checkbox" id="showSchool" '+(prof.show_school?'checked':'')+'> show on my card &amp; boards</label></span></div>';
+    const cb=document.getElementById('showSchool');
+    if(cb) cb.onchange=async()=>{ try{ await sb.from('profiles').update({show_school:cb.checked}).eq('id',me.id); }catch(e){} };
+  }catch(e){} })();
+  // home desk one-tap: membership by domain (captaincy still only via invite code)
+  (async()=>{ try{
+    const el=document.getElementById('deskBody'); if(!el) return;
+    const {data}=await sb.rpc('home_desk_for_me'); const h=(data&&data[0])||null;
+    if(!h) return;
+    const btnRow=document.createElement('div');
+    btnRow.style.cssText='margin-bottom:10px';
+    btnRow.innerHTML='<button class="btn" id="joinHome" style="margin:0">Join '+esc(h.name)+' \u2014 your school\u2019s desk ('+h.members+' on it)</button><div class="msg" id="homeMsg"></div>';
+    el.prepend(btnRow);
+    document.getElementById('joinHome').onclick=async()=>{ try{
+      const {error}=await sb.rpc('join_home_desk');
+      if(error){ say('homeMsg',deskErr(error),true); return; }
+      renderDesk(); }catch(e){ say('homeMsg','Something went wrong.',true); } };
+  }catch(e){} })();
   document.getElementById('acPassSave').onclick=async()=>{
     const p1=document.getElementById('acP1').value, p2=document.getElementById('acP2').value;
     if(p1.length<8){ say('acPassMsg','Password needs at least 8 characters.',true); return; }

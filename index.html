@@ -7949,6 +7949,16 @@ async function onSession(session){
       const d=(data&&data[0])||null;
       if(d&&d.name) showToast('welcome to the desk: '+d.name);
     }catch(e){} }, 1600);
+    // r122: school tag refresh (server-derived) + one home-desk nudge per session
+    setTimeout(async ()=>{ try{
+      if(!window.sb || isAnonUser()) return;
+      await sb.rpc('refresh_school_tag');
+      if(sessionStorage.getItem('hk_home_nudged')) return;
+      if(localStorage.getItem('hk_pending_desk')) return;
+      const {data}=await sb.rpc('home_desk_for_me'); const h=(data&&data[0])||null;
+      if(h&&h.name){ sessionStorage.setItem('hk_home_nudged','1');
+        showToast(h.name+' has a desk \u2014 one tap to join it on your account page'); }
+    }catch(e){} }, 2400);
     try{ localStorage.setItem('hotkey_onboarded','1'); }catch(e){}
     if(typeof onboardOpen!=='undefined' && onboardOpen) closeOnboard();
     // r69: greet returning users on the landing dialog + let one ↵ carry them in —
