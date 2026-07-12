@@ -3100,3 +3100,39 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   slice (record seed per run; race mode reloads the PB's build). S2-lite
   (ghost keystroke ticker + pace delta, build-agnostic) can ship first.
 - Proto only — no shared-asset change; ?v stays 120.
+
+---
+# ROUND 136 — FAVICON CONVERGENCE + MONETIZATION DESIGN + THE FABLE ROADMAP
+- FAVICON MYSTERY SOLVED (Wolf: "don't think it ever populated"): only
+  favicon.svg was ever updated to the F4 keycap crest (r48-era). favicon.ico,
+  favicon-32.png, AND apple-touch-icon.png still carried the ORIGINAL
+  cell-selection mark — and most surfaces (tab bars, bookmarks, iOS home
+  screen) prefer exactly those over the svg, so the crest could never appear.
+  All three regenerated from favicon.svg (Playwright render; .ico rebuilt as
+  a 3-frame PNG-in-ICO container 16/32/48 — no PIL needed). Cache v120→v121.
+  NOTE: browser favicon caches are stubborn (Chrome's ignores ?v on direct
+  /favicon.ico fetches) — convergence may take a revisit, but the bytes are
+  finally right; before this it could never converge.
+- PWA CAPABILITY ANSWER (Wolf asked what else install can carry + browsers):
+  manifest-only can still add app SHORTCUTS (jump-list: random drill/daily/
+  boards), richer-install screenshots, launch_handler focus-existing — all
+  queued as PWA v2 (roadmap #17). SW/offline stays a decision doc (cache
+  discipline). Browser truth: Chrome/Edge desktop+Android = full install;
+  iOS Safari = Add-to-Home-Screen (reads manifest 16.4+, uses apple-touch-icon
+  — fixed this round, so the home-screen icon is finally the crest); Firefox
+  desktop = no install (site works normally), Firefox Android = A2HS.
+- dev/MONETIZATION_DESIGN.md — Wolf's level-locks/season-pass dive mapped onto
+  the CURRENT build: free spine = per-group level unlocks (config table +
+  picker locks + gate modal; campaign skill-path can beat the clock; ships
+  DARK behind BETA_MODE, zero migration) · Pro stays the ONLY SKU (r87) ·
+  SEASONS reconciled with no-treadmill: "comp cycles" (H1/H2) as pure query
+  windows on timestamped runs (zero migration), rewards EARNED cosmetics,
+  Pro auto-collects the track — no purchasable tiers. Honest pushback kept:
+  a paid battle pass would be a second SKU + treadmill; dead.
+- dev/ROADMAP_FABLE.md — the requested 30-40-pass prioritized backlog
+  (38 items, 5 tiers: unblock-backend → monetization core → art ports →
+  structural → audit/hardening → features), effort + [egress]/[Wolf] flags,
+  standing rules footer. ROADMAP OF RECORD for the Fable arc; PROJECT_CONTEXT
+  points here.
+- VERIFY: boot clean w/ new icon links; icons visually reviewed (crest at
+  16/32/180); node --check n/a (no JS changed); docs only otherwise.

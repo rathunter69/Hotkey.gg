@@ -4,7 +4,7 @@ New sessions: the repo IS the handover — read this file, dev/AUDIT.md (newest 
 at the bottom), and the dev/ design docs. No manual doc upload needed when the
 session has the GitHub integration (repo clones automatically)._
 
-## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r135)
+## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r136)
 - **Where we are**: content deepening arc DONE (T2-T6, Mix Rule) · demo-replay e2e
   DONE (dev/e2e-demo-replay.js, all drills green) · Desks v1 + surfaces + protected
   names + seeds/claim-the-desk + school tags v1.5 DONE · XP v4 daily-reset DONE ·
@@ -16,7 +16,12 @@ session has the GitHub integration (repo clones automatically)._
   (LinkedIn rank card: themes.js hkRankCard/hkRankCardShare 1200x627 brand PNG,
   buttons on player-card modal + account Progress; PRO placeholder card on
   account; upgrade-modal copy aligned to the decided subscription model).
-  Cache v120. r133: celebration Enter-leak fixed (keyboard-modal toast) · esc-restart holdover copy killed · index dup-modal colony EXCISED (shortcuts/themes/player-card copies + tierOf-sans-wsum split-brain; nav.js sole owner, navOpenKbd/navOpenProfile exports) · .pc-card/.ob-card scroll containment · medal lab iteration 3 (difficulty GRADES 1-5, rank-emblem escalation grammar) AWAITING WOLF. r134: S6 PWA v1 SHIPPED (manifest-only install, NO service worker by design — SW would fight ?v cache discipline; standalone unlocks the pre-wired Ctrl+PgUp/PgDn chords). r135: medal ITERATION 4 (6 grades, teal/diamond top, ANIMATED G6, vol zero-bbox gradient fix) AWAITING WOLF. Structural: S2 full ghost BLOCKS on S4 seeded-RNG slice (random builds make PB traces incoherent) — order is S4 seed slice then S2 full race mode; S7/S8 need egress. S2 DESIGN (settled r135): record the SELECTION PATH in the trace ({k,t,a:activeCell}) at capture time — the ghost cursor becomes pure DATA playback (timed phantom outline on the grid), NO shadow engine; seed capture makes race-your-PB exact (same build). Pace + key-race ghost already live (armGhost/ghostTick, index ~4966). r132: versionup FIN-FIDELITY fix (Wolf's report — SG&A excl. D&A
+  Cache v120. r133: celebration Enter-leak fixed (keyboard-modal toast) · esc-restart holdover copy killed · index dup-modal colony EXCISED (shortcuts/themes/player-card copies + tierOf-sans-wsum split-brain; nav.js sole owner, navOpenKbd/navOpenProfile exports) · .pc-card/.ob-card scroll containment · medal lab iteration 3 (difficulty GRADES 1-5, rank-emblem escalation grammar) AWAITING WOLF. r134: S6 PWA v1 SHIPPED (manifest-only install, NO service worker by design — SW would fight ?v cache discipline; standalone unlocks the pre-wired Ctrl+PgUp/PgDn chords). r135: medal ITERATION 4 (6 grades, teal/diamond top, ANIMATED G6, vol zero-bbox gradient fix) AWAITING WOLF. Structural: S2 full ghost BLOCKS on S4 seeded-RNG slice (random builds make PB traces incoherent) — order is S4 seed slice then S2 full race mode; S7/S8 need egress. S2 DESIGN (settled r135): record the SELECTION PATH in the trace ({k,t,a:activeCell}) at capture time — the ghost cursor becomes pure DATA playback (timed phantom outline on the grid), NO shadow engine; seed capture makes race-your-PB exact (same build). Pace + key-race ghost already live (armGhost/ghostTick, index ~4966).
+  r136: favicon set CONVERGED (ico/png/apple-touch were still the pre-crest
+  cell mark — regenerated from the svg; v121) · dev/MONETIZATION_DESIGN.md
+  (level gates dark-ship spec, seasons=comp-cycle query windows, Pro only SKU)
+  · dev/ROADMAP_FABLE.md = ROADMAP OF RECORD (38 passes, 5 tiers) — new
+  sessions work TOP OF THAT FILE after the smoke test. r132: versionup FIN-FIDELITY fix (Wolf's report — SG&A excl. D&A
   label, D&A→EBIT reconciliation rows, ratio-bounded inputs, par 150/91, PARS
   fossil added) · ACHIEVEMENT MEDAL LAB art/ach-proto.html iteration 2 (9
   categories, tier-metal medals) AWAITING WOLF approval before hkBadge port ·
