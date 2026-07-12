@@ -3044,3 +3044,26 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   buildable) first; S7 streaks/email + S8 admin analytics queue for an
   egress session; S4 drillgen integration after.
 - CACHE v119 -> v120 (nav.js, nav.css, index.html changed; all 9 pages).
+
+---
+# ROUND 134 — S6 PWA v1 SHIPPED (manifest-only install; the structural arc opens)
+- STRUCTURAL ARC (Wolf's go): first item S6. DESIGN CALL — NO service worker
+  in v1. A SW that caches shared assets would fight the ?v cache-busting
+  discipline (the project's oldest defect class); Chrome no longer requires
+  a SW for installability, so manifest-only gets the install + standalone
+  window with ZERO stale-cache risk. Offline support = its own future round
+  (network-first SW, update flow) if ever wanted.
+- SHIPPED: manifest.json (standalone, start_url /index.html?src=pwa, theme
+  #292b31) + icon-192/512.png rendered from the favicon crest (Playwright,
+  transparent-corner rounded square; 512 declared any+maskable) + manifest
+  link + theme-color meta on index.html.
+- THE PAYOFF WAS PRE-WIRED: IS_STANDALONE (4362), standalone Ctrl/Cmd+PgUp/
+  PgDn drill hop (5931), and the sheet-tab walk already accepting Ctrl+Pg
+  (6106) have sat unreachable since r57/r88 — no manifest ever shipped, so
+  standalone mode could not exist. Install the app and the browser-reserved
+  chords come alive. No engine changes needed this round.
+- VERIFY: manifest fetches + parses from the page (3 icons, standalone),
+  boot clean, zero page errors. Installability itself needs HTTPS — confirm
+  on www.hotkey.gg post-deploy (chrome address-bar install icon).
+- No shared-asset change; ?v stays 120. NEXT STRUCTURAL: S2 ghost cursor
+  (PB-trace replay on the grid; traces timestamped since r9), then S4/S7/S8.

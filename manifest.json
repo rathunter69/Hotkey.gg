@@ -1,0 +1,14 @@
+{
+  "name": "hotkey.gg — keyboard-only Excel training",
+  "short_name": "hotkey.gg",
+  "description": "Excel keystroke speedrun trainer. No mouse allowed.",
+  "start_url": "/index.html?src=pwa",
+  "display": "standalone",
+  "background_color": "#292b31",
+  "theme_color": "#292b31",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
