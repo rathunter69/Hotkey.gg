@@ -2705,3 +2705,32 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   smoke test runs in the SPAWNED FRESH SESSION (this container predates the
   egress policy — see r119 trigger note in chat).
 - No shared-asset change; ?v stays 113. Migration deploys on push.
+
+---
+# ROUND 120 — LEGACY-ARTIFACT AUDIT (Wolf: "recurring issue — keep everything
+# on the latest versions"). Systematic sweep, its own pass as suspected.
+- SWEEP TOOLING (repeatable): (a) `window.X = window.X ||` fallback-copy scan,
+  (b) adjacent-duplicate-line scan (the r112 dup-delegation class), (c) old
+  ladder-name grep, (d) localStorage write/read orphan inventory, (e) weekly-
+  engine reachability, (f) normalized diff of sync-set copies vs themes.js.
+- FOUND & FIXED: index carried ~6.5KB of STALE hkBadge + rankEmblem +
+  RANK_EMBLEM_IDX fallback copies (older art generation; drifted from
+  themes.js v2) — the exact class that made r112's stale ladder: wrong art
+  on any stale-cache day. Deleted; themes.js is the only source (r64 rule);
+  all call sites window.-guarded so a themes failure renders empty, never
+  wrong. Stale themes comment ('capped at Incoming Analyst' — a v3 tier)
+  corrected to Summer Analyst.
+- FALSE ALARMS (documented so nobody re-chases them): hotkey_pb/solves/streak
+  'read-never-written' — written via KV.set(key,...) dynamically, sweep only
+  sees literal setItem; the CSS duplicate gradient line is an intentional
+  two-layer background; weeklyMode ×12 = the retired-but-dormant engine
+  (r-decision, gated).
+- FOSSIL LEDGER TO DATE (the disease this pass closes out): dup taskLine
+  (r103) · dress unsolvable paths (r106-era) · clipboard nulled after paste,
+  loadChallenge edit-state leak, Alt+= demo misuse, editfix mangling (r106) ·
+  3 stale rank ladders + raw-vs-shrunk + wsum split (r112) · promptHandle
+  recursion shim (r115) · 4 drifted computeXP copies (r116) · level-
+  persistence gap (r117) · stale emblem fallbacks (r120). STANDING RULE
+  reaffirmed: shared dicts/fns live in ONE file; fallbacks may not carry
+  implementations, only graceful empties.
+- v114.

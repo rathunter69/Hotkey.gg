@@ -258,7 +258,7 @@ window.HK_RANK = {
     for(let i=T.length-1;i>=1;i--){ if(att>=T[i].att && avgPct<=T[i].pct){ t={...T[i], i}; break; } }
     // PLACEMENT SEASON-ZERO RULE: until you've faced enough real competition
     // (weighted boards \u2265 PROVISIONAL_W — small fields count fractionally), rank is
-    // capped at Incoming Analyst and tagged provisional. Everyone starts low and
+    // capped at Summer Analyst and tagged provisional. Everyone starts low and
     // EARNS altitude as the field fills in — no day-one Second-Years off 3-player boards.
     let provisional=false;
     if(wsum!==undefined && wsum!==null && wsum < this.PROVISIONAL_W && t.i>2){
