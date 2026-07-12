@@ -2915,3 +2915,38 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   unbalanced ternary in the picker tooltip before it ever booted), 4
   pages boot clean, e2e demo-replay ALL GREEN. Live RPC verification
   rides the next fresh-session smoke (egress blocked here).
+
+---
+# ROUND 131 — LIVE SMOKE TEST: THE PIPELINE THAT NEVER RAN (first egress session)
+- FIRST SESSION WITH EGRESS since the desks arc. The planned RPC smoke test
+  instead found the real story: EVERY migration from 20260707000000 onward is
+  MISSING from the live database — desks v1/v1.5/v2, protected names, seeds,
+  school tags, assignments, handle rules, blocklist, flair, entitlements,
+  profiles.team_code. Live profiles = {id, handle, updated_at}.
+- ROOT CAUSE (GitHub Actions logs): all 9 runs of supabase-deploy.yml since
+  2026-07-07 failed at step 1 — "Access token not provided". The repo secret
+  SUPABASE_ACCESS_TOKEN was never set (README one-time setup never done).
+  The r9 "deploys confirmed working (team_code applied)" AUDIT claim was
+  FALSE. Client-side try/catch around desk RPCs made prod degrade silently
+  to the pre-desks UI, which is why nobody saw it.
+- FIXES SHIPPED: workflow gains fail-LOUD secret check + workflow_dispatch
+  manual trigger + SUPABASE_DB_PASSWORD (db push needs it right after the
+  token problem); README rewritten with the 2-secret runbook; all 13
+  migrations re-scanned idempotent → one green run applies the backlog.
+- BUG (static analysis, FIXED in 20260712700000_claim_fix.sql): claim-vs-
+  domain-join deadlock — join_desk claimed only on (ownerless AND zero
+  members); one join_home_desk student would permanently block the club
+  president's code-claim. Now: code-join claims any ownerless desk with no
+  sitting captain (code = captaincy, domain = membership — the r122 doctrine).
+- DISCOVERED LIVE: signup is server-gated to .edu emails ("Only .edu email
+  addresses may register for the beta") — NOT in the repo, added manually in
+  the dashboard. Flagged to Wolf: locks out the stated IB-professional
+  audience; decide keep-and-document vs remove.
+- WHAT PASSED LIVE: auth signup→session (no email confirm), redeem_code HAGS,
+  profiles upsert + RLS self-read. Full matrix is in dev/smoke-live.mjs
+  (committed; runs post-fix). Test accounts left in prod listed in
+  dev/SMOKE_REPORT.md for service-role cleanup.
+- WOLF ACTION REQUIRED (3 min): add SUPABASE_ACCESS_TOKEN +
+  SUPABASE_DB_PASSWORD repo secrets → Actions → Run workflow → tell Claude
+  "pipeline is green". Seed codes must NOT be distributed before that.
+- No shared-asset change; ?v stays 117. No deploy-set page touched.
