@@ -1,159 +1,213 @@
-<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 2</title>
+<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 3</title>
 <style>
-  body{margin:0;font-family:'JetBrains Mono',monospace;background:#17181d;color:#cdd0d6;padding:28px}
+  body{margin:0;font-family:'JetBrains Mono',monospace;background:#141519;color:#cdd0d6;padding:28px}
   h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 4px} .sub{font-size:11px;color:#666a72;margin-bottom:22px}
-  .row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:26px}
-  .tile{width:158px;background:#1f2127;border:1px solid #2f323a;border-radius:12px;padding:18px 10px 12px;text-align:center}
+  .row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:26px;align-items:flex-end}
+  .tile{width:158px;background:#1d1f25;border:1px solid #2d3038;border-radius:12px;padding:18px 10px 12px;text-align:center}
   .tile.light{background:#e9eaed;border-color:#d0d2d8;color:#3a3d44}
   .tile .nm{font-size:9.5px;letter-spacing:1px;margin-top:10px;color:#9a9ea8;text-transform:uppercase}
   .tile .gl{font-size:8.5px;color:#5d616a;margin-top:2px}
   .tile.light .nm{color:#6b6f78}
-  .chips{display:flex;gap:14px;align-items:center;background:#1f2127;border:1px solid #2f323a;border-radius:12px;padding:12px 16px;width:max-content}
+  .chips{display:flex;gap:14px;align-items:center;background:#1d1f25;border:1px solid #2d3038;border-radius:12px;padding:12px 16px;width:max-content}
   .cap{font-size:10px;color:#666a72;margin:18px 0 8px;letter-spacing:1.5px}
-  /* rank-up animation PREVIEW (hover) — the layer groups are animation-ready */
-  .tile svg .aura{transition:opacity .4s} .tile:hover svg .aura{animation:pulse 1.6s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:.75}50%{opacity:1}}
+  .tile svg .aura{transition:opacity .4s} .tile:hover svg .aura{animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
 </style></head><body>
-<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 2</h1>
-<div class="sub">distinct desk-culture glyph per rank &middot; ornament + glow escalate toward the summit &middot; layers grouped for future rank-up FX (hover a tile to preview the aura pulse)</div>
-<div class="cap">HERO 104px · DARK</div><div class="row" id="dark"></div>
-<div class="cap">HERO 104px · LIGHT</div><div class="row" id="light"></div>
-<div class="cap">SILHOUETTE TEST · 20px CHIP ROW</div><div class="chips" id="chips"></div>
+<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 3</h1>
+<div class="sub">EIGHT BESPOKE SILHOUETTES — tier readable from shape alone (the LoL rule) &middot; scale + ornament + glow escalate &middot; coffee retired &rarr; the intern lanyard</div>
+<div class="cap">HERO 116px · DARK</div><div class="row" id="dark"></div>
+<div class="cap">HERO 116px · LIGHT</div><div class="row" id="light"></div>
+<div class="cap">SILHOUETTE TEST · 22px CHIP ROW</div><div class="chips" id="chips"></div>
 <script>
-/* Iteration 2 — Wolf's notes: (1) distinct glyph per rank, tied to desk identity;
-   (2) Master-tier flair: glow borders, ornamental edges, detail density scaling up.
-   Layer groups carry classes (.aura .frame .glyph .ornament) so rank-up animations
-   can target them later without touching the art. */
-function emblem(cfg, size){
-  const id='g'+Math.random().toString(36).slice(2,8);
-  const P=cfg.pal;
-  let defs=`
+/* Iteration 3 — Wolf: "lack of visual clarity between ranks". Fix: ONE SHAPE PER
+   TIER (badge -> seal -> shield -> hex -> flared crest -> bladed crest -> horned
+   crest -> spire), scale grows with rank, ornament + glow stack on top.
+   Layer classes (.aura .frame .glyph .ornament) stay animation-ready. */
+let UID=0;
+function defs(id,P,glow){
+  return `<defs>
     <linearGradient id="${id}m" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${P.hi}"/><stop offset=".45" stop-color="${P.mid}"/>
-      <stop offset=".55" stop-color="${P.lo}"/><stop offset="1" stop-color="${P.deep}"/>
-    </linearGradient>
-    <linearGradient id="${id}m2" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="${P.hi}"/><stop offset="1" stop-color="${P.lo}"/>
-    </linearGradient>
+      <stop offset=".55" stop-color="${P.lo}"/><stop offset="1" stop-color="${P.deep}"/></linearGradient>
     <linearGradient id="${id}p" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${P.plateHi}"/><stop offset="1" stop-color="${P.plateLo}"/>
-    </linearGradient>
-    <radialGradient id="${id}core" cx=".5" cy=".38">
-      <stop offset="0" stop-color="${P.coreGlow}" stop-opacity=".5"/>
-      <stop offset="1" stop-color="${P.coreGlow}" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="${id}glow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="${cfg.glow||0}" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>`;
-  if(cfg.aura) defs+=`<radialGradient id="${id}a"><stop offset=".25" stop-color="${P.aura}" stop-opacity=".5"/><stop offset="1" stop-color="${P.aura}" stop-opacity="0"/></radialGradient>`;
-  const shield='M50 5 L83 17 L87 46 L69 85 L50 95 L31 85 L13 46 L17 17 Z';
-  const inner ='M50 13 L77 23 L80.5 46 L65 79 L50 87 L35 79 L19.5 46 L23 23 Z';
-  let o='';
-  // aura + rays
-  if(cfg.aura) o+=`<g class="aura"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/></g>`;
-  if(cfg.rays){ let r=''; for(let i=0;i<16;i++){ const a=(i*22.5-90)*Math.PI/180, big=i%4===0;
-    r+=`<line x1="${50+Math.cos(a)*(big?38:41)}" y1="${50+Math.sin(a)*(big?38:41)}" x2="${50+Math.cos(a)*(big?49:46)}" y2="${50+Math.sin(a)*(big?49:46)}" stroke="${P.hi}" stroke-width="${big?2.6:1}" stroke-linecap="round" opacity="${big?0.95:0.55}"/>`; }
-    o+=`<g class="aura">${r}</g>`; }
-  // wings — higher, more aggressive sweep
-  if(cfg.wings){ let w='';
-    for(let s of [-1,1]){ for(let f=0;f<cfg.wings;f++){ const y0=38-f*3, len=24+f*9, rise=18+f*8;
-      w+=`<path d="M${50+s*33} ${y0} Q ${50+s*(33+len*0.9)} ${y0-rise*0.8} ${50+s*(33+len)} ${y0-rise}
-           Q ${50+s*(33+len*0.72)} ${y0-rise+7+f*1.5} ${50+s*(33+len*0.34)} ${y0+7+f*2.2} Z"
-           fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8" opacity="${0.97-f*0.09}"/>`; } }
-    o+=`<g class="ornament">${w}</g>`; }
-  // ornamental side thorns (master-tier edge-work)
-  if(cfg.thorns){ let t='';
-    for(let s of [-1,1]){
-      t+=`<path d="M${50+s*36} 52 L${50+s*46} 47 L${50+s*39} 57 L${50+s*49} 56 L${50+s*40} 64 L${50+s*44} 70 L${50+s*36} 66 Z" fill="url(#${id}m2)" stroke="${P.deep}" stroke-width=".7"/>`;
-      t+=`<path d="M${50+s*30} 82 L${50+s*38} 88 L${50+s*29} 89 Z" fill="url(#${id}m2)" stroke="${P.deep}" stroke-width=".6"/>`; }
-    o+=`<g class="ornament">${t}</g>`; }
-  // glowing plate + double frame (outer frame carries the glow filter)
-  o+=`<g class="frame" ${cfg.glow?`filter="url(#${id}glow)"`:''}>
-    <path d="${shield}" fill="url(#${id}p)" stroke="${P.deep}" stroke-width="2.4"/>
-    <path d="${shield}" fill="none" stroke="url(#${id}m)" stroke-width="3.6" transform="scale(0.985)" transform-origin="50 50"/>
-  </g>`;
-  o+=`<path d="${inner}" fill="none" stroke="${P.mid}" stroke-width="1.1" opacity=".85"/>`;
-  // faceted plate detail: inner bevel spokes
-  o+=`<path d="M50 13 L50 5 M23 23 L17 17 M77 23 L83 17 M35 79 L31 85 M65 79 L69 85" stroke="${P.mid}" stroke-width="1" opacity=".5"/>`;
-  o+=`<path d="M19 17.6 L50 5.8 L81 17.6" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".8" stroke-linecap="round"/>`;
-  if(cfg.core) o+=`<circle cx="50" cy="47" r="26" fill="url(#${id}core)"/>`;
-  // laurel
-  if(cfg.laurel){ let lr='';
-    for(let s of [-1,1]){
-      lr+=`<path d="M${50+s*27} 81 q ${s*17} -11 ${s*19} -36" fill="none" stroke="url(#${id}m)" stroke-width="2.4" stroke-linecap="round"/>`;
-      for(let l=0;l<5;l++){ const t2=l/4.4, x=50+s*(27+17*t2*(2-t2)*0.95), y=80-36*t2;
-        lr+=`<ellipse cx="${x}" cy="${y}" rx="4.8" ry="2" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".5" transform="rotate(${s*(-52+t2*66)} ${x} ${y})"/>`; } }
-    o+=`<g class="ornament">${lr}</g>`; }
-  // crown — bigger, jeweled, sits proud of the plate
-  if(cfg.crown){ o+=`<g class="ornament" ${cfg.glow?`filter="url(#${id}glow)"`:''}>
-    <path d="M33 19 L36 6.5 L44 14.5 L50 3.5 L56 14.5 L64 6.5 L67 19 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
-    <circle cx="50" cy="2.8" r="2.2" fill="${P.gemHi}"/><circle cx="36.4" cy="5.6" r="1.5" fill="${P.gemHi}"/><circle cx="63.6" cy="5.6" r="1.5" fill="${P.gemHi}"/>
-  </g>`; }
-  // chevrons (low-tier progression marks, under the glyph)
-  for(let c=0;c<(cfg.chev||0);c++){ const y=78-c*7;
-    o+=`<path d="M40 ${y} L50 ${y-6.5} L60 ${y} L60 ${y+4.5} L50 ${y-2} L40 ${y+4.5} Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>`; }
-  // ---- THE GLYPH (Wolf: every rank gets its own identity) ----
-  const G=P, gy=cfg.chev?42:47;
-  const glyphs={
-    ref:`<text x="50" y="44" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="15" fill="#e0503c">#REF!</text>
-         <text x="50" y="60" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="${P.mid}">circular</text>`,
-    book:`<g transform="translate(50 ${gy})">
-      <path d="M-15 8 Q -8 3.5 0 5 Q 8 3.5 15 8 L15 -9 Q 8 -13.5 0 -12 Q -8 -13.5 -15 -9 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
-      <path d="M0 5 L0 -12" stroke="${P.deep}" stroke-width="1.2"/>
-      <path d="M-11.5 -6 Q -6 -8.5 -3 -7.5 M-11.5 -2 Q -6 -4.5 -3 -3.5 M-11.5 2 Q -6 -0.5 -3 0.5 M3 -7.5 Q 6 -8.5 11.5 -6 M3 -3.5 Q 6 -4.5 11.5 -2" stroke="${P.plateLo}" stroke-width="1" fill="none"/></g>`,
-    coffee:`<g transform="translate(50 ${gy+2})">
-      <path d="M-10 -4 L-8 12 Q 0 15 8 12 L10 -4 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
-      <path d="M10 -1 q 7 0 6 6 q -0.8 5 -7.5 4" fill="none" stroke="url(#${id}m)" stroke-width="2.4"/>
-      <ellipse cx="0" cy="-4" rx="10" ry="2.6" fill="${P.plateLo}" stroke="${P.deep}" stroke-width="1"/>
-      <path d="M-4 -9 q 2 -3 0 -6 M2 -9 q 2 -3 0 -6" stroke="${P.mid}" stroke-width="1.4" fill="none" stroke-linecap="round"/></g>`,
-    keycap:`<g transform="translate(50 ${gy})">
-      <rect x="-13" y="-12" width="26" height="24" rx="4.5" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/>
-      <rect x="-9.5" y="-9" width="19" height="16" rx="3" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
-      <text x="0" y="2.5" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="10" fill="${P.hi}">F4</text></g>`,
-    sigma:`<g transform="translate(50 ${gy})">
-      <path d="M-10 -13 L11 -13 L11 -7.5 L-2.5 -7.5 L6 0 L-2.5 7.5 L11 7.5 L11 13 L-10 13 L-10 8.5 L0.5 0 L-10 -8.5 Z"
-        fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/></g>`,
-    chart:`<g transform="translate(50 ${gy+1})">
-      <rect x="-12" y="4" width="5" height="9" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
-      <rect x="-4" y="-1" width="5" height="14" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
-      <rect x="4" y="-6" width="5" height="19" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
-      <path d="M-12 -3 L-1 -8 L4 -12 L12 -15" fill="none" stroke="${P.hi}" stroke-width="2" stroke-linecap="round"/>
-      <path d="M7 -16.5 L12.5 -15.3 L10.2 -10.5" fill="none" stroke="${P.hi}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>`,
-    nib:`<g transform="translate(50 ${gy})">
-      <path d="M0 -14 Q 11 -6 8.5 4 L0 15 L-8.5 4 Q -11 -6 0 -14 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/>
-      <circle cx="0" cy="-1" r="2.2" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
-      <path d="M0 1 L0 12" stroke="${P.deep}" stroke-width="1.3"/></g>`,
-    bolt:`<g transform="translate(50 ${gy})" ${cfg.glow?`filter="url(#${id}glow)"`:''}>
-      <path d="M-2 -16 L9 -16 L2 -3 L10 -3 L-7 17 L-1 1 L-9 1 Z" fill="${P.gemHi}" stroke="${P.deep}" stroke-width="1"/>
-      <path d="M-2 -16 L9 -16 L2 -3 L-2 -3 Z" fill="#ffffff" opacity=".3"/></g>`,
-  };
-  if(cfg.glyph) o+=`<g class="glyph">${glyphs[cfg.glyph]}</g>`;
-  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">${'<defs>'+defs+'</defs>'}${o}</svg>`;
+      <stop offset="0" stop-color="${P.plateHi}"/><stop offset="1" stop-color="${P.plateLo}"/></linearGradient>
+    <radialGradient id="${id}core" cx=".5" cy=".4">
+      <stop offset="0" stop-color="${P.core}" stop-opacity=".55"/><stop offset="1" stop-color="${P.core}" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${id}a"><stop offset=".25" stop-color="${P.core}" stop-opacity=".5"/><stop offset="1" stop-color="${P.core}" stop-opacity="0"/></radialGradient>
+    <filter id="${id}g" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="${glow||0}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>`;
 }
-const IRON ={hi:'#b9bec9',mid:'#878d99',lo:'#585d68',deep:'#2e3138',plateHi:'#383b43',plateLo:'#22242a',gemHi:'#c2c8d4',aura:'#8b919d',coreGlow:'#9aa0ac'};
-const SLATE={hi:'#c7cbd4',mid:'#949aa6',lo:'#636974',deep:'#33363e',plateHi:'#3d4048',plateLo:'#26282e',gemHi:'#d8dce4',aura:'#949aa6',coreGlow:'#a8adb8'};
-const BRONZE={hi:'#f0bc85',mid:'#cd8d4c',lo:'#98622f',deep:'#4c2f16',plateHi:'#463527',plateLo:'#291f18',gemHi:'#ffd9a8',aura:'#cd8d4c',coreGlow:'#e8a45f'};
-const SILVER={hi:'#f2f5fa',mid:'#c6cdd9',lo:'#8f97a6',deep:'#4a515f',plateHi:'#454b57',plateLo:'#272b33',gemHi:'#ffffff',aura:'#c6cdd9',coreGlow:'#dde2ea'};
-const GOLD ={hi:'#ffedaf',mid:'#f2c452',lo:'#c19023',deep:'#5c4307',plateHi:'#4a3f22',plateLo:'#2a2314',gemHi:'#fff6d8',aura:'#f2c452',coreGlow:'#ffd968'};
-const PLAT ={hi:'#dcfcf6',mid:'#83dac9',lo:'#3f9d90',deep:'#1b4c46',plateHi:'#264a45',plateLo:'#172a28',gemHi:'#eafffb',aura:'#83dac9',coreGlow:'#8ef2df'};
-const CRIM ={hi:'#ffab98',mid:'#e4543f',lo:'#9e2c1e',deep:'#43120e',plateHi:'#3d1e1a',plateLo:'#221110',gemHi:'#ffd0c4',aura:'#ff5d42',coreGlow:'#ff6b52'};
-const DIAM ={hi:'#f0fcff',mid:'#95dcf5',lo:'#4aa4c9',deep:'#1a4860',plateHi:'#22404f',plateLo:'#14262f',gemHi:'#ffffff',aura:'#8fd8f2',coreGlow:'#a8ecff'};
+function frame(id,P,path,glow,sw){ // dark keyline -> metal band -> plate -> rim light
+  return `<g class="frame" ${glow?`filter="url(#${id}g)"`:''}>
+    <path d="${path}" fill="none" stroke="${P.deep}" stroke-width="${(sw||3.4)+2.6}" stroke-linejoin="round"/>
+    <path d="${path}" fill="url(#${id}p)" stroke="url(#${id}m)" stroke-width="${sw||3.4}" stroke-linejoin="round"/>
+  </g>`;
+}
+/* ---------- glyphs ---------- */
+const GLY={
+  ref:(id,P)=>`<text x="50" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="12.5" fill="#e0523d">#REF!</text>`,
+  book:(id,P)=>`<g transform="translate(50 51)">
+    <path d="M-12 6.5 Q -6.5 3 0 4 Q 6.5 3 12 6.5 L12 -7 Q 6.5 -10.5 0 -9.5 Q -6.5 -10.5 -12 -7 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1"/>
+    <path d="M0 4 L0 -9.5" stroke="${P.deep}" stroke-width="1.1"/>
+    <path d="M-9 -4.5 Q -5 -6.5 -2.5 -5.5 M-9 -1 Q -5 -3 -2.5 -2 M2.5 -5.5 Q 5 -6.5 9 -4.5 M2.5 -2 Q 5 -3 9 -1" stroke="${P.plateLo}" stroke-width=".9" fill="none"/></g>`,
+  lanyard:(id,P)=>`<g transform="translate(50 52)">
+    <path d="M-3 -19 L3 -19 L1.6 -12 L-1.6 -12 Z" fill="${P.mid}" stroke="${P.deep}" stroke-width=".8"/>
+    <rect x="-11" y="-12" width="22" height="27" rx="2.5" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
+    <rect x="-7.5" y="-8" width="7" height="8" rx="1" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".7"/>
+    <path d="M2.5 -6 L8 -6 M2.5 -2.5 L8 -2.5" stroke="${P.plateLo}" stroke-width="1.3"/>
+    <path d="M-7.5 5 L8 5 M-7.5 8.5 L4 8.5" stroke="${P.plateLo}" stroke-width="1.3"/>
+    <circle cx="0" cy="-15.4" r="1.3" fill="${P.plateLo}"/></g>`,
+  keycap:(id,P)=>`<g transform="translate(50 50)">
+    <rect x="-13" y="-12.5" width="26" height="25" rx="4.5" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/>
+    <rect x="-9.5" y="-9.5" width="19" height="17" rx="3" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
+    <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="10.5" fill="${P.hi}">F4</text></g>`,
+  sigma:(id,P)=>`<g transform="translate(50 50)">
+    <path d="M-9.5 -13 L10.5 -13 L10.5 -7.6 L-2.2 -7.6 L5.8 0 L-2.2 7.6 L10.5 7.6 L10.5 13 L-9.5 13 L-9.5 8.6 L0.4 0 L-9.5 -8.6 Z"
+      fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/></g>`,
+  chart:(id,P)=>`<g transform="translate(50 51)">
+    <rect x="-12" y="3" width="5.2" height="10" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+    <rect x="-3.5" y="-2" width="5.2" height="15" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+    <rect x="5" y="-7" width="5.2" height="20" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+    <path d="M-12 -6 L-1 -11 L5 -14.5 L12 -17.5" fill="none" stroke="${P.hi}" stroke-width="2.1" stroke-linecap="round"/>
+    <path d="M7 -19.5 L12.8 -17.8 L10.3 -12.6" fill="none" stroke="${P.hi}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></g>`,
+  nib:(id,P)=>`<g transform="translate(50 52)">
+    <path d="M0 -15 Q 11.5 -6.5 9 4.5 L0 16 L-9 4.5 Q -11.5 -6.5 0 -15 Z" fill="#f3ead9" stroke="${P.deep}" stroke-width="1.2"/>
+    <path d="M0 -15 Q 6 -10 5.2 1 L0 16" fill="#d9ccb4" opacity=".55"/>
+    <circle cx="0" cy="-1" r="2.3" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
+    <path d="M0 1.3 L0 13" stroke="${P.deep}" stroke-width="1.4"/></g>`,
+  bolt:(id,P)=>`<g transform="translate(50 50)">
+    <path d="M-1.5 -17 L9.5 -17 L2.5 -3.5 L10.5 -3.5 L-7 18 L-1 1.5 L-9.5 1.5 Z" fill="#ffffff" stroke="${P.lo}" stroke-width="1"/>
+    <path d="M-1.5 -17 L9.5 -17 L2.5 -3.5 L-1.8 -3.5 Z" fill="${P.hi}" opacity=".7"/></g>`,
+};
+/* ---------- palettes ---------- */
+const IRON ={hi:'#a9aeb9',mid:'#7c828e',lo:'#525761',deep:'#26282e',plateHi:'#33363d',plateLo:'#1f2126',core:'#8b919d'};
+const SLATE={hi:'#c4c9d3',mid:'#9299a6',lo:'#5f6570',deep:'#2c2f36',plateHi:'#3a3d45',plateLo:'#24262c',core:'#a5abb8'};
+const BRONZE={hi:'#f4c088',mid:'#cf8e4c',lo:'#95602c',deep:'#432a12',plateHi:'#453425',plateLo:'#271e16',core:'#e8a45f'};
+const SILVER={hi:'#f4f7fc',mid:'#c9d0dc',lo:'#8e96a5',deep:'#454c59',plateHi:'#454b57',plateLo:'#262a32',core:'#dde2ea'};
+const GOLD ={hi:'#ffefb3',mid:'#f4c754',lo:'#bf8e20',deep:'#523a05',plateHi:'#4a3f20',plateLo:'#282112',core:'#ffd968'};
+const PLAT ={hi:'#e0fdf7',mid:'#86dcca',lo:'#3d9c8e',deep:'#173f3a',plateHi:'#25453f',plateLo:'#152522',core:'#8ef2df'};
+const CRIM ={hi:'#ffb3a1',mid:'#e65843',lo:'#9c2a1c',deep:'#3a0f0b',plateHi:'#3b1d19',plateLo:'#1f0f0e',core:'#ff6248'};
+const DIAM ={hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',plateHi:'#21404f',plateLo:'#12232c',core:'#a8ecff'};
+/* ---------- eight bespoke tiers ---------- */
+function t_mba(sz){ const id='e'+(UID++), P=IRON;
+  const sq='M34 34 L66 34 L66 66 L34 66 Z';
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,0)}
+    ${frame(id,P,sq,0,3)}
+    <path d="M40 30 L56 46 L47 52 L62 70" fill="none" stroke="${P.deep}" stroke-width="1.6"/>
+    <path d="M35 34.8 L65 34.8" stroke="#ffffff" stroke-width="1.1" opacity=".55"/>
+    <text x="50" y="53.5" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="11" fill="#e0523d">#REF!</text>
+  </svg>`; }
+function t_candidate(sz){ const id='e'+(UID++), P=SLATE;
+  let notch=''; for(let i=0;i<8;i++){ const a=i*45*Math.PI/180;
+    notch+=`<line x1="${50+Math.cos(a)*27}" y1="${50+Math.sin(a)*27}" x2="${50+Math.cos(a)*30.5}" y2="${50+Math.sin(a)*30.5}" stroke="url(#${id}m)" stroke-width="3.6"/>`; }
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,0)}
+    <g class="ornament">${notch}</g>
+    ${frame(id,P,'M50 24 A26 26 0 1 1 49.9 24 Z',0,3.2)}
+    <circle cx="50" cy="50" r="20.5" fill="none" stroke="${P.mid}" stroke-width=".9" opacity=".8"/>
+    <path d="M31 41 A21 21 0 0 1 69 41" fill="none" stroke="#ffffff" stroke-width="1.2" opacity=".5"/>
+    ${GLY.book(id,P)}
+  </svg>`; }
+function t_summer(sz){ const id='e'+(UID++), P=BRONZE;
+  const sh='M50 20 L76 28 L74 56 L50 82 L26 56 L24 28 Z';
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,0)}
+    <circle cx="50" cy="50" r="27" fill="url(#${id}core)"/>
+    ${frame(id,P,sh,0,3.2)}
+    <circle cx="30" cy="31.5" r="1.7" fill="url(#${id}m)"/><circle cx="70" cy="31.5" r="1.7" fill="url(#${id}m)"/>
+    <circle cx="28.5" cy="53" r="1.7" fill="url(#${id}m)"/><circle cx="71.5" cy="53" r="1.7" fill="url(#${id}m)"/>
+    <path d="M26.5 27.5 L50 20.8 L73.5 27.5" fill="none" stroke="#ffffff" stroke-width="1.3" opacity=".65"/>
+    ${GLY.lanyard(id,P)}
+  </svg>`; }
+function t_firstyear(sz){ const id='e'+(UID++), P=SILVER;
+  const hx='M50 14 L77 30 L77 62 L50 86 L23 62 L23 30 Z';
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,0)}
+    <circle cx="50" cy="50" r="29" fill="url(#${id}core)"/>
+    <g class="ornament">
+      <path d="M23 30 L15 26 L23 38 M77 30 L85 26 L77 38" fill="none" stroke="url(#${id}m)" stroke-width="2.6"/>
+      <path d="M23 62 L16 68 M77 62 L84 68" stroke="url(#${id}m)" stroke-width="2.6"/></g>
+    ${frame(id,P,hx,0,3.2)}
+    <path d="M50 18.5 L73 32 M50 18.5 L27 32" stroke="#ffffff" stroke-width="1.2" opacity=".55"/>
+    <path d="M50 80 L36 68 M50 80 L64 68" stroke="${P.mid}" stroke-width="1" opacity=".6"/>
+    ${GLY.keycap(id,P)}
+  </svg>`; }
+function t_associate(sz){ const id='e'+(UID++), P=GOLD;
+  const cr='M50 12 L62 22 L80 18 L76 44 L64 80 L50 88 L36 80 L24 44 L20 18 L38 22 Z';
+  let lr=''; for(let s of [-1,1]){
+    lr+=`<path d="M${50+s*29} 78 q ${s*17} -12 ${s*18} -38" fill="none" stroke="url(#${id}m)" stroke-width="2.5" stroke-linecap="round"/>`;
+    for(let l=0;l<5;l++){ const t2=l/4.4, x=50+s*(29+16*t2*(2-t2)*0.95), y=77-38*t2;
+      lr+=`<ellipse cx="${x}" cy="${y}" rx="5" ry="2.1" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".5" transform="rotate(${s*(-54+t2*70)} ${x} ${y})"/>`; } }
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,1)}
+    <circle cx="50" cy="48" r="31" fill="url(#${id}core)"/>
+    <g class="ornament">${lr}</g>
+    ${frame(id,P,cr,1,3.2)}
+    <path d="M38 22.6 L50 13 L62 22.6" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".7"/>
+    <circle cx="50" cy="17.5" r="2" fill="${P.hi}"/>
+    ${GLY.sigma(id,P)}
+  </svg>`; }
+function t_vp(sz){ const id='e'+(UID++), P=PLAT;
+  const cr='M50 10 L60 20 L84 14 L78 40 L82 52 L62 84 L50 92 L38 84 L18 52 L22 40 L16 14 L40 20 Z';
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,1.4)}
+    <circle cx="50" cy="48" r="33" fill="url(#${id}core)"/>
+    <g class="ornament">
+      <path d="M16 14 L4 8 L14 26 L8 24 L18 38" fill="none" stroke="url(#${id}m)" stroke-width="2.8" stroke-linejoin="round"/>
+      <path d="M84 14 L96 8 L86 26 L92 24 L82 38" fill="none" stroke="url(#${id}m)" stroke-width="2.8" stroke-linejoin="round"/>
+      <path d="M38 84 L30 94 M62 84 L70 94" stroke="url(#${id}m)" stroke-width="2.4"/></g>
+    ${frame(id,P,cr,1.4,3.2)}
+    <path d="M40 20.5 L50 11 L60 20.5" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".75"/>
+    <path d="M50 10 L50 3" stroke="url(#${id}m)" stroke-width="2.4"/><circle cx="50" cy="2.5" r="2" fill="${P.hi}"/>
+    ${GLY.chart(id,P)}
+  </svg>`; }
+function t_md(sz){ const id='e'+(UID++), P=CRIM;
+  const cr='M50 14 L64 22 L88 10 L80 38 L86 50 L64 86 L50 94 L36 86 L14 50 L20 38 L12 10 L36 22 Z';
+  let horns='';
+  for(let s of [-1,1]){
+    horns+=`<path d="M${50+s*38} 26 Q ${50+s*58} 14 ${50+s*62} -2 Q ${50+s*50} 8 ${50+s*42} 10 Q ${50+s*46} 16 ${50+s*38} 26 Z"
+      transform="translate(0 14)" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1"/>`;
+    horns+=`<path d="M${50+s*36} 60 Q ${50+s*52} 62 ${50+s*56} 74 Q ${50+s*44} 70 ${50+s*40} 66 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>`; }
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,2)}
+    <g class="aura"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/></g>
+    <circle cx="50" cy="50" r="34" fill="url(#${id}core)"/>
+    <g class="ornament">${horns}</g>
+    ${frame(id,P,cr,2,3.4)}
+    <g class="ornament" filter="url(#${id}g)">
+      <path d="M35 21 L38 7 L46 15 L50 4 L54 15 L62 7 L65 21 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
+      <circle cx="50" cy="3" r="2.3" fill="#ffd9cf"/><circle cx="38.4" cy="6.2" r="1.5" fill="#ffd9cf"/><circle cx="61.6" cy="6.2" r="1.5" fill="#ffd9cf"/></g>
+    ${GLY.nib(id,P)}
+  </svg>`; }
+function t_summit(sz){ const id='e'+(UID++), P=DIAM;
+  const sp='M50 2 L64 18 L86 22 L74 46 L78 62 L58 88 L50 98 L42 88 L22 62 L26 46 L14 22 L36 18 Z';
+  let rays=''; for(let i=0;i<20;i++){ const a=(i*18-90)*Math.PI/180, big=i%5===0;
+    rays+=`<line x1="${50+Math.cos(a)*(big?39:42)}" y1="${50+Math.sin(a)*(big?39:42)}" x2="${50+Math.cos(a)*(big?50:46.5)}" y2="${50+Math.sin(a)*(big?50:46.5)}" stroke="${P.hi}" stroke-width="${big?2.6:0.9}" stroke-linecap="round" opacity="${big?0.95:0.5}"/>`; }
+  let shards=''; for(let s of [-1,1]){
+    shards+=`<path d="M${50+s*40} 30 L${50+s*47} 24 L${50+s*44} 34 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
+      <path d="M${50+s*44} 52 L${50+s*52} 50 L${50+s*46} 60 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
+      <path d="M${50+s*34} 78 L${50+s*42} 84 L${50+s*33} 86 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>`; }
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,2.2)}
+    <g class="aura"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/>${rays}</g>
+    <circle cx="50" cy="50" r="34" fill="url(#${id}core)"/>
+    <g class="ornament">${shards}</g>
+    ${frame(id,P,sp,2.2,3.4)}
+    <path d="M36 18.8 L50 3.5 L64 18.8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".85"/>
+    <path d="M26 46 L50 40 L74 46" fill="none" stroke="${P.mid}" stroke-width="1" opacity=".6"/>
+    ${GLY.bolt(id,P)}
+  </svg>`; }
 const TIERS=[
-  {n:'MBA Associate',       g:'#REF! — they broke the model', cfg:{pal:IRON,   glyph:'ref'}},
-  {n:'Candidate',           g:'the book — still studying',    cfg:{pal:SLATE,  glyph:'book',   chev:1}},
-  {n:'Summer Analyst',      g:'the coffee run',               cfg:{pal:BRONZE, glyph:'coffee', chev:1, core:1}},
-  {n:'First-Year Analyst',  g:'the F4 key',                   cfg:{pal:SILVER, glyph:'keycap', chev:2, core:1}},
-  {n:'Associate',           g:'Σ — sums the room',            cfg:{pal:GOLD,   glyph:'sigma',  laurel:1, core:1, glow:1.1}},
-  {n:'VP',                  g:'up and to the right',          cfg:{pal:PLAT,   glyph:'chart',  wings:2, core:1, glow:1.4, thorns:1}},
-  {n:'MD',                  g:'the pen that signs',           cfg:{pal:CRIM,   glyph:'nib',    wings:3, crown:1, core:1, aura:1, glow:2, thorns:1}},
-  {n:'Second-Year Analyst', g:'lightning — the final boss',   cfg:{pal:DIAM,   glyph:'bolt',   wings:3, crown:1, laurel:1, rays:1, core:1, aura:1, glow:2.2, thorns:1}},
+  {n:'MBA Associate', g:'the cracked cell — #REF!', f:t_mba, s:.62},
+  {n:'Candidate', g:'the seal — still studying', f:t_candidate, s:.72},
+  {n:'Summer Analyst', g:'the intern lanyard', f:t_summer, s:.8},
+  {n:'First-Year Analyst', g:'the F4 key', f:t_firstyear, s:.86},
+  {n:'Associate', g:'Σ + laurels', f:t_associate, s:.92},
+  {n:'VP', g:'bladed crest — up and right', f:t_vp, s:.96},
+  {n:'MD', g:'horned crest — the pen signs', f:t_md, s:1},
+  {n:'Second-Year Analyst', g:'the radiant spire', f:t_summit, s:1},
 ];
+const HERO=116;
 for(const t of TIERS){
+  const px=Math.round(HERO*t.s);
   document.getElementById('dark').insertAdjacentHTML('beforeend',
-    `<div class="tile">${emblem(t.cfg,104)}<div class="nm">${t.n}</div><div class="gl">${t.g}</div></div>`);
+    `<div class="tile">${t.f(px)}<div class="nm">${t.n}</div><div class="gl">${t.g}</div></div>`);
   document.getElementById('light').insertAdjacentHTML('beforeend',
-    `<div class="tile light">${emblem(t.cfg,104)}<div class="nm">${t.n}</div></div>`);
-  document.getElementById('chips').insertAdjacentHTML('beforeend', emblem(t.cfg,20));
+    `<div class="tile light">${t.f(px)}<div class="nm">${t.n}</div></div>`);
+  document.getElementById('chips').insertAdjacentHTML('beforeend', t.f(22));
 }
 </script></body></html>
