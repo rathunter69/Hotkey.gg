@@ -2520,3 +2520,34 @@ statement layouts, named companies, FY headers, associate-voice checklists.
   leaderboard rows + player card ride the school-tag chip round · V2
   captain assignments after real desks exist.
 - v107.
+
+---
+# ROUND 112 — RANK CONSISTENCY AUDIT (#29): five real splits found and fixed
+Wolf's #29 ("same tier everywhere — audit") turned out to be FIVE live defects:
+1. STALE INLINE LADDER: index carried the OLD 6-tier HK_RANK as a || fallback
+   (Candidate→Second-Year, pre-r27 thresholds, no provisional rule) + a second
+   stale copy in its local tierOf body; nav.js had a third. Whenever themes.js
+   was slow or stale-cached (the exact failure cache-busting exists for), the
+   game page ranked on a ladder that no longer exists. All deleted — tierOf
+   everywhere is now pure delegation with an MBA-Associate floor fallback
+   (r64 rule: no inlined copies).
+2. PROVISIONAL SPLIT-BRAIN: only the leaderboard roster passed wsum, so the
+   season-zero cap applied THERE but not on the card/pill/standing/top-players
+   — a day-one player on thin boards read MD on their card and Summer Analyst
+   (provisional) on the roster. wsum now flows through every tierOf call
+   (nav card+pill, index card+pill, lb standing/next-rank/top-players ×2,
+   account, stats).
+3. RAW-VS-SHRUNK SCALE: nav's loadProfileData and index's rank pill computed
+   RAW average placement while thresholds are calibrated to the SHRUNK
+   ratingOf scale (r27) — card/pill tier could differ from board tier for the
+   same runs. Both now use HK_RANK.ratingOf / HK_RANK.standing.
+4. LADDER PANEL DUP: leaderboard's roster prepended a manual Candidate row to
+   TIERS.slice(1) — which already starts at Candidate. Candidate listed twice
+   on the tier roster. Prepend removed; reqs read from themes' t.req.
+5. STALE COPY: pill tooltip said the ladder runs 'Candidate → Second-Year';
+   the placement verdict praised 'Top-Bucket Analyst pace' / 'Incoming
+   Analyst pace' — tiers that don't exist. Both speak ladder v4 now.
+- VERIFY: node --check all pages + nav.js; boot x4 zero real errors; demo-
+  replay e2e ALL GREEN. Desks live smoke still pending (egress policy applies
+  to NEW sessions — this one booted under the old policy; retry timer armed).
+- v108.

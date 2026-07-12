@@ -35,15 +35,9 @@
   const GROUP_OF    = _D ? _D.groupOf   : {};
 
   // Same tier function as index.html. Kept in sync — if thresholds change there, change here.
-  function tierOf(avgPct, attemptedCount){
-    if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);   // consolidated source
-    if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);
-    if(avgPct===null || (attemptedCount||0) < 5) return {name:'MBA Associate', cls:'tier-mba'};
-    if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
-    if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst', cls:'tier-platinum'};
-    if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'First-Year Analyst', cls:'tier-gold'};
-    if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Incoming Analyst', cls:'tier-silver'};
-    return {name:'Summer Analyst', cls:'tier-bronze'};
+  function tierOf(avgPct, attemptedCount, wsum){
+    if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount, wsum);   // consolidated source — r112: no stale local ladder
+    return {name:'MBA Associate', cls:'tier-mba'};
   }
 
   // ---------------------------------------------------------------
@@ -294,7 +288,7 @@
     if(!window.sb || !window._navUser) return;
     try{
       const d = await loadProfileData();
-      const t = tierOf(d.avgPct, d.attempted);
+      const t = tierOf(d.avgPct, d.attempted, d.wsum);
       el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name,20):'')+'<span>'+t.name+'</span>';
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
       try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
@@ -332,7 +326,12 @@
       };
     });
     const attempted = drills.filter(d => d.rank !== null);
-    const avgPct = attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null;
+    // r112: SHRUNK rating (HK_RANK.ratingOf), not the raw mean — tier thresholds are
+    // calibrated to the shrunk scale; the raw mean gave the card a different tier than the boards.
+    const avgPct = attempted.length
+      ? (window.HK_RANK ? window.HK_RANK.ratingOf(attempted.map(d=>({pct:d.pct, n:d.total})))
+                        : attempted.reduce((a,d) => a + d.pct, 0) / attempted.length)
+      : null;
     const myRuns = runs.filter(x => x.user_id === me_id);
     let _chordFreq={}, _totKeys=0;
     try{
@@ -379,7 +378,7 @@
     return { lvl, into: xp-floor, need, pct: Math.min(100, Math.round(100*(xp-floor)/need)) }; }
 
   function renderProfile(m, d){
-    const tier = tierOf(d.avgPct, d.attempted);
+    const tier = tierOf(d.avgPct, d.attempted, d.wsum);
     const fmtMs = ms => (ms/1000).toFixed(2) + 's';
     const handle = (window._navProfile && window._navProfile.handle) || 'set a name';
     // r70b: 'set a name' is a real state (profile without a handle) — make it actionable

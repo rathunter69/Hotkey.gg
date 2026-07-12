@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=107" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=107">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=107">
+<link rel="icon" href="favicon.ico?v=108" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=108">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=108">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1079,14 +1079,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=107"></script>
-<link rel="stylesheet" href="nav.css?v=107">
-<script src="themes.js?v=107"></script>
+<script src="drills.js?v=108"></script>
+<link rel="stylesheet" href="nav.css?v=108">
+<script src="themes.js?v=108"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=107"></script>
+<script src="nav.js?v=108"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -6875,22 +6875,9 @@ function updateStreakUI(n){
 // saga of r52-r63). themes.js (loaded above, line ~955) is the single source now.
 const THEMES = window.THEMES;
 let currentTheme = 'default';
-window.HK_RANK = window.HK_RANK || { TIERS:[
-  {name:'Candidate',cls:'tier-unranked',att:0,pct:9},
-  {name:'Summer Analyst',cls:'tier-bronze',att:5,pct:1.01},
-  {name:'Incoming Analyst',cls:'tier-silver',att:8,pct:0.55},
-  {name:'First-Year Analyst',cls:'tier-gold',att:10,pct:0.30},
-  {name:'Top-Bucket Analyst',cls:'tier-platinum',att:13,pct:0.15},
-  {name:'Second-Year Analyst',cls:'tier-diamond',att:15,pct:0.05}],
-  tierOf(avgPct, att){ const T=this.TIERS;
-    if(avgPct===null||(att||0)<5) return {...T[0],i:0,bucket:null,full:T[0].name};
-    let t={...T[1],i:1};
-    for(let i=T.length-1;i>=1;i--){ if(att>=T[i].att&&avgPct<=T[i].pct){ t={...T[i],i}; break; } }
-    const hi=t.pct>1?1:t.pct, lo=t.i+1<T.length?T[t.i+1].pct:0, span=Math.max(1e-9,hi-lo);
-    const pos=Math.min(1,Math.max(0,(avgPct-lo)/span));
-    t.bucket=pos<=1/3?'Top Bucket':(pos<=2/3?'Middle Bucket':'Bottom Bucket');
-    t.full=t.name+' \u00b7 '+t.bucket; return t; }
-};
+/* HK_RANK lives in themes.js ONLY (r64 rule: no inlined copies of shared dicts).
+   r112: the stale 6-tier fallback that sat here showed the OLD ladder whenever
+   themes.js was slow or stale-cached — Wolf's #29 'different rank on different pages'. */
 window.hkBadge = window.hkBadge || function(id, earned, size, color){
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
@@ -7470,18 +7457,12 @@ async function loadProfileData(){
    making it actually rare. The placement axis (avgPct) already averages this user's rank-percentage across drills
    so a single fluke "#1 of 2" run can't carry the rest. The remaining edge case — a player who does 5 drills all
    blazingly fast — caps at Silver here, since Gold needs 10+ drills. */
-function tierOf(avgPct, attemptedCount){
-  if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);
-  if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount);
-  if(avgPct===null || (attemptedCount||0) < 5) return {name:'MBA Associate', cls:'tier-mba'};
-  if(attemptedCount >= 15 && avgPct <= 0.05) return {name:'Second-Year Analyst', cls:'tier-diamond'};
-  if(attemptedCount >= 13 && avgPct <= 0.15) return {name:'Top-Bucket Analyst', cls:'tier-platinum'};
-  if(attemptedCount >= 10 && avgPct <= 0.30) return {name:'First-Year Analyst', cls:'tier-gold'};
-  if(attemptedCount >=  8 && avgPct <= 0.55) return {name:'Incoming Analyst', cls:'tier-silver'};
-  return {name:'Summer Analyst', cls:'tier-bronze'};
+function tierOf(avgPct, attemptedCount, wsum){
+  if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount, wsum);
+  return {name:'MBA Associate', cls:'tier-mba'};   // themes.js missing: show the floor, never a stale ladder
 }
 function renderProfile(m, d){
-  const tier=tierOf(d.avgPct, d.attempted);
+  const tier=tierOf(d.avgPct, d.attempted, d.wsum);
   // Standing is meaningless before the threshold — show progress toward Summer Analyst instead so the user knows what to do.
   // After threshold, show "top X%" (the same average-percentile measure that feeds the tier).
   const fmtMs=ms=>(ms/1000).toFixed(2)+'s';
@@ -7922,7 +7903,7 @@ function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 async function updateRankPill(){
   const el=$('rankPill'); if(!el) return;
   const show=(t)=>{ el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span>';
-    el.title=(t.full||t.name)+' \u2014 the ladder runs Candidate \u2192 Second-Year Analyst. Click for your card.';
+    el.title=(t.full||t.name)+' \u2014 the ladder runs MBA Associate \u2192 Second-Year Analyst. Click for your card.';
     el.className='mb-tool rank-pill '+t.cls; el.style.display='inline-flex';
     el.onclick=()=>{ try{ openProfile(); }catch(e){} }; };
   try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
@@ -7933,13 +7914,11 @@ async function updateRankPill(){
       sb.from('profiles').select('id'),
       sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true})
     ]);
-    const runs=r.data||[]; const per={}; MENU_ORDER.forEach(k=>per[k]=[]); const seen={};
-    runs.forEach(x=>{ if(per[x.challenge]===undefined) return; const key=x.challenge+'|'+x.user_id;
-      if(!seen[key]){ seen[key]=true; per[x.challenge].push(x); } });
-    let att=0, sum=0;
-    MENU_ORDER.forEach(k=>{ const best=per[k]; const idx=best.findIndex(b=>b.user_id===me_user.id);
-      if(idx>=0){ att++; sum+=idx/best.length; } });
-    const t=tierOf(att?sum/att:null, att);
+    const runs=r.data||[];
+    // r112: the pill used a RAW average while every board uses the SHRUNK rating the
+    // tier thresholds are calibrated for — same player, different tier. One path now.
+    const st=window.HK_RANK ? window.HK_RANK.standing(runs, me_user.id, MENU_ORDER) : {avgPct:null, att:0, wsum:0};
+    const t=tierOf(st.avgPct, st.att, st.wsum);
     show(t);
     try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
   }catch(e){}
@@ -8362,9 +8341,9 @@ function startPlacement(){
 // time-vs-par → starting-rung verdict (display only; the real ladder is earned on the boards)
 function placementVerdict(t, par){
   const r = t/Math.max(1,par);
-  if(r<=1.0) return 'Top-Bucket Analyst pace';
-  if(r<=1.5) return 'First-Year Analyst pace';
-  if(r<=2.2) return 'Incoming Analyst pace';
+  if(r<=1.0) return 'Second-Year Analyst pace';
+  if(r<=1.5) return 'Associate pace';
+  if(r<=2.2) return 'First-Year Analyst pace';
   if(r<=3.0) return 'Summer Analyst pace';
   return 'Candidate — the ladder starts here';
 }

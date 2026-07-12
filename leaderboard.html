@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=107" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=107">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=107">
+<link rel="icon" href="favicon.ico?v=108" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=108">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=108">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -165,15 +165,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=107">
-<script src="drills.js?v=107"></script>
+<link rel="stylesheet" href="nav.css?v=108">
+<script src="drills.js?v=108"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=107"></script>
+<script src="themes.js?v=108"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=107"></script>
+<script src="nav.js?v=108"></script>
 
 <header class="head">
   <div class="wrap">
@@ -430,7 +430,7 @@ function heroHtml(){
     }
   }
   const avg=me.att?me.avg:null;
-  const t=tierOf(avg, me.att);
+  const t=tierOf(avg, me.att, me.wsum);
   // XP v2 — mirror of nav.js computeXP (anti-grind decay + challenge bonuses)
   const perD={}; let xp=0;
   DATA.fRuns.filter(x=>x.user_id===meId).forEach(r=>{
@@ -497,9 +497,9 @@ function ladderHtml(){
   const {userStat,meId}=DATA;
   const me=(meId&&userStat[meId])||{att:0,sum:0};
   const avg=me.att?me.avg:null;
-  const cur=tierOf(avg, me.att);
-  const T=[{name:'Candidate',cls:'tier-unranked',req:'take the placement'},
-    ...TIERS.map(t=>({name:t.name,cls:t.cls,req:(t.att?t.att+' drills':'')+(t.pct<=1?' \u00b7 top '+Math.round(t.pct*100)+'%':' \u00b7 any placement')}))];
+  const cur=tierOf(avg, me.att, me.wsum);
+  // r112: TIERS.slice(1) already starts at Candidate — the manual prepend listed it twice
+  const T=TIERS.map(t=>({name:t.name,cls:t.cls,req:t.req||((t.att?t.att+' drills':'')+(t.pct<=1?' \u00b7 top '+Math.round(t.pct*100)+'%':' \u00b7 any placement'))}));
   let rows='';
   T.forEach((t,i)=>{
     const here=t.name===cur.name;
@@ -516,13 +516,13 @@ function topPlayersHtml(){
     .filter(x=>x.att>=5).sort((a,b)=>a.avg-b.avg || b.att-a.att);
   let rows='';
   ranked.slice(0,8).forEach((x,i)=>{
-    const t=tierOf(x.avg,x.att);
+    const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="tp-row'+(x.u===meId?' me':'')+'"><span class="rk'+(i<3?' r'+(i+1):'')+'">'+(i+1)+'</span>'+
       '<span>'+esc(names[x.u])+'<span class="pc-tier tp-tier '+t.cls+'">'+t.name+'</span></span>'+
       '<span class="pct">top '+Math.max(1,Math.round(x.avg*100))+'% \u00b7 '+x.att+' drills</span></div>';
   });
   const myIdx=meId?ranked.findIndex(x=>x.u===meId):-1;
-  if(myIdx>=8){ const x=ranked[myIdx]; const t=tierOf(x.avg,x.att);
+  if(myIdx>=8){ const x=ranked[myIdx]; const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="you-gap">\u00b7\u00b7\u00b7</div><div class="tp-row me"><span class="rk">'+(myIdx+1)+'</span>'+
       '<span>'+esc(names[x.u])+'<span class="pc-tier tp-tier '+t.cls+'">'+t.name+'</span></span>'+
       '<span class="pct">top '+Math.max(1,Math.round(x.avg*100))+'% \u00b7 '+x.att+' drills</span></div>'; }
