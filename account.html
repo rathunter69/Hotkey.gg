@@ -259,6 +259,8 @@ async function load(){
     if(m.includes('ALREADY_ON_DESK'))   return 'You\u2019re already on a desk \u2014 leave it first.';
     if(m.includes('DESK_NOT_FOUND'))    return 'That invite code isn\u2019t valid.';
     if(m.includes('DESK_FULL'))         return 'That desk is full (200).';
+    if(m.includes('DESK_RATE_LIMIT'))   return 'One desk per day \u2014 try again tomorrow.';
+    if(m.includes('NOT_CAPTAIN'))       return 'Only the captain can do that.';
     if(m.includes('duplicate key'))     return 'A desk with that name already exists.';
     return 'Something went wrong.'; };
   async function renderDesk(){
@@ -267,7 +269,7 @@ async function load(){
     try{ const {data}=await sb.rpc('my_desk'); d=(data&&data[0])||null; }catch(e){}
     if(d){
       const inv = d.invite_code
-        ? `<div class="rowline"><span class="k">invite link</span><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><code id="deskLink" style="font-size:11px">https://www.hotkey.gg/?desk=${esc(d.invite_code)}</code><button class="btn ghost" id="deskCopy" style="margin:0">Copy</button></span></div>`
+        ? `<div class="rowline"><span class="k">invite link</span><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><code id="deskLink" style="font-size:11px">https://www.hotkey.gg/?desk=${esc(d.invite_code)}</code><button class="btn ghost" id="deskCopy" style="margin:0">Copy</button><button class="btn ghost" id="deskRotate" style="margin:0" title="new code — old invite links stop working">Rotate</button></span></div>`
         : '';
       el.innerHTML = `<div class="rowline"><span class="k">desk</span><b>${esc(d.name)}</b></div>
         <div class="rowline"><span class="k">analysts</span><span>${d.members} / 200</span></div>
@@ -278,6 +280,14 @@ async function load(){
       const cp=document.getElementById('deskCopy');
       if(cp) cp.onclick=async()=>{ try{ await navigator.clipboard.writeText(document.getElementById('deskLink').textContent);
         say('deskMsg','Link copied \u2014 drop it in the group chat.'); }catch(e){ say('deskMsg','Copy failed \u2014 select the link and copy it.',true); } };
+      const rt=document.getElementById('deskRotate'); let rtArmed=false;
+      if(rt) rt.onclick=async()=>{
+        if(!rtArmed){ rtArmed=true; rt.textContent='Rotate \u2014 old links die'; setTimeout(()=>{rtArmed=false; rt.textContent='Rotate';},2600); return; }
+        try{ const {data,error}=await sb.rpc('rotate_invite');
+          if(error){ say('deskMsg',deskErr(error),true); return; }
+          const lk=document.getElementById('deskLink'); if(lk&&data) lk.textContent='https://www.hotkey.gg/?desk='+data;
+          say('deskMsg','New code minted \u2014 the old invite links are dead.'); rt.textContent='Rotate'; rtArmed=false;
+        }catch(e){ say('deskMsg','Something went wrong.',true); } };
       const lv=document.getElementById('deskLeave'); let armed=false;
       if(lv) lv.onclick=async()=>{
         if(!armed){ armed=true; lv.textContent='Click again to confirm'; setTimeout(()=>{armed=false; lv.textContent='Leave desk';},2600); return; }

@@ -2680,3 +2680,28 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   achievements phase-2 as 8 category glyphs first. Integration = one round:
   rankEmblem gets an asset loader w/ generative fallback.
 - No shared-asset change; ?v stays 113. Migration deploys on push.
+
+---
+# ROUND 119 — DESK SEEDS + CONTROL PASS (claim-the-desk, verified, reports, limits)
+- CLAIM-THE-DESK (the pre-seed unlock): one-desk-per-player means nobody can
+  captain 8 seeds — so seeded desks are OWNERLESS and the FIRST joiner takes
+  the captaincy (join_desk r119). Handing a club president the code IS the
+  handoff. leave_desk semantics unchanged (empty claimed desks self-delete;
+  unclaimed seeds persist).
+- SEEDED 8 PRIMARY TARGETS (fixed codes, in Wolf's hands via chat): Wharton /
+  HBS / Stanford GSB / Columbia Business School / Chicago Booth / Kellogg /
+  NYU Stern / LSE — each with edu_domain stamped (v1.5 home-desk suggest is
+  pre-wired).
+- CONTROLS SHIPPED (from TRUST_SAFETY.md build order): teams.verified flag +
+  '✓ verified' badge on the desk page · reports table (RLS: insert-own only,
+  NO client reads — service-role review) with report affordances on the desk
+  banner (kind desk) and public player cards (kind handle, self-report
+  hidden) · 1 desk/day creation rate limit (trigger; seeds exempt via null
+  owner) · rotate_invite() RPC + captain Rotate button w/ click-again arm
+  ('old links die').
+- teams column grants re-issued incl. verified/edu_domain; leaderboard selects
+  them explicitly (r110 rule).
+- VERIFY: boot clean (lb ?desk= + account); e2e green; node --check; live
+  smoke test runs in the SPAWNED FRESH SESSION (this container predates the
+  egress policy — see r119 trigger note in chat).
+- No shared-asset change; ?v stays 113. Migration deploys on push.

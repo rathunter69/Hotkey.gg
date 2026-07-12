@@ -324,7 +324,7 @@ async function load(){
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
       sb.from('team_members').select('team_id,user_id'),
-      sb.from('teams').select('id,name,slug'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
+      sb.from('teams').select('id,name,slug,verified'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
     ]);
     profs=p.data||[]; runs=r.data||[]; sessions=se.data||[];
     window.__deskMembers=(tm&&tm.data)||[]; window.__deskTeams=(tt&&tt.data)||[];
@@ -350,7 +350,7 @@ async function load(){
   const memByTeam={}; members.forEach(m=>{ (memByTeam[m.team_id]=memByTeam[m.team_id]||[]).push(m.user_id); });
   const deskSlug=new URLSearchParams(location.search).get('desk');
   if(deskSlug){ const t=teams.find(x=>x.slug===deskSlug);
-    if(t) viewDesk={id:t.id, name:t.name, slug:t.slug, ids:new Set(memByTeam[t.id]||[])}; }
+    if(t) viewDesk={id:t.id, name:t.name, slug:t.slug, verified:!!t.verified, ids:new Set(memByTeam[t.id]||[])}; }
   if(meId){
     const mine=members.find(m=>m.user_id===meId);
     const mineTeam=mine && teams.find(t=>t.id===mine.team_id);
@@ -396,10 +396,14 @@ async function load(){
       const ids=[...DATA.viewDesk.ids];
       const roster=ids.map(id=>({id:id, name:DATA.names[id], st:DATA.userStat[id]}))
         .sort((a,b2)=>(((b2.st&&b2.st.crowns)||0)-((a.st&&a.st.crowns)||0)) || (((b2.st&&b2.st.att)||0)-((a.st&&a.st.att)||0)));
-      b.innerHTML='<div class="section-title">\u25c6 desk: '+esc(DATA.viewDesk.name)+' \u2014 '+ids.length+' analyst'+(ids.length===1?'':'s')+' \u00b7 every board below is desk-only</div>'+
+      b.innerHTML='<div class="section-title">\u25c6 desk: '+esc(DATA.viewDesk.name)+(DATA.viewDesk.verified?' <span style="color:var(--accent)">\u2713 verified</span>':'')+' \u2014 '+ids.length+' analyst'+(ids.length===1?'':'s')+' \u00b7 every board below is desk-only'+(DATA.meId?' \u00b7 <a id="deskReport" style="cursor:pointer;color:var(--faint)">report</a>':'')+'</div>'+
         '<div class="seclead">'+roster.slice(0,12).map(m=>'<div class="sl"><div class="sl-name" data-uid="'+m.id+'">'+esc(m.name)+'</div>'+
           '<div class="sl-t">'+((m.st&&m.st.crowns)||0)+' crown'+(((m.st&&m.st.crowns)||0)===1?'':'s')+' \u00b7 '+((m.st&&m.st.att)||0)+' boards</div></div>').join('')+
         (ids.length>12?'<div class="sl"><div class="sl-name" style="color:var(--faint)">+'+(ids.length-12)+' more</div></div>':'')+'</div>';
+      const rep=document.getElementById('deskReport');
+      if(rep) rep.onclick=async()=>{ try{
+        await sb.from('reports').insert({reporter:DATA.meId, kind:'desk', target:DATA.viewDesk.slug});
+        rep.textContent='reported \u2713'; rep.style.pointerEvents='none'; }catch(e){} };
     } else if(b){ b.remove(); }
   }catch(e){} }, 0);
   renderAll();
@@ -424,7 +428,7 @@ function showPublicCard(uid){
   const old=document.getElementById('pubCard'); if(old) old.remove();
   const m=document.createElement('div'); m.id='pubCard'; m.className='pub-wrap';
   m.innerHTML='<div class="pub-card">'+
-    '<div class="pub-cap"><span>PLAYER CARD</span><a class="pub-x">\u00d7</a></div>'+
+    '<div class="pub-cap"><span>PLAYER CARD</span><span>'+(meId&&uid!==meId?'<a class="pub-rep" style="cursor:pointer;color:var(--faint);font-size:9px;margin-right:12px">report</a>':'')+'<a class="pub-x">\u00d7</a></span></div>'+
     '<div class="pub-hero">'+(window.rankEmblem?window.rankEmblem(t.name,54,t.bucket):'')+
       '<div><div class="pub-nm">'+esc(names[uid])+(uid===meId?' <span class="pub-you">(you)</span>':'')+'</div>'+
       '<div class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center;margin-top:4px">'+
@@ -442,6 +446,10 @@ function showPublicCard(uid){
   const esch=(e)=>{ if(e.key==='Escape'){ e.stopImmediatePropagation(); close(); } };
   m.addEventListener('click', e=>{ if(e.target===m) close(); });
   m.querySelector('.pub-x').onclick=close;
+  const pr=m.querySelector('.pub-rep');
+  if(pr) pr.onclick=async()=>{ try{
+    await sb.from('reports').insert({reporter:meId, kind:'handle', target:uid});
+    pr.textContent='reported \u2713'; pr.style.pointerEvents='none'; }catch(e){} };
   document.addEventListener('keydown', esch, true);
   document.body.appendChild(m);
 }
