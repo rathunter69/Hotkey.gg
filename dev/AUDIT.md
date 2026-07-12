@@ -2569,3 +2569,17 @@ Wolf's #29 ("same tier everywhere — audit") turned out to be FIVE live defects
 - VERIFY: Playwright — chip renders, random button switches drills twice,
   zero page errors; e2e ALL GREEN; node --check all.
 - v109.
+
+---
+# ROUND 114 — PUBLIC PLAYER CARDS (#28): click any name on the boards
+- Every rendered name (drill boards, session boards, top players, tier
+  roster, desk-page roster) carries data-uid + hover underline; ONE
+  delegated click handler opens the card — zero new queries, everything
+  computed from the already-loaded runs/standing.
+- Card: frame-language dialog (34px cap strip) — emblem w/ bucket, handle,
+  full tier (+ provisional tag), desk chip when they're on one, tiles
+  (crowns/podiums/top-10s/boards), their 3 best placements w/ times.
+  Esc + backdrop + \u00d7 all close (no {once:true} on closers — r-rule).
+- VERIFY: Playwright w/ stubbed DATA — opens w/ name/desk/tiles, \u00d7
+  closes, Esc closes second card; zero page errors; node --check.
+- v110.
