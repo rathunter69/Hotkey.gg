@@ -520,7 +520,7 @@
       if(prev>=0 && ti>prev && window.hkCelebrate){
         window.hkCelebrate({cap:'rank up', title:tier.name,
           sub:'the desk noticed \u00b7 '+standing,
-          iconHtml:(window.rankEmblem?window.rankEmblem(tier.name,84):'')});
+          iconHtml:(window.rankEmblem?window.rankEmblem(tier.name,84,tier.bucket):'')});
       }
       if(ti>=0) localStorage.setItem('hk_seen_tier', String(ti));
     }catch(e){}
@@ -533,7 +533,7 @@
          side by side beneath (crest tile | level-ring tile), labels under each. */
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px">' +
         '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
-          '<span style="display:inline-flex;line-height:0">'+(window.rankEmblem?window.rankEmblem(tier.name,84):'')+'</span>' +
+          '<span style="display:inline-flex;line-height:0">'+(window.rankEmblem?window.rankEmblem(tier.name,84,tier.bucket):'')+'</span>' +
           '<div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:13px;background:none;box-shadow:none">'+tier.name+'</div>' +
           '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+standing+'</div>' +
           '<div style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:4px">rank \u00b7 speed vs the field</div>' +

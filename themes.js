@@ -142,73 +142,234 @@ window.applyTheme = function(name){
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', window.syncThemeLabels);
 else window.syncThemeLabels();
 
-/* ---- rank emblems: military-style insignia per tier, glow via currentColor ----
-   Single source of truth for every page (themes.js loads everywhere). */
-
-/* ---- rank emblems: LoL-style layered crests, single source for all pages ---- */
+/* ---- rank emblems v3 (r128): LoL-grade layered crests, iteration-8 art ----
+   Ported from art/rank-proto.html (Wolf-approved iteration 8). Single source for
+   every page. API unchanged: rankEmblem(tierName, size, bucket) — bucket is the
+   HK_RANK string ('Bottom/Middle/Top Bucket') or null; with a bucket the canvas
+   grows a division-pip zone (viewBox 100x114, height = size*1.14) and the emblem
+   ESCALATES: bottom = clean frame+glyph, middle = +ornaments, top = ignited
+   (jewel, sparks, hot rim, brighter glow). 'MBA Associate' arrives bucket-null
+   in-game (placement pending) so it renders the iron #REF! plate, no pips.
+   Animation layers for the rank-up moment: .aura .frame .glyph .ornament .jewel
+   .pips .sparks. Glow filters switch off under 24px (crisper, cheaper rows). */
 window.RANK_EMBLEM_IDX = {'MBA Associate':0,'Candidate':1,'Summer Analyst':2,
   'First-Year Analyst':3,'Associate':4,'VP':5,'MD':6,'Second-Year Analyst':7};
-window.rankEmblem = function(tierName, size, bucket){
-  const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
-  size = size || 16;
-  /* THE KEYCAP LADDER v2 (r67): same crest, escalating LoL-style regalia.
-     Transparent ground; layered flats only (crisp at 16px); tier metals are
-     doctrine. Contrast armor for light themes: a dark under-stroke on every
-     rim + rgba under-shadow instead of near-black hex. */
-  const P=[
-    {rim:'#8a8271', face:'#25231e', top:'#2f2d26', leg:'#a89e88', fx:'mouse'},
-    {rim:'#5a5d63', face:'#2a2c30', top:'#34373c', leg:'#8b8e94', fx:null},
-    {rim:'#b0793f', face:'#2e2418', top:'#3d3020', leg:'#e0a35c', fx:'ring'},
-    {rim:'#b9c2cf', face:'#23262b', top:'#31353c', leg:'#dde4ee', fx:'studs'},
-    {rim:'#e3b341', face:'#2b2413', top:'#3a301a', leg:'#ffd769', fx:'laurel'},
-    {rim:'#7fd4c1', face:'#132a26', top:'#1a3833', leg:'#a9f0e0', fx:'wings'},
-    {rim:'#e06a55', face:'#2d1512', top:'#3c1d18', leg:'#ffb3a3', fx:'crown'},
-    {rim:'#8ab4ff', face:'#161a33', top:'#202649', leg:'#c4d7ff', fx:'radiant'},
-  ];
-  const p=P[i];
-  // r74: FLAT crests — halo disc retired (it read as a tinted background), regalia at full strength
-  const ring=(r,op,w)=>'<circle cx="17" cy="17" r="'+r+'" fill="none" stroke="'+p.rim+'" stroke-width="'+(w||1.7)+'" opacity="'+Math.min(1,op+.35)+'"/>';
-  const spokes=(n,r1,r2,w,op)=>{ let s=''; for(let k=0;k<n;k++){ const a=(Math.PI*2*k)/n - Math.PI/2;
-      s+='<path d="M'+(17+r1*Math.cos(a)).toFixed(1)+' '+(17+r1*Math.sin(a)).toFixed(1)+
-         'L'+(17+r2*Math.cos(a)).toFixed(1)+' '+(17+r2*Math.sin(a)).toFixed(1)+
-         '" stroke="'+p.rim+'" stroke-width="'+w+'" stroke-linecap="round" opacity="'+op+'"/>'; } return s; };
-  const dots=(n,r,rr,op)=>{ let s=''; for(let k=0;k<n;k++){ const a=(Math.PI*2*k)/n - Math.PI/2 + Math.PI/n;
-      s+='<circle cx="'+(17+r*Math.cos(a)).toFixed(1)+'" cy="'+(17+r*Math.sin(a)).toFixed(1)+'" r="'+rr+'" fill="'+p.leg+'" opacity="'+op+'"/>'; } return s; };
-  // ---- regalia (escalates hard) ----
-  let plate='', fx1='';
-  if(p.fx==='ring')   plate = ring(15.2,.55);
-  if(p.fx==='studs')  plate = ring(15.2,.6) + dots(8,15.2,1.1,.85);
-  if(p.fx==='laurel'){ plate = ring(15.5,.5,1.2)+ring(13.9,.3,1);
-    fx1='<path d="M7 26c-2.4-2-3.4-5-3-8 M27 26c2.4-2 3.4-5 3-8" fill="none" stroke="'+p.rim+'" stroke-width="1.6" stroke-linecap="round"/>'+
-        '<path d="M4.6 21.5l-2-.4 M5 18.6l-1.9-1 M29.4 21.5l2-.4 M29 18.6l1.9-1" stroke="'+p.rim+'" stroke-width="1.3" stroke-linecap="round"/>'; }
-  if(p.fx==='wings'){ plate = ring(15.5,.5,1.2) + dots(2,15.5,1.4,.9);
-    fx1='<path d="M5 12C2.2 11 .8 8.6 .4 6.4 3.4 7 5.6 8.4 6.8 10.4Z M29 12c2.8-1 4.2-3.4 4.6-5.6-3 .6-5.2 2-6.4 4Z" fill="'+p.rim+'" opacity=".9"/>'; }
-  if(p.fx==='crown'){ plate = ring(15.6,.55,1.3)+ring(13.9,.35,1) + spokes(4,13.5,16.4,1.5,.7);
-    fx1='<path d="M11 5.6l2.2 2.6L17 4.6l3.8 3.6L23 5.6l-1 4.4H12z" fill="'+p.rim+'"/>'; }
-  if(p.fx==='radiant'){ plate = spokes(12,14.2,16.8,1.4,.8) + ring(13.6,.5,1.1) + dots(6,15.6,1,.9);
-    fx1='<path d="M12.6 4.6L14 1.8l3 1.7 3-1.7 1.4 2.8" fill="none" stroke="'+p.leg+'" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'; }
-  // ---- legend ----
-  let legend;
-  if(p.fx==='mouse'){
-    legend='<g fill="none" stroke="'+p.leg+'" stroke-width="1.4" stroke-linecap="round">'+
-      '<rect x="13.4" y="11.5" width="7.2" height="10.5" rx="3.6"/><path d="M17 11.5v3.6"/></g>';
-  } else if(p.fx==='radiant'){
-    legend='<path d="M17 12.2l1.1 2.6 2.8.3-2.1 1.8.7 2.7-2.5-1.5-2.5 1.5.7-2.7-2.1-1.8 2.8-.3z" fill="'+p.leg+'"/>';
-  } else if(i===1){ legend=''; }
-  else if(p.fx==='crown'){ legend='<text x="17" y="21.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="8.5" fill="'+p.leg+'">MD</text>'; }
-  else { legend='<text x="17" y="21.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="9.5" fill="'+p.leg+'">F4</text>'; }
-  let pips='';
-  if(bucket){
-    const n = bucket==='Top Bucket'?3:(bucket==='Middle Bucket'?2:1);
-    for(let k=0;k<3;k++) pips+='<circle cx="'+(13+k*4)+'" cy="31.4" r="1.5" fill="'+(k<n?p.rim:'rgba(120,124,134,.5)')+'"/>';
+window.rankEmblem = (function(){
+  let UID=0;
+  const IRON ={hi:'#a9aeb9',mid:'#7c828e',lo:'#525761',deep:'#26282e',plateHi:'#33363d',plateLo:'#1f2126',core:'#8b919d'};
+  const SLATE={hi:'#c4c9d3',mid:'#9299a6',lo:'#5f6570',deep:'#2c2f36',plateHi:'#3a3d45',plateLo:'#24262c',core:'#a5abb8'};
+  const BRONZE={hi:'#f4c088',mid:'#cf8e4c',lo:'#95602c',deep:'#432a12',plateHi:'#453425',plateLo:'#271e16',core:'#e8a45f'};
+  const SILVER={hi:'#f4f7fc',mid:'#c9d0dc',lo:'#8e96a5',deep:'#454c59',plateHi:'#454b57',plateLo:'#262a32',core:'#dde2ea'};
+  const GOLD ={hi:'#ffefb3',mid:'#f4c754',lo:'#bf8e20',deep:'#523a05',plateHi:'#4a3f20',plateLo:'#282112',core:'#ffd968'};
+  const PLAT ={hi:'#e0fdf7',mid:'#86dcca',lo:'#3d9c8e',deep:'#173f3a',plateHi:'#25453f',plateLo:'#152522',core:'#8ef2df'};
+  const CRIM ={hi:'#ffb3a1',mid:'#e65843',lo:'#9c2a1c',deep:'#3a0f0b',plateHi:'#3b1d19',plateLo:'#1f0f0e',core:'#ff6248'};
+  const DIAM ={hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',plateHi:'#21404f',plateLo:'#12232c',core:'#a8ecff'};
+  function defs(id,P,glow){
+    return '<defs><linearGradient id="'+id+'m" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="'+P.hi+'"/><stop offset=".45" stop-color="'+P.mid+'"/>'+
+      '<stop offset=".55" stop-color="'+P.lo+'"/><stop offset="1" stop-color="'+P.deep+'"/></linearGradient>'+
+      '<linearGradient id="'+id+'p" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="'+P.plateHi+'"/><stop offset="1" stop-color="'+P.plateLo+'"/></linearGradient>'+
+      '<radialGradient id="'+id+'core" cx=".5" cy=".4">'+
+      '<stop offset="0" stop-color="'+P.core+'" stop-opacity=".55"/><stop offset="1" stop-color="'+P.core+'" stop-opacity="0"/></radialGradient>'+
+      '<radialGradient id="'+id+'a"><stop offset=".25" stop-color="'+P.core+'" stop-opacity=".5"/><stop offset="1" stop-color="'+P.core+'" stop-opacity="0"/></radialGradient>'+
+      (glow?'<filter id="'+id+'g" x="-45%" y="-45%" width="190%" height="190%">'+
+      '<feGaussianBlur stdDeviation="'+glow+'" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>':'')+
+      '</defs>';
   }
-  return '<svg class="rank-emblem'+(i===7?' emblem-max':'')+'" viewBox="0 0 34 34" width="'+size+'" height="'+size+'" aria-hidden="true">'+
-    plate + fx1 +
-    '<rect x="7.4" y="6.6" width="19.2" height="17.6" rx="4.2" fill="'+p.face+'" stroke="'+p.rim+'" stroke-width="2.2"/>'+
-    '<rect x="9.4" y="8.4" width="15.2" height="6" rx="3" fill="'+p.top+'"/>'+
-    legend + pips +
-    '</svg>';
-};
+  function frame(id,P,path,glow,sw,hot){
+    return '<g class="frame"'+(glow?' filter="url(#'+id+'g)"':'')+'>'+
+      '<path d="'+path+'" fill="none" stroke="'+P.deep+'" stroke-width="'+((sw||3.4)+2.6)+'" stroke-linejoin="round"/>'+
+      '<path d="'+path+'" fill="url(#'+id+'p)" stroke="url(#'+id+'m)" stroke-width="'+(sw||3.4)+'" stroke-linejoin="round"/>'+
+      (hot?'<path d="'+path+'" fill="none" stroke="'+P.hi+'" stroke-width="1" opacity=".8" stroke-linejoin="round"/>':'')+
+      '</g>';
+  }
+  function pips(id,P,bk){
+    if(!bk) return '';
+    let out='';
+    for(let i=0;i<3;i++){
+      const x=50+(i-1)*13, on=i<bk;
+      out+='<path d="M'+x+' 102 L'+(x+4.6)+' 107 L'+x+' 112 L'+(x-4.6)+' 107 Z" fill="'+
+        (on?'url(#'+id+'m)':'none')+'" stroke="'+(on?P.deep:P.lo)+'" stroke-width="1.1"'+(on?' class="on"':' opacity=".45"')+'/>';
+      if(on) out+='<path d="M'+x+' 103.6 L'+(x+2.7)+' 107 L'+x+' 110.4 L'+(x-2.7)+' 107 Z" fill="'+P.hi+'" opacity="'+(0.35+i*0.18)+'" class="on"/>';
+    }
+    return '<g class="pips">'+out+'</g>';
+  }
+  function sparks(P,pts){
+    return '<g class="sparks">'+pts.map(function(q){ const x=q[0],y=q[1],s=q[2];
+      return '<path d="M'+x+' '+(y-s)+' L'+(x+s*.3)+' '+(y-s*.3)+' L'+(x+s)+' '+y+' L'+(x+s*.3)+' '+(y+s*.3)+' L'+x+' '+(y+s)+' L'+(x-s*.3)+' '+(y+s*.3)+' L'+(x-s)+' '+y+' L'+(x-s*.3)+' '+(y-s*.3)+' Z" fill="#ffffff" opacity=".9"/>'; }).join('')+'</g>';
+  }
+  const GLY={
+    book:function(id,P){ return '<g class="glyph" transform="translate(50 50) scale(1.12)">'+
+      '<path d="M-12 7.5 Q -6.5 4 0 5 Q 6.5 4 12 7.5 L12 -6 Q 6.5 -9.5 0 -8.5 Q -6.5 -9.5 -12 -6 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1"/>'+
+      '<path d="M0 5 L0 -8.5" stroke="'+P.deep+'" stroke-width="1.1"/>'+
+      '<path d="M-9 -3.5 Q -5 -5.5 -2.5 -4.5 M-9 0 Q -5 -2 -2.5 -1 M2.5 -4.5 Q 5 -5.5 9 -3.5 M2.5 -1 Q 5 -2 9 0" stroke="'+P.plateLo+'" stroke-width=".9" fill="none"/></g>'; },
+    sun:function(id,P){ let rays='';
+      for(let i=0;i<8;i++){ const a=i*Math.PI/4, L=(i%2?16.5:20), w=.21, R=11;
+        rays+='<path d="M'+(Math.cos(a-w)*R).toFixed(1)+' '+(Math.sin(a-w)*R).toFixed(1)+' L'+(Math.cos(a)*L).toFixed(1)+' '+(Math.sin(a)*L).toFixed(1)+' L'+(Math.cos(a+w)*R).toFixed(1)+' '+(Math.sin(a+w)*R).toFixed(1)+' Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".7"/>'; }
+      return '<g class="glyph" transform="translate(50 48)">'+rays+
+        '<circle r="9.2" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.1"/>'+
+        '<circle r="5.2" fill="'+P.hi+'" opacity=".65"/></g>'; },
+    keycap:function(id,P){ return '<g class="glyph" transform="translate(50 50)">'+
+      '<rect x="-13" y="-12.5" width="26" height="25" rx="4.5" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.2"/>'+
+      '<rect x="-9.5" y="-9.5" width="19" height="17" rx="3" fill="'+P.plateLo+'" stroke="'+P.deep+'" stroke-width=".8"/>'+
+      '<text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="10.5" fill="'+P.hi+'">F4</text></g>'; },
+    briefcase:function(id,P){ return '<g class="glyph" transform="translate(50 50.5)">'+
+      '<path d="M-5 -9.5 L-5 -12 Q-5 -13.8 -3.2 -13.8 L3.2 -13.8 Q5 -13.8 5 -12 L5 -9.5" fill="none" stroke="'+P.deep+'" stroke-width="2.4"/>'+
+      '<rect x="-14" y="-9.5" width="28" height="21" rx="2.5" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.2"/>'+
+      '<path d="M-14 -2.8 L14 -2.8" stroke="'+P.deep+'" stroke-width="1"/>'+
+      '<rect x="-3.2" y="-5" width="6.4" height="4.8" rx="1" fill="'+P.plateLo+'" stroke="'+P.deep+'" stroke-width=".8"/>'+
+      '<path d="M-10.5 -2.8 L-10.5 .5 M10.5 -2.8 L10.5 .5" stroke="'+P.deep+'" stroke-width="1.4"/>'+
+      '<path d="M-12.5 -8 L12.5 -8" stroke="'+P.hi+'" stroke-width=".9" opacity=".6"/></g>'; },
+    chart:function(id,P){ return '<g class="glyph" transform="translate(50 53)">'+
+      '<rect x="-12" y="3" width="5.2" height="10" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
+      '<rect x="-3.5" y="-2" width="5.2" height="15" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
+      '<rect x="5" y="-7" width="5.2" height="20" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
+      '<path d="M-12 -6 L-1 -11 L5 -14.5 L12 -17.5" fill="none" stroke="'+P.hi+'" stroke-width="2.1" stroke-linecap="round"/>'+
+      '<path d="M7 -19.5 L12.8 -17.8 L10.3 -12.6" fill="none" stroke="'+P.hi+'" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></g>'; },
+    bull:function(id,P){ return '<g class="glyph" transform="translate(50 52)">'+
+      '<path d="M-9.5 -6 Q-21.5 -8 -20.5 -22.5 Q-13 -16 -7.5 -11.5 Z" fill="#f3ead9" stroke="'+P.deep+'" stroke-width="1"/>'+
+      '<path d="M9.5 -6 Q21.5 -8 20.5 -22.5 Q13 -16 7.5 -11.5 Z" fill="#f3ead9" stroke="'+P.deep+'" stroke-width="1"/>'+
+      '<path d="M-10.5 -12.5 L10.5 -12.5 L14 -5 L8.5 4 L5 13 L-5 13 L-8.5 4 L-14 -5 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.2" stroke-linejoin="round"/>'+
+      '<path d="M-5 -12.5 Q0 -9 5 -12.5" fill="none" stroke="'+P.deep+'" stroke-width=".9" opacity=".8"/>'+
+      '<path d="M-8.7 -4.8 L-3.2 -2.6 L-3.8 -.4 L-8.7 -2.2 Z" fill="#ffe1d6"/>'+
+      '<path d="M8.7 -4.8 L3.2 -2.6 L3.8 -.4 L8.7 -2.2 Z" fill="#ffe1d6"/>'+
+      '<path d="M-7.5 5 Q0 8 7.5 5 L5 13 Q0 15.2 -5 13 Z" fill="'+P.lo+'" stroke="'+P.deep+'" stroke-width=".9"/>'+
+      '<ellipse cx="-3.1" cy="9.6" rx="1.5" ry="2" fill="'+P.deep+'"/>'+
+      '<ellipse cx="3.1" cy="9.6" rx="1.5" ry="2" fill="'+P.deep+'"/></g>'; },
+    rocket:function(id,P){ return '<g class="glyph" transform="translate(50 48.5)">'+
+      '<path d="M-7.2 3 L-13.5 12.5 L-6 9.8 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
+      '<path d="M7.2 3 L13.5 12.5 L6 9.8 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
+      '<path d="M-2.8 10.5 L0 19.5 L2.8 10.5 Z" fill="'+P.hi+'"/>'+
+      '<path d="M-1.3 10.5 L0 15.5 L1.3 10.5 Z" fill="#ffffff"/>'+
+      '<path d="M0 -18.5 Q7.2 -9.5 7.2 .5 Q7.2 6.5 5.2 10.5 L-5.2 10.5 Q-7.2 6.5 -7.2 .5 Q-7.2 -9.5 0 -18.5 Z" fill="#f6feff" stroke="'+P.lo+'" stroke-width="1.1"/>'+
+      '<path d="M0 -18.5 Q-7.2 -9.5 -7.2 .5 Q-7.2 6.5 -5.2 10.5 L-2 10.5 Q-3.6 5 -3.6 -1 Q-3.6 -11 0 -18.5 Z" fill="'+P.mid+'" opacity=".35"/>'+
+      '<circle cx="0" cy="-4.5" r="3.1" fill="'+P.plateLo+'" stroke="'+P.deep+'" stroke-width="1"/>'+
+      '<circle cx="0" cy="-4.5" r="1.4" fill="'+P.hi+'" opacity=".8"/></g>'; },
+  };
+  function svgOpen(sz,bk,max){
+    const vb = bk ? '0 0 100 114' : '0 0 100 100';
+    const h = bk ? Math.round(sz*1.14) : sz;
+    return '<svg class="rank-emblem'+(max?' emblem-max':'')+'" viewBox="'+vb+'" width="'+sz+'" height="'+h+'" aria-hidden="true">';
+  }
+  function t_mba(sz,bk,gl){ const id='rk'+(UID++), P=IRON, o2=bk>=2, hot=bk===3;
+    const sq='M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z';
+    return svgOpen(sz,bk,false)+defs(id,P,gl&&hot?0.8:0)+
+      (o2?'<g class="ornament"><circle cx="25.5" cy="25.5" r="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/><circle cx="74.5" cy="25.5" r="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/><circle cx="25.5" cy="74.5" r="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/><circle cx="74.5" cy="74.5" r="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/></g>':'')+
+      frame(id,P,sq,gl&&hot?0.8:0,3.2,hot)+
+      '<path d="M21 42 L79 42 M21 60 L79 60 M41 21 L41 79 M61 21 L61 79" stroke="'+P.mid+'" stroke-width=".8" opacity=".28"/>'+
+      '<path d="M34 16 L55 43 L45 51 L64 84" fill="none" stroke="'+P.deep+'" stroke-width="1.8" opacity=".75"/>'+
+      '<path d="M28.5 22.8 L71.5 22.8" stroke="#ffffff" stroke-width="1.2" opacity=".5"/>'+
+      (hot?'<g class="jewel"><path d="M46.8 21 L50 14.5 L53.2 21 L50 24 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".7"/></g>':'')+
+      '<g class="glyph"><text x="50" y="55.8" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="14" fill="'+P.deep+'">#REF!</text>'+
+      '<text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="14" fill="'+P.hi+'">#REF!</text></g>'+
+      (hot?sparks(P,[[21,17,3],[79,17,3]]):'')+pips(id,P,bk)+'</svg>'; }
+  function t_candidate(sz,bk,gl){ const id='rk'+(UID++), P=SLATE, o2=bk>=2, hot=bk===3, g=gl?[0,0,.4,.9][bk||1]:0;
+    let notch=''; if(o2) for(let i=0;i<8;i++){ const a=i*45*Math.PI/180;
+      notch+='<line x1="'+(50+Math.cos(a)*34).toFixed(1)+'" y1="'+(50+Math.sin(a)*34).toFixed(1)+'" x2="'+(50+Math.cos(a)*38.5).toFixed(1)+'" y2="'+(50+Math.sin(a)*38.5).toFixed(1)+'" stroke="url(#'+id+'m)" stroke-width="4.2"/>'; }
+    return svgOpen(sz,bk,false)+defs(id,P,g)+
+      (o2?'<g class="ornament">'+notch+'</g>':'')+
+      frame(id,P,'M50 17 A33 33 0 1 1 49.9 17 Z',g,3.4,hot)+
+      '<circle cx="50" cy="50" r="26.5" fill="none" stroke="'+P.mid+'" stroke-width="1" opacity="'+(o2?'.8':'.45')+'"/>'+
+      '<path d="M26 39 A27 27 0 0 1 74 39" fill="none" stroke="#ffffff" stroke-width="1.3" opacity=".5"/>'+
+      (hot?'<g class="jewel"><circle cx="50" cy="15.8" r="2.6" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><circle cx="50" cy="15.8" r="1.1" fill="#ffffff" opacity=".85"/></g>':'')+
+      GLY.book(id,P)+(hot?sparks(P,[[22,26,3],[78,26,3]]):'')+pips(id,P,bk)+'</svg>'; }
+  function t_summer(sz,bk,gl){ const id='rk'+(UID++), P=BRONZE, o2=bk>=2, hot=bk===3, g=gl?[0,0,.5,1][bk||1]:0;
+    const sh='M50 10 L82 20 L79 54 L50 90 L21 54 L18 20 Z';
+    return svgOpen(sz,bk,false)+defs(id,P,g)+
+      '<circle cx="50" cy="48" r="29" fill="url(#'+id+'core)" opacity="'+(hot?1:o2?.7:.45)+'"/>'+
+      (o2?'<g class="ornament"><path d="M18 22 L8 17 L15 33 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><path d="M82 22 L92 17 L85 33 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><circle cx="25" cy="24.5" r="2" fill="url(#'+id+'m)"/><circle cx="75" cy="24.5" r="2" fill="url(#'+id+'m)"/><circle cx="23.5" cy="50" r="2" fill="url(#'+id+'m)"/><circle cx="76.5" cy="50" r="2" fill="url(#'+id+'m)"/></g>':'')+
+      frame(id,P,sh,g,3.4,hot)+
+      '<path d="M21 19.2 L50 11 L79 19.2" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".65"/>'+
+      (hot?'<g class="jewel"><path d="M46 12.2 L50 5.5 L54 12.2 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><circle cx="50" cy="10" r="1.1" fill="#ffffff" opacity=".85"/></g>':'')+
+      GLY.sun(id,P)+(hot?sparks(P,[[18,17,3.2],[82,17,3.2]]):'')+pips(id,P,bk)+'</svg>'; }
+  function t_firstyear(sz,bk,gl){ const id='rk'+(UID++), P=SILVER, o2=bk>=2, hot=bk===3, g=gl?[0,0,.6,1.1][bk||1]:0;
+    const hx='M50 8 L82 26 L82 62 L50 92 L18 62 L18 26 Z';
+    return svgOpen(sz,bk,false)+defs(id,P,g)+
+      '<circle cx="50" cy="49" r="30" fill="url(#'+id+'core)" opacity="'+(hot?1:o2?.7:.45)+'"/>'+
+      (o2?'<g class="ornament"><path d="M18 26 L8 21 L18 36 M82 26 L92 21 L82 36" fill="none" stroke="url(#'+id+'m)" stroke-width="2.8"/></g>':'')+
+      (hot?'<g class="ornament"><path d="M18 62 L10 70 M82 62 L90 70" stroke="url(#'+id+'m)" stroke-width="2.8"/></g>':'')+
+      frame(id,P,hx,g,3.4,hot)+
+      '<path d="M50 12.5 L78 28 M50 12.5 L22 28" stroke="#ffffff" stroke-width="1.3" opacity=".55"/>'+
+      (hot?'<g class="jewel"><path d="M46.5 10 L50 3.5 L53.5 10 L50 13 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/></g>':'')+
+      GLY.keycap(id,P)+(hot?sparks(P,[[10,20,3.2],[90,20,3.2]]):'')+pips(id,P,bk)+'</svg>'; }
+  function t_associate(sz,bk,gl){ const id='rk'+(UID++), P=GOLD, o2=bk>=2, hot=bk===3, g=gl?[0,.7,1.1,1.6][bk||1]:0;
+    const cr='M50 11 L63 21 L84 16 L80 46 L68 78 L50 88 L32 78 L20 46 L16 16 L37 21 Z';
+    let lr=''; if(o2) for(let s of [-1,1]){
+      lr+='<path d="M'+(50+s*31)+' 78 q '+(s*17)+' -12 '+(s*18)+' -38" fill="none" stroke="url(#'+id+'m)" stroke-width="2.5" stroke-linecap="round"/>';
+      for(let l=0;l<5;l++){ const t2=l/4.4, x=50+s*(31+16*t2*(2-t2)*0.95), y=77-38*t2;
+        lr+='<ellipse cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" rx="5" ry="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".5" transform="rotate('+(s*(-54+t2*70)).toFixed(1)+' '+x.toFixed(1)+' '+y.toFixed(1)+')"/>'; } }
+    return svgOpen(sz,bk,false)+defs(id,P,g)+
+      '<circle cx="50" cy="48" r="31" fill="url(#'+id+'core)" opacity="'+(hot?1:o2?.8:.55)+'"/>'+
+      (o2?'<g class="ornament">'+lr+'</g>':'')+
+      frame(id,P,cr,g,3.4,hot)+
+      '<path d="M37 21.6 L50 12 L63 21.6" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".7"/>'+
+      (hot?'<g class="jewel"><circle cx="50" cy="16.5" r="2.4" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><circle cx="50" cy="16.5" r="1" fill="#ffffff" opacity=".9"/></g>':'')+
+      GLY.briefcase(id,P)+(hot?sparks(P,[[16,13,3.4],[84,13,3.4]]):'')+pips(id,P,bk)+'</svg>'; }
+  function t_vp(sz,bk,gl){ const id='rk'+(UID++), P=PLAT, o2=bk>=2, hot=bk===3, g=gl?[0,1,1.5,2][bk||1]:0;
+    const cr='M50 10 L60 20 L84 14 L78 40 L82 52 L62 84 L50 92 L38 84 L18 52 L22 40 L16 14 L40 20 Z';
+    return svgOpen(sz,bk,false)+defs(id,P,g)+
+      (hot?'<g class="aura" opacity=".7"><circle cx="50" cy="50" r="48" fill="url(#'+id+'a)"/></g>':'')+
+      '<circle cx="50" cy="48" r="33" fill="url(#'+id+'core)" opacity="'+(hot?1:o2?.8:.55)+'"/>'+
+      (o2?'<g class="ornament"><path d="M16 14 L4 8 L14 26 L8 24 L18 38" fill="none" stroke="url(#'+id+'m)" stroke-width="2.8" stroke-linejoin="round"/><path d="M84 14 L96 8 L86 26 L92 24 L82 38" fill="none" stroke="url(#'+id+'m)" stroke-width="2.8" stroke-linejoin="round"/></g>':'')+
+      (hot?'<g class="ornament"><path d="M38 84 L30 94 M62 84 L70 94" stroke="url(#'+id+'m)" stroke-width="2.4"/></g>':'')+
+      frame(id,P,cr,g,3.4,hot)+
+      '<path d="M40 20.5 L50 11 L60 20.5" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".75"/>'+
+      (hot?'<g class="jewel"><path d="M50 10 L50 3" stroke="url(#'+id+'m)" stroke-width="2.4"/><circle cx="50" cy="2.5" r="2" fill="'+P.hi+'"/></g>':'')+
+      GLY.chart(id,P)+(hot?sparks(P,[[4,8,3.6],[96,8,3.6]]):'')+pips(id,P,bk)+'</svg>'; }
+  function t_md(sz,bk,gl){ const id='rk'+(UID++), P=CRIM, o2=bk>=2, hot=bk===3, g=gl?[0,1.6,2.1,2.6][bk||1]:0;
+    const cr='M50 14 L64 22 L88 10 L80 38 L86 50 L64 86 L50 94 L36 86 L14 50 L20 38 L12 10 L36 22 Z';
+    let horns='';
+    for(let s of [-1,1]){
+      horns+='<path d="M'+(50+s*38)+' 26 Q '+(50+s*58)+' 14 '+(50+s*62)+' -2 Q '+(50+s*50)+' 8 '+(50+s*42)+' 10 Q '+(50+s*46)+' 16 '+(50+s*38)+' 26 Z" transform="translate(0 14)" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1"/>';
+      horns+='<path d="M'+(50+s*36)+' 60 Q '+(50+s*52)+' 62 '+(50+s*56)+' 74 Q '+(50+s*44)+' 70 '+(50+s*40)+' 66 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'; }
+    return svgOpen(sz,bk,false)+defs(id,P,g)+
+      '<g class="aura" opacity="'+(hot?1:o2?.8:.55)+'"><circle cx="50" cy="50" r="49" fill="url(#'+id+'a)"/></g>'+
+      '<circle cx="50" cy="50" r="34" fill="url(#'+id+'core)"/>'+
+      (o2?'<g class="ornament">'+horns+'</g>':'')+
+      frame(id,P,cr,g,3.6,hot)+
+      '<g class="ornament"'+(hot&&g?' filter="url(#'+id+'g)"':'')+'>'+
+      '<path d="M35 21 L38 7 L46 15 L50 4 L54 15 L62 7 L65 21 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.1"/>'+
+      (hot?'<circle cx="50" cy="3" r="2.3" fill="#ffd9cf"/><circle cx="38.4" cy="6.2" r="1.5" fill="#ffd9cf"/><circle cx="61.6" cy="6.2" r="1.5" fill="#ffd9cf"/>':'')+'</g>'+
+      GLY.bull(id,P)+(hot?sparks(P,[[12,10,3.8],[88,10,3.8],[50,-1,3]]):'')+pips(id,P,bk)+'</svg>'; }
+  function t_summit(sz,bk,gl){ const id='rk'+(UID++), P=DIAM, o2=bk>=2, hot=bk===3, g=gl?[0,1.8,2.3,2.8][bk||1]:0;
+    const sp='M50 2 L65 17 L90 21 L77 45 L81 61 L59 88 L50 98 L41 88 L19 61 L23 45 L10 21 L35 17 Z';
+    const rop=o2?1:.45;
+    let rays=''; for(let i=0;i<20;i++){ const a=(i*18-90)*Math.PI/180, big=i%5===0;
+      rays+='<line x1="'+(50+Math.cos(a)*(big?39:42)).toFixed(1)+'" y1="'+(50+Math.sin(a)*(big?39:42)).toFixed(1)+'" x2="'+(50+Math.cos(a)*(big?50:46.5)).toFixed(1)+'" y2="'+(50+Math.sin(a)*(big?50:46.5)).toFixed(1)+'" stroke="'+(big?'#ffd968':P.hi)+'" stroke-width="'+(big?2.6:0.9)+'" stroke-linecap="round" opacity="'+((big?0.95:0.5)*rop).toFixed(2)+'"/>'; }
+    let shards=''; for(let s of [-1,1]){
+      shards+='<path d="M'+(50+s*44)+' 29 L'+(50+s*51)+' 23 L'+(50+s*48)+' 33 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>'+
+        '<path d="M'+(50+s*46)+' 51 L'+(50+s*54)+' 49 L'+(50+s*48)+' 59 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>'+
+        (hot?'<path d="M'+(50+s*37)+' 77 L'+(50+s*45)+' 83 L'+(50+s*36)+' 85 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>':''); }
+    return svgOpen(sz,bk,true)+defs(id,P,g)+
+      '<g class="aura" opacity="'+(hot?1:o2?.8:.6)+'"><circle cx="50" cy="50" r="49" fill="url(#'+id+'a)"/>'+rays+'</g>'+
+      '<circle cx="50" cy="50" r="34" fill="url(#'+id+'core)"/>'+
+      (o2?'<g class="ornament">'+shards+'</g>':'')+
+      frame(id,P,sp,g,3.6,hot)+
+      '<path d="M35 17.8 L50 3.5 L65 17.8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".85"/>'+
+      (hot?'<g class="jewel"><path d="M50 -3 L51.6 1.4 L56 3 L51.6 4.6 L50 9 L48.4 4.6 L44 3 L48.4 1.4 Z" fill="#ffd968" stroke="#523a05" stroke-width=".6"/></g>':'')+
+      GLY.rocket(id,P)+(hot?sparks(P,[[10,21,3.8],[90,21,3.8],[50,-2,3.2]]):'')+pips(id,P,bk)+'</svg>'; }
+  const BUILD=[t_mba,t_candidate,t_summer,t_firstyear,t_associate,t_vp,t_md,t_summit];
+  return function(tierName, size, bucket){
+    size = size || 16;
+    // 'Unranked' (no placement yet, anywhere a tier is unknown): the empty-cell plate
+    if(tierName==='Unranked'){
+      const id='rk'+(UID++), P=IRON;
+      return svgOpen(size,0,false)+defs(id,P,0)+
+        frame(id,P,'M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z',0,3.2)+
+        '<path d="M21 42 L79 42 M21 60 L79 60 M41 21 L41 79 M61 21 L61 79" stroke="'+P.mid+'" stroke-width=".8" opacity=".22"/>'+
+        '<path d="M28.5 22.8 L71.5 22.8" stroke="#ffffff" stroke-width="1.2" opacity=".4"/>'+
+        '<rect x="36" y="36" width="28" height="28" fill="none" stroke="'+P.mid+'" stroke-width="1.6" stroke-dasharray="4.2 3.2" opacity=".85"/>'+
+        '<g class="glyph"><path d="M44 44 L56 56 M56 44 L44 56" stroke="url(#'+id+'m)" stroke-width="3.6" stroke-linecap="round"/>'+
+        '<path d="M44 44 L56 56 M56 44 L44 56" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity=".35"/></g></svg>';
+    }
+    const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
+    const bk = typeof bucket==='number' ? bucket
+      : bucket==='Top Bucket' ? 3 : bucket==='Middle Bucket' ? 2 : bucket==='Bottom Bucket' ? 1 : 0;
+    const gl = size>=24 ? 1 : 0;   // glow filters off at row/chip sizes: crisper + cheaper
+    return BUILD[i](size, bk, gl);
+  };
+})();
 
 window.hkLevelRing = function(lvl, pct, size){
   size=size||56;

@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stats · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=114" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=114">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=114">
+<link rel="icon" href="favicon.ico?v=115" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=115">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=115">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -55,8 +55,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=114">
-<script src="drills.js?v=114"></script>
+<link rel="stylesheet" href="nav.css?v=115">
+<script src="drills.js?v=115"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -64,11 +64,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=114"></script>
+<script src="themes.js?v=115"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=114"></script>
+<script src="nav.js?v=115"></script>
 
 <header class="head">
   <div class="wrap">
@@ -127,7 +127,7 @@ async function load(){
     const xp = window.HK_RANK.computeXP(mine, st);
     const L = window.HK_RANK.levelOf(xp);
     tcHtml = `<div class="stat hero" style="grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap">`+
-      `<span class="${tier.cls}" style="display:inline-flex;color:inherit;">${window.rankEmblem?window.rankEmblem(tier.name,46):''}</span>`+
+      `<span class="${tier.cls}" style="display:inline-flex;color:inherit;">${window.rankEmblem?window.rankEmblem(tier.name,46,tier.bucket):''}</span>`+
       `<div><div style="font-family:var(--mono);font-weight:700;font-size:15px">${tier.name}</div>`+
       `<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${window.hkLevelChip?window.hkLevelChip(L.lvl,20):''} LVL ${L.lvl} \u00b7 ${L.into}/${L.need} xp \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`+
       `<span style="flex:1;min-width:120px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${L.pct}%;background:var(--accent)"></span></span></div>`;

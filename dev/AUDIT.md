@@ -2844,3 +2844,29 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   sparks re-seated at the new wing tips, apex highlight re-anchored.
 - VERIFY: node --check extracted script, Playwright fullPage clean, light
   + 22px chip rows legible.
+
+---
+# ROUND 128 — RANK EMBLEMS v3 WIRED IN (iteration-8 art ships to the game)
+- themes.js rankEmblem REPLACED: 34px keycap crests (r67/r74) -> the
+  Wolf-approved iteration-8 system ported from art/rank-proto.html.
+  API unchanged (tierName, size, bucket-string) so all 9 pages pick it up
+  with zero call-site rework. With a bucket the canvas grows the division-
+  pip zone (viewBox 100x114, height size*1.14) and the emblem escalates
+  bottom/middle/top; bucket-null renders the clean frame (MBA Associate
+  arrives bucket-null in-game = placement pending, so the iron #REF!
+  plate shows no pips — semantically exact). 'Unranked' name renders the
+  generic empty-cell X plate for future surfaces.
+- PERF/CRISPNESS: glow filters off under 24px (leaderboards render
+  hundreds of row emblems); gradients/defs get unique rk-prefixed ids per
+  render (no cross-SVG id collisions).
+- BUCKET now passed at the hero call sites that had tier context: nav.js
+  player-card hero + rank-up celebrate (84px), account.html title card
+  (54) + progress (56), stats.html hero (46). Row sites already passed it.
+- Animation layers (.aura/.frame/.glyph/.ornament/.jewel/.pips/.sparks)
+  ship in every emblem — the rank-up sequence hooks onto these next.
+- CACHE: v114 -> v115 across all 9 pages.
+- VERIFY: node --check themes.js + nav.js; emblem test page at 13/20/22/
+  28/54/84px dark+light rendered clean (screenshot reviewed); index/
+  leaderboard/account/stats boot with ZERO page errors; e2e demo-replay
+  ALL GREEN (40 drills x3). Old keycap renderer fully deleted — no
+  fallback copy retained (house rule).
