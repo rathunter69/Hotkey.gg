@@ -350,6 +350,11 @@ window.rankEmblem = (function(){
       (hot?'<g class="jewel"><path d="M50 -3 L51.6 1.4 L56 3 L51.6 4.6 L50 9 L48.4 4.6 L44 3 L48.4 1.4 Z" fill="#ffd968" stroke="#523a05" stroke-width=".6"/></g>':'')+
       GLY.rocket(id,P)+(hot?sparks(P,[[10,21,3.8],[90,21,3.8],[50,-2,3.2]]):'')+pips(id,P,bk)+'</svg>'; }
   const BUILD=[t_mba,t_candidate,t_summer,t_firstyear,t_associate,t_vp,t_md,t_summit];
+  // tier accent colors for celebration confetti etc. — same palettes as the emblems
+  window.RANK_COLORS={'MBA Associate':[IRON.mid,IRON.hi],'Candidate':[SLATE.mid,SLATE.hi],
+    'Summer Analyst':[BRONZE.mid,BRONZE.hi],'First-Year Analyst':[SILVER.mid,SILVER.hi],
+    'Associate':[GOLD.mid,GOLD.hi],'VP':[PLAT.mid,PLAT.hi],'MD':[CRIM.mid,CRIM.hi],
+    'Second-Year Analyst':[DIAM.mid,DIAM.hi,'#ffd968']};
   return function(tierName, size, bucket){
     size = size || 16;
     // 'Unranked' (no placement yet, anywhere a tier is unknown): the empty-cell plate

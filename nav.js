@@ -518,8 +518,9 @@
       const ti=(window.RANK_EMBLEM_IDX||{})[tier.name] ?? 0;
       const prev=parseInt(localStorage.getItem('hk_seen_tier')||'-1',10);
       if(prev>=0 && ti>prev && window.hkCelebrate){
-        window.hkCelebrate({cap:'rank up', title:tier.name,
+        window.hkCelebrate({cap:'rank up', title:tier.name, rankUp:true,
           sub:'the desk noticed \u00b7 '+standing,
+          colors:(window.RANK_COLORS||{})[tier.name],
           iconHtml:(window.rankEmblem?window.rankEmblem(tier.name,84,tier.bucket):'')});
       }
       if(ti>=0) localStorage.setItem('hk_seen_tier', String(ti));
@@ -804,7 +805,7 @@ window.__hkCelQ=[]; window.__hkCelOpen=false;
 window.hkCelebrate = function(o){
   if(window.__hkCelOpen){ window.__hkCelQ.push(o); return; }
   window.__hkCelOpen=true;
-  const w=document.createElement('div'); w.className='hk-cel-wrap';
+  const w=document.createElement('div'); w.className='hk-cel-wrap'+(o.rankUp?' hk-cel-rank':'');
   w.innerHTML='<div class="hk-cel">'+
     '<div class="hk-cel-cap">'+(o.cap||'nice')+'</div>'+
     '<div class="hk-cel-body">'+

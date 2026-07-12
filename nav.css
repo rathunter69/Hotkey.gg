@@ -244,6 +244,36 @@ body{padding-top:14px}
   animation:hkFall linear both}
 @keyframes hkFall{0%{transform:translateY(-10px) rotate(0)} 100%{transform:translateY(340px) rotate(var(--rz,540deg)); opacity:0}}
 
+/* ---- r129: RANK-UP SEQUENCE — the LoL reveal, staged over the emblem's named
+   layers (every rankEmblem svg ships .frame/.glyph/.ornament/.jewel/.pips/
+   .sparks/.aura). Frame slams in, glyph lands, ornaments attach, jewel drops,
+   pips forge, sparks ignite, aura breathes. Keyframes are from-only with
+   backwards fill so each layer returns to its natural (inline-attr) state. */
+.hk-cel-rank .hk-cel-icon svg{width:132px; height:auto; overflow:visible}
+.hk-cel-rank .hk-cel-icon svg .frame, .hk-cel-rank .hk-cel-icon svg .glyph,
+.hk-cel-rank .hk-cel-icon svg .ornament, .hk-cel-rank .hk-cel-icon svg .jewel,
+.hk-cel-rank .hk-cel-icon svg .pips, .hk-cel-rank .hk-cel-icon svg .sparks,
+.hk-cel-rank .hk-cel-icon svg .aura{transform-box:fill-box; transform-origin:center}
+.hk-cel-rank .hk-cel-icon svg .frame{animation:hkRkIn .55s cubic-bezier(.2,.9,.3,1.35) backwards}
+.hk-cel-rank .hk-cel-icon svg .glyph{animation:hkRkIn .5s cubic-bezier(.2,.9,.3,1.35) .3s backwards}
+.hk-cel-rank .hk-cel-icon svg .ornament{animation:hkRkOrn .5s cubic-bezier(.2,.9,.3,1.25) .6s backwards}
+.hk-cel-rank .hk-cel-icon svg .jewel{animation:hkRkJewel .45s cubic-bezier(.3,1.5,.4,1) .9s backwards}
+.hk-cel-rank .hk-cel-icon svg .pips{animation:hkRkOrn .4s ease-out 1.15s backwards}
+.hk-cel-rank .hk-cel-icon svg .sparks{animation:hkRkSpark .5s ease-out 1.35s backwards}
+.hk-cel-rank .hk-cel-icon svg .aura{animation:hkRkIn .9s ease-out .1s backwards, hkRkPulse 2.2s ease-in-out 1.7s infinite}
+.hk-cel-rank .hk-cel-title{animation:hkRkRise .5s ease-out .45s backwards}
+.hk-cel-rank .hk-cel-sub{animation:hkRkRise .5s ease-out .7s backwards}
+@keyframes hkRkIn{from{opacity:0; transform:scale(.55)}}
+@keyframes hkRkOrn{from{opacity:0; transform:scale(.75)}}
+@keyframes hkRkJewel{from{opacity:0; transform:translateY(-9px)}}
+@keyframes hkRkSpark{from{opacity:0; transform:scale(.4) rotate(-40deg)}}
+@keyframes hkRkPulse{0%,100%{opacity:.75} 50%{opacity:1}}
+@keyframes hkRkRise{from{opacity:0; transform:translateY(8px)}}
+@media (prefers-reduced-motion: reduce){
+  .hk-cel-rank .hk-cel-icon svg *{animation:none !important}
+  .hk-cel-rank .hk-cel-title, .hk-cel-rank .hk-cel-sub{animation:none !important}
+}
+
 /* r81: beta tag on the brand — inherits the adaptive palette */
 .brand-beta{font-family:var(--mono); font-size:8.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
   color:var(--accent); border:1px solid var(--accent-dim); border-radius:5px; padding:1.5px 5px;

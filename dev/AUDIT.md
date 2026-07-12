@@ -2870,3 +2870,22 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   leaderboard/account/stats boot with ZERO page errors; e2e demo-replay
   ALL GREEN (40 drills x3). Old keycap renderer fully deleted — no
   fallback copy retained (house rule).
+
+---
+# ROUND 129 — THE RANK-UP MOMENT (staged LoL reveal on the emblem layers)
+- nav.css: .hk-cel-rank sequence — frame slams in (.55s overshoot), glyph
+  lands (+.3s), ornaments attach (+.6s), jewel drops (+.9s), pips forge
+  (+1.15s), sparks ignite (+1.35s), aura breathes (pulse from 1.7s);
+  title/sub rise on their own delays; emblem renders at 132px in the
+  modal. Keyframes are FROM-ONLY with backwards fill so every layer
+  settles back to its natural inline-attr state (bottom-bucket dim auras
+  stay dim after the show). prefers-reduced-motion kills all of it.
+- nav.js: hkCelebrate takes rankUp flag -> hk-cel-rank class; the rank-up
+  caller passes rankUp + tier-colored confetti via window.RANK_COLORS
+  (exported from themes.js next to the palettes — single source, no
+  inlined copies).
+- CACHE: v115 -> v116 (nav.css/nav.js/themes.js all changed post-r128).
+- VERIFY: node --check nav.js + themes.js; live trigger on index.html via
+  hkCelebrate({rankUp:true...}) — mid-sequence and settled screenshots
+  reviewed (bull emblem staging correctly, crimson confetti, pips forge
+  last); zero page errors.
