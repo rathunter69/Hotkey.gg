@@ -669,6 +669,10 @@
   // Anything nav owns that's currently covering the page (game code checks this
   // to pause its own keyboard handling under our overlays).
   window.navOverlayOpen = () => !!(themesOpen || kbdOpen || settingsOpen || profileOpen);
+  // r133: exported openers — index.html's duplicate modal copies died this round;
+  // the game routes '?' and the deep-link/results card sites through these.
+  window.navOpenKbd = () => kbdOpen ? closeKbd() : openKbd();
+  window.navOpenProfile = () => openProfile();
   // r115 (#30): handle generator — xbox-style suggestions in desk dialect.
   // Server-side moderation (handle blocklist trigger) remains the real gate.
   window.hkSuggestHandle = function(){
@@ -832,11 +836,19 @@ window.hkCelebrate = function(o){
   window.hkConfetti(w.querySelector('.hk-cel-body'), o.colors);
   let done=false;
   const close=()=>{ if(done) return; done=true;
+    document.removeEventListener('keydown', key, true);
     try{ w.remove(); }catch(e){}
     window.__hkCelOpen=false;
     const nx=window.__hkCelQ.shift(); if(nx) setTimeout(()=>window.hkCelebrate(nx), 220); };
+  /* r133: the celebration is MODAL to the keyboard. It preempts every keydown in
+     capture phase and stops propagation — before this, Enter fell through to the
+     results card underneath (resultsChainKeys) and dismissed BOTH, dumping the
+     player back in the grid; 'n'/space could even switch drills under the toast. */
+  const key=(e)=>{
+    e.stopImmediatePropagation();
+    if(e.key==='Enter'||e.key==='Escape'||e.key===' '){ e.preventDefault(); close(); }
+  };
   w.addEventListener('click', close);
-  const key=(e)=>{ if(e.key==='Enter'||e.key==='Escape'){ e.preventDefault(); close(); document.removeEventListener('keydown',key,true);} };
   document.addEventListener('keydown', key, true);
   setTimeout(close, 4200);
 };

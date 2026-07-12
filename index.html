@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=119" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=119">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=119">
+<link rel="icon" href="favicon.ico?v=120" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=120">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=120">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -430,7 +430,8 @@
     align-items:center; justify-content:center; z-index:60}
   .onboard-modal.show{display:flex}
   .ob-card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
-    padding:28px 30px; width:380px; max-width:88vw; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55)}
+    padding:28px 30px; width:380px; max-width:88vw; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55);
+    max-height:86vh; overflow-y:auto}   /* r133: same clip class as .pc-card — tall dialogs must scroll, not spill */
   .ob-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
     letter-spacing:1px; margin-bottom:12px}
   .ob-body{font-size:13.5px; color:var(--text); line-height:1.65; margin-bottom:22px}
@@ -1081,14 +1082,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=119"></script>
-<link rel="stylesheet" href="nav.css?v=119">
-<script src="themes.js?v=119"></script>
+<script src="drills.js?v=120"></script>
+<link rel="stylesheet" href="nav.css?v=120">
+<script src="themes.js?v=120"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=119"></script>
+<script src="nav.js?v=120"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -5533,7 +5534,9 @@ function updateChecklist(){
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
-  html+=`<div class="cl-esc">stuck or off the rails? <kbd>esc</kbd> restarts the drill</div>`;
+  // r133: this footer promised esc-restart THREE waves after r89 killed it (esc = back
+  // out / cancel ants only). Copy now names the real affordance: Shift+F11.
+  html+=`<div class="cl-esc">stuck or off the rails? <kbd>shift</kbd>+<kbd>F11</kbd> restarts the drill</div>`;
   el.innerHTML=html;
 }
 // engine-live chord equivalences — appended per guide step so nobody gets pigeonholed.
@@ -5874,14 +5877,15 @@ document.addEventListener('keydown',e=>{
   }
   // mode launcher open
   if(modesOpen){ e.preventDefault(); if(k==='Escape') closeModes(); return; }
-  // career card open
-  if(profileOpen){ e.preventDefault(); if(k==='Escape') closeProfile(); return; }
-  // themes picker open
-  if(themesOpen){ e.preventDefault(); if(k==='Escape') closeThemes(); return; }
-  // shortcuts overlay open — ? or Esc closes
-  if(kbdOpen){ e.preventDefault(); if(k==='Escape' || k==='?') closeKbd(); return; }
+  // r133: nav.js owns the card/themes/shortcuts overlays. While any is up the game
+  // swallows grid keys; nav closes on esc itself; '?' toggles the sheet shut here.
+  if(window.navOverlayOpen && window.navOverlayOpen()){
+    e.preventDefault();
+    if(k==='?' && window.navOpenKbd) window.navOpenKbd();
+    return;
+  }
   // open shortcuts with ? (Shift+/), as long as we're not mid-edit and no other modal is up
-  if(k==='?' && !editing && !demoPlaying){ e.preventDefault(); openKbd(); return; }
+  if(k==='?' && !editing && !demoPlaying){ e.preventDefault(); if(window.navOpenKbd) window.navOpenKbd(); return; }
   // rapid-fire runs on its own single-cell handler (grid engine is bypassed)
   // session-wide hotkeys (marathon or rapid-fire): Shift+Esc ends, 's' skips drill
   if(marathon && marathon.active){
@@ -6335,8 +6339,7 @@ $('startBtn').addEventListener('click', tryEnter);
 })();
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
-{ const ns=$('navShortcuts'); if(ns) ns.addEventListener('click', e=>{ e.preventDefault(); openKbd(); });
-  const ft=$('navThemes'); if(ft) ft.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
+{ // r133: navShortcuts/navThemes wiring removed — nav.js wires its own buttons (dup fired both renderers)
   const nb=$('navBurger');    if(nb) nb.addEventListener('click', ()=>{ const l=document.querySelector('.topnav-pages'); if(l) l.classList.toggle('open'); }); }
 
 // guest-mode banner when Supabase isn't configured (no leaderboard, no saves)
@@ -6930,80 +6933,12 @@ async function loadTheme(){
 }
 function saveTheme(name){ KV.set('hotkey_theme', name); }
 
-let themesOpen=false;
-function closeThemes(){ themesOpen=false; const m=$('themesModal'); if(m) m.classList.remove('show'); }
-
-/* ============================================================
-   APP KEYBOARD SHORTCUTS — ? overlay
-   ============================================================ */
-const APP_SHORTCUTS = [
-  { title:'navigating drills', rows: [
-    ['\\',         'open the drill picker'],
-    ['1 – 9',      'jump straight to drill # (classic only)'],
-    ['Shift + F11','restart the current drill'],
-  ]},
-  { title:'while training', rows: [
-    ['type',       'start the clock (first keystroke begins the run)'],
-    ['F1',         'toggle guided hints (paint-by-numbers walkthrough)'],
-    ['F2',         'edit the active cell'],
-  ]},
-  { title:'in a session (marathon / rapid-fire)', rows: [
-    ['s',          'skip the current drill (marathon)'],
-    ['g',          'toggle guided hints (marathon)'],
-    ['Shift + Esc','end the session early'],
-  ]},
-  { title:'after solving', rows: [
-    ['Enter',      'run it again'],
-    ['Space',      'next drill (classic)'],
-    ['Esc',        'back to the menu'],
-  ]},
-  { title:'anywhere', rows: [
-    ['?',          'open this shortcut sheet'],
-    ['Esc',        'close menus & modals'],
-  ]},
-];
-let kbdOpen=false;
-function closeKbd(){ kbdOpen=false; const m=$('kbdModal'); if(m) m.classList.remove('show'); }
-function openKbd(){
-  const m=$('kbdModal'); if(!m) return;
-  kbdOpen=true; m.classList.add('show');
-  const sections = APP_SHORTCUTS.map(g=>{
-    const rows = g.rows.map(([k,d])=>
-      `<div class="kb-row"><span class="kb-keys">${k.split('+').map(p=>'<kbd>'+escHtml(p.trim())+'</kbd>').join(' + ')}</span><span class="kb-desc">${escHtml(d)}</span></div>`
-    ).join('');
-    return `<div class="kb-section"><div class="kb-h">${escHtml(g.title)}</div>${rows}</div>`;
-  }).join('');
-  m.innerHTML='<div class="pc-card" style="width:560px">'+
-    '<div class="pc-head"><div class="pc-name">shortcuts</div></div>'+
-    '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
-    '<div class="kb-grid">'+sections+'</div>'+
-    '<div class="pc-foot"><span></span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
-    '</div>';
-  const c=$('kbClose'); if(c) c.onclick=closeKbd;
-  m.addEventListener('click', e=>{ if(e.target===m) closeKbd(); }, {once:true});
-}
-function openThemes(){
-  const m=$('themesModal'); if(!m) return;
-  themesOpen=true; m.classList.add('show');
-  const swatches = Object.entries(THEMES).map(([key,t])=>{
-    const v=t.vars; const isSel = key===currentTheme;
-    return `<button class="th-card${isSel?' sel':''}" data-key="${key}" style="background:${v.bg}; color:${v.text}; border-color:${isSel?v.accent:v.line}">`+
-      `<div class="th-name">${escHtml(t.name)}</div>`+
-      `<div class="th-bars"><span style="background:${v.accent}"></span><span style="background:${v.warn}"></span><span style="background:${v.bad}"></span></div>`+
-      `</button>`;
-  }).join('');
-  m.innerHTML='<div class="pc-card" style="width:600px">'+
-    '<div class="pc-head"><div class="pc-name">themes</div></div>'+
-    '<div class="pc-sub">Click a theme to apply. Your pick saves across sessions.</div>'+
-    '<div class="th-grid">'+swatches+'</div>'+
-    '<div class="pc-foot"><span></span><a id="thClose">close</a></div>'+
-    '</div>';
-  m.querySelectorAll('.th-card').forEach(b=>b.onclick=()=>{
-    const k=b.dataset.key; applyTheme(k); saveTheme(k); openThemes();   // re-render to update selection
-  });
-  const c=$('thClose'); if(c) c.onclick=closeThemes;
-  m.addEventListener('click', e=>{ if(e.target===m) closeThemes(); }, {once:true});
-}
+/* r133 FOSSIL EXCISION: index carried full duplicate copies of the shortcuts (?)
+   sheet, themes picker, and player card — pre-shared-nav leftovers operating on
+   nav.js's OWN modal nodes. Both layers wired the same buttons; index's stale
+   renderers painted LAST (no scroll cap, no modal-x, old card, tierOf without
+   wsum = provisional-cap bypass). nav.js is the single owner (r27 rule); index
+   routes through window.navOpenKbd / window.navOpenProfile. */
 function loadRapidCard(){
   // Draw from the shuffle bag — refill (Fisher-Yates) when empty so every op appears once per cycle.
   if(rfShuffleBag.length === 0) rfReshuffleBag();
@@ -7362,50 +7297,7 @@ function renderSessionGraph(splits){
 /* ============================================================
    CAREER CARD — your bests + where you rank vs the field
    ============================================================ */
-let profileOpen=false;
-function closeProfile(){ profileOpen=false; const m=$('profileModal'); if(m) m.classList.remove('show'); }
-function wireProfileClose(m){ const c=m.querySelector('#pcClose'); if(c) c.onclick=closeProfile;
-  m.addEventListener('click', e=>{ if(e.target===m) closeProfile(); }, {once:true}); }
-async function openProfile(){
-  const m=$('profileModal'); if(!m) return;
-  profileOpen=true; m.classList.add('show');
-  if(!sb || !me_user){
-    m.innerHTML='<div class="pc-card"><div class="pc-msg">Sign in with your school email to see your card and where you rank against the field.</div>'+
-      '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
-    wireProfileClose(m); return;
-  }
-  m.innerHTML='<div class="pc-card"><div class="pc-loading">loading your card…</div></div>';
-  try{ const data=await loadProfileData(); renderProfile(m, data); }
-  catch(e){
-    m.innerHTML='<div class="pc-card"><div class="pc-msg">Couldn’t load the rankings right now — check your connection and try again.</div>'+
-      '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
-    wireProfileClose(m);
-  }
-}
-async function loadProfileData(){
-  const p=await sb.from('profiles').select('id,handle');
-  const r=await sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
-  const profs=p.data||[], runs=r.data||[];
-  const names={}; profs.forEach(x=>names[x.id]=x.handle||'anon');
-  const per={}; MENU_ORDER.forEach(k=>per[k]=[]);
-  const seen={};
-  runs.forEach(x=>{ if(per[x.challenge]===undefined) return;       // ascending → first seen per user is their best
-    const key=x.challenge+'|'+x.user_id; if(!seen[key]){ seen[key]=true; per[x.challenge].push(x); } });
-  const drills=MENU_ORDER.map(k=>{
-    const best=per[k], total=best.length;
-    const idx=best.findIndex(b=>b.user_id===me_user.id);
-    const mine=idx>=0?best[idx]:null;
-    return { key:k, label:(CHALLENGES[k]&&CHALLENGES[k].label)||k, group:GROUP_OF[k]||'',
-      total, rank:idx>=0?idx+1:null, time:mine?mine.time_ms:null, leader:total?best[0].time_ms:null,
-      pct: idx>=0 ? idx/total : null };           // 0 = top of field
-  });
-  const attempted=drills.filter(d=>d.rank!==null);
-  const avgPct=attempted.length ? attempted.reduce((a,d)=>a+d.pct,0)/attempted.length : null;
-  const firsts=attempted.filter(d=>d.rank===1).length;
-  const bestRank=attempted.length ? Math.min(...attempted.map(d=>d.rank)) : null;
-  const players=new Set(runs.map(r=>r.user_id)).size;
-  return { drills, attempted:attempted.length, avgPct, firsts, bestRank, players };
-}
+
 /* Tier assignment is intentionally punitive — Unranked is the default and the only way out is breadth + placement.
    Without a minimum drill floor, the first person to touch a drill is #1 of 1 and tops the ladder. We require at least
    5 drills attempted before any tier appears, and each rung above Summer Analyst compounds an attempted-drill threshold
@@ -7417,40 +7309,7 @@ function tierOf(avgPct, attemptedCount, wsum){
   if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount, wsum);
   return {name:'MBA Associate', cls:'tier-mba'};   // themes.js missing: show the floor, never a stale ladder
 }
-function renderProfile(m, d){
-  const tier=tierOf(d.avgPct, d.attempted, d.wsum);
-  // Standing is meaningless before the threshold — show progress toward Summer Analyst instead so the user knows what to do.
-  // After threshold, show "top X%" (the same average-percentile measure that feeds the tier).
-  const fmtMs=ms=>(ms/1000).toFixed(2)+'s';
-  const standing = (d.attempted < 5)
-    ? d.attempted+'/5 drills toward Summer Analyst'
-    : (d.avgPct===null ? '—' : 'top '+Math.max(1,Math.round(d.avgPct*100))+'%');
-  let body='', lastG=null;
-  d.drills.forEach(x=>{
-    if(x.group!==lastG){ body+=`<div class="pc-grouphdr">${escHtml(x.group)}</div>`; lastG=x.group; }
-    if(x.rank===null){
-      body+=`<div class="pc-row untried"><span class="d-name">${escHtml(x.label)}</span><span class="d-rank">untried</span><span class="d-pct">—</span></div>`;
-    } else {
-      const pct = x.total>1 ? 'top '+Math.max(1,Math.round(x.rank/x.total*100))+'%' : 'only you so far';
-      const gap = (x.rank>1 && x.leader!=null) ? ' · +'+((x.time-x.leader)/1000).toFixed(2)+'s off #1' : (x.rank===1?' · you lead':'');
-      body+=`<div class="pc-row me${x.rank===1?' pc-rank1':''}"><span class="d-name">${escHtml(x.label)} · <b>${fmtMs(x.time)}</b></span>`+
-        `<span class="d-rank">#${x.rank} of ${x.total}</span><span class="d-pct">${pct}${gap}</span></div>`;
-    }
-  });
-  m.innerHTML=`<div class="pc-card">`+
-    `<div class="pc-head"><div class="pc-name">${escHtml(me_handle||'set a name')}</div><div class="pc-tier ${tier.cls}">${tier.name}</div></div>`+
-    `<div class="pc-sub">${escHtml((me_user&&me_user.email)||'')} · ${d.attempted}/${MENU_ORDER.length} drills attempted · field of ${d.players} player${d.players===1?'':'s'}</div>`+
-    `<div class="pc-career">`+
-      `<div class="pc-cstat"><div class="v">${tier.name}</div><div class="l">career rank</div></div>`+
-      `<div class="pc-cstat"><div class="v">${d.bestRank?('#'+d.bestRank):'—'}</div><div class="l">best finish</div></div>`+
-      `<div class="pc-cstat"><div class="v">${d.firsts}</div><div class="l">#1 finishes</div></div>`+
-      `<div class="pc-cstat"><div class="v">${standing}</div><div class="l">avg standing</div></div>`+
-    `</div>`+
-    body+
-    `<div class="pc-foot"><a href="leaderboard.html">full leaderboard ↗</a><a id="pcClose">close</a></div>`+
-    `</div>`;
-  wireProfileClose(m);
-}
+
 
 /* ============================================================
    ACCOUNT SETTINGS — in-app password change (bypasses email reset).
@@ -7867,7 +7726,7 @@ async function updateRankPill(){
   const show=(t)=>{ el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name):'')+'<span>'+t.name+'</span>';
     el.title=(t.full||t.name)+' \u2014 the ladder runs MBA Associate \u2192 Second-Year Analyst. Click for your card.';
     el.className='mb-tool rank-pill '+t.cls; el.style.display='inline-flex';
-    el.onclick=()=>{ try{ openProfile(); }catch(e){} }; };
+    el.onclick=()=>{ try{ (window.navOpenProfile||function(){})(); }catch(e){} }; };
   try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
     if(c && c.exp>Date.now()){ show({name:c.n, cls:c.c}); return; } }catch(e){}
   if(!sb || !me_user || isAnonUser()){ show({name:'MBA Associate', cls:'tier-mba'}); return; }
@@ -8075,7 +7934,7 @@ function bindUserMenu(){
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   };
   const wire = (id, fn) => { const el=$(id); if(el) el.onclick = (e)=>{ e.preventDefault(); closeUserMenu(); fn(); }; };
-  wire('umProfile',  openProfile);
+  // r133: umProfile wired by nav.js only (dup wiring raced the shared card)
   wire('umSaveProg', ()=>openAuth('signup'));
   wire('umSignout',  ()=>{ try{ localStorage.removeItem('hk_handle_cache'); }catch(e){} sb.auth.signOut().finally(()=>location.reload()); });   // r70: fresh landing, sign-in visible
 }
@@ -8401,7 +8260,7 @@ function handleDeepLink(){
   try{
     const p = new URLSearchParams(location.search);
     let consumed = false;
-    if(p.get('openProfile') === '1'){ openProfile(); consumed = true; }
+    if(p.get('openProfile') === '1'){ (window.navOpenProfile||function(){})(); consumed = true; }
     // DESKS v1 (r110): invite link ?desk=CODE — remember it, preview it on the landing,
     // auto-join fires in onSession once a real account is signed in.
     const deskCode = p.get('desk');

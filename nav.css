@@ -171,7 +171,11 @@ body{padding-top:14px}
 .legal-ph{font-family:var(--mono); font-style:normal; color:var(--warn); background:rgba(217,164,65,.14); padding:0 5px; border-radius:3px}
 
 /* ---- player card v3: fixed-height card, pinned close, badge row, inner scroll ---- */
-.pc-card{position:relative; max-height:82vh; display:flex; flex-direction:column}
+/* r133: overflow-y:auto restored — renderers stopped wrapping content in .pc-scroll
+   somewhere after r70, so any card taller than 82vh CLIPPED with no scrollbar
+   (Wolf: "help popup doesn't fit/scroll anymore"). The card itself now scrolls;
+   cards still using .pc-scroll keep their pinned-footer inner scroll. */
+.pc-card{position:relative; max-height:82vh; display:flex; flex-direction:column; overflow-y:auto}
 .pc-x{position:absolute; top:12px; right:16px; font-family:var(--mono); font-size:20px; color:var(--muted);
   cursor:pointer; line-height:1; padding:4px 8px; border-radius:8px; z-index:3}
 .pc-x:hover{color:var(--text); background:var(--surface2)}

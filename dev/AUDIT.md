@@ -2997,3 +2997,50 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   zero page errors. AWAITING WOLF — port to hkBadge (API grows optional tier
   param) only after approval, then cache-bump.
 - CACHE v118 -> v119 (drills.js PARS change; all 9 pages).
+
+---
+# ROUND 133 — CELEBRATION KEY LEAK + AFFORDANCE AUDIT + DUP-MODAL EXCISION + MEDAL ITERATION 3
+- CELEBRATION ENTER LEAK FIXED (Wolf's repro: achievement/level-up toast +
+  Enter dismissed the results card too, dumping you in the grid): hkCelebrate's
+  capture-phase key handler preventDefault'd but never STOPPED PROPAGATION —
+  Enter fell through to resultsChainKeys; 'n'/space could even switch drills
+  under the toast. The celebration is now keyboard-MODAL: every keydown stops
+  at it; Enter/Esc/Space dismiss. Verified: bubble-phase document listener
+  receives ZERO keydowns while a celebration is up; toast closes on Enter.
+- ESC-RESTART HOLDOVER KILLED: the checklist footer still promised
+  '<esc> restarts the drill' — THREE waves after r89 made Esc back-out-only.
+  Now names the real affordance (shift+F11). Affordance sweep: results-card
+  keys (r88 wiring), tour ↵/esc, session-summary enter/esc, paste-dialog esc,
+  ribbon esc copy all verified against handlers — clean.
+- HELP-POPUP CLIP + ROOT CAUSE — DUP-MODAL COLONY EXCISED: index.html carried
+  full pre-shared-nav copies of the shortcuts sheet, themes picker, AND player
+  card (own APP_SHORTCUTS + openKbd/openThemes/openProfile + renderProfile +
+  loadProfileData), all operating on nav.js's modal nodes; BOTH layers wired
+  navShortcuts/navThemes/umProfile, and index's stale renderer painted LAST:
+  no scroll cap, no modal-x, old-generation card (no XP ring/achievements/
+  badges/r131 share button ON THE GAME PAGE), and tierOf called WITHOUT wsum —
+  bypassing the r112 provisional cap (a live rank split-brain). ~120 lines
+  excised; nav.js exports navOpenKbd (toggle) + navOpenProfile; the game
+  keydown consults window.navOverlayOpen() (one check replaces three fossil
+  state vars). tierOf wrapper KEPT (rank pill uses it). Div balance verified
+  vs HEAD (-47/-47). ALSO: .pc-card gets overflow-y:auto (r70's .pc-scroll
+  wrapper had stopped being used — tall cards clipped with no scrollbar) and
+  .ob-card gets max-height:86vh + overflow (same clip class).
+- VERIFY: Playwright functional pass — celebration shield (0 leaked keydowns),
+  '?' opens NAV's sheet (modal-x + kb-grid + overflow auto), '?' toggles shut,
+  esc closes, navOpenProfile paints nav shell, footer copy reads shift+F11;
+  node --check all + extracted inline; e2e demo-replay ALL GREEN (55x3);
+  zero page errors on boot.
+- MEDAL ITERATION 3 (Wolf: rarity must read at a glance, like the rank
+  emblems): DIFFICULTY GRADES 1-5 — color AND structure escalate together:
+  G1 slate/bare · G2 bronze/rivets · G3 silver/fins · G4 gold/crown+ring ·
+  G5 diamond/IGNITED (apex jewel, sparks, hot rim, aura, glow ≥24px).
+  Laddered families climb the grades (Under Par G1 → Metronome G3 →
+  Untouchable G5). 3.1: glyph faces ride a hi→mid ramp (full ramp drowned
+  G1/G2 glyphs at small sizes). Proposed G5 set: Untouchable, Institution,
+  Ten Thousand Keys, Corner Office, Blink. AWAITING WOLF — hkBadge port takes
+  a grade param + per-achievement grade map in drills.js after approval.
+- STRUCTURAL ARC APPROVED (Wolf): r134+ = S2 ghost cursor + S6 PWA (offline-
+  buildable) first; S7 streaks/email + S8 admin analytics queue for an
+  egress session; S4 drillgen integration after.
+- CACHE v119 -> v120 (nav.js, nav.css, index.html changed; all 9 pages).

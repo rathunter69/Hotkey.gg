@@ -4,7 +4,7 @@ New sessions: the repo IS the handover — read this file, dev/AUDIT.md (newest 
 at the bottom), and the dev/ design docs. No manual doc upload needed when the
 session has the GitHub integration (repo clones automatically)._
 
-## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r132)
+## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r133)
 - **Where we are**: content deepening arc DONE (T2-T6, Mix Rule) · demo-replay e2e
   DONE (dev/e2e-demo-replay.js, all drills green) · Desks v1 + surfaces + protected
   names + seeds/claim-the-desk + school tags v1.5 DONE · XP v4 daily-reset DONE ·
@@ -16,7 +16,7 @@ session has the GitHub integration (repo clones automatically)._
   (LinkedIn rank card: themes.js hkRankCard/hkRankCardShare 1200x627 brand PNG,
   buttons on player-card modal + account Progress; PRO placeholder card on
   account; upgrade-modal copy aligned to the decided subscription model).
-  Cache v119. r132: versionup FIN-FIDELITY fix (Wolf's report — SG&A excl. D&A
+  Cache v120. r133: celebration Enter-leak fixed (keyboard-modal toast) · esc-restart holdover copy killed · index dup-modal colony EXCISED (shortcuts/themes/player-card copies + tierOf-sans-wsum split-brain; nav.js sole owner, navOpenKbd/navOpenProfile exports) · .pc-card/.ob-card scroll containment · medal lab iteration 3 (difficulty GRADES 1-5, rank-emblem escalation grammar) AWAITING WOLF. r132: versionup FIN-FIDELITY fix (Wolf's report — SG&A excl. D&A
   label, D&A→EBIT reconciliation rows, ratio-bounded inputs, par 150/91, PARS
   fossil added) · ACHIEVEMENT MEDAL LAB art/ach-proto.html iteration 2 (9
   categories, tier-metal medals) AWAITING WOLF approval before hkBadge port ·
