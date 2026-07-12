@@ -1421,7 +1421,7 @@ const CHALLENGES = {
     targets:['B2:B4','B5','B5','B2:B5','B2:B5'],
     demo(){ return [
       {sel:'B2:B4', keys:[Kb.alt,L('H'),L('H')]},
-      {sel:'B5', keys:[Kb.eq]},
+      {sel:'B5', keys:[Kb.eq, Kb.enter]},
       {sel:'B5', keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
       {sel:'B2:B5', keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
       {sel:'B2:B5', keys:[Kb.alt,L('H'),L('O'),L('I')]},
@@ -1916,12 +1916,18 @@ const CHALLENGES = {
     }
   },
   editfix:{
-    name:'Edit', label:'Fix the typos in place', par:44, parKeys:8,
+    name:'Edit', label:'Fix the typos in place', par:44, parKeys:44,
     prompt:'A pasted-in schedule with THREE typos scattered through the labels \u2014 different words, different spots, every run. Do not retype whole cells: F2 in, arrow the cursor to the mistake, fix it, commit. Edit mode is how you touch a cell without destroying it.',
     req(){ return this._sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 '); },
     guide(){ return this._sites.map((s,i)=>['first typo','second typo','third typo'][i]+' at <b>'+s.cell+'</b> \u00b7 <kbd>F2</kbd> \u00b7 <kbd>\u2190</kbd> to the mistake \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d \u00b7 <kbd>\u21b5</kbd> \u2014 only the final word is graded'); },
     targets(){ return this._sites.map(s=>s.cell); },
-    demo(){ return this._sites.map(s=>({sel:s.cell, keys:[{key:'F2'},{key:'ArrowLeft'},{key:'Backspace'},{key:'Backspace'},...T(s.good.slice(-2)),Kb.enter]})); },
+    demo(){ return this._sites.map(s=>{
+      let p=0; while(p<s.bad.length && p<s.good.length && s.bad[p]===s.good[p]) p++;
+      const del=s.bad.length-p, keys=[{key:'F2'}];
+      for(let i=0;i<del;i++) keys.push({key:'Backspace'});   // F2 lands the caret at the end; trim the wrong tail
+      keys.push(...T(s.good.slice(p)), Kb.enter);            // retype from the divergence point
+      return {sel:s.cell, keys};
+    }); },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 schedule review',txt:true,bold:true};
@@ -2552,7 +2558,7 @@ const CHALLENGES = {
     ],
     targets:['B4','B4:F4'],
     demo(){ return [
-      {sel:'B4', keys:[Kb.eq, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
+      {sel:'B4', keys:[{key:'='}, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
       {sel:'B4:F4', keys:[Kb.fillR]},
     ]; },
     build(){
@@ -5649,10 +5655,11 @@ function doPaste(kind){
       cell.bold=s.bold; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; cell.align=s.align; cell.fontColor=s.fontColor;
     }
     pendingFlash={r1:r0,c1:c0,r2:r0+cb.w-1,c2:c0+cb.h-1};
-    S.clipboard=null; return;
+    return;   // r106: clipboard persists (see below)
   }
   pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
-  S.clipboard=null;
+  // r106: clipboard PERSISTS across pastes (Excel parity — Ctrl+V keeps it; Esc/new copy clears).
+  // Nulling here broke the 'one copy, two pastes' contract copyover + pastes both teach.
 }
 function exitRibbon(act){ mode='normal'; path=[]; dialog=null; pasteKind=null; ribbonNote=''; drawRibbon(); if(act) commitAction(); }
 function enterRibbon(){ if(done)return; startClock(); mode='ribbon'; path=[]; dialog=null; ribbonNote=''; drawRibbon(); }
@@ -7730,6 +7737,7 @@ function loadChallenge(key, opts){
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
+  editing=false; editBuf=''; editCaret=0; editPointer=null; editPointerStart=-1;   // r106: never inherit a stale edit from the prior drill
   mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[]; keyTimes=[];
   updateGuideBtn();
   $('mouseBadge').style.display='none';

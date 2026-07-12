@@ -2370,3 +2370,35 @@ statement layouts, named companies, FY headers, associate-voice checklists.
 - Splicer scanner now comment-aware (an apostrophe in a // comment poisoned
   the string-state machine — caught by the EOF assert, write stayed atomic).
 - v104.
+
+---
+# ROUND 106 — DEMO-REPLAY E2E (the verification lever) + 4 REAL BUGS IT CAUGHT
+- dev/e2e-demo-replay.js: Playwright drives EVERY drill's own demo() through the
+  REAL engine (real KeyboardEvents via demoKey, real recalc, real graders, real
+  win flag) × N random builds. Closes the gap the offline harness can't reach:
+  pointer mode, F2 edit, copy/paste, ribbon dialogs, sort. First run: 48 WIN,
+  7 red. Standalone triage separated 3 contamination false-positives from 4
+  genuine bugs. After fixes: ALL 55 GREEN (5 reps).
+- BUG 1 (real, user-facing) — CLIPBOARD nulled after ONE paste (doPaste). Broke
+  the "one copy, two pastes" contract copyover AND pastes both teach, and Excel
+  parity (Ctrl+V keeps the clipboard; Esc/new-copy clears — that path already
+  existed). Removed the null on the main + transpose paste paths.
+- BUG 2 (latent contamination) — loadChallenge reset mode/path/dialog but NOT the
+  edit vars, so a drill left mid-edit (F2, or Alt+-> mid-edit) poisoned the next
+  drill's keystrokes. Added editing/editBuf/editCaret/editPointer reset. This was
+  also the source of the e2e's 3 cross-drill false positives — one fix, both wins.
+- BUG 3 (broken demo) — bridge used Kb.eq (Alt+=, autoSum) to start a pointed
+  product; autoSum seeds =SUM( and pre-selects, so the walk produced
+  =SUM(B1*B3) referencing a TEXT header. Switched to plain '=' pointer-start.
+  Same class in gauntlet: Kb.eq with no committing Enter left an open edit that
+  corrupted every later step — added Kb.enter (matches the working balance demo).
+- BUG 4 (broken demo) — editfix blind-deleted the last 2 chars and retyped 2,
+  which only fixes last-2-char typos; mid-word transpositions (Reveune->Revenue)
+  got mangled. Rewrote the demo to compute the common prefix, backspace the
+  divergent tail, retype from the divergence point. Now correct for every pair.
+  parKeys 8->44 (the old count was fiction; par 44 kept — foundations, tight-ok).
+- No shared asset (nav/themes/drills.js) changed — index.html + dev/ only — so
+  per the cache rule ?v stays 104. e2e is a dev tool; the site never loads dev/.
+- VERIFY: e2e ALL GREEN (5 reps × 55); offline harness 15/15 shipped drills
+  (no regressions); node --check inline scripts.
+- (no v bump — no shared-asset change.)
