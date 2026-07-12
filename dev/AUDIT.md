@@ -2157,3 +2157,45 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   derived rows to resurrect = 18 formula sites + 4 fills, mixed comma/
   percent formats, drift-parity check. par 135/keys 82. 30-seed verified.
 - v98.
+
+---
+# ROUND 100 — THE MODEL DEEPENING PASS (Wave 3 #18: "solvable with two SUMs")
+- Six Models drills rebuilt to doctrine; the thin single-column ref-chains
+  are gone:
+  · WACC — full desk build: unlever the peer beta, relever at the target's
+    OWN D/E (B8/B7), CAPM, after-tax Kd, weight off ONE denominator. Checks
+    follow the chain — each formula must REFERENCE its upstream cell, so a
+    retyped number breaks the grade. par 142/keys 87 (was 78/48).
+  · COMPS — multiples no longer given: compute EV/EBITDA ×5 + fill down,
+    AVERAGE/MAX/MIN tape, then a second panel walking the target through
+    implied EV (must reference the LIVE mean at D8), equity, per share,
+    premium. par 161/keys 101 (was 62/54).
+  · DCFSENS — now a TRUE two-way table: 5 WACCs × 3 growth rates, ONE
+    formula with genuinely mixed anchors ($B$2 / C$3 / $B4), fill right
+    then down = 15 live cells; the mixed forms are enforced per cell.
+    (The old "mixed anchoring" drill was actually all-absolute — corrected.)
+    par 64/keys 29.
+  · S&U — the two-SUM archetype fixed: anchored %-of-total columns down
+    BOTH sides (=B2/$B$5, filled through 100%); the $-anchor itself is
+    check-enforced. par 153/keys 95 (was 96/46).
+  · LBO — + hold period + IRR =B12^(1/B13)-1, ref-enforced off MOIC and
+    the hold. par 113/keys 65.
+  · ACC/DIL — + the financing drag juniors forget: cash consideration ×
+    after-tax cost = foregone interest, netted in pro forma NI (check
+    label: "the SUM alone is wrong"). par 105/keys 59.
+- HARNESS (r95 rule honored): 40 seeds × 6 drills — canonical solve passes,
+  fresh build fails, hardcode-only (right values, no formulas) fails. Fill
+  mirrors engine translateFormula ($-aware); recalc = 8-pass fixed point.
+  One harness bug caught mid-run: fill chords leaked into the typed-text
+  filter (ctrl+d's 'd' typed into the anchor cell) — harness-side only.
+- parKeys = demo-replay count (typed + chords + Manhattan walk);
+  par = round(keys×1.35+25) — calibrated on versionup (82→135).
+- drills.js: descs updated; duplicate wacc/dcf/lbo/revolver meta keys
+  DEDUPED — later-wins hazard: revolver's live label lived in the second
+  copy; preserved it. HOTKEY_PARS regenerated. 55/55 catalog↔CHALLENGES
+  key parity asserted.
+- No innerHTML surgery this round (drill objects only) — div-balance n/a.
+- Queued next deepening tranche: dcf → 5-yr discount-factor×PV two-row
+  build; waterfall → 3-yr corkscrew cascade; schedule → 5 yr. CAS engine
+  work + comments design still open (r97).
+- v99.

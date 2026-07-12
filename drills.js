@@ -56,9 +56,9 @@ window.HOTKEY_DRILLS = {
     transpose:  { name:'Transpose', label:'Flip it on its side',        tab:'Transpose', desc:'Copy a row, Alt E S E drops it in as a column' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'Strict seniority: MIN rations cash down two tranches' },
     txncomps:   { name:'Txn Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the average, and the implied equity' },
-    sourcesuses:{ name:'S&U',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total the uses, plug sponsor equity, check reads zero' },
-    accdil:     { name:'Acc/Dil',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined income over combined shares — does the deal add to EPS?' },
-    dcfsens:    { name:'Sensitivity',label:'Run the sensitivity row',   tab:'Sens.',     desc:'Mixed anchoring: one formula, six WACCs, ctrl+r does the rest' },
+    sourcesuses:{ name:'S&U',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
+    accdil:     { name:'Acc/Dil',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
+    dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
     retbridge:  { name:'Ret. Bridge',label:'Attribute the returns',     tab:'Bridge',    desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
     football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
     saves:      { name:'Save',     label:'Save like you mean it',   tab:'Save',     desc:'Work, Ctrl+S. More work, Ctrl+S again' },
@@ -85,24 +85,20 @@ window.HOTKEY_DRILLS = {
     // Formulas
     margin:     { name:'Formula',  label:'Build the margin',    tab:'Margin',      desc:'Build a margin formula down the column' },
     growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'YoY growth row — point it, fill right, format %' },
-    wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Weight the cap structure — debt after-tax, always' },
+    wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
     dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'Anchored PV formula, fill right, sum the PVs' },
-    lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — the IC number' },
-    revolver:   { name:'Revolver', label:'Sweep the cash',      tab:'Revolver',    desc:'Revolver draw = MAX(0, −cash) across the years' },
+    lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — then IRR over the hold' },
+    revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'LBO cash sweep — MAX the draw, MIN the paydown' },
     cagr:       { name:'CAGR',     label:'Compound it',         tab:'CAGR',        desc:'One-cell CAGR with the ^ power key' },
     sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'Anchored SUMIF rollup — $-lock the ranges, fill down' },
     cases:      { name:'Sticky switch', label:'Sticky IFs \u2014 one switch runs the model', tab:'Cases', desc:'Anchored scenario IF, filled across, then flip the switch' },
     bridge:     { name:'Bridge',   label:'Stretch the profit row', tab:'Bridge',   desc:'Profit = revenue × margin, fill it across years' },
     foot:       { name:'Foot',     label:'Total it both ways',  tab:'Cross-foot',  desc:'SUM across and down, tie out the corner' },
-    wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Weight the cap structure — debt after-tax, always' },
-    dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'Anchored PV formula, fill right, sum the PVs' },
-    lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — the IC number' },
-    revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'LBO cash sweep — MAX the draw, MIN the paydown' },
     balance:    { name:'Balance',  label:'Make it balance',     tab:'Balance',     desc:'Foot both sides, plug the equity, CHECK cell must read 0' },
     audit:      { name:'The 4am pass', label:'The 4am pass \u2014 find what\u2019s broken', tab:'Audit', desc:'Three planted breaks in a real P&L \u2014 find them all' },
     percent:    { name:'% of rev', label:'Common-size it',      tab:'Common-size', desc:'Common-size with an anchored ($) formula' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'Roll a PP&E schedule forward with links' },
-    comps:      { name:'Comps',    label:'Line up the comps',   tab:'Comps',       desc:'EV/EBITDA multiples, then the average' },
+    comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the tape, land per share and premium' },
 
     // Lookups
     isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'COGS, GP, EBIT, NI — four formulas, twelve cells' },
@@ -176,7 +172,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":98,"percent":64,"lookup":50,"ribbon":42,"pastes":44,"transpose":40,"saves":44,"editfix":44,"undo":28,"autofit":34,"rowops":26,"filldr":24,"blocksel":30,"copyover":36,"polish":38,"foot":72,"comps":62,"center":44,"blue":62,"sort":40,"series":30,"bridge":40,"growth":58,"wacc":78,"dcf":100,"lbo":98,"revolver":52,"isbuild":128,"debtsched":155,"cfslink":132,"bsbuild":125,"nwcsched":132,"threestmt":155,"waterfall":118,"txncomps":110,"sourcesuses":96,"accdil":104,"dcfsens":74,"retbridge":112,"football":92,"cagr":72,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":98,"percent":64,"lookup":50,"ribbon":42,"pastes":44,"transpose":40,"saves":44,"editfix":44,"undo":28,"autofit":34,"rowops":26,"filldr":24,"blocksel":30,"copyover":36,"polish":38,"foot":72,"comps":161,"center":44,"blue":62,"sort":40,"series":30,"bridge":40,"growth":58,"wacc":142,"dcf":100,"lbo":113,"revolver":52,"isbuild":128,"debtsched":155,"cfslink":132,"bsbuild":125,"nwcsched":132,"threestmt":155,"waterfall":118,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

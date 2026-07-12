@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=98" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=98">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=98">
+<link rel="icon" href="favicon.ico?v=99" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=99">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=99">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1053,14 +1053,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=98"></script>
-<link rel="stylesheet" href="nav.css?v=98">
-<script src="themes.js?v=98"></script>
+<script src="drills.js?v=99"></script>
+<link rel="stylesheet" href="nav.css?v=99">
+<script src="themes.js?v=99"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=98"></script>
+<script src="nav.js?v=99"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2239,53 +2239,79 @@ const CHALLENGES = {
     }
   },
   comps:{
-    name:'Comps', label:'Run the comps', par:62, parKeys:54,
-    prompt:'A real comps page in miniature: average the peer multiples, apply the mean to the target\u2019s EBITDA for implied EV, walk down to implied equity and per-share value, and land the premium to the current price. Five formulas \u2014 the whole valuation chain.',
-    req:'<em>B7</em> mean <em>=AVERAGE(B2:B5)</em> \u00b7 <em>B8</em> EV <em>=B7*B9</em> \u00b7 <em>B10</em> equity <em>=B8-B11</em> \u00b7 <em>B12</em> per share <em>=B10/B13</em> \u00b7 <em>B14</em> premium <em>=B12/B15-1</em>',
+    name:'Comps', label:'Run the comps', par:161, parKeys:101,
+    prompt:'A real comps page, both panels: compute EV/EBITDA for five peers and fill it down, read the tape \u2014 mean, high, low \u2014 then walk the target through the implied chain: EV, equity, per share, premium to market. The multiples aren\u2019t given anymore; you build them.',
+    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> <em>=AVERAGE(D3:D7)</em> \u00b7 <em>D9</em> <em>=MAX</em> \u00b7 <em>D10</em> <em>=MIN</em> \u00b7 <em>G4</em> EV <em>=G3*D8</em> \u00b7 <em>G6</em> equity <em>=G4-G5</em> \u00b7 <em>G8</em> per share <em>=G6/G7</em> \u00b7 <em>G10</em> premium <em>=G8/G9-1</em>',
     guide:[
-      'mean multiple at B7 \u00b7 <kbd>=AVERAGE(B2:B5)</kbd> <kbd>\u21b5</kbd>',
-      'implied EV at B8 \u00b7 <kbd>=B7*B9</kbd> \u2014 mean \u00d7 target EBITDA',
-      'implied equity at B10 \u00b7 <kbd>=B8-B11</kbd> \u2014 back out net debt',
-      'per share at B12 \u00b7 <kbd>=B10/B13</kbd> \u00b7 premium at B14 \u00b7 <kbd>=B12/B15-1</kbd>',
+      'multiple, first peer: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'read the tape: D8 \u00b7 <kbd>=AVERAGE(D3:D7)</kbd> \u00b7 D9 \u00b7 <kbd>=MAX(D3:D7)</kbd> \u00b7 D10 \u00b7 <kbd>=MIN(D3:D7)</kbd>',
+      'implied EV at G4 \u00b7 <kbd>=G3*D8</kbd> \u2014 target EBITDA \u00d7 the LIVE mean, not a retyped number',
+      'equity at G6 \u00b7 <kbd>=G4-G5</kbd> \u00b7 per share at G8 \u00b7 <kbd>=G6/G7</kbd>',
+      'premium at G10 \u00b7 <kbd>=G8/G9-1</kbd> \u2014 what you\u2019d be paying up over the market',
     ],
-    targets:['B7','B8','B10','B12','B14'],
+    targets:['D3:D7','D8','D9','D10','G4','G6','G8','G10'],
     demo(){ return [
-      {sel:'B7', keys:[...T('=AVERAGE(B2:B5)'), Kb.enter]},
-      {sel:'B8', keys:[...T('=B7*B9'), Kb.enter]},
-      {sel:'B10', keys:[...T('=B8-B11'), Kb.enter]},
-      {sel:'B12', keys:[...T('=B10/B13'), Kb.enter]},
-      {sel:'B14', keys:[...T('=B12/B15-1'), Kb.enter]},
+      {sel:'D3', keys:[...T('=B3/C3'), Kb.enter]},
+      {sel:'D3:D7', keys:[Kb.fillD]},
+      {sel:'D8', keys:[...T('=AVERAGE(D3:D7)'), Kb.enter]},
+      {sel:'D9', keys:[...T('=MAX(D3:D7)'), Kb.enter]},
+      {sel:'D10', keys:[...T('=MIN(D3:D7)'), Kb.enter]},
+      {sel:'G4', keys:[...T('=G3*D8'), Kb.enter]},
+      {sel:'G6', keys:[...T('=G4-G5'), Kb.enter]},
+      {sel:'G8', keys:[...T('=G6/G7'), Kb.enter]},
+      {sel:'G10', keys:[...T('=G8/G9-1'), Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 EV/EBITDA comps',txt:true,bold:true};
-      const peers=['Peer A','Peer B','Peer C','Peer D']; const mults=[];
-      peers.forEach((p,i)=>{ const m=rnd(70,130)/10; mults.push(m);
-        cells['A'+(2+i)]={...blankCell(),value:p,txt:true};
-        cells['B'+(2+i)]={...blankCell(),value:m,fontColor:'blue',decimals:1}; });
-      cells['A7']={...blankCell(),value:'Mean multiple',txt:true,bold:true};   cells['B7']={...blankCell(),decimals:1,bold:true};
-      cells['A8']={...blankCell(),value:'Implied EV',txt:true};                cells['B8']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['A9']={...blankCell(),value:'Target EBITDA',txt:true};             cells['B9']={...blankCell(),value:rnd(20,60)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A10']={...blankCell(),value:'Implied equity',txt:true};           cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['A11']={...blankCell(),value:'Net debt',txt:true};                 cells['B11']={...blankCell(),value:rnd(5,25)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A12']={...blankCell(),value:'Per share',txt:true};                cells['B12']={...blankCell(),fmtStyle:'currency',decimals:2};
-      cells['A13']={...blankCell(),value:'Shares out',txt:true};               cells['B13']={...blankCell(),value:rnd(8,40),fontColor:'blue',decimals:0};
-      cells['A14']={...blankCell(),value:'Premium to mkt',txt:true,bold:true}; cells['B14']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
-      cells['A15']={...blankCell(),value:'Current price',txt:true};            cells['B15']={...blankCell(),value:rnd(10,80),fontColor:'blue',fmtStyle:'currency',decimals:2};
-      const mean=mults.reduce((a,b)=>a+b,0)/4;
-      this._mean=mean; this._ev=mean*cells['B9'].value; this._eq=this._ev-cells['B11'].value;
-      this._ps=this._eq/cells['B13'].value; this._prem=this._ps/cells['B15'].value-1;
-      return {ROWS:15, cells, active:{r:7,c:2}, sel:null, colW:{1:132,2:96}};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 trading comps ($mm)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Peer',txt:true,bold:true};
+      cells['B2']={...blankCell(),value:'EV',txt:true,bold:true,align:'r'};
+      cells['C2']={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
+      cells['D2']={...blankCell(),value:'EV/EBITDA',txt:true,bold:true,align:'r'};
+      const peers=['Falcon Ind.','Atlas Group','Copper Peak','Summit Co.','Ironline'];
+      this._m=[];
+      for(let i=0;i<5;i++){
+        const ebd=rnd(8,40)*10; const mult=rnd(60,120)/10; const ev=Math.round(ebd*mult);
+        cells['A'+(3+i)]={...blankCell(),value:peers[i],txt:true};
+        cells['B'+(3+i)]={...blankCell(),value:ev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells['C'+(3+i)]={...blankCell(),value:ebd,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells['D'+(3+i)]={...blankCell(),decimals:1};
+        this._m.push(ev/ebd);
+      }
+      cells['A8']={...blankCell(),value:'Mean',txt:true,bold:true};  cells['D8']={...blankCell(),decimals:1,bold:true};
+      cells['A9']={...blankCell(),value:'High',txt:true};            cells['D9']={...blankCell(),decimals:1};
+      cells['A10']={...blankCell(),value:'Low',txt:true};            cells['D10']={...blankCell(),decimals:1};
+      cells['F2']={...blankCell(),value:'Implied valuation',txt:true,bold:true};
+      const tEbd=rnd(15,50)*10, nd=rnd(5,25)*10, sh=rnd(8,40);
+      cells['F3']={...blankCell(),value:'Target EBITDA',txt:true}; cells['G3']={...blankCell(),value:tEbd,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['F4']={...blankCell(),value:'Implied EV',txt:true};    cells['G4']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['F5']={...blankCell(),value:'Net debt',txt:true};      cells['G5']={...blankCell(),value:nd,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['F6']={...blankCell(),value:'Implied equity',txt:true,bold:true}; cells['G6']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['F7']={...blankCell(),value:'Shares out',txt:true};    cells['G7']={...blankCell(),value:sh,fontColor:'blue',decimals:0};
+      cells['F8']={...blankCell(),value:'Per share',txt:true};     cells['G8']={...blankCell(),fmtStyle:'currency',decimals:2};
+      const mean=this._m.reduce((a,b)=>a+b,0)/5;
+      const ps=(tEbd*mean-nd)/sh;
+      const px=Math.max(1,Math.round(ps*(rnd(75,115)/100)*100)/100);
+      cells['F9']={...blankCell(),value:'Current price',txt:true}; cells['G9']={...blankCell(),value:px,fontColor:'blue',fmtStyle:'currency',decimals:2};
+      cells['F10']={...blankCell(),value:'Premium to mkt',txt:true,bold:true}; cells['G10']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
+      this._exp={mean:mean, hi:Math.max(...this._m), lo:Math.min(...this._m),
+        ev:tEbd*mean, eq:tEbd*mean-nd, ps:ps, prem:ps/px-1};
+      return {ROWS:10, cells, active:{r:3,c:4}, sel:null, colW:{1:108,2:76,3:76,4:88,6:118,7:84}};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.05,Math.abs(exp)*1e-3); };
+      const live=(k,exp,tol,ref)=>{ const c=S.cells[k]; if(!c||!c.formula||typeof c.value!=='number') return false;
+        if(Math.abs(c.value-exp)>(tol||0.05)) return false;
+        return !ref || String(c.formula).replace(/\$/g,'').toUpperCase().includes(ref); };
+      const fnRef=(k,fn)=>{ const c=S.cells[k]; return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(fn)); };
+      const e=this._exp;
       return [
-        {label:'mean of the four peer multiples \u2014 live AVERAGE', ok: near('B7',this._mean) && String((S.cells['B7']||{}).formula||'').toUpperCase().includes('AVERAGE')},
-        {label:'implied EV = mean \u00d7 target EBITDA', ok: near('B8',this._ev)},
-        {label:'implied equity = EV \u2212 net debt', ok: near('B10',this._eq)},
-        {label:'implied per-share value', ok: near('B12',this._ps)},
-        {label:'premium to the current price', ok: near('B14',this._prem)},
+        {label:'multiples COMPUTED for all five peers \u2014 EV over EBITDA, filled down (D3:D7)',
+          ok: [0,1,2,3,4].every(i=>live('D'+(3+i),this._m[i],0.05,'C'+(3+i)))},
+        {label:'the tape read live \u2014 AVERAGE mean, MAX high, MIN low (D8:D10)',
+          ok: live('D8',e.mean)&&fnRef('D8','AVERAGE')&&live('D9',e.hi)&&fnRef('D9','MAX')&&live('D10',e.lo)&&fnRef('D10','MIN')},
+        {label:'implied EV off the LIVE mean \u2014 G4 must reference D8', ok: live('G4',e.ev,0.5,'D8')},
+        {label:'implied equity after net debt (G6)', ok: live('G6',e.eq,0.5,'G4')},
+        {label:'per share and the premium to market (G8, G10)', ok: live('G8',e.ps,0.01,'G7')&&live('G10',e.prem,0.001,'G9')},
       ];
     }
   },
@@ -2585,43 +2611,54 @@ const CHALLENGES = {
     }
   },
   wacc:{
-    name:'WACC', label:'Build the discount rate', par:78, parKeys:48,
-    prompt:'Cost of capital, the full desk build: weight both sides of the cap structure off one total, tax-effect the debt side, then assemble WACC. Four formulas \u2014 and the E/V, D/V pair should share a denominator, not a hardcode.',
-    req:'<em>B7</em> E/V <em>=B2/(B2+B3)</em> \u00b7 <em>B8</em> D/V <em>=B3/(B2+B3)</em> \u00b7 <em>B9</em> after-tax Kd <em>=B5*(1-B6)</em> \u00b7 <em>B10</em> WACC <em>=B7*B4+B8*B9</em>',
+    name:'WACC', label:'Build the discount rate', par:142, parKeys:87,
+    prompt:'The full desk build \u2014 no shortcuts: unlever the peer beta at the peer\u2019s structure, relever it at the target\u2019s OWN debt-to-equity, CAPM the cost of equity, tax-effect the debt side, then weight both sides off one denominator. Five formulas, each feeding the next \u2014 the grader follows the chain, so a retyped number breaks it.',
+    req:'<em>B10</em> unlev \u03b2 <em>=B4/(1+(1-B6)*B5)</em> \u00b7 <em>B11</em> relev \u03b2 <em>=B10*(1+(1-B6)*B8/B7)</em> \u00b7 <em>B12</em> Ke <em>=B2+B11*B3</em> \u00b7 <em>B13</em> at-Kd <em>=B9*(1-B6)</em> \u00b7 <em>B14</em> WACC <em>=(B7*B12+B8*B13)/(B7+B8)</em>',
     guide:[
-      'E/V at B7 \u00b7 <kbd>=B2/(B2+B3)</kbd> <kbd>\u21b5</kbd> \u2014 equity over total capital',
-      'D/V at B8 \u00b7 <kbd>=B3/(B2+B3)</kbd> \u2014 the two weights must sum to 1',
-      'after-tax cost of debt at B9 \u00b7 <kbd>=B5*(1-B6)</kbd> \u2014 interest is deductible; equity isn\u2019t',
-      'WACC at B10 \u00b7 <kbd>=B7*B4+B8*B9</kbd> \u2014 each side at its weight and its cost',
+      'unlevered \u03b2 at B10 \u00b7 <kbd>=B4/(1+(1-B6)*B5)</kbd> <kbd>\u21b5</kbd> \u2014 strip the peer\u2019s leverage out',
+      'relevered \u03b2 at B11 \u00b7 <kbd>=B10*(1+(1-B6)*B8/B7)</kbd> \u2014 same algebra, the target\u2019s OWN D/E (B8/B7)',
+      'cost of equity at B12 \u00b7 <kbd>=B2+B11*B3</kbd> \u2014 CAPM: risk-free plus beta times the premium',
+      'after-tax Kd at B13 \u00b7 <kbd>=B9*(1-B6)</kbd> \u2014 interest is deductible; equity isn\u2019t',
+      'WACC at B14 \u00b7 <kbd>=(B7*B12+B8*B13)/(B7+B8)</kbd> \u2014 both sides weighted off ONE denominator',
     ],
-    targets:['B7','B8','B9','B10'],
+    targets:['B10','B11','B12','B13','B14'],
     demo(){ return [
-      {sel:'B7', keys:[...T('=B2/(B2+B3)'), Kb.enter]},
-      {sel:'B8', keys:[...T('=B3/(B2+B3)'), Kb.enter]},
-      {sel:'B9', keys:[...T('=B5*(1-B6)'), Kb.enter]},
-      {sel:'B10', keys:[...T('=B7*B4+B8*B9'), Kb.enter]},
+      {sel:'B10', keys:[...T('=B4/(1+(1-B6)*B5)'), Kb.enter]},
+      {sel:'B11', keys:[...T('=B10*(1+(1-B6)*B8/B7)'), Kb.enter]},
+      {sel:'B12', keys:[...T('=B2+B11*B3'), Kb.enter]},
+      {sel:'B13', keys:[...T('=B9*(1-B6)'), Kb.enter]},
+      {sel:'B14', keys:[...T('=(B7*B12+B8*B13)/(B7+B8)'), Kb.enter]},
     ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 WACC build',txt:true,bold:true};
-      const E=rnd(40,90)*10, D=rnd(20,60)*10, Ke=rnd(9,14)/100, Kd=rnd(5,8)/100, Tx=rnd(21,28)/100;
-      const rows=[[2,'Equity value',E,'comma',0],[3,'Debt value',D,'comma',0],[4,'Cost of equity',Ke,'percent',1],[5,'Cost of debt',Kd,'percent',1],[6,'Tax rate',Tx,'percent',0]];
+      const rf=rnd(35,45)/1000, erp=rnd(45,60)/1000, pb=rnd(90,140)/100, pde=rnd(30,80)/100, tx=rnd(21,28)/100;
+      const E=rnd(40,90)*10, D=rnd(20,60)*10, kd=rnd(5,8)/100;
+      const rows=[[2,'Risk-free rate',rf,'percent',2],[3,'Equity risk premium',erp,'percent',2],
+        [4,'Peer levered beta',pb,null,2],[5,'Peer D/E',pde,null,2],[6,'Tax rate',tx,'percent',0],
+        [7,'Equity value',E,'comma',0],[8,'Debt value',D,'comma',0],[9,'Cost of debt, pre-tax',kd,'percent',1]];
       rows.forEach(([r,n,v,f,d])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
         cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:f,decimals:d}; });
-      cells['A7']={...blankCell(),value:'E / V',txt:true};              cells['B7']={...blankCell(),fmtStyle:'percent',decimals:1};
-      cells['A8']={...blankCell(),value:'D / V',txt:true};              cells['B8']={...blankCell(),fmtStyle:'percent',decimals:1};
-      cells['A9']={...blankCell(),value:'After-tax cost of debt',txt:true}; cells['B9']={...blankCell(),fmtStyle:'percent',decimals:2};
-      cells['A10']={...blankCell(),value:'WACC',txt:true,bold:true};    cells['B10']={...blankCell(),fmtStyle:'percent',decimals:2,bold:true};
-      this._ev=E/(E+D); this._dv=D/(E+D); this._kd=Kd*(1-Tx); this._wacc=this._ev*Ke+this._dv*this._kd;
-      return {ROWS:10, cells, active:{r:7,c:2}, sel:null, colW:{1:168,2:92}};
+      cells['A10']={...blankCell(),value:'Unlevered beta',txt:true};   cells['B10']={...blankCell(),decimals:2};
+      cells['A11']={...blankCell(),value:'Relevered beta',txt:true};   cells['B11']={...blankCell(),decimals:2};
+      cells['A12']={...blankCell(),value:'Cost of equity',txt:true};   cells['B12']={...blankCell(),fmtStyle:'percent',decimals:2};
+      cells['A13']={...blankCell(),value:'After-tax cost of debt',txt:true}; cells['B13']={...blankCell(),fmtStyle:'percent',decimals:2};
+      cells['A14']={...blankCell(),value:'WACC',txt:true,bold:true};   cells['B14']={...blankCell(),fmtStyle:'percent',decimals:2,bold:true};
+      const bu=pb/(1+(1-tx)*pde), bl=bu*(1+(1-tx)*D/E), ke=rf+bl*erp, akd=kd*(1-tx);
+      this._exp={bu:bu, bl:bl, ke:ke, akd:akd, wacc:(E*ke+D*akd)/(E+D)};
+      return {ROWS:14, cells, active:{r:10,c:2}, sel:null, colW:{1:168,2:92}};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(1e-4,Math.abs(exp)*1e-3); };
+      const live=(k,exp,ref)=>{ const c=S.cells[k]; if(!c||!c.formula||typeof c.value!=='number') return false;
+        if(Math.abs(c.value-exp)>Math.max(1e-4,Math.abs(exp)*2e-3)) return false;
+        return !ref || String(c.formula).replace(/\$/g,'').toUpperCase().includes(ref); };
+      const e=this._exp;
       return [
-        {label:'E/V and D/V \u2014 both weights live, off the same total', ok: near('B7',this._ev)&&near('B8',this._dv)},
-        {label:'after-tax cost of debt \u2014 Kd \u00d7 (1 \u2212 tax)', ok: near('B9',this._kd)},
-        {label:'WACC assembles the weighted pieces', ok: near('B10',this._wacc)},
+        {label:'unlevered beta \u2014 the peer\u2019s leverage stripped out (B10)', ok: live('B10',e.bu,'B4')},
+        {label:'relevered at the target\u2019s OWN D/E \u2014 chained off B10, not retyped (B11)', ok: live('B11',e.bl,'B10')},
+        {label:'CAPM cost of equity \u2014 rf + \u03b2 \u00d7 ERP, off the relevered beta (B12)', ok: live('B12',e.ke,'B11')},
+        {label:'after-tax cost of debt \u2014 Kd \u00d7 (1 \u2212 tax) (B13)', ok: live('B13',e.akd,'B9')},
+        {label:'WACC \u2014 both sides weighted off ONE denominator, live all the way down (B14)', ok: live('B14',e.wacc,'B12')&&live('B14',e.wacc,'B13')},
       ];
     }
   },
@@ -2687,16 +2724,17 @@ const CHALLENGES = {
     }
   },
   lbo:{
-    name:'LBO', label:'Run the LBO math', par:98, parKeys:49,
-    prompt:'Entry to exit, the whole chain: build enterprise value at entry, lever it, check the equity, mark the exit at the same multiple, and land MOIC \u2014 the number the whole deal answers to. Six formulas; the multiple stays anchored so entry and exit agree.',
-    req:'<em>B6</em> entry EV <em>=B2*$B$4</em> \u00b7 <em>B7</em> debt <em>=B6*B5</em> \u00b7 <em>B8</em> entry equity <em>=B6-B7</em> \u00b7 <em>B9</em> exit EV <em>=B3*$B$4</em> \u00b7 <em>B11</em> exit equity <em>=B9-B10</em> \u00b7 <em>B12</em> MOIC <em>=B11/B8</em>',
+    name:'LBO', label:'Run the LBO math', par:113, parKeys:65,
+    prompt:'Entry to exit, the whole chain: build enterprise value at entry, lever it, check the equity, mark the exit at the same multiple, land MOIC \u2014 then annualize it over the hold, because the IC never stops at MOIC. Seven formulas; the multiple stays anchored so entry and exit agree, and the IRR compounds off the hold period with the ^ key.',
+    req:'<em>B6</em> entry EV <em>=B2*$B$4</em> \u00b7 <em>B7</em> debt <em>=B6*B5</em> \u00b7 <em>B8</em> entry equity <em>=B6-B7</em> \u00b7 <em>B9</em> exit EV <em>=B3*$B$4</em> \u00b7 <em>B11</em> exit equity <em>=B9-B10</em> \u00b7 <em>B12</em> MOIC <em>=B11/B8</em> \u00b7 <em>B14</em> IRR <em>=B12^(1/B13)-1</em>',
     guide:[
       'entry EV at B6 \u00b7 <kbd>=B2*$B$4</kbd> \u2014 EBITDA \u00d7 the anchored multiple',
       'debt at B7 \u00b7 <kbd>=B6*B5</kbd> \u00b7 entry equity at B8 \u00b7 <kbd>=B6-B7</kbd> \u2014 the check you write',
       'exit EV at B9 \u00b7 <kbd>=B3*$B$4</kbd> \u2014 same multiple, F4 keeps it honest',
       'exit equity at B11 \u00b7 <kbd>=B9-B10</kbd> \u00b7 MOIC at B12 \u00b7 <kbd>=B11/B8</kbd>',
+      'IRR at B14 \u00b7 <kbd>=B12^(1/B13)-1</kbd> \u2014 MOIC compounded over the hold; the ^ key earns its place',
     ],
-    targets:['B6','B7','B8','B9','B11','B12'],
+    targets:['B6','B7','B8','B9','B11','B12','B14'],
     demo(){ return [
       {sel:'B6', keys:[...T('=B2*$B$4'), Kb.enter]},
       {sel:'B7', keys:[...T('=B6*B5'), Kb.enter]},
@@ -2704,6 +2742,7 @@ const CHALLENGES = {
       {sel:'B9', keys:[...T('=B3*$B$4'), Kb.enter]},
       {sel:'B11', keys:[...T('=B9-B10'), Kb.enter]},
       {sel:'B12', keys:[...T('=B11/B8'), Kb.enter]},
+      {sel:'B14', keys:[...T('=B12^(1/B13)-1'), Kb.enter]},
     ]; },
     build(){
       const cells={};
@@ -2714,6 +2753,7 @@ const CHALLENGES = {
         cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:f,decimals:d}; });
       const entryEV=e0*mult, debt=entryEV*lev, entryEq=entryEV-debt, exitEV=e1*mult;
       const exitDebt=Math.round(debt*rnd(40,75)/100);
+      const hold=rnd(4,6);
       cells['A6']={...blankCell(),value:'Entry EV',txt:true};        cells['B6']={...blankCell(),fmtStyle:'comma',decimals:0};
       cells['A7']={...blankCell(),value:'Debt at entry',txt:true};   cells['B7']={...blankCell(),fmtStyle:'comma',decimals:0};
       cells['A8']={...blankCell(),value:'Entry equity',txt:true,bold:true}; cells['B8']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
@@ -2721,18 +2761,26 @@ const CHALLENGES = {
       cells['A10']={...blankCell(),value:'Debt at exit',txt:true};   cells['B10']={...blankCell(),value:exitDebt,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['A11']={...blankCell(),value:'Exit equity',txt:true,bold:true}; cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
       cells['A12']={...blankCell(),value:'MOIC',txt:true,bold:true}; cells['B12']={...blankCell(),decimals:2,bold:true};
-      this._exp={entryEV:entryEV, debt:debt, entryEq:entryEq, exitEV:exitEV, exitEq:exitEV-exitDebt, moic:(exitEV-exitDebt)/entryEq};
-      return {ROWS:12, cells, active:{r:6,c:2}, sel:null, colW:{1:140,2:92}};
+      cells['A13']={...blankCell(),value:'Hold period (yrs)',txt:true}; cells['B13']={...blankCell(),value:hold,fontColor:'blue',decimals:0};
+      cells['A14']={...blankCell(),value:'IRR',txt:true,bold:true};  cells['B14']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
+      const moic=(exitEV-exitDebt)/entryEq;
+      this._exp={entryEV:entryEV, debt:debt, entryEq:entryEq, exitEV:exitEV, exitEq:exitEV-exitDebt, moic:moic, irr:Math.pow(moic,1/hold)-1};
+      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:140,2:92}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
       const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); };
+      const e=this._exp;
       return [
-        {label:'entry EV and debt \u2014 EBITDA \u00d7 anchored multiple, levered', ok: near('B6',this._exp.entryEV)&&near('B7',this._exp.debt)},
-        {label:'entry equity check', ok: near('B8',this._exp.entryEq)},
-        {label:'exit EV at the SAME multiple', ok: near('B9',this._exp.exitEV)},
-        {label:'exit equity after remaining debt', ok: near('B11',this._exp.exitEq)},
-        {label:'MOIC \u2014 exit equity over entry equity', ok: near('B12',this._exp.moic)},
+        {label:'entry EV and debt \u2014 EBITDA \u00d7 anchored multiple, levered', ok: near('B6',e.entryEV)&&near('B7',e.debt)},
+        {label:'entry equity check', ok: near('B8',e.entryEq)},
+        {label:'exit EV at the SAME multiple', ok: near('B9',e.exitEV)},
+        {label:'exit equity after remaining debt', ok: near('B11',e.exitEq)},
+        {label:'MOIC \u2014 exit equity over entry equity', ok: near('B12',e.moic)},
+        {label:'IRR \u2014 MOIC compounded over the hold, live off B12 and B13 (B14)',
+          ok: (()=>{ const c=S.cells['B14']; if(!c||!c.formula||typeof c.value!=='number') return false;
+            const f=String(c.formula).replace(/\$/g,'').toUpperCase();
+            return f.includes('B12')&&f.includes('B13')&&Math.abs(c.value-e.irr)<Math.max(1e-4,Math.abs(e.irr)*2e-3); })()},
       ];
     }
   },
@@ -3287,20 +3335,25 @@ const CHALLENGES = {
     }
   },
   sourcesuses:{
-    name:'S&U', label:'Balance sources and uses', par:96, parKeys:46,
-    prompt:'The first page of every deal book. Total the uses, stack the committed sources, and let sponsor equity be THE PLUG \u2014 whatever the deal still needs. When the check row reads zero, the deal is funded.',
-    req:'<em>B5</em> total uses <em>=SUM(B2:B4)</em> \u00b7 <em>B9</em> sponsor equity <em>=B5-B7-B8</em> (the plug) \u00b7 <em>B10</em> total sources <em>=SUM(B7:B9)</em> \u00b7 <em>B12</em> check <em>=B10-B5</em> \u2192 must read 0',
+    name:'S&U', label:'Balance sources and uses', par:153, parKeys:95,
+    prompt:'The first page of every deal book \u2014 and now the version the MD actually wants: total the uses, let sponsor equity be THE PLUG, total the sources, prove the check reads zero \u2014 then common-size BOTH sides with an anchored % column that runs straight through 100%. Two anchors, two fills, one funded deal.',
+    req:'<em>B5</em> total uses <em>=SUM(B2:B4)</em> \u00b7 <em>C2</em> % <em>=B2/$B$5</em> fill C2:C5 \u00b7 <em>B9</em> sponsor equity <em>=B5-B7-B8</em> (the plug) \u00b7 <em>B10</em> total sources <em>=SUM(B7:B9)</em> \u00b7 <em>C7</em> % <em>=B7/$B$10</em> fill C7:C10 \u00b7 <em>B12</em> check <em>=B10-B5</em> \u2192 0',
     guide:[
       'total uses at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 equity purchase, refi, fees',
+      '% of uses at C2 \u00b7 <kbd>=B2/$B$5</kbd> \u2014 <kbd>F4</kbd> locks the total \u00b7 select C2:C5 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 the total row must read 100%',
       'THE PLUG: sponsor equity at B9 \u00b7 <kbd>=B5-B7-B8</kbd> \u2014 uses less what debt covers',
-      'total sources at B10 \u00b7 <kbd>=SUM(B7:B9)</kbd>',
+      'total sources at B10 \u00b7 <kbd>=SUM(B7:B9)</kbd> \u00b7 % of sources at C7 \u00b7 <kbd>=B7/$B$10</kbd> \u00b7 fill C7:C10',
       'the check at B12 \u00b7 <kbd>=B10-B5</kbd> \u2014 zero or the deal doesn\u2019t close',
     ],
-    targets:['B5','B9','B10','B12'],
+    targets:['B5','C2:C5','B9','B10','C7:C10','B12'],
     demo(){ return [
       {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
+      {sel:'C2', keys:[...T('=B2/$B$5'), Kb.enter]},
+      {sel:'C2:C5', keys:[Kb.fillD]},
       {sel:'B9', keys:[...T('=B5-B7-B8'), Kb.enter]},
       {sel:'B10', keys:[...T('=SUM(B7:B9)'), Kb.enter]},
+      {sel:'C7', keys:[...T('=B7/$B$10'), Kb.enter]},
+      {sel:'C7:C10', keys:[Kb.fillD]},
       {sel:'B12', keys:[...T('=B10-B5'), Kb.enter]},
     ]; },
     build(){
@@ -3311,122 +3364,144 @@ const CHALLENGES = {
       const tl=Math.round(uses*rnd(35,55)/100/10)*10, roll=Math.round(uses*rnd(5,15)/100/10)*10;
       const rows=[[2,'Purchase of equity',eq],[3,'Refinance existing debt',refi],[4,'Fees & expenses',fees]];
       rows.forEach(([r,n,v])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; });
+        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),fmtStyle:'percent',decimals:0}; });
       cells['A5']={...blankCell(),value:'Total uses',txt:true,bold:true}; cells['B5']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['C5']={...blankCell(),fmtStyle:'percent',decimals:0,bold:true};
       cells['A7']={...blankCell(),value:'New term loan',txt:true};   cells['B7']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['A8']={...blankCell(),value:'Rollover equity',txt:true}; cells['B8']={...blankCell(),value:roll,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['A9']={...blankCell(),value:'Sponsor equity',txt:true,bold:true}; cells['B9']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
       cells['A10']={...blankCell(),value:'Total sources',txt:true,bold:true}; cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      ['7','8','9'].forEach(r=>cells['C'+r]={...blankCell(),fmtStyle:'percent',decimals:0});
+      cells['C10']={...blankCell(),fmtStyle:'percent',decimals:0,bold:true};
       cells['A12']={...blankCell(),value:'Check',txt:true,bold:true}; cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-      this._exp={uses:uses, plug:uses-tl-roll};
-      return {ROWS:12, cells, active:{r:5,c:2}, sel:null, colW:{1:172,2:88}};
+      const plug=uses-tl-roll;
+      this._exp={uses:uses, plug:plug, pu:[eq/uses,refi/uses,fees/uses,1], ps:[tl/uses,roll/uses,plug/uses,1]};
+      return {ROWS:12, cells, active:{r:5,c:2}, sel:null, colW:{1:172,2:88,3:64}};
     },
     checks(S){
-      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
+      const near=(k,exp,tol)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<(tol||0.5)); };
+      const anch=(k,a)=>{ const c=S.cells[k]; return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(a)); };
       const e=this._exp;
       return [
-        {label:'total uses \u2014 one live SUM over the three lines', ok: near('B5',e.uses)},
-        {label:'sponsor equity is THE PLUG \u2014 uses less debt less rollover', ok: near('B9',e.plug)},
-        {label:'total sources sums the stack', ok: near('B10',e.uses)},
-        {label:'the check reads ZERO \u2014 the deal is funded', ok: near('B12',0)},
+        {label:'total uses \u2014 one live SUM over the three lines (B5)', ok: near('B5',e.uses)},
+        {label:'% of uses \u2014 anchored on the total, filled through 100% (C2:C5)',
+          ok: [0,1,2,3].every(i=>near('C'+(2+i),e.pu[i],0.005)&&anch('C'+(2+i),'$B$5'))},
+        {label:'sponsor equity is THE PLUG \u2014 uses less debt less rollover (B9)', ok: near('B9',e.plug)},
+        {label:'total sources sums the stack (B10)', ok: near('B10',e.uses)},
+        {label:'% of sources \u2014 same discipline on the funding side (C7:C10)',
+          ok: [0,1,2,3].every(i=>near('C'+(7+i),e.ps[i],0.005)&&anch('C'+(7+i),'$B$10'))},
+        {label:'the check reads ZERO \u2014 the deal is funded (B12)', ok: near('B12',0)},
       ];
     }
   },
   accdil:{
-    name:'Acc/Dil', label:'Run accretion / dilution', par:104, parKeys:50,
-    prompt:'The question every board asks: does the deal ADD to EPS? Combine the income, combine the share count, compute both EPS figures, and land the accretion percentage \u2014 positive means the deal earns its keep.',
-    req:'<em>B5</em> pro forma NI <em>=SUM(B2:B4)</em> \u00b7 <em>B9</em> pro forma shares <em>=B7+B8</em> \u00b7 <em>B11</em> standalone EPS <em>=B2/B7</em> \u00b7 <em>B12</em> pro forma EPS <em>=B5/B9</em> \u00b7 <em>B13</em> accretion <em>=B12/B11-1</em> \u00b7 <em>ctrl+shift+%</em>',
+    name:'Acc/Dil', label:'Run accretion / dilution', par:105, parKeys:59,
+    prompt:'The question every board asks: does the deal ADD to EPS? Now with the part juniors forget \u2014 the financing drag. Cash spent on the deal stops earning; that foregone interest comes OUT of pro forma income before you divide. Combine the income, net the drag, combine the shares, compute both EPS figures, and land the verdict \u2014 synergies push it up, the drag pulls it down.',
+    req:'<em>B7</em> foregone interest <em>=-B5*B6</em> \u00b7 <em>B8</em> pro forma NI <em>=SUM(B2:B4)+B7</em> \u00b7 <em>B11</em> shares <em>=B9+B10</em> \u00b7 <em>B12</em> standalone EPS <em>=B2/B9</em> \u00b7 <em>B13</em> pro forma EPS <em>=B8/B11</em> \u00b7 <em>B14</em> accretion <em>=B13/B12-1</em>',
     guide:[
-      'pro forma net income at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 acquirer + target + synergies',
-      'pro forma shares at B9 \u00b7 <kbd>=B7+B8</kbd> \u2014 old count plus what you issued',
-      'both EPS lines: B11 \u00b7 <kbd>=B2/B7</kbd> \u00b7 B12 \u00b7 <kbd>=B5/B9</kbd>',
-      'accretion at B13 \u00b7 <kbd>=B12/B11-1</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 positive = accretive',
+      'the drag first: B7 \u00b7 <kbd>=-B5*B6</kbd> \u2014 cash consideration \u00d7 its after-tax cost, negative convention',
+      'pro forma NI at B8 \u00b7 <kbd>=SUM(B2:B4)+B7</kbd> \u2014 acquirer + target + synergies, LESS the drag',
+      'pro forma shares at B11 \u00b7 <kbd>=B9+B10</kbd> \u2014 old count plus what you issued',
+      'both EPS lines: B12 \u00b7 <kbd>=B2/B9</kbd> \u00b7 B13 \u00b7 <kbd>=B8/B11</kbd>',
+      'the verdict at B14 \u00b7 <kbd>=B13/B12-1</kbd> \u2014 positive = accretive; the drag can flip it',
     ],
-    targets:['B5','B9','B11','B12','B13'],
+    targets:['B7','B8','B11','B12','B13','B14'],
     demo(){ return [
-      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
-      {sel:'B9', keys:[...T('=B7+B8'), Kb.enter]},
-      {sel:'B11', keys:[...T('=B2/B7'), Kb.enter]},
-      {sel:'B12', keys:[...T('=B5/B9'), Kb.enter]},
-      {sel:'B13', keys:[...T('=B12/B11-1'), Kb.enter]},
-      {sel:'B13', keys:[Kb.pct]},
+      {sel:'B7', keys:[...T('=-B5*B6'), Kb.enter]},
+      {sel:'B8', keys:[...T('=SUM(B2:B4)+B7'), Kb.enter]},
+      {sel:'B11', keys:[...T('=B9+B10'), Kb.enter]},
+      {sel:'B12', keys:[...T('=B2/B9'), Kb.enter]},
+      {sel:'B13', keys:[...T('=B8/B11'), Kb.enter]},
+      {sel:'B14', keys:[...T('=B13/B12-1'), Kb.enter]},
     ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 accretion / dilution ($mm)',txt:true,bold:true};
       const aNI=rnd(40,120)*10, tNI=rnd(8,40)*10, syn=rnd(1,8)*10;
+      const cash=rnd(10,60)*10, rate=rnd(35,55)/1000;
       const aSh=rnd(30,90)*10, newSh=rnd(4,25)*10;
-      const rows=[[2,'Acquirer net income',aNI],[3,'Target net income',tNI],[4,'After-tax synergies',syn]];
-      rows.forEach(([r,n,v])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; });
-      cells['A5']={...blankCell(),value:'Pro forma net income',txt:true,bold:true}; cells['B5']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A7']={...blankCell(),value:'Acquirer shares',txt:true}; cells['B7']={...blankCell(),value:aSh,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A8']={...blankCell(),value:'New shares issued',txt:true}; cells['B8']={...blankCell(),value:newSh,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A9']={...blankCell(),value:'Pro forma shares',txt:true,bold:true}; cells['B9']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A11']={...blankCell(),value:'Standalone EPS',txt:true}; cells['B11']={...blankCell(),decimals:2};
-      cells['A12']={...blankCell(),value:'Pro forma EPS',txt:true};  cells['B12']={...blankCell(),decimals:2};
-      cells['A13']={...blankCell(),value:'Accretion / (dilution)',txt:true,bold:true}; cells['B13']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
-      const pfNI=aNI+tNI+syn, pfSh=aSh+newSh;
-      this._exp={ni:pfNI, sh:pfSh, e0:aNI/aSh, e1:pfNI/pfSh, acc:(pfNI/pfSh)/(aNI/aSh)-1};
-      return {ROWS:13, cells, active:{r:5,c:2}, sel:null, colW:{1:168,2:88}};
+      const rows=[[2,'Acquirer net income',aNI,'comma',0],[3,'Target net income',tNI,'comma',0],
+        [4,'After-tax synergies',syn,'comma',0],[5,'Cash consideration',cash,'comma',0],
+        [6,'After-tax cost of cash',rate,'percent',1]];
+      rows.forEach(([r,n,v,f,d])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
+        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:f,decimals:d}; });
+      cells['A7']={...blankCell(),value:'Foregone interest',txt:true}; cells['B7']={...blankCell(),fmtStyle:'comma',decimals:1};
+      cells['A8']={...blankCell(),value:'Pro forma net income',txt:true,bold:true}; cells['B8']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+      cells['A9']={...blankCell(),value:'Acquirer shares',txt:true}; cells['B9']={...blankCell(),value:aSh,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['A10']={...blankCell(),value:'New shares issued',txt:true}; cells['B10']={...blankCell(),value:newSh,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['A11']={...blankCell(),value:'Pro forma shares',txt:true,bold:true}; cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['A12']={...blankCell(),value:'Standalone EPS',txt:true}; cells['B12']={...blankCell(),decimals:2};
+      cells['A13']={...blankCell(),value:'Pro forma EPS',txt:true};  cells['B13']={...blankCell(),decimals:2};
+      cells['A14']={...blankCell(),value:'Accretion / (dilution)',txt:true,bold:true}; cells['B14']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
+      const fi=-cash*rate, pfNI=aNI+tNI+syn+fi, pfSh=aSh+newSh;
+      this._exp={fi:fi, ni:pfNI, sh:pfSh, e0:aNI/aSh, e1:pfNI/pfSh, acc:(pfNI/pfSh)/(aNI/aSh)-1};
+      return {ROWS:14, cells, active:{r:7,c:2}, sel:null, colW:{1:168,2:88}};
     },
     checks(S){
-      const near=(k,exp,tol)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<(tol||0.5)); };
+      const live=(k,exp,tol,ref)=>{ const c=S.cells[k]; if(!c||!c.formula||typeof c.value!=='number') return false;
+        if(Math.abs(c.value-exp)>(tol||0.5)) return false;
+        return !ref || String(c.formula).replace(/\$/g,'').toUpperCase().includes(ref); };
       const e=this._exp;
       return [
-        {label:'pro forma net income \u2014 income plus income plus synergies', ok: near('B5',e.ni)},
-        {label:'pro forma share count', ok: near('B9',e.sh)},
-        {label:'standalone and pro forma EPS, both live', ok: near('B11',e.e0,0.005)&&near('B12',e.e1,0.005)},
-        {label:'accretion percentage \u2014 formatted as a percent', ok: (()=>{ const c=S.cells['B13'];
+        {label:'the financing drag \u2014 foregone interest, negative, live off cash \u00d7 rate (B7)', ok: live('B7',e.fi,0.05,'B5')&&live('B7',e.fi,0.05,'B6')},
+        {label:'pro forma net income nets the drag \u2014 the SUM alone is wrong (B8)', ok: live('B8',e.ni,0.5,'B7')},
+        {label:'pro forma share count (B11)', ok: live('B11',e.sh)},
+        {label:'standalone and pro forma EPS, both live (B12, B13)', ok: live('B12',e.e0,0.005)&&live('B13',e.e1,0.005)},
+        {label:'the verdict \u2014 accretion vs the standalone line, as a percent (B14)', ok: (()=>{ const c=S.cells['B14'];
           return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-e.acc)<0.001&&c.fmtStyle==='percent'); })()},
       ];
     }
   },
   dcfsens:{
-    name:'Sensitivity', label:'Run the sensitivity row', par:74, parKeys:23,
-    prompt:'One formula, six discount rates. Build the perpetuity value once with MIXED anchoring \u2014 cash flow and growth locked absolute, the WACC header relative \u2014 then fill it across the row. If the anchors are right, six cells populate from one formula. If they\u2019re wrong, the fill tells on you instantly.',
-    req:'<em>C4</em> \u00b7 <em>=$B$2/(C3-$B$3)</em> \u2014 F4 locks FCF and g, the WACC ref stays relative \u00b7 fill C4:H4 \u2192 with <em>ctrl+r</em>',
+    name:'Sensitivity', label:'Run the sensitivity table', par:64, parKeys:29,
+    prompt:'The real thing: a two-way table \u2014 five WACCs across, three growth rates down, FIFTEEN cells from ONE formula. Only true mixed anchors survive this: FCF locked absolute ($B$2), the WACC header row-locked (C$3), the growth column column-locked ($B4). Build it once, fill right, fill down. Wrong anchors don\u2019t fail quietly here \u2014 they fail fifteen times.',
+    req:'<em>C4</em> \u00b7 <em>=$B$2/(C$3-$B4)</em> \u2014 F4 cycles each ref to its mixed form \u00b7 fill C4:G4 <em>ctrl+r</em> \u00b7 then C4:G6 <em>ctrl+d</em>',
     guide:[
-      'at C4 \u00b7 <kbd>=</kbd> \u00b7 point at B2 \u00b7 <kbd>F4</kbd> \u2192 <b>$B$2</b> \u00b7 <kbd>/</kbd> <kbd>(</kbd>',
-      'point up at C3 (the 1st WACC) \u2014 NO anchor; it must walk with the fill \u00b7 <kbd>-</kbd> \u00b7 point at B3 \u00b7 <kbd>F4</kbd> \u2192 <b>$B$3</b> \u00b7 <kbd>)</kbd> <kbd>\u21b5</kbd>',
-      'select C4:H4 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 one formula, six values. Mixed anchoring is the whole trick.',
+      'at C4 \u00b7 <kbd>=$B$2/(C$3-$B4)</kbd> <kbd>\u21b5</kbd> \u2014 <kbd>F4</kbd> cycles $B$2 \u2192 B$2 \u2192 $B2 \u2192 B2; stop on the form each ref needs',
+      'C$3: the column walks with the fill, row 3 stays pinned \u00b7 $B4: column B pinned, the row walks',
+      'select C4:G4 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the WACC ref walks across',
+      'select C4:G6 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 the growth ref walks down \u00b7 fifteen values, one formula',
     ],
-    targets:['C4','C4:H4'],
+    targets:['C4','C4:G4','C4:G6'],
     demo(){ return [
-      {sel:'C4', keys:[...T('=$B$2/(C3-$B$3)'), Kb.enter]},
-      {sel:'C4:H4', keys:[Kb.fillR]},
+      {sel:'C4', keys:[...T('=$B$2/(C$3-$B4)'), Kb.enter]},
+      {sel:'C4:G4', keys:[Kb.fillR]},
+      {sel:'C4:G6', keys:[Kb.fillD]},
     ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 TV sensitivity ($mm)',txt:true,bold:true};
-      const fcf=rnd(40,120)*10, g=rnd(15,30)/1000;
+      const fcf=rnd(40,120)*10;
       cells['A2']={...blankCell(),value:'Terminal FCF',txt:true};
       cells['B2']={...blankCell(),value:fcf,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A3']={...blankCell(),value:'Growth g',txt:true};
-      cells['B3']={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1};
-      cells['A4']={...blankCell(),value:'Implied value',txt:true,bold:true};
-      const w0=rnd(70,85)/1000;
+      cells['B3']={...blankCell(),value:'g \u2193 \u00b7 WACC \u2192',txt:true,align:'r',bold:true};
+      const w0=rnd(75,90)/1000, g0=rnd(15,25)/1000;
       this._exp=[];
-      for(let j=0;j<6;j++){
-        const w=w0+j*0.005;
-        cells[colLetter(3+j)+3]={...blankCell(),value:w,fontColor:'blue',fmtStyle:'percent',decimals:1,bold:true,align:'r'};
-        cells[colLetter(3+j)+4]={...blankCell(),fmtStyle:'comma',decimals:0};
-        this._exp.push(fcf/(w-g));
+      for(let i=0;i<3;i++){
+        const g=g0+i*0.005;
+        cells['B'+(4+i)]={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1,bold:true,align:'r'};
+        const row=[];
+        for(let j=0;j<5;j++){
+          const w=w0+j*0.005;
+          if(i===0) cells[colLetter(3+j)+'3']={...blankCell(),value:w,fontColor:'blue',fmtStyle:'percent',decimals:1,bold:true,align:'r'};
+          cells[colLetter(3+j)+(4+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
+          row.push(fcf/(w-g));
+        }
+        this._exp.push(row);
       }
-      cells['B4']={...blankCell(),value:'\u2190 WACC \u2192',txt:true,align:'r'};
-      return {ROWS:8, cells, active:{r:4,c:3}, sel:null, colW:{1:112,2:84}};
+      return {ROWS:8, cells, active:{r:4,c:3}, sel:null, colW:{1:112,2:96}};
     },
     checks(S){
-      const anchored=k=>{ const c=S.cells[k]; if(!c||!c.formula) return false;
-        const f=String(c.formula).toUpperCase();
-        return f.includes('$B$2') && f.includes('$B$3'); };
+      const cellOk=(i,j)=>{ const col=colLetter(3+j); const c=S.cells[col+(4+i)];
+        if(!c||!c.formula||typeof c.value!=='number') return false;
+        const f=String(c.formula).toUpperCase(); const exp=this._exp[i][j];
+        if(!(f.includes('$B$2')&&f.includes(col+'$3')&&f.includes('$B'+(4+i)))) return false;
+        return Math.abs(c.value-exp)<Math.abs(exp)*2e-3; };
       return [
-        {label:'the base formula at C4 \u2014 FCF and g locked absolute, WACC relative',
-          ok: (()=>{ const c=S.cells['C4'];
-            return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._exp[0])<Math.abs(this._exp[0])*2e-3&&anchored('C4')); })()},
-        {label:'six live values across the row \u2014 anchors held through the fill',
-          ok: [0,1,2,3,4,5].every(j=>{ const c=S.cells[colLetter(3+j)+4];
-            return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._exp[j])<Math.abs(this._exp[j])*2e-3&&anchored(colLetter(3+j)+4)); })},
+        {label:'the base formula \u2014 $B$2 absolute, C$3 row-locked, $B4 column-locked (C4)', ok: cellOk(0,0)},
+        {label:'filled RIGHT \u2014 the WACC ref walked, the anchors held (C4:G4)', ok: [0,1,2,3,4].every(j=>cellOk(0,j))},
+        {label:'filled DOWN \u2014 the growth ref walked; fifteen live cells from one formula (C4:G6)', ok: [0,1,2].every(i=>[0,1,2,3,4].every(j=>cellOk(i,j)))},
       ];
     }
   },
