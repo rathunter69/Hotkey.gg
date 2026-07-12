@@ -2551,3 +2551,21 @@ Wolf's #29 ("same tier everywhere — audit") turned out to be FIVE live defects
   replay e2e ALL GREEN. Desks live smoke still pending (egress policy applies
   to NEW sessions — this one booted under the old policy; retry timer armed).
 - v108.
+
+---
+# ROUND 113 — LEVEL IN TOP BAR (#32) + RANDOM DRILL (#33) + XP v4 DESIGN PASS
+- NAV LEVEL CHIP: hkLevelChip beside the user menu on every page (anon-
+  friendly hk_xp_est estimate; canonical XP still reprices on the card);
+  click opens the player card. Two-ladders doctrine copy in the tooltip.
+- RANDOM DRILL: '⚂ random' tool next to ⚡ daily — deals any drill but the
+  current one. Variety IS the retention loop; also promotes catalog breadth
+  ahead of the XP v4 daily-reset design.
+- XP v4 DESIGN (dev/XP_DESIGN.md, NOT implemented — Wolf reviews): keep
+  first-ever-solve 50 spine; repeat decay RESETS DAILY (15/10/7/5 floor 2
+  per drill per UTC day); +25 warm-up on first solve of the day; no hard
+  caps (decay self-limits). Fixes lifetime decay paying loyal players
+  worst. Implementation notes incl. created_at in run selects + computeXP
+  sync set + hk_clears_day local estimate.
+- VERIFY: Playwright — chip renders, random button switches drills twice,
+  zero page errors; e2e ALL GREEN; node --check all.
+- v109.

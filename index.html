@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=108" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=108">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=108">
+<link rel="icon" href="favicon.ico?v=109" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=109">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=109">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1079,14 +1079,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=108"></script>
-<link rel="stylesheet" href="nav.css?v=108">
-<script src="themes.js?v=108"></script>
+<script src="drills.js?v=109"></script>
+<link rel="stylesheet" href="nav.css?v=109">
+<script src="themes.js?v=109"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=108"></script>
+<script src="nav.js?v=109"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1139,6 +1139,7 @@
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
+      <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
@@ -6266,6 +6267,10 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
     if(anchor){ anchor.after(pBtn); anchor.after(sBtn); } else { tools.prepend(pBtn); tools.prepend(sBtn); }
   } }
 $('dailyBtn').addEventListener('click',startDaily);
+$('randBtn').addEventListener('click',()=>{   // r113 (#33): random drill — variety is the retention loop
+  const pool=MENU_ORDER.filter(k=>k!==cur);
+  loadChallenge(pool[Math.floor(Math.random()*pool.length)]);
+});
 { const __wb=$('weeklyBtn'); if(__wb) __wb.addEventListener('click',startWeekly); }   // r81 hotfix: button retired; unguarded listener was a boot TypeError
 $('campaignBtn').addEventListener('click',openCampaign);
 $('startBtn').addEventListener('click', tryEnter);

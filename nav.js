@@ -615,7 +615,13 @@
     const handle = (window._navProfile && window._navProfile.handle) || (window._navUser.email ? window._navUser.email.split('@')[0] : 'guest');
     const anon = isAnonUser();
     const saveItem = anon ? '<a id="umSaveProg" class="um-accent">Save your progress</a><div class="um-divider"></div>' : '';
-    slot.innerHTML =
+    // r113 (#32): the level lives in the top bar — anon-friendly local estimate
+    // (hk_xp_est, written at every solve); canonical XP still reprices on the card.
+    let lvlHtml='';
+    try{ const xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+      if(xp>0 && window.hkLevelChip){ const L=levelOf(xp);
+        lvlHtml='<span class="nav-lvl" id="navLvl" title="LVL '+L.lvl+' \u00b7 '+L.into+'/'+L.need+' xp \u2014 levels are reps; they never decay">'+window.hkLevelChip(L.lvl,20)+'</span>'; } }catch(e){}
+    slot.innerHTML = lvlHtml +
       '<div class="user-menu">' +
         '<button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false">' +
           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/></svg>' +
@@ -631,6 +637,7 @@
           '<a id="umSignout">Sign out</a>' +
         '</div>' +
       '</div>';
+    const lc = $('navLvl'); if(lc) lc.onclick = ()=>{ try{ openProfile(); }catch(e){} };
     const btn = $('userBtn');
     if(btn) btn.onclick = e => {
       e.stopPropagation();
