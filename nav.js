@@ -660,6 +660,18 @@
   // Anything nav owns that's currently covering the page (game code checks this
   // to pause its own keyboard handling under our overlays).
   window.navOverlayOpen = () => !!(themesOpen || kbdOpen || settingsOpen || profileOpen);
+  // r115 (#30): handle generator — xbox-style suggestions in desk dialect.
+  // Server-side moderation (handle blocklist trigger) remains the real gate.
+  window.hkSuggestHandle = function(){
+    const A=['Levered','Accretive','Diluted','Anchored','Unlevered','Sticky','Circular','Distressed',
+             'ProForma','Synergy','Covenant','Roadshow','Waterfall','Recap','Terminal','BasisPoint',
+             'PasteSpecial','Corkscrew','MidCap','Bulge'];
+    const B=['Analyst','Associate','Intern','Modeler','Machine','Sweep','Multiple','Spread','Bridge',
+             'Anchor','Macro','Deck','Tab','Cell','Margin','Corner','Plug','Font','Turns','Closer'];
+    const a=A[Math.floor(Math.random()*A.length)], b=B[Math.floor(Math.random()*B.length)];
+    const num=Math.random()<0.4 ? String(Math.floor(Math.random()*90)+10) : '';
+    return (a+'_'+b+num).slice(0,24);
+  };
   window.navRefreshAuth = function(){ try{ if(window.__navAuthKick) window.__navAuthKick(); }catch(e){} };
   document.addEventListener('keydown', e => {
     const onTrainer = window.NAV_ACTIVE === 'trainer';

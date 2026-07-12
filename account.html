@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Account · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=110" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=110">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=110">
+<link rel="icon" href="favicon.ico?v=111" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=111">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=111">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -62,8 +62,8 @@
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
 </style>
-<link rel="stylesheet" href="nav.css?v=110">
-<script src="drills.js?v=110"></script>
+<link rel="stylesheet" href="nav.css?v=111">
+<script src="drills.js?v=111"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -71,11 +71,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=110"></script>
+<script src="themes.js?v=111"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=110"></script>
+<script src="nav.js?v=111"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -137,7 +137,9 @@ async function load(){
     <div class="card"><h4>Profile</h4>
       <label>handle — how you appear on every board</label>
       <input id="acHandle" maxlength="24" value="${esc(prof.handle||'')}" placeholder="pick a handle \u2014 letters, numbers, underscores">
-      <button class="btn" id="acHandleSave">Save handle</button><div class="msg" id="acHandleMsg"></div>
+      <button class="btn" id="acHandleSave">Save handle</button>
+      <a id="acHandleSugg" style="font-family:var(--mono);font-size:11.5px;color:var(--accent);cursor:pointer;margin-left:10px">&#x2684; suggest one</a>
+      <div class="msg" id="acHandleMsg"></div>
       <div class="rowline" style="margin-top:14px"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
     </div>
 
@@ -227,6 +229,9 @@ async function load(){
     const b=document.createElement('button'); b.className='btn'; b.style.margin='0'; b.textContent=t.name||k;
     b.onclick=()=>{ try{ window.applyTheme(k); }catch(e){} };
     th.appendChild(b); }); }
+    { const sg=document.getElementById('acHandleSugg');
+    if(sg) sg.onclick=()=>{ const el=document.getElementById('acHandle');
+      if(el && window.hkSuggestHandle){ el.value=window.hkSuggestHandle(); el.focus(); } }; }
   document.getElementById('acHandleSave').onclick=async()=>{
     const v=document.getElementById('acHandle').value.trim().slice(0,24);
     if(!/^[A-Za-z0-9_]{2,24}$/.test(v)){ say('acHandleMsg','2\u201324 characters \u2014 letters, numbers, and underscores only.',true); return; }

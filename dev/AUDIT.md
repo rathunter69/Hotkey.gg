@@ -2583,3 +2583,24 @@ Wolf's #29 ("same tier everywhere — audit") turned out to be FIVE live defects
 - VERIFY: Playwright w/ stubbed DATA — opens w/ name/desk/tiles, \u00d7
   closes, Esc closes second card; zero page errors; node --check.
 - v110.
+
+---
+# ROUND 115 — HANDLE GENERATOR (#30) + THE promptHandle RECURSION FOSSIL
+- FOSSIL (the catch of the round): r76's export shim
+  `window.promptHandle = function(){ return promptHandle(); }` OVERWROTE the
+  global function binding — the bare call inside resolved to the wrapper
+  itself: infinite recursion on EVERY promptHandle() call, swallowed by
+  try/catch at the call sites. The pick-a-name prompt has been silently
+  DEAD since it shipped — the reason new members kept landing as
+  analyst-#### until they found the account page. Shim deleted (a top-level
+  function declaration IS window.promptHandle). Found because r115's
+  verification actually drove the prompt.
+- HANDLE GENERATOR (#30): window.hkSuggestHandle() in nav.js — desk-dialect
+  A×B pools (Levered/Accretive/ProForma… × Analyst/Corkscrew/Multiple…,
+  40% numeric suffix, format-safe ≤24). promptHandle deals 3 chips + reroll
+  (click fills the input); account handle card gets a 'suggest one' link.
+  Server-side blocklist remains the real moderation gate.
+- VERIFY: Playwright — window.promptHandle() opens the modal (was: stack
+  overflow), 3 chips + reroll render, click fills, reroll changes, format
+  regex holds; zero page errors; node --check all; e2e green.
+- v111.
