@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=97" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=97">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=97">
+<link rel="icon" href="favicon.ico?v=98" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=98">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=98">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1053,14 +1053,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=97"></script>
-<link rel="stylesheet" href="nav.css?v=97">
-<script src="themes.js?v=97"></script>
+<script src="drills.js?v=98"></script>
+<link rel="stylesheet" href="nav.css?v=98">
+<script src="themes.js?v=98"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=97"></script>
+<script src="nav.js?v=98"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3774,53 +3774,64 @@ const CHALLENGES = {
   },
 
   versionup:{
-    name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', par:90, parKeys:48,
-    prompt:'You inherited a tab where someone typed the answers: growth rates and EBITDA are hardcoded numbers that happen to be right TODAY \u2014 and will be silently wrong the moment an input moves. Rebuild every output as a live formula so the next analyst can roll it forward. This is versioning discipline: v2 of a model should survive new numbers without a rebuild.',
-    req(){ return '<em>C5:D5</em> growth is TYPED \u2192 rebuild =C4/B4-1 style \u00b7 <em>B7:D7</em> EBITDA is TYPED \u2192 rebuild =B4-B6 style \u00b7 live formulas, same values'; },
+    name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', par:135, parKeys:82,
+    prompt:'You inherited a five-year operating build where someone typed the answers: growth, gross profit, EBITDA, AND the margin are all hardcoded numbers \u2014 right today, silently wrong the moment an input moves. Resurrect every derived row as a live formula, fill it across, and prove nothing drifted. This is versioning discipline: v2 must survive new numbers without a rebuild.',
+    req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4-B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7-B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 same values, now alive'; },
     guide:[
-      'growth row \u2014 the percents are typed \u00b7 C5: <kbd>=</kbd>C4/B4-1 <kbd>\u21b5</kbd>, then <kbd>ctrl</kbd>+<kbd>r</kbd> to D5',
-      'EBITDA row \u2014 typed numbers \u00b7 B7: <kbd>=</kbd>B4-B6 <kbd>\u21b5</kbd>, fill across with <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'the values should NOT change \u2014 same answers, now alive',
+      'growth row is typed \u00b7 C5: <kbd>=</kbd>C4/B4-1 <kbd>\u21b5</kbd> \u00b7 select C5:F5, <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'gross profit is typed \u00b7 B7: <kbd>=</kbd>B4-B6 <kbd>\u21b5</kbd> \u00b7 fill B7:F7',
+      'EBITDA is typed \u00b7 B9: <kbd>=</kbd>B7-B8 <kbd>\u21b5</kbd> \u00b7 fill B9:F9',
+      'margin is typed \u00b7 B10: <kbd>=</kbd>B9/B4 <kbd>\u21b5</kbd> \u00b7 fill B10:F10 \u2014 values must NOT move',
     ],
-    targets:['C5:D5','B7:D7'],
+    targets:['C5:F5','B7:F7','B9:F9','B10:F10'],
     demo(){ return [
-      {sel:'C5', keys:[...T('=C4/B4-1'), Kb.enter]},
-      {sel:'C5:D5', keys:[Kb.fillR]},
-      {sel:'B7', keys:[...T('=B4-B6'), Kb.enter]},
-      {sel:'B7:D7', keys:[Kb.fillR]},
+      {sel:'C5', keys:[...T('=C4/B4-1'), Kb.enter]}, {sel:'C5:F5', keys:[Kb.fillR]},
+      {sel:'B7', keys:[...T('=B4-B6'), Kb.enter]},  {sel:'B7:F7', keys:[Kb.fillR]},
+      {sel:'B9', keys:[...T('=B7-B8'), Kb.enter]},  {sel:'B9:F9', keys:[Kb.fillR]},
+      {sel:'B10', keys:[...T('=B9/B4'), Kb.enter]}, {sel:'B10:F10', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 Operating build v1 (hardcoded \u2014 fix for v2)',txt:true,bold:true};
-      const y0=24+rnd(0,1);
-      cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
-      for(let c=2;c<=4;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
+      const y0=23+rnd(0,2);
+      cells['A3']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
+      for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
+      const rows=[[4,'Revenue',1],[6,'COGS',1],[8,'Opex',1]];
       cells['A4']={...blankCell(),value:'Revenue',txt:true};
-      for(let c=2;c<=4;c++) cells[colLetter(c)+'4']={...blankCell(),value:rnd(150,400)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['A5']={...blankCell(),value:'Growth %',txt:true};
-      for(let c=3;c<=4;c++){ const L2=colLetter(c), P=colLetter(c-1);
-        cells[L2+'5']={...blankCell(),value:cells[L2+'4'].value/cells[P+'4'].value-1,fmtStyle:'percent',decimals:1}; }
-      cells['A6']={...blankCell(),value:'Opex',txt:true};
-      for(let c=2;c<=4;c++) cells[colLetter(c)+'6']={...blankCell(),value:rnd(60,180)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A7']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      for(let c=2;c<=4;c++){ const L2=colLetter(c);
-        cells[L2+'7']={...blankCell(),value:cells[L2+'4'].value-cells[L2+'6'].value,fmtStyle:'comma',decimals:0}; }
-      return {ROWS:8, cells, active:{r:5,c:3}, sel:null, colW:{1:130}};
+      cells['A6']={...blankCell(),value:'COGS',txt:true};
+      cells['A7']={...blankCell(),value:'Gross profit',txt:true,bold:true};
+      cells['A8']={...blankCell(),value:'Opex',txt:true};
+      cells['A9']={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells['A10']={...blankCell(),value:'EBITDA margin',txt:true};
+      for(let c=2;c<=6;c++){ const L2=colLetter(c);
+        cells[L2+'4']={...blankCell(),value:rnd(150,420)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[L2+'6']={...blankCell(),value:rnd(50,160)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[L2+'8']={...blankCell(),value:rnd(30,110)*5,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      for(let c=2;c<=6;c++){ const L2=colLetter(c), P=colLetter(c-1);
+        const rev=cells[L2+'4'].value, cogs=cells[L2+'6'].value, opex=cells[L2+'8'].value;
+        if(c>2) cells[L2+'5']={...blankCell(),value:rev/cells[P+'4'].value-1,fmtStyle:'percent',decimals:1};
+        cells[L2+'7']={...blankCell(),value:rev-cogs,fmtStyle:'comma',decimals:0,bold:true};
+        cells[L2+'9']={...blankCell(),value:rev-cogs-opex,fmtStyle:'comma',decimals:0,bold:true};
+        cells[L2+'10']={...blankCell(),value:(rev-cogs-opex)/rev,fmtStyle:'percent',decimals:1}; }
+      return {ROWS:11, cells, active:{r:5,c:3}, sel:null, colW:{1:132}};
     },
     checks(S){
-      let gOk=true, eOk=true;
-      for(let c=3;c<=4;c++){ const L2=colLetter(c), P=colLetter(c-1);
-        const g=S.cells[L2+'5'];
-        const want=S.cells[L2+'4'].value/S.cells[P+'4'].value-1;
-        if(!g||!g.formula||!(g.formula.replace(/\$/g,'').toUpperCase().includes(L2+'4'))||Math.abs((g.value||0)-want)>1e-6) gOk=false; }
-      for(let c=2;c<=4;c++){ const L2=colLetter(c);
-        const eb=S.cells[L2+'7'];
-        const want=S.cells[L2+'4'].value-S.cells[L2+'6'].value;
-        if(!eb||!eb.formula||!(eb.formula.replace(/\$/g,'').toUpperCase().includes(L2+'6'))||Math.abs((eb.value||0)-want)>1e-6) eOk=false; }
+      const row=(r,f,refNeed)=>{ let ok=true;
+        for(let c=(r===5?3:2);c<=6;c++){ const L2=colLetter(c);
+          const x=S.cells[L2+r]; const want=f(c,L2);
+          if(!x||!x.formula||!(x.formula.replace(/\$/g,'').toUpperCase().includes(refNeed(L2)))||Math.abs((x.value||0)-want)>1e-6) ok=false; }
+        return ok; };
+      const V=(a)=>S.cells[a]?S.cells[a].value:0;
+      const gOk=row(5,(c,L2)=>V(L2+'4')/V(colLetter(c-1)+'4')-1,(L2)=>L2+'4');
+      const gpOk=row(7,(c,L2)=>V(L2+'4')-V(L2+'6'),(L2)=>L2+'6');
+      const eOk=row(9,(c,L2)=>V(L2+'7')-V(L2+'8'),(L2)=>L2+'8');
+      const mOk=row(10,(c,L2)=>V(L2+'9')/V(L2+'4'),(L2)=>L2+'9');
       return [
-        {label:'Growth is a LIVE formula in both years \u2014 same values, no typed percents (C5:D5)', ok:gOk},
-        {label:'EBITDA is a LIVE formula in every year \u2014 revenue minus opex (B7:D7)', ok:eOk},
-        {label:'Nothing drifted \u2014 the rebuilt outputs match the v1 answers exactly', ok:gOk&&eOk},
+        {label:'Growth is a LIVE formula across all four years \u2014 no typed percents (C5:F5)', ok:gOk},
+        {label:'Gross profit computes \u2014 revenue minus COGS, every year (B7:F7)', ok:gpOk},
+        {label:'EBITDA computes \u2014 gross profit minus opex, every year (B9:F9)', ok:eOk},
+        {label:'The margin is live AND nothing drifted \u2014 rebuilt values match v1 exactly (B10:F10)', ok:mOk},
       ];
     }
   },

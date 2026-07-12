@@ -2149,3 +2149,11 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   formulas — checks demand formulas AND value-parity with v1 ("nothing
   drifted"). Versioning discipline as a rep. 30-seed verified. 55 drills.
 - v97.
+
+---
+# ROUND 99 — versionup DENSIFIED (Wolf called the thin ship; he was right)
+- Roll-forward prep rebuilt to doctrine: 5 FY columns, full operating stack
+  (Revenue/Growth/COGS/Gross profit/Opex/EBITDA/margin), FOUR hardcoded
+  derived rows to resurrect = 18 formula sites + 4 fills, mixed comma/
+  percent formats, drift-parity check. par 135/keys 82. 30-seed verified.
+- v98.
