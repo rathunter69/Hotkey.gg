@@ -2284,3 +2284,42 @@ statement layouts, named companies, FY headers, associate-voice checklists.
 - Cross-cutting riders per tranche: drill-titles pass (#25), checklist
   voice tranche 2, retbridge/football re-audit vs doctrine.
 - v101.
+
+---
+# ROUND 103 — T3: FULL BUILDS REBUILT TO THE MIX RULE (+ two dress bugs, one fossil)
+- Wolf directive on T3: no surface density — no drill passes by doing the
+  same motion N times. NEW **MIX RULE** (doctrine): every Full Build exercises
+  ≥3 distinct op FAMILIES (value entry / formula+anchor / fill / link /
+  number format / bold / border walk / font-color dialog). All six now do.
+- ISBUILD — 5 yrs: 4 anchored formulas + net-margin row (ctrl+shift+%),
+  bottom line bolded + ruled (ctrl+b, alt h b t). 160/100 (was 128/61).
+- DEBTSCHED — 5 yrs, and the rate comes "from the VP": YOU type it as a
+  percent (r95 number-entry parity), paint it blue (alt h f c →×4 ↵), then
+  amort/sweep/interest corkscrew; close dressed. req/guide are functions —
+  the rate randomizes per run. 190/122 (was 155/84).
+- CFSLINK — 5 yrs + cash-conversion memo (=B6/B2 as %), close bold+ruled.
+  134/81 (was 132/43).
+- BSBUILD — 3 yrs; RE roll built ONCE and filled across (C10 → walks);
+  both totals bolded, check row ruled; three zeros. 182/116 (was 125/78).
+- NWCSCHED — 5 yrs; the three drivers typed from the "data room" (values
+  randomized into req/guide), painted blue in one selection, NWC row
+  dressed. 206/134 (was 132/85).
+- THREESTMT — 3 yrs × three links, all filled across; three check zeros;
+  TA bolded, check ruled. 174/110 (was 155/82).
+- DRESS BUGS FIXED (found while wiring the mix ops — the guide path was
+  UNSOLVABLE): (1) alt h f c opens on BLACK (idx 0) and the demo hit Enter
+  directly — check demands blue; demo/guide now →×4 to blue (engine default
+  kept: the 'blue' drill already arrows correctly). (2) guide teaches
+  alt h b o (→ ball) but the check read only bb — now bb||ball. Also the
+  comma label claimed "zero decimals" while alt h k applies Excel's 2.
+  97/53 restamped (calibrated counter).
+- FOSSIL: a duplicate taskLine block (renderDrillbar) immediately overwrote
+  the function-aware req render — every function-req drill (percent, margin,
+  dress, versionup, debtsched/nwcsched now) painted its req FUNCTION SOURCE
+  into the task line. Dup removed; function-aware block is the only one.
+- HARNESS v2: sequential key state machine — ctrl chords (b/%/!/r/d), alt
+  ribbon walks vs RUN map, font-color dialog w/ arrow index, number-entry
+  parity for typed values. Formatting-only drills exempt from the
+  hardcode-fail assertion (dress: no formulas to strip). 40 seeds × 7 pass;
+  tranche-2 + r100 drills re-verified under v2.
+- v102.

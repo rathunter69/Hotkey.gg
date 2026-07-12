@@ -101,12 +101,12 @@ window.HOTKEY_DRILLS = {
     comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the tape, land per share and premium' },
 
     // Lookups
-    isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'COGS, GP, EBIT, NI — four formulas, twelve cells' },
-    bsbuild:    { name:'BS Build',  label:'Balance the balance sheet',  tab:'BS Build',  desc:'Totals, the RE roll, and a check row that must read zero' },
-    nwcsched:   { name:'NWC Sched.',label:'Roll working capital',       tab:'NWC',       desc:'AR/inv/AP off anchored DSO·DIO·DPO, then the swing' },
-    threestmt:  { name:'3-Statement',label:'Tie the three statements',  tab:'3-Stmt',    desc:'Three links — corkscrew, CFS→BS cash, RE roll — until it ties' },
-    cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'Net change, then the cash corkscrew ties out' },
-    debtsched:  { name:'Debt Sched.',label:'Run the debt schedule',      tab:'Debt',     desc:'Amort, sweep, average-balance interest — the corkscrew' },
+    isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'5-yr IS: anchored drivers, margin row as %, bottom line ruled' },
+    bsbuild:    { name:'BS Build',  label:'Balance the balance sheet',  tab:'BS Build',  desc:'3 yrs: SUM both sides, RE roll filled across, dressed to zero' },
+    nwcsched:   { name:'NWC Sched.',label:'Roll working capital',       tab:'NWC',       desc:'Type the drivers, paint them blue, roll NWC five years' },
+    threestmt:  { name:'3-Statement',label:'Tie the three statements',  tab:'3-Stmt',    desc:'3 yrs × 3 links, checks at zero, totals dressed to ship' },
+    cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'5-yr corkscrew + conversion memo as %, close ruled off' },
+    debtsched:  { name:'Debt Sched.',label:'Run the debt schedule',      tab:'Debt',     desc:'Type the rate, paint it blue, run the 5-yr sweep corkscrew' },
     lookup:     { name:'Lookup',   label:'Look it up',          tab:'Lookup',      desc:'Pull a value out of a table with INDEX/MATCH' },
     lookup2:    { name:'2-way',    label:'Two-way lookup',      tab:'2-way',       desc:'INDEX with two MATCHes — row and column at once' },
   },
@@ -172,7 +172,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":42,"pastes":44,"transpose":40,"saves":44,"editfix":44,"undo":28,"autofit":34,"rowops":26,"filldr":24,"blocksel":30,"copyover":36,"polish":38,"foot":72,"comps":161,"center":44,"blue":62,"sort":40,"series":30,"bridge":40,"growth":58,"wacc":142,"dcf":140,"lbo":113,"revolver":52,"isbuild":128,"debtsched":155,"cfslink":132,"bsbuild":125,"nwcsched":132,"threestmt":155,"waterfall":168,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":42,"pastes":44,"transpose":40,"saves":44,"editfix":44,"undo":28,"autofit":34,"rowops":26,"filldr":24,"blocksel":30,"copyover":36,"polish":38,"foot":72,"comps":161,"center":44,"blue":62,"sort":40,"series":30,"bridge":40,"growth":58,"wacc":142,"dcf":140,"lbo":113,"revolver":52,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30,"dress":97};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
