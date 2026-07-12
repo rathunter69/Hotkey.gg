@@ -560,9 +560,23 @@
         '</div>';
       })() +
       /* r70: drill-by-drill list retired from the card — stats page carries it */
-      '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcClose">close</a></div>' +
+      '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcShare" title="1200\u00d7627 PNG \u2014 sized for a LinkedIn post">\u2b07 rank card</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;
+    /* r131: LinkedIn-shareable rank card \u2014 the brand PNG rendered from this card's data */
+    const shr=$('pcShare');
+    if(shr) shr.onclick=async()=>{
+      if(!window.hkRankCardShare) return;
+      shr.textContent='rendering\u2026';
+      let __crowns=0; d.drills.forEach(x=>{ if(x.rank===1) __crowns++; });
+      let __streak=0; try{ __streak=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+      const ok=await window.hkRankCardShare({ handle:(window._navProfile&&window._navProfile.handle)||'analyst',
+        tierName:tier.name, bucket:tier.bucket, standing:standing,
+        level:__L.lvl, levelPct:__L.pct, solves:d.mySolves||0, crowns:__crowns,
+        attempted:d.attempted, total:MENU_ORDER.length, streak:__streak });
+      shr.textContent = ok ? '\u2713 saved \u2014 post it' : 'couldn\u2019t render \u2014 retry';
+      setTimeout(()=>{ try{ shr.textContent='\u2b07 rank card'; }catch(e){} }, 3200);
+    };
     const sn=$('pcSetName'); if(sn) sn.onclick=()=>{ closeProfile();
       if(window.promptHandle) window.promptHandle(); else location.href='index.html'; };
     m.addEventListener('click', e => { if(e.target === m) closeProfile(); }, { once: true });

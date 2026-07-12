@@ -2915,3 +2915,40 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   unbalanced ternary in the picker tooltip before it ever booted), 4
   pages boot clean, e2e demo-replay ALL GREEN. Live RPC verification
   rides the next fresh-session smoke (egress blocked here).
+
+---
+# ROUND 131 — MONETIZATION SURFACES (rank card + PRO placeholder; pipeline #35/#36)
+- EGRESS NOTE: supabase.co CONNECT 403 again this session — the r119/r130 live
+  smoke test STAYS QUEUED for a fresh session with open egress. All verification
+  below is offline (localhost boot, canvas render review, e2e).
+- LINKEDIN RANK CARD SHIPPED (#35, replaces the per-drill-PDF certificates idea):
+  themes.js hkRankCard(o) renders a 1200x627 PNG (LinkedIn 1.91:1) — the brand
+  artifact: locked grey-dracula palette painted DIRECTLY (deliberately not
+  theme-reactive; the export must look identical from any theme), 46px strip-cap
+  frame language, handle (auto-shrinks to fit), tier+bucket in the tier's
+  RANK_COLORS hi, standing line, 2x2 stat tiles (LEVEL w/ canvas-drawn ring —
+  hkLevelRing NOT rasterized, its SMIL sweep would capture at frame zero —
+  clean solves / crowns / drills ranked), streak in the footer, iteration-8
+  emblem at 280px on the right. Emblem rasterized from rankEmblem's SVG via
+  data-URL image w/ xmlns injected — all emblem styling is inline attrs so the
+  canvas stays untainted/exportable. hkRankCardShare(o) = shared download wrapper.
+- CALL SITES: player-card modal foot gets '⬇ rank card' (nav.js — every page);
+  account.html Progress card gets a Download button. Both feed the SAME
+  standing/tier/level data their cards already display.
+- PRO PLACEHOLDER SHIPPED (#36, placement = account.html): the thin 'Session'
+  card (dup sign-out) is now the 'hotkey.gg pro — coming at launch' card:
+  access row (beta — everything unlocked), the DECIDED subscription model in
+  4 en-dash lines (full track from L1 / plugin layers / analytics / cosmetics),
+  pricing row w/ grandfather promise. index.html openUpgrade modal copy aligned
+  to the same model (was the older 'priority on new drills' text).
+- FOSSILS KILLED (found while wiring): account Progress card printed
+  '${st.solves} clean solves' but HK_RANK.standing() returns no .solves —
+  it has read 0 since r82 (now mine.length, matching the title card); dup
+  #acSignout id (Session card's danger button was NEVER wired — getElementById
+  stopped at the Security card's) + its dead re-wiring line removed.
+- VERIFY: node --check shared JS + all extracted inline scripts; Playwright
+  boot CLEAN x4 (index/account/leaderboard/stats); hkRankCard rendered from 3
+  fixtures (MD top-bucket, MBA floor bucket-null, summit long-handle) — PNGs
+  reviewed: emblem crisp w/ pips, ring pct correct, handle shrink works,
+  emoji streak renders; e2e demo-replay ALL GREEN (55 drills x3).
+- CACHE v117 -> v118 (all 9 pages).

@@ -543,3 +543,103 @@ window.hkBadge = function(id, earned, size, color){
     '<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(G[id]||G.fin)+'</g>'+
     '</svg>';
 };
+
+/* ---- rank card (r131): the LinkedIn-shareable PNG — brand artifact, single source ----
+   1200x627 (LinkedIn's 1.91:1). Deliberately NOT theme-reactive: the exported card is
+   a brand artifact and must look identical from any theme, so it paints the locked
+   grey-dracula palette directly. The emblem is rasterized from rankEmblem's SVG via a
+   data-URL image (xmlns injected; all emblem styling is inline attrs, no external
+   refs — the canvas stays untainted and exportable). hkLevelRing is NOT rasterized:
+   its SMIL sweep would capture at frame zero — the ring is drawn as a canvas arc. */
+window.hkRankCard = async function(o){
+  // o: {handle, tierName, bucket, standing, level, levelPct, xp, solves, crowns,
+  //     attempted, total, streak}
+  const B={bg:'#292b31',surface:'#383b42',surface2:'#43474f',line:'#5a5e68',
+    text:'#f0f1ec',muted:'#a8adb3',faint:'#767d87',accent:'#6ec9a0',warn:'#d9a441'};
+  const MONO='"JetBrains Mono",ui-monospace,monospace', SANS='"Hanken Grotesk",system-ui,sans-serif';
+  const tcol=((window.RANK_COLORS||{})[o.tierName]||[B.accent,B.accent])[1];
+  try{ if(document.fonts&&document.fonts.ready) await document.fonts.ready; }catch(e){}
+  const emblem=await new Promise(function(res){
+    try{
+      const svg=window.rankEmblem(o.tierName, 280, o.bucket)
+        .replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" ');
+      const im=new Image();
+      im.onload=function(){ res(im); }; im.onerror=function(){ res(null); };
+      im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+    }catch(e){ res(null); }
+  });
+  const cv=document.createElement('canvas'); cv.width=1200; cv.height=627;
+  const x=cv.getContext('2d');
+  const rr=function(px,py,w,h,r){ x.beginPath();
+    x.moveTo(px+r,py); x.arcTo(px+w,py,px+w,py+h,r); x.arcTo(px+w,py+h,px,py+h,r);
+    x.arcTo(px,py+h,px,py,r); x.arcTo(px,py,px+w,py,r); x.closePath(); };
+  x.fillStyle=B.bg; x.fillRect(0,0,1200,627);
+  // the unified frame: surface panel, hairline border, 34px-language strip cap
+  rr(40,40,1120,547,18); x.fillStyle=B.surface; x.fill();
+  x.save(); rr(40,40,1120,547,18); x.clip();
+  x.fillStyle=B.surface2; x.fillRect(40,40,1120,46);
+  x.strokeStyle=B.line; x.lineWidth=1; x.beginPath(); x.moveTo(40,86.5); x.lineTo(1160,86.5); x.stroke();
+  x.restore();
+  rr(40,40,1120,547,18); x.strokeStyle=B.line; x.lineWidth=1.5; x.stroke();
+  x.textBaseline='alphabetic';
+  x.fillStyle=B.accent; x.font='700 19px '+MONO; x.fillText('hotkey.gg',68,70);
+  x.fillStyle=B.faint;  x.font='500 13px '+MONO; x.fillText('keyboard-only excel · speedrun training',196,69);
+  x.textAlign='right'; x.fillText('www.hotkey.gg',1132,69); x.textAlign='left';
+  // left column — handle, tier line, standing
+  const handle=String(o.handle||'analyst');
+  let hs=52; x.font='800 '+hs+'px '+SANS;
+  while(hs>26 && x.measureText(handle).width>600){ hs-=2; x.font='800 '+hs+'px '+SANS; }
+  x.fillStyle=B.text; x.fillText(handle,68,168);
+  x.fillStyle=tcol; x.font='700 23px '+MONO;
+  x.fillText(String(o.tierName||'').toUpperCase()+(o.bucket?' · '+String(o.bucket).toUpperCase():''),68,212);
+  x.fillStyle=B.muted; x.font='500 16px '+MONO;
+  x.fillText(String(o.standing||''),68,246);
+  // stat tiles, 2x2 — the player-card tile language
+  const tiles=[
+    {big:String(o.level!=null?o.level:1), label:'LEVEL', ring:true},
+    {big:String(o.solves!=null?o.solves:0), label:'CLEAN SOLVES'},
+    {big:String(o.crowns!=null?o.crowns:0), label:'CROWNS', col:(o.crowns?B.warn:B.text)},
+    {big:(o.attempted!=null?o.attempted:0)+' / '+(o.total!=null?o.total:''), label:'DRILLS RANKED'},
+  ];
+  tiles.forEach(function(t,i){
+    const tx=68+(i%2)*318, ty=286+Math.floor(i/2)*126, tw=302, th=112;
+    rr(tx,ty,tw,th,14); x.fillStyle=B.surface2; x.fill();
+    x.strokeStyle=B.line; x.lineWidth=1; x.stroke();
+    let bx=tx+26;
+    if(t.ring){
+      const cxx=tx+52, cyy=ty+th/2, r=34;
+      x.lineWidth=7; x.lineCap='round';
+      x.strokeStyle=B.surface; x.beginPath(); x.arc(cxx,cyy,r,0,2*Math.PI); x.stroke();
+      const pct=Math.max(0,Math.min(100,o.levelPct||0));
+      if(pct>0){ x.strokeStyle=B.accent; x.beginPath();
+        x.arc(cxx,cyy,r,-Math.PI/2,-Math.PI/2+2*Math.PI*pct/100); x.stroke(); }
+      x.lineCap='butt';
+      x.fillStyle=B.text; x.font='700 26px '+MONO; x.textAlign='center';
+      x.fillText(t.big,cxx,cyy+9); x.textAlign='left';
+      bx=tx+108;
+      x.fillStyle=B.muted; x.font='500 12px '+MONO; x.fillText(t.label,bx,ty+th/2+5);
+      return;
+    }
+    x.fillStyle=t.col||B.text; x.font='700 34px '+MONO; x.fillText(t.big,bx,ty+52);
+    x.fillStyle=B.muted; x.font='500 12px '+MONO; x.fillText(t.label,bx,ty+80);
+  });
+  // right column — the crest, full size (pips zone included when a bucket rides along)
+  if(emblem){
+    const ew=280, eh=o.bucket?Math.round(280*1.14):280;
+    x.drawImage(emblem, 812, Math.round(120+(400-eh)/2), ew, eh);
+  }
+  // footer
+  x.fillStyle=B.faint; x.font='500 15px '+MONO;
+  x.fillText('think you’re faster? — hotkey.gg'+(o.streak?'   ·   🔥 '+o.streak+'-day streak':''),68,562);
+  return cv;
+};
+// download wrapper — one call site per page keeps the wiring dry
+window.hkRankCardShare = async function(o){
+  try{
+    const cv=await window.hkRankCard(o);
+    const a=document.createElement('a');
+    a.download='hotkey-rank-'+String(o.handle||'analyst').replace(/[^A-Za-z0-9_-]/g,'').slice(0,24)+'.png';
+    a.href=cv.toDataURL('image/png'); a.click();
+    return true;
+  }catch(e){ return false; }
+};

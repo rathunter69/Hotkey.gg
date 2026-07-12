@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=117" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=117">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=117">
+<link rel="icon" href="favicon.ico?v=118" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=118">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=118">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1081,14 +1081,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=117"></script>
-<link rel="stylesheet" href="nav.css?v=117">
-<script src="themes.js?v=117"></script>
+<script src="drills.js?v=118"></script>
+<link rel="stylesheet" href="nav.css?v=118">
+<script src="themes.js?v=118"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=117"></script>
+<script src="nav.js?v=118"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -7899,7 +7899,9 @@ function openUpgrade(featureName){
     '<div class="ob-title">hotkey.gg <span style="color:var(--warn)">pro</span></div>'+
     '<div class="ob-body" style="text-align:left;line-height:1.7">'+
       (featureName?('<b>'+featureName+'</b> is a Pro feature.<br><br>'):'')+
-      'Pro unlocks plugin keyboard profiles, advanced analytics, and priority on new drills.'+
+      'Free keeps a level-gated path through the drills. Pro is one subscription: the full '+
+      'track from level 1, plugin keyboard layers (Macabacus · FactSet), advanced '+
+      'analytics, and card cosmetics.'+
       '<br><br><span style="color:var(--accent);font-family:var(--mono);font-size:12.5px">Beta: everything is free while we build. Pro pricing lands at launch \u2014 early players get grandfathered perks.</span></div>'+
     '<div class="ob-opts"><button class="ob-key primary" id="upClose">Back to training</button></div></div>';
   m.classList.add('show');
