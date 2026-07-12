@@ -3069,7 +3069,7 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   (PB-trace replay on the grid; traces timestamped since r9), then S4/S7/S8.
 
 ---
-# ROUND 135 — MEDAL ITERATION 4 (Wolf's三 notes) + EGRESS RE-CHECK
+# ROUND 135 — MEDAL ITERATION 4 (Wolf's notes) + EGRESS RE-CHECK
 - EGRESS: still policy-blocked in this container (google/jsdelivr/supabase all
   403 at the proxy gateway). The session continued in the SAME container, so
   the env's new network policy never stamped. Smoke test needs a genuinely
