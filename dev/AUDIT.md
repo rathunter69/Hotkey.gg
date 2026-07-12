@@ -2778,3 +2778,22 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   MD close-up render clean (no console/page errors), light-theme row +
   22px chip row legible. Proto only — game wiring (rankEmblem loader)
   waits for Wolf's approval of the set.
+
+---
+# ROUND 124 — RANK ART ITERATION 5 (LoL bucket escalation, sun glyph, proportions)
+- Wolf on iteration 4: pips OK but wants LEAGUE-style escalation (visible
+  flair added per rank), summer-analyst glyph unreadable, gold crest too
+  vertical vs the other frames.
+- BUCKET ESCALATION: emblems now BUILD per bucket — bk1 clean frame+glyph,
+  bk2 bolts on the tier's ornaments (ring notches / shield fins+rivets /
+  hex blades / laurels / wing-blades / bull horns / summit shards+rays),
+  bk3 ignites (crest jewel, sparks, hot rim, brighter core/aura, extra
+  ornament extensions). Pips retained as the tiny-size read. New .jewel
+  animation layer joins .aura/.frame/.glyph/.ornament/.pips/.sparks.
+- SUMMER ANALYST glyph: lanyard replaced with a radiant SUN (8 tapered
+  rays, hot inner disc) — instant "summer" read at every size.
+- PROPORTIONS: gold Associate crest widened (16..84 shoulders, fuller
+  bottom) to match neighbor frames' aspect; glyph-to-frame ratio
+  normalized (book x1.12, sigma x1.2, bolt x1.1).
+- VERIFY: node --check extracted script, Playwright fullPage render clean
+  (no console/page errors), light-theme + 22px chip rows legible.

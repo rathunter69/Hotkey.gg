@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 4</title>
+<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 5</title>
 <style>
   body{margin:0;font-family:'JetBrains Mono',monospace;background:#141519;color:#cdd0d6;padding:28px}
   h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 4px} .sub{font-size:11px;color:#666a72;margin-bottom:22px;max-width:980px;line-height:1.5}
@@ -13,19 +13,20 @@
   .chips{display:flex;gap:14px;align-items:center;background:#1d1f25;border:1px solid #2d3038;border-radius:12px;padding:12px 16px;width:max-content}
   .tile svg .aura{transition:opacity .4s} .tile:hover svg .aura{animation:pulse 1.5s ease-in-out infinite}
   .tile:hover svg .pips .on{animation:pipglow 1.1s ease-in-out infinite alternate}
+  .tile:hover svg .sparks{animation:pipglow 1.1s ease-in-out infinite alternate}
   @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
   @keyframes pipglow{from{filter:brightness(1)}to{filter:brightness(1.7)}}
 </style></head><body>
-<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 4</h1>
-<div class="sub">MD is a BULL now &middot; glyphs optically centered &middot; UNRANKED gets its standardized badge (the cracked cell) &middot; every ranked tier shows its THREE BUCKETS: division pips forge left&rarr;right (Bottom 1 / Middle 2 / Top 3), and TOP BUCKET ignites spark accents + a hotter rim — the same layers a rank-up animation will light in sequence (hover a tile: pips + aura pulse).</div>
+<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 5</h1>
+<div class="sub">LoL-style bucket escalation: the EMBLEM ITSELF builds with each bucket &mdash; BOTTOM is the clean frame + glyph, MIDDLE bolts on the tier's ornaments (notches, fins, blades, laurels, wings, horns), TOP ignites (crest jewel, sparks, hot rim, brighter glow). Pips stay as the tiny-size read. Summer Analyst glyph is now a SUN. Gold crest widened + glyphs rescaled so glyph-to-frame proportion is consistent across tiers.</div>
 <div id="grid"></div>
 <div class="band"><div class="bandcap">LIGHT-THEME SANITY · TOP BUCKET</div><div class="row" id="light"></div></div>
 <div class="band"><div class="bandcap">SILHOUETTE TEST · 22px CHIP ROW (top bucket)</div><div class="chips" id="chips"></div></div>
 <script>
-/* Iteration 4. Canvas is 100x114: emblem art in 0..100, DIVISION PIPS on 100..114.
-   Pips are the bucket language (LoL divisions): 3 diamond sockets in the tier metal,
-   forged left->right; top bucket adds .sparks + hotter rim. Animation hooks:
-   .aura .frame .glyph .ornament .pips .sparks */
+/* Iteration 5. Canvas 100x114: emblem art in 0..100, division pips on 100..114.
+   BUCKET ESCALATION (the LoL read): bk1 = frame+glyph only, bk2 = +ornaments,
+   bk3 = +jewel/sparks/hot rim/max glow. Pips remain the small-size language.
+   Animation layers: .aura .frame .glyph .ornament .jewel .pips .sparks */
 let UID=0;
 function defs(id,P,glow){
   return `<defs>
@@ -48,7 +49,7 @@ function frame(id,P,path,glow,sw,hot){
     ${hot?`<path d="${path}" fill="none" stroke="${P.hi}" stroke-width="1" opacity=".8" stroke-linejoin="round"/>`:''}
   </g>`;
 }
-/* division pips: the bucket language. bucket: 1 bottom / 2 middle / 3 top / null */
+/* division pips: the small-size bucket read. bucket: 1 bottom / 2 middle / 3 top / null */
 function pips(id,P,bucket){
   if(!bucket) return '';
   let out='';
@@ -67,26 +68,25 @@ function sparks(P,pts){
 }
 const VB='0 0 100 114';
 const H=sz=>Math.round(sz*1.14);
-/* ---------- glyphs (optically centered) ---------- */
+/* ---------- glyphs (optically centered, ~0.42 of frame width) ---------- */
 const GLY={
-  book:(id,P)=>`<g transform="translate(50 50)">
+  book:(id,P)=>`<g transform="translate(50 50) scale(1.12)">
     <path d="M-12 7.5 Q -6.5 4 0 5 Q 6.5 4 12 7.5 L12 -6 Q 6.5 -9.5 0 -8.5 Q -6.5 -9.5 -12 -6 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1"/>
     <path d="M0 5 L0 -8.5" stroke="${P.deep}" stroke-width="1.1"/>
     <path d="M-9 -3.5 Q -5 -5.5 -2.5 -4.5 M-9 0 Q -5 -2 -2.5 -1 M2.5 -4.5 Q 5 -5.5 9 -3.5 M2.5 -1 Q 5 -2 9 0" stroke="${P.plateLo}" stroke-width=".9" fill="none"/></g>`,
-  lanyard:(id,P)=>`<g transform="translate(50 47.5)">
-    <path d="M-3 -17.5 L3 -17.5 L1.6 -10.5 L-1.6 -10.5 Z" fill="${P.mid}" stroke="${P.deep}" stroke-width=".8"/>
-    <rect x="-11" y="-10.5" width="22" height="27" rx="2.5" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
-    <rect x="-7.5" y="-6.5" width="7" height="8" rx="1" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".7"/>
-    <path d="M2.5 -4.5 L7.5 -4.5 M2.5 -1 L7.5 -1" stroke="${P.plateLo}" stroke-width="1.3"/>
-    <path d="M-7.5 6.5 L7.5 6.5 M-7.5 10 L3.5 10" stroke="${P.plateLo}" stroke-width="1.3"/>
-    <circle cx="0" cy="-14" r="1.3" fill="${P.plateLo}"/></g>`,
+  sun:(id,P)=>{ let rays='';
+    for(let i=0;i<8;i++){ const a=i*Math.PI/4, L=(i%2?14.5:17.5), w=.21, R=9.6;
+      rays+=`<path d="M${(Math.cos(a-w)*R).toFixed(1)} ${(Math.sin(a-w)*R).toFixed(1)} L${(Math.cos(a)*L).toFixed(1)} ${(Math.sin(a)*L).toFixed(1)} L${(Math.cos(a+w)*R).toFixed(1)} ${(Math.sin(a+w)*R).toFixed(1)} Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".7"/>`; }
+    return `<g transform="translate(50 48)">${rays}
+      <circle r="8" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
+      <circle r="4.5" fill="${P.hi}" opacity=".65"/></g>`; },
   keycap:(id,P)=>`<g transform="translate(50 50)">
     <rect x="-13" y="-12.5" width="26" height="25" rx="4.5" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/>
     <rect x="-9.5" y="-9.5" width="19" height="17" rx="3" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
     <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="10.5" fill="${P.hi}">F4</text></g>`,
-  sigma:(id,P)=>`<g transform="translate(50 49)">
+  sigma:(id,P)=>`<g transform="translate(50 49) scale(1.2)">
     <path d="M-9.5 -13 L10.5 -13 L10.5 -7.6 L-2.2 -7.6 L5.8 0 L-2.2 7.6 L10.5 7.6 L10.5 13 L-9.5 13 L-9.5 8.6 L0.4 0 L-9.5 -8.6 Z"
-      fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/></g>`,
+      fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1"/></g>`,
   chart:(id,P)=>`<g transform="translate(50 53)">
     <rect x="-12" y="3" width="5.2" height="10" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
     <rect x="-3.5" y="-2" width="5.2" height="15" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
@@ -104,7 +104,7 @@ const GLY={
     <path d="M-7.5 5 Q0 8 7.5 5 L5 13 Q0 15.2 -5 13 Z" fill="${P.lo}" stroke="${P.deep}" stroke-width=".9"/>
     <ellipse cx="-3.1" cy="9.6" rx="1.5" ry="2" fill="${P.deep}"/>
     <ellipse cx="3.1" cy="9.6" rx="1.5" ry="2" fill="${P.deep}"/></g>`,
-  bolt:(id,P)=>`<g transform="translate(50 49.5)">
+  bolt:(id,P)=>`<g transform="translate(50 49.5) scale(1.1)">
     <path d="M-1.5 -17 L9.5 -17 L2.5 -3.5 L10.5 -3.5 L-7 18 L-1 1.5 L-9.5 1.5 Z" fill="#ffffff" stroke="${P.lo}" stroke-width="1"/>
     <path d="M-1.5 -17 L9.5 -17 L2.5 -3.5 L-1.8 -3.5 Z" fill="${P.hi}" opacity=".7"/></g>`,
 };
@@ -117,7 +117,7 @@ const GOLD ={hi:'#ffefb3',mid:'#f4c754',lo:'#bf8e20',deep:'#523a05',plateHi:'#4a
 const PLAT ={hi:'#e0fdf7',mid:'#86dcca',lo:'#3d9c8e',deep:'#173f3a',plateHi:'#25453f',plateLo:'#152522',core:'#8ef2df'};
 const CRIM ={hi:'#ffb3a1',mid:'#e65843',lo:'#9c2a1c',deep:'#3a0f0b',plateHi:'#3b1d19',plateLo:'#1f0f0e',core:'#ff6248'};
 const DIAM ={hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',plateHi:'#21404f',plateLo:'#12232c',core:'#a8ecff'};
-/* ---------- tiers (bucket-aware) ---------- */
+/* ---------- tiers (bucket-escalating: bk1 clean / bk2 +ornaments / bk3 ignited) ---------- */
 function t_unranked(sz){ const id='e'+(UID++), P=IRON;
   const sq='M22 22 L78 22 L78 78 L22 78 Z';
   return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,0)}
@@ -127,94 +127,101 @@ function t_unranked(sz){ const id='e'+(UID++), P=IRON;
     <path d="M23.5 23.5 L76.5 23.5" stroke="#ffffff" stroke-width="1.2" opacity=".55"/>
     <text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="15" fill="#e0523d">#REF!</text>
   </svg>`; }
-function t_candidate(sz,bk){ const id='e'+(UID++), P=SLATE, hot=bk===3;
-  let notch=''; for(let i=0;i<8;i++){ const a=i*45*Math.PI/180;
+function t_candidate(sz,bk){ const id='e'+(UID++), P=SLATE, o2=bk>=2, hot=bk===3, gl=[0,0,.4,.9][bk];
+  let notch=''; if(o2) for(let i=0;i<8;i++){ const a=i*45*Math.PI/180;
     notch+=`<line x1="${50+Math.cos(a)*34}" y1="${50+Math.sin(a)*34}" x2="${50+Math.cos(a)*38.5}" y2="${50+Math.sin(a)*38.5}" stroke="url(#${id}m)" stroke-width="4.2"/>`; }
-  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,hot?0.8:0)}
-    <g class="ornament">${notch}</g>
-    ${frame(id,P,'M50 17 A33 33 0 1 1 49.9 17 Z',hot?0.8:0,3.4,hot)}
-    <circle cx="50" cy="50" r="26.5" fill="none" stroke="${P.mid}" stroke-width="1" opacity=".8"/>
+  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    ${o2?`<g class="ornament">${notch}</g>`:''}
+    ${frame(id,P,'M50 17 A33 33 0 1 1 49.9 17 Z',gl,3.4,hot)}
+    <circle cx="50" cy="50" r="26.5" fill="none" stroke="${P.mid}" stroke-width="1" opacity="${o2?.8:.45}"/>
     <path d="M26 39 A27 27 0 0 1 74 39" fill="none" stroke="#ffffff" stroke-width="1.3" opacity=".5"/>
+    ${hot?`<g class="jewel"><circle cx="50" cy="15.8" r="2.6" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/><circle cx="50" cy="15.8" r="1.1" fill="#ffffff" opacity=".85"/></g>`:''}
     ${GLY.book(id,P)}${hot?sparks(P,[[22,26,3],[78,26,3]]):''}${pips(id,P,bk)}
   </svg>`; }
-function t_summer(sz,bk){ const id='e'+(UID++), P=BRONZE, hot=bk===3;
+function t_summer(sz,bk){ const id='e'+(UID++), P=BRONZE, o2=bk>=2, hot=bk===3, gl=[0,0,.5,1][bk];
   const sh='M50 10 L82 20 L79 54 L50 90 L21 54 L18 20 Z';
-  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,hot?0.9:0)}
-    <circle cx="50" cy="48" r="29" fill="url(#${id}core)" opacity="${hot?1:.55}"/>
-    ${frame(id,P,sh,hot?0.9:0,3.4,hot)}
-    <circle cx="25" cy="24.5" r="2" fill="url(#${id}m)"/><circle cx="75" cy="24.5" r="2" fill="url(#${id}m)"/>
-    <circle cx="23.5" cy="50" r="2" fill="url(#${id}m)"/><circle cx="76.5" cy="50" r="2" fill="url(#${id}m)"/>
+  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    <circle cx="50" cy="48" r="29" fill="url(#${id}core)" opacity="${hot?1:o2?.7:.45}"/>
+    ${o2?`<g class="ornament">
+      <path d="M18 22 L8 17 L15 33 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+      <path d="M82 22 L92 17 L85 33 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+      <circle cx="25" cy="24.5" r="2" fill="url(#${id}m)"/><circle cx="75" cy="24.5" r="2" fill="url(#${id}m)"/>
+      <circle cx="23.5" cy="50" r="2" fill="url(#${id}m)"/><circle cx="76.5" cy="50" r="2" fill="url(#${id}m)"/></g>`:''}
+    ${frame(id,P,sh,gl,3.4,hot)}
     <path d="M21 19.2 L50 11 L79 19.2" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".65"/>
-    ${GLY.lanyard(id,P)}${hot?sparks(P,[[18,17,3.2],[82,17,3.2]]):''}${pips(id,P,bk)}
+    ${hot?`<g class="jewel"><path d="M46 12.2 L50 5.5 L54 12.2 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/><circle cx="50" cy="10" r="1.1" fill="#ffffff" opacity=".85"/></g>`:''}
+    ${GLY.sun(id,P)}${hot?sparks(P,[[18,17,3.2],[82,17,3.2]]):''}${pips(id,P,bk)}
   </svg>`; }
-function t_firstyear(sz,bk){ const id='e'+(UID++), P=SILVER, hot=bk===3;
+function t_firstyear(sz,bk){ const id='e'+(UID++), P=SILVER, o2=bk>=2, hot=bk===3, gl=[0,0,.6,1.1][bk];
   const hx='M50 8 L82 26 L82 62 L50 92 L18 62 L18 26 Z';
-  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,hot?1:0)}
-    <circle cx="50" cy="49" r="30" fill="url(#${id}core)" opacity="${hot?1:.55}"/>
-    <g class="ornament">
-      <path d="M18 26 L8 21 L18 36 M82 26 L92 21 L82 36" fill="none" stroke="url(#${id}m)" stroke-width="2.8"/>
-      <path d="M18 62 L10 70 M82 62 L90 70" stroke="url(#${id}m)" stroke-width="2.8"/></g>
-    ${frame(id,P,hx,hot?1:0,3.4,hot)}
+  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    <circle cx="50" cy="49" r="30" fill="url(#${id}core)" opacity="${hot?1:o2?.7:.45}"/>
+    ${o2?`<g class="ornament">
+      <path d="M18 26 L8 21 L18 36 M82 26 L92 21 L82 36" fill="none" stroke="url(#${id}m)" stroke-width="2.8"/></g>`:''}
+    ${hot?`<g class="ornament"><path d="M18 62 L10 70 M82 62 L90 70" stroke="url(#${id}m)" stroke-width="2.8"/></g>`:''}
+    ${frame(id,P,hx,gl,3.4,hot)}
     <path d="M50 12.5 L78 28 M50 12.5 L22 28" stroke="#ffffff" stroke-width="1.3" opacity=".55"/>
+    ${hot?`<g class="jewel"><path d="M46.5 10 L50 3.5 L53.5 10 L50 13 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/></g>`:''}
     ${GLY.keycap(id,P)}${hot?sparks(P,[[10,20,3.2],[90,20,3.2]]):''}${pips(id,P,bk)}
   </svg>`; }
-function t_associate(sz,bk){ const id='e'+(UID++), P=GOLD, hot=bk===3;
-  const cr='M50 12 L62 22 L80 18 L76 44 L64 80 L50 88 L36 80 L24 44 L20 18 L38 22 Z';
-  let lr=''; for(let s of [-1,1]){
-    lr+=`<path d="M${50+s*29} 78 q ${s*17} -12 ${s*18} -38" fill="none" stroke="url(#${id}m)" stroke-width="2.5" stroke-linecap="round"/>`;
-    for(let l=0;l<5;l++){ const t2=l/4.4, x=50+s*(29+16*t2*(2-t2)*0.95), y=77-38*t2;
+function t_associate(sz,bk){ const id='e'+(UID++), P=GOLD, o2=bk>=2, hot=bk===3, gl=[0,.7,1.1,1.6][bk];
+  const cr='M50 11 L63 21 L84 16 L79 44 L66 82 L50 90 L34 82 L21 44 L16 16 L37 21 Z';
+  let lr=''; if(o2) for(let s of [-1,1]){
+    lr+=`<path d="M${50+s*31} 78 q ${s*17} -12 ${s*18} -38" fill="none" stroke="url(#${id}m)" stroke-width="2.5" stroke-linecap="round"/>`;
+    for(let l=0;l<5;l++){ const t2=l/4.4, x=50+s*(31+16*t2*(2-t2)*0.95), y=77-38*t2;
       lr+=`<ellipse cx="${x}" cy="${y}" rx="5" ry="2.1" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".5" transform="rotate(${s*(-54+t2*70)} ${x} ${y})"/>`; } }
-  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,hot?1.5:1)}
-    <circle cx="50" cy="48" r="31" fill="url(#${id}core)"/>
-    <g class="ornament">${lr}</g>
-    ${frame(id,P,cr,hot?1.5:1,3.4,hot)}
-    <path d="M38 22.6 L50 13 L62 22.6" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".7"/>
-    <circle cx="50" cy="17.5" r="2" fill="${P.hi}"/>
-    ${GLY.sigma(id,P)}${hot?sparks(P,[[20,15,3.4],[80,15,3.4]]):''}${pips(id,P,bk)}
+  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    <circle cx="50" cy="48" r="31" fill="url(#${id}core)" opacity="${hot?1:o2?.8:.55}"/>
+    ${o2?`<g class="ornament">${lr}</g>`:''}
+    ${frame(id,P,cr,gl,3.4,hot)}
+    <path d="M37 21.6 L50 12 L63 21.6" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".7"/>
+    ${hot?`<g class="jewel"><circle cx="50" cy="16.5" r="2.4" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/><circle cx="50" cy="16.5" r="1" fill="#ffffff" opacity=".9"/></g>`:''}
+    ${GLY.sigma(id,P)}${hot?sparks(P,[[16,13,3.4],[84,13,3.4]]):''}${pips(id,P,bk)}
   </svg>`; }
-function t_vp(sz,bk){ const id='e'+(UID++), P=PLAT, hot=bk===3;
+function t_vp(sz,bk){ const id='e'+(UID++), P=PLAT, o2=bk>=2, hot=bk===3, gl=[0,1,1.5,2][bk];
   const cr='M50 10 L60 20 L84 14 L78 40 L82 52 L62 84 L50 92 L38 84 L18 52 L22 40 L16 14 L40 20 Z';
-  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,hot?1.9:1.4)}
-    <circle cx="50" cy="48" r="33" fill="url(#${id}core)"/>
-    <g class="ornament">
+  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    <circle cx="50" cy="48" r="33" fill="url(#${id}core)" opacity="${hot?1:o2?.8:.55}"/>
+    ${o2?`<g class="ornament">
       <path d="M16 14 L4 8 L14 26 L8 24 L18 38" fill="none" stroke="url(#${id}m)" stroke-width="2.8" stroke-linejoin="round"/>
-      <path d="M84 14 L96 8 L86 26 L92 24 L82 38" fill="none" stroke="url(#${id}m)" stroke-width="2.8" stroke-linejoin="round"/>
-      <path d="M38 84 L30 94 M62 84 L70 94" stroke="url(#${id}m)" stroke-width="2.4"/></g>
-    ${frame(id,P,cr,hot?1.9:1.4,3.4,hot)}
+      <path d="M84 14 L96 8 L86 26 L92 24 L82 38" fill="none" stroke="url(#${id}m)" stroke-width="2.8" stroke-linejoin="round"/></g>`:''}
+    ${hot?`<g class="ornament"><path d="M38 84 L30 94 M62 84 L70 94" stroke="url(#${id}m)" stroke-width="2.4"/></g>`:''}
+    ${frame(id,P,cr,gl,3.4,hot)}
     <path d="M40 20.5 L50 11 L60 20.5" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".75"/>
-    <path d="M50 10 L50 3" stroke="url(#${id}m)" stroke-width="2.4"/><circle cx="50" cy="2.5" r="2" fill="${P.hi}"/>
+    ${hot?`<g class="jewel"><path d="M50 10 L50 3" stroke="url(#${id}m)" stroke-width="2.4"/><circle cx="50" cy="2.5" r="2" fill="${P.hi}"/></g>`:''}
     ${GLY.chart(id,P)}${hot?sparks(P,[[4,8,3.6],[96,8,3.6]]):''}${pips(id,P,bk)}
   </svg>`; }
-function t_md(sz,bk){ const id='e'+(UID++), P=CRIM, hot=bk===3;
+function t_md(sz,bk){ const id='e'+(UID++), P=CRIM, o2=bk>=2, hot=bk===3, gl=[0,1.6,2.1,2.6][bk];
   const cr='M50 14 L64 22 L88 10 L80 38 L86 50 L64 86 L50 94 L36 86 L14 50 L20 38 L12 10 L36 22 Z';
   let horns='';
   for(let s of [-1,1]){
     horns+=`<path d="M${50+s*38} 26 Q ${50+s*58} 14 ${50+s*62} -2 Q ${50+s*50} 8 ${50+s*42} 10 Q ${50+s*46} 16 ${50+s*38} 26 Z"
       transform="translate(0 14)" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1"/>`;
     horns+=`<path d="M${50+s*36} 60 Q ${50+s*52} 62 ${50+s*56} 74 Q ${50+s*44} 70 ${50+s*40} 66 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>`; }
-  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,hot?2.5:2)}
-    <g class="aura"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/></g>
+  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    <g class="aura" opacity="${hot?1:o2?.8:.55}"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/></g>
     <circle cx="50" cy="50" r="34" fill="url(#${id}core)"/>
-    <g class="ornament">${horns}</g>
-    ${frame(id,P,cr,hot?2.5:2,3.6,hot)}
-    <g class="ornament" filter="url(#${id}g)">
+    ${o2?`<g class="ornament">${horns}</g>`:''}
+    ${frame(id,P,cr,gl,3.6,hot)}
+    <g class="ornament" ${hot?`filter="url(#${id}g)"`:''}>
       <path d="M35 21 L38 7 L46 15 L50 4 L54 15 L62 7 L65 21 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
-      <circle cx="50" cy="3" r="2.3" fill="#ffd9cf"/><circle cx="38.4" cy="6.2" r="1.5" fill="#ffd9cf"/><circle cx="61.6" cy="6.2" r="1.5" fill="#ffd9cf"/></g>
+      ${hot?`<circle cx="50" cy="3" r="2.3" fill="#ffd9cf"/><circle cx="38.4" cy="6.2" r="1.5" fill="#ffd9cf"/><circle cx="61.6" cy="6.2" r="1.5" fill="#ffd9cf"/>`:''}</g>
     ${GLY.bull(id,P)}${hot?sparks(P,[[12,10,3.8],[88,10,3.8],[50,-1,3]]):''}${pips(id,P,bk)}
   </svg>`; }
-function t_summit(sz,bk){ const id='e'+(UID++), P=DIAM, hot=bk===3;
+function t_summit(sz,bk){ const id='e'+(UID++), P=DIAM, o2=bk>=2, hot=bk===3, gl=[0,1.8,2.3,2.8][bk];
   const sp='M50 2 L64 18 L86 22 L74 46 L78 62 L58 88 L50 98 L42 88 L22 62 L26 46 L14 22 L36 18 Z';
+  const rop=o2?1:.45;
   let rays=''; for(let i=0;i<20;i++){ const a=(i*18-90)*Math.PI/180, big=i%5===0;
-    rays+=`<line x1="${50+Math.cos(a)*(big?39:42)}" y1="${50+Math.sin(a)*(big?39:42)}" x2="${50+Math.cos(a)*(big?50:46.5)}" y2="${50+Math.sin(a)*(big?50:46.5)}" stroke="${P.hi}" stroke-width="${big?2.6:0.9}" stroke-linecap="round" opacity="${big?0.95:0.5}"/>`; }
+    rays+=`<line x1="${50+Math.cos(a)*(big?39:42)}" y1="${50+Math.sin(a)*(big?39:42)}" x2="${50+Math.cos(a)*(big?50:46.5)}" y2="${50+Math.sin(a)*(big?50:46.5)}" stroke="${P.hi}" stroke-width="${big?2.6:0.9}" stroke-linecap="round" opacity="${(big?0.95:0.5)*rop}"/>`; }
   let shards=''; for(let s of [-1,1]){
     shards+=`<path d="M${50+s*40} 30 L${50+s*47} 24 L${50+s*44} 34 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
       <path d="M${50+s*44} 52 L${50+s*52} 50 L${50+s*46} 60 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
-      <path d="M${50+s*34} 78 L${50+s*42} 84 L${50+s*33} 86 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>`; }
-  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,hot?2.7:2.2)}
-    <g class="aura"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/>${rays}</g>
+      ${hot?`<path d="M${50+s*34} 78 L${50+s*42} 84 L${50+s*33} 86 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>`:''}`; }
+  return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
+    <g class="aura" opacity="${hot?1:o2?.8:.6}"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/>${rays}</g>
     <circle cx="50" cy="50" r="34" fill="url(#${id}core)"/>
-    <g class="ornament">${shards}</g>
-    ${frame(id,P,sp,hot?2.7:2.2,3.6,hot)}
+    ${o2?`<g class="ornament">${shards}</g>`:''}
+    ${frame(id,P,sp,gl,3.6,hot)}
     <path d="M36 18.8 L50 3.5 L64 18.8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".85"/>
     ${GLY.bolt(id,P)}${hot?sparks(P,[[14,22,3.8],[86,22,3.8],[50,-2,3.2]]):''}${pips(id,P,bk)}
   </svg>`; }
