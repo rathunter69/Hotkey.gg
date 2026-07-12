@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=104" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=104">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=104">
+<link rel="icon" href="favicon.ico?v=105" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=105">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=105">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -116,6 +116,9 @@
   .rowhdr{min-width:30px}
   td{padding:0 9px; height:var(--cellh, 24px); color:var(--text); white-space:nowrap; vertical-align:middle; transition:background .08s}
   td.txt{text-align:left}
+  td.spill{overflow:visible; z-index:3}   /* r107: Excel-parity text spill (see render) */
+  td.spill .sp{position:absolute; left:9px; top:0; bottom:0; display:flex; align-items:center;
+    white-space:nowrap; overflow:hidden; pointer-events:none; text-align:left}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
   td.fill-blue{background:#dbeafe !important; color:#1e50a2}
@@ -1076,14 +1079,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=104"></script>
-<link rel="stylesheet" href="nav.css?v=104">
-<script src="themes.js?v=104"></script>
+<script src="drills.js?v=105"></script>
+<link rel="stylesheet" href="nav.css?v=105">
+<script src="themes.js?v=105"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=104"></script>
+<script src="nav.js?v=105"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4699,6 +4702,19 @@ function render(){
         txt = true
           ? buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '<span class="edcaret">\u258f</span>' + buildFormulaHTML(editBuf.slice(editCaret), refs)
           : buildFormulaHTML(editBuf, refs) + '▏';
+      }
+      else if(cell.txt && !cell.wrap && typeof cell.value==='string'){
+        // r107: EXCEL PARITY — long text SPILLS across empty right neighbors, clipping
+        // at the first occupied cell (titles/labels stop getting amputated mid-word).
+        const est=cell.value.length*6.9+20;   // label font ~13.5px Arial, avg glyph ~6.9px
+        if(est>__ew[c]){
+          let spillW=__ew[c], cc=c+1;
+          while(cc<=COLS){ const n=get(r,cc); if(n && n.value!==null && n.value!=='') break; spillW+=__ew[cc]; cc++; }
+          if(spillW>__ew[c]){   // active/selected cells spill too — Excel draws the border around the anchor, text still runs
+            cls.push('spill');
+            txt='<span class="sp" style="max-width:'+(spillW-12)+'px">'+txt+'</span>';
+          }
+        }
       }
       else if(isNum(cell)&&!cell.wrap){
         const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals).length*CHARPX+12;

@@ -2402,3 +2402,25 @@ statement layouts, named companies, FY headers, associate-voice checklists.
 - VERIFY: e2e ALL GREEN (5 reps × 55); offline harness 15/15 shipped drills
   (no regressions); node --check inline scripts.
 - (no v bump — no shared-asset change.)
+
+---
+# ROUND 107 — T4b: TEXT SPILL (Excel parity) + PICKER-NAME CLARITY (#25)
+- TEXT SPILL: long text cells now run across EMPTY right neighbors, clipping
+  at the first occupied cell — exactly Excel. Implementation: render() wraps
+  spilling text in an absolutely-positioned span clamped to the empty run's
+  width; td.spill lifts overflow/z-index. Active/selected cells spill too
+  (Excel draws the border around the anchor; text still runs). Kills the
+  amputated tab titles ("Cascade Materials — Segm|") wherever the layout
+  leaves room; rows packed with year headers still clip at B1 — which is
+  what Excel does. Screenshot-verified.
+- PICKER NAMES (#25): margin was literally named 'Formula' → 'Margins';
+  'Drill' → 'Hardcode'; retbridge tab collided with bridge ('Bridge' →
+  'Returns'); copyover tab 'Basics' → 'Copy'; stale labels synced to the
+  richer engine copy (cagr/percent/editfix/copyover); descs modernized to
+  match the r100+ rebuilds they describe.
+- foot/cases audited: already doctrine-clean (titles, voice, mix) — no churn.
+  margin/percent/cagr keep scatter layouts by design (multi-site exemption);
+  their table headers are the realism, a fake A1 title would collide.
+- VERIFY: demo-replay e2e ALL 55 GREEN; offline harness clean; node --check;
+  spill screenshot inspected (dress: title spans A1:E1, active border intact).
+- v105.
