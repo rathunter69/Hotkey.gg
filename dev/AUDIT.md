@@ -2501,3 +2501,22 @@ statement layouts, named companies, FY headers, associate-voice checklists.
   errors (sb-offline paths exercised; Supabase writes untestable in
   sandbox — Wolf smoke-tests the live join flow post-deploy).
 - No shared-asset change — ?v stays 106.
+
+---
+# ROUND 111 — DESKS SURFACES: leaderboard filter, desk page, legacy retirement
+- LEADERBOARD: membership now drives the team view — real desk (team_members
+  join) takes precedence, legacy profiles.team_code stays as fallback until
+  its holders migrate. Toggle copy: 'show desk only' / '◉ desk: {name}'.
+  NOTE HONORED: teams selected with EXPLICIT columns (id,name,slug) — the
+  r110 grant revocation makes select * a 403.
+- DESK PAGE: leaderboard.html?desk=slug filters EVERY board to the desk's
+  members + banner with roster strip (top 12 by crowns/boards, '+N more').
+  Account desk card links to it ('Desk boards →').
+- NAV settings: the legacy team-code editor RETIRED (input+save removed);
+  section now points at the account desk card. nav.js changed → v107.
+- VERIFY: boot x5 pages incl ?desk= param — zero real page errors; demo-
+  replay e2e ALL GREEN; node --check nav.js + all inline scripts.
+- QUEUED: v1.5 school tag (spec in TEAMS_DESIGN.md) · desk chips on
+  leaderboard rows + player card ride the school-tag chip round · V2
+  captain assignments after real desks exist.
+- v107.

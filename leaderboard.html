@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=106" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=106">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=106">
+<link rel="icon" href="favicon.ico?v=107" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=107">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=107">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -165,15 +165,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=106">
-<script src="drills.js?v=106"></script>
+<link rel="stylesheet" href="nav.css?v=107">
+<script src="drills.js?v=107"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=106"></script>
+<script src="themes.js?v=107"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=106"></script>
+<script src="nav.js?v=107"></script>
 
 <header class="head">
   <div class="wrap">
@@ -300,12 +300,15 @@ async function load(){
   let profs=[], runs=[], sessions=[], meId=null;
   try{
     try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null; }catch(e){}
-    const [p, r, se] = await Promise.all([
+    const [p, r, se, tm, tt] = await Promise.all([
       sb.from('profiles').select('id,handle,team_code'),
       sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
+      sb.from('team_members').select('team_id,user_id'),
+      sb.from('teams').select('id,name,slug'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
     ]);
     profs=p.data||[]; runs=r.data||[]; sessions=se.data||[];
+    window.__deskMembers=(tm&&tm.data)||[]; window.__deskTeams=(tt&&tt.data)||[];
   }catch(e){
     root.innerHTML='<div class="state"><h2>Couldn\u2019t load times</h2><p>Database unreachable \u2014 refresh in a moment.</p></div>'; return;
   }
@@ -321,11 +324,22 @@ async function load(){
     const r=runs.find(x=>x.challenge===key);
     return {sec:sec, key:key, lab:lab, name:r?names[r.user_id]:null, t:r?(r.time_ms/1000).toFixed(2):null};
   });
-  let teamIds=null, myTeam=null;
-  if(meId){ const me=profs.find(p=>p.id===meId);
-    if(me && me.team_code){ myTeam=me.team_code;
-      teamIds=new Set(profs.filter(p=>p.team_code===me.team_code).map(p=>p.id)); } }
-  const teamOnly = myTeam && sessionStorage.getItem('hk_teamview')==='1';
+  // DESKS (r111): real membership drives the filter; legacy team_code is the fallback
+  // until its holders migrate. ?desk=slug turns the whole page into that desk's boards.
+  let teamIds=null, myTeam=null, myDesk=null, viewDesk=null;
+  const members=window.__deskMembers||[], teams=window.__deskTeams||[];
+  const memByTeam={}; members.forEach(m=>{ (memByTeam[m.team_id]=memByTeam[m.team_id]||[]).push(m.user_id); });
+  const deskSlug=new URLSearchParams(location.search).get('desk');
+  if(deskSlug){ const t=teams.find(x=>x.slug===deskSlug);
+    if(t) viewDesk={id:t.id, name:t.name, slug:t.slug, ids:new Set(memByTeam[t.id]||[])}; }
+  if(meId){
+    const mine=members.find(m=>m.user_id===meId);
+    const mineTeam=mine && teams.find(t=>t.id===mine.team_id);
+    if(mineTeam){ myDesk=mineTeam; myTeam=mineTeam.name; teamIds=new Set(memByTeam[mineTeam.id]||[]); }
+    else{ const me=profs.find(p=>p.id===meId);
+      if(me && me.team_code){ myTeam=me.team_code;
+        teamIds=new Set(profs.filter(p=>p.team_code===me.team_code).map(p=>p.id)); } } }
+  const teamOnly = !viewDesk && myTeam && sessionStorage.getItem('hk_teamview')==='1';
   // render the section-leaders strip into its mount (added below the featured grid)
   setTimeout(()=>{ try{
     let host=document.getElementById('secleadMount');
@@ -337,8 +351,9 @@ async function load(){
                :'<div class="sl-name" style="color:var(--faint)">unclaimed</div><div class="sl-t">be first</div>')+
         '<div class="sl-lab">'+s.lab+'</div></div>').join('')+'</div>';
   }catch(e){} }, 0);
-  const fRuns = teamOnly ? runs.filter(r=>teamIds.has(r.user_id)) : runs;
-  const fSessions = teamOnly ? sessions.filter(r=>teamIds.has(r.user_id)) : sessions;
+  const baseIds = viewDesk ? viewDesk.ids : (teamOnly ? teamIds : null);
+  const fRuns = baseIds ? runs.filter(r=>baseIds.has(r.user_id)) : runs;
+  const fSessions = baseIds ? sessions.filter(r=>baseIds.has(r.user_id)) : sessions;
 
   // per-drill best-per-user boards + per-user standing, computed once
   const perDrill={}, userStat={};
@@ -353,7 +368,21 @@ async function load(){
   Object.values(userStat).forEach(st=>{ st.avg = window.HK_RANK.ratingOf(st.entries);
     st.wsum = st.entries.reduce((a,e)=>a+Math.min(1, Math.log2((e.n||1)+1)/Math.log2(9)),0); });
   const mySolves = meId ? fRuns.filter(x=>x.user_id===meId).length : 0;
-  DATA={profs,runs,sessions,fRuns,fSessions,names,meId,teamIds,myTeam,teamOnly,perDrill,userStat,mySolves};
+  DATA={profs,runs,sessions,fRuns,fSessions,names,meId,teamIds,myTeam,myDesk,viewDesk,teamOnly,perDrill,userStat,mySolves};
+  // desk-page banner + roster (mirrors the secleadMount injection pattern)
+  setTimeout(()=>{ try{
+    let b=document.getElementById('deskBanner');
+    if(DATA.viewDesk){
+      if(!b){ const root=document.getElementById('boards'); b=document.createElement('div'); b.id='deskBanner'; root.parentNode.insertBefore(b, root); }
+      const ids=[...DATA.viewDesk.ids];
+      const roster=ids.map(id=>({id:id, name:DATA.names[id], st:DATA.userStat[id]}))
+        .sort((a,b2)=>(((b2.st&&b2.st.crowns)||0)-((a.st&&a.st.crowns)||0)) || (((b2.st&&b2.st.att)||0)-((a.st&&a.st.att)||0)));
+      b.innerHTML='<div class="section-title">\u25c6 desk: '+esc(DATA.viewDesk.name)+' \u2014 '+ids.length+' analyst'+(ids.length===1?'':'s')+' \u00b7 every board below is desk-only</div>'+
+        '<div class="seclead">'+roster.slice(0,12).map(m=>'<div class="sl"><div class="sl-name">'+esc(m.name)+'</div>'+
+          '<div class="sl-t">'+((m.st&&m.st.crowns)||0)+' crown'+(((m.st&&m.st.crowns)||0)===1?'':'s')+' \u00b7 '+((m.st&&m.st.att)||0)+' boards</div></div>').join('')+
+        (ids.length>12?'<div class="sl"><div class="sl-name" style="color:var(--faint)">+'+(ids.length-12)+' more</div></div>':'')+'</div>';
+    } else if(b){ b.remove(); }
+  }catch(e){} }, 0);
   renderAll();
 }
 
@@ -563,7 +592,7 @@ function browserHtml(){
   const {perDrill,meId,myTeam,teamOnly}=DATA;
   const tabs=[['drills','\u2328 drills'],['marathon','\u23f1 marathon'],['rapidfire','\u26a1 rapid-fire']];
   let html='<div class="tabrow">'+tabs.map(t=>'<span class="tab'+(browseTab===t[0]?' on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</span>').join('');
-  if(myTeam) html+='<span class="tab'+(teamOnly?' on':'')+'" id="teamToggle">'+(teamOnly?'\u25c9 team: '+esc(myTeam):'\u25cb show team only')+'</span>';
+  if(myTeam && !DATA.viewDesk) html+='<span class="tab'+(teamOnly?' on':'')+'" id="teamToggle">'+(teamOnly?'\u25c9 desk: '+esc(myTeam):'\u25cb show desk only')+'</span>';
   html+='</div>';
   if(browseTab==='drills'){
     if(!browseKey || !perDrill[browseKey]) browseKey = (meId && CH.find(c=>perDrill[c.key].some(r=>r.user_id===meId)) || CH[0]).key;

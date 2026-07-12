@@ -233,25 +233,12 @@
       '<button class="auth-go" id="stSave" style="margin-top:12px; width:100%">Save password</button>'+
       '<div class="auth-msg" id="stMsg" style="min-height:14px; margin-top:9px"></div>'+
       '<div class="st-divider"></div>'+
-      '<div class="st-section-h">Team</div>'+
-      '<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:8px;line-height:1.5">Share a private code with your analyst class or finance club \u2014 the leaderboard gets a team-only view.</div>'+
-      '<input id="stTeam" type="text" placeholder="team code (e.g. GS-IBD-2026)" autocomplete="off" style="width:100%;font-family:var(--mono);font-size:13.5px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 12px;outline:none;box-sizing:border-box;text-transform:uppercase">'+
-      '<button class="auth-go" id="stTeamSave" style="margin-top:8px;width:100%">Save team</button>'+
-      '<div class="auth-msg" id="stTeamMsg" style="min-height:14px;margin-top:7px"></div>'+
+      '<div class="st-section-h">Your desk</div>'+
+      '<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:8px;line-height:1.5">Desks replaced team codes \u2014 create one, join by invite link, and share it from your <a href="account.html" style="color:var(--accent)">account page</a>.</div>'+
       '<div class="pc-foot"><a id="stClose">close</a></div>'+
       '</div>';
     const cl=$('stClose'); if(cl) cl.onclick=closeSettings;
     const sv=$('stSave'); if(sv) sv.onclick=doChangePassword;
-    // team code: prefill + save
-    (async()=>{ try{ const r=await window.sb.from('profiles').select('team_code').eq('id',window._navUser.id).single();
-      const el=$('stTeam'); if(el && r.data && r.data.team_code) el.value=r.data.team_code; }catch(e){} })();
-    const tv=$('stTeamSave'); if(tv) tv.onclick=async()=>{
-      const raw=(($('stTeam')||{}).value||'').trim().toUpperCase().slice(0,32);
-      const tm=$('stTeamMsg'); const set=(t,bad)=>{ if(tm){ tm.textContent=t; tm.style.color=bad?'var(--bad)':'var(--accent)'; } };
-      try{ const { error } = await window.sb.from('profiles').update({ team_code: raw||null }).eq('id', window._navUser.id);
-        if(error){ set(error.message||'Couldn\u2019t save.', true); return; }
-        set(raw ? 'Team set \u2014 check the leaderboard \u2713' : 'Left the team \u2713', false);
-      }catch(e){ set('Something went wrong \u2014 try again.', true); } };
     ['stPass1','stPass2'].forEach(id=>{ const el=$(id); if(el) el.onkeydown=e=>{ if(e.key==='Enter') doChangePassword(); }; });
     const p1=$('stPass1'); if(p1) p1.focus();
   }
