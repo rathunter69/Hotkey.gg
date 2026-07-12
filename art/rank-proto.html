@@ -91,43 +91,44 @@ const CRIM ={hi:'#ffb3a1',mid:'#e65843',lo:'#9c2a1c',deep:'#3a0f0b',plateHi:'#3b
 const DIAM ={hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',plateHi:'#21404f',plateLo:'#12232c',core:'#a8ecff'};
 /* ---------- eight bespoke tiers ---------- */
 function t_mba(sz){ const id='e'+(UID++), P=IRON;
-  const sq='M34 34 L66 34 L66 66 L34 66 Z';
+  const sq='M22 22 L78 22 L78 78 L22 78 Z';
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,0)}
     ${frame(id,P,sq,0,3)}
-    <path d="M40 30 L56 46 L47 52 L62 70" fill="none" stroke="${P.deep}" stroke-width="1.6"/>
-    <path d="M35 34.8 L65 34.8" stroke="#ffffff" stroke-width="1.1" opacity=".55"/>
-    <text x="50" y="53.5" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="11" fill="#e0523d">#REF!</text>
+    <path d="M32 16 L56 42 L44 50 L68 84" fill="none" stroke="${P.deep}" stroke-width="2.2"/>
+    <path d="M23.5 23.5 L76.5 23.5" stroke="#ffffff" stroke-width="1.2" opacity=".55"/>
+    <path d="M22 40 L78 40 M22 60 L78 60 M40 22 L40 78 M62 22 L62 78" stroke="${P.mid}" stroke-width=".8" opacity=".35"/>
+    <text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="15" fill="#e0523d">#REF!</text>
   </svg>`; }
 function t_candidate(sz){ const id='e'+(UID++), P=SLATE;
   let notch=''; for(let i=0;i<8;i++){ const a=i*45*Math.PI/180;
-    notch+=`<line x1="${50+Math.cos(a)*27}" y1="${50+Math.sin(a)*27}" x2="${50+Math.cos(a)*30.5}" y2="${50+Math.sin(a)*30.5}" stroke="url(#${id}m)" stroke-width="3.6"/>`; }
+    notch+=`<line x1="${50+Math.cos(a)*34}" y1="${50+Math.sin(a)*34}" x2="${50+Math.cos(a)*38.5}" y2="${50+Math.sin(a)*38.5}" stroke="url(#${id}m)" stroke-width="4.2"/>`; }
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,0)}
     <g class="ornament">${notch}</g>
-    ${frame(id,P,'M50 24 A26 26 0 1 1 49.9 24 Z',0,3.2)}
-    <circle cx="50" cy="50" r="20.5" fill="none" stroke="${P.mid}" stroke-width=".9" opacity=".8"/>
-    <path d="M31 41 A21 21 0 0 1 69 41" fill="none" stroke="#ffffff" stroke-width="1.2" opacity=".5"/>
+    ${frame(id,P,'M50 17 A33 33 0 1 1 49.9 17 Z',0,3.4)}
+    <circle cx="50" cy="50" r="26.5" fill="none" stroke="${P.mid}" stroke-width="1" opacity=".8"/>
+    <path d="M26 39 A27 27 0 0 1 74 39" fill="none" stroke="#ffffff" stroke-width="1.3" opacity=".5"/>
     ${GLY.book(id,P)}
   </svg>`; }
 function t_summer(sz){ const id='e'+(UID++), P=BRONZE;
-  const sh='M50 20 L76 28 L74 56 L50 82 L26 56 L24 28 Z';
+  const sh='M50 10 L82 20 L79 54 L50 90 L21 54 L18 20 Z';
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,0)}
     <circle cx="50" cy="50" r="27" fill="url(#${id}core)"/>
     ${frame(id,P,sh,0,3.2)}
-    <circle cx="30" cy="31.5" r="1.7" fill="url(#${id}m)"/><circle cx="70" cy="31.5" r="1.7" fill="url(#${id}m)"/>
-    <circle cx="28.5" cy="53" r="1.7" fill="url(#${id}m)"/><circle cx="71.5" cy="53" r="1.7" fill="url(#${id}m)"/>
-    <path d="M26.5 27.5 L50 20.8 L73.5 27.5" fill="none" stroke="#ffffff" stroke-width="1.3" opacity=".65"/>
+    <circle cx="25" cy="24.5" r="2" fill="url(#${id}m)"/><circle cx="75" cy="24.5" r="2" fill="url(#${id}m)"/>
+    <circle cx="23.5" cy="50" r="2" fill="url(#${id}m)"/><circle cx="76.5" cy="50" r="2" fill="url(#${id}m)"/>
+    <path d="M21 19.2 L50 11 L79 19.2" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".65"/>
     ${GLY.lanyard(id,P)}
   </svg>`; }
 function t_firstyear(sz){ const id='e'+(UID++), P=SILVER;
-  const hx='M50 14 L77 30 L77 62 L50 86 L23 62 L23 30 Z';
+  const hx='M50 8 L82 26 L82 62 L50 92 L18 62 L18 26 Z';
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 100 100">${defs(id,P,0)}
     <circle cx="50" cy="50" r="29" fill="url(#${id}core)"/>
     <g class="ornament">
-      <path d="M23 30 L15 26 L23 38 M77 30 L85 26 L77 38" fill="none" stroke="url(#${id}m)" stroke-width="2.6"/>
-      <path d="M23 62 L16 68 M77 62 L84 68" stroke="url(#${id}m)" stroke-width="2.6"/></g>
+      <path d="M18 26 L8 21 L18 36 M82 26 L92 21 L82 36" fill="none" stroke="url(#${id}m)" stroke-width="2.8"/>
+      <path d="M18 62 L10 70 M82 62 L90 70" stroke="url(#${id}m)" stroke-width="2.8"/></g>
     ${frame(id,P,hx,0,3.2)}
-    <path d="M50 18.5 L73 32 M50 18.5 L27 32" stroke="#ffffff" stroke-width="1.2" opacity=".55"/>
-    <path d="M50 80 L36 68 M50 80 L64 68" stroke="${P.mid}" stroke-width="1" opacity=".6"/>
+    <path d="M50 12.5 L78 28 M50 12.5 L22 28" stroke="#ffffff" stroke-width="1.3" opacity=".55"/>
+    <path d="M50 86 L32 66 M50 86 L68 66" stroke="${P.mid}" stroke-width="1" opacity=".6"/>
     ${GLY.keycap(id,P)}
   </svg>`; }
 function t_associate(sz){ const id='e'+(UID++), P=GOLD;
@@ -192,12 +193,12 @@ function t_summit(sz){ const id='e'+(UID++), P=DIAM;
     ${GLY.bolt(id,P)}
   </svg>`; }
 const TIERS=[
-  {n:'MBA Associate', g:'the cracked cell — #REF!', f:t_mba, s:.62},
-  {n:'Candidate', g:'the seal — still studying', f:t_candidate, s:.72},
-  {n:'Summer Analyst', g:'the intern lanyard', f:t_summer, s:.8},
-  {n:'First-Year Analyst', g:'the F4 key', f:t_firstyear, s:.86},
-  {n:'Associate', g:'Σ + laurels', f:t_associate, s:.92},
-  {n:'VP', g:'bladed crest — up and right', f:t_vp, s:.96},
+  {n:'MBA Associate', g:'the cracked cell — #REF!', f:t_mba, s:1},
+  {n:'Candidate', g:'the seal — still studying', f:t_candidate, s:1},
+  {n:'Summer Analyst', g:'the intern lanyard', f:t_summer, s:1},
+  {n:'First-Year Analyst', g:'the F4 key', f:t_firstyear, s:1},
+  {n:'Associate', g:'Σ + laurels', f:t_associate, s:1},
+  {n:'VP', g:'bladed crest — up and right', f:t_vp, s:1},
   {n:'MD', g:'horned crest — the pen signs', f:t_md, s:1},
   {n:'Second-Year Analyst', g:'the radiant spire', f:t_summit, s:1},
 ];
