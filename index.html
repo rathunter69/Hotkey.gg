@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=103" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=103">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=103">
+<link rel="icon" href="favicon.ico?v=104" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=104">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=104">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=103"></script>
-<link rel="stylesheet" href="nav.css?v=103">
-<script src="themes.js?v=103"></script>
+<script src="drills.js?v=104"></script>
+<link rel="stylesheet" href="nav.css?v=104">
+<script src="themes.js?v=104"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=103"></script>
+<script src="nav.js?v=104"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2588,58 +2588,67 @@ const CHALLENGES = {
     }
   },
   growth:{
-    name:'Growth', label:'Run the growth rates', par:58, parKeys:37,
-    prompt:'Two revenue builds on one page \u2014 the consolidated line runs across the top; the segment block moves around every run, the way a second segment always does. YoY growth = this year \u00f7 last year \u2212 1, filled across, percent to 1 decimal. Both rows.',
-    req(){ const s=this._seg; return '<em>C3</em> \u00b7 =C2/B2-1 \u00b7 fill C3:F3 \u00b7 <em>ctrl+shift+%</em> \u00b7 then the segment: <em>'+s.c1+s.gr+'</em> \u00b7 ='+s.c1+s.rr+'/'+s.c0+s.rr+'-1 \u00b7 fill '+s.c1+s.gr+':'+s.cN+s.gr+' \u00b7 percent'; },
-    guide(){ const s=this._seg; return [
-      'top build: at C3 \u00b7 <kbd>=</kbd> <kbd>\u2191</kbd> <kbd>/</kbd> <kbd>\u2190</kbd><kbd>\u2191</kbd> <kbd>-</kbd><kbd>1</kbd> <kbd>\u21b5</kbd> \u00b7 fill C3:F3 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'the segment landed at '+s.c0+s.hr+':'+s.cN+s.gr+' this run \u2014 <kbd>ctrl</kbd>+arrows jump you there',
-      'same shape at <b>'+s.c1+s.gr+'</b>, fill to '+s.cN+s.gr+', percent \u2014 growth is growth wherever the block sits',
-    ]; },
-    targets(){ const s=this._seg; return ['C3:F3', s.c1+s.gr+':'+s.cN+s.gr]; },
-    demo(){ const s=this._seg; return [
-      {sel:'C3', keys:[{key:'='},{key:'ArrowUp'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowUp'},{key:'-'},D(1),Kb.enter]},
-      {sel:'C3:F3', keys:[Kb.fillR, Kb.pct]},
-      {sel:s.c1+s.gr, keys:[{key:'='},{key:'ArrowUp'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowUp'},{key:'-'},D(1),Kb.enter]},
-      {sel:s.c1+s.gr+':'+s.cN+s.gr, keys:[Kb.fillR, Kb.pct]},
+    name:'Growth', label:'Run the growth rates', par:110, parKeys:63,
+    prompt:'A real revenue build: two segments, a consolidated line, five fiscal years. Total the segments, run YoY growth off the total \u2014 this year \u00f7 last year \u2212 1, filled across, formatted as a percent \u2014 then land the 4-year CAGR with the ^ key. Three different formulas, and every rate reads like a banker wrote it.',
+    req:'<em>B4</em> total <em>=B2+B3</em> fill \u2192 \u00b7 <em>C5</em> YoY <em>=C4/B4-1</em> \u00b7 fill C5:F5 \u2192 + <em>ctrl+shift+%</em> \u00b7 <em>B7</em> CAGR <em>=(F4/B4)^(1/4)-1</em> + <em>ctrl+shift+%</em> \u00b7 dress B4:F4: <em>ctrl+b</em>',
+    guide:[
+      'consolidate at B4 \u00b7 <kbd>=B2+B3</kbd> \u2014 both segments \u00b7 fill right',
+      'YoY at C5 \u00b7 <kbd>=C4/B4-1</kbd> \u2014 this year over last, minus one \u00b7 fill C5:F5 \u2192',
+      'select C5:F5 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 growth reads as percents',
+      'CAGR at B7 \u00b7 <kbd>=(F4/B4)^(1/4)-1</kbd> \u2014 the ^ key earns its place \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
+      'bold the consolidated line: select B4:F4 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
+    ],
+    targets:['B4','B4:F4','C5','C5:F5','B7'],
+    demo(){ return [
+      {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
+      {sel:'B4:F4', keys:[Kb.fillR]},
+      {sel:'C5', keys:[...T('=C4/B4-1'), Kb.enter]},
+      {sel:'C5:F5', keys:[Kb.fillR]},
+      {sel:'C5:F5', keys:[Kb.pct]},
+      {sel:'B7', keys:[...T('=(F4/B4)^(1/4)-1'), Kb.enter]},
+      {sel:'B7', keys:[Kb.pct]},
+      {sel:'B4:F4', keys:[Kb.bold]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Consolidated',txt:true,bold:true};
-      ['Y1','Y2','Y3','Y4','Y5'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
-      cells['A2']={...blankCell(),value:'Revenue',txt:true};
-      cells['A3']={...blankCell(),value:'Growth',txt:true};
-      this._g1=[]; let prev=null;
-      for(let i=0;i<5;i++){ const v=Math.round(rnd(60,120)*10*Math.pow(1+rnd(3,18)/100,i));
-        cells[colLetter(i+2)+2]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        if(i>0) this._g1.push(v/prev-1);
-        prev=v; }
-      [3,4,5,6].forEach(c=>cells[colLetter(c)+3]={...blankCell()});
-      // segment block: position AND width vary per run
-      const spots=[{r:7,c:5},{r:7,c:2},{r:9,c:4},{r:8,c:6}];
-      const sp=spots[rnd(0,spots.length-1)];
-      const yrs=rnd(3,4);
-      const lab=colLetter(sp.c);
-      cells[lab+sp.r]={...blankCell(),value:'Segment B',txt:true,bold:true};
-      for(let i=0;i<yrs;i++) cells[colLetter(sp.c+1+i)+sp.r]={...blankCell(),value:'Y'+(i+1),txt:true,bold:true,align:'r'};
-      cells[lab+(sp.r+1)]={...blankCell(),value:'Revenue',txt:true};
-      cells[lab+(sp.r+2)]={...blankCell(),value:'Growth',txt:true};
-      this._g2=[]; prev=null;
-      for(let i=0;i<yrs;i++){ const v=Math.round(rnd(20,60)*10*Math.pow(1+rnd(2,25)/100,i));
-        cells[colLetter(sp.c+1+i)+(sp.r+1)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        if(i>0) this._g2.push(v/prev-1);
-        prev=v; }
-      this._seg={ hr:sp.r, rr:sp.r+1, gr:sp.r+2, c0:colLetter(sp.c+1), c1:colLetter(sp.c+2), cN:colLetter(sp.c+yrs), cols:[] };
-      for(let i=1;i<yrs;i++) this._seg.cols.push(colLetter(sp.c+1+i));
-      return {ROWS:12, cells, active:{r:3,c:3}, sel:null, colW:{1:96}};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 revenue build ($mm)',txt:true,bold:true};
+      const y0=rnd(24,26);
+      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      const segs=['Products revenue','Services revenue'];
+      cells['A2']={...blankCell(),value:segs[0],txt:true};
+      cells['A3']={...blankCell(),value:segs[1],txt:true};
+      cells['A4']={...blankCell(),value:'Total revenue',txt:true,bold:true};
+      cells['A5']={...blankCell(),value:'YoY growth',txt:true};
+      cells['A7']={...blankCell(),value:'CAGR (4-yr)',txt:true};
+      let a=rnd(40,90)*10, b=rnd(20,60)*10;
+      this._tot=[];
+      for(let i=0;i<5;i++){ const col=colLetter(i+2);
+        cells[col+2]={...blankCell(),value:a,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+3]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0};
+        if(i>0) cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0};
+        this._tot.push(a+b);
+        a=Math.round(a*(1+rnd(2,12)/100)); b=Math.round(b*(1+rnd(2,14)/100)); }
+      cells['B7']={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._yoy=[1,2,3,4].map(i=>this._tot[i]/this._tot[i-1]-1);
+      this._cagr=Math.pow(this._tot[4]/this._tot[0],1/4)-1;
+      return {ROWS:7, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:70,3:70,4:70,5:70,6:70}};
     },
     checks(S){
-      const ok=(cols,row,exps)=>cols.every((cl,i)=>{ const c=S.cells[cl+row];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exps[i])<1e-4&&c.fmtStyle==='percent'); });
-      const s=this._seg;
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F'];
+      const totOk=[0,1,2,3,4].every(i=>{ const val=v(COL[i]+'4'); return val!==null&&Math.abs(val-this._tot[i])<0.5; });
+      const yoyOk=[1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'5'];
+        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._yoy[i-1])<1e-3&&c.fmtStyle==='percent'); });
+      const cagrC=S.cells['B7'];
+      const cagrOk=!!(cagrC&&cagrC.formula&&String(cagrC.formula).includes('^')&&typeof cagrC.value==='number'&&Math.abs(cagrC.value-this._cagr)<1e-3&&cagrC.fmtStyle==='percent');
+      const boldOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'4']; return !!(c&&c.bold); });
       return [
-        {label:'consolidated growth row \u2014 live, filled, percent (C3:F3)', ok: ok(['C','D','E','F'],3,this._g1)},
-        {label:'segment growth row \u2014 wherever it landed ('+s.c1+s.gr+':'+s.cN+s.gr+')', ok: ok(s.cols,s.gr,this._g2)},
+        {label:'total revenue \u2014 segments consolidated live, all five years', ok: totOk&&refs('B4',['B2','B3'])},
+        {label:'YoY growth \u2014 this year over last, live and percent-formatted', ok: yoyOk&&refs('C5',['C4','B4'])},
+        {label:'CAGR \u2014 compounded with the ^ key, off first and last totals', ok: cagrOk&&refs('B7',['F4','B4'])},
+        {label:'the consolidated line is bold \u2014 it carries the page', ok: boldOk},
       ];
     }
   },
@@ -2826,56 +2835,56 @@ const CHALLENGES = {
     }
   },
   revolver:{
-    name:'Revolver', label:'Sweep the revolver', par:52, parKeys:27,
-    prompt:'The end-of-year cash sweep: pay the revolver down with whatever cash you can spare. Sweep = the LESSER of the outstanding balance and the cash you have above the minimum \u2014 and never negative. Canonical form: =MIN(B3, MAX(0, B2-B4)) \u2014 but any formula that produces the right sweep from these inputs is accepted.',
-    req:'<em>at B5</em> \u00b7 sweep = min(balance, cash available \u2212 min cash), floored at 0 \u00b7 fill across <em>ctrl+r</em>',
+    name:'Revolver', label:'Sweep the revolver', par:113, parKeys:65,
+    prompt:'Four year-end sweeps, each with its own cash picture. Sweep = the LESSER of the outstanding balance and the cash above minimum \u2014 never negative \u2014 then prove each year out: revolver after the sweep, cash after the sweep, and the balance row dressed. MIN and MAX nested once, arithmetic twice, one bold rule.',
+    req:'<em>B5</em> <em>=MIN(B3,MAX(0,B2-B4))</em> \u00b7 fill B5:E5 \u2192 \u00b7 <em>B6</em> <em>=B3-B5</em> fill \u2192 \u00b7 <em>B7</em> <em>=B2-B5</em> fill \u2192 \u00b7 dress B6:E6: <em>ctrl+b</em> + <em>alt h b t</em>',
     guide:[
-      'at B5 type <kbd>=MIN(B3,MAX(0,B2-B4))</kbd> <kbd>\u21b5</kbd> \u2014 can\u2019t sweep more than the balance, can\u2019t dip below minimum cash',
-      'back to B5 \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd><kbd>\u2192</kbd><kbd>\u2192</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 one formula sweeps all four years',
+      'the sweep at B5 \u00b7 <kbd>=MIN(B3,MAX(0,B2-B4))</kbd> <kbd>\u21b5</kbd> \u2014 can\u2019t sweep more than the balance, can\u2019t dip below minimum cash',
+      'select B5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 one formula sweeps all four years',
+      'revolver after the sweep: B6 \u00b7 <kbd>=B3-B5</kbd> \u00b7 fill \u2192 \u00b7 cash after: B7 \u00b7 <kbd>=B2-B5</kbd> \u00b7 fill \u2192',
+      'dress the balance row: select B6:E6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ],
-    targets:['B5','B5'],
+    targets:['B5','B5:E5','B6','B7','B6:E6'],
     demo(){ return [
       {sel:'B5', keys:[...T('=MIN(B3,MAX(0,B2-B4))'), Kb.enter]},
-      {sel:'B5', keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'r',ctrl:true}]},
+      {sel:'B5:E5', keys:[Kb.fillR]},
+      {sel:'B6', keys:[...T('=B3-B5'), Kb.enter]},
+      {sel:'B6:E6', keys:[Kb.fillR]},
+      {sel:'B7', keys:[...T('=B2-B5'), Kb.enter]},
+      {sel:'B7:E7', keys:[Kb.fillR]},
+      {sel:'B6:E6', keys:[Kb.bold]},
+      {sel:'B6:E6', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 cash sweep ($mm)',txt:true,bold:true};
-      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
-      cells['A2']={...blankCell(),value:'Cash available',txt:true};
-      cells['A3']={...blankCell(),value:'Revolver balance',txt:true};
-      cells['A4']={...blankCell(),value:'Minimum cash',txt:true};
-      cells['A5']={...blankCell(),value:'Cash sweep',txt:true,bold:true};
-      // engineered mix: one full paydown, one partial, one zero (cash below minimum)
-      const scenarios=[
-        ()=>({cash:rnd(30,60)*10, bal:rnd(5,15)*10, minc:rnd(5,10)*10}),   // full: spare > balance
-        ()=>({cash:rnd(20,40)*10, bal:rnd(35,60)*10, minc:rnd(5,10)*10}),  // partial: spare < balance
-        ()=>({cash:rnd(4,8)*10,  bal:rnd(20,40)*10, minc:rnd(10,15)*10}),  // zero: cash under minimum
-        ()=>({cash:rnd(15,50)*10, bal:rnd(10,45)*10, minc:rnd(5,12)*10}),  // wildcard
-      ];
-      for(let k=scenarios.length-1;k>0;k--){ const j=rnd(0,k); [scenarios[k],scenarios[j]]=[scenarios[j],scenarios[k]]; }
+      cells['A1']={...blankCell(),value:codename()+' \u2014 revolver sweep ($mm)',txt:true,bold:true};
+      const y0=rnd(24,26);
+      for(let i=0;i<4;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      const rows=[[2,'Cash available'],[3,'Revolver balance'],[4,'Minimum cash'],[5,'Cash sweep'],[6,'Revolver, post-sweep'],[7,'Cash, post-sweep']];
+      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===6)});
       this._exp=[];
-      for(let i=0;i<4;i++){
-        const sc=scenarios[i](); const col=colLetter(i+2);
-        cells[col+'2']={...blankCell(),value:sc.cash,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[col+'3']={...blankCell(),value:sc.bal,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[col+'4']={...blankCell(),value:sc.minc,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[col+'5']={...blankCell(),fmtStyle:'comma',decimals:0};
-        this._exp.push(Math.max(0, Math.min(sc.bal, sc.cash-sc.minc)));
+      for(let i=0;i<4;i++){ const col=colLetter(i+2);
+        const cashA=rnd(6,30)*10, bal=rnd(5,25)*10, minC=rnd(2,12)*10;
+        cells[col+2]={...blankCell(),value:cashA,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+3]={...blankCell(),value:bal,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+4]={...blankCell(),value:minC,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        [5,6,7].forEach(r=>cells[col+r]={...blankCell(),fmtStyle:'comma',decimals:0});
+        const sw=Math.min(bal,Math.max(0,cashA-minC));
+        this._exp.push({sw:sw, rvE:bal-sw, cashE:cashA-sw});
       }
-      return {ROWS:5, cells, active:{r:5,c:2}, sel:null, colW:{1:128,2:76,3:76,4:76,5:76}};
+      return {ROWS:7, cells, active:{r:5,c:2}, sel:null, colW:{1:170,2:74,3:74,4:74,5:74}};
     },
     checks(S){
-      // END-STATE grading: live formula + right sweep VALUE. No function-name policing —
-      // MIN/MAX, IF chains, whatever produces the correct sweep from these inputs passes.
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
       const COL=['B','C','D','E'];
-      const dOk=i=>{ const col=COL[i], c=S.cells[col+'5']; if(!c||!c.formula) return false;
-        const f=String(c.formula).toUpperCase();
-        const refs=[col+'2',col+'3',col+'4'].filter(r=>f.includes(r)).length;
-        return refs>=2 && Math.abs(c.value-this._exp[i])<0.5; };
-      let ok=true; for(let i=0;i<4;i++) if(!dOk(i)) ok=false;
+      const dressOk=[0,1,2,3].every(i=>{ const c=S.cells[COL[i]+'6']; return !!(c&&c.bold&&c.bt); });
       return [
-        {label:'sweep each year: the lesser of the balance and the cash above minimum \u2014 never negative, all 4 years live', ok},
+        {label:'the sweep \u2014 MIN of balance and spare cash, floored at zero, all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'5',this._exp[i].sw))&&refs('B5',['MIN(','MAX('])},
+        {label:'revolver after the sweep, all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'6',this._exp[i].rvE))},
+        {label:'cash after the sweep \u2014 never below the minimum', ok: [0,1,2,3].every(i=>near(COL[i]+'7',this._exp[i].cashE))},
+        {label:'the balance row is DRESSED \u2014 bold with a rule above', ok: dressOk},
       ];
     }
   },
@@ -3776,52 +3785,60 @@ const CHALLENGES = {
     }
   },
   balance:{
-    name:'Balance', label:'Make it balance', par:55, parKeys:18,
-    prompt:'Assets = Liabilities + Equity \u2014 and retained earnings is NEVER a plug; it\u2019s earned. Foot both sides independently with AutoSum, then build the check cell. The check is a DIAGNOSTIC: it reads zero because the sheet is right, not because you forced it.',
-    req:'<em>B6</em> \u00b7 <em>alt+=</em> foots assets \u00b7 <em>B13</em> \u00b7 <em>alt+=</em> foots L&E (retained earnings is a given, not a plug) \u00b7 <em>B14 check</em> \u00b7 <em>=B6-B13</em> \u2192 reads 0 because both sides are honest',
+    name:'Balance', label:'Make it balance', par:126, parKeys:75,
+    prompt:'Two years of balance sheet \u2014 and retained earnings is NEVER a plug; it\u2019s earned, so it\u2019s a given like everything else. Foot both sides with live SUMs, build the check row, and dress the totals. The check is a DIAGNOSTIC: it reads zero because the sheet is right, not because you forced it.',
+    req:'<em>B6</em> <em>=SUM(B2:B5)</em> fill \u2192 \u00b7 <em>B12</em> <em>=SUM(B8:B11)</em> fill \u2192 \u00b7 <em>B14</em> check <em>=B6-B12</em> fill \u2192 \u00b7 dress: <em>ctrl+b</em> B6:C6 and B12:C12 \u00b7 <em>alt h b t</em> B14:C14',
     guide:[
-      'foot the assets \u00b7 at B6 \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> \u00b7 <kbd>\u21b5</kbd>',
-      'foot L&E at B13 \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> \u00b7 <kbd>\u21b5</kbd> \u2014 all four lines are real inputs; nothing gets backed into',
-      'the check at B14 \u00b7 <kbd>=B6-B13</kbd> \u2014 a diagnostic, not a construction. Zero means the sheet is right.',
+      'foot the assets at B6 \u00b7 <kbd>=SUM(B2:B5)</kbd> (<kbd>alt</kbd>+<kbd>=</kbd> proposes it) \u00b7 fill right',
+      'foot L&E at B12 \u00b7 <kbd>=SUM(B8:B11)</kbd> \u2014 all four lines are real inputs; nothing gets backed into \u00b7 fill right',
+      'the check at B14 \u00b7 <kbd>=B6-B12</kbd> \u00b7 fill right \u2014 a diagnostic, not a construction; zero means the sheet is right',
+      'dress it: <kbd>ctrl</kbd>+<kbd>b</kbd> both total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> the check row',
     ],
-    targets:['B6','B13','B14'],
+    targets:['B6','B6:C6','B12','B12:C12','B14','B14:C14'],
     demo(){ return [
-      {sel:'B6',  keys:[Kb.eq, Kb.enter]},
-      {sel:'B13', keys:[Kb.eq, Kb.enter]},
-      {sel:'B14', keys:[...T('=B6-B13'), Kb.enter]},
+      {sel:'B6', keys:[...T('=SUM(B2:B5)'), Kb.enter]},
+      {sel:'B6:C6', keys:[Kb.fillR]},
+      {sel:'B12', keys:[...T('=SUM(B8:B11)'), Kb.enter]},
+      {sel:'B12:C12', keys:[Kb.fillR]},
+      {sel:'B14', keys:[...T('=B6-B12'), Kb.enter]},
+      {sel:'B14:C14', keys:[Kb.fillR]},
+      {sel:'B6:C6', keys:[Kb.bold]},
+      {sel:'B12:C12', keys:[Kb.bold]},
+      {sel:'B14:C14', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
     ]; },
     build(){
       const cells={};
-      const num=v=>({...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'});
-      cells['A1']={...blankCell(),value:codename()+' \u2014 balance sheet ($mm)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Assets',txt:true,bold:true};
-      const aL=['Cash','Receivables','PP&E'];
-      const aV=aL.map(()=>rnd(20,200)*10);
-      aL.forEach((l,i)=>{ cells['A'+(3+i)]={...blankCell(),value:l,txt:true}; cells['B'+(3+i)]=num(aV[i]); });
-      cells['A6']={...blankCell(),value:'Total assets',txt:true,bold:true};
-      cells['B6']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A8']={...blankCell(),value:'Liabilities & equity',txt:true,bold:true};
-      const totalA=aV.reduce((a,b)=>a+b,0);
-      // three L&E lines given; the FOURTH (retained earnings) is ALSO given —
-      // the build engineers the values to tie, so the player's check is honest.
-      const ap=rnd(10,60)*10, debt=rnd(20,120)*10, cs=rnd(10,50)*10;
-      const re=totalA-ap-debt-cs;
-      const lL=[['Payables',ap],['Debt',debt],['Common stock',cs],['Retained earnings',re]];
-      lL.forEach(([l,v],i)=>{ cells['A'+(9+i)]={...blankCell(),value:l,txt:true}; cells['B'+(9+i)]=num(v); });
-      cells['A13']={...blankCell(),value:'Total L&E',txt:true,bold:true};
-      cells['B13']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A14']={...blankCell(),value:'Check',txt:true,bold:true};
-      cells['B14']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-      this._exp={a:totalA};
-      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:150,2:88}};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 balance check ($mm)',txt:true,bold:true};
+      const y0=rnd(24,26);
+      for(let i=0;i<2;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      const rows=[[2,'Cash'],[3,'Receivables'],[4,'Inventory'],[5,'PP&E'],[6,'Total assets'],[8,'Payables'],[9,'Debt'],[10,'Common stock'],[11,'Retained earnings'],[12,'Total liabs & equity'],[14,'Check']];
+      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===6||r===12||r===14)});
+      this._exp={};
+      for(let i=0;i<2;i++){ const col=colLetter(i+2);
+        const ar=rnd(10,30)*10, inv=rnd(8,24)*10, ppe=rnd(30,70)*10;
+        const ap=rnd(8,20)*10, debt=rnd(20,50)*10, cs=rnd(10,30)*10, re=rnd(15,45)*10;
+        const totLE=ap+debt+cs+re, cash=totLE-ar-inv-ppe;
+        [[2,cash],[3,ar],[4,inv],[5,ppe],[8,ap],[9,debt],[10,cs],[11,re]].forEach(([r,val])=>
+          cells[col+r]={...blankCell(),value:val,fontColor:'blue',fmtStyle:'comma',decimals:0});
+        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+12]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+14]={...blankCell(),fmtStyle:'comma',decimals:1};
+        this._exp[col]={ta:totLE, tle:totLE};
+      }
+      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:170,2:84,3:84}};
     },
     checks(S){
-      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
-      const sumRef=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&String(c.formula).toUpperCase().includes('SUM')); };
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C'];
+      const dressOk=COL.every(c=>{ const a=S.cells[c+'6'], b=S.cells[c+'12'], ck=S.cells[c+'14'];
+        return !!(a&&a.bold&&b&&b.bold&&ck&&ck.bt); });
       return [
-        {label:'assets footed with a live SUM', ok: near('B6',this._exp.a)&&sumRef('B6')},
-        {label:'L&E footed with a live SUM \u2014 retained earnings stays a GIVEN, never a plug', ok: near('B13',this._exp.a)&&sumRef('B13')},
-        {label:'the check reads zero \u2014 diagnostic, not construction', ok: near('B14',0)},
+        {label:'total assets \u2014 a live SUM over all four lines, both years', ok: COL.every(c=>near(c+'6',this._exp[c].ta))&&refs('B6',['SUM('])},
+        {label:'total L&E \u2014 SUM-footed, RE is a given not a plug, both years', ok: COL.every(c=>near(c+'12',this._exp[c].tle))&&refs('B12',['SUM('])},
+        {label:'the check row reads ZERO both years \u2014 it balances honestly', ok: COL.every(c=>near(c+'14',0))&&refs('B14',['B6','B12'])},
+        {label:'DRESSED \u2014 totals bold, check row ruled off', ok: dressOk},
       ];
     }
   },
@@ -4041,46 +4058,67 @@ const CHALLENGES = {
   },
 
   sumif:{
-    name:'SUMIF', label:'Roll up the segments', par:52, parKeys:35,
-    prompt:'Roll the ledger up by segment. Seven line items, three segments — build one SUMIF with anchored ranges at E2, then fill it down for the other two. $-lock the ranges so the fill doesn\'t walk them.',
-    req:'<em>at E2</em> type <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> · <em>↵</em> · back up, select E2:E4, <em>ctrl+d</em>',
+    name:'SUMIF', label:'Roll up the segments', par:140, parKeys:85,
+    prompt:'A raw ledger on the left, a summary the MD can read on the right. One SUMIF with anchored ranges, filled down for the other segments \u2014 only the criteria cell walks. Then foot the summary with a live SUM, run % of total off an anchored denominator, and bold the total line. Rollup, ratio, dress: a real summary tab.',
+    req:'<em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> \u00b7 fill E2:E4 \u2193 \u00b7 <em>E5</em> <em>=SUM(E2:E4)</em> \u00b7 <em>F2</em> <em>=E2/$E$5</em> \u00b7 fill F2:F4 \u2193 + <em>ctrl+shift+%</em> \u00b7 dress D5:E5: <em>ctrl+b</em> + <em>alt h b t</em>',
     guide:[
-      'at E2 type <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>↵</kbd> — criteria range, this row\'s segment, sum range',
-      'the $ anchors matter: only D2 should walk when you fill down',
-      'back up (<kbd>↑</kbd>), <kbd>shift</kbd>+<kbd>↓</kbd>&times;2, then <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'the rollup at E2 \u00b7 <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>\u21b5</kbd> \u2014 ranges $-locked, criteria walking',
+      'select E2:E4 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 only D2 walks; that is what the anchors buy you',
+      'foot it at E5 \u00b7 <kbd>=SUM(E2:E4)</kbd> \u2014 the summary must tie to the ledger',
+      'mix at F2 \u00b7 <kbd>=E2/$E$5</kbd> \u2014 anchored denominator \u00b7 fill F2:F4 \u2193 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
+      'dress the total: select D5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ],
-    targets:['E2','E2:E4'],
+    targets:['E2','E2:E4','E5','F2','F2:F4','D5:E5'],
     demo(){ return [
       {sel:'E2', keys:[...T('=SUMIF($A$2:$A$10,D2,$B$2:$B$10)'), Kb.enter]},
       {sel:'E2:E4', keys:[Kb.fillD]},
+      {sel:'E5', keys:[...T('=SUM(E2:E4)'), Kb.enter]},
+      {sel:'F2', keys:[...T('=E2/$E$5'), Kb.enter]},
+      {sel:'F2:F4', keys:[Kb.fillD]},
+      {sel:'F2:F4', keys:[Kb.pct]},
+      {sel:'D5:E5', keys:[Kb.bold]},
+      {sel:'D5:E5', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Segment',txt:true,bold:true};
-      cells['B1']={...blankCell(),value:'Amount',txt:true,bold:true};
-      cells['D1']={...blankCell(),value:'Rollup',txt:true,bold:true};
-      cells['E1']={...blankCell(),value:'Total',txt:true,bold:true};
-      const cats=['NA','EMEA','APAC'];
-      const sums={NA:0,EMEA:0,APAC:0};
-      for(let i=0;i<9;i++){
-        const cat = i<3 ? cats[i] : cats[rnd(0,2)];   // r81: 9 data rows      // each segment appears at least once
-        const v = rnd(10,240)*10;
-        sums[cat]+=v;
-        cells['A'+(i+2)]={...blankCell(),value:cat,txt:true};
-        cells['B'+(i+2)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells['A1']={...blankCell(),value:'Ledger',txt:true,bold:true};
+      cells['D1']={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells['E1']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
+      cells['F1']={...blankCell(),value:'% of total',txt:true,bold:true,align:'r'};
+      const segs=['Freight','Brokerage','Storage'];
+      const sums=[0,0,0];
+      for(let r=2;r<=10;r++){
+        const si=rnd(0,2), amt=rnd(20,140)*5;
+        sums[si]+=amt;
+        cells['A'+r]={...blankCell(),value:segs[si],txt:true};
+        cells['B'+r]={...blankCell(),value:amt,fontColor:'blue',fmtStyle:'comma',decimals:0};
       }
-      cats.forEach((c,i)=>{ cells['D'+(i+2)]={...blankCell(),value:c,txt:true};
-        cells['E'+(i+2)]={...blankCell(),fmtStyle:'comma',decimals:0}; });
-      this._sums=sums; this._cats=cats;
-      return {ROWS:9, cells, active:{r:2,c:5}, sel:null, colW:{1:86,2:84,4:80,5:88}};
+      for(let i=0;i<3;i++){
+        cells['D'+(2+i)]={...blankCell(),value:segs[i],txt:true};
+        cells['E'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells['F'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
+      }
+      cells['D5']={...blankCell(),value:'Total',txt:true};
+      cells['E5']={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._sums=sums; this._tot=sums[0]+sums[1]+sums[2];
+      return {ROWS:10, cells, active:{r:2,c:5}, sel:null, colW:{1:110,2:80,4:110,5:80,6:80}};
     },
     checks(S){
-      const ok=i=>{ const c=S.cells['E'+(i+2)]; if(!c||!c.formula) return false;
-        const f=c.formula.toUpperCase().replace(/\s/g,'');
-        return f.includes('SUMIF')&&f.includes('D'+(i+2))&&Math.abs(c.value-this._sums[this._cats[i]])<1e-6; };
-      let anchored=true; const c0=S.cells['E3'];   // filled rows prove the anchors held
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
+      const anchOk=refs('E2',['SUMIF','$A$2:$A$10','$B$2:$B$10']);
+      const rollOk=[0,1,2].every(i=>{ const val=v('E'+(2+i)); return val!==null&&Math.abs(val-this._sums[i])<0.5; });
+      const totC=S.cells['E5'];
+      const totOk=!!(totC&&totC.formula&&String(totC.formula).toUpperCase().includes('SUM(')&&Math.abs(totC.value-this._tot)<0.5);
+      const pctOk=[0,1,2].every(i=>{ const c=S.cells['F'+(2+i)];
+        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._sums[i]/this._tot)<1e-3&&c.fmtStyle==='percent'); })
+        && refs('F2',['$E$5']);
+      const dressOk=['D5','E5'].every(k=>{ const c=S.cells[k]; return !!(c&&c.bold&&c.bt); });
       return [
-        {label:'Roll each segment up with SUMIF \u2014 criteria pointing at column D (all 3)', ok: ok(0)&&ok(1)&&ok(2)},
+        {label:'one SUMIF, ranges $-locked \u2014 only the criteria walks the fill', ok: anchOk&&rollOk},
+        {label:'the summary foots with a live SUM', ok: totOk},
+        {label:'% of total off the anchored denominator, all three segments', ok: pctOk},
+        {label:'the total line is DRESSED \u2014 bold with a rule above', ok: dressOk},
       ];
     }
   },

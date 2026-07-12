@@ -84,17 +84,17 @@ window.HOTKEY_DRILLS = {
 
     // Formulas
     margin:     { name:'Formula',  label:'Build the margin',    tab:'Margin',      desc:'Build a margin formula down the column' },
-    growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'YoY growth row — point it, fill right, format %' },
+    growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'Consolidate, YoY as %, CAGR with ^ — a real revenue build' },
     wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
     dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'DF row \u00d7 PV row; the TV reuses the year-5 factor' },
     lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — then IRR over the hold' },
-    revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'LBO cash sweep — MAX the draw, MIN the paydown' },
+    revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'MIN/MAX sweep ×4 years, then prove out both balances' },
     cagr:       { name:'CAGR',     label:'Compound it',         tab:'CAGR',        desc:'One-cell CAGR with the ^ power key' },
-    sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'Anchored SUMIF rollup — $-lock the ranges, fill down' },
+    sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'SUMIF rollup + live foot + % of total, summary dressed' },
     cases:      { name:'Sticky switch', label:'Sticky IFs \u2014 one switch runs the model', tab:'Cases', desc:'Anchored scenario IF, filled across, then flip the switch' },
     bridge:     { name:'Bridge',   label:'Stretch the profit row', tab:'Bridge',   desc:'Profit = revenue × margin, fill it across years' },
     foot:       { name:'Foot',     label:'Total it both ways',  tab:'Cross-foot',  desc:'SUM across and down, tie out the corner' },
-    balance:    { name:'Balance',  label:'Make it balance',     tab:'Balance',     desc:'Foot both sides, plug the equity, CHECK cell must read 0' },
+    balance:    { name:'Balance',  label:'Make it balance',     tab:'Balance',     desc:'2 yrs SUM-footed both sides, check at zero, totals dressed' },
     audit:      { name:'The 4am pass', label:'The 4am pass \u2014 find what\u2019s broken', tab:'Audit', desc:'Three planted breaks in a real P&L \u2014 find them all' },
     percent:    { name:'% of rev', label:'Common-size it',      tab:'Common-size', desc:'Common-size with an anchored ($) formula' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'5-yr roll: linked openings + the accumulated-dep memo' },
@@ -172,7 +172,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":42,"pastes":44,"transpose":40,"saves":44,"editfix":44,"undo":28,"autofit":34,"rowops":26,"filldr":24,"blocksel":30,"copyover":36,"polish":38,"foot":72,"comps":161,"center":44,"blue":62,"sort":40,"series":30,"bridge":40,"growth":58,"wacc":142,"dcf":140,"lbo":113,"revolver":52,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":55,"audit":32,"sumif":52,"lookup2":60,"navigation":30,"dress":97};
+window.HOTKEY_PARS = {"drill":13,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":42,"pastes":44,"transpose":40,"saves":44,"editfix":44,"undo":28,"autofit":34,"rowops":26,"filldr":24,"blocksel":30,"copyover":36,"polish":38,"foot":72,"comps":161,"center":44,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":126,"audit":32,"sumif":140,"lookup2":60,"navigation":30,"dress":97};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

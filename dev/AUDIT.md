@@ -2350,3 +2350,23 @@ statement layouts, named companies, FY headers, associate-voice checklists.
 - Sweep classifier fix: unknown alt-walk terminals now throw UNSUPPORTED
   instead of silently no-oping (rowops/series were misreported as fails).
 - v103.
+
+---
+# ROUND 105 — T4a: FORMULAS FAMILY, FIRST TRANCHE (growth/sumif/balance/revolver)
+- Sweep-informed scope: these four were the thinnest (1-2 motions); margin/
+  percent/foot/cases are doctrine-era already and ride T4b (titles/voice).
+- GROWTH (#26 closed) — real revenue build: two segments consolidated live,
+  YoY row as %, 4-yr CAGR with ^, consolidated line bolded. Typed refs (the
+  fill steps Wolf called unclear are now explicit). 110/63 (was 58/37).
+- SUMIF — ledger → summary tab: anchored SUMIF fill, live SUM foot,
+  % of total off $E$5, total line dressed. 140/85 (was 52/35).
+- BALANCE — 2 years, SUM-footed both sides (RE a GIVEN, never a plug),
+  check row zero ×2, totals bold + check ruled. 126/75 (was 55/18; the old
+  drill was alt+= twice and one subtraction). 
+- REVOLVER — 4 sweeps + prove-outs (revolver post-sweep, cash post-sweep),
+  balance row dressed. 113/65 (was 52/27).
+- All 40-seed triple-assert. New demos are TYPED-REF (harness-verifiable);
+  pointer skills still live in margin/bridge (which keep pointer demos).
+- Splicer scanner now comment-aware (an apostrophe in a // comment poisoned
+  the string-state machine — caught by the EOF assert, write stayed atomic).
+- v104.
