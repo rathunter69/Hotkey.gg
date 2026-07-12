@@ -165,11 +165,9 @@ async function load(){
       <div id="acThemes" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     </div>
 
-    <div class="card"><h4>Team</h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px">Share a private code with your analyst class or club — the leaderboard gets a team-only view.</div>
-      <label>team code</label>
-      <input id="acTeam" maxlength="32" value="${esc(prof.team_code||'')}" placeholder="e.g. GS-IBD-2026" style="text-transform:uppercase">
-      <button class="btn" id="acTeamSave">Save team</button><div class="msg" id="acTeamMsg"></div>
+    <div class="card"><h4>Your desk</h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:6px">Your analyst class, club, or cohort — one desk per player, invite by link.</div>
+      <div id="deskBody"><div class="msg">loading\u2026</div></div>
     </div>
 
     <div class="card"><h4>Card flair <span style="color:var(--warn);font-size:9px;letter-spacing:1px">PRO · free in beta</span></h4>
@@ -248,12 +246,61 @@ async function load(){
       }
       say('acHandleMsg','Saved \u2713 \u2014 the boards update on next load. (Handles can change once every 7 days.)'); }catch(e){ say('acHandleMsg','Something went wrong.',true); }
   };
-  document.getElementById('acTeamSave').onclick=async()=>{
-    const v=document.getElementById('acTeam').value.trim().toUpperCase().slice(0,32);
-    try{ const {error}=await sb.from('profiles').update({team_code:v||null}).eq('id',me.id);
-      if(error){ say('acTeamMsg',error.message||'Couldn\u2019t save.',true); return; }
-      say('acTeamMsg', v?'Team set \u2713 — check the leaderboard':'Left the team \u2713'); }catch(e){ say('acTeamMsg','Something went wrong.',true); }
-  };
+  // DESKS v1 (r110): create / join / invite / leave, all through security-definer RPCs.
+  // The invite code never comes from a table read — my_desk() returns it to captains only.
+  const deskErr = e => { const m=String((e&&e.message)||e||'');
+    if(m.includes('DESK_NAME_RESERVED')) return 'That name isn\u2019t available.';
+    if(m.includes('ALREADY_ON_DESK'))   return 'You\u2019re already on a desk \u2014 leave it first.';
+    if(m.includes('DESK_NOT_FOUND'))    return 'That invite code isn\u2019t valid.';
+    if(m.includes('DESK_FULL'))         return 'That desk is full (200).';
+    if(m.includes('duplicate key'))     return 'A desk with that name already exists.';
+    return 'Something went wrong.'; };
+  async function renderDesk(){
+    const el=document.getElementById('deskBody'); if(!el) return;
+    let d=null;
+    try{ const {data}=await sb.rpc('my_desk'); d=(data&&data[0])||null; }catch(e){}
+    if(d){
+      const inv = d.invite_code
+        ? `<div class="rowline"><span class="k">invite link</span><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><code id="deskLink" style="font-size:11px">https://www.hotkey.gg/?desk=${esc(d.invite_code)}</code><button class="btn ghost" id="deskCopy" style="margin:0">Copy</button></span></div>`
+        : '';
+      el.innerHTML = `<div class="rowline"><span class="k">desk</span><b>${esc(d.name)}</b></div>
+        <div class="rowline"><span class="k">analysts</span><span>${d.members} / 200</span></div>
+        <div class="rowline"><span class="k">your role</span><span>${d.role==='captain'?'captain':'analyst'}</span></div>
+        ${inv}
+        <div style="margin-top:10px"><button class="btn ghost" id="deskLeave">Leave desk</button></div>
+        <div class="msg" id="deskMsg"></div>`;
+      const cp=document.getElementById('deskCopy');
+      if(cp) cp.onclick=async()=>{ try{ await navigator.clipboard.writeText(document.getElementById('deskLink').textContent);
+        say('deskMsg','Link copied \u2014 drop it in the group chat.'); }catch(e){ say('deskMsg','Copy failed \u2014 select the link and copy it.',true); } };
+      const lv=document.getElementById('deskLeave'); let armed=false;
+      if(lv) lv.onclick=async()=>{
+        if(!armed){ armed=true; lv.textContent='Click again to confirm'; setTimeout(()=>{armed=false; lv.textContent='Leave desk';},2600); return; }
+        try{ const {error}=await sb.rpc('leave_desk'); if(error){ say('deskMsg',deskErr(error),true); return; }
+          say('deskMsg','You\u2019ve left the desk.'); renderDesk(); }catch(e){ say('deskMsg','Something went wrong.',true); } };
+    } else {
+      el.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input id="deskName" maxlength="40" placeholder="desk name \u2014 e.g. Wharton UG Finance" style="flex:1;min-width:200px">
+          <label style="font-size:11px;display:flex;align-items:center;gap:5px;color:var(--muted)"><input type="checkbox" id="deskPriv"> private</label>
+          <button class="btn" id="deskCreate" style="margin:0">Start a desk</button></div>
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+          <input id="deskCode" maxlength="12" placeholder="have an invite code?" style="width:180px">
+          <button class="btn ghost" id="deskJoin" style="margin:0">Join</button></div>
+        <div class="msg" id="deskMsg"></div>`;
+      document.getElementById('deskCreate').onclick=async()=>{
+        const n=document.getElementById('deskName').value.trim();
+        if(n.length<3){ say('deskMsg','Give the desk a real name (3+ characters).',true); return; }
+        try{ const {error}=await sb.rpc('create_desk',{p_name:n, p_private:document.getElementById('deskPriv').checked});
+          if(error){ say('deskMsg',deskErr(error),true); return; }
+          renderDesk(); }catch(e){ say('deskMsg','Something went wrong.',true); } };
+      document.getElementById('deskJoin').onclick=async()=>{
+        const c=document.getElementById('deskCode').value.trim();
+        if(!c){ say('deskMsg','Paste the invite code from your captain.',true); return; }
+        try{ const {error}=await sb.rpc('join_desk',{p_code:c});
+          if(error){ say('deskMsg',deskErr(error),true); return; }
+          renderDesk(); }catch(e){ say('deskMsg','Something went wrong.',true); } };
+    }
+  }
+  renderDesk();
   document.getElementById('acPassSave').onclick=async()=>{
     const p1=document.getElementById('acP1').value, p2=document.getElementById('acP2').value;
     if(p1.length<8){ say('acPassMsg','Password needs at least 8 characters.',true); return; }

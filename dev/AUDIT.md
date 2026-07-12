@@ -2464,3 +2464,40 @@ statement layouts, named companies, FY headers, associate-voice checklists.
   Remaining Wave 3 stragglers ride later rounds: comments/citations design,
   center-across-selection (needs alignment-span render), growth #26 CLOSED.
 - No shared-asset change (index prompt + dev/ doc) — ?v stays 106.
+
+---
+# ROUND 110 — DESKS v1: BACKEND + JOIN LOOP (Wolf-approved: Desks, cap 200)
+- Wolf's calls: "Desks" naming ✓ one desk per player ✓ cap 200 (MBA/IB club
+  scale) ✓ pre-seed via his contacts ✓.
+- MIGRATION 20260712000000_desks.sql: teams + team_members (UNIQUE(user_id)
+  = one desk per player), name-moderation trigger (same banned list +
+  leetspeak folding as handles), 200-cap trigger, RLS (captain checks via
+  SECURITY DEFINER fn to dodge the self-recursion trap). INVITE CODES ARE
+  NEVER TABLE-READABLE: blanket select revoked, safe columns re-granted —
+  codes travel only through RPCs (r111 NOTE: leaderboard must select
+  EXPLICIT columns from teams; select * will be permission-denied).
+  RPCs: preview_desk (anon ok — landing banner), create_desk (slugifies,
+  captain membership), join_desk, my_desk (invite_code to captains only),
+  leave_desk (captain exit promotes longest-tenured member; empty desk
+  deletes itself).
+- ACCOUNT: legacy Team-code card REPLACED by the Desk card — create
+  (name + private), join by code, captain invite link w/ copy, leave w/
+  click-again confirm. All via RPCs; error mapping incl. DESK_NAME_RESERVED
+  / DESK_FULL / ALREADY_ON_DESK / duplicate-name.
+- INDEX: ?desk=CODE deep link — stored (hk_pending_desk, survives the
+  signup round-trip), landing lede becomes the invitation w/ live member
+  count via preview_desk, param stripped; onSession auto-joins on the
+  first REAL session (anon sessions wait), toasts the welcome; terminal
+  errors clear the pending code, transient ones keep it.
+- profiles.team_code retained as legacy display only (card chip) until the
+  r111 surfaces round swaps chips to real desks.
+- QUEUED NEXT: r111 leaderboard surfaces (my-desk filter on membership,
+  desk page = roster + boards, desk chips) · V1.5 SCHOOL TAG (Wolf's .edu
+  idea — spec added to dev/TEAMS_DESIGN.md: server-derived domain tag,
+  opt-in badge, home-desk auto-suggest; the same mechanism is the future
+  corporate funnel).
+- VERIFY: node --check both pages' inline scripts; markup escape-leak sweep
+  clean; Playwright boot of index (?desk= path) + account — zero real page
+  errors (sb-offline paths exercised; Supabase writes untestable in
+  sandbox — Wolf smoke-tests the live join flow post-deploy).
+- No shared-asset change — ?v stays 106.

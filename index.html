@@ -8007,6 +8007,24 @@ async function onSession(session){
     // (the r71 version only fired while the landing was visible — Wolf still saw 'set a name')
     setTimeout(()=>{ try{ if(!isAnonUser() && me_member && !me_handle) promptHandle(); }catch(e){} }, 900);
     setTimeout(()=>{ try{ hydratePBFromServer(); }catch(e){} }, 1200);   // r83: bests follow the account
+    // DESKS v1 (r110): a pending invite joins as soon as a REAL session lands.
+    // Kept across the signup round-trip; cleared only on success or a terminal error.
+    setTimeout(async ()=>{ try{
+      const code = localStorage.getItem('hk_pending_desk');
+      if(!code || !window.sb || isAnonUser()) return;
+      const {data,error} = await sb.rpc('join_desk',{p_code:code});
+      if(error){
+        const m=String(error.message||'');
+        localStorage.removeItem('hk_pending_desk');
+        if(m.includes('ALREADY_ON_DESK')) showToast('you already have a desk \u2014 manage it from your account page');
+        else if(m.includes('DESK_FULL')) showToast('that desk is full (200 analysts)');
+        else if(m.includes('DESK_NOT_FOUND')) showToast('that desk invite isn\u2019t valid anymore');
+        return;
+      }
+      localStorage.removeItem('hk_pending_desk');
+      const d=(data&&data[0])||null;
+      if(d&&d.name) showToast('welcome to the desk: '+d.name);
+    }catch(e){} }, 1600);
     try{ localStorage.setItem('hotkey_onboarded','1'); }catch(e){}
     if(typeof onboardOpen!=='undefined' && onboardOpen) closeOnboard();
     // r69: greet returning users on the landing dialog + let one ↵ carry them in —
@@ -8397,6 +8415,19 @@ function handleDeepLink(){
     const p = new URLSearchParams(location.search);
     let consumed = false;
     if(p.get('openProfile') === '1'){ openProfile(); consumed = true; }
+    // DESKS v1 (r110): invite link ?desk=CODE — remember it, preview it on the landing,
+    // auto-join fires in onSession once a real account is signed in.
+    const deskCode = p.get('desk');
+    if(deskCode){
+      try{ localStorage.setItem('hk_pending_desk', deskCode); }catch(e){}
+      consumed = true; p.delete('desk');
+      try{ if(window.sb) sb.rpc('preview_desk',{p_code:deskCode}).then(({data})=>{
+        const d=(data&&data[0]); if(!d) return;
+        const l=$('landing'), le=l&&l.querySelector('.lede');
+        if(le && !l.classList.contains('gone')) le.textContent='You\u2019ve been invited to join '+d.name+' \u2014 '+d.members+' on the desk. Sign in and you\u2019re on it.';
+        else showToast('signing you onto '+d.name+' once you\u2019re in');
+      }); }catch(e){}
+    }
     const authMode = p.get('openAuth');
     if(authMode === 'signin' || authMode === 'signup'){ openAuth(authMode); consumed = true; }
     if(consumed){

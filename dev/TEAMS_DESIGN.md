@@ -1,6 +1,6 @@
 # TEAMS / CLUBS / SCHOOLS — design doc (r109, Wave 4 #27)
-_The design turn the pipeline required before any teams code. Nothing here is
-built yet. Wolf reviews → answers the open questions at the bottom → then the
+_Wolf signed off 2026-07-12: DESKS naming, one desk/player, cap 200, pre-seed.
+v1 backend + join loop SHIPPED r110. Wolf reviews → answers the open questions at the bottom → then the
 build phases below become rounds._
 
 ## Thesis
@@ -43,6 +43,25 @@ legacy display until owners claim them).
   team page at `leaderboard.html?team=slug` — roster, team PB board, drill
   boards filtered to members. Zero new query engines: same boards, one
   membership WHERE clause.
+
+## V1.5 — SCHOOL TAG (Wolf, 2026-07-12): .edu auto-identity
+Wolf's ask: sign up with an institutional email → school badge/identifier,
+optional display. Design:
+- **Derivation is server-side** (trigger on profiles from auth.email — never
+  client-claimed): academic domains (.edu, .ac.uk, .edu.au…) → institution
+  tag. Mapping table for the top target schools ('upenn.edu'→'UPenn',
+  'hbs.edu'→'HBS'); fallback = registrable domain sans TLD, title-cased.
+- `profiles.school_domain` (derived) + `profiles.show_school` boolean
+  default FALSE — displaying the badge is OPT-IN, per Wolf.
+- Badge: compact school chip beside the handle on card + leaderboard rows,
+  auto-colored from the existing group-color system. No logo uploads.
+- **Onboarding hook**: `teams.edu_domain` (nullable) marks a desk as a
+  school's home desk; first session with a matching domain gets a one-tap
+  "Wharton has a desk — join?" prompt. Combined with pre-seeding, this is
+  the cold-start loop: seed desk + first .edu signup → self-recruiting.
+- Corporate parallel (v3): company domains → private desk auto-suggest —
+  the same mechanism IS the B2B pre-onboarding funnel.
+- Ships after the leaderboard surfaces round (needs the desk chip anyway).
 
 ## V2 — captain tools (1 round, after v1 has real teams)
 - Weekly team digest strip on the team page (most improved, new PBs, streak
