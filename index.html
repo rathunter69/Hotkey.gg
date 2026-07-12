@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=105" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=105">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=105">
+<link rel="icon" href="favicon.ico?v=106" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=106">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=106">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1079,14 +1079,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=105"></script>
-<link rel="stylesheet" href="nav.css?v=105">
-<script src="themes.js?v=105"></script>
+<script src="drills.js?v=106"></script>
+<link rel="stylesheet" href="nav.css?v=106">
+<script src="themes.js?v=106"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=105"></script>
+<script src="nav.js?v=106"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1321,46 +1321,48 @@ function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:f
 
 const CHALLENGES = {
   drill:{
-    name:'Drill', label:'Hardcode it', par:13, parKeys:9,
-    prompt:'Hardcode column B in place — turn its formulas into plain values. Select B, copy, then paste-special-values right back onto the same cells.',
-    req:'<em>keyboard only</em> · select B, <em>ctrl c</em>, then <em>alt e s v ↵</em> — don\'t move the cursor before pasting, so the values land back on B',
-    guide:['on B2, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> to grab the column · copy <kbd>ctrl</kbd>+<kbd>c</kbd> · paste values <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd>'],
-    targets:[function(){return 'B2:B'+(this._n+1);}],
-    demo(){ const last='B'+(this._n+1); return [
-      {sel:'B2:'+last, keys:[Kb.copy]},
-      {sel:'B2:'+last, keys:[Kb.alt,L('E'),L('S'),L('V'),Kb.enter]},
+    name:'Hardcode', label:'Hardcode it', par:66, parKeys:30,
+    prompt:'This page goes in the deck tonight \u2014 and right now every number on it is a LIVE LINK into the model. Break the links before it ships: grab the column, copy, paste-special VALUES straight back onto itself, then paint the survivors blue, because hardcodes wear blue. The pre-send ritual every desk runs.',
+    req:'on <em>B3</em> \u00b7 <em>ctrl+shift+\u2193</em> grabs B3:B8 \u00b7 <em>ctrl+c</em> \u00b7 <em>alt e s v \u21b5</em> values onto themselves \u00b7 then <em>alt h f c</em> \u2192 \u00d74 <em>\u21b5</em> \u2014 the dead numbers wear blue',
+    guide:[
+      'on B3 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> \u2014 the whole output column in one chord',
+      'copy <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 then <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>\u21b5</kbd> \u2014 values land right back on top; the links are gone',
+      'still selected \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means hardcode; the page tells on itself',
+    ],
+    targets:['B3:B8','B3:B8','B3:B8'],
+    demo(){ return [
+      {sel:'B3:B8', keys:[Kb.copy]},
+      {sel:'B3:B8', keys:[Kb.alt,L('E'),L('S'),L('V'),Kb.enter]},
+      {sel:'B3:B8', keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
     ]; },
     build(){
-      const n = rnd(8,11);
-      const cells = {};
-      const targets = {};
-      for(let r=2;r<=n+1;r++){
-        const a = rnd(120,990);
-        const mult = [1.5,2,3,0.5][rnd(0,3)];
-        cells['A'+r] = {...blankCell(), value:a, txt:false};
-        const val = Math.round(a*mult);
-        cells['B'+r] = {...blankCell(), formula:'=A'+r+'*'+mult, value:val};
-        targets['B'+r] = val;
-      }
-      cells['A1']={...blankCell(),value:'src',txt:true,bold:true};
-      cells['B1']={...blankCell(),value:'calc',txt:true,bold:true};
-      this._n=n; this._targets=targets;
-      return {ROWS:n+1, cells, active:{r:2,c:2}, sel:null};
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 send-out snapshot ($mm)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Metric',txt:true,bold:true};
+      cells['B2']={...blankCell(),value:'Value',txt:true,bold:true,align:'r'};
+      cells['D2']={...blankCell(),value:'Model feed',txt:true,bold:true};
+      const rev=rnd(80,140)*10;
+      const gp=Math.round(rev*rnd(35,55)/100), ebitda=Math.round(gp*rnd(55,75)/100);
+      const ebit=Math.round(ebitda*rnd(70,85)/100), ni=Math.round(ebit*rnd(60,75)/100);
+      const fcf=Math.round(ni*rnd(70,110)/100);
+      const rows=[['Revenue',rev],['Gross profit',gp],['EBITDA',ebitda],['EBIT',ebit],['Net income',ni],['Free cash flow',fcf]];
+      this._exp={};
+      rows.forEach(([n,v],i)=>{ const r=3+i;
+        cells['A'+r]={...blankCell(),value:n,txt:true};
+        cells['E'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells['B'+r]={...blankCell(),formula:'=E'+r,value:v,fmtStyle:'comma',decimals:0};
+        this._exp['B'+r]=v;
+      });
+      return {ROWS:8, cells, active:{r:3,c:2}, sel:null, colW:{1:150,2:80,5:80}};
     },
     checks(S){
-      let conv=0;
-      for(let r=2;r<=this._n+1;r++){ const c=S.cells['B'+r];
-        if(c&&c.formula===null&&Number(c.value)===this._targets['B'+r]) conv++; }
-      return [{label:`hardcode B-column to values (${conv}/${this._n})`, ok:conv===this._n}];
-    },
-    hint(S){
-      let bDone=true; for(let r=2;r<=this._n+1;r++){ const c=S.cells['B'+r]; if(!c||c.formula!==null) bDone=false; }
-      if(bDone) return '';
-      for(let col=3;col<=COLS;col++){ let match=0;
-        for(let r=2;r<=this._n+1;r++){ const c=S.cells[colLetter(col)+r]; if(c&&c.formula===null&&Number(c.value)===this._targets['B'+r]) match++; }
-        if(match>=2) return 'Those values landed in column '+colLetter(col)+' — they need to replace column B in place. Copy B, then paste-special-values <em>without moving the cursor first</em>.';
-      }
-      return '';
+      const dead=Object.keys(this._exp).every(k=>{ const c=S.cells[k];
+        return !!(c&&c.formula===null&&Number(c.value)===this._exp[k]); });
+      const blue=Object.keys(this._exp).every(k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); });
+      return [
+        {label:'the links are BROKEN \u2014 values only, nothing on this page can move', ok: dead},
+        {label:'and the survivors wear blue \u2014 everyone can see these are hardcodes now', ok: blue},
+      ];
     }
   },
 

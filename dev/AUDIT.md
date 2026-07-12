@@ -2424,3 +2424,18 @@ statement layouts, named companies, FY headers, associate-voice checklists.
 - VERIFY: demo-replay e2e ALL 55 GREEN; offline harness clean; node --check;
   spill screenshot inspected (dress: title spans A1:E1, active border intact).
 - v105.
+
+---
+# ROUND 108 — T5: LOOKUPS/DATA/VALUES (one rebuild, five audited clean)
+- AUDIT-FIRST (no churn doctrine): lookup / lookup2 (comps tables, shuffled
+  metric columns), sort (league table + foot + bold), series (year header +
+  dress), transpose (header → summary column) all already meet Specificity +
+  Mix — left alone, logged here as audited.
+- DRILL ('Hardcode it') REBUILT — was the weakest card in the catalog
+  (par 13, two ops, 'src/calc' columns): now the pre-send ritual — a deck
+  page whose Value column is LIVE LINKS (=E3..=E8) into a visible model
+  feed; break the links (ctrl+shift+↓, ctrl+c, alt e s v ↵ onto itself),
+  then paint the dead numbers blue (alt h f c →×4 ↵) because hardcodes
+  wear blue. Checks: links BROKEN + values exact, column blue. 66/30
+  (was 13/9). e2e 8/8 WIN.
+- v106.
