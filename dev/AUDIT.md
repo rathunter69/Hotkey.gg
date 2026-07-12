@@ -2756,3 +2756,25 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   signup -> one-tap membership -> boards fill -> president claims with the
   code. VERIFY: boot clean x3, chip renders in rowHtml, node --check all,
   e2e green. Live RPC verification rides the next fresh-session smoke.
+
+---
+# ROUND 123 — RANK ART ITERATION 4 (Wolf's notes: bull, centering, buckets, unranked)
+- art/rank-proto.html rewritten: canvas grows to 0-100 x 0-114 — emblem art
+  stays square, y 102-112 hosts DIVISION PIPS (3 diamonds, filled left->right
+  = Bottom/Middle/Top Bucket). Every ranked tier renders 3 bucket variants;
+  TOP BUCKET "ignites": spark stars at the shoulders, hotter rim stroke,
+  wider glow. Hover previews the rank-up animation hooks (.aura pulse +
+  .pips .on glow) — layers are grouped (.aura/.frame/.glyph/.ornament/
+  .pips/.sparks) so the real rank-up sequence can light them in order.
+- MD GLYPH IS A BULL now (Wolf's ask): broad angular head, sweeping ivory
+  horns, angry slit eyes, muzzle + flared nostrils. First draft read as a
+  piglet (nub horns, blob face) — redrawn before shipping; reads at 22px.
+- All glyphs optically re-centered (book 50/50, lanyard 50/47.5, sigma
+  50/49, chart 50/53, bolt 50/49.5, bull 50/52); silhouettes hold the
+  consistent-size rule from iteration 3.1.
+- UNRANKED standardized: cracked-cell + gridlines + #REF! badge, no pips
+  (unranked has no buckets, per Wolf).
+- VERIFY: node --check on extracted inline script, Playwright fullPage +
+  MD close-up render clean (no console/page errors), light-theme row +
+  22px chip row legible. Proto only — game wiring (rankEmblem loader)
+  waits for Wolf's approval of the set.
