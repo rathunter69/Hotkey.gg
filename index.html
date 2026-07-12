@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=100" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=100">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=100">
+<link rel="icon" href="favicon.ico?v=101" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=101">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=101">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=100"></script>
-<link rel="stylesheet" href="nav.css?v=100">
-<script src="themes.js?v=100"></script>
+<script src="drills.js?v=101"></script>
+<link rel="stylesheet" href="nav.css?v=101">
+<script src="themes.js?v=101"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=100"></script>
+<script src="nav.js?v=101"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1605,56 +1605,66 @@ const CHALLENGES = {
     }
   },
   schedule:{
-    name:'Schedule', label:'Roll the PP&E forward', par:98, parKeys:39,
-    prompt:'The full PP&E roll: each year opens at the prior close, capex adds, depreciation takes its anchored cut of the OPENING balance, and the ending balance walks forward. Build year 1, link year 2\u2019s opening, fill everything right \u2014 the corkscrew does years 2 and 3 for you.',
-    req:'<em>B4</em> dep <em>=-B2*$B$8</em> \u00b7 <em>B5</em> end <em>=B2+B3+B4</em> \u00b7 <em>C2</em> \u00b7 <em>=B5</em> \u00b7 fill C2:D2 \u2192 \u00b7 fill B4:D5 \u2192',
+    name:'Schedule', label:'Roll the PP&E forward', par:113, parKeys:65,
+    prompt:'Five years of PP&E, two corkscrews. Each year opens at the prior close, capex adds, depreciation takes its anchored cut of the OPENING balance. Build year 1, link year 2\u2019s opening, fill everything right \u2014 then run the accumulated-depreciation memo underneath, because the auditors will ask for it.',
+    req:'<em>B4</em> dep <em>=-B2*$B$9</em> \u00b7 <em>B5</em> end <em>=B2+B3+B4</em> \u00b7 <em>C2</em> \u00b7 <em>=B5</em> \u00b7 fill C2:F2 \u2192 \u00b7 fill B4:F5 \u2192 \u00b7 memo: <em>B7</em> <em>=-B4</em> \u00b7 <em>C7</em> <em>=B7-C4</em> \u00b7 fill C7:F7 \u2192',
     guide:[
-      'depreciation at B4 \u00b7 <kbd>=-B2*$B$8</kbd> \u2014 anchored rate against the OPENING balance, negative convention',
+      'depreciation at B4 \u00b7 <kbd>=-B2*$B$9</kbd> \u2014 anchored rate against the OPENING balance, negative convention',
       'ending at B5 \u00b7 <kbd>=B2+B3+B4</kbd> \u2014 open + capex \u2212 dep',
-      'THE LINK: C2 \u00b7 <kbd>=B5</kbd> \u00b7 fill C2:D2 \u2192 \u2014 each year opens where the last one closed',
-      'select B4:D5 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the roll walks itself across',
+      'THE LINK: C2 \u00b7 <kbd>=B5</kbd> \u00b7 fill C2:F2 \u2192 \u2014 each year opens where the last one closed',
+      'select B4:F5 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the roll walks itself across five years',
+      'the memo: B7 \u00b7 <kbd>=-B4</kbd> \u00b7 C7 \u00b7 <kbd>=B7-C4</kbd> \u00b7 fill C7:F7 \u2014 accumulated dep is its own corkscrew',
     ],
-    targets:['B4','B5','C2'],
+    targets:['B4','B5','C2','C2:F2','B4:F5','B7','C7','C7:F7'],
     demo(){ return [
-      {sel:'B4', keys:[...T('=-B2*$B$8'), Kb.enter]},
+      {sel:'B4', keys:[...T('=-B2*$B$9'), Kb.enter]},
       {sel:'B5', keys:[...T('=B2+B3+B4'), Kb.enter]},
       {sel:'C2', keys:[...T('=B5'), Kb.enter]},
-      {sel:'C2:E2', keys:[Kb.fillR]},
-      {sel:'B4:D5', keys:[Kb.fillR]},
+      {sel:'C2:F2', keys:[Kb.fillR]},
+      {sel:'B4:F5', keys:[Kb.fillR]},
+      {sel:'B7', keys:[...T('=-B4'), Kb.enter]},
+      {sel:'C7', keys:[...T('=B7-C4'), Kb.enter]},
+      {sel:'C7:F7', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 PP&E roll ($mm)',txt:true,bold:true};
-      ['Y1','Y2','Y3'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
+      cells['A1']={...blankCell(),value:codename()+' \u2014 PP&E roll-forward ($mm)',txt:true,bold:true};
+      const y0=rnd(24,27);
+      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
       const rows=[[2,'Beginning PP&E'],[3,'Capex'],[4,'Depreciation'],[5,'Ending PP&E']];
       rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===5)});
-      cells['A8']={...blankCell(),value:'Dep. rate',txt:true};
+      cells['A7']={...blankCell(),value:'Memo: accumulated dep.',txt:true};
+      cells['A9']={...blankCell(),value:'Dep. rate',txt:true};
       const depR=rnd(8,15)/100;
-      cells['B8']={...blankCell(),value:depR,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      cells['B9']={...blankCell(),value:depR,fontColor:'blue',fmtStyle:'percent',decimals:0};
       const beg0=rnd(40,90)*10;
       cells['B2']={...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      const capex=[rnd(5,20)*10, rnd(5,20)*10, rnd(5,20)*10];
-      for(let i=0;i<3;i++){ const col=colLetter(i+2);
+      const capex=[]; for(let i=0;i<5;i++) capex.push(rnd(5,20)*10);
+      for(let i=0;i<5;i++){ const col=colLetter(i+2);
         cells[col+3]={...blankCell(),value:capex[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:1};
         cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+        cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:1};
         if(i>0) cells[col+2]={...blankCell(),fmtStyle:'comma',decimals:1};
       }
-      this._exp=[]; let beg=beg0;
-      for(let i=0;i<3;i++){ const dep=-beg*depR; const end=beg+capex[i]+dep;
-        this._exp.push({beg:beg,dep:dep,end:end}); beg=end; }
-      return {ROWS:8, cells, active:{r:4,c:2}, sel:null, colW:{1:136,2:86,3:86,4:86}};
+      this._exp=[]; let beg=beg0, acc=0;
+      for(let i=0;i<5;i++){ const dep=-beg*depR; const end=beg+capex[i]+dep; acc+=-dep;
+        this._exp.push({beg:beg,dep:dep,end:end,acc:acc}); beg=end; }
+      return {ROWS:9, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:70,3:70,4:70,5:70,6:70}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
       const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*5e-3); };
-      const COL=['B','C','D','E'];
-      const linkOk=[1,2,3].every(i=>{ const c=S.cells[COL[i]+'2'];
-        return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(COL[i-1]+'5')&&near(COL[i]+'2',this._exp[i].beg)); });
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F'];
+      const linkOk=[1,2,3,4].every(i=> refs(COL[i]+'2',[COL[i-1]+'5']) && near(COL[i]+'2',this._exp[i].beg));
+      const memoOk= refs('B7',['B4']) && near('B7',this._exp[0].acc) &&
+        [1,2,3,4].every(i=> refs(COL[i]+'7',[COL[i-1]+'7',COL[i]+'4']) && near(COL[i]+'7',this._exp[i].acc));
       return [
-        {label:'depreciation off the anchored rate against the OPENING balance, all years', ok: [0,1,2].every(i=>near(COL[i]+'4',this._exp[i].dep))},
-        {label:'ending balance \u2014 open + capex \u2212 dep, all years', ok: [0,1,2].every(i=>near(COL[i]+'5',this._exp[i].end))},
+        {label:'depreciation \u2014 the anchored rate against each OPENING balance, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'4',this._exp[i].dep)) && refs('B4',['B2','B9'])},
+        {label:'ending balance \u2014 open + capex \u2212 dep, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'5',this._exp[i].end))},
         {label:'THE LINK \u2014 each year opens at the prior close', ok: linkOk},
+        {label:'the memo corkscrew \u2014 accumulated dep builds off itself, not retyped numbers', ok: memoOk},
       ];
     }
   },
@@ -2686,63 +2696,71 @@ const CHALLENGES = {
     }
   },
   dcf:{
-    name:'DCF', label:'Discount the cash flows', par:100, parKeys:77,
-    prompt:'Three years of FCF, one discount rate. Build the PV formula ONCE with the rate $-locked and the year exponent pointed at row 2, fill it right, then sum the PVs. If your anchors are right, the fill does the work.',
-    req:'<em>B4</em> \u00b7 <em>=B3/(1+$B$6)^B2</em> \u00b7 fill right \u00b7 <em>B8</em> TV <em>=D3*(1+B9)/($B$6-B9)</em> \u00b7 <em>B10</em> PV of TV \u00b7 <em>B11</em> EV <em>=SUM(B4:D4)+B10</em>',
+    name:'DCF', label:'Discount the cash flows', par:140, parKeys:85,
+    prompt:'Five years of FCF and the real discounting stack: a discount-factor row built ONCE off the anchored rate, a PV row that just multiplies, a Gordon terminal value \u2014 and the TV discounts with the year-5 factor you already built. Desk rule: never retype a discount factor.',
+    req:'<em>B4</em> DF <em>=1/(1+$B$7)^B2</em> \u00b7 fill B4:F4 \u2192 \u00b7 <em>B5</em> PV <em>=B3*B4</em> \u00b7 fill B5:F5 \u2192 \u00b7 <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> \u00b7 <em>B11</em> <em>=B10*F4</em> \u00b7 <em>B12</em> EV <em>=SUM(B5:F5)+B11</em>',
     guide:[
-      'PV at B4 \u00b7 <kbd>=B3/(1+$B$6)^B2</kbd> <kbd>\u21b5</kbd> \u2014 rate anchored, year and FCF walking',
-      'back on B4 \u00b7 <kbd>shift</kbd>+<kbd>\u2192</kbd>\u00d72 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> fills the row',
-      'terminal value at B8 \u00b7 <kbd>=D3*(1+B9)/($B$6-B9)</kbd> \u2014 Gordon growth off year 3',
-      'PV of TV at B10 \u00b7 <kbd>=B8/(1+$B$6)^3</kbd>',
-      'Enterprise Value at B11 \u00b7 <kbd>=SUM(B4:D4)+B10</kbd>',
+      'discount factor at B4 \u00b7 <kbd>=1/(1+$B$7)^B2</kbd> \u2014 rate anchored, year walking',
+      'select B4:F4 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 five factors from one formula',
+      'PV row: B5 \u00b7 <kbd>=B3*B4</kbd> \u00b7 fill B5:F5 \u2192 \u2014 cash \u00d7 factor, nothing else',
+      'terminal value at B10 \u00b7 <kbd>=F3*(1+B8)/($B$7-B8)</kbd> \u2014 Gordon growth off year 5',
+      'PV of TV at B11 \u00b7 <kbd>=B10*F4</kbd> \u2014 REUSE the year-5 factor; never retype it',
+      'Enterprise Value at B12 \u00b7 <kbd>=SUM(B5:F5)+B11</kbd>',
     ],
-    targets:['B4','B4:D4','B8','B10','B11'],
+    targets:['B4','B4:F4','B5','B5:F5','B10','B11','B12'],
     demo(){ return [
-      {sel:'B4', keys:[...T('=B3/(1+$B$6)^B2'), Kb.enter]},
-      {sel:'B4:E4', keys:[Kb.fillR]},
-      {sel:'B8', keys:[...T('=D3*(1+B9)/($B$6-B9)'), Kb.enter]},
-      {sel:'B10', keys:[...T('=B8/(1+$B$6)^3'), Kb.enter]},
-      {sel:'B11', keys:[...T('=SUM(B4:D4)+B10'), Kb.enter]},
+      {sel:'B4', keys:[...T('=1/(1+$B$7)^B2'), Kb.enter]},
+      {sel:'B4:F4', keys:[Kb.fillR]},
+      {sel:'B5', keys:[...T('=B3*B4'), Kb.enter]},
+      {sel:'B5:F5', keys:[Kb.fillR]},
+      {sel:'B10', keys:[...T('=F3*(1+B8)/($B$7-B8)'), Kb.enter]},
+      {sel:'B11', keys:[...T('=B10*F4'), Kb.enter]},
+      {sel:'B12', keys:[...T('=SUM(B5:F5)+B11'), Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Mini-DCF',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 DCF ($mm)',txt:true,bold:true};
       cells['A2']={...blankCell(),value:'Year',txt:true,bold:true};
       cells['A3']={...blankCell(),value:'FCF',txt:true};
-      cells['A4']={...blankCell(),value:'PV of FCF',txt:true,bold:true};
-      cells['A6']={...blankCell(),value:'Discount rate',txt:true};
-      cells['A8']={...blankCell(),value:'Terminal value',txt:true};
-      cells['A9']={...blankCell(),value:'LT growth',txt:true};
-      cells['A10']={...blankCell(),value:'PV of TV',txt:true};
-      cells['A11']={...blankCell(),value:'Enterprise Value',txt:true,bold:true};
-      const r=rnd(8,12)/100; const fcfs=[];
-      for(let y=1;y<=3;y++){ const col=colLetter(y+1);
+      cells['A4']={...blankCell(),value:'Discount factor',txt:true};
+      cells['A5']={...blankCell(),value:'PV of FCF',txt:true,bold:true};
+      cells['A7']={...blankCell(),value:'Discount rate',txt:true};
+      cells['A8']={...blankCell(),value:'LT growth',txt:true};
+      cells['A10']={...blankCell(),value:'Terminal value',txt:true};
+      cells['A11']={...blankCell(),value:'PV of TV',txt:true};
+      cells['A12']={...blankCell(),value:'Enterprise Value',txt:true,bold:true};
+      const r=rnd(8,12)/100, g=rnd(2,3)/100;
+      let f=rnd(8,30)*10; const fcfs=[];
+      for(let y=1;y<=5;y++){ const col=colLetter(y+1);
         cells[col+2]={...blankCell(),value:y,fontColor:'blue'};
-        const f=rnd(8,30)*10; fcfs.push(f);
+        fcfs.push(f);
         cells[col+3]={...blankCell(),value:f,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:1}; }
-      cells['B6']={...blankCell(),value:r,fontColor:'blue',fmtStyle:'percent',decimals:1};
-      const g=rnd(2,3)/100;
-      cells['B9']={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1};
-      cells['B8']={...blankCell(),fmtStyle:'comma',decimals:1};
+        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:2};
+        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:1};
+        f=Math.round(f*(1+rnd(3,9)/100)); }
+      cells['B7']={...blankCell(),value:r,fontColor:'blue',fmtStyle:'percent',decimals:1};
+      cells['B8']={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1};
       cells['B10']={...blankCell(),fmtStyle:'comma',decimals:1};
-      cells['B11']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-      this._pv = fcfs.map((f,i)=>f/Math.pow(1+r,i+1));
-      this._sum = this._pv.reduce((a,b)=>a+b,0);
-      this._tv = fcfs[2]*(1+g)/(r-g);
-      this._pvtv = this._tv/Math.pow(1+r,3);
-      this._ev = this._sum + this._pvtv;
-      return {ROWS:11, cells, active:{r:4,c:2}, sel:null, colW:{1:126,2:86,3:86,4:86}};
+      cells['B11']={...blankCell(),fmtStyle:'comma',decimals:1};
+      cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+      this._df=[1,2,3,4,5].map(y=>1/Math.pow(1+r,y));
+      this._pv=fcfs.map((x,i)=>x*this._df[i]);
+      this._tv=fcfs[4]*(1+g)/(r-g);
+      this._pvtv=this._tv*this._df[4];
+      this._ev=this._pv.reduce((a,b)=>a+b,0)+this._pvtv;
+      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:126,2:70,3:70,4:70,5:70,6:70}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const pvOk=[0,1,2].every(i=>{ const val=v(colLetter(i+2)+4); return val!==null&&Math.abs(val-this._pv[i])<1e-4; });
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*1e-3,1e-3); };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F'];
       return [
-        {label:'PV formula anchored on the rate, filled across all 3 years', ok: pvOk},
-        {label:'terminal value \u2014 Gordon growth off year-3 FCF', ok: near('B8',this._tv)},
-        {label:'PV of the terminal value \u2014 discounted 3 years', ok: near('B10',this._pvtv)},
-        {label:'Enterprise Value = PVs + PV of TV', ok: near('B11',this._ev)},
+        {label:'discount-factor row \u2014 one anchored formula, filled across all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'4',this._df[i])) && refs('B4',['B7','B2'])},
+        {label:'PV row \u2014 cash \u00d7 factor, live references both ways', ok: [0,1,2,3,4].every(i=>near(COL[i]+'5',this._pv[i])) && refs('B5',['B3','B4'])},
+        {label:'terminal value \u2014 Gordon growth off year-5 FCF', ok: near('B10',this._tv) && refs('B10',['F3','B8'])},
+        {label:'PV of TV \u2014 REUSES the year-5 factor, not a retyped number', ok: near('B11',this._pvtv) && refs('B11',['B10','F4'])},
+        {label:'Enterprise Value \u2014 SUM of the PV row plus the discounted TV', ok: near('B12',this._ev) && refs('B12',['SUM(','B11'])},
       ];
     }
   },
@@ -3246,59 +3264,74 @@ const CHALLENGES = {
     }
   },
   waterfall:{
-    name:'Waterfall', label:'Run the paydown waterfall', par:118, parKeys:63,
-    prompt:'One year of cash, two tranches of debt, strict seniority. Free cash pays the term loan first \u2014 never more than the balance \u2014 and only what survives touches the revolver. MIN does the rationing; the ending balances prove the cascade.',
-    req:'<em>B5</em> FCF <em>=B2-B3-B4</em> \u00b7 <em>B8</em> TL paydown <em>=MIN(B5,B7)</em> \u00b7 <em>B9</em> TL end <em>=B7-B8</em> \u00b7 <em>B10</em> cash left <em>=B5-B8</em> \u00b7 <em>B13</em> rev. paydown <em>=MIN(B10,B12)</em> \u00b7 <em>B14</em> rev. end <em>=B12-B13</em>',
+    name:'Waterfall', label:'Run the paydown waterfall', par:168, parKeys:106,
+    prompt:'Three years of cash, two tranches, strict seniority \u2014 and the balances CORKSCREW: each year opens where the last one closed. Build year 1 top to bottom, link both openings, fill everything right. MIN does the rationing; the cascade proves itself.',
+    req:'<em>B5</em> FCF <em>=B2-B3-B4</em> \u00b7 fill B5:D5 \u2192 \u00b7 <em>B8</em> <em>=MIN(B5,B7)</em> \u00b7 <em>B9</em> <em>=B7-B8</em> \u00b7 <em>B10</em> <em>=B5-B8</em> \u00b7 fill B8:D10 \u2192 \u00b7 link <em>C7</em> <em>=B9</em> fill \u2192 \u00b7 <em>B13</em> <em>=MIN(B10,B12)</em> \u00b7 <em>B14</em> <em>=B12-B13</em> \u00b7 fill B13:D14 \u2192 \u00b7 link <em>C12</em> <em>=B14</em> fill \u2192',
     guide:[
-      'free cash at B5 \u00b7 <kbd>=B2-B3-B4</kbd> \u2014 EBITDA less capex less interest',
-      'the senior tranche drinks first: B8 \u00b7 <kbd>=MIN(B5,B7)</kbd> \u2014 never more than the balance \u00b7 B9 \u00b7 <kbd>=B7-B8</kbd>',
-      'what survives: B10 \u00b7 <kbd>=B5-B8</kbd>',
-      'the revolver takes the rest: B13 \u00b7 <kbd>=MIN(B10,B12)</kbd> \u00b7 B14 \u00b7 <kbd>=B12-B13</kbd>',
+      'free cash, all years: B5 \u00b7 <kbd>=B2-B3-B4</kbd> \u00b7 fill B5:D5 \u2192',
+      'year-1 cascade: B8 \u00b7 <kbd>=MIN(B5,B7)</kbd> \u2014 never more than the balance \u00b7 B9 \u00b7 <kbd>=B7-B8</kbd> \u00b7 B10 \u00b7 <kbd>=B5-B8</kbd>',
+      'select B8:D10 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the rationing walks across',
+      'THE CORKSCREW: C7 \u00b7 <kbd>=B9</kbd> \u00b7 fill C7:D7 \u2014 the loan opens where it closed',
+      'the junior tranche: B13 \u00b7 <kbd>=MIN(B10,B12)</kbd> \u00b7 B14 \u00b7 <kbd>=B12-B13</kbd> \u00b7 fill B13:D14 \u2192',
+      'link the revolver too: C12 \u00b7 <kbd>=B14</kbd> \u00b7 fill C12:D12 \u2192',
     ],
-    targets:['B5','B8','B9','B10','B13','B14'],
+    targets:['B5','B5:D5','B8','B9','B10','B8:D10','C7','C7:D7','B13','B14','B13:D14','C12','C12:D12'],
     demo(){ return [
       {sel:'B5', keys:[...T('=B2-B3-B4'), Kb.enter]},
+      {sel:'B5:D5', keys:[Kb.fillR]},
       {sel:'B8', keys:[...T('=MIN(B5,B7)'), Kb.enter]},
       {sel:'B9', keys:[...T('=B7-B8'), Kb.enter]},
       {sel:'B10', keys:[...T('=B5-B8'), Kb.enter]},
+      {sel:'B8:D10', keys:[Kb.fillR]},
+      {sel:'C7', keys:[...T('=B9'), Kb.enter]},
+      {sel:'C7:D7', keys:[Kb.fillR]},
       {sel:'B13', keys:[...T('=MIN(B10,B12)'), Kb.enter]},
       {sel:'B14', keys:[...T('=B12-B13'), Kb.enter]},
+      {sel:'B13:D14', keys:[Kb.fillR]},
+      {sel:'C12', keys:[...T('=B14'), Kb.enter]},
+      {sel:'C12:D12', keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 paydown waterfall ($mm)',txt:true,bold:true};
-      const eb=rnd(25,60)*10, cx=rnd(5,15)*10, ix=rnd(3,10)*10;
-      const fcf=eb-cx-ix;
-      // half the runs: TL balance BELOW fcf so the MIN binds on the balance and cash reaches the revolver
-      const tl=(rnd(0,1)? rnd(Math.max(2,Math.floor(fcf/10)-8), Math.floor(fcf/10))*10 : rnd(Math.floor(fcf/10)+4, Math.floor(fcf/10)+20)*10);
+      const y0=rnd(24,27);
+      for(let i=0;i<3;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      const cx=[],ix=[],eb=[],fcf=[];
+      for(let i=0;i<3;i++){ cx.push(rnd(5,15)*10); ix.push(rnd(3,10)*10);
+        const f=rnd(8,30)*10; fcf.push(f); eb.push(cx[i]+ix[i]+f); }
+      const given=[[2,'EBITDA',eb],[3,'Capex',cx],[4,'Cash interest',ix]];
+      given.forEach(([r,n,vs])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
+        for(let i=0;i<3;i++) cells[colLetter(i+2)+r]={...blankCell(),value:vs[i],fontColor:'blue',fmtStyle:'comma',decimals:0}; });
+      // TL sized to exhaust mid-horizon on most seeds \u2014 the cascade has to MOVE
+      const tl=rnd(Math.floor(fcf[0]*0.8/10), Math.floor((fcf[0]+fcf[1])*1.1/10))*10;
       const rv=rnd(8,30)*10;
-      const rows=[[2,'EBITDA',eb],[3,'Capex',cx],[4,'Cash interest',ix]];
-      rows.forEach(([r,n,v])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; });
-      cells['A5']={...blankCell(),value:'Free cash flow',txt:true,bold:true}; cells['B5']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A7']={...blankCell(),value:'Term loan, beg.',txt:true}; cells['B7']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A8']={...blankCell(),value:'TL paydown',txt:true};     cells['B8']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['A9']={...blankCell(),value:'Term loan, end',txt:true,bold:true}; cells['B9']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A10']={...blankCell(),value:'Cash remaining',txt:true}; cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['A12']={...blankCell(),value:'Revolver, beg.',txt:true}; cells['B12']={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A13']={...blankCell(),value:'Rev. paydown',txt:true};   cells['B13']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['A14']={...blankCell(),value:'Revolver, end',txt:true,bold:true}; cells['B14']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      const pd=Math.min(fcf,tl), left=fcf-pd, rpd=Math.min(left,rv);
-      this._exp={fcf:fcf, pd:pd, tlEnd:tl-pd, left:left, rpd:rpd, rvEnd:rv-rpd};
-      return {ROWS:14, cells, active:{r:5,c:2}, sel:null, colW:{1:150,2:88}};
+      const labels=[[5,'Free cash flow',1],[7,'Term Loan B, beg.',0],[8,'TL paydown',0],[9,'Term Loan B, end',1],[10,'Cash after TL',0],[12,'Revolver, beg.',0],[13,'Rev. paydown',0],[14,'Revolver, end',1]];
+      labels.forEach(([r,n,b])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:!!b});
+      cells['B7']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B12']={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      for(let i=0;i<3;i++){ const col=colLetter(i+2);
+        [5,8,9,10,13,14].forEach(r=>cells[col+r]={...blankCell(),fmtStyle:'comma',decimals:0,bold:(r===5||r===9||r===14)});
+        if(i>0){ cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0}; cells[col+12]={...blankCell(),fmtStyle:'comma',decimals:0}; }
+      }
+      this._exp=[]; let tlB=tl, rvB=rv;
+      for(let i=0;i<3;i++){ const f=fcf[i];
+        const pd=Math.min(f,tlB), tlE=tlB-pd, left=f-pd, rpd=Math.min(left,rvB), rvE=rvB-rpd;
+        this._exp.push({fcf:f, tlB:tlB, pd:pd, tlE:tlE, left:left, rpd:rpd, rvB:rvB, rvE:rvE});
+        tlB=tlE; rvB=rvE; }
+      return {ROWS:14, cells, active:{r:5,c:2}, sel:null, colW:{1:150,2:76,3:76,4:76}};
     },
     checks(S){
-      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
-      const minRef=(k,a,b)=>{ const c=S.cells[k]; if(!c||!c.formula) return false;
-        const f=String(c.formula).toUpperCase(); return f.includes('MIN')&&f.includes(a)&&f.includes(b); };
-      const e=this._exp;
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D']; const e=this._exp;
       return [
-        {label:'free cash flow \u2014 EBITDA less capex less interest', ok: near('B5',e.fcf)},
-        {label:'TL paydown rationed by MIN \u2014 cash vs balance, whichever is smaller', ok: near('B8',e.pd)&&minRef('B8','B5','B7')},
-        {label:'term loan ending balance', ok: near('B9',e.tlEnd)},
-        {label:'only surviving cash reaches the revolver', ok: near('B10',e.left)},
-        {label:'revolver paydown \u2014 MIN again, junior waits its turn', ok: near('B13',e.rpd)&&minRef('B13','B10','B12')},
-        {label:'revolver ending balance', ok: near('B14',e.rvEnd)},
+        {label:'free cash flow \u2014 EBITDA less capex less interest, all three years', ok:[0,1,2].every(i=>near(COL[i]+'5',e[i].fcf))},
+        {label:'TL paydown rationed by MIN \u2014 cash vs balance, every year', ok:[0,1,2].every(i=>near(COL[i]+'8',e[i].pd)) && refs('B8',['MIN(','B5','B7'])},
+        {label:'THE CORKSCREW \u2014 the term loan opens each year at the prior close', ok:[1,2].every(i=> refs(COL[i]+'7',[COL[i-1]+'9']) && near(COL[i]+'7',e[i].tlB)) && [0,1,2].every(i=>near(COL[i]+'9',e[i].tlE))},
+        {label:'only surviving cash reaches the revolver', ok:[0,1,2].every(i=>near(COL[i]+'10',e[i].left))},
+        {label:'revolver paydown \u2014 MIN again, junior waits its turn', ok:[0,1,2].every(i=>near(COL[i]+'13',e[i].rpd)) && refs('B13',['MIN(','B10','B12'])},
+        {label:'revolver corkscrew \u2014 opening links the prior close, ending walks the cascade out', ok:[1,2].every(i=> refs(COL[i]+'12',[COL[i-1]+'14']) && near(COL[i]+'12',e[i].rvB)) && [0,1,2].every(i=>near(COL[i]+'14',e[i].rvE))},
       ];
     }
   },

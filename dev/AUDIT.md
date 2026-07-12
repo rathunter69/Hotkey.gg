@@ -2242,3 +2242,45 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   reveal; zero page errors. 40-seed drill harness still ALL PASS. node --check
   all inline scripts + nav.js + drills.js.
 - v100.
+
+---
+# ROUND 102 — DEEPENING TRANCHE 2 (dcf/waterfall/schedule) + PORTFOLIO QUEUE
+- Wolf directive: deepening continues across the ENTIRE portfolio — he's
+  playing through and seeing non-specific, non-realistic exercises. Queue
+  below is the roadmap of record for the arc.
+- DCF — 5-yr, the real discounting stack: discount-factor row =1/(1+$B$7)^B2
+  filled across, PV row =B3*B4 (both refs live), Gordon TV off year-5 FCF,
+  PV of TV must REUSE the year-5 factor (=B10*F4, ref-enforced — desk rule:
+  never retype a DF), EV = SUM(PV row)+PV of TV. par 140/keys 85 (was 100/77).
+- WATERFALL — 3-yr corkscrew cascade: FCF row filled across, MIN-rationed
+  TL block B8:D10 filled right, BOTH tranches corkscrew (C7=B9, C12=B14,
+  filled right; links ref-enforced per year). TL sized to exhaust
+  mid-horizon on most seeds so the cascade MOVES. par 168/keys 106
+  (was 118/63).
+- SCHEDULE — 5-yr roll + a second corkscrew: the accumulated-depreciation
+  memo (B7=-B4; C7=B7-C4 filled — must build off itself; retyped numbers
+  fail). FY headers, randomized start year. par 113/keys 65 (was 98/39).
+- HARNESS: 40 seeds × 3 — canonical solve passes / fresh build fails /
+  hardcode-only fails. Counter calibrated first: reproduces r100's
+  published lbo 65/113 and dcfsens 29/64 exactly. node --check all pages'
+  scripts + drills/nav/themes; 55/55 catalog↔CHALLENGES parity.
+- drills.js descs updated for the three; HOTKEY_PARS regenerated.
+
+## PORTFOLIO DEEPENING QUEUE (Wolf-directed, r102 — the roadmap of record)
+SPECIFICITY DOCTRINE (addition): every drill reads like a REAL tab — real
+statement layouts, named companies, FY headers, associate-voice checklists.
+"Non-specific / non-realistic" is now a defect class, not a style note.
+- T3 Full Builds realism pass: isbuild/cfslink/debtsched/nwcsched/bsbuild/
+  threestmt — pre-doctrine era; titles/FY headers, sweep for two-SUM
+  shortcuts, ref-enforce every link, associate-voice labels.
+- T4 Formulas family: margin/growth/bridge/foot/percent/cagr/revolver/
+  balance/sumif/cases — rebuild on realistic statement layouts (growth
+  clarity, pipeline #26, folds in here).
+- T5 Lookups/Data/Values: lookup/lookup2/sort/series/drill/pastes/
+  transpose — real surfaces (comps tables, trading data, raw dumps).
+- T6 Foundations/Formatting surfaces: mechanics stay, but run on
+  model-shaped sheets ('dress' r97 is the template): navigation/copyover/
+  blocksel/autofit/filldr/format/center/blue/polish/combo/gauntlet.
+- Cross-cutting riders per tranche: drill-titles pass (#25), checklist
+  voice tranche 2, retbridge/football re-audit vs doctrine.
+- v101.
