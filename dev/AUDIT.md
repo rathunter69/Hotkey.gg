@@ -2658,3 +2658,25 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   PBs = local, min-merged with server at login. All three now converge on
   the same numbers on every surface.
 - v113.
+
+---
+# ROUND 118 — DESK TRUST & SAFETY (Wolf's PJT-RSSG concern) + ART SPEC
+- PROTECTED NAMES SHIPPED (migration 20260712300000): real firm names
+  (collapsed-substring: goldmansachs/morganstanley/evercore/centerview/
+  liontree/...) and desk acronyms (standalone tokens: GS MS PJT RSSG KKR
+  PWP CVP...) now raise DESK_NAME_PROTECTED at the trigger — 'Kings of the
+  Grid' passes, 'GS TMT 2026' is reserved until a verified claim. Client
+  copy: 'Real firm and group names are reserved — verified desks are
+  coming.'
+- dev/TRUST_SAFETY.md = the launch pass Wolf called: threat model
+  (impersonation kills the B2B funnel first), verified desks (captain's
+  email domain = the school-tag mechanism in corporate flavor; verification
+  unlocks protected names), report flow, admin powers (force-rename/
+  suspend), creation rate limit, invite rotation, audit trail, terms
+  policy text. Build order documented; triggers on Wolf calling launch.
+- dev/ART_SPEC.md for Wolf's LoL-grade icon work: 8 tier emblems (SVG,
+  square, 8% margin, 16px silhouette test, both themes, naming scheme),
+  rank PLATES 1024x640 for card v3 / rank-reveal (painterly allowed there),
+  achievements phase-2 as 8 category glyphs first. Integration = one round:
+  rankEmblem gets an asset loader w/ generative fallback.
+- No shared-asset change; ?v stays 113. Migration deploys on push.

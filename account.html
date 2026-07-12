@@ -254,6 +254,7 @@ async function load(){
   // DESKS v1 (r110): create / join / invite / leave, all through security-definer RPCs.
   // The invite code never comes from a table read — my_desk() returns it to captains only.
   const deskErr = e => { const m=String((e&&e.message)||e||'');
+    if(m.includes('DESK_NAME_PROTECTED')) return 'Real firm and group names are reserved \u2014 verified desks are coming.';
     if(m.includes('DESK_NAME_RESERVED')) return 'That name isn\u2019t available.';
     if(m.includes('ALREADY_ON_DESK'))   return 'You\u2019re already on a desk \u2014 leave it first.';
     if(m.includes('DESK_NOT_FOUND'))    return 'That invite code isn\u2019t valid.';
