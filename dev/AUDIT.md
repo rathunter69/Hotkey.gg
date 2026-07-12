@@ -2141,3 +2141,11 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
 - 54 drills total. Center-across-selection still queued (needs an engine
   alignment-span mode + renderer support — logged, not forgotten).
 - v96.
+
+---
+# ROUND 98 — "Roll-forward prep" (versionup): the de-hardcode drill
+- NEW DRILL after triage: inherited tab where growth % and EBITDA are TYPED
+  numbers (right today, silently wrong tomorrow). Rebuild both rows as live
+  formulas — checks demand formulas AND value-parity with v1 ("nothing
+  drifted"). Versioning discipline as a rep. 30-seed verified. 55 drills.
+- v97.
