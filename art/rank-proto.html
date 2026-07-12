@@ -1,92 +1,159 @@
-<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 1</title>
+<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 2</title>
 <style>
-  body{margin:0;font-family:'JetBrains Mono',monospace;background:#1b1d22;color:#cdd0d6;padding:28px}
+  body{margin:0;font-family:'JetBrains Mono',monospace;background:#17181d;color:#cdd0d6;padding:28px}
   h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 4px} .sub{font-size:11px;color:#666a72;margin-bottom:22px}
-  .row{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:26px}
-  .tile{width:150px;background:#22242a;border:1px solid #33363e;border-radius:12px;padding:16px 10px 12px;text-align:center}
+  .row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+  .tile{width:158px;background:#1f2127;border:1px solid #2f323a;border-radius:12px;padding:18px 10px 12px;text-align:center}
   .tile.light{background:#e9eaed;border-color:#d0d2d8;color:#3a3d44}
   .tile .nm{font-size:9.5px;letter-spacing:1px;margin-top:10px;color:#9a9ea8;text-transform:uppercase}
+  .tile .gl{font-size:8.5px;color:#5d616a;margin-top:2px}
   .tile.light .nm{color:#6b6f78}
-  .chips{display:flex;gap:14px;align-items:center;background:#22242a;border:1px solid #33363e;border-radius:12px;padding:12px 16px;width:max-content}
+  .chips{display:flex;gap:14px;align-items:center;background:#1f2127;border:1px solid #2f323a;border-radius:12px;padding:12px 16px;width:max-content}
   .cap{font-size:10px;color:#666a72;margin:18px 0 8px;letter-spacing:1.5px}
+  /* rank-up animation PREVIEW (hover) — the layer groups are animation-ready */
+  .tile svg .aura{transition:opacity .4s} .tile:hover svg .aura{animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.75}50%{opacity:1}}
 </style></head><body>
-<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 1</h1>
-<div class="sub">parametric SVG · escalation grammar: plate &rarr; chevrons &rarr; studs &rarr; wings &rarr; gem &rarr; crown &rarr; radiance · iterate by naming the tier + what to change</div>
-<div class="cap">HERO 96px · DARK</div><div class="row" id="dark"></div>
-<div class="cap">HERO 96px · LIGHT</div><div class="row" id="light"></div>
+<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 2</h1>
+<div class="sub">distinct desk-culture glyph per rank &middot; ornament + glow escalate toward the summit &middot; layers grouped for future rank-up FX (hover a tile to preview the aura pulse)</div>
+<div class="cap">HERO 104px · DARK</div><div class="row" id="dark"></div>
+<div class="cap">HERO 104px · LIGHT</div><div class="row" id="light"></div>
 <div class="cap">SILHOUETTE TEST · 20px CHIP ROW</div><div class="chips" id="chips"></div>
 <script>
-/* Parametric ranked-emblem generator — Apex/LoL grammar in pure SVG.
-   Layers: aura -> backplate (faceted shield) -> metal frame (vertical gradient,
-   rim-lit) -> ornaments (chevrons/studs/wings/laurel/crown/rays) -> gem core. */
+/* Iteration 2 — Wolf's notes: (1) distinct glyph per rank, tied to desk identity;
+   (2) Master-tier flair: glow borders, ornamental edges, detail density scaling up.
+   Layer groups carry classes (.aura .frame .glyph .ornament) so rank-up animations
+   can target them later without touching the art. */
 function emblem(cfg, size){
   const id='g'+Math.random().toString(36).slice(2,8);
-  const S=100; // internal canvas
   const P=cfg.pal;
   let defs=`
     <linearGradient id="${id}m" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${P.hi}"/><stop offset=".45" stop-color="${P.mid}"/>
       <stop offset=".55" stop-color="${P.lo}"/><stop offset="1" stop-color="${P.deep}"/>
     </linearGradient>
+    <linearGradient id="${id}m2" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="${P.hi}"/><stop offset="1" stop-color="${P.lo}"/>
+    </linearGradient>
     <linearGradient id="${id}p" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${P.plateHi}"/><stop offset="1" stop-color="${P.plateLo}"/>
     </linearGradient>
-    <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="${P.gemHi}"/><stop offset=".6" stop-color="${P.gem}"/>
-      <stop offset="1" stop-color="${P.gemLo}"/>
-    </linearGradient>`;
-  if(cfg.aura) defs+=`<radialGradient id="${id}a"><stop offset=".3" stop-color="${P.aura}" stop-opacity=".55"/><stop offset="1" stop-color="${P.aura}" stop-opacity="0"/></radialGradient>`;
-  // faceted shield: wide shoulders, pointed keel (the "ranked" read)
-  const shield='M50 6 L82 18 L86 46 L68 84 L50 94 L32 84 L14 46 L18 18 Z';
-  const inner ='M50 14 L76 23.5 L79.5 46 L64 78 L50 86 L36 78 L20.5 46 L24 23.5 Z';
+    <radialGradient id="${id}core" cx=".5" cy=".38">
+      <stop offset="0" stop-color="${P.coreGlow}" stop-opacity=".5"/>
+      <stop offset="1" stop-color="${P.coreGlow}" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="${id}glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="${cfg.glow||0}" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>`;
+  if(cfg.aura) defs+=`<radialGradient id="${id}a"><stop offset=".25" stop-color="${P.aura}" stop-opacity=".5"/><stop offset="1" stop-color="${P.aura}" stop-opacity="0"/></radialGradient>`;
+  const shield='M50 5 L83 17 L87 46 L69 85 L50 95 L31 85 L13 46 L17 17 Z';
+  const inner ='M50 13 L77 23 L80.5 46 L65 79 L50 87 L35 79 L19.5 46 L23 23 Z';
   let o='';
-  if(cfg.aura) o+=`<circle cx="50" cy="50" r="48" fill="url(#${id}a)"/>`;
-  if(cfg.rays){ for(let i=0;i<12;i++){ const a=i*30*Math.PI/180;
-    o+=`<line x1="${50+Math.cos(a)*40}" y1="${50+Math.sin(a)*40}" x2="${50+Math.cos(a)*49}" y2="${50+Math.sin(a)*49}" stroke="${P.hi}" stroke-width="${i%3===0?2.4:1.2}" stroke-linecap="round" opacity=".85"/>`; } }
-  if(cfg.wings){ const w=cfg.wings; // layered swept feathers, mirrored
-    for(let s of [-1,1]){ for(let f=0;f<w;f++){ const y=30+f*9, len=26+f*7;
-      o+=`<path d="M${50+s*34} ${y} q ${s*len*0.85} ${-7+f*2.4} ${s*len} ${13+f*3} q ${-s*len*0.55} ${2-f} ${-s*(len-10)} ${-4}" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8" opacity="${0.96-f*0.11}"/>`; } } }
-  o+=`<path d="${shield}" fill="url(#${id}p)" stroke="${P.deep}" stroke-width="2.6"/>`;
-  o+=`<path d="${shield}" fill="none" stroke="url(#${id}m)" stroke-width="3.4" transform="translate(0,-0.4) scale(0.985)" transform-origin="50 50"/>`;
-  o+=`<path d="${inner}" fill="none" stroke="${P.mid}" stroke-width="1" opacity=".8"/>`;
-  o+=`<path d="M18.5 18.2 L50 6.6 L81.5 18.2" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".75" stroke-linecap="round"/>`; // rim light
-  if(cfg.laurel){ for(let s of [-1,1]){
-    o+=`<path d="M${50+s*26} 80 q ${s*16} -10 ${s*18} -34" fill="none" stroke="url(#${id}m)" stroke-width="2.4" stroke-linecap="round"/>`;
-    for(let l=0;l<5;l++){ const t=l/4.4, x=50+s*(26+16*t*(2-t)*0.95), y=79-34*t;
-      o+=`<ellipse cx="${x}" cy="${y}" rx="4.6" ry="2" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".5" transform="rotate(${s*(-52+t*66)} ${x} ${y})"/>`; } } }
-  if(cfg.studs){ for(let s of [-1,1]) o+=`<circle cx="${50+s*27}" cy="30" r="3.1" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>`; }
-  for(let c=0;c<(cfg.chev||0);c++){ const y=64-c*10;
-    o+=`<path d="M38 ${y} L50 ${y-8} L62 ${y} L62 ${y+5.5} L50 ${y-2.5} L38 ${y+5.5} Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".9"/>`; }
-  if(cfg.crown){ o+=`<path d="M36 20.5 L39 10.5 L45 17 L50 7.5 L55 17 L61 10.5 L64 20.5 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1"/>
-    <circle cx="50" cy="5.8" r="2" fill="${P.gemHi}"/>`; }
-  if(cfg.gem){ o+=`<path d="M50 33 L59 44 L50 58 L41 44 Z" fill="url(#${id}g)" stroke="${P.deep}" stroke-width="1.1"/>
-    <path d="M50 33 L59 44 L41 44 Z" fill="#ffffff" opacity=".22"/>
-    <circle cx="46.5" cy="40" r="1.7" fill="#ffffff" opacity=".95"/>`; }
-  if(cfg.mono){ o+=`<text x="50" y="${cfg.gem?73:52}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="${cfg.gem?11:17}" fill="${P.hi}" ${cfg.gem?'':'dominant-baseline="central"'}>${cfg.mono}</text>`; }
+  // aura + rays
+  if(cfg.aura) o+=`<g class="aura"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/></g>`;
+  if(cfg.rays){ let r=''; for(let i=0;i<16;i++){ const a=(i*22.5-90)*Math.PI/180, big=i%4===0;
+    r+=`<line x1="${50+Math.cos(a)*(big?38:41)}" y1="${50+Math.sin(a)*(big?38:41)}" x2="${50+Math.cos(a)*(big?49:46)}" y2="${50+Math.sin(a)*(big?49:46)}" stroke="${P.hi}" stroke-width="${big?2.6:1}" stroke-linecap="round" opacity="${big?0.95:0.55}"/>`; }
+    o+=`<g class="aura">${r}</g>`; }
+  // wings — higher, more aggressive sweep
+  if(cfg.wings){ let w='';
+    for(let s of [-1,1]){ for(let f=0;f<cfg.wings;f++){ const y0=38-f*3, len=24+f*9, rise=18+f*8;
+      w+=`<path d="M${50+s*33} ${y0} Q ${50+s*(33+len*0.9)} ${y0-rise*0.8} ${50+s*(33+len)} ${y0-rise}
+           Q ${50+s*(33+len*0.72)} ${y0-rise+7+f*1.5} ${50+s*(33+len*0.34)} ${y0+7+f*2.2} Z"
+           fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8" opacity="${0.97-f*0.09}"/>`; } }
+    o+=`<g class="ornament">${w}</g>`; }
+  // ornamental side thorns (master-tier edge-work)
+  if(cfg.thorns){ let t='';
+    for(let s of [-1,1]){
+      t+=`<path d="M${50+s*36} 52 L${50+s*46} 47 L${50+s*39} 57 L${50+s*49} 56 L${50+s*40} 64 L${50+s*44} 70 L${50+s*36} 66 Z" fill="url(#${id}m2)" stroke="${P.deep}" stroke-width=".7"/>`;
+      t+=`<path d="M${50+s*30} 82 L${50+s*38} 88 L${50+s*29} 89 Z" fill="url(#${id}m2)" stroke="${P.deep}" stroke-width=".6"/>`; }
+    o+=`<g class="ornament">${t}</g>`; }
+  // glowing plate + double frame (outer frame carries the glow filter)
+  o+=`<g class="frame" ${cfg.glow?`filter="url(#${id}glow)"`:''}>
+    <path d="${shield}" fill="url(#${id}p)" stroke="${P.deep}" stroke-width="2.4"/>
+    <path d="${shield}" fill="none" stroke="url(#${id}m)" stroke-width="3.6" transform="scale(0.985)" transform-origin="50 50"/>
+  </g>`;
+  o+=`<path d="${inner}" fill="none" stroke="${P.mid}" stroke-width="1.1" opacity=".85"/>`;
+  // faceted plate detail: inner bevel spokes
+  o+=`<path d="M50 13 L50 5 M23 23 L17 17 M77 23 L83 17 M35 79 L31 85 M65 79 L69 85" stroke="${P.mid}" stroke-width="1" opacity=".5"/>`;
+  o+=`<path d="M19 17.6 L50 5.8 L81 17.6" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".8" stroke-linecap="round"/>`;
+  if(cfg.core) o+=`<circle cx="50" cy="47" r="26" fill="url(#${id}core)"/>`;
+  // laurel
+  if(cfg.laurel){ let lr='';
+    for(let s of [-1,1]){
+      lr+=`<path d="M${50+s*27} 81 q ${s*17} -11 ${s*19} -36" fill="none" stroke="url(#${id}m)" stroke-width="2.4" stroke-linecap="round"/>`;
+      for(let l=0;l<5;l++){ const t2=l/4.4, x=50+s*(27+17*t2*(2-t2)*0.95), y=80-36*t2;
+        lr+=`<ellipse cx="${x}" cy="${y}" rx="4.8" ry="2" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".5" transform="rotate(${s*(-52+t2*66)} ${x} ${y})"/>`; } }
+    o+=`<g class="ornament">${lr}</g>`; }
+  // crown — bigger, jeweled, sits proud of the plate
+  if(cfg.crown){ o+=`<g class="ornament" ${cfg.glow?`filter="url(#${id}glow)"`:''}>
+    <path d="M33 19 L36 6.5 L44 14.5 L50 3.5 L56 14.5 L64 6.5 L67 19 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
+    <circle cx="50" cy="2.8" r="2.2" fill="${P.gemHi}"/><circle cx="36.4" cy="5.6" r="1.5" fill="${P.gemHi}"/><circle cx="63.6" cy="5.6" r="1.5" fill="${P.gemHi}"/>
+  </g>`; }
+  // chevrons (low-tier progression marks, under the glyph)
+  for(let c=0;c<(cfg.chev||0);c++){ const y=78-c*7;
+    o+=`<path d="M40 ${y} L50 ${y-6.5} L60 ${y} L60 ${y+4.5} L50 ${y-2} L40 ${y+4.5} Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>`; }
+  // ---- THE GLYPH (Wolf: every rank gets its own identity) ----
+  const G=P, gy=cfg.chev?42:47;
+  const glyphs={
+    ref:`<text x="50" y="44" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="15" fill="#e0503c">#REF!</text>
+         <text x="50" y="60" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="${P.mid}">circular</text>`,
+    book:`<g transform="translate(50 ${gy})">
+      <path d="M-15 8 Q -8 3.5 0 5 Q 8 3.5 15 8 L15 -9 Q 8 -13.5 0 -12 Q -8 -13.5 -15 -9 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
+      <path d="M0 5 L0 -12" stroke="${P.deep}" stroke-width="1.2"/>
+      <path d="M-11.5 -6 Q -6 -8.5 -3 -7.5 M-11.5 -2 Q -6 -4.5 -3 -3.5 M-11.5 2 Q -6 -0.5 -3 0.5 M3 -7.5 Q 6 -8.5 11.5 -6 M3 -3.5 Q 6 -4.5 11.5 -2" stroke="${P.plateLo}" stroke-width="1" fill="none"/></g>`,
+    coffee:`<g transform="translate(50 ${gy+2})">
+      <path d="M-10 -4 L-8 12 Q 0 15 8 12 L10 -4 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.1"/>
+      <path d="M10 -1 q 7 0 6 6 q -0.8 5 -7.5 4" fill="none" stroke="url(#${id}m)" stroke-width="2.4"/>
+      <ellipse cx="0" cy="-4" rx="10" ry="2.6" fill="${P.plateLo}" stroke="${P.deep}" stroke-width="1"/>
+      <path d="M-4 -9 q 2 -3 0 -6 M2 -9 q 2 -3 0 -6" stroke="${P.mid}" stroke-width="1.4" fill="none" stroke-linecap="round"/></g>`,
+    keycap:`<g transform="translate(50 ${gy})">
+      <rect x="-13" y="-12" width="26" height="24" rx="4.5" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/>
+      <rect x="-9.5" y="-9" width="19" height="16" rx="3" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
+      <text x="0" y="2.5" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono,monospace" font-weight="800" font-size="10" fill="${P.hi}">F4</text></g>`,
+    sigma:`<g transform="translate(50 ${gy})">
+      <path d="M-10 -13 L11 -13 L11 -7.5 L-2.5 -7.5 L6 0 L-2.5 7.5 L11 7.5 L11 13 L-10 13 L-10 8.5 L0.5 0 L-10 -8.5 Z"
+        fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/></g>`,
+    chart:`<g transform="translate(50 ${gy+1})">
+      <rect x="-12" y="4" width="5" height="9" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+      <rect x="-4" y="-1" width="5" height="14" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+      <rect x="4" y="-6" width="5" height="19" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".8"/>
+      <path d="M-12 -3 L-1 -8 L4 -12 L12 -15" fill="none" stroke="${P.hi}" stroke-width="2" stroke-linecap="round"/>
+      <path d="M7 -16.5 L12.5 -15.3 L10.2 -10.5" fill="none" stroke="${P.hi}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>`,
+    nib:`<g transform="translate(50 ${gy})">
+      <path d="M0 -14 Q 11 -6 8.5 4 L0 15 L-8.5 4 Q -11 -6 0 -14 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width="1.2"/>
+      <circle cx="0" cy="-1" r="2.2" fill="${P.plateLo}" stroke="${P.deep}" stroke-width=".8"/>
+      <path d="M0 1 L0 12" stroke="${P.deep}" stroke-width="1.3"/></g>`,
+    bolt:`<g transform="translate(50 ${gy})" ${cfg.glow?`filter="url(#${id}glow)"`:''}>
+      <path d="M-2 -16 L9 -16 L2 -3 L10 -3 L-7 17 L-1 1 L-9 1 Z" fill="${P.gemHi}" stroke="${P.deep}" stroke-width="1"/>
+      <path d="M-2 -16 L9 -16 L2 -3 L-2 -3 Z" fill="#ffffff" opacity=".3"/></g>`,
+  };
+  if(cfg.glyph) o+=`<g class="glyph">${glyphs[cfg.glyph]}</g>`;
   return `<svg width="${size}" height="${size}" viewBox="0 0 100 100">${'<defs>'+defs+'</defs>'}${o}</svg>`;
 }
-const IRON ={hi:'#b9bec9',mid:'#8b919d',lo:'#5d626d',deep:'#33363e',plateHi:'#3a3d45',plateLo:'#24262c',gem:'#6a7180',gemHi:'#c2c8d4',gemLo:'#3c414c',aura:'#8b919d'};
-const BRONZE={hi:'#e6b17e',mid:'#c98a4b',lo:'#96602e',deep:'#4f3117',plateHi:'#463527',plateLo:'#2a2019',gem:'#d08c46',gemHi:'#ffd9a8',gemLo:'#7c4c1e',aura:'#c98a4b'};
-const SILVER={hi:'#eef2f8',mid:'#c3cad6',lo:'#8f97a6',deep:'#4d5462',plateHi:'#454b57',plateLo:'#282c34',gem:'#aeb8c8',gemHi:'#ffffff',gemLo:'#6a7383',aura:'#c3cad6'};
-const GOLD ={hi:'#ffe9a6',mid:'#f0c04e',lo:'#c08f22',deep:'#5f4508',plateHi:'#4a3f22',plateLo:'#2b2415',gem:'#ffd75e',gemHi:'#fff6d8',gemLo:'#9a7112',aura:'#f0c04e'};
-const PLAT ={hi:'#d8fbf4',mid:'#7fd6c6',lo:'#3f9d90',deep:'#1c4f49',plateHi:'#274a46',plateLo:'#182b29',gem:'#66e2cd',gemHi:'#eafffb',gemLo:'#22796c',aura:'#7fd6c6'};
-const CRIM ={hi:'#ff9d8a',mid:'#e0503c',lo:'#9c2c1e',deep:'#471410',plateHi:'#3d1f1b',plateLo:'#231211',gem:'#ff5d42',gemHi:'#ffd0c4',gemLo:'#8a1f12',aura:'#e0503c'};
-const DIAM ={hi:'#eafaff',mid:'#8fd8f2',lo:'#4aa4c9',deep:'#1c4a63',plateHi:'#22404f',plateLo:'#152730',gem:'#7de2ff',gemHi:'#ffffff',gemLo:'#2f7fa3',aura:'#8fd8f2'};
+const IRON ={hi:'#b9bec9',mid:'#878d99',lo:'#585d68',deep:'#2e3138',plateHi:'#383b43',plateLo:'#22242a',gemHi:'#c2c8d4',aura:'#8b919d',coreGlow:'#9aa0ac'};
+const SLATE={hi:'#c7cbd4',mid:'#949aa6',lo:'#636974',deep:'#33363e',plateHi:'#3d4048',plateLo:'#26282e',gemHi:'#d8dce4',aura:'#949aa6',coreGlow:'#a8adb8'};
+const BRONZE={hi:'#f0bc85',mid:'#cd8d4c',lo:'#98622f',deep:'#4c2f16',plateHi:'#463527',plateLo:'#291f18',gemHi:'#ffd9a8',aura:'#cd8d4c',coreGlow:'#e8a45f'};
+const SILVER={hi:'#f2f5fa',mid:'#c6cdd9',lo:'#8f97a6',deep:'#4a515f',plateHi:'#454b57',plateLo:'#272b33',gemHi:'#ffffff',aura:'#c6cdd9',coreGlow:'#dde2ea'};
+const GOLD ={hi:'#ffedaf',mid:'#f2c452',lo:'#c19023',deep:'#5c4307',plateHi:'#4a3f22',plateLo:'#2a2314',gemHi:'#fff6d8',aura:'#f2c452',coreGlow:'#ffd968'};
+const PLAT ={hi:'#dcfcf6',mid:'#83dac9',lo:'#3f9d90',deep:'#1b4c46',plateHi:'#264a45',plateLo:'#172a28',gemHi:'#eafffb',aura:'#83dac9',coreGlow:'#8ef2df'};
+const CRIM ={hi:'#ffab98',mid:'#e4543f',lo:'#9e2c1e',deep:'#43120e',plateHi:'#3d1e1a',plateLo:'#221110',gemHi:'#ffd0c4',aura:'#ff5d42',coreGlow:'#ff6b52'};
+const DIAM ={hi:'#f0fcff',mid:'#95dcf5',lo:'#4aa4c9',deep:'#1a4860',plateHi:'#22404f',plateLo:'#14262f',gemHi:'#ffffff',aura:'#8fd8f2',coreGlow:'#a8ecff'};
 const TIERS=[
-  {n:'MBA Associate',        cfg:{pal:IRON,   mono:'MBA'}},
-  {n:'Candidate',            cfg:{pal:IRON,   chev:1}},
-  {n:'Summer Analyst',       cfg:{pal:BRONZE, chev:1, studs:1}},
-  {n:'First-Year Analyst',   cfg:{pal:SILVER, chev:2, studs:1}},
-  {n:'Associate',            cfg:{pal:GOLD,   chev:2, studs:1, laurel:1}},
-  {n:'VP',                   cfg:{pal:PLAT,   chev:1, gem:1, wings:2}},
-  {n:'MD',                   cfg:{pal:CRIM,   gem:1, wings:3, crown:1, aura:1}},
-  {n:'Second-Year Analyst',  cfg:{pal:DIAM,   gem:1, wings:3, crown:1, laurel:1, rays:1, aura:1}},
+  {n:'MBA Associate',       g:'#REF! — they broke the model', cfg:{pal:IRON,   glyph:'ref'}},
+  {n:'Candidate',           g:'the book — still studying',    cfg:{pal:SLATE,  glyph:'book',   chev:1}},
+  {n:'Summer Analyst',      g:'the coffee run',               cfg:{pal:BRONZE, glyph:'coffee', chev:1, core:1}},
+  {n:'First-Year Analyst',  g:'the F4 key',                   cfg:{pal:SILVER, glyph:'keycap', chev:2, core:1}},
+  {n:'Associate',           g:'Σ — sums the room',            cfg:{pal:GOLD,   glyph:'sigma',  laurel:1, core:1, glow:1.1}},
+  {n:'VP',                  g:'up and to the right',          cfg:{pal:PLAT,   glyph:'chart',  wings:2, core:1, glow:1.4, thorns:1}},
+  {n:'MD',                  g:'the pen that signs',           cfg:{pal:CRIM,   glyph:'nib',    wings:3, crown:1, core:1, aura:1, glow:2, thorns:1}},
+  {n:'Second-Year Analyst', g:'lightning — the final boss',   cfg:{pal:DIAM,   glyph:'bolt',   wings:3, crown:1, laurel:1, rays:1, core:1, aura:1, glow:2.2, thorns:1}},
 ];
 for(const t of TIERS){
   document.getElementById('dark').insertAdjacentHTML('beforeend',
-    `<div class="tile">${emblem(t.cfg,96)}<div class="nm">${t.n}</div></div>`);
+    `<div class="tile">${emblem(t.cfg,104)}<div class="nm">${t.n}</div><div class="gl">${t.g}</div></div>`);
   document.getElementById('light').insertAdjacentHTML('beforeend',
-    `<div class="tile light">${emblem(t.cfg,96)}<div class="nm">${t.n}</div></div>`);
+    `<div class="tile light">${emblem(t.cfg,104)}<div class="nm">${t.n}</div></div>`);
   document.getElementById('chips').insertAdjacentHTML('beforeend', emblem(t.cfg,20));
 }
 </script></body></html>
