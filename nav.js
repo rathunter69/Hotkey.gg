@@ -288,6 +288,11 @@
     if(!window.sb || !window._navUser) return;
     try{
       const d = await loadProfileData();
+      // r117: LEVEL PERSISTENCE — nav chip & in-game level run on a local estimate
+      // (hk_xp_est); a returning player on a fresh device read LVL 1 while their card
+      // knew better. Hydrate from canonical XP (PB-hydration pattern, r83). SET, not
+      // max: a second account on the same machine must not inherit the first's level.
+      try{ localStorage.setItem('hk_xp_est', String(computeXP(d, d.myRuns, d.mySessions))); renderAuthBar(); }catch(e){}
       const t = tierOf(d.avgPct, d.attempted, d.wsum);
       el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name,20):'')+'<span>'+t.name+'</span>';
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;

@@ -2625,3 +2625,36 @@ Wolf's #29 ("same tier everywhere — audit") turned out to be FIVE live defects
   =307 exact; breadth 525 vs grind 109; two-day reset 115); node --check all;
   e2e ALL GREEN (solve path exercises the new estimate); boot clean.
 - v112.
+
+---
+# ROUND 117 — GAMEPLAY-LOOP SANITY AUDIT (Wolf-directed): the full flow map
+Every identity/persistence flow traced end to end. VERDICT: the loop is sound
+post-r112/r115/r116; ONE real gap found and fixed this round.
+- FLOW MAP (audited good):
+  1. First visit → landing dialog (frame language) → invite gate (HAGS) →
+     onboarding placement/tour → first drill auto-guided (hk_learn_done).
+  2. Account creation → gate signup w/ invite → members insert → pick-a-name
+     prompt (ALIVE again since r115's recursion fix; now with generator chips).
+  3. Anon → account: auth.updateUser links SAME uid — guest runs/PBs survive.
+  4. Returning, same device: hk-returning skips landing → welcome-back dialog
+     (named, PB, streak, resume; passive dismissal) → session resume.
+  5. Returning, new device: sign in → PB server-hydration (r83, min-merge) →
+     rank pill from canonical standing (r112: shrunk scale + wsum) →
+     LEVEL: was the gap (below).
+  6. Sign-out: handle cache cleared (×3 sites); local PBs/xp stay for device
+     continuity; next login overwrites the level estimate (see fix).
+- FIXED — LEVEL PERSISTENCE ACROSS DEVICES: hk_xp_est was device-local only;
+  fresh device showed LVL 1 in nav/game while the card computed the true
+  level. navRank now hydrates hk_xp_est from canonical computeXP on every
+  pill load (cache-miss cadence \u226410 min) and repaints the chip. SET
+  semantics so account-switching on one machine can't inherit a level.
+- ELEGANCE PASS (inline/frame-language doctrine): landing, welcome-back,
+  celebrations, gate, name prompt, results, public cards all speak the
+  34px-cap frame language; no browser alerts/confirm anywhere in the loop;
+  destructive desk-leave uses click-again confirm. No changes needed.
+- RANK/LEVEL PERSISTENCE MODEL (for the record): RANK = server runs →
+  standing → tierOf (sessionStorage cache 10 min). LEVEL = server runs →
+  computeXP canonical, local estimate for instant paint + anon players.
+  PBs = local, min-merged with server at login. All three now converge on
+  the same numbers on every surface.
+- v113.
