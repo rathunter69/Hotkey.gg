@@ -2889,3 +2889,29 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   hkCelebrate({rankUp:true...}) — mid-sequence and settled screenshots
   reviewed (bull emblem staging correctly, crimson confetti, pips forge
   last); zero page errors.
+
+---
+# ROUND 130 — CAPTAIN ASSIGNMENTS SHIPPED (Desks V2, the corporate-training primitive)
+- MIGRATION 20260712600000: team_assignments (team_id+challenge unique,
+  optional target_ms 1s..1h, note <=120, one-week expiry). Cap 3 LIVE per
+  desk via trigger (expired rows pruned on write; <> challenge guard keeps
+  re-pin upserts legal). RLS read-all; WRITES ONLY via captain RPCs
+  set_assignment (upsert, resets the week) + clear_assignment. Challenge
+  key validated by pattern server-side + against menuOrder client-side.
+- COMPLETION DERIVES FROM RUNS (no completion table): clean run on the
+  drill AFTER it was pinned, under target when one is set.
+- account.html: assignments block in the desk card — captain gets pin UI
+  (datalist over drills.js menuOrder + target-seconds + note) and per-row
+  clear; analysts see the list with Play deep-links (index ?drill=).
+  ASSIGN_CAP mapped in deskErr.
+- index.html: picker chips wear the assignment mark (warn-colored border
+  + diamond, tooltip carries target/note); one toast per session lists
+  the week's pins. Fetch keys off my_desk() then team_assignments.
+- leaderboard.html ?desk= page: "this week's assignments" strip under the
+  banner — each pin shows target ('under Ns' / 'clean clear'), note, and
+  X/N members done (derived from fRuns since created_at).
+- CACHE v116 -> v117 (all 9 pages).
+- VERIFY: node --check on all extracted inline scripts (caught + fixed an
+  unbalanced ternary in the picker tooltip before it ever booted), 4
+  pages boot clean, e2e demo-replay ALL GREEN. Live RPC verification
+  rides the next fresh-session smoke (egress blocked here).

@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=116" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=116">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=116">
+<link rel="icon" href="favicon.ico?v=117" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=117">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=117">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -186,15 +186,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=116">
-<script src="drills.js?v=116"></script>
+<link rel="stylesheet" href="nav.css?v=117">
+<script src="drills.js?v=117"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=116"></script>
+<script src="themes.js?v=117"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=116"></script>
+<script src="nav.js?v=117"></script>
 
 <header class="head">
   <div class="wrap">
@@ -412,6 +412,29 @@ async function load(){
       if(rep) rep.onclick=async()=>{ try{
         await sb.from('reports').insert({reporter:DATA.meId, kind:'desk', target:DATA.viewDesk.slug});
         rep.textContent='reported \u2713'; rep.style.pointerEvents='none'; }catch(e){} };
+      // r130: this week's assignments + completion ticks \u2014 completion DERIVES from runs
+      // (clean run on the drill since it was pinned, under target when one is set)
+      (async()=>{ try{
+        const {data:asg}=await sb.from('team_assignments')
+          .select('challenge,target_ms,note,created_at,expires_at')
+          .eq('team_id', DATA.viewDesk.id).gt('expires_at', new Date().toISOString())
+          .order('created_at');
+        if(!asg||!asg.length) return;
+        const lab={}; CH.forEach(c=>lab[c.key]=c.label||c.key);
+        const ids=[...DATA.viewDesk.ids];
+        const rows=asg.map(a=>{
+          const since=new Date(a.created_at).getTime();
+          const done=ids.filter(id=>DATA.fRuns.some(r=>r.user_id===id && r.challenge===a.challenge &&
+            (!a.target_ms || r.time_ms<=a.target_ms) && new Date(r.created_at||0).getTime()>=since)).length;
+          return '<div class="sl"><div class="sl-sec"><span class="dia">\u25c6</span>'+esc(lab[a.challenge]||a.challenge)+'</div>'+
+            '<div class="sl-name">'+(a.target_ms?('under '+(a.target_ms/1000)+'s'):'clean clear')+'</div>'+
+            '<div class="sl-t">'+done+' / '+ids.length+' done</div>'+
+            (a.note?'<div class="sl-lab">'+esc(a.note)+'</div>':'')+'</div>';
+        }).join('');
+        const w=document.createElement('div');
+        w.innerHTML='<div class="section-title">\u25c6 this week\u2019s assignments</div><div class="seclead">'+rows+'</div>';
+        b.appendChild(w);
+      }catch(e){} })();
     } else if(b){ b.remove(); }
   }catch(e){} }, 0);
   renderAll();

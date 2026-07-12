@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Account · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=116" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=116">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=116">
+<link rel="icon" href="favicon.ico?v=117" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=117">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=117">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -62,8 +62,8 @@
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
 </style>
-<link rel="stylesheet" href="nav.css?v=116">
-<script src="drills.js?v=116"></script>
+<link rel="stylesheet" href="nav.css?v=117">
+<script src="drills.js?v=117"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -71,11 +71,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=116"></script>
+<script src="themes.js?v=117"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=116"></script>
+<script src="nav.js?v=117"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -262,8 +262,58 @@ async function load(){
     if(m.includes('DESK_FULL'))         return 'That desk is full (200).';
     if(m.includes('DESK_RATE_LIMIT'))   return 'One desk per day \u2014 try again tomorrow.';
     if(m.includes('NOT_CAPTAIN'))       return 'Only the captain can do that.';
+    if(m.includes('ASSIGN_CAP'))        return 'Three live assignments max — clear one first.';
     if(m.includes('duplicate key'))     return 'A desk with that name already exists.';
     return 'Something went wrong.'; };
+  // r130: DESK ASSIGNMENTS — the captain pins up to 3 drills for the week; analysts
+  // see them here + marked in the game's picker. Completion lives on the desk boards.
+  async function renderAssignments(d){
+    const host=document.getElementById('asgWrap'); if(!host) return;
+    let rows=[];
+    try{ const {data}=await sb.from('team_assignments')
+      .select('challenge,target_ms,note,expires_at')
+      .eq('team_id', d.team_id).gt('expires_at', new Date().toISOString())
+      .order('created_at'); rows=data||[]; }catch(e){}
+    const D=window.HOTKEY_DRILLS||{}, lab=k=>(D.nameOf&&D.nameOf[k])||k;
+    const days=x=>Math.max(1,Math.ceil((new Date(x)-Date.now())/86400000));
+    let h='<div class="rowline"><span class="k">assignments</span><span style="font-size:11px;color:var(--muted)">'+
+      (rows.length ? rows.length+' live this week'
+        : (d.role==='captain' ? 'pin up to 3 drills for the week' : 'your captain hasn’t pinned any yet'))+'</span></div>';
+    rows.forEach(r=>{
+      h+='<div class="rowline" style="align-items:center"><span style="font-family:var(--mono);font-size:12px"><b>'+esc(lab(r.challenge))+'</b>'+
+        (r.target_ms?' · under '+(r.target_ms/1000)+'s':'')+
+        (r.note?' · <span style="color:var(--muted)">'+esc(r.note)+'</span>':'')+
+        ' <span style="color:var(--faint)">· '+days(r.expires_at)+'d left</span></span>'+
+        (d.role==='captain'
+          ? '<button class="btn ghost asgDel" data-k="'+esc(r.challenge)+'" style="margin:0;padding:2px 9px" title="clear assignment">×</button>'
+          : '<a class="btn ghost" style="margin:0;padding:2px 9px;text-decoration:none" href="index.html?drill='+esc(r.challenge)+'">Play</a>')+'</div>';
+    });
+    if(d.role==='captain'){
+      const opts=((D.menuOrder)||[]).map(k=>'<option value="'+k+'">'+esc(lab(k))+'</option>').join('');
+      h+='<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">'+
+        '<input id="asgKey" list="asgList" placeholder="drill — e.g. debtsched" style="width:170px"><datalist id="asgList">'+opts+'</datalist>'+
+        '<input id="asgTgt" type="number" min="1" max="3600" step="1" placeholder="target s (opt)" style="width:120px">'+
+        '<input id="asgNote" maxlength="120" placeholder="note (opt)" style="flex:1;min-width:140px">'+
+        '<button class="btn ghost" id="asgAdd" style="margin:0">Pin</button></div>'+
+        '<div class="msg" id="asgMsg"></div>';
+    }
+    host.innerHTML=h;
+    host.querySelectorAll('.asgDel').forEach(b=>{ b.onclick=async()=>{ try{
+      const {error}=await sb.rpc('clear_assignment',{p_challenge:b.dataset.k});
+      if(error){ say('asgMsg',deskErr(error),true); return; }
+      renderAssignments(d); }catch(e){ say('asgMsg','Something went wrong.',true); } }; });
+    const add=document.getElementById('asgAdd');
+    if(add) add.onclick=async()=>{
+      const k=(document.getElementById('asgKey').value||'').trim().toLowerCase();
+      if(!k || (D.menuOrder && D.menuOrder.indexOf(k)<0)){ say('asgMsg','Pick a real drill from the list.',true); return; }
+      const tv=parseFloat(document.getElementById('asgTgt').value);
+      const tgt=(isFinite(tv)&&tv>0)?Math.round(tv*1000):null;
+      try{ const {error}=await sb.rpc('set_assignment',{p_challenge:k, p_target_ms:tgt,
+          p_note:(document.getElementById('asgNote').value||'').trim()||null});
+        if(error){ say('asgMsg',deskErr(error),true); return; }
+        renderAssignments(d);
+      }catch(e){ say('asgMsg','Something went wrong.',true); } };
+  }
   async function renderDesk(){
     const el=document.getElementById('deskBody'); if(!el) return;
     let d=null;
@@ -276,8 +326,10 @@ async function load(){
         <div class="rowline"><span class="k">analysts</span><span>${d.members} / 200</span></div>
         <div class="rowline"><span class="k">your role</span><span>${d.role==='captain'?'captain':'analyst'}</span></div>
         ${inv}
+        <div id="asgWrap" style="margin-top:6px"></div>
         <div style="margin-top:10px;display:flex;gap:10px;align-items:center"><a class="btn ghost" style="text-decoration:none" href="leaderboard.html?desk=${esc(d.slug)}">Desk boards \u2192</a><button class="btn ghost" id="deskLeave" style="margin:0">Leave desk</button></div>
         <div class="msg" id="deskMsg"></div>`;
+      renderAssignments(d);
       const cp=document.getElementById('deskCopy');
       if(cp) cp.onclick=async()=>{ try{ await navigator.clipboard.writeText(document.getElementById('deskLink').textContent);
         say('deskMsg','Link copied \u2014 drop it in the group chat.'); }catch(e){ say('deskMsg','Copy failed \u2014 select the link and copy it.',true); } };

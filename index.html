@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=116" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=116">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=116">
+<link rel="icon" href="favicon.ico?v=117" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=117">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=117">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -679,6 +679,8 @@
   .pk-byline.focus{outline:2px solid var(--accent); outline-offset:1px; color:var(--text)}   /* r83: the keyboard cursor */
   .pk-byline.held i{color:var(--accent); font-style:normal; font-size:10px}
   .pk-byline i{color:var(--faint); font-style:normal}
+  .pk-byline.asg{border-color:var(--warn)}   /* r130: desk assignment — captain pinned it */
+  .pk-asgmark{color:var(--warn); font-size:9px}
   /* r81: FLAGSHIPS break formation — full-width block, accent frame, par shown */
   .pk-flagship{grid-column:1/-1; border-color:var(--accent-dim); background:color-mix(in srgb, var(--accent-glow) 45%, transparent)}
   .pk-flagship .pk-glabel{background:color-mix(in srgb, var(--accent-glow) 60%, var(--surface2))}
@@ -1079,14 +1081,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=116"></script>
-<link rel="stylesheet" href="nav.css?v=116">
-<script src="themes.js?v=116"></script>
+<script src="drills.js?v=117"></script>
+<link rel="stylesheet" href="nav.css?v=117">
+<script src="themes.js?v=117"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=116"></script>
+<script src="nav.js?v=117"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -7744,12 +7746,13 @@ function buildSheetTabs(){   // renders the drill picker overlay, grouped by ski
     g.keys.forEach(key=>{
       const C=CHALLENGES[key]; if(!C) return;
       const chip=document.createElement('span');
-      chip.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'');
+      const __a=(window.__deskAsg||{})[key];   // r130: captain's pinned drill
+      chip.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'');
       chip.dataset.key=key;
-      chip.innerHTML=escHtml(C.name||key)+
+      chip.innerHTML=(__a?'<span class="pk-asgmark">\u25c6</span> ':'')+escHtml(C.name||key)+
         (GROUP_OF[key]==='Full Builds'?'<span class="pk-par">par '+(C.par||'')+'s</span>':'')+
         (PB[key]!==undefined?' <i>\u2713</i>':'');
-      chip.title=(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'');
+      chip.title=(__a?('desk assignment'+(__a.t?' \u00b7 target '+(__a.t/1000)+'s':'')+(__a.note?' \u00b7 '+__a.note:'')+' \u00b7 '):'')+(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'');
       chip.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
       cloud.appendChild(chip);
     });
@@ -7959,6 +7962,24 @@ async function onSession(session){
       if(h&&h.name){ sessionStorage.setItem('hk_home_nudged','1');
         showToast(h.name+' has a desk \u2014 one tap to join it on your account page'); }
     }catch(e){} }, 2400);
+    // r130: DESK ASSIGNMENTS \u2014 the captain's pinned drills mark the picker; one toast/session
+    setTimeout(async ()=>{ try{
+      if(!window.sb || isAnonUser()) return;
+      const {data:md}=await sb.rpc('my_desk'); const dk=(md&&md[0])||null;
+      if(!dk) return;
+      const {data:asg}=await sb.from('team_assignments')
+        .select('challenge,target_ms,note,expires_at')
+        .eq('team_id', dk.team_id).gt('expires_at', new Date().toISOString());
+      window.__deskAsg={};
+      (asg||[]).forEach(a=>{ if(CHALLENGES[a.challenge]) window.__deskAsg[a.challenge]={t:a.target_ms, note:a.note}; });
+      const keys=Object.keys(window.__deskAsg);
+      if(!keys.length) return;
+      buildSheetTabs();
+      if(!sessionStorage.getItem('hk_asg_toast')){ sessionStorage.setItem('hk_asg_toast','1');
+        showToast('desk assignment'+(keys.length>1?'s':'')+' this week: '+
+          keys.map(k=>(CHALLENGES[k]&&CHALLENGES[k].name)||k).join(', ')+' \u2014 marked \u25c6 in the picker (\\)');
+      }
+    }catch(e){} }, 3200);
     try{ localStorage.setItem('hotkey_onboarded','1'); }catch(e){}
     if(typeof onboardOpen!=='undefined' && onboardOpen) closeOnboard();
     // r69: greet returning users on the landing dialog + let one ↵ carry them in —
