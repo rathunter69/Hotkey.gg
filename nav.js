@@ -657,7 +657,7 @@
     wire('umProfile',  openProfile);
     wire('umSaveProg', () => goToTrainer('openAuth=signup'));
     wire('umSettings', openSettings);
-    wire('umSignout',  () => { window.sb.auth.signOut(); });
+    wire('umSignout',  () => { try{ localStorage.removeItem('hk_handle_cache'); }catch(e){} window.sb.auth.signOut(); });   // r101: forget the landing greeting too
   }
   // Outside-click and Esc close the dropdown — global listeners, installed once.
   document.addEventListener('click', e => {

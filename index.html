@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=99" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=99">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=99">
+<link rel="icon" href="favicon.ico?v=100" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=100">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=100">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1005,6 +1005,29 @@
     margin-left:26px; margin-right:26px}
   .landing h1{font-size:23px}
   .landing .lede{font-size:14px}
+  /* r101: returning-user welcome-back DIALOG — frame language (cap strip + card) over the blurred game */
+  .wb-dlg{position:fixed; inset:0; z-index:130; display:flex; align-items:center; justify-content:center;
+    background:rgba(20,21,26,.45); backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity .25s}
+  .wb-dlg.show{opacity:1; pointer-events:auto}
+  .wb-dcard{background:var(--surface); border:1px solid var(--line); border-radius:12px; width:min(480px,92vw); overflow:hidden}
+  .wb-dcap{min-height:34px; display:flex; align-items:center; gap:8px; padding:6px 16px; background:var(--surface2);
+    border-bottom:1px solid var(--line); font-family:var(--mono); font-size:12px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--muted)}
+  .wb-dcap b{color:var(--accent)}
+  .wb-dbody{padding:18px 20px 20px}
+  .wb-dtitle{font-size:20px; font-weight:700; margin-bottom:9px}
+  .wb-drows{font-family:var(--mono); font-size:12.5px; color:var(--muted); display:flex; flex-direction:column; gap:5px; margin-bottom:12px}
+  .wb-drows b{color:var(--text)}
+  .wb-dfoot{font-family:var(--mono); font-size:11.5px; color:var(--muted)}
+  .wb-dfoot kbd{font-size:10.5px}
+  .wb-dlogin{display:none; margin:0 0 12px; padding:8px 14px; border:1px solid var(--accent); color:var(--accent);
+    background:transparent; border-radius:8px; font-family:var(--mono); font-size:12.5px; cursor:pointer}
+  .wb-dlogin:hover{background:var(--accent-glow)}
+  #wbStrip{display:flex; align-items:center; gap:8px; margin:0 16px 14px; padding:7px 12px;
+    background:var(--accent-glow); border:1px solid var(--accent-dim); border-radius:8px;
+    font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted)}   /* r101: returning-user strip — mg-cap language, accent-tinted */
+  #wbStrip b{color:var(--accent); text-transform:none; letter-spacing:0}
   .lg-title{font-family:var(--mono); font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); margin-bottom:10px}
   .landing-gate input{width:100%; background:var(--surface); border:1px solid var(--line); border-radius:9px;
     color:var(--text); font-family:var(--mono); font-size:13.5px; padding:11px 14px; margin-bottom:8px; outline:none}
@@ -1053,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=99"></script>
-<link rel="stylesheet" href="nav.css?v=99">
-<script src="themes.js?v=99"></script>
+<script src="drills.js?v=100"></script>
+<link rel="stylesheet" href="nav.css?v=100">
+<script src="themes.js?v=100"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=99"></script>
+<script src="nav.js?v=100"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4110,7 +4133,7 @@ const CHALLENGES = {
       if(!S.navProgress) S.navProgress = {
         home:false, right:false, down:false, left:false, up:false,
         selRow:false, selAll:false, rowSel:false, rowIns:false, rowDel:false,
-        colSel:false, finish:false, initialRows: S.ROWS
+        colSel:false, finish:false
       };
       const np = S.navProgress;
       const selBounds = ()=>{ if(!S.sel) return null;
@@ -4130,11 +4153,11 @@ const CHALLENGES = {
       // Step 8: Shift+Space — full rows (1..7 across every column)
       if(np.selAll && !np.rowSel){ const b=selBounds();
         if(b && b.r1===1 && b.r2===7 && b.c1===1 && b.c2===COLS) np.rowSel = true; }
-      // Steps 9/10 latch on the ACTION (insert/delete handlers set S.lastRowOp), not on
-      // row-count diffs — undo restores the count but doesn't set the flag, so undoing an
-      // insert can no longer fake the delete step. Any input path (chord, numpad, ribbon) counts.
-      if(np.rowSel && !np.rowIns && S.lastRowOp==='ins' && S.ROWS > np.initialRows) np.rowIns = true;
-      if(np.rowIns && !np.rowDel && S.lastRowOp==='del' && S.ROWS <= np.initialRows) np.rowDel = true;
+      // Steps 9/10 latch on the ACTION alone (insert/delete handlers set S.lastRowOp; undo/redo
+      // clear it, so undo can't fake a step). r101: the old S.ROWS comparisons are gone —
+      // the stable-viewport rule means the row count never changes, only cells shift.
+      if(np.rowSel && !np.rowIns && S.lastRowOp==='ins') np.rowIns = true;
+      if(np.rowIns && !np.rowDel && S.lastRowOp==='del') np.rowDel = true;
       // Step 11: Ctrl+Space — a full column (single column, top to bottom; guards against
       // the leftover full-row selection from the delete step auto-satisfying this).
       if(np.rowDel && !np.colSel){ const b=selBounds();
@@ -5445,12 +5468,13 @@ function applyRibbon(key){
     if(rows){
       const count=r.r2-r.r1+1;
       S.cells=shiftCellsRows(r.r1, ins?count:-count);
-      S.ROWS = ins ? S.ROWS+count : Math.max(1,S.ROWS-count);
+      S.ROWS = rowsAfterOp(ins, count);   // r101: stable viewport — see rowsAfterOp
       S.lastRowOp = ins?'ins':'del';
       if(!ins){ S.sel=null; S.active={r:r.r1, c:S.active.c}; }
     } else {
       const count=r.c2-r.c1+1;
       S.cells=shiftCellsCols(r.c1, ins?count:-count);
+      shiftColWidths(r.c1, count, ins);   // r101: widths travel with the content
       if(!ins){ S.sel=null; S.active={r:S.active.r, c:r.c1}; }
     }
     return exitRibbon(true);
@@ -5561,6 +5585,24 @@ function selectCol(){
 // the navigation drill data has no formulas, and translating refs across an insert/delete is a
 // separate engine concern (Excel's #REF! behavior). Worth adding when a drill needs it.
 // ============================================================
+function rowsAfterOp(ins, count){
+  /* r101 GEOMETRY RULE: the sheet is a stable VIEWPORT. Insert/delete shifts CELLS;
+     the frame never shrinks below the loaded size (S._ROWS0) and never grows past it.
+     Content pushed past the bottom edge "scrolls" out of view (still in S.cells, still
+     gradable, undo brings it back) — the old ROWS mutation made deletes collapse the
+     grid into a handful of giant rows (Wolf's "squares" report). */
+  const base = (S && S._ROWS0) || ROWS_MAX;
+  return ins ? Math.min(Math.max(base, ROWS_MAX), S.ROWS + count)
+             : Math.max(base, S.ROWS - count);
+}
+function shiftColWidths(atCol, count, ins){
+  // Excel parity: column geometry travels with the content on column insert/delete.
+  // colW is the 1-indexed engine width array; snapshot()/restore() already carry it for undo.
+  if(ins){ for(let c=COLS;c>=atCol+count;c--) colW[c]=colW[c-count];
+           for(let c=atCol;c<atCol+count&&c<=COLS;c++) colW[c]=COLW_DEFAULT; }
+  else   { for(let c=atCol;c<=COLS-count;c++) colW[c]=colW[c+count];
+           for(let c=Math.max(atCol,COLS-count+1);c<=COLS;c++) colW[c]=COLW_DEFAULT; }
+}
 function shiftCellsRows(atRow, delta){
   const newCells = {};
   for(const key in S.cells){
@@ -5680,10 +5722,13 @@ document.addEventListener('keydown',e=>{
   // TYPE-TO-REPLACE (r41): typing any printable char on a selected cell starts an
   // Enter-mode edit seeded with it — Excel's most basic entry behavior. Sits after
   // the app hotkeys above; '=' and '+' fall through to the formula starter below.
-  if(!editing && mode!=='ribbon' && k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey && k!=='=' && k!=='+'){
+  if(!editing && mode!=='ribbon' && k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey && k!=='=' && k!=='+' && !(k===' ' && e.shiftKey)){
     /* r89: THE RIBBON REGRESSION — Excel alt-walks are tap-Alt-RELEASE-then-letters, so the
        walk letters arrive bare; without the mode guard, type-to-replace ate them before the
-       ribbon branch (which sits ~130 lines below) ever saw them. */
+       ribbon branch (which sits ~130 lines below) ever saw them.
+       r101: Shift+Space carved out — space is a printable char, so type-to-replace was eating
+       Excel's row-select chord before the selection branch below ever saw it. Plain space
+       still starts an edit (Excel parity); only the shifted form falls through. */
     e.preventDefault(); startClock(); startEdit(k, 'enter'); logKey(k); render(); return; }
 
   // AUTHENTIC sheet-switch (Ctrl+PgUp / Ctrl+PgDn) — only in installed/standalone app mode,
@@ -5714,13 +5759,14 @@ document.addEventListener('keydown',e=>{
         if(isFullRow){
           const count = r.r2 - r.r1 + 1;
           S.cells = shiftCellsRows(r.r1, isInsert ? count : -count);
-          S.ROWS = isInsert ? S.ROWS + count : Math.max(1, S.ROWS - count);
+          S.ROWS = rowsAfterOp(isInsert, count);   // r101: stable viewport — see rowsAfterOp
           // After insert, the selection (rows r1..r2) now points to the new empty rows — keep it.
           // After delete, collapse to the row that absorbed the position.
           if(isDelete){ S.sel=null; S.active={r:r.r1, c:1}; }
         } else {
           const count = r.c2 - r.c1 + 1;
           S.cells = shiftCellsCols(r.c1, isInsert ? count : -count);
+          shiftColWidths(r.c1, count, isInsert);   // r101: widths travel with the content
           if(isDelete){ S.sel=null; S.active={r:1, c:r.c1}; }
         }
         commitAction(); return;
@@ -6060,6 +6106,38 @@ $('campaignBtn').addEventListener('click',openCampaign);
 $('startBtn').addEventListener('click', tryEnter);
 { const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); };
   const lb=$('loginBtn'); if(lb) lb.onclick=()=>{ openAuth('signin'); }; }
+
+/* r101: RETURNING-USER GREETING — if this browser has seen a handle before, the landing
+   opens AS the welcome-back card immediately (no waiting on the session roundtrip).
+   The session-settle path (onSession) still upgrades the copy once auth confirms;
+   if it never does, the card says so instead of leaving a dead-feeling page. */
+(function greetReturning(){
+  try{
+    const h = localStorage.getItem('hk_handle_cache');
+    const l = $('landing');
+    if(!h || !l || l.classList.contains('gone')) return;
+    window.__wbGreeted = true;
+    const safe = h.replace(/[<>&"]/g, ch=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[ch]));
+    const br = l.querySelector('.lbrand');
+    if(br && !$('wbStrip')){
+      const d = document.createElement('div');
+      d.id = 'wbStrip';
+      d.innerHTML = '↩ welcome back · <b>'+safe+'</b>';
+      br.after(d);
+    }
+    const h1 = l.querySelector('h1');
+    if(h1) h1.innerHTML = 'Welcome back, '+safe+'<span class="dim">.</span>';
+    const le = l.querySelector('.lede');
+    if(le) le.textContent = 'Your boards, rank, and streak are where you left them — one ↵ drops you on the sheet.';
+    setTimeout(()=>{ try{
+      if(window.__hkHasSession || l.classList.contains('gone')) return;
+      const le2 = l.querySelector('.lede');
+      if(le2) le2.innerHTML = 'You’re signed out on this browser — <b>Log in</b> reconnects '+safe+'’s boards; ↵ trains as a guest.';
+      const lb2 = $('loginBtn');
+      if(lb2){ lb2.style.borderColor = 'var(--accent)'; lb2.style.color = 'var(--accent)'; }
+    }catch(e){} }, 2600);
+  }catch(e){}
+})();
 
 // top-nav: career link opens the profile card; burger toggles links on mobile
 { const ns=$('navShortcuts'); if(ns) ns.addEventListener('click', e=>{ e.preventDefault(); openKbd(); });
@@ -7407,8 +7485,9 @@ function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
   el.style.display='inline-flex';
   el.innerHTML='LVL '+L.lvl+' <span class="lvl-bar"><span style="width:'+L.pct+'%"></span></span>';
   el.style.cursor='pointer'; el.onclick=openXpInfo;
-  el.title=L.into+' / '+L.need+' xp to LVL '+(L.lvl+1)+' \u2014 click for the full breakdown';
-  el.title='level '+l+' \u2014 every clean solve and new drill feeds it. Full XP math on your player card.'; }
+  el.title=L.into+' / '+L.need+' xp to LVL '+(L.lvl+1)+' \u2014 click for the full breakdown'; }
+  /* r101: a stale second el.title line here referenced bare `l` (not L.lvl) \u2014 ReferenceError
+     on EVERY solve, thrown inside the hotkey_solves .then (async, so the try/catch never saw it). */
 function renderStreak(){ const el=$('streakBadge'); if(!el) return;
   el.style.display = streak.n>0 ? 'inline-flex' : 'none';
   el.innerHTML='\ud83d\udd25 '+streak.n; el.title=streak.n+'-day streak — solve a drill every day to keep it alive'; }
@@ -7507,6 +7586,7 @@ function loadChallenge(key, opts){
   const built=C.build();
   _rand = Math.random;                                              // seeded only for the daily build
   S={ROWS:Math.max(built.ROWS, ROWS_MAX), cells:built.cells, active:built.active, sel:null, clipboard:null};
+  S._ROWS0=S.ROWS;   // r101: the loaded frame size — row ops shift cells, never this frame
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
@@ -7629,23 +7709,40 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
    Passive by design — fades on the first keydown WITHOUT swallowing it, so zero friction:
    the key that dismisses it is already your first rep. Shows once per browser session. ---- */
 function showWelcomeBack(key){
+  /* r101: promoted from a thin strip to the frame-language DIALOG (Wolf: returning users
+     should get a real welcome-back pop-out \u2014 the landing is skipped once you're onboarded,
+     so this card IS the arrival moment). Dismissal stays passive: the first keydown fades it
+     WITHOUT being swallowed, so the key that closes it is already your first rep. If the
+     session hasn't restored a moment later, a Log in button surfaces right on the card. */
   try{ if(sessionStorage.getItem('hk_wb')) return; sessionStorage.setItem('hk_wb','1'); }catch(e){}
-  const el = document.getElementById('welcomeBack'); if(!el) return;
   const label = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.labelOf[key]) || key;
   const best = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : null;
   const pbCount = Object.keys(PB).length;
-  el.innerHTML =
-    '<span class="wb-hi">welcome back</span>'+
-    '<span class="wb-sep">·</span> resuming <b>'+escHtml(label)+'</b>'+
-    (best ? '<span class="wb-sep">·</span> PB <b>'+best+'</b>' : '')+
-    (pbCount ? '<span class="wb-sep">·</span> '+pbCount+' drill'+(pbCount===1?'':'s')+' on the board' : '')+
-    (streak.n>1 ? '<span class="wb-sep">·</span> \ud83d\udd25 '+streak.n+'-day streak' : '')+
-    '<span class="wb-keys"><kbd>\\</kbd> drill picker &nbsp;<kbd>1</kbd>–<kbd>9</kbd> jump &nbsp;any key to go</span>';
-  el.classList.add('show');
-  const hide = ()=>{ el.classList.remove('show'); };
-  document.addEventListener('keydown', hide, { once:true, capture:true });  // passive: never preventDefault
-  el.addEventListener('click', hide, { once:true });
-  setTimeout(hide, 8000);
+  let hname=null; try{ hname=localStorage.getItem('hk_handle_cache'); }catch(e){}
+  const w=document.createElement('div'); w.className='wb-dlg'; w.id='wbDlg';
+  w.innerHTML='<div class="wb-dcard">'+
+    '<div class="wb-dcap">hotkey<b>.gg</b><span style="margin-left:auto">welcome back</span></div>'+
+    '<div class="wb-dbody">'+
+      '<div class="wb-dtitle">Welcome back'+(hname?', '+escHtml(hname):'')+'.</div>'+
+      '<div class="wb-drows">'+
+        '<span>resuming <b>'+escHtml(label)+'</b></span>'+
+        (best ? '<span>your PB here <b>'+best+'</b></span>' : '')+
+        (pbCount ? '<span><b>'+pbCount+'</b> drill'+(pbCount===1?'':'s')+' on your board</span>' : '')+
+        (streak.n>1 ? '<span>\ud83d\udd25 <b>'+streak.n+'-day</b> streak \u2014 alive</span>' : '')+
+      '</div>'+
+      '<button class="wb-dlogin" id="wbLogin">Log in \u2192</button>'+
+      '<div class="wb-dfoot"><kbd>\\</kbd> drill picker \u00b7 <kbd>1</kbd>\u2013<kbd>9</kbd> jump \u00b7 any key to start</div>'+
+    '</div></div>';
+  document.body.appendChild(w);
+  requestAnimationFrame(()=>w.classList.add('show'));
+  let gone=false;
+  const hide=()=>{ if(gone) return; gone=true; w.classList.remove('show'); setTimeout(()=>{ try{ w.remove(); }catch(e){} }, 260); };
+  document.addEventListener('keydown', hide, { once:true, capture:true });   // passive: never preventDefault
+  w.addEventListener('click', e=>{ if(!e.target || e.target.id!=='wbLogin') hide(); });
+  const lg=w.querySelector('#wbLogin');
+  if(lg) lg.onclick=(e)=>{ e.stopPropagation(); hide(); openAuth('signin'); };
+  setTimeout(()=>{ try{ if(!gone && !window.__hkHasSession && lg) lg.style.display='inline-flex'; }catch(e){} }, 2200);
+  setTimeout(hide, 12000);
 }
 
 /* ============================================================
@@ -7752,7 +7849,7 @@ async function onSession(session){
       const l=$('landing');
       if(l && !l.classList.contains('gone')){
         const h1=l.querySelector('h1'), le=l.querySelector('.lede'), lb2=$('loginBtn');
-        if(h1) h1.innerHTML='Welcome back<span class="dim">.</span>';
+        if(h1 && !window.__wbGreeted) h1.innerHTML='Welcome back<span class="dim">.</span>';   // r101: don't clobber the named greeting
         if(le) le.textContent='Signed in and ready — one ↵ drops you on the sheet.';
         if(lb2) lb2.style.display='none';
         if(typeof authOpen!=='undefined' && authOpen) closeAuth();      // r70: the sign-in bubble closes itself
@@ -7769,6 +7866,7 @@ async function onSession(session){
     try{
       const { data } = await sb.from('profiles').select('handle').eq('id', me_user.id).maybeSingle();
       me_handle = (data && data.handle) ? data.handle : null;
+      try{ if(me_handle) localStorage.setItem('hk_handle_cache', me_handle); }catch(e2){}   // r101: the landing greets by name on the NEXT visit, before any roundtrip
     }catch(e){ me_handle=null; }
     try{
       const { data:mem } = await sb.from('members').select('user_id').eq('user_id', me_user.id).maybeSingle();
@@ -7824,7 +7922,7 @@ function bindUserMenu(){
   const wire = (id, fn) => { const el=$(id); if(el) el.onclick = (e)=>{ e.preventDefault(); closeUserMenu(); fn(); }; };
   wire('umProfile',  openProfile);
   wire('umSaveProg', ()=>openAuth('signup'));
-  wire('umSignout',  ()=>{ sb.auth.signOut().finally(()=>location.reload()); });   // r70: fresh landing, sign-in visible
+  wire('umSignout',  ()=>{ try{ localStorage.removeItem('hk_handle_cache'); }catch(e){} sb.auth.signOut().finally(()=>location.reload()); });   // r70: fresh landing, sign-in visible
 }
 function closeUserMenu(){
   const btn=$('userBtn'), dd=$('userDropdown');
@@ -7916,6 +8014,7 @@ function renderAuth(){
   [em,pw].forEach(el=>{ if(el) el.onkeydown=e=>{ if(e.key==='Enter') submit(); }; });
 }
 async function doSignIn(){
+  if(!sb){ authErr('Still connecting — give it a second and try again.'); return; }   // r101: never a silent dead button
   const email=($('authEmail')?$('authEmail').value:'').trim().toLowerCase();
   const pass=$('authPass')?$('authPass').value:'';
   if(!email||!pass){ authErr('Enter your email and password.'); return; }
@@ -8027,7 +8126,7 @@ async function saveHandle(){
   try{
     const { error } = await sb.from('profiles').upsert({ id: me_user.id, handle: h, updated_at: new Date().toISOString() });
       try{ (window.navRefreshAuth||function(){})(); }catch(e2){}   // r89: the nav learns your name the moment it exists
-    if(!error) me_handle=h;
+    if(!error){ me_handle=h; try{ localStorage.setItem('hk_handle_cache', h); }catch(e2){} }
   }catch(e){}
   refreshAuthUI(); closeAuth(); advanceAccess();
 }
@@ -8188,7 +8287,7 @@ function showGate(step){
   const si=$('gateSignin'); if(si) si.onclick=openAuth;
   const rd=$('gateRedeem'); if(rd) rd.onclick=redeemCode;
   const ci=$('gateCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter') redeemCode(); }; }
-  const out=$('gateOut'); if(out) out.onclick=()=>{ sb.auth.signOut().finally(()=>location.reload()); };
+  const out=$('gateOut'); if(out) out.onclick=()=>{ try{ localStorage.removeItem('hk_handle_cache'); }catch(e){} sb.auth.signOut().finally(()=>location.reload()); };
 }
 function closeGate(){ gateOpen=false; const g=$('gate'); if(g){ g.classList.remove('show'); g.innerHTML=''; } }
 async function redeemCode(){

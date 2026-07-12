@@ -2199,3 +2199,46 @@ rejected, recovery unclear. Root causes found and fixed; principles now doctrine
   build; waterfall → 3-yr corkscrew cascade; schedule → 5 yr. CAS engine
   work + comments design still open (r97).
 - v99.
+
+---
+# ROUND 101 — Wolf's field reports: two P0 input bugs + the welcome-back dialog
+- SHIFT+SPACE FIXED (row select was dead): type-to-replace treats any printable
+  char as an edit-starter, and space IS printable — it ate the chord before the
+  selection branch ever saw it. Carve-out added: space+shift falls through;
+  plain space still starts an edit (Excel parity). Ctrl+Space was never hit
+  (ctrl already excluded).
+- ROW INSERT/DELETE GEOMETRY FIXED (the "squares" / fat-rows report): the
+  handlers mutated S.ROWS, and since the adaptive grid distributes the box
+  height across the row count, deleting rows collapsed the frame into a few
+  giant rows. NEW GEOMETRY RULE (rowsAfterOp): the sheet is a stable VIEWPORT
+  — S._ROWS0 stamped at load; insert/delete shifts CELLS, never the frame.
+  Content pushed past the bottom edge stays in S.cells (gradable, undo-able),
+  like scrolling out of view. Both call sites (Ctrl chord + Alt H I/D R) share
+  the helper. Column ops now shift colW too (widths travel with content).
+- Navigation drill steps 9/10 re-latched on pure S.lastRowOp action (the
+  S.ROWS comparisons can never fire under the stable-frame rule; undo/redo
+  still clear the latch so undo can't fake steps). initialRows removed.
+- FOSSIL BUG (found by the new Playwright e2e, fires on EVERY solve): a stale
+  second el.title line in renderLvl referenced bare `l` — ReferenceError
+  inside the hotkey_solves .then on every win since the line landed. Removed.
+- WELCOME-BACK DIALOG (Wolf's ask): onboarded users skip the landing entirely
+  (html.hk-returning), so the old thin strip WAS the arrival moment — too
+  subtle. showWelcomeBack is now a frame-language dialog (cap strip + card
+  over the blurred game): named greeting from new localStorage
+  hk_handle_cache, resuming-drill line, PB, board count, streak. Dismissal
+  stays PASSIVE — first keydown fades it without being swallowed (verified:
+  the dismissing ArrowDown still moved the cursor). If the session hasn't
+  restored after 2.2s, a Log in button surfaces ON the card (openAuth signin).
+- hk_handle_cache written on session handle fetch + saveHandle; cleared at all
+  three sign-out sites (index x2, nav.js). Landing (non-onboarded browsers)
+  also greets by name via the same cache + signed-out nudge at 2.6s.
+- doSignIn hardened: explicit !sb guard message (never a silent dead button).
+  Wolf's "sign in button doesn't work" not yet reproduced (works headless,
+  local) — NEED FROM WOLF if it persists post-r101: which page/button, and
+  does the modal open at all.
+- VERIFY: Playwright e2e (real key events): 12/12 nav-tour checks latch incl.
+  Shift+Space + ins/del steps; 7-row delete leaves frame+cellh untouched;
+  undo restores; rowops ribbon path 2/2; wb dialog + passive dismiss + login
+  reveal; zero page errors. 40-seed drill harness still ALL PASS. node --check
+  all inline scripts + nav.js + drills.js.
+- v100.
