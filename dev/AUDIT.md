@@ -2832,3 +2832,15 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   diamond frame (League Challenger's gold-over-blue read).
 - VERIFY: node --check extracted script, Playwright fullPage clean, light
   + 22px chip rows legible.
+
+---
+# ROUND 127 — RANK ART ITERATION 8 (unranked X, summit broadened)
+- UNRANKED: an X now sits inside the dashed selection marquee — the empty
+  placement slot as an invitation ("your rank goes here; queue up"), with
+  a faint white top-light so it reads engraved, not error-red.
+- SUMMIT widened (Wolf: "still a bit lean"): star-frame wings pushed from
+  14/86 out to 10/90 (upper span now the widest silhouette on the ladder,
+  wider than MD's shield), crystal shards moved outboard (+4), shoulder
+  sparks re-seated at the new wing tips, apex highlight re-anchored.
+- VERIFY: node --check extracted script, Playwright fullPage clean, light
+  + 22px chip rows legible.

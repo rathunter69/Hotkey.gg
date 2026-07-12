@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 7</title>
+<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — iteration 8</title>
 <style>
   body{margin:0;font-family:'JetBrains Mono',monospace;background:#141519;color:#cdd0d6;padding:28px}
   h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 4px} .sub{font-size:11px;color:#666a72;margin-bottom:22px;max-width:980px;line-height:1.5}
@@ -17,13 +17,13 @@
   @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
   @keyframes pipglow{from{filter:brightness(1)}to{filter:brightness(1.7)}}
 </style></head><body>
-<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 7</h1>
-<div class="sub">UNRANKED and MBA ASSOCIATE split back out: unranked is the generic empty-cell plate (dashed selection marquee, placement pending), MBA ASSOCIATE is the IRON floor TIER &mdash; #REF! identity, full bucket ladder (rivets at middle, jewel + sparks at top). Gold crest rebalanced (wider hips, shorter drop). League-color experiments: VP top-bucket gains a platinum aura, the summit goes CHALLENGER &mdash; gold major rays + gold peak star over the diamond frame.</div>
+<h1>HOTKEY.GG — RANKED EMBLEMS, ITERATION 8</h1>
+<div class="sub">UNRANKED now carries an X in the selection marquee &mdash; the empty placement slot daring you to queue. SUMMIT widened: star-frame wings pushed to 10/90, crystal shards pushed outboard &mdash; the top rank finally has the broadest shoulders on the ladder. Everything else holds from iteration 7: unranked/MBA-Associate split, iron #REF! floor tier, bucket escalation (clean / ornamented / ignited), VP platinum aura, Challenger-gold summit rays.</div>
 <div id="grid"></div>
 <div class="band"><div class="bandcap">LIGHT-THEME SANITY · TOP BUCKET</div><div class="row" id="light"></div></div>
 <div class="band"><div class="bandcap">SILHOUETTE TEST · 22px CHIP ROW (top bucket)</div><div class="chips" id="chips"></div></div>
 <script>
-/* Iteration 7. Canvas 100x114: emblem art in 0..100, division pips on 100..114.
+/* Iteration 8. Canvas 100x114: emblem art in 0..100, division pips on 100..114.
    BUCKET ESCALATION (the LoL read): bk1 = frame+glyph only, bk2 = +ornaments,
    bk3 = +jewel/sparks/hot rim/max glow. Pips remain the small-size language.
    Animation layers: .aura .frame .glyph .ornament .jewel .pips .sparks */
@@ -137,6 +137,8 @@ function t_unranked(sz){ const id='e'+(UID++), P=IRON;
     <path d="M28.5 22.8 L71.5 22.8" stroke="#ffffff" stroke-width="1.2" opacity=".4"/>
     <rect x="36" y="36" width="28" height="28" fill="none" stroke="${P.mid}" stroke-width="1.6" stroke-dasharray="4.2 3.2" opacity=".85"/>
     <rect x="36" y="36" width="28" height="28" fill="${P.core}" opacity=".07"/>
+    <g class="glyph"><path d="M44 44 L56 56 M56 44 L44 56" stroke="url(#${id}m)" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M44 44 L56 56 M56 44 L44 56" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity=".35"/></g>
   </svg>`; }
 function t_mba(sz,bk){ const id='e'+(UID++), P=IRON, o2=bk>=2, hot=bk===3, gl=[0,0,.35,.8][bk];
   const sq='M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z';
@@ -238,22 +240,22 @@ function t_md(sz,bk){ const id='e'+(UID++), P=CRIM, o2=bk>=2, hot=bk===3, gl=[0,
     ${GLY.bull(id,P)}${hot?sparks(P,[[12,10,3.8],[88,10,3.8],[50,-1,3]]):''}${pips(id,P,bk)}
   </svg>`; }
 function t_summit(sz,bk){ const id='e'+(UID++), P=DIAM, o2=bk>=2, hot=bk===3, gl=[0,1.8,2.3,2.8][bk];
-  const sp='M50 2 L64 18 L86 22 L74 46 L78 62 L58 88 L50 98 L42 88 L22 62 L26 46 L14 22 L36 18 Z';
+  const sp='M50 2 L65 17 L90 21 L77 45 L81 61 L59 88 L50 98 L41 88 L19 61 L23 45 L10 21 L35 17 Z';
   const rop=o2?1:.45;
   let rays=''; for(let i=0;i<20;i++){ const a=(i*18-90)*Math.PI/180, big=i%5===0;
     rays+=`<line x1="${50+Math.cos(a)*(big?39:42)}" y1="${50+Math.sin(a)*(big?39:42)}" x2="${50+Math.cos(a)*(big?50:46.5)}" y2="${50+Math.sin(a)*(big?50:46.5)}" stroke="${big?'#ffd968':P.hi}" stroke-width="${big?2.6:0.9}" stroke-linecap="round" opacity="${(big?0.95:0.5)*rop}"/>`; }
   let shards=''; for(let s of [-1,1]){
-    shards+=`<path d="M${50+s*40} 30 L${50+s*47} 24 L${50+s*44} 34 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
-      <path d="M${50+s*44} 52 L${50+s*52} 50 L${50+s*46} 60 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
-      ${hot?`<path d="M${50+s*34} 78 L${50+s*42} 84 L${50+s*33} 86 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>`:''}`; }
+    shards+=`<path d="M${50+s*44} 29 L${50+s*51} 23 L${50+s*48} 33 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
+      <path d="M${50+s*46} 51 L${50+s*54} 49 L${50+s*48} 59 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>
+      ${hot?`<path d="M${50+s*37} 77 L${50+s*45} 83 L${50+s*36} 85 Z" fill="url(#${id}m)" stroke="${P.deep}" stroke-width=".6"/>`:''}`; }
   return `<svg width="${sz}" height="${H(sz)}" viewBox="${VB}">${defs(id,P,gl)}
     <g class="aura" opacity="${hot?1:o2?.8:.6}"><circle cx="50" cy="50" r="49" fill="url(#${id}a)"/>${rays}</g>
     <circle cx="50" cy="50" r="34" fill="url(#${id}core)"/>
     ${o2?`<g class="ornament">${shards}</g>`:''}
     ${frame(id,P,sp,gl,3.6,hot)}
-    <path d="M36 18.8 L50 3.5 L64 18.8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".85"/>
+    <path d="M35 17.8 L50 3.5 L65 17.8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".85"/>
     ${hot?`<g class="jewel"><path d="M50 -3 L51.6 1.4 L56 3 L51.6 4.6 L50 9 L48.4 4.6 L44 3 L48.4 1.4 Z" fill="#ffd968" stroke="#523a05" stroke-width=".6"/></g>`:''}
-    ${GLY.rocket(id,P)}${hot?sparks(P,[[14,22,3.8],[86,22,3.8],[50,-2,3.2]]):''}${pips(id,P,bk)}
+    ${GLY.rocket(id,P)}${hot?sparks(P,[[10,21,3.8],[90,21,3.8],[50,-2,3.2]]):''}${pips(id,P,bk)}
   </svg>`; }
 const TIERS=[
   {n:'MBA Associate', f:t_mba},
