@@ -4248,3 +4248,29 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   (do-it beats + why-card — Wolf's "justify the product" note).
 - VERIFIED: replay 71/71, alts 32/32, parity 43, onboard 23, visual 311,
   rank 20, sweep clean after blocksel parKeys true-up. CACHE v151->v152.
+
+---
+# ROUND 175 — INTERACTIVE ONBOARDING V2 (T-K) + the no-do-nothing rule
+- TOUR V2 — sell first, explain later (Wolf: "justify the product, more
+  interactive"): 7 explanation spotlights -> 6 steps, only 3 of them
+  explanatory. Step 1-2 are DO-IT beats: the card says "your mouse needs
+  ~4 seconds, your keyboard needs ONE press — hold ctrl and tap →" and
+  the user presses the REAL chord on the LIVE sheet (guard lets exactly
+  the asked chord through; everything else stays blocked; the beat
+  auto-advances after the press). Step 3 is the WHY card: analysts live
+  in Excel 6-10h/day, a mouse round-trip costs ~2s vs ~0.3s a chord,
+  seniors read keyboard pace as a signal, every drill is a real desk
+  task — play it like a ladder game. Then checklist / trainer / ladder
+  spotlights (formula-bar + modes steps cut). Esc still skips all.
+- ONBOARD AUDIT 23 -> 28: do-it hook opens, stray keys blocked on do-it
+  beats, the asked chord advances AND executes on the live sheet,
+  second beat lands on the why-card.
+- NO-DO-NOTHING CHECKS (Wolf): every checklist line must demand a
+  discrete action or graded outcome. Folded 5 standalone leave-it-alone
+  lines into the ok of the action checks they guard: undo (LIVE column
+  intact -> the delete check), blocksel (decoy -> bold + comma checks),
+  polish (other table -> all three dress checks), wrapfix (tape intact
+  -> the fix check), colops (data travels -> the delete check).
+  Doctrine §2.5 rule added. Grading power unchanged — only the lines.
+- VERIFIED: replay 71/71, alts 32/32, parity 43, onboard 28, visual 311,
+  rank 20. CACHE v152 -> v153.

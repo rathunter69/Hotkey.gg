@@ -71,6 +71,10 @@ artifact and the cell/range: `'bold the survivor's header — E2'`,
 state description ("the header IS bold") — the checklist is a markup you
 work THROUGH, not a report you read after (Wolf, r174). A check the player
 can't act on from its label alone is broken.
+**No do-nothing lines** (Wolf, r175): a check whose entire fix is "don't
+touch it" cannot stand alone. Fold don't-touch guards into the `ok` of the
+action check they protect ("comma-format the block — and ONLY there"),
+so every visible line demands a discrete action or a graded outcome.
 Checks must be self-contained given S (never read globals that reset).
 
 ## 3. BUILD PROTOCOL (mechanics)

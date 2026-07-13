@@ -98,8 +98,9 @@ follows the doctrine.)*
 > them all — imperative verb first, artifact + cell named, meaning unchanged.
 > Zero logic edits; replay ×3 per touched drill + full gate.
 
-## T-K · INTERACTIVE ONBOARDING V2  *(Fable-grade — Wolf r174: "justify the
-product, more interactive, fewer explanation pop-outs")*
+## T-K · INTERACTIVE ONBOARDING V2 — DONE r175 (do-it beats + why-card live; onboard audit 28). Remaining polish ideas only: a stopwatch chip with the real ms delta, and a mouse-ghost animation racing the chord.
+
+## ~~T-K original brief~~
 > Rebuild the post-landing intro as an interactive SELL, reusing the tour's
 > spotlight mechanic but making the user DO things:
 > 1. **The hook (do-it beat)**: spotlight the grid, "your mouse takes ~4s to

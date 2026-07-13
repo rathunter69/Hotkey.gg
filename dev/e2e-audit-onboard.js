@@ -152,6 +152,31 @@ const STUB = () => {
   ok(t4c.done && t4c.xlv, 'primer completes and remembers the novice');
   ok(t4c.tourUp, 'product tour follows the primer');
 
+  // T4b (r175): the interactive tour — do-it beats let ONLY the asked chord
+  // through to the live sheet; the chord executes for real and advances the tour.
+  await page.evaluate(() => { ['hk_tour_done'].forEach(k => localStorage.removeItem(k)); });
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+  await page.waitForTimeout(700);
+  await page.keyboard.press('Enter');            // landing
+  await page.waitForTimeout(1000);
+  const t4d0 = await page.evaluate(() => (typeof __tourI !== 'undefined') ? __tourI : -9);
+  ok(t4d0 === 0, 'tour v2 opens on the do-it hook', t4d0);
+  await page.keyboard.press('x'); await page.keyboard.press('7');
+  const t4d1 = await page.evaluate(() => ({ i: __tourI, editing: editing }));
+  ok(t4d1.i === 0 && !t4d1.editing, 'stray keys stay blocked on a do-it beat');
+  const before = await page.evaluate(() => S.active.c);
+  await page.keyboard.press('Control+ArrowRight');
+  await page.waitForTimeout(1200);
+  const t4d2 = await page.evaluate(() => ({ i: __tourI, c: S.active.c }));
+  ok(t4d2.i === 1, 'the asked chord advances the tour', t4d2.i);
+  ok(t4d2.c > before, 'and it executed on the LIVE sheet (cursor moved)', before + '->' + t4d2.c);
+  await page.keyboard.press('Control+Shift+ArrowDown');
+  await page.waitForTimeout(1200);
+  const t4d3 = await page.evaluate(() => ({ i: __tourI, why: /why this exists/i.test(document.getElementById('tourCard').innerText) }));
+  ok(t4d3.i === 2 && t4d3.why, 'second beat lands on the why-card', JSON.stringify(t4d3));
+  for (let i = 0; i < 5; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(220); }
+
   // T5 (r174, Wolf's stranding bug): a returning user whose synced last-drill is
   // LOCKED on this device (fresh xp estimate) must NEVER boot into an empty grid.
   await page.evaluate(() => { try {
