@@ -3212,3 +3212,33 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   regression ALL GREEN (every drill WIN 3/3, zero page errors — merge was
   gated on this). drills.js catalog + PARS synced.
   CACHE v122 -> v123 (all 9 pages).
+
+---
+# ROUND 142 — 'HOUSE STYLE': the realistic formatting flagship (Wolf: core day-to-day)
+- Wolf: "more focus on core navigation and formatting… realistic formatting
+  drills" (= roadmap #19, never fully implemented). The pieces existed as
+  isolated drills (format/blue/dress/polish); the realistic COMPOSITE — a raw
+  tab brought to full desk standard in one pass — did not.
+- NEW DRILL 'housestyle' (House Style, LEADS the Formatting group, 57 total):
+  a raw quarterly P&L lands unformatted — plain title, naked headers, inputs
+  invisible among formulas, raw decimals, decimal margins, nothing ruled.
+  The pass: title bold · headers bold + alt-h-b-b rule-under · INPUTS blue
+  via the alt-h-f-c walk · figures alt-h-k + alt-h-9 ×2 · margins ctrl+shift+%
+  · EBITDA row bold + ruled above. Six op families, zero same-motion-×N.
+- THE TEACHING HOOK: which rows are inputs MOVES every run (Revenue + one of
+  COGS/Opex; the other is formula-driven), and ONE HARDCODE IS BURIED in the
+  formula row (per-run random column) — the drill fails until the player
+  finds and paints it. That's the actual senior's-pass skill: knowing what
+  moves. No leave-untouched checks (positives only, doctrine #3).
+- ENGINE-TRUTH CATCHES (via house e2e, first run FAIL 3/3): alt-h-b-o is
+  OUTLINE border in the engine (Excel-correct) — rule-under is alt-h-b-B;
+  alt-h-k sets comma w/ TWO decimals — the pass needs alt-h-9 ×2 (as the
+  'format' drill already teaches). Copy/demo corrected; second run WIN 3/3.
+- VERIFY: 40-seed sweep (zero pre-solved checks; input-row and buried-cell
+  distributions both ~50/50 across seeds; no override ever lands in an input
+  row); housestyle e2e WIN 3/3; FULL 57-drill regression ALL GREEN (every
+  drill WIN 3/3, zero page errors — merge gated on it). drills.js catalog + PARS synced (par 70/parKeys 42).
+  CACHE v123 -> v124 (all 9 pages).
+- NAV NOTE: Wolf's "navigation more love" is QUEUED as its own push — design
+  sketch: 'modeltour' — N defect cells scattered wide, ctrl-jump navigation
+  graded action-sourced like the navigation drill, realistic find-and-fix.
