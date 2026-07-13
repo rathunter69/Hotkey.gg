@@ -441,8 +441,13 @@ window.HK_RANK = {
     t.full = t.name+' \u00b7 '+t.bucket+(provisional?' \u00b7 provisional':'');
     return t;
   },
+  /* r151: THE CANONICAL LEVEL CURVE — six drifted copies (nav.js, leaderboard,
+     index ×3) now delegate here, same consolidation XP got in r116. Curve softened
+     for the dopamine drip (Wolf): 150/300/450 to L4, then FLAT 600 per level —
+     the old 150×n triangular made L10+ a multi-week desert. Levels only move UP
+     under the new curve (cheaper everywhere), so no one wakes up demoted. */
   levelOf(xp){ let lvl=1, need=150, floor=0;
-    while(xp>=floor+need){ floor+=need; lvl++; need=150*lvl; }
+    while(xp>=floor+need){ floor+=need; lvl++; need=Math.min(150*lvl, 600); }
     return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; },
   /* XP v4 (r116, Wolf-approved — "the trading day"): first-ever solve keeps the big
      spine (50, +15 advanced); repeat decay runs PER DRILL PER UTC DAY (15/10/7/5,

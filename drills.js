@@ -220,6 +220,18 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'grp2', glyph:'crn', tier:'e', name:'Model Citizen',    desc:'Beat par on every Models drill',        test:c=>{ const ks=(c.groups&&c.groups['Models'])||[]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
   { id:'spd4', glyph:'spd', tier:'r', name:'Half-Par Club',    desc:'Clear any drill in under half its par', test:c=>{ const hit=c.menuOrder.some(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]/2); return {done:hit, prog:hit?1:0, goal:1}; } },
   { id:'gnt2', glyph:'gnt', tier:'e', name:'Season Ticket',    desc:'Post gauntlet legs in 4 different weeks', test:c=>{ const wks=new Set(); c.runs.forEach(r=>{ const m=/^wk-(\d{4}-\d{2})-/.exec(r.challenge||''); if(m) wks.add(m[1]); }); return {done:wks.size>=4, prog:Math.min(wks.size,4), goal:4}; } },
+  /* r151: DRIP RUNGS — the ladders had deserts (1 crown then 5; 100 solves then
+     500; 10 dailies then 50). These fill the gaps so an engaged week always has a
+     medal in reach. Fillers are deliberately common-tier: they're cadence, not glory. */
+  { id:'vol0',  glyph:'vol',  name:'Opening Bell',    desc:'25 clean solves',                        test:c=>({done:c.solves>=25, prog:Math.min(c.solves,25), goal:25}) },
+  { id:'vol1b', glyph:'vol',  tier:'r', name:'Deal Flow', desc:'250 clean solves',                   test:c=>({done:c.solves>=250, prog:Math.min(c.solves,250), goal:250}) },
+  { id:'str0',  glyph:'str',  name:'Back Tomorrow',   desc:'3-day streak',                           test:c=>({done:c.streak>=3, prog:Math.min(c.streak,3), goal:3}) },
+  { id:'day0',  glyph:'day',  name:'Morning Person',  desc:'Run 3 daily challenges',                 test:c=>{ const n=c.runs.filter(r=>(r.challenge||'').indexOf('daily-')===0).length; return {done:n>=3, prog:Math.min(n,3), goal:3}; } },
+  { id:'par5',  glyph:'spd',  name:'Finding the Line',desc:'Beat par on 5 different drills',         test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=5, prog:Math.min(n,5), goal:5}; } },
+  { id:'crn3',  glyph:'crn',  tier:'r', name:'Land Grab', desc:'Hold 3 crowns at once',              test:c=>({done:c.crowns>=3, prog:Math.min(c.crowns,3), goal:3}) },
+  { id:'pb20',  glyph:'c3',   name:'Shelf Space',     desc:'Hold a PB on 20 different drills',       test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined).length; return {done:n>=20, prog:Math.min(n,20), goal:20}; } },
+  { id:'att25', glyph:'c1',   name:'Field Coverage',  desc:'Attempt 25 different drills',            test:c=>({done:c.att>=25, prog:Math.min(c.att,25), goal:25}) },
+  { id:'key25', glyph:'keys', tier:'r', name:'Piano Hands', desc:'25,000 keystrokes in clean runs',  test:c=>({done:(c.keysLifetime||0)>=25000, prog:Math.min(c.keysLifetime||0,25000), goal:25000}) },
   /* r150: the new class — morning sheet, races, freezes, RX pack, house style, plugin-era
      chords. New glyphs (rx/flag/sheet/ice/map/brush/keys) live in themes.js hkBadge. */
   { id:'rx1',  glyph:'rx',    tier:'e', name:'The RX Desk',      desc:'Clear revolver, waterfall, cascade and the 13-week', test:c=>{ const ks=['revolver','waterfall','cascade','wk13']; const n=ks.filter(k=>c.pb[k]!==undefined).length; return {done:n>=ks.length, prog:n, goal:ks.length}; } },

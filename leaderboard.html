@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=130" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=130">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=130">
+<link rel="icon" href="favicon.ico?v=131" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=131">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=131">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -267,15 +267,15 @@
 }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=130">
-<script src="drills.js?v=130"></script>
+<link rel="stylesheet" href="nav.css?v=131">
+<script src="drills.js?v=131"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=130"></script>
+<script src="themes.js?v=131"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=130"></script>
+<script src="nav.js?v=131"></script>
 
 <header class="head">
   <div class="wrap">
@@ -395,8 +395,10 @@ function tierOf(avgPct, att){
   for(let i=TIERS.length-1;i>=0;i--){ if(att>=TIERS[i].att && avgPct<=TIERS[i].pct) return {...TIERS[i], i}; }
   return {...TIERS[0], i:0};
 }
-function levelOf(xp){ let lvl=1, need=150, floor=0;
-  while(xp>=floor+need){ floor+=need; lvl++; need=150*lvl; }
+function levelOf(xp){   // r151: delegates to the canonical curve (HK_RANK, themes.js)
+  if(window.HK_RANK && window.HK_RANK.levelOf) return window.HK_RANK.levelOf(xp);
+  let lvl=1, need=150, floor=0;
+  while(xp>=floor+need){ floor+=need; lvl++; need=Math.min(150*lvl, 600); }
   return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; }
 
 let DATA=null;

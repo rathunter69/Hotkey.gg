@@ -3483,3 +3483,42 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   copy) · r148 + r149 suites re-run ALL PASS · FULL 59-drill e2e regression
   ALL GREEN · badge board + data room screenshots eyeballed.
   CACHE v129 -> v130 (all 9 pages).
+
+---
+# ROUND 151 — MOBILE HUB + THE DOPAMINE DRIP (Wolf's brief)
+- MOBILE = ANCILLARY, NOT LOCKED OUT: the r68 mobile gate stopped the whole
+  product; now it stops only THE TRAINER. The gate card is a hub — "the
+  boards", "your numbers", and a dynamic third slot (signed-out: "sign in —
+  player card & saved times" → the auth modal opens ABOVE the gate;
+  signed-in: "your player card" → the profile modal opens above it too).
+  Zero page rebuilds: satellites already render fine at 390px (nav collapses
+  to the burger); only z-index plumbing was needed (.auth-modal 500 in the
+  mobile media query; .profile-modal.show 500 — the .show doubles
+  specificity because nav.css loads after the inline sheet and would win at
+  equal specificity). renderMobileGate paints at boot and re-paints on
+  every onSession.
+- LEVEL CURVE: SIX drifted copies of the 150×n triangular curve (nav.js,
+  themes.js, leaderboard, index ×3 — same class r116 killed for XP) now
+  delegate to HK_RANK.levelOf. Curve softened IN THE ONE PLACE: 150/300/450
+  to L4, then FLAT 600/level — the old curve made L10+ a multi-week desert
+  (L10→11 alone was 1,650xp). Levels only move UP under the new curve, so
+  the repricing reads as a gift, not a demotion.
+- DRIP RUNGS (+9, catalog 56): the ladders had deserts — 1 crown then 5,
+  100 solves then 500, 10 dailies then 50, 10 par-beats after 1. Filled:
+  Opening Bell (25 solves) · Deal Flow (250) · Back Tomorrow (3-day streak) ·
+  Morning Person (3 dailies) · Finding the Line (par ×5) · Land Grab
+  (3 crowns) · Shelf Space (20 PBs) · Field Coverage (25 boards) · Piano
+  Hands (25k lifetime keys — new ctx.keysLifetime from hk_key_counts, wired
+  through all three ctx builders). Fillers are deliberately common-tier:
+  cadence, not glory.
+- THE DRIP LINE: every results card now ends with the NEXT reward in reach —
+  "<n> xp to LVL x · next medal: <name> p/goal". buildAchCtx() extracted from
+  achSweepInGame so the countdown and the actual unlock can never disagree.
+  A lull is now a visible countdown instead of silence.
+- VERIFY: 14-assert r151 suite ALL PASS (hub links + auth-over-gate +
+  card-over-gate at 390px w/ touch, curve delegation 8250xp→L16 identical
+  across copies, 56 unique, Piano Hands/Opening Bell wiring, drip line on a
+  real demo-driven win, zero page errors) · r148/r149/r150 suites re-run ALL
+  PASS (r150's hardcoded catalog-count assert updated for legitimate growth)
+  · FULL 59-drill e2e ALL GREEN · mobile hub + mobile leaderboard
+  screenshots eyeballed. CACHE v130 -> v131 (all 9 pages).
