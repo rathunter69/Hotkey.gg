@@ -3556,3 +3556,42 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   tabs screenshot-eyeballed (tie-out breaks in exactly 2 years, sign flips
   read across distinct columns). Catalog: 62 drills.
   CACHE v131 -> v132 (all 9 pages).
+
+---
+# ROUND 153 — THE RX PACK COMPLETES: liquidity bridge + covenant table (STRATEGY 3.2)
+- With wk13 (r145) these make "The RX desk" a real advanced section — the three
+  pages every restructuring deck actually opens with.
+- 'liqbridge' (Liq. Bridge, Models after wk13): cash + undrawn revolver walks
+  the bridge (burn / asset sales / RX fees) to ending liquidity; the cushion
+  against minimum liquidity is the answer. Build once, fill across Base /
+  Downside / Severe. HONEST ECONOMICS BY CONSTRUCTION: downside/severe take
+  strictly worse deltas so the endings are ordered; cash is raised if the
+  base ending lands thin; the minimum-liquidity line sits strictly between
+  Severe and Base — Base always clears, Severe always breaches, every seed
+  tells the story the page exists to tell. 5 checks (avail / beginning /
+  ending w/ SUM range ref-checked / cushion / ending row bold). par 80/40.
+- 'covtable' (Cov. Table): leverage off LTM EBITDA vs a covenant max that
+  STEPS DOWN mid-table; headroom row; a REAL IF compliance flag (1/0 —
+  first drill to grade the r94 comparator evaluator since 'cases'); MIN
+  pulls the tightest quarter. EBITDA sags mid-path then stabilizes, debt
+  amortizes a touch — breaches surface in ~1/3 of seeds, tight-but-clear in
+  the rest. par 85/40.
+- ENGINE-TRUTH CATCHES (both via the house harness, pre-ship):
+  (1) THE ROW-14 REF CLAMP: fill-right REWRITES cell refs and clamps
+  referenced ROWS at ROWS_MAX=14 — '=B14-B16' filled to '=C14-C14'. Rows
+  15+ can hold cells (balcheck r15 writes fine) but formulas REFERENCING
+  rows >14 die on fill. liqbridge rebuilt onto the canonical 14 rows (WC
+  line dropped from the bridge). HOUSE FACT for future drills: keep
+  REFERENCED rows <= 14.
+  (2) the compliance flag check read `(value)||-1` — a legitimate 0 (breach)
+  is falsy and became -1; classic falsy-zero, caught by the 1/3 seed
+  failures it produced. Also: first-cut minimum liquidity could go NEGATIVE
+  (derived off a deep-negative severe ending) — floored at a real number
+  with the between-Severe-and-Base constraint.
+- VERIFY: 40-seed sweeps ALL CLEAN ×2 (zero pre-solved in 80 builds;
+  endings strictly ordered, base clears + severe breaches every seed,
+  covenant band sane, breach variety 14/40); demo-replay WIN 3/3 ×2; FULL
+  64-drill regression ALL GREEN; r148-r151 suites re-run ALL PASS; pars
+  calibrated from measured optimal paths (40/40 keys); drills.js + PARS
+  synced; both tabs screenshot-eyeballed. CATALOG: 64 DRILLS.
+  CACHE v132 -> v133 (all 9 pages).
