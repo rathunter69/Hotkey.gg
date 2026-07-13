@@ -4491,3 +4491,23 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   21 seeds, zero variance — formula lengths are constant).
 - PARITY 60 -> 67 (section T). ALTS 41 -> 42 (totals-first + ctrl+g
   route + crimes in reverse). CACHE v158 -> v159 (drills.js changed).
+
+## r183 — checklist voice: the whole site speaks in commands (T-J complete)
+- The T-J inventory turned out ~7x the estimate: 162 label instances
+  across 42 drills were state descriptions ("the check row reads ZERO",
+  "Availability is live") or verbless fragments ("ending cash across
+  the sheet") — the fragment class was never counted in the r174 tally.
+  All 162 rewritten to imperative commands (verb first, artifact + cell
+  named, meaning unchanged, ok-expressions untouched): "prove the check
+  row — ZERO both years, it balances honestly", "run ending cash across
+  the sheet".
+- Kept-as-is by decision: the navigation drill's hotkey-notation labels
+  ("Ctrl+Home → A1") — they read as notation, which is the point of a
+  tour drill; converting them would add words without adding a command.
+- Mechanics: anchors verified byte-for-byte before patching (the file
+  mixes \uXXXX escapes and literal glyphs, even between sibling drills
+  — ruleoff escapes its dashes, ruleaudit doesn't); three byte-identical
+  duplicate pairs replaced with count=2; diff is exactly 162 label lines
+  and nothing else. All 40 touched drills replayed to a win with clean
+  concatenated labels before the gate.
+- No cache bump: index.html label strings only.

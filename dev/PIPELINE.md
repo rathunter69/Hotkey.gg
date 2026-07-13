@@ -97,13 +97,10 @@ follows the doctrine.)*
 > HOTKEY_PLUGIN_LAYERS (verify our Macabacus/FactSet defaults still match
 > their current sheets). Output: dev/CANON_DIFF.md + new-drill proposals.
 
-## T-J · CHECKLIST VOICE, REMAINDER  *(any model)*
-> r174 converted 58 front-door check labels to imperative commands (doctrine
-> §2.5); r181 converted 21 more across the tranche-3 six. ~24 state-phrased
-> labels remain in the other Formulas/Models/Full Builds drills ("the check
-> row reads ZERO"). Convert them all — imperative verb first, artifact +
-> cell named, meaning unchanged. Zero logic edits; replay ×3 per touched
-> drill + full gate.
+## T-J · CHECKLIST VOICE — DONE r183 (162 label instances across 42 drills,
+inventoried exhaustively incl. the verbless-fragment class the earlier ~24
+estimate missed; navigation's hotkey-notation labels kept by decision). Every
+checklist on the site now opens with a verb.
 
 ## T-K · INTERACTIVE ONBOARDING V2 — DONE r175 (do-it beats + why-card live; onboard audit 28). Remaining polish ideas only: a stopwatch chip with the real ms delta, and a mouse-ghost animation racing the chord.
 
