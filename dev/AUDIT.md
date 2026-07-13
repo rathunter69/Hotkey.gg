@@ -3862,3 +3862,18 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   solved-board screenshot reviewed (all five rulings legible on the
   light first-touch theme).
 - CACHE v139 -> v140 (all 9 pages).
+
+---
+# ROUND 162 — SHARE CARD RETRENCHED (Wolf: comparison moment, not grind artifact)
+- The per-solve PNG share card is GONE from regular drill results — Wolf's
+  read: nobody posts a random drill time; the share moment is (a) the
+  DAILY / gauntlet legs, where friends compare the same board, and (b)
+  the high-level rank card on the player card (LinkedIn-dimensioned,
+  r148) which STAYS untouched.
+- Results card now: challenge link on EVERY clean solve (the race URL is
+  the true friend-vs-friend loop and costs one button), share card ONLY
+  when dailyMode/weeklyMode. Placement-verdict share kept — it fires
+  once, at placement, and is milestone-shaped.
+- VERIFY (live, both paths): regular solve -> link only, no card; daily
+  solve -> card + link. Syntax checks; full demo-replay ALL GREEN.
+- CACHE v140 -> v141 (all 9 pages).
