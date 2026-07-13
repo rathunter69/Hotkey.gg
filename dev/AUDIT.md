@@ -4433,3 +4433,36 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   median is exactly 33 (range 15-47 — the typo pool is the variance).
   No retune; the r172 big-sample rule catches another false flag.
   filterpass parKeys 14 measured clean on the same sweep.
+
+## r181 — enrichment tranche 3: the advanced tier gets the doctrine
+- Hand-graded growth, wacc, revolver, waterfall, txncomps, football per
+  doctrine §5 (the T-A tranche-3 queue). One real breach found and fixed,
+  the rest was voice and polish.
+- WATERFALL (the breach): capex and cash interest were built as POSITIVE
+  blue inputs with FCF = B2-B3-B4 — exactly the §2.4 SIGNS pattern the
+  doctrine forbids and the neighboring cfslink/nwcsched drills do right.
+  Now both carry their negative sign and FCF is one clean =SUM(B2:B4);
+  req/guide/demo updated, expected values unchanged. Also merged its 6
+  checks to 4 (the §2.5 cap): TL tier and revolver tier each grade as
+  one line (paydown + corkscrew + endings together).
+- CHECKLIST VOICE: all 21 state-phrased labels across the six drills
+  rewritten to imperative commands (verb first, artifact + cell named,
+  ok-expressions untouched) — "the balance row is DRESSED" is now
+  "dress the balance row — bold B6:E6 with a rule above". This clears
+  most of the T-J remainder for the Models tier.
+- TXNCOMPS realism: multiples column now wears fmtStyle 'mult' (reads
+  8.2x, not 8.2), an Announced date column (Mmm-yy serials, context
+  only) finally supports the "precedents are comps with dates" aha, the
+  buyer list shuffles per seed, and the prompt's false "anchored SUM"
+  became "live formula". Sibling note: the trading-comps drill has the
+  same bare-decimals multiples column — queued for the next formatting
+  pass, not touched here.
+- ALTS 38 -> 41: growth (bold-first + alt h p + algebraic (C4-B4)/B4
+  variant), revolver (MAX-outside nest + prove-outs bottom-up + border
+  before bold), waterfall (corkscrews linked BEFORE the block fills,
+  narrower fill geometry than the demo — proves no sequence latch).
+- Revolver sign convention intentionally NOT flipped: its rows read as
+  balances plus a magnitude sweep (the doctrine's magnitude-schedule
+  exception); debtsched remains the negative-convention exemplar.
+- No cache bump: only index.html + dev harnesses changed this round
+  (drills.js/nav.js untouched; pages revalidate HTML on fetch).

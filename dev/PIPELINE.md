@@ -8,7 +8,7 @@ follows the doctrine.)*
 
 ---
 
-## T-A · ENRICHMENT SWEEP, TRANCHE 2 — DONE r170 (see AUDIT). Tranche 3 candidates: growth, wacc, revolver, waterfall, txncomps, football — grade by hand first.
+## T-A · ENRICHMENT SWEEP — TRANCHE 2 DONE r170, TRANCHE 3 DONE r181 (waterfall SIGNS fix + check merge, 21 labels to imperative, txncomps mult/date realism, 3 new ALTS — see AUDIT). Remaining suspects live in the backlog matrix below; grade by hand first.
 
 ## ~~T-A original brief~~  *(kept for method reference)*
 > Read dev/DRILL_DOCTRINE.md and apply §5 (enrichment playbook) to these
@@ -99,10 +99,11 @@ follows the doctrine.)*
 
 ## T-J · CHECKLIST VOICE, REMAINDER  *(any model)*
 > r174 converted 58 front-door check labels to imperative commands (doctrine
-> §2.5). ~45 state-phrased labels remain in the Formulas/Models/Full Builds
-> tiers ("the balance row is DRESSED", "the check row reads ZERO"). Convert
-> them all — imperative verb first, artifact + cell named, meaning unchanged.
-> Zero logic edits; replay ×3 per touched drill + full gate.
+> §2.5); r181 converted 21 more across the tranche-3 six. ~24 state-phrased
+> labels remain in the other Formulas/Models/Full Builds drills ("the check
+> row reads ZERO"). Convert them all — imperative verb first, artifact +
+> cell named, meaning unchanged. Zero logic edits; replay ×3 per touched
+> drill + full gate.
 
 ## T-K · INTERACTIVE ONBOARDING V2 — DONE r175 (do-it beats + why-card live; onboard audit 28). Remaining polish ideas only: a stopwatch chip with the real ms delta, and a mouse-ghost animation racing the chord.
 
@@ -125,12 +126,10 @@ follows the doctrine.)*
 > chord during do-it beats), onboard audit extended to walk the new flow.
 > Design sketch to Wolf via screenshots BEFORE wiring the flow as default.
 
-## T-H · INTERVIEW MODE  *(Fable-grade, PRO roadmap)*
-> Timed assessment: 8 drills sampled across groups (seeded per day so
-> candidates are comparable), no guide/demo, one attempt each, hard clock.
-> Output: report card (time vs par percentile per family, keys-over-optimal,
-> stall analysis from ghost diff) + shareable card. Gate behind PRO
-> (beta-free). Design doc first: dev/INTERVIEW.md, Wolf signs off before build.
+## T-H · INTERVIEW MODE — DESIGN DOC DONE r181 (dev/INTERVIEW.md: daily-seeded
+8-drill superday, 12-min wall clock, one attempt/skip allowed, report card w/
+stall analysis, PRO-gated + free practice sittings, 3 open questions each with
+a default). AWAITING WOLF SIGN-OFF — the build is a config-and-content round.
 
 ## T-I · SEASON REWARDS TRACK  *(PRO roadmap — dev/SEASONS.md exists)*
 > Execute per dev/SEASONS.md once Wolf greenlights scope.

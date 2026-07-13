@@ -74,3 +74,16 @@ math is not "training-shaped" — it is the actual desk math.
 wacc (debt side first), txncomps (SUM/5 still lands), football (ceiling
 first), dcfsens (fill down first) — advanced-tier ALTS now exist, breaking
 the "alts are a Foundations thing" pattern. T-B continues the rollout.
+
+## r181 addendum (tranche 3 hand-grade)
+- waterfall: SIGNS breach fixed (negative capex/interest, =SUM FCF). Its
+  "waterfall" is correctly the LBO debt-paydown cascade, not an equity
+  distribution waterfall — no RoC/pref/catch-up tiers expected. An equity
+  waterfall (tiered carry splits) would be a NEW drill; candidate for a
+  future tranche.
+- txncomps: now reads as a precedents page (dates column, x-multiples).
+  Premia-paid column considered and deliberately skipped — scope.
+- revolver: positive-magnitude sweep kept (balances + magnitude schedule
+  exception); debtsched carries the negative convention for the family.
+- comps (trading): multiples column still bare decimals — queue with the
+  next formatting pass.

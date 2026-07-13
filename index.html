@@ -3592,10 +3592,10 @@ const CHALLENGES = {
       const cagrOk=!!(cagrC&&cagrC.formula&&String(cagrC.formula).includes('^')&&typeof cagrC.value==='number'&&Math.abs(cagrC.value-this._cagr)<1e-3&&cagrC.fmtStyle==='percent');
       const boldOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'4']; return !!(c&&c.bold); });
       return [
-        {label:'total revenue \u2014 segments consolidated live, all five years', ok: totOk&&refs('B4',['B2','B3'])},
-        {label:'YoY growth \u2014 this year over last, live and percent-formatted', ok: yoyOk&&refs('C5',['C4','B4'])},
-        {label:'CAGR \u2014 compounded with the ^ key, off first and last totals', ok: cagrOk&&refs('B7',['F4','B4'])},
-        {label:'the consolidated line is bold \u2014 it carries the page', ok: boldOk},
+        {label:'consolidate the segments live at B4 \u2014 fill across all five years', ok: totOk&&refs('B4',['B2','B3'])},
+        {label:'run YoY growth at C5 \u2014 this year over last, fill C5:F5 and percent it', ok: yoyOk&&refs('C5',['C4','B4'])},
+        {label:'compound the CAGR at B7 with the ^ key \u2014 first and last totals, as a percent', ok: cagrOk&&refs('B7',['F4','B4'])},
+        {label:'bold the consolidated line \u2014 B4:F4 carries the page', ok: boldOk},
       ];
     }
   },
@@ -3644,11 +3644,11 @@ const CHALLENGES = {
         return !ref || String(c.formula).replace(/\$/g,'').toUpperCase().includes(ref); };
       const e=this._exp;
       return [
-        {label:'unlevered beta \u2014 the peer\u2019s leverage stripped out (B10)', ok: live('B10',e.bu,'B4')},
-        {label:'relevered at the target\u2019s OWN D/E \u2014 chained off B10, not retyped (B11)', ok: live('B11',e.bl,'B10')},
-        {label:'CAPM cost of equity \u2014 rf + \u03b2 \u00d7 ERP, off the relevered beta (B12)', ok: live('B12',e.ke,'B11')},
-        {label:'after-tax cost of debt \u2014 Kd \u00d7 (1 \u2212 tax) (B13)', ok: live('B13',e.akd,'B9')},
-        {label:'WACC \u2014 both sides weighted off ONE denominator, live all the way down (B14)', ok: live('B14',e.wacc,'B12')&&live('B14',e.wacc,'B13')},
+        {label:'strip the peer\u2019s leverage out \u2014 unlever beta at B10', ok: live('B10',e.bu,'B4')},
+        {label:'relever at the target\u2019s OWN D/E \u2014 chain B11 off B10, don\u2019t retype', ok: live('B11',e.bl,'B10')},
+        {label:'CAPM the cost of equity at B12 \u2014 rf + \u03b2 \u00d7 ERP, off the relevered beta', ok: live('B12',e.ke,'B11')},
+        {label:'tax-effect the debt side at B13 \u2014 Kd \u00d7 (1 \u2212 tax)', ok: live('B13',e.akd,'B9')},
+        {label:'weight both sides off ONE denominator at B14 \u2014 live all the way down', ok: live('B14',e.wacc,'B12')&&live('B14',e.wacc,'B13')},
       ];
     }
   },
@@ -3832,10 +3832,10 @@ const CHALLENGES = {
       const COL=['B','C','D','E'];
       const dressOk=[0,1,2,3].every(i=>{ const c=S.cells[COL[i]+'6']; return !!(c&&c.bold&&c.bt); });
       return [
-        {label:'the sweep \u2014 MIN of balance and spare cash, floored at zero, all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'5',this._exp[i].sw))&&refs('B5',['MIN(','MAX('])},
-        {label:'revolver after the sweep, all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'6',this._exp[i].rvE))},
-        {label:'cash after the sweep \u2014 never below the minimum', ok: [0,1,2,3].every(i=>near(COL[i]+'7',this._exp[i].cashE))},
-        {label:'the balance row is DRESSED \u2014 bold with a rule above', ok: dressOk},
+        {label:'sweep at B5 \u2014 MIN of balance and spare cash, floored at zero, fill all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'5',this._exp[i].sw))&&refs('B5',['MIN(','MAX('])},
+        {label:'prove the revolver post-sweep at B6 \u2014 fill all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'6',this._exp[i].rvE))},
+        {label:'prove cash post-sweep at B7 \u2014 fill across, never below the minimum', ok: [0,1,2,3].every(i=>near(COL[i]+'7',this._exp[i].cashE))},
+        {label:'dress the balance row \u2014 bold B6:E6 with a rule above', ok: dressOk},
       ];
     }
   },
@@ -4461,9 +4461,9 @@ const CHALLENGES = {
     name:'Waterfall', label:'Run the paydown waterfall', par:168, parKeys:65,
     aha:'paydown follows seniority \u2014 each tranche MINs against the cash that is left',
     prompt:'Three years of cash, two tranches, strict seniority \u2014 and the balances CORKSCREW: each year opens where the last one closed. Build year 1 top to bottom, link both openings, fill everything right. MIN does the rationing; the cascade proves itself.',
-    req:'<em>B5</em> FCF <em>=B2-B3-B4</em> \u00b7 fill B5:D5 \u2192 \u00b7 <em>B8</em> <em>=MIN(B5,B7)</em> \u00b7 <em>B9</em> <em>=B7-B8</em> \u00b7 <em>B10</em> <em>=B5-B8</em> \u00b7 fill B8:D10 \u2192 \u00b7 link <em>C7</em> <em>=B9</em> fill \u2192 \u00b7 <em>B13</em> <em>=MIN(B10,B12)</em> \u00b7 <em>B14</em> <em>=B12-B13</em> \u00b7 fill B13:D14 \u2192 \u00b7 link <em>C12</em> <em>=B14</em> fill \u2192',
+    req:'<em>B5</em> FCF <em>=SUM(B2:B4)</em> \u00b7 fill B5:D5 \u2192 \u00b7 <em>B8</em> <em>=MIN(B5,B7)</em> \u00b7 <em>B9</em> <em>=B7-B8</em> \u00b7 <em>B10</em> <em>=B5-B8</em> \u00b7 fill B8:D10 \u2192 \u00b7 link <em>C7</em> <em>=B9</em> fill \u2192 \u00b7 <em>B13</em> <em>=MIN(B10,B12)</em> \u00b7 <em>B14</em> <em>=B12-B13</em> \u00b7 fill B13:D14 \u2192 \u00b7 link <em>C12</em> <em>=B14</em> fill \u2192',
     guide:[
-      'free cash, all years: B5 \u00b7 <kbd>=B2-B3-B4</kbd> \u00b7 fill B5:D5 \u2192',
+      'free cash, all years: B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 capex and interest already carry their signs \u00b7 fill B5:D5 \u2192',
       'year-1 cascade: B8 \u00b7 <kbd>=MIN(B5,B7)</kbd> \u2014 never more than the balance \u00b7 B9 \u00b7 <kbd>=B7-B8</kbd> \u00b7 B10 \u00b7 <kbd>=B5-B8</kbd>',
       'select B8:D10 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the rationing walks across',
       'THE CORKSCREW: C7 \u00b7 <kbd>=B9</kbd> \u00b7 fill C7:D7 \u2014 the loan opens where it closed',
@@ -4472,7 +4472,7 @@ const CHALLENGES = {
     ],
     targets:['B5','B5:D5','B8','B9','B10','B8:D10','C7','C7:D7','B13','B14','B13:D14','C12','C12:D12'],
     demo(){ return [
-      {sel:'B5', keys:[...T('=B2-B3-B4'), Kb.enter]},
+      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
       {sel:'B5:D5', keys:[Kb.fillR]},
       {sel:'B8', keys:[...T('=MIN(B5,B7)'), Kb.enter]},
       {sel:'B9', keys:[...T('=B7-B8'), Kb.enter]},
@@ -4492,8 +4492,10 @@ const CHALLENGES = {
       const y0=rnd(24,27);
       for(let i=0;i<3;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
       const cx=[],ix=[],eb=[],fcf=[];
-      for(let i=0;i<3;i++){ cx.push(rnd(5,15)*10); ix.push(rnd(3,10)*10);
-        const f=rnd(8,30)*10; fcf.push(f); eb.push(cx[i]+ix[i]+f); }
+      // r181 SIGNS: capex and interest carry their negative sign on the page,
+      // so FCF is one clean SUM down the column (doctrine \u00a72.4)
+      for(let i=0;i<3;i++){ cx.push(-rnd(5,15)*10); ix.push(-rnd(3,10)*10);
+        const f=rnd(8,30)*10; fcf.push(f); eb.push(f-cx[i]-ix[i]); }
       const given=[[2,'EBITDA',eb],[3,'Capex',cx],[4,'Cash interest',ix]];
       given.forEach(([r,n,vs])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
         for(let i=0;i<3;i++) cells[colLetter(i+2)+r]={...blankCell(),value:vs[i],fontColor:'blue',fmtStyle:'comma',decimals:0}; });
@@ -4521,19 +4523,17 @@ const CHALLENGES = {
       const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
       const COL=['B','C','D']; const e=this._exp;
       return [
-        {label:'free cash flow \u2014 EBITDA less capex less interest, all three years', ok:[0,1,2].every(i=>near(COL[i]+'5',e[i].fcf))},
-        {label:'TL paydown rationed by MIN \u2014 cash vs balance, every year', ok:[0,1,2].every(i=>near(COL[i]+'8',e[i].pd)) && refs('B8',['MIN(','B5','B7'])},
-        {label:'THE CORKSCREW \u2014 the term loan opens each year at the prior close', ok:[1,2].every(i=> refs(COL[i]+'7',[COL[i-1]+'9']) && near(COL[i]+'7',e[i].tlB)) && [0,1,2].every(i=>near(COL[i]+'9',e[i].tlE))},
-        {label:'only surviving cash reaches the revolver', ok:[0,1,2].every(i=>near(COL[i]+'10',e[i].left))},
-        {label:'revolver paydown \u2014 MIN again, junior waits its turn', ok:[0,1,2].every(i=>near(COL[i]+'13',e[i].rpd)) && refs('B13',['MIN(','B10','B12'])},
-        {label:'revolver corkscrew \u2014 opening links the prior close, ending walks the cascade out', ok:[1,2].every(i=> refs(COL[i]+'12',[COL[i-1]+'14']) && near(COL[i]+'12',e[i].rvB)) && [0,1,2].every(i=>near(COL[i]+'14',e[i].rvE))},
+        {label:'run free cash flow at B5 \u2014 one clean SUM, signs carried, fill all three years', ok:[0,1,2].every(i=>near(COL[i]+'5',e[i].fcf))},
+        {label:'ration the TL paydown with MIN at B8, then corkscrew \u2014 each year opens at the prior close', ok:[0,1,2].every(i=>near(COL[i]+'8',e[i].pd)) && refs('B8',['MIN(','B5','B7']) && [1,2].every(i=> refs(COL[i]+'7',[COL[i-1]+'9']) && near(COL[i]+'7',e[i].tlB)) && [0,1,2].every(i=>near(COL[i]+'9',e[i].tlE))},
+        {label:'pass only surviving cash down, then ration the revolver paydown with MIN at B13', ok:[0,1,2].every(i=>near(COL[i]+'10',e[i].left)) && [0,1,2].every(i=>near(COL[i]+'13',e[i].rpd)) && refs('B13',['MIN(','B10','B12'])},
+        {label:'link the revolver corkscrew \u2014 open C12:D12 at the prior close, walk the endings out', ok:[1,2].every(i=> refs(COL[i]+'12',[COL[i-1]+'14']) && near(COL[i]+'12',e[i].rvB)) && [0,1,2].every(i=>near(COL[i]+'14',e[i].rvE))},
       ];
     }
   },
   txncomps:{
     name:'Txn Comps', label:'Run precedent transactions', par:110, parKeys:35,
     aha:'precedents are comps with dates \u2014 same multiples, read in deal order',
-    prompt:'Five precedent deals, one target. Compute EV/EBITDA paid in each deal, average the multiples off one anchored SUM, then mark the target: implied EV at the average multiple, less net debt, equals implied equity. The comps page every pitch book leans on.',
+    prompt:'Five precedent deals, one target. Compute EV/EBITDA paid in each deal, average the multiples off one live formula, then mark the target: implied EV at the average multiple, less net debt, equals implied equity. The comps page every pitch book leans on.',
     req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> avg <em>=AVERAGE(D3:D7)</em> \u00b7 <em>B11</em> implied EV <em>=B10*D8</em> \u00b7 <em>B13</em> implied equity <em>=B11-B12</em>',
     guide:[
       'multiple paid, deal one: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -4557,32 +4557,35 @@ const CHALLENGES = {
       cells['C2']={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
       cells['D2']={...blankCell(),value:'EV/EBITDA',txt:true,bold:true,align:'r'};
       const buyers=['Falcon / Ridge','Atlas / Delta','Copper / Peak','Summit / Crest','Ironline / Bay'];
+      for(let k2=buyers.length-1;k2>0;k2--){ const j=rnd(0,k2); [buyers[k2],buyers[j]]=[buyers[j],buyers[k2]]; }
+      cells['E2']={...blankCell(),value:'Announced',txt:true,bold:true,align:'r'};
       this._m=[];
       for(let i=0;i<5;i++){
         const ebd=rnd(8,40)*10; const mult=rnd(60,120)/10; const ev=Math.round(ebd*mult);
         cells['A'+(3+i)]={...blankCell(),value:buyers[i],txt:true};
         cells['B'+(3+i)]={...blankCell(),value:ev,fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells['C'+(3+i)]={...blankCell(),value:ebd,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells['D'+(3+i)]={...blankCell(),decimals:1};
+        cells['D'+(3+i)]={...blankCell(),fmtStyle:'mult',decimals:1};
+        cells['E'+(3+i)]={...blankCell(),value:45300+rnd(0,1100),fmtStyle:'date',decimals:0,align:'r'};   // announced \u2014 context only, precedents READ in deal order
         this._m.push(ev/ebd);
       }
-      cells['A8']={...blankCell(),value:'Average',txt:true,bold:true}; cells['D8']={...blankCell(),decimals:1,bold:true};
+      cells['A8']={...blankCell(),value:'Average',txt:true,bold:true}; cells['D8']={...blankCell(),fmtStyle:'mult',decimals:1,bold:true};
       cells['A10']={...blankCell(),value:'Target EBITDA',txt:true};   cells['B10']={...blankCell(),value:rnd(10,35)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['A11']={...blankCell(),value:'Implied EV',txt:true,bold:true}; cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
       cells['A12']={...blankCell(),value:'Net debt',txt:true};        cells['B12']={...blankCell(),value:rnd(5,20)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['A13']={...blankCell(),value:'Implied equity',txt:true,bold:true}; cells['B13']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
       const avg=this._m.reduce((a,b)=>a+b,0)/5;
       this._exp={avg:avg, ev:cells['B10'].value*avg, eq:cells['B10'].value*avg-cells['B12'].value};
-      return {ROWS:13, cells, active:{r:3,c:4}, sel:null, colW:{1:132,2:80,3:80,4:88}};
+      return {ROWS:13, cells, active:{r:3,c:4}, sel:null, colW:{1:132,2:80,3:80,4:88,5:86}};
     },
     checks(S){
       const near=(k,exp,tol)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<(tol||0.05)); };
       return [
-        {label:'multiple paid, every deal \u2014 EV over EBITDA, filled down D3:D7',
+        {label:'run the multiple paid on every deal \u2014 EV over EBITDA, fill down D3:D7',
           ok: [0,1,2,3,4].every(i=>near('D'+(3+i),this._m[i]))},
-        {label:'average multiple off one live SUM (D8)', ok: near('D8',this._exp.avg)},
-        {label:'implied EV \u2014 target EBITDA \u00d7 the average (B11)', ok: near('B11',this._exp.ev,0.5)},
-        {label:'implied equity after net debt (B13)', ok: near('B13',this._exp.eq,0.5)},
+        {label:'average the multiples live at D8 \u2014 AVERAGE or SUM/5, never a hand-typed mean', ok: near('D8',this._exp.avg)},
+        {label:'mark implied EV at B11 \u2014 target EBITDA \u00d7 the average multiple', ok: near('B11',this._exp.ev,0.5)},
+        {label:'back into implied equity at B13 \u2014 take net debt off the implied EV', ok: near('B13',this._exp.eq,0.5)},
       ];
     }
   },
@@ -4854,10 +4857,10 @@ const CHALLENGES = {
       const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.05); };
       const fRef=(k,fn)=>{ const c=S.cells[k]; return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(fn)); };
       return [
-        {label:'midpoints live for all three methods (D3:D5)', ok: [0,1,2].every(i=>near('D'+(3+i),this._mids[i]))},
-        {label:'the floor \u2014 a live MIN across the lows', ok: near('B7',this._exp.lo)&&fRef('B7','MIN')},
-        {label:'the ceiling \u2014 a live MAX across the highs', ok: near('B8',this._exp.hi)&&fRef('B8','MAX')},
-        {label:'range width ties the two', ok: near('B9',this._exp.w)},
+        {label:'run live midpoints for all three methods \u2014 fill D3:D5', ok: [0,1,2].every(i=>near('D'+(3+i),this._mids[i]))},
+        {label:'floor the range at B7 \u2014 a live MIN across the lows', ok: near('B7',this._exp.lo)&&fRef('B7','MIN')},
+        {label:'cap the range at B8 \u2014 a live MAX across the highs', ok: near('B8',this._exp.hi)&&fRef('B8','MAX')},
+        {label:'tie the width at B9 \u2014 ceiling less floor', ok: near('B9',this._exp.w)},
       ];
     }
   },
