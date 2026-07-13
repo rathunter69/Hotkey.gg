@@ -3016,3 +3016,51 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   hk.smoke.nonedu.1@hotkeysmoketest.com (uid 23dac454-...) added to the
   SMOKE_REPORT cleanup list.
 - CACHE v117 -> v118 (all 9 pages).
+
+---
+# ROUND 134 — DE-BETA ONBOARDING (PRELAUNCH_LOCK) + Wolf's six-item fix list
+- ONBOARDING IS LAUNCH-FINAL NOW (Wolf: "get it working perfectly, then lift
+  one thing to go live"). The in-landing beta gate (invite+handle form:
+  showLandingGate/showGate/redeemCode/submitBetaCode + markup/CSS) is DELETED.
+  New flow: [curtain] -> landing -> Enter DISMISSES (the r-bug: Enter used to
+  open the gate form — Wolf: "keeps the window open") -> spotlight tour
+  (input-blocked) -> tutorial prompt -> placement. Guests play instantly via
+  silent anon session (ensureGuestSession); membership auto-redeems in
+  onSession (rpc redeem_code HAGS — members table stays consistent); accounts
+  happen via sign-in / save-your-progress, unchanged.
+- PRELAUNCH_LOCK = THE LAUNCH SWITCH: device-once access-code curtain before
+  the landing (hk_beta_ok; any session also passes; cancelled sign-in re-arms
+  it). Launch day = flip ONE flag to false. Nothing else changes.
+- TOUR KEY LEAK (Wolf: "still lets me type during the tour"): the __tourI
+  guard sat BELOW picker/marathon/type-to-replace in the keydown — printable
+  keys started edits mid-tour. Guard moved to the top; tour owns the keyboard.
+  Tour and tutorial prompt were also racing on independent timers (both fired
+  ~900ms post-entry) — now sequenced: tour -> __tourAfter -> onboard prompt.
+- PLAYER CARD FOSSIL (Wolf: "alignment broken, old icons, overflowing"): index
+  carried the r13-era card renderer (openProfile/loadProfileData/renderProfile,
+  ~6KB — plain rows, no hero/emblem/achievements, 'school email' copy) and its
+  own umProfile binding — the GAME PAGE opened a seven-generations-stale card.
+  DELETED; nav.js exports window.openProfile (r64 rule: one renderer). PLUS the
+  real overflow bug in the modern card: nav.css's .pc-scroll inner-scroll
+  wrapper (v3 CSS) was never emitted by the renderer — long cards spilled past
+  82vh. Wrapper now emitted; achievements flex-wrap -> even auto-fill grid.
+- CHECKLIST: autoscroll SHIPPED (scoped .cl-body scrollTop math on the .next
+  item — never scrollIntoView, that jiggles the page); the r89-era fossil
+  'esc restarts the drill' copy -> shift+f11 (Esc never restarts).
+- LVL BADGE (game header): xp bar floated above the text baseline — flex
+  centering (#lvlBadge inline-flex + gap). Playwright-asserted midpoints equal.
+- FAVICON (Wolf: "hasn't updated"): favicon.ico was a 429-BYTE PLACEHOLDER and
+  favicon-32.png 230 bytes — browsers prefering .ico showed junk/old art
+  regardless of the SVG. All four assets regenerated from a new emblem-v3-
+  language SVG (engraved plate, metal-rim keycap, F4 legend): real multi-size
+  PNG-embedded .ico (16/32/48), 32px PNG, 180px apple-touch.
+- CREDENTIALS: Wolf rotated token+DB password and updated both repo secrets —
+  verified by a manual workflow run on main (green). Nothing further needed.
+- VERIFY: 23-assert Playwright suite ALL GREEN — fresh-device flow (curtain
+  wrong/right code, Enter dismisses, tour blocks typing, tour->prompt
+  sequence, placement loads), returning-device skip, lvl-bar midpoint, fossil
+  copy, autoscroll re-center, modern card + inner scroll from the game page,
+  4 satellite pages boot clean. node --check + div-balance-delta vs HEAD
+  unchanged. CACHE v118 -> v119 (all 9 pages).
+- LOCALSTORAGE: new key hk_beta_ok (curtain pass). REMOVE the curtain block +
+  key at launch (flip PRELAUNCH_LOCK=false; key becomes inert).
