@@ -68,9 +68,12 @@ const STEP = process.argv[2] || 'all';
   for (const k of Object.keys(users)) {
     const u = users[k];
     let r = await signup(u.email, pw);
+    if (r.status === 422 || (r.data && /already|exists/i.test(errMsg(r)))) {
+      r = await signin(u.email, pw);   // SMOKE_TS reuse: account from a prior run
+    }
     if (r.status === 200 && r.data && r.data.access_token) {
       u.token = r.data.access_token; u.id = r.data.user && r.data.user.id;
-      log(`auth: signup ${k} (${u.email})`, true, `uid ${u.id}`);
+      log(`auth: signup/signin ${k} (${u.email})`, true, `uid ${u.id}`);
     } else if (r.status === 200 && r.data && r.data.user && !r.data.access_token) {
       log(`auth: signup ${k}`, false, 'email confirmation required — no session. ' + errMsg(r));
     } else {
@@ -247,6 +250,10 @@ const STEP = process.argv[2] || 'all';
   // Doctrine says code = captaincy. r119 claim requires owner IS NULL *and zero members*;
   // B (domain member) is already on Wharton. Does C's code join claim the captaincy?
   {
+    const pre = await rpc('my_desk', B.token);
+    const preRow = Array.isArray(pre.data) ? pre.data[0] : null;
+    const preOk = !!preRow && preRow.slug === 'wharton';
+    log('claim: PRECONDITION B is on Wharton as domain member', preOk, JSON.stringify(preRow));
     const r = await rpc('join_desk', C.token, { p_code: '25a39fde' });
     log('claim: C code-joins Wharton (seed code)', r.status === 200, `${r.status} ${JSON.stringify(r.data)}`);
     const my = await rpc('my_desk', C.token);
@@ -274,7 +281,7 @@ const STEP = process.argv[2] || 'all';
     log('claim: A code-joins LSE (ownerless, 0 members)', r.status === 200, `${r.status} ${JSON.stringify(r.data)}`);
     const my = await rpc('my_desk', A.token);
     const m = Array.isArray(my.data) ? my.data[0] : null;
-    log('claim: A took LSE captaincy + code visible', !!m && m.role === 'captain' && !!m.invite_code, JSON.stringify(m));
+    log('claim: A took LSE captaincy + code visible', !!m && m.slug === 'lse' && m.role === 'captain' && !!m.invite_code, JSON.stringify(m));
     const t = await api(`/rest/v1/teams?select=owner_id,verified&slug=eq.lse`, { token: A.token });
     const w = Array.isArray(t.data) ? t.data[0] : null;
     log('claim: LSE owner set to A', !!w && w.owner_id === A.id, JSON.stringify(w));
