@@ -531,6 +531,14 @@ window.hkBadge = function(id, earned, size, color, rarity){
     c6:'<circle cx="13" cy="13" r="3"/><path d="M13 7.5v2 M13 16.5v2 M7.5 13h2 M16.5 13h2 M9.2 9.2l1.4 1.4 M15.4 15.4l1.4 1.4 M16.8 9.2l-1.4 1.4 M9.6 15.4l-1.4 1.4"/>',  // v6 — working capital gears
     c7:'<path d="M13 7.5l5.5 9.5h-11z"/><circle cx="13" cy="14" r="1.2"/>',                                 // v7 — three statements, one triangle
     c8:'<path d="M13 6.5c2.4 2 3.4 4.6 3.4 7.4l-1.6 2.6h-3.6l-1.6-2.6c0-2.8 1-5.4 3.4-7.4z M11.6 16.5l-1.6 3 M14.4 16.5l1.6 3 M13 10.5v2"/>',  // v8 — ship it
+    /* r150: the new class — every new achievement family gets its own mark */
+    rx:'<path d="M7.5 8.5h3v3h3v3h3 M7.5 17.5h11"/>',                                                        // rx — the waterfall steps to the floor
+    flag:'<path d="M9 7.5v11 M9 8h7.5l-1.8 2.5 1.8 2.5H9"/><circle cx="9" cy="18.5" r="1" fill="currentColor" stroke="none"/>', // race flag planted
+    sheet:'<path d="M9 6.5h6l2.5 2.5V19.5H9z M15 6.5V9h2.5"/><path d="M10.8 14.2l1.6 1.8 3-3.6"/>',          // morning sheet — page + tick
+    ice:'<path d="M13 6.5v13 M7.4 9.8l11.2 6.4 M18.6 9.8L7.4 16.2 M13 6.5l-1.6 1.8 M13 6.5l1.6 1.8 M13 19.5l-1.6-1.8 M13 19.5l1.6-1.8"/>', // freeze
+    map:'<path d="M7.5 8.5l3.5-1.5 4 1.5 3.5-1.5v10l-3.5 1.5-4-1.5-3.5 1.5z M11 7v10 M15 8.5v10"/>',          // model tour — the map fold
+    brush:'<path d="M15.5 6.8l3 3-6.4 6.4-3-3z M9 13.5c-1.6.4-2.4 1.6-2.4 3.4 1.8.4 3.2-.2 3.8-1.6"/>',      // house style — the paint pass
+    keys:'<path d="M7 10.5h12v6H7z M9.5 13h1 M12.5 13h1 M15.5 13h1 M9.5 15h7"/>',                             // chord library — keyboard
     fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
   };
   const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
@@ -560,4 +568,12 @@ window.hkBadge = function(id, earned, size, color, rarity){
 window.hkRarityTier = function(pct){
   if(pct===undefined||pct===null||!isFinite(pct)) return null;
   if(pct<=3) return 'legendary'; if(pct<=10) return 'epic'; if(pct<=25) return 'rare'; return null;
+};
+/* r150: EFFECTIVE RARITY — metals were pure data (% of players holding it), which at
+   beta scale reads all-gold (1 of 3 players = 33% = common). Each achievement now
+   carries a hand-set difficulty tier ('r'/'e'/'l') as the DISPLAY FLOOR; live data
+   takes over once the field is big enough to mean something (>= 20 players). */
+window.hkEffRarity = function(tier, dataPct, fieldN){
+  if((fieldN|0)>=20 && dataPct!==undefined && dataPct!==null && isFinite(dataPct)) return dataPct;
+  return tier==='l' ? 3 : tier==='e' ? 10 : tier==='r' ? 25 : 100;
 };

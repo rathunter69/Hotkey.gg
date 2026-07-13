@@ -50,6 +50,13 @@ perks later). Branch auto-merge live per working agreement.
   + staffer program templates (Intern week 0 / First-year bootcamp / Speed
   weeks — 4-week quest sequences pinned one click a week through the existing
   assignment RPCs; progress local per desk).
+- **r150 (Wolf feedback batch)**: share-card silent no-op fixed (blob download
+  + talk-back feedback; pc-foot wraps) · ACHIEVEMENT ECONOMY rebalanced — 6
+  duplicate medals dropped, 10 new ones for new features, 7 new glyphs,
+  hand-set difficulty tiers floor the rarity metals until the field is >= 20
+  players (hkEffRarity, themes.js) · stats pace redefined as time÷par w/
+  methodology footnote + keys/min · picker renamed THE DATA ROOM, files wear
+  task filenames (fix_the_typos_in_place.xlsx), truncation killed.
 - **NEXT (STRATEGY.md sequence)**: audit family + RX pack content round
   (balance sweep, stale-link hunt, sign-error triage; liquidity bridge /
   covenant table ideas) · then seasons design doc (doc only — build gated on

@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=129" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=129">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=129">
+<link rel="icon" href="favicon.ico?v=130" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=130">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=130">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -703,11 +703,12 @@
   .pk-byline.hidden{display:none}
   .pk-byline .vdr-guide{color:color-mix(in srgb, var(--line) 85%, transparent); width:14px; font-size:11px}
   .pk-byline .vdr-fidx{color:var(--faint); font-size:10px; width:34px}
-  .pk-byline .vdr-fname{color:inherit}
+  .pk-byline .vdr-fname{color:inherit; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis;
+    white-space:nowrap}   /* r150: long task-filenames shrink gracefully — the ledger columns never get pushed out */
   .pk-byline .vdr-ext{color:var(--faint); font-style:normal; font-size:10px}
   .pk-byline.cur .vdr-fname{color:var(--accent); font-weight:700}
   .pk-byline.focus{outline:2px solid var(--accent); outline-offset:-1px; color:var(--text)}
-  .pk-byline .vdr-pb{margin-left:auto; color:var(--accent); font-size:10.5px; white-space:nowrap}
+  .pk-byline .vdr-pb{color:var(--accent); font-size:10.5px; white-space:nowrap; min-width:74px; text-align:right}
   .pk-byline .vdr-pb.dim{color:var(--faint)}
   .pk-byline .pk-par{color:var(--faint); font-size:10px; width:64px; text-align:right; white-space:nowrap}
   .pk-byline.asg .vdr-fname{color:var(--warn)}
@@ -1094,14 +1095,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=129"></script>
-<link rel="stylesheet" href="nav.css?v=129">
-<script src="themes.js?v=129"></script>
+<script src="drills.js?v=130"></script>
+<link rel="stylesheet" href="nav.css?v=130">
+<script src="themes.js?v=130"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=129"></script>
+<script src="nav.js?v=130"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -5400,8 +5401,16 @@ function makeShareCard(o){
     x.fillText(rank.toUpperCase(), 64, footY); }
   x.fillStyle=col('--faint'); x.font='500 18px "JetBrains Mono", monospace';
   x.fillText('think you\u2019re faster? hotkey.gg', 620, footY);
-  const a=document.createElement('a');
-  a.download='hotkey-'+cur+'-'+o.t+'s.png'; a.href=cv.toDataURL('image/png'); a.click();
+  // r150: DOM-attached anchor + blob URL — the detached data:URL click is flaky
+  // outside Chrome (same class as the rank-card silent no-op Wolf hit)
+  const fname='hotkey-'+cur+'-'+o.t+'s.png';
+  const send=href=>{ const a=document.createElement('a');
+    a.download=fname; a.href=href; a.style.display='none';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ a.remove(); if(href.indexOf('blob:')===0) URL.revokeObjectURL(href); }, 4000); };
+  if(cv.toBlob) cv.toBlob(b=>send(b?URL.createObjectURL(b):cv.toDataURL('image/png')),'image/png');
+  else send(cv.toDataURL('image/png'));
+  showToast('⬇ card saved — check your downloads');
 }
 let resultsChainKeys=null, lastXpGain=null;
 function nextDrillKey(){ const i=MENU_ORDER.indexOf(cur); return MENU_ORDER[(i+1)%MENU_ORDER.length]; }
@@ -5545,6 +5554,8 @@ function _showResults(o){
                          : '\ud83c\udfc1 '+race.by+' holds it \u2014 +'+(parseFloat(o.t)-race.t).toFixed(2)+'s to their '+race.t.toFixed(2)+'s';
       if(card) card.appendChild(rv);
       try{ ev('race_result',{d:cur, win:win?1:0}); }catch(e){}
+      if(win){ try{ const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');   // r150: Called Out / Undefeated
+        fl.raceWins=(fl.raceWins||0)+1; localStorage.setItem('hk_ach_flags', JSON.stringify(fl)); }catch(e){} }
     }
     if(!o.mouse && !o.guided){
       // r148: share row \u2014 the PNG card + a challenge link (the cheapest viral loop:
@@ -6814,9 +6825,8 @@ function highlightPk(){ const rows=pkRows(); rows.forEach((r,i)=>r.classList.tog
   try{ const c=$('vdrCrumb'); if(c && s){
     const gname=(s.dataset.group||'').toLowerCase();
     const gi=String((+s.dataset.gi||0)+1).padStart(2,'0');
-    if(s.classList.contains('pk-folder')) c.textContent='hotkey.gg \u203a drills \u203a '+gi+' '+gname+'/';
-    else{ const nm=((CHALLENGES[s.dataset.key]||{}).name||s.dataset.key||'').toLowerCase().replace(/\s+/g,'-');
-      c.textContent='hotkey.gg \u203a drills \u203a '+gi+' '+gname+' \u203a '+nm+'.xlsx'; }
+    if(s.classList.contains('pk-folder')) c.textContent='hotkey.gg \u203a vdr \u203a '+gi+' '+gname+'/';
+    else c.textContent='hotkey.gg \u203a vdr \u203a '+gi+' '+gname+' \u203a '+vdrFileName(s.dataset.key);   /* r150: crumb speaks the filename */
   } }catch(e){}
 }
 /* r147: movePkDir retired — the tree is linear; \u2190/\u2192 fold/unfold instead */
@@ -7945,7 +7955,9 @@ function updateStreak(){ const today=dailyDateStr(); if(streak.d===today){ rende
   else { streak.n=1; }
   streak.d=today;
   if(streak.n>0 && streak.n%5===0 && (streak.frz|0)<2){ streak.frz=(streak.frz|0)+1;
-    showToast('\ud83e\uddca streak freeze earned \u2014 auto-covers one missed day'); }
+    showToast('\ud83e\uddca streak freeze earned \u2014 auto-covers one missed day');
+    try{ const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');   // r150: Ice in the Veins
+      fl.frzBanked=(fl.frzBanked||0)+1; localStorage.setItem('hk_ach_flags', JSON.stringify(fl)); }catch(e){} }
   KV.set('hotkey_streak', JSON.stringify(streak)); renderStreak(); }
 /* Local level chip: anon-friendly progress (solves + PB breadth). Signed-in players
    see the full XP math on their card; this keeps the loop visible from solve #1. */
@@ -8119,6 +8131,8 @@ function sheetMarkWin(){
     sh.done.push(cur); localStorage.setItem(k, JSON.stringify(sh)); updateDailyBtn();
     if(sh.done.length===3){
       ev('sheet_clear');
+      try{ const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');   // r150: Clean Sheet ladder
+        fl.sheetClears=(fl.sheetClears||0)+1; localStorage.setItem('hk_ach_flags', JSON.stringify(fl)); }catch(e){}
       if(window.hkCelebrate) hkCelebrate({cap:'morning sheet', title:'Sheet cleared',
         sub:'all three signed off \u2014 the desk runs on people like you', iconHtml:'<span style="font-size:44px">\u26a1</span>'});
       else showToast('\u26a1 morning sheet cleared');
@@ -8183,7 +8197,16 @@ const MENU_ORDER = (()=>{
   }
 })();
 
-function buildSheetTabs(){   // r147: THE DEAL ROOM — VDR file tree (was r80 section blocks)
+/* r150: files wear the TASK as their name (Wolf: "see the drill like a filename") —
+   the label slugs down to a real-looking VDR artifact: the_4am_pass.xlsx,
+   navigation_tour.xlsx. Short name stays available via the row title. */
+function vdrFileName(key){
+  const C=CHALLENGES[key]||{};
+  const s=String(C.label||C.name||key).toLowerCase()
+    .replace(/[’']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+  return (s||key)+'.xlsx';
+}
+function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 section blocks; r150: Wolf's rename)
   const host=$('pkGroups'); if(!host) return;
   host.innerHTML='';
   let folds=[]; try{ folds=JSON.parse(localStorage.getItem('hk_pk_folds')||'[]'); }catch(e){}
@@ -8192,7 +8215,7 @@ function buildSheetTabs(){   // r147: THE DEAL ROOM — VDR file tree (was r80 s
   const extra=MENU_ORDER.filter(k=>!(k in GROUP_OF));
   if(extra.length) groups.push({name:'More', keys:extra});
   const cap=document.createElement('div'); cap.className='vdr-cap';
-  cap.innerHTML='<span>\u25c6 deal room</span><span class="vdr-crumb" id="vdrCrumb">hotkey.gg \u203a drills</span>'+
+  cap.innerHTML='<span>\u25c6 the data room</span><span class="vdr-crumb" id="vdrCrumb">hotkey.gg \u203a vdr</span>'+
     '<span class="vdr-count">'+MENU_ORDER.length+' files \u00b7 '+groups.length+' folders</span>';
   host.appendChild(cap);
   const tree=document.createElement('div'); tree.className='vdr-tree';
@@ -8220,7 +8243,7 @@ function buildSheetTabs(){   // r147: THE DEAL ROOM — VDR file tree (was r80 s
       row.innerHTML='<span class="vdr-guide">'+(ki===g.keys.length-1?'\u2514':'\u251c')+'</span>'+
         '<span class="vdr-fidx">'+String(gi+1).padStart(2,'0')+'.'+(ki+1)+'</span>'+
         (__a?'<span class="pk-asgmark">\u25c6</span>':'')+
-        '<span class="vdr-fname">'+escHtml(C.name||key)+'<i class="vdr-ext">.xlsx</i></span>'+
+        '<span class="vdr-fname">'+escHtml(vdrFileName(key).slice(0,-5))+'<i class="vdr-ext">.xlsx</i></span>'+
         (PB[key]!==undefined?'<span class="vdr-pb">\u2713 '+PB[key].toFixed(2)+'s</span>':'<span class="vdr-pb dim">\u2014</span>')+
         '<span class="pk-par">par '+(C.par||'')+'s</span>';
       row.title=(__a?('desk assignment'+(__a.t?' \u00b7 target '+(__a.t/1000)+'s':'')+(__a.note?' \u00b7 '+__a.note:'')+' \u00b7 '):'')+(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'');
@@ -9009,10 +9032,13 @@ function achSweepInGame(){
     let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
     let lite=[]; try{ lite=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){}
     const groups={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
+    let __ck=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+      __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length; }catch(e){}
     const ctx={ pb:PB, pars:window.HOTKEY_PARS||{}, runs:lite, streak:streakN, solves:solvesN,
       crowns:0, groups, att:Object.keys(PB).length, menuOrder:MENU_ORDER,
       mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
-      nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin };
+      nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin,
+      raceWins:fl.raceWins||0, sheetClears:fl.sheetClears||0, frzBanked:fl.frzBanked||0, chordKinds:__ck };   // r150
     const seen=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]');
     const fresh=[];
     AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
