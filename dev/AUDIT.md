@@ -3300,3 +3300,41 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   beg+ncf=end identity, and flow totals hold every seed); FULL 59-drill
   regression ALL GREEN. drills.js + PARS synced (par 92/keys 48).
   CACHE v125 -> v126 (all 9 pages).
+
+---
+# ROUND 146 — GHOST DIFF (STRATEGY item 3) + Wolf's quick-fix batch
+- GHOST DIFF SHIPPED: the results card now reads the run's own timestamped
+  trace (recorded since r9, never consumed until now) — "WHERE THE TIME
+  WENT": executing vs thinking split (gaps > 1.5s), top-3 stalls each named
+  by what FOLLOWED the pause (Alt -> "hunting the ribbon" · = -> "formula
+  recall" · chords -> "chord recall" · arrows -> "finding the cell"), and
+  keys-over-optimal. Zero-stall runs get "clean execution" + "optimal-length
+  path — nothing wasted" (positive reinforcement is feedback too).
+- N BUTTON DEAD (Wolf): TWO stacked causes — (a) resultsChainKeys (owns
+  ↵/N/space/esc on the card) was only ever consulted in rapid-fire's
+  handler, never classic's done branch; (b) the TYPE-TO-REPLACE branch sat
+  above the done branch and ATE every printable key on a finished drill
+  (startEdit no-ops on done but the event was already swallowed) — so N and
+  plain-space were both dead. Fixed: !done guard on type-to-replace + done
+  branch delegates to resultsChainKeys first (with n/space fallbacks).
+- RESTART REACH (Wolf: "shift+f11 is a stretch"): DOUBLE-TAP ESC restarts
+  (two Esc inside 450ms). Single Esc untouched — still back-out-only (r89
+  doctrine holds; ants-cancel resets the tap timer so a cancel can't chain
+  into a restart). Checklist copy: "esc·esc or shift+f11".
+- IDLE TIMEOUT (Wolf): 60s without a keystroke mid-run -> fresh board +
+  "stalled out" toast. Classic only; nothing posts; armed per keystroke,
+  inert when idle/done/demo. AFK clocks no longer rot on the screen.
+- PICKER CENTERING (Wolf): the r83 stage-top inline paddingTop was fighting
+  the layout — retired; .pk-card centers via margin:auto (overflow-safe),
+  verified 128px/128px symmetric.
+- VERIFY: 7-assert Playwright suite ALL PASS (ghost diff renders, N
+  advances, single-esc safe, esc·esc restarts w/ toast, idle timeout fires,
+  picker centered, zero errors); full 59-drill regression gating the merge.
+  CACHE v126 -> v127.
+- QUEUED r147 (Wolf's VDR idea — verdict: NOT dumb, good skin / wrong
+  interaction if literal): re-skin the picker as a DEAL-ROOM file tree
+  (folder rows = groups w/ index numbers, drill rows = files, breadcrumb
+  cap) while keeping everything expanded + one-keystroke reachable; add
+  optional fold/unfold on ←/→ for the folder feel. Full navigation-depth
+  VDR (enter/exit folders) rejected: it adds keystrokes between the player
+  and the drill — the picker is a speed surface.

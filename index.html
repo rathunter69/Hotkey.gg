@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=126" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=126">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=126">
+<link rel="icon" href="favicon.ico?v=127" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=127">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=127">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -377,6 +377,14 @@
   .rm-time{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--text);
     line-height:1; letter-spacing:-1.5px}
   .rm-time span{font-size:18px; color:var(--muted); font-weight:400; margin-left:2px}
+  /* r146: ghost diff — where the time went */
+  .gd{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:10px 14px; margin:10px 0 4px; text-align:left}
+  .gd-h{font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:6px}
+  .gd-head{font-family:var(--mono); font-size:12px; color:var(--text); margin-bottom:6px}
+  .gd-head b{color:var(--warn)}
+  .gd-row{font-family:var(--mono); font-size:11px; color:var(--muted); margin:3px 0}
+  .gd-row b{color:var(--warn)} .gd-row span{color:var(--faint)}
+  .gd-row kbd{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:10px}
   .rm-stats{display:flex; justify-content:center; gap:24px; margin:20px 0; font-family:var(--mono);
     font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
   .rm-stats b{display:block; color:var(--text); font-size:17px; font-weight:500; margin-top:4px;
@@ -659,9 +667,9 @@
   /* r79: the picker floats OVER the game — translucent, blurred, "still in the game" */
   .picker-modal{position:fixed; inset:0; background:color-mix(in srgb, var(--bg) 62%, transparent);
     backdrop-filter:blur(6px); display:none;
-    align-items:flex-start; justify-content:center; z-index:55; padding:48px 24px 24px}
+    align-items:flex-start; justify-content:center; z-index:55; padding:24px}   /* r146: balanced pad — card centers via margin:auto */
   .picker-modal.show{display:flex}
-  .pk-card{background:transparent; border:0; border-radius:0;
+  .pk-card{background:transparent; border:0; border-radius:0; margin:auto;   /* r146: true centering, overflow-safe */
     width:1180px; max-width:96vw; max-height:86vh; overflow:auto; padding:6px 10px 16px;
     scrollbar-width:thin; scrollbar-color:var(--line) transparent}
   .pk-card::-webkit-scrollbar{width:6px}
@@ -1076,14 +1084,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=126"></script>
-<link rel="stylesheet" href="nav.css?v=126">
-<script src="themes.js?v=126"></script>
+<script src="drills.js?v=127"></script>
+<link rel="stylesheet" href="nav.css?v=127">
+<script src="themes.js?v=127"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=126"></script>
+<script src="nav.js?v=127"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -5381,6 +5389,44 @@ function showResults(o){
   };
   return _showResults(o);
 }
+/* r146: GHOST DIFF — the traces have been timestamped since r9; this finally reads
+   them. Split the run into EXECUTING (keystroke flow) vs THINKING (gaps > 1.5s),
+   name the biggest stalls by what came after them, and show keys-over-optimal.
+   Every loss becomes a lesson; zero-stall runs get told they executed clean. */
+function ghostDiff(o){
+  try{
+    if(keyTimes.length<6) return '';
+    const stalls=[];
+    for(let i=1;i<keyTimes.length;i++){ const g=keyTimes[i]-keyTimes[i-1];
+      if(g>1500) stalls.push({g, key:String(keyLog[i]||'')}); }
+    const total=keyTimes[keyTimes.length-1]||1;
+    const think=stalls.reduce((a,x)=>a+x.g,0);
+    const exec=Math.max(0,total-think);
+    const overKeys=keyLog.length-(o.par||0);
+    const why=k=>{
+      if(k==='Alt') return 'hunting the ribbon';
+      if(k==='=' || k.indexOf('=')===0) return 'formula recall';
+      if(/^Ctrl\+Shift/.test(k)) return 'selection chord recall';
+      if(/^Ctrl\+/.test(k)) return 'chord recall';
+      if(/Arrow|\u2190|\u2192|\u2191|\u2193/.test(k)) return 'finding the cell';
+      if(k==='Enter') return 'checking the work';
+      return 'reading the sheet';
+    };
+    stalls.sort((a,b)=>b.g-a.g);
+    let rows='';
+    stalls.slice(0,3).forEach(x=>{
+      rows+='<div class="gd-row"><b>'+(x.g/1000).toFixed(1)+'s</b> stall, then <kbd>'+escHtml(x.key.length===1?x.key.toUpperCase():x.key)+'</kbd> <span>\u2014 '+why(x.key)+'</span></div>';
+    });
+    const head = stalls.length
+      ? (exec/1000).toFixed(1)+'s executing \u00b7 <b>'+(think/1000).toFixed(1)+'s thinking</b> ('+stalls.length+' stall'+(stalls.length===1?'':'s')+')'
+      : '<b>clean execution</b> \u2014 no stalls over 1.5s';
+    const keysLine = overKeys>3
+      ? '<div class="gd-row">+'+overKeys+' keys over the optimal path <span>\u2014 a shorter route exists</span></div>'
+      : (overKeys<=0 && o.par ? '<div class="gd-row">optimal-length path <span>\u2014 nothing wasted</span></div>' : '');
+    return '<div class="gd"><div class="gd-h">where the time went</div>'+
+      '<div class="gd-head">'+head+'</div>'+rows+keysLine+'</div>';
+  }catch(e){ return ''; }
+}
 function _showResults(o){
   const best = PB[cur]!==undefined ? PB[cur].toFixed(2)+'s' : '—';
   let postRow;
@@ -5400,6 +5446,7 @@ function _showResults(o){
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
+    ghostDiff(o)+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
     `<div class="rm-rank" id="rmRank"></div>`+
     `<div class="rm-opts">`+
@@ -5790,7 +5837,7 @@ function updateChecklist(){
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
-  html+=`<div class="cl-esc">stuck or off the rails? <kbd>shift+f11</kbd> restarts the drill</div>`;
+  html+=`<div class="cl-esc">stuck or off the rails? <kbd>esc</kbd><kbd>esc</kbd> or <kbd>shift+f11</kbd> restarts the drill</div>`;
   el.innerHTML=html;
   // r134: AUTOSCROLL — long checklists scroll inside .cl-body; keep the next failing
   // task in view (scoped scrollTop math, never scrollIntoView — that can jiggle the page)
@@ -5865,7 +5912,18 @@ function updateFxHint(){
   el.innerHTML=fn+'( '+args.map((a,i2)=>i2===Math.min(argIdx,args.length-1)?'<b>'+a+'</b>':a).join(', ')+' )';
   el.classList.add('show');
 }
-function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0); playTick(); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); }
+function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0); playTick(); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); armIdle(); }
+/* r146: IDLE TIMEOUT — a run that goes 60s without a keystroke is dead (phone call,
+   wandered off). Deal a fresh board instead of letting the clock rot; nothing posts. */
+let __idleT=null;
+function armIdle(){ try{ clearTimeout(__idleT);
+  if(!running || done || demoPlaying || gameMode!=='classic') return;
+  __idleT=setTimeout(()=>{ try{
+    if(!running || done || demoPlaying || gameMode!=='classic') return;
+    loadChallenge(cur);
+    showToast('\u23f1 stalled out \u2014 60s without a keystroke, fresh board');
+  }catch(e){} }, 60000);
+}catch(e){} }
 function flashKey(t){
   const el=$('keyflash'); if(!el) return;
   flashChips.push(t); if(flashChips.length>6) flashChips.shift();
@@ -6203,7 +6261,10 @@ document.addEventListener('keydown',e=>{
   // TYPE-TO-REPLACE (r41): typing any printable char on a selected cell starts an
   // Enter-mode edit seeded with it — Excel's most basic entry behavior. Sits after
   // the app hotkeys above; '=' and '+' fall through to the formula starter below.
-  if(!editing && mode!=='ribbon' && k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey && k!=='=' && k!=='+' && !(k===' ' && e.shiftKey)){
+  // r146: !done — this branch sat above the results-card handling and ate every
+  // printable key on a finished drill (N and space were dead; startEdit no-ops on
+  // done but the event was already swallowed).
+  if(!done && !editing && mode!=='ribbon' && k.length===1 && !e.ctrlKey && !e.altKey && !e.metaKey && k!=='=' && k!=='+' && !(k===' ' && e.shiftKey)){
     /* r89: THE RIBBON REGRESSION — Excel alt-walks are tap-Alt-RELEASE-then-letters, so the
        walk letters arrive bare; without the mode guard, type-to-replace ate them before the
        ribbon branch (which sits ~130 lines below) ever saw them.
@@ -6350,8 +6411,12 @@ document.addEventListener('keydown',e=>{
   // RESULTS SCREEN — enter: again · space: next · esc: menu
   if(done){
     if(gameMode!=='classic'){ e.preventDefault(); return; }   // sessions auto-advance; ignore input briefly
+    // r146: the results card's keys (\u21b5/N/space/esc) live in resultsChainKeys — this
+    // branch used to swallow N before the card ever saw it (only rapid-fire consulted it).
+    if(resultsChainKeys){ resultsChainKeys(e); if(e.defaultPrevented) return; }
     if(k==='Enter'){ e.preventDefault(); loadChallenge(cur); return; }
     if(k===' '){ e.preventDefault(); nextChallenge(); return; }
+    if(k==='n'||k==='N'){ e.preventDefault(); nextChallenge(); return; }
     if(k==='Escape'){ e.preventDefault(); toMenu(); return; }
     e.preventDefault(); return;
   }
@@ -6438,7 +6503,12 @@ document.addEventListener('keydown',e=>{
   if(k==='F11'){ e.preventDefault(); return; }   // fullscreen sits next to F2 — swallow it; too costly a misfire mid-drill
   if(k==='Escape' && !e.ctrlKey && !e.altKey){
     e.preventDefault();
-    if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); }
+    if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); window.__escT=0; return; }
+    // r146: DOUBLE-TAP Esc restarts (Wolf: shift+f11 is a stretch). Single Esc still
+    // never restarts (r89 doctrine); two taps inside 450ms is an unambiguous ask.
+    const now=performance.now();
+    if(window.__escT && now-window.__escT<450){ window.__escT=0; loadChallenge(cur); showToast('fresh board \u2014 esc\u00b7esc restarts'); return; }
+    window.__escT=now;
     return;
   }
   // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
@@ -6676,9 +6746,9 @@ function movePkDir(dx, dy){
   if(best>=0){ pkSel=best; highlightPk(); }
 }
 function openPicker(){ if(demoPlaying) return; buildSheetTabs();
-  // r83: the overlay's content top-aligns with the game frame (Wolf: categories floated high)
-  try{ const st=document.querySelector('.stage'); const p=$('picker');
-    if(st&&p){ p.style.paddingTop=Math.max(24, Math.round(st.getBoundingClientRect().top))+'px'; } }catch(e){}
+  // r146: the r83 stage-top alignment is RETIRED (Wolf: center it) — margin:auto on
+  // .pk-card centers overflow-safe; the inline paddingTop was fighting it.
+  try{ const p=$('picker'); if(p) p.style.paddingTop=''; }catch(e){}
   const rows=pkRows(); pkSel=Math.max(0, rows.findIndex(r=>r.dataset.key===cur));
   pickerOpen=true; $('picker').classList.add('show'); highlightPk(); }
 function closePicker(){ pickerOpen=false; const p=$('picker'); if(p) p.classList.remove('show'); }
