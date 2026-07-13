@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=122" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=122">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=122">
+<link rel="icon" href="favicon.ico?v=123" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=123">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=123">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=122"></script>
-<link rel="stylesheet" href="nav.css?v=122">
-<script src="themes.js?v=122"></script>
+<script src="drills.js?v=123"></script>
+<link rel="stylesheet" href="nav.css?v=123">
+<script src="themes.js?v=123"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=122"></script>
+<script src="nav.js?v=123"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2895,6 +2895,89 @@ const CHALLENGES = {
         {label:'revolver after the sweep, all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'6',this._exp[i].rvE))},
         {label:'cash after the sweep \u2014 never below the minimum', ok: [0,1,2,3].every(i=>near(COL[i]+'7',this._exp[i].cashE))},
         {label:'the balance row is DRESSED \u2014 bold with a rule above', ok: dressOk},
+      ];
+    }
+  },
+  cascade:{
+    name:'Full Waterfall', label:'Run the full cascade', par:178, parKeys:102,
+    prompt:'The real thing: three tranches, four years, cash flowing strictly by seniority. The revolver drinks first, the term loan takes what\u2019s left, mezz gets the dregs \u2014 some years it gets nothing, and the MIN has to say so. Every tranche corkscrews its balance across the years, and total debt gets ruled off at the bottom. This is the waterfall AND the debt schedule on one tab.',
+    req:'<em>B6</em> <em>=MIN(B5,B3)</em> fill \u2192 \u00b7 <em>B7</em> <em>=B5-B6</em> fill \u2192 \u00b7 <em>C5</em> <em>=B7</em> fill \u2192 \u00b7 term loan: <em>B9</em> <em>=MIN(B8,B3-B6)</em> \u00b7 <em>B10</em> <em>=B8-B9</em> \u00b7 <em>C8</em> <em>=B10</em> \u00b7 mezz: <em>B12</em> <em>=MIN(B11,B3-B6-B9)</em> \u00b7 <em>B13</em> <em>=B11-B12</em> \u00b7 <em>C11</em> <em>=B13</em> \u00b7 <em>B14</em> <em>=B7+B10+B13</em> fill \u2192 + dress',
+    guide:[
+      'the revolver drinks first: B6 \u00b7 <kbd>=MIN(B5,B3)</kbd> \u2014 can\u2019t pay down more than the balance \u00b7 fill \u2192',
+      'revolver ending: B7 \u00b7 <kbd>=B5-B6</kbd> \u00b7 fill \u2192 \u00b7 then the corkscrew: C5 \u00b7 <kbd>=B7</kbd> \u2014 next year opens where this year closed \u00b7 fill C5:E5 \u2192',
+      'term loan sweeps the REMAINDER: B9 \u00b7 <kbd>=MIN(B8,B3-B6)</kbd> \u00b7 ending B10 \u00b7 <kbd>=B8-B9</kbd> \u00b7 corkscrew C8 \u00b7 <kbd>=B10</kbd> \u00b7 fill all three \u2192',
+      'mezz gets the dregs: B12 \u00b7 <kbd>=MIN(B11,B3-B6-B9)</kbd> \u2014 two seniors already ate \u00b7 ending B13 \u00b7 <kbd>=B11-B12</kbd> \u00b7 corkscrew C11 \u00b7 <kbd>=B13</kbd> \u00b7 fill \u2192',
+      'total debt: B14 \u00b7 <kbd>=B7+B10+B13</kbd> \u00b7 fill \u2192 \u00b7 dress it: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+    ],
+    targets:['B6','B7','C5','B9','B10','C8','B12','B13','C11','B14','B14:E14'],
+    demo(){ return [
+      {sel:'B6',  keys:[...T('=MIN(B5,B3)'), Kb.enter]},
+      {sel:'B6:E6', keys:[Kb.fillR]},
+      {sel:'B7',  keys:[...T('=B5-B6'), Kb.enter]},
+      {sel:'B7:E7', keys:[Kb.fillR]},
+      {sel:'C5',  keys:[...T('=B7'), Kb.enter]},
+      {sel:'C5:E5', keys:[Kb.fillR]},
+      {sel:'B9',  keys:[...T('=MIN(B8,B3-B6)'), Kb.enter]},
+      {sel:'B9:E9', keys:[Kb.fillR]},
+      {sel:'B10', keys:[...T('=B8-B9'), Kb.enter]},
+      {sel:'B10:E10', keys:[Kb.fillR]},
+      {sel:'C8',  keys:[...T('=B10'), Kb.enter]},
+      {sel:'C8:E8', keys:[Kb.fillR]},
+      {sel:'B12', keys:[...T('=MIN(B11,B3-B6-B9)'), Kb.enter]},
+      {sel:'B12:E12', keys:[Kb.fillR]},
+      {sel:'B13', keys:[...T('=B11-B12'), Kb.enter]},
+      {sel:'B13:E13', keys:[Kb.fillR]},
+      {sel:'C11', keys:[...T('=B13'), Kb.enter]},
+      {sel:'C11:E11', keys:[Kb.fillR]},
+      {sel:'B14', keys:[...T('=B7+B10+B13'), Kb.enter]},
+      {sel:'B14:E14', keys:[Kb.fillR]},
+      {sel:'B14:E14', keys:[Kb.bold]},
+      {sel:'B14:E14', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 debt paydown waterfall ($mm)',txt:true,bold:true};
+      const y0=rnd(24,26);
+      for(let i=0;i<4;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      const rows=[[3,'Cash avail. for paydown'],[5,'Revolver \u2014 beginning'],[6,'Revolver \u2014 paydown'],[7,'Revolver \u2014 ending'],
+        [8,'Term loan \u2014 beginning'],[9,'Term loan \u2014 sweep'],[10,'Term loan \u2014 ending'],
+        [11,'Mezzanine \u2014 beginning'],[12,'Mezzanine \u2014 paydown'],[13,'Mezzanine \u2014 ending'],[14,'Total debt']];
+      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===14)});
+      // openings + yearly cash: random CONTENT, fixed real-tab layout (density doctrine).
+      // cash is sized so the cascade BITES: revolver dies mid-model, mezz often starves.
+      let rv=rnd(10,22)*10, tl=rnd(28,46)*10, mz=rnd(10,20)*10;
+      cells['B5']={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B8']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B11']={...blankCell(),value:mz,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      this._exp=[];
+      for(let i=0;i<4;i++){ const col=colLetter(i+2);
+        const cash=rnd(8,32)*10;
+        cells[col+3]={...blankCell(),value:cash,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        [5,6,7,8,9,10,11,12,13,14].forEach(r=>{ const k=col+r;
+          if(!cells[k]) cells[k]={...blankCell(),fmtStyle:'comma',decimals:0}; });
+        const rvPd=Math.min(rv,cash), rvE=rv-rvPd;
+        const tlPd=Math.min(tl,cash-rvPd), tlE=tl-tlPd;
+        const mzPd=Math.min(mz,cash-rvPd-tlPd), mzE=mz-mzPd;
+        this._exp.push({rvPd,rvE,tlPd,tlE,mzPd,mzE,tot:rvE+tlE+mzE});
+        rv=rvE; tl=tlE; mz=mzE;
+      }
+      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:184,2:70,3:70,4:70,5:70}};
+    },
+    checks(S){
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E'];
+      const all=(row,key)=>[0,1,2,3].every(i=>near(COL[i]+row,this._exp[i][key]));
+      const dressOk=[0,1,2,3].every(i=>{ const c=S.cells[COL[i]+'14']; return !!(c&&c.bold&&c.bt); });
+      return [
+        {label:'revolver drinks first \u2014 MIN of balance and cash, all four years', ok: all(6,'rvPd')&&refs('B6',['MIN('])},
+        {label:'revolver corkscrews \u2014 each year opens where the last closed', ok: all(7,'rvE')&&[1,2,3].every(i=>refs(COL[i]+'5',[COL[i-1]+'7']))},
+        {label:'term loan sweeps only the REMAINDER after the revolver', ok: all(9,'tlPd')&&refs('B9',['MIN(','B6'])},
+        {label:'term loan corkscrews across', ok: all(10,'tlE')&&[1,2,3].every(i=>refs(COL[i]+'8',[COL[i-1]+'10']))},
+        {label:'mezz gets the dregs \u2014 both seniors netted out of the cash', ok: all(12,'mzPd')&&refs('B12',['MIN(','B6','B9'])},
+        {label:'mezz corkscrews across', ok: all(13,'mzE')&&[1,2,3].every(i=>refs(COL[i]+'11',[COL[i-1]+'13']))},
+        {label:'total debt \u2014 three endings, DRESSED bold with a rule', ok: all(14,'tot')&&dressOk},
       ];
     }
   },

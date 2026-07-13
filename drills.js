@@ -28,7 +28,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Values',      keys: ['drill', 'series', 'transpose'] },
     { name: 'Data',        keys: ['sort'] },
     { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'triage', 'versionup', 'percent', 'cagr', 'sumif', 'cases'] },
-    { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'txncomps', 'sourcesuses', 'accdil', 'dcfsens', 'retbridge', 'football'] },
+    { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'cascade', 'txncomps', 'sourcesuses', 'accdil', 'dcfsens', 'retbridge', 'football'] },
     { name: 'Full Builds', keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'debtsched', 'threestmt'] },
     { name: 'Lookups',     keys: ['lookup', 'lookup2'] },
   ],
@@ -55,6 +55,7 @@ window.HOTKEY_DRILLS = {
     pastes:     { name:'Paste Sp.',label:'Alt E S everything',      tab:'Paste Sp.',desc:'One copy, two pastes — values then formats' },
     transpose:  { name:'Transpose', label:'Flip it on its side',        tab:'Transpose', desc:'Copy a row, Alt E S E drops it in as a column' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'3-yr cascade: MIN rations, both tranches corkscrew across' },
+    cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche corkscrews, total debt ruled off' },
     txncomps:   { name:'Txn Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the average, and the implied equity' },
     sourcesuses:{ name:'S&U',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
     accdil:     { name:'Acc/Dil',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
@@ -172,7 +173,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"drill":66,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":42,"pastes":44,"transpose":40,"saves":44,"editfix":44,"undo":28,"autofit":34,"rowops":26,"filldr":24,"blocksel":30,"copyover":36,"polish":38,"foot":72,"comps":161,"center":44,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":126,"audit":32,"sumif":140,"lookup2":60,"navigation":30,"dress":97};
+window.HOTKEY_PARS = {"drill":66,"combo":32,"gauntlet":75,"format":42,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":42,"pastes":44,"transpose":40,"saves":44,"editfix":44,"undo":28,"autofit":34,"rowops":26,"filldr":24,"blocksel":30,"copyover":36,"polish":38,"foot":72,"comps":161,"center":44,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":126,"audit":32,"sumif":140,"lookup2":60,"navigation":30,"dress":97};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
