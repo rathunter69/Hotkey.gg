@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=143" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=143">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=143">
+<link rel="icon" href="favicon.ico?v=144" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=144">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=144">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1119,14 +1119,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=143"></script>
-<link rel="stylesheet" href="nav.css?v=143">
-<script src="themes.js?v=143"></script>
+<script src="drills.js?v=144"></script>
+<link rel="stylesheet" href="nav.css?v=144">
+<script src="themes.js?v=144"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=143"></script>
+<script src="nav.js?v=144"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1413,51 +1413,73 @@ const CHALLENGES = {
   },
 
   combo:{
-    name:'Combo', label:'Clean the paste', par:32, parKeys:20,
-    prompt:'A raw paste landed messy. Make it presentable: bold the header row, comma-format the number columns to 0 decimals, wrap the notes column, and autofit so nothing shows ####.',
-    req:'<em>keyboard only</em> · alt h o i autofit · alt h w wrap · ctrl b bold · alt h k comma then alt h 9 to drop decimals',
-    guide:[
-      'on the header row, <kbd>shift</kbd>+<kbd>space</kbd> to select it · <kbd>ctrl</kbd>+<kbd>b</kbd> bold',
-      'select B2:D6 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> comma · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice to drop decimals',
-      'select the notes column E · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd> wrap',
-      'select B:D · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
-    ],
-    targets:['A1:E1','B2:D6','E2:E6','B2:D6'],
-    demo(){ return [
-      {sel:'A1:E1', keys:[Kb.bold]},
-      {sel:'B2:D6', keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
-      {sel:'E2:E6', keys:[Kb.alt,L('H'),L('W')]},
-      {sel:'B2:D6', keys:[Kb.alt,L('H'),L('O'),L('I')]},
+    name:'Combo', label:'Clean the paste', par:48, parKeys:28,
+    prompt:'A comp sheet came over as a raw paste: title with no weight, headers slumming it lowercase-left, figures unformatted, the notes column overrunning its neighbors, half the columns showing ####. Make it presentable end to end — which metrics came over, and where the block sits, changes every run.',
+    req(){ const o=this._o; return '<em>'+o.title+'</em> + headers <em>'+o.hdr+'</em> → <em>ctrl+b</em> · metric headers <em>'+o.mh+'</em> → <em>alt h a r</em> · figures <em>'+o.num+'</em> → <em>alt h k</em> + <em>alt h 9</em> ×2 · notes <em>'+o.notes+'</em> → <em>alt h w</em> · then <em>alt h o i</em> — no #### ships'; },
+    guide(){ const o=this._o; return [
+      'weight first: '+o.title+' · <kbd>ctrl</kbd>+<kbd>b</kbd> · then the header row '+o.hdr+' · <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      'numbers read right-aligned — headers over them too: '+o.mh+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
+      'figures to commas: '+o.num+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
+      'the notes column wraps instead of spilling: '+o.notes+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd>',
+      'last pass, always: select the number columns · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> — nothing ships showing ####',
+    ]; },
+    targets(){ const o=this._o; return [o.title,o.hdr,o.mh,o.num,o.notes,o.num]; },
+    demo(){ const o=this._o; return [
+      {sel:o.title, keys:[Kb.bold]},
+      {sel:o.hdr,   keys:[Kb.bold]},
+      {sel:o.mh,    keys:[Kb.alt,L('H'),L('A'),L('R')]},
+      {sel:o.num,   keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:o.notes, keys:[Kb.alt,L('H'),L('W')]},
+      {sel:o.num,   keys:[Kb.alt,L('H'),L('O'),L('I')]},
     ]; },
     build(){
       const cells={};
-      const heads=['name','rev','ebitda','debt','notes'];
-      heads.forEach((h,i)=>cells[colLetter(i+1)+1]={...blankCell(),value:h,txt:true,bold:false});
-      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox'];
-      const notes=['flagged for review by deal team','pending QoE adjustments','clean — comp set anchor','stub period, annualize','carve-out, normalize'];
-      for(let r=2;r<=6;r++){
-        cells['A'+r]={...blankCell(),value:names[r-2],txt:true};
-        cells['B'+r]={...blankCell(),value:rnd(800,9800)*1000};
-        cells['C'+r]={...blankCell(),value:rnd(120,2400)*1000};
-        cells['D'+r]={...blankCell(),value:rnd(200,5600)*1000};
-        cells['E'+r]={...blankCell(),value:notes[r-2],txt:true};
+      const METRICS=[['Revenue',800,9800],['EBITDA',120,2400],['Net debt',200,5600],['EV',900,12000],['FCF',80,1900]];
+      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      const mets=pick(METRICS, rnd(2,3));
+      const NAMES=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox','Foxglove','Granite Pk'];
+      const NOTES=['flagged for review by deal team','pending QoE adjustments','clean — comp set anchor','stub period, annualize','carve-out, normalize','mgmt case only — haircut it','pre-synergy figures'];
+      const nrows=rnd(4,6);
+      const names=pick(NAMES,nrows), notes=pick(NOTES,nrows);
+      const hr=rnd(2,3);                                       // header row: right under the title, or one blank spacer
+      const r1=hr+1, r2=hr+nrows;
+      const nc=mets.length;                                    // metric col count
+      const notesCol=colLetter(2+nc);                          // last col
+      cells['A1']={...blankCell(),value:codename()+' — comp sheet (raw paste)',txt:true};
+      cells['A'+hr]={...blankCell(),value:'company',txt:true};
+      mets.forEach((mt,i)=>cells[colLetter(2+i)+hr]={...blankCell(),value:mt[0].toLowerCase(),txt:true});
+      cells[notesCol+hr]={...blankCell(),value:'notes',txt:true};
+      for(let r=r1;r<=r2;r++){
+        cells['A'+r]={...blankCell(),value:names[r-r1],txt:true};
+        mets.forEach((mt,i)=>cells[colLetter(2+i)+r]={...blankCell(),value:rnd(mt[1],mt[2])*1000});
+        cells[notesCol+r]={...blankCell(),value:notes[r-r1],txt:true};
       }
-      return {ROWS:6, cells, active:{r:1,c:1}, sel:null};
+      const o={ title:'A1', hdr:'A'+hr+':'+notesCol+hr,
+        mh:'B'+hr+':'+colLetter(1+nc)+hr,
+        num:'B'+r1+':'+colLetter(1+nc)+r2,
+        notes:notesCol+r1+':'+notesCol+r2,
+        hr, r1, r2, nc, notesCol };
+      this._o=o;
+      return {ROWS:Math.max(9,r2+2), cells, active:{r:1,c:1}, sel:null};
     },
     checks(S){
-      let hb=true; for(let c=1;c<=5;c++){ const h=S.cells[colLetter(c)+1]; if(!h||!h.bold) hb=false; }
-      let cf=true; for(let c=2;c<=4;c++)for(let r=2;r<=6;r++){ const cell=S.cells[colLetter(c)+r]; if(!cell||cell.fmtStyle!=='comma'||cell.decimals!==0) cf=false; }
-      let wr=true; for(let r=2;r<=6;r++){ const e=S.cells['E'+r]; if(!e||!e.wrap) wr=false; }
-      let af=true; for(let c=2;c<=4;c++){ if(overflowsCol(S,c)) af=false; }
+      const o=this._o;
+      const cell=k=>S.cells[k]||{};
+      const hdrCells=['A'].concat(Array.from({length:o.nc},(_,i)=>colLetter(2+i))).concat([o.notesCol]);
+      const hb = hdrCells.every(c=>cell(c+o.hr).bold);
+      const ha = Array.from({length:o.nc},(_,i)=>colLetter(2+i)).every(c=>cell(c+o.hr).align==='r');
+      let cf=true; for(let ci=0;ci<o.nc;ci++) for(let r=o.r1;r<=o.r2;r++){ const x=cell(colLetter(2+ci)+r); if(x.fmtStyle!=='comma'||(x.decimals|0)!==0) cf=false; }
+      let wr=true; for(let r=o.r1;r<=o.r2;r++){ if(!cell(o.notesCol+r).wrap) wr=false; }
+      let af=true; for(let ci=0;ci<o.nc;ci++){ if(overflowsCol(S,2+ci)) af=false; }
       return [
-        {label:'Bold the header row \u2014 row 1, every filled cell', ok:hb},
-        {label:'Comma-format the figures in B:D \u2014 zero decimals', ok:cf},
-        {label:'Wrap the notes column so nothing spills into the sheet', ok:wr},
-        {label:'Autofit the columns \u2014 no #### left anywhere', ok:af},
+        {label:'the title and the header row carry weight — bold', ok: !!cell('A1').bold && hb},
+        {label:'metric headers sit RIGHT, over their numbers', ok: ha},
+        {label:'figures in commas, zero decimals', ok: cf},
+        {label:'notes wrap — no text running over the page', ok: wr},
+        {label:'nothing ships showing #### — autofit the number columns', ok: af},
       ];
     }
   },
-
   gauntlet:{
     name:'Gauntlet', label:'Make it model-ready', par:100, parKeys:46,
     prompt:'A raw sources & uses \u2014 both sides straight out of a banker\u2019s head: naked numbers, no totals, nothing marked. Full dress, BOTH blocks: inputs blue, SUM each total with alt+=, bold + top border on both, commas at 0 decimals down both money columns, autofit so nothing clips. Every formatting op you know, both sides of the page, no mouse.',
@@ -2686,48 +2708,57 @@ const CHALLENGES = {
     }
   },
   center:{
-    name:'Center', label:'Set the alignment', par:44, parKeys:28,
-    prompt:'Three alignment passes, house style: center the column headers, left-align the row labels (they pasted in centered), and right-align the total row. The table lands somewhere new each run \u2014 Alt H A C / L / R, same door, three rooms.',
-    req(){ const o=this._o; return '<em>headers</em> '+o.hdr+' \u2192 <em>alt h a c</em> \u00b7 <em>labels</em> '+o.lab+' \u2192 <em>alt h a l</em> \u00b7 <em>totals</em> '+o.tot+' \u2192 <em>alt h a r</em>'; },
+    name:'Center', label:'Set the alignment', par:46, parKeys:26,
+    prompt:'A pipeline summary pasted in with its alignment scrambled: quarter headers slumped left, deal names floating centered, the total row sitting left like a label. House rule — headers centered over their columns, labels pinned left, numbers and their totals right. And a total row reads BOLD or it isn’t a total. Geometry moves every run.',
+    req(){ const o=this._o; return 'quarter headers <em>'+o.hdr+'</em> → <em>alt h a c</em> · deal names <em>'+o.lab+'</em> → <em>alt h a l</em> · total row <em>'+o.tot+'</em> → <em>alt h a r</em> + <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
-      'from '+o.h1+', <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2192</kbd> jumps to the header edge \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> centers them',
-      'labels at '+o.lab+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd> pins them left',
-      'totals at '+o.tot+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> \u2014 numbers never sit left',
+      'quarter headers first: '+o.hdr+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> — centered over their columns',
+      'deal names pinned left: '+o.lab+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd>',
+      'the total row: '+o.tot+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> — numbers never sit left',
+      'and a total reads BOLD: selection holds · <kbd>ctrl</kbd>+<kbd>b</kbd>',
     ]; },
-    targets(){ const o=this._o; return [o.hdr,o.lab,o.tot]; },
+    targets(){ const o=this._o; return [o.hdr,o.lab,o.tot,o.tot]; },
     demo(){ const o=this._o; return [
       {sel:o.hdr, keys:[Kb.alt,L('H'),L('A'),L('C')]},
       {sel:o.lab, keys:[Kb.alt,L('H'),L('A'),L('L')]},
       {sel:o.tot, keys:[Kb.alt,L('H'),L('A'),L('R')]},
+      {sel:o.tot, keys:[Kb.bold]},
     ]; },
     build(){
       const cells={};
-      const spots=[{r:1,c:1},{r:2,c:4},{r:6,c:2},{r:5,c:5},{r:8,c:1}];
-      const sp=spots[rnd(0,spots.length-1)];
-      const r0=sp.r, c0=sp.c;
-      const heads=['Deal','Q1','Q2','Q3','Q4'];
-      heads.forEach((t,i)=>cells[colLetter(c0+i)+r0]={...blankCell(),value:t,txt:true,bold:true,align:(i===0?'l':'r')});
-      const names=['Falcon','Atlas','Copper','Summit'];
-      for(let i=0;i<4;i++){
-        cells[colLetter(c0)+(r0+1+i)]={...blankCell(),value:names[i],txt:true,align:'c'};   // pasted-in wrong
-        for(let j=1;j<5;j++) cells[colLetter(c0+j)+(r0+1+i)]={...blankCell(),value:rnd(5,90)*10,fmtStyle:'comma',decimals:0};
+      const NAMES=['Falcon','Atlas','Copper','Summit','Harbor','Juniper'];
+      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      const nq=rnd(3,5);                                     // Q1..Qn columns
+      const nd=rnd(3,5);                                     // deal rows
+      const names=pick(NAMES,nd);
+      const hr=rnd(2,3);                                     // header row (spacer or not)
+      const r1=hr+1, rt=hr+nd+1;                             // deals, then the total row
+      const LC=colLetter(1+nq);
+      cells['A1']={...blankCell(),value:codename()+' — pipeline by quarter ($mm)',txt:true,bold:true};
+      cells['A'+hr]={...blankCell(),value:'Deal',txt:true,bold:true};
+      for(let q=0;q<nq;q++) cells[colLetter(2+q)+hr]={...blankCell(),value:'Q'+(q+1),txt:true,bold:true,align:'l'};   // slumped left
+      const colSums=new Array(nq).fill(0);
+      for(let d=0;d<nd;d++){ const r=r1+d;
+        cells['A'+r]={...blankCell(),value:names[d],txt:true,align:'c'};                     // floating centered
+        for(let q=0;q<nq;q++){ const v=rnd(20,240); colSums[q]+=v;
+          cells[colLetter(2+q)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; }
       }
-      cells[colLetter(c0)+(r0+5)]={...blankCell(),value:'Total',txt:true,bold:true};
-      for(let j=1;j<5;j++) cells[colLetter(c0+j)+(r0+5)]={...blankCell(),value:rnd(100,400)*10,fmtStyle:'comma',decimals:0,bold:true,align:'l'};  // wrong: numbers left
-      this._o={ h1:colLetter(c0)+r0,
-        hdr:colLetter(c0)+r0+':'+colLetter(c0+4)+r0,
-        lab:colLetter(c0)+(r0+1)+':'+colLetter(c0)+(r0+4),
-        tot:colLetter(c0+1)+(r0+5)+':'+colLetter(c0+4)+(r0+5),
-        r0:r0, c0:c0 };
-      return {ROWS:Math.max(9,r0+6), cells, active:{r:r0,c:c0}, sel:null, colW:{}};
+      cells['A'+rt]={...blankCell(),value:'Total',txt:true,align:'c'};
+      for(let q=0;q<nq;q++){ const col=colLetter(2+q);
+        cells[col+rt]={...blankCell(),formula:'=SUM('+col+r1+':'+col+(rt-1)+')',value:colSums[q],fmtStyle:'comma',decimals:0,align:'l'}; }   // a total, sitting left
+      const o={ hdr:'B'+hr+':'+LC+hr, lab:'A'+r1+':A'+(rt-1), tot:'A'+rt+':'+LC+rt, hr, r1, rt, nq };
+      this._o=o;
+      return {ROWS:Math.max(10,rt+2), cells, active:{r:1,c:1}, sel:null};
     },
     checks(S){
       const o=this._o;
-      const al=(col,row,want)=>{ const c=S.cells[colLetter(col)+row]; return !!(c&&c.align===want); };
+      const cell=k=>S.cells[k]||{};
+      const cols=[]; for(let q=0;q<o.nq;q++) cols.push(colLetter(2+q));
       return [
-        {label:'center the headers ('+o.hdr+')', ok: [0,1,2,3,4].every(j=>al(o.c0+j,o.r0,'c'))},
-        {label:'pin the row labels left ('+o.lab+')', ok: [1,2,3,4].every(i=>al(o.c0,o.r0+i,'l'))},
-        {label:'push the totals right ('+o.tot+')', ok: [1,2,3,4].every(j=>al(o.c0+j,o.r0+5,'r'))},
+        {label:'quarter headers centered over their columns', ok: cols.every(c=>cell(c+o.hr).align==='c')},
+        {label:'deal names pinned LEFT', ok: Array.from({length:o.rt-o.r1},(_,k)=>o.r1+k).every(r=>cell('A'+r).align==='l')},
+        {label:'the total row sits RIGHT — numbers never sit left', ok: cell('A'+o.rt).align==='r' && cols.every(c=>cell(c+o.rt).align==='r')},
+        {label:'and a total reads BOLD', ok: cols.every(c=>cell(c+o.rt).bold) && !!cell('A'+o.rt).bold},
       ];
     }
   },

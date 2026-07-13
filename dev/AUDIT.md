@@ -3913,3 +3913,30 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   only' — honest: the delta + keys readout stays free, the CURSOR is
   the PRO feature). Roadmap now: interview mode, season rewards.
 - CACHE v142 -> v143.
+
+---
+# ROUND 164 — CONTENT ITERATION: the last pre-doctrine drills rebuilt (combo, center)
+- STANDING SWEEP (Wolf: "keep running iterations on existing drills"): the
+  catalog was graded against Density Doctrine v2 + Mix Rule + site-driven
+  randomization. Two clear violators remained, both rebuilt:
+- COMBO ('Clean the paste', par 32->48/keys 28): was a FIXED 5x5 block
+  with junk lowercase headers, no tab title, values-only randomization.
+  Now a real comp sheet — codename title, 2-3 metric columns drawn from
+  a 5-metric pool (EV/EBITDA/Net debt/Revenue/FCF), 4-6 companies from
+  shuffled pools, header row position varies, notes column rides last.
+  FIVE op families: bold (title+headers), align (headers right over
+  numbers — NEW), comma+decimals, wrap, autofit. Raw #### overflow ships
+  on load so the autofit pass is visibly real.
+- CENTER ('Set the alignment', par 44->46/keys 26): was the LAST
+  offset-block drill (a floating 5-col block at random offsets, no
+  title). Now a real pipeline tab — codename title, Q1..Qn headers
+  (3-5), 3-5 deal rows, prefilled SUM total row. Same alignment triple
+  (c/l/r) PLUS the natural fourth family: a total reads BOLD. Every
+  check requires a change (headers ship slumped left, labels centered,
+  totals left-aligned — no leave-untouched).
+- Graded-and-passed without change: series, sort, polish, blue, foot,
+  lookup family (already site-driven post-T5/r155).
+- VERIFY: combo + center demo-replay WIN across 4 seed batches each;
+  full catalog ALL GREEN (66); parity 37; visual 311; rebuilt boards
+  screenshot-reviewed (combo ships with live #### overflow).
+- CACHE v143 -> v144 (all 9 pages).
