@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=158" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=158">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=158">
+<link rel="icon" href="favicon.ico?v=159" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=159">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=159">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -256,6 +256,7 @@
   .fltbtn{float:right; font-size:9px; line-height:1.6; opacity:.55; border:1px solid var(--line); border-radius:2px;
     padding:0 2px; margin-left:4px; font-family:var(--mono)}
   .fltbtn.on{opacity:1; color:var(--accent); border-color:var(--accent)}
+  td.mark{outline:2px dashed var(--warn); outline-offset:-2px}   /* r182: go-to-special marks */
 
   .pd-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none;
     align-items:center; justify-content:center; z-index:50}
@@ -1134,14 +1135,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=158"></script>
-<link rel="stylesheet" href="nav.css?v=158">
-<script src="themes.js?v=158"></script>
+<script src="drills.js?v=159"></script>
+<link rel="stylesheet" href="nav.css?v=159">
+<script src="themes.js?v=159"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=158"></script>
+<script src="nav.js?v=159"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2465,6 +2466,75 @@ const CHALLENGES = {
         {label:'arm the AutoFilter on the header row \u2014 ctrl+shift+L with the cursor on row 3', ok: armed},
         {label:'drop Closed and Dead through the Status picker \u2014 alt+\u2193 on C3, space, \u21b5; only Open rows stay', ok: armed && hidOk},
         {label:'type the largest OPEN size into B'+o.ansR+' \u2014 read it straight off the filtered tape', ok: !!(a && Math.abs((+a.value||0)-o.maxOpen)<0.5)},
+      ];
+    }
+  },
+  hunt:{
+    name:'Audit', label:'Hunt the hardcodes', par:95, parKeys:46,
+    aha:'F5 \u2192 special \u2192 constants is the pre-ship ritual \u2014 every number a formula should own lights up',
+    prompt:'The intern\u2019s opex build looks clean \u2014 it even foots. It isn\u2019t: three cells in the calc block are typed-over numbers, stale since the last turn of the model. Eyes can\u2019t find them; the ritual can. F5, Special, Constants \u2014 every raw number on the page lights up and \u21b5 walks the marks. Relink the three crimes to their formulas, then foot the corrected build and bold the answer row.',
+    req(){ const o=this._o; return '<em>F5</em> \u2192 <em>s</em> \u2192 <em>o</em> marks the constants \u00b7 \u21b5 walks \u00b7 relink '+o.sites.map(s=>'<em>'+s.k+'</em>').join(', ')+' \u00b7 <em>B8</em> <em>=SUM(B3:B7)</em> fill B8:D8 \u2192 \u00b7 <em>ctrl+b</em>'; },
+    guide(){ const o=this._o; return [
+      'run the ritual: <kbd>F5</kbd> \u00b7 <kbd>s</kbd> \u00b7 <kbd>o</kbd> \u2014 every raw number marks up; blue inputs SHOULD light, the calc block should NOT',
+      '<kbd>\u21b5</kbd> walks the marks \u2014 the three sitting in the calc grid ('+o.sites.map(s=>s.k).join(', ')+') are the crimes: retype each as its formula (prior year \u00d7 (1 + growth)) and the mark dies on commit',
+      'foot it: B8 \u00b7 <kbd>=SUM(B3:B7)</kbd> \u00b7 fill B8:D8 \u2192 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 the corrected totals carry the page',
+    ]; },
+    targets(){ const o=this._o; return ['A1', o.sites[0].k, 'B8', 'B8:D8']; },
+    demo(){ const o=this._o;
+      const steps=[{sel:'B3', keys:[{key:'F5'},L('s'),L('o')]}];
+      o.sites.forEach(s=>steps.push({sel:s.k, keys:[...T(s.f), Kb.enter]}));
+      steps.push({sel:'B8', keys:[...T('=SUM(B3:B7)'), Kb.enter]});
+      steps.push({sel:'B8:D8', keys:[Kb.fillR]});
+      steps.push({sel:'B8:D8', keys:[Kb.bold]});
+      return steps; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 opex build (post-intern)',txt:true,bold:true};
+      const y0=rnd(24,26);
+      ['B','C','D'].forEach((cl,i)=>cells[cl+'2']={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'});
+      cells['E2']={...blankCell(),value:'Growth',txt:true,bold:true,align:'r'};
+      const LN=['Compensation','Rent \u0026 occupancy','Technology','T\u0026E','Professional fees'];
+      const vals={};
+      for(let i=0;i<5;i++){ const r=3+i;
+        const b=rnd(20,90)*10, g=rnd(3,9)/100;
+        cells['A'+r]={...blankCell(),value:LN[i],txt:true};
+        cells['B'+r]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells['E'+r]={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1};
+        vals['B'+r]=b; vals['C'+r]=b*(1+g); vals['D'+r]=b*(1+g)*(1+g);
+        cells['C'+r]={...blankCell(),formula:'=B'+r+'*(1+E'+r+')',value:vals['C'+r],fmtStyle:'comma',decimals:0};
+        cells['D'+r]={...blankCell(),formula:'=C'+r+'*(1+E'+r+')',value:vals['D'+r],fmtStyle:'comma',decimals:0};
+      }
+      // the crimes: three calc cells typed over with STALE numbers (drifted, formula gone)
+      const pool=[]; ['C','D'].forEach(cl=>{ for(let r=3;r<=7;r++) pool.push(cl+r); });
+      for(let k2=pool.length-1;k2>0;k2--){ const j=rnd(0,k2); [pool[k2],pool[j]]=[pool[j],pool[k2]]; }
+      const sites=pool.slice(0,3).sort();
+      this._o={sites:[]};
+      sites.forEach(k2=>{ const cl=k2[0], r=+k2.slice(1);
+        const drift=(rnd(0,1)?1:-1)*rnd(4,12)/100;
+        cells[k2]={...blankCell(),value:Math.round(vals[k2]*(1+drift)),fmtStyle:'comma',decimals:0};
+        const f=(cl==='C') ? '=B'+r+'*(1+E'+r+')' : '=C'+r+'*(1+E'+r+')';
+        this._o.sites.push({k:k2, f:f, exp:vals[k2], prev:(cl==='C'?'B':'C')+r, g:'E'+r});
+      });
+      cells['A8']={...blankCell(),value:'Total opex',txt:true,bold:true};
+      ['B','C','D'].forEach(cl=>cells[cl+'8']={...blankCell(),fmtStyle:'comma',decimals:0});
+      this._o.tot={B:0,C:0,D:0};
+      for(let r=3;r<=7;r++){ this._o.tot.B+=vals['B'+r]; this._o.tot.C+=vals['C'+r]; this._o.tot.D+=vals['D'+r]; }
+      return {ROWS:9, cells, active:{r:3,c:2}, sel:null, colW:{1:150,2:76,3:76,4:76,5:70}};
+    },
+    checks(S){
+      const o=this._o;
+      const live=(k,exp,rs)=>{ const c=S.cells[k]; if(!c||!c.formula||typeof c.value!=='number') return false;
+        if(Math.abs(c.value-exp)>0.5) return false;
+        const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const fixed=o.sites.every(s=>live(s.k, s.exp, [s.prev, s.g]));
+      const footed=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8'];
+        return !!(c&&c.formula&&/SUM/i.test(String(c.formula))&&typeof c.value==='number'&&Math.abs(c.value-o.tot[cl])<0.5); });
+      const boldOk=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8']; return !!(c&&c.bold); });
+      return [
+        {label:'flush every raw number out \u2014 F5, special, constants; let the marks do the finding', ok:(S.markN||0)>=1},
+        {label:'relink the three hardcodes \u2014 prior year \u00d7 (1 + growth); formulas own the calc block again', ok: fixed},
+        {label:'foot the corrected build \u2014 =SUM(B3:B7) at B8, fill B8:D8 across', ok: footed},
+        {label:'bold the total row \u2014 B8:D8 carries the corrected page', ok: boldOk},
       ];
     }
   },
@@ -6500,6 +6570,7 @@ function render(){
       // Ref color overlay: when this cell is referenced by the active formula, outline it in that ref's color.
       // Skip the active cell itself (would conflict with the active outline) and the pointer cell (point class wins).
       const refKey = colLetter(c)+r;
+      if(S.marks && S.marks.length && S.marks.indexOf(refKey)>=0 && !isActive) cls.push('mark');   // r182 go-to-special
       const refColor = refColors[refKey];
       let extraStyle = '';
       if(refColor && !isActive && !(editing && editPointer && r===editPointer.r && c===editPointer.c)){
@@ -6700,6 +6771,16 @@ function __drawRibbon(){
     html += `<span class="fc-name">${FONT_SWATCHES[fontColorIdx].name}</span>`;
     html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
     el.innerHTML = html; return;   /* r85: __altFooter was out-of-scope (guided renderer's const) — the crash that "broke the ribbon" */
+  }
+  if(dialog==='goto'){
+    el.className='ribbon show';
+    el.innerHTML='<span class="path">go to \u2192</span><span class="opt"><k>s</k>Special\u2026</span><span class="opt">esc cancel</span>';
+    return;
+  }
+  if(dialog==='gotospecial'){
+    el.className='ribbon show';
+    el.innerHTML='<span class="path">go to special \u2192</span><span class="opt"><k>o</k>Constants (numbers)</span><span class="opt"><k>f</k>Formulas</span><span class="opt"><k>k</k>Blanks</span><span class="opt">marks light up \u00b7 \u21b5 walks \u00b7 esc clears</span>';
+    return;
   }
   if(dialog==='filter'){
     el.className='ribbon show';
@@ -7272,7 +7353,7 @@ function recalc(){
     if(!changed) break;
   }
 }
-function commitAction(){ recalc(); render(); checkWin(); }
+function commitAction(){ recalc(); if(typeof S!=='undefined' && S && S.markCrit) syncMarks(); render(); checkWin(); }
 
 function translateFormula(f, dr, dc){
   /* r154 EXCEL PARITY: rows clamped at the STATIC ROWS_MAX (14) even when the live
@@ -7378,6 +7459,7 @@ function cancelEdit(){
   render();
 }
 function commitEdit(dr,dc){
+  const __wasMarked = S && typeof markKey==='function' && markKey(S.active.r,S.active.c);
   if(editBuf && editBuf[0]==='='){
     const opens=(editBuf.match(/\(/g)||[]).length, closes=(editBuf.match(/\)/g)||[]).length;
     if(opens>closes) editBuf += ')'.repeat(opens-closes);   // Excel parity: auto-close
@@ -7396,8 +7478,10 @@ function commitEdit(dr,dc){
     else if(/^\([\d,]+\.?\d*\)$/.test(buf)){ cell.formula=null; cell.value=-parseFloat(buf.replace(/[(),]/g,'')); cell.txt=false; }
     else { cell.formula=null; cell.value=buf; cell.txt=true; }
   }
-  if(dr||dc){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
+  const __walk = (__wasMarked && dc===0 && dr!==0) ? dr : 0;
+  if((dr||dc) && !__walk){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
   commitAction();
+  if(__walk && S.marks && S.marks.length) gotoNextMark(__walk>0?1:-1);   // r182: the hunt walks itself \u2014 next surviving mark
 }
 
 // Pointer helpers: arrow keys during formula edit drop or move a cell reference into editBuf.
@@ -7649,6 +7733,17 @@ function applyRibbon(key){
     const opt=PASTE_OPTS.find(o=>o[0]===key);
     if(opt){ pasteKind=opt[2]; drawRibbon(); return; }
     if(key==='ENTER'){ doPaste(pasteKind||'all'); exitRibbon(true); return; }
+    return;
+  }
+  // go to (F5 / Ctrl+G): reference boxes need a mouse — Special is the keyboard's door
+  if(dialog==='goto'){
+    if(key==='S'){ dialog='gotospecial'; drawRibbon(); return; }
+    return;
+  }
+  if(dialog==='gotospecial'){
+    if(key==='O') return runGotoSpecial('const');     // Excel's underline: cOnstants
+    if(key==='F') return runGotoSpecial('formula');
+    if(key==='K') return runGotoSpecial('blank');     // Excel's underline: blanKs
     return;
   }
   // filter picker — arrows/space handled in keydown; ENTER applies the kept set
@@ -7938,6 +8033,43 @@ function applyFilterPicker(){
   if(off.length) f.excl[filterCol]=off; else delete f.excl[filterCol];
   syncHidden();
   exitRibbon(true);
+}
+/* r182 GO TO SPECIAL — F5 / Ctrl+G \u2192 S \u2192 O/F/K. Marks every matching
+   cell (the pre-ship audit ritual); Enter walks the marked set in scan order,
+   a fixed cell UNMARKS itself on commit (the hunt shrinks as you work), Esc
+   clears. Excel nuance kept deliberately: Constants means NUMBERS here \u2014
+   the desk ritual unchecks text/logicals before hunting hardcodes. */
+function syncMarks(){
+  if(!S || !S.markCrit) return;
+  const u=usedRange(); const out=[];
+  for(let r=1;r<=u.r;r++) for(let c=1;c<=u.c;c++){
+    const cell=get(r,c); const has=cell && cell.value!==null && cell.value!=='';
+    let hit=false;
+    if(S.markCrit==='const') hit = has && !cell.formula && !cell.txt;
+    else if(S.markCrit==='formula') hit = !!(cell && cell.formula);
+    else if(S.markCrit==='blank') hit = !has;
+    if(hit) out.push(colLetter(c)+r);
+  }
+  S.marks=out;
+  if(!out.length) S.markCrit=null;
+}
+function runGotoSpecial(crit){
+  S.markCrit=crit; S.markN=(S.markN||0)+1;
+  syncMarks();
+  const n=(S.marks||[]).length;
+  showToast(n ? n+' cells marked \u2014 \u21b5 walks them \u00b7 esc clears' : 'nothing matched');
+  return exitRibbon(true);
+}
+function markKey(r,c){ return !!(S && S.marks && S.marks.length && S.marks.indexOf(colLetter(c)+r)>=0); }
+function gotoNextMark(dir){
+  const ms=S.marks; if(!ms||!ms.length) return;
+  const pos=ms.map(k=>{ const m=k.match(/([A-Z]+)(\d+)/); let c=0; for(const ch of m[1]) c=c*26+(ch.charCodeAt(0)-64); return {r:+m[2], c}; })
+    .sort((a,b)=>(a.r-b.r)||(a.c-b.c));
+  const cur=S.active.r*1000+S.active.c;
+  let next;
+  if(dir>0) next = pos.find(p=>p.r*1000+p.c>cur) || pos[0];
+  else { const before=pos.filter(p=>p.r*1000+p.c<cur); next = before.length ? before[before.length-1] : pos[pos.length-1]; }
+  S.active={r:next.r, c:next.c}; S.sel=null; render();
 }
 function selectRow(){
   // Excel parity: Shift+Space extends the selection to full width WHILE preserving the row range.
@@ -8335,6 +8467,9 @@ document.addEventListener('keydown',e=>{
 
   // HINTS — 'g' toggles guided in classic mode. (The session-mode g handler runs earlier and catches it during marathon/rapid-fire.)
   if(k==='F1'){ e.preventDefault(); toggleGuided(); return; }   // r49: 'g' now types into cells (type-to-replace); F1 = Excel's help key
+  if(k==='F5' && !editing && !e.ctrlKey && !e.altKey && mode!=='ribbon'){   // r182: Go To \u2014 the Special door (browser refresh loses to Excel parity here)
+    e.preventDefault(); startClock(); logKey('F5');
+    mode='ribbon'; path=[]; dialog='goto'; ribbonNote=''; drawRibbon(); return; }
   if((k==='PageUp'||k==='PageDown') && (e.altKey||e.ctrlKey) && !editing){
     e.preventDefault(); stepSheetTab(k==='PageDown'?1:-1); return; }   // r57: sheet-tab walk (Ctrl+Pg fires only if the browser lets it through)
 
@@ -8399,6 +8534,7 @@ document.addEventListener('keydown',e=>{
   if(k==='Escape' && !e.ctrlKey && !e.altKey){
     e.preventDefault();
     if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); window.__escT=0; return; }
+    if(S && S.marks && S.marks.length){ S.marks=[]; S.markCrit=null; logKey('Esc'); render(); window.__escT=0; return; }   // r182: second duty \u2014 clear the hunt
     // r146: DOUBLE-TAP Esc restarts (Wolf: shift+f11 is a stretch). Single Esc still
     // never restarts (r89 doctrine); two taps inside 450ms is an unambiguous ask.
     const now=performance.now();
@@ -8406,6 +8542,9 @@ document.addEventListener('keydown',e=>{
     window.__escT=now;
     return;
   }
+  if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey && S && S.marks && S.marks.length){
+    e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+\u21b5':'\u21b5');
+    gotoNextMark(e.shiftKey?-1:1); return; }   // r182: while marks are live, Enter rides the marked set
   // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+↵':'↵');
@@ -8478,6 +8617,8 @@ document.addEventListener('keydown',e=>{
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
     if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
+    if(lk==='g' && !e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+G');   // r182: Excel's other Go To chord
+      mode='ribbon'; path=[]; dialog='goto'; ribbonNote=''; drawRibbon(); return; }
     if(k==='1'){ e.preventDefault(); startClock(); logKey('Ctrl+1');
       mode='ribbon'; path=[]; dialog='fmt'; ribbonNote=''; drawRibbon(); return; }
     if(k==='['){ e.preventDefault(); startClock(); logKey('Ctrl+['); jumpPrecedent(); return; }

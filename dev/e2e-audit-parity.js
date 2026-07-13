@@ -321,6 +321,37 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(s1.cleared, 'Ctrl+Shift+L again clears filter, rows, markers');
   ok(s1.viaRibbon, 'Alt A T is the ribbon route to the same toggle');
 
+  console.log('T. Go To Special (r182)');
+  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('hunt'); });
+  const t1 = await run(() => {
+    const o = CHALLENGES.hunt._o;
+    demoKey({key:'F5'}); const gotoOpen = mode === 'ribbon' && dialog === 'goto';
+    demoKey({key:'s', code:'KeyS'}); demoKey({key:'o', code:'KeyO'});
+    const marked = S.marks.length === 13 && S.markN === 1 && mode === 'normal';   // 5 inputs + 5 growths + 3 crimes
+    setDemoSel('A1'); demoKey({key:'Enter'});
+    const walksTo = colLetter(S.active.c) + S.active.r;                            // first mark in scan order
+    demoKey({key:'Enter', shift:true});
+    const wrapsBack = colLetter(S.active.c) + S.active.r === walksTo || S.marks.indexOf(colLetter(S.active.c)+S.active.r) >= 0;
+    const s0 = o.sites[0];
+    setDemoSel(s0.k); for (const ch of s0.f) demoKey({key:ch}); demoKey({key:'Enter'});
+    const unmarked = S.marks.length === 12 && S.marks.indexOf(s0.k) < 0;           // fixing kills the mark
+    const walkedOn = S.marks.indexOf(colLetter(S.active.c) + S.active.r) >= 0;     // commit rode to a survivor
+    demoKey({key:'Escape'});
+    const cleared = !S.marks.length && !S.markCrit;
+    demoKey({key:'g', ctrl:true}); const ctrlG = mode === 'ribbon' && dialog === 'goto';
+    demoKey({key:'s', code:'KeyS'}); demoKey({key:'f', code:'KeyF'});
+    const formulas = S.marks.length === 8;                                         // 7 surviving calc formulas + 1 fix
+    demoKey({key:'Escape'});
+    return { gotoOpen, marked, walksTo, wrapsBack, unmarked, walkedOn, cleared, ctrlG, formulas };
+  });
+  ok(t1.gotoOpen, 'F5 opens Go To');
+  ok(t1.marked, 'S\u2192O marks every raw number (and only those)');
+  ok(t1.walksTo === 'B3', 'Enter rides the marked set in scan order', t1.walksTo);
+  ok(t1.wrapsBack, 'Shift+Enter walks backward');
+  ok(t1.unmarked && t1.walkedOn, 'fixing a marked cell unmarks it and walks on', JSON.stringify(t1));
+  ok(t1.cleared, 'Esc clears the hunt');
+  ok(t1.ctrlG && t1.formulas, 'Ctrl+G route + Formulas criterion');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

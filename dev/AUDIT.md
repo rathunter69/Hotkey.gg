@@ -4466,3 +4466,28 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   exception); debtsched remains the negative-convention exemplar.
 - No cache bump: only index.html + dev harnesses changed this round
   (drills.js/nav.js untouched; pages revalidate HTML on fetch).
+
+## r182 — Go To Special engine (F5/Ctrl+G) + hunt drill (76 drills)
+- ENGINE: the pre-ship audit ritual, adapted to engine reality exactly as
+  PIPELINE T-D specced — no multi-region selection exists, so F5 (or
+  Ctrl+G) -> S -> O/F/K MARKS every matching cell instead: dashed-amber
+  outlines, S.marks + S.markCrit + a markN latch.
+  - Constants means NUMBERS (txt excluded) — the desk unchecks
+    text/logicals before hunting hardcodes; comment says so in code.
+  - Enter rides the marked set in scan order (Shift+Enter backward);
+    committing an edit INTO a marked cell walks to the next survivor,
+    and syncMarks() in commitAction re-derives membership, so a relinked
+    hardcode unmarks itself — the hunt shrinks as you work. Commits into
+    unmarked cells move normally (no teleport while marks idle).
+  - Esc's second duty (after marching ants): clear the hunt. Dialogs are
+    keyboard-only, Esc-safe, painted in the ribbon strip like fmt/filter.
+  - F5 preventDefaults browser refresh — Excel parity wins mid-drill.
+- NEW DRILL hunt "Hunt the hardcodes" (Formulas, 76 total): the intern's
+  opex build FOOTS — but three calc cells are typed-over stale numbers.
+  Eyes can't find them (that's the aha); the ritual lights up 13 raw
+  numbers, the player reads which three sit in the calc block, relinks
+  each (mark dies on commit), then foots and bolds the total row. Mix
+  rule: dialog ritual + formula + fill + format. parKeys 46 (measured,
+  21 seeds, zero variance — formula lengths are constant).
+- PARITY 60 -> 67 (section T). ALTS 41 -> 42 (totals-first + ctrl+g
+  route + crimes in reverse). CACHE v158 -> v159 (drills.js changed).

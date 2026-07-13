@@ -43,7 +43,7 @@ follows the doctrine.)*
 > tiers, acc/dil). Produce dev/REALISM_NOTES.md with per-drill verdicts, fix
 > everything mechanical in the same round, queue anything structural.
 
-## T-D · ENGINE EXPANSION PACK 1 — 2/3 DONE r173 (IFERROR + trace jumps + drills wirewalk/wrapfix). REMAINING: Go To Special — adapt to engine reality: no multi-region selection exists, so F5 → Special → Constants should MARK all matching cells (stored list + highlight class) and Enter walks the marked set; the "hardcode hunt" drill grades the end state + a markN latch. Keep the dialog keyboard-only, Esc-safe, paint-armored.
+## T-D · ENGINE EXPANSION PACK 1 — DONE (r173 IFERROR + trace jumps; r182 Go To Special: F5/Ctrl+G → S → O/F/K marks + Enter-walk + auto-unmark on fix + hunt drill). The pack is complete.
 
 ## ~~T-D original brief~~
 > Three engine features the canon demands (doctrine §6), then a drill each:

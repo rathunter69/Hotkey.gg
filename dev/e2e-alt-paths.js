@@ -185,6 +185,15 @@ const ALTS = [
         {sel:'A3', keys:[{key:'Alt'},L('a'),L('t')]},
         {sel:'C3', keys:pk},
       ]; }` },
+  { key: 'hunt', name: 'totals footed FIRST, ctrl+g route, crimes fixed in reverse', moves: `C => { const o=C._o;
+      const steps=[
+        {sel:'B8', keys:[...T('=SUM(B3:B7)'),{key:'Enter'}]},
+        {sel:'B8:D8', keys:[{key:'r',ctrl:true}]},
+        {sel:'B8:D8', keys:[{key:'b',ctrl:true}]},
+        {sel:'A1', keys:[{key:'g',ctrl:true},L('s'),L('o')]},
+      ];
+      o.sites.slice().reverse().forEach(s=>steps.push({sel:s.k, keys:[...T(s.f),{key:'Enter'}]}));
+      return steps; }` },
   { key: 'center', name: 'title centered ACROSS first, via alt o e', moves: `C => { const o=C._o; return [
       {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
       {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
