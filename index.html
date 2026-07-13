@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=139" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=139">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=139">
+<link rel="icon" href="favicon.ico?v=140" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=140">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=140">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1111,14 +1111,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=139"></script>
-<link rel="stylesheet" href="nav.css?v=139">
-<script src="themes.js?v=139"></script>
+<script src="drills.js?v=140"></script>
+<link rel="stylesheet" href="nav.css?v=140">
+<script src="themes.js?v=140"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=139"></script>
+<script src="nav.js?v=140"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1592,6 +1592,76 @@ const CHALLENGES = {
         {label:'figures in commas, decimals trimmed', ok: comOk},
         {label:'margins read as percents', ok: pctOk},
         {label:'EBITDA ruled off \u2014 bold with a line above', ok: COL.every(c=>{ const x=cell(c+'7'); return x.bold&&x.bt; })},
+      ];
+    }
+  },
+  ruleoff:{
+    name:'Rule Off', label:'Rule off the schedule', par:52, parKeys:30,
+    prompt:'A segment build is done but naked \u2014 no rulings, and the EBITDA line was never pulled through. Dress it to accounting standard: a line UNDER the headers, a line ABOVE every subtotal (the single-rule convention \u2014 a total earns its line), pull EBITDA across, bold it, rule it, and box the headline figure the MD circles. Sections and the headline year move every run.',
+    req(){ const R=this._R; return 'headers <em>B2:'+R.LC+'2</em> <em>alt h b b</em> \u00b7 rule ABOVE both subtotals <em>B'+R.sub1+':'+R.LC+R.sub1+'</em> and <em>B'+R.sub2+':'+R.LC+R.sub2+'</em> <em>alt h b t</em> \u00b7 EBITDA <em>B'+R.g+'</em> = revenue total + cost total, fill right <em>ctrl+r</em>, <em>ctrl+b</em>, <em>alt h b t</em> \u00b7 box the headline <em>'+R.focus+'</em> <em>alt h b o</em>'; },
+    guide(){ const R=this._R; return [
+      'headers get ruled UNDER: B2:'+R.LC+'2 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd>',
+      'a total earns its line \u2014 rule ABOVE both subtotals: B'+R.sub1+':'+R.LC+R.sub1+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u00b7 then B'+R.sub2+':'+R.LC+R.sub2+' \u00b7 same walk',
+      'pull EBITDA through: B'+R.g+' \u00b7 type <b>=B'+R.sub1+'+B'+R.sub2+'</b> (or point with arrows) \u00b7 <kbd>\u21b5</kbd> \u00b7 select B'+R.g+':'+R.LC+R.g+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'the answer line reads like one: same selection \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'box what the MD circles: '+R.focus+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>',
+    ]; },
+    targets(){ const R=this._R; return ['B2:'+R.LC+'2','B'+R.sub1+':'+R.LC+R.sub1,'B'+R.sub2+':'+R.LC+R.sub2,'B'+R.g,'B'+R.g+':'+R.LC+R.g,R.focus]; },
+    demo(){ const R=this._R;
+      const W=(a,b,c2)=>[{key:'Alt'},L(a),L(b),L(c2)];
+      return [
+        {sel:'B2:'+R.LC+'2', keys:W('h','b','b')},
+        {sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:W('h','b','t')},
+        {sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:W('h','b','t')},
+        {sel:'B'+R.g, keys:T('=B'+R.sub1+'+B'+R.sub2).concat([Kb.enter])},
+        {sel:'B'+R.g+':'+R.LC+R.g, keys:[Kb.fillR]},
+        {sel:'B'+R.g+':'+R.LC+R.g, keys:[Kb.bold]},
+        {sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','t')},
+        {sel:R.focus, keys:W('h','b','o')},
+      ]; },
+    build(){
+      const cells={};
+      const NCOL=rnd(4,5);                                   // FY columns: B.. (E or F)
+      const LC=colLetter(1+NCOL);
+      const y0=rnd(24,26);
+      cells['A1']={...blankCell(),value:codename()+' \u2014 segment build ($mm)',txt:true};
+      for(let i=0;i<NCOL;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,align:'r',bold:true};
+      const SEGS=['Industrial','Consumer','Services','Energy','Healthcare','Digital'];
+      const COSTS=['Compensation','Occupancy','Marketing','R&D','Logistics'];
+      const n1=rnd(2,3), n2=rnd(2,3);
+      const s1=3, sub1=s1+n1, s2=sub1+1, sub2=s2+n2, g=sub2+1;
+      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      const segPick=pick(SEGS,n1), costPick=pick(COSTS,n2);
+      for(let i=0;i<n1;i++) cells['A'+(s1+i)]={...blankCell(),value:segPick[i],txt:true};
+      cells['A'+sub1]={...blankCell(),value:'Total revenue',txt:true};
+      for(let i=0;i<n2;i++) cells['A'+(s2+i)]={...blankCell(),value:costPick[i],txt:true};
+      cells['A'+sub2]={...blankCell(),value:'Total costs',txt:true};
+      cells['A'+g]={...blankCell(),value:'EBITDA',txt:true};
+      for(let i=0;i<NCOL;i++){ const col=colLetter(i+2);
+        let rsum=0, csum=0;
+        for(let r=s1;r<sub1;r++){ const v=rnd(120,540); rsum+=v; cells[col+r]={...blankCell(),value:v}; }
+        cells[col+sub1]={...blankCell(),formula:'=SUM('+col+s1+':'+col+(sub1-1)+')', value:rsum};
+        for(let r=s2;r<sub2;r++){ const v=-rnd(40,180); csum+=v; cells[col+r]={...blankCell(),value:v}; }
+        cells[col+sub2]={...blankCell(),formula:'=SUM('+col+s2+':'+col+(sub2-1)+')', value:csum};
+      }
+      const focus=colLetter(rnd(2,1+NCOL))+g;                // the headline the MD circles
+      this._R={NCOL, LC, sub1, sub2, g, focus};
+      const colW={1:150}; for(let i=0;i<NCOL;i++) colW[i+2]=76;
+      return {ROWS:Math.max(12,g+2), cells, active:{r:1,c:1}, sel:null, colW};
+    },
+    checks(S){
+      const R=this._R;
+      const cols=[]; for(let i=0;i<R.NCOL;i++) cols.push(colLetter(i+2));
+      const cell=k=>S.cells[k]||{};
+      const ebOk = cols.every(c2=>{ const x=cell(c2+R.g);
+        const want=(cell(c2+R.sub1).value||0)+(cell(c2+R.sub2).value||0);
+        return x.formula && Math.abs((x.value||0)-want)<0.01; });
+      return [
+        {label:'headers ruled UNDER \u2014 B2:'+R.LC+'2', ok: cols.every(c2=>cell(c2+'2').bb)},
+        {label:'a line ABOVE each subtotal \u2014 rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
+        {label:'EBITDA pulled through \u2014 formulas, not typed numbers', ok: ebOk},
+        {label:'the answer line reads bold, ruled above', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
+        {label:'the headline at '+R.focus+' wears a box', ok: !!cell(R.focus).ball},
       ];
     }
   },

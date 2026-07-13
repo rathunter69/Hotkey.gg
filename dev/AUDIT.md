@@ -3837,3 +3837,28 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   daylight/serika/everforest (borders/fills/swatches/selection all
   distinct). Formatting-drill checks read cell PROPS, not pixels — zero
   gameplay risk from the palette changes.
+
+---
+# ROUND 161 — 'RULE OFF': the border flagship lands on the r160 substrate (65 drills)
+- NEW DRILL ruleoff ('Rule off the schedule', Formatting, par 52/keys 30):
+  a randomized segment build (2 sections, 2-3 rows each, 4-5 FY columns,
+  shuffled label pools — a dupe-label slice bug was caught on the FIRST
+  screenshot and fixed) that drills the ACCOUNTING RULING CONVENTIONS the
+  r160 ink-border fix finally makes readable: line UNDER the headers
+  (alt h b b), single rule ABOVE each subtotal (alt h b t — "a total
+  earns its line"), EBITDA pulled through (formula + ctrl+r), bolded and
+  ruled, and the MD's headline figure boxed (alt h b o) — the box column
+  moves every run.
+- THE BALANCE DOCTRINE, kept explicit: req/guide TEACH the canonical
+  chords, checks grade END STATE ONLY — typed refs or pointed refs, walk
+  the ribbon or never touch it, any path that leaves the page ruled
+  counts. ("formulas, not typed numbers" is the one prescriptive check —
+  it's the skill, not the path.)
+- MIX RULE: 4 op families (borders x4 sites, formula build, fill-right,
+  bold). No leave-untouched checks. Sites move every run. Sits in the
+  UNGATED Formatting tier — border literacy is basics, not endgame.
+- VERIFY: demo-replay ruleoff WIN 3/3 across 4 separate seed batches;
+  full catalog ALL GREEN (65 drills); parity 37; visual matrix 311;
+  solved-board screenshot reviewed (all five rulings legible on the
+  light first-touch theme).
+- CACHE v139 -> v140 (all 9 pages).
