@@ -3242,3 +3242,34 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - NAV NOTE: Wolf's "navigation more love" is QUEUED as its own push — design
   sketch: 'modeltour' — N defect cells scattered wide, ctrl-jump navigation
   graded action-sourced like the navigation drill, realistic find-and-fix.
+
+---
+# ROUND 143 — PLUGIN LAYER INTEGRATION SWEEP (Wolf: "throughout the entire engine")
+- THE DEAD-CHORD BUG (the catch of the round): a blanket `if(e.altKey)`
+  swallow sat ABOVE the ctrl block in the classic keydown — EVERY Ctrl+Alt
+  chord died there silently since it shipped: Macabacus Ctrl+Alt+A/S
+  AutoColor + CAS+1/4/5 cycles, FactSet Ctrl+Alt+E + FDS CAS-fills, and
+  native Ctrl+Alt+V paste-special. They only ever worked in rapid-fire
+  (separate handler). The r-era "engine adds ..." verifications never drove
+  the real key path. FIX: bare-Alt combos still swallowed (ribbon
+  semantics); Ctrl+Alt flows to the ctrl block; Ctrl+Alt+V moved above a
+  new in-block AltGr guard (`if(e.altKey) return` after the last claimed
+  ctrl+alt branch) so unclaimed Ctrl+Alt combos stay INERT — European
+  AltGr layouts can never fire plain ctrl ops. Found by driving the real
+  chord through the real handler (probe: Ctrl+B logged, Ctrl+Alt+S didn't).
+- RF ALIASES extended to every live plugin chord: font_blue += mcb
+  Ctrl+Alt+A / fds Ctrl+Alt+E · num_comma/comma += CAS+1 · num_pct/percent
+  += CAS+5 · currency += CAS+4 · paste_vals_es += mcb Ctrl+Shift+V.
+  (FactSet number chords are native-identical — already matched.)
+- GUIDED MODE speaks the profile: PLUGIN_ALTS — when a profile is active,
+  steps with a live plugin chord append it (fills -> mcb ctrl+shift+d/r or
+  fds cas+d/k; blue walks -> autocolor; % -> cas+5; commas -> cas+1; paste
+  values -> ctrl+shift+v). Native profile: no plugin noise.
+- PAYOFF PROVEN: under macabacus, ONE Ctrl+Alt+S clears housestyle's whole
+  blue step incl. the buried hardcode (end-state grading = the plugin works
+  exactly like the real thing); CAS+5 clears the margins check.
+- reference.html ● (inEngine) markers audited: accurate as listed.
+- VERIFY: 14-assert Playwright suite ALL PASS (classic chords, 8 RF alias
+  matchers incl. native-off, guide notes per profile); full 57-drill e2e
+  regression ALL GREEN post-fix (the paste-special reorder broke nothing).
+  CACHE v124 -> v125.
