@@ -4274,3 +4274,31 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   Doctrine §2.5 rule added. Grading power unchanged — only the lines.
 - VERIFIED: replay 71/71, alts 32/32, parity 43, onboard 28, visual 311,
   rank 20. CACHE v152 -> v153.
+
+---
+# ROUND 176 — WOLF'S PLAY-SESSION PAIR: celebration Enter-eats-results + #####
+- CELEBRATION vs RESULTS CARD (reproduced): Enter on an achievement /
+  level-up toast fell through and RESTARTED the drill under it. Three
+  fixes: the game keydown ignores trusted input while __hkCelOpen; the
+  results chain guards on it too; hkCelebrate blurs any focused results
+  button (Enter's default click was a second path). Enter now dismisses
+  the toast and LINGERS on the results card; second Enter behaves
+  normally. New: V on any celebration jumps to your player card.
+- THE ##### CLASS, fixed at three layers:
+  1. ENGINE fmtNum GENERAL format is now Excel-like — binary float noise
+     (1152.2999999999997) can never render; toPrecision(10) cleanup, and
+     decimals seeded WITHOUT a style are honored (fixes latent raw
+     quotients in comps/txncomps/lbo displays too).
+  2. ENGINE autofit CLAMP at 220px — a long title used to autofit its
+     column to 300px+ and blow the fixed 10-col grid apart. 220 fits
+     every house number format and keeps ten columns on screen.
+  3. NEW STANDING HARNESS dev/e2e-fit-sweep.js — no drill may LOAD with
+     ##### (numeric cell text vs actual colW, x3 seeds, all drills;
+     autofit/combo/gauntlet exempt — the squeeze IS their lesson).
+     First run caught THREE: housestyle + dress (raw quotient margins ->
+     decimals:4 seeds), format (8-digit magnitudes -> $mm / 000s scale
+     that fits raw AND cast). ALL CLEAN now; added to the doctrine gate.
+- Alt H O W / H O H numeric size dialogs queued into T-E (Wolf's
+  intuition: sizing drills should SET widths, not autofit-roulette).
+- VERIFIED: replay 71/71, alts 32/32, parity 43, onboard 28, visual 311,
+  rank 20, fit sweep clean. CACHE v153 -> v154.

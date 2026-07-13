@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=153" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=153">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=153">
+<link rel="icon" href="favicon.ico?v=154" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=154">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=154">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1125,14 +1125,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=153"></script>
-<link rel="stylesheet" href="nav.css?v=153">
-<script src="themes.js?v=153"></script>
+<script src="drills.js?v=154"></script>
+<link rel="stylesheet" href="nav.css?v=154">
+<script src="themes.js?v=154"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=153"></script>
+<script src="nav.js?v=154"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1614,7 +1614,7 @@ const CHALLENGES = {
         });
         cells[col+5]={...blankCell(),formula:'='+col+'3+'+col+'4', value:rev+cogs};
         cells[col+7]={...blankCell(),formula:'='+col+'5+'+col+'6', value:rev+cogs+opex};
-        cells[col+8]={...blankCell(),formula:'='+col+'7/'+col+'3', value:(rev+cogs+opex)/rev};
+        cells[col+8]={...blankCell(),formula:'='+col+'7/'+col+'3', value:(rev+cogs+opex)/rev, decimals:4};   // r176: raw-but-short until the player casts %
       }
       return {ROWS:9, cells, active:{r:1,c:1}, sel:null, colW:{1:150,2:76,3:76,4:76,5:76,6:76}};
     },
@@ -1832,10 +1832,10 @@ const CHALLENGES = {
       cells[LC+r0]={...blankCell(),value:'Metric',txt:true,bold:true};
       cells[VC+r0]={...blankCell(),value:'Value',txt:true,bold:true,align:'r'};
       const gross=rnd(36,55)/100, ebitda=rnd(150,290)/1000;
-      const rows=[['Gross margin',gross],['EBITDA margin',ebitda],['Revenue',rnd(38,72)*1000000],['EBITDA',rnd(9,28)*1000000],['Shares out.',rnd(40,300)*100000]];
+      const rows=[['Gross margin',gross],['EBITDA margin',ebitda],['Revenue ($mm)',rnd(38,72)*10],['EBITDA ($mm)',rnd(9,28)*10],['Shares out. (000s)',rnd(40,300)*100]];   // r176: fits at 78px raw AND cast
       rows.forEach(([n,v],i)=>{
         cells[LC+(r0+1+i)]={...blankCell(),value:n,txt:true};
-        cells[VC+(r0+1+i)]={...blankCell(),value:v,decimals:6,fontColor:'blue'};
+        cells[VC+(r0+1+i)]={...blankCell(),value:v,decimals:3,fontColor:'blue'};   // r176: raw look, still fits
       });
       this._o={ pct:VC+(r0+1)+':'+VC+(r0+2), cur:VC+(r0+3)+':'+VC+(r0+4), com:VC+(r0+5),
         vc:VC, r0:r0 };
@@ -1953,7 +1953,7 @@ const CHALLENGES = {
       cells['A'+mRow]={...blankCell(),value:'EBITDA margin',txt:true};
       for(let c=2;c<=5;c++){ const L2=colLetter(c);
         let rev=0; for(let rr=4;rr<cRow;rr++) rev+=cells[L2+rr].value;
-        cells[L2+mRow]={...blankCell(),formula:'=('+L2+'4+'+L2+cRow+')/'+L2+'4',value:(rev/nSeg+cells[L2+cRow].value)/(rev/nSeg)}; }
+        cells[L2+mRow]={...blankCell(),formula:'=('+L2+'4+'+L2+cRow+')/'+L2+'4',value:(rev/nSeg+cells[L2+cRow].value)/(rev/nSeg), decimals:4}; }   // r176: raw-but-short
       this._R={ inpRange:'B4:E'+cRow, mRow:mRow, mRowRange:'B'+mRow+':E'+mRow, fRange:'B4:E'+cRow, lastInp:cRow };
       return {ROWS:mRow, cells, active:{r:1,c:1}, sel:null, colW:{1:150}};
     },
@@ -5866,7 +5866,11 @@ function fmtNum(n,style,dec){
   if(style==='comma') return Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
   if(style==='currency') return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
   if(style==='percent') return Number(n*100).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'%';
-  return String(n);
+  /* r176 GENERAL format, Excel-like: never show binary float noise
+     (1152.2999999999997) — and if a build set decimals without a style,
+     honor them. Raw quotients stay short instead of 17 characters wide. */
+  if(typeof dec==='number' && dec>0 && Math.abs(n)%1!==0) return Number(n).toFixed(dec);
+  return String(parseFloat(Number(n).toPrecision(10)));
 }
 function dispText(cell){
   if(cell.value===null||cell.value==='') return '';
@@ -5879,7 +5883,11 @@ function neededWidth(c){
   let w=COLW_DEFAULT;
   for(let r=1;r<=S.ROWS;r++){ const cell=get(r,c); if(cell.wrap) continue;
     const t=dispText(cell); w=Math.max(w, t.length*CHARPX+16); }
-  return Math.ceil(w);
+  /* r176 CLAMP: a long title in the column used to autofit it to 300px+ and
+     blow the fixed 10-col grid apart (Wolf's report). Real Excel scrolls; our
+     drill grid doesn't — 220px fits every house number format comfortably
+     while keeping ten columns on screen. */
+  return Math.min(Math.ceil(w), 220);
 }
 function overflowsCol(St,c){
   for(let r=1;r<=St.ROWS;r++){ const cell=St.cells[ck(r,c)]||blankCell();
@@ -6633,6 +6641,9 @@ function nextDrillKey(){
 function showResults(o){
   // Monkeytype loop: from the results card, Enter = run it again, N = next drill.
   resultsChainKeys = (ev)=>{
+    // r176: a celebration overlay owns the keyboard — Enter there must dismiss
+    // the toast, not restart the drill underneath (Wolf's report).
+    if(window.__hkCelOpen || ev.defaultPrevented) return;
     if(ev.key==='Enter'){ ev.preventDefault(); hideResults(); restartDrill(); return; }
     if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
     if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
@@ -7610,6 +7621,9 @@ document.addEventListener('keydown',e=>{
     if(k==='Escape'){ e.preventDefault(); skipOnboard(); return; }
     return;
   }
+  // r176: a celebration toast owns the keyboard — its own listener handles
+  // Enter/Esc/V; nothing may fall through and clear the results card under it.
+  if(window.__hkCelOpen && e.isTrusted){ return; }
   // during the demo, ignore real user input (synthetic demo keys are not trusted, so they pass)
   if(demoPlaying && e.isTrusted){ e.preventDefault(); if(k==='Escape') cancelDemo(); return; }
   // r134: the TOUR owns the keyboard. This guard used to sit BELOW the picker/marathon/

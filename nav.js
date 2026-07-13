@@ -988,9 +988,10 @@ window.hkCelebrate = function(o){
       (o.iconHtml?'<div class="hk-cel-icon">'+o.iconHtml+'</div>':'')+
       '<div class="hk-cel-title">'+(o.title||'')+'</div>'+
       (o.sub?'<div class="hk-cel-sub">'+o.sub+'</div>':'')+
-      '<div class="hk-cel-hint">click or \u21b5 to continue</div>'+
+      '<div class="hk-cel-hint">\u21b5 continue \u00b7 v \u2014 see it on your card</div>'+
     '</div></div>';
   document.body.appendChild(w);
+  try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}   // r176: a focused results button must not act on Enter
   window.hkConfetti(w.querySelector('.hk-cel-body'), o.colors);
   let done=false;
   const close=()=>{ if(done) return; done=true;
@@ -998,7 +999,10 @@ window.hkCelebrate = function(o){
     window.__hkCelOpen=false;
     const nx=window.__hkCelQ.shift(); if(nx) setTimeout(()=>window.hkCelebrate(nx), 220); };
   w.addEventListener('click', close);
-  const key=(e)=>{ if(e.key==='Enter'||e.key==='Escape'){ e.preventDefault(); close(); document.removeEventListener('keydown',key,true);} };
+  const key=(e)=>{
+    if(e.key==='Enter'||e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); document.removeEventListener('keydown',key,true); return; }
+    if((e.key==='v'||e.key==='V') && window.openProfile){ e.preventDefault(); e.stopPropagation(); close(); document.removeEventListener('keydown',key,true); try{ window.openProfile(); }catch(_){ } return; }
+  };
   document.addEventListener('keydown', key, true);
   setTimeout(close, 4200);
 };

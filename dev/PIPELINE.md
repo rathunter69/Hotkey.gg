@@ -61,6 +61,10 @@ follows the doctrine.)*
 > drill per doctrine. Keep dialogs keyboard-only, Esc-safe, paint-armored.
 
 ## T-E · ENGINE EXPANSION PACK 2 — structure & view  *(any model, engine work)*
+> ALSO (Wolf r176): explicit size dialogs — **Alt H O W** (column width) and
+> **Alt H O H** (row height) as tiny keyboard-only numeric prompts, so sizing
+> drills can teach SETTING a width rather than autofit roulette; pair with a
+> 'set the print widths' beat in a future formatting drill.
 > In canon order: Ctrl+9/Ctrl+0 hide row/col (+ unhide via ribbon), Ctrl+1
 > Format Cells minimal dialog (number tab only — enough for
 > center-across-selection and custom decimals), Ctrl+Shift+L filter toggle on

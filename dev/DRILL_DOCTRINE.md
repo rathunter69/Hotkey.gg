@@ -120,8 +120,11 @@ NODE_PATH=<scratchpad>/node_modules for playwright-core; Chromium at
    Par SECONDS are tuned difficulty (campaign ×1.5 gates, XP tiers) — never
    auto-adjusted; when a rebuild changes scope, retune par deliberately and
    mirror it in HOTKEY_PARS.
-5. **Regression matrices**: e2e-audit-parity.js (37), e2e-audit-onboard.js (20),
-   e2e-audit-visual.js (311, needs 140ms settle), e2e-audit-rank.js (20).
+5. **Regression matrices**: e2e-audit-parity.js, e2e-audit-onboard.js,
+   e2e-audit-visual.js (needs 140ms settle), e2e-audit-rank.js, AND
+   e2e-fit-sweep.js — no drill may LOAD showing ##### (numbers must fit
+   their column widths; seed compact values or set colW in build; only
+   autofit/combo/gauntlet squeeze on purpose).
 6. **Eyes on it**: screenshot the drill fresh + mid-solve + the results card.
    If it doesn't look like a page from a real model, it isn't done.
 7. Ship: cache-bump `?v=N` on all 9 pages when shared assets change, AUDIT.md
