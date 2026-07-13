@@ -57,6 +57,11 @@ perks later). Branch auto-merge live per working agreement.
   players (hkEffRarity, themes.js) · stats pace redefined as time÷par w/
   methodology footnote + keys/min · picker renamed THE DATA ROOM, files wear
   task filenames (fix_the_typos_in_place.xlsx), truncation killed.
+- **r151 (mobile + drip)**: mobile gate is now a HUB (boards/stats/sign-in/
+  player card work on a phone over the gate; trainer stays desk-only) · level
+  curve consolidated to HK_RANK.levelOf (6 drifted copies) and softened
+  (flat 600/level past L4) · +9 drip-rung achievements (catalog 56) · results
+  card ends with "xp to next level · next medal p/goal" (buildAchCtx).
 - **NEXT (STRATEGY.md sequence)**: audit family + RX pack content round
   (balance sweep, stale-link hunt, sign-error triage; liquidity bridge /
   covenant table ideas) · then seasons design doc (doc only — build gated on

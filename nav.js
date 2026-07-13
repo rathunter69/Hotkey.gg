@@ -369,8 +369,12 @@
     d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; if(x.rank!==null&&x.rank<=10) top10s++; });
     return window.HK_RANK ? window.HK_RANK.computeXP(myRuns, {t10:top10s, pod:podiums, crowns:crowns}, mySessions) : 0;
   }
-  function levelOf(xp){ let lvl=1, need=150, floor=0;
-    while(xp >= floor+need){ floor+=need; lvl++; need=150*lvl; }
+  // r151: HK_RANK.levelOf is canonical (curve softened there); this shell only
+  // survives as a same-shape fallback for a themes.js load failure.
+  function levelOf(xp){
+    if(window.HK_RANK && window.HK_RANK.levelOf) return window.HK_RANK.levelOf(xp);
+    let lvl=1, need=150, floor=0;
+    while(xp >= floor+need){ floor+=need; lvl++; need=Math.min(150*lvl, 600); }
     return { lvl, into: xp-floor, need, pct: Math.min(100, Math.round(100*(xp-floor)/need)) }; }
 
   /* r148: SHAREABLE RANK CARD — LinkedIn-dimensioned PNG (1200x627) drawn locally,
@@ -489,13 +493,14 @@
             let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
             let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
             let __xflags={}; try{ __xflags=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
-            let __ck=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
-              __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length; }catch(e){}
+            let __ck=0, __kl=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+              __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length;
+              __kl=Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
             const ctx={ pb:PBl, pars:window.HOTKEY_PARS||{}, runs:d.myRuns||[], streak:streakN, solves:solvesN,
               mouseRuns:__xflags.mouseRuns||0, slowWins:__xflags.slowWins||0,
               nightWin:!!__xflags.nightWin, dawnWin:!!__xflags.dawnWin, weekendWin:!!__xflags.weekendWin,
               raceWins:__xflags.raceWins||0, sheetClears:__xflags.sheetClears||0,
-              frzBanked:__xflags.frzBanked||0, chordKinds:__ck,
+              frzBanked:__xflags.frzBanked||0, chordKinds:__ck, keysLifetime:__kl,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
             // STEAM-STYLE GLOBAL RARITY: evaluate run-derivable achievements for every

@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stats · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=130" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=130">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=130">
+<link rel="icon" href="favicon.ico?v=131" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=131">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=131">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -68,8 +68,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=130">
-<script src="drills.js?v=130"></script>
+<link rel="stylesheet" href="nav.css?v=131">
+<script src="drills.js?v=131"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -77,11 +77,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=130"></script>
+<script src="themes.js?v=131"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=130"></script>
+<script src="nav.js?v=131"></script>
 
 <header class="head">
   <div class="wrap">
@@ -182,12 +182,14 @@ async function load(){
         all.forEach(r=>{ if(!D.meta[r.challenge]) return; if(seen[r.challenge]) return; seen[r.challenge]=r.user_id; });
         crowns=Object.values(seen).filter(u=>u===me.id).length; }
       const groups={}; Object.entries(D.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
-      let __ck=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
-        __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length; }catch(e){}
+      let __ck=0, __kl=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+        __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length;
+        __kl=Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
       const ctx={ pb:pbCtx, pars:window.HOTKEY_PARS||{}, runs:runsL, streak:streakN, solves:solvesN,
         mouseRuns:flags.mouseRuns||0, slowWins:flags.slowWins||0,
         nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
-        raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0, chordKinds:__ck,   // r150
+        raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0,
+        chordKinds:__ck, keysLifetime:__kl,   // r150/r151
         crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
       // global rarity (Steam-style): evaluate run-derivable achievements for every player
       const globalPct=(function(){

@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=130" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=130">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=130">
+<link rel="icon" href="favicon.ico?v=131" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=131">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=131">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1012,6 +1012,16 @@
     .mg-body h2{font-size:21px; margin-bottom:10px}
     .mg-body p{color:var(--muted); font-size:14px; line-height:1.55; margin-bottom:10px}
     .mg-note b{color:var(--accent)}
+    /* r151: the gate is a HUB now — ancillary surfaces work on a phone, only the
+       trainer itself is desk-only. Auth + player card modals must clear z:400. */
+    .mg-links{display:flex; flex-direction:column; gap:9px; margin:16px 0 12px}
+    .mg-btn{display:block; font-family:var(--mono); font-size:13.5px; color:var(--text);
+      background:var(--surface2); border:1px solid var(--line); border-radius:10px;
+      padding:12px 15px; cursor:pointer; text-decoration:none}
+    .mg-btn:active{border-color:var(--accent-dim)}
+    .auth-modal{z-index:500}
+    /* nav.css loads after this block — .show doubles specificity so 500 beats its 62 */
+    .profile-modal.show{z-index:500}
   }
   .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
     background:rgba(11,12,13,.66); backdrop-filter:blur(5px); padding:28px; overflow-y:auto;
@@ -1095,14 +1105,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=130"></script>
-<link rel="stylesheet" href="nav.css?v=130">
-<script src="themes.js?v=130"></script>
+<script src="drills.js?v=131"></script>
+<link rel="stylesheet" href="nav.css?v=131">
+<script src="themes.js?v=131"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=130"></script>
+<script src="nav.js?v=131"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1237,13 +1247,14 @@
   <div class="tour-ring" id="tourRing"></div>
   <div class="tour-card" id="tourCard"></div>
 </div>
-<div class="mobile-gate" aria-hidden="true">
+<div class="mobile-gate">
   <div class="mg-card">
     <div class="mg-cap">hotkey<b>.gg</b></div>
     <div class="mg-body">
-      <h2>This one needs a real keyboard.</h2>
+      <h2>The trainer needs a real keyboard.</h2>
       <p>hotkey.gg trains Excel keyboard shortcuts — F-keys, Ctrl chords, Alt ribbon walks — and none of that exists on a touchscreen.</p>
-      <p class="mg-note">Open <b>hotkey.gg</b> on a computer and start drilling.</p>
+      <div class="mg-links" id="mgLinks"></div>
+      <p class="mg-note">Drills wait for your desk — open <b>hotkey.gg</b> on a computer.</p>
     </div>
   </div>
 </div>
@@ -5331,7 +5342,7 @@ function checkWin(){
     const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
     const nxt=est+xpGain;
     localStorage.setItem('hk_xp_est', String(nxt));
-    const lv=x=>{ let l=1,need=150,fl=0; while(x>=fl+need){ fl+=need; l++; need=150*l; } return l; };
+    const lv=x=>lvlOf(x);   // r151: one curve — the celebration threshold can't drift from the chip
     if(lv(nxt)>lv(est) && window.hkCelebrate){
       window.hkCelebrate({cap:'level up', title:'LEVEL '+lv(nxt),
         sub:'+'+xpGain+' xp \u00b7 keep stacking',
@@ -5588,6 +5599,33 @@ function _showResults(o){
       if(card) card.appendChild(xr);
       setTimeout(()=>{ const a=document.getElementById('xpHow'); if(a) a.onclick=openXpInfo; },0);
     }
+    // r151: THE DRIP — every results card names the next reward in reach: xp to the
+    // next level + the closest unearned medal. The lull between rewards is now
+    // always visible as a countdown instead of silence.
+    try{
+      const bits=[];
+      try{ const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+        const L=lvlDetail(est);
+        bits.push('<b style="color:var(--accent)">'+(L.need-L.into)+' xp</b> to LVL '+(L.lvl+1)); }catch(e){}
+      try{ const AC=window.HOTKEY_ACHIEVEMENTS;
+        if(AC && typeof buildAchCtx==='function'){
+          const ctx2=buildAchCtx();
+          let seen2=[]; try{ seen2=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]'); }catch(e){}
+          let bestA=null;
+          AC.forEach(a=>{ if(seen2.includes(a.id)) return;
+            let r2; try{ r2=a.test(ctx2); }catch(e){ return; }
+            if(!r2 || r2.done || !(r2.goal>1) || !(r2.prog>0)) return;
+            const ratio=r2.prog/r2.goal;
+            if(!bestA || ratio>bestA.ratio) bestA={a, r:r2, ratio}; });
+          if(bestA) bits.push('next medal: <b style="color:var(--warn)">'+escHtml(bestA.a.name)+'</b> '+bestA.r.prog+'/'+bestA.r.goal);
+        } }catch(e){}
+      if(bits.length){
+        const drip=document.createElement('div');
+        drip.style.cssText='font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px;text-align:center;line-height:1.7';
+        drip.innerHTML=bits.join(' &nbsp;·&nbsp; ');
+        if(card) card.appendChild(drip);
+      }
+    }catch(e){}
     const chain=document.createElement('div');
     chain.style.cssText='font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:12px;text-align:center';
     chain.innerHTML='<kbd style="background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:1px 6px">\u21b5</kbd> run it again \u00b7 <kbd style="background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:1px 6px">n</kbd> next drill';
@@ -7962,11 +8000,14 @@ function updateStreak(){ const today=dailyDateStr(); if(streak.d===today){ rende
 /* Local level chip: anon-friendly progress (solves + PB breadth). Signed-in players
    see the full XP math on their card; this keeps the loop visible from solve #1. */
 function localXP(nsol){ return 15*(nsol||0) + 50*Object.keys(PB).length; }
-function lvlOf(xp){ let lvl=1, need=150, floor=0;
-  while(xp >= floor+need){ floor+=need; lvl++; need=150*lvl; } return lvl; }
-function lvlDetail(xp){ let lvl=1, need=150, floor=0;
-  while(xp>=floor+need){ floor+=need; lvl++; need=150*lvl; }
+/* r151: HK_RANK.levelOf is canonical (curve softened there — 600/level past L4);
+   these are thin shells so every LVL readout on this page moves together. */
+function lvlDetail(xp){
+  if(window.HK_RANK && window.HK_RANK.levelOf) return window.HK_RANK.levelOf(xp);
+  let lvl=1, need=150, floor=0;
+  while(xp>=floor+need){ floor+=need; lvl++; need=Math.min(150*lvl, 600); }
   return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; }
+function lvlOf(xp){ return lvlDetail(xp).lvl; }
 function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
   const L=lvlDetail(localXP(nsol));
   el.style.display='inline-flex';
@@ -8307,6 +8348,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
     try{ if(!localStorage.getItem('hk_beta_ok')) showPrelaunchLock(); }catch(e){}
   }
   buildSheetTabs();
+  try{ renderMobileGate(); }catch(e){}   // r151: hub links paint even when sb never connects
   try{ updateDailyBtn(); }catch(e){}   // r140: sheet count paints on the \u26a1 button at boot
   // Resume where they left off: returning users land on their last drill, not the first one.
   let startKey = MENU_ORDER[0];
@@ -8465,7 +8507,23 @@ async function initAuth(){
     sb.auth.onAuthStateChange((evt, s)=>{ if(evt==='PASSWORD_RECOVERY') recoveryMode=true; onSession(s); });
   }catch(e){ refreshAuthUI(); }
 }
+/* r151: MOBILE HUB — the gate stops the TRAINER, not the product. Boards, stats and
+   the player card all work on a phone; auth + profile modals clear the gate's z-index
+   (mobile media query above). The trainer stays desk-only by design. */
+function renderMobileGate(){
+  const host=$('mgLinks'); if(!host) return;
+  const signed=!!(me_user && !isAnonUser());
+  host.innerHTML=
+    '<a class="mg-btn" href="leaderboard.html">🏆 the boards — see who’s fastest</a>'+
+    '<a class="mg-btn" href="stats.html">📈 your numbers</a>'+
+    (signed
+      ? '<a class="mg-btn" id="mgCard">👤 your player card</a>'
+      : '<a class="mg-btn" id="mgAuth">👤 sign in — player card &amp; saved times</a>');
+  const c=$('mgCard'); if(c) c.onclick=()=>{ try{ window.openProfile(); }catch(e){} };
+  const a=$('mgAuth'); if(a) a.onclick=()=>{ try{ openAuth('signin'); }catch(e){} };
+}
 async function onSession(session){
+  try{ setTimeout(renderMobileGate, 300); }catch(e){}   // r151: hub reflects the auth state
   if(arguments[0]){ window.__hkHasSession=true;
     // r134: a session IS beta access — pass the curtain and close it if it's up
     try{ localStorage.setItem('hk_beta_ok','1'); if(gateOpen) closeGate(); }catch(e){}
@@ -9024,21 +9082,28 @@ function logRunLite(t){
   }catch(e){}
 }
 let __achPending=false;
+// r151: ctx builder extracted from the sweep — the results-card drip line reads the
+// same machinery, so "next medal" can never disagree with what actually unlocks.
+function buildAchCtx(){
+  let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+  let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
+  let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+  let lite=[]; try{ lite=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){}
+  const groups={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
+  let __ck=0, __kl=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+    __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length;
+    __kl=Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
+  return { pb:PB, pars:window.HOTKEY_PARS||{}, runs:lite, streak:streakN, solves:solvesN,
+    crowns:0, groups, att:Object.keys(PB).length, menuOrder:MENU_ORDER,
+    mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
+    nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin,
+    raceWins:fl.raceWins||0, sheetClears:fl.sheetClears||0, frzBanked:fl.frzBanked||0,
+    chordKinds:__ck, keysLifetime:__kl };   // r150/r151
+}
 function achSweepInGame(){
   try{
     const AC=window.HOTKEY_ACHIEVEMENTS; if(!AC||!window.hkCelebrate) return;
-    let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
-    let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
-    let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
-    let lite=[]; try{ lite=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){}
-    const groups={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
-    let __ck=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
-      __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length; }catch(e){}
-    const ctx={ pb:PB, pars:window.HOTKEY_PARS||{}, runs:lite, streak:streakN, solves:solvesN,
-      crowns:0, groups, att:Object.keys(PB).length, menuOrder:MENU_ORDER,
-      mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
-      nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin,
-      raceWins:fl.raceWins||0, sheetClears:fl.sheetClears||0, frzBanked:fl.frzBanked||0, chordKinds:__ck };   // r150
+    const ctx=buildAchCtx();
     const seen=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]');
     const fresh=[];
     AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
