@@ -4,20 +4,20 @@ New sessions: the repo IS the handover — read this file, dev/AUDIT.md (newest 
 at the bottom), and the dev/ design docs. No manual doc upload needed when the
 session has the GitHub integration (repo clones automatically)._
 
-## ⚠️ P0 — MIGRATIONS HAVE NEVER DEPLOYED (r131, supersedes all "deploys
-## automatically / VERIFIED working" claims below)
-The supabase-deploy GitHub Action has failed on EVERY run since 2026-07-07:
-the repo secret SUPABASE_ACCESS_TOKEN was never set. Nothing in
-supabase/migrations/ from 20260707000000 onward exists in the live DB — desks
-v1/v1.5/v2, seeds, protected names, school tags, assignments, handle rules,
-blocklist, flair, entitlements are ALL missing in production (client
-try/catch hides it). WOLF: add SUPABASE_ACCESS_TOKEN + SUPABASE_DB_PASSWORD
-repo secrets, then Actions → "Deploy Supabase migrations" → Run workflow
-(runbook: supabase/README.md; findings: dev/SMOKE_REPORT.md). Do NOT
-distribute seed desk codes before this is green. Also discovered live:
-signup is .edu-only via a manual dashboard gate NOT in the repo — Wolf to
-confirm intent. Once green: run `node dev/smoke-live.mjs` and update
-dev/SMOKE_REPORT.md.
+## ✅ r131-r132 RESOLVED — BACKEND DEPLOYED + LIVE-VERIFIED (65/65 smoke)
+r131 found the supabase-deploy Action had failed on EVERY run since
+2026-07-07 (missing repo secrets) — no migration ≥ 20260707000000 was live.
+Wolf added SUPABASE_ACCESS_TOKEN + SUPABASE_DB_PASSWORD; the backlog deployed;
+the r132 smoke found+fixed 3 real bugs (profile-upsert 403 grant gap ·
+hollow desk rate limit · claim-vs-domain-join deadlock) and re-verified
+65/65 (dev/SMOKE_REPORT.md). Seed codes SAFE TO DISTRIBUTE. HOUSE FACT:
+`supabase db push` is STATEFUL — applied migrations never re-run; restore
+consumed seeds/fixtures by re-shipping the insert under a NEW timestamp
+(smoke-u fixture pattern, migration 20260713000000). STILL OPEN (Wolf):
+merge branch claude/hotkey-gg-continue-lvrf86 → main (DB current; main's
+workflow+docs stale) · rotate access token + DB password (pasted in chat) ·
+decide on the dashboard-side .edu-only signup gate (not in repo — locks out
+working professionals).
 
 ## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r130)
 - **Where we are**: content deepening arc DONE (T2-T6, Mix Rule) · demo-replay e2e

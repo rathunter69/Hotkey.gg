@@ -1,106 +1,102 @@
-# SMOKE_REPORT — live Supabase verification (r131, 2026-07-12)
+# SMOKE_REPORT — live Supabase verification (r131–r132, 2026-07-12/13)
 
-_First session with network egress to supabase.co since the desks arc shipped.
-The planned smoke test (desks / school tags / assignments RPCs) ran and
-immediately surfaced something much bigger than an RPC bug._
+## FINAL STATUS: ✅ 65/65 PASS — the full desks/school-tags/assignments backend
+## is deployed and verified live end-to-end (2026-07-13, `dev/smoke-live.mjs`).
 
-## HEADLINE: the migration pipeline has NEVER worked
+Production end state verified: all 8 school seeds present, ownerless, original
+fixed invite codes intact; no stray desks; smoke-u fixture consumed (by
+design — see "fixtures" below). **Seed codes are safe for Wolf to distribute.**
 
-**None of the migrations from `20260707000000_team_code.sql` onward exist in
-the live database.** Every feature shipped since 2026-07-07 that depends on a
-migration is not deployed: desks v1/v1.5/v2, protected names, seeds, school
-tags, captain assignments, handle rules/cooldown, handle blocklist, flair,
-entitlements, `profiles.team_code`.
+---
 
-**Root cause** (from the GitHub Actions logs): all 9 runs of
-`supabase-deploy.yml` since 2026-07-07 failed at the first step with
-`Access token not provided` — the repo secret `SUPABASE_ACCESS_TOKEN` was
-never set. The one-time setup in `supabase/README.md` was never completed.
-The failure was silent from the product's side because the client swallows
-desk-RPC errors (`try/catch` around `my_desk()` etc.) and renders the
-pre-desks UI.
+## Timeline of the two rounds
 
-The AUDIT r9 claim "Supabase deploys confirmed working via GitHub integration
-(team_code applied)" is **wrong** — live `profiles` has only
-`{id, handle, updated_at}`. Whatever was verified then, it wasn't this
-pipeline against this database.
+### r131 — the pipeline that never ran
+First session with egress to supabase.co. The planned smoke test found that
+**no migration ≥ `20260707000000` existed in the live DB**: all 9 runs of
+`supabase-deploy.yml` since 2026-07-07 had failed at "Access token not
+provided" — the `SUPABASE_ACCESS_TOKEN` secret was never set. Desks v1/v1.5/v2,
+seeds, protected names, school tags, assignments, handle rules, blocklist,
+flair, entitlements: shipped in UI, absent in backend, degraded silently
+(client try/catch). Fixed: fail-loud secret check + `workflow_dispatch` +
+`SUPABASE_DB_PASSWORD` in the workflow; 2-secret runbook in supabase/README.md.
+Wolf added both secrets; one green run deployed the entire backlog.
 
-### What IS live (verified by probe)
-| Object | Status |
-|---|---|
-| `runs`, `profiles`, `members`, `invite_codes`, `sessions` tables | live (manual-paste era) |
-| `redeem_code('HAGS')` RPC | live, returns `true` |
-| signup → session (no email confirm) | works |
-| `profiles` upsert w/ handle | works (client-side rules only!) |
-| everything in migrations ≥ 20260707000000 | **missing** |
+### r132 — smoke round 1 (52/64) found three real bugs, all fixed + verified
+1. **Profile upsert 403 (P0, went live with the backlog deploy)** — r122's
+   column-grant tightening omitted `id` from the UPDATE grant; PostgREST
+   upsert (`resolution=merge-duplicates`) puts every payload column in the
+   `ON CONFLICT … DO UPDATE SET` list, so the gate's `upsert({id, handle})`
+   was denied → new members couldn't create profile rows (no handle, no
+   school tag). **Fix `20260712800000`**: id-immutable trigger + `id` added to
+   the update grant + `refresh_school_tag()` upserts instead of updating a
+   possibly-missing row.
+2. **Hollow creation rate limit** — the r119 guard counted *currently owned*
+   desks; create→leave→create bypassed it (proven live). **Fix
+   `20260712900000`**: `desk_creations` log rides the insert transaction
+   (failed creations roll back their log row and consume nothing).
+3. **Claim-vs-domain-join deadlock** (caught statically in r131, verified
+   fixed live in r132) — r119's claim required *zero members*, so one
+   `join_home_desk` student would permanently block the club president's
+   code-claim. **Fix `20260712700000`**: code-join claims any ownerless desk
+   with no sitting captain. Doctrine holds: code = captaincy, domain =
+   membership.
 
-### Production impact right now (www.hotkey.gg)
-- Account desk card, desk deep-links (`?desk=`), leaderboard desk filter/page,
-  school chips, assignment marks/toast/strip: all silently degrade to the
-  pre-desks experience (errors are caught). No crashes observed in code paths,
-  but **every desks/tags/assignments feature is dead in prod**.
-- Handle uniqueness/format/cooldown and the blocklist are **not server-enforced**
-  (migration never applied) — only client checks stand between a user and a
-  duplicate/offensive handle via direct REST.
-- The 8 seeded school desks and their invite codes: **do not exist yet**. Wolf
-  must NOT distribute codes until the pipeline is green and the smoke passes.
+Also learned live: **`supabase db push` is stateful** — applied migrations
+never re-run, so consumed seeds can't be restored by re-running the workflow.
+The r132 run had claimed-and-deleted the Wharton seed via a zero-member claim;
+**`20260713000000_smoke_fixtures.sql`** re-stamped all 8 school seeds (same
+codes) and added the **smoke-u fixture** (ownerless private test desk,
+`edu_domain hotkeysmoketest.edu`, matching the harness accounts) so claim
+tests never touch real school desks again.
 
-## WOLF ACTION REQUIRED (3 minutes — unblocks everything)
-1. app.supabase.com → account icon → **Access Tokens** → Generate new token → copy.
-2. Supabase dashboard → Project Settings → Database → **Database password**
-   (reset if unknown) → copy.
-3. GitHub repo → Settings → Secrets and variables → Actions → add BOTH:
-   `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`.
-4. GitHub → Actions tab → "Deploy Supabase migrations" → **Run workflow**.
-   (r131 added the manual trigger + a loud fail-fast if a secret is missing.)
-5. Tell Claude "pipeline is green" → next session runs `node dev/smoke-live.mjs`
-   and writes the real desks smoke results here.
+## What 65/65 covers (`node dev/smoke-live.mjs`, re-runnable)
+Auth signup/signin (.edu gate) · redeem_code HAGS · profiles upsert + RLS ·
+name guards (RESERVED + PROTECTED ×2) · create/preview/join/my_desk ·
+invite-code table privacy · ALREADY_ON_DESK · assignment cap-3 + re-pin
+upsert + NOT_CAPTAIN + member read + clear + direct-insert denial ·
+rotate_invite + old-code death + NOT_CAPTAIN · heir promotion ·
+empty-desk self-delete + assignment cascade · DESK_RATE_LIMIT (post-fix) ·
+refresh_school_tag (mapped UPenn + unmapped-.edu fallback) · server-derived
+column write denial · show_school opt-in · home_desk_for_me (match/empty/
+on-a-desk) · join_home_desk (member-only + NO_HOME_DESK) · Wharton
+member-join non-destructive · claim-after-domain-join → captaincy (the fix) ·
+captain powers on claimed seed · reports insert / no-read / forged-reporter
+denial.
 
-All 13 migrations were re-scanned this round: idempotent throughout
-(`if not exists` / `drop … if exists` / `on conflict do nothing`), so the
-first successful run applies the whole backlog in one pass safely.
+## Standing facts for future sessions
+- **`supabase db push` never re-runs an applied migration.** Restoring a
+  consumed fixture/seed = ship the insert again under a NEW timestamp.
+- A full smoke run **consumes smoke-u** (last leaver deletes it). Before the
+  next full run: copy `20260713000000_smoke_fixtures.sql` to a new timestamp
+  and deploy. Real school seeds are never claimed/rotated by the harness.
+- The harness reuses its accounts via `SMOKE_TS=03683162 node dev/smoke-live.mjs`
+  (signin fallback) — don't mint new accounts without reason.
+- **Signup is .edu-only** ("Only .edu email addresses may register for the
+  beta") via a manual dashboard-side gate that is NOT in the repo. OPEN
+  QUESTION for Wolf: intentional? It locks out working IB professionals —
+  the stated core audience. If keeping: document where it lives; if not:
+  remove in the Supabase dashboard (Auth hook/trigger).
 
-## What the smoke test DID verify live (2026-07-12)
-- Egress OK; auth health OK.
-- **Signup is server-gated to .edu emails**: non-.edu signup fails with
-  `Only .edu email addresses may register for the beta.` This gate is **not in
-  the repo** (no migration/hook defines it) — it was added manually in the
-  dashboard. FLAG: PROJECT_CONTEXT says the audience is "IB analysts, finance
-  pros, MBAs" with HAGS as the gate — a .edu-only wall locks out working
-  professionals. Wolf: intentional? If yes it belongs in the repo docs; if no,
-  remove it in Supabase Auth settings (it's a dashboard-side hook/trigger).
-- Signup returns a session immediately (email confirmation off).
-- `redeem_code('HAGS')` → `true` for all three test users; `profiles` upsert
-  201; RLS lets a user read their own profile row.
-- Schema probes: see table above; desk/tag/assignment RPCs all 404
-  (`PGRST202`), `teams`/`team_assignments`/`reports`/`school_map` tables 404
-  (`PGRST205`), `profiles.team_code/flair/school_tag/show_school` 42703.
-
-## Bug found by static analysis while building the test matrix (FIXED)
-**Claim-vs-domain-join deadlock** — `join_desk` (r119) claims captaincy only
-when the desk is ownerless AND has zero members. `join_home_desk` (r122) adds
-domain members without touching ownership. So one student auto-joining their
-school desk before the club president enters the code would make the captaincy
-permanently unclaimable. Doctrine (r122) is explicit: code = captaincy, domain
-= membership. **Fix shipped: `20260712700000_claim_fix.sql`** — code-join
-claims an ownerless desk with no sitting captain, regardless of member count.
-`dev/smoke-live.mjs` step 10 asserts the fixed behavior.
-
-## Test artifacts left in prod (service-role cleanup when convenient)
-Accounts (password pattern `Smoke-<TS>-xK9!`, all redeemed HAGS, no runs —
-they appear on no leaderboards):
-- `hk.smoke.b.92166128@upenn.edu` — uid `3a254f44-cd95-455b-904e-614cd7ff81ab` (orphan from aborted run 1, no profile row)
-- `hk.smoke.a.92201356@hotkeysmoketest.edu` — uid `1f4a1396-6796-40f8-84d9-c53d62e7e8bf`, handle `smoke_a_92201356`
-- `hk.smoke.b.92201356@upenn.edu` — uid `48bfb1ba-f7f1-44a9-b7fe-c30cf7921727`, handle `smoke_b_92201356`
-- `hk.smoke.c.92201356@hotkeysmoketest.edu` — uid `28f5543b-4797-4e1f-8ba4-95b3abec5432`, handle `smoke_c_92201356`
-
-## The full desks smoke matrix (BLOCKED — runs the moment the pipeline is green)
-`dev/smoke-live.mjs` covers: create/preview/join/my_desk/leave (incl. heir
-promotion + empty-delete), invite-code privacy, name guards
-(RESERVED/PROTECTED), 1/day rate limit, assignment cap-3 + re-pin upsert +
-captain-only writes + direct-insert denial, rotate_invite (+ NOT_CAPTAIN),
-refresh_school_tag (mapped + unmapped-.edu fallback), server-derived-column
-write denial, home_desk_for_me / join_home_desk (member-only), claim-the-desk
-on a seed, claim-after-domain-join (the r131 fix), reports insert/no-read/
-forged-reporter denial. Seed-state restoration is designed in (LSE reseeds via
-idempotent migration re-run; Wharton is only ever domain/member-joined).
+## Outstanding (Wolf)
+1. **Merge `claude/hotkey-gg-continue-lvrf86` → main.** The DB already has
+   all migrations (deployed from the branch), but main still carries the old
+   workflow (no fail-loud check, no manual trigger) and none of the r131/r132
+   docs/harness. Merging is docs/workflow/migrations only — no site pages.
+2. **Rotate the credentials** pasted in chat: generate a new Supabase access
+   token (revoke the old) and reset the DB password, then update BOTH repo
+   secrets. The pipeline keeps working.
+3. Decide on the .edu signup gate (above).
+4. Distribute seed desk codes to club presidents whenever ready — backend is
+   verified.
+5. Optional service-role cleanup of smoke accounts (harmless; no runs, no
+   leaderboard presence): password pattern `Smoke-<TS>-xK9!`
+   - `hk.smoke.b.92166128@upenn.edu` — `3a254f44-cd95-455b-904e-614cd7ff81ab` (orphan, no profile)
+   - `hk.smoke.a.92201356@hotkeysmoketest.edu` — `1f4a1396-6796-40f8-84d9-c53d62e7e8bf`
+   - `hk.smoke.b.92201356@upenn.edu` — `48bfb1ba-f7f1-44a9-b7fe-c30cf7921727`
+   - `hk.smoke.c.92201356@hotkeysmoketest.edu` — `28f5543b-4797-4e1f-8ba4-95b3abec5432`
+   - `hk.smoke.a.03683162@hotkeysmoketest.edu` / `hk.smoke.b.03683162@upenn.edu` /
+     `hk.smoke.c.03683162@hotkeysmoketest.edu` — the active harness trio
+     (KEEP if you want re-runnable smokes; they hold no desks)
+   - `reports` table holds 2 smoke rows (kind=handle, note mentions smoke) — delete at leisure.
+   - **Remove the smoke-u fixture at launch** (T&S pass) — currently consumed/absent.

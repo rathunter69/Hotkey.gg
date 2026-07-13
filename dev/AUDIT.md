@@ -2950,3 +2950,41 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   SUPABASE_DB_PASSWORD repo secrets → Actions → Run workflow → tell Claude
   "pipeline is green". Seed codes must NOT be distributed before that.
 - No shared-asset change; ?v stays 117. No deploy-set page touched.
+
+---
+# ROUND 132 — SMOKE TO GREEN: 65/65. Backend live-verified end to end.
+- Wolf added both repo secrets; ONE green workflow run deployed the entire
+  2026-07-07..12 migration backlog. Smoke round 1: 52/64 — three REAL bugs,
+  all fixed by migration and re-verified live:
+  1. PROFILE UPSERT 403 (P0, live the moment school_tags applied): r122's
+     update grant omitted id; PostgREST upsert puts every payload column in
+     ON CONFLICT..SET -> gate handle saves denied -> new members rowless (no
+     handle, no tag). Fix 20260712800000: id-immutable trigger + id granted +
+     refresh_school_tag upserts (row-creation-order-proof).
+  2. RATE LIMIT HOLLOW: r119 guard counted currently-OWNED desks;
+     create->leave->create bypassed (proven live). Fix 20260712900000:
+     desk_creations log rides the insert transaction (failed creates consume
+     nothing).
+  3. CLAIM DEADLOCK (r131 static catch): zero-member claim condition let one
+     join_home_desk student block the president's code-claim forever. Fix
+     20260712700000 verified LIVE: C code-claimed smoke-u over a sitting
+     domain member -> captain. Code = captaincy, domain = membership.
+- LESSON (new house fact): `supabase db push` is STATEFUL — applied
+  migrations NEVER re-run; a consumed seed is only restorable by re-shipping
+  the insert under a NEW timestamp. The r132 run consumed the Wharton seed
+  (zero-member claim path); 20260713000000_smoke_fixtures re-stamped all 8
+  school seeds (codes unchanged) + added smoke-u (ownerless private test
+  seed on the harness .edu domain) so claim tests never touch real seeds.
+- HARNESS (dev/smoke-live.mjs): signin fallback (SMOKE_TS account reuse),
+  hard precondition on the claim scenario (round-1 pass was hollow — B never
+  joined), slug-asserted claims, real seeds member-joined only, codes never
+  rotated. Full matrix consumes smoke-u -> re-stamp fixtures before next run.
+- FINAL PROD STATE verified: 8 seeds ownerless w/ original codes, no strays,
+  smoke rows in reports flagged for service-role cleanup. SEED CODES ARE
+  SAFE TO DISTRIBUTE.
+- DISCOVERED r131, still OPEN FOR WOLF: .edu-only signup gate lives ONLY in
+  the dashboard (not repo) — locks out working professionals; decide keep+
+  document vs remove. ALSO: rotate the access token + DB password (pasted in
+  chat = burned) and merge the branch to main (DB is current; main's
+  workflow/docs are stale).
+- No shared-asset change; ?v stays 117. Branch: claude/hotkey-gg-continue-lvrf86.
