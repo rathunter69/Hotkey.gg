@@ -3767,3 +3767,41 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   clean of locked keys, next lands unlocked; leveled profile (LVL 6 + 14
   clears): Formulas+Models OPEN, Full Builds still locked — exactly per
   config; 5 pages boot clean; e2e demo-replay ALL GREEN.
+
+---
+# ROUND 159 — ENGINE VALIDATION PASS + THE FROM-ZERO RAMP (Wolf's brief)
+- ENGINE VALIDATION (before any new drills, per Wolf): all four standing
+  suites run against HEAD. Parity matrix EXTENDED 27 -> 37 asserts with
+  four new families: K row ops (Alt H I R shift + lastRowOp latch + the
+  r95/r101 undo-geometry contract), L formatting ops (Ctrl+B, Alt H A C
+  align='c', Alt H K comma), M autofit (Alt H O I widens engine colW),
+  N pointer mode (arrows point refs, F4 anchors a POINTED ref — the r87
+  bug class — and commits intact). All 37 PASS — the three initial
+  failures were MY assertions vs real engine contracts (stable-viewport
+  rowsAfterOp, l/c/r align codes, 1-indexed colW), not engine bugs.
+  Harnesses gained the r158 gate bypass (_pro=true) — fresh('foot') was
+  silently bouncing at the Formulas gate.
+- REAL BUG FOUND + FIXED (intro keyboard leak): the new comfort card's
+  number keys ALSO fell through to the grid (document-target listener
+  order = registration order, game handler first) — every fresh visitor
+  would start a stray '2' edit in the active cell. window.__introCardOpen
+  guard in the game keydown (onboardOpen pattern); comfort + primer own
+  the keyboard while up.
+- THE FROM-ZERO RAMP (Wolf: "jumps in quickly… undergrads who never use
+  Excel are thrown off off rip"):
+  * COMFORT FORK on first entry (before the tour): "how much Excel have
+    you done?" — basically none / I get around / I live in it (keys 1-3,
+    hk_xlv persisted, comfort event logged).
+  * EXCEL-FROM-ZERO PRIMER (novices only, before the product tour): 5
+    cards teaching the raw vocabulary — the grid + cell addresses (with a
+    mini-grid visual), formula bar vs result, typing/Enter/Esc/F2, the
+    Alt ribbon paths, how you win + F1. Enter-driven, hk_primer_done.
+  * TRAINING WHEELS x3: novices keep guided mode auto-ON for their first
+    3 clean solves (was: 1 drill for everyone); an explicit F1-off is
+    respected for the session (hk_guided_off).
+- onboard audit grew T4 (novice branch: fork re-asks, primer opens on
+  card 1, completes, tour follows) + the fork step in T2: 15 -> 20
+  asserts, ALL PASS.
+- CACHE v137 -> v138 (all 9 pages).
+- VERIFY: full gate green — parity 37, onboard 20, rank 20, demo-replay
+  ALL (64 drills x3); node --check all extracted scripts.

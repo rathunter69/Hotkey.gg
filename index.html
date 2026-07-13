@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=137" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=137">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=137">
+<link rel="icon" href="favicon.ico?v=138" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=138">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=138">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1108,14 +1108,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=137"></script>
-<link rel="stylesheet" href="nav.css?v=137">
-<script src="themes.js?v=137"></script>
+<script src="drills.js?v=138"></script>
+<link rel="stylesheet" href="nav.css?v=138">
+<script src="themes.js?v=138"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=137"></script>
+<script src="nav.js?v=138"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -6167,6 +6167,12 @@ function syncTabs(){
         setTimeout(()=>showToast('guided mode is on for your first run \u2014 follow the highlighted keys \u00b7 F1 turns it off'), 800); }
       localStorage.setItem('hk_learn_done','1');
     }
+    // r159: FROM-ZERO RAMP — a self-declared novice (comfort fork) keeps the
+    // training wheels for their first 3 clean solves, unless they F1 them off.
+    if(localStorage.getItem('hk_xlv')==='0' && !sessionStorage.getItem('hk_guided_off')){
+      const __solves=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0;
+      if(__solves<3 && !guided && !demoPlaying) toggleGuided();
+    }
   }catch(e){}
   if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450); }   // r80: between drills — gameplay moment, zero overlap
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
@@ -6794,6 +6800,9 @@ document.addEventListener('keydown',e=>{
   if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
   // landing overlay is up (and no modal over it): swallow grid keys; Enter starts training
   if(landingOpen && !authOpen && !gateOpen){ if(k==='Enter'){ e.preventDefault(); tryEnter(); } return; }
+  // r159: comfort fork / primer cards own the keyboard while up — their own
+  // listeners (registered later) still see the key; the grid never does.
+  if(window.__introCardOpen){ if(k!=='F5') e.preventDefault(); return; }
   // first-run intro prompt is up: arrow keys flip between options, Enter activates, Esc skips
   if(onboardOpen){
     if(k==='ArrowLeft'||k==='ArrowRight'||k==='ArrowUp'||k==='ArrowDown'||k==='Tab'){
@@ -7231,6 +7240,7 @@ $('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-ke
   const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>F1</kbd> guided: '+(guided?'on':'off'); } }
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn();
+  if(!guided){ try{ sessionStorage.setItem('hk_guided_off','1'); }catch(e){} }   // r159: respect an explicit F1-off — training wheels stay off this session
   try{ document.body.classList.toggle('guided-on', guided); }catch(e){}   // r93: the whole frame says so
   if(S) render();
   if(gameMode==='rapidfire' && rfTask) renderRfCard('show');
@@ -9490,7 +9500,12 @@ function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.clas
   // r134: SEQUENCE, don't race — spotlight tour first (input-blocked), THEN the
   // tutorial prompt. They used to fire on independent timers and overlap.
   let tourDone=false; try{ tourDone=!!localStorage.getItem('hk_tour_done'); }catch(e){}
-  if(!tourDone){ __tourAfter=maybeOnboard; setTimeout(()=>tourShow(0), 700); }
+  if(!tourDone){ __tourAfter=maybeOnboard;
+    // r159: first entry asks the comfort question; "basically none" gets the
+    // excel-from-zero primer BEFORE the product tour.
+    let asked=null; try{ asked=localStorage.getItem('hk_xlv'); }catch(e){}
+    if(asked===null) setTimeout(()=>showComfort(()=>tourShow(0)), 700);
+    else setTimeout(()=>tourShow(0), 700); }
   else maybeOnboard(); }
 function tryEnter(){ enterRequested=true; ev('enter'); if(!sb){ dismissLanding(); return; } advanceAccess(); }
 
@@ -9720,6 +9735,56 @@ async function hydratePBFromServer(){
   }catch(e){}
 }
 /* r91: one-time first-run tour — the buddy-bounce fix */
+/* ---- r159: THE COMFORT FORK + EXCEL-FROM-ZERO PRIMER (Wolf: undergrads who
+   never touched Excel are thrown off "off rip"). One question on first entry;
+   "basically none" gets a 5-card primer teaching the raw vocabulary BEFORE the
+   product tour, plus guided mode for the first 3 solves. ---- */
+function showComfort(after){
+  let m=$('comfortCard');
+  if(!m){ m=document.createElement('div'); m.id='comfortCard'; m.className='onboard-modal'; document.body.appendChild(m); }
+  m.innerHTML='<div class="ob-card" style="max-width:470px">'+
+    '<div class="ob-title">quick one \u2014 how much Excel have you done?</div>'+
+    '<div class="ob-body" style="font-size:12.5px">No wrong answer \u2014 this just sets how much hand-holding you get. You can always press <b>F1</b> for guided mode.</div>'+
+    '<div class="ob-opts" style="flex-direction:column;gap:8px;align-items:stretch">'+
+      '<button class="ob-key primary" data-xlv="0" style="text-align:left"><b>Basically none</b> \u2014 teach me from zero <kbd class="ob-kbd">1</kbd></button>'+
+      '<button class="ob-key" data-xlv="1" style="text-align:left"><b>I get around</b> \u2014 classes, an internship <kbd class="ob-kbd">2</kbd></button>'+
+      '<button class="ob-key" data-xlv="2" style="text-align:left"><b>I live in it</b> \u2014 just show me the drills <kbd class="ob-kbd">3</kbd></button>'+
+    '</div></div>';
+  m.classList.add('show'); window.__introCardOpen=true;
+  const keys=(e)=>{ if(e.key>='1'&&e.key<='3'){ e.preventDefault(); e.stopImmediatePropagation(); pick(+e.key-1); } };
+  const pick=(v)=>{ try{ localStorage.setItem('hk_xlv', String(v)); }catch(e){}
+    try{ ev('comfort',{v:v}); }catch(e){}
+    m.classList.remove('show'); window.__introCardOpen=false; document.removeEventListener('keydown', keys, true);
+    if(v===0) showPrimer(after); else after(); };
+  m.querySelectorAll('[data-xlv]').forEach(b=>{ b.onclick=()=>pick(+b.dataset.xlv); });
+  document.addEventListener('keydown', keys, true);
+}
+const PRIMER=[
+  ['the grid', 'Everything in Excel lives in a <b>cell</b>. Every box has an address \u2014 column letter + row number, like <b style="font-family:var(--mono)">B4</b>. The dark outline is <b>you</b>: the arrow keys move it.',
+   '<table style="border-collapse:collapse;margin:10px auto;font-family:var(--mono);font-size:11px"><tr><td></td><td style="padding:2px 10px;color:var(--faint)">A</td><td style="padding:2px 10px;color:var(--faint)">B</td><td style="padding:2px 10px;color:var(--faint)">C</td></tr><tr><td style="padding:2px 8px;color:var(--faint)">3</td><td style="border:1px solid var(--line);padding:3px 14px"></td><td style="border:1px solid var(--line);padding:3px 14px">340</td><td style="border:1px solid var(--line);padding:3px 14px"></td></tr><tr><td style="padding:2px 8px;color:var(--faint)">4</td><td style="border:1px solid var(--line);padding:3px 14px"></td><td style="border:2px solid var(--accent);padding:3px 14px;font-weight:700">B4</td><td style="border:1px solid var(--line);padding:3px 14px"></td></tr></table>'],
+  ['what a cell shows vs what it is', 'A cell can hold a plain number (<b style="font-family:var(--mono)">340</b>) or a <b>formula</b> that computes one (<b style="font-family:var(--mono)">=B2+B3</b> \u2014 formulas always start with <b style="font-family:var(--mono)">=</b>). The grid shows the RESULT; the <b>formula bar</b> above the grid shows what\u2019s really inside.', ''],
+  ['typing', 'Click nothing. Just <b>type</b> \u2014 it replaces what\u2019s in the cell \u2014 and press <kbd class="ob-kbd">\u21b5</kbd> to commit (<kbd class="ob-kbd">Tab</kbd> commits and moves right). Made a mess? <kbd class="ob-kbd">Esc</kbd> backs out safely. <kbd class="ob-kbd">F2</kbd> opens a cell to fix it without retyping.', ''],
+  ['the ribbon', 'Excel\u2019s menus all have <b>keyboard paths</b>. Tap <kbd class="ob-kbd">Alt</kbd> and letters light up: <b style="font-family:var(--mono)">Alt \u2192 H \u2192 O \u2192 I</b> fixes squeezed columns. Nobody memorizes these overnight \u2014 the drills make them reflex.', ''],
+  ['how you win', 'Each drill: make the sheet match the <b>checklist</b> on the right, fast. Any keystroke path that gets there counts. <kbd class="ob-kbd">F1</kbd> is <b>guided mode</b> \u2014 it highlights every key to press, and it\u2019s ON for your first few runs. You\u2019ve got this.', ''],
+];
+function showPrimer(after, i){
+  i=i||0;
+  let m=$('primerCard');
+  if(!m){ m=document.createElement('div'); m.id='primerCard'; m.className='onboard-modal'; document.body.appendChild(m); }
+  if(i>=PRIMER.length){ m.classList.remove('show'); window.__introCardOpen=false; try{ localStorage.setItem('hk_primer_done','1'); }catch(e){}
+    try{ ev('primer_done',{}); }catch(e){} if(after) after(); return; }
+  window.__introCardOpen=true;
+  const p=PRIMER[i];
+  m.innerHTML='<div class="ob-card" style="max-width:470px">'+
+    '<div class="ob-title" style="display:flex;justify-content:space-between;align-items:baseline"><span>excel from zero \u2014 '+p[0]+'</span><span style="font-size:11px;color:var(--faint);font-family:var(--mono)">'+(i+1)+' / '+PRIMER.length+'</span></div>'+
+    '<div class="ob-body" style="font-size:13px;line-height:1.8;text-align:left">'+p[1]+(p[2]||'')+'</div>'+
+    '<div class="ob-opts"><button class="ob-key primary" id="primerNext">'+(i===PRIMER.length-1?'let\u2019s drill':'next')+' <kbd class="ob-kbd">\u21b5</kbd></button></div></div>';
+  m.classList.add('show');
+  const keys=(e)=>{ if(e.key==='Enter'){ e.preventDefault(); e.stopImmediatePropagation(); go(); } };
+  const go=()=>{ document.removeEventListener('keydown', keys, true); showPrimer(after, i+1); };
+  $('primerNext').onclick=go;
+  document.addEventListener('keydown', keys, true);
+}
 const TOUR_STEPS=[
   {sel:'.gridwrap',   cap:'the sheet',     body:'This is <b>Excel without the mouse</b>. Arrows move. Type to enter. <b>=</b> starts a formula. Everything is graded on the END STATE \u2014 any keystroke path that gets there counts.'},
   {sel:'.cl-inner',   cap:'your instructions', body:'The <b>checklist</b> is the ask \u2014 like an associate\u2019s markup. Green means done. Finish every line and the clock stops.'},

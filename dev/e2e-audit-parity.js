@@ -17,6 +17,9 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   } catch (e) {} });
   await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
+  // r159: the matrix probes gated-tier drills ('foot' = Formulas) — flip the real
+  // pro entitlement so r158's progression gates never bounce a fresh() board.
+  await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 
   const run = (fn, arg) => page.evaluate(fn, arg);
   // fresh neutral board for each probe
@@ -158,6 +161,64 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(i1.cleared, 'Delete clears the selected range');
   ok(i1.undone, 'Ctrl+Z restores it');
   ok(i1.redone, 'Ctrl+Y re-applies');
+
+  console.log('K. row ops + undo geometry (r95 fix)');
+  await fresh();
+  const k1 = await run(() => {
+    const rows0 = S.ROWS, val0 = S.cells['B4'].value;
+    setDemoSel('B4');
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'i'}); demoKey({key:'r'});   // insert row above 4
+    const shifted = S.cells['B5'] && S.cells['B5'].value === val0;
+    const latched = S.lastRowOp === 'ins';         // action-sourced latch (r14) — undo can't fake it
+    demoKey({key:'z', ctrl:true});
+    const undone = S.cells['B4'] && S.cells['B4'].value === val0 && S.ROWS === rows0;
+    return { shifted, latched, undone };
+  });
+  ok(k1.shifted, 'Alt H I R inserts a row (content shifts down)');
+  ok(k1.latched, 'row op latches S.lastRowOp (action-sourced, r14)');
+  ok(k1.undone, 'Ctrl+Z restores content AND geometry (r95/r101 stable viewport)');
+
+  console.log('L. formatting ops land on the cell');
+  await fresh();
+  const l1 = await run(() => {
+    setDemoSel('C5'); demoKey({key:'b', ctrl:true});
+    const bold = !!S.cells['C5'].bold;
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'a'}); demoKey({key:'c'});
+    const centered = S.cells['C5'].align === 'c';   // engine stores l/c/r
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'k'});
+    const comma = S.cells['C5'].fmtStyle === 'comma';
+    return { bold, centered, comma };
+  });
+  ok(l1.bold, 'Ctrl+B bolds the selection');
+  ok(l1.centered, 'Alt H A C centers');
+  ok(l1.comma, 'Alt H K applies comma format', JSON.stringify(l1));
+
+  console.log('M. autofit widens a squeezed column');
+  await fresh();
+  const m1 = await run(() => {
+    setDemoSel('E3'); for (const ch of 'WORKING CAPITAL SCHEDULE') demoKey({key:ch}); demoKey({key:'Enter'});
+    const before = colW[5];                        // E = col 5, 1-indexed engine widths
+    setDemoSel('E3'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'i'});
+    const after = colW[5];
+    return { before, after };
+  });
+  ok(m1.after > m1.before, 'Alt H O I widens the column to fit', m1.before + ' -> ' + m1.after);
+
+  console.log('N. pointer mode + F4 on pointed refs (r87 class)');
+  await fresh();
+  const n1 = await run(() => {
+    setDemoSel('D12'); demoKey({key:'='});
+    demoKey({key:'ArrowUp'}); demoKey({key:'ArrowUp'});
+    const pointed = editBuf;                       // '=D10'
+    demoKey({key:'F4'});
+    const anchored = editBuf;                      // '=$D$10'
+    demoKey({key:'Enter'});
+    const committed = S.cells['D12'].formula;
+    return { pointed, anchored, committed };
+  });
+  ok(n1.pointed === '=D10', 'arrow keys point refs in edit mode', n1.pointed);
+  ok(n1.anchored === '=$D$10', 'F4 anchors a POINTED ref (not just typed)', n1.anchored);
+  ok(n1.committed === '=$D$10', 'pointed+anchored formula commits intact', n1.committed);
 
   console.log('J. esc discipline');
   await fresh();

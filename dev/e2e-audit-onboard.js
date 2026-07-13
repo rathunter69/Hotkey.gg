@@ -60,6 +60,11 @@ const STUB = () => {
   ok(t2.visible, 'landing dialog is up after the curtain');
   await page.keyboard.press('Enter');   // Enter = start (friction-free entry)
   await page.waitForTimeout(900);
+  // r159: the comfort fork asks BEFORE the tour on a first entry
+  const t2fork = await page.evaluate(() => { const m = document.getElementById('comfortCard'); return !!(m && m.classList.contains('show')); });
+  ok(t2fork, 'comfort fork asks how much Excel you know (r159)');
+  await page.keyboard.press('2');       // "I get around" → straight to the tour
+  await page.waitForTimeout(500);
   const t2b = await page.evaluate(() => {
     const l = document.getElementById('landing');
     const w = document.getElementById('tourWrap');
@@ -121,6 +126,31 @@ const STUB = () => {
   });
   ok(t3b.gone, 'first keydown dismisses welcome-back');
   ok(t3b.typed, '…without swallowing the key (it lands in the cell)');
+
+  console.log('T4 the novice branch: primer before tour (r159)');
+  await page.evaluate(() => { ['hk_xlv','hk_tour_done','hotkey_onboarded','hk_primer_done','hk_learn_done'].forEach(k => localStorage.removeItem(k)); });
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+  await page.waitForTimeout(700);
+  await page.keyboard.press('Enter');                 // through the landing again
+  await page.waitForTimeout(900);
+  const t4a = await page.evaluate(() => { const m = document.getElementById('comfortCard'); return !!(m && m.classList.contains('show')); });
+  ok(t4a, 'comfort fork re-asks once the flags are gone');
+  await page.keyboard.press('1');                     // "basically none"
+  await page.waitForTimeout(500);
+  const t4b = await page.evaluate(() => {
+    const m = document.getElementById('primerCard');
+    return { up: !!(m && m.classList.contains('show')), first: m ? /the grid/i.test(m.innerText) : false };
+  });
+  ok(t4b.up && t4b.first, 'excel-from-zero primer opens on card 1 (the grid)');
+  for (let i = 0; i < 5; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(220); }
+  const t4c = await page.evaluate(() => ({
+    done: localStorage.getItem('hk_primer_done') === '1',
+    xlv: localStorage.getItem('hk_xlv') === '0',
+    tourUp: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
+  }));
+  ok(t4c.done && t4c.xlv, 'primer completes and remembers the novice');
+  ok(t4c.tourUp, 'product tour follows the primer');
 
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(realErrors.length === 0, 'zero page errors through onboarding', realErrors.join(' | '));
