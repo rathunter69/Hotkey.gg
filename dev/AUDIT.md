@@ -3638,3 +3638,34 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFY: all three audits ALL PASS post-fix (27+15+20) · FULL 64-drill
   regression ALL GREEN (paste translation broke nothing) · r148-r151 suites
   re-run ALL PASS. No shared-asset change → ?v stays 133.
+
+---
+# ROUND 155 — DENSITY TRANCHE (the last pre-doctrine surfaces) + SEASONS DESIGN DOC
+- MEASURED, not guessed: a catalog-wide density probe (occupied cells / span)
+  ranked all 64 drills. Worst offenders — pastes (5 cells), transpose (6),
+  gauntlet (8 cells on a 2×5 strip). 'undo' stays exempt per the r56 ruling;
+  everything else already passed a doctrine round.
+- 'pastes': the final figure now lives INSIDE a real quarterly P&L (headers,
+  four line items, dressed source cell) and feeds two labeled hand-offs.
+  Same three keystrokes (ctrl+c · alt-e-s-v · alt-e-s-t); 5 → 30 cells.
+- 'transpose': the year row now caps a populated operating build (label col +
+  three data rows) with the summary block waiting below; three site layouts.
+  Same two keystrokes; 6 → 22 cells.
+- 'gauntlet': REBUILT as a two-sided Sources & Uses — every op now runs on
+  BOTH blocks (multi-site per the doctrine): blue both input stacks, alt+=
+  both totals, bold + top border both, comma ×2 walks down both money
+  columns, autofit both. Labels shuffle + row jitter per run. 8 → 21 cells,
+  par 75/30 → 100/46.
+- SEASONS DESIGN DOC at dev/SEASONS.md (the queue's last item, deliberately
+  doc-only): a season = a deal (10 weeks, codename), soft reset on RANK only
+  (LEVEL never resets — two-ladders holds), placement reuses the provisional
+  machinery verbatim, tombstones on the card, flair rides profiles.flair,
+  monetization stance pre-decided (participation/rank never paid; PRO gets
+  finish + insight, zero gameplay). Build trigger: DAU ≥ 30 ×2wks or first
+  B2B desk request. The build round is a config-and-migration round now.
+- VERIFY: WIN 3/3 ×3 on the rebuilds; 40-seed sweeps ALL CLEAN (0 pre-solved
+  in 120 builds, min cells 30/22/21, demos finish every check every seed);
+  pars recalibrated from measured optimal paths (11/6/46); FULL 64-drill
+  regression ALL GREEN; parity audit + r148/r150/r151 suites re-run ALL
+  PASS; both tabs screenshot-eyeballed (the S&U #### wall reads exactly
+  right). drills.js PARS synced. CACHE v133 -> v134 (all 9 pages).
