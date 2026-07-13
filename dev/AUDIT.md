@@ -3338,3 +3338,27 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   optional fold/unfold on ←/→ for the folder feel. Full navigation-depth
   VDR (enter/exit folders) rejected: it adds keystrokes between the player
   and the drill — the picker is a speed surface.
+
+---
+# ROUND 147 — THE DEAL ROOM: VDR picker re-skin (Wolf's idea, hybrid verdict)
+- The picker is now a DEAL-ROOM FILE TREE (r80 section blocks retired):
+  cap strip w/ LIVE BREADCRUMB (hotkey.gg › drills › 01 foundations ›
+  navigate.xlsx — updates on every cursor move) + file/folder counts ·
+  NUMBERED folder rows (01-08, group-color chip, N files, ◆ advanced tag) ·
+  FILE rows (tree guides ├/└, NN.M index, name + .xlsx, staffer ◆ mark,
+  PB ✓-time, right-aligned par ledger column) · FOLD/UNFOLD (Enter or ←
+  on a folder folds; → unfolds/steps in; ← from a file jumps to its
+  folder; folds persist in hk_pk_folds).
+- INTERACTION DOCTRINE HELD: everything stays one keystroke away — no
+  forced folder navigation (the literal-VDR interaction was rejected in
+  r146's queue note; Wolf approved the hybrid). Numbers 1-8 now jump to
+  FOLDERS (they wear the numbers; the old 1-9-loads-first-nine-drills
+  behavior retired). movePkDir (2D chip-cloud nav) retired with the cloud.
+- openPicker focuses the current drill's file row (falls back to its folder
+  when folded). loadChallenge's .cur repaint works unchanged (.pk-byline
+  class kept on file rows on purpose).
+- VERIFY: 8-assert Playwright suite ALL PASS (tree renders 8 folders/59
+  files, breadcrumb tracks folder AND file focus, fold persists + hides
+  files, → unfolds, ← file→folder jump, ↵ loads + closes, zero errors);
+  screenshot reviewed (the VDR read is exactly right); full 59-drill
+  regression gating the merge. CACHE v127 -> v128.
