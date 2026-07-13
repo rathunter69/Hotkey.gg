@@ -67,11 +67,12 @@ follows the doctrine.)*
 > 'set the print widths' beat in a future formatting drill.
 > DONE r177: Ctrl+1 / Alt O E Format Cells dialog. DONE r179: ROW GROUPING
 > (Shift+Alt+→/← + Alt A H/J, hidden-rows substrate, grpfold drill) — the
-> canon never-hide-always-group rule is live. REMAINING: Ctrl+Shift+L filter
-> (ride the same hidden-rows substrate; Alt+↓ value picker), Ctrl+9/0 hide (teach WITH the group-first caveat), filter toggle on
-> a header row (sort/filter integration), row grouping (Shift+Alt+→/←) with
-> collapse glyphs. Each lands with parity asserts; drills follow in a later
-> tranche (grouping alone unlocks a "clean up the inherited model" drill).
+> canon never-hide-always-group rule is live. DONE r180: Ctrl+Shift+L
+> AutoFilter + Alt+↓ value picker + Alt A T ribbon route + filterpass drill
+> (rides the same hidden-rows substrate; Macabacus profile keeps the chord
+> for Fast Fill Left by claim order). REMAINING: Ctrl+9/0 hide (teach WITH
+> the group-first caveat), SUBTOTAL(9) visible-aware math so a future drill
+> can grade "the total follows the filter". Each lands with parity asserts.
 
 ## T-F · RAPID-FIRE ↔ CLASSIC BRIDGE  *(any model)*
 > Rapid-fire recognizes 15+ chords classic never exercises (find/replace/goto/

@@ -4392,3 +4392,44 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   ride this same substrate next.
 - VERIFIED: replay 74/74, alts 37/37, parity 53, onboard 28, visual 311,
   rank 20, fit sweep 71 clean, par sweep 0 flagged. CACHE v156 -> v157.
+
+## r180 — AutoFilter engine (Ctrl+Shift+L) + filterpass drill
+- ENGINE: AutoFilter rides the r179 hidden-rows substrate exactly as
+  planned — syncHidden() now unions filter exclusions with collapsed
+  groups, so navigation routing, render skipping, and SUM-sees-hidden
+  all came free.
+  - S.filter = {hr, c1, c2, r2, excl:{col:[values]}}. Ctrl+Shift+L arms
+    on the active row as header: columns expand left/right while header
+    cells are non-empty, body extent stops at the first blank row.
+    Toggling again clears everything. Arming from an empty cell is a
+    toast + no-op.
+  - Alt+↓ on an armed header opens a value-picker dialog in the ribbon
+    strip (chips modeled on the fontcolor picker): ←/→ walk, space
+    toggles keep/drop, ↵ applies, Esc cancels without applying. Reopening
+    shows the column's current drops. Ribbon route: Alt A T (Data →
+    Filter). Every armed header renders a ▾ (bright when that column
+    excludes values).
+  - Chord conflict resolved by ORDER: the Macabacus profile claims
+    Ctrl+Shift+L first (Fast Fill Left, its documented default); native
+    (and FactSet) profiles get the Excel filter toggle.
+  - No SUBTOTAL function yet — the filter is a READING tool; SUMs see
+    hidden rows (parity-asserted). SUBTOTAL(9) stays queued in PIPELINE.
+- NEW DRILL filterpass "Work the filtered tape" (Data, 75 total): a
+  9-deal tape with Open/Closed/Dead statuses, shuffled + distinct sizes
+  per seed. Arm the filter, drop non-Open through the Status picker,
+  then TYPE the largest open size into the answer cell — the check
+  grades the read, not just the chord. Exactly-non-Open-hidden is graded
+  through S.hidden, so excluding by any column that isolates Open rows
+  also passes (no railroad). Alt: answer typed FIRST, armed via Alt A T
+  from a different header cell, chips swept right-to-left.
+- One smoke-harness lesson re-learned: synthetic keydowns are swallowed
+  by the landing overlay unless the harness sets the onboard/tour
+  localStorage flags (the standing harnesses all do; the new smoke
+  script initially didn't).
+- PARITY 53 -> 60 (section S: arm-from-middle-cell, ▾ markers, picker
+  open, exact hidden set, SUM-sees-hidden, clear, ribbon route).
+  ALTS 37 -> 38.
+- Par sweep flagged editfix 33 -> 39 on its 5-seed sample; the 21-seed
+  median is exactly 33 (range 15-47 — the typo pool is the variance).
+  No retune; the r172 big-sample rule catches another false flag.
+  filterpass parKeys 14 measured clean on the same sweep.

@@ -290,6 +290,37 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(r1.reopened, 'Alt A J from the summary row reopens the fold');
   ok(r1.ungrouped, 'Shift+Alt+LEFT ungroups');
 
+  console.log('S. AutoFilter (r180)');
+  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('filterpass'); });
+  const s1 = await run(() => {
+    const o = CHALLENGES.filterpass._o;
+    setDemoSel('B3'); demoKey({key:'L', ctrl:true, shift:true});
+    const armed = !!S.filter && S.filter.hr === 3 && S.filter.c1 === 1 && S.filter.c2 === 3;   // header block found from a MIDDLE cell
+    const markers = document.querySelectorAll('.fltbtn').length === 3;
+    setDemoSel('C3'); demoKey({key:'ArrowDown', alt:true});
+    const open = mode === 'ribbon' && dialog === 'filter' && filterVals.length === 3;
+    filterVals.forEach((x, i) => { if (x.v !== 'Open') { filterIdx = i; demoKey({key:' '}); } });
+    demoKey({key:'Enter'});
+    const nonOpen = o.rows.filter(x => x.st !== 'Open').map(x => x.r);
+    const hidOk = nonOpen.every(r => S.hidden.has(r)) && S.hidden.size === nonOpen.length;
+    S.cells['E1'] = { ...blankCell(), formula: '=SUM(B4:B12)' }; recalc();
+    let t = 0; for (let r = 4; r <= 12; r++) t += S.cells['B' + r].value;
+    const sumOk = Math.abs(S.cells['E1'].value - t) < 0.5;                     // SUM sees hidden rows (no SUBTOTAL yet)
+    demoKey({key:'L', ctrl:true, shift:true});
+    const cleared = !S.filter && S.hidden.size === 0 && document.querySelectorAll('.fltbtn').length === 0;
+    setDemoSel('A3'); demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'t'});
+    const viaRibbon = !!S.filter && mode === 'normal';
+    demoKey({key:'L', ctrl:true, shift:true});
+    return { armed, markers, open, hidOk, sumOk, cleared, viaRibbon };
+  });
+  ok(s1.armed, 'Ctrl+Shift+L arms across the contiguous header block');
+  ok(s1.markers, 'every armed header wears a \u25be');
+  ok(s1.open, 'Alt+\u2193 on an armed header opens the value picker');
+  ok(s1.hidOk, 'excluded values hide EXACTLY their rows', JSON.stringify(s1));
+  ok(s1.sumOk, 'SUM still sees filtered-out rows');
+  ok(s1.cleared, 'Ctrl+Shift+L again clears filter, rows, markers');
+  ok(s1.viaRibbon, 'Alt A T is the ribbon route to the same toggle');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

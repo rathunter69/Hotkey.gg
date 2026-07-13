@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=157" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=157">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=157">
+<link rel="icon" href="favicon.ico?v=158" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=158">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=158">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -248,6 +248,14 @@
     vertical-align:middle; margin:0 1px; transition:.1s; cursor:pointer}
   .ribbon .fc-swatch.on{border-color:var(--accent); outline:2px solid var(--accent-glow); transform:scale(1.18)}
   .ribbon .fc-name{color:var(--accent); font-family:var(--mono); font-size:11.5px; margin:0 8px 0 4px; min-width:54px}
+  /* AutoFilter (r180): value chips in the ribbon picker + \u25be markers on armed header cells */
+  .ribbon .fl-chip{display:inline-block; padding:1px 7px; margin:0 2px; border-radius:4px; border:1px solid var(--line);
+    font-family:var(--mono); font-size:12px; vertical-align:middle}
+  .ribbon .fl-chip.cur{border-color:var(--accent); outline:2px solid var(--accent-glow)}
+  .ribbon .fl-chip.drop{opacity:.45; text-decoration:line-through}
+  .fltbtn{float:right; font-size:9px; line-height:1.6; opacity:.55; border:1px solid var(--line); border-radius:2px;
+    padding:0 2px; margin-left:4px; font-family:var(--mono)}
+  .fltbtn.on{opacity:1; color:var(--accent); border-color:var(--accent)}
 
   .pd-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none;
     align-items:center; justify-content:center; z-index:50}
@@ -1126,14 +1134,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=157"></script>
-<link rel="stylesheet" href="nav.css?v=157">
-<script src="themes.js?v=157"></script>
+<script src="drills.js?v=158"></script>
+<link rel="stylesheet" href="nav.css?v=158">
+<script src="themes.js?v=158"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=157"></script>
+<script src="nav.js?v=158"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2399,6 +2407,64 @@ const CHALLENGES = {
         {label:'group each quarter’s months — three groups, exactly the detail rows, shift+alt+→', ok: o.blocks.every(covered) && gs.length===3},
         {label:'fold all three away — alt a h; the ⊞ marks where the detail lives', ok: o.blocks.every(folded)},
         {label:'keep the subtotals ON the page — visible, and their SUMs still breathe', ok: subsOk},
+      ];
+    }
+  },
+  filterpass:{
+    name:'Filter', label:'Work the filtered tape', par:60, parKeys:14,
+    aha:'ctrl+shift+L arms the tape, alt+\u2193 works the picker \u2014 hide the noise and the answer reads itself',
+    prompt:'A live deal tape, three statuses deep. The VP wants ONE number: the largest OPEN deal still on the tape. Arm the AutoFilter on the header row (Ctrl+Shift+L), open the Status picker (Alt+\u2193), drop everything that is not Open, and the answer reads straight off the visible rows \u2014 type it where the tape asks.',
+    req(){ const o=this._o; return '<em>ctrl+shift+L</em> on row 3 arms the \u25be \u00b7 <em>alt+\u2193</em> on Status \u2192 <em>space</em> drops Closed/Dead \u2192 <em>\u21b5</em> \u00b7 type the largest visible Size into <em>B'+o.ansR+'</em>'; },
+    guide(){ const o=this._o; return [
+      'put the cursor anywhere on row 3 (the header) \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> \u2014 \u25be pickers arm across the whole header block',
+      'get to C3 (Status) \u00b7 <kbd>alt</kbd>+<kbd>\u2193</kbd> opens the picker \u00b7 <kbd>\u2190</kbd><kbd>\u2192</kbd> walk the values, <kbd>space</kbd> drops one, <kbd>\u21b5</kbd> applies \u2014 keep only Open',
+      'the tape is now all Open \u2014 the largest Size sits in plain sight; type it into B'+o.ansR+' and <kbd>\u21b5</kbd> (ctrl+shift+L again would clear the filter)',
+    ]; },
+    targets(){ const o=this._o; return ['A3:C3','C3','B'+o.ansR]; },
+    demo(){ const o=this._o;
+      const pk=[{key:'ArrowDown',alt:true}];
+      o.chips.forEach((v,i)=>{ if(v!=='Open') pk.push({key:' '}); if(i<o.chips.length-1) pk.push({key:'ArrowRight'}); });
+      pk.push(Kb.enter);
+      return [
+        {sel:'C3', keys:[{key:'l',ctrl:true,shift:true}]},
+        {sel:'C3', keys:pk},
+        {sel:'B'+o.ansR, keys:[...T(String(o.maxOpen)), Kb.enter]},
+      ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 live deal tape',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Deal',txt:true,bold:true};
+      cells['B3']={...blankCell(),value:'Size ($M)',txt:true,bold:true,align:'r'};
+      cells['C3']={...blankCell(),value:'Status',txt:true,bold:true};
+      const NAMES=['Project Anchor','Project Bengal','Project Comet','Project Dune','Project Ember','Project Falcon','Project Grove','Project Harbor','Project Indigo'];
+      const st=['Open','Open','Open','Open','Closed','Closed','Closed','Dead','Dead'];
+      for(let k2=st.length-1;k2>0;k2--){ const j=rnd(0,k2); [st[k2],st[j]]=[st[j],st[k2]]; }
+      // distinct sizes so "the largest open" is one unambiguous number
+      const sizes=[]; while(sizes.length<9){ const v=rnd(8,96)*5; if(sizes.indexOf(v)<0) sizes.push(v); }
+      const rows=[]; let maxOpen=0;
+      for(let i=0;i<9;i++){ const r=4+i;
+        cells['A'+r]={...blankCell(),value:NAMES[i],txt:true};
+        cells['B'+r]={...blankCell(),value:sizes[i],fmtStyle:'comma',decimals:0};
+        cells['C'+r]={...blankCell(),value:st[i],txt:true};
+        if(st[i]==='Open'&&sizes[i]>maxOpen) maxOpen=sizes[i];
+        rows.push({r, st:st[i]});
+      }
+      const ansR=14;
+      cells['A'+ansR]={...blankCell(),value:'Largest OPEN deal ($M):',txt:true,bold:true};
+      const chips=[]; st.forEach(v=>{ if(chips.indexOf(v)<0) chips.push(v); });
+      this._o={rows, maxOpen, ansR, chips};
+      return {ROWS:16, cells, active:{r:3,c:3}, sel:null, colW:{1:130,2:96,3:96}};
+    },
+    checks(S){
+      const o=this._o;
+      const f=S.filter;
+      const armed=!!(f && f.hr===3 && f.c1<=1 && f.c2>=3);
+      const hidOk=o.rows.every(x=> x.st==='Open' ? !(S.hidden&&S.hidden.has(x.r)) : !!(S.hidden&&S.hidden.has(x.r)) );
+      const a=S.cells['B'+o.ansR];
+      return [
+        {label:'arm the AutoFilter on the header row \u2014 ctrl+shift+L with the cursor on row 3', ok: armed},
+        {label:'drop Closed and Dead through the Status picker \u2014 alt+\u2193 on C3, space, \u21b5; only Open rows stay', ok: armed && hidOk},
+        {label:'type the largest OPEN size into B'+o.ansR+' \u2014 read it straight off the filtered tape', ok: !!(a && Math.abs((+a.value||0)-o.maxOpen)<0.5)},
       ];
     }
   },
@@ -6423,6 +6489,11 @@ function render(){
         const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals).length*CHARPX+12;
         if(tw>__ew[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(__ew[c]/8))); }
       }
+      // r180: AutoFilter \u25be on every armed header cell (filled/bright when that column excludes values)
+      if(S.filter && r===S.filter.hr && c>=S.filter.c1 && c<=S.filter.c2 && !(editing&&isActive)){
+        const fx=S.filter.excl[c]&&S.filter.excl[c].length;
+        txt+='<span class="fltbtn'+(fx?' on':'')+'">\u25be</span>';
+      }
       // Ref color overlay: when this cell is referenced by the active formula, outline it in that ref's color.
       // Skip the active cell itself (would conflict with the active outline) and the pointer cell (point class wins).
       const refKey = colLetter(c)+r;
@@ -6549,7 +6620,7 @@ const MENUS = {
   'HFI':[['S','Series…'],['D','Down'],['R','Right']],
   'M':  [['U','Σ AutoSum']],
   'MU': [['S','Sum']],
-  'A':  [['S','Sort'],['H','Hide detail'],['J','Show detail']],
+  'A':  [['S','Sort'],['T','Filter'],['H','Hide detail'],['J','Show detail']],
   'AS': [['A','Sort A→Z'],['D','Sort Z→A']],
   'E':  [['S','Paste special…']],
 };
@@ -6626,6 +6697,16 @@ function __drawRibbon(){
     html += `<span class="fc-name">${FONT_SWATCHES[fontColorIdx].name}</span>`;
     html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
     el.innerHTML = html; return;   /* r85: __altFooter was out-of-scope (guided renderer's const) — the crash that "broke the ribbon" */
+  }
+  if(dialog==='filter'){
+    el.className='ribbon show';
+    let html='<span class="path">filter: '+colLetter(filterCol)+' \u2192</span>';
+    filterVals.forEach((x,i)=>{
+      const label=String(x.v).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      html+='<span class="fl-chip'+(i===filterIdx?' cur':'')+(x.on?'':' drop')+'">'+(x.on?'\u2611':'\u2610')+' '+label+'</span>';
+    });
+    html+='<span class="opt">\u2190 \u2192 pick \u00b7 space keep/drop \u00b7 \u21b5 apply \u00b7 esc cancel</span>';
+    el.innerHTML=html; return;
   }
   if(dialog==='series'){
     el.className='ribbon show';
@@ -7567,6 +7648,11 @@ function applyRibbon(key){
     if(key==='ENTER'){ doPaste(pasteKind||'all'); exitRibbon(true); return; }
     return;
   }
+  // filter picker — arrows/space handled in keydown; ENTER applies the kept set
+  if(dialog==='filter'){
+    if(key==='ENTER'){ pushUndo(); applyFilterPicker(); return; }
+    return;
+  }
   // font color picker dialog — arrow keys handled in keydown; ENTER commits, letter keys ignored
   if(dialog==='fontcolor'){
     if(key==='ENTER'){
@@ -7628,6 +7714,7 @@ function applyRibbon(key){
     }
     return exitRibbon(true);
   }
+  if(np==='AT'){ pushUndo(); toggleFilter(); return exitRibbon(true); }   // r180: Data \u2192 Filter, the ribbon route for ctrl+shift+L
   if(np==='AH'){ pushUndo(); setDetail(false); return exitRibbon(true); }
   if(np==='AJ'){ pushUndo(); setDetail(true);  return exitRibbon(true); }
   if(np==='HOI'){ pushUndo(); autofitCols(); return exitRibbon(true); }
@@ -7775,6 +7862,13 @@ function jumpDependent(){
 function syncHidden(){
   S.hidden = new Set();
   (S.rowGroups||[]).forEach(g=>{ if(g.collapsed) for(let r=g.r1;r<=g.r2;r++) S.hidden.add(r); });
+  // r180: AutoFilter exclusions ride the same substrate — a row hides when ANY
+  // filtered column's value is on that column's excluded list. SUMs still see it.
+  const f=S.filter;
+  if(f){ for(let r=f.hr+1;r<=f.r2;r++){
+    for(let c=f.c1;c<=f.c2;c++){ const ex=f.excl[c]; if(!ex||!ex.length) continue;
+      const cell=get(r,c), v=String(cell&&cell.value!==null&&cell.value!==undefined?cell.value:'');
+      if(ex.indexOf(v)>=0){ S.hidden.add(r); break; } } } }
 }
 function rowHidden(r){ return !!(S.hidden && S.hidden.has(r)); }
 function groupRows(){
@@ -7802,6 +7896,45 @@ function setDetail(show){
   if(rowHidden(S.active.r)){ let nr=S.active.r; while(nr<=S.ROWS&&rowHidden(nr)) nr++;
     if(nr>S.ROWS){ nr=S.active.r; while(nr>=1&&rowHidden(nr)) nr--; }
     S.sel=null; S.active={r:Math.max(1,Math.min(S.ROWS,nr)), c:S.active.c}; }
+}
+/* r180 AUTOFILTER — Ctrl+Shift+L on a header row arms \u25be pickers across the
+   contiguous header block; Alt+\u2193 on an armed header opens a value picker;
+   excluded values hide their rows through the SAME hidden-rows substrate as
+   grouping. No SUBTOTAL in this engine yet, so SUMs see hidden rows — the
+   filter is a READING tool, exactly like a real screen of a deal tape. */
+function toggleFilter(){
+  if(S.filter){ S.filter=null; syncHidden(); render(); return; }
+  const hr=S.active.r;
+  const ne=c=>{ const x=get(hr,c); return x && x.value!==null && x.value!==''; };
+  if(!ne(S.active.c)){ showToast('put the cursor on a header cell first'); return; }
+  let c1=S.active.c, c2=S.active.c;
+  while(c1>1 && ne(c1-1)) c1--;
+  while(c2<COLS && ne(c2+1)) c2++;
+  let r2=hr;
+  for(let r=hr+1;r<=S.ROWS;r++){ let any=false;
+    for(let c=c1;c<=c2;c++){ const x=get(r,c); if(x&&x.value!==null&&x.value!==''){ any=true; break; } }
+    if(!any) break; r2=r; }
+  S.filter={hr, c1, c2, r2, excl:{}};
+  syncHidden(); render();
+}
+let filterCol=0, filterIdx=0, filterVals=[];
+function openFilterPicker(c){
+  const f=S.filter; if(!f) return;
+  filterCol=c; filterIdx=0; filterVals=[];
+  const seen=new Set(), ex=f.excl[c]||[];
+  for(let r=f.hr+1;r<=f.r2;r++){ const cell=get(r,c);
+    const v=String(cell&&cell.value!==null&&cell.value!==undefined?cell.value:'');
+    if(v==='' || seen.has(v)) continue; seen.add(v);
+    filterVals.push({v, on: ex.indexOf(v)<0}); }
+  if(!filterVals.length) return;
+  mode='ribbon'; path=[]; dialog='filter'; ribbonNote=''; drawRibbon();
+}
+function applyFilterPicker(){
+  const f=S.filter; if(!f) return exitRibbon(false);
+  const off=filterVals.filter(x=>!x.on).map(x=>x.v);
+  if(off.length) f.excl[filterCol]=off; else delete f.excl[filterCol];
+  syncHidden();
+  exitRibbon(true);
 }
 function selectRow(){
   // Excel parity: Shift+Space extends the selection to full width WHILE preserving the row range.
@@ -8175,6 +8308,14 @@ document.addEventListener('keydown',e=>{
       if(k==='ArrowUp'||k==='ArrowLeft'){ logKey('\u2191'); const i=PASTE_OPTS.findIndex(o=>o[2]===(pasteKind||'all'));
         pasteKind=PASTE_OPTS[(i-1+PASTE_OPTS.length)%PASTE_OPTS.length][2]; drawRibbon(); return; }
     }
+    // filter value picker: \u2190/\u2192 walk the chips, space toggles keep/drop, Enter applies
+    if(dialog==='filter'){
+      if(k==='ArrowLeft'){  logKey('\u2190'); filterIdx=(filterIdx-1+filterVals.length)%filterVals.length; drawRibbon(); return; }
+      if(k==='ArrowRight'){ logKey('\u2192'); filterIdx=(filterIdx+1)%filterVals.length; drawRibbon(); return; }
+      if(k===' '){ logKey('space'); filterVals[filterIdx].on=!filterVals[filterIdx].on; drawRibbon(); return; }
+      if(k==='Enter'){ logKey('\u21b5'); applyRibbon('ENTER'); return; }
+      return;
+    }
     // font color picker: arrow keys cycle swatches, Enter commits, anything else (except Esc) ignored
     if(dialog==='fontcolor'){
       if(k==='ArrowLeft'){  logKey('←'); fontColorIdx=(fontColorIdx-1+FONT_SWATCHES.length)%FONT_SWATCHES.length; drawRibbon(); return; }
@@ -8233,6 +8374,10 @@ document.addEventListener('keydown',e=>{
     logKey(k==='ArrowRight'?'Shift+Alt+\u2192':'Shift+Alt+\u2190');
     pushUndo(); if(k==='ArrowRight') groupRows(); else ungroupRows();
     commitAction(); return;
+  }
+  if(e.altKey && !e.shiftKey && !(e.ctrlKey||e.metaKey) && k==='ArrowDown' && !editing && mode!=='ribbon'
+     && S.filter && S.active.r===S.filter.hr && S.active.c>=S.filter.c1 && S.active.c<=S.filter.c2){
+    e.preventDefault(); startClock(); logKey('Alt+\u2193'); openFilterPicker(S.active.c); return;   // r180: Excel's dropdown chord, on the armed header only
   }
   if(k==='Alt'){ if(e.shiftKey) return;   // r179: Shift+Alt is the grouping chord's onramp, not the ribbon
     e.preventDefault(); logKey('Alt'); enterRibbon(); return; }
@@ -8305,6 +8450,7 @@ document.addEventListener('keydown',e=>{
     if(keyProfile==='macabacus' && e.altKey && e.shiftKey && (e.key==='5'||e.key==='%')){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+5'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=1;}); commitAction(); return; }
     if(keyProfile==='factset' && e.altKey && !e.shiftKey && lk==='e'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+E'); autoColor('sel'); return; }
     if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='l'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+L'); smartFill('left'); return; }
+    if(!e.altKey && e.shiftKey && lk==='l'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+L'); pushUndo(); toggleFilter(); commitAction(); return; }   // r180: native AutoFilter toggle (the Macabacus profile claims this chord above for fill-left)
     if(keyProfile==='macabacus' && e.altKey && !e.shiftKey && lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+A'); autoColor('sel'); return; }
     if(keyProfile==='macabacus' && e.altKey && !e.shiftKey && lk==='s'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+S'); autoColor('sheet'); return; }
     if(keyProfile==='factset' && e.altKey && e.shiftKey){

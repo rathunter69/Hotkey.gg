@@ -175,6 +175,16 @@ const ALTS = [
       steps.push({sel:'A'+b0.sub, keys:[{key:'Alt'},L('a'),L('j')]});   // reopen from the summary row
       steps.push({sel:'A'+b0.r1, keys:[{key:'Alt'},L('a'),L('h')]});    // fold it back
       return steps; }` },
+  { key: 'filterpass', name: 'answer typed FIRST, armed via ribbon (alt a t) from A3, chips swept right-to-left', moves: `C => { const o=C._o;
+      const pk=[{key:'ArrowDown',alt:true}];
+      for(let i=0;i<o.chips.length-1;i++) pk.push({key:'ArrowRight'});
+      for(let i=o.chips.length-1;i>=0;i--){ if(o.chips[i]!=='Open') pk.push({key:' '}); if(i>0) pk.push({key:'ArrowLeft'}); }
+      pk.push({key:'Enter'});
+      return [
+        {sel:'B'+o.ansR, keys:[...T(String(o.maxOpen)),{key:'Enter'}]},
+        {sel:'A3', keys:[{key:'Alt'},L('a'),L('t')]},
+        {sel:'C3', keys:pk},
+      ]; }` },
   { key: 'center', name: 'title centered ACROSS first, via alt o e', moves: `C => { const o=C._o; return [
       {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
       {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},

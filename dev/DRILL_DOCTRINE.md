@@ -166,12 +166,13 @@ finance Excel training drills, vs our coverage:
   tie-outs, roll-forwards, scenario IFs, INDEX/MATCH, SUMIF, sensitivity
   grids with mixed anchors, sign/stale-link/hardcode auditing.
 - **Named by the canon, missing here** (queued in PIPELINE.md): Go To Special
-  (F5 → constants/formulas/blanks — THE model-audit trick), trace
-  precedents/dependents as navigation (Ctrl+[ / Ctrl+]), Ctrl+1 Format Cells
-  + center-across-selection (the "never merge cells" rule), grouping
-  (Shift+Alt+→), filters (Ctrl+Shift+L), hide row/col (Ctrl+9/0),
-  Ctrl+' copy-formula-above, IFERROR wrapping, VLOOKUP (legacy but tested),
-  named ranges, multi-sheet nav (Ctrl+PgUp/Dn — engine is single-sheet).
+  (F5 → constants/formulas/blanks — THE model-audit trick), hide row/col
+  (Ctrl+9/0 — teach WITH the group-first caveat), Ctrl+' copy-formula-above,
+  VLOOKUP (legacy but tested), named ranges, multi-sheet nav (Ctrl+PgUp/Dn —
+  engine is single-sheet), SUBTOTAL(9) visible-aware math to pair with the
+  filter. LANDED since this sweep: trace jumps + IFERROR (r173), Ctrl+1
+  Format Cells + center-across (r177), grouping (r179), AutoFilter
+  Ctrl+Shift+L + Alt+↓ value picker + Alt A T (r180).
 - Desk habits worth prompting in stories: "tick list you can resume when
   interrupted" (ICAEW), values-only deck hand-offs, F5-special hardcode hunts
   before shipping, one-formula-fills-the-grid pride.
