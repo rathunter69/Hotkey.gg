@@ -13,8 +13,12 @@ hollow desk rate limit · claim-vs-domain-join deadlock) and re-verified
 65/65 (dev/SMOKE_REPORT.md). Seed codes SAFE TO DISTRIBUTE. HOUSE FACT:
 `supabase db push` is STATEFUL — applied migrations never re-run; restore
 consumed seeds/fixtures by re-shipping the insert under a NEW timestamp
-(smoke-u fixture pattern, migration 20260713000000). STILL OPEN (Wolf):
-rotate access token + DB password (pasted in chat — still open).
+(smoke-u fixture pattern, migration 20260713000000). Credentials rotated +
+verified green (r134). r134: onboarding de-beta'd (PRELAUNCH_LOCK = launch
+switch) · index's r13-era player card deleted (nav.js window.openProfile is
+THE card, now with the .pc-scroll inner-scroll it always claimed) · tour
+owns the keyboard · checklist autoscroll · favicon rebuilt (the .ico was a
+429-byte placeholder). Cache v119.
 .edu gate DECIDED r133 (incentive, not wall): gate-removal migration
 20260713100000 + signup-card carrot copy (auto-match school desk, student
 perks later). Branch auto-merge live per working agreement.
@@ -56,9 +60,15 @@ IB associate, restructuring) is founder; Claude is sole developer.
 - Static HTML/JS, no framework/build step. Supabase backend (anon auth + invite gate).
 - Project ref: vshtftzrlepedydmkcnm · URL: https://vshtftzrlepedydmkcnm.supabase.co
 - Anon key (publishable, client-safe): sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT
-- Invite code: HAGS (unlimited). BETA_MODE=true. Signup open to all emails
-  (r133 — the dashboard-era .edu-only gate was removed by migration; .edu is
-  an INCENTIVE: auto school-desk match + future student perks).
+- ACCESS (r134): PRELAUNCH_LOCK=true in index.html is THE LAUNCH SWITCH — a
+  device-once access-code curtain (code HAGS, localStorage hk_beta_ok) before
+  the landing. Behind it, onboarding is LAUNCH-FINAL: Enter -> play instantly
+  as guest (silent anon session; membership auto-redeems via rpc HAGS);
+  tour (input-blocked) -> tutorial prompt -> placement; accounts optional
+  (sign-in / save-your-progress). The old in-landing beta gate is DELETED.
+  Launch = flip PRELAUNCH_LOCK to false. BETA_MODE now ONLY unlocks PRO.
+  Signup open to all emails (r133; .edu = incentive: school-desk auto-match +
+  future student perks).
 - **Git workflow (NEW):** repo github.com/rathunter69/Hotkey.gg (public), GitHub Pages
   via CNAME → www.hotkey.gg. Claude clones per session (no persistent access); Wolf
   pastes a fine-grained token (Contents: R/W, this repo only) when Claude should push.

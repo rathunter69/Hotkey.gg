@@ -528,6 +528,9 @@
     m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-head"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px">' + escHtml(handle) + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
+      /* r134: .pc-scroll wrapper — the v3 CSS (max-height 82vh + inner scroll) existed
+         but the renderer never emitted it, so long cards overflowed the frame */
+      '<div class="pc-scroll">' +
       /* r70: RANK HERO — the crest gets real estate */
       /* r72: rank + LEVEL live together — crest left, tier center, level+progress right */
         /* r76: APEX-STYLE SHOWCASE — handle banner on top, two prominent circulars
@@ -560,6 +563,7 @@
         '</div>';
       })() +
       /* r70: drill-by-drill list retired from the card — stats page carries it */
+      '</div>' +
       '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;
@@ -668,6 +672,8 @@
     return (a+'_'+b+num).slice(0,24);
   };
   window.navRefreshAuth = function(){ try{ if(window.__navAuthKick) window.__navAuthKick(); }catch(e){} };
+  // r134: THE player card (index's r13-era inline copy deleted — this is the only renderer)
+  window.openProfile = openProfile;
   document.addEventListener('keydown', e => {
     const onTrainer = window.NAV_ACTIVE === 'trainer';
     if(e.key === 'Escape'){

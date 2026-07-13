@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=118" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=118">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=118">
+<link rel="icon" href="favicon.ico?v=119" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=119">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=119">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -304,6 +304,9 @@
   #prefsBtn{font-size:15px}
   .mb-tool:hover{border-color:var(--line)}
   #streakBadge,#lvlBadge,#proBadge{border-color:var(--line)}
+  /* r134: the xp bar floated above the text baseline — flex centers it with the label */
+  #lvlBadge{display:inline-flex !important; align-items:center; gap:7px}
+  #lvlBadge .lvl-bar{margin-left:0; vertical-align:initial}
 
   #hkToast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(8px);
     background:var(--surface2); color:var(--text); border:1px solid var(--accent-dim);
@@ -995,9 +998,6 @@
     background:rgba(11,12,13,.66); backdrop-filter:blur(5px); padding:28px; overflow-y:auto;
     transition:opacity .55s ease, visibility .55s}
   .landing.gone{opacity:0; visibility:hidden; pointer-events:none}
-  .landing-gate{display:none; margin-top:22px; text-align:left; max-width:340px}
-  .landing.gated .landing-gate{display:block}
-  .landing.gated .landing-cta, .landing.gated #landingMicro{display:none}
   /* r65: the landing is a DIALOG over the game now — frame language, not a splash page */
   .landing{background:rgba(20,21,26,.55); backdrop-filter:blur(4px)}
   .landing .landing-inner{background:var(--surface); border:1px solid var(--line); border-radius:12px;
@@ -1006,7 +1006,7 @@
     background:var(--surface2); border-bottom:1px solid var(--line);
     font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
   .landing .lbrand b{color:var(--accent)}
-  .landing .eyebrow, .landing h1, .landing .lede, .landing .landing-cta, .landing .landing-gate, .landing #landingMicro{
+  .landing .eyebrow, .landing h1, .landing .lede, .landing .landing-cta, .landing #landingMicro{
     margin-left:26px; margin-right:26px}
   .landing h1{font-size:23px}
   .landing .lede{font-size:14px}
@@ -1033,11 +1033,6 @@
     font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase;
     color:var(--muted)}   /* r101: returning-user strip — mg-cap language, accent-tinted */
   #wbStrip b{color:var(--accent); text-transform:none; letter-spacing:0}
-  .lg-title{font-family:var(--mono); font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); margin-bottom:10px}
-  .landing-gate input{width:100%; background:var(--surface); border:1px solid var(--line); border-radius:9px;
-    color:var(--text); font-family:var(--mono); font-size:13.5px; padding:11px 14px; margin-bottom:8px; outline:none}
-  .landing-gate input:focus{border-color:var(--accent-dim)}
-  .lg-go{margin-top:4px; width:100%}
   html.hk-returning .landing{display:none}    /* returning user (onboarded): skip the marketing landing */
   .landing-inner{max-width:600px; width:100%}
   .landing .lbrand{font-family:var(--mono); font-weight:700; font-size:17px; letter-spacing:-.5px; margin-bottom:34px}
@@ -1081,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=118"></script>
-<link rel="stylesheet" href="nav.css?v=118">
-<script src="themes.js?v=118"></script>
+<script src="drills.js?v=119"></script>
+<link rel="stylesheet" href="nav.css?v=119">
+<script src="themes.js?v=119"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=118"></script>
+<script src="nav.js?v=119"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1247,13 +1242,6 @@
       </span>
     </div>
     <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · everything keyboard</span></div>
-    <div class="landing-gate" id="landingGate">
-      <div class="lg-title">Invite-only beta</div>
-      <input id="betaCode" type="text" placeholder="access code" autocomplete="off" autocapitalize="characters" spellcheck="false">
-      <input id="betaHandle" type="text" placeholder="display name (shows on the boards)" autocomplete="off" maxlength="20">
-      <button class="start-btn lg-go" id="betaGo">Enter →</button>
-      <div class="auth-msg" id="betaMsg" style="min-height:16px"></div>
-    </div>
     <div class="micro" style="margin-top:14px">Been here before? <a id="landingSignin" style="color:var(--accent);cursor:pointer;border-bottom:1px solid var(--accent-dim)">Sign in</a> to pick up your rank, level, and boards.</div>
   </div>
 </div>
@@ -1269,9 +1257,13 @@
    ============================================================ */
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
-const BETA_MODE         = true; // ← access-code-only sign-up for the beta. Flip to false for full email/password auth.
-const REQUIRE_INVITE    = true; // ← flip to false to drop the access code: the field hides and entry auto-redeems.
-const INVITE_AUTO_CODE  = 'HAGS'; // used when REQUIRE_INVITE is false (auto-redeem keeps the members table consistent)
+const BETA_MODE         = true; // PRO stays unlocked during beta (isPro) — no longer gates entry (r134)
+/* r134: THE LAUNCH SWITCH. Onboarding is launch-final (play first, account whenever).
+   While true, a one-time access-code curtain stands in front of the landing
+   (localStorage hk_beta_ok remembers the device; signing in also passes).
+   Launch day = flip this ONE flag to false. Nothing else changes. */
+const PRELAUNCH_LOCK    = true;
+const INVITE_AUTO_CODE  = 'HAGS'; // silently redeemed for every session — keeps the members table consistent
 window.NAV_ACTIVE='trainer';
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -5519,8 +5511,17 @@ function updateChecklist(){
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
-  html+=`<div class="cl-esc">stuck or off the rails? <kbd>esc</kbd> restarts the drill</div>`;
+  html+=`<div class="cl-esc">stuck or off the rails? <kbd>shift+f11</kbd> restarts the drill</div>`;
   el.innerHTML=html;
+  // r134: AUTOSCROLL — long checklists scroll inside .cl-body; keep the next failing
+  // task in view (scoped scrollTop math, never scrollIntoView — that can jiggle the page)
+  try{
+    const bodyEl=el.querySelector('.cl-body'), nx=el.querySelector('.cl-item.next');
+    if(bodyEl && nx && bodyEl.scrollHeight>bodyEl.clientHeight+4){
+      const target = nx.offsetTop - Math.max(0,(bodyEl.clientHeight-nx.offsetHeight)/2);
+      bodyEl.scrollTop = Math.max(0, Math.min(target, bodyEl.scrollHeight-bodyEl.clientHeight));
+    }
+  }catch(e){}
 }
 // engine-live chord equivalences — appended per guide step so nobody gets pigeonholed.
 // ONLY verified pairs (both sides live in ribbonExec/chord handlers). Max two notes per step.
@@ -5848,6 +5849,12 @@ document.addEventListener('keydown',e=>{
   }
   // during the demo, ignore real user input (synthetic demo keys are not trusted, so they pass)
   if(demoPlaying && e.isTrusted){ e.preventDefault(); if(k==='Escape') cancelDemo(); return; }
+  // r134: the TOUR owns the keyboard. This guard used to sit BELOW the picker/marathon/
+  // type-to-replace branches, so printable keys started edits mid-tour (Wolf: "it still
+  // lets me type during the tour"). It must run before every game branch.
+  if(__tourI>=0){ e.preventDefault();
+    if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourShow(TOUR_STEPS.length); }
+    return; }
   // while the sign-in modal is open, the trainer ignores keys (esc closes it)
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
   if(gateOpen){ return; }
@@ -5861,7 +5868,6 @@ document.addEventListener('keydown',e=>{
   // mode launcher open
   if(modesOpen){ e.preventDefault(); if(k==='Escape') closeModes(); return; }
   // career card open
-  if(profileOpen){ e.preventDefault(); if(k==='Escape') closeProfile(); return; }
   // themes picker open
   if(themesOpen){ e.preventDefault(); if(k==='Escape') closeThemes(); return; }
   // shortcuts overlay open — ? or Esc closes
@@ -6052,9 +6058,6 @@ document.addEventListener('keydown',e=>{
     e.preventDefault(); return;
   }
   // SHIFT+F11 restarts the run (Excel: "insert new sheet" — fresh start). ESC no longer restarts.
-  if(__tourI>=0){ e.preventDefault();
-    if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourShow(TOUR_STEPS.length); }
-    return; }
   if(k==='F11' && e.shiftKey){ e.preventDefault(); loadChallenge(cur); return; }
   // ESC only backs out of the ribbon now (matches Excel; frees Esc for normal use)
   if(k==='Escape' && mode==='ribbon'){ e.preventDefault(); exitRibbon(false); return; }   // normal-mode Esc falls through to marquee-cancel / restart below
@@ -7346,98 +7349,12 @@ function renderSessionGraph(splits){
 }
 
 /* ============================================================
-   CAREER CARD — your bests + where you rank vs the field
+   CAREER CARD — r134: the r13-era inline card (openProfile/loadProfileData/
+   renderProfile) is DELETED. nav.js owns THE card (window.openProfile, Apex
+   hero + achievements + inner scroll). r64 rule: no inlined copies of shared
+   renderers — this one had drifted seven generations behind and was still
+   reachable from the game page (user menu + deep links).
    ============================================================ */
-let profileOpen=false;
-function closeProfile(){ profileOpen=false; const m=$('profileModal'); if(m) m.classList.remove('show'); }
-function wireProfileClose(m){ const c=m.querySelector('#pcClose'); if(c) c.onclick=closeProfile;
-  m.addEventListener('click', e=>{ if(e.target===m) closeProfile(); }, {once:true}); }
-async function openProfile(){
-  const m=$('profileModal'); if(!m) return;
-  profileOpen=true; m.classList.add('show');
-  if(!sb || !me_user){
-    m.innerHTML='<div class="pc-card"><div class="pc-msg">Sign in with your school email to see your card and where you rank against the field.</div>'+
-      '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
-    wireProfileClose(m); return;
-  }
-  m.innerHTML='<div class="pc-card"><div class="pc-loading">loading your card…</div></div>';
-  try{ const data=await loadProfileData(); renderProfile(m, data); }
-  catch(e){
-    m.innerHTML='<div class="pc-card"><div class="pc-msg">Couldn’t load the rankings right now — check your connection and try again.</div>'+
-      '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
-    wireProfileClose(m);
-  }
-}
-async function loadProfileData(){
-  const p=await sb.from('profiles').select('id,handle');
-  const r=await sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true});
-  const profs=p.data||[], runs=r.data||[];
-  const names={}; profs.forEach(x=>names[x.id]=x.handle||'anon');
-  const per={}; MENU_ORDER.forEach(k=>per[k]=[]);
-  const seen={};
-  runs.forEach(x=>{ if(per[x.challenge]===undefined) return;       // ascending → first seen per user is their best
-    const key=x.challenge+'|'+x.user_id; if(!seen[key]){ seen[key]=true; per[x.challenge].push(x); } });
-  const drills=MENU_ORDER.map(k=>{
-    const best=per[k], total=best.length;
-    const idx=best.findIndex(b=>b.user_id===me_user.id);
-    const mine=idx>=0?best[idx]:null;
-    return { key:k, label:(CHALLENGES[k]&&CHALLENGES[k].label)||k, group:GROUP_OF[k]||'',
-      total, rank:idx>=0?idx+1:null, time:mine?mine.time_ms:null, leader:total?best[0].time_ms:null,
-      pct: idx>=0 ? idx/total : null };           // 0 = top of field
-  });
-  const attempted=drills.filter(d=>d.rank!==null);
-  const avgPct=attempted.length ? attempted.reduce((a,d)=>a+d.pct,0)/attempted.length : null;
-  const firsts=attempted.filter(d=>d.rank===1).length;
-  const bestRank=attempted.length ? Math.min(...attempted.map(d=>d.rank)) : null;
-  const players=new Set(runs.map(r=>r.user_id)).size;
-  return { drills, attempted:attempted.length, avgPct, firsts, bestRank, players };
-}
-/* Tier assignment is intentionally punitive — Unranked is the default and the only way out is breadth + placement.
-   Without a minimum drill floor, the first person to touch a drill is #1 of 1 and tops the ladder. We require at least
-   5 drills attempted before any tier appears, and each rung above Summer Analyst compounds an attempted-drill threshold
-   onto a placement percentile. Second-Year Analyst demands both deep play (15+ drills) AND elite placement (top 5%) —
-   making it actually rare. The placement axis (avgPct) already averages this user's rank-percentage across drills
-   so a single fluke "#1 of 2" run can't carry the rest. The remaining edge case — a player who does 5 drills all
-   blazingly fast — caps at Silver here, since Gold needs 10+ drills. */
-function tierOf(avgPct, attemptedCount, wsum){
-  if(window.HK_RANK) return window.HK_RANK.tierOf(avgPct, attemptedCount, wsum);
-  return {name:'MBA Associate', cls:'tier-mba'};   // themes.js missing: show the floor, never a stale ladder
-}
-function renderProfile(m, d){
-  const tier=tierOf(d.avgPct, d.attempted, d.wsum);
-  // Standing is meaningless before the threshold — show progress toward Summer Analyst instead so the user knows what to do.
-  // After threshold, show "top X%" (the same average-percentile measure that feeds the tier).
-  const fmtMs=ms=>(ms/1000).toFixed(2)+'s';
-  const standing = (d.attempted < 5)
-    ? d.attempted+'/5 drills toward Summer Analyst'
-    : (d.avgPct===null ? '—' : 'top '+Math.max(1,Math.round(d.avgPct*100))+'%');
-  let body='', lastG=null;
-  d.drills.forEach(x=>{
-    if(x.group!==lastG){ body+=`<div class="pc-grouphdr">${escHtml(x.group)}</div>`; lastG=x.group; }
-    if(x.rank===null){
-      body+=`<div class="pc-row untried"><span class="d-name">${escHtml(x.label)}</span><span class="d-rank">untried</span><span class="d-pct">—</span></div>`;
-    } else {
-      const pct = x.total>1 ? 'top '+Math.max(1,Math.round(x.rank/x.total*100))+'%' : 'only you so far';
-      const gap = (x.rank>1 && x.leader!=null) ? ' · +'+((x.time-x.leader)/1000).toFixed(2)+'s off #1' : (x.rank===1?' · you lead':'');
-      body+=`<div class="pc-row me${x.rank===1?' pc-rank1':''}"><span class="d-name">${escHtml(x.label)} · <b>${fmtMs(x.time)}</b></span>`+
-        `<span class="d-rank">#${x.rank} of ${x.total}</span><span class="d-pct">${pct}${gap}</span></div>`;
-    }
-  });
-  m.innerHTML=`<div class="pc-card">`+
-    `<div class="pc-head"><div class="pc-name">${escHtml(me_handle||'set a name')}</div><div class="pc-tier ${tier.cls}">${tier.name}</div></div>`+
-    `<div class="pc-sub">${escHtml((me_user&&me_user.email)||'')} · ${d.attempted}/${MENU_ORDER.length} drills attempted · field of ${d.players} player${d.players===1?'':'s'}</div>`+
-    `<div class="pc-career">`+
-      `<div class="pc-cstat"><div class="v">${tier.name}</div><div class="l">career rank</div></div>`+
-      `<div class="pc-cstat"><div class="v">${d.bestRank?('#'+d.bestRank):'—'}</div><div class="l">best finish</div></div>`+
-      `<div class="pc-cstat"><div class="v">${d.firsts}</div><div class="l">#1 finishes</div></div>`+
-      `<div class="pc-cstat"><div class="v">${standing}</div><div class="l">avg standing</div></div>`+
-    `</div>`+
-    body+
-    `<div class="pc-foot"><a href="leaderboard.html">full leaderboard ↗</a><a id="pcClose">close</a></div>`+
-    `</div>`;
-  wireProfileClose(m);
-}
-
 /* ============================================================
    ACCOUNT SETTINGS — in-app password change (bypasses email reset).
    Uses sb.auth.updateUser({password}) which works on the already-signed-in session.
@@ -7786,6 +7703,10 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
   if(onboarded){ enterRequested = true; landingOpen = false; }
+  // r134: pre-launch curtain — new devices only (onboarded/session users pass free)
+  if(PRELAUNCH_LOCK && !onboarded){
+    try{ if(!localStorage.getItem('hk_beta_ok')) showPrelaunchLock(); }catch(e){}
+  }
   buildSheetTabs();
   // Resume where they left off: returning users land on their last drill, not the first one.
   let startKey = MENU_ORDER[0];
@@ -7930,6 +7851,8 @@ async function initAuth(){
 }
 async function onSession(session){
   if(arguments[0]){ window.__hkHasSession=true;
+    // r134: a session IS beta access — pass the curtain and close it if it's up
+    try{ localStorage.setItem('hk_beta_ok','1'); if(gateOpen) closeGate(); }catch(e){}
     // r76: a real account with membership but NO handle gets the prompt wherever it is
     // (the r71 version only fired while the landing was visible — Wolf still saw 'set a name')
     setTimeout(()=>{ try{ if(!isAnonUser() && me_member && !me_handle) promptHandle(); }catch(e){} }, 900);
@@ -8010,6 +7933,12 @@ async function onSession(session){
     try{
       const { data:mem } = await sb.from('members').select('user_id').eq('user_id', me_user.id).maybeSingle();
       me_member = !!mem;
+      if(!me_member){
+        // r134: the invite gate is retired — membership auto-redeems per session
+        // (server RPC keeps the members table consistent for RLS and boards)
+        try{ const {data:rd}=await sb.rpc('redeem_code',{p_code:INVITE_AUTO_CODE});
+          if(rd===true) me_member=true; }catch(e){}
+      }
     }catch(e){ me_member=false; }
   } else { me_handle=null; me_member=false; }
   refreshAuthUI();
@@ -8287,12 +8216,18 @@ async function saveHandle(){
   }catch(e){}
   refreshAuthUI(); closeAuth(); advanceAccess();
 }
-function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
+function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; }
+  // r134: cancelling sign-in at the curtain puts the curtain back (never mid-game)
+  try{ if(PRELAUNCH_LOCK && landingOpen && !me_user && !localStorage.getItem('hk_beta_ok')) showPrelaunchLock(); }catch(e){} }
 
 /* ---------- landing → app entry ---------- */
 function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone');
   if(pendingMode){ const mo=pendingMode; pendingMode=null; markOnboarded(); setTimeout(()=>openModes(mo), 640); return; }
-  maybeOnboard(); }
+  // r134: SEQUENCE, don't race — spotlight tour first (input-blocked), THEN the
+  // tutorial prompt. They used to fire on independent timers and overlap.
+  let tourDone=false; try{ tourDone=!!localStorage.getItem('hk_tour_done'); }catch(e){}
+  if(!tourDone){ __tourAfter=maybeOnboard; setTimeout(()=>tourShow(0), 700); }
+  else maybeOnboard(); }
 function tryEnter(){ enterRequested=true; if(!sb){ dismissLanding(); return; } advanceAccess(); }
 
 /* ---------- first-run guided intro ---------- */
@@ -8366,19 +8301,27 @@ async function introRibbonPeek(){
   loadChallenge(cur);                            // clean board for the user
 }
 
-/* ---------- access gate (invite code, enforced server-side) ---------- */
-function advanceAccess(){ try{ setTimeout(maybeStartTour, 900); }catch(e){}
-  if(!sb){ closeGate(); return; }
+/* ---------- entry (r134: friction-free — guests play instantly) ---------- */
+function advanceAccess(){
+  // r134: entry is FRICTION-FREE — Enter drops you on the sheet as a guest; accounts
+  // happen whenever (sign in / save-your-progress). The pre-launch curtain (if any)
+  // already ran at boot. The old beta gate that held the landing open is deleted.
+  if(!sb){ closeGate(); dismissLanding(); return; }
   if(!enterRequested){ return; }                       // hold at the landing until Start
-  if(BETA_MODE){
-    // beta: the gate lives INSIDE the landing card — one overlay, game ghosted behind
-    if(!me_user || !me_member || !me_handle){ showLandingGate(); return; }
-    closeGate(); dismissLanding(); handleDeepLink(); return;
-  }
-  if(!me_user){ openAuth(); return; }                  // full auth: email+password
-  if(!me_member){ showGate('code'); return; }          // then invite code
-  if(!me_handle){ closeGate(); promptHandle(); return; }
   closeGate(); dismissLanding(); handleDeepLink();
+  ensureGuestSession();                                 // silent, async, failure-safe
+}
+/* r134: guest sessions happen silently — the game never asks for a form to start.
+   Anon session + auto-redeem (onSession) keep uid continuity for the upgrade path
+   and the members table consistent. Failure is fine: the trainer runs offline. */
+let __guestBusy=false;
+async function ensureGuestSession(){
+  try{
+    if(!sb || me_user || __guestBusy || !sb.auth.signInAnonymously) return;
+    __guestBusy=true;
+    const { data } = await sb.auth.signInAnonymously();
+    if(data && data.user && !me_user) me_user = data.user;
+  }catch(e){} finally{ __guestBusy=false; }
 }
 // Deep-link helper — leaderboard/reference pages link here with ?openProfile=1 or ?openAuth=signup
 // to trigger the right modal once the user has cleared the gate. Reads the param, opens the modal,
@@ -8411,109 +8354,32 @@ function handleDeepLink(){
     }
   }catch(e){}
 }
-function showLandingGate(){
-  const l=$('landing');
-  if(!l || l.classList.contains('gone')){ showGate('beta'); return; }   // edge: landing already gone → old overlay
-  l.classList.add('gated');
-  if(!REQUIRE_INVITE){ const ci=$('betaCode'); if(ci) ci.style.display='none'; }
-  const first=$(REQUIRE_INVITE?'betaCode':'betaHandle'); if(first) setTimeout(()=>first.focus(),60);
-  const bg=$('betaGo'); if(bg && !bg._wired){ bg._wired=true; bg.onclick=submitBetaCode;
-    ['betaCode','betaHandle'].forEach(id=>{ const el=$(id); if(el) el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); submitBetaCode(); } }); }); }
-}
-function showGate(step){
+/* ---------- r134: PRE-LAUNCH CURTAIN — the only beta remnant ----------
+   The old in-landing gate (invite code + handle form: showLandingGate/showGate/
+   redeemCode/submitBetaCode) is DELETED. Membership is auto-redeemed per session
+   (onSession); guests play instantly; accounts are optional. This curtain is a
+   device-once access wall that disappears entirely when PRELAUNCH_LOCK=false. */
+function showPrelaunchLock(){
   const g=$('gate'); if(!g) return;
   gateOpen=true;
-  let inner;
-  if(step==='beta'){
-    inner='<div class="auth-card">'+
-      '<div class="gate-brand">hotkey<b>.gg</b></div>'+
-      '<h3>Invite-only beta</h3>'+
-      '<input id="betaCode" type="text" placeholder="access code" autocomplete="off" autocapitalize="characters" spellcheck="false">'+
-      '<input id="betaHandle" type="text" placeholder="display name" autocomplete="off" maxlength="20" style="margin-top:8px">'+
-      '<button class="auth-go" id="betaGo">Enter</button>'+
-      '<div class="auth-msg" id="betaMsg" style="min-height:15px; margin-top:9px"></div>'+
-      '</div>';
-  } else if(step==='signin'){
-    inner='<div class="auth-card">'+
-      '<div class="gate-brand">hotkey<b>.gg</b></div>'+
-      '<h3>Sign in</h3>'+
-      '<button class="auth-go" id="gateSignin">Sign in</button>'+
-      '</div>';
-  } else { // 'code'
-    inner='<div class="auth-card">'+
-      '<div class="gate-brand">hotkey<b>.gg</b></div>'+
-      '<h3>Invite code</h3>'+
-      '<p>Signed in as <b>'+escHtml((me_user&&me_user.email)||'')+'</b>.</p>'+
-      '<input id="gateCode" type="text" placeholder="invite code" autocomplete="off">'+
-      '<button class="auth-go" id="gateRedeem">Unlock</button>'+
-      '<div class="auth-msg" id="gateMsg" style="color:var(--bad); min-height:15px; margin-top:9px"></div>'+
-      '<div class="auth-x" id="gateOut">sign out</div>'+
-      '</div>';
-  }
-  g.innerHTML=inner; g.classList.add('show');
-  const bg=$('betaGo'); if(bg) bg.onclick=submitBetaCode;
-  const bc=$('betaCode'); if(bc){ bc.focus(); bc.onkeydown=e=>{ if(e.key==='Enter'){ const h=$('betaHandle'); if(h&&!h.value){ h.focus(); } else submitBetaCode(); } }; }
-  const bh=$('betaHandle'); if(bh){ bh.onkeydown=e=>{ if(e.key==='Enter') submitBetaCode(); }; }
-  const si=$('gateSignin'); if(si) si.onclick=openAuth;
-  const rd=$('gateRedeem'); if(rd) rd.onclick=redeemCode;
-  const ci=$('gateCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter') redeemCode(); }; }
-  const out=$('gateOut'); if(out) out.onclick=()=>{ try{ localStorage.removeItem('hk_handle_cache'); }catch(e){} sb.auth.signOut().finally(()=>location.reload()); };
+  g.innerHTML='<div class="auth-card">'+
+    '<div class="gate-brand">hotkey<b>.gg</b></div>'+
+    '<h3>Private beta</h3>'+
+    '<p>We\u2019re letting people in gradually \u2014 got a code?</p>'+
+    '<input id="lockCode" type="text" placeholder="access code" autocomplete="off" autocapitalize="characters" spellcheck="false">'+
+    '<button class="auth-go" id="lockGo">Enter</button>'+
+    '<div class="auth-msg" id="lockMsg" style="color:var(--bad); min-height:15px; margin-top:9px"></div>'+
+    '<div class="micro" style="margin-top:10px">Already have an account? <a id="lockSignin" style="color:var(--accent);cursor:pointer">Sign in</a></div>'+
+    '</div>';
+  g.classList.add('show');
+  const go=()=>{ const v=($('lockCode')?$('lockCode').value:'').trim().toUpperCase();
+    if(v===INVITE_AUTO_CODE.toUpperCase()){ try{ localStorage.setItem('hk_beta_ok','1'); }catch(e){} closeGate(); }
+    else { const m2=$('lockMsg'); if(m2) m2.textContent='That code didn\u2019t work. Check with whoever invited you.'; } };
+  const b=$('lockGo'); if(b) b.onclick=go;
+  const ci=$('lockCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } }; }
+  const si=$('lockSignin'); if(si) si.onclick=()=>{ closeGate(); openAuth('signin'); };
 }
 function closeGate(){ gateOpen=false; const g=$('gate'); if(g){ g.classList.remove('show'); g.innerHTML=''; } }
-async function redeemCode(){
-  const inp=$('gateCode'); if(!inp) return;
-  const code=inp.value.trim(); if(!code) return;
-  const msg=$('gateMsg'); if(msg) msg.textContent='';
-  try{
-    const { data, error } = await sb.rpc('redeem_code', { p_code: code });
-    if(!error && data===true){ me_member=true; advanceAccess(); }
-    else if(msg){ msg.textContent='That code didn\u2019t work. Check with whoever invited you.'; }
-  }catch(e){ if(msg) msg.textContent='Couldn\u2019t check the code right now \u2014 try again.'; }
-}
-
-async function submitBetaCode(){
-  const ci=$('betaCode'), hi=$('betaHandle'), msg=$('betaMsg');
-  if(!ci||!hi) return;
-  const code = REQUIRE_INVITE ? ci.value.trim() : (ci.value.trim() || INVITE_AUTO_CODE);
-  const handle=hi.value.trim();
-  const setMsg=(t,bad)=>{ if(msg){ msg.textContent=t; msg.style.color=bad?'var(--bad)':'var(--muted)'; } };
-  if(REQUIRE_INVITE && !code){ setMsg('Enter an access code.', true); ci.focus(); return; }
-  if(!handle){ setMsg('Pick a display name — this is what shows on the leaderboard.', true); hi.focus(); return; }
-  if(handle.length<2 || handle.length>20){ setMsg('Handle should be 2–20 characters.', true); return; }
-  setMsg('Checking…', false);
-  try{
-    // 1. anonymous sign-in if not already signed in
-    if(!me_user){
-      if(!sb.auth.signInAnonymously){ setMsg('Anonymous sign-in not supported by this Supabase client version.', true); return; }
-      const { data: signRes, error: signErr } = await sb.auth.signInAnonymously();
-      if(signErr){
-        if(/disabled|not enabled|not allowed/i.test(signErr.message||'')){
-          setMsg('Anonymous sign-in is disabled in this project. Enable it in Supabase → Authentication → Providers → Anonymous.', true);
-        } else setMsg('Sign-in failed: '+(signErr.message||'unknown error'), true);
-        return;
-      }
-      me_user = signRes && signRes.user ? signRes.user : null;
-      if(!me_user){
-        const { data:{ session } } = await sb.auth.getSession();
-        me_user = session ? session.user : null;
-      }
-      if(!me_user){ setMsg('Couldn\u2019t establish a session — try again.', true); return; }
-    }
-    // 2. redeem the invite code (server-side RPC enforces validity)
-    const { data: rdData, error: rdErr } = await sb.rpc('redeem_code', { p_code: code });
-    if(rdErr || rdData!==true){
-      setMsg('That code didn\u2019t work. Check with whoever invited you.', true); return;
-    }
-    me_member = true;
-    // 3. save handle to profiles (upsert by user id)
-    const { error: upErr } = await sb.from('profiles').upsert({ id: me_user.id, handle });
-      try{ (window.navRefreshAuth||function(){})(); }catch(e2){}   // r89: the nav learns your name the moment it exists
-    if(upErr){ setMsg('Couldn\u2019t save your handle: '+(upErr.message||''), true); return; }
-    me_handle = handle;
-    // 4. in
-    closeGate(); dismissLanding();
-  }catch(e){ setMsg('Something went wrong — try again.', true); }
-}
 
 // r80: lite local run ledger — feeds in-game achievement checks (server runs stay canonical)
 function logRunLite(t){
@@ -8582,11 +8448,12 @@ const TOUR_STEPS=[
   {sel:'#authSlot',   cap:'your card',     body:'Two ladders: <b>LEVEL</b> is your reps \u2014 every clean solve earns xp. <b>RANK</b> is the competition \u2014 how many drills you\u2019ve beaten and how fast, against everyone else. Crest, ring, and achievements live on your <b>player card</b>, right here.'},
   {sel:'.nav a[href*="leaderboard"]', cap:'the boards', body:'Clean, mouseless runs post to the <b>leaderboard</b> \u2014 per-drill boards, crowns for first place. The desk is watching.'},
 ];
-let __tourI=-1;
+let __tourI=-1, __tourAfter=null;
 function tourShow(i){
   const w=$('tourWrap'), ring=$('tourRing'), card=$('tourCard');
   if(!w||!ring||!card) return;
-  if(i>=TOUR_STEPS.length){ w.classList.remove('on'); try{ localStorage.setItem('hk_tour_done','1'); }catch(e){} __tourI=-1; return; }
+  if(i>=TOUR_STEPS.length){ w.classList.remove('on'); try{ localStorage.setItem('hk_tour_done','1'); }catch(e){} __tourI=-1;
+    const f=__tourAfter; __tourAfter=null; if(f) setTimeout(f, 350); return; }
   __tourI=i;
   const st=TOUR_STEPS[i];
   const el=document.querySelector(st.sel);
@@ -8604,10 +8471,8 @@ function tourShow(i){
   const nx=$('tourNext'); if(nx) nx.onclick=()=>tourShow(__tourI+1);
   const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(TOUR_STEPS.length);
 }
-function maybeStartTour(){
-  try{ if(localStorage.getItem('hk_tour_done')) return; }catch(e){}
-  setTimeout(()=>tourShow(0), 650);
-}
+/* r134: maybeStartTour retired — the tour fires from dismissLanding, sequenced
+   before the tutorial prompt, never on an independent timer. */
 function rememberDrill(){ try{ localStorage.setItem('hk_last_drill', cur); }catch(e){} }
 async function recordRun(t){
   // Anon sessions don't post to the leaderboard — scores need a permanent account behind them.
