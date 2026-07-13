@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=124" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=124">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=124">
+<link rel="icon" href="favicon.ico?v=125" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=125">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=125">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=124"></script>
-<link rel="stylesheet" href="nav.css?v=124">
-<script src="themes.js?v=124"></script>
+<script src="drills.js?v=125"></script>
+<link rel="stylesheet" href="nav.css?v=125">
+<script src="themes.js?v=125"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=124"></script>
+<script src="nav.js?v=125"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -5694,9 +5694,28 @@ const GUIDE_ALTS=[
   [/ctrl<\/kbd>\+<kbd>alt<\/kbd>\+<kbd>v/i, 'alt e s'],
   [/<kbd>e<\/kbd> <kbd>s<\/kbd>/i, 'ctrl+alt+v'],
 ];
+/* r143: the plugin layer follows you into guided mode — when a profile is active,
+   steps that have a live plugin chord say so (verified engine-live chords only). */
+const PLUGIN_ALTS={
+  macabacus:[
+    [/ctrl<\/kbd>\+<kbd>d<\/kbd>/i, 'mcb ctrl+shift+d'],
+    [/ctrl<\/kbd>\+<kbd>r<\/kbd>/i, 'mcb ctrl+shift+r'],
+    [/<kbd>h<\/kbd> <kbd>f<\/kbd> <kbd>c<\/kbd>/i, 'mcb ctrl+alt+a autocolors'],
+    [/ctrl<\/kbd>\+<kbd>shift<\/kbd>\+<kbd>%/i, 'mcb cas+5'],
+    [/<kbd>h<\/kbd> <kbd>k<\/kbd>/i, 'mcb cas+1'],
+    [/<kbd>e<\/kbd> <kbd>s<\/kbd>|ctrl<\/kbd>\+<kbd>alt<\/kbd>\+<kbd>v/i, 'mcb ctrl+shift+v'],
+  ],
+  factset:[
+    [/ctrl<\/kbd>\+<kbd>d<\/kbd>/i, 'fds cas+d'],
+    [/ctrl<\/kbd>\+<kbd>r<\/kbd>/i, 'fds cas+k'],
+    [/<kbd>h<\/kbd> <kbd>f<\/kbd> <kbd>c<\/kbd>/i, 'fds ctrl+alt+e autocolors'],
+  ],
+};
 function guideAltNote(stepHtml){
   const notes=[];
   for(const [re,alt] of GUIDE_ALTS){ if(notes.length>=2) break; if(re.test(stepHtml)) notes.push(alt); }
+  const plug=PLUGIN_ALTS[keyProfile]||[];
+  for(const [re,alt] of plug){ if(notes.length>=2) break; if(re.test(stepHtml)) notes.push('<b style="color:var(--accent)">'+alt+'</b>'); }
   return notes.length ? ' <span class="cl-altstep">\u00b7 or '+notes.join(' \u00b7 ')+'</span>' : '';
 }
 const ARROWSYM={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
@@ -6288,7 +6307,11 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(k==='Alt'){ e.preventDefault(); logKey('Alt'); enterRibbon(); return; }
-  if(e.altKey){ e.preventDefault(); if(k==='='){ startClock(); logKey('Alt'); logKey('='); pushUndo(); autoSum(); commitAction(); } return; }
+  // r143: THE DEAD-CHORD BUG — this blanket alt-swallow sat ABOVE the ctrl block,
+  // so every Ctrl+Alt chord (Macabacus AutoColor/cycles, FactSet AutoColor/FDS
+  // fills, native Ctrl+Alt+V) died here silently since it shipped. Bare-Alt
+  // combos are still swallowed (ribbon semantics); Ctrl+Alt flows onward.
+  if(e.altKey && !(e.ctrlKey||e.metaKey)){ e.preventDefault(); if(k==='='){ startClock(); logKey('Alt'); logKey('='); pushUndo(); autoSum(); commitAction(); } return; }
 
   const dirs={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
   if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey); return; }
@@ -6356,13 +6379,17 @@ document.addEventListener('keydown',e=>{
       if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+D'); fillFrom('down'); return; }
       if(lk==='u'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+U'); fillFrom('up'); return; }
     }
+    // r143: Ctrl+Alt+V handled here (was below Ctrl+A/C — unreachable once the
+    // AltGr guard below exists); then UNCLAIMED Ctrl+Alt combos go inert so
+    // AltGr layouts (ctrl+alt on Windows) can never trigger plain ctrl ops.
+    if(e.altKey && lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+V');
+      mode='ribbon'; path=['E','S']; dialog='paste'; pasteKind='all'; ribbonNote=''; drawRibbon(); return; }
+    if(e.altKey){ e.preventDefault(); return; }
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
       const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
     if(keyProfile==='macabacus' && e.shiftKey && !e.altKey && lk==='v'){
       e.preventDefault(); startClock(); logKey('Ctrl+Shift+V'); doPaste('values'); commitAction(); return; }  // Macabacus paste values (documented default)
-    if(e.altKey && lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+V');
-      mode='ribbon'; path=['E','S']; dialog='paste'; pasteKind='all'; ribbonNote=''; drawRibbon(); return; }
     if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
@@ -6644,14 +6671,19 @@ const RF_OPS = [
     instr: ()=>'Pin this label left',
     show: c=>({text:c.text, align:'c'}), solved: c=>({text:c.text}) },
   { op:'font_blue', label:'Blue font', keys:['Alt','H','F','C','\u2192\u00d74','\u21b5'], matchSeq: RFM.altSeq(['h','f','c','arrowright','arrowright','arrowright','arrowright','enter']),
+    /* r143: plugin aliases — AutoColor IS the blue-paint on a hardcode */
+    match: e=> (keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&!e.shiftKey&&e.key.toLowerCase()==='a') ||
+               (keyProfile==='factset'&&e.ctrlKey&&e.altKey&&!e.shiftKey&&e.key.toLowerCase()==='e'),
     make: ()=> ({text:String(rfBig())}),
     instr: ()=>'It\u2019s a hardcode \u2014 blue the font',
     show: c=>({text:c.text}), solved: c=>({text:c.text, color:'#3b6fd4'}) },
   { op:'num_comma', label:'Comma format', keys:['Alt','H','K'], matchSeq: RFM.altSeq(['h','k']),
+    match: e=> keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='1'||e.key==='!'),   // r143 CAS+1
     make: ()=> { const v=rnd(48,980)*1000; return {text:String(v), fmt:v.toLocaleString('en-US')}; },
     instr: ()=>'Raw thousands \u2014 comma format it',
     show: c=>({text:c.text}), solved: c=>({text:c.fmt}) },
   { op:'num_pct', label:'Percent format', keys:['Alt','H','P'], matchSeq: RFM.altSeq(['h','p']),
+    match: e=> keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='5'||e.key==='%'),   // r143 CAS+5
     make: ()=> { const p=rnd(4,96); return {text:'0.'+String(p).padStart(2,'0'), fmt:p+'%'}; },
     instr: ()=>'It\u2019s a rate \u2014 percent format',
     show: c=>({text:c.text}), solved: c=>({text:c.fmt}) },
@@ -6664,6 +6696,7 @@ const RF_OPS = [
     instr: ()=>'Column\u2019s too narrow \u2014 autofit it',
     show: c=>({text:c.text}), solved: c=>({text:c.text.replace(' \u2014 cut off\u2026','')}) },
   { op:'paste_vals_es', label:'Paste values', keys:['Alt','E','S','V','\u21b5'], matchSeq: RFM.altSeq(['e','s','v','enter']),
+    match: e=> keyProfile==='macabacus'&&e.ctrlKey&&e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='v',   // r143
     make: ()=> ({text:String(rfBig())}),
     instr: ()=>'Clipboard\u2019s loaded \u2014 paste VALUES only',
     show: c=>({text:''}), solved: c=>({text:c.text}) },
@@ -6690,17 +6723,17 @@ const RF_OPS = [
     solved: c=>({text:c.text, strike:true}) },
 
   // — NUMBER FORMATTING —
-  { op:'currency', label:'Currency', keys:['Ctrl','Shift','$'], match: RFM.ctrlShift('$','4'),
+  { op:'currency', label:'Currency', keys:['Ctrl','Shift','$'], match: e=> RFM.ctrlShift('$','4')(e) || (keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='4'||e.key==='$')),
     make: ()=> ({num:rfBig()}),
     instr: ()=>'Format as currency',
     show: c=>({text:String(c.num)}),
     solved: c=>({text:'$'+c.num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}) },
-  { op:'percent', label:'Percent', keys:['Ctrl','Shift','%'], match: RFM.ctrlShift('%','5'),
+  { op:'percent', label:'Percent', keys:['Ctrl','Shift','%'], match: e=> RFM.ctrlShift('%','5')(e) || (keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='5'||e.key==='%')),
     make: ()=> ({num:rfRatio()}),
     instr: ()=>'Format as percent',
     show: c=>({text:String(c.num)}),
     solved: c=>({text:(c.num*100).toFixed(1)+'%'}) },
-  { op:'comma', label:'Comma', keys:['Ctrl','Shift','!'], match: RFM.ctrlShift('!','1'),
+  { op:'comma', label:'Comma', keys:['Ctrl','Shift','!'], match: e=> RFM.ctrlShift('!','1')(e) || (keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='1'||e.key==='!')),
     make: ()=> ({num:rfBig()}),
     instr: ()=>'Comma-format the number',
     show: c=>({text:String(c.num)}),
