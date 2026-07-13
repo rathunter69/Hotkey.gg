@@ -23,7 +23,32 @@ owns the keyboard · checklist autoscroll · favicon rebuilt (the .ico was a
 20260713100000 + signup-card carrot copy (auto-match school desk, student
 perks later). Branch auto-merge live per working agreement.
 
-## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r130)
+## SESSION HANDOVER SNAPSHOT (2026-07-13, rounds r131-r145 — the marathon session)
+- **Backend LIVE + smoke-verified** (r131-r132, see note above). **Onboarding is
+  launch-final** behind PRELAUNCH_LOCK (r134) — flip ONE flag to launch
+  (runbook: dev/LAUNCH.md). Staffer (nee captain) Desk Hall dashboard w/ ROI
+  band + quest ticks (r136/138). Achievements live on stats w/ showcase picks
+  (profiles.featured_ach) + rarity metals (r135/138). EVENTS FUNNEL live
+  (r139, insert-only, service-role reads). Morning Sheet daily + streak
+  freezes (r140). PLUGIN LAYER truly engine-wide (r143 — the dead Ctrl+Alt
+  chord bug: a blanket alt-swallow killed every Ctrl+Alt chord in classic
+  play since it shipped; fixed w/ AltGr guard; RF aliases + profile-aware
+  guide notes).
+- **DRILLS: 59** (+4 this session): cascade (full 3-tranche waterfall, r141) ·
+  housestyle (raw P&L -> desk standard; randomized input set + buried
+  hardcode, r142) · modeltour (ctrl-jump find-and-fix, r144) · wk13 (13-week
+  cash flow, RX flagship, r145). All house-bar verified (40-seed sweeps +
+  demo-replay e2e + full-catalog regression gating every merge).
+- **NEXT (STRATEGY.md sequence)**: ghost-diff results insight (item 3 — traces
+  recorded since r9 are waiting) · then share surfaces round (rank card +
+  challenge links + placement share + PRO placeholder) · then cohort report
+  export + staffer program templates. Content queue: audit-family expansion
+  (balance sweep, stale-link hunt, sign-error triage).
+- **Working agreement (r-standing)**: AUTO-MERGE to main once a round's
+  verification gate is green (Wolf 2026-07-13). Merge = deploy.
+- Cache v126. Test accounts + cleanup list: dev/SMOKE_REPORT.md.
+
+## PREVIOUS SNAPSHOT (2026-07-12, rounds r100-r130)
 - **Where we are**: content deepening arc DONE (T2-T6, Mix Rule) · demo-replay e2e
   DONE (dev/e2e-demo-replay.js, all drills green) · Desks v1 + surfaces + protected
   names + seeds/claim-the-desk + school tags v1.5 DONE · XP v4 daily-reset DONE ·
