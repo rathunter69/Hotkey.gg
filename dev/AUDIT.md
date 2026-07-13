@@ -3209,5 +3209,6 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFY: 40-seed structural sweep (zero pre-solved checks, conservation +
   non-negativity + no overspend, mezz starvation confirmed 101/160 tranche-
   years); house e2e demo-replay WIN 3/3 (cascade); FULL 56-drill e2e
-  regression result recorded below. drills.js catalog + PARS synced.
+  regression ALL GREEN (every drill WIN 3/3, zero page errors — merge was
+  gated on this). drills.js catalog + PARS synced.
   CACHE v122 -> v123 (all 9 pages).
