@@ -3398,3 +3398,36 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   card + share card read right); node --check all touched scripts; FULL
   59-drill e2e regression ALL GREEN gating the merge.
   CACHE v128 -> v129 (all 9 pages).
+
+---
+# ROUND 149 — THE B2B ROUND: cohort report export + staffer program templates (STRATEGY item 5)
+- COHORT REPORT EXPORT (leaderboard.html ?desk= hall): "⎙ cohort report
+  (print / PDF)" builds #deskPrint — a print-only artifact (screen never sees
+  it; in print it's the ONLY thing on the page, forced black-on-white because
+  it lands in an inbox, not a theme): brand cap, desk header w/ staffer +
+  date, the ROI band, live-assignment completion table, full roster table,
+  and a methodology footnote (how time-saved/speed-up derive — a buyer will
+  ask). Plus "⬇ summary card": the 1200×627 PNG version of the ROI band for
+  the forwardable one-glance number. Zero backend — both derive entirely
+  from the hall's already-loaded runs. fmtSaved floors at "<1m" (29s of
+  gains read as a broken-looking "0m").
+- STAFFER PROGRAM TEMPLATES (account.html staffer controls): three presets —
+  Intern week 0 (movement → formatting → formulas → find-and-fix) ·
+  First-year bootcamp (clean-up → functions → schedules → statements) ·
+  Speed weeks (par×1.5 targets, basics → models). A program is a 4-week
+  quest sequence pinned ONE CLICK A WEEK: "pin week N" clears current pins
+  (two-click confirm when any exist) and sets the week's ≤3 drills via the
+  existing RPCs — the server never learns about programs (cap-3 / 1-week
+  expiry untouched); progress is local per desk (hk_prog_<team_id>). Notes
+  carry "Program wN: theme" so analysts see the arc on their quest board.
+  Catalog-drift guard: template keys are filtered against menuOrder at pin.
+- Events: report_print, report_card, program_pin{tpl,week}.
+- VERIFY: 19-assert Playwright suite ALL PASS against a stubbed supabase
+  client (hall renders w/ export links, print DOM hidden on screen,
+  window.print fires w/ desk header + roster + assignment + methodology,
+  summary PNG downloads, three templates offered, week-1 preview,
+  replace-confirm arms, clear-then-set RPC order + drills + notes asserted,
+  progress advances w1✓→w2, speed target = par×1.5 verified to the ms);
+  print-media screenshot + PNG eyeballed (both read right); node --check
+  all touched scripts; FULL 59-drill e2e regression ALL GREEN gating the
+  merge. No shared-asset change → ?v stays 129.
