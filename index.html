@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=132" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=132">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=132">
+<link rel="icon" href="favicon.ico?v=133" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=133">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=133">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1105,14 +1105,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=132"></script>
-<link rel="stylesheet" href="nav.css?v=132">
-<script src="themes.js?v=132"></script>
+<script src="drills.js?v=133"></script>
+<link rel="stylesheet" href="nav.css?v=133">
+<script src="themes.js?v=133"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=132"></script>
+<script src="nav.js?v=133"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4523,6 +4523,170 @@ const CHALLENGES = {
         {label:'Costs carry their sign \u2014 COGS, Opex and D&A negative in every year (rows 5-7)', ok:signOk},
         {label:'EBIT reads TRUE \u2014 the sum-through equals revenue less real costs, every year (row 8)', ok:ebitOk},
         {label:'Margin row live and % \u2014 EBIT \u00f7 revenue across all five years (row 10)', ok:mgOk},
+      ];
+    }
+  },
+
+  /* r153: THE RX PACK, tranche two (STRATEGY 3.2) \u2014 the liquidity bridge and the
+     covenant table. With wk13 these make "The RX desk" a real section: the three
+     pages every restructuring deck actually opens with. */
+  liqbridge:{
+    name:'Liq. Bridge', label:'Bridge the liquidity \u2014 three cases', par:80, parKeys:40,
+    prompt:'The first page of every RX deck: where does liquidity land, and in which case does it break? Cash plus undrawn revolver is the starting point; the bridge walks burn, asset sales and fees to an ending number; the cushion against minimum liquidity is the answer. Build it once, fill it across Base / Downside / Severe \u2014 the severe case is SUPPOSED to look ugly. That\u2019s why the page exists.',
+    req(){ return '<em>B7:D7</em> availability \u2192 =B5\u2212B6 \u00b7 <em>B8:D8</em> beginning \u2192 =B4+B7 \u00b7 <em>B12:D12</em> ending \u2192 =B8+SUM(B9:B11) \u00b7 <em>B14:D14</em> cushion \u2192 =B12\u2212B13 \u00b7 ending row bold'; },
+    guide:[
+      'availability = commitment \u2212 drawn \u00b7 B7: <kbd>=</kbd>B5-B6 <kbd>\u21b5</kbd> \u00b7 select B7:D7, <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'beginning liquidity = cash + availability \u00b7 B8: <kbd>=</kbd>B4+B7 <kbd>\u21b5</kbd> \u00b7 fill across',
+      'ending = beginning + the whole bridge \u00b7 B12: <kbd>=</kbd>B8+SUM(B9:B11) <kbd>\u21b5</kbd> \u00b7 fill across',
+      'cushion = ending \u2212 minimum \u00b7 B14: <kbd>=</kbd>B12-B13 <kbd>\u21b5</kbd> \u00b7 fill \u2014 read which cases breach',
+      'dress the answer: select B12:D12, <kbd>ctrl</kbd>+<kbd>b</kbd>',
+    ],
+    targets:['B7:D7','B8:D8','B12:D12','B14:D14','B12:D12'],
+    demo(){ return [
+      {sel:'B7',  keys:[...T('=B5-B6'), Kb.enter]},          {sel:'B7:D7',  keys:[Kb.fillR]},
+      {sel:'B8',  keys:[...T('=B4+B7'), Kb.enter]},          {sel:'B8:D8',  keys:[Kb.fillR]},
+      {sel:'B12', keys:[...T('=B8+SUM(B9:B11)'), Kb.enter]}, {sel:'B12:D12',keys:[Kb.fillR]},
+      {sel:'B14', keys:[...T('=B12-B13'), Kb.enter]},        {sel:'B14:D14',keys:[Kb.fillR]},
+      {sel:'B12:D12', keys:[Kb.bold]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Liquidity bridge (three cases \u2014 which ones breach?)',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Item ($mm)',txt:true,bold:true};
+      ['Base','Downside','Severe'].forEach((h,i)=>cells[colLetter(2+i)+'3']={...blankCell(),value:h,txt:true,bold:true});
+      const lbl={4:'Cash',5:'Revolver commitment',6:'Revolver drawn',7:'Availability',8:'Beginning liquidity',
+                 9:'Operating burn',10:'Asset sale proceeds',11:'RX professional fees',
+                 12:'Ending liquidity',13:'Minimum liquidity',14:'Cushion / (shortfall)'};
+      Object.entries(lbl).forEach(([r,v])=>cells['A'+r]={...blankCell(),value:v,txt:true,
+        bold:(r==='8'||r==='12'||r==='14')});
+      /* Base inputs first; Downside/Severe take STRICTLY worse deltas so the three
+         endings are ordered. Cash is raised if the base ending lands thin, so the
+         minimum-liquidity line can always sit between Severe and Base: Base always
+         clears, Severe always breaches \u2014 the page tells its story every seed. */
+      let cash=rnd(20,120)*5;
+      const commit=rnd(60,200)*5;
+      const drawn=Math.min(commit-25, rnd(10, Math.max(11, Math.floor(commit/5)-5))*5);
+      const burn0=-rnd(30,90)*5, sale0=rnd(20,100)*5, fees0=-rnd(8,30)*5;
+      let baseEnd=cash+(commit-drawn)+burn0+sale0+fees0;
+      if(baseEnd<100){ cash+=Math.ceil((100-baseEnd)/5)*5; baseEnd=cash+(commit-drawn)+burn0+sale0+fees0; }
+      const worse=[0, -rnd(10,30)*5, -rnd(25,60)*5];
+      const saleCut=[1, .6, .25];
+      const ends=[];
+      for(let i=0;i<3;i++){
+        const Lc=colLetter(2+i);
+        cells[Lc+'4']={...blankCell(),value:cash,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+'5']={...blankCell(),value:commit,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+'6']={...blankCell(),value:drawn,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        const burn=burn0+worse[i], sale=Math.round(sale0*saleCut[i]/5)*5,
+              fees=fees0+(i? -rnd(2,8)*5 : 0);
+        cells[Lc+'9']={...blankCell(),value:burn,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+'10']={...blankCell(),value:sale,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+'11']={...blankCell(),value:fees,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        ends.push(cash+(commit-drawn)+burn+sale+fees);
+      }
+      // the minimum sits strictly between Severe and Base, floored at a real number
+      let minLiq=Math.max(25, Math.min(baseEnd-25, ends[2]+rnd(2,8)*5));
+      minLiq=Math.round(minLiq/5)*5;
+      for(let i=0;i<3;i++) cells[colLetter(2+i)+'13']={...blankCell(),value:minLiq,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      this._ends=ends; this._min=minLiq;
+      return {ROWS:14, cells, active:{r:7,c:2}, sel:null, colW:{1:158}};
+    },
+    checks(S){
+      const V=(a)=>{ const x=S.cells[a]; return (x&&typeof x.value==='number')?x.value:0; };
+      const rowChk=(r, mk)=>{ for(let c=2;c<=4;c++){ const Lc=colLetter(c);
+          const x=S.cells[Lc+r];
+          const f=(x&&x.formula)?x.formula.toUpperCase().replace(/[\s$]/g,''):'';
+          const w=mk(Lc);
+          if(!f || !w.refs.every(t=>f.indexOf(t)>=0) || Math.abs(((x&&x.value)||0)-w.v)>1e-6) return false;
+        } return true; };
+      const availOk=rowChk('7', Lc=>({refs:[Lc+'5',Lc+'6'], v:V(Lc+'5')-V(Lc+'6')}));
+      const begOk  =rowChk('8', Lc=>({refs:[Lc+'4',Lc+'7'], v:V(Lc+'4')+V(Lc+'7')}));
+      const endOk  =rowChk('12',Lc=>({refs:[Lc+'8',Lc+'9:'+Lc+'11'], v:V(Lc+'8')+V(Lc+'9')+V(Lc+'10')+V(Lc+'11')}));
+      const cushOk =rowChk('14',Lc=>({refs:[Lc+'12',Lc+'13'], v:V(Lc+'12')-V(Lc+'13')}));
+      let boldOk=true; for(let c=2;c<=4;c++){ const x=S.cells[colLetter(c)+'12']; if(!x||!x.bold) boldOk=false; }
+      return [
+        {label:'Availability is live \u2014 commitment \u2212 drawn, every case (row 7)', ok:availOk},
+        {label:'Beginning liquidity \u2014 cash + availability, every case (row 8)', ok:begOk},
+        {label:'Ending liquidity \u2014 beginning + SUM of the whole bridge (row 12)', ok:endOk},
+        {label:'Cushion / (shortfall) \u2014 ending \u2212 minimum, every case (row 14)', ok:cushOk},
+        {label:'The answer is dressed \u2014 ending liquidity row bold (B12:D12)', ok:boldOk},
+      ];
+    }
+  },
+
+  covtable:{
+    name:'Cov. Table', label:'Run the covenant table', par:85, parKeys:40,
+    prompt:'Leverage is tested every quarter and the covenant STEPS DOWN \u2014 the question is never "are we compliant today", it\'s "which quarter pinches". Compute leverage off LTM EBITDA, headroom against the stepping max, a 1/0 compliance flag with a real IF, and pull the tightest quarter with MIN. When this table goes red, everyone you\'ve ever met gets on a call.',
+    req(){ return '<em>B6:F6</em> leverage \u2192 =B5/B4 \u00b7 <em>B8:F8</em> headroom \u2192 =B7\u2212B6 \u00b7 <em>B9:F9</em> compliant \u2192 =IF(B8>=0,1,0) \u00b7 <em>B11</em> tightest \u2192 =MIN(B8:F8)'; },
+    guide:[
+      'leverage = debt over LTM EBITDA \u00b7 B6: <kbd>=</kbd>B5/B4 <kbd>\u21b5</kbd> \u00b7 select B6:F6, <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'headroom = covenant max \u2212 leverage \u00b7 B8: <kbd>=</kbd>B7-B6 <kbd>\u21b5</kbd> \u00b7 fill across',
+      'the flag is a real IF \u00b7 B9: <kbd>=</kbd>IF(B8>=0,1,0) <kbd>\u21b5</kbd> \u00b7 fill across',
+      'the number the room asks for \u00b7 B11: <kbd>=</kbd>MIN(B8:F8) <kbd>\u21b5</kbd> \u2014 the tightest quarter',
+    ],
+    targets:['B6:F6','B8:F8','B9:F9','B11'],
+    demo(){ return [
+      {sel:'B6', keys:[...T('=B5/B4'), Kb.enter]},          {sel:'B6:F6', keys:[Kb.fillR]},
+      {sel:'B8', keys:[...T('=B7-B6'), Kb.enter]},          {sel:'B8:F8', keys:[Kb.fillR]},
+      {sel:'B9', keys:[...T('=IF(B8>=0,1,0)'), Kb.enter]},  {sel:'B9:F9', keys:[Kb.fillR]},
+      {sel:'B11', keys:[...T('=MIN(B8:F8)'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Covenant compliance (the max steps down \u2014 where does it pinch?)',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
+      for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'Q'+(c-1),txt:true,bold:true};
+      cells['A4']={...blankCell(),value:'LTM EBITDA ($mm)',txt:true};
+      cells['A5']={...blankCell(),value:'Total debt ($mm)',txt:true};
+      cells['A6']={...blankCell(),value:'Leverage (x)',txt:true};
+      cells['A7']={...blankCell(),value:'Covenant max (x)',txt:true};
+      cells['A8']={...blankCell(),value:'Headroom (x)',txt:true,bold:true};
+      cells['A9']={...blankCell(),value:'Compliant? (1/0)',txt:true};
+      cells['A11']={...blankCell(),value:'Tightest quarter (x)',txt:true,bold:true};
+      // EBITDA sags mid-path (the RX story), debt amortizes a touch, the max steps
+      // down \u2014 the pinch lands mid-table more often than at the ends
+      let ebitda=rnd(80,200)*5;
+      const debt0=Math.round(ebitda*(3.5+rnd(0,15)/10)/5)*5;
+      let maxCov=(45+rnd(5,20))/10;                 // 5.0x\u20136.5x, stepping down
+      let debt=debt0;
+      for(let c=2;c<=6;c++){
+        const Lc=colLetter(c);
+        cells[Lc+'4']={...blankCell(),value:ebitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+'5']={...blankCell(),value:debt,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+'7']={...blankCell(),value:Math.round(maxCov*10)/10,fontColor:'blue',decimals:1};
+        const drift=(c<=4? -rnd(2,10) : rnd(0,8));  // sag then stabilize/recover
+        ebitda=Math.max(40, Math.round((ebitda*(1+drift/100))/5)*5);
+        debt=Math.max(40, debt-rnd(0,6)*5);
+        if(c===3||c===5) maxCov-= (2+rnd(0,3))/10;  // the step-downs
+      }
+      return {ROWS:11, cells, active:{r:6,c:2}, sel:null, colW:{1:150}};
+    },
+    checks(S){
+      const V=(a)=>{ const x=S.cells[a]; return (x&&typeof x.value==='number')?x.value:0; };
+      let levOk=true, hdOk=true, flagOk=true;
+      for(let c=2;c<=6;c++){ const Lc=colLetter(c);
+        const lev=S.cells[Lc+'6'];
+        const fl=(lev&&lev.formula)?lev.formula.toUpperCase().replace(/[\s$]/g,''):'';
+        if(!fl || fl.indexOf(Lc+'5')<0 || fl.indexOf(Lc+'4')<0
+           || Math.abs(((lev&&lev.value)||0)-V(Lc+'5')/V(Lc+'4'))>1e-6) levOk=false;
+        const hd=S.cells[Lc+'8'];
+        const fh=(hd&&hd.formula)?hd.formula.toUpperCase().replace(/[\s$]/g,''):'';
+        if(!fh || fh.indexOf(Lc+'7')<0 || fh.indexOf(Lc+'6')<0
+           || Math.abs(((hd&&hd.value)||0)-(V(Lc+'7')-V(Lc+'6')))>1e-6) hdOk=false;
+        const fg=S.cells[Lc+'9'];
+        const ff=(fg&&fg.formula)?fg.formula.toUpperCase().replace(/[\s$]/g,''):'';
+        const wantF=(V(Lc+'8')>=0)?1:0;
+        if(!ff || ff.indexOf('IF(')<0 || ff.indexOf(Lc+'8')<0 || !(fg && typeof fg.value==='number' && fg.value===wantF)) flagOk=false;
+      }
+      const tq=S.cells['B11'];
+      const ft=(tq&&tq.formula)?tq.formula.toUpperCase().replace(/[\s$]/g,''):'';
+      let wantT=Infinity; for(let c=2;c<=6;c++) wantT=Math.min(wantT, V(colLetter(c)+'8'));
+      const tqOk=!!(ft && ft.indexOf('MIN(')>=0 && ft.indexOf('B8:F8')>=0 && hdOk && Math.abs(((tq&&tq.value)||0)-wantT)<1e-6);
+      return [
+        {label:'Leverage is live \u2014 debt \u00f7 LTM EBITDA, every quarter (row 6)', ok:levOk},
+        {label:'Headroom against the STEPPING max \u2014 covenant \u2212 leverage (row 8)', ok:hdOk},
+        {label:'Compliance flag is a real IF \u2014 1 in the clear, 0 in breach (row 9)', ok:flagOk},
+        {label:'Tightest quarter pulled with MIN over the headroom row (B11; needs row 8 live)', ok:tqOk},
       ];
     }
   },

@@ -67,10 +67,16 @@ perks later). Branch auto-merge live per working agreement.
   assumptions, three dead refs) · signerr (positive costs on a sum-through
   P&L + margin sign-off). 62 DRILLS. 40-seed sweeps + WIN 3/3 + full
   regression gated the merge.
-- **NEXT (STRATEGY.md sequence)**: RX pack content tranche (liquidity bridge,
-  covenant table — the deferred half of item 6) · then seasons design doc
-  (doc only — build gated on DAU). Pilot playbook (STRATEGY lens 4.2) is
-  unblocked: events + report + programs all exist.
+- **r153 (content)**: RX PACK COMPLETE — liqbridge (three-case liquidity
+  bridge; base always clears, severe always breaches by construction) +
+  covtable (stepping covenant, real IF flag, MIN pinch quarter). 64 DRILLS.
+  HOUSE FACT (engine): fill-right ref-rewrite CLAMPS referenced rows at
+  ROWS_MAX=14 — cells may live on rows 15+ but formulas referencing rows >14
+  break on fill; keep referenced rows <= 14.
+- **NEXT (STRATEGY.md sequence)**: seasons design doc (doc only — build gated
+  on DAU). Pilot playbook (STRATEGY lens 4.2) is unblocked: events + report
+  + programs all exist. Parked queue: referrals, marathon rethink, PWA,
+  comments engine, achievement art pass.
 - **Working agreement (r-standing)**: AUTO-MERGE to main once a round's
   verification gate is green (Wolf 2026-07-13). Merge = deploy.
 - Cache v129. Test accounts + cleanup list: dev/SMOKE_REPORT.md.
