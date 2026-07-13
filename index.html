@@ -9,6 +9,10 @@
   // screen instead of failing silent ("all the elements are gone" must never be a mystery).
   window.addEventListener('error', function(e){
     try{
+      // resource-load failures (CDN blocked, adblock, offline) bubble here in capture
+      // phase with no .message and target=the failed element — the game still boots in
+      // guest mode, so they must not paint the fatal banner. Only real script errors qualify.
+      if(!e.message && e.target && e.target!==window) return;
       var b=document.getElementById('hkBootErr');
       if(!b){ b=document.createElement('div'); b.id='hkBootErr';
         b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#7c2318;color:#ffd9d1;font:12px ui-monospace,monospace;padding:10px 16px;white-space:pre-wrap';
@@ -28,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=146" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=146">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=146">
+<link rel="icon" href="favicon.ico?v=147" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=147">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=147">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -396,6 +400,8 @@
   .gd-row{font-family:var(--mono); font-size:11px; color:var(--muted); margin:3px 0}
   .gd-row b{color:var(--warn)} .gd-row span{color:var(--faint)}
   .gd-row kbd{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:10px}
+  .rm-aha{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:10px; padding:9px 14px; margin:10px 0 4px; text-align:left; line-height:1.5}
   .rm-stats{display:flex; justify-content:center; gap:24px; margin:20px 0; font-family:var(--mono);
     font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
   .rm-stats b{display:block; color:var(--text); font-size:17px; font-weight:500; margin-top:4px;
@@ -1119,14 +1125,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=146"></script>
-<link rel="stylesheet" href="nav.css?v=146">
-<script src="themes.js?v=146"></script>
+<script src="drills.js?v=147"></script>
+<link rel="stylesheet" href="nav.css?v=147">
+<script src="themes.js?v=147"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=146"></script>
+<script src="nav.js?v=147"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2105,6 +2111,7 @@ const CHALLENGES = {
   },
   ribbon:{
     name:'Ribbon', label:'Walk the ribbon', par:42, parKeys:14,
+    aha:'alt turns the ribbon into a keyboard surface \u2014 every button has a letter path',
     prompt:'Three formatting jobs scattered across a working page \u2014 different cells every run \u2014 and every one of them is a ribbon walk: Alt H 1 bold, Alt H K comma, Alt H A C center. The ribbon is a keyboard surface; walk it.',
     req(){ const o=this._o; return '<em>'+o.b+'</em> \u00b7 <em>alt h 1</em> bold \u00b7 <em>'+o.k+'</em> \u00b7 <em>alt h k</em> comma \u00b7 <em>'+o.c+'</em> \u00b7 <em>alt h a c</em> center'; },
     guide(){ const o=this._o; return [
@@ -2143,6 +2150,7 @@ const CHALLENGES = {
   },
   pastes:{
     name:'Paste Sp.', label:'Alt E S everything', par:40, parKeys:11,
+    aha:'alt e s is the door that never closed \u2014 values, formats, transpose all live behind it',
     prompt:'One copied cell, three different pastes \u2014 and the cells move each run. Alt E S opens the dialog the way twenty years of desks have opened it: V values, T formats, E transpose lives there too. Copy the source ONCE \u2014 it serves every paste.',
     req(){ const o=this._o; return '<em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.v+'</em> \u2192 <em>alt e s v \u21b5</em> values \u00b7 <em>'+o.t+'</em> \u2192 <em>alt e s t \u21b5</em> formats'; },
     guide(){ const o=this._o; return [
@@ -2241,6 +2249,7 @@ const CHALLENGES = {
   },
   saves:{
     name:'Save', label:'Save like you mean it', par:44, parKeys:15, usesSave:true,
+    aha:'ctrl+s after every block of work \u2014 a reflex, not a reminder',
     prompt:'A page of work in progress, three review cells scattered through it \u2014 different spots each run. Mark each one done, and Ctrl+S after EVERY block of work. The reflex is the drill: work, save, work, save.',
     req(){ return this._sites.map(s=>'<em>'+s+'</em> \u00b7 done \u21b5 \u00b7 <em>ctrl+s</em>').join(' \u00b7 then '); },
     guide(){ return this._sites.map((s,i)=>['first','second','third'][i]+' review cell at <b>'+s+'</b> \u00b7 type <kbd>done</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>s</kbd> \u2014 every block of work ends with a save'); },
@@ -2270,6 +2279,7 @@ const CHALLENGES = {
   },
   editfix:{
     name:'Edit', label:'Fix the typos in place', par:44, parKeys:33,
+    aha:'f2 edits in place \u2014 retyping a cell destroys the part that was already right',
     prompt:'A pasted-in schedule with THREE typos scattered through the labels \u2014 different words, different spots, every run. Do not retype whole cells: F2 in, arrow the cursor to the mistake, fix it, commit. Edit mode is how you touch a cell without destroying it.',
     req(){ return this._sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 '); },
     guide(){ return this._sites.map((s,i)=>['first typo','second typo','third typo'][i]+' at <b>'+s.cell+'</b> \u00b7 <kbd>F2</kbd> \u00b7 <kbd>\u2190</kbd> to the mistake \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d \u00b7 <kbd>\u21b5</kbd> \u2014 only the final word is graded'); },
@@ -2313,40 +2323,67 @@ const CHALLENGES = {
     }
   },
   undo:{
-    name:'Undo', label:'Undo is a tool, not a panic', par:28, parKeys:3,
-    prompt:'Delete the flagged row\u2019s value, realize it was needed, bring it back with undo, then bold it instead. Ctrl+Z is not an apology \u2014 it is a first-class move you should make without flinching.',
-    req:'<em>B4</em> \u00b7 <em>delete</em> \u00b7 <em>ctrl+z</em> brings it back \u00b7 <em>ctrl+b</em> bold it',
-    guide:[
-      'on B4 \u00b7 <kbd>delete</kbd> \u2014 gone',
-      '<kbd>ctrl</kbd>+<kbd>z</kbd> \u2014 back, exactly as it was',
-      '<kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 what you actually wanted: flag it bold',
-    ],
-    targets:['B4','B4','B4'],
-    demo(){ return [
-      {sel:'B4', keys:[{key:'Delete'}, {key:'z',ctrl:true}, {key:'b',ctrl:true}]},
+    name:'Undo', label:'Undo is a tool, not a panic', par:34, parKeys:4,
+    aha:'delete big, ctrl+z, re-aim — undo is a move, not an apology',
+    prompt:'Someone built a SCRATCH block right on the live tab — three columns of junk math. You nuke the whole thing… and the note says one of those columns actually FEEDS the model. Ctrl+Z brings all of it back, exactly as it was. Now breathe, and delete only the two dead columns. Undo is how fast hands stay fearless.',
+    req(){ const o=this._o; return 'select the scratch block <em>'+o.blk+'</em> · <em>delete</em> · <em>ctrl+z</em> — it all returns · now only the dead columns: <em>'+o.dead.join('</em> and <em>')+'</em> · <em>delete</em> · bold the LIVE header <em>'+o.liveHdr+'</em>'; },
+    guide(){ const o=this._o; return [
+      'nuke it first — you’re allowed: select '+o.blk+' · <kbd>delete</kbd>',
+      'the note says '+o.liveCol+' feeds the model. <kbd>ctrl</kbd>+<kbd>z</kbd> — every cell back, exactly as it was',
+      'now with aim: '+o.dead.join(' then ')+' · <kbd>delete</kbd> each — the live column never flinches',
+      'flag the survivor: '+o.liveHdr+' · <kbd>ctrl</kbd>+<kbd>b</kbd>',
     ]; },
+    targets(){ const o=this._o; return [o.blk].concat(o.dead).concat([o.liveHdr]); },
+    demo(){ const o=this._o;
+      const steps=[{sel:o.blk, keys:[{key:'Delete'},{key:'z',ctrl:true}]}];
+      o.dead.forEach(d=>steps.push({sel:d, keys:[{key:'Delete'}]}));
+      steps.push({sel:o.liveHdr, keys:[{key:'b',ctrl:true}]});
+      return steps; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Item',txt:true,bold:true};
-      cells['B1']={...blankCell(),value:'Amount',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' — opex build ($mm)',txt:true,bold:true};
+      const OPEX=['Payroll','Rent','Software','Legal','T&E'];
       for(let i=0;i<4;i++){
-        cells['A'+(2+i)]={...blankCell(),value:['Rent','Payroll','Software','Legal'][i],txt:true};
-        cells['B'+(2+i)]={...blankCell(),value:rnd(10,90)*100,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells['A'+(3+i)]={...blankCell(),value:OPEX[i],txt:true};
+        cells['B'+(3+i)]={...blankCell(),value:rnd(10,90)*100,fmtStyle:'comma',decimals:0,fontColor:'blue'};
       }
-      this._b4=cells['B4'].value;
-      return {ROWS:5, cells, active:{r:4,c:2}, sel:null, colW:{1:100,2:96}};
+      // the scratch block: 3 cols x 3 rows, position moves; ONE column is secretly live
+      const spots=[[4,3],[6,3],[4,8],[7,7],[6,9]];
+      const sp=spots[rnd(0,spots.length-1)];
+      const c0=sp[0], r0=sp[1];
+      const live=rnd(0,2);
+      const liveVals=[];
+      for(let j=0;j<3;j++){
+        cells[colLetter(c0+j)+(r0-1)]={...blankCell(),value:(j===live?'LIVE — feeds Q4':'scratch'),txt:true};
+        for(let i=0;i<3;i++){ const v=rnd(10,99)*10;
+          cells[colLetter(c0+j)+(r0+i)]={...blankCell(),value:v};
+          if(j===live) liveVals.push(v);
+        }
+      }
+      const dead=[]; for(let j=0;j<3;j++){ if(j!==live) dead.push(colLetter(c0+j)+r0+':'+colLetter(c0+j)+(r0+2)); }
+      // adjacent dead columns collapse into one selectable range
+      if(live===0) dead.splice(0,2,colLetter(c0+1)+r0+':'+colLetter(c0+2)+(r0+2));
+      if(live===2) dead.splice(0,2,colLetter(c0)+r0+':'+colLetter(c0+1)+(r0+2));
+      this._o={ blk:colLetter(c0)+r0+':'+colLetter(c0+2)+(r0+2), dead,
+        liveCol:colLetter(c0+live), liveHdr:colLetter(c0+live)+(r0-1),
+        liveCells:[0,1,2].map(i=>colLetter(c0+live)+(r0+i)), liveVals,
+        deadCells:[0,1,2].filter(j=>j!==live).flatMap(j=>[0,1,2].map(i=>colLetter(c0+j)+(r0+i))) };
+      return {ROWS:Math.max(12,r0+4), cells, active:{r:r0,c:c0}, sel:null, colW:{1:110,2:80}};
     },
     checks(S){
-      const c=S.cells['B4']||{};
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
       return [
-        {label:'B4 value intact \u2014 the delete was undone', ok: c.value===this._b4},
-        {label:'used undo at least once \u2014 Ctrl+Z', ok: (S.undoN||0)>=1},
-        {label:'B4 bold \u2014 the change you meant to make', ok: !!c.bold},
+        {label:'the dead scratch columns are GONE', ok: o.deadCells.every(k=>cel(k).value===undefined||cel(k).value===null||cel(k).value==='')},
+        {label:'the LIVE column survived — every value exactly as it was', ok: o.liveCells.every((k,i)=>cel(k).value===o.liveVals[i])},
+        {label:'undo was USED, not retyped — ctrl+z at least once', ok: (S.undoN||0)>=1},
+        {label:'the survivor is flagged — '+o.liveHdr+' bold', ok: !!cel(o.liveHdr).bold},
       ];
     }
   },
   autofit:{
     name:'Autofit', label:'Fix the squeezed columns', par:34, parKeys:10,
+    aha:'alt h o i fits the column to its contents \u2014 dragging column edges is a habit, not a skill',
     prompt:'TWO squeezed spots this time \u2014 a pair of columns on each side of the page, labels clipped and numbers reading #####. Select across each tight pair, Alt H O I. Fitting columns by dragging is a habit worth killing today.',
     req(){ const o=this._o; return 'select <em>'+o.a1+':'+o.a2+'</em> \u00b7 <em>alt h o i</em> \u00b7 then <em>'+o.b1+':'+o.b2+'</em> \u00b7 <em>alt h o i</em>'; },
     guide(){ const o=this._o; return [
@@ -2386,6 +2423,7 @@ const CHALLENGES = {
   },
   rowops:{
     name:'Rows', label:'Insert and delete rows', par:26, parKeys:11,
+    aha:'ctrl+plus and ctrl+minus restructure the sheet \u2014 the grid is editable, not fixed',
     prompt:'The schedule is missing a row for D&A and carries a stale "PLACEHOLDER" line. Insert a row where D&A belongs (Alt H I R or Ctrl +) and delete the junk (Alt H D R or Ctrl -). Structural edits, zero mouse.',
     req:'on <em>row 3</em> \u00b7 <em>alt h i r</em> insert \u00b7 then on the <em>PLACEHOLDER row</em> \u00b7 <em>alt h d r</em> delete',
     guide:[
@@ -2417,57 +2455,73 @@ const CHALLENGES = {
     }
   },
   filldr:{
-    name:'Fill', label:'Fill down, fill right', par:24, parKeys:10,
-    prompt:'One formula, a whole block. Growth is written once in B3 \u2014 fill it DOWN the column with Ctrl+D, then select the totals row and fill RIGHT with Ctrl+R. The two keys that turn one cell of work into twenty.',
-    req:'select <em>B3:B5</em> \u00b7 <em>ctrl+d</em> \u00b7 select <em>B7:D7</em> \u00b7 <em>ctrl+r</em>',
-    guide:[
-      'on B3 \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2193</kbd><kbd>\u2193</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 the formula walks down',
-      'to B7 \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd><kbd>\u2192</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the total walks right',
-    ],
-    targets:['B3','B7'],
-    demo(){ return [
-      {sel:'B3', keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'d',ctrl:true}]},
-      {sel:'B7', keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'r',ctrl:true}]},
+    name:'Fill', label:'Fill down, fill right', par:40, parKeys:2,
+    aha:'fill slides refs, $ anchors hold — one cell of work becomes the block',
+    prompt:'A revenue build with ONE formula written and nineteen missing. The growth driver is anchored ($) so it holds; the year refs slide. Fill the formula DOWN the segments with Ctrl+D, then pull the total row RIGHT with Ctrl+R — and read what happened to the refs. That’s the whole trick of modeling fast.',
+    req(){ const o=this._o; return 'select <em>'+o.fillDown+'</em> · <em>ctrl+d</em> — the anchored driver <em>'+o.gCell+'</em> holds · then <em>'+o.fillRight+'</em> · <em>ctrl+r</em> pulls the total across'; },
+    guide(){ const o=this._o; return [
+      'the one written formula is at '+o.f0+' — read it: the year ref slides, <b>$'+o.gCol+'$'+o.gRow+'</b> is pinned',
+      'select '+o.fillDown+' · <kbd>ctrl</kbd>+<kbd>d</kbd> — every segment grows, the driver never moves',
+      'the total starts at '+o.t0+' · select '+o.fillRight+' · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+    ]; },
+    targets(){ const o=this._o; return [o.fillDown,o.fillRight]; },
+    demo(){ const o=this._o; return [
+      {sel:o.fillDown, keys:[{key:'d',ctrl:true}]},
+      {sel:o.fillRight, keys:[{key:'r',ctrl:true}]},
     ]; },
     build(){
-      const g=(rnd(4,9)/100);
       const cells={};
-      cells['A1']={...blankCell(),value:'Growth walk',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Year 1',txt:true}; cells['A3']={...blankCell(),value:'Year 2',txt:true};
-      cells['A4']={...blankCell(),value:'Year 3',txt:true}; cells['A5']={...blankCell(),value:'Year 4',txt:true};
-      cells['B2']={...blankCell(),value:1000,fmtStyle:'comma',decimals:0};
-      cells['B3']={...blankCell(),formula:'=B2*(1+'+g.toFixed(2)+')',fmtStyle:'comma',decimals:0};
-      cells['A7']={...blankCell(),value:'Check',txt:true};
-      cells['B7']={...blankCell(),formula:'=B2+B3'};
-      cells['C2']={...blankCell(),value:500,fmtStyle:'comma',decimals:0}; cells['C3']={...blankCell(),value:520,fmtStyle:'comma',decimals:0};
-      cells['D2']={...blankCell(),value:250,fmtStyle:'comma',decimals:0}; cells['D3']={...blankCell(),value:280,fmtStyle:'comma',decimals:0};
-      this._g=g;
-      return {ROWS:8, cells, active:{r:3,c:2}, sel:null, colW:{1:90,2:88,3:88,4:88}};
+      const SEGS=['Industrial','Consumer','Services','Energy','Digital'];
+      const nseg=rnd(3,4), nyr=rnd(3,4);
+      const r0=rnd(3,4);                                    // segments start row (title+driver above)
+      const g=(rnd(4,9)/100);
+      cells['A1']={...blankCell(),value:codename()+' — revenue build ($mm)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Growth',txt:true};
+      cells['B2']={...blankCell(),value:g,fmtStyle:'percent',decimals:0,fontColor:'blue'};
+      for(let i=0;i<nseg;i++) cells['A'+(r0+i)]={...blankCell(),value:SEGS[i],txt:true};
+      cells['A'+(r0+nseg)]={...blankCell(),value:'Total',txt:true,bold:true};
+      // base year (col B) is inputs; the ONE written formula sits at C{r0}
+      const bases=[];
+      for(let i=0;i<nseg;i++){ const v=rnd(80,420); bases.push(v);
+        cells['B'+(r0+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      cells['C'+r0]={...blankCell(),formula:'=B'+r0+'*(1+$B$2)',value:bases[0]*(1+g),fmtStyle:'comma',decimals:0};
+      for(let y=1;y<nyr;y++){} // later year columns filled by the player's ctrl+r on the total only
+      const tr=r0+nseg;
+      cells['B'+tr]={...blankCell(),formula:'=SUM(B'+r0+':B'+(tr-1)+')',value:bases.reduce((a,b)=>a+b,0),fmtStyle:'comma',decimals:0,bt:true,bold:true};
+      this._o={ f0:'C'+r0, gCell:'$B$2', gCol:'B', gRow:2,
+        fillDown:'C'+r0+':C'+(tr-1), t0:'B'+tr, fillRight:'B'+tr+':C'+tr,
+        r0, nseg, tr, g, bases };
+      return {ROWS:Math.max(10,tr+2), cells, active:{r:r0,c:3}, sel:null, colW:{1:110,2:84,3:84}};
     },
     checks(S){
-      // value + ref checks — any equivalent formula the fill produces (or you write) passes
+      const o=this._o;
       const cel=k=>S.cells[k]||{};
-      const vOk=(k,exp,ref)=>{ const c=cel(k); return !!(c.formula && String(c.formula).toUpperCase().includes(ref) && Math.abs((c.value||0)-exp)<0.5); };
-      const g=this._g;
-      const b3=1000*(1+g), b4=b3*(1+g), b5=b4*(1+g);
+      const segOk = Array.from({length:o.nseg},(_,i)=>{
+        const c=cel('C'+(o.r0+i));
+        return c.formula && String(c.formula).includes('$B$2') && Math.abs((c.value||0)-o.bases[i]*(1+o.g))<0.5; }).every(Boolean);
+      const tot = o.bases.reduce((a,b)=>a+b,0)*(1+o.g);
+      const c=cel('C'+o.tr);
+      const totOk = c.formula && /SUM/i.test(String(c.formula)) && Math.abs((c.value||0)-tot)<0.5;
       return [
-        {label:'fill the growth formula down through B4 and B5 (ctrl+d)', ok: vOk('B4',b4,'B3') && vOk('B5',b5,'B4')},
-        {label:'fill the total right \u2014 C7 and D7 pick up shifted refs (ctrl+r)', ok: vOk('C7',1020,'C2') && vOk('D7',530,'D2')},
+        {label:'every segment filled — formulas, all pinned to $B$2', ok: segOk},
+        {label:'the total pulled RIGHT — still a SUM, right answer', ok: totOk},
       ];
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Grab the whole block', par:30, parKeys:3,
-    prompt:'TWO data islands on the page \u2014 and your brief is only ONE of them. Ctrl+Shift+arrows ride the data edges: land on the target island, take the whole thing in two chords, bold it. The second island is there to test your aim \u2014 the grader wants the entire target, nothing less',
-    req(){ const o=this._o; return 'on <em>'+o.t0+'</em> \u00b7 <em>ctrl+\u21e7+\u2193</em> then <em>ctrl+\u21e7+\u2192</em> grabs the island \u00b7 <em>ctrl+b</em> \u00b7 the '+o.dName+' block stays plain'; },
+    name:'Block Sel.', label:'Grab the whole block', par:38, parKeys:8,
+    aha:'ctrl+shift+arrows take exactly the island — never drag a selection again',
+    prompt:'THREE data islands on the page — and briefs on TWO of them. Ctrl+Shift+arrows ride the data edges: take the first island whole and bold it, take the second whole and comma-format it. The third island is a decoy testing your aim — the grader wants entire islands, nothing more, nothing less.',
+    req(){ const o=this._o; return 'island one at <em>'+o.t0+'</em>: <em>ctrl+⇧+↓</em> <em>ctrl+⇧+→</em> · <em>ctrl+b</em> · island two at <em>'+o.u0+'</em>: same two chords · <em>alt h k</em> · the decoy at <em>'+o.d0+'</em> stays plain'; },
     guide(){ const o=this._o; return [
-      'the target island starts at <b>'+o.t0+'</b> \u2014 <kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2193</kbd> rides to its last row',
-      '<kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2192</kbd> pulls in the second column \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
-      'the decoy at '+o.d0+' stays UNBOLD \u2014 grabbing too much fails the drill',
+      'first brief — the island at <b>'+o.t0+'</b>: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> · <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      'second brief — <b>'+o.u0+'</b>: same two chords take it whole · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> for commas',
+      'the decoy at '+o.d0+' gets NOTHING — grabbing too much fails the brief',
     ]; },
-    targets(){ const o=this._o; return [o.t0]; },
+    targets(){ const o=this._o; return [o.t0,o.u0]; },
     demo(){ const o=this._o; return [
       {sel:o.t0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'b',ctrl:true}]},
+      {sel:o.u0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'Alt'},L('h'),L('k')]},
     ]; },
     build(){
       const cells={};
@@ -2476,75 +2530,97 @@ const CHALLENGES = {
         const keys=[];
         for(let i=0;i<n;i++){ for(let j=0;j<2;j++){
           const key=colLetter(c+j)+(r0+i);
-          cells[key]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          cells[key]={...blankCell(),value:rnd(10,90)*10,fontColor:'blue'};
           keys.push(key); } }
         return keys;
       };
-      const spots=[[2,3],[6,3],[2,9],[6,9],[4,6]];
+      // spot geometry: heights cap at 4 so a top island's bottom (row 6) never touches
+      // the lower island's title (row 8) — contiguous cells would let ctrl+shift+↓ ride
+      // through BOTH islands. Fifth spot sits at cols 9-10 (own column band) for the
+      // same reason: at [4,6] its bottom row bridged the row-9 islands horizontally.
+      const spots=[[2,3],[6,3],[2,9],[6,9],[9,5]];
       for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
-      const T0=spots[0], D0=spots.find(p=>Math.abs(p[0]-T0[0])>=3||Math.abs(p[1]-T0[1])>=5)||spots[1];
-      const n=rnd(4,6);
-      this._tk=island(T0[0],T0[1],n,'Target \u2193');
-      this._dk=island(D0[0],D0[1],rnd(3,5),'Decoy');
-      this._o={ t0:colLetter(T0[0])+T0[1], d0:colLetter(D0[0])+D0[1], dName:'decoy' };
-      return {ROWS:Math.max(12,T0[1]+n,D0[1]+5), cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{}};
+      const T0=spots[0], U0=spots[1], D0=spots[2];
+      const n1=rnd(3,4), n2=rnd(3,4);
+      this._tk=island(T0[0],T0[1],n1,'Brief 1 ↓ bold');
+      this._uk=island(U0[0],U0[1],n2,'Brief 2 ↓ commas');
+      this._dk=island(D0[0],D0[1],rnd(3,4),'Decoy');
+      this._o={ t0:colLetter(T0[0])+T0[1], u0:colLetter(U0[0])+U0[1], d0:colLetter(D0[0])+D0[1] };
+      return {ROWS:Math.max(13,T0[1]+n1,U0[1]+n2,D0[1]+4), cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{}};
     },
     checks(S){
-      const bold=k=>{ const c=S.cells[k]; return !!(c&&c.bold); };
+      const cel=k=>S.cells[k]||{};
       return [
-        {label:'Bold the whole target island \u2014 both columns, every row', ok: this._tk.every(bold)},
+        {label:'island one bold — both columns, every row, nothing outside', ok: this._tk.every(k=>cel(k).bold) && !this._dk.some(k=>cel(k).bold)},
+        {label:'island two in commas — the whole island', ok: this._uk.every(k=>cel(k).fmtStyle==='comma')},
+        {label:'the decoy stayed plain — aim, not appetite', ok: !this._dk.some(k=>cel(k).bold||cel(k).fmtStyle==='comma')},
       ];
     }
   },
   copyover:{
-    name:'Basics', label:'Copy it over, twice', par:36, parKeys:3,
-    prompt:'One source block, TWO outlined destinations across the page \u2014 spots shuffle each run. Select the block, copy ONCE, paste at both targets. The clipboard survives the first paste; the second one is free.',
-    req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 to <em>'+o.d1+'</em> \u00b7 <em>ctrl+v</em> \u00b7 to <em>'+o.d2+'</em> \u00b7 <em>ctrl+v</em>'; },
+    name:'Copyover', label:'One copy, three hand-offs', par:42, parKeys:8,
+    aha:'copy once, paste everywhere — and alt e s v hands off numbers without the wiring',
+    prompt:'A live sub-build — two input rows and a SUM row — feeds THREE hand-offs across the page, spots shuffled each run. Copy the block ONCE. Two targets take the full paste, formulas and all. The third goes to the deck: Alt E S V, values only — the numbers travel, the wiring stays home.',
+    req(){ const o=this._o; return 'select <em>'+o.src+'</em> · <em>ctrl+c</em> · <em>'+o.d1+'</em> + <em>'+o.d2+'</em> → <em>ctrl+v</em> · <em>'+o.d3+'</em> → <em>alt e s v ↵</em>'; },
     guide(){ const o=this._o; return [
-      'on '+o.src.split(':')[0]+' \u00b7 <kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2193</kbd> <kbd>ctrl</kbd>+<kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd>',
-      'first target '+o.d1+' \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd>',
-      'second target '+o.d2+' \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd> \u2014 one copy, two pastes',
+      'on '+o.src.split(':')[0]+' · <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> · <kbd>ctrl</kbd>+<kbd>c</kbd> — one copy serves all three',
+      o.d1+' then '+o.d2+' · <kbd>ctrl</kbd>+<kbd>v</kbd> each — full paste, the SUM row travels as live formulas',
+      'deck hand-off '+o.d3+' · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd> — values only, no wiring',
     ]; },
-    targets(){ const o=this._o; return [o.src, o.d1, o.d2]; },
+    targets(){ const o=this._o; return [o.src, o.d1, o.d2, o.d3]; },
     demo(){ const o=this._o; return [
       {sel:o.src, keys:[Kb.copy]},
       {sel:o.d1, keys:[{key:'v',ctrl:true}]},
       {sel:o.d2, keys:[{key:'v',ctrl:true}]},
+      {sel:o.d3, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'v'}, Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Source block',txt:true,bold:true};
-      const srcSpots=[[2,2],[2,7],[3,4]];
+      cells['A1']={...blankCell(),value:codename()+' — segment sub-build (one block, three hand-offs)',txt:true,bold:true};
+      const srcSpots=[[2,3],[2,7],[3,4]];
       const sp=srcSpots[rnd(0,2)];
+      cells[colLetter(sp[0])+(sp[1]-1)]={...blankCell(),value:'Sub-build',txt:true,bold:true};
       this._vals=[];
-      for(let i=0;i<3;i++){ const row=[];
+      for(let i=0;i<2;i++){ const row=[];
         for(let j=0;j<2;j++){ const v=rnd(10,90)*10;
           cells[colLetter(sp[0]+j)+(sp[1]+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; row.push(v); }
         this._vals.push(row); }
-      // rects: block is 2 wide x 3 tall with a label row above; destinations must be
-      // disjoint from the source AND from each other (r58 fix: overlapping pastes
-      // clobbered each other — F10 collision class)
+      const sums=[];
+      for(let j=0;j<2;j++){ const col=colLetter(sp[0]+j); const s=this._vals[0][j]+this._vals[1][j];
+        cells[col+(sp[1]+2)]={...blankCell(),formula:'=SUM('+col+sp[1]+':'+col+(sp[1]+1)+')',value:s,fmtStyle:'comma',decimals:0,bold:true,bt:true}; sums.push(s); }
+      this._vals.push(sums);
+      // rects: block is 2 wide x 3 tall with a label row above; all three destinations
+      // must be disjoint from the source AND from each other (r58 collision class)
       const rect=(c,r)=>({c1:c,c2:c+1,r1:r-1,r2:r+2});
       const hits=(a,b)=>!(a.c2<b.c1||b.c2<a.c1||a.r2<b.r1||b.r2<a.r1);
-      const srcRect={c1:sp[0],c2:sp[0]+1,r1:sp[1],r2:sp[1]+2};
-      const dSpots=[[6,2],[9,2],[6,8],[9,7],[5,10]].filter(d=>!hits(rect(d[0],d[1]),srcRect));
-      for(let k=dSpots.length-1;k>0;k--){ const j=rnd(0,k); [dSpots[k],dSpots[j]]=[dSpots[j],dSpots[k]]; }
-      const D1=dSpots[0];
-      const D2=dSpots.slice(1).find(d=>!hits(rect(d[0],d[1]),rect(D1[0],D1[1])))||dSpots[1];
-      cells[colLetter(D1[0])+(D1[1]-1)]={...blankCell(),value:'Paste 1 \u2193',txt:true};
-      cells[colLetter(D2[0])+(D2[1]-1)]={...blankCell(),value:'Paste 2 \u2193',txt:true};
+      const srcRect=rect(sp[0],sp[1]);
+      const pool=[[6,3],[9,3],[6,9],[9,8],[5,11]].filter(d=>!hits(rect(d[0],d[1]),srcRect));
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const picked=[];
+      for(const d of pool){ if(picked.every(p=>!hits(rect(d[0],d[1]),rect(p[0],p[1])))) picked.push(d); if(picked.length===3) break; }
+      const D1=picked[0], D2=picked[1], D3=picked[2];
+      cells[colLetter(D1[0])+(D1[1]-1)]={...blankCell(),value:'Hand-off 1 ↓',txt:true};
+      cells[colLetter(D2[0])+(D2[1]-1)]={...blankCell(),value:'Hand-off 2 ↓',txt:true};
+      cells[colLetter(D3[0])+(D3[1]-1)]={...blankCell(),value:'Deck — values ↓',txt:true};
       this._o={ src:colLetter(sp[0])+sp[1]+':'+colLetter(sp[0]+1)+(sp[1]+2),
-        d1:colLetter(D1[0])+D1[1], d2:colLetter(D2[0])+D2[1], D1:D1, D2:D2 };
-      return {ROWS:12, cells, active:{r:sp[1],c:sp[0]}, sel:null, colW:{}};
+        d1:colLetter(D1[0])+D1[1], d2:colLetter(D2[0])+D2[1], d3:colLetter(D3[0])+D3[1],
+        D1:D1, D2:D2, D3:D3 };
+      return {ROWS:13, cells, active:{r:sp[1],c:sp[0]}, sel:null, colW:{}};
     },
     checks(S){
-      const blockOk=(c0,r0)=>{ for(let i=0;i<3;i++)for(let j=0;j<2;j++){
+      const o=this._o;
+      const blockVals=(c0,r0)=>{ for(let i=0;i<3;i++)for(let j=0;j<2;j++){
         const c=S.cells[colLetter(c0+j)+(r0+i)];
         if(!c||c.value!==this._vals[i][j]) return false; } return true; };
-      const o=this._o;
+      const sumRow=(D,wantF)=>{ for(let j=0;j<2;j++){
+        const c=S.cells[colLetter(D[0]+j)+(D[1]+2)];
+        if(!c) return false;
+        const hasF=!!(c.formula&&/SUM/i.test(c.formula));
+        if(wantF!==hasF) return false; } return true; };
       return [
-        {label:'first destination carries the block ('+o.d1+')', ok: blockOk(o.D1[0],o.D1[1])},
-        {label:'second destination too \u2014 one copy served both ('+o.d2+')', ok: blockOk(o.D2[0],o.D2[1])},
+        {label:'hand-off 1 carries the block — SUM row still live ('+o.d1+')', ok: blockVals(o.D1[0],o.D1[1]) && sumRow(o.D1,true)},
+        {label:'hand-off 2 too — one copy served both ('+o.d2+')', ok: blockVals(o.D2[0],o.D2[1]) && sumRow(o.D2,true)},
+        {label:'deck hand-off is VALUES ONLY — numbers, no formulas ('+o.d3+')', ok: blockVals(o.D3[0],o.D3[1]) && sumRow(o.D3,false)},
       ];
     }
   },
@@ -5178,6 +5254,7 @@ const CHALLENGES = {
   },
   modeltour:{
     name:'Model Tour', label:'Chase the marks', par:42, parKeys:13,
+    aha:'ctrl+arrows teleport to the edge of the data \u2014 the tab is a map, not a scroll',
     prompt:'The VP went through the model and marked four broken cells \u2014 they\u2019re scattered to the corners of the tab, and the meeting is in two minutes. Jump to each mark with ctrl+arrows, retype the number from the note, and land back at A1 when you\u2019re done. Arrow-crawling will not make par: this drill is about MOVING like an analyst.',
     req(){ const d=this._d; return d.map(x=>'<em>'+x.k+'</em> \u2192 type <em>'+x.v+'</em>').join(' \u00b7 ')+' \u00b7 finish: <em>ctrl+home</em>'; },
     guide(){ const d=this._d; return [
@@ -5225,6 +5302,7 @@ const CHALLENGES = {
   },
   navigation:{
     name:'Navigate', label:'Navigation tour', par:30, parKeys:12,
+    aha:'every move has a chord \u2014 analysts travel in jumps, never one cell at a time',
     prompt:'The full obstacle course — twelve chords, in order. Lap the edges with all four Ctrl-arrows, select to the edges with Ctrl+Shift, grab full rows and columns, insert and delete rows, and land back home. This is how analysts move: never one cell at a time.',
     req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em> &rarr; <em>ctrl+&larr;</em> &rarr; <em>ctrl+&uarr;</em> &rarr; <em>ctrl+shift+&rarr;</em> &rarr; <em>ctrl+shift+&darr;</em> &rarr; <em>shift+space</em> &rarr; <em>ctrl+shift+=</em> &rarr; <em>ctrl+&minus;</em> &rarr; <em>ctrl+space</em> &rarr; <em>ctrl+home</em>',
     guide:[
@@ -6220,6 +6298,7 @@ function _showResults(o){
     `<div class="rm-time">${o.t}<span>s</span></div>`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     ghostDiff(o)+
+    ((CHALLENGES[cur]&&CHALLENGES[cur].aha)?'<div class="rm-aha">\ud83d\udca1 '+CHALLENGES[cur].aha+'</div>':'')+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
     `<div class="rm-rank" id="rmRank"></div>`+
     `<div class="rm-opts">`+

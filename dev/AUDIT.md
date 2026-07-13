@@ -3992,3 +3992,43 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   (d) each foundation drill should teach exactly ONE aha the player can
   name afterward. Runs as its own round with fresh eyes.
 - CACHE v145 -> v146.
+
+---
+# ROUND 167 — T7 SHIPPED: THE FRONT-DOOR ENGAGEMENT TRANCHE
+- THE FOUR MICRO-DRILLS REBUILT to doctrine (undo, filldr, blocksel,
+  copyover) — each gained a real tab, a second beat, and a story:
+  - UNDO v2 "Undo is a tool, not a panic" (par 34): a 3x3 SCRATCH block
+    lands on a live opex tab, one column secretly LIVE ("feeds Q4").
+    Nuke the block, Ctrl+Z it ALL back, then delete only the two dead
+    columns and bold the survivor's header. checks include the S.undoN
+    latch — undo must be USED, not retyped. Adjacent dead columns
+    collapse into one selectable range.
+  - FILLDR v2 "Fill down, fill right" (par 40): a revenue build with a
+    Growth driver anchored at $B$2, ONE written formula, then Ctrl+D
+    down the segments and Ctrl+R across the total row. checks demand
+    '$B$2' in every filled formula + value parity — fill slides refs,
+    anchors hold.
+  - BLOCKSEL v2 "Grab the whole block" (par 38): THREE islands, briefs
+    on two (bold one, comma the other), the third a decoy testing aim.
+    GEOMETRY LESSON: island heights cap at 4 and the fifth spot moved
+    to its own column band — taller islands made ctrl+shift+arrows RIDE
+    THROUGH a neighbor via contiguous cells (caught by replay: demo
+    bolded the decoy).
+  - COPYOVER v2 "One copy, three hand-offs" (par 42): the block is now
+    a live sub-build (two input rows + a SUM row). Two full pastes keep
+    the formulas alive; the third hand-off is the deck — Alt E S V,
+    values only. checks assert formulas present at 1+2 and ABSENT at 3.
+- THE AHA LINE — every Foundations drill now carries aha:'...' (one
+  nameable insight), surfaced on the results card between the ghost
+  diff and the leaderboard row (.rm-aha, lightbulb). T7's "teach exactly
+  ONE aha the player can name afterward", made literal.
+- BOOT BEACON FALSE ALARM FIXED: the capture-phase error listener also
+  caught RESOURCE load failures (CDN blocked/adblock/offline) and
+  painted the fatal red banner even though guest mode boots fine.
+  Resource errors (no .message, target != window) now return early.
+- PARKEYS set to measured medians (sweep): undo 4, filldr 2, blocksel 8,
+  copyover 8. PARS mirror updated in drills.js (34/40/38/42) + meta
+  labels refreshed. Par sweep: FLAGGED 0.
+- VERIFIED: demo-replay 66/66 GREEN, parity 37, onboard 20, visual 311,
+  rank 20, par sweep clean, inline scripts node --check clean.
+- CACHE v146 -> v147 (all 9 pages).
