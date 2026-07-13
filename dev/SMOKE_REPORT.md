@@ -78,10 +78,8 @@ denial.
   (school-desk auto-match + student perks later).
 
 ## Outstanding (Wolf)
-1. **Merge `claude/hotkey-gg-continue-lvrf86` → main.** The DB already has
-   all migrations (deployed from the branch), but main still carries the old
-   workflow (no fail-loud check, no manual trigger) and none of the r131/r132
-   docs/harness. Merging is docs/workflow/migrations only — no site pages.
+1. ~~Merge branch → main~~ — done (PR #1, 2026-07-13); auto-merge is now a
+   standing working agreement.
 2. **Rotate the credentials** pasted in chat: generate a new Supabase access
    token (revoke the old) and reset the DB password, then update BOTH repo
    secrets. The pipeline keeps working.
