@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stats · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=120" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=120">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=120">
+<link rel="icon" href="favicon.ico?v=121" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=121">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=121">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -68,8 +68,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=120">
-<script src="drills.js?v=120"></script>
+<link rel="stylesheet" href="nav.css?v=121">
+<script src="drills.js?v=121"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -77,11 +77,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=120"></script>
+<script src="themes.js?v=121"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=120"></script>
+<script src="nav.js?v=121"></script>
 
 <header class="head">
   <div class="wrap">
@@ -163,6 +163,79 @@ async function load(){
   if(!me){
     html += `<div class="state">You're viewing local bests only. <a href="index.html">Sign in with a real account</a> and every run posts — ranks, efficiency history, and the ladder all live here.</div>`;
   }
+
+  // ================= r135/r138: ACHIEVEMENTS — prominent, tipped, rarity-tiered =================
+  // Earned medals are clickable — pick up to 3 to SHOWCASE on your player card.
+  // r138: instant data-tip overlays (name · what it is · global rarity) and rarity
+  // METALS on the badge itself (blue rare <=25% · crimson epic <=10% · radiant
+  // legendary <=3%) — computed Steam-style from every player's runs.
+  try{
+    const AC=window.HOTKEY_ACHIEVEMENTS;
+    if(AC && window.hkBadge){
+      let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
+      let runsL=mine.length?mine:[]; if(!runsL.length){ try{ runsL=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){} }
+      let flags={}; try{ flags=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+      const pbCtx={...localPB};
+      mine.forEach(r=>{ const t=r.time_ms/1000; if(pbCtx[r.challenge]===undefined||t<pbCtx[r.challenge]) pbCtx[r.challenge]=t; });
+      let crowns=0;
+      if(me && all.length){ const seen={};
+        all.forEach(r=>{ if(!D.meta[r.challenge]) return; if(seen[r.challenge]) return; seen[r.challenge]=r.user_id; });
+        crowns=Object.values(seen).filter(u=>u===me.id).length; }
+      const groups={}; Object.entries(D.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
+      const ctx={ pb:pbCtx, pars:window.HOTKEY_PARS||{}, runs:runsL, streak:streakN, solves:solvesN,
+        mouseRuns:flags.mouseRuns||0, slowWins:flags.slowWins||0,
+        nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
+        crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
+      // global rarity (Steam-style): evaluate run-derivable achievements for every player
+      const globalPct=(function(){
+        try{
+          if(!all.length) return {};
+          const byUser={}; all.forEach(r=>{ (byUser[r.user_id]=byUser[r.user_id]||[]).push(r); });
+          const uids=Object.keys(byUser); if(uids.length<2) return {};
+          const PARS2=window.HOTKEY_PARS||{}; const out={};
+          const perBoard={}; { const seen={};
+            all.forEach(r=>{ if(!D.meta[r.challenge]) return; const k2=r.challenge;
+              if(!perBoard[k2]) perBoard[k2]=[]; const kk=k2+'|'+r.user_id;
+              if(!seen[kk]){ seen[kk]=1; perBoard[k2].push(r.user_id); } }); }
+          uids.forEach(u=>{
+            const runs=byUser[u]; const best={}; const days=new Set();
+            runs.forEach(r=>{ const ch=r.challenge;
+              if(best[ch]===undefined||r.time_ms<best[ch]) best[ch]=r.time_ms;
+              if(r.created_at) days.add(String(r.created_at).slice(0,10)); });
+            const pbU={}; Object.keys(best).forEach(k2=>pbU[k2]=best[k2]/1000);
+            const ds=[...days].sort(); let streakU=ds.length?1:0, cur=1;
+            for(let i=1;i<ds.length;i++){ const gap=(new Date(ds[i])-new Date(ds[i-1]))/86400000;
+              cur = gap===1 ? cur+1 : 1; if(cur>streakU) streakU=cur; }
+            let crownsU=0; D.menuOrder.forEach(k2=>{ const b=perBoard[k2]||[]; if(b.length&&b[0]===u) crownsU++; });
+            const attU=D.menuOrder.filter(k2=>pbU[k2]!==undefined).length;
+            const ctxU={ pb:pbU, pars:PARS2, runs, streak:streakU, solves:runs.length, crowns:crownsU, att:attU, menuOrder:D.menuOrder, groups };
+            AC.forEach(a=>{ let ru; try{ ru=a.test(ctxU); }catch(e){ ru={done:false}; }
+              if(ru.done) out[a.id]=(out[a.id]||0)+1; });
+          });
+          Object.keys(out).forEach(k2=>out[k2]=Math.round(100*out[k2]/uids.length));
+          AC.forEach(a=>{ if(out[a.id]===undefined) out[a.id]=0; });
+          return out;
+        }catch(e){ return {}; }
+      })();
+      let earnedN=0, grid='';
+      AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
+        if(r.done) earnedN++;
+        const isFeat=r.done && feat.includes(a.id);
+        const gp=globalPct[a.id];
+        const tierW=(window.hkRarityTier?window.hkRarityTier(gp):null);
+        const rareTxt=(gp!==undefined)?(' \u00b7 '+(tierW?tierW.toUpperCase()+' \u2014 ':'')+gp+'% of players have this'):'';
+        grid+='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'"'+
+          ' data-tip="'+esc(a.name)+' \u2014 '+esc(a.desc)+(r.done?' \u2713 EARNED':' \u00b7 '+(r.prog||0)+'/'+(r.goal||1))+rareTxt+(r.done?' \u00b7 click to showcase':'')+'">'+
+          '<span class="st">\u2605</span>'+
+          window.hkBadge(a.glyph, r.done, 40, null, r.done?gp:undefined)+
+          (r.done?'':'<i>'+Math.min(99,Math.round(100*(r.prog||0)/(r.goal||1)))+'%</i>')+
+          esc(a.name)+'</span>'; });
+      html += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span></h3>'+
+        '<div class="ach-hint">click an earned medal to <b style="color:var(--warn)">\u2605 showcase</b> it on your player card \u00b7 up to 3 (oldest pick swaps out)'+(me?'':' \u00b7 sign in to show them on the boards')+
+        '<br>medal metals: <b style="color:var(--warn)">gold</b> earned \u00b7 <b style="color:#8ab4ff">blue</b> rare (\u226425%) \u00b7 <b style="color:#e2574d">crimson</b> epic (\u226410%) \u00b7 <b style="color:#ffd76e">radiant</b> legendary (\u22643%)</div>'+
+        '<div class="ach-grid">'+grid+'</div>';
+    }
+  }catch(e){}
 
   // WEAK-DRILL NUDGE + insights (signed-in, ranked data available)
   if(me && window.HK_RANK){
@@ -293,41 +366,6 @@ async function load(){
       html += `<div class="drow"><span class="nm">${esc(label)}</span><span class="pb">${fmtS(r.time_ms)}</span><span class="eff">${r.keystrokes||'\u2014'} keys</span><span class="eff">${when}</span></div>`;
     });
   }
-  // ================= r135: ACHIEVEMENTS (rolled in from the card) =================
-  // Earned medals are clickable — pick up to 3 to SHOWCASE on your player card
-  // (stored in profiles.featured_ach; public cards render your picks).
-  try{
-    const AC=window.HOTKEY_ACHIEVEMENTS;
-    if(AC && window.hkBadge){
-      let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
-      let runsL=mine.length?mine:[]; if(!runsL.length){ try{ runsL=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){} }
-      let flags={}; try{ flags=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
-      const pbCtx={...localPB};
-      mine.forEach(r=>{ const t=r.time_ms/1000; if(pbCtx[r.challenge]===undefined||t<pbCtx[r.challenge]) pbCtx[r.challenge]=t; });
-      let crowns=0;
-      if(me && all.length){ const seen={};
-        all.forEach(r=>{ if(!D.meta[r.challenge]) return; if(seen[r.challenge]) return; seen[r.challenge]=r.user_id; });
-        crowns=Object.values(seen).filter(u=>u===me.id).length; }
-      const groups={}; Object.entries(D.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
-      const ctx={ pb:pbCtx, pars:window.HOTKEY_PARS||{}, runs:runsL, streak:streakN, solves:solvesN,
-        mouseRuns:flags.mouseRuns||0, slowWins:flags.slowWins||0,
-        nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
-        crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
-      let earnedN=0, grid='';
-      AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
-        if(r.done) earnedN++;
-        const isFeat=r.done && feat.includes(a.id);
-        grid+='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'"'+
-          ' title="'+esc(a.name)+' \u2014 '+esc(a.desc)+(r.done?' \u2713 earned \u00b7 click to showcase':'')+'">'+
-          '<span class="st">\u2605</span>'+
-          window.hkBadge(a.glyph, r.done, 40)+
-          (r.done?'':'<i>'+Math.min(99,Math.round(100*(r.prog||0)/(r.goal||1)))+'%</i>')+
-          esc(a.name)+'</span>'; });
-      html += '<h3 class="section-title" id="achievements">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span></h3>'+
-        '<div class="ach-hint">click an earned medal to <b style="color:var(--warn)">\u2605 showcase</b> it on your player card \u00b7 up to 3 (oldest pick swaps out)'+(me?'':' \u00b7 sign in to show them on the boards')+'</div>'+
-        '<div class="ach-grid">'+grid+'</div>';
-    }
-  }catch(e){}
   root.innerHTML = html;
   // wire the showcase picker (delegated once — root is re-rendered wholesale)
   try{

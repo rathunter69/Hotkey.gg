@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=120" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=120">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=120">
+<link rel="icon" href="favicon.ico?v=121" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=121">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=121">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=120"></script>
-<link rel="stylesheet" href="nav.css?v=120">
-<script src="themes.js?v=120"></script>
+<script src="drills.js?v=121"></script>
+<link rel="stylesheet" href="nav.css?v=121">
+<script src="themes.js?v=121"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=120"></script>
+<script src="nav.js?v=121"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1263,6 +1263,7 @@ const BETA_MODE         = true; // PRO stays unlocked during beta (isPro) — no
    (localStorage hk_beta_ok remembers the device; signing in also passes).
    Launch day = flip this ONE flag to false. Nothing else changes. */
 const PRELAUNCH_LOCK    = true;
+const ev=(n,m)=>{ try{ (window.hkEvent||function(){})(n,m); }catch(e){} };   // r139: funnel telemetry (nav.js hkEvent)
 const INVITE_AUTO_CODE  = 'HAGS'; // silently redeemed for every session — keeps the members table consistent
 window.NAV_ACTIVE='trainer';
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
@@ -7853,6 +7854,8 @@ async function onSession(session){
   if(arguments[0]){ window.__hkHasSession=true;
     // r134: a session IS beta access — pass the curtain and close it if it's up
     try{ localStorage.setItem('hk_beta_ok','1'); if(gateOpen) closeGate(); }catch(e){}
+    try{ if(!isAnonUser() && !localStorage.getItem('hk_ev_signed')){
+      localStorage.setItem('hk_ev_signed','1'); ev('account_session'); } }catch(e){}
     // r76: a real account with membership but NO handle gets the prompt wherever it is
     // (the r71 version only fired while the landing was visible — Wolf still saw 'set a name')
     setTimeout(()=>{ try{ if(!isAnonUser() && me_member && !me_handle) promptHandle(); }catch(e){} }, 900);
@@ -7873,7 +7876,7 @@ async function onSession(session){
       }
       localStorage.removeItem('hk_pending_desk');
       const d=(data&&data[0])||null;
-      if(d&&d.name) showToast('welcome to the desk: '+d.name);
+      if(d&&d.name){ showToast('welcome to the desk: '+d.name); ev('desk_join',{slug:d.slug}); }
     }catch(e){} }, 1600);
     // r122: school tag refresh (server-derived) + one home-desk nudge per session
     setTimeout(async ()=>{ try{
@@ -8228,7 +8231,7 @@ function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.clas
   let tourDone=false; try{ tourDone=!!localStorage.getItem('hk_tour_done'); }catch(e){}
   if(!tourDone){ __tourAfter=maybeOnboard; setTimeout(()=>tourShow(0), 700); }
   else maybeOnboard(); }
-function tryEnter(){ enterRequested=true; if(!sb){ dismissLanding(); return; } advanceAccess(); }
+function tryEnter(){ enterRequested=true; ev('enter'); if(!sb){ dismissLanding(); return; } advanceAccess(); }
 
 /* ---------- first-run guided intro ---------- */
 let onboarded=false, onboardOpen=false;
@@ -8260,10 +8263,10 @@ function showOnboard(){
   paintOnboard();
 }
 function closeOnboard(){ onboardOpen=false; const o=$('onboard'); if(o) o.classList.remove('show'); }
-function skipOnboard(){ markOnboarded(); closeOnboard(); }
+function skipOnboard(){ markOnboarded(); closeOnboard(); ev('tutorial_skip'); }
 let placementMode=false;
 function startPlacement(){
-  markOnboarded(); closeOnboard();
+  markOnboarded(); closeOnboard(); ev('tutorial_start');
   placementMode=true;
   loadChallenge('navigation');   // the 12-chord tour IS the placement — pure movement skill
 }
@@ -8320,7 +8323,7 @@ async function ensureGuestSession(){
     if(!sb || me_user || __guestBusy || !sb.auth.signInAnonymously) return;
     __guestBusy=true;
     const { data } = await sb.auth.signInAnonymously();
-    if(data && data.user && !me_user) me_user = data.user;
+    if(data && data.user && !me_user){ me_user = data.user; ev('guest_session'); }
   }catch(e){} finally{ __guestBusy=false; }
 }
 // Deep-link helper — leaderboard/reference pages link here with ?openProfile=1 or ?openAuth=signup
@@ -8373,7 +8376,7 @@ function showPrelaunchLock(){
     '</div>';
   g.classList.add('show');
   const go=()=>{ const v=($('lockCode')?$('lockCode').value:'').trim().toUpperCase();
-    if(v===INVITE_AUTO_CODE.toUpperCase()){ try{ localStorage.setItem('hk_beta_ok','1'); }catch(e){} closeGate(); }
+    if(v===INVITE_AUTO_CODE.toUpperCase()){ try{ localStorage.setItem('hk_beta_ok','1'); }catch(e){} ev('curtain_pass'); closeGate(); }
     else { const m2=$('lockMsg'); if(m2) m2.textContent='That code didn\u2019t work. Check with whoever invited you.'; } };
   const b=$('lockGo'); if(b) b.onclick=go;
   const ci=$('lockCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } }; }
@@ -8383,6 +8386,9 @@ function closeGate(){ gateOpen=false; const g=$('gate'); if(g){ g.classList.remo
 
 // r80: lite local run ledger — feeds in-game achievement checks (server runs stay canonical)
 function logRunLite(t){
+  try{ ev('solve',{d:cur, ms:Math.round(t*1000)});
+    if(!localStorage.getItem('hk_ev_first')){ localStorage.setItem('hk_ev_first','1'); ev('first_solve',{d:cur}); }
+  }catch(e){}
   try{
     const a=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]');
     a.push({time_ms:Math.round(t*1000), keystrokes:keyLog.length, optimal:CHALLENGES[cur].parKeys});
@@ -8453,6 +8459,7 @@ function tourShow(i){
   const w=$('tourWrap'), ring=$('tourRing'), card=$('tourCard');
   if(!w||!ring||!card) return;
   if(i>=TOUR_STEPS.length){ w.classList.remove('on'); try{ localStorage.setItem('hk_tour_done','1'); }catch(e){} __tourI=-1;
+    ev('tour_done');
     const f=__tourAfter; __tourAfter=null; if(f) setTimeout(f, 350); return; }
   __tourI=i;
   const st=TOUR_STEPS[i];
