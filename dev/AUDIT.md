@@ -3011,5 +3011,8 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   boot x5 (index + lb/stats/account/reference) zero page errors; chip
   geometry (24px svg, 11.5px label, 7px gap) and tip geometry asserted.
   Live non-.edu signup probe AFTER the migration deploys (merge triggers
-  it) — result appended below.
+  it) — RESULT: GATE REMOVED, non-.edu signup succeeds (it was a trigger;
+  the scan found+dropped it — no dashboard hook involved). Probe account
+  hk.smoke.nonedu.1@hotkeysmoketest.com (uid 23dac454-...) added to the
+  SMOKE_REPORT cleanup list.
 - CACHE v117 -> v118 (all 9 pages).

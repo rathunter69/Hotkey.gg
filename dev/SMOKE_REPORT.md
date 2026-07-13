@@ -72,11 +72,10 @@ denial.
   and deploy. Real school seeds are never claimed/rotated by the harness.
 - The harness reuses its accounts via `SMOKE_TS=03683162 node dev/smoke-live.mjs`
   (signin fallback) — don't mint new accounts without reason.
-- **Signup is .edu-only** ("Only .edu email addresses may register for the
-  beta") via a manual dashboard-side gate that is NOT in the repo. OPEN
-  QUESTION for Wolf: intentional? It locks out working IB professionals —
-  the stated core audience. If keeping: document where it lives; if not:
-  remove in the Supabase dashboard (Auth hook/trigger).
+- ~~Signup .edu-only gate~~ RESOLVED r133: Wolf chose incentive-not-wall.
+  Migration 20260713100000 dropped the dashboard-era trigger (verified live:
+  non-.edu signup succeeds); the signup card now pitches .edu as the carrot
+  (school-desk auto-match + student perks later).
 
 ## Outstanding (Wolf)
 1. **Merge `claude/hotkey-gg-continue-lvrf86` → main.** The DB already has
@@ -86,7 +85,7 @@ denial.
 2. **Rotate the credentials** pasted in chat: generate a new Supabase access
    token (revoke the old) and reset the DB password, then update BOTH repo
    secrets. The pipeline keeps working.
-3. Decide on the .edu signup gate (above).
+3. ~~.edu signup gate~~ — resolved r133 (removed; incentive copy shipped).
 4. Distribute seed desk codes to club presidents whenever ready — backend is
    verified.
 5. Optional service-role cleanup of smoke accounts (harmless; no runs, no
@@ -98,5 +97,7 @@ denial.
    - `hk.smoke.a.03683162@hotkeysmoketest.edu` / `hk.smoke.b.03683162@upenn.edu` /
      `hk.smoke.c.03683162@hotkeysmoketest.edu` — the active harness trio
      (KEEP if you want re-runnable smokes; they hold no desks)
+   - `hk.smoke.nonedu.1@hotkeysmoketest.com` — `23dac454-85bd-460b-ab60-23777fca3f11`
+     (r133 gate-removal probe; no profile, no runs)
    - `reports` table holds 2 smoke rows (kind=handle, note mentions smoke) — delete at leisure.
    - **Remove the smoke-u fixture at launch** (T&S pass) — currently consumed/absent.
