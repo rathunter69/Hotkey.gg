@@ -3064,3 +3064,57 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   unchanged. CACHE v118 -> v119 (all 9 pages).
 - LOCALSTORAGE: new key hk_beta_ok (curtain pass). REMOVE the curtain block +
   key at launch (flip PRELAUNCH_LOCK=false; key becomes inert).
+
+---
+# ROUND 135 — SHOWCASE ACHIEVEMENTS + EMBLEM DE-PLATE + favicon verdict
+- EMBLEM PLATE (Wolf: "rank icon has a holdover background"): stats + account
+  wrapped the emblem in tier.cls — the tier PILL css (tinted background) painted
+  a plate behind the transparent SVG. The r74 "hero de-plated" bug class; these
+  two copies survived. Both wrappers stripped to plain spans.
+- FAVICON VERDICT: NOT hosting/supabase — live Pages already serves the r134
+  icon (4,711-byte .ico vs the old 429-byte placeholder). Chrome's favicon
+  cache is a separate DB that hard-refresh doesn't touch; resolves on browser
+  restart / incognito confirms.
+- ACHIEVEMENTS moved to STATS (Wolf's call): full 43-medal grid w/ progress %
+  now lives on stats.html#achievements (local-ctx anon-friendly; crowns exact
+  when signed in). EARNED medals are clickable -> ★ SHOWCASE picks (max 3,
+  oldest swaps out), stored hk_feat_ach + profiles.featured_ach (migration
+  20260713200000, grants re-issued w/ the new column). The player card keeps a
+  highlight reel: picks first (★), rarest-3 fallback, "edit showcase ↗" deep
+  link; the full grid left the card. PUBLIC cards (lb) render picks as-is
+  (cosmetic; profiles select + __featOf map).
+
+---
+# ROUND 136 — THE DESK HALL: captain-first team dashboard (Wolf: "not a re-skin")
+- leaderboard ?desk= page rebuilt as a GUILD HALL (deskBanner block replaced
+  wholesale): cap strip · crest + name + verified + "captained by <name>" ·
+  captain-only "captain's controls →" (account) · REPORT kept.
+- ROI BAND (the justify-the-investment ask, all derived from loaded runs):
+  team time saved (first-attempt -> best, summed) · avg speed-up % per
+  re-drilled task · clean runs + drill coverage · runs this week vs last w/
+  momentum ▲▼. Honest metrics only — no invented "hours on the desk" math.
+- QUEST BOARD: each assignment = quest card (target, note, days left,
+  progress bar, X/N) + PER-MEMBER TICKS (✓/·, click -> player card) — the
+  "make sure everyone has done the drill" view. 100% = "quest complete".
+  Captain empty-state points at the pin controls.
+- EVALUATION ROSTER: analyst (★ captain, (you)) · rank emblem+tier · boards ·
+  crowns · this-week runs (⚠ 0 flags idle, captain view) · time saved;
+  sorted week-activity desc. Rows open public cards (existing delegation).
+- team_members select gains role (captain detection). Boards below remain
+  desk-only (the drill-down). Member view verified: no captain affordances.
+- VERIFY: stubbed-supabase Playwright renders (captain + member screenshots
+  reviewed); zero page errors; lb/index/account/stats boot clean; node
+  --check all extracted scripts. CACHE v119 -> v120 (all 9 pages).
+
+---
+# ROUND 137 — STRATEGY: the five-lens global pass (dev/STRATEGY.md)
+- Wolf asked for the wide-angle Fable pass: game designer / live-ops / IB
+  coach / buyer / MBA candidate. Deliverable at dev/STRATEGY.md — key calls:
+  the 30-second loop is strong, everything BETWEEN sessions is thin; traces
+  (recorded since r9) are the unexploited goldmine; measurement is the
+  pre-launch blocker (events table before anything else); then Morning Sheet
+  daily ritual + streak insurance, ghost-diff results insight, share surfaces
+  (rank card / challenge links / placement share), cohort report export +
+  captain program templates, audit+RX content round, seasons design-doc-only.
+  DO-NOT-BUILD list: more drill breadth, mobile trainer, realtime races,
+  live payments (standing). Sequencing rationale inside.

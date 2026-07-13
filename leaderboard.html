@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=119" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=119">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=119">
+<link rel="icon" href="favicon.ico?v=120" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=120">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=120">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -90,6 +90,61 @@
   .pub-nm{font-family:var(--mono); font-size:17px; font-weight:700}
   .pub-you{font-size:11px; color:var(--muted); font-weight:400}
   .pub-desk{font-family:var(--mono); font-size:11px; color:var(--accent); margin-top:5px}
+  /* ===== r136: THE DESK HALL — captain dashboard (guild frame, house language) ===== */
+  .dk-hall{border:1px solid var(--accent-dim); border-radius:12px; background:var(--surface);
+    margin:0 0 26px; overflow:hidden}
+  .dk-cap{min-height:34px; display:flex; align-items:center; justify-content:space-between; padding:6px 16px;
+    background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono);
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent)}
+  .dk-head{display:flex; align-items:center; gap:16px; padding:18px 20px 6px}
+  .dk-crest{width:54px; height:54px; border-radius:12px; background:var(--accent-glow);
+    border:1px solid var(--accent-dim); display:flex; align-items:center; justify-content:center;
+    font-size:24px; color:var(--accent); flex:none}
+  .dk-name{font-family:var(--mono); font-size:19px; font-weight:700; letter-spacing:-.3px}
+  .dk-ver{color:var(--accent); font-size:12px}
+  .dk-sub{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:3px}
+  .dk-manage{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:999px; padding:8px 16px; text-decoration:none; white-space:nowrap}
+  .dk-manage:hover{background:var(--accent-glow)}
+  .dk-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; padding:14px 20px 4px}
+  .dk-stat{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
+    font-family:var(--mono); text-align:center}
+  .dk-stat .v{font-size:20px; font-weight:700; color:var(--text)}
+  .dk-stat .v em{font-style:normal; font-size:11px; vertical-align:2px}
+  .dk-stat.up .v em{color:var(--accent)} .dk-stat.down .v em{color:var(--warn)}
+  .dk-stat .l{font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-top:5px; line-height:1.5}
+  .dk-sect{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted); padding:16px 20px 8px}
+  .dk-quests{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px; padding:0 20px}
+  .dk-quest{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; font-family:var(--mono)}
+  .dk-quest.done{border-color:var(--accent-dim)}
+  .dk-q-top{display:flex; justify-content:space-between; gap:8px; align-items:baseline}
+  .dk-q-name{font-size:13px; font-weight:700}
+  .dk-q-tgt{font-size:10px; color:var(--muted); white-space:nowrap}
+  .dk-q-note{font-size:10.5px; color:var(--muted); margin-top:4px; line-height:1.5}
+  .dk-q-bar{height:6px; background:var(--bg); border-radius:99px; overflow:hidden; margin:9px 0 5px}
+  .dk-q-bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
+  .dk-quest.done .dk-q-bar i{background:var(--accent)}
+  .dk-q-n{font-size:10px; color:var(--muted)}
+  .dk-q-ticks{display:flex; flex-wrap:wrap; gap:4px 8px; margin-top:8px}
+  .dk-q-ticks span{font-size:9.5px; cursor:pointer; border-radius:6px; padding:1px 5px}
+  .dk-q-ticks .ok{color:var(--accent)}
+  .dk-q-ticks .no{color:var(--faint)}
+  .dk-q-ticks span:hover{background:var(--bg)}
+  .dk-empty{font-family:var(--mono); font-size:11.5px; color:var(--muted); padding:0 20px 6px; line-height:1.6}
+  .dk-roster{padding:0 20px; font-family:var(--mono)}
+  .dk-r{display:grid; grid-template-columns:1fr 150px 62px 62px 66px 76px; gap:10px; align-items:center;
+    padding:7px 10px; border-radius:8px; font-size:12px; cursor:pointer}
+  .dk-r:hover{background:var(--surface2)}
+  .dk-r.hd{cursor:default; font-size:9px; text-transform:uppercase; letter-spacing:.8px; color:var(--faint)}
+  .dk-r.hd:hover{background:none}
+  .dk-r.idle .nm, .dk-r.idle .wk{color:var(--muted)}
+  .dk-r .nm{font-weight:700} .dk-r .you{color:var(--accent); font-weight:400}
+  .dk-r .tr{display:inline-flex; align-items:center; gap:5px; font-size:10.5px; color:var(--muted)}
+  .dk-r .wk{color:var(--accent)} .dk-r.idle .wk{color:var(--warn)}
+  .dk-foot{font-family:var(--mono); font-size:10px; color:var(--faint); padding:10px 20px 16px}
+  @media (max-width:760px){ .dk-r{grid-template-columns:1fr 90px 50px 60px} .dk-r span:nth-child(3),.dk-r span:nth-child(6){display:none} }
+
   .pub-tiles{display:flex; gap:14px; padding:8px 18px 4px; font-family:var(--mono); font-size:11.5px; color:var(--muted)}
   .pub-tiles b{color:var(--text); font-size:14px; margin-right:3px}
   .pub-best{padding:10px 12px 14px}
@@ -186,15 +241,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=119">
-<script src="drills.js?v=119"></script>
+<link rel="stylesheet" href="nav.css?v=120">
+<script src="drills.js?v=120"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=119"></script>
+<script src="themes.js?v=120"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=119"></script>
+<script src="nav.js?v=120"></script>
 
 <header class="head">
   <div class="wrap">
@@ -326,10 +381,10 @@ async function load(){
   try{
     try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null; }catch(e){}
     const [p, r, se, tm, tt] = await Promise.all([
-      sb.from('profiles').select('id,handle,team_code,school_tag,show_school'),
+      sb.from('profiles').select('id,handle,team_code,school_tag,show_school,featured_ach'),
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
-      sb.from('team_members').select('team_id,user_id'),
+      sb.from('team_members').select('team_id,user_id,role'),
       sb.from('teams').select('id,name,slug,verified'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
     ]);
     profs=p.data||[]; runs=r.data||[]; sessions=se.data||[];
@@ -341,6 +396,8 @@ async function load(){
   profs.forEach(p=>{ names[p.id]=p.handle||('analyst-'+String(p.id).slice(0,4)); });
   // r122: opt-in school chips (v1.5) — tag derives server-side from the auth email
   window.__schoolOf={}; profs.forEach(p=>{ if(p.show_school&&p.school_tag) window.__schoolOf[p.id]=p.school_tag; });
+  // r135: featured-achievement picks (cosmetic, curated on the stats page)
+  window.__featOf={}; profs.forEach(p=>{ if(p.featured_ach) window.__featOf[p.id]=String(p.featured_ach).split(',').filter(Boolean).slice(0,3); });
   // section leaders: fastest clean run on each advanced section's flagship.
   // runs arrive time-sorted asc, so first hit per drill IS the leader.
   const SECTION_FLAGSHIPS=[['Full Builds','threestmt','tie the three statements'],
@@ -396,46 +453,120 @@ async function load(){
     st.wsum = st.entries.reduce((a,e)=>a+Math.min(1, Math.log2((e.n||1)+1)/Math.log2(9)),0); });
   const mySolves = meId ? fRuns.filter(x=>x.user_id===meId).length : 0;
   DATA={profs,runs,sessions,fRuns,fSessions,names,meId,teamIds,myTeam,myDesk,viewDesk,teamOnly,perDrill,userStat,mySolves};
-  // desk-page banner + roster (mirrors the secleadMount injection pattern)
-  setTimeout(()=>{ try{
+  // ================= r136: THE DESK HALL — captain-first team dashboard =================
+  // Wolf: "not a re-skinned leaderboard — captains need to see users, evaluate at a
+  // glance, chase assignment completion, and justify the investment." Guild-style:
+  // ROI band (hours saved, cohort improvement, coverage, momentum) + quest board with
+  // per-member ticks + evaluation roster. Everything derives from already-loaded runs.
+  setTimeout(async ()=>{ try{
     let b=document.getElementById('deskBanner');
-    if(DATA.viewDesk){
-      if(!b){ const root=document.getElementById('boards'); b=document.createElement('div'); b.id='deskBanner'; root.parentNode.insertBefore(b, root); }
-      const ids=[...DATA.viewDesk.ids];
-      const roster=ids.map(id=>({id:id, name:DATA.names[id], st:DATA.userStat[id]}))
-        .sort((a,b2)=>(((b2.st&&b2.st.crowns)||0)-((a.st&&a.st.crowns)||0)) || (((b2.st&&b2.st.att)||0)-((a.st&&a.st.att)||0)));
-      b.innerHTML='<div class="section-title">\u25c6 desk: '+esc(DATA.viewDesk.name)+(DATA.viewDesk.verified?' <span style="color:var(--accent)">\u2713 verified</span>':'')+' \u2014 '+ids.length+' analyst'+(ids.length===1?'':'s')+' \u00b7 every board below is desk-only'+(DATA.meId?' \u00b7 <a id="deskReport" style="cursor:pointer;color:var(--faint)">report</a>':'')+'</div>'+
-        '<div class="seclead">'+roster.slice(0,12).map(m=>'<div class="sl"><div class="sl-name" data-uid="'+m.id+'">'+esc(m.name)+'</div>'+
-          '<div class="sl-t">'+((m.st&&m.st.crowns)||0)+' crown'+(((m.st&&m.st.crowns)||0)===1?'':'s')+' \u00b7 '+((m.st&&m.st.att)||0)+' boards</div></div>').join('')+
-        (ids.length>12?'<div class="sl"><div class="sl-name" style="color:var(--faint)">+'+(ids.length-12)+' more</div></div>':'')+'</div>';
-      const rep=document.getElementById('deskReport');
-      if(rep) rep.onclick=async()=>{ try{
-        await sb.from('reports').insert({reporter:DATA.meId, kind:'desk', target:DATA.viewDesk.slug});
-        rep.textContent='reported \u2713'; rep.style.pointerEvents='none'; }catch(e){} };
-      // r130: this week's assignments + completion ticks \u2014 completion DERIVES from runs
-      // (clean run on the drill since it was pinned, under target when one is set)
-      (async()=>{ try{
-        const {data:asg}=await sb.from('team_assignments')
-          .select('challenge,target_ms,note,created_at,expires_at')
-          .eq('team_id', DATA.viewDesk.id).gt('expires_at', new Date().toISOString())
-          .order('created_at');
-        if(!asg||!asg.length) return;
-        const lab={}; CH.forEach(c=>lab[c.key]=c.label||c.key);
-        const ids=[...DATA.viewDesk.ids];
-        const rows=asg.map(a=>{
-          const since=new Date(a.created_at).getTime();
-          const done=ids.filter(id=>DATA.fRuns.some(r=>r.user_id===id && r.challenge===a.challenge &&
-            (!a.target_ms || r.time_ms<=a.target_ms) && new Date(r.created_at||0).getTime()>=since)).length;
-          return '<div class="sl"><div class="sl-sec"><span class="dia">\u25c6</span>'+esc(lab[a.challenge]||a.challenge)+'</div>'+
-            '<div class="sl-name">'+(a.target_ms?('under '+(a.target_ms/1000)+'s'):'clean clear')+'</div>'+
-            '<div class="sl-t">'+done+' / '+ids.length+' done</div>'+
-            (a.note?'<div class="sl-lab">'+esc(a.note)+'</div>':'')+'</div>';
-        }).join('');
-        const w=document.createElement('div');
-        w.innerHTML='<div class="section-title">\u25c6 this week\u2019s assignments</div><div class="seclead">'+rows+'</div>';
-        b.appendChild(w);
-      }catch(e){} })();
-    } else if(b){ b.remove(); }
+    if(!DATA.viewDesk){ if(b) b.remove(); return; }
+    if(!b){ const root=document.getElementById('boards'); b=document.createElement('div'); b.id='deskBanner'; root.parentNode.insertBefore(b, root); }
+    const ids=[...DATA.viewDesk.ids];
+    const WEEK=7*86400000, now=Date.now();
+    const capRow=(window.__deskMembers||[]).find(m=>m.team_id===DATA.viewDesk.id && m.role==='captain');
+    const captainId=capRow&&capRow.user_id;
+    const iAmCaptain=!!(DATA.meId && captainId===DATA.meId);
+
+    // ---- per-member ledger: first-vs-best per drill, weekly activity ----
+    const eco={}; // uid -> {savedMs, impPcts:[], week:0, prevWeek:0, runs:0, drills:Set}
+    ids.forEach(id=>eco[id]={savedMs:0, impPcts:[], week:0, prevWeek:0, runs:0, drills:new Set()});
+    const byUD={};
+    DATA.fRuns.forEach(r=>{
+      const e=eco[r.user_id]; if(!e) return;
+      e.runs++; e.drills.add(r.challenge);
+      const t=new Date(r.created_at||0).getTime();
+      if(t>now-WEEK) e.week++; else if(t>now-2*WEEK) e.prevWeek++;
+      (byUD[r.user_id+'|'+r.challenge]=byUD[r.user_id+'|'+r.challenge]||[]).push(r);
+    });
+    Object.entries(byUD).forEach(([k,arr])=>{
+      if(arr.length<2) return;
+      const uid=k.split('|')[0];
+      const first=arr.slice().sort((a,b2)=>new Date(a.created_at||0)-new Date(b2.created_at||0))[0].time_ms;
+      const best=Math.min(...arr.map(r=>r.time_ms));
+      if(first>best){ eco[uid].savedMs+=(first-best); eco[uid].impPcts.push((first-best)/first); }
+    });
+    const teamSavedMs=ids.reduce((a,id)=>a+eco[id].savedMs,0);
+    const allImp=ids.flatMap(id=>eco[id].impPcts);
+    const avgImp=allImp.length?Math.round(100*allImp.reduce((a,x)=>a+x,0)/allImp.length):null;
+    const teamRuns=ids.reduce((a,id)=>a+eco[id].runs,0);
+    const teamDrills=new Set(); ids.forEach(id=>eco[id].drills.forEach(d=>teamDrills.add(d)));
+    const wk=ids.reduce((a,id)=>a+eco[id].week,0), pwk=ids.reduce((a,id)=>a+eco[id].prevWeek,0);
+    const fmtSaved=ms=>{ const m=Math.round(ms/60000); return m>=60 ? (Math.floor(m/60)+'h '+(m%60)+'m') : (m+'m'); };
+    const mom = pwk ? Math.round(100*(wk-pwk)/pwk) : null;
+
+    // ---- hall header ----
+    const capName=captainId?DATA.names[captainId]:null;
+    let html='<div class="dk-hall">'+
+      '<div class="dk-cap"><span>\u25c6 THE DESK</span><span>'+(DATA.meId?'<a id="deskReport" style="cursor:pointer;color:var(--faint)">report</a>':'')+'</span></div>'+
+      '<div class="dk-head">'+
+        '<div class="dk-crest">\u25c6</div>'+
+        '<div class="dk-id"><div class="dk-name">'+esc(DATA.viewDesk.name)+(DATA.viewDesk.verified?' <span class="dk-ver">\u2713 verified</span>':'')+'</div>'+
+        '<div class="dk-sub">'+ids.length+' analyst'+(ids.length===1?'':'s')+
+          (capName?' \u00b7 captained by <b data-uid="'+captainId+'" style="cursor:pointer">'+esc(capName)+'</b>':' \u00b7 <span style="color:var(--warn)">captaincy unclaimed \u2014 first code-join takes the desk</span>')+'</div></div>'+
+        (iAmCaptain?'<a class="dk-manage" href="account.html">captain\u2019s controls \u2192</a>':'')+
+      '</div>';
+
+    // ---- ROI band ----
+    html+='<div class="dk-stats">'+
+      '<div class="dk-stat"><div class="v">'+(teamSavedMs?fmtSaved(teamSavedMs):'\u2014')+'</div><div class="l">faster, first try \u2192 best<br>summed across the desk</div></div>'+
+      '<div class="dk-stat"><div class="v">'+(avgImp!==null?avgImp+'%':'\u2014')+'</div><div class="l">avg speed-up per<br>re-drilled task</div></div>'+
+      '<div class="dk-stat"><div class="v">'+teamRuns+'</div><div class="l">clean runs \u00b7 '+teamDrills.size+' / '+CH.length+'<br>drills covered</div></div>'+
+      '<div class="dk-stat'+(wk||pwk?(wk>=pwk?' up':' down'):'')+'"><div class="v">'+wk+(mom!==null?' <em>'+(mom>=0?'\u25b2':'\u25bc')+Math.abs(mom)+'%</em>':'')+'</div><div class="l">runs this week<br>vs last</div></div>'+
+      '</div>';
+
+    // ---- quest board (assignments w/ per-member ticks) ----
+    let asg=[];
+    try{ const {data:a2}=await sb.from('team_assignments')
+      .select('challenge,target_ms,note,created_at,expires_at')
+      .eq('team_id', DATA.viewDesk.id).gt('expires_at', new Date().toISOString())
+      .order('created_at'); asg=a2||[]; }catch(e){}
+    const lab={}; CH.forEach(c=>lab[c.key]=c.label||c.key);
+    if(asg.length){
+      html+='<div class="dk-sect">this week\u2019s quests</div><div class="dk-quests">'+asg.map(a=>{
+        const since=new Date(a.created_at).getTime();
+        const doneIds=ids.filter(id=>DATA.fRuns.some(r=>r.user_id===id && r.challenge===a.challenge &&
+          (!a.target_ms || r.time_ms<=a.target_ms) && new Date(r.created_at||0).getTime()>=since));
+        const pct=ids.length?Math.round(100*doneIds.length/ids.length):0;
+        const dSet=new Set(doneIds);
+        const daysLeft=Math.max(0,Math.ceil((new Date(a.expires_at).getTime()-now)/86400000));
+        return '<div class="dk-quest'+(pct===100?' done':'')+'">'+
+          '<div class="dk-q-top"><span class="dk-q-name">\u25c6 '+esc(lab[a.challenge]||a.challenge)+'</span>'+
+            '<span class="dk-q-tgt">'+(a.target_ms?('under '+(a.target_ms/1000)+'s'):'clean clear')+' \u00b7 '+daysLeft+'d left</span></div>'+
+          (a.note?'<div class="dk-q-note">\u201c'+esc(a.note)+'\u201d</div>':'')+
+          '<div class="dk-q-bar"><i style="width:'+pct+'%"></i></div>'+
+          '<div class="dk-q-n">'+doneIds.length+' / '+ids.length+' done'+(pct===100?' \u2014 quest complete':'')+'</div>'+
+          '<div class="dk-q-ticks">'+ids.map(id=>'<span class="'+(dSet.has(id)?'ok':'no')+'" data-uid="'+id+'" title="'+esc(DATA.names[id])+(dSet.has(id)?' \u2713':' \u2014 not yet')+'">'+
+            (dSet.has(id)?'\u2713':'\u00b7')+' '+esc(DATA.names[id])+'</span>').join('')+'</div>'+
+          '</div>';
+      }).join('')+'</div>';
+    } else {
+      html+='<div class="dk-sect">this week\u2019s quests</div>'+
+        '<div class="dk-empty">'+(iAmCaptain?'no quests pinned \u2014 pin up to 3 drills from your <a href="account.html" style="color:var(--accent)">captain\u2019s controls</a> (targets + notes optional)':'no quests pinned this week \u2014 the captain sets them')+'</div>';
+    }
+
+    // ---- evaluation roster ----
+    const roster=ids.map(id=>{ const st=DATA.userStat[id]; const e=eco[id];
+      const t=st?tierOf(st.avg, st.att, st.wsum):window.HK_RANK.tierOf(null,0);
+      return {id, name:DATA.names[id], tier:t, att:(st&&st.att)||0, crowns:(st&&st.crowns)||0,
+        week:e.week, saved:e.savedMs, cap:id===captainId}; })
+      .sort((a,b2)=> b2.week-a.week || b2.crowns-a.crowns || b2.att-a.att);
+    html+='<div class="dk-sect">the roster</div><div class="dk-roster">'+
+      '<div class="dk-r hd"><span>analyst</span><span>rank</span><span>boards</span><span>crowns</span><span>this wk</span><span>saved</span></div>'+
+      roster.map(m=>'<div class="dk-r'+(m.week===0?' idle':'')+'" data-uid="'+m.id+'">'+
+        '<span class="nm">'+(m.cap?'\u2605 ':'')+esc(m.name)+(m.id===DATA.meId?' <b class="you">(you)</b>':'')+'</span>'+
+        '<span class="tr">'+(window.rankEmblem?window.rankEmblem(m.tier.name,16,m.tier.bucket):'')+' '+esc(m.tier.name)+'</span>'+
+        '<span>'+m.att+'</span><span>'+(m.crowns||'\u00b7')+'</span>'+
+        '<span class="wk">'+(m.week||(iAmCaptain?'\u26a0 0':'0'))+'</span>'+
+        '<span>'+(m.saved?fmtSaved(m.saved):'\u2014')+'</span></div>').join('')+
+      '</div>'+
+      '<div class="dk-foot">every board below is desk-only \u00b7 click any analyst for their card'+(iAmCaptain?' \u00b7 \u26a0 = no runs this week':'')+'</div>'+
+      '</div>';
+    b.innerHTML=html;
+    const rep=document.getElementById('deskReport');
+    if(rep) rep.onclick=async()=>{ try{
+      await sb.from('reports').insert({reporter:DATA.meId, kind:'desk', target:DATA.viewDesk.slug});
+      rep.textContent='reported \u2713'; rep.style.pointerEvents='none'; }catch(e){} };
   }catch(e){} }, 0);
   renderAll();
 }
@@ -469,6 +600,18 @@ function showPublicCard(uid){
     '<div class="pub-tiles">'+
       '<span><b>'+((st&&st.crowns)||0)+'</b> crowns</span><span><b>'+((st&&st.pod)||0)+'</b> podiums</span>'+
       '<span><b>'+((st&&st.t10)||0)+'</b> top-10s</span><span><b>'+((st&&st.att)||0)+'</b> boards</span></div>'+
+    (function(){ // r135: their showcase — picked medals, rendered as-is (cosmetic)
+      try{
+        const AC=window.HOTKEY_ACHIEVEMENTS; const picks=(window.__featOf||{})[uid];
+        if(!AC||!picks||!picks.length||!window.hkBadge) return '';
+        const byId={}; AC.forEach(a=>byId[a.id]=a);
+        const items=picks.map(id=>byId[id]).filter(Boolean);
+        if(!items.length) return '';
+        return '<div style="display:flex;gap:12px;justify-content:center;margin:2px 0 10px">'+items.map(a=>
+          '<span title="'+esc(a.name)+' \u2014 '+esc(a.desc)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:8.5px;color:var(--muted);max-width:72px;text-align:center">'+
+          window.hkBadge(a.glyph,true,34)+'\u2605 '+esc(a.name)+'</span>').join('')+'</div>';
+      }catch(e){ return ''; }
+    })()+
     (best.length?'<div class="pub-best">'+best.slice(0,3).map(x=>
       '<div class="pub-row"><span class="rk'+(x.i<3?' r'+(x.i+1):'')+'">'+(x.i+1)+'</span>'+
       '<span class="nm">'+esc(lab[x.k]||x.k)+'</span><span class="tm">'+(x.ms/1000).toFixed(2)+'s \u00b7 of '+x.n+'</span></div>').join('')+'</div>'

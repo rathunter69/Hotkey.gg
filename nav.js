@@ -303,7 +303,7 @@
   { let tries=0; const iv=setInterval(()=>{ if(window._navUser){ clearInterval(iv); navRank(); } else if(++tries>12) clearInterval(iv); }, 700); }
 
   async function loadProfileData(){
-    const p = await window.sb.from('profiles').select('id,handle,flair');
+    const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach');
     const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true});
     let mySessions=[];
     try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', window._navUser.id);
@@ -469,21 +469,25 @@
               }
               localStorage.setItem('hk_ach_seen', JSON.stringify(earnedList.map(e=>e.a.id)));
             }catch(e){}
-            let out='<div class="pc-ach-h">achievements <span style="color:var(--faint)">'+earnedList.length+' / '+AC.length+'</span></div>';
-            if(earnedList.length){
-              out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+earnedList.slice(0,3).map(e=>
+            // r135: SHOWCASE — the player's picked medals lead (profiles.featured_ach,
+            // curated on the stats page); rarest-3 remains the fallback. The full grid
+            // moved to stats.html — the card stays a highlight reel.
+            let picks=[];
+            try{ const meP2=(d._profs||[]).find(x=>x.id===window._navUser.id);
+              if(meP2 && meP2.featured_ach!=null) picks=String(meP2.featured_ach).split(',').filter(Boolean); }catch(e){}
+            if(!picks.length){ try{ picks=JSON.parse(localStorage.getItem('hk_feat_ach')||'[]'); }catch(e){} }
+            const earnedById={}; earnedList.forEach(e=>earnedById[e.a.id]=e);
+            const showcase = picks.map(id=>earnedById[id]).filter(Boolean).slice(0,3);
+            const shown = showcase.length ? showcase : earnedList.slice(0,3);
+            let out='<div class="pc-ach-h">achievements <span style="color:var(--faint)">'+earnedList.length+' / '+AC.length+'</span>'+
+              '<a href="stats.html#achievements" style="float:right;font-size:9.5px;color:var(--accent);text-decoration:none">'+(showcase.length?'edit showcase':'pick your showcase')+' \u2197</a></div>';
+            if(shown.length){
+              out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+shown.map(e=>
                 '<span style="display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;max-width:76px">'+
-                (window.hkBadge?window.hkBadge(e.a.glyph,true,46):'')+e.a.name+
+                (window.hkBadge?window.hkBadge(e.a.glyph,true,46):'')+(showcase.length?'\u2605 ':'')+e.a.name+
                 '</span>').join('')+'</div>';
             }
-            out+='<div class="pc-ach">';
-            AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
-              const gp=globalPct[a.id];
-              const rare=(gp!==undefined)?(' \u00b7 '+gp+'% of players have this'):'';
-              out+='<span class="pc-ach-i'+(r.done?' got':'')+'" data-tip="'+a.name+' \u2014 '+a.desc+(r.done?' \u2713 EARNED':' \u00b7 '+r.prog+'/'+r.goal)+rare+'">'+
-                (window.hkBadge?window.hkBadge(a.glyph, r.done, 40):'')+
-                (r.done?'':'<i>'+Math.min(99,Math.round(100*r.prog/r.goal))+'%</i>')+'</span>'; });
-            out+='</div>';
+            out+='<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin:0 0 4px">full grid + progress on <a href="stats.html#achievements" style="color:var(--accent)">your numbers \u2192</a></div>';
             // ---- most-used shortcuts + coach's notes (directional, never prescriptive) ----
             try{
               const cf=d._chordFreq||{};
