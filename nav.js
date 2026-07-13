@@ -615,7 +615,7 @@
     let lvlHtml='';
     try{ const xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
       if(xp>0 && window.hkLevelChip){ const L=levelOf(xp);
-        lvlHtml='<span class="nav-lvl" id="navLvl" title="LVL '+L.lvl+' \u00b7 '+L.into+'/'+L.need+' xp \u2014 levels are reps; they never decay">'+window.hkLevelChip(L.lvl,20)+'</span>'; } }catch(e){}
+        lvlHtml='<span class="nav-lvl" id="navLvl" title="LVL '+L.lvl+' \u00b7 '+L.into+'/'+L.need+' xp \u2014 levels are reps; they never decay">'+window.hkLevelChip(L.lvl,24)+'<b class="nav-lvl-t">LVL '+L.lvl+'</b></span>'; } }catch(e){}
     slot.innerHTML = lvlHtml +
       '<div class="user-menu">' +
         '<button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false">' +

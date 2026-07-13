@@ -2988,3 +2988,28 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   chat = burned) and merge the branch to main (DB is current; main's
   workflow/docs are stale).
 - No shared-asset change; ?v stays 117. Branch: claude/hotkey-gg-continue-lvrf86.
+
+---
+# ROUND 133 — WOLF'S FIX LIST: nav level legibility, tooltip clip, .edu carrot
+- LEVEL CHIP (Wolf: "way too small to see"): nav keycap 20 -> 24px + a
+  mono "LVL n" text label beside it (.nav-lvl-t, hidden <=740px) — the
+  label carries the read, the keycap is the icon. nav.js + nav.css.
+- TOOLTIP CLIP FOSSIL (Wolf's Chrome: tips bleed above the viewport): the
+  r70 flip-below rule targeted `.nav [data-tip]` but the markup has been
+  `<nav class="topnav">` — the selector NEVER MATCHED; every injected
+  topnav tool tip (sound/profile/random/daily) rendered above and clipped
+  since r70. `.topnav` added to the rule. Playwright-verified: computed
+  ::after top = host height + 8 (below).
+- .EDU GATE -> INCENTIVE (Wolf's decision): migration 20260713100000 drops
+  the dashboard-era auth.users trigger matching the gate's error text
+  ("register for the beta"); if signup still blocks non-.edu post-deploy
+  the gate is an Auth HOOK -> dashboard Authentication -> Hooks (noted in
+  the migration header). Signup card blurb now carries the carrot: use
+  your .edu -> auto-match to your school's desk + student perks later.
+  PROJECT_CONTEXT beta facts updated (.edu question CLOSED).
+- VERIFY: node --check nav.js/themes.js/extracted index script; Playwright
+  boot x5 (index + lb/stats/account/reference) zero page errors; chip
+  geometry (24px svg, 11.5px label, 7px gap) and tip geometry asserted.
+  Live non-.edu signup probe AFTER the migration deploys (merge triggers
+  it) — result appended below.
+- CACHE v117 -> v118 (all 9 pages).
