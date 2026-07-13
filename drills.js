@@ -310,3 +310,29 @@ window.HOTKEY_PLUGIN_LAYERS = {
       {k:'Ctrl+Alt+Shift+!', a:'Apply captured row/column layout to selection', cat:'Utilities'},
     ]},
 };
+
+/* ---- THE PRO OFFER (r156) — single source; hkProSheet in nav.js renders it.
+   DECIDED monetization: subscription; free = the level-gated progression path;
+   PRO = the whole catalog from Level 1 + plugin layers + deep analytics +
+   cosmetics. Prices are placeholders on Stripe TEST MODE — Wolf sets real
+   pricing at launch; beta:true keeps every PRO feature ON for everyone. ---- */
+window.HOTKEY_PRO = {
+  beta: true,
+  monthly: '$7', yearly: '$59', yearlyNote: '2 months free',
+  tagline: 'Train like the desk is watching.',
+  features: [
+    ['The full catalog, day one',
+     'Models + Full Builds from Level 1 — DCF, LBO, debt schedules, three-statement builds',
+     'unlocks as you level'],
+    ['Plugin keyboard layers',
+     'Macabacus + FactSet shortcut profiles on every drill',
+     'native Excel only'],
+    ['Deep analytics',
+     'keystroke heatmap, speed-by-drill trends, percentile history',
+     'core stats + PBs'],
+    ['Pro cosmetics',
+     'exclusive card flair + share-card themes + first access to new looks',
+     'standard flair'],
+  ],
+  betaNote: 'Beta: PRO is switched on for everyone, free. Play now — beta players lock in founder pricing at launch.',
+};

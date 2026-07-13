@@ -278,6 +278,39 @@ body{padding-top:14px}
   .hk-cel-rank .hk-cel-title, .hk-cel-rank .hk-cel-sub{animation:none !important}
 }
 
+/* ---- r156: PRO OFFER SHEET — the one upgrade surface, every page (hkProSheet) ---- */
+.hk-pro{max-width:480px; min-width:min(460px, 94vw); cursor:default; text-align:left}
+.hk-pro .hk-cel-cap{justify-content:space-between}
+.hk-pro-tag{font-family:var(--mono); font-size:12px; color:var(--muted); margin:2px 0 14px}
+.hk-pro-hook{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
+  border:1px solid var(--warn); border-radius:9px; padding:8px 12px; margin:0 0 14px}
+.hk-pro-hook b{color:var(--warn)}
+.hk-pro-grid{border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.hk-pro-head{display:grid; grid-template-columns:1fr 108px; background:var(--surface2);
+  border-bottom:1px solid var(--line); font-family:var(--mono); font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase}
+.hk-pro-head span{padding:7px 12px} .hk-pro-head span:first-child{color:var(--warn)}
+.hk-pro-head span:last-child{color:var(--faint); border-left:1px solid var(--line)}
+.hk-pro-row{display:grid; grid-template-columns:1fr 108px; border-bottom:1px solid var(--line)}
+.hk-pro-row:last-child{border-bottom:none}
+.hk-pro-f{padding:9px 12px} .hk-pro-f b{display:block; font-family:var(--mono); font-size:12px; color:var(--text)}
+.hk-pro-f span{font-family:var(--mono); font-size:10.5px; color:var(--muted); line-height:1.55; display:block; margin-top:2px}
+.hk-pro-free{padding:9px 12px; border-left:1px solid var(--line); font-family:var(--mono); font-size:10.5px;
+  color:var(--faint); display:flex; align-items:center}
+.hk-pro-plans{display:flex; gap:10px; margin:14px 0 0}
+.hk-pro-plan{flex:1; text-align:center; font-family:var(--mono); border:1px solid var(--line); border-radius:10px;
+  padding:9px 8px; cursor:pointer; background:var(--surface2); color:var(--muted)}
+.hk-pro-plan b{display:block; font-size:16px; color:var(--text)} .hk-pro-plan i{font-style:normal; font-size:9.5px}
+.hk-pro-plan.on{border-color:var(--warn); color:var(--text); box-shadow:0 0 0 1px var(--warn) inset}
+.hk-pro-plan.on i{color:var(--warn)}
+.hk-pro-beta{font-family:var(--mono); font-size:11px; color:var(--accent); background:var(--accent-glow);
+  border:1px solid var(--accent-dim); border-radius:9px; padding:8px 12px; margin-top:14px; line-height:1.6}
+.hk-pro-cta{display:block; width:100%; font-family:var(--mono); font-size:13px; font-weight:700; text-align:center;
+  border:none; border-radius:10px; padding:12px; margin-top:14px; cursor:pointer; color:#1c1408;
+  background:linear-gradient(180deg, #ffefb3, #f4c754 55%, #e3b341)}
+.hk-pro-cta.quiet{background:var(--surface2); color:var(--text); border:1px solid var(--line)}
+.hk-pro-msg{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-align:center; min-height:15px; margin-top:8px}
+
 /* r81: beta tag on the brand — inherits the adaptive palette */
 .brand-beta{font-family:var(--mono); font-size:8.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
   color:var(--accent); border:1px solid var(--accent-dim); border-radius:5px; padding:1.5px 5px;

@@ -3669,3 +3669,34 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   regression ALL GREEN; parity audit + r148/r150/r151 suites re-run ALL
   PASS; both tabs screenshot-eyeballed (the S&U #### wall reads exactly
   right). drills.js PARS synced. CACHE v133 -> v134 (all 9 pages).
+
+---
+# ROUND 156 — PRO OFFER SURFACES (Wolf: "know what comes with pro, seamless upgrade")
+- BASE NOTE: this round was first built as "r131" against the pre-r132 tree
+  in a parallel session; on push, main had advanced through r155 (PRs #12-
+  #23: deal-room picker, share surfaces incl. the r148 PRO teaser, RX pack,
+  audits). Rebuilt cleanly on the current base — the r148 card-themes
+  teaser + ?openUpgrade= deep links now land on this sheet, not the old
+  thin modal. (Old line preserved on branch backup-pro-r131.)
+- THE OFFER, made concrete (drills.js window.HOTKEY_PRO, single source):
+  free = the level-gated progression path; PRO = (1) full catalog from
+  Level 1 (Models + Full Builds), (2) Macabacus/FactSet plugin layers,
+  (3) deep analytics, (4) pro cosmetics (flair + share-card themes).
+  Placeholder pricing $7/mo · $59/yr ("2 months free") — Wolf edits ONE
+  object. Every pillar maps to an existing gated surface; nothing vapor.
+- ONE SHEET EVERYWHERE: hkProSheet(feature) in nav.js + .hk-pro in
+  nav.css — PRO-vs-FREE comparison grid, monthly/yearly plan toggle (CTA
+  price follows), feature hook line, and two states: BETA (green "PRO is
+  on for everyone, free — founder pricing at launch", quiet close CTA) vs
+  LAUNCH (gold Upgrade CTA -> hkProCheckout -> create-checkout Edge
+  Function, TEST-mode-only, honest fallback copy). Esc/backdrop/x close.
+- TOUCHPOINTS: picker (VDR tree) advanced-folder diamond tags, stats
+  Analytics PRO tag, account flair PRO tag, NEW account "Your plan" card;
+  index openUpgrade/startCheckout now DELEGATE to the shared sheet (old
+  inline modal deleted; requirePro flow + r148 deep links unchanged, so
+  the launch flip stays config: HOTKEY_PREMIUM.enabled + HOTKEY_PRO.beta).
+- CACHE v134 -> v135 (all 9 pages).
+- VERIFY: node --check nav.js/drills.js + all extracted inline scripts;
+  sheet screenshot-reviewed in both states on the NEW base (plan toggle
+  exercised); 5 pages boot clean; e2e demo-replay ALL GREEN (64 drills).
+  Stripe remains TEST MODE; no live payments (standing constraint).

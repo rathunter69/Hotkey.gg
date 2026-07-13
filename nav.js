@@ -921,6 +921,63 @@ window.hkConfetti = function(host, colors){
   box.innerHTML=bits; host.appendChild(box);
   setTimeout(()=>{ try{ box.remove(); }catch(e){} }, 2400);
 };
+/* ---- r156: PRO OFFER SHEET — THE upgrade surface, shared by every page.
+   Offer content lives in drills.js HOTKEY_PRO (single source). Beta keeps
+   everything free; at launch the CTA runs Stripe TEST-mode checkout via the
+   create-checkout Edge Function (which refuses live keys). ---- */
+window.hkProSheet = function(feature){
+  const O = window.HOTKEY_PRO || {beta:true, monthly:'$7', yearly:'$59', features:[], betaNote:''};
+  const old=document.getElementById('hkProWrap'); if(old) old.remove();
+  let plan='yearly';
+  const w=document.createElement('div'); w.className='hk-cel-wrap'; w.id='hkProWrap';
+  const rows=(O.features||[]).map(f=>
+    '<div class="hk-pro-row"><div class="hk-pro-f"><b>'+f[0]+'</b><span>'+f[1]+'</span></div>'+
+    '<div class="hk-pro-free">'+f[2]+'</div></div>').join('');
+  w.innerHTML='<div class="hk-cel hk-pro">'+
+    '<div class="hk-cel-cap"><span>hotkey.gg <b style="color:var(--warn)">PRO</b></span><a class="pc-x" id="hkProX" style="position:static;cursor:pointer">\u00d7</a></div>'+
+    '<div class="hk-cel-body" style="text-align:left">'+
+      (O.tagline?'<div class="hk-pro-tag">'+O.tagline+'</div>':'')+
+      (feature?'<div class="hk-pro-hook"><b>'+feature+'</b> comes with PRO.</div>':'')+
+      '<div class="hk-pro-grid"><div class="hk-pro-head"><span>\u25c6 pro</span><span>free</span></div>'+rows+'</div>'+
+      '<div class="hk-pro-plans">'+
+        '<div class="hk-pro-plan" data-plan="monthly"><b>'+O.monthly+'</b><i>per month</i></div>'+
+        '<div class="hk-pro-plan on" data-plan="yearly"><b>'+O.yearly+'</b><i>per year'+(O.yearlyNote?' \u00b7 '+O.yearlyNote:'')+'</i></div>'+
+      '</div>'+
+      (O.beta?'<div class="hk-pro-beta">'+O.betaNote+'</div>':'')+
+      (O.beta
+        ? '<button class="hk-pro-cta quiet" id="hkProGo">Back to training \u2014 PRO is on, free</button>'
+        : '<button class="hk-pro-cta" id="hkProGo">Upgrade \u2014 <span id="hkProPrice">'+O.yearly+'/yr</span></button>')+
+      '<div class="hk-pro-msg" id="hkProMsg"></div>'+
+    '</div></div>';
+  document.body.appendChild(w);
+  const close=()=>{ try{ w.remove(); }catch(e){} document.removeEventListener('keydown', esc, true); };
+  const esc=(e)=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopImmediatePropagation(); close(); } };
+  document.addEventListener('keydown', esc, true);
+  w.addEventListener('click', e=>{ if(e.target===w) close(); });
+  const x=document.getElementById('hkProX'); if(x) x.onclick=close;
+  w.querySelectorAll('.hk-pro-plan').forEach(p=>p.onclick=()=>{
+    plan=p.dataset.plan;
+    w.querySelectorAll('.hk-pro-plan').forEach(q=>q.classList.toggle('on', q===p));
+    const pr=document.getElementById('hkProPrice');
+    if(pr) pr.textContent = plan==='monthly' ? (O.monthly+'/mo') : (O.yearly+'/yr');
+  });
+  const go=document.getElementById('hkProGo');
+  if(go) go.onclick=()=>{ if(O.beta){ close(); return; } window.hkProCheckout(plan); };
+};
+window.hkProCheckout = async function(plan){
+  // Stripe TEST-mode scaffold: tries the Edge Function, reports honestly when
+  // checkout isn't live. The function itself refuses non-test keys.
+  const msg=document.getElementById('hkProMsg');
+  const say=t=>{ if(msg) msg.textContent=t; };
+  if(!window.sb || !window._navUser){ say('Sign in first \u2014 PRO attaches to your account.'); return; }
+  say('Opening checkout\u2026');
+  try{
+    const { data, error } = await window.sb.functions.invoke('create-checkout',
+      { body:{ user_id: window._navUser.id, plan: plan||'yearly' } });
+    if(!error && data && data.url){ location.href=data.url; return; }
+  }catch(e){}
+  say('Checkout isn\u2019t live yet \u2014 the beta keeps everything free.');
+};
 window.__hkCelQ=[]; window.__hkCelOpen=false;
 window.hkCelebrate = function(o){
   if(window.__hkCelOpen){ window.__hkCelQ.push(o); return; }

@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=134" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=134">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=134">
+<link rel="icon" href="favicon.ico?v=135" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=135">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=135">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1105,14 +1105,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=134"></script>
-<link rel="stylesheet" href="nav.css?v=134">
-<script src="themes.js?v=134"></script>
+<script src="drills.js?v=135"></script>
+<link rel="stylesheet" href="nav.css?v=135">
+<script src="themes.js?v=135"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=134"></script>
+<script src="nav.js?v=135"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -8750,6 +8750,10 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
       (__adv?'<span class="pk-advtag">\u25c6 advanced</span>':'')+
       '<span class="vdr-n">'+g.keys.length+' file'+(g.keys.length===1?'':'s')+(folded?' \u00b7 folded':'')+'</span>';
     f.onclick=()=>togglePkFold(g.name);
+    // r156: the \u25c6 advanced tag opens the PRO sheet (folder click still folds)
+    { const __t=f.querySelector('.pk-advtag');
+      if(__t){ __t.style.cursor='pointer'; __t.title='what comes with PRO';
+        __t.onclick=(e)=>{ e.stopPropagation(); if(window.hkProSheet) window.hkProSheet('The '+g.name+' track'); }; } }
     tree.appendChild(f);
     g.keys.forEach((key,ki)=>{
       const C=CHALLENGES[key]; if(!C) return;
@@ -8946,34 +8950,10 @@ function requirePro(featureName){
   if(isPro()) return true;
   openUpgrade(featureName); return false;
 }
-function openUpgrade(featureName){
-  let m=$('upgradeModal');
-  if(!m){ m=document.createElement('div'); m.id='upgradeModal'; m.className='onboard-modal'; document.body.appendChild(m); }
-  m.innerHTML='<div class="ob-card" style="max-width:440px;position:relative">'+
-    '<a class="modal-x" id="upX">\u00d7</a>'+
-    '<div class="ob-title">hotkey.gg <span style="color:var(--warn)">pro</span></div>'+
-    '<div class="ob-body" style="text-align:left;line-height:1.7">'+
-      (featureName?('<b>'+featureName+'</b> is a Pro feature.<br><br>'):'')+
-      'Pro unlocks plugin keyboard profiles, advanced analytics, and priority on new drills.'+
-      '<br><br><span style="color:var(--accent);font-family:var(--mono);font-size:12.5px">Beta: everything is free while we build. Pro pricing lands at launch \u2014 early players get grandfathered perks.</span></div>'+
-    '<div class="ob-opts"><button class="ob-key primary" id="upClose">Back to training</button></div></div>';
-  m.classList.add('show');
-  $('upClose').onclick=()=>m.classList.remove('show');
-  const upx=$('upX'); if(upx) upx.onclick=()=>m.classList.remove('show');
-  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
-}
-// startCheckout(): future entry point — calls the create-checkout Edge Function in
-// STRIPE TEST MODE only. Deliberately inert until post-internship.
-async function startCheckout(){
-  // TEST-mode scaffold: tries the Edge Function; falls back to the info modal when
-  // it isn't deployed. The function itself refuses non-test Stripe keys.
-  if(!sb || !me_user || isAnonUser()){ openUpgrade(); return; }
-  try{
-    const { data, error } = await sb.functions.invoke('create-checkout', { body:{ user_id: me_user.id } });
-    if(!error && data && data.url){ location.href = data.url; return; }
-  }catch(e){}
-  openUpgrade();
-}
+// r156: the offer sheet is SHARED chrome now — nav.js hkProSheet renders it on
+// every page from the drills.js HOTKEY_PRO definition (old inline modal deleted).
+function openUpgrade(featureName){ if(window.hkProSheet) window.hkProSheet(featureName); }
+async function startCheckout(){ if(window.hkProCheckout) window.hkProCheckout(); }
 
 async function initAuth(){
   if(!sb){ refreshAuthUI(); return; }
