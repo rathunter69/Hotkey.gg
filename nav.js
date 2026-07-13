@@ -376,7 +376,7 @@
   /* r148: SHAREABLE RANK CARD — LinkedIn-dimensioned PNG (1200x627) drawn locally,
      nothing uploaded. The tier emblem SVG rasterizes via data-URI; if that stalls or
      fails, the card ships text-only — the download never gets held hostage. */
-  function makeRankCard(d, tier, handle, L){
+  function makeRankCard(d, tier, handle, L, onDone){
     try{
       const cv=document.createElement('canvas'); cv.width=1200; cv.height=627;
       const x=cv.getContext('2d');
@@ -413,10 +413,19 @@
       x.fillStyle=col('--faint'); x.font='500 20px "JetBrains Mono", monospace';
       x.fillText('think you’re faster? hotkey.gg', 790, 568);
       let fired=false;
+      /* r150 (Wolf: "doesn't do anything"): the detached-anchor + data:URL click is
+         flaky outside Chrome. Blob URL + DOM-attached anchor is the dependable path,
+         and the caller gets told whether the file actually went out. */
       const finish=()=>{ if(fired) return; fired=true;
-        const a=document.createElement('a');
-        a.download='hotkey-rank-'+name.replace(/[^a-z0-9_-]/gi,'').slice(0,24)+'.png';
-        a.href=cv.toDataURL('image/png'); a.click(); };
+        try{
+          const fname='hotkey-rank-'+name.replace(/[^a-z0-9_-]/gi,'').slice(0,24)+'.png';
+          const send=href=>{ const a=document.createElement('a');
+            a.download=fname; a.href=href; a.style.display='none';
+            document.body.appendChild(a); a.click();
+            setTimeout(()=>{ a.remove(); if(href.indexOf('blob:')===0) URL.revokeObjectURL(href); }, 4000); };
+          if(cv.toBlob) cv.toBlob(b=>{ try{ send(b?URL.createObjectURL(b):cv.toDataURL('image/png')); if(onDone) onDone(true); }catch(e){ if(onDone) onDone(false); } }, 'image/png');
+          else { send(cv.toDataURL('image/png')); if(onDone) onDone(true); }
+        }catch(e){ if(onDone) onDone(false); } };
       try{
         let svg=window.rankEmblem?window.rankEmblem(tier.name,300,tier.bucket):'';
         // the emblem SVG ships for inline DOM use (no xmlns); as an Image document
@@ -432,7 +441,7 @@
           setTimeout(finish, 1200);   // raster stall can't block the download
         } else finish();
       }catch(e){ finish(); }
-    }catch(e){}
+    }catch(e){ if(onDone) onDone(false); }
   }
   function renderProfile(m, d){
     const tier = tierOf(d.avgPct, d.attempted, d.wsum);
@@ -480,9 +489,13 @@
             let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
             let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
             let __xflags={}; try{ __xflags=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+            let __ck=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+              __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length; }catch(e){}
             const ctx={ pb:PBl, pars:window.HOTKEY_PARS||{}, runs:d.myRuns||[], streak:streakN, solves:solvesN,
               mouseRuns:__xflags.mouseRuns||0, slowWins:__xflags.slowWins||0,
               nightWin:!!__xflags.nightWin, dawnWin:!!__xflags.dawnWin, weekendWin:!!__xflags.weekendWin,
+              raceWins:__xflags.raceWins||0, sheetClears:__xflags.sheetClears||0,
+              frzBanked:__xflags.frzBanked||0, chordKinds:__ck,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
             // STEAM-STYLE GLOBAL RARITY: evaluate run-derivable achievements for every
@@ -513,12 +526,15 @@
                 });
                 Object.keys(out).forEach(k=>out[k]=Math.round(100*out[k]/uids.length));
                 AC.forEach(a=>{ if(out[a.id]===undefined) out[a.id]=0; });
+                out.__n=uids.length;   // r150: field size — effective rarity trusts data only at scale
                 return out;
               }catch(e){ return {}; }
             })();
             // r70: header shows earned/possible; top-3 rarest EARNED featured large
+            // r150: gp = EFFECTIVE rarity (static tier floor until the field is >= 20 players)
+            const __fieldN=globalPct.__n||0;
             let earnedList=[]; AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
-              if(r.done) earnedList.push({a, gp:(globalPct[a.id]!==undefined?globalPct[a.id]:100)}); });
+              if(r.done) earnedList.push({a, gp:(window.hkEffRarity?window.hkEffRarity(a.tier, globalPct[a.id], __fieldN):(globalPct[a.id]!==undefined?globalPct[a.id]:100))}); });
             earnedList.sort((x,y)=>x.gp-y.gp);
             // r77: NEW unlocks since last look → celebrate (queued if several)
             try{
@@ -546,7 +562,10 @@
               '<a href="stats.html#achievements" style="float:right;font-size:9.5px;color:var(--accent);text-decoration:none">'+(showcase.length?'edit showcase':'pick your showcase')+' \u2197</a></div>';
             if(shown.length){
               out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+shown.map(e=>
-                '<span data-tip="'+e.a.name+' \u2014 '+e.a.desc+(e.gp!==undefined?' \u00b7 '+e.gp+'% of players have this':'')+'" style="display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;max-width:76px">'+
+                /* r150: the % is only honest at field scale \u2014 below that, speak in tier words */
+                '<span data-tip="'+e.a.name+' \u2014 '+e.a.desc+(function(){ const w=window.hkRarityTier?window.hkRarityTier(e.gp):null;
+                  if(__fieldN>=20 && e.gp!==undefined) return ' \u00b7 '+e.gp+'% of players have this'+(w?' ('+w+')':'');
+                  return w?' \u00b7 '+w:''; })()+'" style="display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;max-width:76px">'+
                 (window.hkBadge?window.hkBadge(e.a.glyph,true,46,null,e.gp):'')+(showcase.length?'\u2605 ':'')+e.a.name+
                 '</span>').join('')+'</div>';
             }
@@ -636,7 +655,12 @@
       '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcShare">\u2b07 share your rank card</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;
-    const shr = $('pcShare'); if(shr) shr.onclick = ()=>{ try{ makeRankCard(d, tier, handle, __L); if(window.hkEvent) window.hkEvent('rankcard_share'); }catch(e){} };
+    /* r150: the click TALKS BACK — Wolf hit a silent no-op and read it as broken */
+    const shr = $('pcShare'); if(shr) shr.onclick = ()=>{ try{
+      shr.textContent='rendering…';
+      makeRankCard(d, tier, handle, __L, ok=>{ shr.textContent= ok ? 'saved ✓ check your downloads' : 'couldn’t render — try again';
+        setTimeout(()=>{ shr.textContent='⬇ share your rank card'; }, 2600); });
+      if(window.hkEvent) window.hkEvent('rankcard_share'); }catch(e){ shr.textContent='couldn’t render — try again'; } };
     const pt = $('pcProThemes'); if(pt) pt.onclick = ()=>{
       if(window.openUpgrade) window.openUpgrade('Share-card themes');
       else location.href='index.html?openUpgrade=1'; };

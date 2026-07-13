@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stats · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=129" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=129">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=129">
+<link rel="icon" href="favicon.ico?v=130" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=130">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=130">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -68,8 +68,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=129">
-<script src="drills.js?v=129"></script>
+<link rel="stylesheet" href="nav.css?v=130">
+<script src="drills.js?v=130"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -77,11 +77,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=129"></script>
+<script src="themes.js?v=130"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=129"></script>
+<script src="nav.js?v=130"></script>
 
 <header class="head">
   <div class="wrap">
@@ -182,9 +182,12 @@ async function load(){
         all.forEach(r=>{ if(!D.meta[r.challenge]) return; if(seen[r.challenge]) return; seen[r.challenge]=r.user_id; });
         crowns=Object.values(seen).filter(u=>u===me.id).length; }
       const groups={}; Object.entries(D.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
+      let __ck=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+        __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length; }catch(e){}
       const ctx={ pb:pbCtx, pars:window.HOTKEY_PARS||{}, runs:runsL, streak:streakN, solves:solvesN,
         mouseRuns:flags.mouseRuns||0, slowWins:flags.slowWins||0,
         nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
+        raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0, chordKinds:__ck,   // r150
         crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
       // global rarity (Steam-style): evaluate run-derivable achievements for every player
       const globalPct=(function(){
@@ -214,6 +217,7 @@ async function load(){
           });
           Object.keys(out).forEach(k2=>out[k2]=Math.round(100*out[k2]/uids.length));
           AC.forEach(a=>{ if(out[a.id]===undefined) out[a.id]=0; });
+          out.__n=uids.length;   // r150: field size gates whether the % means anything
           return out;
         }catch(e){ return {}; }
       })();
@@ -221,9 +225,14 @@ async function load(){
       AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
         if(r.done) earnedN++;
         const isFeat=r.done && feat.includes(a.id);
-        const gp=globalPct[a.id];
+        /* r150: EFFECTIVE rarity \u2014 static difficulty tier is the display floor until
+           the field is big enough (>=20 players) for the live % to mean anything */
+        const __fN=globalPct.__n||0;
+        const gp=window.hkEffRarity?window.hkEffRarity(a.tier, globalPct[a.id], __fN):globalPct[a.id];
         const tierW=(window.hkRarityTier?window.hkRarityTier(gp):null);
-        const rareTxt=(gp!==undefined)?(' \u00b7 '+(tierW?tierW.toUpperCase()+' \u2014 ':'')+gp+'% of players have this'):'';
+        const rareTxt=(__fN>=20 && globalPct[a.id]!==undefined)
+          ? (' \u00b7 '+(tierW?tierW.toUpperCase()+' \u2014 ':'')+globalPct[a.id]+'% of players have this')
+          : (tierW?' \u00b7 '+tierW.toUpperCase():'');
         grid+='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'"'+
           ' data-tip="'+esc(a.name)+' \u2014 '+esc(a.desc)+(r.done?' \u2713 EARNED':' \u00b7 '+(r.prog||0)+'/'+(r.goal||1))+rareTxt+(r.done?' \u00b7 click to showcase':'')+'">'+
           '<span class="st">\u2605</span>'+
@@ -255,21 +264,40 @@ async function load(){
         `<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">one clean run there moves your average more than anywhere else</div></div>`+
         `<a href="index.html?drill=${worst.k}" style="font-family:var(--mono);font-size:12px;color:var(--accent);border:1px solid var(--accent-dim);border-radius:999px;padding:8px 16px">run it \u2192</a></div>`;
     }
+    /* r150 (Wolf: "what is pace based on?") — strongest board gets its numbers, and
+       pace is now DEFINED on the page: time ÷ par, so runs on different drills
+       compare honestly. Plus keys/min so raw hand speed has its own dial. */
     if(bestD){
-      html += `<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:0 0 6px">strongest board: <b style="color:var(--accent)">${esc(D.labelOf[bestD.k]||bestD.k)}</b> \u2014 #${bestD.idx+1} of ${bestD.n}</div>`;
+      const board=st2.per[bestD.k]||[];
+      const mineRow=board[bestD.idx], leadRow=board[0];
+      const gapTxt=(bestD.idx>0 && leadRow && mineRow)?(' \u00b7 +'+((mineRow.time_ms-leadRow.time_ms)/1000).toFixed(2)+'s off #1'):(bestD.idx===0?' \u00b7 you lead it':'');
+      html += `<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:0 0 6px">strongest board: <b style="color:var(--accent)">${esc(D.labelOf[bestD.k]||bestD.k)}</b> \u2014 #${bestD.idx+1} of ${bestD.n} (top ${Math.max(1,Math.round((bestD.idx+1)/bestD.n*100))}%)${mineRow?' \u00b7 your best '+(mineRow.time_ms/1000).toFixed(2)+'s':''}${gapTxt}</div>`;
     }
   }
-  // pace sparkline: your last 15 runs, newest right — falling line = getting faster
+  // r150: PACE = time vs par (each point is one run's time ÷ that drill's par) —
+  // the old raw-seconds line mixed 30s drills with 190s builds and read as noise.
   if(mine.length>=3){
-    const recent=mine.slice().sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0)).slice(-15);
-    const ts=recent.map(r=>r.time_ms/1000);
-    const mn=Math.min(...ts), mx=Math.max(...ts), span=Math.max(.01,mx-mn);
-    const W=560,H=54;
-    const pts=ts.map((t,i)=>`${(i/(ts.length-1)*W).toFixed(1)},${(6+(t-mn)/span*(H-12)).toFixed(1)}`).join(' ');
-    html += `<div class="stat" style="grid-column:1/-1;margin-bottom:6px"><div class="lbl" style="margin:0 0 8px">pace \u00b7 last ${ts.length} runs (lower = faster)</div>`+
-      `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block">`+
-      `<polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`+
-      `</svg></div>`;
+    const PARS3=window.HOTKEY_PARS||{};
+    const recent=mine.slice().sort((a,b)=>new Date(a.created_at||0)-new Date(b.created_at||0))
+      .filter(r=>PARS3[r.challenge]>0).slice(-15);
+    if(recent.length>=3){
+      const rs=recent.map(r=>(r.time_ms/1000)/PARS3[r.challenge]);
+      const mn=Math.min(...rs,0.9), mx=Math.max(...rs,1.1), span=Math.max(.01,mx-mn);
+      const W=560,H=54;
+      const y=v=>(6+(v-mn)/span*(H-12));
+      const pts=rs.map((t,i)=>`${(i/(rs.length-1)*W).toFixed(1)},${y(t).toFixed(1)}`).join(' ');
+      const med=rs.slice().sort((a,b)=>a-b)[Math.floor(rs.length/2)];
+      const kpm=mine.filter(r=>r.time_ms>0&&r.keystrokes>0).map(r=>r.keystrokes/(r.time_ms/60000)).sort((a,b)=>a-b);
+      const kpmMed=kpm.length?Math.round(kpm[Math.floor(kpm.length/2)]):null;
+      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:6px"><div class="lbl" style="margin:0 0 8px">pace \u00b7 time vs par \u00b7 last ${rs.length} runs — below the dashed line = under par`+
+        `<span style="float:right;color:var(--muted)">median ${med.toFixed(2)}\u00d7 par${kpmMed?' \u00b7 '+kpmMed+' keys/min':''}</span></div>`+
+        `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block">`+
+        `<line x1="0" y1="${y(1).toFixed(1)}" x2="${W}" y2="${y(1).toFixed(1)}" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 4"/>`+
+        `<text x="4" y="${(y(1)-3).toFixed(1)}" fill="var(--faint)" font-size="8" font-family="var(--mono)">par</text>`+
+        `<polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`+
+        `</svg>`+
+        `<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:6px">how it's computed: each point = one posted run's time \u00f7 that drill's par, oldest \u2192 newest. keys/min = keystrokes \u00f7 minutes across posted runs (median).</div></div>`;
+    }
   }
   // ---- Analytics (PRO \u00b7 free in beta): key frequency + speed by drill ----
   if(me && mine.length>=3){

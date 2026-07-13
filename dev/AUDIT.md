@@ -3431,3 +3431,55 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   print-media screenshot + PNG eyeballed (both read right); node --check
   all touched scripts; FULL 59-drill e2e regression ALL GREEN gating the
   merge. No shared-asset change → ?v stays 129.
+
+---
+# ROUND 150 — WOLF'S FEEDBACK BATCH (share bug, achievement economy, pace clarity, data room)
+- SHARE "DOESN'T DO ANYTHING" (Wolf's report, player card): two stacked causes
+  found. (a) the pc-foot grew to three links with no flex-wrap — narrow windows
+  overflowed into a horizontal scrollbar (his "horizontal slider navigation
+  bar"); now wraps. (b) the download used a DETACHED anchor + data:URL click —
+  fine in Chrome, silently flaky elsewhere, and every error was swallowed.
+  Now: blob URL + DOM-attached anchor (revoked after), and the click TALKS
+  BACK ("rendering… → saved ✓ check your downloads / couldn't render — try
+  again"). Same hardening applied to the results-card share (makeShareCard)
+  + a confirmation toast. A silent no-op can't happen again.
+- ACHIEVEMENT ECONOMY REBALANCED (Wolf: "not seeing new icons… only gold…
+  balance may be off"). Root causes were real:
+  (1) DUPLICATES — the r79 expansion shipped 6 achievements that already
+  existed: two 7-day streaks, two 30-day streaks, two 5-crown, two
+  attempt-every-drill, TWO 'Model Citizen's (same name+test), and a second
+  after-midnight medal. Dropped: x_strk7/x_strk30/x_crown5/x_models/brd1/
+  ngt1. Banker renames on the survivors (Business Week / Quarter Close /
+  Corner Office / Full Weekend).
+  (2) NO NEW ART — ~14 glyphs served 51 medals, so every unlock looked like
+  the last one. hkBadge grew 7 NEW glyphs (rx staircase, race flag, morning-
+  sheet tick, freeze, model-tour map, house-style brush, chord keyboard).
+  (3) ALL-GOLD METALS — rarity was pure live data (% of players holding it);
+  at beta scale nothing clears the <=25% bar. Every achievement now carries a
+  hand-set difficulty tier (r/e/l) as the DISPLAY FLOOR via hkEffRarity();
+  live percentages take over at field >= 20 players, and tooltips only quote
+  a % when it's real (tier words below scale — no fake numbers).
+  (4) TEN NEW ACHIEVEMENTS for the features that shipped since (The RX Desk,
+  House Style, Called Out/Undefeated races, Clean Sheet/Standing Order,
+  Ice in the Veins, Tour Guide, Chord Library, Shipped It). Catalog: 47,
+  ids+names unique, every test safe on an empty ctx. New flags plumbed at
+  the source (race win / sheet clear / freeze bank -> hk_ach_flags) and into
+  all three ctx builders (nav card, in-game sweep, stats grid).
+- PACE DEFINED (Wolf: "what is this based on?"): the stats pace line was RAW
+  SECONDS across mixed drills — 30s foundations next to 190s builds = noise.
+  Now pace = time ÷ par per posted run (comparable across drills), dashed
+  par baseline, median ×par + median keys/min in the header, and a
+  plain-words "how it's computed" footnote. Strongest board now carries its
+  numbers (top-%, your best time, gap to #1).
+- THE DATA ROOM (Wolf's rename + filename idea): picker cap "◆ the data
+  room", crumb root vdr. Files now wear the TASK as a filename —
+  label slugged: fix_the_typos_in_place.xlsx, bring_it_to_standard.xlsx,
+  the_4am_pass.xlsx. Truncation killed structurally (.vdr-fname flex:1 +
+  ellipsis; ledger columns fixed-width right so par/PB never get pushed out).
+- VERIFY: 21-assert r150 Playwright suite ALL PASS (catalog health, 7 glyphs
+  distinct, eff-rarity math, data-room rename + filenames + zero row
+  overflow + crumb, race/sheet/freeze flags land via the REAL paths,
+  narrow-card no-overflow, share click feedback + blob download, stats pace
+  copy) · r148 + r149 suites re-run ALL PASS · FULL 59-drill e2e regression
+  ALL GREEN · badge board + data room screenshots eyeballed.
+  CACHE v129 -> v130 (all 9 pages).
