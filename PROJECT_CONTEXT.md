@@ -225,6 +225,10 @@ Ship-first, batch outputs, minimal questions, honest pushback, node --check befo
 shipping, deliverables via present_files, concise replies, remind which files to
 redeploy. Bugs reported post-hoc. This file wins over memory summaries — keep it
 updated and uploaded to project knowledge.
+- **AUTO-MERGE (Wolf, 2026-07-13):** when work on the session branch is
+  verified, Claude creates the PR and merges it into main WITHOUT asking —
+  push to main = deploy, so merge only after the round's verification gate
+  (node --check / boot / e2e / smoke as applicable) is green.
 
 ====================================================================
 # PIPELINE v2 — Wolf's full list, triaged (r87, 2026-07-10)
