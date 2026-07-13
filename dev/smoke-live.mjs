@@ -2,10 +2,12 @@
 // Runs against production Supabase with the publishable anon key only.
 // Usage: node dev/smoke-live.mjs        (needs network egress to supabase.co)
 // Design: every mutation is paired with a cleanup so seed state is restored.
-// CAVEAT: step 11 claims the LSE seed and deletes it on leave — after a run,
-// restore it by re-running the deploy workflow (migration 20260712400000 is
-// idempotent, `on conflict (slug) do nothing`). Rotation is only ever tested
-// on a throwaway desk so seed codes are never rotated.
+// CAVEAT: `supabase db push` is STATEFUL — applied migrations never re-run,
+// so consumed fixtures can't be restored by re-running the workflow. Claim
+// tests therefore target ONLY the smoke-u fixture desk (migration
+// 20260713000000); a full run consumes it — restore by shipping a fresh copy
+// of that insert under a NEW timestamp. Real school seeds are only ever
+// member-joined (non-destructive); their codes are never rotated.
 // Each run creates 3 throwaway .edu accounts (signup is server-gated to .edu)
 // — list them in dev/SMOKE_REPORT.md for service-role cleanup.
 const BASE = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -222,7 +224,7 @@ const STEP = process.argv[2] || 'all';
     log('school: unmapped .edu A → fallback tag "Hotkeysmoketest"', r.status === 200 && r.data === 'Hotkeysmoketest', `${r.status} ${JSON.stringify(r.data)}`);
   }
 
-  // ---------- 9. HOME DESK (B → Wharton seed, MEMBER only) ----------
+  // ---------- 9. HOME DESK (B → Wharton seed, MEMBER only, non-destructive) ----------
   let whartonId = null;
   {
     const t = await api(`/rest/v1/teams?select=id,name,slug,owner_id,edu_domain&slug=eq.wharton`, { token: B.token });
@@ -239,61 +241,61 @@ const STEP = process.argv[2] || 'all';
     const t2 = await api(`/rest/v1/teams?select=owner_id&slug=eq.wharton`, { token: B.token });
     const w2 = Array.isArray(t2.data) ? t2.data[0] : null;
     log('school: Wharton still ownerless after domain join', !!w2 && w2.owner_id === null, JSON.stringify(w2));
-    // A: no home desk (non-.edu)
-    r = await rpc('home_desk_for_me', A.token);
-    log('school: A home_desk_for_me → empty', r.status === 200 && Array.isArray(r.data) && r.data.length === 0, JSON.stringify(r.data));
-    const r2 = await rpc('join_home_desk', A.token);
-    log('school: A join_home_desk → NO_HOME_DESK', r2.status >= 400 && errMsg(r2).includes('NO_HOME_DESK'), `${r2.status} ${errMsg(r2)}`);
+    // C never refreshed a school tag → no home desk (negative path)
+    r = await rpc('home_desk_for_me', C.token);
+    log('school: untagged C home_desk_for_me → empty', r.status === 200 && Array.isArray(r.data) && r.data.length === 0, JSON.stringify(r.data));
+    const r2 = await rpc('join_home_desk', C.token);
+    log('school: untagged C join_home_desk → NO_HOME_DESK', r2.status >= 400 && errMsg(r2).includes('NO_HOME_DESK'), `${r2.status} ${errMsg(r2)}`);
   }
 
-  // ---------- 10. THE CLAIM-VS-DOMAIN-JOIN QUESTION (C code-joins Wharton) ----------
-  // Doctrine says code = captaincy. r119 claim requires owner IS NULL *and zero members*;
-  // B (domain member) is already on Wharton. Does C's code join claim the captaincy?
+  // ---------- 10. CLAIM-AFTER-DOMAIN-JOIN on the smoke-u FIXTURE (fix 20260712700000) ----------
+  // A (hotkeysmoketest.edu) domain-joins the smoke-u test seed as member; C then
+  // code-joins and must take the captaincy (code = captaincy, domain = membership).
+  // Real school seeds are never claimed by the harness — smoke-u is consumable
+  // and gets restored by re-stamping the fixtures migration under a new timestamp.
   {
-    const pre = await rpc('my_desk', B.token);
+    let r = await rpc('home_desk_for_me', A.token);
+    const h = Array.isArray(r.data) ? r.data[0] : null;
+    log('fixture: A home_desk_for_me → smoke-u', !!h && h.slug === 'smoke-u', `${r.status} ${JSON.stringify(h)}`);
+    r = await rpc('join_home_desk', A.token);
+    log('fixture: A join_home_desk (member)', r.status === 200, `${r.status} ${JSON.stringify(r.data)}`);
+    const pre = await rpc('my_desk', A.token);
     const preRow = Array.isArray(pre.data) ? pre.data[0] : null;
-    const preOk = !!preRow && preRow.slug === 'wharton';
-    log('claim: PRECONDITION B is on Wharton as domain member', preOk, JSON.stringify(preRow));
-    const r = await rpc('join_desk', C.token, { p_code: '25a39fde' });
-    log('claim: C code-joins Wharton (seed code)', r.status === 200, `${r.status} ${JSON.stringify(r.data)}`);
+    log('claim: PRECONDITION A on smoke-u as domain member', !!preRow && preRow.slug === 'smoke-u' && preRow.role === 'member', JSON.stringify(preRow));
+    // A already on a desk → home_desk_for_me now empty (the not-exists clause)
+    r = await rpc('home_desk_for_me', A.token);
+    log('school: on-a-desk A home_desk_for_me → empty', r.status === 200 && Array.isArray(r.data) && r.data.length === 0, JSON.stringify(r.data));
+    r = await rpc('join_desk', C.token, { p_code: 'smokeu42' });
+    log('claim: C code-joins smoke-u over a sitting domain member', r.status === 200, `${r.status} ${JSON.stringify(r.data)}`);
     const my = await rpc('my_desk', C.token);
     const m = Array.isArray(my.data) ? my.data[0] : null;
-    const claimed = !!m && m.role === 'captain';
-    log('claim: code join after domain member → CAPTAIN (fix 20260712700000)', claimed, JSON.stringify(m));
-    // cleanup C from Wharton (member leave keeps desk; captain leave would promote B!)
-    if (claimed) {
-      // C is captain: leaving promotes B — must then restore ownerless state. Flag loudly.
-      console.log('NOTE: C claimed Wharton captaincy — leave will promote B; will restore below.');
-    }
-    let l = await rpc('leave_desk', C.token);
-    log('claim: C leaves Wharton', l.status === 200 || l.status === 204, `${l.status} ${errMsg(l)}`);
-    // B leaves too (restores seed to 0 members). If B got promoted captain, desk self-deletes → reseed migration needed.
-    l = await rpc('leave_desk', B.token);
-    log('cleanup: B leaves Wharton', l.status === 200 || l.status === 204, `${l.status} ${errMsg(l)}`);
-    const t = await api(`/rest/v1/teams?select=id,owner_id&slug=eq.wharton`, { token: A.token });
+    log('claim: C took the captaincy (fix 20260712700000)', !!m && m.slug === 'smoke-u' && m.role === 'captain' && !!m.invite_code, JSON.stringify(m));
+    const t = await api(`/rest/v1/teams?select=owner_id&slug=eq.smoke-u`, { token: C.token });
     const w = Array.isArray(t.data) ? t.data[0] : null;
-    log('cleanup: Wharton state after leaves (exists+ownerless = restored; empty = NEEDS RESEED)', !!w && w.owner_id === null, JSON.stringify(t.data));
+    log('claim: smoke-u owner set to C', !!w && w.owner_id === C.id, JSON.stringify(w));
+    // captain powers on a claimed seed
+    let r2 = await rpc('set_assignment', C.token, { p_challenge: 'navigation', p_note: 'week one: learn the grid' });
+    log('claim: assignment on claimed seed works', r2.status === 200 || r2.status === 204, `${r2.status} ${errMsg(r2)}`);
+    r2 = await rpc('rotate_invite', C.token);
+    log('claim: rotate on claimed seed works', r2.status === 200 && typeof r2.data === 'string', `${r2.status}`);
   }
 
-  // ---------- 11. CLAIM-THE-DESK proper (A claims LSE — will be reseeded) ----------
+  // ---------- 11. CLEANUP (heir promotion re-check + fixture consumption) ----------
+  // NOTE: the pure zero-member claim (ownerless + empty → captain) was proven
+  // live in the r131 run (C claimed the then-empty Wharton seed) — not repeated
+  // here so real seeds stay untouched.
   {
-    const r = await rpc('join_desk', A.token, { p_code: '1b97e1cd' });
-    log('claim: A code-joins LSE (ownerless, 0 members)', r.status === 200, `${r.status} ${JSON.stringify(r.data)}`);
+    let r = await rpc('leave_desk', C.token);
     const my = await rpc('my_desk', A.token);
     const m = Array.isArray(my.data) ? my.data[0] : null;
-    log('claim: A took LSE captaincy + code visible', !!m && m.slug === 'lse' && m.role === 'captain' && !!m.invite_code, JSON.stringify(m));
-    const t = await api(`/rest/v1/teams?select=owner_id,verified&slug=eq.lse`, { token: A.token });
-    const w = Array.isArray(t.data) ? t.data[0] : null;
-    log('claim: LSE owner set to A', !!w && w.owner_id === A.id, JSON.stringify(w));
-    // captain powers on a claimed seed
-    let r2 = await rpc('set_assignment', A.token, { p_challenge: 'navigation', p_note: 'week one: learn the grid' });
-    log('claim: assignment on claimed seed works', r2.status === 200 || r2.status === 204, `${r2.status} ${errMsg(r2)}`);
-    r2 = await rpc('rotate_invite', A.token);
-    log('claim: rotate on claimed seed works', r2.status === 200 && typeof r2.data === 'string', `${r2.status}`);
-    // leave → desk deletes (documented semantics); reseed migration restores it
-    r2 = await rpc('leave_desk', A.token);
-    const t2 = await api(`/rest/v1/teams?select=id&slug=eq.lse`, { token: A.token });
-    log('claim: A leaves → LSE self-deletes (reseed migration will restore)', (r2.status === 200 || r2.status === 204) && Array.isArray(t2.data) && t2.data.length === 0, JSON.stringify(t2.data));
+    log('cleanup: C (captain) leaves → A promoted heir on smoke-u', (r.status === 200 || r.status === 204) && !!m && m.role === 'captain' && m.slug === 'smoke-u', JSON.stringify(m));
+    r = await rpc('leave_desk', A.token);
+    const t = await api(`/rest/v1/teams?select=id&slug=eq.smoke-u`, { token: A.token });
+    log('cleanup: A leaves → smoke-u consumed (re-stamp fixtures migration to restore)', (r.status === 200 || r.status === 204) && Array.isArray(t.data) && t.data.length === 0, JSON.stringify(t.data));
+    r = await rpc('leave_desk', B.token);
+    const t2 = await api(`/rest/v1/teams?select=owner_id&slug=eq.wharton`, { token: B.token });
+    const w2 = Array.isArray(t2.data) ? t2.data[0] : null;
+    log('cleanup: B leaves Wharton → seed survives ownerless', (r.status === 200 || r.status === 204) && !!w2 && w2.owner_id === null, JSON.stringify(w2));
   }
 
   // ---------- 12. REPORTS ----------
