@@ -3730,3 +3730,40 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   Playwright (pop content, arm toast, nextDrillKey chain = queue order);
   sheet v2 screenshot-reviewed (monthly default, season toggle, roadmap
   line); 5 pages boot clean; e2e demo-replay ALL GREEN.
+
+---
+# ROUND 158 — PROGRESSION GATES GO LIVE (Wolf: gates clear, not early, not slow-passable)
+- THE FREE SPINE, finally real: all 64 drills were open — "unlocks as you
+  level" was sheet copy, not code. Now HOTKEY_GATES (drills.js) locks the
+  three advanced tiers for non-PRO players:
+    Formulas     LVL 3 + 6 pace clears   (day-one reachable at honest pace)
+    Models       LVL 6 + 14 pace clears  (~day 2-3 of real play)
+    Full Builds  LVL 9 + 22 pace clears  (~day 4-6)
+  26 drills (Foundations/Formatting/Values/Data/Lookups) open from minute
+  one — nobody hits a wall in their first session.
+- WOLF'S TWO FAILURE MODES, both closed by the AND: LEVEL alone is
+  slow-grindable (XP pays any completion) -> the CLEARS bar demands pace
+  (par x1.5 clean, the campaign's own bar); CLEARS alone could wall a
+  grinder -> the LEVEL bar honors volume. Pure-skill bypass: shipping the
+  campaign versions covering everything earlier unlocks with no waiting.
+  PB grandfather (you've been in the tier -> it stays open; no rug-pulls).
+- GATES RUN IN BETA (the ladder is the game): unlock checks _pro (real
+  entitlement), NOT BETA_MODE. Sheet betaNote rewritten honestly: perks
+  free in beta, the ladder still applies, PRO opens the catalog at launch.
+  "PRO skips the wait" button on the gate modal -> hkProSheet.
+- SURFACES: VDR picker folders wear a warn gate chip (LVL n · k clears,
+  click = explainer) with rows dimmed .gated; gate explainer modal shows
+  BOTH bars with live progress (you're LVL x · you have y clears) + the
+  campaign path + PRO skip; deep links/next-chain/random dealer/marathon
+  pool/weakness queue/morning-sheet picks all honor the ladder; daily runs
+  and armed race links are EXEMPT (community moments). gate_hit event logs
+  which wall players meet.
+- e2e harness sets _pro=true before the sweep (it exercises the full
+  catalog by design).
+- CACHE v136 -> v137 (all 9 pages).
+- VERIFY: node --check all extracted scripts; Playwright gate matrix —
+  fresh guest: margin/lbo/debtsched LOCKED, navigation/polish/lookup open,
+  deep-load lbo bounces to explainer with state untouched, random pool
+  clean of locked keys, next lands unlocked; leveled profile (LVL 6 + 14
+  clears): Formulas+Models OPEN, Full Builds still locked — exactly per
+  config; 5 pages boot clean; e2e demo-replay ALL GREEN.

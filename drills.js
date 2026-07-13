@@ -316,6 +316,21 @@ window.HOTKEY_PLUGIN_LAYERS = {
    PRO = the whole catalog from Level 1 + plugin layers + deep analytics +
    cosmetics. Prices are placeholders on Stripe TEST MODE — Wolf sets real
    pricing at launch; beta:true keeps every PRO feature ON for everyone. ---- */
+/* ---- PROGRESSION GATES (r158) — the free spine. Advanced groups unlock by
+   LEVEL (volume: you showed up) AND PACE CLEARS (skill: par x1.5 clean — slow
+   grinding alone never opens the door), OR by shipping the campaign versions
+   that cover everything before the group (pure skill path), OR grandfathered
+   by an existing PB in the group. Real PRO entitlement skips; the gates run
+   DURING BETA — the ladder is the game, not the paywall. ---- */
+window.HOTKEY_GATES = {
+  PACE: 1.5,   // = HOTKEY_CAMPAIGN.GATE — one definition of "cleared at pace"
+  groups: {
+    'Formulas':    { lvl:3, clears:6,  chapters:['c1','c2','c3'] },
+    'Models':      { lvl:6, clears:14, chapters:['c1','c2','c3','c4','c5'] },
+    'Full Builds': { lvl:9, clears:22, chapters:['c1','c2','c3','c4','c5','c6','c7'] },
+  },
+};
+
 window.HOTKEY_PRO = {
   beta: true,
   // Wolf-decided (r157): MONTHLY leads ("$7 — crazy ROI on the time you save");
@@ -344,5 +359,5 @@ window.HOTKEY_PRO = {
      'standard flair'],
   ],
   roadmap: ['Ghost replays \u2014 race your PB\u2019s cursor', 'Interview mode \u2014 timed assessment + report card', 'Season rewards track'],
-  betaNote: 'Beta: PRO is switched on for everyone, free. Play now \u2014 beta players lock in founder pricing at launch.',
+  betaNote: 'Beta: PRO perks are free for everyone. The progression ladder still applies \u2014 the climb is the game \u2014 but at launch PRO opens the full catalog from Level 1. Beta players lock in founder pricing.',
 };

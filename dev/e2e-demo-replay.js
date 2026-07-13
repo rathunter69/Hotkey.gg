@@ -38,6 +38,10 @@ const REPS = parseInt(process.env.REPS || '3', 10);
     typeof CHALLENGES !== 'undefined' && typeof loadChallenge === 'function' &&
     typeof demoKey === 'function' && typeof setDemoSel === 'function', null, { timeout: 15000 });
 
+  // r158: the harness exercises the FULL catalog — flip the (real) pro entitlement
+  // so progression gates never bounce a locked-tier load mid-suite.
+  await page.evaluate(() => { try { _pro = true; } catch (e) {} });
+
   const all = await page.evaluate(() => Object.keys(CHALLENGES));
   const want = process.argv.slice(2);
   const keys = want.length ? all.filter(k => want.includes(k)) : all;

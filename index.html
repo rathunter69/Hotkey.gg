@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=136" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=136">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=136">
+<link rel="icon" href="favicon.ico?v=137" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=137">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=137">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -713,6 +713,9 @@
   .pk-byline .pk-par{color:var(--faint); font-size:10px; width:64px; text-align:right; white-space:nowrap}
   .pk-byline.asg .vdr-fname{color:var(--warn)}
   .pk-asgmark{color:var(--warn); font-size:9px}
+  .pk-byline.gated{opacity:.45}   /* r158: locked tier — visible (you can see Challenger) but dimmed */
+  .pk-gatetag{margin-left:8px; font-family:var(--mono); font-size:9px; letter-spacing:.12em; color:var(--warn);
+    border:1px solid var(--warn); border-radius:6px; padding:1px 7px; cursor:pointer; opacity:.85}
   .pk-row{background:color-mix(in srgb, var(--surface) 55%, transparent)}
   .pk-row:hover{background:var(--surface)}
   .pk-title{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase;
@@ -1105,14 +1108,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=136"></script>
-<link rel="stylesheet" href="nav.css?v=136">
-<script src="themes.js?v=136"></script>
+<script src="drills.js?v=137"></script>
+<link rel="stylesheet" href="nav.css?v=137">
+<script src="themes.js?v=137"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=136"></script>
+<script src="nav.js?v=137"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -5897,7 +5900,7 @@ let resultsChainKeys=null, lastXpGain=null;
 function nextDrillKey(){
   // r157: an armed weakness queue owns the next-drill chain until it runs dry
   if(window.__wq && window.__wqI+1 < window.__wq.length) return window.__wq[window.__wqI+1];
-  const i=MENU_ORDER.indexOf(cur); return MENU_ORDER[(i+1)%MENU_ORDER.length]; }
+  return nextUnlockedFrom(MENU_ORDER.indexOf(cur)); }   // r158: n never lands on a locked tier
 function showResults(o){
   // Monkeytype loop: from the results card, Enter = run it again, N = next drill.
   resultsChainKeys = (ev)=>{
@@ -6144,7 +6147,7 @@ function stepSheetTab(dir){
   const i=keys.indexOf(cur);
   loadChallenge(keys[(i+dir+keys.length)%keys.length]);
 }
-function nextChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i+1)%MENU_ORDER.length]); }
+function nextChallenge(){ loadChallenge(nextUnlockedFrom(MENU_ORDER.indexOf(cur))); }   // r158: skip locked tiers
 function prevChallenge(){ const i=MENU_ORDER.indexOf(cur); loadChallenge(MENU_ORDER[(i-1+MENU_ORDER.length)%MENU_ORDER.length]); }
 function toMenu(){ loadChallenge(cur); openPicker(); }
 function syncTabs(){
@@ -7279,6 +7282,7 @@ function buildWeaknessQueue(){
   const now=Date.now(), out=[];
   MENU_ORDER.forEach((k,idx)=>{
     const C=CHALLENGES[k]; if(!C||!C.par) return;
+    if(drillLocked(k)) return;   // r158: the queue never assigns locked tiers
     let score=0, why='';
     if(PB[k]===undefined){
       score=2.2-(idx/MENU_ORDER.length)*0.8; why='never cleared';
@@ -7318,7 +7322,7 @@ function toggleWqPop(){
 }
 $('wqBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleWqPop(); });
 $('randBtn').addEventListener('click',()=>{   // r113 (#33): random drill — variety is the retention loop
-  const pool=MENU_ORDER.filter(k=>k!==cur);
+  const pool=MENU_ORDER.filter(k=>k!==cur && !drillLocked(k));   // r158: the dealer respects the ladder
   loadChallenge(pool[Math.floor(Math.random()*pool.length)]);
 });
 { const __wb=$('weeklyBtn'); if(__wb) __wb.addEventListener('click',startWeekly); }   // r81 hotfix: button retired; unguarded listener was a boot TypeError
@@ -8246,7 +8250,7 @@ document.querySelectorAll('.mb-dur').forEach(b=>{
 $('mhStop').addEventListener('click', ()=>{ endSession(); });
 
 function loadRandomDrill(){
-  const pool=MENU_ORDER.filter(k=>k!==lastKey);
+  const pool=MENU_ORDER.filter(k=>k!==lastKey && !drillLocked(k));   // r158: sessions honor the ladder
   const key=pool.length ? pool[Math.floor(Math.random()*pool.length)] : MENU_ORDER[0];
   lastKey=key; loadChallenge(key);
 }
@@ -8652,6 +8656,53 @@ function updateDailyBtn(){ const b=$('dailyBtn'); if(b){ b.classList.toggle('on'
    (your worst PB-vs-par) · item 3 = FRESH GROUND (never drilled) or CHASE
    (closest to par) when everything's been touched. Deterministic per day,
    computed locally — works signed-out. Clearing all three = the sheet crown. */
+/* ---- r158: PROGRESSION GATES — the free spine (config: drills.js HOTKEY_GATES).
+   Unlock = (level AND pace clears) OR campaign coverage OR PB grandfather OR a
+   REAL pro entitlement (_pro — deliberately not BETA_MODE: the ladder runs in
+   beta because the climb IS the game). Daily and armed races are exempt. ---- */
+function myXpEst(){ let xp=0; try{ xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){} return xp; }
+function paceClears(){ let n=0; try{ MENU_ORDER.forEach(k=>{ if(campCleared(k)) n++; }); }catch(e){} return n; }
+function groupUnlocked(gname){
+  const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return true;
+  if(_pro) return true;
+  try{ const gr=DRILL_GROUPS.find(x=>x.name===gname);
+    if(gr && gr.keys.some(k=>PB[k]!==undefined)) return true; }catch(e){}      // grandfather: you've been here
+  if(lvlOf(myXpEst())>=g.lvl && paceClears()>=g.clears) return true;
+  try{ const st=campState();
+    if(g.chapters && g.chapters.every(id=>{ const c=st.find(x=>x.id===id); return c&&c.done; })) return true; }catch(e){}
+  return false;
+}
+function drillLocked(k){ const gn=GROUP_OF[k]; return (gn && !groupUnlocked(gn)) ? gn : null; }
+function nextUnlockedFrom(i){
+  for(let s=1;s<=MENU_ORDER.length;s++){ const k=MENU_ORDER[(i+s)%MENU_ORDER.length]; if(!drillLocked(k)) return k; }
+  return MENU_ORDER[0];
+}
+function openGateInfo(gname){
+  const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return;
+  const lv=lvlOf(myXpEst()), cl=paceClears();
+  const lvOK=lv>=g.lvl, clOK=cl>=g.clears;
+  let m=$('gateModal');
+  if(!m){ m=document.createElement('div'); m.id='gateModal'; m.className='onboard-modal'; document.body.appendChild(m); }
+  m.innerHTML='<div class="ob-card" style="max-width:440px;position:relative;text-align:left">'+
+    '<a class="modal-x" id="gateX">\u00d7</a>'+
+    '<div class="ob-title">'+gname+' \u2014 locked, for now</div>'+
+    '<div class="ob-body" style="text-align:left;font-size:12.5px;line-height:1.9">'+
+      'This tier opens when the climb says you\u2019re ready \u2014 both bars, or ship the campaign:<br><br>'+
+      '<b style="color:'+(lvOK?'var(--accent)':'var(--warn)')+'">'+(lvOK?'\u2713':'\u25cb')+' LVL '+g.lvl+'</b> <span style="color:var(--muted)">\u2014 you\u2019re LVL '+lv+'</span><br>'+
+      '<b style="color:'+(clOK?'var(--accent)':'var(--warn)')+'">'+(clOK?'\u2713':'\u25cb')+' '+g.clears+' pace clears</b> <span style="color:var(--muted)">\u2014 you have '+cl+' \u00b7 a pace clear = beat par \u00d7'+(window.HOTKEY_GATES.PACE)+' on a clean run</span><br>'+
+      '<span style="color:var(--muted)">or</span> <b>\ud83d\udcc8 ship the campaign</b> <span style="color:var(--muted)">through the earlier versions \u2014 pure speed, no waiting</span>'+
+    '</div>'+
+    '<div class="ob-opts" style="display:flex;gap:10px;flex-wrap:wrap">'+
+      '<button class="ob-key primary" id="gateGo">keep training \u2192</button>'+
+      '<button class="ob-key" id="gatePro" style="color:var(--warn)">\u25c6 PRO skips the wait</button>'+
+    '</div></div>';
+  m.classList.add('show');
+  const close=()=>m.classList.remove('show');
+  $('gateX').onclick=close; $('gateGo').onclick=close;
+  $('gatePro').onclick=()=>{ close(); if(window.hkProSheet) window.hkProSheet('The '+gname+' track'); };
+  m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
+  try{ ev('gate_hit',{g:gname, lvl:lv, clears:cl}); }catch(e){}
+}
 function getSheet(){
   const k='hk_sheet_'+dailyDateStr();
   try{ const v=JSON.parse(localStorage.getItem(k)||'null'); if(v && v.items && v.items.length===3) return v; }catch(e){}
@@ -8664,7 +8715,7 @@ function getSheet(){
   const start=dailySeed()%MENU_ORDER.length;
   for(let i=0;i<MENU_ORDER.length && items.length<3;i++){
     const d=MENU_ORDER[(start+i)%MENU_ORDER.length];
-    if(!items.includes(d) && PB[d]===undefined) items.push(d);
+    if(!items.includes(d) && PB[d]===undefined && !drillLocked(d)) items.push(d);   // r158
   }
   if(items.length<3){ let chase=null;
     Object.keys(PB).forEach(d=>{ if(!CHALLENGES[d]||items.includes(d)||!PARS[d]) return;
@@ -8717,6 +8768,14 @@ function sheetMarkWin(){
   }catch(e){}
 }
 function loadChallenge(key, opts){
+  // r158: progression gate — daily runs and armed races ride through (community
+  // moments); everything else locked-tier bounces to the explainer, state untouched.
+  try{
+    if(!(opts&&(opts.daily||opts.weekly)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
+      const __gn=drillLocked(key);
+      if(__gn){ openGateInfo(__gn); return; }
+    }
+  }catch(e){}
   // r157: weakness-queue bookkeeping — restarts stay, the chain advances,
   // any manual jump elsewhere disarms it (finishing the last item = done).
   if(window.__wq){ const q=window.__wq;
@@ -8817,6 +8876,11 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
       '<span class="vdr-gname">'+g.name+'/</span>'+
       (__adv?'<span class="pk-advtag">\u25c6 advanced</span>':'')+
       '<span class="vdr-n">'+g.keys.length+' file'+(g.keys.length===1?'':'s')+(folded?' \u00b7 folded':'')+'</span>';
+    const __gated=!groupUnlocked(g.name);   // r158: locked tier reads as locked
+    if(__gated){ const gg=(window.HOTKEY_GATES.groups||{})[g.name];
+      f.insertAdjacentHTML('beforeend','<span class="pk-gatetag" title="click for what unlocks this">LVL '+gg.lvl+' \u00b7 '+gg.clears+' clears</span>');
+      const gt=f.querySelector('.pk-gatetag');
+      if(gt) gt.onclick=(e)=>{ e.stopPropagation(); openGateInfo(g.name); }; }
     f.onclick=()=>togglePkFold(g.name);
     // r156: the \u25c6 advanced tag opens the PRO sheet (folder click still folds)
     { const __t=f.querySelector('.pk-advtag');
@@ -8827,7 +8891,7 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
       const C=CHALLENGES[key]; if(!C) return;
       const __a=(window.__deskAsg||{})[key];   // r130: staffer's pinned drill
       const row=document.createElement('div');
-      row.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'')+(folded?' hidden':'');
+      row.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'')+(folded?' hidden':'')+(__gated?' gated':'');
       row.dataset.key=key; row.dataset.group=g.name; row.dataset.gi=gi;
       row.innerHTML='<span class="vdr-guide">'+(ki===g.keys.length-1?'\u2514':'\u251c')+'</span>'+
         '<span class="vdr-fidx">'+String(gi+1).padStart(2,'0')+'.'+(ki+1)+'</span>'+
