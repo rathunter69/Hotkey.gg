@@ -4152,3 +4152,30 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - PIPELINE.md updated: T-A marked done (tranche 3 candidates named),
   T-G marked partial with the egress-remainder spelled out.
 - Docs only — no shipped assets touched, no cache bump.
+
+---
+# ROUND 172 — T-C EXECUTED: Models + Full Builds realism audit (22 drills)
+- METHOD: every advanced drill read line-by-line as a former banker —
+  prompts, labels, formula shapes, sign conventions, units, and whether
+  checks grade what a desk would recognize. dev/REALISM_NOTES.md holds
+  per-drill verdicts.
+- VERDICT: 21/22 CLEAN. The tier was built under the doctrine and the
+  math is desk-true: Hamada unlever/relever, average-balance interest,
+  negative-COGS carried into GP, sponsor-equity-as-plug, financing drag
+  in acc/dil, retbridge decomposition that ties as an algebraic
+  identity, stocks-don't-sum in the 13-week, engineered check-row zeros.
+- ONE FIX: txncomps taught =SUM(D3:D7)/5 for the average while its own
+  guide bragged "no hand-typed mean" — desks type AVERAGE. req/guide/
+  demo now use AVERAGE(D3:D7); the check accepts either idiom and a new
+  alt PROVES SUM/5 still lands.
+- ALT REGISTRY 26→30 (advanced tier now covered): wacc debt-side-first,
+  txncomps SUM/5, football ceiling-first, dcfsens fill-down-first.
+  ALL 30 PASS.
+- PAR SWEEP FLICKER RESOLVED: ruleaudit's optimal varies by seed (defect
+  count is random) — its 5-rep median oscillated across the 15% drift
+  threshold. Measured over 21 seeds: median 16 (range 15-19); parKeys
+  20→16. Doctrine note: high-variance drills deserve big-sample medians.
+- Nits recorded not fixed (REALISM_NOTES): mid-year DCF variant someday,
+  cfslink conversion-memo definition, static peer-name pools.
+- VERIFIED: replay 69/69, parity 37, visual 311, onboard 20, alts 30/30.
+- CACHE v149 -> v150.

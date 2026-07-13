@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=149" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=149">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=149">
+<link rel="icon" href="favicon.ico?v=150" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=150">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=150">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1125,14 +1125,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=149"></script>
-<link rel="stylesheet" href="nav.css?v=149">
-<script src="themes.js?v=149"></script>
+<script src="drills.js?v=150"></script>
+<link rel="stylesheet" href="nav.css?v=150">
+<script src="themes.js?v=150"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=149"></script>
+<script src="nav.js?v=150"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1707,7 +1707,7 @@ const CHALLENGES = {
     }
   },
   ruleaudit:{
-    name:'Ruling Pass', label:'The ruling pass', par:45, parKeys:20,
+    name:'Ruling Pass', label:'The ruling pass', par:45, parKeys:16,
     aha:'read the borders before you trust the math \u2014 a missing rule hides a broken total',
     prompt:'This schedule came back “done.” It isn’t. Somewhere on the page rulings are missing, the answer line lost its dress, or a figure was never pulled through — and WHAT’s broken moves every run. Run the pass: scan against the conventions, find what fails, fix only that. The checklist tells you WHICH conventions are broken — the page tells you where.',
     req(){ return 'the house conventions — headers ruled UNDER (<em>alt h b b</em>) · a line ABOVE every total (<em>alt h b t</em>) · EBITDA pulled through as formulas, <em>ctrl+b</em>, ruled · headline boxed (<em>alt h b o</em>). Some hold, some don’t: fix what the checklist flags.'; },
@@ -4251,10 +4251,10 @@ const CHALLENGES = {
     name:'Txn Comps', label:'Run precedent transactions', par:110, parKeys:35,
     aha:'precedents are comps with dates \u2014 same multiples, read in deal order',
     prompt:'Five precedent deals, one target. Compute EV/EBITDA paid in each deal, average the multiples off one anchored SUM, then mark the target: implied EV at the average multiple, less net debt, equals implied equity. The comps page every pitch book leans on.',
-    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> avg <em>=SUM(D3:D7)/5</em> \u00b7 <em>B11</em> implied EV <em>=B10*D8</em> \u00b7 <em>B13</em> implied equity <em>=B11-B12</em>',
+    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> avg <em>=AVERAGE(D3:D7)</em> \u00b7 <em>B11</em> implied EV <em>=B10*D8</em> \u00b7 <em>B13</em> implied equity <em>=B11-B12</em>',
     guide:[
       'multiple paid, deal one: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
-      'average at D8 \u00b7 <kbd>=SUM(D3:D7)/5</kbd> \u2014 one live SUM, no hand-typed mean',
+      'average at D8 \u00b7 <kbd>=AVERAGE(D3:D7)</kbd> \u2014 live off the column, no hand-typed mean',
       'implied EV at B11 \u00b7 <kbd>=B10*D8</kbd> \u2014 target EBITDA \u00d7 the average multiple',
       'implied equity at B13 \u00b7 <kbd>=B11-B12</kbd> \u2014 net debt comes off last',
     ],
@@ -4262,7 +4262,7 @@ const CHALLENGES = {
     demo(){ return [
       {sel:'D3', keys:[...T('=B3/C3'), Kb.enter]},
       {sel:'D3:D7', keys:[Kb.fillD]},
-      {sel:'D8', keys:[...T('=SUM(D3:D7)/5'), Kb.enter]},
+      {sel:'D8', keys:[...T('=AVERAGE(D3:D7)'), Kb.enter]},
       {sel:'B11', keys:[...T('=B10*D8'), Kb.enter]},
       {sel:'B13', keys:[...T('=B11-B12'), Kb.enter]},
     ]; },

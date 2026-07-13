@@ -152,6 +152,33 @@ const ALTS = [
       {sel:o.k, keys:[{key:'Alt'},L('h'),L('k')]},
       {sel:o.b, keys:[{key:'b',ctrl:true}]},
     ]; }` },
+  // --- T-C realism-audit additions (r172): advanced-tier freedom proofs ---
+  { key: 'wacc', name: 'debt side first — at-Kd before the beta chain', moves: `C => [
+      {sel:'B13', keys:[...T('=B9*(1-B6)'),{key:'Enter'}]},
+      {sel:'B10', keys:[...T('=B4/(1+(1-B6)*B5)'),{key:'Enter'}]},
+      {sel:'B11', keys:[...T('=B10*(1+(1-B6)*B8/B7)'),{key:'Enter'}]},
+      {sel:'B12', keys:[...T('=B2+B11*B3'),{key:'Enter'}]},
+      {sel:'B14', keys:[...T('=(B7*B12+B8*B13)/(B7+B8)'),{key:'Enter'}]},
+    ]` },
+  { key: 'txncomps', name: 'SUM/5 instead of AVERAGE (either idiom lands)', moves: `C => [
+      {sel:'D3', keys:[...T('=B3/C3'),{key:'Enter'}]},
+      {sel:'D3:D7', keys:[{key:'d',ctrl:true}]},
+      {sel:'D8', keys:[...T('=SUM(D3:D7)/5'),{key:'Enter'}]},
+      {sel:'B11', keys:[...T('=B10*D8'),{key:'Enter'}]},
+      {sel:'B13', keys:[...T('=B11-B12'),{key:'Enter'}]},
+    ]` },
+  { key: 'football', name: 'ceiling before floor, mids last', moves: `C => [
+      {sel:'B8', keys:[...T('=MAX(C3:C5)'),{key:'Enter'}]},
+      {sel:'B7', keys:[...T('=MIN(B3:B5)'),{key:'Enter'}]},
+      {sel:'B9', keys:[...T('=B8-B7'),{key:'Enter'}]},
+      {sel:'D3', keys:[...T('=(B3+C3)/2'),{key:'Enter'}]},
+      {sel:'D3:D5', keys:[{key:'d',ctrl:true}]},
+    ]` },
+  { key: 'dcfsens', name: 'fill DOWN first, then right', moves: `C => [
+      {sel:'C4', keys:[...T('=$B$2/(C$3-$B4)'),{key:'Enter'}]},
+      {sel:'C4:C6', keys:[{key:'d',ctrl:true}]},
+      {sel:'C4:G6', keys:[{key:'r',ctrl:true}]},
+    ]` },
 ];
 
 (async () => {
