@@ -3271,4 +3271,5 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - reference.html ● (inEngine) markers audited: accurate as listed.
 - VERIFY: 14-assert Playwright suite ALL PASS (classic chords, 8 RF alias
   matchers incl. native-off, guide notes per profile); full 57-drill e2e
-  regression gating the merge (result below). CACHE v124 -> v125.
+  regression ALL GREEN post-fix (the paste-special reorder broke nothing).
+  CACHE v124 -> v125.
