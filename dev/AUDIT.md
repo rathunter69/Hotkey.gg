@@ -3905,3 +3905,11 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFY: ruleaudit demo-replay WIN across 4 seed batches; full catalog
   ALL GREEN (66 drills); parity 37; visual 311; onboard 20.
 - CACHE v141 -> v142 (all 9 pages).
+
+---
+# ROUND 163b — offer sheet: ghost replays graduate roadmap -> pillar grid
+- HOTKEY_PRO: 'Ghost replays' moves from the landing-during-beta roadmap
+  line into the PRO-vs-FREE grid (free side: 'time + key-count pace
+  only' — honest: the delta + keys readout stays free, the CURSOR is
+  the PRO feature). Roadmap now: interview mode, season rewards.
+- CACHE v142 -> v143.

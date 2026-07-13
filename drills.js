@@ -353,6 +353,9 @@ window.HOTKEY_PRO = {
     ['Plugin keyboard layers',
      'Macabacus + FactSet shortcut profiles on every drill',
      'native Excel only'],
+    ['Ghost replays',
+     'race a live ghost of your PB run \u2014 its cursor glides the recorded path against your clock',
+     'time + key-count pace only'],
     ['Deep analytics',
      'keystroke heatmap, speed-by-drill trends, percentile history',
      'core stats + PBs'],
@@ -360,6 +363,6 @@ window.HOTKEY_PRO = {
      'exclusive card flair + share-card themes + first access to new looks',
      'standard flair'],
   ],
-  roadmap: ['Ghost replays \u2014 race your PB\u2019s cursor', 'Interview mode \u2014 timed assessment + report card', 'Season rewards track'],
+  roadmap: ['Interview mode \u2014 timed assessment + report card', 'Season rewards track'],
   betaNote: 'Beta: PRO perks are free for everyone. The progression ladder still applies \u2014 the climb is the game \u2014 but at launch PRO opens the full catalog from Level 1. Beta players lock in founder pricing.',
 };
