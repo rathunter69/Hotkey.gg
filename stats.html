@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stats · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=119" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=119">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=119">
+<link rel="icon" href="favicon.ico?v=120" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=120">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=120">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -37,6 +37,19 @@
   .stat .big em{font-style:normal; font-size:14px; color:var(--muted)}
   .stat .lbl{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-top:4px}
   .stat.hero{border-color:var(--accent-dim); background:var(--surface)}   /* r62 flat */
+  /* r135: achievements live HERE now (rolled off the card); earned medals are pickable */
+  .ach-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:12px 8px; margin:10px 0 18px}
+  .ach-pick{position:relative; display:flex; flex-direction:column; align-items:center; gap:4px;
+    font-family:var(--mono); font-size:8.5px; color:var(--faint); text-align:center; line-height:1.25;
+    padding:8px 2px 6px; border-radius:10px; border:1px solid transparent}
+  .ach-pick.earned{color:var(--muted); cursor:pointer}
+  .ach-pick.earned:hover{background:var(--surface2); border-color:var(--line)}
+  .ach-pick.feat{border-color:var(--accent-dim); background:var(--accent-glow)}
+  .ach-pick .st{position:absolute; top:3px; right:5px; font-size:10px; color:var(--warn); display:none}
+  .ach-pick.feat .st{display:block}
+  .ach-pick i{position:absolute; top:32px; right:8px; font-style:normal; font-size:7.5px; color:var(--faint);
+    background:var(--surface2); border:1px solid var(--line); border-radius:6px; padding:0 3px}
+  .ach-hint{font-family:var(--mono); font-size:11px; color:var(--muted); margin:2px 0 8px}
   .section-title{font-family:var(--mono); font-size:13px; color:var(--muted); text-transform:uppercase;
     letter-spacing:1.5px; margin:26px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line)}
   .drow{display:grid; grid-template-columns:1fr 92px 92px 110px; gap:14px; align-items:center;
@@ -55,8 +68,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=119">
-<script src="drills.js?v=119"></script>
+<link rel="stylesheet" href="nav.css?v=120">
+<script src="drills.js?v=120"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -64,11 +77,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=119"></script>
+<script src="themes.js?v=120"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=119"></script>
+<script src="nav.js?v=120"></script>
 
 <header class="head">
   <div class="wrap">
@@ -119,6 +132,14 @@ async function load(){
 
   let streakN=0; try{ const s=JSON.parse(localStorage.getItem('hotkey_streak')||'{}'); streakN=s.n||0; }catch(e){}
 
+  // r135: featured-achievement picks — server copy wins when signed in
+  let feat=[]; try{ feat=JSON.parse(localStorage.getItem('hk_feat_ach')||'[]'); }catch(e){}
+  if(sb && me){ try{
+    const {data:pr}=await sb.from('profiles').select('featured_ach').eq('id',me.id).maybeSingle();
+    if(pr && pr.featured_ach!=null){ feat=String(pr.featured_ach).split(',').filter(Boolean);
+      localStorage.setItem('hk_feat_ach', JSON.stringify(feat)); }
+  }catch(e){} }
+
   // title-card strip: emblem + tier + level, from shared HK_RANK helpers
   let tcHtml='';
   if(me && window.HK_RANK){
@@ -127,7 +148,7 @@ async function load(){
     const xp = window.HK_RANK.computeXP(mine, st);
     const L = window.HK_RANK.levelOf(xp);
     tcHtml = `<div class="stat hero" style="grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap">`+
-      `<span class="${tier.cls}" style="display:inline-flex;color:inherit;">${window.rankEmblem?window.rankEmblem(tier.name,46,tier.bucket):''}</span>`+
+      `<span style="display:inline-flex;line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,46,tier.bucket):''}</span>`+  /* r135: tier.cls tint-plate leak removed (r74 bug class) */
       `<div><div style="font-family:var(--mono);font-weight:700;font-size:15px">${tier.name}</div>`+
       `<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${window.hkLevelChip?window.hkLevelChip(L.lvl,20):''} LVL ${L.lvl} \u00b7 ${L.into}/${L.need} xp \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`+
       `<span style="flex:1;min-width:120px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${L.pct}%;background:var(--accent)"></span></span></div>`;
@@ -272,7 +293,56 @@ async function load(){
       html += `<div class="drow"><span class="nm">${esc(label)}</span><span class="pb">${fmtS(r.time_ms)}</span><span class="eff">${r.keystrokes||'\u2014'} keys</span><span class="eff">${when}</span></div>`;
     });
   }
+  // ================= r135: ACHIEVEMENTS (rolled in from the card) =================
+  // Earned medals are clickable — pick up to 3 to SHOWCASE on your player card
+  // (stored in profiles.featured_ach; public cards render your picks).
+  try{
+    const AC=window.HOTKEY_ACHIEVEMENTS;
+    if(AC && window.hkBadge){
+      let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
+      let runsL=mine.length?mine:[]; if(!runsL.length){ try{ runsL=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){} }
+      let flags={}; try{ flags=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+      const pbCtx={...localPB};
+      mine.forEach(r=>{ const t=r.time_ms/1000; if(pbCtx[r.challenge]===undefined||t<pbCtx[r.challenge]) pbCtx[r.challenge]=t; });
+      let crowns=0;
+      if(me && all.length){ const seen={};
+        all.forEach(r=>{ if(!D.meta[r.challenge]) return; if(seen[r.challenge]) return; seen[r.challenge]=r.user_id; });
+        crowns=Object.values(seen).filter(u=>u===me.id).length; }
+      const groups={}; Object.entries(D.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
+      const ctx={ pb:pbCtx, pars:window.HOTKEY_PARS||{}, runs:runsL, streak:streakN, solves:solvesN,
+        mouseRuns:flags.mouseRuns||0, slowWins:flags.slowWins||0,
+        nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
+        crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
+      let earnedN=0, grid='';
+      AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
+        if(r.done) earnedN++;
+        const isFeat=r.done && feat.includes(a.id);
+        grid+='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'"'+
+          ' title="'+esc(a.name)+' \u2014 '+esc(a.desc)+(r.done?' \u2713 earned \u00b7 click to showcase':'')+'">'+
+          '<span class="st">\u2605</span>'+
+          window.hkBadge(a.glyph, r.done, 40)+
+          (r.done?'':'<i>'+Math.min(99,Math.round(100*(r.prog||0)/(r.goal||1)))+'%</i>')+
+          esc(a.name)+'</span>'; });
+      html += '<h3 class="section-title" id="achievements">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span></h3>'+
+        '<div class="ach-hint">click an earned medal to <b style="color:var(--warn)">\u2605 showcase</b> it on your player card \u00b7 up to 3 (oldest pick swaps out)'+(me?'':' \u00b7 sign in to show them on the boards')+'</div>'+
+        '<div class="ach-grid">'+grid+'</div>';
+    }
+  }catch(e){}
   root.innerHTML = html;
+  // wire the showcase picker (delegated once — root is re-rendered wholesale)
+  try{
+    const rootEl=document.getElementById('root');
+    rootEl.addEventListener('click', async (ev)=>{
+      const el=ev.target.closest ? ev.target.closest('.ach-pick.earned') : null;
+      if(!el) return;
+      const id=el.getAttribute('data-ach');
+      if(feat.includes(id)) feat=feat.filter(x=>x!==id);
+      else { if(feat.length>=3) feat.shift(); feat.push(id); }
+      try{ localStorage.setItem('hk_feat_ach', JSON.stringify(feat)); }catch(e){}
+      if(sb && me){ try{ await sb.from('profiles').update({featured_ach:feat.join(',')}).eq('id',me.id); }catch(e){} }
+      document.querySelectorAll('.ach-pick').forEach(x=>x.classList.toggle('feat', feat.includes(x.getAttribute('data-ach')) && x.classList.contains('earned')));
+    });
+  }catch(e){}
 }
 load();
 </script>

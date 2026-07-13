@@ -36,10 +36,13 @@ perks later). Branch auto-merge live per working agreement.
   and verified; harness at dev/smoke-live.mjs (SMOKE_TS reuse; re-stamp the
   smoke-u fixture migration before the next full run). Seed codes (migration
   20260712400000) are cleared for distribution.
-- **Agreed next pipeline items**: monetization surfaces (PRO placeholder + LinkedIn-
-  shareable rank card; Stripe TEST MODE only) · then parked items: referrals design,
-  marathon rethink, PWA, comments/citations engine turn, T&S launch items (verified-
-  desk granting, admin powers), achievement art pass (dev/ART_SPEC.md deliverable 3).
+- **Agreed next pipeline items (r137 STRATEGY.md is the roadmap of record for
+  sequencing)**: 1 events/funnel table · 2 Morning Sheet daily + streak
+  insurance · 3 ghost-diff results insight · 4 proof & growth round (rank card
+  + challenge links + placement share + PRO placeholder, Stripe TEST MODE) ·
+  5 cohort report export + captain program templates · 6 audit family + RX
+  pack · seasons = design doc only. Parked: referrals, marathon rethink, PWA,
+  comments engine, T&S launch items, achievement art pass (ART_SPEC d3).
 - **Art**: art/rank-proto.html is the emblem design lab (iteration 8). The GAME
   renderer is themes.js rankEmblem (ported copy — if Wolf asks for art tweaks,
   iterate in the proto, get approval, then port to themes.js + cache-bump).
