@@ -3595,3 +3595,46 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   calibrated from measured optimal paths (40/40 keys); drills.js + PARS
   synced; both tabs screenshot-eyeballed. CATALOG: 64 DRILLS.
   CACHE v132 -> v133 (all 9 pages).
+
+---
+# ROUND 154 — THE FULL PASS: onboarding / account / rank / visual audits + Excel-parity fixes (Wolf's standing brief)
+- NEW STANDING HARNESSES (dev/): e2e-audit-parity.js (27-assert Excel-parity
+  keystroke matrix — movement, edit semantics, F4 cycle order, jumps/selections,
+  fill translation, paste, number entry, evaluator, undo, esc discipline),
+  e2e-audit-onboard.js (15-assert fresh-visitor walk: curtain → landing → tour
+  → prompt → play, plus the return visit), e2e-audit-rank.js (20-assert rank
+  cross-surface consistency + account flows + recovery + 2-theme overflow
+  sweep). Run them like the demo-replay e2e; they are the drift-catchers for
+  exactly this pass.
+- THREE REAL BUGS FOUND AND FIXED:
+  (1) EXCEL PARITY, translateFormula: fill's ref-rewrite clamped rows at the
+  STATIC ROWS_MAX (14) — on a 15-row tab '=B8-B14' filled fine but any ref to
+  rows >14 silently re-pointed ('=B14-B16' → '=C14-C14', the r153 catch). Now
+  clamps to the LIVE sheet height; the r153 house-fact landmine is REMOVED —
+  tall tabs may reference their own rows freely.
+  (2) EXCEL PARITY, doPaste: paste NEVER translated relative refs — '=B4+1'
+  copied from C9 pasted at D10 still read B4, while fill translated correctly.
+  Paste now shifts relatives by the paste offset (anchors hold), for both
+  Ctrl+V and Alt-E-S-F; full 64-drill regression confirms no drill leaned on
+  the verbatim behavior.
+  (3) RANK CONSISTENCY, leaderboard tierOf wrapper: declared (avgPct, att)
+  while every caller passed (avg, att, WSUM) — the provisional season-zero cap
+  (Summer Analyst until real exposure) silently never applied on ANY
+  leaderboard surface (your-standing card, desk-hall roster, public player
+  cards, tier panel) while nav/account/stats enforced it. The exact
+  split-brain class r112 killed; wsum now passes through, and the audit
+  asserts board tier == canonical tier == nav pill on a provisional-scale
+  dataset.
+- CLEAN BILLS: onboarding end-to-end (curtain incl. wrong-code error +
+  case-insensitive pass, landing Enter, tour input-block + release, tutorial
+  prompt sequencing, grid takes keys, welcome-back non-swallowing dismiss);
+  account flows (handle save + cooldown mapping, protected-desk mapping,
+  password recovery flow, sign-out); zero horizontal overflow on 5 pages ×
+  2 themes; number-entry/evaluator/undo/esc parity all hold.
+- AUDIT-HARNESS HUMILITY (logged so the next auditor doesn't re-learn it):
+  position:fixed overlays have offsetParent === null even when visible — six
+  "failures" in the first onboarding run were probe artifacts; S.sel is an
+  anchor {r,c} (selRange() is the reader), not a rect.
+- VERIFY: all three audits ALL PASS post-fix (27+15+20) · FULL 64-drill
+  regression ALL GREEN (paste translation broke nothing) · r148-r151 suites
+  re-run ALL PASS. No shared-asset change → ?v stays 133.

@@ -389,9 +389,14 @@ const rapidScore    = r => { const t=r.score+(r.misses||0); const a=t?Math.round
 
 /* ---- tier + level math (mirrors index.html/nav.js — keep the three in sync) ---- */
 const TIERS = window.HK_RANK.TIERS.slice(1);   // ranked tiers (floor 'MBA Associate' excluded from requirement lists)
-function tierOf(avgPct, att){
-  if(window.HK_RANK){ const t=window.HK_RANK.tierOf(avgPct, att); return {...t, i:t.i-1}; }  // HK_RANK indexes incl. Candidate; local TIERS excludes it
-  return window.HK_RANK.tierOf(avgPct, att);
+function tierOf(avgPct, att, wsum){
+  /* r154 RANK CONSISTENCY: this wrapper took two params while every caller passed
+     three — wsum silently fell on the floor, so the provisional season-zero cap
+     (Summer Analyst until real exposure) never applied on ANY leaderboard surface
+     while the nav card / account / stats enforced it. Same split-brain class r112
+     killed; pass it through. */
+  if(window.HK_RANK){ const t=window.HK_RANK.tierOf(avgPct, att, wsum); return {...t, i:t.i-1}; }  // HK_RANK indexes incl. Candidate; local TIERS excludes it
+  return {...TIERS[0], i:0};
   for(let i=TIERS.length-1;i>=0;i--){ if(att>=TIERS[i].att && avgPct<=TIERS[i].pct) return {...TIERS[i], i}; }
   return {...TIERS[0], i:0};
 }
