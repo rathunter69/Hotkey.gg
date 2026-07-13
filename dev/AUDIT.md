@@ -3805,3 +3805,35 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - CACHE v137 -> v138 (all 9 pages).
 - VERIFY: full gate green — parity 37, onboard 20, rank 20, demo-replay
   ALL (64 drills x3); node --check all extracted scripts.
+
+---
+# ROUND 160 — VISUAL-CLARITY AUDIT: grid, colors, text, borders (Wolf's standing brief)
+- NEW STANDING HARNESS dev/e2e-audit-visual.js: computes REAL WCAG
+  contrast from getComputedStyle across ALL 21 themes — gridlines vs
+  sheet, APPLIED borders vs sheet AND vs gridlines (distinct layers),
+  all 10 font swatches vs cell bg (white exempt on light themes — Excel
+  parity), blue-fill text vs fill, fill vs sheet. 311 assertions.
+  Measurement lesson baked in: td background transitions .08s — settle
+  140ms after applyTheme or you read mid-flip colors.
+- 26 REAL FAILURES FOUND, 3 CSS ROOT CAUSES, ALL FIXED:
+  (1) APPLIED BORDERS drew in var(--accent) — near-invisible on light
+  themes (serika 1.46:1, indistinguishable from gridlines at 0.96 ratio)
+  and everywhere ambiguous with the SELECTION language. Now var(--text)
+  INK, Excel-style: borders=ink, gridlines=line, selection=accent —
+  three distinct layers on every theme. This is the substrate Wolf's
+  beefed-up border drills need.
+  (2) orange/yellow font swatches illegible on paper themes (1.67-2.39):
+  bases darkened (#c55a11 / #a67c00), dark themes keep the bright
+  variants via [data-dark] overrides (orange override added).
+  (3) BLUE FILL invisible: light fill #dbeafe was 1.05:1 vs paper sheets
+  -> deepened to #9cc3e8 (text #153c7a, 4.3:1); dark fill #16344e was
+  1.03:1 vs everforest/onedark -> brightened to #1d5080 (text #cfe8ff).
+- NOT-A-BUG, documented: fresh devices boot to OS prefers-color-scheme
+  (light for many users) — light themes are FIRST-TOUCH surfaces, which
+  is why the light-theme failures mattered doubly.
+- CACHE v138 -> v139 (all 9 pages).
+- VERIFY: visual matrix ALL 311 PASS post-fix; demo-replay ALL GREEN;
+  parity 37 PASS; formatting showcase screenshots reviewed on default/
+  daylight/serika/everforest (borders/fills/swatches/selection all
+  distinct). Formatting-drill checks read cell PROPS, not pixels — zero
+  gameplay risk from the palette changes.
