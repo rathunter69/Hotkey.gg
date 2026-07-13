@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=123" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=123">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=123">
+<link rel="icon" href="favicon.ico?v=124" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=124">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=124">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=123"></script>
-<link rel="stylesheet" href="nav.css?v=123">
-<script src="themes.js?v=123"></script>
+<script src="drills.js?v=124"></script>
+<link rel="stylesheet" href="nav.css?v=124">
+<script src="themes.js?v=124"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=123"></script>
+<script src="nav.js?v=124"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1458,6 +1458,81 @@ const CHALLENGES = {
         {label:'bold + top border on total', ok:tot},
         {label:'comma-format column B', ok:cf},
         {label:'Autofit the columns \u2014 no #### left anywhere', ok:af},
+      ];
+    }
+  },
+  housestyle:{
+    name:'House Style', label:'Bring it to standard', par:70, parKeys:42,
+    prompt:'A raw P&L fragment just landed from a first-year: no title weight, naked headers, inputs invisible among the formulas, decimals everywhere, margins reading as decimals, nothing ruled off. Bring the whole tab to house standard \u2014 the pass a senior runs before ANY page leaves the desk. The inputs move every run, and one of them is a hardcode someone buried in a formula row: paint it or it ships wrong.',
+    req(){ const R=this._R; return '<em>A1</em> <em>ctrl+b</em> \u00b7 headers <em>B2:F2</em> bold + <em>alt h b b</em> \u00b7 inputs blue via <em>alt h f c</em>: <em>'+R.inpRows.map(r=>'B'+r+':F'+r).join('</em> \u00b7 <em>')+'</em> + the buried hardcode <em>'+R.override+'</em> \u00b7 figures <em>B3:F7</em> <em>alt h k</em> + <em>alt h 9</em> \u00d72 \u00b7 margins <em>B8:F8</em> <em>ctrl+shift+%</em> \u00b7 EBITDA <em>B7:F7</em> <em>ctrl+b</em> + <em>alt h b t</em>'; },
+    guide(){ const R=this._R; return [
+      'the title carries the page: A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then headers B2:F2 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 bold, ruled under',
+      'paint the inputs BLUE so the next analyst knows what moves: '+R.inpRows.map(r=>'B'+r+':F'+r).join(' and ')+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 \u00b7 <kbd>\u21b5</kbd>',
+      'the buried hardcode at '+R.override+' \u2014 someone typed over the formula. Same blue walk: it\u2019s an input now, mark it like one',
+      'figures to commas: select B3:F7 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice \u2014 decimals off \u00b7 margins to percents: B8:F8 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
+      'rule off the answer: B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 EBITDA is what the page is FOR',
+    ]; },
+    targets(){ const R=this._R; return ['A1','B2:F2'].concat(R.inpRows.map(r=>'B'+r+':F'+r)).concat([R.override,'B3:F7','B8:F8','B7:F7']); },
+    demo(){ const R=this._R;
+      const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter];
+      const steps=[
+        {sel:'A1', keys:[Kb.bold]},
+        {sel:'B2:F2', keys:[Kb.bold]},
+        {sel:'B2:F2', keys:[{key:'Alt'}, L('h'), L('b'), L('b')]},
+      ];
+      R.inpRows.forEach(r=>steps.push({sel:'B'+r+':F'+r, keys:BLUE.slice()}));
+      steps.push({sel:R.override, keys:BLUE.slice()});
+      steps.push({sel:'B3:F7', keys:[{key:'Alt'}, L('h'), L('k')]});
+      steps.push({sel:'B3:F7', keys:[{key:'Alt'}, L('h'), D(9)]});
+      steps.push({sel:'B3:F7', keys:[{key:'Alt'}, L('h'), D(9)]});
+      steps.push({sel:'B8:F8', keys:[Kb.pct]});
+      steps.push({sel:'B7:F7', keys:[Kb.bold]});
+      steps.push({sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]});
+      return steps; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 quarterly P&L ($mm)',txt:true};
+      const y0=rnd(24,26);
+      for(let i=0;i<5;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,align:'r'};
+      [[3,'Revenue'],[4,'COGS'],[5,'Gross profit'],[6,'Opex'],[7,'EBITDA'],[8,'EBITDA margin']]
+        .forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true});
+      // WHICH rows are inputs moves every run: Revenue always; COGS or Opex joins it,
+      // the other is formula-driven. One extra hardcode is buried in the formula row.
+      const second = rnd(0,1) ? 4 : 6;                      // COGS or Opex row is also input
+      const formulaRow = second===4 ? 6 : 4;
+      const ovCol = colLetter(rnd(2,6));                     // the buried hardcode's column
+      const R={ inpRows:[3,second], override: ovCol+formulaRow };
+      this._R=R;
+      for(let i=0;i<5;i++){ const col=colLetter(i+2);
+        const rev=rnd(180,420)*10+rnd(0,9)/10;               // raw decimals on purpose
+        const cogsPct=rnd(35,55)/100, opexPct=rnd(15,30)/100;
+        const cogs=-Math.round(rev*cogsPct*10)/10, opex=-Math.round(rev*opexPct*10)/10;
+        const vals={3:rev, 4:cogs, 6:opex};
+        [3,4,6].forEach(r=>{
+          const isInput = R.inpRows.includes(r) || (col+r)===R.override;
+          cells[col+r]={...blankCell(),
+            ...(isInput ? {value:vals[r]} : {formula:(r===4?'=-B3*'+cogsPct:'=-B3*'+opexPct).replace('B3',col+'3'), value:vals[r]})};
+        });
+        cells[col+5]={...blankCell(),formula:'='+col+'3+'+col+'4', value:rev+cogs};
+        cells[col+7]={...blankCell(),formula:'='+col+'5+'+col+'6', value:rev+cogs+opex};
+        cells[col+8]={...blankCell(),formula:'='+col+'7/'+col+'3', value:(rev+cogs+opex)/rev};
+      }
+      return {ROWS:9, cells, active:{r:1,c:1}, sel:null, colW:{1:150,2:76,3:76,4:76,5:76,6:76}};
+    },
+    checks(S){
+      const R=this._R;
+      const COL=['B','C','D','E','F'];
+      const cell=k=>S.cells[k]||{};
+      const blueOk = R.inpRows.every(r=>COL.every(c=>cell(c+r).fontColor==='blue')) && cell(R.override).fontColor==='blue';
+      const comOk = [3,4,5,6,7].every(r=>COL.every(c=>{ const x=cell(c+r); return x.fmtStyle==='comma'&&(x.decimals|0)===0; }));
+      const pctOk = COL.every(c=>cell(c+'8').fmtStyle==='percent');
+      return [
+        {label:'the title carries weight \u2014 A1 bold', ok: !!cell('A1').bold},
+        {label:'headers dressed \u2014 bold, ruled underneath', ok: COL.every(c=>{ const x=cell(c+'2'); return x.bold&&x.bb; })},
+        {label:'every INPUT wears blue \u2014 including the one buried at '+R.override, ok: blueOk},
+        {label:'figures in commas, decimals trimmed', ok: comOk},
+        {label:'margins read as percents', ok: pctOk},
+        {label:'EBITDA ruled off \u2014 bold with a line above', ok: COL.every(c=>{ const x=cell(c+'7'); return x.bold&&x.bt; })},
       ];
     }
   },
