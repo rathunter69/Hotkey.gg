@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=127" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=127">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=127">
+<link rel="icon" href="favicon.ico?v=128" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=128">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=128">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -675,33 +675,43 @@
   .pk-card::-webkit-scrollbar{width:6px}
   .pk-card::-webkit-scrollbar-track{background:transparent}
   .pk-card::-webkit-scrollbar-thumb{background:var(--line); border-radius:99px}
-  /* r80: SECTION BLOCKS — group card w/ colored cap, byline cloud of drills inside */
-  #pkGroups{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
-  .pk-group{background:color-mix(in srgb, var(--surface) 72%, transparent); border:1px solid var(--line);
-    border-radius:12px; overflow:hidden; margin-bottom:0}
-  .pk-group .pk-glabel{min-height:32px; display:flex; align-items:center; padding:5px 13px; margin:0;
-    background:var(--surface2); border-bottom:1px solid var(--line)}
-  .pk-cloud{display:flex; flex-wrap:wrap; gap:6px 7px; padding:11px 13px 13px}
-  .pk-byline{font-family:var(--mono); font-size:11.5px; color:var(--muted); cursor:pointer;
-    padding:3px 9px; border:1px solid color-mix(in srgb, var(--line) 70%, transparent); border-radius:6px;
-    transition:.12s; white-space:nowrap}
-  .pk-byline:hover{color:var(--text); border-color:var(--line); background:var(--surface2)}
-  .pk-byline.cur{color:var(--accent); border-color:var(--accent-dim); font-weight:700}
-  .pk-byline.focus{outline:2px solid var(--accent); outline-offset:1px; color:var(--text)}   /* r83: the keyboard cursor */
-  .pk-byline.held i{color:var(--accent); font-style:normal; font-size:10px}
-  .pk-byline i{color:var(--faint); font-style:normal}
-  .pk-byline.asg{border-color:var(--warn)}   /* r130: desk assignment — captain pinned it */
+  /* r147: THE DEAL ROOM — the picker is a VDR file tree (Wolf's call). Folder rows
+     are numbered, drills are files, the cap strip carries a live breadcrumb, and
+     folders fold on \u2190/\u2192 — but everything stays one keystroke away. */
+  #pkGroups{max-width:720px; margin:0 auto; background:color-mix(in srgb, var(--surface) 82%, transparent);
+    border:1px solid var(--line); border-radius:12px; overflow:hidden}
+  .vdr-cap{min-height:34px; display:flex; align-items:center; gap:14px; padding:6px 16px;
+    background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono);
+    font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+  .vdr-crumb{color:var(--muted); letter-spacing:.04em; text-transform:none; flex:1; min-width:0;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .vdr-count{color:var(--faint); letter-spacing:.04em; text-transform:none; white-space:nowrap}
+  .vdr-tree{padding:8px 10px 10px; font-family:var(--mono)}
+  .pk-folder{display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:7px;
+    font-size:12.5px; font-weight:700; color:var(--text); cursor:pointer; margin-top:3px}
+  .pk-folder:hover{background:var(--surface2)}
+  .pk-folder .vdr-idx{color:var(--faint); font-weight:400; font-size:10.5px; width:20px}
+  .pk-folder .vdr-tri{color:var(--muted); width:12px; font-size:10px}
+  .pk-folder .vdr-gname{letter-spacing:.02em}
+  .pk-folder .vdr-n{margin-left:auto; color:var(--faint); font-weight:400; font-size:10px}
+  .pk-folder.focus{outline:2px solid var(--accent); outline-offset:-1px}
+  .pk-advtag{font-size:9px; letter-spacing:.12em; color:var(--accent); border:1px solid var(--accent-dim);
+    border-radius:5px; padding:1px 6px; text-transform:uppercase; font-weight:400}
+  .pk-byline{display:flex; align-items:center; gap:8px; padding:3.5px 8px 3.5px 14px; border-radius:6px;
+    font-size:12px; color:var(--muted); cursor:pointer; transition:.1s}
+  .pk-byline:hover{color:var(--text); background:var(--surface2)}
+  .pk-byline.hidden{display:none}
+  .pk-byline .vdr-guide{color:color-mix(in srgb, var(--line) 85%, transparent); width:14px; font-size:11px}
+  .pk-byline .vdr-fidx{color:var(--faint); font-size:10px; width:34px}
+  .pk-byline .vdr-fname{color:inherit}
+  .pk-byline .vdr-ext{color:var(--faint); font-style:normal; font-size:10px}
+  .pk-byline.cur .vdr-fname{color:var(--accent); font-weight:700}
+  .pk-byline.focus{outline:2px solid var(--accent); outline-offset:-1px; color:var(--text)}
+  .pk-byline .vdr-pb{margin-left:auto; color:var(--accent); font-size:10.5px; white-space:nowrap}
+  .pk-byline .vdr-pb.dim{color:var(--faint)}
+  .pk-byline .pk-par{color:var(--faint); font-size:10px; width:64px; text-align:right; white-space:nowrap}
+  .pk-byline.asg .vdr-fname{color:var(--warn)}
   .pk-asgmark{color:var(--warn); font-size:9px}
-  /* r81: FLAGSHIPS break formation — full-width block, accent frame, par shown */
-  .pk-flagship{grid-column:1/-1; border-color:var(--accent-dim); background:color-mix(in srgb, var(--accent-glow) 45%, transparent)}
-  .pk-flagship .pk-glabel{background:color-mix(in srgb, var(--accent-glow) 60%, var(--surface2))}
-  .pk-flagtag{margin-left:auto; font-family:var(--mono); font-size:9px; letter-spacing:.16em; color:var(--accent);
-    border:1px solid var(--accent-dim); border-radius:5px; padding:2px 7px; text-transform:uppercase}
-  .pk-flagship .pk-byline{font-size:12.5px; padding:6px 12px; border-color:var(--accent-dim); color:var(--text)}
-  .pk-flagship .pk-byline:hover{background:var(--accent-glow)}
-  .pk-flagship .pk-byline .pk-par{color:var(--muted); font-size:10px; margin-left:7px}
-  @media(max-width:980px){ #pkGroups{grid-template-columns:1fr 1fr} }
-  @media(max-width:640px){ #pkGroups{grid-template-columns:1fr} }
   .pk-row{background:color-mix(in srgb, var(--surface) 55%, transparent)}
   .pk-row:hover{background:var(--surface)}
   .pk-title{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase;
@@ -1084,14 +1094,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=127"></script>
-<link rel="stylesheet" href="nav.css?v=127">
-<script src="themes.js?v=127"></script>
+<script src="drills.js?v=128"></script>
+<link rel="stylesheet" href="nav.css?v=128">
+<script src="themes.js?v=128"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=127"></script>
+<script src="nav.js?v=128"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1203,9 +1213,8 @@
 <div class="results-modal" id="resultsModal"></div>
 <div class="picker-modal" id="picker">
   <div class="pk-card">
-    <div class="pk-title">choose a drill</div>
     <div id="pkGroups"></div>
-    <div class="pk-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>↵</kbd> open · <kbd>1</kbd>–<kbd>9</kbd> jump · <kbd>esc</kbd> close</div>
+    <div class="pk-foot"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>←</kbd><kbd>→</kbd> fold · <kbd>↵</kbd> open · <kbd>1</kbd>–<kbd>9</kbd> folder · <kbd>esc</kbd> close</div>
   </div>
 </div>
 <div class="modes-modal" id="modesModal"></div>
@@ -6248,12 +6257,17 @@ document.addEventListener('keydown',e=>{
   if(pickerOpen){
     e.preventDefault();
     if(k==='Escape'||k==='\\'){ closePicker(); return; }
-    if(k==='ArrowDown'){ movePkDir(0,1); return; }
-    if(k==='ArrowUp'){ movePkDir(0,-1); return; }
-    if(k==='ArrowRight'){ movePkDir(1,0); return; }
-    if(k==='ArrowLeft'){ movePkDir(-1,0); return; }
+    if(k==='ArrowDown'){ movePk(1); return; }
+    if(k==='ArrowUp'){ movePk(-1); return; }
+    if(k==='ArrowRight'){ pkFoldKey(false); return; }
+    if(k==='ArrowLeft'){ pkFoldKey(true); return; }
     if(k==='Enter'){ choosePk(); return; }
-    if(/^[1-9]$/.test(k)){ const key=MENU_ORDER[+k-1]; if(key){ closePicker(); loadChallenge(key); } return; }
+    // r147: number keys jump to FOLDERS now (they wear the numbers) — unfold + focus
+    if(/^[1-9]$/.test(k)){ const rows=pkRows();
+      const i=rows.findIndex(r=>r.classList.contains('pk-folder')&&(+r.dataset.gi)===(+k-1));
+      if(i>=0){ pkSel=i; const r=rows[i];
+        if(r.classList.contains('folded')) togglePkFold(r.dataset.group); else highlightPk(); }
+      return; }
     return;
   }
   // open the picker with backslash (ignored while typing a formula or mid-marathon)
@@ -6730,31 +6744,33 @@ $('nextDrill').addEventListener('click', ()=>{ if(!demoPlaying) nextChallenge();
 
 /* ---------- drill picker overlay ---------- */
 let pickerOpen=false, pkSel=0;
-function pkRows(){ const h=$('pkGroups'); return h ? [...h.querySelectorAll('.pk-byline')] : []; }   // r83: rows died in the v80 redesign — arrows now walk the bylines
+function pkRows(){ const h=$('pkGroups'); return h ? [...h.querySelectorAll('.pk-folder, .pk-byline:not(.hidden)')] : []; }   // r147: the tree walks folders AND visible files
 function highlightPk(){ const rows=pkRows(); rows.forEach((r,i)=>r.classList.toggle('focus', i===pkSel));
-  const s=rows[pkSel]; if(s && s.scrollIntoView) s.scrollIntoView({block:'nearest'}); }
-function movePkDir(dx, dy){
-  const rows=pkRows(); if(!rows.length) return;
-  if(dy===0){ pkSel=(pkSel+dx+rows.length)%rows.length; highlightPk(); return; }
-  // vertical: nearest chip by x in the closest offsetTop band above/below
-  const me=rows[pkSel]; const mr=me.getBoundingClientRect(); const mx=mr.left+mr.width/2;
-  let best=-1, bestDy=1e9, bestDx=1e9;
-  rows.forEach((r,i)=>{ if(i===pkSel) return; const rr=r.getBoundingClientRect();
-    const ddy=(rr.top-mr.top)*dy; if(ddy<=4) return;
-    const ddx=Math.abs(rr.left+rr.width/2-mx);
-    if(ddy<bestDy-2 || (Math.abs(ddy-bestDy)<=2 && ddx<bestDx)){ best=i; bestDy=ddy; bestDx=ddx; } });
-  if(best>=0){ pkSel=best; highlightPk(); }
+  const s=rows[pkSel]; if(s && s.scrollIntoView) s.scrollIntoView({block:'nearest'});
+  // r147: live breadcrumb — the cap strip names where the cursor is
+  try{ const c=$('vdrCrumb'); if(c && s){
+    const gname=(s.dataset.group||'').toLowerCase();
+    const gi=String((+s.dataset.gi||0)+1).padStart(2,'0');
+    if(s.classList.contains('pk-folder')) c.textContent='hotkey.gg \u203a drills \u203a '+gi+' '+gname+'/';
+    else{ const nm=((CHALLENGES[s.dataset.key]||{}).name||s.dataset.key||'').toLowerCase().replace(/\s+/g,'-');
+      c.textContent='hotkey.gg \u203a drills \u203a '+gi+' '+gname+' \u203a '+nm+'.xlsx'; }
+  } }catch(e){}
 }
+/* r147: movePkDir retired — the tree is linear; \u2190/\u2192 fold/unfold instead */
 function openPicker(){ if(demoPlaying) return; buildSheetTabs();
   // r146: the r83 stage-top alignment is RETIRED (Wolf: center it) — margin:auto on
   // .pk-card centers overflow-safe; the inline paddingTop was fighting it.
   try{ const p=$('picker'); if(p) p.style.paddingTop=''; }catch(e){}
-  const rows=pkRows(); pkSel=Math.max(0, rows.findIndex(r=>r.dataset.key===cur));
+  let rows=pkRows(); let i=rows.findIndex(r=>r.dataset.key===cur);
+  if(i<0){ const g=GROUP_OF[cur]; i=rows.findIndex(r=>r.classList.contains('pk-folder')&&r.dataset.group===g); }
+  pkSel=Math.max(0,i);
   pickerOpen=true; $('picker').classList.add('show'); highlightPk(); }
 function closePicker(){ pickerOpen=false; const p=$('picker'); if(p) p.classList.remove('show'); }
 function movePk(d){ const rows=pkRows(); if(!rows.length) return;
   pkSel=(pkSel+d+rows.length)%rows.length; highlightPk(); }
-function choosePk(){ const rows=pkRows(); const r=rows[pkSel]; if(r){ closePicker(); loadChallenge(r.dataset.key); } }
+function choosePk(){ const rows=pkRows(); const r=rows[pkSel]; if(!r) return;
+  if(r.classList.contains('pk-folder')){ togglePkFold(r.dataset.group); return; }   // r147: \u21b5 on a folder folds it
+  closePicker(); loadChallenge(r.dataset.key); }
 $('drillPick').addEventListener('click', ()=>{ pickerOpen?closePicker():openPicker(); });
 $('picker').addEventListener('click', e=>{ if(e.target===$('picker')) closePicker(); });
 
@@ -8104,39 +8120,75 @@ const MENU_ORDER = (()=>{
   }
 })();
 
-function buildSheetTabs(){   // renders the drill picker overlay, grouped by skill
+function buildSheetTabs(){   // r147: THE DEAL ROOM — VDR file tree (was r80 section blocks)
   const host=$('pkGroups'); if(!host) return;
   host.innerHTML='';
+  let folds=[]; try{ folds=JSON.parse(localStorage.getItem('hk_pk_folds')||'[]'); }catch(e){}
   const groups=DRILL_GROUPS.map(g=>({name:g.name, keys:g.keys.filter(k=>CHALLENGES[k])}))
     .filter(g=>g.keys.length);
-  // catch any drill not assigned to a group
   const extra=MENU_ORDER.filter(k=>!(k in GROUP_OF));
   if(extra.length) groups.push({name:'More', keys:extra});
-  groups.forEach(g=>{
+  const cap=document.createElement('div'); cap.className='vdr-cap';
+  cap.innerHTML='<span>\u25c6 deal room</span><span class="vdr-crumb" id="vdrCrumb">hotkey.gg \u203a drills</span>'+
+    '<span class="vdr-count">'+MENU_ORDER.length+' files \u00b7 '+groups.length+' folders</span>';
+  host.appendChild(cap);
+  const tree=document.createElement('div'); tree.className='vdr-tree';
+  groups.forEach((g,gi)=>{
+    const folded=folds.includes(g.name);
     const gcol=(window.HOTKEY_GROUP_COLORS||{})[g.name]||'var(--muted)';
     const __adv=(window.HOTKEY_PREMIUM&&window.HOTKEY_PREMIUM.groups||[]).includes(g.name);
-    const __flag = g.name==='Full Builds';
-    const sec=document.createElement('div'); sec.className='pk-group'+(__adv?' pk-adv':'')+(__flag?' pk-flagship':'');
-    sec.innerHTML='<div class="pk-glabel"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+gcol+';margin-right:8px;vertical-align:1px"></span>'+g.name+(__adv?' <span class="pk-advtag">\u25c6 advanced</span>':'')+(__flag?'<span class="pk-flagtag">\u25c6 flagship</span>':'')+'</div>';
-    // r80: the block body is a byline cloud — small clickable drill names,
-    // one line each, PB tick when held. Detail lives in the game; this is a map.
-    const cloud=document.createElement('div'); cloud.className='pk-cloud';
-    g.keys.forEach(key=>{
+    const f=document.createElement('div');
+    f.className='pk-folder'+(folded?' folded':'');
+    f.dataset.group=g.name; f.dataset.gi=gi;
+    f.innerHTML='<span class="vdr-idx">'+String(gi+1).padStart(2,'0')+'</span>'+
+      '<span class="vdr-tri">'+(folded?'\u25b8':'\u25be')+'</span>'+
+      '<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+gcol+'"></span>'+
+      '<span class="vdr-gname">'+g.name+'/</span>'+
+      (__adv?'<span class="pk-advtag">\u25c6 advanced</span>':'')+
+      '<span class="vdr-n">'+g.keys.length+' file'+(g.keys.length===1?'':'s')+(folded?' \u00b7 folded':'')+'</span>';
+    f.onclick=()=>togglePkFold(g.name);
+    tree.appendChild(f);
+    g.keys.forEach((key,ki)=>{
       const C=CHALLENGES[key]; if(!C) return;
-      const chip=document.createElement('span');
-      const __a=(window.__deskAsg||{})[key];   // r130: captain's pinned drill
-      chip.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'');
-      chip.dataset.key=key;
-      chip.innerHTML=(__a?'<span class="pk-asgmark">\u25c6</span> ':'')+escHtml(C.name||key)+
-        (GROUP_OF[key]==='Full Builds'?'<span class="pk-par">par '+(C.par||'')+'s</span>':'')+
-        (PB[key]!==undefined?' <i>\u2713</i>':'');
-      chip.title=(__a?('desk assignment'+(__a.t?' \u00b7 target '+(__a.t/1000)+'s':'')+(__a.note?' \u00b7 '+__a.note:'')+' \u00b7 '):'')+(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'');
-      chip.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
-      cloud.appendChild(chip);
+      const __a=(window.__deskAsg||{})[key];   // r130: staffer's pinned drill
+      const row=document.createElement('div');
+      row.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'')+(folded?' hidden':'');
+      row.dataset.key=key; row.dataset.group=g.name; row.dataset.gi=gi;
+      row.innerHTML='<span class="vdr-guide">'+(ki===g.keys.length-1?'\u2514':'\u251c')+'</span>'+
+        '<span class="vdr-fidx">'+String(gi+1).padStart(2,'0')+'.'+(ki+1)+'</span>'+
+        (__a?'<span class="pk-asgmark">\u25c6</span>':'')+
+        '<span class="vdr-fname">'+escHtml(C.name||key)+'<i class="vdr-ext">.xlsx</i></span>'+
+        (PB[key]!==undefined?'<span class="vdr-pb">\u2713 '+PB[key].toFixed(2)+'s</span>':'<span class="vdr-pb dim">\u2014</span>')+
+        '<span class="pk-par">par '+(C.par||'')+'s</span>';
+      row.title=(__a?('desk assignment'+(__a.t?' \u00b7 target '+(__a.t/1000)+'s':'')+(__a.note?' \u00b7 '+__a.note:'')+' \u00b7 '):'')+(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'');
+      row.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
+      tree.appendChild(row);
     });
-    sec.appendChild(cloud);
-    host.appendChild(sec);
   });
+  host.appendChild(tree);
+}
+function togglePkFold(name){
+  let folds=[]; try{ folds=JSON.parse(localStorage.getItem('hk_pk_folds')||'[]'); }catch(e){}
+  folds = folds.includes(name) ? folds.filter(x=>x!==name) : folds.concat([name]);
+  try{ localStorage.setItem('hk_pk_folds', JSON.stringify(folds)); }catch(e){}
+  buildSheetTabs();
+  const rows=pkRows(); const i=rows.findIndex(r=>r.classList.contains('pk-folder')&&r.dataset.group===name);
+  if(i>=0){ pkSel=i; highlightPk(); }
+}
+function pkFoldKey(foldIt){
+  const rows=pkRows(); const r=rows[pkSel]; if(!r) return;
+  if(r.classList.contains('pk-folder')){
+    const folded=r.classList.contains('folded');
+    if(foldIt && !folded){ togglePkFold(r.dataset.group); return; }
+    if(!foldIt && folded){ togglePkFold(r.dataset.group); return; }
+    if(!foldIt && !folded){ movePk(1); return; }   // step into the first file
+    return;
+  }
+  if(foldIt){ // from a file, \u2190 jumps to (not folds) its folder — one tap to orient, two to fold
+    const g=r.dataset.group;
+    const i=rows.findIndex(x=>x.classList.contains('pk-folder')&&x.dataset.group===g);
+    if(i>=0){ pkSel=i; highlightPk(); }
+  }
 }
 
 /* ---- PB persistence — survives across sessions on production deploys ---- */
