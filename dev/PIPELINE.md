@@ -8,7 +8,9 @@ follows the doctrine.)*
 
 ---
 
-## T-A · ENRICHMENT SWEEP, TRANCHE 2 — mid-tier singles  *(Fable-grade)*
+## T-A · ENRICHMENT SWEEP, TRANCHE 2 — DONE r170 (see AUDIT). Tranche 3 candidates: growth, wacc, revolver, waterfall, txncomps, football — grade by hand first.
+
+## ~~T-A original brief~~  *(kept for method reference)*
 > Read dev/DRILL_DOCTRINE.md and apply §5 (enrichment playbook) to these
 > drills, in order: **cagr, lookup, lookup2, percent, bridge, autofit, saves,
 > editfix, ribbon, format, drill (hardcode), transpose**. For each: grade by
@@ -71,7 +73,13 @@ follows the doctrine.)*
 > reference.html section mapping every classic drill → its chord family →
 > its rapid-fire cards. Zero engine work; pure wiring + content.
 
-## T-G · SCRAPE-DRIVEN CONTENT REFRESH  *(needs network egress)*
+## T-G · SCRAPE-DRIVEN CONTENT REFRESH — PARTIALLY DONE r171  *(finish needs egress)*
+> DONE via search layer: dev/CANON_DIFF.md (coverage diff, 6 new-drill
+> proposals, grouping/center-across/circuit-breaker specifics, realism
+> nuggets). REMAINING for an egress session: verify [canon]-tagged rows +
+> HOTKEY_PLUGIN_LAYERS Macabacus/FactSet defaults against the live cheat
+> sheets, and pull 2-3 WSO threads verbatim for voice/priority calibration.
+> Original brief:
 > WSO/WSP/BIWS block direct fetch through this proxy (403) but search-layer
 > summaries work. From a session with egress: pull the WSP shortcut sheet,
 > Macabacus shortcut manager defaults, BIWS "Excel shortcuts investment

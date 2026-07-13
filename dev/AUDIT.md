@@ -4135,3 +4135,20 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFIED: replay 69/69, parity 37, onboard 20, visual 311, rank 20,
   par sweep FLAGGED 0 (ribbon parKeys trued 18→14 measured).
 - CACHE v148 -> v149.
+
+---
+# ROUND 171 — T-G (partial): CANON DIFF via the search layer
+- Direct fetch of every major training site is 403-blocked by the
+  environment network policy; the WebSearch summary layer worked. All
+  claims in dev/CANON_DIFF.md are tagged [live] vs [canon] accordingly.
+- dev/CANON_DIFF.md shipped: covered / recognition-only / missing tables
+  with engine-lift estimates; 6 new-drill proposals (hardcode hunt, walk
+  the wire, wrap-it-or-fix-it, fold-the-detail, no-merge header,
+  SUMPRODUCT rollup); realism nuggets for existing copy. New specifics
+  extracted live: grouping chords (shift+alt+arrows, alt+shift+=/−) and
+  the WSO "never hide, always group" rule; center-across-selection exact
+  path (Ctrl+1, A, TAB, C, C); circuit-breaker convention for circular
+  models; IFERROR-sparingly principle; Alt W V G gridlines.
+- PIPELINE.md updated: T-A marked done (tranche 3 candidates named),
+  T-G marked partial with the egress-remainder spelled out.
+- Docs only — no shipped assets touched, no cache bump.
