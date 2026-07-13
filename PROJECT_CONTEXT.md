@@ -45,10 +45,16 @@ perks later). Branch auto-merge live per working agreement.
   placement verdict percentile + share card · PRO placeholder (card-themes
   teaser → openUpgrade; ?openUpgrade=1 deep link from satellites). Ghost diff
   shipped r146; VDR deal-room picker r147.
-- **NEXT (STRATEGY.md sequence)**: cohort report export + staffer program
-  templates (item 5 — the B2B round) · then audit family + RX pack content
-  round (balance sweep, stale-link hunt, sign-error triage) · then seasons
-  design doc.
+- **B2B ROUND SHIPPED (r149, STRATEGY item 5)**: cohort report export (print/
+  PDF #deskPrint + 1200×627 summary-card PNG off the desk hall, zero backend)
+  + staffer program templates (Intern week 0 / First-year bootcamp / Speed
+  weeks — 4-week quest sequences pinned one click a week through the existing
+  assignment RPCs; progress local per desk).
+- **NEXT (STRATEGY.md sequence)**: audit family + RX pack content round
+  (balance sweep, stale-link hunt, sign-error triage; liquidity bridge /
+  covenant table ideas) · then seasons design doc (doc only — build gated on
+  DAU). Pilot playbook (STRATEGY lens 4.2) is now unblocked: events + report
+  + programs all exist.
 - **Working agreement (r-standing)**: AUTO-MERGE to main once a round's
   verification gate is green (Wolf 2026-07-13). Merge = deploy.
 - Cache v129. Test accounts + cleanup list: dev/SMOKE_REPORT.md.
