@@ -3236,8 +3236,8 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   'format' drill already teaches). Copy/demo corrected; second run WIN 3/3.
 - VERIFY: 40-seed sweep (zero pre-solved checks; input-row and buried-cell
   distributions both ~50/50 across seeds; no override ever lands in an input
-  row); housestyle e2e WIN 3/3; FULL 57-drill regression result recorded
-  below. drills.js catalog + PARS synced (par 70/parKeys 42).
+  row); housestyle e2e WIN 3/3; FULL 57-drill regression ALL GREEN (every
+  drill WIN 3/3, zero page errors — merge gated on it). drills.js catalog + PARS synced (par 70/parKeys 42).
   CACHE v123 -> v124 (all 9 pages).
 - NAV NOTE: Wolf's "navigation more love" is QUEUED as its own push — design
   sketch: 'modeltour' — N defect cells scattered wide, ctrl-jump navigation
