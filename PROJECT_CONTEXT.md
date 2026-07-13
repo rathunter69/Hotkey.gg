@@ -39,14 +39,19 @@ perks later). Branch auto-merge live per working agreement.
   hardcode, r142) · modeltour (ctrl-jump find-and-fix, r144) · wk13 (13-week
   cash flow, RX flagship, r145). All house-bar verified (40-seed sweeps +
   demo-replay e2e + full-catalog regression gating every merge).
-- **NEXT (STRATEGY.md sequence)**: ghost-diff results insight (item 3 — traces
-  recorded since r9 are waiting) · then share surfaces round (rank card +
-  challenge links + placement share + PRO placeholder) · then cohort report
-  export + staffer program templates. Content queue: audit-family expansion
-  (balance sweep, stale-link hunt, sign-error triage).
+- **PROOF & GROWTH SHIPPED (r148, STRATEGY item 4)**: challenge links
+  (?race=drill&t=secs&by=name — URL-only race ghosts, copy-link button on every
+  clean solve) · shareable rank card (1200×627 PNG off the player card) ·
+  placement verdict percentile + share card · PRO placeholder (card-themes
+  teaser → openUpgrade; ?openUpgrade=1 deep link from satellites). Ghost diff
+  shipped r146; VDR deal-room picker r147.
+- **NEXT (STRATEGY.md sequence)**: cohort report export + staffer program
+  templates (item 5 — the B2B round) · then audit family + RX pack content
+  round (balance sweep, stale-link hunt, sign-error triage) · then seasons
+  design doc.
 - **Working agreement (r-standing)**: AUTO-MERGE to main once a round's
   verification gate is green (Wolf 2026-07-13). Merge = deploy.
-- Cache v126. Test accounts + cleanup list: dev/SMOKE_REPORT.md.
+- Cache v129. Test accounts + cleanup list: dev/SMOKE_REPORT.md.
 
 ## PREVIOUS SNAPSHOT (2026-07-12, rounds r100-r130)
 - **Where we are**: content deepening arc DONE (T2-T6, Mix Rule) · demo-replay e2e
