@@ -4070,3 +4070,39 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFIED: replay 69/69 GREEN, parity 37, onboard 20, visual 311,
   rank 20, par sweep FLAGGED 0, node --check clean.
 - CACHE v147 -> v148 (all 9 pages).
+
+---
+# ROUND 169 — THE DOCTRINE ROUND: anti-railroad harness + methodology + pipeline
+- WOLF'S DIRECTIVE: while Fable is available — codify the drill quality
+  methodology, prove drills allow alternative solve paths (not railroads),
+  research the external training canon, and leave a callable task pipeline.
+- NEW STANDING HARNESS: dev/e2e-alt-paths.js — replays ALTERNATIVE
+  solutions per drill: ribbon vs ctrl chords (alt h 1 / ctrl+b,
+  ctrl+shift+! / alt h k), dialog routes (alt h v s vs alt e s), ribbon
+  fills (h f i d/r vs ctrl+d/r), ctrl+± with shift+space rows, typed $
+  vs F4 vs pointer+F4, and order permutations everywhere (deck-first
+  copyover, bold-first undo, insert-first colops, foot-first sort...).
+  RESULT: 14/14 alts across 13 drills PASS on first run — end-state
+  grading held; zero railroads found in the covered set. Harness is now
+  part of the standard gate; every new/rebuilt drill must land an ALTS
+  entry (one order alt + one chord-route alt where the engine has two).
+- dev/DRILL_DOCTRINE.md — the canonical methodology: the five doctrines
+  (density / freedom / mix / realism / checklist), build protocol
+  (splice discipline, ride-through geometry, engine surface incl. the
+  full evalFormula function list), the 7-step test gate, the enrichment
+  playbook (smallest-upgrade-first ladder), canon research notes, voice.
+- dev/PIPELINE.md — the Fable task queue Wolf can paste into any fresh
+  session: T-A enrichment tranche 2 (12 drills, ranked matrix included),
+  T-B alt-paths to full 69-drill coverage, T-C Models-tier realism
+  audit, T-D engine pack 1 (Go To Special, ctrl+[ precedent jump,
+  IFERROR), T-E engine pack 2 (hide, format-cells, filter, grouping),
+  T-F rapid-fire bridge, T-G scrape-driven canon diff (needs egress —
+  WSO/WSP 403 through this proxy; search layer worked), T-H interview
+  mode, T-I seasons. Standing items preserved (Supabase smoke test etc).
+- RESEARCH (search layer): WSP/Macabacus/WSO/BIWS/FE-ICAEW consensus
+  mapped against our catalog — covered list + missing list recorded in
+  doctrine §6; the missing set feeds T-D/T-E (Go To Special is the
+  canon's #1 audit ritual we don't teach).
+- PROJECT_CONTEXT.md: doctrine arc + 4-harness gate recorded.
+- No shipped-asset changes this round (docs + dev harness only) — no
+  cache bump. Replay/parity untouched; alt-paths ALL 14 PASS.

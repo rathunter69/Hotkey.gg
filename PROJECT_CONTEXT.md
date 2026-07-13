@@ -83,6 +83,15 @@ perks later). Branch auto-merge live per working agreement.
   par 100/46). SEASONS design doc at dev/SEASONS.md (build gated: DAU ≥ 30
   ×2wks or first B2B ask; rank-only soft reset, tombstones, PRO = finish
   not advantage).
+- **r167-r169 (the doctrine arc, Fable)**: T7/T8 density filter game-wide —
+  aha on ALL 69 drills (surfaced on results card), four Foundations micro-
+  drills + foot rebuilt, three gap drills added (colops/anchor/decimals, 66→69).
+  **dev/DRILL_DOCTRINE.md is now the canonical build/test/enrich methodology**
+  and **dev/PIPELINE.md is the Wolf-callable task queue** (T-A…T-I). FOURTH
+  STANDING HARNESS: dev/e2e-alt-paths.js (anti-railroad — alternative chords/
+  orders must win; every new/rebuilt drill adds an ALTS entry). Full gate is
+  now: syntax → demo-replay → ALT-PATHS → par-sweep → parity/onboard/visual/
+  rank → screenshots. Boot beacon ignores resource-load errors (adblock class).
 - **NEXT**: pilot playbook (STRATEGY lens 4.2) is fully unblocked: events +
   report + programs exist — needs Wolf to pick 2-3 clubs. Parked queue:
   referrals, marathon rethink, PWA, comments engine, achievement art pass.
