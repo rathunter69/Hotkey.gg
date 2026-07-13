@@ -510,7 +510,10 @@ window.HK_RANK = {
 };
 
 /* ---- achievement badges: hex medals, single source (inline copy in index — sync) ---- */
-window.hkBadge = function(id, earned, size, color){
+window.hkBadge = function(id, earned, size, color, rarity){
+  // r138: RARITY METALS — rarity = % of players holding it (from run-derived
+  // global stats). <=25% rare (platinum blue), <=10% epic (crimson), <=3%
+  // legendary (radiant gold + rays). Explicit `color` (campaign groups) wins.
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
   const G={
@@ -532,14 +535,29 @@ window.hkBadge = function(id, earned, size, color){
   };
   const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
   const hexIn='M13 5.1 L19.7 9 V17 L13 20.9 L6.3 17 V9 Z';
-  const col = earned ? (color||'var(--warn)') : 'var(--faint)';
+  let metal=null, regalia='';
+  if(earned && rarity!==undefined && rarity!==null && isFinite(rarity)){
+    if(rarity<=3){ metal='#ffd76e';   // LEGENDARY — radiant: apex rays + shoulder sparks
+      regalia='<path d="M13 -.2v2.6 M7.8 1l1 2.2 M18.2 1l-1 2.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>'+
+              '<path d="M2.6 4.2l1.6 1.3 M23.4 4.2l-1.6 1.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".9"/>'; }
+    else if(rarity<=10){ metal='#e2574d';  // EPIC — crimson, side fins
+      regalia='<path d="M1.8 10.6l2.2 1.1 M1.8 15.2l2.2-1.1 M24.2 10.6L22 11.7 M24.2 15.2L22 14.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".85"/>'; }
+    else if(rarity<=25){ metal='#8ab4ff';  // RARE — platinum blue, second inner ring
+      regalia='<path d="M13 6.4 L18.6 9.7 V16.3 L13 19.6 L7.4 16.3 V9.7 Z" fill="none" stroke="currentColor" stroke-width=".6" opacity=".4"/>'; }
+  }
+  const col = earned ? (color||metal||'var(--warn)') : 'var(--faint)';
   // r67: earned medals wear the regalia — double ring + apex notches; locked stays a ghost.
   const crown = earned ? '<path d="M13 .8v1.6 M5.2 5.4l1.3.9 M20.8 5.4l-1.3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>' : '';
   return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+'">'+
-    crown+
-    '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?'.16':'.05')+'"/>'+
+    crown+regalia+
+    '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?(metal?'.2':'.16'):'.05')+'"/>'+
     '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.6"/>'+
     (earned?'<path d="'+hexIn+'" fill="none" stroke="currentColor" stroke-width=".9" opacity=".55"/>':'')+
     '<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(G[id]||G.fin)+'</g>'+
     '</svg>';
+};
+// r138: shared rarity helpers — tier word + tooltip fragment (stats grid + cards)
+window.hkRarityTier = function(pct){
+  if(pct===undefined||pct===null||!isFinite(pct)) return null;
+  if(pct<=3) return 'legendary'; if(pct<=10) return 'epic'; if(pct<=25) return 'rare'; return null;
 };

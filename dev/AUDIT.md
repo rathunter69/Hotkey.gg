@@ -3118,3 +3118,45 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   captain program templates, audit+RX content round, seasons design-doc-only.
   DO-NOT-BUILD list: more drill breadth, mobile trainer, realtime races,
   live payments (standing). Sequencing rationale inside.
+
+---
+# ROUND 138 — STAFFER RENAME + LAUNCH RUNBOOK + ACHIEVEMENTS PROMINENCE/RARITY
+- STAFFER (Wolf: "more accurate" — the staffer hands out the work): all
+  user-facing 'captain' copy renamed across the Desk Hall (staffer: <name>,
+  staffer seat open, staffer controls) + account (role line, NOT_CAPTAIN
+  message, invite copy, quest empty-state). SCHEMA UNTOUCHED — role column,
+  RPCs, and error codes stay 'captain' (display-layer rename only; rule
+  noted inline).
+- dev/LAUNCH.md — the launch runbook Wolf asked to "build in": phase 0 gates
+  (events data, Morning Sheet shipped, pilot cohort, T&S minimums, smoke-u
+  removal, beta-tools sweep), launch day = flip PRELAUNCH_LOCK + cache bump
+  + verify + watch funnel, week-1 posture, rollback (flip back; nothing else
+  to unwind).
+- ACHIEVEMENTS (Wolf mid-round): section MOVED UP on stats (directly under
+  the headline tiles); title-attr tooltips -> instant data-tip overlays w/
+  name · desc · progress · GLOBAL RARITY; hkBadge gains RARITY METALS
+  (5th param, % of players): <=25% platinum-blue + inner ring, <=10% crimson
+  + side fins, <=3% radiant gold + apex rays — the "hardest to get" medals
+  now read at a glance (legend line under the header). Card showcase badges
+  carry rarity + tips too. NOTE: this is the interim system — the LoL-grade
+  achievement ART pass (ART_SPEC d3) remains queued; when it lands it
+  inherits the rarity tiers.
+
+---
+# ROUND 139 — EVENTS: the funnel we couldn't build retroactively (STRATEGY item 1)
+- MIGRATION 20260713300000: events (user_id nullable, session_key <=64,
+  name ^[a-z0-9_]{2,40}$, meta jsonb <=1KB, created_at). INSERT-ONLY policy
+  (anon + authed; user_id must be null-or-own); NO select policy — reads are
+  service-role (feeds the S8 admin funnel view). Flood posture documented
+  (beta scale; rate limiting rides the T&S launch pass).
+- nav.js: window.hkEvent (fire-and-forget, never throws, session_key from
+  sessionStorage stitches anon funnels) + one 'pv' beacon per page load.
+- index fire points (10): curtain_pass · enter · tour_done · tutorial_start ·
+  tutorial_skip · solve{d,ms} · first_solve{d} (device-once) · guest_session ·
+  account_session (device-once real login) · desk_join{slug}.
+- The launch funnel reads: pv -> curtain_pass -> enter -> tour_done ->
+  first_solve -> account_session, stitched by session_key. LAUNCH.md phase-1
+  step 5 consumes exactly this.
+- VERIFY: node --check all touched scripts; boot suite ALL PASS (stats grid +
+  picker re-verified post-move); live insert probe post-merge (below).
+  CACHE v120 -> v121 (all 9 pages).

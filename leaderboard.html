@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard · hotkey.gg</title>
-<link rel="icon" href="favicon.ico?v=120" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=120">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=120">
+<link rel="icon" href="favicon.ico?v=121" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=121">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=121">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -241,15 +241,15 @@
   @media(max-width:640px){ .foot-fine{text-align:left} }
 </style>
 
-<link rel="stylesheet" href="nav.css?v=120">
-<script src="drills.js?v=120"></script>
+<link rel="stylesheet" href="nav.css?v=121">
+<script src="drills.js?v=121"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=120"></script>
+<script src="themes.js?v=121"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=120"></script>
+<script src="nav.js?v=121"></script>
 
 <header class="head">
   <div class="wrap">
@@ -503,8 +503,8 @@ async function load(){
         '<div class="dk-crest">\u25c6</div>'+
         '<div class="dk-id"><div class="dk-name">'+esc(DATA.viewDesk.name)+(DATA.viewDesk.verified?' <span class="dk-ver">\u2713 verified</span>':'')+'</div>'+
         '<div class="dk-sub">'+ids.length+' analyst'+(ids.length===1?'':'s')+
-          (capName?' \u00b7 captained by <b data-uid="'+captainId+'" style="cursor:pointer">'+esc(capName)+'</b>':' \u00b7 <span style="color:var(--warn)">captaincy unclaimed \u2014 first code-join takes the desk</span>')+'</div></div>'+
-        (iAmCaptain?'<a class="dk-manage" href="account.html">captain\u2019s controls \u2192</a>':'')+
+          (capName?' \u00b7 staffer: <b data-uid="'+captainId+'" style="cursor:pointer">'+esc(capName)+'</b>':' \u00b7 <span style="color:var(--warn)">staffer seat open \u2014 first code-join takes the desk</span>')+'</div></div>'+
+        (iAmCaptain?'<a class="dk-manage" href="account.html">staffer controls \u2192</a>':'')+
       '</div>';
 
     // ---- ROI band ----
@@ -542,7 +542,7 @@ async function load(){
       }).join('')+'</div>';
     } else {
       html+='<div class="dk-sect">this week\u2019s quests</div>'+
-        '<div class="dk-empty">'+(iAmCaptain?'no quests pinned \u2014 pin up to 3 drills from your <a href="account.html" style="color:var(--accent)">captain\u2019s controls</a> (targets + notes optional)':'no quests pinned this week \u2014 the captain sets them')+'</div>';
+        '<div class="dk-empty">'+(iAmCaptain?'no quests pinned \u2014 pin up to 3 drills from your <a href="account.html" style="color:var(--accent)">staffer controls</a> (targets + notes optional)':'no quests pinned this week \u2014 the staffer sets them')+'</div>';
     }
 
     // ---- evaluation roster ----

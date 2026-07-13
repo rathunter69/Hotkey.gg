@@ -483,8 +483,8 @@
               '<a href="stats.html#achievements" style="float:right;font-size:9.5px;color:var(--accent);text-decoration:none">'+(showcase.length?'edit showcase':'pick your showcase')+' \u2197</a></div>';
             if(shown.length){
               out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+shown.map(e=>
-                '<span style="display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;max-width:76px">'+
-                (window.hkBadge?window.hkBadge(e.a.glyph,true,46):'')+(showcase.length?'\u2605 ':'')+e.a.name+
+                '<span data-tip="'+e.a.name+' \u2014 '+e.a.desc+(e.gp!==undefined?' \u00b7 '+e.gp+'% of players have this':'')+'" style="display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;max-width:76px">'+
+                (window.hkBadge?window.hkBadge(e.a.glyph,true,46,null,e.gp):'')+(showcase.length?'\u2605 ':'')+e.a.name+
                 '</span>').join('')+'</div>';
             }
             out+='<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin:0 0 4px">full grid + progress on <a href="stats.html#achievements" style="color:var(--accent)">your numbers \u2192</a></div>';
@@ -678,6 +678,18 @@
   window.navRefreshAuth = function(){ try{ if(window.__navAuthKick) window.__navAuthKick(); }catch(e){} };
   // r134: THE player card (index's r13-era inline copy deleted — this is the only renderer)
   window.openProfile = openProfile;
+  // r139: EVENTS — insert-only funnel telemetry (STRATEGY lens 2). Fire-and-forget:
+  // never throws, never blocks, works signed-out (session_key stitches the funnel).
+  window.hkEvent = function(name, meta){ try{
+    if(!window.sb) return;
+    let sk=sessionStorage.getItem('hk_sess');
+    if(!sk){ sk=Math.random().toString(36).slice(2,12)+Date.now().toString(36); sessionStorage.setItem('hk_sess', sk); }
+    const uid=(window._navUser&&window._navUser.id)||null;
+    window.sb.from('events').insert({user_id:uid, session_key:sk,
+      name:String(name).toLowerCase().replace(/[^a-z0-9_]/g,'_').slice(0,40), meta:meta||null}).then(()=>{},()=>{});
+  }catch(e){} };
+  // one pv per page load (cheap DAU/page traffic; the funnel's denominator)
+  setTimeout(function(){ try{ window.hkEvent('pv',{p:location.pathname.replace(/^.*\//,'')||'index.html'}); }catch(e){} }, 1500);
   document.addEventListener('keydown', e => {
     const onTrainer = window.NAV_ACTIVE === 'trainer';
     if(e.key === 'Escape'){
