@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=133" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=133">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=133">
+<link rel="icon" href="favicon.ico?v=134" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=134">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=134">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1105,14 +1105,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=133"></script>
-<link rel="stylesheet" href="nav.css?v=133">
-<script src="themes.js?v=133"></script>
+<script src="drills.js?v=134"></script>
+<link rel="stylesheet" href="nav.css?v=134">
+<script src="themes.js?v=134"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=133"></script>
+<script src="nav.js?v=134"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1441,52 +1441,72 @@ const CHALLENGES = {
   },
 
   gauntlet:{
-    name:'Gauntlet', label:'Make it model-ready', par:75, parKeys:30,
-    prompt:'Finish this mini build to house style: shade the three input cells blue, add a SUM total, make the total bold with a top border, comma-format column B to 0 decimals, and autofit so nothing clips.',
-    req:'<em>keyboard only</em> · alt h h fill · alt = sum · ctrl b bold · alt h b t top border · alt h k / alt h 9 format · alt h o i autofit',
-    guide:[
-      'select B2:B4 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> fill · pick blue',
-      'go to B5 · <kbd>alt</kbd>+<kbd>=</kbd> autosum · <kbd>↵</kbd>',
-      'on B5 · <kbd>ctrl</kbd>+<kbd>b</kbd> bold · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> top border',
-      'select B2:B5 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
-      'select column B · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> autofit',
-    ],
-    targets:['B2:B4','B5','B5','B2:B5','B2:B5'],
-    demo(){ return [
-      {sel:'B2:B4', keys:[Kb.alt,L('H'),L('H')]},
-      {sel:'B5', keys:[Kb.eq, Kb.enter]},
-      {sel:'B5', keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
-      {sel:'B2:B5', keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
-      {sel:'B2:B5', keys:[Kb.alt,L('H'),L('O'),L('I')]},
+    name:'Gauntlet', label:'Make it model-ready', par:100, parKeys:46,
+    prompt:'A raw sources & uses \u2014 both sides straight out of a banker\u2019s head: naked numbers, no totals, nothing marked. Full dress, BOTH blocks: inputs blue, SUM each total with alt+=, bold + top border on both, commas at 0 decimals down both money columns, autofit so nothing clips. Every formatting op you know, both sides of the page, no mouse.',
+    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h h blue \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b t</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h o i</em> autofit'; },
+    guide(){ const R=this._R; return [
+      'both input stacks blue: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u00b7 then the same on '+R.useIn,
+      'totals with autosum: '+R.srcTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd> \u00b7 then '+R.useTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd>',
+      'dress both totals: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'commas, 0 decimals, both money columns: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> \u00d72',
+      'autofit both: <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 no #### leaves the desk',
+    ]; },
+    targets(){ const R=this._R; return [R.srcIn, R.srcTot, R.srcTot, R.srcCol, R.srcCol]; },
+    demo(){ const R=this._R; return [
+      {sel:R.srcIn,  keys:[Kb.alt,L('H'),L('H')]},
+      {sel:R.useIn,  keys:[Kb.alt,L('H'),L('H')]},
+      {sel:R.srcTot, keys:[Kb.eq, Kb.enter]},
+      {sel:R.useTot, keys:[Kb.eq, Kb.enter]},
+      {sel:R.srcTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
+      {sel:R.useTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
+      {sel:R.srcCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:R.useCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:R.srcCol, keys:[Kb.alt,L('H'),L('O'),L('I')]},
+      {sel:R.useCol, keys:[Kb.alt,L('H'),L('O'),L('I')]},
     ]; },
     build(){
+      /* r155 DENSITY: was a 2\u00d75 strip \u2014 now a real two-sided S&U; every op runs
+         on both blocks (multi-site per the doctrine), labels shuffle per run. */
       const cells={};
-      cells['A1']={...blankCell(),value:'Sources',txt:true,bold:true};
-      const labels=['Senior debt','Mezzanine','Sponsor equity'];
-      const inputs=[];
-      for(let r=2;r<=4;r++){
-        cells['A'+r]={...blankCell(),value:labels[r-2],txt:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Sources & uses (dress it before it ships)',txt:true,bold:true};
+      const r0=3+rnd(0,1);
+      const srcLbl=['Senior debt','Mezzanine','Sponsor equity','Rollover'];
+      const useLbl=['Purchase equity','Refi existing debt','Fees & OID','Min. cash to BS'];
+      for(let a=srcLbl.length-1;a>0;a--){ const j=rnd(0,a); [srcLbl[a],srcLbl[j]]=[srcLbl[j],srcLbl[a]]; }
+      for(let a=useLbl.length-1;a>0;a--){ const j=rnd(0,a); [useLbl[a],useLbl[j]]=[useLbl[j],useLbl[a]]; }
+      cells['A'+r0]={...blankCell(),value:'Sources',txt:true,bold:true};
+      cells['D'+r0]={...blankCell(),value:'Uses',txt:true,bold:true};
+      for(let i=0;i<4;i++){ const r=r0+1+i;
+        cells['A'+r]={...blankCell(),value:srcLbl[i],txt:true};
         cells['B'+r]={...blankCell(),value:rnd(40,260)*1000000};
-        inputs.push('B'+r);
+        cells['D'+r]={...blankCell(),value:useLbl[i],txt:true};
+        cells['E'+r]={...blankCell(),value:rnd(40,260)*1000000};
       }
-      cells['A5']={...blankCell(),value:'Total sources',txt:true};
-      // B5 left empty for the SUM
-      this._inputs=inputs; this._total='B5'; this._sumRange='B2:B4';
-      return {ROWS:5, cells, active:{r:2,c:2}, sel:null};
+      cells['A'+(r0+5)]={...blankCell(),value:'Total sources',txt:true};
+      cells['D'+(r0+5)]={...blankCell(),value:'Total uses',txt:true};
+      this._R={ srcIn:'B'+(r0+1)+':B'+(r0+4), useIn:'E'+(r0+1)+':E'+(r0+4),
+        srcTot:'B'+(r0+5), useTot:'E'+(r0+5),
+        srcCol:'B'+(r0+1)+':B'+(r0+5), useCol:'E'+(r0+1)+':E'+(r0+5), r0 };
+      return {ROWS:Math.max(10,r0+6), cells, active:{r:r0+1,c:2}, sel:null, colW:{1:118,4:128}};
     },
     checks(S){
-      let fill=true; for(const k of this._inputs){ const c=S.cells[k]; if(!c||c.fill!=='blue') fill=false; }
-      const t=S.cells['B5'];
-      const sum=!!(t&&t.formula&&/^=SUM\(/i.test(t.formula));
-      const tot=!!(t&&t.bold&&t.bt);
-      let cf=true; for(let r=2;r<=5;r++){ const c=S.cells['B'+r]; if(!c||c.fmtStyle!=='comma'||c.decimals!==0) cf=false; }
-      const af=!overflowsCol(S,2);
+      const R=this._R, r0=R.r0;
+      let fill=true;
+      for(let i=1;i<=4;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
+        if(!c||c.fill!=='blue') fill=false; } }
+      const tS=S.cells['B'+(r0+5)], tU=S.cells['E'+(r0+5)];
+      const sum=!!(tS&&tS.formula&&/^=SUM\(/i.test(tS.formula)) && !!(tU&&tU.formula&&/^=SUM\(/i.test(tU.formula));
+      const tot=!!(tS&&tS.bold&&tS.bt) && !!(tU&&tU.bold&&tU.bt);
+      let cf=true;
+      for(let i=1;i<=5;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
+        if(!c||c.fmtStyle!=='comma'||c.decimals!==0) cf=false; } }
+      const af=!overflowsCol(S,2)&&!overflowsCol(S,5);
       return [
-        {label:'shade inputs blue', ok:fill},
-        {label:'SUM the total', ok:sum},
-        {label:'bold + top border on total', ok:tot},
-        {label:'comma-format column B', ok:cf},
-        {label:'Autofit the columns \u2014 no #### left anywhere', ok:af},
+        {label:'shade BOTH input stacks blue (sources and uses)', ok:fill},
+        {label:'SUM both totals \u2014 alt+= twice', ok:sum},
+        {label:'bold + top border on both totals', ok:tot},
+        {label:'comma-format both money columns, 0 decimals', ok:cf},
+        {label:'Autofit \u2014 no #### left on either side', ok:af},
       ];
     }
   },
@@ -1913,7 +1933,7 @@ const CHALLENGES = {
     }
   },
   pastes:{
-    name:'Paste Sp.', label:'Alt E S everything', par:44, parKeys:14,
+    name:'Paste Sp.', label:'Alt E S everything', par:40, parKeys:11,
     prompt:'One copied cell, three different pastes \u2014 and the cells move each run. Alt E S opens the dialog the way twenty years of desks have opened it: V values, T formats, E transpose lives there too. Copy the source ONCE \u2014 it serves every paste.',
     req(){ const o=this._o; return '<em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.v+'</em> \u2192 <em>alt e s v \u21b5</em> values \u00b7 <em>'+o.t+'</em> \u2192 <em>alt e s t \u21b5</em> formats'; },
     guide(){ const o=this._o; return [
@@ -1928,23 +1948,32 @@ const CHALLENGES = {
       {sel:o.t, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'t'}, Kb.enter]},
     ]; },
     build(){
+      /* r155 DENSITY: the old tab was 5 floating cells on an empty sheet. Now the
+         final figure lives INSIDE a real quarterly summary and feeds two hand-offs —
+         same three keystrokes, real surroundings. */
       const cells={};
-      const spots=[{r:2,c:2},{r:3,c:5},{r:6,c:3},{r:2,c:7},{r:8,c:2}];
-      const sp=spots[rnd(0,spots.length-1)];
-      const v=rnd(40,900)*10;
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Quarterly summary (one final figure feeds the deck)',txt:true,bold:true};
+      const y0=23+rnd(0,2);
+      cells['A3']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
+      for(let j=0;j<4;j++) cells[colLetter(2+j)+'3']={...blankCell(),value:'Q'+(j+1)+'-'+y0,txt:true,bold:true};
+      const rows=['Revenue','COGS','Opex','EBITDA'];
+      for(let i=0;i<4;i++){ const r=4+i;
+        cells['A'+r]={...blankCell(),value:rows[i],txt:true,bold:i===3};
+        for(let j=0;j<4;j++) cells[colLetter(2+j)+r]={...blankCell(),value:rnd(40,400)*5,fmtStyle:'comma',decimals:0}; }
+      // THE FINAL FIGURE — dressed to house style, somewhere in the table each run
+      const sp={r:4+rnd(0,3), c:2+rnd(0,3)};
       const SRC=colLetter(sp.c)+sp.r;
-      const vSpots=[{r:sp.r,c:sp.c+2},{r:sp.r+2,c:sp.c+1},{r:sp.r+3,c:sp.c+2}];
-      const vs=vSpots[rnd(0,2)];
-      const V=colLetter(vs.c)+vs.r;
-      const T=colLetter(vs.c)+(vs.r+2);
-      cells[colLetter(sp.c-1)+sp.r]={...blankCell(),value:'Source',txt:true};
-      cells[SRC]={...blankCell(),value:v,bold:true,fill:'blue',fmtStyle:'comma',decimals:0,fontColor:'blue'};
-      cells[colLetter(vs.c-1)+vs.r]={...blankCell(),value:'\u2192 values',txt:true};
-      cells[colLetter(vs.c-1)+(vs.r+2)]={...blankCell(),value:'\u2192 formats',txt:true};
-      cells[T]={...blankCell(),value:rnd(1,9)*7};
-      this._v=v; this._tv=cells[T].value;
-      this._o={src:SRC, v:V, t:T};
-      return {ROWS:Math.max(9,vs.r+3), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{}};
+      cells[SRC]={...blankCell(),value:rnd(40,900)*10,bold:true,fill:'blue',fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      const homes=[{v:{r:10,c:3},t:{r:10,c:6}},{v:{r:11,c:2},t:{r:11,c:7}},{v:{r:10,c:5},t:{r:12,c:3}}];
+      const h=homes[rnd(0,2)];
+      const V=colLetter(h.v.c)+h.v.r, Tc=colLetter(h.t.c)+h.t.r;
+      cells['A9']={...blankCell(),value:'Hand-offs',txt:true,bold:true};
+      cells[colLetter(h.v.c-1)+h.v.r]={...blankCell(),value:'deck \u2192 value',txt:true};
+      cells[colLetter(h.t.c-1)+h.t.r]={...blankCell(),value:'draft \u2192 formats',txt:true};
+      cells[Tc]={...blankCell(),value:rnd(1,9)*7};
+      this._v=cells[SRC].value; this._tv=cells[Tc].value;
+      this._o={src:SRC, v:V, t:Tc};
+      return {ROWS:Math.max(12,h.t.r), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{1:110}};
     },
     checks(S){
       const o=this._o;
@@ -1958,7 +1987,7 @@ const CHALLENGES = {
     }
   },
   transpose:{
-    name:'Transpose', label:'Flip it on its side', par:40, parKeys:14,
+    name:'Transpose', label:'Flip it on its side', par:30, parKeys:6,
     prompt:'A year header runs across the page, but the summary block needs it running DOWN. Copy the row once, then Alt E S E \u2014 transpose \u2014 drops it in sideways. No retyping, no dragging.',
     req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 to <em>'+o.dst+'</em> \u00b7 <em>alt e s e \u21b5</em> \u2014 the row lands as a column'; },
     guide(){ const o=this._o; return [
@@ -1972,18 +2001,25 @@ const CHALLENGES = {
       {sel:o.dst, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'e'}, Kb.enter]},
     ]; },
     build(){
+      /* r155 DENSITY: the year row now caps a REAL populated build (labels + three
+         data rows), and the summary block waits below — same two keystrokes. */
       const cells={};
-      const spots=[{r:1,c:2,dr:5,dc:1},{r:2,c:3,dr:6,dc:2},{r:1,c:4,dr:4,dc:1},{r:3,c:2,dr:8,dc:6}];
-      const sp=spots[rnd(0,spots.length-1)];
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Operating build (the summary block reads DOWN)',txt:true,bold:true};
+      const layouts=[{r:3,c:2,dr:8,dc:1},{r:3,c:3,dr:8,dc:7},{r:2,c:2,dr:7,dc:8}];
+      const sp=layouts[rnd(0,layouts.length-1)];
       const y0=rnd(2021,2025);
       cells[colLetter(sp.c-1)+sp.r]={...blankCell(),value:'Years',txt:true};
       this._years=[];
       for(let j=0;j<4;j++){ const y=y0+j; this._years.push(y);
         cells[colLetter(sp.c+j)+sp.r]={...blankCell(),value:y,bold:true,align:'r',decimals:0}; }
+      const rows=['Revenue','EBITDA','Capex'];
+      for(let i=0;i<3;i++){ const r=sp.r+1+i;
+        cells[colLetter(sp.c-1)+r]={...blankCell(),value:rows[i],txt:true};
+        for(let j=0;j<4;j++) cells[colLetter(sp.c+j)+r]={...blankCell(),value:rnd(30,300)*5,fmtStyle:'comma',decimals:0}; }
       cells[colLetter(sp.dc)+(sp.dr-1)]={...blankCell(),value:'Summary',txt:true,bold:true};
       this._o={ a:colLetter(sp.c)+sp.r, src:colLetter(sp.c)+sp.r+':'+colLetter(sp.c+3)+sp.r,
         dst:colLetter(sp.dc)+sp.dr, dc:sp.dc, dr:sp.dr };
-      return {ROWS:Math.max(10,sp.dr+4), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{}};
+      return {ROWS:Math.max(12,sp.dr+4), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{}};
     },
     checks(S){
       const o=this._o;

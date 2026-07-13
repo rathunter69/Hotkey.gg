@@ -73,10 +73,19 @@ perks later). Branch auto-merge live per working agreement.
   HOUSE FACT (engine): fill-right ref-rewrite CLAMPS referenced rows at
   ROWS_MAX=14 — cells may live on rows 15+ but formulas referencing rows >14
   break on fill; keep referenced rows <= 14.
-- **NEXT (STRATEGY.md sequence)**: seasons design doc (doc only — build gated
-  on DAU). Pilot playbook (STRATEGY lens 4.2) is unblocked: events + report
-  + programs all exist. Parked queue: referrals, marathon rethink, PWA,
-  comments engine, achievement art pass.
+- **r154 (the full pass)**: 3 real bugs fixed — fill ref-rewrite ROWS_MAX
+  clamp (tall tabs now legal), paste never translated relative refs (now
+  Excel-true), leaderboard tierOf dropped wsum (provisional cap was dead on
+  every board surface). THREE STANDING AUDIT HARNESSES in dev/
+  (e2e-audit-parity/onboard/rank — 27+15+20 asserts): run them each audit arc.
+- **r155 (density + design)**: last pre-doctrine surfaces densified — pastes
+  5→30 cells, transpose 6→22, gauntlet rebuilt as a two-sided S&U (8→21,
+  par 100/46). SEASONS design doc at dev/SEASONS.md (build gated: DAU ≥ 30
+  ×2wks or first B2B ask; rank-only soft reset, tombstones, PRO = finish
+  not advantage).
+- **NEXT**: pilot playbook (STRATEGY lens 4.2) is fully unblocked: events +
+  report + programs exist — needs Wolf to pick 2-3 clubs. Parked queue:
+  referrals, marathon rethink, PWA, comments engine, achievement art pass.
 - **Working agreement (r-standing)**: AUTO-MERGE to main once a round's
   verification gate is green (Wolf 2026-07-13). Merge = deploy.
 - Cache v129. Test accounts + cleanup list: dev/SMOKE_REPORT.md.
