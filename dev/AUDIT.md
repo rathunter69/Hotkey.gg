@@ -3185,3 +3185,29 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   popover deals daily/sharpen/fresh tags, click loads drill, win marks 1/3 +
   button repaints, freeze consumed n5->6 frz1->0, zero page errors); node
   --check. CACHE v121 -> v122 (all 9 pages).
+
+---
+# ROUND 141 — 'CASCADE': the full waterfall (Wolf reopened content; 13-week parked)
+- Wolf redirected the content budget: "full waterfall and debt schedules are
+  more relevant" — the 13-WEEK CASH FLOW design (front-8-weeks window, flow
+  totals, cushion row) is SPEC'D AND PARKED for the next content push.
+- NEW DRILL 'cascade' (Full Waterfall, Models after waterfall, 56 total):
+  three tranches x four years of strict-seniority paydown — revolver drinks
+  first (MIN of balance/cash), term loan sweeps the REMAINDER (MIN w/ B3-B6),
+  mezz gets the dregs (MIN w/ two seniors netted; STARVES in ~2/3 of tranche-
+  years by construction — the honest edge case the MIN must express). Every
+  tranche corkscrews (C5=B7 class links, ref-checked), total debt row summed
+  and dressed. It is the waterfall AND the debt schedule on one tab — each
+  tranche is a mini debt schedule. Mix Rule: 3 escalating typed MINs +
+  3 corkscrew link families + arithmetic + 10 fills + dress chord.
+- RANDOMIZATION (density doctrine): fixed real-tab layout, random content —
+  openings rv 100-220 / tl 280-460 / mz 100-200, cash 80-320/yr sized so the
+  revolver dies mid-model and the cascade visibly bites.
+- CHECKS: 7, all value+ref enforced (MIN( presence, remainder-chain refs
+  B3-B6 / B3-B6-B9, corkscrew refs per year, dress bold+bt). par 178 /
+  parKeys 102 (token count 117; player-favorable per min-policy).
+- VERIFY: 40-seed structural sweep (zero pre-solved checks, conservation +
+  non-negativity + no overspend, mezz starvation confirmed 101/160 tranche-
+  years); house e2e demo-replay WIN 3/3 (cascade); FULL 56-drill e2e
+  regression result recorded below. drills.js catalog + PARS synced.
+  CACHE v122 -> v123 (all 9 pages).
