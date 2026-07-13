@@ -3160,3 +3160,28 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFY: node --check all touched scripts; boot suite ALL PASS (stats grid +
   picker re-verified post-move); live insert probe post-merge (below).
   CACHE v120 -> v121 (all 9 pages).
+
+---
+# ROUND 140 — MORNING SHEET + STREAK INSURANCE (STRATEGY item 2, Wolf: "sure, build it")
+- MORNING SHEET: the ⚡ button is now the SHEET (label carries n/3 live) —
+  a frame-language popover deals three drills per UTC day: [1] the seeded
+  DAILY (unchanged key, its board survives), [2] SHARPEN (worst PB-vs-par),
+  [3] FRESH GROUND (never-drilled, seed-rotated pick) with CHASE-PAR
+  fallback when everything's been touched. Deterministic per day, computed
+  from local PB — works signed-out. Clean win on a sheet drill signs it off
+  (logRunLite hook); 3/3 fires the sheet-cleared celebration + ev('sheet_clear').
+  State: hk_sheet_YYYY-MM-DD localStorage. startDaily/drillOfDay unchanged
+  underneath (item 1 loads {daily:true} so daily boards keep filling).
+- STREAK INSURANCE: every 5-day streak banks a 🧊 freeze (hold max 2); a
+  freeze auto-covers exactly ONE missed day — loadStreak forgives the gap at
+  paint time, updateStreak consumes it on the next solve (n continues, toast
+  says so). Earn toast at each bank. 🔥 badge shows banked freezes + tooltip
+  explains the mechanic. KV hotkey_streak gains .frz (backward compatible).
+- HARNESS CATCH: the logRunLite hook silently no-op'd on first apply (a
+  conditional anchor matched its own output) — the Playwright suite caught
+  the miss before ship (sheet stayed 0/3 after a win). RULE reaffirmed:
+  behavioral verification over edit-success narration.
+- VERIFY: 7-assert Playwright suite ALL GREEN (freeze survives gap at boot,
+  popover deals daily/sharpen/fresh tags, click loads drill, win marks 1/3 +
+  button repaints, freeze consumed n5->6 frz1->0, zero page errors); node
+  --check. CACHE v121 -> v122 (all 9 pages).
