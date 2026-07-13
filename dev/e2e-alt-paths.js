@@ -27,8 +27,10 @@ const ALTS = [
   { key: 'polish', name: 'reversed order + ribbon bold (alt h 1)', moves: `C => { const o=C._o; return [
       {sel:o.h1+':'+o.h2, keys:[{key:'Alt'},L('h'),L('h'), {key:'Alt'},L('h'),L('b'),L('b'), {key:'Alt'},L('h'),D(1)]},
     ]; }` },
-  { key: 'blocksel', name: 'briefs in reverse + ribbon bold + ctrl+shift+! comma', moves: `C => { const o=C._o; return [
-      {sel:o.u0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'!',ctrl:true,shift:true}]},
+  { key: 'blocksel', name: 'move FIRST, reselect at the new address, ctrl+shift+! + ribbon bold', moves: `C => { const o=C._o; return [
+      {sel:o.u0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'x',ctrl:true}]},
+      {sel:o.dst, keys:[{key:'v',ctrl:true}]},
+      {sel:o.dst, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'!',ctrl:true,shift:true}]},
       {sel:o.t0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'Alt'},L('h'),D(1)]},
     ]; }` },
   { key: 'undo', name: 'flag the survivor FIRST, ribbon bold', moves: `C => { const o=C._o;

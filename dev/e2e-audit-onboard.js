@@ -152,6 +152,33 @@ const STUB = () => {
   ok(t4c.done && t4c.xlv, 'primer completes and remembers the novice');
   ok(t4c.tourUp, 'product tour follows the primer');
 
+  // T5 (r174, Wolf's stranding bug): a returning user whose synced last-drill is
+  // LOCKED on this device (fresh xp estimate) must NEVER boot into an empty grid.
+  await page.evaluate(() => { try {
+    localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_xlv', '2');
+    localStorage.setItem('hotkey_last_drill', 'dcf');   // a gated Models drill
+    localStorage.removeItem('hk_xp_est');
+  } catch (e) {} });
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+  await page.waitForTimeout(1300);
+  const t5 = await page.evaluate(() => ({
+    cells: (typeof S !== 'undefined' && S && S.cells) ? Object.keys(S.cells).length : -1,
+    locked: (typeof drillLocked === 'function') ? !!drillLocked(typeof cur !== 'undefined' ? cur : '') : null,
+    gate: !!(document.getElementById('gateModal') && document.getElementById('gateModal').classList.contains('show')),
+  }));
+  ok(t5.cells > 0, 'locked-resume boot still loads a board (no empty grid)', JSON.stringify(t5));
+  ok(t5.locked === false, 'the fallback drill is an UNLOCKED one');
+  if (t5.gate) {
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    const g2 = await page.evaluate(() => document.getElementById('gateModal').classList.contains('show'));
+    ok(!g2, 'Escape dismisses the gate modal');
+  } else {
+    ok(true, 'gate modal not shown at boot (also acceptable)');
+  }
+
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(realErrors.length === 0, 'zero page errors through onboarding', realErrors.join(' | '));
   await browser.close();

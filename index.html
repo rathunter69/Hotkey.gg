@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=151" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=151">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=151">
+<link rel="icon" href="favicon.ico?v=152" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=152">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=152">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1125,14 +1125,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=151"></script>
-<link rel="stylesheet" href="nav.css?v=151">
-<script src="themes.js?v=151"></script>
+<script src="drills.js?v=152"></script>
+<link rel="stylesheet" href="nav.css?v=152">
+<script src="themes.js?v=152"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=151"></script>
+<script src="nav.js?v=152"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1413,8 +1413,8 @@ const CHALLENGES = {
         return !!(c&&c.formula===null&&Number(c.value)===this._exp[k]); });
       const blue=Object.keys(this._exp).every(k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); });
       return [
-        {label:'the links are BROKEN \u2014 values only, nothing on this page can move', ok: dead},
-        {label:'and the survivors wear blue \u2014 everyone can see these are hardcodes now', ok: blue},
+        {label:'break the links \u2014 values only, nothing on this page can move', ok: dead},
+        {label:'paint the survivors blue \u2014 the page tells on itself', ok: blue},
       ];
     }
   },
@@ -1480,11 +1480,11 @@ const CHALLENGES = {
       let wr=true; for(let r=o.r1;r<=o.r2;r++){ if(!cell(o.notesCol+r).wrap) wr=false; }
       let af=true; for(let ci=0;ci<o.nc;ci++){ if(overflowsCol(S,2+ci)) af=false; }
       return [
-        {label:'the title and the header row carry weight — bold', ok: !!cell('A1').bold && hb},
+        {label:'bold the title and the header row', ok: !!cell('A1').bold && hb},
         {label:'metric headers sit RIGHT, over their numbers', ok: ha},
         {label:'figures in commas, zero decimals', ok: cf},
         {label:'notes wrap — no text running over the page', ok: wr},
-        {label:'nothing ships showing #### — autofit the number columns', ok: af},
+        {label:'autofit the number columns — nothing ships showing ####', ok: af},
       ];
     }
   },
@@ -1628,9 +1628,9 @@ const CHALLENGES = {
       return [
         {label:'the title carries weight \u2014 A1 bold', ok: !!cell('A1').bold},
         {label:'headers dressed \u2014 bold, ruled underneath', ok: COL.every(c=>{ const x=cell(c+'2'); return x.bold&&x.bb; })},
-        {label:'every INPUT wears blue \u2014 including the one buried at '+R.override, ok: blueOk},
+        {label:'paint every INPUT blue \u2014 including the one buried at '+R.override, ok: blueOk},
         {label:'figures in commas, decimals trimmed', ok: comOk},
-        {label:'margins read as percents', ok: pctOk},
+        {label:'cast the margins as percents', ok: pctOk},
         {label:'EBITDA ruled off \u2014 bold with a line above', ok: COL.every(c=>{ const x=cell(c+'7'); return x.bold&&x.bt; })},
       ];
     }
@@ -1844,11 +1844,11 @@ const CHALLENGES = {
     checks(S){
       const o=this._o, r0=o.r0, g=r=>S.cells[o.vc+r]||{};
       return [
-        {label:'margins read as percentages \u2014 EBITDA margin to one decimal ('+o.pct+')',
+        {label:'cast the margins as percentages \u2014 EBITDA margin to one decimal ('+o.pct+')',
           ok: g(r0+1).fmtStyle==='percent' && g(r0+2).fmtStyle==='percent' && (g(r0+2).decimals|0)===1},
-        {label:'dollar figures in currency, no stray decimals ('+o.cur+')',
+        {label:'cast the dollar figures as currency \u2014 no stray decimals ('+o.cur+')',
           ok: ['currency'].includes(g(r0+3).fmtStyle) && g(r0+4).fmtStyle==='currency' && (g(r0+3).decimals|0)===0 && (g(r0+4).decimals|0)===0},
-        {label:'share count comma-separated, whole number ('+o.com+')',
+        {label:'comma-separate the share count \u2014 whole number ('+o.com+')',
           ok: g(r0+5).fmtStyle==='comma' && (g(r0+5).decimals|0)===0},
       ];
     }
@@ -1910,9 +1910,9 @@ const CHALLENGES = {
         return col.vals.every((v,i)=>{ const cc=S.cells[col.L+(o.hr+1+i)];
           return !!(cc&&cc.value===v&&cc.decimals===col.target&&cc.fmtStyle===col.style); }); };
       return [
-        {label:'dollars take NO decimals — EV column at zero places, values untouched', ok: colOk('EV ($mm)')},
-        {label:'multiples take ONE — 8x reads 8.2x down the column', ok: colOk('EV/EBITDA')},
-        {label:'margins take ONE — three places walked back to one', ok: colOk('Margin')},
+        {label:'strip the EV column to ZERO decimals — values untouched', ok: colOk('EV ($mm)')},
+        {label:'give the multiples ONE decimal — 8x becomes 8.2x down the column', ok: colOk('EV/EBITDA')},
+        {label:'walk the margins back to ONE decimal place', ok: colOk('Margin')},
       ];
     }
   },
@@ -2069,8 +2069,8 @@ const CHALLENGES = {
         else { const nf=norm(cc.formula); if(!(nf.includes('$B')&&nf.includes('$'+o.hr))) gridOk=false; }
       }
       return [
-        {label:'the driver formula pins both ways — $B locks the volume, $'+o.hr+' locks the price row', ok: pinOk},
-        {label:'one formula runs the grid — nine cells live, every price × volume right', ok: gridOk},
+        {label:'pin the driver formula both ways — $B locks the volume, $'+o.hr+' locks the price row', ok: pinOk},
+        {label:'run the grid from ONE formula — nine cells live, every price × volume right', ok: gridOk},
       ];
     }
   },
@@ -2276,10 +2276,10 @@ const CHALLENGES = {
     checks(S){
       const o=this._o, c=k=>S.cells[k]||{};
       return [
-        {label:'the title at '+o.b+' is bold \u2014 Alt H 1', ok: !!c(o.b).bold},
-        {label:'the figure at '+o.k+' wears commas \u2014 Alt H K', ok: c(o.k).fmtStyle==='comma'},
-        {label:'the header at '+o.c+' sits centered \u2014 Alt H A C', ok: c(o.c).align==='c'},
-        {label:'the block at '+o.r+' is ruled off underneath \u2014 Alt H B B', ok: o.rc.every(cc=>!!c(colLetter(cc)+o.rr).bb)},
+        {label:'bold the title at '+o.b+' \u2014 Alt H 1', ok: !!c(o.b).bold},
+        {label:'comma-format the figure at '+o.k+' \u2014 Alt H K', ok: c(o.k).fmtStyle==='comma'},
+        {label:'center the header at '+o.c+' \u2014 Alt H A C', ok: c(o.c).align==='c'},
+        {label:'rule off the block at '+o.r+' \u2014 Alt H B B', ok: o.rc.every(cc=>!!c(colLetter(cc)+o.rr).bb)},
       ];
     }
   },
@@ -2408,8 +2408,8 @@ const CHALLENGES = {
     checks(S){
       const done=k=>{ const c=S.cells[k]; return !!(c&&String(c.value).toLowerCase()==='done'); };
       return [
-        {label:'all three review cells marked done ('+this._sites.join(', ')+')', ok: this._sites.every(done)},
-        {label:'saved at least three times \u2014 Ctrl+S after each block', ok: (S.saveN||0)>=3},
+        {label:'mark all three review cells done ('+this._sites.join(', ')+')', ok: this._sites.every(done)},
+        {label:'save at least three times \u2014 Ctrl+S after each block', ok: (S.saveN||0)>=3},
       ];
     }
   },
@@ -2453,7 +2453,7 @@ const CHALLENGES = {
     },
     checks(S){
       return this._sites.map(s=>({
-        label:'\u201c'+s.bad+'\u201d reads \u201c'+s.good+'\u201d at '+s.cell+' \u2014 fixed in place',
+        label:'fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d at '+s.cell+' \u2014 in place',
         ok: (()=>{ const c=S.cells[s.cell]; return !!(c&&String(c.value)===s.good); })()
       }));
     }
@@ -2510,10 +2510,10 @@ const CHALLENGES = {
       const o=this._o;
       const cel=k=>S.cells[k]||{};
       return [
-        {label:'the dead scratch columns are GONE', ok: o.deadCells.every(k=>cel(k).value===undefined||cel(k).value===null||cel(k).value==='')},
-        {label:'the LIVE column survived — every value exactly as it was', ok: o.liveCells.every((k,i)=>cel(k).value===o.liveVals[i])},
-        {label:'undo was USED, not retyped — ctrl+z at least once', ok: (S.undoN||0)>=1},
-        {label:'the survivor is flagged — '+o.liveHdr+' bold', ok: !!cel(o.liveHdr).bold},
+        {label:'delete the dead scratch columns \u2014 only them', ok: o.deadCells.every(k=>cel(k).value===undefined||cel(k).value===null||cel(k).value==='')},
+        {label:'keep the LIVE column intact — every value exactly as it was', ok: o.liveCells.every((k,i)=>cel(k).value===o.liveVals[i])},
+        {label:'use ctrl+z at least once — bring it back, don\u2019t retype it', ok: (S.undoN||0)>=1},
+        {label:'bold the survivor\u2019s header — '+o.liveHdr, ok: !!cel(o.liveHdr).bold},
       ];
     }
   },
@@ -2553,8 +2553,8 @@ const CHALLENGES = {
       const w=S._colW||{}; 
       const fit=c=>(w[c]||0)>=neededWidth(c)-1;
       return [
-        {label:'first pair fits its content \u2014 no clipped labels, no #####', ok: this._o.ac.every(fit)},
-        {label:'second pair too \u2014 the other side of the page', ok: this._o.bc.every(fit)},
+        {label:'fit the first pair to its content \u2014 no clipped labels, no #####', ok: this._o.ac.every(fit)},
+        {label:'fit the second pair too \u2014 the other side of the page', ok: this._o.bc.every(fit)},
       ];
     }
   },
@@ -2586,8 +2586,8 @@ const CHALLENGES = {
       const v=k=>{ const c=S.cells[k]; return c?c.value:undefined; };
       const noPlaceholder = !Object.values(S.cells).some(c=>c && c.value==='PLACEHOLDER');
       return [
-        {label:'a blank row sits where D&A belongs (COGS pushed down)', ok: v('A3')===undefined && v('A4')==='COGS' && v('B4')===this._cogs},
-        {label:'the PLACEHOLDER row is deleted', ok: noPlaceholder && v('A6')===undefined},
+        {label:'open a blank row where D&A belongs \u2014 push COGS down', ok: v('A3')===undefined && v('A4')==='COGS' && v('B4')===this._cogs},
+        {label:'delete the PLACEHOLDER row', ok: noPlaceholder && v('A6')===undefined},
       ];
     }
   },
@@ -2653,10 +2653,10 @@ const CHALLENGES = {
         return this._q[q].every((v,i)=>{ const cc=S.cells[colLetter(h.c)+(hr+1+i)]; return !!(cc&&cc.value===v); }); });
       const mqh=hdrs.find(x=>x.v===o.mq);
       return [
-        {label:'DRAFT is gone — whole column deleted, the table closed the gap', ok: noDraft},
-        {label:'quarters read Q1 Q2 Q3 Q4 across the header', ok: ordered},
-        {label:'the surviving data traveled intact — every value where its quarter went', ok: dataOk},
-        {label:'the new '+o.mq+' header dressed to match — bold', ok: !!(mqh&&mqh.bold)},
+        {label:'delete the whole DRAFT column — let the table close the gap', ok: noDraft},
+        {label:'line the header up — Q1 Q2 Q3 Q4 in order', ok: ordered},
+        {label:'keep the surviving data intact — every value with its quarter', ok: dataOk},
+        {label:'bold the new '+o.mq+' header to match the row', ok: !!(mqh&&mqh.bold)},
       ];
     }
   },
@@ -2709,25 +2709,27 @@ const CHALLENGES = {
       const c=cel('C'+o.tr);
       const totOk = c.formula && /SUM/i.test(String(c.formula)) && Math.abs((c.value||0)-tot)<0.5;
       return [
-        {label:'every segment filled — formulas, all pinned to $B$2', ok: segOk},
-        {label:'the total pulled RIGHT — still a SUM, right answer', ok: totOk},
+        {label:'fill every segment — formulas, all pinned to $B$2', ok: segOk},
+        {label:'pull the total RIGHT — keep it a live SUM', ok: totOk},
       ];
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Grab the whole block', par:38, parKeys:8,
-    aha:'ctrl+shift+arrows take exactly the island — never drag a selection again',
-    prompt:'THREE data islands on the page — and briefs on TWO of them. Ctrl+Shift+arrows ride the data edges: take the first island whole and bold it, take the second whole and comma-format it. The third island is a decoy testing your aim — the grader wants entire islands, nothing more, nothing less.',
-    req(){ const o=this._o; return 'island one at <em>'+o.t0+'</em>: <em>ctrl+⇧+↓</em> <em>ctrl+⇧+→</em> · <em>ctrl+b</em> · island two at <em>'+o.u0+'</em>: same two chords · <em>alt h k</em> · the decoy at <em>'+o.d0+'</em> stays plain'; },
+    name:'Block Sel.', label:'Grab the whole block', par:52, parKeys:10,
+    aha:'ctrl+shift+arrows take the island whole, ctrl+x ctrl+v moves it — dress it where it lands',
+    prompt:'THREE data islands, and real instructions on two of them: bold the first where it sits — and the second one is parked in the WRONG PLACE. Take it whole with ctrl+shift+arrows, Ctrl+X, drop it on the marked spot with Ctrl+V, and comma-format it at its new address. The third island is a decoy testing your aim. Blocks are objects: grab, move, dress.',
+    req(){ const o=this._o; return 'island one at <em>'+o.t0+'</em>: <em>ctrl+⇧+↓</em> <em>ctrl+⇧+→</em> · <em>ctrl+b</em> · island two at <em>'+o.u0+'</em>: same chords · <em>ctrl+x</em> · to <em>'+o.dst+'</em> · <em>ctrl+v</em> · <em>alt h k</em> · the decoy at <em>'+o.d0+'</em> stays put'; },
     guide(){ const o=this._o; return [
       'first brief — the island at <b>'+o.t0+'</b>: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> · <kbd>ctrl</kbd>+<kbd>b</kbd>',
-      'second brief — <b>'+o.u0+'</b>: same two chords take it whole · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> for commas',
-      'the decoy at '+o.d0+' gets NOTHING — grabbing too much fails the brief',
+      'second brief — <b>'+o.u0+'</b> is parked wrong: same two chords take it whole · <kbd>ctrl</kbd>+<kbd>x</kbd> cuts it',
+      'land on <b>'+o.dst+'</b> · <kbd>ctrl</kbd>+<kbd>v</kbd> — the block moves WHOLE and stays selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> dresses it',
+      'the decoy at '+o.d0+' gets NOTHING — moved, bolded or formatted, it fails the brief',
     ]; },
-    targets(){ const o=this._o; return [o.t0,o.u0]; },
+    targets(){ const o=this._o; return [o.t0,o.u0,o.dst]; },
     demo(){ const o=this._o; return [
       {sel:o.t0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'b',ctrl:true}]},
-      {sel:o.u0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'Alt'},L('h'),L('k')]},
+      {sel:o.u0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'x',ctrl:true}]},
+      {sel:o.dst, keys:[{key:'v',ctrl:true},{key:'Alt'},L('h'),L('k')]},
     ]; },
     build(){
       const cells={};
@@ -2743,23 +2745,30 @@ const CHALLENGES = {
       // spot geometry: heights cap at 4 so a top island's bottom (row 6) never touches
       // the lower island's title (row 8) — contiguous cells would let ctrl+shift+↓ ride
       // through BOTH islands. Fifth spot sits at cols 9-10 (own column band) for the
-      // same reason: at [4,6] its bottom row bridged the row-9 islands horizontally.
+      // same reason. The unused spots become the MOVE destination pool.
       const spots=[[2,3],[6,3],[2,9],[6,9],[9,5]];
       for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
-      const T0=spots[0], U0=spots[1], D0=spots[2];
+      const T0=spots[0], U0=spots[1], D0=spots[2], DEST=spots[3];
       const n1=rnd(3,4), n2=rnd(3,4);
       this._tk=island(T0[0],T0[1],n1,'Brief 1 ↓ bold');
-      this._uk=island(U0[0],U0[1],n2,'Brief 2 ↓ commas');
+      this._uk=island(U0[0],U0[1],n2,'Brief 2 ↓ move + commas');
       this._dk=island(D0[0],D0[1],rnd(3,4),'Decoy');
-      this._o={ t0:colLetter(T0[0])+T0[1], u0:colLetter(U0[0])+U0[1], d0:colLetter(D0[0])+D0[1] };
-      return {ROWS:Math.max(13,T0[1]+n1,U0[1]+n2,D0[1]+4), cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{}};
+      this._uvals=this._uk.map(k=>cells[k].value);
+      cells[colLetter(DEST[0])+(DEST[1]-1)]={...blankCell(),value:'Move here ↓',txt:true};
+      this._dstk=[];
+      for(let i=0;i<n2;i++) for(let j=0;j<2;j++) this._dstk.push(colLetter(DEST[0]+j)+(DEST[1]+i));
+      this._o={ t0:colLetter(T0[0])+T0[1], u0:colLetter(U0[0])+U0[1], d0:colLetter(D0[0])+D0[1],
+        dst:colLetter(DEST[0])+DEST[1] };
+      return {ROWS:Math.max(13,T0[1]+n1,U0[1]+n2,DEST[1]+n2,D0[1]+4), cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{}};
     },
     checks(S){
       const cel=k=>S.cells[k]||{};
+      const empty=k=>{ const c=S.cells[k]; return !c||c.value===undefined||c.value===null||c.value===''; };
       return [
-        {label:'island one bold — both columns, every row, nothing outside', ok: this._tk.every(k=>cel(k).bold) && !this._dk.some(k=>cel(k).bold)},
-        {label:'island two in commas — the whole island', ok: this._uk.every(k=>cel(k).fmtStyle==='comma')},
-        {label:'the decoy stayed plain — aim, not appetite', ok: !this._dk.some(k=>cel(k).bold||cel(k).fmtStyle==='comma')},
+        {label:'bold island one — both columns, every row, nothing outside', ok: this._tk.every(k=>cel(k).bold) && !this._dk.some(k=>cel(k).bold)},
+        {label:'move the block WHOLE — leave the old address empty', ok: this._uk.every(empty) && this._dstk.every((k,i)=>cel(k).value===this._uvals[i])},
+        {label:'comma-format the block at its NEW address', ok: this._dstk.every(k=>cel(k).fmtStyle==='comma')},
+        {label:'leave the decoy alone — aim, not appetite', ok: !this._dk.some(k=>cel(k).bold||cel(k).fmtStyle==='comma')},
       ];
     }
   },
@@ -2824,9 +2833,9 @@ const CHALLENGES = {
         const hasF=!!(c.formula&&/SUM/i.test(c.formula));
         if(wantF!==hasF) return false; } return true; };
       return [
-        {label:'hand-off 1 carries the block — SUM row still live ('+o.d1+')', ok: blockVals(o.D1[0],o.D1[1]) && sumRow(o.D1,true)},
-        {label:'hand-off 2 too — one copy served both ('+o.d2+')', ok: blockVals(o.D2[0],o.D2[1]) && sumRow(o.D2,true)},
-        {label:'deck hand-off is VALUES ONLY — numbers, no formulas ('+o.d3+')', ok: blockVals(o.D3[0],o.D3[1]) && sumRow(o.D3,false)},
+        {label:'land the block at hand-off 1 — SUM row still live ('+o.d1+')', ok: blockVals(o.D1[0],o.D1[1]) && sumRow(o.D1,true)},
+        {label:'land hand-off 2 from the SAME copy ('+o.d2+')', ok: blockVals(o.D2[0],o.D2[1]) && sumRow(o.D2,true)},
+        {label:'paste the deck hand-off as VALUES ONLY — numbers, no formulas ('+o.d3+')', ok: blockVals(o.D3[0],o.D3[1]) && sumRow(o.D3,false)},
       ];
     }
   },
@@ -2863,10 +2872,10 @@ const CHALLENGES = {
     checks(S){
       const c=k=>S.cells[k]||{};
       return [
-        {label:'target header bold, all four cells', ok: this._hk.every(k=>c(k).bold)},
-        {label:'bottom border runs under the whole header', ok: this._hk.every(k=>c(k).bb)},
-        {label:'header shaded', ok: this._hk.every(k=>c(k).fill==='blue')},
-        {label:'the OTHER table untouched — formatting stops where you said it would', ok: !this._dk.some(k=>c(k).bold||c(k).bb||c(k).fill==='blue')},
+        {label:'bold the target header \u2014 all four cells', ok: this._hk.every(k=>c(k).bold)},
+        {label:'run a bottom border under the whole header', ok: this._hk.every(k=>c(k).bb)},
+        {label:'shade the header', ok: this._hk.every(k=>c(k).fill==='blue')},
+        {label:'leave the OTHER table untouched — formatting stops where you say', ok: !this._dk.some(k=>c(k).bold||c(k).bb||c(k).fill==='blue')},
       ];
     }
   },
@@ -2912,7 +2921,7 @@ const CHALLENGES = {
       return [
         {label:'Total every row down column F — live SUMs, not typed numbers', ok: [2,3,4,5].every(rowOk)},
         {label:'Total every column across row 6 — live SUMs', ok: [2,3,4,5].every(c=>colOk(c))},
-        {label:'The corner ties — F6 agrees with BOTH the row and column edges', ok: live('F6')&&Math.abs(val('F6')-this._g)<1e-6},
+        {label:'tie the corner — F6 must agree with BOTH edges', ok: live('F6')&&Math.abs(val('F6')-this._g)<1e-6},
       ];
     }
   },
@@ -3156,9 +3165,9 @@ const CHALLENGES = {
       const sorted=vals.every(v=>typeof v==='number') && vals.every((v,i)=>i===0||vals[i-1]>=v);
       const f=S.cells[o.foot];
       return [
-        {label:'six deals sorted largest-first ('+o.range+')', ok: sorted},
-        {label:'foot the size column \u2014 live SUM at '+o.foot, ok: !!(f&&f.formula&&String(f.formula).toUpperCase().includes('SUM')&&Math.abs((f.value||0)-this._sum)<0.5)},
-        {label:'total bolded', ok: !!(f&&f.bold)},
+        {label:'sort the six deals largest-first ('+o.range+')', ok: sorted},
+        {label:'foot the size column \u2014 land a live SUM at '+o.foot, ok: !!(f&&f.formula&&String(f.formula).toUpperCase().includes('SUM')&&Math.abs((f.value||0)-this._sum)<0.5)},
+        {label:'bold the total', ok: !!(f&&f.bold)},
       ];
     }
   },
@@ -3199,7 +3208,7 @@ const CHALLENGES = {
       const cellsOK=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r];
         return !!(c&&c.value===o.y0+j&&c.bold&&c.align==='r'); });
       return [
-        {label:'five sequential years across '+o.range+' \u2014 filled, bolded, right-aligned', ok: cellsOK},
+        {label:'run five sequential years across '+o.range+' \u2014 fill, bold, right-align', ok: cellsOK},
       ];
     }
   },
@@ -3715,10 +3724,10 @@ const CHALLENGES = {
     name:'IS Build', label:'Build the income statement', par:160, parKeys:52,
     aha:'an income statement is subtotals all the way down \u2014 SUM the blocks, rule the lines',
     prompt:'Five years of income statement, start to finish: COGS off an anchored margin, gross profit, EBIT, net income after the anchored tax rate \u2014 then the net-margin row as a clean percent, and the bottom line bolded and ruled the way it goes in the book. Formulas, fills, a format chord, and the border walk: the whole toolkit on one tab.',
-    req:'<em>B3</em> =-B2*$B$10 fill \u2192 \u00b7 <em>B4</em> =B2+B3 fill \u2192 \u00b7 <em>B6</em> =B4-B5 fill \u2192 \u00b7 <em>B7</em> =B6*(1-$B$11) fill \u2192 \u00b7 <em>B8</em> =B7/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B7:F7: <em>ctrl+b</em> + <em>alt h b t</em>',
+    req:'<em>B3</em> =-B2*$B$10 fill \u2192 \u00b7 <em>B4</em> =B2+B3 fill \u2192 \u00b7 <em>B6</em> =B4+B5 fill \u2192 \u00b7 <em>B7</em> =B6*(1-$B$11) fill \u2192 \u00b7 <em>B8</em> =B7/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B7:F7: <em>ctrl+b</em> + <em>alt h b t</em>',
     guide:[
       'COGS at B3 \u00b7 <kbd>=-B2*$B$10</kbd> \u2014 margin anchored, revenue walking \u00b7 fill right',
-      'gross profit at B4 \u00b7 <kbd>=B2+B3</kbd> (COGS is negative) \u00b7 fill right \u00b7 EBIT at B6 \u00b7 <kbd>=B4-B5</kbd> \u00b7 fill right',
+      'gross profit at B4 \u00b7 <kbd>=B2+B3</kbd> (COGS is negative) \u00b7 fill right \u00b7 EBIT at B6 \u00b7 <kbd>=B4+B5</kbd> \u2014 SG&A carries its own sign \u00b7 fill right',
       'net income at B7 \u00b7 <kbd>=B6*(1-$B$11)</kbd> \u2014 tax rate anchored \u00b7 fill right',
       'net margin at B8 \u00b7 <kbd>=B7/B2</kbd> \u00b7 fill right \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 margins read as percents',
       'dress the bottom line: select B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold, ruled off',
@@ -3729,7 +3738,7 @@ const CHALLENGES = {
       {sel:'B3:F3', keys:[Kb.fillR]},
       {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
       {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'B6', keys:[...T('=B4-B5'), Kb.enter]},
+      {sel:'B6', keys:[...T('=B4+B5'), Kb.enter]},
       {sel:'B6:F6', keys:[Kb.fillR]},
       {sel:'B7', keys:[...T('=B6*(1-$B$11)'), Kb.enter]},
       {sel:'B7:F7', keys:[Kb.fillR]},
@@ -3755,14 +3764,14 @@ const CHALLENGES = {
       for(let i=0;i<5;i++){ const col=colLetter(i+2);
         const rv=Math.floor(rnd(80,140)*10*(1+i*0.08)); this._rev.push(rv);
         cells[col+2]={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        const sg=rnd(10,20)*10; this._sga.push(sg);
+        const sg=-rnd(10,20)*10; this._sga.push(sg);   // r174: costs live negative
         cells[col+5]={...blankCell(),value:sg,fontColor:'blue',fmtStyle:'comma',decimals:0};
         [3,4,6].forEach(r=>cells[col+r]={...blankCell(),fmtStyle:'comma',decimals:0,bold:(r===4)});
         cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0};
         cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:0};
       }
       this._cog=cog; this._tax=tax;
-      this._exp = this._rev.map((rv,i)=>{ const c=-rv*cog, gp=rv+c, eb=gp-this._sga[i], ni=eb*(1-tax);
+      this._exp = this._rev.map((rv,i)=>{ const c=-rv*cog, gp=rv+c, eb=gp+this._sga[i], ni=eb*(1-tax);
         return {c:c,gp:gp,eb:eb,ni:ni,m:ni/rv}; });
       return {ROWS:11, cells, active:{r:3,c:2}, sel:null, colW:{1:170,2:70,3:70,4:70,5:70,6:70}};
     },
@@ -4095,9 +4104,9 @@ const CHALLENGES = {
     name:'3-Statement', label:'Tie the three statements', par:174, parKeys:59,
     aha:'net income walks to cash, cash walks to the sheet \u2014 three statements, one loop',
     prompt:'The capstone, now three years wide: cash walks from the CFS into the balance sheet, retained earnings absorbs net income year after year, and the check row proves the whole machine ties \u2014 three different LINKS, each built once and filled across. When all three check cells read zero, dress the totals and ship it.',
-    req:'<em>B5</em> =B2+B3-B4 fill \u2192 \u00b7 <em>B7</em> =B6+B5 \u00b7 <em>C6</em> =B7 fill \u2192 \u00b7 fill B7:D7 \u2192 \u00b7 <em>B9</em> =B7 fill \u2192 \u00b7 <em>B11</em> =B9+B10 fill \u2192 \u00b7 <em>C13</em> =B13+C2 fill \u2192 \u00b7 <em>B14</em> =B11-B12-B13 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B11:D11 \u00b7 <em>alt h b t</em> B14:D14',
+    req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B7</em> =B6+B5 \u00b7 <em>C6</em> =B7 fill \u2192 \u00b7 fill B7:D7 \u2192 \u00b7 <em>B9</em> =B7 fill \u2192 \u00b7 <em>B11</em> =B9+B10 fill \u2192 \u00b7 <em>C13</em> =B13+C2 fill \u2192 \u00b7 <em>B14</em> =B11-B12-B13 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B11:D11 \u00b7 <em>alt h b t</em> B14:D14',
     guide:[
-      'net change at B5 \u00b7 <kbd>=B2+B3-B4</kbd> \u2014 NI + D&A \u2212 capex \u00b7 fill right \u00b7 ending cash at B7 \u00b7 <kbd>=B6+B5</kbd>',
+      'net change at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 capex already carries its sign; one clean SUM \u00b7 fill right \u00b7 ending cash at B7 \u00b7 <kbd>=B6+B5</kbd>',
       'LINK 1, the corkscrew: C6 \u00b7 <kbd>=B7</kbd> \u00b7 fill C6:D6 \u2192 and B7:D7 \u2192',
       'LINK 2, CFS\u2192BS: cash on the balance sheet at B9 \u00b7 <kbd>=B7</kbd> \u00b7 fill right \u00b7 total assets at B11 \u00b7 <kbd>=B9+B10</kbd> \u00b7 fill \u2192',
       'LINK 3, the RE roll: C13 \u00b7 <kbd>=B13+C2</kbd> \u00b7 fill C13:D13 \u2192 \u2014 RE absorbs NI every year',
@@ -4106,7 +4115,7 @@ const CHALLENGES = {
     ],
     targets:['B5','B7','C6','B9','B11','C13','B14','B11:D11','B14:D14'],
     demo(){ return [
-      {sel:'B5', keys:[...T('=B2+B3-B4'), Kb.enter]},
+      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
       {sel:'B5:D5', keys:[Kb.fillR]},
       {sel:'B7', keys:[...T('=B6+B5'), Kb.enter]},
       {sel:'C6', keys:[...T('=B7'), Kb.enter]},
@@ -4143,7 +4152,7 @@ const CHALLENGES = {
       for(let i=0;i<3;i++){ const col=colLetter(i+2);
         cells[col+2]={...blankCell(),value:ni[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells[col+3]={...blankCell(),value:da[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),value:cx[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+4]={...blankCell(),value:-cx[i],fontColor:'blue',fmtStyle:'comma',decimals:0};   // r174: capex lives negative (matches the CFS-link drill)
         cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0};
         cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
         cells[col+9]={...blankCell(),fmtStyle:'comma',decimals:0};
@@ -4626,7 +4635,7 @@ const CHALLENGES = {
       }));
       const w=this._sites.reduce((a,s)=>s.exp>a.exp?s:a,this._sites[0]);
       const wi='ABC'[this._sites.indexOf(w)];
-      out.push({label:'the winner is CALLED \u2014 Deal '+wi+' has the highest CAGR, and only it is bold',
+      out.push({label:'call the winner \u2014 bold Deal '+wi+' (highest CAGR), and only it',
         ok: this._sites.every(s=>{ const c=S.cells[s.col+s.ans]||{}; return s===w? !!c.bold : !c.bold; })});
       return out;
     }
@@ -4697,7 +4706,7 @@ const CHALLENGES = {
     req(){ return '<em>scan the Total column</em> \u00b7 one SUM stops at FY4 \u2014 <em>F2</em>, extend it \u00b7 one EBITDA is a typed number \u2014 rebuild it live \u00b7 one EBITDA crosses columns \u2014 repoint it'; },
     guide:[
       'read the Total column (G) \u2014 one division\u2019s SUM ends a year early \u00b7 <kbd>F2</kbd>, extend the range to column F, <kbd>\u21b5</kbd>',
-      'read the EBITDA row \u2014 one year is a hardcoded number (nothing in the formula bar) \u00b7 retype it live: <kbd>=</kbd> total rev <kbd>\u2212</kbd> opex <kbd>\u21b5</kbd>',
+      'read the EBITDA row \u2014 one year is a hardcoded number (nothing in the formula bar) \u00b7 retype it live: <kbd>=</kbd> total rev <kbd>+</kbd> signed opex <kbd>\u21b5</kbd>',
       'one EBITDA computes but reads the NEIGHBOR column\u2019s opex \u00b7 <kbd>F2</kbd>, repoint the column, <kbd>\u21b5</kbd>',
     ],
     targets:[function(){return this._t1;}, function(){return this._t2;}, function(){return this._t3;}],
@@ -4706,8 +4715,8 @@ const CHALLENGES = {
       const col2=c2[0], col3=c3[0];
       return [
         {sel:c1, keys:[{key:'F2'}, {key:'Backspace'}, {key:'Backspace'}, {key:'Backspace'}, ...T('F'+c1.slice(1)+')'), Kb.enter]},
-        {sel:c2, keys:[...T('='+col2+'10-'+col2+'12'), Kb.enter]},
-        {sel:c3, keys:[{key:'F2'}, ...Array.from({length:9},()=>({key:'Backspace'})), ...T('='+col3+'10-'+col3+'12'), Kb.enter]},
+        {sel:c2, keys:[...T('='+col2+'10+'+col2+'12'), Kb.enter]},
+        {sel:c3, keys:[{key:'F2'}, ...Array.from({length:9},()=>({key:'Backspace'})), ...T('='+col3+'10+'+col3+'12'), Kb.enter]},
       ];
     },
     build(){
@@ -4739,18 +4748,18 @@ const CHALLENGES = {
         const L=colLetter(c);
         let t=0; for(let r=4;r<=9;r++) t+=cells[L+r].value;
         cells[L+'10']={...blankCell(),formula:'=SUM('+L+'4:'+L+'9)',value:t,fmtStyle:'comma',decimals:0,bold:true};
-        cells[L+'12']={...blankCell(),value:rnd(60,240)*5,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[L+'12']={...blankCell(),value:-rnd(60,240)*5,fmtStyle:'comma',decimals:0,fontColor:'blue'};   // r174: costs live negative
       }
       for(let c=2;c<=6;c++){
         const L=colLetter(c);
         const rev=cells[L+'10'].value, ox=cells[L+'12'].value;
         if(c===cHard){
-          cells[L+'13']={...blankCell(),value:rev-ox+rnd(2,9)*5,fmtStyle:'comma',decimals:0};
+          cells[L+'13']={...blankCell(),value:rev+ox+rnd(2,9)*5,fmtStyle:'comma',decimals:0};
         } else if(c===cCross){
           const N=colLetter(c===6?5:c+1);
-          cells[L+'13']={...blankCell(),formula:'='+L+'10-'+N+'12',value:rev-cells[N+'12'].value,fmtStyle:'comma',decimals:0};
+          cells[L+'13']={...blankCell(),formula:'='+L+'10+'+N+'12',value:rev+cells[N+'12'].value,fmtStyle:'comma',decimals:0};
         } else {
-          cells[L+'13']={...blankCell(),formula:'='+L+'10-'+L+'12',value:rev-ox,fmtStyle:'comma',decimals:0};
+          cells[L+'13']={...blankCell(),formula:'='+L+'10+'+L+'12',value:rev+ox,fmtStyle:'comma',decimals:0};
         }
       }
       this._t1='G'+badDivRow; this._t2=colLetter(cHard)+'13'; this._t3=colLetter(cCross)+'13';
@@ -4770,7 +4779,7 @@ const CHALLENGES = {
         if(!eb||!eb.formula){ liveOk=false; continue; }
         const f=eb.formula.toUpperCase().replace(/[\s$]/g,'');
         // self-consistent: judged against the DISPLAYED total (no recalc engine)
-        if(!f.includes(L+'12') || Math.abs((eb.value||0)-(((tot&&tot.value)||0)-ox))>1e-6) ownOk=false;
+        if(!f.includes(L+'12') || Math.abs((eb.value||0)-(((tot&&tot.value)||0)+ox))>1e-6) ownOk=false;
       }
       return [
         {label:'Every division\u2019s five-year Total spans B through F \u2014 one row stops a year short (column G)', ok:totOk},
@@ -5168,9 +5177,9 @@ const CHALLENGES = {
       const bad=S.cells[o.bad]||{};
       const num=k=>{ const c=S.cells[k]; return (c&&typeof c.value==='number')?c.value:NaN; };
       return [
-        {label:'fixed at the SOURCE — '+o.bad+' reads '+o.good+' again', ok: bad.value===o.good},
-        {label:'everything downstream repriced — subtotal and the deck figure are right', ok: Math.abs(num(o.mid)-o.sumGood)<0.5 && Math.abs(num(o.deck)-o.deckGood)<0.5},
-        {label:'the wire was WALKED — ctrl+[ / ctrl+] hops, not eye-hunting', ok: (S.traceN||0)>=2},
+        {label:'fix it at the SOURCE — '+o.bad+' back to '+o.good, ok: bad.value===o.good},
+        {label:'let the wire reprice — subtotal and deck figure land right', ok: Math.abs(num(o.mid)-o.sumGood)<0.5 && Math.abs(num(o.deck)-o.deckGood)<0.5},
+        {label:'walk the wire — ctrl+[ / ctrl+] hops, not eye-hunting', ok: (S.traceN||0)>=2},
       ];
     }
   },
@@ -5219,11 +5228,11 @@ const CHALLENGES = {
       const v=k=>{ const c=S.cells[k]; return c?c.value:undefined; };
       const f1=f(o.q1), f2=f(o.q2);
       return [
-        {label:'the TRUE miss is wrapped — IFERROR around the intact lookup, zero fallback ('+o.q1+')',
+        {label:'wrap the TRUE miss — IFERROR around the intact lookup, zero fallback ('+o.q1+')',
           ok: f1.includes('IFERROR(')&&f1.includes('INDEX(')&&f1.includes('MATCH(')&&v(o.q1)===0},
-        {label:'the broken range is FIXED, not buried — MATCH reads the names, no IFERROR ('+o.q2+')',
+        {label:'fix the broken range — point MATCH at the names, NO iferror ('+o.q2+')',
           ok: f2.includes('MATCH(')&&f2.includes('A3:A7')&&!f2.includes('IFERROR')&&v(o.q2)===o.exp},
-        {label:'the tape itself untouched — every revenue where it was', ok: this._vals.every((x,i)=>v('B'+(3+i))===x)},
+        {label:'leave the tape untouched — every revenue where it was', ok: this._vals.every((x,i)=>v('B'+(3+i))===x)},
       ];
     }
   },
@@ -5394,18 +5403,18 @@ const CHALLENGES = {
     name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', par:135, parKeys:30,
     aha:'a hardcode freezes yesterday \u2014 relink it and the model rolls forward by itself',
     prompt:'You inherited a five-year operating build where someone typed the answers: growth, gross profit, EBITDA, AND the margin are all hardcoded numbers \u2014 right today, silently wrong the moment an input moves. Resurrect every derived row as a live formula, fill it across, and prove nothing drifted. This is versioning discipline: v2 must survive new numbers without a rebuild.',
-    req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4-B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7-B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 same values, now alive'; },
+    req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4+B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7+B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 costs carry their sign \u2014 subtotals are clean sums'; },
     guide:[
       'growth row is typed \u00b7 C5: <kbd>=</kbd>C4/B4-1 <kbd>\u21b5</kbd> \u00b7 select C5:F5, <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'gross profit is typed \u00b7 B7: <kbd>=</kbd>B4-B6 <kbd>\u21b5</kbd> \u00b7 fill B7:F7',
-      'EBITDA is typed \u00b7 B9: <kbd>=</kbd>B7-B8 <kbd>\u21b5</kbd> \u00b7 fill B9:F9',
+      'gross profit is typed \u00b7 B7: <kbd>=</kbd>B4+B6 <kbd>\u21b5</kbd> \u2014 COGS is negative; adding it IS subtracting \u00b7 fill B7:F7',
+      'EBITDA is typed \u00b7 B9: <kbd>=</kbd>B7+B8 <kbd>\u21b5</kbd> \u00b7 fill B9:F9',
       'margin is typed \u00b7 B10: <kbd>=</kbd>B9/B4 <kbd>\u21b5</kbd> \u00b7 fill B10:F10 \u2014 values must NOT move',
     ],
     targets:['C5:F5','B7:F7','B9:F9','B10:F10'],
     demo(){ return [
       {sel:'C5', keys:[...T('=C4/B4-1'), Kb.enter]}, {sel:'C5:F5', keys:[Kb.fillR]},
-      {sel:'B7', keys:[...T('=B4-B6'), Kb.enter]},  {sel:'B7:F7', keys:[Kb.fillR]},
-      {sel:'B9', keys:[...T('=B7-B8'), Kb.enter]},  {sel:'B9:F9', keys:[Kb.fillR]},
+      {sel:'B7', keys:[...T('=B4+B6'), Kb.enter]},  {sel:'B7:F7', keys:[Kb.fillR]},
+      {sel:'B9', keys:[...T('=B7+B8'), Kb.enter]},  {sel:'B9:F9', keys:[Kb.fillR]},
       {sel:'B10', keys:[...T('=B9/B4'), Kb.enter]}, {sel:'B10:F10', keys:[Kb.fillR]},
     ]; },
     build(){
@@ -5424,14 +5433,14 @@ const CHALLENGES = {
       cells['A10']={...blankCell(),value:'EBITDA margin',txt:true};
       for(let c=2;c<=6;c++){ const L2=colLetter(c);
         cells[L2+'4']={...blankCell(),value:rnd(150,420)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[L2+'6']={...blankCell(),value:rnd(50,160)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[L2+'8']={...blankCell(),value:rnd(30,110)*5,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+        cells[L2+'6']={...blankCell(),value:-rnd(50,160)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[L2+'8']={...blankCell(),value:-rnd(30,110)*5,fontColor:'blue',fmtStyle:'comma',decimals:0}; }   // r174: costs live negative
       for(let c=2;c<=6;c++){ const L2=colLetter(c), P=colLetter(c-1);
         const rev=cells[L2+'4'].value, cogs=cells[L2+'6'].value, opex=cells[L2+'8'].value;
         if(c>2) cells[L2+'5']={...blankCell(),value:rev/cells[P+'4'].value-1,fmtStyle:'percent',decimals:1};
-        cells[L2+'7']={...blankCell(),value:rev-cogs,fmtStyle:'comma',decimals:0,bold:true};
-        cells[L2+'9']={...blankCell(),value:rev-cogs-opex,fmtStyle:'comma',decimals:0,bold:true};
-        cells[L2+'10']={...blankCell(),value:(rev-cogs-opex)/rev,fmtStyle:'percent',decimals:1}; }
+        cells[L2+'7']={...blankCell(),value:rev+cogs,fmtStyle:'comma',decimals:0,bold:true};
+        cells[L2+'9']={...blankCell(),value:rev+cogs+opex,fmtStyle:'comma',decimals:0,bold:true};
+        cells[L2+'10']={...blankCell(),value:(rev+cogs+opex)/rev,fmtStyle:'percent',decimals:1}; }
       return {ROWS:11, cells, active:{r:5,c:3}, sel:null, colW:{1:132}};
     },
     checks(S){
@@ -5442,13 +5451,13 @@ const CHALLENGES = {
         return ok; };
       const V=(a)=>S.cells[a]?S.cells[a].value:0;
       const gOk=row(5,(c,L2)=>V(L2+'4')/V(colLetter(c-1)+'4')-1,(L2)=>L2+'4');
-      const gpOk=row(7,(c,L2)=>V(L2+'4')-V(L2+'6'),(L2)=>L2+'6');
-      const eOk=row(9,(c,L2)=>V(L2+'7')-V(L2+'8'),(L2)=>L2+'8');
+      const gpOk=row(7,(c,L2)=>V(L2+'4')+V(L2+'6'),(L2)=>L2+'6');
+      const eOk=row(9,(c,L2)=>V(L2+'7')+V(L2+'8'),(L2)=>L2+'8');
       const mOk=row(10,(c,L2)=>V(L2+'9')/V(L2+'4'),(L2)=>L2+'9');
       return [
         {label:'Growth is a LIVE formula across all four years \u2014 no typed percents (C5:F5)', ok:gOk},
-        {label:'Gross profit computes \u2014 revenue minus COGS, every year (B7:F7)', ok:gpOk},
-        {label:'EBITDA computes \u2014 gross profit minus opex, every year (B9:F9)', ok:eOk},
+        {label:'Gross profit computes \u2014 revenue plus signed COGS, every year (B7:F7)', ok:gpOk},
+        {label:'EBITDA computes \u2014 gross profit plus signed opex, every year (B9:F9)', ok:eOk},
         {label:'The margin is live AND nothing drifted \u2014 rebuilt values match v1 exactly (B10:F10)', ok:mOk},
       ];
     }
@@ -7369,6 +7378,21 @@ function doPaste(kind){
   /* r154 EXCEL PARITY: paste TRANSLATES relative refs by the paste offset — fill
      always did, paste never did, so '=B4+1' copied from C9 pasted at D10 still read
      B4. Anchors hold, relatives shift, recalc reprices the value on commit. */
+  if(cb.cut){
+    /* r174 CUT-PASTE MOVES (Excel parity): refs do NOT translate, the source
+       range empties, and the clipboard is consumed — cut is one-shot. */
+    for(let rr=cb.rect.r1; rr<=cb.rect.r2; rr++) for(let cc=cb.rect.c1; cc<=cb.rect.c2; cc++) delete S.cells[colLetter(cc)+rr];
+    for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
+      const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
+      cell.formula=s.formula; cell.value=s.value;
+      cell.bold=s.bold; cell.fill=s.fill; cell.wrap=s.wrap; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals;
+      cell.bt=s.bt; cell.bb=s.bb; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor;
+    }
+    S.clipboard=null; try{ const mq=$('marquee'); if(mq) mq.style.display='none'; }catch(e){}
+    pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
+    S.sel={r:r0,c:c0}; S.active={r:r0+cb.h-1,c:c0+cb.w-1};   // the landed block is selected
+    return;
+  }
   const dr=cb.rect?r0-cb.rect.r1:0, dc=cb.rect?c0-cb.rect.c1:0;
   const xl=f=>(f&&(dr||dc))?translateFormula(f,dr,dc):f;
   for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
@@ -7392,6 +7416,7 @@ function doPaste(kind){
     return;   // r106: clipboard persists (see below)
   }
   pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
+  S.sel={r:r0,c:c0}; S.active={r:r0+cb.h-1,c:c0+cb.w-1};   // r174: Excel selects what it pasted
   // r106: clipboard PERSISTS across pastes (Excel parity — Ctrl+V keeps it; Esc/new copy clears).
   // Nulling here broke the 'one copy, two pastes' contract copyover + pastes both teach.
 }
@@ -7967,6 +7992,7 @@ document.addEventListener('keydown',e=>{
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
       const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
+    if(lk==='x'){ e.preventDefault(); startClock(); logKey('Ctrl+X'); copySel(); if(S.clipboard) S.clipboard.cut=true; render(); return; }
     if(keyProfile==='macabacus' && e.shiftKey && !e.altKey && lk==='v'){
       e.preventDefault(); startClock(); logKey('Ctrl+Shift+V'); doPaste('values'); commitAction(); return; }  // Macabacus paste values (documented default)
     if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
@@ -9464,6 +9490,9 @@ function nextUnlockedFrom(i){
 }
 function openGateInfo(gname){
   const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return;
+  // r174: mid-tour a locked tier gets a toast, not a modal — the tour scrim sits
+  // above modal z and made the gate card visible-but-unclickable (Wolf's stuck box).
+  if(typeof __tourI!=='undefined' && __tourI>=0){ try{ showToast(gname+' unlocks as you level \u2014 finish the tour first'); }catch(e){} return; }
   const lv=lvlOf(myXpEst()), cl=paceClears();
   const lvOK=lv>=g.lvl, clOK=cl>=g.clears;
   let m=$('gateModal');
@@ -9482,7 +9511,9 @@ function openGateInfo(gname){
       '<button class="ob-key" id="gatePro" style="color:var(--warn)">\u25c6 PRO skips the wait</button>'+
     '</div></div>';
   m.classList.add('show');
-  const close=()=>m.classList.remove('show');
+  const __esc=(e)=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); } };
+  const close=()=>{ m.classList.remove('show'); document.removeEventListener('keydown',__esc,true); };
+  document.addEventListener('keydown',__esc,true);   // r174: a modal without keyboard dismissal is a trap
   $('gateX').onclick=close; $('gateGo').onclick=close;
   $('gatePro').onclick=()=>{ close(); if(window.hkProSheet) window.hkProSheet('The '+gname+' track'); };
   m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
@@ -9558,7 +9589,11 @@ function loadChallenge(key, opts){
   try{
     if(!(opts&&(opts.daily||opts.weekly)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
       const __gn=drillLocked(key);
-      if(__gn){ openGateInfo(__gn); return; }
+      if(__gn){
+        openGateInfo(__gn);
+        if(S){ return; }                       // a board is on screen — stay on it
+        key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174)
+      }
     }
   }catch(e){}
   // r157: weakness-queue bookkeeping — restarts stay, the chain advances,
@@ -10293,6 +10328,9 @@ async function loadOnboard(){
 function markOnboarded(){ onboarded = true; KV.set('hotkey_onboarded','1'); }
 function maybeOnboard(){
   if(onboarded||onboardOpen||demoPlaying) return;
+  // r174: a live session means the user already dove in — don't stack the prompt
+  // over a running clock (repro: mode click mid-tour left marathon + prompt overlapped).
+  if((typeof marathon!=='undefined'&&marathon&&marathon.active)||(typeof gameMode!=='undefined'&&gameMode!=='classic')){ markOnboarded(); return; }
   setTimeout(showOnboard, 620);   // let the landing finish fading first
 }
 function paintOnboard(){

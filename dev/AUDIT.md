@@ -4210,3 +4210,41 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   with the Go To Special mark-and-walk adaptation spec'd.
 - VERIFIED: replay 71/71, parity 43, visual 311, onboard 20, rank 20,
   alts 32/32. CACHE v150 -> v151.
+
+---
+# ROUND 174 — WOLF'S TRIPLE: sign convention game-wide, onboarding strand
+# fixed (reproduced!), blocksel v3 moves blocks, checklist voice -> imperative
+- ONBOARDING BUG (Wolf's report, REPRODUCED): three compounding failures.
+  (1) A gate bounce with NO board loaded — boot restore or ?drill= link
+  targeting a locked tier — returned into the void: EMPTY GRID + gate
+  modal. loadChallenge now falls through to the first unlocked drill
+  when no board exists. (2) The gate modal had NO keyboard dismissal and
+  the tour scrim ate its buttons — it lingered over everything ("keep
+  training / PRO" stuck box). Escape now closes it; mid-tour it degrades
+  to a toast. (3) The tutorial prompt could fire over a live session.
+  ONBOARD AUDIT 20 -> 23 (locked-resume boot, unlocked fallback, Esc).
+- SIGN CONVENTION, GLOBAL (banking best practice, Wolf): expenses carry
+  their sign so subtotals are clean sums. Converted: isbuild (SG&A
+  negative, EBIT=B4+B5), versionup (COGS/opex negative, GP/EBITDA as
+  sums), threestmt (capex negative, net change = one SUM — now matches
+  cfslink), audit (opex negative, EBITDA=rev+opex all three break
+  classes). Kept as-is with doctrine-documented reasons: wk13 (paired
+  gross flows), percent (%-of-revenue magnitudes), pure-cost detail
+  tables. signerr already TAUGHT the convention; the game now lives it.
+  Doctrine §2.4 SIGNS rule added.
+- ENGINE: Ctrl+X CUT — copySel + cut flag; paste MOVES (refs do NOT
+  translate, source empties, clipboard consumed — Excel one-shot cut).
+  Paste (all kinds) now SELECTS the landed range (Excel parity).
+- BLOCKSEL v3 (Wolf: "still light — I left one whole block alone"):
+  three islands, three briefs — bold one IN PLACE, the second is parked
+  WRONG: grab whole, ctrl+x, ctrl+v on the marked spot, alt h k at the
+  new address. Decoy still tests aim. The unused spot pool provides the
+  destination (geometry stays ride-through-safe). par 38->52, parKeys 10
+  (measured). Alt: move-first + ctrl+shift+! + ribbon bold.
+- CHECKLIST VOICE (Wolf): checks are now IMPERATIVE COMMANDS ("bold the
+  survivor's header", "delete the whole DRAFT column") — 58 front-door
+  labels converted; doctrine §2.5 rewritten; T-J queued for the ~45
+  advanced-tier stragglers. T-K queued: interactive onboarding v2 spec
+  (do-it beats + why-card — Wolf's "justify the product" note).
+- VERIFIED: replay 71/71, alts 32/32, parity 43, onboard 23, visual 311,
+  rank 20, sweep clean after blocksel parKeys true-up. CACHE v151->v152.

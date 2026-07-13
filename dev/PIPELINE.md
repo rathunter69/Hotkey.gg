@@ -91,6 +91,33 @@ follows the doctrine.)*
 > HOTKEY_PLUGIN_LAYERS (verify our Macabacus/FactSet defaults still match
 > their current sheets). Output: dev/CANON_DIFF.md + new-drill proposals.
 
+## T-J · CHECKLIST VOICE, REMAINDER  *(any model)*
+> r174 converted 58 front-door check labels to imperative commands (doctrine
+> §2.5). ~45 state-phrased labels remain in the Formulas/Models/Full Builds
+> tiers ("the balance row is DRESSED", "the check row reads ZERO"). Convert
+> them all — imperative verb first, artifact + cell named, meaning unchanged.
+> Zero logic edits; replay ×3 per touched drill + full gate.
+
+## T-K · INTERACTIVE ONBOARDING V2  *(Fable-grade — Wolf r174: "justify the
+product, more interactive, fewer explanation pop-outs")*
+> Rebuild the post-landing intro as an interactive SELL, reusing the tour's
+> spotlight mechanic but making the user DO things:
+> 1. **The hook (do-it beat)**: spotlight the grid, "your mouse takes ~4s to
+>    do this — your keyboard takes 1: press <ctrl+→>" — user actually presses
+>    it, cursor flies, a stopwatch chip shows the delta. Then ctrl+b on a
+>    title. Two real chords in the first 20 seconds.
+> 2. **The why card**: one screen of product truth — bankers live in Excel
+>    8h/day, keyboard pace is a hiring signal, this site drills exactly that
+>    (tie to rank/boards). Numbers, not features.
+> 3. **The map**: existing spotlight steps compressed to 3 (checklist,
+>    guided mode/F1, drill map) — cut formula-bar and modes steps into
+>    tooltips discoverable later.
+> 4. Then the existing placement run (navigation) unchanged.
+> Constraints: keyboard-only, Esc skips everything, input-gated per beat
+> (tour guard already blocks stray keys — extend it to allow ONLY the asked
+> chord during do-it beats), onboard audit extended to walk the new flow.
+> Design sketch to Wolf via screenshots BEFORE wiring the flow as default.
+
 ## T-H · INTERVIEW MODE  *(Fable-grade, PRO roadmap)*
 > Timed assessment: 8 drills sampled across groups (seeded per day so
 > candidates are comparable), no guide/demo, one attempt each, hard clock.

@@ -50,7 +50,13 @@ classic drills.
 ### 2.4 Realism Rule
 Terminology, conventions, and the *task itself* must be defensible to a
 first-year IB/consulting analyst:
-- dollars 0 decimals, multiples 1, percents 1; negatives for costs; blue
+- **SIGNS (r174, global)**: expense/outflow line items CARRY THEIR SIGN —
+  COGS, opex, capex, interest live as negatives so every subtotal is a
+  clean SUM/+ down the column; never `A - B` against a positive cost.
+  Exceptions: all-cost magnitude schedules (an opex detail table), flow
+  rows explicitly labeled as paired gross flows (13-week receipts /
+  disbursements), and %-of-revenue magnitude tables.
+- dollars 0 decimals, multiples 1, percents 1; blue
   inputs / black formulas; rule totals (`bt`), never rainbow fills
 - artifacts from the actual workflow: comps, roll-forwards, S&U, 13-week,
   tie-outs, league tables, sensitivity grids, deck hand-offs (values only!)
@@ -59,9 +65,12 @@ first-year IB/consulting analyst:
   survives the first paste", "the auditors will ask for the memo")
 
 ### 2.5 Checklist Rule
-2–4 checks, each a **user-visible sentence in associate voice** naming the
-artifact and the cell/range: `'the LIVE column survived — every value exactly
-as it was'`. A check the player can't act on from its label alone is broken.
+2–4 checks, each an **IMPERATIVE COMMAND in associate voice** naming the
+artifact and the cell/range: `'bold the survivor's header — E2'`,
+`'delete the whole DRAFT column — let the table close the gap'`. Never a
+state description ("the header IS bold") — the checklist is a markup you
+work THROUGH, not a report you read after (Wolf, r174). A check the player
+can't act on from its label alone is broken.
 Checks must be self-contained given S (never read globals that reset).
 
 ## 3. BUILD PROTOCOL (mechanics)
