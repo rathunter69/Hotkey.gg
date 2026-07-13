@@ -220,6 +220,31 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(n1.anchored === '=$D$10', 'F4 anchors a POINTED ref (not just typed)', n1.anchored);
   ok(n1.committed === '=$D$10', 'pointed+anchored formula commits intact', n1.committed);
 
+  console.log('O. audit pack — IFERROR + trace jumps (r173)');
+  await fresh();
+  const o1 = await run(() => {
+    setDemoSel('C2'); for (const ch of '5') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('C3'); for (const ch of '=SUM(C2:C2)') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('C4'); for (const ch of '=C3*2') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('C5'); for (const ch of '=IFERROR(MATCH(99,C2:C3,0),7)') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('C6'); for (const ch of '=IFERROR(C2*2,7)') demoKey({key:ch}); demoKey({key:'Enter'});
+    const fallback = S.cells['C5'].value;              // MATCH misses -> 7
+    const passthru = S.cells['C6'].value;              // clean -> 10
+    setDemoSel('C4'); demoKey({key:'[', ctrl:true});
+    const prec = colLetter(S.active.c) + S.active.r;   // C3
+    demoKey({key:'[', ctrl:true});
+    const prec2 = colLetter(S.active.c) + S.active.r;  // C2 via the range head
+    demoKey({key:']', ctrl:true});
+    const dep = colLetter(S.active.c) + S.active.r;    // back to C3 (range containment)
+    return { fallback, passthru, prec, prec2, dep, traced: S.traceN };
+  });
+  ok(o1.fallback === 7, 'IFERROR catches a MATCH miss -> fallback', o1.fallback);
+  ok(o1.passthru === 10, 'IFERROR passes a clean value through', o1.passthru);
+  ok(o1.prec === 'C3', 'Ctrl+[ jumps to the first precedent', o1.prec);
+  ok(o1.prec2 === 'C2', 'Ctrl+[ follows a range ref to its head', o1.prec2);
+  ok(o1.dep === 'C3', 'Ctrl+] finds the dependent via range containment', o1.dep);
+  ok(o1.traced === 3, 'S.traceN latches every hop', o1.traced);
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=150" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=150">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=150">
+<link rel="icon" href="favicon.ico?v=151" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=151">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=151">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1125,14 +1125,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=150"></script>
-<link rel="stylesheet" href="nav.css?v=150">
-<script src="themes.js?v=150"></script>
+<script src="drills.js?v=151"></script>
+<link rel="stylesheet" href="nav.css?v=151">
+<script src="themes.js?v=151"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=150"></script>
+<script src="nav.js?v=151"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -5116,6 +5116,117 @@ const CHALLENGES = {
   /* r153: THE RX PACK, tranche two (STRATEGY 3.2) \u2014 the liquidity bridge and the
      covenant table. With wk13 these make "The RX desk" a real section: the three
      pages every restructuring deck actually opens with. */
+  wirewalk:{
+    name:'Trace', label:'Walk the wire', par:60, parKeys:6,
+    aha:'ctrl+[ rides to the source, ctrl+] rides back — a wrong number is a trail, not a mystery',
+    prompt:'The deck figure is wrong, and the VP’s note says which input to blame — three links upstream. Do not hunt by eye: Ctrl+[ jumps to a formula’s first precedent, hop by hop, until you’re standing on the source. Fix it there, and Ctrl+] rides the wire back down while everything reprices. Auditors call it tracing; the desk calls it Tuesday.',
+    req(){ const o=this._o; return 'on <em>'+o.deck+'</em> · <em>ctrl+[</em> to the subtotal · <em>ctrl+[</em> again to the source block · fix <em>'+o.badLbl+'</em> to <em>'+o.good+'</em> · <em>ctrl+]</em> ×2 rides back down'; },
+    guide(){ const o=this._o; return [
+      'start on the deck figure '+o.deck+' · <kbd>ctrl</kbd>+<kbd>[</kbd> — you land on the subtotal it reads',
+      '<kbd>ctrl</kbd>+<kbd>[</kbd> again — now you’re at the top of the source block; the note says '+o.badLbl+' should read '+o.good,
+      'arrow to it, type <kbd>'+o.good+'</kbd> <kbd>↵</kbd> — the subtotal and the deck reprice on the spot',
+      '<kbd>ctrl</kbd>+<kbd>]</kbd> <kbd>ctrl</kbd>+<kbd>]</kbd> — ride the wire back down and watch the deck figure land right',
+    ]; },
+    targets(){ const o=this._o; return [o.deck, o.mid, o.bad]; },
+    demo(){ const o=this._o;
+      const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
+      for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
+      keys.push(...T(String(o.good)), Kb.enter, {key:'ArrowUp'}, {key:']',ctrl:true}, {key:']',ctrl:true});
+      return [{sel:o.deck, keys:keys}];
+    },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — deck tie-out (one number is wrong upstream)',txt:true,bold:true};
+      const r0=rnd(4,7);
+      const pool=['Payroll','Rent','Software','T&E','Legal','Marketing'];
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const labels=pool.slice(0,3);
+      const vals=[];
+      cells['A'+(r0-1)]={...blankCell(),value:'Opex detail ($000s)',txt:true,bold:true};
+      for(let i=0;i<3;i++){ const v=rnd(20,90)*10; vals.push(v);
+        cells['A'+(r0+i)]={...blankCell(),value:labels[i],txt:true};
+        cells['B'+(r0+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      const bi=rnd(0,2), good=vals[bi];
+      const bad=good+(rnd(0,1)?1:-1)*rnd(1,9)*100;
+      cells['B'+(r0+bi)].value=bad;
+      const up=rnd(5,15)/100;
+      const sumBad=vals.reduce((a,b)=>a+b,0)-good+bad;
+      const sumGood=vals.reduce((a,b)=>a+b,0);
+      cells['D'+(r0+1)]={...blankCell(),value:'Opex subtotal',txt:true};
+      cells['E'+(r0+1)]={...blankCell(),formula:'=SUM(B'+r0+':B'+(r0+2)+')',value:sumBad,fmtStyle:'comma',decimals:0};
+      cells['G2']={...blankCell(),value:'Deck figure',txt:true,bold:true};
+      cells['H2']={...blankCell(),formula:'=E'+(r0+1)+'*(1+H3)',value:sumBad*(1+up),fmtStyle:'comma',decimals:0,bold:true};
+      cells['G3']={...blankCell(),value:'Uplift',txt:true};
+      cells['H3']={...blankCell(),value:up,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      cells['G5']={...blankCell(),value:'Note: '+labels[bi]+' should read '+good,txt:true,fontColor:'red'};
+      this._o={ deck:'H2', mid:'E'+(r0+1), bad:'B'+(r0+bi), bi:bi, badLbl:labels[bi],
+        good:good, sumGood:sumGood, deckGood:sumGood*(1+up) };
+      return {ROWS:Math.max(11,r0+4), cells, active:{r:2,c:8}, sel:null, colW:{1:104,4:104,7:210}};
+    },
+    checks(S){
+      const o=this._o;
+      const bad=S.cells[o.bad]||{};
+      const num=k=>{ const c=S.cells[k]; return (c&&typeof c.value==='number')?c.value:NaN; };
+      return [
+        {label:'fixed at the SOURCE — '+o.bad+' reads '+o.good+' again', ok: bad.value===o.good},
+        {label:'everything downstream repriced — subtotal and the deck figure are right', ok: Math.abs(num(o.mid)-o.sumGood)<0.5 && Math.abs(num(o.deck)-o.deckGood)<0.5},
+        {label:'the wire was WALKED — ctrl+[ / ctrl+] hops, not eye-hunting', ok: (S.traceN||0)>=2},
+      ];
+    }
+  },
+  wrapfix:{
+    name:'IFERROR', label:'Wrap it or fix it', par:70, parKeys:73,
+    aha:'iferror is a seatbelt, not a blindfold — wrap the truly missing, fix the merely broken',
+    prompt:'Two lookups are down on the segment tape, both reading #N/A — and they are NOT the same problem. One queries a discontinued segment that is genuinely gone: wrap it in IFERROR with a zero fallback so the page stops screaming. The other has a broken MATCH range — it aims at the numbers instead of the names: FIX it, don’t bury it. Suppressing an error is not the same as repairing one.',
+    req(){ const o=this._o; return '<em>'+o.q1+'</em> → wrap: <em>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</em> · <em>'+o.q2+'</em> → fix the range: MATCH must read <em>A3:A7</em>, not B3:B7 — and NO iferror here'; },
+    guide(){ const o=this._o; return [
+      o.q1+' hunts a segment that no longer exists — that error is TRUE. Wrap it: <kbd>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</kbd> <kbd>↵</kbd>',
+      o.q2+' is just broken — its MATCH aims at the NUMBERS column. <kbd>F2</kbd> in, repoint the range to <kbd>A3:A7</kbd>, commit',
+      'the discipline: a fallback for the truly missing, a repair for the merely broken — never the other way around',
+    ]; },
+    targets(){ const o=this._o; return [o.q1, o.q2]; },
+    demo(){ const o=this._o; return [
+      {sel:o.q1, keys:[...T('=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)'), Kb.enter]},
+      {sel:o.q2, keys:[...T('=INDEX(B3:B7,MATCH(E5,A3:A7,0))'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — segment tape (two lookups are down)',txt:true,bold:true};
+      const pool=['Consumer','Industrial','Services','Energy','Retail','Healthcare'];
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const segs=pool.slice(0,5);
+      cells['A2']={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells['B2']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
+      this._vals=[];
+      for(let i=0;i<5;i++){ const v=rnd(20,90)*10; this._vals.push(v);
+        cells['A'+(3+i)]={...blankCell(),value:segs[i],txt:true};
+        cells['B'+(3+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      const qi=rnd(0,4);
+      cells['D2']={...blankCell(),value:'Discontinued',txt:true};
+      cells['E2']={...blankCell(),value:'Aerospace',txt:true};
+      cells['D3']={...blankCell(),value:'Revenue',txt:true};
+      cells['E3']={...blankCell(),formula:'=INDEX(B3:B7,MATCH(E2,A3:A7,0))',value:'#N/A',fmtStyle:'comma',decimals:0};
+      cells['D5']={...blankCell(),value:'Segment',txt:true};
+      cells['E5']={...blankCell(),value:segs[qi],txt:true};
+      cells['D6']={...blankCell(),value:'Revenue',txt:true};
+      cells['E6']={...blankCell(),formula:'=INDEX(B3:B7,MATCH(E5,B3:B7,0))',value:'#N/A',fmtStyle:'comma',decimals:0};
+      this._o={ q1:'E3', q2:'E6', exp:this._vals[qi] };
+      return {ROWS:9, cells, active:{r:3,c:5}, sel:null, colW:{1:104,4:104,5:104}};
+    },
+    checks(S){
+      const o=this._o;
+      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?String(c.formula).toUpperCase().replace(/\s/g,''):''; };
+      const v=k=>{ const c=S.cells[k]; return c?c.value:undefined; };
+      const f1=f(o.q1), f2=f(o.q2);
+      return [
+        {label:'the TRUE miss is wrapped — IFERROR around the intact lookup, zero fallback ('+o.q1+')',
+          ok: f1.includes('IFERROR(')&&f1.includes('INDEX(')&&f1.includes('MATCH(')&&v(o.q1)===0},
+        {label:'the broken range is FIXED, not buried — MATCH reads the names, no IFERROR ('+o.q2+')',
+          ok: f2.includes('MATCH(')&&f2.includes('A3:A7')&&!f2.includes('IFERROR')&&v(o.q2)===o.exp},
+        {label:'the tape itself untouched — every revenue where it was', ok: this._vals.every((x,i)=>v('B'+(3+i))===x)},
+      ];
+    }
+  },
   liqbridge:{
     name:'Liq. Bridge', label:'Bridge the liquidity \u2014 three cases', par:80, parKeys:40,
     aha:'liquidity is cash plus revolver minus needs \u2014 three cases, one bridge',
@@ -5791,6 +5902,26 @@ function cellRaw(ref){ const c=S.cells[ref]; return c?c.value:null; }
 function eqLoose(a,b){ return (typeof a==='number'&&typeof b==='number')?a===b:String(a).trim().toLowerCase()===String(b).trim().toLowerCase(); }
 function evalFormula(expr){
   let s=String(expr).replace(/^=/,''), i=0;
+  /* r173 IFERROR — outermost form. Every other function pre-evaluates its
+     arguments, so a throwing first argument (MATCH miss, bad range) must be
+     caught HERE before the parser runs. Non-finite results (DIV/0) also
+     route to the fallback. Canon rule the drill teaches: wrap sparingly. */
+  {
+    const mIE=/^\s*IFERROR\s*\(/i.exec(s);
+    if(mIE){
+      let d=1, j=mIE[0].length, cut=-1;
+      for(; j<s.length; j++){ const ch=s[j];
+        if(ch==='(') d++;
+        else if(ch===')'){ d--; if(d===0) break; }
+        else if(ch===','&&d===1&&cut<0) cut=j; }
+      if(d===0&&cut>0&&s.slice(j+1).trim()===''){
+        const argA=s.slice(mIE[0].length,cut), argB=s.slice(cut+1,j);
+        let v; try{ v=evalFormula('='+argA); }catch(_){ v=undefined; }
+        if(v===undefined||(typeof v==='number'&&!isFinite(v))) return evalFormula('='+argB);
+        return v;
+      }
+    }
+  }
   const skip=()=>{ while(s[i]===' ') i++; };
   const flat=args=>args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellNum):[a.val]).flat();
   const rawOf=a=>a.ref!==undefined?cellRaw(a.ref):(a.val!==undefined?a.val:null);
@@ -5830,6 +5961,8 @@ function evalFormula(expr){
       case 'ABS': return Math.abs(xs[0]);
       case 'ROUND': return Math.round(xs[0]*Math.pow(10,xs[1]||0))/Math.pow(10,xs[1]||0);
       case 'IF': return (args[0]&&args[0].val) ? (args[1]?args[1].val:0) : (args[2]?args[2].val:0);   /* r96: eager IF — branches pre-evaluated */
+      case 'IFERROR': { const a=args[0]?args[0].val:undefined;
+        return (typeof a==='number'&&isFinite(a))?a:(args[1]?args[1].val:0); }   /* r173: nested form; throwing args are caught at the outermost layer */
       default: throw new Error('fn '+name);
     } }
   /* r96: comparators — Excel's lowest precedence; TRUE/FALSE land as 1/0 */
@@ -7300,6 +7433,43 @@ function move(dr,dc,shift,ctrl){
   // which is why the old dropbottom drill silently "didn't complete" even when the cursor landed correctly.
   checkWin();
 }
+/* r173 TRACE JUMPS — Ctrl+[ rides to the active formula's FIRST precedent;
+   Ctrl+] finds the first cell (row-major) whose formula reads the active one,
+   including range containment (SUM(B4:B6) reads B5 without naming it).
+   Navigation is unobservable in the end state, so S.traceN latches each hop
+   for drills that grade the technique (the S.undoN pattern). */
+function jumpPrecedent(){
+  const c=get(S.active.r,S.active.c);
+  if(!c||!c.formula) return;
+  const m=/(\$?)([A-J])(\$?)(\d{1,3})/.exec(String(c.formula).toUpperCase().replace(/^=/,''));
+  if(!m) return;
+  const col=m[2].charCodeAt(0)-64, row=parseInt(m[4],10);
+  if(row<1||row>S.ROWS||col<1||col>COLS) return;
+  S.sel=null; S.active={r:row,c:col};
+  S.traceN=(S.traceN||0)+1;
+  render();
+}
+function formulaReads(f,r,c){
+  const F=String(f).toUpperCase().replace(/\$/g,'');
+  let m; const rr=/([A-J])(\d{1,3}):([A-J])(\d{1,3})/g;
+  while((m=rr.exec(F))){
+    const c1=m[1].charCodeAt(0)-64, r1=+m[2], c2=m[3].charCodeAt(0)-64, r2=+m[4];
+    if(r>=Math.min(r1,r2)&&r<=Math.max(r1,r2)&&c>=Math.min(c1,c2)&&c<=Math.max(c1,c2)) return true;
+  }
+  const F2=F.replace(/([A-J])(\d{1,3}):([A-J])(\d{1,3})/g,' ');
+  return new RegExp('(^|[^A-J0-9])'+colLetter(c)+r+'(?![0-9])').test(F2);
+}
+function jumpDependent(){
+  const {r,c}=S.active;
+  const keys=Object.keys(S.cells).map(k=>{ const m=/^([A-J])(\d{1,3})$/.exec(k);
+    return m?{r:+m[2],c:m[1].charCodeAt(0)-64}:null; }).filter(Boolean)
+    .sort((a,b)=>(a.r-b.r)||(a.c-b.c));
+  for(const p of keys){ const cc=S.cells[colLetter(p.c)+p.r];
+    if(cc&&cc.formula&&formulaReads(cc.formula,r,c)){
+      S.sel=null; S.active={r:p.r,c:p.c};
+      S.traceN=(S.traceN||0)+1;
+      render(); return; } }
+}
 function selectRow(){
   // Excel parity: Shift+Space extends the selection to full width WHILE preserving the row range.
   // If a multi-row selection already exists, expand each row to all columns instead of collapsing to a single row.
@@ -7803,6 +7973,8 @@ document.addEventListener('keydown',e=>{
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
     if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
+    if(k==='['){ e.preventDefault(); startClock(); logKey('Ctrl+['); jumpPrecedent(); return; }
+    if(k===']'){ e.preventDefault(); startClock(); logKey('Ctrl+]'); jumpDependent(); return; }
     if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
     if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
     if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }

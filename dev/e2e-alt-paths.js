@@ -179,6 +179,23 @@ const ALTS = [
       {sel:'C4:C6', keys:[{key:'d',ctrl:true}]},
       {sel:'C4:G6', keys:[{key:'r',ctrl:true}]},
     ]` },
+  // --- T-D audit pack (r173) ---
+  { key: 'wirewalk', name: 'hop up, fix, ctrl+home — no return trip', moves: `C => { const o=C._o;
+      const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
+      for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
+      keys.push(...T(String(o.good)),{key:'Enter'},{key:'Home',ctrl:true});
+      return [{sel:o.deck, keys:keys}]; }` },
+  { key: 'wrapfix', name: 'fix the range FIRST, wrap second — F2 edit for the fix', moves: `C => { const o=C._o;
+      // F2 into the broken MATCH range: caret at end; walk back over ',0))' then fix B->A twice
+      return [
+        {sel:o.q2, keys:[{key:'F2'},
+          ...Array.from({length:8},()=>({key:'ArrowLeft'})),
+          {key:'Backspace'},...T('A'),
+          ...Array.from({length:3},()=>({key:'ArrowRight'})),
+          {key:'Backspace'},...T('A'),
+          {key:'Enter'}]},
+        {sel:o.q1, keys:[...T('=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)'),{key:'Enter'}]},
+      ]; }` },
 ];
 
 (async () => {

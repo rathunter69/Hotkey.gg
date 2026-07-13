@@ -4179,3 +4179,34 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   cfslink conversion-memo definition, static peer-name pools.
 - VERIFIED: replay 69/69, parity 37, visual 311, onboard 20, alts 30/30.
 - CACHE v149 -> v150.
+
+---
+# ROUND 173 — T-D (2/3): IFERROR + TRACE JUMPS land in the engine, 71 drills
+- ENGINE:
+  - IFERROR in evalFormula — outermost preprocessing (every other function
+    pre-evaluates args, so a throwing first argument must be caught before
+    the parser runs); non-finite results (DIV/0) also route to the
+    fallback; nested non-throwing form handled in the fn dispatch.
+  - Ctrl+[ jumps to the active formula's FIRST precedent; Ctrl+] finds
+    the first dependent ROW-MAJOR — including RANGE CONTAINMENT
+    (SUM(B4:B6) reads B5 without naming it; formulaReads() checks both
+    literal refs and range coverage). S.traceN latches every hop (the
+    undoN pattern) for drills that grade the technique.
+- TWO NEW DRILLS (69 -> 71, both Formulas tier, gated):
+  - wirewalk "Walk the wire": the deck figure is wrong three links
+    upstream; ctrl+[ hop to the subtotal, hop to the source block, fix
+    the input the VP's note names, ctrl+] rides back while everything
+    reprices. Checks: fixed at source, downstream repriced, traceN>=2.
+  - wrapfix "Wrap it or fix it": two #N/A lookups that are NOT the same
+    problem — a discontinued segment (truly missing -> wrap in IFERROR
+    with a zero fallback) vs a MATCH range aimed at the numbers column
+    (merely broken -> F2 fix, and the check FAILS if you bury it in
+    IFERROR). The canon's suppressing-is-not-fixing rule, graded.
+- PARITY 37 -> 43 (section O: fallback, passthrough, precedent hop,
+  range-head hop, dependent-via-containment, traceN).
+- ALTS 30 -> 32 (wirewalk no-return-trip; wrapfix fix-first with a real
+  F2 caret edit). ALL PASS.
+- parKeys from sweep: wirewalk 6, wrapfix 73. PIPELINE: T-D marked 2/3
+  with the Go To Special mark-and-walk adaptation spec'd.
+- VERIFIED: replay 71/71, parity 43, visual 311, onboard 20, rank 20,
+  alts 32/32. CACHE v150 -> v151.
