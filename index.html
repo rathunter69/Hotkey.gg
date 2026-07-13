@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=144" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=144">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=144">
+<link rel="icon" href="favicon.ico?v=145" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=145">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=145">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1119,14 +1119,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=144"></script>
-<link rel="stylesheet" href="nav.css?v=144">
-<script src="themes.js?v=144"></script>
+<script src="drills.js?v=145"></script>
+<link rel="stylesheet" href="nav.css?v=145">
+<script src="themes.js?v=145"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=144"></script>
+<script src="nav.js?v=145"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1367,7 +1367,7 @@ function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:f
 
 const CHALLENGES = {
   drill:{
-    name:'Hardcode', label:'Hardcode it', par:66, parKeys:30,
+    name:'Hardcode', label:'Hardcode it', par:66, parKeys:15,
     prompt:'This page goes in the deck tonight \u2014 and right now every number on it is a LIVE LINK into the model. Break the links before it ships: grab the column, copy, paste-special VALUES straight back onto itself, then paint the survivors blue, because hardcodes wear blue. The pre-send ritual every desk runs.',
     req:'on <em>B3</em> \u00b7 <em>ctrl+shift+\u2193</em> grabs B3:B8 \u00b7 <em>ctrl+c</em> \u00b7 <em>alt e s v \u21b5</em> values onto themselves \u00b7 then <em>alt h f c</em> \u2192 \u00d74 <em>\u21b5</em> \u2014 the dead numbers wear blue',
     guide:[
@@ -1413,7 +1413,7 @@ const CHALLENGES = {
   },
 
   combo:{
-    name:'Combo', label:'Clean the paste', par:48, parKeys:28,
+    name:'Combo', label:'Clean the paste', par:48, parKeys:22,
     prompt:'A comp sheet came over as a raw paste: title with no weight, headers slumming it lowercase-left, figures unformatted, the notes column overrunning its neighbors, half the columns showing ####. Make it presentable end to end — which metrics came over, and where the block sits, changes every run.',
     req(){ const o=this._o; return '<em>'+o.title+'</em> + headers <em>'+o.hdr+'</em> → <em>ctrl+b</em> · metric headers <em>'+o.mh+'</em> → <em>alt h a r</em> · figures <em>'+o.num+'</em> → <em>alt h k</em> + <em>alt h 9</em> ×2 · notes <em>'+o.notes+'</em> → <em>alt h w</em> · then <em>alt h o i</em> — no #### ships'; },
     guide(){ const o=this._o; return [
@@ -1795,7 +1795,7 @@ const CHALLENGES = {
     }
   },
   format:{
-    name:'Format', label:'Fix the formats', par:42, parKeys:24,
+    name:'Format', label:'Fix the formats', par:42, parKeys:18,
     prompt:'These outputs came in raw \u2014 and they land somewhere new each run. Cast each number to its right type: margins as percentages, dollar figures as currency, the share count with commas \u2014 and trim every stray decimal.',
     req(){ const o=this._o; return '<em>'+o.pct+'</em> \u2192 <em>ctrl+shift+%</em> (+1 decimal on the second) \u00b7 <em>'+o.cur+'</em> \u2192 <em>ctrl+shift+$</em>, drop decimals \u00b7 <em>'+o.com+'</em> \u2192 <em>ctrl+shift+!</em>, drop decimals'; },
     guide(){ const o=this._o; return [
@@ -1840,7 +1840,7 @@ const CHALLENGES = {
     }
   },
   dress:{
-    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:97, parKeys:53,
+    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:97, parKeys:21,
     prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, inputs in blue, margins as clean percents, dollars with commas. Four different formatting muscles, one pass, and the sites move every run.',
     req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em>'; },
     guide:[
@@ -1900,7 +1900,7 @@ const CHALLENGES = {
   },
 
   margin:{
-    name:'Formula', label:'Margins across the page', par:52, parKeys:48,
+    name:'Formula', label:'Margins across the page', par:52, parKeys:21,
     prompt:'Three comp tables, one skill: EBITDA \u00f7 revenue, built by pointing, filled down, formatted as a percent. The tables land somewhere new every run \u2014 your hands should stop caring where the table lives.',
     req(){ return this._sites.map((s,i)=>'<em>'+s.m+s.r0+'</em> \u00b7 ='+s.e+s.r0+'/'+s.v+s.r0+' \u00b7 fill '+s.m+s.r0+':'+s.m+(s.r0+2)+' \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then '); },
     guide(){ return this._sites.map((s,i)=>['table one','table two','table three'][i]+' at <b>'+s.m+s.r0+'</b> \u00b7 point <kbd>='+s.e+s.r0+'/'+s.v+s.r0+'</kbd> <kbd>\u21b5</kbd> \u00b7 fill down \u00d72 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>'+(i===0?' \u2014 <kbd>ctrl</kbd>+arrows jump between tables':'')); },
@@ -1942,7 +1942,7 @@ const CHALLENGES = {
     }
   },
   schedule:{
-    name:'Schedule', label:'Roll the PP&E forward', par:113, parKeys:65,
+    name:'Schedule', label:'Roll the PP&E forward', par:113, parKeys:34,
     prompt:'Five years of PP&E, two corkscrews. Each year opens at the prior close, capex adds, depreciation takes its anchored cut of the OPENING balance. Build year 1, link year 2\u2019s opening, fill everything right \u2014 then run the accumulated-depreciation memo underneath, because the auditors will ask for it.',
     req:'<em>B4</em> dep <em>=-B2*$B$9</em> \u00b7 <em>B5</em> end <em>=B2+B3+B4</em> \u00b7 <em>C2</em> \u00b7 <em>=B5</em> \u00b7 fill C2:F2 \u2192 \u00b7 fill B4:F5 \u2192 \u00b7 memo: <em>B7</em> <em>=-B4</em> \u00b7 <em>C7</em> <em>=B7-C4</em> \u00b7 fill C7:F7 \u2192',
     guide:[
@@ -2006,7 +2006,7 @@ const CHALLENGES = {
     }
   },
   percent:{
-    name:'% of rev', label:'Common-size both statements', par:64, parKeys:32,
+    name:'% of rev', label:'Common-size both statements', par:64, parKeys:14,
     prompt:'Two statements on one page, both common-sized \u2014 and the second one moves and deepens between runs. The anchor is the whole lesson: each block\u2019s divisor is ITS OWN revenue, locked with F4 so the fill can\u2019t drag it.',
     req(){ const R=this._R; return '<em>C2</em> \u00b7 =B2/$B$2 (F4 locks it) \u00b7 fill C2:C6 \u00b7 <em>ctrl+shift+%</em> \u00b7 then: <em>'+R.pc+R.r0+'</em> \u00b7 ='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0+' \u00b7 fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent'; },
     guide(){ const R=this._R; return [
@@ -2240,7 +2240,7 @@ const CHALLENGES = {
     }
   },
   saves:{
-    name:'Save', label:'Save like you mean it', par:44, parKeys:20, usesSave:true,
+    name:'Save', label:'Save like you mean it', par:44, parKeys:15, usesSave:true,
     prompt:'A page of work in progress, three review cells scattered through it \u2014 different spots each run. Mark each one done, and Ctrl+S after EVERY block of work. The reflex is the drill: work, save, work, save.',
     req(){ return this._sites.map(s=>'<em>'+s+'</em> \u00b7 done \u21b5 \u00b7 <em>ctrl+s</em>').join(' \u00b7 then '); },
     guide(){ return this._sites.map((s,i)=>['first','second','third'][i]+' review cell at <b>'+s+'</b> \u00b7 type <kbd>done</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>s</kbd> \u2014 every block of work ends with a save'); },
@@ -2269,7 +2269,7 @@ const CHALLENGES = {
     }
   },
   editfix:{
-    name:'Edit', label:'Fix the typos in place', par:44, parKeys:44,
+    name:'Edit', label:'Fix the typos in place', par:44, parKeys:33,
     prompt:'A pasted-in schedule with THREE typos scattered through the labels \u2014 different words, different spots, every run. Do not retype whole cells: F2 in, arrow the cursor to the mistake, fix it, commit. Edit mode is how you touch a cell without destroying it.',
     req(){ return this._sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 '); },
     guide(){ return this._sites.map((s,i)=>['first typo','second typo','third typo'][i]+' at <b>'+s.cell+'</b> \u00b7 <kbd>F2</kbd> \u00b7 <kbd>\u2190</kbd> to the mistake \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d \u00b7 <kbd>\u21b5</kbd> \u2014 only the final word is graded'); },
@@ -2497,7 +2497,7 @@ const CHALLENGES = {
     }
   },
   copyover:{
-    name:'Basics', label:'Copy it over, twice', par:36, parKeys:14,
+    name:'Basics', label:'Copy it over, twice', par:36, parKeys:3,
     prompt:'One source block, TWO outlined destinations across the page \u2014 spots shuffle each run. Select the block, copy ONCE, paste at both targets. The clipboard survives the first paste; the second one is free.',
     req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 to <em>'+o.d1+'</em> \u00b7 <em>ctrl+v</em> \u00b7 to <em>'+o.d2+'</em> \u00b7 <em>ctrl+v</em>'; },
     guide(){ const o=this._o; return [
@@ -2549,7 +2549,7 @@ const CHALLENGES = {
     }
   },
   polish:{
-    name:'Polish', label:'Dress the header row', par:38, parKeys:11,
+    name:'Polish', label:'Dress the header row', par:38, parKeys:8,
     prompt:'Two tables on the page. Dress the TARGET table\u2019s header \u2014 bold, bottom border, shaded \u2014 and leave the other one alone. Print-ready means knowing where the formatting stops.',
     req(){ const o=this._o; return 'select <em>'+o.h1+':'+o.h2+'</em> \u00b7 <em>ctrl b</em> \u00b7 <em>alt h b b</em> border \u00b7 <em>alt h h</em> shade \u00b7 the table at '+o.d1+' stays plain'; },
     guide(){ const o=this._o; return [
@@ -2631,7 +2631,7 @@ const CHALLENGES = {
     }
   },
   comps:{
-    name:'Comps', label:'Run the comps', par:161, parKeys:101,
+    name:'Comps', label:'Run the comps', par:161, parKeys:70,
     prompt:'A real comps page, both panels: compute EV/EBITDA for five peers and fill it down, read the tape \u2014 mean, high, low \u2014 then walk the target through the implied chain: EV, equity, per share, premium to market. The multiples aren\u2019t given anymore; you build them.',
     req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> <em>=AVERAGE(D3:D7)</em> \u00b7 <em>D9</em> <em>=MAX</em> \u00b7 <em>D10</em> <em>=MIN</em> \u00b7 <em>G4</em> EV <em>=G3*D8</em> \u00b7 <em>G6</em> equity <em>=G4-G5</em> \u00b7 <em>G8</em> per share <em>=G6/G7</em> \u00b7 <em>G10</em> premium <em>=G8/G9-1</em>',
     guide:[
@@ -2708,7 +2708,7 @@ const CHALLENGES = {
     }
   },
   center:{
-    name:'Center', label:'Set the alignment', par:46, parKeys:26,
+    name:'Center', label:'Set the alignment', par:46, parKeys:13,
     prompt:'A pipeline summary pasted in with its alignment scrambled: quarter headers slumped left, deal names floating centered, the total row sitting left like a label. House rule — headers centered over their columns, labels pinned left, numbers and their totals right. And a total row reads BOLD or it isn’t a total. Geometry moves every run.',
     req(){ const o=this._o; return 'quarter headers <em>'+o.hdr+'</em> → <em>alt h a c</em> · deal names <em>'+o.lab+'</em> → <em>alt h a l</em> · total row <em>'+o.tot+'</em> → <em>alt h a r</em> + <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
@@ -2763,7 +2763,7 @@ const CHALLENGES = {
     }
   },
   blue:{
-    name:'Inputs', label:'Blue the inputs, everywhere', par:62, parKeys:61,
+    name:'Inputs', label:'Blue the inputs, everywhere', par:62, parKeys:36,
     prompt:'A model page the way you actually inherit one: hardcodes scattered across four spots \u2014 different spots every run \u2014 plus formula cells that must stay untouched. Color every hardcode blue; leave the formulas alone. The grader checks both directions.',
     req(){ const s=this._scatter; return 'blue these: <em>'+s.b1.a+':'+s.b1.b+'</em> \u00b7 <em>'+s.b2.a+':'+s.b2.b+'</em> \u00b7 singles <em>'+s.s1+'</em> and <em>'+s.s2+'</em> (alt h f c \u00b7 \u2192\u00d74 \u00b7 \u21b5) \u00b7 formulas at '+s.d1+' / '+s.d2+' stay default'; },
     guide(){ const s=this._scatter; return [
@@ -2825,7 +2825,7 @@ const CHALLENGES = {
     }
   },
   sort:{
-    name:'Sort', label:'Sort the league table', par:40, parKeys:22,
+    name:'Sort', label:'Sort the league table', par:40, parKeys:7,
     prompt:'League-table workflow wherever the table lands: sort the six deals by size, largest first, foot the column with AutoSum, bold the total. Sort, foot, bold \u2014 the whole rep.',
     req(){ const o=this._o; return 'select <em>'+o.range+'</em> (active in the size column) \u00b7 <em>alt a s d</em> sorts Z\u2192A \u00b7 drop to <em>'+o.foot+'</em> \u00b7 <em>alt+=</em> \u2192 <em>\u21b5</em> \u00b7 <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
@@ -2873,7 +2873,7 @@ const CHALLENGES = {
     }
   },
   series:{
-    name:'Years', label:'Stub the year header', par:30, parKeys:24,
+    name:'Years', label:'Stub the year header', par:30, parKeys:11,
     prompt:'Extend and dress a year header wherever it starts this run: two seed years are in, three more to fill with Series, then bold the whole run and right-align it so the years sit over their number columns.',
     req(){ const o=this._o; return 'select <em>'+o.range+'</em> \u00b7 <em>alt h f i s \u21b5</em> fills the missing years \u00b7 selection holds \u2192 <em>ctrl+b</em> \u00b7 <em>alt h a r</em>'; },
     guide(){ const o=this._o; return [
@@ -2910,7 +2910,7 @@ const CHALLENGES = {
     }
   },
   bridge:{
-    name:'Point Mode', label:'Point, don\u2019t type', par:40, parKeys:12,
+    name:'Point Mode', label:'Point, don\u2019t type', par:40, parKeys:6,
     prompt:'Build profit = revenue \u00d7 margin by POINTING \u2014 = then arrow up to grab each reference, never typing a cell address \u2014 and fill it across five years. Point mode is the fastest formula entry there is; the fill proves your references were relative.',
     req:'<em>B4</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs B2 \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs B3 \u00b7 <em>\u21b5</em> \u00b7 select B4:F4 \u00b7 <em>ctrl+r</em>',
     guide:[
@@ -2956,7 +2956,7 @@ const CHALLENGES = {
     }
   },
   growth:{
-    name:'Growth', label:'Run the growth rates', par:110, parKeys:63,
+    name:'Growth', label:'Run the growth rates', par:110, parKeys:35,
     prompt:'A real revenue build: two segments, a consolidated line, five fiscal years. Total the segments, run YoY growth off the total \u2014 this year \u00f7 last year \u2212 1, filled across, formatted as a percent \u2014 then land the 4-year CAGR with the ^ key. Three different formulas, and every rate reads like a banker wrote it.',
     req:'<em>B4</em> total <em>=B2+B3</em> fill \u2192 \u00b7 <em>C5</em> YoY <em>=C4/B4-1</em> \u00b7 fill C5:F5 \u2192 + <em>ctrl+shift+%</em> \u00b7 <em>B7</em> CAGR <em>=(F4/B4)^(1/4)-1</em> + <em>ctrl+shift+%</em> \u00b7 dress B4:F4: <em>ctrl+b</em>',
     guide:[
@@ -3073,7 +3073,7 @@ const CHALLENGES = {
     }
   },
   dcf:{
-    name:'DCF', label:'Discount the cash flows', par:140, parKeys:85,
+    name:'DCF', label:'Discount the cash flows', par:140, parKeys:64,
     prompt:'Five years of FCF and the real discounting stack: a discount-factor row built ONCE off the anchored rate, a PV row that just multiplies, a Gordon terminal value \u2014 and the TV discounts with the year-5 factor you already built. Desk rule: never retype a discount factor.',
     req:'<em>B4</em> DF <em>=1/(1+$B$7)^B2</em> \u00b7 fill B4:F4 \u2192 \u00b7 <em>B5</em> PV <em>=B3*B4</em> \u00b7 fill B5:F5 \u2192 \u00b7 <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> \u00b7 <em>B11</em> <em>=B10*F4</em> \u00b7 <em>B12</em> EV <em>=SUM(B5:F5)+B11</em>',
     guide:[
@@ -3203,7 +3203,7 @@ const CHALLENGES = {
     }
   },
   revolver:{
-    name:'Revolver', label:'Sweep the revolver', par:113, parKeys:65,
+    name:'Revolver', label:'Sweep the revolver', par:113, parKeys:41,
     prompt:'Four year-end sweeps, each with its own cash picture. Sweep = the LESSER of the outstanding balance and the cash above minimum \u2014 never negative \u2014 then prove each year out: revolver after the sweep, cash after the sweep, and the balance row dressed. MIN and MAX nested once, arithmetic twice, one bold rule.',
     req:'<em>B5</em> <em>=MIN(B3,MAX(0,B2-B4))</em> \u00b7 fill B5:E5 \u2192 \u00b7 <em>B6</em> <em>=B3-B5</em> fill \u2192 \u00b7 <em>B7</em> <em>=B2-B5</em> fill \u2192 \u00b7 dress B6:E6: <em>ctrl+b</em> + <em>alt h b t</em>',
     guide:[
@@ -3410,7 +3410,7 @@ const CHALLENGES = {
     }
   },
   isbuild:{
-    name:'IS Build', label:'Build the income statement', par:160, parKeys:100,
+    name:'IS Build', label:'Build the income statement', par:160, parKeys:52,
     prompt:'Five years of income statement, start to finish: COGS off an anchored margin, gross profit, EBIT, net income after the anchored tax rate \u2014 then the net-margin row as a clean percent, and the bottom line bolded and ruled the way it goes in the book. Formulas, fills, a format chord, and the border walk: the whole toolkit on one tab.',
     req:'<em>B3</em> =-B2*$B$10 fill \u2192 \u00b7 <em>B4</em> =B2+B3 fill \u2192 \u00b7 <em>B6</em> =B4-B5 fill \u2192 \u00b7 <em>B7</em> =B6*(1-$B$11) fill \u2192 \u00b7 <em>B8</em> =B7/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B7:F7: <em>ctrl+b</em> + <em>alt h b t</em>',
     guide:[
@@ -3482,7 +3482,7 @@ const CHALLENGES = {
     }
   },
   debtsched:{
-    name:'Debt Sched.', label:'Run the debt schedule', par:190, parKeys:122,
+    name:'Debt Sched.', label:'Run the debt schedule', par:190, parKeys:77,
     prompt:'The corkscrew, five years, and it starts the way real staffing does: the VP gives you the amort rate over the phone \u2014 you type it, you paint it blue, THEN you build. Mandatory amort off your anchored rate, a MIN/MAX cash sweep, interest on the average balance, the year-over-year link \u2014 and the ending row bolded and ruled when the machine ties.',
     req(){ return 'type <em>'+this._ratePct+'%</em> at B9 \u2192 <em>alt h f c</em> blue \u00b7 <em>B4</em> =-B2*$B$9 \u00b7 <em>B5</em> =-MIN(B2+B4,MAX(0,B3)) \u00b7 <em>B6</em> =B2+B4+B5 \u00b7 <em>B7</em> =$B$10*(B2+B6)/2 \u00b7 <em>C2</em> =B6 \u00b7 fill C2:F2 \u2192 \u00b7 fill B4:F7 \u2192 \u00b7 dress B6:F6: <em>ctrl+b</em> + <em>alt h b t</em>'; },
     guide(){ return [
@@ -3560,7 +3560,7 @@ const CHALLENGES = {
     }
   },
   cfslink:{
-    name:'CFS Link', label:'Link the cash flow statement', par:134, parKeys:81,
+    name:'CFS Link', label:'Link the cash flow statement', par:134, parKeys:36,
     prompt:'Five years of cash flow, closed end to end: one SUM for the net change, the cash corkscrew linking every year to the last, a cash-conversion memo the MD will actually read \u2014 as a percent \u2014 and the ending row bolded and ruled. Four different muscles: sum, link, ratio, dress.',
     req:'<em>B6</em> =SUM(B2:B5) fill \u2192 \u00b7 <em>B8</em> =B7+B6 \u00b7 <em>C7</em> =B8 \u00b7 fill C7:F7 \u2192 \u00b7 fill B8:F8 \u2192 \u00b7 memo <em>B10</em> =B6/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B8:F8: <em>ctrl+b</em> + <em>alt h b t</em>',
     guide:[
@@ -3631,7 +3631,7 @@ const CHALLENGES = {
     }
   },
   bsbuild:{
-    name:'BS Build', label:'Balance the balance sheet', par:182, parKeys:116,
+    name:'BS Build', label:'Balance the balance sheet', par:182, parKeys:62,
     prompt:'Three years of balance sheet. Total both sides with live SUMs, build the retained-earnings roll ONCE and fill it across \u2014 prior RE + net income \u2212 dividends, walking year to year \u2014 prove it balances with a check row that must read zero three times, then dress it: totals bolded, the check row ruled off. If a check cell isn\u2019t 0.0, something upstream is broken.',
     req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B8</em> =SUM(B6:B7) fill \u2192 \u00b7 <em>C10</em> RE roll =B10+C12-C13 \u00b7 fill C10:D10 \u2192 \u00b7 <em>B11</em> =B8+B9+B10 fill \u2192 \u00b7 <em>B14</em> =B5-B11 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B5:D5 and B11:D11 \u00b7 <em>alt h b t</em> B14:D14',
     guide:[
@@ -3712,7 +3712,7 @@ const CHALLENGES = {
     }
   },
   nwcsched:{
-    name:'NWC Sched.', label:'Roll working capital', par:206, parKeys:134,
+    name:'NWC Sched.', label:'Roll working capital', par:206, parKeys:78,
     prompt:'Working capital the way diligence actually hands it to you: three driver assumptions from the data room \u2014 you type them in, paint them blue, THEN build. AR off DSO, inventory off DIO, payables off DPO, each driver anchored and filled across five years, net working capital bolded and ruled, and the year-over-year swing that feeds the cash flow statement.',
     req(){ return 'type the drivers at B9:B11 \u2014 DSO <em>'+this._dso+'</em> \u00b7 DIO <em>'+this._dio+'</em> \u00b7 DPO <em>'+this._dpo+'</em> \u2014 then <em>alt h f c</em> blue \u00b7 <em>B4</em> =B2/365*$B$9 fill \u2192 \u00b7 <em>B5</em> =B3/365*$B$10 fill \u2192 \u00b7 <em>B6</em> =B3/365*$B$11 fill \u2192 \u00b7 <em>B7</em> =B4+B5-B6 fill \u2192 + <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 <em>C8</em> \u0394 =C7-B7 fill \u2192'; },
     guide(){ return [
@@ -3785,7 +3785,7 @@ const CHALLENGES = {
     }
   },
   threestmt:{
-    name:'3-Statement', label:'Tie the three statements', par:174, parKeys:110,
+    name:'3-Statement', label:'Tie the three statements', par:174, parKeys:59,
     prompt:'The capstone, now three years wide: cash walks from the CFS into the balance sheet, retained earnings absorbs net income year after year, and the check row proves the whole machine ties \u2014 three different LINKS, each built once and filled across. When all three check cells read zero, dress the totals and ship it.',
     req:'<em>B5</em> =B2+B3-B4 fill \u2192 \u00b7 <em>B7</em> =B6+B5 \u00b7 <em>C6</em> =B7 fill \u2192 \u00b7 fill B7:D7 \u2192 \u00b7 <em>B9</em> =B7 fill \u2192 \u00b7 <em>B11</em> =B9+B10 fill \u2192 \u00b7 <em>C13</em> =B13+C2 fill \u2192 \u00b7 <em>B14</em> =B11-B12-B13 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B11:D11 \u00b7 <em>alt h b t</em> B14:D14',
     guide:[
@@ -3867,7 +3867,7 @@ const CHALLENGES = {
     }
   },
   waterfall:{
-    name:'Waterfall', label:'Run the paydown waterfall', par:168, parKeys:106,
+    name:'Waterfall', label:'Run the paydown waterfall', par:168, parKeys:65,
     prompt:'Three years of cash, two tranches, strict seniority \u2014 and the balances CORKSCREW: each year opens where the last one closed. Build year 1 top to bottom, link both openings, fill everything right. MIN does the rationing; the cascade proves itself.',
     req:'<em>B5</em> FCF <em>=B2-B3-B4</em> \u00b7 fill B5:D5 \u2192 \u00b7 <em>B8</em> <em>=MIN(B5,B7)</em> \u00b7 <em>B9</em> <em>=B7-B8</em> \u00b7 <em>B10</em> <em>=B5-B8</em> \u00b7 fill B8:D10 \u2192 \u00b7 link <em>C7</em> <em>=B9</em> fill \u2192 \u00b7 <em>B13</em> <em>=MIN(B10,B12)</em> \u00b7 <em>B14</em> <em>=B12-B13</em> \u00b7 fill B13:D14 \u2192 \u00b7 link <em>C12</em> <em>=B14</em> fill \u2192',
     guide:[
@@ -3939,7 +3939,7 @@ const CHALLENGES = {
     }
   },
   txncomps:{
-    name:'Txn Comps', label:'Run precedent transactions', par:110, parKeys:54,
+    name:'Txn Comps', label:'Run precedent transactions', par:110, parKeys:35,
     prompt:'Five precedent deals, one target. Compute EV/EBITDA paid in each deal, average the multiples off one anchored SUM, then mark the target: implied EV at the average multiple, less net debt, equals implied equity. The comps page every pitch book leans on.',
     req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> avg <em>=SUM(D3:D7)/5</em> \u00b7 <em>B11</em> implied EV <em>=B10*D8</em> \u00b7 <em>B13</em> implied equity <em>=B11-B12</em>',
     guide:[
@@ -3994,7 +3994,7 @@ const CHALLENGES = {
     }
   },
   sourcesuses:{
-    name:'S&U', label:'Balance sources and uses', par:153, parKeys:95,
+    name:'S&U', label:'Balance sources and uses', par:153, parKeys:57,
     prompt:'The first page of every deal book \u2014 and now the version the MD actually wants: total the uses, let sponsor equity be THE PLUG, total the sources, prove the check reads zero \u2014 then common-size BOTH sides with an anchored % column that runs straight through 100%. Two anchors, two fills, one funded deal.',
     req:'<em>B5</em> total uses <em>=SUM(B2:B4)</em> \u00b7 <em>C2</em> % <em>=B2/$B$5</em> fill C2:C5 \u00b7 <em>B9</em> sponsor equity <em>=B5-B7-B8</em> (the plug) \u00b7 <em>B10</em> total sources <em>=SUM(B7:B9)</em> \u00b7 <em>C7</em> % <em>=B7/$B$10</em> fill C7:C10 \u00b7 <em>B12</em> check <em>=B10-B5</em> \u2192 0',
     guide:[
@@ -4113,7 +4113,7 @@ const CHALLENGES = {
     }
   },
   dcfsens:{
-    name:'Sensitivity', label:'Run the sensitivity table', par:64, parKeys:29,
+    name:'Sensitivity', label:'Run the sensitivity table', par:64, parKeys:17,
     prompt:'The real thing: a two-way table \u2014 five WACCs across, three growth rates down, FIFTEEN cells from ONE formula. Only true mixed anchors survive this: FCF locked absolute ($B$2), the WACC header row-locked (C$3), the growth column column-locked ($B4). Build it once, fill right, fill down. Wrong anchors don\u2019t fail quietly here \u2014 they fail fifteen times.',
     req:'<em>C4</em> \u00b7 <em>=$B$2/(C$3-$B4)</em> \u2014 F4 cycles each ref to its mixed form \u00b7 fill C4:G4 <em>ctrl+r</em> \u00b7 then C4:G6 <em>ctrl+d</em>',
     guide:[
@@ -4212,7 +4212,7 @@ const CHALLENGES = {
     }
   },
   football:{
-    name:'Football', label:'Build the football field', par:92, parKeys:52,
+    name:'Football', label:'Build the football field', par:92, parKeys:39,
     prompt:'Three methodologies, three ranges, one summary: midpoint per method, then the widest view \u2014 the lowest low and the highest high across all three. MIN and MAX earn their keep; the last page of every valuation section.',
     req:'<em>D3</em> mid <em>=(B3+C3)/2</em> \u00b7 fill D3:D5 \u2193 \u00b7 <em>B7</em> floor <em>=MIN(B3:B5)</em> \u00b7 <em>B8</em> ceiling <em>=MAX(C3:C5)</em> \u00b7 <em>B9</em> width <em>=B8-B7</em>',
     guide:[
@@ -4264,7 +4264,7 @@ const CHALLENGES = {
     }
   },
   cagr:{
-    name:'CAGR', label:'Compound it, three times', par:72, parKeys:79,
+    name:'CAGR', label:'Compound it, three times', par:72, parKeys:55,
     prompt:'Three CAGR checks scattered where a real page would leave them \u2014 and they move every run. Same clean formula each time: (End \u00f7 Begin) ^ (1 \u00f7 Years) \u2212 1, percent to 1 decimal. The refs change with the block; the shape never does.',
     req(){ return this._sites.map(s=>'<em>'+s.col+s.ans+'</em> \u00b7 =('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1 \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then '); },
     guide(){ return this._sites.map((s,i)=>['block one','block two','block three'][i]+' \u2014 at <b>'+s.col+s.ans+'</b> type <kbd>=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>'); },
@@ -4306,7 +4306,7 @@ const CHALLENGES = {
     }
   },
   balance:{
-    name:'Balance', label:'Make it balance', par:126, parKeys:75,
+    name:'Balance', label:'Make it balance', par:126, parKeys:39,
     prompt:'Two years of balance sheet \u2014 and retained earnings is NEVER a plug; it\u2019s earned, so it\u2019s a given like everything else. Foot both sides with live SUMs, build the check row, and dress the totals. The check is a DIAGNOSTIC: it reads zero because the sheet is right, not because you forced it.',
     req:'<em>B6</em> <em>=SUM(B2:B5)</em> fill \u2192 \u00b7 <em>B12</em> <em>=SUM(B8:B11)</em> fill \u2192 \u00b7 <em>B14</em> check <em>=B6-B12</em> fill \u2192 \u00b7 dress: <em>ctrl+b</em> B6:C6 and B12:C12 \u00b7 <em>alt h b t</em> B14:C14',
     guide:[
@@ -4453,7 +4453,7 @@ const CHALLENGES = {
   },
 
   triage:{
-    name:'Error triage', label:'Error triage \u2014 #REF!, #DIV/0!, #VALUE!', par:85, parKeys:40,
+    name:'Error triage', label:'Error triage \u2014 #REF!, #DIV/0!, #VALUE!', par:85, parKeys:25,
     prompt:'Three classic breaks on one tab: a #REF! where a deleted row took the SUM with it, a #DIV/0! where the denominator points at nothing, and a #VALUE! where a formula grabbed text. Triage all three \u2014 read the error, find the intent, rebuild the formula. The error message is the diagnosis; you\u2019re the fix.',
     req(){ const R=this._R; return '<em>'+R.refCell+'</em> #REF! \u2192 rebuild =SUM('+R.refFix+') \u00b7 <em>'+R.divCell+'</em> #DIV/0! \u2192 denominator is '+R.divFix+' \u00b7 <em>'+R.valCell+'</em> #VALUE! \u2192 point at the NUMBER ('+R.valFix+')'; },
     guide:[
@@ -4946,7 +4946,7 @@ const CHALLENGES = {
   },
 
   versionup:{
-    name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', par:135, parKeys:82,
+    name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', par:135, parKeys:30,
     prompt:'You inherited a five-year operating build where someone typed the answers: growth, gross profit, EBITDA, AND the margin are all hardcoded numbers \u2014 right today, silently wrong the moment an input moves. Resurrect every derived row as a live formula, fill it across, and prove nothing drifted. This is versioning discipline: v2 must survive new numbers without a rebuild.',
     req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4-B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7-B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 same values, now alive'; },
     guide:[
@@ -5009,7 +5009,7 @@ const CHALLENGES = {
   },
 
   sumif:{
-    name:'SUMIF', label:'Roll up the segments', par:140, parKeys:85,
+    name:'SUMIF', label:'Roll up the segments', par:140, parKeys:59,
     prompt:'A raw ledger on the left, a summary the MD can read on the right. One SUMIF with anchored ranges, filled down for the other segments \u2014 only the criteria cell walks. Then foot the summary with a live SUM, run % of total off an anchored denominator, and bold the total line. Rollup, ratio, dress: a real summary tab.',
     req:'<em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> \u00b7 fill E2:E4 \u2193 \u00b7 <em>E5</em> <em>=SUM(E2:E4)</em> \u00b7 <em>F2</em> <em>=E2/$E$5</em> \u00b7 fill F2:F4 \u2193 + <em>ctrl+shift+%</em> \u00b7 dress D5:E5: <em>ctrl+b</em> + <em>alt h b t</em>',
     guide:[
@@ -5074,7 +5074,7 @@ const CHALLENGES = {
     }
   },
   cases:{
-    name:'Sticky switch', label:'Sticky IFs \u2014 one switch runs the model', par:95, parKeys:62,
+    name:'Sticky switch', label:'Sticky IFs \u2014 one switch runs the model', par:95, parKeys:47,
     prompt:'Every real model has a scenario switch: one cell that flips Base / Upside / Downside and repopulates the whole tab. Build the sticky IF once \u2014 anchored so hard it can\u2019t drift \u2014 fill it across five years, then FLIP THE SWITCH and watch the row obey. This is how you make one sheet answer three questions.',
     req(){ return '<em>C10</em> \u00b7 =B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5))) \u2014 F4 every anchor \u00b7 fill C10:F10 with <em>ctrl+r</em> \u00b7 then set the switch: <em>B3</em> \u2192 3 \u00b7 the row repopulates itself'; },
     guide:[
@@ -5177,7 +5177,7 @@ const CHALLENGES = {
     }
   },
   modeltour:{
-    name:'Model Tour', label:'Chase the marks', par:42, parKeys:33,
+    name:'Model Tour', label:'Chase the marks', par:42, parKeys:13,
     prompt:'The VP went through the model and marked four broken cells \u2014 they\u2019re scattered to the corners of the tab, and the meeting is in two minutes. Jump to each mark with ctrl+arrows, retype the number from the note, and land back at A1 when you\u2019re done. Arrow-crawling will not make par: this drill is about MOVING like an analyst.',
     req(){ const d=this._d; return d.map(x=>'<em>'+x.k+'</em> \u2192 type <em>'+x.v+'</em>').join(' \u00b7 ')+' \u00b7 finish: <em>ctrl+home</em>'; },
     guide(){ const d=this._d; return [

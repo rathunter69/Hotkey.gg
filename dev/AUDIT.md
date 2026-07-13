@@ -3940,3 +3940,27 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   full catalog ALL GREEN (66); parity 37; visual 311; rebuilt boards
   screenshot-reviewed (combo ships with live #### overflow).
 - CACHE v143 -> v144 (all 9 pages).
+
+---
+# ROUND 165 — PAR CALIBRATION SWEEP: the efficiency metric comes back to true
+- NEW STANDING HARNESS dev/e2e-par-sweep.js: replays every drill's demo
+  through the live engine 5x and compares the MEASURED optimal key count
+  (keyLog at the win — the exact metric the HUD, results-card efficiency
+  ratio, and marathon scoring show players) against declared parKeys.
+- THE FINDING: 38 of 66 drills carried parKeys counted under the OLD r33
+  token convention (TYPE:str=len, walk letters counted) while the live
+  keyLog counts CHORDS — so "optimal" overcounted by 25-80% on most of
+  the catalog. Every player's efficiency ratio has been reading
+  flattering-to-meaningless (versionup claimed optimal 82 when the real
+  optimal path logs 30). New drills (ruleoff/ruleaudit) were already
+  true — they were calibrated against the live metric.
+- FIX: parKeys := measured median for the 38 drifted drills (all
+  measured LOWER, consistent with the metric shift — assignment IS the
+  old min-policy). PAR SECONDS UNTOUCHED everywhere: par is tuned
+  difficulty (campaign gates x1.5, XP advanced >=55s threshold, PARS
+  snapshot in drills.js) — no gameplay difficulty changed this round.
+  Ratio-only outliers (undo 3-key etc.) left alone: short drills are
+  reading-dominated by design; sweep now reports s/key as INFO only.
+- Sweep re-run post-fix: FLAGGED 0. Full catalog replay ALL GREEN;
+  parity 37.
+- CACHE v144 -> v145 (all 9 pages).
