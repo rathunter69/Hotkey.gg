@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=131" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=131">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=131">
+<link rel="icon" href="favicon.ico?v=132" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=132">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=132">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1105,14 +1105,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=131"></script>
-<link rel="stylesheet" href="nav.css?v=131">
-<script src="themes.js?v=131"></script>
+<script src="drills.js?v=132"></script>
+<link rel="stylesheet" href="nav.css?v=132">
+<script src="themes.js?v=132"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=131"></script>
+<script src="nav.js?v=132"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -4257,6 +4257,272 @@ const CHALLENGES = {
         {label:'Rebuild the #REF! total \u2014 =SUM over the Q1 block (B8)', ok:refOk},
         {label:'Fix the #DIV/0! margin \u2014 the denominator is Services revenue, C5 (B10)', ok:divOk},
         {label:'Fix the #VALUE! growth \u2014 totals, not labels: C8 over B8 (B11; fix B8 first)', ok:valOk},
+      ];
+    }
+  },
+
+  /* r152: AUDIT FAMILY EXPANSION \u2014 "find what's broken under time pressure" is THE
+     skill VPs notice (STRATEGY lens 3.1). Three new diagnostics, each a different
+     failure class: a dead check row hiding breaks (balcheck), links reading a dead
+     assumptions block (stalelink), pasted-in positive costs (signerr). */
+  balcheck:{
+    name:'Tie-out', label:'Make it tie \u2014 hunt the break', par:75, parKeys:27,
+    prompt:'A balance sheet that doesn\u2019t balance \u2014 and someone pasted zeros over the check row so it LOOKS like it does. Resurrect the check row live, read which years break, and run both culprits down: one Total assets lost its first line to a later insert, and one equity cell is a typed plug where the corkscrew should be. The check row is the smoke alarm; this sheet shipped with the battery pulled.',
+    req(){ return '<em>B15:E15</em> check \u2192 =B8\u2212B14, filled \u00b7 one <em>Total assets</em> starts a row short \u2014 respan it \u00b7 one <em>Equity</em> cell is typed \u2014 corkscrew it \u00b7 every check reads 0'; },
+    guide:[
+      'the check row is pasted zeros \u00b7 B15: <kbd>=</kbd>B8-B14 <kbd>\u21b5</kbd> \u00b7 select B15:E15, <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 now read which years break',
+      'one Total assets SUM starts at row 5 \u2014 the Cash line fell out of the range \u00b7 retype it over the whole block: <kbd>=</kbd>SUM(\u20264:\u20267) <kbd>\u21b5</kbd>',
+      'one equity cell is a typed number \u00b7 rebuild the corkscrew: <kbd>=</kbd>prior-year equity <kbd>+</kbd> NI memo <kbd>\u21b5</kbd>',
+      'sign-off: the check row reads dead zero in all four years',
+    ],
+    targets:['B15:E15', function(){return this._short;}, function(){return this._plug;}, 'B15:E15'],
+    demo(){
+      const sh=this._short, pl=this._plug;
+      const shL=sh.replace(/\d+/g,''), plL=pl.replace(/\d+/g,'');
+      const prev=String.fromCharCode(plL.charCodeAt(0)-1);
+      return [
+        {sel:'B15', keys:[...T('=B8-B14'), Kb.enter]},
+        {sel:'B15:E15', keys:[Kb.fillR]},
+        {sel:sh, keys:[...T('=SUM('+shL+'4:'+shL+'7)'), Kb.enter]},
+        {sel:pl, keys:[...T('='+prev+'12+'+plL+'13'), Kb.enter]},
+      ];
+    },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Balance sheet (doesn\u2019t tie \u2014 find why)',txt:true,bold:true};
+      const y0=23+rnd(0,2);
+      cells['A3']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
+      for(let c=2;c<=5;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
+      const aRows=['Cash','Receivables','Inventory','PP&E'];
+      for(let i=0;i<4;i++) cells['A'+(4+i)]={...blankCell(),value:aRows[i],txt:true};
+      cells['A8']={...blankCell(),value:'Total assets',txt:true,bold:true};
+      const lRows=['Payables','Debt','Equity'];
+      for(let i=0;i<3;i++) cells['A'+(10+i)]={...blankCell(),value:lRows[i],txt:true};
+      cells['A13']={...blankCell(),value:'Net income (memo)',txt:true};
+      cells['A14']={...blankCell(),value:'Total L&E',txt:true,bold:true};
+      cells['A15']={...blankCell(),value:'Check (A \u2212 L&E)',txt:true,bold:true};
+      // L&E side first (equity corkscrews off the NI memo); assets sized so the sheet
+      // GENUINELY tied before the two defects \u2014 the fix restores truth, not cosmetics
+      const eq0=rnd(120,300)*5;
+      const ni=[0, rnd(20,90)*5, rnd(20,90)*5, rnd(20,90)*5];
+      const eq=[eq0]; for(let i=1;i<4;i++) eq.push(eq[i-1]+ni[i]);
+      const plugCol=2+rnd(1,3);                       // C..E \u2014 only roll years corkscrew
+      let shortCol=2+rnd(0,3); while(shortCol===plugCol) shortCol=2+rnd(0,3);
+      for(let c=2;c<=5;c++){
+        const Lc=colLetter(c), i=c-2;
+        const pay=rnd(40,160)*5, debt=rnd(80,300)*5;
+        cells[Lc+'10']={...blankCell(),value:pay,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+'11']={...blankCell(),value:debt,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        if(c===2) cells[Lc+'12']={...blankCell(),value:eq0,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        else if(c===plugCol) cells[Lc+'12']={...blankCell(),value:eq[i]+rnd(3,12)*5,fmtStyle:'comma',decimals:0};   // the stale plug \u2014 a visible wedge off true
+        else cells[Lc+'12']={...blankCell(),formula:'='+colLetter(c-1)+'12+'+Lc+'13',value:eq[i],fmtStyle:'comma',decimals:0};
+        if(c>2) cells[Lc+'13']={...blankCell(),value:ni[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        const totLE=pay+debt+eq[i];
+        cells[Lc+'14']={...blankCell(),formula:'=SUM('+Lc+'10:'+Lc+'12)',
+          value:(c===plugCol? pay+debt+cells[Lc+'12'].value : totLE),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        const cash=rnd(10,40)*5, ar=rnd(10,50)*5, inv=rnd(10,50)*5;
+        const ppe=totLE-cash-ar-inv;                  // ranges keep this comfortably positive
+        const av=[cash,ar,inv,ppe];
+        for(let r=4;r<=7;r++) cells[Lc+r]={...blankCell(),value:av[r-4],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        const short=(c===shortCol);
+        cells[Lc+'8']={...blankCell(),formula:'=SUM('+Lc+(short?'5':'4')+':'+Lc+'7)',
+          value:(short? ar+inv+ppe : totLE),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        cells[Lc+'15']={...blankCell(),value:0,fmtStyle:'comma',decimals:0};   // the pasted-over zeros
+      }
+      this._short=colLetter(shortCol)+'8'; this._plug=colLetter(plugCol)+'12';
+      return {ROWS:15, cells, active:{r:15,c:2}, sel:null, colW:{1:132}};
+    },
+    checks(S){
+      let liveOk=true, zeroOk=true, totOk=true, eqOk=true;
+      for(let c=2;c<=5;c++){ const Lc=colLetter(c);
+        const ck=S.cells[Lc+'15'];
+        const f=(ck&&ck.formula)?ck.formula.toUpperCase().replace(/[\s$]/g,''):'';
+        const want=(((S.cells[Lc+'8']||{}).value)||0)-(((S.cells[Lc+'14']||{}).value)||0);
+        if(!f || f.indexOf(Lc+'8')<0 || f.indexOf(Lc+'14')<0 || Math.abs(((ck&&ck.value)||0)-want)>1e-6) liveOk=false;
+        if(Math.abs(((ck&&ck.value)||0))>1e-6) zeroOk=false;
+        const t=S.cells[Lc+'8'];
+        let wantT=0; for(let r=4;r<=7;r++){ const x=S.cells[Lc+r]; wantT+=(x&&typeof x.value==='number')?x.value:0; }
+        const ft=(t&&t.formula)?t.formula.toUpperCase().replace(/[\s$]/g,''):'';
+        if(!ft || ft.indexOf(Lc+'4:'+Lc+'7')<0 || Math.abs(((t&&t.value)||0)-wantT)>1e-6) totOk=false;
+        if(c>2){ const P=colLetter(c-1);
+          const e=S.cells[Lc+'12'];
+          const fe=(e&&e.formula)?e.formula.toUpperCase().replace(/[\s$]/g,''):'';
+          const wantE=(((S.cells[P+'12']||{}).value)||0)+(((S.cells[Lc+'13']||{}).value)||0);
+          if(!fe || fe.indexOf(P+'12')<0 || fe.indexOf(Lc+'13')<0 || Math.abs(((e&&e.value)||0)-wantE)>1e-6) eqOk=false;
+        }
+      }
+      return [
+        {label:'The check row is LIVE \u2014 =Total assets \u2212 Total L&E, all four years (row 15)', ok:liveOk},
+        {label:'Every Total assets spans ALL four asset lines \u2014 one range starts a row short (row 8)', ok:totOk},
+        {label:'Equity corkscrews \u2014 prior year + NI memo in every roll year; one is a typed plug (row 12)', ok:eqOk},
+        {label:'It ties \u2014 every check reads dead zero (row 15)', ok:zeroOk&&liveOk},
+      ];
+    }
+  },
+
+  stalelink:{
+    name:'Stale Links', label:'Re-point the stale links', par:70, parKeys:27,
+    prompt:'The assumptions moved to v2 this morning \u2014 but three cells in the build still read the DEAD v1 column. The tab computes, nothing errors, every number is confidently wrong. Hunt the rows whose pattern breaks, F2 the stale refs onto the live block, and prove contribution ties to v2. Silent staleness is worse than a #REF! \u2014 at least the #REF! admits it.',
+    req(){ const R=this._stale; return '<em>'+R.join('</em> \u00b7 <em>')+'</em> still read the v1 column (C) \u2014 re-point each at the LIVE v2 block ($B$4:$B$6) \u00b7 contribution must tie to v2'; },
+    guide:[
+      'read each row for the value that breaks the pattern \u2014 that cell\u2019s formula points at column C (v1, dead)',
+      'revenue row: every year = $B$4 (live price) \u00d7 its units \u00b7 <kbd>F2</kbd> the stale one, walk C onto B <kbd>\u21b5</kbd>',
+      'cost row: $B$5 \u00d7 revenue \u00b7 fix the stale ref the same way',
+      'royalty row: $B$6 \u00d7 revenue \u00b7 fix the last one \u2014 contribution re-ties itself',
+    ],
+    targets:[function(){return this._stale[0];}, function(){return this._stale[1];}, function(){return this._stale[2];}, 'B14:F14'],
+    demo(){
+      const st=this._stale;
+      const mk=(cell)=>{ const Lc=cell.replace(/\d+/g,''), r=cell.replace(/\D+/g,'');
+        const src=r==='11'?'$B$4':(r==='12'?'$B$5':'$B$6');
+        const dep=r==='11'?(Lc+'10'):(Lc+'11');
+        return {sel:cell, keys:[...T('='+src+'*'+dep), Kb.enter]}; };
+      return st.map(mk);
+    },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 Reforecast (assumptions v2 landed \u2014 some links still read v1)',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Assumptions',txt:true,bold:true};
+      cells['B3']={...blankCell(),value:'v2 \u00b7 live',txt:true,bold:true};
+      cells['C3']={...blankCell(),value:'v1 \u00b7 dead',txt:true,bold:true};
+      cells['A4']={...blankCell(),value:'Price / unit',txt:true};
+      cells['A5']={...blankCell(),value:'Cost rate',txt:true};
+      cells['A6']={...blankCell(),value:'Royalty',txt:true};
+      const price=rnd(24,60), rate=rnd(30,60)/100, roy=rnd(3,9)/100;
+      const price1=price+(rnd(0,1)?1:-1)*rnd(3,9);
+      const rate1=Math.min(.7,Math.max(.15,rate+(rnd(0,1)?1:-1)*rnd(6,14)/100));
+      const roy1=Math.min(.15,Math.max(.01,roy+(rnd(0,1)?1:-1)*rnd(2,4)/100));
+      cells['B4']={...blankCell(),value:price,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['C4']={...blankCell(),value:price1,fmtStyle:'comma',decimals:0};
+      cells['B5']={...blankCell(),value:rate,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      cells['C5']={...blankCell(),value:rate1,fmtStyle:'percent',decimals:0};
+      cells['B6']={...blankCell(),value:roy,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      cells['C6']={...blankCell(),value:roy1,fmtStyle:'percent',decimals:0};
+      const y0=23+rnd(0,2);
+      cells['A9']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
+      for(let c=2;c<=6;c++) cells[colLetter(c)+'9']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
+      cells['A10']={...blankCell(),value:'Units (k)',txt:true};
+      cells['A11']={...blankCell(),value:'Revenue',txt:true};
+      cells['A12']={...blankCell(),value:'Cost',txt:true};
+      cells['A13']={...blankCell(),value:'Royalty',txt:true};
+      cells['A14']={...blankCell(),value:'Contribution',txt:true,bold:true};
+      // one stale link PER ROW, columns shuffled so the trio never stacks
+      const colsShuf=[2,3,4,5,6].sort(()=>Math.random()-.5);
+      const staleCol={11:colsShuf[0], 12:colsShuf[1], 13:colsShuf[2]};
+      this._truth={};
+      for(let c=2;c<=6;c++){
+        const Lc=colLetter(c);
+        const units=rnd(20,120)*5;
+        cells[Lc+'10']={...blankCell(),value:units,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        const revT=price*units, costT=rate*revT, royT=roy*revT;
+        const rev = (staleCol[11]===c) ? price1*units : revT;
+        cells[Lc+'11']={...blankCell(),formula:'='+(staleCol[11]===c?'$C$4':'$B$4')+'*'+Lc+'10',value:rev,fmtStyle:'comma',decimals:0};
+        const cost=(staleCol[12]===c) ? rate1*rev : rate*rev;
+        cells[Lc+'12']={...blankCell(),formula:'='+(staleCol[12]===c?'$C$5':'$B$5')+'*'+Lc+'11',value:cost,fmtStyle:'comma',decimals:0};
+        const royV=(staleCol[13]===c) ? roy1*rev : roy*rev;
+        cells[Lc+'13']={...blankCell(),formula:'='+(staleCol[13]===c?'$C$6':'$B$6')+'*'+Lc+'11',value:royV,fmtStyle:'comma',decimals:0};
+        cells[Lc+'14']={...blankCell(),formula:'='+Lc+'11-'+Lc+'12-'+Lc+'13',value:rev-cost-royV,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        this._truth[Lc]=revT-costT-royT;
+      }
+      this._stale=[colLetter(staleCol[11])+'11', colLetter(staleCol[12])+'12', colLetter(staleCol[13])+'13'];
+      return {ROWS:14, cells, active:{r:11,c:2}, sel:null, colW:{1:126}};
+    },
+    checks(S){
+      const rowOk=(r, src, depRow)=>{
+        for(let c=2;c<=6;c++){ const Lc=colLetter(c);
+          const x=S.cells[Lc+r];
+          const f=(x&&x.formula)?x.formula.toUpperCase().replace(/[\s$]/g,''):'';
+          const dep=(S.cells[Lc+depRow]||{}).value||0;
+          const base=(S.cells[src]||{}).value||0;
+          if(!f || f.indexOf(src)<0 || Math.abs(((x&&x.value)||0)-base*dep)>1e-6) return false;
+        }
+        return true;
+      };
+      const revOk=rowOk('11','B4','10'), costOk=rowOk('12','B5','11'), royOk=rowOk('13','B6','11');
+      let tieOk=true;
+      for(let c=2;c<=6;c++){ const Lc=colLetter(c);
+        const x=S.cells[Lc+'14'];
+        const f=(x&&x.formula)?x.formula.toUpperCase().replace(/[\s$]/g,''):'';
+        if(!f || f.indexOf(Lc+'11')<0 || f.indexOf(Lc+'12')<0 || f.indexOf(Lc+'13')<0
+           || Math.abs(((x&&x.value)||0)-this._truth[Lc])>1e-6) tieOk=false;
+      }
+      return [
+        {label:'Revenue reads the LIVE price \u2014 $B$4 \u00d7 units in every year (row 11)', ok:revOk},
+        {label:'Cost reads the LIVE rate \u2014 $B$5 \u00d7 revenue in every year (row 12)', ok:costOk},
+        {label:'Royalty reads the LIVE rate \u2014 $B$6 \u00d7 revenue in every year (row 13)', ok:royOk},
+        {label:'Contribution ties to the v2 assumptions in every year (row 14)', ok:tieOk},
+      ];
+    }
+  },
+
+  signerr:{
+    name:'Sign Sweep', label:'Flip the signs back', par:60, parKeys:22,
+    prompt:'Someone pasted three cost cells in from a positive-convention deck \u2014 this tab runs costs NEGATIVE and sums straight through, so EBIT is silently rich in three years. Sweep rows 5-7 for costs that lost their sign, flip them back, then prove the fix: EBIT re-ties itself, and you land a margin row as the sign-off. A sign error doesn\u2019t crash; it just lies.',
+    req(){ return 'costs carry their sign \u2014 <em>rows 5-7 all negative</em> \u00b7 EBIT sum-through re-ties every year (row 8) \u00b7 <em>B10:F10</em> margin \u2192 =B8/B4, filled, shown as % (<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>)'; },
+    guide:[
+      'scan rows 5-7 \u2014 three cost cells read POSITIVE \u00b7 retype each with its minus <kbd>\u21b5</kbd> (type-to-replace)',
+      'EBIT sums straight through (=SUM of rev + negative costs) \u2014 it re-ties the moment the signs are right',
+      'margin sign-off \u00b7 B10: <kbd>=</kbd>B8/B4 <kbd>\u21b5</kbd> \u00b7 select B10:F10, <kbd>ctrl</kbd>+<kbd>r</kbd>, then <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
+    ],
+    targets:['B5:F7', 'B8:F8', 'B10:F10'],
+    demo(){
+      const moves=this._flips.map(cell=>({sel:cell, keys:[...T(String(-Math.abs(this._mag[cell]))), Kb.enter]}));
+      moves.push({sel:'B10', keys:[...T('=B8/B4'), Kb.enter]});
+      moves.push({sel:'B10:F10', keys:[Kb.fillR, Kb.pct]});
+      return moves;
+    },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 P&L (pasted from a positive-convention deck \u2014 fix the signs)',txt:true,bold:true};
+      const y0=23+rnd(0,2);
+      cells['A3']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
+      for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
+      cells['A4']={...blankCell(),value:'Revenue',txt:true};
+      cells['A5']={...blankCell(),value:'COGS',txt:true};
+      cells['A6']={...blankCell(),value:'Opex',txt:true};
+      cells['A7']={...blankCell(),value:'D&A',txt:true};
+      cells['A8']={...blankCell(),value:'EBIT',txt:true,bold:true};
+      cells['A10']={...blankCell(),value:'EBIT margin',txt:true};
+      // three flips, three DIFFERENT columns (never stacked \u2014 each break reads alone)
+      const flipCols=[2,3,4,5,6].sort(()=>Math.random()-.5).slice(0,3);
+      const flips=flipCols.map(c=>colLetter(c)+(5+rnd(0,2)));
+      this._flips=flips; this._mag={}; this._truth={};
+      for(let c=2;c<=6;c++){
+        const Lc=colLetter(c);
+        const rev=rnd(200,900)*5;
+        const costs={5:-rnd(80,300)*5, 6:-rnd(40,200)*5, 7:-rnd(10,60)*5};
+        cells[Lc+'4']={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        let disp=rev;
+        for(const r of [5,6,7]){
+          const flipped=flips.includes(Lc+r);
+          const v=flipped ? Math.abs(costs[r]) : costs[r];
+          if(flipped) this._mag[Lc+r]=Math.abs(costs[r]);
+          cells[Lc+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+          disp+=v;
+        }
+        this._truth[Lc]=rev+costs[5]+costs[6]+costs[7];
+        cells[Lc+'8']={...blankCell(),formula:'=SUM('+Lc+'4:'+Lc+'7)',value:disp,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      }
+      return {ROWS:10, cells, active:{r:5,c:2}, sel:null, colW:{1:110}};
+    },
+    checks(S){
+      let signOk=true, ebitOk=true, mgOk=true;
+      for(let c=2;c<=6;c++){ const Lc=colLetter(c);
+        for(const r of [5,6,7]){ const x=S.cells[Lc+r];
+          if(!x || typeof x.value!=='number' || x.value>=0) signOk=false; }
+        const e=S.cells[Lc+'8'];
+        const fe=(e&&e.formula)?e.formula.toUpperCase().replace(/[\s$]/g,''):'';
+        if(!fe || fe.indexOf(Lc+'4:'+Lc+'7')<0 || Math.abs(((e&&e.value)||0)-this._truth[Lc])>1e-6) ebitOk=false;
+        const m=S.cells[Lc+'10'];
+        const fm=(m&&m.formula)?m.formula.toUpperCase().replace(/[\s$]/g,''):'';
+        const rev=(S.cells[Lc+'4']||{}).value||1;
+        if(!fm || fm.indexOf(Lc+'8')<0 || fm.indexOf(Lc+'4')<0 || (m&&m.fmtStyle)!=='percent'
+           || Math.abs(((m&&m.value)||0)-this._truth[Lc]/rev)>1e-6) mgOk=false;
+      }
+      return [
+        {label:'Costs carry their sign \u2014 COGS, Opex and D&A negative in every year (rows 5-7)', ok:signOk},
+        {label:'EBIT reads TRUE \u2014 the sum-through equals revenue less real costs, every year (row 8)', ok:ebitOk},
+        {label:'Margin row live and % \u2014 EBIT \u00f7 revenue across all five years (row 10)', ok:mgOk},
       ];
     }
   },

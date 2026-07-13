@@ -34,7 +34,7 @@ perks later). Branch auto-merge live per working agreement.
   chord bug: a blanket alt-swallow killed every Ctrl+Alt chord in classic
   play since it shipped; fixed w/ AltGr guard; RF aliases + profile-aware
   guide notes).
-- **DRILLS: 59** (+4 this session): cascade (full 3-tranche waterfall, r141) ·
+- **DRILLS: 62** (r152 added the audit family; previously 59): cascade (full 3-tranche waterfall, r141) ·
   housestyle (raw P&L -> desk standard; randomized input set + buried
   hardcode, r142) · modeltour (ctrl-jump find-and-fix, r144) · wk13 (13-week
   cash flow, RX flagship, r145). All house-bar verified (40-seed sweeps +
@@ -62,11 +62,15 @@ perks later). Branch auto-merge live per working agreement.
   curve consolidated to HK_RANK.levelOf (6 drifted copies) and softened
   (flat 600/level past L4) · +9 drip-rung achievements (catalog 56) · results
   card ends with "xp to next level · next medal p/goal" (buildAchCtx).
-- **NEXT (STRATEGY.md sequence)**: audit family + RX pack content round
-  (balance sweep, stale-link hunt, sign-error triage; liquidity bridge /
-  covenant table ideas) · then seasons design doc (doc only — build gated on
-  DAU). Pilot playbook (STRATEGY lens 4.2) is now unblocked: events + report
-  + programs all exist.
+- **r152 (content)**: AUDIT FAMILY EXPANSION shipped — balcheck (Tie-out:
+  pasted-zero check row + short range + equity plug) · stalelink (v1/v2
+  assumptions, three dead refs) · signerr (positive costs on a sum-through
+  P&L + margin sign-off). 62 DRILLS. 40-seed sweeps + WIN 3/3 + full
+  regression gated the merge.
+- **NEXT (STRATEGY.md sequence)**: RX pack content tranche (liquidity bridge,
+  covenant table — the deferred half of item 6) · then seasons design doc
+  (doc only — build gated on DAU). Pilot playbook (STRATEGY lens 4.2) is
+  unblocked: events + report + programs all exist.
 - **Working agreement (r-standing)**: AUTO-MERGE to main once a round's
   verification gate is green (Wolf 2026-07-13). Merge = deploy.
 - Cache v129. Test accounts + cleanup list: dev/SMOKE_REPORT.md.

@@ -3522,3 +3522,37 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   PASS (r150's hardcoded catalog-count assert updated for legitimate growth)
   · FULL 59-drill e2e ALL GREEN · mobile hub + mobile leaderboard
   screenshots eyeballed. CACHE v130 -> v131 (all 9 pages).
+
+---
+# ROUND 152 — AUDIT FAMILY EXPANSION: three new diagnostics ship (STRATEGY 3.1, Wolf: "run it")
+- The family thesis: "find what's broken under time pressure" is THE skill VPs
+  notice. Each new drill is a DIFFERENT failure class from audit/triage:
+- 'balcheck' (Tie-out, Formulas after triage): a balance sheet that doesn't
+  tie — and the check row was PASTED OVER WITH ZEROS to hide it. Resurrect
+  the check row live (=B8−B14, filled), read which years break, then run
+  down both culprits: one Total assets range starts a row short (the Cash
+  line fell out to a later insert) and one Equity cell is a typed plug where
+  the corkscrew belongs. Construction is honest: the L&E side is built
+  first, assets are sized so the sheet GENUINELY tied pre-defect — the fix
+  restores truth. 4 checks (live row / respan / corkscrew / dead-zero tie,
+  the tie gated on liveness so pasted zeros can't pre-pass). par 75/keys 27.
+- 'stalelink' (Stale Links): assumptions moved to v2; three build cells still
+  reference the DEAD v1 column — computes fine, confidently wrong. One stale
+  link per row (rev/cost/royalty), columns shuffled so the trio never
+  stacks; anchored $B$ refs are the fix. Contribution check judged against
+  stored v2 TRUTH (not displayed parity — which would pre-pass). par 70/27.
+- 'signerr' (Sign Sweep): three cost cells pasted in POSITIVE on a
+  negative-convention sum-through P&L — EBIT silently rich in exactly those
+  years. Flip the signs (type-to-replace), EBIT re-ties via recalc, then a
+  margin row (=B8/B4, fill, ctrl+shift+%) as the sign-off — formula + fill +
+  format chord keep the Mix Rule honest on a hunt drill. par 60/22.
+- VERIFY: 40-seed structural sweeps ALL CLEAN ×3 (zero pre-solved checks in
+  120 builds; defect invariants hold — plug col ≠ short col, assets always
+  positive, stale trio never stacks, flips always 3 distinct columns w/ EBIT
+  off in exactly 3 years; every demo finishes every check); house demo-replay
+  e2e WIN 3/3 ×3 on the FIRST run; FULL 62-drill regression ALL GREEN;
+  r148-r151 suites re-run ALL PASS; pars calibrated from measured optimal
+  paths (27/27/22 keys, min policy); drills.js catalog + PARS synced;
+  tabs screenshot-eyeballed (tie-out breaks in exactly 2 years, sign flips
+  read across distinct columns). Catalog: 62 drills.
+  CACHE v131 -> v132 (all 9 pages).
