@@ -93,6 +93,65 @@ const ALTS = [
       {sel:o.range, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
       {sel:o.range, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
     ]; }` },
+  // --- T-A tranche 2 additions (r170) ---
+  { key: 'lookup', name: 'the two-way INDEX form (block + double MATCH)', moves: `C => [
+      {sel:'G4', keys:[...T('=INDEX(B2:D8,MATCH(G2,A2:A8,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
+    ]` },
+  { key: 'lookup2', name: 'header-inclusive ranges (consistent off-by-one)', moves: `C => [
+      {sel:'G4', keys:[...T('=INDEX(B1:D6,MATCH(G2,A1:A6,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
+    ]` },
+  { key: 'percent', name: 'dollars typed by hand, block B first', moves: `C => { const R=C._R; return [
+      {sel:R.pc+R.r0, keys:[...T('='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0),{key:'Enter'}]},
+      {sel:R.pc+R.r0+':'+R.pc+R.rN, keys:[{key:'d',ctrl:true},{key:'%',ctrl:true,shift:true}]},
+      {sel:'C2', keys:[...T('=B2/$B$2'),{key:'Enter'}]},
+      {sel:'C2:C6', keys:[{key:'d',ctrl:true},{key:'%',ctrl:true,shift:true}]},
+    ]; }` },
+  { key: 'bridge', name: 'typed refs (no pointing) + ribbon fill right', moves: `C => [
+      {sel:'B4', keys:[...T('=B2*B3'),{key:'Enter'}]},
+      {sel:'B4:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+    ]` },
+  { key: 'autofit', name: 'second pair first', moves: `C => { const o=C._o; return [
+      {sel:o.b1+':'+o.b2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+      {sel:o.a1+':'+o.a2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+    ]; }` },
+  { key: 'saves', name: 'review cells in reverse order', moves: `C => C._sites.slice().reverse().map(s =>
+      ({sel:s, keys:[...T('done'),{key:'Enter'},{key:'s',ctrl:true}]})) ` },
+  { key: 'editfix', name: 'typos fixed in reverse order', moves: `C => C._sites.slice().reverse().map(s => {
+      let p=0; while(p<s.bad.length && p<s.good.length && s.bad[p]===s.good[p]) p++;
+      const keys=[{key:'F2'}];
+      for(let i=0;i<s.bad.length-p;i++) keys.push({key:'Backspace'});
+      keys.push(...T(s.good.slice(p)),{key:'Enter'});
+      return {sel:s.cell, keys};
+    }) ` },
+  { key: 'drill', name: 'values paste via the H V S dialog route', moves: `C => [
+      {sel:'B3:B8', keys:[{key:'c',ctrl:true}]},
+      {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
+      {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+    ]` },
+  { key: 'transpose', name: 'transpose via the H V S dialog route', moves: `C => { const o=C._o; return [
+      {sel:o.src, keys:[{key:'c',ctrl:true}]},
+      {sel:o.dst, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('e'),{key:'Enter'}]},
+    ]; }` },
+  { key: 'format', name: 'reversed order + ribbon percent (alt h p)', moves: `C => { const o=C._o; return [
+      {sel:o.com, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.cur, keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.pct, keys:[{key:'Alt'},L('h'),L('p')]},
+      {sel:o.pct.split(':')[1], keys:[{key:'Alt'},L('h'),D(0)]},
+    ]; }` },
+  { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
+      const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
+      const steps=C._sites.slice().reverse().flatMap(s=>[
+        {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'),{key:'Enter'}]},
+        {sel:s.col+s.ans, keys:[{key:'%',ctrl:true,shift:true}]},
+      ]);
+      steps.push({sel:w.col+w.ans, keys:[{key:'Alt'},L('h'),D(1)]});
+      return steps; }` },
+  { key: 'ribbon', name: 'jobs in reverse + ctrl+b for the bold job', moves: `C => { const o=C._o; return [
+      {sel:o.r, keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
+      {sel:o.c, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
+      {sel:o.k, keys:[{key:'Alt'},L('h'),L('k')]},
+      {sel:o.b, keys:[{key:'b',ctrl:true}]},
+    ]; }` },
 ];
 
 (async () => {

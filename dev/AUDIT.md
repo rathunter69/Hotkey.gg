@@ -4106,3 +4106,32 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - PROJECT_CONTEXT.md: doctrine arc + 4-harness gate recorded.
 - No shipped-asset changes this round (docs + dev harness only) — no
   cache bump. Replay/parity untouched; alt-paths ALL 14 PASS.
+
+---
+# ROUND 170 — T-A EXECUTED: enrichment tranche 2 (12 drills hand-graded)
+- METHOD: doctrine §5 — grade by hand, smallest upgrade that clears the
+  bar. Verdicts: percent/bridge/saves/lookup2/drill/transpose SOUND
+  (alt entries only); six took upgrades; two REAL BUGS found by reading:
+  - LOOKUP DEMO BUG: demo INDEX range ran 2:6 against a 7-row table
+    (MATCH over A2:A8) — out-of-range whenever the queried company sat
+    in the last two rows. Replay had been passing on seed luck. → 2:8.
+  - ENGINE BUG: classic ribbon MENUS advertises Alt H P (Percent) with
+    NO RUN handler — the walk dead-ended back to the tab strip. Added
+    RUN['HP'] (percent, 0 decimals). The format alt now exercises it.
+- UPGRADES:
+  - cagr: page title + a JUDGMENT beat — compute three CAGRs, then READ
+    them and bold only the winner (checks: winner bold, losers not).
+    Mix rule satisfied: formula + format + judgment. par 72→76.
+  - ribbon: 4th walk into the borders SUBMENU (alt h b b rules off a
+    block bottom) — teaches menu depth, not just single hops. par 42→48.
+  - format: codename title (spot pool shifted off row 1).
+  - editfix: typo pool 8→14 (amortization/goodwill/accrued/deferred/
+    recurring/working capital — real schedule vocabulary).
+  - autofit: dead rnd(0,0) → per-run name rotation.
+- ALT REGISTRY 14→26 entries, 25 drills covered: two-way INDEX form,
+  header-inclusive lookup2 ranges, typed-$ percent, typed-ref bridge +
+  ribbon fill, H V S dialog routes for drill/transpose, alt h p route,
+  reverse orders everywhere. ALL 26 PASS.
+- VERIFIED: replay 69/69, parity 37, onboard 20, visual 311, rank 20,
+  par sweep FLAGGED 0 (ribbon parKeys trued 18→14 measured).
+- CACHE v148 -> v149.
