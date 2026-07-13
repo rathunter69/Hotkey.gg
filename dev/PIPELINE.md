@@ -65,9 +65,10 @@ follows the doctrine.)*
 > **Alt H O H** (row height) as tiny keyboard-only numeric prompts, so sizing
 > drills can teach SETTING a width rather than autofit roulette; pair with a
 > 'set the print widths' beat in a future formatting drill.
-> DONE r177: Ctrl+1 / Alt O E Format Cells dialog (general/number/currency/
-> percent/multiple/date + footnote ¹ + center-across-selection). REMAINING
-> in canon order: Ctrl+9/Ctrl+0 hide row/col (+ unhide), Ctrl+Shift+L filter toggle on
+> DONE r177: Ctrl+1 / Alt O E Format Cells dialog. DONE r179: ROW GROUPING
+> (Shift+Alt+→/← + Alt A H/J, hidden-rows substrate, grpfold drill) — the
+> canon never-hide-always-group rule is live. REMAINING: Ctrl+Shift+L filter
+> (ride the same hidden-rows substrate; Alt+↓ value picker), Ctrl+9/0 hide (teach WITH the group-first caveat), filter toggle on
 > a header row (sort/filter integration), row grouping (Shift+Alt+→/←) with
 > collapse glyphs. Each lands with parity asserts; drills follow in a later
 > tranche (grouping alone unlocks a "clean up the inherited model" drill).

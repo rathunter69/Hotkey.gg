@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=156" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=156">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=156">
+<link rel="icon" href="favicon.ico?v=157" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=157">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=157">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -400,6 +400,7 @@
   .gd-row{font-family:var(--mono); font-size:11px; color:var(--muted); margin:3px 0}
   .gd-row b{color:var(--warn)} .gd-row span{color:var(--faint)}
   .gd-row kbd{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:10px}
+  .rowhdr.grp{box-shadow:inset 3px 0 0 var(--accent)}
   .rm-aha{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:10px; padding:9px 14px; margin:10px 0 4px; text-align:left; line-height:1.5}
   .rm-stats{display:flex; justify-content:center; gap:24px; margin:20px 0; font-family:var(--mono);
@@ -1125,14 +1126,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=156"></script>
-<link rel="stylesheet" href="nav.css?v=156">
-<script src="themes.js?v=156"></script>
+<script src="drills.js?v=157"></script>
+<link rel="stylesheet" href="nav.css?v=157">
+<script src="themes.js?v=157"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=156"></script>
+<script src="nav.js?v=157"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2342,6 +2343,62 @@ const CHALLENGES = {
         {label:'flag presence down C4:C10 — live COUNTIF against the finance list, no zeros left', ok: flagsOk},
         {label:'bring the missing deal into finance — name AND the book amount (D10:E10)', ok: missOk},
         {label:'drive the recon to ZERO — Δ live via INDEX/MATCH, every row reads 0 (F4:F10)', ok: diffOk},
+      ];
+    }
+  },
+  grpfold:{
+    name:'Group', label:'Fold the detail away', par:64, parKeys:12,
+    aha:'never hide rows — group them; the ⊞ tells the reader the detail still exists',
+    prompt:'The MD wants the SUMMARY view of this build — quarterly totals, not the monthly noise under them. The house rule is absolute: you never HIDE rows, you GROUP them (Shift+Alt+→), then fold the detail (Alt A H) so a ⊞ tells the next reader exactly where it lives. Three months under each quarter; group each block, fold each block, and the totals keep breathing.',
+    req(){ const o=this._o; return o.blocks.map((b,i)=>'<em>A'+b.r1+':A'+b.r2+'</em> → <em>shift+alt+→</em>').join(' · ')+' · then fold each: <em>alt a h</em> — subtotals stay on the page'; },
+    guide(){ const o=this._o; return [
+      'quarter one: select rows '+o.blocks[0].r1+'-'+o.blocks[0].r2+' (the months) · <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>→</kbd> groups them · <kbd>alt</kbd> <kbd>a</kbd> <kbd>h</kbd> folds the detail',
+      'same for the other two quarters — group the months, fold them; the Q-total rows never leave the page',
+      'the ⊞ on the row header is the point: detail exists, on request — hiding raw rows would bury it (alt a j reopens any fold)',
+    ]; },
+    targets(){ const o=this._o; return o.blocks.map(b=>'A'+b.r1+':B'+b.r2); },
+    demo(){ const o=this._o;
+      const steps=[];
+      o.blocks.forEach(b=>{
+        steps.push({sel:'A'+b.r1+':A'+b.r2, keys:[{key:'ArrowRight',alt:true,shift:true}]});
+        steps.push({sel:'A'+b.r1, keys:[Kb.alt,L('A'),L('H')]});
+      });
+      return steps; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — operating build (the MD wants the summary view)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Item',txt:true,bold:true};
+      cells['B2']={...blankCell(),value:'Amount ($000s)',txt:true,bold:true,align:'r'};
+      const y=24+rnd(0,2);
+      const MO=[['Jan','Feb','Mar'],['Apr','May','Jun'],['Jul','Aug','Sep']];
+      this._o={blocks:[]}; this._subs=[];
+      let r=3;
+      for(let q=0;q<3;q++){
+        const r1=r; let sum=0;
+        for(let m=0;m<3;m++){ const v=rnd(20,90)*10; sum+=v;
+          cells['A'+r]={...blankCell(),value:MO[q][m]+'-'+y,txt:true};
+          cells['B'+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          r++; }
+        cells['A'+r]={...blankCell(),value:'Q'+(q+1)+' total',txt:true,bold:true};
+        cells['B'+r]={...blankCell(),formula:'=SUM(B'+r1+':B'+(r-1)+')',value:sum,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        this._o.blocks.push({r1:r1, r2:r-1, sub:r, sum:sum});
+        this._subs.push(r);
+        r++;
+      }
+      cells['A'+(r+1)]={...blankCell(),value:'Memo: monthly detail available on request',txt:true};
+      return {ROWS:Math.max(14,r+2), cells, active:{r:3,c:1}, sel:null, colW:{1:150,2:110}};
+    },
+    checks(S){
+      const o=this._o;
+      const gs=S.rowGroups||[];
+      const covered=b=>gs.some(g=>g.r1===b.r1&&g.r2===b.r2);
+      const folded=b=>gs.some(g=>g.r1===b.r1&&g.r2===b.r2&&g.collapsed);
+      const subsOk=o.blocks.every(b=>{ const c=S.cells['B'+b.sub];
+        return !(S.hidden&&S.hidden.has(b.sub)) && !!(c&&c.formula&&/SUM/i.test(String(c.formula))&&Math.abs((c.value||0)-b.sum)<0.5); });
+      return [
+        {label:'group each quarter’s months — three groups, exactly the detail rows, shift+alt+→', ok: o.blocks.every(covered) && gs.length===3},
+        {label:'fold all three away — alt a h; the ⊞ marks where the detail lives', ok: o.blocks.every(folded)},
+        {label:'keep the subtotals ON the page — visible, and their SUMs still breathe', ok: subsOk},
       ];
     }
   },
@@ -6313,7 +6370,13 @@ function render(){
   for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${__ew[c]}px">${colLetter(c)}</th>`;
   head+='</tr>'; g.innerHTML+=head;
   for(let r=1;r<=S.ROWS;r++){
-    let row=`<tr><th class="rowhdr">${r}</th>`;
+    if(rowHidden(r)) continue;   // r179: collapsed group detail
+    let grpCls='', grpGlyph='';
+    if(S.rowGroups){ for(const g of S.rowGroups){
+      if(!g.collapsed && r>=g.r1 && r<=g.r2) grpCls=' grp';
+      if(g.collapsed && r===(function(){ let nr=g.r2+1; while(nr<=S.ROWS&&rowHidden(nr)) nr++; return nr; })()) grpGlyph='\u229e ';
+    } }
+    let row=`<tr><th class="rowhdr${grpCls}">${grpGlyph}${r}</th>`;
     for(let c=1;c<=COLS;c++){
       const cell=get(r,c);
       let cls=[]; if(cell.bold)cls.push('bold'); if(cell.txt&&!isNum(cell))cls.push('txt');
@@ -6486,7 +6549,7 @@ const MENUS = {
   'HFI':[['S','Series…'],['D','Down'],['R','Right']],
   'M':  [['U','Σ AutoSum']],
   'MU': [['S','Sum']],
-  'A':  [['S','Sort']],
+  'A':  [['S','Sort'],['H','Hide detail'],['J','Show detail']],
   'AS': [['A','Sort A→Z'],['D','Sort Z→A']],
   'E':  [['S','Paste special…']],
 };
@@ -7565,6 +7628,8 @@ function applyRibbon(key){
     }
     return exitRibbon(true);
   }
+  if(np==='AH'){ pushUndo(); setDetail(false); return exitRibbon(true); }
+  if(np==='AJ'){ pushUndo(); setDetail(true);  return exitRibbon(true); }
   if(np==='HOI'){ pushUndo(); autofitCols(); return exitRibbon(true); }
   if(np==='HOA'){ return exitRibbon(true); }
   if(np==='HUS'||np==='MUS'){ autoSum(); return exitRibbon(true); }   // proposes in editor; commit happens on Enter
@@ -7636,6 +7701,8 @@ function copySel(){
 /* ============================================================
    KEY HANDLING
    ============================================================ */
+function visStep(r,dr){ let nr=r+dr; while(nr>=1&&nr<=S.ROWS&&rowHidden(nr)) nr+=dr;
+  return (nr<1||nr>S.ROWS)? r : nr; }
 function move(dr,dc,shift,ctrl){
   // Excel quirk: when a multi-cell selection is active and you press a plain arrow key
   // (no Shift, no Ctrl), the first press just COLLAPSES the selection to the anchor cell
@@ -7649,8 +7716,12 @@ function move(dr,dc,shift,ctrl){
     return;
   }
   let nr,nc;
-  if(ctrl){ const j=ctrlJump(S.active.r,S.active.c,dr,dc); nr=j.r; nc=j.c; }
-  else { nr=Math.min(S.ROWS,Math.max(1,S.active.r+dr)); nc=Math.min(COLS,Math.max(1,S.active.c+dc)); }
+  if(ctrl){ const j=ctrlJump(S.active.r,S.active.c,dr,dc); nr=j.r; nc=j.c;
+    if(dr!==0 && rowHidden(nr)) nr=visStep(nr,dr>0?1:-1);   // r179: never land inside a collapsed group
+  }
+  else { nc=Math.min(COLS,Math.max(1,S.active.c+dc));
+    nr = dr!==0 ? visStep(S.active.r,dr) : S.active.r;      // r179: plain steps skip hidden rows
+  }
   if(shift){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; }
   else S.sel=null;
   S.active={r:nr,c:nc};
@@ -7696,6 +7767,41 @@ function jumpDependent(){
       S.sel=null; S.active={r:p.r,c:p.c};
       S.traceN=(S.traceN||0)+1;
       render(); return; } }
+}
+/* r179 ROW GROUPING — S.rowGroups = [{r1,r2,collapsed}]; hidden rows derive
+   from collapsed groups only (the canon rule: hiding is ALWAYS via a group).
+   Hidden rows still exist for every calculation — SUMs see them, fills skip
+   nothing; only display and navigation route around them. */
+function syncHidden(){
+  S.hidden = new Set();
+  (S.rowGroups||[]).forEach(g=>{ if(g.collapsed) for(let r=g.r1;r<=g.r2;r++) S.hidden.add(r); });
+}
+function rowHidden(r){ return !!(S.hidden && S.hidden.has(r)); }
+function groupRows(){
+  const r=selRange(); if(!S.rowGroups) S.rowGroups=[];
+  if(S.rowGroups.some(g=>g.r1===r.r1&&g.r2===r.r2)) return;
+  S.rowGroups.push({r1:r.r1, r2:r.r2, collapsed:false});
+  syncHidden();
+}
+function ungroupRows(){
+  const r=selRange(); if(!S.rowGroups) return;
+  const i=S.rowGroups.findIndex(g=>!(r.r2<g.r1||g.r2<r.r1));
+  if(i>=0){ S.rowGroups.splice(i,1); syncHidden(); }
+}
+function setDetail(show){
+  const r=selRange(); if(!S.rowGroups) return;
+  let hit=false;
+  S.rowGroups.forEach(g=>{ if(!(r.r2<g.r1||g.r2<r.r1)){ g.collapsed=!show; hit=true; } });
+  if(!hit && !show){ S.rowGroups.forEach(g=>g.collapsed=true); }   // Excel-ish: hide-detail with no group under the cursor folds all
+  if(!hit && show){
+    // Show Detail from the summary row NEXT TO a collapsed group (where the ⊞
+    // sits — the natural cursor position) expands that group.
+    S.rowGroups.forEach(g=>{ if(g.collapsed && (g.r2+1===r.r1 || g.r1-1===r.r2)) g.collapsed=false; });
+  }
+  syncHidden();
+  if(rowHidden(S.active.r)){ let nr=S.active.r; while(nr<=S.ROWS&&rowHidden(nr)) nr++;
+    if(nr>S.ROWS){ nr=S.active.r; while(nr>=1&&rowHidden(nr)) nr--; }
+    S.sel=null; S.active={r:Math.max(1,Math.min(S.ROWS,nr)), c:S.active.c}; }
 }
 function selectRow(){
   // Excel parity: Shift+Space extends the selection to full width WHILE preserving the row range.
@@ -8115,14 +8221,21 @@ document.addEventListener('keydown',e=>{
   }
 
   // ENTER ribbon
-  if(e.altKey && (k==='ArrowRight'||k==='ArrowLeft') && !editing && mode!=='ribbon'){
+  if(e.altKey && !e.shiftKey && (k==='ArrowRight'||k==='ArrowLeft') && !editing && mode!=='ribbon'){   // r179: Shift+Alt+arrows = grouping, below
     // r91 seamless loop: Alt+→/← hops drills without the picker (Alt+PgUp/Dn still walks groups)
     e.preventDefault();
     const i=MENU_ORDER.indexOf(cur), n=MENU_ORDER.length;
     loadChallenge(MENU_ORDER[(i+(k==='ArrowRight'?1:n-1))%n]);
     return;
   }
-  if(k==='Alt'){ e.preventDefault(); logKey('Alt'); enterRibbon(); return; }
+  if(e.altKey && e.shiftKey && (k==='ArrowRight'||k==='ArrowLeft')){
+    e.preventDefault(); startClock();
+    logKey(k==='ArrowRight'?'Shift+Alt+\u2192':'Shift+Alt+\u2190');
+    pushUndo(); if(k==='ArrowRight') groupRows(); else ungroupRows();
+    commitAction(); return;
+  }
+  if(k==='Alt'){ if(e.shiftKey) return;   // r179: Shift+Alt is the grouping chord's onramp, not the ribbon
+    e.preventDefault(); logKey('Alt'); enterRibbon(); return; }
   // r143: THE DEAD-CHORD BUG — this blanket alt-swallow sat ABOVE the ctrl block,
   // so every Ctrl+Alt chord (Macabacus AutoColor/cycles, FactSet AutoColor/FDS
   // fills, native Ctrl+Alt+V) died here silently since it shipped. Bare-Alt

@@ -4363,3 +4363,32 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   SUM; recon in scrambled order). parKeys from sweep: scrub 19, recon 81.
 - VERIFIED: replay 73/73, alts 36/36, parity 48, onboard 28, visual 311,
   rank 20, fit sweep 70 clean, par sweep 0 flagged. CACHE v155 -> v156.
+
+---
+# ROUND 179 — ROW GROUPING lands (T-E): never hide, always group (74 drills)
+- ENGINE — the hidden-rows substrate + grouping on top of it:
+  - S.rowGroups[{r1,r2,collapsed}]; hidden rows DERIVE from collapsed
+    groups only — the canon rule is structural: hiding happens through a
+    group or not at all. SUMs still see hidden rows; only display and
+    navigation route around them (visStep; ctrl-jumps never land inside
+    a fold; the cursor relocates when its row folds under it).
+  - Chords: Shift+Alt+→ groups the selected rows, Shift+Alt+← ungroups,
+    Alt A H hides detail, Alt A J shows it — including from the summary
+    row NEXT TO a collapsed group (where the ⊞ sits; Excel behavior).
+  - Two real bugs caught while wiring: the r91 Alt+arrow drill-hopper
+    swallowed Shift+Alt+→ (now shift-excluded), and Show Detail was a
+    no-op from the natural cursor position (adjacency expansion added).
+  - Visuals: grouped rows carry an accent rail on the row header; the
+    first visible row after a collapsed block shows ⊞.
+- NEW DRILL grpfold "Fold the detail away" (Data, 74 total): monthly
+  detail under three quarterly subtotals; the MD wants the summary view.
+  Group each month-block, fold each one — the Q-total rows stay on the
+  page and their SUMs keep breathing (hidden months still count).
+  Checks grade S.rowGroups directly: three exact-range groups, all
+  collapsed, subtotals visible + live. Alt: quarters in reverse plus
+  one fold REOPENED via Alt A J and refolded.
+- PARITY 48 -> 53 (section R: group/fold/route-around/reopen/ungroup).
+  ALTS 36 -> 37. parKeys 12 (measured). Filter (Ctrl+Shift+L) queued to
+  ride this same substrate next.
+- VERIFIED: replay 74/74, alts 37/37, parity 53, onboard 28, visual 311,
+  rank 20, fit sweep 71 clean, par sweep 0 flagged. CACHE v156 -> v157.

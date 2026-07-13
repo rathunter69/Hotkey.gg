@@ -269,6 +269,27 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(q1.ca === 4, 'ctrl+1 A centers ACROSS the selected span', q1.ca);
   ok(q1.clean, 'esc leaves the dialog cleanly');
 
+  console.log('R. row grouping substrate (r179)');
+  await fresh();
+  const r1 = await run(() => {
+    setDemoSel('A2:A3'); demoKey({key:'ArrowRight', alt:true, shift:true});
+    const grouped = S.rowGroups.length === 1 && S.rowGroups[0].r1 === 2 && S.rowGroups[0].r2 === 3;
+    setDemoSel('A2'); demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'h'});
+    const hidden = S.hidden.has(2) && S.hidden.has(3);
+    const relocated = S.active.r === 4;                    // cursor never strands on a hidden row
+    setDemoSel('A1'); demoKey({key:'ArrowDown'});
+    const skips = S.active.r === 4;                        // plain step routes around the fold
+    demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'j'});
+    const reopened = S.hidden.size === 0;                  // show-detail works from the summary row
+    setDemoSel('A2:A3'); demoKey({key:'ArrowLeft', alt:true, shift:true});
+    return { grouped, hidden, relocated, skips, reopened, ungrouped: S.rowGroups.length === 0 };
+  });
+  ok(r1.grouped, 'Shift+Alt+RIGHT groups the selected rows');
+  ok(r1.hidden && r1.relocated, 'Alt A H folds the group; cursor relocates', JSON.stringify(r1));
+  ok(r1.skips, 'plain arrows route around folded rows');
+  ok(r1.reopened, 'Alt A J from the summary row reopens the fold');
+  ok(r1.ungrouped, 'Shift+Alt+LEFT ungroups');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

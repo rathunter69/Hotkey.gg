@@ -26,7 +26,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Foundations', keys: ['navigation', 'modeltour', 'blocksel', 'ribbon', 'editfix', 'undo', 'filldr', 'pastes', 'rowops', 'colops', 'autofit', 'saves', 'copyover'] },
     { name: 'Formatting',  keys: ['housestyle', 'ruleoff', 'ruleaudit', 'polish', 'combo', 'format', 'decimals', 'dress', 'center', 'blue', 'gauntlet'] },
     { name: 'Values',      keys: ['drill', 'series', 'transpose'] },
-    { name: 'Data',        keys: ['sort', 'scrub', 'recon', 'lookup', 'lookup2'] },
+    { name: 'Data',        keys: ['sort', 'scrub', 'recon', 'grpfold', 'lookup', 'lookup2'] },
     { name: 'Formulas',    keys: ['margin', 'anchor', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'signerr', 'versionup', 'percent', 'cagr', 'sumif', 'cases'] },
     { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'cascade', 'wk13', 'liqbridge', 'covtable', 'txncomps', 'sourcesuses', 'accdil', 'dcfsens', 'retbridge', 'football'] },
     { name: 'Full Builds', keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'debtsched', 'threestmt'] },
@@ -91,6 +91,7 @@ window.HOTKEY_DRILLS = {
     sort:       { name:'Sort',     label:'Sort the league table',tab:'Sort',       desc:'Sort the league table, foot it, bold the total' },
     scrub:      { name:'Scrub',    label:'Clean the export',     tab:'Scrub',      desc:'Junk rows out, sort what\u2019s real, refoot the clean tape' },
     recon:      { name:'Recon',    label:'Two systems, one truth',tab:'Recon',     desc:'COUNTIF for presence, INDEX/MATCH for amounts \u2014 drive \u0394 to zero' },
+    grpfold:    { name:'Group',    label:'Fold the detail away', tab:'Group',      desc:'Shift+Alt+\u2192 groups the months \u2014 never hide, always group' },
 
     // Formulas
     margin:     { name:'Margins',  label:'Margins across the page', tab:'Margin',  desc:'EBITDA ÷ revenue, three comp tables — pointed, filled, %' },
@@ -189,7 +190,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":58,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":40,"transpose":30,"saves":44,"editfix":44,"undo":34,"autofit":34,"rowops":26,"filldr":40,"blocksel":52,"copyover":42,"polish":38,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"lookup2":60,"navigation":30,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"wrapfix":70,"scrub":66,"recon":96,"modeltour":42,"dress":104,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
+window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":58,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":40,"transpose":30,"saves":44,"editfix":44,"undo":34,"autofit":34,"rowops":26,"filldr":40,"blocksel":52,"copyover":42,"polish":38,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"lookup2":60,"navigation":30,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"modeltour":42,"dress":104,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

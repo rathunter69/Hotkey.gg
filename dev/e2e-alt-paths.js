@@ -165,6 +165,16 @@ const ALTS = [
       {sel:'C4', keys:[...T('=COUNTIF($D$4:$D$10,A4)'),{key:'Enter'}]},
       {sel:'C4:C10', keys:[{key:'d',ctrl:true}]},
     ]; }` },
+  { key: 'grpfold', name: 'quarters in REVERSE + one reopened and refolded (alt a j proof)', moves: `C => { const o=C._o;
+      const steps=[];
+      o.blocks.slice().reverse().forEach(b=>{
+        steps.push({sel:'A'+b.r1+':A'+b.r2, keys:[{key:'ArrowRight',alt:true,shift:true}]});
+        steps.push({sel:'A'+b.r1, keys:[{key:'Alt'},L('a'),L('h')]});
+      });
+      const b0=o.blocks[0];
+      steps.push({sel:'A'+b0.sub, keys:[{key:'Alt'},L('a'),L('j')]});   // reopen from the summary row
+      steps.push({sel:'A'+b0.r1, keys:[{key:'Alt'},L('a'),L('h')]});    // fold it back
+      return steps; }` },
   { key: 'center', name: 'title centered ACROSS first, via alt o e', moves: `C => { const o=C._o; return [
       {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
       {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
