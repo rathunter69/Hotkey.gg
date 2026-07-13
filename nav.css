@@ -214,8 +214,10 @@ body{padding-top:14px}
 
 /* ---- instant tooltips (native title has a ~1s OS delay) ---- */
 [data-tip]{position:relative}
-/* r70: inside the top nav, tips render BELOW the element — above the nav they clip past the viewport/bookmark bar */
-.nav [data-tip]:hover::after, header .mb-tool[data-tip]:hover::after{bottom:auto !important; top:calc(100% + 8px)}
+/* r70: inside the top nav, tips render BELOW the element — above the nav they clip past the viewport/bookmark bar.
+   r133: the rule targeted .nav but the markup is <nav class="topnav"> — it never matched, every injected
+   topnav tool tip (sound/profile/random/daily) clipped off-screen since r70. .topnav added. */
+.topnav [data-tip]:hover::after, .nav [data-tip]:hover::after, header .mb-tool[data-tip]:hover::after{bottom:auto !important; top:calc(100% + 8px)}
 [data-tip]:hover::after{content:attr(data-tip); position:absolute; bottom:calc(100% + 8px); left:50%;
   transform:translateX(-50%); background:var(--surface2); color:var(--text); border:1px solid var(--line);
   font-family:var(--mono); font-size:10.5px; line-height:1.5; padding:7px 11px; border-radius:8px;
@@ -280,4 +282,7 @@ body{padding-top:14px}
   margin-left:8px; vertical-align:3px}
 
 /* r113 (#32): level chip beside the user menu */
-.nav-lvl{display:inline-flex;align-items:center;margin-right:9px;cursor:pointer;vertical-align:middle}
+.nav-lvl{display:inline-flex;align-items:center;gap:7px;margin-right:9px;cursor:pointer;vertical-align:middle}
+/* r133: the keycap number alone was illegible at nav size — the label carries the read */
+.nav-lvl-t{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--text)}
+@media (max-width:740px){.nav-lvl-t{display:none}}

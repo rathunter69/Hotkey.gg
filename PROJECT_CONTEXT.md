@@ -14,10 +14,10 @@ hollow desk rate limit · claim-vs-domain-join deadlock) and re-verified
 `supabase db push` is STATEFUL — applied migrations never re-run; restore
 consumed seeds/fixtures by re-shipping the insert under a NEW timestamp
 (smoke-u fixture pattern, migration 20260713000000). STILL OPEN (Wolf):
-merge branch claude/hotkey-gg-continue-lvrf86 → main (DB current; main's
-workflow+docs stale) · rotate access token + DB password (pasted in chat) ·
-decide on the dashboard-side .edu-only signup gate (not in repo — locks out
-working professionals).
+rotate access token + DB password (pasted in chat — still open).
+.edu gate DECIDED r133 (incentive, not wall): gate-removal migration
+20260713100000 + signup-card carrot copy (auto-match school desk, student
+perks later). Branch auto-merge live per working agreement.
 
 ## SESSION HANDOVER SNAPSHOT (2026-07-12, rounds r100-r130)
 - **Where we are**: content deepening arc DONE (T2-T6, Mix Rule) · demo-replay e2e
@@ -56,7 +56,9 @@ IB associate, restructuring) is founder; Claude is sole developer.
 - Static HTML/JS, no framework/build step. Supabase backend (anon auth + invite gate).
 - Project ref: vshtftzrlepedydmkcnm · URL: https://vshtftzrlepedydmkcnm.supabase.co
 - Anon key (publishable, client-safe): sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT
-- Invite code: HAGS (unlimited). BETA_MODE=true.
+- Invite code: HAGS (unlimited). BETA_MODE=true. Signup open to all emails
+  (r133 — the dashboard-era .edu-only gate was removed by migration; .edu is
+  an INCENTIVE: auto school-desk match + future student perks).
 - **Git workflow (NEW):** repo github.com/rathunter69/Hotkey.gg (public), GitHub Pages
   via CNAME → www.hotkey.gg. Claude clones per session (no persistent access); Wolf
   pastes a fine-grained token (Contents: R/W, this repo only) when Claude should push.
