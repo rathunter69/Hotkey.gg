@@ -3273,3 +3273,30 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   matchers incl. native-off, guide notes per profile); full 57-drill e2e
   regression ALL GREEN post-fix (the paste-special reorder broke nothing).
   CACHE v124 -> v125.
+
+---
+# ROUND 144 — 'MODEL TOUR': navigation realism (Wolf's "nav needs more love")
+- NEW DRILL 'modeltour' (Foundations, after navigation): a DENSE operating
+  model tab (10 line items x 9 cols, fully populated so ctrl-jumps have real
+  edges) with FOUR #REF! marks scattered to far corners + one buried
+  mid-table (positions jitter per run). Jump, retype the number from the
+  note, land back at A1. Navigation efficiency enforced by the CLOCK
+  (freedom doctrine: par 42/keys 33 makes arrow-crawling unaffordable) +
+  one stateful finish check (active===A1, gated on all fixes so it can't
+  pre-pass). Dictated fix values are intentional — movement is the skill.
+- VERIFY: WIN 3/3 house e2e; 40-seed sweep (0 pre-solved, 0 site
+  collisions, marks always render).
+
+---
+# ROUND 145 — 'WK13': the 13-week cash flow ships (parked r141 spec, unparked)
+- NEW DRILL 'wk13' (Models, after cascade; 59 total): the RX staple — front
+  eight weeks of the 13-week. Net flow, beginning/ending CORKSCREW, cushion
+  vs minimum liquidity with an ANCHORED $B$12 (ref-checked so the anchor
+  can't walk), totals on FLOWS ONLY (J4:J6 via SUM + fill-down; ending cash
+  gets no total — "an ending balance total is how you spot a tourist").
+- HONEST ECONOMICS: cushion goes NEGATIVE in ~43% of week-cells across
+  seeds — the sheet shows the crunch, which is what a 13-week is FOR.
+- VERIFY: WIN 3/3 house e2e; 40-seed sweep (0 pre-solved; corkscrew,
+  beg+ncf=end identity, and flow totals hold every seed); FULL 59-drill
+  regression ALL GREEN. drills.js + PARS synced (par 92/keys 48).
+  CACHE v125 -> v126 (all 9 pages).
