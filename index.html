@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=155" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=155">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=155">
+<link rel="icon" href="favicon.ico?v=156" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=156">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=156">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1125,14 +1125,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=155"></script>
-<link rel="stylesheet" href="nav.css?v=155">
-<script src="themes.js?v=155"></script>
+<script src="drills.js?v=156"></script>
+<link rel="stylesheet" href="nav.css?v=156">
+<script src="themes.js?v=156"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=155"></script>
+<script src="nav.js?v=156"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2203,6 +2203,145 @@ const CHALLENGES = {
       return [
         {label:'Statement A common-sized \u2014 every row anchored on $B$2', ok: ok('C',2,5,this._L,'$B$2')},
         {label:'Statement B \u2014 anchored on ITS revenue, $'+R.vc+'$'+R.r0, ok: ok(R.pc,R.r0,R.n,this._Rexp,'$'+R.vc+'$'+R.r0)},
+      ];
+    }
+  },
+  scrub:{
+    name:'Scrub', label:'Clean the export', par:66, parKeys:19,
+    aha:'exports come in dirty — junk rows out, sort, refoot; the tape is yours again',
+    prompt:'The deal tape came out of the system DIRTY: a duplicated header row, a "--- PAGE 2 ---" break, and a stale SUBTOTAL row that will double-count the moment anyone foots the column. Scrub it — delete all three junk rows, sort what is real largest-first, and refoot the clean tape. Every export you will ever receive needs this pass.',
+    req(){ const o=this._o; return 'delete the 3 junk rows (<em>alt h d r</em> each) · select <em>'+o.range+'</em> · <em>alt a s d</em> · foot at <em>'+o.foot+'</em> → <em>alt+=</em> <em>↵</em> · <em>ctrl+b</em>'; },
+    guide(){ const o=this._o; return [
+      'hunt the junk top to bottom: the duplicate header, the page break, the SUBTOTAL trap — on each row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>',
+      'the tape is contiguous now: select '+o.range+' (cursor in the size column) · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> — largest first',
+      'refoot it: '+o.foot+' · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd> · <kbd>ctrl</kbd>+<kbd>b</kbd> — a SUBTOTAL row would have poisoned this SUM',
+    ]; },
+    targets(){ const o=this._o; return [o.range, o.foot]; },
+    demo(){ const o=this._o;
+      const steps=o.junkRows.slice().sort((a,b)=>b-a).map(r=>({sel:'A'+r, keys:[Kb.alt,L('H'),L('D'),L('R')]}));
+      steps.push({sel:o.range, keys:[Kb.alt,L('A'),L('S'),L('D')]});
+      steps.push({sel:o.foot, keys:[Kb.eq, Kb.enter]});
+      steps.push({sel:o.foot, keys:[Kb.bold]});
+      return steps; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — deal tape (system export, uncleaned)',txt:true,bold:true};
+      const hr=3;
+      cells['A'+hr]={...blankCell(),value:'Deal',txt:true,bold:true};
+      cells['B'+hr]={...blankCell(),value:'Size ($mm)',txt:true,bold:true,align:'r'};
+      const pool=['Falcon','Atlas','Copper','Summit','Ridge','Delta','Harbor','Juniper','Ironline'];
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const names=pool.slice(0,7);
+      const sizes=[]; while(sizes.length<7){ const v=rnd(5,95)*10; if(!sizes.includes(v)) sizes.push(v); }
+      // 10 slots below the header; 3 random ones carry the junk
+      const slots=[0,1,2,3,4,5,6,7,8,9];
+      for(let k=slots.length-1;k>0;k--){ const j=rnd(0,k); [slots[k],slots[j]]=[slots[j],slots[k]]; }
+      const junkAt=slots.slice(0,3).sort((a,b)=>a-b);
+      const JUNK=[
+        r=>{ cells['A'+r]={...blankCell(),value:'Deal',txt:true};   cells['B'+r]={...blankCell(),value:'Size ($mm)',txt:true}; },
+        r=>{ cells['A'+r]={...blankCell(),value:'--- PAGE 2 ---',txt:true}; },
+        r=>{ cells['A'+r]={...blankCell(),value:'SUBTOTAL',txt:true,bold:true}; cells['B'+r]={...blankCell(),value:rnd(100,400)*10,fmtStyle:'comma',decimals:0}; },
+      ];
+      let di=0, ji=0;
+      for(let s=0;s<10;s++){ const r=hr+1+s;
+        if(junkAt.includes(s)){ JUNK[ji++](r); }
+        else { cells['A'+r]={...blankCell(),value:names[di],txt:true};
+          cells['B'+r]={...blankCell(),value:sizes[di],fmtStyle:'comma',decimals:0,fontColor:'blue'}; di++; }
+      }
+      this._names=names.slice(); this._sizes=sizes.slice();
+      this._byName={}; names.forEach((n,i)=>this._byName[n]=sizes[i]);
+      this._o={ hr:hr, junkRows:junkAt.map(s=>hr+1+s),
+        range:'A'+(hr+1)+':B'+(hr+7), foot:'B'+(hr+8) };
+      return {ROWS:hr+11, cells, active:{r:hr+1,c:2}, sel:null, colW:{1:118}};
+    },
+    checks(S){
+      const o=this._o, hr=o.hr;
+      let junkGone=true, dealHdrs=0;
+      for(const k in S.cells){ const v=S.cells[k]&&S.cells[k].value;
+        if(v==='--- PAGE 2 ---'||v==='SUBTOTAL') junkGone=false;
+        if(v==='Deal') dealHdrs++; }
+      const want=this._sizes.slice().sort((a,b)=>b-a);
+      let sorted=true;
+      for(let i=0;i<7;i++){ const a=S.cells['A'+(hr+1+i)], b=S.cells['B'+(hr+1+i)];
+        if(!b||b.value!==want[i]) sorted=false;
+        else if(!a||this._byName[a.value]!==b.value) sorted=false; }
+      const f=S.cells[o.foot];
+      const tot=this._sizes.reduce((x,y)=>x+y,0);
+      return [
+        {label:'delete all three junk rows — the dup header, the page break, the SUBTOTAL trap', ok: junkGone && dealHdrs===1},
+        {label:'sort the seven real deals largest-first ('+o.range+')', ok: sorted},
+        {label:'refoot the clean tape — live SUM at '+o.foot+', bold', ok: !!(f&&f.formula&&/SUM/i.test(String(f.formula))&&Math.abs((f.value||0)-tot)<0.5&&f.bold)},
+      ];
+    }
+  },
+  recon:{
+    name:'Recon', label:'Two systems, one truth', par:96, parKeys:81,
+    aha:'recon is countif for presence, index/match for size — then drive every difference to zero',
+    prompt:'The trading system says seven deals; the finance extract says six — and one amount they DO share does not agree. This is reconciliation, the data job every first-year owns: flag presence with COUNTIF, pull the book amount with INDEX/MATCH, bring the missing deal across, and drive the difference column to zeros. Nothing ships while the recon shows a break.',
+    req(){ const o=this._o; return '<em>C4</em> → <em>=COUNTIF($D$4:$D$10,A4)</em> · fill C4:C10 · the 0-flag deal → add it at <em>D10:E10</em> · <em>F4</em> → <em>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</em> · fill F4:F10 · fix the broken amount — every Δ reads 0'; },
+    guide(){ const o=this._o; return [
+      'presence first: C4 · <kbd>=COUNTIF($D$4:$D$10,A4)</kbd> <kbd>↵</kbd> · select C4:C10 · <kbd>ctrl</kbd>+<kbd>d</kbd> — a 0 means finance never booked it',
+      'bring the missing deal across: type its name at D10, its amount from column B at E10',
+      'now the amounts: F4 · <kbd>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</kbd> <kbd>↵</kbd> · fill F4:F10 — INDEX/MATCH pulls the book number',
+      'one row shows a difference — retype its amount in column E from the system of record · every Δ must read 0',
+    ]; },
+    targets(){ const o=this._o; return ['C4:C10','D10:E10','F4:F10']; },
+    demo(){ const o=this._o; return [
+      {sel:'C4', keys:[...T('=COUNTIF($D$4:$D$10,A4)'), Kb.enter]},
+      {sel:'C4:C10', keys:[Kb.fillD]},
+      {sel:'D10', keys:[...T(o.missName), Kb.enter]},
+      {sel:'E10', keys:[...T(String(o.missAmt)), Kb.enter]},
+      {sel:'F4', keys:[...T('=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))'), Kb.enter]},
+      {sel:'F4:F10', keys:[Kb.fillD]},
+      {sel:'E'+o.badRow, keys:[...T(String(o.badTrue)), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — deal recon (trading vs finance)',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Deal (system)',txt:true,bold:true};
+      cells['B3']={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
+      cells['C3']={...blankCell(),value:'In fin?',txt:true,bold:true,align:'r'};
+      cells['D3']={...blankCell(),value:'Deal (finance)',txt:true,bold:true};
+      cells['E3']={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
+      cells['F3']={...blankCell(),value:'Δ vs book',txt:true,bold:true,align:'r'};
+      const pool=['Falcon','Atlas','Copper','Summit','Ridge','Delta','Harbor','Juniper'];
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const names=pool.slice(0,7);
+      const amts=names.map(()=>rnd(20,90)*10);
+      names.forEach((n,i)=>{
+        cells['A'+(4+i)]={...blankCell(),value:n,txt:true};
+        cells['B'+(4+i)]={...blankCell(),value:amts[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells['C'+(4+i)]={...blankCell(),decimals:0};
+      });
+      const mi=rnd(0,6);                                    // the deal finance never booked
+      const present=names.map((n,i)=>({n:n,a:amts[i]})).filter((_,i)=>i!==mi);
+      for(let k=present.length-1;k>0;k--){ const j=rnd(0,k); [present[k],present[j]]=[present[j],present[k]]; }
+      const bi=rnd(0,5);                                    // the amount finance fat-fingered
+      present.forEach((d,i)=>{ const r=4+i;
+        cells['D'+r]={...blankCell(),value:d.n,txt:true};
+        const wrong=(i===bi);
+        cells['E'+r]={...blankCell(),value:wrong? d.a+(rnd(0,1)?1:-1)*rnd(1,9)*10 : d.a,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells['F'+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+      });
+      cells['F10']={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._names=names; this._amts=amts;
+      this._o={ missName:names[mi], missAmt:amts[mi], badRow:4+bi, badTrue:present[bi].a };
+      return {ROWS:12, cells, active:{r:4,c:3}, sel:null, colW:{1:112,4:112}};
+    },
+    checks(S){
+      const o=this._o;
+      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?String(c.formula).toUpperCase():''; };
+      const v=k=>{ const c=S.cells[k]; return c?c.value:undefined; };
+      const flagsOk=[0,1,2,3,4,5,6].every(i=>{ const k='C'+(4+i);
+        return f(k).includes('COUNTIF(') && v(k)===1; });
+      let missOk=false;
+      for(let r=4;r<=10;r++){ if(v('D'+r)===o.missName && v('E'+r)===o.missAmt) missOk=true; }
+      const diffOk=[0,1,2,3,4,5,6].every(i=>{ const k='F'+(4+i);
+        return f(k).includes('INDEX(') && f(k).includes('MATCH(') && typeof v(k)==='number' && Math.abs(v(k))<0.5; });
+      return [
+        {label:'flag presence down C4:C10 — live COUNTIF against the finance list, no zeros left', ok: flagsOk},
+        {label:'bring the missing deal into finance — name AND the book amount (D10:E10)', ok: missOk},
+        {label:'drive the recon to ZERO — Δ live via INDEX/MATCH, every row reads 0 (F4:F10)', ok: diffOk},
       ];
     }
   },

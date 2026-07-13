@@ -149,6 +149,22 @@ const ALTS = [
       {sel:R.mRowRange, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
       {sel:R.fRange, keys:[{key:'Alt'},L('h'),L('k')]},
     ]; }` },
+  { key: 'scrub', name: 'junk deleted TOP-DOWN (shift math) + typed SUM', moves: `C => { const o=C._o;
+      const rows=o.junkRows.slice().sort((a,b)=>a-b);
+      const steps=rows.map((r,i)=>({sel:'A'+(r-i), keys:[{key:'Alt'},L('h'),L('d'),L('r')]}));
+      steps.push({sel:o.range, keys:[{key:'Alt'},L('a'),L('s'),L('d')]});
+      steps.push({sel:o.foot, keys:[...T('=SUM(B'+(o.hr+1)+':B'+(o.hr+7)+')'),{key:'Enter'}]});
+      steps.push({sel:o.foot, keys:[{key:'b',ctrl:true}]});
+      return steps; }` },
+  { key: 'recon', name: 'typo fixed FIRST, diff before flags', moves: `C => { const o=C._o; return [
+      {sel:'E'+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]},
+      {sel:'D10', keys:[...T(o.missName),{key:'Enter'}]},
+      {sel:'E10', keys:[...T(String(o.missAmt)),{key:'Enter'}]},
+      {sel:'F4', keys:[...T('=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))'),{key:'Enter'}]},
+      {sel:'F4:F10', keys:[{key:'d',ctrl:true}]},
+      {sel:'C4', keys:[...T('=COUNTIF($D$4:$D$10,A4)'),{key:'Enter'}]},
+      {sel:'C4:C10', keys:[{key:'d',ctrl:true}]},
+    ]; }` },
   { key: 'center', name: 'title centered ACROSS first, via alt o e', moves: `C => { const o=C._o; return [
       {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
       {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},

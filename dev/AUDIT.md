@@ -4335,3 +4335,31 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   PIPELINE T-E pruned (ctrl+1 done ahead of schedule).
 - VERIFIED: replay 71/71, alts 34/34, parity 48, onboard 28, visual 311,
   rank 20, par sweep 0 flagged, fit sweep clean. CACHE v154 -> v155.
+
+---
+# ROUND 178 — THE DATA MODULE GETS REAL (Wolf: "data drills not very built out")
+- DECISION (Wolf's question answered with structure): data VALIDATION is
+  skipped on purpose — dialog/mouse-heavy, not hotkey-central. But the
+  Data section was thin for a bad reason: the two hotkey-dense data jobs
+  every analyst actually owns were missing. Both built, ZERO engine work
+  (COUNTIF / INDEX+MATCH / row ops / sort / autosum already existed).
+- MODULE MERGE: Lookups (2 drills) folds INTO Data — lookups ARE data
+  work. Data = sort · scrub · recon · lookup · lookup2. Two stub groups
+  became one coherent 5-drill module. Campaign chapters untouched
+  (versioned); gates unaffected (Data/Lookups were never gated); sumif
+  deliberately STAYS in gated Formulas so the free tier doesn't widen.
+- NEW DRILLS (71 -> 73):
+  - scrub "Clean the export": the tape came out of the system dirty — a
+    duplicated header row, a '--- PAGE 2 ---' break, and a SUBTOTAL trap
+    that would double-count the foot. Delete all three (alt h d r),
+    sort what's real largest-first, refoot with alt+=. Junk positions
+    shuffle; checks scan the WHOLE sheet for surviving junk.
+  - recon "Two systems, one truth": trading shows 7 deals, finance
+    booked 6, and one shared amount disagrees. COUNTIF flags presence,
+    the missing deal comes across with its book amount, INDEX/MATCH
+    pulls the record amount into a Δ column, and nothing passes until
+    every Δ reads zero. The first-year's actual data job, graded.
+- ALTS 34 -> 36 (scrub top-down deletion with shift arithmetic + typed
+  SUM; recon in scrambled order). parKeys from sweep: scrub 19, recon 81.
+- VERIFIED: replay 73/73, alts 36/36, parity 48, onboard 28, visual 311,
+  rank 20, fit sweep 70 clean, par sweep 0 flagged. CACHE v155 -> v156.
