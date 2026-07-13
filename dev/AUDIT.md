@@ -3877,3 +3877,31 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFY (live, both paths): regular solve -> link only, no card; daily
   solve -> card + link. Syntax checks; full demo-replay ALL GREEN.
 - CACHE v140 -> v141 (all 9 pages).
+
+---
+# ROUND 163 — GHOST REPLAYS + 'RULING PASS' (66 drills)
+- GHOST REPLAYS SHIP (PRO pillar graduates from the roadmap): every
+  keystroke now also logs the ACTIVE CELL (keyCells beside keyLog/
+  keyTimes; server trace rows carry {k,t,c} going forward). When a PB
+  lands, the run's cursor path (consecutive-dupe-collapsed, capped 500)
+  is kept on-device (hk_ghost_<drill>); on the next run a warn-dashed
+  translucent GHOST CURSOR glides through the recorded path in real
+  time against the clock — race your own hands. Server traces recorded
+  post-r163 feed the ghost across devices for signed-in players. Gated
+  by isPro() (beta keeps it on); prefers-reduced-motion kills it; never
+  catches input (pointer-events none, z-order under selection).
+  VERIFIED LIVE: PB run recorded a 6-step path on ruleoff; the re-run
+  armed and the cursor glided through 4 distinct positions and settled.
+  Layer language stays clean: selection=accent, borders=ink, ghost=warn.
+- NEW DRILL ruleaudit ('The ruling pass', Formatting, par 45/keys 20):
+  the DIAGNOSIS twin of r161's Rule Off — the page arrives dressed and
+  "done", but 3 random conventions are knocked out (header rule, either
+  subtotal's line, answer-line rule/bold, headline box) and one EBITDA
+  figure was never pulled through (always; column moves). Checklist
+  names broken CONVENTIONS, the page reveals WHERE; intact conventions
+  pass at load (the audit-family read). All fixes are idempotent ops
+  (set-not-toggle walks; bold knockout is whole-row so ctrl+b is safe).
+  Freedom kept: end-state graded, any path counts.
+- VERIFY: ruleaudit demo-replay WIN across 4 seed batches; full catalog
+  ALL GREEN (66 drills); parity 37; visual 311; onboard 20.
+- CACHE v141 -> v142 (all 9 pages).

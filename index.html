@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=141" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=141">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=141">
+<link rel="icon" href="favicon.ico?v=142" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=142">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=142">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -153,6 +153,14 @@
   @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
   td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
   td.ttarget{outline:1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:-2px}
+  /* r163: GHOST CURSOR - your PB run gliding through its recorded path. Warn-dashed
+     so it reads apart from selection (accent) and ink borders; never catches input. */
+  #ghostCur{position:absolute; pointer-events:none; z-index:4; display:none;
+    border:2px dashed var(--warn); border-radius:3px; opacity:.5;
+    transition:left .13s linear, top .13s linear, width .13s, height .13s}
+  #ghostCur::after{content:'pb'; position:absolute; top:-15px; left:-2px;
+    font-family:var(--mono); font-size:9px; letter-spacing:.08em; color:var(--warn); opacity:.9}
+  @media (prefers-reduced-motion: reduce){ #ghostCur{display:none !important} }
   .taskline{display:none}   /* retired r49 — the sheet-skinned checklist carries the task; req text lives in the picker */
   .taskline em{font-style:normal; color:var(--accent); font-weight:700}
   .taskline .tl-dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:9px; vertical-align:1px}
@@ -1111,14 +1119,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=141"></script>
-<link rel="stylesheet" href="nav.css?v=141">
-<script src="themes.js?v=141"></script>
+<script src="drills.js?v=142"></script>
+<link rel="stylesheet" href="nav.css?v=142">
+<script src="themes.js?v=142"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=141"></script>
+<script src="nav.js?v=142"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1660,6 +1668,105 @@ const CHALLENGES = {
         {label:'headers ruled UNDER \u2014 B2:'+R.LC+'2', ok: cols.every(c2=>cell(c2+'2').bb)},
         {label:'a line ABOVE each subtotal \u2014 rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
         {label:'EBITDA pulled through \u2014 formulas, not typed numbers', ok: ebOk},
+        {label:'the answer line reads bold, ruled above', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
+        {label:'the headline at '+R.focus+' wears a box', ok: !!cell(R.focus).ball},
+      ];
+    }
+  },
+  ruleaudit:{
+    name:'Ruling Pass', label:'The ruling pass', par:45, parKeys:20,
+    prompt:'This schedule came back “done.” It isn’t. Somewhere on the page rulings are missing, the answer line lost its dress, or a figure was never pulled through — and WHAT’s broken moves every run. Run the pass: scan against the conventions, find what fails, fix only that. The checklist tells you WHICH conventions are broken — the page tells you where.',
+    req(){ return 'the house conventions — headers ruled UNDER (<em>alt h b b</em>) · a line ABOVE every total (<em>alt h b t</em>) · EBITDA pulled through as formulas, <em>ctrl+b</em>, ruled · headline boxed (<em>alt h b o</em>). Some hold, some don’t: fix what the checklist flags.'; },
+    guide(){ const R=this._R; const out=[];
+      if(R.defects.includes('hdr'))  out.push('the header rule is gone: B2:'+R.LC+'2 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd>');
+      if(R.defects.includes('sub1')) out.push('Total revenue lost its line: B'+R.sub1+':'+R.LC+R.sub1+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>');
+      if(R.defects.includes('sub2')) out.push('Total costs lost its line: B'+R.sub2+':'+R.LC+R.sub2+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>');
+      if(R.defects.includes('gbt'))  out.push('the answer line isn’t ruled: B'+R.g+':'+R.LC+R.g+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>');
+      if(R.defects.includes('gbold'))out.push('the answer line isn’t bold: B'+R.g+':'+R.LC+R.g+' · <kbd>ctrl</kbd>+<kbd>b</kbd>');
+      if(R.defects.includes('box'))  out.push('nobody boxed the headline: '+R.focus+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>');
+      out.push('and '+R.mcol+R.g+' was never pulled through: type <b>='+R.mcol+R.sub1+'+'+R.mcol+R.sub2+'</b> · <kbd>↵</kbd>');
+      return out; },
+    targets(){ const R=this._R; const t=[];
+      if(R.defects.includes('hdr'))  t.push('B2:'+R.LC+'2');
+      if(R.defects.includes('sub1')) t.push('B'+R.sub1+':'+R.LC+R.sub1);
+      if(R.defects.includes('sub2')) t.push('B'+R.sub2+':'+R.LC+R.sub2);
+      if(R.defects.includes('gbt')||R.defects.includes('gbold')) t.push('B'+R.g+':'+R.LC+R.g);
+      if(R.defects.includes('box'))  t.push(R.focus);
+      t.push(R.mcol+R.g);
+      return t; },
+    demo(){ const R=this._R;
+      const W=(a,b,c2)=>[{key:'Alt'},L(a),L(b),L(c2)];
+      const steps=[];
+      steps.push({sel:R.mcol+R.g, keys:T('='+R.mcol+R.sub1+'+'+R.mcol+R.sub2).concat([Kb.enter])});
+      if(R.defects.includes('hdr'))  steps.push({sel:'B2:'+R.LC+'2', keys:W('h','b','b')});
+      if(R.defects.includes('sub1')) steps.push({sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:W('h','b','t')});
+      if(R.defects.includes('sub2')) steps.push({sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:W('h','b','t')});
+      if(R.defects.includes('gbt'))  steps.push({sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','t')});
+      if(R.defects.includes('gbold'))steps.push({sel:'B'+R.g+':'+R.LC+R.g, keys:[Kb.bold]});
+      if(R.defects.includes('box'))  steps.push({sel:R.focus, keys:W('h','b','o')});
+      return steps; },
+    build(){
+      const cells={};
+      const NCOL=rnd(4,5);
+      const LC=colLetter(1+NCOL);
+      const y0=rnd(24,26);
+      cells['A1']={...blankCell(),value:codename()+' — segment build ($mm)',txt:true};
+      for(let i=0;i<NCOL;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,align:'r',bold:true};
+      const SEGS=['Industrial','Consumer','Services','Energy','Healthcare','Digital'];
+      const COSTS=['Compensation','Occupancy','Marketing','R&D','Logistics'];
+      const n1=rnd(2,3), n2=rnd(2,3);
+      const s1=3, sub1=s1+n1, s2=sub1+1, sub2=s2+n2, g=sub2+1;
+      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      const segPick=pick(SEGS,n1), costPick=pick(COSTS,n2);
+      for(let i=0;i<n1;i++) cells['A'+(s1+i)]={...blankCell(),value:segPick[i],txt:true};
+      cells['A'+sub1]={...blankCell(),value:'Total revenue',txt:true};
+      for(let i=0;i<n2;i++) cells['A'+(s2+i)]={...blankCell(),value:costPick[i],txt:true};
+      cells['A'+sub2]={...blankCell(),value:'Total costs',txt:true};
+      cells['A'+g]={...blankCell(),value:'EBITDA',txt:true};
+      const sums={};
+      for(let i=0;i<NCOL;i++){ const col=colLetter(i+2);
+        let rsum=0, csum=0;
+        for(let r=s1;r<sub1;r++){ const v=rnd(120,540); rsum+=v; cells[col+r]={...blankCell(),value:v}; }
+        cells[col+sub1]={...blankCell(),formula:'=SUM('+col+s1+':'+col+(sub1-1)+')', value:rsum};
+        for(let r=s2;r<sub2;r++){ const v=-rnd(40,180); csum+=v; cells[col+r]={...blankCell(),value:v}; }
+        cells[col+sub2]={...blankCell(),formula:'=SUM('+col+s2+':'+col+(sub2-1)+')', value:csum};
+        cells[col+g]={...blankCell(),formula:'='+col+sub1+'+'+col+sub2, value:rsum+csum, bold:true, bt:true};
+        sums[col]={rsum, csum};
+      }
+      const focus=colLetter(rnd(2,1+NCOL))+g;
+      // dress EVERYTHING to standard, then knock out the run's defects
+      for(let i=0;i<NCOL;i++){ cells[colLetter(i+2)+2].bb=true; cells[colLetter(i+2)+sub1].bt=true; cells[colLetter(i+2)+sub2].bt=true; }
+      cells[focus].ball=true;
+      const pool=['hdr','sub1','sub2','gbt','gbold','box'];
+      const defects=pick(pool, 3);
+      defects.forEach(d=>{
+        for(let i=0;i<NCOL;i++){ const col=colLetter(i+2);
+          if(d==='hdr')   cells[col+2].bb=false;
+          if(d==='sub1')  cells[col+sub1].bt=false;
+          if(d==='sub2')  cells[col+sub2].bt=false;
+          if(d==='gbt')   cells[col+g].bt=false;
+          if(d==='gbold') cells[col+g].bold=false;
+        }
+        if(d==='box') cells[focus].ball=false;
+      });
+      // one EBITDA figure was never pulled through (always) — the formula family
+      const mcol=colLetter(rnd(2,1+NCOL));
+      cells[mcol+g]={...blankCell(), bold:cells[mcol+g].bold, bt:cells[mcol+g].bt, ball:cells[mcol+g].ball};
+      this._R={NCOL, LC, sub1, sub2, g, focus, defects, mcol};
+      const colW={1:150}; for(let i=0;i<NCOL;i++) colW[i+2]=76;
+      return {ROWS:Math.max(12,g+2), cells, active:{r:1,c:1}, sel:null, colW};
+    },
+    checks(S){
+      const R=this._R;
+      const cols=[]; for(let i=0;i<R.NCOL;i++) cols.push(colLetter(i+2));
+      const cell=k=>S.cells[k]||{};
+      const ebOk = cols.every(c2=>{ const x=cell(c2+R.g);
+        const want=(cell(c2+R.sub1).value||0)+(cell(c2+R.sub2).value||0);
+        return x.formula && Math.abs((x.value||0)-want)<0.01; });
+      return [
+        {label:'headers ruled UNDER — B2:'+R.LC+'2', ok: cols.every(c2=>cell(c2+'2').bb)},
+        {label:'a line ABOVE each subtotal — rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
+        {label:'EBITDA pulled through — every year a formula', ok: ebOk},
         {label:'the answer line reads bold, ruled above', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
         {label:'the headline at '+R.focus+' wears a box', ok: !!cell(R.focus).ball},
       ];
@@ -5206,7 +5313,7 @@ let editMode='enter', editCaret=0;   // Excel distinction: F2 = Edit mode (arrow
 const MODEL_CODENAMES=['Project Falcon','Project Atlas','Northwind Industrial','Bluepeak Foods','Ironline Logistics','Cascade Materials','Halcyon Health','Redrock Energy','Project Copper','Summit Retail'];
 function codename(){ return MODEL_CODENAMES[rnd(0,MODEL_CODENAMES.length-1)]; }
 const OPERATOR_BOUNDARY = /[=+\-*/^(,]$/;
-let undoStack=[], redoStack=[], keyLog=[], keyTimes=[];
+let undoStack=[], redoStack=[], keyLog=[], keyTimes=[], keyCells=[];   // r163: cells feed the ghost cursor
 let gameMode='classic';   // 'classic' | 'marathon'
 let marathon=null;        // active marathon session state
 let lastKey=null;         // last drill key, to avoid back-to-back repeats in marathon
@@ -5797,7 +5904,17 @@ let ghostPB=null, ghostTrace=null;
    drill. Zero backend: the URL IS the challenge. by= is display-only (textContent /
    escHtml at every paint), t is clamped at parse so a crafted link can't render nonsense. */
 let race=null;
+let ghostSteps=null, ghostStepI=0;
+function ghostCurEl(){ let g=document.getElementById('ghostCur');
+  if(!g){ const gw=document.querySelector('.gridwrap'); if(!gw) return null;
+    g=document.createElement('div'); g.id='ghostCur'; gw.appendChild(g); }
+  return g; }
+function hideGhostCur(){ const g=document.getElementById('ghostCur'); if(g) g.style.display='none'; }
 function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null; ghostTrace=null;
+  // r163: cursor ghost - the PB run's recorded path (PRO pillar; beta keeps it on)
+  ghostSteps=null; ghostStepI=0; hideGhostCur();
+  try{ if(isPro()){ const raw=localStorage.getItem('hk_ghost_'+scoreKey());
+    if(raw){ const gj=JSON.parse(raw); if(gj&&Array.isArray(gj.steps)&&gj.steps.length>2) ghostSteps=gj.steps; } } }catch(e){}
   const el=$('ghostDelta'); if(el){ el.style.display=ghostPB?'inline':'none'; el.className='ghost'; el.textContent=ghostPB?('pb '+ghostPB.toFixed(2)):''; }
   const rEl=$('raceDelta'); if(rEl){ const on=!!(race && race.drill===cur);
     rEl.style.display=on?'inline':'none'; rEl.className='ghost';
@@ -5812,9 +5929,30 @@ function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null; gho
         const row=r.data&&r.data[0];
         if(row && Array.isArray(row.trace) && row.trace.length && typeof row.trace[0]==='object' && row.trace[0].t!=null){
           ghostTrace = row.trace.map(x=>x.t).sort((a,b)=>a-b);
+          // r163: post-r163 server traces carry cells - cursor ghost follows across devices
+          if(!ghostSteps && isPro()){ const st=[]; let last=null;
+            row.trace.forEach(x=>{ if(x.c&&x.c!==last&&st.length<500){ st.push({t:x.t, c:x.c}); last=x.c; } });
+            if(st.length>2){ ghostSteps=st; ghostStepI=0; } }
         } });
   } }
+function ghostCurTick(ms){
+  if(!ghostSteps || demoPlaying || done) return;
+  const g=ghostCurEl(); if(!g) return;
+  while(ghostStepI<ghostSteps.length && ghostSteps[ghostStepI].t<=ms) ghostStepI++;
+  if(ghostSteps[0].t>ms) return;                          // ghost hasn't moved yet
+  if(ghostStepI>=ghostSteps.length && ms>(ghostSteps[ghostSteps.length-1].t+1500)){ g.style.display='none'; return; }
+  const step=ghostSteps[Math.max(0,ghostStepI-1)];
+  const m2=String(step.c).match(/^([A-J])(\d+)$/); if(!m2) return;
+  const td=document.querySelector('td[data-r="'+m2[2]+'"][data-c="'+(m2[1].charCodeAt(0)-64)+'"]');
+  const gw=document.querySelector('.gridwrap');
+  if(!td||!gw){ g.style.display='none'; return; }
+  const tr=td.getBoundingClientRect(), wr=gw.getBoundingClientRect();
+  g.style.left=(tr.left-wr.left)+'px'; g.style.top=(tr.top-wr.top)+'px';
+  g.style.width=(tr.width-4)+'px'; g.style.height=(tr.height-4)+'px';
+  g.style.display='block';
+}
 function ghostTick(t){
+  ghostCurTick(t*1000);
   if(race && race.drill===cur){ const rEl=$('raceDelta'); if(rEl){ const rd=race.t-t;
     rEl.textContent=(rd>=0?'−':'+')+Math.abs(rd).toFixed(2)+' vs '+race.by;
     rEl.className='ghost '+(rd>=0?'ahead':'behind'); } }
@@ -5897,6 +6035,16 @@ function checkWin(){
   }catch(e){} }
   if(!mouseUsed && !guidedUsed){ const prev=PB[sk];
     if(prev===undefined||t<prev){ PB[sk]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s';
+      // r163: GHOST REPLAY — keep the PB run's cursor path on this device (consecutive
+      // duplicate cells collapse; capped). Next run, the ghost glides through it live.
+      try{
+        const steps=[]; let last=null;
+        for(let gi=0; gi<keyTimes.length && steps.length<500; gi++){
+          const cc=keyCells[gi]; if(!cc||cc===last) continue;
+          steps.push({t:keyTimes[gi], c:cc}); last=cc;
+        }
+        if(steps.length>2) localStorage.setItem('hk_ghost_'+sk, JSON.stringify({ms:Math.round(t*1000), steps}));
+      }catch(e){}
       try{ if(window.hkConfetti) window.hkConfetti($('result')); }catch(e){} } }
   updateStreak();
   try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
@@ -6599,7 +6747,9 @@ function updateFxHint(){
   el.innerHTML=fn+'( '+args.map((a,i2)=>i2===Math.min(argIdx,args.length-1)?'<b>'+a+'</b>':a).join(', ')+' )';
   el.classList.add('show');
 }
-function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0); playTick(); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); armIdle(); }
+function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0);
+  try{ keyCells.push((S&&S.active)?(colLetter(S.active.c)+S.active.r):''); }catch(e){ keyCells.push(''); }   // r163: ghost cursor path
+  playTick(); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); armIdle(); }
 /* r146: IDLE TIMEOUT — a run that goes 60s without a keystroke is dead (phone call,
    wandered off). Deal a fresh board instead of letting the clock rot; nothing posts. */
 let __idleT=null;
@@ -8888,7 +9038,7 @@ function loadChallenge(key, opts){
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; editPointerStart=-1;   // r106: never inherit a stale edit from the prior drill
-  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[]; keyTimes=[];
+  mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[]; keyTimes=[]; keyCells=[];
   updateGuideBtn();
   $('mouseBadge').style.display='none';
   $('timer').textContent='0.00'; $('timer').classList.remove('run');
@@ -9909,7 +10059,7 @@ async function recordRun(t){
       user_id: me_user.id, challenge: scoreKey(),
       time_ms: Math.round(t*1000), keystrokes: keyLog.length,
       optimal: CHALLENGES[cur].parKeys, mouse_used: false,
-      trace: keyLog.map((k,i)=>({k, t: keyTimes[i]||0}))   // timestamped — ghost-replay ready
+      trace: keyLog.map((k,i)=>({k, t: keyTimes[i]||0, c: keyCells[i]||undefined}))   // r163: +cell — the ghost cursor's path
     });
     return !error;
   }catch(e){ return false; }
