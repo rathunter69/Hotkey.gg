@@ -340,7 +340,9 @@
     const myRuns = runs.filter(x => x.user_id === me_id);
     let _chordFreq={}, _totKeys=0;
     try{
-      const tr=await window.sb.from('runs').select('trace,keystrokes').eq('user_id', meId)
+      /* r148: was `meId` — a ReferenceError the try/catch swallowed since r72, so the
+         chord-frequency fetch never ran and coach's notes always saw an empty map */
+      const tr=await window.sb.from('runs').select('trace,keystrokes').eq('user_id', me_id)
         .eq('mouse_used',false).order('created_at',{ascending:false}).limit(40);
       (tr.data||[]).forEach(row=>{ _totKeys+=(row.keystrokes||0);
         (Array.isArray(row.trace)?row.trace:[]).forEach(k=>{ const key=(k&&k.k)||k;
@@ -371,6 +373,67 @@
     while(xp >= floor+need){ floor+=need; lvl++; need=150*lvl; }
     return { lvl, into: xp-floor, need, pct: Math.min(100, Math.round(100*(xp-floor)/need)) }; }
 
+  /* r148: SHAREABLE RANK CARD — LinkedIn-dimensioned PNG (1200x627) drawn locally,
+     nothing uploaded. The tier emblem SVG rasterizes via data-URI; if that stalls or
+     fails, the card ships text-only — the download never gets held hostage. */
+  function makeRankCard(d, tier, handle, L){
+    try{
+      const cv=document.createElement('canvas'); cv.width=1200; cv.height=627;
+      const x=cv.getContext('2d');
+      const css=getComputedStyle(document.documentElement);
+      const col=v=>css.getPropertyValue(v).trim()||'#000';
+      const name=(handle && handle!=='set a name')?String(handle):'analyst';
+      x.fillStyle=col('--bg'); x.fillRect(0,0,1200,627);
+      x.fillStyle=col('--surface'); x.fillRect(32,32,1136,563);
+      x.strokeStyle=col('--accent'); x.lineWidth=2; x.strokeRect(32,32,1136,563);
+      x.fillStyle=col('--accent'); x.font='700 32px "JetBrains Mono", monospace';
+      x.fillText('hotkey.gg', 72, 104);
+      x.fillStyle=col('--muted'); x.font='500 20px "JetBrains Mono", monospace';
+      x.fillText('keyboard-only excel · no mouse allowed', 72, 138);
+      x.fillStyle=col('--text'); x.font='700 52px "Hanken Grotesk", sans-serif';
+      x.fillText(name.slice(0,20), 72, 226);
+      x.fillStyle=col('--warn'); x.font='700 38px "JetBrains Mono", monospace';
+      x.fillText(tier.name.toUpperCase(), 72, 288);
+      const standing=(d.attempted<5) ? (d.attempted+'/5 boards toward a rank')
+        : (d.avgPct===null?'':'top '+Math.max(1,Math.round(d.avgPct*100))+'% of the field');
+      x.fillStyle=col('--muted'); x.font='500 24px "JetBrains Mono", monospace';
+      if(standing) x.fillText(standing, 72, 330);
+      let crowns=0; d.drills.forEach(r=>{ if(r.rank===1) crowns++; });
+      x.fillStyle=col('--text'); x.font='700 25px "JetBrains Mono", monospace';
+      x.fillText('LEVEL '+L.lvl+'  ·  '+(d.mySolves||0)+' clean solves'+(crowns?('  ·  '+crowns+' crown'+(crowns===1?'':'s')):''), 72, 396);
+      const tops=d.drills.filter(r=>r.rank!==null && r.total>1)
+        .sort((a,b)=>(a.rank/a.total)-(b.rank/b.total)).slice(0,3);
+      x.font='500 21px "JetBrains Mono", monospace';
+      tops.forEach((r,i)=>{
+        x.fillStyle=col('--accent');
+        x.fillText('#'+r.rank+' of '+r.total, 72, 448+i*36);
+        x.fillStyle=col('--muted');
+        x.fillText('— '+String(r.label).slice(0,28)+' · '+(r.time/1000).toFixed(2)+'s', 250, 448+i*36);
+      });
+      x.fillStyle=col('--faint'); x.font='500 20px "JetBrains Mono", monospace';
+      x.fillText('think you’re faster? hotkey.gg', 790, 568);
+      let fired=false;
+      const finish=()=>{ if(fired) return; fired=true;
+        const a=document.createElement('a');
+        a.download='hotkey-rank-'+name.replace(/[^a-z0-9_-]/gi,'').slice(0,24)+'.png';
+        a.href=cv.toDataURL('image/png'); a.click(); };
+      try{
+        let svg=window.rankEmblem?window.rankEmblem(tier.name,300,tier.bucket):'';
+        // the emblem SVG ships for inline DOM use (no xmlns); as an Image document
+        // it MUST carry the namespace or the raster silently errors out
+        if(svg && !/xmlns=/.test(svg)) svg=svg.replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" ');
+        if(svg){
+          const img=new Image();
+          img.onload=()=>{ try{
+            const w=300, h=img.height&&img.width ? w*(img.height/img.width) : 300;
+            x.drawImage(img, 830, 150, w, h); }catch(e){} finish(); };
+          img.onerror=finish;
+          img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+          setTimeout(finish, 1200);   // raster stall can't block the download
+        } else finish();
+      }catch(e){ finish(); }
+    }catch(e){}
+  }
   function renderProfile(m, d){
     const tier = tierOf(d.avgPct, d.attempted, d.wsum);
     const fmtMs = ms => (ms/1000).toFixed(2) + 's';
@@ -567,10 +630,16 @@
         '</div>';
       })() +
       /* r70: drill-by-drill list retired from the card — stats page carries it */
+      /* r148: share row \u2014 the rank card is the proof artifact that leaves the product */
+      '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);text-align:center;margin:6px 0 2px">the card downloads as a PNG \u00b7 <a id="pcProThemes" style="color:var(--warn);cursor:pointer" data-tip="custom card themes land with PRO at launch">card themes \u2014 PRO</a></div>' +
       '</div>' +
-      '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcClose">close</a></div>' +
+      '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcShare">\u2b07 share your rank card</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;
+    const shr = $('pcShare'); if(shr) shr.onclick = ()=>{ try{ makeRankCard(d, tier, handle, __L); if(window.hkEvent) window.hkEvent('rankcard_share'); }catch(e){} };
+    const pt = $('pcProThemes'); if(pt) pt.onclick = ()=>{
+      if(window.openUpgrade) window.openUpgrade('Share-card themes');
+      else location.href='index.html?openUpgrade=1'; };
     const sn=$('pcSetName'); if(sn) sn.onclick=()=>{ closeProfile();
       if(window.promptHandle) window.promptHandle(); else location.href='index.html'; };
     m.addEventListener('click', e => { if(e.target === m) closeProfile(); }, { once: true });

@@ -3362,3 +3362,39 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   files, → unfolds, ← file→folder jump, ↵ loads + closes, zero errors);
   screenshot reviewed (the VDR read is exactly right); full 59-drill
   regression gating the merge. CACHE v127 -> v128.
+
+---
+# ROUND 148 — PROOF & GROWTH: the share surfaces round (STRATEGY item 4)
+- CHALLENGE LINKS: ?race=<drill>&t=<secs>&by=<name> arms a race target — landing
+  banner ("beat wolfy's 42.50s"), live HUD race chip riding ghostTick (works with
+  ZERO PB — the recipient may be brand new), a results verdict (race won / holder
+  keeps it), and a "copy challenge link" button on every clean solve. The URL IS
+  the challenge — no backend row anywhere, works logged out. by= is display-only
+  (escaped / textContent at every paint), t clamped 0.5–3600 at parse. A race
+  outranks last-drill resume; the welcome-back card stays down on race arrivals.
+- SHAREABLE RANK CARD: the player-card foot grows "share your rank card" — a
+  1200×627 (LinkedIn-dimensioned) PNG drawn locally, nothing uploaded: handle,
+  tier + crest, top-N% standing, level/solves/crowns, best-3 board placements.
+  ENGINE-TRUTH CATCH: rankEmblem's SVG ships namespace-less for inline DOM use;
+  as an Image document it silently errors — xmlns injected at raster time, and
+  a 1.2s timeout means a raster stall can never hold the download hostage.
+- PLACEMENT SHARE: the verdict line now fetches a NUMBER — percentile vs
+  distinct-user bests on the board (skipped under 5-player fields; a 3-person
+  field isn't a percentile) — plus a "share your verdict" card. makeShareCard
+  grew an optional sub line (footer row slides down to make room).
+- PRO PLACEHOLDER: "card themes — PRO" teaser on the player card →
+  openUpgrade('Share-card themes') on index; satellites deep-link via
+  ?openUpgrade=1 (handleDeepLink consumes it like openProfile/openAuth).
+- FOSSIL KILLED (nav.js): loadProfileData's chord-frequency fetch referenced
+  `meId` (undefined) since it shipped — the try/catch swallowed the
+  ReferenceError, so "most-used shortcuts" + coach's notes never saw live-trace
+  data. One-word fix: me_id.
+- Events added: race_open, race_result{win}, challenge_copy, placement_share,
+  rankcard_share.
+- VERIFY: 19-assert Playwright suite ALL PASS (race arm/banner/chip, by= XSS
+  escape + t clamp, out-of-range t stays inert, race-win verdict, clipboard URL
+  round-trip, N-advance regression on the new card, placement verdict + PNG
+  download, rank-card PNG download w/ crest, PRO modal); PNGs eyeballed (rank
+  card + share card read right); node --check all touched scripts; FULL
+  59-drill e2e regression ALL GREEN gating the merge.
+  CACHE v128 -> v129 (all 9 pages).

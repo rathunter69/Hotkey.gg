@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=128" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=128">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=128">
+<link rel="icon" href="favicon.ico?v=129" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=129">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=129">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1094,14 +1094,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=128"></script>
-<link rel="stylesheet" href="nav.css?v=128">
-<script src="themes.js?v=128"></script>
+<script src="drills.js?v=129"></script>
+<link rel="stylesheet" href="nav.css?v=129">
+<script src="themes.js?v=129"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=128"></script>
+<script src="nav.js?v=129"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1173,7 +1173,7 @@
         <div class="fbar" style="position:relative">
           <div id="fxHint" class="fx-hint"></div>
           <span class="namebox" id="nameBox">A1</span>
-          <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span>
+          <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span><span class="ghost" id="raceDelta" style="display:none"></span>
           <span class="fx"><i>fx</i></span>
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
@@ -5235,8 +5235,15 @@ function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').tex
 /* PB pace ghost: while you run, the gap to your own best counts down beside the clock.
    Green while you're ahead of the PB, red the instant it slips away. */
 let ghostPB=null, ghostTrace=null;
+/* r148: CHALLENGE LINKS — ?race=<drill>&t=<secs>&by=<name> arms a race target on that
+   drill. Zero backend: the URL IS the challenge. by= is display-only (textContent /
+   escHtml at every paint), t is clamped at parse so a crafted link can't render nonsense. */
+let race=null;
 function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null; ghostTrace=null;
   const el=$('ghostDelta'); if(el){ el.style.display=ghostPB?'inline':'none'; el.className='ghost'; el.textContent=ghostPB?('pb '+ghostPB.toFixed(2)):''; }
+  const rEl=$('raceDelta'); if(rEl){ const on=!!(race && race.drill===cur);
+    rEl.style.display=on?'inline':'none'; rEl.className='ghost';
+    rEl.textContent=on?('🏁 beat '+race.t.toFixed(2)):''; }
   // true ghost v1: pull the PB run's timestamped trace so the ghost's keystrokes
   // race yours in real time. Old traces (pre-timestamps) are label-only — skipped.
   if(sb && me_user && !isAnonUser()){
@@ -5249,7 +5256,11 @@ function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null; gho
           ghostTrace = row.trace.map(x=>x.t).sort((a,b)=>a-b);
         } });
   } }
-function ghostTick(t){ if(ghostPB==null) return; const el=$('ghostDelta'); if(!el) return;
+function ghostTick(t){
+  if(race && race.drill===cur){ const rEl=$('raceDelta'); if(rEl){ const rd=race.t-t;
+    rEl.textContent=(rd>=0?'−':'+')+Math.abs(rd).toFixed(2)+' vs '+race.by;
+    rEl.className='ghost '+(rd>=0?'ahead':'behind'); } }
+  if(ghostPB==null) return; const el=$('ghostDelta'); if(!el) return;
   const d=ghostPB-t;
   let keysBit='';
   if(ghostTrace){
@@ -5379,11 +5390,16 @@ function makeShareCard(o){
   x.fillText(o.t+'s', 64, 350);
   x.fillStyle=col('--muted'); x.font='500 24px "JetBrains Mono", monospace';
   x.fillText(o.keys+' keys · par '+o.par, 64, 400);
+  // r148: optional sub line (placement verdict / race result) sits where the rank
+  // chip did; the footer row slides down to make room.
+  const footY = o.sub ? 478 : 452;
+  if(o.sub){ x.fillStyle=col('--warn'); x.font='700 22px "JetBrains Mono", monospace';
+    x.fillText(String(o.sub).slice(0,68), 64, 440); }
   let rank=''; try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null'); if(c) rank=c.n; }catch(e){}
   if(rank){ x.fillStyle=col('--warn'); x.font='700 22px "JetBrains Mono", monospace';
-    x.fillText(rank.toUpperCase(), 64, 452); }
+    x.fillText(rank.toUpperCase(), 64, footY); }
   x.fillStyle=col('--faint'); x.font='500 18px "JetBrains Mono", monospace';
-  x.fillText('think you\u2019re faster? hotkey.gg', 620, 452);
+  x.fillText('think you\u2019re faster? hotkey.gg', 620, footY);
   const a=document.createElement('a');
   a.download='hotkey-'+cur+'-'+o.t+'s.png'; a.href=cv.toDataURL('image/png'); a.click();
 }
@@ -5483,10 +5499,30 @@ function _showResults(o){
     const card = m.querySelector('.pc-card, .res-card, div');
     if(placementMode){
       placementMode=false;
+      const verdict=placementVerdict(parseFloat(o.t), CHALLENGES[cur].par);
       const v=document.createElement('div');
       v.style.cssText='font-family:var(--mono);font-size:14px;color:var(--warn);margin:10px 0 2px;font-weight:700;letter-spacing:.4px';
-      v.textContent='\ud83c\udfaf placement: '+placementVerdict(parseFloat(o.t), CHALLENGES[cur].par);
+      v.textContent='\ud83c\udfaf placement: '+verdict;
       if(card) card.insertBefore(v, card.children[1]||null);
+      // r148: the verdict gets a NUMBER \u2014 percentile vs distinct-user bests on this
+      // board \u2014 plus a share card. Recruiting season wants something postable.
+      let sub='placement: '+verdict;
+      if(sb){ try{
+        sb.from('runs').select('user_id,time_ms').eq('challenge',cur).eq('mouse_used',false)
+          .then(r=>{ try{
+            const best={}; (r.data||[]).forEach(x2=>{ if(best[x2.user_id]===undefined||x2.time_ms<best[x2.user_id]) best[x2.user_id]=x2.time_ms; });
+            const times=Object.values(best); if(times.length<5) return;   // a 3-person field isn't a percentile
+            const tm=parseFloat(o.t)*1000;
+            const beat=times.filter(x2=>x2>tm).length;
+            const line=' \u2014 faster than '+Math.round(100*beat/times.length)+'% of '+times.length+' analysts';
+            v.textContent+=line; sub+=line;
+          }catch(e){} });
+      }catch(e){} }
+      const shp=document.createElement('button');
+      shp.className='ob-key'; shp.style.cssText='margin-top:8px;width:100%';
+      shp.textContent='\u2b07 share your verdict';
+      shp.onclick=()=>{ makeShareCard(Object.assign({}, o, {sub})); try{ ev('placement_share'); }catch(e){} };
+      if(card) card.insertBefore(shp, v.nextSibling);
     }
     if(weeklyMode && weeklyIdx+1<weeklyList.length){
       const nx=document.createElement('button');
@@ -5500,12 +5536,39 @@ function _showResults(o){
       fin.textContent='🏁 gauntlet complete — combined time is on the weekly board';
       if(card) card.appendChild(fin);
     }
+    if(race && race.drill===cur && !o.mouse && !o.guided){
+      // r148: race verdict \u2014 the whole point of arriving via a challenge link
+      const win=parseFloat(o.t)<race.t;
+      const rv=document.createElement('div');
+      rv.style.cssText='font-family:var(--mono);font-size:13.5px;margin-top:10px;font-weight:700;text-align:center;color:'+(win?'var(--accent)':'var(--warn)');
+      rv.textContent=win ? '\ud83c\udfc1 race won \u2014 '+race.by+'\u2019s '+race.t.toFixed(2)+'s is history'
+                         : '\ud83c\udfc1 '+race.by+' holds it \u2014 +'+(parseFloat(o.t)-race.t).toFixed(2)+'s to their '+race.t.toFixed(2)+'s';
+      if(card) card.appendChild(rv);
+      try{ ev('race_result',{d:cur, win:win?1:0}); }catch(e){}
+    }
     if(!o.mouse && !o.guided){
+      // r148: share row \u2014 the PNG card + a challenge link (the cheapest viral loop:
+      // the URL carries the race, no backend touches it)
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;gap:8px;margin-top:10px';
       const sh=document.createElement('button');
-      sh.className='ob-key'; sh.style.cssText='margin-top:10px;width:100%';
-      sh.textContent='\u2b07 download share card';
+      sh.className='ob-key'; sh.style.cssText='flex:1';
+      sh.textContent='\u2b07 share card';
       sh.onclick=()=>makeShareCard(o);
-      if(card) card.appendChild(sh);
+      const ch=document.createElement('button');
+      ch.className='ob-key'; ch.style.cssText='flex:1';
+      ch.textContent='\u2694 copy challenge link';
+      ch.onclick=()=>{
+        let h=''; try{ h=(localStorage.getItem('hk_handle_cache')||'').trim(); }catch(e){}
+        const u=location.origin+location.pathname.replace(/index\.html$/,'')
+          +'?race='+encodeURIComponent(cur)+'&t='+encodeURIComponent(o.t)
+          +(h?'&by='+encodeURIComponent(h.slice(0,24)):'');
+        const done2=()=>{ showToast('challenge link copied \u2014 they have to beat '+o.t+'s'); try{ ev('challenge_copy',{d:cur}); }catch(e){} };
+        try{ navigator.clipboard.writeText(u).then(done2, ()=>{ try{ window.prompt('your challenge link:', u); }catch(e){} }); }
+        catch(e){ try{ window.prompt('your challenge link:', u); }catch(e2){} }
+      };
+      row.appendChild(sh); row.appendChild(ch);
+      if(card) card.appendChild(row);
     }
     if(lastXpGain && lastXpGain.n>0){
       const xr=document.createElement('div');
@@ -8230,8 +8293,24 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   }
   try{ const qd=new URLSearchParams(location.search).get('drill');
     if(qd && CHALLENGES[qd]) startKey=qd; }catch(e){}
+  // r148: challenge link — the race target outranks last-drill resume.
+  try{ const p=new URLSearchParams(location.search);
+    const rd=p.get('race');
+    if(rd && CHALLENGES[rd]){
+      const rt=parseFloat(p.get('t'));
+      if(isFinite(rt) && rt>=0.5 && rt<=3600){
+        race={drill:rd, t:Math.round(rt*100)/100, by:String(p.get('by')||'an analyst').slice(0,24)};
+        startKey=rd;
+        try{ ev('race_open',{d:rd}); }catch(e){}
+      }
+    }
+  }catch(e){}
   loadChallenge(startKey);
-  if(onboarded) showWelcomeBack(startKey);
+  if(race && race.drill===startKey){
+    const r=$('result'); if(r){ r.className='result';
+      r.innerHTML='🏁 <b>beat '+escHtml(race.by)+'’s '+race.t.toFixed(2)+'s</b> — type to start the race'; }
+  }
+  if(onboarded && !race) showWelcomeBack(startKey);
   initAuth().then(()=>{ updateRankPill(); loadEntitlement(); });
 })();
 
@@ -8862,9 +8941,12 @@ function handleDeepLink(){
     }
     const authMode = p.get('openAuth');
     if(authMode === 'signin' || authMode === 'signup'){ openAuth(authMode); consumed = true; }
+    // r148: satellite pages (player card lives on all of them) deep-link the upgrade
+    // surface here — openUpgrade() itself only exists on this page.
+    if(p.get('openUpgrade') === '1'){ openUpgrade('Share-card themes'); consumed = true; }
     if(consumed){
       // Strip the consumed params so a page refresh doesn't reopen the modal.
-      p.delete('openProfile'); p.delete('openAuth');
+      p.delete('openProfile'); p.delete('openAuth'); p.delete('openUpgrade');
       const q = p.toString();
       history.replaceState({}, '', location.pathname + (q ? '?' + q : '') + location.hash);
     }
