@@ -4302,3 +4302,36 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   intuition: sizing drills should SET widths, not autofit-roulette).
 - VERIFIED: replay 71/71, alts 32/32, parity 43, onboard 28, visual 311,
   rank 20, fit sweep clean. CACHE v153 -> v154.
+
+---
+# ROUND 177 — THE FORMAT WARDROBE: Ctrl+1 dialog + de-indexing comma (Wolf)
+- WOLF'S CALL: comma formatting was over-indexed (desks cycle formats via
+  Macabacus/FactSet); the game was missing multiples, dates, superscript
+  footnotes, center-across — the formatting people actually reach Ctrl+1
+  for. All landed this round.
+- ENGINE — mini FORMAT CELLS dialog, keyboard-only, instant-apply:
+  Ctrl+1 opens it; so does legacy ALT O E (the pre-ribbon chord that
+  still works in real Excel — and Chrome reserves ctrl+digit for tab
+  switching, so the legacy route is the always-capturable browser path;
+  guides teach both). Letters: G general · N 1,234 · C $1,234 · P 12.3%
+  · X 8.2x · D Mmm-yy · F footnote ¹ · A center-across. New fmtStyles:
+  'mult' (x-suffix) and 'date' (Excel serial -> Mmm-yy). Footnote = a
+  real superscript ¹ toggled on text cells. CENTER ACROSS SELECTION:
+  cell.ca span rides the r107 text-spill renderer, centered — the
+  never-merge rule made keyboard-real.
+- DRILL FOLDS (existing drills, per Wolf — no new drills):
+  - format v3: two new rows — EV/EBITDA cast to 8.2x (ctrl+1 x) and a
+    raw serial cast to Mmm-yy (ctrl+1 d). par 42->58. aha rewritten:
+    "ctrl+1 is the whole format wardrobe."
+  - dress: the adjusted-margin label takes its footnote ¹ (ctrl+1 f).
+    par 97->104.
+  - center: the stranded title centers ACROSS the model (ctrl+1 a,
+    "merged cells are banned"). par 46->56. aha now carries the
+    numbers-right / headers-centered / center-across best practice.
+- PARITY 43 -> 48 (section Q: multiple, date, footnote, center-across,
+  esc-clean). ALTS 32 -> 34+2 rewrites (alt-o-e routes for all three).
+- DOCTRINE: format-emphasis note (comma = native baseline, not the
+  star); realism rules gain mult/date/ca/footnote conventions.
+  PIPELINE T-E pruned (ctrl+1 done ahead of schedule).
+- VERIFIED: replay 71/71, alts 34/34, parity 48, onboard 28, visual 311,
+  rank 20, par sweep 0 flagged, fit sweep clean. CACHE v154 -> v155.

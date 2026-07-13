@@ -56,8 +56,17 @@ first-year IB/consulting analyst:
   Exceptions: all-cost magnitude schedules (an opex detail table), flow
   rows explicitly labeled as paired gross flows (13-week receipts /
   disbursements), and %-of-revenue magnitude tables.
-- dollars 0 decimals, multiples 1, percents 1; blue
-  inputs / black formulas; rule totals (`bt`), never rainbow fills
+- dollars 0 decimals, multiples 1 ("8.2x", fmtStyle 'mult'), percents 1,
+  dates Mmm-yy off Excel serials (fmtStyle 'date'); blue inputs / black
+  formulas; rule totals (`bt`), never rainbow fills; long titles CENTER
+  ACROSS SELECTION (ctrl+1 A — cell.ca), never merged; footnote marks via
+  ctrl+1 F (superscript ¹ on the label)
+- **FORMAT EMPHASIS (Wolf, r177)**: comma (alt h k) was over-indexed — on
+  real desks plugins cycle number formats. Comma stays as the native
+  baseline, but new formatting beats should reach for the FULL wardrobe:
+  bold/colors/alignment discipline (numbers right, headers centered) and
+  Ctrl+1 (or legacy Alt O E — Chrome reserves ctrl+digit) for multiples,
+  dates, custom casts, footnotes
 - artifacts from the actual workflow: comps, roll-forwards, S&U, 13-week,
   tie-outs, league tables, sensitivity grids, deck hand-offs (values only!)
 - names from the house pools (codename() deals, Falcon/Atlas/Summit peers)

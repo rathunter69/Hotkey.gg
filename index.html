@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=154" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=154">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=154">
+<link rel="icon" href="favicon.ico?v=155" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=155">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=155">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1125,14 +1125,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=154"></script>
-<link rel="stylesheet" href="nav.css?v=154">
-<script src="themes.js?v=154"></script>
+<script src="drills.js?v=155"></script>
+<link rel="stylesheet" href="nav.css?v=155">
+<script src="themes.js?v=155"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=154"></script>
+<script src="nav.js?v=155"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1807,21 +1807,25 @@ const CHALLENGES = {
     }
   },
   format:{
-    name:'Format', label:'Fix the formats', par:42, parKeys:18,
-    aha:'comma, percent, decimals \u2014 an unformatted number is an unread number',
-    prompt:'These outputs came in raw \u2014 and they land somewhere new each run. Cast each number to its right type: margins as percentages, dollar figures as currency, the share count with commas \u2014 and trim every stray decimal.',
-    req(){ const o=this._o; return '<em>'+o.pct+'</em> \u2192 <em>ctrl+shift+%</em> (+1 decimal on the second) \u00b7 <em>'+o.cur+'</em> \u2192 <em>ctrl+shift+$</em>, drop decimals \u00b7 <em>'+o.com+'</em> \u2192 <em>ctrl+shift+!</em>, drop decimals'; },
+    name:'Format', label:'Fix the formats', par:58, parKeys:24,
+    aha:'ctrl+1 is the whole format wardrobe \u2014 percents, dollars, multiples, dates, one dialog',
+    prompt:'These outputs came in raw \u2014 and they land somewhere new each run. Cast each number to its right type: margins as percentages, dollars as currency, the share count with commas, the multiple as 8.2x and the report date as Mmm-yy \u2014 the last two live in Ctrl+1 (or the old-school Alt O E), the dialog every desk formats through.',
+    req(){ const o=this._o; return '<em>'+o.pct+'</em> \u2192 <em>ctrl+shift+%</em> (+1 dec on the second) \u00b7 <em>'+o.cur+'</em> \u2192 <em>ctrl+shift+$</em> \u2212 decimals \u00b7 <em>'+o.com+'</em> \u2192 <em>ctrl+shift+!</em> \u2212 decimals \u00b7 <em>'+o.mult+'</em> \u2192 <em>ctrl+1</em> <em>x</em> \u00b7 <em>'+o.date+'</em> \u2192 <em>ctrl+1</em> <em>d</em>'; },
     guide(){ const o=this._o; return [
       'the margins at '+o.pct+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 one decimal on the EBITDA margin: <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>',
       'dollar rows at '+o.cur+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
       'share count at '+o.com+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>!</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
+      'the multiple at '+o.mult+' \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>x</kbd> \u2014 8.2x, one decimal (browser eats ctrl+1? <kbd>alt</kbd> <kbd>o</kbd> <kbd>e</kbd> is the same dialog)',
+      'the report date at '+o.date+' \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>d</kbd> \u2014 the serial becomes Mmm-yy',
     ]; },
-    targets(){ const o=this._o; return [o.pct,o.cur,o.com]; },
+    targets(){ const o=this._o; return [o.pct,o.cur,o.com,o.mult,o.date]; },
     demo(){ const o=this._o; return [
       {sel:o.pct, keys:[Kb.pct]},
       {sel:o.pct.split(':')[1], keys:[Kb.alt,L('H'),D(0)]},
       {sel:o.cur, keys:[Kb.cur,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
       {sel:o.com, keys:[Kb.com,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:o.mult, keys:[{key:'1',ctrl:true},L('X')]},
+      {sel:o.date, keys:[{key:'1',ctrl:true},L('D')]},
     ]; },
     build(){
       const cells={};
@@ -1832,14 +1836,14 @@ const CHALLENGES = {
       cells[LC+r0]={...blankCell(),value:'Metric',txt:true,bold:true};
       cells[VC+r0]={...blankCell(),value:'Value',txt:true,bold:true,align:'r'};
       const gross=rnd(36,55)/100, ebitda=rnd(150,290)/1000;
-      const rows=[['Gross margin',gross],['EBITDA margin',ebitda],['Revenue ($mm)',rnd(38,72)*10],['EBITDA ($mm)',rnd(9,28)*10],['Shares out. (000s)',rnd(40,300)*100]];   // r176: fits at 78px raw AND cast
+      const rows=[['Gross margin',gross],['EBITDA margin',ebitda],['Revenue ($mm)',rnd(38,72)*10],['EBITDA ($mm)',rnd(9,28)*10],['Shares out. (000s)',rnd(40,300)*100],['EV / EBITDA',rnd(55,140)/10],['Report date',45930+rnd(90,800)]];   // r176 fits · r177 multiple + date (serial)
       rows.forEach(([n,v],i)=>{
         cells[LC+(r0+1+i)]={...blankCell(),value:n,txt:true};
         cells[VC+(r0+1+i)]={...blankCell(),value:v,decimals:3,fontColor:'blue'};   // r176: raw look, still fits
       });
       this._o={ pct:VC+(r0+1)+':'+VC+(r0+2), cur:VC+(r0+3)+':'+VC+(r0+4), com:VC+(r0+5),
-        vc:VC, r0:r0 };
-      return {ROWS:Math.max(9,r0+6), cells, active:{r:r0+1,c:sp.c+1}, sel:null, colW:{}};
+        mult:VC+(r0+6), date:VC+(r0+7), vc:VC, r0:r0 };
+      return {ROWS:Math.max(9,r0+8), cells, active:{r:r0+1,c:sp.c+1}, sel:null, colW:{}};
     },
     checks(S){
       const o=this._o, r0=o.r0, g=r=>S.cells[o.vc+r]||{};
@@ -1850,6 +1854,10 @@ const CHALLENGES = {
           ok: ['currency'].includes(g(r0+3).fmtStyle) && g(r0+4).fmtStyle==='currency' && (g(r0+3).decimals|0)===0 && (g(r0+4).decimals|0)===0},
         {label:'comma-separate the share count \u2014 whole number ('+o.com+')',
           ok: g(r0+5).fmtStyle==='comma' && (g(r0+5).decimals|0)===0},
+        {label:'cast the multiple as 8.2x \u2014 ctrl+1, one decimal ('+o.mult+')',
+          ok: g(r0+6).fmtStyle==='mult' && (g(r0+6).decimals|0)===1},
+        {label:'cast the report date as Mmm-yy \u2014 ctrl+1 turns the serial into a date ('+o.date+')',
+          ok: g(r0+7).fmtStyle==='date'},
       ];
     }
   },
@@ -1917,23 +1925,25 @@ const CHALLENGES = {
     }
   },
   dress:{
-    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:97, parKeys:21,
+    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:104, parKeys:23,
     aha:'a full dress pass is chords end to end \u2014 the tab should read like a printed page',
     prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, inputs in blue, margins as clean percents, dollars with commas. Four different formatting muscles, one pass, and the sites move every run.',
-    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em>'; },
+    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 footnote the margin label <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>f</em>'; },
     guide:[
       'A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 the title carries the rule',
       'select the input block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means typed, black means computed',
       'select the margins row \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> \u2014 one decimal',
       'select the dollar figures \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 commas, zero decimals',
+      'the margin is adjusted \u2014 it needs its footnote: on A-of-the-margin-row \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>f</kbd> marks it \u00b9',
     ],
-    targets:[function(){return 'A1';}, function(){return this._R.inpRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}],
+    targets:[function(){return 'A1';}, function(){return this._R.inpRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}, function(){return 'A'+this._R.mRow;}],
     demo(){ const R=this._R;
       return [
         {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('o')]},
         {sel:R.inpRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
         {sel:R.mRowRange, keys:[Kb.pct, {key:'Alt'}, L('h'), D(0)]},
         {sel:R.fRange, keys:[{key:'Alt'}, L('h'), L('k')]},
+        {sel:'A'+R.mRow, keys:[{key:'1',ctrl:true}, L('F')]},
       ]; },
     build(){
       const cells={};
@@ -1973,6 +1983,8 @@ const CHALLENGES = {
         {label:'Paint every typed input BLUE ('+R.inpRange+') \u2014 blue means hardcode', ok:blueOk},
         {label:'Margins read as percents, ONE decimal (row '+R.mRow+')', ok:pctOk},
         {label:'Comma-format the dollar figures ('+R.fRange+')', ok:comOk},
+        {label:'footnote the margin label \u2014 ctrl+1, f adds the \u00b9 (A'+R.mRow+')',
+          ok: (()=>{ const l=S.cells['A'+R.mRow]; return !!(l&&String(l.value).endsWith('\u00b9')); })()},
       ];
     }
   },
@@ -3000,22 +3012,24 @@ const CHALLENGES = {
     }
   },
   center:{
-    name:'Center', label:'Set the alignment', par:46, parKeys:13,
-    aha:'alignment is a ribbon walk \u2014 alt h a c seats the label over its column',
+    name:'Center', label:'Set the alignment', par:56, parKeys:16,
+    aha:'right-align numbers, center headers \u2014 and long titles center ACROSS, never merged',
     prompt:'A pipeline summary pasted in with its alignment scrambled: quarter headers slumped left, deal names floating centered, the total row sitting left like a label. House rule — headers centered over their columns, labels pinned left, numbers and their totals right. And a total row reads BOLD or it isn’t a total. Geometry moves every run.',
-    req(){ const o=this._o; return 'quarter headers <em>'+o.hdr+'</em> → <em>alt h a c</em> · deal names <em>'+o.lab+'</em> → <em>alt h a l</em> · total row <em>'+o.tot+'</em> → <em>alt h a r</em> + <em>ctrl+b</em>'; },
+    req(){ const o=this._o; return 'quarter headers <em>'+o.hdr+'</em> → <em>alt h a c</em> · deal names <em>'+o.lab+'</em> → <em>alt h a l</em> · total row <em>'+o.tot+'</em> → <em>alt h a r</em> + <em>ctrl+b</em> · title <em>A1:'+o.lc+'1</em> → <em>ctrl+1</em> <em>a</em> — centered ACROSS, never merged'; },
     guide(){ const o=this._o; return [
       'quarter headers first: '+o.hdr+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> — centered over their columns',
       'deal names pinned left: '+o.lab+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd>',
       'the total row: '+o.tot+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> — numbers never sit left',
       'and a total reads BOLD: selection holds · <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      'the title is stranded in column A — select A1:'+o.lc+'1 · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>a</kbd> — center ACROSS the model, no merged cells ever',
     ]; },
-    targets(){ const o=this._o; return [o.hdr,o.lab,o.tot,o.tot]; },
+    targets(){ const o=this._o; return [o.hdr,o.lab,o.tot,o.tot,'A1:'+o.lc+'1']; },
     demo(){ const o=this._o; return [
       {sel:o.hdr, keys:[Kb.alt,L('H'),L('A'),L('C')]},
       {sel:o.lab, keys:[Kb.alt,L('H'),L('A'),L('L')]},
       {sel:o.tot, keys:[Kb.alt,L('H'),L('A'),L('R')]},
       {sel:o.tot, keys:[Kb.bold]},
+      {sel:'A1:'+o.lc+'1', keys:[{key:'1',ctrl:true},L('A')]},
     ]; },
     build(){
       const cells={};
@@ -3039,7 +3053,7 @@ const CHALLENGES = {
       cells['A'+rt]={...blankCell(),value:'Total',txt:true,align:'c'};
       for(let q=0;q<nq;q++){ const col=colLetter(2+q);
         cells[col+rt]={...blankCell(),formula:'=SUM('+col+r1+':'+col+(rt-1)+')',value:colSums[q],fmtStyle:'comma',decimals:0,align:'l'}; }   // a total, sitting left
-      const o={ hdr:'B'+hr+':'+LC+hr, lab:'A'+r1+':A'+(rt-1), tot:'A'+rt+':'+LC+rt, hr, r1, rt, nq };
+      const o={ hdr:'B'+hr+':'+LC+hr, lab:'A'+r1+':A'+(rt-1), tot:'A'+rt+':'+LC+rt, hr, r1, rt, nq, lc:LC };
       this._o=o;
       return {ROWS:Math.max(10,rt+2), cells, active:{r:1,c:1}, sel:null};
     },
@@ -3052,6 +3066,8 @@ const CHALLENGES = {
         {label:'deal names pinned LEFT', ok: Array.from({length:o.rt-o.r1},(_,k)=>o.r1+k).every(r=>cell('A'+r).align==='l')},
         {label:'the total row sits RIGHT — numbers never sit left', ok: cell('A'+o.rt).align==='r' && cols.every(c=>cell(c+o.rt).align==='r')},
         {label:'and a total reads BOLD', ok: cols.every(c=>cell(c+o.rt).bold) && !!cell('A'+o.rt).bold},
+        {label:'center the title ACROSS the model \u2014 ctrl+1, a; merged cells are banned (A1)',
+          ok: (cell('A1').ca|0) >= o.nq+1},
       ];
     }
   },
@@ -5866,6 +5882,10 @@ function fmtNum(n,style,dec){
   if(style==='comma') return Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
   if(style==='currency') return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
   if(style==='percent') return Number(n*100).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'%';
+  if(style==='mult') return Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'x';
+  if(style==='date'){ /* value = Excel serial (days since 1899-12-30); shown Mmm-yy, the deck standard */
+    const d=new Date(Date.UTC(1899,11,30)+Number(n)*86400000);
+    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()]+'-'+String(d.getUTCFullYear()).slice(2); }
   /* r176 GENERAL format, Excel-like: never show binary float noise
      (1152.2999999999997) — and if a build set decimals without a style,
      honor them. Raw quotients stay short instead of 17 characters wide. */
@@ -6177,6 +6197,13 @@ function render(){
           ? buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '<span class="edcaret">\u258f</span>' + buildFormulaHTML(editBuf.slice(editCaret), refs)
           : buildFormulaHTML(editBuf, refs) + '▏';
       }
+      else if(cell.txt && (cell.ca|0)>1 && typeof cell.value==='string'){
+        /* r177 CENTER ACROSS SELECTION — the anchor's text centers over its
+           stored span; no merged cells, exactly the desk rule. */
+        let caw=0; for(let k2=0;k2<cell.ca && c+k2<=COLS;k2++) caw+=__ew[c+k2];
+        cls.push('spill');
+        txt='<span class="sp" style="width:'+(caw-12)+'px;max-width:'+(caw-12)+'px;text-align:center;display:inline-block">'+txt+'</span>';
+      }
       else if(cell.txt && !cell.wrap && typeof cell.value==='string'){
         // r107: EXCEL PARITY — long text SPILLS across empty right neighbors, clipping
         // at the first occupied cell (titles/labels stop getting amputated mid-word).
@@ -6324,6 +6351,14 @@ const MENUS = {
   'AS': [['A','Sort A→Z'],['D','Sort Z→A']],
   'E':  [['S','Paste special…']],
 };
+/* r177 FORMAT CELLS (Ctrl+1 / legacy Alt O E) — the desk set. Letters apply
+   INSTANTLY (this is a speed trainer): number formats via eachSel; F toggles a
+   footnote superscript mark on text cells; A centers the anchor cell ACROSS
+   the selected span (the never-merge rule made keyboard-real). */
+const FMT_OPTS = [
+  ['G','General'],['N','1,234'],['C','$1,234'],['P','12.3%'],
+  ['X','8.2x'],['D','Mar-26'],['F','footnote \u00b9'],['A','center across'],
+];
 const PASTE_OPTS = [
   ['A','All','all'],['F','Formulas','formulas'],['V','Values','values'],
   ['T','Formats','formats'],['U','Values & number formats','valuesnum'],['W','Column widths','colwidths'],
@@ -6375,6 +6410,11 @@ function __drawRibbon(){
     PASTE_OPTS.forEach(([k,lbl,kind])=>{ ph+='<span class="opt'+(pasteKind===kind?' on':'')+'"><k>'+k.toLowerCase()+'</k>'+lbl+'</span>'; });
     ph+='<span class="opt">\u2191\u2193 or letters \u00b7 \u21b5 apply \u00b7 esc cancel</span>';
     el.innerHTML=ph; return; }
+  if(dialog==='fmt'){ el.className='ribbon show';
+    let fh='<span class="path">format cells →</span>';
+    FMT_OPTS.forEach(([k,lbl])=>{ fh+='<span class="opt"><k>'+k.toLowerCase()+'</k>'+lbl+'</span>'; });
+    fh+='<span class="opt">letters apply \u00b7 esc cancel</span>';
+    el.innerHTML=fh; return; }
   if(dialog==='fontcolor'){
     el.className='ribbon show';
     let html = '<span class="path">font color →</span>';
@@ -7304,6 +7344,21 @@ function redoAct(){ if(!redoStack.length) return; undoStack.push(snapshot()); re
 
 function applyRibbon(key){
   // paste special dialog
+  if(dialog==='fmt'){
+    const apply=(fn)=>{ pushUndo(); eachSel(fn); return exitRibbon(true); };
+    if(key==='G') return apply(c=>{ c.fmtStyle='general'; c.decimals=0; });
+    if(key==='N') return apply(c=>{ c.fmtStyle='comma';   c.decimals=0; });
+    if(key==='C') return apply(c=>{ c.fmtStyle='currency';c.decimals=0; });
+    if(key==='P') return apply(c=>{ c.fmtStyle='percent'; c.decimals=1; });
+    if(key==='X') return apply(c=>{ c.fmtStyle='mult';    c.decimals=1; });
+    if(key==='D') return apply(c=>{ c.fmtStyle='date';    c.decimals=0; });
+    if(key==='F') return apply(c=>{ if(c.txt&&typeof c.value==='string'){
+      c.value = c.value.endsWith('\u00b9') ? c.value.slice(0,-1) : c.value+'\u00b9'; } });
+    if(key==='A'){ const r=selRange(); pushUndo();
+      const a=ensure(r.r1,r.c1); a.ca=r.c2-r.c1+1;
+      return exitRibbon(true); }
+    return;
+  }
   if(dialog==='paste'){
     const opt=PASTE_OPTS.find(o=>o[0]===key);
     if(opt){ pasteKind=opt[2]; drawRibbon(); return; }
@@ -7328,6 +7383,7 @@ function applyRibbon(key){
   if(path.length===0){
     if(key==='='){ autoSum(); return exitRibbon(true); }              // alt = chord — proposes, Enter commits
     if(key==='E'){ path=['E']; ribbonNote=''; drawRibbon(); return; } // legacy alt e s
+    if(key==='O'){ path=['O']; ribbonNote=''; drawRibbon(); return; } // legacy alt o e — Format Cells
     const t=TABS.find(x=>x.k===key);
     if(t&&t.live){ path=[key]; ribbonNote=''; drawRibbon(); return; }
     if(t){ ribbonNote=t.name+' — no drills wired here yet'; drawRibbon(); return; }
@@ -7336,6 +7392,7 @@ function applyRibbon(key){
   // inside a tab/menu
   const np=path.join('')+key;
   if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; drawRibbon(); return; }
+  if(np==='OE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route
   if(np==='HFC'){ dialog='fontcolor'; fontColorIdx=0; drawRibbon(); return; }
   if(np==='HFIS'){ dialog='series'; drawRibbon(); return; }
   if(np==='ASA'){ pushUndo(); sortRange('asc'); return exitRibbon(true); }
@@ -8020,6 +8077,8 @@ document.addEventListener('keydown',e=>{
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
     if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
+    if(k==='1'){ e.preventDefault(); startClock(); logKey('Ctrl+1');
+      mode='ribbon'; path=[]; dialog='fmt'; ribbonNote=''; drawRibbon(); return; }
     if(k==='['){ e.preventDefault(); startClock(); logKey('Ctrl+['); jumpPrecedent(); return; }
     if(k===']'){ e.preventDefault(); startClock(); logKey('Ctrl+]'); jumpDependent(); return; }
     if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }

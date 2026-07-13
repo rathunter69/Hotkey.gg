@@ -65,9 +65,9 @@ follows the doctrine.)*
 > **Alt H O H** (row height) as tiny keyboard-only numeric prompts, so sizing
 > drills can teach SETTING a width rather than autofit roulette; pair with a
 > 'set the print widths' beat in a future formatting drill.
-> In canon order: Ctrl+9/Ctrl+0 hide row/col (+ unhide via ribbon), Ctrl+1
-> Format Cells minimal dialog (number tab only — enough for
-> center-across-selection and custom decimals), Ctrl+Shift+L filter toggle on
+> DONE r177: Ctrl+1 / Alt O E Format Cells dialog (general/number/currency/
+> percent/multiple/date + footnote ¹ + center-across-selection). REMAINING
+> in canon order: Ctrl+9/Ctrl+0 hide row/col (+ unhide), Ctrl+Shift+L filter toggle on
 > a header row (sort/filter integration), row grouping (Shift+Alt+→/←) with
 > collapse glyphs. Each lands with parity asserts; drills follow in a later
 > tranche (grouping alone unlocks a "clean up the inherited model" drill).

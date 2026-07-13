@@ -134,11 +134,27 @@ const ALTS = [
       {sel:o.src, keys:[{key:'c',ctrl:true}]},
       {sel:o.dst, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('e'),{key:'Enter'}]},
     ]; }` },
-  { key: 'format', name: 'reversed order + ribbon percent (alt h p)', moves: `C => { const o=C._o; return [
+  { key: 'format', name: 'reversed order + ribbon percent + ALT O E for multiple/date', moves: `C => { const o=C._o; return [
+      {sel:o.date, keys:[{key:'Alt'},L('o'),L('e'),L('d')]},
+      {sel:o.mult, keys:[{key:'Alt'},L('o'),L('e'),L('x')]},
       {sel:o.com, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
       {sel:o.cur, keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
       {sel:o.pct, keys:[{key:'Alt'},L('h'),L('p')]},
       {sel:o.pct.split(':')[1], keys:[{key:'Alt'},L('h'),D(0)]},
+    ]; }` },
+  { key: 'dress', name: 'footnote FIRST via alt o e, then the dress pass', moves: `C => { const R=C._R; return [
+      {sel:'A'+R.mRow, keys:[{key:'Alt'},L('o'),L('e'),L('f')]},
+      {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('o')]},
+      {sel:R.inpRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:R.mRowRange, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
+      {sel:R.fRange, keys:[{key:'Alt'},L('h'),L('k')]},
+    ]; }` },
+  { key: 'center', name: 'title centered ACROSS first, via alt o e', moves: `C => { const o=C._o; return [
+      {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
+      {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
+      {sel:o.lab, keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
+      {sel:o.tot, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:o.tot, keys:[{key:'b',ctrl:true}]},
     ]; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);

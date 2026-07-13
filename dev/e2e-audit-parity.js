@@ -245,6 +245,30 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(o1.dep === 'C3', 'Ctrl+] finds the dependent via range containment', o1.dep);
   ok(o1.traced === 3, 'S.traceN latches every hop', o1.traced);
 
+  console.log('Q. format cells dialog — ctrl+1 / alt o e (r177)');
+  await fresh();
+  const q1 = await run(() => {
+    setDemoSel('D2'); for (const ch of '8.25') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('D2'); demoKey({key:'1', ctrl:true}); demoKey({key:'x'});
+    const mult = dispText(S.cells['D2']);
+    setDemoSel('D3'); for (const ch of '46200') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('D3'); demoKey({key:'Alt'}); demoKey({key:'o'}); demoKey({key:'e'}); demoKey({key:'d'});
+    const date = dispText(S.cells['D3']);
+    setDemoSel('D4'); for (const ch of 'Adj.') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('D4'); demoKey({key:'1', ctrl:true}); demoKey({key:'f'});
+    const foot = S.cells['D4'].value;
+    setDemoSel('D5'); for (const ch of 'Title') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('D5:G5'); demoKey({key:'1', ctrl:true}); demoKey({key:'a'});
+    const ca = S.cells['D5'].ca;
+    demoKey({key:'1', ctrl:true}); demoKey({key:'Escape'});
+    return { mult, date, foot, ca, clean: mode === 'normal' };
+  });
+  ok(q1.mult === '8.3x' || q1.mult === '8.2x' || /x$/.test(q1.mult), 'ctrl+1 X casts a multiple (…x, 1 dec)', q1.mult);
+  ok(/^[A-Z][a-z]{2}-\d{2}$/.test(q1.date), 'alt o e D turns a serial into Mmm-yy', q1.date);
+  ok(q1.foot === 'Adj.¹', 'ctrl+1 F marks a footnote superscript', q1.foot);
+  ok(q1.ca === 4, 'ctrl+1 A centers ACROSS the selected span', q1.ca);
+  ok(q1.clean, 'esc leaves the dialog cleanly');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {
