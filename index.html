@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=125" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=125">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=125">
+<link rel="icon" href="favicon.ico?v=126" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=126">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=126">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=125"></script>
-<link rel="stylesheet" href="nav.css?v=125">
-<script src="themes.js?v=125"></script>
+<script src="drills.js?v=126"></script>
+<link rel="stylesheet" href="nav.css?v=126">
+<script src="themes.js?v=126"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=125"></script>
+<script src="nav.js?v=126"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3056,6 +3056,76 @@ const CHALLENGES = {
       ];
     }
   },
+  wk13:{
+    name:'13-Week Cash', label:'Run the 13-week', par:92, parKeys:48,
+    prompt:'The RX desk staple: the front eight weeks of the 13-week cash flow. Receipts and disbursements are in from treasury \u2014 you build the spine: net flow each week, the beginning/ending corkscrew, the cushion against minimum liquidity (anchored \u2014 it does NOT walk), and totals on the FLOWS only. Stocks don\u2019t sum: an ending balance total is how you spot a tourist.',
+    req:'<em>B6</em> <em>=B4-B5</em> fill \u2192 \u00b7 <em>B8</em> <em>=B7+B6</em> fill \u2192 \u00b7 corkscrew <em>C7</em> <em>=B8</em> fill \u2192 \u00b7 cushion <em>B10</em> <em>=B8-$B$12</em> fill \u2192 \u00b7 totals <em>J4</em> <em>=SUM(B4:I4)</em> + fill J4:J6 \u2193 \u00b7 dress <em>B8:I8</em>: <em>ctrl+b</em> + <em>alt h b t</em>',
+    guide:[
+      'net flow first: B6 \u00b7 <kbd>=B4-B5</kbd> \u2014 receipts less disbursements \u00b7 fill \u2192 to week 8',
+      'ending cash: B8 \u00b7 <kbd>=B7+B6</kbd> \u00b7 fill \u2192 \u00b7 then the corkscrew: C7 \u00b7 <kbd>=B8</kbd> \u2014 next week opens where this one closed \u00b7 fill \u2192',
+      'the cushion: B10 \u00b7 <kbd>=B8-$B$12</kbd> \u2014 minimum liquidity is ANCHORED (<kbd>F4</kbd> locks it) \u00b7 fill \u2192 \u00b7 negative weeks are the whole point of this sheet',
+      'totals on FLOWS only: J4 \u00b7 <kbd>=SUM(B4:I4)</kbd> \u00b7 select J4:J6 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 receipts, disbursements, net. Ending cash gets NO total',
+      'dress the answer row: B8:I8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+    ],
+    targets:['B6','B8','C7','B10','J4','J4:J6','B8:I8'],
+    demo(){ return [
+      {sel:'B6',  keys:[...T('=B4-B5'), Kb.enter]},
+      {sel:'B6:I6', keys:[Kb.fillR]},
+      {sel:'B8',  keys:[...T('=B7+B6'), Kb.enter]},
+      {sel:'B8:I8', keys:[Kb.fillR]},
+      {sel:'C7',  keys:[...T('=B8'), Kb.enter]},
+      {sel:'C7:I7', keys:[Kb.fillR]},
+      {sel:'B10', keys:[...T('=B8-$B$12'), Kb.enter]},
+      {sel:'B10:I10', keys:[Kb.fillR]},
+      {sel:'J4',  keys:[...T('=SUM(B4:I4)'), Kb.enter]},
+      {sel:'J4:J6', keys:[Kb.fillD]},
+      {sel:'B8:I8', keys:[Kb.bold]},
+      {sel:'B8:I8', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 13-week cash flow, wks 1-8 ($000s)',txt:true,bold:true};
+      for(let i=0;i<8;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'W-'+(i+1),txt:true,bold:true,align:'r'};
+      cells['J2']={...blankCell(),value:'8-wk',txt:true,bold:true,align:'r'};
+      [[4,'Operating receipts'],[5,'Operating disbursements'],[6,'Net cash flow'],[7,'Beginning cash'],
+       [8,'Ending cash'],[10,'Cushion vs. minimum'],[12,'Minimum liquidity']]
+        .forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===8)});
+      const open=rnd(15,60)*10, minL=rnd(8,25)*10;
+      cells['B7']={...blankCell(),value:open,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B12']={...blankCell(),value:minL,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      this._exp=[]; let beg=open, totR=0, totD=0, totN=0;
+      for(let i=0;i<8;i++){ const col=colLetter(i+2);
+        const rec=rnd(30,90)*10, dis=rnd(30,95)*10;
+        cells[col+4]={...blankCell(),value:rec,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+5]={...blankCell(),value:dis,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        [6,7,8,10].forEach(r=>{ const k=col+r; if(!cells[k]) cells[k]={...blankCell(),fmtStyle:'comma',decimals:0}; });
+        const ncf=rec-dis, end=beg+ncf;
+        this._exp.push({ncf, beg, end, cush:end-minL});
+        totR+=rec; totD+=dis; totN+=ncf; beg=end;
+      }
+      [4,5,6].forEach(r=>cells['J'+r]={...blankCell(),fmtStyle:'comma',decimals:0});
+      this._tot={r:totR, d:totD, n:totN};
+      return {ROWS:12, cells, active:{r:6,c:2}, sel:null, colW:{1:158,2:58,3:58,4:58,5:58,6:58,7:58,8:58,9:58,10:62}};
+    },
+    checks(S){
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F','G','H','I'];
+      const IDX=[0,1,2,3,4,5,6,7];
+      const anchOk=(function(){ const c=S.cells['C10']; if(!c||!c.formula) return false;
+        return String(c.formula).toUpperCase().indexOf('$B$12')>=0; })();
+      const dressOk=IDX.every(i=>{ const c=S.cells[COL[i]+'8']; return !!(c&&c.bold&&c.bt); });
+      return [
+        {label:'net cash flow, all eight weeks \u2014 receipts less disbursements', ok: IDX.every(i=>near(COL[i]+'6',this._exp[i].ncf))},
+        {label:'the corkscrew \u2014 each week opens where the last closed', ok: IDX.slice(1).every(i=>near(COL[i]+'7',this._exp[i].beg)) && [1,2,3].every(i=>refs(COL[i]+'7',[COL[i-1]+'8']))},
+        {label:'ending cash across the sheet', ok: IDX.every(i=>near(COL[i]+'8',this._exp[i].end)) && refs('B8',['B7','B6'])},
+        {label:'cushion vs. minimum \u2014 the anchor holds ($B$12 does not walk)', ok: IDX.every(i=>near(COL[i]+'10',this._exp[i].cush)) && anchOk},
+        {label:'totals on the FLOWS \u2014 SUM across receipts, disbursements, net', ok: near('J4',this._tot.r)&&near('J5',this._tot.d)&&near('J6',this._tot.n)&&refs('J4',['SUM('])},
+        {label:'ending-cash row DRESSED \u2014 bold, ruled above', ok: dressOk},
+      ];
+    }
+  },
   isbuild:{
     name:'IS Build', label:'Build the income statement', par:160, parKeys:100,
     prompt:'Five years of income statement, start to finish: COGS off an anchored margin, gross profit, EBIT, net income after the anchored tax rate \u2014 then the net-margin row as a clean percent, and the bottom line bolded and ruled the way it goes in the book. Formulas, fills, a format chord, and the border walk: the whole toolkit on one tab.',
@@ -4390,6 +4460,53 @@ const CHALLENGES = {
       return [
         {label:'INDEX with TWO MATCHes — row and column', ok: twoMatches},
         {label:'answer matches the queried company \u00d7 metric', ok: valOk},
+      ];
+    }
+  },
+  modeltour:{
+    name:'Model Tour', label:'Chase the marks', par:42, parKeys:33,
+    prompt:'The VP went through the model and marked four broken cells \u2014 they\u2019re scattered to the corners of the tab, and the meeting is in two minutes. Jump to each mark with ctrl+arrows, retype the number from the note, and land back at A1 when you\u2019re done. Arrow-crawling will not make par: this drill is about MOVING like an analyst.',
+    req(){ const d=this._d; return d.map(x=>'<em>'+x.k+'</em> \u2192 type <em>'+x.v+'</em>').join(' \u00b7 ')+' \u00b7 finish: <em>ctrl+home</em>'; },
+    guide(){ const d=this._d; return [
+      'first mark at '+d[0].k+' \u2014 <kbd>ctrl</kbd>+<kbd>\u2192</kbd> rides the header to the far edge, <kbd>ctrl</kbd>+<kbd>\u2193</kbd> drops down the column \u00b7 type <kbd>'+d[0].v+'</kbd> <kbd>\u21b5</kbd>',
+      'second mark at '+d[1].k+' \u2014 you\u2019re already on the right edge: <kbd>ctrl</kbd>+<kbd>\u2193</kbd> to the bottom of the data \u00b7 type <kbd>'+d[1].v+'</kbd> <kbd>\u21b5</kbd>',
+      'third mark at '+d[2].k+' \u2014 <kbd>ctrl</kbd>+<kbd>\u2190</kbd> flies across the row \u00b7 type <kbd>'+d[2].v+'</kbd> <kbd>\u21b5</kbd>',
+      'the buried one at '+d[3].k+' \u2014 <kbd>ctrl</kbd>+<kbd>\u2191</kbd> then arrow in; mid-table marks take one jump and a step or two \u00b7 type <kbd>'+d[3].v+'</kbd> <kbd>\u21b5</kbd>',
+      'meeting time: <kbd>ctrl</kbd>+<kbd>home</kbd> \u2014 a finished tab greets the reader at A1',
+    ]; },
+    targets(){ return this._d.map(x=>x.k).concat(['A1']); },
+    demo(){ const d=this._d;
+      const steps=d.map(x=>({sel:x.k, keys:[...T(String(x.v)), Kb.enter]}));
+      steps.push({sel:d[3].k, keys:[Kb.ctrlHome]});
+      return steps; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 operating model ($000s)',txt:true,bold:true};
+      const q0=rnd(1,4);
+      for(let i=0;i<8;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'Q'+(((q0+i-1)%4)+1)+'-2'+(5+Math.floor((q0+i-1)/4)),txt:true,bold:true,align:'r'};
+      cells['J2']={...blankCell(),value:'FY+',txt:true,bold:true,align:'r'};
+      const LBL=['Revenue','COGS','Gross profit','Marketing','G&A','R&D','EBITDA','D&A','EBIT','Interest'];
+      LBL.forEach((n,j)=>cells['A'+(3+j)]={...blankCell(),value:n,txt:true});
+      cells['A13']={...blankCell(),value:'Net income',txt:true,bold:true};
+      for(let r=3;r<=13;r++) for(let c=2;c<=10;c++)
+        cells[colLetter(c)+r]={...blankCell(),value:rnd(40,980),fmtStyle:'comma',decimals:0};
+      // four marks, far corners + one buried mid-table (positions jitter per run)
+      const sites=[ 'J'+rnd(3,5), 'J'+rnd(11,13), 'B'+rnd(11,13), colLetter(rnd(5,7))+rnd(6,9) ];
+      this._d=sites.map(k=>{ const v=rnd(40,980);
+        cells[k]={...blankCell(),value:'#REF!',txt:true,bold:true};
+        return {k, v}; });
+      return {ROWS:13, cells, active:{r:3,c:2}, sel:null, colW:{1:120,2:64,3:64,4:64,5:64,6:64,7:64,8:64,9:64,10:64}};
+    },
+    checks(S){
+      const d=this._d;
+      const fixed=x=>{ const c=S.cells[x.k]; return !!(c && !c.txt && !c.formula && c.value===x.v); };
+      const allFixed=d.every(fixed);
+      return [
+        {label:'the far-corner mark at '+d[0].k+' \u2014 back to '+d[0].v, ok: fixed(d[0])},
+        {label:'the bottom-edge mark at '+d[1].k+' \u2014 back to '+d[1].v, ok: fixed(d[1])},
+        {label:'the left-edge mark at '+d[2].k+' \u2014 back to '+d[2].v, ok: fixed(d[2])},
+        {label:'the buried mark at '+d[3].k+' \u2014 back to '+d[3].v, ok: fixed(d[3])},
+        {label:'finished at A1 \u2014 ctrl+home, the tab greets the reader', ok: allFixed && S.active.r===1 && S.active.c===1},
       ];
     }
   },
