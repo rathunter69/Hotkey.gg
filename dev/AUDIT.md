@@ -3700,3 +3700,33 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   sheet screenshot-reviewed in both states on the NEW base (plan toggle
   exercised); 5 pages boot clean; e2e demo-replay ALL GREEN (64 drills).
   Stripe remains TEST MODE; no live payments (standing constraint).
+
+---
+# ROUND 157 — PRICING FINAL + THE WEAKNESS QUEUE SHIPS (PRO pillar #2 goes real)
+- PRICING (Wolf-decided): MONTHLY $7 leads ("crazy ROI on the time you
+  save"), YEARLY DROPPED — this audience trains in cycles, not years.
+  Second SKU = SEASON PASS $19 / 3 months ("one recruiting cycle", ~10%
+  off) for the pre-summer ramp. HOTKEY_PRO grew a plans[] array;
+  hkProSheet renders plans generically (first = default), CTA price
+  follows the toggle, checkout passes plan id.
+- OFFER SHEET v2: five REAL pillars (full catalog day one, THE WEAKNESS
+  QUEUE, plugin layers, deep analytics, pro cosmetics) + an honest
+  "landing during beta" roadmap line (ghost replays, interview mode,
+  season rewards track) — nothing on the paid side of the grid is vapor.
+- THE WEAKNESS QUEUE (index): "◆ weakness" joins the drill bar. Scoring
+  is LOCAL-ONLY (guest-friendly): PB/par gap (known weakness, capped),
+  never-cleared (unknown weakness, progression-weighted by catalog
+  position), staleness (>5 days since last clean run adds up to +1) —
+  hk_runs_lite entries now carry d+ts to feed it (back-compatible; old
+  rows just lack staleness). Pop lists top 6 with REASONS ("38% over
+  par · 9d stale"), single rows load directly, "train the queue" arms
+  sequential mode: nextDrillKey() serves the queue so the results card's
+  n walks it (label shows the true next), restarts stay in place, any
+  manual jump disarms, finishing the last item toasts + clears. Gated by
+  requirePro('The Weakness Queue') — free in beta, PRO at launch.
+  Events: wq_start, wq_done.
+- CACHE v135 -> v136 (all 9 pages).
+- VERIFY: node --check all extracted scripts; queue driven live in
+  Playwright (pop content, arm toast, nextDrillKey chain = queue order);
+  sheet v2 screenshot-reviewed (monthly default, season toggle, roadmap
+  line); 5 pages boot clean; e2e demo-replay ALL GREEN.

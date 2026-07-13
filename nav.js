@@ -926,9 +926,10 @@ window.hkConfetti = function(host, colors){
    everything free; at launch the CTA runs Stripe TEST-mode checkout via the
    create-checkout Edge Function (which refuses live keys). ---- */
 window.hkProSheet = function(feature){
-  const O = window.HOTKEY_PRO || {beta:true, monthly:'$7', yearly:'$59', features:[], betaNote:''};
+  const O = window.HOTKEY_PRO || {beta:true, plans:[{id:'monthly',price:'$7',cap:'per month'}], features:[], betaNote:''};
+  const PL = O.plans || [{id:'monthly', price:O.monthly||'$7', cap:'per month'}];
   const old=document.getElementById('hkProWrap'); if(old) old.remove();
-  let plan='yearly';
+  let plan=PL[0];
   const w=document.createElement('div'); w.className='hk-cel-wrap'; w.id='hkProWrap';
   const rows=(O.features||[]).map(f=>
     '<div class="hk-pro-row"><div class="hk-pro-f"><b>'+f[0]+'</b><span>'+f[1]+'</span></div>'+
@@ -939,14 +940,12 @@ window.hkProSheet = function(feature){
       (O.tagline?'<div class="hk-pro-tag">'+O.tagline+'</div>':'')+
       (feature?'<div class="hk-pro-hook"><b>'+feature+'</b> comes with PRO.</div>':'')+
       '<div class="hk-pro-grid"><div class="hk-pro-head"><span>\u25c6 pro</span><span>free</span></div>'+rows+'</div>'+
-      '<div class="hk-pro-plans">'+
-        '<div class="hk-pro-plan" data-plan="monthly"><b>'+O.monthly+'</b><i>per month</i></div>'+
-        '<div class="hk-pro-plan on" data-plan="yearly"><b>'+O.yearly+'</b><i>per year'+(O.yearlyNote?' \u00b7 '+O.yearlyNote:'')+'</i></div>'+
-      '</div>'+
+      '<div class="hk-pro-plans">'+PL.map(function(p,i){ return '<div class="hk-pro-plan'+(i===0?' on':'')+'" data-plan="'+p.id+'"><b>'+p.price+'</b><i>'+p.cap+'</i></div>'; }).join('')+'</div>'+
+      (O.roadmap&&O.roadmap.length?'<div class="hk-pro-tag" style="margin:12px 0 0">landing during beta: '+O.roadmap.join(' \u00b7 ')+'</div>':'')+
       (O.beta?'<div class="hk-pro-beta">'+O.betaNote+'</div>':'')+
       (O.beta
         ? '<button class="hk-pro-cta quiet" id="hkProGo">Back to training \u2014 PRO is on, free</button>'
-        : '<button class="hk-pro-cta" id="hkProGo">Upgrade \u2014 <span id="hkProPrice">'+O.yearly+'/yr</span></button>')+
+        : '<button class="hk-pro-cta" id="hkProGo">Upgrade \u2014 <span id="hkProPrice">'+PL[0].price+' '+PL[0].cap.split(' \u00b7 ')[0]+'</span></button>')+
       '<div class="hk-pro-msg" id="hkProMsg"></div>'+
     '</div></div>';
   document.body.appendChild(w);
@@ -956,13 +955,13 @@ window.hkProSheet = function(feature){
   w.addEventListener('click', e=>{ if(e.target===w) close(); });
   const x=document.getElementById('hkProX'); if(x) x.onclick=close;
   w.querySelectorAll('.hk-pro-plan').forEach(p=>p.onclick=()=>{
-    plan=p.dataset.plan;
+    plan=PL.find(q=>q.id===p.dataset.plan)||PL[0];
     w.querySelectorAll('.hk-pro-plan').forEach(q=>q.classList.toggle('on', q===p));
     const pr=document.getElementById('hkProPrice');
-    if(pr) pr.textContent = plan==='monthly' ? (O.monthly+'/mo') : (O.yearly+'/yr');
+    if(pr) pr.textContent = plan.price+' '+plan.cap.split(' \u00b7 ')[0];
   });
   const go=document.getElementById('hkProGo');
-  if(go) go.onclick=()=>{ if(O.beta){ close(); return; } window.hkProCheckout(plan); };
+  if(go) go.onclick=()=>{ if(O.beta){ close(); return; } window.hkProCheckout(plan.id); };
 };
 window.hkProCheckout = async function(plan){
   // Stripe TEST-mode scaffold: tries the Edge Function, reports honestly when

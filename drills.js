@@ -318,12 +318,21 @@ window.HOTKEY_PLUGIN_LAYERS = {
    pricing at launch; beta:true keeps every PRO feature ON for everyone. ---- */
 window.HOTKEY_PRO = {
   beta: true,
-  monthly: '$7', yearly: '$59', yearlyNote: '2 months free',
+  // Wolf-decided (r157): MONTHLY leads ("$7 — crazy ROI on the time you save");
+  // SEASON = one recruiting cycle / pre-summer ramp, lightly discounted. No annual —
+  // this audience trains in cycles, not years.
+  plans: [
+    { id:'monthly', price:'$7',  cap:'per month' },
+    { id:'season',  price:'$19', cap:'per season \u00b7 3 months \u00b7 one recruiting cycle' },
+  ],
   tagline: 'Train like the desk is watching.',
   features: [
     ['The full catalog, day one',
-     'Models + Full Builds from Level 1 — DCF, LBO, debt schedules, three-statement builds',
+     'Models + Full Builds from Level 1 \u2014 DCF, LBO, debt schedules, three-statement builds',
      'unlocks as you level'],
+    ['The Weakness Queue',
+     'the site builds your session \u2014 slowest vs par, never-cleared, gone-stale drills first',
+     'pick your own drills'],
     ['Plugin keyboard layers',
      'Macabacus + FactSet shortcut profiles on every drill',
      'native Excel only'],
@@ -334,5 +343,6 @@ window.HOTKEY_PRO = {
      'exclusive card flair + share-card themes + first access to new looks',
      'standard flair'],
   ],
-  betaNote: 'Beta: PRO is switched on for everyone, free. Play now — beta players lock in founder pricing at launch.',
+  roadmap: ['Ghost replays \u2014 race your PB\u2019s cursor', 'Interview mode \u2014 timed assessment + report card', 'Season rewards track'],
+  betaNote: 'Beta: PRO is switched on for everyone, free. Play now \u2014 beta players lock in founder pricing at launch.',
 };
