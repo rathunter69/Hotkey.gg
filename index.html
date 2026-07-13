@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=121" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=121">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=121">
+<link rel="icon" href="favicon.ico?v=122" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=122">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=122">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1076,14 +1076,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=121"></script>
-<link rel="stylesheet" href="nav.css?v=121">
-<script src="themes.js?v=121"></script>
+<script src="drills.js?v=122"></script>
+<link rel="stylesheet" href="nav.css?v=122">
+<script src="themes.js?v=122"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=121"></script>
+<script src="nav.js?v=122"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1135,7 +1135,10 @@
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
-      <button class="mb-tool" id="dailyBtn" title="the daily challenge — same drill, same layout, for everyone, all day">⚡ daily</button>
+      <span style="position:relative; display:inline-flex">
+      <button class="mb-tool" id="dailyBtn" data-tip="the morning sheet — three drills for today: the daily, a weak spot, and fresh ground">⚡ sheet</button>
+      <div class="prefs-pop" id="sheetPop" style="min-width:290px; flex-direction:column; gap:4px"></div>
+      </span>
       <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
@@ -6281,7 +6284,7 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
     const anchor=document.getElementById('navShortcuts');
     if(anchor){ anchor.after(pBtn); anchor.after(sBtn); } else { tools.prepend(pBtn); tools.prepend(sBtn); }
   } }
-$('dailyBtn').addEventListener('click',startDaily);
+$('dailyBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); });   // r140: the sheet owns the button
 $('randBtn').addEventListener('click',()=>{   // r113 (#33): random drill — variety is the retention loop
   const pool=MENU_ORDER.filter(k=>k!==cur);
   loadChallenge(pool[Math.floor(Math.random()*pool.length)]);
@@ -7470,13 +7473,22 @@ $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo();
 /* ---- daily streak: any completed drill keeps the fire alive (local, per device) ---- */
 let streak={d:'',n:0};
 async function loadStreak(){ try{ const v=await KV.get('hotkey_streak'); if(v){ streak=JSON.parse(v); } }catch(e){}
-  // streak dies quietly if a day was missed — shown as 0 until the next solve
-  const today=dailyDateStr(), yd=new Date(Date.now()-864e5).toISOString().slice(0,10);
-  if(streak.d!==today && streak.d!==yd) streak.n=0;
+  // r140: STREAK INSURANCE — a freeze (earned every 5 days, hold max 2) auto-covers
+  // ONE missed day. The gap is forgiven at display time and consumed on next solve.
+  const today=dailyDateStr(), yd=new Date(Date.now()-864e5).toISOString().slice(0,10),
+        d2=new Date(Date.now()-2*864e5).toISOString().slice(0,10);
+  if(streak.d!==today && streak.d!==yd && !(streak.d===d2 && (streak.frz|0)>0)) streak.n=0;
   renderStreak(); }
 function updateStreak(){ const today=dailyDateStr(); if(streak.d===today){ renderStreak(); return; }
-  const yd=new Date(Date.now()-864e5).toISOString().slice(0,10);
-  streak.n = (streak.d===yd) ? streak.n+1 : 1; streak.d=today;
+  const yd=new Date(Date.now()-864e5).toISOString().slice(0,10),
+        d2=new Date(Date.now()-2*864e5).toISOString().slice(0,10);
+  if(streak.d===yd){ streak.n=streak.n+1; }
+  else if(streak.d===d2 && (streak.frz|0)>0){ streak.frz=(streak.frz|0)-1; streak.n=streak.n+1;
+    showToast('\ud83e\uddca streak freeze used \u2014 \ud83d\udd25 '+streak.n+' kept alive'); }
+  else { streak.n=1; }
+  streak.d=today;
+  if(streak.n>0 && streak.n%5===0 && (streak.frz|0)<2){ streak.frz=(streak.frz|0)+1;
+    showToast('\ud83e\uddca streak freeze earned \u2014 auto-covers one missed day'); }
   KV.set('hotkey_streak', JSON.stringify(streak)); renderStreak(); }
 /* Local level chip: anon-friendly progress (solves + PB breadth). Signed-in players
    see the full XP math on their card; this keeps the loop visible from solve #1. */
@@ -7496,7 +7508,10 @@ function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
      on EVERY solve, thrown inside the hotkey_solves .then (async, so the try/catch never saw it). */
 function renderStreak(){ const el=$('streakBadge'); if(!el) return;
   el.style.display = streak.n>0 ? 'inline-flex' : 'none';
-  el.innerHTML='\ud83d\udd25 '+streak.n; el.title=streak.n+'-day streak — solve a drill every day to keep it alive'; }
+  const frz=(streak.frz|0);
+  el.innerHTML='\ud83d\udd25 '+streak.n+(frz?' <span style="opacity:.75">\ud83e\uddca'+(frz>1?'\u00d7'+frz:'')+'</span>':'');
+  el.title=streak.n+'-day streak \u2014 solve a drill every day to keep it alive'+
+    (frz?' \u00b7 '+frz+' freeze'+(frz>1?'s':'')+' banked (auto-covers a missed day)':' \u00b7 every 5 days banks a freeze'); }
 
 let _toastT=null;
 function showToast(msg){
@@ -7585,7 +7600,74 @@ function restartDrill(){
 function scoreKey(){ if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return dailyMode ? dailyKey() : cur; }
 function drillOfDay(){ return MENU_ORDER[dailySeed() % MENU_ORDER.length]; }
 function startDaily(){ loadChallenge(drillOfDay(), {daily:true}); updateDailyBtn(); }
-function updateDailyBtn(){ const b=$('dailyBtn'); if(b) b.classList.toggle('on', dailyMode); }
+function updateDailyBtn(){ const b=$('dailyBtn'); if(b){ b.classList.toggle('on', dailyMode);
+  try{ const sh=getSheet(); const n=sh.done.length;
+    b.innerHTML='\u26a1 sheet <span style="opacity:.8">'+n+'/3</span>'+(n===3?' \u2713':''); }catch(e){} } }
+/* ---------- r140: THE MORNING SHEET — three drills a day, one ritual ----------
+   item 1 = the seeded DAILY (everyone's, keeps its board) · item 2 = SHARPEN
+   (your worst PB-vs-par) · item 3 = FRESH GROUND (never drilled) or CHASE
+   (closest to par) when everything's been touched. Deterministic per day,
+   computed locally — works signed-out. Clearing all three = the sheet crown. */
+function getSheet(){
+  const k='hk_sheet_'+dailyDateStr();
+  try{ const v=JSON.parse(localStorage.getItem(k)||'null'); if(v && v.items && v.items.length===3) return v; }catch(e){}
+  const PARS=window.HOTKEY_PARS||{};
+  const items=[drillOfDay()];
+  let worst=null;
+  Object.keys(PB).forEach(d=>{ if(!CHALLENGES[d]||items.includes(d)||!PARS[d]) return;
+    const r=PB[d]/PARS[d]; if(!worst||r>worst.r) worst={d,r}; });
+  if(worst) items.push(worst.d);
+  const start=dailySeed()%MENU_ORDER.length;
+  for(let i=0;i<MENU_ORDER.length && items.length<3;i++){
+    const d=MENU_ORDER[(start+i)%MENU_ORDER.length];
+    if(!items.includes(d) && PB[d]===undefined) items.push(d);
+  }
+  if(items.length<3){ let chase=null;
+    Object.keys(PB).forEach(d=>{ if(!CHALLENGES[d]||items.includes(d)||!PARS[d]) return;
+      const r=PB[d]/PARS[d]; if(r>1 && (!chase||r<chase.r)) chase={d,r}; });
+    if(chase) items.push(chase.d); }
+  for(let i=0;i<MENU_ORDER.length && items.length<3;i++){
+    const d=MENU_ORDER[(start+i)%MENU_ORDER.length];
+    if(!items.includes(d)) items.push(d); }
+  const sh={items:items.slice(0,3), done:[]};
+  try{ localStorage.setItem(k, JSON.stringify(sh)); }catch(e){}
+  return sh;
+}
+function sheetTag(sh,i){ const d=sh.items[i];
+  if(i===0) return 'the daily';
+  return PB[d]===undefined ? 'fresh ground' : ((window.HOTKEY_PARS||{})[d] && PB[d]>(window.HOTKEY_PARS||{})[d] ? 'sharpen' : 'chase par'); }
+function toggleSheetPop(){
+  const p=$('sheetPop'); if(!p) return;
+  if(p.classList.contains('show')){ p.classList.remove('show'); return; }
+  const sh=getSheet();
+  p.innerHTML='<div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:4px 6px 6px">\u26a1 morning sheet \u00b7 '+sh.done.length+'/3'+(sh.done.length===3?' \u2014 cleared':'')+'</div>'+
+    sh.items.map((d,i)=>{ const done=sh.done.includes(d); const nm=(CHALLENGES[d]&&CHALLENGES[d].name)||d;
+      return '<button class="mb-tool" data-sheet="'+d+'" data-i="'+i+'" style="'+(done?'opacity:.55':'')+'">'+
+        '<span style="color:'+(done?'var(--accent)':'var(--faint)')+';width:14px;display:inline-block">'+(done?'\u2713':'\u00b7')+'</span> '+
+        nm+' <span style="margin-left:auto;font-size:9px;color:var(--faint)">'+sheetTag(sh,i)+'</span></button>'; }).join('')+
+    '<div style="font-family:var(--mono);font-size:9px;color:var(--faint);padding:5px 6px 2px">clear all three \u2014 the sheet is your day\u2019s signature</div>';
+  p.classList.add('show');
+  p.querySelectorAll('[data-sheet]').forEach(b=>{ b.onclick=(e2)=>{ e2.stopPropagation();
+    p.classList.remove('show');
+    const d=b.getAttribute('data-sheet');
+    loadChallenge(d, b.getAttribute('data-i')==='0'?{daily:true}:undefined);
+    updateDailyBtn(); }; });
+}
+document.addEventListener('click',(e)=>{ const p=$('sheetPop');
+  if(p && p.classList.contains('show') && !e.target.closest('#sheetPop') && !e.target.closest('#dailyBtn')) p.classList.remove('show'); });
+function sheetMarkWin(){
+  try{
+    const k='hk_sheet_'+dailyDateStr(); const sh=getSheet();
+    if(!sh.items.includes(cur) || sh.done.includes(cur)) return;
+    sh.done.push(cur); localStorage.setItem(k, JSON.stringify(sh)); updateDailyBtn();
+    if(sh.done.length===3){
+      ev('sheet_clear');
+      if(window.hkCelebrate) hkCelebrate({cap:'morning sheet', title:'Sheet cleared',
+        sub:'all three signed off \u2014 the desk runs on people like you', iconHtml:'<span style="font-size:44px">\u26a1</span>'});
+      else showToast('\u26a1 morning sheet cleared');
+    } else showToast('\u26a1 sheet: '+sh.done.length+'/3 signed off');
+  }catch(e){}
+}
 function loadChallenge(key, opts){
   dailyMode = !!(opts && opts.daily);
   weeklyMode = !!(opts && opts.weekly);
@@ -7709,6 +7791,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
     try{ if(!localStorage.getItem('hk_beta_ok')) showPrelaunchLock(); }catch(e){}
   }
   buildSheetTabs();
+  try{ updateDailyBtn(); }catch(e){}   // r140: sheet count paints on the \u26a1 button at boot
   // Resume where they left off: returning users land on their last drill, not the first one.
   let startKey = MENU_ORDER[0];
   if(onboarded){
@@ -8386,6 +8469,7 @@ function closeGate(){ gateOpen=false; const g=$('gate'); if(g){ g.classList.remo
 
 // r80: lite local run ledger — feeds in-game achievement checks (server runs stay canonical)
 function logRunLite(t){
+  try{ sheetMarkWin(); }catch(e){}
   try{ ev('solve',{d:cur, ms:Math.round(t*1000)});
     if(!localStorage.getItem('hk_ev_first')){ localStorage.setItem('hk_ev_first','1'); ev('first_solve',{d:cur}); }
   }catch(e){}
