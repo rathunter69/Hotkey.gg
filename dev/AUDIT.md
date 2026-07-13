@@ -4032,3 +4032,41 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFIED: demo-replay 66/66 GREEN, parity 37, onboard 20, visual 311,
   rank 20, par sweep clean, inline scripts node --check clean.
 - CACHE v146 -> v147 (all 9 pages).
+
+---
+# ROUND 168 — THE DENSITY FILTER, GAME-WIDE + THREE GAP-FILLING DRILLS (66 -> 69)
+- WOLF'S DIRECTIVE: apply the T7 fun/density filter to ALL drills, then
+  theorycraft drills for hotkeys/tricks the catalog was missing.
+- GRADED ALL 66 against the doctrine (machine matrix: aha/codename/rnd
+  count/prompt length/body length). Verdict: the advanced tiers were
+  already dense; the failures clustered in the mid-tier singles.
+- THE AHA LINE IS NOW UNIVERSAL: all drills carry aha:'...' — one
+  nameable insight, surfaced on the results card. 12 (T7) -> 69.
+- SIX MID-TIER UPGRADES:
+  - foot v2: the Alt+= drill it always should have been — zero typed
+    SUMs; Alt+= reads the row, the column, and the corner (totals moved
+    adjacent so the proposal sees the block; par 72->48).
+  - polish: the prompt PROMISED the decoy table stays plain but never
+    graded it — now checked. + codename title + aha.
+  - sort: codename title + aha. series: header now caps a Revenue+EBITDA
+    mini-build + aha. margin/transpose: aha (already dense).
+- ENGINE-COVERAGE GAP ANALYSIS: rapid-fire covers dialog chords as
+  recognition; the CLASSIC grid supported five behaviors NO drill
+  taught: column insert/delete (HIC/HDC), Ctrl+Space, decimals walk
+  (H9/H0), and full F4 cycling (only single-press was touched).
+- THREE NEW DRILLS (69 total):
+  - colops "Columns move too" (Foundations, after rowops): stale DRAFT
+    column + missing quarter — Ctrl+Space, Alt H D C, Alt H I C, head
+    and dress the new column. End-state graded (any op order).
+  - anchor "Pin it with F4" (Formulas, after margin): 3x3 price x volume
+    grid from ONE formula — F4 x3 to $B pin, F4 x2 to row pin, fill both
+    ways. The explicit on-ramp to dcfsens.
+  - decimals "The decimals pass" (Formatting, after format): Alt H 9 /
+    Alt H 0 — dollars zero places, multiples and percents one. Columns
+    shuffle; values must survive untouched.
+- CAMPAIGN CHAPTERS UNTOUCHED (versioned paths): new drills join groups
+  and gates but never retro-unclear anyone's chapter badges.
+- PARKEYS from sweep medians: colops 13, anchor 13, decimals 15, foot 8.
+- VERIFIED: replay 69/69 GREEN, parity 37, onboard 20, visual 311,
+  rank 20, par sweep FLAGGED 0, node --check clean.
+- CACHE v147 -> v148 (all 9 pages).

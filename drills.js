@@ -23,11 +23,11 @@ window.HOTKEY_DRILLS = {
   // Group order here is the order in the drill picker.
   // ---------------------------------------------------------------
   groups: [
-    { name: 'Foundations', keys: ['navigation', 'modeltour', 'blocksel', 'ribbon', 'editfix', 'undo', 'filldr', 'pastes', 'rowops', 'autofit', 'saves', 'copyover'] },
-    { name: 'Formatting',  keys: ['housestyle', 'ruleoff', 'ruleaudit', 'polish', 'combo', 'format', 'dress', 'center', 'blue', 'gauntlet'] },
+    { name: 'Foundations', keys: ['navigation', 'modeltour', 'blocksel', 'ribbon', 'editfix', 'undo', 'filldr', 'pastes', 'rowops', 'colops', 'autofit', 'saves', 'copyover'] },
+    { name: 'Formatting',  keys: ['housestyle', 'ruleoff', 'ruleaudit', 'polish', 'combo', 'format', 'decimals', 'dress', 'center', 'blue', 'gauntlet'] },
     { name: 'Values',      keys: ['drill', 'series', 'transpose'] },
     { name: 'Data',        keys: ['sort'] },
-    { name: 'Formulas',    keys: ['margin', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'triage', 'balcheck', 'stalelink', 'signerr', 'versionup', 'percent', 'cagr', 'sumif', 'cases'] },
+    { name: 'Formulas',    keys: ['margin', 'anchor', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'triage', 'balcheck', 'stalelink', 'signerr', 'versionup', 'percent', 'cagr', 'sumif', 'cases'] },
     { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'cascade', 'wk13', 'liqbridge', 'covtable', 'txncomps', 'sourcesuses', 'accdil', 'dcfsens', 'retbridge', 'football'] },
     { name: 'Full Builds', keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'debtsched', 'threestmt'] },
     { name: 'Lookups',     keys: ['lookup', 'lookup2'] },
@@ -47,6 +47,7 @@ window.HOTKEY_DRILLS = {
     navigation: { name:'Navigate', label:'Navigation tour',     tab:'Nav',         desc:'The full obstacle course — 12 chords: edges, selections, rows, columns' },
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — Alt H O I fits the columns' },
     rowops:     { name:'Rows',     label:'Insert and delete rows',  tab:'Rows',     desc:'Alt H I R opens a row, Alt H D R kills one' },
+    colops:     { name:'Columns',  label:'Columns move too',        tab:'Columns',  desc:'Ctrl+Space grabs it, Alt H D C kills it, Alt H I C opens one' },
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Ctrl+D and Ctrl+R — one formula, whole block' },
     blocksel:   { name:'Block Sel.',label:'Grab the whole block',   tab:'Block',    desc:'Ctrl+Shift+arrow rides to the end of the data' },
     ribbon:     { name:'Ribbon',   label:'Learn the ribbon',        tab:'Ribbon',   desc:'Alt is a menu — walk H 1, H K, H A C' },
@@ -75,6 +76,7 @@ window.HOTKEY_DRILLS = {
     polish:     { name:'Polish',   label:'Polish the Header',   tab:'Header',      desc:'Bold + bottom border + shade a header row' },
     combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Bold, comma, wrap and autofit a pasted table' },
     format:     { name:'Format',   label:'Fix the formats',     tab:'Formats',     desc:'Triage the units — percent, currency, comma' },
+    decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Alt H 9 / Alt H 0 — dollars none, multiples and percents one' },
     dress:      { name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', tab:'Dress', desc:'Title ruled, inputs blue, percents, commas \u2014 book-ready' },
     triage:     { name:'Error triage', label:'Error triage \u2014 #REF! #DIV/0! #VALUE!', tab:'Triage', desc:'Three classic breaks \u2014 read the error, rebuild the intent' },
     versionup:  { name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', tab:'Rollfwd', desc:'Typed answers \u2192 live formulas; v2 must survive new numbers' },
@@ -91,6 +93,7 @@ window.HOTKEY_DRILLS = {
 
     // Formulas
     margin:     { name:'Margins',  label:'Margins across the page', tab:'Margin',  desc:'EBITDA ÷ revenue, three comp tables — pointed, filled, %' },
+    anchor:     { name:'Anchors',  label:'Pin it with F4',          tab:'F4',      desc:'F4 cycles the locks — one pinned formula prices the whole grid' },
     growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'Consolidate, YoY as %, CAGR with ^ — a real revenue build' },
     wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
     dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'DF row \u00d7 PV row; the TV reuses the year-5 factor' },
@@ -183,7 +186,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":42,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":42,"pastes":40,"transpose":30,"saves":44,"editfix":44,"undo":34,"autofit":34,"rowops":26,"filldr":40,"blocksel":38,"copyover":42,"polish":38,"housestyle":70,"foot":72,"comps":161,"center":46,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":126,"audit":32,"sumif":140,"lookup2":60,"navigation":30,"modeltour":42,"dress":97,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
+window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":42,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":42,"pastes":40,"transpose":30,"saves":44,"editfix":44,"undo":34,"autofit":34,"rowops":26,"filldr":40,"blocksel":38,"copyover":42,"polish":38,"housestyle":70,"foot":48,"comps":161,"center":46,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":72,"balance":126,"audit":32,"sumif":140,"lookup2":60,"navigation":30,"colops":40,"anchor":52,"decimals":42,"modeltour":42,"dress":97,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
