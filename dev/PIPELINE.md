@@ -24,15 +24,10 @@ follows the doctrine.)*
 > could carry a real work-op between saves; ribbon is 3 jobs on one page —
 > consider a 4th family. Full gate, screenshots, AUDIT round, push.
 
-## T-B · ALT-PATHS TO FULL COVERAGE  *(any model)*
-> dev/e2e-alt-paths.js covers 13 drills with 14 alts. Extend the ALTS registry
-> until EVERY drill key in CHALLENGES has ≥1 alternative-route entry (order
-> permutation at minimum; chord swaps where the engine has two routes:
-> ctrl+b↔alt h 1, alt h k↔ctrl+shift+!, alt e s↔alt h v s, ctrl+d/r↔alt h f i
-> d/r, ctrl+±↔alt h i/d r, typed $↔F4↔pointer+F4). Long builds (isbuild,
-> threestmt, debtsched…): permute section order. Any FAIL = overfit check or
-> missing engine route — fix per doctrine §2.2, never delete the alt. Add the
-> harness to the standard gate list in PROJECT_CONTEXT.md.
+## T-B · ALT-PATHS TO FULL COVERAGE — DONE r184 (77 alts, every drill covered;
+navigation latch recorded as a by-design doctrine finding; harness caveat:
+never use regex escapes inside moves template literals — they collapse before
+eval). The harness has been in the standard gate since r169.
 
 ## T-C · MODELS-TIER REALISM AUDIT  *(Fable-grade)*
 > Play every Models + Full Builds drill via replay AND read every prompt,

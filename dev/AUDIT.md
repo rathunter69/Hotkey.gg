@@ -4511,3 +4511,26 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   and nothing else. All 40 touched drills replayed to a win with clean
   concatenated labels before the gate.
 - No cache bump: index.html label strings only.
+
+## r184 — anti-railroad coverage complete: every drill has an alt (T-B done)
+- ALTS 42 -> 77: all 35 uncovered drills got an alternative-route entry.
+  The long builds carry the highest-value proofs — threestmt builds the
+  BALANCE SHEET before the CFS, dcf lays the PV row before the discount
+  factors it reads, lbo types the whole chain in REVERSE (IRR first),
+  debtsched builds the machine before the VP's rate exists — all riding
+  the engine's multi-pass recalc, which closes forward references on
+  the final commit. Chord swaps throughout (ribbon fills, alt h 1,
+  alt h p, ctrl+shift+!, ctrl+1).
+- DOCTRINE FINDING (recorded, not forced): navigation's checks are a
+  sequential state latch BY DESIGN — the tour is the lesson, so no
+  reordered route can exist. Its entry proves the one real freedom:
+  ribbon row-insert/delete (alt h i r / d r) satisfies the same
+  lastRowOp latches as the ctrl chords. blue and modeltour are
+  order-permutation-only (the engine offers no second chord route).
+- One real bug caught in the harness itself: regex escapes die inside
+  the ALTS template literals (`\d` collapses to a literal 'd' before
+  eval), which silently turned two entries' cell parsing to garbage.
+  Both rewritten to string ops; noted here so future entries avoid
+  regexes in moves sources.
+- 35/35 pass (after the harness fix); no check needed loosening — the
+  end-state grading discipline held across the entire advanced tier.
