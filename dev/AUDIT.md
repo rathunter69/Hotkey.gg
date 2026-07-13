@@ -3964,3 +3964,31 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - Sweep re-run post-fix: FLAGGED 0. Full catalog replay ALL GREEN;
   parity 37.
 - CACHE v144 -> v145 (all 9 pages).
+
+---
+# ROUND 166 — PAR POLICY DECIDED (plugin overlays) + THE FRONT-DOOR TRANCHE QUEUED
+- PAR vs PLUGIN OVERLAYS (Wolf's question, answered as policy):
+  PAR IS NATIVE-CALIBRATED, ALWAYS. One bar for every board — per-profile
+  pars would fragment leaderboard comparability, campaign gates, and the
+  XP advanced threshold, and plugin coverage varies per drill. Plugin
+  layers (Macabacus/FactSet) are a LEGAL EDGE: their chords are shorter,
+  so a plugin player beats par easier — exactly like a real desk, and
+  exactly the pitch of the PRO plugin-layers pillar. mouse_used stays
+  the ONLY purity flag on boards. Policy shipped where players look:
+  "how par works" section in the how-xp-works modal (par = native pace;
+  plugin layers are playing it like a real desk, not cheating; guided
+  mode lists alternates via guideAltNote). FUTURE (queued, not built):
+  the par sweep could gain plugin-alternate demos to publish an
+  informational "plugin floor" per drill — display-only, never the bar.
+- T7 QUEUED — THE FRONT-DOOR ENGAGEMENT TRANCHE (Wolf: earliest free
+  drills must be "incredibly fun, engaging, unique"). Graded tonight:
+  all 12 Foundations are randomized, 9/12 site-driven, prompts in voice
+  — no combo-grade emergencies. The tranche is therefore about JUICE,
+  not density: (a) the three 3-key micro-drills (blocksel, undo,
+  copyover) deserve a second beat or a stronger story; (b) win moments
+  on first-session drills should land harder (the drip line + confetti
+  exist — first-clear on foundations could celebrate bigger); (c)
+  navigation/filldr/pastes/rowops are sites=N — worth site-driving;
+  (d) each foundation drill should teach exactly ONE aha the player can
+  name afterward. Runs as its own round with fresh eyes.
+- CACHE v145 -> v146.

@@ -28,9 +28,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=145" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=145">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=145">
+<link rel="icon" href="favicon.ico?v=146" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=146">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=146">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1119,14 +1119,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=145"></script>
-<link rel="stylesheet" href="nav.css?v=145">
-<script src="themes.js?v=145"></script>
+<script src="drills.js?v=146"></script>
+<link rel="stylesheet" href="nav.css?v=146">
+<script src="themes.js?v=146"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=145"></script>
+<script src="nav.js?v=146"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -8896,6 +8896,8 @@ function openXpInfo(){
     '<b style="color:var(--accent)">daily</b> +30 \u00b7 <b>gauntlet leg</b> +25 \u00b7 <b>marathon</b> +20 \u00b7 <b>rapid-fire</b> +10<br>'+
     '<b style="color:var(--warn)">boards</b>: top-10 +25 \u00b7 podium +100 \u00b7 crown +250<br>'+
     '<span style="color:var(--muted);font-size:11px">Each level costs a bit more than the last. New drills and showing up daily are the fastest climb.</span>'+
+    '<br><br><b style="color:var(--warn)">how par works</b><br>'+
+    '<span style="color:var(--muted);font-size:11px">Par is a clean run at NATIVE Excel pace \u2014 the same bar for everyone, every board. Plugin keyboard layers (Macabacus / FactSet) are a legal edge: their shortcuts are shorter, so beating par with them is playing it like a real desk, not cheating. Guided mode lists the alternates when one exists.</span>'+
     '</div><div class="ob-opts"><button class="ob-key primary" id="xpClose">got it</button></div></div>';
   m.classList.add('show');
   $('xpClose').onclick=()=>m.classList.remove('show');
