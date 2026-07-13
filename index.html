@@ -6150,10 +6150,15 @@ function recalc(){
 function commitAction(){ recalc(); render(); checkWin(); }
 
 function translateFormula(f, dr, dc){
+  /* r154 EXCEL PARITY: rows clamped at the STATIC ROWS_MAX (14) even when the live
+     sheet is taller — '=B14-B16' filled right became '=C14-C14' on a 17-row tab
+     (the r153 catch). Clamp to the sheet's real height instead; refs must never
+     silently re-point at a different row than the one they named. */
+  const rowMax=(typeof S!=='undefined'&&S&&S.ROWS)?Math.max(S.ROWS,ROWS_MAX):ROWS_MAX;
   return f.replace(/(\$?)([A-Za-z]+)(\$?)(\d+)/g, (m, ad, col, ar, row)=>{
     let c=col.toUpperCase().charCodeAt(0)-64, r=parseInt(row,10);
     if(!ad) c=Math.max(1,Math.min(COLS,c+dc));
-    if(!ar) r=Math.max(1,Math.min(ROWS_MAX,r+dr));
+    if(!ar) r=Math.max(1,Math.min(rowMax,r+dr));
     return ad+colLetter(c)+ar+r;
   });
 }
@@ -6575,16 +6580,21 @@ function doPaste(kind){
   if(!S.clipboard) return;
   pushUndo();
   const sr=selRange(); const cb=S.clipboard, r0=sr.r1, c0=sr.c1;
+  /* r154 EXCEL PARITY: paste TRANSLATES relative refs by the paste offset — fill
+     always did, paste never did, so '=B4+1' copied from C9 pasted at D10 still read
+     B4. Anchors hold, relatives shift, recalc reprices the value on commit. */
+  const dr=cb.rect?r0-cb.rect.r1:0, dc=cb.rect?c0-cb.rect.c1:0;
+  const xl=f=>(f&&(dr||dc))?translateFormula(f,dr,dc):f;
   for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
     const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
     const fmt=()=>{cell.bold=s.bold;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;};
     if(kind==='values'){ cell.formula=null; cell.value=s.value; }
-    else if(kind==='formulas'){ cell.formula=s.formula; cell.value=s.value; }
+    else if(kind==='formulas'){ cell.formula=xl(s.formula); cell.value=s.value; }
     else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; }
     else if(kind==='formats'){ fmt(); }
     else if(kind==='colwidths'){ colW[c0+j]=cb.cols[j]; }
     else if(kind==='transpose'){ /* handled below, skip per-cell loop */ }
-    else { cell.formula=s.formula; cell.value=s.value; fmt(); }   // all
+    else { cell.formula=xl(s.formula); cell.value=s.value; fmt(); }   // all
   }
   if(kind==='transpose'){
     for(let i=0;i<cb.w;i++) for(let j=0;j<cb.h;j++){
