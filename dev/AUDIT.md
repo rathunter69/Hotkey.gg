@@ -5239,3 +5239,30 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   build-the-finish), the randomization + self-verification bar, the latch/Freedom
   grading shape, the 8-check gate, a per-drill build-to spec table for all 13
   Foundations drills, and how it runs across the remaining sets.
+
+## r219 — Daily Challenge 2.0 + theme-label reactivity fix (Wolf)
+- DAILY CHALLENGE (T-L shipped): a ◆ daily-challenge marquee chip (accent, pulses
+  when today's sitting is unplayed, ✓ once done) opens a hero modal — today's
+  EXTRA-HARD board (curated hard pool: gauntlet/combo/cascade/threestmt/debtsched/
+  comps/waterfall/sourcesuses/football/retbridge/housestyle/dcfsens/revolver/
+  schedule; seeded worldwide via challengeSeed=dailySeed^0x9e3779b9; own board key
+  challenge-YYYY-MM-DD, distinct seed from the casual daily), a live countdown to
+  the next drop (Esc-safe, timer cleared on close), the player's streak, and a
+  STANDALONE global leaderboard (fastest-per-user from Supabase runs, medals, your
+  rank + delta, degrades gracefully offline / signed-out). GATE: level ≥3 to enter,
+  isPro() skips it (beta = all unlocked) and reveals the full field (free sees top
+  10) + replays + practice re-rolls. scoreKey() routes challenge runs to the
+  standalone board; loadChallenge rides the gate like the daily; the chip flips to
+  done on a challenge win. Verified: modal renders, countdown ticks, play loads the
+  hard board in challengeMode, Esc closes, daily/weekly unaffected, zero page errors.
+- THEME REACTIVITY (Wolf's structural note): the top-bar theme name only updated on
+  REFRESH. Root cause — index.html defined a LOCAL applyTheme() that shadowed
+  themes.js's window.applyTheme and never called syncThemeLabels(); it also set a
+  local currentTheme, not window.currentTheme (which syncThemeLabels reads). Fixed
+  index's applyTheme to set window.currentTheme + call window.syncThemeLabels().
+  Verified: label tracks Daylight→Dracula→Phoebe's Paws on SELECT, no refresh.
+  (Same render-once pattern noted for login rank-pill + keyboard-profile overlay —
+  queued for the reactivity pass; login needs a live signed-in session to verify.)
+- GATE: onboard 28 PASS, parity 94 PASS, demo-replay (navigation/modeltour/
+  threestmt/gauntlet) WIN, zero page errors. index.html only (no ?v bump — CSS +
+  JS inline).

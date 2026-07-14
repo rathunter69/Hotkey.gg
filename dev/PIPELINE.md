@@ -176,7 +176,23 @@ a default). AWAITING WOLF SIGN-OFF — the build is a config-and-content round.
 ## T-I · SEASON REWARDS TRACK  *(PRO roadmap — dev/SEASONS.md exists)*
 > Execute per dev/SEASONS.md once Wolf greenlights scope.
 
-## T-L · DAILY CHALLENGE 2.0 — QUEUED (Wolf r204, design-first)  *(not yet built)*
+## T-L · DAILY CHALLENGE 2.0 — ✅ SHIPPED r219 (Wolf)
+> Built the marquee mode. A ◆ daily-challenge chip (accent, pulses when today's
+> sitting is unplayed) opens a hero modal: today's EXTRA-HARD board (drawn from a
+> curated hard pool — gauntlet/combo/cascade/threestmt/debtsched/comps/…, seeded
+> deterministically worldwide via challengeSeed = dailySeed^0x9e3779b9, its own
+> `challenge-YYYY-MM-DD` board so it never collides with the casual morning-sheet
+> daily), a live countdown to the next drop, the player's streak, and a STANDALONE
+> global leaderboard (fastest-per-user from Supabase, medals, your rank + delta,
+> degrades gracefully offline). GATE: level ≥3 to enter, PRO skips the gate AND
+> unlocks the full field (free sees top 10) + replays + practice re-rolls — the
+> level/PRO mix Wolf's funnel wants. Esc-safe (countdown cleared on close). Gate
+> green: onboard 28, parity 94, demo-replay WIN, zero page errors. FUTURE (T-M
+> generator feeds this): difficulty tiers, branchier daily mazes. The UI-streamline
+> / IA restructure (primary-modes rail) stays a separate screenshot-first round.
+> Original design note below.
+>
+> ## (original T-L design note)
 > Wolf: "the daily challenge, which should be gated by either level or the
 > paywall, with its own standalone leaderboard that's prominent — in the vein
 > of the NYT games: extra-hard daily, with real-time leaders."
