@@ -5026,3 +5026,21 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   #8a6300 (amber-gold, ~4.5:1 on the sheet), still recognizably the "yellow"
   swatch but clearly legible. Dark-theme variant (#ffd75e) unchanged — bright
   on dark already. GATE: visual-clarity matrix ALL 311 PASS.
+
+## r206 — ghost cursor opt-in + formula refs only color during edit (Wolf)
+- Wolf, reviewing live: (1) "the ghost cursor is still distracting — keep it as
+  an optional feature"; (2) "if my cursor is on a formula it's highlighting the
+  affected cells — ok for auditing but not how Excel works, and it's distracting
+  because I can't tell where my cursor is / where to select-and-drag."
+- GHOST: the toggle has existed since r190 but defaulted ON. Flipped to default
+  OFF — now opt-in (ghostOn=false; pref reads '1'=on). Toolbar toggle unchanged;
+  both the cursor box (gated at the tick) and the pace delta stay hidden until
+  the player opts in.
+- FORMULA REFS: render used to color a formula's precedents whenever its cell was
+  merely SELECTED ("F2-to-inspect"). Real Excel colors refs only while you're IN
+  the cell (editing). Dropped the non-editing branch — refColors now populates
+  from editBuf only. Selection no longer lights up inputs, so the active outline
+  is never lost in a wash of ref outlines. Auditing still rides explicit Ctrl+[
+  trace jumps + Go-To-Special marks.
+- GATE: syntax clean → demo-replay ALL GREEN → visual matrix ALL 311 PASS.
+  index.html only (no ?v bump — Pages serves it fresh). No grading change.
