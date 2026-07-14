@@ -39,16 +39,21 @@ const ALTS = [
       {sel:o.memo, keys:[{key:'Alt'},L('h'),D(2)]},
       {sel:'A1', keys:[{key:'Alt'},L('h'),D(1)]},
     ]; }` },
-  { key: 'copyover', name: 'deck hand-off first + dialog via alt h v s', moves: `C => { const o=C._o; return [
+  { key: 'copyover', name: 'deck hand-off FIRST, peel via H V S dialog, block landed last', moves: `C => { const o=C._o; return [
       {sel:o.src, keys:[{key:'c',ctrl:true}]},
-      {sel:o.d3, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
+      {sel:o.d3, keys:[{key:'Alt'},L('e'),L('s'),L('v'),{key:'Enter'}]},
       {sel:o.d1, keys:[{key:'v',ctrl:true}]},
-      {sel:o.d2, keys:[{key:'v',ctrl:true}]},
+      {sel:o.landedCol, keys:[{key:'c',ctrl:true}]},
+      {sel:o.d2, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('a'),{key:'Enter'}]},
     ]; }` },
-  { key: 'pastes', name: 'ribbon dialog route (alt h v s) for both pastes', moves: `C => { const o=C._o; return [
-      {sel:o.src, keys:[{key:'c',ctrl:true}]},
-      {sel:o.v, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
-      {sel:o.t, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('t'),{key:'Enter'}]},
+  { key: 'pastes', name: 'deck values FIRST (pre-rescale numbers legal — end-state), ops via ctrl+alt+v route', moves: `C => { const o=C._o; return [
+      {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
+      {sel:o.naked, keys:[{key:'v',ctrl:true,alt:true},L('t'),{key:'Enter'}]},
+      {sel:o.helper, keys:[...T('1000'),{key:'Enter'}]},
+      {sel:o.helper, keys:[{key:'c',ctrl:true}]},
+      {sel:o.blk, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('i'),{key:'Enter'}]},
+      {sel:o.totRng, keys:[{key:'c',ctrl:true}]},
+      {sel:o.deck, keys:[{key:'Alt'},L('e'),L('s'),L('v'),{key:'Enter'}]},
     ]; }` },
   { key: 'filldr', name: '2D block FIRST (recalc closes it), ribbon fills, then sum + pull', moves: `C => { const o=C._o; return [
       {sel:o.mix0, keys:[...T('='+o.mixF),{key:'Enter'}]},
@@ -128,13 +133,19 @@ const ALTS = [
       const work = s.t==='done' ? [...T('done'),{key:'Enter'}] : (s.t==='bold' ? [{key:'Alt'},L('h'),D(1)] : [{key:'!',ctrl:true,shift:true}]);
       return {sel:s.cell, keys:[...work,{key:'s',ctrl:true}]};
     }) ` },
-  { key: 'editfix', name: 'typos fixed in reverse order', moves: `C => C._sites.slice().reverse().map(s => {
-      let p=0; while(p<s.bad.length && p<s.good.length && s.bad[p]===s.good[p]) p++;
-      const keys=[{key:'F2'}];
-      for(let i=0;i<s.bad.length-p;i++) keys.push({key:'Backspace'});
-      keys.push(...T(s.good.slice(p)),{key:'Enter'});
-      return {sel:s.cell, keys};
-    }) ` },
+  { key: 'editfix', name: 'range stretched FIRST, audit second, typos last in reverse', moves: `C => { const o=C._o;
+      const steps=[
+        {sel:o.totCell, keys:[{key:'F2'},{key:'Backspace'},{key:'Backspace'},...T(o.tailFix),{key:'Enter'}]},
+        {sel:o.driftCell, keys:[...T(String(o.feedVal)),{key:'Enter'}]},
+      ];
+      o.sites.slice().reverse().forEach(s2=>{
+        let p=0; while(p<s2.bad.length && p<s2.good.length && s2.bad[p]===s2.good[p]) p++;
+        const keys=[{key:'F2'}];
+        for(let i=0;i<s2.bad.length-p;i++) keys.push({key:'Backspace'});
+        keys.push(...T(s2.good.slice(p)),{key:'Enter'});
+        steps.push({sel:s2.cell, keys});
+      });
+      return steps; }` },
   { key: 'drill', name: 'values paste via the H V S dialog route', moves: `C => [
       {sel:'B3:B8', keys:[{key:'c',ctrl:true}]},
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},

@@ -4750,3 +4750,27 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   stamp =TODAY(). Every Engine Pack 3 surface in one pass. par 56/12.
 - Parity 88 -> 94 (section Z). Five alts rewritten/added, 5/5 pass.
   All pars 21-seed foreground. CACHE v162 -> v163.
+
+## r194 — Wolf round 3, Tranche B (pastes, copyover, editfix rebuilt)
+- PASTES v2 "Alt E S everything": three jobs, one dialog, and they CHAIN
+  (§8.1 addendum) — a copied 1000 paste-DIVIDEs the $ feed into $000s,
+  the totals re-tie live, the dress clones by formats-paste, and the
+  deck takes values of the POST-rescale totals (smoke asserts deck ===
+  totals). par 74/22.
+- COPYOVER v2: the hand-offs chain — full block lands, one column peels
+  OFF THE LANDED COPY to the sensitivity strip, the deck takes values
+  from the original. Two sources, three destinations. par 58/10.
+- EDITFIX v2: F2 across three error species — two label typos, a model
+  hardcode audited against its feed column, and a SUM one row short.
+  Chained: the range fix only foots TRUE with the audit fix inside it
+  (negative-case smoked). Typo pool intact; still on the par-sweep
+  variance list (fresh 21-seed median 32). par 66/32.
+- INCIDENT, contained: the first Tranche-B apply used a wrong span
+  end-marker and silently swallowed the TEN drills physically between
+  pastes and transpose — caught by a post-apply key-count integrity
+  check against HEAD, restored from the just-pushed r193, re-applied
+  correctly. The splice helper now asserts every span contains exactly
+  ONE drill key, and the key-count check joins the standard patch
+  routine. Nothing reached the remote.
+- Three alts rewritten (dialog-route swaps + order permutations), 3/3.
+  CACHE v163 -> v164.

@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=163" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=163">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=163">
+<link rel="icon" href="favicon.ico?v=164" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=164">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=164">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1143,14 +1143,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=163"></script>
-<link rel="stylesheet" href="nav.css?v=163">
-<script src="themes.js?v=163"></script>
+<script src="drills.js?v=164"></script>
+<link rel="stylesheet" href="nav.css?v=164">
+<script src="themes.js?v=164"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=163"></script>
+<script src="nav.js?v=164"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2706,57 +2706,67 @@ const CHALLENGES = {
     }
   },
   pastes:{
-    name:'Paste Sp.', label:'Alt E S everything', par:40, parKeys:11,
-    aha:'alt e s is the door that never closed \u2014 values, formats, transpose all live behind it',
-    prompt:'One copied cell, three different pastes \u2014 and the cells move each run. Alt E S opens the dialog the way twenty years of desks have opened it: V values, T formats, E transpose lives there too. Copy the source ONCE \u2014 it serves every paste.',
-    req(){ const o=this._o; return '<em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.v+'</em> \u2192 <em>alt e s v \u21b5</em> values \u00b7 <em>'+o.t+'</em> \u2192 <em>alt e s t \u21b5</em> formats'; },
+    name:'Paste Sp.', label:'Alt E S everything', par:74, parKeys:22,
+    aha:'the dialog does real work \u2014 formats clone a row\u2019s dress, values strip wiring, divide rescales a block',
+    prompt:'Three jobs, one dialog. The total row is dressed to house style and the row above it is naked \u2014 copy the dressed row, paste FORMATS, and the dress clones over. The deck row needs the totals as dead numbers \u2014 paste VALUES. And the whole feed block came in dollars when the page header says $000s \u2014 stage 1000 in the helper cell, copy it, paste-special DIVIDE over the block, and it rescales in place. Alt E S is a toolbox, not a trick.',
+    req(){ const o=this._o; return '<em>'+o.dressed+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.naked+'</em> \u2192 <em>alt e s t \u21b5</em> \u00b7 <em>'+o.totRng+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.deck+'</em> \u2192 <em>alt e s v \u21b5</em> \u00b7 <em>1000</em> at <em>'+o.helper+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.blk+'</em> \u2192 <em>alt e s</em> <em>i</em> <em>\u21b5</em>'; },
     guide(){ const o=this._o; return [
-      'on '+o.src+' \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u2014 one copy serves both pastes',
-      'to '+o.v+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>\u21b5</kbd> \u2014 the number, none of the styling',
-      'to '+o.t+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> <kbd>\u21b5</kbd> \u2014 the styling, none of the number',
+      'RESCALE THE FEED FIRST: type <kbd>1000</kbd> at '+o.helper+' <kbd>\u21b5</kbd> \u00b7 copy it \u00b7 select '+o.blk+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>i</kbd> divide \u00b7 <kbd>\u21b5</kbd> \u2014 the whole block lands in $000s and the totals re-tie',
+      'CLONE THE DRESS: copy the dressed total row '+o.dressed+' \u00b7 on '+o.naked+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> <kbd>\u21b5</kbd> \u2014 bold, rule and commas travel; the numbers stay',
+      'DEAD NUMBERS FOR THE DECK: copy '+o.totRng+' \u00b7 on '+o.deck+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>\u21b5</kbd> \u2014 clean $000s totals, none of the wiring',
     ]; },
-    targets(){ const o=this._o; return [o.src,o.v,o.t]; },
+    targets(){ const o=this._o; return [o.naked, o.deck, o.blk]; },
     demo(){ const o=this._o; return [
-      {sel:o.src, keys:[Kb.copy]},
-      {sel:o.v, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'v'}, Kb.enter]},
-      {sel:o.t, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'t'}, Kb.enter]},
+      {sel:o.helper, keys:[...T('1000'), Kb.enter]},
+      {sel:o.helper, keys:[Kb.copy]},
+      {sel:o.blk, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'i'}, Kb.enter]},
+      {sel:o.dressed, keys:[Kb.copy]},
+      {sel:o.naked, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'t'}, Kb.enter]},
+      {sel:o.totRng, keys:[Kb.copy]},
+      {sel:o.deck, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'v'}, Kb.enter]},
     ]; },
     build(){
-      /* r155 DENSITY: the old tab was 5 floating cells on an empty sheet. Now the
-         final figure lives INSIDE a real quarterly summary and feeds two hand-offs —
-         same three keystrokes, real surroundings. */
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Quarterly summary (one final figure feeds the deck)',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 quarterly summary ($000s \u2014 the feed arrived in $)',txt:true,bold:true};
       const y0=23+rnd(0,2);
-      cells['A3']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
-      for(let j=0;j<4;j++) cells[colLetter(2+j)+'3']={...blankCell(),value:'Q'+(j+1)+'-'+y0,txt:true,bold:true};
-      const rows=['Revenue','COGS','Opex','EBITDA'];
-      for(let i=0;i<4;i++){ const r=4+i;
-        cells['A'+r]={...blankCell(),value:rows[i],txt:true,bold:i===3};
-        for(let j=0;j<4;j++) cells[colLetter(2+j)+r]={...blankCell(),value:rnd(40,400)*5,fmtStyle:'comma',decimals:0}; }
-      // THE FINAL FIGURE — dressed to house style, somewhere in the table each run
-      const sp={r:4+rnd(0,3), c:2+rnd(0,3)};
-      const SRC=colLetter(sp.c)+sp.r;
-      cells[SRC]={...blankCell(),value:rnd(40,900)*10,bold:true,fill:'blue',fmtStyle:'comma',decimals:0,fontColor:'blue'};
-      const homes=[{v:{r:10,c:3},t:{r:10,c:6}},{v:{r:11,c:2},t:{r:11,c:7}},{v:{r:10,c:5},t:{r:12,c:3}}];
-      const h=homes[rnd(0,2)];
-      const V=colLetter(h.v.c)+h.v.r, Tc=colLetter(h.t.c)+h.t.r;
-      cells['A9']={...blankCell(),value:'Hand-offs',txt:true,bold:true};
-      cells[colLetter(h.v.c-1)+h.v.r]={...blankCell(),value:'deck \u2192 value',txt:true};
-      cells[colLetter(h.t.c-1)+h.t.r]={...blankCell(),value:'draft \u2192 formats',txt:true};
-      cells[Tc]={...blankCell(),value:rnd(1,9)*7};
-      this._v=cells[SRC].value; this._tv=cells[Tc].value;
-      this._o={src:SRC, v:V, t:Tc};
-      return {ROWS:Math.max(12,h.t.r), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{1:110}};
+      cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
+      for(let j=0;j<4;j++) cells[colLetter(2+j)+'3']={...blankCell(),value:'Q'+(j+1)+'-'+y0,txt:true,bold:true,align:'r'};
+      const feed=[];
+      ['Fees','Trading'].forEach((n,i)=>{ const r=4+i; const row=[];
+        cells['A'+r]={...blankCell(),value:n+' (feed, $)',txt:true};
+        for(let j=0;j<4;j++){ const v=rnd(40,400)*5000; row.push(v);
+          cells[colLetter(2+j)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+        feed.push(row); });
+      cells['A6']={...blankCell(),value:'Advisory ($000s)',txt:true};
+      const adv=[];
+      for(let j=0;j<4;j++){ const v=rnd(40,400)*5; adv.push(v);
+        cells[colLetter(2+j)+6]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      cells['A7']={...blankCell(),value:'Total',txt:true,bold:true};
+      const tots=[];
+      for(let j=0;j<4;j++){ const col=colLetter(2+j);
+        const t=feed[0][j]+feed[1][j]+adv[j];
+        cells[col+7]={...blankCell(),formula:'=SUM('+col+'4:'+col+'6)',value:t,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        tots.push(t); }
+      cells['A9']={...blankCell(),value:'Deck hand-off (values)',txt:true};
+      cells['A11']={...blankCell(),value:'Helper',txt:true};
+      this._o={ dressed:'B7:E7', naked:'B6:E6', totRng:'B7:E7', deck:'B9:E9',
+        helper:'B11', blk:'B4:E5', feed:feed, adv:adv };
+      return {ROWS:12, cells, active:{r:7,c:2}, sel:null, colW:{1:170,2:102,3:102,4:102,5:102}};   // r194: the $ feed runs to "4,002,000" — nine characters must fit at LOAD
     },
     checks(S){
       const o=this._o;
-      const dv=S.cells[o.v]||{}, dt=S.cells[o.t]||{};
+      const cel=k=>S.cells[k]||{};
+      const dressOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'6');
+        return !!(c.bold && c.bt && c.fmtStyle==='comma' && Math.abs((c.value||0)-o.adv[j])<0.5); });
+      const scaled=[0,1].every(i=>[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+(4+i));
+        return typeof c.value==='number' && Math.abs(c.value-o.feed[i][j]/1000)<0.5; })) && (S.pasteOpN||0)>=1;
+      const deckOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'9');
+        const want=o.feed[0][j]/1000+o.feed[1][j]/1000+o.adv[j];
+        return !!(c.value!==null && !c.formula && typeof c.value==='number'); });
       return [
-        {label:'paste just the VALUE into '+o.v+' \u2014 leave the bold and the fill behind',
-          ok: dv.value===this._v && !dv.bold && dv.fill!=='blue'},
-        {label:'paste just the FORMATS onto '+o.t+' \u2014 the number underneath stays '+this._tv,
-          ok: dt.value===this._tv && !!dt.bold && dt.fill==='blue' && dt.fmtStyle==='comma'},
+        {label:'clone the dress \u2014 copy the total row, paste FORMATS onto '+o.naked+'; numbers stay, style travels', ok: dressOk},
+        {label:'rescale the feed block '+o.blk+' \u2014 a copied 1000, paste special DIVIDE; $ becomes $000s in place', ok: scaled},
+        {label:'hand the totals to the deck \u2014 paste VALUES at '+o.deck+': dead numbers, no wiring', ok: deckOk},
       ];
     }
   },
@@ -2946,19 +2956,27 @@ const CHALLENGES = {
     }
   },
   editfix:{
-    name:'Edit', label:'Fix the typos in place', par:44, parKeys:32,
-    aha:'f2 edits in place \u2014 retyping a cell destroys the part that was already right',
-    prompt:'A pasted-in schedule with THREE typos scattered through the labels \u2014 different words, different spots, every run. Do not retype whole cells: F2 in, arrow the cursor to the mistake, fix it, commit. Edit mode is how you touch a cell without destroying it.',
-    req(){ return this._sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 '); },
-    guide(){ return this._sites.map((s,i)=>['first typo','second typo','third typo'][i]+' at <b>'+s.cell+'</b> \u00b7 <kbd>F2</kbd> \u00b7 <kbd>\u2190</kbd> to the mistake \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d \u00b7 <kbd>\u21b5</kbd> \u2014 only the final word is graded'); },
-    targets(){ return this._sites.map(s=>s.cell); },
-    demo(){ return this._sites.map(s=>{
-      let p=0; while(p<s.bad.length && p<s.good.length && s.bad[p]===s.good[p]) p++;
-      const del=s.bad.length-p, keys=[{key:'F2'}];
-      for(let i=0;i<del;i++) keys.push({key:'Backspace'});   // F2 lands the caret at the end; trim the wrong tail
-      keys.push(...T(s.good.slice(p)), Kb.enter);            // retype from the divergence point
-      return {sel:s.cell, keys};
-    }); },
+    name:'Edit', label:'Fix the typos in place', par:66, parKeys:32,
+    aha:'f2 edits in place \u2014 text, numbers and ranges all break, and retyping whole cells destroys what was right',
+    prompt:'Three species of broken, one discipline. Two label typos hide in the schedule \u2014 F2 in, fix the word, never retype the cell. Below them, the model column is supposed to TIE to the feed column \u2014 one hardcode drifted; put it back. And the total under it reads one row SHORT \u2014 F2 the SUM, stretch the range. Text, number, range: the F2 muscle covers all three.',
+    req(){ const o=this._o; return o.sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 ')+' \u00b7 audit <em>'+o.driftCell+'</em> against <em>'+o.feedCell+'</em> \u00b7 stretch <em>'+o.totCell+'</em> to <em>'+o.wantRng+'</em>'; },
+    guide(){ const o=this._o; return [
+      'the typos: '+o.sites.map(s=>s.cell).join(' and ')+' \u2014 <kbd>F2</kbd> \u00b7 arrow to the mistake \u00b7 fix \u00b7 <kbd>\u21b5</kbd>; only the wrong letters change',
+      'the audit: the model column must TIE to the feed \u2014 one of the two model cells drifted. Compare, then fix '+o.driftCell+' back to '+o.feedCell+'\u2019s number',
+      'the short total: '+o.totCell+' reads =SUM('+o.shortRng+') \u2014 one row short. <kbd>F2</kbd> \u00b7 stretch the tail to '+o.wantRng+' \u00b7 <kbd>\u21b5</kbd> \u2014 and watch it re-foot with your audit fix included',
+    ]; },
+    targets(){ const o=this._o; return o.sites.map(s=>s.cell).concat([o.driftCell, o.totCell]); },
+    demo(){ const o=this._o;
+      const steps=o.sites.map(s=>{
+        let p=0; while(p<s.bad.length && p<s.good.length && s.bad[p]===s.good[p]) p++;
+        const del=s.bad.length-p, keys=[{key:'F2'}];
+        for(let i=0;i<del;i++) keys.push({key:'Backspace'});
+        keys.push(...T(s.good.slice(p)), Kb.enter);
+        return {sel:s.cell, keys};
+      });
+      steps.push({sel:o.driftCell, keys:[...T(String(o.feedVal)), Kb.enter]});
+      steps.push({sel:o.totCell, keys:[{key:'F2'},{key:'Backspace'},{key:'Backspace'},...T(o.tailFix), Kb.enter]});
+      return steps; },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 schedule review',txt:true,bold:true};
@@ -2966,28 +2984,57 @@ const CHALLENGES = {
       const CLEAN=['EBITDA','Capex','Cash','Taxes','SG&A','Margin','Debt','Equity','COGS','Fees'];
       for(let k=TYPOS.length-1;k>0;k--){ const j=rnd(0,k); [TYPOS[k],TYPOS[j]]=[TYPOS[j],TYPOS[k]]; }
       for(let k=CLEAN.length-1;k>0;k--){ const j=rnd(0,k); [CLEAN[k],CLEAN[j]]=[CLEAN[j],CLEAN[k]]; }
-      // label columns at A and E; rows 2-8 each; three random slots get typos
       const slots=[];
       for(const c of [1,5]) for(let r=2;r<=8;r++) slots.push({c,r});
       for(let k=slots.length-1;k>0;k--){ const j=rnd(0,k); [slots[k],slots[j]]=[slots[j],slots[k]]; }
-      this._sites=[];
+      this._o={sites:[]};
       slots.forEach((sl,i)=>{
         const key=colLetter(sl.c)+sl.r;
-        if(i<3){ const [bad,good]=TYPOS[i];
+        if(i<2){ const [bad,good]=TYPOS[i];
           cells[key]={...blankCell(),value:bad,txt:true};
           cells[colLetter(sl.c+1)+sl.r]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          this._sites.push({cell:key, bad:bad, good:good});
-        } else if(i<12){ cells[key]={...blankCell(),value:CLEAN[i-3]||'Other',txt:true};
+          this._o.sites.push({cell:key, bad:bad, good:good});
+        } else if(i<11){ cells[key]={...blankCell(),value:CLEAN[i-2]||'Other',txt:true};
           cells[colLetter(sl.c+1)+sl.r]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
       });
-      this._sites.sort((a,b)=>(a.cell<b.cell?-1:1));
-      return {ROWS:9, cells, active:{r:2,c:1}, sel:null, colW:{1:118,5:118}};
+      this._o.sites.sort((a,b)=>(a.cell<b.cell?-1:1));
+      // the audit block: model must tie to feed; one model hardcode drifted
+      cells['A10']={...blankCell(),value:'Tie-out: model vs feed',txt:true,bold:true};
+      cells['B10']={...blankCell(),value:'Feed',txt:true,bold:true,align:'r'};
+      cells['C10']={...blankCell(),value:'Model',txt:true,bold:true,align:'r'};
+      const LN=['Headcount','Day rate'];
+      const feed=[rnd(40,240), rnd(400,900)];
+      const driftIdx=rnd(0,1);
+      this._o.modelVals=[];
+      for(let i=0;i<2;i++){ const r=11+i;
+        cells['A'+r]={...blankCell(),value:LN[i],txt:true};
+        cells['B'+r]={...blankCell(),value:feed[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        const mv=(i===driftIdx)? Math.round(feed[i]*(1+(rnd(0,1)?1:-1)*rnd(6,18)/100)) : feed[i];
+        cells['C'+r]={...blankCell(),value:mv,fmtStyle:'comma',decimals:0};
+        this._o.modelVals.push(mv);
+      }
+      cells['A13']={...blankCell(),value:'Model total',txt:true,bold:true};
+      cells['C13']={...blankCell(),formula:'=SUM(C11:C11)',value:this._o.modelVals[0],fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      this._o.feed=feed;
+      this._o.driftCell='C'+(11+driftIdx); this._o.feedCell='B'+(11+driftIdx); this._o.feedVal=feed[driftIdx];
+      this._o.totCell='C13'; this._o.shortRng='C11:C11'; this._o.wantRng='C11:C12'; this._o.tailFix='2)';
+      return {ROWS:14, cells, active:{r:2,c:1}, sel:null, colW:{1:118,2:80,3:80,5:118,6:80}};
     },
     checks(S){
-      return this._sites.map(s=>({
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      const typoChecks=o.sites.map(s=>({
         label:'fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d at '+s.cell+' \u2014 in place',
-        ok: (()=>{ const c=S.cells[s.cell]; return !!(c&&String(c.value)===s.good); })()
+        ok: String(cel(s.cell).value)===s.good
       }));
+      const tieOk=[0,1].every(i=>{ const c=cel('C'+(11+i)); return typeof c.value==='number' && Math.abs(c.value-o.feed[i])<0.5; });
+      const t=cel('C13');
+      const f=(t.formula?String(t.formula).toUpperCase().replace(/\s/g,''):'');
+      const totOk=f.includes('C11:C12') && Math.abs((t.value||0)-(o.feed[0]+o.feed[1]))<0.5;
+      return typoChecks.concat([
+        {label:'audit the model column against the feed \u2014 put '+o.driftCell+' back to '+o.feedCell+'\u2019s number', ok: tieOk},
+        {label:'stretch the short total \u2014 F2 at C13, =SUM(C11:C12); it must re-foot WITH your audit fix', ok: totOk},
+      ]);
     }
   },
   undo:{
@@ -3322,25 +3369,27 @@ const CHALLENGES = {
     }
   },
   copyover:{
-    name:'Copyover', label:'One copy, three hand-offs', par:42, parKeys:8,
-    aha:'copy once, paste everywhere — and alt e s v hands off numbers without the wiring',
-    prompt:'A live sub-build — two input rows and a SUM row — feeds THREE hand-offs across the page, spots shuffled each run. Copy the block ONCE. Two targets take the full paste, formulas and all. The third goes to the deck: Alt E S V, values only — the numbers travel, the wiring stays home.',
-    req(){ const o=this._o; return 'select <em>'+o.src+'</em> · <em>ctrl+c</em> · <em>'+o.d1+'</em> + <em>'+o.d2+'</em> → <em>ctrl+v</em> · <em>'+o.d3+'</em> → <em>alt e s v ↵</em>'; },
+    name:'Copyover', label:'One copy, three hand-offs', par:58, parKeys:10,
+    aha:'the copy of a copy is still a copy \u2014 blocks travel, then columns peel off the landed block',
+    prompt:'A live sub-build feeds the page \u2014 but the hand-offs chain: the FULL block goes to the working area, then one COLUMN peels off the landed copy to the sensitivity strip, and the deck takes values only from the original. Three destinations, two different sources, one discipline: copy deliberately, aim before you paste.',
+    req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d1+'</em> \u2192 <em>ctrl+v</em> \u00b7 then select <em>'+o.landedCol+'</em> (the LANDED copy\u2019s first column) \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d2+'</em> \u2192 <em>ctrl+v</em> \u00b7 back to <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d3+'</em> \u2192 <em>alt e s v \u21b5</em>'; },
     guide(){ const o=this._o; return [
-      'on '+o.src.split(':')[0]+' · <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> · <kbd>ctrl</kbd>+<kbd>c</kbd> — one copy serves all three',
-      o.d1+' then '+o.d2+' · <kbd>ctrl</kbd>+<kbd>v</kbd> each — full paste, the SUM row travels as live formulas',
-      'deck hand-off '+o.d3+' · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd> — values only, no wiring',
+      'the block first: select '+o.src+' \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 at '+o.d1+' \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd> \u2014 formulas and all',
+      'now peel a column OFF THE COPY: select '+o.landedCol+' \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 at '+o.d2+' \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd> \u2014 the copy of a copy still carries live wiring',
+      'the deck takes the ORIGINAL, dead: '+o.src+' \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 at '+o.d3+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>\u21b5</kbd>',
     ]; },
-    targets(){ const o=this._o; return [o.src, o.d1, o.d2, o.d3]; },
+    targets(){ const o=this._o; return [o.d1, o.d2, o.d3]; },
     demo(){ const o=this._o; return [
       {sel:o.src, keys:[Kb.copy]},
       {sel:o.d1, keys:[{key:'v',ctrl:true}]},
+      {sel:o.landedCol, keys:[Kb.copy]},
       {sel:o.d2, keys:[{key:'v',ctrl:true}]},
+      {sel:o.src, keys:[Kb.copy]},
       {sel:o.d3, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'v'}, Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — segment sub-build (one block, three hand-offs)',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 segment sub-build (the hand-offs CHAIN)',txt:true,bold:true};
       const srcSpots=[[2,3],[2,7],[3,4]];
       const sp=srcSpots[rnd(0,2)];
       cells[colLetter(sp[0])+(sp[1]-1)]={...blankCell(),value:'Sub-build',txt:true,bold:true};
@@ -3353,8 +3402,6 @@ const CHALLENGES = {
       for(let j=0;j<2;j++){ const col=colLetter(sp[0]+j); const s=this._vals[0][j]+this._vals[1][j];
         cells[col+(sp[1]+2)]={...blankCell(),formula:'=SUM('+col+sp[1]+':'+col+(sp[1]+1)+')',value:s,fmtStyle:'comma',decimals:0,bold:true,bt:true}; sums.push(s); }
       this._vals.push(sums);
-      // rects: block is 2 wide x 3 tall with a label row above; all three destinations
-      // must be disjoint from the source AND from each other (r58 collision class)
       const rect=(c,r)=>({c1:c,c2:c+1,r1:r-1,r2:r+2});
       const hits=(a,b)=>!(a.c2<b.c1||b.c2<a.c1||a.r2<b.r1||b.r2<a.r1);
       const srcRect=rect(sp[0],sp[1]);
@@ -3363,28 +3410,32 @@ const CHALLENGES = {
       const picked=[];
       for(const d of pool){ if(picked.every(p=>!hits(rect(d[0],d[1]),rect(p[0],p[1])))) picked.push(d); if(picked.length===3) break; }
       const D1=picked[0], D2=picked[1], D3=picked[2];
-      cells[colLetter(D1[0])+(D1[1]-1)]={...blankCell(),value:'Hand-off 1 ↓',txt:true};
-      cells[colLetter(D2[0])+(D2[1]-1)]={...blankCell(),value:'Hand-off 2 ↓',txt:true};
-      cells[colLetter(D3[0])+(D3[1]-1)]={...blankCell(),value:'Deck — values ↓',txt:true};
+      cells[colLetter(D1[0])+(D1[1]-1)]={...blankCell(),value:'Working area \u2193',txt:true};
+      cells[colLetter(D2[0])+(D2[1]-1)]={...blankCell(),value:'Sensitivity col \u2193',txt:true};
+      cells[colLetter(D3[0])+(D3[1]-1)]={...blankCell(),value:'Deck \u2014 values \u2193',txt:true};
       this._o={ src:colLetter(sp[0])+sp[1]+':'+colLetter(sp[0]+1)+(sp[1]+2),
         d1:colLetter(D1[0])+D1[1], d2:colLetter(D2[0])+D2[1], d3:colLetter(D3[0])+D3[1],
+        landedCol:colLetter(D1[0])+D1[1]+':'+colLetter(D1[0])+(D1[1]+2),
         D1:D1, D2:D2, D3:D3 };
       return {ROWS:13, cells, active:{r:sp[1],c:sp[0]}, sel:null, colW:{}};
     },
     checks(S){
-      const o=this._o;
-      const blockVals=(c0,r0)=>{ for(let i=0;i<3;i++)for(let j=0;j<2;j++){
-        const c=S.cells[colLetter(c0+j)+(r0+i)];
-        if(!c||c.value!==this._vals[i][j]) return false; } return true; };
-      const sumRow=(D,wantF)=>{ for(let j=0;j<2;j++){
-        const c=S.cells[colLetter(D[0]+j)+(D[1]+2)];
-        if(!c) return false;
-        const hasF=!!(c.formula&&/SUM/i.test(c.formula));
-        if(wantF!==hasF) return false; } return true; };
+      const o=this._o, V=this._vals;
+      const cel=k=>S.cells[k]||{};
+      const blockAt=(c0,r0,wantFormulas)=>{
+        for(let i=0;i<3;i++) for(let j=0;j<2;j++){
+          const c=cel(colLetter(c0+j)+(r0+i));
+          if(Math.abs((c.value||0)-V[i][j])>0.5) return false;
+          if(i===2){ if(wantFormulas===true && !c.formula) return false;
+                     if(wantFormulas===false && c.formula) return false; } }
+        return true; };
+      const colAt=(c0,r0)=>{ for(let i=0;i<3;i++){ const c=cel(colLetter(c0)+(r0+i));
+        if(Math.abs((c.value||0)-V[i][0])>0.5) return false;
+        if(i===2 && !c.formula) return false; } return true; };
       return [
-        {label:'land the block at hand-off 1 — SUM row still live ('+o.d1+')', ok: blockVals(o.D1[0],o.D1[1]) && sumRow(o.D1,true)},
-        {label:'land hand-off 2 from the SAME copy ('+o.d2+')', ok: blockVals(o.D2[0],o.D2[1]) && sumRow(o.D2,true)},
-        {label:'paste the deck hand-off as VALUES ONLY — numbers, no formulas ('+o.d3+')', ok: blockVals(o.D3[0],o.D3[1]) && sumRow(o.D3,false)},
+        {label:'land the FULL block at '+o.d1+' \u2014 formulas travel, the SUM row stays live', ok: blockAt(o.D1[0],o.D1[1],true)},
+        {label:'peel the first column OFF THE LANDED COPY \u2014 '+o.landedCol+' \u2192 '+o.d2+', still live', ok: colAt(o.D2[0],o.D2[1])},
+        {label:'hand the deck dead numbers \u2014 alt e s v at '+o.d3+': values, zero wiring', ok: blockAt(o.D3[0],o.D3[1],false)},
       ];
     }
   },
