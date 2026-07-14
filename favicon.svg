@@ -1,28 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34">
-  <!-- r134: favicon refreshed to the emblem-v3 language (rank art iteration 8):
-       engraved plate, metallic keycap rim, hot legend. Same F4 keycap identity. -->
-  <defs>
-    <linearGradient id="fvRim" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8fe6c3"/>
-      <stop offset=".45" stop-color="#6ec9a0"/>
-      <stop offset="1" stop-color="#3d8f6c"/>
-    </linearGradient>
-    <linearGradient id="fvCap" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3d4049"/>
-      <stop offset=".5" stop-color="#33363e"/>
-      <stop offset="1" stop-color="#282b32"/>
-    </linearGradient>
-    <linearGradient id="fvTop" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#4a4e58"/>
-      <stop offset="1" stop-color="#3a3d45"/>
-    </linearGradient>
-  </defs>
-  <rect width="34" height="34" rx="8" fill="#1f2126"/>
-  <rect x="1" y="1" width="32" height="32" rx="7" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
-  <rect x="5.6" y="7.6" width="22.8" height="20.8" rx="5.2" fill="rgba(0,0,0,.55)"/>
-  <rect x="6.6" y="5.8" width="20.8" height="19.4" rx="4.6" fill="url(#fvCap)" stroke="url(#fvRim)" stroke-width="1.7"/>
-  <rect x="9" y="7.9" width="16" height="6.4" rx="3.1" fill="url(#fvTop)"/>
-  <path d="M10.2 9.2h13.6" stroke="rgba(255,255,255,.16)" stroke-width="1" stroke-linecap="round"/>
-  <text x="17" y="21.9" text-anchor="middle" font-family="ui-monospace,Menlo,Consolas,monospace" font-weight="700" font-size="10" fill="#c8f4e0">F4</text>
-  <path d="M9.3 23.3h15.4" stroke="rgba(110,201,160,.35)" stroke-width="1" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- r208: sleek mark — a spreadsheet cell being navigated (cursor in a grid).
+       Reads on both light and dark browser tab bars: the green tile is mid-tone
+       (pops on white AND black), and prefers-color-scheme lifts it on dark. -->
+  <style>
+    .tile{ fill:#0e9b57 }
+    .ink { fill:none; stroke:#ffffff; stroke-width:2.4 }
+    .cur { fill:#ffffff }
+    @media (prefers-color-scheme: dark){
+      .tile{ fill:#2bb978 }
+      .ink { stroke:#0c2a1e }
+      .cur { fill:#0c2a1e }
+    }
+  </style>
+  <rect class="tile" x="2" y="2" width="28" height="28" rx="7.5"/>
+  <rect class="ink" x="9" y="9" width="14" height="14" rx="2.4"/>
+  <rect class="cur" x="16.4" y="16.4" width="6.6" height="6.6" rx="1.4"/>
 </svg>

@@ -5075,3 +5075,17 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - QUEUED next (Wolf): the "Excel-maze" movement layer — make the Ctrl-arrow lap
   bounce through a set path (maze-style, the inspiration for the app); and a
   sleeker theme-aware favicon (both being handled as follow-ups).
+
+## r208 — sleeker, theme-aware favicon (Wolf)
+- Wolf: "make the favicon more sleek — not married to the F4 logo — elegant
+  against the tab border regardless of the browser's color mode." The old F4
+  keycap plate was dark (#1f2126) and skeuomorphic: muddy at 16px, and it all
+  but vanished on a dark tab bar.
+- NEW MARK: a spreadsheet cell being navigated — a green rounded tile with a
+  white cell outline + an active-cursor block (ties straight to the app's
+  navigation identity). favicon.svg is THEME-AWARE via prefers-color-scheme:
+  deep green #0e9b57 + white cursor on light tabs, brighter mint #2bb978 + dark
+  cursor on dark tabs — legible on either bar down to 16px. Regenerated
+  favicon.ico (32px, PNG-in-ICO, transparent corners) and apple-touch-icon.png
+  (180px, full-bleed green so iOS's own rounding masks cleanly). ?v 169->170.
+- Previewed to Wolf at 16/24/32/64px on both light and dark bars before ship.
