@@ -10,6 +10,11 @@
 const { chromium } = require('playwright-core');
 const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const REPS = 5;
+// Known-high-variance drills: 5-seed medians swing across the flag threshold in
+// BOTH directions (editfix: 39, 24, 42 on successive gates; the 21-seed median
+// is exactly its declared 33). Reported as INFO, never FLAGGED — retune only
+// against a 21-seed median (doctrine r172).
+const VARIANCE_OK = new Set(['editfix']);
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
@@ -56,8 +61,10 @@ const REPS = 5;
     // DRIFT is the fixable defect (parKeys vs the live keyLog metric). s/key RATIO is
     // informational only — short drills are reading-dominated, par seconds are tuned
     // difficulty (campaign gates + XP tiers), never auto-adjusted here.
-    const flag = (drift !== null && Math.abs(drift) > 15 && Math.abs(med - row.parKeys) > 4) ? ' <-- DRIFT' : '';
-    if (flag) flagged.push({ key: row.key, par: row.par, parKeys: row.parKeys, med, drift });
+    const noisy = VARIANCE_OK.has(row.key);
+    const flag = (!noisy && drift !== null && Math.abs(drift) > 15 && Math.abs(med - row.parKeys) > 4) ? ' <-- DRIFT'
+               : (noisy && drift !== null && Math.abs(drift) > 15 ? ' (known variance — info only)' : '');
+    if (flag && !noisy) flagged.push({ key: row.key, par: row.par, parKeys: row.parKeys, med, drift });
     console.log(
       row.key.padEnd(18) + String(row.par).padStart(4) + String(row.parKeys).padStart(8) +
       String(med).padStart(9) + String(drift === null ? '—' : drift + '%').padStart(8) +

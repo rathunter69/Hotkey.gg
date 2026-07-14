@@ -4559,3 +4559,22 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   then keeps pressing keys is testing the menu. Reordered the smoke.
 - PARITY 67 -> 73 (section U). ALTS 77 -> 78 (width-first + ribbon
   unhide + grouped-while-hidden). CACHE v159 -> v160.
+
+## r186 — rapid-fire ↔ classic bridge (T-F) + par-sweep variance list
+- RAPID-FIRE DECKS: the picker's rapid-fire menu now carries a deck row —
+  "all chords" (the full bag, unchanged default) and "dialog chords":
+  find / replace / go to / format cells / insert fn / comment / freeze /
+  link / new sheet / save / show formulas / paste values — the twelve
+  ops classic drills never exercise, isolated so they stop drowning in
+  the full rotation. Deck click keeps the popover open; the duration
+  click starts the run; the bag builder filters by deck and cycles the
+  full family before any repeat.
+- reference.html gains a "Classic ↔ rapid-fire" section mapping each
+  classic drill family to the card categories that drill the same
+  chords, and naming the dialog deck's twelve.
+- PAR-SWEEP: known-variance list (editfix). Its 5-seed median has now
+  crossed the flag threshold in BOTH directions across four gates
+  (39, 24, 42 vs the 21-seed median of exactly 33). Reported as
+  info-only; the flag stays armed for every other drill. Retunes still
+  require a 21-seed median per the r172 rule.
+- No cache bump (inline page changes only; shared assets untouched).

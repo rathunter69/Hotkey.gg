@@ -590,6 +590,10 @@
   .mb-popover .mb-dur{display:block; width:100%; text-align:left; background:none; border:none; color:var(--muted);
     font-family:var(--mono); font-size:12.5px; padding:7px 12px; border-radius:6px; cursor:pointer; transition:.1s}
   .mb-popover .mb-dur:hover{color:var(--accent); background:var(--accent-glow)}
+  .mb-deckrow{display:flex; gap:4px; padding:4px 6px 6px; border-bottom:1px solid var(--line); margin-bottom:4px}
+  .mb-deck{flex:1; font-size:11px; padding:3px 6px; border-radius:5px; border:1px solid var(--line);
+    background:none; color:var(--muted); cursor:pointer; font-family:var(--mono)}
+  .mb-deck.selected{color:var(--accent); border-color:var(--accent)}
   .mb-spacer{flex:1}
   /* Monkeytype-style config bar: quiet text buttons, borders only on hover — less chrome, same tools */
   .modebar [data-tip]:hover::after, .drillbar [data-tip]:hover::after{bottom:auto !important; top:calc(100% + 8px)}   /* r70: don't clip past the viewport top */
@@ -1186,6 +1190,10 @@
           <span class="ico">⚡</span>rapid-fire<span class="caret">▾</span>
         </button>
         <div class="mb-popover" id="mbRapidPop">
+          <div class="mb-deckrow">
+            <button class="mb-deck selected" data-deck="all">all chords</button>
+            <button class="mb-deck" data-deck="dialogs">dialog chords</button>
+          </div>
           <button class="mb-dur" data-mode="rapidfire" data-dur="30">30 seconds</button>
           <button class="mb-dur" data-mode="rapidfire" data-dur="60">1 minute</button>
           <button class="mb-dur" data-mode="rapidfire" data-dur="120">2 minutes</button>
@@ -8973,10 +8981,17 @@ $('picker').addEventListener('click', e=>{ if(e.target===$('picker')) closePicke
    ============================================================ */
 let modesOpen=false, sessionOpen=false, modesMode='marathon';
 let rfTask=null, lastRapid=null, rfShuffleBag=[];
+/* r186 RAPID-FIRE DECKS (PIPELINE T-F) — classic drills never exercise the
+   dialog chords (find/replace/goto/format-cells/freeze/comment/insert-fn\u2026);
+   rapid-fire always could, but they drowned in the full bag. The 'dialogs'
+   deck is that family alone \u2014 the bridge between the two modes. */
+const RF_DIALOG_OPS = new Set(['find','replace','goto','format_cells','insert_function',
+  'add_comment','freeze_panes','hyperlink','new_sheet','save','show_formulas','paste_values']);
+let rfDeck = 'all';
 // Fisher-Yates shuffle for the rapid-fire bag — every op appears exactly once per cycle before any repeat,
 // and the first op of a new cycle is swapped if it would match the last op served (no cross-cycle dupes).
 function rfReshuffleBag(){
-  const bag = [...RF_OPS];
+  const bag = rfDeck==='dialogs' ? RF_OPS.filter(o=>RF_DIALOG_OPS.has(o.op)) : [...RF_OPS];
   for(let i = bag.length - 1; i > 0; i--){
     const j = Math.floor(Math.random() * (i + 1));
     [bag[i], bag[j]] = [bag[j], bag[i]];
@@ -9789,6 +9804,13 @@ document.querySelectorAll('.mb-dur').forEach(b=>{
     if(demoPlaying) return;
     closeAllModePops();
     startSession(b.dataset.mode, +b.dataset.dur);
+  });
+});
+document.querySelectorAll('.mb-deck').forEach(b=>{
+  b.addEventListener('click', e=>{
+    e.stopPropagation();   // picking a deck must not close the popover — the duration click starts the run
+    rfDeck = b.dataset.deck;
+    document.querySelectorAll('.mb-deck').forEach(x=>x.classList.toggle('selected', x===b));
   });
 });
 $('mhStop').addEventListener('click', ()=>{ endSession(); });

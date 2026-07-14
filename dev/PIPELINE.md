@@ -69,12 +69,9 @@ eval). The harness has been in the standard gate since r169.
 > SUBTOTAL(9) visible-aware math so a future drill can grade "the total
 > follows the filter". Each lands with parity asserts.
 
-## T-F · RAPID-FIRE ↔ CLASSIC BRIDGE  *(any model)*
-> Rapid-fire recognizes 15+ chords classic never exercises (find/replace/goto/
-> format-cells/freeze/comment/insert-fn…). Add a "dialog chords" rapid-fire
-> deck surfaced from the picker next to the classic groups it feeds, and a
-> reference.html section mapping every classic drill → its chord family →
-> its rapid-fire cards. Zero engine work; pure wiring + content.
+## T-F · RAPID-FIRE ↔ CLASSIC BRIDGE — DONE r186 (dialog-chords deck in the
+picker, twelve ops; reference.html classic↔card map). Future idea only:
+per-category cycling using RF_CAT (the map has existed since r143).
 
 ## T-G · SCRAPE-DRIVEN CONTENT REFRESH — PARTIALLY DONE r171  *(finish needs egress)*
 > DONE via search layer: dev/CANON_DIFF.md (coverage diff, 6 new-drill
