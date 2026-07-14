@@ -5044,3 +5044,34 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   trace jumps + Go-To-Special marks.
 - GATE: syntax clean → demo-replay ALL GREEN → visual matrix ALL 311 PASS.
   index.html only (no ?v bump — Pages serves it fresh). No grading change.
+
+## r207 — navigation rebuilt as a MOVE + SELECT drill; structure ops split out (Wolf)
+- Wolf, reviewing r203 live: drop Ctrl+End; the drill should teach the selection
+  muscle analysts live on — select entire row (Shift+Space), entire column
+  (Ctrl+Space), extend a selection (Shift+arrow), shoot to the edge
+  (Ctrl+Shift+arrow) — and Ctrl+arrow should land on the true data edge (it
+  "wasn't navigating properly" because r203's board had an empty margin hole).
+  He chose "focus navigation; move structure (insert row/col) to the next drill;
+  add more navigation muscle, get creative."
+- REBUILD: contiguous P&L (no holes → every Ctrl-arrow lands true). 8 graded
+  beats, each latched on the exact state: Ctrl+Home → Ctrl+→ (jump) → Ctrl+Space
+  (whole column) → Ctrl+Home/Ctrl+↓ (dive) → Shift+→ (nudge) → Ctrl+Shift+→
+  (shoot to edge) → Shift+Space (whole row) → Ctrl+Space (the whole model, the
+  Shift+Space→Ctrl+Space "select everything" trick as the climax). No Ctrl+End,
+  no insert/type. The finale grades on the DATA extent so Ctrl+A is an equal
+  route (the alt uses it).
+- ENGINE: selectRow()/selectCol() now call checkWin() (mirrors move()) — a
+  selection-final drill couldn't auto-complete before; this is the same fix
+  class as the r203 move()-checkWin note. Benign for every other drill (checkWin
+  no-ops unless all checks pass).
+- par 38→42, parKeys 11 (measured 9). meta desc + alt-paths route updated.
+- GATE: syntax clean → demo-replay navigation WIN 3/3, E2E ALL GREEN →
+  alt-paths ALL 80 PASS (caught + fixed a finale grading bug: the `all` latch
+  measured vs S.ROWS, but Ctrl+A stops at the used range < grid height; re-based
+  on the data extent) → par-sweep FLAGGED 0 → fit ALL CLEAN → parity PASS →
+  onboard PASS → visual ALL 311 PASS. index.html + drills.js (desc/par) +
+  e2e-alt-paths.js. No shared-asset ?v bump (index/drills already at v169 from
+  this session's arc; drills.js desc is display-only).
+- QUEUED next (Wolf): the "Excel-maze" movement layer — make the Ctrl-arrow lap
+  bounce through a set path (maze-style, the inspiration for the app); and a
+  sleeker theme-aware favicon (both being handled as follow-ups).

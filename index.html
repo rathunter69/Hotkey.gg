@@ -6483,37 +6483,39 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation tour', par:38, parKeys:11,
-    aha:'the keyboard teleports corner to corner — then one chord fills a whole row you would have dragged',
-    prompt:'The mouse crawls; the keyboard teleports. Lap this model corner to corner — Ctrl+Home to the top-left, Ctrl+End to the far corner, and the Ctrl-arrows jump edge to edge with zero scrolling. Then the payoff every analyst feels on day one: the EBIT margin is only filled for the first year. Select the row and Ctrl+R spreads the formula across all four years in a single keystroke — no dragging the little handle. Land back at A1.',
-    req:'<em>ctrl+home</em> → <em>ctrl+end</em> → <em>ctrl+←</em> → <em>ctrl+↑</em> → <em>ctrl+→</em> → <em>ctrl+↓</em> · fill the margin row <em>B7:E7</em> → <em>ctrl+r</em> · <em>ctrl+home</em>',
+    name:'Navigate', label:'Navigation tour', par:42, parKeys:11,
+    aha:'the keyboard doesn’t just move — it GRABS: a column, a row, the whole model, each in one chord',
+    prompt:'The mouse crawls; the keyboard teleports — and then it grabs. Lap this model with the Ctrl-arrows (jump edge to edge, zero scrolling), then learn the selection chords every analyst lives on: Ctrl+Space takes a whole column, Shift+arrow opens a selection cell by cell, Ctrl+Shift+arrow shoots it to the edge in one shot, Shift+Space takes a whole row — and Shift+Space then Ctrl+Space grabs the entire model at once. No mouse touches the sheet.',
+    req:'<em>ctrl+home</em> → <em>ctrl+→</em> · <em>ctrl+space</em> (column) · <em>ctrl+home</em> → <em>ctrl+↓</em> · <em>⇧+→</em> · <em>ctrl+⇧+→</em> · <em>⇧+space</em> (row) · <em>ctrl+space</em> (all)',
     guide:[
       '<kbd>ctrl</kbd>+<kbd>home</kbd> — snap to the top-left corner, A1',
-      '<kbd>ctrl</kbd>+<kbd>end</kbd> — teleport straight to the bottom-right corner of the data',
-      '<kbd>ctrl</kbd>+<kbd>←</kbd> — jump to the start of the row',
-      '<kbd>ctrl</kbd>+<kbd>↑</kbd> — jump back to the top',
       '<kbd>ctrl</kbd>+<kbd>→</kbd> — jump to the end of the header row',
-      '<kbd>ctrl</kbd>+<kbd>↓</kbd> — dive to the bottom of the column',
-      'the margin is only done for FY1: select <b>B7</b> across to <b>E7</b> (<kbd>⇧</kbd>+<kbd>→</kbd> walks the selection) · <kbd>ctrl</kbd>+<kbd>r</kbd> — the formula fills every year in ONE keystroke',
-      '<kbd>ctrl</kbd>+<kbd>home</kbd> — finish at A1, the margin line complete',
+      '<kbd>ctrl</kbd>+<kbd>space</kbd> — select the whole year column, top to bottom',
+      '<kbd>ctrl</kbd>+<kbd>home</kbd>, then <kbd>ctrl</kbd>+<kbd>↓</kbd> — dive to the bottom of the labels',
+      '<kbd>⇧</kbd>+<kbd>→</kbd> — open the selection one cell at a time',
+      '<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> — shoot the selection to the far edge of the row',
+      '<kbd>⇧</kbd>+<kbd>space</kbd> — select the entire row',
+      '<kbd>ctrl</kbd>+<kbd>space</kbd> — widen it to the whole model: everything selected in one chord',
     ],
-    targets:['A1','E7','A7','A1','E1','E6','B7:E7','A1'],
+    targets:['A1','E1','E1:E6','A6','A6:B6','A6:E6','A6:J6','A1:J6'],
     demo(){ return [
-      {sel:'C4',    keys:[Kb.ctrlHome]},
-      {sel:'A1',    keys:[Kb.ctrlEnd]},
-      {sel:'E7',    keys:[Kb.ctrlLeft]},
-      {sel:'A7',    keys:[{key:'ArrowUp', ctrl:true}]},
-      {sel:'A1',    keys:[Kb.ctrlRight]},
-      {sel:'E1',    keys:[Kb.ctrlDown]},
-      {sel:'B7',    keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR]},
-      {sel:'A1',    keys:[Kb.ctrlHome]},
+      {sel:'C3',    keys:[Kb.ctrlHome]},                              // → A1
+      {sel:'A1',    keys:[Kb.ctrlRight]},                             // → E1 (end of header)
+      {sel:'E1',    keys:[{key:' ',ctrl:true}]},                      // Ctrl+Space → whole column E
+      {sel:'E1:E6', keys:[Kb.ctrlHome, Kb.ctrlDown]},                 // → A1 → A6 (bottom of labels)
+      {sel:'A6',    keys:[{key:'ArrowRight',shift:true}]},            // Shift+→ → A6:B6 (nudge)
+      {sel:'A6:B6', keys:[{key:'ArrowRight',ctrl:true,shift:true}]},  // Ctrl+Shift+→ → A6:E6 (to edge)
+      {sel:'A6:E6', keys:[{key:' ',shift:true}]},                     // Shift+Space → whole row 6
+      {sel:'A6:J6', keys:[{key:' ',ctrl:true}]},                      // Ctrl+Space → whole model
     ]; },
     build(){
-      // r203 (Wolf): the FLAGSHIP intro — movement first (teleport corner to corner with
-      // Ctrl+Home/End + the Ctrl-arrows), then ONE productivity payoff: fill the EBIT-margin
-      // formula across a whole row with Ctrl+R (the "mouse takes 10s, keyboard takes 1"
-      // moment). No insert, no typing — that structural work is rowops, two drills on.
-      // Board pre-dressed to the banker's-workbook bar (§2.1b); only the margin awaits its fill.
+      // r207 (Wolf): the FLAGSHIP is a NAVIGATION drill — move + SELECT at speed, no mouse.
+      // Structure ops (insert row / insert column) moved to the next Foundations drill; this one
+      // is pure travel + selection muscle: teleport the corners with the Ctrl-arrows, then the
+      // chords analysts live on — Ctrl+Space (column), Shift+arrow (nudge), Ctrl+Shift+arrow
+      // (shoot to the edge), Shift+Space (row), and Shift+Space→Ctrl+Space (the whole model).
+      // CONTIGUOUS board (no empty holes) so every Ctrl-arrow lands on the true data edge.
+      // Pre-dressed to the banker's-workbook bar (§2.1b).
       const cells={};
       const y0=rnd(23,26);
       cells['A1']={...blankCell(),value:codename(),txt:true,bold:true,bb:true};
@@ -6523,7 +6525,6 @@ const CHALLENGES = {
       cells['A4']={...blankCell(),value:'Gross profit',txt:true,bold:true};
       cells['A5']={...blankCell(),value:'Operating expenses',txt:true};
       cells['A6']={...blankCell(),value:'EBIT',txt:true,bold:true};
-      cells['A7']={...blankCell(),value:'EBIT margin',txt:true};
       for(let c=2;c<=5;c++){ const L=colLetter(c);
         const rev=rnd(140,200)*5, cogs=-rnd(60,110), opex=-rnd(30,70);
         cells[L+'2']={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
@@ -6532,35 +6533,37 @@ const CHALLENGES = {
         cells[L+'5']={...blankCell(),value:opex,fmtStyle:'comma',decimals:0,fontColor:'blue'};
         cells[L+'6']={...blankCell(),formula:'='+L+'4+'+L+'5',value:rev+cogs+opex,fmtStyle:'comma',decimals:0,bold:true,bt:true};
       }
-      cells['B7']={...blankCell(),formula:'=B6/B2',value:cells['B6'].value/cells['B2'].value,fmtStyle:'percent',decimals:1};   // FY1 only — C7:E7 await the fill
-      this._mExp={};
-      for(let c=3;c<=5;c++){ const L=colLetter(c); this._mExp[L]=cells[L+'6'].value/cells[L+'2'].value; }
-      return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:132,2:74,3:74,4:74,5:74}};
+      return {ROWS:6, cells, active:{r:3,c:3}, sel:null, colW:{1:132,2:74,3:74,4:74,5:74}};
     },
-    // Movement latches sequentially (Ctrl+Home → End → the arrows); the fill is graded on
-    // the END STATE so the payoff can be reached any legitimate way.
+    // Each chord latches sequentially: movement beats check the active cell (no selection),
+    // selection beats check the exact selRange rectangle. Grading the STATE (not the keystroke)
+    // keeps every legit route valid — the alt reaches the same rectangles a different way.
     checks(S){
-      if(!S.navProgress) S.navProgress = { home:false, end:false, left:false, up:false, right:false, down:false };
+      if(!S.navProgress) S.navProgress = { home:false, jumpR:false, colE:false, bottom:false, nudge:false, edge:false, rowAll:false, all:false };
       const np = S.navProgress;
-      const a=(r,c)=> S.active.r===r && S.active.c===c && !S.sel;
-      if(!np.home && a(1,1)) np.home = true;
-      if( np.home && !np.end  && a(7,5)) np.end  = true;
-      if( np.end  && !np.left && a(7,1)) np.left = true;
-      if( np.left && !np.up   && a(1,1)) np.up   = true;
-      if( np.up   && !np.right&& a(1,5)) np.right= true;
-      if( np.right&& !np.down && a(6,5)) np.down = true;
-      const cel=k=>S.cells[k]||{};
-      const fillOk = ['C','D','E'].every(c=>{ const x=cel(c+'7');
-        return !!(x.formula && typeof x.value==='number' && Math.abs(x.value-this._mExp[c])<1e-6); });
+      const A=S.active, sel=S.sel, s=selRange();
+      const at=(r,c)=> A.r===r && A.c===c && !sel;
+      const rng=(r1,r2,c1,c2)=> !!sel && s.r1===r1 && s.r2===r2 && s.c1===c1 && s.c2===c2;
+      if(!np.home   && at(1,1))                     np.home   = true;
+      if( np.home   && !np.jumpR  && at(1,5))        np.jumpR  = true;   // Ctrl+→ to E1
+      if( np.jumpR  && !np.colE   && rng(1,S.ROWS,5,5)) np.colE = true;  // Ctrl+Space, column E
+      if( np.colE   && !np.bottom && at(6,1))        np.bottom = true;   // Ctrl+Home → Ctrl+↓ to A6
+      if( np.bottom && !np.nudge  && rng(6,6,1,2))   np.nudge  = true;   // Shift+→ nudge A6:B6
+      if( np.nudge  && !np.edge   && rng(6,6,1,5))   np.edge   = true;   // Ctrl+Shift+→ to data edge A6:E6
+      if( np.edge   && !np.rowAll && rng(6,6,1,COLS))np.rowAll = true;   // Shift+Space, whole row
+      // finale: the whole model selected — measured against the DATA extent (6 rows, through
+      // col E), not the grid, so BOTH routes count: Ctrl+A stops at the used range (A1:E6) while
+      // Shift+Space→Ctrl+Space spans the full sheet — either covers the model, any legit way.
+      if( np.rowAll && !np.all && !!sel && s.r1===1 && s.r2>=6 && s.c1===1 && s.c2>=5) np.all = true;
       return [
-        {label:'Ctrl+Home → A1, the top-left corner',                 ok: np.home},
-        {label:'Ctrl+End → the bottom-right corner in one press',     ok: np.end},
-        {label:'Ctrl+← to the start of the row',                      ok: np.left},
-        {label:'Ctrl+↑ back to the top',                              ok: np.up},
-        {label:'Ctrl+→ to the end of the header row',                 ok: np.right},
-        {label:'Ctrl+↓ to the bottom of the column',                  ok: np.down},
-        {label:'fill the EBIT margin across — select B7:E7, Ctrl+R spreads the formula to every year', ok: fillOk},
-        {label:'finish at A1 — Ctrl+Home',                            ok: np.down && fillOk && a(1,1)},
+        {label:'Ctrl+Home — snap to the top-left corner (A1)',              ok: np.home},
+        {label:'Ctrl+→ — jump to the end of the header row',                ok: np.jumpR},
+        {label:'Ctrl+Space — select the entire year column',               ok: np.colE},
+        {label:'Ctrl+Home, then Ctrl+↓ — dive to the bottom of the labels', ok: np.bottom},
+        {label:'Shift+→ — open the selection one cell at a time',           ok: np.nudge},
+        {label:'Ctrl+Shift+→ — shoot the selection to the edge of the row',  ok: np.edge},
+        {label:'Shift+Space — select the entire row',                       ok: np.rowAll},
+        {label:'Ctrl+Space — grab the whole model, everything at once',     ok: np.all},
       ];
     }
   }
@@ -8719,6 +8722,7 @@ function selectRow(){
     S.sel={r:S.active.r,c:1}; S.active={r:S.active.r,c:COLS};
   }
   render();
+  checkWin();   // r207: selection-final drills (the navigation tour ends on a select) need the win check
 }
 function selectCol(){
   // Same as selectRow but for columns — Ctrl+Space preserves column span and extends to all rows.
@@ -8731,6 +8735,7 @@ function selectCol(){
     S.sel={r:1,c:S.active.c}; S.active={r:S.ROWS,c:S.active.c};
   }
   render();
+  checkWin();   // r207: mirror selectRow — selection is a legitimate final action
 }
 // ============================================================
 // ROW / COLUMN INSERT + DELETE
