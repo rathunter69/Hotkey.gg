@@ -193,12 +193,13 @@
   @keyframes ants{to{background-position:8px 0,-8px 100%,0 -8px,100% 8px}}
   /* r160: applied borders are INK (Excel parity) — accent is the SELECTION language.
      On accent they were near-invisible on light themes and read as selection. */
-  td.bt{box-shadow:inset 0 2px 0 -0px var(--text)}
-  td.bb{box-shadow:inset 0 -2px 0 -0px var(--text)}
-  td.bt.bb{box-shadow:inset 0 2px 0 var(--text), inset 0 -2px 0 var(--text)}
+  /* r202 (Wolf): thin single-rule weight — visible but realistic, closer to Excel's 1px */
+  td.bt{box-shadow:inset 0 1px 0 -0px var(--text)}
+  td.bb{box-shadow:inset 0 -1px 0 -0px var(--text)}
+  td.bt.bb{box-shadow:inset 0 1px 0 var(--text), inset 0 -1px 0 var(--text)}
   td.it{font-style:italic}
   td.strike{text-decoration:line-through; opacity:.75}
-  td.ball{box-shadow:inset 0 0 0 1.5px var(--text)}
+  td.ball{box-shadow:inset 0 0 0 1px var(--text)}
 
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
      faint at rest, lit in Alt-mode. Mirrors Excel instead of popping a banner. */
@@ -7077,10 +7078,10 @@ function render(){
       let extraStyle = '';
       if(cell.bl || cell.br){   // r193: left/right edges compose inline (class shadows can't stack four ways)
         const sh=[];
-        if(cell.bt) sh.push('inset 0 2px 0 var(--text)');
-        if(cell.bb) sh.push('inset 0 -2px 0 var(--text)');
-        if(cell.bl) sh.push('inset 2px 0 0 var(--text)');
-        if(cell.br) sh.push('inset -2px 0 0 var(--text)');
+        if(cell.bt) sh.push('inset 0 1px 0 var(--text)');
+        if(cell.bb) sh.push('inset 0 -1px 0 var(--text)');
+        if(cell.bl) sh.push('inset 1px 0 0 var(--text)');
+        if(cell.br) sh.push('inset -1px 0 0 var(--text)');
         extraStyle += ';box-shadow:'+sh.join(', ');
       }
       if(refColor && !isActive && !(editing && editPointer && r===editPointer.r && c===editPointer.c)){
