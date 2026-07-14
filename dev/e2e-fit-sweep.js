@@ -42,6 +42,26 @@ const EXEMPT = new Set(['autofit', 'combo', 'gauntlet', 'unhide']);   // unhide 
         return out;
       }, key);
       if (hits.length) { (bad[key] = bad[key] || new Set()); hits.forEach(h => bad[key].add(h)); }
+      // r190: POST-SOLVE fit — Wolf kept resizing columns after comma-formatting.
+      // Replay the demo and scan the WIN state too; formats applied mid-drill
+      // (comma@2, paren negatives) must also fit without touching a width.
+      const post = await page.evaluate((k) => {
+        const C = CHALLENGES[k];
+        const moves = (typeof C.demo === 'function') ? C.demo.call(C) : C.demo;
+        if (!moves) return [];
+        for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+        const out = [];
+        for (let c = 1; c <= COLS; c++) {
+          for (let r = 1; r <= S.ROWS; r++) {
+            const cell = S.cells[colLetter(c) + r];
+            if (!cell || cell.wrap || typeof cell.value !== 'number') continue;
+            const t = fmtNum(cell.value, cell.fmtStyle, cell.decimals);
+            if (t.length * CHARPX + 12 > colW[c]) out.push('POST:' + colLetter(c) + r + '=' + t + ' @' + colW[c] + 'px');
+          }
+        }
+        return out;
+      }, key);
+      if (post.length) { (bad[key] = bad[key] || new Set()); post.forEach(h => bad[key].add(h)); }
     }
   }
   const names = Object.keys(bad);

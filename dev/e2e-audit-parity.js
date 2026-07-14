@@ -255,7 +255,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     setDemoSel('D3'); demoKey({key:'Alt'}); demoKey({key:'o'}); demoKey({key:'e'}); demoKey({key:'d'});
     const date = dispText(S.cells['D3']);
     setDemoSel('D4'); for (const ch of 'Adj.') demoKey({key:ch}); demoKey({key:'Enter'});
-    setDemoSel('D4'); demoKey({key:'1', ctrl:true}); demoKey({key:'f'});
+    setDemoSel('D4'); demoKey({key:'1', ctrl:true}); demoKey({key:'e'});
     const foot = S.cells['D4'].value;
     setDemoSel('D5'); for (const ch of 'Title') demoKey({key:ch}); demoKey({key:'Enter'});
     setDemoSel('D5:G5'); demoKey({key:'1', ctrl:true}); demoKey({key:'a'});
@@ -265,7 +265,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   });
   ok(q1.mult === '8.3x' || q1.mult === '8.2x' || /x$/.test(q1.mult), 'ctrl+1 X casts a multiple (…x, 1 dec)', q1.mult);
   ok(/^[A-Z][a-z]{2}-\d{2}$/.test(q1.date), 'alt o e D turns a serial into Mmm-yy', q1.date);
-  ok(q1.foot === 'Adj.¹', 'ctrl+1 F marks a footnote superscript', q1.foot);
+  ok(q1.foot === 'Adj.¹', 'ctrl+1 E (Excel\'s Alt+E) marks a footnote superscript', q1.foot);
   ok(q1.ca === 4, 'ctrl+1 A centers ACROSS the selected span', q1.ca);
   ok(q1.clean, 'esc leaves the dialog cleanly');
 

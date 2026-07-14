@@ -16,9 +16,29 @@ What remains, and what unblocks it:
    column hide (render surface), Alt H O H row height (needs a height model),
    SUBTOTAL(9) visible-aware math (pairs with a "total follows the filter"
    drill).
+## WOLF PLAYTEST QUEUE (r192, specced from live feedback July 2026)
+1. SORT WARNING dialog: single-column selection adjacent to data + alt a s d
+   → Excel's "expand the selection?" prompt (E expand default / C current
+   only / Esc). Expand = grow to the contiguous block, sort rows by the
+   ORIGINAL active column. sortRange already row-sorts within selection —
+   the warning is the missing guardrail. Sort drill gains the expand route
+   as an alt; parity asserts both paths.
+2. CTRL+ARROW early stop on the sort board (reported: lands 2-3 cells down,
+   not at the bottom) — reproduce first; suspect sort's deep-cloned blank
+   cells or prebuilt formatted-empties registering as content in nonEmpty().
+   Fix at the jump primitive, parity-assert with formatted-empty cells.
+3. ALT+= flow: (a) range-form — selection ending in empty total cell(s)
+   fills committed SUMs with selection preserved (true Excel, the power
+   move); (b) single-cell proposal — Enter-commit STAYS on the cell so
+   bold/border follows immediately (Wolf's workflow ask). Re-measure
+   foot/sort/gauntlet pars (keystroke counts drop).
+
 Future-content seedbank: equity DISTRIBUTION waterfall (RoC/pref/catch-up/
 carry — see REALISM_NOTES r181), RF per-category cycling via RF_CAT,
-interview mode report-card stall coaching, plugin-floor display.
+interview mode report-card stall coaching, plugin-floor display, in-cell
+PARTIAL text formatting (would make the footnote flow fully Excel-real:
+select "(1)" inside the cell, ctrl+1, superscript — engine has whole-cell
+formatting only; big lift, queued for if formatting depth becomes a pillar).
 *(r169. Wolf: paste any task block below into a fresh session as the opening
 prompt. Each is self-contained; every task ends with the full gate from
 dev/DRILL_DOCTRINE.md §4 and an AUDIT.md round entry. Order is priority order,

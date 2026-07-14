@@ -4632,3 +4632,40 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   three gates to what's next (egress session, Wolf's two decisions,
   deferred engine items) named explicitly for whichever session
   continues from here.
+
+## r190 — Wolf's playtest round: ghost toggle, real footnote chord, (parens)
+- GHOST: now a toolbar toggle (👻, persisted, default on) — Wolf: "I like
+  it but it's distracting." Off hides the cursor ghost AND the pb pace
+  counter; race links stay visible. The "slightly off" highlight was
+  real: the ghost box ignored gridwrap scroll offsets — fixed.
+- FOOTNOTE: the Format Cells letter is now E — Excel's actual Font-tab
+  superscript accelerator (Alt+E), exactly the flow Wolf described from
+  the desk. F is inert in the dialog. Both routes (ctrl+1 / alt o e)
+  parity-tested. Whole-cell ¹ stays the mechanic — in-cell partial text
+  selection is beyond the engine deliberately; noted in PIPELINE.
+- (PARENS): comma and currency styles now wrap negatives in parentheses
+  — Excel's own behavior and the desk convention Wolf asked for by
+  name. Percent/mult keep the minus. Alt H K suddenly earns its keep:
+  the comma pass is what flips costs to (parens) on the page.
+- DRESS v4: gains the beat Wolf specced — a live EBITDA total row to
+  bold + rule off (alt h b t), costs visibly flip to (parens) during
+  the comma pass, and columns are wide enough that NOTHING needs
+  resizing mid-drill (his exact complaint). Six checks — one over the
+  soft cap, accepted for the flagship full-pass drill. par 112 /
+  parKeys 28 (21-seed flat).
+- FIT-SWEEP LEARNS POST-SOLVE: the sweep now replays every demo and
+  scans the WIN state too. First run caught NINE drills that could
+  ##### mid-solve (the class Wolf kept hitting): parens widened
+  schedule/debtsched/nwcsched, comma@2 overflowed ribbon/saves, raw
+  10-sig-fig quotients overflowed triage/covtable/cases, dcf was
+  borderline. All fixed at the source (widths, magnitudes, seeded
+  decimals). ALL CLEAN, load + post-solve, 74 drills.
+- Gate postscript: the dress par tune initially FAILED SILENTLY — its
+  patch anchor used a literal em dash where the file stores —, the
+  assert tripped inside a background command chain, and the gate ran on
+  stale values (that was the FLAGGED:1). Root rule reaffirmed: anchor
+  asserts only protect you if the script runs where you can SEE it die
+  — par tunes now run foreground before any gate. Also: wk13's 58px
+  columns overflowed on paren-negative seeds the first clean sweep
+  happened to miss — widened to 76 (fit is seed-dependent; the sweep's
+  3 reps are a sample, not a proof).

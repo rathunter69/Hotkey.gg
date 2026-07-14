@@ -1202,6 +1202,7 @@
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
+      <button class="mb-tool" id="ghostToggle" data-tip="PB pace counter + cursor ghost \u2014 click to toggle">\ud83d\udc7b ghost: on</button>
       <span style="position:relative; display:inline-flex">
       <button class="mb-tool" id="dailyBtn" data-tip="the morning sheet — three drills for today: the daily, a weak spot, and fresh ground">⚡ sheet</button>
       <div class="prefs-pop" id="sheetPop" style="min-width:290px; flex-direction:column; gap:4px"></div>
@@ -1947,16 +1948,17 @@ const CHALLENGES = {
     }
   },
   dress:{
-    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:104, parKeys:23,
+    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:112, parKeys:28,
     aha:'a full dress pass is chords end to end \u2014 the tab should read like a printed page',
     prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, inputs in blue, margins as clean percents, dollars with commas. Four different formatting muscles, one pass, and the sites move every run.',
-    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 footnote the margin label <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>f</em>'; },
+    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 footnote the margin label <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 dress the EBITDA row <em>A'+R.tRow+':E'+R.tRow+'</em> \u2192 <em>ctrl+b</em> + <em>alt h b t</em>'; },
     guide:[
       'A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 the title carries the rule',
       'select the input block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means typed, black means computed',
       'select the margins row \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> \u2014 one decimal',
       'select the dollar figures \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 commas, zero decimals',
-      'the margin is adjusted \u2014 it needs its footnote: on A-of-the-margin-row \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>f</kbd> marks it \u00b9',
+      'the margin is adjusted \u2014 it needs its footnote: on A-of-the-margin-row \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>e</kbd> \u2014 superscript, Excel\u2019s own Alt+E \u2014 marks it \u00b9',
+      'the EBITDA row carries the page \u00b7 select A-through-E on it \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold with a rule above; and notice the costs now read (parens) once the commas land',
     ],
     targets:[function(){return 'A1';}, function(){return this._R.inpRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}, function(){return 'A'+this._R.mRow;}],
     demo(){ const R=this._R;
@@ -1965,7 +1967,8 @@ const CHALLENGES = {
         {sel:R.inpRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
         {sel:R.mRowRange, keys:[Kb.pct, {key:'Alt'}, L('h'), D(0)]},
         {sel:R.fRange, keys:[{key:'Alt'}, L('h'), L('k')]},
-        {sel:'A'+R.mRow, keys:[{key:'1',ctrl:true}, L('F')]},
+        {sel:'A'+R.mRow, keys:[{key:'1',ctrl:true}, L('E')]},
+        {sel:'A'+R.tRow+':E'+R.tRow, keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('t')]},
       ]; },
     build(){
       const cells={};
@@ -1981,13 +1984,18 @@ const CHALLENGES = {
         r++; }
       const cRow=r; cells['A'+cRow]={...blankCell(),value:'Costs',txt:true};
       for(let c=2;c<=5;c++) cells[colLetter(c)+cRow]={...blankCell(),value:-rnd(50,200)*5};
-      const mRow=cRow+2;
+      const tRow=cRow+1, mRow=cRow+2;
+      cells['A'+tRow]={...blankCell(),value:'EBITDA',txt:true};   // r190: the total line — live SUM, dressed by the player
+      for(let c=2;c<=5;c++){ const L2=colLetter(c);
+        let tot=0; for(let rr=4;rr<=cRow;rr++) tot+=cells[L2+rr].value;
+        cells[L2+tRow]={...blankCell(),formula:'=SUM('+L2+'4:'+L2+cRow+')',value:tot}; }
       cells['A'+mRow]={...blankCell(),value:'EBITDA margin',txt:true};
       for(let c=2;c<=5;c++){ const L2=colLetter(c);
         let rev=0; for(let rr=4;rr<cRow;rr++) rev+=cells[L2+rr].value;
         cells[L2+mRow]={...blankCell(),formula:'=('+L2+'4+'+L2+cRow+')/'+L2+'4',value:(rev/nSeg+cells[L2+cRow].value)/(rev/nSeg), decimals:4}; }   // r176: raw-but-short
-      this._R={ inpRange:'B4:E'+cRow, mRow:mRow, mRowRange:'B'+mRow+':E'+mRow, fRange:'B4:E'+cRow, lastInp:cRow };
-      return {ROWS:mRow, cells, active:{r:1,c:1}, sel:null, colW:{1:150}};
+      this._R={ inpRange:'B4:E'+cRow, mRow:mRow, tRow:tRow, mRowRange:'B'+mRow+':E'+mRow, fRange:'B4:E'+tRow, lastInp:cRow };
+      // r190: columns wide enough for comma@2 WITH paren negatives — "(1,000.00)" — no mid-drill resizing
+      return {ROWS:mRow, cells, active:{r:1,c:1}, sel:null, colW:{1:150,2:96,3:96,4:96,5:96}};
     },
     checks(S){
       const R=this._R;
@@ -1998,15 +2006,18 @@ const CHALLENGES = {
         for(let rr=4;rr<=R.lastInp;rr++){ const x=S.cells[L2+rr];
           if(!x||x.fontColor!=='blue') blueOk=false;
           if(!x||x.fmtStyle!=='comma') comOk=false; }
+        const t=S.cells[L2+R.tRow]; if(!t||t.fmtStyle!=='comma') comOk=false;   // r190: the total line commas with the figures
         const m=S.cells[L2+R.mRow];
         if(!m||m.fmtStyle!=='percent'||m.decimals!==1) pctOk=false; }
+      const dressOk=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+R.tRow]; if(!x||!x.bold||!x.bt) return false; } return true; })();
       return [
         {label:'Bold the title and rule it off \u2014 A1 gets bold + a bottom border', ok:titleOk},
         {label:'Paint every typed input BLUE ('+R.inpRange+') \u2014 blue means hardcode', ok:blueOk},
         {label:'Cast the margins as percents, ONE decimal (row '+R.mRow+')', ok:pctOk},
-        {label:'Comma-format the dollar figures ('+R.fRange+')', ok:comOk},
-        {label:'footnote the margin label \u2014 ctrl+1, f adds the \u00b9 (A'+R.mRow+')',
+        {label:'Comma-format the dollar figures ('+R.fRange+') \u2014 negatives flip to (parens), the desk convention', ok:comOk},
+        {label:'footnote the margin label \u2014 ctrl+1, e (superscript) adds the \u00b9 (A'+R.mRow+')',
           ok: (()=>{ const l=S.cells['A'+R.mRow]; return !!(l&&String(l.value).endsWith('\u00b9')); })()},
+        {label:'dress the EBITDA row \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above', ok: dressOk},
       ];
     }
   },
@@ -2155,7 +2166,7 @@ const CHALLENGES = {
       this._exp=[]; let beg=beg0, acc=0;
       for(let i=0;i<5;i++){ const dep=-beg*depR; const end=beg+capex[i]+dep; acc+=-dep;
         this._exp.push({beg:beg,dep:dep,end:end,acc:acc}); beg=end; }
-      return {ROWS:9, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:70,3:70,4:70,5:70,6:70}};
+      return {ROWS:9, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:84,3:84,4:84,5:84,6:84}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
@@ -2669,7 +2680,7 @@ const CHALLENGES = {
       const labs=['Revenue','COGS','Gross profit','SG&A','EBITDA','D&A','EBIT','Interest'];
       [[1,2],[5,2],[1,8],[5,8]].forEach(([c,r0],t)=>{ for(let i=0;i<3;i++){
         cells[colLetter(c)+(r0+i)]={...blankCell(),value:labs[(t*2+i)%8],txt:true};
-        cells[colLetter(c+1)+(r0+i)]={...blankCell(),value:rnd(1000,99999)*10,fontColor:'blue',decimals:0}; } });
+        cells[colLetter(c+1)+(r0+i)]={...blankCell(),value:rnd(100,999)*10,fontColor:'blue',decimals:0}; } });   // r190: must survive comma@2 without #####
       const titleSpots=[[1,1],[5,1],[1,7],[5,7]], numSpots=[[2,3],[6,3],[2,9],[6,9]], hdrSpots=[[3,1],[8,1],[3,7],[8,7]];
       const pick=arr=>arr[rnd(0,arr.length-1)];
       const T0=pick(titleSpots), N0=pick(numSpots), H0=pick(hdrSpots);
@@ -2678,7 +2689,7 @@ const CHALLENGES = {
       cells[colLetter(T0[0])+T0[1]]={...blankCell(),value:codename().split(' \u2014')[0]+' detail',txt:true};
       cells[colLetter(H0[0])+H0[1]]={...blankCell(),value:'FY'+rnd(24,28)+'E',txt:true};
       this._o={ b:colLetter(T0[0])+T0[1], k:colLetter(N0[0])+N0[1], c:colLetter(H0[0])+H0[1], r:rRange, rc:[RB[0],RB[0]+1], rr:RB[1]+2 };
-      return {ROWS:11, cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{1:104,5:104}};
+      return {ROWS:11, cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{1:104,5:104,2:92,6:92}};
     },
     checks(S){
       const o=this._o, c=k=>S.cells[k]||{};
@@ -2818,7 +2829,7 @@ const CHALLENGES = {
       for(let k=jobs.length-1;k>0;k--){ const j=rnd(0,k); [jobs[k],jobs[j]]=[jobs[j],jobs[k]]; }
       this._sites=spots.slice(0,3).map(([c,r],i)=>{
         cells[colLetter(c-1)+r]={...blankCell(),value:jobs[i].lab,txt:true};
-        if(jobs[i].t!=='done') cells[colLetter(c)+r]={...blankCell(),value:rnd(10,90)*100};
+        if(jobs[i].t!=='done') cells[colLetter(c)+r]={...blankCell(),value:rnd(1,9)*100};   // r190: comma@2 must fit the default column
         return {cell:colLetter(c)+r, t:jobs[i].t};
       }).sort((a,b)=>(a.cell<b.cell?-1:1));
       return {ROWS:9, cells, active:{r:2,c:2}, sel:null, colW:{1:96,5:96}};
@@ -3865,7 +3876,7 @@ const CHALLENGES = {
       this._tv=fcfs[4]*(1+g)/(r-g);
       this._pvtv=this._tv*this._df[4];
       this._ev=this._pv.reduce((a,b)=>a+b,0)+this._pvtv;
-      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:126,2:70,3:70,4:70,5:70,6:70}};
+      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:126,2:84,3:84,4:84,5:84,6:84}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
@@ -4132,7 +4143,7 @@ const CHALLENGES = {
       }
       [4,5,6].forEach(r=>cells['J'+r]={...blankCell(),fmtStyle:'comma',decimals:0});
       this._tot={r:totR, d:totD, n:totN};
-      return {ROWS:12, cells, active:{r:6,c:2}, sel:null, colW:{1:158,2:58,3:58,4:58,5:58,6:58,7:58,8:58,9:58,10:62}};
+      return {ROWS:12, cells, active:{r:6,c:2}, sel:null, colW:{1:158,2:76,3:76,4:76,5:76,6:76,7:76,8:76,9:76,10:76}};   // r190: paren negatives — "(1,800)" must fit on every seed
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
@@ -4283,7 +4294,7 @@ const CHALLENGES = {
         this._exp.push({beg:beg,am:am,sw:sw,end:end,inx:inx});
         beg=end;
       }
-      return {ROWS:10, cells, active:{r:9,c:2}, sel:null, colW:{1:170,2:70,3:70,4:70,5:70,6:70}};
+      return {ROWS:10, cells, active:{r:9,c:2}, sel:null, colW:{1:170,2:84,3:84,4:84,5:84,6:84}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
@@ -4515,7 +4526,7 @@ const CHALLENGES = {
         this._exp.push({ar:ar,inv:inv,ap:ap,nwc:nwc,d:prevN===null?null:nwc-prevN});
         prevN=nwc;
       }
-      return {ROWS:11, cells, active:{r:9,c:2}, sel:null, colW:{1:170,2:70,3:70,4:70,5:70,6:70}};
+      return {ROWS:11, cells, active:{r:9,c:2}, sel:null, colW:{1:170,2:84,3:84,4:84,5:84,6:84}};
     },
     checks(S){
       const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
@@ -5258,9 +5269,9 @@ const CHALLENGES = {
       let c8=0; for(let r=4;r<=7;r++) c8+=cells['C'+r].value;
       cells['C8']={...blankCell(),formula:'=SUM(C4:C7)',value:c8};
       cells['A10']={...blankCell(),value:'Svc margin (Q2)',txt:true};
-      cells['B10']={...blankCell(),value:'#DIV/0!',txt:true};
+      cells['B10']={...blankCell(),value:'#DIV/0!',txt:true,decimals:2};   // r190: the fixed quotient shows 2dp
       cells['A11']={...blankCell(),value:'Total growth Q2/Q1',txt:true};
-      cells['B11']={...blankCell(),value:'#VALUE!',txt:true};
+      cells['B11']={...blankCell(),value:'#VALUE!',txt:true,decimals:2};
       const svc=cells['C5'].value, svcCost=rnd(20,120)*5;
       cells['D5']={...blankCell(),value:svcCost,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['D3']={...blankCell(),value:'Cost',txt:true,bold:true};
@@ -5797,11 +5808,13 @@ const CHALLENGES = {
         cells[Lc+'4']={...blankCell(),value:ebitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells[Lc+'5']={...blankCell(),value:debt,fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells[Lc+'7']={...blankCell(),value:Math.round(maxCov*10)/10,fontColor:'blue',decimals:1};
+        cells[Lc+'6']={...blankCell(),decimals:2}; cells[Lc+'8']={...blankCell(),decimals:2};   // r190: ratios land at 2dp
         const drift=(c<=4? -rnd(2,10) : rnd(0,8));  // sag then stabilize/recover
         ebitda=Math.max(40, Math.round((ebitda*(1+drift/100))/5)*5);
         debt=Math.max(40, debt-rnd(0,6)*5);
         if(c===3||c===5) maxCov-= (2+rnd(0,3))/10;  // the step-downs
       }
+      cells['B11']={...blankCell(),decimals:2};
       return {ROWS:11, cells, active:{r:6,c:2}, sel:null, colW:{1:150}};
     },
     checks(S){
@@ -5999,6 +6012,7 @@ const CHALLENGES = {
       for(let c=2;c<=6;c++) cells[colLetter(c)+'9']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
       cells['A10']={...blankCell(),value:'Revenue',txt:true,bold:true};
       cells['B10']={...blankCell(),value:rnd(120,400)*5,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      for(let c2=3;c2<=6;c2++) cells[colLetter(c2)+'10']={...blankCell(),decimals:1};   // r190: grown revenue shows 1dp, not a 10-digit float
       this._g=[gB/100,gU/100,gD/100];
       return {ROWS:11, cells, active:{r:10,c:3}, sel:null, colW:{1:150}};
     },
@@ -6371,8 +6385,12 @@ function selRange(){
 function eachSel(fn){ const r=selRange(); for(let rr=r.r1;rr<=r.r2;rr++) for(let cc=r.c1;cc<=r.c2;cc++) fn(ensure(rr,cc),rr,cc); }
 
 function fmtNum(n,style,dec){
-  if(style==='comma') return Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
-  if(style==='currency') return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+  /* r190: Excel's comma/currency styles wrap negatives in PARENS — (1,234) —
+     the desk convention Wolf asked for by name. Percent/mult keep the minus. */
+  if(style==='comma'){ const a=Math.abs(Number(n)).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+    return Number(n)<0 ? '('+a+')' : a; }
+  if(style==='currency'){ const a='$'+Math.abs(Number(n)).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+    return Number(n)<0 ? '('+a+')' : a; }
   if(style==='percent') return Number(n*100).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'%';
   if(style==='mult') return Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'x';
   if(style==='date'){ /* value = Excel serial (days since 1899-12-30); shown Mmm-yy, the deck standard */
@@ -6879,7 +6897,7 @@ const MENUS = {
    the selected span (the never-merge rule made keyboard-real). */
 const FMT_OPTS = [
   ['G','General'],['N','1,234'],['C','$1,234'],['P','12.3%'],
-  ['X','8.2x'],['D','Mar-26'],['F','footnote \u00b9'],['A','center across'],
+  ['X','8.2x'],['D','Mar-26'],['E','superscript \u00b9'],['A','center across'],
 ];
 const PASTE_OPTS = [
   ['A','All','all'],['F','Formulas','formulas'],['V','Values','values'],
@@ -7003,6 +7021,12 @@ function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').tex
 /* PB pace ghost: while you run, the gap to your own best counts down beside the clock.
    Green while you're ahead of the PB, red the instant it slips away. */
 let ghostPB=null, ghostTrace=null;
+let ghostOn=true;   // r190: Wolf — the ghost is a feature AND a distraction; player's call
+async function loadGhostPref(){ try{ const v=await KV.get('hotkey_ghost'); if(v==='0') ghostOn=false; }catch(e){} updateGhostBtn(); }
+function updateGhostBtn(){ const b=$('ghostToggle'); if(b){ b.classList.toggle('on',ghostOn); b.textContent='\ud83d\udc7b ghost: '+(ghostOn?'on':'off'); } }
+function toggleGhost(){ ghostOn=!ghostOn; KV.set('hotkey_ghost',ghostOn?'1':'0'); updateGhostBtn();
+  if(!ghostOn){ hideGhostCur(); const el=$('ghostDelta'); if(el) el.style.display='none'; }
+  else if(S) armGhost(); }
 /* r148: CHALLENGE LINKS — ?race=<drill>&t=<secs>&by=<name> arms a race target on that
    drill. Zero backend: the URL IS the challenge. by= is display-only (textContent /
    escHtml at every paint), t is clamped at parse so a crafted link can't render nonsense. */
@@ -7018,7 +7042,7 @@ function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null; gho
   ghostSteps=null; ghostStepI=0; hideGhostCur();
   try{ if(isPro()){ const raw=localStorage.getItem('hk_ghost_'+scoreKey());
     if(raw){ const gj=JSON.parse(raw); if(gj&&Array.isArray(gj.steps)&&gj.steps.length>2) ghostSteps=gj.steps; } } }catch(e){}
-  const el=$('ghostDelta'); if(el){ el.style.display=ghostPB?'inline':'none'; el.className='ghost'; el.textContent=ghostPB?('pb '+ghostPB.toFixed(2)):''; }
+  const el=$('ghostDelta'); if(el){ el.style.display=(ghostPB&&ghostOn)?'inline':'none'; el.className='ghost'; el.textContent=ghostPB?('pb '+ghostPB.toFixed(2)):''; }
   const rEl=$('raceDelta'); if(rEl){ const on=!!(race && race.drill===cur);
     rEl.style.display=on?'inline':'none'; rEl.className='ghost';
     rEl.textContent=on?('🏁 beat '+race.t.toFixed(2)):''; }
@@ -7039,7 +7063,7 @@ function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null; gho
         } });
   } }
 function ghostCurTick(ms){
-  if(!ghostSteps || demoPlaying || done) return;
+  if(!ghostOn || !ghostSteps || demoPlaying || done) return;
   const g=ghostCurEl(); if(!g) return;
   while(ghostStepI<ghostSteps.length && ghostSteps[ghostStepI].t<=ms) ghostStepI++;
   if(ghostSteps[0].t>ms) return;                          // ghost hasn't moved yet
@@ -7050,7 +7074,7 @@ function ghostCurTick(ms){
   const gw=document.querySelector('.gridwrap');
   if(!td||!gw){ g.style.display='none'; return; }
   const tr=td.getBoundingClientRect(), wr=gw.getBoundingClientRect();
-  g.style.left=(tr.left-wr.left)+'px'; g.style.top=(tr.top-wr.top)+'px';
+  g.style.left=(tr.left-wr.left+gw.scrollLeft)+'px'; g.style.top=(tr.top-wr.top+gw.scrollTop)+'px';   // r190: was drifting once the grid scrolled
   g.style.width=(tr.width-4)+'px'; g.style.height=(tr.height-4)+'px';
   g.style.display='block';
 }
@@ -7059,7 +7083,7 @@ function ghostTick(t){
   if(race && race.drill===cur){ const rEl=$('raceDelta'); if(rEl){ const rd=race.t-t;
     rEl.textContent=(rd>=0?'−':'+')+Math.abs(rd).toFixed(2)+' vs '+race.by;
     rEl.className='ghost '+(rd>=0?'ahead':'behind'); } }
-  if(ghostPB==null) return; const el=$('ghostDelta'); if(!el) return;
+  if(!ghostOn || ghostPB==null) return; const el=$('ghostDelta'); if(!el) return;
   const d=ghostPB-t;
   let keysBit='';
   if(ghostTrace){
@@ -7902,7 +7926,7 @@ function applyRibbon(key){
     if(key==='P') return apply(c=>{ c.fmtStyle='percent'; c.decimals=1; });
     if(key==='X') return apply(c=>{ c.fmtStyle='mult';    c.decimals=1; });
     if(key==='D') return apply(c=>{ c.fmtStyle='date';    c.decimals=0; });
-    if(key==='F') return apply(c=>{ if(c.txt&&typeof c.value==='string'){
+    if(key==='E') return apply(c=>{ if(c.txt&&typeof c.value==='string'){   /* r190: E = Excel's Font-tab superscript accelerator (Alt+E) */
       c.value = c.value.endsWith('\u00b9') ? c.value.slice(0,-1) : c.value+'\u00b9'; } });
     if(key==='A'){ const r=selRange(); pushUndo();
       const a=ensure(r.r1,r.c1); a.ca=r.c2-r.c1+1;
@@ -8904,6 +8928,7 @@ function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guid
   else if(!S) updateChecklist();
 }
 $('guideToggle').addEventListener('click',toggleGuided);
+{ const gb=$('ghostToggle'); if(gb) gb.addEventListener('click',toggleGhost); }
 function soundStateLabel(){
   if(!soundOn) return '\ud83d\udd07 off';
   if(keyTicks) return '\ud83d\udd0a thock';
@@ -10637,6 +10662,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadPB();
   await loadOnboard();
   await loadHardo();
+  await loadGhostPref();
   await loadSound();
   updateSoundBtn();
   await loadProfile();

@@ -146,12 +146,13 @@ const ALTS = [
       {sel:o.pct, keys:[{key:'Alt'},L('h'),L('p')]},
       {sel:o.pct.split(':')[1], keys:[{key:'Alt'},L('h'),D(0)]},
     ]; }` },
-  { key: 'dress', name: 'footnote FIRST via alt o e, then the dress pass', moves: `C => { const R=C._R; return [
-      {sel:'A'+R.mRow, keys:[{key:'Alt'},L('o'),L('e'),L('f')]},
+  { key: 'dress', name: 'footnote FIRST via alt o e, total row dressed mid-pass via ribbon routes', moves: `C => { const R=C._R; return [
+      {sel:'A'+R.mRow, keys:[{key:'Alt'},L('o'),L('e'),L('e')]},
       {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('o')]},
+      {sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
       {sel:R.inpRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       {sel:R.mRowRange, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
-      {sel:R.fRange, keys:[{key:'Alt'},L('h'),L('k')]},
+      {sel:R.fRange, keys:[{key:'!',ctrl:true,shift:true}]},
     ]; }` },
   { key: 'scrub', name: 'junk deleted TOP-DOWN (shift math) + typed SUM', moves: `C => { const o=C._o;
       const rows=o.junkRows.slice().sort((a,b)=>a-b);
