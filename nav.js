@@ -176,7 +176,7 @@
     const m=$('themesModal'); if(!m) return;
     themesOpen=true; m.classList.add('show');
     // × is injected per-open (innerHTML below rebuilds content) — see append after build
-    const swatches = Object.entries(THEMES).map(([key,t])=>{
+    const swatches = (window.themeList?window.themeList():Object.entries(THEMES)).map(([key,t])=>{
       const v=t.vars; const isSel = key===currentTheme;
       return `<button class="th-card${isSel?' sel':''}" data-key="${key}" style="background:${v.bg}; color:${v.text}; border-color:${isSel?v.accent:v.line}">`+
         `<div class="th-name">${escHtml(t.name)}</div>`+

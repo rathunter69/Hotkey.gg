@@ -5157,3 +5157,14 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - GATE: demo WIN 3/3, E2E ALL GREEN · alt ALL 80 PASS · par FLAGGED 0 · parity
   94 · onboard 28 · visual ALL 379 PASS (26 themes) · fit ALL CLEAN. themes.js
   shared-asset ?v 171->172.
+
+## r214 — coherent theme-picker order + themes in the intro tour (Wolf)
+- Wolf: the picker interleaved light/dark randomly; and the tour never pointed
+  out themes. Added window.THEME_ORDER + window.themeList() in themes.js —
+  LIGHT/paper first (Daylight, the default light, leads), then DARK roughly
+  light→dark (Default/grey leads → Bloomberg black). Both pickers (index.html
+  openThemes + nav.js modal) now iterate themeList(); a theme missing from the
+  order still shows (appended), so nothing can vanish.
+- TOUR: new step spotlighting #navThemes ("make it yours") between the trainer
+  and the ladder steps. Onboard audit ALL 28 PASS (walks steps dynamically).
+- themes.js + nav.js shared-asset ?v 172->173.
