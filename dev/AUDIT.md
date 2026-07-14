@@ -4859,3 +4859,49 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   onboard 28 → visual 311 → rank 20 → fit-sweep 75 clean → reference.html
   render check. No drill logic touched. CANON_DIFF.md verdicts recorded.
   CACHE v165 -> v166.
+
+## r198 — FactSet layer verified + rowops rebuilt to the depth bar (Wolf audit)
+- FACTSET PLUGIN VERIFY (T-G remainder, now that egress reaches FactSet's
+  published Hot Keys sheet — media.felix.fe.training PDF via curl+Read). The
+  engine-backed chords were all correct (fills Ctrl+Alt+Shift+K/J/D/U,
+  AutoColor Ctrl+Alt+E, Currency/Percent Ctrl+Shift+4/5). Fixed in the DISPLAY
+  table: Date SmartCycle is Ctrl+Shift+2 not 3; killed two fabricated rows
+  ("Ctrl+Shift+: cell color" → the real Ctrl+; Blue-Black; "Ctrl+Alt+Shift+!
+  row/col" → Ctrl+Alt+K Paste Row/Column Info); relabelled Ctrl+Shift+Y as the
+  Binary (not general) cycle; sharpened the Copy/Paste Exact Formulas labels.
+  ADDED missing priority-5 canon: General Number Ctrl+Shift+1, Smart Copy
+  Right/Down Ctrl+Shift+R/D, AutoColor Selection Ctrl+Alt+A, Increase/Decrease
+  Decimal Ctrl+, / Ctrl+. Display-only (drills.js). Both plugin layers now
+  match their live sheets; CANON_DIFF updated.
+- FOUNDATIONS DEPTH (Wolf: "marginal improvement, not to the level of my
+  vision"). Graded all 13 against DRILL_DOCTRINE §8. Finding: the r193-r195
+  rebuilds (modeltour, editfix, filldr, pastes, copyover, undo) hit the bar,
+  but the UN-rebuilt reflex cards drag the group's first impression —
+  rowops was the worst (par 26/parKeys 11: two disconnected chores, insert a
+  row + delete a row, on a 5-row stub; single op family, no chain, not
+  sendable). Also flagged for a later pass: ribbon (four order-free
+  formatting chores, no chain) and autofit (the "two disconnected islands"
+  tell the AUDIT itself named in §8.1).
+- ROWOPS v2 "Rebuild the schedule": a real desk moment that CHAINS — the opex
+  schedule came back mis-built (a line dropped, a stale PLACEHOLDER wedged in).
+  Insert the missing line + type it, delete the junk, then Alt+= the Total —
+  it reads the block you just rebuilt, so it TIES only if the structure is
+  right (the foot check does double duty enforcing correct insert placement +
+  the delete). Bold + rule the total. 3 op families (structural / formula /
+  formatting), 4 beats, sendable footed page. Randomizes which line drops,
+  which slot the junk sits, values, labels. par 70 / parKeys 28.
+  CHECKLIST CLARITY (Wolf, live): first cut read "insert the dropped Insurance
+  line below Software — type it in at 260" — a locational lookup + two actions
+  in one item. Tightened to "add the missing Insurance line — insert a row,
+  enter 260", now a clean parallel to "delete the PLACEHOLDER row". PRINCIPLE
+  reinforced (§2.5): a checklist item is ONE crisp command, not a compound
+  locational puzzle; the how-to detail lives in the guide, not the check.
+- ENGINE: added S.insRowN / S.delRowN persistent counters (mirroring undoN/
+  pasteOpN) on both row insert/delete paths (ribbon HIR/HDR + Ctrl+±), so
+  structural drills latch on the MECHANIC without brittle geometry checks.
+  shiftCellsRows relocates cells but does NOT rewrite formula ranges (house
+  fact, confirmed) — hence the design foots AFTER restructuring with Alt+=.
+- GATE: syntax → demo-replay ALL GREEN → alt-paths 80/80 (rowops alt rewritten:
+  Ctrl-chord insert/delete + typed SUM + ribbon bold) → par-sweep FLAGGED:0 →
+  parity 94 → onboard 28 → visual 311 → rank 20 → fit-sweep 75 clean →
+  screenshots (fresh + win). CACHE v166 -> v167.

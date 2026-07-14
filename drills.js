@@ -45,7 +45,7 @@ window.HOTKEY_DRILLS = {
     // Foundations
     navigation: { name:'Navigate', label:'Navigation tour',     tab:'Nav',         desc:'The full obstacle course — 12 chords: edges, selections, rows, columns' },
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — Alt H O I fits the columns' },
-    rowops:     { name:'Rows',     label:'Insert and delete rows',  tab:'Rows',     desc:'Alt H I R opens a row, Alt H D R kills one' },
+    rowops:     { name:'Rows',     label:'Rebuild the schedule',    tab:'Rows',     desc:'Insert the dropped line, delete the junk, re-foot so it still ties' },
     colops:     { name:'Columns',  label:'Columns move too',        tab:'Columns',  desc:'Ctrl+Space grabs it, Alt H D C kills it, Alt H I C opens one' },
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Ctrl+D and Ctrl+R — one formula, whole block' },
     blocksel:   { name:'Block Sel.',label:'Grab the whole block',   tab:'Block',    desc:'Grab it whole, Ctrl+X / Ctrl+V moves it, dress it where it lands' },
@@ -195,7 +195,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":62,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":74,"transpose":64,"saves":44,"editfix":66,"undo":48,"autofit":48,"rowops":26,"filldr":78,"blocksel":52,"copyover":58,"polish":66,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":30,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":64,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
+window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":62,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":74,"transpose":64,"saves":44,"editfix":66,"undo":48,"autofit":48,"rowops":70,"filldr":78,"blocksel":52,"copyover":58,"polish":66,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":30,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":64,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
@@ -306,22 +306,28 @@ window.HOTKEY_PLUGIN_LAYERS = {
       {k:'Ctrl+Alt+=', a:'Zoom in (5% steps)', cat:'View'},
       {k:'Ctrl+Alt+-', a:'Zoom out', cat:'View'},
     ]},
-  factset: { name:'FactSet', color:'#e0879e', note:'From FactSet\u2019s published hot-key sheet + desk convention \u2014 remappable via FactSet ribbon \u2192 Settings \u2192 Manage Hotkeys.',
+  factset: { name:'FactSet', color:'#e0879e', note:'Verified against FactSet\u2019s published Hot Keys sheet (Jul 2026) \u2014 remappable via FactSet ribbon \u2192 Settings \u2192 Manage Hotkeys.',
     keys:[
-      {k:'Ctrl+Alt+Shift+K', a:'Fill right', cat:'Modeling', inEngine:true},
-      {k:'Ctrl+Alt+Shift+J', a:'Fill left', cat:'Modeling', inEngine:true},
-      {k:'Ctrl+Alt+Shift+D', a:'Fill down', cat:'Modeling', inEngine:true},
-      {k:'Ctrl+Alt+Shift+U', a:'Fill up', cat:'Modeling', inEngine:true},
-      {k:'Ctrl+Alt+E', a:'AutoColor by content \u2014 blue inputs, green links, black formulas', cat:'Colors', inEngine:true},
-      {k:'Ctrl+Shift+3', a:'Number format: date', cat:'Numbers'},
-      {k:'Ctrl+Shift+4', a:'Number format: currency', cat:'Numbers', inEngine:true},
-      {k:'Ctrl+Shift+5', a:'Number format: percent', cat:'Numbers', inEngine:true},
-      {k:'Ctrl+Shift+8', a:'Number format: multiple (x)', cat:'Numbers'},
-      {k:'Ctrl+Shift+Y', a:'Number format cycle', cat:'Numbers'},
-      {k:'Ctrl+Shift+:', a:'Cell color cycle', cat:'Colors'},
-      {k:'Ctrl+Alt+,', a:'Copy formula refs + formatting', cat:'Paste'},
-      {k:'Ctrl+Alt+.', a:'Paste formula refs + formatting', cat:'Paste'},
-      {k:'Ctrl+Alt+Shift+!', a:'Apply captured row/column layout to selection', cat:'Utilities'},
+      {k:'Ctrl+Alt+Shift+K', a:'Fill Right (FDS) \u2014 copy with links', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Alt+Shift+J', a:'Fill Left (FDS)', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Alt+Shift+D', a:'Fill Down (FDS)', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Alt+Shift+U', a:'Fill Up (FDS)', cat:'Modeling', inEngine:true},
+      {k:'Ctrl+Shift+R', a:'Smart Copy Right \u2014 copies the formula intelligently', cat:'Modeling'},
+      {k:'Ctrl+Shift+D', a:'Smart Copy Down', cat:'Modeling'},
+      {k:'Ctrl+Alt+E', a:'AutoColor \u2014 recolors by content: blue inputs, green links, black formulas', cat:'Colors', inEngine:true},
+      {k:'Ctrl+Alt+A', a:'AutoColor Selection', cat:'Colors'},
+      {k:'Ctrl+;', a:'Blue-Black SmartCycle \u2014 the font blue/black toggle', cat:'Colors'},
+      {k:'Ctrl+Shift+1', a:'General Number SmartCycle', cat:'Numbers'},
+      {k:'Ctrl+Shift+2', a:'Date SmartCycle', cat:'Numbers'},
+      {k:'Ctrl+Shift+4', a:'Currency SmartCycle', cat:'Numbers', inEngine:true},
+      {k:'Ctrl+Shift+5', a:'Percent SmartCycle', cat:'Numbers', inEngine:true},
+      {k:'Ctrl+Shift+8', a:'Multiple SmartCycle (7.5x)', cat:'Numbers'},
+      {k:'Ctrl+Shift+Y', a:'Binary SmartCycle (on/off, yes/no)', cat:'Numbers'},
+      {k:'Ctrl+,', a:'Increase Decimal', cat:'Numbers'},
+      {k:'Ctrl+.', a:'Decrease Decimal', cat:'Numbers'},
+      {k:'Ctrl+Alt+,', a:'Copy Exact Formulas \u2014 capture for pasting elsewhere', cat:'Paste'},
+      {k:'Ctrl+Alt+.', a:'Paste Exact Formulas \u2014 no reference adjustment', cat:'Paste'},
+      {k:'Ctrl+Alt+K', a:'Paste Row/Column Info \u2014 size, hidden + grouped state', cat:'Utilities'},
     ]},
 };
 
