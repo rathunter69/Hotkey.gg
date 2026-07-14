@@ -1,21 +1,29 @@
 # PIPELINE — the Fable task queue
 
-## ⚡ STATE OF THE QUEUE (r188, July 2026 — read this first)
-Every executable task below is DONE: T-A (all enrichment tranches + backlog
-matrix), T-B (79 alts, full coverage), T-C, T-D (engine pack 1), T-E (engine
-pack 2, minus deliberately-deferred items), T-F (dialog deck), T-J (voice),
-T-K (onboarding v2). All six CANON_DIFF drill proposals are live. 78 drills,
-parity 77, gate green at every push.
+## ⚡ STATE OF THE QUEUE (r196, 2026-07-14 — read this first)
+Every executable task below is DONE, and so is Wolf playtest round 3 (r190-
+r195: engine pack 3 + the nine drill rebuilds across Tranches A/B/C). 79
+drills, parity 94, alts 80, gate green at every push. **THE EGRESS MILESTONE
+IS DONE (r196): the Supabase live smoke re-ran 65/65 first-try** — the whole
+desks/assignments/school-tags backend is verified healthy in prod, and the
+SEEDED DESK CODES ARE CLEARED FOR DISTRIBUTION (dev/SMOKE_REPORT.md).
 What remains, and what unblocks it:
-1. **EGRESS SESSION** (next real milestone): Supabase live smoke test
-   (accounts/leaderboards/desk RPCs are UNVERIFIED against prod — seeded desk
-   codes stay held until green) + T-G canon verification remainder.
+1. **T-G CANON REMAINDER** (partially unblocked — macabacus.com and WSP fetch
+   200 from cloud sessions now; WSO still 403): verify the [canon]-tagged
+   CANON_DIFF rows + HOTKEY_PLUGIN_LAYERS Macabacus/FactSet defaults against
+   the live sheets.
 2. **WOLF DECISIONS**: T-H interview mode (dev/INTERVIEW.md awaits sign-off;
-   a plain "go" starts the build) · T-I seasons (gated on DAU per STRATEGY).
+   a plain "go" starts the build) · T-I seasons (gated on DAU per STRATEGY) ·
+   pilot playbook (pick 2-3 clubs — events/report/programs all exist, and the
+   desk codes are now verified safe to hand out) · credential rotation
+   reminder (SMOKE_REPORT "Outstanding" #2, from r132).
 3. **DEFERRED ENGINE** (build only when a drill concept demands it): Ctrl+0
    column hide (render surface), Alt H O H row height (needs a height model),
    SUBTOTAL(9) visible-aware math (pairs with a "total follows the filter"
    drill).
+House rule for parallel sessions, learned live in r194/r195: FETCH BEFORE
+EVERY ROUND-CLOSE — two sessions ran the same tranche queue simultaneously
+and the slower one must yield to whatever main already deployed.
 ## WOLF PLAYTEST QUEUE — DONE r192 (sort warning live + alt entry; ctrl+arrow
 ## unreproducible, behaves Excel-correct, parity-armored, watching; Alt+= both
 ## forms live). Original spec kept below.
