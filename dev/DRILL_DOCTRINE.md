@@ -183,3 +183,36 @@ Associate voice, lowercase confidence, em dashes, no exclamation marks.
 The prompt sells the stakes; the guide is a senior walking you through it;
 the checks are the checklist you'd actually write on a sticky note; the aha
 is what you'd tell the next intern. Never "click", never "please".
+
+## 8. THE WOLF TEST (r193 — the playtest rubric, codified from live rounds)
+Every drill must pass three questions, asked as a practitioner:
+1. **Mechanics-sense** — does the story JUSTIFY each action? A checklist item
+   with no narrative reason ("delete this, undo it" with no stakes) fails.
+   The undo-v2 pattern is the fix: script the mistake so the mechanic is felt.
+2. **Desk-mirror** — is this the literal motion a banker/consultant makes?
+   Not "a use of the chord" but THE use: comma style flips costs to (parens),
+   the sort warning appears when it would appear, Alt+E is the superscript
+   key because it really is.
+3. **Variety-density** — depth comes from ADJACENT ops in the same vein
+   (bold + unbold + italic + strike + stamp), never one chord repeated.
+   A drill solvable in <10 keystrokes that isn't a navigation/reflex drill
+   is presumptively thin. A demo that is one chord family is presumptively
+   a card, not a drill.
+Proxies that would have caught the r193 rebuild class earlier: parKeys<10
+outside Foundations-reflex; single-op-family demos; boards with zero
+formulas; checks that grade one property. Sweep the set against these
+whenever the rubric changes, not drill-by-drill on complaint.
+
+### §8.1 addendum (Wolf, live) — two tests the rubric under-weighted
+4. **Do the beats CHAIN?** Density is integration, not itemization: the best
+   drills make each action change what the next one operates on (transpose
+   lands the block → multiply flips it → the earlier comma pass now shows
+   parens). A five-beat drill whose beats are order-free chores passes §8.3
+   but misses the vibe — acceptable for pure-formatting showcases (typeset),
+   never for Formulas/Data/Models drills.
+5. **Does the win state look SENDABLE?** The board must end as an artifact —
+   a page you'd actually hand over — not a scratchpad with five green checks.
+   Boards of disconnected exercise blocks (autofit v2's two islands) are the
+   tell; prefer one coherent page even when teaching a contrast.
+Do not anchor on the owner's literal examples; they illustrate the vibe, they
+don't bound it.

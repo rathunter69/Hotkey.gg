@@ -472,6 +472,41 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(y1.stays && y1.bolds, 'proposal commit stays put — ctrl+b lands on the sum', JSON.stringify(y1));
   ok(y1.normalMoves, 'ordinary commits still move down');
 
+  console.log('Z. engine pack 3 (r193)');
+  await fresh();
+  const z1 = await run(() => {
+    setDemoSel('B2'); demoKey({key:'i',ctrl:true});
+    const italic = !!S.cells['B2'].it;
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'2',code:'Digit2'});
+    const italicOff = !S.cells['B2'].it;
+    setDemoSel('B3'); demoKey({key:'5',ctrl:true});
+    const struck = !!S.cells['B3'].strike;
+    demoKey({key:'1',ctrl:true}); demoKey({key:'k'});
+    const struckOff = !S.cells['B3'].strike;
+    S.cells['H1']={...blankCell(), formula:'=TODAY()', fmtStyle:'date'}; recalc();
+    const days=Math.floor((Date.now()-Date.UTC(1899,11,30))/86400000);
+    const today = Math.abs(S.cells['H1'].value-days)<=1;
+    setDemoSel('G10:I12'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'b'}); demoKey({key:'o'});   // empty region — foot's own dressed rows must not pollute the probe
+    const g=(k)=>S.cells[k]||{};
+    const perim = !!(g('G10').bt && g('I10').bt && g('G12').bb && g('G10').bl && g('G11').bl && g('I11').br) && !(g('H11').bt||g('H11').bb||g('H11').bl||g('H11').br);
+    S.cells['H3']={...blankCell(), value:100}; S.cells['H4']={...blankCell(), value:4200}; recalc(); render();
+    setDemoSel('H3'); demoKey({key:'c',ctrl:true}); setDemoSel('H4');
+    demoKey({key:'Alt'}); demoKey({key:'e'}); demoKey({key:'s'}); demoKey({key:'i'}); demoKey({key:'Enter'});
+    const divided = S.cells['H4'].value===42;
+    S.cells['H6']={...blankCell(), value:1, bold:true}; S.cells['H7']={...blankCell(), value:2}; render();
+    setDemoSel('H6:H7'); demoKey({key:'b',ctrl:true});
+    const mixedAll = !!S.cells['H6'].bold && !!S.cells['H7'].bold;   // mixed -> ALL bold (Excel), not a per-cell flip
+    demoKey({key:'b',ctrl:true});
+    const uniformOff = !S.cells['H6'].bold && !S.cells['H7'].bold;
+    return { italic, italicOff, struck, struckOff, today, perim, divided, mixedAll, uniformOff };
+  });
+  ok(z1.italic && z1.italicOff, 'Ctrl+I / Alt H 2 italicize');
+  ok(z1.struck && z1.struckOff, 'Ctrl+5 / Ctrl+1 K strike');
+  ok(z1.today, 'TODAY() returns the Excel serial');
+  ok(z1.perim, 'Alt H B O draws the selection PERIMETER, interior clean', JSON.stringify(z1));
+  ok(z1.divided, 'paste-op Divide lands');
+  ok(z1.mixedAll && z1.uniformOff, 'mixed-selection Ctrl+B bolds ALL first (Excel), uniform toggles off');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

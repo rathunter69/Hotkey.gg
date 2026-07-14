@@ -4719,3 +4719,34 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   its flag in cancelEdit (the first smoke caught Esc taking the editing
   branch around the normal-mode clear).
 - PARITY 82 -> 88 (sections X + Y). No cache bump (index.html only).
+
+## r193 — Wolf round 3, Engine Pack 3 + Tranche A (79 drills)
+- ENGINE PACK 3: italic (Ctrl+I / Alt H 2), strikethrough (Ctrl+5 /
+  Ctrl+1 K — Excel's Font-tab accelerator), TODAY() (checks grade the
+  formula, never the value), Alt H B O now draws the selection
+  PERIMETER (bl/br edge flags, inline-composed shadows), paste-op
+  Divide (I). All four flags threaded through copy/cut/formats/
+  transpose carriers. Font size/family recorded as out of scope.
+- ENGINE PARITY BUG (found live by the new modeltour): Ctrl+B/I/5 were
+  pure per-cell toggles — bolding a row containing an already-bold cell
+  flipped that cell OFF. Excel's rule: mixed selection → apply to ALL;
+  only a uniformly-formatted selection removes. toggleAllOrNone() now
+  backs Ctrl+B/I/5 and ribbon H1/H2. Parity-asserted (section Z).
+- MODELTOUR v2: costs carry their sign; the checklist PRINTS the four
+  numbers (Wolf: "not clear I'm supposed to calculate" — you're not);
+  new totals pass (bold + rule + dollars on GP/EBITDA/NI rows). 3 checks.
+- FILLDR v2 (was parKeys TWO): pull a feed row across, foot with one
+  SUM filled, then the 2D fill — one mixed-anchor cell → right → down
+  → twelve live ratios. par 78/25.
+- UNDO v2: the mistake is SCRIPTED — the note names the wrong block,
+  you clear it, the second note reveals it fed Q4, ctrl+z rewinds
+  exactly, then you aim. Which block is "wrong" randomizes per seed
+  (Wolf's trick idea, made deterministic). par 48/5.
+- AUTOFIT v2: teaches when autofit is WRONG — content-fit the label
+  pair, then ONE width (Alt H O W, 12) across the ragged print block.
+  par 48/12.
+- NEW DRILL typeset "Typeset the memo" (Formatting): bold the headers,
+  UNBOLD the imposter row, italicize the memos, strike the dead line,
+  stamp =TODAY(). Every Engine Pack 3 surface in one pass. par 56/12.
+- Parity 88 -> 94 (section Z). Five alts rewritten/added, 5/5 pass.
+  All pars 21-seed foreground. CACHE v162 -> v163.

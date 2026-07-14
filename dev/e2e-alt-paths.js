@@ -33,13 +33,12 @@ const ALTS = [
       {sel:o.dst, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'!',ctrl:true,shift:true}]},
       {sel:o.t0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'Alt'},L('h'),D(1)]},
     ]; }` },
-  { key: 'undo', name: 'flag the survivor FIRST, ribbon bold', moves: `C => { const o=C._o;
-      const steps=[
-        {sel:o.liveHdr, keys:[{key:'Alt'},L('h'),D(1)]},
-        {sel:o.blk, keys:[{key:'Delete'},{key:'z',ctrl:true}]},
-      ];
-      o.dead.forEach(d=>steps.push({sel:d, keys:[{key:'Delete'}]}));
-      return steps; }` },
+  { key: 'undo', name: 'the mistake walked FIRST, dressing last, italic via alt h 2', moves: `C => { const o=C._o; return [
+      {sel:o.wrongRng, keys:[{key:'Delete'},{key:'z',ctrl:true}]},
+      {sel:o.rightRng, keys:[{key:'Delete'}]},
+      {sel:o.memo, keys:[{key:'Alt'},L('h'),D(2)]},
+      {sel:'A1', keys:[{key:'Alt'},L('h'),D(1)]},
+    ]; }` },
   { key: 'copyover', name: 'deck hand-off first + dialog via alt h v s', moves: `C => { const o=C._o; return [
       {sel:o.src, keys:[{key:'c',ctrl:true}]},
       {sel:o.d3, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
@@ -51,9 +50,14 @@ const ALTS = [
       {sel:o.v, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
       {sel:o.t, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('t'),{key:'Enter'}]},
     ]; }` },
-  { key: 'filldr', name: 'ribbon fills: alt h f i d / alt h f i r', moves: `C => { const o=C._o; return [
-      {sel:o.fillDown, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:o.fillRight, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+  { key: 'filldr', name: '2D block FIRST (recalc closes it), ribbon fills, then sum + pull', moves: `C => { const o=C._o; return [
+      {sel:o.mix0, keys:[...T('='+o.mixF),{key:'Enter'}]},
+      {sel:'B11:B13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.blk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.sum0, keys:[...T('=SUM(B5:B8)'),{key:'Enter'}]},
+      {sel:o.sumRng, keys:[{key:'r',ctrl:true}]},
+      {sel:o.pull0, keys:[...T('='+o.feed0),{key:'Enter'}]},
+      {sel:o.pullRng, keys:[{key:'r',ctrl:true}]},
     ]; }` },
   { key: 'foot', name: 'typed SUMs (no alt+=), columns before rows', moves: `C => [
       {sel:'B6', keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
@@ -116,8 +120,8 @@ const ALTS = [
         {sel:o.f, keys:[...T('='+L2+(o.hr+1)+'*'+L2+(o.hr+2)),{key:'Enter'}]},
         {sel:o.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       ]; }` },
-  { key: 'autofit', name: 'second pair first', moves: `C => { const o=C._o; return [
-      {sel:o.b1+':'+o.b2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+  { key: 'autofit', name: 'uniform width FIRST, then content-fit; both via ribbon', moves: `C => { const o=C._o; return [
+      {sel:o.uRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]},
       {sel:o.a1+':'+o.a2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
   { key: 'saves', name: 'blocks in reverse, ribbon bold + ctrl+shift+! comma routes', moves: `C => C._sites.slice().reverse().map(s => {
@@ -195,6 +199,13 @@ const ALTS = [
         {sel:'A3', keys:[{key:'Alt'},L('a'),L('t')]},
         {sel:'C3', keys:pk},
       ]; }` },
+  { key: 'typeset', name: 'reverse order, ribbon bold/italic routes, strike via ctrl+1 K', moves: `C => { const o=C._o; return [
+      {sel:o.stamp, keys:[...T('=TODAY()'),{key:'Enter'}]},
+      {sel:o.deadRng, keys:[{key:'1',ctrl:true},L('k')]},
+      {sel:o.memoRng, keys:[{key:'Alt'},L('h'),D(2)]},
+      {sel:o.wbRng, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:'A2:D2', keys:[{key:'b',ctrl:true}]},
+    ]; }` },
   { key: 'unhide', name: 'width fixed FIRST, ribbon unhide route, grouped while still hidden', moves: `C => { const o=C._o; return [
       {sel:'B2', keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]},
       {sel:'A'+o.h1+':A'+o.h2, keys:[{key:'ArrowRight',alt:true,shift:true}]},
@@ -447,9 +458,10 @@ const ALTS = [
       {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('p')]},
     ]) ` },
-  { key: 'modeltour', name: 'marks fixed in REVERSE (buried one first), ctrl+home from the far corner', moves: `C => { const d=C._d;
-      const steps=d.slice().reverse().map(x=>({sel:x.k, keys:[...T(String(x.v)),{key:'Enter'}]}));
-      steps.push({sel:d[0].k, keys:[{key:'Home',ctrl:true}]});
+  { key: 'modeltour', name: 'marks in REVERSE, dress rows 13->5 via alt h 1 + ctrl+1 C, home last', moves: `C => { const d=C._d.slice().reverse();
+      const steps=d.map(x=>({sel:x.k, keys:[...T(String(x.v)),{key:'Enter'}]}));
+      [13,9,5].forEach(r=>steps.push({sel:'B'+r+':J'+r, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t'),{key:'1',ctrl:true},L('c')]}));
+      steps.push({sel:'A1', keys:[{key:'Home',ctrl:true}]});
       return steps; }` },
   { key: 'nwcsched', name: 'drivers typed bottom-up, NWC + dress before the driver rows, ribbon fills', moves: `C => [
       {sel:'B11', keys:[...T(String(C._dpo)),{key:'Enter'}]},

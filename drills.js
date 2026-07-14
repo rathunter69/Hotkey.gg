@@ -24,7 +24,7 @@ window.HOTKEY_DRILLS = {
   // ---------------------------------------------------------------
   groups: [
     { name: 'Foundations', keys: ['navigation', 'modeltour', 'blocksel', 'ribbon', 'editfix', 'undo', 'filldr', 'pastes', 'rowops', 'colops', 'autofit', 'saves', 'copyover'] },
-    { name: 'Formatting',  keys: ['housestyle', 'ruleoff', 'ruleaudit', 'polish', 'combo', 'format', 'decimals', 'dress', 'center', 'blue', 'gauntlet'] },
+    { name: 'Formatting',  keys: ['housestyle', 'ruleoff', 'ruleaudit', 'polish', 'combo', 'format', 'typeset', 'decimals', 'dress', 'center', 'blue', 'gauntlet'] },
     { name: 'Values',      keys: ['drill', 'series', 'transpose'] },
     { name: 'Data',        keys: ['sort', 'scrub', 'recon', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2'] },
     { name: 'Formulas',    keys: ['margin', 'anchor', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'hunt', 'signerr', 'versionup', 'percent', 'cagr', 'sumif', 'rollup', 'cases'] },
@@ -74,6 +74,7 @@ window.HOTKEY_DRILLS = {
     ruleaudit:  { name:'Ruling Pass', label:'The ruling pass', tab:'Ruling Pass', desc:'The page says done \u2014 the pass disagrees. Find the missing rulings, fix only those' },
     polish:     { name:'Polish',   label:'Polish the Header',   tab:'Header',      desc:'Bold + bottom border + shade a header row' },
     combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Bold, comma, wrap and autofit a pasted table' },
+    typeset:    { name:'Typeset',  label:'Typeset the memo',    tab:'Typeset',     desc:'Bold, unbold, italic memos, strike the dead line, =TODAY() stamp' },
     format:     { name:'Format',   label:'Fix the formats',     tab:'Formats',     desc:'Percent, currency, comma — plus 8.2x and Mmm-yy via Ctrl+1' },
     decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Alt H 9 / Alt H 0 — dollars none, multiples and percents one' },
     dress:      { name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', tab:'Dress', desc:'Title ruled, inputs blue, percents, commas \u2014 book-ready' },
@@ -194,7 +195,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":58,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":40,"transpose":64,"saves":44,"editfix":44,"undo":34,"autofit":34,"rowops":26,"filldr":40,"blocksel":52,"copyover":42,"polish":38,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":30,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":42,"dress":112,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
+window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":58,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":40,"transpose":64,"saves":44,"editfix":44,"undo":48,"autofit":48,"rowops":26,"filldr":78,"blocksel":52,"copyover":42,"polish":38,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":30,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":64,"typeset":56,"dress":112,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
