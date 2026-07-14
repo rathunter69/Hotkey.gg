@@ -176,6 +176,40 @@ a default). AWAITING WOLF SIGN-OFF — the build is a config-and-content round.
 ## T-I · SEASON REWARDS TRACK  *(PRO roadmap — dev/SEASONS.md exists)*
 > Execute per dev/SEASONS.md once Wolf greenlights scope.
 
+## T-L · DAILY CHALLENGE 2.0 — QUEUED (Wolf r204, design-first)  *(not yet built)*
+> Wolf: "the daily challenge, which should be gated by either level or the
+> paywall, with its own standalone leaderboard that's prominent — in the vein
+> of the NYT games: extra-hard daily, with real-time leaders."
+> WHAT EXISTS TODAY: a per-day board keyed `daily-YYYY-MM-DD` already collects
+> runs of the day's rotating drill (see the leaderboard board-picker). This
+> task is the ENHANCEMENT that turns that quiet board into the marquee mode.
+> SCOPE TO DESIGN (Wolf sign-off before building, like T-H/T-K):
+> 1. **The challenge itself** — a single daily-seeded, EXTRA-HARD sitting
+>    (harder than the catalog par; think a gauntlet/combo-tier board or a
+>    bespoke daily seed). One attempt (or one ranked attempt + free practice),
+>    same seed for everyone worldwide so the leaderboard is apples-to-apples —
+>    the NYT crossword model. Reuse the interview-mode daily-seed machinery
+>    (dev/INTERVIEW.md) rather than inventing a second seeder.
+> 2. **The gate** — playable only at/above a level threshold OR with PRO
+>    (paywall). Decide which is primary: level-gate keeps it aspirational and
+>    free (drives retention); PRO-gate makes it a conversion lever. Likely
+>    BOTH: level-gate the entry, PRO-gate a perk (e.g. see full leaderboard /
+>    replay top runs / practice re-rolls). Wolf to pick the mix.
+> 3. **The standalone leaderboard** — PROMINENT and separate from the per-drill
+>    boards: today's global ranking, live-updating (real-time leaders), your
+>    rank + delta to the cut line, a countdown to the next drop, and a streak
+>    counter (consecutive dailies — the habit hook). Its own hero slot in the
+>    UI, not buried in the board-picker dropdown.
+> 4. **UI STREAMLINE (Wolf's paired note)** — "we might have to streamline a
+>    bit now that we have so many features." Audit the top nav + picker: the
+>    feature set (drills, campaigns, seasons, interview, teams/desks, daily)
+>    has outgrown the flat tab row. Propose an information architecture that
+>    gives Daily Challenge a front-door without crowding the rest — likely a
+>    primary-modes rail (Practice / Daily / Compete) with everything else
+>    nested. Sketch to Wolf via screenshots BEFORE moving chrome.
+> Constraints: keyboard-only, Esc-safe, real-time board must degrade gracefully
+> offline; entitlement checks reuse HOTKEY_PREMIUM. Full gate + AUDIT round.
+
 ## Standing items (do NOT lose)
 - **Supabase live smoke test** — FIRST session with egress: desks/assignments/
   school-tags RPCs against prod; seeded desk codes stay held until green.
