@@ -4961,3 +4961,59 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - GATE: syntax → demo-replay ALL GREEN → visual matrix (label render) → spot
   replay of all 18 touched drills WIN 3/3. index.html only (no shared-asset
   ?v bump needed). No engine/grading change.
+
+## r201–r202 — navigation dressed + thinner grid borders (catalog pass #1)
+- r201: navigation board dressed to the banker's-workbook bar (§2.1b) —
+  codename title, ruled FY header, ruled subtotals. r202: grid border weight
+  cut 2px → 1px across both render paths (td.bt/bb/ball box-shadows + the
+  inline perimeter shadows), so borders read as a single realistic rule rather
+  than a heavy slab (Wolf: "borders look pretty thick — keep visual distinction
+  but slightly more realistic"). Both shipped from the parallel handover branch
+  (commits #31/#30 on main).
+
+## r203 — navigation FLAGSHIP rebuilt lean: movement + one-chord fill (Wolf)
+- Wolf steered the flagship twice: first "insert-then-delete feels pointless"
+  (→ insert + build gross profit), then "maybe the insert is too much for our
+  intro — make the user MOVE around, select, fill the formula across." Landed
+  on the "Movement + fill payoff" shape (Wolf-picked via question): lap the
+  model corner to corner (Ctrl+Home/End + the four Ctrl-arrows, zero scroll),
+  then the day-one payoff — EBIT margin filled only for FY1, and Ctrl+R spreads
+  the formula across all four years in ONE keystroke. No insert, no typing
+  (that structural work is rowops, two drills on). Board ships pre-dressed to
+  the §2.1b bar; only the margin awaits its fill.
+- checks: movement latches sequentially (home→end→left→up→right→down on the
+  static 7-row table); the fill grades the END STATE (C7:E7 carry a formula
+  whose value ties EBIT[c]/Revenue[c]) so the payoff is reachable any legit way.
+- par 30→38, parKeys 11 (measured median after the demo walks the B7:E7
+  selection with Shift+→×3 so par reflects real play, not setDemoSel). meta
+  desc rewritten off the stale "12-chord obstacle course". Alt path: same tour
+  + ribbon Fill-Right (alt h f i r) instead of Ctrl+R.
+- GATE: syntax clean → demo-replay 3/3 → alt-paths PASS → par-sweep FLAGGED:0
+  → parity 94/94 → onboard 28/28 → fit-sweep ALL CLEAN across 4 full repeat
+  passes (chasing an earlier intermittent 1-drill ##### that never recurred —
+  not navigation; its ranges are bounded ≤~1000 in 74px cols).
+
+## r204 — Daylight is the default light theme + softer light-theme ink (Wolf)
+- Wolf: "make Daylight the default light theme — the dark default is hard for
+  some; keep the font a nice darker grey (not black) but more vibrant/visible
+  colors for menu items, navigation, and drill headers."
+- DEFAULT: system-light browsers now land on Daylight, not the harsher plain
+  Light. Changed BOTH init paths — themes.js head IIFE (shared by leaderboard/
+  reference) and the trainer's own loadTheme() — to prefers-color-scheme:light
+  → 'daylight', else 'default' (dark stays the Wolf-liked windows-grey desk).
+- INK: Daylight text #26241f → #38352d, Light #1a1a1a → #35352f (warm graphite,
+  not near-black). On LIGHT sheets black-formatted drill cells now follow the
+  softened --text (new html[data-dark="0"] td.fc-black rule), mirroring the
+  existing dark override — "a nice darker grey, not black".
+- VIBRANCE: one lever — --accent drives menu tabs (.tab.on), nav, and every
+  drill-header accent. Daylight+Light accent #2ea36f → #0e9b57 (deeper, more
+  saturated green), accent-dim → #0a7442, glow → rgba(14,155,87,.16). The
+  deeper green also RAISES contrast, so nothing regresses.
+- palette is single-source in themes.js (index.html reads window.THEMES); no
+  duplicate to sync. GATE: syntax clean → visual-clarity matrix ALL 311 PASS
+  (all 20 themes, incl. the new Daylight/Light contrasts) → Daylight screenshot
+  eyeballed (accent pops on tabs/logo/chip; ink reads graphite). Shared-asset
+  change — ?v cache bump on the 9 pages.
+- QUEUED (not built): T-L Daily Challenge 2.0 in PIPELINE.md — level/PRO-gated,
+  prominent standalone real-time leaderboard, NYT-style extra-hard daily; paired
+  with a UI-streamline audit (the flat tab row has outgrown the feature set).

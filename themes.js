@@ -15,13 +15,16 @@ window.THEMES = {
     warn:'#d9a441', bad:'#c8533f' }},
   daylight: { name:'Daylight', dark:false, vars:{
     bg:'#dbd8d1', surface:'#ecebe6', surface2:'#e1dfd8', line:'#c6c2b8',
-    text:'#26241f', muted:'#6b665d', faint:'#a09a8f',
-    accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.14)',
+    /* r204 (Wolf): softer warm graphite text (not black) + a punchier, more saturated
+       accent so menu tabs, nav, and drill headers POP on the paper background. */
+    text:'#38352d', muted:'#6b665d', faint:'#a09a8f',
+    accent:'#0e9b57', 'accent-dim':'#0a7442', 'accent-glow':'rgba(14,155,87,.16)',
     warn:'#9a6700', bad:'#b3261e' }},
   light: { name:'Light', dark:false, vars:{
     bg:'#f7f7f4', surface:'#ffffff', surface2:'#eeeeea', line:'#d8d8d2',
-    text:'#1a1a1a', muted:'#6a6a6a', faint:'#a8a8a4',
-    accent:'#2ea36f', 'accent-dim':'#1d6647', 'accent-glow':'rgba(46,163,111,.18)',
+    /* r204 (Wolf): graphite text instead of near-black, same vibrant accent as Daylight. */
+    text:'#35352f', muted:'#6a6a6a', faint:'#a8a8a4',
+    accent:'#0e9b57', 'accent-dim':'#0a7442', 'accent-glow':'rgba(14,155,87,.16)',
     warn:'#b8860b', bad:'#a83232' }},
   serika: { name:'Serika', dark:false, vars:{
     bg:'#e1e1e3', surface:'#f5f5f7', surface2:'#d0d0d2', line:'#b8b8bb',
@@ -128,13 +131,18 @@ window.applyTheme = function(name){
   window.syncThemeLabels();
 };
 
-// On script load: apply the saved theme, else the dark default — the SAME fallback the trainer
-// uses, so navigating between pages never flips light/dark on a fresh browser.
+// On script load: apply the saved theme, else follow the OS preference — the SAME fallback the
+// trainer uses, so navigating between pages never flips light/dark on a fresh browser.
+// r204 (Wolf): Daylight is now THE default light theme; system-light browsers land there instead
+// of the harsher plain Light. Dark stays 'default' (the windows-grey desk look Wolf likes).
 (function(){
   let saved = null;
   try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
-  if(!saved || !window.THEMES[saved]) saved = 'default';   // r56: Default IS the windows-grey desk look; saved 'desk' falls through here too
-  window.applyTheme(saved);
+  if(saved && window.THEMES[saved]){ window.applyTheme(saved); return; }
+  try{
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    window.applyTheme(prefersLight ? 'daylight' : 'default');
+  }catch(e){ window.applyTheme('default'); }
 })();
 
 // Theme-name labels live in the page body, which doesn't exist yet when this runs in <head>.
