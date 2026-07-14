@@ -24,8 +24,11 @@ const ALTS = [
       {sel:'A3', keys:[{key:' ',shift:true},{key:'=',ctrl:true,shift:true}]},
       {sel:'A6', keys:[{key:' ',shift:true},{key:'-',ctrl:true}]},
     ]` },
-  { key: 'polish', name: 'reversed order + ribbon bold (alt h 1)', moves: `C => { const o=C._o; return [
+  { key: 'polish', name: 'reversed header order + ribbon bold/italic, ALT O E date, ctrl+1 currency (0-dec in one chord)', moves: `C => { const o=C._o; return [
       {sel:o.h1+':'+o.h2, keys:[{key:'Alt'},L('h'),L('h'), {key:'Alt'},L('h'),L('b'),L('b'), {key:'Alt'},L('h'),D(1)]},
+      {sel:o.dates, keys:[{key:'Alt'},L('o'),L('e'),L('d'), {key:'Alt'},L('h'),D(1)]},
+      {sel:o.money, keys:[{key:'1',ctrl:true},L('c')]},
+      {sel:o.growth, keys:[{key:'Alt'},L('h'),D(2)]},
     ]; }` },
   { key: 'blocksel', name: 'move FIRST, reselect at the new address, ctrl+shift+! + ribbon bold', moves: `C => { const o=C._o; return [
       {sel:o.u0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'x',ctrl:true}]},
@@ -165,9 +168,11 @@ const ALTS = [
       {sel:o.cur, keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
       {sel:o.pct, keys:[{key:'Alt'},L('h'),L('p')]},
       {sel:o.pct.split(':')[1], keys:[{key:'Alt'},L('h'),D(0)]},
+      {sel:o.pct, keys:[{key:'Alt'},L('h'),D(2)]},
     ]; }` },
-  { key: 'dress', name: 'footnote FIRST via alt o e, total row dressed mid-pass via ribbon routes', moves: `C => { const R=C._R; return [
+  { key: 'dress', name: 'footnote FIRST via alt o e, perimeter EARLY, total row dressed mid-pass via ribbon routes', moves: `C => { const R=C._R; return [
       {sel:'A'+R.mRow, keys:[{key:'Alt'},L('o'),L('e'),L('e')]},
+      {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
       {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('o')]},
       {sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
       {sel:R.inpRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},

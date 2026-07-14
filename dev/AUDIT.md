@@ -4774,3 +4774,26 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   routine. Nothing reached the remote.
 - Three alts rewritten (dialog-route swaps + order permutations), 3/3.
   CACHE v163 -> v164.
+
+## r195 — Wolf round 3, Tranche C (polish, format, dress) — round 3 COMPLETE
+- POLISH v2 "Dress the header row": a historical-financials fragment
+  with the whole header STACK undressed — title (bold + rule + shade),
+  a date row still in raw serials (ctrl+1 D + bold), the money row to
+  dollars, the growth memo italicized — and a decoy second table that
+  must stay plain (Wolf: "multiple headers, per-row formats"). Four
+  checks, per-row judgment graded both ways (dress T1, DON'T dress T2).
+  par 66/19.
+- FORMAT v2: the dollar pair now includes a NEGATIVE ("Net debt ($mm)")
+  so the currency cast visibly lands the ($xx) paren convention (r190
+  engine payoff, smoked with a parens assert), and the %-pair check now
+  requires ctrl+i — "%-lines whisper" (Wolf: italic percent lines).
+  par 62/23.
+- DRESS v5: the title takes a clean rule (alt h b b) and a NEW check
+  makes the MD's move explicit — one perimeter (alt h b o) around the
+  whole OUTPUT row A:E, graded edge-by-edge (bl/br at the corners,
+  bt/bb across). Blue-check copy rewritten per Wolf: "we're not
+  painting the numbers, we're making the font blue." par 120/32.
+- Three alts rewritten (polish: ALT O E date + ctrl+1 currency zero-dec
+  route + ribbon bold/italic; format: +italic beat; dress: perimeter
+  EARLY permutation), 3/3. Pars 21-seed foreground, dead flat.
+  CACHE v164 -> v165. Wolf playtest round 3 fully shipped.

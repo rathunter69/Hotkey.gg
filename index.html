@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=164" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=164">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=164">
+<link rel="icon" href="favicon.ico?v=165" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=165">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=165">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1143,14 +1143,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=164"></script>
-<link rel="stylesheet" href="nav.css?v=164">
-<script src="themes.js?v=164"></script>
+<script src="drills.js?v=165"></script>
+<link rel="stylesheet" href="nav.css?v=165">
+<script src="themes.js?v=165"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=164"></script>
+<script src="nav.js?v=165"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1834,7 +1834,7 @@ const CHALLENGES = {
     }
   },
   format:{
-    name:'Format', label:'Fix the formats', par:58, parKeys:24,
+    name:'Format', label:'Fix the formats', par:62, parKeys:23,
     aha:'ctrl+1 is the whole format wardrobe \u2014 percents, dollars, multiples, dates, one dialog',
     prompt:'These outputs came in raw \u2014 and they land somewhere new each run. Cast each number to its right type: margins as percentages, dollars as currency, the share count with commas, the multiple as 8.2x and the report date as Mmm-yy \u2014 the last two live in Ctrl+1 (or the old-school Alt O E), the dialog every desk formats through.',
     req(){ const o=this._o; return '<em>'+o.pct+'</em> \u2192 <em>ctrl+shift+%</em> (+1 dec on the second) \u00b7 <em>'+o.cur+'</em> \u2192 <em>ctrl+shift+$</em> \u2212 decimals \u00b7 <em>'+o.com+'</em> \u2192 <em>ctrl+shift+!</em> \u2212 decimals \u00b7 <em>'+o.mult+'</em> \u2192 <em>ctrl+1</em> <em>x</em> \u00b7 <em>'+o.date+'</em> \u2192 <em>ctrl+1</em> <em>d</em>'; },
@@ -1849,6 +1849,7 @@ const CHALLENGES = {
     demo(){ const o=this._o; return [
       {sel:o.pct, keys:[Kb.pct]},
       {sel:o.pct.split(':')[1], keys:[Kb.alt,L('H'),D(0)]},
+      {sel:o.pct, keys:[{key:'i',ctrl:true}]},
       {sel:o.cur, keys:[Kb.cur,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
       {sel:o.com, keys:[Kb.com,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
       {sel:o.mult, keys:[{key:'1',ctrl:true},L('X')]},
@@ -1863,7 +1864,7 @@ const CHALLENGES = {
       cells[LC+r0]={...blankCell(),value:'Metric',txt:true,bold:true};
       cells[VC+r0]={...blankCell(),value:'Value',txt:true,bold:true,align:'r'};
       const gross=rnd(36,55)/100, ebitda=rnd(150,290)/1000;
-      const rows=[['Gross margin',gross],['EBITDA margin',ebitda],['Revenue ($mm)',rnd(38,72)*10],['EBITDA ($mm)',rnd(9,28)*10],['Shares out. (000s)',rnd(40,300)*100],['EV / EBITDA',rnd(55,140)/10],['Report date',45930+rnd(90,800)]];   // r176 fits · r177 multiple + date (serial)
+      const rows=[['Gross margin',gross],['EBITDA margin',ebitda],['Revenue ($mm)',rnd(38,72)*10],['Net debt ($mm)',-rnd(9,28)*10],['Shares out. (000s)',rnd(40,300)*100],['EV / EBITDA',rnd(55,140)/10],['Report date',45930+rnd(90,800)]];   // r195: the dollar pair includes a NEGATIVE — currency cast shows ($xx), the r190 payoff
       rows.forEach(([n,v],i)=>{
         cells[LC+(r0+1+i)]={...blankCell(),value:n,txt:true};
         cells[VC+(r0+1+i)]={...blankCell(),value:v,decimals:3,fontColor:'blue'};   // r176: raw look, still fits
@@ -1875,8 +1876,8 @@ const CHALLENGES = {
     checks(S){
       const o=this._o, r0=o.r0, g=r=>S.cells[o.vc+r]||{};
       return [
-        {label:'cast the margins as percentages \u2014 EBITDA margin to one decimal ('+o.pct+')',
-          ok: g(r0+1).fmtStyle==='percent' && g(r0+2).fmtStyle==='percent' && (g(r0+2).decimals|0)===1},
+        {label:'cast the margins as percentages and ITALICIZE the pair \u2014 %-lines whisper; EBITDA margin to one decimal ('+o.pct+')',
+          ok: g(r0+1).fmtStyle==='percent' && g(r0+2).fmtStyle==='percent' && (g(r0+2).decimals|0)===1 && g(r0+1).it && g(r0+2).it},
         {label:'cast the dollar figures as currency \u2014 no stray decimals ('+o.cur+')',
           ok: ['currency'].includes(g(r0+3).fmtStyle) && g(r0+4).fmtStyle==='currency' && (g(r0+3).decimals|0)===0 && (g(r0+4).decimals|0)===0},
         {label:'comma-separate the share count \u2014 whole number ('+o.com+')',
@@ -1952,12 +1953,13 @@ const CHALLENGES = {
     }
   },
   dress:{
-    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:112, parKeys:28,
+    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:120, parKeys:32,
     aha:'a full dress pass is chords end to end \u2014 the tab should read like a printed page',
     prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, inputs in blue, margins as clean percents, dollars with commas. Four different formatting muscles, one pass, and the sites move every run.',
-    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 footnote the margin label <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 dress the EBITDA row <em>A'+R.tRow+':E'+R.tRow+'</em> \u2192 <em>ctrl+b</em> + <em>alt h b t</em>'; },
+    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b b</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue font \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 circle the OUTPUT: <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b o</em>'; },
     guide:[
-      'A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 the title carries the rule',
+      'A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 the title carries the rule',
+      'the MD circles the OUTPUT: select the margin row block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 one perimeter around the whole answer',
       'select the input block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means typed, black means computed',
       'select the margins row \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> \u2014 one decimal',
       'select the dollar figures \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 commas, zero decimals',
@@ -1967,12 +1969,13 @@ const CHALLENGES = {
     targets:[function(){return 'A1';}, function(){return this._R.inpRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}, function(){return 'A'+this._R.mRow;}],
     demo(){ const R=this._R;
       return [
-        {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('o')]},
+        {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('b')]},
         {sel:R.inpRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
         {sel:R.mRowRange, keys:[Kb.pct, {key:'Alt'}, L('h'), D(0)]},
         {sel:R.fRange, keys:[{key:'Alt'}, L('h'), L('k')]},
         {sel:'A'+R.mRow, keys:[{key:'1',ctrl:true}, L('E')]},
         {sel:'A'+R.tRow+':E'+R.tRow, keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('t')]},
+        {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'}, L('h'), L('b'), L('o')]},
       ]; },
     build(){
       const cells={};
@@ -2016,9 +2019,13 @@ const CHALLENGES = {
       const dressOk=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+R.tRow]; if(!x||!x.bold||!x.bt) return false; } return true; })();
       return [
         {label:'Bold the title and rule it off \u2014 A1 gets bold + a bottom border', ok:titleOk},
-        {label:'Paint every typed input BLUE ('+R.inpRange+') \u2014 blue means hardcode', ok:blueOk},
+        {label:'Make the font blue on every typed input ('+R.inpRange+') \u2014 blue font marks hardcoded data', ok:blueOk},
         {label:'Cast the margins as percents, ONE decimal (row '+R.mRow+')', ok:pctOk},
         {label:'Comma-format the dollar figures ('+R.fRange+') \u2014 negatives flip to (parens), the desk convention', ok:comOk},
+        {label:'circle the OUTPUT \u2014 one perimeter (alt h b o) around A'+R.mRow+':E'+R.mRow+', the row the MD reads', ok: (()=>{
+          const a2=S.cells['A'+R.mRow]||{}, e2=S.cells['E'+R.mRow]||{};
+          if(!(a2.bt&&a2.bb&&a2.bl)||!(e2.bt&&e2.bb&&e2.br)) return false;
+          for(let c2=1;c2<=5;c2++){ const x=S.cells[colLetter(c2)+R.mRow]||{}; if(!x.bt||!x.bb) return false; } return true; })()},
         {label:'footnote the margin label \u2014 ctrl+1, e (superscript) adds the \u00b9 (A'+R.mRow+')',
           ok: (()=>{ const l=S.cells['A'+R.mRow]; return !!(l&&String(l.value).endsWith('\u00b9')); })()},
         {label:'dress the EBITDA row \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above', ok: dressOk},
@@ -3440,41 +3447,63 @@ const CHALLENGES = {
     }
   },
   polish:{
-    name:'Polish', label:'Dress the header row', par:38, parKeys:8,
-    aha:'one selection, three chords — bold, rule, shade — and know where the formatting stops',
-    prompt:'Two tables on the page. Dress the TARGET table\u2019s header \u2014 bold, bottom border, shaded \u2014 and leave the other one alone. Print-ready means knowing where the formatting stops.',
-    req(){ const o=this._o; return 'select <em>'+o.h1+':'+o.h2+'</em> \u00b7 <em>ctrl b</em> \u00b7 <em>alt h b b</em> border \u00b7 <em>alt h h</em> shade \u00b7 the table at '+o.d1+' stays plain'; },
+    name:'Polish', label:'Dress the header row', par:66, parKeys:19,
+    aha:'every row of a model header wears a DIFFERENT dress \u2014 and you know where the formatting stops',
+    prompt:'A historical financials fragment with its whole header stack undressed: the section title, a date row still showing raw serials, the money row, and the growth memo under it. Each row wears a DIFFERENT dress \u2014 title bold-ruled-shaded, dates cast to Mmm-yy and bolded, money as dollars, growth italicized \u2014 and the second table on the page stays exactly as you found it. Print-ready means per-row judgment, not one style everywhere.',
+    req(){ const o=this._o; return '<em>'+o.h1+':'+o.h2+'</em> \u2192 <em>ctrl+b</em> + <em>alt h b b</em> + <em>alt h h</em> \u00b7 dates <em>'+o.dates+'</em> \u2192 <em>ctrl+1</em> <em>d</em> + <em>ctrl+b</em> \u00b7 money <em>'+o.money+'</em> \u2192 <em>ctrl+shift+$</em> \u2212 decimals \u00b7 growth <em>'+o.growth+'</em> \u2192 <em>ctrl+i</em> \u00b7 the table at '+o.d1+' stays plain'; },
     guide(){ const o=this._o; return [
-      'on '+o.h1+' \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00d73 across the header \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
-      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 bottom border under the row',
-      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u2014 shade it \u00b7 the OTHER table\u2019s header stays untouched',
+      'the section header '+o.h1+':'+o.h2+' \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u2014 the classic three',
+      'the date row '+o.dates+' is raw serials \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>d</kbd> casts Mmm-yy \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 periods carry the page',
+      'the money row '+o.money+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice \u2014 dollars, no cents',
+      'the growth memo '+o.growth+' \u00b7 <kbd>ctrl</kbd>+<kbd>i</kbd> \u2014 memos whisper \u00b7 and the OTHER table\u2019s header stays untouched',
     ]; },
-    targets(){ const o=this._o; return [o.h1+':'+o.h2]; },
+    targets(){ const o=this._o; return [o.h1+':'+o.h2, o.dates, o.money, o.growth]; },
     demo(){ const o=this._o; return [
       {sel:o.h1+':'+o.h2, keys:[{key:'b',ctrl:true}, Kb.alt,{key:'h'},{key:'b'},{key:'b'}, Kb.alt,{key:'h'},{key:'h'}]},
+      {sel:o.dates, keys:[{key:'1',ctrl:true},L('D'),{key:'b',ctrl:true}]},
+      {sel:o.money, keys:[Kb.cur, Kb.alt,L('H'),D(9), Kb.alt,L('H'),D(9)]},
+      {sel:o.growth, keys:[{key:'i',ctrl:true}]},
     ]; },
     build(){
       const cells={};
-      const hdr=['Segment','FY1','FY2','FY3'];
-      const mk=(c0,r0)=>{ const keys=[];
-        hdr.forEach((t,j)=>{ const k=colLetter(c0+j)+r0; cells[k]={...blankCell(),value:t,txt:true}; keys.push(k); });
-        for(let i=1;i<=3;i++){ cells[colLetter(c0)+(r0+i)]={...blankCell(),value:['Industrial','Consumer','Services'][i-1],txt:true};
-          for(let j=1;j<4;j++) cells[colLetter(c0+j)+(r0+i)]={...blankCell(),value:rnd(10,90)*10,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-        return keys; };
-      cells['A1']={...blankCell(),value:codename()+' — segment schedules (dress ONE header)',txt:true,bold:true};
-      const spots=[[1,3],[6,3],[1,8],[6,8]];
+      cells['A1']={...blankCell(),value:codename()+' \u2014 historical financials (dress ONE table)',txt:true,bold:true};
+      const mk=(c0,r0,full)=>{
+        const hk=[];
+        ['Historicals','',' ','  '].forEach((t,j)=>{ const k=colLetter(c0+j)+r0;
+          cells[k]={...blankCell(),value:j===0?'Historicals':('\u00a0'.repeat(j)),txt:true}; hk.push(k); });
+        const dk=[], mk2=[], gk=[];
+        for(let j=1;j<4;j++){ const k=colLetter(c0+j)+(r0+1);
+          cells[k]={...blankCell(),value:45200+365*(j-1)+rnd(0,20),decimals:0,align:'r'}; dk.push(k); }
+        cells[colLetter(c0)+(r0+1)]={...blankCell(),value:'Period',txt:true};
+        cells[colLetter(c0)+(r0+2)]={...blankCell(),value:'Revenue',txt:true};
+        const revs=[];
+        for(let j=1;j<4;j++){ const k=colLetter(c0+j)+(r0+2); const v=rnd(60,240)*10; revs.push(v);
+          cells[k]={...blankCell(),value:v,fontColor:'blue'}; mk2.push(k); }
+        cells[colLetter(c0)+(r0+3)]={...blankCell(),value:'% growth',txt:true};
+        for(let j=2;j<4;j++){ const k=colLetter(c0+j)+(r0+3);
+          cells[k]={...blankCell(),formula:'='+colLetter(c0+j)+(r0+2)+'/'+colLetter(c0+j-1)+(r0+2)+'-1',
+            value:revs[j-1]/revs[j-2]-1,fmtStyle:'percent',decimals:1}; gk.push(k); }
+        return {hk, dk, mk2, gk};
+      };
+      const spots=[[1,3],[6,3],[1,9],[6,9]];
       for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
       const A=spots[0], B=spots.find(p=>p[0]!==A[0]||Math.abs(p[1]-A[1])>=6)||spots[1];
-      this._hk=mk(A[0],A[1]); this._dk=mk(B[0],B[1]);
-      this._o={ h1:this._hk[0], h2:this._hk[3], d1:this._dk[0] };
-      return {ROWS:12, cells, active:{r:A[1],c:A[0]}, sel:null, colW:{}};
+      const T1=mk(A[0],A[1],true), T2=mk(B[0],B[1],false);
+      this._t1=T1; this._t2=T2;
+      this._o={ h1:T1.hk[0], h2:T1.hk[3],
+        dates:T1.dk[0]+':'+T1.dk[2], money:T1.mk2[0]+':'+T1.mk2[2],
+        growth:T1.gk[0]+':'+T1.gk[1], d1:T2.hk[0] };
+      const cw={}; cw[A[0]]=96; cw[B[0]]=96;
+      return {ROWS:14, cells, active:{r:A[1],c:A[0]}, sel:null, colW:cw};
     },
     checks(S){
       const c=k=>S.cells[k]||{};
+      const T1=this._t1, T2=this._t2;
       return [
-        {label:'bold the target header \u2014 all four cells, that table only', ok: this._hk.every(k=>c(k).bold) && !this._dk.some(k=>c(k).bold)},
-        {label:'run a bottom border under the whole header \u2014 and nowhere else', ok: this._hk.every(k=>c(k).bb) && !this._dk.some(k=>c(k).bb)},
-        {label:'shade the header \u2014 the other table stays yours to leave', ok: this._hk.every(k=>c(k).fill==='blue') && !this._dk.some(k=>c(k).fill==='blue')},
+        {label:'dress the section header \u2014 bold + rule + shade, THAT table only', ok: T1.hk.every(k=>c(k).bold&&c(k).bb&&c(k).fill==='blue') && !T2.hk.some(k=>c(k).bold||c(k).bb||c(k).fill==='blue')},
+        {label:'cast the date row to Mmm-yy and bold it \u2014 periods carry the page', ok: T1.dk.every(k=>c(k).fmtStyle==='date'&&c(k).bold)},
+        {label:'dollars on the money row \u2014 currency, zero decimals', ok: T1.mk2.every(k=>c(k).fmtStyle==='currency'&&c(k).decimals===0)},
+        {label:'italicize the growth memo \u2014 and leave the second table alone', ok: T1.gk.every(k=>c(k).it) && !T2.gk.some(k=>c(k).it)},
       ];
     }
   },
