@@ -175,17 +175,21 @@ window.HOTKEY_DRILLS = {
    Badges derive from cleared chapters — rendered on the player card. ---- */
 window.HOTKEY_CAMPAIGN = {
   GATE: 1.5,
+  /* r215 (Wolf): each shipped version pays a ONE-TIME xp bounty (awarded once, on top of the
+     per-solve xp + the medal) so the campaign reads as the spine of progression, not a side
+     feature. Escalating to reward the climb; the Models/Full-Builds versions carry the fat
+     bounties that funnel toward PRO. */
   chapters: [
-    { id:'c1', name:'v1 \u00b7 Foundations',  badge:'\ud83c\udf93', keys:['navigation','blocksel','ribbon','editfix','undo','filldr','pastes','rowops','autofit','saves','copyover'] },
-    { id:'c2', name:'v2 \u00b7 Formatting',   badge:'\ud83c\udfa8', keys:['polish','combo','format','center','blue','gauntlet'] },
-    { id:'c3', name:'v3 \u00b7 Values & Data',badge:'\ud83d\udccb', keys:['drill','series','sort'] },
-    { id:'c4', name:'v4 \u00b7 Formulas I',   badge:'\u2797',        keys:['margin','growth','foot','percent'] },
-    { id:'c5', name:'v5 \u00b7 Formulas II',  badge:'\ud83e\uddee', keys:['bridge','audit','balance','revolver','cagr','sumif'] },
-    { id:'c6', name:'v6 \u00b7 Models',       badge:'\ud83c\udfe6', keys:['wacc','dcf','lbo','schedule','comps'] },
-    { id:'c7', name:'v7 \u00b7 Lookups',      badge:'\ud83d\udd0e', keys:['lookup','lookup2'] },
-    { id:'c8', name:'v8 \u00b7 Full Builds',  badge:'\ud83c\udfd7', keys:['isbuild','bsbuild','cfslink','nwcsched','debtsched','threestmt'] },
+    { id:'c1', name:'v1 \u00b7 Foundations',  badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','ribbon','editfix','undo','filldr','pastes','rowops','autofit','saves','copyover'] },
+    { id:'c2', name:'v2 \u00b7 Formatting',   badge:'\ud83c\udfa8', xp:200, keys:['polish','combo','format','center','blue','gauntlet'] },
+    { id:'c3', name:'v3 \u00b7 Values & Data',badge:'\ud83d\udccb', xp:200, keys:['drill','series','sort'] },
+    { id:'c4', name:'v4 \u00b7 Formulas I',   badge:'\u2797',        xp:250, keys:['margin','growth','foot','percent'] },
+    { id:'c5', name:'v5 \u00b7 Formulas II',  badge:'\ud83e\uddee', xp:300, keys:['bridge','audit','balance','revolver','cagr','sumif'] },
+    { id:'c6', name:'v6 \u00b7 Models',       badge:'\ud83c\udfe6', xp:450, keys:['wacc','dcf','lbo','schedule','comps'] },
+    { id:'c7', name:'v7 \u00b7 Lookups',      badge:'\ud83d\udd0e', xp:250, keys:['lookup','lookup2'] },
+    { id:'c8', name:'v8 \u00b7 Full Builds',  badge:'\ud83c\udfd7', xp:600, keys:['isbuild','bsbuild','cfslink','nwcsched','debtsched','threestmt'] },
   ],
-  finisher: { badge:'\u2b50', name:'Model complete' },
+  finisher: { badge:'\u2b50', name:'Model complete', xp:500 },
 };
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
