@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hotkey.gg — keyboard Excel trainer</title>
+<title>hotkey.gg · spreadsheet speedruns</title>
 <script>
   // BOOT BEACON: if anything fatal happens while the game loads, paint the error on
   // screen instead of failing silent ("all the elements are gone" must never be a mystery).
@@ -111,7 +111,11 @@
     align-self:stretch; display:flex; flex-direction:column}
   .gridwrap table{flex:1 1 auto; height:100%}   /* r70b: flex-basis alone doesn't stretch display:table in all engines — height:100% against the resolved gridwrap height does. Rows share the surplus; --cellh is the floor. */
   table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}   /* r65: Calibri renders smaller — sized up */
-  .edcaret{color:var(--accent); font-weight:700; animation:edblink 1s steps(1) infinite; margin:0 -2px}
+  /* r216 (Wolf): the edit caret used to be a tall block glyph (▏) that grew the row on F2 —
+     a visible shift. Now a zero-width CSS bar constrained inside the text's line box, so entering
+     edit mode never reflows the row. */
+  .edcaret{display:inline-block; width:0; height:.92em; border-right:1.6px solid var(--accent);
+    vertical-align:-.16em; margin:0; animation:edblink 1s steps(1) infinite}
   @keyframes edblink{50%{opacity:0}}
   td:hover{background:inherit}   /* keyboard game — no mouse-hover cell glow (r39) */
   th,td{border:1px solid var(--line); height:38px; text-align:right; position:relative; overflow:hidden}
@@ -7065,9 +7069,7 @@ function render(){
         // Editing cell: show formula buffer with colored refs (matches what's in the formula bar)
         const {refs} = parseFormulaRefs(editBuf);
         cls.push('editing');
-        txt = true
-          ? buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '<span class="edcaret">\u258f</span>' + buildFormulaHTML(editBuf.slice(editCaret), refs)
-          : buildFormulaHTML(editBuf, refs) + '▏';
+        txt = buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '<span class="edcaret"></span>' + buildFormulaHTML(editBuf.slice(editCaret), refs);
       }
       else if(cell.txt && (cell.ca|0)>1 && typeof cell.value==='string'){
         /* r177 CENTER ACROSS SELECTION — the anchor's text centers over its
