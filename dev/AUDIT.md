@@ -5017,3 +5017,12 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - QUEUED (not built): T-L Daily Challenge 2.0 in PIPELINE.md — level/PRO-gated,
   prominent standalone real-time leaderboard, NYT-style extra-hard daily; paired
   with a UI-streamline audit (the flat tab row has outgrown the feature set).
+
+## r205 — higher-contrast yellow drill-cell font on light themes (Wolf)
+- Wolf on the new light scheme: "yellow drills look a little hard to see still —
+  might need a different higher-contrast color for that drill set." The
+  fc-yellow font swatch (yellow-formatted cells) was #a67c00 — passed the audit
+  floor but read weak on the lighter Daylight sheet (~3.2:1). Deepened to
+  #8a6300 (amber-gold, ~4.5:1 on the sheet), still recognizably the "yellow"
+  swatch but clearly legible. Dark-theme variant (#ffd75e) unchanged — bright
+  on dark already. GATE: visual-clarity matrix ALL 311 PASS.
