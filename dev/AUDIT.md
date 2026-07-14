@@ -5184,3 +5184,16 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   bar, and a PRO funnel line pointing at the Models/Full-Builds bounties.
 - GATE: syntax clean; demo-replay ALL GREEN (award hook is a try/catch no-op
   during single-drill replays). drills.js shared-asset ?v 173->174.
+
+## r216 — elegant tab title + F2 no longer shifts the row (Wolf)
+- TITLE: "hotkey.gg — keyboard Excel trainer" → "hotkey.gg · spreadsheet
+  speedruns" (Monkeytype-flavored, and sidesteps the raw MS-Excel trademark in
+  the persistent tab title per Wolf's caution; the app still references Excel
+  nominatively throughout).
+- F2 SHIFT: the edit caret was a tall block glyph (▏, U+258F) whose line box
+  exceeded the cell's, so entering edit mode grew the row ~1px — a visible jump.
+  Replaced with a zero-width CSS bar (border-right, height .92em, constrained
+  inside the text line box). Measured: table/row/row-below heights identical
+  before vs after F2 (delta 0.00) — editing is now shift-free and snappy.
+- GATE: syntax clean; F2 row-shift measured 0.00; demo-replay ALL GREEN (editing
+  drills exercise the caret). index.html only (no ?v bump).
