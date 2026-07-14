@@ -60,14 +60,14 @@ eval). The harness has been in the standard gate since r169.
 > **Alt H O H** (row height) as tiny keyboard-only numeric prompts, so sizing
 > drills can teach SETTING a width rather than autofit roulette; pair with a
 > 'set the print widths' beat in a future formatting drill.
-> DONE r177: Ctrl+1 / Alt O E Format Cells dialog. DONE r179: ROW GROUPING
-> (Shift+Alt+→/← + Alt A H/J, hidden-rows substrate, grpfold drill) — the
-> canon never-hide-always-group rule is live. DONE r180: Ctrl+Shift+L
-> AutoFilter + Alt+↓ value picker + Alt A T ribbon route + filterpass drill
-> (rides the same hidden-rows substrate; Macabacus profile keeps the chord
-> for Fast Fill Left by claim order). REMAINING: Ctrl+9/0 hide (teach WITH
-> the group-first caveat), SUBTOTAL(9) visible-aware math so a future drill
-> can grade "the total follows the filter". Each lands with parity asserts.
+> DONE r177 (Ctrl+1/Alt O E Format Cells), r179 (row grouping + grpfold),
+> r180 (AutoFilter + filterpass), r185 (Ctrl+9/Ctrl+Shift+9 manual hide +
+> Alt H O U R/O + Alt H O W width dialog + unhide drill — the group-first
+> caveat IS the drill's story). REMAINING: Ctrl+0 column hide (needs hidden-
+> column render/nav surface — bigger than it looks, low training value),
+> Alt H O H row height (needs a row-height model the engine lacks),
+> SUBTOTAL(9) visible-aware math so a future drill can grade "the total
+> follows the filter". Each lands with parity asserts.
 
 ## T-F · RAPID-FIRE ↔ CLASSIC BRIDGE  *(any model)*
 > Rapid-fire recognizes 15+ chords classic never exercises (find/replace/goto/

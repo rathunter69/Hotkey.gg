@@ -352,6 +352,30 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(t1.cleared, 'Esc clears the hunt');
   ok(t1.ctrlG && t1.formulas, 'Ctrl+G route + Formulas criterion');
 
+  console.log('U. manual hide + column width (r185)');
+  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('unhide'); });
+  const u1 = await run(() => {
+    const preHidden = [4,5,6,7].every(r => S.hidden.has(r)) && S.hiddenRows.length === 4;   // board loads with the sins in place
+    const subLive = Math.abs(S.cells['B3'].value - CHALLENGES.unhide._o.sum) < 0.5;        // SUM sees hidden rows
+    setDemoSel('A3:A8'); demoKey({key:'9', ctrl:true, shift:true});
+    const unhid = S.hidden.size === 0 && S.unhideN === 1;
+    setDemoSel('A5:A6'); demoKey({key:'9', ctrl:true});
+    const rehid = S.hidden.has(5) && S.hidden.has(6) && !S.hidden.has(4) && !rowHidden(S.active.r);
+    setDemoSel('A4:A7'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'u'}); demoKey({key:'o'});
+    const ribbonUnhide = S.hidden.size === 0;
+    setDemoSel('B2'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'w'});
+    const dlg = mode === 'ribbon' && dialog === 'colw';
+    demoKey({key:'1'}); demoKey({key:'2'}); demoKey({key:'Enter'});
+    const applied = colW[2] === Math.round(12*7)+5 && mode === 'normal';
+    return { preHidden, subLive, unhid, rehid, ribbonUnhide, dlg, applied };
+  });
+  ok(u1.preHidden, 'a board can load with manually hidden rows');
+  ok(u1.subLive, 'SUM sees manually hidden rows');
+  ok(u1.unhid, 'Ctrl+Shift+9 unhides across the selection');
+  ok(u1.rehid, 'Ctrl+9 hides + relocates the cursor', JSON.stringify(u1));
+  ok(u1.ribbonUnhide, 'Alt H O U O is the ribbon unhide route');
+  ok(u1.dlg && u1.applied, 'Alt H O W numeric width prompt applies Excel units');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

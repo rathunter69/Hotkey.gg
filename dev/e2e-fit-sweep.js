@@ -8,7 +8,7 @@
 const { chromium } = require('playwright-core');
 const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const REPS = 3;
-const EXEMPT = new Set(['autofit', 'combo', 'gauntlet']);
+const EXEMPT = new Set(['autofit', 'combo', 'gauntlet', 'unhide']);   // unhide loads with an intentional squeeze — Alt H O W is the lesson
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });

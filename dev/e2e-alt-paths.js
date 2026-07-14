@@ -185,6 +185,12 @@ const ALTS = [
         {sel:'A3', keys:[{key:'Alt'},L('a'),L('t')]},
         {sel:'C3', keys:pk},
       ]; }` },
+  { key: 'unhide', name: 'width fixed FIRST, ribbon unhide route, grouped while still hidden', moves: `C => { const o=C._o; return [
+      {sel:'B2', keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]},
+      {sel:'A'+o.h1+':A'+o.h2, keys:[{key:'ArrowRight',alt:true,shift:true}]},
+      {sel:'A'+(o.h1-1)+':A'+(o.h2+1), keys:[{key:'Alt'},L('h'),L('o'),L('u'),L('o')]},
+      {sel:'A'+(o.h1-1), keys:[{key:'Alt'},L('a'),L('h')]},
+    ]; }` },
   { key: 'hunt', name: 'totals footed FIRST, ctrl+g route, crimes fixed in reverse', moves: `C => { const o=C._o;
       const steps=[
         {sel:'B8', keys:[...T('=SUM(B3:B7)'),{key:'Enter'}]},

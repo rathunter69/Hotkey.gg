@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=159" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=159">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=159">
+<link rel="icon" href="favicon.ico?v=160" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=160">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=160">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1135,14 +1135,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=159"></script>
-<link rel="stylesheet" href="nav.css?v=159">
-<script src="themes.js?v=159"></script>
+<script src="drills.js?v=160"></script>
+<link rel="stylesheet" href="nav.css?v=160">
+<script src="themes.js?v=160"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=159"></script>
+<script src="nav.js?v=160"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2535,6 +2535,57 @@ const CHALLENGES = {
         {label:'relink the three hardcodes \u2014 prior year \u00d7 (1 + growth); formulas own the calc block again', ok: fixed},
         {label:'foot the corrected build \u2014 =SUM(B3:B7) at B8, fill B8:D8 across', ok: footed},
         {label:'bold the total row \u2014 B8:D8 carries the corrected page', ok: boldOk},
+      ];
+    }
+  },
+  unhide:{
+    name:'Unhide', label:'Flush the hidden rows', par:68, parKeys:12,
+    aha:'hidden rows lie \u2014 a group tells the truth; unhide the sins, fold them right',
+    prompt:'The last analyst HID the monthly detail instead of grouping it \u2014 rows 4 to 7 are just\u2026 gone. No \u229e, no rail, no trace: the row numbers skip and the subtotal reads like magic. The MD wants it done RIGHT. Select across the gap and unhide (Ctrl+Shift+9 \u2014 or Alt H O U O), group the detail properly (Shift+Alt+\u2192), fold it back (Alt A H) so the \u229e tells the next reader where it lives \u2014 and while you\u2019re in there, the Size column is squeezed to hash marks: set it to a real width (Alt H O W).',
+    req(){ const o=this._o; return 'select rows '+(o.h1-1)+':'+(o.h2+1)+' \u00b7 <em>ctrl+shift+9</em> (or <em>alt h o u o</em>) \u00b7 group '+o.h1+':'+o.h2+' <em>shift+alt+\u2192</em> \u00b7 fold <em>alt a h</em> \u00b7 <em>alt h o w</em> \u2192 12 on column B'; },
+    guide(){ const o=this._o; return [
+      'the row numbers jump '+(o.h1-1)+' \u2192 '+(o.h2+1)+' \u2014 that\u2019s the tell \u00b7 select across the gap (rows '+(o.h1-1)+' to '+(o.h2+1)+') \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>9</kbd> or <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>u</kbd> <kbd>o</kbd> \u2014 the detail returns',
+      'now do it RIGHT: select rows '+o.h1+':'+o.h2+' \u00b7 <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>\u2192</kbd> groups them \u00b7 <kbd>alt</kbd> <kbd>a</kbd> <kbd>h</kbd> folds \u2014 same clean page, but the \u229e admits the detail exists',
+      'column B is crushed to ##### \u00b7 put the cursor on it \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd> \u00b7 type <kbd>12</kbd> <kbd>\u21b5</kbd> \u2014 numbers you can read',
+    ]; },
+    targets(){ const o=this._o; return ['A'+(o.h1-1)+':A'+(o.h2+1), 'A'+o.h1+':A'+o.h2, 'B2']; },
+    demo(){ const o=this._o; return [
+      {sel:'A'+(o.h1-1)+':A'+(o.h2+1), keys:[{key:'9',ctrl:true,shift:true}]},
+      {sel:'A'+o.h1+':A'+o.h2, keys:[{key:'ArrowRight',alt:true,shift:true}]},
+      {sel:'A'+o.h1, keys:[{key:'Alt'},L('a'),L('h')]},
+      {sel:'B2', keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 regional tape (inherited)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Region',txt:true,bold:true};
+      cells['B2']={...blankCell(),value:'Size ($M)',txt:true,bold:true,align:'r'};
+      const MO=['North detail','South detail','East detail','West detail'];
+      let sum=0;
+      for(let i=0;i<4;i++){ const r=4+i, v=rnd(30,95)*10; sum+=v;
+        cells['A'+r]={...blankCell(),value:MO[i],txt:true};
+        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      }
+      cells['A3']={...blankCell(),value:'Consolidated',txt:true,bold:true};
+      cells['B3']={...blankCell(),formula:'=SUM(B4:B7)',value:sum,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      cells['A9']={...blankCell(),value:'Memo: detail restated in v4',txt:true};
+      this._o={h1:4, h2:7, sum:sum};
+      return {ROWS:10, cells, active:{r:3,c:1}, sel:null, colW:{1:130,2:40},
+        hiddenRows:[4,5,6,7]};
+    },
+    checks(S){
+      const o=this._o;
+      const stillHidden=(S.hiddenRows||[]).some(r=>r>=o.h1&&r<=o.h2);
+      const unhid=!stillHidden && (S.unhideN||0)>=1;
+      const g=(S.rowGroups||[]).find(x=>x.r1===o.h1&&x.r2===o.h2);
+      const sub=S.cells['B3'];
+      const grouped=!!g && !stillHidden;
+      const folded=!!g && g.collapsed && !!(sub && sub.formula && Math.abs((sub.value||0)-o.sum)<0.5);
+      const wOk=(S.colwN||0)>=1 && colW[2]>=Math.round(12*7)+5-8;
+      return [
+        {label:'unhide the buried detail \u2014 select across the gap, ctrl+shift+9 or alt h o u o', ok: unhid},
+        {label:'group rows '+o.h1+':'+o.h2+' the HOUSE way \u2014 shift+alt+\u2192, then fold with alt a h; the \u229e owns the page', ok: grouped && folded},
+        {label:'set column B to width 12 \u2014 alt h o w; the tape reads again', ok: wOk},
       ];
     }
   },
@@ -6686,7 +6737,8 @@ const MENUS = {
   'HV': [['S','Paste special…']],
   'HI': [['R','Insert rows'],['C','Insert columns']],
   'HD': [['R','Delete rows'],['C','Delete columns']],
-  'HO': [['I','Autofit width'],['A','Autofit height']],
+  'HO': [['I','Autofit width'],['A','Autofit height'],['W','Column width\u2026'],['U','Hide & Unhide']],
+  'HOU':[['R','Hide rows'],['O','Unhide rows']],
   'HB': [['T','Top'],['B','Bottom'],['A','All'],['O','Outside']],
   'HU': [['S','Sum']],
   'HA': [['L','Left'],['C','Center'],['R','Right']],
@@ -6771,6 +6823,11 @@ function __drawRibbon(){
     html += `<span class="fc-name">${FONT_SWATCHES[fontColorIdx].name}</span>`;
     html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
     el.innerHTML = html; return;   /* r85: __altFooter was out-of-scope (guided renderer's const) — the crash that "broke the ribbon" */
+  }
+  if(dialog==='colw'){
+    el.className='ribbon show';
+    el.innerHTML='<span class="path">column width \u2192</span><span class="opt" style="font-family:var(--mono)">'+(colwBuf||'\u2026')+'</span><span class="opt">type a width (Excel units) \u00b7 \u21b5 apply \u00b7 esc cancel</span>';
+    return;
   }
   if(dialog==='goto'){
     el.className='ribbon show';
@@ -7735,6 +7792,11 @@ function applyRibbon(key){
     if(key==='ENTER'){ doPaste(pasteKind||'all'); exitRibbon(true); return; }
     return;
   }
+  // column width prompt \u2014 Enter applies the typed number to every selected column
+  if(dialog==='colw'){
+    if(key==='ENTER'){ applyColWidth(); return; }
+    return;
+  }
   // go to (F5 / Ctrl+G): reference boxes need a mouse — Special is the keyboard's door
   if(dialog==='goto'){
     if(key==='S'){ dialog='gotospecial'; drawRibbon(); return; }
@@ -7815,6 +7877,9 @@ function applyRibbon(key){
   if(np==='AT'){ pushUndo(); toggleFilter(); return exitRibbon(true); }   // r180: Data \u2192 Filter, the ribbon route for ctrl+shift+L
   if(np==='AH'){ pushUndo(); setDetail(false); return exitRibbon(true); }
   if(np==='AJ'){ pushUndo(); setDetail(true);  return exitRibbon(true); }
+  if(np==='HOW'){ dialog='colw'; colwBuf=''; drawRibbon(); return; }   // r185: numeric width prompt
+  if(np==='HOUR'){ pushUndo(); hideRows();   return exitRibbon(true); }
+  if(np==='HOUO'){ pushUndo(); unhideRows(); return exitRibbon(true); }
   if(np==='HOI'){ pushUndo(); autofitCols(); return exitRibbon(true); }
   if(np==='HOA'){ return exitRibbon(true); }
   if(np==='HUS'||np==='MUS'){ autoSum(); return exitRibbon(true); }   // proposes in editor; commit happens on Enter
@@ -7960,6 +8025,7 @@ function jumpDependent(){
 function syncHidden(){
   S.hidden = new Set();
   (S.rowGroups||[]).forEach(g=>{ if(g.collapsed) for(let r=g.r1;r<=g.r2;r++) S.hidden.add(r); });
+  (S.hiddenRows||[]).forEach(r=>S.hidden.add(r));   // r185: Ctrl+9 manual hides \u2014 the sins the group-first rule exists to prevent
   // r180: AutoFilter exclusions ride the same substrate — a row hides when ANY
   // filtered column's value is on that column's excluded list. SUMs still see it.
   const f=S.filter;
@@ -8070,6 +8136,42 @@ function gotoNextMark(dir){
   if(dir>0) next = pos.find(p=>p.r*1000+p.c>cur) || pos[0];
   else { const before=pos.filter(p=>p.r*1000+p.c<cur); next = before.length ? before[before.length-1] : pos[pos.length-1]; }
   S.active={r:next.r, c:next.c}; S.sel=null; render();
+}
+/* r185 MANUAL HIDE (Ctrl+9 / Ctrl+Shift+9, ribbon Alt H O U R / O) \u2014 the
+   thing the canon says never to do, implemented so a drill can teach WHY:
+   hidden rows leave no \u229e, no rail, no trace. The unhide drill's whole
+   story is converting these sins into honest groups. */
+function hideRows(){
+  const r=selRange(); if(!S.hiddenRows) S.hiddenRows=[];
+  for(let x=r.r1;x<=r.r2;x++) if(S.hiddenRows.indexOf(x)<0) S.hiddenRows.push(x);
+  S.hideN=(S.hideN||0)+1;
+  syncHidden();
+  if(rowHidden(S.active.r)){ let nr=S.active.r; while(nr<=S.ROWS&&rowHidden(nr)) nr++;
+    if(nr>S.ROWS){ nr=S.active.r; while(nr>=1&&rowHidden(nr)) nr--; }
+    S.sel=null; S.active={r:Math.max(1,Math.min(S.ROWS,nr)), c:S.active.c}; }
+  showToast('rows hidden \u2014 the desk rule prefers a group (shift+alt+\u2192)');
+}
+function unhideRows(){
+  if(!S.hiddenRows || !S.hiddenRows.length) return;
+  const r=selRange();
+  // Excel parity: unhide anything hidden INSIDE the selection; a single-cell
+  // selection reaches one row either side (the only way to grab a neighbor).
+  const lo=(r.r1===r.r2&&r.c1===r.c2)?r.r1-1:r.r1, hi=(r.r1===r.r2&&r.c1===r.c2)?r.r2+1:r.r2;
+  S.hiddenRows=S.hiddenRows.filter(x=>x<lo||x>hi);
+  S.unhideN=(S.unhideN||0)+1;
+  syncHidden();
+}
+let colwBuf='';
+function applyColWidth(){
+  const n=parseFloat(colwBuf);
+  if(isFinite(n) && n>0){
+    const r=selRange(); pushUndo();
+    const px=Math.max(28, Math.min(220, Math.round(n*7)+5));   // Excel character units \u2192 px, clamped to the grid's sane band
+    for(let c=r.c1;c<=r.c2;c++) colW[c]=px;
+    S.colwN=(S.colwN||0)+1;
+  }
+  colwBuf='';
+  exitRibbon(true);
 }
 function selectRow(){
   // Excel parity: Shift+Space extends the selection to full width WHILE preserving the row range.
@@ -8443,6 +8545,13 @@ document.addEventListener('keydown',e=>{
       if(k==='ArrowUp'||k==='ArrowLeft'){ logKey('\u2191'); const i=PASTE_OPTS.findIndex(o=>o[2]===(pasteKind||'all'));
         pasteKind=PASTE_OPTS[(i-1+PASTE_OPTS.length)%PASTE_OPTS.length][2]; drawRibbon(); return; }
     }
+    // column width prompt: digits build the number, Enter applies, Esc cancels
+    if(dialog==='colw'){
+      if(/^[0-9.]$/.test(k)){ logKey(k); colwBuf+=k; drawRibbon(); return; }
+      if(k==='Backspace'){ colwBuf=colwBuf.slice(0,-1); drawRibbon(); return; }
+      if(k==='Enter'){ logKey('\u21b5'); applyRibbon('ENTER'); return; }
+      return;
+    }
     // filter value picker: \u2190/\u2192 walk the chips, space toggles keep/drop, Enter applies
     if(dialog==='filter'){
       if(k==='ArrowLeft'){  logKey('\u2190'); filterIdx=(filterIdx-1+filterVals.length)%filterVals.length; drawRibbon(); return; }
@@ -8617,6 +8726,10 @@ document.addEventListener('keydown',e=>{
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); eachSel(c=>c.bold=!c.bold); commitAction(); return; }
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
     if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
+    if(k==='9' && !e.altKey){ e.preventDefault(); startClock();
+      if(e.shiftKey){ logKey('Ctrl+Shift+9'); pushUndo(); unhideRows(); } else { logKey('Ctrl+9'); pushUndo(); hideRows(); }
+      commitAction(); return; }   // r185: hide/unhide rows (Chrome steals ctrl+digit live \u2014 Alt H O U is the taught route)
+    if(k==='(' && e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+9'); pushUndo(); unhideRows(); commitAction(); return; }   // shifted-9 layouts report '('
     if(lk==='g' && !e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+G');   // r182: Excel's other Go To chord
       mode='ribbon'; path=[]; dialog='goto'; ribbonNote=''; drawRibbon(); return; }
     if(k==='1'){ e.preventDefault(); startClock(); logKey('Ctrl+1');
@@ -10239,6 +10352,7 @@ function loadChallenge(key, opts){
   S._ROWS0=S.ROWS;   // r101: the loaded frame size — row ops shift cells, never this frame
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
+  if(built.hiddenRows){ S.hiddenRows=built.hiddenRows.slice(); syncHidden(); }   // r185: inherited sins load pre-hidden
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; editPointerStart=-1;   // r106: never inherit a stale edit from the prior drill
   mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[]; keyTimes=[]; keyCells=[];

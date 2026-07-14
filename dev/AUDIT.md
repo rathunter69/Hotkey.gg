@@ -4534,3 +4534,28 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   regexes in moves sources.
 - 35/35 pass (after the harness fix); no check needed loosening — the
   end-state grading discipline held across the entire advanced tier.
+
+## r185 — manual hide + column width dialog + unhide drill (77 drills)
+- ENGINE: the canon's forbidden op, built so a drill can teach WHY it's
+  forbidden. Ctrl+9 hides selected rows into S.hiddenRows (third client
+  of the r179 hidden-rows substrate after groups and filter);
+  Ctrl+Shift+9 unhides across the selection (single-cell reach-one-
+  either-side, Excel parity); ribbon routes Alt H O U R / O. Chrome
+  steals ctrl+digit live, so the ribbon route is the taught path (the
+  Alt O E precedent). Boards can now LOAD pre-hidden (loadChallenge
+  carries built.hiddenRows) — that's the drill's whole premise.
+- Alt H O W: numeric column-width prompt in the ribbon strip — type
+  Excel character units, Enter applies to the selected columns
+  (px = units*7+5, clamped), Esc cancels. Row height (Alt H O H) NOT
+  built: the engine has no row-height model; queued with a note.
+- NEW DRILL unhide "Flush the hidden rows" (Data, 77 total): inherited
+  tape where rows 4-7 are just GONE — no ⊞, no rail, row numbers skip.
+  Unhide the sins, regroup them the house way, fold honestly, and fix
+  the crushed Size column with a real width. The load state is an
+  intentional squeeze — fit-sweep exemption #4. par 68 / parKeys 12
+  (21-seed, zero variance).
+- One smoke-harness lesson (not an engine bug): Esc while the results
+  card is up means "to menu" by design — a test that wins the drill and
+  then keeps pressing keys is testing the menu. Reordered the smoke.
+- PARITY 67 -> 73 (section U). ALTS 77 -> 78 (width-first + ribbon
+  unhide + grouped-while-hidden). CACHE v159 -> v160.
