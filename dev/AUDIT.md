@@ -5136,3 +5136,24 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   on the SHEET luminance, not the theme's dark flag — so it applies to any light
   sheet. VISUAL MATRIX: ALL 295 PASS (was 311; 16 fewer = white now exempt on
   the 16 dark themes' light sheets). index.html only (no ?v bump).
+
+## r213 — navigation: discrete arrow beats + a COPY goal; +6 themes; softer sheet (Wolf)
+- Wolf on the live nav drill: make each arrow chord its OWN discrete beat (don't
+  chain Shift+arrow straight into Ctrl+Shift), add SELECTING DOWN, and give the
+  ending a goal (selecting the whole sheet "for no reason" felt weird). Rebuilt:
+  Ctrl+Home → Ctrl+→ → Ctrl+↓ (jumps, both axes) → back to A1 → Shift+→ →
+  Shift+↓ (extend one, both axes) → Ctrl+Shift+↓ → Ctrl+Shift+→ (shoot to edge,
+  both axes) → Ctrl+C. The finale GOAL: the whole model is highlighted, so
+  Ctrl+C copies it for the deck (graded on S.clipboard.rect covering A1:E6).
+  par 46, parKeys 11 (measured 9). alt = the slow route (repeated Shift+arrows).
+  ENGINE: the Ctrl+C handler now runs checkWin() (a copy can be a drill's goal;
+  no-op elsewhere).
+- THEMES (+6, Wolf: set felt samey): light/paper — Ledger (accounting green),
+  Sepia (warm), Frost (cool), Phoebe's Paws (Sakura pink); bold identities —
+  Crimson, Tangerine. Light ones keep their own paper sheet; the bold darks ride
+  the r212 dark-chrome/light-sheet.
+- SHEET: softened the dark-mode light sheet off stark white to a warm off-white
+  (--surface #f0efe8) — easier on the eyes (Wolf).
+- GATE: demo WIN 3/3, E2E ALL GREEN · alt ALL 80 PASS · par FLAGGED 0 · parity
+  94 · onboard 28 · visual ALL 379 PASS (26 themes) · fit ALL CLEAN. themes.js
+  shared-asset ?v 171->172.
