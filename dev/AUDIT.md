@@ -5106,3 +5106,15 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   gold #8a6600, platinum #1f8574, diamond #2f6bc4, crimson #b23520, mba #6b6250)
   + matching lighter borders. Verified all seven pills legible on the Daylight
   bar. tier-unranked already rode var(--muted) (theme-aware) — untouched.
+
+## r211 — level readout is PROGRESS-first, not an explanation (Wolf)
+- Wolf: "the level progress shouldn't be an explanation but more of your current
+  progress, xp to next rank etc — like most video games." Clicking the level
+  badge (#lvlBadge) opened openXpInfo — the "how xp works" text wall.
+- NEW openLevelProgress(): a game-style panel — big level ring + "LEVEL n" + a
+  full-width xp bar with "into / need xp" and "<N> xp to LVL n+1", plus the
+  current rank (from the nav's cached tier). "how xp works ›" is now a small
+  secondary link inside it, not the headline. #lvlBadge.onclick now opens this;
+  renderLvl stashes window.__lvlXp so the panel matches the badge exactly.
+- Verified on Daylight + dark: ring/bar/text all legible. index.html only,
+  display-only (no grading change, no ?v bump).

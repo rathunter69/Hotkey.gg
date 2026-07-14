@@ -10661,11 +10661,12 @@ function lvlDetail(xp){
   return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; }
 function lvlOf(xp){ return lvlDetail(xp).lvl; }
 function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
-  const L=lvlDetail(localXP(nsol));
+  const xp=localXP(nsol); window.__lvlXp=xp;   // r211: keep the progress panel in sync with the badge
+  const L=lvlDetail(xp);
   el.style.display='inline-flex';
   el.innerHTML='LVL '+L.lvl+' <span class="lvl-bar"><span style="width:'+L.pct+'%"></span></span>';
-  el.style.cursor='pointer'; el.onclick=openXpInfo;
-  el.title=L.into+' / '+L.need+' xp to LVL '+(L.lvl+1)+' \u2014 click for the full breakdown'; }
+  el.style.cursor='pointer'; el.onclick=openLevelProgress;   // r211: show progress first, not the xp explanation
+  el.title=L.into+' / '+L.need+' xp \u00b7 '+Math.max(0,L.need-L.into)+' to LVL '+(L.lvl+1); }
   /* r101: a stale second el.title line here referenced bare `l` (not L.lvl) \u2014 ReferenceError
      on EVERY solve, thrown inside the hotkey_solves .then (async, so the try/catch never saw it). */
 function renderStreak(){ const el=$('streakBadge'); if(!el) return;
@@ -10728,6 +10729,40 @@ function openCampaign(){
   $('campX').onclick=()=>m.classList.remove('show');
   m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
   m.querySelectorAll('.camp-drill').forEach(d=>d.onclick=()=>{ m.classList.remove('show'); loadChallenge(d.dataset.key); });
+}
+/* r211 (Wolf): clicking the level badge used to open the "how xp works" EXPLANATION.
+   Players want their PROGRESS first, like a game — level ring, an xp bar, and how far
+   to the next level. The explanation is now a small secondary link inside. */
+function openLevelProgress(){
+  const xp = (typeof window.__lvlXp==='number') ? window.__lvlXp : myXpEst();
+  const L = lvlDetail(xp);
+  const toNext = Math.max(0, L.need - L.into);
+  let rankName=''; try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null'); if(c&&c.n) rankName=c.n; }catch(e){}
+  let m=$('lvlModal');
+  if(!m){ m=document.createElement('div'); m.id='lvlModal'; m.className='onboard-modal'; document.body.appendChild(m); }
+  m.innerHTML='<div class="ob-card" style="max-width:360px;position:relative">'+
+    '<a class="modal-x" id="lvX">×</a>'+
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:11px;padding:8px 0 2px">'+
+      (window.hkLevelRing?window.hkLevelRing(L.lvl, L.pct, 96):'')+
+      '<div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--accent);letter-spacing:.6px">LEVEL '+L.lvl+'</div>'+
+      '<div style="width:230px">'+
+        '<div style="height:9px;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+L.pct+'%;background:var(--accent);border-radius:99px"></div></div>'+
+        '<div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:6px">'+
+          '<span>'+L.into+' / '+L.need+' xp</span>'+
+          '<span><b style="color:var(--text)">'+toNext+' xp</b> to LVL '+(L.lvl+1)+'</span>'+
+        '</div>'+
+      '</div>'+
+      (rankName?'<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px">current rank · <b style="color:var(--text)">'+escHtml(rankName)+'</b></div>':'')+
+    '</div>'+
+    '<div class="ob-opts" style="margin-top:16px"><button class="ob-key primary" id="lvGo">keep climbing</button></div>'+
+    '<div style="text-align:center;margin-top:9px"><a id="lvHow" style="font-family:var(--mono);font-size:10.5px;color:var(--muted);cursor:pointer;text-decoration:underline">how xp works ›</a></div>'+
+    '</div>';
+  m.classList.add('show');
+  const close=()=>m.classList.remove('show');
+  const x=$('lvX'), g=$('lvGo'), h=$('lvHow');
+  if(x) x.onclick=close; if(g) g.onclick=close;
+  if(h) h.onclick=()=>{ close(); openXpInfo(); };
+  m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
 }
 function openXpInfo(){
   let m=$('xpModal');
