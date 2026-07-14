@@ -34,10 +34,18 @@ and the WSP shortcut page. Findings:
   "Starts with F5 not Ctrl"). Our hunt drill (r182) is correct.
 - **[live] grouping Alt+Shift+→/← + trace-precedents Alt M P → VERIFIED** (WSP).
 - **[canon] VLOOKUP** characterization (legacy, still interview-tested) stands.
-- **FactSet table: NOT re-verified this pass** — no authoritative FactSet sheet
-  fetched (their hot-key PDF wasn't reachable). Flagged for a future FactSet
-  egress pass; the fills (Ctrl+Alt+Shift+K/J/D/U) + AutoColor (Ctrl+Alt+E) are
-  the engine-backed ones and match the r122 research at the summary level.
+- **FactSet table: VERIFIED r198** against FactSet's published Hot Keys sheet
+  (media.felix.fe.training PDF, curl+Read). The engine-backed chords were all
+  correct — Fill Right/Left/Down/Up (Ctrl+Alt+Shift+K/J/D/U), AutoColor
+  (Ctrl+Alt+E), Currency/Percent SmartCycles (Ctrl+Shift+4/5). Fixed in the
+  DISPLAY table: Date SmartCycle is Ctrl+Shift+2 (Ctrl Shift @), not Ctrl+Shift+3;
+  the fabricated "Ctrl+Shift+: cell color" → Ctrl+; (Blue-Black SmartCycle) and
+  the fabricated "Ctrl+Alt+Shift+! row/col layout" → Ctrl+Alt+K (Paste Row/Column
+  Info); relabelled Ctrl+Shift+Y as the Binary (not general) cycle; sharpened the
+  Copy/Paste Exact Formulas labels. ADDED the missing priority-5 canon: General
+  Number SmartCycle (Ctrl+Shift+1), Smart Copy Right/Down (Ctrl+Shift+R/D),
+  AutoColor Selection (Ctrl+Alt+A), Increase/Decrease Decimal (Ctrl+, / Ctrl+.).
+  Both plugin layers (Macabacus r197 + FactSet r198) now match their live sheets.
 
 ## Sources consulted (search layer)
 Wall Street Prep shortcuts + center-across-selection; Macabacus features/blog

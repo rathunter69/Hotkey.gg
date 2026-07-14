@@ -20,10 +20,17 @@ const REPS = 3;
 const only = process.argv.slice(2);
 
 const ALTS = [
-  { key: 'rowops', name: 'ctrl chords with shift+space rows (not the ribbon)', moves: `C => [
-      {sel:'A3', keys:[{key:' ',shift:true},{key:'=',ctrl:true,shift:true}]},
-      {sel:'A6', keys:[{key:' ',shift:true},{key:'-',ctrl:true}]},
-    ]` },
+  { key: 'rowops', name: 'ctrl chords for insert/delete (shift+space rows) + typed SUM + ribbon bold', moves: `C => { const o=C._o;
+      const pr=o.predRow0, jr=o.junkRow0, tr=o.totRow0, insAt=pr+1;
+      const jr2=jr+(jr>=insAt?1:0), tr2=tr;
+      return [
+        {sel:'A'+insAt, keys:[{key:' ',shift:true},{key:'=',ctrl:true,shift:true}]},
+        {sel:'A'+insAt, keys:[...T(o.missing),{key:'Enter'}]},
+        {sel:'B'+insAt, keys:[...T(String(o.missVal)),{key:'Enter'}]},
+        {sel:'A'+jr2, keys:[{key:' ',shift:true},{key:'-',ctrl:true}]},
+        {sel:'B'+tr2, keys:[...T('=SUM(B'+(o.hr+1)+':B'+(tr2-1)+')'),{key:'Enter'}]},
+        {sel:'A'+tr2+':B'+tr2, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
+      ]; }` },
   { key: 'polish', name: 'reversed header order + ribbon bold/italic, ALT O E date, ctrl+1 currency (0-dec in one chord)', moves: `C => { const o=C._o; return [
       {sel:o.h1+':'+o.h2, keys:[{key:'Alt'},L('h'),L('h'), {key:'Alt'},L('h'),L('b'),L('b'), {key:'Alt'},L('h'),D(1)]},
       {sel:o.dates, keys:[{key:'Alt'},L('o'),L('e'),L('d'), {key:'Alt'},L('h'),D(1)]},

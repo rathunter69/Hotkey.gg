@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=166" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=166">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=166">
+<link rel="icon" href="favicon.ico?v=167" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=167">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=167">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1143,14 +1143,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=166"></script>
-<link rel="stylesheet" href="nav.css?v=166">
-<script src="themes.js?v=166"></script>
+<script src="drills.js?v=167"></script>
+<link rel="stylesheet" href="nav.css?v=167">
+<script src="themes.js?v=167"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=166"></script>
+<script src="nav.js?v=167"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3147,35 +3147,88 @@ const CHALLENGES = {
     }
   },
   rowops:{
-    name:'Rows', label:'Insert and delete rows', par:26, parKeys:11,
-    aha:'ctrl+plus and ctrl+minus restructure the sheet \u2014 the grid is editable, not fixed',
-    prompt:'The schedule is missing a row for D&A and carries a stale "PLACEHOLDER" line. Insert a row where D&A belongs (Alt H I R or Ctrl +) and delete the junk (Alt H D R or Ctrl -). Structural edits, zero mouse.',
-    req:'on <em>row 3</em> \u00b7 <em>alt h i r</em> insert \u00b7 then on the <em>PLACEHOLDER row</em> \u00b7 <em>alt h d r</em> delete',
-    guide:[
-      'on A3 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd> \u2014 a fresh row opens above COGS',
-      'arrow down to the PLACEHOLDER row \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd> \u2014 gone, everything shifts up',
-    ],
-    targets:['A3','A6'],
-    demo(){ return [
-      {sel:'A3', keys:[Kb.alt, {key:'h'}, {key:'i'}, {key:'r'}]},
-      {sel:'A6', keys:[Kb.alt, {key:'h'}, {key:'d'}, {key:'r'}]},
+    name:'Rows', label:'Rebuild the schedule', par:70, parKeys:28,
+    aha:'insert and delete restructure the column \u2014 then the foot reads whatever you left it, so it has to tie',
+    prompt:'The opex schedule came back mis-built: a line got DROPPED and a stale PLACEHOLDER is still sitting in the block. Fix the structure, then make it foot. Insert the missing line where it belongs (Alt H I R or Ctrl +), type it in; delete the junk (Alt H D R or Ctrl -); then Alt+= the Total \u2014 it reads the block you just rebuilt, so it only ties if the structure is right. Bold the total and rule it off. A schedule you\u2019d actually send.',
+    req(){ const o=this._o; return 'add <em>'+o.missing+'</em> (<em>'+o.missVal.toLocaleString('en-US')+'</em>) with a new row \u00b7 delete the <em>PLACEHOLDER</em> row \u00b7 <em>alt+=</em> the Total \u00b7 <em>ctrl+b</em> + <em>alt h b t</em> the total row'; },
+    guide(){ const o=this._o; return [
+      'a line is missing: select the row below <b>'+o.predecessor+'</b> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd> (or <kbd>ctrl</kbd>+<kbd>+</kbd>) opens a blank \u00b7 type <b>'+o.missing+'</b> and <b>'+o.missVal.toLocaleString('en-US')+'</b> \u2014 anywhere in the block works, the foot doesn\u2019t care about order',
+      'the stale line: on the <b>PLACEHOLDER</b> row \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd> (or <kbd>ctrl</kbd>+<kbd>\u2212</kbd>) \u2014 the block closes up',
+      'now foot it: on the Total cell \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> \u2014 it sums the block you just rebuilt, and it ties to <b>'+o.total.toLocaleString('en-US')+'</b> only if the structure is right',
+      'dress the total: select the Total row \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold, ruled off',
     ]; },
+    targets(){ const o=this._o; return ['A'+(o.hr+1), 'A'+o.junkRow0, 'B'+o.totRow0, 'A'+o.totRow0+':B'+o.totRow0]; },
+    demo(){ const o=this._o;
+      const pr=o.predRow0, jr=o.junkRow0, tr=o.totRow0;
+      // insert a blank below the predecessor (opens at pr+1, shifts everything below down 1)
+      const insAt=pr+1;
+      const steps=[{sel:'A'+insAt, keys:[Kb.alt,{key:'h'},{key:'i'},{key:'r'}]}];
+      steps.push({sel:'A'+insAt, keys:[...T(o.missing), Kb.enter]});
+      steps.push({sel:'B'+insAt, keys:[...T(String(o.missVal)), Kb.enter]});   // values are <1000 — renders clean next to the 0-dec block, no format beat needed
+      // junk shifted down 1 if it was below the insert point
+      const jr2 = jr + (jr>=insAt?1:0);
+      steps.push({sel:'A'+jr2, keys:[{key:' ',shift:true}, Kb.alt,{key:'h'},{key:'d'},{key:'r'}]});   // full-row select then delete
+      // total: +1 from insert, -1 from delete (both above it) => back to tr
+      const tr2 = tr + 1 - 1;
+      steps.push({sel:'B'+tr2, keys:[Kb.eq, Kb.enter]});
+      steps.push({sel:'A'+tr2+':B'+tr2, keys:[Kb.bold, Kb.alt,{key:'h'},{key:'b'},{key:'t'}]});
+      return steps; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Opex build',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Revenue',txt:true};   cells['B2']={...blankCell(),value:rnd(500,900)*1000,fmtStyle:'comma',decimals:0};
-      cells['A3']={...blankCell(),value:'COGS',txt:true};      cells['B3']={...blankCell(),value:rnd(200,400)*1000,fmtStyle:'comma',decimals:0};
-      cells['A4']={...blankCell(),value:'SG&A',txt:true};      cells['B4']={...blankCell(),value:rnd(80,150)*1000,fmtStyle:'comma',decimals:0};
-      cells['A5']={...blankCell(),value:'PLACEHOLDER',txt:true,fontColor:'red'};
-      this._cogs=cells['B3'].value;
-      return {ROWS:7, cells, active:{r:3,c:1}, sel:null, colW:{1:110,2:96}};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 opex schedule ($000s)',txt:true,bold:true};
+      const y=rnd(24,27), hr=3;
+      cells['A'+hr]={...blankCell(),value:'Item',txt:true,bold:true};
+      cells['B'+hr]={...blankCell(),value:'FY'+y+'E',txt:true,bold:true,align:'r'};
+      const POOL=['Payroll','Rent','Software','Marketing','Travel & ent.','Insurance','Utilities','Depreciation','Facilities','Recruiting'];
+      for(let k=POOL.length-1;k>0;k--){ const j=rnd(0,k); [POOL[k],POOL[j]]=[POOL[j],POOL[k]]; }
+      const lines=POOL.slice(0,5);                       // the 5 correct lines, in this order
+      const vals={}; lines.forEach(l=>vals[l]=rnd(12,90)*10);
+      const missIdx=1+rnd(0,2);                          // a mid-block line is DROPPED
+      const missing=lines[missIdx], predecessor=lines[missIdx-1];
+      const shown=lines.filter((_,i)=>i!==missIdx);      // 4 correct lines, in order
+      const junkAt=rnd(0,shown.length);                  // stale line wedged somewhere in the block
+      const display=[...shown.slice(0,junkAt), '__JUNK__', ...shown.slice(junkAt)];
+      let r=hr+1, junkRow0=0;
+      display.forEach(lab=>{
+        if(lab==='__JUNK__'){
+          cells['A'+r]={...blankCell(),value:'PLACEHOLDER',txt:true,fontColor:'red'};
+          cells['B'+r]={...blankCell(),value:rnd(5,40)*10,fmtStyle:'comma',decimals:0};   // has a value: leaving it breaks the foot
+          junkRow0=r;
+        } else {
+          cells['A'+r]={...blankCell(),value:lab,txt:true};
+          cells['B'+r]={...blankCell(),value:vals[lab],fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        }
+        r++;
+      });
+      const totRow0=r;
+      cells['A'+totRow0]={...blankCell(),value:'Total opex',txt:true};
+      cells['B'+totRow0]={...blankCell(),fmtStyle:'comma',decimals:0};   // empty \u2014 the player foots it
+      const predRow0=hr+1+display.indexOf(predecessor);
+      this._o={ hr, missing, predecessor, lines, vals, missVal:vals[missing],
+        total:lines.reduce((s,l)=>s+vals[l],0),
+        junkRow0, totRow0, predRow0 };
+      return {ROWS:Math.max(11,totRow0+1), cells, active:{r:hr+1,c:1}, sel:null, colW:{1:150,2:104}};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return c?c.value:undefined; };
-      const noPlaceholder = !Object.values(S.cells).some(c=>c && c.value==='PLACEHOLDER');
+      const o=this._o;
+      // content-scan (robust to row shifts): read the Item/value column, find the Total row
+      const body=[]; let totRow=null, totCell=null;
+      for(let r=o.hr+1;r<=24;r++){ const a=S.cells['A'+r]; if(!a||a.value==null||a.value==='') continue;
+        if(/^Total/i.test(String(a.value))){ totRow=r; totCell=S.cells['B'+r]||{}; continue; }
+        body.push({lab:String(a.value), val:(S.cells['B'+r]||{}).value}); }
+      const labs=body.map(x=>x.lab);
+      const missIn=body.find(x=>x.lab===o.missing && typeof x.val==='number' && Math.abs(x.val-o.missVal)<0.5);
+      const junkGone=!labs.some(l=>/PLACEHOLDER/i.test(l));
+      const footOk=!!(totCell && totCell.formula && /SUM|\+/i.test(String(totCell.formula)) &&
+        typeof totCell.value==='number' && Math.abs(totCell.value-o.total)<0.5);
+      const dressOk=!!(totRow && (S.cells['A'+totRow]||{}).bold &&
+        (((S.cells['A'+totRow]||{}).bt) || ((S.cells['B'+totRow]||{}).bt)));
       return [
-        {label:'open a blank row where D&A belongs \u2014 push COGS down', ok: v('A3')===undefined && v('A4')==='COGS' && v('B4')===this._cogs},
-        {label:'delete the PLACEHOLDER row', ok: noPlaceholder && v('A6')===undefined},
+        {label:'add the missing '+o.missing+' line \u2014 insert a row, enter '+o.missVal.toLocaleString('en-US'),
+          ok: !!missIn && (S.insRowN||0)>=1},
+        {label:'delete the PLACEHOLDER row \u2014 the block closes up', ok: junkGone && (S.delRowN||0)>=1},
+        {label:'foot the Total with alt+= \u2014 it ties to '+o.total.toLocaleString('en-US')+' only if the structure is right', ok: footOk},
+        {label:'dress the total row \u2014 bold it and rule it off (alt h b t)', ok: dressOk},
       ];
     }
   },
@@ -8306,6 +8359,7 @@ function applyRibbon(key){
       S.cells=shiftCellsRows(r.r1, ins?count:-count);
       S.ROWS = rowsAfterOp(ins, count);   // r101: stable viewport — see rowsAfterOp
       S.lastRowOp = ins?'ins':'del';
+      if(ins) S.insRowN=(S.insRowN||0)+1; else S.delRowN=(S.delRowN||0)+1;   // r198: structural-drill latches (mechanic used, not geometry-inferred)
       if(!ins){ S.sel=null; S.active={r:r.r1, c:S.active.c}; }
     } else {
       const count=r.c2-r.c1+1;
@@ -8878,6 +8932,7 @@ document.addEventListener('keydown',e=>{
         pushUndo();
         S.lastRowOp = isInsert ? 'ins' : 'del';   // action-sourced: drills latch on THIS, not on row-count diffs
         if(isFullRow){
+          if(isInsert) S.insRowN=(S.insRowN||0)+1; else S.delRowN=(S.delRowN||0)+1;   // r198: structural-drill latches
           const count = r.r2 - r.r1 + 1;
           S.cells = shiftCellsRows(r.r1, isInsert ? count : -count);
           S.ROWS = rowsAfterOp(isInsert, count);   // r101: stable viewport — see rowsAfterOp
