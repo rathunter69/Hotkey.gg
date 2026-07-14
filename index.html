@@ -6976,14 +6976,12 @@ function render(){
   const g=$('grid'); g.innerHTML='';
   const sr=selRange();
   const gt=currentTargetRange();
-  // Color refs: while editing → from editBuf; otherwise → from the active cell's formula (Excel's "F2 to inspect" behavior).
-  // Same code path serves both contexts.
+  // Color refs ONLY while editing (from editBuf) — exactly like Excel, which colors a
+  // formula's precedents when you're IN the cell (F2/double-click), NOT on plain selection.
+  // r206 (Wolf): the passive "select a formula → light up its inputs" overlay hid where the
+  // cursor was and read as non-Excel/distracting; dropped. Auditing rides Ctrl+[ trace jumps.
   let refColors = {};
   if(editing){ refColors = parseFormulaRefs(editBuf).cellColors; }
-  else {
-    const ac = get(S.active.r, S.active.c);
-    if(ac.formula) refColors = parseFormulaRefs(ac.formula).cellColors;
-  }
   // header row
   let head='<tr><th class="rowhdr"></th>';
   for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${__ew[c]}px">${colLetter(c)}</th>`;
@@ -7336,8 +7334,8 @@ function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').tex
 /* PB pace ghost: while you run, the gap to your own best counts down beside the clock.
    Green while you're ahead of the PB, red the instant it slips away. */
 let ghostPB=null, ghostTrace=null;
-let ghostOn=true;   // r190: Wolf — the ghost is a feature AND a distraction; player's call
-async function loadGhostPref(){ try{ const v=await KV.get('hotkey_ghost'); if(v==='0') ghostOn=false; }catch(e){} updateGhostBtn(); }
+let ghostOn=false;   // r206: Wolf — the cursor ghost reads as distracting; now OPT-IN (default off), toggle in the toolbar
+async function loadGhostPref(){ try{ const v=await KV.get('hotkey_ghost'); if(v!=null&&v!=='') ghostOn=(v==='1'); }catch(e){} updateGhostBtn(); }
 function updateGhostBtn(){ const b=$('ghostToggle'); if(b){ b.classList.toggle('on',ghostOn); b.textContent='\ud83d\udc7b ghost: '+(ghostOn?'on':'off'); } }
 function toggleGhost(){ ghostOn=!ghostOn; KV.set('hotkey_ghost',ghostOn?'1':'0'); updateGhostBtn();
   if(!ghostOn){ hideGhostCur(); const el=$('ghostDelta'); if(el) el.style.display='none'; }
