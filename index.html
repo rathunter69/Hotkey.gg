@@ -1580,7 +1580,7 @@ const CHALLENGES = {
       return [
         {label:'shade BOTH input stacks blue (sources and uses)', ok:fill},
         {label:'SUM both totals \u2014 alt+= twice', ok:sum},
-        {label:'dress both totals \u2014 bold with a top border', ok:tot},
+        {label:'bold both total rows and add a top border above them', ok:tot},
         {label:'comma-format both money columns, 0 decimals', ok:cf},
         {label:'Autofit \u2014 no #### left on either side', ok:af},
       ];
@@ -1654,11 +1654,11 @@ const CHALLENGES = {
       const pctOk = COL.every(c=>cell(c+'8').fmtStyle==='percent');
       return [
         {label:'bold A1 \u2014 the title carries weight', ok: !!cell('A1').bold},
-        {label:'dress the headers \u2014 bold, ruled underneath', ok: COL.every(c=>{ const x=cell(c+'2'); return x.bold&&x.bb; })},
+        {label:'bold the header row and add a bottom border under it', ok: COL.every(c=>{ const x=cell(c+'2'); return x.bold&&x.bb; })},
         {label:'paint every INPUT blue \u2014 including the one buried at '+R.override, ok: blueOk},
         {label:'comma-format the figures, trim the decimals', ok: comOk},
         {label:'cast the margins as percents', ok: pctOk},
-        {label:'rule off EBITDA \u2014 bold with a line above', ok: COL.every(c=>{ const x=cell(c+'7'); return x.bold&&x.bt; })},
+        {label:'bold the EBITDA row and add a top border above it', ok: COL.every(c=>{ const x=cell(c+'7'); return x.bold&&x.bt; })},
       ];
     }
   },
@@ -1725,11 +1725,11 @@ const CHALLENGES = {
         const want=(cell(c2+R.sub1).value||0)+(cell(c2+R.sub2).value||0);
         return x.formula && Math.abs((x.value||0)-want)<0.01; });
       return [
-        {label:'rule the headers UNDER \u2014 B2:'+R.LC+'2', ok: cols.every(c2=>cell(c2+'2').bb)},
-        {label:'rule a line ABOVE each subtotal \u2014 rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
+        {label:'add a bottom border under the headers \u2014 B2:'+R.LC+'2', ok: cols.every(c2=>cell(c2+'2').bb)},
+        {label:'add a top border above each subtotal row \u2014 rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
         {label:'pull EBITDA through \u2014 formulas, not typed numbers', ok: ebOk},
-        {label:'dress the answer line \u2014 bold, ruled above', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
-        {label:'box the headline at '+R.focus, ok: !!cell(R.focus).ball},
+        {label:'bold the EBITDA line and add a top border above it', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
+        {label:'add an outside border around the headline at '+R.focus, ok: !!cell(R.focus).ball},
       ];
     }
   },
@@ -1825,11 +1825,11 @@ const CHALLENGES = {
         const want=(cell(c2+R.sub1).value||0)+(cell(c2+R.sub2).value||0);
         return x.formula && Math.abs((x.value||0)-want)<0.01; });
       return [
-        {label:'rule the headers UNDER — B2:'+R.LC+'2', ok: cols.every(c2=>cell(c2+'2').bb)},
-        {label:'rule a line ABOVE each subtotal — rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
+        {label:'add a bottom border under the headers — B2:'+R.LC+'2', ok: cols.every(c2=>cell(c2+'2').bb)},
+        {label:'add a top border above each subtotal row — rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
         {label:'pull EBITDA through — every year a formula', ok: ebOk},
-        {label:'dress the answer line \u2014 bold, ruled above', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
-        {label:'box the headline at '+R.focus, ok: !!cell(R.focus).ball},
+        {label:'bold the EBITDA line and add a top border above it', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
+        {label:'add an outside border around the headline at '+R.focus, ok: !!cell(R.focus).ball},
       ];
     }
   },
@@ -2018,7 +2018,7 @@ const CHALLENGES = {
         if(!m||m.fmtStyle!=='percent'||m.decimals!==1) pctOk=false; }
       const dressOk=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+R.tRow]; if(!x||!x.bold||!x.bt) return false; } return true; })();
       return [
-        {label:'Bold the title and rule it off \u2014 A1 gets bold + a bottom border', ok:titleOk},
+        {label:'bold A1 and add a bottom border under it', ok:titleOk},
         {label:'Make the font blue on every typed input ('+R.inpRange+') \u2014 blue font marks hardcoded data', ok:blueOk},
         {label:'Cast the margins as percents, ONE decimal (row '+R.mRow+')', ok:pctOk},
         {label:'Comma-format the dollar figures ('+R.fRange+') \u2014 negatives flip to (parens), the desk convention', ok:comOk},
@@ -2708,7 +2708,7 @@ const CHALLENGES = {
         {label:'bold the title at '+o.b+' \u2014 Alt H 1', ok: !!c(o.b).bold},
         {label:'comma-format the figure at '+o.k+' \u2014 Alt H K', ok: c(o.k).fmtStyle==='comma'},
         {label:'center the header at '+o.c+' \u2014 Alt H A C', ok: c(o.c).align==='c'},
-        {label:'rule off the block at '+o.r+' \u2014 Alt H B B', ok: o.rc.every(cc=>!!c(colLetter(cc)+o.rr).bb)},
+        {label:'add a bottom border under the block at '+o.r+' \u2014 Alt H B B', ok: o.rc.every(cc=>!!c(colLetter(cc)+o.rr).bb)},
       ];
     }
   },
@@ -3228,7 +3228,7 @@ const CHALLENGES = {
           ok: !!missIn && (S.insRowN||0)>=1},
         {label:'delete the PLACEHOLDER row \u2014 the block closes up', ok: junkGone && (S.delRowN||0)>=1},
         {label:'foot the Total with alt+= \u2014 it ties to '+o.total.toLocaleString('en-US')+' only if the structure is right', ok: footOk},
-        {label:'dress the total row \u2014 bold it and rule it off (alt h b t)', ok: dressOk},
+        {label:'bold the total row and add a top border above it (alt h b t)', ok: dressOk},
       ];
     }
   },
@@ -3553,7 +3553,7 @@ const CHALLENGES = {
       const c=k=>S.cells[k]||{};
       const T1=this._t1, T2=this._t2;
       return [
-        {label:'dress the section header \u2014 bold + rule + shade, THAT table only', ok: T1.hk.every(k=>c(k).bold&&c(k).bb&&c(k).fill==='blue') && !T2.hk.some(k=>c(k).bold||c(k).bb||c(k).fill==='blue')},
+        {label:'bold the header, add a bottom border under it, and shade it \u2014 THAT table only', ok: T1.hk.every(k=>c(k).bold&&c(k).bb&&c(k).fill==='blue') && !T2.hk.some(k=>c(k).bold||c(k).bb||c(k).fill==='blue')},
         {label:'cast the date row to Mmm-yy and bold it \u2014 periods carry the page', ok: T1.dk.every(k=>c(k).fmtStyle==='date'&&c(k).bold)},
         {label:'dollars on the money row \u2014 currency, zero decimals', ok: T1.mk2.every(k=>c(k).fmtStyle==='currency'&&c(k).decimals===0)},
         {label:'italicize the growth memo \u2014 and leave the second table alone', ok: T1.gk.every(k=>c(k).it) && !T2.gk.some(k=>c(k).it)},
@@ -4253,7 +4253,7 @@ const CHALLENGES = {
         {label:'sweep at B5 \u2014 MIN of balance and spare cash, floored at zero, fill all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'5',this._exp[i].sw))&&refs('B5',['MIN(','MAX('])},
         {label:'prove the revolver post-sweep at B6 \u2014 fill all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'6',this._exp[i].rvE))},
         {label:'prove cash post-sweep at B7 \u2014 fill across, never below the minimum', ok: [0,1,2,3].every(i=>near(COL[i]+'7',this._exp[i].cashE))},
-        {label:'dress the balance row \u2014 bold B6:E6 with a rule above', ok: dressOk},
+        {label:'bold the balance row (B6:E6) and add a top border above it', ok: dressOk},
       ];
     }
   },
@@ -4337,7 +4337,7 @@ const CHALLENGES = {
         {label:'corkscrew the term loan across', ok: all(10,'tlE')&&[1,2,3].every(i=>refs(COL[i]+'8',[COL[i-1]+'10']))},
         {label:'give the mezz the dregs \u2014 both seniors netted out of the cash', ok: all(12,'mzPd')&&refs('B12',['MIN(','B6','B9'])},
         {label:'corkscrew the mezz across', ok: all(13,'mzE')&&[1,2,3].every(i=>refs(COL[i]+'11',[COL[i-1]+'13']))},
-        {label:'total the debt \u2014 three endings, DRESSED bold with a rule', ok: all(14,'tot')&&dressOk},
+        {label:'total the debt \u2014 three endings, bold with a top border above', ok: all(14,'tot')&&dressOk},
       ];
     }
   },
@@ -4408,7 +4408,7 @@ const CHALLENGES = {
         {label:'run ending cash across the sheet', ok: IDX.every(i=>near(COL[i]+'8',this._exp[i].end)) && refs('B8',['B7','B6'])},
         {label:'run the cushion vs. minimum \u2014 the anchor holds ($B$12 does not walk)', ok: IDX.every(i=>near(COL[i]+'10',this._exp[i].cush)) && anchOk},
         {label:'total the FLOWS \u2014 SUM across receipts, disbursements, net', ok: near('J4',this._tot.r)&&near('J5',this._tot.d)&&near('J6',this._tot.n)&&refs('J4',['SUM('])},
-        {label:'DRESS the ending-cash row \u2014 bold, ruled above', ok: dressOk},
+        {label:'bold the ending-cash row and add a top border above it', ok: dressOk},
       ];
     }
   },
@@ -4481,7 +4481,7 @@ const CHALLENGES = {
         {label:'run gross profit and EBIT, all five years', ok: rowOk(4,e=>e.gp)&&rowOk(6,e=>e.eb)},
         {label:'run net income after the anchored tax rate, all five years', ok: rowOk(7,e=>e.ni)&&refs('B7',['B6','B11'])},
         {label:'run the net margin \u2014 live ratio, formatted as a percent', ok: mOk},
-        {label:'DRESS the bottom line \u2014 bold with a rule above (ctrl+b, alt h b t)', ok: dressOk},
+        {label:'bold the bottom line and add a top border above it (ctrl+b, alt h b t)', ok: dressOk},
       ];
     }
   },
@@ -4560,7 +4560,7 @@ const CHALLENGES = {
         {label:'run mandatory amort off YOUR anchored rate, all five years', ok: rowOk(4,e=>e.am)&&refs('B4',['B2','B9'])},
         {label:'run the cash sweep \u2014 capped by remaining balance AND available cash', ok: rowOk(5,e=>e.sw)&&refs('B5',['MIN(','MAX('])},
         {label:'run the ending balance and average-balance interest, all five years', ok: rowOk(6,e=>e.end)&&rowOk(7,e=>e.inx)},
-        {label:'DRESS the close \u2014 ending row bold with a rule above', ok: dressOk},
+        {label:'bold the ending row and add a top border above it', ok: dressOk},
       ];
     }
   },
@@ -4632,7 +4632,7 @@ const CHALLENGES = {
         {label:'build THE LINK \u2014 beginning cash = prior year\u2019s ending cash', ok: linkOk},
         {label:'tie out ending cash through year 5', ok: [0,1,2,3,4].every(i=>near(COL[i]+'8',this._exp[i].end))},
         {label:'run the cash-conversion memo \u2014 live ratio, formatted as a percent', ok: cvOk},
-        {label:'DRESS the close \u2014 ending row bold with a rule above', ok: dressOk},
+        {label:'bold the ending row and add a top border above it', ok: dressOk},
       ];
     }
   },
@@ -4714,7 +4714,7 @@ const CHALLENGES = {
         {label:'run THE RE ROLL \u2014 prior RE + NI \u2212 dividends, built once, walking across', ok: rollOk},
         {label:'foot total liabs & equity, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',this._exp[COL[i]].tle))},
         {label:'prove the check row \u2014 ZERO three times, it balances', ok: [0,1,2].every(i=>near(COL[i]+'14',0))},
-        {label:'DRESS it \u2014 totals bold, check row ruled off (ctrl+b, alt h b t)', ok: boldOk(5)&&boldOk(11)&&ruleOk},
+        {label:'bold the totals and add a top border above the check row (ctrl+b, alt h b t)', ok: boldOk(5)&&boldOk(11)&&ruleOk},
       ];
     }
   },
@@ -4787,7 +4787,7 @@ const CHALLENGES = {
         {label:'type the drivers as YOUR hardcodes \u2014 at B9:B11, painted blue', ok: drv('B9',this._dso)&&drv('B10',this._dio)&&drv('B11',this._dpo)},
         {label:'run AR off YOUR anchored DSO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'4',this._exp[i].ar))&&refs('B4',['B2','B9'])},
         {label:'run inventory and payables off anchored DIO / DPO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'5',this._exp[i].inv)&&near(COL[i]+'6',this._exp[i].ap))},
-        {label:'run net working capital \u2014 and DRESS the row, bold with a rule', ok: [0,1,2,3,4].every(i=>near(COL[i]+'7',this._exp[i].nwc))&&dressOk},
+        {label:'run net working capital, then bold the row and add a top border above it', ok: [0,1,2,3,4].every(i=>near(COL[i]+'7',this._exp[i].nwc))&&dressOk},
         {label:'point \u0394NWC at the prior year, years 2-5', ok: [1,2,3,4].every(i=> refs(COL[i]+'8',[COL[i-1]+'7',COL[i]+'7']) && near(COL[i]+'8',this._exp[i].d))},
       ];
     }
@@ -5390,7 +5390,7 @@ const CHALLENGES = {
         {label:'foot total assets \u2014 a live SUM over all four lines, both years', ok: COL.every(c=>near(c+'6',this._exp[c].ta))&&refs('B6',['SUM('])},
         {label:'foot total L&E with SUM \u2014 RE is a given not a plug, both years', ok: COL.every(c=>near(c+'12',this._exp[c].tle))&&refs('B12',['SUM('])},
         {label:'prove the check row \u2014 ZERO both years, it balances honestly', ok: COL.every(c=>near(c+'14',0))&&refs('B14',['B6','B12'])},
-        {label:'DRESS it \u2014 totals bold, check row ruled off', ok: dressOk},
+        {label:'bold the totals and add a top border above the check row', ok: dressOk},
       ];
     }
   },
@@ -6221,7 +6221,7 @@ const CHALLENGES = {
         {label:'build one SUMIF, ranges $-locked \u2014 only the criteria walks the fill', ok: anchOk&&rollOk},
         {label:'foot the summary with a live SUM', ok: totOk},
         {label:'run % of total off the anchored denominator, all three segments', ok: pctOk},
-        {label:'DRESS the total line \u2014 bold with a rule above', ok: dressOk},
+        {label:'bold the total line and add a top border above it', ok: dressOk},
       ];
     }
   },
@@ -6352,7 +6352,7 @@ const CHALLENGES = {
         {label:'build ONE SUMIFS at G3 \u2014 ranges $-locked, $F3 column-locked, G$2 row-locked', ok: anchOk&&live('G3',o.grid.G3)},
         {label:'fill the grid from that one formula \u2014 all four crosses live and distinct', ok: gridOk},
         {label:'foot both regions at G5:H5 \u2014 live SUMs that re-add the whole tape', ok: feetOk},
-        {label:'dress the total line \u2014 bold F5:H5 with a rule above', ok: dressOk},
+        {label:'bold the total line (F5:H5) and add a top border above it', ok: dressOk},
       ];
     }
   },

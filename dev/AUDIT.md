@@ -4938,3 +4938,26 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   order, close NI via ctrl+1 C) → par-sweep FLAGGED:0 → parity 94 → onboard 28
   → visual 311 → rank 20 → fit-sweep 75 clean → screenshots (fresh + win).
   drills.js meta/par synced. CACHE v167 -> v168.
+
+## r200 — border checklist-clarity sweep (Wolf) + doctrine codified
+- Wolf: border checklist items must be LITERAL single actions ("add a top
+  border to the sum row" / "add a bottom border to the column headers"), never
+  vague verbs — "dress this up", "rule it off", "box this". Swept EVERY
+  border-bearing checklist label in the catalog: 26 labels across ~18 drills
+  (ruleoff, ruleaudit, housestyle, dress, ribbon, polish, rowops, sourcesuses,
+  revolver, debtsched, cfslink, bsbuild, nwcsched, threestmt, wk13, football,
+  accdil, retbridge …). Each now names the exact border + range: bt →
+  "add a top border above the … row", bb → "add a bottom border under the …",
+  ball → "add an outside border around …". Grading unchanged (labels are
+  display strings); the chords still ride in the guides.
+- DOCTRINE codified (dev/DRILL_DOCTRINE.md): §2.5 gains the LITERAL BORDERS +
+  ONE-ACTION-PER-LINE rules; new §2.1b "Banker's-Workbook Finish" — every
+  financial-statement drill must, at its WIN state, read like a page a banker
+  would hand over (bold title, ruled headers, ruled subtotals via top borders,
+  bottom-ruled bottom line, perfectly formatted numbers, blue inputs / black
+  formulas, no orphan-format cells). Where formatting is the lesson the player
+  builds it; otherwise the board ships pre-dressed. This is a standing arc —
+  the next passes carry it drill by drill (Wolf steering).
+- GATE: syntax → demo-replay ALL GREEN → visual matrix (label render) → spot
+  replay of all 18 touched drills WIN 3/3. index.html only (no shared-asset
+  ?v bump needed). No engine/grading change.

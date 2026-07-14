@@ -28,6 +28,29 @@ Randomize **content and sites** (positions from a spot pool, label pools via
 Fisher-Yates `pick`), never lazy offset-blocks. A drill body under ~2.8k chars
 or with <4 `rnd()` calls is suspect — grade it by hand.
 
+### 2.1b Banker's-Workbook Finish (Wolf, r200) — the visual-density bar
+Every drill that mirrors a financial artifact must, **at its win state**, read
+like a page a banker would actually hand over — not a scratchpad with green
+checks. The end-state target:
+- **Clear headers**: a bold title (`codename() + ' — <artifact> (<units>)'`),
+  a bold period/column header row, right-aligned, with a **bottom border under
+  the headers** separating them from the body.
+- **Perfectly formatted numbers**: comma/currency/percent/multiple per the
+  Realism Rule, consistent decimals down a column, negatives in (parens),
+  blue font on typed inputs and black on formulas.
+- **Ruled subtotals**: every computed subtotal/total row gets a **top border**
+  (the single-rule "a total earns its line" convention); the bottom line of a
+  statement gets bold + a bottom rule to close it. Borders are the grammar
+  that says "this row is computed" — see the modeltour cascade for the pattern.
+- **No orphan cells**: a value the player types mid-drill inherits the column's
+  format (magnitude-checked so nothing overflows) so the finished page is
+  uniform.
+Where the drill's LESSON is the formatting, the player builds this finish (and
+the checks grade it). Where the lesson is elsewhere (navigation, a formula
+build), the BOARD ships pre-dressed so the win state is already clean. Applying
+this across the whole catalog is a standing arc — grade drill by drill; a
+financial-statement board whose win state still looks like raw data is not done.
+
 ### 2.2 Freedom Doctrine (anti-railroad)
 **req/guide teach the chords; checks grade the END STATE.** The player may
 solve in any order, by any legitimate route (ribbon walk vs Ctrl chord, dialog
@@ -85,6 +108,18 @@ touch it" cannot stand alone. Fold don't-touch guards into the `ok` of the
 action check they protect ("comma-format the block — and ONLY there"),
 so every visible line demands a discrete action or a graded outcome.
 Checks must be self-contained given S (never read globals that reset).
+**LITERAL BORDERS** (Wolf, r199/r200): a border check names the exact border
+and where it goes — `'add a top border above the total row'`, `'add a bottom
+border under the column headers'`, `'add an outside border around the headline'`.
+NEVER a vague verb — no "dress this up", "rule it off", "box this". The reader
+must know the physical action from the label alone. (`bt` = top border, `bb` =
+bottom, `ball` = outside/box — say which.) The chord may ride along in the guide;
+the checklist says the outcome literally.
+**ONE ACTION PER LINE** (Wolf, r199): prefer a single verb per check. A line
+that bundles two distinct ops ("dollar-format AND rule off") reads as a puzzle —
+split it ("dollar-format the row" / "add a bottom border under it"). A tightly-
+paired dress (bold+rule of the same row) may share a line if phrased as one
+motion ("bold the total row and add a top border above it").
 
 ## 3. BUILD PROTOCOL (mechanics)
 
