@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=167" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=167">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=167">
+<link rel="icon" href="favicon.ico?v=168" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=168">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=168">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1143,14 +1143,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=167"></script>
-<link rel="stylesheet" href="nav.css?v=167">
-<script src="themes.js?v=167"></script>
+<script src="drills.js?v=168"></script>
+<link rel="stylesheet" href="nav.css?v=168">
+<script src="themes.js?v=168"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=167"></script>
+<script src="nav.js?v=168"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -6400,54 +6400,81 @@ const CHALLENGES = {
     }
   },
   modeltour:{
-    name:'Model Tour', label:'Chase the marks', par:64, parKeys:33,
-    aha:'ctrl+arrows teleport to the edge of the data \u2014 fix it, dress it, land home',
-    prompt:'The VP marked four broken cells and scattered notes across this checklist \u2014 each note PRINTS the right number; your job is to fly there and type it in, not to derive anything. Then the totals pass: Gross profit, EBITDA and Net income get bold, a rule above, and dollar format \u2014 the page has to read finished, not just correct. Costs on this tab carry their sign. Land at A1 when the tab is dressed.',
-    req(){ const d=this._d; return d.map(x=>'<em>'+x.k+'</em> \u2192 type <em>'+x.v+'</em>').join(' \u00b7 ')+' \u00b7 dress rows '+this._tR.join('/')+': <em>ctrl+b</em> + <em>alt h b t</em> + <em>ctrl+shift+$</em> \u00b7 finish: <em>ctrl+home</em>'; },
-    guide(){ const d=this._d; return [
-      'first mark at '+d[0].k+' \u2014 <kbd>ctrl</kbd>+<kbd>\u2192</kbd> rides the header to the far edge, <kbd>ctrl</kbd>+<kbd>\u2193</kbd> drops down the column \u00b7 type <kbd>'+d[0].v+'</kbd> <kbd>\u21b5</kbd>',
-      'second mark at '+d[1].k+' \u2014 you\u2019re already on the right edge: <kbd>ctrl</kbd>+<kbd>\u2193</kbd> to the bottom of the data \u00b7 type <kbd>'+d[1].v+'</kbd> <kbd>\u21b5</kbd>',
-      'third mark at '+d[2].k+' \u2014 <kbd>ctrl</kbd>+<kbd>\u2190</kbd> flies across the row \u00b7 type <kbd>'+d[2].v+'</kbd> <kbd>\u21b5</kbd>',
-      'the buried one at '+d[3].k+' \u2014 <kbd>ctrl</kbd>+<kbd>\u2191</kbd> then arrow in; mid-table marks take one jump and a step or two \u00b7 type <kbd>'+d[3].v+'</kbd> <kbd>\u21b5</kbd>',
-      'the totals pass \u2014 for each of rows '+this._tR.join(', ')+': select B-through-J on it \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> \u2014 the page reads FINISHED',
-      'meeting time: <kbd>ctrl</kbd>+<kbd>home</kbd> \u2014 a dressed tab greets the reader at A1',
+    name:'Model Tour', label:'Chase the marks', par:78, parKeys:40,
+    aha:'subtotals are formulas, not numbers — fly to each #REF!, rebuild the cascade, and the P&L recomputes to net income',
+    prompt:'The model came back with four subtotals blown out to #REF! — Gross profit, EBITDA, EBIT and Net income each lost a cell. Those are the ruled, bold rows: they are COMPUTED, not typed. Ctrl-arrows fly you to each break — rebuild the FORMULA that sums the lines above it (costs already carry their sign, so it just adds up) and the number recomputes down the column. Then close the bottom line — dollar-format Net income and rule it off — and land at A1 for the meeting.',
+    req(){ const m=this._m; return m.map(x=>'<em>'+x.k+'</em> → <em>='+x.disp+'</em>').join(' · ')+' · <em>ctrl+shift+$</em> Net income <em>'+this._niRng+'</em> + a <em>bottom border</em> (<em>alt h b b</em>) · finish <em>ctrl+home</em>'; },
+    guide(){ const m=this._m; return [
+      'the Gross profit break at '+m[0].k+' — fly there with ctrl-arrows · it’s Revenue plus COGS (COGS is negative, so it just adds): type <kbd>='+m[0].disp+'</kbd> <kbd>↵</kbd>',
+      'the EBITDA break at '+m[1].k+' — gross profit plus the two opex lines: <kbd>='+m[1].disp+'</kbd> <kbd>↵</kbd>',
+      'the EBIT break at '+m[2].k+' — EBITDA plus D&A: <kbd>='+m[2].disp+'</kbd> <kbd>↵</kbd>',
+      'the Net income break at '+m[3].k+' — EBIT plus interest and taxes: <kbd>='+m[3].disp+'</kbd> <kbd>↵</kbd> — watch the whole column tie',
+      'close the statement: select Net income '+this._niRng+' · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> dollar-format · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> adds a bottom border — the closing rule under the bottom line',
+      'meeting time: <kbd>ctrl</kbd>+<kbd>home</kbd> — a clean model greets the reader at A1',
     ]; },
-    targets(){ const tR=this._tR; return this._d.map(x=>x.k).concat(tR.map(r=>'B'+r+':J'+r)).concat(['A1']); },
-    demo(){ const d=this._d, tR=this._tR;
-      const steps=d.map(x=>({sel:x.k, keys:[...T(String(x.v)), Kb.enter]}));
-      tR.forEach(r=>steps.push({sel:'B'+r+':J'+r, keys:[Kb.bold, Kb.alt, {key:'h'}, {key:'b'}, {key:'t'}, {key:'$',ctrl:true,shift:true}]}));
+    targets(){ const m=this._m; return [m[0].k, this._niRng, this._niRng, 'A1']; },
+    demo(){ const m=this._m;
+      const steps=m.map(x=>({sel:x.k, keys:[...T('='+x.disp), Kb.enter]}));
+      steps.push({sel:this._niRng, keys:[{key:'$',ctrl:true,shift:true}, Kb.alt, {key:'h'}, {key:'b'}, {key:'b'}]});
       steps.push({sel:'A1', keys:[Kb.ctrlHome]});
       return steps; },
     build(){
+      /* r199 (Wolf): a real P&L build, not a retype-the-hardcode drill. The subtotal
+         rows (Gross profit / EBITDA / EBIT / Net income) are bold + ruled — the
+         computed-row cue — and each lost ONE cell to #REF!. The player flies to each
+         (ctrl-arrows) and rebuilds the FORMULA; costs carry their sign so every
+         subtotal is a clean sum of the lines above. The cascade recomputes on commit. */
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 operating model ($000s)',txt:true,bold:true};
-      const q0=rnd(1,4);
-      for(let i=0;i<8;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'Q'+(((q0+i-1)%4)+1)+'-2'+(5+Math.floor((q0+i-1)/4)),txt:true,bold:true,align:'r'};
-      cells['J2']={...blankCell(),value:'FY+',txt:true,bold:true,align:'r'};
-      const LBL=['Revenue','COGS','Gross profit','Marketing','G&A','R&D','EBITDA','D&A','EBIT','Interest'];
-      const COSTROWS=new Set([4,6,7,8,10,12]);   // r193 (Wolf): costs carry their sign
-      LBL.forEach((n,j)=>cells['A'+(3+j)]={...blankCell(),value:n,txt:true});
-      cells['A13']={...blankCell(),value:'Net income',txt:true,bold:true};
-      for(let r=3;r<=13;r++) for(let c=2;c<=10;c++)
-        cells[colLetter(c)+r]={...blankCell(),value:(COSTROWS.has(r)?-1:1)*rnd(40,980),fmtStyle:'comma',decimals:0};
-      this._tR=[5,9,13];   // Gross profit / EBITDA / Net income — the totals pass
-      // four marks, far corners + one buried mid-table (positions jitter per run)
-      const sites=[ 'J'+rnd(3,5), 'J'+rnd(11,13), 'B'+rnd(11,13), colLetter(rnd(5,7))+rnd(6,9) ];
-      this._d=sites.map(k=>{ const r=+k.slice(1); const v=(COSTROWS.has(r)?-1:1)*rnd(40,980);
-        cells[k]={...blankCell(),value:'#REF!',txt:true,bold:true};
-        return {k, v}; });
-      return {ROWS:13, cells, active:{r:3,c:2}, sel:null, colW:{1:120,2:92,3:92,4:92,5:92,6:92,7:92,8:92,9:92,10:92}};   // r193: the currency pass writes "($980.00)" — columns must hold it
+      cells['A1']={...blankCell(),value:codename()+' — operating model ($000s)',txt:true,bold:true};
+      const NC=5, q0=rnd(1,4), yy=25;
+      for(let i=0;i<NC;i++){ const qi=(q0+i-1)%4, yr=yy+Math.floor((q0+i-1)/4);
+        cells[colLetter(2+i)+2]={...blankCell(),value:'Q'+(qi+1)+"'"+yr,txt:true,bold:true,align:'r'}; }
+      const SPEC=[
+        {r:3,  n:'Revenue',            sign:1,  mag:()=>rnd(600,900)*10},
+        {r:4,  n:'COGS',               sign:-1, mag:()=>rnd(250,400)*10},
+        {r:5,  n:'Gross profit',       sub:[3,4]},
+        {r:6,  n:'Sales & marketing',  sign:-1, mag:()=>rnd(40,90)*10},
+        {r:7,  n:'General & admin',    sign:-1, mag:()=>rnd(30,70)*10},
+        {r:8,  n:'EBITDA',             sub:[5,6,7]},
+        {r:9,  n:'D&A',                sign:-1, mag:()=>rnd(20,50)*10},
+        {r:10, n:'EBIT',               sub:[8,9]},
+        {r:11, n:'Interest',           sign:-1, mag:()=>rnd(10,30)*10},
+        {r:12, n:'Taxes',              sign:-1, mag:()=>rnd(20,60)*10},
+        {r:13, n:'Net income',         sub:[10,11,12]},
+      ];
+      const byR={}; SPEC.forEach(x=>byR[x.r]=x);
+      const SUBR=[5,8,10,13];
+      SPEC.forEach(x=>cells['A'+x.r]={...blankCell(),value:x.n,txt:true,bold:SUBR.includes(x.r)});
+      const val={};
+      SPEC.filter(x=>x.sub===undefined).forEach(x=>{ val[x.r]={};
+        for(let c=2;c<2+NC;c++){ const v=x.sign*x.mag(); val[x.r][c]=v;
+          cells[colLetter(c)+x.r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; } });
+      SUBR.forEach(r=>{ val[r]={}; for(let c=2;c<2+NC;c++) val[r][c]=byR[r].sub.reduce((s,p)=>s+val[p][c],0); });
+      // one mark per subtotal row, spread across columns: far-right, far-left, two interior
+      const mids=[]; for(let c=3;c<2+NC-1;c++) mids.push(c);
+      for(let k=mids.length-1;k>0;k--){ const j=rnd(0,k); [mids[k],mids[j]]=[mids[j],mids[k]]; }
+      const cols=[2+NC-1, 2, mids[0], mids[1]];
+      this._m = SUBR.map((r,i)=>{ const c=cols[i], L=colLetter(c); const sub=byR[r].sub;
+        return {k:L+r, r, c, disp:sub.map(p=>L+p).join('+'), rng:L+sub[0]+':'+L+sub[sub.length-1], v:val[r][c]}; });
+      SUBR.forEach(r=>{ for(let c=2;c<2+NC;c++){ const L=colLetter(c);
+        const mk=this._m.find(x=>x.r===r&&x.c===c);
+        if(mk) cells[L+r]={...blankCell(),value:'#REF!',txt:true,bold:true,bt:true,fmtStyle:'comma',decimals:0};   // dispText shows the string; the fix inherits comma
+        else   cells[L+r]={...blankCell(),formula:'='+byR[r].sub.map(p=>L+p).join('+'),value:val[r][c],fmtStyle:'comma',decimals:0,bold:true,bt:true}; } });
+      this._NC=NC; this._niRng='B13:'+colLetter(1+NC)+'13'; this._val=val;
+      const cw={1:150}; for(let c=2;c<2+NC;c++) cw[c]=92;   // currency @2 with (parens) must hold at load + post-solve
+      return {ROWS:13, cells, active:{r:3,c:2}, sel:null, colW:cw};
     },
     checks(S){
-      const d=this._d, tR=this._tR;
-      const fixed=x=>{ const c=S.cells[x.k]; return !!(c && !c.txt && !c.formula && c.value===x.v); };
-      const allFixed=d.every(fixed);
-      const dressOk=tR.every(r=>{ for(let c=2;c<=10;c++){ const x=S.cells[colLetter(c)+r];
-        if(!x||!x.bold||!x.bt||x.fmtStyle!=='currency') return false; } return true; });
+      const m=this._m, NC=this._NC;
+      const fixOne=x=>{ const c=S.cells[x.k]; return !!(c && c.formula && typeof c.value==='number' && Math.abs(c.value-x.v)<0.5); };
+      const allFixed=m.every(fixOne);
+      let curOk=true, borderOk=true;
+      for(let c=2;c<2+NC;c++){ const x=S.cells[colLetter(c)+13]||{}; if(x.fmtStyle!=='currency') curOk=false; if(!x.bb) borderOk=false; }
       return [
-        {label:'fly to all four marks and type the PRINTED numbers back in \u2014 '+d.map(x=>x.k+'\u2192'+x.v).join(', '), ok: allFixed},
-        {label:'run the totals pass \u2014 bold Gross profit, EBITDA and Net income (rows '+tR.join('/')+') with a rule above and dollar format', ok: dressOk},
-        {label:'finish at A1 \u2014 ctrl+home, a DRESSED tab greets the reader', ok: allFixed && dressOk && S.active.r===1 && S.active.c===1},
+        {label:'rebuild the four broken subtotals — the cascade FORMULA, not a typed number ('+m.map(x=>x.k).join(', ')+')', ok: allFixed},
+        {label:'dollar-format the Net income row ('+this._niRng+') — ctrl+shift+$', ok: curOk},
+        {label:'add a bottom border under the Net income row ('+this._niRng+') — the statement’s closing rule', ok: borderOk},
+        {label:'finish at A1 — ctrl+home, a clean model greets the reader', ok: allFixed && curOk && borderOk && S.active.r===1 && S.active.c===1},
       ];
     }
   },

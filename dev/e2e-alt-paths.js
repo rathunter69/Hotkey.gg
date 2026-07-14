@@ -481,9 +481,9 @@ const ALTS = [
       {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('p')]},
     ]) ` },
-  { key: 'modeltour', name: 'marks in REVERSE, dress rows 13->5 via alt h 1 + ctrl+1 C, home last', moves: `C => { const d=C._d.slice().reverse();
-      const steps=d.map(x=>({sel:x.k, keys:[...T(String(x.v)),{key:'Enter'}]}));
-      [13,9,5].forEach(r=>steps.push({sel:'B'+r+':J'+r, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t'),{key:'1',ctrl:true},L('c')]}));
+  { key: 'modeltour', name: 'subtotals rebuilt in REVERSE via SUM(range), close NI with ctrl+1 C + border, home last', moves: `C => { const m=C._m.slice().reverse();
+      const steps=m.map(x=>({sel:x.k, keys:[...T('=SUM('+x.rng+')'),{key:'Enter'}]}));
+      steps.push({sel:C._niRng, keys:[{key:'1',ctrl:true},L('c'),{key:'Alt'},L('h'),L('b'),L('b')]});
       steps.push({sel:'A1', keys:[{key:'Home',ctrl:true}]});
       return steps; }` },
   { key: 'nwcsched', name: 'drivers typed bottom-up, NWC + dress before the driver rows, ribbon fills', moves: `C => [
