@@ -4578,3 +4578,29 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   info-only; the flag stays armed for every other drill. Retunes still
   require a 21-seed median per the r172 rule.
 - No cache bump (inline page changes only; shared assets untouched).
+
+## r187 — backlog-matrix quality round (the r169 suspects, closed out)
+- BRIDGE: the block finally MOVES — four spot-pool anchors per seed
+  (§2.1: sites randomize, not just values). Point-mode keystrokes are
+  identical from any anchor, so par is untouched; req/guide/targets/
+  demo/checks all derive from the geometry now. ALTS entry rewritten
+  geometry-derived.
+- SAVES: the flag stood since r169 — its "blocks of work" were typing
+  'done' three times. Now three DIFFERENT micro-jobs per seed (mark
+  done / bold the total / comma the figure), each ending in Ctrl+S;
+  four checks (three actions + the save latch). parKeys 15 -> 11
+  (21-seed, zero variance). The aha finally tells the truth.
+- DRILL (hardcode): a live margin memo now sits under the block — an
+  over-broad Ctrl+Space column paste flattens it and FAILS check 1
+  (guard folded into the action check per §2.5; smoke-proven both
+  directions). Honest-path keystrokes unchanged.
+- EDITFIX: typo pool 14 -> 19 (severance/collateral/contingency/
+  impairment/maintenance — schedule vocabulary, mid-word divergence).
+  Fresh 21-seed median 32 (range 20-58), declared 32; VARIANCE_OK note
+  refreshed.
+- COMPS: multiples finally wear the x (fmtStyle 'mult' on D3:D10) —
+  verified no check/demo/alt/harness compares display text before
+  changing. RIBBON's matrix flag was stale: its 4th job family (borders
+  submenu) shipped at r170; nothing to do.
+- The r169 enrichment backlog matrix is now fully dispatched.
+- No cache bump (index.html + dev files only).

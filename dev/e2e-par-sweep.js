@@ -11,9 +11,9 @@ const { chromium } = require('playwright-core');
 const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const REPS = 5;
 // Known-high-variance drills: 5-seed medians swing across the flag threshold in
-// BOTH directions (editfix: 39, 24, 42 on successive gates; the 21-seed median
-// is exactly its declared 33). Reported as INFO, never FLAGGED — retune only
-// against a 21-seed median (doctrine r172).
+// BOTH directions (editfix: 39, 24, 42 on successive gates). Reported as INFO,
+// never FLAGGED — retune only against a 21-seed median (doctrine r172).
+// r187: pool widened to 19 pairs; fresh 21-seed median 32 (range 20-58), declared 32.
 const VARIANCE_OK = new Set(['editfix']);
 
 (async () => {

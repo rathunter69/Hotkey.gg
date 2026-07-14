@@ -132,7 +132,8 @@ a default). AWAITING WOLF SIGN-OFF — the build is a config-and-content round.
   fetch-first (parallel sessions!); force-sync claude/project-handover-80gboe.
 - Model ID never in commits/PRs/code artifacts. Stripe stays TEST MODE.
 
-## Enrichment backlog matrix (r169 snapshot — suspects, grade by hand first)
+## Enrichment backlog matrix — FULLY DISPATCHED as of r187 (tranches r170/r181/r187; ribbon's flag was stale, resolved r170). Kept below for the historical record.
+## (r169 snapshot — suspects, grade by hand first)
 key        | flags (proxies only — margin/cagr/editfix "0 checks" = .map()-generated, fine)
 -----------|------------------------------------------------------------------
 cagr       | offset-cloned blocks, no codename

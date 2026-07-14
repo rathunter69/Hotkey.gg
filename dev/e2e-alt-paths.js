@@ -108,16 +108,20 @@ const ALTS = [
       {sel:'C2', keys:[...T('=B2/$B$2'),{key:'Enter'}]},
       {sel:'C2:C6', keys:[{key:'d',ctrl:true},{key:'%',ctrl:true,shift:true}]},
     ]; }` },
-  { key: 'bridge', name: 'typed refs (no pointing) + ribbon fill right', moves: `C => [
-      {sel:'B4', keys:[...T('=B2*B3'),{key:'Enter'}]},
-      {sel:'B4:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  { key: 'bridge', name: 'typed refs (no pointing) + ribbon fill right, geometry-derived', moves: `C => { const o=C._o;
+      const L2=colLetter(o.c0);
+      return [
+        {sel:o.f, keys:[...T('='+L2+(o.hr+1)+'*'+L2+(o.hr+2)),{key:'Enter'}]},
+        {sel:o.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      ]; }` },
   { key: 'autofit', name: 'second pair first', moves: `C => { const o=C._o; return [
       {sel:o.b1+':'+o.b2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
       {sel:o.a1+':'+o.a2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
-  { key: 'saves', name: 'review cells in reverse order', moves: `C => C._sites.slice().reverse().map(s =>
-      ({sel:s, keys:[...T('done'),{key:'Enter'},{key:'s',ctrl:true}]})) ` },
+  { key: 'saves', name: 'blocks in reverse, ribbon bold + ctrl+shift+! comma routes', moves: `C => C._sites.slice().reverse().map(s => {
+      const work = s.t==='done' ? [...T('done'),{key:'Enter'}] : (s.t==='bold' ? [{key:'Alt'},L('h'),D(1)] : [{key:'!',ctrl:true,shift:true}]);
+      return {sel:s.cell, keys:[...work,{key:'s',ctrl:true}]};
+    }) ` },
   { key: 'editfix', name: 'typos fixed in reverse order', moves: `C => C._sites.slice().reverse().map(s => {
       let p=0; while(p<s.bad.length && p<s.good.length && s.bad[p]===s.good[p]) p++;
       const keys=[{key:'F2'}];

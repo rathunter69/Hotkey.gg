@@ -1393,7 +1393,7 @@ const CHALLENGES = {
   drill:{
     name:'Hardcode', label:'Hardcode it', par:66, parKeys:15,
     aha:'paste-special values onto itself kills the link \u2014 the number stays, the wire dies',
-    prompt:'This page goes in the deck tonight \u2014 and right now every number on it is a LIVE LINK into the model. Break the links before it ships: grab the column, copy, paste-special VALUES straight back onto itself, then paint the survivors blue, because hardcodes wear blue. The pre-send ritual every desk runs.',
+    prompt:'This page goes in the deck tonight \u2014 and right now every number on it is a LIVE LINK into the model. Break the links before it ships: grab the column, copy, paste-special VALUES straight back onto itself, then paint the survivors blue, because hardcodes wear blue. Aim at the column, not the page \u2014 the margin memo below stays LIVE. The pre-send ritual every desk runs.',
     req:'on <em>B3</em> \u00b7 <em>ctrl+shift+\u2193</em> grabs B3:B8 \u00b7 <em>ctrl+c</em> \u00b7 <em>alt e s v \u21b5</em> values onto themselves \u00b7 then <em>alt h f c</em> \u2192 \u00d74 <em>\u21b5</em> \u2014 the dead numbers wear blue',
     guide:[
       'on B3 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> \u2014 the whole output column in one chord',
@@ -1424,14 +1424,18 @@ const CHALLENGES = {
         cells['B'+r]={...blankCell(),formula:'=E'+r,value:v,fmtStyle:'comma',decimals:0};
         this._exp['B'+r]=v;
       });
-      return {ROWS:8, cells, active:{r:3,c:2}, sel:null, colW:{1:150,2:80,5:80}};
+      // r187 DECOY: a live margin memo below the block \u2014 an over-broad column
+      // paste (ctrl+space) would flatten it; the honest B3:B8 selection leaves it alone
+      cells['A10']={...blankCell(),value:'Memo: EBITDA margin (stays live)',txt:true};
+      cells['B10']={...blankCell(),formula:'=E5/E3',value:ebitda/rev,fmtStyle:'percent',decimals:1};
+      return {ROWS:10, cells, active:{r:3,c:2}, sel:null, colW:{1:150,2:80,5:80}};
     },
     checks(S){
       const dead=Object.keys(this._exp).every(k=>{ const c=S.cells[k];
         return !!(c&&c.formula===null&&Number(c.value)===this._exp[k]); });
       const blue=Object.keys(this._exp).every(k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); });
       return [
-        {label:'break the links \u2014 values only, nothing on this page can move', ok: dead},
+        {label:'break the links in B3:B8 \u2014 values only, and the margin memo at B10 keeps its wire', ok: dead && !!(S.cells['B10']&&S.cells['B10'].formula)},
         {label:'paint the survivors blue \u2014 the page tells on itself', ok: blue},
       ];
     }
@@ -2787,13 +2791,18 @@ const CHALLENGES = {
     }
   },
   saves:{
-    name:'Save', label:'Save like you mean it', par:44, parKeys:15, usesSave:true,
+    name:'Save', label:'Save like you mean it', par:44, parKeys:11, usesSave:true,
     aha:'ctrl+s after every block of work \u2014 a reflex, not a reminder',
     prompt:'A page of work in progress, three review cells scattered through it \u2014 different spots each run. Mark each one done, and Ctrl+S after EVERY block of work. The reflex is the drill: work, save, work, save.',
-    req(){ return this._sites.map(s=>'<em>'+s+'</em> \u00b7 done \u21b5 \u00b7 <em>ctrl+s</em>').join(' \u00b7 then '); },
-    guide(){ return this._sites.map((s,i)=>['first','second','third'][i]+' review cell at <b>'+s+'</b> \u00b7 type <kbd>done</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>s</kbd> \u2014 every block of work ends with a save'); },
-    targets(){ return this._sites.slice(); },
-    demo(){ return this._sites.map(s=>({sel:s, keys:[...T('done'), Kb.enter, {key:'s',ctrl:true}]})); },
+    req(){ const J={done:'done \u21b5', bold:'ctrl+b', comma:'alt h k'};
+      return this._sites.map(s=>'<em>'+s.cell+'</em> \u00b7 '+J[s.t]+' \u00b7 <em>ctrl+s</em>').join(' \u00b7 then '); },
+    guide(){ const G={done:'type <kbd>done</kbd> <kbd>\u21b5</kbd>', bold:'<kbd>ctrl</kbd>+<kbd>b</kbd> the total', comma:'<kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> the figure'};
+      return this._sites.map((s,i)=>['first','second','third'][i]+' block at <b>'+s.cell+'</b> \u00b7 '+G[s.t]+' \u00b7 <kbd>ctrl</kbd>+<kbd>s</kbd> \u2014 every block of work ends with a save'); },
+    targets(){ return this._sites.map(s=>s.cell); },
+    demo(){ return this._sites.map(s=>{
+      const work = s.t==='done' ? [...T('done'), Kb.enter] : (s.t==='bold' ? [Kb.bold] : [Kb.alt, L('H'), L('K')]);
+      return {sel:s.cell, keys:[...work, {key:'s',ctrl:true}]};
+    }); },
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 working file',txt:true,bold:true};
@@ -2804,20 +2813,34 @@ const CHALLENGES = {
         cells[colLetter(c+1)+(r0+i)]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'}; } });
       const spots=[[4,3],[8,4],[3,8],[7,8],[9,2],[2,7]];
       for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
-      this._sites=spots.slice(0,3).map(([c,r])=>{ cells[colLetter(c-1)+r]={...blankCell(),value:'Review \u2192',txt:true};
-        return colLetter(c)+r; }).sort();
+      // r187: three DIFFERENT blocks of work \u2014 the reflex needs real work to follow
+      const jobs=[{lab:'mark done \u2192',t:'done'},{lab:'bold this total \u2192',t:'bold'},{lab:'comma this figure \u2192',t:'comma'}];
+      for(let k=jobs.length-1;k>0;k--){ const j=rnd(0,k); [jobs[k],jobs[j]]=[jobs[j],jobs[k]]; }
+      this._sites=spots.slice(0,3).map(([c,r],i)=>{
+        cells[colLetter(c-1)+r]={...blankCell(),value:jobs[i].lab,txt:true};
+        if(jobs[i].t!=='done') cells[colLetter(c)+r]={...blankCell(),value:rnd(10,90)*100};
+        return {cell:colLetter(c)+r, t:jobs[i].t};
+      }).sort((a,b)=>(a.cell<b.cell?-1:1));
       return {ROWS:9, cells, active:{r:2,c:2}, sel:null, colW:{1:96,5:96}};
     },
     checks(S){
-      const done=k=>{ const c=S.cells[k]; return !!(c&&String(c.value).toLowerCase()==='done'); };
-      return [
-        {label:'mark all three review cells done ('+this._sites.join(', ')+')', ok: this._sites.every(done)},
-        {label:'save at least three times \u2014 Ctrl+S after each block', ok: (S.saveN||0)>=3},
-      ];
+      const OK={
+        done:  c=>!!(c&&String(c.value).toLowerCase()==='done'),
+        bold:  c=>!!(c&&c.bold),
+        comma: c=>!!(c&&c.fmtStyle==='comma'),
+      };
+      const LBL={
+        done:  s=>'mark '+s.cell+' done \u2014 then ctrl+s',
+        bold:  s=>'bold the total at '+s.cell+' \u2014 then ctrl+s',
+        comma: s=>'comma the figure at '+s.cell+' \u2014 then ctrl+s',
+      };
+      const out=this._sites.map(s=>({label:LBL[s.t](s), ok:OK[s.t](S.cells[s.cell])}));
+      out.push({label:'save after EVERY block \u2014 three saves minimum', ok:(S.saveN||0)>=3});
+      return out;
     }
   },
   editfix:{
-    name:'Edit', label:'Fix the typos in place', par:44, parKeys:33,
+    name:'Edit', label:'Fix the typos in place', par:44, parKeys:32,
     aha:'f2 edits in place \u2014 retyping a cell destroys the part that was already right',
     prompt:'A pasted-in schedule with THREE typos scattered through the labels \u2014 different words, different spots, every run. Do not retype whole cells: F2 in, arrow the cursor to the mistake, fix it, commit. Edit mode is how you touch a cell without destroying it.',
     req(){ return this._sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 fix \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 '); },
@@ -2833,7 +2856,7 @@ const CHALLENGES = {
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 schedule review',txt:true,bold:true};
-      const TYPOS=[['Reveune','Revenue'],['Grwoth','Growth'],['Recievables','Receivables'],['Depriciation','Depreciation'],['Intrest','Interest'],['Payabels','Payables'],['Inventroy','Inventory'],['Divdends','Dividends'],['Ammortization','Amortization'],['Goodwil','Goodwill'],['Acrued','Accrued'],['Defered','Deferred'],['Recuring','Recurring'],['Workng capital','Working capital']];
+      const TYPOS=[['Reveune','Revenue'],['Grwoth','Growth'],['Recievables','Receivables'],['Depriciation','Depreciation'],['Intrest','Interest'],['Payabels','Payables'],['Inventroy','Inventory'],['Divdends','Dividends'],['Ammortization','Amortization'],['Goodwil','Goodwill'],['Acrued','Accrued'],['Defered','Deferred'],['Recuring','Recurring'],['Workng capital','Working capital'],['Sevrance','Severance'],['Colateral','Collateral'],['Contigency','Contingency'],['Impariment','Impairment'],['Maintenence','Maintenance']];
       const CLEAN=['EBITDA','Capex','Cash','Taxes','SG&A','Margin','Debt','Equity','COGS','Fees'];
       for(let k=TYPOS.length-1;k>0;k--){ const j=rnd(0,k); [TYPOS[k],TYPOS[j]]=[TYPOS[j],TYPOS[k]]; }
       for(let k=CLEAN.length-1;k>0;k--){ const j=rnd(0,k); [CLEAN[k],CLEAN[j]]=[CLEAN[j],CLEAN[k]]; }
@@ -3362,12 +3385,12 @@ const CHALLENGES = {
         cells['A'+(3+i)]={...blankCell(),value:peers[i],txt:true};
         cells['B'+(3+i)]={...blankCell(),value:ev,fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells['C'+(3+i)]={...blankCell(),value:ebd,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells['D'+(3+i)]={...blankCell(),decimals:1};
+        cells['D'+(3+i)]={...blankCell(),fmtStyle:'mult',decimals:1};
         this._m.push(ev/ebd);
       }
-      cells['A8']={...blankCell(),value:'Mean',txt:true,bold:true};  cells['D8']={...blankCell(),decimals:1,bold:true};
-      cells['A9']={...blankCell(),value:'High',txt:true};            cells['D9']={...blankCell(),decimals:1};
-      cells['A10']={...blankCell(),value:'Low',txt:true};            cells['D10']={...blankCell(),decimals:1};
+      cells['A8']={...blankCell(),value:'Mean',txt:true,bold:true};  cells['D8']={...blankCell(),fmtStyle:'mult',decimals:1,bold:true};
+      cells['A9']={...blankCell(),value:'High',txt:true};            cells['D9']={...blankCell(),fmtStyle:'mult',decimals:1};
+      cells['A10']={...blankCell(),value:'Low',txt:true};            cells['D10']={...blankCell(),fmtStyle:'mult',decimals:1};
       cells['F2']={...blankCell(),value:'Implied valuation',txt:true,bold:true};
       const tEbd=rnd(15,50)*10, nd=rnd(5,25)*10, sh=rnd(8,40);
       cells['F3']={...blankCell(),value:'Target EBITDA',txt:true}; cells['G3']={...blankCell(),value:tEbd,fontColor:'blue',fmtStyle:'comma',decimals:0};
@@ -3619,45 +3642,52 @@ const CHALLENGES = {
     name:'Point Mode', label:'Point, don\u2019t type', par:40, parKeys:6,
     aha:'point mode grabs refs with arrows \u2014 the fastest formula is the one you never typed',
     prompt:'Build profit = revenue \u00d7 margin by POINTING \u2014 = then arrow up to grab each reference, never typing a cell address \u2014 and fill it across five years. Point mode is the fastest formula entry there is; the fill proves your references were relative.',
-    req:'<em>B4</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs B2 \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs B3 \u00b7 <em>\u21b5</em> \u00b7 select B4:F4 \u00b7 <em>ctrl+r</em>',
-    guide:[
-      'at B4 \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
+    req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs revenue \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs margin \u00b7 <em>\u21b5</em> \u00b7 select '+o.rng+' \u00b7 <em>ctrl+r</em>'; },
+    guide(){ const o=this._o; return [
+      'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
       '<kbd>\u2191</kbd> \u2014 one hop to margin \u00b7 <kbd>\u21b5</kbd>',
-      'select B4:F4 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 five years from one pointed formula',
-    ],
-    targets:['B4','B4:F4'],
-    demo(){ return [
-      {sel:'B4', keys:[{key:'='}, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
+      'select '+o.rng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 five years from one pointed formula',
+    ]; },
+    targets(){ const o=this._o; return [o.f, o.rng]; },
+    demo(){ const o=this._o; return [
+      {sel:o.f, keys:[{key:'='}, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
+      {sel:o.rng, keys:[Kb.fillR]},
     ]; },
     build(){
       const cells={};
+      // r187: the block MOVES per seed (\u00a72.1 \u2014 sites randomize, not just values);
+      // point-mode keystrokes are identical from any anchor, so par is untouched.
+      const [c0,hr]=[[2,1],[3,2],[2,3],[4,2]][rnd(0,3)];
+      const lc=colLetter(c0-1);
       cells['A1']={...blankCell(),value:codename()+' \u2014 profit build ($mm)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Revenue',txt:true};
-      cells['A3']={...blankCell(),value:'EBITDA margin',txt:true};
-      cells['A4']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      cells['A6']={...blankCell(),value:'Memo: growth',txt:true};
+      cells[lc+(hr+1)]={...blankCell(),value:'Revenue',txt:true};
+      cells[lc+(hr+2)]={...blankCell(),value:'EBITDA margin',txt:true};
+      cells[lc+(hr+3)]={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells[lc+(hr+5)]={...blankCell(),value:'Memo: growth',txt:true};
       this._exp=[];
       let rev=rnd(40,90)*10;
       for(let j=0;j<5;j++){
-        const m=rnd(18,34)/100;
-        cells[colLetter(2+j)+1]={...blankCell(),value:'FY'+(24+j),txt:true,bold:true,align:'r'};
-        cells[colLetter(2+j)+2]={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[colLetter(2+j)+3]={...blankCell(),value:m,fontColor:'blue',fmtStyle:'percent',decimals:1};
-        cells[colLetter(2+j)+4]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        if(j<4) cells[colLetter(3+j)+6]={...blankCell(),value:rnd(3,9)/100,fmtStyle:'percent',decimals:1};
+        const m=rnd(18,34)/100, L2=colLetter(c0+j);
+        cells[L2+hr]={...blankCell(),value:'FY'+(24+j),txt:true,bold:true,align:'r'};
+        cells[L2+(hr+1)]={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[L2+(hr+2)]={...blankCell(),value:m,fontColor:'blue',fmtStyle:'percent',decimals:1};
+        cells[L2+(hr+3)]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+        if(j<4) cells[colLetter(c0+1+j)+(hr+5)]={...blankCell(),value:rnd(3,9)/100,fmtStyle:'percent',decimals:1};
         this._exp.push({rev:rev, m:m});
         rev=Math.round(rev*(1+rnd(3,9)/100));
       }
-      return {ROWS:7, cells, active:{r:4,c:2}, sel:null, colW:{1:118}};
+      this._o={c0:c0, hr:hr, f:colLetter(c0)+(hr+3), rng:colLetter(c0)+(hr+3)+':'+colLetter(c0+4)+(hr+3)};
+      const cw={}; cw[c0-1]=118;
+      return {ROWS:Math.max(7,hr+6), cells, active:{r:hr+3,c:c0}, sel:null, colW:cw};
     },
     checks(S){
-      const okCol=j=>{ const L2=colLetter(2+j), c=S.cells[L2+'4']; if(!c||!c.formula) return false;
+      const o=this._o;
+      const okCol=j=>{ const L2=colLetter(o.c0+j), c=S.cells[L2+(o.hr+3)]; if(!c||!c.formula) return false;
         const f=String(c.formula).toUpperCase().replace(/[\s$]/g,'');
-        const refs=f.includes(L2+'2')&&f.includes(L2+'3');
+        const refs=f.includes(L2+(o.hr+1))&&f.includes(L2+(o.hr+2));
         return refs && typeof c.value==='number' && Math.abs(c.value-this._exp[j].rev*this._exp[j].m)<0.5; };
       return [
-        {label:'build EBITDA at B4 \u2014 revenue \u00d7 margin, both refs pointed in-column', ok: okCol(0)},
+        {label:'build EBITDA at '+o.f+' \u2014 revenue \u00d7 margin, both refs pointed in-column', ok: okCol(0)},
         {label:'fill it across all five years \u2014 relative refs walked with the fill', ok: [1,2,3,4].every(okCol)},
       ];
     }
