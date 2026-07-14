@@ -4826,3 +4826,36 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   damage), and this session took the egress milestone instead — work the
   drill-focused session couldn't have raced. Rule added to PIPELINE: fetch
   before every round-close; the slower twin yields.
+
+## r197 — T-G canon verification (egress): the Macabacus defaults were wrong
+- The standing T-G remainder ran now that egress reached the sources. The
+  authoritative CFI×Macabacus cheat-sheet PDF exposed a SYSTEMATIC error in
+  our Macabacus plugin layer: the number/border/color CYCLES were over-
+  modified with a phantom Alt. Real Macabacus number cycles piggyback on the
+  NATIVE Excel format chords — General Number Ctrl+Shift+1, Local Currency
+  Ctrl+Shift+4, Percent Ctrl+Shift+5, Multiple Ctrl+Shift+8, Increase/Decrease
+  Decimals Ctrl+, / Ctrl+. — not the Ctrl+Alt+Shift+‹digit› we displayed.
+  Also fixed: Center Cycle Ctrl+Shift+C, Outside Border Ctrl+Shift+7, Bottom
+  Border Ctrl+Shift+Down, Blue-Black toggle Ctrl+Shift+; (a Colors item),
+  AutoColor Workbook Ctrl+Alt+Q (was W). 11 chords corrected in drills.js
+  HOTKEY_PLUGIN_LAYERS.
+- ENGINE FIX (the real bite): index.html actually BOUND the phantom
+  Ctrl+Alt+Shift+1/4/5 for the macabacus profile (classic keydown + 5 rapid-
+  fire matchers), and a code comment claimed the profile was “verified.” It
+  wasn't — it taught wrong muscle memory. Removed the three phantom classic
+  bindings and dropped the phantom clauses from the RF currency/percent/comma
+  matchers (the real chords already match via RFM.ctrlShift) and the
+  num_comma/num_pct aliases. The correct chords (Ctrl+Shift+1/4/5) were always
+  handled by the native un-gated format handlers, so macabacus users lose
+  nothing and now train the true chords.
+- VERIFIED [canon] rows against the cheat sheet: trace precedents Ctrl+[ / ]
+  (wirewalk r173 correct), Go To Special F5→Alt+S (hunt r182 correct),
+  grouping Alt+Shift+→/← and trace Alt M P (WSP), VLOOKUP characterization.
+  FactSet table NOT re-verified (no authoritative sheet reachable) — flagged
+  in CANON_DIFF for a future FactSet egress pass.
+- Live behavior check (bespoke, macabacus profile): Ctrl+Shift+1/4/5 →
+  comma/currency/percent, phantom Ctrl+Alt+Shift+1 no-ops, 0 page errors.
+  GATE: syntax → demo-replay ALL GREEN → alt-paths 80/80 → parity 94 →
+  onboard 28 → visual 311 → rank 20 → fit-sweep 75 clean → reference.html
+  render check. No drill logic touched. CANON_DIFF.md verdicts recorded.
+  CACHE v165 -> v166.
