@@ -394,6 +394,37 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(v1.zero, 'SUMIFS with no match sums to zero');
   ok(v1.err, 'malformed SUMIFS throws into IFERROR, not into the sheet');
 
+  console.log('W. paste operations (r191)');
+  await fresh();
+  const w1 = await run(() => {
+    S.cells['H2']={...blankCell(), value:-1};
+    S.cells['H3']={...blankCell(), value:100}; S.cells['H4']={...blankCell(), value:200};
+    S.cells['H5']={...blankCell(), formula:'=H3+H4', value:300};
+    recalc(); render();
+    setDemoSel('H2'); demoKey({key:'c',ctrl:true});
+    setDemoSel('H3:H5');
+    demoKey({key:'Alt'}); demoKey({key:'e'}); demoKey({key:'s'}); demoKey({key:'m'}); demoKey({key:'Enter'});
+    recalc();
+    const mult = S.cells['H3'].value===-100 && S.cells['H4'].value===-200;
+    const wrap = S.cells['H5'].formula==='=(H3+H4)*-1' && Math.abs(S.cells['H5'].value-300)<0.5;
+    const latch = S.pasteOpN===1;
+    S.cells['H7']={...blankCell(), value:7}; render();
+    setDemoSel('H7'); demoKey({key:'c',ctrl:true});
+    setDemoSel('H3');
+    demoKey({key:'Alt'}); demoKey({key:'e'}); demoKey({key:'s'}); demoKey({key:'d'}); demoKey({key:'Enter'});
+    const add = S.cells['H3'].value===-93;
+    setDemoSel('H7'); demoKey({key:'c',ctrl:true});
+    setDemoSel('H8');
+    demoKey({key:'Alt'}); demoKey({key:'e'}); demoKey({key:'s'}); demoKey({key:'Enter'});
+    const reset = S.cells['H8'].value===7;   // op resets to None on every open — plain paste unharmed
+    return { mult, wrap, latch, add, reset };
+  });
+  ok(w1.mult, 'multiply broadcasts a copied single cell over the selection');
+  ok(w1.wrap, 'formula cells wrap =(F)*k like Excel writes them', JSON.stringify(w1));
+  ok(w1.latch, 'pasteOpN latch counts operation pastes');
+  ok(w1.add, 'add operation lands');
+  ok(w1.reset, 'operation resets to None each time the dialog opens');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

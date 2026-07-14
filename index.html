@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=161" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=161">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=161">
+<link rel="icon" href="favicon.ico?v=162" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=162">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=162">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -258,8 +258,10 @@
   .fltbtn.on{opacity:1; color:var(--accent); border-color:var(--accent)}
   td.mark{outline:2px dashed var(--warn); outline-offset:-2px}   /* r182: go-to-special marks */
 
-  .pd-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none;
-    align-items:center; justify-content:center; z-index:50}
+  /* r191: Excel parity \u2014 Paste Special floats OVER the sheet as a compact card;
+     the page never dims and the card is exactly content-sized (no inset stretch) */
+  .pd-backdrop{display:none; z-index:50}
+  .pd-sect{padding:5px 2px 2px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint)}
   .pd-box{background:var(--surface); border:1px solid var(--line); border-radius:12px; width:312px;
     overflow:hidden}   /* r60 flat: border carries the depth */
   .pd-title{padding:12px 16px; border-bottom:1px solid var(--line); font-size:14px; font-weight:600;
@@ -1134,19 +1136,19 @@
   /* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
   #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
   #grid th{font-size:10.5px}
-  #pasteDialog{position:absolute; right:16px; bottom:16px; z-index:30;
+  #pasteDialog{position:fixed; z-index:30;   /* r191: floats over the SHEET — drawDialog sets left/top */
     background:var(--surface2); border:1px solid var(--line); border-radius:12px;
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=161"></script>
-<link rel="stylesheet" href="nav.css?v=161">
-<script src="themes.js?v=161"></script>
+<script src="drills.js?v=162"></script>
+<link rel="stylesheet" href="nav.css?v=162">
+<script src="themes.js?v=162"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=161"></script>
+<script src="nav.js?v=162"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2757,47 +2759,75 @@ const CHALLENGES = {
     }
   },
   transpose:{
-    name:'Transpose', label:'Flip it on its side', par:30, parKeys:6,
-    aha:'alt e s e drops the row in sideways — nothing gets retyped to turn a corner',
-    prompt:'A year header runs across the page, but the summary block needs it running DOWN. Copy the row once, then Alt E S E \u2014 transpose \u2014 drops it in sideways. No retyping, no dragging.',
-    req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 to <em>'+o.dst+'</em> \u00b7 <em>alt e s e \u21b5</em> \u2014 the row lands as a column'; },
+    name:'Transpose', label:'Flip it on its side', par:64, parKeys:14,
+    aha:'transpose turns the whole table in one paste \u2014 and a copied \u22121 times a row flips its sign',
+    prompt:'The data team sent the build YEARS-ACROSS; the book reads YEARS-DOWN \u2014 and their capex came in positive, which your P&L can\u2019t use. Two paste-special moves fix everything: copy the WHOLE table and Alt E S E drops it in sideways, then stage a \u22121, copy it, and paste-special MULTIPLY over the landed capex column \u2014 the sign flips in place, no retyping. The dialog is doing real arithmetic.',
+    req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 at <em>'+o.dst+'</em> \u00b7 <em>alt e s e \u21b5</em> \u00b7 type <em>-1</em> at <em>'+o.helper+'</em> \u00b7 <em>ctrl+c</em> \u00b7 select <em>'+o.capexRng+'</em> \u00b7 <em>alt e s</em> <em>m</em> <em>\u21b5</em>'; },
     guide(){ const o=this._o; return [
-      'select the year row '+o.src+' \u2014 cursor on '+o.a+', <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2192</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd>',
-      'jump to '+o.dst+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>e</kbd> <kbd>\u21b5</kbd> \u2014 transpose',
-      'the four years now run down the column \u2014 formats ride along',
+      'grab the WHOLE table \u2014 labels, years, all three metric rows: '+o.src+' \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd>',
+      'at '+o.dst+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>e</kbd> <kbd>\u21b5</kbd> \u2014 the table lands turned: years run down, metrics run across',
+      'the desk sign-flip: type <kbd>-1</kbd> at '+o.helper+' <kbd>\u21b5</kbd> \u00b7 copy it \u00b7 select the landed capex column '+o.capexRng+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>m</kbd> multiply \u00b7 <kbd>\u21b5</kbd> \u2014 every cell \u00d7 \u22121, and the commas they carried flip them to (parens)',
     ]; },
-    targets(){ const o=this._o; return [o.src, o.dst]; },
+    targets(){ const o=this._o; return [o.src, o.dst, o.capexRng]; },
     demo(){ const o=this._o; return [
       {sel:o.src, keys:[Kb.copy]},
       {sel:o.dst, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'e'}, Kb.enter]},
+      {sel:o.helper, keys:[...T('-1'), Kb.enter]},
+      {sel:o.helper, keys:[Kb.copy]},
+      {sel:o.capexRng, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'m'}, Kb.enter]},
     ]; },
     build(){
-      /* r155 DENSITY: the year row now caps a REAL populated build (labels + three
-         data rows), and the summary block waits below — same two keystrokes. */
+      /* r191 (Wolf): flip the ENTIRE table — 5 cols \u00d7 4 rows lands 4\u00d75 — then
+         paste-special MULTIPLY a copied -1 over the landed capex column. */
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Operating build (the summary block reads DOWN)',txt:true,bold:true};
-      const layouts=[{r:3,c:2,dr:8,dc:1},{r:3,c:3,dr:8,dc:7},{r:2,c:2,dr:7,dc:8}];
+      cells['A1']={...blankCell(),value:codename()+' \u2014 data-team extract (the book reads YEARS-DOWN)',txt:true,bold:true};
+      const layouts=[{r:3,c:2,dr:9,dc:6},{r:3,c:2,dr:3,dc:7},{r:9,c:2,dr:3,dc:2}];
       const sp=layouts[rnd(0,layouts.length-1)];
       const y0=rnd(2021,2025);
-      cells[colLetter(sp.c-1)+sp.r]={...blankCell(),value:'Years',txt:true};
+      cells[colLetter(sp.c-1)+sp.r]={...blankCell(),value:'Item',txt:true,bold:true};
       this._years=[];
       for(let j=0;j<4;j++){ const y=y0+j; this._years.push(y);
         cells[colLetter(sp.c+j)+sp.r]={...blankCell(),value:y,bold:true,align:'r',decimals:0}; }
       const rows=['Revenue','EBITDA','Capex'];
+      this._vals={};
       for(let i=0;i<3;i++){ const r=sp.r+1+i;
         cells[colLetter(sp.c-1)+r]={...blankCell(),value:rows[i],txt:true};
-        for(let j=0;j<4;j++) cells[colLetter(sp.c+j)+r]={...blankCell(),value:rnd(30,300)*5,fmtStyle:'comma',decimals:0}; }
-      cells[colLetter(sp.dc)+(sp.dr-1)]={...blankCell(),value:'Summary',txt:true,bold:true};
-      this._o={ a:colLetter(sp.c)+sp.r, src:colLetter(sp.c)+sp.r+':'+colLetter(sp.c+3)+sp.r,
-        dst:colLetter(sp.dc)+sp.dr, dc:sp.dc, dr:sp.dr };
-      return {ROWS:Math.max(12,sp.dr+4), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{}};
+        this._vals[rows[i]]=[];
+        for(let j=0;j<4;j++){ const v=rnd(30,300)*5; this._vals[rows[i]].push(v);
+          cells[colLetter(sp.c+j)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; } }
+      cells[colLetter(sp.dc)+(sp.dr-1)]={...blankCell(),value:'Book layout \u2192',txt:true,bold:true};
+      // transposed block: 4 cols x 5 rows starting at dst; capex lands in the LAST column, rows dr+1..dr+4
+      const capCol=colLetter(sp.dc+3);
+      this._o={ a:colLetter(sp.c-1)+sp.r,
+        src:colLetter(sp.c-1)+sp.r+':'+colLetter(sp.c+3)+(sp.r+3),
+        dst:colLetter(sp.dc)+sp.dr, dc:sp.dc, dr:sp.dr,
+        helper:colLetter(sp.dc+5)+sp.dr,
+        capexRng:capCol+(sp.dr+1)+':'+capCol+(sp.dr+4) };
+      const cw={}; cw[sp.c-1]=96; cw[sp.dc]=96;
+      return {ROWS:Math.max(14,sp.dr+6), cells, active:{r:sp.r,c:sp.c-1}, sel:null, colW:cw};
     },
     checks(S){
       const o=this._o;
-      const ok=[0,1,2,3].every(j=>{ const c=S.cells[colLetter(o.dc)+(o.dr+j)];
-        return !!(c&&c.value===this._years[j]&&c.bold); });
+      const M=['Revenue','EBITDA','Capex'];
+      const flipOk=(()=>{
+        for(let j=0;j<4;j++){ const yc=S.cells[colLetter(o.dc)+(o.dr+1+j)];
+          if(!yc||yc.value!==this._years[j]) return false; }
+        for(let i=0;i<3;i++){ const hc=S.cells[colLetter(o.dc+1+i)+o.dr];
+          if(!hc||hc.value!==M[i]) return false;
+          for(let j=0;j<4;j++){ const c=S.cells[colLetter(o.dc+1+i)+(o.dr+1+j)];
+            const want=this._vals[M[i]][j];
+            if(!c||typeof c.value!=='number') return false;
+            if(i<2 && Math.abs(c.value-want)>0.5) return false;
+            if(i===2 && Math.abs(Math.abs(c.value)-want)>0.5) return false; } }
+        return true;
+      })();
+      const helperOk=(()=>{ const h=S.cells[o.helper]; return !!(h&&h.value===-1); })();
+      const capOk=[0,1,2,3].every(j=>{ const c=S.cells[colLetter(o.dc+3)+(o.dr+1+j)];
+        return !!(c&&typeof c.value==='number'&&Math.abs(c.value+this._vals.Capex[j])<0.5); }) && (S.pasteOpN||0)>=1;
       return [
-        {label:'run the four years DOWN from '+o.dst+' \u2014 values and bolding carried by the transpose', ok: ok},
+        {label:'flip the WHOLE table sideways \u2014 copy '+o.src+', transpose-paste at '+o.dst, ok: flipOk},
+        {label:'stage the helper \u2014 type -1 at '+o.helper, ok: helperOk},
+        {label:'flip capex\u2019s sign the desk way \u2014 a copied \u22121, paste special MULTIPLY over '+o.capexRng, ok: capOk},
       ];
     }
   },
@@ -6899,6 +6929,10 @@ const FMT_OPTS = [
   ['G','General'],['N','1,234'],['C','$1,234'],['P','12.3%'],
   ['X','8.2x'],['D','Mar-26'],['E','superscript \u00b9'],['A','center across'],
 ];
+const PASTE_OP_OPTS = [
+  ['N','None','none'],['M','Multiply','multiply'],['D','Add','add'],   // Excel's accelerators: M / D(add)
+];
+let pasteOp='none';
 const PASTE_OPTS = [
   ['A','All','all'],['F','Formulas','formulas'],['V','Values','values'],
   ['T','Formats','formats'],['U','Values & number formats','valuesnum'],['W','Column widths','colwidths'],
@@ -6932,7 +6966,18 @@ function drawDialog(){
     const on=pasteKind===kind;
     rows+=`<div class="pd-opt${on?' on':''}"><span class="pd-radio">${on?'●':'○'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`;
   });
+  rows+=`<div class="pd-sect">operation</div>`;
+  PASTE_OP_OPTS.forEach(([k,lbl,op])=>{
+    const on=pasteOp===op;
+    rows+=`<div class="pd-opt${on?' on':''}"><span class="pd-radio">${on?'●':'○'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`;
+  });
   $('pdOpts').innerHTML=rows;
+  // r191: float the card over the SHEET like Excel \u2014 lower half so source rows stay readable
+  try{ const gw=document.querySelector('.gridwrap');
+    if(gw){ const wr=gw.getBoundingClientRect();
+      d.style.left=Math.max(8, wr.left+wr.width/2-150)+'px';
+      const want=Math.round(wr.top+wr.height*0.30);
+      d.style.top=Math.max(8, Math.min(want, window.innerHeight-(d.offsetHeight||360)-14))+'px'; } }catch(e){}
 }
 function drawRibbon(){ try{ __drawRibbon(); }catch(err){
   // r86: paint armor — a rendering bug must NEVER strand the player in an
@@ -6946,10 +6991,8 @@ function __drawRibbon(){
   const el=$('ribbon');
   if(mode!=='ribbon'){ el.className='ribbon'; el.innerHTML='<span class="rhint"><k>alt</k> ribbon</span>'; return; }
   if(dialog==='paste'){ el.className='ribbon show';
-    let ph='<span class="path">paste special →</span>';
-    PASTE_OPTS.forEach(([k,lbl,kind])=>{ ph+='<span class="opt'+(pasteKind===kind?' on':'')+'"><k>'+k.toLowerCase()+'</k>'+lbl+'</span>'; });
-    ph+='<span class="opt">\u2191\u2193 or letters \u00b7 \u21b5 apply \u00b7 esc cancel</span>';
-    el.innerHTML=ph; return; }
+    el.innerHTML='<span class="path">paste special \u2192</span><span class="opt">letters pick \u00b7 m/d set the operation \u00b7 \u21b5 apply \u00b7 esc cancel</span>';   // r191: the floating card carries the options now
+    return; }
   if(dialog==='fmt'){ el.className='ribbon show';
     let fh='<span class="path">format cells →</span>';
     FMT_OPTS.forEach(([k,lbl])=>{ fh+='<span class="opt"><k>'+k.toLowerCase()+'</k>'+lbl+'</span>'; });
@@ -7934,9 +7977,11 @@ function applyRibbon(key){
     return;
   }
   if(dialog==='paste'){
+    const op2=PASTE_OP_OPTS.find(o=>o[0]===key);
+    if(op2){ pasteOp=op2[2]; drawRibbon(); return; }
     const opt=PASTE_OPTS.find(o=>o[0]===key);
     if(opt){ pasteKind=opt[2]; drawRibbon(); return; }
-    if(key==='ENTER'){ doPaste(pasteKind||'all'); exitRibbon(true); return; }
+    if(key==='ENTER'){ doPaste(pasteKind||'all', pasteOp); exitRibbon(true); return; }
     return;
   }
   // column width prompt \u2014 Enter applies the typed number to every selected column
@@ -7986,7 +8031,7 @@ function applyRibbon(key){
   }
   // inside a tab/menu
   const np=path.join('')+key;
-  if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; drawRibbon(); return; }
+  if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; pasteOp='none'; drawRibbon(); return; }
   if(np==='OE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route
   if(np==='HFC'){ dialog='fontcolor'; fontColorIdx=0; drawRibbon(); return; }
   if(np==='HFIS'){ dialog='series'; drawRibbon(); return; }
@@ -8035,10 +8080,26 @@ function applyRibbon(key){
   path=[]; ribbonNote=''; drawRibbon();
 }
 function autofitCols(){ const r=selRange(); for(let c=r.c1;c<=r.c2;c++) colW[c]=neededWidth(c); }
-function doPaste(kind){
+function doPaste(kind, op){
   if(!S.clipboard) return;
   pushUndo();
   const sr=selRange(); const cb=S.clipboard, r0=sr.r1, c0=sr.c1;
+  /* r191 PASTE OPERATIONS (Excel's Operation group) — pure arithmetic paste:
+     applies over the whole SELECTION, broadcasting the clipboard cyclically
+     (the copied single -1 \u00d7 a whole row is THE desk sign-flip). Formula
+     cells wrap \u2014 =(F)\u00d7k \u2014 exactly what Excel writes; formats untouched. */
+  if(op && op!=='none'){
+    for(let rr=sr.r1; rr<=sr.r2; rr++) for(let cc=sr.c1; cc<=sr.c2; cc++){
+      const s=cb.data[(rr-sr.r1)%cb.h][(cc-sr.c1)%cb.w];
+      if(typeof s.value!=='number') continue;
+      const cell=ensure(rr,cc); const k=s.value;
+      if(cell.formula){ cell.formula='=('+String(cell.formula).replace(/^=/,'')+')'+(op==='multiply'?'*':'+')+k; }
+      else if(typeof cell.value==='number'){ cell.value = op==='multiply' ? cell.value*k : cell.value+k; }
+    }
+    S.pasteOpN=(S.pasteOpN||0)+1;
+    pendingFlash={r1:sr.r1,c1:sr.c1,r2:sr.r2,c2:sr.c2};
+    return;
+  }
   /* r154 EXCEL PARITY: paste TRANSLATES relative refs by the paste offset — fill
      always did, paste never did, so '=B4+1' copied from C9 pasted at D10 still read
      B4. Anchors hold, relatives shift, recalc reprices the value on commit. */
@@ -8861,7 +8922,7 @@ document.addEventListener('keydown',e=>{
     // AltGr guard below exists); then UNCLAIMED Ctrl+Alt combos go inert so
     // AltGr layouts (ctrl+alt on Windows) can never trigger plain ctrl ops.
     if(e.altKey && lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+V');
-      mode='ribbon'; path=['E','S']; dialog='paste'; pasteKind='all'; ribbonNote=''; drawRibbon(); return; }
+      mode='ribbon'; path=['E','S']; dialog='paste'; pasteKind='all'; pasteOp='none'; ribbonNote=''; drawRibbon(); return; }
     if(e.altKey){ e.preventDefault(); return; }
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
       const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }

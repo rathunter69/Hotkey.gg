@@ -4669,3 +4669,29 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   columns overflowed on paren-negative seeds the first clean sweep
   happened to miss — widened to 76 (fit is seed-dependent; the sweep's
   3 reps are a sample, not a proof).
+
+## r191 — Paste Special grows up: floating card + real operations (Wolf spec)
+- THE DIALOG: Paste Special now floats over the SHEET as a compact card
+  — Excel's own presentation — instead of the bottom-right corner pin
+  it had worn since r36 (an #pasteDialog ID rule was overriding
+  everything; the class-rule "modal" CSS had been dead specificity for
+  months). Position clamps to the viewport, the page never dims, and
+  the ribbon strip dedupes to a one-line hint. Found the hard way: the
+  class rule's inset:0 kept stretching the card to the viewport bottom
+  under the JS positioning until removed.
+- OPERATIONS: the card gains Excel's Operation group — N None (default,
+  reset on every open) · M Multiply · D Add, real accelerators. An
+  operation paste is pure arithmetic over the whole SELECTION with the
+  clipboard broadcast cyclically: the copied single −1 × a column is
+  THE desk sign-flip. Formula cells wrap =(F)*k exactly as Excel
+  writes them; formats untouched. S.pasteOpN latches.
+- TRANSPOSE v2 (Wolf's spec verbatim): the data team sent years-ACROSS
+  with positive capex. Flip the WHOLE 5×4 table (labels, years, all
+  three metrics) with one transpose paste, stage a −1, and paste-
+  special MULTIPLY over the landed capex column — which then reads in
+  (parens) thanks to r190. Retyped negatives without the operation
+  provably fail (latch check). par 64 / parKeys 14 (21-seed flat,
+  tuned in the foreground per the r190 lesson).
+- PARITY 77 → 82 (section W: broadcast multiply, formula wrap, add,
+  latch, reset-on-open). ALTS transpose entry rewritten (helper first,
+  ctrl+alt+v flip, multiply via alt h v s). CACHE v161 → v162.

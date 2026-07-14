@@ -134,9 +134,12 @@ const ALTS = [
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
     ]` },
-  { key: 'transpose', name: 'transpose via the H V S dialog route', moves: `C => { const o=C._o; return [
+  { key: 'transpose', name: 'helper staged FIRST, ctrl+alt+v flip, multiply via alt h v s', moves: `C => { const o=C._o; return [
+      {sel:o.helper, keys:[...T('-1'),{key:'Enter'}]},
       {sel:o.src, keys:[{key:'c',ctrl:true}]},
-      {sel:o.dst, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('e'),{key:'Enter'}]},
+      {sel:o.dst, keys:[{key:'v',ctrl:true,alt:true},L('e'),{key:'Enter'}]},
+      {sel:o.helper, keys:[{key:'c',ctrl:true}]},
+      {sel:o.capexRng, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('m'),{key:'Enter'}]},
     ]; }` },
   { key: 'format', name: 'reversed order + ribbon percent + ALT O E for multiple/date', moves: `C => { const o=C._o; return [
       {sel:o.date, keys:[{key:'Alt'},L('o'),L('e'),L('d')]},
