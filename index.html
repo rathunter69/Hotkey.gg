@@ -6480,109 +6480,84 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation tour', par:30, parKeys:12,
-    aha:'every move has a chord \u2014 analysts travel in jumps, never one cell at a time',
-    prompt:'The full obstacle course — twelve chords, in order. Lap the edges with all four Ctrl-arrows, select to the edges with Ctrl+Shift, grab full rows and columns, insert and delete rows, and land back home. This is how analysts move: never one cell at a time.',
-    req:'<em>ctrl+home</em> &rarr; <em>ctrl+&rarr;</em> &rarr; <em>ctrl+&darr;</em> &rarr; <em>ctrl+&larr;</em> &rarr; <em>ctrl+&uarr;</em> &rarr; <em>ctrl+shift+&rarr;</em> &rarr; <em>ctrl+shift+&darr;</em> &rarr; <em>shift+space</em> &rarr; <em>ctrl+shift+=</em> &rarr; <em>ctrl+&minus;</em> &rarr; <em>ctrl+space</em> &rarr; <em>ctrl+home</em>',
+    name:'Navigate', label:'Navigation tour', par:38, parKeys:11,
+    aha:'the keyboard teleports corner to corner — then one chord fills a whole row you would have dragged',
+    prompt:'The mouse crawls; the keyboard teleports. Lap this model corner to corner — Ctrl+Home to the top-left, Ctrl+End to the far corner, and the Ctrl-arrows jump edge to edge with zero scrolling. Then the payoff every analyst feels on day one: the EBIT margin is only filled for the first year. Select the row and Ctrl+R spreads the formula across all four years in a single keystroke — no dragging the little handle. Land back at A1.',
+    req:'<em>ctrl+home</em> → <em>ctrl+end</em> → <em>ctrl+←</em> → <em>ctrl+↑</em> → <em>ctrl+→</em> → <em>ctrl+↓</em> · fill the margin row <em>B7:E7</em> → <em>ctrl+r</em> · <em>ctrl+home</em>',
     guide:[
-      '<kbd>ctrl</kbd>+<kbd>home</kbd> — snap to A1',
-      '<kbd>ctrl</kbd>+<kbd>&rarr;</kbd> — jump to the end of the header row',
-      '<kbd>ctrl</kbd>+<kbd>&darr;</kbd> — dive to the bottom of the column',
-      '<kbd>ctrl</kbd>+<kbd>&larr;</kbd> — jump back to the start of the row',
-      '<kbd>ctrl</kbd>+<kbd>&uarr;</kbd> — climb back to the top',
-      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&rarr;</kbd> — select across the header',
-      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>&darr;</kbd> — extend down: whole table selected',
-      '<kbd>shift</kbd>+<kbd>space</kbd> — blow the selection out to full rows',
-      '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>=</kbd> — insert rows above',
-      '<kbd>ctrl</kbd>+<kbd>&minus;</kbd> — delete them again',
-      '<kbd>ctrl</kbd>+<kbd>space</kbd> — grab the entire column',
-      '<kbd>ctrl</kbd>+<kbd>home</kbd> — finish where you started',
+      '<kbd>ctrl</kbd>+<kbd>home</kbd> — snap to the top-left corner, A1',
+      '<kbd>ctrl</kbd>+<kbd>end</kbd> — teleport straight to the bottom-right corner of the data',
+      '<kbd>ctrl</kbd>+<kbd>←</kbd> — jump to the start of the row',
+      '<kbd>ctrl</kbd>+<kbd>↑</kbd> — jump back to the top',
+      '<kbd>ctrl</kbd>+<kbd>→</kbd> — jump to the end of the header row',
+      '<kbd>ctrl</kbd>+<kbd>↓</kbd> — dive to the bottom of the column',
+      'the margin is only done for FY1: select <b>B7</b> across to <b>E7</b> (<kbd>⇧</kbd>+<kbd>→</kbd> walks the selection) · <kbd>ctrl</kbd>+<kbd>r</kbd> — the formula fills every year in ONE keystroke',
+      '<kbd>ctrl</kbd>+<kbd>home</kbd> — finish at A1, the margin line complete',
     ],
-    targets:['A1','E1','E7','A7','A1','A1:E1','A1:E7','A1:J7','A1:J7','A1:J7','A1:A7','A1'],
+    targets:['A1','E7','A7','A1','E1','E6','B7:E7','A1'],
     demo(){ return [
       {sel:'C4',    keys:[Kb.ctrlHome]},
-      {sel:'A1',    keys:[Kb.ctrlRight]},
-      {sel:'E1',    keys:[Kb.ctrlDown]},
+      {sel:'A1',    keys:[Kb.ctrlEnd]},
       {sel:'E7',    keys:[Kb.ctrlLeft]},
       {sel:'A7',    keys:[{key:'ArrowUp', ctrl:true}]},
-      {sel:'A1',    keys:[{key:'ArrowRight', ctrl:true, shift:true}]},
-      {sel:'A1:E1', keys:[{key:'ArrowDown',  ctrl:true, shift:true}]},
-      {sel:'A1:E7', keys:[{key:' ',    shift:true}]},
-      {sel:'A1:J7', keys:[{key:'=',    ctrl:true, shift:true}]},
-      {sel:'A1:J7', keys:[{key:'-',    ctrl:true}]},
-      {sel:'A1:J7', keys:[{key:' ',    ctrl:true}]},
-      {sel:'A1:A7', keys:[Kb.ctrlHome]},
+      {sel:'A1',    keys:[Kb.ctrlRight]},
+      {sel:'E1',    keys:[Kb.ctrlDown]},
+      {sel:'B7',    keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR]},
+      {sel:'A1',    keys:[Kb.ctrlHome]},
     ]; },
     build(){
-      // 7×5 income statement; cursor starts mid-grid so plain arrows would be slow —
-      // the chord tour laps the whole thing in twelve presses. r201: the board ships
-      // pre-dressed to the banker's-workbook bar (§2.1b) — a nav drill, so the player
-      // never formats it, but the tour should lap a page that already looks real.
+      // r203 (Wolf): the FLAGSHIP intro — movement first (teleport corner to corner with
+      // Ctrl+Home/End + the Ctrl-arrows), then ONE productivity payoff: fill the EBIT-margin
+      // formula across a whole row with Ctrl+R (the "mouse takes 10s, keyboard takes 1"
+      // moment). No insert, no typing — that structural work is rowops, two drills on.
+      // Board pre-dressed to the banker's-workbook bar (§2.1b); only the margin awaits its fill.
       const cells={};
       const y0=rnd(23,26);
-      cells['A1']={...blankCell(),value:codename(),txt:true,bold:true,bb:true};   // corner + the header rule runs under it
-      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true});
-      const rows=[['Revenue',1],['COGS',-1],['SG&A',-1],['Opex',-1],['D&A',-1]];
-      rows.forEach(([lbl,sign],i)=>{ const r=i+2;
-        cells['A'+r]={...blankCell(),value:lbl,txt:true};
-        for(let c=2;c<=5;c++) cells[colLetter(c)+r]={...blankCell(),value:(lbl==='Revenue'?rnd(130,200)*5:-rnd(40,140)),fmtStyle:'comma',decimals:0,fontColor:'blue'};
-      });
-      // EBIT — the ruled subtotal: bold, top border, computed so the page ties
-      cells['A7']={...blankCell(),value:'EBIT',txt:true,bold:true};
-      for(let c=2;c<=5;c++){ let s=0; for(let r=2;r<=6;r++) s+=cells[colLetter(c)+r].value;
-        cells[colLetter(c)+7]={...blankCell(),value:s,fmtStyle:'comma',decimals:0,bold:true,bt:true}; }
-      return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:110,2:74,3:74,4:74,5:74}};
+      cells['A1']={...blankCell(),value:codename(),txt:true,bold:true,bb:true};
+      for(let i=0;i<4;i++) cells[colLetter(2+i)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true};
+      cells['A2']={...blankCell(),value:'Revenue',txt:true};
+      cells['A3']={...blankCell(),value:'COGS',txt:true};
+      cells['A4']={...blankCell(),value:'Gross profit',txt:true,bold:true};
+      cells['A5']={...blankCell(),value:'Operating expenses',txt:true};
+      cells['A6']={...blankCell(),value:'EBIT',txt:true,bold:true};
+      cells['A7']={...blankCell(),value:'EBIT margin',txt:true};
+      for(let c=2;c<=5;c++){ const L=colLetter(c);
+        const rev=rnd(140,200)*5, cogs=-rnd(60,110), opex=-rnd(30,70);
+        cells[L+'2']={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[L+'3']={...blankCell(),value:cogs,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[L+'4']={...blankCell(),formula:'='+L+'2+'+L+'3',value:rev+cogs,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        cells[L+'5']={...blankCell(),value:opex,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[L+'6']={...blankCell(),formula:'='+L+'4+'+L+'5',value:rev+cogs+opex,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      }
+      cells['B7']={...blankCell(),formula:'=B6/B2',value:cells['B6'].value/cells['B2'].value,fmtStyle:'percent',decimals:1};   // FY1 only — C7:E7 await the fill
+      this._mExp={};
+      for(let c=3;c<=5;c++){ const L=colLetter(c); this._mExp[L]=cells[L+'6'].value/cells[L+'2'].value; }
+      return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:132,2:74,3:74,4:74,5:74}};
     },
-    // Sequential progression: each step latches once, and only after the previous one has.
-    // Out-of-order presses don't satisfy later checks. ROWS snapshot lets insert/delete compare.
+    // Movement latches sequentially (Ctrl+Home → End → the arrows); the fill is graded on
+    // the END STATE so the payoff can be reached any legitimate way.
     checks(S){
-      if(!S.navProgress) S.navProgress = {
-        home:false, right:false, down:false, left:false, up:false,
-        selRow:false, selAll:false, rowSel:false, rowIns:false, rowDel:false,
-        colSel:false, finish:false
-      };
+      if(!S.navProgress) S.navProgress = { home:false, end:false, left:false, up:false, right:false, down:false };
       const np = S.navProgress;
-      const selBounds = ()=>{ if(!S.sel) return null;
-        return { r1:Math.min(S.active.r,S.sel.r), r2:Math.max(S.active.r,S.sel.r),
-                 c1:Math.min(S.active.c,S.sel.c), c2:Math.max(S.active.c,S.sel.c) }; };
-      if(!np.home   && S.active.r===1 && S.active.c===1 && !S.sel) np.home  = true;
-      if( np.home   && !np.right && S.active.r===1 && S.active.c===5) np.right = true;
-      if( np.right  && !np.down  && S.active.r===7 && S.active.c===5) np.down  = true;
-      if( np.down   && !np.left  && S.active.r===7 && S.active.c===1) np.left  = true;
-      if( np.left   && !np.up    && S.active.r===1 && S.active.c===1 && !S.sel) np.up = true;
-      // Step 6: Ctrl+Shift+→ from A1 — header row A1:E1 selected
-      if(np.up && !np.selRow){ const b=selBounds();
-        if(b && b.r1===1 && b.r2===1 && b.c1===1 && b.c2===5) np.selRow = true; }
-      // Step 7: Ctrl+Shift+↓ — extend to the whole table A1:E7
-      if(np.selRow && !np.selAll){ const b=selBounds();
-        if(b && b.r1===1 && b.r2===7 && b.c1===1 && b.c2===5) np.selAll = true; }
-      // Step 8: Shift+Space — full rows (1..7 across every column)
-      if(np.selAll && !np.rowSel){ const b=selBounds();
-        if(b && b.r1===1 && b.r2===7 && b.c1===1 && b.c2===COLS) np.rowSel = true; }
-      // Steps 9/10 latch on the ACTION alone (insert/delete handlers set S.lastRowOp; undo/redo
-      // clear it, so undo can't fake a step). r101: the old S.ROWS comparisons are gone —
-      // the stable-viewport rule means the row count never changes, only cells shift.
-      if(np.rowSel && !np.rowIns && S.lastRowOp==='ins') np.rowIns = true;
-      if(np.rowIns && !np.rowDel && S.lastRowOp==='del') np.rowDel = true;
-      // Step 11: Ctrl+Space — a full column (single column, top to bottom; guards against
-      // the leftover full-row selection from the delete step auto-satisfying this).
-      if(np.rowDel && !np.colSel){ const b=selBounds();
-        if(b && b.c1===b.c2 && b.r1===1 && b.r2>=7) np.colSel = true; }
-      // Step 12: Ctrl+Home — land back on A1, selection collapsed.
-      if(np.colSel && !np.finish && S.active.r===1 && S.active.c===1 && !S.sel) np.finish = true;
+      const a=(r,c)=> S.active.r===r && S.active.c===c && !S.sel;
+      if(!np.home && a(1,1)) np.home = true;
+      if( np.home && !np.end  && a(7,5)) np.end  = true;
+      if( np.end  && !np.left && a(7,1)) np.left = true;
+      if( np.left && !np.up   && a(1,1)) np.up   = true;
+      if( np.up   && !np.right&& a(1,5)) np.right= true;
+      if( np.right&& !np.down && a(6,5)) np.down = true;
+      const cel=k=>S.cells[k]||{};
+      const fillOk = ['C','D','E'].every(c=>{ const x=cel(c+'7');
+        return !!(x.formula && typeof x.value==='number' && Math.abs(x.value-this._mExp[c])<1e-6); });
       return [
-        {label:'Ctrl+Home \u2192 A1',                                  ok: np.home},
-        {label:'Ctrl+\u2192 to the end of the header row',             ok: np.right},
-        {label:'Ctrl+\u2193 to the bottom of the column',              ok: np.down},
-        {label:'Ctrl+\u2190 back to the start of the row',             ok: np.left},
-        {label:'Ctrl+\u2191 back to the top',                          ok: np.up},
-        {label:'Ctrl+Shift+\u2192 \u2192 select across the header',    ok: np.selRow},
-        {label:'Ctrl+Shift+\u2193 \u2192 select the whole table',      ok: np.selAll},
-        {label:'Shift+Space \u2192 full rows, edge to edge',           ok: np.rowSel},
-        {label:'Ctrl and the + key \u2192 insert rows (numpad + or Shift+=)', ok: np.rowIns},
-        {label:'Ctrl+\u2212 \u2192 delete the inserted rows',          ok: np.rowDel},
-        {label:'Ctrl+Space \u2192 grab the entire column',             ok: np.colSel},
-        {label:'Ctrl+Home \u2192 finish where you started',            ok: np.finish},
+        {label:'Ctrl+Home → A1, the top-left corner',                 ok: np.home},
+        {label:'Ctrl+End → the bottom-right corner in one press',     ok: np.end},
+        {label:'Ctrl+← to the start of the row',                      ok: np.left},
+        {label:'Ctrl+↑ back to the top',                              ok: np.up},
+        {label:'Ctrl+→ to the end of the header row',                 ok: np.right},
+        {label:'Ctrl+↓ to the bottom of the column',                  ok: np.down},
+        {label:'fill the EBIT margin across — select B7:E7, Ctrl+R spreads the formula to every year', ok: fillOk},
+        {label:'finish at A1 — Ctrl+Home',                            ok: np.down && fillOk && a(1,1)},
       ];
     }
   }

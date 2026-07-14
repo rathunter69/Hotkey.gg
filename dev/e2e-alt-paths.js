@@ -657,19 +657,15 @@ const ALTS = [
       {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
       {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
     ]; }` },
-  { key: 'navigation', name: 'same tour, ribbon rows — alt h i r / alt h d r for the insert and delete legs', moves: `C => [
+  { key: 'navigation', name: 'same tour, ribbon fill (alt h f i r) instead of ctrl+r for the margin', moves: `C => [
       {sel:'C4',    keys:[{key:'Home',ctrl:true}]},
-      {sel:'A1',    keys:[{key:'ArrowRight',ctrl:true}]},
-      {sel:'E1',    keys:[{key:'ArrowDown',ctrl:true}]},
+      {sel:'A1',    keys:[{key:'End',ctrl:true}]},
       {sel:'E7',    keys:[{key:'ArrowLeft',ctrl:true}]},
       {sel:'A7',    keys:[{key:'ArrowUp',ctrl:true}]},
-      {sel:'A1',    keys:[{key:'ArrowRight',ctrl:true,shift:true}]},
-      {sel:'A1:E1', keys:[{key:'ArrowDown',ctrl:true,shift:true}]},
-      {sel:'A1:E7', keys:[{key:' ',shift:true}]},
-      {sel:'A1:J7', keys:[{key:'Alt'},L('h'),L('i'),L('r')]},
-      {sel:'A1:J7', keys:[{key:'Alt'},L('h'),L('d'),L('r')]},
-      {sel:'A1:J7', keys:[{key:' ',ctrl:true}]},
-      {sel:'A1:A7', keys:[{key:'Home',ctrl:true}]},
+      {sel:'A1',    keys:[{key:'ArrowRight',ctrl:true}]},
+      {sel:'E1',    keys:[{key:'ArrowDown',ctrl:true}]},
+      {sel:'B7:E7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'A1',    keys:[{key:'Home',ctrl:true}]},
     ]` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
