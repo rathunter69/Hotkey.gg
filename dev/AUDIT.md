@@ -5168,3 +5168,19 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - TOUR: new step spotlighting #navThemes ("make it yours") between the trainer
   and the ladder steps. Onboard audit ALL 28 PASS (walks steps dynamically).
 - themes.js + nav.js shared-asset ?v 172->173.
+
+## r215 — campaign progression front-and-center: progress, wider menu, xp bounties (Wolf)
+- Wolf: show campaign progress more clearly; the menu was too skinny; and each
+  gate should pay a ONE-TIME xp reward (on top of the medal) so the campaign
+  reads as the progression spine and funnels toward PRO.
+- XP BOUNTIES: HOTKEY_CAMPAIGN chapters gained an `xp` field (150→600, escalating;
+  Models 450 / Full Builds 600 carry the fat ones) + a 500 finisher. New
+  awardCampaignXP() pays each version's bounty ONCE (hk_camp_xp flags), adds it
+  to the local xp estimate driving the level chip, and celebrates. Hooked right
+  after every PB save (the only moment a new drill can ship a version).
+- MODAL redesign: widened 520→680px; a progress header (versions shipped X/8,
+  a drills-cleared bar, campaign-xp earned/total), per-version xp chips
+  (claimed=green ✓ / unclaimed=warn / locked=faint) + a per-version progress
+  bar, and a PRO funnel line pointing at the Models/Full-Builds bounties.
+- GATE: syntax clean; demo-replay ALL GREEN (award hook is a try/catch no-op
+  during single-drill replays). drills.js shared-asset ?v 173->174.
