@@ -8,10 +8,12 @@ IS DONE (r196): the Supabase live smoke re-ran 65/65 first-try** — the whole
 desks/assignments/school-tags backend is verified healthy in prod, and the
 SEEDED DESK CODES ARE CLEARED FOR DISTRIBUTION (dev/SMOKE_REPORT.md).
 What remains, and what unblocks it:
-1. **T-G CANON REMAINDER** (partially unblocked — macabacus.com and WSP fetch
-   200 from cloud sessions now; WSO still 403): verify the [canon]-tagged
-   CANON_DIFF rows + HOTKEY_PLUGIN_LAYERS Macabacus/FactSet defaults against
-   the live sheets.
+1. **T-G CANON REMAINDER — MACABACUS DONE r197** (the CFI×Macabacus cheat-sheet
+   PDF verified via curl+Read; WebFetch/WSP 403 under Cloudflare but the PDF is
+   static). Found + fixed a systematic phantom-Alt error in our Macabacus number/
+   border/color cycles (display + engine bindings) — see AUDIT r197 / CANON_DIFF.
+   REMAINING: the **FactSet** table is still unverified (no authoritative FactSet
+   hot-key sheet reachable this pass) — do it when a FactSet source is fetchable.
 2. **WOLF DECISIONS**: T-H interview mode (dev/INTERVIEW.md awaits sign-off;
    a plain "go" starts the build) · T-I seasons (gated on DAU per STRATEGY) ·
    pilot playbook (pick 2-3 clubs — events/report/programs all exist, and the

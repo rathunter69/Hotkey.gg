@@ -6,6 +6,39 @@ every claim below is tagged [live] (surfaced in a July-2026 search summary) or
 future session with full egress should verify the [canon] rows and the plugin
 default tables in HOTKEY_PLUGIN_LAYERS against the current cheat sheets.)*
 
+## ✅ VERIFICATION PASS — r197 (2026-07-14, T-G remainder)
+Egress reached the authoritative **CFI×Macabacus "Excel + Macabacus Shortcuts"
+cheat sheet PDF** (macabacus.com/assets/2023/01/Macabacus-Shortcuts-Cheatsheet.pdf)
+and the WSP shortcut page. Findings:
+- **PLUGIN TABLE HAD SYSTEMATIC ERRORS (fixed r197).** Our Macabacus number/
+  border/color CYCLES were over-modified with a phantom Alt. The real defaults
+  piggyback on the native Excel format chords: General Number **Ctrl+Shift+1**
+  (was Ctrl+Alt+Shift+1), Local Currency **Ctrl+Shift+4**, Percent
+  **Ctrl+Shift+5**, Multiple **Ctrl+Shift+8**, Increase/Decrease Decimals
+  **Ctrl+,** / **Ctrl+.** (was Ctrl+Alt+Shift+./,), Center Cycle
+  **Ctrl+Shift+C**, Outside Border **Ctrl+Shift+7**, Bottom Border
+  **Ctrl+Shift+Down**, Blue-Black toggle **Ctrl+Shift+;** (a Colors item, not
+  Fonts), AutoColor Workbook **Ctrl+Alt+Q** (was Ctrl+Alt+W). CORRECT already:
+  Fast Fill Right/Down (Ctrl+Shift+R/D), AutoColor Selection/Sheet (Ctrl+Alt+A/S),
+  Date Cycle (Ctrl+Alt+Shift+2), Underline Cycle (Ctrl+Alt+Shift+U), Pro
+  Precedents/Dependents (Ctrl+Shift+[ / ]), gridlines/zoom (Ctrl+Alt+G/=/-).
+- **ENGINE MISEDUCATION (fixed r197).** index.html bound the macabacus profile's
+  number formats to the phantom Ctrl+Alt+Shift+1/4/5 (classic play + 5 rapid-
+  fire matchers). Removed — the real chords (Ctrl+Shift+1/4/5) already work via
+  the native un-gated format handlers, so macabacus users now train the true
+  muscle memory. Verified live: Ctrl+Shift+1/4/5 → comma/currency/percent,
+  phantom no longer fires, zero page errors.
+- **[canon] Trace precedents Ctrl+[ / Ctrl+] → VERIFIED** (native Excel, cheat
+  sheet p.1: "Go to precedent cell = Ctrl+["). Our wirewalk (r173) is correct.
+- **[canon] Go To Special = F5 then Alt+S → VERIFIED** (cheat sheet footnote
+  "Starts with F5 not Ctrl"). Our hunt drill (r182) is correct.
+- **[live] grouping Alt+Shift+→/← + trace-precedents Alt M P → VERIFIED** (WSP).
+- **[canon] VLOOKUP** characterization (legacy, still interview-tested) stands.
+- **FactSet table: NOT re-verified this pass** — no authoritative FactSet sheet
+  fetched (their hot-key PDF wasn't reachable). Flagged for a future FactSet
+  egress pass; the fills (Ctrl+Alt+Shift+K/J/D/U) + AutoColor (Ctrl+Alt+E) are
+  the engine-backed ones and match the r122 research at the summary level.
+
 ## Sources consulted (search layer)
 Wall Street Prep shortcuts + center-across-selection; Macabacus features/blog
 (shortcuts, grouping, hidden-row removal); WSO forum threads + "never hide,

@@ -1,8 +1,41 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Refreshed 2026-07-12 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+_Refreshed 2026-07-14 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
 New sessions: the repo IS the handover — read this file, dev/AUDIT.md (newest round
 at the bottom), and the dev/ design docs. No manual doc upload needed when the
 session has the GitHub integration (repo clones automatically)._
+
+## SESSION HANDOVER SNAPSHOT (2026-07-14, rounds r188-r196)
+- **79 DRILLS, parity 94, alts 80, cache v165.** Gate green at every push.
+- **WOLF PLAYTEST ROUND 3 COMPLETE (r190-r195)** — live-feedback arc, engine
+  + content: r190 ghost toggle + real footnote chord (Alt+E superscript) +
+  (paren) negatives on comma/currency; r191 Paste Special floating card w/
+  real Operations (Multiply/Add/Divide — the copied −1 sign-flip is a
+  mechanic now); r192 Sort Warning dialog + both Alt+= forms (range-fill
+  commits in place, single-cell proposal stays on the cell); **r193 ENGINE
+  PACK 3** (italic Ctrl+I, strikethrough Ctrl+5, TODAY(), Alt H B O selection
+  PERIMETER border, paste-op Divide) + the Ctrl+B/I/5 mixed-selection parity
+  fix (toggleAllOrNone); r194 Tranche B (pastes/copyover/editfix rebuilt to
+  CHAIN — dialog ops, three paste KINDS, F2 across text/number/ref); r195
+  Tranche C (polish/format rebuilt per-row, dress v5 boxes the output table
+  w/ the perimeter op, game-wide costs-carry-sign (parens) sweep).
+- **r196 — THE EGRESS MILESTONE DONE.** Live Supabase smoke re-ran **65/65
+  first try, zero fixes** — whole desks/assignments/school-tags backend
+  verified healthy in prod. Procedure: re-stamp the consumed smoke-u fixture
+  under a NEW timestamp (migration 20260714000000; `db push` is STATEFUL),
+  deploy, run dev/smoke-live.mjs. **SEED DESK CODES CLEARED FOR
+  DISTRIBUTION** — pilot playbook now blocks only on Wolf picking clubs.
+- **PARALLEL-SESSION RULE (learned live r194/r195):** two Claude sessions ran
+  the same round-3 queue simultaneously; the twin's r194/r195 reached main
+  first, this session's independent builds yielded (fetch-first caught both).
+  FETCH BEFORE EVERY ROUND-CLOSE; the slower twin yields + repurposes.
+- **NEXT (executable, no Wolf needed):** T-G canon remainder — macabacus.com
+  and WSP fetch 200 from cloud sessions now (WSO still 403); verify the
+  [canon]-tagged dev/CANON_DIFF.md rows + HOTKEY_PLUGIN_LAYERS Macabacus/
+  FactSet defaults against the live sheets. **Wolf-gated:** T-H interview mode
+  (dev/INTERVIEW.md awaits a "go"), T-I seasons (DAU-gated), pilot club picks,
+  credential rotation (SMOKE_REPORT "Outstanding" #2).
+- dev/PIPELINE.md ⚡ header is the live queue; dev/AUDIT.md r190-r196 is the
+  detail. THIS handover snapshot supersedes the older ones below on conflict.
 
 ## ✅ r131-r132 RESOLVED — BACKEND DEPLOYED + LIVE-VERIFIED (65/65 smoke)
 r131 found the supabase-deploy Action had failed on EVERY run since

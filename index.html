@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=165" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=165">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=165">
+<link rel="icon" href="favicon.ico?v=166" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=166">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=166">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1143,14 +1143,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=165"></script>
-<link rel="stylesheet" href="nav.css?v=165">
-<script src="themes.js?v=165"></script>
+<script src="drills.js?v=166"></script>
+<link rel="stylesheet" href="nav.css?v=166">
+<script src="themes.js?v=166"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=165"></script>
+<script src="nav.js?v=166"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -7849,10 +7849,12 @@ function fillFrom(dir){ // 'down' | 'up' | 'right' | 'left'
 
 /* ============================================================
    KEYBOARD PROFILES — native Excel / Macabacus / FactSet.
-   Verified default bindings only (macabacus.com cheatsheet + FactSet hot-keys PDF):
+   Verified against the CFI×Macabacus cheat sheet (r197 T-G egress pass):
      Macabacus:  Ctrl+Shift+R Fast Fill Right (smart extent) · Ctrl+Shift+L Fast Fill Left
                  Ctrl+Alt+A AutoColor selection · Ctrl+Alt+S AutoColor sheet
-     FactSet:    Ctrl+Alt+Shift+K/J/D/U — FDS Fill Right/Left/Down/Up
+                 number cycles = Ctrl+Shift+1/4/5 (SAME keys as native format chords
+                 — handled below un-gated, not a separate Macabacus binding)
+     FactSet:    Ctrl+Alt+Shift+K/J/D/U — FDS Fill Right/Left/Down/Up (not re-verified r197)
    Native chords keep working in every profile (true on the desk too).
    ============================================================ */
 let keyProfile='native';
@@ -9164,9 +9166,11 @@ document.addEventListener('keydown',e=>{
     // ---- keyboard-profile chords (checked first; native chords still work below) ----
     if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+R'); smartFill('right'); return; }
     if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+D'); fillFrom('down'); render(); return; }
-    if(keyProfile==='macabacus' && e.altKey && e.shiftKey && (e.key==='1'||e.key==='!')){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+1'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
-    if(keyProfile==='macabacus' && e.altKey && e.shiftKey && (e.key==='4'||e.key==='$')){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+4'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
-    if(keyProfile==='macabacus' && e.altKey && e.shiftKey && (e.key==='5'||e.key==='%')){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+Shift+5'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=1;}); commitAction(); return; }
+    /* r197 (T-G canon verify): Macabacus number cycles are Ctrl+Shift+1/4/5 — the
+       SAME keys as native Excel's format chords (that's the whole design). Those
+       are handled un-gated below (Ctrl+Shift+!/$/%). The old Ctrl+Alt+Shift+1/4/5
+       bindings here were phantom — no such Macabacus default — and taught wrong
+       muscle memory; removed after checking the CFI×Macabacus cheat sheet. */
     if(keyProfile==='factset' && e.altKey && !e.shiftKey && lk==='e'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+E'); autoColor('sel'); return; }
     if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='l'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+L'); smartFill('left'); return; }
     if(!e.altKey && e.shiftKey && lk==='l'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+L'); pushUndo(); toggleFilter(); commitAction(); return; }   // r180: native AutoFilter toggle (the Macabacus profile claims this chord above for fill-left)
@@ -9552,12 +9556,14 @@ const RF_OPS = [
     instr: ()=>'It\u2019s a hardcode \u2014 blue the font',
     show: c=>({text:c.text}), solved: c=>({text:c.text, color:'#3b6fd4'}) },
   { op:'num_comma', label:'Comma format', keys:['Alt','H','K'], matchSeq: RFM.altSeq(['h','k']),
-    match: e=> keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='1'||e.key==='!'),   // r143 CAS+1
+    /* r197: the plugin alias (Macabacus General Number Cycle) is Ctrl+Shift+1 = the
+       native comma chord — already carried by the 'comma' op below; no phantom here. */
     make: ()=> { const v=rnd(48,980)*1000; return {text:String(v), fmt:v.toLocaleString('en-US')}; },
     instr: ()=>'Raw thousands \u2014 comma format it',
     show: c=>({text:c.text}), solved: c=>({text:c.fmt}) },
   { op:'num_pct', label:'Percent format', keys:['Alt','H','P'], matchSeq: RFM.altSeq(['h','p']),
-    match: e=> keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='5'||e.key==='%'),   // r143 CAS+5
+    /* r197: Macabacus Percent Cycle is Ctrl+Shift+5 = the native percent chord —
+       carried by the 'percent' op below; no phantom Ctrl+Alt+Shift here. */
     make: ()=> { const p=rnd(4,96); return {text:'0.'+String(p).padStart(2,'0'), fmt:p+'%'}; },
     instr: ()=>'It\u2019s a rate \u2014 percent format',
     show: c=>({text:c.text}), solved: c=>({text:c.fmt}) },
@@ -9597,17 +9603,17 @@ const RF_OPS = [
     solved: c=>({text:c.text, strike:true}) },
 
   // — NUMBER FORMATTING —
-  { op:'currency', label:'Currency', keys:['Ctrl','Shift','$'], match: e=> RFM.ctrlShift('$','4')(e) || (keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='4'||e.key==='$')),
+  { op:'currency', label:'Currency', keys:['Ctrl','Shift','$'], match: RFM.ctrlShift('$','4'),   // r197: = Macabacus Local Currency Cycle (Ctrl+Shift+4)
     make: ()=> ({num:rfBig()}),
     instr: ()=>'Format as currency',
     show: c=>({text:String(c.num)}),
     solved: c=>({text:'$'+c.num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}) },
-  { op:'percent', label:'Percent', keys:['Ctrl','Shift','%'], match: e=> RFM.ctrlShift('%','5')(e) || (keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='5'||e.key==='%')),
+  { op:'percent', label:'Percent', keys:['Ctrl','Shift','%'], match: RFM.ctrlShift('%','5'),   // r197: = Macabacus Percent Cycle (Ctrl+Shift+5)
     make: ()=> ({num:rfRatio()}),
     instr: ()=>'Format as percent',
     show: c=>({text:String(c.num)}),
     solved: c=>({text:(c.num*100).toFixed(1)+'%'}) },
-  { op:'comma', label:'Comma', keys:['Ctrl','Shift','!'], match: e=> RFM.ctrlShift('!','1')(e) || (keyProfile==='macabacus'&&e.ctrlKey&&e.altKey&&e.shiftKey&&(e.key==='1'||e.key==='!')),
+  { op:'comma', label:'Comma', keys:['Ctrl','Shift','!'], match: RFM.ctrlShift('!','1'),   // r197: = Macabacus General Number Cycle (Ctrl+Shift+1)
     make: ()=> ({num:rfBig()}),
     instr: ()=>'Comma-format the number',
     show: c=>({text:String(c.num)}),
