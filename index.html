@@ -657,6 +657,47 @@
   .mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
   .mb-tool kbd{font-family:var(--mono); background:var(--surface2); border:1px solid var(--line);
     border-radius:3px; padding:0 4px; font-size:10px; margin-right:4px; color:inherit}
+  /* r219 (Wolf): the Daily Challenge is the marquee mode — its chip carries the accent
+     so it reads as the front door, and a soft pulse when today's sitting is unplayed. */
+  .mb-tool.mb-daily{color:var(--accent); font-weight:700; border-color:var(--accent-dim);
+    background:var(--accent-glow); letter-spacing:.02em}
+  .mb-tool.mb-daily:hover{color:var(--accent); border-color:var(--accent)}
+  .mb-tool.mb-daily.undone{animation:dcpulse 2.4s ease-in-out infinite}
+  @keyframes dcpulse{0%,100%{box-shadow:0 0 0 0 var(--accent-glow)}50%{box-shadow:0 0 0 4px var(--accent-glow)}}
+  .mb-tool.mb-daily.done::after{content:' ✓'; opacity:.85}
+  /* Daily Challenge hero modal */
+  .dc-card{max-width:640px; width:94vw; text-align:left; position:relative}
+  .dc-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .dc-badge{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--accent); border:1px solid var(--accent-dim); background:var(--accent-glow); padding:2px 8px; border-radius:20px}
+  .dc-count{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .dc-count b{color:var(--text); font-variant-numeric:tabular-nums}
+  .dc-today{display:flex; align-items:baseline; gap:10px; margin:14px 0 4px}
+  .dc-today .nm{font-size:19px; font-weight:800; color:var(--text)}
+  .dc-today .tag{font-family:var(--mono); font-size:10.5px; color:var(--warn); border:1px solid var(--warn);
+    border-radius:4px; padding:1px 6px; opacity:.9}
+  .dc-sub{color:var(--muted); font-size:12.5px; line-height:1.7; margin-bottom:12px}
+  .dc-stats{display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap}
+  .dc-stat{flex:1 1 0; min-width:120px; background:var(--surface2); border:1px solid var(--line);
+    border-radius:9px; padding:10px 12px}
+  .dc-stat .k{font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint)}
+  .dc-stat .v{font-size:17px; font-weight:800; color:var(--text); margin-top:3px; font-variant-numeric:tabular-nums}
+  .dc-board{border:1px solid var(--line); border-radius:9px; overflow:hidden; margin-bottom:6px}
+  .dc-board .hd{display:flex; justify-content:space-between; align-items:center; padding:8px 12px;
+    background:var(--surface2); font-family:var(--mono); font-size:10.5px; letter-spacing:.05em;
+    text-transform:uppercase; color:var(--muted)}
+  .dc-row{display:flex; align-items:center; gap:10px; padding:7px 12px; border-top:1px solid var(--line); font-size:13px}
+  .dc-row .rk{width:26px; font-family:var(--mono); color:var(--faint); font-variant-numeric:tabular-nums}
+  .dc-row .nm{flex:1; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .dc-row .tm{font-family:var(--mono); color:var(--muted); font-variant-numeric:tabular-nums}
+  .dc-row.me{background:var(--accent-glow)} .dc-row.me .nm{color:var(--accent); font-weight:700}
+  .dc-row.gold .rk{color:#e0b020; font-weight:700} .dc-row.silver .rk{color:#b8b8c0; font-weight:700}
+  .dc-row.bronze .rk{color:#c8804a; font-weight:700}
+  .dc-empty{padding:16px 12px; color:var(--muted); font-size:12.5px; text-align:center; border-top:1px solid var(--line)}
+  .dc-perk{font-size:11.5px; color:var(--muted); margin:8px 2px 0; line-height:1.7}
+  .dc-perk b{color:var(--warn)}
+  .dc-locked{background:var(--surface2); border:1px solid var(--warn); border-radius:9px; padding:12px 14px;
+    margin-bottom:12px; font-size:12.5px; line-height:1.8; color:var(--text)}
 
   /* two-column workspace: grid on the left, checklist rail on the right */
   /* ONE UNIFIED BLOCK (r47): taskline caps it, ribbon + formula bar run as permanent
@@ -1274,6 +1315,7 @@
       <div class="prefs-pop" id="wqPop" style="min-width:300px; flex-direction:column; gap:4px"></div>
       </span>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
+      <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily challenge</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
       <span class="mb-tool" id="proBadge" style="display:none; cursor:default; color:var(--warn); font-weight:700; border-color:var(--warn)"></span>
@@ -1430,6 +1472,18 @@ function dailyDateStr(){ return new Date().toISOString().slice(0,10); }
 function dailyKey(){ return 'daily-'+dailyDateStr(); }
 function dailySeed(){ const s=dailyDateStr(); let x=0; for(const ch of s) x=(x*31+ch.charCodeAt(0))>>>0; return x; }
 let dailyMode=false;
+// ---- r219 (Wolf): THE DAILY CHALLENGE — one EXTRA-HARD, daily-seeded sitting, the
+// SAME board for everyone worldwide (the NYT-games model), on its own standalone
+// leaderboard. Drawn from the toughest catalog boards; level-gated to enter (PRO
+// skips the gate + unlocks the full board). Distinct seed + board key from the
+// casual morning-sheet daily so the two never collide. ----
+let challengeMode=false;
+const CHALLENGE_POOL=['gauntlet','combo','cascade','threestmt','debtsched','comps','waterfall','sourcesuses','football','retbridge','housestyle','dcfsens','revolver','schedule'];
+const CHALLENGE_MIN_LVL=3;
+function challengeKey(){ return 'challenge-'+dailyDateStr(); }
+function challengeSeed(){ return (dailySeed()^0x9e3779b9)>>>0; }   // deterministic worldwide, distinct from the daily
+function challengeOfDay(){ const pool=CHALLENGE_POOL.filter(k=>(typeof CHALLENGES!=='undefined')&&CHALLENGES[k]);
+  return (pool.length?pool:MENU_ORDER)[challengeSeed()%(pool.length||MENU_ORDER.length)]; }
 // ---- weekly gauntlet: 5 seeded drills, combined time. Runs post per-drill under
 // 'wk-<isoweek>-<drill>'; the leaderboard sums users who completed all five. ----
 let weeklyMode=false, weeklyIdx=0, weeklyList=[];
@@ -7584,6 +7638,7 @@ function checkWin(){
       }catch(e){}
       try{ if(window.hkConfetti) window.hkConfetti($('result')); }catch(e){} } }
   updateStreak();
+  if(challengeMode){ markChallengeDone(); try{ updateChallengeBtn(); }catch(e){} }   // r219: today's sitting is done — flip the marquee chip
   try{ awardCampaignXP(); }catch(e){}   // r215: a new PB may have just shipped a version — pay the one-time bounty
   try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
     KV.set('hotkey_solves', String(nsol)); renderLvl(nsol); }); }catch(e){}
@@ -9512,6 +9567,7 @@ $('randBtn').addEventListener('click',()=>{   // r113 (#33): random drill — va
 });
 { const __wb=$('weeklyBtn'); if(__wb) __wb.addEventListener('click',startWeekly); }   // r81 hotfix: button retired; unguarded listener was a boot TypeError
 $('campaignBtn').addEventListener('click',openCampaign);
+{ const _dcb=$('dailyChallengeBtn'); if(_dcb) _dcb.addEventListener('click',openDailyChallenge); }
 $('startBtn').addEventListener('click', tryEnter);
 { const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); };
   const lb=$('loginBtn'); if(lb) lb.onclick=()=>{ openAuth('signin'); }; }
@@ -10149,6 +10205,8 @@ function applyTheme(name){
   for(const k in t.vars) root.style.setProperty('--' + k, t.vars[k]);
   root.setAttribute('data-dark', t.dark ? '1' : '0');   // drives cell-color visibility overrides
   currentTheme = name;
+  window.currentTheme = name;                                            // r220: keep the shared state in sync so...
+  try{ window.syncThemeLabels && window.syncThemeLabels(); }catch(e){}   // ...the top-bar theme name updates on SELECT, not just on refresh (Wolf)
 }
 async function loadTheme(){
   const saved = await KV.get('hotkey_theme');
@@ -10929,9 +10987,120 @@ function xpEarnFor(key){
 function restartDrill(){
   loadChallenge(cur, {daily:dailyMode, weekly:weeklyMode});   // same drill, same mode; daily/weekly reseed identically
 }
-function scoreKey(){ if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return dailyMode ? dailyKey() : cur; }
+function scoreKey(){ if(challengeMode) return challengeKey(); if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return dailyMode ? dailyKey() : cur; }
 function drillOfDay(){ return MENU_ORDER[dailySeed() % MENU_ORDER.length]; }
 function startDaily(){ loadChallenge(drillOfDay(), {daily:true}); updateDailyBtn(); }
+
+/* ============================================================
+   r219 (Wolf): THE DAILY CHALLENGE — the marquee mode
+   ============================================================ */
+function challengeEligible(){ return isPro() || lvlOf(myXpEst())>=CHALLENGE_MIN_LVL; }
+function challengeDoneToday(){ try{ return localStorage.getItem('hk_dc_done')===challengeKey(); }catch(e){ return false; } }
+function markChallengeDone(){ try{ localStorage.setItem('hk_dc_done', challengeKey()); }catch(e){} }
+function startChallenge(){ if(!challengeEligible()){ openDailyChallenge(); return; }
+  closeDailyChallenge(); loadChallenge(challengeOfDay(), {challenge:true}); try{ ev('dc_start',{d:challengeOfDay()}); }catch(e){} }
+function updateChallengeBtn(){ const b=$('dailyChallengeBtn'); if(!b) return;
+  const done=challengeDoneToday();
+  b.classList.toggle('on', challengeMode);
+  b.classList.toggle('done', done && !challengeMode);
+  b.classList.toggle('undone', !done && challengeEligible() && !challengeMode); }
+
+// countdown to the next drop (local midnight) — kept in a var so the modal can clear it
+let _dcTimer=null;
+function dcCountdownStr(){ const now=new Date(); const nxt=new Date(now); nxt.setHours(24,0,0,0);
+  let s=Math.max(0,Math.floor((nxt-now)/1000)); const h=Math.floor(s/3600); s-=h*3600; const m=Math.floor(s/60); s-=m*60;
+  const p=n=>String(n).padStart(2,'0'); return p(h)+':'+p(m)+':'+p(s); }
+
+// standalone board: pull today's challenge runs (fastest per user, no mouse), decorate with handles
+async function fetchChallengeBoard(){
+  if(!sb) return {rows:null, off:true};
+  try{
+    const {data:runs} = await sb.from('runs').select('user_id,time_ms')
+      .eq('challenge', challengeKey()).eq('mouse_used', false).order('time_ms',{ascending:true});
+    if(!runs) return {rows:[], off:false};
+    const seen={}, best=[]; runs.forEach(r=>{ if(!seen[r.user_id]){ seen[r.user_id]=true; best.push(r); } });
+    let names={};
+    try{ const ids=best.slice(0,50).map(r=>r.user_id);
+      if(ids.length){ const {data:profs}=await sb.from('profiles').select('id,handle').in('id',ids);
+        (profs||[]).forEach(p=>names[p.id]=p.handle); } }catch(e){}
+    return {rows:best.map((r,i)=>({rank:i+1, name:names[r.user_id]||'anon', ms:r.time_ms, me: me_user&&r.user_id===me_user.id})), off:false};
+  }catch(e){ return {rows:null, off:true}; }
+}
+
+function closeDailyChallenge(){ const m=$('dcModal'); if(m){ m.classList.remove('show'); }
+  if(_dcTimer){ clearInterval(_dcTimer); _dcTimer=null; } }
+
+function openDailyChallenge(){
+  const dk=challengeOfDay(), C=CHALLENGES[dk];
+  const label=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.labelOf&&window.HOTKEY_DRILLS.labelOf[dk])||(C&&C.label)||dk;
+  const par=(window.HOTKEY_PARS&&window.HOTKEY_PARS[dk])||(C&&C.par)||null;
+  const elig=challengeEligible(), done=challengeDoneToday(), lvl=lvlOf(myXpEst());
+  let m=$('dcModal');
+  if(!m){ m=document.createElement('div'); m.id='dcModal'; m.className='onboard-modal'; document.body.appendChild(m); }
+  const boardSlot='<div class="dc-board" id="dcBoard"><div class="hd"><span>today’s global field</span><span id="dcYou"></span></div>'+
+      '<div class="dc-empty">loading the field…</div></div>';
+  const gate = elig
+    ? '<button class="ob-key primary" id="dcPlay" style="font-size:14px">'+(done?'↺ play again (practice)':'◆ play today’s challenge')+' →</button>'
+    : '<div class="dc-locked"><b style="color:var(--warn)">○ Locked — reach LVL '+CHALLENGE_MIN_LVL+' to enter</b> <span style="color:var(--muted)">(you’re LVL '+lvl+'). The Daily Challenge is where the field competes head-to-head — keep training to unlock it, or</span></div>'+
+      '<div class="ob-opts" style="display:flex;gap:10px;flex-wrap:wrap"><button class="ob-key primary" id="dcTrain">keep training →</button><button class="ob-key" id="dcPro" style="color:var(--warn)">◆ PRO enters now</button></div>';
+  const perk = elig
+    ? '<div class="dc-perk">Free players see the <b style="color:var(--muted)">top 10</b> · <b>PRO</b> sees the full field, replays the top runs, and gets unlimited practice re-rolls.</div>'
+    : '';
+  m.innerHTML='<div class="ob-card dc-card"><a class="modal-x" id="dcX">×</a>'+
+    '<div class="dc-head"><span class="dc-badge">◆ Daily Challenge</span>'+
+      '<span class="dc-count">next drop in <b id="dcCd">'+dcCountdownStr()+'</b></span></div>'+
+    '<div class="dc-today"><span class="nm">'+escHtml(label)+'</span><span class="tag">extra-hard</span></div>'+
+    '<div class="dc-sub">One sitting. The same board for everyone, everywhere, all day — '+
+      (par?'par is <b>'+par+'s</b>, and the field is racing it right now. ':'')+
+      'Your best time today is what ranks.</div>'+
+    '<div class="dc-stats">'+
+      '<div class="dc-stat"><div class="k">🔥 your streak</div><div class="v">'+(streak.n||0)+' day'+((streak.n||0)===1?'':'s')+'</div></div>'+
+      '<div class="dc-stat"><div class="k">today’s board</div><div class="v" id="dcCount">—</div></div>'+
+      '<div class="dc-stat"><div class="k">your rank</div><div class="v" id="dcRank">—</div></div>'+
+    '</div>'+
+    boardSlot + perk +
+    '<div style="margin-top:14px">'+gate+'</div>'+
+    '</div>';
+  m.classList.add('show');
+  const close=()=>{ closeDailyChallenge(); document.removeEventListener('keydown',__esc,true); };
+  const __esc=(e)=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); } };
+  document.addEventListener('keydown',__esc,true);
+  $('dcX').onclick=close;
+  m.addEventListener('click',e=>{ if(e.target===m) close(); });
+  const play=$('dcPlay'); if(play) play.onclick=()=>{ close(); startChallenge(); };
+  const tr=$('dcTrain'); if(tr) tr.onclick=close;
+  const pro=$('dcPro'); if(pro) pro.onclick=()=>{ close(); if(window.hkProSheet) window.hkProSheet('The Daily Challenge'); };
+  // live countdown
+  if(_dcTimer) clearInterval(_dcTimer);
+  _dcTimer=setInterval(()=>{ const cd=$('dcCd'); if(!cd){ clearInterval(_dcTimer); _dcTimer=null; return; } cd.textContent=dcCountdownStr(); }, 1000);
+  try{ ev('dc_open',{d:dk, elig}); }catch(e){}
+  // fill the standalone board (async, degrades gracefully offline)
+  fetchChallengeBoard().then(res=>{
+    const bd=$('dcBoard'); if(!bd) return;
+    const cnt=$('dcCount'), rk=$('dcRank');
+    if(res.off || res.rows===null){
+      bd.querySelector('.dc-empty').innerHTML = me_user
+        ? 'the global field loads when you’re online — be the first to post a time today'
+        : '<b>sign in</b> to see today’s global field and put your time on the board';
+      if(cnt) cnt.textContent='—'; if(rk) rk.textContent=elig?'unranked':'locked';
+      return;
+    }
+    const rows=res.rows; if(cnt) cnt.textContent=rows.length+' player'+(rows.length===1?'':'s');
+    const mine=rows.find(r=>r.me);
+    if(rk) rk.textContent = mine ? ('#'+mine.rank) : (elig?'unranked':'locked');
+    const cap = isPro() ? rows.length : Math.min(10, rows.length);
+    const medal=i=>i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    let html='<div class="hd"><span>today’s global field</span><span>'+rows.length+' racing</span></div>';
+    if(!rows.length){ html+='<div class="dc-empty">no times yet today — be the first on the board</div>'; }
+    else { rows.slice(0,cap).forEach(r=>{ html+='<div class="dc-row '+medal(r.rank-1)+(r.me?' me':'')+'">'+
+        '<span class="rk">'+r.rank+'</span><span class="nm">'+escHtml(r.name)+'</span>'+
+        '<span class="tm">'+(r.ms/1000).toFixed(2)+'s</span></div>'; });
+      if(!isPro() && rows.length>cap){ html+='<div class="dc-empty"><b style="color:var(--warn)">◆ PRO</b> reveals the remaining '+(rows.length-cap)+' · including the leaders you’re chasing</div>'; }
+      if(mine && mine.rank>cap){ html+='<div class="dc-row me"><span class="rk">'+mine.rank+'</span><span class="nm">'+escHtml(mine.name)+' (you)</span><span class="tm">'+(mine.ms/1000).toFixed(2)+'s</span></div>'; }
+    }
+    bd.innerHTML=html;
+  }).catch(()=>{});
+}
 function updateDailyBtn(){ const b=$('dailyBtn'); if(b){ b.classList.toggle('on', dailyMode);
   try{ const sh=getSheet(); const n=sh.done.length;
     b.innerHTML='\u26a1 sheet <span style="opacity:.8">'+n+'/3</span>'+(n===3?' \u2713':''); }catch(e){} } }
@@ -11060,7 +11229,7 @@ function loadChallenge(key, opts){
   // r158: progression gate — daily runs and armed races ride through (community
   // moments); everything else locked-tier bounces to the explainer, state untouched.
   try{
-    if(!(opts&&(opts.daily||opts.weekly)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
+    if(!(opts&&(opts.daily||opts.weekly||opts.challenge)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
       const __gn=drillLocked(key);
       if(__gn){
         openGateInfo(__gn);
@@ -11079,9 +11248,11 @@ function loadChallenge(key, opts){
   }
   dailyMode = !!(opts && opts.daily);
   weeklyMode = !!(opts && opts.weekly);
-  updateDailyBtn(); updateWeeklyBtn();
+  challengeMode = !!(opts && opts.challenge);
+  updateDailyBtn(); updateWeeklyBtn(); try{ updateChallengeBtn(); }catch(e){}
   cur=key; const C=CHALLENGES[key];
   if(dailyMode){ _rand = mulberry32(dailySeed()); }                 // deterministic build for the day
+  if(challengeMode){ _rand = mulberry32(challengeSeed()); }         // r219: same extra-hard board worldwide
   if(weeklyMode){ _rand = mulberry32(weekSeed() + weeklyIdx*7919); } // deterministic per gauntlet leg
   try{ if(!dailyMode && !weeklyMode) KV.set('hotkey_last_drill', key); }catch(e){}  // resume point (daily doesn't override it)
   const built=C.build();
@@ -11257,6 +11428,7 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   buildSheetTabs();
   try{ renderMobileGate(); }catch(e){}   // r151: hub links paint even when sb never connects
   try{ updateDailyBtn(); }catch(e){}   // r140: sheet count paints on the \u26a1 button at boot
+  try{ updateChallengeBtn(); }catch(e){}   // r219: the daily-challenge chip pulses when today's sitting is unplayed
   // Resume where they left off: returning users land on their last drill, not the first one.
   let startKey = MENU_ORDER[0];
   if(onboarded){
