@@ -1,7 +1,9 @@
-# SMOKE_REPORT — live Supabase verification (r131–r132, 2026-07-12/13)
+# SMOKE_REPORT — live Supabase verification (r131–r132 · r196 re-run 2026-07-14)
 
 ## FINAL STATUS: ✅ 65/65 PASS — the full desks/school-tags/assignments backend
-## is deployed and verified live end-to-end (2026-07-13, `dev/smoke-live.mjs`).
+## is deployed and verified live end-to-end (2026-07-13, `dev/smoke-live.mjs`;
+## RE-VERIFIED 65/65 first-try on 2026-07-14, r196 — the standing "first
+## session with egress" milestone. Seed codes remain SAFE TO DISTRIBUTE.)
 
 Production end state verified: all 8 school seeds present, ownerless, original
 fixed invite codes intact; no stray desks; smoke-u fixture consumed (by
@@ -64,6 +66,19 @@ member-join non-destructive · claim-after-domain-join → captaincy (the fix) �
 captain powers on claimed seed · reports insert / no-read / forged-reporter
 denial.
 
+### r196 — smoke round 2 (65/65 FIRST TRY, 2026-07-14)
+The standing "first session with egress" run, verifying everything shipped
+since r132 stayed healthy in prod. Procedure per the fixture rule: smoke-u
+re-stamped via migration `20260714000000_smoke_fixtures_restamp.sql` (PR #24,
+deploy Action green in 29s), fixture verified live, then the full harness:
+**65/65 PASS, zero fixes needed** — auth/gate/profiles, name guards, desk
+create/join/preview, invite_code RLS denial, assignment cap + captain-only +
+upsert + cascade, invite rotation, rate limits (ALREADY_ON_DESK ·
+DESK_RATE_LIMIT), heir promotion, empty-desk self-delete, school tags (mapped
++ fallback + write-denial), home-desk domain joins (non-destructive on real
+seeds), claim-after-domain-join captaincy, reports RLS. SMOKE_TS=12016212.
+smoke-u consumed again by design — re-stamp before the next full run.
+
 ## Standing facts for future sessions
 - **`supabase db push` never re-runs an applied migration.** Restoring a
   consumed fixture/seed = ship the insert again under a NEW timestamp.
@@ -97,5 +112,9 @@ denial.
      (KEEP if you want re-runnable smokes; they hold no desks)
    - `hk.smoke.nonedu.1@hotkeysmoketest.com` — `23dac454-85bd-460b-ab60-23777fca3f11`
      (r133 gate-removal probe; no profile, no runs)
-   - `reports` table holds 2 smoke rows (kind=handle, note mentions smoke) — delete at leisure.
+   - r196 trio (2026-07-14, hold no desks, no runs): `hk.smoke.a.12016212@hotkeysmoketest.edu`
+     — `f65cac20-94f8-46fa-bd39-74008fb0b46d` · `hk.smoke.b.12016212@upenn.edu`
+     — `85bdc0f5-f455-46db-9b74-3371a1e59b03` · `hk.smoke.c.12016212@hotkeysmoketest.edu`
+     — `aa7f620c-92f3-41bf-aa88-58f52f1582bd`
+   - `reports` table holds 3 smoke rows (kind=handle, note mentions smoke) — delete at leisure.
    - **Remove the smoke-u fixture at launch** (T&S pass) — currently consumed/absent.

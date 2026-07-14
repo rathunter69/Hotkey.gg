@@ -4797,3 +4797,32 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   route + ribbon bold/italic; format: +italic beat; dress: perimeter
   EARLY permutation), 3/3. Pars 21-seed foreground, dead flat.
   CACHE v164 -> v165. Wolf playtest round 3 fully shipped.
+
+## r196 — THE EGRESS MILESTONE: live smoke re-run, 65/65 first try
+- This session reached supabase.co (the first since the r131-r134 marathon)
+  so the standing queue item ran: full live smoke against prod. Procedure
+  per the r132 fixture rule — smoke-u re-stamped under a NEW timestamp
+  (migration 20260714000000_smoke_fixtures_restamp.sql, PR #24, deploy
+  Action green in 29s, fixture verified live before the run).
+- **65/65 PASS, zero fixes needed.** Everything shipped to the backend since
+  the r132 verification held up in prod: auth/gate/profile upserts, desk
+  name guards, create/preview/join, invite_code RLS denial, the assignment
+  cap + captain-only writes + cascade, invite rotation, both rate-limit
+  guards, heir promotion, empty-desk self-delete, school tags (mapped +
+  registrable-label fallback + server-column write denial), non-destructive
+  domain joins on real seeds, claim-after-domain-join captaincy, reports
+  RLS. SMOKE_TS=12016212; throwaway trio listed in SMOKE_REPORT for
+  service-role cleanup; smoke-u consumed again by design.
+- **Consequence: the seeded desk codes are CLEARED FOR DISTRIBUTION** — the
+  pilot playbook (STRATEGY 4.2) now blocks only on Wolf picking clubs.
+- Docs: SMOKE_REPORT.md gains the r196 section; PIPELINE.md state-of-queue
+  header rewritten (round 3 complete, egress milestone done, T-G remainder
+  partially unblocked — macabacus/WSP fetch 200 from cloud sessions, WSO
+  still 403).
+- SESSION NOTE (coordination class, new): two Claude sessions ran the Wolf
+  round-3 queue in parallel today. The other session's r194/r195 reached
+  main first; this session's independent Tranche B/C builds were reset in
+  favor of the deployed ones (fetch-first caught both collisions before any
+  damage), and this session took the egress milestone instead — work the
+  drill-focused session couldn't have raced. Rule added to PIPELINE: fetch
+  before every round-close; the slower twin yields.
