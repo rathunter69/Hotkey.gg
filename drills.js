@@ -43,7 +43,7 @@ window.HOTKEY_DRILLS = {
   // ---------------------------------------------------------------
   meta: {
     // Foundations
-    navigation: { name:'Navigate', label:'Navigation tour',     tab:'Nav',         desc:'Jump, extend, shoot to the edge — each arrow chord on its own — then copy the whole model for the deck' },
+    navigation: { name:'Navigate', label:'Navigation tour',     tab:'Nav',         desc:'The keyboard LEAPS — thread a scattered sheet marker to marker with Ctrl-arrows, reach the model, then grab it and copy it for the deck' },
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — Alt H O I fits the columns' },
     rowops:     { name:'Rows',     label:'Rebuild the schedule',    tab:'Rows',     desc:'Insert the dropped line, delete the junk, re-foot so it still ties' },
     colops:     { name:'Columns',  label:'Columns move too',        tab:'Columns',  desc:'Ctrl+Space grabs it, Alt H D C kills it, Alt H I C opens one' },
@@ -199,7 +199,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
 
-window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":62,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":74,"transpose":64,"saves":44,"editfix":66,"undo":48,"autofit":48,"rowops":70,"filldr":78,"blocksel":52,"copyover":58,"polish":66,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":46,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":78,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
+window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":62,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":74,"transpose":64,"saves":44,"editfix":66,"undo":48,"autofit":48,"rowops":70,"filldr":78,"blocksel":52,"copyover":58,"polish":66,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":44,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":78,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

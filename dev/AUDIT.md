@@ -5197,3 +5197,29 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   before vs after F2 (delta 0.00) — editing is now shift-free and snappy.
 - GATE: syntax clean; F2 row-shift measured 0.00; demo-replay ALL GREEN (editing
   drills exercise the caret). index.html only (no ?v bump).
+
+## r217 — the flagship becomes an EXCEL MAZE (Wolf)
+- Wolf: build the Excel-maze movement INTO the first navigation drill so we wow
+  people off the bat with real randomization — but keep the "grab the model"
+  payoff. Shape chosen: "Maze journey → grab the model."
+- THE MAZE: the sheet now ships as a SCATTER of stray marker cells (blue ●), not
+  a contiguous block. From A1 the Ctrl-arrows LEAP marker to marker across the
+  blanks — the "corner to corner in one keystroke, zero scrolling" wow. The trail
+  zig-zags a fixed shape (down, right, down, LEFT, down) so the guide/req stay
+  deterministic, but every marker POSITION randomizes. The last leap lands on a
+  compact P&L (Revenue/COGS/Gross profit/EBIT × 2 yrs) tucked in a corner; the
+  payoff is grabbing it (Ctrl+Shift+→/↓) and Ctrl+C for the deck.
+- SELF-VERIFYING BUILD: build() carries a local replica of the engine's ctrlJump
+  (`sim()`) and, before shipping a board, replays the whole A1→markers→model
+  thread through it — if any leap misses, it re-rolls (80 attempts, then a
+  guaranteed-clean staircase fallback). So no random seed can ship an unsolvable
+  maze. Verified live: demo-replay WIN 15/15 across random seeds.
+- GRADING: 8 discrete latches — m0..m3 (active ON each marker, no selection, in
+  order) → model corner → selW (Ctrl+Shift+→) → selH (Ctrl+Shift+↓) → copied
+  (the model is on the clipboard). State-graded, so any legit route counts; the
+  lit marker + Ctrl-arrow is the fast/intended way.
+- GATE: demo-replay 15/15 · alt-paths PASS (thread via Ctrl-arrows, grow the
+  block the SLOW Shift-by-Shift way) · visual ALL 379 PASS · fit-sweep CLEAN ·
+  onboard 28 PASS · parity 94 PASS · par-sweep navigation par 44 / 9 keys,
+  median 8, drift -11% (healthy). drills.js meta desc + HOTKEY_PARS navigation
+  46->44; e2e-alt-paths navigation rewritten for the maze state.

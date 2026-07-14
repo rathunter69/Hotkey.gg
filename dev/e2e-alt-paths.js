@@ -657,17 +657,22 @@ const ALTS = [
       {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
       {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
     ]; }` },
-  { key: 'navigation', name: 'same beats, but the block is grown the SLOW way — repeated Shift+arrows instead of Ctrl+Shift', moves: `C => [
-      {sel:'C3',    keys:[{key:'Home',ctrl:true}]},                       // → A1 (home)
-      {sel:'A1',    keys:[{key:'ArrowRight',ctrl:true}]},                 // Ctrl+→ → E1 (jumpR)
-      {sel:'E1',    keys:[{key:'ArrowDown',ctrl:true}]},                  // Ctrl+↓ → E6 (jumpD)
-      {sel:'E6',    keys:[{key:'Home',ctrl:true}]},                       // back to A1
-      {sel:'A1',    keys:[{key:'ArrowRight',shift:true}]},                // Shift+→ → A1:B1 (selR)
-      {sel:'A1:B1', keys:[{key:'ArrowDown',shift:true}]},                 // Shift+↓ → A1:B2 (selD)
-      {sel:'A1:B2', keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true}]}, // Shift+↓×4 → A1:B6 (edgeD, slow route)
-      {sel:'A1:B6', keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}]}, // Shift+→×3 → A1:E6 (edgeR, slow route)
-      {sel:'A1:E6', keys:[{key:'c',ctrl:true}]},                          // Ctrl+C → copy the model (goal)
-    ]` },
+  { key: 'navigation', name: 'thread the maze with Ctrl-arrows, then grow the model the SLOW way — repeated Shift+arrows instead of Ctrl+Shift', moves: `C => {
+      const P=C._path, M=C._model, D=C._dirs, cl=colLetter;
+      const K={D:{key:'ArrowDown',ctrl:true},U:{key:'ArrowUp',ctrl:true},R:{key:'ArrowRight',ctrl:true},L:{key:'ArrowLeft',ctrl:true}};
+      const steps=[{sel:'C3', keys:[{key:'Home',ctrl:true}]}];   // → A1
+      let cur='A1';
+      for(let i=0;i<P.length;i++){ steps.push({sel:cur, keys:[K[D[i]]]}); cur=cl(P[i].c)+P[i].r; }   // leap each marker
+      steps.push({sel:cur, keys:[K[D[4]]]});                     // last leap → model corner
+      const c0=M.c0, r0=M.r0, corner=cl(c0)+r0;
+      const across=[]; for(let j=0;j<M.w-1;j++) across.push({key:'ArrowRight',shift:true});
+      steps.push({sel:corner, keys:across});                     // Shift+→ ×(w-1) → wide (slow route)
+      const wide=corner+':'+cl(c0+M.w-1)+r0;
+      const down=[]; for(let j=0;j<M.h-1;j++) down.push({key:'ArrowDown',shift:true});
+      steps.push({sel:wide, keys:down});                         // Shift+↓ ×(h-1) → whole block (slow route)
+      const full=corner+':'+cl(c0+M.w-1)+(r0+M.h-1);
+      steps.push({sel:full, keys:[{key:'c',ctrl:true}]});        // Ctrl+C → copy the model (goal)
+      return steps; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
       const steps=C._sites.slice().reverse().flatMap(s=>[
