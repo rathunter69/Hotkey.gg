@@ -210,6 +210,22 @@ a default). AWAITING WOLF SIGN-OFF — the build is a config-and-content round.
 > Constraints: keyboard-only, Esc-safe, real-time board must degrade gracefully
 > offline; entitlement checks reuse HOTKEY_PREMIUM. Full gate + AUDIT round.
 
+## T-M · EXCEL-MAZE MOVEMENT LAYER — QUEUED (Wolf r207/r208, design-first)
+> Wolf: "the Ctrl-arrow movement can be made more interesting by having to
+> BOUNCE around cells — reminiscent of the Excel mazes that inspired the app."
+> IDEA: layer a maze onto navigation's movement half. Instead of a free lap, the
+> board seeds a path of "stops" (islands of data separated by blanks) so each
+> Ctrl-arrow JUMPS land exactly on the next waypoint — the player threads the
+> maze corner to corner using only edge-jumps, the way Ctrl+arrow actually
+> behaves (it stops at the boundary between filled and empty). Nail the FEEL: a
+> visible breadcrumb/next-stop marker, a wrong-jump nudge, and a satisfying
+> "solved the maze" finish. Reuse navigation's latch machinery (each waypoint =
+> a latch in order). Open questions for Wolf: is this a NEW drill (nav II /
+> "the maze") or a reshaped movement half of navigation? difficulty tiers
+> (longer/branchier mazes as you level)? does it feed the daily challenge
+> (T-L)? Sketch to Wolf before building — this is the app's origin story, worth
+> getting the feel exactly right.
+
 ## Standing items (do NOT lose)
 - **Supabase live smoke test** — FIRST session with egress: desks/assignments/
   school-tags RPCs against prod; seeded desk codes stay held until green.
