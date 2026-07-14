@@ -130,9 +130,12 @@ window.THEMES = {
     accent:'#2b7bbd', 'accent-dim':'#1b5688', 'accent-glow':'rgba(43,123,189,.14)',
     warn:'#9a6700', bad:'#b3261e' }},
   phoebes: { name:'Phoebe’s Paws', dark:false, vars:{
-    bg:'#f7e8ee', surface:'#fdf3f7', surface2:'#f2dde6', line:'#e6c2d1',
-    text:'#3b2b32', muted:'#8a6b76', faint:'#c2a2ae',
-    accent:'#c43a77', 'accent-dim':'#9a2a5a', 'accent-glow':'rgba(196,58,119,.14)',
+    // r217 (Wolf): modeled on his friend's cat's toe beans — #D5957F, nudged pinker
+    // into a soft Sakura rose. The blush backgrounds + dusty-rose accent keep the
+    // toe-bean warmth while reading clearly PINK, not salmon/tan.
+    bg:'#f9e9ee', surface:'#fef5f8', surface2:'#f4d9e2', line:'#ebbfce',
+    text:'#3c2930', muted:'#8c6874', faint:'#c49fad',
+    accent:'#c55c7d', 'accent-dim':'#9e4460', 'accent-glow':'rgba(213,126,150,.16)',
     warn:'#9a6700', bad:'#b3261e' }},
   crimson: { name:'Crimson', dark:true, vars:{
     bg:'#191012', surface:'#241619', surface2:'#301b20', line:'#4a2d33',
