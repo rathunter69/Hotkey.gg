@@ -4,6 +4,37 @@ New sessions: the repo IS the handover — read this file, dev/AUDIT.md (newest 
 at the bottom), and the dev/ design docs. No manual doc upload needed when the
 session has the GitHub integration (repo clones automatically)._
 
+## SESSION HANDOVER SNAPSHOT (2026-07-14, rounds r197-r200 — the polish arc)
+- **THE ACTIVE ARC: Wolf is auditing drills and driving a drill-by-drill
+  quality pass** (fun, relatability, depth, realism, VISUAL CLARITY, readable
+  checklists). Three new doctrine standards codified this arc (dev/
+  DRILL_DOCTRINE.md) — apply them to every drill going forward:
+  1. **§2.1b Banker's-Workbook Finish** — every financial-statement drill's WIN
+     state must read like a page a banker would hand over: bold ruled headers,
+     ruled subtotals (top border = "a total earns its line"), bottom-ruled
+     bottom line, perfectly formatted numbers, blue inputs / black formulas, no
+     orphan-format cells. Formatting-lesson drills build it; others ship the
+     board pre-dressed. THIS IS A STANDING ARC — carry it drill by drill.
+  2. **§2.5 LITERAL BORDERS** — a border checklist item names the exact border +
+     range ("add a top border above the total row"), never "dress/rule off/box".
+  3. **§2.5 ONE ACTION PER LINE** — split bundled checks; a tightly-paired dress
+     may share a line only if phrased as one motion.
+- **r197**: T-G Macabacus plugin verify — fixed a systematic phantom-Alt error
+  (number/border/color cycles are Ctrl+Shift+‹key›, not Ctrl+Alt+Shift) in the
+  display AND the engine bindings. **r198**: FactSet plugin verified (both
+  layers now match their live cheat sheets); rowops rebuilt to the depth bar
+  ("Rebuild the schedule" — insert dropped line + delete junk + re-foot + dress;
+  engine gained S.insRowN/S.delRowN latches). **r199**: modeltour reframed to a
+  real P&L cascade — the four subtotals (GP/EBITDA/EBIT/NI) are bold+ruled and
+  each lost a cell to #REF!; fly to each and rebuild the FORMULA (live formula +
+  value parity, hardcodes reject). **r200**: border checklist-clarity sweep (26
+  labels across ~18 drills made literal) + the doctrine codification above.
+- **Foundations depth map**: rebuilt + good — modeltour, editfix, filldr, pastes,
+  copyover, undo, rowops. STILL THIN (queued for the drill-by-drill pass):
+  ribbon (4 order-free chores → one dressed artifact), autofit (two disconnected
+  islands → one print block), and a visual-density pass on the rest.
+- Cache v168. Branches main == pipeline-overview-y020a7 == project-handover-80gboe.
+
 ## SESSION HANDOVER SNAPSHOT (2026-07-14, rounds r188-r196)
 - **79 DRILLS, parity 94, alts 80, cache v165.** Gate green at every push.
 - **WOLF PLAYTEST ROUND 3 COMPLETE (r190-r195)** — live-feedback arc, engine
