@@ -4604,3 +4604,24 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   submenu) shipped at r170; nothing to do.
 - The r169 enrichment backlog matrix is now fully dispatched.
 - No cache bump (index.html + dev files only).
+
+## r188 — SUMIFS engine + rollup drill (78 drills) — CANON_DIFF closed
+- ENGINE: SUMIFS(sumRange, critRange, crit, ...pairs) and SUMPRODUCT
+  (pairwise dot product across equal-length ranges) join evalFormula,
+  mirroring SUMIF's ref machinery. Malformed args throw into IFERROR,
+  never into the sheet (parity-asserted).
+- NEW DRILL rollup "Cross the tape" (Formulas, 78 total): raw
+  segment × region tape, and the MD wants the CROSS. One SUMIFS with
+  ranges $-locked, $F3 column-locked, G$2 row-locked — the dcfsens
+  mixed-anchor lesson pointed at data — fills the whole 2×2 grid, then
+  feet + dress. Negative case smoke-proven: an over-anchored $F$3/$G$2
+  formula repeats one value across the grid and FAILS. Every combo
+  seeded ≥2 rows so no grid cell is ever legitimately zero. parKeys 68
+  (21-seed, zero variance). Alt: feet FIRST via multi-pass recalc,
+  criteria pairs swapped, all fills by ribbon.
+- With this, ALL SIX new-drill proposals in dev/CANON_DIFF.md §4 are
+  live (hunt r182, wirewalk/wrapfix r173, grpfold r179, center-across
+  r177, rollup r188). The §5 realism nuggets landed too: balcheck cites
+  the OK/ERROR desk convention, audit names the F5-special sweep the
+  seniors run, housestyle carries the never-merge rule verbatim.
+- PARITY 73 -> 77 (section V). ALTS 78 -> 79. CACHE v160 -> v161.

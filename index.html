@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=160" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=160">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=160">
+<link rel="icon" href="favicon.ico?v=161" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=161">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=161">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1139,14 +1139,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=160"></script>
-<link rel="stylesheet" href="nav.css?v=160">
-<script src="themes.js?v=160"></script>
+<script src="drills.js?v=161"></script>
+<link rel="stylesheet" href="nav.css?v=161">
+<script src="themes.js?v=161"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=160"></script>
+<script src="nav.js?v=161"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1584,7 +1584,7 @@ const CHALLENGES = {
   housestyle:{
     name:'House Style', label:'Bring it to standard', par:70, parKeys:42,
     aha:'blue inputs, black formulas, ruled totals \u2014 house style is how a model reads at 4am',
-    prompt:'A raw P&L fragment just landed from a first-year: no title weight, naked headers, inputs invisible among the formulas, decimals everywhere, margins reading as decimals, nothing ruled off. Bring the whole tab to house standard \u2014 the pass a senior runs before ANY page leaves the desk. The inputs move every run, and one of them is a hardcode someone buried in a formula row: paint it or it ships wrong.',
+    prompt:'A raw P&L fragment just landed from a first-year \u2014 and remember the sibling rule while you dress it: center across, never merge; merged cells break every fill and every sort. No title weight, naked headers, inputs invisible among the formulas, decimals everywhere, margins reading as decimals, nothing ruled off. Bring the whole tab to house standard \u2014 the pass a senior runs before ANY page leaves the desk. The inputs move every run, and one of them is a hardcode someone buried in a formula row: paint it or it ships wrong.',
     req(){ const R=this._R; return '<em>A1</em> <em>ctrl+b</em> \u00b7 headers <em>B2:F2</em> bold + <em>alt h b b</em> \u00b7 inputs blue via <em>alt h f c</em>: <em>'+R.inpRows.map(r=>'B'+r+':F'+r).join('</em> \u00b7 <em>')+'</em> + the buried hardcode <em>'+R.override+'</em> \u00b7 figures <em>B3:F7</em> <em>alt h k</em> + <em>alt h 9</em> \u00d72 \u00b7 margins <em>B8:F8</em> <em>ctrl+shift+%</em> \u00b7 EBITDA <em>B7:F7</em> <em>ctrl+b</em> + <em>alt h b t</em>'; },
     guide(){ const R=this._R; return [
       'the title carries the page: A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then headers B2:F2 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 bold, ruled under',
@@ -5138,7 +5138,7 @@ const CHALLENGES = {
   audit:{
     name:'The 4am pass', label:'The 4am pass \u2014 find what\u2019s broken', par:75, parKeys:36,
     aha:'broken models leave fingerprints \u2014 hardcodes in formula rows, refs off by one',
-    prompt:'A divisional P&L someone else built, and three things are wrong with it: one division\u2019s five-year Total stops a column short, one EBITDA is a stale hardcode, and one EBITDA reads the wrong year\u2019s opex. Nobody tells you which \u2014 read the tab like you\u2019ll have to defend it. This is the pass your associate does at 4am; learn to do it at 4pm.',
+    prompt:'A divisional P&L someone else built \u2014 seniors sweep pages like this with F5 \u2192 Special \u2192 Constants, a ritual you now have \u2014 and three things are wrong with it: one division\u2019s five-year Total stops a column short, one EBITDA is a stale hardcode, and one EBITDA reads the wrong year\u2019s opex. Nobody tells you which \u2014 read the tab like you\u2019ll have to defend it. This is the pass your associate does at 4am; learn to do it at 4pm.',
     req(){ return '<em>scan the Total column</em> \u00b7 one SUM stops at FY4 \u2014 <em>F2</em>, extend it \u00b7 one EBITDA is a typed number \u2014 rebuild it live \u00b7 one EBITDA crosses columns \u2014 repoint it'; },
     guide:[
       'read the Total column (G) \u2014 one division\u2019s SUM ends a year early \u00b7 <kbd>F2</kbd>, extend the range to column F, <kbd>\u21b5</kbd>',
@@ -5296,7 +5296,7 @@ const CHALLENGES = {
   balcheck:{
     name:'Tie-out', label:'Make it tie \u2014 hunt the break', par:75, parKeys:27,
     aha:'tie-outs hunt by halving \u2014 check the subtotal, then only the block that fails',
-    prompt:'A balance sheet that doesn\u2019t balance \u2014 and someone pasted zeros over the check row so it LOOKS like it does. Resurrect the check row live, read which years break, and run both culprits down: one Total assets lost its first line to a later insert, and one equity cell is a typed plug where the corkscrew should be. The check row is the smoke alarm; this sheet shipped with the battery pulled.',
+    prompt:'A balance sheet that doesn\u2019t balance \u2014 and someone pasted zeros over the check row so it LOOKS like it does. On real desks the check line reads OK/ERROR; ours reads zero \u2014 same religion. Resurrect the check row live, read which years break, and run both culprits down: one Total assets lost its first line to a later insert, and one equity cell is a typed plug where the corkscrew should be. The check row is the smoke alarm; this sheet shipped with the battery pulled.',
     req(){ return '<em>B15:E15</em> check \u2192 =B8\u2212B14, filled \u00b7 one <em>Total assets</em> starts a row short \u2014 respan it \u00b7 one <em>Equity</em> cell is typed \u2014 corkscrew it \u00b7 every check reads 0'; },
     guide:[
       'the check row is pasted zeros \u00b7 B15: <kbd>=</kbd>B8-B14 <kbd>\u21b5</kbd> \u00b7 select B15:E15, <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 now read which years break',
@@ -6026,6 +6026,74 @@ const CHALLENGES = {
     }
   },
 
+  rollup:{
+    name:'SUMIFS', label:'Cross the tape', par:120, parKeys:68,
+    aha:'SUMIFS crosses two labels at once \u2014 one mixed-anchor formula fills the whole grid',
+    prompt:'A raw deal tape \u2014 segment, region, revenue \u2014 and the MD wants the CROSS: a segment \u00d7 region grid, four numbers, footed. One SUMIFS does it: ranges $-locked, the segment criterion column-locked ($F3), the region criterion row-locked (G$2) \u2014 then the SAME formula fills right and down and the grid builds itself. The dcfsens anchor lesson, pointed at data.',
+    req:'<em>G3</em> <em>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</em> \u00b7 fill G3:H3 \u2192 \u00b7 fill G3:H4 \u2193 \u00b7 <em>G5</em> <em>=SUM(G3:G4)</em> fill \u2192 \u00b7 dress F5:H5: <em>ctrl+b</em> + <em>alt h b t</em>',
+    guide:[
+      'the cross at G3 \u00b7 <kbd>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</kbd> <kbd>\u21b5</kbd> \u2014 sum range first, then each (range, criterion) pair; $F3 walks DOWN only, G$2 walks RIGHT only',
+      'select G3:H3 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u00b7 then G3:H4 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 four live cells from ONE formula; if a number repeats, an anchor is wrong',
+      'foot it: G5 \u00b7 <kbd>=SUM(G3:G4)</kbd> \u00b7 fill G5:H5 \u2192 \u2014 the two feet must re-add the whole tape',
+      'dress the total line: select F5:H5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+    ],
+    targets:['G3','G3:H4','G5:H5','F5:H5'],
+    demo(){ return [
+      {sel:'G3', keys:[...T('=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)'), Kb.enter]},
+      {sel:'G3:H3', keys:[Kb.fillR]},
+      {sel:'G3:H4', keys:[Kb.fillD]},
+      {sel:'G5', keys:[...T('=SUM(G3:G4)'), Kb.enter]},
+      {sel:'G5:H5', keys:[Kb.fillR]},
+      {sel:'F5:H5', keys:[Kb.bold]},
+      {sel:'F5:H5', keys:[Kb.alt, L('H'), L('B'), L('T')]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 deal tape, segment \u00d7 region ($mm)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells['B2']={...blankCell(),value:'Region',txt:true,bold:true};
+      cells['C2']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
+      const SEG=['Retail','Instl'], REG=['Americas','EMEA'];
+      // every combo at least twice, ninth row random \u2014 no empty grid cell on any seed
+      const combos=[];
+      SEG.forEach(sg=>REG.forEach(rg=>{ combos.push([sg,rg]); combos.push([sg,rg]); }));
+      combos.push([SEG[rnd(0,1)], REG[rnd(0,1)]]);
+      for(let k2=combos.length-1;k2>0;k2--){ const j=rnd(0,k2); [combos[k2],combos[j]]=[combos[j],combos[k2]]; }
+      const tot={};
+      combos.forEach(([sg,rg],i)=>{ const r=3+i, v=rnd(4,60)*10;
+        cells['A'+r]={...blankCell(),value:sg,txt:true};
+        cells['B'+r]={...blankCell(),value:rg,txt:true};
+        cells['C'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        tot[sg+'|'+rg]=(tot[sg+'|'+rg]||0)+v;
+      });
+      cells['F2']={...blankCell(),value:'Cross',txt:true,bold:true};
+      cells['G2']={...blankCell(),value:REG[0],txt:true,bold:true,align:'r'};
+      cells['H2']={...blankCell(),value:REG[1],txt:true,bold:true,align:'r'};
+      cells['F3']={...blankCell(),value:SEG[0],txt:true};
+      cells['F4']={...blankCell(),value:SEG[1],txt:true};
+      cells['F5']={...blankCell(),value:'Total',txt:true};
+      [['G',3],['H',3],['G',4],['H',4],['G',5],['H',5]].forEach(([cl,r])=>cells[cl+r]={...blankCell(),fmtStyle:'comma',decimals:0});
+      this._o={grid:{G3:tot[SEG[0]+'|'+REG[0]]||0, H3:tot[SEG[0]+'|'+REG[1]]||0, G4:tot[SEG[1]+'|'+REG[0]]||0, H4:tot[SEG[1]+'|'+REG[1]]||0}};
+      this._o.feet={G5:this._o.grid.G3+this._o.grid.G4, H5:this._o.grid.H3+this._o.grid.H4};
+      return {ROWS:11, cells, active:{r:3,c:7}, sel:null, colW:{1:76,2:88,3:80,6:70,7:88,8:88}};
+    },
+    checks(S){
+      const o=this._o;
+      const live=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
+      const g3=S.cells['G3'], f=(g3&&g3.formula)?String(g3.formula).toUpperCase():'';
+      const anchOk=f.includes('SUMIFS')&&f.includes('$C$3:$C$11')&&f.includes('$F3')&&f.includes('G$2');
+      const gridOk=['G3','H3','G4','H4'].every(k=>live(k,o.grid[k]));
+      const feetOk=['G5','H5'].every(k=>{ const c=S.cells[k];
+        return live(k,o.feet[k]) && /SUM/i.test(String(c.formula)); });
+      const dressOk=['F5','G5','H5'].every(k=>{ const c=S.cells[k]; return !!(c&&c.bold&&c.bt); });
+      return [
+        {label:'build ONE SUMIFS at G3 \u2014 ranges $-locked, $F3 column-locked, G$2 row-locked', ok: anchOk&&live('G3',o.grid.G3)},
+        {label:'fill the grid from that one formula \u2014 all four crosses live and distinct', ok: gridOk},
+        {label:'foot both regions at G5:H5 \u2014 live SUMs that re-add the whole tape', ok: feetOk},
+        {label:'dress the total line \u2014 bold F5:H5 with a rule above', ok: dressOk},
+      ];
+    }
+  },
   lookup2:{
     name:'2-way', label:'Two-way lookup', par:60, parKeys:50,
     aha:'a two-way lookup crosses a row match with a column match \u2014 INDEX reads the intersection',
@@ -6402,6 +6470,23 @@ function evalFormula(expr){
       let s=0; for(let p=0;p<critRefs.length;p++){
         if(eqLoose(cellRaw(critRefs[p]), crit)) s += cellNum(sumRefs[p]||''); }
       return s;
+    }
+    if(name==='SUMIFS'){   /* r188: multi-criteria rollup \u2014 sum range FIRST (Excel arg order), then (critRange, crit) pairs */
+      if(!args[0].range) throw new Error('sumifs-args');
+      const sumRefs = rangeRefs(args[0].range[0], args[0].range[1]);
+      const pairs=[];
+      for(let p=1;p+1<args.length;p+=2){ if(!args[p].range) throw new Error('sumifs-args');
+        pairs.push({refs: rangeRefs(args[p].range[0], args[p].range[1]), crit: rawOf(args[p+1])}); }
+      if(!pairs.length) throw new Error('sumifs-args');
+      let t=0; for(let q=0;q<sumRefs.length;q++){
+        if(pairs.every(pr=>eqLoose(cellRaw(pr.refs[q]||''), pr.crit))) t += cellNum(sumRefs[q]||''); }
+      return t;
+    }
+    if(name==='SUMPRODUCT'){   /* r188: pairwise product across equal-length ranges \u2014 the weighted-average workhorse */
+      if(!args.length || args.some(a=>!a.range)) throw new Error('sumproduct-args');
+      const cols = args.map(a=>rangeRefs(a.range[0], a.range[1]));
+      let t=0; for(let q=0;q<cols[0].length;q++){ let m=1; for(const cl of cols) m*=cellNum(cl[q]||''); t+=m; }
+      return t;
     }
     if(name==='COUNTIF'){   /* r97 */
       if(!args[0].range) throw new Error('countif-args');

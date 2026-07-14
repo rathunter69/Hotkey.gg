@@ -195,6 +195,15 @@ const ALTS = [
       {sel:'A'+(o.h1-1)+':A'+(o.h2+1), keys:[{key:'Alt'},L('h'),L('o'),L('u'),L('o')]},
       {sel:'A'+(o.h1-1), keys:[{key:'Alt'},L('a'),L('h')]},
     ]; }` },
+  { key: 'rollup', name: 'feet FIRST (recalc closes them), criteria pairs swapped, ribbon fills', moves: `C => [
+      {sel:'G5', keys:[...T('=SUM(G3:G4)'),{key:'Enter'}]},
+      {sel:'G5:H5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'F5:H5', keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:'F5:H5', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'G3', keys:[...T('=SUMIFS($C$3:$C$11,$B$3:$B$11,G$2,$A$3:$A$11,$F3)'),{key:'Enter'}]},
+      {sel:'G3:H3', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'G3:H4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+    ]` },
   { key: 'hunt', name: 'totals footed FIRST, ctrl+g route, crimes fixed in reverse', moves: `C => { const o=C._o;
       const steps=[
         {sel:'B8', keys:[...T('=SUM(B3:B7)'),{key:'Enter'}]},

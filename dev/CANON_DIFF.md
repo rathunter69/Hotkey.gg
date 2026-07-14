@@ -56,7 +56,11 @@ give the top ones real grid behavior.
 | **Multi-sheet nav Ctrl+PgUp/Dn** | med | engine is single-tab | roadmap |
 | **Named ranges** | med | moderate | roadmap |
 
-## 4. New-drill proposals (once engine lands)
+## 4. New-drill proposals — ALL SIX LIVE as of r188 (hunt r182, wirewalk r173,
+## wrapfix r173, grpfold r179, center-across r177, rollup/SUMIFS r188 — the
+## SUMPRODUCT idea shipped as SUMIFS, the tool a desk actually reaches for;
+## SUMPRODUCT itself is in the engine for future use). §5 nuggets folded r188.
+## (original list kept below)
 1. **"The hardcode hunt"** (T-D.1): a shipped-looking model block; F5 →
    Special → Constants inside the formula region selects the buried
    hardcodes; relink or blue them. Canon's #1 audit ritual.

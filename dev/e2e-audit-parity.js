@@ -376,6 +376,24 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(u1.ribbonUnhide, 'Alt H O U O is the ribbon unhide route');
   ok(u1.dlg && u1.applied, 'Alt H O W numeric width prompt applies Excel units');
 
+  console.log('V. SUMIFS + SUMPRODUCT (r188)');
+  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('rollup'); });
+  const v1 = await run(() => {
+    S.cells['J1']={...blankCell(), formula:'=SUMIFS(C3:C11,A3:A11,"Retail",B3:B11,"EMEA")'};
+    S.cells['J2']={...blankCell(), formula:'=SUMPRODUCT(C3:C6,C3:C6)'};
+    S.cells['J3']={...blankCell(), formula:'=SUMIFS(C3:C11,A3:A11,"Nobody",B3:B11,"EMEA")'};
+    S.cells['J4']={...blankCell(), formula:'=IFERROR(SUMIFS(C3:C11,A3:A11),-1)'};   // odd args \u2192 error \u2192 fallback
+    recalc();
+    let want=0; for(let r=3;r<=11;r++) if(S.cells['A'+r].value==='Retail'&&S.cells['B'+r].value==='EMEA') want+=S.cells['C'+r].value;
+    let dot=0; for(let r=3;r<=6;r++) dot+=S.cells['C'+r].value*S.cells['C'+r].value;
+    return { two: Math.abs(S.cells['J1'].value-want)<0.5, dot: Math.abs(S.cells['J2'].value-dot)<0.5,
+      zero: S.cells['J3'].value===0, err: S.cells['J4'].value===-1 };
+  });
+  ok(v1.two, 'SUMIFS crosses two criteria correctly');
+  ok(v1.dot, 'SUMPRODUCT is a pairwise dot product');
+  ok(v1.zero, 'SUMIFS with no match sums to zero');
+  ok(v1.err, 'malformed SUMIFS throws into IFERROR, not into the sheet');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {
