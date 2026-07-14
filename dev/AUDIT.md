@@ -5223,3 +5223,19 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   onboard 28 PASS · parity 94 PASS · par-sweep navigation par 44 / 9 keys,
   median 8, drift -11% (healthy). drills.js meta desc + HOTKEY_PARS navigation
   46->44; e2e-alt-paths navigation rewritten for the maze state.
+
+## r218 — Phoebe's Paws re-tuned to the cat-toe hex + Foundations design spec (Wolf)
+- THEME: Wolf wanted Phoebe's Paws modeled on his friend's cat's toe beans
+  (#D5957F) but pushed PINKER. Re-anchored the palette on a soft Sakura rose:
+  blush backgrounds (bg #f9e9ee, surface #fef5f8, surface2 #f4d9e2, line
+  #ebbfce), a dusty-rose accent (#c55c7d, dim #9e4460, glow from #D5957F@.16).
+  Reads clearly pink now, not salmon/tan; keeps the toe-bean warmth. Visual
+  matrix ALL 379 PASS (text/muted/accent legible on the blush). themes.js ?v
+  174->175.
+- SPEC: wrote dev/FOUNDATIONS_SPEC.md — the completed design document Wolf asked
+  for after nailing the first two flagships. Codifies the standard nav (the maze,
+  archetype 2A movement) and modeltour (the #REF! cascade, archetype 2B build)
+  set: the 7 fields every drill specifies, the 2 archetypes (ships-dressed vs
+  build-the-finish), the randomization + self-verification bar, the latch/Freedom
+  grading shape, the 8-check gate, a per-drill build-to spec table for all 13
+  Foundations drills, and how it runs across the remaining sets.
