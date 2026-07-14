@@ -5089,3 +5089,20 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   favicon.ico (32px, PNG-in-ICO, transparent corners) and apple-touch-icon.png
   (180px, full-bleed green so iOS's own rounding masks cleanly). ?v 169->170.
 - Previewed to Wolf at 16/24/32/64px on both light and dark bars before ship.
+
+## r209 — favicon: spreadsheet grid + selected cell (Wolf's pick "A")
+- Wolf chose option A from the 5-up: a spreadsheet grid with the active cell
+  selected — most representative of the brand/goal. Replaced the r208 cell-cursor
+  mark. favicon.svg theme-aware (green tile; white grid on light tabs, dark grid
+  on dark). Regenerated favicon.ico (32px) + apple-touch-icon.png (180px
+  full-bleed grid). ?v 170->171.
+
+## r210 — rank pill (and tier colors) legible on light themes (Wolf)
+- Wolf on Daylight (the default light theme): "some text can't be seen — like my
+  rank in the top bar." The .tier-* colors (nav.css + index.html inline copy)
+  are light pastels tuned for dark sheets (#c3c8cf silver, #e0b341 gold,
+  #7db8ff diamond, …) — ~1:1 on a light bar. Added html[data-dark="0"] .tier-*
+  overrides with darker, saturated variants (bronze #8a5323, silver #5f6670,
+  gold #8a6600, platinum #1f8574, diamond #2f6bc4, crimson #b23520, mba #6b6250)
+  + matching lighter borders. Verified all seven pills legible on the Daylight
+  bar. tier-unranked already rode var(--muted) (theme-aware) — untouched.

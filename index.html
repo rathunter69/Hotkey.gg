@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=170" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=170">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=170">
+<link rel="icon" href="favicon.ico?v=171" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=171">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=171">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -871,6 +871,14 @@
   .tier-diamond{color:#7db8ff; border-color:#3a6196; background:rgba(125,184,255,.14)}
   .tier-crimson{color:#e06a55; border-color:#7c3328; background:rgba(224,106,85,.13)}
   .tier-mba{color:#a89e88; border-color:#4c473c; background:rgba(168,158,136,.10)}
+  /* r210 (Wolf): darker tier text for light themes — the pastels above vanish on Daylight */
+  html[data-dark="0"] .tier-bronze  {color:#8a5323; border-color:#c8a074}
+  html[data-dark="0"] .tier-silver  {color:#5f6670; border-color:#a7adb6}
+  html[data-dark="0"] .tier-gold    {color:#8a6600; border-color:#cba24a}
+  html[data-dark="0"] .tier-platinum{color:#1f8574; border-color:#6fc0b3}
+  html[data-dark="0"] .tier-diamond {color:#2f6bc4; border-color:#84acdf}
+  html[data-dark="0"] .tier-crimson {color:#b23520; border-color:#dd8a7c}
+  html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
   .pc-sub{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin:6px 0 18px}
   .pc-career{display:flex; gap:22px; flex-wrap:wrap; background:var(--surface2); border:1px solid var(--line);
     border-radius:12px; padding:14px 18px; margin-bottom:8px}
@@ -1147,14 +1155,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=170"></script>
-<link rel="stylesheet" href="nav.css?v=170">
-<script src="themes.js?v=170"></script>
+<script src="drills.js?v=171"></script>
+<link rel="stylesheet" href="nav.css?v=171">
+<script src="themes.js?v=171"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=170"></script>
+<script src="nav.js?v=171"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>

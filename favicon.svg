@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- r208: sleek mark — a spreadsheet cell being navigated (cursor in a grid).
-       Reads on both light and dark browser tab bars: the green tile is mid-tone
-       (pops on white AND black), and prefers-color-scheme lifts it on dark. -->
+  <!-- r209: brand mark — a spreadsheet grid with the active cell selected (Wolf's pick).
+       Theme-aware: reads on light AND dark browser tab bars via prefers-color-scheme. -->
   <style>
     .tile{ fill:#0e9b57 }
-    .ink { fill:none; stroke:#ffffff; stroke-width:2.4 }
-    .cur { fill:#ffffff }
+    .ink { fill:none; stroke:#ffffff }
+    .cell{ fill:#ffffff }
     @media (prefers-color-scheme: dark){
       .tile{ fill:#2bb978 }
       .ink { stroke:#0c2a1e }
-      .cur { fill:#0c2a1e }
+      .cell{ fill:#0c2a1e }
     }
   </style>
   <rect class="tile" x="2" y="2" width="28" height="28" rx="7.5"/>
-  <rect class="ink" x="9" y="9" width="14" height="14" rx="2.4"/>
-  <rect class="cur" x="16.4" y="16.4" width="6.6" height="6.6" rx="1.4"/>
+  <rect class="ink" x="8" y="8" width="16" height="16" rx="2.2" stroke-width="2.2"/>
+  <path class="ink" d="M16 8.5V23.5M8.5 16H23.5" stroke-width="1.8"/>
+  <rect class="cell" x="9.4" y="9.4" width="5.4" height="5.4" rx="1"/>
 </svg>
