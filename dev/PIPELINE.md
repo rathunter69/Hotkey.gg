@@ -210,7 +210,17 @@ a default). AWAITING WOLF SIGN-OFF — the build is a config-and-content round.
 > Constraints: keyboard-only, Esc-safe, real-time board must degrade gracefully
 > offline; entitlement checks reuse HOTKEY_PREMIUM. Full gate + AUDIT round.
 
-## T-M · EXCEL-MAZE MOVEMENT LAYER — QUEUED (Wolf r207/r208, design-first)
+## T-M · EXCEL-MAZE MOVEMENT LAYER — ✅ SHIPPED r217 (built into navigation)
+> RESOLVED: Wolf chose "built into the first nav still so we can wow people off
+> the bat with additional randomization" (not a separate drill). r217 ships the
+> maze AS the navigation flagship: a scatter of stray marker cells the Ctrl-arrows
+> leap between (fixed zig-zag shape D,R,D,L,D, randomized positions), landing on a
+> compact P&L the player grabs and copies. build() self-verifies every board with
+> a ctrlJump replica before shipping (no unsolvable seed). demo-replay 15/15.
+> Difficulty tiers / daily-challenge feed (longer, branchier mazes) remain a
+> future lever — the generator is parameterized (RN/CN/dir-sequence) to grow into
+> them. Original design note below for reference.
+>
 > Wolf: "the Ctrl-arrow movement can be made more interesting by having to
 > BOUNCE around cells — reminiscent of the Excel mazes that inspired the app."
 > IDEA: layer a maze onto navigation's movement half. Instead of a free lap, the
