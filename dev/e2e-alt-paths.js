@@ -657,15 +657,15 @@ const ALTS = [
       {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
       {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
     ]; }` },
-  { key: 'navigation', name: 'same tour, ribbon fill (alt h f i r) instead of ctrl+r for the margin', moves: `C => [
-      {sel:'C4',    keys:[{key:'Home',ctrl:true}]},
-      {sel:'A1',    keys:[{key:'End',ctrl:true}]},
-      {sel:'E7',    keys:[{key:'ArrowLeft',ctrl:true}]},
-      {sel:'A7',    keys:[{key:'ArrowUp',ctrl:true}]},
-      {sel:'A1',    keys:[{key:'ArrowRight',ctrl:true}]},
-      {sel:'E1',    keys:[{key:'ArrowDown',ctrl:true}]},
-      {sel:'B7:E7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'A1',    keys:[{key:'Home',ctrl:true}]},
+  { key: 'navigation', name: 'same tour; whole-model finale via Ctrl+A instead of Shift+Space→Ctrl+Space', moves: `C => [
+      {sel:'C3',    keys:[{key:'Home',ctrl:true}]},                       // → A1 (home)
+      {sel:'A1',    keys:[{key:'ArrowRight',ctrl:true}]},                 // → E1 (jumpR)
+      {sel:'E1',    keys:[{key:' ',ctrl:true}]},                          // Ctrl+Space → column E (colE)
+      {sel:'E1:E6', keys:[{key:'Home',ctrl:true},{key:'ArrowDown',ctrl:true}]}, // → A1 → A6 (bottom)
+      {sel:'A6',    keys:[{key:'ArrowRight',shift:true}]},                // Shift+→ → A6:B6 (nudge)
+      {sel:'A6:B6', keys:[{key:'ArrowRight',ctrl:true,shift:true}]},      // Ctrl+Shift+→ → A6:E6 (edge)
+      {sel:'A6:E6', keys:[{key:' ',shift:true}]},                         // Shift+Space → whole row (rowAll)
+      {sel:'A6:J6', keys:[{key:'a',ctrl:true}]},                          // Ctrl+A → data region (all, tolerant finale)
     ]` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
