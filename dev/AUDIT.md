@@ -4625,3 +4625,10 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   the OK/ERROR desk convention, audit names the F5-special sweep the
   seniors run, housestyle carries the never-merge rule verbatim.
 - PARITY 73 -> 77 (section V). ALTS 78 -> 79. CACHE v160 -> v161.
+
+## r189 — docs only: pipeline state-of-the-queue header
+- No game assets touched (verified: diff is dev/*.md only). PIPELINE.md
+  now opens with the r188 queue state — every executable task done; the
+  three gates to what's next (egress session, Wolf's two decisions,
+  deferred engine items) named explicitly for whichever session
+  continues from here.

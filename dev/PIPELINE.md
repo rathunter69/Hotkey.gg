@@ -1,4 +1,24 @@
 # PIPELINE — the Fable task queue
+
+## ⚡ STATE OF THE QUEUE (r188, July 2026 — read this first)
+Every executable task below is DONE: T-A (all enrichment tranches + backlog
+matrix), T-B (79 alts, full coverage), T-C, T-D (engine pack 1), T-E (engine
+pack 2, minus deliberately-deferred items), T-F (dialog deck), T-J (voice),
+T-K (onboarding v2). All six CANON_DIFF drill proposals are live. 78 drills,
+parity 77, gate green at every push.
+What remains, and what unblocks it:
+1. **EGRESS SESSION** (next real milestone): Supabase live smoke test
+   (accounts/leaderboards/desk RPCs are UNVERIFIED against prod — seeded desk
+   codes stay held until green) + T-G canon verification remainder.
+2. **WOLF DECISIONS**: T-H interview mode (dev/INTERVIEW.md awaits sign-off;
+   a plain "go" starts the build) · T-I seasons (gated on DAU per STRATEGY).
+3. **DEFERRED ENGINE** (build only when a drill concept demands it): Ctrl+0
+   column hide (render surface), Alt H O H row height (needs a height model),
+   SUBTOTAL(9) visible-aware math (pairs with a "total follows the filter"
+   drill).
+Future-content seedbank: equity DISTRIBUTION waterfall (RoC/pref/catch-up/
+carry — see REALISM_NOTES r181), RF per-category cycling via RF_CAT,
+interview mode report-card stall coaching, plugin-floor display.
 *(r169. Wolf: paste any task block below into a fresh session as the opening
 prompt. Each is self-contained; every task ends with the full gate from
 dev/DRILL_DOCTRINE.md §4 and an AUDIT.md round entry. Order is priority order,
