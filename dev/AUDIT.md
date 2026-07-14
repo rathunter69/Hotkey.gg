@@ -4905,3 +4905,36 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   Ctrl-chord insert/delete + typed SUM + ribbon bold) → par-sweep FLAGGED:0 →
   parity 94 → onboard 28 → visual 311 → rank 20 → fit-sweep 75 clean →
   screenshots (fresh + win). CACHE v166 -> v167.
+
+## r199 — modeltour rebuilt as a real P&L cascade (Wolf feedback)
+- Wolf on "Chase the marks": great drill, but (a) hard to see WHERE to add the
+  formula, (b) it should build down to EBIT then Net income, (c) more borders
+  so it's clear you're rebuilding FORMULAS, not hardcoding — "every drill a
+  story of a task someone would actually do." The old drill had you fly to
+  four #REF! marks and RETYPE the printed hardcode; every subtotal was a random
+  number. Reframed end to end.
+- MODELTOUR v3: a proper operating P&L that CASCADES — Revenue, COGS, **Gross
+  profit**, S&M, G&A, **EBITDA**, D&A, **EBIT**, Interest, Taxes, **Net
+  income**. The four subtotal rows are bold + top-ruled (the computed-row cue)
+  and each lost ONE cell to #REF!, scattered across columns so ctrl-arrows are
+  the way to reach them. The player flies to each and rebuilds the FORMULA
+  (=the sum of the lines above; costs carry their sign so it just adds); the
+  cascade recomputes down the column on commit. Graded as a LIVE formula with
+  value parity — hardcodes reject (§2.2 exception: "don't hardcode" IS the
+  lesson). Then close the bottom line and land at A1. 5 periods, marks +
+  values + columns jitter per seed. par 78 / parKeys 40 (median 39).
+- ENGINE-honest design: #REF! marks are txt cells carrying fmtStyle:comma, so
+  dispText shows the "#REF!" string pre-fix and the fixed numeric value renders
+  comma'd post-fix (commitEdit preserves format + the bt rule). No new engine
+  code needed.
+- CHECKLIST CLARITY — BORDERS (Wolf, live, 2nd note): border checklist items
+  must be LITERAL single actions ("add a bottom border to the sum row"), never
+  "dress this up / rule it off / box this". Split modeltour's close-the-line
+  check into two: "dollar-format the Net income row — ctrl+shift+$" and "add a
+  bottom border under the Net income row — the statement's closing rule". This
+  becomes a standing copy rule; a site-wide border-label sweep is queued next.
+- GATE: syntax → demo-replay ALL GREEN (modeltour incl. the 4-check split) →
+  alt-paths 80/80 (modeltour alt rewritten: subtotals via SUM(range) in reverse
+  order, close NI via ctrl+1 C) → par-sweep FLAGGED:0 → parity 94 → onboard 28
+  → visual 311 → rank 20 → fit-sweep 75 clean → screenshots (fresh + win).
+  drills.js meta/par synced. CACHE v167 -> v168.
