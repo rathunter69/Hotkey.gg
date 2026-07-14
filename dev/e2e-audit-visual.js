@@ -66,12 +66,14 @@ function contrast(fgS, bgS) {
     const m = await page.evaluate((t) => {
       const $td = (r, c) => document.querySelector('td[data-r="' + r + '"][data-c="' + c + '"]') ||
         [...document.querySelectorAll('td')].find(x => x.dataset && +x.dataset.r === r && +x.dataset.c === c);
-      const cellBg = getComputedStyle(document.querySelector('.gridwrap table') || document.body).backgroundColor;
-      const bodyBg = getComputedStyle(document.body).backgroundColor;
+      // r212: the visible sheet bg is the .gridwrap DIV (background:var(--surface)), NOT the
+      // body — cells are transparent and sit over the gridwrap. On dark themes the sheet is now
+      // light (dark chrome, light sheet), so measuring against body would be wrong.
+      const sheetBg = getComputedStyle(document.querySelector('.gridwrap') || document.body).backgroundColor;
       const anyTd = document.querySelector('td:not(.rowhdr)');
       const grid = getComputedStyle(anyTd).borderTopColor;
       const tdBg0 = getComputedStyle(anyTd).backgroundColor;
-      const bg = (parseFloat((tdBg0.match(/[\d.]+\)$/) || ['1'])[0]) === 0 || tdBg0 === 'rgba(0, 0, 0, 0)') ? bodyBg : tdBg0;
+      const bg = (parseFloat((tdBg0.match(/[\d.]+\)$/) || ['1'])[0]) === 0 || tdBg0 === 'rgba(0, 0, 0, 0)') ? sheetBg : tdBg0;
       const sw = {};
       document.querySelectorAll('td').forEach(td => {
         [...td.classList].forEach(cl => { if (cl.indexOf('fc-') === 0) sw[cl.slice(3)] = getComputedStyle(td).color; });
@@ -94,7 +96,10 @@ function contrast(fgS, bgS) {
       ok(layerRatio >= 1.6, th + ': applied border distinct from gridlines', 'ratio ' + layerRatio.toFixed(2));
     }
     for (const [name, col] of Object.entries(m.sw)) {
-      if (name === 'white' && !m.dark) continue;   // Excel parity: white-on-white is invisible in real Excel too
+      // Excel parity: white font on a light sheet is invisible in real Excel too. r212 decoupled
+      // the sheet from the theme (dark chrome, LIGHT sheet), so exempt white whenever the SHEET is
+      // light — not just on light themes.
+      if (name === 'white') { const bgc = parseColor(m.bg); if (bgc && lum(bgc.rgb) > 0.5) continue; }
       const c = contrast(col, m.bg);
       ok(c !== null && c >= 2.5, th + ': font swatch "' + name + '" legible', 'contrast ' + (c && c.toFixed(2)));
     }

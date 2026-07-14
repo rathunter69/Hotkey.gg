@@ -5118,3 +5118,21 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   renderLvl stashes window.__lvlXp so the panel matches the badge exactly.
 - Verified on Daylight + dark: ring/bar/text all legible. index.html only,
   display-only (no grading change, no ?v bump).
+
+## r212 (part 1) — DARK CHROME, LIGHT SHEET (Wolf: "feels like Excel")
+- Wolf chose, for "keep the main grid a lighter variant so it still feels like
+  Excel": the real-Excel-in-dark-mode look — dark nav/ribbon/checklist chrome,
+  but the drill grid renders on a LIGHT sheet. Implemented by scoping a fixed
+  light palette onto .gridwrap for dark themes only (html[data-dark="1"]
+  .gridwrap { --bg/--surface/--surface2/--line/--text/--muted/--faint/--warn/
+  --bad + an Excel-green --accent }). CSS vars cascade to every cell, so the
+  sheet flips while the chrome keeps the theme. Light themes already have a
+  light sheet — untouched. The dark-theme fc-*/fill-blue overrides (tuned for a
+  dark sheet) are negated inside .gridwrap so swatches use their light base.
+- AUDIT harness corrected (e2e-audit-visual.js): the "sheet bg" was read from
+  the BODY (transparent cells fell through to it) — wrong now that the sheet is
+  the .gridwrap surface, not the body. Now reads the .gridwrap div's bg. And the
+  white-swatch exemption ("white-on-white is invisible in Excel too") now keys
+  on the SHEET luminance, not the theme's dark flag — so it applies to any light
+  sheet. VISUAL MATRIX: ALL 295 PASS (was 311; 16 fewer = white now exempt on
+  the 16 dark themes' light sheets). index.html only (no ?v bump).
