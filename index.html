@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=171" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=171">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=171">
+<link rel="icon" href="favicon.ico?v=172" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=172">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=172">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -132,7 +132,9 @@
      ribbon / checklist / background keep the theme. Scoped to .gridwrap so only the sheet
      flips; CSS vars cascade to every cell. Light themes already have a light sheet — untouched. */
   html[data-dark="1"] .gridwrap{
-    --bg:#ffffff; --surface:#f8f8f5; --surface2:#e9e9e4; --line:#cdcdc6;
+    /* r213 (Wolf): softened off the stark white — a gentle warm off-white sheet, easier on the
+       eyes in dark mode while still reading like a clean Excel page. */
+    --bg:#f7f6f1; --surface:#f0efe8; --surface2:#e4e2da; --line:#c9c7bf;
     --text:#22262b; --muted:#66696e; --faint:#9a9da2;
     --warn:#9a6700; --bad:#b3261e;
     --accent:#1f8a55; --accent-dim:#14663d; --accent-glow:rgba(31,138,85,.14);   /* Excel-green selection on the light sheet */
@@ -1176,14 +1178,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=171"></script>
-<link rel="stylesheet" href="nav.css?v=171">
-<script src="themes.js?v=171"></script>
+<script src="drills.js?v=172"></script>
+<link rel="stylesheet" href="nav.css?v=172">
+<script src="themes.js?v=172"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=171"></script>
+<script src="nav.js?v=172"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -6512,39 +6514,40 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation tour', par:42, parKeys:11,
-    aha:'the keyboard doesn’t just move — it GRABS: a column, a row, the whole model, each in one chord',
-    prompt:'The mouse crawls; the keyboard teleports — and then it grabs. Lap this model with the Ctrl-arrows (jump edge to edge, zero scrolling), then learn the selection chords every analyst lives on: Ctrl+Space takes a whole column, Shift+arrow opens a selection cell by cell, Ctrl+Shift+arrow shoots it to the edge in one shot, Shift+Space takes a whole row — and Shift+Space then Ctrl+Space grabs the entire model at once. No mouse touches the sheet.',
-    req:'<em>ctrl+home</em> → <em>ctrl+→</em> · <em>ctrl+space</em> (column) · <em>ctrl+home</em> → <em>ctrl+↓</em> · <em>⇧+→</em> · <em>ctrl+⇧+→</em> · <em>⇧+space</em> (row) · <em>ctrl+space</em> (all)',
+    name:'Navigate', label:'Navigation tour', par:46, parKeys:11,
+    aha:'each arrow chord is its own move — jump, extend, shoot to the edge — then you grab the model and copy it',
+    prompt:'The mouse crawls; the keyboard teleports — and then it grabs. First learn to MOVE: Ctrl+→ and Ctrl+↓ jump edge to edge, one chord each, zero scrolling. Then learn to SELECT, one chord at a time: Shift+→ and Shift+↓ open a selection a cell at a time, and Ctrl+Shift+↓ then Ctrl+Shift+→ shoot it to the data’s edge. The job at the end: you’ve got the whole model highlighted — Ctrl+C copies it onto your clipboard, ready to drop into the deck. No mouse touches the sheet.',
+    req:'<em>ctrl+home</em> · <em>ctrl+→</em> · <em>ctrl+↓</em> · back to <em>A1</em> · <em>⇧+→</em> · <em>⇧+↓</em> · <em>ctrl+⇧+↓</em> · <em>ctrl+⇧+→</em> · <em>ctrl+c</em>',
     guide:[
       '<kbd>ctrl</kbd>+<kbd>home</kbd> — snap to the top-left corner, A1',
       '<kbd>ctrl</kbd>+<kbd>→</kbd> — jump to the end of the header row',
-      '<kbd>ctrl</kbd>+<kbd>space</kbd> — select the whole year column, top to bottom',
-      '<kbd>ctrl</kbd>+<kbd>home</kbd>, then <kbd>ctrl</kbd>+<kbd>↓</kbd> — dive to the bottom of the labels',
-      '<kbd>⇧</kbd>+<kbd>→</kbd> — open the selection one cell at a time',
-      '<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> — shoot the selection to the far edge of the row',
-      '<kbd>⇧</kbd>+<kbd>space</kbd> — select the entire row',
-      '<kbd>ctrl</kbd>+<kbd>space</kbd> — widen it to the whole model: everything selected in one chord',
+      '<kbd>ctrl</kbd>+<kbd>↓</kbd> — jump to the bottom of the column',
+      'back at <b>A1</b> (<kbd>ctrl</kbd>+<kbd>home</kbd>) · <kbd>⇧</kbd>+<kbd>→</kbd> — open a selection one cell right',
+      '<kbd>⇧</kbd>+<kbd>↓</kbd> — grow the selection one cell down',
+      '<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> — shoot the selection to the bottom of the data',
+      '<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> — shoot it out to the last column: the whole model is highlighted',
+      '<kbd>ctrl</kbd>+<kbd>c</kbd> — copy the model onto your clipboard for the deck',
     ],
-    targets:['A1','E1','E1:E6','A6','A6:B6','A6:E6','A6:J6','A1:J6'],
+    targets:['A1','E1','E6','A1:B1','A1:B2','A1:B6','A1:E6','A1:E6'],
     demo(){ return [
       {sel:'C3',    keys:[Kb.ctrlHome]},                              // → A1
-      {sel:'A1',    keys:[Kb.ctrlRight]},                             // → E1 (end of header)
-      {sel:'E1',    keys:[{key:' ',ctrl:true}]},                      // Ctrl+Space → whole column E
-      {sel:'E1:E6', keys:[Kb.ctrlHome, Kb.ctrlDown]},                 // → A1 → A6 (bottom of labels)
-      {sel:'A6',    keys:[{key:'ArrowRight',shift:true}]},            // Shift+→ → A6:B6 (nudge)
-      {sel:'A6:B6', keys:[{key:'ArrowRight',ctrl:true,shift:true}]},  // Ctrl+Shift+→ → A6:E6 (to edge)
-      {sel:'A6:E6', keys:[{key:' ',shift:true}]},                     // Shift+Space → whole row 6
-      {sel:'A6:J6', keys:[{key:' ',ctrl:true}]},                      // Ctrl+Space → whole model
+      {sel:'A1',    keys:[Kb.ctrlRight]},                             // Ctrl+→ → E1 (end of header)
+      {sel:'E1',    keys:[Kb.ctrlDown]},                              // Ctrl+↓ → E6 (bottom of column)
+      {sel:'E6',    keys:[Kb.ctrlHome]},                              // back to A1
+      {sel:'A1',    keys:[{key:'ArrowRight',shift:true}]},            // Shift+→ → A1:B1
+      {sel:'A1:B1', keys:[{key:'ArrowDown',shift:true}]},            // Shift+↓ → A1:B2
+      {sel:'A1:B2', keys:[{key:'ArrowDown',ctrl:true,shift:true}]},  // Ctrl+Shift+↓ → A1:B6
+      {sel:'A1:B6', keys:[{key:'ArrowRight',ctrl:true,shift:true}]}, // Ctrl+Shift+→ → A1:E6 (whole model)
+      {sel:'A1:E6', keys:[{key:'c',ctrl:true}]},                     // Ctrl+C → copy the model
     ]; },
     build(){
-      // r207 (Wolf): the FLAGSHIP is a NAVIGATION drill — move + SELECT at speed, no mouse.
-      // Structure ops (insert row / insert column) moved to the next Foundations drill; this one
-      // is pure travel + selection muscle: teleport the corners with the Ctrl-arrows, then the
-      // chords analysts live on — Ctrl+Space (column), Shift+arrow (nudge), Ctrl+Shift+arrow
-      // (shoot to the edge), Shift+Space (row), and Shift+Space→Ctrl+Space (the whole model).
+      // r213 (Wolf): the FLAGSHIP navigation drill — each arrow chord is its OWN discrete beat:
+      // Ctrl+→ / Ctrl+↓ jump (both axes), Shift+→ / Shift+↓ extend one cell (both axes),
+      // Ctrl+Shift+↓ / Ctrl+Shift+→ shoot to the data edge — no chaining shift straight into
+      // ctrl+shift. The finale has a GOAL: the whole model is highlighted, so Ctrl+C copies it
+      // for the deck (a real analyst hand-off), not "select everything for no reason".
+      // Structure ops (insert row/column) live in the next Foundations drill.
       // CONTIGUOUS board (no empty holes) so every Ctrl-arrow lands on the true data edge.
-      // Pre-dressed to the banker's-workbook bar (§2.1b).
       const cells={};
       const y0=rnd(23,26);
       cells['A1']={...blankCell(),value:codename(),txt:true,bold:true,bb:true};
@@ -6564,35 +6567,34 @@ const CHALLENGES = {
       }
       return {ROWS:6, cells, active:{r:3,c:3}, sel:null, colW:{1:132,2:74,3:74,4:74,5:74}};
     },
-    // Each chord latches sequentially: movement beats check the active cell (no selection),
-    // selection beats check the exact selRange rectangle. Grading the STATE (not the keystroke)
-    // keeps every legit route valid — the alt reaches the same rectangles a different way.
+    // r213: each arrow chord latches as its OWN discrete beat. Movement beats check the active
+    // cell (no selection); selection beats check the exact selRange rectangle; the finale checks
+    // the CLIPBOARD (the model got copied). Grading the STATE keeps every legit route valid.
     checks(S){
-      if(!S.navProgress) S.navProgress = { home:false, jumpR:false, colE:false, bottom:false, nudge:false, edge:false, rowAll:false, all:false };
+      if(!S.navProgress) S.navProgress = { home:false, jumpR:false, jumpD:false, selR:false, selD:false, edgeD:false, edgeR:false, copied:false };
       const np = S.navProgress;
       const A=S.active, sel=S.sel, s=selRange();
       const at=(r,c)=> A.r===r && A.c===c && !sel;
       const rng=(r1,r2,c1,c2)=> !!sel && s.r1===r1 && s.r2===r2 && s.c1===c1 && s.c2===c2;
-      if(!np.home   && at(1,1))                     np.home   = true;
-      if( np.home   && !np.jumpR  && at(1,5))        np.jumpR  = true;   // Ctrl+→ to E1
-      if( np.jumpR  && !np.colE   && rng(1,S.ROWS,5,5)) np.colE = true;  // Ctrl+Space, column E
-      if( np.colE   && !np.bottom && at(6,1))        np.bottom = true;   // Ctrl+Home → Ctrl+↓ to A6
-      if( np.bottom && !np.nudge  && rng(6,6,1,2))   np.nudge  = true;   // Shift+→ nudge A6:B6
-      if( np.nudge  && !np.edge   && rng(6,6,1,5))   np.edge   = true;   // Ctrl+Shift+→ to data edge A6:E6
-      if( np.edge   && !np.rowAll && rng(6,6,1,COLS))np.rowAll = true;   // Shift+Space, whole row
-      // finale: the whole model selected — measured against the DATA extent (6 rows, through
-      // col E), not the grid, so BOTH routes count: Ctrl+A stops at the used range (A1:E6) while
-      // Shift+Space→Ctrl+Space spans the full sheet — either covers the model, any legit way.
-      if( np.rowAll && !np.all && !!sel && s.r1===1 && s.r2>=6 && s.c1===1 && s.c2>=5) np.all = true;
+      const cb=S.clipboard&&S.clipboard.rect;
+      if(!np.home   && at(1,1))                       np.home  = true;
+      if( np.home   && !np.jumpR && at(1,5))          np.jumpR = true;   // Ctrl+→ to E1
+      if( np.jumpR  && !np.jumpD && at(6,5))          np.jumpD = true;   // Ctrl+↓ to E6
+      if( np.jumpD  && !np.selR  && rng(1,1,1,2))     np.selR  = true;   // back to A1, Shift+→ → A1:B1
+      if( np.selR   && !np.selD  && rng(1,2,1,2))     np.selD  = true;   // Shift+↓ → A1:B2
+      if( np.selD   && !np.edgeD && rng(1,6,1,2))     np.edgeD = true;   // Ctrl+Shift+↓ → A1:B6
+      if( np.edgeD  && !np.edgeR && rng(1,6,1,5))     np.edgeR = true;   // Ctrl+Shift+→ → A1:E6 (whole model)
+      // finale GOAL: the model is on the clipboard (covers A1:E6, any legit selection route).
+      if( np.edgeR  && !np.copied && !!cb && cb.r1===1 && cb.c1===1 && cb.r2>=6 && cb.c2>=5) np.copied = true;
       return [
-        {label:'Ctrl+Home — snap to the top-left corner (A1)',              ok: np.home},
-        {label:'Ctrl+→ — jump to the end of the header row',                ok: np.jumpR},
-        {label:'Ctrl+Space — select the entire year column',               ok: np.colE},
-        {label:'Ctrl+Home, then Ctrl+↓ — dive to the bottom of the labels', ok: np.bottom},
-        {label:'Shift+→ — open the selection one cell at a time',           ok: np.nudge},
-        {label:'Ctrl+Shift+→ — shoot the selection to the edge of the row',  ok: np.edge},
-        {label:'Shift+Space — select the entire row',                       ok: np.rowAll},
-        {label:'Ctrl+Space — grab the whole model, everything at once',     ok: np.all},
+        {label:'Ctrl+Home — snap to the top-left corner (A1)',                ok: np.home},
+        {label:'Ctrl+→ — jump to the end of the header row',                  ok: np.jumpR},
+        {label:'Ctrl+↓ — jump to the bottom of the column',                  ok: np.jumpD},
+        {label:'back at A1, Shift+→ — open a selection one cell right',       ok: np.selR},
+        {label:'Shift+↓ — grow the selection one cell down',                 ok: np.selD},
+        {label:'Ctrl+Shift+↓ — shoot the selection to the bottom of the data', ok: np.edgeD},
+        {label:'Ctrl+Shift+→ — shoot it out to the last column (whole model)', ok: np.edgeR},
+        {label:'Ctrl+C — copy the model onto your clipboard for the deck',    ok: np.copied},
       ];
     }
   }
@@ -9290,7 +9292,7 @@ document.addEventListener('keydown',e=>{
     if(e.altKey){ e.preventDefault(); return; }
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
       const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }
-    if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); return; }
+    if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); checkWin(); return; }   /* r213: a copy can be a drill's goal (navigation) — run the win check; no-op for every other drill */
     if(lk==='x'){ e.preventDefault(); startClock(); logKey('Ctrl+X'); copySel(); if(S.clipboard) S.clipboard.cut=true; render(); return; }
     if(keyProfile==='macabacus' && e.shiftKey && !e.altKey && lk==='v'){
       e.preventDefault(); startClock(); logKey('Ctrl+Shift+V'); doPaste('values'); commitAction(); return; }  // Macabacus paste values (documented default)

@@ -657,15 +657,16 @@ const ALTS = [
       {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
       {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
     ]; }` },
-  { key: 'navigation', name: 'same tour; whole-model finale via Ctrl+A instead of Shift+Space→Ctrl+Space', moves: `C => [
+  { key: 'navigation', name: 'same beats, but the block is grown the SLOW way — repeated Shift+arrows instead of Ctrl+Shift', moves: `C => [
       {sel:'C3',    keys:[{key:'Home',ctrl:true}]},                       // → A1 (home)
-      {sel:'A1',    keys:[{key:'ArrowRight',ctrl:true}]},                 // → E1 (jumpR)
-      {sel:'E1',    keys:[{key:' ',ctrl:true}]},                          // Ctrl+Space → column E (colE)
-      {sel:'E1:E6', keys:[{key:'Home',ctrl:true},{key:'ArrowDown',ctrl:true}]}, // → A1 → A6 (bottom)
-      {sel:'A6',    keys:[{key:'ArrowRight',shift:true}]},                // Shift+→ → A6:B6 (nudge)
-      {sel:'A6:B6', keys:[{key:'ArrowRight',ctrl:true,shift:true}]},      // Ctrl+Shift+→ → A6:E6 (edge)
-      {sel:'A6:E6', keys:[{key:' ',shift:true}]},                         // Shift+Space → whole row (rowAll)
-      {sel:'A6:J6', keys:[{key:'a',ctrl:true}]},                          // Ctrl+A → data region (all, tolerant finale)
+      {sel:'A1',    keys:[{key:'ArrowRight',ctrl:true}]},                 // Ctrl+→ → E1 (jumpR)
+      {sel:'E1',    keys:[{key:'ArrowDown',ctrl:true}]},                  // Ctrl+↓ → E6 (jumpD)
+      {sel:'E6',    keys:[{key:'Home',ctrl:true}]},                       // back to A1
+      {sel:'A1',    keys:[{key:'ArrowRight',shift:true}]},                // Shift+→ → A1:B1 (selR)
+      {sel:'A1:B1', keys:[{key:'ArrowDown',shift:true}]},                 // Shift+↓ → A1:B2 (selD)
+      {sel:'A1:B2', keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true}]}, // Shift+↓×4 → A1:B6 (edgeD, slow route)
+      {sel:'A1:B6', keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}]}, // Shift+→×3 → A1:E6 (edgeR, slow route)
+      {sel:'A1:E6', keys:[{key:'c',ctrl:true}]},                          // Ctrl+C → copy the model (goal)
     ]` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);

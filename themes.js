@@ -111,6 +111,39 @@ window.THEMES = {
     text:'#dcd7ba', muted:'#c8c093', faint:'#727169',
     accent:'#ffa066', 'accent-dim':'#c97f4d', 'accent-glow':'rgba(255,160,102,.22)',
     warn:'#e6c384', bad:'#c34043' }},
+  /* r213 (Wolf): more distinct LIGHT/paper themes + bolder color identities — the set skewed
+     dark-blue. Light themes keep their own paper sheet; the bold dark ones ride the r212
+     dark-chrome / light-sheet, so their identity lives in the chrome. */
+  ledger: { name:'Ledger', dark:false, vars:{
+    bg:'#e7ede0', surface:'#f2f6ea', surface2:'#dde5d0', line:'#c2cdad',
+    text:'#26301c', muted:'#5b6650', faint:'#98a186',
+    accent:'#2f7a44', 'accent-dim':'#1d5730', 'accent-glow':'rgba(47,122,68,.14)',
+    warn:'#8a6100', bad:'#a83232' }},
+  sepia: { name:'Sepia', dark:false, vars:{
+    bg:'#ece0cd', surface:'#f5ecdd', surface2:'#e2d4bd', line:'#cab897',
+    text:'#3a2e20', muted:'#6e5c45', faint:'#a08e74',
+    accent:'#a3592a', 'accent-dim':'#7a3f18', 'accent-glow':'rgba(163,89,42,.13)',
+    warn:'#8a6100', bad:'#9c3b2e' }},
+  frost: { name:'Frost', dark:false, vars:{
+    bg:'#e8edf3', surface:'#f6fafd', surface2:'#dce4ec', line:'#c1ccd9',
+    text:'#1f2733', muted:'#5b6673', faint:'#97a2b0',
+    accent:'#2b7bbd', 'accent-dim':'#1b5688', 'accent-glow':'rgba(43,123,189,.14)',
+    warn:'#9a6700', bad:'#b3261e' }},
+  phoebes: { name:'Phoebe’s Paws', dark:false, vars:{
+    bg:'#f7e8ee', surface:'#fdf3f7', surface2:'#f2dde6', line:'#e6c2d1',
+    text:'#3b2b32', muted:'#8a6b76', faint:'#c2a2ae',
+    accent:'#c43a77', 'accent-dim':'#9a2a5a', 'accent-glow':'rgba(196,58,119,.14)',
+    warn:'#9a6700', bad:'#b3261e' }},
+  crimson: { name:'Crimson', dark:true, vars:{
+    bg:'#191012', surface:'#241619', surface2:'#301b20', line:'#4a2d33',
+    text:'#f2e2e2', muted:'#c09a9a', faint:'#7d585e',
+    accent:'#e2503f', 'accent-dim':'#b0392b', 'accent-glow':'rgba(226,80,63,.22)',
+    warn:'#e0b020', bad:'#ff6a5a' }},
+  tangerine: { name:'Tangerine', dark:true, vars:{
+    bg:'#181410', surface:'#231d15', surface2:'#2f251a', line:'#4a3c28',
+    text:'#f3e9db', muted:'#c3ac8c', faint:'#847258',
+    accent:'#f0871f', 'accent-dim':'#bf6810', 'accent-glow':'rgba(240,135,31,.22)',
+    warn:'#ffd24a', bad:'#ff6a4a' }},
 };
 
 window.currentTheme = 'default';
