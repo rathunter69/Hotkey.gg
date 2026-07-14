@@ -146,6 +146,24 @@ window.THEMES = {
     warn:'#ffd24a', bad:'#ff6a4a' }},
 };
 
+/* r214 (Wolf): the picker interleaved light and dark randomly. Give it a coherent order —
+   LIGHT/paper first (Daylight, the default light, leads), then DARK roughly light → dark
+   (Default, the grey prior-default, leads). themeList() feeds both pickers; any theme missing
+   from the list still shows (appended), so a new theme can't vanish. */
+window.THEME_ORDER = [
+  // light / paper
+  'daylight','github','light','phoebes','newsprint','frost','ledger','serika','sepia',
+  // dark, ~lightest → darkest
+  'default','nord','everforest','dracula','onedark','gruvbox','monokai','kanagawa','catppuccin',
+  'synthwave','tokyo','rose','solarized','crimson','tangerine','carbon','terminal','bloomberg',
+];
+window.themeList = function(){
+  const seen={}, out=[];
+  (window.THEME_ORDER||[]).forEach(k=>{ if(window.THEMES[k]){ out.push([k, window.THEMES[k]]); seen[k]=1; } });
+  Object.keys(window.THEMES).forEach(k=>{ if(!seen[k]) out.push([k, window.THEMES[k]]); });
+  return out;
+};
+
 window.currentTheme = 'default';
 
 // Update any theme-name labels on the page (Monkeytype-style text next to the theme selector).

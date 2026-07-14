@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=172" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=172">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=172">
+<link rel="icon" href="favicon.ico?v=173" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=173">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=173">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1178,14 +1178,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=172"></script>
-<link rel="stylesheet" href="nav.css?v=172">
-<script src="themes.js?v=172"></script>
+<script src="drills.js?v=173"></script>
+<link rel="stylesheet" href="nav.css?v=173">
+<script src="themes.js?v=173"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=172"></script>
+<script src="nav.js?v=173"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -10151,7 +10151,7 @@ function openKbd(){
 function openThemes(){
   const m=$('themesModal'); if(!m) return;
   themesOpen=true; m.classList.add('show');
-  const swatches = Object.entries(THEMES).map(([key,t])=>{
+  const swatches = (window.themeList?window.themeList():Object.entries(THEMES)).map(([key,t])=>{
     const v=t.vars; const isSel = key===currentTheme;
     return `<button class="th-card${isSel?' sel':''}" data-key="${key}" style="background:${v.bg}; color:${v.text}; border-color:${isSel?v.accent:v.line}">`+
       `<div class="th-name">${escHtml(t.name)}</div>`+
@@ -11975,6 +11975,7 @@ const TOUR_STEPS=[
     body:'That speed is the product.<br><br>\u00b7 Analysts live in Excel <b>6\u201310 hours a day</b> \u2014 a mouse round-trip costs ~2s, a chord costs ~0.3s. Over a model, that\u2019s hours.<br>\u00b7 Seniors <b>read keyboard pace as a signal</b> \u2014 it says you\u2019ve done the reps.<br>\u00b7 Every drill here is a <b>real desk task</b> \u2014 comps, roll-forwards, tie-outs \u2014 graded on the end state, timed like the desk is watching.<br><br>Play it like a ladder game: solve clean, beat par, climb the rank.'},
   {sel:'.cl-inner',   cap:'your instructions', body:'The <b>checklist</b> is the ask \u2014 an associate\u2019s markup. Every line is an action; green means done. Finish them all and the clock stops.'},
   {sel:'.drillbar',   cap:'the trainer',   body:'<b>\\</b> opens the drill map \u00b7 <b>Alt+\u2190/\u2192</b> hops drills \u00b7 <b>F1</b> is guided mode \u2014 it walks you key by key when you\u2019re lost \u00b7 <b>Esc</b> never restarts your run.'},
+  {sel:'#navThemes',  cap:'make it yours', body:'Prefer light or dark? <b>Themes</b> live here \u2014 paper-white to Bloomberg-black, and every one keeps a clean Excel sheet you can actually read. Pick one anytime; it saves across sessions.'},
   {sel:'#authSlot',   cap:'the ladder',    body:'<b>LEVEL</b> is your reps \u2014 every clean solve earns xp. <b>RANK</b> is the competition \u2014 clean, mouseless runs post to per-drill <b>leaderboards</b>, crowns for first. The desk is watching.'},
 ];
 let __tourI=-1, __tourAfter=null;
