@@ -6513,17 +6513,24 @@ const CHALLENGES = {
       {sel:'A1:A7', keys:[Kb.ctrlHome]},
     ]; },
     build(){
-      // 7×5 income-statement-style table; cursor starts mid-grid so plain arrows would be slow —
-      // the chord tour laps the whole thing in twelve presses.
+      // 7×5 income statement; cursor starts mid-grid so plain arrows would be slow —
+      // the chord tour laps the whole thing in twelve presses. r201: the board ships
+      // pre-dressed to the banker's-workbook bar (§2.1b) — a nav drill, so the player
+      // never formats it, but the tour should lap a page that already looks real.
       const cells={};
-      cells['A1']={...blankCell(),value:'Model',txt:true,bold:true};
-      const labels=['Revenue','COGS','SG&A','Opex','D&A','EBIT'];
-      labels.forEach((lbl,i)=>cells['A'+(i+2)]={...blankCell(),value:lbl,txt:true});
-      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:y,txt:true,bold:true,align:'r'});
-      for(let r=2;r<=7;r++) for(let c=2;c<=5;c++){
-        cells[colLetter(c)+r]={...blankCell(),value:rnd(20,99)*10,fmtStyle:'comma',decimals:0};
-      }
-      return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74}};
+      const y0=rnd(23,26);
+      cells['A1']={...blankCell(),value:codename(),txt:true,bold:true,bb:true};   // corner + the header rule runs under it
+      ['Y1','Y2','Y3','Y4'].forEach((y,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true});
+      const rows=[['Revenue',1],['COGS',-1],['SG&A',-1],['Opex',-1],['D&A',-1]];
+      rows.forEach(([lbl,sign],i)=>{ const r=i+2;
+        cells['A'+r]={...blankCell(),value:lbl,txt:true};
+        for(let c=2;c<=5;c++) cells[colLetter(c)+r]={...blankCell(),value:(lbl==='Revenue'?rnd(130,200)*5:-rnd(40,140)),fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      });
+      // EBIT — the ruled subtotal: bold, top border, computed so the page ties
+      cells['A7']={...blankCell(),value:'EBIT',txt:true,bold:true};
+      for(let c=2;c<=5;c++){ let s=0; for(let r=2;r<=6;r++) s+=cells[colLetter(c)+r].value;
+        cells[colLetter(c)+7]={...blankCell(),value:s,fmtStyle:'comma',decimals:0,bold:true,bt:true}; }
+      return {ROWS:7, cells, active:{r:4,c:3}, sel:null, colW:{1:110,2:74,3:74,4:74,5:74}};
     },
     // Sequential progression: each step latches once, and only after the previous one has.
     // Out-of-order presses don't satisfy later checks. ROWS snapshot lets insert/delete compare.
