@@ -85,11 +85,13 @@ const ALTS = [
       {sel:o.col, keys:[{key:'d',ctrl:true}]},
       {sel:o.grid, keys:[{key:'r',ctrl:true}]},
     ]; }` },
-  { key: 'sort', name: 'foot and dress BEFORE sorting', moves: `C => { const o=C._o; return [
-      {sel:o.foot, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
-      {sel:o.foot, keys:[{key:'b',ctrl:true}]},
-      {sel:o.range, keys:[{key:'Alt'},L('a'),L('s'),L('d')]},
-    ]; }` },
+  { key: 'sort', name: 'foot and dress BEFORE sorting, single-column sort resolved via the WARNING (e expand)', moves: `C => { const o=C._o;
+      const m=o.range.match(/([A-J])(\\d+):([A-J])(\\d+)/);
+      return [
+        {sel:o.foot, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
+        {sel:o.foot, keys:[{key:'b',ctrl:true}]},
+        {sel:o.sc+m[2]+':'+o.sc+m[4], keys:[{key:'Alt'},L('a'),L('s'),L('d'),L('e')]},
+      ]; }` },
   { key: 'series', name: 'dress first, series last', moves: `C => { const o=C._o; return [
       {sel:o.range, keys:[{key:'b',ctrl:true}]},
       {sel:o.range, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},

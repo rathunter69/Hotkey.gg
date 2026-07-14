@@ -6584,6 +6584,26 @@ function evalFormula(expr){
   const r=cmp_(); skip(); if(i<s.length) throw new Error('trailing'); return r;
 }
 function autoSum(){
+  /* r192 (Wolf): Excel's RANGE form — select a column/row THROUGH its empty
+     total cell and Alt+= fills the sum COMMITTED, selection preserved. The
+     single-cell form still proposes in the editor; its Enter-commit now
+     STAYS on the cell so bold/border follows without re-navigating. */
+  if(S.sel){
+    const r2=selRange();
+    if(r2.c1===r2.c2 && r2.r2>r2.r1 && !nonEmpty(r2.r2,r2.c1)){
+      let n=0; for(let rr=r2.r1;rr<r2.r2;rr++) if(typeof get(rr,r2.c1).value==='number') n++;
+      if(n){ pushUndo(); const cell=ensure(r2.r2,r2.c1);
+        cell.formula='=SUM('+colLetter(r2.c1)+r2.r1+':'+colLetter(r2.c1)+(r2.r2-1)+')';
+        try{ cell.value=evalFormula(cell.formula); }catch(_){ cell.value=0; }
+        commitAction(); return; } }
+    if(r2.r1===r2.r2 && r2.c2>r2.c1 && !nonEmpty(r2.r1,r2.c2)){
+      let n=0; for(let cc=r2.c1;cc<r2.c2;cc++) if(typeof get(r2.r1,cc).value==='number') n++;
+      if(n){ pushUndo(); const cell=ensure(r2.r1,r2.c2);
+        cell.formula='=SUM('+colLetter(r2.c1)+r2.r1+':'+colLetter(r2.c2-1)+r2.r1+')';
+        try{ cell.value=evalFormula(cell.formula); }catch(_){ cell.value=0; }
+        commitAction(); return; } }
+  }
+  window.__autoSumEdit=true;
   const {r,c}=S.active;
   // adaptive proposal: contiguous numbers ABOVE first (Excel prefers vertical),
   // then contiguous numbers to the LEFT (cross-footing)
@@ -6609,9 +6629,9 @@ function autoSum(){
 // Sort the selected range by the active cell's column.
 // dir='asc' or 'desc'. Sorts whole rows together so values stay aligned across columns.
 // All cell properties (format, font color, etc) move with the value — we sort by deep-cloning rows.
-function sortRange(dir){
+function sortRange(dir, keyCol){
   const r = selRange(); if(!r) return;
-  const sortCol = S.active.c;
+  const sortCol = keyCol || S.active.c;   // r192: the sort-warning expand path keys off the ORIGINAL column
   if(sortCol < r.c1 || sortCol > r.c2) return;       // sort column must be inside the selection
   if(r.r1 === r.r2) return;                          // single row — nothing to sort
   // Gather rows as arrays of cloned cell objects
@@ -7011,6 +7031,11 @@ function __drawRibbon(){
   if(dialog==='colw'){
     el.className='ribbon show';
     el.innerHTML='<span class="path">column width \u2192</span><span class="opt" style="font-family:var(--mono)">'+(colwBuf||'\u2026')+'</span><span class="opt">type a width (Excel units) \u00b7 \u21b5 apply \u00b7 esc cancel</span>';
+    return;
+  }
+  if(dialog==='sortwarn'){
+    el.className='ribbon show';
+    el.innerHTML='<span class="path">sort warning \u2192</span><span class="opt"><k>e</k>Expand the selection</span><span class="opt"><k>c</k>Continue with the current selection</span><span class="opt">data sits NEXT to your column \u2014 \u21b5 = expand (Excel\u2019s default) \u00b7 esc cancel</span>';
     return;
   }
   if(dialog==='goto'){
@@ -7701,12 +7726,14 @@ function startEdit(initial, mode){
   render();
 }
 function cancelEdit(){
+  window.__autoSumEdit=false;   // r192: a canceled Alt+= proposal must not make the NEXT commit sticky
   editing=false; editBuf='';
   editAnchor=null; editPointer=null; editPointerStart=-1; editPointerBase=null;
   render();
 }
 function commitEdit(dr,dc){
   const __wasMarked = S && typeof markKey==='function' && markKey(S.active.r,S.active.c);
+  const __asStay = !!window.__autoSumEdit; window.__autoSumEdit=false;   // r192: Alt+= commit stays for the bold
   if(editBuf && editBuf[0]==='='){
     const opens=(editBuf.match(/\(/g)||[]).length, closes=(editBuf.match(/\)/g)||[]).length;
     if(opens>closes) editBuf += ')'.repeat(opens-closes);   // Excel parity: auto-close
@@ -7726,7 +7753,7 @@ function commitEdit(dr,dc){
     else { cell.formula=null; cell.value=buf; cell.txt=true; }
   }
   const __walk = (__wasMarked && dc===0 && dr!==0) ? dr : 0;
-  if((dr||dc) && !__walk){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
+  if((dr||dc) && !__walk && !__asStay){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
   commitAction();
   if(__walk && S.marks && S.marks.length) gotoNextMark(__walk>0?1:-1);   // r182: the hunt walks itself \u2014 next surviving mark
 }
@@ -7989,6 +8016,23 @@ function applyRibbon(key){
     if(key==='ENTER'){ applyColWidth(); return; }
     return;
   }
+  // sort warning — E/Enter expands to the contiguous block (Excel's default), C sorts the lone column
+  if(dialog==='sortwarn'){
+    if(key==='E'||key==='ENTER'){
+      const p=sortPend; sortPend=null;
+      let c1=p.key, c2=p.key;
+      const nbr=(cc)=>{ if(cc<1||cc>COLS) return false;
+        for(let rr=p.r1;rr<=p.r2;rr++) if(nonEmpty(rr,cc)) return true; return false; };
+      while(c1>1 && nbr(c1-1)) c1--;
+      while(c2<COLS && nbr(c2+1)) c2++;
+      S.sel={r:p.r1, c:c1}; S.active={r:p.r2, c:c2};   // the expanded block; the key column rides through sortRange's override
+      pushUndo(); sortRange(p.dir, p.key); return exitRibbon(true);
+    }
+    if(key==='C'){ const p=sortPend; sortPend=null; pushUndo();
+      S.sel={r:p.r1,c:p.key}; S.active={r:p.r2,c:p.key};
+      sortRange(p.dir); return exitRibbon(true); }
+    return;
+  }
   // go to (F5 / Ctrl+G): reference boxes need a mouse — Special is the keyboard's door
   if(dialog==='goto'){
     if(key==='S'){ dialog='gotospecial'; drawRibbon(); return; }
@@ -8035,8 +8079,19 @@ function applyRibbon(key){
   if(np==='OE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route
   if(np==='HFC'){ dialog='fontcolor'; fontColorIdx=0; drawRibbon(); return; }
   if(np==='HFIS'){ dialog='series'; drawRibbon(); return; }
-  if(np==='ASA'){ pushUndo(); sortRange('asc'); return exitRibbon(true); }
-  if(np==='ASD'){ pushUndo(); sortRange('desc'); return exitRibbon(true); }
+  if(np==='ASA'||np==='ASD'){
+    const dir = np==='ASD'?'desc':'asc';
+    const r=selRange();
+    /* r192 SORT WARNING (Wolf) — Excel's guardrail: a single-column selection
+       with data alongside decouples rows silently; Excel asks first. */
+    const nbr=(cc)=>{ if(cc<1||cc>COLS) return false;
+      for(let rr=r.r1;rr<=r.r2;rr++) if(nonEmpty(rr,cc)) return true; return false; };
+    if(r.c1===r.c2 && r.r1!==r.r2 && (nbr(r.c1-1)||nbr(r.c2+1))){
+      sortPend={dir:dir, r1:r.r1, r2:r.r2, key:S.active.c};
+      dialog='sortwarn'; drawRibbon(); return;
+    }
+    pushUndo(); sortRange(dir); return exitRibbon(true);
+  }
   if(np==='HFID'){ pushUndo(); fillFrom('down');  return exitRibbon(true); }    // mirror of Ctrl+D, available from the Fill submenu
   if(np==='HFIR'){ pushUndo(); fillFrom('right'); return exitRibbon(true); }    // mirror of Ctrl+R
   const RUN={
@@ -8290,6 +8345,7 @@ function toggleFilter(){
   syncHidden(); render();
 }
 let filterCol=0, filterIdx=0, filterVals=[];
+let sortPend=null;   // r192: pending sort while the warning dialog is up
 function openFilterPicker(c){
   const f=S.filter; if(!f) return;
   filterCol=c; filterIdx=0; filterVals=[];
@@ -8852,6 +8908,7 @@ document.addEventListener('keydown',e=>{
     e.preventDefault();
     if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); window.__escT=0; return; }
     if(S && S.marks && S.marks.length){ S.marks=[]; S.markCrit=null; logKey('Esc'); render(); window.__escT=0; return; }   // r182: second duty \u2014 clear the hunt
+    window.__autoSumEdit=false;   // r192: a canceled Alt+= proposal must not make the NEXT commit sticky
     // r146: DOUBLE-TAP Esc restarts (Wolf: shift+f11 is a stretch). Single Esc still
     // never restarts (r89 doctrine); two taps inside 450ms is an unambiguous ask.
     const now=performance.now();

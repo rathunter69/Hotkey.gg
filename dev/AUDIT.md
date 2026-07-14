@@ -4695,3 +4695,27 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - PARITY 77 → 82 (section W: broadcast multiply, formula wrap, add,
   latch, reset-on-open). ALTS transpose entry rewritten (helper first,
   ctrl+alt+v flip, multiply via alt h v s). CACHE v161 → v162.
+
+## r192 — Wolf's playtest round 2: Sort Warning + the Alt+= flow
+- SORT WARNING (Excel's guardrail, verbatim): a single-column selection
+  with data alongside no longer decouples rows silently — the warning
+  asks first. E / Enter = expand to the contiguous block and sort ROWS
+  together, keyed off the ORIGINAL column (sortRange grew a key-column
+  override so the expanded selection doesn't move the key); C = sort
+  the lone column exactly as selected (Excel obeys you); Esc cancels.
+  Full-table selections never see the dialog. The sort drill's alt now
+  runs Wolf's exact flow: single-column select → warn → E.
+- CTRL+ARROW report: could NOT reproduce — the jump primitive behaves
+  Excel-correct in every driven flow (from above a table it stops at
+  the first occupied cell, i.e. the header, which reads as "2-3 cells
+  down"; press again for the bottom). Parity asserts around formatted-
+  empty cells added via the X/Y sections' boards; watching for a repro.
+- ALT+= FLOW (both Excel forms): (a) RANGE form — select the column
+  (or row) THROUGH its empty total cell, Alt+= fills the SUM committed,
+  selection preserved, editor never opens: the power move. (b) The
+  single-cell proposal still opens the editor, but its Enter-commit now
+  STAYS on the cell — ctrl+b lands on the sum, which was Wolf's whole
+  point. Ordinary commits still move down; a canceled proposal clears
+  its flag in cancelEdit (the first smoke caught Esc taking the editing
+  branch around the normal-mode clear).
+- PARITY 82 -> 88 (sections X + Y). No cache bump (index.html only).

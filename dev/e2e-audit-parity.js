@@ -425,6 +425,53 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(w1.add, 'add operation lands');
   ok(w1.reset, 'operation resets to None each time the dialog opens');
 
+  console.log('X. sort warning (r192)');
+  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('sort'); });
+  const x1 = await run(() => {
+    const o = CHALLENGES.sort._o, m = o.range.match(/([A-J])(\d+):([A-J])(\d+)/);
+    const r1 = +m[2], r2 = +m[4], scN = o.sc.charCodeAt(0) - 64;
+    const pairs = []; for (let rr = r1; rr <= r2; rr++) pairs.push([S.cells[m[1]+rr].value, S.cells[o.sc+rr].value]);
+    S.sel = { r: r1, c: scN }; S.active = { r: r2, c: scN }; render();
+    demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'s'}); demoKey({key:'d'});
+    const warned = dialog === 'sortwarn';
+    demoKey({key:'Enter'});                                  // Enter = expand, Excel's default
+    const post = []; for (let rr = r1; rr <= r2; rr++) post.push([S.cells[m[1]+rr].value, S.cells[o.sc+rr].value]);
+    const desc = post.every((p, i) => i === 0 || post[i-1][1] >= p[1]);
+    const coupled = post.every(p => pairs.some(q => q[0] === p[0] && q[1] === p[1]));
+    S.sel = { r: r1, c: m[1].charCodeAt(0)-64 }; S.active = { r: r2, c: scN }; render();
+    demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'s'}); demoKey({key:'a'});
+    const noWarnFull = mode === 'normal' && dialog === null;  // full-table selection never warns
+    return { warned, desc, coupled, noWarnFull };
+  });
+  ok(x1.warned, 'single-column sort beside data raises the warning');
+  ok(x1.desc && x1.coupled, 'Enter expands — rows travel together', JSON.stringify(x1));
+  ok(x1.noWarnFull, 'full-table selection sorts with no dialog');
+
+  console.log('Y. Alt+= flow (r192)');
+  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('sort'); });
+  const y1 = await run(() => {
+    const o = CHALLENGES.sort._o, m = o.range.match(/([A-J])(\d+):([A-J])(\d+)/);
+    const r1 = +m[2], r2 = +m[4], scN = o.sc.charCodeAt(0) - 64;
+    let want = 0; for (let rr = r1; rr <= r2; rr++) want += S.cells[o.sc+rr].value;
+    S.sel = { r: r1, c: scN }; S.active = { r: r2 + 1, c: scN }; render();
+    demoKey({key:'=', alt:true});
+    const f = S.cells[o.foot];
+    const rangeForm = !!(f && f.formula && Math.abs(f.value - want) < 0.5) && !editing && !!S.sel;
+    loadChallenge('sort');
+    const o2 = CHALLENGES.sort._o, fr = +o2.foot.match(/\d+/)[0], fc = o2.foot[0].charCodeAt(0) - 64;
+    S.active = { r: fr, c: fc }; S.sel = null; render();
+    demoKey({key:'=', alt:true}); demoKey({key:'Enter'});
+    const stays = S.active.r === fr && S.active.c === fc;
+    demoKey({key:'b', ctrl:true});
+    const bolds = !!(S.cells[o2.foot] && S.cells[o2.foot].bold);
+    setDemoSel('E12'); demoKey({key:'5'}); demoKey({key:'Enter'});
+    const normalMoves = S.active.r === 13;
+    return { rangeForm, stays, bolds, normalMoves };
+  });
+  ok(y1.rangeForm, 'range-form Alt+= commits the SUM, selection preserved, no editor');
+  ok(y1.stays && y1.bolds, 'proposal commit stays put — ctrl+b lands on the sum', JSON.stringify(y1));
+  ok(y1.normalMoves, 'ordinary commits still move down');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

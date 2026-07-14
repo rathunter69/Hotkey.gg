@@ -16,7 +16,10 @@ What remains, and what unblocks it:
    column hide (render surface), Alt H O H row height (needs a height model),
    SUBTOTAL(9) visible-aware math (pairs with a "total follows the filter"
    drill).
-## WOLF PLAYTEST QUEUE (r192, specced from live feedback July 2026)
+## WOLF PLAYTEST QUEUE — DONE r192 (sort warning live + alt entry; ctrl+arrow
+## unreproducible, behaves Excel-correct, parity-armored, watching; Alt+= both
+## forms live). Original spec kept below.
+## (r192, specced from live feedback July 2026)
 1. SORT WARNING dialog: single-column selection adjacent to data + alt a s d
    → Excel's "expand the selection?" prompt (E expand default / C current
    only / Esc). Expand = grow to the contiguous block, sort rows by the
