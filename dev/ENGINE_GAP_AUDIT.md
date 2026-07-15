@@ -103,8 +103,10 @@ These are the ones Wolf named and they're the highest drill-depth-per-effort:
    Same principle as never anchoring on Alt H K: teach the muscle pros actually use.
 
 **Tier 2 — realism polish.** (in progress)
-5. **Font size** (grow/shrink Alt H F G/K + `size` prop) — titles bigger, footnotes smaller.
-6. **Font-color as a visible dropdown** (not a blind cycle).
+5. ✅ **Font size** (r235) — Alt H F G grow / Alt H F K shrink, stepping the ladder
+   [10, 11.5, 13.5(base→null), 16, 18, 20]; `fsz` prop rendered inline, travels with paste.
+6. ✅ **Font-color as a visible dropdown** — already shipped: the Alt H F C picker
+   draws the swatch row live (arrows walk it, ↵ applies), same pattern as the fill picker.
 7. ✅ **Border ribbon depth** (r234) — Alt H B now: Top/Bottom/**Left**/**Right**/All/
    **Inside**/Outside/**Thick box**/**No border**. Left/Right are per-cell edges;
    Inside draws interior grid only; Thick box adds a 2px `thick` flag on the perimeter;

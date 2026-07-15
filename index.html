@@ -1518,7 +1518,12 @@ const colLetter = c => String.fromCharCode(64+c);
 
 function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:false,
   fmtStyle:'general',decimals:0,bt:false,bb:false,ball:false,txt:false,
-  align:null,fontColor:null,uline:false,indent:0,scale:0,thick:false};}
+  align:null,fontColor:null,uline:false,indent:0,scale:0,thick:false,fsz:null};}
+/* r235: font-size ladder around the 13.5px base. Grow/shrink (Alt H F G / K) step through it;
+   base normalizes back to null so an unresized cell carries no fsz. */
+const FSZ_LADDER=[10,11.5,13.5,16,18,20], FSZ_BASE=13.5;
+function stepFsz(cur,dir){ let i=FSZ_LADDER.indexOf(cur==null?FSZ_BASE:cur); if(i<0)i=FSZ_LADDER.indexOf(FSZ_BASE);
+  i=Math.max(0,Math.min(FSZ_LADDER.length-1,i+dir)); return FSZ_LADDER[i]===FSZ_BASE?null:FSZ_LADDER[i]; }
 
 const CHALLENGES = {
   drill:{
@@ -7316,7 +7321,8 @@ function render(){
         }
       }
       else if(isNum(cell)&&!cell.wrap){
-        const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale).length*CHARPX+12;
+        const fz=cell.fsz?cell.fsz/13.5:1;   // r235: a resized number takes proportionally more/less width
+        const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale).length*CHARPX*fz+12;
         if(tw>__ew[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(__ew[c]/8))); }
       }
       // r180: AutoFilter \u25be on every armed header cell (filled/bright when that column excludes values)
@@ -7347,6 +7353,7 @@ function render(){
         const pad = 9 + (cell.indent|0)*13;
         extraStyle += (cell.align==='r') ? (';padding-right:'+pad+'px') : (';padding-left:'+pad+'px');
       }
+      if(cell.fsz){ extraStyle += ';font-size:'+cell.fsz+'px'; }   // r235: grow/shrink font (Alt H F G/K)
       row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${__ew[c]}px;max-width:${__ew[c]}px${extraStyle}">${txt}</td>`;
     }
     row+='</tr>'; g.innerHTML+=row;
@@ -7463,7 +7470,7 @@ const MENUS = {
   'HB': [['T','Top'],['B','Bottom'],['L','Left'],['R','Right'],['A','All'],['I','Inside'],['O','Outside'],['K','Thick box'],['N','No border']],
   'HU': [['S','Sum']],
   'HA': [['L','Left'],['C','Center'],['R','Right'],['N','$ Accounting']],
-  'HF': [['C','Font color'],['I','Fill']],
+  'HF': [['C','Font color'],['G','Grow font'],['K','Shrink font'],['I','Fill']],
   'HFI':[['S','Series…'],['D','Down'],['R','Right']],
   'M':  [['U','Σ AutoSum']],
   'MU': [['S','Sum']],
@@ -8654,6 +8661,8 @@ function applyRibbon(key){
   if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; pasteOp='none'; drawRibbon(); return; }
   if(np==='OE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route
   if(np==='HFC'){ dialog='fontcolor'; fontColorIdx=0; drawRibbon(); return; }
+  if(np==='HFG'){ pushUndo(); eachSel(c=>c.fsz=stepFsz(c.fsz, 1)); return exitRibbon(true); }   // r235: grow font (Alt H F G)
+  if(np==='HFK'){ pushUndo(); eachSel(c=>c.fsz=stepFsz(c.fsz,-1)); return exitRibbon(true); }   // r235: shrink font (Alt H F K)
   if(np==='HH'){ dialog='fillcolor'; fillColorIdx=0; drawRibbon(); return; }   // r231: Alt H H fill picker
   if(np==='HFIS'){ dialog='series'; drawRibbon(); return; }
   if(np==='ASA'||np==='ASD'){
@@ -8775,7 +8784,7 @@ function doPaste(kind, op){
       const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
       cell.formula=s.formula; cell.value=s.value;
       cell.bold=s.bold; cell.fill=s.fill; cell.wrap=s.wrap; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals;
-      cell.bt=s.bt; cell.bb=s.bb; cell.bl=s.bl; cell.br=s.br; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor; cell.it=s.it; cell.strike=s.strike; cell.uline=s.uline; cell.indent=s.indent|0; cell.scale=s.scale|0; cell.thick=!!s.thick;
+      cell.bt=s.bt; cell.bb=s.bb; cell.bl=s.bl; cell.br=s.br; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor; cell.it=s.it; cell.strike=s.strike; cell.uline=s.uline; cell.indent=s.indent|0; cell.scale=s.scale|0; cell.thick=!!s.thick; cell.fsz=s.fsz||null;
     }
     S.clipboard=null; try{ const mq=$('marquee'); if(mq) mq.style.display='none'; }catch(e){}
     pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
@@ -8786,7 +8795,7 @@ function doPaste(kind, op){
   const xl=f=>(f&&(dr||dc))?translateFormula(f,dr,dc):f;
   for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
     const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
-    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;cell.scale=s.scale|0;cell.thick=!!s.thick;};
+    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;cell.scale=s.scale|0;cell.thick=!!s.thick;cell.fsz=s.fsz||null;};
     if(kind==='values'){ cell.formula=null; cell.value=s.value; }
     else if(kind==='formulas'){ cell.formula=xl(s.formula); cell.value=s.value; }
     else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; cell.scale=s.scale|0; }
@@ -8815,7 +8824,7 @@ function enterRibbon(){ if(done)return; startClock(); mode='ribbon'; path=[]; di
 function copySel(){
   const r=selRange(); const data=[];
   for(let rr=r.r1;rr<=r.r2;rr++){ const row=[]; for(let cc=r.c1;cc<=r.c2;cc++){ const c=get(rr,cc);
-    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent,scale:c.scale,thick:c.thick}); } data.push(row); }
+    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent,scale:c.scale,thick:c.thick,fsz:c.fsz}); } data.push(row); }
   const cols=[]; for(let cc=r.c1;cc<=r.c2;cc++) cols.push(colW[cc]);
   S.clipboard={data,cols,h:r.r2-r.r1+1,w:r.c2-r.c1+1,rect:{r1:r.r1,c1:r.c1,r2:r.r2,c2:r.c2}};
 }
