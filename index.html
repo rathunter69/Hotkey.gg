@@ -2345,6 +2345,74 @@ const CHALLENGES = {
       ];
     }
   },
+  intsched:{
+    name:'Interest', label:'Run the interest schedule', par:115, parKeys:44,
+    aha:'Interest ties the debt block to the P&L — rate × the opening balance, then EBITDA ÷ interest is the coverage the covenant reads.',
+    prompt:'A term loan and the schedule that feeds the P&L: each year opens at the prior close, mandatory amort pays it down, and cash interest is the anchored rate on the OPENING balance. Build year 1, link the opening, fill the roll across — then run coverage, EBITDA over interest, because that ratio is what the covenant actually tests.',
+    req:'<em>B4</em> ending <em>=B2+B3</em> · <em>C2</em> <em>=B4</em> · fill C2:F2 → · fill B4:F4 → · <em>B6</em> interest <em>=B2*$B$10</em> · fill B6:F6 → · <em>B8</em> coverage <em>=B7/B6</em> · fill B8:F8 →',
+    guide:[
+      'ending debt at B4 · <kbd>=B2+B3</kbd> — opening less the mandatory amort (already negative)',
+      'THE LINK: C2 · <kbd>=B4</kbd> · fill C2:F2 → — each year opens where the last one closed',
+      'select B4:F4 · <kbd>ctrl</kbd>+<kbd>r</kbd> — the debt roll walks itself across',
+      'cash interest at B6 · <kbd>=B2*$B$10</kbd> — the anchored rate on the OPENING balance · fill B6:F6 →',
+      'interest coverage at B8 · <kbd>=B7/B6</kbd> — EBITDA over interest, the covenant ratio · fill B8:F8 →',
+    ],
+    targets:['B4','C2','C2:F2','B4:F4','B6','B6:F6','B8','B8:F8'],
+    demo(){ return [
+      {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
+      {sel:'C2', keys:[...T('=B4'), Kb.enter]},
+      {sel:'C2:F2', keys:[Kb.fillR]},
+      {sel:'B4:F4', keys:[Kb.fillR]},
+      {sel:'B6', keys:[...T('=B2*$B$10'), Kb.enter]},
+      {sel:'B6:F6', keys:[Kb.fillR]},
+      {sel:'B8', keys:[...T('=B7/B6'), Kb.enter]},
+      {sel:'B8:F8', keys:[Kb.fillR]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — interest schedule ($mm)',txt:true,bold:true};
+      const y0=rnd(24,27);
+      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      cells['A2']={...blankCell(),value:'Beginning debt',txt:true};
+      cells['A3']={...blankCell(),value:'Less: mandatory amort.',txt:true};
+      cells['A4']={...blankCell(),value:'Ending debt',txt:true,bold:true};
+      cells['A6']={...blankCell(),value:'Cash interest',txt:true};
+      cells['A7']={...blankCell(),value:'EBITDA',txt:true};
+      cells['A8']={...blankCell(),value:'Interest coverage (x)',txt:true,bold:true};
+      cells['A10']={...blankCell(),value:'Interest rate',txt:true};
+      const rate=rnd(6,9)/100;
+      cells['B10']={...blankCell(),value:rate,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      const beg0=rnd(60,90)*10;
+      cells['B2']={...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      const amort=[]; for(let i=0;i<5;i++) amort.push(-rnd(3,8)*10);
+      const ebitda=[]; for(let i=0;i<5;i++) ebitda.push(rnd(15,30)*10);
+      for(let i=0;i<5;i++){ const col=colLetter(i+2);
+        cells[col+3]={...blankCell(),value:amort[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+7]={...blankCell(),value:ebitda[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+        if(i>0) cells[col+2]={...blankCell(),fmtStyle:'comma',decimals:0};
+      }
+      this._exp=[]; let beg=beg0;
+      for(let i=0;i<5;i++){ const end=beg+amort[i]; const interest=beg*rate; const cov=ebitda[i]/interest;
+        this._exp.push({beg:beg,end:end,interest:interest,cov:cov}); beg=end; }
+      return {ROWS:11, cells, active:{r:4,c:2}, sel:null, colW:{1:160,2:82,3:82,4:82,5:82,6:82}};
+    },
+    checks(S){
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*5e-3); };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F'];
+      const linkOk=[1,2,3,4].every(i=> refs(COL[i]+'2',[COL[i-1]+'4']) && near(COL[i]+'2',this._exp[i].beg));
+      return [
+        {label:'run the ending debt — opening less the mandatory amort, all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',this._exp[i].end)) && refs('B4',['B2','B3'])},
+        {label:'build THE LINK — each year opens at the prior close', ok:linkOk},
+        {label:'run cash interest — the anchored rate on each OPENING balance, all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'6',this._exp[i].interest)) && refs('B6',['B2','B10'])},
+        {label:'run interest coverage — EBITDA over interest, all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'8',this._exp[i].cov)) && refs('B8',['B7','B6'])},
+      ];
+    }
+  },
   percent:{
     name:'% of rev', label:'Common-size both statements', par:64, parKeys:14,
     aha:'Divide by an anchored base — F4 locks the divisor so fill-right can’t drag it.',
