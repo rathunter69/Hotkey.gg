@@ -1657,15 +1657,16 @@ const CHALLENGES = {
     }
   },
   gauntlet:{
-    name:'Gauntlet', label:'Make it model-ready', par:100, parKeys:46,
-    aha:'Model-ready is one rhythm: bold, comma, border, fill — the same chords, every time.',
+    name:'Gauntlet', label:'Make it model-ready', par:110, parKeys:50,
+    aha:'Model-ready is one rhythm: bold, comma, border, fill — and the totals in accounting format (Alt H A N).',
     prompt:'A raw sources & uses \u2014 both sides straight out of a banker\u2019s head: naked numbers, no totals, nothing marked. Full dress, BOTH blocks: inputs blue, SUM each total with alt+=, bold + top border on both, commas at 0 decimals down both money columns, autofit so nothing clips. Every formatting op you know, both sides of the page, no mouse.',
-    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h h blue \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b t</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h o i</em> autofit'; },
+    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h h blue \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b t</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
     guide(){ const R=this._R; return [
       'both input stacks blue: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u00b7 then the same on '+R.useIn,
       'totals with autosum: '+R.srcTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd> \u00b7 then '+R.useTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd>',
       'dress both totals: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
-      'commas, 0 decimals, both money columns: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> \u00d72',
+      'commas, 0 decimals, both money bodies: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> \u00d72',
+      'the two totals in accounting format: <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> \u2014 $ aligned, the S&U convention',
       'autofit both: <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 no #### leaves the desk',
     ]; },
     targets(){ const R=this._R; return [R.srcIn, R.srcTot, R.srcTot, R.srcCol, R.srcCol]; },
@@ -1678,6 +1679,8 @@ const CHALLENGES = {
       {sel:R.useTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
       {sel:R.srcCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
       {sel:R.useCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      {sel:R.srcTot, keys:[Kb.alt,L('H'),L('A'),L('N')]},
+      {sel:R.useTot, keys:[Kb.alt,L('H'),L('A'),L('N')]},
       {sel:R.srcCol, keys:[Kb.alt,L('H'),L('O'),L('I')]},
       {sel:R.useCol, keys:[Kb.alt,L('H'),L('O'),L('I')]},
     ]; },
@@ -1715,14 +1718,16 @@ const CHALLENGES = {
       const sum=!!(tS&&tS.formula&&/^=SUM\(/i.test(tS.formula)) && !!(tU&&tU.formula&&/^=SUM\(/i.test(tU.formula));
       const tot=!!(tS&&tS.bold&&tS.bt) && !!(tU&&tU.bold&&tU.bt);
       let cf=true;
-      for(let i=1;i<=5;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
+      for(let i=1;i<=4;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
         if(!c||c.fmtStyle!=='comma'||c.decimals!==0) cf=false; } }
+      const acct=!!(tS&&tS.fmtStyle==='acct')&&!!(tU&&tU.fmtStyle==='acct');
       const af=!overflowsCol(S,2)&&!overflowsCol(S,5);
       return [
         {label:'shade BOTH input stacks blue (sources and uses)', ok:fill},
         {label:'SUM both totals \u2014 alt+= twice', ok:sum},
         {label:'bold both total rows and add a top border above them', ok:tot},
-        {label:'comma-format both money columns, 0 decimals', ok:cf},
+        {label:'comma-format both money BODIES, 0 decimals', ok:cf},
+        {label:'the two totals in accounting format \u2014 alt h a n, the S&U convention', ok:acct},
         {label:'Autofit \u2014 no #### left on either side', ok:af},
       ];
     }
