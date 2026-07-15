@@ -97,6 +97,11 @@
     font-family:var(--mono); font-size:11.5px; color:var(--muted); white-space:nowrap}
   .fx-hint b{color:var(--accent); font-weight:700}
   .fx-hint.show{display:block}
+  /* r257: Excel-style cell-mode badge (Point / Edit) shown while editing a formula */
+  .edmode{display:none; font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.1em;
+    padding:2px 6px; border-radius:5px; margin-right:8px; text-transform:uppercase; white-space:nowrap}
+  .edmode.point{display:inline-block; color:var(--accent); background:var(--accent-glow); border:1px solid var(--accent-dim)}
+  .edmode.edit{display:inline-block; color:var(--warn); background:rgba(224,207,122,.14); border:1px solid rgba(224,207,122,.4)}
   .namebox{min-width:56px; padding:7px 10px; color:var(--accent); background:var(--surface2);
     border-right:1px solid var(--line); text-align:center; font-weight:500}
   .fx{padding:7px 11px; color:var(--faint); font-style:italic; font-family:var(--sans);
@@ -1372,6 +1377,7 @@
           <span class="namebox" id="nameBox">A1</span>
           <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span><span class="ghost" id="raceDelta" style="display:none"></span>
           <span class="fx"><i>fx</i></span>
+          <span class="edmode" id="edMode" aria-live="polite"></span>
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
         <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
@@ -7323,6 +7329,25 @@ function evalFormula(expr){
       const crit = rawOf(args[1]);
       return rangeRefs(args[0].range[0], args[0].range[1]).filter(rf=>eqLoose(cellRaw(rf),crit)).length;
     }
+    if(name==='CHOOSE'){   /* r257: scenario selector — CHOOSE(index, v1, v2, …) picks the index-th value (1-based) */
+      const idx = Math.round(args[0] ? (args[0].val||0) : 0);
+      if(idx<1 || idx>=args.length) throw new Error('CHOOSE#VALUE');
+      const v = rawOf(args[idx]);
+      return typeof v==='number' ? v : (typeof v==='string' ? v : (v==null?0:v));
+    }
+    if(name==='OFFSET'){   /* r257: OFFSET(ref, rows, cols, [h], [w]) — single-cell form (the "pick the active row" driver move) */
+      if(!args[0] || !args[0].ref) throw new Error('OFFSET#base');
+      const p = parseRef(args[0].ref);
+      const dr = Math.round(args[1] ? (args[1].val||0) : 0);
+      const dc = Math.round(args[2] ? (args[2].val||0) : 0);
+      const h  = args[3] ? Math.round(args[3].val||1) : 1;
+      const w  = args[4] ? Math.round(args[4].val||1) : 1;
+      if(h!==1 || w!==1) throw new Error('OFFSET#range');   // single-cell only for now
+      const rr=p.r+dr, cc=p.c+dc;
+      if(rr<1 || cc<1) throw new Error('OFFSET#REF');
+      const v = cellRaw(colLetter(cc)+rr);
+      return v==null ? 0 : v;   // preserve text (pick the active case NAME) and numbers alike
+    }
     const xs=flat(args);
     switch(name){
       case 'SUM': return xs.reduce((a,b)=>a+b,0);
@@ -7691,13 +7716,18 @@ function buildFormulaHTML(buf, refs){
   return out;
 }
 function updateFormulaBar(){
+  const em=$('edMode');
   if(editing){
     $('nameBox').textContent=ck(S.active.r,S.active.c);
     const fc=$('fContent'); fc.className='fcontent isfx';
     const {refs} = parseFormulaRefs(editBuf);
     fc.innerHTML = buildFormulaHTML(editBuf, refs);
+    // r257: show the cell mode while in a formula — POINT (arrows grab refs) vs EDIT (F2, arrows move the caret)
+    if(em){ if(editBuf[0]==='='){ em.className='edmode '+(editMode==='edit'?'edit':'point'); em.textContent=(editMode==='edit'?'edit':'point'); }
+            else { em.className='edmode'; em.textContent=''; } }
     return;
   }
+  if(em){ em.className='edmode'; em.textContent=''; }
   const cell=get(S.active.r,S.active.c);
   $('nameBox').textContent=ck(S.active.r,S.active.c);
   const fc=$('fContent');
@@ -8514,7 +8544,10 @@ function recalc(){
     let changed=false;
     for(const k in S.cells){ const c=S.cells[k]; if(c && c.formula){
       let v; try{ v=evalFormula(c.formula); }catch(_){ v=c.value; }
-      if(isFinite(v) && v!==c.value){ c.value=v; changed=true; }
+      // r257: accept text results too (CHOOSE/OFFSET can pull a case NAME) — store finite
+      // numbers OR non-null non-numbers; skip NaN/Infinity/undefined so a bad eval can't poison a cell.
+      const okv = (typeof v==='number') ? isFinite(v) : (v!=null);
+      if(okv && v!==c.value){ c.value=v; changed=true; }
     }}
     if(!changed) break;
   }
@@ -8667,6 +8700,20 @@ function startPointerFromArrow(dr, dc){
   editBuf += ck(r, c);
   editCaret = editBuf.length;
   return true;
+}
+/* r257 (Wolf): Excel's Point mode — in Enter mode, an arrow while editing a FORMULA
+   grabs a cell reference. If the buffer ends in a bare ref, RE-POINT that ref (move
+   it); otherwise (after =, an operator, or a non-ref tail) append a fresh pointer. */
+function pointArrow(dr, dc){
+  const m = /(\$?[A-Za-z]+\$?\d+)$/.exec(editBuf);
+  if(m && !OPERATOR_BOUNDARY.test(editBuf)){
+    const refStr = m[1], pr = parseRef(refStr.replace(/\$/g,'').toUpperCase());
+    editPointerStart = editBuf.length - refStr.length;
+    editPointer = { r:pr.r, c:pr.c };
+    editPointerBase = null;
+    return movePointer(dr, dc, false);
+  }
+  return startPointerFromArrow(dr, dc);
 }
 function writePointerRef(){
   editBuf = editBuf.slice(0, editPointerStart) +
@@ -8825,7 +8872,8 @@ const FN_SIGS={ IF:['condition','if_true','if_false'], SUM:['range'], SUMIF:['ra
   AVERAGE:['range'], MIN:['range'], MAX:['range'], COUNT:['range'], COUNTA:['range'],
   INDEX:['array','row_num','col_num'], MATCH:['lookup_value','lookup_array','0'],
   VLOOKUP:['value','table','col_index','FALSE'], HLOOKUP:['value','table','row_index','FALSE'],
-  IFERROR:['value','value_if_error'], ROUND:['number','digits'], ABS:['number'], EOMONTH:['start','months'] };
+  IFERROR:['value','value_if_error'], ROUND:['number','digits'], ABS:['number'], EOMONTH:['start','months'],
+  CHOOSE:['index','value1','value2','...'], OFFSET:['ref','rows','cols'] };
 function updateFxHint(){
   const el=$('fxHint'); if(!el) return;
   if(!editing || !editBuf.startsWith('=')){ el.classList.remove('show'); return; }
@@ -9692,9 +9740,12 @@ document.addEventListener('keydown',e=>{
     e.preventDefault();
     if(k==='F2'){ editMode = editMode==='edit' ? 'enter' : 'edit'; logKey('F2'); render(); return; }   // Excel: F2 toggles Edit/Enter while editing
     if(editMode==='edit'){
-      // EDIT MODE: arrows navigate the text, exactly like pressing F2 in Excel
+      // EDIT MODE: arrows navigate the TEXT (Excel: F2 stops the arrows from pointing).
+      // All four arrows are owned here so none fall through to Point mode.
       if(k==='ArrowLeft'){ editCaret=Math.max(0,editCaret-1); render(); return; }
       if(k==='ArrowRight'){ editCaret=Math.min(editBuf.length,editCaret+1); render(); return; }
+      if(k==='ArrowUp'){ editCaret = editBuf[0]==='=' ? 1 : 0; render(); return; }     // single-line: Up = Home
+      if(k==='ArrowDown'){ editCaret=editBuf.length; render(); return; }               // Down = End
       if(k==='Home'){ editCaret = editBuf[0]==='=' ? 1 : 0; render(); return; }
       if(k==='End'){ editCaret=editBuf.length; render(); return; }
       if(k==='Delete'){ if(editCaret<editBuf.length){ editBuf=editBuf.slice(0,editCaret)+editBuf.slice(editCaret+1); logKey('Delete'); render(); } return; }
@@ -9738,12 +9789,13 @@ document.addEventListener('keydown',e=>{
         if(movePointer(dr, dc, e.shiftKey)){ logKey((e.shiftKey?'\u21e7+':'')+ARROWSYM[k]); render(); }
         return;
       }
-      // (2) editBuf ends in an operator boundary (=, +, -, *, /, ^, (, ,) → start a new pointer.
-      if(editAnchor && OPERATOR_BOUNDARY.test(editBuf)){
-        if(startPointerFromArrow(dr, dc)){ logKey(ARROWSYM[k]); render(); }
+      // (2) Enter mode + a FORMULA → Point mode: the arrow grabs/moves a cell reference
+      //     (Excel points on any arrow in a formula, not only right after an operator).
+      if(editAnchor && editBuf[0]==='='){
+        if(pointArrow(dr, dc)){ logKey(ARROWSYM[k]); render(); }
         return;
       }
-      // (3) Otherwise — typing-mode arrow committing the edit (existing behavior for non-formula entries).
+      // (3) Otherwise — a plain value: the arrow commits the edit and moves (Excel).
       commitEdit(dr, dc);
       return;
     }

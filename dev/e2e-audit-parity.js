@@ -507,6 +507,29 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(z1.divided, 'paste-op Divide lands');
   ok(z1.mixedAll && z1.uniformOff, 'mixed-selection Ctrl+B bolds ALL first (Excel), uniform toggles off');
 
+  console.log('AA. CHOOSE + OFFSET (r257)');
+  await fresh();
+  const aa1 = await run(() => {
+    const bc=()=>({...blankCell()});
+    S.cells['B3']={...bc(), value:2};                                   // scenario switch
+    S.cells['B5']={...bc(), value:0.06}; S.cells['C5']={...bc(), value:0.12}; S.cells['D5']={...bc(), value:-0.01};
+    S.cells['A9']={...bc(), value:'Base', txt:true}; S.cells['A10']={...bc(), value:'Upside', txt:true}; S.cells['A11']={...bc(), value:'Downside', txt:true};
+    S.cells['J1']={...bc(), formula:'=CHOOSE($B$3,$B$5,$C$5,$D$5)'};    // -> 0.12 (case 2)
+    S.cells['J2']={...bc(), formula:'=OFFSET($B$5,0,$B$3-1)'};          // B5 + 1 col -> C5 = 0.12
+    S.cells['J3']={...bc(), formula:'=OFFSET($A$9,$B$3-1,0)'};          // A9 + 1 row -> "Upside"
+    S.cells['J4']={...bc(), formula:'=IFERROR(CHOOSE(9,1,2),-1)'};      // out of range -> IFERROR -> -1
+    S.cells['B3'].value=1; recalc();                                    // flip to case 1
+    const case1 = S.cells['J1'].value;                                 // -> 0.06
+    S.cells['B3'].value=2; recalc();                                    // back to case 2
+    return { choose: Math.abs(S.cells['J1'].value-0.12)<1e-9, offNum: Math.abs(S.cells['J2'].value-0.12)<1e-9,
+      offTxt: S.cells['J3'].value==='Upside', oob: S.cells['J4'].value===-1, reactive: Math.abs(case1-0.06)<1e-9 };
+  });
+  ok(aa1.choose, 'CHOOSE picks the switch-selected value');
+  ok(aa1.offNum, 'OFFSET(ref,0,n) walks columns to the active assumption');
+  ok(aa1.offTxt, 'OFFSET preserves text (pulls the active case NAME)');
+  ok(aa1.oob, 'CHOOSE out of range throws into IFERROR, not the sheet');
+  ok(aa1.reactive, 'CHOOSE reprices when the switch flips');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {
