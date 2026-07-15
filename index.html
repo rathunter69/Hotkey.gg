@@ -97,11 +97,15 @@
     font-family:var(--mono); font-size:11.5px; color:var(--muted); white-space:nowrap}
   .fx-hint b{color:var(--accent); font-weight:700}
   .fx-hint.show{display:block}
-  /* r257: Excel-style cell-mode badge (Point / Edit) shown while editing a formula */
-  .edmode{display:none; font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.1em;
-    padding:2px 6px; border-radius:5px; margin-right:8px; text-transform:uppercase; white-space:nowrap}
-  .edmode.point{display:inline-block; color:var(--accent); background:var(--accent-glow); border:1px solid var(--accent-dim)}
-  .edmode.edit{display:inline-block; color:var(--warn); background:rgba(224,207,122,.14); border:1px solid rgba(224,207,122,.4)}
+  /* r257: Excel formula-bar Cancel/Enter buttons — greyed when idle, lit (red ✕ / green ✓)
+     the moment you're editing a cell. Clicking cancels/commits, like native Excel. */
+  /* decorative only — the app is keyboard-only, so these never take a click */
+  .fx-actions{display:inline-flex; align-items:center; gap:5px; margin:0 9px 0 3px; pointer-events:none; user-select:none}
+  .fx-actions button{width:19px; height:19px; display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid var(--line); border-radius:5px; background:var(--surface2); color:var(--faint);
+    font-size:11px; line-height:1; padding:0; cursor:default; transition:color .12s,border-color .12s,background .12s}
+  .fx-actions.on .fx-x{color:#e0574d; border-color:#e0574d; background:rgba(224,87,77,.12)}
+  .fx-actions.on .fx-ok{color:#3fae7a; border-color:#3fae7a; background:rgba(63,174,122,.12)}
   .namebox{min-width:56px; padding:7px 10px; color:var(--accent); background:var(--surface2);
     border-right:1px solid var(--line); text-align:center; font-weight:500}
   .fx{padding:7px 11px; color:var(--faint); font-style:italic; font-family:var(--sans);
@@ -1376,8 +1380,8 @@
           <div id="fxHint" class="fx-hint"></div>
           <span class="namebox" id="nameBox">A1</span>
           <span class="ftimer" id="timer">0.00</span><span class="ghost" id="ghostDelta" style="display:none"></span><span class="ghost" id="raceDelta" style="display:none"></span>
+          <span class="fx-actions" id="fxActions"><button class="fx-x" id="fxCancel" title="Cancel (Esc)" tabindex="-1">✕</button><button class="fx-ok" id="fxEnter" title="Enter (↵)" tabindex="-1">✓</button></span>
           <span class="fx"><i>fx</i></span>
-          <span class="edmode" id="edMode" aria-live="polite"></span>
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
         <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
@@ -7716,18 +7720,16 @@ function buildFormulaHTML(buf, refs){
   return out;
 }
 function updateFormulaBar(){
-  const em=$('edMode');
+  const fxa=$('fxActions');
   if(editing){
     $('nameBox').textContent=ck(S.active.r,S.active.c);
     const fc=$('fContent'); fc.className='fcontent isfx';
     const {refs} = parseFormulaRefs(editBuf);
     fc.innerHTML = buildFormulaHTML(editBuf, refs);
-    // r257: show the cell mode while in a formula — POINT (arrows grab refs) vs EDIT (F2, arrows move the caret)
-    if(em){ if(editBuf[0]==='='){ em.className='edmode '+(editMode==='edit'?'edit':'point'); em.textContent=(editMode==='edit'?'edit':'point'); }
-            else { em.className='edmode'; em.textContent=''; } }
+    if(fxa) fxa.classList.add('on');   // r257: light the ✕/✓ while editing (Excel)
     return;
   }
-  if(em){ em.className='edmode'; em.textContent=''; }
+  if(fxa) fxa.classList.remove('on');
   const cell=get(S.active.r,S.active.c);
   $('nameBox').textContent=ck(S.active.r,S.active.c);
   const fc=$('fContent');
