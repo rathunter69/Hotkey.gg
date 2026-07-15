@@ -102,10 +102,13 @@ These are the ones Wolf named and they're the highest drill-depth-per-effort:
    must teach the ribbon path first — do not build "only knows Ctrl+1" habits.
    Same principle as never anchoring on Alt H K: teach the muscle pros actually use.
 
-**Tier 2 — realism polish.**
+**Tier 2 — realism polish.** (in progress)
 5. **Font size** (grow/shrink Alt H F G/K + `size` prop) — titles bigger, footnotes smaller.
 6. **Font-color as a visible dropdown** (not a blind cycle).
-7. **Border ribbon depth** (L/R/outside/inside/thick + a clear-border) — expose what the model already stores.
+7. ✅ **Border ribbon depth** (r234) — Alt H B now: Top/Bottom/**Left**/**Right**/All/
+   **Inside**/Outside/**Thick box**/**No border**. Left/Right are per-cell edges;
+   Inside draws interior grid only; Thick box adds a 2px `thick` flag on the perimeter;
+   No border strips every edge. Thick travels with copy/paste.
 8. **Cell styles gallery** (Input/Heading/Calculation) — the fast house-style path.
 9. **Find & Replace** (Ctrl+H).
 
