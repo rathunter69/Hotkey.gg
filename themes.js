@@ -907,14 +907,16 @@ window.schoolChip = function(idOrTag, size){
   var fam = s.face==='serif'     ? "Georgia,'Times New Roman',serif"
           : s.face==='condensed' ? "'Arial Narrow','Helvetica Neue',Arial,sans-serif"
           : "'JetBrains Mono',ui-monospace,'SFMono-Regular',monospace";
-  var ls = len>=2 ? '-.03em' : '0';
+  // r252: letter-spacing offsets multi-char monos off horizontal-center (trailing
+  // space), and cap-only glyphs sit high with line-height:1 — so drop letter-spacing
+  // and nudge the glyph down 0.04em via an inner span for true optical centering.
   return '<span class="school-chip'+(s.other?' school-other':'')+'" title="'+_schEsc(s.name)+'" '+
     'role="img" aria-label="'+_schEsc(s.name)+'" data-school="'+_schEsc(s.id||('other:'+s.name))+'" '+
     'style="display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;box-sizing:border-box;'+
-    'width:'+size+'px;height:'+size+'px;border-radius:50%;flex:0 0 auto;padding:0 1px;'+
+    'width:'+size+'px;height:'+size+'px;border-radius:50%;flex:0 0 auto;padding:0;'+
     'background:'+s.fill+';color:'+s.ink+';font-family:'+fam+';font-weight:700;'+
-    'font-size:'+fs+'px;line-height:1;letter-spacing:'+ls+';overflow:hidden;user-select:none">'+
-    _schEsc(s.mono)+'</span>';
+    'font-size:'+fs+'px;line-height:1;letter-spacing:0;overflow:hidden;user-select:none">'+
+    '<span style="display:block;transform:translateY(.04em)">'+_schEsc(s.mono)+'</span></span>';
 };
 /* ordered id list for pickers (roster order above == curated priority order) */
 window.SCHOOL_IDS = Object.keys(window.SCHOOLS);
