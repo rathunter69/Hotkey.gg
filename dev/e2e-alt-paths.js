@@ -188,8 +188,9 @@ const ALTS = [
       {sel:o.pct.split(':')[1], keys:[{key:'Alt'},L('h'),D(0)]},
       {sel:o.pct, keys:[{key:'Alt'},L('h'),D(2)]},
     ]; }` },
-  { key: 'dress', name: 'footnote FIRST via alt o e, perimeter EARLY, total row dressed mid-pass via ribbon routes', moves: `C => { const R=C._R; return [
+  { key: 'dress', name: 'footnote FIRST via alt o e, perimeter EARLY, total row dressed mid-pass via ribbon routes, header shaded late', moves: `C => { const R=C._R; return [
       {sel:'A'+R.mRow, keys:[{key:'Alt'},L('o'),L('e'),L('e')]},
+      {sel:'A3:E3', keys:[{key:'Alt'},L('h'),L('h'),{key:'ArrowRight'},{key:'Enter'}]},
       {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
       {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('o')]},
       {sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
@@ -630,6 +631,8 @@ const ALTS = [
       {sel:R.srcTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
       {sel:R.useCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
       {sel:R.srcCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:R.useTot, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
+      {sel:R.srcTot, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
       {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
       {sel:R.srcCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
@@ -666,7 +669,7 @@ const ALTS = [
       {sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
       {sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
       {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
-      {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
+      {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('k')]},
     ]; }` },
   { key: 'navigation', name: 'thread the random maze, grow the block the SLOW way (Shift-by-Shift), then copy → hop to the deck → paste → home', moves: `C => {
       const P=C._path, M=C._model, D=C._deck, DR=C._dirs, cl=colLetter;
