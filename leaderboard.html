@@ -79,6 +79,26 @@
   [data-uid]{cursor:pointer}
   .sch{font-family:var(--mono); font-size:9px; color:var(--muted); border:1px solid var(--line);
     border-radius:6px; padding:1px 5px; margin-left:7px; letter-spacing:.4px; vertical-align:middle}
+  /* r252: leaderboard rows get the school chip with a little breathing room */
+  .nm .school-chip{margin-left:7px}
+  /* r252: School Standings panel — school-vs-school rivalry */
+  .standings{margin-top:18px}
+  .st-list{display:flex; flex-direction:column}
+  /* left-aligned: rank · chip · name hug the left; stats pushed to the right edge */
+  .st-row{display:flex; align-items:center; gap:11px;
+    padding:9px 10px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:12.5px}
+  .st-row:last-child{border-bottom:none}
+  .st-row.mine{background:var(--accent-glow); border-radius:8px}
+  .st-rk{flex:0 0 auto; width:20px; color:var(--faint); text-align:right}
+  .st-rk.m1{color:#e0b341} .st-rk.m2{color:#b8c0c8} .st-rk.m3{color:#cc8b53}
+  .st-row .school-chip{flex:0 0 auto}
+  .st-body{min-width:0; margin-right:auto; display:flex; flex-direction:column; gap:1px}
+  .st-name{color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .st-champ{color:var(--faint); font-size:10.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .st-stats{flex:0 0 auto; display:flex; gap:15px; color:var(--muted); text-align:right; white-space:nowrap}
+  .st-stats b{color:var(--text); font-weight:700; font-variant-numeric:tabular-nums}
+  .st-stats .crown b{color:var(--warn)}
+  @media(max-width:560px){ .st-stats .boards{display:none} }
   .nm[data-uid]:hover, .ros-nm[data-uid]:hover, span[data-uid]:hover{text-decoration:underline; text-underline-offset:3px}
   .pub-wrap{position:fixed; inset:0; z-index:220; background:color-mix(in srgb, var(--bg) 55%, transparent);
     backdrop-filter:blur(5px); display:flex; align-items:flex-start; justify-content:center; padding-top:12vh}
@@ -270,12 +290,12 @@
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="drills.js?v=181"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=177"></script>
+<script src="themes.js?v=252"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=176"></script>
+<script src="nav.js?v=252"></script>
 
 <header class="head">
   <div class="wrap">
@@ -321,12 +341,15 @@ function rowHtml(r,i,names,meId,extra,leaderMs){
   const gap = (me && i>0 && leaderMs) ? `<span class="gap">+${((r.time_ms-leaderMs)/1000).toFixed(2)}</span>` : '';
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
     `<span class="rk${medal}">${i+1}</span>`+
-    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChip(r.user_id)}</span>`+
+    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChipByUid(r.user_id)}</span>`+
     `<span class="tm">${fmt(r.time_ms)}${gap}</span></div>`;
 }
-function schoolChip(uid){
+// r252: colored-monogram chip (themes.js window.schoolChip). Named *ByUid to avoid
+// clobbering the global component — a top-level `function schoolChip` would shadow it.
+function schoolChipByUid(uid, size){
   const t=(window.__schoolOf||{})[uid];
-  return t ? '<span class="sch">'+esc(t)+'</span>' : '';
+  if(!t) return '';
+  return window.schoolChip ? window.schoolChip(t, size||15) : '<span class="sch">'+esc(t)+'</span>';
 }
 function boardHtml(c, best, names, meId){
   let body;
@@ -350,7 +373,7 @@ function sessionRowHtml(r,i,names,meId,labelFn,extra){
   const medal = i<3 ? ' r'+(i+1) : '';
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
     `<span class="rk${medal}">${i+1}</span>`+
-    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChip(r.user_id)}</span>`+
+    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChipByUid(r.user_id)}</span>`+
     `<span class="tm">${labelFn(r)}</span></div>`;
 }
 function sessionBoardHtml(title, sublabel, best, names, meId, labelFn){
@@ -705,7 +728,7 @@ function showPublicCard(uid){
       '<div class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center;margin-top:4px">'+
         (window.rankEmblem?window.rankEmblem(t.name,13,t.bucket):'')+'<span>'+(t.full||t.name)+(t.provisional?' \u00b7 provisional':'')+'</span></div>'+
       (deskNm?'<div class="pub-desk">\u25c6 '+esc(deskNm)+'</div>':'')+
-      ((window.__schoolOf||{})[uid]?'<div class="pub-desk" style="color:var(--muted)">'+esc(window.__schoolOf[uid])+'</div>':'')+'</div></div>'+
+      ((window.__schoolOf||{})[uid]?'<div class="pub-desk" style="color:var(--muted);display:flex;align-items:center;gap:6px">'+schoolChipByUid(uid,16)+esc((window.schoolResolve&&window.schoolResolve(window.__schoolOf[uid])||{}).name||window.__schoolOf[uid])+'</div>':'')+'</div></div>'+
     '<div class="pub-tiles">'+
       '<span><b>'+((st&&st.crowns)||0)+'</b> crowns</span><span><b>'+((st&&st.pod)||0)+'</b> podiums</span>'+
       '<span><b>'+((st&&st.t10)||0)+'</b> top-10s</span><span><b>'+((st&&st.att)||0)+'</b> boards</span></div>'+
@@ -938,6 +961,51 @@ function rosterHtml(){
     '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">rating = stabilized average placement (lower is better) \u00b7 your row is highlighted</div></div>';
 }
 function TIER_OF(av,att,w){ return window.HK_RANK.tierOf(av,att,w); }
+/* r252: SCHOOL STANDINGS — school-vs-school aggregate of opted-in analysts.
+   Crowns (board #1s) lead the ranking; headcount and the school's champion follow.
+   Reflects the current board scope (global by default). Skips silently when the
+   field has no opted-in schools yet. */
+function schoolStandingsHtml(){
+  if(!window.schoolResolve || !DATA) return '';
+  const {profs,userStat,names,meId}=DATA;
+  const by={};
+  let mineKey=null;
+  profs.forEach(p=>{
+    if(!(p.show_school && p.school_tag)) return;
+    const s=window.schoolResolve(p.school_tag); if(!s) return;
+    const key=s.id||('other:'+s.name.toLowerCase());
+    const e=by[key]||(by[key]={key:key, tag:(s.id||p.school_tag), name:s.name, n:0, competing:0,
+      crowns:0, pod:0, best:null, bestU:null, boards:0});
+    e.n++;
+    const st=userStat[p.id];
+    if(st && st.att){ e.competing++; e.crowns+=st.crowns; e.pod+=st.pod; e.boards+=st.att;
+      if(e.best===null || st.avg<e.best){ e.best=st.avg; e.bestU=p.id; } }
+    if(meId && p.id===meId) mineKey=key;
+  });
+  const rows=Object.values(by).filter(e=>e.n>0);
+  if(!rows.length) return '';
+  rows.sort((a,b)=> b.crowns-a.crowns || b.pod-a.pod || b.competing-a.competing || b.n-a.n
+    || ((a.best==null?9:a.best)-(b.best==null?9:b.best)) || a.name.localeCompare(b.name));
+  const body=rows.slice(0,12).map((e,i)=>{
+    const mine = mineKey && e.key===mineKey;
+    const champ = e.bestU ? ('champion '+esc(names[e.bestU])) : (e.competing?'':'no ranked runs yet');
+    const analysts = e.competing || e.n;
+    return '<div class="st-row'+(mine?' mine':'')+'">'+
+      '<span class="st-rk'+(i<3?(' m'+(i+1)):'')+'">'+(i+1)+'</span>'+
+      (window.schoolChip?window.schoolChip(e.tag,22):'')+
+      '<span class="st-body"><span class="st-name">'+esc(e.name)+'</span>'+
+        (champ?'<span class="st-champ">'+champ+'</span>':'')+'</span>'+
+      '<span class="st-stats">'+
+        (e.crowns?'<span class="crown"><b>'+e.crowns+'</b> ♛</span>':'')+
+        '<span class="analysts"><b>'+analysts+'</b> '+(analysts===1?'analyst':'analysts')+'</span>'+
+        '<span class="boards"><b>'+e.boards+'</b> boards</span>'+
+      '</span></div>';
+  }).join('');
+  return '<div class="panel standings"><h4>🎓 School Standings</h4>'+
+    '<div class="st-list">'+body+'</div>'+
+    '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">'+
+      'schools ranked by crowns (board #1s), then depth · opt in from your account to fly your colors</div></div>';
+}
 function browserHtml(){
   const {perDrill,meId,myTeam,teamOnly}=DATA;
   const tabs=[['drills','\u2328 drills'],['marathon','\u23f1 marathon'],['rapidfire','\u26a1 rapid-fire']];
@@ -970,6 +1038,7 @@ function renderAll(){
     '<div class="hero">'+heroHtml()+ladderHtml()+topPlayersHtml()+'</div>'+
     featuredHtml()+
     rosterHtml()+
+    schoolStandingsHtml()+
     '<h3 class="section-title">Browse the boards</h3>'+browserHtml();
   wire();
   document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; renderAll(); });

@@ -1,1 +1,4 @@
 dev/smoke-results.json
+
+# session scratch (screenshots, preview generators, temp data)
+scratchpad/

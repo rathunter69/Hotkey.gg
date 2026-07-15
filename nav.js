@@ -315,7 +315,7 @@
   { let tries=0; const iv=setInterval(()=>{ if(window._navUser){ clearInterval(iv); navRank(); } else if(++tries>12) clearInterval(iv); }, 700); }
 
   async function loadProfileData(){
-    const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach');
+    const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach,school_tag,show_school');
     const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true});
     let mySessions=[];
     try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', window._navUser.id);
@@ -612,8 +612,16 @@
           '';
       }
     }catch(e){}
-    let myFlair=null;
-    try{ const meP=(d._profs||[]).find(x=>x.id===window._navUser.id); myFlair=meP&&meP.flair; }catch(e){}
+    let myFlair=null, mySchoolTag=null;
+    try{ const meP=(d._profs||[]).find(x=>x.id===window._navUser.id);
+      myFlair=meP&&meP.flair; mySchoolTag=(meP&&meP.school_tag)||null; }catch(e){}
+    /* r252: SCHOOL FLAIR — the colored monogram rides beside the handle on the card.
+       Shown on your own card whenever you have a school set (public display is the
+       separate show_school opt-in that governs the boards). */
+    const mySchoolChip = (mySchoolTag && window.schoolChip)
+      ? '<span style="display:inline-flex;align-items:center;gap:7px;margin-left:2px" title="'+
+          escHtml(((window.schoolResolve&&window.schoolResolve(mySchoolTag))||{}).name||mySchoolTag)+'">'+
+          window.schoolChip(mySchoolTag,22)+'</span>' : '';
     const __xp = computeXP(d, d.myRuns, d.mySessions);
     const __L  = levelOf(__xp);
     // r77: RANK-UP — tier climbed since last look → celebrate with the new crest
@@ -630,7 +638,7 @@
     }catch(e){}
     m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
-      '<div class="pc-head"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px">' + escHtml(handle) + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
+      '<div class="pc-head"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:9px">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
       /* r134: .pc-scroll wrapper — the v3 CSS (max-height 82vh + inner scroll) existed
          but the renderer never emitted it, so long cards overflowed the frame */
       '<div class="pc-scroll">' +

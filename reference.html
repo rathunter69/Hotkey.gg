@@ -58,7 +58,7 @@
   .chip{font-family:var(--mono); font-size:12px; color:var(--muted); background:var(--surface);
     border:1px solid var(--line); padding:6px 11px; border-radius:999px; cursor:pointer; transition:all .14s; user-select:none;}
   .chip:hover{color:var(--text); border-color:#34373c;}
-  .chip.on{color:var(--bg); background:var(--accent); border-color:var(--accent); font-weight:700;}
+  .chip.on{color:var(--on-accent); background:var(--accent); border-color:var(--accent); font-weight:700;}
 
   /* ---------- grid of cards ---------- */
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; padding:8px 0 60px;}
@@ -107,11 +107,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'reference';
 </script>
-<script src="themes.js?v=177"></script>
+<script src="themes.js?v=252"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=176"></script>
+<script src="nav.js?v=252"></script>
 <div class="wrap">
   <header>
     <h1>Shortcut <span class="em">reference</span></h1>
