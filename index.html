@@ -1518,7 +1518,7 @@ const colLetter = c => String.fromCharCode(64+c);
 
 function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:false,
   fmtStyle:'general',decimals:0,bt:false,bb:false,ball:false,txt:false,
-  align:null,fontColor:null,uline:false};}
+  align:null,fontColor:null,uline:false,indent:0};}
 
 const CHALLENGES = {
   drill:{
@@ -7335,6 +7335,10 @@ function render(){
       if(refColor && !isActive && !(editing && editPointer && r===editPointer.r && c===editPointer.c)){
         extraStyle = `;outline:2px solid ${refColor};outline-offset:-2px;z-index:2`;
       }
+      if(cell.indent){   // r232: Alt H 6/5 indent — pad the content gutter (right edge for right-aligned cells)
+        const pad = 9 + (cell.indent|0)*13;
+        extraStyle += (cell.align==='r') ? (';padding-right:'+pad+'px') : (';padding-left:'+pad+'px');
+      }
       row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${__ew[c]}px;max-width:${__ew[c]}px${extraStyle}">${txt}</td>`;
     }
     row+='</tr>'; g.innerHTML+=row;
@@ -7441,8 +7445,9 @@ const TABS = [
   {k:'W',name:'View',live:false},
 ];
 const MENUS = {
-  'H':  [['V','Paste'],['1','Bold'],['2','Italic'],['F','Font'],['A','Align'],['H','Fill'],['B','Borders'],['W','Wrap'],['K','Comma'],['P','Percent'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['U','Σ Sum']],
+  'H':  [['V','Paste'],['1','Bold'],['2','Italic'],['F','Font'],['A','Align'],['5','Indent −'],['6','Indent +'],['H','Fill'],['B','Borders'],['W','Wrap'],['K','Comma'],['P','Percent'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['E','Clear'],['U','Σ Sum']],
   'HV': [['S','Paste special…']],
+  'HE': [['A','Clear all'],['F','Clear formats'],['C','Clear contents']],
   'HI': [['R','Insert rows'],['C','Insert columns']],
   'HD': [['R','Delete rows'],['C','Delete columns']],
   'HO': [['I','Autofit width'],['A','Autofit height'],['W','Column width\u2026'],['U','Hide & Unhide']],
@@ -8683,6 +8688,15 @@ function applyRibbon(key){
     }
     return exitRibbon(true);
   }
+  // r232 (Wolf, Tier-1): the Clear menu — Alt H E {A / F / C}. Excel's Editing group.
+  // A wipes everything, F keeps content but strips every format, C keeps formats but empties content.
+  if(np==='HEA'){ pushUndo(); eachSel(c=>{ for(const k in c) delete c[k]; Object.assign(c, blankCell()); }); return exitRibbon(true); }   // Clear All
+  if(np==='HEF'){ pushUndo(); eachSel(c=>{ const v=c.value, f=c.formula; for(const k in c) delete c[k]; Object.assign(c, blankCell()); c.value=v; c.formula=f; }); return exitRibbon(true); }   // Clear Formats
+  if(np==='HEC'){ pushUndo(); eachSel(c=>{ c.value=null; c.formula=null; }); return exitRibbon(true); }   // Clear Contents (mirror of Delete key)
+  // r232 (Wolf, Tier-1): indent — Alt H 6 increases, Alt H 5 decreases (Excel's Alignment group).
+  // Each level pads the content one gutter; on right-aligned cells the pad rides the right edge.
+  if(np==='H6'){ pushUndo(); eachSel(c=>c.indent=Math.min(8,(c.indent|0)+1)); return exitRibbon(true); }
+  if(np==='H5'){ pushUndo(); eachSel(c=>c.indent=Math.max(0,(c.indent|0)-1)); return exitRibbon(true); }
   if(np==='H1'){ pushUndo(); toggleAllOrNone('bold'); return exitRibbon(true); }   // r193: mixed-selection semantics, same as Ctrl+B
   if(np==='H2'){ pushUndo(); toggleAllOrNone('it');   return exitRibbon(true); }
   if(np==='H3'){ pushUndo(); toggleAllOrNone('uline'); return exitRibbon(true); }   // r229: Alt H 3 underline (mirrors Ctrl+U)
@@ -8740,7 +8754,7 @@ function doPaste(kind, op){
       const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
       cell.formula=s.formula; cell.value=s.value;
       cell.bold=s.bold; cell.fill=s.fill; cell.wrap=s.wrap; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals;
-      cell.bt=s.bt; cell.bb=s.bb; cell.bl=s.bl; cell.br=s.br; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor; cell.it=s.it; cell.strike=s.strike;
+      cell.bt=s.bt; cell.bb=s.bb; cell.bl=s.bl; cell.br=s.br; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor; cell.it=s.it; cell.strike=s.strike; cell.uline=s.uline; cell.indent=s.indent|0;
     }
     S.clipboard=null; try{ const mq=$('marquee'); if(mq) mq.style.display='none'; }catch(e){}
     pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
@@ -8751,7 +8765,7 @@ function doPaste(kind, op){
   const xl=f=>(f&&(dr||dc))?translateFormula(f,dr,dc):f;
   for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
     const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
-    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;};
+    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;};
     if(kind==='values'){ cell.formula=null; cell.value=s.value; }
     else if(kind==='formulas'){ cell.formula=xl(s.formula); cell.value=s.value; }
     else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; }
@@ -8780,7 +8794,7 @@ function enterRibbon(){ if(done)return; startClock(); mode='ribbon'; path=[]; di
 function copySel(){
   const r=selRange(); const data=[];
   for(let rr=r.r1;rr<=r.r2;rr++){ const row=[]; for(let cc=r.c1;cc<=r.c2;cc++){ const c=get(rr,cc);
-    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor}); } data.push(row); }
+    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent}); } data.push(row); }
   const cols=[]; for(let cc=r.c1;cc<=r.c2;cc++) cols.push(colW[cc]);
   S.clipboard={data,cols,h:r.r2-r.r1+1,w:r.c2-r.c1+1,rect:{r1:r.r1,c1:r.c1,r2:r.r2,c2:r.c2}};
 }
