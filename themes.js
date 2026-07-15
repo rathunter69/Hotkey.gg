@@ -727,7 +727,7 @@ window.SCHOOLS = {
   sloan:        { name:'MIT Sloan',          mono:'S',   fill:'#750014', ink:'#C2C0BF' },
   nyu:          { name:'NYU',                mono:'NYU', fill:'#57068C' },
   stern:        { name:'NYU Stern',          mono:'S',   fill:'#57068C' },
-  chicago:      { name:'UChicago',           mono:'C',   fill:'#800000', face:'serif' },
+  chicago:      { name:'UChicago',           mono:'UC',  fill:'#800000', face:'serif' },
   booth:        { name:'Chicago Booth',      mono:'B',   fill:'#800000' },
   northwestern: { name:'Northwestern',       mono:'N',   fill:'#4E2A84' },
   kellogg:      { name:'Kellogg',            mono:'K',   fill:'#4E2A84' },
