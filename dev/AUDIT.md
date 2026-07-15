@@ -5444,3 +5444,14 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - GATE: demo-replay blocksel 8/8 + navigation 8/8 · alt-paths PASS (CUT-first/COPY-last, ribbon
   variants, box-before-bold) · targeted fit CLEAN (0 load/post ####, 0 h-overflow, both drills).
   drills.js label+par 74→120, ?v 180→181. (onboard/parity/visual re-run confirming post-deploy.)
+
+## r230 — flat level chip (Wolf: flat design, more colour variation, favicon-sleek)
+- Wolf: "the colored glow renders oddly — go completely flat, more badge-colour + glyph variation,
+  the sleek favicon style, not the legacy shadowed icon."
+- LEVEL CHIP: hkLevelChip() dropped the drop-shadow rect + dark base + colored-stroke "glow" for a
+  FLAT tier-coloured tile with a white numeral. Six colour bands now (was 5): slate <5, bronze 5-9,
+  silver 10-14, gold 15-19, blue 20-24, violet 25+. Rendered clean at levels 1/7/12/17/22/27.
+  themes.js ?v 176→177.
+- NEXT (queued): the rank EMBLEM system (window.rankEmblem — the ornamented frames/jewels/auras)
+  and achievement glyphs get the same flat + varied treatment; that's a larger SVG system best
+  done sample-first with Wolf's eye.
