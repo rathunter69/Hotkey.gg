@@ -111,8 +111,10 @@ These are the ones Wolf named and they're the highest drill-depth-per-effort:
    **Inside**/Outside/**Thick box**/**No border**. Left/Right are per-cell edges;
    Inside draws interior grid only; Thick box adds a 2px `thick` flag on the perimeter;
    No border strips every edge. Thick travels with copy/paste.
-8. **Cell styles gallery** (Input/Heading/Calculation) — the fast house-style path.
-9. **Find & Replace** (Ctrl+H).
+8. **Cell styles gallery** (Input/Heading/Calculation) — the fast house-style path. *(next)*
+9. ✅ **Find & Replace** (r236) — Ctrl+H opens a two-field dialog (Tab toggles Find/Replace,
+   type into each, ↵ replaces all literal occurrences in string cells). Scope = the
+   selection when >1 cell, else the whole sheet. Numbers/formulas untouched; undo-safe.
 
 **Tier 3 — nice-to-have / lower drill value.** vertical align · wrap discoverability ·
 conditional formatting · comments · freeze panes.

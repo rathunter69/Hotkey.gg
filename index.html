@@ -7593,6 +7593,14 @@ function __drawRibbon(){
     el.innerHTML='<span class="path">column width \u2192</span><span class="opt" style="font-family:var(--mono)">'+(colwBuf||'\u2026')+'</span><span class="opt">type a width (Excel units) \u00b7 \u21b5 apply \u00b7 esc cancel</span>';
     return;
   }
+  if(dialog==='findrep'){   // r236 Find & Replace
+    el.className='ribbon show';
+    const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const cur=(active)=>active?'<span class="edcaret"></span>':'';
+    const fF=frField===0, fld=(lbl,buf,on)=>'<span class="opt" style="font-family:var(--mono)'+(on?';color:var(--text)':'')+'">'+lbl+': '+(esc(buf)||'\u2026')+cur(on)+'</span>';
+    el.innerHTML='<span class="path">find &amp; replace \u2192</span>'+fld('Find',findBuf,fF)+fld('Replace',repBuf,!fF)+'<span class="opt">tab switches \u00b7 \u21b5 replace all \u00b7 esc cancel</span>';
+    return;
+  }
   if(dialog==='sortwarn'){
     el.className='ribbon show';
     el.innerHTML='<span class="path">sort warning \u2192</span><span class="opt"><k>e</k>Expand the selection</span><span class="opt"><k>c</k>Continue with the current selection</span><span class="opt">data sits NEXT to your column \u2014 \u21b5 = expand (Excel\u2019s default) \u00b7 esc cancel</span>';
@@ -8593,6 +8601,11 @@ function applyRibbon(key){
     if(key==='ENTER'){ applyColWidth(); return; }
     return;
   }
+  // r236 Find & Replace \u2014 Enter replaces all
+  if(dialog==='findrep'){
+    if(key==='ENTER'){ doFindReplace(); return; }
+    return;
+  }
   // sort warning — E/Enter expands to the contiguous block (Excel's default), C sorts the lone column
   if(dialog==='sortwarn'){
     if(key==='E'||key==='ENTER'){
@@ -9044,6 +9057,26 @@ function unhideRows(){
   syncHidden();
 }
 let colwBuf='';
+// r236: Find & Replace (Ctrl+H). Two typed fields (Tab toggles), Enter replaces all
+// literal occurrences in string cells. Scope = the selection when >1 cell, else the sheet.
+let findBuf='', repBuf='', frField=0, frCount=null;
+function doFindReplace(){
+  if(!findBuf){ frCount=0; return exitRibbon(false); }
+  const r=selRange();
+  const whole = (r.r1===r.r2 && r.c1===r.c2);   // a lone active cell means "search the whole sheet"
+  const r1=whole?1:r.r1, r2=whole?S.ROWS:r.r2, c1=whole?1:r.c1, c2=whole?COLS:r.c2;
+  let n=0; pushUndo();
+  for(let rr=r1;rr<=r2;rr++) for(let cc=c1;cc<=c2;cc++){
+    const cell=S.cells[ck(rr,cc)]; if(!cell || typeof cell.value!=='string' || !cell.value) continue;
+    if(cell.value.indexOf(findBuf)<0) continue;
+    n += cell.value.split(findBuf).length-1;
+    cell.value = cell.value.split(findBuf).join(repBuf);
+  }
+  frCount=n;
+  if(n>0){ try{ showToast(n+' replaced'); }catch(e){} return exitRibbon(true); }
+  try{ showToast('no matches'); }catch(e){}
+  return exitRibbon(false);
+}
 function applyColWidth(){
   const n=parseFloat(colwBuf);
   if(isFinite(n) && n>0){
@@ -9437,6 +9470,14 @@ document.addEventListener('keydown',e=>{
       if(k==='Enter'){ logKey('\u21b5'); applyRibbon('ENTER'); return; }
       return;
     }
+    // r236 Find & Replace: Tab toggles field, chars type into the active field, Enter replaces all
+    if(dialog==='findrep'){
+      if(k==='Tab'){ frField=1-frField; drawRibbon(); return; }
+      if(k==='Backspace'){ if(frField===0) findBuf=findBuf.slice(0,-1); else repBuf=repBuf.slice(0,-1); drawRibbon(); return; }
+      if(k==='Enter'){ logKey('\u21b5'); applyRibbon('ENTER'); return; }
+      if(k && k.length===1){ if(frField===0) findBuf+=k; else repBuf+=k; drawRibbon(); return; }
+      return;
+    }
     // filter value picker: \u2190/\u2192 walk the chips, space toggles keep/drop, Enter applies
     if(dialog==='filter'){
       if(k==='ArrowLeft'){  logKey('\u2190'); filterIdx=(filterIdx-1+filterVals.length)%filterVals.length; drawRibbon(); return; }
@@ -9629,6 +9670,8 @@ document.addEventListener('keydown',e=>{
       mode='ribbon'; path=[]; dialog='goto'; ribbonNote=''; drawRibbon(); return; }
     if(k==='1'){ e.preventDefault(); startClock(); logKey('Ctrl+1');
       mode='ribbon'; path=[]; dialog='fmt'; ribbonNote=''; drawRibbon(); return; }
+    if(lk==='h' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+H');   // r236: Find & Replace
+      mode='ribbon'; path=[]; dialog='findrep'; findBuf=''; repBuf=''; frField=0; frCount=null; ribbonNote=''; drawRibbon(); return; }
     if(k==='['){ e.preventDefault(); startClock(); logKey('Ctrl+['); jumpPrecedent(); return; }
     if(k===']'){ e.preventDefault(); startClock(); logKey('Ctrl+]'); jumpDependent(); return; }
     if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
