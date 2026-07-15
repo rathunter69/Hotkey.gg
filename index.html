@@ -7460,7 +7460,7 @@ const TABS = [
   {k:'W',name:'View',live:false},
 ];
 const MENUS = {
-  'H':  [['V','Paste'],['1','Bold'],['2','Italic'],['F','Font'],['A','Align'],['5','Indent −'],['6','Indent +'],['H','Fill'],['B','Borders'],['W','Wrap'],['K','Comma'],['P','Percent'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['E','Clear'],['U','Σ Sum']],
+  'H':  [['V','Paste'],['1','Bold'],['2','Italic'],['F','Font'],['A','Align'],['5','Indent −'],['6','Indent +'],['H','Fill'],['B','Borders'],['J','Cell styles'],['W','Wrap'],['K','Comma'],['P','Percent'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['E','Clear'],['U','Σ Sum']],
   'HV': [['S','Paste special…']],
   'HE': [['A','Clear all'],['F','Clear formats'],['C','Clear contents']],
   'HI': [['R','Insert rows'],['C','Insert columns']],
@@ -7523,6 +7523,19 @@ const FILL_SWATCHES = [
   {k:null,     hex:'transparent', name:'No fill'},
 ];
 let fillColorIdx = 0;
+// r237 (Wolf, Tier-2): the Cell Styles gallery — Alt H J. A curated house-style set that
+// composes the primitives into one keystroke. `apply(c)` mutates a cell in the selection.
+// Normal is Excel's reset (strip formats, keep content); the rest are the desk conventions.
+const CELL_STYLES = [
+  {k:'normal',  name:'Normal',  apply:c=>{ const v=c.value,f=c.formula; for(const k in c) delete c[k]; Object.assign(c, blankCell()); c.value=v; c.formula=f; }},
+  {k:'input',   name:'Input',   apply:c=>{ c.fontColor='blue'; }},                                   // blue hardcodes
+  {k:'link',    name:'Link',    apply:c=>{ c.fontColor='green'; }},                                  // green cross-sheet links
+  {k:'heading', name:'Heading', apply:c=>{ c.bold=true; c.fsz=16; c.bb=true; }},                     // bold, larger, underscored
+  {k:'total',   name:'Total',   apply:c=>{ c.bold=true; c.bt=true; c.bb=true; }},                    // ruled total row
+  {k:'note',    name:'Note',    apply:c=>{ c.it=true; c.fsz=11.5; c.fontColor='gray'; }},            // small grey footnote
+  {k:'warning', name:'Warning', apply:c=>{ c.fontColor='red'; c.bold=true; }},                       // red flag
+];
+let cellStyleIdx = 0;
 let ribbonNote='';
 const tabName = k => (TABS.find(t=>t.k===k)||{name:k}).name;
 
@@ -7586,6 +7599,13 @@ function __drawRibbon(){
     });
     html += `<span class="fc-name">${FILL_SWATCHES[fillColorIdx].name}</span>`;
     html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
+    el.innerHTML = html; return;
+  }
+  if(dialog==='cellstyle'){   // r237: cell-styles gallery \u2014 chip row, arrows walk it, \u21b5 applies
+    el.className='ribbon show';
+    let html = '<span class="path">cell styles \u2192</span>';
+    CELL_STYLES.forEach((st,i)=>{ html += `<span class="opt${i===cellStyleIdx?' on':''}">${st.name}</span>`; });
+    html += '<span class="opt">\u2190 \u2192 pick \u00b7 \u21b5 apply \u00b7 esc cancel</span>';
     el.innerHTML = html; return;
   }
   if(dialog==='colw'){
@@ -8659,6 +8679,10 @@ function applyRibbon(key){
     if(key==='ENTER'){ pushUndo(); fillSeries(); return exitRibbon(true); }
     return;
   }
+  if(dialog==='cellstyle'){   // r237: cell-styles gallery — Enter applies the highlighted style to the selection
+    if(key==='ENTER'){ const st=CELL_STYLES[cellStyleIdx]; pushUndo(); eachSel(c=>st.apply(c)); return exitRibbon(true); }
+    return;
+  }
   // top level: pick a ribbon tab (or legacy / chord)
   if(path.length===0){
     if(key==='='){ autoSum(); return exitRibbon(true); }              // alt = chord — proposes, Enter commits
@@ -8677,6 +8701,7 @@ function applyRibbon(key){
   if(np==='HFG'){ pushUndo(); eachSel(c=>c.fsz=stepFsz(c.fsz, 1)); return exitRibbon(true); }   // r235: grow font (Alt H F G)
   if(np==='HFK'){ pushUndo(); eachSel(c=>c.fsz=stepFsz(c.fsz,-1)); return exitRibbon(true); }   // r235: shrink font (Alt H F K)
   if(np==='HH'){ dialog='fillcolor'; fillColorIdx=0; drawRibbon(); return; }   // r231: Alt H H fill picker
+  if(np==='HJ'){ dialog='cellstyle'; cellStyleIdx=0; drawRibbon(); return; }   // r237: Alt H J cell-styles gallery
   if(np==='HFIS'){ dialog='series'; drawRibbon(); return; }
   if(np==='ASA'||np==='ASD'){
     const dir = np==='ASD'?'desc':'asc';
@@ -9490,6 +9515,12 @@ document.addEventListener('keydown',e=>{
     if(dialog==='fillcolor'){
       if(k==='ArrowLeft'){  logKey('←'); fillColorIdx=(fillColorIdx-1+FILL_SWATCHES.length)%FILL_SWATCHES.length; drawRibbon(); return; }
       if(k==='ArrowRight'){ logKey('→'); fillColorIdx=(fillColorIdx+1)%FILL_SWATCHES.length; drawRibbon(); return; }
+    }
+    if(dialog==='cellstyle'){   // r237: arrows walk the gallery, Enter applies
+      if(k==='ArrowLeft'){  logKey('←'); cellStyleIdx=(cellStyleIdx-1+CELL_STYLES.length)%CELL_STYLES.length; drawRibbon(); return; }
+      if(k==='ArrowRight'){ logKey('→'); cellStyleIdx=(cellStyleIdx+1)%CELL_STYLES.length; drawRibbon(); return; }
+      if(k==='Enter'){      logKey('↵'); applyRibbon('ENTER'); return; }
+      return;
     }
     if(dialog==='fontcolor'){
       if(k==='ArrowLeft'){  logKey('←'); fontColorIdx=(fontColorIdx-1+FONT_SWATCHES.length)%FONT_SWATCHES.length; drawRibbon(); return; }

@@ -102,7 +102,7 @@ These are the ones Wolf named and they're the highest drill-depth-per-effort:
    must teach the ribbon path first — do not build "only knows Ctrl+1" habits.
    Same principle as never anchoring on Alt H K: teach the muscle pros actually use.
 
-**Tier 2 — realism polish.** (in progress)
+**Tier 2 — realism polish. ✅ SHIPPED (r234–r237).**
 5. ✅ **Font size** (r235) — Alt H F G grow / Alt H F K shrink, stepping the ladder
    [10, 11.5, 13.5(base→null), 16, 18, 20]; `fsz` prop rendered inline, travels with paste.
 6. ✅ **Font-color as a visible dropdown** — already shipped: the Alt H F C picker
@@ -111,7 +111,10 @@ These are the ones Wolf named and they're the highest drill-depth-per-effort:
    **Inside**/Outside/**Thick box**/**No border**. Left/Right are per-cell edges;
    Inside draws interior grid only; Thick box adds a 2px `thick` flag on the perimeter;
    No border strips every edge. Thick travels with copy/paste.
-8. **Cell styles gallery** (Input/Heading/Calculation) — the fast house-style path. *(next)*
+8. ✅ **Cell styles gallery** (r237) — Alt H J opens a chip-row gallery (arrows walk,
+   ↵ applies) with the desk set: Normal (reset), Input (blue), Link (green),
+   Heading (bold+16+underscore), Total (bold+top/bottom rule), Note (italic grey 11.5),
+   Warning (red bold). Each composes the primitives into one keystroke.
 9. ✅ **Find & Replace** (r236) — Ctrl+H opens a two-field dialog (Tab toggles Find/Replace,
    type into each, ↵ replaces all literal occurrences in string cells). Scope = the
    selection when >1 cell, else the whole sheet. Numbers/formulas untouched; undo-safe.
