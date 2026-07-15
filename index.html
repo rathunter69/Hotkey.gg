@@ -8754,6 +8754,16 @@ function updateFxHint(){
   if(!fn){ el.classList.remove('show'); return; }
   const args=FN_SIGS[fn];
   el.innerHTML=fn+'( '+args.map((a,i2)=>i2===Math.min(argIdx,args.length-1)?'<b>'+a+'</b>':a).join(', ')+' )';
+  // r253 (Wolf): Excel floats the ScreenTip right under the cell you're editing —
+  // the old fixed spot up by the formula bar went unnoticed. Anchor it to the live
+  // editing cell (fall back to the formula-bar spot if we can't find the cell).
+  const td=document.querySelector('td.editing');
+  if(td){ const r=td.getBoundingClientRect();
+    el.style.position='fixed';
+    el.style.left=Math.round(r.left)+'px';
+    el.style.top=Math.round(r.bottom+3)+'px';
+    el.style.marginTop='0';
+  } else { el.style.position=''; el.style.left=''; el.style.top=''; el.style.marginTop=''; }
   el.classList.add('show');
 }
 function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0);
