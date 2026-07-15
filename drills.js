@@ -22,14 +22,20 @@ window.HOTKEY_DRILLS = {
   // Each group lists its drill keys in the order they should appear.
   // Group order here is the order in the drill picker.
   // ---------------------------------------------------------------
+  // r242 — curriculum v2.1 regroup (skeleton). 8 chapters, ~10 drills each, a clean
+  // difficulty spine: Foundations → Formatting → Formulas I (all FREE) → Data & Lookups
+  // (level bridge) → Formulas II / Models I / Models II / Full Builds (PRO). Six legacy
+  // drills (saves, ribbon, polish, format, blue, transpose) are FOLDED OUT of the picker —
+  // their CHALLENGES defs still exist (and stay gate-tested) until the flesh pass merges them.
   groups: [
-    { name: 'Foundations', keys: ['navigation', 'modeltour', 'blocksel', 'ribbon', 'editfix', 'undo', 'filldr', 'pastes', 'rowops', 'colops', 'autofit', 'saves', 'copyover'] },
-    { name: 'Formatting',  keys: ['housestyle', 'ruleoff', 'ruleaudit', 'polish', 'combo', 'format', 'typeset', 'decimals', 'dress', 'center', 'blue', 'gauntlet'] },
-    { name: 'Values',      keys: ['drill', 'series', 'transpose'] },
-    { name: 'Data',        keys: ['sort', 'scrub', 'recon', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2'] },
-    { name: 'Formulas',    keys: ['margin', 'anchor', 'growth', 'bridge', 'foot', 'revolver', 'balance', 'audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'hunt', 'signerr', 'versionup', 'percent', 'cagr', 'sumif', 'rollup', 'cases'] },
-    { name: 'Models',      keys: ['wacc', 'dcf', 'lbo', 'schedule', 'comps', 'waterfall', 'cascade', 'wk13', 'liqbridge', 'covtable', 'txncomps', 'sourcesuses', 'accdil', 'dcfsens', 'retbridge', 'football'] },
-    { name: 'Full Builds', keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'debtsched', 'threestmt'] },
+    { name: 'Foundations',    keys: ['navigation', 'modeltour', 'blocksel', 'filldr', 'pastes', 'rowops', 'colops', 'editfix', 'undo', 'copyover'] },
+    { name: 'Formatting',     keys: ['housestyle', 'ruleoff', 'ruleaudit', 'dress', 'typeset', 'decimals', 'center', 'autofit', 'combo', 'gauntlet'] },
+    { name: 'Formulas I',     keys: ['margin', 'foot', 'percent', 'growth', 'cagr', 'anchor', 'bridge', 'sumif', 'rollup', 'cases'] },
+    { name: 'Data & Lookups', keys: ['sort', 'scrub', 'recon', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2', 'drill', 'series'] },
+    { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'hunt', 'signerr', 'versionup', 'balance'] },
+    { name: 'Models I',       keys: ['wacc', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
+    { name: 'Models II',      keys: ['lbo', 'revolver', 'schedule', 'waterfall', 'cascade', 'wk13', 'liqbridge', 'covtable', 'debtsched'] },
+    { name: 'Full Builds',    keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt'] },
   ],
 
   // ---------------------------------------------------------------
@@ -179,15 +185,17 @@ window.HOTKEY_CAMPAIGN = {
      per-solve xp + the medal) so the campaign reads as the spine of progression, not a side
      feature. Escalating to reward the climb; the Models/Full-Builds versions carry the fat
      bounties that funnel toward PRO. */
+  // r242 \u2014 chapters mirror the v2.1 groups 1:1 (the campaign IS the spine). Escalating XP:
+  // the free tiers (c1-c3) hook, the PRO tiers (c5-c8) carry the fat bounties that funnel to PRO.
   chapters: [
-    { id:'c1', name:'v1 \u00b7 Foundations',  badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','ribbon','editfix','undo','filldr','pastes','rowops','autofit','saves','copyover'] },
-    { id:'c2', name:'v2 \u00b7 Formatting',   badge:'\ud83c\udfa8', xp:200, keys:['polish','combo','format','center','blue','gauntlet'] },
-    { id:'c3', name:'v3 \u00b7 Values & Data',badge:'\ud83d\udccb', xp:200, keys:['drill','series','sort'] },
-    { id:'c4', name:'v4 \u00b7 Formulas I',   badge:'\u2797',        xp:250, keys:['margin','growth','foot','percent'] },
-    { id:'c5', name:'v5 \u00b7 Formulas II',  badge:'\ud83e\uddee', xp:300, keys:['bridge','audit','balance','revolver','cagr','sumif'] },
-    { id:'c6', name:'v6 \u00b7 Models',       badge:'\ud83c\udfe6', xp:450, keys:['wacc','dcf','lbo','schedule','comps'] },
-    { id:'c7', name:'v7 \u00b7 Lookups',      badge:'\ud83d\udd0e', xp:250, keys:['lookup','lookup2'] },
-    { id:'c8', name:'v8 \u00b7 Full Builds',  badge:'\ud83c\udfd7', xp:600, keys:['isbuild','bsbuild','cfslink','nwcsched','debtsched','threestmt'] },
+    { id:'c1', name:'v1 \u00b7 Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','modeltour','blocksel','filldr','pastes','rowops','colops','editfix','undo','copyover'] },
+    { id:'c2', name:'v2 \u00b7 Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','ruleoff','ruleaudit','dress','typeset','decimals','center','autofit','combo','gauntlet'] },
+    { id:'c3', name:'v3 \u00b7 Formulas I',             badge:'\u2797',        xp:250, keys:['margin','foot','percent','growth','cagr','anchor','bridge','sumif','rollup','cases'] },
+    { id:'c4', name:'v4 \u00b7 Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','scrub','recon','grpfold','filterpass','unhide','lookup','lookup2','drill','series'] },
+    { id:'c5', name:'v5 \u00b7 Formulas II',            badge:'\ud83e\uddee', xp:350, keys:['audit','triage','wrapfix','balcheck','stalelink','wirewalk','hunt','signerr','versionup','balance'] },
+    { id:'c6', name:'v6 \u00b7 Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:450, keys:['wacc','dcf','comps','txncomps','football','dcfsens','retbridge','accdil','sourcesuses'] },
+    { id:'c7', name:'v7 \u00b7 Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:500, keys:['lbo','revolver','schedule','waterfall','cascade','wk13','liqbridge','covtable','debtsched'] },
+    { id:'c8', name:'v8 \u00b7 Full Builds',            badge:'\ud83c\udfd7', xp:600, keys:['isbuild','bsbuild','cfslink','nwcsched','threestmt'] },
   ],
   finisher: { badge:'\u2b50', name:'Model complete', xp:500 },
 };
@@ -197,7 +205,7 @@ window.HOTKEY_CAMPAIGN = {
 // enabled:false during beta. Advanced groups carry the \u25c6 badge and section-leader
 // boards now; flipping enabled:true (post-beta, post-internship, Stripe LIVE keys)
 // gates these groups behind entitlement. Everything else stays free.
-window.HOTKEY_PREMIUM = { enabled:false, groups:['Models','Full Builds'] };
+window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
 window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":62,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":74,"transpose":64,"saves":44,"editfix":66,"undo":48,"autofit":48,"rowops":70,"filldr":78,"blocksel":120,"copyover":58,"polish":66,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":70,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":78,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85};
 
@@ -240,7 +248,7 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'day4', glyph:'day', tier:'e', name:'Live Deal',        desc:'25 posted runs in a single day',        test:c=>{ const per={}; c.runs.forEach(r=>{ const d=String(r.created_at||'').slice(0,10); if(d) per[d]=(per[d]||0)+1; }); const best=Math.max(0,...Object.values(per)); return {done:best>=25, prog:Math.min(best,25), goal:25}; } },
   { id:'wkd1', glyph:'day', tier:'r', name:'Full Weekend',  desc:'Post runs on both Saturday and Sunday of the same weekend', test:c=>{ const wk={}; c.runs.forEach(r=>{ const t=new Date(r.created_at||0); const day=t.getDay(); if(day===0||day===6){ const sat=new Date(t); sat.setDate(t.getDate()-(day===0?1:0)); const key=sat.toISOString().slice(0,10); wk[key]=(wk[key]||0)|(day===6?1:2); } }); const hit=Object.values(wk).some(v=>v===3); return {done:hit, prog:hit?1:0, goal:1}; } },
   { id:'grp1', glyph:'spd', tier:'r', name:'Solid Foundation', desc:'Beat par on every Foundations drill',   test:c=>{ const ks=(c.groups&&c.groups['Foundations'])||[]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
-  { id:'grp2', glyph:'crn', tier:'e', name:'Model Citizen',    desc:'Beat par on every Models drill',        test:c=>{ const ks=(c.groups&&c.groups['Models'])||[]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
+  { id:'grp2', glyph:'crn', tier:'e', name:'Model Citizen',    desc:'Beat par on every Models drill',        test:c=>{ const ks=[...((c.groups&&c.groups['Models I'])||[]),...((c.groups&&c.groups['Models II'])||[])]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
   { id:'spd4', glyph:'spd', tier:'r', name:'Half-Par Club',    desc:'Clear any drill in under half its par', test:c=>{ const hit=c.menuOrder.some(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]/2); return {done:hit, prog:hit?1:0, goal:1}; } },
   { id:'gnt2', glyph:'gnt', tier:'e', name:'Season Ticket',    desc:'Post gauntlet legs in 4 different weeks', test:c=>{ const wks=new Set(); c.runs.forEach(r=>{ const m=/^wk-(\d{4}-\d{2})-/.exec(r.challenge||''); if(m) wks.add(m[1]); }); return {done:wks.size>=4, prog:Math.min(wks.size,4), goal:4}; } },
   /* r151: DRIP RUNGS — the ladders had deserts (1 crown then 5; 100 solves then
@@ -272,8 +280,9 @@ window.HOTKEY_ACHIEVEMENTS = [
 /* ---- group color identity: one muted hue per skill family. Used as accents only
    (left borders, label tints, badge strokes) — never full fills. ---- */
 window.HOTKEY_GROUP_COLORS = {
-  'Foundations':'#8ab4ff', 'Formatting':'#d9a441', 'Values':'#2ea36f',
-  'Data':'#b9c2cf', 'Formulas':'#e0879e', 'Models':'#c9a2e8', 'Full Builds':'#e3b341', 'Lookups':'#7fd4c1', 'More':'#8b8e94'
+  'Foundations':'#8ab4ff', 'Formatting':'#d9a441', 'Formulas I':'#e0879e',
+  'Data & Lookups':'#7fd4c1', 'Formulas II':'#e06a86', 'Models I':'#c9a2e8',
+  'Models II':'#a97fd6', 'Full Builds':'#e3b341', 'More':'#8b8e94'
 };
 
 /* ---- PLUGIN KEY LAYERS: curated Macabacus + FactSet defaults for IB workflows.
@@ -356,13 +365,16 @@ window.HOTKEY_GATES = {
   // chapters = the campaign chapters BEFORE this group (never the group's own — that would be
   // circular: you can't ship a locked group's chapter). Shipping them is the "pure speed, no
   // waiting" bypass alongside the level+clears path.
+  // r242 — v2.1 gates. Foundations / Formatting / Formulas I are FREE (no entry = open).
+  // Data & Lookups is a level bridge (gated, NOT pro). Formulas II / Models I / Models II /
+  // Full Builds are PRO (see HOTKEY_PREMIUM) — the level+clears path or the chapters below
+  // is the beta bypass; a real PRO entitlement skips all of it.
   groups: {
-    'Formatting':  { lvl:3,  clears:5,  chapters:['c1'] },
-    'Values':      { lvl:4,  clears:8,  chapters:['c1','c2'] },
-    'Data':        { lvl:5,  clears:11, chapters:['c1','c2'] },
-    'Formulas':    { lvl:6,  clears:14, chapters:['c1','c2','c3'] },
-    'Models':      { lvl:9,  clears:22, chapters:['c1','c2','c3','c4','c5'] },
-    'Full Builds': { lvl:13, clears:32, chapters:['c1','c2','c3','c4','c5','c6','c7'] },
+    'Data & Lookups': { lvl:4,  clears:8,  chapters:['c1','c2','c3'] },
+    'Formulas II':    { lvl:6,  clears:12, chapters:['c1','c2','c3','c4'] },
+    'Models I':       { lvl:9,  clears:18, chapters:['c1','c2','c3','c4','c5'] },
+    'Models II':      { lvl:12, clears:26, chapters:['c1','c2','c3','c4','c5','c6'] },
+    'Full Builds':    { lvl:15, clears:34, chapters:['c1','c2','c3','c4','c5','c6','c7'] },
   },
 };
 
