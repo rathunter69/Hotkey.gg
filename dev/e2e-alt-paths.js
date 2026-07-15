@@ -37,14 +37,22 @@ const ALTS = [
       {sel:o.money, keys:[{key:'1',ctrl:true},L('c')]},
       {sel:o.growth, keys:[{key:'Alt'},L('h'),D(2)]},
     ]; }` },
-  { key: 'blocksel', name: 'CUT the misfiled columns FIRST, COPY the base last, comma via ctrl+shift+! + trim', moves: `C => { const O=C._o; return [
-      {sel:O.ebTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT EBITDA column first
-      {sel:O.o.ebitda[0],keys:[{key:'v',ctrl:true}]},                                               // paste under EBITDA
-      {sel:O.opTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT Op inc column
-      {sel:O.o.opinc[0], keys:[{key:'v',ctrl:true}]},                                               // paste under Op inc
-      {sel:O.baseTL,     keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]}, // COPY the base last
-      {sel:O.o.seg[0],   keys:[{key:'v',ctrl:true}]},                                               // paste into Segment · Revenue
-      {sel:O.fmtRng,     keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},                     // comma via Ctrl+Shift+! then trim to 0 dec
+  { key: 'blocksel', name: 'CUT first / COPY last, margin via typed refs, dress via RIBBON variants (Alt H 1/2/K/P) + box before bold', moves: `C => { const O=C._o; return [
+      {sel:O.ebTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT EBITDA first
+      {sel:O.o.ebitda[0],keys:[{key:'v',ctrl:true}]},
+      {sel:O.opTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT Op inc
+      {sel:O.o.opinc[0], keys:[{key:'v',ctrl:true}]},
+      {sel:O.baseTL,     keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]}, // COPY base last
+      {sel:O.o.seg[0],   keys:[{key:'v',ctrl:true}]},
+      {sel:O.o.margin[0],keys:[...T('='+O.marginF),{key:'Enter'}]},                                 // margin via typed ref
+      {sel:O.marginRng,  keys:[{key:'d',ctrl:true}]},
+      {sel:O.marginRng,  keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(2)]},                 // percent + italic via RIBBON (Alt H P, Alt H 2)
+      {sel:O.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('a')]},                                  // box BEFORE bold (order swap)
+      {sel:O.hdrRng,     keys:[{key:'Alt'},L('h'),D(1)]},                                            // bold header via ribbon (Alt H 1)
+      {sel:O.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},   // top line $ 0-dec
+      {sel:O.restRng,    keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},        // rest commas via Alt H K + trim
+      {sel:O.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:O.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'Alt'},L('h'),D(3)]},          // centre + underline via ribbon (Alt H 3)
     ]; }` },
   { key: 'undo', name: 'the mistake walked FIRST, dressing last, italic via alt h 2', moves: `C => { const o=C._o; return [
       {sel:o.wrongRng, keys:[{key:'Delete'},{key:'z',ctrl:true}]},

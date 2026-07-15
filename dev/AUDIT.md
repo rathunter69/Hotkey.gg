@@ -5423,3 +5423,24 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   then re-renders) appear the moment you sign in. nav.js ?v 175→176. Zero page errors.
 - Reactivity pass status: theme name (r219), logout wipe (r226), sign-in rank/level (r228) all
   fixed. Remaining minor item: keyboard-profile overlay refresh — queued.
+
+## r229 — blocksel to the FULL spec + standard grid + underline engine (Wolf)
+- Wolf on r225: "there's a whole block I do nothing with; why am I bolding in place; no title for
+  Revenue, I'm guessing; checklist item 1 doesn't pop; I'm SO tired of Alt H K — dress the table
+  properly (bold headers, $ top row over numbers, right-align, centre+underline labels, box it),
+  and with the bigger grid, insert/compute a margin memo. And standardize the grid — A is wider."
+  Deep rebuild to internalize the standard (now written into FOUNDATIONS_SPEC §8).
+- BLOCKSEL v4 — "Assemble & dress the summary": every source is HEADERED (base carries
+  Segment|Revenue headers; metrics "EBITDA·CUT"/"Op inc·CUT") so nothing's guessed. COPY the base
+  that stays + CUT the two misfiled columns into their slots (copy vs cut explicit + graded). A
+  Margin memo computed off the block (=EBITDA/Revenue, live formula → %, italic). Then a banker
+  DRESS with DIVERSE chords: bold header (Ctrl+B) + box (Alt H B A); currency top line + comma rows
+  at 0-dec (Ctrl+Shift+$ / Ctrl+Shift+! + Alt H 9); right-align figures (Alt H A R); segment names
+  centred + underlined (Alt H A C / Ctrl+U). 13 distinct muscles, zero Alt H K spam.
+- UNDERLINE ENGINE (new): blankCell.uline, td.uline CSS, Ctrl+U chord + Alt H 3 ribbon, render
+  class. Tested: toggles on/off, renders, 0 page errors — no existing drill uses it (isolated).
+- STANDARD GRID: ROWS:16 + even columns (80px) — the maze's uneven A(88)/rest(74) → even 80 (Wolf's
+  ask); documented as the standard for upgraded drills.
+- GATE: demo-replay blocksel 8/8 + navigation 8/8 · alt-paths PASS (CUT-first/COPY-last, ribbon
+  variants, box-before-bold) · targeted fit CLEAN (0 load/post ####, 0 h-overflow, both drills).
+  drills.js label+par 74→120, ?v 180→181. (onboard/parity/visual re-run confirming post-deploy.)

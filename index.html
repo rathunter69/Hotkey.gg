@@ -229,6 +229,8 @@
   td.bt.bb{box-shadow:inset 0 1px 0 var(--text), inset 0 -1px 0 var(--text)}
   td.it{font-style:italic}
   td.strike{text-decoration:line-through; opacity:.75}
+  td.uline{text-decoration:underline; text-underline-offset:2px}
+  td.uline.strike{text-decoration:underline line-through}
   td.ball{box-shadow:inset 0 0 0 1px var(--text)}
 
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
@@ -1241,7 +1243,7 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=180"></script>
+<script src="drills.js?v=181"></script>
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="themes.js?v=176"></script>
 
@@ -1503,7 +1505,7 @@ const colLetter = c => String.fromCharCode(64+c);
 
 function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:false,
   fmtStyle:'general',decimals:0,bt:false,bb:false,ball:false,txt:false,
-  align:null,fontColor:null};}
+  align:null,fontColor:null,uline:false};}
 
 const CHALLENGES = {
   drill:{
@@ -3483,100 +3485,125 @@ const CHALLENGES = {
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Assemble the summary', par:74, parKeys:20,
-    aha:'a summary gets ASSEMBLED — COPY the reference that stays, CUT the misfiled columns into place, then dress the output',
-    prompt:'The segment summary is due and the pieces are scattered across the tab. The base [Segment · Revenue] block is filed and stays where it is — you COPY it. Two metric columns (EBITDA and Op inc) got dropped in the wrong place — you CUT each one out and drop it into its labeled slot. Then comma the figures. It’s an assembly puzzle: read what each loose block IS, grab it whole (across a row, down a column), and land it in the right column of the summary — copy what stays, cut what moves. The pieces land somewhere new every run.',
-    req(){ const o=this._o; return 'COPY the base at <em>'+o.baseTL+'</em> (<em>ctrl+⇧+→</em> <em>ctrl+⇧+↓</em> · <em>ctrl+c</em>) → paste at <em>'+o.o.seg[0]+'</em> · CUT EBITDA at <em>'+o.ebTL+'</em> (<em>ctrl+⇧+↓</em> · <em>ctrl+x</em>) → <em>'+o.o.ebitda[0]+'</em> · CUT Op inc at <em>'+o.opTL+'</em> → <em>'+o.o.opinc[0]+'</em> · comma <em>'+o.fmtRng+'</em> (<em>alt h k</em>, <em>alt h 9</em>×2)'; },
+    name:'Block Sel.', label:'Assemble & dress the summary', par:120, parKeys:34,
+    aha:'assemble the summary from scattered pieces — COPY what stays, CUT what moves — then dress it like the deck: a margin memo, currency on the top line, ruled and boxed',
+    prompt:'The segment summary is due and the pieces are scattered. COPY the base [Segment · Revenue] that stays filed; CUT the two misfiled metric columns (EBITDA, Op inc) into their slots. Then build it out like a real page: a Margin memo that computes off the block (EBITDA ÷ Revenue, in %), and the banker dress — bold headers, the top line in $ with the rest in commas, figures right, the segment names centred and underlined, the whole table boxed. Read what each loose piece IS, land it in the right column, and finish it clean. The pieces scatter to a new spot every run.',
+    req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b a</em> · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
     guide(){ const o=this._o; return [
-      'the base <b>[Segment · Revenue]</b> at <b>'+o.baseTL+'</b> stays filed — so COPY it: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> across, <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> down, <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at <b>'+o.o.seg[0]+'</b>',
-      'the <b>EBITDA</b> column at <b>'+o.ebTL+'</b> is misfiled — CUT it: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> · <kbd>ctrl</kbd>+<kbd>x</kbd> · paste under <b>EBITDA</b> at '+o.o.ebitda[0]+' — its old spot empties',
-      'the <b>Op inc</b> column at <b>'+o.opTL+'</b> is misfiled too — CUT it the same way · paste under <b>Op inc</b> at '+o.o.opinc[0],
-      'dress the output: select <b>'+o.fmtRng+'</b> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice — commas at 0 decimals',
+      'COPY the <b>base</b> [Segment · Revenue] at <b>'+o.baseTL+'</b> (it stays filed): <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at '+o.o.seg[0],
+      'CUT the misfiled <b>EBITDA</b> at <b>'+o.ebTL+'</b> and <b>Op inc</b> at <b>'+o.opTL+'</b>: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>x</kbd> · paste into their slots — the old spots empty',
+      'the <b>Margin</b> memo: at '+o.o.margin[0]+' type <kbd>=</kbd> EBITDA ÷ Revenue (<kbd>='+o.marginF+'</kbd>), fill down, then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>%</kbd> and italic <kbd>ctrl</kbd>+<kbd>i</kbd>',
+      'dress it: <b>bold</b> the header row (<kbd>ctrl</kbd>+<kbd>b</kbd>) · box the whole table <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd>',
+      'money: the <b>top line</b> in dollars (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>$</kbd>, trim to 0-dec with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd>×2), the rows below in <b>commas</b> (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>!</kbd>, 0-dec)',
+      'finish: figures <b>right</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>) · segment names <b>centred + underlined</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> · <kbd>ctrl</kbd>+<kbd>u</kbd>)',
     ]; },
-    targets(){ const o=this._o; return [o.baseTL, o.ebTL, o.opTL, o.fmtRng]; },
+    targets(){ const o=this._o; return [o.baseTL, o.ebTL, o.opTL, o.o.margin[0], o.hdrRng, o.tableRng]; },
     demo(){ const o=this._o;
       const gd=[{key:'ArrowDown',ctrl:true,shift:true}], gr=[{key:'ArrowRight',ctrl:true,shift:true}];
-      return [
-        {sel:o.baseTL,     keys:[...gr,...gd,{key:'c',ctrl:true}]},   // COPY the 2-col base (across + down)
-        {sel:o.o.seg[0],   keys:[{key:'v',ctrl:true}]},              // paste under Segment · Revenue
-        {sel:o.ebTL,       keys:[...gd,{key:'x',ctrl:true}]},        // CUT EBITDA column (down)
-        {sel:o.o.ebitda[0],keys:[{key:'v',ctrl:true}]},             // paste under EBITDA
-        {sel:o.opTL,       keys:[...gd,{key:'x',ctrl:true}]},        // CUT Op inc column
-        {sel:o.o.opinc[0], keys:[{key:'v',ctrl:true}]},             // paste under Op inc
-        {sel:o.fmtRng,     keys:[{key:'Alt'},L('h'),L('k')]},        // comma (2 dec)
-        {sel:o.fmtRng,     keys:[{key:'Alt'},L('h'),{key:'9'}]},     // trim
-        {sel:o.fmtRng,     keys:[{key:'Alt'},L('h'),{key:'9'}]},     // -> 0 decimals
-      ]; },
+      const steps=[
+        {sel:o.baseTL,     keys:[...gr,...gd,{key:'c',ctrl:true}]},   // COPY base
+        {sel:o.o.seg[0],   keys:[{key:'v',ctrl:true}]},
+        {sel:o.ebTL,       keys:[...gd,{key:'x',ctrl:true}]},        // CUT EBITDA
+        {sel:o.o.ebitda[0],keys:[{key:'v',ctrl:true}]},
+        {sel:o.opTL,       keys:[...gd,{key:'x',ctrl:true}]},        // CUT Op inc
+        {sel:o.o.opinc[0], keys:[{key:'v',ctrl:true}]},
+        {sel:o.o.margin[0],keys:[...T('='+o.marginF), {key:'Enter'}]},   // margin memo formula
+        {sel:o.marginRng,  keys:[{key:'d',ctrl:true}]},                  // fill down
+        {sel:o.marginRng,  keys:[{key:'%',ctrl:true,shift:true},{key:'i',ctrl:true}]},   // percent + italic
+        {sel:o.hdrRng,     keys:[{key:'b',ctrl:true}]},                  // bold header
+        {sel:o.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('a')]},     // box the table
+        {sel:o.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),{key:'9'},{key:'Alt'},L('h'),{key:'9'}]},   // top line $ (0-dec)
+        {sel:o.restRng,    keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),{key:'9'},{key:'Alt'},L('h'),{key:'9'}]},   // rest commas (0-dec)
+        {sel:o.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},     // figures right
+        {sel:o.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'u',ctrl:true}]},   // labels centred + underlined
+      ];
+      return steps; },
     build(){
-      // r225 (Wolf, deep rewrite): NOT a decoy/bold-in-place drill. This is an ASSEMBLY puzzle
-      // that teaches the real block muscles — COPY the reference that stays, CUT the misfiled
-      // columns into place — with select-across-a-row (Ctrl+Shift+→) and select-down-a-column
-      // (Ctrl+Shift+↓), landing each piece in a clearly-labeled output slot. Copy vs cut is
-      // called out explicitly and graded (base intact after copy; sources empty after cut).
-      // The output frame is fixed + labeled (so WHERE is clear); the loose pieces scatter to a
-      // shuffled, isolated spot every run (so it stays a puzzle).
+      // r229 (Wolf, full-spec rebuild): the block drill is an ASSEMBLY-then-DRESS puzzle on the
+      // roomy standard grid. COPY the reference that stays, CUT the misfiled columns into a clearly
+      // HEADERED output, compute a Margin memo off the block, and dress it like the deck with DIVERSE
+      // chords — bold, a currency top line over commas, right-aligned figures, centred+underlined
+      // segment labels, a boxed table. Every source is headered (no guessing what a number is);
+      // pieces scatter to a shuffled, isolated anchor every run.
       const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — build the segment summary',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' — build the segment summary ($000s)',txt:true,bold:true};
       const N=4;
-      const segs=shuffle(['Cloud','Devices','Ads','Search','Health','Autos','Games','Media']).slice(0,N);
+      const segs=shuffle(['Cloud','Devices','Ads','Search','Health','Autos','Games','Media','Fintech','Cyber']).slice(0,N);
       const rev = segs.map(()=>rnd(180,880)*10);
       const ebit= rev.map(v=>Math.round(v*rnd(18,34)/100/10)*10);
-      const opin= ebit.map(v=>Math.max(100, v-rnd(2,7)*100));
+      const opin= ebit.map((v,i)=>Math.max(100, v-rnd(2,7)*100));
 
-      // OUTPUT frame — FIXED at cols A..D, clearly labeled, empty bordered slots below.
+      // OUTPUT frame — FIXED cols A..E, headered, empty bordered slots below.
       const oR=3;
-      cells['A'+(oR-1)]={...blankCell(),value:'▸ SEGMENT SUMMARY — assemble here',txt:true,bold:true,fontColor:'green'};
-      ['Segment','Revenue','EBITDA','Op inc'].forEach((h,i)=>cells[colLetter(1+i)+oR]={...blankCell(),value:h,txt:true,bold:true,align:i===0?'l':'r',bb:true});
-      const o={seg:[],rev:[],ebitda:[],opinc:[]};
-      for(let r=0;r<N;r++){ for(let c=0;c<4;c++){ const k=colLetter(1+c)+(oR+1+r);
-        cells[k]={...blankCell(),bl:c===0,br:c===3,bb:r===N-1}; }
-        o.seg.push('A'+(oR+1+r)); o.rev.push('B'+(oR+1+r)); o.ebitda.push('C'+(oR+1+r)); o.opinc.push('D'+(oR+1+r)); }
+      cells['A'+(oR-1)]={...blankCell(),value:'▸ SEGMENT SUMMARY — assemble & dress',txt:true,bold:true,fontColor:'green'};
+      ['Segment','Revenue','EBITDA','Op inc','Margin'].forEach((h,i)=>cells[colLetter(1+i)+oR]={...blankCell(),value:h,txt:true,bold:false,align:i===0?'l':'r'});
+      const o={seg:[],rev:[],ebitda:[],opinc:[],margin:[]};
+      for(let r=0;r<N;r++){ for(let c=0;c<5;c++){ const k=colLetter(1+c)+(oR+1+r); cells[k]={...blankCell()}; }
+        o.seg.push('A'+(oR+1+r)); o.rev.push('B'+(oR+1+r)); o.ebitda.push('C'+(oR+1+r)); o.opinc.push('D'+(oR+1+r)); o.margin.push('E'+(oR+1+r)); }
 
-      // SOURCES — scattered on the right (cols 6..10) at isolated, shuffled anchors. Each anchor is
-      // an N-tall slot with a title row above; the base needs 2 cols, the metrics 1. Anchors are
-      // spaced (gap col 8, gap row) so Ctrl+Shift grabs never bleed between blocks.
-      const anchors=shuffle([{c:6,r:4},{c:9,r:4},{c:6,r:10},{c:9,r:10}]);
-      const baseA=anchors[0], ebA=anchors[1], opA=anchors[2];   // 4th anchor stays empty
-      const mkTitle=(c,r,t,col)=>cells[colLetter(c)+(r-1)]={...blankCell(),value:t,txt:true,bold:true,fontColor:col};
-      // base [Segment | Revenue] — the reference that STAYS (copy)
-      mkTitle(baseA.c, baseA.r, '▸ base', 'blue');
+      // SOURCES — scattered on the right (cols 7..10), two vertical bands so a grab never bleeds.
+      // base is a 2-col [Segment|Revenue] block (headered); the two metrics are single headered columns.
+      const bands=shuffle([3,10]);   // one band gets the base, the other the two metrics
+      const baseR=bands[0], metR=bands[1];
+      // base at cols 7-8 (G-H)
+      cells['G'+(baseR-1)]={...blankCell(),value:'▸ base · COPY',txt:true,bold:true,fontColor:'blue'};
+      cells['G'+baseR]={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells['H'+baseR]={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
       const baseSegKeys=[], baseRevKeys=[];
-      for(let r=0;r<N;r++){ const kS=colLetter(baseA.c)+(baseA.r+r), kR=colLetter(baseA.c+1)+(baseA.r+r);
+      for(let r=0;r<N;r++){ const kS='G'+(baseR+1+r), kR='H'+(baseR+1+r);
         cells[kS]={...blankCell(),value:segs[r],txt:true};
         cells[kR]={...blankCell(),value:rev[r],decimals:0,fontColor:'blue'};
         baseSegKeys.push(kS); baseRevKeys.push(kR); }
-      // EBITDA column — misfiled (cut)
-      mkTitle(ebA.c, ebA.r, '▸ EBITDA', 'orange');
-      const ebSrcKeys=[];
-      for(let r=0;r<N;r++){ const k=colLetter(ebA.c)+(ebA.r+r); cells[k]={...blankCell(),value:ebit[r],decimals:0,fontColor:'blue'}; ebSrcKeys.push(k); }
-      // Op inc column — misfiled (cut)
-      mkTitle(opA.c, opA.r, '▸ Op inc', 'orange');
-      const opSrcKeys=[];
-      for(let r=0;r<N;r++){ const k=colLetter(opA.c)+(opA.r+r); cells[k]={...blankCell(),value:opin[r],decimals:0,fontColor:'blue'}; opSrcKeys.push(k); }
+      // the two metrics at cols 7 and 9 (G,I) of the metric band, shuffled which is which
+      const metCols=shuffle(['G','I']);
+      const ebCol=metCols[0], opCol=metCols[1];
+      cells[ebCol+(metR-1)]={...blankCell(),value:'EBITDA · CUT',txt:true,bold:true,fontColor:'orange'};
+      cells[opCol+(metR-1)]={...blankCell(),value:'Op inc · CUT',txt:true,bold:true,fontColor:'orange'};
+      const ebSrcKeys=[], opSrcKeys=[];
+      for(let r=0;r<N;r++){ const ke=ebCol+(metR+r), ko=opCol+(metR+r);
+        cells[ke]={...blankCell(),value:ebit[r],decimals:0,fontColor:'blue'};
+        cells[ko]={...blankCell(),value:opin[r],decimals:0,fontColor:'blue'};
+        ebSrcKeys.push(ke); opSrcKeys.push(ko); }
 
       this._o={ o, segVals:segs, revVals:rev, ebVals:ebit, opVals:opin,
         baseSegKeys, baseRevKeys, ebSrcKeys, opSrcKeys,
-        baseTL:colLetter(baseA.c)+baseA.r, ebTL:colLetter(ebA.c)+ebA.r, opTL:colLetter(opA.c)+opA.r,
-        fmtRng:'B'+(oR+1)+':D'+(oR+N) };
-      return {ROWS:14, cells, active:{r:oR+1,c:1}, sel:null,
-        colW:{1:92,2:78,3:78,4:78,5:34,6:92,7:78,8:78,9:92,10:78}};
+        baseTL:'G'+(baseR+1), ebTL:ebCol+metR, opTL:opCol+metR,
+        marginF:'C'+(oR+1)+'/B'+(oR+1), marginRng:'E'+(oR+1)+':E'+(oR+N),
+        hdrRng:'A'+oR+':E'+oR, tableRng:'A'+oR+':E'+(oR+N),
+        topRowRng:'B'+(oR+1)+':D'+(oR+1), restRng:'B'+(oR+2)+':D'+(oR+N),
+        figRng:'B'+(oR+1)+':E'+(oR+N), labelRng:'A'+(oR+1)+':A'+(oR+N) };
+      return {ROWS:16, cells, active:{r:oR+1,c:1}, sel:null,
+        colW:{1:88,2:80,3:80,4:80,5:80,6:34,7:88,8:80,9:80,10:80}};
     },
     checks(S){
-      const o=this._o, cel=k=>S.cells[k]||{};
+      const o=this._o, cel=k=>S.cells[k]||{}, N=o.o.seg.length;
       const empty=k=>{ const c=S.cells[k]; return !c||c.value===undefined||c.value===null||c.value===''; };
-      const segOut = o.segVals.every((v,i)=>cel(o.o.seg[i]).value===v);
-      const revOut = o.revVals.every((v,i)=>cel(o.o.rev[i]).value===v);
-      const baseIntact = o.baseSegKeys.every((k,i)=>cel(k).value===o.segVals[i]) && o.baseRevKeys.every((k,i)=>cel(k).value===o.revVals[i]);
-      const copied = segOut && revOut && baseIntact;                                  // COPY: landed AND base still there
-      const cutEb = o.ebVals.every((v,i)=>cel(o.o.ebitda[i]).value===v) && o.ebSrcKeys.every(empty);   // CUT: landed AND source empty
-      const cutOp = o.opVals.every((v,i)=>cel(o.o.opinc[i]).value===v) && o.opSrcKeys.every(empty);
-      const fmtOk = [...o.o.rev,...o.o.ebitda,...o.o.opinc].every(k=>cel(k).fmtStyle==='comma' && (cel(k).decimals|0)===0);
+      // 1) COPY base — output seg+rev filled, base still intact
+      const copied = o.segVals.every((v,i)=>cel(o.o.seg[i]).value===v) && o.revVals.every((v,i)=>cel(o.o.rev[i]).value===v)
+        && o.baseSegKeys.every((k,i)=>cel(k).value===o.segVals[i]) && o.baseRevKeys.every((k,i)=>cel(k).value===o.revVals[i]);
+      // 2) CUT the two metrics — landed, sources empty
+      const cutBoth = o.ebVals.every((v,i)=>cel(o.o.ebitda[i]).value===v) && o.ebSrcKeys.every(empty)
+        && o.opVals.every((v,i)=>cel(o.o.opinc[i]).value===v) && o.opSrcKeys.every(empty);
+      // 3) Margin memo — live formula EBITDA/Revenue, percent, italic
+      const marginOk = o.o.margin.every((k,i)=>{ const c=cel(k);
+        return !!(c.formula && Math.abs((c.value||0)-(o.ebVals[i]/o.revVals[i]))<1e-4 && c.fmtStyle==='percent' && c.it); });
+      // 4) header bold + table boxed
+      const dressed = ['A','B','C','D','E'].every(cc=>cel(cc+3).bold) && (function(){ let ok=true;
+        for(let r=3;r<=3+N;r++) for(const cc of ['A','B','C','D','E']){ if(!cel(cc+r).ball) ok=false; } return ok; })();
+      // 5) money — top line currency @0-dec, the rows below comma @0-dec
+      const money = ['B','C','D'].every(cc=>cel(cc+'4').fmtStyle==='currency' && (cel(cc+'4').decimals|0)===0)
+        && (function(){ let ok=true; for(let r=5;r<=3+N;r++) for(const cc of ['B','C','D']){ const x=cel(cc+r); if(x.fmtStyle!=='comma'||(x.decimals|0)!==0) ok=false; } return ok; })();
+      // 6) figures right-aligned + segment labels centred & underlined
+      const aligned = (function(){ let ok=true;
+        for(let r=4;r<=3+N;r++){ for(const cc of ['B','C','D','E']) if(cel(cc+r).align!=='r') ok=false; if(cel('A'+r).align!=='c'||!cel('A'+r).uline) ok=false; } return ok; })();
       return [
-        {label:'COPY the [Segment · Revenue] base whole (Ctrl+Shift+→ ↓, Ctrl+C) → paste into the summary — the base stays filed', ok: copied},
-        {label:'CUT the misfiled EBITDA column (Ctrl+Shift+↓, Ctrl+X) → paste under EBITDA — its old spot empties', ok: cutEb},
-        {label:'CUT the misfiled Op inc column (Ctrl+X) → paste under Op inc — that spot empties too', ok: cutOp},
-        {label:'comma-format Revenue · EBITDA · Op inc — 0 decimals (Alt H K, then Alt H 9 ×2)', ok: fmtOk},
+        {label:'COPY the [Segment · Revenue] base whole → paste into the summary (the base stays filed)', ok: copied},
+        {label:'CUT the two misfiled columns (EBITDA, Op inc) → paste into their slots (old spots empty)', ok: cutBoth},
+        {label:'Margin memo — =EBITDA/Revenue down the column, format % and italic (Ctrl+Shift+%, Ctrl+I)', ok: marginOk},
+        {label:'bold the header row (Ctrl+B) and box the whole table (Alt H B A)', ok: dressed},
+        {label:'money: the top line in $ (Ctrl+Shift+$), the rows below in commas — 0 decimals', ok: money},
+        {label:'figures right-aligned (Alt H A R); segment names centred + underlined (Alt H A C, Ctrl+U)', ok: aligned},
       ];
     }
   },
@@ -6753,7 +6780,7 @@ const CHALLENGES = {
         this._model={r0:mr,c0:mc,w:3,h:4};
         this._deck={r:deckRow,c:cdeck};
         return {ROWS:RN, cells, active:{r:1,c:1}, sel:null,
-          colW:{1:88,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74,10:74}};
+          colW:{1:80,2:80,3:80,4:80,5:80,6:80,7:80,8:80,9:80,10:80}}   // r229: STANDARD grid — even columns;
       }
       // fallback: a guaranteed-clean fixed maze (5 markers incl an up-leap) — the moat holds here too.
       const fp=[{r:5,c:1},{r:5,c:6},{r:2,c:6},{r:2,c:3},{r:5,c:3}], fmr=9, fmc=3;
@@ -6765,7 +6792,7 @@ const CHALLENGES = {
       this._path=fp; this._dirs=['D','R','U','L','D','D'];
       this._model={r0:fmr,c0:fmc,w:3,h:4}; this._deck={r:fdeckRow,c:fcdeck};
       return {ROWS:RN, cells:cF, active:{r:1,c:1}, sel:null,
-        colW:{1:88,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74,10:74}};
+        colW:{1:80,2:80,3:80,4:80,5:80,6:80,7:80,8:80,9:80,10:80}}   // r229: STANDARD grid — even columns;
     },
     // r223: latches thread the maze in order (active ON each marker, no selection), then the model
     // corner, the block grab, the copy, the PASTE into the deck, and the finish at A1. Marker beats
@@ -7231,6 +7258,7 @@ function render(){
       const cell=get(r,c);
       let cls=[]; if(cell.bold)cls.push('bold'); if(cell.txt&&!isNum(cell))cls.push('txt');
       if(cell.it)cls.push('it'); if(cell.strike)cls.push('strike');   // r193
+      if(cell.uline)cls.push('uline');   // r229: cell underline (Ctrl+U / Alt H 3)
       if(cell.wrap)cls.push('wrap'); if(cell.fill==='blue')cls.push('fill-blue');
       if(cell.bt)cls.push('bt'); if(cell.bb)cls.push('bb'); if(cell.ball)cls.push('ball');
       if(cell.align)cls.push('align-'+cell.align);
@@ -8615,6 +8643,7 @@ function applyRibbon(key){
   }
   if(np==='H1'){ pushUndo(); toggleAllOrNone('bold'); return exitRibbon(true); }   // r193: mixed-selection semantics, same as Ctrl+B
   if(np==='H2'){ pushUndo(); toggleAllOrNone('it');   return exitRibbon(true); }
+  if(np==='H3'){ pushUndo(); toggleAllOrNone('uline'); return exitRibbon(true); }   // r229: Alt H 3 underline (mirrors Ctrl+U)
   if(np==='HBO'){   /* r193: OUTSIDE border = the PERIMETER of the selection; a 1\u00d71 perimeter IS the classic box (ball) */
     const r=selRange(); pushUndo();
     if(r.r1===r.r2 && r.c1===r.c2){ ensure(r.r1,r.c1).ball=true; return exitRibbon(true); }
@@ -9498,6 +9527,7 @@ document.addEventListener('keydown',e=>{
     if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); toggleAllOrNone('bold'); commitAction(); return; }
     if(lk==='i' && !e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+I'); pushUndo(); toggleAllOrNone('it'); commitAction(); return; }   // r193: italic
+    if(lk==='u' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+U'); pushUndo(); toggleAllOrNone('uline'); commitAction(); return; }   // r229: underline
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
     if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
     if(k==='5' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+5'); pushUndo(); toggleAllOrNone('strike'); commitAction(); return; }   // r193: strikethrough (Excel's chord; Chrome steals ctrl+digit live — ctrl+1 K is the taught fallback)
