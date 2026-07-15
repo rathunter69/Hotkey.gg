@@ -5387,3 +5387,19 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   'Assemble the summary', par 52→74; ?v 179→180. (Global onboard/parity audits hit infra
   timeouts this round; the drill is self-contained — build/demo/checks touch no shared
   flow — and the demo-replay's zero-page-error gate passed.)
+
+## r226 — logout no longer leaves a stale rank/level in the top bar (Wolf)
+- Wolf: "logged out and my old account info stays in the top tab — shows guest but still
+  a first-year-analyst rank and level 15. Maybe none of the header stuff is adaptive?"
+- ROOT CAUSE: the active sign-out (nav.js, which owns the auth slot) called signOut()
+  WITHOUT clearing the caches that hydrate the header — sessionStorage hk_rank3 (the rank
+  pill), localStorage hk_xp_est (the level chip), hk_handle_cache — and the rank pill is its
+  OWN element that renderAuthBar never touches. So the pill + level survived sign-out (and a
+  reload would even repaint them from the caches).
+- FIX: a shared clearAccountUI() wipes hk_rank3 / hk_xp_est / hk_handle_cache, hides + empties
+  navRankPill, removes the nav level chip, zeroes window.__lvlXp. Wired into (a) the nav.js
+  sign-out button (then signOut + reload for a bulletproof guest reset), (b) the reactive
+  onAuthStateChange SIGNED_OUT branch (covers cross-tab logout, no reload), and (c) index.html's
+  own sign-out path (shares window.clearAccountUI before its reload). Verified: with a simulated
+  signed-in header (xp 9000, rank pill 'First-year Analyst'), clearAccountUI() → all caches null,
+  pill display:none + emptied. Zero page errors. nav.js ?v 174→175 across all pages.
