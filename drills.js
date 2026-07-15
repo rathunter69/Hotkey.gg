@@ -202,6 +202,39 @@ window.HOTKEY_CAMPAIGN = {
   finisher: { badge:'\u2b50', name:'Model complete', xp:600 },
 };
 
+/* ---- TIME BANDS (r256, Wolf) — per-drill speed medals anchored to the (now brutal)
+   par. A clean solve earns Cleared; the speed tiers key off time÷par so they scale
+   with the drill. ELITE = beat par. One-time xp bounty when you reach a new band —
+   the "chase the next tier" loop the tight par sets up. The global/competitive layer
+   stays the leaderboard + rank tiers (no redundant top-X% badge). ---- */
+window.HK_BAND = {
+  // ordered easiest → hardest; `max` = the time÷par ceiling to earn it (lower is faster)
+  BANDS: [
+    { i:1, key:'cleared', name:'Cleared', color:'#8b909a', max:Infinity },
+    { i:2, key:'bronze',  name:'Bronze',  color:'#c8894e', max:2.0 },
+    { i:3, key:'silver',  name:'Silver',  color:'#aeb6c0', max:1.5 },
+    { i:4, key:'gold',    name:'Gold',    color:'#e0b341', max:1.15 },
+    { i:5, key:'elite',   name:'Elite',   color:'#b98bff', max:1.0 },
+  ],
+  XP: { cleared:0, bronze:15, silver:30, gold:60, elite:120 },   // one-time, cumulative deltas paid on reach
+  // best band earned for a given PB (seconds) against par (seconds); null if unsolved
+  of(pbSec, parSec){
+    if(pbSec==null || !isFinite(pbSec) || !parSec) return null;
+    const r = pbSec/parSec;
+    for(let j=this.BANDS.length-1;j>=0;j--){ if(r<=this.BANDS[j].max) return this.BANDS[j]; }
+    return this.BANDS[0];
+  },
+  // the next tier up + the time you'd need to hit it (null at Elite)
+  next(parSec, curBand){
+    const i = curBand ? curBand.i : 0;
+    const nb = this.BANDS.find(b=>b.i===i+1);
+    if(!nb || !isFinite(nb.max)) return nb ? {band:nb, needSec:parSec*nb.max} : null;
+    return { band:nb, needSec:parSec*nb.max };
+  },
+  // total one-time xp earned for holding a band (sum of deltas up to it)
+  xpFor(band){ if(!band) return 0; let t=0; for(const b of this.BANDS){ t+=this.XP[b.key]||0; if(b.i===band.i) break; } return t; },
+};
+
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
 // ---- ADVANCED TIER / PAYWALL SCAFFOLD ----
 // enabled:false during beta. Advanced groups carry the \u25c6 badge and section-leader
