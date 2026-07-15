@@ -5403,3 +5403,12 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   own sign-out path (shares window.clearAccountUI before its reload). Verified: with a simulated
   signed-in header (xp 9000, rank pill 'First-year Analyst'), clearAccountUI() → all caches null,
   pill display:none + emptied. Zero page errors. nav.js ?v 174→175 across all pages.
+
+## r227 — player-card level ring shows an ADORNED number, not "n / LVL" (Wolf)
+- Wolf (long-standing): the level/xp circle read as a plain "1" stacked over a redundant "LVL",
+  when the "LEVEL n" label already sits right below the ring — he wanted just an adorned number
+  in the ring.
+- FIX: hkLevelRing() now centers the level as one big, bold (800), accent-colored numeral
+  (23px for 1-digit, 19px for 2-digit) with a hairline surface stroke for legibility on the arc
+  — and drops the inner "LVL" text. Verified across levels 1/5/15/23: clean adorned number inside
+  the progress arc, "LEVEL n" label below. themes.js ?v 174/175 → 176 across all pages.

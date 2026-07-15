@@ -449,8 +449,9 @@ window.hkLevelRing = function(lvl, pct, size){
       '<animate attributeName="stroke-dashoffset" from="'+C.toFixed(1)+'" to="'+off.toFixed(1)+'" dur="0.9s" '+
         'calcMode="spline" keySplines="0.2 0.8 0.2 1" fill="freeze"/>'+
       '</circle>'+
-    '<text x="28" y="26.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="14" fill="var(--text)">'+lvl+'</text>'+
-    '<text x="28" y="38" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-size="6.5" letter-spacing="1.5" fill="var(--muted)">LVL</text></svg>';
+    /* r227 (Wolf): the ring shows just the level number, ADORNED — big, bold, accent —
+       not a plain "1" stacked over a redundant "LVL" (the "LEVEL n" label sits below the ring). */
+    '<text x="28" y="34.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="'+(String(lvl).length>1?19:23)+'" fill="var(--accent)" style="paint-order:stroke" stroke="var(--surface2)" stroke-width="0.5">'+lvl+'</text></svg>';
 };
 window.hkLevelChip = function(lvl, size){
   size=size||22;
