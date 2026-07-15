@@ -959,7 +959,8 @@
     align-items:flex-start; justify-content:center; z-index:62; padding:38px 22px; overflow:auto}
   .profile-modal.show{display:flex}
   .pc-card{background:var(--surface); border:1px solid var(--line); border-radius:16px;
-    width:640px; max-width:96vw; padding:26px 30px 22px; box-shadow:0 28px 80px rgba(0,0,0,.65); margin:auto}
+    width:640px; max-width:96vw; padding:26px 30px 22px; box-shadow:0 28px 80px rgba(0,0,0,.65); margin:auto;
+    max-height:calc(100vh - 80px); overflow-y:auto}   /* r239 (Wolf): the card caps at the viewport and scrolls INSIDE its own backer — a card that fits shows no scrollbar, and a tall one never spawns a page/modal scrollbar */
   .pc-head{display:flex; align-items:center; justify-content:space-between; gap:16px}
   .pc-name{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--text); letter-spacing:-.5px}
   .pc-tier{font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
@@ -7983,7 +7984,6 @@ function _showResults(o){
     `<div class="rm-opts">`+
     `<button class="rm-key" data-act="again"><kbd>↵ enter</kbd>again</button>`+
     `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
-    `<button class="rm-key" data-act="next"><kbd>space</kbd>next</button>`+
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
     `</div>`+
     guestPrompt+
