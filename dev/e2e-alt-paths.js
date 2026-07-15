@@ -37,11 +37,14 @@ const ALTS = [
       {sel:o.money, keys:[{key:'1',ctrl:true},L('c')]},
       {sel:o.growth, keys:[{key:'Alt'},L('h'),D(2)]},
     ]; }` },
-  { key: 'blocksel', name: 'carry the block FIRST, comma via ctrl+shift+!, bold the LIVE one last via ribbon', moves: `C => { const o=C._o; return [
-      {sel:o.move,  keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'x',ctrl:true}]},   // grab + cut the ▸ TO MODEL block
-      {sel:o.frame, keys:[{key:'v',ctrl:true}]},                                                                                   // drop it in the frame
-      {sel:o.frameRng, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},                       // comma via Ctrl+Shift+!, then trim to 0 decimals
-      {sel:o.live,  keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'Alt'},L('h'),D(1)]}, // bold the LIVE block via the ribbon
+  { key: 'blocksel', name: 'CUT the misfiled columns FIRST, COPY the base last, comma via ctrl+shift+! + trim', moves: `C => { const O=C._o; return [
+      {sel:O.ebTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT EBITDA column first
+      {sel:O.o.ebitda[0],keys:[{key:'v',ctrl:true}]},                                               // paste under EBITDA
+      {sel:O.opTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT Op inc column
+      {sel:O.o.opinc[0], keys:[{key:'v',ctrl:true}]},                                               // paste under Op inc
+      {sel:O.baseTL,     keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]}, // COPY the base last
+      {sel:O.o.seg[0],   keys:[{key:'v',ctrl:true}]},                                               // paste into Segment · Revenue
+      {sel:O.fmtRng,     keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},                     // comma via Ctrl+Shift+! then trim to 0 dec
     ]; }` },
   { key: 'undo', name: 'the mistake walked FIRST, dressing last, italic via alt h 2', moves: `C => { const o=C._o; return [
       {sel:o.wrongRng, keys:[{key:'Delete'},{key:'z',ctrl:true}]},
