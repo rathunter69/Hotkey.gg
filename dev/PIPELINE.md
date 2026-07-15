@@ -1,5 +1,33 @@
 # PIPELINE — the Fable task queue
 
+## ⚡ STATE OF THE QUEUE (r251, 2026-07-15 — READ FIRST)
+Curriculum v2.1 is fully shipped, gated green, and coherent end to end. Since the
+r196 block (kept below as history):
+- **Engine Tier 1+2 DONE** — fill palette (Alt H H), Clear menu (Alt H E), indent
+  (Alt H 5/6), accounting (Alt H A N), scale, border depth incl. thick box
+  (Alt H B K), font size (Alt H F G/K), Find & Replace (Ctrl+H), cell styles
+  (Alt H J). Ctrl+1 kept to high-value cases only (Wolf doctrine).
+- **Curriculum v2.1 regroup DONE (r242)** — 8 chapters, ~10 drills each: Foundations /
+  Formatting / Formulas I (FREE) · Data & Lookups (level bridge) · Formulas II /
+  Models I / Models II / Full Builds (PRO). Catalog = 80 drills; groups == chapters.
+- **Flesh-out pass DONE (r243–r249)** — toolkit wired where it teaches (dress fill,
+  ruleoff thick box, gauntlet accounting, versionup Ctrl+H rename); **7 NEW drills**
+  (fcfbuild, intsched, dcfbuild, lbobuild, opmodel, debtblock, dashcover); the **6
+  weak drills DELETED** (saves, ribbon, polish, format, blue, transpose).
+- **Campaign + economy DONE (r250–r251)** — campaign recut to a curated flagship
+  SPINE (31 drills, 3–4/chapter, not all 80); bounties steepened (PRO chapters
+  450–1000, finisher 600); gate level-walls softened (Full Builds L15→L11, lean on
+  clears); 2 new medals (Formula Desk, Master Builder). Achievements: no stale refs.
+- Gate green at every push: demo-replay 80 · parity 94 · onboard 28 · alt-paths 74.
+
+**NEXT UP — SCHOOL FLAIR Phase 1 (T-Q below).** Wolf-approved across a design session
+(mockups were in the ephemeral session scratchpad — the spec in T-Q is self-contained).
+Colored-monogram marks, our own, NO logos/symbols. Pure-frontend + one stored column.
+**T-O (desk-palette-grades-drills) is SHELVED** — Wolf chose identity flair over
+re-grading drills. Older open items still live below (FactSet canon verify, T-H
+interview mode awaiting "go", T-I seasons gated on DAU, deferred engine bits).
+
+<!-- ————————————————— history below ————————————————— -->
 ## ⚡ STATE OF THE QUEUE (r196, 2026-07-14 — read this first)
 Every executable task below is DONE, and so is Wolf playtest round 3 (r190-
 r195: engine pack 3 + the nine drill rebuilds across Tranches A/B/C). 79
@@ -296,6 +324,41 @@ transpose  | fine after r168 aha; lowest priority
 > drills RENDER + GRADE against that desk's palette, not the generic one. Depends on the
 > Tier-1 fill palette + font muscles (T-N) and the team/desk model. Big retention + B2B
 > hook — desks buy training that looks like their own book. Sketch to Wolf before building.
+> **SHELVED (Wolf r251):** superseded by T-Q — Wolf chose identity flair over drills that
+> render/grade against a desk palette. Keep the note for reference; do not build.
+
+## T-Q · SCHOOL & DESK FLAIR — Phase 1 APPROVED, ready to build (Wolf r251)
+> Surface the latent school/desk data as visible IDENTITY. The backend already exists and
+> is verified healthy (r196): `.edu` sign-up auto-matches to a school's desk, plus the
+> `refresh_school_tag` RPC and `my_desk` — but NOTHING shows in the UI today. This makes it
+> wearable: a pill on the card + every leaderboard row, and school-vs-school standings.
+>
+> **THE SCHOOL MARK — DECIDED (colored monogram, our own; no logos/symbols):**
+> - a letter (1–3 chars) in the school's colors, in ONE clean shape (a circle chip).
+> - **two-tone = BACKGROUND fill + LETTER color** (Wharton = navy chip, red letter). **NO
+>   border ring** — Wolf r251: single-color icon reads cleanest; the second color lives in
+>   the letter, not an outline.
+> - **match real school colors as closely as possible**, held to our UI contrast bar —
+>   auto-pick a readable ink on light fills (Columbia light-blue → navy letter).
+> - optional letterform (mono default / serif / condensed) — keep or drop the dial per taste.
+> - **NO official crests / logos / mascots** — trademarked, decided against on both IP and
+>   clarity grounds. Custom original symbol-emblems (phoenix/keystone/etc.) were prototyped
+>   and REJECTED — they confuse anyone who isn't an alum. Letters + colors only.
+>
+> **DATA MODEL:** `SCHOOLS = { id: { name, mono, fill, ink?, face? } }` — seed ~100 finance
+> feeders with real colors; "Other" = freeform name + a swatch from a small curated palette.
+>
+> **PHASE 1 (frontend + one stored column):**
+>   1. `SCHOOLS` seed table — draft the ~100 list + colors; Wolf trims/approves the list.
+>   2. `schoolChip(schoolId, size)` render component (auto-contrast ink) + the "Other" monogram.
+>   3. School picker at sign-up + in profile (curated list + "Other"), wired to the existing
+>      `.edu` auto-match so most users arrive pre-filled.
+>   4. Surfaces: chip on the player card, every leaderboard row, and a **School Standings**
+>      panel (aggregate of a school's top analysts — the rivalry / sharing hook).
+> **PHASE 2 (frontend):** desk chip beside the school pill; join by code or the auto-match.
+> **PHASE 3 (needs Supabase — desk-owner role, aesthetics table, RLS):** a desk owner sets
+>   name · accent color · emblem-emoji · tagline; members inherit the desk accent as light
+>   flair (their pill tints to it). Aesthetic-only — never drill-grading.
 
 ## T-P · CURRICULUM v2 — CONFIRMED shape, EXECUTE AFTER the engine pack (Wolf r230)
 > Wolf confirmed: 8 chapters, ~10 RICH drills each, deep domains numbered, cut/merge the weak ~6.
