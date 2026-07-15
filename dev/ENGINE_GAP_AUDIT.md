@@ -81,20 +81,26 @@ richness closing it unlocks.
 
 ## 3. PRIORITY — what to build, in order (each unlocks drill depth)
 
-**Tier 1 — the elegance + depth unlock (do first).** These are the ones Wolf named
-and they're the highest drill-depth-per-effort:
-1. **Fill color as a real palette** (not just 'blue'). Add `fill` values
-   (blue-input, grey-header, yellow-flag, green, red, none) + a discoverable
-   Alt H H picker. Unlocks: house-style shading, input/flag conventions, the
-   desk-theme feature (§5). *Also fixes "the way we set background colors isn't
-   elegant."*
-2. **Clear menu** (Alt H E A/F/C): clear-all / clear-formats / clear-contents.
-   Unlocks a real "strip the dead formatting off this paste" drill and mirrors the
-   Delete-vs-clear distinction bankers know.
-3. **Indent** (Alt H 5/6 + `indent` prop, render as left padding). Unlocks
-   proper sub-line-item structure in every P&L/schedule drill.
-4. **Ctrl+1 number-format depth**: date, accounting, and the custom `#,##0,,"M"`
-   scale format — the single most-used banker number muscle after comma.
+**Tier 1 — the elegance + depth unlock (do first). ✅ SHIPPED (r231–r233).**
+These are the ones Wolf named and they're the highest drill-depth-per-effort:
+1. ✅ **Fill color as a real palette** (r231) — `fill` values blue/grey/yellow/
+   green/red/none + the Alt H H picker (arrows+↵ or B/G/Y/R/N). Unlocks house-style
+   shading, input/flag conventions, the desk-theme feature (§5).
+2. ✅ **Clear menu** (r232) — Alt H E A/F/C: clear-all / clear-formats /
+   clear-contents. The "strip the dead formatting off this paste" muscle.
+3. ✅ **Indent** (r232) — Alt H 6/5, `indent` prop 0–8 rendered as gutter padding
+   (right edge for right-aligned cells). Proper sub-line-item structure.
+4. ✅ **Number-format depth** (r233) — **Accounting** ($ set-off, parens-neg,
+   dash-zero) on the RIBBON at Excel's real **Alt H A N** keytip; **scale** ÷000s /
+   ÷millions as a **Ctrl+1** custom format (`scale` prop, display-only, value intact).
+
+   **CTRL+1 DOCTRINE (Wolf, r233):** Ctrl+1 is *not* the number-format crutch.
+   Everyday number formats go through **ribbon hotkeys** (Alt H K comma, Alt H P
+   percent, Alt H A N accounting, Ctrl+Shift+$/%/#). Ctrl+1 is reserved for what
+   genuinely needs the dialog: **center-across selection**, **custom formats**
+   (the ÷000s/millions scale), and **date-style cycling / quick fixes**. Drills
+   must teach the ribbon path first — do not build "only knows Ctrl+1" habits.
+   Same principle as never anchoring on Alt H K: teach the muscle pros actually use.
 
 **Tier 2 — realism polish.**
 5. **Font size** (grow/shrink Alt H F G/K + `size` prop) — titles bigger, footnotes smaller.
