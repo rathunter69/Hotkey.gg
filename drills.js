@@ -22,11 +22,12 @@ window.HOTKEY_DRILLS = {
   // Each group lists its drill keys in the order they should appear.
   // Group order here is the order in the drill picker.
   // ---------------------------------------------------------------
-  // r242 — curriculum v2.1 regroup (skeleton). 8 chapters, ~10 drills each, a clean
-  // difficulty spine: Foundations → Formatting → Formulas I (all FREE) → Data & Lookups
-  // (level bridge) → Formulas II / Models I / Models II / Full Builds (PRO). Six legacy
-  // drills (saves, ribbon, polish, format, blue, transpose) are FOLDED OUT of the picker —
-  // their CHALLENGES defs still exist (and stay gate-tested) until the flesh pass merges them.
+  // r242 — curriculum v2.1 regroup. 8 chapters, ~10 drills each, a clean difficulty spine:
+  // Foundations → Formatting → Formulas I (all FREE) → Data & Lookups (level bridge) →
+  // Formulas II / Models I / Models II / Full Builds (PRO).
+  // r249 — the 6 folded legacy drills (saves, ribbon, polish, format, blue, transpose) were
+  // deleted outright, their value covered by survivors (copyover, housestyle, dress, decimals,
+  // the Alt-H drills, pastes). Catalog is now exactly the 80 grouped drills.
   groups: [
     { name: 'Foundations',    keys: ['navigation', 'modeltour', 'blocksel', 'filldr', 'pastes', 'rowops', 'colops', 'editfix', 'undo', 'copyover'] },
     { name: 'Formatting',     keys: ['housestyle', 'ruleoff', 'ruleaudit', 'dress', 'typeset', 'decimals', 'center', 'autofit', 'combo', 'gauntlet'] },
@@ -55,11 +56,9 @@ window.HOTKEY_DRILLS = {
     colops:     { name:'Columns',  label:'Columns move too',        tab:'Columns',  desc:'Ctrl+Space grabs it, Alt H D C kills it, Alt H I C opens one' },
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Ctrl+D and Ctrl+R — one formula, whole block' },
     blocksel:   { name:'Block Sel.',label:'Assemble & dress the summary',tab:'Block', desc:'COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck' },
-    ribbon:     { name:'Ribbon',   label:'Learn the ribbon',        tab:'Ribbon',   desc:'Alt is a menu — walk H 1, H K, H A C' },
     editfix:    { name:'Edit',     label:'Fix the typos in place',  tab:'Edit',     desc:'Three typos, three F2 repairs — never retype a cell' },
     undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete big, Ctrl+Z, then delete only what deserved it' },
     pastes:     { name:'Paste Sp.',label:'Alt E S everything',      tab:'Paste Sp.',desc:'One copy, two pastes — values then formats' },
-    transpose:  { name:'Transpose', label:'Flip it on its side',        tab:'Transpose', desc:'Copy a row, Alt E S E drops it in as a column' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'3-yr cascade: MIN rations, both tranches corkscrew across' },
     cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche corkscrews, total debt ruled off' },
     wk13:       { name:'13-Week Cash', label:'Run the 13-week', tab:'13-Week', desc:'The RX staple: weekly corkscrew, anchored liquidity cushion, totals on flows only' },
@@ -71,23 +70,19 @@ window.HOTKEY_DRILLS = {
     dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
     retbridge:  { name:'Ret. Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
     football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
-    saves:      { name:'Save',     label:'Save like you mean it',   tab:'Save',     desc:'Work, Ctrl+S. More work, Ctrl+S again' },
     copyover:   { name:'Copyover', label:'One copy, three hand-offs', tab:'Copy',  desc:'Two full pastes + Alt E S V values for the deck' },
 
     // Formatting
     housestyle: { name:'House Style', label:'Bring it to standard', tab:'House Style', desc:'The senior\u2019s pass: title, headers, blue inputs (one buried), commas, %, ruled off' },
     ruleoff:    { name:'Rule Off',  label:'Rule off the schedule', tab:'Rule Off',  desc:'Accounting rulings: line under headers, line above every total, box the headline' },
     ruleaudit:  { name:'Ruling Pass', label:'The ruling pass', tab:'Ruling Pass', desc:'The page says done \u2014 the pass disagrees. Find the missing rulings, fix only those' },
-    polish:     { name:'Polish',   label:'Polish the Header',   tab:'Header',      desc:'Bold + bottom border + shade a header row' },
     combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Bold, comma, wrap and autofit a pasted table' },
     typeset:    { name:'Typeset',  label:'Typeset the memo',    tab:'Typeset',     desc:'Bold, unbold, italic memos, strike the dead line, =TODAY() stamp' },
-    format:     { name:'Format',   label:'Fix the formats',     tab:'Formats',     desc:'Percent, currency, comma — plus 8.2x and Mmm-yy via Ctrl+1' },
     decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Alt H 9 / Alt H 0 — dollars none, multiples and percents one' },
     dress:      { name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', tab:'Dress', desc:'Title ruled, inputs blue, percents, commas \u2014 book-ready' },
     triage:     { name:'Error triage', label:'Error triage \u2014 #REF! #DIV/0! #VALUE!', tab:'Triage', desc:'Three classic breaks \u2014 read the error, rebuild the intent' },
     versionup:  { name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', tab:'Rollfwd', desc:'Typed answers \u2192 live formulas; v2 must survive new numbers' },
     center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Center, left, right — three alignment passes, house style' },
-    blue:       { name:'Blue',     label:'Blue the inputs',     tab:'Inputs',      desc:'Blue the hardcoded inputs — Alt H F C' },
     gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Model',       desc:'A full model-ready formatting pass' },
 
     // Values
@@ -214,7 +209,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
-window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":62,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":74,"transpose":64,"saves":44,"editfix":66,"undo":48,"autofit":48,"rowops":70,"filldr":78,"blocksel":120,"copyover":58,"polish":66,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":70,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":78,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85,"fcfbuild":100,"intsched":115,"dcfbuild":160,"lbobuild":170,"opmodel":160,"debtblock":190,"dashcover":120};
+window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"margin":52,"schedule":113,"percent":64,"lookup":50,"pastes":74,"editfix":66,"undo":48,"autofit":48,"rowops":70,"filldr":78,"blocksel":120,"copyover":58,"housestyle":70,"foot":48,"comps":161,"center":56,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":70,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":78,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85,"fcfbuild":100,"intsched":115,"dcfbuild":160,"lbobuild":170,"opmodel":160,"debtblock":190,"dashcover":120};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

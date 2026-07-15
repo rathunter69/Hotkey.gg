@@ -1979,62 +1979,6 @@ const CHALLENGES = {
       ];
     }
   },
-  format:{
-    name:'Format', label:'Fix the formats', par:62, parKeys:23,
-    aha:'Ctrl+1 opens Format Cells — percent, currency, multiple, date, all in one dialog.',
-    prompt:'These outputs came in raw \u2014 and they land somewhere new each run. Cast each number to its right type: margins as percentages, dollars as currency, the share count with commas, the multiple as 8.2x and the report date as Mmm-yy \u2014 the last two live in Ctrl+1 (or the old-school Alt O E), the dialog every desk formats through.',
-    req(){ const o=this._o; return '<em>'+o.pct+'</em> \u2192 <em>ctrl+shift+%</em> (+1 dec on the second) \u00b7 <em>'+o.cur+'</em> \u2192 <em>ctrl+shift+$</em> \u2212 decimals \u00b7 <em>'+o.com+'</em> \u2192 <em>ctrl+shift+!</em> \u2212 decimals \u00b7 <em>'+o.mult+'</em> \u2192 <em>ctrl+1</em> <em>x</em> \u00b7 <em>'+o.date+'</em> \u2192 <em>ctrl+1</em> <em>d</em>'; },
-    guide(){ const o=this._o; return [
-      'the margins at '+o.pct+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 one decimal on the EBITDA margin: <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>',
-      'dollar rows at '+o.cur+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
-      'share count at '+o.com+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>!</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
-      'the multiple at '+o.mult+' \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>x</kbd> \u2014 8.2x, one decimal (browser eats ctrl+1? <kbd>alt</kbd> <kbd>o</kbd> <kbd>e</kbd> is the same dialog)',
-      'the report date at '+o.date+' \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>d</kbd> \u2014 the serial becomes Mmm-yy',
-    ]; },
-    targets(){ const o=this._o; return [o.pct,o.cur,o.com,o.mult,o.date]; },
-    demo(){ const o=this._o; return [
-      {sel:o.pct, keys:[Kb.pct]},
-      {sel:o.pct.split(':')[1], keys:[Kb.alt,L('H'),D(0)]},
-      {sel:o.pct, keys:[{key:'i',ctrl:true}]},
-      {sel:o.cur, keys:[Kb.cur,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
-      {sel:o.com, keys:[Kb.com,Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
-      {sel:o.mult, keys:[{key:'1',ctrl:true},L('X')]},
-      {sel:o.date, keys:[{key:'1',ctrl:true},L('D')]},
-    ]; },
-    build(){
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 output summary (cast the units)',txt:true,bold:true};
-      const spots=[{r:3,c:1},{r:2,c:4},{r:5,c:2},{r:3,c:6},{r:7,c:3}];
-      const sp=spots[rnd(0,spots.length-1)];
-      const r0=sp.r, LC=colLetter(sp.c), VC=colLetter(sp.c+1);
-      cells[LC+r0]={...blankCell(),value:'Metric',txt:true,bold:true};
-      cells[VC+r0]={...blankCell(),value:'Value',txt:true,bold:true,align:'r'};
-      const gross=rnd(36,55)/100, ebitda=rnd(150,290)/1000;
-      const rows=[['Gross margin',gross],['EBITDA margin',ebitda],['Revenue ($mm)',rnd(38,72)*10],['Net debt ($mm)',-rnd(9,28)*10],['Shares out. (000s)',rnd(40,300)*100],['EV / EBITDA',rnd(55,140)/10],['Report date',45930+rnd(90,800)]];   // r195: the dollar pair includes a NEGATIVE — currency cast shows ($xx), the r190 payoff
-      rows.forEach(([n,v],i)=>{
-        cells[LC+(r0+1+i)]={...blankCell(),value:n,txt:true};
-        cells[VC+(r0+1+i)]={...blankCell(),value:v,decimals:3,fontColor:'blue'};   // r176: raw look, still fits
-      });
-      this._o={ pct:VC+(r0+1)+':'+VC+(r0+2), cur:VC+(r0+3)+':'+VC+(r0+4), com:VC+(r0+5),
-        mult:VC+(r0+6), date:VC+(r0+7), vc:VC, r0:r0 };
-      return {ROWS:Math.max(9,r0+8), cells, active:{r:r0+1,c:sp.c+1}, sel:null, colW:{}};
-    },
-    checks(S){
-      const o=this._o, r0=o.r0, g=r=>S.cells[o.vc+r]||{};
-      return [
-        {label:'cast the margins as percentages and ITALICIZE the pair \u2014 %-lines whisper; EBITDA margin to one decimal ('+o.pct+')',
-          ok: g(r0+1).fmtStyle==='percent' && g(r0+2).fmtStyle==='percent' && (g(r0+2).decimals|0)===1 && g(r0+1).it && g(r0+2).it},
-        {label:'cast the dollar figures as currency \u2014 no stray decimals ('+o.cur+')',
-          ok: ['currency'].includes(g(r0+3).fmtStyle) && g(r0+4).fmtStyle==='currency' && (g(r0+3).decimals|0)===0 && (g(r0+4).decimals|0)===0},
-        {label:'comma-separate the share count \u2014 whole number ('+o.com+')',
-          ok: g(r0+5).fmtStyle==='comma' && (g(r0+5).decimals|0)===0},
-        {label:'cast the multiple as 8.2x \u2014 ctrl+1, one decimal ('+o.mult+')',
-          ok: g(r0+6).fmtStyle==='mult' && (g(r0+6).decimals|0)===1},
-        {label:'cast the report date as Mmm-yy \u2014 ctrl+1 turns the serial into a date ('+o.date+')',
-          ok: g(r0+7).fmtStyle==='date'},
-      ];
-    }
-  },
   decimals:{
     name:'Decimals', label:'The decimals pass', par:42, parKeys:15,
     aha:'Alt H 0 adds a decimal, Alt H 9 drops one — dollars take 0, multiples and percents take 1.',
@@ -2886,50 +2830,6 @@ const CHALLENGES = {
       ];
     }
   },
-  ribbon:{
-    name:'Ribbon', label:'Walk the ribbon', par:48, parKeys:14,
-    aha:'Alt turns the ribbon into keys — every button has a letter path (Alt H, Alt A…).',
-    prompt:'Four formatting jobs scattered across a working page \u2014 different cells every run \u2014 and every one is a ribbon walk: Alt H 1 bold, Alt H K comma, Alt H A C center, and Alt H B B walks INTO the borders submenu to rule a block off. The ribbon is a keyboard surface; walk it.',
-    req(){ const o=this._o; return '<em>'+o.b+'</em> \u00b7 <em>alt h 1</em> bold \u00b7 <em>'+o.k+'</em> \u00b7 <em>alt h k</em> comma \u00b7 <em>'+o.c+'</em> \u00b7 <em>alt h a c</em> center \u00b7 <em>'+o.r+'</em> \u00b7 <em>alt h b b</em> rule it off'; },
-    guide(){ const o=this._o; return [
-      'bold the title at <b>'+o.b+'</b> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd>',
-      'comma format the figure at <b>'+o.k+'</b> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd>',
-      'center the header at <b>'+o.c+'</b> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd>',
-      'rule off the block bottom at <b>'+o.r+'</b> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 one level deeper into the ribbon',
-    ]; },
-    targets(){ const o=this._o; return [o.b,o.k,o.c,o.r]; },
-    demo(){ const o=this._o; return [
-      {sel:o.b, keys:[Kb.alt,{key:'h'},{key:'1'}]},
-      {sel:o.k, keys:[Kb.alt,{key:'h'},{key:'k'}]},
-      {sel:o.c, keys:[Kb.alt,{key:'h'},{key:'a'},{key:'c'}]},
-      {sel:o.r, keys:[Kb.alt,{key:'h'},{key:'b'},{key:'b'}]},
-    ]; },
-    build(){
-      const cells={};
-      const labs=['Revenue','COGS','Gross profit','SG&A','EBITDA','D&A','EBIT','Interest'];
-      [[1,2],[5,2],[1,8],[5,8]].forEach(([c,r0],t)=>{ for(let i=0;i<3;i++){
-        cells[colLetter(c)+(r0+i)]={...blankCell(),value:labs[(t*2+i)%8],txt:true};
-        cells[colLetter(c+1)+(r0+i)]={...blankCell(),value:rnd(100,999)*10,fontColor:'blue',decimals:0}; } });   // r190: must survive comma@2 without #####
-      const titleSpots=[[1,1],[5,1],[1,7],[5,7]], numSpots=[[2,3],[6,3],[2,9],[6,9]], hdrSpots=[[3,1],[8,1],[3,7],[8,7]];
-      const pick=arr=>arr[rnd(0,arr.length-1)];
-      const T0=pick(titleSpots), N0=pick(numSpots), H0=pick(hdrSpots);
-      const blocks=[[1,2],[5,2],[1,8],[5,8]]; const RB=blocks[rnd(0,3)];
-      const rRange=colLetter(RB[0])+(RB[1]+2)+':'+colLetter(RB[0]+1)+(RB[1]+2);
-      cells[colLetter(T0[0])+T0[1]]={...blankCell(),value:codename().split(' \u2014')[0]+' detail',txt:true};
-      cells[colLetter(H0[0])+H0[1]]={...blankCell(),value:'FY'+rnd(24,28)+'E',txt:true};
-      this._o={ b:colLetter(T0[0])+T0[1], k:colLetter(N0[0])+N0[1], c:colLetter(H0[0])+H0[1], r:rRange, rc:[RB[0],RB[0]+1], rr:RB[1]+2 };
-      return {ROWS:11, cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{1:104,5:104,2:92,6:92}};
-    },
-    checks(S){
-      const o=this._o, c=k=>S.cells[k]||{};
-      return [
-        {label:'bold the title at '+o.b+' \u2014 Alt H 1', ok: !!c(o.b).bold},
-        {label:'comma-format the figure at '+o.k+' \u2014 Alt H K', ok: c(o.k).fmtStyle==='comma'},
-        {label:'center the header at '+o.c+' \u2014 Alt H A C', ok: c(o.c).align==='c'},
-        {label:'add a bottom border under the block at '+o.r+' \u2014 Alt H B B', ok: o.rc.every(cc=>!!c(colLetter(cc)+o.rr).bb)},
-      ];
-    }
-  },
   pastes:{
     name:'Paste Sp.', label:'Alt E S everything', par:74, parKeys:22,
     aha:'Paste Special (Ctrl+Alt+V) picks what travels — formats, values, or a divide that rescales a block.',
@@ -2993,128 +2893,6 @@ const CHALLENGES = {
         {label:'rescale the feed block '+o.blk+' \u2014 a copied 1000, paste special DIVIDE; $ becomes $000s in place', ok: scaled},
         {label:'hand the totals to the deck \u2014 paste VALUES at '+o.deck+': dead numbers, no wiring', ok: deckOk},
       ];
-    }
-  },
-  transpose:{
-    name:'Transpose', label:'Flip it on its side', par:64, parKeys:14,
-    aha:'Ctrl+Alt+V → E transposes a table in one paste; paste-multiply by −1 flips the signs.',
-    prompt:'The data team sent the build YEARS-ACROSS; the book reads YEARS-DOWN \u2014 and their capex came in positive, which your P&L can\u2019t use. Two paste-special moves fix everything: copy the WHOLE table and Alt E S E drops it in sideways, then stage a \u22121, copy it, and paste-special MULTIPLY over the landed capex column \u2014 the sign flips in place, no retyping. The dialog is doing real arithmetic.',
-    req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 at <em>'+o.dst+'</em> \u00b7 <em>alt e s e \u21b5</em> \u00b7 type <em>-1</em> at <em>'+o.helper+'</em> \u00b7 <em>ctrl+c</em> \u00b7 select <em>'+o.capexRng+'</em> \u00b7 <em>alt e s</em> <em>m</em> <em>\u21b5</em>'; },
-    guide(){ const o=this._o; return [
-      'grab the WHOLE table \u2014 labels, years, all three metric rows: '+o.src+' \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd>',
-      'at '+o.dst+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>e</kbd> <kbd>\u21b5</kbd> \u2014 the table lands turned: years run down, metrics run across',
-      'the desk sign-flip: type <kbd>-1</kbd> at '+o.helper+' <kbd>\u21b5</kbd> \u00b7 copy it \u00b7 select the landed capex column '+o.capexRng+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>m</kbd> multiply \u00b7 <kbd>\u21b5</kbd> \u2014 every cell \u00d7 \u22121, and the commas they carried flip them to (parens)',
-    ]; },
-    targets(){ const o=this._o; return [o.src, o.dst, o.capexRng]; },
-    demo(){ const o=this._o; return [
-      {sel:o.src, keys:[Kb.copy]},
-      {sel:o.dst, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'e'}, Kb.enter]},
-      {sel:o.helper, keys:[...T('-1'), Kb.enter]},
-      {sel:o.helper, keys:[Kb.copy]},
-      {sel:o.capexRng, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'m'}, Kb.enter]},
-    ]; },
-    build(){
-      /* r191 (Wolf): flip the ENTIRE table — 5 cols \u00d7 4 rows lands 4\u00d75 — then
-         paste-special MULTIPLY a copied -1 over the landed capex column. */
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 data-team extract (the book reads YEARS-DOWN)',txt:true,bold:true};
-      const layouts=[{r:3,c:2,dr:9,dc:6},{r:3,c:2,dr:3,dc:7},{r:9,c:2,dr:3,dc:2}];
-      const sp=layouts[rnd(0,layouts.length-1)];
-      const y0=rnd(2021,2025);
-      cells[colLetter(sp.c-1)+sp.r]={...blankCell(),value:'Item',txt:true,bold:true};
-      this._years=[];
-      for(let j=0;j<4;j++){ const y=y0+j; this._years.push(y);
-        cells[colLetter(sp.c+j)+sp.r]={...blankCell(),value:y,bold:true,align:'r',decimals:0}; }
-      const rows=['Revenue','EBITDA','Capex'];
-      this._vals={};
-      for(let i=0;i<3;i++){ const r=sp.r+1+i;
-        cells[colLetter(sp.c-1)+r]={...blankCell(),value:rows[i],txt:true};
-        this._vals[rows[i]]=[];
-        for(let j=0;j<4;j++){ const v=rnd(30,300)*5; this._vals[rows[i]].push(v);
-          cells[colLetter(sp.c+j)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; } }
-      cells[colLetter(sp.dc)+(sp.dr-1)]={...blankCell(),value:'Book layout \u2192',txt:true,bold:true};
-      // transposed block: 4 cols x 5 rows starting at dst; capex lands in the LAST column, rows dr+1..dr+4
-      const capCol=colLetter(sp.dc+3);
-      this._o={ a:colLetter(sp.c-1)+sp.r,
-        src:colLetter(sp.c-1)+sp.r+':'+colLetter(sp.c+3)+(sp.r+3),
-        dst:colLetter(sp.dc)+sp.dr, dc:sp.dc, dr:sp.dr,
-        helper:colLetter(sp.dc+5)+sp.dr,
-        capexRng:capCol+(sp.dr+1)+':'+capCol+(sp.dr+4) };
-      const cw={}; cw[sp.c-1]=96; cw[sp.dc]=96;
-      return {ROWS:Math.max(14,sp.dr+6), cells, active:{r:sp.r,c:sp.c-1}, sel:null, colW:cw};
-    },
-    checks(S){
-      const o=this._o;
-      const M=['Revenue','EBITDA','Capex'];
-      const flipOk=(()=>{
-        for(let j=0;j<4;j++){ const yc=S.cells[colLetter(o.dc)+(o.dr+1+j)];
-          if(!yc||yc.value!==this._years[j]) return false; }
-        for(let i=0;i<3;i++){ const hc=S.cells[colLetter(o.dc+1+i)+o.dr];
-          if(!hc||hc.value!==M[i]) return false;
-          for(let j=0;j<4;j++){ const c=S.cells[colLetter(o.dc+1+i)+(o.dr+1+j)];
-            const want=this._vals[M[i]][j];
-            if(!c||typeof c.value!=='number') return false;
-            if(i<2 && Math.abs(c.value-want)>0.5) return false;
-            if(i===2 && Math.abs(Math.abs(c.value)-want)>0.5) return false; } }
-        return true;
-      })();
-      const helperOk=(()=>{ const h=S.cells[o.helper]; return !!(h&&h.value===-1); })();
-      const capOk=[0,1,2,3].every(j=>{ const c=S.cells[colLetter(o.dc+3)+(o.dr+1+j)];
-        return !!(c&&typeof c.value==='number'&&Math.abs(c.value+this._vals.Capex[j])<0.5); }) && (S.pasteOpN||0)>=1;
-      return [
-        {label:'flip the WHOLE table sideways \u2014 copy '+o.src+', transpose-paste at '+o.dst, ok: flipOk},
-        {label:'stage the helper \u2014 type -1 at '+o.helper, ok: helperOk},
-        {label:'flip capex\u2019s sign the desk way \u2014 a copied \u22121, paste special MULTIPLY over '+o.capexRng, ok: capOk},
-      ];
-    }
-  },
-  saves:{
-    name:'Save', label:'Save like you mean it', par:44, parKeys:11, usesSave:true,
-    aha:'Ctrl+S after every block of work — a reflex, not a reminder.',
-    prompt:'A page of work in progress, three review cells scattered through it \u2014 different spots each run. Mark each one done, and Ctrl+S after EVERY block of work. The reflex is the drill: work, save, work, save.',
-    req(){ const J={done:'done \u21b5', bold:'ctrl+b', comma:'alt h k'};
-      return this._sites.map(s=>'<em>'+s.cell+'</em> \u00b7 '+J[s.t]+' \u00b7 <em>ctrl+s</em>').join(' \u00b7 then '); },
-    guide(){ const G={done:'type <kbd>done</kbd> <kbd>\u21b5</kbd>', bold:'<kbd>ctrl</kbd>+<kbd>b</kbd> the total', comma:'<kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> the figure'};
-      return this._sites.map((s,i)=>['first','second','third'][i]+' block at <b>'+s.cell+'</b> \u00b7 '+G[s.t]+' \u00b7 <kbd>ctrl</kbd>+<kbd>s</kbd> \u2014 every block of work ends with a save'); },
-    targets(){ return this._sites.map(s=>s.cell); },
-    demo(){ return this._sites.map(s=>{
-      const work = s.t==='done' ? [...T('done'), Kb.enter] : (s.t==='bold' ? [Kb.bold] : [Kb.alt, L('H'), L('K')]);
-      return {sel:s.cell, keys:[...work, {key:'s',ctrl:true}]};
-    }); },
-    build(){
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 working file',txt:true,bold:true};
-      const labs=['Revenue','COGS','EBITDA','Capex','Interest','Taxes','NWC','Debt'];
-      for(let k=labs.length-1;k>0;k--){ const j=rnd(0,k); [labs[k],labs[j]]=[labs[j],labs[k]]; }
-      [[1,2],[5,2]].forEach(([c,r0],t)=>{ for(let i=0;i<4;i++){
-        cells[colLetter(c)+(r0+i)]={...blankCell(),value:labs[t*4+i],txt:true};
-        cells[colLetter(c+1)+(r0+i)]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'}; } });
-      const spots=[[4,3],[8,4],[3,8],[7,8],[9,2],[2,7]];
-      for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
-      // r187: three DIFFERENT blocks of work \u2014 the reflex needs real work to follow
-      const jobs=[{lab:'mark done \u2192',t:'done'},{lab:'bold this total \u2192',t:'bold'},{lab:'comma this figure \u2192',t:'comma'}];
-      for(let k=jobs.length-1;k>0;k--){ const j=rnd(0,k); [jobs[k],jobs[j]]=[jobs[j],jobs[k]]; }
-      this._sites=spots.slice(0,3).map(([c,r],i)=>{
-        cells[colLetter(c-1)+r]={...blankCell(),value:jobs[i].lab,txt:true};
-        if(jobs[i].t!=='done') cells[colLetter(c)+r]={...blankCell(),value:rnd(1,9)*100};   // r190: comma@2 must fit the default column
-        return {cell:colLetter(c)+r, t:jobs[i].t};
-      }).sort((a,b)=>(a.cell<b.cell?-1:1));
-      return {ROWS:9, cells, active:{r:2,c:2}, sel:null, colW:{1:96,5:96}};
-    },
-    checks(S){
-      const OK={
-        done:  c=>!!(c&&String(c.value).toLowerCase()==='done'),
-        bold:  c=>!!(c&&c.bold),
-        comma: c=>!!(c&&c.fmtStyle==='comma'),
-      };
-      const LBL={
-        done:  s=>'mark '+s.cell+' done \u2014 then ctrl+s',
-        bold:  s=>'bold the total at '+s.cell+' \u2014 then ctrl+s',
-        comma: s=>'comma the figure at '+s.cell+' \u2014 then ctrl+s',
-      };
-      const out=this._sites.map(s=>({label:LBL[s.t](s), ok:OK[s.t](S.cells[s.cell])}));
-      out.push({label:'save after EVERY block \u2014 three saves minimum', ok:(S.saveN||0)>=3});
-      return out;
     }
   },
   typeset:{
@@ -3783,67 +3561,6 @@ const CHALLENGES = {
       ];
     }
   },
-  polish:{
-    name:'Polish', label:'Dress the header row', par:66, parKeys:19,
-    aha:'Each header row wears a different dress — bold, italic, border — and you decide where formatting stops.',
-    prompt:'A historical financials fragment with its whole header stack undressed: the section title, a date row still showing raw serials, the money row, and the growth memo under it. Each row wears a DIFFERENT dress \u2014 title bold-ruled-shaded, dates cast to Mmm-yy and bolded, money as dollars, growth italicized \u2014 and the second table on the page stays exactly as you found it. Print-ready means per-row judgment, not one style everywhere.',
-    req(){ const o=this._o; return '<em>'+o.h1+':'+o.h2+'</em> \u2192 <em>ctrl+b</em> + <em>alt h b b</em> + <em>alt h h</em> \u00b7 dates <em>'+o.dates+'</em> \u2192 <em>ctrl+1</em> <em>d</em> + <em>ctrl+b</em> \u00b7 money <em>'+o.money+'</em> \u2192 <em>ctrl+shift+$</em> \u2212 decimals \u00b7 growth <em>'+o.growth+'</em> \u2192 <em>ctrl+i</em> \u00b7 the table at '+o.d1+' stays plain'; },
-    guide(){ const o=this._o; return [
-      'the section header '+o.h1+':'+o.h2+' \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u2014 the classic three',
-      'the date row '+o.dates+' is raw serials \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>d</kbd> casts Mmm-yy \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 periods carry the page',
-      'the money row '+o.money+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice \u2014 dollars, no cents',
-      'the growth memo '+o.growth+' \u00b7 <kbd>ctrl</kbd>+<kbd>i</kbd> \u2014 memos whisper \u00b7 and the OTHER table\u2019s header stays untouched',
-    ]; },
-    targets(){ const o=this._o; return [o.h1+':'+o.h2, o.dates, o.money, o.growth]; },
-    demo(){ const o=this._o; return [
-      {sel:o.h1+':'+o.h2, keys:[{key:'b',ctrl:true}, Kb.alt,{key:'h'},{key:'b'},{key:'b'}, Kb.alt,{key:'h'},{key:'h'},Kb.enter]},
-      {sel:o.dates, keys:[{key:'1',ctrl:true},L('D'),{key:'b',ctrl:true}]},
-      {sel:o.money, keys:[Kb.cur, Kb.alt,L('H'),D(9), Kb.alt,L('H'),D(9)]},
-      {sel:o.growth, keys:[{key:'i',ctrl:true}]},
-    ]; },
-    build(){
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 historical financials (dress ONE table)',txt:true,bold:true};
-      const mk=(c0,r0,full)=>{
-        const hk=[];
-        ['Historicals','',' ','  '].forEach((t,j)=>{ const k=colLetter(c0+j)+r0;
-          cells[k]={...blankCell(),value:j===0?'Historicals':('\u00a0'.repeat(j)),txt:true}; hk.push(k); });
-        const dk=[], mk2=[], gk=[];
-        for(let j=1;j<4;j++){ const k=colLetter(c0+j)+(r0+1);
-          cells[k]={...blankCell(),value:45200+365*(j-1)+rnd(0,20),decimals:0,align:'r'}; dk.push(k); }
-        cells[colLetter(c0)+(r0+1)]={...blankCell(),value:'Period',txt:true};
-        cells[colLetter(c0)+(r0+2)]={...blankCell(),value:'Revenue',txt:true};
-        const revs=[];
-        for(let j=1;j<4;j++){ const k=colLetter(c0+j)+(r0+2); const v=rnd(60,240)*10; revs.push(v);
-          cells[k]={...blankCell(),value:v,fontColor:'blue'}; mk2.push(k); }
-        cells[colLetter(c0)+(r0+3)]={...blankCell(),value:'% growth',txt:true};
-        for(let j=2;j<4;j++){ const k=colLetter(c0+j)+(r0+3);
-          cells[k]={...blankCell(),formula:'='+colLetter(c0+j)+(r0+2)+'/'+colLetter(c0+j-1)+(r0+2)+'-1',
-            value:revs[j-1]/revs[j-2]-1,fmtStyle:'percent',decimals:1}; gk.push(k); }
-        return {hk, dk, mk2, gk};
-      };
-      const spots=[[1,3],[6,3],[1,9],[6,9]];
-      for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
-      const A=spots[0], B=spots.find(p=>p[0]!==A[0]||Math.abs(p[1]-A[1])>=6)||spots[1];
-      const T1=mk(A[0],A[1],true), T2=mk(B[0],B[1],false);
-      this._t1=T1; this._t2=T2;
-      this._o={ h1:T1.hk[0], h2:T1.hk[3],
-        dates:T1.dk[0]+':'+T1.dk[2], money:T1.mk2[0]+':'+T1.mk2[2],
-        growth:T1.gk[0]+':'+T1.gk[1], d1:T2.hk[0] };
-      const cw={}; cw[A[0]]=96; cw[B[0]]=96;
-      return {ROWS:14, cells, active:{r:A[1],c:A[0]}, sel:null, colW:cw};
-    },
-    checks(S){
-      const c=k=>S.cells[k]||{};
-      const T1=this._t1, T2=this._t2;
-      return [
-        {label:'bold the header, add a bottom border under it, and shade it \u2014 THAT table only', ok: T1.hk.every(k=>c(k).bold&&c(k).bb&&c(k).fill==='blue') && !T2.hk.some(k=>c(k).bold||c(k).bb||c(k).fill==='blue')},
-        {label:'cast the date row to Mmm-yy and bold it \u2014 periods carry the page', ok: T1.dk.every(k=>c(k).fmtStyle==='date'&&c(k).bold)},
-        {label:'dollars on the money row \u2014 currency, zero decimals', ok: T1.mk2.every(k=>c(k).fmtStyle==='currency'&&c(k).decimals===0)},
-        {label:'italicize the growth memo \u2014 and leave the second table alone', ok: T1.gk.every(k=>c(k).it) && !T2.gk.some(k=>c(k).it)},
-      ];
-    }
-  },
   foot:{
     name:'Foot', label:'Foot the table both ways', par:48, parKeys:8,
     aha:'Alt+= proposes the SUM it sees — foot the rows, the columns, and the corner.',
@@ -4025,69 +3742,6 @@ const CHALLENGES = {
         {label:'bold the total row', ok: cols.every(c=>cell(c+o.rt).bold) && !!cell('A'+o.rt).bold},
         {label:'center the title ACROSS the model \u2014 ctrl+1, a; merged cells are banned (A1)',
           ok: (cell('A1').ca|0) >= o.nq+1},
-      ];
-    }
-  },
-  blue:{
-    name:'Inputs', label:'Blue the inputs, everywhere', par:62, parKeys:36,
-    aha:'The instant you type a number, flag it blue — inputs are coloured as they’re born.',
-    prompt:'A model page the way you actually inherit one: hardcodes scattered across four spots \u2014 different spots every run \u2014 plus formula cells that must stay untouched. Color every hardcode blue; leave the formulas alone. The grader checks both directions.',
-    req(){ const s=this._scatter; return 'blue these: <em>'+s.b1.a+':'+s.b1.b+'</em> \u00b7 <em>'+s.b2.a+':'+s.b2.b+'</em> \u00b7 singles <em>'+s.s1+'</em> and <em>'+s.s2+'</em> (alt h f c \u00b7 \u2192\u00d74 \u00b7 \u21b5) \u00b7 formulas at '+s.d1+' / '+s.d2+' stay default'; },
-    guide(){ const s=this._scatter; return [
-      'block one: '+s.b1.a+', <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs it \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 \u2192\u00d74 \u00b7 <kbd>\u21b5</kbd>',
-      'block two at '+s.b2.a+':'+s.b2.b+' \u2014 <kbd>ctrl</kbd>+arrows across \u00b7 same chord',
-      'the loose singles this run: '+s.s1+' and '+s.s2+' \u2014 real pages hide hardcodes in corners',
-      s.d1+' and '+s.d2+' are FORMULAS \u2014 blueing them fails the drill',
-    ]; },
-    targets(){ const s=this._scatter; return [s.b1.a+':'+s.b1.b, s.b2.a+':'+s.b2.b, s.s1, s.s2]; },
-    demo(){ const s=this._scatter; const chord=[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter];
-      return [
-        {sel:s.b1.a+':'+s.b1.b, keys:chord},
-        {sel:s.b2.a+':'+s.b2.b, keys:chord},
-        {sel:s.s1, keys:chord},
-        {sel:s.s2, keys:chord},
-      ]; },
-    build(){
-      const cells={};
-      const b1pool=[{c:2,r:3},{c:3,r:2},{c:2,r:8}], b2pool=[{c:7,r:2},{c:8,r:4},{c:6,r:9}];
-      const b1=b1pool[rnd(0,2)], b2=b2pool[rnd(0,2)];
-      const names1=['Volume','Price','Growth'], names2=['Tax','Discount','Terminal g'];
-      const B1=colLetter(b1.c), B2=colLetter(b2.c);
-      cells[colLetter(b1.c-1)+(b1.r-1)]={...blankCell(),value:'Assumptions',txt:true,bold:true};
-      names1.forEach((n,i)=>{ cells[colLetter(b1.c-1)+(b1.r+i)]={...blankCell(),value:n,txt:true};
-        cells[B1+(b1.r+i)]={...blankCell(),value:rnd(5,95)*10,fmtStyle:'comma',decimals:0}; });
-      cells[colLetter(b2.c-1)+(b2.r-1)]={...blankCell(),value:'Rates',txt:true,bold:true};
-      names2.forEach((n,i)=>{ cells[colLetter(b2.c-1)+(b2.r+i)]={...blankCell(),value:n,txt:true};
-        cells[B2+(b2.r+i)]={...blankCell(),value:rnd(2,30)/100,fmtStyle:'percent',decimals:1}; });
-      // two loose singles + two formula decoys from a spot pool, non-colliding
-      const taken=new Set();
-      const key=(c,r)=>colLetter(c)+r;
-      [b1,b2].forEach(b=>{ for(let i=-1;i<3;i++){ taken.add(key(b.c,b.r+i)); taken.add(key(b.c-1,b.r+i)); } });
-      const pool=[{c:4,r:11},{c:9,r:11},{c:5,r:6},{c:9,r:7},{c:3,r:12},{c:7,r:12}].filter(p=>!taken.has(key(p.c,p.r))&&!taken.has(key(p.c-1,p.r)));
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const singles=[['Shares',rnd(8,60),0],['Min cash',rnd(3,20)*10,0]];
-      const sp=[pool[0],pool[1]], dp=[pool[2],pool[3]];
-      singles.forEach(([n,v,d],i)=>{ cells[key(sp[i].c-1,sp[i].r)]={...blankCell(),value:n,txt:true};
-        cells[key(sp[i].c,sp[i].r)]={...blankCell(),value:v,fmtStyle:'comma',decimals:d}; });
-      cells[key(dp[0].c-1,dp[0].r)]={...blankCell(),value:'Revenue',txt:true};
-      cells[key(dp[0].c,dp[0].r)]={...blankCell(),formula:'='+B1+b1.r+'*'+B1+(b1.r+1),value:0,fmtStyle:'comma',decimals:0};
-      cells[key(dp[1].c-1,dp[1].r)]={...blankCell(),value:'After-tax',txt:true};
-      cells[key(dp[1].c,dp[1].r)]={...blankCell(),formula:'=1-'+B2+b2.r,value:0,fmtStyle:'percent',decimals:1};
-      this._scatter={ b1:{a:B1+b1.r, b:B1+(b1.r+2), keys:[0,1,2].map(i=>B1+(b1.r+i))},
-                      b2:{a:B2+b2.r, b:B2+(b2.r+2), keys:[0,1,2].map(i=>B2+(b2.r+i))},
-                      s1:key(sp[0].c,sp[0].r), s2:key(sp[1].c,sp[1].r),
-                      d1:key(dp[0].c,dp[0].r), d2:key(dp[1].c,dp[1].r) };
-      return {ROWS:12, cells, active:{r:b1.r, c:b1.c}, sel:null, colW:{1:78}};
-    },
-    checks(S){
-      const s=this._scatter;
-      const blue=k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); };
-      const notBlue=k=>{ const c=S.cells[k]; return !(c&&c.fontColor==='blue'); };
-      return [
-        {label:'paint the assumptions block blue ('+s.b1.a+':'+s.b1.b+')', ok: s.b1.keys.every(blue)},
-        {label:'paint the rates block blue ('+s.b2.a+':'+s.b2.b+')', ok: s.b2.keys.every(blue)},
-        {label:'paint the loose hardcodes too \u2014 '+s.s1+' and '+s.s2, ok: blue(s.s1)&&blue(s.s2)},
-        {label:'leave the formula cells ('+s.d1+', '+s.d2+') DEFAULT \u2014 convention cuts both ways', ok: notBlue(s.d1)&&notBlue(s.d2)},
       ];
     }
   },
@@ -6846,22 +6500,24 @@ const CHALLENGES = {
   },
 
   versionup:{
-    name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', par:135, parKeys:30,
-    aha:'A hardcode freezes yesterday — relink it (=) and the model rolls forward by itself.',
+    name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', par:145, parKeys:38,
+    aha:'A hardcode freezes yesterday — relink it (=), then bulk-rename the version tag (Ctrl+H) so the whole page reads v2.',
     prompt:'You inherited a five-year operating build where someone typed the answers: growth, gross profit, EBITDA, AND the margin are all hardcoded numbers \u2014 right today, silently wrong the moment an input moves. Resurrect every derived row as a live formula, fill it across, and prove nothing drifted. This is versioning discipline: v2 must survive new numbers without a rebuild.',
-    req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4+B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7+B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 costs carry their sign \u2014 subtotals are clean sums'; },
+    req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4+B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7+B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 stamp it v2 (<em>ctrl+h</em> v1 \u2192 v2) \u00b7 costs carry their sign \u2014 subtotals are clean sums'; },
     guide:[
       'growth row is typed \u00b7 C5: <kbd>=</kbd>C4/B4-1 <kbd>\u21b5</kbd> \u00b7 select C5:F5, <kbd>ctrl</kbd>+<kbd>r</kbd>',
       'gross profit is typed \u00b7 B7: <kbd>=</kbd>B4+B6 <kbd>\u21b5</kbd> \u2014 COGS is negative; adding it IS subtracting \u00b7 fill B7:F7',
       'EBITDA is typed \u00b7 B9: <kbd>=</kbd>B7+B8 <kbd>\u21b5</kbd> \u00b7 fill B9:F9',
       'margin is typed \u00b7 B10: <kbd>=</kbd>B9/B4 <kbd>\u21b5</kbd> \u00b7 fill B10:F10 \u2014 values must NOT move',
+      'stamp it v2: <kbd>ctrl</kbd>+<kbd>h</kbd> \u00b7 find <b>v1</b> <kbd>tab</kbd> replace <b>v2</b> <kbd>\u21b5</kbd> \u2014 one pass renames every version tag on the page',
     ],
-    targets:['C5:F5','B7:F7','B9:F9','B10:F10'],
+    targets:['C5:F5','B7:F7','B9:F9','B10:F10','A12:A13'],
     demo(){ return [
       {sel:'C5', keys:[...T('=C4/B4-1'), Kb.enter]}, {sel:'C5:F5', keys:[Kb.fillR]},
       {sel:'B7', keys:[...T('=B4+B6'), Kb.enter]},  {sel:'B7:F7', keys:[Kb.fillR]},
       {sel:'B9', keys:[...T('=B7+B8'), Kb.enter]},  {sel:'B9:F9', keys:[Kb.fillR]},
       {sel:'B10', keys:[...T('=B9/B4'), Kb.enter]}, {sel:'B10:F10', keys:[Kb.fillR]},
+      {sel:'A1', keys:[{key:'h',ctrl:true,code:'KeyH'}, {key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'}, Kb.enter]},
     ]; },
     build(){
       const cells={};
@@ -6887,7 +6543,9 @@ const CHALLENGES = {
         cells[L2+'7']={...blankCell(),value:rev+cogs,fmtStyle:'comma',decimals:0,bold:true};
         cells[L2+'9']={...blankCell(),value:rev+cogs+opex,fmtStyle:'comma',decimals:0,bold:true};
         cells[L2+'10']={...blankCell(),value:(rev+cogs+opex)/rev,fmtStyle:'percent',decimals:1}; }
-      return {ROWS:11, cells, active:{r:5,c:3}, sel:null, colW:{1:132}};
+      cells['A12']={...blankCell(),value:'Tag: v1 — supersede on roll-forward',txt:true,it:true};
+      cells['A13']={...blankCell(),value:'Footnotes cite the v1 basis',txt:true,it:true};
+      return {ROWS:13, cells, active:{r:5,c:3}, sel:null, colW:{1:132}};
     },
     checks(S){
       const row=(r,f,refNeed)=>{ let ok=true;
@@ -6900,11 +6558,13 @@ const CHALLENGES = {
       const gpOk=row(7,(c,L2)=>V(L2+'4')+V(L2+'6'),(L2)=>L2+'6');
       const eOk=row(9,(c,L2)=>V(L2+'7')+V(L2+'8'),(L2)=>L2+'8');
       const mOk=row(10,(c,L2)=>V(L2+'9')/V(L2+'4'),(L2)=>L2+'9');
+      const tagOk=['A12','A13'].every(k=>{ const c=S.cells[k]; return c&&typeof c.value==='string'&&c.value.indexOf('v2')>=0&&c.value.indexOf('v1')<0; });
       return [
         {label:'Make growth a LIVE formula across all four years \u2014 no typed percents (C5:F5)', ok:gOk},
         {label:'Compute gross profit \u2014 revenue plus signed COGS, every year (B7:F7)', ok:gpOk},
         {label:'Compute EBITDA \u2014 gross profit plus signed opex, every year (B9:F9)', ok:eOk},
         {label:'Run the margin live \u2014 nothing drifts, rebuilt values match v1 exactly (B10:F10)', ok:mOk},
+        {label:'Stamp the roll-forward \u2014 ctrl+h to bulk-rename v1 \u2192 v2 across the page (A12:A13)', ok:tagOk},
       ];
     }
   },
