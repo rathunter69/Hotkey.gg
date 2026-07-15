@@ -921,6 +921,15 @@ window.schoolChip = function(idOrTag, size){
 /* ordered id list for pickers (roster order above == curated priority order) */
 window.SCHOOL_IDS = Object.keys(window.SCHOOLS);
 
+/* r256: time-band medal — a small filled pip (◆) in the band's color. size=pip px. */
+window.hkBandChip = function(band, size){
+  if(!band) return '';
+  size = size || 13;
+  return '<span class="band-chip band-'+_schEsc(band.key)+'" title="'+_schEsc(band.name)+'" '+
+    'style="display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;'+
+    'width:'+size+'px;height:'+size+'px;color:'+band.color+';font-size:'+Math.round(size*0.92)+'px;line-height:1">◆</span>';
+};
+
 /* Shared SCHOOL PICKER — curated search + freeform "Other". Returns a DOM element
    whose .getValue() gives the current selection (a SCHOOLS id, an "other:Name"
    string, or null). onPick(value) fires on every change. Self-contained styling

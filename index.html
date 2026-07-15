@@ -460,6 +460,13 @@
 
   .rc-stats{font-size:14px; margin-bottom:11px}
   .result .par{color:var(--muted)}
+  /* r256: results-card speed-band row */
+  .rm-band{display:flex; align-items:center; gap:8px; justify-content:center; margin:-4px 0 16px;
+    font-family:var(--mono); font-size:12.5px}
+  .rm-band-name{letter-spacing:.14em; font-weight:700}
+  .rm-band-new{color:var(--warn); font-weight:700; font-size:11px; letter-spacing:.06em}
+  .rm-band-next{color:var(--faint); font-size:11.5px; margin-left:2px}
+  .rm-band-next b{font-weight:700}
   .rc-opts{display:flex; gap:8px; flex-wrap:wrap}
   .rc-key{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:8px; padding:7px 13px; cursor:pointer; transition:.15s}
@@ -1274,9 +1281,9 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=255"></script>
+<script src="drills.js?v=256"></script>
 <link rel="stylesheet" href="nav.css?v=174">
-<script src="themes.js?v=253"></script>
+<script src="themes.js?v=256"></script>
 
 </head>
 <body>
@@ -8056,9 +8063,11 @@ function checkWin(){
   updateStreak();
   if(challengeMode){ markChallengeDone(); try{ updateChallengeBtn(); }catch(e){} }   // r219: today's sitting is done — flip the marquee chip
   try{ awardCampaignXP(); }catch(e){}   // r215: a new PB may have just shipped a version — pay the one-time bounty
+  let __bandRes=0; try{ __bandRes = awardBandXP(sk, t, C.par); }catch(e){}   // r256: one-time speed-band bounty
   try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
     KV.set('hotkey_solves', String(nsol)); renderLvl(nsol); }); }catch(e){}
-  showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed});
+  showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed,
+    newBand:(__bandRes&&__bandRes.isNew)?__bandRes.band:null, bandXp:(__bandRes&&__bandRes.gained)||0});
   if(sb && me_user && !isAnonUser() && !mouseUsed && !guidedUsed){
     recordRun(t).then(async ok=>{
       const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); }
@@ -8181,6 +8190,45 @@ function ghostDiff(o){
       '<div class="gd-head">'+head+'</div>'+rows+keysLine+'</div>';
   }catch(e){ return ''; }
 }
+/* r256: award the one-time xp bounty when a clean run reaches a new speed band.
+   Bands key off PB÷par; only clean (non-mouse, non-guided) runs qualify. Local
+   estimate only — same model as the campaign version bounties. */
+function awardBandXP(key, tSec, parSec){
+  try{
+    if(mouseUsed || guidedUsed) return 0;
+    const B=window.HK_BAND; if(!B || !parSec) return 0;
+    const pb = PB[key];                       // already updated to include this run
+    const band = B.of(pb, parSec); if(!band) return 0;
+    let store={}; try{ store=JSON.parse(localStorage.getItem('hk_band_best')||'{}'); }catch(e){}
+    const prevI = store[key]|0;
+    if(band.i <= prevI) return { band, gained:0, isNew:false };
+    let gained=0; B.BANDS.forEach(b=>{ if(b.i>prevI && b.i<=band.i) gained += B.XP[b.key]||0; });
+    store[key]=band.i; try{ localStorage.setItem('hk_band_best', JSON.stringify(store)); }catch(e){}
+    if(gained>0){
+      const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+      localStorage.setItem('hk_xp_est', String(est+gained));
+      window.__lvlXp=(typeof window.__lvlXp==='number'?window.__lvlXp:est)+gained;
+      try{ const nsol=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; renderLvl(nsol); }catch(e){}
+    }
+    return { band, gained, isNew:true };
+  }catch(e){ return 0; }
+}
+/* the results-card band row: current tier + the gap to the next one (the chase). */
+function _bandRow(o){
+  try{
+    const B=window.HK_BAND; if(!B) return '';
+    const par=CHALLENGES[cur]&&CHALLENGES[cur].par; if(!par) return '';
+    const pb=PB[cur]; const band=B.of(pb, par); if(!band) return '';
+    const chip=window.hkBandChip?window.hkBandChip(band,15):'';
+    const nx=B.next(par, band);
+    let right;
+    if(nx && nx.band){ const gap=pb - nx.needSec;
+      right='<span class="rm-band-next">'+(gap>0?gap.toFixed(2)+'s to <b style="color:'+nx.band.color+'">'+nx.band.name+'</b>':'—')+'</span>';
+    } else right='<span class="rm-band-next" style="color:'+band.color+'">the ceiling — beat par held</span>';
+    return '<div class="rm-band">'+chip+'<b class="rm-band-name" style="color:'+band.color+'">'+band.name.toUpperCase()+'</b>'+
+      (o&&o.newBand?'<span class="rm-band-new">★ new'+(o.bandXp?' · +'+o.bandXp+'xp':'')+'</span>':'')+right+'</div>';
+  }catch(e){ return ''; }
+}
 function _showResults(o){
   const best = PB[cur]!==undefined ? PB[cur].toFixed(2)+'s' : '—';
   let postRow;
@@ -8200,6 +8248,7 @@ function _showResults(o){
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
+    _bandRow(o)+
     ghostDiff(o)+
     ((CHALLENGES[cur]&&CHALLENGES[cur].aha)?'<div class="rm-aha">\ud83d\udca1 '+CHALLENGES[cur].aha+'</div>':'')+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
