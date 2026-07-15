@@ -417,24 +417,43 @@ window.rankEmblem = (function(){
     'Summer Analyst':[BRONZE.mid,BRONZE.hi],'First-Year Analyst':[SILVER.mid,SILVER.hi],
     'Associate':[GOLD.mid,GOLD.hi],'VP':[PLAT.mid,PLAT.hi],'MD':[CRIM.mid,CRIM.hi],
     'Second-Year Analyst':[DIAM.mid,DIAM.hi,'#ffd968']};
+  /* r240 (Wolf): FLAT rank emblems — each tier keeps its distinct silhouette
+     (square / circle / shield / hex / crown / star) and its glyph, but rendered
+     flat: a solid tier colour, a white glyph with a soft ink outline, and 3 flat
+     bucket pips. No gradients, glow, sparks, or jewels — favicon-sleek, matching
+     the level chips. */
+  const FLAT=[
+    {sh:'M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z', col:'#5f6672', gl:'ref'},        // MBA — rounded square
+    {sh:'M50 17 A33 33 0 1 1 49.9 17 Z', col:'#8b93a1', gl:'book'},                                   // Candidate — disc
+    {sh:'M50 10 L82 20 L79 54 L50 90 L21 54 L18 20 Z', col:'#c0793c', gl:'sun'},                       // Summer — shield
+    {sh:'M50 8 L82 26 L82 62 L50 92 L18 62 L18 26 Z', col:'#7e8794', gl:'keycap'},                     // First-Year — hex
+    {sh:'M27 17 H73 Q76 17 76 20 V50 Q76 58 50 85 Q24 58 24 50 V20 Q24 17 27 17 Z', col:'#e0a52a', gl:'briefcase'}, // Associate — rounded-top crest (holds the wide briefcase cleanly)
+    {sh:'M50 10 L60 20 L84 14 L78 40 L82 52 L62 84 L50 92 L38 84 L18 52 L22 40 L16 14 L40 20 Z', col:'#33b0a1', gl:'chart'}, // VP — spiked crown
+    {sh:'M50 14 L64 22 L88 10 L80 38 L86 50 L64 86 L50 94 L36 86 L14 50 L20 38 L12 10 L36 22 Z', col:'#d14b3b', gl:'bull'},  // MD — jagged crown
+    {sh:'M50 2 L65 17 L90 21 L77 45 L81 61 L59 88 L50 98 L41 88 L19 61 L23 45 L10 21 L35 17 Z', col:'#6d9be6', gl:'rocket'}, // Second-Year — summit star
+  ];
+  const FLAT_P={hi:'#ffffff',mid:'#ffffff',lo:'#ffffff',deep:'rgba(20,22,26,.42)',plateHi:'#ffffff',plateLo:'rgba(20,22,26,.34)',core:'#ffffff'};
+  function flatPips(col,bk){ if(!bk) return ''; let o=''; for(let i=0;i<3;i++){ const x=50+(i-1)*11, on=i<bk;
+    o+='<circle cx="'+x+'" cy="107" r="3" fill="'+(on?col:'none')+'" stroke="'+col+'" stroke-width="1.5" opacity="'+(on?'1':'.4')+'"/>'; } return o; }
+  function flatGlyph(gl){
+    if(gl==='ref') return '<text x="50" y="55.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="13.5" fill="#ffffff">#REF!</text>';
+    return GLY[gl] ? GLY[gl]('flat', FLAT_P) : '';
+  }
   return function(tierName, size, bucket){
     size = size || 16;
-    // 'Unranked' (no placement yet, anywhere a tier is unknown): the empty-cell plate
-    if(tierName==='Unranked'){
-      const id='rk'+(UID++), P=IRON;
-      return svgOpen(size,0,false)+defs(id,P,0)+
-        frame(id,P,'M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z',0,3.2)+
-        '<path d="M21 42 L79 42 M21 60 L79 60 M41 21 L41 79 M61 21 L61 79" stroke="'+P.mid+'" stroke-width=".8" opacity=".22"/>'+
-        '<path d="M28.5 22.8 L71.5 22.8" stroke="#ffffff" stroke-width="1.2" opacity=".4"/>'+
-        '<rect x="36" y="36" width="28" height="28" fill="none" stroke="'+P.mid+'" stroke-width="1.6" stroke-dasharray="4.2 3.2" opacity=".85"/>'+
-        '<g class="glyph"><path d="M44 44 L56 56 M56 44 L44 56" stroke="url(#'+id+'m)" stroke-width="3.6" stroke-linecap="round"/>'+
-        '<path d="M44 44 L56 56 M56 44 L44 56" stroke="#ffffff" stroke-width="1" stroke-linecap="round" opacity=".35"/></g></svg>';
-    }
-    const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
     const bk = typeof bucket==='number' ? bucket
       : bucket==='Top Bucket' ? 3 : bucket==='Middle Bucket' ? 2 : bucket==='Bottom Bucket' ? 1 : 0;
-    const gl = size>=24 ? 1 : 0;   // glow filters off at row/chip sizes: crisper + cheaper
-    return BUILD[i](size, bk, gl);
+    // white m-gradient so the reused GLY glyph paths (which fill via url(#flatm)) render solid white
+    const wm='<defs><linearGradient id="flatm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>';
+    if(tierName==='Unranked'){
+      return svgOpen(size,0,false)+
+        '<path d="M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z" fill="none" stroke="#7c828e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="5 4"/>'+
+        '<path d="M43 43 L57 57 M57 43 L43 57" stroke="#7c828e" stroke-width="3" stroke-linecap="round"/></svg>';
+    }
+    const i = window.RANK_EMBLEM_IDX[tierName] ?? 0, T=FLAT[i]||FLAT[0];
+    return svgOpen(size,bk,false)+wm+
+      '<path d="'+T.sh+'" fill="'+T.col+'" stroke="rgba(20,22,26,.30)" stroke-width="2" stroke-linejoin="round"/>'+
+      flatGlyph(T.gl)+flatPips(T.col,bk)+'</svg>';
   };
 })();
 
@@ -586,7 +605,7 @@ window.hkBadge = function(id, earned, size, color, rarity){
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
   const G={
-    spd:'<path d="M14 8l-4 6h4l-2 6 6-8h-4l2-4z"/>',
+    spd:'<path d="M13.8 6 L9 13.8 H12.2 L11.4 20 L17 12.4 H13.8 L14.8 6 Z"/>',   // r240: centred on the hex
     vol:'<path d="M8.5 17.5h9 M8.5 14h9 M8.5 10.5h9"/>',
     str:'<path d="M13 7c2.6 2 4.4 4.2 4.4 7a4.4 4.4 0 0 1-8.8 0c0-1.4.6-2.6 1.5-3.7.2 1 .8 1.8 1.7 2.2-.3-2 .2-4 1.2-5.5z"/>',
     crn:'<path d="M8 17l-1-6 3.4 2.4L13 9.5l2.6 3.9L19 11l-1 6z"/>',
@@ -602,11 +621,11 @@ window.hkBadge = function(id, earned, size, color, rarity){
     c8:'<path d="M13 6.5c2.4 2 3.4 4.6 3.4 7.4l-1.6 2.6h-3.6l-1.6-2.6c0-2.8 1-5.4 3.4-7.4z M11.6 16.5l-1.6 3 M14.4 16.5l1.6 3 M13 10.5v2"/>',  // v8 — ship it
     /* r150: the new class — every new achievement family gets its own mark */
     rx:'<path d="M7.5 8.5h3v3h3v3h3 M7.5 17.5h11"/>',                                                        // rx — the waterfall steps to the floor
-    flag:'<path d="M9 7.5v11 M9 8h7.5l-1.8 2.5 1.8 2.5H9"/><circle cx="9" cy="18.5" r="1" fill="currentColor" stroke="none"/>', // race flag planted
+    flag:'<path d="M10.5 6.5v13 M10.5 7.5h6l-1.6 2.4 1.6 2.4h-6"/>', // r240: race flag, centred
     sheet:'<path d="M9 6.5h6l2.5 2.5V19.5H9z M15 6.5V9h2.5"/><path d="M10.8 14.2l1.6 1.8 3-3.6"/>',          // morning sheet — page + tick
     ice:'<path d="M13 6.5v13 M7.4 9.8l11.2 6.4 M18.6 9.8L7.4 16.2 M13 6.5l-1.6 1.8 M13 6.5l1.6 1.8 M13 19.5l-1.6-1.8 M13 19.5l1.6-1.8"/>', // freeze
     map:'<path d="M7.5 8.5l3.5-1.5 4 1.5 3.5-1.5v10l-3.5 1.5-4-1.5-3.5 1.5z M11 7v10 M15 8.5v10"/>',          // model tour — the map fold
-    brush:'<path d="M15.5 6.8l3 3-6.4 6.4-3-3z M9 13.5c-1.6.4-2.4 1.6-2.4 3.4 1.8.4 3.2-.2 3.8-1.6"/>',      // house style — the paint pass
+    brush:'<rect x="7.3" y="10.6" width="7.4" height="7.4" rx="1.6"/><path d="M10 8.1h5.1a1.9 1.9 0 0 1 1.9 1.9v5.1"/>',  // r240: house style — stacked style-cards (the swatch gallery)
     keys:'<path d="M7 10.5h12v6H7z M9.5 13h1 M12.5 13h1 M15.5 13h1 M9.5 15h7"/>',                             // chord library — keyboard
     fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
   };
@@ -622,15 +641,27 @@ window.hkBadge = function(id, earned, size, color, rarity){
     else if(rarity<=25){ metal='#8ab4ff';  // RARE — platinum blue, second inner ring
       regalia='<path d="M13 6.4 L18.6 9.7 V16.3 L13 19.6 L7.4 16.3 V9.7 Z" fill="none" stroke="currentColor" stroke-width=".6" opacity=".4"/>'; }
   }
-  const col = earned ? (color||metal||'var(--warn)') : 'var(--faint)';
+  /* r240 (Wolf): per-FAMILY colour so the glyph wall isn't one gold hue. Explicit
+     `color` (campaign groups) and rarity `metal` still win; this is the base tint. */
+  /* r240 (Wolf): spread the palette so it isn't a wall of gold — colour by sub-family. */
+  const FAM={ spd:'#4a90e2', gnt:'#37a866', vol:'#37a866',            // speed=blue · efficiency=green
+    day:'#9b6ef0', ice:'#3fb6c4',                                     // time=violet · freeze=cyan
+    c1:'#e0a52a', c2:'#e0a52a',                                       // income-statement build = gold
+    c3:'#2fa79f', rx:'#2fa79f',                                       // waterfall / flows = teal
+    c4:'#4a90e2', c5:'#4a90e2',                                       // links / debt corkscrew = blue
+    c6:'#7e8794',                                                     // working-capital gears = slate
+    c7:'#e0a52a', c8:'#e0842a',                                       // three-statement gold · ship-it orange
+    crn:'#e0842a', str:'#9b6ef0', fin:'#9b6ef0',                      // crown=orange · streak/star=violet
+    flag:'#e0653a', sheet:'#3fae8f', map:'#3fae8f', brush:'#c05fb0', keys:'#6d8fe6' };
+  const col = earned ? (color||metal||FAM[id]||'var(--warn)') : 'var(--faint)';
   // r67: earned medals wear the regalia — double ring + apex notches; locked stays a ghost.
-  const crown = earned ? '<path d="M13 .8v1.6 M5.2 5.4l1.3.9 M20.8 5.4l-1.3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>' : '';
+  /* r240 (Wolf): FLAT + OUTLINED — a transparent hex with a coloured FRAME and a
+     matching coloured glyph. No solid fill, no tint, no crown notches, no rings
+     (that soft-tint stack was the "fuzzy edges"). Locked is the same shape ghosted. */
+  const op = earned ? '' : ' opacity=".5"';
   return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+'">'+
-    crown+regalia+
-    '<path d="'+hex+'" fill="currentColor" opacity="'+(earned?(metal?'.2':'.16'):'.05')+'"/>'+
-    '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.6"/>'+
-    (earned?'<path d="'+hexIn+'" fill="none" stroke="currentColor" stroke-width=".9" opacity=".55"/>':'')+
-    '<g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(G[id]||G.fin)+'</g>'+
+    '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.7"'+op+'/>'+
+    '<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'+op+'>'+(G[id]||G.fin)+'</g>'+
     '</svg>';
 };
 // r138: shared rarity helpers — tier word + tooltip fragment (stats grid + cards)
