@@ -196,7 +196,15 @@
      not pure #000 — "a nice darker grey, not black". Mirrors the dark-theme override above. */
   html[data-dark="0"] td.fc-black    {color:var(--text) !important}
   td.over{color:var(--warn); letter-spacing:1px}
-  td.editing{text-align:left; color:var(--text); box-shadow:inset 0 0 0 2px var(--accent); background:var(--bg)}
+  /* r253 (Wolf): the edit box POPS OUT beyond the column so a long formula reads
+     in-cell (Excel behavior) instead of forcing you to the formula bar. The cell
+     stops clipping; an absolute overlay grows to the formula's width and paints
+     over the empty neighbors to the right. */
+  td.editing{text-align:left; color:var(--text); background:transparent; box-shadow:none; padding:0; overflow:visible; z-index:6}
+  td.editing .edbox{position:absolute; left:0; top:0; bottom:0; min-width:100%; width:max-content; max-width:640px;
+    display:flex; align-items:center; padding:0 8px; box-sizing:border-box; background:var(--bg); color:var(--text);
+    box-shadow:inset 0 0 0 2px var(--accent); z-index:6}
+  td.editing .edin{white-space:nowrap}
   @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
   td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
   td.ttarget{outline:1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:-2px}
@@ -7511,7 +7519,10 @@ function render(){
         // Editing cell: show formula buffer with colored refs (matches what's in the formula bar)
         const {refs} = parseFormulaRefs(editBuf);
         cls.push('editing');
-        txt = buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '<span class="edcaret"></span>' + buildFormulaHTML(editBuf.slice(editCaret), refs);
+        // r253: wrap in the pop-out overlay (grows past the column for long formulas)
+        txt = '<span class="edbox"><span class="edin">' +
+              buildFormulaHTML(editBuf.slice(0,editCaret), refs) + '<span class="edcaret"></span>' + buildFormulaHTML(editBuf.slice(editCaret), refs) +
+              '</span></span>';
       }
       else if(cell.txt && (cell.ca|0)>1 && typeof cell.value==='string'){
         /* r177 CENTER ACROSS SELECTION — the anchor's text centers over its
@@ -8754,6 +8765,16 @@ function updateFxHint(){
   if(!fn){ el.classList.remove('show'); return; }
   const args=FN_SIGS[fn];
   el.innerHTML=fn+'( '+args.map((a,i2)=>i2===Math.min(argIdx,args.length-1)?'<b>'+a+'</b>':a).join(', ')+' )';
+  // r253 (Wolf): Excel floats the ScreenTip right under the cell you're editing —
+  // the old fixed spot up by the formula bar went unnoticed. Anchor it to the live
+  // editing cell (fall back to the formula-bar spot if we can't find the cell).
+  const td=document.querySelector('td.editing');
+  if(td){ const r=td.getBoundingClientRect();
+    el.style.position='fixed';
+    el.style.left=Math.round(r.left)+'px';
+    el.style.top=Math.round(r.bottom+3)+'px';
+    el.style.marginTop='0';
+  } else { el.style.position=''; el.style.left=''; el.style.top=''; el.style.marginTop=''; }
   el.classList.add('show');
 }
 function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0);
