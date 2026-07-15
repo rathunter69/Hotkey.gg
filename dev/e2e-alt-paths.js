@@ -359,11 +359,11 @@ const ALTS = [
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
     ]` },
-  { key: 'cases', name: 'growth pulled before the capture, then flip through the cases', moves: `C => [
+  { key: 'cases', name: 'growth read before the capture, then flip through the cases', moves: `C => [
       {sel:'C10', keys:[...T('=B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5)))'),{key:'Enter'}]},
       {sel:'C10:F10', keys:[{key:'r',ctrl:true}]},
-      {sel:'C16', keys:[...T('=B5'),{key:'Enter'}]},
-      {sel:'C16:E16', keys:[{key:'r',ctrl:true}]},
+      {sel:'C11', keys:[...T('=C10/B10-1'),{key:'Enter'}]},
+      {sel:'C11:F11', keys:[{key:'r',ctrl:true}]},
       {sel:'C15', keys:[...T('=IF($B$3=C$14,$F$10,C15)'),{key:'Enter'}]},
       {sel:'C15:E15', keys:[{key:'r',ctrl:true}]},
       {sel:'B3', keys:[...T('1'),{key:'Enter'}]},

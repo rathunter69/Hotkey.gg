@@ -1281,7 +1281,7 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=258"></script>
+<script src="drills.js?v=259"></script>
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="themes.js?v=256"></script>
 
@@ -6651,24 +6651,24 @@ const CHALLENGES = {
     }
   },
   cases:{
-    name:'Sticky switch', label:'Sticky IFs — snapshot each case', par:74, parKeys:78,
+    name:'Sticky switch', label:'Sticky IFs — snapshot each case', par:81, parKeys:85,
     aha:'A self-referencing IF snapshots each case as you flip — the model stays live, the output table holds.',
     prompt:'A model answers ONE case at a time — flip the switch and it reprices. But the deck needs all three side by side. The move: build the live model on a sticky IF, then a CAPTURE cell that reads the output only when its case is live and otherwise references ITSELF to hold the value — =IF($B$3=case, output, this_cell). Fill it across the cases, then flip the switch through 1·2·3: each column snapshots its scenario and RETAINS it. That frozen table is what goes on the slide — no hardcoding, no paste-values.',
-    req(){ return '<em>C10</em> driver · =B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5))) — F4-anchored · fill <em>C10:F10</em> → · capture: <em>C15</em> =IF($B$3=C$14,$F$10,C15) · fill <em>C15:E15</em> → · growth: <em>C16</em> =B5 · fill <em>C16:E16</em> → · flip <em>B3</em> → 1 · 2 · 3'; },
+    req(){ return '<em>C10</em> driver · =B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5))) — F4-anchored · fill <em>C10:F10</em> → · % growth: <em>C11</em> =C10/B10-1 · fill <em>C11:F11</em> → · capture: <em>C15</em> =IF($B$3=C$14,$F$10,C15) · fill <em>C15:E15</em> → · flip <em>B3</em> → 1 · 2 · 3'; },
     guide:[
-      'the live model: <em>C10</em> · <kbd>=</kbd>B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5))) — <kbd>F4</kbd> locks every case ref · <kbd>↵</kbd> · fill <em>C10:F10</em> <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'the capture: <em>C15</em> · <kbd>=</kbd>IF($B$3=C$14,$F$10,C15) — reads the final-year revenue only when its case is the switch, else holds ITSELF · <kbd>↵</kbd> · fill <em>C15:E15</em> · then <em>C16</em> <kbd>=</kbd>B5 · fill — each case’s growth, right below its revenue',
-      'now flip the switch: <em>B3</em> → <kbd>1</kbd> then <kbd>2</kbd> then <kbd>3</kbd> — each column freezes its scenario; the growth above shows what drove it',
+      'the live model: <em>C10</em> · <kbd>=</kbd>B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5))) — <kbd>F4</kbd> locks every case ref · <kbd>↵</kbd> · fill <em>C10:F10</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then the <em>% growth</em> under it: <em>C11</em> <kbd>=</kbd>C10/B10-1 · fill — the rate the switch is driving',
+      'the capture: <em>C15</em> · <kbd>=</kbd>IF($B$3=C$14,$F$10,C15) — reads the final-year revenue only when its case is the switch, else holds ITSELF · <kbd>↵</kbd> · fill <em>C15:E15</em> <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'now flip the switch: <em>B3</em> → <kbd>1</kbd> then <kbd>2</kbd> then <kbd>3</kbd> — each column freezes its scenario and stays put as you move on',
     ],
-    targets:['C10','C10:F10','C15','C15:E15','C16:E16','B3'],
+    targets:['C10','C10:F10','C11:F11','C15','C15:E15','B3'],
     demo(){
       return [
         {sel:'C10', keys:[...T('=B10*(1+IF($B$3=1,$B$5,IF($B$3=2,$C$5,$D$5)))'), Kb.enter]},
         {sel:'C10:F10', keys:[Kb.fillR]},
+        {sel:'C11', keys:[...T('=C10/B10-1'), Kb.enter]},
+        {sel:'C11:F11', keys:[Kb.fillR]},
         {sel:'C15', keys:[...T('=IF($B$3=C$14,$F$10,C15)'), Kb.enter]},
         {sel:'C15:E15', keys:[Kb.fillR]},
-        {sel:'C16', keys:[...T('=B5'), Kb.enter]},
-        {sel:'C16:E16', keys:[Kb.fillR]},
         {sel:'B3', keys:[...T('1'), Kb.enter]},
         {sel:'B3', keys:[...T('2'), Kb.enter]},
         {sel:'B3', keys:[...T('3'), Kb.enter]},
@@ -6693,6 +6693,8 @@ const CHALLENGES = {
       cells['A10']={...blankCell(),value:'Revenue',txt:true,bold:true};
       cells['B10']={...blankCell(),value:rnd(120,400)*5,fmtStyle:'comma',decimals:0,fontColor:'blue'};
       for(let c2=3;c2<=6;c2++) cells[colLetter(c2)+'10']={...blankCell(),fmtStyle:'comma',decimals:1};   // user builds the driver here
+      cells['A11']={...blankCell(),value:'% growth',txt:true};
+      for(let c3=3;c3<=6;c3++) cells[colLetter(c3)+'11']={...blankCell(),fmtStyle:'percent',decimals:1};  // user reads the YoY growth off the revenue line — the switch driving each year
       cells['A12']={...blankCell(),value:'case output table — snapshot each scenario',txt:true};
       cells['C13']={...blankCell(),value:'Base',txt:true,bold:true};
       cells['D13']={...blankCell(),value:'Upside',txt:true,bold:true};
@@ -6701,10 +6703,8 @@ const CHALLENGES = {
       cells['C14']={...blankCell(),value:1}; cells['D14']={...blankCell(),value:2}; cells['E14']={...blankCell(),value:3};
       cells['A15']={...blankCell(),value:'FY'+(y0+4)+' Revenue',txt:true,bold:true};
       for(const L of ['C','D','E']) cells[L+'15']={...blankCell(),fmtStyle:'comma',decimals:1};   // user builds the capture IFs here
-      cells['A16']={...blankCell(),value:'Growth applied',txt:true};
-      for(const L of ['C','D','E']) cells[L+'16']={...blankCell(),fmtStyle:'percent',decimals:1};  // user pulls each case's growth — the driver behind the numbers
       this._g=[gB/100,gU/100,gD/100];
-      return {ROWS:17, cells, active:{r:10,c:3}, sel:null, colW:{1:160}};
+      return {ROWS:16, cells, active:{r:10,c:3}, sel:null, colW:{1:160}};
     },
     checks(S){
       const g=this._g;
@@ -6730,16 +6730,16 @@ const CHALLENGES = {
         const want=base*Math.pow(1+g[i],4);
         if(Math.abs((cell.value||0)-want)>Math.max(1e-2,Math.abs(want)*1e-5)) retainOk=false;
       });
-      // growth row: each case pulls its own growth assumption (=B5 filled across) — the driver behind the numbers
+      // % growth under the revenue line: YoY off the model (=C10/B10-1, filled) — the switch driving each year
       let growthOk=true;
-      cols.forEach((L,i)=>{ const cell=S.cells[L+'16'];
-        if(!cell||!cell.formula){ growthOk=false; return; }
-        if(Math.abs((cell.value||0)-g[i])>1e-6) growthOk=false;
-      });
+      for(let c=3;c<=6;c++){ const L=colLetter(c); const cell=S.cells[L+'11'];
+        if(!cell||!cell.formula){ growthOk=false; continue; }
+        if(Math.abs((cell.value||0)-gi)>Math.max(1e-4,Math.abs(gi)*1e-4)) growthOk=false;
+      }
       return [
         {label:'Build the driver sticky IF (C10, F4-anchored) and fill C10:F10 — the model reprices off the switch', ok:driverOk},
+        {label:'Read the % growth under revenue (C11 =C10/B10-1, fill C11:F11) — the rate the switch is driving', ok:growthOk},
         {label:'Build the capture IF — =IF($B$3=C$14,$F$10,C15), reads the final year (F10) or holds ITSELF — and fill C15:E15', ok:captureOk},
-        {label:'Pull each case’s growth below revenue (C16 =B5, fill C16:E16) — see what drives each number', ok:growthOk},
         {label:'Flip the switch through 1·2·3 — each column snapshots its scenario and RETAINS it', ok:captureOk && retainOk},
       ];
     }
