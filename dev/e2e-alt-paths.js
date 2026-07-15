@@ -359,19 +359,19 @@ const ALTS = [
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
     ]` },
-  { key: 'cases', name: 'driver built growth-first, model then capture, then flip through the cases', moves: `C => [
+  { key: 'cases', name: 'driver built growth-first, model then capture, then flip through the cases', moves: `C => { const cap=C._capL; return [
       {sel:'B9', keys:[...T('=CHOOSE($B$3,B6,C6,D6)'),{key:'Enter'}]},
       {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'),{key:'Enter'}]},
       {sel:'C12', keys:[...T('=B12*(1+$B$9)'),{key:'Enter'}]},
       {sel:'C12:F12', keys:[{key:'r',ctrl:true}]},
       {sel:'C13', keys:[...T('=C12/B12-1'),{key:'Enter'}]},
       {sel:'C13:F13', keys:[{key:'r',ctrl:true}]},
-      {sel:'C18', keys:[...T('=IF($B$3=C$17,$F$12,C18)'),{key:'Enter'}]},
+      {sel:'C18', keys:[...T('=IF($B$3=C$17,$'+cap+'$12,C18)'),{key:'Enter'}]},
       {sel:'C18:E18', keys:[{key:'r',ctrl:true}]},
       {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
       {sel:'B3', keys:[...T('2'),{key:'Enter'}]},
       {sel:'B3', keys:[...T('3'),{key:'Enter'}]},
-    ]` },
+    ]; }` },
   { key: 'cfslink', name: 'rule the close FIRST, memo before the corkscrew, alt h p percent, bold last', moves: `C => [
       {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
       {sel:'B6',  keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
