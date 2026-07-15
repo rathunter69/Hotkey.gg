@@ -1241,7 +1241,7 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=179"></script>
+<script src="drills.js?v=180"></script>
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="themes.js?v=175"></script>
 
@@ -3483,81 +3483,100 @@ const CHALLENGES = {
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Grab the whole block', par:66, parKeys:16,
-    aha:'a block is an OBJECT — read its tag, then grab it whole: bold the LIVE one in place, carry the misplaced one to the model frame, leave the STALE one dead',
-    prompt:'Three comp blocks landed loose on the page — and each one is TAGGED, so you have to read them. The ● LIVE block is good where it sits: grab it whole (Ctrl+Shift+arrows) and bold it. One is tagged ▸ TO MODEL: take it whole, Ctrl+X, carry it to the outlined frame, Ctrl+V, and comma-format it at its new home. The STALE block is a dead paste — it gets nothing. Which block is which changes every run; read the tags, don’t guess.',
-    req(){ const o=this._o; return 'read the tags · <em>● LIVE</em> at '+o.live+': grab whole (<em>ctrl+⇧+↓</em> <em>ctrl+⇧+→</em>) · <em>ctrl+b</em> · <em>▸ TO MODEL</em> at '+o.move+': grab whole · <em>ctrl+x</em> · to the frame '+o.frame+' · <em>ctrl+v</em> · <em>alt h k</em> then <em>alt h 9</em>×2 · <em>STALE</em> stays put'; },
+    name:'Block Sel.', label:'Assemble the summary', par:74, parKeys:20,
+    aha:'a summary gets ASSEMBLED — COPY the reference that stays, CUT the misfiled columns into place, then dress the output',
+    prompt:'The segment summary is due and the pieces are scattered across the tab. The base [Segment · Revenue] block is filed and stays where it is — you COPY it. Two metric columns (EBITDA and Op inc) got dropped in the wrong place — you CUT each one out and drop it into its labeled slot. Then comma the figures. It’s an assembly puzzle: read what each loose block IS, grab it whole (across a row, down a column), and land it in the right column of the summary — copy what stays, cut what moves. The pieces land somewhere new every run.',
+    req(){ const o=this._o; return 'COPY the base at <em>'+o.baseTL+'</em> (<em>ctrl+⇧+→</em> <em>ctrl+⇧+↓</em> · <em>ctrl+c</em>) → paste at <em>'+o.o.seg[0]+'</em> · CUT EBITDA at <em>'+o.ebTL+'</em> (<em>ctrl+⇧+↓</em> · <em>ctrl+x</em>) → <em>'+o.o.ebitda[0]+'</em> · CUT Op inc at <em>'+o.opTL+'</em> → <em>'+o.o.opinc[0]+'</em> · comma <em>'+o.fmtRng+'</em> (<em>alt h k</em>, <em>alt h 9</em>×2)'; },
     guide(){ const o=this._o; return [
-      'read the tags first — the <b>● LIVE</b> block at <b>'+o.live+'</b> is good where it sits: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> grabs it whole · <kbd>ctrl</kbd>+<kbd>b</kbd>',
-      'the <b>▸ TO MODEL</b> block at <b>'+o.move+'</b> is parked wrong: same two chords take it whole · <kbd>ctrl</kbd>+<kbd>x</kbd> cuts it',
-      'land on the frame at <b>'+o.frame+'</b> · <kbd>ctrl</kbd>+<kbd>v</kbd> — the block moves WHOLE and stays selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice — commas at 0 decimals',
-      'the <b>STALE</b> block is a dead paste — moved, bolded or formatted, it fails the brief',
+      'the base <b>[Segment · Revenue]</b> at <b>'+o.baseTL+'</b> stays filed — so COPY it: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> across, <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> down, <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at <b>'+o.o.seg[0]+'</b>',
+      'the <b>EBITDA</b> column at <b>'+o.ebTL+'</b> is misfiled — CUT it: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> · <kbd>ctrl</kbd>+<kbd>x</kbd> · paste under <b>EBITDA</b> at '+o.o.ebitda[0]+' — its old spot empties',
+      'the <b>Op inc</b> column at <b>'+o.opTL+'</b> is misfiled too — CUT it the same way · paste under <b>Op inc</b> at '+o.o.opinc[0],
+      'dress the output: select <b>'+o.fmtRng+'</b> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice — commas at 0 decimals',
     ]; },
-    targets(){ const o=this._o; return [o.live, o.move, o.frame]; },
+    targets(){ const o=this._o; return [o.baseTL, o.ebTL, o.opTL, o.fmtRng]; },
     demo(){ const o=this._o;
-      const grab=[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true}];
+      const gd=[{key:'ArrowDown',ctrl:true,shift:true}], gr=[{key:'ArrowRight',ctrl:true,shift:true}];
       return [
-        {sel:o.live,   keys:[...grab, {key:'b',ctrl:true}]},                 // bold the LIVE block in place
-        {sel:o.move,   keys:[...grab, {key:'x',ctrl:true}]},                 // cut the misplaced block whole
-        {sel:o.frame,  keys:[{key:'v',ctrl:true}]},                         // drop it in the frame
-        {sel:o.frameRng, keys:[{key:'Alt'},L('h'),L('k')]},                 // comma-format (2 dec)
-        {sel:o.frameRng, keys:[{key:'Alt'},L('h'),{key:'9'}]},              // Alt H 9 — trim a decimal
-        {sel:o.frameRng, keys:[{key:'Alt'},L('h'),{key:'9'}]},              // Alt H 9 again — commas at 0 decimals (banker style)
+        {sel:o.baseTL,     keys:[...gr,...gd,{key:'c',ctrl:true}]},   // COPY the 2-col base (across + down)
+        {sel:o.o.seg[0],   keys:[{key:'v',ctrl:true}]},              // paste under Segment · Revenue
+        {sel:o.ebTL,       keys:[...gd,{key:'x',ctrl:true}]},        // CUT EBITDA column (down)
+        {sel:o.o.ebitda[0],keys:[{key:'v',ctrl:true}]},             // paste under EBITDA
+        {sel:o.opTL,       keys:[...gd,{key:'x',ctrl:true}]},        // CUT Op inc column
+        {sel:o.o.opinc[0], keys:[{key:'v',ctrl:true}]},             // paste under Op inc
+        {sel:o.fmtRng,     keys:[{key:'Alt'},L('h'),L('k')]},        // comma (2 dec)
+        {sel:o.fmtRng,     keys:[{key:'Alt'},L('h'),{key:'9'}]},     // trim
+        {sel:o.fmtRng,     keys:[{key:'Alt'},L('h'),{key:'9'}]},     // -> 0 decimals
       ]; },
     build(){
-      // r222 (Wolf sample): the flagship LIFT of a block-selection drill — same core muscle
-      // (Ctrl+Shift grab, Ctrl+X/V move, dress) but now the player READS on-board tags to
-      // decide each block's fate (LIVE→bold in place, ▸TO MODEL→carry to the outlined frame,
-      // STALE→leave it), and the destination is a visible outlined frame, not a bare address.
-      // Which block carries which tag randomizes every run, so it can't be run from memory.
+      // r225 (Wolf, deep rewrite): NOT a decoy/bold-in-place drill. This is an ASSEMBLY puzzle
+      // that teaches the real block muscles — COPY the reference that stays, CUT the misfiled
+      // columns into place — with select-across-a-row (Ctrl+Shift+→) and select-down-a-column
+      // (Ctrl+Shift+↓), landing each piece in a clearly-labeled output slot. Copy vs cut is
+      // called out explicitly and graded (base intact after copy; sources empty after cut).
+      // The output frame is fixed + labeled (so WHERE is clear); the loose pieces scatter to a
+      // shuffled, isolated spot every run (so it stays a puzzle).
       const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — comp blocks came in loose',txt:true,bold:true};
-      const N=rnd(3,4);
-      // [col,row0]; two-col bands with an empty gap row between the stacks so a grab can't bleed
-      const spots=shuffle([[2,3],[6,3],[2,9],[6,9]]);
-      const frame=spots[3];
-      const roles=shuffle(['live','move','stale']);
-      const labels=shuffle(['Peer set','Trading tape','Screen output','Sector comps','Deal set','Precedent tape']);
-      const TAG={ live:{t:'● LIVE',c:'green'}, move:{t:'▸ TO MODEL',c:'orange'}, stale:{t:'STALE',c:'darkgray'} };
-      const isl={};
-      [0,1,2].forEach(i=>{ const c0=spots[i][0], r0=spots[i][1], role=roles[i];
-        cells[colLetter(c0)+(r0-1)]={...blankCell(),value:labels[i],txt:true,bold:true};
-        cells[colLetter(c0+1)+(r0-1)]={...blankCell(),value:TAG[role].t,txt:true,bold:true,align:'r',fontColor:TAG[role].c};
-        const keys=[], vals=[];
-        for(let rr=0;rr<N;rr++) for(let cc=0;cc<2;cc++){ const k=colLetter(c0+cc)+(r0+rr);
-          const v=rnd(12,98)*100; cells[k]={...blankCell(),value:v,decimals:0,fontColor:'blue'}; keys.push(k); vals.push(v); }
-        isl[role]={c0,r0,keys,vals};
-      });
-      const fc=frame[0], fr0=frame[1];
-      cells[colLetter(fc)+(fr0-1)]={...blankCell(),value:'the model ▸ drop here',txt:true,bold:true,fontColor:'orange'};
-      const frameKeys=[];
-      for(let rr=0;rr<N;rr++) for(let cc=0;cc<2;cc++){ const k=colLetter(fc+cc)+(fr0+rr);
-        cells[k]={...blankCell(),bt:rr===0,bb:rr===N-1,bl:cc===0,br:cc===1};   // outlined empty drop-zone
-        frameKeys.push(k); }
-      this._N=N; this._live=isl.live; this._move=isl.move; this._stale=isl.stale; this._frameKeys=frameKeys;
-      this._o={ live:colLetter(isl.live.c0)+isl.live.r0, move:colLetter(isl.move.c0)+isl.move.r0,
-        stale:colLetter(isl.stale.c0)+isl.stale.r0, frame:colLetter(fc)+fr0,
-        frameRng:colLetter(fc)+fr0+':'+colLetter(fc+1)+(fr0+N-1) };
-      return {ROWS:Math.max(13,fr0+N), cells, active:{r:isl.live.r0,c:isl.live.c0}, sel:null,
-        colW:{1:88,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74,10:74}};   // wide enough for 4-digit comma values (no #####)
+      cells['A1']={...blankCell(),value:codename()+' — build the segment summary',txt:true,bold:true};
+      const N=4;
+      const segs=shuffle(['Cloud','Devices','Ads','Search','Health','Autos','Games','Media']).slice(0,N);
+      const rev = segs.map(()=>rnd(180,880)*10);
+      const ebit= rev.map(v=>Math.round(v*rnd(18,34)/100/10)*10);
+      const opin= ebit.map(v=>Math.max(100, v-rnd(2,7)*100));
+
+      // OUTPUT frame — FIXED at cols A..D, clearly labeled, empty bordered slots below.
+      const oR=3;
+      cells['A'+(oR-1)]={...blankCell(),value:'▸ SEGMENT SUMMARY — assemble here',txt:true,bold:true,fontColor:'green'};
+      ['Segment','Revenue','EBITDA','Op inc'].forEach((h,i)=>cells[colLetter(1+i)+oR]={...blankCell(),value:h,txt:true,bold:true,align:i===0?'l':'r',bb:true});
+      const o={seg:[],rev:[],ebitda:[],opinc:[]};
+      for(let r=0;r<N;r++){ for(let c=0;c<4;c++){ const k=colLetter(1+c)+(oR+1+r);
+        cells[k]={...blankCell(),bl:c===0,br:c===3,bb:r===N-1}; }
+        o.seg.push('A'+(oR+1+r)); o.rev.push('B'+(oR+1+r)); o.ebitda.push('C'+(oR+1+r)); o.opinc.push('D'+(oR+1+r)); }
+
+      // SOURCES — scattered on the right (cols 6..10) at isolated, shuffled anchors. Each anchor is
+      // an N-tall slot with a title row above; the base needs 2 cols, the metrics 1. Anchors are
+      // spaced (gap col 8, gap row) so Ctrl+Shift grabs never bleed between blocks.
+      const anchors=shuffle([{c:6,r:4},{c:9,r:4},{c:6,r:10},{c:9,r:10}]);
+      const baseA=anchors[0], ebA=anchors[1], opA=anchors[2];   // 4th anchor stays empty
+      const mkTitle=(c,r,t,col)=>cells[colLetter(c)+(r-1)]={...blankCell(),value:t,txt:true,bold:true,fontColor:col};
+      // base [Segment | Revenue] — the reference that STAYS (copy)
+      mkTitle(baseA.c, baseA.r, '▸ base', 'blue');
+      const baseSegKeys=[], baseRevKeys=[];
+      for(let r=0;r<N;r++){ const kS=colLetter(baseA.c)+(baseA.r+r), kR=colLetter(baseA.c+1)+(baseA.r+r);
+        cells[kS]={...blankCell(),value:segs[r],txt:true};
+        cells[kR]={...blankCell(),value:rev[r],decimals:0,fontColor:'blue'};
+        baseSegKeys.push(kS); baseRevKeys.push(kR); }
+      // EBITDA column — misfiled (cut)
+      mkTitle(ebA.c, ebA.r, '▸ EBITDA', 'orange');
+      const ebSrcKeys=[];
+      for(let r=0;r<N;r++){ const k=colLetter(ebA.c)+(ebA.r+r); cells[k]={...blankCell(),value:ebit[r],decimals:0,fontColor:'blue'}; ebSrcKeys.push(k); }
+      // Op inc column — misfiled (cut)
+      mkTitle(opA.c, opA.r, '▸ Op inc', 'orange');
+      const opSrcKeys=[];
+      for(let r=0;r<N;r++){ const k=colLetter(opA.c)+(opA.r+r); cells[k]={...blankCell(),value:opin[r],decimals:0,fontColor:'blue'}; opSrcKeys.push(k); }
+
+      this._o={ o, segVals:segs, revVals:rev, ebVals:ebit, opVals:opin,
+        baseSegKeys, baseRevKeys, ebSrcKeys, opSrcKeys,
+        baseTL:colLetter(baseA.c)+baseA.r, ebTL:colLetter(ebA.c)+ebA.r, opTL:colLetter(opA.c)+opA.r,
+        fmtRng:'B'+(oR+1)+':D'+(oR+N) };
+      return {ROWS:14, cells, active:{r:oR+1,c:1}, sel:null,
+        colW:{1:92,2:78,3:78,4:78,5:34,6:92,7:78,8:78,9:92,10:78}};
     },
     checks(S){
-      const L=this._live, M=this._move, ST=this._stale, FK=this._frameKeys;
-      const cel=k=>S.cells[k]||{};
+      const o=this._o, cel=k=>S.cells[k]||{};
       const empty=k=>{ const c=S.cells[k]; return !c||c.value===undefined||c.value===null||c.value===''; };
-      const liveBold  = L.keys.every(k=>cel(k).bold);
-      const onlyLive  = !M.keys.some(k=>cel(k).bold) && !ST.keys.some(k=>cel(k).bold) && !FK.some(k=>cel(k).bold);
-      const moved     = M.keys.every(empty) && FK.every((k,i)=>cel(k).value===M.vals[i]);
-      const commaHome = FK.every(k=>cel(k).fmtStyle==='comma' && (cel(k).decimals|0)===0);   // banker style: commas at 0 decimals
-      // the STALE block is a guard folded into the three beats (never its own pre-checked line):
-      // it must stay put — same values, never bolded, never comma-formatted.
-      const staleIntact = ST.keys.every((k,i)=>cel(k).value===ST.vals[i]);
-      const staleClean  = !ST.keys.some(k=>cel(k).bold) && !ST.keys.some(k=>cel(k).fmtStyle==='comma');
+      const segOut = o.segVals.every((v,i)=>cel(o.o.seg[i]).value===v);
+      const revOut = o.revVals.every((v,i)=>cel(o.o.rev[i]).value===v);
+      const baseIntact = o.baseSegKeys.every((k,i)=>cel(k).value===o.segVals[i]) && o.baseRevKeys.every((k,i)=>cel(k).value===o.revVals[i]);
+      const copied = segOut && revOut && baseIntact;                                  // COPY: landed AND base still there
+      const cutEb = o.ebVals.every((v,i)=>cel(o.o.ebitda[i]).value===v) && o.ebSrcKeys.every(empty);   // CUT: landed AND source empty
+      const cutOp = o.opVals.every((v,i)=>cel(o.o.opinc[i]).value===v) && o.opSrcKeys.every(empty);
+      const fmtOk = [...o.o.rev,...o.o.ebitda,...o.o.opinc].every(k=>cel(k).fmtStyle==='comma' && (cel(k).decimals|0)===0);
       return [
-        {label:'read the tags — grab the ● LIVE block whole and bold it in place (only it, not the STALE one)', ok: liveBold && onlyLive},
-        {label:'carry the ▸ TO MODEL block whole to the frame — old address empty, the STALE block stays put', ok: moved && staleIntact},
-        {label:'comma-format the moved block — 0 decimals (Alt H K, then Alt H 9 ×2); the STALE block gets nothing', ok: commaHome && staleClean},
+        {label:'COPY the [Segment · Revenue] base whole (Ctrl+Shift+→ ↓, Ctrl+C) → paste into the summary — the base stays filed', ok: copied},
+        {label:'CUT the misfiled EBITDA column (Ctrl+Shift+↓, Ctrl+X) → paste under EBITDA — its old spot empties', ok: cutEb},
+        {label:'CUT the misfiled Op inc column (Ctrl+X) → paste under Op inc — that spot empties too', ok: cutOp},
+        {label:'comma-format Revenue · EBITDA · Op inc — 0 decimals (Alt H K, then Alt H 9 ×2)', ok: fmtOk},
       ];
     }
   },

@@ -5364,3 +5364,26 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - VERIFIED: demo-replay 12/12 · alt-paths PASS (Ctrl+Shift+! + trim) · 0 post-solve
   overflow cells across 12 runs (correct global colW). drills.js blocksel par 52→66,
   ?v 178→179. (Only blocksel touched — no other drill can regress.)
+
+## r225 — blocksel DEEP rewrite: "Assemble the segment summary" (Wolf)
+- Wolf on r222/r224: "you're doing surface permutations, not a deep rewrite — there's a
+  whole block I do nothing with; why am I bolding in place; the drill should teach COPY
+  and CUT explicitly, select across a row AND down a column, paste into clearly-labeled
+  slots; the model headers spill." Rebuilt from the story up.
+- NEW DRILL — an ASSEMBLY puzzle: the segment summary's pieces are scattered/misfiled.
+  COPY the [Segment · Revenue] base that stays filed (Ctrl+Shift+→ across, Ctrl+Shift+↓
+  down, Ctrl+C) → paste under Segment/Revenue; CUT the misfiled EBITDA column
+  (Ctrl+Shift+↓, Ctrl+X) → paste under EBITDA; CUT the misfiled Op inc column → paste
+  under Op inc; comma-format at 0 decimals. 4 beats, COPY vs CUT called out EXPLICITLY
+  and graded (base intact after copy; sources empty after cut). Every source is used —
+  no dead decoy, no pointless bold-in-place.
+- CLARITY + FIT: a FIXED, labeled output frame ("▸ SEGMENT SUMMARY", headers
+  Segment/Revenue/EBITDA/Op inc) so WHERE is obvious; short source tags (▸ base blue,
+  ▸ EBITDA / ▸ Op inc orange) that fit their column — no spill. Sources scatter to a
+  shuffled, isolated anchor every run (the puzzle). Verified: 0 load ####, 0 post-solve
+  ####, 0 horizontal overflow over 14 builds.
+- GATE: demo-replay 15/15 (then 12/12 after meta) · alt-paths PASS (cut-first, copy-last,
+  Ctrl+Shift+! + trim) · targeted fit CLEAN. drills.js label 'Grab the whole block' →
+  'Assemble the summary', par 52→74; ?v 179→180. (Global onboard/parity audits hit infra
+  timeouts this round; the drill is self-contained — build/demo/checks touch no shared
+  flow — and the demo-replay's zero-page-error gate passed.)
