@@ -40,7 +40,7 @@ const ALTS = [
   { key: 'blocksel', name: 'carry the block FIRST, comma via ctrl+shift+!, bold the LIVE one last via ribbon', moves: `C => { const o=C._o; return [
       {sel:o.move,  keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'x',ctrl:true}]},   // grab + cut the ▸ TO MODEL block
       {sel:o.frame, keys:[{key:'v',ctrl:true}]},                                                                                   // drop it in the frame
-      {sel:o.frameRng, keys:[{key:'!',ctrl:true,shift:true}]},                                                                     // comma via Ctrl+Shift+! (not Alt H K)
+      {sel:o.frameRng, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},                       // comma via Ctrl+Shift+!, then trim to 0 decimals
       {sel:o.live,  keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'Alt'},L('h'),D(1)]}, // bold the LIVE block via the ribbon
     ]; }` },
   { key: 'undo', name: 'the mistake walked FIRST, dressing last, italic via alt h 2', moves: `C => { const o=C._o; return [

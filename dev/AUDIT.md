@@ -5352,3 +5352,15 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   drift -7% / 0 flagged. drills.js meta+par navigation 58→70; ?v 177→178.
 - NOTE: the full fit-sweep flagged 1 OTHER drill (not navigation, not blocksel — both pass
   analytically at CHARPX 8.6); a marginal pre-existing overflow to identify + fix next.
+
+## r224 — blocksel post-solve #### fix (comma at 0 decimals, banker style)
+- The r222 blocksel lift shipped a POST-SOLVE overflow: Alt H K applies comma with
+  2 decimals (engine default), so the moved block rendered "4,900.00" (8 chars) and
+  overflowed the 74px columns — the full fit-sweep's one flagged drill (not nav).
+- FIX: the comma beat is now the banker standard the rest of the catalog uses —
+  Alt H K then Alt H 9 ×2 → commas at 0 decimals ("4,900" fits 74px). Demo, check
+  (fmtStyle==='comma' && decimals===0), guide, req, and alt-path all updated; island
+  values carry decimals:0. par 58→66 / parKeys 12→16 for the two trim chords.
+- VERIFIED: demo-replay 12/12 · alt-paths PASS (Ctrl+Shift+! + trim) · 0 post-solve
+  overflow cells across 12 runs (correct global colW). drills.js blocksel par 52→66,
+  ?v 178→179. (Only blocksel touched — no other drill can regress.)
