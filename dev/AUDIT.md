@@ -5412,3 +5412,14 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   (23px for 1-digit, 19px for 2-digit) with a hairline surface stroke for legibility on the arc
   — and drops the inner "LVL" text. Verified across levels 1/5/15/23: clean adorned number inside
   the progress arc, "LEVEL n" label below. themes.js ?v 174/175 → 176 across all pages.
+
+## r228 — rank pill populates on SIGN-IN, not only on refresh (Wolf)
+- Wolf's other reactivity half: "login shows username and rank only on refresh." Username
+  already re-rendered via onAuthStateChange→renderAuthBar, but the RANK PILL is filled by
+  navRank(), which only ran from a boot-time poll that gives up after ~8s — so a user who
+  signs in later saw no rank until they refreshed.
+- FIX: onAuthStateChange's sign-in branch (and the initial getUser path) now call navRank()
+  right after the profile loads, so the rank pill + the level chip (navRank hydrates hk_xp_est
+  then re-renders) appear the moment you sign in. nav.js ?v 175→176. Zero page errors.
+- Reactivity pass status: theme name (r219), logout wipe (r226), sign-in rank/level (r228) all
+  fixed. Remaining minor item: keyboard-profile overlay refresh — queued.

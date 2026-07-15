@@ -888,6 +888,7 @@
           window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).single().then(({ data: prof }) => {
             window._navProfile = prof || null;
             renderAuthBar();
+            try{ navRank(); }catch(e){}   // r228 (Wolf): populate the rank pill on SIGN-IN, not only on the next refresh (the boot poll had already given up)
           });
         } else {
           renderAuthBar();
@@ -900,6 +901,7 @@
           window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).single().then(({ data: prof }) => {
             window._navProfile = prof || null;
             renderAuthBar();
+            try{ navRank(); }catch(e){}   // r228 (Wolf): populate the rank pill on SIGN-IN, not only on the next refresh (the boot poll had already given up)
           });
         } else {
           window._navProfile = null;
