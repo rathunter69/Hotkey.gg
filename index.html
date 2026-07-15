@@ -131,6 +131,15 @@
   td.bold{font-weight:700}
   td.fill-blue{background:#9cc3e8 !important; color:#153c7a}   /* r160: #dbeafe was 1.05:1 vs paper sheets — invisible fill */
   html[data-dark="1"] td.fill-blue{background:#1d5080 !important; color:#cfe8ff}   /* r160: #16344e was 1.03:1 vs everforest/onedark sheets */
+  /* r231 (Wolf): the FILL PALETTE — Alt H H picker. Banker shades: grey headers, yellow flags, green, red. Three theme layers each (light / dark chrome / dark-chrome-light-sheet). */
+  td.fill-gray{background:#d4d4d4 !important; color:#2a2a2a}
+  td.fill-yellow{background:#ffe699 !important; color:#6b5300}
+  td.fill-green{background:#c6e0b4 !important; color:#274e13}
+  td.fill-red{background:#f2b8b8 !important; color:#7a1a1a}
+  html[data-dark="1"] td.fill-gray{background:#3c4149 !important; color:#dfe3e8}
+  html[data-dark="1"] td.fill-yellow{background:#5c4a1c !important; color:#ffe08a}
+  html[data-dark="1"] td.fill-green{background:#2c4321 !important; color:#c9e6b8}
+  html[data-dark="1"] td.fill-red{background:#4d2222 !important; color:#f2bcbc}
   /* r212 (Wolf): DARK CHROME, LIGHT SHEET — like real Excel in dark mode. On dark themes the
      drill grid renders on a fixed light sheet (dark ink, light gridlines), while the nav /
      ribbon / checklist / background keep the theme. Scoped to .gridwrap so only the sheet
@@ -154,6 +163,10 @@
   html[data-dark="1"] .gridwrap td.fc-yellow   {color:#8a6300 !important}
   html[data-dark="1"] .gridwrap td.fc-orange   {color:#c55a11 !important}
   html[data-dark="1"] .gridwrap td.fill-blue   {background:#9cc3e8 !important; color:#153c7a !important}
+  html[data-dark="1"] .gridwrap td.fill-gray   {background:#d4d4d4 !important; color:#2a2a2a !important}
+  html[data-dark="1"] .gridwrap td.fill-yellow {background:#ffe699 !important; color:#6b5300 !important}
+  html[data-dark="1"] .gridwrap td.fill-green  {background:#c6e0b4 !important; color:#274e13 !important}
+  html[data-dark="1"] .gridwrap td.fill-red    {background:#f2b8b8 !important; color:#7a1a1a !important}
   /* explicit alignment overrides (Excel Alt H A L/C/R) — use !important to beat .txt and num defaults */
   td.align-l{text-align:left !important}
   td.align-c{text-align:center !important}
@@ -1642,8 +1655,8 @@ const CHALLENGES = {
     ]; },
     targets(){ const R=this._R; return [R.srcIn, R.srcTot, R.srcTot, R.srcCol, R.srcCol]; },
     demo(){ const R=this._R; return [
-      {sel:R.srcIn,  keys:[Kb.alt,L('H'),L('H')]},
-      {sel:R.useIn,  keys:[Kb.alt,L('H'),L('H')]},
+      {sel:R.srcIn,  keys:[Kb.alt,L('H'),L('H'),Kb.enter]},
+      {sel:R.useIn,  keys:[Kb.alt,L('H'),L('H'),Kb.enter]},
       {sel:R.srcTot, keys:[Kb.eq, Kb.enter]},
       {sel:R.useTot, keys:[Kb.eq, Kb.enter]},
       {sel:R.srcTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
@@ -3691,7 +3704,7 @@ const CHALLENGES = {
     ]; },
     targets(){ const o=this._o; return [o.h1+':'+o.h2, o.dates, o.money, o.growth]; },
     demo(){ const o=this._o; return [
-      {sel:o.h1+':'+o.h2, keys:[{key:'b',ctrl:true}, Kb.alt,{key:'h'},{key:'b'},{key:'b'}, Kb.alt,{key:'h'},{key:'h'}]},
+      {sel:o.h1+':'+o.h2, keys:[{key:'b',ctrl:true}, Kb.alt,{key:'h'},{key:'b'},{key:'b'}, Kb.alt,{key:'h'},{key:'h'},Kb.enter]},
       {sel:o.dates, keys:[{key:'1',ctrl:true},L('D'),{key:'b',ctrl:true}]},
       {sel:o.money, keys:[Kb.cur, Kb.alt,L('H'),D(9), Kb.alt,L('H'),D(9)]},
       {sel:o.growth, keys:[{key:'i',ctrl:true}]},
@@ -7259,7 +7272,7 @@ function render(){
       let cls=[]; if(cell.bold)cls.push('bold'); if(cell.txt&&!isNum(cell))cls.push('txt');
       if(cell.it)cls.push('it'); if(cell.strike)cls.push('strike');   // r193
       if(cell.uline)cls.push('uline');   // r229: cell underline (Ctrl+U / Alt H 3)
-      if(cell.wrap)cls.push('wrap'); if(cell.fill==='blue')cls.push('fill-blue');
+      if(cell.wrap)cls.push('wrap'); if(cell.fill)cls.push('fill-'+cell.fill);   // r231: any fill palette key
       if(cell.bt)cls.push('bt'); if(cell.bb)cls.push('bb'); if(cell.ball)cls.push('ball');
       if(cell.align)cls.push('align-'+cell.align);
       if(cell.fontColor)cls.push('fc-'+cell.fontColor);
@@ -7478,6 +7491,17 @@ const FONT_SWATCHES = [
   {k:'purple',   hex:'#7030a0', name:'Purple'},
 ];
 let fontColorIdx = 0;
+// r231 (Wolf): the FILL palette — Alt H H opens this picker. Blue leads (the existing input/header
+// shade convention), then the banker shades. 'none' clears the fill.
+const FILL_SWATCHES = [
+  {k:'blue',   hex:'#9cc3e8', name:'Blue'},
+  {k:'gray',   hex:'#d4d4d4', name:'Gray (header)'},
+  {k:'yellow', hex:'#ffe699', name:'Yellow (flag)'},
+  {k:'green',  hex:'#c6e0b4', name:'Green'},
+  {k:'red',    hex:'#f2b8b8', name:'Red'},
+  {k:null,     hex:'transparent', name:'No fill'},
+];
+let fillColorIdx = 0;
 let ribbonNote='';
 const tabName = k => (TABS.find(t=>t.k===k)||{name:k}).name;
 
@@ -7531,6 +7555,17 @@ function __drawRibbon(){
     html += `<span class="fc-name">${FONT_SWATCHES[fontColorIdx].name}</span>`;
     html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
     el.innerHTML = html; return;   /* r85: __altFooter was out-of-scope (guided renderer's const) — the crash that "broke the ribbon" */
+  }
+  if(dialog==='fillcolor'){   // r231: Alt H H fill picker — mirrors the font-colour dialog
+    el.className='ribbon show';
+    let html = '<span class="path">fill →</span>';
+    FILL_SWATCHES.forEach((sw, i) => {
+      const bg = sw.k===null ? 'repeating-linear-gradient(45deg,#bbb 0 4px,#eee 4px 8px)' : sw.hex;
+      html += `<span class="fc-swatch${i===fillColorIdx?' on':''}" style="background:${bg}"></span>`;
+    });
+    html += `<span class="fc-name">${FILL_SWATCHES[fillColorIdx].name}</span>`;
+    html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
+    el.innerHTML = html; return;
   }
   if(dialog==='colw'){
     el.className='ribbon show';
@@ -8577,6 +8612,12 @@ function applyRibbon(key){
     }
     return;
   }
+  if(dialog==='fillcolor'){   // r231: fill picker — Enter applies the highlighted swatch; letter keys jump+apply
+    const LETTER={B:'blue',G:'green',Y:'yellow',R:'red',N:null};
+    if(key==='ENTER'){ const sw=FILL_SWATCHES[fillColorIdx]; pushUndo(); eachSel(c=>c.fill=sw.k); return exitRibbon(true); }
+    if(Object.prototype.hasOwnProperty.call(LETTER,key)){ pushUndo(); const v=LETTER[key]; eachSel(c=>c.fill=v); return exitRibbon(true); }
+    return;
+  }
   // fill-series dialog — Excel opens a "Series" dialog from Alt H F I S; Enter applies defaults
   if(dialog==='series'){
     if(key==='ENTER'){ pushUndo(); fillSeries(); return exitRibbon(true); }
@@ -8597,6 +8638,7 @@ function applyRibbon(key){
   if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; pasteOp='none'; drawRibbon(); return; }
   if(np==='OE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route
   if(np==='HFC'){ dialog='fontcolor'; fontColorIdx=0; drawRibbon(); return; }
+  if(np==='HH'){ dialog='fillcolor'; fillColorIdx=0; drawRibbon(); return; }   // r231: Alt H H fill picker
   if(np==='HFIS'){ dialog='series'; drawRibbon(); return; }
   if(np==='ASA'||np==='ASD'){
     const dir = np==='ASD'?'desc':'asc';
@@ -8614,7 +8656,7 @@ function applyRibbon(key){
   if(np==='HFID'){ pushUndo(); fillFrom('down');  return exitRibbon(true); }    // mirror of Ctrl+D, available from the Fill submenu
   if(np==='HFIR'){ pushUndo(); fillFrom('right'); return exitRibbon(true); }    // mirror of Ctrl+R
   const RUN={
-    'HH':c=>c.fill='blue', 'HW':c=>c.wrap=!c.wrap,
+    'HW':c=>c.wrap=!c.wrap,   /* r231: 'HH' now opens the fill-colour picker (below), not an instant blue */
     'HK':c=>{c.fmtStyle='comma';c.decimals=2;}, 'HP':c=>{c.fmtStyle='percent';c.decimals=0;}, 'H9':c=>c.decimals=Math.max(0,c.decimals-1),
     'H0':c=>c.decimals=Math.min(6,c.decimals+1), 'HBT':c=>c.bt=true, 'HBB':c=>c.bb=true,
     'HBA':c=>c.ball=true,
@@ -9360,6 +9402,10 @@ document.addEventListener('keydown',e=>{
       return;
     }
     // font color picker: arrow keys cycle swatches, Enter commits, anything else (except Esc) ignored
+    if(dialog==='fillcolor'){
+      if(k==='ArrowLeft'){  logKey('←'); fillColorIdx=(fillColorIdx-1+FILL_SWATCHES.length)%FILL_SWATCHES.length; drawRibbon(); return; }
+      if(k==='ArrowRight'){ logKey('→'); fillColorIdx=(fillColorIdx+1)%FILL_SWATCHES.length; drawRibbon(); return; }
+    }
     if(dialog==='fontcolor'){
       if(k==='ArrowLeft'){  logKey('←'); fontColorIdx=(fontColorIdx-1+FONT_SWATCHES.length)%FONT_SWATCHES.length; drawRibbon(); return; }
       if(k==='ArrowRight'){ logKey('→'); fontColorIdx=(fontColorIdx+1)%FONT_SWATCHES.length; drawRibbon(); return; }

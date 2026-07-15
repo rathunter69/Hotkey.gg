@@ -5455,3 +5455,19 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - NEXT (queued): the rank EMBLEM system (window.rankEmblem — the ornamented frames/jewels/auras)
   and achievement glyphs get the same flat + varied treatment; that's a larger SVG system best
   done sample-first with Wolf's eye.
+
+## r231 — ENGINE Tier-1 #1: the FILL-COLOR PALETTE (Wolf, Excel-first)
+- Wolf: "the way we set background colors isn't elegant" — Alt H H forced instant 'blue' and there
+  was no palette. Excel-real fix: Alt H H now opens a swatch PICKER.
+- PALETTE: fill can be blue / gray (header shade) / yellow (flag) / green / red / none. Each renders
+  across the three theme layers (light · dark chrome · dark-chrome-light-sheet), legible. The render
+  generalized from `fill==='blue'` to `fill-<key>`.
+- PICKER (mirrors the font-color dialog): Alt H H → swatch row; ← → to pick + Enter, OR letter
+  shortcuts B/G/Y/R/N. Elegant + discoverable, unlike the old blind instant-blue.
+- COMPAT: the 3 drill demos/alts that pressed Alt H H for blue (housestyle, polish) now add Enter
+  (blue is the default swatch). No check changed — fill values are unchanged, so graders still read
+  fill==='blue'.
+- GATE: demo-replay ALL GREEN · parity 94 PASS · fill picker verified (Enter=blue, arrow=gray,
+  letter Y=yellow; 0 page errors) · fill drills (housestyle/polish/dress/blue/ruleoff/combo/gauntlet)
+  WIN. New gray/yellow/green/red aren't used by any existing drill yet (no live regression) — the
+  visual audit validates them when the drill rebuilds put them to work. index.html only.

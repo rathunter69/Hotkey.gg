@@ -296,3 +296,17 @@ transpose  | fine after r168 aha; lowest priority
 > drills RENDER + GRADE against that desk's palette, not the generic one. Depends on the
 > Tier-1 fill palette + font muscles (T-N) and the team/desk model. Big retention + B2B
 > hook — desks buy training that looks like their own book. Sketch to Wolf before building.
+
+## T-P · CURRICULUM v2 — CONFIRMED shape, EXECUTE AFTER the engine pack (Wolf r230)
+> Wolf confirmed: 8 chapters, ~10 RICH drills each, deep domains numbered, cut/merge the weak ~6.
+> ORDER: build the engine Tier-1/2 muscles (T-N) FIRST, then restructure + rebuild drills onto them.
+> The confirmed chapter map:
+>   1. Foundations (10, free): navigation, modeltour, blocksel, filldr, pastes, rowops, colops, editfix, undo, copyover
+>   2. Formatting (10, free): housestyle, ruleoff, ruleaudit, dress, typeset, decimals, center, autofit, combo, gauntlet
+>   3. Data & Lookups (10, level): sort, scrub, recon, grpfold, filterpass, unhide, lookup, lookup2, drill, series
+>   4. Formulas I — Building (10, level): margin, foot, percent, growth, cagr, anchor, bridge, sumif, rollup, cases
+>   5. Formulas II — Audit & Repair (10, level): audit, triage, wrapfix, balcheck, stalelink, wirewalk, hunt, signerr, versionup, balance
+>   6. Models I — Valuation (9, PRO): wacc, dcf, comps, txncomps, football, dcfsens, retbridge, accdil, sourcesuses
+>   7. Models II — Credit & Schedules (9, PRO): lbo, revolver, schedule, waterfall, cascade, wk13, liqbridge, covtable, debtsched
+>   8. Full Builds (5, PRO): isbuild, bsbuild, cfslink, nwcsched, threestmt
+> CUT/MERGE the weak: saves→fold copyover · polish/blue/format→merge housestyle/dress/decimals · ribbon→fold into Formatting · transpose→fold pastes.
