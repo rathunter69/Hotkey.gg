@@ -7231,8 +7231,8 @@ function parseRef(ref){ const m=ref.replace(/\$/g,'').match(/^([A-Z]+)(\d+)$/i);
 function resolveRange(str){ if(!str) return null; const parts=str.split(':'); const a=parseRef(parts[0]); const b=parts[1]?parseRef(parts[1]):a; if(!a||!b) return null;
   return {r1:Math.min(a.r,b.r),r2:Math.max(a.r,b.r),c1:Math.min(a.c,b.c),c2:Math.max(a.c,b.c)}; }
 function currentTargetRange(){
-  if(!S||done) return null;
-  const C=CHALLENGES[cur]; if(!C.targets) return null;
+  if(!S||done||sandboxMode) return null;   // r238: the warm-up sandbox has no CHALLENGES entry / no targets
+  const C=CHALLENGES[cur]; if(!C||!C.targets) return null;
   const T2=(typeof C.targets==='function') ? C.targets.call(C) : C.targets;
   const items=C.checks(S);
   for(let i=0;i<items.length;i++){ if(!items[i].ok){ let t=T2[i]; if(typeof t==='function') t=t.call(C); return resolveRange(t); } }
@@ -7669,7 +7669,7 @@ function __drawRibbon(){
 /* ============================================================
    ACTIONS
    ============================================================ */
-function startClock(){ if(running||done)return; running=true; started=performance.now();
+function startClock(){ if(running||done||sandboxMode)return; running=true; started=performance.now();   // r238: the onboarding sandbox never times
   if(marathon && marathon.active && !marathon.endAt){
     marathon.startAt=started; marathon.endAt=started+marathon.dur*1000; }
   $('timer').classList.add('run'); tickH=setInterval(updateTimer,40); }
@@ -7753,7 +7753,7 @@ function stopClock(){ running=false; clearInterval(tickH); finished=performance.
   $('timer').classList.remove('run'); }
 
 function checkWin(){
-  if(done||demoPlaying) return;
+  if(done||demoPlaying||sandboxMode) return;   // r238: the sandbox is a free-play scratch sheet — never wins, never scores
   if(!gradePass()) return;
   const t=(performance.now()-started)/1000;
   stopClock(); done=true; $('timer').textContent=t.toFixed(2);
@@ -8450,6 +8450,7 @@ function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
   try{ updateFxHint(); const fc=document.querySelector('.fcontent'); if(fc && editing) fc.scrollLeft=fc.scrollWidth; }catch(e){} }; })();   // r91
 function updateChecklist(){
   const el=$('checklist'); if(!el||!S) return;
+  if(sandboxMode || !CHALLENGES[cur]){ el.innerHTML=''; return; }   // r238: the sandbox has no checklist
   el.classList.toggle('dense', (CHALLENGES[cur].checks(S)||[]).length>=5 || guided);
   const C=CHALLENGES[cur];
   const items=C.checks(S);
@@ -9229,7 +9230,7 @@ document.addEventListener('keydown',e=>{
     }
     if(k==='Enter'){
       e.preventDefault();
-      if(onboardChoice===0) startPlacement(); else skipOnboard();
+      if(onboardChoice===0) startSandbox(); else skipOnboard();
       return;
     }
     if(k==='Escape'){ e.preventDefault(); skipOnboard(); return; }
@@ -9596,7 +9597,8 @@ document.addEventListener('keydown',e=>{
   if(e.altKey && !(e.ctrlKey||e.metaKey)){ e.preventDefault(); if(k==='='){ startClock(); logKey('Alt'); logKey('='); pushUndo(); autoSum(); commitAction(); } return; }
 
   const dirs={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
-  if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey); return; }
+  if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey);
+    if(sandboxMode) sandboxCallout(e.ctrlKey||e.metaKey, e.shiftKey); return; }
   // r89: ESC NEVER RESTARTS. Excel muscle memory hammers Esc to back out of cells/formulas;
   // a stray Esc nuking a run is exactly the wrong punishment. Esc = cancel marching ants,
   // otherwise nothing. Restart lives on Shift+F11 and the results card.
@@ -10485,10 +10487,7 @@ function applyTheme(name){
 async function loadTheme(){
   const saved = await KV.get('hotkey_theme');
   if(saved && THEMES[saved]){ applyTheme(saved); return; }
-  try{
-    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    applyTheme(prefersLight ? 'daylight' : 'default');   // r204: Daylight is the default light theme
-  }catch(e){ applyTheme('default'); }
+  applyTheme('daylight');   // r238 (Wolf): Daylight is the UNCONDITIONAL default — a saved choice still wins, but a clean login always opens on Daylight rather than following OS dark-mode
 }
 function saveTheme(name){ KV.set('hotkey_theme', name); }
 
@@ -11540,6 +11539,7 @@ function loadChallenge(key, opts){
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   if(built.hiddenRows){ S.hiddenRows=built.hiddenRows.slice(); syncHidden(); }   // r185: inherited sins load pre-hidden
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
+  sandboxMode=false;   // r238: loading any real drill exits the warm-up sandbox (covers the picker escape-hatch)
   editing=false; editBuf=''; editCaret=0; editPointer=null; editPointerStart=-1;   // r106: never inherit a stale edit from the prior drill
   mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[]; keyTimes=[]; keyCells=[];
   updateGuideBtn();
@@ -12263,7 +12263,7 @@ function paintOnboard(){
   a.classList.toggle('focused', onboardChoice===0);
   b.classList.toggle('focused', onboardChoice===1);
   // Show the ↵ kbd hint only on the currently-selected button
-  a.innerHTML = '▶ Show me how it works' + (onboardChoice===0 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
+  a.innerHTML = '▶ Quick warm-up — feel the moves' + (onboardChoice===0 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
   b.innerHTML = "Skip — I’ll dive in" + (onboardChoice===1 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
 }
 function showOnboard(){
@@ -12271,7 +12271,7 @@ function showOnboard(){
   if(window.__hkHasSession){ onboarded=true; try{localStorage.setItem('hotkey_onboarded','1');}catch(e){} return; }
   const o=$('onboard'); if(!o) return;
   onboardOpen=true; onboardChoice=0; o.classList.add('show');
-  const s=$('obStart'); if(s) s.onclick=startPlacement;
+  const s=$('obStart'); if(s) s.onclick=startSandbox;   // r238: warm-up sandbox, not the graded placement
   const k=$('obSkip'); if(k) k.onclick=skipOnboard;
   paintOnboard();
 }
@@ -12282,6 +12282,65 @@ function startPlacement(){
   markOnboarded(); closeOnboard(); ev('tutorial_start');
   placementMode=true;
   loadChallenge('navigation');   // the 12-chord tour IS the placement — pure movement skill
+}
+/* r238 (Wolf): the onboarding rep is now a THROWAWAY SANDBOX — a scratch grid with no
+   timer and no grading, big callouts for what the movement/selection chords do, and a
+   "Ready" button that drops you onto a clean, untouched first drill. Fixes the bug where
+   practicing on the live first drill left it half-initialized. */
+let sandboxMode=false;
+function sbCell(v,o){ return Object.assign(blankCell(), {value:v}, o||{}); }
+function startSandbox(){
+  markOnboarded(); closeOnboard(); try{ ev('sandbox_start'); }catch(e){}
+  sandboxMode=true; placementMode=false; cur='__sandbox__';
+  const cells={};
+  cells['A1']=sbCell('Warm-up — no timer, no score. Feel out the moves, then hit Ready.',{txt:true, it:true, fontColor:'gray'});
+  const hdr=['Region','Q1','Q2','Q3','Q4'];
+  hdr.forEach((h,i)=>{ cells[colLetter(1+i)+3]=sbCell(h,{bold:true, bb:true}); });
+  const rows=[['North',120,140,160,150],['South',90,110,130,140],['West',75,95,120,135],['East',110,130,150,170]];
+  rows.forEach((r,ri)=>{ r.forEach((v,ci)=>{
+    cells[colLetter(1+ci)+(4+ri)]=sbCell(typeof v==='number'? v*1000 : v, typeof v==='number'?{fmtStyle:'comma',decimals:0}:{}); }); });
+  S={ROWS:ROWS_MAX, cells, active:{r:4,c:1}, sel:null, clipboard:null};
+  S._ROWS0=S.ROWS;
+  colW=new Array(COLS+1).fill(COLW_DEFAULT);
+  started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
+  editing=false; editBuf=''; editCaret=0; editPointer=null; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
+  clearInterval(tickH);
+  window.__sbSeen={};
+  guided=false;   // r238: no paint-by-numbers in the sandbox — it's free play
+  try{ updateGuideBtn(); }catch(e){}
+  const tm=$('timer'); if(tm){ tm.textContent='—'; tm.classList.remove('run'); }
+  try{ $('par').textContent='—'; $('keyPar').textContent='—'; $('pb').textContent='—'; }catch(e){}
+  const dn=$('dbName'); if(dn) dn.textContent='Warm-up';
+  const dc=$('dbCat'); if(dc) dc.innerHTML='practice';
+  const tl=$('taskLine'); if(tl) tl.innerHTML='<span class="tl-dot" style="background:var(--accent)"></span>Try the moves below — <b>Ctrl+→</b> to jump, <b>Shift+→</b> to select, <b>Ctrl+Shift+→</b> to grab the whole run.';
+  drawRibbon(); render();
+  sandboxReadyCard();
+}
+function sandboxReadyCard(){
+  const r=$('result'); if(!r) return;
+  r.className='result';
+  r.innerHTML='<b>Warm-up</b> — no clock, no score. '+
+    '<kbd>Ctrl</kbd>+<kbd>→</kbd> leaps to the edge · <kbd>Shift</kbd>+<kbd>→</kbd> selects across · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>→</kbd> grabs the run · <kbd>Ctrl</kbd>+<kbd>Home</kbd> home. '+
+    '<button id="sbReady" class="ob-key primary" style="margin-top:8px;width:100%">Ready — start your first drill →</button>';
+  const b=$('sbReady'); if(b) b.onclick=exitSandbox;
+}
+let __sbT=0;
+function sandboxCallout(ctrl, shift){
+  // one-time toast per distinct chord so the sheet teaches what just happened
+  const seen=window.__sbSeen||(window.__sbSeen={});
+  const key = ctrl&&shift ? 'cs' : ctrl ? 'c' : shift ? 's' : 'm';
+  if(seen[key]) return; seen[key]=1;
+  const msg = key==='cs' ? 'Ctrl+Shift+→ — grabbed the whole run in one leap'
+            : key==='c'  ? 'Ctrl+→ — jumped straight to the edge of the data'
+            : key==='s'  ? 'Shift+→ — extended the selection (watch the blue block grow)'
+            :              'arrows move one cell — add Ctrl to leap, Shift to select';
+  try{ showToast(msg); }catch(e){}
+}
+function exitSandbox(){
+  sandboxMode=false; window.__sbSeen={};
+  try{ ev('sandbox_done'); }catch(e){}
+  loadChallenge(MENU_ORDER[0]);   // a clean, untouched level-1 starter
+  try{ showToast('same moves — now for real. take your time; the clock starts on your first keystroke'); }catch(e){}
 }
 // time-vs-par → starting-rung verdict (display only; the real ladder is earned on the boards)
 function placementVerdict(t, par){
