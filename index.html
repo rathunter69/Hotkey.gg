@@ -1805,15 +1805,15 @@ const CHALLENGES = {
   },
   ruleoff:{
     name:'Rule Off', label:'Rule off the schedule', par:52, parKeys:30,
-    aha:'Alt H B lays borders exactly where you point — top, bottom, box, outside.',
+    aha:'Alt H B lays borders where you point — top, bottom, outside, or a THICK box (Alt H B K) around the headline.',
     prompt:'A segment build is done but naked \u2014 no rulings, and the EBITDA line was never pulled through. Dress it to accounting standard: a line UNDER the headers, a line ABOVE every subtotal (the single-rule convention \u2014 a total earns its line), pull EBITDA across, bold it, rule it, and box the headline figure the MD circles. Sections and the headline year move every run.',
-    req(){ const R=this._R; return 'headers <em>B2:'+R.LC+'2</em> <em>alt h b b</em> \u00b7 rule ABOVE both subtotals <em>B'+R.sub1+':'+R.LC+R.sub1+'</em> and <em>B'+R.sub2+':'+R.LC+R.sub2+'</em> <em>alt h b t</em> \u00b7 EBITDA <em>B'+R.g+'</em> = revenue total + cost total, fill right <em>ctrl+r</em>, <em>ctrl+b</em>, <em>alt h b t</em> \u00b7 box the headline <em>'+R.focus+'</em> <em>alt h b o</em>'; },
+    req(){ const R=this._R; return 'headers <em>B2:'+R.LC+'2</em> <em>alt h b b</em> \u00b7 rule ABOVE both subtotals <em>B'+R.sub1+':'+R.LC+R.sub1+'</em> and <em>B'+R.sub2+':'+R.LC+R.sub2+'</em> <em>alt h b t</em> \u00b7 EBITDA <em>B'+R.g+'</em> = revenue total + cost total, fill right <em>ctrl+r</em>, <em>ctrl+b</em>, <em>alt h b t</em> \u00b7 box the headline <em>'+R.focus+'</em> <em>alt h b k</em> (thick box)'; },
     guide(){ const R=this._R; return [
       'headers get ruled UNDER: B2:'+R.LC+'2 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd>',
       'a total earns its line \u2014 rule ABOVE both subtotals: B'+R.sub1+':'+R.LC+R.sub1+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u00b7 then B'+R.sub2+':'+R.LC+R.sub2+' \u00b7 same walk',
       'pull EBITDA through: B'+R.g+' \u00b7 type <b>=B'+R.sub1+'+B'+R.sub2+'</b> (or point with arrows) \u00b7 <kbd>\u21b5</kbd> \u00b7 select B'+R.g+':'+R.LC+R.g+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd>',
       'the answer line reads like one: same selection \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
-      'box what the MD circles: '+R.focus+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>',
+      'box what the MD circles with a THICK box: '+R.focus+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>k</kbd> \u2014 2px says "this is the number"',
     ]; },
     targets(){ const R=this._R; return ['B2:'+R.LC+'2','B'+R.sub1+':'+R.LC+R.sub1,'B'+R.sub2+':'+R.LC+R.sub2,'B'+R.g,'B'+R.g+':'+R.LC+R.g,R.focus]; },
     demo(){ const R=this._R;
@@ -1826,7 +1826,7 @@ const CHALLENGES = {
         {sel:'B'+R.g+':'+R.LC+R.g, keys:[Kb.fillR]},
         {sel:'B'+R.g+':'+R.LC+R.g, keys:[Kb.bold]},
         {sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','t')},
-        {sel:R.focus, keys:W('h','b','o')},
+        {sel:R.focus, keys:W('h','b','k')},
       ]; },
     build(){
       const cells={};
@@ -1870,7 +1870,7 @@ const CHALLENGES = {
         {label:'add a top border above each subtotal row \u2014 rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
         {label:'pull EBITDA through \u2014 formulas, not typed numbers', ok: ebOk},
         {label:'bold the EBITDA line and add a top border above it', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
-        {label:'add an outside border around the headline at '+R.focus, ok: !!cell(R.focus).ball},
+        {label:'box the MD headline at '+R.focus+' with a THICK box (alt h b k)', ok: !!(cell(R.focus).ball && cell(R.focus).thick)},
       ];
     }
   },
@@ -2094,12 +2094,13 @@ const CHALLENGES = {
     }
   },
   dress:{
-    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:120, parKeys:32,
-    aha:'A full dress pass is chords end to end — bold, align, comma, border, fill, no mouse.',
+    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:130, parKeys:36,
+    aha:'A full dress pass is chords end to end — bold, comma, border, then shade the header with Alt H H — no mouse.',
     prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, inputs in blue, margins as clean percents, dollars with commas. Four different formatting muscles, one pass, and the sites move every run.',
-    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b b</em> \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue font \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 circle the OUTPUT: <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b o</em>'; },
+    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b b</em> \u00b7 header <em>A3:E3</em> \u2192 <em>alt h h</em> gray \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue font \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 circle the OUTPUT: <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b o</em>'; },
     guide:[
       'A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 the title carries the rule',
+      'shade the header band \u2014 select A3:E3 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u00b7 <kbd>\u2192</kbd> Gray (header) \u00b7 <kbd>\u21b5</kbd> \u2014 a shaded header reads as a header at a glance',
       'the MD circles the OUTPUT: select the margin row block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 one perimeter around the whole answer',
       'select the input block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means typed, black means computed',
       'select the margins row \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> \u2014 one decimal',
@@ -2107,10 +2108,11 @@ const CHALLENGES = {
       'the margin is adjusted \u2014 it needs its footnote: on A-of-the-margin-row \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>e</kbd> \u2014 superscript, Excel\u2019s own Alt+E \u2014 marks it \u00b9',
       'the EBITDA row carries the page \u00b7 select A-through-E on it \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold with a rule above; and notice the costs now read (parens) once the commas land',
     ],
-    targets:[function(){return 'A1';}, function(){return this._R.inpRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}, function(){return 'A'+this._R.mRow;}],
+    targets:[function(){return 'A1';}, function(){return 'A3:E3';}, function(){return this._R.inpRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}, function(){return 'A'+this._R.mRow;}],
     demo(){ const R=this._R;
       return [
         {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('b')]},
+        {sel:'A3:E3', keys:[{key:'Alt'}, L('h'), L('h'), {key:'ArrowRight'}, Kb.enter]},
         {sel:R.inpRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
         {sel:R.mRowRange, keys:[Kb.pct, {key:'Alt'}, L('h'), D(0)]},
         {sel:R.fRange, keys:[{key:'Alt'}, L('h'), L('k')]},
@@ -2149,6 +2151,7 @@ const CHALLENGES = {
       const R=this._R;
       const a1=S.cells['A1'];
       const titleOk=!!(a1&&a1.bold&&(a1.bb||a1.ball));
+      const hdrFillOk=(function(){ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+3]||{}; if(x.fill!=='gray') return false; } return true; })();
       let blueOk=true, pctOk=true, comOk=true;
       for(let c=2;c<=5;c++){ const L2=colLetter(c);
         for(let rr=4;rr<=R.lastInp;rr++){ const x=S.cells[L2+rr];
@@ -2160,6 +2163,7 @@ const CHALLENGES = {
       const dressOk=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+R.tRow]; if(!x||!x.bold||!x.bt) return false; } return true; })();
       return [
         {label:'bold A1 and add a bottom border under it', ok:titleOk},
+        {label:'shade the header band gray - select A3:E3, alt h h, Gray (header)', ok:hdrFillOk},
         {label:'Make the font blue on every typed input ('+R.inpRange+') \u2014 blue font marks hardcoded data', ok:blueOk},
         {label:'Cast the margins as percents, ONE decimal (row '+R.mRow+')', ok:pctOk},
         {label:'Comma-format the dollar figures ('+R.fRange+') \u2014 negatives flip to (parens), the desk convention', ok:comOk},
