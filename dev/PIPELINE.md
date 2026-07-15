@@ -277,3 +277,22 @@ ribbon     | 3 jobs, could take a 4th family
 format     | no codename; overlaps decimals drill — differentiate or merge
 drill      | good; ESV-onto-itself could add a decoy link
 transpose  | fine after r168 aha; lowest priority
+
+## T-N · ENGINE CAPABILITY GAPS (Excel-first) — QUEUED (Wolf r230)
+> Wolf's reframe: build drills to EXCEL's spec, not the engine's. Full audit lives in
+> dev/ENGINE_GAP_AUDIT.md. Tier-1 muscles to build first (highest drill-depth/effort),
+> then re-pass the Formatting + Foundations drills to USE them:
+>   1. FILL COLOR as a real palette (not just 'blue') + a discoverable Alt H H picker —
+>      also fixes "the way we set background colors isn't elegant".
+>   2. CLEAR menu (Alt H E A/F/C) — clear all / formats / contents.
+>   3. INDENT (Alt H 5/6 + indent prop) — sub-line-item structure.
+>   4. Ctrl+1 number-format DEPTH — date, accounting, custom scale (#,##0,,"M").
+> Tier-2: font size (Alt H F G/K), font-color as a visible dropdown, border ribbon depth
+> (L/R/outside/inside/thick + clear-border), cell styles gallery, Find & Replace.
+> NOT building: Merge & Center (the never-merge house rule is itself a lesson).
+
+## T-O · DESK THEME COLORS IN DRILLS — QUEUED (Wolf r230, design-first)
+> A desk/team sets a house palette (input-blue, header-shade, total-rule, title font);
+> drills RENDER + GRADE against that desk's palette, not the generic one. Depends on the
+> Tier-1 fill palette + font muscles (T-N) and the team/desk model. Big retention + B2B
+> hook — desks buy training that looks like their own book. Sketch to Wolf before building.
