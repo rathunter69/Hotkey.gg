@@ -176,10 +176,23 @@ window.syncThemeLabels = function(){
   try{ document.querySelectorAll('[data-theme-label]').forEach(function(el){ el.textContent = t.name; }); }catch(e){}
 };
 
+/* r252 (Wolf): accent buttons hardcoded a near-black label, which is unreadable on
+   accents like newsprint's dark red or carbon/github blue. Derive a readable
+   on-accent label PER THEME (white on dark accents, near-black on light ones) so
+   every accent CTA passes contrast on every palette — set as the --on-accent token.*/
+/* readable label on an accent fill — exposed so every page's applyTheme (some carry
+   their own copy) sets the SAME token. */
+window.hkOnAccent = function(accent){
+  var L=_schLum(accent);
+  var rDark=(Math.max(L,0)+0.05)/(0+0.05);          // vs near-black (lum≈0)
+  var rWhite=(1+0.05)/(L+0.05);                       // vs white   (lum≈1)
+  return rWhite>rDark ? '#ffffff' : '#0d1013';
+};
 window.applyTheme = function(name){
   const t = window.THEMES[name] || window.THEMES.default;
   const root = document.documentElement;
   for(const k in t.vars) root.style.setProperty('--' + k, t.vars[k]);
+  root.style.setProperty('--on-accent', window.hkOnAccent(t.vars.accent || '#6ec9a0'));
   root.setAttribute('data-dark', t.dark ? '1' : '0');   // drives cell-color visibility overrides
   window.currentTheme = name;
   window.syncThemeLabels();
@@ -676,4 +689,294 @@ window.hkRarityTier = function(pct){
 window.hkEffRarity = function(tier, dataPct, fieldN){
   if((fieldN|0)>=20 && dataPct!==undefined && dataPct!==null && isFinite(dataPct)) return dataPct;
   return tier==='l' ? 3 : tier==='e' ? 10 : tier==='r' ? 25 : 100;
+};
+
+/* =====================================================================
+   SCHOOL FLAIR — Phase 1 (T-Q, Wolf r251)  ·  r252
+   The school mark is a COLORED MONOGRAM, our own: a 1–3 letter monogram in a
+   school's real colors on ONE clean circle chip. Two-tone = background fill +
+   letter color (Wharton = navy chip / red letter). NO border ring, NO crests /
+   logos / mascots (trademark + clarity). Everything is data-driven.
+
+     SCHOOLS[id] = { name, mono, fill, ink?, face? }
+       name  display name (also what the .edu auto-match / school_tag may carry)
+       mono  the monogram (1–3 chars)
+       fill  chip background — the school's PRIMARY color
+       ink   letter color — the school's SECOND color; OMIT to auto-pick a
+             readable ink (dark on light fills — e.g. Columbia light-blue → navy)
+       face  'serif' | 'condensed' | undefined (default geometric mono)
+
+   Colors matched as closely as possible to each school's real identity, held to
+   our contrast bar (schoolInk guarantees a legible letter on every fill).
+   ~100 finance feeders seeded for Wolf to trim/approve. ===================== */
+window.SCHOOLS = {
+  /* ---- Ivy League ---- */
+  harvard:      { name:'Harvard',            mono:'H',   fill:'#A51C30', face:'serif' },
+  yale:         { name:'Yale',               mono:'Y',   fill:'#00356B', face:'serif' },
+  princeton:    { name:'Princeton',          mono:'P',   fill:'#111111', ink:'#E77500', face:'serif' },
+  penn:         { name:'Penn',               mono:'P',   fill:'#011F5B', ink:'#E4002B' },
+  columbia:     { name:'Columbia',           mono:'C',   fill:'#B9D9EB' },              /* light fill → auto navy ink */
+  brown:        { name:'Brown',              mono:'B',   fill:'#4E3629', ink:'#FFC72C', face:'serif' },
+  dartmouth:    { name:'Dartmouth',          mono:'D',   fill:'#00693E', face:'serif' },
+  cornell:      { name:'Cornell',            mono:'C',   fill:'#B31B1B', face:'serif' },
+  /* ---- Target undergrad + their marquee B-schools ---- */
+  wharton:      { name:'Wharton',            mono:'W',   fill:'#012169', ink:'#E4002B' },
+  stanford:     { name:'Stanford',           mono:'S',   fill:'#8C1515', face:'serif' },
+  gsb:          { name:'Stanford GSB',       mono:'GSB', fill:'#8C1515', ink:'#DAD7CB', face:'serif' },
+  mit:          { name:'MIT',                mono:'MIT', fill:'#750014', ink:'#C2C0BF', face:'condensed' },
+  sloan:        { name:'MIT Sloan',          mono:'S',   fill:'#750014', ink:'#C2C0BF' },
+  nyu:          { name:'NYU',                mono:'NYU', fill:'#57068C' },
+  stern:        { name:'NYU Stern',          mono:'S',   fill:'#57068C' },
+  chicago:      { name:'UChicago',           mono:'C',   fill:'#800000', face:'serif' },
+  booth:        { name:'Chicago Booth',      mono:'B',   fill:'#800000' },
+  northwestern: { name:'Northwestern',       mono:'N',   fill:'#4E2A84' },
+  kellogg:      { name:'Kellogg',            mono:'K',   fill:'#4E2A84' },
+  duke:         { name:'Duke',               mono:'D',   fill:'#012169' },
+  fuqua:        { name:'Duke Fuqua',         mono:'F',   fill:'#012169' },
+  georgetown:   { name:'Georgetown',         mono:'G',   fill:'#041E42', ink:'#8A8D8F', face:'serif' },
+  uva:          { name:'Virginia',           mono:'V',   fill:'#232D4B', ink:'#E57200' },
+  darden:       { name:'Darden',             mono:'D',   fill:'#232D4B', ink:'#E57200' },
+  michigan:     { name:'Michigan',           mono:'M',   fill:'#00274C', ink:'#FFCB05' },
+  ross:         { name:'Michigan Ross',      mono:'R',   fill:'#00274C', ink:'#FFCB05' },
+  berkeley:     { name:'UC Berkeley',        mono:'Cal', fill:'#002676', ink:'#FDB515' },
+  haas:         { name:'Berkeley Haas',      mono:'H',   fill:'#002676', ink:'#FDB515' },
+  utaustin:     { name:'UT Austin',          mono:'UT',  fill:'#BF5700', face:'condensed' },
+  mccombs:      { name:'McCombs',            mono:'M',   fill:'#BF5700', face:'condensed' },
+  notredame:    { name:'Notre Dame',         mono:'ND',  fill:'#0C2340', ink:'#C99700', face:'serif' },
+  vanderbilt:   { name:'Vanderbilt',         mono:'V',   fill:'#121212', ink:'#CFAE70', face:'serif' },
+  washu:        { name:'WashU',              mono:'W',   fill:'#006A4D' },
+  usc:          { name:'USC',                mono:'SC',  fill:'#990000', ink:'#FFC72C', face:'serif' },
+  ucla:         { name:'UCLA',               mono:'LA',  fill:'#2774AE', ink:'#FFD100' },
+  emory:        { name:'Emory',              mono:'E',   fill:'#012169', ink:'#F2A900' },
+  bostoncollege:{ name:'Boston College',     mono:'BC',  fill:'#862633', ink:'#BC9B6A', face:'serif' },
+  villanova:    { name:'Villanova',          mono:'V',   fill:'#002664', ink:'#13B5EA' },
+  indiana:      { name:'Indiana Kelley',     mono:'IU',  fill:'#990000', ink:'#EEEDEB', face:'serif' },
+  unc:          { name:'UNC',                mono:'NC',  fill:'#4B9CD3', ink:'#13294B' },  /* Carolina blue → navy letter */
+  cmu:          { name:'Carnegie Mellon',    mono:'CMU', fill:'#941120' },
+  jhu:          { name:'Johns Hopkins',      mono:'JHU', fill:'#002D72' },
+  rice:         { name:'Rice',               mono:'R',   fill:'#00205B', face:'serif' },
+  gatech:       { name:'Georgia Tech',       mono:'GT',  fill:'#003057', ink:'#B3A369', face:'condensed' },
+  wakeforest:   { name:'Wake Forest',        mono:'W',   fill:'#000000', ink:'#9E7E38', face:'serif' },
+  /* ---- Semi-targets ---- */
+  bu:           { name:'Boston University',  mono:'BU',  fill:'#CC0000' },
+  fordham:      { name:'Fordham',            mono:'F',   fill:'#900028', face:'serif' },
+  baruch:       { name:'Baruch',             mono:'B',   fill:'#003865' },
+  bentley:      { name:'Bentley',            mono:'B',   fill:'#00457C', ink:'#B5A268' },
+  lehigh:       { name:'Lehigh',             mono:'L',   fill:'#663300', ink:'#FFFFFF' },
+  bucknell:     { name:'Bucknell',           mono:'B',   fill:'#003865', ink:'#E87722' },
+  wisconsin:    { name:'Wisconsin',          mono:'W',   fill:'#C5050C', face:'serif' },
+  ohiostate:    { name:'Ohio State',         mono:'OS',  fill:'#BB0000', ink:'#B0B7BC', face:'condensed' },
+  illinois:     { name:'Illinois',           mono:'I',   fill:'#13294B', ink:'#FF5F05' },
+  purdue:       { name:'Purdue',             mono:'P',   fill:'#000000', ink:'#CEB888', face:'condensed' },
+  pennstate:    { name:'Penn State',         mono:'PSU', fill:'#041E42', face:'condensed' },
+  maryland:     { name:'Maryland',           mono:'M',   fill:'#E21833', ink:'#FFD520' },
+  rutgers:      { name:'Rutgers',            mono:'R',   fill:'#CC0033', face:'serif' },
+  miamifl:      { name:'Miami',              mono:'M',   fill:'#005030', ink:'#F47321' },
+  tulane:       { name:'Tulane',             mono:'T',   fill:'#14453D', ink:'#418FDE' },
+  smu:          { name:'SMU Cox',            mono:'SMU', fill:'#C8102E' },
+  tcu:          { name:'TCU',                mono:'TCU', fill:'#4D1979' },
+  babson:       { name:'Babson',             mono:'B',   fill:'#006A4D' },
+  northeastern: { name:'Northeastern',       mono:'NU',  fill:'#CC0000', face:'condensed' },
+  wm:           { name:'William & Mary',     mono:'WM',  fill:'#115740', ink:'#B9975B', face:'serif' },
+  uga:          { name:'Georgia',            mono:'G',   fill:'#BA0C2F', ink:'#000000', face:'serif' },
+  florida:      { name:'Florida',            mono:'UF',  fill:'#0021A5', ink:'#FA4616' },
+  uwashington:  { name:'Washington Foster',  mono:'W',   fill:'#4B2E83', ink:'#E8E3D3' },
+  minnesota:    { name:'Minnesota',          mono:'M',   fill:'#7A0019', ink:'#FFCC33', face:'serif' },
+  tamu:         { name:'Texas A&M',          mono:'AM',  fill:'#500000', face:'serif' },
+  asu:          { name:'Arizona State',      mono:'ASU', fill:'#8C1D40', ink:'#FFC627' },
+  richmond:     { name:'Richmond',           mono:'R',   fill:'#001970', ink:'#E5B93C' },
+  casewestern:  { name:'Case Western',       mono:'C',   fill:'#0A304E' },
+  rochester:    { name:'Rochester Simon',    mono:'R',   fill:'#003B71', ink:'#FFD100' },
+  bryant:       { name:'Bryant',             mono:'B',   fill:'#000000', ink:'#C5A253' },
+  byu:          { name:'BYU',                mono:'BYU', fill:'#002E5D' },              /* big consulting/accounting feeder */
+  drexel:       { name:'Drexel',             mono:'D',   fill:'#07294D', ink:'#FFC600' },
+  gwu:          { name:'George Washington',  mono:'GW',  fill:'#033C5A', ink:'#A69362' },
+  msu:          { name:'Michigan State',     mono:'MSU', fill:'#18453B' },
+  /* ---- Liberal-arts feeders ---- */
+  amherst:      { name:'Amherst',            mono:'A',   fill:'#31006F', face:'serif' },
+  williams:     { name:'Williams',           mono:'W',   fill:'#512698', ink:'#FFD100', face:'serif' },
+  middlebury:   { name:'Middlebury',         mono:'M',   fill:'#0D2B52', face:'serif' },
+  colgate:      { name:'Colgate',            mono:'C',   fill:'#862633', face:'serif' },
+  hamilton:     { name:'Hamilton',           mono:'H',   fill:'#00548F', face:'serif' },
+  cmc:          { name:'Claremont McKenna',  mono:'CMC', fill:'#82112F', ink:'#B99C6B' },
+  pomona:       { name:'Pomona',             mono:'P',   fill:'#00449C', ink:'#F0AB00' },
+  swarthmore:   { name:'Swarthmore',         mono:'S',   fill:'#862334', face:'serif' },
+  bowdoin:      { name:'Bowdoin',            mono:'B',   fill:'#000000', ink:'#C8B267', face:'serif' },
+  davidson:     { name:'Davidson',           mono:'D',   fill:'#000000', ink:'#C8102E', face:'serif' },
+  washlee:      { name:'Washington & Lee',   mono:'WL',  fill:'#003865', ink:'#B08A38', face:'serif' },
+  holycross:    { name:'Holy Cross',         mono:'HC',  fill:'#602D89', face:'serif' },
+  /* ---- HBCU finance feeders ---- */
+  howard:       { name:'Howard',             mono:'H',   fill:'#003A63', ink:'#F44C5E', face:'serif' },
+  morehouse:    { name:'Morehouse',          mono:'M',   fill:'#6F263D', ink:'#B3995D', face:'serif' },
+  spelman:      { name:'Spelman',            mono:'S',   fill:'#00539B', face:'serif' },
+  /* ---- International finance feeders ---- */
+  lse:          { name:'LSE',                mono:'LSE', fill:'#7A003C' },
+  oxford:       { name:'Oxford',             mono:'O',   fill:'#002147', face:'serif' },
+  cambridge:    { name:'Cambridge',          mono:'C',   fill:'#0072CF', face:'serif' },
+  imperial:     { name:'Imperial College',   mono:'IC',  fill:'#003E74' },
+  warwick:      { name:'Warwick',            mono:'W',   fill:'#5A2D81' },
+  lbs:          { name:'London Business Sch',mono:'LBS', fill:'#002147' },
+  bocconi:      { name:'Bocconi',            mono:'B',   fill:'#002F6C', face:'serif' },
+  hec:          { name:'HEC Paris',          mono:'HEC', fill:'#00205B', ink:'#B8985A' },
+  insead:       { name:'INSEAD',             mono:'I',   fill:'#00447C' },
+  mcgill:       { name:'McGill',             mono:'M',   fill:'#ED1B2F', face:'serif' },
+  toronto:      { name:'Toronto Rotman',     mono:'T',   fill:'#002A5C', face:'serif' },
+  ivey:         { name:'Ivey (Western)',     mono:'I',   fill:'#4F2683' },
+  queens:       { name:'Queen’s',       mono:'Q',   fill:'#11335D', ink:'#F2A900', face:'serif' },
+  waterloo:     { name:'Waterloo',           mono:'W',   fill:'#000000', ink:'#FED34C', face:'condensed' },
+  ubc:          { name:'UBC',                mono:'UBC', fill:'#002145', ink:'#F2A900' },
+  nus:          { name:'NUS Singapore',      mono:'NUS', fill:'#003D7C', ink:'#EF7C00' },
+  hku:          { name:'Hong Kong (HKU)',    mono:'HKU', fill:'#00695C', ink:'#D4AF37' },
+  tsinghua:     { name:'Tsinghua',           mono:'T',   fill:'#660874', face:'serif' },
+  pku:          { name:'Peking',             mono:'P',   fill:'#94070A', face:'serif' },
+  /* ---- more US feeders + marquee MBA brands ---- */
+  tuck:         { name:'Tuck (Dartmouth)',   mono:'T',   fill:'#00693E' },
+  cbs:          { name:'Columbia Business',  mono:'CBS', fill:'#012169', ink:'#9BCBEB' },
+  yalesom:      { name:'Yale SOM',           mono:'SOM', fill:'#00356B', face:'serif' },
+  syracuse:     { name:'Syracuse',           mono:'S',   fill:'#F76900', ink:'#0E1E45' },
+  pitt:         { name:'Pittsburgh',         mono:'P',   fill:'#003594', ink:'#FFB81C' },
+  uconn:        { name:'UConn',              mono:'C',   fill:'#000E2F', ink:'#E4002B' }
+};
+
+/* small curated palette for freeform "Other" schools — professional, distinct,
+   and deterministically assigned so a given name always wears the same swatch. */
+window.SCHOOL_OTHER_PALETTE = [
+  '#2E4A62', /* slate blue  */ '#1F6E5A', /* forest    */ '#6D3B5E', /* plum   */
+  '#8A4B2E', /* clay        */ '#3A3F8F', /* indigo    */ '#7A2E3B', /* wine   */
+  '#4E5B3C', /* olive       */ '#2C6E7F', /* teal      */ '#8A6D2E'  /* bronze */
+];
+
+/* relative luminance (sRGB → linear), for auto-contrast ink selection */
+function _schLum(hex){
+  var m=/^#?([0-9a-f]{6})$/i.exec(String(hex||'').trim()); if(!m) return 0;
+  var n=parseInt(m[1],16), ch=[(n>>16)&255,(n>>8)&255,n&255].map(function(v){
+    v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); });
+  return 0.2126*ch[0]+0.7152*ch[1]+0.0722*ch[2];
+}
+/* the readable letter color for a given fill: explicit ink wins; otherwise a
+   deep neutral navy on light fills, near-white on dark ones. */
+window.schoolInk = function(fill, ink){
+  if(ink) return ink;
+  return _schLum(fill) > 0.48 ? '#132339' : '#F8F8F5';
+};
+function _schEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+/* freeform initials: up to 2 letters, skipping filler words */
+window.schoolMonoFromName = function(name){
+  var words=String(name||'').trim().split(/[\s.&\-]+/).filter(function(w){
+    return w && !/^(of|the|and|at|de|for|university|college|school|business)$/i.test(w); });
+  if(!words.length) words=[String(name||'?').trim()||'?'];
+  var m = words.length>=2 ? (words[0][0]+words[1][0]) : words[0].slice(0,2);
+  return m.toUpperCase();
+};
+window.schoolSwatchFor = function(name){
+  var s=String(name||''), h=0; for(var i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))>>>0; }
+  var P=window.SCHOOL_OTHER_PALETTE; return P[h % P.length];
+};
+function _schEntry(id, S){
+  return { id:id, name:S.name, mono:S.mono, fill:S.fill,
+           ink:window.schoolInk(S.fill, S.ink), face:S.face||'', other:false };
+}
+function _schOther(name){
+  name=String(name||'').trim();
+  var fill=window.schoolSwatchFor(name);
+  return { id:null, name:name||'Other', mono:window.schoolMonoFromName(name), fill:fill,
+           ink:window.schoolInk(fill), face:'', other:true };
+}
+/* resolve a stored value (a SCHOOLS id, a display name from the .edu match, or an
+   "other:Free Name") to a renderable entry — always returns something legible. */
+window.schoolResolve = function(tag){
+  if(tag==null || tag==='') return null;
+  tag=String(tag).trim(); if(!tag) return null;
+  var S=window.SCHOOLS||{}, key=tag.toLowerCase();
+  if(key.indexOf('other:')===0) return _schOther(tag.slice(6).trim());
+  if(S[tag]) return _schEntry(tag, S[tag]);
+  if(S[key]) return _schEntry(key, S[key]);
+  var id;
+  for(id in S){ if(S[id].name.toLowerCase()===key) return _schEntry(id, S[id]); }
+  for(id in S){ var nm=S[id].name.toLowerCase(); if(nm===key || nm.replace(/[^a-z0-9]/g,'')===key.replace(/[^a-z0-9]/g,'')) return _schEntry(id, S[id]); }
+  return _schOther(tag);   /* unknown → freeform monogram, never a broken chip */
+};
+/* THE component: schoolChip(schoolId | school_tag, size) → inline colored monogram.
+   Self-contained inline styles so it renders identically on every page + surface. */
+window.schoolChip = function(idOrTag, size){
+  var s = window.schoolResolve(idOrTag); if(!s) return '';
+  size = size || 18;
+  var len = s.mono.length;
+  var fs = Math.round(size * (len>=3 ? 0.40 : len===2 ? 0.46 : 0.54));
+  var fam = s.face==='serif'     ? "Georgia,'Times New Roman',serif"
+          : s.face==='condensed' ? "'Arial Narrow','Helvetica Neue',Arial,sans-serif"
+          : "'JetBrains Mono',ui-monospace,'SFMono-Regular',monospace";
+  var ls = len>=2 ? '-.03em' : '0';
+  return '<span class="school-chip'+(s.other?' school-other':'')+'" title="'+_schEsc(s.name)+'" '+
+    'role="img" aria-label="'+_schEsc(s.name)+'" data-school="'+_schEsc(s.id||('other:'+s.name))+'" '+
+    'style="display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;box-sizing:border-box;'+
+    'width:'+size+'px;height:'+size+'px;border-radius:50%;flex:0 0 auto;padding:0 1px;'+
+    'background:'+s.fill+';color:'+s.ink+';font-family:'+fam+';font-weight:700;'+
+    'font-size:'+fs+'px;line-height:1;letter-spacing:'+ls+';overflow:hidden;user-select:none">'+
+    _schEsc(s.mono)+'</span>';
+};
+/* ordered id list for pickers (roster order above == curated priority order) */
+window.SCHOOL_IDS = Object.keys(window.SCHOOLS);
+
+/* Shared SCHOOL PICKER — curated search + freeform "Other". Returns a DOM element
+   whose .getValue() gives the current selection (a SCHOOLS id, an "other:Name"
+   string, or null). onPick(value) fires on every change. Self-contained styling
+   (CSS-var fallbacks) so it drops into signup, the account page, anywhere. */
+window.buildSchoolPicker = function(current, onPick){
+  var wrap=document.createElement('div'); wrap.className='school-picker';
+  wrap.style.cssText='display:flex;flex-direction:column;gap:8px;font-family:var(--mono,ui-monospace,monospace)';
+  var cur=document.createElement('div');
+  var search=document.createElement('input'); search.type='text';
+  search.placeholder='search ~100 schools…'; search.setAttribute('aria-label','search schools');
+  search.style.cssText='width:100%;box-sizing:border-box;background:var(--surface2,#33363c);color:var(--text,#eee);border:1px solid var(--line,#555);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12.5px';
+  var list=document.createElement('div');
+  list.style.cssText='max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:1px;border:1px solid var(--line,#555);border-radius:8px;padding:5px;background:var(--surface,#2f3238)';
+  var state={ value: current||null };
+  function optBtn(id, S){
+    var b=document.createElement('button'); b.type='button'; b.setAttribute('data-id',id);
+    b.style.cssText='display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;color:var(--text,#eee);font-family:inherit;font-size:12.5px;padding:6px 7px;border-radius:6px;cursor:pointer';
+    b.onmouseover=function(){ b.style.background='var(--surface2,#3a3e46)'; };
+    b.onmouseout=function(){ b.style.background='none'; };
+    b.innerHTML=window.schoolChip(id,20)+'<span>'+_schEsc(S.name)+'</span>';
+    b.onclick=function(){ set(id); };
+    return b;
+  }
+  function renderList(q){
+    q=(q||'').trim().toLowerCase(); list.innerHTML='';
+    var ids=window.SCHOOL_IDS, shown=0;
+    for(var i=0;i<ids.length;i++){ var id=ids[i], S=window.SCHOOLS[id];
+      if(q && S.name.toLowerCase().indexOf(q)<0 && id.toLowerCase().indexOf(q)<0) continue;
+      list.appendChild(optBtn(id,S)); shown++;
+      if(shown>=80 && !q) break;
+    }
+    var other=document.createElement('div');
+    other.style.cssText='display:flex;gap:6px;align-items:center;margin-top:5px;padding-top:7px;border-top:1px solid var(--line,#555)';
+    var oi=document.createElement('input'); oi.type='text'; oi.value = q ? search.value.trim() : '';
+    oi.placeholder='other — type your school'; oi.setAttribute('aria-label','other school name'); oi.maxLength=40;
+    oi.style.cssText='flex:1;min-width:0;background:var(--surface2,#33363c);color:var(--text,#eee);border:1px solid var(--line,#555);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px';
+    var ob=document.createElement('button'); ob.type='button'; ob.textContent='use';
+    ob.style.cssText='background:var(--accent,#6ec9a0);color:var(--on-accent,#0d1013);border:none;border-radius:6px;padding:6px 13px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer';
+    function useOther(){ var nm=oi.value.trim(); if(nm) set('other:'+nm); }
+    ob.onclick=useOther; oi.onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); useOther(); } };
+    if(!shown && q){ var none=document.createElement('div');
+      none.style.cssText='color:var(--faint,#888);font-size:11px;padding:6px 7px';
+      none.textContent='no curated match — add it as “Other” below'; list.appendChild(none); }
+    other.appendChild(oi); other.appendChild(ob); list.appendChild(other);
+  }
+  function renderCur(){
+    if(state.value){ var s=window.schoolResolve(state.value);
+      cur.innerHTML='<div style="display:flex;align-items:center;gap:9px;padding:2px 0">'+
+        window.schoolChip(state.value,26)+'<span style="color:var(--text,#eee);font-size:13.5px;font-weight:600">'+_schEsc(s?s.name:state.value)+'</span>'+
+        '<button type="button" data-clear="1" style="margin-left:auto;background:none;border:none;color:var(--faint,#888);font-family:inherit;font-size:11px;cursor:pointer;text-decoration:underline">remove</button></div>';
+      var cl=cur.querySelector('[data-clear]'); if(cl) cl.onclick=function(){ set(null); };
+    } else { cur.innerHTML='<div style="color:var(--faint,#888);font-size:12px;padding:2px 0">no school set — pick one to fly your colors</div>'; }
+  }
+  function set(v){ state.value=v; renderCur(); try{ if(onPick) onPick(v); }catch(e){} }
+  search.oninput=function(){ renderList(search.value); };
+  wrap.appendChild(cur); wrap.appendChild(search); wrap.appendChild(list);
+  renderCur(); renderList('');
+  wrap.getValue=function(){ return state.value; };
+  wrap.setValue=function(v){ set(v); };
+  return wrap;
 };
