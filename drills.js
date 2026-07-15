@@ -190,16 +190,16 @@ window.HOTKEY_CAMPAIGN = {
   // r242 \u2014 chapters mirror the v2.1 groups 1:1 (the campaign IS the spine). Escalating XP:
   // the free tiers (c1-c3) hook, the PRO tiers (c5-c8) carry the fat bounties that funnel to PRO.
   chapters: [
-    { id:'c1', name:'v1 \u00b7 Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','modeltour','blocksel','filldr','pastes','rowops','colops','editfix','undo','copyover'] },
-    { id:'c2', name:'v2 \u00b7 Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','ruleoff','ruleaudit','dress','typeset','decimals','center','autofit','combo','gauntlet'] },
-    { id:'c3', name:'v3 \u00b7 Formulas I',             badge:'\u2797',        xp:250, keys:['margin','foot','percent','growth','cagr','anchor','bridge','sumif','rollup','cases'] },
-    { id:'c4', name:'v4 \u00b7 Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','scrub','recon','grpfold','filterpass','unhide','lookup','lookup2','drill','series'] },
-    { id:'c5', name:'v5 \u00b7 Formulas II',            badge:'\ud83e\uddee', xp:350, keys:['audit','triage','wrapfix','balcheck','stalelink','wirewalk','hunt','signerr','versionup','balance'] },
-    { id:'c6', name:'v6 \u00b7 Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:450, keys:['wacc','fcfbuild','dcf','comps','txncomps','football','dcfsens','retbridge','accdil','sourcesuses'] },
-    { id:'c7', name:'v7 \u00b7 Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:500, keys:['lbo','revolver','schedule','intsched','waterfall','cascade','wk13','liqbridge','covtable','debtsched'] },
-    { id:'c8', name:'v8 \u00b7 Full Builds',            badge:'\ud83c\udfd7', xp:600, keys:['isbuild','bsbuild','cfslink','nwcsched','threestmt','opmodel','dcfbuild','lbobuild','debtblock','dashcover'] },
+    { id:'c1', name:'v1 \u00b7 Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'] },
+    { id:'c2', name:'v2 \u00b7 Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','dress','gauntlet'] },
+    { id:'c3', name:'v3 \u00b7 Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
+    { id:'c4', name:'v4 \u00b7 Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
+    { id:'c5', name:'v5 \u00b7 Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
+    { id:'c6', name:'v6 \u00b7 Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
+    { id:'c7', name:'v7 \u00b7 Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'] },
+    { id:'c8', name:'v8 \u00b7 Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
   ],
-  finisher: { badge:'\u2b50', name:'Model complete', xp:500 },
+  finisher: { badge:'\u2b50', name:'Model complete', xp:600 },
 };
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
@@ -374,11 +374,11 @@ window.HOTKEY_GATES = {
   // Full Builds are PRO (see HOTKEY_PREMIUM) — the level+clears path or the chapters below
   // is the beta bypass; a real PRO entitlement skips all of it.
   groups: {
-    'Data & Lookups': { lvl:4,  clears:8,  chapters:['c1','c2','c3'] },
-    'Formulas II':    { lvl:6,  clears:12, chapters:['c1','c2','c3','c4'] },
-    'Models I':       { lvl:9,  clears:18, chapters:['c1','c2','c3','c4','c5'] },
-    'Models II':      { lvl:12, clears:26, chapters:['c1','c2','c3','c4','c5','c6'] },
-    'Full Builds':    { lvl:15, clears:34, chapters:['c1','c2','c3','c4','c5','c6','c7'] },
+    'Data & Lookups': { lvl:3,  clears:8,  chapters:['c1','c2','c3'] },
+    'Formulas II':    { lvl:5,  clears:12, chapters:['c1','c2','c3','c4'] },
+    'Models I':       { lvl:7,  clears:18, chapters:['c1','c2','c3','c4','c5'] },
+    'Models II':      { lvl:9,  clears:26, chapters:['c1','c2','c3','c4','c5','c6'] },
+    'Full Builds':    { lvl:11, clears:32, chapters:['c1','c2','c3','c4','c5','c6','c7'] },
   },
 };
 
