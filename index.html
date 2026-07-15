@@ -3483,59 +3483,79 @@ const CHALLENGES = {
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Grab the whole block', par:52, parKeys:10,
-    aha:'ctrl+shift+arrows take the island whole, ctrl+x ctrl+v moves it — dress it where it lands',
-    prompt:'THREE data islands, and real instructions on two of them: bold the first where it sits — and the second one is parked in the WRONG PLACE. Take it whole with ctrl+shift+arrows, Ctrl+X, drop it on the marked spot with Ctrl+V, and comma-format it at its new address. The third island is a decoy testing your aim. Blocks are objects: grab, move, dress.',
-    req(){ const o=this._o; return 'island one at <em>'+o.t0+'</em>: <em>ctrl+⇧+↓</em> <em>ctrl+⇧+→</em> · <em>ctrl+b</em> · island two at <em>'+o.u0+'</em>: same chords · <em>ctrl+x</em> · to <em>'+o.dst+'</em> · <em>ctrl+v</em> · <em>alt h k</em> · the decoy at <em>'+o.d0+'</em> stays put'; },
+    name:'Block Sel.', label:'Grab the whole block', par:58, parKeys:12,
+    aha:'a block is an OBJECT — read its tag, then grab it whole: bold the LIVE one in place, carry the misplaced one to the model frame, leave the STALE one dead',
+    prompt:'Three comp blocks landed loose on the page — and each one is TAGGED, so you have to read them. The ● LIVE block is good where it sits: grab it whole (Ctrl+Shift+arrows) and bold it. One is tagged ▸ TO MODEL: take it whole, Ctrl+X, carry it to the outlined frame, Ctrl+V, and comma-format it at its new home. The STALE block is a dead paste — it gets nothing. Which block is which changes every run; read the tags, don’t guess.',
+    req(){ const o=this._o; return 'read the tags · <em>● LIVE</em> at '+o.live+': grab whole (<em>ctrl+⇧+↓</em> <em>ctrl+⇧+→</em>) · <em>ctrl+b</em> · <em>▸ TO MODEL</em> at '+o.move+': grab whole · <em>ctrl+x</em> · to the frame '+o.frame+' · <em>ctrl+v</em> · <em>alt h k</em> · <em>STALE</em> stays put'; },
     guide(){ const o=this._o; return [
-      'first brief — the island at <b>'+o.t0+'</b>: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> · <kbd>ctrl</kbd>+<kbd>b</kbd>',
-      'second brief — <b>'+o.u0+'</b> is parked wrong: same two chords take it whole · <kbd>ctrl</kbd>+<kbd>x</kbd> cuts it',
-      'land on <b>'+o.dst+'</b> · <kbd>ctrl</kbd>+<kbd>v</kbd> — the block moves WHOLE and stays selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> dresses it',
-      'the decoy at '+o.d0+' gets NOTHING — moved, bolded or formatted, it fails the brief',
+      'read the tags first — the <b>● LIVE</b> block at <b>'+o.live+'</b> is good where it sits: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> grabs it whole · <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      'the <b>▸ TO MODEL</b> block at <b>'+o.move+'</b> is parked wrong: same two chords take it whole · <kbd>ctrl</kbd>+<kbd>x</kbd> cuts it',
+      'land on the frame at <b>'+o.frame+'</b> · <kbd>ctrl</kbd>+<kbd>v</kbd> — the block moves WHOLE and stays selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> comma-formats it at its new home',
+      'the <b>STALE</b> block is a dead paste — moved, bolded or formatted, it fails the brief',
     ]; },
-    targets(){ const o=this._o; return [o.t0,o.u0,o.dst]; },
-    demo(){ const o=this._o; return [
-      {sel:o.t0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'b',ctrl:true}]},
-      {sel:o.u0, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'x',ctrl:true}]},
-      {sel:o.dst, keys:[{key:'v',ctrl:true},{key:'Alt'},L('h'),L('k')]},
-    ]; },
+    targets(){ const o=this._o; return [o.live, o.move, o.frame]; },
+    demo(){ const o=this._o;
+      const grab=[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true}];
+      return [
+        {sel:o.live,   keys:[...grab, {key:'b',ctrl:true}]},                 // bold the LIVE block in place
+        {sel:o.move,   keys:[...grab, {key:'x',ctrl:true}]},                 // cut the misplaced block whole
+        {sel:o.frame,  keys:[{key:'v',ctrl:true}]},                         // drop it in the frame
+        {sel:o.frameRng, keys:[{key:'Alt'},L('h'),L('k')]},                 // comma-format at the new home
+      ]; },
     build(){
+      // r222 (Wolf sample): the flagship LIFT of a block-selection drill — same core muscle
+      // (Ctrl+Shift grab, Ctrl+X/V move, dress) but now the player READS on-board tags to
+      // decide each block's fate (LIVE→bold in place, ▸TO MODEL→carry to the outlined frame,
+      // STALE→leave it), and the destination is a visible outlined frame, not a bare address.
+      // Which block carries which tag randomizes every run, so it can't be run from memory.
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
       const cells={};
-      const island=(c,r0,n,title)=>{
-        cells[colLetter(c)+(r0-1)]={...blankCell(),value:title,txt:true};
-        const keys=[];
-        for(let i=0;i<n;i++){ for(let j=0;j<2;j++){
-          const key=colLetter(c+j)+(r0+i);
-          cells[key]={...blankCell(),value:rnd(10,90)*10,fontColor:'blue'};
-          keys.push(key); } }
-        return keys;
-      };
-      // spot geometry: heights cap at 4 so a top island's bottom (row 6) never touches
-      // the lower island's title (row 8) — contiguous cells would let ctrl+shift+↓ ride
-      // through BOTH islands. Fifth spot sits at cols 9-10 (own column band) for the
-      // same reason. The unused spots become the MOVE destination pool.
-      const spots=[[2,3],[6,3],[2,9],[6,9],[9,5]];
-      for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
-      const T0=spots[0], U0=spots[1], D0=spots[2], DEST=spots[3];
-      const n1=rnd(3,4), n2=rnd(3,4);
-      this._tk=island(T0[0],T0[1],n1,'Brief 1 ↓ bold');
-      this._uk=island(U0[0],U0[1],n2,'Brief 2 ↓ move + commas');
-      this._dk=island(D0[0],D0[1],rnd(3,4),'Decoy');
-      this._uvals=this._uk.map(k=>cells[k].value);
-      cells[colLetter(DEST[0])+(DEST[1]-1)]={...blankCell(),value:'Move here ↓',txt:true};
-      this._dstk=[];
-      for(let i=0;i<n2;i++) for(let j=0;j<2;j++) this._dstk.push(colLetter(DEST[0]+j)+(DEST[1]+i));
-      this._o={ t0:colLetter(T0[0])+T0[1], u0:colLetter(U0[0])+U0[1], d0:colLetter(D0[0])+D0[1],
-        dst:colLetter(DEST[0])+DEST[1] };
-      return {ROWS:Math.max(13,T0[1]+n1,U0[1]+n2,DEST[1]+n2,D0[1]+4), cells, active:{r:T0[1],c:T0[0]}, sel:null, colW:{}};
+      cells['A1']={...blankCell(),value:codename()+' — comp blocks came in loose',txt:true,bold:true};
+      const N=rnd(3,4);
+      // [col,row0]; two-col bands with an empty gap row between the stacks so a grab can't bleed
+      const spots=shuffle([[2,3],[6,3],[2,9],[6,9]]);
+      const frame=spots[3];
+      const roles=shuffle(['live','move','stale']);
+      const labels=shuffle(['Peer set','Trading tape','Screen output','Sector comps','Deal set','Precedent tape']);
+      const TAG={ live:{t:'● LIVE',c:'green'}, move:{t:'▸ TO MODEL',c:'orange'}, stale:{t:'STALE',c:'darkgray'} };
+      const isl={};
+      [0,1,2].forEach(i=>{ const c0=spots[i][0], r0=spots[i][1], role=roles[i];
+        cells[colLetter(c0)+(r0-1)]={...blankCell(),value:labels[i],txt:true,bold:true};
+        cells[colLetter(c0+1)+(r0-1)]={...blankCell(),value:TAG[role].t,txt:true,bold:true,align:'r',fontColor:TAG[role].c};
+        const keys=[], vals=[];
+        for(let rr=0;rr<N;rr++) for(let cc=0;cc<2;cc++){ const k=colLetter(c0+cc)+(r0+rr);
+          const v=rnd(12,98)*100; cells[k]={...blankCell(),value:v,fontColor:'blue'}; keys.push(k); vals.push(v); }
+        isl[role]={c0,r0,keys,vals};
+      });
+      const fc=frame[0], fr0=frame[1];
+      cells[colLetter(fc)+(fr0-1)]={...blankCell(),value:'the model ▸ drop here',txt:true,bold:true,fontColor:'orange'};
+      const frameKeys=[];
+      for(let rr=0;rr<N;rr++) for(let cc=0;cc<2;cc++){ const k=colLetter(fc+cc)+(fr0+rr);
+        cells[k]={...blankCell(),bt:rr===0,bb:rr===N-1,bl:cc===0,br:cc===1};   // outlined empty drop-zone
+        frameKeys.push(k); }
+      this._N=N; this._live=isl.live; this._move=isl.move; this._stale=isl.stale; this._frameKeys=frameKeys;
+      this._o={ live:colLetter(isl.live.c0)+isl.live.r0, move:colLetter(isl.move.c0)+isl.move.r0,
+        stale:colLetter(isl.stale.c0)+isl.stale.r0, frame:colLetter(fc)+fr0,
+        frameRng:colLetter(fc)+fr0+':'+colLetter(fc+1)+(fr0+N-1) };
+      return {ROWS:Math.max(13,fr0+N), cells, active:{r:isl.live.r0,c:isl.live.c0}, sel:null,
+        colW:{1:88,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74,10:74}};   // wide enough for 4-digit comma values (no #####)
     },
     checks(S){
+      const L=this._live, M=this._move, ST=this._stale, FK=this._frameKeys;
       const cel=k=>S.cells[k]||{};
       const empty=k=>{ const c=S.cells[k]; return !c||c.value===undefined||c.value===null||c.value===''; };
+      const liveBold  = L.keys.every(k=>cel(k).bold);
+      const onlyLive  = !M.keys.some(k=>cel(k).bold) && !ST.keys.some(k=>cel(k).bold) && !FK.some(k=>cel(k).bold);
+      const moved     = M.keys.every(empty) && FK.every((k,i)=>cel(k).value===M.vals[i]);
+      const commaHome = FK.every(k=>cel(k).fmtStyle==='comma');
+      // the STALE block is a guard folded into the three beats (never its own pre-checked line):
+      // it must stay put — same values, never bolded, never comma-formatted.
+      const staleIntact = ST.keys.every((k,i)=>cel(k).value===ST.vals[i]);
+      const staleClean  = !ST.keys.some(k=>cel(k).bold) && !ST.keys.some(k=>cel(k).fmtStyle==='comma');
       return [
-        {label:'bold island one — both columns, every row, nothing outside', ok: this._tk.every(k=>cel(k).bold) && !this._dk.some(k=>cel(k).bold)},
-        {label:'move the block WHOLE — leave the old address empty', ok: this._uk.every(empty) && this._dstk.every((k,i)=>cel(k).value===this._uvals[i])},
-        {label:'comma-format the block at its NEW address — and ONLY there', ok: this._dstk.every(k=>cel(k).fmtStyle==='comma') && !this._dk.some(k=>cel(k).fmtStyle==='comma')},
+        {label:'read the tags — grab the ● LIVE block whole and bold it in place (only it, not the STALE one)', ok: liveBold && onlyLive},
+        {label:'carry the ▸ TO MODEL block whole to the frame — old address empty, the STALE block stays put', ok: moved && staleIntact},
+        {label:'comma-format the moved block at its new home — the STALE block gets nothing', ok: commaHome && staleClean},
       ];
     }
   },
