@@ -5331,3 +5331,24 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - READ ON THE SET: the Foundations catalog is already stronger than "raise the
   floor" implied — every drill has a real financial narrative. So the flagship
   lift is REFINEMENT (affordances + read-and-decide + HUD polish), not rescue.
+
+## r223 — navigation maze v3: more jumps, deterministic grab (moat), roomier grid (Wolf)
+- Wolf on the live v2: "add even MORE jumps — build it out longer"; the ENGINE catch —
+  "when I grab the block with Ctrl+Shift+→, a marker to the RIGHT of the model gets
+  swept into the selection (as Excel would), so I have to Shift+Left to drop it before
+  pasting — and the keystrokes-to-win then differ across random seeds"; and "make the
+  grid more spacious (more rows, smaller height)."
+- MORE JUMPS: NMARK 5→7 (7 marker leaps + the model = 8 jumps), a 12-beat checklist.
+- THE MOAT (the fix): every marker is now kept OUT of the model's 1-cell bordering ring,
+  so Ctrl+Shift+→/↓ always grab EXACTLY the model — no stray marker adjacent to it, ever.
+  Verified: 0 ring violations across 40 builds → the keystrokes-to-win are now identical
+  every seed. The deck still sits beyond the ring (gap≥2), so the deck hop is unaffected.
+- ROOMIER GRID: RN 14→16; the engine auto-shrinks row height as ROWS grows, so it reads
+  more spacious. Fit confirmed (nav 0 #### / 0 h-overflow over 20 loads; values ≤950 @74px).
+- ROBUSTNESS: the 7-marker walk + moat + fit is restrictive, so attempts 1500→9000 — the
+  full 7-marker maze ships 50/50 (0 fallback), 44 distinct direction-sequences /50.
+- GATE: demo-replay 20/20 · alt-paths PASS (thread + slow grow + copy/hop/paste/home) ·
+  visual 379 PASS · onboard 28 · parity 94 · par-sweep par 70 / 15 keys / median 14 /
+  drift -7% / 0 flagged. drills.js meta+par navigation 58→70; ?v 177→178.
+- NOTE: the full fit-sweep flagged 1 OTHER drill (not navigation, not blocksel — both pass
+  analytically at CHARPX 8.6); a marginal pre-existing overflow to identify + fix next.
