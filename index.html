@@ -1241,7 +1241,7 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=176"></script>
+<script src="drills.js?v=177"></script>
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="themes.js?v=175"></script>
 
@@ -11152,7 +11152,10 @@ function updateDailyBtn(){ const b=$('dailyBtn'); if(b){ b.classList.toggle('on'
    Unlock = (level AND pace clears) OR campaign coverage OR PB grandfather OR a
    REAL pro entitlement (_pro — deliberately not BETA_MODE: the ladder runs in
    beta because the climb IS the game). Daily and armed races are exempt. ---- */
-function myXpEst(){ let xp=0; try{ xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){} return xp; }
+function myXpEst(){ let xp=0; try{ xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){}
+  // r221 (Wolf): the gate must read the SAME xp the visible LVL chip shows (window.__lvlXp,
+  // the local solves+breadth estimate) so a player can never see "LVL 5" yet stay gated.
+  try{ const lx=window.__lvlXp|0; if(lx>xp) xp=lx; }catch(e){} return xp; }
 function paceClears(){ let n=0; try{ MENU_ORDER.forEach(k=>{ if(campCleared(k)) n++; }); }catch(e){} return n; }
 function groupUnlocked(gname){
   const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return true;
