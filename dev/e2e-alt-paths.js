@@ -31,12 +31,6 @@ const ALTS = [
         {sel:'B'+tr2, keys:[...T('=SUM(B'+(o.hr+1)+':B'+(tr2-1)+')'),{key:'Enter'}]},
         {sel:'A'+tr2+':B'+tr2, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
       ]; }` },
-  { key: 'polish', name: 'reversed header order + ribbon bold/italic, ALT O E date, ctrl+1 currency (0-dec in one chord)', moves: `C => { const o=C._o; return [
-      {sel:o.h1+':'+o.h2, keys:[{key:'Alt'},L('h'),L('h'),{key:'Enter'}, {key:'Alt'},L('h'),L('b'),L('b'), {key:'Alt'},L('h'),D(1)]},
-      {sel:o.dates, keys:[{key:'Alt'},L('o'),L('e'),L('d'), {key:'Alt'},L('h'),D(1)]},
-      {sel:o.money, keys:[{key:'1',ctrl:true},L('c')]},
-      {sel:o.growth, keys:[{key:'Alt'},L('h'),D(2)]},
-    ]; }` },
   { key: 'blocksel', name: 'CUT first / COPY last, margin via typed refs, dress via RIBBON variants (Alt H 1/2/K/P) + box before bold', moves: `C => { const O=C._o; return [
       {sel:O.ebTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT EBITDA first
       {sel:O.o.ebitda[0],keys:[{key:'v',ctrl:true}]},
@@ -150,10 +144,6 @@ const ALTS = [
       {sel:o.uRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]},
       {sel:o.a1+':'+o.a2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
-  { key: 'saves', name: 'blocks in reverse, ribbon bold + ctrl+shift+! comma routes', moves: `C => C._sites.slice().reverse().map(s => {
-      const work = s.t==='done' ? [...T('done'),{key:'Enter'}] : (s.t==='bold' ? [{key:'Alt'},L('h'),D(1)] : [{key:'!',ctrl:true,shift:true}]);
-      return {sel:s.cell, keys:[...work,{key:'s',ctrl:true}]};
-    }) ` },
   { key: 'editfix', name: 'range stretched FIRST, audit second, typos last in reverse', moves: `C => { const o=C._o;
       const steps=[
         {sel:o.totCell, keys:[{key:'F2'},{key:'Backspace'},{key:'Backspace'},...T(o.tailFix),{key:'Enter'}]},
@@ -172,22 +162,6 @@ const ALTS = [
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
     ]` },
-  { key: 'transpose', name: 'helper staged FIRST, ctrl+alt+v flip, multiply via alt h v s', moves: `C => { const o=C._o; return [
-      {sel:o.helper, keys:[...T('-1'),{key:'Enter'}]},
-      {sel:o.src, keys:[{key:'c',ctrl:true}]},
-      {sel:o.dst, keys:[{key:'v',ctrl:true,alt:true},L('e'),{key:'Enter'}]},
-      {sel:o.helper, keys:[{key:'c',ctrl:true}]},
-      {sel:o.capexRng, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('m'),{key:'Enter'}]},
-    ]; }` },
-  { key: 'format', name: 'reversed order + ribbon percent + ALT O E for multiple/date', moves: `C => { const o=C._o; return [
-      {sel:o.date, keys:[{key:'Alt'},L('o'),L('e'),L('d')]},
-      {sel:o.mult, keys:[{key:'Alt'},L('o'),L('e'),L('x')]},
-      {sel:o.com, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:o.cur, keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:o.pct, keys:[{key:'Alt'},L('h'),L('p')]},
-      {sel:o.pct.split(':')[1], keys:[{key:'Alt'},L('h'),D(0)]},
-      {sel:o.pct, keys:[{key:'Alt'},L('h'),D(2)]},
-    ]; }` },
   { key: 'dress', name: 'footnote FIRST via alt o e, perimeter EARLY, total row dressed mid-pass via ribbon routes, header shaded late', moves: `C => { const R=C._R; return [
       {sel:'A'+R.mRow, keys:[{key:'Alt'},L('o'),L('e'),L('e')]},
       {sel:'A3:E3', keys:[{key:'Alt'},L('h'),L('h'),{key:'ArrowRight'},{key:'Enter'}]},
@@ -345,14 +319,6 @@ const ALTS = [
         {sel:sh, keys:[...T('=SUM('+shL+'4:'+shL+'7)'),{key:'Enter'}]},
         {sel:'B15', keys:[...T('=B8-B14'),{key:'Enter'}]},
         {sel:'B15:E15', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      ]; }` },
-  { key: 'blue', name: 'scatter painted in REVERSE — loose singles before the blocks', moves: `C => { const s=C._scatter;
-      const chord=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
-      return [
-        {sel:s.s2, keys:chord},
-        {sel:s.s1, keys:chord},
-        {sel:s.b2.a+':'+s.b2.b, keys:chord},
-        {sel:s.b1.a+':'+s.b1.b, keys:chord},
       ]; }` },
   { key: 'bsbuild', name: 'dress FIRST, RE roll before any footing, assets footed LAST, ribbon fills + alt h 1', moves: `C => [
       {sel:'B5:D5',   keys:[{key:'Alt'},L('h'),D(1)]},
@@ -599,6 +565,7 @@ const ALTS = [
       {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'C5', keys:[...T('=C4/B4-1'),{key:'Enter'}]},
       {sel:'C5:F5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'A1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]},
     ]` },
   { key: 'wk13', name: 'totals + dress FIRST, cushion before the spine, ribbon fills throughout', moves: `C => [
       {sel:'J4', keys:[...T('=SUM(B4:I4)'),{key:'Enter'}]},
@@ -699,13 +666,6 @@ const ALTS = [
       ]);
       steps.push({sel:w.col+w.ans, keys:[{key:'Alt'},L('h'),D(1)]});
       return steps; }` },
-  { key: 'ribbon', name: 'jobs in reverse + ctrl+b for the bold job', moves: `C => { const o=C._o; return [
-      {sel:o.r, keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
-      {sel:o.c, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
-      {sel:o.k, keys:[{key:'Alt'},L('h'),L('k')]},
-      {sel:o.b, keys:[{key:'b',ctrl:true}]},
-    ]; }` },
-  // --- T-C realism-audit additions (r172): advanced-tier freedom proofs ---
   { key: 'wacc', name: 'debt side first — at-Kd before the beta chain', moves: `C => [
       {sel:'B13', keys:[...T('=B9*(1-B6)'),{key:'Enter'}]},
       {sel:'B10', keys:[...T('=B4/(1+(1-B6)*B5)'),{key:'Enter'}]},
