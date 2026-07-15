@@ -35,7 +35,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'hunt', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
     { name: 'Models II',      keys: ['lbo', 'revolver', 'schedule', 'intsched', 'waterfall', 'cascade', 'wk13', 'liqbridge', 'covtable', 'debtsched'] },
-    { name: 'Full Builds',    keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt'] },
+    { name: 'Full Builds',    keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt', 'dcfbuild', 'lbobuild'] },
   ],
 
   // ---------------------------------------------------------------
@@ -109,6 +109,8 @@ window.HOTKEY_DRILLS = {
     wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
     fcfbuild:   { name:'uFCF',     label:'Build the unlevered FCF', tab:'uFCF',    desc:'EBIT \u2192 less taxes \u2192 NOPAT \u2192 plus D&A, less capex and the NWC build: the row every DCF discounts, filled across five years' },
     dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'DF row \u00d7 PV row; the TV reuses the year-5 factor' },
+    dcfbuild:   { name:'DCF page', label:'Build the DCF page',      tab:'DCF page',desc:'The whole valuation page: DF, PV, terminal value, EV \u2014 then bridge net debt to equity and divide to value per share' },
+    lbobuild:   { name:'Paper LBO',label:'Build the paper LBO',     tab:'Paper LBO',desc:'Sources & uses sizes the equity plug, then entry to exit turns it into MOIC and IRR \u2014 the whole paper LBO on one tab' },
     lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — then IRR over the hold' },
     modeltour:  { name:'Model Tour', label:'Chase the marks', tab:'Model Tour', desc:'Four subtotals blown to #REF! \u2014 ctrl-jump to each, rebuild the cascade formula' },
     revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'MIN/MAX sweep ×4 years, then prove out both balances' },
@@ -197,7 +199,7 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c5', name:'v5 \u00b7 Formulas II',            badge:'\ud83e\uddee', xp:350, keys:['audit','triage','wrapfix','balcheck','stalelink','wirewalk','hunt','signerr','versionup','balance'] },
     { id:'c6', name:'v6 \u00b7 Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:450, keys:['wacc','fcfbuild','dcf','comps','txncomps','football','dcfsens','retbridge','accdil','sourcesuses'] },
     { id:'c7', name:'v7 \u00b7 Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:500, keys:['lbo','revolver','schedule','intsched','waterfall','cascade','wk13','liqbridge','covtable','debtsched'] },
-    { id:'c8', name:'v8 \u00b7 Full Builds',            badge:'\ud83c\udfd7', xp:600, keys:['isbuild','bsbuild','cfslink','nwcsched','threestmt'] },
+    { id:'c8', name:'v8 \u00b7 Full Builds',            badge:'\ud83c\udfd7', xp:600, keys:['isbuild','bsbuild','cfslink','nwcsched','threestmt','dcfbuild','lbobuild'] },
   ],
   finisher: { badge:'\u2b50', name:'Model complete', xp:500 },
 };
@@ -209,7 +211,7 @@ window.HOTKEY_CAMPAIGN = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
-window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":62,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":74,"transpose":64,"saves":44,"editfix":66,"undo":48,"autofit":48,"rowops":70,"filldr":78,"blocksel":120,"copyover":58,"polish":66,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":70,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":78,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85,"fcfbuild":100,"intsched":115};
+window.HOTKEY_PARS = {"ruleoff":52,"ruleaudit":45,"drill":66,"combo":48,"gauntlet":100,"format":62,"margin":52,"schedule":113,"percent":64,"lookup":50,"ribbon":48,"pastes":74,"transpose":64,"saves":44,"editfix":66,"undo":48,"autofit":48,"rowops":70,"filldr":78,"blocksel":120,"copyover":58,"polish":66,"housestyle":70,"foot":48,"comps":161,"center":56,"blue":62,"sort":40,"series":30,"bridge":40,"growth":110,"wacc":142,"dcf":140,"lbo":113,"revolver":113,"isbuild":160,"debtsched":190,"cfslink":134,"bsbuild":182,"nwcsched":206,"threestmt":174,"waterfall":168,"cascade":178,"wk13":92,"txncomps":110,"sourcesuses":153,"accdil":105,"dcfsens":64,"retbridge":112,"football":92,"cagr":76,"balance":126,"audit":32,"sumif":140,"rollup":120,"lookup2":60,"navigation":70,"colops":40,"anchor":52,"decimals":42,"wirewalk":60,"hunt":95,"wrapfix":70,"scrub":66,"recon":96,"grpfold":64,"filterpass":60,"unhide":68,"modeltour":78,"typeset":56,"dress":120,"balcheck":75,"stalelink":70,"signerr":60,"liqbridge":80,"covtable":85,"fcfbuild":100,"intsched":115,"dcfbuild":160,"lbobuild":170};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

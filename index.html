@@ -4492,6 +4492,176 @@ const CHALLENGES = {
       ];
     }
   },
+  dcfbuild:{
+    name:'DCF page', label:'Build the DCF page', par:160, parKeys:70,
+    aha:'A DCF page runs end to end — discount the cash, add the terminal value, then bridge EV all the way to value per share.',
+    prompt:'The whole valuation page, one build: a discount-factor row off the anchored rate, PV of each year, a Gordon terminal value that reuses the year-5 factor, the sum to Enterprise Value — then keep going where a half-finished DCF stops: net debt out to equity value, divided by shares to a price per share. This is the page that goes in the book.',
+    req:'<em>B4</em> DF <em>=1/(1+$B$7)^B2</em> · fill B4:F4 → · <em>B5</em> PV <em>=B3*B4</em> · fill B5:F5 → · <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> · <em>B11</em> <em>=B10*F4</em> · <em>B12</em> EV <em>=SUM(B5:F5)+B11</em> · <em>B14</em> equity <em>=B12-B13</em> · <em>B16</em> per share <em>=B14/B15</em>',
+    guide:[
+      'discount factor at B4 · <kbd>=1/(1+$B$7)^B2</kbd> · fill B4:F4 → — rate anchored, year walking',
+      'PV row at B5 · <kbd>=B3*B4</kbd> · fill B5:F5 → — cash × factor',
+      'terminal value at B10 · <kbd>=F3*(1+B8)/($B$7-B8)</kbd> · PV of TV at B11 · <kbd>=B10*F4</kbd> — reuse the year-5 factor',
+      'Enterprise Value at B12 · <kbd>=SUM(B5:F5)+B11</kbd>',
+      'bridge it home: equity at B14 · <kbd>=B12-B13</kbd> — EV less net debt · per share at B16 · <kbd>=B14/B15</kbd>',
+    ],
+    targets:['B4','B4:F4','B5','B5:F5','B10','B11','B12','B14','B16'],
+    demo(){ return [
+      {sel:'B4', keys:[...T('=1/(1+$B$7)^B2'), Kb.enter]},
+      {sel:'B4:F4', keys:[Kb.fillR]},
+      {sel:'B5', keys:[...T('=B3*B4'), Kb.enter]},
+      {sel:'B5:F5', keys:[Kb.fillR]},
+      {sel:'B10', keys:[...T('=F3*(1+B8)/($B$7-B8)'), Kb.enter]},
+      {sel:'B11', keys:[...T('=B10*F4'), Kb.enter]},
+      {sel:'B12', keys:[...T('=SUM(B5:F5)+B11'), Kb.enter]},
+      {sel:'B14', keys:[...T('=B12-B13'), Kb.enter]},
+      {sel:'B16', keys:[...T('=B14/B15'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — DCF ($mm, except per share)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Year',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Unlevered FCF',txt:true};
+      cells['A4']={...blankCell(),value:'Discount factor',txt:true};
+      cells['A5']={...blankCell(),value:'PV of uFCF',txt:true,bold:true};
+      cells['A7']={...blankCell(),value:'Discount rate',txt:true};
+      cells['A8']={...blankCell(),value:'LT growth',txt:true};
+      cells['A10']={...blankCell(),value:'Terminal value',txt:true};
+      cells['A11']={...blankCell(),value:'PV of TV',txt:true};
+      cells['A12']={...blankCell(),value:'Enterprise Value',txt:true,bold:true};
+      cells['A13']={...blankCell(),value:'Less: net debt',txt:true};
+      cells['A14']={...blankCell(),value:'Equity value',txt:true,bold:true};
+      cells['A15']={...blankCell(),value:'Shares outstanding',txt:true};
+      cells['A16']={...blankCell(),value:'Value per share',txt:true,bold:true};
+      const r=rnd(8,12)/100, g=rnd(2,3)/100;
+      let f=rnd(8,30)*10; const fcfs=[];
+      for(let y=1;y<=5;y++){ const col=colLetter(y+1);
+        cells[col+2]={...blankCell(),value:y,fontColor:'blue'};
+        fcfs.push(f);
+        cells[col+3]={...blankCell(),value:f,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:2};
+        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:1};
+        f=Math.round(f*(1+rnd(3,9)/100)); }
+      cells['B7']={...blankCell(),value:r,fontColor:'blue',fmtStyle:'percent',decimals:1};
+      cells['B8']={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1};
+      cells['B10']={...blankCell(),fmtStyle:'comma',decimals:1};
+      cells['B11']={...blankCell(),fmtStyle:'comma',decimals:1};
+      cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+      const netdebt=rnd(10,60)*10;
+      cells['B13']={...blankCell(),value:netdebt,fontColor:'blue',fmtStyle:'comma',decimals:1};
+      cells['B14']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+      const shares=rnd(20,90);
+      cells['B15']={...blankCell(),value:shares,fontColor:'blue',fmtStyle:'comma',decimals:1};
+      cells['B16']={...blankCell(),fmtStyle:'comma',decimals:2,bold:true,bt:true};
+      const df=[1,2,3,4,5].map(y=>1/Math.pow(1+r,y));
+      const pv=fcfs.map((x,i)=>x*df[i]);
+      const tv=fcfs[4]*(1+g)/(r-g);
+      const pvtv=tv*df[4];
+      const ev=pv.reduce((a,b)=>a+b,0)+pvtv;
+      const equity=ev-netdebt;
+      this._exp={df:df,pv:pv,tv:tv,pvtv:pvtv,ev:ev,equity:equity,ps:equity/shares};
+      return {ROWS:16, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:84,3:84,4:84,5:84,6:84}};
+    },
+    checks(S){
+      const E=this._exp;
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*1e-3,1e-3); };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F'];
+      return [
+        {label:'discount-factor row — one anchored formula filled across all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',E.df[i])) && refs('B4',['B7','B2'])},
+        {label:'PV row — cash × factor, filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'5',E.pv[i])) && refs('B5',['B3','B4'])},
+        {label:'terminal value and its PV — Gordon off year 5, discounted on the year-5 factor', ok:near('B10',E.tv) && near('B11',E.pvtv) && refs('B11',['B10','F4'])},
+        {label:'sum to Enterprise Value — the PV row plus the discounted TV', ok:near('B12',E.ev) && refs('B12',['SUM(','B11'])},
+        {label:'bridge to equity value — EV less net debt', ok:near('B14',E.equity) && refs('B14',['B12','B13'])},
+        {label:'divide to value per share — equity over shares', ok:near('B16',E.ps) && refs('B16',['B14','B15'])},
+      ];
+    }
+  },
+  lbobuild:{
+    name:'Paper LBO', label:'Build the paper LBO', par:170, parKeys:78,
+    aha:'A paper LBO is two blocks — sources & uses sizes the equity check, then entry to exit turns it into MOIC and IRR.',
+    prompt:'The whole paper LBO on one tab. Size the deal: purchase EV off the entry multiple, add fees for total uses, lever it, and the sponsor equity is the PLUG that makes sources tie to uses. Then run it to exit: exit EV at the exit multiple, net debt out for exit equity, MOIC against the check you wrote, and IRR compounded over the hold. Eight formulas, entry to exit, no mouse.',
+    req:'<em>B6</em> EV <em>=B4*B5</em> · <em>B8</em> uses <em>=B6+B7</em> · <em>B10</em> debt <em>=B4*B9</em> · <em>B11</em> equity <em>=B8-B10</em> · <em>B16</em> exit EV <em>=B14*B15</em> · <em>B18</em> exit eq <em>=B16-B17</em> · <em>B20</em> MOIC <em>=B18/B11</em> · <em>B21</em> IRR <em>=B20^(1/B19)-1</em>',
+    guide:[
+      'size the deal: purchase EV at B6 · <kbd>=B4*B5</kbd> — EBITDA × entry multiple · total uses at B8 · <kbd>=B6+B7</kbd>',
+      'lever it: debt at B10 · <kbd>=B4*B9</kbd> — turns of EBITDA · sponsor equity at B11 · <kbd>=B8-B10</kbd> — the PLUG that ties sources to uses',
+      'run to exit: exit EV at B16 · <kbd>=B14*B15</kbd> · exit equity at B18 · <kbd>=B16-B17</kbd> — net debt out',
+      'the returns: MOIC at B20 · <kbd>=B18/B11</kbd> — exit over entry · IRR at B21 · <kbd>=B20^(1/B19)-1</kbd> — compounded over the hold',
+    ],
+    targets:['B6','B8','B10','B11','B16','B18','B20','B21'],
+    demo(){ return [
+      {sel:'B6', keys:[...T('=B4*B5'), Kb.enter]},
+      {sel:'B8', keys:[...T('=B6+B7'), Kb.enter]},
+      {sel:'B10', keys:[...T('=B4*B9'), Kb.enter]},
+      {sel:'B11', keys:[...T('=B8-B10'), Kb.enter]},
+      {sel:'B16', keys:[...T('=B14*B15'), Kb.enter]},
+      {sel:'B18', keys:[...T('=B16-B17'), Kb.enter]},
+      {sel:'B20', keys:[...T('=B18/B11'), Kb.enter]},
+      {sel:'B21', keys:[...T('=B20^(1/B19)-1'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — paper LBO ($mm)',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Sources & uses',txt:true,bold:true};
+      cells['A4']={...blankCell(),value:'Entry EBITDA',txt:true};
+      cells['A5']={...blankCell(),value:'Entry multiple (x)',txt:true};
+      cells['A6']={...blankCell(),value:'Purchase EV',txt:true};
+      cells['A7']={...blankCell(),value:'Fees & expenses',txt:true};
+      cells['A8']={...blankCell(),value:'Total uses',txt:true,bold:true};
+      cells['A9']={...blankCell(),value:'Leverage (x debt)',txt:true};
+      cells['A10']={...blankCell(),value:'Debt',txt:true};
+      cells['A11']={...blankCell(),value:'Sponsor equity (plug)',txt:true,bold:true};
+      cells['A13']={...blankCell(),value:'Returns',txt:true,bold:true};
+      cells['A14']={...blankCell(),value:'Exit EBITDA',txt:true};
+      cells['A15']={...blankCell(),value:'Exit multiple (x)',txt:true};
+      cells['A16']={...blankCell(),value:'Exit EV',txt:true};
+      cells['A17']={...blankCell(),value:'Exit net debt',txt:true};
+      cells['A18']={...blankCell(),value:'Exit equity',txt:true,bold:true};
+      cells['A19']={...blankCell(),value:'Hold (years)',txt:true};
+      cells['A20']={...blankCell(),value:'MOIC (x)',txt:true,bold:true};
+      cells['A21']={...blankCell(),value:'IRR',txt:true,bold:true};
+      const ebitda=rnd(50,150), entM=rnd(70,110)/10, fees=rnd(2,8)*10, lev=rnd(40,60)/10;
+      const grow=rnd(20,60)/100, exitEbitda=Math.round(ebitda*(1+grow)), exitM=rnd(70,110)/10;
+      const purchEV=ebitda*entM, uses=purchEV+fees, debt=ebitda*lev, equity=uses-debt;
+      const exitEV=exitEbitda*exitM;
+      const exitNetDebt=Math.round(debt*rnd(50,90)/100);
+      const exitEq=exitEV-exitNetDebt;
+      const hold=rnd(3,6);
+      const moic=exitEq/equity, irr=Math.pow(moic,1/hold)-1;
+      cells['B4']={...blankCell(),value:ebitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B5']={...blankCell(),value:entM,fontColor:'blue',fmtStyle:'comma',decimals:1};
+      cells['B6']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['B7']={...blankCell(),value:fees,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B8']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      cells['B9']={...blankCell(),value:lev,fontColor:'blue',fmtStyle:'comma',decimals:1};
+      cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      cells['B14']={...blankCell(),value:exitEbitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B15']={...blankCell(),value:exitM,fontColor:'blue',fmtStyle:'comma',decimals:1};
+      cells['B16']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['B17']={...blankCell(),value:exitNetDebt,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B18']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      cells['B19']={...blankCell(),value:hold,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B20']={...blankCell(),fmtStyle:'comma',decimals:2,bold:true};
+      cells['B21']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
+      this._exp={purchEV:purchEV,uses:uses,debt:debt,equity:equity,exitEV:exitEV,exitEq:exitEq,moic:moic,irr:irr};
+      return {ROWS:22, cells, active:{r:6,c:2}, sel:null, colW:{1:170,2:110}};
+    },
+    checks(S){
+      const E=this._exp;
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*1e-3,1e-3); };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      return [
+        {label:'size the uses — purchase EV (=B4*B5) plus fees to total uses', ok:near('B6',E.purchEV) && near('B8',E.uses) && refs('B8',['B6','B7'])},
+        {label:'lever it — debt as turns of EBITDA (=B4*B9)', ok:near('B10',E.debt) && refs('B10',['B4','B9'])},
+        {label:'the equity PLUG — sponsor equity ties sources to uses (=B8-B10)', ok:near('B11',E.equity) && refs('B11',['B8','B10'])},
+        {label:'exit equity — exit EV (=B14*B15) less net debt', ok:near('B16',E.exitEV) && near('B18',E.exitEq) && refs('B18',['B16','B17'])},
+        {label:'MOIC — exit equity over the entry check (=B18/B11)', ok:near('B20',E.moic) && refs('B20',['B18','B11'])},
+        {label:'IRR — MOIC compounded over the hold (=B20^(1/B19)-1)', ok:near('B21',E.irr) && refs('B21',['B20','B19'])},
+      ];
+    }
+  },
   lbo:{
     name:'LBO', label:'Run the LBO math', par:113, parKeys:65,
     aha:'Entry, leverage, exit — four lines of math and the IRR falls out.',
