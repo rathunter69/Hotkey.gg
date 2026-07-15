@@ -203,3 +203,37 @@ unchanged. Two set-specific notes:
 When a set is "run," every drill in it has: the seven §1 fields filled, an
 archetype, randomization meeting §3, latches meeting §4, and a green §5 gate —
 and reads, at its win state, like a page a banker would hand over.
+
+---
+
+## 8. THE RICH-DRILL STANDARD (r229, Wolf) — internalized so it's not re-explained
+
+Blocksel's rebuild set the bar every Foundations/Formatting drill is now held to. When a
+drill teaches a manipulation muscle, it must ALSO look and behave like a page a banker builds
+— not a minimal 3-beat toy. The standard:
+
+- **The standard grid is spacious + even.** ROWS:16, colW even (80px) unless a drill has a
+  persistent label column (then that one column is wider, the rest even). The extra room is
+  what lets a drill carry a real output table + a memo + a dress.
+- **Every source/column is HEADERED.** The player never guesses what a number is — the base
+  block carries "Segment | Revenue" headers, metric sources carry "EBITDA · CUT" etc. Tag the
+  OPERATION on the source (COPY stays / CUT moves), colour-coded (blue = copy, orange = cut).
+- **Show BOTH copy and cut, called out explicitly** in the checklist ("COPY the base…",
+  "CUT the misfiled column…") and graded (source intact after copy; source empty after cut).
+- **Dress it like the deck, with DIVERSE chords — never Alt H K on repeat.** The banker finish
+  is a sequence of *different* muscles: bold headers (Ctrl+B), a **currency top line over comma
+  rows** (Ctrl+Shift+$ / Ctrl+Shift+! + Alt H 9 trim to 0-dec — the "$ on the top line, numbers
+  below" convention), right-aligned figures (Alt H A R), **centred + underlined** row labels
+  (Alt H A C / Ctrl+U — underline added to the engine r229), a **boxed** table (Alt H B A).
+- **Add computed + structural depth.** A memo the player computes off the block (e.g. EBITDA
+  margin = EBITDA/Revenue, formatted %, italicised) — a live formula, not a typed number.
+  Insert-row / insert-column belong here too where the layout gives room.
+- **A puzzle with randomness.** Pieces scatter to shuffled, isolated anchors every run; which
+  metric is where changes; values + labels randomise. Isolated (blank moat) so Ctrl+Shift grabs
+  never bleed between blocks.
+
+The muscle inventory a drill can draw diverse chords from: Ctrl+B bold · Ctrl+I italic ·
+Ctrl+U underline · Ctrl+Shift+$ currency · Ctrl+Shift+% percent · Ctrl+Shift+! comma ·
+Alt H 9/0 decimals · Alt H A L/C/R align · Alt H B T/B/A borders (A = full box) · Alt H H fill ·
+Ctrl +/− and Alt H I/D R/C insert-delete row/column · Ctrl+D/R fill · Ctrl+X/C/V move/copy.
+Reach for variety; repetition of one chord is a smell.
