@@ -455,11 +455,12 @@ window.hkLevelRing = function(lvl, pct, size){
 };
 window.hkLevelChip = function(lvl, size){
   size=size||22;
-  const m = lvl>=20?['#8ab4ff','#c4d7ff'] : lvl>=15?['#e3b341','#ffd769'] : lvl>=10?['#b9c2cf','#dde4ee'] : lvl>=5?['#b0793f','#e0a35c'] : ['#6f7480','#a8adb6'];
+  /* r230 (Wolf): FLAT — no drop-shadow / dark base / glow. A clean tier-coloured tile
+     with a white numeral, favicon-sleek. More colour bands than the legacy 5. */
+  const T = lvl>=25?'#8b5cf6' : lvl>=20?'#3b82f6' : lvl>=15?'#e0a52a' : lvl>=10?'#8b93a1' : lvl>=5?'#c07a3c' : '#5f6672';
   return '<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true" style="vertical-align:-4px">'+
-    '<rect x="2.5" y="4" width="19" height="17" rx="4.5" fill="rgba(0,0,0,.5)"/>'+
-    '<rect x="3.5" y="2.8" width="17" height="15.6" rx="4" fill="#2a2d34" stroke="'+m[0]+'" stroke-width="1.6"/>'+
-    '<text x="12" y="14.6" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="700" font-size="'+(String(lvl).length>2?8:9.5)+'" fill="'+m[1]+'">'+lvl+'</text></svg>';
+    '<rect x="2.5" y="3" width="19" height="18" rx="5" fill="'+T+'"/>'+
+    '<text x="12" y="16.1" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="'+(String(lvl).length>2?8.5:11)+'" fill="#fff">'+lvl+'</text></svg>';
 };
 
 /* ---- shared rank/level math for account.html + stats.html (older pages keep
