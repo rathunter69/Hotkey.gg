@@ -299,6 +299,18 @@
       try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
     }catch(e){}
   }
+  // r226 (Wolf): on sign-out the top bar kept the old rank + level because the caches that
+  // hydrate them (sessionStorage rank, localStorage xp estimate + handle) survived, and the
+  // rank pill is its OWN element renderAuthBar never touches. Wipe all of it so a guest never
+  // sees stale account info — used by the sign-out button AND the reactive SIGNED_OUT event.
+  function clearAccountUI(){
+    try{ localStorage.removeItem('hk_handle_cache'); localStorage.removeItem('hk_xp_est'); }catch(e){}
+    try{ sessionStorage.removeItem('hk_rank3'); }catch(e){}
+    const rp=$('navRankPill'); if(rp){ rp.style.display='none'; rp.innerHTML=''; }
+    const lc=$('navLvl');      if(lc) lc.remove();
+    try{ if('__lvlXp' in window) window.__lvlXp=0; }catch(e){}
+  }
+  window.clearAccountUI = clearAccountUI;   // pages (index.html) share the same wipe on their own sign-out path
   // user state lands async — poll briefly, then give up quietly
   { let tries=0; const iv=setInterval(()=>{ if(window._navUser){ clearInterval(iv); navRank(); } else if(++tries>12) clearInterval(iv); }, 700); }
 
@@ -751,7 +763,7 @@
     wire('umProfile',  openProfile);
     wire('umSaveProg', () => goToTrainer('openAuth=signup'));
     wire('umSettings', openSettings);
-    wire('umSignout',  () => { try{ localStorage.removeItem('hk_handle_cache'); }catch(e){} window.sb.auth.signOut(); });   // r101: forget the landing greeting too
+    wire('umSignout',  () => { clearAccountUI(); window.sb.auth.signOut().finally(()=>{ try{ location.reload(); }catch(e){} }); });   // r226 (Wolf): wipe the cached rank/level BEFORE reload so a guest never sees stale account info
   }
   // Outside-click and Esc close the dropdown — global listeners, installed once.
   document.addEventListener('click', e => {
@@ -891,6 +903,7 @@
           });
         } else {
           window._navProfile = null;
+          clearAccountUI();      // r226: SIGNED_OUT (incl. from another tab) — clear the stale rank/level reactively
           renderAuthBar();
         }
       });

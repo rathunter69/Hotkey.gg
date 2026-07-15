@@ -1248,7 +1248,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=174"></script>
+<script src="nav.js?v=175"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -11804,7 +11804,7 @@ function bindUserMenu(){
   const wire = (id, fn) => { const el=$(id); if(el) el.onclick = (e)=>{ e.preventDefault(); closeUserMenu(); fn(); }; };
   wire('umProfile',  openProfile);
   wire('umSaveProg', ()=>openAuth('signup'));
-  wire('umSignout',  ()=>{ try{ localStorage.removeItem('hk_handle_cache'); }catch(e){} sb.auth.signOut().finally(()=>location.reload()); });   // r70: fresh landing, sign-in visible
+  wire('umSignout',  ()=>{ try{ if(window.clearAccountUI) window.clearAccountUI(); else { localStorage.removeItem('hk_handle_cache'); localStorage.removeItem('hk_xp_est'); sessionStorage.removeItem('hk_rank3'); } }catch(e){} sb.auth.signOut().finally(()=>location.reload()); });   // r226: clear cached rank/level so the reloaded page is a clean guest
 }
 function closeUserMenu(){
   const btn=$('userBtn'), dd=$('userDropdown');
