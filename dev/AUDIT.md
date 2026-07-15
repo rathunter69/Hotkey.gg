@@ -5310,3 +5310,24 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   PASS (boot never strands, fallback is an unlocked drill). Gated drills still
   build+win via demo/daily (gate only blocks manual navigation). drills.js ?v
   176->177.
+
+## r222 — blocksel flagship LIFT (Wolf sample: apply the maze DNA to the set)
+- Wolf greenlit a "sample-first" refinement pass: take the maze's transferable DNA
+  (structural randomization + on-board affordances + read-and-decide + HUD-style
+  latches) and lift an existing Foundations drill as the exemplar, to decide ROI
+  before running catalog-wide.
+- BLOCKSEL LIFT: same core muscle (Ctrl+Shift grab, Ctrl+X/V move, dress) but now
+  (a) each of three comp blocks carries an on-board TAG the player must READ —
+  ● LIVE (bold it in place), ▸ TO MODEL (carry it to the frame), STALE (leave it);
+  (b) the destination is a visible outlined "the model ▸ drop here" FRAME, not a
+  bare address; (c) which block carries which tag randomizes every run, so it
+  can't be run from memory. 3 clean HUD beats (the STALE guard folded in, never a
+  pre-checked line).
+- GATE: demo-replay 15/15 across random tag assignments · alt-paths PASS (carry
+  first, comma via Ctrl+Shift+!, bold LIVE via ribbon) · visual 379 PASS · onboard
+  28 · parity 94 · fit CLEAN after widening columns to 88/74 (the 4-digit comma
+  values overflowed the old default width — targeted check 0 #### / 0 h-overflow
+  over 14 loads). alt-paths rewritten for the new _o shape.
+- READ ON THE SET: the Foundations catalog is already stronger than "raise the
+  floor" implied — every drill has a real financial narrative. So the flagship
+  lift is REFINEMENT (affordances + read-and-decide + HUD polish), not rescue.
