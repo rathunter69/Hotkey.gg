@@ -1518,7 +1518,7 @@ const colLetter = c => String.fromCharCode(64+c);
 
 function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:false,
   fmtStyle:'general',decimals:0,bt:false,bb:false,ball:false,txt:false,
-  align:null,fontColor:null,uline:false,indent:0};}
+  align:null,fontColor:null,uline:false,indent:0,scale:0};}
 
 const CHALLENGES = {
   drill:{
@@ -6922,13 +6922,19 @@ function selRange(){
 }
 function eachSel(fn){ const r=selRange(); for(let rr=r.r1;rr<=r.r2;rr++) for(let cc=r.c1;cc<=r.c2;cc++) fn(ensure(rr,cc),rr,cc); }
 
-function fmtNum(n,style,dec){
+function fmtNum(n,style,dec,scale){
   /* r190: Excel's comma/currency styles wrap negatives in PARENS — (1,234) —
      the desk convention Wolf asked for by name. Percent/mult keep the minus. */
-  if(style==='comma'){ const a=Math.abs(Number(n)).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
-    return Number(n)<0 ? '('+a+')' : a; }
-  if(style==='currency'){ const a='$'+Math.abs(Number(n)).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
-    return Number(n)<0 ? '('+a+')' : a; }
+  n=Number(n);
+  if(scale) n=n/Math.pow(10,scale);   // r233: display-only scaling — "$ in 000s / millions" (Ctrl+1 custom scale). Stored value is untouched.
+  if(style==='comma'){ const a=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+    return n<0 ? '('+a+')' : a; }
+  if(style==='currency'){ const a='$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+    return n<0 ? '('+a+')' : a; }
+  if(style==='acct'){   /* r233 ACCOUNTING: $ set off from the figure, negatives in parens, a true zero as a dash — the desk's default number format */
+    if(n===0) return '$   -  ';
+    const a=Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+    return n<0 ? '$ ('+a+')' : '$ '+a; }
   if(style==='percent') return Number(n*100).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'%';
   if(style==='mult') return Number(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec})+'x';
   if(style==='date'){ /* value = Excel serial (days since 1899-12-30); shown Mmm-yy, the deck standard */
@@ -6942,7 +6948,7 @@ function fmtNum(n,style,dec){
 }
 function dispText(cell){
   if(cell.value===null||cell.value==='') return '';
-  if(typeof cell.value==='number') return fmtNum(cell.value,cell.fmtStyle,cell.decimals);
+  if(typeof cell.value==='number') return fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale);
   return String(cell.value);
 }
 function isNum(cell){ return typeof cell.value==='number'; }
@@ -6960,7 +6966,7 @@ function neededWidth(c){
 function overflowsCol(St,c){
   for(let r=1;r<=St.ROWS;r++){ const cell=St.cells[ck(r,c)]||blankCell();
     if(!isNum(cell)||cell.wrap) continue;
-    const t=fmtNum(cell.value,cell.fmtStyle,cell.decimals);
+    const t=fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale);
     if(t.length*CHARPX+12 > ((St._ew||St._colW)?(St._ew||St._colW)[c]:COLW_DEFAULT)) return true; }
   return false;
 }
@@ -7310,7 +7316,7 @@ function render(){
         }
       }
       else if(isNum(cell)&&!cell.wrap){
-        const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals).length*CHARPX+12;
+        const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale).length*CHARPX+12;
         if(tw>__ew[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(__ew[c]/8))); }
       }
       // r180: AutoFilter \u25be on every armed header cell (filled/bright when that column excludes values)
@@ -7454,7 +7460,7 @@ const MENUS = {
   'HOU':[['R','Hide rows'],['O','Unhide rows']],
   'HB': [['T','Top'],['B','Bottom'],['A','All'],['O','Outside']],
   'HU': [['S','Sum']],
-  'HA': [['L','Left'],['C','Center'],['R','Right']],
+  'HA': [['L','Left'],['C','Center'],['R','Right'],['N','$ Accounting']],
   'HF': [['C','Font color'],['I','Fill']],
   'HFI':[['S','Series…'],['D','Down'],['R','Right']],
   'M':  [['U','Σ AutoSum']],
@@ -7469,7 +7475,8 @@ const MENUS = {
    the selected span (the never-merge rule made keyboard-real). */
 const FMT_OPTS = [
   ['G','General'],['N','1,234'],['C','$1,234'],['P','12.3%'],
-  ['X','8.2x'],['D','Mar-26'],['E','superscript \u00b9'],['K','strikethrough'],['A','center across'],
+  ['X','8.2x'],['D','Mar-26'],['S','\u00f7 000s'],['M','\u00f7 millions'],
+  ['E','superscript \u00b9'],['K','strikethrough'],['A','center across'],
 ];
 const PASTE_OP_OPTS = [
   ['N','None','none'],['M','Multiply','multiply'],['D','Add','add'],['I','Divide','divide'],   // Excel's accelerators: M / D(add) / I(divide)
@@ -8548,12 +8555,14 @@ function applyRibbon(key){
   // paste special dialog
   if(dialog==='fmt'){
     const apply=(fn)=>{ pushUndo(); eachSel(fn); return exitRibbon(true); };
-    if(key==='G') return apply(c=>{ c.fmtStyle='general'; c.decimals=0; });
+    if(key==='G') return apply(c=>{ c.fmtStyle='general'; c.decimals=0; c.scale=0; });   // General clears any scale too
     if(key==='N') return apply(c=>{ c.fmtStyle='comma';   c.decimals=0; });
     if(key==='C') return apply(c=>{ c.fmtStyle='currency';c.decimals=0; });
     if(key==='P') return apply(c=>{ c.fmtStyle='percent'; c.decimals=1; });
     if(key==='X') return apply(c=>{ c.fmtStyle='mult';    c.decimals=1; });
     if(key==='D') return apply(c=>{ c.fmtStyle='date';    c.decimals=0; });
+    if(key==='S') return apply(c=>{ c.scale=3; });   // r233 scale: show in thousands (composes with the number style)
+    if(key==='M') return apply(c=>{ c.scale=6; });   // r233 scale: show in millions
     if(key==='E') return apply(c=>{ if(c.txt&&typeof c.value==='string'){   /* r190: E = Excel's Font-tab superscript accelerator (Alt+E) */
       c.value = c.value.endsWith('\u00b9') ? c.value.slice(0,-1) : c.value+'\u00b9'; } });
     if(key==='K') return apply(c=>{ c.strike=!c.strike; });   /* r193: Excel's Font-tab strikethrough accelerator (Alt+K) */
@@ -8666,6 +8675,7 @@ function applyRibbon(key){
     'H0':c=>c.decimals=Math.min(6,c.decimals+1), 'HBT':c=>c.bt=true, 'HBB':c=>c.bb=true,
     'HBA':c=>c.ball=true,
     'HAL':c=>c.align='l', 'HAC':c=>c.align='c', 'HAR':c=>c.align='r',
+    'HAN':c=>{c.fmtStyle='acct';c.decimals=0;},   // r233: Accounting Number Format — Excel's real Alt H A N keytip (ribbon path, not Ctrl+1)
   };
   if(RUN[np]){ pushUndo(); eachSel(RUN[np]); return exitRibbon(true); }
   // Alt H I R / Alt H D R — ribbon route to row insert/delete. Unlike the Ctrl chord,
@@ -8754,7 +8764,7 @@ function doPaste(kind, op){
       const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
       cell.formula=s.formula; cell.value=s.value;
       cell.bold=s.bold; cell.fill=s.fill; cell.wrap=s.wrap; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals;
-      cell.bt=s.bt; cell.bb=s.bb; cell.bl=s.bl; cell.br=s.br; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor; cell.it=s.it; cell.strike=s.strike; cell.uline=s.uline; cell.indent=s.indent|0;
+      cell.bt=s.bt; cell.bb=s.bb; cell.bl=s.bl; cell.br=s.br; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor; cell.it=s.it; cell.strike=s.strike; cell.uline=s.uline; cell.indent=s.indent|0; cell.scale=s.scale|0;
     }
     S.clipboard=null; try{ const mq=$('marquee'); if(mq) mq.style.display='none'; }catch(e){}
     pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
@@ -8765,10 +8775,10 @@ function doPaste(kind, op){
   const xl=f=>(f&&(dr||dc))?translateFormula(f,dr,dc):f;
   for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
     const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
-    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;};
+    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;cell.scale=s.scale|0;};
     if(kind==='values'){ cell.formula=null; cell.value=s.value; }
     else if(kind==='formulas'){ cell.formula=xl(s.formula); cell.value=s.value; }
-    else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; }
+    else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; cell.scale=s.scale|0; }
     else if(kind==='formats'){ fmt(); }
     else if(kind==='colwidths'){ colW[c0+j]=cb.cols[j]; }
     else if(kind==='transpose'){ /* handled below, skip per-cell loop */ }
@@ -8794,7 +8804,7 @@ function enterRibbon(){ if(done)return; startClock(); mode='ribbon'; path=[]; di
 function copySel(){
   const r=selRange(); const data=[];
   for(let rr=r.r1;rr<=r.r2;rr++){ const row=[]; for(let cc=r.c1;cc<=r.c2;cc++){ const c=get(rr,cc);
-    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent}); } data.push(row); }
+    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent,scale:c.scale}); } data.push(row); }
   const cols=[]; for(let cc=r.c1;cc<=r.c2;cc++) cols.push(colW[cc]);
   S.clipboard={data,cols,h:r.r2-r.r1+1,w:r.c2-r.c1+1,rect:{r1:r.r1,c1:r.c1,r2:r.r2,c2:r.c2}};
 }
