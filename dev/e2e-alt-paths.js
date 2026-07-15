@@ -657,13 +657,13 @@ const ALTS = [
       {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
       {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
     ]; }` },
-  { key: 'navigation', name: 'thread the maze with Ctrl-arrows, then grow the model the SLOW way — repeated Shift+arrows instead of Ctrl+Shift', moves: `C => {
-      const P=C._path, M=C._model, D=C._dirs, cl=colLetter;
+  { key: 'navigation', name: 'thread the random maze, grow the block the SLOW way (Shift-by-Shift), then copy → hop to the deck → paste → home', moves: `C => {
+      const P=C._path, M=C._model, D=C._deck, DR=C._dirs, cl=colLetter;
       const K={D:{key:'ArrowDown',ctrl:true},U:{key:'ArrowUp',ctrl:true},R:{key:'ArrowRight',ctrl:true},L:{key:'ArrowLeft',ctrl:true}};
       const steps=[{sel:'C3', keys:[{key:'Home',ctrl:true}]}];   // → A1
       let cur='A1';
-      for(let i=0;i<P.length;i++){ steps.push({sel:cur, keys:[K[D[i]]]}); cur=cl(P[i].c)+P[i].r; }   // leap each marker
-      steps.push({sel:cur, keys:[K[D[4]]]});                     // last leap → model corner
+      for(let i=0;i<P.length;i++){ steps.push({sel:cur, keys:[K[DR[i]]]}); cur=cl(P[i].c)+P[i].r; }   // leap each marker (random dirs)
+      steps.push({sel:cur, keys:[K[DR[P.length]]]});             // last leap → model corner
       const c0=M.c0, r0=M.r0, corner=cl(c0)+r0;
       const across=[]; for(let j=0;j<M.w-1;j++) across.push({key:'ArrowRight',shift:true});
       steps.push({sel:corner, keys:across});                     // Shift+→ ×(w-1) → wide (slow route)
@@ -671,7 +671,11 @@ const ALTS = [
       const down=[]; for(let j=0;j<M.h-1;j++) down.push({key:'ArrowDown',shift:true});
       steps.push({sel:wide, keys:down});                         // Shift+↓ ×(h-1) → whole block (slow route)
       const full=corner+':'+cl(c0+M.w-1)+(r0+M.h-1);
-      steps.push({sel:full, keys:[{key:'c',ctrl:true}]});        // Ctrl+C → copy the model (goal)
+      steps.push({sel:full, keys:[{key:'c',ctrl:true}]});        // Ctrl+C → copy
+      steps.push({sel:full, keys:[{key:'ArrowRight',ctrl:true}]});// hop right to the deck frame
+      const deck=cl(D.c)+D.r;
+      steps.push({sel:deck, keys:[{key:'v',ctrl:true}]});        // Ctrl+V → drop it in the deck
+      steps.push({sel:deck, keys:[{key:'Home',ctrl:true}]});     // Ctrl+Home → finish at A1 (goal)
       return steps; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);

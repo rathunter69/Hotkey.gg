@@ -5266,3 +5266,26 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
 - GATE: onboard 28 PASS, parity 94 PASS, demo-replay (navigation/modeltour/
   threestmt/gauntlet) WIN, zero page errors. index.html only (no ?v bump — CSS +
   JS inline).
+
+## r220 — navigation maze v2: random directions, more jumps, paste + home (Wolf)
+- Wolf: "love the blue markers — make it RANDOM (up/down/left/right), hard to max
+  out, more jumps; keep the block grab but actually PASTE the block; keep ending
+  at home." Rebuilt the flagship.
+- RANDOM MAZE: the trail no longer runs a fixed zig-zag — build() does a free
+  random-direction walk (D/U/L/R) of 5 markers + the model corner = 6 leaps
+  (one more than v1). A local ctrlJump replica VERIFIES the whole thread AND the
+  deck hop before shipping; re-rolls busts (600 attempts) with a guaranteed-clean
+  fixed fallback (which itself includes an up-leap). Measured: 29 distinct
+  direction-sequences over 40 builds, fallback only 2/40 — genuinely un-maxable.
+- FULL HAND-OFF: thread the maze → grab the model (Ctrl+Shift+→/↓) → Ctrl+C →
+  hop right to the green "deck ▸" frame (Ctrl+→, one clean leap from the block's
+  bottom-right) → Ctrl+V drops the model in → Ctrl+Home lands home, clean. 10
+  ordered state latches (m0..m4, corner, grab, copied, pasted, home).
+- ROW/COLUMN SELECT: left OUT of the flagship on purpose — Ctrl+Space (Columns)
+  and Shift+Space (Rows) are the explicit lessons of the very next two Foundations
+  drills, so the flagship stays crisp. Offered to Wolf to weave a Ctrl+Space beat
+  in if he wants it here.
+- GATE: demo-replay 20/20 across random seeds · alt-paths PASS (thread + slow
+  Shift-grow + paste + home) · fit CLEAN · visual 379 PASS · onboard 28 · parity
+  94 · par-sweep par 58 / 13 keys / median 12 / drift -8% / 0 flagged. drills.js
+  meta desc + HOTKEY_PARS navigation 44->58; ?v 175->176; alt-paths rewritten.

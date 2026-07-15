@@ -1241,7 +1241,7 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=175"></script>
+<script src="drills.js?v=176"></script>
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="themes.js?v=175"></script>
 
@@ -6590,130 +6590,169 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation tour', par:44, parKeys:9,
-    aha:'the keyboard doesn’t crawl — it LEAPS: Ctrl-arrows fly you across a scattered sheet, marker to marker, then you grab the model and copy it',
-    prompt:'The mouse would scroll and hunt. The keyboard flies. This sheet is a scatter of stray cells — thread the trail with the Ctrl-arrows: each one LEAPS straight to the next marker, corner to corner, zero scrolling. Hop all the way to the model tucked in the corner — then grab it (Ctrl+Shift+→, Ctrl+Shift+↓) and Ctrl+C drops it on your clipboard for the deck. Every layout is different; the reflex is the same. No mouse touches the sheet.',
-    req:'<em>ctrl+home</em> → hop the markers with <em>ctrl+↓ / ctrl+→ / ctrl+←</em> → reach the model → <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> · <em>ctrl+c</em>',
+    name:'Navigate', label:'Navigation tour', par:58, parKeys:13,
+    aha:'the keyboard doesn’t crawl — it LEAPS in any direction: random Ctrl-arrows thread a scattered sheet marker to marker, then you grab the model, copy it, and drop it in the deck',
+    prompt:'The mouse would scroll and hunt. The keyboard flies — in every direction. This sheet is a scatter of stray cells and the trail zig-zags a DIFFERENT way every time: up, down, left, right. Read the lit marker, fire the Ctrl-arrow that LEAPS to it, and thread the whole maze to the model in the corner. Then the hand-off: grab the model (Ctrl+Shift+→, Ctrl+Shift+↓), Ctrl+C, hop to the deck frame and Ctrl+V drops it in — then Ctrl+Home lands you back at A1, clean, for the meeting. No mouse touches the sheet.',
+    req:'<em>ctrl+home</em> → thread the markers with <em>ctrl+↑/↓/←/→</em> → reach the model → grab it <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → hop to the deck → <em>ctrl+v</em> → finish <em>ctrl+home</em>',
     guide:[
       '<kbd>ctrl</kbd>+<kbd>home</kbd> — snap to A1, the top-left corner',
-      'the lit marker is your next stop — <kbd>ctrl</kbd>+<kbd>↓</kbd> LEAPS straight down to it, no scrolling',
-      'next marker — <kbd>ctrl</kbd>+<kbd>→</kbd> flies to it across the blanks in one press',
-      'keep threading — <kbd>ctrl</kbd>+<kbd>↓</kbd> to the marker below',
-      'the trail doubles back — <kbd>ctrl</kbd>+<kbd>←</kbd> leaps left to the next one',
-      'last leap — <kbd>ctrl</kbd>+<kbd>↓</kbd> lands you on the model in the corner',
-      'grab it: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> selects across the model',
-      '<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> — down the model: the whole block is highlighted',
-      '<kbd>ctrl</kbd>+<kbd>c</kbd> — copy the model onto your clipboard for the deck',
+      'the lit marker is your next stop — the Ctrl-arrow toward it LEAPS straight there, no scrolling',
+      'keep reading the trail — it doubles back and climbs; fire the Ctrl-arrow that points at the next lit marker',
+      'the trail zig-zags — up, across, down; each Ctrl-arrow is one clean leap',
+      'thread the last legs — the maze mixes it up every run, but the reflex is the same',
+      'last leap lands you on the model tucked in the corner',
+      'grab it — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>: the whole block lights up',
+      '<kbd>ctrl</kbd>+<kbd>c</kbd> — copy the model onto your clipboard',
+      'hop right to the <b>deck frame</b> (<kbd>ctrl</kbd>+<kbd>→</kbd>) and <kbd>ctrl</kbd>+<kbd>v</kbd> — drop the model into the deck',
+      '<kbd>ctrl</kbd>+<kbd>home</kbd> — back to A1, clean, for the meeting',
     ],
-    targets(){ const P=this._path||[], M=this._model; if(!M) return [];
+    targets(){ const P=this._path||[], M=this._model, D=this._deck; if(!M||!D) return [];
       const ref=p=>colLetter(p.c)+p.r;
-      const corner=colLetter(M.c0)+M.r0, wide=colLetter(M.c0)+M.r0+':'+colLetter(M.c0+M.w-1)+M.r0,
-            full=colLetter(M.c0)+M.r0+':'+colLetter(M.c0+M.w-1)+(M.r0+M.h-1);
-      return [ref(P[0]),ref(P[1]),ref(P[2]),ref(P[3]),corner,wide,full,full]; },
-    demo(){ const P=this._path, M=this._model, D=this._dirs;
+      const corner=colLetter(M.c0)+M.r0, wide=corner+':'+colLetter(M.c0+M.w-1)+M.r0,
+            full=corner+':'+colLetter(M.c0+M.w-1)+(M.r0+M.h-1);
+      const deck=colLetter(D.c)+D.r;
+      return [...P.map(ref), corner, wide, full, full, deck, deck, 'A1']; },
+    demo(){ const P=this._path, M=this._model, D=this._deck, DR=this._dirs;
+      const K={D:Kb.ctrlDown,U:Kb.ctrlUp,R:Kb.ctrlRight,L:Kb.ctrlLeft};
       const ref=p=>colLetter(p.c)+p.r;
-      const K={D:Kb.ctrlDown,R:Kb.ctrlRight,L:Kb.ctrlLeft,U:Kb.ctrlUp};
       const steps=[{sel:'C3', keys:[Kb.ctrlHome]}];
       let cur='A1';
-      for(let i=0;i<P.length;i++){ steps.push({sel:cur, keys:[K[D[i]]]}); cur=ref(P[i]); }
+      for(let i=0;i<P.length;i++){ steps.push({sel:cur, keys:[K[DR[i]]]}); cur=ref(P[i]); }
       const c0=M.c0,r0=M.r0, corner=colLetter(c0)+r0;
       const wide=corner+':'+colLetter(c0+M.w-1)+r0, full=corner+':'+colLetter(c0+M.w-1)+(r0+M.h-1);
-      steps.push({sel:corner, keys:[{key:'ArrowRight',ctrl:true,shift:true}]});
-      steps.push({sel:wide,   keys:[{key:'ArrowDown',ctrl:true,shift:true}]});
-      steps.push({sel:full,   keys:[{key:'c',ctrl:true}]});
+      steps.push({sel:corner, keys:[{key:'ArrowRight',ctrl:true,shift:true}]});   // grab across
+      steps.push({sel:wide,   keys:[{key:'ArrowDown',ctrl:true,shift:true}]});    // grab down
+      steps.push({sel:full,   keys:[Kb.copy]});                                   // copy
+      steps.push({sel:full,   keys:[Kb.ctrlRight]});                              // hop to the deck frame
+      const deck=colLetter(D.c)+D.r;
+      steps.push({sel:deck,   keys:[Kb.paste]});                                  // drop it in the deck
+      steps.push({sel:deck,   keys:[Kb.ctrlHome]});                               // finish at A1
       return steps; },
     build(){
-      // r217 (Wolf): the FLAGSHIP is an EXCEL MAZE — the sheet ships as a scatter of stray marker
-      // cells, and the Ctrl-arrows LEAP marker to marker across the blanks (the "corner to corner
-      // in one keystroke" wow). The trail zig-zags (down, right, down, LEFT, down) to a compact P&L
-      // tucked in a corner; the payoff is grabbing that model (Ctrl+Shift+→/↓) and copying it for
-      // the deck. Every layout randomizes, so the reflex generalizes. A local replica of the
-      // engine's ctrlJump VERIFIES the trail threads exactly before the board ships.
+      // r220 (Wolf): the FLAGSHIP maze, v2. Every run the trail zig-zags a DIFFERENT
+      // way — the Ctrl-arrows leap UP, down, left and right (random directions, more
+      // jumps) so it's genuinely hard to max out. The payoff is the full desk hand-off:
+      // thread the maze → grab the model → copy → hop to the deck frame → PASTE it in →
+      // land back at A1. A local ctrlJump replica VERIFIES the whole thread (and the
+      // deck hop) before the board ships; a guaranteed-clean fixed board is the fallback.
+      const RN=14, CN=10;
       const isF=(m,r,c)=>{ const x=m[colLetter(c)+r]; return !!(x && ((x.value!==null&&x.value!=='')||x.formula)); };
-      const RN=12, CN=10;
       function sim(m,r,c,dr,dc){ let nr=r+dr,nc=c+dc; const ib=(rr,cc)=>rr>=1&&rr<=RN&&cc>=1&&cc<=CN;
         if(!ib(nr,nc)) return {r,c};
         if(isF(m,r,c)&&isF(m,nr,nc)){ while(ib(nr+dr,nc+dc)&&isF(m,nr+dr,nc+dc)){nr+=dr;nc+=dc;} }
         else { while(ib(nr,nc)&&!isF(m,nr,nc)){ if(!ib(nr+dr,nc+dc))break; nr+=dr;nc+=dc;} }
         return {r:nr,c:nc}; }
-      const DV={D:[1,0],U:[-1,0],R:[0,1],L:[0,-1]};
-      for(let attempt=0; attempt<80; attempt++){
-        // trail geometry: down, right, down, left, down — a zig-zag with one back-left bounce
-        const r1=rnd(2,3);
-        const c2=rnd(6,7);
-        const r3=rnd(6,7);
-        const c4=rnd(2,3);
-        const mr=r3+rnd(2,3);          // model top row, below the last bounce
-        const mc=c4;                    // model left col = where the last leap lands
-        if(mr+3>RN || mc+2>CN) continue;
-        const path=[{r:r1,c:1},{r:r1,c:c2},{r:r3,c:c2},{r:r3,c:c4},{r:mr,c:mc}];
-        const dirs=['D','R','D','L','D'];
-        // place marker cells + the model, then verify the whole thread
-        const cells={};
-        for(let i=0;i<4;i++) cells[colLetter(path[i].c)+path[i].r]={...blankCell(),value:'●',txt:true,bold:true,align:'c',fontColor:'blue'};
-        // model — compact P&L block (label col + 2 year cols), banker-dressed
-        const y0=rnd(23,25); const mL=colLetter(mc);
-        const yrs=[colLetter(mc+1),colLetter(mc+2)];
+      const DV={D:[1,0],U:[-1,0],R:[0,1],L:[0,-1]}, DK=['D','U','R','L'];
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      const rangeArr=(lo,hi)=>{ const o=[]; for(let v=lo;v<=hi;v++) o.push(v); return o; };
+      const NMARK=5;   // 5 markers + the model corner = 6 leaps (more than v1's 5), directions random
+
+      function mkModelCells(mr,mc){
+        const cells={}, mL=colLetter(mc), yrs=[colLetter(mc+1),colLetter(mc+2)];
         cells[mL+mr]={...blankCell(),value:'Revenue',txt:true};
         cells[mL+(mr+1)]={...blankCell(),value:'COGS',txt:true};
         cells[mL+(mr+2)]={...blankCell(),value:'Gross profit',txt:true,bold:true};
         cells[mL+(mr+3)]={...blankCell(),value:'EBIT',txt:true,bold:true};
-        yrs.forEach((Y,j)=>{ const rev=rnd(120,190)*5, cogs=-rnd(55,100), gp=rev+cogs, ebit=gp-rnd(20,55);
+        yrs.forEach(Y=>{ const rev=rnd(120,190)*5, cogs=-rnd(55,100), gp=rev+cogs, ebit=gp-rnd(20,55);
           cells[Y+mr]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
           cells[Y+(mr+1)]={...blankCell(),value:cogs,fmtStyle:'comma',decimals:0,fontColor:'blue'};
           cells[Y+(mr+2)]={...blankCell(),formula:'='+Y+mr+'+'+Y+(mr+1),value:gp,fmtStyle:'comma',decimals:0,bold:true,bt:true};
-          cells[Y+(mr+3)]={...blankCell(),value:ebit,fmtStyle:'comma',decimals:0,bold:true,bt:true};
-          cells[Y+(mr-0)]; });
-        // header year labels sit ABOVE the model? keep it 4 rows tall — the block IS Rev..EBIT.
-        // VERIFY: from A1, applying dirs, we must land EXACTLY on each path point (marker, then model corner).
-        let ok=true, cur={r:1,c:1};
-        for(let i=0;i<dirs.length;i++){ const d=DV[dirs[i]]; const nx=sim(cells,cur.r,cur.c,d[0],d[1]);
-          if(nx.r!==path[i].r||nx.c!==path[i].c){ ok=false; break; } cur=nx; }
+          cells[Y+(mr+3)]={...blankCell(),value:ebit,fmtStyle:'comma',decimals:0,bold:true,bt:true}; });
+        return cells; }
+
+      for(let attempt=0; attempt<600; attempt++){
+        // 1) free random-direction walk: NMARK markers + a 6th cell = the model corner
+        const occ={}, put=(r,c)=>{occ[r+','+c]=true;}, has=(r,c)=>!!occ[r+','+c];
+        let cur={r:1,c:1}; const pts=[], dirs=[]; let bust=false;
+        for(let i=0;i<NMARK+1;i++){
+          const order=shuffle(DK.slice()); let placed=false;
+          for(const d of order){ const dr=DV[d][0], dc=DV[d][1];
+            const dmax = d==='D'?RN-cur.r : d==='U'?cur.r-1 : d==='R'?CN-cur.c : cur.c-1;
+            if(dmax<2) continue;
+            for(const dist of shuffle(rangeArr(2,dmax))){
+              const tr=cur.r+dr*dist, tc=cur.c+dc*dist;
+              if(tr<1||tr>RN||tc<1||tc>CN||has(tr,tc)) continue;
+              let clear=true; for(let s=1;s<dist;s++){ if(has(cur.r+dr*s,cur.c+dc*s)){clear=false;break;} }
+              if(!clear) continue;
+              put(tr,tc); pts.push({r:tr,c:tc}); dirs.push(d); cur={r:tr,c:tc}; placed=true; break;
+            }
+            if(placed) break; }
+          if(!placed){ bust=true; break; }
+        }
+        if(bust) continue;
+        const corner=pts[NMARK], mr=corner.r, mc=corner.c;
+        // 2) the model (3 wide x 4 tall) must fit at the corner AND leave room for the deck to the right
+        if(mr+3>RN || mc+2>CN) continue;
+        const gap=rnd(2,3), cdeck=mc+2+gap, deckRow=mr+3;   // deck anchor in the model's BOTTOM row, to the right
+        if(cdeck+2>CN) continue;
+        if(deckRow+3>RN) continue;                          // the pasted model must fit below the deck anchor
+        // 3) collision check: model block + deck anchor + pasted deck region must not sit on any marker
+        const clash=(r1,c1,r2,c2)=>{ for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++) if(has(r,c)&&!(r===mr&&c===mc)) return true; return false; };
+        if(clash(mr,mc,mr+3,mc+2)) continue;                // model footprint (corner is a marker cell, allowed)
+        if(clash(deckRow,cdeck,deckRow+3,cdeck+2)) continue;// deck anchor + where the paste lands
+        // 4) build the board and VERIFY the full thread + the deck hop through the engine replica
+        const cells={};
+        for(let i=0;i<NMARK;i++) cells[colLetter(pts[i].c)+pts[i].r]={...blankCell(),value:'●',txt:true,bold:true,align:'c',fontColor:'blue'};
+        Object.assign(cells, mkModelCells(mr,mc));
+        cells[colLetter(cdeck)+deckRow]={...blankCell(),value:'deck ▸',txt:true,bold:true,align:'c',fontColor:'green',bb:true,bt:true,bl:true,br:true};
+        // verify: A1 -> each marker -> model corner
+        let ok=true, c2={r:1,c:1};
+        for(let i=0;i<=NMARK;i++){ const d=DV[dirs[i]]; const nx=sim(cells,c2.r,c2.c,d[0],d[1]);
+          const want=pts[i]; if(nx.r!==want.r||nx.c!==want.c){ ok=false; break; } c2=nx; }
         if(!ok) continue;
-        this._path=path.slice(0,4);           // the 4 markers (model corner graded separately)
+        // verify the deck hop: from the grabbed block's bottom-right corner, Ctrl+Right lands on the deck anchor
+        const hop=sim(cells, mr+3, mc+2, 0, 1);
+        if(hop.r!==deckRow || hop.c!==cdeck) continue;
+        this._path=pts.slice(0,NMARK);
         this._dirs=dirs;
         this._model={r0:mr,c0:mc,w:3,h:4};
+        this._deck={r:deckRow,c:cdeck};
         return {ROWS:RN, cells, active:{r:1,c:1}, sel:null,
-          colW:{1:96,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74,10:74}};
+          colW:{1:88,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74,10:74}};
       }
-      // fallback: a guaranteed-clean staircase (should never be needed)
-      const cells={}; const path=[{r:2,c:1},{r:2,c:6},{r:6,c:6},{r:6,c:3},{r:9,c:3}];
-      for(let i=0;i<4;i++) cells[colLetter(path[i].c)+path[i].r]={...blankCell(),value:'●',txt:true,bold:true,align:'c',fontColor:'blue'};
-      const mr=9,mc=3,mL=colLetter(mc),yrs=[colLetter(mc+1),colLetter(mc+2)];
-      cells[mL+mr]={...blankCell(),value:'Revenue',txt:true}; cells[mL+(mr+1)]={...blankCell(),value:'COGS',txt:true};
-      cells[mL+(mr+2)]={...blankCell(),value:'Gross profit',txt:true,bold:true}; cells[mL+(mr+3)]={...blankCell(),value:'EBIT',txt:true,bold:true};
-      yrs.forEach(Y=>{ const rev=800,cogs=-300; cells[Y+mr]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[Y+(mr+1)]={...blankCell(),value:cogs,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[Y+(mr+2)]={...blankCell(),formula:'='+Y+mr+'+'+Y+(mr+1),value:rev+cogs,fmtStyle:'comma',decimals:0,bold:true,bt:true};
-        cells[Y+(mr+3)]={...blankCell(),value:330,fmtStyle:'comma',decimals:0,bold:true,bt:true}; });
-      this._path=path.slice(0,4); this._dirs=['D','R','D','L','D']; this._model={r0:9,c0:3,w:3,h:4};
-      return {ROWS:12, cells, active:{r:1,c:1}, sel:null, colW:{1:96,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74,10:74}};
+      // fallback: a guaranteed-clean fixed maze that INCLUDES an up-leap (D,R,U,L,D then D->corner).
+      // markers A5,F5,F2,C2,C5 -> corner C8; model C8:E11; deck anchor G11 (Ctrl+-> from E11).
+      const fp=[{r:5,c:1},{r:5,c:6},{r:2,c:6},{r:2,c:3},{r:5,c:3}], fmr=8, fmc=3;
+      const cF={};
+      fp.forEach(p=>cF[colLetter(p.c)+p.r]={...blankCell(),value:'●',txt:true,bold:true,align:'c',fontColor:'blue'});
+      Object.assign(cF, mkModelCells(fmr,fmc));
+      const fcdeck=7, fdeckRow=fmr+3;   // G11
+      cF[colLetter(fcdeck)+fdeckRow]={...blankCell(),value:'deck ▸',txt:true,bold:true,align:'c',fontColor:'green',bb:true,bt:true,bl:true,br:true};
+      this._path=fp; this._dirs=['D','R','U','L','D','D'];
+      this._model={r0:fmr,c0:fmc,w:3,h:4}; this._deck={r:fdeckRow,c:fcdeck};
+      return {ROWS:RN, cells:cF, active:{r:1,c:1}, sel:null,
+        colW:{1:88,2:74,3:74,4:74,5:74,6:74,7:74,8:74,9:74,10:74}};
     },
-    // r217: latches thread the maze in order (active ON each marker, no selection), then the model
-    // corner, then the two grab-selects, then the CLIPBOARD (the model got copied). State-graded, so
-    // any legit route counts — but the lit marker + Ctrl-arrow is the fast (and intended) way.
+    // r220: latches thread the maze in order (active ON each marker, no selection), then the model
+    // corner, the block grab, the copy, the PASTE into the deck, and the finish at A1.
     checks(S){
-      const P=this._path, M=this._model;
-      if(!S.navProgress) S.navProgress={m0:false,m1:false,m2:false,m3:false,arr:false,selW:false,selH:false,copied:false};
+      const P=this._path, M=this._model, D=this._deck;
+      if(!S.navProgress) S.navProgress={};
       const np=S.navProgress, A=S.active, sel=S.sel, s=selRange();
       const at=(r,c)=> A.r===r && A.c===c && !sel;
       const cb=S.clipboard&&S.clipboard.rect;
-      const mk=['m0','m1','m2','m3'];
-      for(let i=0;i<4;i++){ const prev=i===0?true:np[mk[i-1]];
+      const mk=P.map((_,i)=>'m'+i);
+      for(let i=0;i<P.length;i++){ const prev=i===0?true:np[mk[i-1]];
         if(prev && !np[mk[i]] && at(P[i].r,P[i].c)) np[mk[i]]=true; }
-      if( np.m3  && !np.arr  && at(M.r0,M.c0)) np.arr=true;                                   // last leap → model corner
-      if( np.arr && !np.selW && !!sel && s.r1===M.r0 && s.r2===M.r0 && s.c1===M.c0 && s.c2===M.c0+M.w-1) np.selW=true;
-      if( np.selW&& !np.selH && !!sel && s.r1===M.r0 && s.r2===M.r0+M.h-1 && s.c1===M.c0 && s.c2===M.c0+M.w-1) np.selH=true;
-      if( np.selH&& !np.copied && !!cb && cb.r1===M.r0 && cb.c1===M.c0 && cb.r2>=M.r0+M.h-1 && cb.c2>=M.c0+M.w-1) np.copied=true;
+      const lastM=np[mk[mk.length-1]];
+      if( lastM && !np.arr  && at(M.r0,M.c0)) np.arr=true;                                   // last leap -> model corner
+      if( np.arr && !np.grab && !!sel && s.r1===M.r0 && s.r2===M.r0+M.h-1 && s.c1===M.c0 && s.c2===M.c0+M.w-1) np.grab=true;
+      if( np.grab&& !np.copied && !!cb && cb.r1===M.r0 && cb.c1===M.c0 && cb.r2>=M.r0+M.h-1 && cb.c2>=M.c0+M.w-1) np.copied=true;
+      // paste: the deck anchor cell now carries the model's corner label ('Revenue')
+      const dcell=S.cells[colLetter(D.c)+D.r];
+      if( np.copied && !np.pasted && dcell && dcell.value==='Revenue') np.pasted=true;
+      if( np.pasted && !np.home && A.r===1 && A.c===1) np.home=true;
       return [
-        {label:'Ctrl+↓ — leap to the first lit marker',                      ok: np.m0},
-        {label:'Ctrl+→ — fly across to the next marker',                     ok: np.m1},
-        {label:'Ctrl+↓ — thread down to the marker below',                   ok: np.m2},
-        {label:'Ctrl+← — the trail doubles back: leap left to the next',     ok: np.m3},
-        {label:'Ctrl+↓ — last leap lands you on the model',                  ok: np.arr},
-        {label:'Ctrl+Shift+→ — select across the model',                     ok: np.selW},
-        {label:'Ctrl+Shift+↓ — select down the model (whole block lit)',     ok: np.selH},
-        {label:'Ctrl+C — copy the model onto your clipboard for the deck',   ok: np.copied},
+        {label:'thread the maze — leap to the first lit marker (Ctrl-arrow)',   ok: np[mk[0]]},
+        {label:'keep threading — the next marker (the trail zig-zags)',         ok: np[mk[1]]},
+        {label:'the trail climbs and doubles back — leap to the next',          ok: np[mk[2]]},
+        {label:'keep reading the trail — leap to the next marker',              ok: np[mk[3]]},
+        {label:'last marker — one leap left before the model',                  ok: np[mk[4]]},
+        {label:'last leap lands you on the model in the corner',                ok: np.arr},
+        {label:'grab the model — Ctrl+Shift+→ then Ctrl+Shift+↓ (whole block)', ok: np.grab},
+        {label:'Ctrl+C — copy the model onto your clipboard',                   ok: np.copied},
+        {label:'hop to the deck frame (Ctrl+→) and Ctrl+V — drop it in',        ok: np.pasted},
+        {label:'Ctrl+Home — back to A1, clean, for the meeting',                ok: np.home},
       ];
     }
   }
