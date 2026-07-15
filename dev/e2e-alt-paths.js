@@ -32,7 +32,7 @@ const ALTS = [
         {sel:'A'+tr2+':B'+tr2, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
       ]; }` },
   { key: 'polish', name: 'reversed header order + ribbon bold/italic, ALT O E date, ctrl+1 currency (0-dec in one chord)', moves: `C => { const o=C._o; return [
-      {sel:o.h1+':'+o.h2, keys:[{key:'Alt'},L('h'),L('h'), {key:'Alt'},L('h'),L('b'),L('b'), {key:'Alt'},L('h'),D(1)]},
+      {sel:o.h1+':'+o.h2, keys:[{key:'Alt'},L('h'),L('h'),{key:'Enter'}, {key:'Alt'},L('h'),L('b'),L('b'), {key:'Alt'},L('h'),D(1)]},
       {sel:o.dates, keys:[{key:'Alt'},L('o'),L('e'),L('d'), {key:'Alt'},L('h'),D(1)]},
       {sel:o.money, keys:[{key:'1',ctrl:true},L('c')]},
       {sel:o.growth, keys:[{key:'Alt'},L('h'),D(2)]},
@@ -622,8 +622,8 @@ const ALTS = [
       {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
   { key: 'gauntlet', name: 'uses side FIRST, typed SUMs (no alt+=), alt h 1 bold, ctrl+shift+! commas', moves: `C => { const R=C._R, r0=R.r0; return [
-      {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('h')]},
-      {sel:R.srcIn,  keys:[{key:'Alt'},L('h'),L('h')]},
+      {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('h'),{key:'Enter'}]},
+      {sel:R.srcIn,  keys:[{key:'Alt'},L('h'),L('h'),{key:'Enter'}]},
       {sel:R.useTot, keys:[...T('=SUM(E'+(r0+1)+':E'+(r0+4)+')'),{key:'Enter'}]},
       {sel:R.srcTot, keys:[...T('=SUM(B'+(r0+1)+':B'+(r0+4)+')'),{key:'Enter'}]},
       {sel:R.useTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
