@@ -4662,6 +4662,234 @@ const CHALLENGES = {
       ];
     }
   },
+  opmodel:{
+    name:'Op model', label:'Build the operating model', par:160, parKeys:72,
+    aha:'An operating model is drivers → margins — grow revenue off one rate, cost it as % of sales, and the EBITDA line builds itself.',
+    prompt:'Five years of operating model from the drivers up. Revenue compounds off a single growth rate; COGS and opex are each a percent of that revenue; gross profit and EBITDA fall out, and the margin line reads the story. Every rate is anchored so the fill can’t drag it — build column one, fill the whole model right.',
+    req:'<em>C3</em> revenue <em>=B3*(1+$B$10)</em> · fill C3:F3 → · <em>B4</em> COGS <em>=-B3*$B$11</em> · <em>B5</em> GP <em>=B3+B4</em> · <em>B6</em> opex <em>=-B3*$B$12</em> · <em>B7</em> EBITDA <em>=B5+B6</em> · <em>B8</em> margin <em>=B7/B3</em> · fill each row B:F →',
+    guide:[
+      'grow the top line: C3 · <kbd>=B3*(1+$B$10)</kbd> — prior year × the anchored growth · fill C3:F3 →',
+      'cost of sales at B4 · <kbd>=-B3*$B$11</kbd> · gross profit at B5 · <kbd>=B3+B4</kbd> · fill both right',
+      'opex at B6 · <kbd>=-B3*$B$12</kbd> · EBITDA at B7 · <kbd>=B5+B6</kbd> · fill both right',
+      'the margin line at B8 · <kbd>=B7/B3</kbd> · fill B8:F8 → · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> if it needs it',
+    ],
+    targets:['C3','C3:F3','B4:F4','B5:F5','B6:F6','B7:F7','B8:F8'],
+    demo(){ return [
+      {sel:'C3', keys:[...T('=B3*(1+$B$10)'), Kb.enter]},
+      {sel:'C3:F3', keys:[Kb.fillR]},
+      {sel:'B4', keys:[...T('=-B3*$B$11'), Kb.enter]},
+      {sel:'B4:F4', keys:[Kb.fillR]},
+      {sel:'B5', keys:[...T('=B3+B4'), Kb.enter]},
+      {sel:'B5:F5', keys:[Kb.fillR]},
+      {sel:'B6', keys:[...T('=-B3*$B$12'), Kb.enter]},
+      {sel:'B6:F6', keys:[Kb.fillR]},
+      {sel:'B7', keys:[...T('=B5+B6'), Kb.enter]},
+      {sel:'B7:F7', keys:[Kb.fillR]},
+      {sel:'B8', keys:[...T('=B7/B3'), Kb.enter]},
+      {sel:'B8:F8', keys:[Kb.fillR]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — operating model ($mm)',txt:true,bold:true};
+      const y0=rnd(24,27);
+      for(let i=0;i<5;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      cells['A3']={...blankCell(),value:'Revenue',txt:true};
+      cells['A4']={...blankCell(),value:'Less: COGS',txt:true};
+      cells['A5']={...blankCell(),value:'Gross profit',txt:true,bold:true};
+      cells['A6']={...blankCell(),value:'Less: opex',txt:true};
+      cells['A7']={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells['A8']={...blankCell(),value:'EBITDA margin',txt:true};
+      cells['A10']={...blankCell(),value:'Revenue growth',txt:true};
+      cells['A11']={...blankCell(),value:'COGS % of rev',txt:true};
+      cells['A12']={...blankCell(),value:'Opex % of rev',txt:true};
+      const rev0=rnd(80,200)*10, grow=rnd(5,15)/100, cogsP=rnd(45,62)/100, opexP=rnd(12,24)/100;
+      cells['B3']={...blankCell(),value:rev0,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B10']={...blankCell(),value:grow,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      cells['B11']={...blankCell(),value:cogsP,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      cells['B12']={...blankCell(),value:opexP,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      for(let i=0;i<5;i++){ const col=colLetter(i+2);
+        if(i>0) cells[col+3]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        cells[col+8]={...blankCell(),fmtStyle:'percent',decimals:1};
+      }
+      this._exp=[]; let rev=rev0;
+      for(let i=0;i<5;i++){ const cogs=-rev*cogsP, gp=rev+cogs, opex=-rev*opexP, ebitda=gp+opex;
+        this._exp.push({rev:rev,cogs:cogs,gp:gp,opex:opex,ebitda:ebitda,margin:ebitda/rev});
+        rev=rev*(1+grow); }
+      return {ROWS:13, cells, active:{r:3,c:3}, sel:null, colW:{1:150,2:84,3:84,4:84,5:84,6:84}};
+    },
+    checks(S){
+      const E=this._exp;
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*2e-3,0.5); };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F'];
+      return [
+        {label:'grow the revenue line — prior year × the anchored growth, filled across', ok:[1,2,3,4].every(i=>near(COL[i]+'3',E[i].rev)) && refs('C3',['B3','B10'])},
+        {label:'run COGS and gross profit — % of revenue, then revenue less COGS', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',E[i].cogs)&&near(COL[i]+'5',E[i].gp)) && refs('B4',['B3','B11']) && refs('B5',['B3','B4'])},
+        {label:'run opex and EBITDA — % of revenue, then GP less opex', ok:[0,1,2,3,4].every(i=>near(COL[i]+'6',E[i].opex)&&near(COL[i]+'7',E[i].ebitda)) && refs('B6',['B3','B12']) && refs('B7',['B5','B6'])},
+        {label:'run the EBITDA margin — EBITDA over revenue, all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'8',E[i].margin)) && refs('B8',['B7','B3'])},
+      ];
+    }
+  },
+  debtblock:{
+    name:'Debt block', label:'Build the debt & interest block', par:190, parKeys:88,
+    aha:'A debt block is two corkscrews and their interest — each tranche rolls on its own rate, then total debt and total interest feed the model.',
+    prompt:'Two tranches, one block: a senior term loan and subordinated notes. Each opens at the prior close, its mandatory amort pays it down, and interest accrues at its OWN anchored rate. Build both corkscrews, run both interest lines, then foot total debt and total interest — the two rows the balance sheet and P&L actually pull.',
+    req:'Senior: <em>B5</em> <em>=B3+B4</em> · <em>C3</em> <em>=B5</em> · fill roll → · <em>B6</em> <em>=B3*$B$16</em> · Sub: <em>B10</em> <em>=B8+B9</em> · <em>C8</em> <em>=B10</em> · fill roll → · <em>B11</em> <em>=B8*$B$17</em> · Totals: <em>B13</em> <em>=B5+B10</em> · <em>B14</em> <em>=B6+B11</em> · fill →',
+    guide:[
+      'senior roll: ending at B5 · <kbd>=B3+B4</kbd> · link C3 · <kbd>=B5</kbd> · fill C3:F3 → · then fill B5:F5 →',
+      'senior interest at B6 · <kbd>=B3*$B$16</kbd> — the anchored senior rate on the opening balance · fill B6:F6 →',
+      'sub roll: ending at B10 · <kbd>=B8+B9</kbd> · link C8 · <kbd>=B10</kbd> · fill C8:F8 → · fill B10:F10 → · interest B11 · <kbd>=B8*$B$17</kbd> · fill →',
+      'foot the block: total debt at B13 · <kbd>=B5+B10</kbd> · total interest at B14 · <kbd>=B6+B11</kbd> · fill both right',
+    ],
+    targets:['B5','C3','C3:F3','B5:F5','B6:F6','B10','C8','C8:F8','B10:F10','B11:F11','B13:F13','B14:F14'],
+    demo(){ return [
+      {sel:'B5', keys:[...T('=B3+B4'), Kb.enter]},
+      {sel:'C3', keys:[...T('=B5'), Kb.enter]},
+      {sel:'C3:F3', keys:[Kb.fillR]},
+      {sel:'B5:F5', keys:[Kb.fillR]},
+      {sel:'B6', keys:[...T('=B3*$B$16'), Kb.enter]},
+      {sel:'B6:F6', keys:[Kb.fillR]},
+      {sel:'B10', keys:[...T('=B8+B9'), Kb.enter]},
+      {sel:'C8', keys:[...T('=B10'), Kb.enter]},
+      {sel:'C8:F8', keys:[Kb.fillR]},
+      {sel:'B10:F10', keys:[Kb.fillR]},
+      {sel:'B11', keys:[...T('=B8*$B$17'), Kb.enter]},
+      {sel:'B11:F11', keys:[Kb.fillR]},
+      {sel:'B13', keys:[...T('=B5+B10'), Kb.enter]},
+      {sel:'B13:F13', keys:[Kb.fillR]},
+      {sel:'B14', keys:[...T('=B6+B11'), Kb.enter]},
+      {sel:'B14:F14', keys:[Kb.fillR]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — debt & interest block ($mm)',txt:true,bold:true};
+      const y0=rnd(24,27);
+      for(let i=0;i<5;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      cells['A3']={...blankCell(),value:'Senior — beginning',txt:true};
+      cells['A4']={...blankCell(),value:'Senior — amort.',txt:true};
+      cells['A5']={...blankCell(),value:'Senior — ending',txt:true,bold:true};
+      cells['A6']={...blankCell(),value:'Senior — interest',txt:true};
+      cells['A8']={...blankCell(),value:'Sub — beginning',txt:true};
+      cells['A9']={...blankCell(),value:'Sub — amort.',txt:true};
+      cells['A10']={...blankCell(),value:'Sub — ending',txt:true,bold:true};
+      cells['A11']={...blankCell(),value:'Sub — interest',txt:true};
+      cells['A13']={...blankCell(),value:'Total debt',txt:true,bold:true};
+      cells['A14']={...blankCell(),value:'Total interest',txt:true,bold:true};
+      cells['A16']={...blankCell(),value:'Senior rate',txt:true};
+      cells['A17']={...blankCell(),value:'Sub rate',txt:true};
+      const sRate=rnd(5,7)/100, subRate=rnd(9,12)/100;
+      cells['B16']={...blankCell(),value:sRate,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      cells['B17']={...blankCell(),value:subRate,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      const sBeg0=rnd(40,70)*10, subBeg0=rnd(20,35)*10;
+      cells['B3']={...blankCell(),value:sBeg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B8']={...blankCell(),value:subBeg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      const sAmort=[], subAmort=[];
+      for(let i=0;i<5;i++){ sAmort.push(-rnd(2,6)*10); subAmort.push(-rnd(1,3)*10); }
+      for(let i=0;i<5;i++){ const col=colLetter(i+2);
+        cells[col+4]={...blankCell(),value:sAmort[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+9]={...blankCell(),value:subAmort[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        if(i>0){ cells[col+3]={...blankCell(),fmtStyle:'comma',decimals:0}; cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:0}; }
+        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+10]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+        cells[col+11]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+13]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        cells[col+14]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      }
+      this._exp=[]; let sBeg=sBeg0, subBeg=subBeg0;
+      for(let i=0;i<5;i++){ const sEnd=sBeg+sAmort[i], sInt=sBeg*sRate, subEnd=subBeg+subAmort[i], subInt=subBeg*subRate;
+        this._exp.push({sBeg:sBeg,sEnd:sEnd,sInt:sInt,subBeg:subBeg,subEnd:subEnd,subInt:subInt,totD:sEnd+subEnd,totI:sInt+subInt});
+        sBeg=sEnd; subBeg=subEnd; }
+      return {ROWS:18, cells, active:{r:5,c:2}, sel:null, colW:{1:160,2:82,3:82,4:82,5:82,6:82}};
+    },
+    checks(S){
+      const E=this._exp;
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*5e-3,0.5); };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F'];
+      const sLink=[1,2,3,4].every(i=>refs(COL[i]+'3',[COL[i-1]+'5']) && near(COL[i]+'3',E[i].sBeg));
+      const subLink=[1,2,3,4].every(i=>refs(COL[i]+'8',[COL[i-1]+'10']) && near(COL[i]+'8',E[i].subBeg));
+      return [
+        {label:'roll the senior tranche — ending (=B3+B4) and each year opening at the prior close', ok:[0,1,2,3,4].every(i=>near(COL[i]+'5',E[i].sEnd)) && refs('B5',['B3','B4']) && sLink},
+        {label:'run senior interest — the anchored senior rate on each opening (=B3*$B$16)', ok:[0,1,2,3,4].every(i=>near(COL[i]+'6',E[i].sInt)) && refs('B6',['B3','B16'])},
+        {label:'roll the sub tranche — ending (=B8+B9) linked to the prior close', ok:[0,1,2,3,4].every(i=>near(COL[i]+'10',E[i].subEnd)) && refs('B10',['B8','B9']) && subLink},
+        {label:'run sub interest — the anchored sub rate on each opening (=B8*$B$17)', ok:[0,1,2,3,4].every(i=>near(COL[i]+'11',E[i].subInt)) && refs('B11',['B8','B17'])},
+        {label:'foot the block — total debt (=B5+B10) and total interest (=B6+B11), filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'13',E[i].totD)&&near(COL[i]+'14',E[i].totI)) && refs('B13',['B5','B10']) && refs('B14',['B6','B11'])},
+      ];
+    }
+  },
+  dashcover:{
+    name:'Model cover', label:'Build the model cover', par:120, parKeys:44,
+    aha:'The cover page is all references — pull the model outputs into the headline metrics an IC actually reads.',
+    prompt:'Page one of the deck: the cover box. The model spits out enterprise value, net debt, shares, EBITDA and interest — your job is the summary an IC reads first. Reference the outputs (never retype them) into equity value, value per share, the EV/EBITDA the deal is priced at, net leverage and interest coverage. Every cell points at the model above; change an input and the cover moves.',
+    req:'<em>B10</em> equity <em>=B3-B4</em> · <em>B11</em> per share <em>=B10/B5</em> · <em>B12</em> EV/EBITDA <em>=B3/B6</em> · <em>B13</em> leverage <em>=B4/B6</em> · <em>B14</em> coverage <em>=B6/B7</em>',
+    guide:[
+      'equity value at B10 · <kbd>=B3-B4</kbd> — enterprise value less net debt (reference, don’t retype)',
+      'value per share at B11 · <kbd>=B10/B5</kbd> — equity over shares',
+      'the multiple the deal is priced at: EV/EBITDA at B12 · <kbd>=B3/B6</kbd>',
+      'the credit read: net leverage at B13 · <kbd>=B4/B6</kbd> — net debt / EBITDA · coverage at B14 · <kbd>=B6/B7</kbd> — EBITDA / interest',
+    ],
+    targets:['B10','B11','B12','B13','B14'],
+    demo(){ return [
+      {sel:'B10', keys:[...T('=B3-B4'), Kb.enter]},
+      {sel:'B11', keys:[...T('=B10/B5'), Kb.enter]},
+      {sel:'B12', keys:[...T('=B3/B6'), Kb.enter]},
+      {sel:'B13', keys:[...T('=B4/B6'), Kb.enter]},
+      {sel:'B14', keys:[...T('=B6/B7'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — model cover ($mm, except per share)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Model outputs',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'Enterprise value',txt:true};
+      cells['A4']={...blankCell(),value:'Net debt',txt:true};
+      cells['A5']={...blankCell(),value:'Shares outstanding',txt:true};
+      cells['A6']={...blankCell(),value:'EBITDA',txt:true};
+      cells['A7']={...blankCell(),value:'Cash interest',txt:true};
+      cells['A9']={...blankCell(),value:'Cover — headline metrics',txt:true,bold:true};
+      cells['A10']={...blankCell(),value:'Equity value',txt:true,bold:true};
+      cells['A11']={...blankCell(),value:'Value per share',txt:true,bold:true};
+      cells['A12']={...blankCell(),value:'EV / EBITDA (x)',txt:true};
+      cells['A13']={...blankCell(),value:'Net leverage (x)',txt:true};
+      cells['A14']={...blankCell(),value:'Interest coverage (x)',txt:true};
+      const ebitda=rnd(40,120)*10, mult=rnd(80,140)/10;
+      const ev=Math.round(ebitda*mult);
+      const nd=Math.round(ev*rnd(15,45)/100);
+      const shares=rnd(20,90);
+      const interest=Math.round(ebitda*rnd(10,20)/100);
+      cells['B3']={...blankCell(),value:ev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B4']={...blankCell(),value:nd,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B5']={...blankCell(),value:shares,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B6']={...blankCell(),value:ebitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B7']={...blankCell(),value:interest,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      cells['B11']={...blankCell(),fmtStyle:'comma',decimals:2,bold:true};
+      cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1};
+      cells['B13']={...blankCell(),fmtStyle:'comma',decimals:1};
+      cells['B14']={...blankCell(),fmtStyle:'comma',decimals:1};
+      this._exp={equity:ev-nd, ps:(ev-nd)/shares, evEbitda:ev/ebitda, lev:nd/ebitda, cov:ebitda/interest};
+      return {ROWS:15, cells, active:{r:10,c:2}, sel:null, colW:{1:170,2:110}};
+    },
+    checks(S){
+      const E=this._exp;
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*2e-3,1e-2); };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      return [
+        {label:'equity value — enterprise value less net debt, referenced not retyped (=B3-B4)', ok:near('B10',E.equity) && refs('B10',['B3','B4'])},
+        {label:'value per share — equity over shares (=B10/B5)', ok:near('B11',E.ps) && refs('B11',['B10','B5'])},
+        {label:'the priced multiple — EV / EBITDA (=B3/B6)', ok:near('B12',E.evEbitda) && refs('B12',['B3','B6'])},
+        {label:'net leverage — net debt / EBITDA (=B4/B6)', ok:near('B13',E.lev) && refs('B13',['B4','B6'])},
+        {label:'interest coverage — EBITDA / interest (=B6/B7)', ok:near('B14',E.cov) && refs('B14',['B6','B7'])},
+      ];
+    }
+  },
   lbo:{
     name:'LBO', label:'Run the LBO math', par:113, parKeys:65,
     aha:'Entry, leverage, exit — four lines of math and the IRR falls out.',
