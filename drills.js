@@ -348,10 +348,21 @@ window.HOTKEY_PLUGIN_LAYERS = {
    DURING BETA — the ladder is the game, not the paywall. ---- */
 window.HOTKEY_GATES = {
   PACE: 1.5,   // = HOTKEY_CAMPAIGN.GATE — one definition of "cleared at pace"
+  // r221 (Wolf): the level ladder now gates EVERY group past Foundations, escalating —
+  // finish Foundations and the wall goes up: keep grinding for the next tier (levels +
+  // pace-clears) OR ship that stretch of the campaign OR go PRO (which skips every gate).
+  // The funnel: Foundations is the free hook; the climb after it converts. Each group opens
+  // on (level AND pace-clears) OR the campaign chapters below OR a real PRO entitlement.
+  // chapters = the campaign chapters BEFORE this group (never the group's own — that would be
+  // circular: you can't ship a locked group's chapter). Shipping them is the "pure speed, no
+  // waiting" bypass alongside the level+clears path.
   groups: {
-    'Formulas':    { lvl:3, clears:6,  chapters:['c1','c2','c3'] },
-    'Models':      { lvl:6, clears:14, chapters:['c1','c2','c3','c4','c5'] },
-    'Full Builds': { lvl:9, clears:22, chapters:['c1','c2','c3','c4','c5','c6','c7'] },
+    'Formatting':  { lvl:3,  clears:5,  chapters:['c1'] },
+    'Values':      { lvl:4,  clears:8,  chapters:['c1','c2'] },
+    'Data':        { lvl:5,  clears:11, chapters:['c1','c2'] },
+    'Formulas':    { lvl:6,  clears:14, chapters:['c1','c2','c3'] },
+    'Models':      { lvl:9,  clears:22, chapters:['c1','c2','c3','c4','c5'] },
+    'Full Builds': { lvl:13, clears:32, chapters:['c1','c2','c3','c4','c5','c6','c7'] },
   },
 };
 

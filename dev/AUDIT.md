@@ -5289,3 +5289,24 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   Shift-grow + paste + home) · fit CLEAN · visual 379 PASS · onboard 28 · parity
   94 · par-sweep par 58 / 13 keys / median 12 / drift -8% / 0 flagged. drills.js
   meta desc + HOTKEY_PARS navigation 44->58; ?v 175->176; alt-paths rewritten.
+
+## r221 — level ladder gates EVERY post-Foundations group (Wolf's PRO funnel)
+- Wolf: "increase the level gate — I want the entire level system to gate the next
+  drill/campaign behind additional practice so people are incentivized to pay for
+  PRO after the Foundations drills."
+- GATES: HOTKEY_GATES previously gated only Formulas/Models/Full Builds. Now EVERY
+  group past Foundations is gated, escalating: Formatting lvl3/5clears · Values
+  lvl4/8 · Data lvl5/11 · Formulas lvl6/14 · Models lvl9/22 · Full Builds
+  lvl13/32. Foundations stays free (the hook). Each group opens on (level AND
+  pace-clears) OR the campaign chapters BEFORE it (the "pure speed" bypass, fixed
+  to never require a group's own circular chapter) OR a real PRO entitlement
+  (_pro skips every gate; deliberately not BETA so the ladder runs in beta).
+- XP CONSISTENCY FIX: the gate read hk_xp_est while the visible LVL chip reads the
+  local solves+breadth estimate (window.__lvlXp) — they could diverge, so a player
+  might see "LVL 5" yet stay gated. myXpEst() now returns max(hk_xp_est, __lvlXp)
+  so the gate never lags the chip the player sees.
+- VERIFIED: fresh profile — Foundations UNLOCKED, all six later groups LOCKED
+  (housestyle → 'Formatting' gate), lvl 1 / 0 clears, zero page errors. Onboard 28
+  PASS (boot never strands, fallback is an unlocked drill). Gated drills still
+  build+win via demo/daily (gate only blocks manual navigation). drills.js ?v
+  176->177.
