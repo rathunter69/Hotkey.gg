@@ -4356,6 +4356,74 @@ const CHALLENGES = {
       ];
     }
   },
+  fcfbuild:{
+    name:'uFCF', label:'Build the unlevered FCF', par:100, parKeys:40,
+    aha:'Unlevered FCF is a cascade — NOPAT, add back D&A, take out capex and the NWC build; the row the DCF discounts.',
+    prompt:'A five-year operating case, and the one row a DCF actually needs: unlevered free cash flow. Tax the EBIT (rate anchored), drop to NOPAT, add back the non-cash D&A, then take out what the business really spends — capex and the increase in working capital. Three formula rows, each filled across; the FCF line is what every valuation sits on.',
+    req:'<em>B4</em> taxes <em>=-B3*$B$11</em> · fill B4:F4 → · <em>B5</em> NOPAT <em>=B3+B4</em> · fill B5:F5 → · <em>B9</em> uFCF <em>=B5+B6+B7+B8</em> · fill B9:F9 →',
+    guide:[
+      'cash taxes at B4 · <kbd>=-B3*$B$11</kbd> — EBIT × the anchored tax rate, negative',
+      'select B4:F4 · <kbd>ctrl</kbd>+<kbd>r</kbd> — one formula, all five years',
+      'NOPAT at B5 · <kbd>=B3+B4</kbd> · fill B5:F5 → — EBIT after tax',
+      'unlevered FCF at B9 · <kbd>=B5+B6+B7+B8</kbd> — NOPAT + D&A + capex + ΔNWC (the last two already negative) · fill B9:F9 →',
+    ],
+    targets:['B4','B4:F4','B5','B5:F5','B9','B9:F9'],
+    demo(){ return [
+      {sel:'B4', keys:[...T('=-B3*$B$11'), Kb.enter]},
+      {sel:'B4:F4', keys:[Kb.fillR]},
+      {sel:'B5', keys:[...T('=B3+B4'), Kb.enter]},
+      {sel:'B5:F5', keys:[Kb.fillR]},
+      {sel:'B9', keys:[...T('=B5+B6+B7+B8'), Kb.enter]},
+      {sel:'B9:F9', keys:[Kb.fillR]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — unlevered FCF ($mm)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Year',txt:true,bold:true};
+      cells['A3']={...blankCell(),value:'EBIT',txt:true};
+      cells['A4']={...blankCell(),value:'Less: cash taxes',txt:true};
+      cells['A5']={...blankCell(),value:'NOPAT',txt:true,bold:true};
+      cells['A6']={...blankCell(),value:'Plus: D&A',txt:true};
+      cells['A7']={...blankCell(),value:'Less: capex',txt:true};
+      cells['A8']={...blankCell(),value:'Less: increase in NWC',txt:true};
+      cells['A9']={...blankCell(),value:'Unlevered FCF',txt:true,bold:true};
+      cells['A11']={...blankCell(),value:'Tax rate',txt:true};
+      const tax=rnd(21,28)/100;
+      let ebit=rnd(20,60)*10;
+      this._tax=tax; this._ebit=[]; this._da=[]; this._capex=[]; this._dnwc=[];
+      this._taxes=[]; this._nopat=[]; this._ufcf=[];
+      for(let y=1;y<=5;y++){ const col=colLetter(y+1);
+        cells[col+2]={...blankCell(),value:y,fontColor:'blue'};
+        const da=Math.round(ebit*rnd(15,30)/100);
+        const capex=-Math.round(ebit*rnd(20,40)/100);
+        const dnwc=-Math.round(ebit*rnd(3,12)/100);
+        cells[col+3]={...blankCell(),value:ebit,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+        cells[col+6]={...blankCell(),value:da,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+7]={...blankCell(),value:capex,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+8]={...blankCell(),value:dnwc,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+9]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        const taxes=-ebit*tax, nopat=ebit+taxes, ufcf=nopat+da+capex+dnwc;
+        this._ebit.push(ebit); this._da.push(da); this._capex.push(capex); this._dnwc.push(dnwc);
+        this._taxes.push(taxes); this._nopat.push(nopat); this._ufcf.push(ufcf);
+        ebit=Math.round(ebit*(1+rnd(4,10)/100));
+      }
+      cells['B11']={...blankCell(),value:tax,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:80,3:80,4:80,5:80,6:80}};
+    },
+    checks(S){
+      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
+      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*1e-3,0.5); };
+      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const COL=['B','C','D','E','F'];
+      return [
+        {label:'tax the EBIT — one anchored formula (=-B3*$B$11), filled across all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',this._taxes[i])) && refs('B4',['B3','B11'])},
+        {label:'drop to NOPAT — EBIT after tax, filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'5',this._nopat[i])) && refs('B5',['B3','B4'])},
+        {label:'build unlevered FCF — NOPAT + D&A + capex + ΔNWC, filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'9',this._ufcf[i])) && refs('B9',['B5','B6','B7','B8'])},
+      ];
+    }
+  },
   lbo:{
     name:'LBO', label:'Run the LBO math', par:113, parKeys:65,
     aha:'Entry, leverage, exit — four lines of math and the IRR falls out.',
