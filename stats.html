@@ -158,6 +158,11 @@ async function load(){
       mine = all.filter(x=>x.user_id===me.id);
     }catch(e){}
   }
+  // r273: the ACCOUNT-side analytics aggregate — primary source when signed in;
+  // localStorage stays the guest/offline cache
+  let srvKeys=null;
+  if(sb && me){ try{ const {data}=await sb.from('key_stats').select('counts,keys_lifetime').eq('user_id',me.id).maybeSingle();
+    if(data && data.counts && Object.keys(data.counts).length) srvKeys=data; }catch(e){} }
 
   // headline numbers — posted runs if signed in, else local PBs
   const drilled = new Set(mine.map(x=>x.challenge).filter(k=>D.meta[k]));
@@ -224,9 +229,10 @@ async function load(){
         all.forEach(r=>{ if(!D.meta[r.challenge]) return; if(seen[r.challenge]) return; seen[r.challenge]=r.user_id; });
         crowns=Object.values(seen).filter(u=>u===me.id).length; }
       const groups={}; Object.entries(D.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
-      let __ck=0, __kl=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
-        __ck=Object.keys(kc).filter(isChordUnit).length;   // r272: semantic units
-        __kl=parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10) || Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
+      let __ck=0, __kl=0; try{ const kc=(srvKeys&&srvKeys.counts) || JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+        __ck=Object.keys(kc).filter(isChordUnit).length;   // r272: semantic units · r273: account-first
+        __kl=Math.max((srvKeys&&srvKeys.keys_lifetime)||0,
+          parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10) || Object.values(kc).reduce((a,b)=>a+(b|0),0)); }catch(e){}
       const ctx={ pb:pbCtx, pars:window.HOTKEY_PARS||{}, runs:runsL, streak:streakN, solves:solvesN,
         mouseRuns:flags.mouseRuns||0, slowWins:flags.slowWins||0,
         nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
@@ -390,13 +396,14 @@ async function load(){
     html += `<h3 class="section-title">Analytics <span class="proTag" style="float:right;font-size:9px;color:var(--warn);letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO \u00b7 free in beta</span></h3>`;
     // r91 MERGED PANEL: local tally (every clean run) is the primary source; posted-run
     // traces retired as a display source (kept for distinct-shortcut stat above).
-    let tally={};
-    try{ tally=JSON.parse(localStorage.getItem('hk_key_counts')||'{}'); }catch(e){}
+    let tally={}, tallySrc='this device';
+    if(srvKeys){ tally=srvKeys.counts; tallySrc='synced to your account'; }
+    else{ try{ tally=JSON.parse(localStorage.getItem('hk_key_counts')||'{}'); }catch(e){} }
     let tEnts=Object.entries(tally).filter(([k])=>isChordUnit(k)).sort((a,b)=>b[1]-a[1]).slice(0,12);
-    if(!tEnts.length) tEnts=top;   // fresh device: fall back to posted traces
+    if(!tEnts.length) tEnts=top;   // fresh device + empty account: fall back to posted traces
     if(tEnts.length){
       const mxT=tEnts[0][1];
-      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:10px"><div class="lbl" style="margin:0 0 10px">your most-used chords &amp; functions \u00b7 all clean runs on this device</div>`;
+      html += `<div class="stat" style="grid-column:1/-1;margin-bottom:10px"><div class="lbl" style="margin:0 0 10px">your most-used chords &amp; functions \u00b7 ${tallySrc}</div>`;
       tEnts.forEach(([k,n])=>{ html += `<div style="display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px;margin-bottom:5px">`+
         `<span style="min-width:86px;color:var(--text)">${esc(k)}</span>`+
         `<span style="flex:1;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${Math.round(100*n/mxT)}%;background:var(--accent);border-radius:99px"></span></span>`+
