@@ -329,6 +329,8 @@ async function load(){
         '<span>'+(m.saved?fmtSaved(m.saved):'\u2014')+'</span></div>').join('')+
       '</div>'+
       '<div class="dk-foot">every board below is desk-only \u00b7 click any analyst for their card'+(iAmCaptain?' \u00b7 \u26a0 = no runs this week':'')+
+        (DATA.meId && !iAmCaptain && DATA.viewDesk.ids.has(DATA.meId)
+          ?' \u00b7 <a id="dkLateral" style="cursor:pointer;color:var(--warn)" title="leave this desk \u2014 your runs and rank travel with you">\u2609 lateral out</a>':'')+
       /* r149: the artifacts that leave the product \u2014 print report + PNG summary card */
       '<span style="float:right"><a id="deskExport" style="cursor:pointer;color:var(--accent)">\u2399 cohort report (print / PDF)</a> \u00b7 <a id="deskCardBtn" style="cursor:pointer;color:var(--accent)">\u2b07 summary card</a></span></div>'+
       '</div>';
@@ -406,6 +408,13 @@ async function load(){
       a.href=cv.toDataURL('image/png'); a.click();
       if(window.hkEvent) hkEvent('report_card',{d:DATA.viewDesk.slug});
     }catch(e){} };
+    const dkl=document.getElementById('dkLateral'); let dklArmed=false;
+    if(dkl) dkl.onclick=async()=>{
+      if(!dklArmed){ dklArmed=true; dkl.textContent='\u2609 lateral out \u2014 click again to confirm'; setTimeout(()=>{dklArmed=false; dkl.textContent='\u2609 lateral out';},2800); return; }
+      try{ const {error}=await sb.rpc('leave_desk');
+        if(error){ dkl.textContent=deskErrMsg(error); return; }
+        location.href='desks.html';   // lands on the guild board \u2014 find the next seat
+      }catch(e){ dkl.textContent='something went wrong'; } };
     const dka=document.getElementById('dkApply');
     if(dka) dka.onclick=async()=>{ try{
       const {error}=await sb.rpc('apply_to_desk',{p_team:DATA.viewDesk.id, p_note:null});
@@ -1118,7 +1127,7 @@ function renderAll(){
     }
     if(h1 && DATA.viewDesk) h1.textContent='\u25c6 '+DATA.viewDesk.name;
     root.innerHTML =
-      (!DATA.viewDesk ? guildHtml() : '')+
+      (!DATA.viewDesk && !DATA.myDesk ? guildHtml() : '')+
       '<h3 class="section-title">Standings \u00b7 the cohorts</h3>'+
       '<div class="featured" style="grid-column:1/-1;align-items:start;margin-bottom:0">'+deskStandingsHtml()+schoolStandingsHtml()+'</div>'+
       '<div style="grid-column:1/-1;min-width:0">'+rosterHtml()+'</div>'+
