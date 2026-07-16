@@ -2075,31 +2075,34 @@ const CHALLENGES = {
     }
   },
   dress:{
-    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:37, parKeys:37,
-    aha:'A full dress pass is chords end to end — bold, comma, border, then shade the header with Alt H H — no mouse.',
-    prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, inputs in blue, margins as clean percents, dollars with commas. Four different formatting muscles, one pass, and the sites move every run.',
-    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b b</em> \u00b7 header <em>A3:E3</em> \u2192 <em>alt h h</em> gray \u00b7 inputs '+R.inpRange+' \u2192 <em>alt h f c</em> blue font \u00b7 margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 circle the OUTPUT: <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b o</em>'; },
-    guide:[
-      'A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 the title carries the rule',
-      'shade the header band \u2014 select A3:E3 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u00b7 <kbd>\u2192</kbd> Gray (header) \u00b7 <kbd>\u21b5</kbd> \u2014 a shaded header reads as a header at a glance',
-      'the MD circles the OUTPUT: select the margin row block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 one perimeter around the whole answer',
-      'select the input block \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means typed, black means computed',
-      'select the margins row \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> \u2014 one decimal',
-      'select the dollar figures \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 commas, zero decimals',
-      'the margin is adjusted \u2014 it needs its footnote: on A-of-the-margin-row \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>e</kbd> \u2014 superscript, Excel\u2019s own Alt+E \u2014 marks it \u00b9',
-      'the EBITDA row carries the page \u00b7 select A-through-E on it \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold with a rule above; and notice the costs now read (parens) once the commas land',
-    ],
-    targets:[function(){return 'A1';}, function(){return 'A3:E3';}, function(){return this._R.inpRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}, function(){return 'A'+this._R.mRow;}],
+    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:46, parKeys:47,
+    aha:'A full dress pass is chords end to end — bold, comma, percent, border, shade, blue, italic — and EBITDA margin is EBITDA over the Revenue line right above it.',
+    prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, hardcodes in blue, EBITDA margins as clean percents, dollars with commas, the output circled, and the source line whispering in italics. Seven formatting muscles, one pass, and the block moves every run.',
+    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b b</em> \u00b7 header <em>A3:E3</em> \u2192 <em>alt h h</em> gray \u00b7 blue the hardcodes '+R.segRange+' + '+R.costRange+' \u2192 <em>alt h f c</em> \u00b7 EBITDA margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 circle the OUTPUT <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b o</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 source <em>A'+R.srcRow+'</em> \u2192 <em>ctrl+i</em>'; },
+    guide(){ const R=this._R; return [
+      'the title \u00b7 <em>A1</em> \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 bold, and a rule underneath',
+      'shade the header band \u2014 select <em>A3:E3</em> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u00b7 <kbd>\u2192</kbd> Gray (header) \u00b7 <kbd>\u21b5</kbd> \u2014 a shaded header reads as a header at a glance',
+      'blue the hardcodes \u2014 the typed numbers, not the computed ones: select <em>'+R.segRange+'</em> (segment revenues) \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 Blue \u00b7 <kbd>\u21b5</kbd> \u00b7 then the cost line <em>'+R.costRange+'</em> the same way \u2014 blue = typed, black = computed',
+      'the EBITDA margins \u2014 <em>'+R.mRowRange+'</em> (EBITDA \u00f7 the Revenue line above) \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> \u2014 one decimal',
+      'comma the dollar figures \u2014 select <em>'+R.fRange+'</em> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 thousands separators; negatives flip to (parens)',
+      'circle the OUTPUT \u2014 select the margin row <em>A'+R.mRow+':E'+R.mRow+'</em> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 one perimeter around the row the MD reads',
+      'footnote the margin label \u2014 on <em>A'+R.mRow+'</em> \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>e</kbd> \u2014 superscript stamps the \u00b9',
+      'the EBITDA line carries the page \u2014 select <em>A'+R.tRow+':E'+R.tRow+'</em> \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold with a rule above',
+      'the source line whispers \u2014 on <em>A'+R.srcRow+'</em> \u00b7 <kbd>ctrl</kbd>+<kbd>i</kbd> \u2014 italic marks a footnote/source',
+    ]; },
+    targets:[function(){return 'A1';}, function(){return 'A3:E3';}, function(){return this._R.segRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}, function(){return 'A'+this._R.mRow+':E'+this._R.mRow;}, function(){return 'A'+this._R.mRow;}, function(){return 'A'+this._R.tRow+':E'+this._R.tRow;}, function(){return 'A'+this._R.srcRow;}],
     demo(){ const R=this._R;
       return [
         {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('b')]},
         {sel:'A3:E3', keys:[{key:'Alt'}, L('h'), L('h'), {key:'ArrowRight'}, Kb.enter]},
-        {sel:R.inpRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
+        {sel:R.segRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
+        {sel:R.costRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
         {sel:R.mRowRange, keys:[Kb.pct, {key:'Alt'}, L('h'), D(0)]},
         {sel:R.fRange, keys:[{key:'Alt'}, L('h'), L('k')]},
+        {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'}, L('h'), L('b'), L('o')]},
         {sel:'A'+R.mRow, keys:[{key:'1',ctrl:true}, L('E')]},
         {sel:'A'+R.tRow+':E'+R.tRow, keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('t')]},
-        {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'}, L('h'), L('b'), L('o')]},
+        {sel:'A'+R.srcRow, keys:[{key:'i',ctrl:true}]},
       ]; },
     build(){
       const cells={};
@@ -2109,52 +2112,62 @@ const CHALLENGES = {
       for(let c=2;c<=5;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true};
       const nSeg=3+rnd(0,1);
       const segs=['Freight','Brokerage','Warehousing','Intermodal'];
-      let r=4;
-      for(let i2=0;i2<nSeg;i2++){ cells['A'+r]={...blankCell(),value:segs[i2]+' revenue',txt:true};
-        for(let c=2;c<=5;c++) cells[colLetter(c)+r]={...blankCell(),value:rnd(80,400)*5};
-        r++; }
-      const cRow=r; cells['A'+cRow]={...blankCell(),value:'Costs',txt:true};
-      for(let c=2;c<=5;c++) cells[colLetter(c)+cRow]={...blankCell(),value:-rnd(50,200)*5};
-      const tRow=cRow+1, mRow=cRow+2;
-      cells['A'+tRow]={...blankCell(),value:'EBITDA',txt:true};   // r190: the total line — live SUM, dressed by the player
+      const segR0=4, segR1=3+nSeg;
+      for(let i2=0;i2<nSeg;i2++){ const rr=segR0+i2; cells['A'+rr]={...blankCell(),value:segs[i2]+' revenue',txt:true};
+        for(let c=2;c<=5;c++) cells[colLetter(c)+rr]={...blankCell(),value:rnd(80,400)*5}; }
+      const revRow=segR1+1;   // Revenue subtotal — the denominator, spelled out so the margin is legible
+      cells['A'+revRow]={...blankCell(),value:'Revenue',txt:true,bold:true};
       for(let c=2;c<=5;c++){ const L2=colLetter(c);
-        let tot=0; for(let rr=4;rr<=cRow;rr++) tot+=cells[L2+rr].value;
-        cells[L2+tRow]={...blankCell(),formula:'=SUM('+L2+'4:'+L2+cRow+')',value:tot}; }
+        let tot=0; for(let rr=segR0;rr<=segR1;rr++) tot+=cells[L2+rr].value;
+        cells[L2+revRow]={...blankCell(),formula:'=SUM('+L2+segR0+':'+L2+segR1+')',value:tot}; }
+      const cRow=revRow+1; cells['A'+cRow]={...blankCell(),value:'Costs',txt:true};   // hardcoded input, sized off revenue so the margin lands realistic
+      for(let c=2;c<=5;c++){ const L2=colLetter(c); const rev=cells[L2+revRow].value; const cp=rnd(58,80)/100;
+        cells[L2+cRow]={...blankCell(),value:-Math.round(rev*cp/5)*5}; }
+      const tRow=cRow+1, mRow=cRow+2;
+      cells['A'+tRow]={...blankCell(),value:'EBITDA',txt:true};   // Revenue less costs — the total line, dressed by the player
+      for(let c=2;c<=5;c++){ const L2=colLetter(c);
+        cells[L2+tRow]={...blankCell(),formula:'='+L2+revRow+'+'+L2+cRow,value:cells[L2+revRow].value+cells[L2+cRow].value}; }
       cells['A'+mRow]={...blankCell(),value:'EBITDA margin',txt:true};
       for(let c=2;c<=5;c++){ const L2=colLetter(c);
-        let rev=0; for(let rr=4;rr<cRow;rr++) rev+=cells[L2+rr].value;
-        cells[L2+mRow]={...blankCell(),formula:'=('+L2+'4+'+L2+cRow+')/'+L2+'4',value:(rev/nSeg+cells[L2+cRow].value)/(rev/nSeg), decimals:4}; }   // r176: raw-but-short
-      this._R={ inpRange:'B4:E'+cRow, mRow:mRow, tRow:tRow, mRowRange:'B'+mRow+':E'+mRow, fRange:'B4:E'+tRow, lastInp:cRow };
-      // r190: columns wide enough for comma@2 WITH paren negatives — "(1,000.00)" — no mid-drill resizing
-      return {ROWS:mRow, cells, active:{r:1,c:1}, sel:null, colW:{1:150,2:96,3:96,4:96,5:96}};
+        cells[L2+mRow]={...blankCell(),formula:'='+L2+tRow+'/'+L2+revRow,value:cells[L2+tRow].value/cells[L2+revRow].value, decimals:4}; }   // EBITDA / Revenue — clear numerator and denominator
+      const srcRow=mRow+2; cells['A'+srcRow]={...blankCell(),value:'Source: company filings, figures unaudited',txt:true};   // the italic muscle, down in the open bottom-left
+      this._R={ segR0:segR0, segR1:segR1, revRow:revRow, costRow:cRow, tRow:tRow, mRow:mRow, srcRow:srcRow,
+                segRange:'B'+segR0+':E'+segR1, costRange:'B'+cRow+':E'+cRow, mRowRange:'B'+mRow+':E'+mRow, fRange:'B'+segR0+':E'+tRow };
+      // columns wide enough for comma@2 with 4-digit paren negatives — "(6,400.00)" — no mid-drill resizing
+      return {ROWS:srcRow, cells, active:{r:1,c:1}, sel:null, colW:{1:170,2:106,3:106,4:106,5:106}};
     },
     checks(S){
       const R=this._R;
       const a1=S.cells['A1'];
       const titleOk=!!(a1&&a1.bold&&(a1.bb||a1.ball));
       const hdrFillOk=(function(){ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+3]||{}; if(x.fill!=='gray') return false; } return true; })();
-      let blueOk=true, pctOk=true, comOk=true;
+      // blue on the typed hardcodes only \u2014 segment revenues + the cost line; Revenue & EBITDA are computed, stay black
+      let blueOk=true;
       for(let c=2;c<=5;c++){ const L2=colLetter(c);
-        for(let rr=4;rr<=R.lastInp;rr++){ const x=S.cells[L2+rr];
-          if(!x||x.fontColor!=='blue') blueOk=false;
-          if(!x||x.fmtStyle!=='comma') comOk=false; }
-        const t=S.cells[L2+R.tRow]; if(!t||t.fmtStyle!=='comma') comOk=false;   // r190: the total line commas with the figures
-        const m=S.cells[L2+R.mRow];
-        if(!m||m.fmtStyle!=='percent'||m.decimals!==1) pctOk=false; }
+        for(let rr=R.segR0;rr<=R.segR1;rr++){ const x=S.cells[L2+rr]; if(!x||x.fontColor!=='blue') blueOk=false; }
+        const cc=S.cells[L2+R.costRow]; if(!cc||cc.fontColor!=='blue') blueOk=false; }
+      let pctOk=true;
+      for(let c=2;c<=5;c++){ const m=S.cells[colLetter(c)+R.mRow]; if(!m||m.fmtStyle!=='percent'||m.decimals!==1) pctOk=false; }
+      // comma on every dollar figure \u2014 segment revenues, Revenue subtotal, Costs, EBITDA
+      let comOk=true;
+      for(let c=2;c<=5;c++){ const L2=colLetter(c);
+        for(let rr=R.segR0;rr<=R.tRow;rr++){ const x=S.cells[L2+rr]; if(!x||x.fmtStyle!=='comma') comOk=false; } }
+      const circleOk=(()=>{ const a2=S.cells['A'+R.mRow]||{}, e2=S.cells['E'+R.mRow]||{};
+        if(!(a2.bt&&a2.bb&&a2.bl)||!(e2.bt&&e2.bb&&e2.br)) return false;
+        for(let c2=1;c2<=5;c2++){ const x=S.cells[colLetter(c2)+R.mRow]||{}; if(!x.bt||!x.bb) return false; } return true; })();
+      const footOk=(()=>{ const l=S.cells['A'+R.mRow]; return !!(l&&String(l.value).endsWith('\u00b9')); })();
       const dressOk=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+R.tRow]; if(!x||!x.bold||!x.bt) return false; } return true; })();
+      const srcOk=(()=>{ const s=S.cells['A'+R.srcRow]; return !!(s&&s.it); })();
       return [
-        {label:'bold A1 and add a bottom border under it', ok:titleOk},
-        {label:'shade the header band gray - select A3:E3, alt h h, Gray (header)', ok:hdrFillOk},
-        {label:'Make the font blue on every typed input ('+R.inpRange+') \u2014 blue font marks hardcoded data', ok:blueOk},
-        {label:'Cast the margins as percents, ONE decimal (row '+R.mRow+')', ok:pctOk},
-        {label:'Comma-format the dollar figures ('+R.fRange+') \u2014 negatives flip to (parens), the desk convention', ok:comOk},
-        {label:'circle the OUTPUT \u2014 one perimeter (alt h b o) around A'+R.mRow+':E'+R.mRow+', the row the MD reads', ok: (()=>{
-          const a2=S.cells['A'+R.mRow]||{}, e2=S.cells['E'+R.mRow]||{};
-          if(!(a2.bt&&a2.bb&&a2.bl)||!(e2.bt&&e2.bb&&e2.br)) return false;
-          for(let c2=1;c2<=5;c2++){ const x=S.cells[colLetter(c2)+R.mRow]||{}; if(!x.bt||!x.bb) return false; } return true; })()},
-        {label:'footnote the margin label \u2014 ctrl+1, e (superscript) adds the \u00b9 (A'+R.mRow+')',
-          ok: (()=>{ const l=S.cells['A'+R.mRow]; return !!(l&&String(l.value).endsWith('\u00b9')); })()},
-        {label:'dress the EBITDA row \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above', ok: dressOk},
+        {label:'Bold A1 and rule it \u2014 ctrl+b, then alt h b b for the bottom border', ok:titleOk},
+        {label:'Shade the header band A3:E3 gray \u2014 alt h h, pick Gray (header)', ok:hdrFillOk},
+        {label:'Blue the hardcodes \u2014 alt h f c on the segment revenues ('+R.segRange+') and the cost line ('+R.costRange+')', ok:blueOk},
+        {label:'Percent the EBITDA margins, one decimal \u2014 ctrl+shift+% on '+R.mRowRange, ok:pctOk},
+        {label:'Comma the dollar figures ('+R.fRange+') \u2014 alt h k; negatives read as (parens)', ok:comOk},
+        {label:'Circle the output row \u2014 alt h b o around A'+R.mRow+':E'+R.mRow, ok:circleOk},
+        {label:'Footnote the margin label \u2014 ctrl+1, e (superscript) stamps the \u00b9 on A'+R.mRow, ok:footOk},
+        {label:'Dress the EBITDA line \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above (alt h b t)', ok:dressOk},
+        {label:'Italicize the source line \u2014 ctrl+i on A'+R.srcRow, ok:srcOk},
       ];
     }
   },
