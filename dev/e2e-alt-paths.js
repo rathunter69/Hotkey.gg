@@ -359,7 +359,7 @@ const ALTS = [
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
     ]` },
-  { key: 'cases', name: 'driver built growth-first, model then capture, then flip through the cases', moves: `C => { const cap=C._capL; return [
+  { key: 'cases', name: 'driver built growth-first, model then capture, flip the cases, then the deal-team revision + refresh', moves: `C => { const cap=C._capL, mp=String(Math.round(C._mutG*100)); return [
       {sel:'B9', keys:[...T('=CHOOSE($B$3,B6,C6,D6)'),{key:'Enter'}]},
       {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'),{key:'Enter'}]},
       {sel:'C12', keys:[...T('=B12*(1+$B$9)'),{key:'Enter'}]},
@@ -371,6 +371,8 @@ const ALTS = [
       {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
       {sel:'B3', keys:[...T('2'),{key:'Enter'}]},
       {sel:'B3', keys:[...T('3'),{key:'Enter'}]},
+      {sel:'B6', keys:[...T(mp+'%'),{key:'Enter'}]},
+      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
     ]; }` },
   { key: 'cfslink', name: 'rule the close FIRST, memo before the corkscrew, alt h p percent, bold last', moves: `C => [
       {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},

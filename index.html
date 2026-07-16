@@ -136,12 +136,13 @@
   td.spill{overflow:visible; z-index:3}   /* r107: Excel-parity text spill (see render) */
   td.spill .sp{position:absolute; left:9px; top:0; bottom:0; display:flex; align-items:center;
     white-space:nowrap; overflow:hidden; pointer-events:none; text-align:left}
-  /* r261: when a spilling cell is the active/selected anchor, carry the outline + glow across the whole
-     spilled span instead of clipping it at the one-column anchor (the box should wrap the visible text) */
+  /* r261: a spilling cell that is the active/selected anchor carries its highlight across the WHOLE cells
+     the text spans — backgrounds snap to cell edges, never a partial cell (matches Excel's whole-cell fill).
+     The .sphi box paints the glow/outline; the text span then renders on top of it. */
   td.active.spill, td.sel.spill{outline:none; background:transparent}
-  td.active.spill .sp{left:0; padding-left:9px; box-sizing:border-box; overflow:visible;
-    outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow)}
-  td.sel.spill .sp{left:0; padding-left:9px; box-sizing:border-box; background:var(--accent-glow)}
+  td.spill .sphi{position:absolute; left:0; top:0; bottom:0; pointer-events:none}
+  td.active.spill .sphi{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow)}
+  td.sel.spill .sphi{background:var(--accent-glow)}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
   td.fill-blue{background:#9cc3e8 !important; color:#153c7a}   /* r160: #dbeafe was 1.05:1 vs paper sheets — invisible fill */
@@ -6667,18 +6668,19 @@ const CHALLENGES = {
     }
   },
   cases:{
-    name:'Sticky switch', label:'Scenario driver — CHOOSE + sticky capture', par:91, parKeys:97,
-    aha:'CHOOSE selects the active case into a driver block; the model runs off THAT, and a self-referencing IF freezes each case as you flip.',
-    prompt:'This is how a real model switches scenarios. A driver block reads ONE cell — the switch — and CHOOSE pulls the active case’s name and growth into it; the whole model runs off that driver, not a nest of IFs. Then, so the deck can show all three side by side, a CAPTURE cell reads the locked-year revenue only when its case is live and otherwise references ITSELF to hold the value. Build the driver, run the model off it, flip the switch 1·2·3 — the driver reselects, the model reprices, and each output column snapshots its scenario and RETAINS it.',
-    req(){ const c=this._capL; return 'driver: <em>B8</em> =CHOOSE($B$3,B5,C5,D5) · <em>B9</em> =CHOOSE($B$3,B6,C6,D6) · model: <em>C12</em> =B12*(1+$B$9) F4-anchored, fill <em>C12:F12</em> → · <em>C13</em> =C12/B12-1 fill <em>C13:F13</em> → · capture: <em>C18</em> =IF($B$3=C$17,$'+c+'$12,C18) fill <em>C18:E18</em> → · flip <em>B3</em> → 1 · 2 · 3'; },
-    guide(){ const c=this._capL; return [
+    name:'Sticky switch', label:'Scenario driver — CHOOSE + sticky capture', par:94, parKeys:100,
+    aha:'A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the deck holds the old number until you revisit that case.',
+    prompt:'This is how a real model switches scenarios. A driver block reads ONE cell — the switch — and CHOOSE pulls the active case’s name and growth into it; the whole model runs off that driver, not a nest of IFs. A CAPTURE cell then reads the locked-year revenue only when its case is live and otherwise references ITSELF to hold the value — so the deck shows all three side by side. Build the driver, run the model off it, flip 1·2·3 to snapshot each case. THEN the twist every analyst gets burned by: the deal team revises an assumption. Watch the snapshot stay frozen at the stale number, and refresh it by revisiting the case — while the others never budge.',
+    req(){ const c=this._capL, m=(this._mutG*100).toFixed(1); return 'driver: <em>B8</em> =CHOOSE($B$3,B5,C5,D5) · <em>B9</em> =CHOOSE($B$3,B6,C6,D6) · model: <em>C12</em> =B12*(1+$B$9) F4-anchored, fill <em>C12:F12</em> → · <em>C13</em> =C12/B12-1 fill <em>C13:F13</em> → · capture: <em>C18</em> =IF($B$3=C$17,$'+c+'$12,C18) fill <em>C18:E18</em> → · flip <em>B3</em> → 1 · 2 · 3 · then revise <em>B6</em> → '+m+'% and re-flip <em>B3</em> → 1'; },
+    guide(){ const c=this._capL, m=(this._mutG*100).toFixed(1); return [
       'the DRIVER — CHOOSE reads the switch: <em>B8</em> · <kbd>=</kbd>CHOOSE($B$3,B5,C5,D5) — the active case NAME · <kbd>↵</kbd> · <em>B9</em> · <kbd>=</kbd>CHOOSE($B$3,B6,C6,D6) — the active GROWTH · <kbd>↵</kbd>',
       'the model runs off the driver: <em>C12</em> · <kbd>=</kbd>B12*(1+$B$9) — <kbd>F4</kbd> locks the growth cell · <kbd>↵</kbd> · fill <em>C12:F12</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>% growth</em>: <em>C13</em> <kbd>=</kbd>C12/B12-1 · fill',
-      'the sticky capture: <em>C18</em> · <kbd>=</kbd>IF($B$3=C$17,$'+c+'$12,C18) — reads the locked-year revenue only when its case is the switch, else holds ITSELF · fill <em>C18:E18</em> · then flip <em>B3</em> → <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> — the driver reselects, the model reprices, each column freezes',
+      'the sticky capture: <em>C18</em> · <kbd>=</kbd>IF($B$3=C$17,$'+c+'$12,C18) — reads the locked-year revenue only when its case is the switch, else holds ITSELF · fill <em>C18:E18</em> · then flip <em>B3</em> → <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> — each column snapshots its case',
+      'the revision — the twist: the deal team resets Base growth. Retype <em>B6</em> · <kbd>'+m+'%</kbd> · <kbd>↵</kbd> — notice the Base snapshot DOESN’T move (it’s frozen), while the live model jumps. Flip <em>B3</em> → <kbd>1</kbd> to REFRESH Base · Upside & Downside never budge — they were anchored all along',
     ]; },
-    targets:['B8','B9','C12','C12:F12','C13:F13','C18','C18:E18','B3'],
+    targets:['B8','B9','C12','C12:F12','C13:F13','C18','C18:E18','B3','B6'],
     demo(){
-      const c=this._capL;
+      const c=this._capL, m=(this._mutG*100).toFixed(1).replace(/\.0$/,'');
       return [
         {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'), Kb.enter]},
         {sel:'B9', keys:[...T('=CHOOSE($B$3,B6,C6,D6)'), Kb.enter]},
@@ -6691,6 +6693,8 @@ const CHALLENGES = {
         {sel:'B3', keys:[...T('1'), Kb.enter]},
         {sel:'B3', keys:[...T('2'), Kb.enter]},
         {sel:'B3', keys:[...T('3'), Kb.enter]},
+        {sel:'B6', keys:[...T(m+'%'), Kb.enter]},   // the deal-team revision
+        {sel:'B3', keys:[...T('1'), Kb.enter]},      // revisit Base to refresh the frozen snapshot
       ];
     },
     build(){
@@ -6716,6 +6720,7 @@ const CHALLENGES = {
       cells['D5']={...blankCell(),value:'Downside',txt:true,bold:true,fill:shade};
       cells['A6']={...blankCell(),value:'Growth',txt:true};
       const gB=rnd(4,7), gU=gB+rnd(3,6), gD=gB-rnd(5,9);
+      this._mutG=(gB+rnd(2,5))/100;   // the deal-team revision to Base growth — forces a refresh
       cells['B6']={...blankCell(),value:gB/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
       cells['C6']={...blankCell(),value:gU/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
       cells['D6']={...blankCell(),value:gD/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
@@ -6743,16 +6748,21 @@ const CHALLENGES = {
       cells['C17']={...blankCell(),value:1,align:'r'}; cells['D17']={...blankCell(),value:2,align:'r'}; cells['E17']={...blankCell(),value:3,align:'r'};
       cells['A18']={...blankCell(),value:'FY'+(y0+capNum-2)+' Revenue',txt:true,bold:true};
       for(const L of ['C','D','E']) cells[L+'18']={...blankCell(),fmtStyle:revFmt,decimals:revDec};   // user builds the capture IFs
+      // the deal-team revision memo — the mutation that forces a refresh (text, spills right)
+      cells['A20']={...blankCell(),value:'deal-team revision → reset Base growth (B6) to '+(this._mutG*100).toFixed(1)+'%, then re-flip B3 to 1 to refresh',txt:true,it:true};
       this._g=[gB/100,gU/100,gD/100];
       this._capL=capL; this._capNum=capNum;
       const colW={1:190}; for(let c=2;c<=6;c++) colW[c]=88;   // "Downside" clears the default 78px
-      return {ROWS:19, cells, active:{r:8,c:2}, sel:null, colW};
+      return {ROWS:21, cells, active:{r:8,c:2}, sel:null, colW};
     },
     checks(S){
-      const g=this._g, capL=this._capL, capNum=this._capNum;
+      const capL=this._capL, capNum=this._capNum;
       const base=S.cells['B12']?S.cells['B12'].value:0;
       const sw=S.cells['B3'] ? Math.round(S.cells['B3'].value) : 1;
-      const gi=(sw>=1&&sw<=3)?g[sw-1]:g[0];
+      // read the CURRENT assumptions off the sheet, so the mutation flows through every check
+      const gcell=k=>(S.cells[k]&&typeof S.cells[k].value==='number')?S.cells[k].value:0;
+      const gCur=[gcell('B6'),gcell('C6'),gcell('D6')];
+      const gi=(sw>=1&&sw<=3)?gCur[sw-1]:gCur[0];
       const names=['Base','Upside','Downside'];
       // the CHOOSE driver: active case NAME (B8) + active GROWTH (B9)
       const b8=S.cells['B8'], b9=S.cells['B9'];
@@ -6775,23 +6785,26 @@ const CHALLENGES = {
         if(!cell||!cell.formula){ growthOk=false; continue; }
         if(Math.abs((cell.value||0)-gi)>Math.max(1e-4,Math.abs(gi)*1e-4)) growthOk=false;
       }
-      // sticky capture — self-referencing IF freezes the locked-year revenue for each case
+      // sticky capture — self-referencing IF; each snapshot must match its case's CURRENT assumption
       const capExp=capNum-2;   // compounding steps from the seed year to the locked year
-      const cols=['C','D','E']; let captureOk=true, retainOk=true;
+      const cols=['C','D','E']; let captureOk=true; const snapOk=[false,false,false];
       cols.forEach((L,i)=>{
         const cell=S.cells[L+'18'];
-        if(!cell||!cell.formula){ captureOk=false; retainOk=false; return; }
+        if(!cell||!cell.formula) { captureOk=false; return; }
         const f=cell.formula.toUpperCase().replace(/\s/g,'');
         if(!f.includes('IF(')||!f.includes('$B$3')||!f.includes('$'+capL+'$12')||!f.includes(L+'18')) captureOk=false;
-        const want=base*Math.pow(1+g[i],capExp);
-        if(Math.abs((cell.value||0)-want)>Math.max(1e-2,Math.abs(want)*1e-5)) retainOk=false;
+        const want=base*Math.pow(1+gCur[i],capExp);
+        snapOk[i]= Math.abs((cell.value||0)-want)<=Math.max(1e-2,Math.abs(want)*1e-5);
       });
+      // the revision + refresh: Base growth reset to the revised number, and the Base snapshot refreshed to match
+      const mutApplied = Math.abs(gcell('B6')-this._mutG)<1e-9;
       return [
         {label:'Build the DRIVER via CHOOSE — B8 =CHOOSE($B$3,B5,C5,D5) (active case), B9 =CHOOSE($B$3,B6,C6,D6) (active growth)', ok:driverOk},
         {label:'Run the model off the driver — C12 =B12*(1+$B$9), F4-anchored, fill C12:F12', ok:modelOk},
         {label:'Read the % growth under revenue — C13 =C12/B12-1, fill C13:F13', ok:growthOk},
         {label:'Build the sticky capture — C18 =IF($B$3=C$17,$'+capL+'$12,C18), fill C18:E18', ok:captureOk},
-        {label:'Flip the switch 1·2·3 — the driver reselects, the model reprices, each output freezes & holds', ok:driverOk && captureOk && retainOk},
+        {label:'Flip 1·2·3 to snapshot each case — Upside & Downside anchor and hold', ok:driverOk && captureOk && snapOk[1] && snapOk[2]},
+        {label:'Revise Base growth to '+(this._mutG*100).toFixed(1)+'% and refresh Base — the frozen snapshot only updates when you revisit it', ok:mutApplied && snapOk[0]},
       ];
     }
   },
@@ -7645,11 +7658,14 @@ function render(){
         // at the first occupied cell (titles/labels stop getting amputated mid-word).
         const est=cell.value.length*6.9+20;   // label font ~13.5px Arial, avg glyph ~6.9px
         if(est>__ew[c]){
-          let spillW=__ew[c], cc=c+1;
-          while(cc<=COLS){ const n=get(r,cc); if(n && n.value!==null && n.value!=='') break; spillW+=__ew[cc]; cc++; }
-          if(spillW>__ew[c]){   // active/selected cells spill too — Excel draws the border around the anchor, text still runs
+          let spillW=__ew[c], cc=c+1, coveredW=__ew[c];   // coveredW snaps to WHOLE cells the text reaches
+          while(cc<=COLS){ const n=get(r,cc); if(n && n.value!==null && n.value!=='') break; spillW+=__ew[cc]; if(coveredW<est) coveredW+=__ew[cc]; cc++; }
+          if(spillW>__ew[c]){
             cls.push('spill');
-            txt='<span class="sp" style="max-width:'+(spillW-12)+'px">'+txt+'</span>';
+            // r261: when this spilling cell is the highlighted anchor, glow/outline covers the whole cells
+            // the text spans (no partial-cell backgrounds); the text then paints on top
+            const hi = (isActive || (inSel && S.sel)) ? '<span class="sphi" style="width:'+coveredW+'px"></span>' : '';
+            txt=hi+'<span class="sp" style="max-width:'+(spillW-12)+'px">'+txt+'</span>';
           }
         }
       }
