@@ -124,7 +124,11 @@ async function load(){
   if(!sb){ root.innerHTML='<div class="state"><h2>Leaderboard not connected yet</h2></div>'; return; }
   let profs=[], runs=[], sessions=[], meId=null;
   try{
-    try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null; }catch(e){}
+    let meAnon=false;
+    try{ const { data:{ session } } = await sb.auth.getSession(); meId = session ? session.user.id : null;
+      const u=session&&session.user;
+      meAnon = !!(u && (u.is_anonymous===true || (Array.isArray(u.identities)&&u.identities.length===0)));   // r271: mirrors nav.js isAnonUser
+      window.__meAnon=meAnon; }catch(e){}
     const [p, r, se, tm, tt] = await Promise.all([
       sb.from('profiles').select('id,handle,team_code,school_tag,show_school,featured_ach'),
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
@@ -271,7 +275,7 @@ async function load(){
         '<div class="dk-sub">'+ids.length+' analyst'+(ids.length===1?'':'s')+
           (capName?' \u00b7 staffer: <b data-uid="'+captainId+'" style="cursor:pointer">'+esc(capName)+'</b>':' \u00b7 <span style="color:var(--warn)">staffer seat open \u2014 first code-join takes the desk</span>')+'</div></div>'+
         (iAmCaptain?'<a class="dk-manage" href="desks.html?manage=1">staffer controls \u2192</a>':'')+
-        (!iAmCaptain && DATA.meId && !DATA.myDesk && !DATA.viewDesk.priv && !DATA.viewDesk.ids.has(DATA.meId)
+        (!iAmCaptain && DATA.meId && !window.__meAnon && !DATA.myDesk && !DATA.viewDesk.priv && !DATA.viewDesk.ids.has(DATA.meId)
           ?'<a class="dk-manage" id="dkApply" style="cursor:pointer">apply to join \u2192</a>':'')+
       '</div>';
 
@@ -747,6 +751,7 @@ function deskErrMsg(e){ const m=String((e&&e.message)||e||'');
   if(m.includes('DESK_RATE_LIMIT'))   return 'one desk per day \u2014 try again tomorrow.';
   if(m.includes('DESK_PRIVATE'))      return 'that desk is invite-only.';
   if(m.includes('APPLY_RATE_LIMIT'))  return 'five open applications max \u2014 withdraw one first.';
+  if(m.includes('FULL_ACCOUNT_REQUIRED')) return 'applications need a full account \u2014 add an email to your account first.';
   if(m.includes('APPLICATION_GONE'))  return 'that application was already handled.';
   if(m.includes('APPLICANT_TAKEN'))   return 'they joined another desk in the meantime.';
   if(m.includes('NOT_CAPTAIN'))       return 'only the staffer can do that.';
@@ -781,7 +786,9 @@ function guildHtml(){
       : (applied
         ? '<span class="gb-applied" data-team="'+t.id+'" title="click to withdraw">applied \u00b7 pending \u2713</span>'
         : (canApply
-          ? '<button class="tab gb-apply" data-team="'+t.id+'">apply</button>'
+          ? (window.__meAnon
+            ? '<a class="gb-lock" href="account.html" title="anonymous sessions can\u2019t apply \u2014 add an email to your account">add an email to apply</a>'
+            : '<button class="tab gb-apply" data-team="'+t.id+'">apply</button>')
           : '<a class="tab" href="index.html">sign in to apply</a>'));
     return '<div class="gb-card">'+
       '<div class="gb-top"><span class="dk-mini">\u25c6</span><a class="gb-name" href="desks.html?desk='+encodeURIComponent(t.slug)+'">'+esc(t.name)+(t.verified?' <span style="color:var(--accent)">\u2713</span>':'')+'</a></div>'+
