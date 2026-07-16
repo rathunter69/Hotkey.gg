@@ -1319,7 +1319,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=254"></script>
+<script src="nav.js?v=255"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -13244,6 +13244,36 @@ function showPrelaunchLock(){
 }
 function closeGate(){ gateOpen=false; const g=$('gate'); if(g){ g.classList.remove('show'); g.innerHTML=''; } }
 
+/* r272 (Wolf): the analytics tally now stores SEMANTIC units, not raw keys — "your most
+   used hotkey is alt" taught nothing. An alt-ribbon sequence tallies as one chord
+   ("alt h k"), ctrl chords stay as logged ("Ctrl+C"), and typed formulas tally the
+   FUNCTIONS they used ("SUM()"). Bare modifiers, typing, and navigation are noise. */
+function isChordUnit(k){
+  return /^alt( [a-z0-9]){1,6}$/.test(k) || /\(\)$/.test(k) || /^F[0-9]+$/.test(k) || /^Ctrl\+/.test(k);
+}
+function chordifyLog(log){
+  const out=[]; let i=0;
+  while(i<log.length){
+    const k=String(log[i]||'');
+    if(k==='Alt'){                                   // ribbon chord: collect the menu letters
+      let j=i+1; const seq=[];
+      while(j<log.length && seq.length<6 && /^[a-z0-9]$/i.test(String(log[j]||''))){ seq.push(String(log[j]).toLowerCase()); j++; }
+      if(seq.length) out.push('alt '+seq.join(' '));
+      i=j; continue;
+    }
+    if(k==='='){                                     // formula: assemble until commit, mine the function names
+      let j=i+1, buf='=';
+      while(j<log.length){ const c=String(log[j]||'');
+        if(c==='\u21b5'||c==='Tab'||c==='Esc') break;
+        if(c.length===1) buf+=c; j++; }
+      (buf.toUpperCase().match(/[A-Z][A-Z0-9]*\(/g)||[]).forEach(fn=>out.push(fn.slice(0,-1)+'()'));
+      i=j; continue;
+    }
+    if(/^Ctrl\+/.test(k) || /^F[0-9]+$/.test(k)) out.push(k);
+    i++;
+  }
+  return out;
+}
 // r80: lite local run ledger — feeds in-game achievement checks (server runs stay canonical)
 function logRunLite(t){
   try{ sheetMarkWin(); }catch(e){}
@@ -13253,10 +13283,16 @@ function logRunLite(t){
   try{
     const a=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]');
     a.push({time_ms:Math.round(t*1000), keystrokes:keyLog.length, optimal:CHALLENGES[cur].parKeys, d:cur, ts:Date.now()});   // r157: d+ts feed the weakness queue
-    // r90: keystroke heatmap feed — tally the chords this run actually used
+    // r90/r272: keystroke heatmap feed — semantic units only (see chordifyLog above)
     try{
       const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
-      keyLog.forEach(kk=>{ if(kk && kk.length<=16){ kc[kk]=(kc[kk]||0)+1; } });
+      // lifetime keystrokes get their own plain counter now (the unit tally no longer
+      // approximates them); first run under r272 seeds it from the old per-key sums
+      const prevKL=parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10)||0;
+      const seedKL=prevKL || Object.values(kc).reduce((a,b)=>a+(b|0),0);
+      localStorage.setItem('hk_keys_lifetime', String(seedKL + keyLog.length));
+      Object.keys(kc).forEach(k2=>{ if(!isChordUnit(k2)) delete kc[k2]; });   // one-time legacy sweep
+      chordifyLog(keyLog).forEach(u=>{ if(u && u.length<=18){ kc[u]=(kc[u]||0)+1; } });
       const ks=Object.keys(kc);
       if(ks.length>80){ ks.sort((x,y)=>kc[x]-kc[y]).slice(0,ks.length-80).forEach(k2=>delete kc[k2]); }
       localStorage.setItem('hk_key_counts', JSON.stringify(kc));
@@ -13275,8 +13311,8 @@ function buildAchCtx(){
   let lite=[]; try{ lite=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){}
   const groups={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
   let __ck=0, __kl=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
-    __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length;
-    __kl=Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
+    __ck=Object.keys(kc).filter(isChordUnit).length;   // r272: semantic units
+    __kl=parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10) || Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
   return { pb:PB, pars:window.HOTKEY_PARS||{}, runs:lite, streak:streakN, solves:solvesN,
     crowns:0, groups, att:Object.keys(PB).length, menuOrder:MENU_ORDER,
     mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,

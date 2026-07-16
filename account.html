@@ -75,7 +75,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=254"></script>
+<script src="nav.js?v=255"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -290,6 +290,11 @@ async function load(){
         try{ const {error}=await sb.rpc('leave_desk'); if(error){ say('deskMsg',deskErr(error),true); return; }
           say('deskMsg','You\u2019ve left the desk.'); renderDesk(); }catch(e){ say('deskMsg','Something went wrong.',true); } };
     } else {
+      const anonAcct = !!(me && (me.is_anonymous===true || (Array.isArray(me.identities)&&me.identities.length===0)));
+      if(anonAcct){
+        el.innerHTML = `<div style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7">Desks need a full account \u2014 set an email &amp; password in the Profile card above and your progress comes with you.</div>`;
+        return;
+      }
       el.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <input id="deskName" maxlength="40" placeholder="desk name \u2014 e.g. Wharton UG Finance" style="flex:1;min-width:200px">
           <label style="font-size:11px;display:flex;align-items:center;gap:5px;color:var(--muted)"><input type="checkbox" id="deskPriv"> private</label>
