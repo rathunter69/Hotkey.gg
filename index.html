@@ -223,17 +223,21 @@
   td.editing .edin{white-space:nowrap}
   @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
   td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
-  /* r266 PROTOTYPE — watch-solution spotlight (flag: localStorage hk_demo_spot='1').
+  /* r271 — watch-solution spotlight (default ON; opt out: localStorage hk_demo_spot='0').
      Dim the page, cut a window around the cells the demo is editing, caption the step. */
   #demoSpot{position:fixed; z-index:24; pointer-events:none; display:none;
     border:2px solid var(--accent); border-radius:5px;
-    box-shadow:0 0 0 9999px color-mix(in srgb, #000 52%, transparent), 0 0 18px var(--accent-glow);
+    box-shadow:0 0 0 1px color-mix(in srgb, #fff 30%, transparent),
+      0 0 0 9999px color-mix(in srgb, #000 52%, transparent), 0 0 18px var(--accent-glow);
     transition:left .28s ease, top .28s ease, width .28s ease, height .28s ease}
   #demoSpotCap{position:fixed; z-index:26; pointer-events:none; display:none; max-width:420px;
-    font-family:var(--mono); font-size:12.5px; line-height:1.5; color:#f2f2f2;
-    background:rgba(18,20,25,.94); border:1px solid rgba(255,255,255,.14);
+    font-family:var(--mono); font-size:12.5px; line-height:1.5; color:var(--text);
+    background:var(--surface); border:1px solid var(--line);
+    box-shadow:0 4px 18px rgba(0,0,0,.35);
     padding:7px 12px; border-radius:8px; transition:left .28s ease, top .28s ease}
   #demoSpotCap b{color:var(--accent)}
+  #demoSpotCap kbd{font-family:inherit; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:5px; padding:0 5px}
   td.ttarget{outline:1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:-2px}
   /* r163: GHOST CURSOR - your PB run gliding through its recorded path. Warn-dashed
      so it reads apart from selection (accent) and ink borders; never catches input. */
@@ -11702,29 +11706,61 @@ function demoKey(spec){ document.dispatchEvent(new KeyboardEvent('keydown',{
 function updateDemoBtn(){ const b=$('demoBtn'); if(b){ b.classList.toggle('on',demoPlaying);
   b.innerHTML=demoPlaying?'<kbd>esc</kbd> stop demo':'▶ watch solution'; } }
 function cancelDemo(){ demoPlaying=false; try{ demoSpotOff(); }catch(e){} }
-/* r266 PROTOTYPE — watch-solution spotlight. Behind localStorage hk_demo_spot='1' until approved.
-   demoSpotTo(sel) dims the page and frames the cells the demo edits next; the caption names them. */
-function demoSpotOn(){ return (function(){ try{ return localStorage.getItem('hk_demo_spot')==='1'; }catch(e){ return false; } })(); }
+/* r271 — watch-solution spotlight (Wolf: "dimming the background and highlighting areas").
+   Default ON; opt out with localStorage hk_demo_spot='0'. demoSpotTo() dims the page and
+   frames the range the demo edits; the caption names the step and the chord being played.
+   Re-anchors after EVERY keystroke and on scroll/resize — structure edits (row inserts,
+   column widths) move cells mid-step, and a stale frame points at the wrong row. */
+function demoSpotOn(){ try{ return localStorage.getItem('hk_demo_spot')!=='0'; }catch(e){ return true; } }
 function demoSpotCellTD(r,c){ try{ return document.querySelector('#grid td[data-r="'+r+'"][data-c="'+c+'"]'); }catch(e){ return null; } }
-function demoSpotTo(sel, stepN, total){
+let demoSpotCur=null;
+function demoSpotKeys(keys){
+  try{
+    const nm=k=>{ const K=k.key||'';
+      return K===' '?'space':K==='Enter'?'\u21b5':K==='Escape'?'esc'
+        :K==='ArrowRight'?'\u2192':K==='ArrowLeft'?'\u2190':K==='ArrowUp'?'\u2191':K==='ArrowDown'?'\u2193'
+        :K==='Delete'?'del':K==='Backspace'?'\u232b':K==='Tab'?'tab':K==='Alt'?'alt':K.toLowerCase(); };
+    const toks=[]; let typing='', menu=false;   // menu: bare Alt opens ribbon chords — letters after it are keys, not typed text
+    for(const k of keys){
+      const plain = k.key && k.key.length===1 && !k.ctrl && !k.alt && !k.shift;
+      if(plain && menu && /^[a-z0-9]$/i.test(k.key)){ toks.push(k.key.toLowerCase()); continue; }
+      if(plain){ typing+=k.key; continue; }
+      if(typing){ toks.push('\u201c'+typing+'\u201d'); typing=''; }
+      menu = (k.key==='Alt');
+      let t=''; if(k.ctrl)t+='ctrl+'; if(k.alt&&k.key!=='Alt')t+='alt+'; if(k.shift)t+='shift+';
+      toks.push(t+nm(k));
+    }
+    if(typing) toks.push('\u201c'+typing+'\u201d');
+    let lab=toks.join(' ');
+    return lab.length>72 ? lab.slice(0,69)+'\u2026' : lab;
+  }catch(e){ return ''; }
+}
+function demoSpotTo(sel, stepN, total, keysLab, instant){
   try{
     const rng=resolveRange(sel); if(!rng) return;
     const a=demoSpotCellTD(rng.r1,rng.c1), b=demoSpotCellTD(rng.r2,rng.c2);
     if(!a||!b) return;
+    demoSpotCur={sel:sel, stepN:stepN, total:total, keys:keysLab||''};
     const ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
     const L=Math.min(ra.left,rb.left)-4, T=Math.min(ra.top,rb.top)-4;
     const R=Math.max(ra.right,rb.right)+4, B=Math.max(ra.bottom,rb.bottom)+4;
     let sp=$('demoSpot'), cap=$('demoSpotCap');
     if(!sp){ sp=document.createElement('div'); sp.id='demoSpot'; document.body.appendChild(sp); }
     if(!cap){ cap=document.createElement('div'); cap.id='demoSpotCap'; document.body.appendChild(cap); }
+    sp.style.transition = instant ? 'none' : ''; cap.style.transition = instant ? 'none' : '';
     sp.style.display='block'; cap.style.display='block';
     sp.style.left=L+'px'; sp.style.top=T+'px'; sp.style.width=(R-L)+'px'; sp.style.height=(B-T)+'px';
-    cap.innerHTML='step <b>'+stepN+'</b>/'+total+' — editing <b>'+escHtml(sel)+'</b>';
+    cap.innerHTML='step <b>'+stepN+'</b>/'+total+' \u00b7 <b>'+escHtml(sel)+'</b>'+
+      (demoSpotCur.keys?' \u00b7 <kbd>'+escHtml(demoSpotCur.keys)+'</kbd>':'');
     const capY = (B+12+44>window.innerHeight) ? (T-46) : (B+12);
     cap.style.left=Math.max(10,L)+'px'; cap.style.top=capY+'px';
   }catch(e){}
 }
-function demoSpotOff(){ try{ const sp=$('demoSpot'); if(sp) sp.style.display='none'; const cap=$('demoSpotCap'); if(cap) cap.style.display='none'; }catch(e){} }
+function demoSpotSync(){ if(demoSpotCur){ const c=demoSpotCur; demoSpotTo(c.sel, c.stepN, c.total, c.keys, true); } }
+window.addEventListener('scroll', ()=>demoSpotSync(), true);
+window.addEventListener('resize', ()=>demoSpotSync());
+function demoSpotOff(){ demoSpotCur=null;
+  try{ const sp=$('demoSpot'); if(sp) sp.style.display='none'; const cap=$('demoSpotCap'); if(cap) cap.style.display='none'; }catch(e){} }
 async function playDemo(){
   if(demoPlaying||!S) return;
   loadChallenge(cur);
@@ -11737,9 +11773,10 @@ async function playDemo(){
   const spot=demoSpotOn(); let stepN=0;
   for(const mv of moves){ if(!demoPlaying) break;
     setDemoSel(mv.sel); stepN++;
-    if(spot) demoSpotTo(mv.sel, stepN, moves.length);
+    if(spot) demoSpotTo(mv.sel, stepN, moves.length, demoSpotKeys(mv.keys));
     await sleep(520);
     for(const k of mv.keys){ if(!demoPlaying) break; demoKey(k);
+      if(spot) demoSpotSync();
       // plain character typing plays fast; chords/navigation keep a readable beat
       const plain = k && k.key && k.key.length===1 && !k.ctrl && !k.alt && !k.shift;
       await sleep(plain?110:330); }
