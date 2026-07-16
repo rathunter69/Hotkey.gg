@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Kill the hardcodes — make it roll forward — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Typed answers → live formulas; v2 must survive new numbers Par: 32 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Typed answers → live formulas; v2 must survive new numbers Par 33s, optimal 32 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Kill the hardcodes — make it roll forward — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Typed answers → live formulas; v2 must survive new numbers Par: 32 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Typed answers → live formulas; v2 must survive new numbers Par 33s, optimal 32 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/versionup.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Kill the hardcodes — make it roll forward — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Typed answers → live formulas; v2 must survive new numbers Par: 32 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Typed answers → live formulas; v2 must survive new numbers Par 33s, optimal 32 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/versionup.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Kill the hardcodes — make it roll forward","description":"Typed answers → live formulas; v2 must survive new numbers","url":"https://www.hotkey.gg/drills/versionup.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"A hardcode freezes yesterday — relink it (=), then bulk-rename the version tag (Ctrl+H) so the whole page reads v2.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Kill the hardcodes — make it roll forward","item":"https://www.hotkey.gg/drills/versionup.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Kill the hardcodes — make it roll forward","description":"Typed answers → live formulas; v2 must survive new numbers","url":"https://www.hotkey.gg/drills/versionup.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"A hardcode freezes yesterday — relink it (=), then bulk-rename the version tag (Ctrl+H) so the whole page reads v2.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT33S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Kill the hardcodes — make it roll forward","item":"https://www.hotkey.gg/drills/versionup.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,18 +102,17 @@
   <div class="sub">You inherited a five-year operating build where someone typed the answers: growth, gross profit, EBITDA, AND the margin are all hardcoded numbers — right today, silently wrong the moment an input moves. Resurrect every derived row as a live formula, fill it across, and prove nothing drifted. This is versioning discipline: v2 must survive new numbers without a rebuild.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=versionup">train this drill →</a>
-    <span class="par">par 32 keystrokes · keyboard only · free</span>
+    <span class="par">par 33s · optimal 32 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>C5:F5</em> growth → =C4/B4-1, fill · <em>B7:F7</em> GP → =B4+B6 · <em>B9:F9</em> EBITDA → =B7+B8 · <em>B10:F10</em> margin → =B9/B4 · stamp it v2 (<em>ctrl+h</em> v1 → v2) · costs carry their sign — subtotals are clean sums</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+H</kbd><span class="m">⌘H on mac</span><span class="what">Find &amp; replace</span></div><div class="use">Find &amp; Replace fixes a mislabeled quarter or a stale entity name across the whole tab in one pass.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>growth row is typed · C5: <kbd>=</kbd>C4/B4-1 <kbd>↵</kbd> · select C5:F5, <kbd>ctrl</kbd>+<kbd>r</kbd></span></li>
-<li><span>gross profit is typed · B7: <kbd>=</kbd>B4+B6 <kbd>↵</kbd> — COGS is negative; adding it IS subtracting · fill B7:F7</span></li>
-<li><span>EBITDA is typed · B9: <kbd>=</kbd>B7+B8 <kbd>↵</kbd> · fill B9:F9</span></li>
-<li><span>margin is typed · B10: <kbd>=</kbd>B9/B4 <kbd>↵</kbd> · fill B10:F10 — values must NOT move</span></li>
-<li><span>stamp it v2: <kbd>ctrl</kbd>+<kbd>h</kbd> · find <b>v1</b> <kbd>tab</kbd> replace <b>v2</b> <kbd>↵</kbd> — one pass renames every version tag on the page</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>C5:F5</em> growth → =C4/B4-1, fill · <em>B7:F7</em> GP → =B4+B6 · <em>B9:F9</em> EBITDA → =B7+B8 · <em>B10:F10</em> margin → =B9/B4 · stamp it v2 (<em>ctrl+h</em> v1 → v2) · costs carry their sign — subtotals are clean sums</div></div>
 
   <div class="section-title">More Formulas II drills</div>
   <div class="rel">

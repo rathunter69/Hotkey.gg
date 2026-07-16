@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Build the debt &amp; interest block — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest Par: 59 keystrokes. F">
+<meta name="description" content="Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest Par 57s, optimal 59 k">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Build the debt &amp; interest block — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest Par: 59 keystrokes. F">
+<meta property="og:description" content="Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest Par 57s, optimal 59 k">
 <meta property="og:url" content="https://www.hotkey.gg/drills/debtblock.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Build the debt &amp; interest block — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest Par: 59 keystrokes. F">
+<meta name="twitter:description" content="Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest Par 57s, optimal 59 k">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/debtblock.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the debt & interest block","description":"Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest","url":"https://www.hotkey.gg/drills/debtblock.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"A debt block is two corkscrews and their interest — each tranche rolls on its own rate, then total debt and total interest feed the model.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the debt & interest block","item":"https://www.hotkey.gg/drills/debtblock.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the debt & interest block","description":"Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest","url":"https://www.hotkey.gg/drills/debtblock.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"A debt block is two corkscrews and their interest — each tranche rolls on its own rate, then total debt and total interest feed the model.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT57S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the debt & interest block","item":"https://www.hotkey.gg/drills/debtblock.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,17 +102,16 @@
   <div class="sub">Two tranches, one block: a senior term loan and subordinated notes. Each opens at the prior close, its mandatory amort pays it down, and interest accrues at its OWN anchored rate. Build both corkscrews, run both interest lines, then foot total debt and total interest — the two rows the balance sheet and P&L actually pull.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=debtblock">train this drill →</a>
-    <span class="par">par 59 keystrokes · keyboard only · free</span>
+    <span class="par">par 57s · optimal 59 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys">Senior: <em>B5</em> <em>=B3+B4</em> · <em>C3</em> <em>=B5</em> · fill roll → · <em>B6</em> <em>=B3*$B$16</em> · Sub: <em>B10</em> <em>=B8+B9</em> · <em>C8</em> <em>=B10</em> · fill roll → · <em>B11</em> <em>=B8*$B$17</em> · Totals: <em>B13</em> <em>=B5+B10</em> · <em>B14</em> <em>=B6+B11</em> · fill →</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>senior roll: ending at B5 · <kbd>=B3+B4</kbd> · link C3 · <kbd>=B5</kbd> · fill C3:F3 → · then fill B5:F5 →</span></li>
-<li><span>senior interest at B6 · <kbd>=B3*$B$16</kbd> — the anchored senior rate on the opening balance · fill B6:F6 →</span></li>
-<li><span>sub roll: ending at B10 · <kbd>=B8+B9</kbd> · link C8 · <kbd>=B10</kbd> · fill C8:F8 → · fill B10:F10 → · interest B11 · <kbd>=B8*$B$17</kbd> · fill →</span></li>
-<li><span>foot the block: total debt at B13 · <kbd>=B5+B10</kbd> · total interest at B14 · <kbd>=B6+B11</kbd> · fill both right</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">Senior: <em>B5</em> <em>=B3+B4</em> · <em>C3</em> <em>=B5</em> · fill roll → · <em>B6</em> <em>=B3*$B$16</em> · Sub: <em>B10</em> <em>=B8+B9</em> · <em>C8</em> <em>=B10</em> · fill roll → · <em>B11</em> <em>=B8*$B$17</em> · Totals: <em>B13</em> <em>=B5+B10</em> · <em>B14</em> <em>=B6+B11</em> · fill →</div></div>
 
   <div class="section-title">More Full Builds drills</div>
   <div class="rel">

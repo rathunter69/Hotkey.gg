@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Walk the wire — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream Par: 6 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream Par 10s, optimal 6 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Walk the wire — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream Par: 6 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream Par 10s, optimal 6 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/wirewalk.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Walk the wire — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream Par: 6 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream Par 10s, optimal 6 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/wirewalk.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Walk the wire","description":"Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream","url":"https://www.hotkey.gg/drills/wirewalk.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"Ctrl+[ jumps to a formula’s source, Ctrl+] back — a wrong number is a trail, not a mystery.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Walk the wire","item":"https://www.hotkey.gg/drills/wirewalk.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Walk the wire","description":"Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream","url":"https://www.hotkey.gg/drills/wirewalk.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"Ctrl+[ jumps to a formula’s source, Ctrl+] back — a wrong number is a trail, not a mystery.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT10S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Walk the wire","item":"https://www.hotkey.gg/drills/wirewalk.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,17 +102,17 @@
   <div class="sub">The deck figure is wrong, and the VP’s note says which input to blame — three links upstream. Do not hunt by eye: Ctrl+[ jumps to a formula’s first precedent, hop by hop, until you’re standing on the source. Fix it there, and Ctrl+] rides the wire back down while everything reprices. Auditors call it tracing; the desk calls it Tuesday.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=wirewalk">train this drill →</a>
-    <span class="par">par 6 keystrokes · keyboard only · free</span>
+    <span class="par">par 10s · optimal 6 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys">on <em>H2</em> · <em>ctrl+[</em> to the subtotal · <em>ctrl+[</em> again to the source block · fix <em>Software</em> to <em>290</em> · <em>ctrl+]</em> ×2 rides back down</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+[</kbd><span class="m">⌘[ on mac</span><span class="what">Jump to precedents</span></div><div class="use">Jump to the cells a formula reads from — the fastest way to audit where a number comes from.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+]</kbd><span class="m">⌘] on mac</span><span class="what">Jump to dependents</span></div><div class="use">Jump to the cells that depend on this one — check what breaks before you change anything.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>start on the deck figure H2 · <kbd>ctrl</kbd>+<kbd>[</kbd> — you land on the subtotal it reads</span></li>
-<li><span><kbd>ctrl</kbd>+<kbd>[</kbd> again — now you’re at the top of the source block; the note says Software should read 290</span></li>
-<li><span>arrow to it, type <kbd>290</kbd> <kbd>↵</kbd> — the subtotal and the deck reprice on the spot</span></li>
-<li><span><kbd>ctrl</kbd>+<kbd>]</kbd> <kbd>ctrl</kbd>+<kbd>]</kbd> — ride the wire back down and watch the deck figure land right</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">on <em>H2</em> · <em>ctrl+[</em> to the subtotal · <em>ctrl+[</em> again to the source block · fix <em>Payroll</em> to <em>880</em> · <em>ctrl+]</em> ×2 rides back down</div></div>
 
   <div class="section-title">More Formulas II drills</div>
   <div class="rel">

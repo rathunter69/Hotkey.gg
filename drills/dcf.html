@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Discount the cash flows — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="DF row × PV row; the TV reuses the year-5 factor Par: 64 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="DF row × PV row; the TV reuses the year-5 factor Par 62s, optimal 64 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Discount the cash flows — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="DF row × PV row; the TV reuses the year-5 factor Par: 64 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="DF row × PV row; the TV reuses the year-5 factor Par 62s, optimal 64 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/dcf.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Discount the cash flows — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="DF row × PV row; the TV reuses the year-5 factor Par: 64 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="DF row × PV row; the TV reuses the year-5 factor Par 62s, optimal 64 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/dcf.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Discount the cash flows","description":"DF row × PV row; the TV reuses the year-5 factor","url":"https://www.hotkey.gg/drills/dcf.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Each year ÷ (1+r)^n — discounting is a fill; then add the terminal value.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Discount the cash flows","item":"https://www.hotkey.gg/drills/dcf.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Discount the cash flows","description":"DF row × PV row; the TV reuses the year-5 factor","url":"https://www.hotkey.gg/drills/dcf.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Each year ÷ (1+r)^n — discounting is a fill; then add the terminal value.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT62S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Discount the cash flows","item":"https://www.hotkey.gg/drills/dcf.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,19 +102,17 @@
   <div class="sub">Five years of FCF and the real discounting stack: a discount-factor row built ONCE off the anchored rate, a PV row that just multiplies, a Gordon terminal value — and the TV discounts with the year-5 factor you already built. Desk rule: never retype a discount factor.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=dcf">train this drill →</a>
-    <span class="par">par 64 keystrokes · keyboard only · free</span>
+    <span class="par">par 62s · optimal 64 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>B4</em> DF <em>=1/(1+$B$7)^B2</em> · fill B4:F4 → · <em>B5</em> PV <em>=B3*B4</em> · fill B5:F5 → · <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> · <em>B11</em> <em>=B10*F4</em> · <em>B12</em> EV <em>=SUM(B5:F5)+B11</em></div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="fnline">functions you'll type: <b style="color:var(--text)">SUM()</b></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>discount factor at B4 · <kbd>=1/(1+$B$7)^B2</kbd> — rate anchored, year walking</span></li>
-<li><span>select B4:F4 · <kbd>ctrl</kbd>+<kbd>r</kbd> — five factors from one formula</span></li>
-<li><span>PV row: B5 · <kbd>=B3*B4</kbd> · fill B5:F5 → — cash × factor, nothing else</span></li>
-<li><span>terminal value at B10 · <kbd>=F3*(1+B8)/($B$7-B8)</kbd> — Gordon growth off year 5</span></li>
-<li><span>PV of TV at B11 · <kbd>=B10*F4</kbd> — REUSE the year-5 factor; never retype it</span></li>
-<li><span>Enterprise Value at B12 · <kbd>=SUM(B5:F5)+B11</kbd></span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>B4</em> DF <em>=1/(1+$B$7)^B2</em> · fill B4:F4 → · <em>B5</em> PV <em>=B3*B4</em> · fill B5:F5 → · <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> · <em>B11</em> <em>=B10*F4</em> · <em>B12</em> EV <em>=SUM(B5:F5)+B11</em></div></div>
 
   <div class="section-title">More Models I drills</div>
   <div class="rel">

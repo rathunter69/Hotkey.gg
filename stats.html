@@ -217,7 +217,7 @@ async function load(){
   let html = `<div class="hero${tcHtml?'':' solo'}">` + tcHtml + `<div class="cards">
     <div class="stat lead"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
     <div class="stat"><div class="big">${bestKps?bestKps.toFixed(1):'—'}</div><div class="lbl">peak keys / sec</div></div>
-    <div class="stat"><div class="big">${avgEff!==null?avgEff+'<em>%</em>':'—'}</div><div class="lbl">avg efficiency vs par</div></div>
+    <div class="stat"><div class="big">${avgEff!==null?avgEff+'<em>%</em>':'—'}</div><div class="lbl">avg keys vs optimal path</div></div>
     <div class="stat"><div class="big">${streakN?'🔥 '+streakN:'—'}</div><div class="lbl">day streak</div></div>
   </div></div>`;
 

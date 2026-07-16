@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Run the interest schedule — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads Par: 28 keystrokes. Free interactiv">
+<meta name="description" content="Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads Par 29s, optimal 28 keys. Free inte">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Run the interest schedule — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads Par: 28 keystrokes. Free interactiv">
+<meta property="og:description" content="Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads Par 29s, optimal 28 keys. Free inte">
 <meta property="og:url" content="https://www.hotkey.gg/drills/intsched.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Run the interest schedule — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads Par: 28 keystrokes. Free interactiv">
+<meta name="twitter:description" content="Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads Par 29s, optimal 28 keys. Free inte">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/intsched.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run the interest schedule","description":"Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads","url":"https://www.hotkey.gg/drills/intsched.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models II","teaches":"Interest ties the debt block to the P&L — rate × the opening balance, then EBITDA ÷ interest is the coverage the covenant reads.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run the interest schedule","item":"https://www.hotkey.gg/drills/intsched.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run the interest schedule","description":"Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads","url":"https://www.hotkey.gg/drills/intsched.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models II","teaches":"Interest ties the debt block to the P&L — rate × the opening balance, then EBITDA ÷ interest is the coverage the covenant reads.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT29S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run the interest schedule","item":"https://www.hotkey.gg/drills/intsched.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,18 +102,16 @@
   <div class="sub">A term loan and the schedule that feeds the P&L: each year opens at the prior close, mandatory amort pays it down, and cash interest is the anchored rate on the OPENING balance. Build year 1, link the opening, fill the roll across — then run coverage, EBITDA over interest, because that ratio is what the covenant actually tests.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=intsched">train this drill →</a>
-    <span class="par">par 28 keystrokes · keyboard only · free</span>
+    <span class="par">par 29s · optimal 28 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>B4</em> ending <em>=B2+B3</em> · <em>C2</em> <em>=B4</em> · fill C2:F2 → · fill B4:F4 → · <em>B6</em> interest <em>=B2*$B$10</em> · fill B6:F6 → · <em>B8</em> coverage <em>=B7/B6</em> · fill B8:F8 →</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>ending debt at B4 · <kbd>=B2+B3</kbd> — opening less the mandatory amort (already negative)</span></li>
-<li><span>THE LINK: C2 · <kbd>=B4</kbd> · fill C2:F2 → — each year opens where the last one closed</span></li>
-<li><span>select B4:F4 · <kbd>ctrl</kbd>+<kbd>r</kbd> — the debt roll walks itself across</span></li>
-<li><span>cash interest at B6 · <kbd>=B2*$B$10</kbd> — the anchored rate on the OPENING balance · fill B6:F6 →</span></li>
-<li><span>interest coverage at B8 · <kbd>=B7/B6</kbd> — EBITDA over interest, the covenant ratio · fill B8:F8 →</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>B4</em> ending <em>=B2+B3</em> · <em>C2</em> <em>=B4</em> · fill C2:F2 → · fill B4:F4 → · <em>B6</em> interest <em>=B2*$B$10</em> · fill B6:F6 → · <em>B8</em> coverage <em>=B7/B6</em> · fill B8:F8 →</div></div>
 
   <div class="section-title">More Models II drills</div>
   <div class="rel">

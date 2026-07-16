@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Chase the marks — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula Par: 54 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula Par 53s, optimal 54 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Chase the marks — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula Par: 54 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula Par 53s, optimal 54 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/modeltour.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Chase the marks — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula Par: 54 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula Par 53s, optimal 54 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/modeltour.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Chase the marks","description":"Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula","url":"https://www.hotkey.gg/drills/modeltour.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Subtotals are formulas — fly to each #REF! (Ctrl+arrows) and rebuild it; then the margin rows go in with ONE formula filled RIGHT across the columns.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Chase the marks","item":"https://www.hotkey.gg/drills/modeltour.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Chase the marks","description":"Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula","url":"https://www.hotkey.gg/drills/modeltour.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Subtotals are formulas — fly to each #REF! (Ctrl+arrows) and rebuild it; then the margin rows go in with ONE formula filled RIGHT across the columns.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT53S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Chase the marks","item":"https://www.hotkey.gg/drills/modeltour.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,21 +102,20 @@
   <div class="sub">The model came back with four subtotals blown out to #REF! — Gross profit, EBITDA, EBIT and Net income each lost a cell. Those are the ruled, bold rows: they are COMPUTED, not typed. Ctrl-arrows fly you to each break — rebuild the FORMULA that sums the lines above it (costs already carry their sign, so it just adds up). Then put in the margin rows: build =subtotal ÷ Revenue in the first column and FILL RIGHT so one formula runs the whole row. Close the bottom line — dollar-format Net income and rule it off — and land at A1 for the meeting.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=modeltour">train this drill →</a>
-    <span class="par">par 54 keystrokes · keyboard only · free</span>
+    <span class="par">par 53s · optimal 54 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>F5</em> → <em>=F3+F4</em> · <em>B9</em> → <em>=B5+B7+B8</em> · <em>C12</em> → <em>=C9+C11</em> · <em>E15</em> → <em>=E12+E13+E14</em> · margins <em>B6</em> =B5/B3 fill right <em>B6:F6</em>, <em>B10</em> =B9/B3 fill right · <em>ctrl+shift+$</em> Net income <em>B15:F15</em> + <em>bottom border</em> (<em>alt h b b</em>) · finish <em>ctrl+home</em></div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+$</kbd><span class="m">⌘⇧$ on mac</span><span class="what">Currency, 2 decimals</span></div><div class="use">Price columns and per-share figures read as money instantly — standard on comps pages and output rows.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b b</kbd><span class="m">⌥ h b b on mac</span><span class="what">Bottom border</span></div><div class="use">Bottom border under headers — rulings mark structure, not decoration.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+Home</kbd><span class="m">⌘Home on mac</span><span class="what">Go to A1</span></div><div class="use">Back to A1 — end every session with the cursor home so the next person opens the tab clean.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>the Gross profit break at F5 — fly there with ctrl-arrows · it’s Revenue plus COGS (COGS is negative, so it just adds): type <kbd>=F3+F4</kbd> <kbd>↵</kbd></span></li>
-<li><span>the EBITDA break at B9 — gross profit plus the two opex lines: <kbd>=B5+B7+B8</kbd> <kbd>↵</kbd></span></li>
-<li><span>the EBIT break at C12 — EBITDA plus D&A: <kbd>=C9+C11</kbd> <kbd>↵</kbd></span></li>
-<li><span>the Net income break at E15 — EBIT plus interest and taxes: <kbd>=E12+E13+E14</kbd> <kbd>↵</kbd> — watch the whole column tie</span></li>
-<li><span>the Gross profit margin — in the FIRST column: <em>B6</em> · <kbd>=B5/B3</kbd> <kbd>↵</kbd> (Gross profit ÷ Revenue) · then select <em>B6:F6</em> · <kbd>ctrl</kbd>+<kbd>r</kbd> — one formula fills RIGHT, each column re-bases to its own quarter</span></li>
-<li><span>the EBITDA margin the same way: <em>B10</em> · <kbd>=B9/B3</kbd> <kbd>↵</kbd> · fill right <kbd>ctrl</kbd>+<kbd>r</kbd></span></li>
-<li><span>close the statement: select Net income B15:F15 · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> dollar-format · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> adds a bottom border — the closing rule under the bottom line</span></li>
-<li><span>meeting time: <kbd>ctrl</kbd>+<kbd>home</kbd> — a clean model greets the reader at A1</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>F5</em> → <em>=F3+F4</em> · <em>B9</em> → <em>=B5+B7+B8</em> · <em>D12</em> → <em>=D9+D11</em> · <em>E15</em> → <em>=E12+E13+E14</em> · margins <em>B6</em> =B5/B3 fill right <em>B6:F6</em>, <em>B10</em> =B9/B3 fill right · <em>ctrl+shift+$</em> Net income <em>B15:F15</em> + <em>bottom border</em> (<em>alt h b b</em>) · finish <em>ctrl+home</em></div></div>
 
   <div class="section-title">More Foundations drills</div>
   <div class="rel">

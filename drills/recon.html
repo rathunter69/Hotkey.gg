@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Two systems, one truth — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero Par: 81 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero Par 77s, optimal 81 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Two systems, one truth — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero Par: 81 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero Par 77s, optimal 81 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/recon.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Two systems, one truth — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero Par: 81 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero Par 77s, optimal 81 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/recon.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Two systems, one truth","description":"COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero","url":"https://www.hotkey.gg/drills/recon.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"COUNTIF checks presence, INDEX/MATCH checks size — drive every difference to zero.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Two systems, one truth","item":"https://www.hotkey.gg/drills/recon.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Two systems, one truth","description":"COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero","url":"https://www.hotkey.gg/drills/recon.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"COUNTIF checks presence, INDEX/MATCH checks size — drive every difference to zero.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT77S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Two systems, one truth","item":"https://www.hotkey.gg/drills/recon.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,17 +102,17 @@
   <div class="sub">The trading system says seven deals; the finance extract says six — and one amount they DO share does not agree. This is reconciliation, the data job every first-year owns: flag presence with COUNTIF, pull the book amount with INDEX/MATCH, bring the missing deal across, and drive the difference column to zeros. Nothing ships while the recon shows a break.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=recon">train this drill →</a>
-    <span class="par">par 81 keystrokes · keyboard only · free</span>
+    <span class="par">par 77s · optimal 81 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>C4</em> → <em>=COUNTIF($D$4:$D$10,A4)</em> · fill C4:C10 · the 0-flag deal → add it at <em>D10:E10</em> · <em>F4</em> → <em>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</em> · fill F4:F10 · fix the broken amount — every Δ reads 0</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
+    <div class="fnline">functions you'll type: <b style="color:var(--text)">COUNTIF()</b> · <b style="color:var(--text)">INDEX()</b> · <b style="color:var(--text)">MATCH()</b></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>presence first: C4 · <kbd>=COUNTIF($D$4:$D$10,A4)</kbd> <kbd>↵</kbd> · select C4:C10 · <kbd>ctrl</kbd>+<kbd>d</kbd> — a 0 means finance never booked it</span></li>
-<li><span>bring the missing deal across: type its name at D10, its amount from column B at E10</span></li>
-<li><span>now the amounts: F4 · <kbd>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</kbd> <kbd>↵</kbd> · fill F4:F10 — INDEX/MATCH pulls the book number</span></li>
-<li><span>one row shows a difference — retype its amount in column E from the system of record · every Δ must read 0</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>C4</em> → <em>=COUNTIF($D$4:$D$10,A4)</em> · fill C4:C10 · the 0-flag deal → add it at <em>D10:E10</em> · <em>F4</em> → <em>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</em> · fill F4:F10 · fix the broken amount — every Δ reads 0</div></div>
 
   <div class="section-title">More Data &amp; Lookups drills</div>
   <div class="rel">

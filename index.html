@@ -262,6 +262,8 @@
     border:1px solid var(--line); border-radius:5px; padding:0 5px}
   #demoSpotCap.echo-miss{animation:echoShake .3s; border-color:var(--bad)}
   @keyframes echoShake{25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}}
+  .mb-tool.nudge{animation:hkNudge 1.1s ease-in-out 5; border-color:var(--accent)}
+  @keyframes hkNudge{50%{box-shadow:0 0 0 5px var(--accent-glow)}}
   td.ttarget{outline:1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:-2px}
   /* r163: GHOST CURSOR - your PB run gliding through its recorded path. Warn-dashed
      so it reads apart from selection (accent) and ink borders; never catches input. */
@@ -1398,7 +1400,7 @@
       </div>
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
-      <button class="mb-tool" id="echoBtn" data-tip="the demo hands YOU the keys — press each highlighted chord to advance">&#9000; echo it</button>
+      <button class="mb-tool" id="echoBtn" data-tip="the demo hands YOU the keys — press each highlighted chord to advance">&#9000; follow along</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <button class="mb-tool" id="ghostToggle" data-tip="PB pace counter + cursor ghost \u2014 click to toggle">\ud83d\udc7b ghost: on</button>
@@ -5988,7 +5990,7 @@ const CHALLENGES = {
       cells['A10']={...blankCell(),value:'Total revenue',txt:true,bold:true};
       cells['A12']={...blankCell(),value:'Opex',txt:true};
       cells['A13']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      const shuffled=[2,3,4,5,6].sort(()=>Math.random()-.5);
+      const shuffled=[2,3,4,5,6].sort(()=>_rand()-.5);
       const cHard=shuffled[0], cCross=shuffled[1];
       for(let c=2;c<=6;c++){
         const L=colLetter(c);
@@ -6247,7 +6249,7 @@ const CHALLENGES = {
       cells['A13']={...blankCell(),value:'Royalty',txt:true};
       cells['A14']={...blankCell(),value:'Contribution',txt:true,bold:true};
       // one stale link PER ROW, columns shuffled so the trio never stacks
-      const colsShuf=[2,3,4,5,6].sort(()=>Math.random()-.5);
+      const colsShuf=[2,3,4,5,6].sort(()=>_rand()-.5);
       const staleCol={11:colsShuf[0], 12:colsShuf[1], 13:colsShuf[2]};
       this._truth={};
       for(let c=2;c<=6;c++){
@@ -6325,7 +6327,7 @@ const CHALLENGES = {
       cells['A8']={...blankCell(),value:'EBIT',txt:true,bold:true};
       cells['A10']={...blankCell(),value:'EBIT margin',txt:true};
       // three flips, three DIFFERENT columns (never stacked \u2014 each break reads alone)
-      const flipCols=[2,3,4,5,6].sort(()=>Math.random()-.5).slice(0,3);
+      const flipCols=[2,3,4,5,6].sort(()=>_rand()-.5).slice(0,3);
       const flips=flipCols.map(c=>colLetter(c)+(5+rnd(0,2)));
       this._flips=flips; this._mag={}; this._truth={};
       for(let c=2;c<=6;c++){
@@ -8473,7 +8475,7 @@ function makeShareCard(o){
   x.fillStyle=col('--accent'); x.font='700 120px "JetBrains Mono", monospace';
   x.fillText(o.t+'s', 64, 350);
   x.fillStyle=col('--muted'); x.font='500 24px "JetBrains Mono", monospace';
-  x.fillText(o.keys+' keys · par '+o.par, 64, 400);
+  x.fillText(o.keys+' keys · optimal '+o.par, 64, 400);   // o.par carries parKeys — 'par' unqualified reads as the TIME par
   // r148: optional sub line (placement verdict / race result) sits where the rank
   // chip did; the footer row slides down to make room.
   const footY = o.sub ? 478 : 452;
@@ -11920,7 +11922,7 @@ async function playDemo(){
   if(kf) kf.classList.remove('demo');
   demoPlaying=false; updateDemoBtn();
   loadChallenge(cur);
-  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — or <b>⌨ echo it</b> to walk the steps yourself'; }
+  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — or <b>⌨ follow along</b> to walk the steps yourself'; }
 }
 $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():(echoOn?echoStop():playDemo()); });
 
@@ -11936,7 +11938,7 @@ $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():(echoOn?ech
    the replay/parity suites and watch mode out of its way.
    ============================================================ */
 function updateEchoBtn(){ const b=$('echoBtn'); if(b){ b.classList.toggle('on',echoOn);
-  b.innerHTML=echoOn?'<kbd>esc</kbd> stop echo':'⌨ echo it'; } }
+  b.innerHTML=echoOn?'<kbd>esc</kbd> stop':'⌨ follow along'; } }
 function echoAbort(){ if(!echoOn) return; echoOn=false; echoState=null;
   try{ demoSpotOff(); updateEchoBtn(); const kf=$('keyflash'); if(kf) kf.classList.remove('demo'); }catch(e){} }
 function echoStop(){ if(!echoOn) return;
@@ -11958,7 +11960,7 @@ function echoStart(){
   try{ ev('echo_start',{d:cur}); }catch(e){}
   updateEchoBtn();
   const kf=$('keyflash'); if(kf) kf.classList.add('demo');
-  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⌨ echo — press each highlighted chord yourself · <kbd>esc</kbd> bails'; }
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⌨ follow along — press each highlighted chord yourself · <kbd>esc</kbd> bails'; }
   setTimeout(echoStep,150);
 }
 function echoDone(){
@@ -11966,7 +11968,7 @@ function echoDone(){
   try{ ev('echo_done',{d:cur, miss:missed}); }catch(e){}
   echoAbort(); loadChallenge(cur);
   const r=$('result'); if(r){ r.className='result';
-    r.innerHTML='⚡ echoed '+(missed?'('+missed+' stray key'+(missed>1?'s':'')+')':'clean')+' — board’s reset, now run it for time'; }
+    r.innerHTML='⚡ you walked the whole line'+(missed?' ('+missed+' stray key'+(missed>1?'s':'')+')':'')+' — board’s reset, now run it for time'; }
 }
 function echoNudge(){
   if(echoState) echoState.miss++;
@@ -12026,6 +12028,29 @@ document.addEventListener('mouseup', function(e){
   if(echoOn && e.target && e.target.closest && e.target.closest('#grid')) setTimeout(echoStep, 60);
 }, true);
 $('echoBtn').addEventListener('click',()=>{ echoOn?echoStop():echoStart(); });
+
+/* r283 STUCK NUDGE (Wolf) — a fresh player staring at a drill with zero checklist
+   progress for 40s doesn't know the trainers exist. One quiet pointer per drill
+   load: toast + a pulse on watch-solution / follow-along. Any checklist progress
+   disarms it for that load; window.* state avoids TDZ (loadChallenge runs at boot). */
+function __stkOk(){ try{ const C=CHALLENGES[cur]; if(!C||!C.checks||!S) return null;
+  return C.checks.call(C,S).filter(c=>c&&c.ok).length; }catch(e){ return null; } }
+setInterval(()=>{ try{
+  if(!S || done || demoPlaying || echoOn || gameMode!=='classic' || window.__stkDone) return;
+  if(gateOpen || authOpen || pickerOpen || modesOpen || themesOpen || kbdOpen || sessionOpen || window.__hkCelOpen) return;
+  if(typeof __tourI!=='undefined' && __tourI>=0) return;
+  // actually-rendered check — onboarded boots hide the landing without the 'gone' class
+  const l=$('landing'); if(l && !l.classList.contains('gone') && l.getClientRects().length>0) return;
+  if(window.__stkBase==null){ window.__stkBase=__stkOk(); return; }
+  const nowOk=__stkOk(); if(nowOk==null) return;
+  if(nowOk>window.__stkBase){ window.__stkDone=true; return; }   // they're moving — never interrupt
+  if(Date.now()-(window.__stkT||0) < 40000) return;
+  window.__stkDone=true;
+  showToast('stuck? \u25b6 watch solution plays the line \u2014 \u2328 follow along walks you through it');
+  ['demoBtn','echoBtn'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
+    setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); } });
+  try{ ev('stuck_nudge',{d:cur}); }catch(e){}
+}catch(e){} }, 3000);
 
 /* ============================================================
    LOAD / RESET
@@ -12488,6 +12513,7 @@ function sheetMarkWin(){
 }
 function loadChallenge(key, opts){
   try{ echoAbort(); }catch(e){}
+  try{ window.__stkT=Date.now(); window.__stkBase=null; window.__stkDone=false; }catch(e){}
   // r158: progression gate — daily runs and armed races ride through (community
   // moments); everything else locked-tier bounces to the explainer, state untouched.
   try{
@@ -13087,6 +13113,15 @@ function renderAuth(){
     (signup ? '<div id="authSchoolWrap" style="margin-top:4px;margin-bottom:4px">'+
         '<a id="authSchoolToggle" style="font-family:var(--mono);font-size:11.5px;color:var(--accent);cursor:pointer;text-decoration:none">+ add your school <span style="color:var(--faint)">(optional — or use your .edu)</span></a>'+
         '<div id="authSchoolMount" style="margin-top:9px;display:none"></div></div>' : '')+
+    /* r283: optional desk/referral code — one field, same pipeline as ?desk= share
+       links (hk_pending_desk + join_desk at onSession). A code that arrived via a
+       staffer's link pre-fills and previews; typing one by hand joins the same way. */
+    (signup ? '<div id="authDeskWrap" style="margin-top:2px;margin-bottom:4px">'+
+        '<a id="authDeskToggle" style="font-family:var(--mono);font-size:11.5px;color:var(--accent);cursor:pointer;text-decoration:none">+ desk or referral code <span style="color:var(--faint)">(optional)</span></a>'+
+        '<div id="authDeskMount" style="margin-top:9px;display:none">'+
+          '<input id="authDeskCode" type="text" placeholder="desk / referral code" autocomplete="off" autocapitalize="characters" spellcheck="false">'+
+          '<div id="authDeskMsg" style="font-family:var(--mono);font-size:11px;min-height:13px;margin-top:5px;color:var(--muted)"></div>'+
+        '</div></div>' : '')+
     '<div class="auth-alt">'+(signup
         ? '<a id="toSignin">Have an account? Sign in</a>'
         : '<a id="toSignup">Create an account</a><a id="toReset">Forgot password?</a>')+'</div>'+
@@ -13114,6 +13149,27 @@ function renderAuth(){
   const em=$('authEmail'), pw=$('authPass'); if(em) em.focus();
   const submit = signup ? doSignUp : doSignIn;
   [em,pw].forEach(el=>{ if(el) el.onkeydown=e=>{ if(e.key==='Enter') submit(); }; });
+  // r283: desk/referral code wiring — reveal on demand, pre-fill from a pending
+  // share-link code, live-preview the desk it joins, store/clear as they type.
+  const dkTog=$('authDeskToggle');
+  if(dkTog){
+    const openDk=()=>{ const mo=$('authDeskMount'); if(mo){ mo.style.display='block'; dkTog.style.display='none'; } };
+    dkTog.onclick=openDk;
+    const di=$('authDeskCode'), dmsg=$('authDeskMsg');
+    const preview=async v=>{ if(!dmsg) return; dmsg.textContent='';
+      if(!v || !window.sb) return;
+      try{ const {data}=await sb.rpc('preview_desk',{p_code:v}); const d=(data&&data[0])||null;
+        dmsg.style.color = d ? 'var(--accent)' : 'var(--warn)';
+        dmsg.textContent = d ? ('\u2713 joins '+d.name+' \u2014 '+d.members+' on the desk') : 'code not recognized \u2014 check with whoever sent it';
+      }catch(e){} };
+    if(di){
+      di.oninput=()=>{ const v=di.value.trim(); try{ if(v) localStorage.setItem('hk_pending_desk',v); else localStorage.removeItem('hk_pending_desk'); }catch(e){} };
+      di.onchange=()=>preview(di.value.trim());
+      di.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } };
+      let pend=null; try{ pend=localStorage.getItem('hk_pending_desk'); }catch(e){}
+      if(pend){ di.value=pend; openDk(); preview(pend); }
+    }
+  }
 }
 async function doSignIn(){
   if(!sb){ authErr('Still connecting — give it a second and try again.'); return; }   // r101: never a silent dead button

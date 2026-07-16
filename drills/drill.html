@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Hardcode it — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Break the links before it ships — ESV in place, painted blue Par: 15 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Break the links before it ships — ESV in place, painted blue Par 18s, optimal 15 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Hardcode it — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Break the links before it ships — ESV in place, painted blue Par: 15 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Break the links before it ships — ESV in place, painted blue Par 18s, optimal 15 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/drill.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Hardcode it — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Break the links before it ships — ESV in place, painted blue Par: 15 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Break the links before it ships — ESV in place, painted blue Par 18s, optimal 15 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/drill.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Hardcode it","description":"Break the links before it ships — ESV in place, painted blue","url":"https://www.hotkey.gg/drills/drill.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"Ctrl+Alt+V → V pastes values only — the number stays, the live link dies.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Hardcode it","item":"https://www.hotkey.gg/drills/drill.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Hardcode it","description":"Break the links before it ships — ESV in place, painted blue","url":"https://www.hotkey.gg/drills/drill.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"Ctrl+Alt+V → V pastes values only — the number stays, the live link dies.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT18S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Hardcode it","item":"https://www.hotkey.gg/drills/drill.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,16 +102,19 @@
   <div class="sub">This page goes in the deck tonight — and right now every number on it is a LIVE LINK into the model. Break the links before it ships: grab the column, copy, paste-special VALUES straight back onto itself, then paint the survivors blue, because hardcodes wear blue. Aim at the column, not the page — the margin memo below stays LIVE. The pre-send ritual every desk runs.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=drill">train this drill →</a>
-    <span class="par">par 15 keystrokes · keyboard only · free</span>
+    <span class="par">par 18s · optimal 15 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys">on <em>B3</em> · <em>ctrl+shift+↓</em> grabs B3:B8 · <em>ctrl+c</em> · <em>alt e s v ↵</em> values onto themselves · then <em>alt h f c</em> → ×4 <em>↵</em> — the dead numbers wear blue</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+C</kbd><span class="m">⌘C on mac</span><span class="what">Copy</span></div><div class="use">Copy starts almost every hand-off — grab a finished block once, then place it in the summary, the deck, or next quarter’s column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt e s v</kbd><span class="m">⌥ e s v on mac</span><span class="what">Paste values (legacy chain)</span></div><div class="use">The values-only paste is how numbers leave a model safely: no formulas, no links, nothing to break downstream.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h f c</kbd><span class="m">⌥ h f c on mac</span><span class="what">Font color</span></div><div class="use">Font color: blue inputs, black formulas — the oldest convention in banking models, still enforced.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>on B3 · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> — the whole output column in one chord</span></li>
-<li><span>copy <kbd>ctrl</kbd>+<kbd>c</kbd> · then <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd> — values land right back on top; the links are gone</span></li>
-<li><span>still selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 <kbd>↵</kbd> — blue means hardcode; the page tells on itself</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">on <em>B3</em> · <em>ctrl+shift+↓</em> grabs B3:B8 · <em>ctrl+c</em> · <em>alt e s v ↵</em> values onto themselves · then <em>alt h f c</em> → ×4 <em>↵</em> — the dead numbers wear blue</div></div>
 
   <div class="section-title">More Data &amp; Lookups drills</div>
   <div class="rel">

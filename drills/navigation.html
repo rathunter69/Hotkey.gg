@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Navigation tour — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, copy it, drop it in the deck, land home Par: 14 keystrokes. Free int">
+<meta name="description" content="The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, copy it, drop it in the deck, land home Par 17s, optimal 14 keys. Fr">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Navigation tour — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, copy it, drop it in the deck, land home Par: 14 keystrokes. Free int">
+<meta property="og:description" content="The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, copy it, drop it in the deck, land home Par 17s, optimal 14 keys. Fr">
 <meta property="og:url" content="https://www.hotkey.gg/drills/navigation.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Navigation tour — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, copy it, drop it in the deck, land home Par: 14 keystrokes. Free int">
+<meta name="twitter:description" content="The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, copy it, drop it in the deck, land home Par 17s, optimal 14 keys. Fr">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/navigation.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Navigation tour","description":"The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, copy it, drop it in the deck, land home","url":"https://www.hotkey.gg/drills/navigation.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"The keyboard LEAPS — Ctrl+arrow jumps to the data’s edge, Shift+arrow selects across; thread the trail, grab the block, drop it in the deck.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Navigation tour","item":"https://www.hotkey.gg/drills/navigation.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Navigation tour","description":"The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, copy it, drop it in the deck, land home","url":"https://www.hotkey.gg/drills/navigation.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"The keyboard LEAPS — Ctrl+arrow jumps to the data’s edge, Shift+arrow selects across; thread the trail, grab the block, drop it in the deck.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT17S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Navigation tour","item":"https://www.hotkey.gg/drills/navigation.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,25 +102,23 @@
   <div class="sub">The mouse would scroll and hunt. The keyboard flies — in every direction. This sheet is a long scatter of stray cells and the trail zig-zags a DIFFERENT way every time: up, down, left, right, all over the board. Read the lit marker, fire the Ctrl-arrow that LEAPS to it, and thread the whole maze to the model in the corner. Then the hand-off: grab the model (Ctrl+Shift+→, Ctrl+Shift+↓), Ctrl+C, hop to the deck frame and Ctrl+V drops it in — then Ctrl+Home lands you back at A1, clean, for the meeting. No mouse touches the sheet.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=navigation">train this drill →</a>
-    <span class="par">par 14 keystrokes · keyboard only · free</span>
+    <span class="par">par 17s · optimal 14 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>ctrl+home</em> → thread the markers with <em>ctrl+↑/↓/←/→</em> → reach the model → grab it <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → hop to the deck → <em>ctrl+v</em> → finish <em>ctrl+home</em></div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+Home</kbd><span class="m">⌘Home on mac</span><span class="what">Go to A1</span></div><div class="use">Back to A1 — end every session with the cursor home so the next person opens the tab clean.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+→</kbd><span class="m">⌘→ on mac</span><span class="what">Jump to the edge of the data region</span></div><div class="use">Edge-jumping crosses a wide page in two keystrokes — the horizontal version of the same move.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+↓</kbd><span class="m">⌘↓ on mac</span><span class="what">Jump to the edge of the data region</span></div><div class="use">Edge-jumping crosses a 500-row tape in two keystrokes instead of a held-down arrow key.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+←</kbd><span class="m">⌘← on mac</span><span class="what">Jump to the edge of the data region</span></div><div class="use">Edge-jumping crosses a wide page in two keystrokes — the horizontal version of the same move.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+↑</kbd><span class="m">⌘↑ on mac</span><span class="what">Jump to the edge of the data region</span></div><div class="use">Edge-jumping crosses a 500-row tape in two keystrokes instead of a held-down arrow key.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+→</kbd><span class="m">⌘⇧→ on mac</span><span class="what">Extend selection to the edge of data</span></div><div class="use">Select from here to the end of the row — grab a header or a year of quarters in one chord.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+↓</kbd><span class="m">⌘⇧↓ on mac</span><span class="what">Extend selection to the edge of data</span></div><div class="use">Select from here to the edge of the data — the standard grab before formatting or filling a column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+C</kbd><span class="m">⌘C on mac</span><span class="what">Copy</span></div><div class="use">Copy starts almost every hand-off — grab a finished block once, then place it in the summary, the deck, or next quarter’s column.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span><kbd>ctrl</kbd>+<kbd>home</kbd> — snap to A1, the top-left corner</span></li>
-<li><span>the lit marker is your next stop — the Ctrl-arrow toward it LEAPS straight there, no scrolling</span></li>
-<li><span>keep reading the trail — it doubles back and climbs; fire the Ctrl-arrow that points at the next lit marker</span></li>
-<li><span>the trail zig-zags on — one clean Ctrl-arrow leap to the next lit marker</span></li>
-<li><span>the trail zig-zags on — one clean Ctrl-arrow leap to the next lit marker</span></li>
-<li><span>the trail zig-zags on — one clean Ctrl-arrow leap to the next lit marker</span></li>
-<li><span>the trail zig-zags on — one clean Ctrl-arrow leap to the next lit marker</span></li>
-<li><span>last leap lands you on the model tucked in the corner</span></li>
-<li><span>grab it — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>: the whole block lights up</span></li>
-<li><span><kbd>ctrl</kbd>+<kbd>c</kbd> — copy the model onto your clipboard</span></li>
-<li><span>hop right to the <b>deck frame</b> (<kbd>ctrl</kbd>+<kbd>→</kbd>) and <kbd>ctrl</kbd>+<kbd>v</kbd> — drop the model into the deck</span></li>
-<li><span><kbd>ctrl</kbd>+<kbd>home</kbd> — back to A1, clean, for the meeting</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>ctrl+home</em> → thread the markers with <em>ctrl+↑/↓/←/→</em> → reach the model → grab it <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → hop to the deck → <em>ctrl+v</em> → finish <em>ctrl+home</em></div></div>
 
   <div class="section-title">More Foundations drills</div>
   <div class="rel">

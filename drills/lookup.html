@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Look it up — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Pull a value out of a table with INDEX/MATCH Par: 31 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Pull a value out of a table with INDEX/MATCH Par 32s, optimal 31 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Look it up — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Pull a value out of a table with INDEX/MATCH Par: 31 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Pull a value out of a table with INDEX/MATCH Par 32s, optimal 31 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/lookup.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Look it up — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Pull a value out of a table with INDEX/MATCH Par: 31 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Pull a value out of a table with INDEX/MATCH Par 32s, optimal 31 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/lookup.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Look it up","description":"Pull a value out of a table with INDEX/MATCH","url":"https://www.hotkey.gg/drills/lookup.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"INDEX/MATCH targets headers, not cell positions — reorder the columns and it still lands.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Look it up","item":"https://www.hotkey.gg/drills/lookup.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Look it up","description":"Pull a value out of a table with INDEX/MATCH","url":"https://www.hotkey.gg/drills/lookup.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"INDEX/MATCH targets headers, not cell positions — reorder the columns and it still lands.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT32S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Look it up","item":"https://www.hotkey.gg/drills/lookup.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,15 +102,12 @@
   <div class="sub">Pull a figure out of the table with INDEX/MATCH. The query panel names a company and a metric — return that number into the Answer cell. The metric columns are shuffled every round, so read the headers and aim INDEX at the right column.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=lookup">train this drill →</a>
-    <span class="par">par 31 keystrokes · keyboard only · free</span>
+    <span class="par">par 32s · optimal 31 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>INDEX + MATCH</em> · MATCH(G2, A2:A8, 0) finds the company's row, then INDEX that metric's column · e.g. <em>=INDEX(C2:C8, MATCH(G2,A2:A8,0))</em> — or two-way <em>=INDEX(B2:D8, MATCH(G2,A2:A8,0), MATCH(G3,B1:D1,0))</em></div></div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>in G4 type <kbd>=INDEX(</kbd> the queried metric's column, e.g. C2:C8 <kbd>, MATCH(G2,A2:A8,0))</kbd> — MATCH locates the company row, INDEX pulls from that column</span></li>
-<li><span>if the number looks wrong, INDEX is pointed at the wrong column — match it to the Metric named in G3</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>INDEX + MATCH</em> · MATCH(G2, A2:A8, 0) finds the company's row, then INDEX that metric's column · e.g. <em>=INDEX(C2:C8, MATCH(G2,A2:A8,0))</em> — or two-way <em>=INDEX(B2:D8, MATCH(G2,A2:A8,0), MATCH(G3,B1:D1,0))</em></div></div>
 
   <div class="section-title">More Data &amp; Lookups drills</div>
   <div class="rel">

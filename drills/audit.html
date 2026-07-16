@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>The 4am pass — find what’s broken — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Three planted breaks in a real P&amp;L — find them all Par: 33 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Three planted breaks in a real P&amp;L — find them all Par 34s, optimal 33 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="The 4am pass — find what’s broken — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Three planted breaks in a real P&amp;L — find them all Par: 33 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Three planted breaks in a real P&amp;L — find them all Par 34s, optimal 33 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/audit.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The 4am pass — find what’s broken — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Three planted breaks in a real P&amp;L — find them all Par: 33 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Three planted breaks in a real P&amp;L — find them all Par 34s, optimal 33 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/audit.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"The 4am pass — find what’s broken","description":"Three planted breaks in a real P&L — find them all","url":"https://www.hotkey.gg/drills/audit.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"Broken models leave fingerprints — hardcodes in formula rows, refs off by one.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"The 4am pass — find what’s broken","item":"https://www.hotkey.gg/drills/audit.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"The 4am pass — find what’s broken","description":"Three planted breaks in a real P&L — find them all","url":"https://www.hotkey.gg/drills/audit.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"Broken models leave fingerprints — hardcodes in formula rows, refs off by one.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT34S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"The 4am pass — find what’s broken","item":"https://www.hotkey.gg/drills/audit.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,16 +102,16 @@
   <div class="sub">A divisional P&L someone else built — seniors sweep pages like this with F5 → Special → Constants, a ritual you now have — and three things are wrong with it: one division’s five-year Total stops a column short, one EBITDA is a stale hardcode, and one EBITDA reads the wrong year’s opex. Nobody tells you which — read the tab like you’ll have to defend it. This is the pass your associate does at 4am; learn to do it at 4pm.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=audit">train this drill →</a>
-    <span class="par">par 33 keystrokes · keyboard only · free</span>
+    <span class="par">par 34s · optimal 33 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>scan the Total column</em> · one SUM stops at FY4 — <em>F2</em>, extend it · one EBITDA is a typed number — rebuild it live · one EBITDA crosses columns — repoint it</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>F2</kbd><span class="m">⌃U · fn F2 on mac</span><span class="what">Edit the active cell (cursor at the end)</span></div><div class="use">Edit-in-place lights up every cell a formula touches — the first move when a number looks wrong.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>read the Total column (G) — one division’s SUM ends a year early · <kbd>F2</kbd>, extend the range to column F, <kbd>↵</kbd></span></li>
-<li><span>read the EBITDA row — one year is a hardcoded number (nothing in the formula bar) · retype it live: <kbd>=</kbd> total rev <kbd>+</kbd> signed opex <kbd>↵</kbd></span></li>
-<li><span>one EBITDA computes but reads the NEIGHBOR column’s opex · <kbd>F2</kbd>, repoint the column, <kbd>↵</kbd></span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>scan the Total column</em> · one SUM stops at FY4 — <em>F2</em>, extend it · one EBITDA is a typed number — rebuild it live · one EBITDA crosses columns — repoint it</div></div>
 
   <div class="section-title">More Formulas II drills</div>
   <div class="rel">

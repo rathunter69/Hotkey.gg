@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Wrap it or fix it — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Wrap the truly missing, fix the merely broken — never bury errors Par: 73 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Wrap the truly missing, fix the merely broken — never bury errors Par 70s, optimal 73 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Wrap it or fix it — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Wrap the truly missing, fix the merely broken — never bury errors Par: 73 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Wrap the truly missing, fix the merely broken — never bury errors Par 70s, optimal 73 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/wrapfix.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Wrap it or fix it — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Wrap the truly missing, fix the merely broken — never bury errors Par: 73 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Wrap the truly missing, fix the merely broken — never bury errors Par 70s, optimal 73 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/wrapfix.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Wrap it or fix it","description":"Wrap the truly missing, fix the merely broken — never bury errors","url":"https://www.hotkey.gg/drills/wrapfix.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"IFERROR is a seatbelt, not a blindfold — wrap the truly missing, fix the merely broken.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Wrap it or fix it","item":"https://www.hotkey.gg/drills/wrapfix.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Wrap it or fix it","description":"Wrap the truly missing, fix the merely broken — never bury errors","url":"https://www.hotkey.gg/drills/wrapfix.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"IFERROR is a seatbelt, not a blindfold — wrap the truly missing, fix the merely broken.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT70S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Wrap it or fix it","item":"https://www.hotkey.gg/drills/wrapfix.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,16 +102,12 @@
   <div class="sub">Two lookups are down on the segment tape, both reading #N/A — and they are NOT the same problem. One queries a discontinued segment that is genuinely gone: wrap it in IFERROR with a zero fallback so the page stops screaming. The other has a broken MATCH range — it aims at the numbers instead of the names: FIX it, don’t bury it. Suppressing an error is not the same as repairing one.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=wrapfix">train this drill →</a>
-    <span class="par">par 73 keystrokes · keyboard only · free</span>
+    <span class="par">par 70s · optimal 73 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>E3</em> → wrap: <em>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</em> · <em>E6</em> → fix the range: MATCH must read <em>A3:A7</em>, not B3:B7 — and NO iferror here</div></div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>E3 hunts a segment that no longer exists — that error is TRUE. Wrap it: <kbd>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</kbd> <kbd>↵</kbd></span></li>
-<li><span>E6 is just broken — its MATCH aims at the NUMBERS column. <kbd>F2</kbd> in, repoint the range to <kbd>A3:A7</kbd>, commit</span></li>
-<li><span>the discipline: a fallback for the truly missing, a repair for the merely broken — never the other way around</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>E3</em> → wrap: <em>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</em> · <em>E6</em> → fix the range: MATCH must read <em>A3:A7</em>, not B3:B7 — and NO iferror here</div></div>
 
   <div class="section-title">More Formulas II drills</div>
   <div class="rel">
