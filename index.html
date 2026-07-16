@@ -136,6 +136,12 @@
   td.spill{overflow:visible; z-index:3}   /* r107: Excel-parity text spill (see render) */
   td.spill .sp{position:absolute; left:9px; top:0; bottom:0; display:flex; align-items:center;
     white-space:nowrap; overflow:hidden; pointer-events:none; text-align:left}
+  /* r261: when a spilling cell is the active/selected anchor, carry the outline + glow across the whole
+     spilled span instead of clipping it at the one-column anchor (the box should wrap the visible text) */
+  td.active.spill, td.sel.spill{outline:none; background:transparent}
+  td.active.spill .sp{left:0; padding-left:9px; box-sizing:border-box; overflow:visible;
+    outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow)}
+  td.sel.spill .sp{left:0; padding-left:9px; box-sizing:border-box; background:var(--accent-glow)}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
   td.fill-blue{background:#9cc3e8 !important; color:#153c7a}   /* r160: #dbeafe was 1.05:1 vs paper sheets — invisible fill */
