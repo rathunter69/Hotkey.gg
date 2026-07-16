@@ -757,7 +757,7 @@
         '<div class="user-dropdown" id="userDropdown" role="menu">' +
           '<a id="umProfile">Player card</a>' +
           '<a href="stats.html">Your numbers</a>' +
-          '<a href="desks.html" title="your desk\u2019s hall \u2014 quests, roster, standings">Your desk</a>' +
+          (anon ? '' : '<a href="desks.html" title="your desk\u2019s hall \u2014 quests, roster, standings">Your desk</a>') +
           saveItem +
           '<a href="account.html">Account</a>' +
           '<a id="umSignout">Sign out</a>' +

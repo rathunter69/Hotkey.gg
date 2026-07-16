@@ -799,8 +799,10 @@ function guildHtml(){
       '</div>';
   }).join('');
   const startRow = DATA.meId
-    ? '<div class="gb-start"><input id="gbName" maxlength="40" placeholder="start a desk \u2014 name it (e.g. Wharton UG Finance)"><button class="tab on" id="gbCreate">start a desk</button>'+
-      '<span class="gb-or">or</span><input id="gbCode" maxlength="12" placeholder="invite code"><button class="tab" id="gbJoin">join</button><span class="gb-msg" id="gbMsg"></span></div>'
+    ? (window.__meAnon
+      ? '<div class="gb-start" style="color:var(--muted)">Desks need a full account \u2014 <a href="account.html" style="color:var(--accent)">add an email &amp; password</a> and your progress comes with you.</div>'
+      : '<div class="gb-start"><input id="gbName" maxlength="40" placeholder="start a desk \u2014 name it (e.g. Wharton UG Finance)"><button class="tab on" id="gbCreate">start a desk</button>'+
+        '<span class="gb-or">or</span><input id="gbCode" maxlength="12" placeholder="invite code"><button class="tab" id="gbJoin">join</button><span class="gb-msg" id="gbMsg"></span></div>')
     : '<div class="gb-start" style="color:var(--muted)"><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</div>';
   return '<h3 class="section-title">The guild board \u00b7 find your desk</h3>'+
     '<div style="grid-column:1/-1;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:-4px 0 2px">a desk is a private team room \u2014 shared boards, weekly quests from the staffer, a roster your cohort can see \u00b7 apply below, redeem an invite code, or start your own</div>'+
