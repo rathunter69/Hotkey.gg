@@ -9776,6 +9776,62 @@ function shiftColWidths(atCol, count, ins){
   else   { for(let c=atCol;c<=COLS-count;c++) colW[c]=colW[c+count];
            for(let c=Math.max(atCol,COLS-count+1);c<=COLS;c++) colW[c]=COLW_DEFAULT; }
 }
+/* r265 EXCEL PARITY — inserting/deleting rows or columns REWRITES formula references,
+   exactly like Excel: refs below an insert shift down, ranges spanning the insert EXPAND,
+   refs inside a deleted band become #REF!, and ranges CONTRACT around a deleted band.
+   Ranges are handled before single refs so endpoints clamp instead of #REF!-ing. */
+function adjRowRef(r, atRow, delta){
+  if(delta>0) return r>=atRow ? r+delta : r;
+  const cnt=-delta;
+  if(r>=atRow && r<atRow+cnt) return null;          // inside the deleted band
+  return r>=atRow+cnt ? r-cnt : r;
+}
+function adjustFormulaRows(f, atRow, delta){
+  const SR=/(\$?)([A-J])(\$?)(\d{1,3})/;
+  let s=String(f);
+  // ranges first — endpoints clamp on delete (Excel contracts, it doesn't #REF! the whole range)
+  s=s.replace(/(\$?[A-J]\$?\d{1,3}):(\$?[A-J]\$?\d{1,3})/g, (m,a,b)=>{
+    const ma=SR.exec(a), mb=SR.exec(b); if(!ma||!mb) return m;
+    let r1=adjRowRef(+ma[4],atRow,delta), r2=adjRowRef(+mb[4],atRow,delta);
+    if(delta<0){ const cnt=-delta;
+      if(r1===null) r1=atRow;                        // start fell in the band → clamp to the seam
+      if(r2===null) r2=atRow-1;                      // end fell in the band → clamp above it
+      if(r2<r1) return '#REF!'; }                    // whole range deleted
+    return ma[1]+ma[2]+ma[3]+r1+':'+mb[1]+mb[2]+mb[3]+r2;
+  });
+  // then single refs
+  s=s.replace(/(?<!:)(\$?)([A-J])(\$?)(\d{1,3})(?![\d:])/g, (m,cd,col,rd,row)=>{   // lookbehind: a range's 2nd endpoint was already adjusted by the pass above
+    const r=adjRowRef(+row,atRow,delta);
+    return r===null ? '#REF!' : cd+col+rd+r;
+  });
+  return s;
+}
+function adjColRef(n, atCol, delta){
+  if(delta>0) return n>=atCol ? n+delta : n;
+  const cnt=-delta;
+  if(n>=atCol && n<atCol+cnt) return null;
+  return n>=atCol+cnt ? n-cnt : n;
+}
+function adjustFormulaCols(f, atCol, delta){
+  const SR=/(\$?)([A-J])(\$?)(\d{1,3})/;
+  const CN=L=>L.charCodeAt(0)-64;
+  let s=String(f);
+  s=s.replace(/(\$?[A-J]\$?\d{1,3}):(\$?[A-J]\$?\d{1,3})/g, (m,a,b)=>{
+    const ma=SR.exec(a), mb=SR.exec(b); if(!ma||!mb) return m;
+    let c1=adjColRef(CN(ma[2]),atCol,delta), c2=adjColRef(CN(mb[2]),atCol,delta);
+    if(delta<0){
+      if(c1===null) c1=atCol;
+      if(c2===null) c2=atCol-1;
+      if(c2<c1) return '#REF!'; }
+    if(c1<1||c1>10||c2<1||c2>10) return '#REF!';
+    return ma[1]+colLetter(c1)+ma[3]+ma[4]+':'+mb[1]+colLetter(c2)+mb[3]+mb[4];
+  });
+  s=s.replace(/(?<!:)(\$?)([A-J])(\$?)(\d{1,3})(?![\d:])/g, (m,cd,col,rd,row)=>{   // lookbehind mirrors the rows pass
+    const c=adjColRef(CN(col),atCol,delta);
+    return (c===null||c<1||c>10) ? '#REF!' : cd+colLetter(c)+rd+row;
+  });
+  return s;
+}
 function shiftCellsRows(atRow, delta){
   const newCells = {};
   for(const key in S.cells){
@@ -9791,6 +9847,7 @@ function shiftCellsRows(atRow, delta){
       else                          newCells[key] = S.cells[key];
     }
   }
+  for(const k in newCells){ const c=newCells[k]; if(c && c.formula) c.formula=adjustFormulaRows(c.formula, atRow, delta); }   // r265
   return newCells;
 }
 function shiftCellsCols(atCol, delta){
@@ -9809,6 +9866,7 @@ function shiftCellsCols(atCol, delta){
       else                          newCells[key] = S.cells[key];
     }
   }
+  for(const k in newCells){ const c=newCells[k]; if(c && c.formula) c.formula=adjustFormulaCols(c.formula, atCol, delta); }   // r265
   return newCells;
 }
 
