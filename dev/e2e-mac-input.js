@@ -109,6 +109,54 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   `));
   ok(e2.v === 123, 'plain digits type and commit', String(e2.v));
 
+  console.log('F. display layer speaks Mac (Stage 2)');
+  await run(() => { try { localStorage.setItem('hk_mac_seen', '1'); } catch (e) {} });
+  const f = await run(new Function('arg', K + `
+    loadChallenge('dress');
+    const btnShown = (document.getElementById('macBtn')||{style:{}}).style.display !== 'none';
+    const tl = (document.getElementById('taskLine')||{innerHTML:''}).innerHTML;
+    const reqMac = tl.indexOf('\u2325') >= 0 || tl.indexOf('\u2318') >= 0;
+    setDemoSel('C5'); K({key:'b', code:'KeyB', metaKey:true});
+    const flash = (document.getElementById('keyflash')||{textContent:''}).textContent;
+    return { btnShown, reqMac, flashMac: flash.indexOf('\u2318') >= 0, tl: tl.slice(0, 80) };
+  `));
+  ok(f.btnShown, 'the ⌘ mac keys button shows for Mac visitors');
+  ok(f.reqMac, 'the task line renders ⌥/⌘ caps', f.tl);
+  ok(f.flashMac, 'keyflash chips speak ⌘');
+
+  const g = await run(new Function('arg', K + `
+    if(window.hkMacPopup) window.hkMacPopup();
+    const pop = document.getElementById('hkMacPop');
+    const hasKeyTips = pop && pop.textContent.indexOf('KeyTips') >= 0;
+    const hasFn = pop && pop.textContent.indexOf('standard function keys') >= 0;
+    if(pop) pop.remove();
+    return { opened: !!pop, hasKeyTips, hasFn };
+  `));
+  ok(g.opened && g.hasKeyTips && g.hasFn, 'the mac popup opens and teaches KeyTips + the fn setting');
+
+  console.log('G. reference page toggle (Stage 3)');
+  const ref = await browser.newPage();
+  await ref.addInitScript(() => { try {
+    Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' });
+  } catch (e) {} });
+  await ref.goto((process.env.URL || 'http://127.0.0.1:8791/index.html').replace('index.html', 'reference.html'), { waitUntil: 'load' });
+  await ref.waitForTimeout(900);
+  const r1 = await ref.evaluate(() => {
+    const caps = [...document.querySelectorAll('.cap')].map(c => c.textContent);
+    const macNow = caps.some(c => c === '\u2318') && caps.some(c => c === '\u2325');
+    document.getElementById('platToggle').click();
+    const caps2 = [...document.querySelectorAll('.cap')].map(c => c.textContent);
+    const winBack = caps2.some(c => /^ctrl$/i.test(c)) && !caps2.some(c => c === '\u2318');
+    document.getElementById('platToggle').click();
+    document.getElementById('macSetup').click();
+    const popped = !!document.getElementById('hkMacPop');
+    return { macNow, winBack, popped };
+  });
+  ok(r1.macNow, 'reference defaults to ⌘/⌥ caps on a Mac');
+  ok(r1.winBack, 'toggle flips back to windows caps');
+  ok(r1.popped, 'mac setup link opens the popup');
+  await ref.close();
+
   ok(errs.length === 0, 'zero page errors through the Mac matrix', errs.join(' | '));
   console.log(fail === 0 ? `MAC INPUT: ALL ${pass} PASS` : `MAC INPUT: ${fail} FAIL / ${pass} pass`);
   await browser.close();

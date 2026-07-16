@@ -121,7 +121,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'reference';
 </script>
-<script src="themes.js?v=259"></script>
+<script src="themes.js?v=260"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -133,6 +133,10 @@ window.NAV_ACTIVE = 'reference';
       <span><span class="dot"></span>drilled in the trainer</span>
       <span><span class="ch">→</span> press in sequence (release between)</span>
       <span><span style="color:var(--text);font-family:var(--mono);font-weight:700">+</span> hold together</span>
+      <span id="platRow" style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <button id="platToggle" style="font-family:var(--mono);font-size:11px;padding:4px 12px;border-radius:999px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--muted)"></button>
+        <a id="macSetup" style="display:none;font-family:var(--mono);font-size:11px;color:var(--accent);cursor:pointer">&#9432; mac setup</a>
+      </span>
     </div>
   </header>
 
@@ -279,8 +283,39 @@ function renderCombo(spec){
   return caps.join(sep);
 }
 
+/* r279 STAGE 3 — Windows/Mac keycap toggle. Defaults to the visitor's platform;
+   swaps modifier caps in place (originals kept on dataset). KeyTips-forward:
+   Alt walks become \u2325 walks — the same letters real Mac Excel now accepts. */
+let refMac=(function(){ try{ const v=localStorage.getItem('hk_ref_mac');
+  if(v!==null) return v==='1';
+  return !!(window.hkIsMac && window.hkIsMac()); }catch(e){ return false; } })();
+function macCap(t){
+  if(/^ctrl$/i.test(t)) return '\u2318';
+  if(/^alt$/i.test(t)) return '\u2325';
+  if(/^shift$/i.test(t)) return '\u21e7';
+  return t;
+}
+function applyPlatform(){
+  document.querySelectorAll('.cap').forEach(c=>{
+    if(!c.dataset.win) c.dataset.win=c.textContent;
+    c.textContent = refMac ? macCap(c.dataset.win) : c.dataset.win;
+  });
+  const b=document.getElementById('platToggle');
+  if(b){ b.textContent = refMac ? '\u2318 mac keys \u00b7 show windows' : '\u229e windows keys \u00b7 show mac';
+    b.style.color = refMac ? 'var(--accent)' : 'var(--muted)';
+    b.style.borderColor = refMac ? 'var(--accent-dim)' : 'var(--line)'; }
+  const ms=document.getElementById('macSetup');
+  if(ms) ms.style.display = refMac ? '' : 'none';
+}
 const grid = document.getElementById('grid');
 const chipsEl = document.getElementById('chips');
+setTimeout(()=>{ try{
+  applyPlatform();
+  const b=document.getElementById('platToggle');
+  if(b) b.onclick=()=>{ refMac=!refMac; try{ localStorage.setItem('hk_ref_mac', refMac?'1':'0'); }catch(e){} applyPlatform(); };
+  const ms=document.getElementById('macSetup');
+  if(ms) ms.onclick=()=>{ if(window.hkMacPopup) window.hkMacPopup(); };
+}catch(e){} }, 0);
 const countEl = document.getElementById('count');
 const qEl = document.getElementById('q');
 let activeCat = 'all';
