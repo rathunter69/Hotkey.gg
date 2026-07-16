@@ -1328,12 +1328,12 @@
 </style>
 <script src="drills.js?v=263"></script>
 <link rel="stylesheet" href="nav.css?v=174">
-<script src="themes.js?v=258"></script>
+<script src="themes.js?v=259"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=256"></script>
+<script src="nav.js?v=257"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -11766,7 +11766,12 @@ function demoSpotTo(sel, stepN, total, keysLab, instant){
     sp.style.left=L+'px'; sp.style.top=T+'px'; sp.style.width=(R-L)+'px'; sp.style.height=(B-T)+'px';
     cap.innerHTML='step <b>'+stepN+'</b>/'+total+' \u00b7 <b>'+escHtml(sel)+'</b>'+
       (demoSpotCur.keys?' \u00b7 <kbd>'+escHtml(demoSpotCur.keys)+'</kbd>':'');
-    const capY = (B+12+44>window.innerHeight) ? (T-46) : (B+12);
+    let capY = (B+12+44>window.innerHeight) ? (T-46) : (B+12);
+    try{ // dodge the fx-hint popup — it pops under the cell on formula steps
+      const fh=document.querySelector('.fx-hint');
+      if(fh && fh.offsetParent){ const fr=fh.getBoundingClientRect();
+        if(capY<fr.bottom && capY+44>fr.top) capY=fr.bottom+8; }
+    }catch(e){}
     cap.style.left=Math.max(10,L)+'px'; cap.style.top=capY+'px';
   }catch(e){}
 }
@@ -11781,6 +11786,7 @@ async function playDemo(){
   const C=CHALLENGES[cur]; const moves = typeof C.demo==='function'?C.demo.call(C):C.demo;
   if(!moves) return;
   demoPlaying=true; updateDemoBtn();
+  try{ ev('demo_play',{d:cur, spot:demoSpotOn()?1:0}); }catch(e){}
   const kf=$('keyflash'); if(kf) kf.classList.add('demo');
   const r=$('result'); if(r){ r.className='result'; r.innerHTML='▶ watch the optimal keystrokes — then it’s your turn'; }
   await sleep(450);

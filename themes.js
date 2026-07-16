@@ -956,7 +956,11 @@ window.hkNameOk = function(name){
            .replace(/4/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/[^a-z]/g,'');
   var SUB=['nigg','fagg','kike','wetback','tranny','pedo','whore','slut','cunt','fuck','shit','bitch','retard','jizz','porn'];
   for(var i=0;i<SUB.length;i++) if(s.indexOf(SUB[i])>=0) return false;
-  var words=raw.replace(/[^a-z]+/g,' ').split(' ');
+  // r276: word check runs on the leet-MAPPED text (spaces intact) — 'n4z1' becomes the
+  // word 'nazi' and blocks; 'Ashkenazi' stays one long word and passes
+  var mapped=raw.replace(/[@]/g,'a').replace(/0/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e')
+                .replace(/4/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t');
+  var words=mapped.replace(/[^a-z]+/g,' ').split(' ');
   var WORD=['rape','nazi','dyke','anal','cum','cock','dick','pussy','penis','vagina','coon','spic','chink','hoe','kkk','isis','hitler'];
   for(var j=0;j<words.length;j++) if(WORD.indexOf(words[j])>=0) return false;
   return true;
