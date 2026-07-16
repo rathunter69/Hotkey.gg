@@ -471,8 +471,10 @@ const ALTS = [
       {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('p')]},
     ]) ` },
-  { key: 'modeltour', name: 'subtotals rebuilt in REVERSE via SUM(range), close NI with ctrl+1 C + border, home last', moves: `C => { const m=C._m.slice().reverse();
-      const steps=m.map(x=>({sel:x.k, keys:[...T('=SUM('+x.rng+')'),{key:'Enter'}]}));
+  { key: 'modeltour', name: 'subtotals rebuilt in REVERSE (typed + form), margins filled right, close NI with ctrl+1 C + border, home last', moves: `C => { const m=C._m.slice().reverse(); const MG=C._marg; const LC=colLetter(1+C._NC);
+      const steps=m.map(x=>({sel:x.k, keys:[...T('='+x.disp),{key:'Enter'}]}));
+      MG.forEach(g=>{ steps.push({sel:'B'+g.r, keys:[...T('=B'+g.num+'/B3'),{key:'Enter'}]});
+                      steps.push({sel:'B'+g.r+':'+LC+g.r, keys:[{key:'r',ctrl:true}]}); });
       steps.push({sel:C._niRng, keys:[{key:'1',ctrl:true},L('c'),{key:'Alt'},L('h'),L('b'),L('b')]});
       steps.push({sel:'A1', keys:[{key:'Home',ctrl:true}]});
       return steps; }` },
