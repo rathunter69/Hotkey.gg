@@ -6934,21 +6934,25 @@ const CHALLENGES = {
     }
   },
   modeltour:{
-    name:'Model Tour', label:'Chase the marks', par:39, parKeys:39,
-    aha:'Subtotals are formulas, not numbers — fly to each #REF! (Ctrl+arrows), rebuild with SUM, and net income recomputes.',
-    prompt:'The model came back with four subtotals blown out to #REF! — Gross profit, EBITDA, EBIT and Net income each lost a cell. Those are the ruled, bold rows: they are COMPUTED, not typed. Ctrl-arrows fly you to each break — rebuild the FORMULA that sums the lines above it (costs already carry their sign, so it just adds up) and the number recomputes down the column. Then close the bottom line — dollar-format Net income and rule it off — and land at A1 for the meeting.',
-    req(){ const m=this._m; return m.map(x=>'<em>'+x.k+'</em> → <em>='+x.disp+'</em>').join(' · ')+' · <em>ctrl+shift+$</em> Net income <em>'+this._niRng+'</em> + a <em>bottom border</em> (<em>alt h b b</em>) · finish <em>ctrl+home</em>'; },
-    guide(){ const m=this._m; return [
+    name:'Model Tour', label:'Chase the marks', par:53, parKeys:54,
+    aha:'Subtotals are formulas — fly to each #REF! (Ctrl+arrows) and rebuild it; then the margin rows go in with ONE formula filled RIGHT across the columns.',
+    prompt:'The model came back with four subtotals blown out to #REF! — Gross profit, EBITDA, EBIT and Net income each lost a cell. Those are the ruled, bold rows: they are COMPUTED, not typed. Ctrl-arrows fly you to each break — rebuild the FORMULA that sums the lines above it (costs already carry their sign, so it just adds up). Then put in the margin rows: build =subtotal ÷ Revenue in the first column and FILL RIGHT so one formula runs the whole row. Close the bottom line — dollar-format Net income and rule it off — and land at A1 for the meeting.',
+    req(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return m.map(x=>'<em>'+x.k+'</em> → <em>='+x.disp+'</em>').join(' · ')+' · margins <em>B'+MG[0].r+'</em> =B'+MG[0].num+'/B3 fill right <em>B'+MG[0].r+':'+LC+MG[0].r+'</em>, <em>B'+MG[1].r+'</em> =B'+MG[1].num+'/B3 fill right · <em>ctrl+shift+$</em> Net income <em>'+this._niRng+'</em> + <em>bottom border</em> (<em>alt h b b</em>) · finish <em>ctrl+home</em>'; },
+    guide(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return [
       'the Gross profit break at '+m[0].k+' — fly there with ctrl-arrows · it’s Revenue plus COGS (COGS is negative, so it just adds): type <kbd>='+m[0].disp+'</kbd> <kbd>↵</kbd>',
       'the EBITDA break at '+m[1].k+' — gross profit plus the two opex lines: <kbd>='+m[1].disp+'</kbd> <kbd>↵</kbd>',
       'the EBIT break at '+m[2].k+' — EBITDA plus D&A: <kbd>='+m[2].disp+'</kbd> <kbd>↵</kbd>',
       'the Net income break at '+m[3].k+' — EBIT plus interest and taxes: <kbd>='+m[3].disp+'</kbd> <kbd>↵</kbd> — watch the whole column tie',
+      'the Gross profit margin — in the FIRST column: <em>B'+MG[0].r+'</em> · <kbd>=B'+MG[0].num+'/B3</kbd> <kbd>↵</kbd> (Gross profit ÷ Revenue) · then select <em>B'+MG[0].r+':'+LC+MG[0].r+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd> — one formula fills RIGHT, each column re-bases to its own quarter',
+      'the EBITDA margin the same way: <em>B'+MG[1].r+'</em> · <kbd>=B'+MG[1].num+'/B3</kbd> <kbd>↵</kbd> · fill right <kbd>ctrl</kbd>+<kbd>r</kbd>',
       'close the statement: select Net income '+this._niRng+' · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> dollar-format · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> adds a bottom border — the closing rule under the bottom line',
       'meeting time: <kbd>ctrl</kbd>+<kbd>home</kbd> — a clean model greets the reader at A1',
     ]; },
-    targets(){ const m=this._m; return [m[0].k, this._niRng, this._niRng, 'A1']; },
-    demo(){ const m=this._m;
+    targets(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return [m[0].k, 'B'+MG[0].r+':'+LC+MG[0].r, 'B'+MG[1].r+':'+LC+MG[1].r, this._niRng, this._niRng, 'A1']; },
+    demo(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC);
       const steps=m.map(x=>({sel:x.k, keys:[...T('='+x.disp), Kb.enter]}));
+      MG.forEach(g=>{ steps.push({sel:'B'+g.r, keys:[...T('=B'+g.num+'/B3'), Kb.enter]});
+                      steps.push({sel:'B'+g.r+':'+LC+g.r, keys:[Kb.fillR]}); });
       steps.push({sel:this._niRng, keys:[{key:'$',ctrl:true,shift:true}, Kb.alt, {key:'h'}, {key:'b'}, {key:'b'}]});
       steps.push({sel:'A1', keys:[Kb.ctrlHome]});
       return steps; },
@@ -6963,27 +6967,33 @@ const CHALLENGES = {
       const NC=5, q0=rnd(1,4), yy=25;
       for(let i=0;i<NC;i++){ const qi=(q0+i-1)%4, yr=yy+Math.floor((q0+i-1)/4);
         cells[colLetter(2+i)+2]={...blankCell(),value:'Q'+(qi+1)+"'"+yr,txt:true,bold:true,align:'r'}; }
+      // r262 (Wolf): margin rows sit under Gross profit and EBITDA — the player builds them in the first
+      // column and FILLS RIGHT, so the drill adds the copy-right muscle and reads like a real op model.
       const SPEC=[
         {r:3,  n:'Revenue',            sign:1,  mag:()=>rnd(600,900)*10},
         {r:4,  n:'COGS',               sign:-1, mag:()=>rnd(250,400)*10},
         {r:5,  n:'Gross profit',       sub:[3,4]},
-        {r:6,  n:'Sales & marketing',  sign:-1, mag:()=>rnd(40,90)*10},
-        {r:7,  n:'General & admin',    sign:-1, mag:()=>rnd(30,70)*10},
-        {r:8,  n:'EBITDA',             sub:[5,6,7]},
-        {r:9,  n:'D&A',                sign:-1, mag:()=>rnd(20,50)*10},
-        {r:10, n:'EBIT',               sub:[8,9]},
-        {r:11, n:'Interest',           sign:-1, mag:()=>rnd(10,30)*10},
-        {r:12, n:'Taxes',              sign:-1, mag:()=>rnd(20,60)*10},
-        {r:13, n:'Net income',         sub:[10,11,12]},
+        {r:7,  n:'Sales & marketing',  sign:-1, mag:()=>rnd(40,90)*10},
+        {r:8,  n:'General & admin',    sign:-1, mag:()=>rnd(30,70)*10},
+        {r:9,  n:'EBITDA',             sub:[5,7,8]},
+        {r:11, n:'D&A',                sign:-1, mag:()=>rnd(20,50)*10},
+        {r:12, n:'EBIT',               sub:[9,11]},
+        {r:13, n:'Interest',           sign:-1, mag:()=>rnd(10,30)*10},
+        {r:14, n:'Taxes',              sign:-1, mag:()=>rnd(20,60)*10},
+        {r:15, n:'Net income',         sub:[12,13,14]},
       ];
       const byR={}; SPEC.forEach(x=>byR[x.r]=x);
-      const SUBR=[5,8,10,13];
+      const SUBR=[5,9,12,15];
+      const MARG=[{r:6, num:5, n:'Gross profit margin'}, {r:10, num:9, n:'EBITDA margin'}];   // = subtotal / Revenue(3), player-built + filled right
       SPEC.forEach(x=>cells['A'+x.r]={...blankCell(),value:x.n,txt:true,bold:SUBR.includes(x.r)});
+      MARG.forEach(x=>cells['A'+x.r]={...blankCell(),value:x.n,txt:true,indent:1});
       const val={};
       SPEC.filter(x=>x.sub===undefined).forEach(x=>{ val[x.r]={};
         for(let c=2;c<2+NC;c++){ const v=x.sign*x.mag(); val[x.r][c]=v;
           cells[colLetter(c)+x.r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; } });
       SUBR.forEach(r=>{ val[r]={}; for(let c=2;c<2+NC;c++) val[r][c]=byR[r].sub.reduce((s,p)=>s+val[p][c],0); });
+      // margin cells: pre-formatted percent but EMPTY — the player builds col B then fills right
+      MARG.forEach(x=>{ for(let c=2;c<2+NC;c++) cells[colLetter(c)+x.r]={...blankCell(),fmtStyle:'percent',decimals:1}; });
       // one mark per subtotal row, spread across columns: far-right, far-left, two interior
       const mids=[]; for(let c=3;c<2+NC-1;c++) mids.push(c);
       for(let k=mids.length-1;k>0;k--){ const j=rnd(0,k); [mids[k],mids[j]]=[mids[j],mids[k]]; }
@@ -6994,21 +7004,32 @@ const CHALLENGES = {
         const mk=this._m.find(x=>x.r===r&&x.c===c);
         if(mk) cells[L+r]={...blankCell(),value:'#REF!',txt:true,bold:true,bt:true,fmtStyle:'comma',decimals:0};   // dispText shows the string; the fix inherits comma
         else   cells[L+r]={...blankCell(),formula:'='+byR[r].sub.map(p=>L+p).join('+'),value:val[r][c],fmtStyle:'comma',decimals:0,bold:true,bt:true}; } });
-      this._NC=NC; this._niRng='B13:'+colLetter(1+NC)+'13'; this._val=val;
-      const cw={1:150}; for(let c=2;c<2+NC;c++) cw[c]=92;   // currency @2 with (parens) must hold at load + post-solve
-      return {ROWS:13, cells, active:{r:3,c:2}, sel:null, colW:cw};
+      this._marg=MARG; this._NC=NC; this._niRng='B15:'+colLetter(1+NC)+'15'; this._val=val;
+      const cw={1:170}; for(let c=2;c<2+NC;c++) cw[c]=92;   // currency @2 with (parens) must hold at load + post-solve
+      return {ROWS:15, cells, active:{r:3,c:2}, sel:null, colW:cw};
     },
     checks(S){
-      const m=this._m, NC=this._NC;
+      const m=this._m, NC=this._NC, val=this._val, MG=this._marg;
       const fixOne=x=>{ const c=S.cells[x.k]; return !!(c && c.formula && typeof c.value==='number' && Math.abs(c.value-x.v)<0.5); };
       const allFixed=m.every(fixOne);
+      // margin row: =subtotal/Revenue built in every column (B typed, C..F via fill right), percent-formatted
+      const marginOk=g=>{ for(let c=2;c<2+NC;c++){ const L=colLetter(c); const cell=S.cells[L+g.r];
+        if(!cell||!cell.formula) return false;
+        const f=cell.formula.toUpperCase().replace(/\s/g,'');
+        if(!f.includes(L+g.num)||!f.includes(L+'3')) return false;
+        const want=val[g.num][c]/val[3][c];
+        if(Math.abs((cell.value||0)-want)>Math.max(1e-4,Math.abs(want)*1e-4)) return false;
+        if(cell.fmtStyle!=='percent') return false; } return true; };
+      const gpmOk=marginOk(MG[0]), ebmOk=marginOk(MG[1]);
       let curOk=true, borderOk=true;
-      for(let c=2;c<2+NC;c++){ const x=S.cells[colLetter(c)+13]||{}; if(x.fmtStyle!=='currency') curOk=false; if(!x.bb) borderOk=false; }
+      for(let c=2;c<2+NC;c++){ const x=S.cells[colLetter(c)+15]||{}; if(x.fmtStyle!=='currency') curOk=false; if(!x.bb) borderOk=false; }
       return [
-        {label:'rebuild the four broken subtotals — the cascade FORMULA, not a typed number ('+m.map(x=>x.k).join(', ')+')', ok: allFixed},
-        {label:'dollar-format the Net income row ('+this._niRng+') — ctrl+shift+$', ok: curOk},
-        {label:'add a bottom border under the Net income row ('+this._niRng+') — the statement’s closing rule', ok: borderOk},
-        {label:'finish at A1 — ctrl+home, a clean model greets the reader', ok: allFixed && curOk && borderOk && S.active.r===1 && S.active.c===1},
+        {label:'Rebuild the four broken subtotals — the cascade FORMULA, not a typed number ('+m.map(x=>x.k).join(', ')+')', ok: allFixed},
+        {label:'Gross profit margin — build =Gross profit ÷ Revenue in column B, then fill right across row '+MG[0].r+' (ctrl+r)', ok: gpmOk},
+        {label:'EBITDA margin — build =EBITDA ÷ Revenue in column B, then fill right across row '+MG[1].r, ok: ebmOk},
+        {label:'Dollar-format the Net income row ('+this._niRng+') — ctrl+shift+$', ok: curOk},
+        {label:'Rule off Net income — a bottom border under '+this._niRng+' (alt h b b)', ok: borderOk},
+        {label:'Finish at A1 — ctrl+home, a clean model greets the reader', ok: allFixed && gpmOk && ebmOk && curOk && borderOk && S.active.r===1 && S.active.c===1},
       ];
     }
   },
