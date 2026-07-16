@@ -2876,67 +2876,88 @@ const CHALLENGES = {
     }
   },
   pastes:{
-    name:'Paste Sp.', label:'Alt E S everything', par:24, parKeys:22,
-    aha:'Paste Special (Ctrl+Alt+V) picks what travels — formats, values, or a divide that rescales a block.',
-    prompt:'Three jobs, one dialog. The total row is dressed to house style and the row above it is naked \u2014 copy the dressed row, paste FORMATS, and the dress clones over. The deck row needs the totals as dead numbers \u2014 paste VALUES. And the whole feed block came in dollars when the page header says $000s \u2014 stage 1000 in the helper cell, copy it, paste-special DIVIDE over the block, and it rescales in place. Alt E S is a toolbox, not a trick.',
-    req(){ const o=this._o; return '<em>'+o.dressed+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.naked+'</em> \u2192 <em>alt e s t \u21b5</em> \u00b7 <em>'+o.totRng+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.deck+'</em> \u2192 <em>alt e s v \u21b5</em> \u00b7 <em>1000</em> at <em>'+o.helper+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.blk+'</em> \u2192 <em>alt e s</em> <em>i</em> <em>\u21b5</em>'; },
+    name:'Paste Sp.', label:'Alt E S everything', par:40, parKeys:40,
+    aha:'Alt E S is a toolbox: TRANSPOSE turns a column into a row, DIVIDE/MULTIPLY rescale or flip a block, FORMATS clone a look, VALUES freeze the wiring.',
+    prompt:'The feed came in a mess and Paste Special fixes every kind of mess. TRANSPOSE the side fee schedule (it is a column; you need it as a row). DIVIDE the Trading line by 1000 \u2014 it arrived in raw dollars, the page is in $000s. MULTIPLY the cost line by \u22121 \u2014 someone typed the costs positive. Clone the total row FORMATS onto Advisory, then clear the top border it dragged along (that rule belongs only to the total). Finally paste the totals to the deck as VALUES \u2014 dead numbers, no wiring. One dialog, every lever.',
+    req(){ const o=this._o; return 'copy <em>'+o.side+'</em> \u2192 <em>alt e s e</em> (transpose) at <em>'+o.feesRow+'</em> \u00b7 <em>1000</em> at '+o.helperDiv+', copy \u2192 <em>'+o.divBlk+'</em> <em>alt e s i</em> (divide) \u00b7 <em>-1</em> at '+o.helperNeg+', copy \u2192 <em>'+o.costRow+'</em> <em>alt e s m</em> (multiply) \u00b7 copy <em>'+o.dressed+'</em> \u2192 <em>'+o.naked+'</em> <em>alt e s t</em> then <em>alt h b n</em> \u00b7 copy <em>'+o.dressed+'</em> \u2192 <em>'+o.deck+'</em> <em>alt e s v</em>'; },
     guide(){ const o=this._o; return [
-      'RESCALE THE FEED FIRST: type <kbd>1000</kbd> at '+o.helper+' <kbd>\u21b5</kbd> \u00b7 copy it \u00b7 select '+o.blk+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>i</kbd> divide \u00b7 <kbd>\u21b5</kbd> \u2014 the whole block lands in $000s and the totals re-tie',
-      'CLONE THE DRESS: copy the dressed total row '+o.dressed+' \u00b7 on '+o.naked+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> <kbd>\u21b5</kbd> \u2014 bold, rule and commas travel; the numbers stay',
-      'DEAD NUMBERS FOR THE DECK: copy '+o.totRng+' \u00b7 on '+o.deck+' \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>\u21b5</kbd> \u2014 clean $000s totals, none of the wiring',
+      'TRANSPOSE the side schedule into a row: select <em>'+o.side+'</em> (the vertical fee list) \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 click <em>'+o.feesRow.split(':')[0]+'</em> \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>e</kbd> Transpose \u00b7 <kbd>\u21b5</kbd> \u2014 the column lands across the Fees row',
+      'DIVIDE to rescale: type <kbd>1000</kbd> at '+o.helperDiv+' <kbd>\u21b5</kbd> \u00b7 copy it \u00b7 select <em>'+o.divBlk+'</em> (Trading, in raw $) \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>i</kbd> Divide \u00b7 <kbd>\u21b5</kbd> \u2014 $ becomes $000s in place, the total re-ties',
+      'MULTIPLY to flip the sign: type <kbd>-1</kbd> at '+o.helperNeg+' <kbd>\u21b5</kbd> \u00b7 copy it \u00b7 select <em>'+o.costRow+'</em> (costs typed positive) \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>m</kbd> Multiply \u00b7 <kbd>\u21b5</kbd> \u2014 the costs turn negative and the total drops',
+      'CLONE the look, then fix it: copy the dressed total row <em>'+o.dressed+'</em> \u00b7 select <em>'+o.naked+'</em> \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> Formats <kbd>\u21b5</kbd> \u2014 bold, fill and commas travel \u00b7 but the TOP BORDER came too, and Advisory is not a total: still selected \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>n</kbd> No Border',
+      'FREEZE for the deck: copy <em>'+o.dressed+'</em> \u00b7 select <em>'+o.deck+'</em> \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> Values <kbd>\u21b5</kbd> \u2014 dead numbers, none of the wiring',
     ]; },
-    targets(){ const o=this._o; return [o.naked, o.deck, o.blk]; },
+    targets(){ const o=this._o; return [o.feesRow, o.divBlk, o.costRow, o.naked, o.deck]; },
     demo(){ const o=this._o; return [
-      {sel:o.helper, keys:[...T('1000'), Kb.enter]},
-      {sel:o.helper, keys:[Kb.copy]},
-      {sel:o.blk, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'i'}, Kb.enter]},
+      {sel:o.side, keys:[Kb.copy]},
+      {sel:o.feesRow.split(':')[0], keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'e'}, Kb.enter]},
+      {sel:o.helperDiv, keys:[...T('1000'), Kb.enter]},
+      {sel:o.helperDiv, keys:[Kb.copy]},
+      {sel:o.divBlk, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'i'}, Kb.enter]},
+      {sel:o.helperNeg, keys:[...T('-1'), Kb.enter]},
+      {sel:o.helperNeg, keys:[Kb.copy]},
+      {sel:o.costRow, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'m'}, Kb.enter]},
       {sel:o.dressed, keys:[Kb.copy]},
       {sel:o.naked, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'t'}, Kb.enter]},
-      {sel:o.totRng, keys:[Kb.copy]},
+      {sel:o.naked, keys:[Kb.alt, {key:'h'}, {key:'b'}, {key:'n'}]},
+      {sel:o.dressed, keys:[Kb.copy]},
       {sel:o.deck, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'v'}, Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 quarterly summary ($000s \u2014 the feed arrived in $)',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 paste-special cleanup ($000s; the feed came in raw)',txt:true,bold:true};
       const y0=23+rnd(0,2);
       cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
       for(let j=0;j<4;j++) cells[colLetter(2+j)+'3']={...blankCell(),value:'Q'+(j+1)+'-'+y0,txt:true,bold:true,align:'r'};
-      const feed=[];
-      ['Fees','Trading'].forEach((n,i)=>{ const r=4+i; const row=[];
-        cells['A'+r]={...blankCell(),value:n+' (feed, $)',txt:true};
-        for(let j=0;j<4;j++){ const v=rnd(40,400)*5000; row.push(v);
-          cells[colLetter(2+j)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-        feed.push(row); });
+      // the side schedule — a vertical fee list the player TRANSPOSES into the Fees row
+      cells['G3']={...blankCell(),value:'Fees feed ↓',txt:true,bold:true};
+      const feesVals=[]; for(let i=0;i<4;i++){ const v=rnd(40,300)*5; feesVals.push(v);
+        cells['G'+(4+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      cells['A4']={...blankCell(),value:'Fees ($000s)',txt:true};
+      for(let j=0;j<4;j++) cells[colLetter(2+j)+'4']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A5']={...blankCell(),value:'Trading (feed, $)',txt:true};
+      const tradingFeed=[]; for(let j=0;j<4;j++){ const v=rnd(40,300)*5000; tradingFeed.push(v);
+        cells[colLetter(2+j)+'5']={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
       cells['A6']={...blankCell(),value:'Advisory ($000s)',txt:true};
-      const adv=[];
-      for(let j=0;j<4;j++){ const v=rnd(40,400)*5; adv.push(v);
-        cells[colLetter(2+j)+6]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      cells['A7']={...blankCell(),value:'Total',txt:true,bold:true};
-      const tots=[];
+      const advVals=[]; for(let j=0;j<4;j++){ const v=rnd(40,300)*5; advVals.push(v);
+        cells[colLetter(2+j)+'6']={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      cells['A7']={...blankCell(),value:'Costs (entered +)',txt:true};
+      const costVals=[]; for(let j=0;j<4;j++){ const v=rnd(30,150)*5; costVals.push(v);
+        cells[colLetter(2+j)+'7']={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      cells['A8']={...blankCell(),value:'Total',txt:true,bold:true};
       for(let j=0;j<4;j++){ const col=colLetter(2+j);
-        const t=feed[0][j]+feed[1][j]+adv[j];
-        cells[col+7]={...blankCell(),formula:'=SUM('+col+'4:'+col+'6)',value:t,fmtStyle:'comma',decimals:0,bold:true,bt:true};
-        tots.push(t); }
-      cells['A9']={...blankCell(),value:'Deck hand-off (values)',txt:true};
-      cells['A11']={...blankCell(),value:'Helper',txt:true};
-      this._o={ dressed:'B7:E7', naked:'B6:E6', totRng:'B7:E7', deck:'B9:E9',
-        helper:'B11', blk:'B4:E5', feed:feed, adv:adv };
-      return {ROWS:12, cells, active:{r:7,c:2}, sel:null, colW:{1:170,2:102,3:102,4:102,5:102}};   // r194: the $ feed runs to "4,002,000" — nine characters must fit at LOAD
+        cells[col+'8']={...blankCell(),formula:'=SUM('+col+'4:'+col+'7)',value:0,fmtStyle:'comma',decimals:0,bold:true,bt:true,fill:'gray'}; }
+      cells['A10']={...blankCell(),value:'Deck hand-off (values)',txt:true};
+      cells['A12']={...blankCell(),value:'Helper',txt:true};
+      this._o={ side:'G4:G7', feesRow:'B4:E4', divBlk:'B5:E5', costRow:'B7:E7',
+        dressed:'B8:E8', naked:'B6:E6', deck:'B10:E10', helperDiv:'B12', helperNeg:'C12',
+        feesVals:feesVals, tradingFeed:tradingFeed, advVals:advVals, costVals:costVals };
+      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:170,2:100,3:100,4:100,5:100,6:34,7:100}};   // F is a thin gutter before the side schedule in G
     },
     checks(S){
       const o=this._o;
       const cel=k=>S.cells[k]||{};
-      const dressOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'6');
-        return !!(c.bold && c.bt && c.fmtStyle==='comma' && Math.abs((c.value||0)-o.adv[j])<0.5); });
-      const scaled=[0,1].every(i=>[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+(4+i));
-        return typeof c.value==='number' && Math.abs(c.value-o.feed[i][j]/1000)<0.5; })) && (S.pasteOpN||0)>=1;
-      const deckOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'9');
-        const want=o.feed[0][j]/1000+o.feed[1][j]/1000+o.adv[j];
-        return !!(c.value!==null && !c.formula && typeof c.value==='number'); });
+      // 1. TRANSPOSE: the vertical side schedule landed across the Fees row as plain values
+      const transOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'4');
+        return c.value!=null && !c.formula && Math.abs((c.value||0)-o.feesVals[j])<0.5; });
+      // 2. DIVIDE: Trading rescaled from raw $ to $000s
+      const divOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'5');
+        return typeof c.value==='number' && Math.abs(c.value-o.tradingFeed[j]/1000)<0.5; }) && (S.pasteOpN||0)>=1;
+      // 3. MULTIPLY -1: costs flipped negative
+      const negOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'7');
+        return typeof c.value==='number' && Math.abs(c.value+o.costVals[j])<0.5; });
+      // 4. FORMATS cloned onto Advisory (bold + fill + commas), then the dragged-along top border cleared; values untouched
+      const fmtOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'6');
+        return c.bold && c.fill==='gray' && c.fmtStyle==='comma' && !c.bt && Math.abs((c.value||0)-o.advVals[j])<0.5; });
+      // 5. VALUES on the deck: dead numbers, no formulas
+      const deckOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'10');
+        return c.value!=null && !c.formula && typeof c.value==='number'; });
       return [
-        {label:'clone the dress \u2014 copy the total row, paste FORMATS onto '+o.naked+'; numbers stay, style travels', ok: dressOk},
-        {label:'rescale the feed block '+o.blk+' \u2014 a copied 1000, paste special DIVIDE; $ becomes $000s in place', ok: scaled},
-        {label:'hand the totals to the deck \u2014 paste VALUES at '+o.deck+': dead numbers, no wiring', ok: deckOk},
+        {label:'Transpose the side fee schedule into the Fees row \u2014 copy '+o.side+', then paste-special TRANSPOSE (alt e s e) at '+o.feesRow.split(':')[0], ok: transOk},
+        {label:'Divide Trading by 1000 \u2014 copy a typed 1000, select '+o.divBlk+', paste-special DIVIDE (alt e s i); raw $ becomes $000s', ok: divOk},
+        {label:'Multiply the costs by \u22121 \u2014 copy a typed -1, select '+o.costRow+', paste-special MULTIPLY (alt e s m); the signs flip', ok: negOk},
+        {label:'Clone the total-row look onto Advisory \u2014 copy '+o.dressed+', paste FORMATS (alt e s t) onto '+o.naked+', then clear the top border it carried (alt h b n)', ok: fmtOk},
+        {label:'Freeze the totals for the deck \u2014 copy '+o.dressed+', paste VALUES (alt e s v) onto '+o.deck+': dead numbers', ok: deckOk},
       ];
     }
   },
