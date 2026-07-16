@@ -188,6 +188,22 @@ window.hkOnAccent = function(accent){
   var rWhite=(1+0.05)/(L+0.05);                       // vs white   (lum≈1)
   return rWhite>rDark ? '#ffffff' : '#0d1013';
 };
+/* r268 THEMED SCROLLBARS — every overflow scroller (checklist, player card, pickers,
+   board lists) rides the theme instead of the OS default. Injected once; colors come
+   from the CSS vars so every theme is covered automatically. */
+(function(){
+  try{
+    var st=document.createElement('style'); st.id='hk-scrollbars';
+    st.textContent='*{scrollbar-width:thin; scrollbar-color:var(--line,#555) transparent}'+
+      '*::-webkit-scrollbar{width:9px;height:9px}'+
+      '*::-webkit-scrollbar-track{background:transparent}'+
+      '*::-webkit-scrollbar-thumb{background:var(--line,#555);border-radius:99px;border:2px solid transparent;background-clip:padding-box}'+
+      '*::-webkit-scrollbar-thumb:hover{background:var(--faint,#777);border:2px solid transparent;background-clip:padding-box}'+
+      '*::-webkit-scrollbar-corner{background:transparent}';
+    (document.head||document.documentElement).appendChild(st);
+  }catch(e){}
+})();
+
 window.applyTheme = function(name){
   const t = window.THEMES[name] || window.THEMES.default;
   const root = document.documentElement;
