@@ -13292,10 +13292,30 @@ function logRunLite(t){
       const seedKL=prevKL || Object.values(kc).reduce((a,b)=>a+(b|0),0);
       localStorage.setItem('hk_keys_lifetime', String(seedKL + keyLog.length));
       Object.keys(kc).forEach(k2=>{ if(!isChordUnit(k2)) delete kc[k2]; });   // one-time legacy sweep
-      chordifyLog(keyLog).forEach(u=>{ if(u && u.length<=18){ kc[u]=(kc[u]||0)+1; } });
+      const runUnits={};
+      chordifyLog(keyLog).forEach(u=>{ if(u && u.length<=18){ kc[u]=(kc[u]||0)+1; runUnits[u]=(runUnits[u]||0)+1; } });
       const ks=Object.keys(kc);
       if(ks.length>80){ ks.sort((x,y)=>kc[x]-kc[y]).slice(0,ks.length-80).forEach(k2=>delete kc[k2]); }
       localStorage.setItem('hk_key_counts', JSON.stringify(kc));
+      // r273 (Wolf): analytics ride the ACCOUNT, not the device — every signed-in run
+      // bumps the server aggregate (fire-and-forget). The first bump from a device also
+      // carries its local history, so old grinding isn't stranded in localStorage.
+      if(sb){
+        const nKeys=keyLog.length;
+        sb.auth.getSession().then(({data})=>{
+          if(!data || !data.session) return;
+          const um={...runUnits}; let pk=nKeys, seeding=false;
+          try{
+            if(!localStorage.getItem('hk_keystats_seeded')){
+              seeding=true;
+              Object.entries(kc).forEach(([k2,v])=>{ um[k2]=Math.min(500,(um[k2]||0)+(v|0)); });
+              pk+=parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10)||0;
+            }
+          }catch(e){}
+          sb.rpc('bump_key_stats',{p_counts:um, p_keys:Math.min(5000,pk)})
+            .then(({error})=>{ if(!error && seeding){ try{ localStorage.setItem('hk_keystats_seeded','1'); }catch(e){} } }, ()=>{});
+        }, ()=>{});
+      }
     }catch(e){}
     while(a.length>400) a.shift();
     localStorage.setItem('hk_runs_lite', JSON.stringify(a));
