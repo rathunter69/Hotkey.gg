@@ -259,6 +259,8 @@
   #demoSpotCap b{color:var(--accent)}
   #demoSpotCap kbd{font-family:inherit; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:5px; padding:0 5px}
+  #demoSpotCap.echo-miss{animation:echoShake .3s; border-color:var(--bad)}
+  @keyframes echoShake{25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}}
   td.ttarget{outline:1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:-2px}
   /* r163: GHOST CURSOR - your PB run gliding through its recorded path. Warn-dashed
      so it reads apart from selection (accent) and ink borders; never catches input. */
@@ -1395,6 +1397,7 @@
       </div>
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
+      <button class="mb-tool" id="echoBtn" data-tip="the demo hands YOU the keys — press each highlighted chord to advance">&#9000; echo it</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <button class="mb-tool" id="ghostToggle" data-tip="PB pace counter + cursor ghost \u2014 click to toggle">\ud83d\udc7b ghost: on</button>
@@ -7385,6 +7388,7 @@ const IS_STANDALONE = !!(window.matchMedia && (window.matchMedia('(display-mode:
 let mouseUsed=false, mode='normal', path=[], dialog=null, done=false, pasteKind=null, pendingFlash=null;
 let guided=false, guidedUsed=false;
 let demoPlaying=false;
+let echoOn=false, echoState=null;   // r281 (#27) echo mode — you press the demo's keys
 let editing=false, editBuf='';
 // Formula-pointer state: when editing a formula AND arrow keys point to insert cell refs (Excel's "build by clicking" behavior).
 // editAnchor   = the cell where the formula lives (its target row/col)
@@ -8305,7 +8309,7 @@ function armGhost(){ const p=PB[scoreKey()]; ghostPB=(p!==undefined)?p:null; gho
         } });
   } }
 function ghostCurTick(ms){
-  if(!ghostOn || !ghostSteps || demoPlaying || done) return;
+  if(!ghostOn || !ghostSteps || demoPlaying || echoOn || done) return;
   const g=ghostCurEl(); if(!g) return;
   while(ghostStepI<ghostSteps.length && ghostSteps[ghostStepI].t<=ms) ghostStepI++;
   if(ghostSteps[0].t>ms) return;                          // ghost hasn't moved yet
@@ -8339,7 +8343,7 @@ function stopClock(){ running=false; clearInterval(tickH); finished=performance.
   $('timer').classList.remove('run'); }
 
 function checkWin(){
-  if(done||demoPlaying||sandboxMode) return;   // r238: the sandbox is a free-play scratch sheet — never wins, never scores
+  if(done||demoPlaying||sandboxMode||echoOn) return;   // r238: the sandbox is a free-play scratch sheet — never wins, never scores
   if(!gradePass()) return;
   const t=(performance.now()-started)/1000;
   stopClock(); done=true; $('timer').textContent=t.toFixed(2);
@@ -11889,7 +11893,7 @@ function demoSpotOff(){ demoSpotCur=null;
   try{ const sp=$('demoSpot'); if(sp) sp.style.display='none'; const cap=$('demoSpotCap'); if(cap) cap.style.display='none';
     const wt=$('demoWatch'); if(wt) wt.style.display='none'; }catch(e){} }
 async function playDemo(){
-  if(demoPlaying||!S) return;
+  if(demoPlaying||echoOn||!S) return;
   loadChallenge(cur);
   const C=CHALLENGES[cur]; const moves = typeof C.demo==='function'?C.demo.call(C):C.demo;
   if(!moves) return;
@@ -11915,9 +11919,112 @@ async function playDemo(){
   if(kf) kf.classList.remove('demo');
   demoPlaying=false; updateDemoBtn();
   loadChallenge(cur);
-  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn'; }
+  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — or <b>⌨ echo it</b> to walk the steps yourself'; }
 }
-$('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo(); });
+$('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():(echoOn?echoStop():playDemo()); });
+
+/* ============================================================
+   r281 (#27) ECHO MODE — watch it, then DO it.
+   The same demo script drives both: watch replays the keys, echo hands
+   them to YOU. The spotlight frames each step and names the chord; only
+   the asked-for keys reach the engine — anything else is swallowed with
+   a caption shake. Esc bails; drill switches abort via loadChallenge.
+   Echoed runs never score (checkWin guard) — finish resets the board
+   for a real run. The gate listener runs CAPTURE-phase so it beats the
+   game handler; synthetic (untrusted) keys pass untouched, which keeps
+   the replay/parity suites and watch mode out of its way.
+   ============================================================ */
+function updateEchoBtn(){ const b=$('echoBtn'); if(b){ b.classList.toggle('on',echoOn);
+  b.innerHTML=echoOn?'<kbd>esc</kbd> stop echo':'⌨ echo it'; } }
+function echoAbort(){ if(!echoOn) return; echoOn=false; echoState=null;
+  try{ demoSpotOff(); updateEchoBtn(); const kf=$('keyflash'); if(kf) kf.classList.remove('demo'); }catch(e){} }
+function echoStop(){ if(!echoOn) return;
+  try{ ev('echo_stop',{d:cur, step:(echoState?echoState.mi:0)}); }catch(e){}
+  echoAbort(); loadChallenge(cur);
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='your turn'; } }
+function echoStep(){
+  const st=echoState; if(!st||!echoOn) return;
+  const mv=st.moves[st.mi]; if(!mv) return;
+  setDemoSel(mv.sel);
+  demoSpotTo(mv.sel, st.mi+1, st.moves.length, demoSpotKeys(mv.keys), false, mv.watch||null);
+}
+function echoStart(){
+  if(echoOn||demoPlaying||!S) return;
+  loadChallenge(cur);
+  const C=CHALLENGES[cur]; const moves=typeof C.demo==='function'?C.demo.call(C):C.demo;
+  if(!moves||!moves.length) return;
+  echoOn=true; echoState={moves:moves, mi:0, ki:0, miss:0};
+  try{ ev('echo_start',{d:cur}); }catch(e){}
+  updateEchoBtn();
+  const kf=$('keyflash'); if(kf) kf.classList.add('demo');
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⌨ echo — press each highlighted chord yourself · <kbd>esc</kbd> bails'; }
+  setTimeout(echoStep,150);
+}
+function echoDone(){
+  const missed=echoState?echoState.miss:0;
+  try{ ev('echo_done',{d:cur, miss:missed}); }catch(e){}
+  echoAbort(); loadChallenge(cur);
+  const r=$('result'); if(r){ r.className='result';
+    r.innerHTML='⚡ echoed '+(missed?'('+missed+' stray key'+(missed>1?'s':'')+')':'clean')+' — board’s reset, now run it for time'; }
+}
+function echoNudge(){
+  if(echoState) echoState.miss++;
+  try{ const cap=$('demoSpotCap'); if(cap){
+    cap.classList.remove('echo-miss'); void cap.offsetWidth; cap.classList.add('echo-miss'); } }catch(e){}
+}
+/* does this real keydown perform the expected spec? Mac-fluent: ⌘ plays ctrl,
+   ⌥ dead characters recover via e.code, ⌘T≡F4 and ⌃U≡F2 — mirrors hkMacAdapt. */
+function echoMatch(e, x){
+  const xk=x.key||'';
+  let key=e.key, ctrl=e.ctrlKey, alt=e.altKey;
+  if(HK_MAC){
+    if(xk==='F4' && e.metaKey && /^t$/i.test(key)) return true;
+    if(xk==='F2' && e.ctrlKey && /^u$/i.test(key)) return true;
+    if(e.metaKey) ctrl=true;
+    if(alt && key.length===1 && !/^[a-zA-Z0-9]$/.test(key)){
+      const c=e.code||'';
+      if(c.slice(0,3)==='Key') key=c.slice(3).toLowerCase();
+      else if(c.slice(0,5)==='Digit') key=c.slice(5);
+      else if(MAC_CODE_PUNCT[c]) key=MAC_CODE_PUNCT[c];
+    }
+  }
+  if(ctrl!==!!x.ctrl) return false;
+  if(x.alt && !alt) return false;
+  if(!x.alt && x.ctrl && alt) return false;          // ctrl+alt+X is a DIFFERENT chord than ctrl+X
+  if(xk.length===1){
+    if(xk===' '){ return key===' ' && !!e.shiftKey===!!x.shift; }   // space vs shift+space differ
+    if(key.length!==1) return false;
+    return key===xk || key.toLowerCase()===xk.toLowerCase();        // symbols prove their own shift
+  }
+  if(key!==xk) return false;                          // named keys exact…
+  return !!e.shiftKey===!!x.shift;                    // …and shift+arrow ≠ arrow
+}
+document.addEventListener('keydown', function(e){
+  if(!echoOn || !e.isTrusted) return;
+  // a modal owns the keyboard — echo waits rather than eating its keys
+  if(pickerOpen||authOpen||modesOpen||themesOpen||kbdOpen||sessionOpen||gateOpen||window.__hkCelOpen||__tourI>=0) return;
+  const st=echoState; if(!st) return;
+  const mv=st.moves[st.mi]; const exp=mv&&mv.keys[st.ki];
+  if(e.key==='Escape' && !(exp&&exp.key==='Escape')){ e.preventDefault(); e.stopPropagation(); echoStop(); return; }
+  if(!exp) return;
+  if(e.key==='Control'||e.key==='Meta'||e.key==='Shift') return;    // held-modifier preamble
+  if(e.key==='Alt'&&exp.key!=='Alt'){ if(exp.alt) return;           // alt going down ahead of alt+=
+    e.preventDefault(); e.stopPropagation(); echoNudge(); return; } // stray alt would open the ribbon
+  if(echoMatch(e, exp)){
+    st.ki++;
+    if(st.ki>=mv.keys.length){
+      st.mi++; st.ki=0;
+      if(st.mi>=st.moves.length) setTimeout(echoDone, 420);
+      else setTimeout(echoStep, 380);
+    } else setTimeout(function(){ try{ demoSpotSync(); }catch(_){} }, 30);
+    // fall through — the engine executes the key for real
+  } else { e.preventDefault(); e.stopPropagation(); echoNudge(); }
+}, true);
+// clicks move the selection out from under the script — re-assert the step
+document.addEventListener('mouseup', function(e){
+  if(echoOn && e.target && e.target.closest && e.target.closest('#grid')) setTimeout(echoStep, 60);
+}, true);
+$('echoBtn').addEventListener('click',()=>{ echoOn?echoStop():echoStart(); });
 
 /* ============================================================
    LOAD / RESET
@@ -12379,6 +12486,7 @@ function sheetMarkWin(){
   }catch(e){}
 }
 function loadChallenge(key, opts){
+  try{ echoAbort(); }catch(e){}
   // r158: progression gate — daily runs and armed races ride through (community
   // moments); everything else locked-tier bounces to the explainer, state untouched.
   try{
