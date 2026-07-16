@@ -1292,7 +1292,7 @@
   /* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
   #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
   #grid th{font-size:10.5px}
-  #pasteDialog{position:fixed; z-index:30;   /* r191: floats over the SHEET — drawDialog sets left/top */
+  #pasteDialog,#fmtDialog{position:fixed; z-index:30;   /* r191/r263: float over the SHEET — drawDialog sets left/top */
     background:var(--surface2); border:1px solid var(--line); border-radius:12px;
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
@@ -1420,6 +1420,13 @@
     <div class="pd-title">Paste Special <span class="x">esc to cancel</span></div>
     <div class="pd-group"><h4>Paste</h4><div id="pdOpts"></div></div>
     <div class="pd-foot"><span class="pd-btn">Cancel <kbd>esc</kbd></span><span class="pd-btn ok">OK <kbd>↵</kbd></span></div>
+  </div>
+</div>
+<div class="pd-backdrop" id="fmtDialog">
+  <div class="pd-box">
+    <div class="pd-title">Format Cells <span class="x">esc to cancel</span></div>
+    <div class="pd-group"><div id="fmtOpts"></div></div>
+    <div class="pd-foot"><span class="pd-btn">a letter applies · <kbd>esc</kbd> cancels</span></div>
   </div>
 </div>
 
@@ -7965,21 +7972,44 @@ let ribbonNote='';
 const tabName = k => (TABS.find(t=>t.k===k)||{name:k}).name;
 
 function drawDialog(){
-  const d=$('pasteDialog'); if(!d) return;
-  if(dialog!=='paste'){ d.style.display='none'; return; }
-  d.style.display='flex';
-  let rows='';
-  PASTE_OPTS.forEach(([k,lbl,kind])=>{
-    const on=pasteKind===kind;
-    rows+=`<div class="pd-opt${on?' on':''}"><span class="pd-radio">${on?'●':'○'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`;
-  });
-  rows+=`<div class="pd-sect">operation</div>`;
-  PASTE_OP_OPTS.forEach(([k,lbl,op])=>{
-    const on=pasteOp===op;
-    rows+=`<div class="pd-opt${on?' on':''}"><span class="pd-radio">${on?'●':'○'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`;
-  });
-  $('pdOpts').innerHTML=rows;
-  // r191: float the card over the SHEET like Excel \u2014 lower half so source rows stay readable
+  const d=$('pasteDialog');
+  if(d){
+    if(dialog!=='paste'){ d.style.display='none'; }
+    else {
+      d.style.display='flex';
+      let rows='';
+      PASTE_OPTS.forEach(([k,lbl,kind])=>{
+        const on=pasteKind===kind;
+        rows+=`<div class="pd-opt${on?' on':''}"><span class="pd-radio">${on?'●':'○'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`;
+      });
+      rows+=`<div class="pd-sect">operation</div>`;
+      PASTE_OP_OPTS.forEach(([k,lbl,op])=>{
+        const on=pasteOp===op;
+        rows+=`<div class="pd-opt${on?' on':''}"><span class="pd-radio">${on?'●':'○'}</span><span class="pd-key">${k}</span><span>${lbl}</span></div>`;
+      });
+      $('pdOpts').innerHTML=rows;
+      positionDialog(d);
+    }
+  }
+  // r263 (Wolf): Ctrl+1 Format Cells \u2014 a compact standalone card like Paste Special, grouped
+  // like Excel's tabs (Number / Font / Alignment) pared to the desk set; a letter applies instantly.
+  const fd=$('fmtDialog');
+  if(fd){
+    if(dialog!=='fmt'){ fd.style.display='none'; }
+    else {
+      fd.style.display='flex';
+      const byK={}; FMT_OPTS.forEach(([k,lbl])=>byK[k]=lbl);
+      const groups=[['number',['G','N','C','P','X','D','S','M']],['font',['E','K']],['alignment',['A']]];
+      let frows='';
+      groups.forEach(([sect,keys])=>{ frows+=`<div class="pd-sect">${sect}</div>`;
+        keys.forEach(k=>{ if(byK[k]!==undefined) frows+=`<div class="pd-opt"><span class="pd-key">${k.toLowerCase()}</span><span>${byK[k]}</span></div>`; }); });
+      $('fmtOpts').innerHTML=frows;
+      positionDialog(fd);
+    }
+  }
+}
+function positionDialog(d){
+  // float the card over the SHEET like Excel \u2014 lower half so source rows stay readable
   try{ const gw=document.querySelector('.gridwrap');
     if(gw){ const wr=gw.getBoundingClientRect();
       d.style.left=Math.max(8, wr.left+wr.width/2-150)+'px';
@@ -8002,7 +8032,7 @@ function __drawRibbon(){
     return; }
   if(dialog==='fmt'){ el.className='ribbon show';
     let fh='<span class="path">format cells →</span>';
-    FMT_OPTS.forEach(([k,lbl])=>{ fh+='<span class="opt"><k>'+k.toLowerCase()+'</k>'+lbl+'</span>'; });
+    // r263: options now live in the floating Format Cells card (drawDialog), not the ribbon strip
     fh+='<span class="opt">letters apply \u00b7 esc cancel</span>';
     el.innerHTML=fh; return; }
   if(dialog==='fontcolor'){
