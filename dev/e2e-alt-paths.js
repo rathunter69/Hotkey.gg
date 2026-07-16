@@ -408,14 +408,14 @@ const ALTS = [
       {sel:'D9',  keys:[...T('=MAX(D3:D7)'),{key:'Enter'}]},
       {sel:'D8',  keys:[...T('=MEDIAN(D3:D7)'),{key:'Enter'}]},
     ]` },
-  { key: 'covtable', name: 'read bottom-up — MIN first, flags before headroom, leverage last, ribbon fills', moves: `C => [
-      {sel:'B11', keys:[...T('=MIN(B8:F8)'),{key:'Enter'}]},
-      {sel:'B9',  keys:[...T('=IF(B8>=0,1,0)'),{key:'Enter'}]},
+  { key: 'covtable', name: 'read bottom-up — MIN first, flags before headroom, net leverage last, ribbon fills', moves: `C => [
+      {sel:'B12', keys:[...T('=MIN(B9:F9)'),{key:'Enter'}]},
+      {sel:'B10', keys:[...T('=IF(B9>=0,1,0)'),{key:'Enter'}]},
+      {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'B9',  keys:[...T('=B8-B7'),{key:'Enter'}]},
       {sel:'B9:F9', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B8',  keys:[...T('=B7-B6'),{key:'Enter'}]},
-      {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B6',  keys:[...T('=B5/B4'),{key:'Enter'}]},
-      {sel:'B6:F6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'B7',  keys:[...T('=(B5-B6)/B4'),{key:'Enter'}]},
+      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
   { key: 'dcf', name: 'TV block FIRST, PV row before the factors it reads, ribbon fills', moves: `C => [
       {sel:'B10', keys:[...T('=F3*(1+B8)/($B$7-B8)'),{key:'Enter'}]},
