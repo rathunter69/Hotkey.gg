@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="lb.css?v=1">
 <style>
   html{scrollbar-gutter:stable}   /* r68: content filters change page height — without this the centered wrap jumps horizontally */
   :root{
@@ -30,13 +31,19 @@
   h1{font-size:22px; font-weight:700; letter-spacing:-.4px; margin-bottom:4px}
   .sub{font-size:15px; color:var(--muted)}
   main{padding-bottom:80px}
-  .cards{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:22px 0}
+  /* r269 (Wolf): same visual organization as the leaderboard top — a "your card" panel
+     beside the headline numbers, one hero row */
+  .hero{display:grid; grid-template-columns:minmax(280px,1fr) minmax(0,1.7fr); gap:16px; margin:22px 0; align-items:stretch}
+  .hero.solo{grid-template-columns:1fr}
+  .cards{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:0}
+  .hero.solo .cards{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:820px){ .hero{grid-template-columns:1fr} .hero.solo .cards{grid-template-columns:repeat(2,1fr)} }
   @media(max-width:680px){ .cards{grid-template-columns:repeat(2,1fr)} }
   .stat{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px}
   .stat .big{font-family:var(--mono); font-size:26px; font-weight:700; color:var(--text)}
   .stat .big em{font-style:normal; font-size:14px; color:var(--muted)}
   .stat .lbl{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:1.2px; margin-top:4px}
-  .stat.hero{border-color:var(--accent-dim); background:var(--surface)}   /* r62 flat */
+  .stat.lead{border-color:var(--accent-dim); background:var(--surface)}   /* r62 flat */
   /* r135: achievements live HERE now (rolled off the card); earned medals are pickable */
   .ach-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:12px 8px; margin:10px 0 18px}
   /* r267: wall navigation — filter chips (58 medals was one undifferentiated wall) */
@@ -86,11 +93,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=257"></script>
+<script src="themes.js?v=258"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=253"></script>
+<script src="nav.js?v=254"></script>
 
 <header class="head">
   <div class="wrap">
@@ -156,18 +163,20 @@ async function load(){
     const tier = window.HK_RANK.tierOf(st.avgPct, st.att, st.wsum);
     const xp = window.HK_RANK.computeXP(mine, st);
     const L = window.HK_RANK.levelOf(xp);
-    tcHtml = `<div class="stat hero" style="grid-column:1/-1;display:flex;align-items:center;gap:16px;flex-wrap:wrap">`+
-      `<span style="display:inline-flex;line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,46,tier.bucket):''}</span>`+  /* r135: tier.cls tint-plate leak removed (r74 bug class) */
-      `<div><div style="font-family:var(--mono);font-weight:700;font-size:15px">${tier.name}</div>`+
-      `<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${window.hkLevelChip?window.hkLevelChip(L.lvl,20):''} LVL ${L.lvl} \u00b7 ${L.into}/${L.need} xp \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`+
-      `<span style="flex:1;min-width:120px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><span style="display:block;height:100%;width:${L.pct}%;background:var(--accent)"></span></span></div>`;
+    /* r269: same card the leaderboard hero deals — tier pill, level bar, trophy line */
+    tcHtml = `<div class="panel me"><h4>your card</h4>`+
+      `<div class="yc-top"><span class="pc-tier ${tier.cls}" style="display:inline-flex;align-items:center">${window.rankEmblem?window.rankEmblem(tier.name,28,tier.bucket):''}<span>${tier.full||tier.name}</span></span>`+
+      `<span class="yc-lvl">LVL ${L.lvl}</span><span class="yc-bar"><i style="width:${L.pct}%"></i></span>`+
+      `<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">${L.into}/${L.need} xp</span></div>`+
+      `<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">${st.crowns} crown${st.crowns===1?'':'s'} \u00b7 ${st.pod} podium${st.pod===1?'':'s'} \u00b7 ${st.att}/${D.menuOrder.length} boards</div>`+
+      `<div class="yc-next" style="margin-top:auto">defend them on <a href="leaderboard.html" style="color:var(--accent)">the boards \u2192</a> \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`;
   }
-  let html = tcHtml + `<div class="cards">
-    <div class="stat hero"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
+  let html = `<div class="hero${tcHtml?'':' solo'}">` + tcHtml + `<div class="cards">
+    <div class="stat lead"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
     <div class="stat"><div class="big">${bestKps?bestKps.toFixed(1):'—'}</div><div class="lbl">peak keys / sec</div></div>
     <div class="stat"><div class="big">${avgEff!==null?avgEff+'<em>%</em>':'—'}</div><div class="lbl">avg efficiency vs par</div></div>
     <div class="stat"><div class="big">${streakN?'🔥 '+streakN:'—'}</div><div class="lbl">day streak</div></div>
-  </div>`;
+  </div></div>`;
 
   if(!me){
     html += `<div class="state">You're viewing local bests only. <a href="index.html">Sign in with a real account</a> and every run posts — ranks, efficiency history, and the ladder all live here.</div>`;

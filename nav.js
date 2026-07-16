@@ -6,7 +6,7 @@
    3. Wires up: shortcuts modal, themes modal, user menu dropdown, settings modal, profile modal.
 
    Each page must define BEFORE loading this script:
-     window.NAV_ACTIVE = 'trainer' | 'leaderboard' | 'reference'   (which link gets the active style)
+     window.NAV_ACTIVE = 'trainer' | 'leaderboard' | 'desks' | 'stats' | 'reference'   (which link gets the active style)
      window.sb         = supabase client (or null if Supabase failed to init)
    This script reads window.sb but does NOT create it — pages own their own Supabase init.
    ============================================================ */
@@ -71,6 +71,7 @@
         <div class="topnav-pages" id="navPages">
           <a class="topnav-link" data-page="trainer"     href="index.html" title="trainer" aria-label="trainer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="tl-label">trainer</span></a>
           <a class="topnav-link" data-page="leaderboard" href="leaderboard.html" title="leaderboard" aria-label="leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg><span class="tl-label">leaderboard</span></a>
+          <a class="topnav-link" data-page="desks"       href="desks.html" title="desks & schools" aria-label="desks and schools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="tl-label">desks</span></a>
           <a class="topnav-link" data-page="stats"       href="stats.html" title="stats" aria-label="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 4 5-8"/></svg><span class="tl-label">stats</span></a>
           <a class="topnav-link" data-page="reference"   href="reference.html" title="reference" aria-label="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-1.6-1-4-1.5-6-1.5S2 5 2 5v13s2-.5 4-.5 4.4.5 6 1.5c1.6-1 4-1.5 6-1.5s4 .5 4 .5V5s-2-.5-4-.5-4.4.5-6 1.5Z"/><path d="M12 6v13"/></svg><span class="tl-label">reference</span></a>
         </div>
@@ -756,7 +757,7 @@
         '<div class="user-dropdown" id="userDropdown" role="menu">' +
           '<a id="umProfile">Player card</a>' +
           '<a href="stats.html">Your numbers</a>' +
-          '<a href="account.html#desk" title="your team\u2019s private boards + assignments">Your desk</a>' +
+          '<a href="desks.html" title="your desk\u2019s hall \u2014 quests, roster, standings">Your desk</a>' +
           saveItem +
           '<a href="account.html">Account</a>' +
           '<a id="umSignout">Sign out</a>' +
