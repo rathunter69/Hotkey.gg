@@ -67,3 +67,16 @@ Use `billing@hotkey.gg` for the account, `hello@hotkey.gg` for the public
 support contact Stripe requires, and the LLC's legal name once it exists —
 Stripe asks for entity details up front, so forming the LLC first avoids
 re-verification.
+
+## 5. The weekly desk digest is pre-wired (r277)
+
+The whole pipeline is deployed and DORMANT: pg_cron fires the `weekly-digest`
+edge function every Monday 13:00 UTC; without `RESEND_API_KEY` it no-ops with
+a "dormant" note. To light it up, one step after your Resend account exists:
+
+    Supabase dashboard → Edge Functions → weekly-digest → Secrets
+    → add RESEND_API_KEY = re_xxx
+
+(`DIGEST_CRON_SECRET` is already set — minted into Vault + function secrets.)
+Recipients: desk members with real emails who haven't opted out. Users manage
+it from the account page; every email carries a one-click unsubscribe.
