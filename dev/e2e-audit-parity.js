@@ -530,6 +530,20 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(aa1.oob, 'CHOOSE out of range throws into IFERROR, not the sheet');
   ok(aa1.reactive, 'CHOOSE reprices when the switch flips');
 
+  console.log('AB. MEDIAN (r264)');
+  await fresh();
+  const ab1 = await run(() => {
+    const bc=()=>({...blankCell()});
+    S.cells['K1']={...bc(), value:8}; S.cells['K2']={...bc(), value:12}; S.cells['K3']={...bc(), value:7};
+    S.cells['K4']={...bc(), value:30}; S.cells['K5']={...bc(), value:9};
+    S.cells['L1']={...bc(), formula:'=MEDIAN(K1:K5)'};   // sorted 7 8 9 12 30 -> 9 (outlier 30 ignored)
+    S.cells['L2']={...bc(), formula:'=MEDIAN(K1:K4)'};   // even count: (8+12)/2 = 10
+    recalc();
+    return { odd: S.cells['L1'].value===9, even: Math.abs(S.cells['L2'].value-10)<1e-9 };
+  });
+  ok(ab1.odd, 'MEDIAN of an odd set picks the middle (outlier-resistant)');
+  ok(ab1.even, 'MEDIAN of an even set averages the middle pair');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

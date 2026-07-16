@@ -406,7 +406,7 @@ const ALTS = [
       {sel:'D3:D7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:'D10', keys:[...T('=MIN(D3:D7)'),{key:'Enter'}]},
       {sel:'D9',  keys:[...T('=MAX(D3:D7)'),{key:'Enter'}]},
-      {sel:'D8',  keys:[...T('=AVERAGE(D3:D7)'),{key:'Enter'}]},
+      {sel:'D8',  keys:[...T('=MEDIAN(D3:D7)'),{key:'Enter'}]},
     ]` },
   { key: 'covtable', name: 'read bottom-up — MIN first, flags before headroom, leverage last, ribbon fills', moves: `C => [
       {sel:'B11', keys:[...T('=MIN(B8:F8)'),{key:'Enter'}]},
@@ -612,8 +612,8 @@ const ALTS = [
       {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
   { key: 'gauntlet', name: 'uses side FIRST, typed SUMs (no alt+=), alt h 1 bold, ctrl+shift+! commas', moves: `C => { const R=C._R, r0=R.r0; return [
-      {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('h'),{key:'Enter'}]},
-      {sel:R.srcIn,  keys:[{key:'Alt'},L('h'),L('h'),{key:'Enter'}]},
+      {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:R.srcIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       {sel:R.useTot, keys:[...T('=SUM(E'+(r0+1)+':E'+(r0+4)+')'),{key:'Enter'}]},
       {sel:R.srcTot, keys:[...T('=SUM(B'+(r0+1)+':B'+(r0+4)+')'),{key:'Enter'}]},
       {sel:R.useTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
@@ -695,10 +695,10 @@ const ALTS = [
       {sel:'B12', keys:[...T('=B2+B11*B3'),{key:'Enter'}]},
       {sel:'B14', keys:[...T('=(B7*B12+B8*B13)/(B7+B8)'),{key:'Enter'}]},
     ]` },
-  { key: 'txncomps', name: 'SUM/5 instead of AVERAGE (either idiom lands)', moves: `C => [
+  { key: 'txncomps', name: 'tape filled via ctrl+d, MEDIAN typed last-first', moves: `C => [
       {sel:'D3', keys:[...T('=B3/C3'),{key:'Enter'}]},
       {sel:'D3:D7', keys:[{key:'d',ctrl:true}]},
-      {sel:'D8', keys:[...T('=SUM(D3:D7)/5'),{key:'Enter'}]},
+      {sel:'D8', keys:[...T('=MEDIAN(D3:D7)'),{key:'Enter'}]},
       {sel:'B11', keys:[...T('=B10*D8'),{key:'Enter'}]},
       {sel:'B13', keys:[...T('=B11-B12'),{key:'Enter'}]},
     ]` },
@@ -715,11 +715,11 @@ const ALTS = [
       {sel:'C4:G6', keys:[{key:'r',ctrl:true}]},
     ]` },
   // --- T-D audit pack (r173) ---
-  { key: 'wirewalk', name: 'hop up, fix, ctrl+home — no return trip', moves: `C => { const o=C._o;
+  { key: 'wirewalk', name: 'hop up, fix, then ride the dependents back down', moves: `C => { const o=C._o;
       const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
       for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
-      keys.push(...T(String(o.good)),{key:'Enter'},{key:'Home',ctrl:true});
-      return [{sel:o.deck, keys:keys}]; }` },
+      keys.push(...T(String(o.good)),{key:'Enter'});
+      return [{sel:o.deck, keys:keys}, {sel:o.bad, keys:[{key:']',ctrl:true},{key:']',ctrl:true},{key:'Home',ctrl:true}]}]; }` },
   { key: 'wrapfix', name: 'fix the range FIRST, wrap second — F2 edit for the fix', moves: `C => { const o=C._o;
       // F2 into the broken MATCH range: caret at end; walk back over ',0))' then fix B->A twice
       return [
