@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
+<meta name="description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="hotkey.gg">
+<meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
+<meta property="og:description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:url" content="https://www.hotkey.gg/">
+<meta property="og:image" content="https://www.hotkey.gg/art/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
+<meta name="twitter:description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
+<link rel="canonical" href="https://www.hotkey.gg/">
 <script>
   // BOOT BEACON: if anything fatal happens while the game loads, paint the error on
   // screen instead of failing silent ("all the elements are gone" must never be a mystery).
@@ -12600,7 +12614,9 @@ function renderMobileGate(){
   const signed=!!(me_user && !isAnonUser());
   host.innerHTML=
     '<a class="mg-btn" href="leaderboard.html">🏆 the boards — see who’s fastest</a>'+
+    '<a class="mg-btn" href="desks.html">\u25c6 desks &amp; schools</a>'+
     '<a class="mg-btn" href="stats.html">📈 your numbers</a>'+
+    '<a class="mg-btn" href="reference.html">\u2328 shortcut reference</a>'+
     (signed
       ? '<a class="mg-btn" id="mgCard">👤 your player card</a>'
       : '<a class="mg-btn" id="mgAuth">👤 sign in — player card &amp; saved times</a>');
