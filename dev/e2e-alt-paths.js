@@ -162,13 +162,15 @@ const ALTS = [
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
     ]` },
-  { key: 'dress', name: 'footnote FIRST via alt o e, perimeter EARLY, total row dressed mid-pass via ribbon routes, header shaded late', moves: `C => { const R=C._R; return [
+  { key: 'dress', name: 'footnote FIRST via alt o e, perimeter EARLY, blue in two passes, source italic mid-pass, header shaded late', moves: `C => { const R=C._R; return [
       {sel:'A'+R.mRow, keys:[{key:'Alt'},L('o'),L('e'),L('e')]},
       {sel:'A3:E3', keys:[{key:'Alt'},L('h'),L('h'),{key:'ArrowRight'},{key:'Enter'}]},
       {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
       {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('o')]},
       {sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
-      {sel:R.inpRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:'A'+R.srcRow, keys:[{key:'i',ctrl:true}]},
+      {sel:R.costRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:R.segRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       {sel:R.mRowRange, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
       {sel:R.fRange, keys:[{key:'!',ctrl:true,shift:true}]},
     ]; }` },
