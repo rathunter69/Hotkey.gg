@@ -989,16 +989,11 @@ window.hkMacPopup = function(){
       '<div style="max-width:520px;width:100%;background:var(--surface,#141517);border:1px solid var(--line,#333);border-radius:14px;overflow:hidden;font-family:var(--mono,ui-monospace,monospace)">'+
       '<div style="min-height:34px;display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:var(--surface2,#1c1d20);border-bottom:1px solid var(--line,#333);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted,#888)">'+
         '<span>\u2318 mac keys \u2014 one motion, every excel</span><a id="hkMacX" style="cursor:pointer;font-size:15px">\u00d7</a></div>'+
-      '<div style="padding:16px 20px;font-size:12.5px;line-height:1.75;color:var(--muted,#999)">'+
-        '<div style="color:var(--text,#eee)"><b style="color:var(--accent,#2ea36f)">\u2325</b> opens the ribbon \u2014 <b>\u2325 h k</b> = commas, <b>\u2325 e s v</b> = paste values. Same letters as Windows <b>Alt</b> walks <i>and</i> the new Excel-for-Mac KeyTips.</div>'+
-        '<div style="margin-top:7px"><b style="color:var(--text,#eee)">\u2318 is your Ctrl</b> \u2014 \u2318C copy \u00b7 \u2318B bold \u00b7 \u2318\u2193 jump the data edge. Plain Ctrl chords work too.</div>'+
-        '<div style="margin-top:7px"><b style="color:var(--text,#eee)">\u2318T</b> cycles $anchors like <b>F4</b> \u00b7 <b>\u2303U</b> edits the cell like <b>F2</b> \u2014 both accepted, no setup.</div>'+
-        '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line,#333)">'+
-        '<b style="color:var(--warn,#d9a441)">In the real Excel for Mac:</b><br>'+
-        '1. Update Office (Help \u2192 Check for Updates) \u2014 recent builds include <b>KeyTips</b>.<br>'+
-        '2. Press <b>and release</b> \u2325 \u2014 letters appear on the ribbon; walk them like Windows.<br>'+
-        '3. F-keys: System Settings \u2192 Keyboard \u2192 \u201cUse F1, F2\u2026 as standard function keys\u201d \u2014 then <b>F2</b>/<b>F4</b> work bare (or hold <b>fn</b>).</div>'+
-        '<div style="margin-top:12px;font-size:10.5px;color:var(--faint,#666)">boards and pars are identical across platforms \u2014 same chords, same clock</div>'+
+      '<div style="padding:16px 20px;font-size:12.5px;line-height:1.8;color:var(--muted,#999)">'+
+        '<div style="color:var(--text,#eee)"><b>\u2318 = Ctrl</b> \u2014 \u2318C \u00b7 \u2318B \u00b7 \u2318\u2193. <b style="color:var(--accent,#2ea36f)">\u2325 walks the ribbon</b> \u2014 \u2325 e s v pastes values, same letters as Windows Alt and Mac Excel\u2019s new KeyTips. <b>\u2318T</b> = F4 anchors \u00b7 <b>\u2303U</b> = F2 edit.</div>'+
+        '<div style="margin-top:12px;padding-top:11px;border-top:1px dashed var(--line,#333)">'+
+        '<b style="color:var(--warn,#d9a441)">Real Excel for Mac:</b> update Office, then tap \u2325 \u2014 KeyTips light up the ribbon. F-keys need <b>fn</b>, or flip \u201cUse F1, F2\u2026 as standard function keys\u201d in System Settings \u2192 Keyboard.</div>'+
+        '<div style="margin-top:11px;font-size:10.5px;color:var(--faint,#666)">same boards, same pars, every platform</div>'+
       '</div>'+
       '<div style="padding:0 20px 16px"><button id="hkMacOk" style="font-family:inherit;font-size:12.5px;padding:9px 22px;border-radius:999px;border:1px solid var(--accent,#2ea36f);background:var(--accent,#2ea36f);color:#0c0d0e;font-weight:700;cursor:pointer">got it</button></div></div>';
     var close=function(){ w.remove(); document.removeEventListener('keydown',esch,true); };
