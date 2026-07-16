@@ -3028,7 +3028,7 @@ const CHALLENGES = {
     }
   },
   editfix:{
-    name:'Edit', label:'Fix the typos in place', par:32, parKeys:31,
+    name:'Edit', label:'Fix the typos in place', par:39, parKeys:39,
     aha:'F2 edits inside the cell — fix the typo, don’t retype the whole thing.',
     prompt:'Three species of broken, one discipline. Two label typos hide in the schedule \u2014 F2 in, fix the word, never retype the cell. Below them, the model column is supposed to TIE to the feed column \u2014 one hardcode drifted; put it back. And the total under it reads one row SHORT \u2014 F2 the SUM, stretch the range. Text, number, range: the F2 muscle covers all three.',
     req(){ const o=this._o; return o.sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 ')+' \u00b7 audit <em>'+o.driftCell+'</em> against <em>'+o.feedCell+'</em> \u00b7 stretch <em>'+o.totCell+'</em> to <em>'+o.wantRng+'</em>'; },
@@ -3046,7 +3046,11 @@ const CHALLENGES = {
         keys.push(...T(s.good.slice(p)), Kb.enter);
         return {sel:s.cell, keys};
       });
-      steps.push({sel:o.driftCell, keys:[...T(String(o.feedVal)), Kb.enter]});
+      // r264: the number fix rides F2 too — the drill's whole theme is edit-in-place, not retype
+      const driftLen=String(o.driftVal!==undefined?o.driftVal:'').length || String(o.feedVal).length;
+      const dk=[{key:'F2'}]; for(let i=0;i<driftLen;i++) dk.push({key:'Backspace'});
+      dk.push(...T(String(o.feedVal)), Kb.enter);
+      steps.push({sel:o.driftCell, keys:dk});
       steps.push({sel:o.totCell, keys:[{key:'F2'},{key:'Backspace'},{key:'Backspace'},...T(o.tailFix), Kb.enter]});
       return steps; },
     build(){
@@ -3088,7 +3092,7 @@ const CHALLENGES = {
       cells['A13']={...blankCell(),value:'Model total',txt:true,bold:true};
       cells['C13']={...blankCell(),formula:'=SUM(C11:C11)',value:this._o.modelVals[0],fmtStyle:'comma',decimals:0,bold:true,bt:true};
       this._o.feed=feed;
-      this._o.driftCell='C'+(11+driftIdx); this._o.feedCell='B'+(11+driftIdx); this._o.feedVal=feed[driftIdx];
+      this._o.driftCell='C'+(11+driftIdx); this._o.feedCell='B'+(11+driftIdx); this._o.feedVal=feed[driftIdx]; this._o.driftVal=this._o.modelVals[driftIdx];
       this._o.totCell='C13'; this._o.shortRng='C11:C11'; this._o.wantRng='C11:C12'; this._o.tailFix='2)';
       return {ROWS:14, cells, active:{r:2,c:1}, sel:null, colW:{1:118,2:80,3:80,5:118,6:80}};
     },
@@ -6516,22 +6520,22 @@ const CHALLENGES = {
   },
 
   covtable:{
-    name:'Cov. Table', label:'Run the covenant table', par:40, parKeys:40,
+    name:'Cov. Table', label:'Run the covenant table', par:45, parKeys:45,
     aha:'Covenants are ratios with teeth — the table shows headroom before the breach.',
-    prompt:'Leverage is tested every quarter and the covenant STEPS DOWN \u2014 the question is never "are we compliant today", it\'s "which quarter pinches". Compute leverage off LTM EBITDA, headroom against the stepping max, a 1/0 compliance flag with a real IF, and pull the tightest quarter with MIN. When this table goes red, everyone you\'ve ever met gets on a call.',
-    req(){ return '<em>B6:F6</em> leverage \u2192 =B5/B4 \u00b7 <em>B8:F8</em> headroom \u2192 =B7\u2212B6 \u00b7 <em>B9:F9</em> compliant \u2192 =IF(B8>=0,1,0) \u00b7 <em>B11</em> tightest \u2192 =MIN(B8:F8)'; },
+    prompt:'Leverage is tested every quarter and the covenant STEPS DOWN \u2014 the question is never "are we compliant today", it\'s "which quarter pinches". Covenants test NET leverage: debt less cash, over LTM EBITDA. Compute it, headroom against the stepping max, a 1/0 compliance flag with a real IF, and pull the tightest quarter with MIN. When this table goes red, everyone you\'ve ever met gets on a call.',
+    req(){ return '<em>B7:F7</em> net leverage \u2192 =(B5-B6)/B4 \u00b7 <em>B9:F9</em> headroom \u2192 =B8\u2212B7 \u00b7 <em>B10:F10</em> compliant \u2192 =IF(B9>=0,1,0) \u00b7 <em>B12</em> tightest \u2192 =MIN(B9:F9)'; },
     guide:[
-      'leverage = debt over LTM EBITDA \u00b7 B6: <kbd>=</kbd>B5/B4 <kbd>\u21b5</kbd> \u00b7 select B6:F6, <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'headroom = covenant max \u2212 leverage \u00b7 B8: <kbd>=</kbd>B7-B6 <kbd>\u21b5</kbd> \u00b7 fill across',
-      'the flag is a real IF \u00b7 B9: <kbd>=</kbd>IF(B8>=0,1,0) <kbd>\u21b5</kbd> \u00b7 fill across',
-      'the number the room asks for \u00b7 B11: <kbd>=</kbd>MIN(B8:F8) <kbd>\u21b5</kbd> \u2014 the tightest quarter',
+      'NET leverage = (debt \u2212 cash) over LTM EBITDA \u2014 covenants credit the cash \u00b7 B7: <kbd>=</kbd>(B5-B6)/B4 <kbd>\u21b5</kbd> \u00b7 select B7:F7, <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'headroom = covenant max \u2212 net leverage \u00b7 B9: <kbd>=</kbd>B8-B7 <kbd>\u21b5</kbd> \u00b7 fill across',
+      'the flag is a real IF \u00b7 B10: <kbd>=</kbd>IF(B9>=0,1,0) <kbd>\u21b5</kbd> \u00b7 fill across',
+      'the number the room asks for \u00b7 B12: <kbd>=</kbd>MIN(B9:F9) <kbd>\u21b5</kbd> \u2014 the tightest quarter',
     ],
-    targets:['B6:F6','B8:F8','B9:F9','B11'],
+    targets:['B7:F7','B9:F9','B10:F10','B12'],
     demo(){ return [
-      {sel:'B6', keys:[...T('=B5/B4'), Kb.enter]},          {sel:'B6:F6', keys:[Kb.fillR]},
-      {sel:'B8', keys:[...T('=B7-B6'), Kb.enter]},          {sel:'B8:F8', keys:[Kb.fillR]},
-      {sel:'B9', keys:[...T('=IF(B8>=0,1,0)'), Kb.enter]},  {sel:'B9:F9', keys:[Kb.fillR]},
-      {sel:'B11', keys:[...T('=MIN(B8:F8)'), Kb.enter]},
+      {sel:'B7', keys:[...T('=(B5-B6)/B4'), Kb.enter]},      {sel:'B7:F7', keys:[Kb.fillR]},
+      {sel:'B9', keys:[...T('=B8-B7'), Kb.enter]},           {sel:'B9:F9', keys:[Kb.fillR]},
+      {sel:'B10', keys:[...T('=IF(B9>=0,1,0)'), Kb.enter]},  {sel:'B10:F10', keys:[Kb.fillR]},
+      {sel:'B12', keys:[...T('=MIN(B9:F9)'), Kb.enter]},
     ]; },
     build(){
       const cells={};
@@ -6540,57 +6544,60 @@ const CHALLENGES = {
       for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'Q'+(c-1),txt:true,bold:true};
       cells['A4']={...blankCell(),value:'LTM EBITDA ($mm)',txt:true};
       cells['A5']={...blankCell(),value:'Total debt ($mm)',txt:true};
-      cells['A6']={...blankCell(),value:'Leverage (x)',txt:true};
-      cells['A7']={...blankCell(),value:'Covenant max (x)',txt:true};
-      cells['A8']={...blankCell(),value:'Headroom (x)',txt:true,bold:true};
-      cells['A9']={...blankCell(),value:'Compliant? (1/0)',txt:true};
-      cells['A11']={...blankCell(),value:'Tightest quarter (x)',txt:true,bold:true};
-      // EBITDA sags mid-path (the RX story), debt amortizes a touch, the max steps
-      // down \u2014 the pinch lands mid-table more often than at the ends
+      cells['A6']={...blankCell(),value:'Cash ($mm)',txt:true};
+      cells['A7']={...blankCell(),value:'Net leverage (x)',txt:true};
+      cells['A8']={...blankCell(),value:'Covenant max (x)',txt:true};
+      cells['A9']={...blankCell(),value:'Headroom (x)',txt:true,bold:true};
+      cells['A10']={...blankCell(),value:'Compliant? (1/0)',txt:true};
+      cells['A12']={...blankCell(),value:'Tightest quarter (x)',txt:true,bold:true};
+      // EBITDA sags mid-path (the RX story), debt amortizes a touch, cash breathes,
+      // the max steps down \u2014 the pinch lands mid-table more often than at the ends
       let ebitda=rnd(80,200)*5;
       const debt0=Math.round(ebitda*(3.5+rnd(0,15)/10)/5)*5;
       let maxCov=(45+rnd(5,20))/10;                 // 5.0x\u20136.5x, stepping down
-      let debt=debt0;
+      let debt=debt0, cash=rnd(4,16)*5;
       for(let c=2;c<=6;c++){
         const Lc=colLetter(c);
         cells[Lc+'4']={...blankCell(),value:ebitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells[Lc+'5']={...blankCell(),value:debt,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'7']={...blankCell(),value:Math.round(maxCov*10)/10,fontColor:'blue',decimals:1};
-        cells[Lc+'6']={...blankCell(),decimals:2}; cells[Lc+'8']={...blankCell(),decimals:2};   // r190: ratios land at 2dp
+        cells[Lc+'6']={...blankCell(),value:cash,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+'8']={...blankCell(),value:Math.round(maxCov*10)/10,fontColor:'blue',decimals:1};
+        cells[Lc+'7']={...blankCell(),decimals:2}; cells[Lc+'9']={...blankCell(),decimals:2};   // r190: ratios land at 2dp
         const drift=(c<=4? -rnd(2,10) : rnd(0,8));  // sag then stabilize/recover
         ebitda=Math.max(40, Math.round((ebitda*(1+drift/100))/5)*5);
         debt=Math.max(40, debt-rnd(0,6)*5);
+        cash=Math.max(10, cash+(rnd(0,1)?1:-1)*rnd(0,4)*5);
         if(c===3||c===5) maxCov-= (2+rnd(0,3))/10;  // the step-downs
       }
-      cells['B11']={...blankCell(),decimals:2};
-      return {ROWS:11, cells, active:{r:6,c:2}, sel:null, colW:{1:150}};
+      cells['B12']={...blankCell(),decimals:2};
+      return {ROWS:12, cells, active:{r:7,c:2}, sel:null, colW:{1:150}};
     },
     checks(S){
       const V=(a)=>{ const x=S.cells[a]; return (x&&typeof x.value==='number')?x.value:0; };
       let levOk=true, hdOk=true, flagOk=true;
       for(let c=2;c<=6;c++){ const Lc=colLetter(c);
-        const lev=S.cells[Lc+'6'];
+        const lev=S.cells[Lc+'7'];
         const fl=(lev&&lev.formula)?lev.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        if(!fl || fl.indexOf(Lc+'5')<0 || fl.indexOf(Lc+'4')<0
-           || Math.abs(((lev&&lev.value)||0)-V(Lc+'5')/V(Lc+'4'))>1e-6) levOk=false;
-        const hd=S.cells[Lc+'8'];
+        if(!fl || fl.indexOf(Lc+'5')<0 || fl.indexOf(Lc+'6')<0 || fl.indexOf(Lc+'4')<0
+           || Math.abs(((lev&&lev.value)||0)-(V(Lc+'5')-V(Lc+'6'))/V(Lc+'4'))>1e-6) levOk=false;
+        const hd=S.cells[Lc+'9'];
         const fh=(hd&&hd.formula)?hd.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        if(!fh || fh.indexOf(Lc+'7')<0 || fh.indexOf(Lc+'6')<0
-           || Math.abs(((hd&&hd.value)||0)-(V(Lc+'7')-V(Lc+'6')))>1e-6) hdOk=false;
-        const fg=S.cells[Lc+'9'];
+        if(!fh || fh.indexOf(Lc+'8')<0 || fh.indexOf(Lc+'7')<0
+           || Math.abs(((hd&&hd.value)||0)-(V(Lc+'8')-V(Lc+'7')))>1e-6) hdOk=false;
+        const fg=S.cells[Lc+'10'];
         const ff=(fg&&fg.formula)?fg.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        const wantF=(V(Lc+'8')>=0)?1:0;
-        if(!ff || ff.indexOf('IF(')<0 || ff.indexOf(Lc+'8')<0 || !(fg && typeof fg.value==='number' && fg.value===wantF)) flagOk=false;
+        const wantF=(V(Lc+'9')>=0)?1:0;
+        if(!ff || ff.indexOf('IF(')<0 || ff.indexOf(Lc+'9')<0 || !(fg && typeof fg.value==='number' && fg.value===wantF)) flagOk=false;
       }
-      const tq=S.cells['B11'];
+      const tq=S.cells['B12'];
       const ft=(tq&&tq.formula)?tq.formula.toUpperCase().replace(/[\s$]/g,''):'';
-      let wantT=Infinity; for(let c=2;c<=6;c++) wantT=Math.min(wantT, V(colLetter(c)+'8'));
-      const tqOk=!!(ft && ft.indexOf('MIN(')>=0 && ft.indexOf('B8:F8')>=0 && hdOk && Math.abs(((tq&&tq.value)||0)-wantT)<1e-6);
+      let wantT=Infinity; for(let c=2;c<=6;c++) wantT=Math.min(wantT, V(colLetter(c)+'9'));
+      const tqOk=!!(ft && ft.indexOf('MIN(')>=0 && ft.indexOf('B9:F9')>=0 && hdOk && Math.abs(((tq&&tq.value)||0)-wantT)<1e-6);
       return [
-        {label:'Run leverage live \u2014 debt \u00f7 LTM EBITDA, every quarter (row 6)', ok:levOk},
-        {label:'Run headroom against the STEPPING max \u2014 covenant \u2212 leverage (row 8)', ok:hdOk},
-        {label:'Build the compliance flag as a real IF \u2014 1 in the clear, 0 in breach (row 9)', ok:flagOk},
-        {label:'Pull the tightest quarter with MIN over the headroom row (B11; needs row 8 live)', ok:tqOk},
+        {label:'Run NET leverage live \u2014 (debt \u2212 cash) \u00f7 LTM EBITDA, every quarter (row 7)', ok:levOk},
+        {label:'Run headroom against the STEPPING max \u2014 covenant \u2212 net leverage (row 9)', ok:hdOk},
+        {label:'Build the compliance flag as a real IF \u2014 1 in the clear, 0 in breach (row 10)', ok:flagOk},
+        {label:'Pull the tightest quarter with MIN over the headroom row (B12; needs row 9 live)', ok:tqOk},
       ];
     }
   },
