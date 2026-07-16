@@ -108,7 +108,8 @@
           <span class="sf-fine">Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.</span>
         </div>
         <nav class="sf-links" aria-label="footer">
-          <a href="mailto:hello@hotkey.gg">contact</a>
+          <a href="contact.html">contact</a>
+          <a href="enterprise.html">enterprise</a>
           <a href="mailto:hello@hotkey.gg?subject=Bug%20report%20%E2%80%94%20hotkey.gg">report a bug</a>
           <a href="terms.html">terms</a>
           <a href="privacy.html">privacy</a>
@@ -755,7 +756,6 @@
           '<svg class="um-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</button>' +
         '<div class="user-dropdown" id="userDropdown" role="menu">' +
-          '<a id="umProfile">Player card</a>' +
           '<a href="stats.html">Your numbers</a>' +
           (anon ? '' : '<a href="desks.html" title="your desk\u2019s hall \u2014 quests, roster, standings">Your desk</a>') +
           saveItem +
@@ -844,7 +844,11 @@
     if(!mount){ console.warn('nav.js: no #navMount found on this page'); return; }
     mount.innerHTML = NAV_HTML;
     if(window.syncThemeLabels) window.syncThemeLabels();
-    const fmount = $('siteFooter'); if(fmount) fmount.innerHTML = FOOTER_HTML;
+    /* r274: init() runs mid-parse (navMount exists before the rest of the body), so
+       #siteFooter usually doesn't exist yet — the footer silently never rendered on
+       ANY page. Inject now if present, else on DOMContentLoaded. */
+    const injectFooter=()=>{ const f=$('siteFooter'); if(f) f.innerHTML = FOOTER_HTML; };
+    if($('siteFooter')) injectFooter(); else document.addEventListener('DOMContentLoaded', injectFooter);
 
     // Mark the active page link based on what the page declared.
     const active = window.NAV_ACTIVE || 'trainer';

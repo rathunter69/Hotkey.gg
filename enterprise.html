@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>enterprise · hotkey.gg</title>
+<link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  html{scrollbar-gutter:stable}
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49; --accent:#2ea36f; --accent-dim:#1d6647;
+    --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; line-height:1.6}
+  .wrap{max-width:980px; margin:0 auto; padding:0 24px 80px}
+  header.head{padding:14px 0 6px}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin-bottom:8px}
+  h1{font-size:26px; font-weight:700; letter-spacing:-.4px; margin-bottom:6px}
+  .sub{font-size:15.5px; color:var(--muted); max-width:640px}
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin:18px 0 8px}
+  .cta{font-family:var(--mono); font-size:13px; padding:11px 22px; border-radius:999px; text-decoration:none;
+    border:1px solid var(--accent-dim); color:var(--accent)}
+  .cta.solid{background:var(--accent); color:#0c0d0e; border-color:var(--accent); font-weight:700}
+  .cta:hover{background:var(--accent-glow)} .cta.solid:hover{background:var(--accent); filter:brightness(1.08)}
+  .section-title{font-family:var(--mono); font-size:12px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:1.5px; margin:34px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--line)}
+  .grid3{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px}
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px}
+  .panel h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:10px}
+  .panel p, .panel li{font-size:13.5px; color:var(--muted)}
+  .panel ul{list-style:none; display:flex; flex-direction:column; gap:7px}
+  .panel li::before{content:'\25c6'; color:var(--accent); font-size:9px; margin-right:9px; vertical-align:1px}
+  .panel b{color:var(--text)}
+  .price{border-color:var(--accent-dim)}
+  .price .big{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--text); margin:2px 0}
+  .price .big em{font-style:normal; font-size:12px; color:var(--warn)}
+  .steps{counter-reset:s; display:flex; flex-direction:column; gap:10px}
+  .step{display:flex; gap:14px; align-items:baseline; font-size:13.5px; color:var(--muted)}
+  .step::before{counter-increment:s; content:counter(s); font-family:var(--mono); font-weight:700; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:8px; min-width:26px; text-align:center; padding:1px 0}
+  .step b{color:var(--text)}
+  .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
+  .fine a{color:var(--muted)}
+</style>
+<link rel="stylesheet" href="nav.css?v=174">
+<script src="drills.js?v=263"></script>
+<script>
+  const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+  window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  window.NAV_ACTIVE='';
+</script>
+<script src="themes.js?v=258"></script>
+</head>
+<body>
+<div id="navMount"></div>
+<script src="nav.js?v=256"></script>
+
+<div class="wrap">
+  <header class="head">
+    <div class="eyebrow">&#9670; enterprise &amp; partnerships</div>
+    <h1>PRO for the whole desk</h1>
+    <div class="sub">Your analysts already live in Excel. hotkey.gg turns keyboard fluency into a measurable, competitive team sport — private boards, weekly assignments, and a cohort report you can put in front of whoever signed off on the budget.</div>
+    <div class="cta-row">
+      <a class="cta solid" href="mailto:hello@hotkey.gg?subject=Enterprise%20%E2%80%94%20PRO%20for%20our%20desk">talk to us &#8594;</a>
+      <a class="cta" href="desks.html">see the desks page</a>
+    </div>
+  </header>
+
+  <div class="section-title">What a desk gets</div>
+  <div class="grid3">
+    <div class="panel">
+      <h4>&#9670; the private room</h4>
+      <ul>
+        <li><b>Desk-only leaderboards</b> across all 81 drills, marathons, and rapid-fire</li>
+        <li><b>The hall</b> — roster, ranks, weekly activity, time saved per analyst</li>
+        <li><b>School colors</b> and verified-desk badging</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4>&#9997; the training program</h4>
+      <ul>
+        <li><b>Weekly quests</b> — the staffer pins up to 3 drills with time targets</li>
+        <li><b>4-week program templates</b>: Intern week 0, First-year bootcamp, Speed weeks</li>
+        <li><b>Guided demos</b> with the watch-solution spotlight on every drill</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h4>&#128200; the receipts</h4>
+      <ul>
+        <li><b>Cohort report</b> (print / PDF) — hours saved, speed-ups, coverage, momentum</li>
+        <li><b>Per-analyst evaluation</b> — first-try vs. best, weekly reps, rank progression</li>
+        <li><b>Application inbox</b> — recruit from the guild board, staffer approves</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">How firms use it</div>
+  <div class="grid3">
+    <div class="panel">
+      <h4>analyst classes</h4>
+      <p>Run the <b>Intern week 0</b> and <b>First-year bootcamp</b> programs during training — every incoming analyst hits the desk standard before they touch a live model.</p>
+    </div>
+    <div class="panel">
+      <h4>live desks</h4>
+      <p>Staffers pin the week's quests; the hall shows who's putting in reps and who's idle. The desk ladder makes speed a standing competition instead of a one-off training.</p>
+    </div>
+    <div class="panel">
+      <h4>clubs &amp; programs</h4>
+      <p>Finance clubs and MBA cohorts run desks under their school's colors — school standings are public, so your members' crowns count for the institution too.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Pricing</div>
+  <div class="grid3">
+    <div class="panel price">
+      <h4>beta desks</h4>
+      <div class="big">free <em>&#9670; everything unlocked</em></div>
+      <p>During the private beta every desk gets the full PRO feature set. Desks formed in beta lock in <b>founder pricing</b> at launch.</p>
+    </div>
+    <div class="panel price">
+      <h4>at launch</h4>
+      <div class="big">per-seat <em>&#9670; billed to the desk</em></div>
+      <p>One invoice for the whole desk — no analyst expense reports. Volume tiers for classes of 20+; custom terms for firm-wide rollouts.</p>
+    </div>
+    <div class="panel price">
+      <h4>partnerships</h4>
+      <div class="big">let's talk</div>
+      <p>Training providers, prep courses, career centers, content collaborations — if your audience lives in Excel, we probably fit together.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Getting started takes an afternoon</div>
+  <div class="panel"><div class="steps">
+    <div class="step"><span><b>Start a desk</b> from the <a href="desks.html" style="color:var(--accent)">desks page</a> — name it, grab the invite link.</span></div>
+    <div class="step"><span><b>Drop the link in the group chat.</b> Analysts join in one click; applications from the guild board land in your inbox.</span></div>
+    <div class="step"><span><b>Pin a program.</b> One click a week runs a 4-week curriculum with time targets derived from par.</span></div>
+    <div class="step"><span><b>Print the cohort report</b> when someone asks whether it worked.</span></div>
+  </div></div>
+
+  <div class="cta-row" style="margin-top:26px">
+    <a class="cta solid" href="mailto:hello@hotkey.gg?subject=Enterprise%20%E2%80%94%20PRO%20for%20our%20desk">enterprise inquiries &#8594;</a>
+    <a class="cta" href="mailto:hello@hotkey.gg?subject=Partnership%20%E2%80%94%20hotkey.gg">partnerships &#8594;</a>
+    <a class="cta" href="contact.html">everything else</a>
+  </div>
+
+  <div class="fine">
+    Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.
+    Legal: <a href="terms.html">terms</a> · <a href="privacy.html">privacy</a> · <a href="security.html">security</a>.
+  </div>
+</div>
+
+<div id="siteFooter"></div>
+</body>
+</html>
