@@ -544,6 +544,36 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(ab1.odd, 'MEDIAN of an odd set picks the middle (outlier-resistant)');
   ok(ab1.even, 'MEDIAN of an even set averages the middle pair');
 
+  console.log('AC. insert/delete rewrites formula refs (r265)');
+  await fresh();
+  const ac1 = await run(() => {
+    const bc=()=>({...blankCell()});
+    // a block with a SUM below it and a pointer above it
+    S.cells['H2']={...bc(), value:10}; S.cells['H3']={...bc(), value:20}; S.cells['H4']={...bc(), value:30};
+    S.cells['H6']={...bc(), formula:'=SUM(H2:H4)', value:60};
+    S.cells['I1']={...bc(), formula:'=H3*2', value:40};
+    // INSERT a row at 3: SUM range expands to H2:H5, the H3 pointer shifts to H4
+    S.sel={r:3,c:1}; S.active={r:3,c:10};
+    S.cells = shiftCellsRows(3, 1); S.ROWS=Math.max(S.ROWS,14); recalc();
+    const insSum=String((S.cells['H7']||{}).formula||'');
+    const insPtr=String((S.cells['I1']||{}).formula||'');
+    // DELETE the inserted row back out: range contracts, pointer returns
+    S.cells = shiftCellsRows(3, -1); recalc();
+    const delSum=String((S.cells['H6']||{}).formula||'');
+    const delPtr=String((S.cells['I1']||{}).formula||'');
+    // DELETE a row a single ref points at -> #REF!
+    S.cells = shiftCellsRows(3, -1); // removes old H3 (the pointer's target)
+    const refErr=String((S.cells['I1']||{}).formula||'');
+    return { insSum: insSum==='=SUM(H2:H5)', insPtr: insPtr==='=H4*2',
+             delSum: delSum==='=SUM(H2:H4)', delPtr: delPtr==='=H3*2',
+             refErr: refErr.includes('#REF!') };
+  });
+  ok(ac1.insSum, 'row insert inside a SUM range EXPANDS the range');
+  ok(ac1.insPtr, 'row insert shifts single refs below it');
+  ok(ac1.delSum, 'row delete inside a SUM range CONTRACTS the range');
+  ok(ac1.delPtr, 'row delete shifts single refs back up');
+  ok(ac1.refErr, 'deleting a referenced row leaves #REF!, like Excel');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {
