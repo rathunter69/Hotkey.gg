@@ -230,7 +230,7 @@ async function load(){
     document.getElementById('acDataMsg').textContent='local cache cleared (PBs + streak kept; server runs untouched).';
   }catch(e){} };
   const so=document.getElementById('acSignout');
-  if(so) so.onclick=async()=>{ try{ await sb.auth.signOut(); }finally{ location.href='index.html'; } };
+  if(so) so.onclick=async()=>{ try{ await Promise.race([sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]); }catch(e){} location.href='index.html'; };   // r266: never strand the click on a hung signOut
   const th=document.getElementById('acThemes');
   if(th && window.THEMES){ Object.entries(window.THEMES).forEach(([k,t])=>{
     const b=document.createElement('button'); b.className='btn'; b.style.margin='0'; b.textContent=t.name||k;
@@ -541,7 +541,7 @@ async function load(){
       say('devMsg','Ranked unlocked for testing ✓ — open the leaderboard.'); };
     if(dro) dro.onclick=()=>{ try{ localStorage.removeItem('hk_dev_unlock'); localStorage.removeItem('hk_ranked'); }catch(e){}
       say('devMsg','Reset ✓ — the real gate applies again.'); } }
-  document.getElementById('acSignout').onclick=async()=>{ try{ await sb.auth.signOut(); }catch(e){} location.href='index.html'; };
+  document.getElementById('acSignout').onclick=async()=>{ try{ await Promise.race([sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]); }catch(e){} location.href='index.html'; };   // r266: race-guarded like the nav signout
 }
 load();
 </script>

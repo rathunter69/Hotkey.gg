@@ -771,7 +771,7 @@
     wire('umProfile',  openProfile);
     wire('umSaveProg', () => goToTrainer('openAuth=signup'));
     wire('umSettings', openSettings);
-    wire('umSignout',  () => { clearAccountUI(); window.sb.auth.signOut().finally(()=>{ try{ location.reload(); }catch(e){} }); });   // r226 (Wolf): wipe the cached rank/level BEFORE reload so a guest never sees stale account info
+    wire('umSignout',  () => { clearAccountUI(); Promise.race([window.sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{ try{ location.reload(); }catch(e){} }); });   // r266: reload must NEVER wait on a hung signOut round-trip (it used to — sign-out looked dead until a manual refresh); r226 wipe still runs first
   }
   // Outside-click and Esc close the dropdown — global listeners, installed once.
   document.addEventListener('click', e => {
@@ -903,7 +903,10 @@
         }
       }).catch(() => renderAuthBar());
       // React to sign-in / sign-out across tabs.
-      window.sb.auth.onAuthStateChange((_evt, session) => {
+      // r266: the callback body is DEFERRED (setTimeout 0) — supabase-js v2 holds its auth
+      // lock while emitting, and the profiles query inside re-acquires that same lock via
+      // getSession(); querying synchronously here deadlocked the fetch until a page refresh.
+      window.sb.auth.onAuthStateChange((_evt, session) => { setTimeout(() => { try{
         window._navUser = session && session.user || null;
         if(window._navUser){
           window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).single().then(({ data: prof }) => {
@@ -916,7 +919,7 @@
           clearAccountUI();      // r226: SIGNED_OUT (incl. from another tab) — clear the stale rank/level reactively
           renderAuthBar();
         }
-      });
+      }catch(e){} }, 0); });
     } else {
       renderAuthBar();
     }
