@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="../">
+<title>The drill library — 81 Excel shortcut drills · hotkey.gg</title>
+<meta name="description" content="Every hotkey.gg drill: navigation, formatting, formulas, lookups, and full model builds — 81 interactive Excel keyboard drills with par scores. No mouse allowed.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="hotkey.gg">
+<meta property="og:title" content="The drill library — 81 Excel shortcut drills · hotkey.gg">
+<meta property="og:description" content="Every hotkey.gg drill: navigation, formatting, formulas, lookups, and full model builds — 81 interactive Excel keyboard drills with par scores. No mouse allowed.">
+<meta property="og:url" content="https://www.hotkey.gg/drills/">
+<meta property="og:image" content="https://www.hotkey.gg/art/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The drill library — 81 Excel shortcut drills · hotkey.gg">
+<meta name="twitter:description" content="Every hotkey.gg drill: navigation, formatting, formulas, lookups, and full model builds — 81 interactive Excel keyboard drills with par scores. No mouse allowed.">
+<meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
+<link rel="canonical" href="https://www.hotkey.gg/drills/">
+<link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  html{scrollbar-gutter:stable}
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49; --accent:#2ea36f; --accent-dim:#1d6647;
+    --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; line-height:1.6}
+  .wrap{max-width:860px; margin:0 auto; padding:0 24px 80px}
+  .crumbs{font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:16px 0 4px}
+  .crumbs a{color:var(--muted); text-decoration:none} .crumbs a:hover{color:var(--accent)}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin:10px 0 8px}
+  h1{font-size:26px; font-weight:700; letter-spacing:-.4px; margin-bottom:6px}
+  .aha{font-size:15.5px; color:var(--warn); font-style:italic; margin:2px 0 12px}
+  .sub{font-size:14.5px; color:var(--muted); max-width:640px}
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin:20px 0 8px; align-items:center}
+  .cta{font-family:var(--mono); font-size:13px; padding:11px 22px; border-radius:999px; text-decoration:none;
+    border:1px solid var(--accent-dim); color:var(--accent)}
+  .cta.solid{background:var(--accent); color:#0c0d0e; border-color:var(--accent); font-weight:700}
+  .cta:hover{background:var(--accent-glow)} .cta.solid:hover{background:var(--accent); filter:brightness(1.08)}
+  .par{font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .section-title{font-family:var(--mono); font-size:12px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:1.5px; margin:30px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--line)}
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px}
+  .keys{font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:2}
+  .keys em, .steps em{font-style:normal; color:var(--text); background:var(--surface2); border:1px solid var(--line);
+    border-radius:5px; padding:0 6px; font-family:var(--mono); font-size:12.5px}
+  .steps{list-style:none; counter-reset:s; display:flex; flex-direction:column; gap:10px}
+  .steps li{font-size:13.5px; color:var(--muted); display:flex; gap:14px; align-items:baseline}
+  .steps li::before{counter-increment:s; content:counter(s); font-family:var(--mono); font-weight:700; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:8px; min-width:26px; text-align:center; padding:1px 0; flex:none}
+  kbd{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:5px; padding:0 5px}
+  .rel{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px}
+  .rel a{display:block; background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; text-decoration:none; color:var(--text)}
+  .rel a:hover{border-color:var(--accent-dim)}
+  .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
+  .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
+  .fine a{color:var(--muted)}
+  .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
+  .grouphead small{color:var(--faint); font-weight:400}</style>
+<link rel="stylesheet" href="nav.css?v=174">
+<script src="drills.js?v=263"></script>
+<script>
+  const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+  window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  window.NAV_ACTIVE='';
+</script>
+<script src="themes.js?v=262"></script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"CollectionPage","name":"The drill library — 81 Excel shortcut drills · hotkey.gg","description":"Every hotkey.gg drill: navigation, formatting, formulas, lookups, and full model builds — 81 interactive Excel keyboard drills with par scores. No mouse allowed.","url":"https://www.hotkey.gg/drills/","isPartOf":{"@type":"WebSite","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},{"@context":"https://schema.org","@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"name":"Navigation tour","url":"https://www.hotkey.gg/drills/navigation.html"},{"@type":"ListItem","position":2,"name":"Chase the marks","url":"https://www.hotkey.gg/drills/modeltour.html"},{"@type":"ListItem","position":3,"name":"Fill down, fill right","url":"https://www.hotkey.gg/drills/filldr.html"},{"@type":"ListItem","position":4,"name":"Alt E S everything","url":"https://www.hotkey.gg/drills/pastes.html"},{"@type":"ListItem","position":5,"name":"Assemble & dress the summary","url":"https://www.hotkey.gg/drills/blocksel.html"},{"@type":"ListItem","position":6,"name":"Rebuild the schedule","url":"https://www.hotkey.gg/drills/rowops.html"},{"@type":"ListItem","position":7,"name":"Columns move too","url":"https://www.hotkey.gg/drills/colops.html"},{"@type":"ListItem","position":8,"name":"Fix the typos in place","url":"https://www.hotkey.gg/drills/editfix.html"},{"@type":"ListItem","position":9,"name":"Undo is a tool","url":"https://www.hotkey.gg/drills/undo.html"},{"@type":"ListItem","position":10,"name":"One copy, three hand-offs","url":"https://www.hotkey.gg/drills/copyover.html"},{"@type":"ListItem","position":11,"name":"Typeset the memo","url":"https://www.hotkey.gg/drills/typeset.html"},{"@type":"ListItem","position":12,"name":"The decimals pass","url":"https://www.hotkey.gg/drills/decimals.html"},{"@type":"ListItem","position":13,"name":"Set the alignment","url":"https://www.hotkey.gg/drills/center.html"},{"@type":"ListItem","position":14,"name":"Fix the squeezed columns","url":"https://www.hotkey.gg/drills/autofit.html"},{"@type":"ListItem","position":15,"name":"Rule off the schedule","url":"https://www.hotkey.gg/drills/ruleoff.html"},{"@type":"ListItem","position":16,"name":"The ruling pass","url":"https://www.hotkey.gg/drills/ruleaudit.html"},{"@type":"ListItem","position":17,"name":"Clean the paste","url":"https://www.hotkey.gg/drills/combo.html"},{"@type":"ListItem","position":18,"name":"Dress the tab — full formatting pass","url":"https://www.hotkey.gg/drills/dress.html"},{"@type":"ListItem","position":19,"name":"Bring it to standard","url":"https://www.hotkey.gg/drills/housestyle.html"},{"@type":"ListItem","position":20,"name":"Make it model-ready","url":"https://www.hotkey.gg/drills/gauntlet.html"},{"@type":"ListItem","position":21,"name":"Margins across the page","url":"https://www.hotkey.gg/drills/margin.html"},{"@type":"ListItem","position":22,"name":"Total it both ways","url":"https://www.hotkey.gg/drills/foot.html"},{"@type":"ListItem","position":23,"name":"Pin it with F4","url":"https://www.hotkey.gg/drills/anchor.html"},{"@type":"ListItem","position":24,"name":"Common-size both statements","url":"https://www.hotkey.gg/drills/percent.html"},{"@type":"ListItem","position":25,"name":"Run the growth rates","url":"https://www.hotkey.gg/drills/growth.html"},{"@type":"ListItem","position":26,"name":"Compound it, three times","url":"https://www.hotkey.gg/drills/cagr.html"},{"@type":"ListItem","position":27,"name":"Stretch the profit row","url":"https://www.hotkey.gg/drills/bridge.html"},{"@type":"ListItem","position":28,"name":"Roll up the segments","url":"https://www.hotkey.gg/drills/sumif.html"},{"@type":"ListItem","position":29,"name":"Cross the tape","url":"https://www.hotkey.gg/drills/rollup.html"},{"@type":"ListItem","position":30,"name":"Convert the page — one boxed rate","url":"https://www.hotkey.gg/drills/fxconvert.html"},{"@type":"ListItem","position":31,"name":"Scenario driver — CHOOSE + sticky capture","url":"https://www.hotkey.gg/drills/cases.html"},{"@type":"ListItem","position":32,"name":"Sort the league table","url":"https://www.hotkey.gg/drills/sort.html"},{"@type":"ListItem","position":33,"name":"Clean the export","url":"https://www.hotkey.gg/drills/scrub.html"},{"@type":"ListItem","position":34,"name":"Fold the detail away","url":"https://www.hotkey.gg/drills/grpfold.html"},{"@type":"ListItem","position":35,"name":"Work the filtered tape","url":"https://www.hotkey.gg/drills/filterpass.html"},{"@type":"ListItem","position":36,"name":"Flush the hidden rows","url":"https://www.hotkey.gg/drills/unhide.html"},{"@type":"ListItem","position":37,"name":"Look it up","url":"https://www.hotkey.gg/drills/lookup.html"},{"@type":"ListItem","position":38,"name":"Two-way lookup","url":"https://www.hotkey.gg/drills/lookup2.html"},{"@type":"ListItem","position":39,"name":"Two systems, one truth","url":"https://www.hotkey.gg/drills/recon.html"},{"@type":"ListItem","position":40,"name":"Hardcode it","url":"https://www.hotkey.gg/drills/drill.html"},{"@type":"ListItem","position":41,"name":"Stub the year header","url":"https://www.hotkey.gg/drills/series.html"},{"@type":"ListItem","position":42,"name":"The 4am pass — find what’s broken","url":"https://www.hotkey.gg/drills/audit.html"},{"@type":"ListItem","position":43,"name":"Error triage — #REF! #DIV/0! #VALUE!","url":"https://www.hotkey.gg/drills/triage.html"},{"@type":"ListItem","position":44,"name":"Wrap it or fix it","url":"https://www.hotkey.gg/drills/wrapfix.html"},{"@type":"ListItem","position":45,"name":"Make it tie — hunt the break","url":"https://www.hotkey.gg/drills/balcheck.html"},{"@type":"ListItem","position":46,"name":"Re-point the stale links","url":"https://www.hotkey.gg/drills/stalelink.html"},{"@type":"ListItem","position":47,"name":"Walk the wire","url":"https://www.hotkey.gg/drills/wirewalk.html"},{"@type":"ListItem","position":48,"name":"Hunt the hardcodes","url":"https://www.hotkey.gg/drills/hunt.html"},{"@type":"ListItem","position":49,"name":"Flip the signs back","url":"https://www.hotkey.gg/drills/signerr.html"},{"@type":"ListItem","position":50,"name":"Kill the hardcodes — make it roll forward","url":"https://www.hotkey.gg/drills/versionup.html"},{"@type":"ListItem","position":51,"name":"Make it balance","url":"https://www.hotkey.gg/drills/balance.html"},{"@type":"ListItem","position":52,"name":"Build the discount rate","url":"https://www.hotkey.gg/drills/wacc.html"},{"@type":"ListItem","position":53,"name":"Build the unlevered FCF","url":"https://www.hotkey.gg/drills/fcfbuild.html"},{"@type":"ListItem","position":54,"name":"Discount the cash flows","url":"https://www.hotkey.gg/drills/dcf.html"},{"@type":"ListItem","position":55,"name":"Run the comps","url":"https://www.hotkey.gg/drills/comps.html"},{"@type":"ListItem","position":56,"name":"Run precedent transactions","url":"https://www.hotkey.gg/drills/txncomps.html"},{"@type":"ListItem","position":57,"name":"Build the football field","url":"https://www.hotkey.gg/drills/football.html"},{"@type":"ListItem","position":58,"name":"Run the sensitivity table","url":"https://www.hotkey.gg/drills/dcfsens.html"},{"@type":"ListItem","position":59,"name":"Attribute the returns","url":"https://www.hotkey.gg/drills/retbridge.html"},{"@type":"ListItem","position":60,"name":"Run accretion / dilution","url":"https://www.hotkey.gg/drills/accdil.html"},{"@type":"ListItem","position":61,"name":"Balance sources and uses","url":"https://www.hotkey.gg/drills/sourcesuses.html"},{"@type":"ListItem","position":62,"name":"Roll it forward","url":"https://www.hotkey.gg/drills/schedule.html"},{"@type":"ListItem","position":63,"name":"Run the interest schedule","url":"https://www.hotkey.gg/drills/intsched.html"},{"@type":"ListItem","position":64,"name":"Run the LBO math","url":"https://www.hotkey.gg/drills/lbo.html"},{"@type":"ListItem","position":65,"name":"Sweep the revolver","url":"https://www.hotkey.gg/drills/revolver.html"},{"@type":"ListItem","position":66,"name":"Run the paydown waterfall","url":"https://www.hotkey.gg/drills/waterfall.html"},{"@type":"ListItem","position":67,"name":"Run the covenant table","url":"https://www.hotkey.gg/drills/covtable.html"},{"@type":"ListItem","position":68,"name":"Bridge the liquidity — three cases","url":"https://www.hotkey.gg/drills/liqbridge.html"},{"@type":"ListItem","position":69,"name":"Run the 13-week","url":"https://www.hotkey.gg/drills/wk13.html"},{"@type":"ListItem","position":70,"name":"Run the full cascade","url":"https://www.hotkey.gg/drills/cascade.html"},{"@type":"ListItem","position":71,"name":"Run the debt schedule","url":"https://www.hotkey.gg/drills/debtsched.html"},{"@type":"ListItem","position":72,"name":"Build the income statement","url":"https://www.hotkey.gg/drills/isbuild.html"},{"@type":"ListItem","position":73,"name":"Balance the balance sheet","url":"https://www.hotkey.gg/drills/bsbuild.html"},{"@type":"ListItem","position":74,"name":"Link the cash flow statement","url":"https://www.hotkey.gg/drills/cfslink.html"},{"@type":"ListItem","position":75,"name":"Roll working capital","url":"https://www.hotkey.gg/drills/nwcsched.html"},{"@type":"ListItem","position":76,"name":"Tie the three statements","url":"https://www.hotkey.gg/drills/threestmt.html"},{"@type":"ListItem","position":77,"name":"Build the operating model","url":"https://www.hotkey.gg/drills/opmodel.html"},{"@type":"ListItem","position":78,"name":"Build the DCF page","url":"https://www.hotkey.gg/drills/dcfbuild.html"},{"@type":"ListItem","position":79,"name":"Build the paper LBO","url":"https://www.hotkey.gg/drills/lbobuild.html"},{"@type":"ListItem","position":80,"name":"Build the debt & interest block","url":"https://www.hotkey.gg/drills/debtblock.html"},{"@type":"ListItem","position":81,"name":"Build the model cover","url":"https://www.hotkey.gg/drills/dashcover.html"}]}]</script>
+</head>
+<body>
+<div id="navMount"></div>
+<script src="nav.js?v=258"></script>
+<div class="wrap">
+  <div class="crumbs"><a href="index.html">hotkey.gg</a> / drill library</div>
+  <div class="eyebrow">◆ the drill library</div>
+  <h1>81 drills, zero mouse</h1>
+  <div class="sub">The whole curriculum — from arrow-key navigation to full three-statement builds. Every drill has a par, a guided demo, an echo walk, and a leaderboard. The chords are the Windows banker set; on a Mac, ⌘ and ⌥ speak the same language.</div>
+  <div class="cta-row">
+    <a class="cta solid" href="index.html">start training →</a>
+    <a class="cta" href="reference.html">the shortcut compendium</a>
+  </div>
+
+  <div class="grouphead">Foundations <small>· 10 drills</small></div>
+  <div class="rel">
+    <a href="drills/navigation.html"><div class="rn">Navigation tour</div><div class="rd">The keyboard LEAPS every direction — thread a long random maze (8 jumps), grab the model, </div></a>
+    <a href="drills/modeltour.html"><div class="rn">Chase the marks</div><div class="rd">Four subtotals blown to #REF! — ctrl-jump to each, rebuild the cascade formula</div></a>
+    <a href="drills/filldr.html"><div class="rn">Fill down, fill right</div><div class="rd">Ctrl+D and Ctrl+R — one formula, whole block</div></a>
+    <a href="drills/pastes.html"><div class="rn">Alt E S everything</div><div class="rd">One copy, two pastes — values then formats</div></a>
+    <a href="drills/blocksel.html"><div class="rn">Assemble &amp; dress the summary</div><div class="rd">COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it l</div></a>
+    <a href="drills/rowops.html"><div class="rn">Rebuild the schedule</div><div class="rd">Insert a row and paste the staged line in, delete the junk — the live SUM widens and contr</div></a>
+    <a href="drills/colops.html"><div class="rn">Columns move too</div><div class="rd">Ctrl+Space grabs it, Alt H D C kills it, Alt H I C opens one</div></a>
+    <a href="drills/editfix.html"><div class="rn">Fix the typos in place</div><div class="rd">Three typos, three F2 repairs — never retype a cell</div></a>
+    <a href="drills/undo.html"><div class="rn">Undo is a tool</div><div class="rd">Delete big, Ctrl+Z, then delete only what deserved it</div></a>
+    <a href="drills/copyover.html"><div class="rn">One copy, three hand-offs</div><div class="rd">Two full pastes + Alt E S V values for the deck</div></a>
+  </div>
+
+  <div class="grouphead">Formatting <small>· 10 drills</small></div>
+  <div class="rel">
+    <a href="drills/typeset.html"><div class="rn">Typeset the memo</div><div class="rd">Bold, unbold, italic memos, strike the dead line, =TODAY() stamp</div></a>
+    <a href="drills/decimals.html"><div class="rn">The decimals pass</div><div class="rd">Alt H 9 / Alt H 0 — dollars none, multiples and percents one</div></a>
+    <a href="drills/center.html"><div class="rn">Set the alignment</div><div class="rd">Center, left, right — three alignment passes, house style</div></a>
+    <a href="drills/autofit.html"><div class="rn">Fix the squeezed columns</div><div class="rd">##### everywhere — Alt H O I fits the columns</div></a>
+    <a href="drills/ruleoff.html"><div class="rn">Rule off the schedule</div><div class="rd">Accounting rulings: line under headers, line above every total, box the headline</div></a>
+    <a href="drills/ruleaudit.html"><div class="rn">The ruling pass</div><div class="rd">The page says done — the pass disagrees. Find the missing rulings, fix only those</div></a>
+    <a href="drills/combo.html"><div class="rn">Clean the paste</div><div class="rd">Bold, comma, wrap and autofit a pasted table</div></a>
+    <a href="drills/dress.html"><div class="rn">Dress the tab — full formatting pass</div><div class="rd">Title ruled, inputs blue, percents, commas — book-ready</div></a>
+    <a href="drills/housestyle.html"><div class="rn">Bring it to standard</div><div class="rd">The senior’s pass: title, headers, blue inputs (one buried), commas, %, ruled off</div></a>
+    <a href="drills/gauntlet.html"><div class="rn">Make it model-ready</div><div class="rd">A full model-ready formatting pass</div></a>
+  </div>
+
+  <div class="grouphead">Formulas I <small>· 11 drills</small></div>
+  <div class="rel">
+    <a href="drills/margin.html"><div class="rn">Margins across the page</div><div class="rd">EBITDA ÷ revenue, three comp tables — pointed, filled, %</div></a>
+    <a href="drills/foot.html"><div class="rn">Total it both ways</div><div class="rd">SUM across and down, tie out the corner</div></a>
+    <a href="drills/anchor.html"><div class="rn">Pin it with F4</div><div class="rd">F4 cycles the locks — one pinned formula prices the whole grid</div></a>
+    <a href="drills/percent.html"><div class="rn">Common-size both statements</div><div class="rd">Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift</div></a>
+    <a href="drills/growth.html"><div class="rn">Run the growth rates</div><div class="rd">Consolidate, YoY as %, CAGR with ^ — a real revenue build</div></a>
+    <a href="drills/cagr.html"><div class="rn">Compound it, three times</div><div class="rd">(End÷Begin)^(1÷yrs)−1 — three scattered blocks</div></a>
+    <a href="drills/bridge.html"><div class="rn">Stretch the profit row</div><div class="rd">Profit = revenue × margin, fill it across years</div></a>
+    <a href="drills/sumif.html"><div class="rn">Roll up the segments</div><div class="rd">SUMIF rollup + live foot + % of total, summary dressed</div></a>
+    <a href="drills/rollup.html"><div class="rn">Cross the tape</div><div class="rd">One mixed-anchor SUMIFS fills the segment × region grid</div></a>
+    <a href="drills/fxconvert.html"><div class="rn">Convert the page — one boxed rate</div><div class="rd">One boxed EUR→USD rate drives a 2D-filled conversion — anchored driver, outlined output</div></a>
+    <a href="drills/cases.html"><div class="rn">Scenario driver — CHOOSE + sticky capture</div><div class="rd">A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshot</div></a>
+  </div>
+
+  <div class="grouphead">Data &amp; Lookups <small>· 10 drills</small></div>
+  <div class="rel">
+    <a href="drills/sort.html"><div class="rn">Sort the league table</div><div class="rd">Sort the league table, foot it, bold the total</div></a>
+    <a href="drills/scrub.html"><div class="rn">Clean the export</div><div class="rd">Junk rows out, sort what’s real, refoot the clean tape</div></a>
+    <a href="drills/grpfold.html"><div class="rn">Fold the detail away</div><div class="rd">Shift+Alt+→ groups the months — never hide, always group</div></a>
+    <a href="drills/filterpass.html"><div class="rn">Work the filtered tape</div><div class="rd">Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself</div></a>
+    <a href="drills/unhide.html"><div class="rn">Flush the hidden rows</div><div class="rd">Hidden rows lie — unhide the sins, group them right, set a real width</div></a>
+    <a href="drills/lookup.html"><div class="rn">Look it up</div><div class="rd">Pull a value out of a table with INDEX/MATCH</div></a>
+    <a href="drills/lookup2.html"><div class="rn">Two-way lookup</div><div class="rd">INDEX with two MATCHes — row and column at once</div></a>
+    <a href="drills/recon.html"><div class="rn">Two systems, one truth</div><div class="rd">COUNTIF for presence, INDEX/MATCH for amounts — drive Δ to zero</div></a>
+    <a href="drills/drill.html"><div class="rn">Hardcode it</div><div class="rd">Break the links before it ships — ESV in place, painted blue</div></a>
+    <a href="drills/series.html"><div class="rn">Stub the year header</div><div class="rd">Fill the year header, then bold + right-align it</div></a>
+  </div>
+
+  <div class="grouphead">Formulas II <small>· 10 drills</small></div>
+  <div class="rel">
+    <a href="drills/audit.html"><div class="rn">The 4am pass — find what’s broken</div><div class="rd">Three planted breaks in a real P&amp;L — find them all</div></a>
+    <a href="drills/triage.html"><div class="rn">Error triage — #REF! #DIV/0! #VALUE!</div><div class="rd">Three classic breaks — read the error, rebuild the intent</div></a>
+    <a href="drills/wrapfix.html"><div class="rn">Wrap it or fix it</div><div class="rd">Wrap the truly missing, fix the merely broken — never bury errors</div></a>
+    <a href="drills/balcheck.html"><div class="rn">Make it tie — hunt the break</div><div class="rd">The check row was pasted over — resurrect it, run both breaks down</div></a>
+    <a href="drills/stalelink.html"><div class="rn">Re-point the stale links</div><div class="rd">Assumptions moved to v2 — three cells still read the dead block</div></a>
+    <a href="drills/wirewalk.html"><div class="rn">Walk the wire</div><div class="rd">Ctrl+[ rides to the source, Ctrl+] rides back — fix it upstream</div></a>
+    <a href="drills/hunt.html"><div class="rn">Hunt the hardcodes</div><div class="rd">F5 → special → constants — every number a formula should own lights up</div></a>
+    <a href="drills/signerr.html"><div class="rn">Flip the signs back</div><div class="rd">Pasted costs came in positive — sweep the signs, prove EBIT, margin it</div></a>
+    <a href="drills/versionup.html"><div class="rn">Kill the hardcodes — make it roll forward</div><div class="rd">Typed answers → live formulas; v2 must survive new numbers</div></a>
+    <a href="drills/balance.html"><div class="rn">Make it balance</div><div class="rd">2 yrs SUM-footed both sides, check at zero, totals dressed</div></a>
+  </div>
+
+  <div class="grouphead">Models I <small>· 10 drills</small></div>
+  <div class="rel">
+    <a href="drills/wacc.html"><div class="rn">Build the discount rate</div><div class="rd">Unlever, relever, CAPM, weight — the full discount-rate build</div></a>
+    <a href="drills/fcfbuild.html"><div class="rn">Build the unlevered FCF</div><div class="rd">EBIT → less taxes → NOPAT → plus D&amp;A, less capex and the NWC build: the row every DCF disc</div></a>
+    <a href="drills/dcf.html"><div class="rn">Discount the cash flows</div><div class="rd">DF row × PV row; the TV reuses the year-5 factor</div></a>
+    <a href="drills/comps.html"><div class="rn">Run the comps</div><div class="rd">Build the multiples, read the tape, land per share and premium</div></a>
+    <a href="drills/txncomps.html"><div class="rn">Run precedent transactions</div><div class="rd">Multiples paid, the average, and the implied equity</div></a>
+    <a href="drills/football.html"><div class="rn">Build the football field</div><div class="rd">Midpoints per method, MIN floor, MAX ceiling — the summary page</div></a>
+    <a href="drills/dcfsens.html"><div class="rn">Run the sensitivity table</div><div class="rd">True mixed anchors — one formula fills the 5×3 WACC × growth grid</div></a>
+    <a href="drills/retbridge.html"><div class="rn">Attribute the returns</div><div class="rd">Growth, multiple, delever — prove the bridge ties with a zero check</div></a>
+    <a href="drills/accdil.html"><div class="rn">Run accretion / dilution</div><div class="rd">Combined EPS vs standalone — synergies in, financing drag out</div></a>
+    <a href="drills/sourcesuses.html"><div class="rn">Balance sources and uses</div><div class="rd">Total, plug, check zero — then % of total down both sides</div></a>
+  </div>
+
+  <div class="grouphead">Models II <small>· 10 drills</small></div>
+  <div class="rel">
+    <a href="drills/schedule.html"><div class="rn">Roll it forward</div><div class="rd">5-yr roll: linked openings + the accumulated-dep memo</div></a>
+    <a href="drills/intsched.html"><div class="rn">Run the interest schedule</div><div class="rd">Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is</div></a>
+    <a href="drills/lbo.html"><div class="rn">Run the LBO math</div><div class="rd">Entry equity, exit equity, MOIC — then IRR over the hold</div></a>
+    <a href="drills/revolver.html"><div class="rn">Sweep the revolver</div><div class="rd">MIN/MAX sweep ×4 years, then prove out both balances</div></a>
+    <a href="drills/waterfall.html"><div class="rn">Run the paydown waterfall</div><div class="rd">3-yr cascade: MIN rations, both tranches corkscrew across</div></a>
+    <a href="drills/covtable.html"><div class="rn">Run the covenant table</div><div class="rd">Net leverage vs a stepping max — headroom, a real IF flag, MIN pulls the pinch quarter</div></a>
+    <a href="drills/liqbridge.html"><div class="rn">Bridge the liquidity — three cases</div><div class="rd">Cash + undrawn to ending liquidity, Base / Downside / Severe — read which cases breach</div></a>
+    <a href="drills/wk13.html"><div class="rn">Run the 13-week</div><div class="rd">The RX staple: weekly corkscrew, anchored liquidity cushion, totals on flows only</div></a>
+    <a href="drills/cascade.html"><div class="rn">Run the full cascade</div><div class="rd">3 tranches × 4 yrs: seniority MINs, per-tranche corkscrews, total debt ruled off</div></a>
+    <a href="drills/debtsched.html"><div class="rn">Run the debt schedule</div><div class="rd">Type the rate, paint it blue, run the 5-yr sweep corkscrew</div></a>
+  </div>
+
+  <div class="grouphead">Full Builds <small>· 10 drills</small></div>
+  <div class="rel">
+    <a href="drills/isbuild.html"><div class="rn">Build the income statement</div><div class="rd">5-yr IS: anchored drivers, margin row as %, bottom line ruled</div></a>
+    <a href="drills/bsbuild.html"><div class="rn">Balance the balance sheet</div><div class="rd">3 yrs: SUM both sides, RE roll filled across, dressed to zero</div></a>
+    <a href="drills/cfslink.html"><div class="rn">Link the cash flow statement</div><div class="rd">5-yr corkscrew + conversion memo as %, close ruled off</div></a>
+    <a href="drills/nwcsched.html"><div class="rn">Roll working capital</div><div class="rd">Type the drivers, paint them blue, roll NWC five years</div></a>
+    <a href="drills/threestmt.html"><div class="rn">Tie the three statements</div><div class="rd">3 yrs × 3 links, checks at zero, totals dressed to ship</div></a>
+    <a href="drills/opmodel.html"><div class="rn">Build the operating model</div><div class="rd">Drivers up: grow revenue off one anchored rate, cost it as % of sales, and gross profit, E</div></a>
+    <a href="drills/dcfbuild.html"><div class="rn">Build the DCF page</div><div class="rd">The whole valuation page: DF, PV, terminal value, EV — then bridge net debt to equity and </div></a>
+    <a href="drills/lbobuild.html"><div class="rn">Build the paper LBO</div><div class="rd">Sources &amp; uses sizes the equity plug, then entry to exit turns it into MOIC and IRR — the </div></a>
+    <a href="drills/debtblock.html"><div class="rn">Build the debt &amp; interest block</div><div class="rd">Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both inte</div></a>
+    <a href="drills/dashcover.html"><div class="rn">Build the model cover</div><div class="rd">The page-one output box: reference the model into equity value, value per share, EV/EBITDA</div></a>
+  </div>
+  <div class="fine">
+    Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.
+    More: <a href="reference.html">the shortcut compendium</a> · <a href="drills/index.html">all drills</a> · <a href="About.html">about hotkey.gg</a>.
+  </div>
+</div>
+<div id="siteFooter"></div>
+</body>
+</html>
