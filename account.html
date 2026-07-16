@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Account · hotkey.gg</title>
+<meta name="description" content="Your profile, handle, school colors, desk, and data controls.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="hotkey.gg">
+<meta property="og:title" content="Account · hotkey.gg">
+<meta property="og:description" content="Your profile, handle, school colors, desk, and data controls.">
+<meta property="og:url" content="https://www.hotkey.gg/account.html">
+<meta property="og:image" content="https://www.hotkey.gg/art/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Account · hotkey.gg">
+<meta name="twitter:description" content="Your profile, handle, school colors, desk, and data controls.">
+<meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
+<link rel="canonical" href="https://www.hotkey.gg/account.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
@@ -207,6 +221,15 @@ async function load(){
     <div class="card"><h4>Session</h4>
       <div class="rowline"><span class="k">pro status</span><span style="color:var(--accent)">beta — everything unlocked</span></div>
       <button class="btn danger" id="acSignout">Sign out</button>
+    </div>
+
+    <div class="card" style="border-color:var(--bad)"><h4 style="color:var(--bad)">Delete account</h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.7">Permanent. Your profile, runs, boards entries, desk membership, and analytics are erased immediately. If you\u2019re a desk staffer, the desk passes to the longest-tenured analyst first. This cannot be undone.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input id="delConfirm" placeholder="type DELETE to confirm" autocomplete="off" style="width:220px">
+        <button class="btn danger" id="acDelete" style="margin:0">Delete my account</button>
+      </div>
+      <div class="msg" id="acDelMsg"></div>
     </div>`;
 
   const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--bad)':'var(--accent)'; } };
@@ -229,6 +252,20 @@ async function load(){
     ['hk_ach_flags','hk_xp_est','hk_runs_lite','hk_clears'].forEach(k=>localStorage.removeItem(k));
     document.getElementById('acDataMsg').textContent='local cache cleared (PBs + streak kept; server runs untouched).';
   }catch(e){} };
+  // r275: self-serve deletion — type-to-confirm, RPC, local wipe, out
+  const delBtn=document.getElementById('acDelete');
+  if(delBtn) delBtn.onclick=async()=>{
+    const v=(document.getElementById('delConfirm').value||'').trim();
+    if(v!=='DELETE'){ say('acDelMsg','Type DELETE (all caps) to confirm \u2014 this is permanent.',true); return; }
+    delBtn.disabled=true; say('acDelMsg','Deleting\u2026');
+    try{
+      const {error}=await sb.rpc('delete_account');
+      if(error){ say('acDelMsg','Couldn\u2019t delete \u2014 contact hello@hotkey.gg and we\u2019ll handle it.',true); delBtn.disabled=false; return; }
+      try{ localStorage.clear(); }catch(e){}
+      try{ await Promise.race([sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]); }catch(e){}
+      location.href='index.html';
+    }catch(e){ say('acDelMsg','Something went wrong \u2014 contact hello@hotkey.gg.',true); delBtn.disabled=false; }
+  };
   const so=document.getElementById('acSignout');
   if(so) so.onclick=async()=>{ try{ await Promise.race([sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]); }catch(e){} location.href='index.html'; };   // r266: never strand the click on a hung signOut
   const th=document.getElementById('acThemes');

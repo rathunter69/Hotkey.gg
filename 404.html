@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 · hotkey.gg</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --accent:#2ea36f; --accent-dim:#1d6647;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh;
+    display:flex; align-items:center; justify-content:center; padding:24px}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; max-width:460px; width:100%; overflow:hidden}
+  .cap{min-height:34px; display:flex; align-items:center; padding:6px 16px; background:var(--surface2);
+    border-bottom:1px solid var(--line); font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted)}
+  .body{padding:22px 24px 24px}
+  .ref{font-family:var(--mono); font-size:13px; color:var(--muted); margin-bottom:6px}
+  .ref b{color:#c8533f}
+  h1{font-size:21px; letter-spacing:-.3px; margin-bottom:8px}
+  p{font-size:14px; color:var(--muted); line-height:1.65; margin-bottom:16px}
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  a.btn{font-family:var(--mono); font-size:12.5px; padding:9px 18px; border-radius:999px; text-decoration:none;
+    border:1px solid var(--line); color:var(--muted)}
+  a.btn.solid{background:var(--accent); color:#0c0d0e; border-color:var(--accent); font-weight:700}
+  a.btn:hover{border-color:var(--accent-dim); color:var(--text)}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="cap">hotkey.gg · cell reference check</div>
+    <div class="body">
+      <div class="ref">=IFERROR(this_page, <b>#REF!</b>)</div>
+      <h1>That reference doesn't resolve.</h1>
+      <p>The page you're after was moved, renamed, or never existed — like a formula pointing at a deleted row. The sheet itself is fine.</p>
+      <div class="row">
+        <a class="btn solid" href="/">back to the trainer</a>
+        <a class="btn" href="/leaderboard.html">leaderboard</a>
+        <a class="btn" href="/reference.html">shortcuts</a>
+        <a class="btn" href="/contact.html">report a broken link</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

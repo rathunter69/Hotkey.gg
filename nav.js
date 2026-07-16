@@ -812,6 +812,20 @@
       name:String(name).toLowerCase().replace(/[^a-z0-9_]/g,'_').slice(0,40), meta:meta||null}).then(()=>{},()=>{});
   }catch(e){} };
   // one pv per page load (cheap DAU/page traffic; the funnel's denominator)
+  // r275: error telemetry — JS exceptions used to vanish silently on player machines.
+  // Rate-limited to 3 per page load; message truncated; feeds the ops error feed.
+  (function(){
+    var sent=0;
+    window.addEventListener('error', function(e){
+      if(sent>=3) return; sent++;
+      try{ window.hkEvent('err', { m:String(e.message||'').slice(0,180),
+        src:String(e.filename||'').replace(/^.*\//,'').slice(0,60)+':'+(e.lineno||0) }); }catch(_){}
+    });
+    window.addEventListener('unhandledrejection', function(e){
+      if(sent>=3) return; sent++;
+      try{ var r=e && e.reason; window.hkEvent('err', { m:('promise: '+String((r&&r.message)||r||'')).slice(0,180) }); }catch(_){}
+    });
+  })();
   setTimeout(function(){ try{ window.hkEvent('pv',{p:location.pathname.replace(/^.*\//,'')||'index.html'}); }catch(e){} }, 1500);
   document.addEventListener('keydown', e => {
     const onTrainer = window.NAV_ACTIVE === 'trainer';

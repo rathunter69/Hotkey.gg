@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ops · hotkey.gg</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  html{scrollbar-gutter:stable}
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49; --accent:#2ea36f; --accent-dim:#1d6647;
+    --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; line-height:1.55}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px 80px}
+  header.head{padding:14px 0 6px}
+  h1{font-size:22px; font-weight:700; letter-spacing:-.4px}
+  .sub{font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:20px 0}
+  .tile{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; font-family:var(--mono)}
+  .tile .v{font-size:22px; font-weight:700}
+  .tile .l{font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-top:4px}
+  .tile.bad .v{color:var(--bad)}
+  .section-title{font-family:var(--mono); font-size:12px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:1.5px; margin:26px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line)}
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start}
+  @media(max-width:820px){ .two{grid-template-columns:1fr} }
+  .bars{display:flex; align-items:flex-end; gap:5px; height:110px; padding-top:6px}
+  .bars .b{flex:1; background:var(--accent); border-radius:3px 3px 0 0; min-height:2px; position:relative}
+  .bars .b i{position:absolute; bottom:-18px; left:50%; transform:translateX(-50%); font-style:normal;
+    font-family:var(--mono); font-size:8px; color:var(--faint); white-space:nowrap}
+  .row{display:flex; gap:10px; align-items:baseline; font-family:var(--mono); font-size:12px;
+    padding:6px 2px; border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .row .n{margin-left:auto; color:var(--muted)}
+  .row .t{color:var(--faint); font-size:10px; white-space:nowrap}
+  .row .meta{color:var(--muted); font-size:10.5px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .row .tab{font-family:var(--mono); font-size:10px; padding:3px 10px; border-radius:999px; cursor:pointer;
+    border:1px solid var(--line); color:var(--muted); background:var(--surface)}
+  .row .tab:hover{color:var(--text); border-color:var(--accent-dim)}
+  .state{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:40px 30px;
+    text-align:center; font-family:var(--mono); font-size:13px; color:var(--muted); margin-top:30px}
+  .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
+</style>
+<link rel="stylesheet" href="nav.css?v=174">
+<script src="drills.js?v=263"></script>
+<script>
+  const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+  window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  window.NAV_ACTIVE='';
+</script>
+<script src="themes.js?v=258"></script>
+</head>
+<body>
+<div id="navMount"></div>
+<script src="nav.js?v=256"></script>
+
+<div class="wrap">
+  <header class="head">
+    <h1>Ops</h1>
+    <div class="sub">admin-only · live metrics, error feed, moderation queue · refreshes on load</div>
+  </header>
+  <div id="root"><div class="loading">checking clearance…</div></div>
+</div>
+
+<script>
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const $=id=>document.getElementById(id);
+async function load(){
+  const root=$('root');
+  let me=null;
+  try{ const {data:{session}}=await sb.auth.getSession(); me=session&&session.user; }catch(e){}
+  if(!me){ root.innerHTML='<div class="state">Sign in first — then reload this page.</div>'; return; }
+  let m=null;
+  try{ const {data,error}=await sb.rpc('admin_metrics'); if(error) throw error; m=data; }
+  catch(e){ root.innerHTML='<div class="state">This page is for the hotkey.gg team.</div>'; return; }
+  const tile=(v,l,bad)=>'<div class="tile'+(bad?' bad':'')+'"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';
+  let html='<div class="tiles">'+
+    tile(m.players,'players')+
+    tile(m.active_7d,'active · 7d')+
+    tile(m.runs_24h,'runs · 24h')+
+    tile(m.runs_7d,'runs · 7d')+
+    tile(m.desks,'desks')+
+    tile(m.applications,'open applications')+
+    tile(m.reports_open,'open reports', m.reports_open>0)+
+    tile(m.errors_24h,'js errors · 24h', m.errors_24h>0)+
+    '</div>';
+  // runs by day (14d)
+  const days=m.runs_by_day||[];
+  const mx=Math.max(1,...days.map(d=>d[1]));
+  html+='<div class="section-title">runs · last 14 days</div><div class="panel"><div class="bars">'+
+    days.map(d=>'<span class="b" style="height:'+Math.max(2,Math.round(100*d[1]/mx))+'%" title="'+esc(d[0])+' · '+d[1]+' runs"><i>'+esc(String(d[0]).slice(5))+'</i></span>').join('')+
+    '</div><div style="height:18px"></div></div>';
+  html+='<div class="two" style="margin-top:16px">';
+  // top events
+  html+='<div class="panel"><div class="section-title" style="margin-top:0">events · 24h ('+m.events_24h+' total)</div>'+
+    ((m.top_events_24h||[]).map(e=>'<div class="row"><span>'+esc(e[0])+'</span><span class="n">'+e[1]+'</span></div>').join('')||'<div class="row">quiet</div>')+'</div>';
+  // error feed
+  html+='<div class="panel"><div class="section-title" style="margin-top:0">error feed</div><div id="errs"><div class="loading" style="padding:10px">loading…</div></div></div>';
+  html+='</div>';
+  // reports queue
+  html+='<div class="section-title">moderation · report queue</div><div class="panel" id="reps"><div class="loading" style="padding:10px">loading…</div></div>';
+  root.innerHTML=html;
+  // errors
+  try{ const {data:ev}=await sb.rpc('admin_events',{p_name:'err',p_limit:25});
+    $('errs').innerHTML=(ev&&ev.length)
+      ? ev.map(e=>'<div class="row"><span class="meta" title="'+esc(JSON.stringify(e.meta||{}))+'">'+esc((e.meta&&e.meta.m)||'(no message)')+'</span><span class="t">'+esc(String(e.created_at).slice(5,16))+'</span></div>').join('')
+      : '<div class="row">no JS errors logged — good sign</div>';
+  }catch(e){ $('errs').innerHTML='<div class="row">could not load</div>'; }
+  // reports
+  async function renderReports(){
+    try{ const {data:rp}=await sb.rpc('admin_reports');
+      $('reps').innerHTML=(rp&&rp.length)
+        ? rp.map(r=>'<div class="row"><span>'+esc(r.kind)+'</span><span class="meta">'+esc(r.target)+'</span>'+
+            '<span class="t">by '+esc(r.reporter_handle||'?')+' · '+esc(String(r.created_at).slice(0,10))+'</span>'+
+            '<span class="tab rep-done" data-k="'+esc(r.kind)+'" data-t="'+esc(r.target)+'">resolve</span></div>').join('')
+        : '<div class="row">queue empty — nothing reported</div>';
+      document.querySelectorAll('.rep-done').forEach(b=>b.onclick=async()=>{
+        b.textContent='…';
+        try{ await sb.rpc('admin_resolve_report',{p_kind:b.dataset.k, p_target:b.dataset.t}); renderReports(); }catch(e){} });
+    }catch(e){ $('reps').innerHTML='<div class="row">could not load</div>'; }
+  }
+  renderReports();
+}
+load();
+</script>
+
+<div id="siteFooter"></div>
+</body>
+</html>
