@@ -930,6 +930,22 @@ window.hkBandChip = function(band, size){
     'width:'+size+'px;height:'+size+'px;color:'+band.color+';font-size:'+Math.round(size*0.92)+'px;line-height:1">◆</span>';
 };
 
+/* r267 NAME FILTER — shared first-pass moderation for user-named things (desks, "Other"
+   schools). Substring list carries only unambiguous fragments; word list holds terms that
+   are innocent inside real names (Dickinson, Ashkenazi, Analyst...). The server stays the
+   real gate — this just keeps obvious garbage from ever reaching it. */
+window.hkNameOk = function(name){
+  var raw=String(name||'').toLowerCase();
+  var s=raw.replace(/[@]/g,'a').replace(/0/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e')
+           .replace(/4/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/[^a-z]/g,'');
+  var SUB=['nigg','fagg','kike','wetback','tranny','pedo','whore','slut','cunt','fuck','shit','bitch','retard','jizz','porn'];
+  for(var i=0;i<SUB.length;i++) if(s.indexOf(SUB[i])>=0) return false;
+  var words=raw.replace(/[^a-z]+/g,' ').split(' ');
+  var WORD=['rape','nazi','dyke','anal','cum','cock','dick','pussy','penis','vagina','coon','spic','chink','hoe','kkk','isis','hitler'];
+  for(var j=0;j<words.length;j++) if(WORD.indexOf(words[j])>=0) return false;
+  return true;
+};
+
 /* Shared SCHOOL PICKER — curated search + freeform "Other". Returns a DOM element
    whose .getValue() gives the current selection (a SCHOOLS id, an "other:Name"
    string, or null). onPick(value) fires on every change. Self-contained styling
@@ -968,7 +984,9 @@ window.buildSchoolPicker = function(current, onPick){
     oi.style.cssText='flex:1;min-width:0;background:var(--surface2,#33363c);color:var(--text,#eee);border:1px solid var(--line,#555);border-radius:6px;padding:6px 8px;font-family:inherit;font-size:12px';
     var ob=document.createElement('button'); ob.type='button'; ob.textContent='use';
     ob.style.cssText='background:var(--accent,#6ec9a0);color:var(--on-accent,#0d1013);border:none;border-radius:6px;padding:6px 13px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer';
-    function useOther(){ var nm=oi.value.trim(); if(nm) set('other:'+nm); }
+    function useOther(){ var nm=oi.value.trim(); if(!nm) return;
+      if(window.hkNameOk && !window.hkNameOk(nm)){ oi.value=''; oi.placeholder='pick a real school name'; oi.style.borderColor='var(--warn,#c77)'; setTimeout(function(){ oi.style.borderColor='var(--line,#555)'; oi.placeholder='other \u2014 your school, past or present'; },1800); return; }
+      set('other:'+nm); }
     ob.onclick=useOther; oi.onkeydown=function(e){ if(e.key==='Enter'){ e.preventDefault(); useOther(); } };
     if(!shown && q){ var none=document.createElement('div');
       none.style.cssText='color:var(--faint,#888);font-size:11px;padding:6px 7px';

@@ -39,6 +39,15 @@
   .stat.hero{border-color:var(--accent-dim); background:var(--surface)}   /* r62 flat */
   /* r135: achievements live HERE now (rolled off the card); earned medals are pickable */
   .ach-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:12px 8px; margin:10px 0 18px}
+  /* r267: wall navigation — filter chips (58 medals was one undifferentiated wall) */
+  .ach-filters{display:inline-flex; gap:6px; margin-left:14px; vertical-align:2px}
+  .ach-f{font-family:var(--mono); font-size:10.5px; padding:3px 10px; border-radius:99px; cursor:pointer;
+    background:var(--surface); color:var(--muted); border:1px solid var(--line)}
+  .ach-f:hover{color:var(--text); border-color:var(--faint)}
+  .ach-f.on{color:var(--on-accent,#fff); background:var(--accent); border-color:var(--accent)}
+  .ach-grid[data-f="earned"] .ach-pick:not([data-state="earned"]),
+  .ach-grid[data-f="prog"]   .ach-pick:not([data-state="prog"]),
+  .ach-grid[data-f="locked"] .ach-pick:not([data-state="locked"]){display:none}
   .ach-pick{position:relative; display:flex; flex-direction:column; align-items:center; gap:4px;
     font-family:var(--mono); font-size:8.5px; color:var(--faint); text-align:center; line-height:1.25;
     padding:8px 2px 6px; border-radius:10px; border:1px solid transparent}
@@ -77,11 +86,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=256"></script>
+<script src="themes.js?v=257"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=252"></script>
+<script src="nav.js?v=253"></script>
 
 <header class="head">
   <div class="wrap">
@@ -235,13 +244,20 @@ async function load(){
         const rareTxt=(__fN>=20 && globalPct[a.id]!==undefined)
           ? (' \u00b7 '+(tierW?tierW.toUpperCase()+' \u2014 ':'')+globalPct[a.id]+'% of players have this')
           : (tierW?' \u00b7 '+tierW.toUpperCase():'');
-        grid+='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'"'+
+        const __state=r.done?'earned':((r.prog||0)>0?'prog':'locked');
+        grid+='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'" data-state="'+__state+'"'+
           ' data-tip="'+esc(a.name)+' \u2014 '+esc(a.desc)+(r.done?' \u2713 EARNED':' \u00b7 '+(r.prog||0)+'/'+(r.goal||1))+rareTxt+(r.done?' \u00b7 click to showcase':'')+'">'+
           '<span class="st">\u2605</span>'+
           window.hkBadge(a.glyph, r.done, 40, null, r.done?gp:undefined)+
           (r.done?'':'<i>'+Math.min(99,Math.round(100*(r.prog||0)/(r.goal||1)))+'%</i>')+
           esc(a.name)+'</span>'; });
-      html += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span></h3>'+
+      html += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span>'+
+        '<span class="ach-filters">'+
+          '<button class="ach-f on" data-f="all">all</button>'+
+          '<button class="ach-f" data-f="earned">earned</button>'+
+          '<button class="ach-f" data-f="prog">in progress</button>'+
+          '<button class="ach-f" data-f="locked">locked</button>'+
+        '</span></h3>'+
         '<div class="ach-hint">click an earned medal to <b style="color:var(--warn)">\u2605 showcase</b> it on your player card \u00b7 up to 3 (oldest pick swaps out)'+(me?'':' \u00b7 sign in to show them on the boards')+
         '<br>medal metals: <b style="color:var(--warn)">gold</b> earned \u00b7 <b style="color:#8ab4ff">blue</b> rare (\u226425%) \u00b7 <b style="color:#e2574d">crimson</b> epic (\u226410%) \u00b7 <b style="color:#ffd76e">radiant</b> legendary (\u22643%)</div>'+
         '<div class="ach-grid">'+grid+'</div>';
@@ -273,7 +289,13 @@ async function load(){
       const board=st2.per[bestD.k]||[];
       const mineRow=board[bestD.idx], leadRow=board[0];
       const gapTxt=(bestD.idx>0 && leadRow && mineRow)?(' \u00b7 +'+((mineRow.time_ms-leadRow.time_ms)/1000).toFixed(2)+'s off #1'):(bestD.idx===0?' \u00b7 you lead it':'');
-      html += `<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:0 0 6px">strongest board: <b style="color:var(--accent)">${esc(D.labelOf[bestD.k]||bestD.k)}</b> \u2014 #${bestD.idx+1} of ${bestD.n} (top ${Math.max(1,Math.round((bestD.idx+1)/bestD.n*100))}%)${mineRow?' \u00b7 your best '+(mineRow.time_ms/1000).toFixed(2)+'s':''}${gapTxt}</div>`;
+      // r267: the strongest board gets the same card treatment as the weakest — the two used to be
+      // a boxed callout + a floating text line, which read as an accident rather than a pair
+      html += `<div class="stat" style="grid-column:1/-1;display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-color:var(--accent-dim);margin:0 0 6px">`+
+        `<span style="font-size:20px">\ud83c\udfc6</span>`+
+        `<div style="flex:1;min-width:200px"><div style="font-family:var(--mono);font-size:13px">Your strongest board: <b style="color:var(--accent)">${esc(D.labelOf[bestD.k]||bestD.k)}</b> \u2014 #${bestD.idx+1} of ${bestD.n} (top ${Math.max(1,Math.round((bestD.idx+1)/bestD.n*100))}%)</div>`+
+        `<div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${mineRow?'your best '+(mineRow.time_ms/1000).toFixed(2)+'s':''}${gapTxt}</div></div>`+
+        `<a href="index.html?drill=${bestD.k}" style="font-family:var(--mono);font-size:12px;color:var(--accent);border:1px solid var(--accent-dim);border-radius:999px;padding:8px 16px">defend it \u2192</a></div>`;
     }
   }
   // r150: PACE = time vs par (each point is one run's time ÷ that drill's par) —
@@ -399,6 +421,10 @@ async function load(){
   root.innerHTML = html;
   // r156: the analytics PRO tag opens the shared offer sheet
   document.querySelectorAll('.proTag').forEach(t=>t.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Deep analytics'); });
+  // r267: achievements wall filters — chips set data-f on the grid; CSS does the hiding
+  document.querySelectorAll('.ach-f').forEach(b=>b.onclick=(ev)=>{ ev.stopPropagation();
+    document.querySelectorAll('.ach-f').forEach(x=>x.classList.toggle('on', x===b));
+    const g=document.querySelector('.ach-grid'); if(g){ if(b.dataset.f==='all') g.removeAttribute('data-f'); else g.setAttribute('data-f', b.dataset.f); } });
   // wire the showcase picker (delegated once — root is re-rendered wholesale)
   try{
     const rootEl=document.getElementById('root');
