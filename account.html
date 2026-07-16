@@ -71,11 +71,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=256"></script>
+<script src="themes.js?v=257"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=252"></script>
+<script src="nav.js?v=253"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -168,8 +168,8 @@ async function load(){
       <div id="acThemes" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     </div>
 
-    <div class="card"><h4>Your desk</h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:6px">Your analyst class, club, or cohort — one desk per player, invite by link.</div>
+    <div class="card" id="desk"><h4>Your desk</h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:6px;line-height:1.6">A desk is your team’s private corner of hotkey.gg — its own leaderboard, drill assignments from the staffer, one invite link. Analyst class, club, or deal team; one desk per player.</div>
       <div id="deskBody"><div class="msg">loading\u2026</div></div>
     </div>
 
@@ -297,10 +297,10 @@ async function load(){
     if(d.role==='captain'){
       const opts=((D.menuOrder)||[]).map(k=>'<option value="'+k+'">'+esc(lab(k))+'</option>').join('');
       h+='<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">'+
-        '<input id="asgKey" list="asgList" placeholder="drill — e.g. debtsched" style="width:170px"><datalist id="asgList">'+opts+'</datalist>'+
-        '<input id="asgTgt" type="number" min="1" max="3600" step="1" placeholder="target s (opt)" style="width:120px">'+
-        '<input id="asgNote" maxlength="120" placeholder="note (opt)" style="flex:1;min-width:140px">'+
-        '<button class="btn ghost" id="asgAdd" style="margin:0">Pin</button></div>'+
+        '<input id="asgKey" list="asgList" placeholder="drill \u2014 type to search" style="width:180px" title="start typing a drill name \u2014 the list narrows as you type"><datalist id="asgList">'+opts+'</datalist>'+
+        '<input id="asgTgt" type="number" min="1" max="3600" step="1" placeholder="target s (optional)" style="width:130px">'+
+        '<input id="asgNote" maxlength="120" placeholder="note for the desk (optional)" style="flex:1;min-width:150px">'+
+        '<button class="btn" id="asgAdd" style="margin:0">Pin it</button></div>'+
         '<div class="msg" id="asgMsg"></div>'+
         /* r149: PROGRAM TEMPLATES — captains shouldn't design curriculum. A program is a
            4-week quest sequence pinned one click a week; progress lives locally per desk
@@ -449,6 +449,7 @@ async function load(){
       document.getElementById('deskCreate').onclick=async()=>{
         const n=document.getElementById('deskName').value.trim();
         if(n.length<3){ say('deskMsg','Give the desk a real name (3+ characters).',true); return; }
+        if(window.hkNameOk && !window.hkNameOk(n)){ say('deskMsg','That name won\u2019t fly \u2014 pick something you\u2019d put on a resume.',true); return; }
         try{ const {error}=await sb.rpc('create_desk',{p_name:n, p_private:document.getElementById('deskPriv').checked});
           if(error){ say('deskMsg',deskErr(error),true); return; }
           renderDesk(); }catch(e){ say('deskMsg','Something went wrong.',true); } };

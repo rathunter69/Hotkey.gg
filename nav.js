@@ -618,10 +618,13 @@
     /* r252: SCHOOL FLAIR — the colored monogram rides beside the handle on the card.
        Shown on your own card whenever you have a school set (public display is the
        separate show_school opt-in that governs the boards). */
+    /* r267 (Wolf): the chip used to crowd the handle with no gap and no label — the school
+       name now rides beside it, muted, and the row gets real spacing */
+    const __schName=((window.schoolResolve&&window.schoolResolve(mySchoolTag))||{}).name||mySchoolTag||'';
     const mySchoolChip = (mySchoolTag && window.schoolChip)
-      ? '<span style="display:inline-flex;align-items:center;gap:7px;margin-left:2px" title="'+
-          escHtml(((window.schoolResolve&&window.schoolResolve(mySchoolTag))||{}).name||mySchoolTag)+'">'+
-          window.schoolChip(mySchoolTag,22)+'</span>' : '';
+      ? '<span style="display:inline-flex;align-items:center;gap:7px;margin-left:6px" title="'+escHtml(__schName)+'">'+
+          window.schoolChip(mySchoolTag,22)+
+          '<span style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0">'+escHtml(__schName)+'</span></span>' : '';
     const __xp = computeXP(d, d.myRuns, d.mySessions);
     const __L  = levelOf(__xp);
     // r77: RANK-UP — tier climbed since last look → celebrate with the new crest
@@ -638,7 +641,7 @@
     }catch(e){}
     m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
-      '<div class="pc-head"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:9px">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
+      '<div class="pc-head" style="margin-bottom:10px"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
       /* r134: .pc-scroll wrapper — the v3 CSS (max-height 82vh + inner scroll) existed
          but the renderer never emitted it, so long cards overflowed the frame */
       '<div class="pc-scroll">' +
@@ -753,6 +756,7 @@
         '<div class="user-dropdown" id="userDropdown" role="menu">' +
           '<a id="umProfile">Player card</a>' +
           '<a href="stats.html">Your numbers</a>' +
+          '<a href="account.html#desk" title="your team\u2019s private boards + assignments">Your desk</a>' +
           saveItem +
           '<a href="account.html">Account</a>' +
           '<a id="umSignout">Sign out</a>' +

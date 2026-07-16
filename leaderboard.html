@@ -66,7 +66,7 @@
   .tm{font-family:var(--mono); text-align:right; font-weight:500}
   .empty{padding:18px 14px; color:var(--faint); font-family:var(--mono); font-size:13px; text-align:center}
   /* ---- dashboard panels ---- */
-  .hero{display:grid; grid-template-columns:1.15fr .85fr 1fr; gap:16px; margin-bottom:18px}
+  .hero{display:grid; grid-template-columns:minmax(200px,.75fr) minmax(215px,.8fr) minmax(300px,1.45fr); gap:16px; margin-bottom:18px}   /* r267: floors + the players panel gets the width its rows need */
   @media(max-width:1080px){ .hero{grid-template-columns:1fr 1fr} }
   @media(max-width:820px){ .hero{grid-template-columns:1fr} }
   .ld-row{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:11px; padding:7.5px 8px; border-radius:9px; min-height:38px;
@@ -181,14 +181,17 @@
   .yc-next{font-family:var(--mono); font-size:12.5px; color:var(--muted); line-height:1.7; border-top:1px dashed var(--line); padding-top:10px; margin-top:8px}
   .yc-next b{color:var(--text)}
   .yc-next .have{color:var(--accent)} .yc-next .lack{color:var(--warn)}
-  .tp-row{display:grid; grid-template-columns:26px 1fr auto; gap:12px; align-items:center;
-    font-family:var(--mono); font-size:13px; padding:7px 4px; border-bottom:1px solid var(--line)}
+  .tp-row{display:grid; grid-template-columns:26px minmax(0,1fr) auto auto; gap:10px; align-items:center;
+    font-family:var(--mono); font-size:13px; padding:7px 4px; border-bottom:1px solid var(--line)}   /* r267: tier chip rides its own column — it used to clip mid-ellipsis inside the name */
   .tp-row:last-child{border-bottom:none}
-  .tp-row .pct{color:var(--muted); font-size:12px}
+  .tp-row .pct{color:var(--muted); font-size:12px; justify-self:end; text-align:right; line-height:1.45}   /* r267: uniform two-line stat — it used to wrap at a different point on every row */
+  .tp-row .pct b{display:block; font-weight:500; color:var(--text); white-space:nowrap}
+  .tp-row .pct i{display:block; font-style:normal; font-size:10.5px; white-space:nowrap}
+  .tp-row .nm{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .tp-row.me{background:var(--accent-glow); border-radius:8px; padding-left:8px; padding-right:8px}
   .row.open{opacity:.42}
   .row.open .nm{color:var(--faint); font-style:italic; letter-spacing:.4px}
-  .tp-tier{font-size:8.5px; padding:3px 8px; margin-left:8px; vertical-align:2px}
+  .tp-emb{display:inline-flex; line-height:0; justify-self:end}   /* r267: tier rides as the small crest (tooltip carries the name) — a full text pill starved the name column */
   .featured{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px}
   .seclead{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:18px}
   .seclead .sl{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px}
@@ -290,12 +293,12 @@
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="drills.js?v=263"></script>
 <script>window.NAV_ACTIVE = 'leaderboard';</script>
-<script src="themes.js?v=256"></script>
+<script src="themes.js?v=257"></script>
 </head>
 <body>
 
 <div id="navMount"></div>
-<script src="nav.js?v=252"></script>
+<script src="nav.js?v=253"></script>
 
 <header class="head">
   <div class="wrap">
@@ -891,14 +894,16 @@ function topPlayersHtml(){
   ranked.slice(0,8).forEach((x,i)=>{
     const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="tp-row'+(x.u===meId?' me':'')+'"><span class="rk'+(i<3?' r'+(i+1):'')+'">'+(i+1)+'</span>'+
-      '<span data-uid="'+x.u+'">'+esc(names[x.u])+'<span class="pc-tier tp-tier '+t.cls+'">'+t.name+'</span></span>'+
-      '<span class="pct">top '+Math.max(1,Math.round(x.avg*100))+'% \u00b7 '+x.att+' drills</span></div>';
+      '<span class="nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
+      '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,18,t.bucket):'')+'</span>'+
+      '<span class="pct"><b>top '+Math.max(1,Math.round(x.avg*100))+'%</b><i>'+x.att+' drills</i></span></div>';
   });
   const myIdx=meId?ranked.findIndex(x=>x.u===meId):-1;
   if(myIdx>=8){ const x=ranked[myIdx]; const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="you-gap">\u00b7\u00b7\u00b7</div><div class="tp-row me"><span class="rk">'+(myIdx+1)+'</span>'+
-      '<span data-uid="'+x.u+'">'+esc(names[x.u])+'<span class="pc-tier tp-tier '+t.cls+'">'+t.name+'</span></span>'+
-      '<span class="pct">top '+Math.max(1,Math.round(x.avg*100))+'% \u00b7 '+x.att+' drills</span></div>'; }
+      '<span class="nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
+      '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,18,t.bucket):'')+'</span>'+
+      '<span class="pct"><b>top '+Math.max(1,Math.round(x.avg*100))+'%</b><i>'+x.att+' drills</i></span></div>'; }
   if(!rows) rows='<div class="empty">nobody has placed yet (5+ drills) \u2014 <b>be the first name here</b></div>';
   return '<div class="panel"><h4>top players \u00b7 the field</h4>'+rows+'</div>';
 }
