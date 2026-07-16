@@ -1297,7 +1297,7 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=260"></script>
+<script src="drills.js?v=261"></script>
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="themes.js?v=256"></script>
 
@@ -1585,7 +1585,7 @@ const CHALLENGES = {
       'copy <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 then <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>\u21b5</kbd> \u2014 values land right back on top; the links are gone',
       'still selected \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means hardcode; the page tells on itself',
     ],
-    targets:['B3:B8','B3:B8','B3:B8'],
+    targets:['B3:B8','B3:B8'],
     demo(){ return [
       {sel:'B3:B8', keys:[Kb.copy]},
       {sel:'B3:B8', keys:[Kb.alt,L('E'),L('S'),L('V'),Kb.enter]},
@@ -1621,7 +1621,7 @@ const CHALLENGES = {
       const blue=Object.keys(this._exp).every(k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); });
       return [
         {label:'break the links in B3:B8 \u2014 values only, and the margin memo at B10 keeps its wire', ok: dead && !!(S.cells['B10']&&S.cells['B10'].formula)},
-        {label:'paint the survivors blue \u2014 the page tells on itself', ok: blue},
+        {label:'Blue-font the now-hardcoded numbers in B3:B8 \u2014 blue marks dead values', ok: blue},
       ];
     }
   },
@@ -1638,7 +1638,7 @@ const CHALLENGES = {
       'the notes column wraps instead of spilling: '+o.notes+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd>',
       'last pass, always: select the number columns · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> — nothing ships showing ####',
     ]; },
-    targets(){ const o=this._o; return [o.title,o.hdr,o.mh,o.num,o.notes,o.num]; },
+    targets(){ const o=this._o; return [o.title,o.mh,o.num,o.notes,o.num]; },
     demo(){ const o=this._o; return [
       {sel:o.title, keys:[Kb.bold]},
       {sel:o.hdr,   keys:[Kb.bold]},
@@ -1696,22 +1696,22 @@ const CHALLENGES = {
     }
   },
   gauntlet:{
-    name:'Gauntlet', label:'Make it model-ready', par:54, parKeys:56,
-    aha:'Model-ready is one rhythm: bold, comma, border, fill — and the totals in accounting format (Alt H A N).',
+    name:'Gauntlet', label:'Make it model-ready', par:63, parKeys:66,
+    aha:'Model-ready is one rhythm: bold, comma, border, blue inputs — and the totals in accounting format (Alt H A N).',
     prompt:'A raw sources & uses \u2014 both sides straight out of a banker\u2019s head: naked numbers, no totals, nothing marked. Full dress, BOTH blocks: inputs blue, SUM each total with alt+=, bold + top border on both, commas at 0 decimals down both money columns, autofit so nothing clips. Every formatting op you know, both sides of the page, no mouse.',
-    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h h blue \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b t</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
+    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h f c blue font \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b t</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
     guide(){ const R=this._R; return [
-      'both input stacks blue: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u00b7 then the same on '+R.useIn,
+      'both input stacks in blue font: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 Blue <kbd>\u21b5</kbd> \u00b7 then the same on '+R.useIn,
       'totals with autosum: '+R.srcTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd> \u00b7 then '+R.useTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd>',
       'dress both totals: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
       'commas, 0 decimals, both money bodies: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> \u00d72',
       'the two totals in accounting format: <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> \u2014 $ aligned, the S&U convention',
       'autofit both: <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 no #### leaves the desk',
     ]; },
-    targets(){ const R=this._R; return [R.srcIn, R.srcTot, R.srcTot, R.srcCol, R.srcCol]; },
+    targets(){ const R=this._R; return [R.srcIn, R.srcTot, R.srcTot, R.srcCol, R.srcTot, R.srcCol]; },
     demo(){ const R=this._R; return [
-      {sel:R.srcIn,  keys:[Kb.alt,L('H'),L('H'),Kb.enter]},
-      {sel:R.useIn,  keys:[Kb.alt,L('H'),L('H'),Kb.enter]},
+      {sel:R.srcIn,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+      {sel:R.useIn,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
       {sel:R.srcTot, keys:[Kb.eq, Kb.enter]},
       {sel:R.useTot, keys:[Kb.eq, Kb.enter]},
       {sel:R.srcTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
@@ -1752,7 +1752,7 @@ const CHALLENGES = {
       const R=this._R, r0=R.r0;
       let fill=true;
       for(let i=1;i<=4;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
-        if(!c||c.fill!=='blue') fill=false; } }
+        if(!c||c.fontColor!=='blue') fill=false; } }
       const tS=S.cells['B'+(r0+5)], tU=S.cells['E'+(r0+5)];
       const sum=!!(tS&&tS.formula&&/^=SUM\(/i.test(tS.formula)) && !!(tU&&tU.formula&&/^=SUM\(/i.test(tU.formula));
       const tot=!!(tS&&tS.bold&&tS.bt) && !!(tU&&tU.bold&&tU.bt);
@@ -1762,7 +1762,7 @@ const CHALLENGES = {
       const acct=!!(tS&&tS.fmtStyle==='acct')&&!!(tU&&tU.fmtStyle==='acct');
       const af=!overflowsCol(S,2)&&!overflowsCol(S,5);
       return [
-        {label:'shade BOTH input stacks blue (sources and uses)', ok:fill},
+        {label:'Blue the inputs on BOTH stacks (alt h f c) — blue font marks typed data', ok:fill},
         {label:'SUM both totals \u2014 alt+= twice', ok:sum},
         {label:'bold both total rows and add a top border above them', ok:tot},
         {label:'comma-format both money BODIES, 0 decimals', ok:cf},
@@ -1783,7 +1783,7 @@ const CHALLENGES = {
       'figures to commas: select B3:F7 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice \u2014 decimals off \u00b7 margins to percents: B8:F8 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
       'rule off the answer: B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 EBITDA is what the page is FOR',
     ]; },
-    targets(){ const R=this._R; return ['A1','B2:F2'].concat(R.inpRows.map(r=>'B'+r+':F'+r)).concat([R.override,'B3:F7','B8:F8','B7:F7']); },
+    targets(){ const R=this._R; return ['A1','B2:F2',R.override,'B3:F7','B8:F8','B7:F7']; },
     demo(){ const R=this._R;
       const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter];
       const steps=[
@@ -1859,7 +1859,7 @@ const CHALLENGES = {
       'the answer line reads like one: same selection \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
       'box what the MD circles with a THICK box: '+R.focus+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>k</kbd> \u2014 2px says "this is the number"',
     ]; },
-    targets(){ const R=this._R; return ['B2:'+R.LC+'2','B'+R.sub1+':'+R.LC+R.sub1,'B'+R.sub2+':'+R.LC+R.sub2,'B'+R.g,'B'+R.g+':'+R.LC+R.g,R.focus]; },
+    targets(){ const R=this._R; return ['B2:'+R.LC+'2','B'+R.sub1+':'+R.LC+R.sub1,'B'+R.g,'B'+R.g+':'+R.LC+R.g,R.focus]; },
     demo(){ const R=this._R;
       const W=(a,b,c2)=>[{key:'Alt'},L(a),L(b),L(c2)];
       return [
@@ -1932,14 +1932,10 @@ const CHALLENGES = {
       if(R.defects.includes('box'))  out.push('nobody boxed the headline: '+R.focus+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>');
       out.push('and '+R.mcol+R.g+' was never pulled through: type <b>='+R.mcol+R.sub1+'+'+R.mcol+R.sub2+'</b> · <kbd>↵</kbd>');
       return out; },
-    targets(){ const R=this._R; const t=[];
-      if(R.defects.includes('hdr'))  t.push('B2:'+R.LC+'2');
-      if(R.defects.includes('sub1')) t.push('B'+R.sub1+':'+R.LC+R.sub1);
-      if(R.defects.includes('sub2')) t.push('B'+R.sub2+':'+R.LC+R.sub2);
-      if(R.defects.includes('gbt')||R.defects.includes('gbold')) t.push('B'+R.g+':'+R.LC+R.g);
-      if(R.defects.includes('box'))  t.push(R.focus);
-      t.push(R.mcol+R.g);
-      return t; },
+    targets(){ const R=this._R;
+      // r264: fixed 1:1 with the five fixed checks (headers rule, subtotal rules, EBITDA pull, EBITDA dress, box) —
+      // the old defect-conditional list drifted against the check order and pointed at the wrong cells
+      return ['B2:'+R.LC+'2', 'B'+R.sub1+':'+R.LC+R.sub1, R.mcol+R.g, 'B'+R.g+':'+R.LC+R.g, R.focus]; },
     demo(){ const R=this._R;
       const W=(a,b,c2)=>[{key:'Alt'},L(a),L(b),L(c2)];
       const steps=[];
@@ -2232,7 +2228,7 @@ const CHALLENGES = {
       '<kbd>*</kbd> · type <kbd>C'+o.hr+'</kbd> then <kbd>F4</kbd> ×2 — <b>C$'+o.hr+'</b>: row pinned, column free · <kbd>↵</kbd>',
       'select '+o.col+' · <kbd>ctrl</kbd>+<kbd>d</kbd> · select '+o.grid+' · <kbd>ctrl</kbd>+<kbd>r</kbd> — nine prices from one formula',
     ]; },
-    targets(){ const o=this._o; return [o.tl, o.col, o.grid]; },
+    targets(){ const o=this._o; return [o.tl, o.grid]; },
     demo(){ const o=this._o; return [
       {sel:o.tl, keys:[...T('=B'+o.r0), {key:'F4'},{key:'F4'},{key:'F4'}, {key:'*'}, ...T('C'+o.hr), {key:'F4'},{key:'F4'}, Kb.enter]},
       {sel:o.col, keys:[Kb.fillD]},
@@ -2288,7 +2284,7 @@ const CHALLENGES = {
       'select B4:F5 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the roll walks itself across five years',
       'the memo: B7 \u00b7 <kbd>=-B4</kbd> \u00b7 C7 \u00b7 <kbd>=B7-C4</kbd> \u00b7 fill C7:F7 \u2014 accumulated dep is its own corkscrew',
     ],
-    targets:['B4','B5','C2','C2:F2','B4:F5','B7','C7','C7:F7'],
+    targets:['B4:F4','B5:F5','C2:F2','B7:F7'],
     demo(){ return [
       {sel:'B4', keys:[...T('=-B2*$B$9'), Kb.enter]},
       {sel:'B5', keys:[...T('=B2+B3+B4'), Kb.enter]},
@@ -2353,7 +2349,7 @@ const CHALLENGES = {
       'cash interest at B6 · <kbd>=B2*$B$10</kbd> — the anchored rate on the OPENING balance · fill B6:F6 →',
       'interest coverage at B8 · <kbd>=B7/B6</kbd> — EBITDA over interest, the covenant ratio · fill B8:F8 →',
     ],
-    targets:['B4','C2','C2:F2','B4:F4','B6','B6:F6','B8','B8:F8'],
+    targets:['B4:F4','C2:F2','B6:F6','B8:F8'],
     demo(){ return [
       {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
       {sel:'C2', keys:[...T('=B4'), Kb.enter]},
@@ -2474,7 +2470,7 @@ const CHALLENGES = {
       'the tape is contiguous now: select '+o.range+' (cursor in the size column) · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> — largest first',
       'refoot it: '+o.foot+' · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd> · <kbd>ctrl</kbd>+<kbd>b</kbd> — a SUBTOTAL row would have poisoned this SUM',
     ]; },
-    targets(){ const o=this._o; return [o.range, o.foot]; },
+    targets(){ const o=this._o; return [o.range, o.range, o.foot]; },
     demo(){ const o=this._o;
       const steps=o.junkRows.slice().sort((a,b)=>b-a).map(r=>({sel:'A'+r, keys:[Kb.alt,L('H'),L('D'),L('R')]}));
       steps.push({sel:o.range, keys:[Kb.alt,L('A'),L('S'),L('D')]});
@@ -2599,7 +2595,7 @@ const CHALLENGES = {
       return [
         {label:'flag presence down C4:C10 — live COUNTIF against the finance list, no zeros left', ok: flagsOk},
         {label:'bring the missing deal into finance — name AND the book amount (D10:E10)', ok: missOk},
-        {label:'drive the recon to ZERO — Δ live via INDEX/MATCH, every row reads 0 (F4:F10)', ok: diffOk},
+        {label:'Drive every Δ to 0 (F4:F10) — INDEX/MATCH the other system, never retype', ok: diffOk},
       ];
     }
   },
@@ -2655,7 +2651,7 @@ const CHALLENGES = {
       return [
         {label:'group each quarter’s months — three groups, exactly the detail rows, shift+alt+→', ok: o.blocks.every(covered) && gs.length===3},
         {label:'fold all three away — alt a h; the ⊞ marks where the detail lives', ok: o.blocks.every(folded)},
-        {label:'keep the subtotals ON the page — visible, and their SUMs still breathe', ok: subsOk},
+        {label:'Keep the quarter-total rows visible, their SUM formulas intact', ok: subsOk},
       ];
     }
   },
@@ -2779,7 +2775,7 @@ const CHALLENGES = {
         return !!(c&&c.formula&&/SUM/i.test(String(c.formula))&&typeof c.value==='number'&&Math.abs(c.value-o.tot[cl])<0.5); });
       const boldOk=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8']; return !!(c&&c.bold); });
       return [
-        {label:'flush every raw number out \u2014 F5, special, constants; let the marks do the finding', ok:(S.markN||0)>=1},
+        {label:'Run F5 \u2192 Special \u2192 Constants to mark every hardcoded number', ok:(S.markN||0)>=1},
         {label:'relink the three hardcodes \u2014 prior year \u00d7 (1 + growth); formulas own the calc block again', ok: fixed},
         {label:'foot the corrected build \u2014 =SUM(B3:B7) at B8, fill B8:D8 across', ok: footed},
         {label:'bold the total row \u2014 B8:D8 carries the corrected page', ok: boldOk},
@@ -3115,7 +3111,7 @@ const CHALLENGES = {
   },
   undo:{
     name:'Undo', label:'Undo is a tool, not a panic', par:10, parKeys:5,
-    aha:'Ctrl+Z rewinds your exact steps, Ctrl+Y replays them — undo is aim, not panic.',
+    aha:'Ctrl+Z rewinds your exact steps — undo is aim, not panic; delete big, rewind, then delete only what deserved it.',
     prompt:'Two scratch blocks on a live tab, and the note taped to your monitor names the one to clear. You clear it \u2014 and the SECOND note, under the first, says that block feeds Q4 and the OTHER one was the junk. Ctrl+Z brings every cell back exactly as it was; then clear the right block and dress the survivors. Undo is how fast hands stay fearless.',
     req(){ const o=this._o; return 'bold <em>A1</em> \u00b7 italicize the memo <em>'+o.memo+'</em> \u00b7 clear <em>'+o.wrongRng+'</em> (\u201c'+o.wrongName+'\u201d \u2014 the note says so) \u00b7 <em>ctrl+z</em> \u2014 it FED Q4 \u00b7 now clear <em>'+o.rightRng+'</em>'; },
     guide(){ const o=this._o; return [
@@ -3124,7 +3120,7 @@ const CHALLENGES = {
       'second note: '+o.wrongName+' FEEDS Q4 \u2014 <kbd>ctrl</kbd>+<kbd>z</kbd>, every value back exactly as it was',
       'the junk was '+o.rightName+' all along: select '+o.rightRng+' \u00b7 <kbd>delete</kbd> \u2014 aim, then fire',
     ]; },
-    targets(){ const o=this._o; return ['A1', o.memo, o.wrongRng, o.rightRng]; },
+    targets(){ const o=this._o; return ['A1', o.wrongRng, o.rightRng]; },
     demo(){ const o=this._o; return [
       {sel:'A1', keys:[Kb.bold]},
       {sel:o.memo, keys:[{key:'i',ctrl:true}]},
@@ -3311,7 +3307,7 @@ const CHALLENGES = {
       'open the gap: any '+o.nq+' cell · <kbd>ctrl</kbd>+<kbd>space</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>c</kbd> — the missing quarter goes before '+o.nq,
       'head it: type <b>'+o.mq+'</b> · <kbd>↵</kbd> · back up and <kbd>ctrl</kbd>+<kbd>b</kbd> to match the row',
     ]; },
-    targets(){ const o=this._o; return [o.draftCell, o.nextCell]; },
+    targets(){ const o=this._o; return [o.draftCell, o.nextCell, 'B'+o.hr+':E'+o.hr, o.nextCell]; },
     demo(){ const o=this._o;
       const dc=o.dc, ni=o.ni, hr=o.hr;
       const steps=[];
@@ -3356,14 +3352,16 @@ const CHALLENGES = {
       for(let c=2;c<=7;c++){ const cc=S.cells[colLetter(c)+hr];
         if(cc&&cc.value!==undefined&&cc.value!==null&&cc.value!=='') hdrs.push({c:c, v:String(cc.value), bold:!!cc.bold}); }
       const names=hdrs.map(h=>h.v);
-      const noDraft = !names.includes('DRAFT') && hdrs.length===4;
+      const draftGone = !names.includes('DRAFT');                    // r264: delete graded on its own — the old merged check kept step 1 red until the insert too
+      const noDraft = draftGone && hdrs.length===4;
       const ordered = names.join(',')==='Q1,Q2,Q3,Q4';
       const dataOk = Object.keys(this._q).every(q=>{
         const h=hdrs.find(x=>x.v===q); if(!h) return false;
         return this._q[q].every((v,i)=>{ const cc=S.cells[colLetter(h.c)+(hr+1+i)]; return !!(cc&&cc.value===v); }); });
       const mqh=hdrs.find(x=>x.v===o.mq);
       return [
-        {label:'delete the whole DRAFT column — the gap closes, every value travels with its quarter', ok: noDraft && dataOk},
+        {label:'delete the whole DRAFT column — Ctrl+Space grabs it, Alt H D C removes it', ok: draftGone},
+        {label:'insert the missing '+o.mq+' column where it belongs and type its data — every value with its quarter', ok: noDraft && dataOk},
         {label:'line the header up — Q1 Q2 Q3 Q4 in order', ok: ordered},
         {label:'bold the new '+o.mq+' header to match the row', ok: !!(mqh&&mqh.bold)},
       ];
@@ -3471,7 +3469,7 @@ const CHALLENGES = {
       'money: the <b>top line</b> in dollars (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>$</kbd>, trim to 0-dec with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd>×2), the rows below in <b>commas</b> (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>!</kbd>, 0-dec)',
       'finish: figures <b>right</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>) · segment names <b>centred + underlined</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> · <kbd>ctrl</kbd>+<kbd>u</kbd>)',
     ]; },
-    targets(){ const o=this._o; return [o.baseTL, o.ebTL, o.opTL, o.o.margin[0], o.hdrRng, o.tableRng]; },
+    targets(){ const o=this._o; return [o.baseTL, o.ebTL, o.o.margin[0], o.hdrRng, o.figRng, o.labelRng]; },
     demo(){ const o=this._o;
       const gd=[{key:'ArrowDown',ctrl:true,shift:true}], gr=[{key:'ArrowRight',ctrl:true,shift:true}];
       const steps=[
@@ -3648,7 +3646,7 @@ const CHALLENGES = {
       return [
         {label:'land the FULL block at '+o.d1+' \u2014 formulas travel, the SUM row stays live', ok: blockAt(o.D1[0],o.D1[1],true)},
         {label:'peel the first column OFF THE LANDED COPY \u2014 '+o.landedCol+' \u2192 '+o.d2+', still live', ok: colAt(o.D2[0],o.D2[1])},
-        {label:'hand the deck dead numbers \u2014 alt e s v at '+o.d3+': values, zero wiring', ok: blockAt(o.D3[0],o.D3[1],false)},
+        {label:'hand the deck values only, no formulas \u2014 alt e s v at '+o.d3+': values, zero wiring', ok: blockAt(o.D3[0],o.D3[1],false)},
       ];
     }
   },
@@ -3699,22 +3697,22 @@ const CHALLENGES = {
     }
   },
   comps:{
-    name:'Comps', label:'Run the comps', par:67, parKeys:70,
+    name:'Comps', label:'Run the comps', par:66, parKeys:69,
     aha:'Build one row of logic, then Ctrl+D stamps it down the page.',
-    prompt:'A real comps page, both panels: compute EV/EBITDA for five peers and fill it down, read the tape \u2014 mean, high, low \u2014 then walk the target through the implied chain: EV, equity, per share, premium to market. The multiples aren\u2019t given anymore; you build them.',
-    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> <em>=AVERAGE(D3:D7)</em> \u00b7 <em>D9</em> <em>=MAX</em> \u00b7 <em>D10</em> <em>=MIN</em> \u00b7 <em>G4</em> EV <em>=G3*D8</em> \u00b7 <em>G6</em> equity <em>=G4-G5</em> \u00b7 <em>G8</em> per share <em>=G6/G7</em> \u00b7 <em>G10</em> premium <em>=G8/G9-1</em>',
+    prompt:'A real comps page, both panels: compute EV/EBITDA for five peers and fill it down, read the tape \u2014 median, high, low \u2014 then walk the target through the implied chain: EV, equity, per share, premium to market. The multiples aren\u2019t given anymore; you build them.',
+    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> <em>=MEDIAN(D3:D7)</em> \u00b7 <em>D9</em> <em>=MAX</em> \u00b7 <em>D10</em> <em>=MIN</em> \u00b7 <em>G4</em> EV <em>=G3*D8</em> \u00b7 <em>G6</em> equity <em>=G4-G5</em> \u00b7 <em>G8</em> per share <em>=G6/G7</em> \u00b7 <em>G10</em> premium <em>=G8/G9-1</em>',
     guide:[
       'multiple, first peer: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
-      'read the tape: D8 \u00b7 <kbd>=AVERAGE(D3:D7)</kbd> \u00b7 D9 \u00b7 <kbd>=MAX(D3:D7)</kbd> \u00b7 D10 \u00b7 <kbd>=MIN(D3:D7)</kbd>',
-      'implied EV at G4 \u00b7 <kbd>=G3*D8</kbd> \u2014 target EBITDA \u00d7 the LIVE mean, not a retyped number',
+      'read the tape: D8 \u00b7 <kbd>=MEDIAN(D3:D7)</kbd> \u2014 the median resists outliers; bankers lead with it \u00b7 D9 \u00b7 <kbd>=MAX(D3:D7)</kbd> \u00b7 D10 \u00b7 <kbd>=MIN(D3:D7)</kbd>',
+      'implied EV at G4 \u00b7 <kbd>=G3*D8</kbd> \u2014 target EBITDA \u00d7 the LIVE median, not a retyped number',
       'equity at G6 \u00b7 <kbd>=G4-G5</kbd> \u00b7 per share at G8 \u00b7 <kbd>=G6/G7</kbd>',
       'premium at G10 \u00b7 <kbd>=G8/G9-1</kbd> \u2014 what you\u2019d be paying up over the market',
     ],
-    targets:['D3:D7','D8','D9','D10','G4','G6','G8','G10'],
+    targets:['D3:D7','D8:D10','G4','G6','G8'],
     demo(){ return [
       {sel:'D3', keys:[...T('=B3/C3'), Kb.enter]},
       {sel:'D3:D7', keys:[Kb.fillD]},
-      {sel:'D8', keys:[...T('=AVERAGE(D3:D7)'), Kb.enter]},
+      {sel:'D8', keys:[...T('=MEDIAN(D3:D7)'), Kb.enter]},
       {sel:'D9', keys:[...T('=MAX(D3:D7)'), Kb.enter]},
       {sel:'D10', keys:[...T('=MIN(D3:D7)'), Kb.enter]},
       {sel:'G4', keys:[...T('=G3*D8'), Kb.enter]},
@@ -3739,7 +3737,7 @@ const CHALLENGES = {
         cells['D'+(3+i)]={...blankCell(),fmtStyle:'mult',decimals:1};
         this._m.push(ev/ebd);
       }
-      cells['A8']={...blankCell(),value:'Mean',txt:true,bold:true};  cells['D8']={...blankCell(),fmtStyle:'mult',decimals:1,bold:true};
+      cells['A8']={...blankCell(),value:'Median',txt:true,bold:true};  cells['D8']={...blankCell(),fmtStyle:'mult',decimals:1,bold:true};
       cells['A9']={...blankCell(),value:'High',txt:true};            cells['D9']={...blankCell(),fmtStyle:'mult',decimals:1};
       cells['A10']={...blankCell(),value:'Low',txt:true};            cells['D10']={...blankCell(),fmtStyle:'mult',decimals:1};
       cells['F2']={...blankCell(),value:'Implied valuation',txt:true,bold:true};
@@ -3750,7 +3748,7 @@ const CHALLENGES = {
       cells['F6']={...blankCell(),value:'Implied equity',txt:true,bold:true}; cells['G6']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
       cells['F7']={...blankCell(),value:'Shares out',txt:true};    cells['G7']={...blankCell(),value:sh,fontColor:'blue',decimals:0};
       cells['F8']={...blankCell(),value:'Per share',txt:true};     cells['G8']={...blankCell(),fmtStyle:'currency',decimals:2};
-      const mean=this._m.reduce((a,b)=>a+b,0)/5;
+      const srt=this._m.slice().sort((a,b)=>a-b), mean=srt[2];   // r264: median of five \u2014 comps lead with the median
       const ps=(tEbd*mean-nd)/sh;
       const px=Math.max(1,Math.round(ps*(rnd(75,115)/100)*100)/100);
       cells['F9']={...blankCell(),value:'Current price',txt:true}; cells['G9']={...blankCell(),value:px,fontColor:'blue',fmtStyle:'currency',decimals:2};
@@ -3768,9 +3766,9 @@ const CHALLENGES = {
       return [
         {label:'COMPUTE the multiples for all five peers \u2014 EV over EBITDA, filled down (D3:D7)',
           ok: [0,1,2,3,4].every(i=>live('D'+(3+i),this._m[i],0.05,'C'+(3+i)))},
-        {label:'read the tape live \u2014 AVERAGE mean, MAX high, MIN low (D8:D10)',
-          ok: live('D8',e.mean)&&fnRef('D8','AVERAGE')&&live('D9',e.hi)&&fnRef('D9','MAX')&&live('D10',e.lo)&&fnRef('D10','MIN')},
-        {label:'run implied EV off the LIVE mean \u2014 G4 must reference D8', ok: live('G4',e.ev,0.5,'D8')},
+        {label:'Read the tape \u2014 MEDIAN at D8, MAX high at D9, MIN low at D10',
+          ok: live('D8',e.mean)&&fnRef('D8','MEDIAN')&&live('D9',e.hi)&&fnRef('D9','MAX')&&live('D10',e.lo)&&fnRef('D10','MIN')},
+        {label:'Run implied EV off the LIVE median \u2014 G4 must reference D8', ok: live('G4',e.ev,0.5,'D8')},
         {label:'back into implied equity after net debt (G6)', ok: live('G6',e.eq,0.5,'G4')},
         {label:'run per share and the premium to market (G8, G10)', ok: live('G8',e.ps,0.01,'G7')&&live('G10',e.prem,0.001,'G9')},
       ];
@@ -3845,9 +3843,9 @@ const CHALLENGES = {
       'cursor to '+o.b2+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs the size column \u00b7 <kbd>shift</kbd>+<kbd>\u2190</kbd> pulls in the names',
       'sort largest first \u00b7 <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd>',
       'drop to '+o.foot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> proposes the SUM \u00b7 <kbd>\u21b5</kbd>',
-      'back up \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> bolds the total',
+      'bold it \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
     ]; },
-    targets(){ const o=this._o; return [o.range,o.range,o.foot,o.foot]; },
+    targets(){ const o=this._o; return [o.range, o.foot, o.foot]; },
     demo(){ const o=this._o; return [
       {sel:o.range, active:o.b2, keys:[Kb.alt,L('A'),L('S'),L('D')]},
       {sel:o.foot, keys:[Kb.eq, Kb.enter]},
@@ -3895,7 +3893,7 @@ const CHALLENGES = {
       '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> opens Series \u00b7 apply with <kbd>\u21b5</kbd>',
       'selection is still live \u2014 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
     ]; },
-    targets(){ const o=this._o; return [o.range,o.range,o.range,o.range]; },
+    targets(){ const o=this._o; return [o.range]; },
     demo(){ const o=this._o; return [
       {sel:o.range, active:o.a, keys:[Kb.alt,L('H'),L('F'),L('I'),L('S'),Kb.enter]},
       {sel:o.range, keys:[Kb.bold]},
@@ -3992,7 +3990,7 @@ const CHALLENGES = {
       'CAGR at B7 \u00b7 <kbd>=(F4/B4)^(1/4)-1</kbd> \u2014 the ^ key earns its place \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
       'bold the consolidated line: select B4:F4 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
     ],
-    targets:['B4','B4:F4','C5','C5:F5','B7'],
+    targets:['B4:F4','C5:F5','B7','B4:F4'],
     demo(){ return [
       {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
       {sel:'B4:F4', keys:[Kb.fillR]},
@@ -4112,7 +4110,7 @@ const CHALLENGES = {
       'PV of TV at B11 \u00b7 <kbd>=B10*F4</kbd> \u2014 REUSE the year-5 factor; never retype it',
       'Enterprise Value at B12 \u00b7 <kbd>=SUM(B5:F5)+B11</kbd>',
     ],
-    targets:['B4','B4:F4','B5','B5:F5','B10','B11','B12'],
+    targets:['B4:F4','B5:F5','B10','B11','B12'],
     demo(){ return [
       {sel:'B4', keys:[...T('=1/(1+$B$7)^B2'), Kb.enter]},
       {sel:'B4:F4', keys:[Kb.fillR]},
@@ -4180,7 +4178,7 @@ const CHALLENGES = {
       'NOPAT at B5 · <kbd>=B3+B4</kbd> · fill B5:F5 → — EBIT after tax',
       'unlevered FCF at B9 · <kbd>=B5+B6+B7+B8</kbd> — NOPAT + D&A + capex + ΔNWC (the last two already negative) · fill B9:F9 →',
     ],
-    targets:['B4','B4:F4','B5','B5:F5','B9','B9:F9'],
+    targets:['B4:F4','B5:F5','B9:F9'],
     demo(){ return [
       {sel:'B4', keys:[...T('=-B3*$B$11'), Kb.enter]},
       {sel:'B4:F4', keys:[Kb.fillR]},
@@ -4249,7 +4247,7 @@ const CHALLENGES = {
       'Enterprise Value at B12 · <kbd>=SUM(B5:F5)+B11</kbd>',
       'bridge it home: equity at B14 · <kbd>=B12-B13</kbd> — EV less net debt · per share at B16 · <kbd>=B14/B15</kbd>',
     ],
-    targets:['B4','B4:F4','B5','B5:F5','B10','B11','B12','B14','B16'],
+    targets:['B5:D5','B8:D8','C10:D10','B11:D11','B14:D14','B5:D5'],
     demo(){ return [
       {sel:'B4', keys:[...T('=1/(1+$B$7)^B2'), Kb.enter]},
       {sel:'B4:F4', keys:[Kb.fillR]},
@@ -4333,7 +4331,7 @@ const CHALLENGES = {
       'run to exit: exit EV at B16 · <kbd>=B14*B15</kbd> · exit equity at B18 · <kbd>=B16-B17</kbd> — net debt out',
       'the returns: MOIC at B20 · <kbd>=B18/B11</kbd> — exit over entry · IRR at B21 · <kbd>=B20^(1/B19)-1</kbd> — compounded over the hold',
     ],
-    targets:['B6','B8','B10','B11','B16','B18','B20','B21'],
+    targets:['B9:B11','B4:F4','B5:F6','B7:F7','C8:F8'],
     demo(){ return [
       {sel:'B6', keys:[...T('=B4*B5'), Kb.enter]},
       {sel:'B8', keys:[...T('=B6+B7'), Kb.enter]},
@@ -4418,7 +4416,7 @@ const CHALLENGES = {
       'opex at B6 · <kbd>=-B3*$B$12</kbd> · EBITDA at B7 · <kbd>=B5+B6</kbd> · fill both right',
       'the margin line at B8 · <kbd>=B7/B3</kbd> · fill B8:F8 → · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> if it needs it',
     ],
-    targets:['C3','C3:F3','B4:F4','B5:F5','B6:F6','B7:F7','B8:F8'],
+    targets:['B6:F6','C7:F7','B8:F8','B10:F10','B8:F8'],
     demo(){ return [
       {sel:'C3', keys:[...T('=B3*(1+$B$10)'), Kb.enter]},
       {sel:'C3:F3', keys:[Kb.fillR]},
@@ -4491,7 +4489,7 @@ const CHALLENGES = {
       'sub roll: ending at B10 · <kbd>=B8+B9</kbd> · link C8 · <kbd>=B10</kbd> · fill C8:F8 → · fill B10:F10 → · interest B11 · <kbd>=B8*$B$17</kbd> · fill →',
       'foot the block: total debt at B13 · <kbd>=B5+B10</kbd> · total interest at B14 · <kbd>=B6+B11</kbd> · fill both right',
     ],
-    targets:['B5','C3','C3:F3','B5:F5','B6:F6','B10','C8','C8:F8','B10:F10','B11:F11','B13:F13','B14:F14'],
+    targets:['B5:D5','C6:D6','B9:D9','B11:D11','C13:D13','B14:D14'],
     demo(){ return [
       {sel:'B5', keys:[...T('=B3+B4'), Kb.enter]},
       {sel:'C3', keys:[...T('=B5'), Kb.enter]},
@@ -4647,7 +4645,7 @@ const CHALLENGES = {
       'exit equity at B11 \u00b7 <kbd>=B9-B10</kbd> \u00b7 MOIC at B12 \u00b7 <kbd>=B11/B8</kbd>',
       'IRR at B14 \u00b7 <kbd>=B12^(1/B13)-1</kbd> \u2014 MOIC compounded over the hold; the ^ key earns its place',
     ],
-    targets:['B6','B7','B8','B9','B11','B12','B14'],
+    targets:['B6','B8','B9','B11','B12','B14'],
     demo(){ return [
       {sel:'B6', keys:[...T('=B2*$B$4'), Kb.enter]},
       {sel:'B7', keys:[...T('=B6*B5'), Kb.enter]},
@@ -4686,7 +4684,7 @@ const CHALLENGES = {
       const e=this._exp;
       return [
         {label:'run entry EV and debt \u2014 EBITDA \u00d7 anchored multiple, levered', ok: near('B6',e.entryEV)&&near('B7',e.debt)},
-        {label:'check the entry equity', ok: near('B8',e.entryEq)},
+        {label:'Entry equity \u2014 EV less debt (B8)', ok: near('B8',e.entryEq)},
         {label:'mark exit EV at the SAME multiple', ok: near('B9',e.exitEV)},
         {label:'back into exit equity after remaining debt', ok: near('B11',e.exitEq)},
         {label:'run MOIC \u2014 exit equity over entry equity', ok: near('B12',e.moic)},
@@ -4708,7 +4706,7 @@ const CHALLENGES = {
       'revolver after the sweep: B6 \u00b7 <kbd>=B3-B5</kbd> \u00b7 fill \u2192 \u00b7 cash after: B7 \u00b7 <kbd>=B2-B5</kbd> \u00b7 fill \u2192',
       'dress the balance row: select B6:E6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ],
-    targets:['B5','B5:E5','B6','B7','B6:E6'],
+    targets:['B5:E5','B6:E6','B7:E7','B6:E6'],
     demo(){ return [
       {sel:'B5', keys:[...T('=MIN(B3,MAX(0,B2-B4))'), Kb.enter]},
       {sel:'B5:E5', keys:[Kb.fillR]},
@@ -4764,7 +4762,7 @@ const CHALLENGES = {
       'mezz gets the dregs: B12 \u00b7 <kbd>=MIN(B11,B3-B6-B9)</kbd> \u2014 two seniors already ate \u00b7 ending B13 \u00b7 <kbd>=B11-B12</kbd> \u00b7 corkscrew C11 \u00b7 <kbd>=B13</kbd> \u00b7 fill \u2192',
       'total debt: B14 \u00b7 <kbd>=B7+B10+B13</kbd> \u00b7 fill \u2192 \u00b7 dress it: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ],
-    targets:['B6','B7','C5','B9','B10','C8','B12','B13','C11','B14','B14:E14'],
+    targets:['B6:E6','C5:E5','B9:E9','C8:E8','B12:E12','C11:E11','B14:E14'],
     demo(){ return [
       {sel:'B6',  keys:[...T('=MIN(B5,B3)'), Kb.enter]},
       {sel:'B6:E6', keys:[Kb.fillR]},
@@ -4826,11 +4824,11 @@ const CHALLENGES = {
       const all=(row,key)=>[0,1,2,3].every(i=>near(COL[i]+row,this._exp[i][key]));
       const dressOk=[0,1,2,3].every(i=>{ const c=S.cells[COL[i]+'14']; return !!(c&&c.bold&&c.bt); });
       return [
-        {label:'let the revolver drink first \u2014 MIN of balance and cash, all four years', ok: all(6,'rvPd')&&refs('B6',['MIN('])},
+        {label:'Pay the revolver first (most senior) \u2014 MIN of balance and cash, all four years', ok: all(6,'rvPd')&&refs('B6',['MIN('])},
         {label:'corkscrew the revolver \u2014 each year opens where the last closed', ok: all(7,'rvE')&&[1,2,3].every(i=>refs(COL[i]+'5',[COL[i-1]+'7']))},
         {label:'sweep the term loan with only the REMAINDER after the revolver', ok: all(9,'tlPd')&&refs('B9',['MIN(','B6'])},
         {label:'corkscrew the term loan across', ok: all(10,'tlE')&&[1,2,3].every(i=>refs(COL[i]+'8',[COL[i-1]+'10']))},
-        {label:'give the mezz the dregs \u2014 both seniors netted out of the cash', ok: all(12,'mzPd')&&refs('B12',['MIN(','B6','B9'])},
+        {label:'Pay the mezzanine from the cash left after BOTH seniors', ok: all(12,'mzPd')&&refs('B12',['MIN(','B6','B9'])},
         {label:'corkscrew the mezz across', ok: all(13,'mzE')&&[1,2,3].every(i=>refs(COL[i]+'11',[COL[i-1]+'13']))},
         {label:'total the debt \u2014 three endings, bold with a top border above', ok: all(14,'tot')&&dressOk},
       ];
@@ -4848,7 +4846,7 @@ const CHALLENGES = {
       'totals on FLOWS only: J4 \u00b7 <kbd>=SUM(B4:I4)</kbd> \u00b7 select J4:J6 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 receipts, disbursements, net. Ending cash gets NO total',
       'dress the answer row: B8:I8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ],
-    targets:['B6','B8','C7','B10','J4','J4:J6','B8:I8'],
+    targets:['B6:I6','C7:I7','B8:I8','B10:I10','J4:J6','B8:I8'],
     demo(){ return [
       {sel:'B6',  keys:[...T('=B4-B5'), Kb.enter]},
       {sel:'B6:I6', keys:[Kb.fillR]},
@@ -4919,7 +4917,7 @@ const CHALLENGES = {
       'net margin at B8 \u00b7 <kbd>=B7/B2</kbd> \u00b7 fill right \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 margins read as percents',
       'dress the bottom line: select B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold, ruled off',
     ],
-    targets:['B3','B4','B6','B7','B8','B8:F8','B7:F7'],
+    targets:['B4:F4','B5:F5','B10:B11','B12','B14','B16'],
     demo(){ return [
       {sel:'B3', keys:[...T('=-B2*$B$10'), Kb.enter]},
       {sel:'B3:F3', keys:[Kb.fillR]},
@@ -4993,7 +4991,7 @@ const CHALLENGES = {
       'THE LINK: C2 \u00b7 <kbd>=B6</kbd> \u00b7 fill C2:F2 \u2192 \u00b7 then B4:F7 \u2192 \u2014 five years walk across',
       'dress the close: select B6:F6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ]; },
-    targets:['B9','B4','B5','B6','B7','C2','C2:F2','B4:F7','B6:F6'],
+    targets:['B9','C2:F2','B4:F4','B5:F5','B6:F7','B6:F6'],
     demo(){ return [
       {sel:'B9', keys:[...T(this._ratePct+'%'), Kb.enter]},
       {sel:'B9', keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
@@ -5071,7 +5069,7 @@ const CHALLENGES = {
       'the memo the MD reads: B10 \u00b7 <kbd>=B6/B2</kbd> \u2014 cash conversion \u00b7 fill right \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
       'dress the close: select B8:F8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ],
-    targets:['B6','B8','C7','C7:F7','B8:F8','B10','B10:F10'],
+    targets:['B6','B10','B11','B16','B20','B21'],
     demo(){ return [
       {sel:'B6', keys:[...T('=SUM(B2:B5)'), Kb.enter]},
       {sel:'B6:F6', keys:[Kb.fillR]},
@@ -5126,7 +5124,7 @@ const CHALLENGES = {
         {label:'run net change in cash \u2014 one SUM over the four lines, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'6',this._exp[i].ch))&&refs('B6',['SUM('])},
         {label:'build THE LINK \u2014 beginning cash = prior year\u2019s ending cash', ok: linkOk},
         {label:'tie out ending cash through year 5', ok: [0,1,2,3,4].every(i=>near(COL[i]+'8',this._exp[i].end))},
-        {label:'run the cash-conversion memo \u2014 live ratio, formatted as a percent', ok: cvOk},
+        {label:'Cash conversion memo \u2014 net change \u00f7 net income, formatted as a percent', ok: cvOk},
         {label:'bold the ending row and add a top border above it', ok: dressOk},
       ];
     }
@@ -5143,7 +5141,7 @@ const CHALLENGES = {
       'total L&E at B11 \u00b7 <kbd>=B8+B9+B10</kbd> \u00b7 fill \u2192 \u00b7 check at B14 \u00b7 <kbd>=B5-B11</kbd> \u00b7 fill \u2192 \u2014 all three years must read 0',
       'dress it: <kbd>ctrl</kbd>+<kbd>b</kbd> the two total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> the check row',
     ],
-    targets:['B5','B8','C10','C10:D10','B11','B14','B5:D5','B11:D11','B14:D14'],
+    targets:['C3:F3','B4:F5','B6:F7','B8:F8'],
     demo(){ return [
       {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
       {sel:'B5:D5', keys:[Kb.fillR]},
@@ -5174,6 +5172,9 @@ const CHALLENGES = {
       const re=[re0, re0+ni[1]-div[1], re0+ni[1]-div[1]+ni[2]-div[2]];
       this._exp={};
       for(let i=0;i<3;i++){ const col=colLetter(i+2);
+        // r264: cash is the balancer — keep it positive (negative cash on a BS reads as a bug, not a plug)
+        let short=(ap[i]+debt[i]+cs+re[i])-ar[i]-ppe[i];
+        if(short<20){ debt[i]+=Math.ceil((20-short)/10)*10; }
         const totLE=ap[i]+debt[i]+cs+re[i];
         const cash=totLE-ar[i]-ppe[i];
         cells[col+2]={...blankCell(),value:cash,fontColor:'blue',fmtStyle:'comma',decimals:0};
@@ -5208,7 +5209,7 @@ const CHALLENGES = {
         {label:'foot total liabilities \u2014 live SUM, all three years', ok: [0,1,2].every(i=>near(COL[i]+'8',this._exp[COL[i]].tl))&&refs('B8',['SUM('])},
         {label:'run THE RE ROLL \u2014 prior RE + NI \u2212 dividends, built once, walking across', ok: rollOk},
         {label:'foot total liabs & equity, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',this._exp[COL[i]].tle))},
-        {label:'prove the check row \u2014 ZERO three times, it balances', ok: [0,1,2].every(i=>near(COL[i]+'14',0))},
+        {label:'Check row = assets minus L&E \u2014 reads 0 in all three years', ok: [0,1,2].every(i=>near(COL[i]+'14',0))},
         {label:'bold the totals and add a top border above the check row (ctrl+b, alt h b t)', ok: boldOk(5)&&boldOk(11)&&ruleOk},
       ];
     }
@@ -5226,7 +5227,7 @@ const CHALLENGES = {
       'NWC at B7 \u00b7 <kbd>=B4+B5-B6</kbd> \u00b7 fill right \u00b7 then <kbd>ctrl</kbd>+<kbd>b</kbd> and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 the line that matters gets dressed',
       '\u0394NWC at C8 \u00b7 <kbd>=C7-B7</kbd> \u00b7 fill C8:F8 \u2192 \u2014 the swing that hits cash flow',
     ]; },
-    targets:['B9','B10','B11','B9:B11','B4','B5','B6','B7','B7:F7','C8'],
+    targets:['B5:F5','B6:F6','B10:F10','B11:F11','B13:F14'],
     demo(){ return [
       {sel:'B9', keys:[...T(String(this._dso)), Kb.enter]},
       {sel:'B10', keys:[...T(String(this._dio)), Kb.enter]},
@@ -5279,7 +5280,7 @@ const CHALLENGES = {
       const drv=(k,exp)=>{ const c=S.cells[k]; return !!(c&&!c.formula&&typeof c.value==='number'&&c.value===exp&&c.fontColor==='blue'); };
       const dressOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'7']; return !!(c&&c.bold&&c.bt); });
       return [
-        {label:'type the drivers as YOUR hardcodes \u2014 at B9:B11, painted blue', ok: drv('B9',this._dso)&&drv('B10',this._dio)&&drv('B11',this._dpo)},
+        {label:'Type DSO / DIO / DPO into B9:B11 and blue-font them (alt h f c)', ok: drv('B9',this._dso)&&drv('B10',this._dio)&&drv('B11',this._dpo)},
         {label:'run AR off YOUR anchored DSO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'4',this._exp[i].ar))&&refs('B4',['B2','B9'])},
         {label:'run inventory and payables off anchored DIO / DPO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'5',this._exp[i].inv)&&near(COL[i]+'6',this._exp[i].ap))},
         {label:'run net working capital, then bold the row and add a top border above it', ok: [0,1,2,3,4].every(i=>near(COL[i]+'7',this._exp[i].nwc))&&dressOk},
@@ -5300,7 +5301,7 @@ const CHALLENGES = {
       'the check at B14 \u00b7 <kbd>=B11-B12-B13</kbd> \u00b7 fill \u2192 \u2014 all three years must read ZERO',
       'then dress it: <kbd>ctrl</kbd>+<kbd>b</kbd> total assets \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> the check row',
     ],
-    targets:['B5','B7','C6','B9','B11','C13','B14','B11:D11','B14:D14'],
+    targets:['B3:F3','B4:F4','B7:F7','B8:F8','B7:F7'],
     demo(){ return [
       {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
       {sel:'B5:D5', keys:[Kb.fillR]},
@@ -5366,7 +5367,7 @@ const CHALLENGES = {
         {label:'build LINK 2 \u2014 BS cash pulls from the CFS, all three years', ok: [0,1,2].every(i=> refs(COL[i]+'9',[COL[i]+'7']) && near(COL[i]+'9',e.end[i]))},
         {label:'foot total assets, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',e.ta[i]))},
         {label:'build LINK 3 \u2014 the RE roll absorbs net income, both later years', ok: [1,2].every(i=> refs(COL[i]+'13',[COL[i-1]+'13',COL[i]+'2']) && near(COL[i]+'13',e.re[i]))},
-        {label:'drive all three check cells to ZERO \u2014 then it\u2019s DRESSED to ship', ok: [0,1,2].every(i=>near(COL[i]+'14',0))&&dressOk},
+        {label:'All three check cells read ZERO \u2014 then bold the totals and rule the check row', ok: [0,1,2].every(i=>near(COL[i]+'14',0))&&dressOk},
       ];
     }
   },
@@ -5381,9 +5382,9 @@ const CHALLENGES = {
       'select B8:D10 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the rationing walks across',
       'THE CORKSCREW: C7 \u00b7 <kbd>=B9</kbd> \u00b7 fill C7:D7 \u2014 the loan opens where it closed',
       'the junior tranche: B13 \u00b7 <kbd>=MIN(B10,B12)</kbd> \u00b7 B14 \u00b7 <kbd>=B12-B13</kbd> \u00b7 fill B13:D14 \u2192',
-      'link the revolver too: C12 \u00b7 <kbd>=B14</kbd> \u00b7 fill C12:D12 \u2192',
+      'link the second lien too: C12 \u00b7 <kbd>=B14</kbd> \u00b7 fill C12:D12 \u2192',
     ],
-    targets:['B5','B5:D5','B8','B9','B10','B8:D10','C7','C7:D7','B13','B14','B13:D14','C12','C12:D12'],
+    targets:['B5:D5','B8:D9','B13:D13','C12:D12'],
     demo(){ return [
       {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
       {sel:'B5:D5', keys:[Kb.fillR]},
@@ -5415,7 +5416,7 @@ const CHALLENGES = {
       // TL sized to exhaust mid-horizon on most seeds \u2014 the cascade has to MOVE
       const tl=rnd(Math.floor(fcf[0]*0.8/10), Math.floor((fcf[0]+fcf[1])*1.1/10))*10;
       const rv=rnd(8,30)*10;
-      const labels=[[5,'Free cash flow',1],[7,'Term Loan B, beg.',0],[8,'TL paydown',0],[9,'Term Loan B, end',1],[10,'Cash after TL',0],[12,'Revolver, beg.',0],[13,'Rev. paydown',0],[14,'Revolver, end',1]];
+      const labels=[[5,'Free cash flow',1],[7,'Term Loan B, beg.',0],[8,'TL paydown',0],[9,'Term Loan B, end',1],[10,'Cash after TL',0],[12,'Second Lien, beg.',0],[13,'2L paydown',0],[14,'Second Lien, end',1]];
       labels.forEach(([r,n,b])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:!!b});
       cells['B7']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['B12']={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
@@ -5438,27 +5439,27 @@ const CHALLENGES = {
       return [
         {label:'run free cash flow at B5 \u2014 one clean SUM, signs carried, fill all three years', ok:[0,1,2].every(i=>near(COL[i]+'5',e[i].fcf))},
         {label:'ration the TL paydown with MIN at B8, then corkscrew \u2014 each year opens at the prior close', ok:[0,1,2].every(i=>near(COL[i]+'8',e[i].pd)) && refs('B8',['MIN(','B5','B7']) && [1,2].every(i=> refs(COL[i]+'7',[COL[i-1]+'9']) && near(COL[i]+'7',e[i].tlB)) && [0,1,2].every(i=>near(COL[i]+'9',e[i].tlE))},
-        {label:'pass only surviving cash down, then ration the revolver paydown with MIN at B13', ok:[0,1,2].every(i=>near(COL[i]+'10',e[i].left)) && [0,1,2].every(i=>near(COL[i]+'13',e[i].rpd)) && refs('B13',['MIN(','B10','B12'])},
-        {label:'link the revolver corkscrew \u2014 open C12:D12 at the prior close, walk the endings out', ok:[1,2].every(i=> refs(COL[i]+'12',[COL[i-1]+'14']) && near(COL[i]+'12',e[i].rvB)) && [0,1,2].every(i=>near(COL[i]+'14',e[i].rvE))},
+        {label:'pass only surviving cash down, then ration the second-lien paydown with MIN at B13', ok:[0,1,2].every(i=>near(COL[i]+'10',e[i].left)) && [0,1,2].every(i=>near(COL[i]+'13',e[i].rpd)) && refs('B13',['MIN(','B10','B12'])},
+        {label:'link the second-lien corkscrew \u2014 open C12:D12 at the prior close, walk the endings out', ok:[1,2].every(i=> refs(COL[i]+'12',[COL[i-1]+'14']) && near(COL[i]+'12',e[i].rvB)) && [0,1,2].every(i=>near(COL[i]+'14',e[i].rvE))},
       ];
     }
   },
   txncomps:{
-    name:'Txn Comps', label:'Run precedent transactions', par:37, parKeys:37,
+    name:'Txn Comps', label:'Run precedent transactions', par:36, parKeys:36,
     aha:'Precedents are comps with dates — same multiples, read in deal order.',
     prompt:'Five precedent deals, one target. Compute EV/EBITDA paid in each deal, average the multiples off one live formula, then mark the target: implied EV at the average multiple, less net debt, equals implied equity. The comps page every pitch book leans on.',
-    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> avg <em>=AVERAGE(D3:D7)</em> \u00b7 <em>B11</em> implied EV <em>=B10*D8</em> \u00b7 <em>B13</em> implied equity <em>=B11-B12</em>',
+    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> median <em>=MEDIAN(D3:D7)</em> \u00b7 <em>B11</em> implied EV <em>=B10*D8</em> \u00b7 <em>B13</em> implied equity <em>=B11-B12</em>',
     guide:[
       'multiple paid, deal one: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
-      'average at D8 \u00b7 <kbd>=AVERAGE(D3:D7)</kbd> \u2014 live off the column, no hand-typed mean',
-      'implied EV at B11 \u00b7 <kbd>=B10*D8</kbd> \u2014 target EBITDA \u00d7 the average multiple',
+      'median at D8 \u00b7 <kbd>=MEDIAN(D3:D7)</kbd> \u2014 outlier-resistant, live off the column',
+      'implied EV at B11 \u00b7 <kbd>=B10*D8</kbd> \u2014 target EBITDA \u00d7 the median multiple',
       'implied equity at B13 \u00b7 <kbd>=B11-B12</kbd> \u2014 net debt comes off last',
     ],
     targets:['D3:D7','D8','B11','B13'],
     demo(){ return [
       {sel:'D3', keys:[...T('=B3/C3'), Kb.enter]},
       {sel:'D3:D7', keys:[Kb.fillD]},
-      {sel:'D8', keys:[...T('=AVERAGE(D3:D7)'), Kb.enter]},
+      {sel:'D8', keys:[...T('=MEDIAN(D3:D7)'), Kb.enter]},
       {sel:'B11', keys:[...T('=B10*D8'), Kb.enter]},
       {sel:'B13', keys:[...T('=B11-B12'), Kb.enter]},
     ]; },
@@ -5482,12 +5483,12 @@ const CHALLENGES = {
         cells['E'+(3+i)]={...blankCell(),value:45300+rnd(0,1100),fmtStyle:'date',decimals:0,align:'r'};   // announced \u2014 context only, precedents READ in deal order
         this._m.push(ev/ebd);
       }
-      cells['A8']={...blankCell(),value:'Average',txt:true,bold:true}; cells['D8']={...blankCell(),fmtStyle:'mult',decimals:1,bold:true};
+      cells['A8']={...blankCell(),value:'Median',txt:true,bold:true}; cells['D8']={...blankCell(),fmtStyle:'mult',decimals:1,bold:true};
       cells['A10']={...blankCell(),value:'Target EBITDA',txt:true};   cells['B10']={...blankCell(),value:rnd(10,35)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['A11']={...blankCell(),value:'Implied EV',txt:true,bold:true}; cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
       cells['A12']={...blankCell(),value:'Net debt',txt:true};        cells['B12']={...blankCell(),value:rnd(5,20)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['A13']={...blankCell(),value:'Implied equity',txt:true,bold:true}; cells['B13']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      const avg=this._m.reduce((a,b)=>a+b,0)/5;
+      const avg=this._m.slice().sort((a,b)=>a-b)[2];   // r264: median of five \u2014 precedents lead with the median
       this._exp={avg:avg, ev:cells['B10'].value*avg, eq:cells['B10'].value*avg-cells['B12'].value};
       return {ROWS:13, cells, active:{r:3,c:4}, sel:null, colW:{1:132,2:80,3:80,4:88,5:86}};
     },
@@ -5496,8 +5497,8 @@ const CHALLENGES = {
       return [
         {label:'run the multiple paid on every deal \u2014 EV over EBITDA, fill down D3:D7',
           ok: [0,1,2,3,4].every(i=>near('D'+(3+i),this._m[i]))},
-        {label:'average the multiples live at D8 \u2014 AVERAGE or SUM/5, never a hand-typed mean', ok: near('D8',this._exp.avg)},
-        {label:'mark implied EV at B11 \u2014 target EBITDA \u00d7 the average multiple', ok: near('B11',this._exp.ev,0.5)},
+        {label:'Take the MEDIAN of the multiples at D8 \u2014 live off the column, never hand-typed', ok: near('D8',this._exp.avg)},
+        {label:'mark implied EV at B11 \u2014 target EBITDA \u00d7 the median multiple', ok: near('B11',this._exp.ev,0.5)},
         {label:'back into implied equity at B13 \u2014 take net debt off the implied EV', ok: near('B13',this._exp.eq,0.5)},
       ];
     }
@@ -5576,7 +5577,7 @@ const CHALLENGES = {
       'both EPS lines: B12 \u00b7 <kbd>=B2/B9</kbd> \u00b7 B13 \u00b7 <kbd>=B8/B11</kbd>',
       'the verdict at B14 \u00b7 <kbd>=B13/B12-1</kbd> \u2014 positive = accretive; the drag can flip it',
     ],
-    targets:['B7','B8','B11','B12','B13','B14'],
+    targets:['B7','B8','B11','B12:B13','B14'],
     demo(){ return [
       {sel:'B7', keys:[...T('=-B5*B6'), Kb.enter]},
       {sel:'B8', keys:[...T('=SUM(B2:B4)+B7'), Kb.enter]},
@@ -5784,7 +5785,7 @@ const CHALLENGES = {
     req(){ return this._sites.map(s=>'<em>'+s.col+s.ans+'</em> \u00b7 =('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1 \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then ')+' \u00b7 then <em>ctrl+b</em> the HIGHEST of the three'; },
     guide(){ const g=this._sites.map((s,i)=>['block one','block two','block three'][i]+' \u2014 at <b>'+s.col+s.ans+'</b> type <kbd>=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>');
       g.push('now READ them \u2014 the highest CAGR wins the page: back to that cell \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>'); return g; },
-    targets(){ return this._sites.map(s=>s.col+s.ans); },
+    targets(){ const w=this._sites.reduce((a,s)=>s.exp>a.exp?s:a,this._sites[0]); return [...this._sites.map(s=>s.col+s.ans), w.col+w.ans]; },
     demo(){ const steps=this._sites.flatMap(s=>[
       {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'), Kb.enter]},
       {sel:s.col+s.ans, keys:[Kb.pct]},
@@ -5841,7 +5842,7 @@ const CHALLENGES = {
       'the check at B14 \u00b7 <kbd>=B6-B12</kbd> \u00b7 fill right \u2014 a diagnostic, not a construction; zero means the sheet is right',
       'dress it: <kbd>ctrl</kbd>+<kbd>b</kbd> both total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> the check row',
     ],
-    targets:['B6','B6:C6','B12','B12:C12','B14','B14:C14'],
+    targets:['B6','B12','B14','B14:C14'],
     demo(){ return [
       {sel:'B6', keys:[...T('=SUM(B2:B5)'), Kb.enter]},
       {sel:'B6:C6', keys:[Kb.fillR]},
@@ -5863,7 +5864,11 @@ const CHALLENGES = {
       this._exp={};
       for(let i=0;i<2;i++){ const col=colLetter(i+2);
         const ar=rnd(10,30)*10, inv=rnd(8,24)*10, ppe=rnd(30,70)*10;
-        const ap=rnd(8,20)*10, debt=rnd(20,50)*10, cs=rnd(10,30)*10, re=rnd(15,45)*10;
+        const ap=rnd(8,20)*10, cs=rnd(10,30)*10, re=rnd(15,45)*10;
+        let debt=rnd(20,50)*10;
+        // r264: keep the cash line positive — the sheet preaches "RE is never a plug"; a negative cash plug undermines it
+        const short=(ap+debt+cs+re)-ar-inv-ppe;
+        if(short<20) debt+=Math.ceil((20-short)/10)*10;
         const totLE=ap+debt+cs+re, cash=totLE-ar-inv-ppe;
         [[2,cash],[3,ar],[4,inv],[5,ppe],[8,ap],[9,debt],[10,cs],[11,re]].forEach(([r,val])=>
           cells[col+r]={...blankCell(),value:val,fontColor:'blue',fmtStyle:'comma',decimals:0});
@@ -5884,7 +5889,7 @@ const CHALLENGES = {
       return [
         {label:'foot total assets \u2014 a live SUM over all four lines, both years', ok: COL.every(c=>near(c+'6',this._exp[c].ta))&&refs('B6',['SUM('])},
         {label:'foot total L&E with SUM \u2014 RE is a given not a plug, both years', ok: COL.every(c=>near(c+'12',this._exp[c].tle))&&refs('B12',['SUM('])},
-        {label:'prove the check row \u2014 ZERO both years, it balances honestly', ok: COL.every(c=>near(c+'14',0))&&refs('B14',['B6','B12'])},
+        {label:'Check row = assets minus L&E \u2014 reads 0 in both years', ok: COL.every(c=>near(c+'14',0))&&refs('B14',['B6','B12'])},
         {label:'bold the totals and add a top border above the check row', ok: dressOk},
       ];
     }
@@ -5972,7 +5977,7 @@ const CHALLENGES = {
         if(!f.includes(L+'12') || Math.abs((eb.value||0)-(((tot&&tot.value)||0)+ox))>1e-6) ownOk=false;
       }
       return [
-        {label:'Stretch every division\u2019s five-year Total across B through F \u2014 one row stops a year short (column G)', ok:totOk},
+        {label:'Extend each division\u2019s Total SUM to cover all five years \u2014 one row stops a year short (column G)', ok:totOk},
         {label:'Make EBITDA a LIVE formula in every year \u2014 one is a stale typed number (row 13)', ok:liveOk},
         {label:'Point every EBITDA at its OWN year\u2019s opex \u2014 one column crossed wires (row 13)', ok:ownOk},
       ];
@@ -5986,8 +5991,8 @@ const CHALLENGES = {
     req(){ const R=this._R; return '<em>'+R.refCell+'</em> #REF! \u2192 rebuild =SUM('+R.refFix+') \u00b7 <em>'+R.divCell+'</em> #DIV/0! \u2192 denominator is '+R.divFix+' \u00b7 <em>'+R.valCell+'</em> #VALUE! \u2192 point at the NUMBER ('+R.valFix+')'; },
     guide:[
       'the #REF! total lost its range to a deleted row \u00b7 retype it: <kbd>=</kbd>SUM over the block <kbd>\u21b5</kbd>',
-      'the #DIV/0! margin divides by an EMPTY cell \u00b7 <kbd>F2</kbd>, repoint the denominator at revenue <kbd>\u21b5</kbd>',
-      'the #VALUE! growth grabbed the LABEL, not the number \u00b7 <kbd>F2</kbd>, walk the ref one column right <kbd>\u21b5</kbd>',
+      'the #DIV/0! cost ratio lost its denominator \u00b7 rebuild it: type <kbd>=</kbd>cost \u00f7 the Q2 revenue \u00b7 <kbd>\u21b5</kbd>',
+      'the #VALUE! growth grabbed the LABEL, not the number \u00b7 rebuild it against the right cells \u00b7 <kbd>\u21b5</kbd>',
     ],
     targets:[function(){return this._R.refCell;}, function(){return this._R.divCell;}, function(){return this._R.valCell;}],
     demo(){ const R=this._R;
@@ -6011,7 +6016,7 @@ const CHALLENGES = {
       cells['B8']={...blankCell(),value:'#REF!',txt:true};
       let c8=0; for(let r=4;r<=7;r++) c8+=cells['C'+r].value;
       cells['C8']={...blankCell(),formula:'=SUM(C4:C7)',value:c8};
-      cells['A10']={...blankCell(),value:'Svc margin (Q2)',txt:true};
+      cells['A10']={...blankCell(),value:'Svc cost ratio (Q2)',txt:true};
       cells['B10']={...blankCell(),value:'#DIV/0!',txt:true,decimals:2};   // r190: the fixed quotient shows 2dp
       cells['A11']={...blankCell(),value:'Total growth Q2/Q1',txt:true};
       cells['B11']={...blankCell(),value:'#VALUE!',txt:true,decimals:2};
@@ -6326,7 +6331,7 @@ const CHALLENGES = {
       'arrow to it, type <kbd>'+o.good+'</kbd> <kbd>↵</kbd> — the subtotal and the deck reprice on the spot',
       '<kbd>ctrl</kbd>+<kbd>]</kbd> <kbd>ctrl</kbd>+<kbd>]</kbd> — ride the wire back down and watch the deck figure land right',
     ]; },
-    targets(){ const o=this._o; return [o.deck, o.mid, o.bad]; },
+    targets(){ const o=this._o; return [o.bad, o.mid, o.deck]; },
     demo(){ const o=this._o;
       const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
       for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
@@ -6672,7 +6677,7 @@ const CHALLENGES = {
       'mix at F2 \u00b7 <kbd>=E2/$E$5</kbd> \u2014 anchored denominator \u00b7 fill F2:F4 \u2193 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
       'dress the total: select D5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ],
-    targets:['E2','E2:E4','E5','F2','F2:F4','D5:E5'],
+    targets:['E2:E4','E5','F2:F4','D5:E5'],
     demo(){ return [
       {sel:'E2', keys:[...T('=SUMIF($A$2:$A$10,D2,$B$2:$B$10)'), Kb.enter]},
       {sel:'E2:E4', keys:[Kb.fillD]},
@@ -7100,7 +7105,7 @@ const CHALLENGES = {
       const corner=colLetter(M.c0)+M.r0, wide=corner+':'+colLetter(M.c0+M.w-1)+M.r0,
             full=corner+':'+colLetter(M.c0+M.w-1)+(M.r0+M.h-1);
       const deck=colLetter(D.c)+D.r;
-      return [...P.map(ref), corner, wide, full, full, deck, deck, 'A1']; },
+      return [...P.map(ref), corner, full, full, deck, 'A1']; },
     demo(){ const P=this._path, M=this._model, D=this._deck, DR=this._dirs;
       const K={D:Kb.ctrlDown,U:Kb.ctrlUp,R:Kb.ctrlRight,L:Kb.ctrlLeft};
       const ref=p=>colLetter(p.c)+p.r;
@@ -7143,7 +7148,7 @@ const CHALLENGES = {
         cells[mL+(mr+1)]={...blankCell(),value:'COGS',txt:true};
         cells[mL+(mr+2)]={...blankCell(),value:'Gross profit',txt:true,bold:true};
         cells[mL+(mr+3)]={...blankCell(),value:'EBIT',txt:true,bold:true};
-        yrs.forEach(Y=>{ const rev=rnd(120,190)*5, cogs=-rnd(55,100), gp=rev+cogs, ebit=gp-rnd(20,55);
+        yrs.forEach(Y=>{ const rev=rnd(120,190)*5, cogs=-Math.round(rev*rnd(45,65)/100), gp=rev+cogs, ebit=gp-rnd(20,55);
           cells[Y+mr]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
           cells[Y+(mr+1)]={...blankCell(),value:cogs,fmtStyle:'comma',decimals:0,fontColor:'blue'};
           cells[Y+(mr+2)]={...blankCell(),formula:'='+Y+mr+'+'+Y+(mr+1),value:gp,fmtStyle:'comma',decimals:0,bold:true,bt:true};
@@ -7490,6 +7495,8 @@ function evalFormula(expr){
     switch(name){
       case 'SUM': return xs.reduce((a,b)=>a+b,0);
       case 'AVERAGE': case 'AVG': return xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:0;
+      case 'MEDIAN': { if(!xs.length) return 0; const s2=xs.slice().sort((a,b)=>a-b); const m=s2.length>>1;   // r264: comps lead with the median, not the mean
+        return s2.length%2 ? s2[m] : (s2[m-1]+s2[m])/2; }
       case 'MIN': return Math.min(...xs);
       case 'MAX': return Math.max(...xs);
       case 'ABS': return Math.abs(xs[0]);
@@ -9031,7 +9038,7 @@ const ARROWSYM={ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
 function arrowLabel(k,shift,ctrl){ return (ctrl?'Ctrl+':'')+(shift?'Shift+':'')+ARROWSYM[k]; }
 let flashTimer=null, flashChips=[];
 const FN_SIGS={ IF:['condition','if_true','if_false'], SUM:['range'], SUMIF:['range','criteria','sum_range'],
-  AVERAGE:['range'], MIN:['range'], MAX:['range'], COUNT:['range'], COUNTA:['range'],
+  AVERAGE:['range'], MEDIAN:['range'], MIN:['range'], MAX:['range'], COUNT:['range'], COUNTA:['range'],
   INDEX:['array','row_num','col_num'], MATCH:['lookup_value','lookup_array','0'],
   VLOOKUP:['value','table','col_index','FALSE'], HLOOKUP:['value','table','row_index','FALSE'],
   IFERROR:['value','value_if_error'], ROUND:['number','digits'], ABS:['number'], EOMONTH:['start','months'],
@@ -9456,6 +9463,7 @@ function jumpDependent(){
     if(cc&&cc.formula&&formulaReads(cc.formula,r,c)){
       S.sel=null; S.active={r:p.r,c:p.c};
       S.traceN=(S.traceN||0)+1;
+      S.depN=(S.depN||0)+1;   // r264: dependents hop tracked separately — wirewalk grades the Ctrl+] ride distinctly
       render(); return; } }
 }
 /* r179 ROW GROUPING — S.rowGroups = [{r1,r2,collapsed}]; hidden rows derive
