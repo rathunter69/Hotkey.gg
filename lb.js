@@ -130,7 +130,7 @@ async function load(){
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
       sb.from('team_members').select('team_id,user_id,role'),
-      sb.from('teams').select('id,name,slug,verified'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
+      sb.from('teams').select('id,name,slug,verified,is_private'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
     ]);
     profs=p.data||[]; runs=r.data||[]; sessions=se.data||[];
     window.__deskMembers=(tm&&tm.data)||[]; window.__deskTeams=(tt&&tt.data)||[];
@@ -160,7 +160,7 @@ async function load(){
   const memByTeam={}; members.forEach(m=>{ (memByTeam[m.team_id]=memByTeam[m.team_id]||[]).push(m.user_id); });
   const deskSlug=new URLSearchParams(location.search).get('desk');
   if(deskSlug){ const t=teams.find(x=>x.slug===deskSlug);
-    if(t) viewDesk={id:t.id, name:t.name, slug:t.slug, verified:!!t.verified, ids:new Set(memByTeam[t.id]||[])}; }
+    if(t) viewDesk={id:t.id, name:t.name, slug:t.slug, verified:!!t.verified, priv:!!t.is_private, ids:new Set(memByTeam[t.id]||[])}; }
   if(meId){
     const mine=members.find(m=>m.user_id===meId);
     const mineTeam=mine && teams.find(t=>t.id===mine.team_id);
@@ -170,7 +170,7 @@ async function load(){
         teamIds=new Set(profs.filter(p=>p.team_code===me.team_code).map(p=>p.id)); } } }
   // r269: on desks.html, members land scoped to their OWN desk — no slug link needed
   if(pageView()==='teams' && !viewDesk && myDesk && teamIds)
-    viewDesk={id:myDesk.id, name:myDesk.name, slug:myDesk.slug, verified:!!myDesk.verified, ids:teamIds};
+    viewDesk={id:myDesk.id, name:myDesk.name, slug:myDesk.slug, verified:!!myDesk.verified, priv:!!myDesk.is_private, ids:teamIds};
   const teamOnly = !viewDesk && myTeam && sessionStorage.getItem('hk_teamview')==='1';
   // render the section-leaders strip into its mount (added below the featured grid)
   setTimeout(()=>{ try{
@@ -213,7 +213,11 @@ async function load(){
       st.wsum = st.entries.reduce((a,e)=>a+Math.min(1, Math.log2((e.n||1)+1)/Math.log2(9)),0); });
   }
   const mySolves = meId ? fRuns.filter(x=>x.user_id===meId).length : 0;
-  DATA={profs,runs,sessions,fRuns,fSessions,names,meId,teamIds,myTeam,myDesk,viewDesk,teamOnly,perDrill,userStat,gUserStat,mySolves};
+  DATA={profs,runs,sessions,fRuns,fSessions,names,meId,teamIds,myTeam,myDesk,viewDesk,teamOnly,perDrill,userStat,gUserStat,mySolves,myApps:{}};
+  // r270: guild board \u2014 surface my open applications so cards show "applied \u00b7 pending"
+  if(pageView()==='teams' && meId && !myDesk){
+    try{ const {data:ap}=await sb.rpc('my_applications'); (ap||[]).forEach(a=>{ DATA.myApps[a.team_id]=true; }); }catch(e){}
+  }
   // ================= r136: THE DESK HALL — captain-first team dashboard =================
   // Wolf: "not a re-skinned leaderboard — captains need to see users, evaluate at a
   // glance, chase assignment completion, and justify the investment." Guild-style:
@@ -221,7 +225,7 @@ async function load(){
   // per-member ticks + evaluation roster. Everything derives from already-loaded runs.
   setTimeout(async ()=>{ try{
     let b=document.getElementById('deskBanner');
-    if(!DATA.viewDesk){ if(b) b.remove(); return; }
+    if(!DATA.viewDesk || subView()==='manage'){ if(b) b.remove(); return; }
     if(!b){ const root=document.getElementById('boards'); b=document.createElement('div'); b.id='deskBanner'; root.parentNode.insertBefore(b, root); }
     const ids=[...DATA.viewDesk.ids];
     const WEEK=7*86400000, now=Date.now();
@@ -266,7 +270,9 @@ async function load(){
         '<div class="dk-id"><div class="dk-name">'+esc(DATA.viewDesk.name)+(DATA.viewDesk.verified?' <span class="dk-ver">\u2713 verified</span>':'')+'</div>'+
         '<div class="dk-sub">'+ids.length+' analyst'+(ids.length===1?'':'s')+
           (capName?' \u00b7 staffer: <b data-uid="'+captainId+'" style="cursor:pointer">'+esc(capName)+'</b>':' \u00b7 <span style="color:var(--warn)">staffer seat open \u2014 first code-join takes the desk</span>')+'</div></div>'+
-        (iAmCaptain?'<a class="dk-manage" href="account.html#desk">staffer controls \u2192</a>':'')+
+        (iAmCaptain?'<a class="dk-manage" href="desks.html?manage=1">staffer controls \u2192</a>':'')+
+        (!iAmCaptain && DATA.meId && !DATA.myDesk && !DATA.viewDesk.priv && !DATA.viewDesk.ids.has(DATA.meId)
+          ?'<a class="dk-manage" id="dkApply" style="cursor:pointer">apply to join \u2192</a>':'')+
       '</div>';
 
     // ---- ROI band ----
@@ -304,7 +310,7 @@ async function load(){
       }).join('')+'</div>';
     } else {
       html+='<div class="dk-sect">this week\u2019s quests</div>'+
-        '<div class="dk-empty">'+(iAmCaptain?'no quests pinned \u2014 pin up to 3 drills from your <a href="account.html" style="color:var(--accent)">staffer controls</a> (targets + notes optional)':'no quests pinned this week \u2014 the staffer sets them')+'</div>';
+        '<div class="dk-empty">'+(iAmCaptain?'no quests pinned \u2014 pin up to 3 drills from your <a href="desks.html?manage=1" style="color:var(--accent)">staffer controls</a> (targets + notes optional)':'no quests pinned this week \u2014 the staffer sets them')+'</div>';
     }
 
     // ---- evaluation roster ----
@@ -400,6 +406,12 @@ async function load(){
       a.href=cv.toDataURL('image/png'); a.click();
       if(window.hkEvent) hkEvent('report_card',{d:DATA.viewDesk.slug});
     }catch(e){} };
+    const dka=document.getElementById('dkApply');
+    if(dka) dka.onclick=async()=>{ try{
+      const {error}=await sb.rpc('apply_to_desk',{p_team:DATA.viewDesk.id, p_note:null});
+      dka.textContent = error ? deskErrMsg(error) : 'applied \u2713 \u2014 the staffer decides';
+      dka.style.pointerEvents='none';
+    }catch(e){ dka.textContent='something went wrong'; } };
     const rep=document.getElementById('deskReport');
     if(rep) rep.onclick=async()=>{ try{
       await sb.from('reports').insert({reporter:DATA.meId, kind:'desk', target:DATA.viewDesk.slug});
@@ -638,6 +650,7 @@ function featuredHtml(){
     .map(u=>({user_id:u, time_ms:legs.reduce((s,k)=>s+per[u][k],0)})).sort((a,b)=>a.time_ms-b.time_ms);
   return '<div class="featured">'+
     boardHtml({label:'\u26a1 today \u00b7 '+dl, lvl:dailyDate}, bestD, names, meId)+
+    boardHtml({label:'\ud83c\udfc1 weekly gauntlet \u00b7 '+legs.length+' legs, one clock', lvl:'wk '+wkStr}, combined, names, meId)+
     '</div>';
 }
 
@@ -715,6 +728,107 @@ function schoolStandingsHtml(){
     '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">'+
       'schools ranked by crowns (board #1s), then depth · opt in from your account to fly your colors</div></div>';
 }
+/* r270: shared desk-error copy (mirrors account.html's map + the application codes) */
+function deskErrMsg(e){ const m=String((e&&e.message)||e||'');
+  if(m.includes('DESK_NAME_PROTECTED')) return 'real firm and group names are reserved \u2014 verified desks are coming.';
+  if(m.includes('DESK_NAME_RESERVED')) return 'that name isn\u2019t available.';
+  if(m.includes('ALREADY_ON_DESK'))   return 'you\u2019re already on a desk \u2014 leave it first.';
+  if(m.includes('DESK_NOT_FOUND'))    return 'that invite code isn\u2019t valid.';
+  if(m.includes('DESK_FULL'))         return 'that desk is full (200).';
+  if(m.includes('DESK_RATE_LIMIT'))   return 'one desk per day \u2014 try again tomorrow.';
+  if(m.includes('DESK_PRIVATE'))      return 'that desk is invite-only.';
+  if(m.includes('APPLY_RATE_LIMIT'))  return 'five open applications max \u2014 withdraw one first.';
+  if(m.includes('APPLICATION_GONE'))  return 'that application was already handled.';
+  if(m.includes('APPLICANT_TAKEN'))   return 'they joined another desk in the meantime.';
+  if(m.includes('NOT_CAPTAIN'))       return 'only the staffer can do that.';
+  if(m.includes('ASSIGN_CAP'))        return 'three live assignments max \u2014 clear one first.';
+  if(m.includes('does not exist')||m.includes('Could not find')||m.includes('404'))
+                                      return 'applications aren\u2019t live yet \u2014 ask the staffer for an invite code.';
+  if(m.includes('duplicate key'))     return 'a desk with that name already exists.';
+  return 'something went wrong.'; }
+
+/* r270: THE GUILD BOARD \u2014 deskless players browse public desks, apply with a
+   one-line note, redeem an invite code, or start their own. Private desks list
+   but stay invite-only. */
+function guildHtml(){
+  if(!DATA) return '';
+  const teams=window.__deskTeams||[], members=window.__deskMembers||[];
+  const stat=DATA.gUserStat||DATA.userStat, names=DATA.names;
+  const memBy={}; members.forEach(m=>{ (memBy[m.team_id]=memBy[m.team_id]||[]).push(m.user_id); });
+  const apps=DATA.myApps||{};
+  const cards=teams.map(t=>{
+    const ids=memBy[t.id]||[];
+    let crowns=0,boards=0,best=null,bestU=null;
+    ids.forEach(id=>{ const st=stat[id]; if(!(st&&st.att)) return;
+      crowns+=st.crowns; boards+=st.att;
+      if(best===null||st.avg<best){ best=st.avg; bestU=id; } });
+    return {t:t, n:ids.length, crowns:crowns, boards:boards, bestU:bestU};
+  }).sort((a,b)=> b.crowns-a.crowns || b.n-a.n || a.t.name.localeCompare(b.t.name));
+  const canApply=!!DATA.meId;
+  const cardHtml=cards.map(c=>{
+    const t=c.t, applied=!!apps[t.id];
+    const act = t.is_private
+      ? '<span class="gb-lock" title="private desk \u2014 joins by invite code only">\ud83d\udd12 invite-only</span>'
+      : (applied
+        ? '<span class="gb-applied" data-team="'+t.id+'" title="click to withdraw">applied \u00b7 pending \u2713</span>'
+        : (canApply
+          ? '<button class="tab gb-apply" data-team="'+t.id+'">apply</button>'
+          : '<a class="tab" href="index.html">sign in to apply</a>'));
+    return '<div class="gb-card">'+
+      '<div class="gb-top"><span class="dk-mini">\u25c6</span><a class="gb-name" href="desks.html?desk='+encodeURIComponent(t.slug)+'">'+esc(t.name)+(t.verified?' <span style="color:var(--accent)">\u2713</span>':'')+'</a></div>'+
+      '<div class="gb-stats">'+c.n+' analyst'+(c.n===1?'':'s')+(c.crowns?' \u00b7 '+c.crowns+' \u265b':'')+(c.boards?' \u00b7 '+c.boards+' boards':'')+'</div>'+
+      (c.bestU?'<div class="gb-champ">top analyst '+esc(names[c.bestU])+'</div>':'<div class="gb-champ" style="color:var(--faint)">open roster \u2014 be the first name on it</div>')+
+      '<div class="gb-act"><a class="gb-hall" href="desks.html?desk='+encodeURIComponent(t.slug)+'">the hall \u2192</a>'+act+'</div>'+
+      '<div class="gb-note" id="gbn-'+t.id+'"></div>'+
+      '</div>';
+  }).join('');
+  const startRow = DATA.meId
+    ? '<div class="gb-start"><input id="gbName" maxlength="40" placeholder="start a desk \u2014 name it (e.g. Wharton UG Finance)"><button class="tab on" id="gbCreate">start a desk</button>'+
+      '<span class="gb-or">or</span><input id="gbCode" maxlength="12" placeholder="invite code"><button class="tab" id="gbJoin">join</button><span class="gb-msg" id="gbMsg"></span></div>'
+    : '<div class="gb-start" style="color:var(--muted)"><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</div>';
+  return '<h3 class="section-title">The guild board \u00b7 find your desk</h3>'+
+    '<div style="grid-column:1/-1;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:-4px 0 2px">a desk is a private team room \u2014 shared boards, weekly quests from the staffer, a roster your cohort can see \u00b7 apply below, redeem an invite code, or start your own</div>'+
+    '<div class="gb-grid" style="grid-column:1/-1">'+cardHtml+'</div>'+
+    '<div style="grid-column:1/-1">'+startRow+'</div>';
+}
+function wireGuild(){
+  const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--warn)':'var(--accent)'; } };
+  document.querySelectorAll('.gb-apply').forEach(b=>b.onclick=()=>{
+    const host=document.getElementById('gbn-'+b.dataset.team); if(!host) return;
+    host.innerHTML='<input class="gb-notein" maxlength="140" placeholder="one line for the staffer (optional)">'+
+      '<button class="tab on gb-send">send</button>';
+    const send=host.querySelector('.gb-send');
+    send.onclick=async()=>{ send.disabled=true;
+      try{ const note=(host.querySelector('.gb-notein').value||'').trim()||null;
+        const {error}=await sb.rpc('apply_to_desk',{p_team:b.dataset.team, p_note:note});
+        if(error){ host.innerHTML='<span class="gb-msg" style="color:var(--warn)">'+esc(deskErrMsg(error))+'</span>'; return; }
+        if(DATA) DATA.myApps[b.dataset.team]=true;
+        renderAll();
+      }catch(e){ host.innerHTML='<span class="gb-msg" style="color:var(--warn)">something went wrong.</span>'; } };
+    const ni=host.querySelector('.gb-notein');
+    ni.onkeydown=e=>{ e.stopPropagation(); if(e.key==='Enter') send.click(); };
+    ni.focus();
+  });
+  document.querySelectorAll('.gb-applied').forEach(sp=>{ let armed=false; sp.onclick=async()=>{
+    if(!armed){ armed=true; sp.textContent='withdraw application?'; setTimeout(()=>{armed=false; sp.textContent='applied \u00b7 pending \u2713';},2600); return; }
+    try{ await sb.rpc('withdraw_application',{p_team:sp.dataset.team});
+      if(DATA) delete DATA.myApps[sp.dataset.team]; renderAll(); }catch(e){} }; });
+  const cr=document.getElementById('gbCreate');
+  if(cr) cr.onclick=async()=>{
+    const n=(document.getElementById('gbName').value||'').trim();
+    if(n.length<3){ say('gbMsg','give the desk a real name (3+ characters).',1); return; }
+    if(window.hkNameOk && !window.hkNameOk(n)){ say('gbMsg','that name won\u2019t fly \u2014 pick something you\u2019d put on a resume.',1); return; }
+    try{ const {error}=await sb.rpc('create_desk',{p_name:n, p_private:false});
+      if(error){ say('gbMsg',deskErrMsg(error),1); return; } load(); }catch(e){ say('gbMsg','something went wrong.',1); } };
+  const jn=document.getElementById('gbJoin');
+  if(jn) jn.onclick=async()=>{
+    const c=(document.getElementById('gbCode').value||'').trim();
+    if(!c){ say('gbMsg','paste the invite code from your staffer.',1); return; }
+    try{ const {error}=await sb.rpc('join_desk',{p_code:c});
+      if(error){ say('gbMsg',deskErrMsg(error),1); return; } load(); }catch(e){ say('gbMsg','something went wrong.',1); } };
+  ['gbName','gbCode'].forEach(id=>{ const el=document.getElementById(id); if(el) el.onkeydown=e=>e.stopPropagation(); });
+}
+
 /* r269: DESK STANDINGS — desk-vs-desk, the twin of the school panel. Always ranks the
    whole field (gUserStat); every row deep-links into that desk's hall. */
 function deskStandingsHtml(){
@@ -751,6 +865,199 @@ function deskStandingsHtml(){
   return '<div class="panel standings" style="margin-top:0"><h4>\u25c6 Desk Standings</h4><div class="st-list">'+body+'</div>'+
     '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">desks ranked by crowns (board #1s), then depth \u00b7 click a desk for its hall \u00b7 <a href="account.html#desk" style="color:var(--accent)">start or join a desk</a></div></div>';
 }
+/* r270: STAFFER CONTROLS — the manager's standalone screen (desks.html?manage=1).
+   Everything the captain runs lives here: invite link, application inbox, weekly
+   quests + program templates, roster with removals, the exit. account.html keeps
+   only create/join and a pointer over. */
+async function renderManage(root){
+  let d=null;
+  try{ const {data}=await sb.rpc('my_desk'); d=(data&&data[0])||null; }catch(e){}
+  if(!d){ root.innerHTML='<div class="standing cta" style="grid-column:1/-1">You’re not on a desk — <a href="desks.html">find one on the guild board</a>.</div>'; return; }
+  if(d.role!=='captain'){ root.innerHTML='<div class="standing cta" style="grid-column:1/-1">Only the staffer sees the controls — <a href="desks.html">back to your desk’s hall</a>.</div>'; return; }
+  const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--warn)':'var(--accent)'; } };
+  const lab={}; CH.forEach(c=>lab[c.key]=c.label||c.key);
+  root.innerHTML=
+    '<div style="grid-column:1/-1;font-family:var(--mono);font-size:12px;color:var(--muted);margin:-6px 0 4px">⚙ staffer controls for <b>'+esc(d.name)+'</b> · '+d.members+' analyst'+(d.members==1?'':'s')+' · <a href="desks.html" style="color:var(--accent)">← the hall</a></div>'+
+    '<div class="panel"><h4>invite link</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">the fast lane — anyone with the link joins instantly</div><div id="mgInvite"></div></div>'+
+    '<div class="panel"><h4>applications · the inbox</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">from the guild board — accept seats them, pass clears it</div><div id="mgApps"><div class="loading" style="padding:8px">checking…</div></div></div>'+
+    '<div class="panel" style="grid-column:1/-1"><h4>this week’s quests</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">up to 3 drills, optional targets — they show in every analyst’s picker and on the hall</div><div id="mgAsg"></div></div>'+
+    '<div class="panel" style="grid-column:1/-1"><h4>the roster</h4><div id="mgRoster"></div></div>'+
+    '<div class="panel" style="grid-column:1/-1"><h4>the exit</h4><div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px">Leaving hands the desk to the longest-tenured analyst; if you’re the last one out, the desk dissolves.</div><button class="tab" id="mgLeave">leave the desk</button><span class="gb-msg" id="mgLeaveMsg" style="margin-left:10px"></span></div>';
+  // ---- invite ----
+  function renderInvite(code){
+    const inv=document.getElementById('mgInvite'); if(!inv) return;
+    inv.innerHTML = code
+      ? '<div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:12px"><code id="mgLink" style="background:var(--surface2);border:1px solid var(--line);border-radius:7px;padding:5px 9px">https://www.hotkey.gg/?desk='+esc(code)+'</code><button class="tab" id="mgCopy">copy</button><button class="tab" id="mgRotate" title="new code — old invite links stop working">rotate</button></div><div class="gb-msg" id="mgInvMsg" style="margin-top:6px"></div>'
+      : '<div style="font-family:var(--mono);font-size:12px;color:var(--muted)">no code available</div>';
+    const cp=document.getElementById('mgCopy');
+    if(cp) cp.onclick=async()=>{ try{ await navigator.clipboard.writeText(document.getElementById('mgLink').textContent);
+      say('mgInvMsg','link copied — drop it in the group chat.'); }catch(e){ say('mgInvMsg','copy failed — select the link and copy it.',1); } };
+    let armed=false; const rt=document.getElementById('mgRotate');
+    if(rt) rt.onclick=async()=>{
+      if(!armed){ armed=true; rt.textContent='rotate — old links die'; setTimeout(()=>{armed=false; rt.textContent='rotate';},2600); return; }
+      try{ const {data,error}=await sb.rpc('rotate_invite');
+        if(error){ say('mgInvMsg',deskErrMsg(error),1); return; }
+        renderInvite(data||''); say('mgInvMsg','new code minted — the old invite links are dead.');
+      }catch(e){ say('mgInvMsg','something went wrong.',1); } };
+  }
+  // ---- applications inbox ----
+  async function renderApps(){
+    const host=document.getElementById('mgApps'); if(!host) return;
+    let rows=null;
+    try{ const {data,error}=await sb.rpc('desk_applications'); if(error) throw error; rows=data||[]; }
+    catch(e){ host.innerHTML='<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.7">applications aren’t enabled on the server yet — the invite link still works.</div>'; return; }
+    if(!rows.length){ host.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--muted)">no applications waiting — the guild board sends them here.</div>'; return; }
+    const days=x=>Math.max(0,Math.floor((Date.now()-new Date(x))/86400000));
+    host.innerHTML=rows.map(r=>'<div class="mg-app"><span class="mg-app-nm" data-uid="'+r.user_id+'">'+esc(r.handle||('analyst-'+String(r.user_id).slice(0,4)))+'</span>'+
+      (r.note?'<span class="mg-app-note">“'+esc(r.note)+'”</span>':'')+
+      '<span class="mg-app-age">'+(days(r.created_at)===0?'today':days(r.created_at)+'d ago')+'</span>'+
+      '<span class="mg-app-act"><button class="tab on mg-ok" data-u="'+r.user_id+'">accept</button><button class="tab mg-no" data-u="'+r.user_id+'">pass</button></span></div>').join('')+
+      '<div class="gb-msg" id="mgAppMsg"></div>';
+    host.querySelectorAll('.mg-ok,.mg-no').forEach(b=>b.onclick=async()=>{ b.disabled=true;
+      try{ const {error}=await sb.rpc('decide_application',{p_user:b.dataset.u, p_accept:b.classList.contains('mg-ok')});
+        if(error){ say('mgAppMsg',deskErrMsg(error),1); b.disabled=false; return; }
+        renderApps(); }catch(e){ say('mgAppMsg','something went wrong.',1); b.disabled=false; } });
+  }
+  // ---- quests + program templates (ported from account.html r130/r149) ----
+  const MG_PROGRAMS={
+    intern0:{name:'Intern week 0', pitch:'zero to desk-ready — movement, formatting, first formulas, find-and-fix', weeks:[
+      {note:'get moving, no mouse',        keys:['navigation','copyover','saves']},
+      {note:'desk-standard formatting',    keys:['housestyle','format','blue']},
+      {note:'first formulas',              keys:['margin','growth','foot']},
+      {note:'find it and fix it',          keys:['modeltour','audit','triage']}]},
+    bootcamp:{name:'First-year bootcamp', pitch:'the modeling core — clean-up, functions, schedules, statements', weeks:[
+      {note:'clean-up week',               keys:['housestyle','editfix','pastes']},
+      {note:'function week',               keys:['percent','sumif','lookup']},
+      {note:'schedule week',               keys:['schedule','debtsched','nwcsched']},
+      {note:'statement week',              keys:['cfslink','bsbuild','threestmt']}]},
+    speed:{name:'Speed weeks', pitch:'PB-chase under par-based bars, basics to models', mult:1.5, weeks:[
+      {note:'speed: the basics',           keys:['navigation','format','margin']},
+      {note:'speed: the sheet',            keys:['foot','percent','series']},
+      {note:'speed: data + lookups',       keys:['sort','lookup','sumif']},
+      {note:'speed: the models',           keys:['dcf','waterfall','lbo']}]}
+  };
+  let mgProgArmed=false;
+  async function renderQuests(){
+    const host=document.getElementById('mgAsg'); if(!host) return;
+    let rows=[];
+    try{ const {data}=await sb.from('team_assignments').select('challenge,target_ms,note,created_at,expires_at')
+      .eq('team_id', d.team_id).gt('expires_at', new Date().toISOString()).order('created_at'); rows=data||[]; }catch(e){}
+    const days=x=>Math.max(1,Math.ceil((new Date(x)-Date.now())/86400000));
+    let h= rows.length? rows.map(r=>'<div class="mg-q"><span><b>'+esc(lab[r.challenge]||r.challenge)+'</b>'+(r.target_ms?' · under '+(r.target_ms/1000)+'s':'')+(r.note?' · <span style="color:var(--muted)">'+esc(r.note)+'</span>':'')+' <span style="color:var(--faint)">· '+days(r.expires_at)+'d left</span></span><button class="tab mg-qdel" data-k="'+esc(r.challenge)+'">clear</button></div>').join('')
+      : '<div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:4px">nothing pinned this week.</div>';
+    const opts=CH.map(c=>'<option value="'+c.key+'">'+esc(c.label)+'</option>').join('');
+    h+='<div class="mg-pin"><input id="mgQKey" list="mgQList" placeholder="drill — type to search"><datalist id="mgQList">'+opts+'</datalist>'+
+      '<input id="mgQTgt" type="number" min="1" max="3600" step="1" placeholder="target s (optional)">'+
+      '<input id="mgQNote" maxlength="120" placeholder="note for the desk (optional)">'+
+      '<button class="tab on" id="mgQAdd">pin it</button></div><div class="gb-msg" id="mgQMsg"></div>'+
+      '<div style="font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:14px">program templates — a 4-week quest sequence, pinned one click a week</div><div id="mgProg"></div>';
+    host.innerHTML=h;
+    host.querySelectorAll('input').forEach(el=>el.onkeydown=e=>e.stopPropagation());
+    host.querySelectorAll('.mg-qdel').forEach(b=>b.onclick=async()=>{ try{
+      const {error}=await sb.rpc('clear_assignment',{p_challenge:b.dataset.k});
+      if(error){ say('mgQMsg',deskErrMsg(error),1); return; } renderQuests(); }catch(e){ say('mgQMsg','something went wrong.',1); } });
+    const add=document.getElementById('mgQAdd');
+    if(add) add.onclick=async()=>{
+      const k=(document.getElementById('mgQKey').value||'').trim().toLowerCase();
+      if(!lab[k]){ say('mgQMsg','pick a real drill from the list.',1); return; }
+      const tv=parseFloat(document.getElementById('mgQTgt').value);
+      try{ const {error}=await sb.rpc('set_assignment',{p_challenge:k,
+          p_target_ms:(isFinite(tv)&&tv>0)?Math.round(tv*1000):null,
+          p_note:(document.getElementById('mgQNote').value||'').trim()||null});
+        if(error){ say('mgQMsg',deskErrMsg(error),1); return; } renderQuests();
+      }catch(e){ say('mgQMsg','something went wrong.',1); } };
+    renderProgramsMg(rows);
+  }
+  function renderProgramsMg(liveRows){
+    const w=document.getElementById('mgProg'); if(!w) return;
+    const skey='hk_prog_'+d.team_id;
+    let st=null; try{ st=JSON.parse(localStorage.getItem(skey)||'null'); }catch(e){}
+    if(st && !MG_PROGRAMS[st.tpl]) st=null;
+    const save=v=>{ try{ v?localStorage.setItem(skey,JSON.stringify(v)):localStorage.removeItem(skey); }catch(e){} };
+    const pinWeek=async(tpl, weekIdx)=>{
+      const P=MG_PROGRAMS[tpl], wkDef=P.weeks[weekIdx];
+      if(!wkDef) return;
+      if(liveRows.length && !mgProgArmed){ mgProgArmed=true;
+        say('mgQMsg','this replaces the current pins — click again to confirm.',1);
+        setTimeout(()=>{mgProgArmed=false;},3000); return; }
+      mgProgArmed=false;
+      try{
+        for(const r of liveRows){ const {error}=await sb.rpc('clear_assignment',{p_challenge:r.challenge});
+          if(error){ say('mgQMsg',deskErrMsg(error),1); return; } }
+        const PARS=window.HOTKEY_PARS||{};
+        for(const k of wkDef.keys){
+          if(!lab[k]) continue;   // catalog drift guard
+          const tgt=P.mult&&PARS[k] ? Math.round(PARS[k]*P.mult)*1000 : null;
+          const {error}=await sb.rpc('set_assignment',{p_challenge:k, p_target_ms:tgt,
+            p_note:P.name+' w'+(weekIdx+1)+': '+wkDef.note});
+          if(error){ say('mgQMsg',deskErrMsg(error),1); return; }
+        }
+        save({tpl:tpl, week:weekIdx+1});   // .week = weeks completed
+        if(window.hkEvent) window.hkEvent('program_pin',{tpl:tpl, week:weekIdx+1});
+        await renderQuests();   // re-render first — say() after, or the message gets wiped
+        say('mgQMsg','week '+(weekIdx+1)+' pinned — '+wkDef.keys.map(k=>lab[k]||k).join(', ')+'.');
+      }catch(e){ say('mgQMsg','something went wrong.',1); }
+    };
+    if(st){
+      const P=MG_PROGRAMS[st.tpl], nxt=st.week;   // next week INDEX to pin (0-based = weeks done)
+      let h='<div style="font-family:var(--mono);font-size:12px;margin-top:6px"><b>'+esc(P.name)+'</b> — '+
+        P.weeks.map((wkDef,i)=>'<span style="color:'+(i<st.week?'var(--accent)':'var(--muted)')+'">w'+(i+1)+(i<st.week?' ✓':'')+'</span>').join(' · ')+'</div>';
+      if(nxt<P.weeks.length){
+        h+='<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:4px 0">next — <b>week '+(nxt+1)+': '+esc(P.weeks[nxt].note)+'</b> · '+
+          P.weeks[nxt].keys.map(k=>esc(lab[k]||k)).join(', ')+(P.mult?' (targets: par × '+P.mult+')':'')+'</div>'+
+          '<div style="display:flex;gap:10px;align-items:center;margin-top:4px">'+
+          '<button class="tab mg-prog-pin" data-w="'+nxt+'">pin week '+(nxt+1)+'</button>'+
+          '<a class="mg-prog-drop" style="cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--faint)">abandon program</a></div>';
+      } else {
+        h+='<div style="font-family:var(--mono);font-size:11.5px;color:var(--accent);margin:4px 0">program complete — all 4 weeks pinned. Run it back or pick another.</div>'+
+          '<a class="mg-prog-drop" style="cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--faint)">clear program</a>';
+      }
+      w.innerHTML=h;
+      w.querySelectorAll('.mg-prog-pin').forEach(b=>b.onclick=()=>pinWeek(st.tpl, parseInt(b.dataset.w,10)));
+      const dr=w.querySelector('.mg-prog-drop'); if(dr) dr.onclick=()=>{ save(null); renderProgramsMg(liveRows); };
+    } else {
+      w.innerHTML=Object.entries(MG_PROGRAMS).map(([id,P])=>
+        '<div style="display:flex;gap:10px;align-items:baseline;margin-top:6px;font-family:var(--mono);font-size:12px">'+
+        '<button class="tab mg-prog-start" data-t="'+id+'" style="white-space:nowrap">'+esc(P.name)+'</button>'+
+        '<span style="font-size:11px;color:var(--muted)">'+esc(P.pitch)+'</span></div>').join('');
+      w.querySelectorAll('.mg-prog-start').forEach(b=>b.onclick=()=>{ save({tpl:b.dataset.t, week:0}); renderProgramsMg(liveRows); });
+    }
+  }
+  // ---- roster with removals (RLS lets the captain delete membership rows) ----
+  function renderRoster(){
+    const host=document.getElementById('mgRoster'); if(!host||!DATA) return;
+    const ids=(window.__deskMembers||[]).filter(m=>m.team_id===d.team_id).map(m=>m.user_id);
+    const stat=DATA.gUserStat||DATA.userStat; const WEEK=7*86400000, now2=Date.now();
+    const rows=ids.map(id=>{ const st=stat[id]||{att:0,crowns:0};
+      const wk=DATA.runs.filter(r=>r.user_id===id && new Date(r.created_at||0).getTime()>now2-WEEK).length;
+      const t=st.att?tierOf(st.avg,st.att,st.wsum):window.HK_RANK.tierOf(null,0);
+      return {id:id, nm:DATA.names[id], t:t, att:st.att||0, crowns:st.crowns||0, wk:wk}; })
+      .sort((a,b)=> (b.id===DATA.meId?1:0)-(a.id===DATA.meId?1:0) || b.wk-a.wk || b.att-a.att);
+    host.innerHTML='<div class="dk-roster" style="padding:0">'+
+      '<div class="dk-r hd"><span>analyst</span><span>rank</span><span>boards</span><span>crowns</span><span>this wk</span><span></span></div>'+
+      rows.map(m=>'<div class="dk-r'+(m.wk===0?' idle':'')+'">'+
+        '<span class="nm" data-uid="'+m.id+'">'+esc(m.nm)+(m.id===DATA.meId?' <b class="you">(you · staffer)</b>':'')+'</span>'+
+        '<span class="tr">'+(window.rankEmblem?window.rankEmblem(m.t.name,16,m.t.bucket):'')+' '+esc(m.t.name)+'</span>'+
+        '<span>'+m.att+'</span><span>'+(m.crowns||'·')+'</span><span class="wk">'+m.wk+'</span>'+
+        '<span>'+(m.id===DATA.meId?'':'<button class="tab mg-kick" data-u="'+m.id+'" data-n="'+esc(m.nm)+'">remove</button>')+'</span></div>').join('')+
+      '</div><div class="gb-msg" id="mgRosMsg" style="margin-top:6px"></div>';
+    host.querySelectorAll('.mg-kick').forEach(b=>{ let armed=false; b.onclick=async()=>{
+      if(!armed){ armed=true; b.textContent='remove '+b.dataset.n+'?'; setTimeout(()=>{armed=false; b.textContent='remove';},2800); return; }
+      try{ const {error}=await sb.from('team_members').delete().eq('team_id',d.team_id).eq('user_id',b.dataset.u);
+        if(error){ say('mgRosMsg',deskErrMsg(error),1); return; }
+        window.__deskMembers=(window.__deskMembers||[]).filter(m=>!(m.team_id===d.team_id&&m.user_id===b.dataset.u));
+        say('mgRosMsg','removed — they can re-apply or re-join with a code.'); renderRoster();
+      }catch(e){ say('mgRosMsg','something went wrong.',1); } }; });
+  }
+  renderInvite(d.invite_code||'');
+  renderApps(); renderQuests(); renderRoster();
+  let lArmed=false; const lv=document.getElementById('mgLeave');
+  if(lv) lv.onclick=async()=>{
+    if(!lArmed){ lArmed=true; lv.textContent='click again to confirm'; setTimeout(()=>{lArmed=false; lv.textContent='leave the desk';},2600); return; }
+    try{ const {error}=await sb.rpc('leave_desk'); if(error){ say('mgLeaveMsg',deskErrMsg(error),1); return; }
+      location.href='desks.html'; }catch(e){ say('mgLeaveMsg','something went wrong.',1); } };
+}
+
 function browserHtml(){
   const {perDrill,meId,myTeam,teamOnly}=DATA;
   const tabs=[['drills','\u2328 drills'],['marathon','\u23f1 marathon'],['rapidfire','\u26a1 rapid-fire']];
@@ -788,6 +1095,9 @@ function pageView(){
      window.LB_PAGE='teams'; leaderboard.html stays the clean overview. */
   return window.LB_PAGE || 'overview';
 }
+function subView(){
+  try{ return new URLSearchParams(location.search).get('manage') ? 'manage' : null; }catch(e){ return null; }
+}
 // legacy deep links (leaderboard.html?view=teams / ?desk=slug) land on the new page
 try{ const q=new URLSearchParams(location.search);
   if(pageView()==='overview' && (q.get('view')==='teams' || q.get('desk')))
@@ -799,10 +1109,16 @@ function renderAll(){
   if(pageView()==='teams'){
     /* r269: the standalone Desks & Schools page — your desk's hall on top (injected as
        #deskBanner above this root), then field-wide standings, then desk-only boards. */
+    /* r270: ?manage=1 is the staffer's screen; deskless players get the guild board */
+    if(subView()==='manage'){
+      if(h1) h1.textContent='Staffer controls';
+      root.innerHTML='<div class="loading">opening the manager\u2026</div>';
+      renderManage(root);
+      return;
+    }
     if(h1 && DATA.viewDesk) h1.textContent='\u25c6 '+DATA.viewDesk.name;
     root.innerHTML =
-      (!DATA.viewDesk && DATA.meId ? '<div class="standing cta" style="grid-column:1/-1">A <b>desk</b> is your team\u2019s private room \u2014 shared boards, weekly quests from the staffer, and a roster your cohort can see. <a href="account.html#desk">Start one or join with a code \u2192</a></div>' : '')+
-      (!DATA.meId ? '<div class="standing cta" style="grid-column:1/-1"><a href="index.html">Sign in</a> to join a desk and fly your school\u2019s colors \u2014 the standings below are live.</div>' : '')+
+      (!DATA.viewDesk ? guildHtml() : '')+
       '<h3 class="section-title">Standings \u00b7 the cohorts</h3>'+
       '<div class="featured" style="grid-column:1/-1;align-items:start;margin-bottom:0">'+deskStandingsHtml()+schoolStandingsHtml()+'</div>'+
       '<div style="grid-column:1/-1;min-width:0">'+rosterHtml()+'</div>'+
@@ -816,7 +1132,7 @@ function renderAll(){
         '<a href="desks.html" style="float:right;font-size:11px;color:var(--accent);text-decoration:none">\ud83c\udf93 schools & desks \u2192</a></h3>'+
       '<div class="browse" style="grid-column:1/-1">'+browserHtml()+'</div>';
   }
-  wire();
+  wire(); wireGuild();
   document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; renderAll(); });
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
