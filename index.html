@@ -9942,7 +9942,9 @@ let HK_MAC=(function(){ try{
 try{ window.HK_MAC=HK_MAC; }catch(e){}
 function hkSetPlatform(mac){
   HK_MAC=!!mac; try{ window.HK_MAC=HK_MAC; }catch(e){}
-  try{ localStorage.setItem('hk_platform', mac?'mac':'win'); }catch(e){}
+  try{ localStorage.setItem('hk_platform', mac?'mac':'win');
+    localStorage.removeItem('hk_ref_mac');                 // reference page follows a fresh pick
+  }catch(e){}
   try{ const mb=$('macBtn'); if(mb){ mb.style.display=HK_MAC?'':'none';
     if(HK_MAC) mb.onclick=function(){ if(window.hkMacPopup) window.hkMacPopup(); }; } }catch(e){}
   try{ updateChecklist(); render(); }catch(e){}
