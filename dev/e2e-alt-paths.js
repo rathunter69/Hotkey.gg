@@ -70,10 +70,12 @@ const ALTS = [
       {sel:o.totRng, keys:[{key:'c',ctrl:true}]},
       {sel:o.deck, keys:[{key:'Alt'},L('e'),L('s'),L('v'),{key:'Enter'}]},
     ]; }` },
-  { key: 'filldr', name: '2D block FIRST (recalc closes it), ribbon fills, then sum + pull', moves: `C => { const o=C._o; return [
+  { key: 'filldr', name: '2D block FIRST (recalc closes it), ribbon fills, FY column down, then sum + pull', moves: `C => { const o=C._o; return [
       {sel:o.mix0, keys:[...T('='+o.mixF),{key:'Enter'}]},
       {sel:'B11:B13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:o.blk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.fy0, keys:[...T('=SUM('+o.fyArg+')'),{key:'Enter'}]},
+      {sel:o.fyRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:o.sum0, keys:[...T('=SUM(B5:B8)'),{key:'Enter'}]},
       {sel:o.sumRng, keys:[{key:'r',ctrl:true}]},
       {sel:o.pull0, keys:[...T('='+o.feed0),{key:'Enter'}]},

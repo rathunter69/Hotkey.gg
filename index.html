@@ -3342,19 +3342,22 @@ const CHALLENGES = {
     }
   },
   filldr:{
-    name:'Fill', label:'Fill down, fill right', par:27, parKeys:25,
+    name:'Fill', label:'Fill down, fill right', par:37, parKeys:37,
     aha:'Ctrl+D fills down, Ctrl+R fills right — one seed cell builds the whole table.',
     prompt:'An empty quarterly buildout and a feed row from the data team. Three moves fill the page: PULL the feed (reference it once, fill across), FOOT it (write one SUM, fill it across), then the real trick \u2014 one mixed-anchor formula and a 2D fill: right THEN down, and twelve %-of-revenue cells build themselves. This is how a table gets filled without a table\u2019s worth of typing.',
-    req(){ const o=this._o; return '<em>'+o.pull0+'</em> <em>='+o.feed0+'</em> \u00b7 fill '+o.pullRng+' \u2192 \u00b7 <em>'+o.sum0+'</em> <em>=SUM('+o.sumArg+')</em> \u00b7 fill '+o.sumRng+' \u2192 \u00b7 <em>'+o.mix0+'</em> <em>='+o.mixF+'</em> \u00b7 select '+o.blkRow+' <em>ctrl+r</em> \u00b7 select '+o.blk+' <em>ctrl+d</em>'; },
+    req(){ const o=this._o; return '<em>'+o.pull0+'</em> <em>='+o.feed0+'</em> \u00b7 fill '+o.pullRng+' \u2192 \u00b7 <em>'+o.fy0+'</em> <em>=SUM('+o.fyArg+')</em> \u00b7 fill '+o.fyRng+' \u2193 \u00b7 <em>'+o.sum0+'</em> <em>=SUM('+o.sumArg+')</em> \u00b7 fill '+o.sumRng+' \u2192 \u00b7 <em>'+o.mix0+'</em> <em>='+o.mixF+'</em> \u00b7 select '+o.blkRow+' <em>ctrl+r</em> \u00b7 select '+o.blk+' <em>ctrl+d</em>'; },
     guide(){ const o=this._o; return [
-      'PULL: at '+o.pull0+' type <kbd>='+o.feed0+'</kbd> <kbd>\u21b5</kbd> \u2014 reference the feed row \u00b7 select '+o.pullRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 four quarters pulled in two moves',
-      'FOOT: at '+o.sum0+' write <kbd>=SUM('+o.sumArg+')</kbd> <kbd>\u21b5</kbd> \u00b7 select '+o.sumRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 EBITDA all the way across',
-      'THE 2D FILL: at '+o.mix0+' type <kbd>='+o.mixF+'</kbd> \u2014 the $-lock on row '+o.pullR+' is the whole trick \u00b7 select '+o.blkRow+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u00b7 then '+o.blk+' \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 twelve live ratios from one cell',
+      'PULL across: at '+o.pull0+' type <kbd>='+o.feed0+'</kbd> <kbd>\u21b5</kbd> \u2014 reference the feed row \u00b7 select '+o.pullRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 four quarters pulled in two moves',
+      'FY total, down the column: at '+o.fy0+' type <kbd>=SUM('+o.fyArg+')</kbd> <kbd>\u21b5</kbd> \u2014 the full-year revenue \u00b7 select '+o.fyRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 one formula foots every line for the year',
+      'FOOT across: at '+o.sum0+' write <kbd>=SUM('+o.sumArg+')</kbd> <kbd>\u21b5</kbd> \u00b7 select '+o.sumRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 EBITDA all the way across, the FY column included',
+      'THE 2D FILL: at '+o.mix0+' type <kbd>='+o.mixF+'</kbd> \u2014 the $-lock on row '+o.pullR+' is the whole trick \u00b7 select '+o.blkRow+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u00b7 then '+o.blk+' \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 fifteen live ratios from one cell',
     ]; },
-    targets(){ const o=this._o; return [o.pullRng, o.sumRng, o.blk]; },
+    targets(){ const o=this._o; return [o.pullRng, o.fyRng, o.sumRng, o.blk]; },
     demo(){ const o=this._o; return [
       {sel:o.pull0, keys:[...T('='+o.feed0), Kb.enter]},
       {sel:o.pullRng, keys:[{key:'r',ctrl:true}]},
+      {sel:o.fy0, keys:[...T('=SUM('+o.fyArg+')'), Kb.enter]},
+      {sel:o.fyRng, keys:[{key:'d',ctrl:true}]},
       {sel:o.sum0, keys:[...T('=SUM('+o.sumArg+')'), Kb.enter]},
       {sel:o.sumRng, keys:[{key:'r',ctrl:true}]},
       {sel:o.mix0, keys:[...T('='+o.mixF), Kb.enter]},
@@ -3364,12 +3367,13 @@ const CHALLENGES = {
     build(){
       const cells={};
       cells['A1']={...blankCell(),value:codename()+' \u2014 quarterly buildout ($mm)',txt:true,bold:true};
-      ['Q1','Q2','Q3','Q4'].forEach((q,i)=>cells[colLetter(2+i)+2]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
+      ['Q1','Q2','Q3','Q4','FY'].forEach((q,i)=>cells[colLetter(2+i)+2]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
       cells['A3']={...blankCell(),value:'Revenue feed (data team)',txt:true};
       const feed=[];
       for(let i=0;i<4;i++){ const v=rnd(60,240)*5; feed.push(v);
         cells[colLetter(2+i)+3]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
       cells['A5']={...blankCell(),value:'Revenue',txt:true,bold:true};
+      for(let i=0;i<4;i++) cells[colLetter(2+i)+5]={...blankCell(),fmtStyle:'comma',decimals:0};   // pulled cells pre-formatted so the row reads consistent with the FY total
       const COSTS=[['COGS',35,45],['Opex',15,25],['D&A',5,10]];
       const costVals=[];
       COSTS.forEach(([n,lo,hi],j)=>{ const r=6+j;
@@ -3380,35 +3384,49 @@ const CHALLENGES = {
         costVals.push(row);
       });
       cells['A9']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      for(let i=0;i<4;i++) cells[colLetter(2+i)+9]={...blankCell(),fmtStyle:'comma',decimals:0,bt:true,bold:true};
+      for(let i=0;i<5;i++) cells[colLetter(2+i)+9]={...blankCell(),fmtStyle:'comma',decimals:0,bt:true,bold:true};   // incl the FY total at F9 (FOOT fills right into it)
+      for(let r=5;r<=8;r++) cells['F'+r]={...blankCell(),fmtStyle:'comma',decimals:0};   // FY column — player builds F5 then fills DOWN
       cells['A11']={...blankCell(),value:'% of revenue',txt:true,it:true};
       ['COGS %','Opex %','D&A %'].forEach((n,j)=>{ const r=11+j;
         if(j>0) cells['A'+r]={...blankCell(),value:n,txt:true,it:true};
-        for(let i=0;i<4;i++) cells[colLetter(2+i)+r]={...blankCell(),fmtStyle:'percent',decimals:1,it:true}; });
+        for(let i=0;i<5;i++) cells[colLetter(2+i)+r]={...blankCell(),fmtStyle:'percent',decimals:1,it:true}; });   // % block now spans the FY column too
       cells['A11'].value='COGS %';
       this._o={ feed:feed, costVals:costVals,
         pull0:'B5', feed0:'B3', pullRng:'B5:E5', pullR:5,
-        sum0:'B9', sumArg:'B5:B8', sumRng:'B9:E9',
-        mix0:'B11', mixF:'B6/B$5', blkRow:'B11:E11', blk:'B11:E13' };
-      return {ROWS:14, cells, active:{r:5,c:2}, sel:null, colW:{1:150,2:76,3:76,4:76,5:76}};
+        fy0:'F5', fyArg:'B5:E5', fyRng:'F5:F8',
+        sum0:'B9', sumArg:'B5:B8', sumRng:'B9:F9',
+        mix0:'B11', mixF:'B6/B$5', blkRow:'B11:F11', blk:'B11:F13' };
+      return {ROWS:14, cells, active:{r:5,c:2}, sel:null, colW:{1:150,2:76,3:76,4:76,5:76,6:76}};
     },
     checks(S){
       const o=this._o;
       const cel=k=>S.cells[k]||{};
+      const feedSum=o.feed.reduce((s,v)=>s+v,0);
+      const costSum=j=>o.costVals[j].reduce((s,v)=>s+v,0);
       const pullOk=[0,1,2,3].every(i=>{ const c=cel(colLetter(2+i)+5);
         return !!(c.formula && Math.abs((c.value||0)-o.feed[i])<0.5); });
-      const sumOk=[0,1,2,3].every(i=>{ const c=cel(colLetter(2+i)+9);
-        const want=o.feed[i]+o.costVals[0][i]+o.costVals[1][i]+o.costVals[2][i];
+      // FY column, filled DOWN: F5 = full-year revenue, F6:F8 = full-year costs
+      const fyOk=[5,6,7,8].every(r=>{ const c=cel('F'+r);
+        const want = r===5 ? feedSum : costSum(r-6);
         return !!(c.formula && /SUM/i.test(String(c.formula)) && Math.abs((c.value||0)-want)<0.5); });
-      const mixOk=(()=>{ for(let j=0;j<3;j++) for(let i=0;i<4;i++){
+      // FOOT across, now including the FY total at F9
+      const sumOk=[0,1,2,3,4].every(i=>{ const c=cel(colLetter(2+i)+9);
+        const want = i<4 ? (o.feed[i]+o.costVals[0][i]+o.costVals[1][i]+o.costVals[2][i])
+                         : (feedSum+costSum(0)+costSum(1)+costSum(2));
+        return !!(c.formula && /SUM/i.test(String(c.formula)) && Math.abs((c.value||0)-want)<0.5); });
+      // 2D % block now spans the FY column \u2014 one mixed-anchor cell fills a 3\u00d75 grid
+      const mixOk=(()=>{ for(let j=0;j<3;j++) for(let i=0;i<5;i++){
         const c=cel(colLetter(2+i)+(11+j));
-        const want=o.costVals[j][i]/o.feed[i];
+        const rev = i<4 ? o.feed[i] : feedSum;
+        const cost= i<4 ? o.costVals[j][i] : costSum(j);
+        const want=cost/rev;
         if(!c.formula || !String(c.formula).includes('$5') || Math.abs((c.value||0)-want)>1e-4) return false; }
         return true; })();
       return [
         {label:'PULL the feed \u2014 reference B3 once at B5, fill B5:E5 across', ok: pullOk},
-        {label:'FOOT it \u2014 one =SUM(B5:B8) at B9, filled across; costs already carry their sign', ok: sumOk},
-        {label:'fill the whole % block from ONE mixed-anchor cell \u2014 B11 right then down (B$5 holds)', ok: mixOk},
+        {label:'FY total DOWN the column \u2014 =SUM(B5:E5) at F5, fill F5:F8 down; every line foots for the year', ok: fyOk},
+        {label:'FOOT it \u2014 one =SUM(B5:B8) at B9, filled across B9:F9 (the FY total ties too)', ok: sumOk},
+        {label:'fill the whole % block from ONE mixed-anchor cell \u2014 B11 right then down, FY column included (B$5 holds)', ok: mixOk},
       ];
     }
   },
