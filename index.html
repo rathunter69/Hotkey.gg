@@ -136,12 +136,13 @@
   td.spill{overflow:visible; z-index:3}   /* r107: Excel-parity text spill (see render) */
   td.spill .sp{position:absolute; left:9px; top:0; bottom:0; display:flex; align-items:center;
     white-space:nowrap; overflow:hidden; pointer-events:none; text-align:left}
-  /* r261: when a spilling cell is the active/selected anchor, carry the outline + glow across the whole
-     spilled span instead of clipping it at the one-column anchor (the box should wrap the visible text) */
+  /* r261: a spilling cell that is the active/selected anchor carries its highlight across the WHOLE cells
+     the text spans — backgrounds snap to cell edges, never a partial cell (matches Excel's whole-cell fill).
+     The .sphi box paints the glow/outline; the text span then renders on top of it. */
   td.active.spill, td.sel.spill{outline:none; background:transparent}
-  td.active.spill .sp{left:0; padding-left:9px; box-sizing:border-box; overflow:visible;
-    outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow)}
-  td.sel.spill .sp{left:0; padding-left:9px; box-sizing:border-box; background:var(--accent-glow)}
+  td.spill .sphi{position:absolute; left:0; top:0; bottom:0; pointer-events:none}
+  td.active.spill .sphi{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow)}
+  td.sel.spill .sphi{background:var(--accent-glow)}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
   td.fill-blue{background:#9cc3e8 !important; color:#153c7a}   /* r160: #dbeafe was 1.05:1 vs paper sheets — invisible fill */
@@ -7645,11 +7646,14 @@ function render(){
         // at the first occupied cell (titles/labels stop getting amputated mid-word).
         const est=cell.value.length*6.9+20;   // label font ~13.5px Arial, avg glyph ~6.9px
         if(est>__ew[c]){
-          let spillW=__ew[c], cc=c+1;
-          while(cc<=COLS){ const n=get(r,cc); if(n && n.value!==null && n.value!=='') break; spillW+=__ew[cc]; cc++; }
-          if(spillW>__ew[c]){   // active/selected cells spill too — Excel draws the border around the anchor, text still runs
+          let spillW=__ew[c], cc=c+1, coveredW=__ew[c];   // coveredW snaps to WHOLE cells the text reaches
+          while(cc<=COLS){ const n=get(r,cc); if(n && n.value!==null && n.value!=='') break; spillW+=__ew[cc]; if(coveredW<est) coveredW+=__ew[cc]; cc++; }
+          if(spillW>__ew[c]){
             cls.push('spill');
-            txt='<span class="sp" style="max-width:'+(spillW-12)+'px">'+txt+'</span>';
+            // r261: when this spilling cell is the highlighted anchor, glow/outline covers the whole cells
+            // the text spans (no partial-cell backgrounds); the text then paints on top
+            const hi = (isActive || (inSel && S.sel)) ? '<span class="sphi" style="width:'+coveredW+'px"></span>' : '';
+            txt=hi+'<span class="sp" style="max-width:'+(spillW-12)+'px">'+txt+'</span>';
           }
         }
       }
