@@ -227,13 +227,17 @@
      Dim the page, cut a window around the cells the demo is editing, caption the step. */
   #demoSpot{position:fixed; z-index:24; pointer-events:none; display:none;
     border:2px solid var(--accent); border-radius:5px;
-    box-shadow:0 0 0 9999px color-mix(in srgb, #000 52%, transparent), 0 0 18px var(--accent-glow);
+    box-shadow:0 0 0 1px color-mix(in srgb, #fff 30%, transparent),
+      0 0 0 9999px color-mix(in srgb, #000 52%, transparent), 0 0 18px var(--accent-glow);
     transition:left .28s ease, top .28s ease, width .28s ease, height .28s ease}
   #demoSpotCap{position:fixed; z-index:26; pointer-events:none; display:none; max-width:420px;
-    font-family:var(--mono); font-size:12.5px; line-height:1.5; color:#f2f2f2;
-    background:rgba(18,20,25,.94); border:1px solid rgba(255,255,255,.14);
+    font-family:var(--mono); font-size:12.5px; line-height:1.5; color:var(--text);
+    background:var(--surface); border:1px solid var(--line);
+    box-shadow:0 4px 18px rgba(0,0,0,.35);
     padding:7px 12px; border-radius:8px; transition:left .28s ease, top .28s ease}
   #demoSpotCap b{color:var(--accent)}
+  #demoSpotCap kbd{font-family:inherit; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:5px; padding:0 5px}
   td.ttarget{outline:1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:-2px}
   /* r163: GHOST CURSOR - your PB run gliding through its recorded path. Warn-dashed
      so it reads apart from selection (accent) and ink borders; never catches input. */
@@ -11747,7 +11751,7 @@ function demoSpotTo(sel, stepN, total, keysLab, instant){
     sp.style.display='block'; cap.style.display='block';
     sp.style.left=L+'px'; sp.style.top=T+'px'; sp.style.width=(R-L)+'px'; sp.style.height=(B-T)+'px';
     cap.innerHTML='step <b>'+stepN+'</b>/'+total+' \u00b7 <b>'+escHtml(sel)+'</b>'+
-      (demoSpotCur.keys?' \u00b7 <kbd style="font-family:inherit;color:#e8e8dd">'+escHtml(demoSpotCur.keys)+'</kbd>':'');
+      (demoSpotCur.keys?' \u00b7 <kbd>'+escHtml(demoSpotCur.keys)+'</kbd>':'');
     const capY = (B+12+44>window.innerHeight) ? (T-46) : (B+12);
     cap.style.left=Math.max(10,L)+'px'; cap.style.top=capY+'px';
   }catch(e){}
