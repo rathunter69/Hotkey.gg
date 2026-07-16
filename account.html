@@ -117,7 +117,7 @@ async function load(){
   let prof={handle:'',team_code:null}, runs=[];
   try{
     const [p,r] = await Promise.all([
-      sb.from('profiles').select('handle,team_code,flair,show_school,school_tag').eq('id',me.id).single(),
+      sb.from('profiles').select('handle,team_code,flair,show_school,school_tag,digest_optout').eq('id',me.id).single(),
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
     ]);
     if(p.data) prof=p.data; runs=r.data||[];
@@ -172,6 +172,9 @@ async function load(){
 
     <div class="card"><h4>Data</h4>
       <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Your runs live on the server under this account. Local device data (PBs cache, streak, achievement flags) can be exported or cleared.</div>
+      <div class="rowline" style="margin-bottom:8px"><span class="k">weekly desk digest</span>
+        <label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="acDigest" ${prof.digest_optout?'':'checked'}> email me Monday desk standings &amp; quests</label></div>
       <button class="btn ghost" id="acExport">Export local data</button>
       <button class="btn ghost" id="acClearLocal" style="margin-left:8px">Clear local cache</button>
       <div class="msg" id="acDataMsg"></div>
@@ -239,6 +242,8 @@ async function load(){
     const {error}=await sb.auth.resetPasswordForEmail(me.email,{redirectTo:location.origin+'/index.html'});
     say('acPwMsg', error?('Could not send: '+error.message):'Reset link sent \u2014 check your inbox.', !!error);
   }catch(e){ say('acPwMsg','Could not send the reset email.',true); } };
+  const dg=document.getElementById('acDigest');
+  if(dg) dg.onchange=async()=>{ try{ await sb.from('profiles').update({digest_optout:!dg.checked}).eq('id',me.id); }catch(e){} };
   const ex=document.getElementById('acExport');
   if(ex) ex.onclick=()=>{ try{
     const dump={}; ['hotkey_pb','hotkey_streak','hotkey_solves','hk_ach_flags','hk_ach_seen','hk_xp_est','hk_runs_lite','hk_clears'].forEach(k=>dump[k]=localStorage.getItem(k));

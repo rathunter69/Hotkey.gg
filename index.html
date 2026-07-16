@@ -244,6 +244,13 @@
     box-shadow:0 0 0 1px color-mix(in srgb, #fff 30%, transparent),
       0 0 0 9999px color-mix(in srgb, #000 52%, transparent), 0 0 18px var(--accent-glow);
     transition:left .28s ease, top .28s ease, width .28s ease, height .28s ease}
+  #demoWatch{position:fixed; z-index:25; pointer-events:none; display:none;
+    border:2px dashed var(--warn); border-radius:5px;
+    box-shadow:0 0 14px rgba(217,164,65,.4);
+    transition:left .28s ease, top .28s ease, width .28s ease, height .28s ease}
+  #demoWatch::after{content:'watch'; position:absolute; top:-19px; right:-2px;
+    font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.08em;
+    color:var(--warn); text-shadow:0 1px 4px rgba(0,0,0,.6)}
   #demoSpotCap{position:fixed; z-index:26; pointer-events:none; display:none; max-width:420px;
     font-family:var(--mono); font-size:12.5px; line-height:1.5; color:var(--text);
     background:var(--surface); border:1px solid var(--line);
@@ -1537,6 +1544,11 @@ const PRELAUNCH_LOCK    = true;
 const ev=(n,m)=>{ try{ (window.hkEvent||function(){})(n,m); }catch(e){} };   // r139: funnel telemetry (nav.js hkEvent)
 const INVITE_AUTO_CODE  = 'HAGS'; // silently redeemed for every session — keeps the members table consistent
 window.NAV_ACTIVE='trainer';
+// r277: one-click digest unsubscribe from the email footer (?digest=off)
+try{ if(new URLSearchParams(location.search).get('digest')==='off'){
+  setTimeout(async()=>{ try{ if(window.sb){ await window.sb.rpc('digest_unsubscribe');
+    alert('Weekly digest off \u2014 re-enable it anytime from your account page.'); } }catch(e){} }, 1500);
+} }catch(e){}
 const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.sb = sb;   // shared nav (nav.js) drives the nav bar, user menu, and player card
@@ -3258,11 +3270,11 @@ const CHALLENGES = {
     targets(){ const o=this._o; return [o.stagedRng, 'A'+o.junkRow0, 'B'+o.totRow0, 'B'+(o.predRow0+1)]; },
     demo(){ const o=this._o;
       const pr=o.predRow0, jr=o.junkRow0, insAt=pr+1;
-      const steps=[{sel:'A'+insAt, keys:[{key:' ',shift:true}, Kb.alt,{key:'h'},{key:'i'},{key:'r'}]}];
+      const steps=[{sel:'A'+insAt, keys:[{key:' ',shift:true}, Kb.alt,{key:'h'},{key:'i'},{key:'r'}], watch:'@A~^Total:B'}];
       steps.push({sel:o.stagedRng, keys:[Kb.copy]});
       steps.push({sel:'A'+insAt, keys:[Kb.paste]});
       const jr2 = jr + (jr>=insAt?1:0);
-      steps.push({sel:'A'+jr2, keys:[{key:' ',shift:true}, Kb.alt,{key:'h'},{key:'d'},{key:'r'}]});
+      steps.push({sel:'A'+jr2, keys:[{key:' ',shift:true}, Kb.alt,{key:'h'},{key:'d'},{key:'r'}], watch:'@A~^Total:B'});
       const insAt2 = insAt - (jr2<insAt?1:0);   // the junk delete pulls the pasted row up when it sat above
       steps.push({sel:'B'+insAt2, keys:[Kb.alt,{key:'h'},{key:'k'}]});
       steps.push({sel:'B'+insAt2, keys:[Kb.alt,{key:'h'},{key:'f'},{key:'c'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]});
@@ -6791,11 +6803,11 @@ const CHALLENGES = {
         {sel:'C13:F13', keys:[Kb.fillR]},
         {sel:'C18', keys:[...T('=IF($B$3=C$17,$'+c+'$12,C18)'), Kb.enter]},
         {sel:'C18:E18', keys:[Kb.fillR]},
-        {sel:'B3', keys:[...T('1'), Kb.enter]},
-        {sel:'B3', keys:[...T('2'), Kb.enter]},
-        {sel:'B3', keys:[...T('3'), Kb.enter]},
-        {sel:'B6', keys:[...T(m+'%'), Kb.enter]},   // the deal-team revision
-        {sel:'B3', keys:[...T('1'), Kb.enter]},      // revisit Base to refresh the frozen snapshot
+        {sel:'B3', keys:[...T('1'), Kb.enter], watch:'C18:E18'},
+        {sel:'B3', keys:[...T('2'), Kb.enter], watch:'C18:E18'},
+        {sel:'B3', keys:[...T('3'), Kb.enter], watch:'C18:E18'},
+        {sel:'B6', keys:[...T(m+'%'), Kb.enter], watch:'C18:E18'},   // the deal-team revision — snapshot stays FROZEN
+        {sel:'B3', keys:[...T('1'), Kb.enter], watch:'C18:E18'},      // revisit Base to refresh the frozen snapshot
       ];
     },
     build(){
@@ -11749,12 +11761,28 @@ function demoSpotKeys(keys){
     return lab.length>72 ? lab.slice(0,69)+'\u2026' : lab;
   }catch(e){ return ''; }
 }
-function demoSpotTo(sel, stepN, total, keysLab, instant){
+/* r277 (#28): steps can declare watch:'B10' or the self-healing '@A~^Total:B'
+   ("ring column B on the row whose column-A label matches /^Total/i") — live-formula
+   payoffs (a SUM re-tying) get celebrated instead of hidden by the dim. */
+function demoWatchResolve(spec){
+  try{
+    if(!spec) return null;
+    if(spec[0]!=='@') return resolveRange(spec);
+    const m=spec.match(/^@([A-Z])~(.+):([A-Z]+)$/); if(!m) return null;
+    const rx=new RegExp(m[2],'i');
+    for(let r=1;r<=(S.ROWS||30);r++){
+      const cell=S.cells[m[1]+r];
+      if(cell && cell.value!=null && rx.test(String(cell.value))) return resolveRange(m[3]+r);
+    }
+    return null;
+  }catch(e){ return null; }
+}
+function demoSpotTo(sel, stepN, total, keysLab, instant, watch){
   try{
     const rng=resolveRange(sel); if(!rng) return;
     const a=demoSpotCellTD(rng.r1,rng.c1), b=demoSpotCellTD(rng.r2,rng.c2);
     if(!a||!b) return;
-    demoSpotCur={sel:sel, stepN:stepN, total:total, keys:keysLab||''};
+    demoSpotCur={sel:sel, stepN:stepN, total:total, keys:keysLab||'', watch:watch||null};
     const ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
     const L=Math.min(ra.left,rb.left)-4, T=Math.min(ra.top,rb.top)-4;
     const R=Math.max(ra.right,rb.right)+4, B=Math.max(ra.bottom,rb.bottom)+4;
@@ -11766,6 +11794,19 @@ function demoSpotTo(sel, stepN, total, keysLab, instant){
     sp.style.left=L+'px'; sp.style.top=T+'px'; sp.style.width=(R-L)+'px'; sp.style.height=(B-T)+'px';
     cap.innerHTML='step <b>'+stepN+'</b>/'+total+' \u00b7 <b>'+escHtml(sel)+'</b>'+
       (demoSpotCur.keys?' \u00b7 <kbd>'+escHtml(demoSpotCur.keys)+'</kbd>':'');
+    // the watch ring — independent element, above the dim, self-healing coordinates
+    let wt=$('demoWatch');
+    if(!wt){ wt=document.createElement('div'); wt.id='demoWatch'; document.body.appendChild(wt); }
+    const wr=watch?demoWatchResolve(watch):null;
+    const wa=wr&&demoSpotCellTD(wr.r1,wr.c1), wb=wr&&demoSpotCellTD(wr.r2,wr.c2);
+    if(wa&&wb){
+      const r1=wa.getBoundingClientRect(), r2=wb.getBoundingClientRect();
+      wt.style.transition = instant ? 'none' : '';
+      wt.style.display='block';
+      wt.style.left=(Math.min(r1.left,r2.left)-3)+'px'; wt.style.top=(Math.min(r1.top,r2.top)-3)+'px';
+      wt.style.width=(Math.max(r1.right,r2.right)-Math.min(r1.left,r2.left)+6)+'px';
+      wt.style.height=(Math.max(r1.bottom,r2.bottom)-Math.min(r1.top,r2.top)+6)+'px';
+    } else wt.style.display='none';
     let capY = (B+12+44>window.innerHeight) ? (T-46) : (B+12);
     try{ // dodge the fx-hint popup — it pops under the cell on formula steps
       const fh=document.querySelector('.fx-hint');
@@ -11775,11 +11816,12 @@ function demoSpotTo(sel, stepN, total, keysLab, instant){
     cap.style.left=Math.max(10,L)+'px'; cap.style.top=capY+'px';
   }catch(e){}
 }
-function demoSpotSync(){ if(demoSpotCur){ const c=demoSpotCur; demoSpotTo(c.sel, c.stepN, c.total, c.keys, true); } }
+function demoSpotSync(){ if(demoSpotCur){ const c=demoSpotCur; demoSpotTo(c.sel, c.stepN, c.total, c.keys, true, c.watch); } }
 window.addEventListener('scroll', ()=>demoSpotSync(), true);
 window.addEventListener('resize', ()=>demoSpotSync());
 function demoSpotOff(){ demoSpotCur=null;
-  try{ const sp=$('demoSpot'); if(sp) sp.style.display='none'; const cap=$('demoSpotCap'); if(cap) cap.style.display='none'; }catch(e){} }
+  try{ const sp=$('demoSpot'); if(sp) sp.style.display='none'; const cap=$('demoSpotCap'); if(cap) cap.style.display='none';
+    const wt=$('demoWatch'); if(wt) wt.style.display='none'; }catch(e){} }
 async function playDemo(){
   if(demoPlaying||!S) return;
   loadChallenge(cur);
@@ -11793,7 +11835,7 @@ async function playDemo(){
   const spot=demoSpotOn(); let stepN=0;
   for(const mv of moves){ if(!demoPlaying) break;
     setDemoSel(mv.sel); stepN++;
-    if(spot) demoSpotTo(mv.sel, stepN, moves.length, demoSpotKeys(mv.keys));
+    if(spot) demoSpotTo(mv.sel, stepN, moves.length, demoSpotKeys(mv.keys), false, mv.watch||null);
     await sleep(520);
     for(const k of mv.keys){ if(!demoPlaying) break; demoKey(k);
       if(spot) demoSpotSync();
