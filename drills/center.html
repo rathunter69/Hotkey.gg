@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="../">
+<title>Set the alignment — Excel shortcut drill · hotkey.gg</title>
+<meta name="description" content="Center, left, right — three alignment passes, house style Par: 15 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="hotkey.gg">
+<meta property="og:title" content="Set the alignment — Excel shortcut drill · hotkey.gg">
+<meta property="og:description" content="Center, left, right — three alignment passes, house style Par: 15 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:url" content="https://www.hotkey.gg/drills/center.html">
+<meta property="og:image" content="https://www.hotkey.gg/art/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Set the alignment — Excel shortcut drill · hotkey.gg">
+<meta name="twitter:description" content="Center, left, right — three alignment passes, house style Par: 15 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
+<link rel="canonical" href="https://www.hotkey.gg/drills/center.html">
+<link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  html{scrollbar-gutter:stable}
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49; --accent:#2ea36f; --accent-dim:#1d6647;
+    --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; line-height:1.6}
+  .wrap{max-width:860px; margin:0 auto; padding:0 24px 80px}
+  .crumbs{font-family:var(--mono); font-size:11.5px; color:var(--faint); padding:16px 0 4px}
+  .crumbs a{color:var(--muted); text-decoration:none} .crumbs a:hover{color:var(--accent)}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin:10px 0 8px}
+  h1{font-size:26px; font-weight:700; letter-spacing:-.4px; margin-bottom:6px}
+  .aha{font-size:15.5px; color:var(--warn); font-style:italic; margin:2px 0 12px}
+  .sub{font-size:14.5px; color:var(--muted); max-width:640px}
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin:20px 0 8px; align-items:center}
+  .cta{font-family:var(--mono); font-size:13px; padding:11px 22px; border-radius:999px; text-decoration:none;
+    border:1px solid var(--accent-dim); color:var(--accent)}
+  .cta.solid{background:var(--accent); color:#0c0d0e; border-color:var(--accent); font-weight:700}
+  .cta:hover{background:var(--accent-glow)} .cta.solid:hover{background:var(--accent); filter:brightness(1.08)}
+  .par{font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .section-title{font-family:var(--mono); font-size:12px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:1.5px; margin:30px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--line)}
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px}
+  .keys{font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:2}
+  .keys em, .steps em{font-style:normal; color:var(--text); background:var(--surface2); border:1px solid var(--line);
+    border-radius:5px; padding:0 6px; font-family:var(--mono); font-size:12.5px}
+  .steps{list-style:none; counter-reset:s; display:flex; flex-direction:column; gap:10px}
+  .steps li{font-size:13.5px; color:var(--muted); display:flex; gap:14px; align-items:baseline}
+  .steps li::before{counter-increment:s; content:counter(s); font-family:var(--mono); font-weight:700; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:8px; min-width:26px; text-align:center; padding:1px 0; flex:none}
+  kbd{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:5px; padding:0 5px}
+  .rel{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px}
+  .rel a{display:block; background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; text-decoration:none; color:var(--text)}
+  .rel a:hover{border-color:var(--accent-dim)}
+  .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
+  .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
+  .fine a{color:var(--muted)}
+  .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
+  .grouphead small{color:var(--faint); font-weight:400}</style>
+<link rel="stylesheet" href="nav.css?v=174">
+<script src="drills.js?v=263"></script>
+<script>
+  const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+  window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  window.NAV_ACTIVE='';
+</script>
+<script src="themes.js?v=262"></script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Set the alignment","description":"Center, left, right — three alignment passes, house style","url":"https://www.hotkey.gg/drills/center.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formatting","teaches":"Alt H A R right-aligns numbers, A C centers headers — long titles center ACROSS (Ctrl+1), never merged.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Set the alignment","item":"https://www.hotkey.gg/drills/center.html"}]}]</script>
+</head>
+<body>
+<div id="navMount"></div>
+<script src="nav.js?v=258"></script>
+<div class="wrap">
+  <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / formatting</div>
+  <div class="eyebrow">◆ Formatting · drill</div>
+  <h1>Set the alignment</h1>
+  <div class="aha">Alt H A R right-aligns numbers, A C centers headers — long titles center ACROSS (Ctrl+1), never merged.</div>
+  <div class="sub">A pipeline summary pasted in with its alignment scrambled: quarter headers slumped left, deal names floating centered, the total row sitting left like a label. House rule — headers centered over their columns, labels pinned left, numbers and their totals right. And a total row reads BOLD or it isn’t a total. Geometry moves every run.</div>
+  <div class="cta-row">
+    <a class="cta solid" href="index.html?drill=center">train this drill →</a>
+    <span class="par">par 15 keystrokes · keyboard only · free</span>
+  </div>
+
+  <div class="section-title">The keys</div>
+  <div class="panel"><div class="keys">quarter headers <em>B3:D3</em> → <em>alt h a c</em> · deal names <em>A4:A6</em> → <em>alt h a l</em> · total row <em>A7:D7</em> → <em>alt h a r</em> + <em>ctrl+b</em> · title <em>A1:D1</em> → <em>ctrl+1</em> <em>a</em> — centered ACROSS, never merged</div></div>
+
+  <div class="section-title">Step by step</div>
+  <div class="panel"><ol class="steps"><li><span>quarter headers first: B3:D3 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> — centered over their columns</span></li>
+<li><span>deal names pinned left: A4:A6 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd></span></li>
+<li><span>the total row: A7:D7 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> — numbers never sit left</span></li>
+<li><span>and a total reads BOLD: selection holds · <kbd>ctrl</kbd>+<kbd>b</kbd></span></li>
+<li><span>the title is stranded in column A — select A1:D1 · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>a</kbd> — center ACROSS the model, no merged cells ever</span></li></ol></div>
+
+  <div class="section-title">More Formatting drills</div>
+  <div class="rel">
+    <a href="drills/typeset.html"><div class="rn">Typeset the memo</div><div class="rd">Bold, unbold, italic memos, strike the dead line, =TODAY() stamp</div></a>
+    <a href="drills/decimals.html"><div class="rn">The decimals pass</div><div class="rd">Alt H 9 / Alt H 0 — dollars none, multiples and percents one</div></a>
+    <a href="drills/autofit.html"><div class="rn">Fix the squeezed columns</div><div class="rd">##### everywhere — Alt H O I fits the columns</div></a>
+    <a href="drills/ruleoff.html"><div class="rn">Rule off the schedule</div><div class="rd">Accounting rulings: line under headers, line above every total, box the headline</div></a>
+  </div>
+  <div class="cta-row" style="margin-top:26px">
+    <a class="cta" href="drills/decimals.html">← Decimals</a>
+    <a class="cta" href="drills/autofit.html">Autofit →</a>
+    <a class="cta" href="drills/index.html">all 81 drills</a>
+  </div>
+  <div class="fine">
+    Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.
+    More: <a href="reference.html">the shortcut compendium</a> · <a href="drills/index.html">all drills</a> · <a href="About.html">about hotkey.gg</a>.
+  </div>
+</div>
+<div id="siteFooter"></div>
+</body>
+</html>
