@@ -1335,7 +1335,7 @@
 </style>
 <script src="drills.js?v=263"></script>
 <link rel="stylesheet" href="nav.css?v=174">
-<script src="themes.js?v=261"></script>
+<script src="themes.js?v=262"></script>
 
 </head>
 <body>
@@ -9934,10 +9934,19 @@ function codeToChar(code,k){
    ⌥H) — the intended key is recovered from e.code, never e.key.
    Windows/Linux sessions pass through untouched (adapter returns null).
    ============================================================ */
-const HK_MAC=(function(){ try{
+let HK_MAC=(function(){ try{
+  const o=localStorage.getItem('hk_platform');            // r280: onboarding pick wins
+  if(o==='mac') return true; if(o==='win') return false;
   return /Mac/i.test(navigator.platform||'') || /Macintosh/i.test(navigator.userAgent||'');
 }catch(e){ return false; } })();
 try{ window.HK_MAC=HK_MAC; }catch(e){}
+function hkSetPlatform(mac){
+  HK_MAC=!!mac; try{ window.HK_MAC=HK_MAC; }catch(e){}
+  try{ localStorage.setItem('hk_platform', mac?'mac':'win'); }catch(e){}
+  try{ const mb=$('macBtn'); if(mb){ mb.style.display=HK_MAC?'':'none';
+    if(HK_MAC) mb.onclick=function(){ if(window.hkMacPopup) window.hkMacPopup(); }; } }catch(e){}
+  try{ updateChecklist(); render(); }catch(e){}
+}
 const MAC_CODE_PUNCT={Equal:'=',Minus:'-',Comma:',',Period:'.',Slash:'/',Backslash:'\\',
   Semicolon:';',Quote:"'",BracketLeft:'[',BracketRight:']',Backquote:'`'};
 function hkMacAdapt(ev){
@@ -13142,7 +13151,7 @@ function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.clas
     // r159: first entry asks the comfort question; "basically none" gets the
     // excel-from-zero primer BEFORE the product tour.
     let asked=null; try{ asked=localStorage.getItem('hk_xlv'); }catch(e){}
-    if(asked===null) setTimeout(()=>showComfort(()=>tourShow(0)), 700);
+    if(asked===null) setTimeout(()=>showKeyboard(()=>showComfort(()=>tourShow(0))), 700);
     else setTimeout(()=>tourShow(0), 700); }
   else maybeOnboard(); }
 function tryEnter(){ enterRequested=true; ev('enter'); if(!sb){ dismissLanding(); return; } advanceAccess(); }
@@ -13354,9 +13363,18 @@ function showPrelaunchLock(){
     '<div class="micro" style="margin-top:10px">Already have an account? <a id="lockSignin" style="color:var(--accent);cursor:pointer">Sign in</a></div>'+
     '</div>';
   g.classList.add('show');
-  const go=()=>{ const v=($('lockCode')?$('lockCode').value:'').trim().toUpperCase();
-    if(v===INVITE_AUTO_CODE.toUpperCase()){ try{ localStorage.setItem('hk_beta_ok','1'); }catch(e){} ev('curtain_pass'); closeGate(); }
-    else { const m2=$('lockMsg'); if(m2) m2.textContent='That code didn\u2019t work. Check with whoever invited you.'; } };
+  /* r279: codes validate SERVER-SIDE (beta_codes table via curtain_check) so we can
+     rotate/revoke without shipping code. The client-side compare survives only as the
+     offline fallback when Supabase never loaded. */
+  const go=async()=>{ const v=($('lockCode')?$('lockCode').value:'').trim().toUpperCase();
+    const m2=$('lockMsg'), b2=$('lockGo'); if(!v){ if(m2) m2.textContent='Enter your access code.'; return; }
+    if(b2){ b2.disabled=true; b2.textContent='checking\u2026'; }
+    let okCode=false;
+    if(window.sb){ try{ const {data,error}=await sb.rpc('curtain_check',{p_code:v}); okCode=!error&&data===true; }catch(e){} }
+    else okCode=(v===INVITE_AUTO_CODE.toUpperCase());
+    if(b2){ b2.disabled=false; b2.textContent='Enter'; }
+    if(okCode){ try{ localStorage.setItem('hk_beta_ok','1'); }catch(e){} ev('curtain_pass'); closeGate(); }
+    else if(m2) m2.textContent='That code didn\u2019t work. Check with whoever invited you.'; };
   const b=$('lockGo'); if(b) b.onclick=go;
   const ci=$('lockCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } }; }
   const si=$('lockSignin'); if(si) si.onclick=()=>{ closeGate(); openAuth('signin'); };
@@ -13495,6 +13513,30 @@ async function hydratePBFromServer(){
    never touched Excel are thrown off "off rip"). One question on first entry;
    "basically none" gets a 5-card primer teaching the raw vocabulary BEFORE the
    product tour, plus guided mode for the first 3 solves. ---- */
+/* r280 (Wolf): keyboard pick up front — the right overlay loads without hunting
+   for a toggle. Detection preselects; the pick overrides it everywhere (keycaps,
+   the mac popup, the reference default). */
+function showKeyboard(after){
+  let m=$('kbCard');
+  if(!m){ m=document.createElement('div'); m.id='kbCard'; m.className='onboard-modal'; document.body.appendChild(m); }
+  const macGuess=HK_MAC;
+  m.innerHTML='<div class="ob-card" style="max-width:470px">'+
+    '<div class="ob-title">first — what keyboard are you on?</div>'+
+    '<div class="ob-body" style="font-size:12.5px">Keycaps and shortcuts render for your machine. Same drills, same boards either way.</div>'+
+    '<div class="ob-opts" style="flex-direction:column;gap:8px;align-items:stretch">'+
+      '<button class="ob-key'+(macGuess?'':' primary')+'" data-kb="win" style="text-align:left"><b>⊞ Windows</b> — Ctrl chords, Alt ribbon walks'+(macGuess?'':' <span style="color:var(--faint);font-size:10px">(detected)</span>')+' <kbd class="ob-kbd">1</kbd></button>'+
+      '<button class="ob-key'+(macGuess?' primary':'')+'" data-kb="mac" style="text-align:left"><b>⌘ Mac</b> — ⌘ chords, ⌥ ribbon walks (KeyTips)'+(macGuess?' <span style="color:var(--faint);font-size:10px">(detected)</span>':'')+' <kbd class="ob-kbd">2</kbd></button>'+
+    '</div></div>';
+  m.classList.add('show'); window.__introCardOpen=true;
+  const keys=(e)=>{ if(e.key==='1'||e.key==='2'){ e.preventDefault(); e.stopImmediatePropagation(); pick(e.key==='2'); } };
+  const pick=(mac)=>{
+    try{ hkSetPlatform(mac); }catch(e){}
+    try{ ev('kb_pick',{mac:mac?1:0}); }catch(e){}
+    m.classList.remove('show'); window.__introCardOpen=false; document.removeEventListener('keydown', keys, true);
+    after(); };
+  m.querySelectorAll('[data-kb]').forEach(b=>{ b.onclick=()=>pick(b.dataset.kb==='mac'); });
+  document.addEventListener('keydown', keys, true);
+}
 function showComfort(after){
   let m=$('comfortCard');
   if(!m){ m=document.createElement('div'); m.id='comfortCard'; m.className='onboard-modal'; document.body.appendChild(m); }

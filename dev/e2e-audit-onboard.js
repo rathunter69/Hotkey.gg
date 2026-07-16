@@ -21,7 +21,10 @@ const STUB = () => {
     },
     from: t => ({ select: () => mk([]), insert: () => Promise.resolve({ data: null, error: null }),
       upsert: () => Promise.resolve({ data: null, error: null }) }),
-    rpc: () => Promise.resolve({ data: null, error: null }),
+    // r279: curtain codes validate server-side — mirror the live beta_codes behavior
+    rpc: (name, args) => name === 'curtain_check'
+      ? Promise.resolve({ data: String((args && args.p_code) || '').trim().toUpperCase() === 'HAGS', error: null })
+      : Promise.resolve({ data: null, error: null }),
     functions: { invoke: () => Promise.resolve({ data: null, error: 'no' }) }
   }) };
 };
@@ -42,15 +45,15 @@ const STUB = () => {
     return { shown: !!(g && g.classList.contains('show')), hasInput: !!document.getElementById('lockCode') };
   });
   ok(t1.shown && t1.hasInput, 'prelaunch curtain shows for a fresh device');
+  // r279: codes validate server-side (curtain_check RPC) — both probes are async round-trips
   await page.fill('#lockCode', 'WRONG');
   await page.click('#lockGo');
-  const t1b = await page.evaluate(() => (document.getElementById('lockMsg') || {}).textContent || '');
-  ok(/didn/.test(t1b), 'wrong code gets a real error', t1b);
+  const t1b = await page.waitForFunction(() => /didn/.test((document.getElementById('lockMsg') || {}).textContent || ''), null, { timeout: 15000 }).then(() => true).catch(() => false);
+  ok(t1b, 'wrong code gets a real error (server-checked)');
   await page.fill('#lockCode', 'hags');   // case-insensitive per the uppercase()
   await page.click('#lockGo');
-  await page.waitForTimeout(300);
-  const t1c = await page.evaluate(() => !document.getElementById('gate').classList.contains('show'));
-  ok(t1c, 'right code (case-insensitive) passes the curtain');
+  const t1c = await page.waitForFunction(() => !document.getElementById('gate').classList.contains('show'), null, { timeout: 15000 }).then(() => true).catch(() => false);
+  ok(t1c, 'right code (case-insensitive) passes the curtain (server-checked)');
 
   console.log('T2 landing → enter → tour');
   const t2 = await page.evaluate(() => {
@@ -60,7 +63,12 @@ const STUB = () => {
   ok(t2.visible, 'landing dialog is up after the curtain');
   await page.keyboard.press('Enter');   // Enter = start (friction-free entry)
   await page.waitForTimeout(900);
-  // r159: the comfort fork asks BEFORE the tour on a first entry
+  // r280: the keyboard pick asks FIRST — the right key overlay loads up front
+  const t2kb = await page.evaluate(() => { const m = document.getElementById('kbCard'); return !!(m && m.classList.contains('show')); });
+  ok(t2kb, 'keyboard pick asks first (r280)');
+  await page.keyboard.press('1');       // Windows
+  await page.waitForTimeout(500);
+  // r159: the comfort fork follows
   const t2fork = await page.evaluate(() => { const m = document.getElementById('comfortCard'); return !!(m && m.classList.contains('show')); });
   ok(t2fork, 'comfort fork asks how much Excel you know (r159)');
   await page.keyboard.press('2');       // "I get around" → straight to the tour
@@ -134,6 +142,8 @@ const STUB = () => {
   await page.waitForTimeout(700);
   await page.keyboard.press('Enter');                 // through the landing again
   await page.waitForTimeout(900);
+  await page.keyboard.press('1');                     // r280: keyboard pick first (windows)
+  await page.waitForTimeout(500);
   const t4a = await page.evaluate(() => { const m = document.getElementById('comfortCard'); return !!(m && m.classList.contains('show')); });
   ok(t4a, 'comfort fork re-asks once the flags are gone');
   await page.keyboard.press('1');                     // "basically none"

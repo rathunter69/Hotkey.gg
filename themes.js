@@ -957,6 +957,8 @@ window.hkBandChip = function(band, size){
    F-keys stay F-keys on screen — the popup teaches fn + the ⌘T/⌃U alternates.
    ============================================================ */
 window.hkIsMac = function(){ try{
+  var o=localStorage.getItem('hk_platform');              // r280: onboarding pick wins
+  if(o==='mac') return true; if(o==='win') return false;
   return /Mac/i.test(navigator.platform||'') || /Macintosh/i.test(navigator.userAgent||'');
 }catch(e){ return false; } };
 window.hkMacChord = function(s){
