@@ -1297,7 +1297,7 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=261"></script>
+<script src="drills.js?v=262"></script>
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="themes.js?v=256"></script>
 
@@ -6945,6 +6945,80 @@ const CHALLENGES = {
         {label:'fill the grid from that one formula \u2014 all four crosses live and distinct', ok: gridOk},
         {label:'foot both regions at G5:H5 \u2014 live SUMs that re-add the whole tape', ok: feetOk},
         {label:'bold the total line (F5:H5) and add a top border above it', ok: dressOk},
+      ];
+    }
+  },
+  fxconvert:{
+    name:'FX Convert', label:'Convert the page — one boxed rate', par:35, parKeys:34,
+    aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention boxes the driver (Alt H B A) while the output table gets an outline (Alt H B O).',
+    prompt:'The revenue table came over from the Frankfurt desk in euros — the book prints in dollars. The desk convention: the FX rate lives in ONE cell, typed blue and BOXED (Alt H B A — all borders on a standalone driver), and every converted number reads off it. Build the USD block from a single anchored formula — fill right, then down — comma it, and OUTLINE the finished table (Alt H B O), never a grid of borders. One rate cell, twelve conversions, zero retyping.',
+    req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), box it (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outline <em>A10:F12</em> (<em>alt h b o</em>)'; },
+    guide(){ return [
+      'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — a standalone input gets ALL borders; that box says "this cell drives the page"',
+      'one formula converts everything: <em>B10</em> · <kbd>=B6*$B$3</kbd> — <kbd>F4</kbd> pins the rate · <kbd>↵</kbd> · select <em>B10:F10</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>B10:F12</em> <kbd>ctrl</kbd>+<kbd>d</kbd> — twelve live conversions off one cell',
+      'dress the output: still on <em>B10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · then select <em>A10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> — ONE outline around the table; a grid of borders is never the look',
+    ]; },
+    targets:['B3','B3','B10:F12','B10:F12','A10:F12'],
+    demo(){ return [
+      {sel:'B3', keys:[...T(this._rateStr), Kb.enter]},
+      {sel:'B3', keys:[Kb.alt,L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+      {sel:'B3', keys:[Kb.alt,L('h'),L('b'),L('a')]},
+      {sel:'B10', keys:[...T('=B6*$B$3'), Kb.enter]},
+      {sel:'B10:F10', keys:[Kb.fillR]},
+      {sel:'B10:F12', keys:[Kb.fillD]},
+      {sel:'B10:F12', keys:[Kb.alt,L('h'),L('k')]},
+      {sel:'A10:F12', keys:[Kb.alt,L('h'),L('b'),L('o')]},
+    ]; },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — revenue by segment (€mm → $mm)',txt:true,bold:true};
+      const rate=(105+rnd(0,10))/100;                       // 1.05–1.15 EUR→USD
+      this._rate=rate; this._rateStr=rate.toFixed(2);
+      cells['A3']={...blankCell(),value:'EUR → USD rate',txt:true,bold:true};
+      cells['B3']={...blankCell(),decimals:2};              // the driver — player types, blues, boxes it
+      cells['C3']={...blankCell(),value:'◀ desk rate: '+this._rateStr,txt:true};   // legend spills right, never under the driver
+      cells['A5']={...blankCell(),value:'EUR (€mm)',txt:true,bold:true};
+      ['Q1','Q2','Q3','Q4','FY'].forEach((q,i)=>cells[colLetter(2+i)+'5']={...blankCell(),value:q,txt:true,bold:true,align:'r'});
+      const SEGS=['Software','Services','Hardware'];
+      this._eur=[];
+      SEGS.forEach((n,i)=>{ const r=6+i; cells['A'+r]={...blankCell(),value:n,txt:true};
+        const row=[]; let tot=0;
+        for(let j=0;j<4;j++){ const v=rnd(60,240); row.push(v); tot+=v;
+          cells[colLetter(2+j)+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+        cells['F'+r]={...blankCell(),formula:'=SUM(B'+r+':E'+r+')',value:tot,fmtStyle:'comma',decimals:0};
+        row.push(tot); this._eur.push(row); });
+      cells['A9']={...blankCell(),value:'USD ($mm) — × the boxed rate',txt:true,bold:true};
+      SEGS.forEach((n,i)=>{ const r=10+i; cells['A'+r]={...blankCell(),value:n,txt:true};
+        for(let j=0;j<5;j++) cells[colLetter(2+j)+r]={...blankCell(),decimals:0}; });
+      return {ROWS:13, cells, active:{r:3,c:2}, sel:null, colW:{1:150,2:80,3:80,4:80,5:80,6:88}};
+    },
+    checks(S){
+      const rate=this._rate;
+      const b3=S.cells['B3'];
+      const rateOk=!!(b3 && typeof b3.value==='number' && Math.abs(b3.value-rate)<1e-9 && b3.fontColor==='blue');
+      const boxOk=!!(b3 && b3.ball);
+      // one anchored formula, 2D-filled: every USD cell reads $B$3 and its own EUR cell
+      let usdOk=true, comOk=true;
+      for(let i=0;i<3;i++) for(let j=0;j<5;j++){
+        const L=colLetter(2+j), cell=S.cells[L+(10+i)];
+        if(!cell||!cell.formula){ usdOk=false; comOk=false; continue; }
+        const f=cell.formula.toUpperCase().replace(/\s/g,'');
+        if(f.indexOf('$B$3')<0 || f.indexOf(L+(6+i))<0) usdOk=false;
+        const want=(typeof b3?.value==='number'?b3.value:rate)*this._eur[i][j];
+        if(Math.abs((cell.value||0)-want)>Math.max(1e-2,Math.abs(want)*1e-6)) usdOk=false;
+        if(cell.fmtStyle!=='comma') comOk=false;
+      }
+      // one OUTLINE around A10:F12 — perimeter only, the desk look
+      const outOk=(()=>{ for(let c=1;c<=6;c++){ const t=S.cells[colLetter(c)+'10']||{}, b=S.cells[colLetter(c)+'12']||{};
+          if(!t.bt||!b.bb) return false; }
+        for(let r=10;r<=12;r++){ const l=S.cells['A'+r]||{}, rr=S.cells['F'+r]||{};
+          if(!l.bl||!rr.br) return false; } return true; })();
+      return [
+        {label:'Type the desk rate '+this._rateStr+' at B3 and blue it (alt h f c) — the one hardcode on the page', ok:rateOk},
+        {label:'Box the rate cell (alt h b a) — all borders on a standalone driver, the desk convention', ok:boxOk},
+        {label:'Convert with ONE formula — B10 =B6*$B$3, F4-anchored, fill right then down (B10:F12)', ok:usdOk},
+        {label:'Comma-format the USD block (alt h k)', ok:usdOk&&comOk},
+        {label:'Outline the finished table A10:F12 (alt h b o) — one perimeter, never a grid of borders', ok:outOk},
       ];
     }
   },
