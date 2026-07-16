@@ -9921,7 +9921,49 @@ function codeToChar(code,k){
   return /^[A-Z0-9=]$/.test(up)?up:'';
 }
 
-document.addEventListener('keydown',e=>{
+/* ============================================================
+   r278 MAC INPUT LAYER — Stage 1 of dev/MAC_DESIGN.md (Wolf-approved).
+   One curriculum, both platforms: on a Mac, ⌘ plays the Ctrl role, ⌥ opens
+   the ribbon exactly like Alt (matching Excel-for-Mac's new KeyTips), and
+   the two Mac-native chords everyone knows are honored: ⌘T ≡ F4, ⌃U ≡ F2.
+   The load-bearing fix: ⌥-held letters arrive as dead characters ("˙" for
+   ⌥H) — the intended key is recovered from e.code, never e.key.
+   Windows/Linux sessions pass through untouched (adapter returns null).
+   ============================================================ */
+const HK_MAC=(function(){ try{
+  return /Mac/i.test(navigator.platform||'') || /Macintosh/i.test(navigator.userAgent||'');
+}catch(e){ return false; } })();
+try{ window.HK_MAC=HK_MAC; }catch(e){}
+const MAC_CODE_PUNCT={Equal:'=',Minus:'-',Comma:',',Period:'.',Slash:'/',Backslash:'\\',
+  Semicolon:';',Quote:"'",BracketLeft:'[',BracketRight:']',Backquote:'`'};
+function hkMacAdapt(ev){
+  if(!HK_MAC) return null;
+  let key=ev.key, ctrl=!!ev.ctrlKey||!!ev.metaKey, alt=!!ev.altKey;
+  // ⌥-generated dead characters: recover the intended key from the physical code
+  if(ev.altKey && ev.code){
+    let m=/^Key([A-Z])$/.exec(ev.code);
+    if(m) key=(ev.shiftKey? m[1] : m[1].toLowerCase());
+    else{ m=/^Digit([0-9])$/.exec(ev.code); if(m) key=m[1];
+      else if(MAC_CODE_PUNCT[ev.code]) key=MAC_CODE_PUNCT[ev.code]; }
+  }
+  // Mac-native muscle memory: ⌘T cycles anchors (F4) · ⌃U edits the cell (F2)
+  if(ev.metaKey && !ev.altKey && !ev.ctrlKey && String(key).toLowerCase()==='t'){ key='F4'; ctrl=false; }
+  else if(ev.ctrlKey && !ev.metaKey && !ev.altKey && String(key).toLowerCase()==='u'){ key='F2'; ctrl=false; }
+  return {
+    key:key, code:ev.code, ctrlKey:ctrl, altKey:alt, shiftKey:!!ev.shiftKey, metaKey:false,
+    repeat:!!ev.repeat, isComposing:!!ev.isComposing, location:ev.location, type:ev.type,
+    target:ev.target, isTrusted:ev.isTrusted, timeStamp:ev.timeStamp,
+    getModifierState:function(mod){
+      if(mod==='Control') return ctrl; if(mod==='Alt') return alt;
+      if(mod==='Shift') return !!ev.shiftKey; if(mod==='Meta') return false;
+      try{ return ev.getModifierState(mod); }catch(e){ return false; } },
+    preventDefault:function(){ ev.preventDefault(); },
+    stopPropagation:function(){ ev.stopPropagation(); },
+    stopImmediatePropagation:function(){ if(ev.stopImmediatePropagation) ev.stopImmediatePropagation(); }
+  };
+}
+document.addEventListener('keydown',hkRawE=>{
+  const e=hkMacAdapt(hkRawE)||hkRawE;
   const k=e.key;
   // let text fields (auth email/handle) receive their own keystrokes
   if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
@@ -10444,7 +10486,7 @@ if(!window.__hkModalDelegated){ window.__hkModalDelegated = true;
 }
 
 // stop Alt keyup from focusing the browser menu bar
-document.addEventListener('keyup',e=>{ if(e.key==='Alt') e.preventDefault(); },{capture:true});
+document.addEventListener('keyup',e=>{ if(e.key==='Alt'||(HK_MAC&&e.key==='Meta')) e.preventDefault(); },{capture:true});
 
 // mouse: usable, but flagged (does not block per scoring default)
 $('grid').addEventListener('mousedown',e=>{

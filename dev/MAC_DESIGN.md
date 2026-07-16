@@ -10,7 +10,7 @@ Excel for Mac is not Windows Excel with different keycaps:
 
 | Concept | Windows Excel | Excel for Mac |
 |---|---|---|
-| Ribbon access | **Alt walks** (`alt h k`, `alt e s v`) | **Does not exist.** No Alt-key ribbon sequences at all |
+| Ribbon access | **Alt walks** (`alt h k`, `alt e s v`) | **KeyTips shipped** (beta Aug 2024, since rolled out): press-and-release **⌥ Option**, Windows-matching letters (`⌥ h 9`). Some commands still lack KeyTips (e.g. autofit `h o i` at beta) |
 | Anchor cycling | `F4` | `⌘T` (or `fn+F4` if fn-keys enabled) |
 | Paste special | `Ctrl+Alt+V` / `alt e s` | `⌘⌃V` |
 | Edit cell | `F2` | `⌃U` (F2 needs fn) |
@@ -19,10 +19,11 @@ Excel for Mac is not Windows Excel with different keycaps:
 | Number formats | `Ctrl+Shift+1/4/5` | `⌃⇧1/4/5` (mostly parity) |
 | Function keys | plain | intercepted by macOS unless fn or "use F-keys" enabled |
 
-Roughly 60% of our curriculum maps 1:1 with a modifier swap; the Alt-ribbon
-walks (~25% of drilled chords, including the formatting spine) have **no Mac
-equivalent** — Mac Excel users do those tasks via ⌘1 dialogs, menu search, or
-toolbar clicks.
+Roughly 60% of our curriculum maps 1:1 with a modifier swap — and since the
+KeyTips rollout (Wolf's catch, verified 2026-07), the Alt-ribbon walks now have
+a REAL Mac equivalent: ⌥-then-letters, same sequences as Windows. Gaps remain
+on individual commands (device-verify the drilled walks in Stage 3), and the
+older-build installed base won't have KeyTips.
 
 ## The decision: which Excel do we teach a Mac user?
 
@@ -52,8 +53,10 @@ the same par), and under-prepares them for the desk they're training FOR.
 - The reference page gets a Windows/Mac column toggle showing the true Mac
   Excel binding next to each chord — so the same page serves both worlds.
 
-This keeps one curriculum, one leaderboard, one par table — and turns the Mac
-gap into a selling point ("your MacBook is now a Windows-Excel trainer").
+This keeps one curriculum, one leaderboard, one par table — and post-KeyTips
+the pitch is even cleaner: the SAME sequences now work in modern Mac Excel
+(⌥ h k) and on the desk's Windows box (alt h k). We teach one motion; both
+platforms accept it.
 
 ## Build plan (each stage shippable + gateable)
 

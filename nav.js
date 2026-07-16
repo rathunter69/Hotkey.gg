@@ -827,7 +827,8 @@
       try{ var r=e && e.reason; window.hkEvent('err', { m:('promise: '+String((r&&r.message)||r||'')).slice(0,180) }); }catch(_){}
     });
   })();
-  setTimeout(function(){ try{ window.hkEvent('pv',{p:location.pathname.replace(/^.*\//,'')||'index.html'}); }catch(e){} }, 1500);
+  setTimeout(function(){ try{ window.hkEvent('pv',{p:location.pathname.replace(/^.*\//,'')||'index.html',
+    mac:(/Mac/i.test(navigator.platform||'')||/Macintosh/i.test(navigator.userAgent||''))?1:0}); }catch(e){} }, 1500);
   document.addEventListener('keydown', e => {
     const onTrainer = window.NAV_ACTIVE === 'trainer';
     if(e.key === 'Escape'){
