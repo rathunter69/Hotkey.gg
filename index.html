@@ -1335,7 +1335,7 @@
 </style>
 <script src="drills.js?v=263"></script>
 <link rel="stylesheet" href="nav.css?v=174">
-<script src="themes.js?v=259"></script>
+<script src="themes.js?v=260"></script>
 
 </head>
 <body>
@@ -1396,6 +1396,7 @@
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
+      <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <button class="mb-tool" id="ghostToggle" data-tip="PB pace counter + cursor ghost \u2014 click to toggle">\ud83d\udc7b ghost: on</button>
       <span style="position:relative; display:inline-flex">
       <button class="mb-tool" id="dailyBtn" data-tip="the morning sheet — three drills for today: the daily, a weak spot, and fresh ground">⚡ sheet</button>
@@ -8822,6 +8823,7 @@ function syncTabs(){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
       const reqTxt=(typeof C.req==='function') ? C.req.call(C) : (C.req||C.prompt||'');
       tl.innerHTML='<span class="tl-dot" style="background:'+gc+'"></span>'+reqTxt;
+      try{ if(window.hkMacifyKbds) window.hkMacifyKbds(tl); }catch(e){}   // r279
   } }
   { let xc=$('dbXp');
     if(!xc && nel){ xc=document.createElement('span'); xc.id='dbXp'; xc.className='db-xp'; nel.after(xc); }
@@ -9114,6 +9116,7 @@ function updateChecklist(){
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
   html+=`<div class="cl-esc">stuck or off the rails? <kbd>esc</kbd><kbd>esc</kbd> or <kbd>shift+f11</kbd> restarts the drill</div>`;
   el.innerHTML=html;
+  try{ if(window.hkMacifyKbds) window.hkMacifyKbds(el); }catch(e){}   // r279: Mac keycap language
   // r134: AUTOSCROLL — long checklists scroll inside .cl-body; keep the next failing
   // task in view (scoped scrollTop math, never scrollIntoView — that can jiggle the page)
   try{
@@ -9214,6 +9217,7 @@ function armIdle(){ try{ clearTimeout(__idleT);
 }catch(e){} }
 function flashKey(t){
   const el=$('keyflash'); if(!el) return;
+  if(HK_MAC && window.hkMacChord) t=window.hkMacChord(String(t)).replace(/^Alt$/,'\u2325');   // r279
   flashChips.push(t); if(flashChips.length>6) flashChips.shift();
   el.innerHTML=flashChips.map((x,i)=>`<span class="kchip${i===flashChips.length-1?' new':''}">${x}</span>`).join('');
   el.classList.add('show');
@@ -9962,6 +9966,14 @@ function hkMacAdapt(ev){
     stopImmediatePropagation:function(){ if(ev.stopImmediatePropagation) ev.stopImmediatePropagation(); }
   };
 }
+setTimeout(function(){ try{
+  if(HK_MAC){
+    const mb=$('macBtn');
+    if(mb){ mb.style.display=''; mb.onclick=function(){ if(window.hkMacPopup) window.hkMacPopup(); }; }
+    let seen=null; try{ seen=localStorage.getItem('hk_mac_seen'); }catch(e){}
+    if(!seen) setTimeout(function(){ try{ if(window.hkMacPopup) window.hkMacPopup(); }catch(e){} }, 2200);
+  }
+}catch(e){} }, 0);
 document.addEventListener('keydown',hkRawE=>{
   const e=hkMacAdapt(hkRawE)||hkRawE;
   const k=e.key;
@@ -11800,6 +11812,7 @@ function demoSpotKeys(keys){
     }
     if(typing) toks.push('\u201c'+typing+'\u201d');
     let lab=toks.join(' ');
+    if(HK_MAC && window.hkMacChord) lab=window.hkMacChord(lab).replace(/\balt\b/g,'\u2325');
     return lab.length>72 ? lab.slice(0,69)+'\u2026' : lab;
   }catch(e){ return ''; }
 }

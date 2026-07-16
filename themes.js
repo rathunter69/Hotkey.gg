@@ -950,6 +950,67 @@ window.hkBandChip = function(band, size){
    schools). Substring list carries only unambiguous fragments; word list holds terms that
    are innocent inside real names (Dickinson, Ashkenazi, Analyst...). The server stays the
    real gate — this just keeps obvious garbage from ever reaching it. */
+/* ============================================================
+   r279 MAC DISPLAY LAYER (Stage 2+3, dev/MAC_DESIGN.md) — shared by the game,
+   the reference page, and anywhere else keycaps render. KeyTips-forward per
+   Wolf: the ⌥ ribbon walks are the star (they now match real Mac Excel);
+   F-keys stay F-keys on screen — the popup teaches fn + the ⌘T/⌃U alternates.
+   ============================================================ */
+window.hkIsMac = function(){ try{
+  return /Mac/i.test(navigator.platform||'') || /Macintosh/i.test(navigator.userAgent||'');
+}catch(e){ return false; } };
+window.hkMacChord = function(s){
+  return String(s)
+    .replace(/ctrl\+/gi,'\u2318')
+    .replace(/\bshift\+/gi,'\u21e7')
+    .replace(/\balt\b(?=(\s|\+))/gi,'\u2325');
+};
+window.hkMacifyKbds = function(root){
+  if(!window.hkIsMac() || !root) return;
+  try{
+    root.querySelectorAll('kbd,em,b,.cl-label,.cl-hint').forEach(function(n){
+      if(n.children.length) return;
+      var t=n.textContent, tt=t.trim();
+      if(/^ctrl$/i.test(tt)) n.textContent='\u2318';
+      else if(/^alt$/i.test(tt)) n.textContent='\u2325';
+      else if(/^shift$/i.test(tt)) n.textContent='\u21e7';
+      else if(/ctrl\+|\balt\b|shift\+/i.test(t)) n.textContent=window.hkMacChord(t);
+    });
+  }catch(e){}
+};
+/* the small popup Wolf asked for: what the keys are here + how to switch on
+   KeyTips in real Excel for Mac + the F-key setting. Openable any time. */
+window.hkMacPopup = function(){
+  try{
+    var old=document.getElementById('hkMacPop'); if(old) old.remove();
+    var w=document.createElement('div'); w.id='hkMacPop';
+    w.style.cssText='position:fixed;inset:0;z-index:320;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px';
+    w.innerHTML=
+      '<div style="max-width:520px;width:100%;background:var(--surface,#141517);border:1px solid var(--line,#333);border-radius:14px;overflow:hidden;font-family:var(--mono,ui-monospace,monospace)">'+
+      '<div style="min-height:34px;display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:var(--surface2,#1c1d20);border-bottom:1px solid var(--line,#333);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted,#888)">'+
+        '<span>\u2318 mac keys \u2014 one motion, every excel</span><a id="hkMacX" style="cursor:pointer;font-size:15px">\u00d7</a></div>'+
+      '<div style="padding:16px 20px;font-size:12.5px;line-height:1.75;color:var(--muted,#999)">'+
+        '<div style="color:var(--text,#eee)"><b style="color:var(--accent,#2ea36f)">\u2325</b> opens the ribbon \u2014 <b>\u2325 h k</b> = commas, <b>\u2325 e s v</b> = paste values. Same letters as Windows <b>Alt</b> walks <i>and</i> the new Excel-for-Mac KeyTips.</div>'+
+        '<div style="margin-top:7px"><b style="color:var(--text,#eee)">\u2318 is your Ctrl</b> \u2014 \u2318C copy \u00b7 \u2318B bold \u00b7 \u2318\u2193 jump the data edge. Plain Ctrl chords work too.</div>'+
+        '<div style="margin-top:7px"><b style="color:var(--text,#eee)">\u2318T</b> cycles $anchors like <b>F4</b> \u00b7 <b>\u2303U</b> edits the cell like <b>F2</b> \u2014 both accepted, no setup.</div>'+
+        '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line,#333)">'+
+        '<b style="color:var(--warn,#d9a441)">In the real Excel for Mac:</b><br>'+
+        '1. Update Office (Help \u2192 Check for Updates) \u2014 recent builds include <b>KeyTips</b>.<br>'+
+        '2. Press <b>and release</b> \u2325 \u2014 letters appear on the ribbon; walk them like Windows.<br>'+
+        '3. F-keys: System Settings \u2192 Keyboard \u2192 \u201cUse F1, F2\u2026 as standard function keys\u201d \u2014 then <b>F2</b>/<b>F4</b> work bare (or hold <b>fn</b>).</div>'+
+        '<div style="margin-top:12px;font-size:10.5px;color:var(--faint,#666)">boards and pars are identical across platforms \u2014 same chords, same clock</div>'+
+      '</div>'+
+      '<div style="padding:0 20px 16px"><button id="hkMacOk" style="font-family:inherit;font-size:12.5px;padding:9px 22px;border-radius:999px;border:1px solid var(--accent,#2ea36f);background:var(--accent,#2ea36f);color:#0c0d0e;font-weight:700;cursor:pointer">got it</button></div></div>';
+    var close=function(){ w.remove(); document.removeEventListener('keydown',esch,true); };
+    var esch=function(e){ if(e.key==='Escape'){ e.stopImmediatePropagation(); close(); } };
+    w.addEventListener('click',function(e){ if(e.target===w) close(); });
+    document.addEventListener('keydown',esch,true);
+    document.body.appendChild(w);
+    document.getElementById('hkMacX').onclick=close;
+    document.getElementById('hkMacOk').onclick=close;
+    try{ localStorage.setItem('hk_mac_seen','1'); }catch(e){}
+  }catch(e){}
+};
 window.hkNameOk = function(name){
   var raw=String(name||'').toLowerCase();
   var s=raw.replace(/[@]/g,'a').replace(/0/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e')
