@@ -13171,9 +13171,17 @@ async function doSignUp(){
     if(me_user && isAnonUser()){
       // LINK the anonymous session instead of creating a new account: same user id,
       // so every run and PB posted as a guest stays yours.
-      const { error } = await sb.auth.updateUser({ email, password:pass });
+      const { data:lk, error } = await sb.auth.updateUser({ email, password:pass });
       if(error){ authErr(/registered|already/i.test(error.message)?'That email already has an account \u2014 sign in instead (guest scores can\u2019t merge into it).':error.message); return; }
       try{ await sb.from('profiles').upsert({ id: me_user.id }, { onConflict:'id' }); }catch(e){}
+      // once email confirmations are ON, the address stays pending until clicked \u2014
+      // say so instead of claiming the account is saved (new_email = pending confirm)
+      if(lk && lk.user && !lk.user.email_confirmed_at && (lk.user.new_email || lk.user.email===email)){
+        const m=$('authModal').querySelector('.auth-card');
+        m.innerHTML='<h3>Confirm your email</h3><p>We sent a confirmation link to <b style="color:var(--text)">'+escHtml(email)+'</b>. Click it and this account \u2014 with all your guest runs \u2014 is yours.</p><div class="auth-x" id="authClose">close</div>';
+        const c=$('authClose'); if(c) c.onclick=closeAuth;
+        return;
+      }
       closeAuth(); showToast('account saved \u2014 your guest runs are yours now. Set a handle on the Account page.');
       return;
     }
