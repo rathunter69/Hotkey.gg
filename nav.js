@@ -108,6 +108,7 @@
           <span class="sf-fine">Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.</span>
         </div>
         <nav class="sf-links" aria-label="footer">
+          <a href="About.html">about</a>
           <a href="contact.html">contact</a>
           <a href="enterprise.html">enterprise</a>
           <a href="mailto:hello@hotkey.gg?subject=Bug%20report%20%E2%80%94%20hotkey.gg">report a bug</a>

@@ -85,11 +85,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=258"></script>
+<script src="themes.js?v=259"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=256"></script>
+<script src="nav.js?v=257"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -389,10 +389,21 @@ async function load(){
       if(pickerOpen && window.buildSchoolPicker){
         const mount=document.getElementById('schPickerMount');
         const picker=window.buildSchoolPicker(tag, async(v)=>{
-          tag=v; prof.school_tag=v;
-          try{ const upd={school_tag:v};
-            if(v && !prof.show_school){ upd.show_school=true; prof.show_school=true; }  // picking opts you in by default
-            await sb.from('profiles').update(upd).eq('id',me.id); }catch(e){}
+          // r276: saves ride the set_school_tag RPC — the direct column write had been
+          // silently rejected (42501) since r122 revoked school_tag from clients
+          try{
+            const {error}=await sb.rpc('set_school_tag',{p_tag:v});
+            if(error){
+              const m=String(error.message||'');
+              alert(m.includes('TAG_RESERVED') ? 'That name won\u2019t fly \u2014 pick something you\u2019d put on a resume.'
+                : m.includes('TAG_FORMAT') ? 'Letters, numbers, spaces and simple punctuation only (2\u201340 chars).'
+                : 'Couldn\u2019t save \u2014 try again.');
+              return;
+            }
+            tag=v; prof.school_tag=v;
+            if(v && !prof.show_school){ prof.show_school=true;
+              try{ await sb.from('profiles').update({show_school:true}).eq('id',me.id); }catch(e){} }  // picking opts you in by default
+          }catch(e){}
           pickerOpen=false; render();
         });
         mount.appendChild(picker);
