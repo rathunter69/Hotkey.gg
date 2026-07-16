@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>contact · hotkey.gg</title>
+<link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  html{scrollbar-gutter:stable}
+  :root{
+    --bg:#0c0d0e; --surface:#141517; --surface2:#1c1d20; --line:#26282c;
+    --text:#e9e8e3; --muted:#7c7d77; --faint:#4c4d49; --accent:#2ea36f; --accent-dim:#1d6647;
+    --accent-glow:rgba(46,163,111,.22); --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); -webkit-font-smoothing:antialiased; line-height:1.6}
+  .wrap{max-width:880px; margin:0 auto; padding:0 24px 80px}
+  header.head{padding:14px 0 6px}
+  h1{font-size:22px; font-weight:700; letter-spacing:-.4px; margin-bottom:4px}
+  .sub{font-size:15px; color:var(--muted); max-width:560px}
+  .lanes{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin-top:26px}
+  .lane{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px;
+    display:flex; flex-direction:column; gap:8px}
+  .lane h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px}
+  .lane p{font-size:13.5px; color:var(--muted)}
+  .lane a.go{font-family:var(--mono); font-size:12.5px; color:var(--accent); text-decoration:none; margin-top:auto; padding-top:6px}
+  .lane a.go:hover{text-decoration:underline; text-underline-offset:3px}
+  .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:26px; line-height:1.8}
+  .fine a{color:var(--muted)}
+</style>
+<link rel="stylesheet" href="nav.css?v=174">
+<script src="drills.js?v=263"></script>
+<script>
+  const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
+  const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+  window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  window.NAV_ACTIVE='';
+</script>
+<script src="themes.js?v=258"></script>
+</head>
+<body>
+<div id="navMount"></div>
+<script src="nav.js?v=256"></script>
+
+<div class="wrap">
+  <header class="head">
+    <h1>Contact the team</h1>
+    <div class="sub">One inbox, routed by subject line — pick your lane and we'll get back to you, usually within two business days.</div>
+  </header>
+
+  <div class="lanes">
+    <div class="lane">
+      <h4>&#9993; support</h4>
+      <p>Stuck on your account, a board that looks wrong, sign-in trouble, or a data request (export / deletion).</p>
+      <a class="go" href="mailto:hello@hotkey.gg?subject=Support%20%E2%80%94%20hotkey.gg">hello@hotkey.gg &#8594;</a>
+    </div>
+    <div class="lane">
+      <h4>&#9888; bugs</h4>
+      <p>Something behaved un-Excel? Tell us the drill, the keystrokes you pressed, and what you expected — that's usually enough to reproduce it.</p>
+      <a class="go" href="mailto:hello@hotkey.gg?subject=Bug%20report%20%E2%80%94%20hotkey.gg">report a bug &#8594;</a>
+    </div>
+    <div class="lane">
+      <h4>&#9670; desks &amp; enterprise</h4>
+      <p>PRO for a whole desk, analyst-class training programs, or firm-wide rollouts — there's a dedicated page for that conversation.</p>
+      <a class="go" href="enterprise.html">enterprise &amp; partnerships &#8594;</a>
+    </div>
+    <div class="lane">
+      <h4>&#127891; schools &amp; clubs</h4>
+      <p>Finance clubs, MBA cohorts, and career centers: school standings are already live — we're happy to help you set up a desk for your members.</p>
+      <a class="go" href="mailto:hello@hotkey.gg?subject=School%20%2F%20club%20%E2%80%94%20hotkey.gg">talk to us &#8594;</a>
+    </div>
+    <div class="lane">
+      <h4>&#128240; press</h4>
+      <p>Writing about keyboard-first Excel training or the finance-prep space? We'll get you screenshots, numbers, and a human.</p>
+      <a class="go" href="mailto:hello@hotkey.gg?subject=Press%20%E2%80%94%20hotkey.gg">press inquiries &#8594;</a>
+    </div>
+    <div class="lane">
+      <h4>&#128274; security</h4>
+      <p>Found a vulnerability? Please report it privately — see the disclosure policy for scope and what to include.</p>
+      <a class="go" href="security.html">security policy &#8594;</a>
+    </div>
+  </div>
+
+  <div class="fine">
+    hotkey.gg is in private beta — replies come from a small team, so include enough detail to skip a round trip.
+    Legal: <a href="terms.html">terms</a> · <a href="privacy.html">privacy</a> · <a href="security.html">security</a>.
+  </div>
+</div>
+
+<div id="siteFooter"></div>
+</body>
+</html>
