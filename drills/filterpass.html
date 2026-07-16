@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Work the filtered tape — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself Par: 10 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself Par 13s, optimal 10 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Work the filtered tape — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself Par: 10 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself Par 13s, optimal 10 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/filterpass.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Work the filtered tape — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself Par: 10 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself Par 13s, optimal 10 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/filterpass.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Work the filtered tape","description":"Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself","url":"https://www.hotkey.gg/drills/filterpass.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"Ctrl+Shift+L arms the filter, Alt+↓ opens the picker — hide the noise, the answer reads itself.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Work the filtered tape","item":"https://www.hotkey.gg/drills/filterpass.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Work the filtered tape","description":"Ctrl+Shift+L arms the tape, Alt+↓ works the picker — the answer reads itself","url":"https://www.hotkey.gg/drills/filterpass.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"Ctrl+Shift+L arms the filter, Alt+↓ opens the picker — hide the noise, the answer reads itself.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT13S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Work the filtered tape","item":"https://www.hotkey.gg/drills/filterpass.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,16 +102,17 @@
   <div class="sub">A live deal tape, three statuses deep. The VP wants ONE number: the largest OPEN deal still on the tape. Arm the AutoFilter on the header row (Ctrl+Shift+L), open the Status picker (Alt+↓), drop everything that is not Open, and the answer reads straight off the visible rows — type it where the tape asks.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=filterpass">train this drill →</a>
-    <span class="par">par 10 keystrokes · keyboard only · free</span>
+    <span class="par">par 13s · optimal 10 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>ctrl+shift+L</em> on row 3 arms the ▾ · <em>alt+↓</em> on Status → <em>space</em> drops Closed/Dead → <em>↵</em> · type the largest visible Size into <em>B14</em></div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+L</kbd><span class="m">⌘⇧L on mac</span><span class="what">Toggle AutoFilter on the header row</span></div><div class="use">Filters on and off over a header row — the first triage tool on any raw export.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt+↓</kbd><span class="m">⌥↓ on mac</span><span class="what">Open the filter value picker on a header</span></div><div class="use">Opens the dropdown under the cell — pick from values already in the column for consistent labels.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>put the cursor anywhere on row 3 (the header) · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> — ▾ pickers arm across the whole header block</span></li>
-<li><span>get to C3 (Status) · <kbd>alt</kbd>+<kbd>↓</kbd> opens the picker · <kbd>←</kbd><kbd>→</kbd> walk the values, <kbd>space</kbd> drops one, <kbd>↵</kbd> applies — keep only Open</span></li>
-<li><span>the tape is now all Open — the largest Size sits in plain sight; type it into B14 and <kbd>↵</kbd> (ctrl+shift+L again would clear the filter)</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>ctrl+shift+L</em> on row 3 arms the ▾ · <em>alt+↓</em> on Status → <em>space</em> drops Closed/Dead → <em>↵</em> · type the largest visible Size into <em>B14</em></div></div>
 
   <div class="section-title">More Data &amp; Lookups drills</div>
   <div class="rel">

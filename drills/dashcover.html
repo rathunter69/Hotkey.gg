@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Build the model cover — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage Par: 31 keystrokes. Free intera">
+<meta name="description" content="The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage Par 32s, optimal 31 keys. Free ">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Build the model cover — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage Par: 31 keystrokes. Free intera">
+<meta property="og:description" content="The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage Par 32s, optimal 31 keys. Free ">
 <meta property="og:url" content="https://www.hotkey.gg/drills/dashcover.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Build the model cover — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage Par: 31 keystrokes. Free intera">
+<meta name="twitter:description" content="The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage Par 32s, optimal 31 keys. Free ">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/dashcover.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the model cover","description":"The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage","url":"https://www.hotkey.gg/drills/dashcover.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"The cover page is all references — pull the model outputs into the headline metrics an IC actually reads.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the model cover","item":"https://www.hotkey.gg/drills/dashcover.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the model cover","description":"The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage","url":"https://www.hotkey.gg/drills/dashcover.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"The cover page is all references — pull the model outputs into the headline metrics an IC actually reads.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT32S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the model cover","item":"https://www.hotkey.gg/drills/dashcover.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,17 +102,12 @@
   <div class="sub">Page one of the deck: the cover box. The model spits out enterprise value, net debt, shares, EBITDA and interest — your job is the summary an IC reads first. Reference the outputs (never retype them) into equity value, value per share, the EV/EBITDA the deal is priced at, net leverage and interest coverage. Every cell points at the model above; change an input and the cover moves.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=dashcover">train this drill →</a>
-    <span class="par">par 31 keystrokes · keyboard only · free</span>
+    <span class="par">par 32s · optimal 31 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>B10</em> equity <em>=B3-B4</em> · <em>B11</em> per share <em>=B10/B5</em> · <em>B12</em> EV/EBITDA <em>=B3/B6</em> · <em>B13</em> leverage <em>=B4/B6</em> · <em>B14</em> coverage <em>=B6/B7</em></div></div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>equity value at B10 · <kbd>=B3-B4</kbd> — enterprise value less net debt (reference, don’t retype)</span></li>
-<li><span>value per share at B11 · <kbd>=B10/B5</kbd> — equity over shares</span></li>
-<li><span>the multiple the deal is priced at: EV/EBITDA at B12 · <kbd>=B3/B6</kbd></span></li>
-<li><span>the credit read: net leverage at B13 · <kbd>=B4/B6</kbd> — net debt / EBITDA · coverage at B14 · <kbd>=B6/B7</kbd> — EBITDA / interest</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>B10</em> equity <em>=B3-B4</em> · <em>B11</em> per share <em>=B10/B5</em> · <em>B12</em> EV/EBITDA <em>=B3/B6</em> · <em>B13</em> leverage <em>=B4/B6</em> · <em>B14</em> coverage <em>=B6/B7</em></div></div>
 
   <div class="section-title">More Full Builds drills</div>
   <div class="rel">

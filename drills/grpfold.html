@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Fold the detail away — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Shift+Alt+→ groups the months — never hide, always group Par: 12 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Shift+Alt+→ groups the months — never hide, always group Par 15s, optimal 12 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Fold the detail away — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Shift+Alt+→ groups the months — never hide, always group Par: 12 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Shift+Alt+→ groups the months — never hide, always group Par 15s, optimal 12 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/grpfold.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Fold the detail away — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Shift+Alt+→ groups the months — never hide, always group Par: 12 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Shift+Alt+→ groups the months — never hide, always group Par 15s, optimal 12 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/grpfold.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Fold the detail away","description":"Shift+Alt+→ groups the months — never hide, always group","url":"https://www.hotkey.gg/drills/grpfold.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"Group rows (Shift+Alt+→), never hide them — the ⊞ tells the reader the detail’s still there.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Fold the detail away","item":"https://www.hotkey.gg/drills/grpfold.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Fold the detail away","description":"Shift+Alt+→ groups the months — never hide, always group","url":"https://www.hotkey.gg/drills/grpfold.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Data & Lookups","teaches":"Group rows (Shift+Alt+→), never hide them — the ⊞ tells the reader the detail’s still there.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT15S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Fold the detail away","item":"https://www.hotkey.gg/drills/grpfold.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,16 +102,18 @@
   <div class="sub">The MD wants the SUMMARY view of this build — quarterly totals, not the monthly noise under them. The house rule is absolute: you never HIDE rows, you GROUP them (Shift+Alt+→), then fold the detail (Alt A H) so a ⊞ tells the next reader exactly where it lives. Three months under each quarter; group each block, fold each block, and the totals keep breathing.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=grpfold">train this drill →</a>
-    <span class="par">par 12 keystrokes · keyboard only · free</span>
+    <span class="par">par 15s · optimal 12 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>A3:A5</em> → <em>shift+alt+→</em> · <em>A7:A9</em> → <em>shift+alt+→</em> · <em>A11:A13</em> → <em>shift+alt+→</em> · then fold each: <em>alt a h</em> — subtotals stay on the page</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Alt+Shift+→</kbd><span class="m">⌥⇧→ on mac</span><span class="what">Group rows/columns (outline)</span></div><div class="use">Group detail rows so a reviewer can collapse to the summary — finished models ship with the detail folded.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt a h</kbd><span class="m">⌥ a h on mac</span><span class="what">Hide (fold) group detail</span></div><div class="use">Collapse grouped detail to read the summary — the fold hides rows without deleting them.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>quarter one: select rows 3-5 (the months) · <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>→</kbd> groups them · <kbd>alt</kbd> <kbd>a</kbd> <kbd>h</kbd> folds the detail</span></li>
-<li><span>same for the other two quarters — group the months, fold them; the Q-total rows never leave the page</span></li>
-<li><span>the ⊞ on the row header is the point: detail exists, on request — hiding raw rows would bury it (alt a j reopens any fold)</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>A3:A5</em> → <em>shift+alt+→</em> · <em>A7:A9</em> → <em>shift+alt+→</em> · <em>A11:A13</em> → <em>shift+alt+→</em> · then fold each: <em>alt a h</em> — subtotals stay on the page</div></div>
 
   <div class="section-title">More Data &amp; Lookups drills</div>
   <div class="rel">

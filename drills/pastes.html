@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Alt E S everything — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="One copy, two pastes — values then formats Par: 40 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="One copy, two pastes — values then formats Par 40s, optimal 40 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Alt E S everything — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="One copy, two pastes — values then formats Par: 40 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="One copy, two pastes — values then formats Par 40s, optimal 40 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/pastes.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Alt E S everything — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="One copy, two pastes — values then formats Par: 40 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="One copy, two pastes — values then formats Par 40s, optimal 40 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/pastes.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Alt E S everything","description":"One copy, two pastes — values then formats","url":"https://www.hotkey.gg/drills/pastes.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Alt E S is a toolbox: TRANSPOSE turns a column into a row, DIVIDE/MULTIPLY rescale or flip a block, FORMATS clone a look, VALUES freeze the wiring.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Alt E S everything","item":"https://www.hotkey.gg/drills/pastes.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Alt E S everything","description":"One copy, two pastes — values then formats","url":"https://www.hotkey.gg/drills/pastes.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Alt E S is a toolbox: TRANSPOSE turns a column into a row, DIVIDE/MULTIPLY rescale or flip a block, FORMATS clone a look, VALUES freeze the wiring.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT40S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Alt E S everything","item":"https://www.hotkey.gg/drills/pastes.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,18 +102,23 @@
   <div class="sub">The feed came in a mess and Paste Special fixes every kind of mess. TRANSPOSE the side fee schedule (it is a column; you need it as a row). DIVIDE the Trading line by 1000 — it arrived in raw dollars, the page is in $000s. MULTIPLY the cost line by −1 — someone typed the costs positive. Clone the total row FORMATS onto Advisory, then clear the top border it dragged along (that rule belongs only to the total). Finally paste the totals to the deck as VALUES — dead numbers, no wiring. One dialog, every lever.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=pastes">train this drill →</a>
-    <span class="par">par 40 keystrokes · keyboard only · free</span>
+    <span class="par">par 40s · optimal 40 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys">copy <em>G4:G7</em> → <em>alt e s e</em> (transpose) at <em>B4:E4</em> · <em>1000</em> at B12, copy → <em>B5:E5</em> <em>alt e s i</em> (divide) · <em>-1</em> at C12, copy → <em>B7:E7</em> <em>alt e s m</em> (multiply) · copy <em>B8:E8</em> → <em>B6:E6</em> <em>alt e s t</em> then <em>alt h b n</em> · copy <em>B8:E8</em> → <em>B10:E10</em> <em>alt e s v</em></div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+C</kbd><span class="m">⌘C on mac</span><span class="what">Copy</span></div><div class="use">Copy starts almost every hand-off — grab a finished block once, then place it in the summary, the deck, or next quarter’s column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt e s e</kbd><span class="m">⌥ e s e on mac</span><span class="what">Paste Special — transpose (column ↔ row)</span></div><div class="use">Transpose flips a block between column and row — labels running the wrong way, fixed in one dialog.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt e s i</kbd><span class="m">⌥ e s i on mac</span><span class="what">Paste Special — divide in place by the copied value</span></div><div class="use">Paste-divide rescales in place — raw dollars become $000s with no helper column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt e s m</kbd><span class="m">⌥ e s m on mac</span><span class="what">Paste Special — multiply in place by the copied value</span></div><div class="use">Paste-multiply scales or sign-flips a block at once — costs typed positive become negative in one pass.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt e s t</kbd><span class="m">⌥ e s t on mac</span><span class="what">Paste Special — formats only</span></div><div class="use">Clone a finished row’s look — commas, decimals, borders — onto raw numbers without touching the values.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b n</kbd><span class="m">⌥ h b n on mac</span><span class="what">No border</span></div><div class="use">Clear borders a paste dragged along — formats travel with copies whether you want them or not.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt e s v</kbd><span class="m">⌥ e s v on mac</span><span class="what">Paste values (legacy chain)</span></div><div class="use">The values-only paste is how numbers leave a model safely: no formulas, no links, nothing to break downstream.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>TRANSPOSE the side schedule into a row: select <em>G4:G7</em> (the vertical fee list) · <kbd>ctrl</kbd>+<kbd>c</kbd> · click <em>B4</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>e</kbd> Transpose · <kbd>↵</kbd> — the column lands across the Fees row</span></li>
-<li><span>DIVIDE to rescale: type <kbd>1000</kbd> at B12 <kbd>↵</kbd> · copy it · select <em>B5:E5</em> (Trading, in raw $) · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>i</kbd> Divide · <kbd>↵</kbd> — $ becomes $000s in place, the total re-ties</span></li>
-<li><span>MULTIPLY to flip the sign: type <kbd>-1</kbd> at C12 <kbd>↵</kbd> · copy it · select <em>B7:E7</em> (costs typed positive) · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>m</kbd> Multiply · <kbd>↵</kbd> — the costs turn negative and the total drops</span></li>
-<li><span>CLONE the look, then fix it: copy the dressed total row <em>B8:E8</em> · select <em>B6:E6</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> Formats <kbd>↵</kbd> — bold, fill and commas travel · but the TOP BORDER came too, and Advisory is not a total: still selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>n</kbd> No Border</span></li>
-<li><span>FREEZE for the deck: copy <em>B8:E8</em> · select <em>B10:E10</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> Values <kbd>↵</kbd> — dead numbers, none of the wiring</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">copy <em>G4:G7</em> → <em>alt e s e</em> (transpose) at <em>B4:E4</em> · <em>1000</em> at B12, copy → <em>B5:E5</em> <em>alt e s i</em> (divide) · <em>-1</em> at C12, copy → <em>B7:E7</em> <em>alt e s m</em> (multiply) · copy <em>B8:E8</em> → <em>B6:E6</em> <em>alt e s t</em> then <em>alt h b n</em> · copy <em>B8:E8</em> → <em>B10:E10</em> <em>alt e s v</em></div></div>
 
   <div class="section-title">More Foundations drills</div>
   <div class="rel">

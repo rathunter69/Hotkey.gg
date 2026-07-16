@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Assemble &amp; dress the summary — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck Par: 47 keystrokes. Free interactive Excel drill — no m">
+<meta name="description" content="COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck Par 46s, optimal 47 keys. Free interactive Excel drill ">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Assemble &amp; dress the summary — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck Par: 47 keystrokes. Free interactive Excel drill — no m">
+<meta property="og:description" content="COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck Par 46s, optimal 47 keys. Free interactive Excel drill ">
 <meta property="og:url" content="https://www.hotkey.gg/drills/blocksel.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Assemble &amp; dress the summary — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck Par: 47 keystrokes. Free interactive Excel drill — no m">
+<meta name="twitter:description" content="COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck Par 46s, optimal 47 keys. Free interactive Excel drill ">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/blocksel.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Assemble & dress the summary","description":"COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck","url":"https://www.hotkey.gg/drills/blocksel.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Ctrl+C copies what stays, Ctrl+X cuts what moves — assemble, then dress with borders and a margin memo.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Assemble & dress the summary","item":"https://www.hotkey.gg/drills/blocksel.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Assemble & dress the summary","description":"COPY what stays, CUT what moves into a headered output, add a margin memo, then dress it like the deck","url":"https://www.hotkey.gg/drills/blocksel.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Ctrl+C copies what stays, Ctrl+X cuts what moves — assemble, then dress with borders and a margin memo.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT46S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Assemble & dress the summary","item":"https://www.hotkey.gg/drills/blocksel.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,19 +102,23 @@
   <div class="sub">The segment summary is due and the pieces are scattered. COPY the base [Segment · Revenue] that stays filed; CUT the two misfiled metric columns (EBITDA, Op inc) into their slots. Then build it out like a real page: a Margin memo that computes off the block (EBITDA ÷ Revenue, in %), and the banker dress — bold headers, the top line in $ with the rest in commas, figures right, the segment names centred and underlined, the whole table boxed. Read what each loose piece IS, land it in the right column, and finish it clean. The pieces scatter to a new spot every run.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=blocksel">train this drill →</a>
-    <span class="par">par 47 keystrokes · keyboard only · free</span>
+    <span class="par">par 46s · optimal 47 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys">COPY base G11 → A4 · CUT EBITDA G3 → C4 · CUT Op inc I3 → D4 · Margin E4 <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b a</em> · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em></div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+→</kbd><span class="m">⌘⇧→ on mac</span><span class="what">Extend selection to the edge of data</span></div><div class="use">Select from here to the end of the row — grab a header or a year of quarters in one chord.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+↓</kbd><span class="m">⌘⇧↓ on mac</span><span class="what">Extend selection to the edge of data</span></div><div class="use">Select from here to the edge of the data — the standard grab before formatting or filling a column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+C</kbd><span class="m">⌘C on mac</span><span class="what">Copy</span></div><div class="use">Copy starts almost every hand-off — grab a finished block once, then place it in the summary, the deck, or next quarter’s column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+V</kbd><span class="m">⌘V on mac</span><span class="what">Paste</span></div><div class="use">Plain paste brings everything: values, formulas, formats. Reach for Paste Special when you only want part of it.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+X</kbd><span class="m">⌘X on mac</span><span class="what">Cut</span></div><div class="use">Cut moves a block and drags its references along intact — the safe way to reorganize a page without breaking the wiring.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+%</kbd><span class="m">⌘⇧% on mac</span><span class="what">Percent, 0 decimals</span></div><div class="use">Margins, growth rates, weights — any ratio gets the percent treatment the moment it’s computed.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+I</kbd><span class="m">⌘I on mac</span><span class="what">Italic</span></div><div class="use">Italics are the convention for memos, footnotes, and anything explanatory rather than computed.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>COPY the <b>base</b> [Segment · Revenue] at <b>G11</b> (it stays filed): <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at A4</span></li>
-<li><span>CUT the misfiled <b>EBITDA</b> at <b>G3</b> and <b>Op inc</b> at <b>I3</b>: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>x</kbd> · paste into their slots — the old spots empty</span></li>
-<li><span>the <b>Margin</b> memo: at E4 type <kbd>=</kbd> EBITDA ÷ Revenue (<kbd>=C4/B4</kbd>), fill down, then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>%</kbd> and italic <kbd>ctrl</kbd>+<kbd>i</kbd></span></li>
-<li><span>dress it: <b>bold</b> the header row (<kbd>ctrl</kbd>+<kbd>b</kbd>) · box the whole table <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd></span></li>
-<li><span>money: the <b>top line</b> in dollars (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>$</kbd>, trim to 0-dec with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd>×2), the rows below in <b>commas</b> (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>!</kbd>, 0-dec)</span></li>
-<li><span>finish: figures <b>right</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>) · segment names <b>centred + underlined</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> · <kbd>ctrl</kbd>+<kbd>u</kbd>)</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">COPY base G11 → A4 · CUT EBITDA I3 → C4 · CUT Op inc G3 → D4 · Margin E4 <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b a</em> · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em></div></div>
 
   <div class="section-title">More Foundations drills</div>
   <div class="rel">

@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Roll up the segments — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="SUMIF rollup + live foot + % of total, summary dressed Par: 59 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="SUMIF rollup + live foot + % of total, summary dressed Par 57s, optimal 59 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Roll up the segments — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="SUMIF rollup + live foot + % of total, summary dressed Par: 59 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="SUMIF rollup + live foot + % of total, summary dressed Par 57s, optimal 59 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/sumif.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Roll up the segments — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="SUMIF rollup + live foot + % of total, summary dressed Par: 59 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="SUMIF rollup + live foot + % of total, summary dressed Par 57s, optimal 59 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/sumif.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Roll up the segments","description":"SUMIF rollup + live foot + % of total, summary dressed","url":"https://www.hotkey.gg/drills/sumif.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"SUMIF reads the labels for you — one formula rolls up an entire segment.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Roll up the segments","item":"https://www.hotkey.gg/drills/sumif.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Roll up the segments","description":"SUMIF rollup + live foot + % of total, summary dressed","url":"https://www.hotkey.gg/drills/sumif.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"SUMIF reads the labels for you — one formula rolls up an entire segment.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT57S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Roll up the segments","item":"https://www.hotkey.gg/drills/sumif.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,18 +102,21 @@
   <div class="sub">A raw ledger on the left, a summary the MD can read on the right. One SUMIF with anchored ranges, filled down for the other segments — only the criteria cell walks. Then foot the summary with a live SUM, run % of total off an anchored denominator, and bold the total line. Rollup, ratio, dress: a real summary tab.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=sumif">train this drill →</a>
-    <span class="par">par 59 keystrokes · keyboard only · free</span>
+    <span class="par">par 57s · optimal 59 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> · fill E2:E4 ↓ · <em>E5</em> <em>=SUM(E2:E4)</em> · <em>F2</em> <em>=E2/$E$5</em> · fill F2:F4 ↓ + <em>ctrl+shift+%</em> · dress D5:E5: <em>ctrl+b</em> + <em>alt h b t</em></div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+%</kbd><span class="m">⌘⇧% on mac</span><span class="what">Percent, 0 decimals</span></div><div class="use">Margins, growth rates, weights — any ratio gets the percent treatment the moment it’s computed.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b t</kbd><span class="m">⌥ h b t on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="fnline">functions you'll type: <b style="color:var(--text)">SUMIF()</b> · <b style="color:var(--text)">SUM()</b></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>the rollup at E2 · <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>↵</kbd> — ranges $-locked, criteria walking</span></li>
-<li><span>select E2:E4 · <kbd>ctrl</kbd>+<kbd>d</kbd> — only D2 walks; that is what the anchors buy you</span></li>
-<li><span>foot it at E5 · <kbd>=SUM(E2:E4)</kbd> — the summary must tie to the ledger</span></li>
-<li><span>mix at F2 · <kbd>=E2/$E$5</kbd> — anchored denominator · fill F2:F4 ↓ · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd></span></li>
-<li><span>dress the total: select D5:E5 · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd></span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> · fill E2:E4 ↓ · <em>E5</em> <em>=SUM(E2:E4)</em> · <em>F2</em> <em>=E2/$E$5</em> · fill F2:F4 ↓ + <em>ctrl+shift+%</em> · dress D5:E5: <em>ctrl+b</em> + <em>alt h b t</em></div></div>
 
   <div class="section-title">More Formulas I drills</div>
   <div class="rel">

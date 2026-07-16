@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Make it model-ready — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="A full model-ready formatting pass Par: 66 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="A full model-ready formatting pass Par 63s, optimal 66 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Make it model-ready — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="A full model-ready formatting pass Par: 66 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="A full model-ready formatting pass Par 63s, optimal 66 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/gauntlet.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Make it model-ready — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="A full model-ready formatting pass Par: 66 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="A full model-ready formatting pass Par 63s, optimal 66 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/gauntlet.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Make it model-ready","description":"A full model-ready formatting pass","url":"https://www.hotkey.gg/drills/gauntlet.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formatting","teaches":"Model-ready is one rhythm: bold, comma, border, blue inputs — and the totals in accounting format (Alt H A N).","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Make it model-ready","item":"https://www.hotkey.gg/drills/gauntlet.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Make it model-ready","description":"A full model-ready formatting pass","url":"https://www.hotkey.gg/drills/gauntlet.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formatting","teaches":"Model-ready is one rhythm: bold, comma, border, blue inputs — and the totals in accounting format (Alt H A N).","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT63S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Make it model-ready","item":"https://www.hotkey.gg/drills/gauntlet.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,19 +102,24 @@
   <div class="sub">A raw sources & uses — both sides straight out of a banker’s head: naked numbers, no totals, nothing marked. Full dress, BOTH blocks: inputs blue, SUM each total with alt+=, bold + top border on both, commas at 0 decimals down both money columns, autofit so nothing clips. Every formatting op you know, both sides of the page, no mouse.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=gauntlet">train this drill →</a>
-    <span class="par">par 66 keystrokes · keyboard only · free</span>
+    <span class="par">par 63s · optimal 66 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>keyboard only</em> · inputs <em>B5:B8</em> + <em>E5:E8</em> → alt h f c blue font · <em>alt+=</em> both totals · <em>ctrl+b</em> + <em>alt h b t</em> both · <em>alt h k</em> + <em>alt h 9</em> ×2 down both columns · <em>alt h a n</em> both totals · <em>alt h o i</em> autofit</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Alt h f c</kbd><span class="m">⌥ h f c on mac</span><span class="what">Font color</span></div><div class="use">Font color: blue inputs, black formulas — the oldest convention in banking models, still enforced.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt+=</kbd><span class="m">⌥ = on mac</span><span class="what">AutoSum the adjacent range</span></div><div class="use">AutoSum reads the block above or beside the cursor and proposes the SUM — foot rows and columns without typing a formula.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b t</kbd><span class="m">⌥ h b t on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h k</kbd><span class="m">⌥ h k on mac</span><span class="what">Apply comma style</span></div><div class="use">Comma style on any block of raw numbers — readable thousands in three keys.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h 9</kbd><span class="m">⌥ h 9 on mac</span><span class="what">Remove a decimal place</span></div><div class="use">Strip decimals — share counts and headcounts don’t want cents.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h a n</kbd><span class="m">⌥ h a n on mac</span><span class="what">Align middle (vertical)</span></div><div class="use">Middle-align vertically when rows get tall — wrapped headers stay centered.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h o i</kbd><span class="m">⌥ h o i on mac</span><span class="what">Autofit column width</span></div><div class="use">The ##### fix: autofit the column to its widest entry in three keys.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>both input stacks in blue font: select B5:B8 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then the same on E5:E8</span></li>
-<li><span>totals with autosum: B9 · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd> · then E9 · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd></span></li>
-<li><span>dress both totals: <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd></span></li>
-<li><span>commas, 0 decimals, both money bodies: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> ×2</span></li>
-<li><span>the two totals in accounting format: <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> — $ aligned, the S&U convention</span></li>
-<li><span>autofit both: <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> — no #### leaves the desk</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>keyboard only</em> · inputs <em>B4:B7</em> + <em>E4:E7</em> → alt h f c blue font · <em>alt+=</em> both totals · <em>ctrl+b</em> + <em>alt h b t</em> both · <em>alt h k</em> + <em>alt h 9</em> ×2 down both columns · <em>alt h a n</em> both totals · <em>alt h o i</em> autofit</div></div>
 
   <div class="section-title">More Formatting drills</div>
   <div class="rel">

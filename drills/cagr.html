@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Compound it, three times — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="(End÷Begin)^(1÷yrs)−1 — three scattered blocks Par: 57 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="(End÷Begin)^(1÷yrs)−1 — three scattered blocks Par 55s, optimal 57 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Compound it, three times — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="(End÷Begin)^(1÷yrs)−1 — three scattered blocks Par: 57 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="(End÷Begin)^(1÷yrs)−1 — three scattered blocks Par 55s, optimal 57 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/cagr.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Compound it, three times — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="(End÷Begin)^(1÷yrs)−1 — three scattered blocks Par: 57 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="(End÷Begin)^(1÷yrs)−1 — three scattered blocks Par 55s, optimal 57 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/cagr.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Compound it, three times","description":"(End÷Begin)^(1÷yrs)−1 — three scattered blocks","url":"https://www.hotkey.gg/drills/cagr.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"CAGR = (end ÷ start)^(1÷years) − 1 — the ^ key does the compounding.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Compound it, three times","item":"https://www.hotkey.gg/drills/cagr.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Compound it, three times","description":"(End÷Begin)^(1÷yrs)−1 — three scattered blocks","url":"https://www.hotkey.gg/drills/cagr.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"CAGR = (end ÷ start)^(1÷years) − 1 — the ^ key does the compounding.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT55S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Compound it, three times","item":"https://www.hotkey.gg/drills/cagr.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,17 +102,17 @@
   <div class="sub">Three CAGR checks scattered where a real page would leave them — and they move every run. Same clean formula each time: (End ÷ Begin) ^ (1 ÷ Years) − 1, percent. Then read your own output like a banker: the deal with the highest CAGR gets flagged bold — computing the number is half the job; calling the winner is the other half.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=cagr">train this drill →</a>
-    <span class="par">par 57 keystrokes · keyboard only · free</span>
+    <span class="par">par 55s · optimal 57 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>B6</em> · =(B4/B3)^(1/B5)-1 · <em>ctrl+shift+%</em> · then <em>G6</em> · =(G4/G3)^(1/G5)-1 · <em>ctrl+shift+%</em> · then <em>I11</em> · =(I9/I8)^(1/I10)-1 · <em>ctrl+shift+%</em> · then <em>ctrl+b</em> the HIGHEST of the three</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+Shift+%</kbd><span class="m">⌘⇧% on mac</span><span class="what">Percent, 0 decimals</span></div><div class="use">Margins, growth rates, weights — any ratio gets the percent treatment the moment it’s computed.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>block one — at <b>B6</b> type <kbd>=(B4/B3)^(1/B5)-1</kbd> <kbd>↵</kbd> · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd></span></li>
-<li><span>block two — at <b>G6</b> type <kbd>=(G4/G3)^(1/G5)-1</kbd> <kbd>↵</kbd> · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd></span></li>
-<li><span>block three — at <b>I11</b> type <kbd>=(I9/I8)^(1/I10)-1</kbd> <kbd>↵</kbd> · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd></span></li>
-<li><span>now READ them — the highest CAGR wins the page: back to that cell · <kbd>ctrl</kbd>+<kbd>b</kbd></span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>E7</em> · =(E5/E4)^(1/E6)-1 · <em>ctrl+shift+%</em> · then <em>I11</em> · =(I9/I8)^(1/I10)-1 · <em>ctrl+shift+%</em> · then <em>D12</em> · =(D10/D9)^(1/D11)-1 · <em>ctrl+shift+%</em> · then <em>ctrl+b</em> the HIGHEST of the three</div></div>
 
   <div class="section-title">More Formulas I drills</div>
   <div class="rel">

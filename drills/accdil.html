@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Run accretion / dilution — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Combined EPS vs standalone — synergies in, financing drag out Par: 51 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Combined EPS vs standalone — synergies in, financing drag out Par 50s, optimal 51 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Run accretion / dilution — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Combined EPS vs standalone — synergies in, financing drag out Par: 51 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Combined EPS vs standalone — synergies in, financing drag out Par 50s, optimal 51 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/accdil.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Run accretion / dilution — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Combined EPS vs standalone — synergies in, financing drag out Par: 51 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Combined EPS vs standalone — synergies in, financing drag out Par 50s, optimal 51 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/accdil.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run accretion / dilution","description":"Combined EPS vs standalone — synergies in, financing drag out","url":"https://www.hotkey.gg/drills/accdil.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Accretion = pro-forma EPS ÷ standalone − 1 — the verdict is four rows of math.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run accretion / dilution","item":"https://www.hotkey.gg/drills/accdil.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run accretion / dilution","description":"Combined EPS vs standalone — synergies in, financing drag out","url":"https://www.hotkey.gg/drills/accdil.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Accretion = pro-forma EPS ÷ standalone − 1 — the verdict is four rows of math.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT50S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run accretion / dilution","item":"https://www.hotkey.gg/drills/accdil.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,18 +102,12 @@
   <div class="sub">The question every board asks: does the deal ADD to EPS? Now with the part juniors forget — the financing drag. Cash spent on the deal stops earning; that foregone interest comes OUT of pro forma income before you divide. Combine the income, net the drag, combine the shares, compute both EPS figures, and land the verdict — synergies push it up, the drag pulls it down.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=accdil">train this drill →</a>
-    <span class="par">par 51 keystrokes · keyboard only · free</span>
+    <span class="par">par 50s · optimal 51 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>B7</em> foregone interest <em>=-B5*B6</em> · <em>B8</em> pro forma NI <em>=SUM(B2:B4)+B7</em> · <em>B11</em> shares <em>=B9+B10</em> · <em>B12</em> standalone EPS <em>=B2/B9</em> · <em>B13</em> pro forma EPS <em>=B8/B11</em> · <em>B14</em> accretion <em>=B13/B12-1</em></div></div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>the drag first: B7 · <kbd>=-B5*B6</kbd> — cash consideration × its after-tax cost, negative convention</span></li>
-<li><span>pro forma NI at B8 · <kbd>=SUM(B2:B4)+B7</kbd> — acquirer + target + synergies, LESS the drag</span></li>
-<li><span>pro forma shares at B11 · <kbd>=B9+B10</kbd> — old count plus what you issued</span></li>
-<li><span>both EPS lines: B12 · <kbd>=B2/B9</kbd> · B13 · <kbd>=B8/B11</kbd></span></li>
-<li><span>the verdict at B14 · <kbd>=B13/B12-1</kbd> — positive = accretive; the drag can flip it</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>B7</em> foregone interest <em>=-B5*B6</em> · <em>B8</em> pro forma NI <em>=SUM(B2:B4)+B7</em> · <em>B11</em> shares <em>=B9+B10</em> · <em>B12</em> standalone EPS <em>=B2/B9</em> · <em>B13</em> pro forma EPS <em>=B8/B11</em> · <em>B14</em> accretion <em>=B13/B12-1</em></div></div>
 
   <div class="section-title">More Models I drills</div>
   <div class="rel">

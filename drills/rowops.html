@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Rebuild the schedule — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Insert a row and paste the staged line in, delete the junk — the live SUM widens and contracts itself Par: 24 keystrokes. Free interactive Excel drill — no mo">
+<meta name="description" content="Insert a row and paste the staged line in, delete the junk — the live SUM widens and contracts itself Par 26s, optimal 24 keys. Free interactive Excel drill —">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Rebuild the schedule — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Insert a row and paste the staged line in, delete the junk — the live SUM widens and contracts itself Par: 24 keystrokes. Free interactive Excel drill — no mo">
+<meta property="og:description" content="Insert a row and paste the staged line in, delete the junk — the live SUM widens and contracts itself Par 26s, optimal 24 keys. Free interactive Excel drill —">
 <meta property="og:url" content="https://www.hotkey.gg/drills/rowops.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Rebuild the schedule — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Insert a row and paste the staged line in, delete the junk — the live SUM widens and contracts itself Par: 24 keystrokes. Free interactive Excel drill — no mo">
+<meta name="twitter:description" content="Insert a row and paste the staged line in, delete the junk — the live SUM widens and contracts itself Par 26s, optimal 24 keys. Free interactive Excel drill —">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/rowops.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Rebuild the schedule","description":"Insert a row and paste the staged line in, delete the junk — the live SUM widens and contracts itself","url":"https://www.hotkey.gg/drills/rowops.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Ctrl++ inserts a row, Ctrl+− deletes one — and the live SUM widens and contracts itself; structure is keyboard work.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Rebuild the schedule","item":"https://www.hotkey.gg/drills/rowops.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Rebuild the schedule","description":"Insert a row and paste the staged line in, delete the junk — the live SUM widens and contracts itself","url":"https://www.hotkey.gg/drills/rowops.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Ctrl++ inserts a row, Ctrl+− deletes one — and the live SUM widens and contracts itself; structure is keyboard work.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT26S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Rebuild the schedule","item":"https://www.hotkey.gg/drills/rowops.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,17 +102,23 @@
   <div class="sub">The opex schedule came back mis-built: a line got DROPPED (the data team staged it off to the side) and a stale PLACEHOLDER is still inflating the total. The Total is a LIVE SUM — watch it re-tie as you fix the structure. Insert a row where the missing line belongs (Shift+Space, then Ctrl + or Alt H I R), COPY the staged pair in, delete the junk row (Ctrl −), then dress the pasted value to match the block. The foot never gets retyped — the SUM stretches and shrinks with the sheet.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=rowops">train this drill →</a>
-    <span class="par">par 24 keystrokes · keyboard only · free</span>
+    <span class="par">par 26s · optimal 24 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys">insert a row below <em>Recruiting</em> · copy the staged <em>G4:H4</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row · the live Total re-ties to <em>2,460</em> on its own · dress the pasted value: comma + blue (<em>alt h k</em>, <em>alt h f c</em>)</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Shift+Space</kbd><span class="m">⇧Space on mac</span><span class="what">Select the entire row</span></div><div class="use">Select the whole row — pair it with Ctrl+Shift+= to insert, Ctrl+- to delete.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h i r</kbd><span class="m">⌥ h i r on mac</span><span class="what">Insert rows</span></div><div class="use">Insert rows where the schedule grows — a live SUM widens to absorb the new line.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+C</kbd><span class="m">⌘C on mac</span><span class="what">Copy</span></div><div class="use">Copy starts almost every hand-off — grab a finished block once, then place it in the summary, the deck, or next quarter’s column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+V</kbd><span class="m">⌘V on mac</span><span class="what">Paste</span></div><div class="use">Plain paste brings everything: values, formulas, formats. Reach for Paste Special when you only want part of it.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h d r</kbd><span class="m">⌥ h d r on mac</span><span class="what">Delete rows</span></div><div class="use">Delete full rows as structure changes — live formulas rewire themselves around the edit.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h k</kbd><span class="m">⌥ h k on mac</span><span class="what">Apply comma style</span></div><div class="use">Comma style on any block of raw numbers — readable thousands in three keys.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h f c</kbd><span class="m">⌥ h f c on mac</span><span class="what">Font color</span></div><div class="use">Font color: blue inputs, black formulas — the oldest convention in banking models, still enforced.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>a line is missing — open a slot: select the row below <b>Recruiting</b> · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row · <kbd>ctrl</kbd>+<kbd>+</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd>) — and watch the Total’s SUM WIDEN by itself</span></li>
-<li><span>the data team staged the line at <b>G4:H4</b>: select it · <kbd>ctrl</kbd>+<kbd>c</kbd> · land on the new row’s label cell · <kbd>ctrl</kbd>+<kbd>v</kbd> — label and value drop in together</span></li>
-<li><span>the stale line: on the <b>PLACEHOLDER</b> row · <kbd>shift</kbd>+<kbd>space</kbd> · <kbd>ctrl</kbd>+<kbd>−</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>) — the block closes up and the SUM CONTRACTS; the Total now ties to <b>2,460</b></span></li>
-<li><span>the pasted value arrived naked — dress it to the block: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> — typed data wears blue</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">insert a row below <em>Facilities</em> · copy the staged <em>G4:H4</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row · the live Total re-ties to <em>2,010</em> on its own · dress the pasted value: comma + blue (<em>alt h k</em>, <em>alt h f c</em>)</div></div>
 
   <div class="section-title">More Foundations drills</div>
   <div class="rel">

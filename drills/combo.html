@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Clean the paste — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Bold, comma, wrap and autofit a pasted table Par: 22 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Bold, comma, wrap and autofit a pasted table Par 24s, optimal 22 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Clean the paste — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Bold, comma, wrap and autofit a pasted table Par: 22 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Bold, comma, wrap and autofit a pasted table Par 24s, optimal 22 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/combo.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Clean the paste — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Bold, comma, wrap and autofit a pasted table Par: 22 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Bold, comma, wrap and autofit a pasted table Par 24s, optimal 22 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/combo.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Clean the paste","description":"Bold, comma, wrap and autofit a pasted table","url":"https://www.hotkey.gg/drills/combo.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formatting","teaches":"Select the whole range, format once — Alt H chords work a block, not a cell.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Clean the paste","item":"https://www.hotkey.gg/drills/combo.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Clean the paste","description":"Bold, comma, wrap and autofit a pasted table","url":"https://www.hotkey.gg/drills/combo.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formatting","teaches":"Select the whole range, format once — Alt H chords work a block, not a cell.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT24S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Clean the paste","item":"https://www.hotkey.gg/drills/combo.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,18 +102,22 @@
   <div class="sub">A comp sheet came over as a raw paste: title with no weight, headers slumming it lowercase-left, figures unformatted, the notes column overrunning its neighbors, half the columns showing ####. Make it presentable end to end — which metrics came over, and where the block sits, changes every run.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=combo">train this drill →</a>
-    <span class="par">par 22 keystrokes · keyboard only · free</span>
+    <span class="par">par 24s · optimal 22 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys"><em>A1</em> + headers <em>A2:E2</em> → <em>ctrl+b</em> · metric headers <em>B2:D2</em> → <em>alt h a r</em> · figures <em>B3:D6</em> → <em>alt h k</em> + <em>alt h 9</em> ×2 · notes <em>E3:E6</em> → <em>alt h w</em> · then <em>alt h o i</em> — no #### ships</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h a r</kbd><span class="m">⌥ h a r on mac</span><span class="what">Align right</span></div><div class="use">Right-align headers over number columns so they sit flush with their digits.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h k</kbd><span class="m">⌥ h k on mac</span><span class="what">Apply comma style</span></div><div class="use">Comma style on any block of raw numbers — readable thousands in three keys.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h 9</kbd><span class="m">⌥ h 9 on mac</span><span class="what">Remove a decimal place</span></div><div class="use">Strip decimals — share counts and headcounts don’t want cents.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h w</kbd><span class="m">⌥ h w on mac</span><span class="what">Wrap text</span></div><div class="use">Wrap long header text instead of widening the column — the layout survives.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h o i</kbd><span class="m">⌥ h o i on mac</span><span class="what">Autofit column width</span></div><div class="use">The ##### fix: autofit the column to its widest entry in three keys.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>weight first: A1 · <kbd>ctrl</kbd>+<kbd>b</kbd> · then the header row A2:E2 · <kbd>ctrl</kbd>+<kbd>b</kbd></span></li>
-<li><span>numbers read right-aligned — headers over them too: B2:D2 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd></span></li>
-<li><span>figures to commas: B3:D6 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice</span></li>
-<li><span>the notes column wraps instead of spilling: E3:E6 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd></span></li>
-<li><span>last pass, always: select the number columns · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> — nothing ships showing ####</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>A1</em> + headers <em>A2:D2</em> → <em>ctrl+b</em> · metric headers <em>B2:C2</em> → <em>alt h a r</em> · figures <em>B3:C7</em> → <em>alt h k</em> + <em>alt h 9</em> ×2 · notes <em>D3:D7</em> → <em>alt h w</em> · then <em>alt h o i</em> — no #### ships</div></div>
 
   <div class="section-title">More Formatting drills</div>
   <div class="rel">

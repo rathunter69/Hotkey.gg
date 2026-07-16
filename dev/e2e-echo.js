@@ -91,7 +91,7 @@ function combo(k) {
   const finished = await page.waitForFunction(() => !echoOn, null, { timeout: 5000 }).then(() => true).catch(() => false);
   ok(finished, 'echo completes after the last chord');
   s = await st();
-  ok(/echoed/.test(s.res), 'the epilogue celebrates the echo', s.res);
+  ok(/walked the whole line/.test(s.res), 'the epilogue celebrates the walk', s.res);
   ok(s.done === false && !s.cel, 'the run never scored (no win, no celebration)');
   ok(!s.spot, 'the spotlight is gone');
   const reset = await page.evaluate(() => !(S.cells['F2'] && S.cells['F2'].formula));
@@ -136,6 +136,17 @@ function combo(k) {
   });
   ok(Object.values(mac.mac).every(v => v === true), 'mac equivalences all accept', JSON.stringify(mac.mac));
   ok(Object.values(mac.win).every(v => v === false), 'near-miss chords all reject', JSON.stringify(mac.win));
+
+  console.log('G. the stuck nudge points lost players at the trainers');
+  await page.evaluate(() => { loadChallenge('foot'); });
+  await page.waitForTimeout(3600);                       // one interval tick sets the baseline
+  await page.evaluate(() => { window.__stkT = Date.now() - 50000; window.__stkDone = false; });
+  const nudged = await page.waitForFunction(() =>
+    document.getElementById('echoBtn').classList.contains('nudge'), null, { timeout: 8000 })
+    .then(() => true).catch(() => false);
+  ok(nudged, 'no checklist progress for 40s pulses watch/follow-along');
+  const disarmed = await page.evaluate(() => window.__stkDone === true);
+  ok(disarmed, 'the nudge fires once per drill load');
 
   ok(errs.length === 0, 'zero page errors through echo mode', errs.join(' | '));
   console.log(fail === 0 ? `ECHO: ALL ${pass} PASS` : `ECHO: ${fail} FAIL / ${pass} pass`);

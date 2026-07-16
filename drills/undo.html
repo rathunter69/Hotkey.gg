@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Undo is a tool — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Delete big, Ctrl+Z, then delete only what deserved it Par: 5 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Delete big, Ctrl+Z, then delete only what deserved it Par 10s, optimal 5 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Undo is a tool — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Delete big, Ctrl+Z, then delete only what deserved it Par: 5 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Delete big, Ctrl+Z, then delete only what deserved it Par 10s, optimal 5 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/undo.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Undo is a tool — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Delete big, Ctrl+Z, then delete only what deserved it Par: 5 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Delete big, Ctrl+Z, then delete only what deserved it Par 10s, optimal 5 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/undo.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Undo is a tool","description":"Delete big, Ctrl+Z, then delete only what deserved it","url":"https://www.hotkey.gg/drills/undo.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Ctrl+Z rewinds your exact steps — undo is aim, not panic; delete big, rewind, then delete only what deserved it.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Undo is a tool","item":"https://www.hotkey.gg/drills/undo.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Undo is a tool","description":"Delete big, Ctrl+Z, then delete only what deserved it","url":"https://www.hotkey.gg/drills/undo.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Foundations","teaches":"Ctrl+Z rewinds your exact steps — undo is aim, not panic; delete big, rewind, then delete only what deserved it.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT10S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Undo is a tool","item":"https://www.hotkey.gg/drills/undo.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,17 +102,18 @@
   <div class="sub">Two scratch blocks on a live tab, and the note taped to your monitor names the one to clear. You clear it — and the SECOND note, under the first, says that block feeds Q4 and the OTHER one was the junk. Ctrl+Z brings every cell back exactly as it was; then clear the right block and dress the survivors. Undo is how fast hands stay fearless.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=undo">train this drill →</a>
-    <span class="par">par 5 keystrokes · keyboard only · free</span>
+    <span class="par">par 10s · optimal 5 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys">bold <em>A1</em> · italicize the memo <em>A2</em> · clear <em>F10:G12</em> (“SCRATCH A” — the note says so) · <em>ctrl+z</em> — it FED Q4 · now clear <em>B10:C12</em></div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+I</kbd><span class="m">⌘I on mac</span><span class="what">Italic</span></div><div class="use">Italics are the convention for memos, footnotes, and anything explanatory rather than computed.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+Z</kbd><span class="m">⌘Z on mac</span><span class="what">Undo</span></div><div class="use">Delete big, undo, keep what deserved to stay — the undo stack is deep, and working fearlessly is faster than working carefully.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>housekeeping first: <kbd>ctrl</kbd>+<kbd>b</kbd> the title · the memo at A2 goes <kbd>ctrl</kbd>+<kbd>i</kbd> — memos read italic</span></li>
-<li><span>the note says clear SCRATCH A: select F10:G12 · <kbd>delete</kbd></span></li>
-<li><span>second note: SCRATCH A FEEDS Q4 — <kbd>ctrl</kbd>+<kbd>z</kbd>, every value back exactly as it was</span></li>
-<li><span>the junk was SCRATCH B all along: select B10:C12 · <kbd>delete</kbd> — aim, then fire</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">bold <em>A1</em> · italicize the memo <em>A2</em> · clear <em>B10:C12</em> (“SCRATCH A” — the note says so) · <em>ctrl+z</em> — it FED Q4 · now clear <em>F5:G7</em></div></div>
 
   <div class="section-title">More Foundations drills</div>
   <div class="rel">

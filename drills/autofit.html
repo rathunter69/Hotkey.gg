@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Fix the squeezed columns — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="##### everywhere — Alt H O I fits the columns Par: 12 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="##### everywhere — Alt H O I fits the columns Par 15s, optimal 12 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Fix the squeezed columns — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="##### everywhere — Alt H O I fits the columns Par: 12 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="##### everywhere — Alt H O I fits the columns Par 15s, optimal 12 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/autofit.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Fix the squeezed columns — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="##### everywhere — Alt H O I fits the columns Par: 12 keystrokes. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="##### everywhere — Alt H O I fits the columns Par 15s, optimal 12 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/autofit.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -67,6 +67,15 @@
   .rel a:hover{border-color:var(--accent-dim)}
   .rel .rn{font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--accent)}
   .rel .rd{font-size:12px; color:var(--muted); margin-top:3px}
+  .scb{padding:13px 0; border-bottom:1px solid var(--line)}
+  .scb:last-child{border-bottom:0; padding-bottom:2px}
+  .sch{display:flex; gap:14px; align-items:baseline; flex-wrap:wrap}
+  .sch kbd{padding:1px 8px; font-size:12.5px}
+  .sch .m{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .sch .what{font-size:13.5px; color:var(--text); font-weight:600}
+  .scb .use{font-size:13px; color:var(--muted); margin-top:5px; max-width:640px}
+  .walknote{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:6px; padding-bottom:11px; border-bottom:1px solid var(--line)}
+  .fnline{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--line)}
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
@@ -80,7 +89,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=262"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Fix the squeezed columns","description":"##### everywhere — Alt H O I fits the columns","url":"https://www.hotkey.gg/drills/autofit.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formatting","teaches":"Alt H O I autofits to content; a print block wants ONE width — set it with Alt H O W.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Fix the squeezed columns","item":"https://www.hotkey.gg/drills/autofit.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Fix the squeezed columns","description":"##### everywhere — Alt H O I fits the columns","url":"https://www.hotkey.gg/drills/autofit.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formatting","teaches":"Alt H O I autofits to content; a print block wants ONE width — set it with Alt H O W.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT15S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Fix the squeezed columns","item":"https://www.hotkey.gg/drills/autofit.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -93,15 +102,19 @@
   <div class="sub">Two problems, two different fixes — and knowing which is which is the skill. The label block is squeezed to hash marks: Alt H O I fits it to its contents. The four data columns are RAGGED — every width different, and autofit would keep them uneven. Select across them and set ONE width: Alt H O W, 12, enter. Autofit is for content; uniformity is for print.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=autofit">train this drill →</a>
-    <span class="par">par 12 keystrokes · keyboard only · free</span>
+    <span class="par">par 15s · optimal 12 keys · keyboard only · free</span>
   </div>
 
-  <div class="section-title">The keys</div>
-  <div class="panel"><div class="keys">select <em>A1:B1</em> · <em>alt h o i</em> — fit to content · then <em>E3:H3</em> · <em>alt h o w</em> → <em>12</em> <em>↵</em> — ONE width across the print block</div></div>
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Shift+→</kbd><span class="m">⇧→ on mac</span><span class="what">Extend selection one cell</span></div><div class="use">Nudge a selection one cell at a time when the block you need doesn’t end at a data edge.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h o i</kbd><span class="m">⌥ h o i on mac</span><span class="what">Autofit column width</span></div><div class="use">The ##### fix: autofit the column to its widest entry in three keys.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h o w 1 2</kbd><span class="m">⌥ h o w 1 2 on mac</span><span class="what">Set column width…</span></div><div class="use">Exact column widths when autofit gives a ragged page — uniform width is part of house style.</div></div>
+  </div>
 
-  <div class="section-title">Step by step</div>
-  <div class="panel"><ol class="steps"><li><span>the squeezed labels: on A1 · <kbd>⇧</kbd>+<kbd>→</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> — content decides</span></li>
-<li><span>the ragged data block at E3:H3 — autofit would keep it UNEVEN. Select across it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd> · type <kbd>12</kbd> <kbd>↵</kbd> — one width, clean edge, print-ready</span></li></ol></div>
+  <div class="section-title">The optimal line</div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">select <em>A1:B1</em> · <em>alt h o i</em> — fit to content · then <em>E3:H3</em> · <em>alt h o w</em> → <em>12</em> <em>↵</em> — ONE width across the print block</div></div>
 
   <div class="section-title">More Formatting drills</div>
   <div class="rel">
