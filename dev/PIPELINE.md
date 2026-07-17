@@ -1,6 +1,62 @@
 # PIPELINE — the Fable task queue
 
-## ⚡ STATE OF THE QUEUE (r296, 2026-07-17 — READ FIRST)
+## ⚡ STATE OF THE QUEUE (r302, 2026-07-17 evening — READ FIRST)
+**Seven PRs merged today (#134–#140), all Wolf-live-feedback driven.** Shipped: engine
+finance/text/sort pack (NPV·IRR·LARGE/SMALL/RANK·text pack·& operator) folded into
+dcfbuild/lbobuild/comps/dashcover · Flash Fill (Ctrl+E) · border chords to EXCEL CANON
+(Alt H B O/P/L/R/N/A/S/T/B/D — T was top for months, wrong) + full-product canon audit
+(1 more wrong chord found+fixed: Paste Special None=O; Alt H V V wired in classic) ·
+sign-out lands home as a "fresh desk" reset + full account-mirror wipe · login renders
+eagerly AND hard-reloads on sign-in (the mismatch class is dead) · **ONE RANK EVERYWHERE**
+(nav.js hand-rolled pct=idx/total vs shared idx/(n-1) — root-caused, unified on
+HK_RANK.standing + write-through cache) · rapid-fire overhaul (real ribbon echo, fixed C4
+target, 8-row big grid, every-route matchers, dupe cards deleted) · collision-checked
+handle suggestions · UI/nav polish batch (one-row mode bar, DC dot cue, ribbon wraps,
+bubble back-button, responsive nav labels, icon-only level chips) · dev/COPY_INVENTORY.md
+(555 rows, 34 flagged, batch-markup ready).
+
+**HOUSE RULES REINFORCED TODAY:**
+- A round is NOT done until the PR is MERGED and main verified moved (the stranded-branch
+  fiasco: 19 commits sat unmerged while Wolf stared at a stale site).
+- Canon sweeps must cover FOUR key encodings: `L('B'),L('T')` spaced + unspaced,
+  `{key:'b'},{key:'t'}` object literals, and `W('h','b','t')` wrappers.
+- Iterate with TARGETED tests; CI is the authoritative full gate (local full-sweeps were
+  stalling sessions for 1–2h).
+
+**THE QUEUE (priority order, specs in the named docs):**
+1. **ONBOARDING V3** — dev/ONBOARDING_V3.md (build-ready): fold the primer into ONE
+   spotlight sequence on a CLEARED grid w/ a hidden intro drill; teach = OR +; new
+   typed-entry tour gate; counter fix; replayable tour.
+2. **RANKED OPT-IN + LP-STYLE PROGRESSION (Wolf, design-first — mock before build):**
+   currently users show a rank without ever opting in. Wanted: prompt at threshold level
+   explaining ranked + sub-buckets (top/middle/bottom of tier — also surface as leaderboard
+   filter), opt in at lowest rank, UNRANKED icon + opt-in affordance on the card until then,
+   and League-style visible in-rank progress ("LP": pass someone → gain; clear rank-up rules).
+3. **SHEET TABS REWORK (Wolf):** tabs so compressed the text is useless — explore chapter =
+   two "pages" of ~5 drills so every tab is readable. Screenshot to Wolf before shipping.
+4. **SEED TEST USERS (Wolf):** ~15–25 clearly-marked bot accounts w/ plausible spread of
+   per-drill times so boards read lived-in (smoke-u fixture pattern, NEW-timestamp migration;
+   decide a flag for later purge/filter).
+5. **QUICK UX:** picker opens AT the current drill (unfold + scrollIntoView) · move the
+   keyboard-selector button into the mode bar · Format Cells card gets a visible
+   "house letters, not Excel's" marker (canon-audit item — 9 of its letters are inventions;
+   E/K are real) · RF solved-cell display fidelity (percent 0-dec, comma 2-dec, date
+   d-mmm-yy) · RF "comment"→"note" label · refmap generator tail-bleed fix
+   (ALT>H>I>C>Q>2) · reference practice-links for those two chords.
+6. **GRID COLOR A/B (Wolf, design-first):** black/near-black cell cursor + green ONLY for
+   selection highlights (all-green outlines confuse). Screenshot A/B both themes.
+7. **F9 + TIE-OUT DRILL:** engine F9 evaluate-fragment (select part of a formula in edit,
+   F9 collapses to value, Esc restores) + a fulsome audit drill (trace 3 hops w/ Ctrl+[,
+   F9 the suspect piece, fix at source, totals re-tie). Extends or supersedes wirewalk.
+8. **ICON CONSISTENCY SWEEP (Wolf):** match every ancillary icon to the page-header set
+   (keyboard/trophy/social/stats/book). Screenshot-first batch.
+9. **COPY BATCH:** dev/COPY_INVENTORY.md awaits Wolf's row-number markup (he'll do it from
+   a personal PC; header lists what's already fixed).
+10. **WOLF-GATED:** email reminders/verification templates (EMAIL_SETUP.md step 1 = domain
+    mailbox) · T-H interview mode "go" · T-Q school flair phases 2-3 · seasons (DAU-gated).
+
+<!-- ————————————————— history below ————————————————— -->
+## ⚡ prior state (r296, 2026-07-17 morning)
 The r296 round (branch `claude/pipeline-engine-integration-laki0l`) did three things:
 1. **RESCUED THE STRANDED SESSION** — the one-row-toolbar / marathon-purge / auth-fix /
    account-overhaul / leaderboard / rapid-fire arc (19 commits) was sitting unmerged on
