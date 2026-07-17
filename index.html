@@ -2511,7 +2511,7 @@ const CHALLENGES = {
     name:'Scrub', label:'Clean the export', par:21, parKeys:19,
     aha:'Exports come dirty — delete junk rows (Ctrl+−), sort (Alt A S), re-total; the data is yours.',
     prompt:'The deal list came out of the system DIRTY: a duplicated header row, a "--- PAGE 2 ---" break, and a stale SUBTOTAL row that will double-count the moment anyone totals the column. Scrub it — delete all three junk rows, sort what is real largest-first, and re-total the clean data. Every export you will ever receive needs this pass.',
-    req(){ const o=this._o; return 'delete the 3 junk rows (<em>alt h d r</em> each) · select <em>'+o.range+'</em> · <em>alt a s d</em> · foot at <em>'+o.foot+'</em> → <em>alt+=</em> <em>↵</em> · <em>ctrl+b</em>'; },
+    req(){ const o=this._o; return 'the junk = the second <em>Deal</em> header, <em>--- PAGE 2 ---</em>, and <em>SUBTOTAL</em> — delete each (<em>alt h d r</em>) · select <em>'+o.range+'</em> · <em>alt a s d</em> · foot at <em>'+o.foot+'</em> → <em>alt+=</em> <em>↵</em> · <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'hunt the junk top to bottom: the duplicate header, the page break, the SUBTOTAL trap — on each row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>',
       'the data is contiguous now: select '+o.range+' (cursor in the size column) · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> — largest first',
@@ -2568,8 +2568,14 @@ const CHALLENGES = {
         else if(!a||this._byName[a.value]!==b.value) sorted=false; }
       const f=S.cells[o.foot];
       const tot=this._sizes.reduce((x,y)=>x+y,0);
+      let pageGone=true, subGone=true;
+      for(const k in S.cells){ const v=S.cells[k]&&S.cells[k].value;
+        if(v==='--- PAGE 2 ---') pageGone=false;
+        if(v==='SUBTOTAL') subGone=false; }
       return [
-        {label:'delete all three junk rows — the dup header, the page break, the SUBTOTAL trap', ok: junkGone && dealHdrs===1},
+        {label:'delete the duplicate header row — two "Deal" headers, only the top one is real', ok: dealHdrs===1},
+        {label:'delete the "--- PAGE 2 ---" print-break row', ok: pageGone},
+        {label:'delete the SUBTOTAL row — it double-counts the moment anyone totals the column', ok: subGone},
         {label:'sort the seven real deals largest-first ('+o.range+')', ok: sorted},
         {label:'re-total the clean data — live SUM at '+o.foot+', bold', ok: !!(f&&f.formula&&/SUM/i.test(String(f.formula))&&Math.abs((f.value||0)-tot)<0.5&&f.bold)},
       ];

@@ -91,7 +91,7 @@ window.HOTKEY_DRILLS = {
 
     // Data
     sort:       { name:'Sort',     label:'Sort the table',tab:'Sort',       desc:'Sort the table, total it, bold the total' },
-    scrub:      { name:'Scrub',    label:'Clean the export',     tab:'Scrub',      desc:'Drop the junk rows, sort what\u2019s real, re-total the clean data' },
+    scrub:      { name:'Scrub',    label:'Clean the export',     tab:'Scrub',      desc:'A system export with a duplicate header, a page-break row, and a stale SUBTOTAL \u2014 delete all three, sort, re-total' },
     recon:      { name:'Recon',    label:'Two systems, one truth',tab:'Recon',     desc:'COUNTIF for presence, INDEX/MATCH for amounts \u2014 drive \u0394 to zero' },
     grpfold:    { name:'Group',    label:'Fold the detail away', tab:'Group',      desc:'Shift+Alt+\u2192 groups the months \u2014 never hide, always group' },
     filterpass: { name:'Filter',   label:'Work the filtered view', tab:'Filter',    desc:'Ctrl+Shift+L turns on filters, Alt+\u2193 opens the picker \u2014 the answer reads itself' },
