@@ -3679,8 +3679,8 @@ const CHALLENGES = {
     }
   },
   copyover:{
-    name:'Copyover', label:'One copy, three hand-offs', par:13, parKeys:10,
-    aha:'Ctrl+C once, Ctrl+V many — a copied block travels, then columns peel off where it landed.',
+    name:'Copyover', label:'Chain the hand-offs', par:13, parKeys:10,
+    aha:'Ctrl+C carries formulas WITH the data — chain it: block to the build, a column off the landed copy, values-only to the summary.',
     prompt:'A live sub-build feeds the page \u2014 but the hand-offs chain: the FULL block goes to the working area, then one COLUMN peels off the landed copy to the sensitivity strip, and the summary takes values only from the original. Three destinations, two different sources, one discipline: copy deliberately, aim before you paste.',
     req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d1+'</em> \u2192 <em>ctrl+v</em> \u00b7 then select <em>'+o.landedCol+'</em> (the LANDED copy\u2019s first column) \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d2+'</em> \u2192 <em>ctrl+v</em> \u00b7 back to <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d3+'</em> \u2192 <em>alt e s v \u21b5</em>'; },
     guide(){ const o=this._o; return [
@@ -7558,6 +7558,21 @@ function usedRange(){
   return {r:maxR, c:maxC};
 }
 
+/* r308: Excel's CURRENT REGION — grow the box until a full border ring is empty */
+function regionAround(r,c){
+  let r1=r,r2=r,c1=c,c2=c;
+  const any=(rr1,cc1,rr2,cc2)=>{ for(let rr=Math.max(1,rr1);rr<=Math.min(S.ROWS,rr2);rr++)
+    for(let cc=Math.max(1,cc1);cc<=Math.min(COLS,cc2);cc++){ if(nonEmpty(rr,cc)) return true; } return false; };
+  for(let guard=0; guard<40; guard++){
+    let grew=false;
+    if(r1>1    && any(r1-1,c1-1,r1-1,c2+1)){ r1--; grew=true; }
+    if(r2<S.ROWS && any(r2+1,c1-1,r2+1,c2+1)){ r2++; grew=true; }
+    if(c1>1    && any(r1-1,c1-1,r2+1,c1-1)){ c1--; grew=true; }
+    if(c2<COLS && any(r1-1,c2+1,r2+1,c2+1)){ c2++; grew=true; }
+    if(!grew) break;
+  }
+  return {r1,c1,r2,c2};
+}
 function selRange(){
   if(!S.sel) return {r1:S.active.r,c1:S.active.c,r2:S.active.r,c2:S.active.c};
   return {r1:Math.min(S.sel.r,S.active.r),r2:Math.max(S.sel.r,S.active.r),
@@ -8084,6 +8099,9 @@ function render(){
   let head='<tr><th class="rowhdr"></th>';
   for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${__ew[c]}px">${colLetter(c)}</th>`;
   head+='</tr>'; g.innerHTML+=head;
+  /* r308 (Wolf): the DISPLAYED active cell is the selection ANCHOR (Excel-true) — extending
+     a selection used to march the ring to the far end; native Excel keeps it at the start */
+  const __dA = S.sel ? (S.selA && S.selA.r>=1 ? S.selA : {r:S.sel.r, c:S.sel.c}) : S.active;
   for(let r=1;r<=S.ROWS;r++){
     if(rowHidden(r)) continue;   // r179: collapsed group detail
     let grpCls='', grpGlyph='';
@@ -8103,7 +8121,7 @@ function render(){
       if(cell.bt)cls.push('bt'); if(cell.bb)cls.push('bb'); if(cell.ball)cls.push('ball'); if(cell.bdbl)cls.push('bdbl');
       if(cell.align)cls.push('align-'+cell.align);
       if(cell.fontColor)cls.push('fc-'+cell.fontColor);
-      const isActive=(r===S.active.r&&c===S.active.c);
+      const isActive=(r===__dA.r&&c===__dA.c);
       const inSel=(r>=sr.r1&&r<=sr.r2&&c>=sr.c1&&c<=sr.c2);
       if(isActive)cls.push('active'); else if(inSel&&S.sel)cls.push('sel');
       if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2) cls.push(guided?'gtarget':'ttarget');
@@ -8280,8 +8298,9 @@ function updateFormulaBar(){
     return;
   }
   if(fxa) fxa.classList.remove('on');
-  const cell=get(S.active.r,S.active.c);
-  $('nameBox').textContent=ck(S.active.r,S.active.c);
+  const __dA = S.sel ? (S.selA && S.selA.r>=1 ? S.selA : {r:S.sel.r, c:S.sel.c}) : S.active;   /* r308: anchor display */
+  const cell=get(__dA.r,__dA.c);
+  $('nameBox').textContent=ck(__dA.r,__dA.c);
   const fc=$('fContent');
   if(cell.formula){
     fc.className='fcontent isfx';
@@ -9309,8 +9328,25 @@ function autoColor(scope){
   commitAction();
 }
 
+/* r308 (Wolf): with a selection live, TYPING edits the DISPLAYED active cell (the anchor),
+   not the selection's far corner — Excel-true, and it makes Ctrl+Enter's per-cell ref
+   translation read naturally (type =C4*2 on anchor C8 → D8 gets =D4*2). Only when the
+   anchor is a CORNER (shift-extends, pastes) — the 2-corner selection model can't hold an
+   interior active cell, so space-selects keep the old behavior. */
+function editRetarget(){
+  try{
+    if(!S || !S.sel || editing) return;
+    const rg=selRange();
+    const a=(S.selA && S.selA.r>=1) ? S.selA : {r:S.sel.r, c:S.sel.c};
+    const isCorner=(a.r===rg.r1||a.r===rg.r2)&&(a.c===rg.c1||a.c===rg.c2);
+    if(!isCorner || (a.r===S.active.r && a.c===S.active.c)) return;
+    S.sel={r:(a.r===rg.r1?rg.r2:rg.r1), c:(a.c===rg.c1?rg.c2:rg.c1)};
+    S.active={r:a.r, c:a.c}; S.selA={r:a.r, c:a.c};
+  }catch(e){}
+}
 function startEdit(initial, mode){
   if(done) return; startClock();
+  editRetarget();
   editing=true; editBuf=initial;
   editMode = mode || 'enter';
   editCaret = initial.length;
@@ -9352,6 +9388,31 @@ function commitEdit(dr,dc){
   if(__walk && S.marks && S.marks.length) gotoNextMark(__walk>0?1:-1);   // r182: the hunt walks itself \u2014 next surviving mark
 }
 
+/* r308 (Wolf): Ctrl+Enter — Excel's fill-commit. The edit commits into EVERY cell of the
+   selection; formulas translate relative to the edited cell, values copy as-is. Selection
+   and active cell stay put — the follow-up format chord lands on the same range. */
+function commitEditAll(){
+  if(editBuf && editBuf[0]==='='){
+    const opens=(editBuf.match(/\(/g)||[]).length, closes=(editBuf.match(/\)/g)||[]).length;
+    if(opens>closes) editBuf += ')'.repeat(opens-closes);
+  }
+  const buf=editBuf.trim();
+  const ar=S.active.r, ac=S.active.c;
+  editing=false; editBuf='';
+  editAnchor=null; editPointer=null; editPointerStart=-1; editPointerBase=null;
+  if(buf!==''){
+    pushUndo();
+    eachSel((cell,rr,cc)=>{
+      if(buf[0]==='='){
+        const f=(rr!==ar||cc!==ac) ? translateFormula(buf, rr-ar, cc-ac) : buf;
+        cell.formula=f; let v; try{ v=evalFormula(f); }catch(_){ v=NaN; }
+        cell.value=(typeof v==='number')?(isFinite(v)?v:0):(v!=null?v:0); cell.txt=false;
+      } else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf); cell.txt=false; }
+      else { cell.formula=null; cell.value=buf; cell.txt=true; }
+    });
+  }
+  commitAction();
+}
 // Pointer helpers: arrow keys during formula edit drop or move a cell reference into editBuf.
 // startPointerFromArrow → first arrow after `=` or after an operator: pointer = anchor + arrow direction.
 // movePointer → subsequent arrows while a reference is active: move the pointer, rewrite the ref in editBuf.
@@ -9885,14 +9946,14 @@ function doPaste(kind, op){
     }
     S.clipboard=null; try{ const mq=$('marquee'); if(mq) mq.style.display='none'; }catch(e){}
     pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
-    S.sel={r:r0,c:c0}; S.active={r:r0+cb.h-1,c:c0+cb.w-1};   // the landed block is selected
+    S.sel={r:r0,c:c0}; S.active={r:r0+cb.h-1,c:c0+cb.w-1}; S.selA=null;   // the landed block is selected; top-left displays active (r308)
     return;
   }
   const dr=cb.rect?r0-cb.rect.r1:0, dc=cb.rect?c0-cb.rect.c1:0;
   const xl=f=>(f&&(dr||dc))?translateFormula(f,dr,dc):f;
   for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
     const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
-    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;cell.scale=s.scale|0;cell.thick=!!s.thick;cell.fsz=s.fsz||null;};
+    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;cell.scale=s.scale|0;cell.thick=!!s.thick;cell.fsz=s.fsz||null;cell.bdbl=!!s.bdbl;cell.cmt=!!s.cmt;};   /* r308: bdbl + comments travel — paste EVERYTHING means everything */
     if(kind==='values'){ cell.formula=null; cell.value=s.value; }
     else if(kind==='formulas'){ cell.formula=xl(s.formula); cell.value=s.value; }
     else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; cell.scale=s.scale|0; }
@@ -9911,7 +9972,7 @@ function doPaste(kind, op){
     return;   // r106: clipboard persists (see below)
   }
   pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
-  S.sel={r:r0,c:c0}; S.active={r:r0+cb.h-1,c:c0+cb.w-1};   // r174: Excel selects what it pasted
+  S.sel={r:r0,c:c0}; S.active={r:r0+cb.h-1,c:c0+cb.w-1}; S.selA=null;   // r174: Excel selects what it pasted; top-left displays active (r308)
   S.pasteN=(S.pasteN||0)+1;   // r265: structural drills grade "content was PASTED in", not retyped
   // r106: clipboard PERSISTS across pastes (Excel parity — Ctrl+V keeps it; Esc/new copy clears).
   // Nulling here broke the 'one copy, two pastes' contract copyover + pastes both teach.
@@ -9922,7 +9983,7 @@ function enterRibbon(){ if(done)return; startClock(); mode='ribbon'; path=[]; di
 function copySel(){
   const r=selRange(); const data=[];
   for(let rr=r.r1;rr<=r.r2;rr++){ const row=[]; for(let cc=r.c1;cc<=r.c2;cc++){ const c=get(rr,cc);
-    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent,scale:c.scale,thick:c.thick,fsz:c.fsz}); } data.push(row); }
+    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent,scale:c.scale,thick:c.thick,fsz:c.fsz,bdbl:c.bdbl,cmt:c.cmt}); } data.push(row); }
   const cols=[]; for(let cc=r.c1;cc<=r.c2;cc++) cols.push(colW[cc]);
   S.clipboard={data,cols,h:r.r2-r.r1+1,w:r.c2-r.c1+1,rect:{r1:r.r1,c1:r.c1,r2:r.r2,c2:r.c2}};
 }
@@ -9947,7 +10008,7 @@ function move(dr,dc,shift,ctrl){
   else { nc=Math.min(COLS,Math.max(1,S.active.c+dc));
     nr = dr!==0 ? visStep(S.active.r,dr) : S.active.r;      // r179: plain steps skip hidden rows
   }
-  if(shift){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; }
+  if(shift){ if(!S.sel){ S.sel={r:S.active.r,c:S.active.c}; S.selA=null; } }   /* r308: new shift-selection — the anchor (S.sel) is the DISPLAYED active cell, Excel-true */
   else S.sel=null;
   S.active={r:nr,c:nc};
   render();
@@ -10576,7 +10637,9 @@ document.addEventListener('keydown',hkRawE=>{
       if(k==='End'){ editCaret=editBuf.length; render(); return; }
       if(k==='Delete'){ if(editCaret<editBuf.length){ editBuf=editBuf.slice(0,editCaret)+editBuf.slice(editCaret+1); logKey('Delete'); render(); } return; }
     }
-    if(k==='Enter'){ commitEdit(e.shiftKey?-1:1,0); return; }   // Shift+Enter commits and moves UP (Excel parity)
+    if(k==='Enter'){
+      if((e.ctrlKey||e.metaKey) && S.sel){ logKey('Ctrl+\u21b5'); commitEditAll(); return; }   /* r308 (Wolf): Ctrl+Enter fills the whole selection with the edit — refs translate per cell */
+      commitEdit(e.shiftKey?-1:1,0); return; }   // Shift+Enter commits and moves UP (Excel parity)
     if(k==='Tab'){ commitEdit(0,e.shiftKey?-1:1); return; }      // Shift+Tab commits and moves LEFT
     if(k==='Escape'){ cancelEdit(); return; }
     if(k==='Delete'){
@@ -10641,6 +10704,7 @@ document.addEventListener('keydown',hkRawE=>{
       e.preventDefault(); startEdit(k==='+' ? '=+' : '='); logKey(k==='+' ? '+' : '='); render(); return;
     }
     if(k==='F2'){ e.preventDefault(); startClock(); logKey('F2');
+      editRetarget();   /* r308: F2 on a selection edits the anchor cell */
       const c=get(S.active.r,S.active.c);
       startEdit(c.formula||(c.value!=null&&c.value!==''?String(c.value):''), 'edit');   // Edit mode: arrows move the caret, not the cell
       return; }
@@ -10765,8 +10829,14 @@ document.addEventListener('keydown',hkRawE=>{
 
   // ROW / COLUMN SELECTION — Excel: shift+space (row), ctrl+space (column)
   if(k===' '){
-    if(e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); startClock(); logKey('Shift+Space'); selectRow(); return; }
-    if(e.ctrlKey || e.metaKey){ e.preventDefault(); startClock(); logKey('Ctrl+Space'); selectCol(); return; }
+    if((e.ctrlKey||e.metaKey) && e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+Space');
+      /* r308 (Wolf): select the CURRENT REGION (the table under the cursor) — Excel's Ctrl+Shift+Space */
+      S.selA={r:S.active.r,c:S.active.c};
+      const rg=regionAround(S.active.r,S.active.c);
+      S.sel={r:rg.r1,c:rg.c1}; S.active={r:rg.r2,c:rg.c2};
+      render(); commitAction(); return; }
+    if(e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); startClock(); logKey('Shift+Space'); S.selA={r:S.active.r,c:S.active.c}; selectRow(); return; }
+    if(e.ctrlKey || e.metaKey){ e.preventDefault(); startClock(); logKey('Ctrl+Space'); S.selA={r:S.active.r,c:S.active.c}; selectCol(); return; }
   }
 
   // ENTER ribbon
@@ -10882,6 +10952,7 @@ document.addEventListener('keydown',hkRawE=>{
       mode='ribbon'; path=['E','S']; dialog='paste'; pasteKind='all'; pasteOp='none'; ribbonNote=''; drawRibbon(); return; }
     if(e.altKey){ e.preventDefault(); return; }
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
+      S.selA={r:S.active.r,c:S.active.c};   /* r308: Excel keeps the active cell where it was */
       const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); checkWin(); return; }   /* r213: a copy can be a drill's goal (navigation) — run the win check; no-op for every other drill */
     if(lk==='x'){ e.preventDefault(); startClock(); logKey('Ctrl+X'); copySel(); if(S.clipboard) S.clipboard.cut=true; render(); return; }

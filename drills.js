@@ -70,7 +70,7 @@ window.HOTKEY_DRILLS = {
     dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
     retbridge:  { name:'Ret. Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
     football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
-    copyover:   { name:'Copyover', label:'One copy, three hand-offs', tab:'Copy',  desc:'Two full pastes + Alt E S V values for the summary' },
+    copyover:   { name:'Copyover', label:'Chain the hand-offs', tab:'Copy',  desc:'Formulas travel with Ctrl+C \u2014 chain a block, a peeled column, then values-only for the summary' },
 
     // Formatting
     housestyle: { name:'House Style', label:'Clean it to standard', tab:'House Style', desc:'A full cleanup pass: title, headers, blue inputs (one buried), commas, %, ruled off' },
