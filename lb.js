@@ -656,6 +656,7 @@ function featuredHtml(){
 
 /* ---- drill browser: tabs + chips + one detail board ---- */
 let browseTab = sessionStorage.getItem('hk_lb_tab') || 'drills';
+if(browseTab==='marathon') browseTab='drills';   // r293: marathon boards retired — stale saved tab falls back
 let browseKey = sessionStorage.getItem('hk_lb_key') || null;
 let rosterTier = null;
 function rosterHtml(flush){
@@ -1106,7 +1107,8 @@ async function renderManage(root){
 
 function browserHtml(){
   const {perDrill,meId,myTeam,teamOnly}=DATA;
-  const tabs=[['drills','\u2328 drills'],['marathon','\u23f1 marathon'],['rapidfire','\u26a1 rapid-fire']];
+  /* r293 (Wolf): marathon retired site-wide — session boards are rapid-fire only */
+  const tabs=[['drills','\u2328 drills'],['rapidfire','\u26a1 rapid-fire']];
   let html='<div class="tabrow">'+tabs.map(t=>'<span class="tab'+(browseTab===t[0]?' on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</span>').join('');
   if(myTeam && !DATA.viewDesk) html+='<span class="tab'+(teamOnly?' on':'')+'" id="teamToggle">'+(teamOnly?'\u25c9 desk: '+esc(myTeam):'\u25cb show desk only')+'</span>';
   html+='</div>';
@@ -1126,11 +1128,11 @@ function browserHtml(){
       '<div class="browse-detail" id="detail">'+boardHtml(c, perDrill[browseKey], DATA.names, meId)+'</div>'+
     '</div>';
   } else {
-    const durs = browseTab==='marathon'?MARATHON_DURS:RAPID_DURS;
+    const durs = RAPID_DURS;
     if(!browseKey || !durs.some(d=>String(d.sec)===String(browseKey))) browseKey=String(durs[0].sec);
     html+='<div class="chips">'+durs.map(d=>'<span class="chip'+(String(browseKey)===String(d.sec)?' on':'')+'" data-key="'+d.sec+'">'+esc(d.label)+'</span>').join('')+'</div>';
     const best=bestPerUser(DATA.fSessions, browseTab, +browseKey);
-    const fmtFn=browseTab==='marathon'?marathonScore:rapidScore;
+    const fmtFn=rapidScore;
     html+='<div id="detail">'+sessionBoardHtml(durs.find(d=>String(d.sec)===String(browseKey)).label,'best per player', best, DATA.names, DATA.meId, fmtFn)+'</div>';
   }
   return html;

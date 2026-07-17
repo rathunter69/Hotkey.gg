@@ -222,10 +222,10 @@ window.applyTheme = function(name){
   let saved = null;
   try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
   if(saved && window.THEMES[saved]){ window.applyTheme(saved); return; }
-  try{
-    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    window.applyTheme(prefersLight ? 'daylight' : 'default');
-  }catch(e){ window.applyTheme('default'); }
+  // r293 (Wolf): Daylight is the unconditional default everywhere — a fresh device /
+  // logged-out visitor always lands on light, matching the trainer (r238). A saved
+  // choice (local, or synced from the account by nav.js) still wins.
+  window.applyTheme('daylight');
 })();
 
 // Theme-name labels live in the page body, which doesn't exist yet when this runs in <head>.

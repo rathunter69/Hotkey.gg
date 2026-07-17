@@ -98,7 +98,8 @@
   @media (max-width:760px){
     .topnav-in{padding:0 16px; gap:10px}
     .topnav-pages{display:none; position:absolute; top:60px; left:0; right:0; flex-direction:column;
-      gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0}
+      gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0;
+      z-index:120; box-shadow:0 18px 40px -18px rgba(0,0,0,.35)}   /* r293: paint over the page (wrappers carry z-index:1) */
     .topnav-pages.open{display:flex}
     .topnav-link{padding:12px 22px; border-radius:0; width:100%}
     .topnav-tools .auth-slot{display:none}
@@ -1338,13 +1339,13 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
 <script src="drills.js?v=264"></script>
-<link rel="stylesheet" href="nav.css?v=174">
-<script src="themes.js?v=262"></script>
+<link rel="stylesheet" href="nav.css?v=175">
+<script src="themes.js?v=263"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=260"></script>
+<script src="nav.js?v=261"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -10728,13 +10729,12 @@ if(!sb){
 }
 { const MODE_BLURBS = {
     classic:   "Solve drills at your own pace · the timer's just feedback.",
-    marathon:  "Random drills, back to back, against the clock · pick a duration when you start.",
     rapidfire: "One cell, one chord, one transform · go as fast as you can recall.",
   };
   function pickMode(m){
     pendingMode = (m==='classic') ? null : m;
-    ['Classic','Marathon','Rapid'].forEach(id=>{ const el=$('chip'+id); if(el) el.classList.remove('selected'); });
-    const sel=$('chip'+(m==='rapidfire'?'Rapid':(m==='marathon'?'Marathon':'Classic'))); if(sel) sel.classList.add('selected');
+    ['Classic','Rapid'].forEach(id=>{ const el=$('chip'+id); if(el) el.classList.remove('selected'); });
+    const sel=$('chip'+(m==='rapidfire'?'Rapid':'Classic')); if(sel) sel.classList.add('selected');
     const mc=$('landingMicro'); if(mc) mc.innerHTML='<b>'+(m==='rapidfire'?'Rapid-fire':(m[0].toUpperCase()+m.slice(1)))+' mode.</b> '+MODE_BLURBS[m];
   }
   const cc=$('chipClassic');  if(cc) cc.addEventListener('click', ()=>pickMode('classic'));
@@ -11324,7 +11324,9 @@ async function loadTheme(){
   if(saved && THEMES[saved]){ applyTheme(saved); return; }
   applyTheme('daylight');   // r238 (Wolf): Daylight is the UNCONDITIONAL default — a saved choice still wins, but a clean login always opens on Daylight rather than following OS dark-mode
 }
-function saveTheme(name){ KV.set('hotkey_theme', name); }
+function saveTheme(name){ KV.set('hotkey_theme', name);
+  // r293 (Wolf): the pick follows the account — other devices land on the same theme
+  try{ if(sb && me_user) sb.from('profiles').update({theme:name}).eq('id', me_user.id).then(()=>{}); }catch(e){} }
 
 let themesOpen=false;
 function closeThemes(){ themesOpen=false; const m=$('themesModal'); if(m) m.classList.remove('show'); }
@@ -11343,9 +11345,9 @@ const APP_SHORTCUTS = [
     ['F1',         'toggle guided hints (paint-by-numbers walkthrough)'],
     ['F2',         'edit the active cell'],
   ]},
-  { title:'in a session (marathon / rapid-fire)', rows: [
-    ['s',          'skip the current drill (marathon)'],
-    ['g',          'toggle guided hints (marathon)'],
+  { title:'in a rapid-fire session', rows: [
+    ['s',          'skip the current task'],
+    ['g',          'reveal the keycap hints'],
     ['Shift + Esc','end the session early'],
   ]},
   { title:'after solving', rows: [
@@ -11597,7 +11599,7 @@ function rfSkip(){
   loadNext();
 }
 
-function openModes(mode){ if(demoPlaying) return; modesMode=mode||'marathon';
+function openModes(mode){ if(demoPlaying) return; modesMode=mode||'rapidfire';
   const cfg=SESSION_CFG[modesMode]; const m=$('modesModal'); const isRapid=modesMode==='rapidfire';
   m.innerHTML=`<div class="mm-card"><div class="mm-title">${cfg.title}</div>`+
     `<div class="mm-body">${cfg.body}</div>`+
@@ -12330,7 +12332,7 @@ function openXpInfo(){
     '<div class="ob-title">how xp works</div>'+
     '<div class="ob-body" style="text-align:left;font-size:12.5px;line-height:2">'+
     '<b style="color:var(--accent)">new drill</b> +50 (advanced +65) \u00b7 <b>repeat</b> +15<br>'+
-    '<b style="color:var(--accent)">daily</b> +30 \u00b7 <b>gauntlet leg</b> +25 \u00b7 <b>marathon</b> +20 \u00b7 <b>rapid-fire</b> +10<br>'+
+    '<b style="color:var(--accent)">daily</b> +30 \u00b7 <b>gauntlet leg</b> +25 \u00b7 <b>rapid-fire</b> +10<br>'+
     '<b style="color:var(--warn)">boards</b>: top-10 +25 \u00b7 podium +100 \u00b7 crown +250<br>'+
     '<span style="color:var(--muted);font-size:11px">Each level costs a bit more than the last. New drills and showing up daily are the fastest climb.</span>'+
     '<br><br><b style="color:var(--warn)">how par works</b><br>'+
@@ -12828,7 +12830,16 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
       r.innerHTML='🏁 <b>beat '+escHtml(race.by)+'’s '+race.t.toFixed(2)+'s</b> — type to start the race'; }
   }
   if(onboarded && !race) showWelcomeBack(startKey);
-  initAuth().then(()=>{ updateRankPill(); loadEntitlement(); });
+  initAuth().then(()=>{ updateRankPill(); loadEntitlement();
+    // r293: account theme lands on devices with no local pick yet (mobile carry) —
+    // mirrors nav.js on the secondary pages; an explicit local choice always wins.
+    (async()=>{ try{
+      if(!me_user || localStorage.getItem('hotkey_theme')) return;
+      const { data:p } = await sb.from('profiles').select('theme').eq('id', me_user.id).maybeSingle();
+      const th=p && p.theme;
+      if(th && THEMES[th]){ applyTheme(th); saveTheme(th); }
+    }catch(e){} })();
+  });
 })();
 
 /* ---- welcome-back strip: returning users get a one-glance "you're on the game page" cue.

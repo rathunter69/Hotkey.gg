@@ -38,8 +38,11 @@ body{padding-top:14px}
 .topnav-burger{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:22px; cursor:pointer; padding:4px 10px}
 @media (max-width:760px){
   .topnav-in{padding:0 16px; gap:10px}
+  /* r293 (Wolf): page wrappers carry z-index:1 — without an explicit stack level the
+     open menu painted UNDER the page (links spilling through the h1 on iPhone). */
   .topnav-pages{display:none; position:absolute; top:60px; left:0; right:0; flex-direction:column;
-    gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0}
+    gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0;
+    z-index:120; box-shadow:0 18px 40px -18px rgba(0,0,0,.35)}
   .topnav-pages.open{display:flex}
   .topnav-link{padding:12px 22px; border-radius:0; width:100%}
   .tl-label{display:inline}

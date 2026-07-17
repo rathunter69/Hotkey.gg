@@ -21,6 +21,9 @@
   // ---------------------------------------------------------------
   function saveTheme(name){
     try { localStorage.setItem('hotkey_theme', name); } catch(e){}
+    // r293 (Wolf): the theme follows the ACCOUNT — push the pick to the profile so
+    // opening the site on another device (mobile) lands on the same look.
+    try{ if(window.sb && window._navUser) window.sb.from('profiles').update({theme:name}).eq('id', window._navUser.id).then(()=>{}); }catch(e){}
   }
 
   // ---------------------------------------------------------------
@@ -135,9 +138,9 @@
       ['g',          'toggle guided hints'],
       ['F2',         'edit the active cell'],
     ]},
-    { title:'in a session (marathon / rapid-fire)', rows: [
-      ['s',          'skip the current drill (marathon)'],
-      ['g',          'toggle guided hints (marathon)'],
+    { title:'in a rapid-fire session', rows: [
+      ['s',          'skip the current task'],
+      ['g',          'reveal the keycap hints'],
       ['Shift + Esc','end the session early'],
     ]},
     { title:'after solving', rows: [
@@ -720,8 +723,12 @@
         const { data } = await window.sb.auth.getSession();
         window._navUser = data && data.session ? data.session.user : null;
         if(window._navUser){
-          try{ const p = await window.sb.from('profiles').select('handle,flair').eq('id', window._navUser.id).maybeSingle();
+          try{ const p = await window.sb.from('profiles').select('handle,flair,theme').eq('id', window._navUser.id).maybeSingle();
             window._navProfile = p && p.data ? p.data : null; }catch(e){}
+          // r293: account theme lands on devices with no local pick yet (mobile carry)
+          try{ const th=window._navProfile && window._navProfile.theme;
+            if(th && window.THEMES && window.THEMES[th] && !localStorage.getItem('hotkey_theme')){
+              window.applyTheme(th); localStorage.setItem('hotkey_theme', th); } }catch(e){}
         }
       }
     }catch(e){}
