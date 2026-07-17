@@ -52,8 +52,22 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+<script>
+  /* r285 (#37): load supabase-js WITHOUT blocking first paint or the load event.
+     A <script defer> still holds 'load' until it resolves — fatal when the CDN is
+     slow or blocked. A dynamically-appended script is fully async: the page paints
+     and becomes interactive immediately; sb initializes if/when the library lands.
+     Test stubs that pre-set window.supabase skip the fetch entirely. */
+  (function(){ if(window.supabase) return;
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.async=true; s.onload=function(){ if(window.__sbInit) window.__sbInit(); };
+    document.head.appendChild(s);
+  })();
+</script>
 <style>
   :root{
     --bg:#292b31; --surface:#383b42; --surface2:#43474f; --line:#5a5e68;
@@ -1345,7 +1359,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=258"></script>
+<script src="nav.js?v=259"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1556,10 +1570,22 @@ try{ if(new URLSearchParams(location.search).get('digest')==='off'){
   setTimeout(async()=>{ try{ if(window.sb){ await window.sb.rpc('digest_unsubscribe');
     alert('Weekly digest off \u2014 re-enable it anytime from your account page.'); } }catch(e){} }, 1500);
 } }catch(e){}
-const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-window.sb = sb;   // shared nav (nav.js) drives the nav bar, user menu, and player card
-if(window.navRefreshAuth) setTimeout(window.navRefreshAuth, 0);
+/* r285 (#37): supabase-js is DEFERRED so a slow CDN can't block first paint.
+   sb initializes the instant the library lands: immediately if it's already
+   there (test stubs inject it pre-parse), else on DOMContentLoaded — which the
+   browser fires only after defer scripts execute. CDN dead = sb null = the
+   same guest mode the sync tag produced. Await __sbReady before auth work. */
+let sb = null;
+const __sbReady = new Promise(resolve=>{
+  const mk=()=>{ if(!sb && SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase){
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      window.sb = sb;   // shared nav (nav.js) drives the nav bar, user menu, and player card
+      if(window.navRefreshAuth) setTimeout(window.navRefreshAuth, 0);
+    } resolve(sb); };
+  window.__sbInit = mk;                 // the injected <script>'s onload calls this
+  if(window.supabase) mk();             // already present (test stub) → resolve now
+  // else: __sbInit fires from the async loader; a blocked CDN just leaves sb null (guest mode)
+});
 let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
 let enterRequested = false, landingOpen = true, recoveryMode = false;
 let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
@@ -12844,6 +12870,7 @@ function openUpgrade(featureName){ if(window.hkProSheet) window.hkProSheet(featu
 async function startCheckout(){ if(window.hkProCheckout) window.hkProCheckout(); }
 
 async function initAuth(){
+  await __sbReady;
   if(!sb){ refreshAuthUI(); return; }
   try{
     const { data:{ session } } = await sb.auth.getSession();

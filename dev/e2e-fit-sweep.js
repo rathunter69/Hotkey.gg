@@ -6,7 +6,7 @@
    Run: node dev/e2e-fit-sweep.js   (server on 127.0.0.1:8791) */
 'use strict';
 const { chromium } = require('playwright-core');
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const REPS = 3;
 const EXEMPT = new Set(['autofit', 'combo', 'gauntlet', 'unhide']);   // unhide loads with an intentional squeeze — Alt H O W is the lesson
 

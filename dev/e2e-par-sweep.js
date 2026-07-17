@@ -8,7 +8,7 @@
    Run: node dev/e2e-par-sweep.js   (server on 127.0.0.1:8791) */
 'use strict';
 const { chromium } = require('playwright-core');
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const REPS = 5;
 // Known-high-variance drills: 5-seed medians swing across the flag threshold in
 // BOTH directions (editfix: 39, 24, 42 on successive gates). Reported as INFO,
