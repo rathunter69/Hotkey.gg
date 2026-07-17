@@ -403,6 +403,8 @@ const ALTS = [
       {sel:'G10', keys:[...T('=G8/G9-1'),{key:'Enter'}]},
       {sel:'D3',  keys:[...T('=B3/C3'),{key:'Enter'}]},
       {sel:'D3:D7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:'D12', keys:[...T('=SMALL(D3:D7,2)'),{key:'Enter'}]},
+      {sel:'D11', keys:[...T('=LARGE(D3:D7,2)'),{key:'Enter'}]},
       {sel:'D10', keys:[...T('=MIN(D3:D7)'),{key:'Enter'}]},
       {sel:'D9',  keys:[...T('=MAX(D3:D7)'),{key:'Enter'}]},
       {sel:'D8',  keys:[...T('=MEDIAN(D3:D7)'),{key:'Enter'}]},

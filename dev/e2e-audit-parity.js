@@ -574,6 +574,79 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(ac1.delPtr, 'row delete shifts single refs back up');
   ok(ac1.refErr, 'deleting a referenced row leaves #REF!, like Excel');
 
+  console.log('AD. finance pack — NPV + IRR (r296)');
+  await fresh();
+  const ad1 = await run(() => {
+    const bc=()=>({...blankCell()});
+    S.cells['H1']={...bc(), value:-1000}; S.cells['I1']={...bc(), value:300};
+    S.cells['J1']={...bc(), value:400};   S.cells['K1']={...bc(), value:500}; S.cells['L1']={...bc(), value:600};
+    S.cells['M1']={...bc(), formula:'=NPV(0.1,I1:L1)'};
+    S.cells['M2']={...bc(), formula:'=IRR(H1:L1)'};
+    S.cells['M3']={...bc(), formula:'=NPV(IRR(H1:L1),I1:L1)'};              // NPV at the IRR ≡ -year0 flow
+    S.cells['M4']={...bc(), formula:'=IFERROR(IRR(I1:L1),-99)'};            // no sign change → #NUM → fallback
+    recalc();
+    const manual = 300/1.1 + 400/1.21 + 500/1.331 + 600/1.4641;
+    return { npv: Math.abs(S.cells['M1'].value-manual)<1e-6,
+      irrTies: Math.abs(S.cells['M3'].value-1000)<1e-4,
+      irrConverged: S.cells['M2'].value>0 && S.cells['M2'].value<1,
+      irrNum: S.cells['M4'].value===-99 };
+  });
+  ok(ad1.npv, 'NPV discounts the first flow one full period (Excel-true)');
+  ok(ad1.irrConverged, 'IRR converges on a mixed-sign flow line');
+  ok(ad1.irrTies, 'NPV at the IRR reproduces the year-0 outflow — the identity holds');
+  ok(ad1.irrNum, 'IRR with no sign change throws into IFERROR, not the sheet');
+
+  console.log('AE. text pack + & operator (r296)');
+  await fresh();
+  const ae1 = await run(() => {
+    const bc=()=>({...blankCell()});
+    S.cells['H2']={...bc(), value:'  acme   holdings  ', txt:true};
+    S.cells['H3']={...bc(), value:'AAPL US Equity', txt:true};
+    S.cells['H4']={...bc(), value:12};
+    S.cells['M1']={...bc(), formula:'=PROPER(TRIM(H2))'};
+    S.cells['M2']={...bc(), formula:'=LEFT(H3,FIND(" ",H3)-1)'};            // the ticker, composably
+    S.cells['M3']={...bc(), formula:'=MID(H3,6,2)'};
+    S.cells['M4']={...bc(), formula:'=LEN(H3)'};
+    S.cells['M5']={...bc(), formula:'="FY"&H4&" — "&UPPER(LEFT(H3,4))'};    // & operator + literal + nesting
+    S.cells['M6']={...bc(), formula:'=IFERROR(FIND("z",H3),0)'};            // case-sensitive miss → 0
+    S.cells['M7']={...bc(), formula:'=CONCATENATE(LOWER(LEFT(H3,4)),".us")'};
+    recalc();
+    return { trimProper: S.cells['M1'].value==='Acme Holdings',
+      leftFind: S.cells['M2'].value==='AAPL', mid: S.cells['M3'].value==='US',
+      len: S.cells['M4'].value===14, amp: S.cells['M5'].value==='FY12 — AAPL',
+      findMiss: S.cells['M6'].value===0, concat: S.cells['M7'].value==='aapl.us' };
+  });
+  ok(ae1.trimProper, 'TRIM collapses runs of spaces; PROPER title-cases the result');
+  ok(ae1.leftFind, 'LEFT + FIND compose (grab the ticker before the first space)');
+  ok(ae1.mid && ae1.len, 'MID and LEN read Excel-true (1-based, real length)');
+  ok(ae1.amp, '& concatenates literals, numbers and nested text functions');
+  ok(ae1.findMiss, 'FIND is case-sensitive and a miss throws into IFERROR');
+  ok(ae1.concat, 'CONCATENATE joins mixed args');
+
+  console.log('AF. sorting functions — LARGE / SMALL / RANK (r296)');
+  await fresh();
+  const af1 = await run(() => {
+    const bc=()=>({...blankCell()});
+    S.cells['H5']={...bc(), value:10}; S.cells['I5']={...bc(), value:40}; S.cells['J5']={...bc(), value:20};
+    S.cells['K5']={...bc(), value:40}; S.cells['L5']={...bc(), value:30};
+    S.cells['H6']={...bc(), value:'n/a', txt:true};                          // text in range must be ignored
+    S.cells['M1']={...bc(), formula:'=LARGE(H5:L5,2)'};                      // 40 (tie: 1st and 2nd both 40)
+    S.cells['M2']={...bc(), formula:'=SMALL(H5:L5,2)'};                      // 20
+    S.cells['M3']={...bc(), formula:'=RANK(J5,H5:L5)'};                      // desc: 4th
+    S.cells['M4']={...bc(), formula:'=RANK(J5,H5:L5,1)'};                    // asc: 2nd
+    S.cells['M5']={...bc(), formula:'=RANK(I5,H5:L5)'};                      // tied top → 1 (RANK.EQ)
+    S.cells['M6']={...bc(), formula:'=IFERROR(RANK(7,H5:L5),-1)'};           // absent value → #N/A → fallback
+    S.cells['M7']={...bc(), formula:'=IFERROR(LARGE(H5:L5,9),-1)'};          // k out of range → #NUM → fallback
+    recalc();
+    return { l2: S.cells['M1'].value===40, s2: S.cells['M2'].value===20,
+      rDesc: S.cells['M3'].value===4, rAsc: S.cells['M4'].value===2, rTie: S.cells['M5'].value===1,
+      rMiss: S.cells['M6'].value===-1, kOob: S.cells['M7'].value===-1 };
+  });
+  ok(af1.l2 && af1.s2, 'LARGE/SMALL pick the k-th ranked value (ties Excel-true)');
+  ok(af1.rDesc && af1.rAsc, 'RANK defaults descending; order arg flips it');
+  ok(af1.rTie, 'tied values share the top rank (RANK.EQ)');
+  ok(af1.rMiss && af1.kOob, 'RANK miss and LARGE k-out-of-range throw into IFERROR');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

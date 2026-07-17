@@ -104,11 +104,11 @@ window.HOTKEY_DRILLS = {
     wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
     fcfbuild:   { name:'uFCF',     label:'Build the unlevered FCF', tab:'uFCF',    desc:'EBIT \u2192 less taxes \u2192 NOPAT \u2192 plus D&A, less capex and the NWC build: the row every DCF discounts, filled across five years' },
     dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'DF row \u00d7 PV row; the TV reuses the year-5 factor' },
-    dcfbuild:   { name:'DCF page', label:'Build the DCF page',      tab:'DCF page',desc:'The whole valuation page: DF, PV, terminal value, EV \u2014 then bridge net debt to equity and divide to value per share' },
-    lbobuild:   { name:'Paper LBO',label:'Build the paper LBO',     tab:'Paper LBO',desc:'Sources & uses sizes the equity plug, then entry to exit turns it into MOIC and IRR \u2014 the whole paper LBO on one tab' },
+    dcfbuild:   { name:'DCF page', label:'Build the DCF page',      tab:'DCF page',desc:'The whole valuation page: DF, PV, terminal value, EV \u2014 bridge to value per share, then one =NPV() line audits your whole PV row' },
+    lbobuild:   { name:'Paper LBO',label:'Build the paper LBO',     tab:'Paper LBO',desc:'Sources & uses sizes the equity plug, entry to exit lands MOIC \u2014 then prove the IRR twice: compounded, and =IRR() over the raw equity flows' },
     opmodel:    { name:'Op model', label:'Build the operating model',tab:'Op model',desc:'Drivers up: grow revenue off one anchored rate, cost it as % of sales, and gross profit, EBITDA and the margin line build themselves' },
     debtblock:  { name:'Debt block',label:'Build the debt & interest block',tab:'Debt block',desc:'Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest' },
-    dashcover:  { name:'Model cover',label:'Build the model cover',  tab:'Model cover',desc:'The page-one output box: reference the model into equity value, value per share, EV/EBITDA, net leverage and interest coverage' },
+    dashcover:  { name:'Model cover',label:'Build the model cover',  tab:'Model cover',desc:'The page-one output box: reference the model into the headline metrics, then stamp the cover title clean with UPPER(TRIM())' },
     lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — then IRR over the hold' },
     modeltour:  { name:'Model Tour', label:'Follow the markers', tab:'Model Tour', desc:'Four subtotals blown to #REF! \u2014 ctrl-jump to each, rebuild the cascade formula' },
     revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'MIN/MAX sweep ×4 years, then prove out both balances' },
@@ -130,7 +130,7 @@ window.HOTKEY_DRILLS = {
     percent:    { name:'% of rev', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
     intsched:   { name:'Interest', label:'Run the interest schedule', tab:'Interest', desc:'Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'5-yr roll: linked openings + the accumulated-dep memo' },
-    comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the summary, land per share and premium' },
+    comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the summary \u2014 median, high/low and the LARGE/SMALL trimmed range \u2014 land per share and premium' },
 
     // Lookups
     isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'5-yr IS: anchored drivers, margin row as %, bottom line ruled' },
@@ -243,7 +243,7 @@ window.HK_BAND = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
-window.HOTKEY_PARS = {"navigation":17,"modeltour":53,"blocksel":46,"filldr":37,"pastes":40,"rowops":26,"colops":16,"editfix":39,"undo":10,"copyover":13,"housestyle":47,"ruleoff":29,"ruleaudit":18,"dress":46,"typeset":15,"decimals":18,"center":18,"autofit":15,"combo":24,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":66,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":76,"lbobuild":61,"debtblock":57,"dashcover":32};
+window.HOTKEY_PARS = {"navigation":17,"modeltour":53,"blocksel":46,"filldr":37,"pastes":40,"rowops":26,"colops":16,"editfix":39,"undo":10,"copyover":13,"housestyle":47,"ruleoff":29,"ruleaudit":18,"dress":46,"typeset":15,"decimals":18,"center":18,"autofit":15,"combo":24,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

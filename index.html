@@ -1345,14 +1345,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=264"></script>
+<script src="drills.js?v=265"></script>
 <link rel="stylesheet" href="nav.css?v=175">
 <script src="themes.js?v=263"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=261"></script>
+<script src="nav.js?v=262"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -3765,24 +3765,27 @@ const CHALLENGES = {
     }
   },
   comps:{
-    name:'Comps', label:'Run the comps', par:66, parKeys:69,
-    aha:'Build one row of logic, then Ctrl+D stamps it down the page.',
-    prompt:'A real comps page, both panels: compute EV/EBITDA for five peers and fill it down, read the data \u2014 median, high, low \u2014 then walk the target through the implied chain: EV, equity, per share, premium to market. The multiples aren\u2019t given anymore; you build them.',
-    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> <em>=MEDIAN(D3:D7)</em> \u00b7 <em>D9</em> <em>=MAX</em> \u00b7 <em>D10</em> <em>=MIN</em> \u00b7 <em>G4</em> EV <em>=G3*D8</em> \u00b7 <em>G6</em> equity <em>=G4-G5</em> \u00b7 <em>G8</em> per share <em>=G6/G7</em> \u00b7 <em>G10</em> premium <em>=G8/G9-1</em>',
+    name:'Comps', label:'Run the comps', par:94, parKeys:99,
+    aha:'Build one row of logic, then Ctrl+D stamps it down the page \u2014 and LARGE/SMALL read the range with the outliers trimmed off.',
+    prompt:'A real comps page, both panels: compute EV/EBITDA for five peers and fill it down, read the data \u2014 median, high, low, then the TRIMMED read (2nd-high and 2nd-low, because one weird peer shouldn\u2019t set your range) \u2014 then walk the target through the implied chain: EV, equity, per share, premium to market. The multiples aren\u2019t given anymore; you build them.',
+    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> <em>=MEDIAN(D3:D7)</em> \u00b7 <em>D9</em> <em>=MAX</em> \u00b7 <em>D10</em> <em>=MIN</em> \u00b7 <em>D11</em> <em>=LARGE(D3:D7,2)</em> \u00b7 <em>D12</em> <em>=SMALL(D3:D7,2)</em> \u00b7 <em>G4</em> EV <em>=G3*D8</em> \u00b7 <em>G6</em> equity <em>=G4-G5</em> \u00b7 <em>G8</em> per share <em>=G6/G7</em> \u00b7 <em>G10</em> premium <em>=G8/G9-1</em>',
     guide:[
       'multiple, first peer: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
       'read the data: D8 \u00b7 <kbd>=MEDIAN(D3:D7)</kbd> \u2014 the median resists outliers; bankers lead with it \u00b7 D9 \u00b7 <kbd>=MAX(D3:D7)</kbd> \u00b7 D10 \u00b7 <kbd>=MIN(D3:D7)</kbd>',
+      'the trimmed read: D11 \u00b7 <kbd>=LARGE(D3:D7,2)</kbd> \u2014 the 2nd-highest \u00b7 D12 \u00b7 <kbd>=SMALL(D3:D7,2)</kbd> \u2014 one weird peer shouldn\u2019t set the range the IC sees',
       'implied EV at G4 \u00b7 <kbd>=G3*D8</kbd> \u2014 target EBITDA \u00d7 the LIVE median, not a retyped number',
       'equity at G6 \u00b7 <kbd>=G4-G5</kbd> \u00b7 per share at G8 \u00b7 <kbd>=G6/G7</kbd>',
       'premium at G10 \u00b7 <kbd>=G8/G9-1</kbd> \u2014 what you\u2019d be paying up over the market',
     ],
-    targets:['D3:D7','D8:D10','G4','G6','G8'],
+    targets:['D3:D7','D8:D12','G4','G6','G8'],
     demo(){ return [
       {sel:'D3', keys:[...T('=B3/C3'), Kb.enter]},
       {sel:'D3:D7', keys:[Kb.fillD]},
       {sel:'D8', keys:[...T('=MEDIAN(D3:D7)'), Kb.enter]},
       {sel:'D9', keys:[...T('=MAX(D3:D7)'), Kb.enter]},
       {sel:'D10', keys:[...T('=MIN(D3:D7)'), Kb.enter]},
+      {sel:'D11', keys:[...T('=LARGE(D3:D7,2)'), Kb.enter]},
+      {sel:'D12', keys:[...T('=SMALL(D3:D7,2)'), Kb.enter]},
       {sel:'G4', keys:[...T('=G3*D8'), Kb.enter]},
       {sel:'G6', keys:[...T('=G4-G5'), Kb.enter]},
       {sel:'G8', keys:[...T('=G6/G7'), Kb.enter]},
@@ -3808,6 +3811,8 @@ const CHALLENGES = {
       cells['A8']={...blankCell(),value:'Median',txt:true,bold:true};  cells['D8']={...blankCell(),fmtStyle:'mult',decimals:1,bold:true};
       cells['A9']={...blankCell(),value:'High',txt:true};            cells['D9']={...blankCell(),fmtStyle:'mult',decimals:1};
       cells['A10']={...blankCell(),value:'Low',txt:true};            cells['D10']={...blankCell(),fmtStyle:'mult',decimals:1};
+      cells['A11']={...blankCell(),value:'2nd high',txt:true};       cells['D11']={...blankCell(),fmtStyle:'mult',decimals:1};   /* r296: the trimmed read */
+      cells['A12']={...blankCell(),value:'2nd low',txt:true};        cells['D12']={...blankCell(),fmtStyle:'mult',decimals:1};
       cells['F2']={...blankCell(),value:'Implied valuation',txt:true,bold:true};
       const tEbd=rnd(15,50)*10, nd=rnd(5,25)*10, sh=rnd(8,40);
       cells['F3']={...blankCell(),value:'Target EBITDA',txt:true}; cells['G3']={...blankCell(),value:tEbd,fontColor:'blue',fmtStyle:'comma',decimals:0};
@@ -3821,9 +3826,9 @@ const CHALLENGES = {
       const px=Math.max(1,Math.round(ps*(rnd(75,115)/100)*100)/100);
       cells['F9']={...blankCell(),value:'Current price',txt:true}; cells['G9']={...blankCell(),value:px,fontColor:'blue',fmtStyle:'currency',decimals:2};
       cells['F10']={...blankCell(),value:'Premium to mkt',txt:true,bold:true}; cells['G10']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
-      this._exp={mean:mean, hi:Math.max(...this._m), lo:Math.min(...this._m),
+      this._exp={mean:mean, hi:Math.max(...this._m), lo:Math.min(...this._m), hi2:srt[3], lo2:srt[1],
         ev:tEbd*mean, eq:tEbd*mean-nd, ps:ps, prem:ps/px-1};
-      return {ROWS:10, cells, active:{r:3,c:4}, sel:null, colW:{1:108,2:76,3:76,4:88,6:118,7:84}};
+      return {ROWS:12, cells, active:{r:3,c:4}, sel:null, colW:{1:108,2:76,3:76,4:88,6:118,7:84}};
     },
     checks(S){
       const live=(k,exp,tol,ref)=>{ const c=S.cells[k]; if(!c||!c.formula||typeof c.value!=='number') return false;
@@ -3836,6 +3841,8 @@ const CHALLENGES = {
           ok: [0,1,2,3,4].every(i=>live('D'+(3+i),this._m[i],0.05,'C'+(3+i)))},
         {label:'Read the data \u2014 MEDIAN at D8, MAX high at D9, MIN low at D10',
           ok: live('D8',e.mean)&&fnRef('D8','MEDIAN')&&live('D9',e.hi)&&fnRef('D9','MAX')&&live('D10',e.lo)&&fnRef('D10','MIN')},
+        {label:'The TRIMMED read \u2014 =LARGE(D3:D7,2) at D11 and =SMALL(D3:D7,2) at D12; one outlier peer never sets the range',
+          ok: live('D11',e.hi2)&&fnRef('D11','LARGE')&&live('D12',e.lo2)&&fnRef('D12','SMALL')},
         {label:'Run implied EV off the LIVE median \u2014 G4 must reference D8', ok: live('G4',e.ev,0.5,'D8')},
         {label:'back into implied equity after net debt (G6)', ok: live('G6',e.eq,0.5,'G4')},
         {label:'run per share and the premium to market (G8, G10)', ok: live('G8',e.ps,0.01,'G7')&&live('G10',e.prem,0.001,'G9')},
@@ -4304,18 +4311,19 @@ const CHALLENGES = {
     }
   },
   dcfbuild:{
-    name:'DCF page', label:'Build the DCF page', par:76, parKeys:80,
-    aha:'A DCF page runs end to end — discount the cash, add the terminal value, then bridge EV all the way to value per share.',
-    prompt:'The whole valuation page, one build: a discount-factor row off the anchored rate, PV of each year, a Gordon terminal value that reuses the year-5 factor, the sum to Enterprise Value — then keep going where a half-finished DCF stops: net debt out to equity value, divided by shares to a price per share. This is the page that goes in the book.',
-    req:'<em>B4</em> DF <em>=1/(1+$B$7)^B2</em> · fill B4:F4 → · <em>B5</em> PV <em>=B3*B4</em> · fill B5:F5 → · <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> · <em>B11</em> <em>=B10*F4</em> · <em>B12</em> EV <em>=SUM(B5:F5)+B11</em> · <em>B14</em> equity <em>=B12-B13</em> · <em>B16</em> per share <em>=B14/B15</em>',
+    name:'DCF page', label:'Build the DCF page', par:91, parKeys:96,
+    aha:'A DCF page runs end to end — discount the cash, add the terminal value, bridge to per share — then NPV() re-derives your whole PV row in one line.',
+    prompt:'The whole valuation page, one build: a discount-factor row off the anchored rate, PV of each year, a Gordon terminal value that reuses the year-5 factor, the sum to Enterprise Value — then keep going where a half-finished DCF stops: net debt out to equity value, divided by shares to a price per share. Last, the desk ritual before anything ships: one =NPV() over the raw cash must reproduce your hand-built PV row exactly. This is the page that goes in the book.',
+    req:'<em>B4</em> DF <em>=1/(1+$B$7)^B2</em> · fill B4:F4 → · <em>B5</em> PV <em>=B3*B4</em> · fill B5:F5 → · <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> · <em>B11</em> <em>=B10*F4</em> · <em>B12</em> EV <em>=SUM(B5:F5)+B11</em> · <em>B14</em> equity <em>=B12-B13</em> · <em>B16</em> per share <em>=B14/B15</em> · <em>B18</em> check <em>=NPV($B$7,B3:F3)</em> — must equal the PV row summed',
     guide:[
       'discount factor at B4 · <kbd>=1/(1+$B$7)^B2</kbd> · fill B4:F4 → — rate anchored, year walking',
       'PV row at B5 · <kbd>=B3*B4</kbd> · fill B5:F5 → — cash × factor',
       'terminal value at B10 · <kbd>=F3*(1+B8)/($B$7-B8)</kbd> · PV of TV at B11 · <kbd>=B10*F4</kbd> — reuse the year-5 factor',
       'Enterprise Value at B12 · <kbd>=SUM(B5:F5)+B11</kbd>',
       'bridge it home: equity at B14 · <kbd>=B12-B13</kbd> — EV less net debt · per share at B16 · <kbd>=B14/B15</kbd>',
+      'the audit line at B18 · <kbd>=NPV($B$7,B3:F3)</kbd> — Excel discounts the first flow one full period, exactly like your factor row; if this doesn’t match SUM(B5:F5), a factor is off',
     ],
-    targets:['B5:D5','B8:D8','C10:D10','B11:D11','B14:D14','B5:D5'],
+    targets:['B5:D5','B8:D8','C10:D10','B11:D11','B14:D14','B18:D18'],
     demo(){ return [
       {sel:'B4', keys:[...T('=1/(1+$B$7)^B2'), Kb.enter]},
       {sel:'B4:F4', keys:[Kb.fillR]},
@@ -4326,6 +4334,7 @@ const CHALLENGES = {
       {sel:'B12', keys:[...T('=SUM(B5:F5)+B11'), Kb.enter]},
       {sel:'B14', keys:[...T('=B12-B13'), Kb.enter]},
       {sel:'B16', keys:[...T('=B14/B15'), Kb.enter]},
+      {sel:'B18', keys:[...T('=NPV($B$7,B3:F3)'), Kb.enter]},
     ]; },
     build(){
       const cells={};
@@ -4343,6 +4352,7 @@ const CHALLENGES = {
       cells['A14']={...blankCell(),value:'Equity value',txt:true,bold:true};
       cells['A15']={...blankCell(),value:'Shares outstanding',txt:true};
       cells['A16']={...blankCell(),value:'Value per share',txt:true,bold:true};
+      cells['A18']={...blankCell(),value:'Check: NPV of uFCF',txt:true,it:true};   /* r296: the one-line tie-out */
       const r=rnd(8,12)/100, g=rnd(2,3)/100;
       let f=rnd(8,30)*10; const fcfs=[];
       for(let y=1;y<=5;y++){ const col=colLetter(y+1);
@@ -4363,14 +4373,15 @@ const CHALLENGES = {
       const shares=rnd(20,90);
       cells['B15']={...blankCell(),value:shares,fontColor:'blue',fmtStyle:'comma',decimals:1};
       cells['B16']={...blankCell(),fmtStyle:'comma',decimals:2,bold:true,bt:true};
+      cells['B18']={...blankCell(),fmtStyle:'comma',decimals:1,it:true};
       const df=[1,2,3,4,5].map(y=>1/Math.pow(1+r,y));
       const pv=fcfs.map((x,i)=>x*df[i]);
       const tv=fcfs[4]*(1+g)/(r-g);
       const pvtv=tv*df[4];
       const ev=pv.reduce((a,b)=>a+b,0)+pvtv;
       const equity=ev-netdebt;
-      this._exp={df:df,pv:pv,tv:tv,pvtv:pvtv,ev:ev,equity:equity,ps:equity/shares};
-      return {ROWS:16, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:84,3:84,4:84,5:84,6:84}};
+      this._exp={df:df,pv:pv,tv:tv,pvtv:pvtv,ev:ev,equity:equity,ps:equity/shares,pvsum:pv.reduce((a,b)=>a+b,0)};
+      return {ROWS:18, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:84,3:84,4:84,5:84,6:84}};
     },
     checks(S){
       const E=this._exp;
@@ -4385,22 +4396,25 @@ const CHALLENGES = {
         {label:'sum to Enterprise Value — the PV row plus the discounted TV', ok:near('B12',E.ev) && refs('B12',['SUM(','B11'])},
         {label:'bridge to equity value — EV less net debt', ok:near('B14',E.equity) && refs('B14',['B12','B13'])},
         {label:'divide to value per share — equity over shares', ok:near('B16',E.ps) && refs('B16',['B14','B15'])},
+        {label:'the audit line — =NPV($B$7,B3:F3) reproduces the PV row in one formula', ok:near('B18',E.pvsum) && refs('B18',['NPV(','B7','B3:F3'])},
       ];
     }
   },
   lbobuild:{
-    name:'Paper LBO', label:'Build the paper LBO', par:61, parKeys:63,
-    aha:'A paper LBO is two blocks — sources & uses sizes the equity check, then entry to exit turns it into MOIC and IRR.',
-    prompt:'The whole paper LBO on one tab. Size the deal: purchase EV off the entry multiple, add fees for total uses, lever it, and the sponsor equity is the PLUG that makes sources tie to uses. Then run it to exit: exit EV at the exit multiple, net debt out for exit equity, MOIC against the check you wrote, and IRR compounded over the hold. Eight formulas, entry to exit, no mouse.',
-    req:'<em>B6</em> EV <em>=B4*B5</em> · <em>B8</em> uses <em>=B6+B7</em> · <em>B10</em> debt <em>=B4*B9</em> · <em>B11</em> equity <em>=B8-B10</em> · <em>B16</em> exit EV <em>=B14*B15</em> · <em>B18</em> exit eq <em>=B16-B17</em> · <em>B20</em> MOIC <em>=B18/B11</em> · <em>B21</em> IRR <em>=B20^(1/B19)-1</em>',
+    name:'Paper LBO', label:'Build the paper LBO', par:82, parKeys:85,
+    aha:'A paper LBO is two blocks — sources & uses sizes the equity check, entry-to-exit turns it into MOIC — and IRR has two roads that MUST agree: compound the MOIC, or hand the raw equity flows to =IRR().',
+    prompt:'The whole paper LBO on one tab. Size the deal: purchase EV off the entry multiple, add fees for total uses, lever it, and the sponsor equity is the PLUG that makes sources tie to uses. Then run it to exit: exit EV at the exit multiple, net debt out for exit equity, MOIC against the check you wrote, and IRR compounded over the hold. Then prove it the way the fund model does — lay the equity out as CASH FLOWS (your check out at year 0, exit proceeds in at the end) and let =IRR() read the line. No interim flows means the two answers match to the decimal; when they don’t, someone fat-fingered the hold.',
+    req:'<em>B6</em> EV <em>=B4*B5</em> · <em>B8</em> uses <em>=B6+B7</em> · <em>B10</em> debt <em>=B4*B9</em> · <em>B11</em> equity <em>=B8-B10</em> · <em>B16</em> exit EV <em>=B14*B15</em> · <em>B18</em> exit eq <em>=B16-B17</em> · <em>B20</em> MOIC <em>=B18/B11</em> · <em>B21</em> IRR <em>=B20^(1/B19)-1</em> · flows: <em>B24</em> <em>=-B11</em> · exit-year cell <em>=B18</em> · <em>B25</em> <em>=IRR(</em>flow row<em>)</em> — ties to B21',
     guide:[
       'size the deal: purchase EV at B6 · <kbd>=B4*B5</kbd> — EBITDA × entry multiple · total uses at B8 · <kbd>=B6+B7</kbd>',
       'lever it: debt at B10 · <kbd>=B4*B9</kbd> — turns of EBITDA · sponsor equity at B11 · <kbd>=B8-B10</kbd> — the PLUG that ties sources to uses',
       'run to exit: exit EV at B16 · <kbd>=B14*B15</kbd> · exit equity at B18 · <kbd>=B16-B17</kbd> — net debt out',
       'the returns: MOIC at B20 · <kbd>=B18/B11</kbd> — exit over entry · IRR at B21 · <kbd>=B20^(1/B19)-1</kbd> — compounded over the hold',
+      'now the fund-model road: the equity check flows OUT at year 0 · B24 · <kbd>=-B11</kbd> — money out is negative · exit proceeds land in the LAST year’s cell · <kbd>=B18</kbd>',
+      'hand the whole flow row to <kbd>=IRR(</kbd>B24 through the exit year<kbd>)</kbd> at B25 — with no interim flows it MUST equal B21; two roads, one number',
     ],
     targets:['B9:B11','B4:F4','B5:F6','B7:F7','C8:F8'],
-    demo(){ return [
+    demo(){ const X=this._exp, xc=colLetter(2+X.hold); return [
       {sel:'B6', keys:[...T('=B4*B5'), Kb.enter]},
       {sel:'B8', keys:[...T('=B6+B7'), Kb.enter]},
       {sel:'B10', keys:[...T('=B4*B9'), Kb.enter]},
@@ -4409,6 +4423,9 @@ const CHALLENGES = {
       {sel:'B18', keys:[...T('=B16-B17'), Kb.enter]},
       {sel:'B20', keys:[...T('=B18/B11'), Kb.enter]},
       {sel:'B21', keys:[...T('=B20^(1/B19)-1'), Kb.enter]},
+      {sel:'B24', keys:[...T('=-B11'), Kb.enter]},
+      {sel:xc+'24', keys:[...T('=B18'), Kb.enter]},
+      {sel:'B25', keys:[...T('=IRR(B24:'+xc+'24)'), Kb.enter]},
     ]; },
     build(){
       const cells={};
@@ -4455,8 +4472,20 @@ const CHALLENGES = {
       cells['B19']={...blankCell(),value:hold,fontColor:'blue',fmtStyle:'comma',decimals:0};
       cells['B20']={...blankCell(),fmtStyle:'comma',decimals:2,bold:true};
       cells['B21']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
-      this._exp={purchEV:purchEV,uses:uses,debt:debt,equity:equity,exitEV:exitEV,exitEq:exitEq,moic:moic,irr:irr};
-      return {ROWS:22, cells, active:{r:6,c:2}, sel:null, colW:{1:170,2:110}};
+      /* r296: the fund-model road — equity laid out as dated flows, then =IRR() reads the line.
+         Year 0 and the exit year are the player's formulas; the quiet middle years are given 0s. */
+      cells['A23']={...blankCell(),value:'Year',txt:true,bold:true};
+      cells['A24']={...blankCell(),value:'Equity flows',txt:true,bold:true};
+      cells['A25']={...blankCell(),value:'IRR — from the flows',txt:true,bold:true};
+      for(let y=0;y<=hold;y++){ const col=colLetter(2+y);
+        cells[col+23]={...blankCell(),value:y,fontColor:'blue',align:'r'};
+        if(y>0 && y<hold) cells[col+24]={...blankCell(),value:0,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      cells['B24']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[colLetter(2+hold)+'24']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['B25']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true,bt:true};
+      this._exp={purchEV:purchEV,uses:uses,debt:debt,equity:equity,exitEV:exitEV,exitEq:exitEq,moic:moic,irr:irr,hold:hold};
+      const cw={1:170,2:110}; for(let y=1;y<=hold;y++) cw[2+y]=84;
+      return {ROWS:25, cells, active:{r:6,c:2}, sel:null, colW:cw};
     },
     checks(S){
       const E=this._exp;
@@ -4470,6 +4499,10 @@ const CHALLENGES = {
         {label:'exit equity — exit EV (=B14*B15) less net debt', ok:near('B16',E.exitEV) && near('B18',E.exitEq) && refs('B18',['B16','B17'])},
         {label:'MOIC — exit equity over the entry check (=B18/B11)', ok:near('B20',E.moic) && refs('B20',['B18','B11'])},
         {label:'IRR — MOIC compounded over the hold (=B20^(1/B19)-1)', ok:near('B21',E.irr) && refs('B21',['B20','B19'])},
+        {label:'lay out the equity flows — the check OUT at year 0 (=-B11), exit proceeds IN at year '+E.hold+' (=B18)',
+          ok:near('B24',-E.equity) && refs('B24',['B11']) && near(colLetter(2+E.hold)+'24',E.exitEq) && refs(colLetter(2+E.hold)+'24',['B18'])},
+        {label:'the second road — =IRR() over the flow row lands on the SAME number as B21',
+          ok:near('B25',E.irr) && refs('B25',['IRR(','B24'])},
       ];
     }
   },
@@ -4636,23 +4669,25 @@ const CHALLENGES = {
     }
   },
   dashcover:{
-    name:'Model cover', label:'Build the model cover', par:32, parKeys:31,
-    aha:'The cover page is all references — pull the model outputs into the headline metrics an IC actually reads.',
-    prompt:'Page one of the summary: the cover box. The model spits out enterprise value, net debt, shares, EBITDA and interest — your job is the summary an IC reads first. Reference the outputs (never retype them) into equity value, value per share, the EV/EBITDA the deal is priced at, net leverage and interest coverage. Every cell points at the model above; change an input and the cover moves.',
-    req:'<em>B10</em> equity <em>=B3-B4</em> · <em>B11</em> per share <em>=B10/B5</em> · <em>B12</em> EV/EBITDA <em>=B3/B6</em> · <em>B13</em> leverage <em>=B4/B6</em> · <em>B14</em> coverage <em>=B6/B7</em>',
+    name:'Model cover', label:'Build the model cover', par:48, parKeys:48,
+    aha:'The cover page is all references — pull the model outputs into the headline metrics an IC actually reads, then stamp the title clean off the raw feed.',
+    prompt:'Page one of the summary: the cover box. The model spits out enterprise value, net debt, shares, EBITDA and interest — your job is the summary an IC reads first. Reference the outputs (never retype them) into equity value, value per share, the EV/EBITDA the deal is priced at, net leverage and interest coverage. Then the last inch of polish: the deal name arrived from the data room as a mess of spaces and lowercase — stamp the cover with it CLEANED, by formula, so when the name changes upstream the cover follows.',
+    req:'<em>B10</em> equity <em>=B3-B4</em> · <em>B11</em> per share <em>=B10/B5</em> · <em>B12</em> EV/EBITDA <em>=B3/B6</em> · <em>B13</em> leverage <em>=B4/B6</em> · <em>B14</em> coverage <em>=B6/B7</em> · <em>B16</em> stamp <em>=UPPER(TRIM(B15))</em> — collapse the junk spaces, then shout it',
     guide:[
       'equity value at B10 · <kbd>=B3-B4</kbd> — enterprise value less net debt (reference, don’t retype)',
       'value per share at B11 · <kbd>=B10/B5</kbd> — equity over shares',
       'the multiple the deal is priced at: EV/EBITDA at B12 · <kbd>=B3/B6</kbd>',
       'the credit read: net leverage at B13 · <kbd>=B4/B6</kbd> — net debt / EBITDA · coverage at B14 · <kbd>=B6/B7</kbd> — EBITDA / interest',
+      'the stamp at B16 · <kbd>=UPPER(TRIM(B15))</kbd> — TRIM eats the stray spaces (even the doubles inside), UPPER makes it a title; nested, inside-out',
     ],
-    targets:['B10','B11','B12','B13','B14'],
+    targets:['B10','B11','B12','B13','B14','B16'],
     demo(){ return [
       {sel:'B10', keys:[...T('=B3-B4'), Kb.enter]},
       {sel:'B11', keys:[...T('=B10/B5'), Kb.enter]},
       {sel:'B12', keys:[...T('=B3/B6'), Kb.enter]},
       {sel:'B13', keys:[...T('=B4/B6'), Kb.enter]},
       {sel:'B14', keys:[...T('=B6/B7'), Kb.enter]},
+      {sel:'B16', keys:[...T('=UPPER(TRIM(B15))'), Kb.enter]},
     ]; },
     build(){
       const cells={};
@@ -4684,8 +4719,17 @@ const CHALLENGES = {
       cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1};
       cells['B13']={...blankCell(),fmtStyle:'comma',decimals:1};
       cells['B14']={...blankCell(),fmtStyle:'comma',decimals:1};
-      this._exp={equity:ev-nd, ps:(ev-nd)/shares, evEbitda:ev/ebitda, lev:nd/ebitda, cov:ebitda/interest};
-      return {ROWS:15, cells, active:{r:10,c:2}, sel:null, colW:{1:170,2:110}};
+      /* r296: the raw deal-name feed — data-room mess (stray + double spaces, all lowercase) */
+      const dealNames=['project aurora','project keystone','project ridgeline','project bluebird','project granite','project meridian','project copperfield','project northstar'];
+      const rawName=dealNames[rnd(0,dealNames.length-1)];
+      const dirty='  '+rawName.replace(' ','   ')+' ';
+      cells['A15']={...blankCell(),value:'Deal name — raw feed',txt:true};
+      cells['B15']={...blankCell(),value:dirty,txt:true,fontColor:'blue'};
+      cells['A16']={...blankCell(),value:'Cover stamp',txt:true,bold:true};
+      cells['B16']={...blankCell(),txt:true,bold:true};
+      this._exp={equity:ev-nd, ps:(ev-nd)/shares, evEbitda:ev/ebitda, lev:nd/ebitda, cov:ebitda/interest,
+        stamp:rawName.toUpperCase()};
+      return {ROWS:16, cells, active:{r:10,c:2}, sel:null, colW:{1:170,2:158}};   /* r296: B wide enough for the stamped deal name */
     },
     checks(S){
       const E=this._exp;
@@ -4698,6 +4742,8 @@ const CHALLENGES = {
         {label:'the priced multiple — EV / EBITDA (=B3/B6)', ok:near('B12',E.evEbitda) && refs('B12',['B3','B6'])},
         {label:'net leverage — net debt / EBITDA (=B4/B6)', ok:near('B13',E.lev) && refs('B13',['B4','B6'])},
         {label:'interest coverage — EBITDA / interest (=B6/B7)', ok:near('B14',E.cov) && refs('B14',['B6','B7'])},
+        {label:'the cover stamp — =UPPER(TRIM(B15)) cleans the raw feed by FORMULA, not by retyping',
+          ok:(()=>{ const c=S.cells['B16']; return !!(c && c.formula && c.value===E.stamp && refs('B16',['UPPER(','TRIM(','B15'])); })()},
       ];
     }
   },
@@ -7575,8 +7621,14 @@ function evalFormula(expr){
     }
   }
   const skip=()=>{ while(s[i]===' ') i++; };
-  const flat=args=>args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellNum):[a.val]).flat();
+  const flat=args=>args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellNum):[typeof a.val==='number'?a.val:0]).flat();   /* r296: non-numeric scalar args contribute 0 (text can reach here now that refs carry raw strings) */
   const rawOf=a=>a.ref!==undefined?cellRaw(a.ref):(a.val!==undefined?a.val:null);
+  /* r296 text plumbing: General-format text of any value (numbers shed float noise),
+     and the numeric read of an arg for count/position parameters */
+  const txtOf=v=>{ if(v==null||v==='') return ''; if(typeof v==='number') return String(parseFloat(Number(v).toPrecision(10))); return String(v); };
+  const argTxt=a=>txtOf(rawOf(a));
+  const argNum=a=>{ if(!a) return 0; const v=(a.val!==undefined)?a.val:rawOf(a); if(typeof v==='number') return v; const p=parseFloat(v); return isNaN(p)?0:p; };
+  const numsIn=a=>{ if(!a||!a.range) throw new Error('range'); return rangeRefs(a.range[0],a.range[1]).map(cellRaw).filter(v=>typeof v==='number'); };   /* numbers only — text/blanks ignored, Excel-style */
   function fn(name,args){
     if(name==='MATCH'){ const lk=rawOf(args[0]); if(!args[1].range) throw new Error('m-range');
       const refs=rangeRefs(args[1].range[0],args[1].range[1]);
@@ -7643,6 +7695,65 @@ function evalFormula(expr){
       const v = cellRaw(colLetter(cc)+rr);
       return v==null ? 0 : v;   // preserve text (pick the active case NAME) and numbers alike
     }
+    if(name==='NPV'){   /* r296: NPV(rate, flows…) — Excel-true: the FIRST flow discounts one full period */
+      if(args.length<2) throw new Error('npv-args');
+      const rate=argNum(args[0]); if(!isFinite(rate) || rate<=-1) throw new Error('NPV#NUM');
+      const flows=args.slice(1).map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellNum):[argNum(a)]).flat();
+      let t=0; for(let p=0;p<flows.length;p++) t+=flows[p]/Math.pow(1+rate,p+1);
+      return t;
+    }
+    if(name==='IRR'){   /* r296: IRR(flows) over a range in time order, first period = t0 (undiscounted).
+      Bisection on the t0-anchored NPV — deterministic, no guess dependence; needs both signs present. */
+      if(!args[0] || !args[0].range) throw new Error('irr-args');
+      const flows=rangeRefs(args[0].range[0],args[0].range[1]).map(cellNum);
+      if(!(flows.some(x=>x>0) && flows.some(x=>x<0))) throw new Error('IRR#NUM');
+      const f=r=>{ let t=0; for(let p=0;p<flows.length;p++) t+=flows[p]/Math.pow(1+r,p); return t; };
+      let lo=-0.999999, hi=10, flo=f(lo), fhi=f(hi);
+      if(!isFinite(flo)||!isFinite(fhi)||flo*fhi>0) throw new Error('IRR#NUM');
+      for(let k=0;k<100;k++){ const mid=(lo+hi)/2, fm=f(mid);
+        if(!isFinite(fm)) throw new Error('IRR#NUM');
+        if(flo*fm<=0){ hi=mid; fhi=fm; } else { lo=mid; flo=fm; } }
+      return (lo+hi)/2;
+    }
+    if(name==='LARGE'||name==='SMALL'){   /* r296: the formula-level sort — k-th ranked value, text/blanks ignored */
+      const vals=numsIn(args[0]); const k=Math.round(argNum(args[1]));
+      if(k<1 || k>vals.length) throw new Error(name+'#NUM');
+      vals.sort((a,b)=>name==='LARGE'?b-a:a-b);
+      return vals[k-1];
+    }
+    if(name==='RANK'){   /* r296: RANK(number, range, [order]) — RANK.EQ semantics, ties share the top rank */
+      const x=argNum(args[0]); const vals=numsIn(args[1]);
+      if(!vals.some(v=>v===x)) throw new Error('RANK#N/A');
+      const asc=args[2] ? Math.round(argNum(args[2]))!==0 : false;
+      return vals.filter(v=>asc ? v<x : v>x).length+1;
+    }
+    /* ---- r296 TEXT PACK — the label muscles a desk actually uses ---- */
+    if(name==='LEN')   return argTxt(args[0]).length;
+    if(name==='TRIM')  return argTxt(args[0]).replace(/ +/g,' ').replace(/^ | $/g,'');   /* spaces only + collapse doubles, Excel-true */
+    if(name==='UPPER') return argTxt(args[0]).toUpperCase();
+    if(name==='LOWER') return argTxt(args[0]).toLowerCase();
+    if(name==='PROPER')return argTxt(args[0]).toLowerCase().replace(/(^|[^A-Za-z])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+    if(name==='LEFT'||name==='RIGHT'){
+      const t=argTxt(args[0]); const n=args.length>1?Math.round(argNum(args[1])):1;
+      if(n<0) throw new Error(name+'#VALUE');
+      return name==='LEFT' ? t.slice(0,n) : (n===0?'':t.slice(Math.max(0,t.length-n)));
+    }
+    if(name==='MID'){
+      const t=argTxt(args[0]); const st2=Math.round(argNum(args[1])), n=Math.round(argNum(args[2]));
+      if(st2<1 || n<0) throw new Error('MID#VALUE');
+      return t.substr(st2-1,n);
+    }
+    if(name==='FIND'){   /* case-sensitive, 1-based; a miss ERRORS (wrap it in IFERROR — that's the lesson) */
+      const needle=argTxt(args[0]), hay=argTxt(args[1]);
+      const st3=args.length>2?Math.round(argNum(args[2])):1;
+      if(st3<1) throw new Error('FIND#VALUE');
+      const p=hay.indexOf(needle, st3-1);
+      if(p<0) throw new Error('FIND#VALUE');
+      return p+1;
+    }
+    if(name==='CONCATENATE'||name==='CONCAT'){
+      return args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellRaw).map(txtOf).join(''):argTxt(a)).join('');
+    }
     const xs=flat(args);
     switch(name){
       case 'SUM': return xs.reduce((a,b)=>a+b,0);
@@ -7658,30 +7769,37 @@ function evalFormula(expr){
         return (typeof a==='number'&&isFinite(a))?a:(args[1]?args[1].val:0); }   /* r173: nested form; throwing args are caught at the outermost layer */
       default: throw new Error('fn '+name);
     } }
+  /* r296: arithmetic coercion — text reads 0 (the engine's long-standing rule) EXCEPT a
+     fully-numeric string, which reads as its number (Excel-true). Applied only where an
+     operator actually fires, so bare refs still pass text through to & and the text pack. */
+  const nm=v=>{ if(typeof v==='number') return v; if(v==null||v==='') return 0;
+    const p=parseFloat(v); return (!isNaN(p) && /^\s*-?\d*\.?\d+\s*$/.test(String(v))) ? p : 0; };
   /* r96: comparators — Excel's lowest precedence; TRUE/FALSE land as 1/0 */
-  function cmp_(){ let v=expr_(); skip();
+  function cmp_(){ let v=cat_(); skip();
     while(s[i]==='<'||s[i]==='>'||s[i]==='='){
       let op=s[i++]; if((op==='<'&&(s[i]==='='||s[i]==='>'))||(op==='>'&&s[i]==='=')) op+=s[i++];
-      const r=expr_();
+      const r=cat_();
       v = (op==='='? (v===r) : op==='<>'? (v!==r) : op==='<'? (v<r) : op==='<='? (v<=r) : op==='>'? (v>r) : (v>=r)) ? 1 : 0;
       skip(); }
     return v; }
-  function expr_(){ let v=term(); skip(); while(s[i]==='+'||s[i]==='-'){ const o=s[i++]; const t=term(); v=o==='+'?v+t:v-t; skip(); } return v; }
-  function term(){ let v=pow_(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=pow_(); v=o==='*'?v*f:v/f; skip(); } return v; }
-  function pow_(){ let v=fac(); skip(); while(s[i]==='^'){ i++; const e=fac(); v=Math.pow(v,e); skip(); } return v; }
+  function cat_(){ let v=expr_(); skip(); while(s[i]==='&'){ i++; const r2=expr_(); v=txtOf(v)+txtOf(r2); skip(); } return v; }   /* r296: & — Excel's concat operator, between comparison and +/- in precedence */
+  function expr_(){ let v=term(); skip(); while(s[i]==='+'||s[i]==='-'){ const o=s[i++]; const t=term(); v=o==='+'?nm(v)+nm(t):nm(v)-nm(t); skip(); } return v; }
+  function term(){ let v=pow_(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=pow_(); v=o==='*'?nm(v)*nm(f):nm(v)/nm(f); skip(); } return v; }
+  function pow_(){ let v=fac(); skip(); while(s[i]==='^'){ i++; const e=fac(); v=Math.pow(nm(v),nm(e)); skip(); } return v; }
   function fac(){ skip();
     if(s[i]==='('){ i++; const v=cmp_(); skip(); if(s[i]!==')') throw new Error('paren'); i++; return v; }   /* r96: parens admit comparisons */
-    if(s[i]==='-'){ i++; return -fac(); }
+    if(s[i]==='-'){ i++; return -nm(fac()); }
     if(s[i]==='+'){ i++; return fac(); }
+    let q=/^"([^"]*)"/.exec(s.slice(i)); if(q){ i+=q[0].length; return q[1]; }   /* r296: string literals live in expressions now (="FY"&B2) */
     let m=/^\d*\.?\d+/.exec(s.slice(i)); if(m){ i+=m[0].length; return parseFloat(m[0]); }
     let f=/^([A-Za-z]+)\s*\(/.exec(s.slice(i)); if(f){ i+=f[1].length; skip(); i++; const a=argList(); skip(); if(s[i]!==')') throw new Error('fnparen'); i++; return fn(f[1].toUpperCase(),a); }
-    let cr=/^\$?[A-Za-z]+\$?\d+/.exec(s.slice(i)); if(cr){ i+=cr[0].length; return cellNum(cr[0].replace(/\$/g,'').toUpperCase()); }
+    let cr=/^\$?[A-Za-z]+\$?\d+/.exec(s.slice(i)); if(cr){ i+=cr[0].length; const rv=cellRaw(cr[0].replace(/\$/g,'').toUpperCase()); return typeof rv==='string'&&rv!==''?rv:(typeof rv==='number'?rv:0); }   /* r296: refs carry raw text through (for & / text fns); operators coerce via nm() exactly as before */
     throw new Error('unexpected'); }
   function argList(){ const a=[]; skip(); if(s[i]===')') return a; a.push(arg()); skip(); while(s[i]===','){ i++; a.push(arg()); skip(); } return a; }
   function arg(){ skip(); const rng=/^(\$?[A-Za-z]+\$?\d+)\s*:\s*(\$?[A-Za-z]+\$?\d+)/.exec(s.slice(i));
     if(rng){ i+=rng[0].length; return {range:[rng[1].toUpperCase(),rng[2].toUpperCase()]}; }
     const str=/^"([^"]*)"/.exec(s.slice(i));   // quoted text criteria, e.g. SUMIF(A:A,"NA",B:B)
-    if(str){ i+=str[0].length; return {val:str[1]}; }
+    if(str){ const save=i; i+=str[0].length; skip(); if(s[i]===','||s[i]===')') return {val:str[1]}; i=save; }   // r296: a literal mid-expression ("Q"&B1) falls through to the parser instead
     const st=i; const v=cmp_(); const cons=s.slice(st,i).trim();   /* r96: args parse comparisons (IF conditions) */
     if(/^\$?[A-Za-z]+\$?\d+$/.test(cons)) return {val:v, ref:cons.replace(/\$/g,'').toUpperCase()};
     return {val:v}; }
@@ -9056,7 +9174,8 @@ function commitEdit(dr,dc){
   if(buf!==''){
     pushUndo();
     const cell=ensure(S.active.r,S.active.c);
-    if(buf[0]==='='){ cell.formula=buf; let v; try{ v=evalFormula(buf); }catch(_){ v=NaN; } cell.value=isFinite(v)?v:0; cell.txt=false; }
+    if(buf[0]==='='){ cell.formula=buf; let v; try{ v=evalFormula(buf); }catch(_){ v=NaN; }
+      cell.value=(typeof v==='number')?(isFinite(v)?v:0):(v!=null?v:0); cell.txt=false; }   /* r296: text results commit as text (mirrors recalc's r257 rule) — the text pack & the & operator need it */
     else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf); cell.txt=false; }
     /* r95 audit (Excel parity): bankers type these — they must land as NUMBERS, not text */
     else if(/^-?[\d,]+\.?\d*$/.test(buf) && /,/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf.replace(/,/g,'')); cell.txt=false; cell.fmtStyle=cell.fmtStyle||'comma'; if(cell.decimals===undefined) cell.decimals=0; }
@@ -9257,7 +9376,11 @@ const FN_SIGS={ IF:['condition','if_true','if_false'], SUM:['range'], SUMIF:['ra
   INDEX:['array','row_num','col_num'], MATCH:['lookup_value','lookup_array','0'],
   VLOOKUP:['value','table','col_index','FALSE'], HLOOKUP:['value','table','row_index','FALSE'],
   IFERROR:['value','value_if_error'], ROUND:['number','digits'], ABS:['number'], EOMONTH:['start','months'],
-  CHOOSE:['index','value1','value2','...'], OFFSET:['ref','rows','cols'] };
+  CHOOSE:['index','value1','value2','...'], OFFSET:['ref','rows','cols'],
+  NPV:['rate','flows'], IRR:['flows'], LARGE:['range','k'], SMALL:['range','k'], RANK:['number','range','order'],
+  LEFT:['text','n'], RIGHT:['text','n'], MID:['text','start','n'], LEN:['text'], TRIM:['text'],
+  UPPER:['text'], LOWER:['text'], PROPER:['text'], FIND:['find_text','within_text','start'],
+  CONCATENATE:['text1','text2','...'] };   /* r296 additions */
 function updateFxHint(){
   const el=$('fxHint'); if(!el) return;
   if(!editing || !editBuf.startsWith('=')){ el.classList.remove('show'); return; }

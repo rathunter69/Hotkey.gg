@@ -1,6 +1,30 @@
 # PIPELINE — the Fable task queue
 
-## ⚡ STATE OF THE QUEUE (r251, 2026-07-15 — READ FIRST)
+## ⚡ STATE OF THE QUEUE (r296, 2026-07-17 — READ FIRST)
+The r296 round (branch `claude/pipeline-engine-integration-laki0l`) did three things:
+1. **RESCUED THE STRANDED SESSION** — the one-row-toolbar / marathon-purge / auth-fix /
+   account-overhaul / leaderboard / rapid-fire arc (19 commits) was sitting unmerged on
+   `claude/school-flair-phase-1-35myh2` with NO PR; Pages serves main, so none of it ever
+   deployed. It ships with r296. **HOUSE RULE: a round is not done until the PR is opened,
+   merged, and main is verified to have moved.**
+2. **ENGINE FUNCTION PACK (Wolf)** — NPV + IRR (the great find), the text pack
+   (LEFT/RIGHT/MID/LEN/TRIM/UPPER/LOWER/PROPER/FIND/CONCATENATE + & + string literals), and
+   the sorting functions (LARGE/SMALL/RANK). TABLES skipped (Wolf call). Folded into drills:
+   dcfbuild (=NPV audit line), lbobuild (=IRR over real equity flows ties to compounded MOIC),
+   comps (LARGE/SMALL trimmed read), dashcover (=UPPER(TRIM()) cover stamp). Parity 94→120.
+3. **SIGN-OUT NAV AUDIT (Wolf)** — sign-out now lands HOME from every page and wipes ALL
+   account-derived local mirrors (stats can never show the previous account to a guest);
+   device prefs survive. account.html "sign out everywhere" shares the wipe.
+**QUEUED NEXT (content, engine is ready):**
+- **"Clean the import" drill (text-pack flagship)** — a pasted deal list with dirty names/
+  tickers: TRIM/PROPER the names, LEFT&FIND the tickers off "AAPL US Equity" strings, &
+  rebuild a canonical label column. Data & Lookups chapter, ~par 60.
+- **RANK's drill home** — a league-table beat (rank the deals by size, live re-rank on edit),
+  natural fit: scrub or a new "league table" drill; RANK is engine-ready + parity-armored.
+- Text still deferred: TEXT(value,fmt) custom format codes (rabbit hole, build when a drill
+  demands it), SUBSTITUTE/REPLACE, TEXTJOIN.
+
+## ⚡ prior state (r251, 2026-07-15)
 Curriculum v2.1 is fully shipped, gated green, and coherent end to end. Since the
 r196 block (kept below as history):
 - **Engine Tier 1+2 DONE** — fill palette (Alt H H), Clear menu (Alt H E), indent

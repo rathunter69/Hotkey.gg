@@ -84,7 +84,7 @@
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
 <link rel="stylesheet" href="nav.css?v=175">
-<script src="drills.js?v=264"></script>
+<script src="drills.js?v=265"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -96,7 +96,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=261"></script>
+<script src="nav.js?v=262"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -265,7 +265,7 @@ async function load(){
     }catch(e){ say('acDelMsg','Something went wrong \u2014 contact hello@hotkey.gg.',true); delBtn.disabled=false; }
   };
   const so=document.getElementById('acSignoutAll');
-  if(so) so.onclick=async()=>{ try{ await Promise.race([sb.auth.signOut({scope:'global'}), new Promise(r=>setTimeout(r,1200))]); }catch(e){} location.href='index.html'; };   // r293: revokes EVERY device's session; plain sign-out lives in the nav menu
+  if(so) so.onclick=async()=>{ try{ if(window.clearAccountUI) window.clearAccountUI(); }catch(e){} try{ await Promise.race([sb.auth.signOut({scope:'global'}), new Promise(r=>setTimeout(r,1200))]); }catch(e){} location.href='index.html'; };   // r293: revokes EVERY device's session; plain sign-out lives in the nav menu. r296: shares the nav.js account wipe — this path used to leave every local mirror behind
   const th=document.getElementById('acThemes');
   if(th && window.THEMES){ Object.entries(window.THEMES).forEach(([k,t])=>{
     const b=document.createElement('button'); b.className='btn'; b.style.margin='0'; b.textContent=t.name||k;

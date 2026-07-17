@@ -5471,3 +5471,57 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   letter Y=yellow; 0 page errors) · fill drills (housestyle/polish/dress/blue/ruleoff/combo/gauntlet)
   WIN. New gray/yellow/green/red aren't used by any existing drill yet (no live regression) — the
   visual audit validates them when the drill rebuilds put them to work. index.html only.
+
+## r296 — THE STRANDED-BRANCH RESCUE + engine finance/text/sort pack + sign-out lands home (Wolf)
+- **THE DEPLOY MYSTERY SOLVED.** Wolf hard-refreshed and saw NONE of the recent UI work (one-row
+  toolbar, marathon/sheet-button removal, auth fixes…). Root cause: that whole session — 19 commits
+  including "Game toolbar: retire marathon + sheet button", "Kill marathon from the UI", "Marathon
+  purge", the auth/rank root-cause fix, account overhaul, leaderboard rework, rapid-fire rebuild —
+  was pushed to `claude/school-flair-phase-1-35myh2` and **no PR was ever opened**. Pages serves
+  main; main never got it. Fixed: branch fast-forwarded onto the working branch and shipped with
+  this round. HOUSE RULE REINFORCED: a push to a side branch deploys NOTHING — every round ends
+  with the PR opened and merged, and the session verifies main moved.
+- **SIGN-OUT LANDS YOU HOME (the navigation-pipeline audit).** Wolf: "when I sign out I'm not
+  directed anywhere and am left staring at a stale stats page." Two defects: (a) nav.js umSignout
+  reloaded IN PLACE, so satellites kept you on a now-guest page; (b) the r226 wipe cleared only the
+  HEADER caches — stats.html re-read the account's local mirrors (hotkey_pb, hk_runs_lite,
+  hotkey_solves, hotkey_streak, hk_key_counts, hk_camp_xp, achievements, ghosts) and showed the
+  signed-out account's numbers to whoever sat down next. Fix: clearAccountUI now wipes every
+  account-derived mirror (device prefs — theme, platform, onboarding flags — survive; the server
+  re-hydrates the account on next sign-in per r114), and the sign-out button navigates to the home
+  page from every surface (location.href resolves via <base>, so drill subpages route home too).
+  account.html's "sign out everywhere" (r293) now shares the same wipe — it used to leave every
+  mirror behind. Verified live: all mirrors null after sign-out, prefs kept, redirect asserted, 0
+  page errors. Cross-tab SIGNED_OUT wipes reactively (r226 path) but deliberately does NOT reload —
+  a token-expiry event mid-drill must never eat a run.
+- **ENGINE — the finance pack (Wolf's NPV/IRR find).** evalFormula gains **NPV(rate, flows…)**
+  (Excel-true: first flow discounts one full period) and **IRR(flows)** (bisection on the
+  t0-anchored NPV, deterministic, no guess; mixed signs required, else #NUM → IFERROR-able).
+  Identity verified in parity: =NPV(IRR(line),tail) reproduces the year-0 outflow exactly.
+- **ENGINE — the text pack.** LEFT/RIGHT/MID/LEN/TRIM (collapses inner space-runs, Excel-true)/
+  UPPER/LOWER/PROPER/FIND (case-sensitive, 1-based, miss throws)/CONCATENATE — plus the **&
+  operator** at Excel's precedence and **string literals in expressions** (="FY"&B2). Parser
+  plumbing: refs now carry raw text through to & and the text functions; arithmetic operators
+  coerce exactly as before (text→0, numeric strings now read as their number, Excel-true), so no
+  existing drill moves. Commit path accepts text results (mirrors recalc's r257 rule).
+- **ENGINE — the sorting functions.** LARGE/SMALL (k-th ranked, text/blanks ignored, ties
+  Excel-true) and RANK (RANK.EQ semantics: desc default, order arg flips, ties share the top rank,
+  absent value #N/A). TABLES (structured refs) deliberately skipped — Wolf call.
+- **FOLDED INTO DRILLS (build the muscle, then the drills that need it get deeper for free):**
+  · **dcfbuild** — the audit line: B18 =NPV($B$7,B3:F3) must reproduce the hand-built PV row; the
+    pre-ship tie-out ritual as a graded beat. par 76→91 / parKeys 80→96 (sweep).
+  · **lbobuild** — the fund-model road: equity laid out as dated FLOWS (check out at year 0 =-B11,
+    exit proceeds in at year N =B18, quiet 0s between), then B25 =IRR(flow row) must land on the
+    SAME number as the compounded-MOIC B21. Two roads, one number — the aha the drill now teaches.
+    Timeline length rides the randomized hold (3–6y). par 61→82 / parKeys 63→85.
+  · **comps** — the TRIMMED read: D11 =LARGE(D3:D7,2) / D12 =SMALL(D3:D7,2) — one outlier peer
+    never sets the range the IC sees. par 66→94 / parKeys 69→99.
+  · **dashcover** — the cover stamp: B16 =UPPER(TRIM(B15)) cleans the data-room's raw deal-name
+    feed by FORMULA (randomized dirty name pool, stray + double spaces). par 32→48 / parKeys 31→48.
+  RANK ships engine+parity only; its drill home (league-table beat) queued in PIPELINE with the
+  text-pack flagship ("clean the import": TRIM/PROPER + LEFT&FIND ticker extraction + & rebuild).
+- GATE (all green): demo-replay 81 · **parity 94→120** (3 new sections: finance, text+&, sorting) ·
+  onboard 29 · alt-paths 74 (comps alt gained the trimmed read) · mac-input 19 · echo 21 ·
+  rapidfire 12 · par-sweep: 4 edited drills re-measured, declared = measured, drift ≤2% (lbobuild
+  −8%→0 after re-declare) · drill pages regenerated (descs updated for the 4 drills). Cache: nav.js
+  ?v 261→262, drills.js ?v 264→265 across all pages.
