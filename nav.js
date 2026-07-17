@@ -802,7 +802,7 @@
     wire('umProfile',  openProfile);
     wire('umSaveProg', () => goToTrainer('openAuth=signup'));
     wire('umSettings', openSettings);
-    wire('umSignout',  () => { clearAccountUI(); Promise.race([window.sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{ try{ location.href = TRAINER_URL; }catch(e){} }); });   // r266: never wait on a hung signOut round-trip. r296 (Wolf): sign-out LANDS YOU HOME — reloading in place left you staring at a stale stats/boards page; the home page is the one guest-state view that always makes sense. (location.href resolves via <base>, so drill subpages route home too.)
+    wire('umSignout',  () => { clearAccountUI(); Promise.race([window.sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{ try{ location.href = TRAINER_URL + '?fresh=1'; }catch(e){} }); });   // r266: never wait on a hung signOut round-trip. r296 (Wolf): sign-out LANDS YOU HOME. r299: ?fresh=1 — the trainer opens on drill one with a "signed out" cue, so it FEELS like the platform reset (last-drill memory is wiped with the account mirrors).
   }
   // Outside-click and Esc close the dropdown — global listeners, installed once.
   document.addEventListener('click', e => {

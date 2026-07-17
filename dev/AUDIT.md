@@ -1,5 +1,35 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r299 — sign-out feels like a reset, deterministic login, Alt+↓ filter dropdown, hidden-row cue (Wolf batch)
+- **SIGN-OUT NOW READS AS A RESET (Wolf).** The r296 land-home redirect carries `?fresh=1`; the
+  trainer opens on DRILL ONE (last-drill memory is wiped with the account mirrors) and toasts
+  "Signed out — fresh desk, drill one." The param strips from the URL after arrival. First
+  attempt wired the toast into exitSession()'s resume path by mistake (same loadChallenge line,
+  wrong caller) — verified live at the real boot site.
+- **LOGIN IS A FULL RELOAD (Wolf: "still not showing my account until I refresh").** Two layers:
+  (1) the r297 eager-render fix had NOT deployed when Wolf re-tested — it was sitting in the
+  unmerged PR (again: nothing is fixed until main moves); (2) belt-and-suspenders per Wolf's own
+  instinct — successful password sign-in now does location.reload(), so every surface (rank pill,
+  boards, mirrors, account theme) hydrates from scratch instead of trusting a chain of reactive
+  re-renders. This bug class has now come back twice; deterministic wins.
+- **HELD Alt+↓ OPENS THE FILTER DROPDOWN (Wolf: "doesn't work in the filtered-row drill").** The
+  r143 dead-chord class AGAIN: the Alt keydown entered ribbon mode before ↓ arrived, so the r180
+  dropdown branch (gated on mode!=='ribbon') never fired. The ribbon handler now recognizes
+  fresh-ribbon + Alt-held + ↓ on an armed filter header as the dropdown chord. Sequential
+  Alt, then ↓ still works as before. Verified live: armed → held-chord → dialog='filter'.
+- **HIDDEN ROWS SHOW THE BREAK LINE (Wolf: "no icon indicating hidden rows").** Row headers under
+  a hidden run now carry Excel's cue — a double rule (.rowhdr.hidcut) where rows are missing.
+  The unhide drill stops being a guessing game. Verified on the unhide board.
+- **Unhide-all ritual in the reference (Wolf):** new row — Ctrl+A → Alt H O U O, "unhide EVERY
+  row — the open-a-new-sheet ritual." (Column unhide stays out until the engine models hidden
+  columns; noted in T-E's deferred list.)
+- GATE: targeted — filterpass/unhide/grpfold/navigation replay 3/3 each · parity 124 · live
+  probes for the three new behaviors · CI full gate on the PR.
+- QUEUED from this Wolf batch: unique-handle suggestions + suggest-in-onboarding · email
+  reminders/verification customization (EMAIL_SETUP.md is the runbook, Wolf-gated on mailbox) ·
+  icon-consistency sweep (screenshot-first) · trace-precedents + F9-evaluate drill (engine F9 +
+  'tieout' drill spec in the task).
+
 ## r298 — BORDER CHORDS TO EXCEL CANON (Wolf caught it) + insert-seq copy + name-gen + copy quick fixes
 - **THE CANON BUG (Wolf, from live play): our Alt H B letters were WRONG vs real Excel.** We taught
   T=top and B=bottom for months; Excel's actual access keys are **O=Bottom, P=Top, T=THICK BOX,
