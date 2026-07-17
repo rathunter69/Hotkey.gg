@@ -668,6 +668,29 @@
   .onboard-modal{position:fixed; inset:0; background:rgba(0,0,0,.62); display:none;
     align-items:center; justify-content:center; z-index:60}
   .onboard-modal.show{display:flex}
+    /* r309: the xp/rank explainer — tight, tabbed, icon-led */
+  .xr-card{text-align:left}
+  .xr-tabs{display:flex; gap:6px; margin-bottom:14px}
+  .xr-tab{flex:1; font-family:var(--mono); font-size:11.5px; font-weight:700; color:var(--muted);
+    background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:8px; cursor:pointer; transition:.12s}
+  .xr-tab.on{color:var(--on-accent,#0c0d0e); background:var(--accent); border-color:var(--accent)}
+  .xr-grid{display:flex; flex-direction:column; gap:2px}
+  .xr-row{display:flex; align-items:center; gap:10px; padding:7px 8px; border-radius:7px}
+  .xr-row:nth-child(odd){background:var(--surface2)}
+  .xr-ic{width:20px; text-align:center; color:var(--accent); font-size:14px; flex:none}
+  .xr-lb{flex:1; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--text)}
+  .xr-lb em{display:block; font-style:normal; font-weight:400; font-size:10.5px; color:var(--muted); margin-top:1px}
+  .xr-v{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--accent)}
+  .xr-sub{font-family:var(--mono); font-size:9.5px; letter-spacing:1.1px; text-transform:uppercase; color:var(--faint); margin:12px 4px 5px}
+  .xr-note{font-family:var(--sans); font-size:11.5px; line-height:1.6; color:var(--muted); margin-top:12px}
+  .xr-ladder{display:flex; flex-direction:column; gap:1px; margin:12px 0}
+  .xr-tier{display:flex; align-items:center; gap:9px; padding:5px 8px; border-radius:7px; position:relative}
+  .xr-tier.here{background:var(--accent-glow); box-shadow:inset 0 0 0 1px var(--accent-dim)}
+  .xr-em{line-height:0; flex:none}
+  .xr-tn{flex:1; font-family:var(--mono); font-size:12px; font-weight:700; color:var(--text)}
+  .xr-tg{font-family:var(--mono); font-size:10px; color:var(--muted)}
+  .xr-you{font-family:var(--mono); font-size:8.5px; font-weight:700; letter-spacing:.8px; text-transform:uppercase;
+    color:var(--on-accent,#0c0d0e); background:var(--accent); border-radius:99px; padding:2px 7px; margin-left:6px}
   .ob-card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
     padding:28px 30px; width:380px; max-width:88vw; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55)}
   .ob-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
@@ -12860,25 +12883,59 @@ function openLevelProgress(){
   if(h) h.onclick=()=>{ close(); openXpInfo(); };
   m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
 }
-function openXpInfo(){
+/* r309 (Wolf): the xp/rank explainers were walls of <br> text. Rebuilt as ONE tight,
+   scannable card with two tabs \u2014 XP (how you level) and RANK (how you place) \u2014 each an
+   icon-led grid + chips, not prose. openRankInfo() jumps straight to the RANK tab. */
+function xpRankModal(tab){
   let m=$('xpModal');
   if(!m){ m=document.createElement('div'); m.id='xpModal'; m.className='onboard-modal'; document.body.appendChild(m); }
-  m.innerHTML='<div class="ob-card" style="max-width:460px;text-align:left;position:relative">'+
+  const XP_ROWS=[
+    ['\u25c9','new drill','first clean solve','+50'],
+    ['\u21bb','repeat','solves 2\u201310 of a drill','+15'],
+    ['\u25c6','daily','the morning sheet','+30'],
+    ['\u26a1','rapid-fire','a timed sitting','+10'],
+  ];
+  const BOARD_ROWS=[
+    ['top 10','a board\u2019s top ten','+25','var(--accent)'],
+    ['podium','top three','+100','var(--warn)'],
+    ['crown','#1 \u2014 the fastest','+250','var(--warn)'],
+  ];
+  const T=(window.HK_RANK&&window.HK_RANK.TIERS)||[];
+  let curTierName=''; try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null'); if(c&&c.n) curTierName=c.n; }catch(e){}
+  const em=(name)=> window.rankEmblem?window.rankEmblem(name,26):'';
+  const ladder=T.map(t=>{
+    const here=t.name===curTierName;
+    const gate = t.pct>=9 ? 'the floor' : t.pct>1 ? '5 drills in' : 'top '+Math.round(t.pct*100)+'%';
+    return '<div class="xr-tier'+(here?' here':'')+'">'+
+      '<span class="xr-em">'+em(t.name)+'</span>'+
+      '<span class="xr-tn">'+escHtml(t.name)+'</span>'+
+      '<span class="xr-tg">'+gate+'</span>'+
+      (here?'<span class="xr-you">you</span>':'')+'</div>';
+  }).join('');
+  const xpPane=
+    '<div class="xr-grid">'+XP_ROWS.map(r=>'<div class="xr-row"><span class="xr-ic">'+r[0]+'</span><span class="xr-lb">'+r[1]+'<em>'+r[2]+'</em></span><b class="xr-v">'+r[3]+'</b></div>').join('')+'</div>'+
+    '<div class="xr-sub">leaderboard bonuses</div>'+
+    '<div class="xr-grid">'+BOARD_ROWS.map(r=>'<div class="xr-row"><span class="xr-lb" style="margin-left:2px">'+r[0]+'<em>'+r[1]+'</em></span><b class="xr-v" style="color:'+r[3]+'">'+r[2]+'</b></div>').join('')+'</div>'+
+    '<div class="xr-note">Each level costs a little more than the last. New drills and showing up daily are the fastest climb.</div>';
+  const rankPane=
+    '<div class="xr-note" style="margin-top:0">Your rank is <b style="color:var(--text)">speed vs the field</b> \u2014 your best time on each drill, ranked against everyone else\u2019s, averaged. Climb by beating more people on more boards.</div>'+
+    '<div class="xr-ladder">'+ladder+'</div>'+
+    '<div class="xr-note"><b style="color:var(--warn)">par</b> is a clean run at native Excel pace \u2014 the same bar for everyone. Macabacus / FactSet layers are a legal edge (shorter chords = real-desk play, not cheating).</div>';
+  m.innerHTML='<div class="ob-card xr-card" style="max-width:420px;position:relative">'+
     '<a class="modal-x" id="xpX">\u00d7</a>'+
-    '<div class="ob-title">how xp works</div>'+
-    '<div class="ob-body" style="text-align:left;font-size:12.5px;line-height:2">'+
-    '<b style="color:var(--accent)">new drill</b> +50 (advanced +65) \u00b7 <b>repeat</b> +15<br>'+
-    '<b style="color:var(--accent)">daily</b> +30 \u00b7 <b>gauntlet leg</b> +25 \u00b7 <b>rapid-fire</b> +10<br>'+
-    '<b style="color:var(--warn)">boards</b>: top-10 +25 \u00b7 podium +100 \u00b7 crown +250<br>'+
-    '<span style="color:var(--muted);font-size:11px">Each level costs a bit more than the last. New drills and showing up daily are the fastest climb.</span>'+
-    '<br><br><b style="color:var(--warn)">how par works</b><br>'+
-    '<span style="color:var(--muted);font-size:11px">Par is a clean run at NATIVE Excel pace \u2014 the same bar for everyone, every board. Plugin keyboard layers (Macabacus / FactSet) are a legal edge: their shortcuts are shorter, so beating par with them is playing it like a real desk, not cheating. Guided mode lists the alternates when one exists.</span>'+
-    '</div><div class="ob-opts"><button class="ob-key primary" id="xpClose">got it</button></div></div>';
+    '<div class="xr-tabs"><button class="xr-tab'+(tab!=='rank'?' on':'')+'" data-t="xp">how xp works</button>'+
+      '<button class="xr-tab'+(tab==='rank'?' on':'')+'" data-t="rank">how rank works</button></div>'+
+    '<div class="xr-pane">'+(tab==='rank'?rankPane:xpPane)+'</div>'+
+    '<div class="ob-opts" style="margin-top:14px"><button class="ob-key primary" id="xpClose">got it</button></div></div>';
   m.classList.add('show');
-  $('xpClose').onclick=()=>m.classList.remove('show');
-  $('xpX').onclick=()=>m.classList.remove('show');
-  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
+  const close=()=>m.classList.remove('show');
+  $('xpClose').onclick=close; $('xpX').onclick=close;
+  m.querySelectorAll('.xr-tab').forEach(b=>b.onclick=()=>xpRankModal(b.dataset.t));
+  m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
 }
+function openXpInfo(){ xpRankModal('xp'); }
+function openRankInfo(){ xpRankModal('rank'); }
+window.openRankInfo=openRankInfo;
 function xpEarnFor(key){
   // r116 XP v4: what the NEXT clean solve pays TODAY (daily ladder + warm-up aware)
   let cd={d:'',counts:{}}; try{ cd=JSON.parse(localStorage.getItem('hk_clears_day')||'{}')||cd; }catch(e){}
