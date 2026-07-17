@@ -1596,20 +1596,20 @@
 </div>
 <div class="landing" id="landing">
   <div class="landing-inner">
+    <!-- r314 (Wolf): stripped from a marketing splash to a clean start prompt — begin drilling or
+         log in. Logged-in returning users skip this entirely (welcome-back path). -->
     <div class="lbrand">hotkey<b>.gg</b></div>
-    <div class="eyebrow">Keyboard-only Excel</div>
-    <h1>Drills, <span class="dim">not lessons.</span></h1>
-    <p class="lede">Real shortcuts, real tasks. Built for the keystrokes you use every day.</p>
+    <div class="eyebrow">Keyboard-only Excel training</div>
+    <h1>Ready to <span class="dim">drill?</span></h1>
     <div class="landing-cta">
-      <button class="start-btn" id="startBtn">Start training <kbd class="kbd-cta">↵</kbd></button>
+      <button class="start-btn" id="startBtn">Start drilling <kbd class="kbd-cta">↵</kbd></button>
       <button class="start-btn ghosted" id="loginBtn" style="background:transparent;border:1px solid var(--line);color:var(--muted)">Log in</button>
       <span class="modes">
         <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
         <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
       </span>
     </div>
-    <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · everything keyboard</span></div>
-    <div class="micro" style="margin-top:14px">Been here before? <a id="landingSignin" style="color:var(--accent);cursor:pointer;border-bottom:1px solid var(--accent-dim)">Sign in</a> to pick up your rank, level, and boards.</div>
+    <div class="micro" id="landingMicro"><span class="micro-hint"><kbd>↵</kbd> to begin · everything’s keyboard — no mouse needed</span></div>
   </div>
 </div>
 
@@ -13817,7 +13817,11 @@ let authMode='signin';
 function isAnonUser(){ return !!(me_user && me_user.is_anonymous); }
 function authErr(msg){ const e=$('authErr'); if(e) e.textContent=msg||''; }
 
-function openAuth(mode){ authMode=mode||'signin'; authOpen=true; renderAuth();
+function openAuth(mode){ authMode=mode||'signin'; authOpen=true;
+  // r314 (Wolf): retract the welcome-back card the instant login opens \u2014 it used to sit behind
+  // the auth modal and flash "welcome back" before the login window, breaking the tight feel.
+  try{ const wb=$('wbDlg'); if(wb){ wb.style.display='none'; wb.remove(); } }catch(e){}
+  renderAuth();
   if(!sb){ const msg=$('authMsg'); if(msg) msg.textContent='connecting\u2026 one moment'; setTimeout(()=>{ if(sb) renderAuth(); }, 800); } }
 function renderAuth(){
   const m=$('authModal');
