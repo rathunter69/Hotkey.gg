@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="lb.css?v=2">
+<link rel="stylesheet" href="lb.css?v=4">
 <style>
   html{scrollbar-gutter:stable}   /* r68: content filters change page height — without this the centered wrap jumps horizontally */
   :root{
@@ -79,6 +79,9 @@
   .ach-pick.feat .st{display:block}
   .ach-pick i{position:absolute; top:32px; right:8px; font-style:normal; font-size:7.5px; color:var(--faint);
     background:var(--surface2); border:1px solid var(--line); border-radius:6px; padding:0 3px}
+  /* r293 (Wolf): rarity tag under earned rare+ medals so the wall reads rare-vs-common at a glance */
+  .ach-pick .rr{font-family:var(--mono); font-size:7px; letter-spacing:.09em; font-weight:700;
+    padding:0 4px; border-radius:6px; border:1px solid currentColor; opacity:.92; margin-top:1px}
   .ach-hint{font-family:var(--mono); font-size:11px; color:var(--muted); margin:2px 0 8px}
   .section-title{font-family:var(--mono); font-size:13px; color:var(--muted); text-transform:uppercase;
     letter-spacing:1.5px; margin:26px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line)}
@@ -98,7 +101,7 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=174">
+<link rel="stylesheet" href="nav.css?v=175">
 <script src="drills.js?v=264"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -107,11 +110,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=262"></script>
+<script src="themes.js?v=263"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=259"></script>
+<script src="nav.js?v=261"></script>
 
 <header class="head">
   <div class="wrap">
@@ -214,9 +217,26 @@ async function load(){
       `<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">${st.crowns} crown${st.crowns===1?'':'s'} \u00b7 ${st.pod} podium${st.pod===1?'':'s'} \u00b7 ${st.att}/${D.menuOrder.length} boards</div>`+
       `<div class="yc-next" style="margin-top:auto">defend them on <a href="leaderboard.html" style="color:var(--accent)">the boards \u2192</a> \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`;
   }
+  /* r293 (Wolf): TIME SAVED — the professional's core metric, same methodology as the
+     desk report: your first recorded time vs your current best on each re-drilled task,
+     summed. Server runs when signed in (created_at ordering), local history otherwise. */
+  let savedMs=0;
+  try{
+    const firstBy={}, bestBy={};
+    let src2=[];
+    if(mine.length){ src2=mine.slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).map(r=>({d:r.challenge, t:r.time_ms})); }
+    else{ src2=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]').map(r=>({d:r.d, t:r.time_ms})).filter(r=>r.d); }
+    src2.forEach(r=>{ if(firstBy[r.d]===undefined) firstBy[r.d]=r.t;
+      if(bestBy[r.d]===undefined||r.t<bestBy[r.d]) bestBy[r.d]=r.t; });
+    Object.keys(firstBy).forEach(d=>{ const s=firstBy[d]-bestBy[d]; if(s>0) savedMs+=s; });
+  }catch(e){}
+  const savedTxt = savedMs<=0 ? '\u2014'
+    : savedMs<60000 ? (savedMs/1000).toFixed(0)+'<em>s</em>'
+    : savedMs<3600000 ? Math.round(savedMs/60000)+'<em>m</em>'
+    : Math.floor(savedMs/3600000)+'<em>h</em> '+Math.round((savedMs%3600000)/60000)+'<em>m</em>';
   let html = `<div class="hero${tcHtml?'':' solo'}">` + tcHtml + `<div class="cards">
-    <div class="stat lead"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
-    <div class="stat"><div class="big">${bestKps?bestKps.toFixed(1):'—'}</div><div class="lbl">peak keys / sec</div></div>
+    <div class="stat lead"><div class="big">\u23f1 ${savedTxt}</div><div class="lbl">time banked \u2014 first try vs best</div></div>
+    <div class="stat"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
     <div class="stat"><div class="big">${avgEff!==null?avgEff+'<em>%</em>':'—'}</div><div class="lbl">avg keys vs optimal path</div></div>
     <div class="stat"><div class="big">${streakN?'🔥 '+streakN:'—'}</div><div class="lbl">day streak</div></div>
   </div></div>`;
@@ -285,8 +305,8 @@ async function load(){
           return out;
         }catch(e){ return {}; }
       })();
-      let earnedN=0, grid='';
-      AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
+      let earnedN=0; const cells=[];
+      AC.forEach((a,ord)=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
         if(r.done) earnedN++;
         const isFeat=r.done && feat.includes(a.id);
         /* r150: EFFECTIVE rarity \u2014 static difficulty tier is the display floor until
@@ -294,16 +314,24 @@ async function load(){
         const __fN=globalPct.__n||0;
         const gp=window.hkEffRarity?window.hkEffRarity(a.tier, globalPct[a.id], __fN):globalPct[a.id];
         const tierW=(window.hkRarityTier?window.hkRarityTier(gp):null);
+        const rm=(window.hkRarityMeta?window.hkRarityMeta(gp):{abbr:'',color:'var(--warn)',weight:3});
         const rareTxt=(__fN>=20 && globalPct[a.id]!==undefined)
           ? (' \u00b7 '+(tierW?tierW.toUpperCase()+' \u2014 ':'')+globalPct[a.id]+'% of players have this')
           : (tierW?' \u00b7 '+tierW.toUpperCase():'');
         const __state=r.done?'earned':((r.prog||0)>0?'prog':'locked');
-        grid+='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'" data-state="'+__state+'"'+
+        // r293 (Wolf): a rarity tag under earned rare+ medals + rarity-ordered wall
+        const rlabel=(r.done && rm.abbr) ? '<span class="rr" style="color:'+rm.color+'">'+rm.abbr+'</span>' : '';
+        const cellHtml='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'" data-state="'+__state+'" data-rarity="'+(tierW||'common')+'"'+
           ' data-tip="'+esc(a.name)+' \u2014 '+esc(a.desc)+(r.done?' \u2713 EARNED':' \u00b7 '+(r.prog||0)+'/'+(r.goal||1))+rareTxt+(r.done?' \u00b7 click to showcase':'')+'">'+
           '<span class="st">\u2605</span>'+
           window.hkBadge(a.glyph, r.done, 40, null, r.done?gp:undefined)+
           (r.done?'':'<i>'+Math.min(99,Math.round(100*(r.prog||0)/(r.goal||1)))+'%</i>')+
-          esc(a.name)+'</span>'; });
+          esc(a.name)+rlabel+'</span>';
+        // earned float to the top, then rarest-first, then catalog order
+        cells.push({ html:cellHtml, sort:(r.done?0:1000)+rm.weight*100+ord });
+      });
+      cells.sort((x,y)=>x.sort-y.sort);
+      const grid=cells.map(c=>c.html).join('');
       html += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span>'+
         '<span class="ach-filters">'+
           '<button class="ach-f on" data-f="all">all</button>'+
@@ -311,8 +339,8 @@ async function load(){
           '<button class="ach-f" data-f="prog">in progress</button>'+
           '<button class="ach-f" data-f="locked">locked</button>'+
         '</span></h3>'+
-        '<div class="ach-hint">click an earned medal to <b style="color:var(--warn)">\u2605 showcase</b> it on your player card \u00b7 up to 3 (oldest pick swaps out)'+(me?'':' \u00b7 sign in to show them on the boards')+
-        '<br>medal metals: <b style="color:var(--warn)">gold</b> earned \u00b7 <b style="color:#8ab4ff">blue</b> rare (\u226425%) \u00b7 <b style="color:#e2574d">crimson</b> epic (\u226410%) \u00b7 <b style="color:#ffd76e">radiant</b> legendary (\u22643%)</div>'+
+        '<div class="ach-hint">medals sort rarest-first \u00b7 click an earned one to <b style="color:var(--warn)">\u2605 showcase</b> it on your player card \u00b7 up to 3 (oldest pick swaps out)'+(me?'':' \u00b7 sign in to show them on the boards')+
+        '<br>tiers: <b style="color:var(--warn)">gold</b> earned \u00b7 <b style="color:#3f7fe0">RARE</b> (\u226425% of players) \u00b7 <b style="color:#d64a3f">EPIC</b> (\u226410%) \u00b7 <b style="color:#d99a1f">LEGENDARY</b> (\u22643%)</div>'+
         '<div class="ach-grid">'+grid+'</div>';
     }
   }catch(e){}

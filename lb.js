@@ -134,7 +134,7 @@ async function load(){
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
       sb.from('team_members').select('team_id,user_id,role'),
-      sb.from('teams').select('id,name,slug,verified,is_private'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
+      sb.from('teams').select('id,name,slug,verified,is_private,recruiting'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
     ]);
     profs=p.data||[]; runs=r.data||[]; sessions=se.data||[];
     window.__deskMembers=(tm&&tm.data)||[]; window.__deskTeams=(tt&&tt.data)||[];
@@ -164,7 +164,7 @@ async function load(){
   const memByTeam={}; members.forEach(m=>{ (memByTeam[m.team_id]=memByTeam[m.team_id]||[]).push(m.user_id); });
   const deskSlug=new URLSearchParams(location.search).get('desk');
   if(deskSlug){ const t=teams.find(x=>x.slug===deskSlug);
-    if(t) viewDesk={id:t.id, name:t.name, slug:t.slug, verified:!!t.verified, priv:!!t.is_private, ids:new Set(memByTeam[t.id]||[])}; }
+    if(t) viewDesk={id:t.id, name:t.name, slug:t.slug, verified:!!t.verified, priv:!!t.is_private, recr:t.recruiting!==false, ids:new Set(memByTeam[t.id]||[])}; }
   if(meId){
     const mine=members.find(m=>m.user_id===meId);
     const mineTeam=mine && teams.find(t=>t.id===mine.team_id);
@@ -174,7 +174,7 @@ async function load(){
         teamIds=new Set(profs.filter(p=>p.team_code===me.team_code).map(p=>p.id)); } } }
   // r269: on desks.html, members land scoped to their OWN desk — no slug link needed
   if(pageView()==='teams' && !viewDesk && myDesk && teamIds)
-    viewDesk={id:myDesk.id, name:myDesk.name, slug:myDesk.slug, verified:!!myDesk.verified, priv:!!myDesk.is_private, ids:teamIds};
+    viewDesk={id:myDesk.id, name:myDesk.name, slug:myDesk.slug, verified:!!myDesk.verified, priv:!!myDesk.is_private, recr:myDesk.recruiting!==false, ids:teamIds};
   const teamOnly = !viewDesk && myTeam && sessionStorage.getItem('hk_teamview')==='1';
   // render the section-leaders strip into its mount (added below the featured grid)
   setTimeout(()=>{ try{
@@ -546,22 +546,9 @@ function heroHtml(){
     {t10:me.t10||0, pod:me.pod||0, crowns:me.crowns||0},
     DATA.fSessions.filter(x=>x.user_id===meId));
   const L=levelOf(xp);
-  // NEXT RANK: first tier above the current with concrete unmet requirements
-  let nextHtml='';
-  const nxt=TIERS[t.i+1];
-  if(nxt){
-    const attOk=me.att>=nxt.att, pctOk=avg!==null&&avg<=nxt.pct;
-    // progress toward the next tier's placement requirement (band position, clamped)
-    const hiB=(t.pct>1?1:t.pct), prog = avg===null?0:Math.max(0,Math.min(100,Math.round(100*(hiB-avg)/Math.max(1e-9,hiB-nxt.pct))));
-    nextHtml='<div class="yc-next">next rank: <b>'+nxt.name+'</b><br>'+
-      '<span class="'+(attOk?'have':'lack')+'">'+(attOk?'\u2713':'\u25cb')+' '+nxt.att+' drills attempted (you: '+me.att+')</span><br>'+
-      '<span class="'+(pctOk?'have':'lack')+'">'+(pctOk?'\u2713':'\u25cb')+' top '+Math.round(nxt.pct*100)+'% avg placement (you: '+(avg===null?'\u2014':'top '+Math.max(1,Math.round(avg*100))+'%')+')</span>'+
-      '<div style="height:5px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:8px"><div style="height:100%;width:'+prog+'%;background:var(--accent);border-radius:99px"></div></div>'+
-      '<div style="font-size:9.5px;color:var(--faint);margin-top:3px">placement progress through '+t.name+' \u2014 buckets: bottom \u2192 middle \u2192 top \u2192 promote</div>'+
-      '<a id="leaveRanked" style="display:inline-block;margin-top:8px;font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
-  } else {
-    nextHtml='<div class="yc-next"><b>Top of the ladder.</b> Rankings stay live \u2014 keep placing to hold it. <a id="leaveRanked" style="font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
-  }
+  /* r293 (Wolf): the persistent next-rank progression block is retired — the opt-in
+     infographic already explains the climb, and the card stays slim. Keep the exit. */
+  const nextHtml='<div class="yc-next"><a id="leaveRanked" style="font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
   return '<div class="panel me"><h4>your card</h4>'+
     '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name,28,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+
     '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
@@ -669,9 +656,10 @@ function featuredHtml(){
 
 /* ---- drill browser: tabs + chips + one detail board ---- */
 let browseTab = sessionStorage.getItem('hk_lb_tab') || 'drills';
+if(browseTab==='marathon') browseTab='drills';   // r293: marathon boards retired — stale saved tab falls back
 let browseKey = sessionStorage.getItem('hk_lb_key') || null;
 let rosterTier = null;
-function rosterHtml(){
+function rosterHtml(flush){
   const {names,meId}=DATA; const userStat=DATA.gUserStat||DATA.userStat;
   const users=Object.entries(userStat).map(([u,st])=>{
     const av=st.att?st.avg:null;
@@ -690,7 +678,7 @@ function rosterHtml(){
     '<span class="ros-r">rating '+(x.av*100).toFixed(1)+'</span>'+
     '<span class="ros-a">'+x.st.att+' boards</span></div>').join('');
   if(!inTier.length) rows='<div class="empty">nobody holds this tier yet \u2014 it\u2019s open</div>';
-  return '<div class="panel" style="margin-top:18px"><h4>the field \u00b7 by tier</h4>'+
+  return '<div class="panel" style="margin-top:'+(flush?'0':'18px')+'"><h4>the field \u00b7 by tier</h4>'+
     '<div class="ros-tabs">'+tierNames.map(tn=>'<span class="tab ros-t'+(tn===rosterTier?' on':'')+'" data-tier="'+tn+'">'+tn.replace(' Analyst','')+'</span>').join('')+'</div>'+
     '<div class="ros-list">'+rows+'</div>'+
     '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">rating = stabilized average placement (lower is better) \u00b7 your row is highlighted</div></div>';
@@ -750,6 +738,7 @@ function deskErrMsg(e){ const m=String((e&&e.message)||e||'');
   if(m.includes('DESK_FULL'))         return 'that desk is full (200).';
   if(m.includes('DESK_RATE_LIMIT'))   return 'one desk per day \u2014 try again tomorrow.';
   if(m.includes('DESK_PRIVATE'))      return 'that desk is invite-only.';
+  if(m.includes('DESK_NOT_RECRUITING')) return 'that desk closed its roster \u2014 invite codes still work.';
   if(m.includes('APPLY_RATE_LIMIT'))  return 'five open applications max \u2014 withdraw one first.';
   if(m.includes('FULL_ACCOUNT_REQUIRED')) return 'applications need a full account \u2014 add an email to your account first.';
   if(m.includes('APPLICATION_GONE'))  return 'that application was already handled.';
@@ -761,6 +750,22 @@ function deskErrMsg(e){ const m=String((e&&e.message)||e||'');
   if(m.includes('duplicate key'))     return 'a desk with that name already exists.';
   return 'something went wrong.'; }
 
+/* r293 (Wolf): desk identity helpers — a deterministic accent hue per desk (cards
+   stop looking identical) and a WSO-style tier grade (S+++ … C-) from the roster's
+   competitive record. Grades need 3+ competing analysts; below that a desk reads
+   "unrated" instead of pretending small-sample precision. */
+function deskHue(slug){ let h=0; const s=String(slug||''); for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))>>>0; } return h%360; }
+const DESK_GRADES=[[.12,'S+++'],[.16,'S++'],[.20,'S+'],[.25,'S'],[.30,'A+'],[.36,'A'],[.44,'B+'],[.52,'B'],[.62,'C+'],[.75,'C'],[9,'C-']];
+function deskGrade(meanRating, competing){
+  if(competing<3 || meanRating==null) return null;
+  for(const [cap,g] of DESK_GRADES){ if(meanRating<=cap) return g; }
+  return 'C-';
+}
+function deskGradeChip(g){
+  if(!g) return '<span class="dk-grade unrated" title="grades unlock at 3 competing analysts">unrated</span>';
+  const cls=g[0]==='S'?'s':(g[0]==='A'?'a':(g[0]==='B'?'b':'c'));
+  return '<span class="dk-grade '+cls+'" title="desk grade \u2014 roster-wide average placement, WSO-tier scale">'+g+'</span>';
+}
 /* r270: THE GUILD BOARD \u2014 deskless players browse public desks, apply with a
    one-line note, redeem an invite code, or start their own. Private desks list
    but stay invite-only. */
@@ -772,26 +777,30 @@ function guildHtml(){
   const apps=DATA.myApps||{};
   const cards=teams.map(t=>{
     const ids=memBy[t.id]||[];
-    let crowns=0,boards=0,best=null,bestU=null;
+    let crowns=0,boards=0,best=null,bestU=null,competing=0,rsum=0;
     ids.forEach(id=>{ const st=stat[id]; if(!(st&&st.att)) return;
-      crowns+=st.crowns; boards+=st.att;
+      competing++; rsum+=st.avg; crowns+=st.crowns; boards+=st.att;
       if(best===null||st.avg<best){ best=st.avg; bestU=id; } });
-    return {t:t, n:ids.length, crowns:crowns, boards:boards, bestU:bestU};
+    return {t:t, n:ids.length, crowns:crowns, boards:boards, bestU:bestU,
+      grade:deskGrade(competing?rsum/competing:null, competing)};
   }).sort((a,b)=> b.crowns-a.crowns || b.n-a.n || a.t.name.localeCompare(b.t.name));
   const canApply=!!DATA.meId;
   const cardHtml=cards.map(c=>{
     const t=c.t, applied=!!apps[t.id];
     const act = t.is_private
       ? '<span class="gb-lock" title="private desk \u2014 joins by invite code only">\ud83d\udd12 invite-only</span>'
+      : (t.recruiting===false
+      ? '<span class="gb-lock" title="the staffer closed the roster \u2014 invite codes still work">roster closed</span>'
       : (applied
         ? '<span class="gb-applied" data-team="'+t.id+'" title="click to withdraw">applied \u00b7 pending \u2713</span>'
         : (canApply
           ? (window.__meAnon
             ? '<a class="gb-lock" href="account.html" title="anonymous sessions can\u2019t apply \u2014 add an email to your account">add an email to apply</a>'
             : '<button class="tab gb-apply" data-team="'+t.id+'">apply</button>')
-          : '<a class="tab" href="index.html">sign in to apply</a>'));
-    return '<div class="gb-card">'+
-      '<div class="gb-top"><span class="dk-mini">\u25c6</span><a class="gb-name" href="desks.html?desk='+encodeURIComponent(t.slug)+'">'+esc(t.name)+(t.verified?' <span style="color:var(--accent)">\u2713</span>':'')+'</a></div>'+
+          : '<a class="tab" href="index.html">sign in to apply</a>')));
+    const hue=deskHue(t.slug);
+    return '<div class="gb-card" style="border-left:3px solid hsl('+hue+' 45% 52%);background:linear-gradient(135deg, hsl('+hue+' 40% 50% / .07), transparent 55%), var(--surface)">'+
+      '<div class="gb-top"><span class="dk-mini" style="color:hsl('+hue+' 45% 55%)">\u25c6</span><a class="gb-name" href="desks.html?desk='+encodeURIComponent(t.slug)+'">'+esc(t.name)+(t.verified?' <span style="color:var(--accent)">\u2713</span>':'')+'</a>'+deskGradeChip(c.grade)+'</div>'+
       '<div class="gb-stats">'+c.n+' analyst'+(c.n===1?'':'s')+(c.crowns?' \u00b7 '+c.crowns+' \u265b':'')+(c.boards?' \u00b7 '+c.boards+' boards':'')+'</div>'+
       (c.bestU?'<div class="gb-champ">top analyst '+esc(names[c.bestU])+'</div>':'<div class="gb-champ" style="color:var(--faint)">open roster \u2014 be the first name on it</div>')+
       '<div class="gb-act"><a class="gb-hall" href="desks.html?desk='+encodeURIComponent(t.slug)+'">the hall \u2192</a>'+act+'</div>'+
@@ -804,13 +813,30 @@ function guildHtml(){
       : '<div class="gb-start"><input id="gbName" maxlength="40" placeholder="start a desk \u2014 name it (e.g. Wharton UG Finance)"><button class="tab on" id="gbCreate">start a desk</button>'+
         '<span class="gb-or">or</span><input id="gbCode" maxlength="12" placeholder="invite code"><button class="tab" id="gbJoin">join</button><span class="gb-msg" id="gbMsg"></span></div>')
     : '<div class="gb-start" style="color:var(--muted)"><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</div>';
-  return '<h3 class="section-title">The guild board \u00b7 find your desk</h3>'+
-    '<div style="grid-column:1/-1;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:-4px 0 2px">a desk is a private team room \u2014 shared boards, weekly quests from the staffer, a roster your cohort can see \u00b7 apply below, redeem an invite code, or start your own</div>'+
-    '<div class="gb-grid" style="grid-column:1/-1">'+cardHtml+'</div>'+
+  /* r293 (Wolf): ONE tile + arrows instead of a full grid, tight header, no explainer */
+  return '<h3 class="section-title">The guild board</h3>'+
+    '<div class="gb-caro" style="grid-column:1/-1">'+
+      '<button class="gb-arrow" id="gbPrev" aria-label="previous desk">\u2039</button>'+
+      '<div class="gb-stage" id="gbStage">'+cardHtml+'</div>'+
+      '<button class="gb-arrow" id="gbNext" aria-label="next desk">\u203a</button>'+
+      '<span class="gb-count" id="gbCount"></span>'+
+    '</div>'+
     '<div style="grid-column:1/-1">'+startRow+'</div>';
 }
 function wireGuild(){
   const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--warn)':'var(--accent)'; } };
+  // r293: one-tile carousel — arrows walk the listings, counter shows where you are
+  { const stage=document.getElementById('gbStage');
+    if(stage){
+      const cards=[...stage.querySelectorAll('.gb-card')];
+      let gi=0;
+      const show=()=>{ cards.forEach((c,i)=>c.classList.toggle('cur', i===gi));
+        const ct=document.getElementById('gbCount'); if(ct) ct.textContent=cards.length?((gi+1)+' / '+cards.length):'no desks yet'; };
+      const pv=document.getElementById('gbPrev'), nx=document.getElementById('gbNext');
+      if(pv) pv.onclick=()=>{ if(cards.length){ gi=(gi-1+cards.length)%cards.length; show(); } };
+      if(nx) nx.onclick=()=>{ if(cards.length){ gi=(gi+1)%cards.length; show(); } };
+      show();
+    } }
   document.querySelectorAll('.gb-apply').forEach(b=>b.onclick=()=>{
     const host=document.getElementById('gbn-'+b.dataset.team); if(!host) return;
     host.innerHTML='<input class="gb-notein" maxlength="140" placeholder="one line for the staffer (optional)">'+
@@ -858,10 +884,12 @@ function deskStandingsHtml(){
   const rows=teams.map(t=>{
     const ids=memBy[t.id]||[]; if(!ids.length) return null;
     let crowns=0,pod=0,boards=0,competing=0,best=null,bestU=null;
+    let rsum=0;
     ids.forEach(id=>{ const st=stat[id]; if(!(st&&st.att)) return;
-      competing++; crowns+=st.crowns; pod+=st.pod; boards+=st.att;
+      competing++; rsum+=st.avg; crowns+=st.crowns; pod+=st.pod; boards+=st.att;
       if(best===null||st.avg<best){ best=st.avg; bestU=id; } });
-    return {id:t.id,name:t.name,slug:t.slug,verified:!!t.verified,n:ids.length,competing,crowns,pod,boards,best,bestU};
+    return {id:t.id,name:t.name,slug:t.slug,verified:!!t.verified,n:ids.length,competing,crowns,pod,boards,best,bestU,
+      grade:deskGrade(competing?rsum/competing:null, competing)};
   }).filter(Boolean);
   if(!rows.length) return '';
   rows.sort((a,b)=> b.crowns-a.crowns || b.pod-a.pod || b.competing-a.competing || b.n-a.n
@@ -871,8 +899,8 @@ function deskStandingsHtml(){
     const champ=e.bestU?('top analyst '+esc(names[e.bestU])):(e.competing?'':'no ranked runs yet');
     return '<a class="st-row'+(mineId===e.id?' mine':'')+'" href="desks.html?desk='+encodeURIComponent(e.slug)+'">'+
       '<span class="st-rk'+(i<3?(' m'+(i+1)):'')+'">'+(i+1)+'</span>'+
-      '<span class="dk-mini">\u25c6</span>'+
-      '<span class="st-body"><span class="st-name">'+esc(e.name)+(e.verified?' <span style="color:var(--accent)">\u2713</span>':'')+'</span>'+
+      '<span class="dk-mini" style="color:hsl('+deskHue(e.slug)+' 45% 55%)">\u25c6</span>'+
+      '<span class="st-body"><span class="st-name">'+esc(e.name)+(e.verified?' <span style="color:var(--accent)">\u2713</span>':'')+' '+deskGradeChip(e.grade)+'</span>'+
         (champ?'<span class="st-champ">'+champ+'</span>':'')+'</span>'+
       '<span class="st-stats">'+
         (e.crowns?'<span class="crown"><b>'+e.crowns+'</b> \u265b</span>':'')+
@@ -897,9 +925,11 @@ async function renderManage(root){
   root.innerHTML=
     '<div style="grid-column:1/-1;font-family:var(--mono);font-size:12px;color:var(--muted);margin:-6px 0 4px">⚙ staffer controls for <b>'+esc(d.name)+'</b> · '+d.members+' analyst'+(d.members==1?'':'s')+' · <a href="desks.html" style="color:var(--accent)">← the hall</a></div>'+
     '<div class="panel"><h4>invite link</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">the fast lane — anyone with the link joins instantly</div><div id="mgInvite"></div></div>'+
-    '<div class="panel"><h4>applications · the inbox</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">from the guild board — accept seats them, pass clears it</div><div id="mgApps"><div class="loading" style="padding:8px">checking…</div></div></div>'+
-    '<div class="panel" style="grid-column:1/-1"><h4>PRO for the desk</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">unlock every PRO feature for all '+d.members+' analyst'+(d.members==1?'':'s')+' at once — student clubs train free for a recruiting cycle, firms bill the whole desk on one invoice</div><div id="mgPro"><div class="loading" style="padding:8px">checking…</div></div></div>'+
-    '<div class="panel" style="grid-column:1/-1"><h4>this week’s quests</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">up to 3 drills, optional targets — they show in every analyst’s picker and on the hall</div><div id="mgAsg"></div></div>'+
+    '<div class="panel"><h4>applications · the inbox</h4>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-family:var(--mono);font-size:11px;color:var(--muted)">recruiting <button class="tab'+(DATA.viewDesk&&DATA.viewDesk.recr?' on':'')+'" id="mgRecr" style="font-size:10.5px;padding:4px 12px">'+(DATA.viewDesk&&DATA.viewDesk.recr?'open to applicants':'roster closed')+'</button><span class="gb-msg" id="mgRecrMsg"></span></div>'+
+    '<div id="mgApps"><div class="loading" style="padding:8px">checking…</div></div></div>'+
+    '<div class="panel" style="grid-column:1/-1"><h4>PRO for the desk</h4><div id="mgPro"><div class="loading" style="padding:8px">checking…</div></div></div>'+
+    '<div class="panel" style="grid-column:1/-1"><h4>this week’s quests · up to 3</h4><div id="mgAsg"></div></div>'+
     '<div class="panel" style="grid-column:1/-1"><h4>the roster</h4><div id="mgRoster"></div></div>'+
     '<div class="panel" style="grid-column:1/-1"><h4>the exit</h4><div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px">Leaving hands the desk to the longest-tenured analyst; if you’re the last one out, the desk dissolves.</div><button class="tab" id="mgLeave">leave the desk</button><span class="gb-msg" id="mgLeaveMsg" style="margin-left:10px"></span></div>';
   // ---- invite ----
@@ -1110,6 +1140,14 @@ async function renderManage(root){
   }
   renderInvite(d.invite_code||'');
   renderApps(); renderPro(); renderQuests(); renderRoster();
+  { const rb=document.getElementById('mgRecr');
+    if(rb) rb.onclick=async()=>{ rb.disabled=true;
+      const next=!(DATA.viewDesk&&DATA.viewDesk.recr);
+      try{ const {error}=await sb.rpc('set_desk_recruiting',{p_on:next});
+        if(error){ const el=document.getElementById('mgRecrMsg'); if(el){ el.textContent=deskErrMsg(error); el.style.color='var(--warn)'; } rb.disabled=false; return; }
+        if(DATA.viewDesk) DATA.viewDesk.recr=next;
+        rb.classList.toggle('on', next); rb.textContent=next?'open to applicants':'roster closed'; rb.disabled=false;
+      }catch(e){ rb.disabled=false; } }; }
   let lArmed=false; const lv=document.getElementById('mgLeave');
   if(lv) lv.onclick=async()=>{
     if(!lArmed){ lArmed=true; lv.textContent='click again to confirm'; setTimeout(()=>{lArmed=false; lv.textContent='leave the desk';},2600); return; }
@@ -1119,7 +1157,8 @@ async function renderManage(root){
 
 function browserHtml(){
   const {perDrill,meId,myTeam,teamOnly}=DATA;
-  const tabs=[['drills','\u2328 drills'],['marathon','\u23f1 marathon'],['rapidfire','\u26a1 rapid-fire']];
+  /* r293 (Wolf): marathon retired site-wide — session boards are rapid-fire only */
+  const tabs=[['drills','\u2328 drills'],['rapidfire','\u26a1 rapid-fire']];
   let html='<div class="tabrow">'+tabs.map(t=>'<span class="tab'+(browseTab===t[0]?' on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</span>').join('');
   if(myTeam && !DATA.viewDesk) html+='<span class="tab'+(teamOnly?' on':'')+'" id="teamToggle">'+(teamOnly?'\u25c9 desk: '+esc(myTeam):'\u25cb show desk only')+'</span>';
   html+='</div>';
@@ -1139,11 +1178,11 @@ function browserHtml(){
       '<div class="browse-detail" id="detail">'+boardHtml(c, perDrill[browseKey], DATA.names, meId)+'</div>'+
     '</div>';
   } else {
-    const durs = browseTab==='marathon'?MARATHON_DURS:RAPID_DURS;
+    const durs = RAPID_DURS;
     if(!browseKey || !durs.some(d=>String(d.sec)===String(browseKey))) browseKey=String(durs[0].sec);
     html+='<div class="chips">'+durs.map(d=>'<span class="chip'+(String(browseKey)===String(d.sec)?' on':'')+'" data-key="'+d.sec+'">'+esc(d.label)+'</span>').join('')+'</div>';
     const best=bestPerUser(DATA.fSessions, browseTab, +browseKey);
-    const fmtFn=browseTab==='marathon'?marathonScore:rapidScore;
+    const fmtFn=rapidScore;
     html+='<div id="detail">'+sessionBoardHtml(durs.find(d=>String(d.sec)===String(browseKey)).label,'best per player', best, DATA.names, DATA.meId, fmtFn)+'</div>';
   }
   return html;
@@ -1163,6 +1202,8 @@ try{ const q=new URLSearchParams(location.search);
     location.replace('desks.html'+(q.get('desk')?('?desk='+encodeURIComponent(q.get('desk'))):''));
 }catch(e){}
 function renderAll(){
+  const __sy = window.scrollY;   // r293 (Wolf): tab/chip clicks re-render the page — hold the scroll so it doesn't jump
+
   const root=document.getElementById('boards');
   const h1=document.querySelector('h1');
   if(pageView()==='teams'){
@@ -1185,7 +1226,8 @@ function renderAll(){
   } else {
     if(h1) h1.textContent='Leaderboard';
     root.innerHTML =
-      '<div class="hero">'+heroHtml()+ladderHtml()+topPlayersHtml()+'</div>'+
+      '<div class="hero two">'+heroHtml()+topPlayersHtml()+'</div>'+
+      '<div style="grid-column:1/-1;min-width:0;margin-bottom:18px">'+rosterHtml(true)+'</div>'+
       featuredHtml()+
       '<h3 class="section-title">Browse the boards'+
         '<a href="desks.html" style="float:right;font-size:11px;color:var(--accent);text-decoration:none">\ud83c\udf93 schools & desks \u2192</a></h3>'+
@@ -1196,6 +1238,7 @@ function renderAll(){
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
   const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ try{ localStorage.setItem('hk_ranked','0'); }catch(e){} load(); };
+  try{ window.scrollTo(0, __sy); }catch(e){}
 }
 function wire(){
   const bs=document.getElementById('blSearch');

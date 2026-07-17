@@ -91,7 +91,7 @@ window.HOTKEY_DRILLS = {
 
     // Data
     sort:       { name:'Sort',     label:'Sort the table',tab:'Sort',       desc:'Sort the table, total it, bold the total' },
-    scrub:      { name:'Scrub',    label:'Clean the export',     tab:'Scrub',      desc:'Drop the junk rows, sort what\u2019s real, re-total the clean data' },
+    scrub:      { name:'Scrub',    label:'Clean the export',     tab:'Scrub',      desc:'A system export with a duplicate header, a page-break row, and a stale SUBTOTAL \u2014 delete all three, sort, re-total' },
     recon:      { name:'Recon',    label:'Two systems, one truth',tab:'Recon',     desc:'COUNTIF for presence, INDEX/MATCH for amounts \u2014 drive \u0394 to zero' },
     grpfold:    { name:'Group',    label:'Fold the detail away', tab:'Group',      desc:'Shift+Alt+\u2192 groups the months \u2014 never hide, always group' },
     filterpass: { name:'Filter',   label:'Work the filtered view', tab:'Filter',    desc:'Ctrl+Shift+L turns on filters, Alt+\u2193 opens the picker \u2014 the answer reads itself' },
@@ -317,10 +317,13 @@ window.HOTKEY_ACHIEVEMENTS = [
 
 /* ---- group color identity: one muted hue per skill family. Used as accents only
    (left borders, label tints, badge strokes) — never full fills. ---- */
+/* r293 (Wolf): mid-saturated family palette — the old pastels read on the dark
+   sheet strip but washed out on light themes (the tab bar / next-chapter chip sits
+   on var(--surface2)). These hues carry enough saturation to stay legible on BOTH. */
 window.HOTKEY_GROUP_COLORS = {
-  'Foundations':'#8ab4ff', 'Formatting':'#d9a441', 'Formulas I':'#e0879e',
-  'Data & Lookups':'#7fd4c1', 'Formulas II':'#e06a86', 'Models I':'#c9a2e8',
-  'Models II':'#a97fd6', 'Full Builds':'#e3b341', 'More':'#8b8e94'
+  'Foundations':'#4f86e0', 'Formatting':'#c68a26', 'Formulas I':'#d1637e',
+  'Data & Lookups':'#2fa891', 'Formulas II':'#cf4d6b', 'Models I':'#9a6ee0',
+  'Models II':'#7d55c8', 'Full Builds':'#d98f2f', 'More':'#71757e'
 };
 
 /* ---- PLUGIN KEY LAYERS: curated Macabacus + FactSet defaults for IB workflows.

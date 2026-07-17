@@ -98,7 +98,8 @@
   @media (max-width:760px){
     .topnav-in{padding:0 16px; gap:10px}
     .topnav-pages{display:none; position:absolute; top:60px; left:0; right:0; flex-direction:column;
-      gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0}
+      gap:0; background:var(--bg); border-bottom:1px solid var(--line); padding:6px 0; margin:0;
+      z-index:120; box-shadow:0 18px 40px -18px rgba(0,0,0,.35)}   /* r293: paint over the page (wrappers carry z-index:1) */
     .topnav-pages.open{display:flex}
     .topnav-link{padding:12px 22px; border-radius:0; width:100%}
     .topnav-tools .auth-slot{display:none}
@@ -316,14 +317,16 @@
   /* r160: applied borders are INK (Excel parity) — accent is the SELECTION language.
      On accent they were near-invisible on light themes and read as selection. */
   /* r202 (Wolf): thin single-rule weight — visible but realistic, closer to Excel's 1px */
-  td.bt{box-shadow:inset 0 1px 0 -0px var(--text)}
-  td.bb{box-shadow:inset 0 -1px 0 -0px var(--text)}
-  td.bt.bb{box-shadow:inset 0 1px 0 var(--text), inset 0 -1px 0 var(--text)}
+  /* r292 (Wolf): accounting borders are REAL borders now, not box-shadow insets sitting
+     next to the faint gridline (that doubled-line look). border-collapse merges each
+     shared edge into a single rule. Coloured brighter than the gridline so they win. */
+  td.bt{border-top:1px solid var(--rule,var(--text))}
+  td.bb{border-bottom:1px solid var(--rule,var(--text))}
   td.it{font-style:italic}
   td.strike{text-decoration:line-through; opacity:.75}
   td.uline{text-decoration:underline; text-underline-offset:2px}
   td.uline.strike{text-decoration:underline line-through}
-  td.ball{box-shadow:inset 0 0 0 1px var(--text)}
+  td.ball{border:1px solid var(--rule,var(--text))}
 
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
      faint at rest, lit in Alt-mode. Mirrors Excel instead of popping a banner. */
@@ -547,6 +550,13 @@
   .rc-stats{font-size:14px; margin-bottom:11px}
   .result .par{color:var(--muted)}
   /* r256: results-card speed-band row */
+  /* r293 (Wolf): slim card — the detail block folds behind a d-toggle */
+  .rm-more{display:none}
+  .rm-more.open{display:block}
+  .rm-more-t{display:block; font-family:var(--mono); font-size:11px; color:var(--faint); cursor:pointer;
+    margin:2px 0 14px; letter-spacing:.04em}
+  .rm-more-t:hover{color:var(--muted)}
+  .rm-more-t kbd{font-family:var(--mono); font-size:10px; border:1px solid var(--line); border-radius:4px; padding:0 4px; margin-right:5px}
   .rm-band{display:flex; align-items:center; gap:8px; justify-content:center; margin:-4px 0 16px;
     font-family:var(--mono); font-size:12.5px}
   .rm-band-name{letter-spacing:.14em; font-weight:700}
@@ -646,7 +656,11 @@
     border:1px solid var(--line); border-radius:9px; padding:11px 14px; cursor:pointer; transition:.15s;
     display:flex; align-items:center; justify-content:space-between; gap:10px}
   .ob-key:hover{border-color:var(--accent); color:var(--accent)}
-  .ob-key.focused{border-color:var(--accent); color:var(--accent); background:var(--accent-glow); box-shadow:0 0 0 2px var(--accent-glow)}
+  /* r292 (Wolf): the selected option must be unmistakable in BOTH themes — accent text
+     on a translucent-accent fill was low-contrast in daylight. Solid accent + on-accent. */
+  .ob-key.focused{border-color:var(--accent); color:var(--on-accent); background:var(--accent); box-shadow:0 0 0 3px var(--accent-glow)}
+  .ob-key.focused .ob-kbd{background:rgba(6,18,12,.2); border-color:rgba(6,18,12,.3); color:var(--on-accent)}
+  .ob-key.focused span{color:var(--on-accent)!important}
   .ob-key.primary{background:var(--accent-dim); border-color:var(--accent); color:var(--text)}
   .ob-key.primary:hover{background:var(--accent); color:var(--on-accent)}
   .ob-key.primary.focused{background:var(--accent); color:var(--on-accent); box-shadow:0 0 0 2px var(--accent-glow)}
@@ -839,10 +853,11 @@
   .st-tab.cur{color:var(--text); background:var(--bg); font-weight:700;
     border-color:var(--gcol, var(--accent-dim)); border-top-color:var(--gcol, var(--accent))}
   .st-tab .st-pb{color:var(--faint); margin-left:7px; font-size:10px}
-  .st-next{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.14em;
-    margin-left:auto; padding:0 6px 0 10px; align-self:center; cursor:pointer; white-space:nowrap; flex:none;
-    opacity:.8; transition:.12s; overflow:visible}
-  .st-next:hover{opacity:1}
+  /* r293 (Wolf): the next-set control reads as a clear coloured chip, not faint text */
+  .st-next{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.12em;
+    margin-left:auto; padding:3px 10px; align-self:center; cursor:pointer; white-space:nowrap; flex:none;
+    border:1px solid currentColor; border-radius:99px; opacity:.92; transition:.12s; overflow:visible}
+  .st-next:hover{opacity:1; background:color-mix(in srgb, currentColor 14%, transparent)}
   /* Monkeytype-scale: the sheet grows into the screen instead of sitting in a box.
      zoom scales the whole grid (cells, fonts, borders) without touching the engine's
      px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */
@@ -1133,60 +1148,30 @@
   .kb-desc{color:var(--text); font-family:var(--sans); font-size:13.5px}
   #kbClose kbd{color:inherit; background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px; margin:0 2px}
 
-  /* ---- rapid-fire: single-cell card, mounted INLINE in the grid's space (r291) ---- */
+  /* ---- rapid-fire: the task strip + the REAL grid as the play surface (r293) ---- */
   #rapidStage{display:none}
-  /* the stage frame, HUD toolbar, and sheet-tab strip all stay put — only the grid
-     itself swaps for the rapid card, so the mode reads as part of the game, not a page. */
-  body.rapidfire #gridwrap{display:none}
-  body.rapidfire #rapidStage{
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    flex:1 1 auto; min-height:0; padding:20px 16px;   /* fills the grid area, not the viewport */
-  }
-  body.rapidfire .checklist{display:none}       /* rapid-fire's task lives on the card, not the rail */
-  body.rapidfire .fbar{display:none}            /* the formula bar is grid-only; the HUD carries the timer */
+  /* r293 (Wolf): rapid-fire runs ON the real sheet — the grid stays live, the ribbon and
+     formula bar stay put, and this strip above the formula bar carries the call: one
+     instruction in large type, the target ref, the keycaps, the streak. */
+  body.rapidfire #rapidStage{display:flex; align-items:center; gap:16px; padding:13px 18px;
+    background:var(--surface2); border-bottom:1px solid var(--line); flex-wrap:wrap}
+  body.rapidfire .checklist{display:none}       /* rapid-fire's task lives on the strip, not the rail */
+  body.rapidfire .ftimer, body.rapidfire .ghost{display:none}   /* the HUD carries the session clock */
+  body.rapidfire .sheettabs{pointer-events:none; opacity:.45}    /* tabs stay as chrome, but a mid-session click must not load a classic drill */
   /* the ribbon STAYS in rapid-fire (Wolf): softens the transition and keeps the available
      Home/Insert/... options on screen as a reference while you chord one cell at a time */
   body.rapidfire .exrow{display:none}
-  .rf-card{background:var(--surface2); border:2px solid var(--faint); border-radius:16px;
-    padding:30px 30px 34px; max-width:460px; width:100%; margin:0; text-align:center;
-    box-shadow:0 28px 70px -24px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.02) inset}
-  .rf-instr{font-family:var(--mono); font-size:15px; color:var(--accent); letter-spacing:.3px; margin-bottom:22px; min-height:20px}
-  .rf-sheet{border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--bg); margin-bottom:26px}
-  .rf-srow{display:grid; grid-template-columns:44px 1fr}
-  .rf-rownum{font-family:var(--mono); font-size:12px; color:var(--faint); background:var(--surface2);
-    display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line)}
-  .rf-cell{font-family:var(--mono); font-size:18px; padding:18px; color:var(--text); min-height:58px;
-    display:flex; align-items:center; box-shadow:inset 0 0 0 2px var(--accent); transition:background .2s, color .2s, font-weight .1s}
-  .rf-cell.bold{font-weight:700}
-  .rf-cell.italic{font-style:italic}
-  .rf-cell.underline{text-decoration:underline}
-  .rf-cell.strike{text-decoration:line-through; color:var(--muted)}
-  .rf-cell.bold.underline{text-decoration:underline}
-  .rf-cell.italic.underline{text-decoration:underline}
-  .rf-cell.fx{color:var(--accent)}
-  .rf-cell.link{color:var(--accent); text-decoration:underline}
-  .rf-cell.border{box-shadow:inset 0 0 0 2px var(--accent), inset 0 0 0 5px var(--surface), inset 0 0 0 7px var(--text)}
-  /* Single-edge border variants — banker-style subtotal/total lines */
-  .rf-cell.border-top   {box-shadow:inset 0  2px 0 0 var(--accent), inset 0  5px 0 0 var(--surface), inset 0  7px 0 0 var(--text)}
-  .rf-cell.border-bottom{box-shadow:inset 0 -2px 0 0 var(--accent), inset 0 -5px 0 0 var(--surface), inset 0 -7px 0 0 var(--text)}
-  /* Comment marker — Excel's red triangle in the top-right corner of a commented cell */
-  .rf-cell.comment{position:relative}
-  .rf-cell.comment::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
-    border-top:9px solid var(--bad); border-left:9px solid transparent}
-  /* success pulse on the rf-cell — sharp flash then quick fade. Faster than transition: feels like the chord SNAPPED into place */
-  @keyframes rfCellFlash {
-    0%   { background:var(--accent); color:#000; transform:scale(1.04); box-shadow:inset 0 0 0 2px var(--accent), 0 0 0 0 var(--accent-glow); }
-    35%  { background:var(--accent); color:#000; transform:scale(1.025); box-shadow:inset 0 0 0 2px var(--accent), 0 0 22px 4px var(--accent-glow); }
-    100% { background:var(--accent-glow); color:var(--text); transform:scale(1.0); box-shadow:inset 0 0 0 2px var(--accent), 0 0 0 0 transparent; }
-  }
-  .rf-cell.flash{ animation: rfCellFlash .42s cubic-bezier(.2,.9,.3,1) both; }
-  /* celebratory outer halo on the card so success registers in peripheral vision too */
-  @keyframes rfCardCelebrate {
-    0%   { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 0 0 var(--accent-glow); }
-    25%  { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 36px 6px var(--accent-glow); }
-    100% { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 0 0 transparent; }
-  }
-  .rf-card.celebrate{ animation: rfCardCelebrate .55s ease-out both; }
+  .rf-instr{font-family:var(--mono); font-size:19px; font-weight:700; color:var(--text);
+    letter-spacing:.2px; flex:1 1 auto; min-width:0}
+  .rf-ref{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:8px; padding:4px 10px; flex:none}
+  /* success pulse on the REAL cell — a sharp accent wash that fades, so the chord
+     visibly lands in the sheet (the synthetic card's flash, relocated to the grid) */
+  @keyframes rfTdHit{ 0%{box-shadow:inset 0 0 0 99px var(--accent-glow)} 100%{box-shadow:inset 0 0 0 99px transparent} }
+  #grid td.rfhit{animation:rfTdHit .55s ease-out both}
+  /* Excel's red comment triangle — rapid-fire's add-comment op stamps cell.cmt */
+  td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
+    border-top:8px solid var(--bad); border-left:8px solid transparent}
   /* r241 (Wolf): the streak flame flickers — a little warm pizzazz, GPU-cheap (transform+filter only) */
   .streak-flame{ display:inline-block; transform-origin:50% 85%; animation:streakFlicker 1.7s ease-in-out infinite; will-change:transform,filter }
   @keyframes streakFlicker{
@@ -1200,7 +1185,7 @@
   /* streak counter — appears at ×3, escalates through 5 tiers. Sits above the card so it fills the sparse area
      without competing with the cell content. Hidden by default; the JS adds .show + a tier class. */
   .rf-streak{ font-family:var(--mono); font-size:13px; text-align:center; color:transparent;
-    margin:0 auto 12px; min-height:24px; letter-spacing:1.5px; transition:color .25s, font-size .2s, text-shadow .25s; user-select:none }
+    margin:0 0 0 auto; min-height:24px; letter-spacing:1.5px; transition:color .25s, font-size .2s, text-shadow .25s; user-select:none }
   .rf-streak.show{ color:var(--muted); }
   .rf-streak .num{ font-weight:700 }
   .rf-streak.t1{ color:var(--accent); font-size:14px; }
@@ -1218,17 +1203,6 @@
     100% { transform:scale(1.0); }
   }
   .rf-streak.bump{ animation: rfStreakBump .32s cubic-bezier(.2,.9,.3,1) both; }
-  /* multi-cell layouts (autosum, fill-down, fill-right) */
-  .rf-cell-multi{padding:8px; min-height:58px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; box-shadow:none}
-  .rf-stack{display:flex; flex-direction:column; align-items:stretch; gap:0; min-width:130px}
-  .rf-row{display:flex; flex-direction:row; align-items:stretch; gap:0}
-  .rf-mini{font-family:var(--mono); font-size:14px; padding:9px 14px; text-align:right; min-width:130px;
-    border:1px solid var(--line); background:var(--surface2); color:var(--muted)}
-  .rf-stack .rf-mini + .rf-mini{border-top:none}
-  .rf-row .rf-mini + .rf-mini{border-left:none}
-  .rf-mini.rf-target{background:var(--surface); color:var(--text); box-shadow:inset 0 0 0 2px var(--accent)}
-  .rf-mini.rf-target.fx{color:var(--accent)}
-  .rf-mini.rf-target.flash{background:var(--accent-glow)}
   .rf-keys{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; min-height:40px}
   .rf-keycap{font-family:var(--mono); font-size:13px; color:var(--muted); background:var(--surface2);
     border:1px solid var(--line); border-bottom-width:2px; border-radius:7px; padding:8px 13px; min-width:36px; transition:all .12s}
@@ -1372,13 +1346,13 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
 <script src="drills.js?v=264"></script>
-<link rel="stylesheet" href="nav.css?v=174">
-<script src="themes.js?v=262"></script>
+<link rel="stylesheet" href="nav.css?v=175">
+<script src="themes.js?v=263"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=259"></script>
+<script src="nav.js?v=261"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1407,16 +1381,7 @@
       <button class="mb-mode active" id="mbClassic" data-mode="classic">
         <span class="ico">●</span>classic
       </button>
-      <div class="mb-mode-wrap">
-        <button class="mb-mode" id="mbMarathonBtn" data-mode="marathon" aria-haspopup="true">
-          <span class="ico">⏱</span>marathon<span class="caret">▾</span>
-        </button>
-        <div class="mb-popover" id="mbMarathonPop">
-          <button class="mb-dur" data-mode="marathon" data-dur="300">5 minutes</button>
-          <button class="mb-dur" data-mode="marathon" data-dur="600">10 minutes</button>
-          <button class="mb-dur" data-mode="marathon" data-dur="900">15 minutes</button>
-        </div>
-      </div>
+      <!-- r292 (Wolf): marathon mode retired from the UI (rapid-fire covers timed play). -->
       <div class="mb-mode-wrap">
         <button class="mb-mode" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true">
           <span class="ico">⚡</span>rapid-fire<span class="caret">▾</span>
@@ -1433,14 +1398,11 @@
       </div>
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
-      <button class="mb-tool" id="echoBtn" data-tip="the demo hands YOU the keys — press each highlighted chord to advance">&#9000; follow along</button>
+      <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn mode</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
-      <button class="mb-tool" id="ghostToggle" data-tip="PB pace counter + cursor ghost \u2014 click to toggle">\ud83d\udc7b ghost: on</button>
-      <span style="position:relative; display:inline-flex">
-      <button class="mb-tool" id="dailyBtn" data-tip="the morning sheet — three drills for today: the daily, a weak spot, and fresh ground">⚡ sheet</button>
-      <div class="prefs-pop" id="sheetPop" style="min-width:290px; flex-direction:column; gap:4px"></div>
-      </span>
+      <button class="mb-tool" id="ghostToggle" data-tip="\u25c6 PRO \u2014 race a live ghost of your PB run \u00b7 pace counter is free \u00b7 click to toggle">\ud83d\udc7b ghost: on</button>
+      <!-- r292 (Wolf): the "sheet" button retired -->
       <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
       <span style="position:relative; display:inline-flex">
       <button class="mb-tool" id="wqBtn" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c6; weakness</button>
@@ -1459,6 +1421,14 @@
     <div class="stage-row">
       <div class="stage-main">
         <div class="ribbon" id="ribbon"></div>
+        <!-- r293: rapid-fire runs ON the real sheet below — this strip is just the caller:
+             big instruction, the live target ref, keycap hints, streak -->
+        <div id="rapidStage">
+          <div class="rf-instr" id="rfInstr">—</div>
+          <span class="rf-ref" id="rfCellLabel">B4</span>
+          <div class="rf-keys" id="rfKeys"></div>
+          <div class="rf-streak" id="rfStreak"></div>
+        </div>
         <div class="fbar" style="position:relative">
           <div id="fxHint" class="fx-hint"></div>
           <span class="namebox" id="nameBox">A1</span>
@@ -1468,16 +1438,6 @@
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
         <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
-        <!-- r291: rapid-fire mounts INLINE here, in the grid's own space — same chrome,
-             large font, one chord at a time (was a full-viewport takeover) -->
-        <div id="rapidStage">
-          <div class="rf-streak" id="rfStreak"></div>
-          <div class="rf-card">
-            <div class="rf-instr" id="rfInstr">—</div>
-            <div class="rf-sheet"><div class="rf-srow"><div class="rf-rownum" id="rfCellLabel">B4</div><div class="rf-cell" id="rfCell"></div></div></div>
-            <div class="rf-keys" id="rfKeys"></div>
-          </div>
-        </div>
       </div>
       <aside class="checklist" id="checklist"></aside>
     </div>
@@ -1556,9 +1516,8 @@
       <button class="start-btn" id="startBtn">Start training <kbd class="kbd-cta">↵</kbd></button>
       <button class="start-btn ghosted" id="loginBtn" style="background:transparent;border:1px solid var(--line);color:var(--muted)">Log in</button>
       <span class="modes">
-        <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
         <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
-        <span class="mode-chip pick" id="chipMarathon" title="random drills against a clock">⏱ Marathon</span>
+        <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
       </span>
     </div>
     <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · everything keyboard</span></div>
@@ -2559,7 +2518,7 @@ const CHALLENGES = {
     name:'Scrub', label:'Clean the export', par:21, parKeys:19,
     aha:'Exports come dirty — delete junk rows (Ctrl+−), sort (Alt A S), re-total; the data is yours.',
     prompt:'The deal list came out of the system DIRTY: a duplicated header row, a "--- PAGE 2 ---" break, and a stale SUBTOTAL row that will double-count the moment anyone totals the column. Scrub it — delete all three junk rows, sort what is real largest-first, and re-total the clean data. Every export you will ever receive needs this pass.',
-    req(){ const o=this._o; return 'delete the 3 junk rows (<em>alt h d r</em> each) · select <em>'+o.range+'</em> · <em>alt a s d</em> · foot at <em>'+o.foot+'</em> → <em>alt+=</em> <em>↵</em> · <em>ctrl+b</em>'; },
+    req(){ const o=this._o; return 'the junk = the second <em>Deal</em> header, <em>--- PAGE 2 ---</em>, and <em>SUBTOTAL</em> — delete each (<em>alt h d r</em>) · select <em>'+o.range+'</em> · <em>alt a s d</em> · foot at <em>'+o.foot+'</em> → <em>alt+=</em> <em>↵</em> · <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'hunt the junk top to bottom: the duplicate header, the page break, the SUBTOTAL trap — on each row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>',
       'the data is contiguous now: select '+o.range+' (cursor in the size column) · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> — largest first',
@@ -2616,8 +2575,14 @@ const CHALLENGES = {
         else if(!a||this._byName[a.value]!==b.value) sorted=false; }
       const f=S.cells[o.foot];
       const tot=this._sizes.reduce((x,y)=>x+y,0);
+      let pageGone=true, subGone=true;
+      for(const k in S.cells){ const v=S.cells[k]&&S.cells[k].value;
+        if(v==='--- PAGE 2 ---') pageGone=false;
+        if(v==='SUBTOTAL') subGone=false; }
       return [
-        {label:'delete all three junk rows — the dup header, the page break, the SUBTOTAL trap', ok: junkGone && dealHdrs===1},
+        {label:'delete the duplicate header row — two "Deal" headers, only the top one is real', ok: dealHdrs===1},
+        {label:'delete the "--- PAGE 2 ---" print-break row', ok: pageGone},
+        {label:'delete the SUBTOTAL row — it double-counts the moment anyone totals the column', ok: subGone},
         {label:'sort the seven real deals largest-first ('+o.range+')', ok: sorted},
         {label:'re-total the clean data — live SUM at '+o.foot+', bold', ok: !!(f&&f.formula&&/SUM/i.test(String(f.formula))&&Math.abs((f.value||0)-tot)<0.5&&f.bold)},
       ];
@@ -3560,12 +3525,12 @@ const CHALLENGES = {
     name:'Block Sel.', label:'Assemble & format the summary', par:46, parKeys:47,
     aha:'Ctrl+C copies what stays, Ctrl+X cuts what moves — assemble, then format with borders and a margin note.',
     prompt:'The segment summary is due and the pieces are scattered. COPY the base [Segment · Revenue] that stays filed; CUT the two misfiled metric columns (EBITDA, Op inc) into their slots. Then build it out like a real page: a Margin memo that computes off the block (EBITDA ÷ Revenue, in %), and the banker dress — bold headers, the top line in $ with the rest in commas, figures right, the segment names centred and underlined, the whole table boxed. Read what each loose piece IS, land it in the right column, and finish it clean. The pieces scatter to a new spot every run.',
-    req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b a</em> · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
+    req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b s</em> (outline) · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
     guide(){ const o=this._o; return [
       'COPY the <b>base</b> [Segment · Revenue] at <b>'+o.baseTL+'</b> (it stays filed): <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at '+o.o.seg[0],
       'CUT the misfiled <b>EBITDA</b> at <b>'+o.ebTL+'</b> and <b>Op inc</b> at <b>'+o.opTL+'</b>: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>x</kbd> · paste into their slots — the old spots empty',
       'the <b>Margin</b> memo: at '+o.o.margin[0]+' type <kbd>=</kbd> EBITDA ÷ Revenue (<kbd>='+o.marginF+'</kbd>), fill down, then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>%</kbd> and italic <kbd>ctrl</kbd>+<kbd>i</kbd>',
-      'format it: <b>bold</b> the header row (<kbd>ctrl</kbd>+<kbd>b</kbd>) · box the whole table <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd>',
+      'format it: <b>bold</b> the header row (<kbd>ctrl</kbd>+<kbd>b</kbd>) · select the whole table and box it <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> (outline)',
       'money: the <b>top line</b> in dollars (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>$</kbd>, trim to 0-dec with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd>×2), the rows below in <b>commas</b> (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>!</kbd>, 0-dec)',
       'finish: figures <b>right</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>) · segment names <b>centred + underlined</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> · <kbd>ctrl</kbd>+<kbd>u</kbd>)',
     ]; },
@@ -3583,7 +3548,7 @@ const CHALLENGES = {
         {sel:o.marginRng,  keys:[{key:'d',ctrl:true}]},                  // fill down
         {sel:o.marginRng,  keys:[{key:'%',ctrl:true,shift:true},{key:'i',ctrl:true}]},   // percent + italic
         {sel:o.hdrRng,     keys:[{key:'b',ctrl:true}]},                  // bold header
-        {sel:o.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('a')]},     // box the table
+        {sel:o.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('s')]},     // outline the whole table (Outside Borders)
         {sel:o.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),{key:'9'},{key:'Alt'},L('h'),{key:'9'}]},   // top line $ (0-dec)
         {sel:o.restRng,    keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),{key:'9'},{key:'Alt'},L('h'),{key:'9'}]},   // rest commas (0-dec)
         {sel:o.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},     // figures right
@@ -3661,8 +3626,11 @@ const CHALLENGES = {
       const marginOk = o.o.margin.every((k,i)=>{ const c=cel(k);
         return !!(c.formula && Math.abs((c.value||0)-(o.ebVals[i]/o.revVals[i]))<1e-4 && c.fmtStyle==='percent' && c.it); });
       // 4) header bold + table boxed
-      const dressed = ['A','B','C','D','E'].every(cc=>cel(cc+3).bold) && (function(){ let ok=true;
-        for(let r=3;r<=3+N;r++) for(const cc of ['A','B','C','D','E']){ if(!cel(cc+r).ball) ok=false; } return ok; })();
+      // r292: the ask is an OUTLINE around the whole table (Alt H B S), not a border on
+      // every cell — verify the perimeter: top row bt, bottom row bb, left col bl, right col br.
+      const dressed = ['A','B','C','D','E'].every(cc=>cel(cc+3).bold) && (function(){ let ok=true; const last=3+N;
+        for(const cc of ['A','B','C','D','E']){ if(!cel(cc+3).bt) ok=false; if(!cel(cc+last).bb) ok=false; }
+        for(let r=3;r<=last;r++){ if(!cel('A'+r).bl) ok=false; if(!cel('E'+r).br) ok=false; } return ok; })();
       // 5) money — top line currency @0-dec, the rows below comma @0-dec
       const money = ['B','C','D'].every(cc=>cel(cc+'4').fmtStyle==='currency' && (cel(cc+'4').decimals|0)===0)
         && (function(){ let ok=true; for(let r=5;r<=3+N;r++) for(const cc of ['B','C','D']){ const x=cel(cc+r); if(x.fmtStyle!=='comma'||(x.decimals|0)!==0) ok=false; } return ok; })();
@@ -3673,7 +3641,7 @@ const CHALLENGES = {
         {label:'COPY the [Segment · Revenue] base whole → paste into the summary (the base stays filed)', ok: copied},
         {label:'CUT the two misfiled columns (EBITDA, Op inc) → paste into their slots (old spots empty)', ok: cutBoth},
         {label:'Margin memo — =EBITDA/Revenue down the column, format % and italic (Ctrl+Shift+%, Ctrl+I)', ok: marginOk},
-        {label:'bold the header row (Ctrl+B) and box the whole table (Alt H B A)', ok: dressed},
+        {label:'bold the header row (Ctrl+B) and outline the whole table (Alt H B S)', ok: dressed},
         {label:'money: the top line in $ (Ctrl+Shift+$), the rows below in commas — 0 decimals', ok: money},
         {label:'figures right-aligned (Alt H A R); segment names centred + underlined (Alt H A C, Ctrl+U)', ok: aligned},
       ];
@@ -7846,6 +7814,7 @@ function resolveRange(str){ if(!str) return null; const parts=str.split(':'); co
   return {r1:Math.min(a.r,b.r),r2:Math.max(a.r,b.r),c1:Math.min(a.c,b.c),c2:Math.max(a.c,b.c)}; }
 function currentTargetRange(){
   if(!S||done||sandboxMode) return null;   // r238: the warm-up sandbox has no CHALLENGES entry / no targets
+  if(gameMode==='rapidfire') return null;  // r293: the rapid sheet is NOT the classic drill — its target ring must not paint here
   const C=CHALLENGES[cur]; if(!C||!C.targets) return null;
   const T2=(typeof C.targets==='function') ? C.targets.call(C) : C.targets;
   const items=C.checks(S);
@@ -7897,6 +7866,7 @@ function render(){
       let cls=[]; if(cell.bold)cls.push('bold'); if(cell.txt&&!isNum(cell))cls.push('txt');
       if(cell.it)cls.push('it'); if(cell.strike)cls.push('strike');   // r193
       if(cell.uline)cls.push('uline');   // r229: cell underline (Ctrl+U / Alt H 3)
+      if(cell.cmt)cls.push('cmt');       // r293: comment triangle (rapid-fire Shift+F2)
       if(cell.wrap)cls.push('wrap'); if(cell.fill)cls.push('fill-'+cell.fill);   // r231: any fill palette key
       if(cell.bt)cls.push('bt'); if(cell.bb)cls.push('bb'); if(cell.ball)cls.push('ball');
       if(cell.align)cls.push('align-'+cell.align);
@@ -7956,15 +7926,15 @@ function render(){
       if(S.marks && S.marks.length && S.marks.indexOf(refKey)>=0 && !isActive) cls.push('mark');   // r182 go-to-special
       const refColor = refColors[refKey];
       let extraStyle = '';
-      if(cell.bl || cell.br || cell.thick){   // r193/r234: left/right edges (and any THICK edge) compose inline — class shadows can't stack, and thick needs a 2px weight
-        const w = cell.thick ? 2 : 1;   // r234: Thick Box Border renders every set edge at 2px
-        const sh=[];
-        if(cell.bt) sh.push('inset 0 '+w+'px 0 var(--text)');
-        if(cell.bb) sh.push('inset 0 -'+w+'px 0 var(--text)');
-        if(cell.bl) sh.push('inset '+w+'px 0 0 var(--text)');
-        if(cell.br) sh.push('inset -'+w+'px 0 0 var(--text)');
-        if(cell.ball) sh.push('inset 0 0 0 '+w+'px var(--text)');
-        if(sh.length) extraStyle += ';box-shadow:'+sh.join(', ');
+      if(cell.bl || cell.br || cell.thick){   // r292: left/right/thick edges as real borders (collapse merges shared edges, no doubling)
+        const w = cell.thick ? 2 : 1;   // Thick Box Border renders every set edge at 2px
+        if(cell.ball){ extraStyle += ';border:'+w+'px solid var(--rule,var(--text))'; }
+        else{
+          if(cell.bt) extraStyle += ';border-top:'+w+'px solid var(--rule,var(--text))';
+          if(cell.bb) extraStyle += ';border-bottom:'+w+'px solid var(--rule,var(--text))';
+        }
+        if(cell.bl) extraStyle += ';border-left:'+w+'px solid var(--rule,var(--text))';
+        if(cell.br) extraStyle += ';border-right:'+w+'px solid var(--rule,var(--text))';
       }
       if(refColor && !isActive && !(editing && editPointer && r===editPointer.r && c===editPointer.c)){
         extraStyle = `;outline:2px solid ${refColor};outline-offset:-2px;z-index:2`;
@@ -8090,7 +8060,7 @@ const MENUS = {
   'HD': [['R','Delete rows'],['C','Delete columns']],
   'HO': [['I','Autofit width'],['A','Autofit height'],['W','Column width\u2026'],['U','Hide & Unhide']],
   'HOU':[['R','Hide rows'],['O','Unhide rows']],
-  'HB': [['T','Top'],['B','Bottom'],['L','Left'],['R','Right'],['A','All'],['I','Inside'],['O','Outside'],['K','Thick box'],['N','No border']],
+  'HB': [['T','Top'],['B','Bottom'],['L','Left'],['R','Right'],['A','All'],['I','Inside'],['S','Outside'],['O','Outside'],['K','Thick box'],['N','No border']],
   'HU': [['S','Sum']],
   'HA': [['L','Left'],['C','Center'],['R','Right'],['N','$ Accounting']],
   'HF': [['C','Font color'],['G','Grow font'],['K','Shrink font'],['I','Fill']],
@@ -8482,7 +8452,19 @@ function checkWin(){
   if(challengeMode){ markChallengeDone(); try{ updateChallengeBtn(); }catch(e){} }   // r219: today's sitting is done — flip the marquee chip
   try{ awardCampaignXP(); }catch(e){}   // r215: a new PB may have just shipped a version — pay the one-time bounty
   let __bandRes=0; try{ __bandRes = awardBandXP(sk, t, C.par); }catch(e){}   // r256: one-time speed-band bounty
+  /* r293 (Wolf): DISCOVERY NUDGE — three clears in, point at rapid-fire once.
+     One toast + a pulse on the mode pill; never repeats. */
   try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
+    try{
+      if(nsol===3 && !localStorage.getItem('hk_rf_nudged')){
+        localStorage.setItem('hk_rf_nudged','1');
+        setTimeout(()=>{ try{
+          showToast('three clears in \u2014 try \u26a1 rapid-fire: one chord at a time, against the clock');
+          const b=$('mbRapidBtn'); if(b){ b.classList.add('nudge'); setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); }
+          ev('rf_nudge',{});
+        }catch(e){} }, 1200);
+      }
+    }catch(e){}
     KV.set('hotkey_solves', String(nsol)); renderLvl(nsol); }); }catch(e){}
   showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed,
     newBand:(__bandRes&&__bandRes.isNew)?__bandRes.band:null, bandXp:(__bandRes&&__bandRes.gained)||0,
@@ -8569,6 +8551,7 @@ function showResults(o){
     if(ev.key==='Enter'){ ev.preventDefault(); hideResults(); restartDrill(); return; }
     if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
     if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
+    if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':'details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards'; } return; }   // r293: progressive disclosure
   };
   return _showResults(o);
 }
@@ -8675,16 +8658,42 @@ function _showResults(o){
   }
   const flowRow=(o.combo && o.combo>=8)
     ? `<div class="rm-nearmiss" style="color:var(--muted)">🔥 ${o.combo}-key flow streak <span>— you were locked in</span></div>` : '';
+  /* r293 (Wolf): TIME SAVED — per-run vs your first try on this drill + lifetime bank,
+     same first-vs-best methodology as the desk report and the stats lead tile */
+  let savedRow='';
+  try{
+    const rl=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]');
+    const ms=Math.round(parseFloat(o.t)*1000);
+    const firstBy={}, bestBy={};
+    rl.forEach(r=>{ if(!r.d) return; if(firstBy[r.d]===undefined) firstBy[r.d]=r.time_ms;
+      if(bestBy[r.d]===undefined||r.time_ms<bestBy[r.d]) bestBy[r.d]=r.time_ms; });
+    if(bestBy[cur]===undefined||ms<bestBy[cur]) bestBy[cur]=ms;
+    if(firstBy[cur]===undefined) firstBy[cur]=ms;
+    let life=0; Object.keys(firstBy).forEach(d=>{ const s=firstBy[d]-bestBy[d]; if(s>0) life+=s; });
+    const dThis=firstBy[cur]-ms;
+    const lifeTxt=life<=0?'':(life<60000?(life/1000).toFixed(0)+'s':(life<3600000?Math.round(life/60000)+'m':Math.floor(life/3600000)+'h '+Math.round((life%3600000)/60000)+'m'));
+    if(dThis>400 || life>0){
+      savedRow='<div class="rm-nearmiss" style="color:var(--muted)">\u23f1 '+
+        (dThis>400?('<b style="color:var(--accent)">'+(dThis/1000).toFixed(1)+'s faster</b> than your first try'):'time banked')+
+        (lifeTxt?' <span>\u00b7 '+lifeTxt+' banked lifetime</span>':'')+'</div>';
+    }
+  }catch(e){}
+  /* r293 (Wolf): SLIM CARD — the hero is the time + ONE hook + the next action.
+     Keys/band/stalls/boards fold behind a d-toggle so the loop stays fast. */
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
     hookRow+flowRow+
+    `<a class="rm-more-t" id="rmMoreT"><kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards</a>`+
+    `<div class="rm-more">`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     _bandRow(o)+
+    savedRow+
     ghostDiff(o)+
     ((CHALLENGES[cur]&&CHALLENGES[cur].aha)?'<div class="rm-aha">\ud83d\udca1 '+CHALLENGES[cur].aha+'</div>':'')+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
     `<div class="rm-rank" id="rmRank"></div>`+
+    `</div>`+
     `<div class="rm-opts">`+
     `<button class="rm-key" data-act="again"><kbd>↵ enter</kbd>again</button>`+
     `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
@@ -8694,6 +8703,7 @@ function _showResults(o){
     `</div>`;
   m.classList.add('show');
   // r88: the rm-key buttons rendered but had NO click wiring — keyboard-only card.
+  { const mt=m.querySelector('#rmMoreT'); if(mt) mt.onclick=()=>{ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); mt.innerHTML=(x&&x.classList.contains('open'))?'<kbd>d</kbd> hide the detail':'<kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards'; }; }
   m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
     const a=b.dataset.act;
     if(a==='again'){ hideResults(); restartDrill(); }
@@ -8977,7 +8987,9 @@ function fillFrom(dir){ // 'down' | 'up' | 'right' | 'left'
 let keyProfile='native';
 async function loadProfile(){ const v=await KV.get('hotkey_profile'); if(v==='macabacus'||v==='factset') keyProfile=v; }
 function saveProfile(){ KV.set('hotkey_profile', keyProfile); }
-function updateProfileBtn(){ const b=$('profileToggle'); if(b){ b.innerHTML='\u2328 '+keyProfile; b.classList.toggle('on', keyProfile!=='native'); } }
+function updateProfileBtn(){ const b=$('profileToggle'); if(b){
+  b.innerHTML='\u2328 '+(typeof HK_MAC!=='undefined'&&HK_MAC?'mac':'win')+' \u00b7 '+keyProfile;
+  b.classList.toggle('on', keyProfile!=='native'); } }
 function cycleProfile(){
   const next = keyProfile==='native'?'macabacus':(keyProfile==='macabacus'?'factset':'native');
   if(next!=='native' && !requirePro('Plugin keyboard layers (Macabacus / FactSet)')) return;
@@ -9517,8 +9529,9 @@ function applyRibbon(key){
   if(np==='H1'){ pushUndo(); toggleAllOrNone('bold'); return exitRibbon(true); }   // r193: mixed-selection semantics, same as Ctrl+B
   if(np==='H2'){ pushUndo(); toggleAllOrNone('it');   return exitRibbon(true); }
   if(np==='H3'){ pushUndo(); toggleAllOrNone('uline'); return exitRibbon(true); }   // r229: Alt H 3 underline (mirrors Ctrl+U)
-  if(np==='HBO' || np==='HBK'){   /* r193: OUTSIDE border = the PERIMETER of the selection; a 1\u00d71 perimeter IS the classic box (ball).
-                                     r234: THICK BOX (Alt H B K) = the same perimeter, drawn at 2px via the `thick` flag. */
+  if(np==='HBO' || np==='HBK' || np==='HBS'){   /* r193: OUTSIDE border = the PERIMETER of the selection; a 1\u00d71 perimeter IS the classic box (ball).
+                                     r234: THICK BOX (Alt H B K) = the same perimeter, drawn at 2px via the `thick` flag.
+                                     r292: HBS is Excel's real "Outside Borders" access key \u2014 same perimeter box. */
     const r=selRange(); pushUndo(); const thick = np==='HBK';
     if(r.r1===r.r2 && r.c1===r.c2){ const a=ensure(r.r1,r.c1); a.ball=true; if(thick)a.thick=true; return exitRibbon(true); }
     for(let cc=r.c1;cc<=r.c2;cc++){ const t=ensure(r.r1,cc),b=ensure(r.r2,cc); t.bt=true; b.bb=true; if(thick){t.thick=true;b.thick=true;} }
@@ -10656,13 +10669,37 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
   if(tools){
     const mk=(id,tip)=>{ const b=document.createElement('button'); b.className='topnav-icon'; b.id=id; b.setAttribute('data-tip',tip); return b; };
     const sBtn=mk('soundToggle','sound pack \u2014 click to cycle: classic \u2192 arcade \u2192 thock \u2192 off');
-    const pBtn=mk('profileToggle','keyboard profile \u2014 native Excel, Macabacus, or FactSet chords');
+    const pBtn=mk('profileToggle','your keyboard \u2014 layout (Windows / Mac) + shortcut profile (native \u00b7 Macabacus \u00b7 FactSet, \u25c6 PRO)');
     sBtn.onclick=cycleSound;
-    pBtn.onclick=cycleProfile;
+    /* r293 (Wolf): ONE keyboard control — shows the CURRENT layout + profile, opens a
+       popover with a Windows/Mac choice and a one-or-other plugin layer. The auto-detect
+       still picks the starting layout; this makes it visible and reversible. */
+    const pWrap=document.createElement('span'); pWrap.style.cssText='position:relative;display:inline-flex';
+    const pPop=document.createElement('div'); pPop.className='prefs-pop'; pPop.id='kbPop';
+    pPop.style.cssText='min-width:240px;flex-direction:column;gap:4px';
+    pWrap.appendChild(pBtn); pWrap.appendChild(pPop);
+    const kbHead=t=>{ const d=document.createElement('div');
+      d.style.cssText='font-family:var(--mono);font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);padding:4px 6px 2px'; d.innerHTML=t; return d; };
+    const kbRow=(label,on,fn)=>{ const b=document.createElement('button'); b.className='mb-tool'+(on?' on':'');
+      b.textContent=label; b.onclick=(e)=>{ e.stopPropagation(); fn(); renderKbPop(); }; return b; };
+    function renderKbPop(){
+      pPop.innerHTML='';
+      pPop.appendChild(kbHead('layout \u2014 detected, switch anytime'));
+      pPop.appendChild(kbRow('\u229e windows', !HK_MAC, ()=>{ hkSetPlatform(false); updateProfileBtn(); }));
+      pPop.appendChild(kbRow('\u2318 mac', HK_MAC, ()=>{ hkSetPlatform(true); updateProfileBtn(); }));
+      pPop.appendChild(kbHead('shortcut profile \u00b7 <span style="color:var(--warn)">\u25c6 PRO</span> \u00b7 one at a time'));
+      pPop.appendChild(kbRow('native Excel', keyProfile==='native', ()=>{ keyProfile='native'; saveProfile(); updateProfileBtn(); }));
+      pPop.appendChild(kbRow('Macabacus', keyProfile==='macabacus', ()=>{ if(!requirePro('Plugin keyboard layers (Macabacus / FactSet)')) return; keyProfile='macabacus'; saveProfile(); updateProfileBtn(); }));
+      pPop.appendChild(kbRow('FactSet', keyProfile==='factset', ()=>{ if(!requirePro('Plugin keyboard layers (Macabacus / FactSet)')) return; keyProfile='factset'; saveProfile(); updateProfileBtn(); }));
+    }
+    pBtn.onclick=(e)=>{ e.stopPropagation(); const open=pPop.classList.contains('show');
+      document.querySelectorAll('.prefs-pop').forEach(p=>p.classList.remove('show'));
+      if(!open){ renderKbPop(); pPop.classList.add('show'); } };
+    document.addEventListener('click', e=>{ if(!e.target.closest('#kbPop') && e.target!==pBtn) pPop.classList.remove('show'); });
     const anchor=document.getElementById('navShortcuts');
-    if(anchor){ anchor.after(pBtn); anchor.after(sBtn); } else { tools.prepend(pBtn); tools.prepend(sBtn); }
+    if(anchor){ anchor.after(pWrap); anchor.after(sBtn); } else { tools.prepend(pWrap); tools.prepend(sBtn); }
   } }
-$('dailyBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); });   // r140: the sheet owns the button
+{ const _db=$('dailyBtn'); if(_db) _db.addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); }); }
 /* ---- r157: THE WEAKNESS QUEUE (PRO pillar #2; free in beta via requirePro) ----
    The site builds the session: score every drill from LOCAL data only —
    PB vs par (known weakness), never-cleared (unknown weakness, progression-
@@ -10771,17 +10808,15 @@ if(!sb){
 }
 { const MODE_BLURBS = {
     classic:   "Solve drills at your own pace · the timer's just feedback.",
-    marathon:  "Random drills, back to back, against the clock · pick a duration when you start.",
     rapidfire: "One cell, one chord, one transform · go as fast as you can recall.",
   };
   function pickMode(m){
     pendingMode = (m==='classic') ? null : m;
-    ['Classic','Marathon','Rapid'].forEach(id=>{ const el=$('chip'+id); if(el) el.classList.remove('selected'); });
-    const sel=$('chip'+(m==='rapidfire'?'Rapid':(m==='marathon'?'Marathon':'Classic'))); if(sel) sel.classList.add('selected');
+    ['Classic','Rapid'].forEach(id=>{ const el=$('chip'+id); if(el) el.classList.remove('selected'); });
+    const sel=$('chip'+(m==='rapidfire'?'Rapid':'Classic')); if(sel) sel.classList.add('selected');
     const mc=$('landingMicro'); if(mc) mc.innerHTML='<b>'+(m==='rapidfire'?'Rapid-fire':(m[0].toUpperCase()+m.slice(1)))+' mode.</b> '+MODE_BLURBS[m];
   }
   const cc=$('chipClassic');  if(cc) cc.addEventListener('click', ()=>pickMode('classic'));
-  const cm=$('chipMarathon'); if(cm) cm.addEventListener('click', ()=>pickMode('marathon'));
   const cr=$('chipRapid');    if(cr) cr.addEventListener('click', ()=>pickMode('rapidfire'));
 }
 $('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
@@ -11368,7 +11403,9 @@ async function loadTheme(){
   if(saved && THEMES[saved]){ applyTheme(saved); return; }
   applyTheme('daylight');   // r238 (Wolf): Daylight is the UNCONDITIONAL default — a saved choice still wins, but a clean login always opens on Daylight rather than following OS dark-mode
 }
-function saveTheme(name){ KV.set('hotkey_theme', name); }
+function saveTheme(name){ KV.set('hotkey_theme', name);
+  // r293 (Wolf): the pick follows the account — other devices land on the same theme
+  try{ if(sb && me_user) sb.from('profiles').update({theme:name}).eq('id', me_user.id).then(()=>{}); }catch(e){} }
 
 let themesOpen=false;
 function closeThemes(){ themesOpen=false; const m=$('themesModal'); if(m) m.classList.remove('show'); }
@@ -11387,9 +11424,9 @@ const APP_SHORTCUTS = [
     ['F1',         'toggle guided hints (paint-by-numbers walkthrough)'],
     ['F2',         'edit the active cell'],
   ]},
-  { title:'in a session (marathon / rapid-fire)', rows: [
-    ['s',          'skip the current drill (marathon)'],
-    ['g',          'toggle guided hints (marathon)'],
+  { title:'in a rapid-fire session', rows: [
+    ['s',          'skip the current task'],
+    ['g',          'reveal the keycap hints'],
     ['Shift + Esc','end the session early'],
   ]},
   { title:'after solving', rows: [
@@ -11461,50 +11498,83 @@ function loadRapidCard(){
     type: s.matchSeq ? 'seq' : 'chord',
     test: s.matchSeq ? s.matchSeq() : s.match,
   }));
+  /* r293: the task lives in the REAL sheet now. Column layouts pin to B2.. so the
+     ops' hardcoded formula text (=SUM(B2:Bn)) points at the actual staged cells. */
+  const v0 = op.show(data);
+  let cell;
+  if(v0.layout==='column'){ const n=(v0.context||[]).length; cell={r:2+n, c:2}; }
+  else if(v0.layout==='row'){ const n=(v0.context||[]).length; cell={r:2, c:2+n}; }
+  else if(data.cellLabel && /^[A-J]\d+$/.test(data.cellLabel)){ cell={r:parseInt(data.cellLabel.slice(1),10), c:data.cellLabel.charCodeAt(0)-64}; }
+  else cell={ r:2+Math.floor(Math.random()*6), c:2+Math.floor(Math.random()*4) };
   rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data, matchers,
-    cellLabel: data.cellLabel || (colLetter(2+(Math.random()*4|0))+(2+(Math.random()*6|0))), shownAt:performance.now() };
+    cell, cellLabel: colLetter(cell.c)+cell.r, shownAt:performance.now() };
   rfBusy=false; renderRfCard('show');
+}
+/* r293 REBUILD (Wolf): rapid-fire renders in the REAL grid. Each task stages its
+   pre-state into actual sheet cells; the solve writes the post-state so the chord
+   visibly lands in the sheet — real selection ring, real formula bar, real formats. */
+function rfResetSheet(){ S={ROWS:ROWS_MAX, cells:{}, active:{r:1,c:1}, sel:null, clipboard:null}; }
+function rfWriteCell(r,c,view){
+  const cell=ensure(r,c); Object.assign(cell, blankCell());
+  cell.it=false; cell.strike=false; cell.cmt=false;   // r193/r229/r293 flags live outside blankCell
+  const text=(view.text==null)?'':String(view.text);
+  if(view.fx && text.charAt(0)==='='){
+    /* live formula when every ref resolves to staged content (autosum → the engine
+       computes the real total); otherwise the formula TEXT displays literally,
+       exactly like Excel's formulas view */
+    const refs=text.match(/\$?[A-J]\$?\d+/g)||[];
+    const live=refs.length && refs.every(rf=>{ const m=rf.replace(/\$/g,''); return nonEmpty(parseInt(m.slice(1),10), m.charCodeAt(0)-64); });
+    if(live){ cell.formula=text; } else { cell.value=text; cell.txt=true; }
+  } else if(text!==''){
+    const bare=text.replace(/,/g,''); let m;
+    if(/^-?\d+(\.\d+)?$/.test(bare)){
+      cell.value=parseFloat(bare);
+      cell.decimals=(bare.split('.')[1]||'').length;
+      if(text.indexOf(',')>=0) cell.fmtStyle='comma';
+    }
+    else if((m=text.match(/^(-?[\d,]+(?:\.(\d+))?)%$/))){ cell.value=parseFloat(m[1].replace(/,/g,''))/100; cell.fmtStyle='percent'; cell.decimals=(m[2]||'').length; }
+    else if((m=text.match(/^\$\s?(-?[\d,]+(?:\.(\d+))?)$/))){ cell.value=parseFloat(m[1].replace(/,/g,'')); cell.fmtStyle='currency'; cell.decimals=(m[2]||'').length; }
+    else { cell.value=text; cell.txt=true; }
+  }
+  if(view.bold) cell.bold=true;
+  if(view.italic) cell.it=true;
+  if(view.underline||view.link) cell.uline=true;
+  if(view.strike) cell.strike=true;
+  if(view.border) cell.ball=true;
+  if(view.borderTop) cell.bt=true;
+  if(view.borderBottom) cell.bb=true;
+  if(view.align) cell.align=view.align;
+  if(view.fontColor) cell.fontColor=view.fontColor;
+  else if(view.color||view.link) cell.fontColor='blue';   // the hex from font_blue = our palette blue
+  if(view.comment) cell.cmt=true;
+  return cell;
+}
+function rfPaintView(view, state){
+  if(!rfTask || !rfTask.cell) return;
+  const t=rfTask.cell;
+  if(state!=='solved') rfResetSheet();   // fresh sheet per task; solve mutates in place
+  if(view.layout==='row' || view.layout==='column'){
+    (view.context||[]).forEach((v,i)=>{
+      const rr = view.layout==='column' ? (t.r-(view.context.length-i)) : t.r;
+      const cc = view.layout==='column' ? t.c : (t.c-(view.context.length-i));
+      rfWriteCell(rr, cc, {text:String(v)});
+    });
+  }
+  rfWriteCell(t.r, t.c, view);
+  recalc();
+  S.active={r:t.r, c:t.c}; S.sel=null;
+  render(); updateFormulaBar();
+  if(state==='solved'){
+    const td=document.querySelector('#grid td[data-r="'+t.r+'"][data-c="'+t.c+'"]');
+    if(td){ td.classList.remove('rfhit'); void td.offsetWidth; td.classList.add('rfhit'); }
+  }
 }
 function renderRfCard(state){
   if(!rfTask) return;
   const view = state==='solved' ? rfTask.def.solved(rfTask.data) : rfTask.def.show(rfTask.data);
   const ie=$('rfInstr'); if(ie) ie.textContent = (typeof rfTask.def.instr==='function') ? rfTask.def.instr(rfTask.data) : rfTask.def.instr;
   const le=$('rfCellLabel'); if(le) le.textContent=rfTask.cellLabel;
-  const cell=$('rfCell');
-  if(cell){
-    const layout = view.layout || 'single';
-    if(layout === 'single'){
-      // single-cell render: text + visual flags on the cell itself
-      cell.innerHTML = '';
-      cell.textContent = view.text||'\u00A0';
-      const flags=['bold','italic','underline','strike','fx','link','border','comment']
-        .filter(f=>view[f]).join(' ')
-        + (view.borderTop ? ' border-top' : '')
-        + (view.borderBottom ? ' border-bottom' : '');
-      cell.className='rf-cell'+(flags?' '+flags:'')+(state==='solved'?' flash':'');
-      // alignment override (for the center/right-align RF ops) — flex-based since rf-cell is display:flex
-      cell.style.justifyContent = view.align==='c' ? 'center' : view.align==='r' ? 'flex-end' : '';
-      // font color override (for the blue-input RF op) — look up the swatch hex
-      if(view.fontColor){
-        const sw = FONT_SWATCHES.find(s=>s.k===view.fontColor);
-        cell.style.color = sw ? sw.hex : '';
-      } else cell.style.color = '';
-    } else {
-      // multi-cell: container holds context mini-cells + the target
-      cell.className = 'rf-cell-multi';
-      cell.textContent = '';
-      const wrap = document.createElement('div');
-      wrap.className = layout === 'row' ? 'rf-row' : 'rf-stack';
-      (view.context||[]).forEach(v=>{
-        const m=document.createElement('div'); m.className='rf-mini'; m.textContent=String(v); wrap.appendChild(m);
-      });
-      const t=document.createElement('div');
-      t.className='rf-mini rf-target'+(view.fx?' fx':'')+(state==='solved'?' flash':'');
-      t.textContent = view.text||'\u00A0';
-      wrap.appendChild(t);
-      cell.appendChild(wrap);
-    }
-  }
+  rfPaintView(view, state);   // r293: the task renders in the REAL grid
   const keys=$('rfKeys'); if(keys){ keys.className='rf-keys'+(guided?'':' hardo'); keys.innerHTML='';
     // Default rapid-fire = no keycaps shown (hardo). Pressing `g` reveals them but flags the run as a practice run.
     const showKeys = guided || state==='solved';
@@ -11530,11 +11600,6 @@ function rapidKey(e){
   const k=e.key;
   if(resultsChainKeys){ resultsChainKeys(e); if(e.defaultPrevented) return; }
   if(k==='Escape'){ e.preventDefault(); return; }
-  // 's' (bare, no modifiers) skips the current task — same convention as marathon's drill skip.
-  // Ctrl+S still routes to the save op since the ctrl check above excludes the chord path.
-  if((k==='s'||k==='S') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey){
-    e.preventDefault(); rfSkip(); return;
-  }
   // Keys that browsers love to steal — Alt+Home (homepage), Ctrl+Home (scroll-to-top in some configs),
   // Ctrl+T (new tab), F5 (refresh), etc. Block defaults for ANY modifier-plus-key, navigation key, or function
   // key inside rapid-fire — the session has full keyboard ownership regardless of whether it matches an op.
@@ -11554,6 +11619,12 @@ function rapidKey(e){
     if(res === 'partial') sawPartial = true;
   }
   if(sawPartial){ e.preventDefault(); kickTimer(); return; }
+  // 's' (bare, no modifiers) skips the current task — same convention as marathon's drill skip.
+  // r293: checked AFTER the sequence matchers so the S inside a ribbon walk (tap-Alt
+  // E S V ↵ = legacy paste-values) advances the sequence instead of skipping the task.
+  if((k==='s'||k==='S') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey){
+    e.preventDefault(); rfSkip(); return;
+  }
   // CURRENT-TASK CHORD CHECK — match against any chord solution (primary or alt) of this task.
   for(const m of rfTask.matchers){
     if(m.type === 'chord' && m.test(e)){ e.preventDefault(); kickTimer(); rfSolve(m); return; }
@@ -11586,15 +11657,14 @@ function rfSolve(matched){
   const tier = streakTier(marathon.streak);
   updateStreakUI(marathon.streak);
   renderRfCard('solved'); updateMarathonHud();
-  // dopamine: sound (tier-shifted) + outer-card halo. The rf-cell flash is already wired in renderRfCard('solved').
+  // dopamine: sound (tier-shifted). The real-cell accent flash is wired in rfPaintView('solved').
   playSuccessBlip(tier);
-  const card = document.querySelector('.rf-card');
-  if(card){ card.classList.remove('celebrate'); void card.offsetWidth; card.classList.add('celebrate'); }
   if(marathon.endAt && performance.now() >= marathon.endAt){ setTimeout(endSession, marathon.advance); return; }
   setTimeout(()=>{ if(marathon && marathon.active) loadNext(); }, marathon.advance);
 }
 function rfMiss(){
   marathon.misses+=1;
+  try{ if(rfTask){ (marathon.missedOps=marathon.missedOps||{})[rfTask.op]=(marathon.missedOps[rfTask.op]||0)+1; } }catch(e){}
   marathon.streak = 0;            // streak breaks immediately on a miss
   updateStreakUI(0);              // hide the counter so the user sees+hears the reset together
   const keys=$('rfKeys'); if(keys){ keys.classList.remove('miss'); void keys.offsetWidth; keys.classList.add('miss'); }
@@ -11604,12 +11674,13 @@ function rfMiss(){
 function rfSkip(){
   if(rfBusy || !rfTask) return;
   marathon.skipped = (marathon.skipped||0) + 1;
+  try{ (marathon.missedOps=marathon.missedOps||{})[rfTask.op]=(marathon.missedOps[rfTask.op]||0)+2; }catch(e){}   // a skip is a louder signal than a wrong chord
   marathon.streak = 0;
   updateStreakUI(0);
   loadNext();
 }
 
-function openModes(mode){ if(demoPlaying) return; modesMode=mode||'marathon';
+function openModes(mode){ if(demoPlaying) return; modesMode=mode||'rapidfire';
   const cfg=SESSION_CFG[modesMode]; const m=$('modesModal'); const isRapid=modesMode==='rapidfire';
   m.innerHTML=`<div class="mm-card"><div class="mm-title">${cfg.title}</div>`+
     `<div class="mm-body">${cfg.body}</div>`+
@@ -11635,7 +11706,7 @@ function toggleModePop(btn, popId){
   closeAllModePops();
   if(!wasOpen){ pop.classList.add('show'); btn.classList.add('open'); }
 }
-$('mbMarathonBtn').addEventListener('click', e=>{ e.stopPropagation(); toggleModePop(e.currentTarget,'mbMarathonPop'); });
+{ const _mb=$('mbMarathonBtn'); if(_mb) _mb.addEventListener('click', e=>{ e.stopPropagation(); toggleModePop(e.currentTarget,'mbMarathonPop'); }); }
 $('mbRapidBtn').addEventListener('click', e=>{ e.stopPropagation(); toggleModePop(e.currentTarget,'mbRapidPop'); });
 $('mbClassic').addEventListener('click', e=>{ e.stopPropagation(); closeAllModePops(); /* classic is the default — no popover, just dismiss any open one */ });
 // click anywhere outside a mode pill or its popover closes whichever's open
@@ -11774,6 +11845,31 @@ function showSessionSummary(){
     `</div>`+
     guestPrompt+
     `</div>`;
+  /* r293 (Wolf): the BENCHMARK readout — rapid-fire doubles as a skill test (never in
+     onboarding). Misses/skips roll up by category; the weakest one maps to a drill
+     recommendation with a one-click start. */
+  try{
+    if(rapid && s.missedOps && Object.keys(s.missedOps).length){
+      const catScore={};
+      Object.entries(s.missedOps).forEach(([op,w])=>{ const c=RF_CAT[op]||'general'; catScore[c]=(catScore[c]||0)+w; });
+      const worst=Object.entries(catScore).sort((a,b)=>b[1]-a[1])[0];
+      const CAT_DRILL={ styling:'typeset', alignment:'center', numbers:'decimals', borders:'ruleoff',
+        data:'sort', navigation:'navigation', stamps:'editfix', editing:'pastes', formulas:'foot', workflow:'navigation' };
+      const dk=CAT_DRILL[worst[0]];
+      if(dk && CHALLENGES[dk] && !drillLocked(dk)){
+        const nm=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.meta[dk]&&window.HOTKEY_DRILLS.meta[dk].label)||dk;
+        const card=m.querySelector('.ss-card');
+        const d=document.createElement('div');
+        d.style.cssText='font-family:var(--mono);font-size:12px;color:var(--muted);margin:2px 0 12px;text-align:center';
+        d.innerHTML='benchmark: <b style="color:var(--warn)">'+escHtml(worst[0])+'</b> chords cost you the most this run \u2014 '+
+          '<a id="ssTrainRec" style="color:var(--accent);cursor:pointer;text-decoration:underline dotted">train \u201c'+escHtml(nm)+'\u201d \u2192</a>';
+        const opts=card&&card.querySelector('.ss-opts');
+        if(opts) card.insertBefore(d, opts);
+        const tr=document.getElementById('ssTrainRec');
+        if(tr) tr.onclick=()=>{ hideSessionSummary(); exitSession(); loadChallenge(dk); };
+      }
+    }
+  }catch(e){}
   m.classList.add('show'); sessionOpen=true;
   m.querySelectorAll('.ss-key').forEach(b=>b.addEventListener('click', ()=>{
     if(b.dataset.act==='again') startSession(s.mode, s.dur); else exitSession();
@@ -11972,13 +12068,14 @@ function demoSpotTo(sel, stepN, total, keysLab, instant, watch){
       wt.style.width=(Math.max(r1.right,r2.right)-Math.min(r1.left,r2.left)+6)+'px';
       wt.style.height=(Math.max(r1.bottom,r2.bottom)-Math.min(r1.top,r2.top)+6)+'px';
     } else wt.style.display='none';
-    let capY = (B+12+44>window.innerHeight) ? (T-46) : (B+12);
-    try{ // dodge the fx-hint popup — it pops under the cell on formula steps
-      const fh=document.querySelector('.fx-hint');
-      if(fh && fh.offsetParent){ const fr=fh.getBoundingClientRect();
-        if(capY<fr.bottom && capY+44>fr.top) capY=fr.bottom+8; }
-    }catch(e){}
-    cap.style.left=Math.max(10,L)+'px'; cap.style.top=capY+'px';
+    /* r292 (Wolf): the caption used to sit right under the spotlight and could cover the
+       very cells you're watching. Pin it to a fixed bottom-center status strip instead —
+       the ring already shows WHERE; the caption only needs to say the step + chord, and it
+       never blocks the grid. Nudges above the sheet-tab strip if that's on screen. */
+    let capBottom = 74;
+    try{ const st=document.getElementById('sheetTabs'); if(st && st.offsetParent){ capBottom = Math.max(74, window.innerHeight - st.getBoundingClientRect().top + 12); } }catch(e){}
+    cap.style.left='50%'; cap.style.right='auto'; cap.style.top='auto';
+    cap.style.transform='translateX(-50%)'; cap.style.bottom=capBottom+'px';
   }catch(e){}
 }
 function demoSpotSync(){ if(demoSpotCur){ const c=demoSpotCur; demoSpotTo(c.sel, c.stepN, c.total, c.keys, true, c.watch); } }
@@ -12014,7 +12111,7 @@ async function playDemo(){
   if(kf) kf.classList.remove('demo');
   demoPlaying=false; updateDemoBtn();
   loadChallenge(cur);
-  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — or <b>⌨ follow along</b> to walk the steps yourself'; }
+  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — or <b>⌨ learn mode</b> to walk the steps yourself'; }
 }
 $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():(echoOn?echoStop():playDemo()); });
 
@@ -12030,7 +12127,7 @@ $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():(echoOn?ech
    the replay/parity suites and watch mode out of its way.
    ============================================================ */
 function updateEchoBtn(){ const b=$('echoBtn'); if(b){ b.classList.toggle('on',echoOn);
-  b.innerHTML=echoOn?'<kbd>esc</kbd> stop':'⌨ follow along'; } }
+  b.innerHTML=echoOn?'<kbd>esc</kbd> stop':'⌨ learn mode'; } }
 function echoAbort(){ if(!echoOn) return; echoOn=false; echoState=null;
   try{ demoSpotOff(); updateEchoBtn(); const kf=$('keyflash'); if(kf) kf.classList.remove('demo'); }catch(e){} }
 function echoStop(){ if(!echoOn) return;
@@ -12052,7 +12149,7 @@ function echoStart(){
   try{ ev('echo_start',{d:cur}); }catch(e){}
   updateEchoBtn();
   const kf=$('keyflash'); if(kf) kf.classList.add('demo');
-  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⌨ follow along — press each highlighted chord yourself · <kbd>esc</kbd> bails'; }
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⌨ learn mode — press each highlighted chord yourself · <kbd>esc</kbd> bails'; }
   setTimeout(echoStep,150);
 }
 function echoDone(){
@@ -12138,8 +12235,8 @@ setInterval(()=>{ try{
   if(nowOk>window.__stkBase){ window.__stkDone=true; return; }   // they're moving — never interrupt
   if(Date.now()-(window.__stkT||0) < 40000) return;
   window.__stkDone=true;
-  showToast('stuck? \u25b6 watch solution plays the line \u2014 \u2328 follow along walks you through it');
-  ['demoBtn','echoBtn'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
+  showToast('stuck? \u25b6 watch solution plays the line \u00b7 \u2328 learn mode walks you through it \u00b7 F1 guides every key');
+  ['demoBtn','echoBtn','guideToggle'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
     setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); } });
   try{ ev('stuck_nudge',{d:cur}); }catch(e){}
 }catch(e){} }, 3000);
@@ -12181,7 +12278,10 @@ function lvlDetail(xp){
   return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; }
 function lvlOf(xp){ return lvlDetail(xp).lvl; }
 function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
-  const xp=localXP(nsol); window.__lvlXp=xp;   // r211: keep the progress panel in sync with the badge
+  // r292 (Wolf): when signed in, use the SAME server-computed XP the account/stats/board
+  // pages use (window.__srvXp, set by updateRankPill) so the level number never disagrees
+  // across surfaces. localXP is the guest/offline estimate only.
+  const xp=(typeof window.__srvXp==='number') ? window.__srvXp : localXP(nsol); window.__lvlXp=xp;
   const L=lvlDetail(xp);
   el.style.display='inline-flex';
   el.innerHTML='LVL '+L.lvl+' <span class="lvl-bar"><span style="width:'+L.pct+'%"></span></span>';
@@ -12338,7 +12438,7 @@ function openXpInfo(){
     '<div class="ob-title">how xp works</div>'+
     '<div class="ob-body" style="text-align:left;font-size:12.5px;line-height:2">'+
     '<b style="color:var(--accent)">new drill</b> +50 (advanced +65) \u00b7 <b>repeat</b> +15<br>'+
-    '<b style="color:var(--accent)">daily</b> +30 \u00b7 <b>gauntlet leg</b> +25 \u00b7 <b>marathon</b> +20 \u00b7 <b>rapid-fire</b> +10<br>'+
+    '<b style="color:var(--accent)">daily</b> +30 \u00b7 <b>gauntlet leg</b> +25 \u00b7 <b>rapid-fire</b> +10<br>'+
     '<b style="color:var(--warn)">boards</b>: top-10 +25 \u00b7 podium +100 \u00b7 crown +250<br>'+
     '<span style="color:var(--muted);font-size:11px">Each level costs a bit more than the last. New drills and showing up daily are the fastest climb.</span>'+
     '<br><br><b style="color:var(--warn)">how par works</b><br>'+
@@ -12836,7 +12936,16 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
       r.innerHTML='🏁 <b>beat '+escHtml(race.by)+'’s '+race.t.toFixed(2)+'s</b> — type to start the race'; }
   }
   if(onboarded && !race) showWelcomeBack(startKey);
-  initAuth().then(()=>{ updateRankPill(); loadEntitlement(); });
+  initAuth().then(()=>{ updateRankPill(); loadEntitlement();
+    // r293: account theme lands on devices with no local pick yet (mobile carry) —
+    // mirrors nav.js on the secondary pages; an explicit local choice always wins.
+    (async()=>{ try{
+      if(!me_user || localStorage.getItem('hotkey_theme')) return;
+      const { data:p } = await sb.from('profiles').select('theme').eq('id', me_user.id).maybeSingle();
+      const th=p && p.theme;
+      if(th && THEMES[th]){ applyTheme(th); saveTheme(th); }
+    }catch(e){} })();
+  });
 })();
 
 /* ---- welcome-back strip: returning users get a one-glance "you're on the game page" cue.
@@ -12908,6 +13017,13 @@ async function updateRankPill(){
     const t=tierOf(st.avgPct, st.att, st.wsum);
     show(t);
     try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
+    // r292: compute the canonical XP from the SAME runs + standing the boards use, and
+    // repaint the level badge with it — kills the game-vs-account level mismatch.
+    try{ if(window.HK_RANK && window.HK_RANK.computeXP){
+      const mine=runs.filter(x=>x.user_id===me_user.id);
+      window.__srvXp=window.HK_RANK.computeXP(mine, st);
+      try{ const nsol=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; renderLvl(nsol); }catch(e){}
+    } }catch(e){}
   }catch(e){}
 }
 /* ============================================================
@@ -13807,19 +13923,28 @@ function showKeyboard(after){
   const macGuess=HK_MAC;
   m.innerHTML='<div class="ob-card" style="max-width:470px">'+
     '<div class="ob-title">first — what keyboard are you on?</div>'+
-    '<div class="ob-body" style="font-size:12.5px">Keycaps and shortcuts render for your machine. Same drills, same boards either way.</div>'+
+    '<div class="ob-body" style="font-size:12.5px">Keycaps and shortcuts render for your machine. Same drills either way. <span style="color:var(--faint)">↑↓ to choose · ↵ to confirm</span></div>'+
     '<div class="ob-opts" style="flex-direction:column;gap:8px;align-items:stretch">'+
-      '<button class="ob-key'+(macGuess?'':' primary')+'" data-kb="win" style="text-align:left"><b>⊞ Windows</b> — Ctrl chords, Alt ribbon walks'+(macGuess?'':' <span style="color:var(--faint);font-size:10px">(detected)</span>')+' <kbd class="ob-kbd">1</kbd></button>'+
-      '<button class="ob-key'+(macGuess?' primary':'')+'" data-kb="mac" style="text-align:left"><b>⌘ Mac</b> — ⌘ chords, ⌥ ribbon walks (KeyTips)'+(macGuess?' <span style="color:var(--faint);font-size:10px">(detected)</span>':'')+' <kbd class="ob-kbd">2</kbd></button>'+
+      '<button class="ob-key" data-kb="win" style="text-align:left"><b>⊞ Windows</b> — Ctrl chords, Alt ribbon walks'+(macGuess?'':' <span style="color:var(--faint);font-size:10px">(detected)</span>')+' <kbd class="ob-kbd">1</kbd></button>'+
+      '<button class="ob-key" data-kb="mac" style="text-align:left"><b>⌘ Mac</b> — ⌘ chords, ⌥ ribbon walks (KeyTips)'+(macGuess?' <span style="color:var(--faint);font-size:10px">(detected)</span>':'')+' <kbd class="ob-kbd">2</kbd></button>'+
     '</div></div>';
   m.classList.add('show'); window.__introCardOpen=true;
-  const keys=(e)=>{ if(e.key==='1'||e.key==='2'){ e.preventDefault(); e.stopImmediatePropagation(); pick(e.key==='2'); } };
+  // r292: arrow-key + Enter navigation, defaulting to the detected platform
+  const btns=[...m.querySelectorAll('[data-kb]')];
+  let sel=macGuess?1:0;
+  const paint=()=>btns.forEach((b,i)=>b.classList.toggle('focused', i===sel));
+  paint();
+  const keys=(e)=>{
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); e.stopImmediatePropagation(); sel=sel?0:1; paint(); return; }
+    if(e.key==='Enter'){ e.preventDefault(); e.stopImmediatePropagation(); pick(sel===1); return; }
+    if(e.key==='1'||e.key==='2'){ e.preventDefault(); e.stopImmediatePropagation(); pick(e.key==='2'); }
+  };
   const pick=(mac)=>{
     try{ hkSetPlatform(mac); }catch(e){}
     try{ ev('kb_pick',{mac:mac?1:0}); }catch(e){}
     m.classList.remove('show'); window.__introCardOpen=false; document.removeEventListener('keydown', keys, true);
     after(); };
-  m.querySelectorAll('[data-kb]').forEach(b=>{ b.onclick=()=>pick(b.dataset.kb==='mac'); });
+  btns.forEach((b,i)=>{ b.onclick=()=>pick(b.dataset.kb==='mac'); b.onmouseenter=()=>{ sel=i; paint(); }; });
   document.addEventListener('keydown', keys, true);
 }
 function showComfort(after){
@@ -13869,19 +13994,22 @@ function showPrimer(after, i){
   document.addEventListener('keydown', keys, true);
 }
 const TOUR_STEPS=[
-  /* r175 INTERACTIVE INTRO — sell first, explain later. Two DO-IT beats put a
-     real chord under the user's fingers in the first 20 seconds; the why-card
-     justifies the product; only three explanation spotlights survive. */
+  /* r292 INTERACTIVE INTRO — plain, professional, succinct. Two DO-IT beats put a real
+     chord under the fingers in the first 15s; the rest points at the actual controls. */
   {sel:'.gridwrap', cap:'try this', doIt:{key:'ArrowRight',ctrl:true},
-    body:'Your mouse needs ~4 seconds to scroll-and-click across a model. Your keyboard needs ONE press.<br><br><b>Hold <kbd>ctrl</kbd> and tap <kbd>\u2192</kbd></b> \u2014 right now, on this sheet.'},
-  {sel:'.gridwrap', cap:'again \u2014 bigger', doIt:{key:'ArrowDown',ctrl:true,shift:true},
-    body:'The cursor FLEW to the edge of the data. Now grab a whole column of it \u2014 no dragging:<br><br><b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd></b> \u2014 selection to the edge, one chord.'},
-  {sel:null, cap:'why this exists', full:true,
-    body:'That speed is the product.<br><br>\u00b7 Analysts live in Excel <b>6\u201310 hours a day</b> \u2014 a mouse round-trip costs ~2s, a chord costs ~0.3s. Over a model, that\u2019s hours.<br>\u00b7 Seniors <b>read keyboard pace as a signal</b> \u2014 it says you\u2019ve done the reps.<br>\u00b7 Every drill here is a <b>real desk task</b> \u2014 comps, roll-forwards, tie-outs \u2014 graded on the end state, timed like the desk is watching.<br><br>Play it like a ladder game: solve clean, beat par, climb the rank.'},
-  {sel:'.cl-inner',   cap:'your instructions', body:'The <b>checklist</b> is the ask \u2014 an associate\u2019s markup. Every line is an action; green means done. Finish them all and the clock stops.'},
-  {sel:'.drillbar',   cap:'the trainer',   body:'<b>\\</b> opens the drill map \u00b7 <b>Alt+\u2190/\u2192</b> hops drills \u00b7 <b>F1</b> is guided mode \u2014 it walks you key by key when you\u2019re lost \u00b7 <b>Esc</b> never restarts your run.'},
-  {sel:'#navThemes',  cap:'make it yours', body:'Prefer light or dark? <b>Themes</b> live here \u2014 paper-white to Bloomberg-black, and every one keeps a clean Excel sheet you can actually read. Pick one anytime; it saves across sessions.'},
-  {sel:'#authSlot',   cap:'the ladder',    body:'<b>LEVEL</b> is your reps \u2014 every clean solve earns xp. <b>RANK</b> is the competition \u2014 clean, mouseless runs post to per-drill <b>leaderboards</b>, crowns for first. The desk is watching.'},
+    body:'A mouse takes a few seconds to scroll and click across a sheet. The keyboard takes one press.<br><br><b>Hold <kbd>ctrl</kbd> and tap <kbd>→</kbd></b> — right now.'},
+  {sel:'.gridwrap', cap:'again — bigger', doIt:{key:'ArrowDown',ctrl:true,shift:true},
+    body:'The cursor jumped to the edge of the data. Now select a whole column of it, no dragging:<br><br><b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd></b> — one chord.'},
+  {sel:'.cl-inner',   cap:'your checklist', body:'Each drill gives you a <b>checklist</b> on the right. Every line is one action; it turns green when done. Clear them all and the clock stops — any keystroke path that gets there counts.'},
+  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list — <b>↑↓ arrows</b> move, <b>↵</b> loads. Or hop straight with <b>Alt+←/→</b>. <b>Esc</b> never ends your run.'},
+  {sel:'#guideToggle', cap:'stuck? two helpers', body:'<b>Guided mode</b> (this button, or <kbd>F1</kbd>) highlights every key to press — on by default for your first runs. Beside it, <b>watch solution</b> plays the optimal keys, and <b>learn mode</b> hands you the keys one step at a time.'},
+  {sel:'#profileToggle', cap:'your keyboard', optional:true, body:'Your layout (Windows or Mac, auto-detected) and shortcut profile (native Excel · Macabacus · FactSet) live here — click to switch either. The drills accept the chords of whichever profile you train.'},
+  {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor so you can race your own time. Toggle it here.'},
+  {sel:'#navThemes',  cap:'make it yours', body:'Light or dark — <b>themes</b> live here, and every one keeps a clean, readable sheet. Pick one anytime; it saves across sessions.'},
+  {sel:'#authSlot',   cap:'save your progress', signedOut:true,
+    body:'You’re playing as a guest. <b>Create a free account</b> to save your progress, post times to the <b>leaderboards</b>, join <b>ranked</b>, and join a <b>team</b>. Takes a few seconds — or keep playing and sign up whenever.'},
+  {sel:'#authSlot',   cap:'the ladder',    signedIn:true,
+    body:'<b>LEVEL</b> is your reps — every clean solve earns xp. <b>RANK</b> is the competition — clean, keyboard-only runs post to per-drill <b>leaderboards</b>, with crowns for first.'},
 ];
 let __tourI=-1, __tourAfter=null;
 function tourShow(i){
@@ -13892,8 +14020,14 @@ function tourShow(i){
     const f=__tourAfter; __tourAfter=null; if(f) setTimeout(f, 350); return; }
   __tourI=i;
   const st=TOUR_STEPS[i];
+  // r292: audience-gated steps — the account step differs signed-in vs signed-out;
+  // optional steps (mac button, ghost) skip when their control isn't on screen.
+  const signedIn = !!(me_user && !isAnonUser());
+  if(st.signedIn && !signedIn){ tourShow(i+1); return; }
+  if(st.signedOut && signedIn){ tourShow(i+1); return; }
   const el=st.sel?document.querySelector(st.sel):null;
   if(st.sel && !el){ tourShow(i+1); return; }
+  if(st.optional && el){ const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden'){ tourShow(i+1); return; } }
   w.classList.add('on');
   if(st.full){
     ring.style.width='0px'; ring.style.height='0px'; ring.style.left='-20px'; ring.style.top='-20px';
@@ -13910,7 +14044,7 @@ function tourShow(i){
   card.innerHTML='<div class="tour-cap"><span>'+st.cap+'</span><span style="color:var(--faint)">'+(i+1)+' / '+TOUR_STEPS.length+'</span></div>'+
     '<div class="tour-body">'+st.body+'</div>'+
     (st.doIt?'<div class="tour-body" id="tourDo" style="color:var(--accent);font-weight:600">\u25b8 press it \u2014 the sheet is live</div>':'')+
-    '<div class="tour-foot"><span class="tour-next" id="tourNext">'+(i===TOUR_STEPS.length-1?'start drilling':(st.doIt?'skip this one \u00b7 \u21b5':'next \u00b7 \u21b5'))+'</span><span class="tour-skip" id="tourSkip">skip tour \u00b7 esc</span></div>';
+    '<div class="tour-foot"><span class="tour-next" id="tourNext">'+(i===TOUR_STEPS.length-1?'start drilling':'next \u00b7 \u21b5')+'</span><span class="tour-skip" id="tourSkip">skip tour \u00b7 esc</span></div>';
   const nx=$('tourNext'); if(nx) nx.onclick=()=>tourShow(__tourI+1);
   const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(TOUR_STEPS.length);
 }

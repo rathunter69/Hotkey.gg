@@ -188,8 +188,9 @@ const STUB = () => {
   ok(t4d2.c > before, 'and it executed on the LIVE sheet (cursor moved)', before + '->' + t4d2.c);
   await page.keyboard.press('Control+Shift+ArrowDown');
   await page.waitForTimeout(1200);
-  const t4d3 = await page.evaluate(() => ({ i: __tourI, why: /why this exists/i.test(document.getElementById('tourCard').innerText) }));
-  ok(t4d3.i === 2 && t4d3.why, 'second beat lands on the why-card', JSON.stringify(t4d3));
+  // r292: the "why this exists" card was cut; step 2 now explains the checklist
+  const t4d3 = await page.evaluate(() => ({ i: __tourI, ck: /checklist/i.test(document.getElementById('tourCard').innerText) }));
+  ok(t4d3.i === 2 && t4d3.ck, 'second beat lands on the checklist card', JSON.stringify(t4d3));
   for (let i = 0; i < 5; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(220); }
 
   // T5 (r174, Wolf's stranding bug): a returning user whose synced last-drill is

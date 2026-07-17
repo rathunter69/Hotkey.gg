@@ -93,12 +93,13 @@
   .keys{flex:0 0 auto; display:flex; align-items:center; gap:5px; flex-wrap:wrap; min-width:0;}
   .desc{flex:1; font-size:13.5px; color:var(--text); min-width:0;}
   .desc .dr{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:7px; vertical-align:middle;}
-  /* r291: practice link — appears on hover, jumps straight into a drill that trains the chord */
+  /* r292 (Wolf): ALWAYS visible — keyboard-first users won't hover to discover it.
+     Quiet by default, lights up on row hover. Jumps straight into a drill for the chord. */
   .practice{flex:0 0 auto; font-family:var(--mono); font-size:11px; color:var(--accent); text-decoration:none;
-    white-space:nowrap; opacity:0; transition:opacity .12s; padding:2px 8px; border:1px solid var(--accent-dim); border-radius:999px;}
-  .row:hover .practice{opacity:1;}
-  .practice:hover{background:var(--accent-glow);}
-  @media (hover:none){ .practice{opacity:1;} }   /* touch: always visible */
+    white-space:nowrap; opacity:.72; transition:opacity .12s, background .12s; padding:2px 9px;
+    border:1px solid var(--accent-dim); border-radius:999px;}
+  .row:hover .practice{opacity:1; background:var(--accent-glow);}
+  .practice:hover{opacity:1; background:var(--accent);color:var(--on-accent);}
 
   /* ---------- keycaps ---------- */
   .cap{display:inline-flex; align-items:center; justify-content:center; min-width:29px; height:29px; padding:0 9px;
@@ -117,7 +118,7 @@
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-family:var(--mono); font-size:14px; padding:50px 0;}
 </style>
 
-<link rel="stylesheet" href="nav.css?v=174">
+<link rel="stylesheet" href="nav.css?v=175">
 <script src="drills.js?v=264"></script>
 <script src="refmap.js?v=1"></script>
 <script>
@@ -128,11 +129,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'reference';
 </script>
-<script src="themes.js?v=262"></script>
+<script src="themes.js?v=263"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=259"></script>
+<script src="nav.js?v=261"></script>
 <div class="wrap">
   <header>
     <h1>Shortcut <span class="em">reference</span></h1>
@@ -257,16 +258,6 @@ const DATA = [
     {k:'Formulas drills', d:'\u2192 formulas cards (autosum, fills, F4 abs, trace, show formulas)'},
     {k:'Dialog chords deck', d:'find \u00b7 replace \u00b7 go to \u00b7 format cells \u00b7 insert fn \u00b7 comment \u00b7 freeze \u00b7 link \u00b7 new sheet \u00b7 save \u2014 the chords classic drills never exercise; pick the deck in the rapid-fire menu'},
   ]},
-  {cat:'Plugin profiles', ic:'⚡', items:[
-    {k:'Ctrl+Shift+R', d:'Macabacus — Fast Fill Right (smart extent)'},
-    {k:'Ctrl+Shift+L', d:'Macabacus — Fast Fill Left'},
-    {k:'Ctrl+Alt+A', d:'Macabacus — AutoColor selection (inputs blue, formulas default)'},
-    {k:'Ctrl+Alt+S', d:'Macabacus — AutoColor the whole sheet'},
-    {k:'Ctrl+Alt+Shift+K', d:'FactSet — Fill Right (FDS)'},
-    {k:'Ctrl+Alt+Shift+J', d:'FactSet — Fill Left (FDS)'},
-    {k:'Ctrl+Alt+Shift+D', d:'FactSet — Fill Down (FDS)'},
-    {k:'Ctrl+Alt+Shift+U', d:'FactSet — Fill Up (FDS)'},
-  ]},
   {cat:'Workbook', ic:'◳', items:[
     {k:'Ctrl+Z', d:'Undo', dr:true},
     {k:'Ctrl+Y', d:'Redo', dr:true},
@@ -276,6 +267,19 @@ const DATA = [
     {k:'Ctrl+P', d:'Print'},
   ]},
 ];
+
+/* r293 (Wolf): Macabacus + FactSet are STANDALONE sections in the main grid now —
+   their own filter chips, searchable rows, plugin accent, PRO tag — instead of an
+   8-row teaser card up top and the full list buried under the page. Rows come from
+   drills.js HOTKEY_PLUGIN_LAYERS (single source, verified against each vendor's
+   published sheet). ● = live in the trainer under that keyboard profile. */
+(function(){
+  const L = window.HOTKEY_PLUGIN_LAYERS; if(!L) return;
+  Object.values(L).forEach(p=>{
+    DATA.push({ cat:p.name, ic:'⚡', color:p.color, pro:true, note:p.note,
+      items:p.keys.map(x=>({ k:x.k, d:x.cat+' — '+x.a, dr:!!x.inEngine })) });
+  });
+})();
 
 function renderCombo(spec){
   const seq = spec.includes('>');
@@ -349,7 +353,9 @@ DATA.forEach((sec,si)=>{
   const card = document.createElement('section');
   card.className='card'; card.dataset.cat=sec.cat;
   card.style.animationDelay=(si*45)+'ms';
-  card.innerHTML = `<h2><span class="ic">${sec.ic}</span>${sec.cat}<span class="n">${sec.items.length}</span></h2>` +
+  const proTag = sec.pro ? '<span style="font-size:9px;color:var(--warn);letter-spacing:1px;vertical-align:2px;margin-left:8px">\u25c6 PRO \u00b7 free in beta</span>' : '';
+  const noteLine = sec.note ? `<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);margin:-4px 0 10px">${sec.note}</div>` : '';
+  card.innerHTML = `<h2>${sec.color?`<span class="ic" style="color:${sec.color}">${sec.ic}</span>`:`<span class="ic">${sec.ic}</span>`}${sec.cat}${proTag}<span class="n">${sec.items.length}</span></h2>` + noteLine +
     sec.items.map(it=>{
       const txt=(it.k+' '+it.d).toLowerCase();
       // r291: link each shortcut to a drill that trains it (from the generated chord map).
@@ -396,31 +402,14 @@ qEl.addEventListener('input', apply);
 apply();
 </script>
 <script>
-/* ---- plugin layers: Macabacus + FactSet sections, each in its own accent ---- */
+/* r293: trademark hygiene for the vendor profiles now that they're first-class tabs */
 (function(){
   const host=document.querySelector('.wrap')||document.body;
-  const L=window.HOTKEY_PLUGIN_LAYERS; if(!L) return;
-  const sec=document.createElement('div');
-  let html='<h2 style="font-family:var(--mono);font-size:15px;margin:44px 0 6px">Plugin layers <span style="font-size:9px;color:var(--warn);letter-spacing:1px;vertical-align:2px">PRO \u00b7 free in beta</span></h2>'+
-    '<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:18px">Switch your keyboard profile in the trainer (\u2699 \u2192 \u2328) and the engine accepts these chords. Entries marked \u25cf are live in the trainer today; the rest are on the desk-reference for real Excel.</div>';
-  Object.values(L).forEach(p=>{
-    html+='<div style="border:1px solid '+p.color+'33;border-radius:14px;padding:18px 20px;margin-bottom:18px">'+
-      '<div style="font-family:var(--mono);font-weight:700;font-size:14px;color:'+p.color+';margin-bottom:4px">'+p.name+'</div>'+
-      '<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-bottom:14px">'+p.note+'</div>';
-    let lastCat=null;
-    p.keys.forEach(x=>{
-      if(x.cat!==lastCat){ lastCat=x.cat;
-        html+='<div style="font-family:var(--mono);font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:'+p.color+'aa;margin:12px 0 6px">'+x.cat+'</div>'; }
-      const keys=x.k.split('+').map(t=>'<kbd style="font-family:var(--mono);font-size:10.5px;background:var(--surface2);border:1px solid '+p.color+'55;border-bottom-width:2px;border-radius:5px;padding:2px 7px">'+t+'</kbd>').join('<span style="color:var(--faint)">+</span>');
-      html+='<div style="display:flex;align-items:center;gap:12px;padding:5px 0;font-family:var(--mono);font-size:12px">'+
-        '<span style="min-width:250px;display:flex;gap:3px;align-items:center;flex-wrap:wrap">'+keys+'</span>'+
-        '<span style="color:var(--text);flex:1">'+x.a+'</span>'+
-        (x.inEngine?'<span title="live in the trainer under this profile" style="color:'+p.color+'">\u25cf</span>':'')+
-        '</div>';
-    });
-    html+='</div>';
-  });
-  sec.innerHTML=html; host.appendChild(sec);
+  const d=document.createElement('div');
+  d.style.cssText='font-family:var(--mono);font-size:10.5px;color:var(--faint);margin:34px 0 0;line-height:1.8';
+  d.innerHTML='Macabacus is a trademark of Macabacus Inc.; FactSet is a trademark of FactSet Research Systems Inc. '+
+    'hotkey.gg is independent and not affiliated with or endorsed by either \u2014 the profiles above describe published default keyboard shortcuts for training compatibility, verified against each vendor\u2019s public documentation.';
+  host.appendChild(d);
 })();
 </script>
 </body>

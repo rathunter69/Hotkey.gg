@@ -40,7 +40,7 @@ const ALTS = [
       {sel:O.o.margin[0],keys:[...T('='+O.marginF),{key:'Enter'}]},                                 // margin via typed ref
       {sel:O.marginRng,  keys:[{key:'d',ctrl:true}]},
       {sel:O.marginRng,  keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(2)]},                 // percent + italic via RIBBON (Alt H P, Alt H 2)
-      {sel:O.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('a')]},                                  // box BEFORE bold (order swap)
+      {sel:O.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('s')]},                                  // outline BEFORE bold (r292: Outside Borders, not All)
       {sel:O.hdrRng,     keys:[{key:'Alt'},L('h'),D(1)]},                                            // bold header via ribbon (Alt H 1)
       {sel:O.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},   // top line $ 0-dec
       {sel:O.restRng,    keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},        // rest commas via Alt H K + trim

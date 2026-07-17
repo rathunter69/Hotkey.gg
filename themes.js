@@ -222,10 +222,10 @@ window.applyTheme = function(name){
   let saved = null;
   try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}
   if(saved && window.THEMES[saved]){ window.applyTheme(saved); return; }
-  try{
-    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-    window.applyTheme(prefersLight ? 'daylight' : 'default');
-  }catch(e){ window.applyTheme('default'); }
+  // r293 (Wolf): Daylight is the unconditional default everywhere — a fresh device /
+  // logged-out visitor always lands on light, matching the trainer (r238). A saved
+  // choice (local, or synced from the account by nav.js) still wins.
+  window.applyTheme('daylight');
 })();
 
 // Theme-name labels live in the page body, which doesn't exist yet when this runs in <head>.
@@ -662,12 +662,14 @@ window.hkBadge = function(id, earned, size, color, rarity){
   const hexIn='M13 5.1 L19.7 9 V17 L13 20.9 L6.3 17 V9 Z';
   let metal=null, regalia='';
   if(earned && rarity!==undefined && rarity!==null && isFinite(rarity)){
-    if(rarity<=3){ metal='#ffd76e';   // LEGENDARY — radiant: apex rays + shoulder sparks
+    // r293 (Wolf): mid-saturated metals so the tier reads on BOTH dark and light
+    // themes — the old pale gold/blue washed out to invisible on Daylight/Newsprint.
+    if(rarity<=3){ metal='#d99a1f';   // LEGENDARY — radiant gold: apex rays + shoulder sparks
       regalia='<path d="M13 -.2v2.6 M7.8 1l1 2.2 M18.2 1l-1 2.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>'+
               '<path d="M2.6 4.2l1.6 1.3 M23.4 4.2l-1.6 1.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".9"/>'; }
-    else if(rarity<=10){ metal='#e2574d';  // EPIC — crimson, side fins
+    else if(rarity<=10){ metal='#d64a3f';  // EPIC — crimson, side fins
       regalia='<path d="M1.8 10.6l2.2 1.1 M1.8 15.2l2.2-1.1 M24.2 10.6L22 11.7 M24.2 15.2L22 14.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".85"/>'; }
-    else if(rarity<=25){ metal='#8ab4ff';  // RARE — platinum blue, second inner ring
+    else if(rarity<=25){ metal='#3f7fe0';  // RARE — platinum blue, second inner ring
       regalia='<path d="M13 6.4 L18.6 9.7 V16.3 L13 19.6 L7.4 16.3 V9.7 Z" fill="none" stroke="currentColor" stroke-width=".6" opacity=".4"/>'; }
   }
   /* r240 (Wolf): per-FAMILY colour so the glyph wall isn't one gold hue. Explicit
@@ -697,6 +699,16 @@ window.hkBadge = function(id, earned, size, color, rarity){
 window.hkRarityTier = function(pct){
   if(pct===undefined||pct===null||!isFinite(pct)) return null;
   if(pct<=3) return 'legendary'; if(pct<=10) return 'epic'; if(pct<=25) return 'rare'; return null;
+};
+/* r293 (Wolf): one source of truth for the rarity word + its (cross-theme) metal +
+   a sort weight, so the wall can ORGANISE by rarity and every label/legend matches
+   the colour painted on the badge. weight: 0 legendary … 3 common (sort ascending). */
+window.hkRarityMeta = function(pct){
+  const t=window.hkRarityTier(pct);
+  if(t==='legendary') return { word:'legendary', abbr:'LEG', color:'#d99a1f', weight:0 };
+  if(t==='epic')      return { word:'epic',      abbr:'EPIC', color:'#d64a3f', weight:1 };
+  if(t==='rare')      return { word:'rare',      abbr:'RARE', color:'#3f7fe0', weight:2 };
+  return { word:'common', abbr:'', color:'var(--warn)', weight:3 };
 };
 /* r150: EFFECTIVE RARITY — metals were pure data (% of players holding it), which at
    beta scale reads all-gold (1 of 3 players = 33% = common). Each achievement now

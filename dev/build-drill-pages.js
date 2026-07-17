@@ -294,7 +294,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
 <style>${CSS}</style>
-<link rel="stylesheet" href="nav.css?v=174">
+<link rel="stylesheet" href="nav.css?v=175">
 <script src="drills.js?v=264"><\/script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
@@ -302,12 +302,12 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
   window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
   window.NAV_ACTIVE='';
 <\/script>
-<script src="themes.js?v=262"><\/script>
+<script src="themes.js?v=263"><\/script>
 <script type="application/ld+json">${ld}</script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=259"><\/script>
+<script src="nav.js?v=261"><\/script>
 <div class="wrap">`;
 
   const FOOT = `

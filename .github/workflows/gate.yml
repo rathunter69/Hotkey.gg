@@ -42,6 +42,8 @@ jobs:
         run: node dev/e2e-mac-input.js
       - name: Echo / follow-along
         run: node dev/e2e-echo.js
+      - name: Rapid-fire on the real grid
+        run: node dev/e2e-rapidfire.js
       - name: Drill pages in sync
         run: |
           node dev/build-drill-pages.js
