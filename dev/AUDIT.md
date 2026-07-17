@@ -1,5 +1,14 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r307 — the LANDING ZONE + tight bar (Wolf, watching a friend play)
+- **PASTE/MOVE DESTINATION GHOST:** while the clipboard is armed, a dashed accent outline
+  shows exactly where the copied/cut block will land from the current cell (footprint =
+  clipboard w×h, clamped to the grid; hidden while sitting on the source, while editing,
+  and on Esc/paste). Wolf watched a new player not know "where to go next" — the landing
+  zone now travels with the cursor. Verified live: 2×3 copy → ghost spans E9:F11 at E9,
+  Esc hides, zero page errors, screenshot on file.
+- **NO MORE BAR GAP:** the flex spacer left the mode bar — groups sit at a uniform 8px.
+
 ## r306 — MODE BAR to Wolf's order: modes → helpers → flair → settings, weight ∝ usage
 - **THE BAR, REORDERED (Wolf #35):** [modes] ◆ daily (ACCENT chip while unplayed — the one
   thing worth highlighting — reverting to a normal chip once done) · campaign · rapid-fire

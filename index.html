@@ -305,6 +305,13 @@
   td.sel-r{border-right:2px solid var(--accent)}
   @keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
   td.pasted{animation:pasteflash .5s ease-out}
+  /* r307 (Wolf): the LANDING ZONE — while the clipboard is armed, a dashed ghost shows
+     exactly where the copied/cut block will land from the current cell. Watching a new
+     player, "where do I go next" wasn't readable; now the destination footprint travels
+     with the cursor. */
+  .pastedest{position:absolute; display:none; pointer-events:none; z-index:5;
+    border:2px dashed var(--accent); opacity:.5; border-radius:2px;
+    background:color-mix(in srgb, var(--accent) 7%, transparent)}
   .marquee{position:absolute; display:none; pointer-events:none; z-index:6;
     background-color:var(--accent-glow);
     background-image:
@@ -1418,7 +1425,6 @@
           <button class="mb-dur" data-mode="rapidfire" data-dur="120">2 minutes</button>
         </div>
       </div>
-      <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; solution</button>
       <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
@@ -1462,7 +1468,7 @@
           <span class="fx"><i>fx</i></span>
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
-        <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
+        <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div><div class="pastedest" id="pastedest"></div></div>
       </div>
       <aside class="checklist" id="checklist"></aside>
     </div>
@@ -8175,11 +8181,31 @@ function render(){
     row+='</tr>'; g.innerHTML+=row;
   }
   positionMarquee();
+  positionPasteDest();
   if(pendingFlash){ const f=pendingFlash; pendingFlash=null;
     for(let r=f.r1;r<=f.r2;r++)for(let c=f.c1;c<=f.c2;c++){
       const td=document.querySelector(`td[data-r="${r}"][data-c="${c}"]`); if(td)td.classList.add('pasted'); } }
   updateChecklist();
   updateFormulaBar();
+}
+function positionPasteDest(){
+  const m=document.getElementById('pastedest'); if(!m) return;
+  const cb=S&&S.clipboard;
+  if(!cb || !cb.w || !cb.h || editing || demoPlaying){ m.style.display='none'; return; }
+  const r1=S.active.r, c1=S.active.c;
+  const r2=Math.min(S.ROWS, r1+cb.h-1), c2=Math.min(COLS, c1+cb.w-1);
+  const src=cb.rect;
+  if(src && r1===src.r1 && c1===src.c1){ m.style.display='none'; return; }   // still sitting on the source — the marquee already says it
+  const a=document.querySelector(`td[data-r="${r1}"][data-c="${c1}"]`);
+  const b=document.querySelector(`td[data-r="${r2}"][data-c="${c2}"]`);
+  if(!a||!b){ m.style.display='none'; return; }
+  const wrap=document.getElementById('gridwrap');
+  const wr=wrap.getBoundingClientRect(), ar=a.getBoundingClientRect(), br=b.getBoundingClientRect();
+  m.style.display='block';
+  m.style.left=(ar.left-wr.left+wrap.scrollLeft)+'px';
+  m.style.top=(ar.top-wr.top+wrap.scrollTop)+'px';
+  m.style.width=(br.right-ar.left)+'px';
+  m.style.height=(br.bottom-ar.top)+'px';
 }
 function positionMarquee(){
   const m=document.getElementById('marquee'); if(!m) return;
