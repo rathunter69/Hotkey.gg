@@ -331,9 +331,11 @@
 
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
      faint at rest, lit in Alt-mode. Mirrors Excel instead of popping a banner. */
-  .ribbon{display:flex; align-items:center; gap:7px; height:34px; overflow:hidden;
+  /* r302 (Wolf): was height:34px + overflow:hidden — long menus (Home) clipped their tail
+     options (Borders et al). The strip now wraps to a second line when a menu needs it. */
+  .ribbon{display:flex; align-items:center; flex-wrap:wrap; gap:4px 7px; min-height:34px; row-gap:2px;
     font-family:var(--mono); font-size:12px; margin:0; border:0; border-bottom:1px solid var(--line);
-    background:var(--surface2); border-radius:0; padding:0 12px}
+    background:var(--surface2); border-radius:0; padding:2px 12px}
   .ribbon .rhint{color:var(--faint); font-size:11px}
   .ribbon.show{background:var(--accent-glow)}   /* r58 flat pass: no shadows, no gradients — a quiet tint is enough */
   .ribbon .rhint{color:var(--muted); font-size:12px; display:inline-flex; align-items:center}
@@ -794,8 +796,12 @@
   .mb-tool.mb-daily{color:var(--accent); font-weight:700; border-color:var(--accent-dim);
     background:var(--accent-glow); letter-spacing:.02em}
   .mb-tool.mb-daily:hover{color:var(--accent); border-color:var(--accent)}
-  .mb-tool.mb-daily.undone{animation:dcpulse 2.4s ease-in-out infinite}
-  @keyframes dcpulse{0%,100%{box-shadow:0 0 0 0 var(--accent-glow)}50%{box-shadow:0 0 0 4px var(--accent-glow)}}
+  /* r302 (Wolf): the expanding outer box-shadow read as a sloppy/broken border. The
+     unplayed cue is now a small breathing dot INSIDE the chip — quiet, contained. */
+  .mb-tool.mb-daily.undone{position:relative}
+  .mb-tool.mb-daily.undone::after{content:''; position:absolute; top:4px; right:5px; width:6px; height:6px;
+    border-radius:50%; background:var(--accent); animation:dcdot 2.4s ease-in-out infinite}
+  @keyframes dcdot{0%,100%{opacity:.35}50%{opacity:1}}
   .mb-tool.mb-daily.done::after{content:' ✓'; opacity:.85}
   /* Daily Challenge hero modal */
   .dc-card{max-width:640px; width:94vw; text-align:left; position:relative}
@@ -843,10 +849,11 @@
   .sheettabs{display:flex; align-items:flex-end; gap:3px; padding:0 10px; height:38px;
     background:var(--surface2); border-top:1px solid var(--line); overflow-x:auto; scrollbar-width:none}
   .sheettabs::-webkit-scrollbar{display:none}
+  /* r302 (Wolf): the back control wears the SAME bubble chip as next — consistent pair */
   .st-lead{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.14em;
-    color:var(--gcol, var(--accent)); padding:0 12px 0 4px; align-self:center; white-space:nowrap; flex:none;
-    cursor:pointer; opacity:.9}
-  .st-lead:hover{opacity:1}
+    color:var(--gcol, var(--accent)); margin-right:8px; padding:3px 10px; align-self:center; white-space:nowrap; flex:none;
+    cursor:pointer; border:1px solid currentColor; border-radius:99px; opacity:.92; transition:.12s}
+  .st-lead:hover{opacity:1; background:color-mix(in srgb, currentColor 14%, transparent)}
   .st-tab{flex:0 1 auto; min-width:52px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;   /* r88: dense groups compress gracefully */
     font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
     border:1px solid var(--line); border-bottom:0; border-top:2.5px solid var(--gcol, var(--line));
@@ -1350,13 +1357,13 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
 <script src="drills.js?v=265"></script>
-<link rel="stylesheet" href="nav.css?v=176">
+<link rel="stylesheet" href="nav.css?v=177">
 <script src="themes.js?v=263"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=266"></script>
+<script src="nav.js?v=267"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1401,19 +1408,19 @@
         </div>
       </div>
       <span class="mb-spacer"></span>
-      <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
-      <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn mode</button>
+      <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; solution</button>
+      <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <button class="mb-tool" id="ghostToggle" data-tip="\u25c6 PRO \u2014 race a live ghost of your PB run \u00b7 pace counter is free \u00b7 click to toggle">\ud83d\udc7b ghost: on</button>
       <!-- r292 (Wolf): the "sheet" button retired -->
       <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
       <span style="position:relative; display:inline-flex">
-      <button class="mb-tool" id="wqBtn" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r297: ◈ — the ◆ was a glyph collision with the daily challenge chip -->
+      <button class="mb-tool" id="wqBtn" style="display:none" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r302 (Wolf): OFF the bar — one tight row of critical controls; weakness queue lives on (results-card 'n' chain + this dormant popover) until it earns a new home -->
       <div class="prefs-pop" id="wqPop" style="min-width:300px; flex-direction:column; gap:4px"></div>
       </span>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
-      <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily challenge</button>
+      <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
       <span class="mb-tool" id="proBadge" style="display:none; cursor:default; color:var(--warn); font-weight:700; border-color:var(--warn)"></span>
@@ -8261,7 +8268,7 @@ const TABS = [
 ];
 const MENUS = {
   'H':  [['V','Paste'],['1','Bold'],['2','Italic'],['F','Font'],['A','Align'],['5','Indent −'],['6','Indent +'],['H','Fill'],['B','Borders'],['J','Cell styles'],['W','Wrap'],['K','Comma'],['P','Percent'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['E','Clear'],['U','Σ Sum']],
-  'HV': [['S','Paste special…']],
+  'HV': [['V','Paste values'],['S','Paste special…']],   /* r302: HVV is real Excel — RF taught it but classic dead-ended */
   'HE': [['A','Clear all'],['F','Clear formats'],['C','Clear contents']],
   'HI': [['R','Insert rows'],['C','Insert columns']],
   'HD': [['R','Delete rows'],['C','Delete columns']],
@@ -8288,7 +8295,7 @@ const FMT_OPTS = [
   ['E','superscript \u00b9'],['K','strikethrough'],['A','center across'],
 ];
 const PASTE_OP_OPTS = [
-  ['N','None','none'],['M','Multiply','multiply'],['D','Add','add'],['I','Divide','divide'],   // Excel's accelerators: M / D(add) / I(divide)
+  ['O','None','none'],['M','Multiply','multiply'],['D','Add','add'],['I','Divide','divide'],   // r302 canon audit: O None / M Multiply / D Add / I Divide — N was WRONG (it's Validation in the real dialog)
 ];
 let pasteOp='none';
 const PASTE_OPTS = [
@@ -9677,6 +9684,7 @@ function applyRibbon(key){
   }
   // inside a tab/menu
   const np=path.join('')+key;
+  if(np==='HVV'){ pushUndo(); doPaste('values'); commitAction(); return exitRibbon(true); }   /* r302: real Excel Alt H V V — paste values without the dialog */
   if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; pasteOp='none'; drawRibbon(); return; }
   if(np==='OE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route
   if(np==='HFC'){ dialog='fontcolor'; fontColorIdx=0; drawRibbon(); return; }
@@ -10822,8 +10830,8 @@ document.addEventListener('keydown',hkRawE=>{
     if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
     if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
     if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
-    if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
-    if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=1;}); commitAction(); return; }
+    /* r302 canon audit: the dead duplicate $/% branches are GONE — the % dup carried
+       decimals:1 (canon is 0) and was one reorder away from silently un-canoning percent */
     if(k==='~'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+~'); pushUndo(); eachSel(c=>{c.fmtStyle=null;c.decimals=0;}); commitAction(); return; }
   }
 },{capture:true});
@@ -12531,9 +12539,12 @@ function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
   const xp=(typeof window.__srvXp==='number') ? window.__srvXp : localXP(nsol); window.__lvlXp=xp;
   const L=lvlDetail(xp);
   el.style.display='inline-flex';
-  el.innerHTML='LVL '+L.lvl+' <span class="lvl-bar"><span style="width:'+L.pct+'%"></span></span>';
+  // r302 (Wolf): the CHIP carries the number \u2014 "LVL 14" text + a wide xp bar beside a
+  // 14-chip was redundant AND the widest thing on the row (it forced the wrap). Icon+number
+  // only; the bar/progress detail lives one click away (openLevelProgress) + in the title.
+  el.innerHTML=(window.hkLevelChip ? window.hkLevelChip(L.lvl,22) : 'LVL '+L.lvl);
   el.style.cursor='pointer'; el.onclick=openLevelProgress;   // r211: show progress first, not the xp explanation
-  el.title=L.into+' / '+L.need+' xp \u00b7 '+Math.max(0,L.need-L.into)+' to LVL '+(L.lvl+1); }
+  el.title='LVL '+L.lvl+' \u00b7 '+L.into+' / '+L.need+' xp \u00b7 '+Math.max(0,L.need-L.into)+' to LVL '+(L.lvl+1); }
   /* r101: a stale second el.title line here referenced bare `l` (not L.lvl) \u2014 ReferenceError
      on EVERY solve, thrown inside the hotkey_solves .then (async, so the try/catch never saw it). */
 function renderStreak(){ const el=$('streakBadge'); if(!el) return;

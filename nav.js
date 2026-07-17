@@ -360,16 +360,17 @@
         total, rank: idx >= 0 ? idx + 1 : null,
         time: mine ? mine.time_ms : null,
         leader: total ? best[0].time_ms : null,
-        pct: idx >= 0 ? idx / total : null,
+        pct: idx >= 0 ? (total > 1 ? idx / (total - 1) : 0) : null,   // r302: idx/(n-1), the SAME percentile HK_RANK.standing uses everywhere else
       };
     });
     const attempted = drills.filter(d => d.rank !== null);
-    // r112: SHRUNK rating (HK_RANK.ratingOf), not the raw mean — tier thresholds are
-    // calibrated to the shrunk scale; the raw mean gave the card a different tier than the boards.
-    const avgPct = attempted.length
-      ? (window.HK_RANK ? window.HK_RANK.ratingOf(attempted.map(d=>({pct:d.pct, n:d.total})))
-                        : attempted.reduce((a,d) => a + d.pct, 0) / attempted.length)
-      : null;
+    /* r302 (Wolf, THIRD recurrence of "my rank differs by surface"): this file used to
+       hand-roll the standing with pct = idx/total while HK_RANK.standing (stats, boards,
+       desks) uses idx/(n-1) — on small fields that's a different tier. ONE calc now:
+       the shared standing. The hand-rolled path is gone, not patched. */
+    const __st = window.HK_RANK ? window.HK_RANK.standing(runs, me_id, MENU_ORDER) : null;
+    const avgPct = __st ? __st.avgPct
+      : (attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null);
     const myRuns = runs.filter(x => x.user_id === me_id);
     let _chordFreq={}, _totKeys=0;
     try{
@@ -383,8 +384,8 @@
     }catch(e){}
     const _perBoard={}; MENU_ORDER.forEach(k=>{ _perBoard[k]=[]; const seenB={};
       runs.forEach(x=>{ if(x.challenge===k && !seenB[x.user_id]){ seenB[x.user_id]=true; _perBoard[k].push(x.user_id); } }); });
-    return { drills, attempted: attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs, _allRuns: runs, _perBoard, _chordFreq, _totKeys,
-      wsum: drills.reduce((a,x)=>a+(x.rank!==null?Math.min(1,Math.log2((x.total||1)+1)/Math.log2(9)):0),0) };
+    return { drills, attempted: __st ? __st.att : attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs, _allRuns: runs, _perBoard, _chordFreq, _totKeys,
+      wsum: __st ? __st.wsum : drills.reduce((a,x)=>a+(x.rank!==null?Math.min(1,Math.log2((x.total||1)+1)/Math.log2(9)):0),0) };   /* r302: att + wsum + avgPct all come from the ONE shared standing */
   }
   /* ---- XP & LEVELS ----
      XP = 15/clean solve + 50/distinct drill + 25/top-10 + 100/podium + 250/crown.
@@ -772,7 +773,7 @@
     let lvlHtml='';
     try{ const xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
       if(xp>0 && window.hkLevelChip){ const L=levelOf(xp);
-        lvlHtml='<span class="nav-lvl" id="navLvl" title="LVL '+L.lvl+' \u00b7 '+L.into+'/'+L.need+' xp \u2014 levels are reps; they never decay">'+window.hkLevelChip(L.lvl,24)+'<b class="nav-lvl-t">LVL '+L.lvl+'</b></span>'; } }catch(e){}
+        lvlHtml='<span class="nav-lvl" id="navLvl" title="LVL '+L.lvl+' \u00b7 '+L.into+'/'+L.need+' xp \u2014 levels are reps; they never decay">'+window.hkLevelChip(L.lvl,24)+'</span>'; } }catch(e){}   // r302 (Wolf): the chip already carries the number — 'LVL 14' text beside a 14-chip was redundant
     slot.innerHTML = lvlHtml +
       '<div class="user-menu">' +
         '<button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false">' +

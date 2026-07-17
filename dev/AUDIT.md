@@ -1,5 +1,27 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r302 — ONE RANK EVERYWHERE (structural, 3rd recurrence) + Wolf's visual batch
+- **THE RANK MISMATCH, KILLED AT THE ROOT.** Wolf (nav said Associate, stats said First-Year
+  Analyst — third report of this class): every surface used the SAME tierOf, but nav.js
+  hand-rolled its standing with **pct = idx/total** while HK_RANK.standing (stats, boards,
+  desks) uses **pct = idx/(n-1)** — a different percentile on small fields → a different tier.
+  nav.js now calls the ONE shared HK_RANK.standing for avgPct/att/wsum (hand-rolled path
+  deleted, per-drill display pct aligned), and stats.html WRITES THROUGH its freshly computed
+  tier to the shared nav-pill cache + repaints the pill in place — the top bar can never
+  disagree with the page you're reading. (The game-page pill already did both, r292.)
+- **Visual batch (Wolf):** daily-challenge unplayed cue is a small breathing dot INSIDE the
+  chip (the expanding outer box-shadow read as a broken border) · ribbon strip WRAPS instead
+  of clipping (Home's tail options — Borders — were cut at 34px fixed height; verified all 20
+  options visible) · tab-bar back control wears the same bubble chip as next · top-nav labels
+  now ≥1120px only (crowded/mid-cut between 900-1120) · level chip is icon+number only in nav
+  AND the mode bar ("14 · LEVEL 14" was redundant and the xp bar was the widest thing on the
+  row) · weakness button OFF the mode bar (queue survives via the results-card 'n' chain) ·
+  labels trimmed (solution/learn/daily) — **mode bar is ONE row at 1150/1280/1440** (verified).
+- Deferred from this Wolf batch (queued): sheet-tabs two-page rework · ranked opt-in flow +
+  unranked card state + LP-style progression design · keyboard-selector move to the bar ·
+  seeded test users · picker-opens-at-current-drill.
+- GATE: onboard 29 · parity 124 · mode-bar row + ribbon probes · CI full gate on the PR.
+
 ## r301 — RAPID-FIRE OVERHAUL (Wolf's live spec, executed in full)
 - **THE REAL RIBBON, IN RAPID-FIRE.** rapidKey's matchers still own scoring, but every Alt-walk
   now ECHOES into the classic ribbon strip (same MENUS, same KeyTips, same screen spot): Alt
