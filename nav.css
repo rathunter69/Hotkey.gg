@@ -27,7 +27,9 @@ body{padding-top:14px}
 .tl-label{display:none}
 /* r297 (nav audit): desktop shows the section NAMES, not five bare glyphs — "desks" and
    "reference" were unguessable from their icons alone. Mobile keeps icon-only (burger has labels). */
-@media (min-width: 900px){ .topnav .tl-label{display:inline; font-size:12.5px} }
+@media (min-width: 1120px){ .topnav .tl-label{display:inline; font-size:12.5px} }
+/* r302 (Wolf): labels only when there's truly room — between 900-1120px they crowded and
+   mid-cut on resize; below the breakpoint it's clean icons (hover titles carry the names) */
 .topnav-link:hover{color:var(--text); background:var(--surface)}
 .topnav-link.active{color:var(--accent); background:var(--surface)}
 .topnav-tools{display:flex; align-items:center; gap:2px; margin-left:auto}
