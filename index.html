@@ -1411,16 +1411,7 @@
       <button class="mb-mode active" id="mbClassic" data-mode="classic">
         <span class="ico">●</span>classic
       </button>
-      <div class="mb-mode-wrap">
-        <button class="mb-mode" id="mbMarathonBtn" data-mode="marathon" aria-haspopup="true">
-          <span class="ico">⏱</span>marathon<span class="caret">▾</span>
-        </button>
-        <div class="mb-popover" id="mbMarathonPop">
-          <button class="mb-dur" data-mode="marathon" data-dur="300">5 minutes</button>
-          <button class="mb-dur" data-mode="marathon" data-dur="600">10 minutes</button>
-          <button class="mb-dur" data-mode="marathon" data-dur="900">15 minutes</button>
-        </div>
-      </div>
+      <!-- r292 (Wolf): marathon mode retired from the UI (rapid-fire covers timed play). -->
       <div class="mb-mode-wrap">
         <button class="mb-mode" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true">
           <span class="ico">⚡</span>rapid-fire<span class="caret">▾</span>
@@ -1441,10 +1432,7 @@
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <button class="mb-tool" id="ghostToggle" data-tip="PB pace counter + cursor ghost \u2014 click to toggle">\ud83d\udc7b ghost: on</button>
-      <span style="position:relative; display:inline-flex">
-      <button class="mb-tool" id="dailyBtn" data-tip="the morning sheet — three drills for today: the daily, a weak spot, and fresh ground">⚡ sheet</button>
-      <div class="prefs-pop" id="sheetPop" style="min-width:290px; flex-direction:column; gap:4px"></div>
-      </span>
+      <!-- r292 (Wolf): the "sheet" button retired -->
       <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
       <span style="position:relative; display:inline-flex">
       <button class="mb-tool" id="wqBtn" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c6; weakness</button>
@@ -10670,7 +10658,7 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
     const anchor=document.getElementById('navShortcuts');
     if(anchor){ anchor.after(pBtn); anchor.after(sBtn); } else { tools.prepend(pBtn); tools.prepend(sBtn); }
   } }
-$('dailyBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); });   // r140: the sheet owns the button
+{ const _db=$('dailyBtn'); if(_db) _db.addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); }); }
 /* ---- r157: THE WEAKNESS QUEUE (PRO pillar #2; free in beta via requirePro) ----
    The site builds the session: score every drill from LOCAL data only —
    PB vs par (known weakness), never-cleared (unknown weakness, progression-
@@ -11643,7 +11631,7 @@ function toggleModePop(btn, popId){
   closeAllModePops();
   if(!wasOpen){ pop.classList.add('show'); btn.classList.add('open'); }
 }
-$('mbMarathonBtn').addEventListener('click', e=>{ e.stopPropagation(); toggleModePop(e.currentTarget,'mbMarathonPop'); });
+{ const _mb=$('mbMarathonBtn'); if(_mb) _mb.addEventListener('click', e=>{ e.stopPropagation(); toggleModePop(e.currentTarget,'mbMarathonPop'); }); }
 $('mbRapidBtn').addEventListener('click', e=>{ e.stopPropagation(); toggleModePop(e.currentTarget,'mbRapidPop'); });
 $('mbClassic').addEventListener('click', e=>{ e.stopPropagation(); closeAllModePops(); /* classic is the default — no popover, just dismiss any open one */ });
 // click anywhere outside a mode pill or its popover closes whichever's open
