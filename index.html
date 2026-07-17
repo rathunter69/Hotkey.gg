@@ -169,13 +169,14 @@
   td.spill{overflow:visible; z-index:3}   /* r107: Excel-parity text spill (see render) */
   td.spill .sp{position:absolute; left:9px; top:0; bottom:0; display:flex; align-items:center;
     white-space:nowrap; overflow:hidden; pointer-events:none; text-align:left}
-  /* r261: a spilling cell that is the active/selected anchor carries its highlight across the WHOLE cells
-     the text spans — backgrounds snap to cell edges, never a partial cell (matches Excel's whole-cell fill).
-     The .sphi box paints the glow/outline; the text span then renders on top of it. */
+  /* r312 (Wolf): a spilling cell's highlight is now SINGLE-CELL, not spanning. The old r261
+     spanned the glow across every covered cell, so selecting A9 (with text spilling into B9:D9)
+     PAINTED B9:D9 too — it read as "the whole range is selected." Excel boxes only the source
+     cell; the text still spills as display. .sphi width is now the cell's own width (set in render). */
   td.active.spill, td.sel.spill{outline:none; background:transparent}
   td.spill .sphi{position:absolute; left:0; top:0; bottom:0; pointer-events:none}
-  td.active.spill .sphi{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow)}
-  td.sel.spill .sphi{background:var(--accent-glow)}
+  td.active.spill .sphi{outline:2.5px solid var(--cell-cursor); outline-offset:-2px; background:var(--active-fill)}
+  td.sel.spill .sphi{background:var(--sel-grey)}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
   td.fill-blue{background:#9cc3e8 !important; color:#153c7a}   /* r160: #dbeafe was 1.05:1 vs paper sheets — invisible fill */
@@ -294,26 +295,37 @@
   .taskline{display:none}   /* retired r49 — the sheet-skinned checklist carries the task; req text lives in the picker */
   .taskline em{font-style:normal; color:var(--accent); font-weight:700}
   .taskline .tl-dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:9px; vertical-align:1px}
-  td.active{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow); z-index:2}
+  /* r312 (Wolf): the exact Excel model — GREY fill for the selection range, DARK-GREEN box for
+     the active cell (lighter green on dark sheets so it stays the brightest mark). The active
+     cell has no grey fill (it reads as the anchor); the range border is green like Excel. */
+  :root{ --cell-cursor:#1a7a45; --active-fill:rgba(26,122,69,.13); --sel-grey:rgba(64,68,78,.15); }
+  html[data-dark="1"]{ --cell-cursor:#7ee0ad; --active-fill:rgba(126,224,173,.16); --sel-grey:rgba(220,225,235,.13); }
+  td.active{outline:2.5px solid var(--cell-cursor); outline-offset:-2px; background:var(--active-fill); z-index:4}
   /* Formula pointer — appears on the cell whose reference is currently being inserted into the formula bar.
      Dashed border reads distinct from the solid active-cell outline, and the warn color marks "this is where the formula is grabbing from". */
   td.point{outline:2px dashed var(--warn); outline-offset:-2px; background:rgba(224,175,104,.12); z-index:3}
-  td.sel{background:var(--accent-glow)}
-  td.sel-t{border-top:2px solid var(--accent)}
-  td.sel-b{border-bottom:2px solid var(--accent)}
-  td.sel-l{border-left:2px solid var(--accent)}
-  td.sel-r{border-right:2px solid var(--accent)}
+  td.sel{background:var(--sel-grey)}                                  /* r312: grey selection fill */
+  td.active.sel{background:var(--active-fill)}                        /* the anchor keeps its green, not grey */
+  td.sel-t{border-top:2px solid var(--cell-cursor)}                   /* green range border, Excel-like */
+  td.sel-b{border-bottom:2px solid var(--cell-cursor)}
+  td.sel-l{border-left:2px solid var(--cell-cursor)}
+  td.sel-r{border-right:2px solid var(--cell-cursor)}
+  /* r312 (Wolf): the fill-handle square, Excel-style, at the current cell's bottom-right corner */
+  td.fh::after{content:''; position:absolute; right:0; bottom:0; width:7px; height:7px;
+    background:var(--cell-cursor); box-shadow:-1px -1px 0 1px var(--surface); z-index:6}
+  td.editing.fh::after, td.point.fh::after{display:none}   /* no handle mid-edit / while pointing */
   @keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
   td.pasted{animation:pasteflash .5s ease-out}
   /* r307 (Wolf): the LANDING ZONE — while the clipboard is armed, a dashed ghost shows
      exactly where the copied/cut block will land from the current cell. Watching a new
      player, "where do I go next" wasn't readable; now the destination footprint travels
      with the cursor. */
+  /* r312 (Wolf): the paste TARGET reads as a clear framed landing zone (a solid green box, no
+     block fill) so "where does it go" is obvious — the copy source stays marching-ants only. */
   .pastedest{position:absolute; display:none; pointer-events:none; z-index:5;
-    border:2px dashed var(--accent); opacity:.5; border-radius:2px;
-    background:color-mix(in srgb, var(--accent) 7%, transparent)}
+    border:2px solid var(--cell-cursor); opacity:.95; border-radius:2px;
+    box-shadow:0 0 0 2px color-mix(in srgb, var(--cell-cursor) 22%, transparent)}
   .marquee{position:absolute; display:none; pointer-events:none; z-index:6;
-    background-color:var(--accent-glow);
     background-image:
       linear-gradient(90deg,var(--accent) 50%,transparent 50%),
       linear-gradient(90deg,var(--accent) 50%,transparent 50%),
@@ -1628,6 +1640,7 @@ const __sbReady = new Promise(resolve=>{
   const mk=()=>{ if(!sb && SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase){
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       window.sb = sb;   // shared nav (nav.js) drives the nav bar, user menu, and player card
+      try{ const gb=document.getElementById('guestBanner'); if(gb) gb.remove(); }catch(e){}   // r312: lib landed late — retract any guest banner
       if(window.navRefreshAuth) setTimeout(window.navRefreshAuth, 0);
     } resolve(sb); };
   window.__sbInit = mk;                 // the injected <script>'s onload calls this
@@ -8164,6 +8177,9 @@ function render(){
       if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2) cls.push(guided?'gtarget':'ttarget');
       if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
+      // r312 (Wolf): Excel's fill-handle — the tiny green square at the selection's bottom-right
+      // (or on the lone active cell when nothing's ranged) that marks the current cell.
+      if(S.sel){ if(r===sr.r2&&c===sr.c2) cls.push('fh'); } else if(isActive){ cls.push('fh'); }
       let txt=dispText(cell);
       if(editing && isActive){
         // Editing cell: show formula buffer with colored refs (matches what's in the formula bar)
@@ -8192,7 +8208,7 @@ function render(){
             cls.push('spill');
             // r261: when this spilling cell is the highlighted anchor, glow/outline covers the whole cells
             // the text spans (no partial-cell backgrounds); the text then paints on top
-            const hi = (isActive || (inSel && S.sel)) ? '<span class="sphi" style="width:'+coveredW+'px"></span>' : '';
+            const hi = (isActive || (inSel && S.sel)) ? '<span class="sphi" style="width:'+__ew[c]+'px"></span>' : '';   // r312: single-cell box, not the spanned coveredW
             txt=hi+'<span class="sp" style="max-width:'+(spillW-12)+'px">'+txt+'</span>';
           }
         }
@@ -11238,12 +11254,17 @@ $('startBtn').addEventListener('click', tryEnter);
   const ft=$('navThemes'); if(ft) ft.addEventListener('click', e=>{ e.preventDefault(); openThemes(); });
   const nb=$('navBurger');    if(nb) nb.addEventListener('click', ()=>{ const l=document.querySelector('.topnav-pages'); if(l) l.classList.toggle('open'); }); }
 
-// guest-mode banner when Supabase isn't configured (no leaderboard, no saves)
-if(!sb){
+// guest-mode banner when Supabase truly isn't reachable (no leaderboard, no saves).
+// r312 (Wolf): supabase-js is deferred (r285), so at parse time sb is ALWAYS still null —
+// the old synchronous check flashed this banner on every normal load. Wait for __sbReady
+// (the lib landing) or a timeout for a genuinely dead CDN; only then, if sb is still null,
+// show it. If the lib lands late, mk() clears any banner it finds.
+Promise.race([__sbReady, new Promise(r=>setTimeout(r,5000))]).then(()=>{
+  if(sb || document.getElementById('guestBanner')) return;
   const ban=document.createElement('div'); ban.id='guestBanner';
   ban.innerHTML='⚠ <b>Guest mode</b> — Supabase not configured, runs won\'t save and there\'s no login. <a href="https://supabase.com/docs/guides/auth" target="_blank">setup →</a>';
   document.body.appendChild(ban);
-}
+});
 { const MODE_BLURBS = {
     classic:   "Solve drills at your own pace · the timer's just feedback.",
     rapidfire: "One cell, one chord, one transform · go as fast as you can recall.",
