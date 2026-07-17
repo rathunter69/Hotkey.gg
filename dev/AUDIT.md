@@ -1,5 +1,23 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r300 — unique handle suggestions + rapid-fire canon-border cards (Wolf batch)
+- **HANDLE SUGGESTIONS ARE COLLISION-CHECKED (Wolf: "make sure it's truly unique").**
+  New `hkSuggestHandleUnique(n)`: batches candidates, ONE profiles query per deal
+  (case-insensitive compare), redraws taken names up to 4 rounds, numbered fallback.
+  The handle modal deals its 3 chips instantly (sync) then quietly swaps any that
+  turn out taken; account.html's suggest button same. Offline the check degrades to
+  the old behavior. Server unique constraint remains the hard gate.
+- **RAPID-FIRE gains the r298 canon borders** — Double bottom (Alt H B B, "close the
+  grand total") and Top & bottom (Alt H B D). Flash Fill deliberately NOT a rapid-fire
+  card (it needs a source block + example, not a single-cell op) — it gets its own
+  drill (queued). RF suite 12 PASS.
+- **Email reminders / verification customization (Wolf asked):** still Wolf-gated —
+  dev/EMAIL_SETUP.md step 1 (domain mailbox) hasn't happened; templates + weekly
+  digest (deployed, dormant since r118) hang off it.
+- Remaining queue after this round: onboarding spotlight rebuild (spec ready, next big
+  round) · modes-rail mock · tier sub-buckets + LP-style rank design (Wolf-input) ·
+  F9 + tie-out drill · icon sweep (screenshot-first) · copy-inventory batch markup.
+
 ## r299 — sign-out feels like a reset, deterministic login, Alt+↓ filter dropdown, hidden-row cue (Wolf batch)
 - **SIGN-OUT NOW READS AS A RESET (Wolf).** The r296 land-home redirect carries `?fresh=1`; the
   trainer opens on DRILL ONE (last-drill memory is wiped with the account mirrors) and toasts

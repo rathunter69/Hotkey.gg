@@ -1354,7 +1354,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=265"></script>
+<script src="nav.js?v=266"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -11291,6 +11291,16 @@ const RF_OPS = [
     instr: ()=>'Add a bottom border (subtotal line)',
     show: c=>({text:c.text}),
     solved: c=>({text:c.text, borderBottom:true}) },
+  { op:'border_dbl', label:'Double bottom', keys:['Alt','H','B','B'], matchSeq: RFM.altSeq(['h','b','b']),   /* r300: the grand-total rule (canon r298) */
+    make: ()=> ({text:'Total'}),
+    instr: ()=>'Close the grand total — double bottom border',
+    show: c=>({text:c.text, bold:true}),
+    solved: c=>({text:c.text, bold:true, borderBottom:true}) },
+  { op:'border_topbot', label:'Top & bottom', keys:['Alt','H','B','D'], matchSeq: RFM.altSeq(['h','b','d']),   /* r300 */
+    make: ()=> ({text:pickHeader()}),
+    instr: ()=>'Rule it top and bottom in one move',
+    show: c=>({text:c.text}),
+    solved: c=>({text:c.text, borderTop:true, borderBottom:true}) },
   // Filter activation — pure muscle-memory drill for Ctrl+Shift+L. No filter engine; the ▼ caret
   // on solve signals "filter dropdown now available" the same way Excel's header changes after activation.
   { op:'filter', label:'Filter', keys:['Ctrl','Shift','L'], match: RFM.ctrlShift('L','l'),
@@ -13749,12 +13759,18 @@ function promptHandle(){
   const sugg=$('handleSugg');
   if(sugg && window.hkSuggestHandle){
     const deal=()=>{ sugg.innerHTML='';
+      const chips=[];
       for(let i=0;i<3;i++){ const c=document.createElement('span'); c.textContent=window.hkSuggestHandle();
         c.style.cssText='font-family:var(--mono);font-size:11.5px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--muted)';
-        c.onclick=()=>{ if(inp){ inp.value=c.textContent; inp.focus(); } }; sugg.appendChild(c); }
+        c.onclick=()=>{ if(inp){ inp.value=c.textContent; inp.focus(); } }; sugg.appendChild(c); chips.push(c); }
       const r=document.createElement('span'); r.textContent='\u2684 reroll';
       r.style.cssText='font-family:var(--mono);font-size:11.5px;padding:5px 10px;cursor:pointer;color:var(--accent)';
-      r.onclick=deal; sugg.appendChild(r); };
+      r.onclick=deal; sugg.appendChild(r);
+      // r300 (Wolf): verify the deal against profiles \u2014 any TAKEN chip is quietly swapped
+      // for a checked-free one, so a suggestion can never bounce off the unique constraint
+      try{ if(window.hkSuggestHandleUnique) window.hkSuggestHandleUnique(3).then(u=>{
+        chips.forEach((c,i)=>{ if(u[i] && c.isConnected) c.textContent=u[i]; }); }).catch(()=>{}); }catch(e){}
+    };
     deal();
   }
   $('handleSave').onclick=saveHandle;

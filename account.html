@@ -97,7 +97,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=265"></script>
+<script src="nav.js?v=266"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -276,7 +276,8 @@ async function load(){
     th.appendChild(b); }); }
     { const sg=document.getElementById('acHandleSugg');
     if(sg) sg.onclick=()=>{ const el=document.getElementById('acHandle');
-      if(el && window.hkSuggestHandle){ el.value=window.hkSuggestHandle(); el.focus(); } }; }
+      if(el && window.hkSuggestHandle){ el.value=window.hkSuggestHandle(); el.focus();
+        try{ if(window.hkSuggestHandleUnique) window.hkSuggestHandleUnique(1).then(u=>{ if(u[0] && el.value && document.activeElement===el) el.value=u[0]; }).catch(()=>{}); }catch(e){} } }; }   // r300: swap in a collision-checked handle
   document.getElementById('acHandleSave').onclick=async()=>{
     const v=document.getElementById('acHandle').value.trim().slice(0,24);
     if(!/^[A-Za-z0-9_]{2,24}$/.test(v)){ say('acHandleMsg','2\u201324 characters \u2014 letters, numbers, and underscores only.',true); return; }

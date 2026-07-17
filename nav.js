@@ -834,6 +834,30 @@
     }
     return 'Anchored_Analyst'+String(Math.floor(Math.random()*90)+10);
   };
+  // r300 (Wolf): suggestions must be TRULY FREE — never deal a handle that's already taken.
+  // One batched profiles query per deal (case-insensitive compare), a few rounds of redraws,
+  // then a numbered fallback that's collision-proof in practice. Sync callers can still use
+  // hkSuggestHandle directly; this is the checked path the UI prefers.
+  window.hkSuggestHandleUnique = async function(n){
+    n=n||3;
+    const out=[], seen=new Set();
+    for(let round=0; round<4 && out.length<n; round++){
+      const cand=[];
+      while(cand.length < (n-out.length)*2 && cand.length<12){
+        const h=window.hkSuggestHandle();
+        if(!seen.has(h.toLowerCase())){ seen.add(h.toLowerCase()); cand.push(h); } }
+      const taken=new Set();
+      try{
+        if(window.sb){
+          const {data}=await window.sb.from('profiles').select('handle').in('handle',cand);
+          (data||[]).forEach(r=>taken.add(String(r.handle||'').toLowerCase()));
+        }
+      }catch(e){}
+      for(const h of cand){ if(out.length<n && !taken.has(h.toLowerCase())) out.push(h); }
+    }
+    while(out.length<n) out.push((window.hkSuggestHandle()+String(Math.floor(Math.random()*900)+100)).slice(0,24));
+    return out;
+  };
   window.navRefreshAuth = function(){ try{ if(window.__navAuthKick) window.__navAuthKick(); }catch(e){} };
   // r134: THE player card (index's r13-era inline copy deleted — this is the only renderer)
   window.openProfile = openProfile;
