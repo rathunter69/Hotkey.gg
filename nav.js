@@ -1026,12 +1026,12 @@
 
 
 /* ---- r77: celebration engine (shared by every page) ---- */
-window.hkConfetti = function(host, colors){
+window.hkConfetti = function(host, colors, count){
   if(!host) return;
   colors = colors && colors.length ? colors : ['#6ec9a0','#e3b341','#8ab4ff','#e0879e','#7fd4c1','#e0cf7a'];
   const box=document.createElement('div'); box.className='hk-confetti';
   let bits='';
-  for(let i=0;i<38;i++){
+  for(let i=0;i<(count||38);i++){
     bits+='<i style="left:'+(Math.random()*100).toFixed(1)+'%;background:'+colors[i%colors.length]+
       ';--rz:'+(360+Math.random()*540).toFixed(0)+'deg;animation-duration:'+(1.1+Math.random()*.9).toFixed(2)+
       's;animation-delay:'+(Math.random()*.35).toFixed(2)+'s"></i>';
@@ -1099,7 +1099,7 @@ window.__hkCelQ=[]; window.__hkCelOpen=false;
 window.hkCelebrate = function(o){
   if(window.__hkCelOpen){ window.__hkCelQ.push(o); return; }
   window.__hkCelOpen=true;
-  const w=document.createElement('div'); w.className='hk-cel-wrap'+(o.rankUp?' hk-cel-rank':'');
+  const w=document.createElement('div'); w.className='hk-cel-wrap'+(o.rankUp?' hk-cel-rank':'')+(o.big?' hk-cel-big':'');
   w.innerHTML='<div class="hk-cel">'+
     '<div class="hk-cel-cap">'+(o.cap||'nice')+'</div>'+
     '<div class="hk-cel-body">'+
@@ -1111,6 +1111,7 @@ window.hkCelebrate = function(o){
   document.body.appendChild(w);
   try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}   // r176: a focused results button must not act on Enter
   window.hkConfetti(w.querySelector('.hk-cel-body'), o.colors);
+  if(o.big) window.hkConfetti(w, o.colors, 80);   /* r305: level/rank moments rain across the whole overlay, not just the card */
   let done=false;
   const close=()=>{ if(done) return; done=true;
     try{ w.remove(); }catch(e){}

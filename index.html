@@ -603,6 +603,14 @@
   .rm-stats b{display:block; color:var(--text); font-size:17px; font-weight:500; margin-top:4px;
     letter-spacing:0; text-transform:none}
   .rm-note{font-family:var(--mono); font-size:11px; color:var(--warn); margin:-8px 0 14px}
+    /* r305: the ONE xp bar — fills from pre-run xp to now; crossing a level sweeps + refills */
+  .rm-xpwrap{margin-top:11px}
+  .rm-xprow{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--mono); font-size:10px; color:var(--faint); margin-bottom:4px}
+  .rm-xprow .rm-xpgain{color:var(--accent); font-size:12.5px; font-weight:700}
+  .rm-xpbar{height:7px; background:var(--surface2); border-radius:99px; overflow:hidden}
+  .rm-xpbar i{display:block; height:100%; width:0; background:var(--accent); border-radius:99px; transition:width .72s cubic-bezier(.22,.9,.35,1)}
+  .rm-xpsub{font-family:var(--mono); font-size:10px; color:var(--faint); margin-top:5px; text-align:center}
+  .rm-xpsub a{cursor:pointer; text-decoration:underline; text-underline-offset:2px}
   .rm-scores{border-top:1px solid var(--line); padding-top:14px; margin-bottom:18px;
     display:flex; flex-direction:column; gap:3px}
   .rm-scores-h{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
@@ -1360,13 +1368,13 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
 <script src="drills.js?v=265"></script>
-<link rel="stylesheet" href="nav.css?v=177">
+<link rel="stylesheet" href="nav.css?v=178">
 <script src="themes.js?v=263"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=267"></script>
+<script src="nav.js?v=268"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -8646,7 +8654,8 @@ function checkWin(){
     if(lv(nxt)>lv(est) && window.hkCelebrate){
       window.hkCelebrate({cap:'level up', title:'LEVEL '+lv(nxt),
         sub:'+'+xpGain+' xp \u00b7 keep stacking',
-        iconHtml:(window.hkLevelRing?window.hkLevelRing(lv(nxt), 4, 84):'')});
+        big:true,   /* r305 (Wolf): a level-up is a MOMENT — full-screen burst, popped card */
+        iconHtml:(window.hkLevelChip?window.hkLevelChip(lv(nxt), 64):(window.hkLevelRing?window.hkLevelRing(lv(nxt), 4, 84):''))});
     }
   }catch(e){} }
   let __prevBest=null, __pbDelta=null;
@@ -8912,7 +8921,7 @@ function _showResults(o){
     `<div class="rm-rank" id="rmRank"></div>`+
     `</div>`+
     `<div class="rm-opts">`+
-    `<button class="rm-key" data-act="again"><kbd>↵ enter</kbd>again</button>`+
+    `<button class="rm-key" data-act="again"><kbd>↵</kbd>again</button>`+
     `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
     `</div>`+
@@ -8990,8 +8999,11 @@ function _showResults(o){
       // loop: the URL carries the race). r162 (Wolf): the PNG share card is a
       // COMPARISON moment, not a grind artifact \u2014 it only appears on the daily
       // and gauntlet legs; the high-level rank card lives on the player card.
+      /* r305 (Wolf): the share affordance is a QUIET footer link, not a hero button —
+         it was reading as a primary action on every solve. Daily/weekly keep the share-card
+         button (that one IS the moment). */
       const row=document.createElement('div');
-      row.style.cssText='display:flex;gap:8px;margin-top:10px';
+      row.style.cssText='display:flex;gap:12px;margin-top:9px;justify-content:center;align-items:center';
       let sh=null;
       if(dailyMode||weeklyMode){
         sh=document.createElement('button');
@@ -8999,9 +9011,9 @@ function _showResults(o){
         sh.textContent='\u2b07 share card';
         sh.onclick=()=>makeShareCard(o);
       }
-      const ch=document.createElement('button');
-      ch.className='ob-key'; ch.style.cssText='flex:1';
-      ch.textContent='\u2694 copy challenge link';
+      const ch=document.createElement('a');
+      ch.style.cssText='font-family:var(--mono);font-size:10.5px;color:var(--faint);cursor:pointer;text-decoration:underline;text-underline-offset:2px';
+      ch.textContent='\u2694 challenge a friend';
       ch.onclick=()=>{
         let h=''; try{ h=(localStorage.getItem('hk_handle_cache')||'').trim(); }catch(e){}
         const u=location.origin+location.pathname.replace(/index\.html$/,'')
@@ -9015,44 +9027,61 @@ function _showResults(o){
       row.appendChild(ch);
       if(card) card.appendChild(row);
     }
+    /* r305 (Wolf): the xp story is ONE ANIMATED BAR — it fills from where you were to
+       where you are (crossing a level sweeps to full, snaps, and fills the remainder).
+       The old "+N xp · note · how xp works" text row and the separate drip line are gone;
+       "how xp works" survives as a tiny link, the next-medal chase keeps its line. */
     if(lastXpGain && lastXpGain.n>0){
-      const xr=document.createElement('div');
-      xr.style.cssText='font-family:var(--mono);font-size:13px;color:var(--accent);margin-top:10px;font-weight:700;text-align:center';
-      xr.innerHTML='+'+lastXpGain.n+' xp <span style="color:var(--muted);font-weight:400;font-size:11px">\u00b7 '+lastXpGain.note+' \u00b7 <a id="xpHow" style="cursor:pointer;text-decoration:underline">how xp works</a></span>';
-      if(card) card.appendChild(xr);
-      setTimeout(()=>{ const a=document.getElementById('xpHow'); if(a) a.onclick=openXpInfo; },0);
+      try{
+        const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+        const pre=Math.max(0, est-lastXpGain.n);
+        const L0=lvlDetail(pre), L1=lvlDetail(est);
+        const xw=document.createElement('div');
+        xw.className='rm-xpwrap';
+        xw.innerHTML='<div class="rm-xprow"><span>LVL '+L1.lvl+'</span>'+
+            '<b class="rm-xpgain">+'+lastXpGain.n+' xp</b><span>LVL '+(L1.lvl+1)+'</span></div>'+
+          '<div class="rm-xpbar"><i id="rmXpFill" style="width:'+(L1.lvl>L0.lvl?0:L0.pct)+'%"></i></div>'+
+          '<div class="rm-xpsub">'+(L1.need-L1.into)+' xp to LVL '+(L1.lvl+1)+' \u00b7 '+escHtml(lastXpGain.note||'')+' \u00b7 <a id="xpHow">how xp works</a></div>';
+        if(card) card.appendChild(xw);
+        setTimeout(()=>{ const a=document.getElementById('xpHow'); if(a) a.onclick=openXpInfo; },0);
+        // animate: leveled runs sweep 100 then restart at 0; same-level runs just fill
+        const fill=xw.querySelector('#rmXpFill');
+        if(fill){
+          if(L1.lvl>L0.lvl){
+            fill.style.width=L0.pct+'%';
+            requestAnimationFrame(()=>{ setTimeout(()=>{ fill.style.width='100%';
+              setTimeout(()=>{ fill.style.transition='none'; fill.style.width='0%';
+                requestAnimationFrame(()=>{ fill.style.transition=''; fill.style.width=L1.pct+'%'; }); }, 720);
+            }, 180); });
+          } else {
+            requestAnimationFrame(()=>{ setTimeout(()=>{ fill.style.width=L1.pct+'%'; }, 180); });
+          }
+        }
+      }catch(e){}
     }
-    // r151: THE DRIP — every results card names the next reward in reach: xp to the
-    // next level + the closest unearned medal. The lull between rewards is now
-    // always visible as a countdown instead of silence.
+    // r151/r305: the next-medal chase keeps its own quiet line
     try{
-      const bits=[];
-      try{ const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
-        const L=lvlDetail(est);
-        bits.push('<b style="color:var(--accent)">'+(L.need-L.into)+' xp</b> to LVL '+(L.lvl+1)); }catch(e){}
-      try{ const AC=window.HOTKEY_ACHIEVEMENTS;
-        if(AC && typeof buildAchCtx==='function'){
-          const ctx2=buildAchCtx();
-          let seen2=[]; try{ seen2=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]'); }catch(e){}
-          let bestA=null;
-          AC.forEach(a=>{ if(seen2.includes(a.id)) return;
-            let r2; try{ r2=a.test(ctx2); }catch(e){ return; }
-            if(!r2 || r2.done || !(r2.goal>1) || !(r2.prog>0)) return;
-            const ratio=r2.prog/r2.goal;
-            if(!bestA || ratio>bestA.ratio) bestA={a, r:r2, ratio}; });
-          if(bestA) bits.push('next medal: <b style="color:var(--warn)">'+escHtml(bestA.a.name)+'</b> '+bestA.r.prog+'/'+bestA.r.goal);
-        } }catch(e){}
-      if(bits.length){
+      const AC=window.HOTKEY_ACHIEVEMENTS; let line='';
+      if(AC && typeof buildAchCtx==='function'){
+        const ctx2=buildAchCtx();
+        let seen2=[]; try{ seen2=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]'); }catch(e){}
+        let bestA=null;
+        AC.forEach(a=>{ if(seen2.includes(a.id)) return;
+          let r2; try{ r2=a.test(ctx2); }catch(e){ return; }
+          if(!r2 || r2.done || !(r2.goal>1) || !(r2.prog>0)) return;
+          const ratio=r2.prog/r2.goal;
+          if(!bestA || ratio>bestA.ratio) bestA={a, r:r2, ratio}; });
+        if(bestA) line='next medal: <b style="color:var(--warn)">'+escHtml(bestA.a.name)+'</b> '+bestA.r.prog+'/'+bestA.r.goal;
+      }
+      if(line){
         const drip=document.createElement('div');
-        drip.style.cssText='font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px;text-align:center;line-height:1.7';
-        drip.innerHTML=bits.join(' &nbsp;·&nbsp; ');
+        drip.style.cssText='font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:7px;text-align:center;line-height:1.7';
+        drip.innerHTML=line;
         if(card) card.appendChild(drip);
       }
     }catch(e){}
-    const chain=document.createElement('div');
-    chain.style.cssText='font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:12px;text-align:center';
-    chain.innerHTML='<kbd style="background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:1px 6px">\u21b5</kbd> run it again \u00b7 <kbd style="background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:1px 6px">n</kbd> next drill';
-    if(card) card.appendChild(chain);
+    /* r305 (Wolf): the "\u21b5 run it again \u00b7 n next drill" footer hint is GONE \u2014 the buttons
+       directly above already carry those exact keys; saying it twice was the clutter. */
   }catch(e){}
 
 }

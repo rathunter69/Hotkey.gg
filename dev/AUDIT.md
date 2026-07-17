@@ -1,5 +1,22 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r305 — completion-card declutter + level-up MOMENT (Wolf spec #33 + #32)
+- **THE COMPLETION CARD, DECLUTTERED (Wolf):** the "+N xp · note · how xp works" text row
+  and the separate drip line are replaced by ONE animated xp bar that fills current→next
+  level (crossing a level sweeps to full, snaps, refills the remainder); "how xp works"
+  survives as a tiny link, the next-medal chase keeps its quiet line. Killed the duplicated
+  footer hint ("↵ run it again · n next drill" — the buttons directly above carry those keys).
+  Button keycaps show the SYMBOL only ("↵ again", not "↵ enter again"). The share affordance
+  is a quiet "⚔ challenge a friend" footer LINK, not a hero button (daily/weekly keep the
+  share-card button — that one is the moment).
+- **LEVEL-UP IS A MOMENT (Wolf #32):** hkCelebrate gains `big` — the card POPS in (scale
+  bounce), the whole overlay rains confetti (80 bits viewport-wide, not just the card), and
+  the level shows as the flat level chip. Rank-ups already had the LoL emblem reveal; this
+  brings level-ups up to the same weight.
+- Verified live (screenshots): the level-up burst + the slim card with the animated bar,
+  0 page errors; replay foot/navigation/margin WIN; onboard 34.
+- Cache: nav.js v268, nav.css v178.
+
 ## r304 — tab-bar clamp, the grid strip, queue intake (Wolf live batch 3)
 - **GROUP NAV NEVER WRAPS (Wolf):** the « back chip on Foundations used to wrap to Full
   Builds — a brand-new user one click from the PRO catalog. stepGroup() clamps at both ends;
