@@ -175,7 +175,7 @@
      cell; the text still spills as display. .sphi width is now the cell's own width (set in render). */
   td.active.spill, td.sel.spill{outline:none; background:transparent}
   td.spill .sphi{position:absolute; left:0; top:0; bottom:0; pointer-events:none}
-  td.active.spill .sphi{outline:2.5px solid var(--cell-cursor); outline-offset:-2px; background:var(--active-fill)}
+  td.active.spill .sphi{outline:1.5px solid var(--cell-cursor); outline-offset:-1px; background:var(--active-fill)}
   td.sel.spill .sphi{background:var(--sel-grey)}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
@@ -300,19 +300,22 @@
      cell has no grey fill (it reads as the anchor); the range border is green like Excel. */
   :root{ --cell-cursor:#1a7a45; --active-fill:rgba(26,122,69,.13); --sel-grey:rgba(64,68,78,.15); }
   html[data-dark="1"]{ --cell-cursor:#7ee0ad; --active-fill:rgba(126,224,173,.16); --sel-grey:rgba(220,225,235,.13); }
-  td.active{outline:2.5px solid var(--cell-cursor); outline-offset:-2px; background:var(--active-fill); z-index:4}
+  /* r313 (Wolf): thinner than r312 — the 2.5px box read as "very thick" and its offset clipped
+     against neighbors. 1.5px inset by 1px sits cleanly like Excel's cursor. */
+  td.active{outline:1.5px solid var(--cell-cursor); outline-offset:-1px; background:var(--active-fill); z-index:4}
   /* Formula pointer — appears on the cell whose reference is currently being inserted into the formula bar.
      Dashed border reads distinct from the solid active-cell outline, and the warn color marks "this is where the formula is grabbing from". */
   td.point{outline:2px dashed var(--warn); outline-offset:-2px; background:rgba(224,175,104,.12); z-index:3}
   td.sel{background:var(--sel-grey)}                                  /* r312: grey selection fill */
   td.active.sel{background:var(--active-fill)}                        /* the anchor keeps its green, not grey */
-  td.sel-t{border-top:2px solid var(--cell-cursor)}                   /* green range border, Excel-like */
-  td.sel-b{border-bottom:2px solid var(--cell-cursor)}
-  td.sel-l{border-left:2px solid var(--cell-cursor)}
-  td.sel-r{border-right:2px solid var(--cell-cursor)}
-  /* r312 (Wolf): the fill-handle square, Excel-style, at the current cell's bottom-right corner */
-  td.fh::after{content:''; position:absolute; right:0; bottom:0; width:7px; height:7px;
-    background:var(--cell-cursor); box-shadow:-1px -1px 0 1px var(--surface); z-index:6}
+  td.sel-t{border-top:1.5px solid var(--cell-cursor)}                 /* green range border, Excel-like (r313: thinner) */
+  td.sel-b{border-bottom:1.5px solid var(--cell-cursor)}
+  td.sel-l{border-left:1.5px solid var(--cell-cursor)}
+  td.sel-r{border-right:1.5px solid var(--cell-cursor)}
+  /* r312/r313 (Wolf): the fill-handle square at the current cell's bottom-right. Sits just inside
+     the corner (no protruding box-shadow — that was clipped by the cell's overflow:hidden). */
+  td.fh::after{content:''; position:absolute; right:1px; bottom:1px; width:6px; height:6px;
+    background:var(--cell-cursor); border:1px solid var(--surface); z-index:6}
   td.editing.fh::after, td.point.fh::after{display:none}   /* no handle mid-edit / while pointing */
   @keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
   td.pasted{animation:pasteflash .5s ease-out}
@@ -718,8 +721,10 @@
   .ob-key.focused{border-color:var(--accent); color:var(--on-accent); background:var(--accent); box-shadow:0 0 0 3px var(--accent-glow)}
   .ob-key.focused .ob-kbd{background:rgba(6,18,12,.2); border-color:rgba(6,18,12,.3); color:var(--on-accent)}
   .ob-key.focused span{color:var(--on-accent)!important}
-  .ob-key.primary{background:var(--accent-dim); border-color:var(--accent); color:var(--text)}
-  .ob-key.primary:hover{background:var(--accent); color:var(--on-accent)}
+  /* r313 (Wolf): the recommended option filled with accent-dim + --text read as muddy/unreadable
+     on light sheets. Now it's a normal readable chip with a left accent bar marking it. */
+  .ob-key.primary{background:var(--surface2); border-color:var(--accent); color:var(--text); box-shadow:inset 3px 0 0 0 var(--accent)}
+  .ob-key.primary:hover{background:color-mix(in srgb, var(--accent) 12%, var(--surface2)); color:var(--text)}
   .ob-key.primary.focused{background:var(--accent); color:var(--on-accent); box-shadow:0 0 0 2px var(--accent-glow)}
   .ob-kbd{font-family:var(--mono); font-size:11px; font-weight:600;
     background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.22); border-radius:4px; padding:1px 6px; line-height:1}
@@ -1305,7 +1310,10 @@
   /* r91: first-run tour — spotlight ring + frame-language caption card */
   .tour-wrap{display:none; position:fixed; inset:0; z-index:340}
   .tour-wrap.on{display:block}
-  .tour-wrap::before{content:''; position:absolute; inset:0; background:rgba(16,17,21,.55)}
+  .tour-wrap::before{content:''; position:absolute; inset:0; background:rgba(16,17,21,.55); transition:background .2s}
+  /* r313 (Wolf): on steps where you actually type/chord into the sheet, drop the dim so the
+     grid is fully visible and testable — the ring still marks the target. */
+  .tour-wrap.lite::before{background:rgba(16,17,21,.14)}
   .tour-ring{position:absolute; border:2px solid var(--accent); border-radius:10px;
     box-shadow:0 0 0 9999px rgba(16,17,21,.55); transition:all .28s cubic-bezier(.2,.8,.2,1)}
   .tour-card{position:absolute; width:330px; background:var(--surface); border:1px solid var(--line);
@@ -14085,7 +14093,15 @@ function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList
   try{ if(PRELAUNCH_LOCK && landingOpen && !me_user && !localStorage.getItem('hk_beta_ok')) showPrelaunchLock(); }catch(e){} }
 
 /* ---------- landing → app entry ---------- */
-function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone');
+let __landingDismissed=false;
+function dismissLanding(){
+  // r313 (Wolf): IDEMPOTENT. advanceAccess() fires from several async auth paths (onSession,
+  // ensureGuestSession's anon sign-in), each calling dismissLanding. Without this guard the
+  // second call re-ran the launch branch — restarting the tour from step 1 and re-opening the
+  // keyboard/experience cards (stacking their keydown listeners). Run the transition ONCE.
+  if(__landingDismissed) return;
+  __landingDismissed=true;
+  landingOpen=false; const l=$('landing'); if(l) l.classList.add('gone');
   if(pendingMode){ const mo=pendingMode; pendingMode=null; markOnboarded(); setTimeout(()=>openModes(mo), 640); return; }
   // r134: SEQUENCE, don't race — spotlight tour first (input-blocked), THEN the
   // tutorial prompt. They used to fire on independent timers and overlap.
@@ -14468,7 +14484,7 @@ function showKeyboard(after){
   const macGuess=HK_MAC;
   m.innerHTML='<div class="ob-card" style="max-width:470px">'+
     '<div class="ob-title">first — what keyboard are you on?</div>'+
-    '<div class="ob-body" style="font-size:12.5px">Keycaps and shortcuts render for your machine. Same drills either way. <span style="color:var(--faint)">↑↓ to choose · ↵ to confirm</span></div>'+
+    '<div class="ob-body" style="font-size:12.5px"><b style="color:var(--accent)">Hands on the keyboard from here — no mouse needed.</b> Use <b>↑↓</b> to choose and <b>↵</b> to confirm. Keycaps render for your machine; same drills either way.</div>'+
     '<div class="ob-opts" style="flex-direction:column;gap:8px;align-items:stretch">'+
       '<button class="ob-key" data-kb="win" style="text-align:left"><b>⊞ Windows</b> — Ctrl chords, Alt ribbon walks'+(macGuess?'':' <span style="color:var(--faint);font-size:10px">(detected)</span>')+' <kbd class="ob-kbd">1</kbd></button>'+
       '<button class="ob-key" data-kb="mac" style="text-align:left"><b>⌘ Mac</b> — ⌘ chords, ⌥ ribbon walks (KeyTips)'+(macGuess?' <span style="color:var(--faint);font-size:10px">(detected)</span>':'')+' <kbd class="ob-kbd">2</kbd></button>'+
@@ -14504,12 +14520,23 @@ function showComfort(after){
       '<button class="ob-key" data-xlv="2" style="text-align:left"><b>I live in it</b> \u2014 just show me the drills <kbd class="ob-kbd">3</kbd></button>'+
     '</div></div>';
   m.classList.add('show'); window.__introCardOpen=true;
-  const keys=(e)=>{ if(e.key>='1'&&e.key<='3'){ e.preventDefault(); e.stopImmediatePropagation(); pick(+e.key-1); } };
+  // r313 (Wolf): the experience card had NO arrow/Enter nav (digits only) — you couldn't
+  // drive it with the keyboard we're teaching. Now it matches the keyboard card exactly.
+  const btns=[...m.querySelectorAll('[data-xlv]')];
+  let sel=0;
+  const paint=()=>btns.forEach((b,i)=>b.classList.toggle('focused', i===sel));
+  paint();
+  const keys=(e)=>{
+    if(e.key==='ArrowDown'){ e.preventDefault(); e.stopImmediatePropagation(); sel=(sel+1)%3; paint(); return; }
+    if(e.key==='ArrowUp'){ e.preventDefault(); e.stopImmediatePropagation(); sel=(sel+2)%3; paint(); return; }
+    if(e.key==='Enter'){ e.preventDefault(); e.stopImmediatePropagation(); pick(sel); return; }
+    if(e.key>='1'&&e.key<='3'){ e.preventDefault(); e.stopImmediatePropagation(); pick(+e.key-1); }
+  };
   const pick=(v)=>{ try{ localStorage.setItem('hk_xlv', String(v)); }catch(e){}
     try{ ev('comfort',{v:v}); }catch(e){}
     m.classList.remove('show'); window.__introCardOpen=false; document.removeEventListener('keydown', keys, true);
     after(); };   // r303: the primer is folded INTO the tour now (buildTourPlan gates the fundamentals by xlv) — no separate modal
-  m.querySelectorAll('[data-xlv]').forEach(b=>{ b.onclick=()=>pick(+b.dataset.xlv); });
+  btns.forEach((b,i)=>{ b.onclick=()=>pick(+b.dataset.xlv); b.onmouseenter=()=>{ sel=i; paint(); }; });
   document.addEventListener('keydown', keys, true);
 }
 /* r303: PRIMER + showPrimer DELETED — the five cards live on as the tour's novice beats. */
@@ -14526,7 +14553,11 @@ function startOnboardBoard(){
   cells['A4']=sbCell(340,{fmtStyle:'comma',decimals:0, fontColor:'blue'});
   cells['B4']=sbCell(210,{fmtStyle:'comma',decimals:0, fontColor:'blue'});
   // A5 = the typing target · C4 = the formula target (=A4-B4 or +A4-B4)
-  S={ROWS:8, cells, active:{r:4,c:1}, sel:null, clipboard:null};
+  // r313 (Wolf): a FULL monthly run A6:H6 so the Ctrl+→ / Ctrl+Shift+← demos actually TRAVEL —
+  // the old board stopped at B4, so the jump moved one cell and the time-save never landed.
+  cells['A6']=sbCell('Monthly',{bold:true, fontColor:'gray'});
+  [120,180,150,240,300,260,410,520,470,610].forEach((v,i)=>{ cells[colLetter(1+i)+7]=sbCell(v,{fmtStyle:'comma',decimals:0, fontColor:'blue'}); });
+  S={ROWS:9, cells, active:{r:4,c:1}, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; guided=false; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
@@ -14541,30 +14572,30 @@ function startOnboardBoard(){
 const TOUR_STEPS=[
   /* r303 — the folded-in fundamentals (shown only for the "basically none" answer) */
   {sel:'.gridwrap', novice:true, cap:'this is the grid', at:'A4',
-    body:'Everything in Excel lives in a <b>cell</b>. Each has an address — column letter + row number, like <b style="font-family:var(--mono)">A4</b>. The bright outline is <b>you</b>.<br><br><b>Tap an arrow key</b> to move it.', doIt:{key:'ArrowRight'}},
+    body:'Every cell has an address — <b style="font-family:var(--mono)">A4</b>. The bright box is you. <b>Tap an arrow</b> to move.', doIt:{key:'ArrowRight'}},
   {sel:'#nameBox', novice:true, cap:'where am I?', at:'A4',
-    body:'The <b>name box</b> always shows the address of the cell you’re on. Watch it as you move:<br><br><b>tap <kbd>→</kbd> again</b> — it updates.', doIt:{key:'ArrowRight'}},
+    body:'The <b>name box</b> shows your cell’s address. <b>Tap <kbd>→</kbd></b> — watch it change.', doIt:{key:'ArrowRight'}},
   {sel:'.fbar', novice:true, cap:'shown vs. inside', at:'A4',
-    body:'A cell can hold a plain number or a <b>formula</b> that computes one. The grid shows the <b>result</b>; the <b>formula bar</b> (here) shows what’s really inside. Press <kbd>↵</kbd> to go on.'},
+    body:'The grid shows the <b>result</b>; the <b>formula bar</b> shows what’s inside. <kbd>↵</kbd> to go on.'},
   {sel:'.gridwrap', novice:true, cap:'just type', at:'A5', entry:true, commit:(c)=>typeof c.value==='number',
-    body:'No clicking needed. The cursor is on <b style="font-family:var(--mono)">A5</b> — <b>type a number and press <kbd>↵</kbd></b>. (Typing replaces the cell; <kbd>Esc</kbd> backs out; <kbd>F2</kbd> edits without retyping.)'},
+    body:'No clicking. On <b style="font-family:var(--mono)">A5</b>, <b>type a number, press <kbd>↵</kbd></b>.'},
   {sel:'.gridwrap', novice:true, cap:'start a formula', at:'C4', entry:true, commit:(c)=>!!c.formula,
-    body:'Formulas start with <b style="font-family:var(--mono)">=</b> <i>or</i> <b style="font-family:var(--mono)">+</b> (bankers use +). On <b style="font-family:var(--mono)">C4</b>, type <b style="font-family:var(--mono)">=A4-B4</b> and press <kbd>↵</kbd> — profit computes itself.'},
+    body:'Formulas start with <b style="font-family:var(--mono)">=</b> or <b style="font-family:var(--mono)">+</b>. On <b style="font-family:var(--mono)">C4</b> type <b style="font-family:var(--mono)">=A4-B4</b>, <kbd>↵</kbd>.'},
   /* r292 INTERACTIVE INTRO — the chord beats, now for everyone after the fundamentals. */
-  {sel:'.gridwrap', cap:'now the point', doIt:{key:'ArrowRight',ctrl:true}, at:'A4',
-    body:'A mouse takes seconds to cross a sheet. The keyboard takes one press.<br><br><b>Hold <kbd>ctrl</kbd> and tap <kbd>→</kbd></b> — jump to the edge of the data.'},
-  {sel:'.gridwrap', cap:'again — bigger', doIt:{key:'ArrowDown',ctrl:true,shift:true},
-    body:'That jumped to the edge. Now <b>select</b> a whole run of it, no dragging:<br><br><b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd></b> — one chord.'},
-  {sel:'.cl-inner',   cap:'your checklist', body:'Each drill gives you a <b>checklist</b> on the right. Every line is one action; it turns green when done. Clear them all and the clock stops — any keystroke path that gets there counts.'},
-  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list — <b>↑↓ arrows</b> move, <b>↵</b> loads. Or hop straight with <b>Alt+←/→</b>. <b>Esc</b> never ends your run.'},
-  {sel:'#guideToggle', cap:'stuck? two helpers', body:'<b>Guided mode</b> (this button, or <kbd>F1</kbd>) highlights every key to press — on by default for your first runs. Beside it, <b>watch solution</b> plays the optimal keys, and <b>learn mode</b> hands you the keys one step at a time.'},
-  {sel:'#profileToggle', cap:'your keyboard', optional:true, body:'Your layout (Windows or Mac, auto-detected) and shortcut profile (native Excel · Macabacus · FactSet) live here — click to switch either. The drills accept the chords of whichever profile you train.'},
-  {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor so you can race your own time. Toggle it here.'},
-  {sel:'#navThemes',  cap:'make it yours', body:'Light or dark — <b>themes</b> live here, and every one keeps a clean, readable sheet. Pick one anytime; it saves across sessions.'},
+  {sel:'.gridwrap', cap:'the whole point', doIt:{key:'ArrowRight',ctrl:true}, at:'A7',
+    body:'A mouse drags cell by cell. <b>Hold <kbd>ctrl</kbd>, tap <kbd>→</kbd></b> — fly to the end of the row in one press.'},
+  {sel:'.gridwrap', cap:'now select it', doIt:{key:'ArrowLeft',ctrl:true,shift:true}, at:'J7',
+    body:'Add <kbd>shift</kbd> and it <b>selects</b> as it jumps. <b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>←</kbd></b> — grab the whole row, no dragging.'},
+  {sel:'.cl-inner',   cap:'your checklist', body:'Every line is one action — it turns green when done. Clear them all and the clock stops.'},
+  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list (<b>↑↓</b> move, <b>↵</b> loads). <b>Alt+←/→</b> hops drills. <b>Esc</b> never ends a run.'},
+  {sel:'#guideToggle', cap:'stuck?', body:'<b>Guided</b> (<kbd>F1</kbd>) lights up every key to press — on for your first runs. <b>Solution</b> plays the optimal keys; <b>learn</b> hands them to you one at a time.'},
+  {sel:'#profileToggle', cap:'your keyboard', optional:true, body:'Your layout and shortcut profile (Excel · Macabacus · FactSet) live here — click to switch.'},
+  {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor — race your own time.'},
+  {sel:'#navThemes',  cap:'make it yours', body:'<b>Themes</b> — light or dark — live here. Pick one anytime; it saves.'},
   {sel:'#authSlot',   cap:'save your progress', signedOut:true,
-    body:'You’re playing as a guest. <b>Create a free account</b> to save your progress, post times to the <b>leaderboards</b>, join <b>ranked</b>, and join a <b>team</b>. Takes a few seconds — or keep playing and sign up whenever.'},
+    body:'You’re a guest. A <b>free account</b> saves progress, posts to <b>leaderboards</b>, and unlocks <b>ranked</b> + <b>teams</b>. Sign up whenever.'},
   {sel:'#authSlot',   cap:'the ladder',    signedIn:true,
-    body:'<b>LEVEL</b> is your reps — every clean solve earns xp. <b>RANK</b> is the competition — clean, keyboard-only runs post to per-drill <b>leaderboards</b>, with crowns for first.'},
+    body:'<b>LEVEL</b> is reps — every clean solve earns xp. <b>RANK</b> is the competition — keyboard-only runs post to per-drill boards.'},
 ];
 let __tourI=-1, __tourAfter=null, __tourPlan=[];
 /* r303: precompute the steps that will ACTUALLY show for this user — one place for the
@@ -14588,7 +14619,16 @@ function tourShow(i){
   if(i<=0) __tourPlan=buildTourPlan();
   if(i>=__tourPlan.length){ w.classList.remove('on'); try{ localStorage.setItem('hk_tour_done','1'); }catch(e){} __tourI=-1;
     ev('tour_done');
-    const f=__tourAfter; __tourAfter=null; if(f) setTimeout(f, 350); return; }
+    // r313 (Wolf): the tour ended ON the warm-up board with no next action. ALWAYS leave the
+    // sandbox for the real first drill (guided on) and cue it, whatever __tourAfter was.
+    try{ markOnboarded(); }catch(e){}       // finishing the tour IS the onboarding — so the post-tour "quick warm-up?" prompt no-ops
+    const f=__tourAfter; __tourAfter=null;
+    setTimeout(()=>{
+      try{ if(sandboxMode){ sandboxMode=false; loadChallenge(MENU_ORDER[0], {guided:true}); } }catch(e){}
+      if(f){ try{ f(); }catch(e){} }        // f re-checks sandboxMode (won't double-load); its maybeOnboard() now no-ops via onboarded=true
+      try{ if(typeof showToast==='function') showToast('You’re set — first drill’s loaded, guided’s on. Clear the checklist · press \\ for the full list.'); }catch(e){}
+    }, 350);
+    return; }
   __tourI=i;
   const st=__tourPlan[i];
   // r303: park the cursor where the step teaches (name-box demo, typing/formula targets)
@@ -14596,6 +14636,7 @@ function tourShow(i){
   __tourBase = (st.entry && st.at) ? JSON.parse(JSON.stringify(get(parseRef(st.at).r, parseRef(st.at).c))) : null;
   const el=st.sel?document.querySelector(st.sel):null;
   w.classList.add('on');
+  w.classList.toggle('lite', !!(st.entry || st.doIt));   // r313: interactive steps un-dim the sheet
   if(st.full){
     ring.style.width='0px'; ring.style.height='0px'; ring.style.left='-20px'; ring.style.top='-20px';
     card.style.left=Math.max(12,(window.innerWidth-420)/2)+'px';
