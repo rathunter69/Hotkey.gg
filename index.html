@@ -1415,12 +1415,12 @@
 </style>
 <script src="drills.js?v=265"></script>
 <link rel="stylesheet" href="nav.css?v=179">
-<script src="themes.js?v=263"></script>
+<script src="themes.js?v=264"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=268"></script>
+<script src="nav.js?v=269"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -10488,6 +10488,10 @@ document.addEventListener('keydown',hkRawE=>{
   const k=e.key;
   // let text fields (auth email/handle) receive their own keystrokes
   if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+  // r311 (Wolf): Edge (and IE-legacy) hijack F4 to the address-bar dropdown / page top.
+  // F4 is ALWAYS ours here (anchor cycle while editing; a no-op otherwise) — claim it before
+  // any browser default fires, on every path. preventDefault only; the real handlers still run.
+  if(k==='F4') e.preventDefault();
   // landing overlay is up (and no modal over it): swallow grid keys; Enter starts training
   if(landingOpen && !authOpen && !gateOpen){ if(k==='Enter'){ e.preventDefault(); tryEnter(); } return; }
   // r159: comfort fork / primer cards own the keyboard while up — their own
@@ -11819,7 +11823,7 @@ function updateStreakUI(n){
 // change reached the satellite pages but never the main game (the whole theme-sync
 // saga of r52-r63). themes.js (loaded above, line ~955) is the single source now.
 const THEMES = window.THEMES;
-let currentTheme = 'default';
+let currentTheme = 'daylight';
 /* HK_RANK lives in themes.js ONLY (r64 rule: no inlined copies of shared dicts).
    r112: the stale 6-tier fallback that sat here showed the OLD ladder whenever
    themes.js was slow or stale-cached — Wolf's #29 'different rank on different pages'. */

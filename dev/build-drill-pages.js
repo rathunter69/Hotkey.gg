@@ -302,12 +302,12 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
   window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
   window.NAV_ACTIVE='';
 <\/script>
-<script src="themes.js?v=263"><\/script>
+<script src="themes.js?v=264"><\/script>
 <script type="application/ld+json">${ld}</script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=268"><\/script>
+<script src="nav.js?v=269"><\/script>
 <div class="wrap">`;
 
   const FOOT = `

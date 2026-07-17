@@ -3,7 +3,7 @@
    Exposes: window.THEMES (the dict), window.applyTheme(name), window.currentTheme. */
 
 window.THEMES = {
-  default: { name:'Default', dark:true, vars:{
+  default: { name:'Graphite', dark:true, vars:{
     bg:'#292b31', surface:'#383b42', surface2:'#43474f', line:'#5a5e68',
     text:'#f0f1ec', muted:'#a8adb3', faint:'#767d87',
     accent:'#6ec9a0', 'accent-dim':'#4a8f72', 'accent-glow':'rgba(110,201,160,.2)',
@@ -167,7 +167,7 @@ window.themeList = function(){
   return out;
 };
 
-window.currentTheme = 'default';
+window.currentTheme = 'daylight';
 
 // Update any theme-name labels on the page (Monkeytype-style text next to the theme selector).
 // Elements opt in with a data-theme-label attribute; we set their text to the active theme's name.
@@ -217,7 +217,8 @@ window.applyTheme = function(name){
 // On script load: apply the saved theme, else follow the OS preference — the SAME fallback the
 // trainer uses, so navigating between pages never flips light/dark on a fresh browser.
 // r204 (Wolf): Daylight is now THE default light theme; system-light browsers land there instead
-// of the harsher plain Light. Dark stays 'default' (the windows-grey desk look Wolf likes).
+// of the harsher plain Light. The grey desk theme (key 'default', kept for internal fallback) is
+// now LABELLED 'Graphite' — Daylight is THE default a fresh device/visitor sees (Wolf).
 (function(){
   let saved = null;
   try{ saved = localStorage.getItem('hotkey_theme'); }catch(e){}

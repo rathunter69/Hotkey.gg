@@ -330,6 +330,14 @@
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
         if(k && k.indexOf('hk_ghost_')===0) localStorage.removeItem(k); }   // per-drill ghost replays
     }catch(e){}
+    // r311 (Wolf): sign-out kept "coming back" because the race that redirects after 1200ms
+    // can fire BEFORE supabase's network signOut clears its persisted token — the reload then
+    // re-hydrates the session and you're logged back in. Nuke the token ourselves so the
+    // reload ALWAYS starts logged out, hung round-trip or not. (default storageKey = sb-<ref>-auth-token)
+    try{
+      for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
+        if(k && (/^sb-.*-auth-token$/.test(k) || k==='supabase.auth.token')) localStorage.removeItem(k); }
+    }catch(e){}
   }
   window.clearAccountUI = clearAccountUI;   // pages (index.html) share the same wipe on their own sign-out path
   // user state lands async — poll briefly, then give up quietly
