@@ -590,6 +590,7 @@
   .gd-row b{color:var(--warn)} .gd-row span{color:var(--faint)}
   .gd-row kbd{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:10px}
   .rowhdr.grp{box-shadow:inset 3px 0 0 var(--accent)}
+  .rowhdr.hidcut{border-top:3px double var(--accent)}   /* r299: hidden rows above — Excel's break-line cue */
   .rm-aha{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:10px; padding:9px 14px; margin:10px 0 4px; text-align:left; line-height:1.5}
   .rm-stats{display:flex; justify-content:center; gap:24px; margin:20px 0; font-family:var(--mono);
@@ -1353,7 +1354,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=264"></script>
+<script src="nav.js?v=265"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -8061,7 +8062,8 @@ function render(){
       if(!g.collapsed && r>=g.r1 && r<=g.r2) grpCls=' grp';
       if(g.collapsed && r===(function(){ let nr=g.r2+1; while(nr<=S.ROWS&&rowHidden(nr)) nr++; return nr; })()) grpGlyph='\u229e ';
     } }
-    let row=`<tr><th class="rowhdr${grpCls}">${grpGlyph}${r}</th>`;
+    const hidCut = r>1 && rowHidden(r-1) ? ' hidcut' : '';   // r299 (Wolf): Excel shows a break line where rows are hidden — without it the unhide drill was a guessing game
+    let row=`<tr><th class="rowhdr${grpCls}${hidCut}">${grpGlyph}${r}</th>`;
     for(let c=1;c<=COLS;c++){
       const cell=get(r,c);
       let cls=[]; if(cell.bold)cls.push('bold'); if(cell.txt&&!isNum(cell))cls.push('txt');
@@ -10580,6 +10582,14 @@ document.addEventListener('keydown',hkRawE=>{
   // RIBBON MODE — read physical key code so Mac Option / non-US layouts still work
   if(mode==='ribbon'){
     e.preventDefault();
+    // r299 (Wolf): HELD Alt+↓ on an armed filter header — the Alt keydown had already
+    // entered ribbon mode by the time ↓ arrived, so the r180 dropdown branch below never
+    // fired (the r143 dead-chord class again). Catch it here: fresh ribbon (no path, no
+    // dialog), Alt still held, cursor on the filter header → that's the dropdown chord.
+    if(k==='ArrowDown' && e.altKey && !path.length && !dialog
+       && S.filter && S.active.r===S.filter.hr && S.active.c>=S.filter.c1 && S.active.c<=S.filter.c2){
+      startClock(); logKey('Alt+↓'); mode='sheet'; openFilterPicker(S.active.c); return;
+    }
     // paste special: arrows cycle the options (they used to be swallowed — "arrows dead")
     if(dialog==='paste'){
       if(k==='ArrowDown'||k==='ArrowRight'){ logKey('\u2193'); const i=PASTE_OPTS.findIndex(o=>o[2]===(pasteKind||'all'));
@@ -13142,6 +13152,12 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
     }
   }catch(e){}
   loadChallenge(startKey);
+  // r299 (Wolf): arriving from sign-out (?fresh=1) — say so, so the clean slate reads as
+  // intentional. The account wipe already cleared last-drill, so this lands on drill one.
+  try{ if(/[?&]fresh=1/.test(location.search)){
+    setTimeout(()=>{ try{ showToast('Signed out — fresh desk, drill one.'); }catch(e){} }, 700);
+    history.replaceState(null,'',location.pathname);
+  } }catch(e){}
   if(race && race.drill===startKey){
     const r=$('result'); if(r){ r.className='result';
       r.innerHTML='🏁 <b>beat '+escHtml(race.by)+'’s '+race.t.toFixed(2)+'s</b> — type to start the race'; }
@@ -13632,6 +13648,10 @@ async function doSignIn(){
       }
       return; }
     closeAuth();
+    // r299 (Wolf): sign-in is a FULL reload \u2014 every surface (rank pill, boards, stats
+    // mirrors, account theme) hydrates from scratch instead of trusting a chain of
+    // reactive re-renders. Deterministic beats clever here; this bug came back twice.
+    try{ location.reload(); }catch(e){}
   }catch(e){ authErr('Something went wrong \u2014 try again.'); }
 }
 async function doSignUp(){
