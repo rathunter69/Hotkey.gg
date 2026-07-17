@@ -1,5 +1,49 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r304 — tab-bar clamp, the grid strip, queue intake (Wolf live batch 3)
+- **GROUP NAV NEVER WRAPS (Wolf):** the « back chip on Foundations used to wrap to Full
+  Builds — a brand-new user one click from the PRO catalog. stepGroup() clamps at both ends;
+  the « chip now shows the PREVIOUS group's name in its color (mirroring the » chip) and
+  disappears entirely on the first group, » disappears on the last. Verified live: clamped
+  both directions, correct chip labels on first/middle/last groups.
+- **THE 10px SHEET STRIP (Wolf: "a small strip by the checklist on ~70% of drills"):** the
+  gridwrap painted the sheet background across its own 10px right padding — visible as a
+  light strip on dark-chrome themes wherever the grid (870px typical) sat narrower than the
+  880px wrap; wider grids (dress/comps/dcfbuild) covered it, hence "~70%". The sheet now
+  paints on the TABLE; the wrap is transparent, so the padding shows the page background —
+  seamless. (The light-sheet var scoping on .gridwrap is untouched; it cascades to the table.)
+- Verified: replay navigation/dress/comps/foot · onboard 34 · parity 124.
+- INTAKE (queued in PIPELINE 4b + tasks): explainer-popup cleanup (xp/rank modals → tight,
+  icon-led) · STANDARD GRID WIDTH catalog-wide (measured 870/893/913/1015 — normalize, Full
+  Builds + RF exempt; also fixes the dress-class overflow past the 880px wrap).
+
+## r303 — ONBOARDING V3: one spotlight sequence, on a cleared board (Wolf-approved direction)
+- **THE PRIMER IS DEAD; LONG LIVE THE TOUR.** The 5-card centered-modal primer (with its fake
+  drawn 3×3 grid) is DELETED — its content lives on as five `novice:true` SPOTLIGHT beats at
+  the head of the one tour: the grid (arrow do-it) → the name box (watch it change) → formula
+  bar (shown vs. inside) → **typing beat** (type a number, ↵ commits — a real cell on the real
+  sheet) → **formula beat** (=A4-B4, taught as "= or + — bankers use +"; the engine already
+  accepted + since r95, now it's TAUGHT). Everyone gets one coherent dim+spotlight system.
+- **RUNS ON A CLEARED BOARD (Wolf's ask):** startOnboardBoard() stages a tiny Revenue/Costs/
+  Profit warm-up sheet (sandboxMode — no timer, no score, no checklist) so the intro never
+  fights drill one's content; the tour's end hands off to the real first drill.
+- **NEW TOUR MACHINERY:** buildTourPlan() precomputes the steps that will actually show
+  (novice beats only for the "basically none" comfort answer; signed-in/out + optional gates
+  centralized) — the "n / total" counter is finally honest. Steps can pin the cursor (`at`).
+  The input guard gained an ENTRY mode: printable keys flow to the live editor and the beat
+  advances on real COMMIT (checked via the step's `commit(cell)` predicate); Enter skips an
+  entry beat only when not mid-edit; Esc mid-edit cancels the edit, not the tour.
+- **HARNESS REWRITTEN:** dev/e2e-audit-onboard.js T4 now walks the folded flow end-to-end
+  (no-primer check, cleared-board check, both typed beats committing real values, chord beat,
+  handoff to a real drill, expert-skip) — **ONBOARD 34 PASS** (was 28) · parity 124 · replay
+  spot-checks green. One real bug caught by the old tests: Enter used to strand on entry
+  beats; now documented-and-skippable.
+- QUEUED from Wolf's newest batch (tasks + PIPELINE): celebration overhaul (confetti level-up,
+  richer achievement cards) · completion-card declutter (one animated xp bar, no dup button
+  labels, subtle share link) · guided mode ON RAILS (lock input to the target cell) · mode-bar
+  reorder to modes→helpers→flair→settings w/ gear collapse + ghost-source toggle (my PB /
+  all-time / desk) + rapid-fire button de-emphasis · picker centers current+next drill.
+
 ## r302 — ONE RANK EVERYWHERE (structural, 3rd recurrence) + Wolf's visual batch
 - **THE RANK MISMATCH, KILLED AT THE ROOT.** Wolf (nav said Associate, stats said First-Year
   Analyst — third report of this class): every surface used the SAME tierOf, but nav.js
