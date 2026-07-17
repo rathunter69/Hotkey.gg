@@ -316,6 +316,20 @@
     const rp=$('navRankPill'); if(rp){ rp.style.display='none'; rp.innerHTML=''; }
     const lc=$('navLvl');      if(lc) lc.remove();
     try{ if('__lvlXp' in window) window.__lvlXp=0; }catch(e){}
+    // r296 (Wolf): the header wipe wasn't enough — stats.html still read the ACCOUNT's
+    // local mirrors (PBs, run history, key counts, streak, achievements) after sign-out,
+    // so a guest on a shared machine stared at the previous account's numbers. The server
+    // owns all of this for account holders (r114: analytics ride the account; it re-hydrates
+    // on the next sign-in), so the device copy goes too. Device PREFERENCES stay (theme,
+    // platform, onboarding/tour flags) — those belong to the machine, not the account.
+    try{
+      ['hotkey_pb','hk_runs_lite','hotkey_solves','hotkey_streak','hk_camp_xp','hk_clears',
+       'hk_clears_day','hk_key_counts','hk_keys_lifetime','hk_keystats_seeded','hk_ach_flags',
+       'hk_ach_seen','hk_feat_ach','hk_band_best','hk_dc_done','hk_ranked','hk_seen_tier',
+       'hk_xlv','hk_last_drill'].forEach(k=>localStorage.removeItem(k));
+      for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
+        if(k && k.indexOf('hk_ghost_')===0) localStorage.removeItem(k); }   // per-drill ghost replays
+    }catch(e){}
   }
   window.clearAccountUI = clearAccountUI;   // pages (index.html) share the same wipe on their own sign-out path
   // user state lands async — poll briefly, then give up quietly
@@ -788,7 +802,7 @@
     wire('umProfile',  openProfile);
     wire('umSaveProg', () => goToTrainer('openAuth=signup'));
     wire('umSettings', openSettings);
-    wire('umSignout',  () => { clearAccountUI(); Promise.race([window.sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{ try{ location.reload(); }catch(e){} }); });   // r266: reload must NEVER wait on a hung signOut round-trip (it used to — sign-out looked dead until a manual refresh); r226 wipe still runs first
+    wire('umSignout',  () => { clearAccountUI(); Promise.race([window.sb.auth.signOut(), new Promise(r=>setTimeout(r,1200))]).catch(()=>{}).then(()=>{ try{ location.href = TRAINER_URL; }catch(e){} }); });   // r266: never wait on a hung signOut round-trip. r296 (Wolf): sign-out LANDS YOU HOME — reloading in place left you staring at a stale stats/boards page; the home page is the one guest-state view that always makes sense. (location.href resolves via <base>, so drill subpages route home too.)
   }
   // Outside-click and Esc close the dropdown — global listeners, installed once.
   document.addEventListener('click', e => {
