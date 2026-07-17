@@ -524,7 +524,22 @@
     opacity:0; transition:opacity .4s; pointer-events:none; z-index:60}
   .keyflash.show{opacity:1}
   .keyflash .kchip{font-size:13px; padding:3px 9px; box-shadow:0 2px 12px rgba(0,0,0,.35)}
-  .keyflash .kchip.new{border-color:var(--accent); color:var(--accent)}
+  .keyflash .kchip.new{border-color:var(--accent); color:var(--accent); animation:kchipPop .18s ease-out}
+  @keyframes kchipPop{0%{transform:scale(.7);opacity:.4}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+  /* r290 FLOW combo — a productive keystroke streak with no stall. Grows a pill next to
+     keyflash; a fresh peak throbs. Live runs only (never demo/echo). */
+  #hkCombo{position:fixed; right:18px; bottom:52px; z-index:60; font-family:var(--mono);
+    font-weight:700; font-size:13px; padding:3px 11px; border-radius:999px;
+    background:var(--surface); border:1px solid var(--accent-dim); color:var(--accent);
+    box-shadow:0 2px 12px rgba(0,0,0,.35); opacity:0; transform:translateY(4px);
+    transition:opacity .2s, transform .2s; pointer-events:none}
+  #hkCombo.show{opacity:1; transform:translateY(0)}
+  #hkCombo.peak{animation:comboThrob .28s ease-out}
+  #hkCombo.hot{border-color:var(--warn); color:var(--warn)}
+  @keyframes comboThrob{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+  .rm-nearmiss{font-family:var(--mono); font-size:13.5px; color:var(--warn); font-weight:700;
+    margin:2px 0 6px; letter-spacing:.2px}
+  .rm-nearmiss span{color:var(--muted); font-weight:400}
   .keyflash.demo{right:auto; left:50%; transform:translateX(-50%); bottom:26px; gap:8px}
   .keyflash.demo .kchip{font-size:21px; padding:9px 16px; border-radius:10px; font-weight:700}
   .keyflash.demo .kchip.new{background:var(--accent); color:var(--on-accent); border-color:var(--accent); box-shadow:0 8px 30px var(--accent-glow)}
@@ -1488,6 +1503,7 @@
 </div>
 
 <div class="keyflash" id="keyflash"></div>
+<div id="hkCombo"></div>
 <div class="results-modal" id="resultsModal"></div>
 <div class="picker-modal" id="picker">
   <div class="pk-card">
@@ -8435,8 +8451,11 @@ function checkWin(){
         iconHtml:(window.hkLevelRing?window.hkLevelRing(lv(nxt), 4, 84):'')});
     }
   }catch(e){} }
+  let __prevBest=null, __pbDelta=null;
   if(!mouseUsed && !guidedUsed){ const prev=PB[sk];
+    __prevBest = (prev===undefined) ? null : prev;
     if(prev===undefined||t<prev){ PB[sk]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s';
+      if(prev!==undefined) __pbDelta = prev - t;   // how much faster than the old best
       // r163: GHOST REPLAY — keep the PB run's cursor path on this device (consecutive
       // duplicate cells collapse; capped). Next run, the ghost glides through it live.
       try{
@@ -8455,7 +8474,9 @@ function checkWin(){
   try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
     KV.set('hotkey_solves', String(nsol)); renderLvl(nsol); }); }catch(e){}
   showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed,
-    newBand:(__bandRes&&__bandRes.isNew)?__bandRes.band:null, bandXp:(__bandRes&&__bandRes.gained)||0});
+    newBand:(__bandRes&&__bandRes.isNew)?__bandRes.band:null, bandXp:(__bandRes&&__bandRes.gained)||0,
+    prevBest:__prevBest, pbDelta:__pbDelta, combo:hkComboMax});
+  try{ hkComboReset(); }catch(e){}
   if(sb && me_user && !isAnonUser() && !mouseUsed && !guidedUsed){
     recordRun(t).then(async ok=>{
       const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); }
@@ -8632,9 +8653,21 @@ function _showResults(o){
     ? `<div class="guest-cta">playing as guest \u2014 nothing saved · <a id="rmSaveProg">save your progress</a></div>`
     : '';
   const m=$('resultsModal');
+  // r290 dopamine hooks: a PB shows how much faster; a clean non-PB frames the near-miss
+  // and dares you to run it again; a strong flow streak gets a nod.
+  let hookRow='';
+  if(o.pb && o.pbDelta!=null){
+    hookRow=`<div class="rm-nearmiss" style="color:var(--accent)">★ new best — ${o.pbDelta.toFixed(2)}s faster <span>than your old ${(parseFloat(o.t)+o.pbDelta).toFixed(2)}s</span></div>`;
+  } else if(!o.pb && !o.mouse && !o.guided && o.prevBest!=null){
+    const off=(parseFloat(o.t)-o.prevBest);
+    hookRow=`<div class="rm-nearmiss">${off<=0.5?'so close':'off the pace'} — +${off.toFixed(2)}s off your ${o.prevBest.toFixed(2)}s best <span>· <kbd style="color:var(--warn)">↵</kbd> run it back</span></div>`;
+  }
+  const flowRow=(o.combo && o.combo>=8)
+    ? `<div class="rm-nearmiss" style="color:var(--muted)">🔥 ${o.combo}-key flow streak <span>— you were locked in</span></div>` : '';
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
+    hookRow+flowRow+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     _bandRow(o)+
     ghostDiff(o)+
@@ -9236,7 +9269,29 @@ function updateFxHint(){
 }
 function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performance.now()-started) : 0);
   try{ keyCells.push((S&&S.active)?(colLetter(S.active.c)+S.active.r):''); }catch(e){ keyCells.push(''); }   // r163: ghost cursor path
-  playTick(); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); armIdle(); }
+  playTick(); const kn=$('keyN'); if(kn) kn.textContent=keyLog.length; flashKey(t); hkComboTick(); armIdle(); }
+/* r290 FLOW COMBO — consecutive productive keystrokes with no stall (>1.2s gap) build a
+   streak; a stall or a fresh board resets it. Live classic runs only — demo/echo/tour
+   drive logKey too, but their keys shouldn't score flow. Purely cosmetic (never gates
+   a win), so it stays out of the parity/replay assertions. */
+let hkCombo=0, hkComboMax=0, _hkComboLastT=0;
+function hkComboTick(){
+  try{
+    if(!running || done || demoPlaying || echoOn || (typeof __tourI!=='undefined'&&__tourI>=0) || gameMode!=='classic'){ return; }
+    const now=performance.now();
+    hkCombo = (_hkComboLastT && (now-_hkComboLastT) < 1200) ? hkCombo+1 : 1;
+    _hkComboLastT = now;
+    if(hkCombo>hkComboMax) hkComboMax=hkCombo;
+    const el=$('hkCombo'); if(!el) return;
+    if(hkCombo>=4){
+      el.textContent='×'+hkCombo+' flow';
+      el.classList.add('show'); el.classList.toggle('hot', hkCombo>=12);
+      el.classList.remove('peak'); void el.offsetWidth; el.classList.add('peak');
+    } else { el.classList.remove('show','hot'); }
+  }catch(e){}
+}
+function hkComboReset(){ hkCombo=0; hkComboMax=0; _hkComboLastT=0;
+  const el=$('hkCombo'); if(el) el.classList.remove('show','hot','peak'); }
 /* r146: IDLE TIMEOUT — a run that goes 60s without a keystroke is dead (phone call,
    wandered off). Deal a fresh board instead of letting the clock rot; nothing posts. */
 let __idleT=null;
@@ -9259,7 +9314,7 @@ function flashKey(t){
 }
 function resetFlash(){ flashChips=[]; clearTimeout(flashTimer);
   const el=$('keyflash'); if(el){ el.classList.remove('show'); el.innerHTML=''; }
-  const kn=$('keyN'); if(kn) kn.textContent='0'; }
+  const kn=$('keyN'); if(kn) kn.textContent='0'; try{ hkComboReset(); }catch(e){} }
 function snapshot(){ return {cells:JSON.parse(JSON.stringify(S.cells)), colW:colW.slice(), ROWS:S.ROWS}; }   /* r95 audit: ROWS was missing — undo after a row insert/delete corrupted the sheet's geometry */
 function restore(s){ S.cells=JSON.parse(JSON.stringify(s.cells)); colW=s.colW.slice(); if(s.ROWS!==undefined) S.ROWS=s.ROWS; }
 function pushUndo(){ undoStack.push(snapshot()); if(undoStack.length>60) undoStack.shift(); redoStack=[]; }
