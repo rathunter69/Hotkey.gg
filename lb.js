@@ -93,7 +93,7 @@ function bestPerUser(rows, mode, dur){
       .forEach(r=>{ if(!seen[r.user_id]){ seen[r.user_id]=true; best.push(r); } });
   return best;
 }
-const MARATHON_DURS = [{sec:180, label:'3-minute marathon'}, {sec:300, label:'5-minute marathon'}, {sec:600, label:'10-minute marathon'}];  // must match the trainer's duration configs
+// r298: MARATHON_DURS deleted — marathon boards retired r293; nothing referenced it
 const RAPID_DURS    = [{sec:30,  label:'30-second rapid-fire'}, {sec:60, label:'60-second rapid-fire'}, {sec:90, label:'90-second rapid-fire'}];  // must match the trainer's duration configs
 const marathonScore = r => `${r.score} drill${r.score===1?'':'s'} · ${r.keystrokes} keys`;
 const rapidScore    = r => { const t=r.score+(r.misses||0); const a=t?Math.round(100*r.score/t):100;
@@ -1014,8 +1014,8 @@ async function renderManage(root){
   // ---- quests + program templates (ported from account.html r130/r149) ----
   const MG_PROGRAMS={
     intern0:{name:'Intern week 0', pitch:'zero to desk-ready — movement, formatting, first formulas, find-and-fix', weeks:[
-      {note:'get moving, no mouse',        keys:['navigation','copyover','saves']},
-      {note:'desk-standard formatting',    keys:['housestyle','format','blue']},
+      {note:'get moving, no mouse',        keys:['navigation','copyover','undo']},
+      {note:'desk-standard formatting',    keys:['housestyle','dress','decimals']},
       {note:'first formulas',              keys:['margin','growth','foot']},
       {note:'find it and fix it',          keys:['modeltour','audit','triage']}]},
     bootcamp:{name:'First-year bootcamp', pitch:'the modeling core — clean-up, functions, schedules, statements', weeks:[
@@ -1024,7 +1024,7 @@ async function renderManage(root){
       {note:'schedule week',               keys:['schedule','debtsched','nwcsched']},
       {note:'statement week',              keys:['cfslink','bsbuild','threestmt']}]},
     speed:{name:'Speed weeks', pitch:'PB-chase under par-based bars, basics to models', mult:1.5, weeks:[
-      {note:'speed: the basics',           keys:['navigation','format','margin']},
+      {note:'speed: the basics',           keys:['navigation','decimals','margin']},
       {note:'speed: the sheet',            keys:['foot','percent','series']},
       {note:'speed: data + lookups',       keys:['sort','lookup','sumif']},
       {note:'speed: the models',           keys:['dcf','waterfall','lbo']}]}

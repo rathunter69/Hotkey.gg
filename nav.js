@@ -135,7 +135,7 @@
     ]},
     { title:'while training', rows: [
       ['type',       'start the clock (first keystroke begins the run)'],
-      ['g',          'toggle guided hints'],
+      ['F1',         'toggle guided hints'],
       ['F2',         'edit the active cell'],
     ]},
     { title:'in a rapid-fire session', rows: [
@@ -813,16 +813,26 @@
   // to pause its own keyboard handling under our overlays).
   window.navOverlayOpen = () => !!(themesOpen || kbdOpen || settingsOpen || profileOpen);
   // r115 (#30): handle generator — xbox-style suggestions in desk dialect.
+  // r298 (Wolf): pools rebuilt — the old list could deal "Bulge_…" and leaned hard on IB
+  // recruiting slang. Now tongue-in-cheek across the whole spreadsheet-class (banking,
+  // consulting, corp fin, accounting), with a compose-time guard as a safety net.
   // Server-side moderation (handle blocklist trigger) remains the real gate.
   window.hkSuggestHandle = function(){
-    const A=['Levered','Accretive','Diluted','Anchored','Unlevered','Sticky','Circular','Distressed',
-             'ProForma','Synergy','Covenant','Roadshow','Waterfall','Recap','Terminal','BasisPoint',
-             'PasteSpecial','Corkscrew','MidCap','Bulge'];
-    const B=['Analyst','Associate','Intern','Modeler','Machine','Sweep','Multiple','Spread','Bridge',
-             'Anchor','Macro','Deck','Tab','Cell','Margin','Corner','Plug','Font','Turns','Closer'];
-    const a=A[Math.floor(Math.random()*A.length)], b=B[Math.floor(Math.random()*B.length)];
-    const num=Math.random()<0.4 ? String(Math.floor(Math.random()*90)+10) : '';
-    return (a+'_'+b+num).slice(0,24);
+    const A=['Levered','Accretive','Anchored','ProForma','Synergy','Covenant','Roadshow',
+             'Waterfall','Recap','Terminal','BasisPoint','PasteSpecial','Corkscrew','MidCap',
+             'PivotTable','HardCoded','ZeroBased','FullyLoaded','RunRate','TopDown','BottomUp',
+             'GoingConcern','CircularRef','DoubleClick','Deliverable','ActionItem','QuickSave','WellFormatted'];
+    const B=['Analyst','Associate','Modeler','Machine','Sweep','Multiple','Bridge','Anchor',
+             'Macro','Deck','Tab','Cell','Margin','Plug','Font','Closer','Keyboard','Shortcut',
+             'Wizard','Gridline','Footnote','Ledger','Forecast','Template','Consultant','Controller'];
+    const BAD=/bulge|dilut|distress|strip|naked|swall|shaft/i;   // never compose these, whatever the pools hold later
+    for(let tries=0; tries<8; tries++){
+      const a=A[Math.floor(Math.random()*A.length)], b=B[Math.floor(Math.random()*B.length)];
+      const num=Math.random()<0.4 ? String(Math.floor(Math.random()*90)+10) : '';
+      const h=(a+'_'+b+num).slice(0,24);
+      if(!BAD.test(h)) return h;
+    }
+    return 'Anchored_Analyst'+String(Math.floor(Math.random()*90)+10);
   };
   window.navRefreshAuth = function(){ try{ if(window.__navAuthKick) window.__navAuthKick(); }catch(e){} };
   // r134: THE player card (index's r13-era inline copy deleted — this is the only renderer)

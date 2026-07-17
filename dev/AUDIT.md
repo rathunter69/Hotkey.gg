@@ -1,5 +1,37 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r298 — BORDER CHORDS TO EXCEL CANON (Wolf caught it) + insert-seq copy + name-gen + copy quick fixes
+- **THE CANON BUG (Wolf, from live play): our Alt H B letters were WRONG vs real Excel.** We taught
+  T=top and B=bottom for months; Excel's actual access keys are **O=Bottom, P=Top, T=THICK BOX,
+  S=Outside, N=No Border**. For a product whose whole promise is "muscle memory that transfers to
+  real Excel," this was the worst class of bug we can ship. Fixed everywhere in one sweep:
+  · ENGINE: HBP→top, HBO→bottom, HBT→thick box (was K), HBS→outside (kept), HBN→clear (kept, now
+    also clears bdbl). NEW canon items: **HBD = Top & Bottom**, **HBB = DOUBLE BOTTOM** (new `bdbl`
+    cell flag + 3px double render — the grand-total rule bankers actually close a page with).
+    REMOVED: the r234 "Inside borders" chord (Excel's gallery has no such access key) and the
+    nonstandard K/O aliases.
+  · SWEEP: 140 chord references migrated across index.html (drill demos in FOUR key encodings,
+    req/guide/prompt copy, ribbon MENUS labels), dev/e2e-alt-paths.js, dev/e2e-borders.js,
+    dev/e2e-audit-parity.js, reference.html (+ thick box / double bottom / top&bottom rows added).
+    Lesson recorded: demo key sequences exist in spaced AND unspaced AND object-literal AND W()
+    encodings — canon sweeps must grep all four (the first pass missed 19 spaced/object refs and
+    three drills' demos silently hit the NEW double-bottom B).
+  · VERIFIED: e2e-borders rewritten to canon (13 PASS incl. new O/P/D/B asserts) · full
+    demo-replay 81 GREEN · parity 124 · alt-paths 74 · echo 21 · mac 19 · rapidfire 12.
+- **Insert-row sequencing (Wolf):** engine already Excel-true (Ctrl+Shift+= / Ctrl+- only fire on a
+  FULL row/col selection — Shift+Space / Ctrl+Space first), and rowops teaches it; the reference
+  sheet now spells the sequence out on the insert/delete rows.
+- **Handle generator (Wolf: "suggesting names with bulge"):** pools rebuilt — tongue-in-cheek
+  across the whole spreadsheet class (PivotTable_Wizard, RunRate_Consultant, HardCoded_Footnote),
+  IB slang kept where it's funny and safe; 'Bulge'/'Diluted'/'Distressed' gone; compose-time
+  regex guard as a safety net. Server-side moderation stays the real gate.
+- **Copy quick fixes (from dev/COPY_INVENTORY.md, marked resolved there):** ladder-floor copy
+  unified (MBA Associate is the floor); dead onboarding placement button aligned with the live
+  warm-up copy; "dive in" banned phrase out; staffer program templates no longer pin drills
+  deleted in r249 (saves/format/blue → undo/dress/decimals); nav shortcut sheet 'g'→'F1';
+  dead MARATHON_DURS removed. 555-row inventory awaits Wolf's batch markup for the rest.
+- Cache: nav.js 263→264, lb.js 10→11; drill pages + refmap regenerated.
+
 ## r297 — Flash Fill, login-shows-account fix, welcome-back honesty, UI+nav polish (Wolf batch)
 - **ENGINE — Flash Fill (Ctrl+E)**, the average corporate user's favorite trick (Wolf's ask).
   `flashFill()`: infers a transform from ONE typed example beside a data column and fills the

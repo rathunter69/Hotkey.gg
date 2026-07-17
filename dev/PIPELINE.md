@@ -29,7 +29,7 @@ Curriculum v2.1 is fully shipped, gated green, and coherent end to end. Since th
 r196 block (kept below as history):
 - **Engine Tier 1+2 DONE** — fill palette (Alt H H), Clear menu (Alt H E), indent
   (Alt H 5/6), accounting (Alt H A N), scale, border depth incl. thick box
-  (Alt H B K), font size (Alt H F G/K), Find & Replace (Ctrl+H), cell styles
+  (Alt H B T), font size (Alt H F G/K), Find & Replace (Ctrl+H), cell styles
   (Alt H J). Ctrl+1 kept to high-value cases only (Wolf doctrine).
 - **Curriculum v2.1 regroup DONE (r242)** — 8 chapters, ~10 drills each: Foundations /
   Formatting / Formulas I (FREE) · Data & Lookups (level bridge) · Formulas II /

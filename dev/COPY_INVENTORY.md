@@ -3,6 +3,14 @@
 All user-facing copy on the included surfaces, one row per string, numbered for batch markup
 (reply e.g. "change 12, 47, 83 as suggested; for 51 use: ...").
 
+**ALREADY FIXED in r298** (same session as the sweep — these flags are resolved, review the rest):
+- Ladder-floor inconsistency → onboarding card now says "MBA Associate → Second-Year Analyst" (the real floor per themes.js); the placement verdict's "Candidate — the ladder starts here" stays (Candidate IS the lowest *earned* rank).
+- Dead onboarding button → static HTML now matches the live JS ("▶ Quick warm-up — feel the moves"); "Skip — I'll dive in" → "Skip — straight to the drills" (both copies).
+- Staffer program templates no longer pin deleted drills: saves→undo, format→dress/decimals, blue→decimals (lb.js MG_PROGRAMS).
+- nav.js shortcut sheet: guided-hints key corrected 'g' → 'F1'.
+- Marathon leftovers: dead MARATHON_DURS removed from lb.js (boards retired r293).
+- Border chord copy everywhere migrated to Excel canon (Alt H B: O/P/S/T/B/D/N) as part of the r298 canon fix — any inventory row quoting the old T=top/B=bottom letters is superseded.
+
 **Line numbers** are from a working-tree snapshot taken **2026-07-17 16:29 UTC** (HEAD `2cd5602` + uncommitted edits).
 The repo was being actively edited during the sweep, so treat line numbers as "close, search the quoted text if it moved."
 **Excluded by design:** per-drill prompt/req/guide/aha/checklist text inside index.html's CHALLENGES object (its own pass),

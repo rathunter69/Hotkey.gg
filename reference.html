@@ -133,7 +133,7 @@ window.NAV_ACTIVE = 'reference';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=263"></script>
+<script src="nav.js?v=264"></script>
 <div class="wrap">
   <header>
     <h1>Shortcut <span class="em">reference</span></h1>
@@ -221,10 +221,13 @@ const DATA = [
     {k:'Alt>H>F>C', d:'Font color'},
   ]},
   {cat:'Borders', ic:'▢', items:[
-    {k:'Alt>H>B>B', d:'Bottom border', dr:true},
-    {k:'Alt>H>B>T', d:'Top border', dr:true},
+    {k:'Alt>H>B>O', d:'Bottom border', dr:true},
+    {k:'Alt>H>B>P', d:'Top border', dr:true},
     {k:'Alt>H>B>A', d:'All borders', dr:true},
-    {k:'Alt>H>B>O', d:'Outside border'},
+    {k:'Alt>H>B>S', d:'Outside borders'},
+    {k:'Alt>H>B>T', d:'Thick box border'},
+    {k:'Alt>H>B>B', d:'Double bottom border (grand total)'},
+    {k:'Alt>H>B>D', d:'Top and bottom border'},
     {k:'Alt>H>B>N', d:'No border'},
   ]},
   {cat:'Copy & paste', ic:'⧉', items:[
@@ -236,8 +239,8 @@ const DATA = [
     {k:'Alt>H>V>S', d:'Paste Special (ribbon chain)', dr:true},
   ]},
   {cat:'Rows & columns', ic:'⊞', items:[
-    {k:'Ctrl+Shift++', d:'Insert rows / columns'},
-    {k:'Ctrl+-', d:'Delete rows / columns'},
+    {k:'Ctrl+Shift++', d:'Insert rows / columns — select the whole row/column first (Shift+Space / Ctrl+Space)'},
+    {k:'Ctrl+-', d:'Delete rows / columns — select the whole row/column first'},
     {k:'Alt>H>O>I', d:'Autofit column width', dr:true},
     {k:'Alt>H>O>A', d:'Autofit row height'},
     {k:'Ctrl+9', d:'Hide rows (Ctrl+0 hides columns)'},

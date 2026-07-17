@@ -486,7 +486,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     S.cells['H1']={...blankCell(), formula:'=TODAY()', fmtStyle:'date'}; recalc();
     const days=Math.floor((Date.now()-Date.UTC(1899,11,30))/86400000);
     const today = Math.abs(S.cells['H1'].value-days)<=1;
-    setDemoSel('G10:I12'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'b'}); demoKey({key:'o'});   // empty region — foot's own dressed rows must not pollute the probe
+    setDemoSel('G10:I12'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'b'}); demoKey({key:'s'});   // empty region — foot's own dressed rows must not pollute the probe
     const g=(k)=>S.cells[k]||{};
     const perim = !!(g('G10').bt && g('I10').bt && g('G12').bb && g('G10').bl && g('G11').bl && g('I11').br) && !(g('H11').bt||g('H11').bb||g('H11').bl||g('H11').br);
     S.cells['H3']={...blankCell(), value:100}; S.cells['H4']={...blankCell(), value:4200}; recalc(); render();
@@ -503,7 +503,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(z1.italic && z1.italicOff, 'Ctrl+I / Alt H 2 italicize');
   ok(z1.struck && z1.struckOff, 'Ctrl+5 / Ctrl+1 K strike');
   ok(z1.today, 'TODAY() returns the Excel serial');
-  ok(z1.perim, 'Alt H B O draws the selection PERIMETER, interior clean', JSON.stringify(z1));
+  ok(z1.perim, 'Alt H B S draws the selection PERIMETER, interior clean', JSON.stringify(z1));
   ok(z1.divided, 'paste-op Divide lands');
   ok(z1.mixedAll && z1.uniformOff, 'mixed-selection Ctrl+B bolds ALL first (Excel), uniform toggles off');
 
