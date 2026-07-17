@@ -1133,15 +1133,17 @@
   .kb-desc{color:var(--text); font-family:var(--sans); font-size:13.5px}
   #kbClose kbd{color:inherit; background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px; margin:0 2px}
 
-  /* ---- rapid-fire: single-cell card (one instruction, one cell, one chord) ---- */
+  /* ---- rapid-fire: single-cell card, mounted INLINE in the grid's space (r291) ---- */
   #rapidStage{display:none}
+  /* the stage frame, HUD toolbar, and sheet-tab strip all stay put — only the grid
+     itself swaps for the rapid card, so the mode reads as part of the game, not a page. */
+  body.rapidfire #gridwrap{display:none}
   body.rapidfire #rapidStage{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    /* fill the available viewport below the header + HUD so the card sits at visual center */
-    min-height: calc(100vh - 200px);
-    padding: 24px 16px;
+    flex:1 1 auto; min-height:0; padding:20px 16px;   /* fills the grid area, not the viewport */
   }
-  body.rapidfire .stage{display:none}
+  body.rapidfire .checklist{display:none}       /* rapid-fire's task lives on the card, not the rail */
+  body.rapidfire .fbar, body.rapidfire .ribbon{display:none}   /* grid-only chrome */
   body.rapidfire .exrow{display:none}
   .rf-card{background:var(--surface2); border:2px solid var(--faint); border-radius:16px;
     padding:30px 30px 34px; max-width:460px; width:100%; margin:0; text-align:center;
@@ -1464,21 +1466,22 @@
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
         <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
+        <!-- r291: rapid-fire mounts INLINE here, in the grid's own space — same chrome,
+             large font, one chord at a time (was a full-viewport takeover) -->
+        <div id="rapidStage">
+          <div class="rf-streak" id="rfStreak"></div>
+          <div class="rf-card">
+            <div class="rf-instr" id="rfInstr">—</div>
+            <div class="rf-sheet"><div class="rf-srow"><div class="rf-rownum" id="rfCellLabel">B4</div><div class="rf-cell" id="rfCell"></div></div></div>
+            <div class="rf-keys" id="rfKeys"></div>
+          </div>
+        </div>
       </div>
       <aside class="checklist" id="checklist"></aside>
     </div>
     <div class="sheettabs" id="sheetTabs"></div>
   </div>
   <div class="result" id="result"></div>
-
-  <div id="rapidStage">
-    <div class="rf-streak" id="rfStreak"></div>
-    <div class="rf-card">
-      <div class="rf-instr" id="rfInstr">—</div>
-      <div class="rf-sheet"><div class="rf-srow"><div class="rf-rownum" id="rfCellLabel">B4</div><div class="rf-cell" id="rfCell"></div></div></div>
-      <div class="rf-keys" id="rfKeys"></div>
-    </div>
-  </div>
 
   <div class="bar" style="display:none">
     <div class="stat">time par <b id="par">—</b> · best <b id="pb">—</b><br>keys <b id="keyN">0</b> · optimal ~<b id="keyPar">—</b></div>
