@@ -330,6 +330,14 @@
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
         if(k && k.indexOf('hk_ghost_')===0) localStorage.removeItem(k); }   // per-drill ghost replays
     }catch(e){}
+    // r311 (Wolf): sign-out kept "coming back" because the race that redirects after 1200ms
+    // can fire BEFORE supabase's network signOut clears its persisted token — the reload then
+    // re-hydrates the session and you're logged back in. Nuke the token ourselves so the
+    // reload ALWAYS starts logged out, hung round-trip or not. (default storageKey = sb-<ref>-auth-token)
+    try{
+      for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
+        if(k && (/^sb-.*-auth-token$/.test(k) || k==='supabase.auth.token')) localStorage.removeItem(k); }
+    }catch(e){}
   }
   window.clearAccountUI = clearAccountUI;   // pages (index.html) share the same wipe on their own sign-out path
   // user state lands async — poll briefly, then give up quietly
@@ -679,7 +687,7 @@
           '<span style="display:inline-flex;line-height:0">'+(window.rankEmblem?window.rankEmblem(tier.name,84,tier.bucket):'')+'</span>' +
           '<div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:13px;background:none;box-shadow:none">'+tier.name+'</div>' +
           '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+standing+'</div>' +
-          '<div style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:4px">rank \u00b7 speed vs the field</div>' +
+          '<div class="pc-rankhow" style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;cursor:pointer" title="how rank works">rank \u00b7 speed vs the field \u203a</div>' +
         '</div>' +
         '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
           (window.hkLevelRing?window.hkLevelRing(__L.lvl, __L.pct, 84):'') +
@@ -708,6 +716,8 @@
       '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcShare">\u2b07 share your rank card</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;
+    /* r309: the card's rank label opens the how-rank-works explainer */
+    try{ const rh=m.querySelector('.pc-rankhow'); if(rh) rh.onclick=()=>{ closeProfile(); if(window.openRankInfo) window.openRankInfo(); else if(window.__openRankInfo) window.__openRankInfo(); }; }catch(e){}
     /* r150: the click TALKS BACK — Wolf hit a silent no-op and read it as broken */
     const shr = $('pcShare'); if(shr) shr.onclick = ()=>{ try{
       shr.textContent='rendering…';

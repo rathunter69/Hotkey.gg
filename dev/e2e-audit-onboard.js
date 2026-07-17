@@ -100,18 +100,19 @@ const STUB = () => {
     return !(w && w.classList.contains('on'));
   });
   ok(t2d, 'tour completes on repeated Enter and releases the keyboard');
-  await page.waitForTimeout(1200);   // tour → +350ms → maybeOnboard → +620ms → show
-  const t2e = await page.evaluate(() => {
-    const ob = document.getElementById('onboard');
-    return { prompt: !!(ob && ob.classList.contains('show')) };
-  });
-  ok(t2e.prompt, 'tutorial/placement prompt follows the tour');
-  await page.evaluate(() => { const k = document.getElementById('obSkip'); if (k) k.click(); });
+  // r313 (Wolf): finishing the tour no longer re-prompts "quick warm-up?" — it hands off
+  // straight to the first REAL drill (guided on) and toasts, leaving the warm-up board behind.
+  await page.waitForTimeout(900);    // tour → +350ms → loadChallenge(first drill)
+  const t2e = await page.evaluate(() => ({
+    handedOff: (typeof cur !== 'undefined' && cur !== '__onboard__' && !sandboxMode),
+    onboarded: !!onboarded }));
+  ok(t2e.handedOff, 'tour hands off to the first real drill (not the warm-up board)');
+  ok(t2e.onboarded, 'finishing the tour marks the user onboarded');
   const t2f = await page.evaluate(() => {
     setDemoSel('B4'); demoKey({key:'5'}); demoKey({key:'Enter'});
     return S.cells['B4'].value === 5 || S.cells['B4'].value === '5';
   });
-  ok(t2f, 'after onboarding the grid takes keys immediately');
+  ok(t2f, 'after the tour the grid takes keys immediately');
 
   console.log('T3 second visit: welcome back');
   // domcontentloaded, not load: supabase-js loads async now (r285) — 'load' waits on

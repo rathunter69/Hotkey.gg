@@ -20,7 +20,7 @@ body{padding-top:14px}
 .topnav-brand b{color:var(--accent); font-weight:700}
 .topnav-pages{display:flex; align-items:center; gap:4px; margin-left:14px}   /* Monkeytype: icons sit WITH the brand */
 
-.topnav-link{font-family:var(--mono); font-size:13px; color:var(--muted); text-decoration:none;
+.topnav-link{font-family:var(--mono); font-size:13px; color:var(--text); text-decoration:none;
   padding:7px 12px; border-radius:7px; transition:all .15s; letter-spacing:.2px;
   display:inline-flex; align-items:center; gap:8px}
 .topnav .topnav-link svg{width:19px !important; height:19px !important; display:block; flex:none}
@@ -63,11 +63,11 @@ body{padding-top:14px}
 
 /* ---------- AUTH SLOT + USER MENU DROPDOWN ---------- */
 .auth-slot{display:flex; align-items:center}
-.auth-btn{font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
+.auth-btn{font-family:var(--mono); font-size:12.5px; color:var(--text); background:var(--surface);
   border:1px solid var(--line); border-radius:7px; padding:6px 13px; cursor:pointer; transition:all .15s}
 .auth-btn:hover{color:var(--accent); border-color:var(--accent-dim)}
 .user-menu{position:relative; display:inline-flex; align-items:center}
-.user-btn{font-family:var(--mono); font-size:13px; color:var(--muted); background:none;
+.user-btn{font-family:var(--mono); font-size:13px; color:var(--text); background:none;
   border:none; padding:8px 12px; border-radius:6px; cursor:pointer; transition:.13s;
   display:inline-flex; align-items:center; gap:7px; letter-spacing:.2px}
 .user-btn:hover{color:var(--text); background:var(--surface)}
