@@ -845,10 +845,11 @@
   .st-tab.cur{color:var(--text); background:var(--bg); font-weight:700;
     border-color:var(--gcol, var(--accent-dim)); border-top-color:var(--gcol, var(--accent))}
   .st-tab .st-pb{color:var(--faint); margin-left:7px; font-size:10px}
-  .st-next{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.14em;
-    margin-left:auto; padding:0 6px 0 10px; align-self:center; cursor:pointer; white-space:nowrap; flex:none;
-    opacity:.8; transition:.12s; overflow:visible}
-  .st-next:hover{opacity:1}
+  /* r293 (Wolf): the next-set control reads as a clear coloured chip, not faint text */
+  .st-next{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.12em;
+    margin-left:auto; padding:3px 10px; align-self:center; cursor:pointer; white-space:nowrap; flex:none;
+    border:1px solid currentColor; border-radius:99px; opacity:.92; transition:.12s; overflow:visible}
+  .st-next:hover{opacity:1; background:color-mix(in srgb, currentColor 14%, transparent)}
   /* Monkeytype-scale: the sheet grows into the screen instead of sitting in a box.
      zoom scales the whole grid (cells, fonts, borders) without touching the engine's
      px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */

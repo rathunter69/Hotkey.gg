@@ -317,10 +317,13 @@ window.HOTKEY_ACHIEVEMENTS = [
 
 /* ---- group color identity: one muted hue per skill family. Used as accents only
    (left borders, label tints, badge strokes) — never full fills. ---- */
+/* r293 (Wolf): mid-saturated family palette — the old pastels read on the dark
+   sheet strip but washed out on light themes (the tab bar / next-chapter chip sits
+   on var(--surface2)). These hues carry enough saturation to stay legible on BOTH. */
 window.HOTKEY_GROUP_COLORS = {
-  'Foundations':'#8ab4ff', 'Formatting':'#d9a441', 'Formulas I':'#e0879e',
-  'Data & Lookups':'#7fd4c1', 'Formulas II':'#e06a86', 'Models I':'#c9a2e8',
-  'Models II':'#a97fd6', 'Full Builds':'#e3b341', 'More':'#8b8e94'
+  'Foundations':'#4f86e0', 'Formatting':'#c68a26', 'Formulas I':'#d1637e',
+  'Data & Lookups':'#2fa891', 'Formulas II':'#cf4d6b', 'Models I':'#9a6ee0',
+  'Models II':'#7d55c8', 'Full Builds':'#d98f2f', 'More':'#71757e'
 };
 
 /* ---- PLUGIN KEY LAYERS: curated Macabacus + FactSet defaults for IB workflows.
