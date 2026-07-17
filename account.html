@@ -399,6 +399,7 @@ async function load(){
               const m=String(error.message||'');
               alert(m.includes('TAG_RESERVED') ? 'That name won\u2019t fly \u2014 pick something you\u2019d put on a resume.'
                 : m.includes('TAG_FORMAT') ? 'Letters, numbers, spaces and simple punctuation only (2\u201340 chars).'
+                : m.includes('SCHOOL_COOLDOWN') ? 'School changes are limited to one per 30 days \u2014 your colors are a commitment, not a costume.'
                 : 'Couldn\u2019t save \u2014 try again.');
               return;
             }
