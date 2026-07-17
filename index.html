@@ -107,7 +107,7 @@
   }
 
   .tabs{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:18px}
-  .tab{white-space:nowrap; font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
+  .tab{white-space:nowrap; font-family:var(--mono); font-size:12.5px; color:var(--text); background:none;
     border:1px solid transparent; border-radius:7px; padding:7px 13px; cursor:pointer; transition:.15s}
   .tab:hover{color:var(--text)}
   .tab.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
@@ -730,13 +730,13 @@
 
   .hdr-right{display:flex; align-items:center; gap:15px}
   .auth-slot{display:flex; align-items:center}
-  .auth-btn{font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
+  .auth-btn{font-family:var(--mono); font-size:12.5px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:7px; padding:6px 13px; cursor:pointer; transition:all .15s}
   .auth-btn:hover{color:var(--accent); border-color:var(--accent-dim)}
   /* User menu: dropdown anchored to a topnav-styled button so the username matches the rest of the header. */
   .user-menu{position:relative; display:inline-flex; align-items:center}
   .um-menu{min-width:190px}
-  .user-btn{font-family:var(--mono); font-size:13px; color:var(--muted); background:none;
+  .user-btn{font-family:var(--mono); font-size:13px; color:var(--text); background:none;
     border:none; padding:8px 12px; border-radius:6px; cursor:pointer; transition:.13s;
     display:inline-flex; align-items:center; gap:7px; letter-spacing:.2px}
   .user-btn:hover{color:var(--text); background:var(--surface)}
@@ -820,21 +820,35 @@
   .mb-popover .mb-dur:hover{color:var(--accent); background:var(--accent-glow)}
   .mb-deckrow{display:flex; gap:4px; padding:4px 6px 6px; border-bottom:1px solid var(--line); margin-bottom:4px}
   .mb-deck{flex:1; font-size:11px; padding:3px 6px; border-radius:5px; border:1px solid var(--line);
-    background:none; color:var(--muted); cursor:pointer; font-family:var(--mono)}
+    background:var(--surface2); color:var(--text); cursor:pointer; font-family:var(--mono)}
   .mb-deck.selected{color:var(--accent); border-color:var(--accent)}
   .mb-spacer{flex:1}
   /* Monkeytype-style config bar: quiet text buttons, borders only on hover — less chrome, same tools */
   .modebar [data-tip]:hover::after, .drillbar [data-tip]:hover::after{bottom:auto !important; top:calc(100% + 8px)}   /* r70: don't clip past the viewport top */
-  .mb-tool{background:var(--surface2); border:1px solid color-mix(in srgb, var(--line) 75%, transparent);
-    color:var(--muted); font-family:var(--mono); font-size:11px;
-    padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s}   /* r58: border + fill carry the affordance — flat, no shadow */
-  .mb-tool:hover{color:var(--text); border-color:var(--muted)}
+  /* r310 (Wolf): buttons must READ as buttons at rest — the old muted-text-until-hover made
+     the whole bar look disabled. Resting text is now full --text, the border is solid, and
+     hover lifts the fill. Applies across every command button below. */
+  .mb-tool{background:var(--surface2); border:1px solid var(--line);
+    color:var(--text); font-family:var(--mono); font-size:11px; font-weight:500;
+    padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s}
+  .mb-tool:hover{color:var(--text); border-color:var(--accent-dim); background:color-mix(in srgb, var(--accent) 8%, var(--surface2))}
   .mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+  /* r310 (Wolf): the KEY mode launchers each carry their own color so they pop past the
+     quiet adaptive toggles — daily=accent(green), campaign=blue, rapid-fire=amber.
+     color-mix against theme text/line/surface keeps them legible in every theme. */
+  .mb-tool.mb-campaign{--h:#5b8def; color:color-mix(in srgb, var(--h) 44%, var(--text)); font-weight:600;
+    border-color:color-mix(in srgb, var(--h) 55%, var(--line)); background:color-mix(in srgb, var(--h) 12%, var(--surface2))}
+  .mb-tool.mb-campaign:hover{border-color:var(--h); background:color-mix(in srgb, var(--h) 20%, var(--surface2))}
+  .mb-tool.mb-campaign.on{color:#fff; border-color:var(--h); background:var(--h)}
+  .mb-tool.mb-rapid{--h:#e8913a; color:color-mix(in srgb, var(--h) 46%, var(--text)); font-weight:600;
+    border-color:color-mix(in srgb, var(--h) 55%, var(--line)); background:color-mix(in srgb, var(--h) 12%, var(--surface2))}
+  .mb-tool.mb-rapid:hover{border-color:var(--h); background:color-mix(in srgb, var(--h) 20%, var(--surface2))}
+  .mb-tool.mb-rapid.on{color:#fff; border-color:var(--h); background:var(--h)}
   .mb-tool kbd{font-family:var(--mono); background:var(--surface2); border:1px solid var(--line);
     border-radius:3px; padding:0 4px; font-size:10px; margin-right:4px; color:inherit}
   /* r219 (Wolf): the Daily Challenge is the marquee mode — its chip carries the accent
      so it reads as the front door, and a soft pulse when today's sitting is unplayed. */
-  .mb-tool.mb-daily{color:var(--accent); font-weight:700; border-color:var(--accent-dim);
+  .mb-tool.mb-daily{color:var(--accent); font-weight:700; border-color:var(--accent-dim); background:var(--accent-glow);
     background:var(--accent-glow); letter-spacing:.02em}
   .mb-tool.mb-daily:hover{color:var(--accent); border-color:var(--accent)}
   /* r302/r306 (Wolf): unplayed daily = ACCENT chip (the one thing worth highlighting);
@@ -1400,7 +1414,7 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
 <script src="drills.js?v=265"></script>
-<link rel="stylesheet" href="nav.css?v=178">
+<link rel="stylesheet" href="nav.css?v=179">
 <script src="themes.js?v=263"></script>
 
 </head>
@@ -1435,9 +1449,9 @@
       <!-- r306 (Wolf): modes → helpers → flair → settings, weight ∝ usage. Classic chip and
            random retired (the drill menu covers both); rapid-fire downweighted to a normal chip. -->
       <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily</button>
-      <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
+      <button class="mb-tool mb-campaign" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
       <div class="mb-mode-wrap">
-        <button class="mb-tool" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true">⚡ rapid-fire<span class="caret">▾</span></button>
+        <button class="mb-tool mb-rapid" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true">⚡ rapid-fire<span class="caret">▾</span></button>
         <div class="mb-popover" id="mbRapidPop">
           <div class="mb-deckrow">
             <button class="mb-deck selected" data-deck="all">all chords</button>
