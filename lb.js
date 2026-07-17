@@ -93,7 +93,7 @@ function bestPerUser(rows, mode, dur){
       .forEach(r=>{ if(!seen[r.user_id]){ seen[r.user_id]=true; best.push(r); } });
   return best;
 }
-const MARATHON_DURS = [{sec:180, label:'3-minute marathon'}, {sec:300, label:'5-minute marathon'}, {sec:600, label:'10-minute marathon'}];  // must match the trainer's duration configs
+// r298: MARATHON_DURS deleted — marathon boards retired r293; nothing referenced it
 const RAPID_DURS    = [{sec:30,  label:'30-second rapid-fire'}, {sec:60, label:'60-second rapid-fire'}, {sec:90, label:'90-second rapid-fire'}];  // must match the trainer's duration configs
 const marathonScore = r => `${r.score} drill${r.score===1?'':'s'} · ${r.keystrokes} keys`;
 const rapidScore    = r => { const t=r.score+(r.misses||0); const a=t?Math.round(100*r.score/t):100;
@@ -814,13 +814,17 @@ function guildHtml(){
         '<span class="gb-or">or</span><input id="gbCode" maxlength="12" placeholder="invite code"><button class="tab" id="gbJoin">join</button><span class="gb-msg" id="gbMsg"></span></div>')
     : '<div class="gb-start" style="color:var(--muted)"><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</div>';
   /* r293 (Wolf): ONE tile + arrows instead of a full grid, tight header, no explainer */
-  return '<h3 class="section-title">The guild board</h3>'+
-    '<div class="gb-caro" style="grid-column:1/-1">'+
-      '<button class="gb-arrow" id="gbPrev" aria-label="previous desk">\u2039</button>'+
-      '<div class="gb-stage" id="gbStage">'+cardHtml+'</div>'+
-      '<button class="gb-arrow" id="gbNext" aria-label="next desk">\u203a</button>'+
-      '<span class="gb-count" id="gbCount"></span>'+
-    '</div>'+
+  /* r297: with ZERO desks the carousel used to render two stranded arrows around an empty
+     stage \u2014 now the empty state is a single centered line and the chrome stays hidden */
+  const caro = cardHtml
+    ? '<div class="gb-caro" style="grid-column:1/-1">'+
+        '<button class="gb-arrow" id="gbPrev" aria-label="previous desk">\u2039</button>'+
+        '<div class="gb-stage" id="gbStage">'+cardHtml+'</div>'+
+        '<button class="gb-arrow" id="gbNext" aria-label="next desk">\u203a</button>'+
+        '<span class="gb-count" id="gbCount"></span>'+
+      '</div>'
+    : '<div style="grid-column:1/-1; text-align:center; padding:26px 0; font-family:var(--mono); font-size:12.5px; color:var(--muted)">no desks yet \u2014 start one below</div>';
+  return '<h3 class="section-title">The guild board</h3>'+ caro +
     '<div style="grid-column:1/-1">'+startRow+'</div>';
 }
 function wireGuild(){
@@ -1010,8 +1014,8 @@ async function renderManage(root){
   // ---- quests + program templates (ported from account.html r130/r149) ----
   const MG_PROGRAMS={
     intern0:{name:'Intern week 0', pitch:'zero to desk-ready — movement, formatting, first formulas, find-and-fix', weeks:[
-      {note:'get moving, no mouse',        keys:['navigation','copyover','saves']},
-      {note:'desk-standard formatting',    keys:['housestyle','format','blue']},
+      {note:'get moving, no mouse',        keys:['navigation','copyover','undo']},
+      {note:'desk-standard formatting',    keys:['housestyle','dress','decimals']},
       {note:'first formulas',              keys:['margin','growth','foot']},
       {note:'find it and fix it',          keys:['modeltour','audit','triage']}]},
     bootcamp:{name:'First-year bootcamp', pitch:'the modeling core — clean-up, functions, schedules, statements', weeks:[
@@ -1020,7 +1024,7 @@ async function renderManage(root){
       {note:'schedule week',               keys:['schedule','debtsched','nwcsched']},
       {note:'statement week',              keys:['cfslink','bsbuild','threestmt']}]},
     speed:{name:'Speed weeks', pitch:'PB-chase under par-based bars, basics to models', mult:1.5, weeks:[
-      {note:'speed: the basics',           keys:['navigation','format','margin']},
+      {note:'speed: the basics',           keys:['navigation','decimals','margin']},
       {note:'speed: the sheet',            keys:['foot','percent','series']},
       {note:'speed: data + lookups',       keys:['sort','lookup','sumif']},
       {note:'speed: the models',           keys:['dcf','waterfall','lbo']}]}

@@ -322,6 +322,7 @@
      shared edge into a single rule. Coloured brighter than the gridline so they win. */
   td.bt{border-top:1px solid var(--rule,var(--text))}
   td.bb{border-bottom:1px solid var(--rule,var(--text))}
+  td.bdbl{border-bottom:3px double var(--rule,var(--text))}   /* r298: Alt H B B — the double rule under a grand total */
   td.it{font-style:italic}
   td.strike{text-decoration:line-through; opacity:.75}
   td.uline{text-decoration:underline; text-underline-offset:2px}
@@ -1346,13 +1347,13 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
 <script src="drills.js?v=265"></script>
-<link rel="stylesheet" href="nav.css?v=175">
+<link rel="stylesheet" href="nav.css?v=176">
 <script src="themes.js?v=263"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=262"></script>
+<script src="nav.js?v=264"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1405,7 +1406,7 @@
       <!-- r292 (Wolf): the "sheet" button retired -->
       <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
       <span style="position:relative; display:inline-flex">
-      <button class="mb-tool" id="wqBtn" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c6; weakness</button>
+      <button class="mb-tool" id="wqBtn" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r297: ◈ — the ◆ was a glyph collision with the daily challenge chip -->
       <div class="prefs-pop" id="wqPop" style="min-width:300px; flex-direction:column; gap:4px"></div>
       </span>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
@@ -1483,10 +1484,10 @@
 <div class="onboard-modal" id="onboard">
   <div class="ob-card">
     <div class="ob-title">welcome to hotkey.gg</div>
-    <div class="ob-body">The ladder runs Candidate → Second-Year Analyst. One drill tells you where you start.</div>
+    <div class="ob-body">The ladder runs MBA Associate → Second-Year Analyst. One warm-up shows you the moves.</div>
     <div class="ob-opts">
-      <button class="ob-key primary" id="obStart">🎯 60-second placement — find your rung</button>
-      <button class="ob-key" id="obSkip">Skip — I’ll dive in</button>
+      <button class="ob-key primary" id="obStart">▶ Quick warm-up — feel the moves</button>
+      <button class="ob-key" id="obSkip">Skip — straight to the drills</button>
     </div>
   </div>
 </div>
@@ -1621,7 +1622,7 @@ const colLetter = c => String.fromCharCode(64+c);
 
 function blankCell(){return {value:null,formula:null,bold:false,fill:null,wrap:false,
   fmtStyle:'general',decimals:0,bt:false,bb:false,ball:false,txt:false,
-  align:null,fontColor:null,uline:false,indent:0,scale:0,thick:false,fsz:null};}
+  align:null,fontColor:null,uline:false,indent:0,scale:0,thick:false,fsz:null,bdbl:false};}   /* r298: bdbl = DOUBLE bottom border (Alt H B B) — the grand-total rule */
 /* r235: font-size ladder around the 13.5px base. Grow/shrink (Alt H F G / K) step through it;
    base normalizes back to null so an unresized cell carries no fsz. */
 const FSZ_LADDER=[10,11.5,13.5,16,18,20], FSZ_BASE=13.5;
@@ -1753,11 +1754,11 @@ const CHALLENGES = {
     name:'Gauntlet', label:'Make it model-ready', par:63, parKeys:66,
     aha:'Model-ready is one rhythm: bold, comma, border, blue inputs — and the totals in accounting format (Alt H A N).',
     prompt:'A raw sources & uses \u2014 both sides straight out of a banker\u2019s head: naked numbers, no totals, nothing marked. Full dress, BOTH blocks: inputs blue, SUM each total with alt+=, bold + top border on both, commas at 0 decimals down both money columns, autofit so nothing clips. Every formatting op you know, both sides of the page, no mouse.',
-    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h f c blue font \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b t</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
+    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h f c blue font \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b p</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
     guide(){ const R=this._R; return [
       'both input stacks in blue font: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 Blue <kbd>\u21b5</kbd> \u00b7 then the same on '+R.useIn,
       'totals with autosum: '+R.srcTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd> \u00b7 then '+R.useTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd>',
-      'dress both totals: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'dress both totals: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
       'commas, 0 decimals, both money bodies: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> \u00d72',
       'the two totals in accounting format: <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> \u2014 $ aligned, the S&U convention',
       'autofit both: <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 no #### leaves the desk',
@@ -1768,8 +1769,8 @@ const CHALLENGES = {
       {sel:R.useIn,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
       {sel:R.srcTot, keys:[Kb.eq, Kb.enter]},
       {sel:R.useTot, keys:[Kb.eq, Kb.enter]},
-      {sel:R.srcTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
-      {sel:R.useTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('T')]},
+      {sel:R.srcTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('P')]},
+      {sel:R.useTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('P')]},
       {sel:R.srcCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
       {sel:R.useCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
       {sel:R.srcTot, keys:[Kb.alt,L('H'),L('A'),L('N')]},
@@ -1829,13 +1830,13 @@ const CHALLENGES = {
     name:'House Style', label:'Bring it to standard', par:47, parKeys:48,
     aha:'Blue the inputs, keep formulas black, rule the totals — colour says typed vs computed.',
     prompt:'A raw P&L fragment just landed from a first-year \u2014 and remember the sibling rule while you format it: center across, never merge; merged cells break every fill and every sort. No title weight, naked headers, inputs invisible among the formulas, decimals everywhere, margins reading as decimals, nothing ruled off. Bring the whole tab to house standard \u2014 the pass a senior runs before ANY page leaves the desk. The inputs move every run, and one of them is a hardcode someone buried in a formula row: paint it or it ships wrong.',
-    req(){ const R=this._R; return '<em>A1</em> <em>ctrl+b</em> \u00b7 headers <em>B2:F2</em> bold + <em>alt h b b</em> \u00b7 inputs blue via <em>alt h f c</em>: <em>'+R.inpRows.map(r=>'B'+r+':F'+r).join('</em> \u00b7 <em>')+'</em> + the buried hardcode <em>'+R.override+'</em> \u00b7 figures <em>B3:F7</em> <em>alt h k</em> + <em>alt h 9</em> \u00d72 \u00b7 margins <em>B8:F8</em> <em>ctrl+shift+%</em> \u00b7 EBITDA <em>B7:F7</em> <em>ctrl+b</em> + <em>alt h b t</em>'; },
+    req(){ const R=this._R; return '<em>A1</em> <em>ctrl+b</em> \u00b7 headers <em>B2:F2</em> bold + <em>alt h b o</em> \u00b7 inputs blue via <em>alt h f c</em>: <em>'+R.inpRows.map(r=>'B'+r+':F'+r).join('</em> \u00b7 <em>')+'</em> + the buried hardcode <em>'+R.override+'</em> \u00b7 figures <em>B3:F7</em> <em>alt h k</em> + <em>alt h 9</em> \u00d72 \u00b7 margins <em>B8:F8</em> <em>ctrl+shift+%</em> \u00b7 EBITDA <em>B7:F7</em> <em>ctrl+b</em> + <em>alt h b p</em>'; },
     guide(){ const R=this._R; return [
-      'the title carries the page: A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then headers B2:F2 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 bold, ruled under',
+      'the title carries the page: A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then headers B2:F2 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 bold, ruled under',
       'paint the inputs BLUE so the next analyst knows what moves: '+R.inpRows.map(r=>'B'+r+':F'+r).join(' and ')+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 \u00b7 <kbd>\u21b5</kbd>',
       'the buried hardcode at '+R.override+' \u2014 someone typed over the formula. Same blue walk: it\u2019s an input now, mark it like one',
       'figures to commas: select B3:F7 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice \u2014 decimals off \u00b7 margins to percents: B8:F8 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'rule off the answer: B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 EBITDA is what the page is FOR',
+      'rule off the answer: B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> \u2014 EBITDA is what the page is FOR',
     ]; },
     targets(){ const R=this._R; return ['A1','B2:F2',R.override,'B3:F7','B8:F8','B7:F7']; },
     demo(){ const R=this._R;
@@ -1843,7 +1844,7 @@ const CHALLENGES = {
       const steps=[
         {sel:'A1', keys:[Kb.bold]},
         {sel:'B2:F2', keys:[Kb.bold]},
-        {sel:'B2:F2', keys:[{key:'Alt'}, L('h'), L('b'), L('b')]},
+        {sel:'B2:F2', keys:[{key:'Alt'}, L('h'), L('b'), L('o')]},
       ];
       R.inpRows.forEach(r=>steps.push({sel:'B'+r+':F'+r, keys:BLUE.slice()}));
       steps.push({sel:R.override, keys:BLUE.slice()});
@@ -1852,7 +1853,7 @@ const CHALLENGES = {
       steps.push({sel:'B3:F7', keys:[{key:'Alt'}, L('h'), D(9)]});
       steps.push({sel:'B8:F8', keys:[Kb.pct]});
       steps.push({sel:'B7:F7', keys:[Kb.bold]});
-      steps.push({sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]});
+      steps.push({sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]});
       return steps; },
     build(){
       const cells={};
@@ -1903,28 +1904,28 @@ const CHALLENGES = {
   },
   ruleoff:{
     name:'Rule Off', label:'Rule off the schedule', par:29, parKeys:28,
-    aha:'Alt H B lays borders where you point — top, bottom, outside, or a THICK box (Alt H B K) around the headline.',
+    aha:'Alt H B lays borders where you point — top, bottom, outside, or a THICK box (Alt H B T) around the headline.',
     prompt:'A segment build is done but naked \u2014 no rulings, and the EBITDA line was never pulled through. Dress it to accounting standard: a line UNDER the headers, a line ABOVE every subtotal (the single-rule convention \u2014 a total earns its line), pull EBITDA across, bold it, rule it, and box the headline figure the MD circles. Sections and the headline year move every run.',
-    req(){ const R=this._R; return 'headers <em>B2:'+R.LC+'2</em> <em>alt h b b</em> \u00b7 rule ABOVE both subtotals <em>B'+R.sub1+':'+R.LC+R.sub1+'</em> and <em>B'+R.sub2+':'+R.LC+R.sub2+'</em> <em>alt h b t</em> \u00b7 EBITDA <em>B'+R.g+'</em> = revenue total + cost total, fill right <em>ctrl+r</em>, <em>ctrl+b</em>, <em>alt h b t</em> \u00b7 box the headline <em>'+R.focus+'</em> <em>alt h b k</em> (thick box)'; },
+    req(){ const R=this._R; return 'headers <em>B2:'+R.LC+'2</em> <em>alt h b o</em> \u00b7 rule ABOVE both subtotals <em>B'+R.sub1+':'+R.LC+R.sub1+'</em> and <em>B'+R.sub2+':'+R.LC+R.sub2+'</em> <em>alt h b p</em> \u00b7 EBITDA <em>B'+R.g+'</em> = revenue total + cost total, fill right <em>ctrl+r</em>, <em>ctrl+b</em>, <em>alt h b p</em> \u00b7 box the headline <em>'+R.focus+'</em> <em>alt h b t</em> (thick box)'; },
     guide(){ const R=this._R; return [
-      'headers get ruled UNDER: B2:'+R.LC+'2 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd>',
-      'a total earns its line \u2014 rule ABOVE both subtotals: B'+R.sub1+':'+R.LC+R.sub1+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u00b7 then B'+R.sub2+':'+R.LC+R.sub2+' \u00b7 same walk',
+      'headers get ruled UNDER: B2:'+R.LC+'2 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>',
+      'a total earns its line \u2014 rule ABOVE both subtotals: B'+R.sub1+':'+R.LC+R.sub1+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> \u00b7 then B'+R.sub2+':'+R.LC+R.sub2+' \u00b7 same walk',
       'pull EBITDA through: B'+R.g+' \u00b7 type <b>=B'+R.sub1+'+B'+R.sub2+'</b> (or point with arrows) \u00b7 <kbd>\u21b5</kbd> \u00b7 select B'+R.g+':'+R.LC+R.g+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'the answer line reads like one: same selection \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
-      'box what the MD circles with a THICK box: '+R.focus+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>k</kbd> \u2014 2px says "this is the number"',
+      'the answer line reads like one: same selection \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
+      'box what the MD circles with a THICK box: '+R.focus+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 2px says "this is the number"',
     ]; },
     targets(){ const R=this._R; return ['B2:'+R.LC+'2','B'+R.sub1+':'+R.LC+R.sub1,'B'+R.g,'B'+R.g+':'+R.LC+R.g,R.focus]; },
     demo(){ const R=this._R;
       const W=(a,b,c2)=>[{key:'Alt'},L(a),L(b),L(c2)];
       return [
-        {sel:'B2:'+R.LC+'2', keys:W('h','b','b')},
-        {sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:W('h','b','t')},
-        {sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:W('h','b','t')},
+        {sel:'B2:'+R.LC+'2', keys:W('h','b','o')},
+        {sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:W('h','b','p')},
+        {sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:W('h','b','p')},
         {sel:'B'+R.g, keys:T('=B'+R.sub1+'+B'+R.sub2).concat([Kb.enter])},
         {sel:'B'+R.g+':'+R.LC+R.g, keys:[Kb.fillR]},
         {sel:'B'+R.g+':'+R.LC+R.g, keys:[Kb.bold]},
-        {sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','t')},
-        {sel:R.focus, keys:W('h','b','k')},
+        {sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','p')},
+        {sel:R.focus, keys:W('h','b','t')},
       ]; },
     build(){
       const cells={};
@@ -1968,22 +1969,22 @@ const CHALLENGES = {
         {label:'add a top border above each subtotal row \u2014 rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
         {label:'pull EBITDA through \u2014 formulas, not typed numbers', ok: ebOk},
         {label:'bold the EBITDA line and add a top border above it', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
-        {label:'box the MD headline at '+R.focus+' with a THICK box (alt h b k)', ok: !!(cell(R.focus).ball && cell(R.focus).thick)},
+        {label:'box the MD headline at '+R.focus+' with a THICK box (alt h b t)', ok: !!(cell(R.focus).ball && cell(R.focus).thick)},
       ];
     }
   },
   ruleaudit:{
     name:'Ruling Pass', label:'The ruling pass', par:18, parKeys:16,
-    aha:'Read the rulings before the math — Alt H B B under every subtotal, box the result.',
+    aha:'Read the rulings before the math — Alt H B O under every subtotal, box the result.',
     prompt:'This schedule came back “done.” It isn’t. Somewhere on the page rulings are missing, the answer line lost its dress, or a figure was never pulled through — and WHAT’s broken moves every run. Run the pass: scan against the conventions, find what fails, fix only that. The checklist tells you WHICH conventions are broken — the page tells you where.',
-    req(){ return 'the house conventions — headers ruled UNDER (<em>alt h b b</em>) · a line ABOVE every total (<em>alt h b t</em>) · EBITDA pulled through as formulas, <em>ctrl+b</em>, ruled · headline boxed (<em>alt h b o</em>). Some hold, some don’t: fix what the checklist flags.'; },
+    req(){ return 'the house conventions — headers ruled UNDER (<em>alt h b o</em>) · a line ABOVE every total (<em>alt h b p</em>) · EBITDA pulled through as formulas, <em>ctrl+b</em>, ruled · headline boxed (<em>alt h b s</em>). Some hold, some don’t: fix what the checklist flags.'; },
     guide(){ const R=this._R; const out=[];
-      if(R.defects.includes('hdr'))  out.push('the header rule is gone: B2:'+R.LC+'2 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd>');
-      if(R.defects.includes('sub1')) out.push('Total revenue lost its line: B'+R.sub1+':'+R.LC+R.sub1+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>');
-      if(R.defects.includes('sub2')) out.push('Total costs lost its line: B'+R.sub2+':'+R.LC+R.sub2+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>');
-      if(R.defects.includes('gbt'))  out.push('the answer line isn’t ruled: B'+R.g+':'+R.LC+R.g+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>');
+      if(R.defects.includes('hdr'))  out.push('the header rule is gone: B2:'+R.LC+'2 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>');
+      if(R.defects.includes('sub1')) out.push('Total revenue lost its line: B'+R.sub1+':'+R.LC+R.sub1+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>');
+      if(R.defects.includes('sub2')) out.push('Total costs lost its line: B'+R.sub2+':'+R.LC+R.sub2+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>');
+      if(R.defects.includes('gbt'))  out.push('the answer line isn’t ruled: B'+R.g+':'+R.LC+R.g+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>');
       if(R.defects.includes('gbold'))out.push('the answer line isn’t bold: B'+R.g+':'+R.LC+R.g+' · <kbd>ctrl</kbd>+<kbd>b</kbd>');
-      if(R.defects.includes('box'))  out.push('nobody boxed the headline: '+R.focus+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>');
+      if(R.defects.includes('box'))  out.push('nobody boxed the headline: '+R.focus+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd>');
       out.push('and '+R.mcol+R.g+' was never pulled through: type <b>='+R.mcol+R.sub1+'+'+R.mcol+R.sub2+'</b> · <kbd>↵</kbd>');
       return out; },
     targets(){ const R=this._R;
@@ -1994,12 +1995,12 @@ const CHALLENGES = {
       const W=(a,b,c2)=>[{key:'Alt'},L(a),L(b),L(c2)];
       const steps=[];
       steps.push({sel:R.mcol+R.g, keys:T('='+R.mcol+R.sub1+'+'+R.mcol+R.sub2).concat([Kb.enter])});
-      if(R.defects.includes('hdr'))  steps.push({sel:'B2:'+R.LC+'2', keys:W('h','b','b')});
-      if(R.defects.includes('sub1')) steps.push({sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:W('h','b','t')});
-      if(R.defects.includes('sub2')) steps.push({sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:W('h','b','t')});
-      if(R.defects.includes('gbt'))  steps.push({sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','t')});
+      if(R.defects.includes('hdr'))  steps.push({sel:'B2:'+R.LC+'2', keys:W('h','b','o')});
+      if(R.defects.includes('sub1')) steps.push({sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:W('h','b','p')});
+      if(R.defects.includes('sub2')) steps.push({sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:W('h','b','p')});
+      if(R.defects.includes('gbt'))  steps.push({sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','p')});
       if(R.defects.includes('gbold'))steps.push({sel:'B'+R.g+':'+R.LC+R.g, keys:[Kb.bold]});
-      if(R.defects.includes('box'))  steps.push({sel:R.focus, keys:W('h','b','o')});
+      if(R.defects.includes('box'))  steps.push({sel:R.focus, keys:W('h','b','s')});
       return steps; },
     build(){
       const cells={};
@@ -2135,30 +2136,30 @@ const CHALLENGES = {
     name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:46, parKeys:47,
     aha:'A full formatting pass is chords end to end — bold, comma, percent, border, shade, blue, italic — and EBITDA margin is EBITDA over the Revenue line right above it.',
     prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, hardcodes in blue, EBITDA margins as clean percents, dollars with commas, the output circled, and the source line whispering in italics. Seven formatting muscles, one pass, and the block moves every run.',
-    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b b</em> \u00b7 header <em>A3:E3</em> \u2192 <em>alt h h</em> gray \u00b7 blue the hardcodes '+R.segRange+' + '+R.costRange+' \u2192 <em>alt h f c</em> \u00b7 EBITDA margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 circle the OUTPUT <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b o</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 source <em>A'+R.srcRow+'</em> \u2192 <em>ctrl+i</em>'; },
+    req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 header <em>A3:E3</em> \u2192 <em>alt h h</em> gray \u00b7 blue the hardcodes '+R.segRange+' + '+R.costRange+' \u2192 <em>alt h f c</em> \u00b7 EBITDA margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 circle the OUTPUT <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b s</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b p</em> \u00b7 source <em>A'+R.srcRow+'</em> \u2192 <em>ctrl+i</em>'; },
     guide(){ const R=this._R; return [
-      'the title \u00b7 <em>A1</em> \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> \u2014 bold, and a rule underneath',
+      'the title \u00b7 <em>A1</em> \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 bold, and a rule underneath',
       'shade the header band \u2014 select <em>A3:E3</em> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>h</kbd> \u00b7 <kbd>\u2192</kbd> Gray (header) \u00b7 <kbd>\u21b5</kbd> \u2014 a shaded header reads as a header at a glance',
       'blue the hardcodes \u2014 the typed numbers, not the computed ones: select <em>'+R.segRange+'</em> (segment revenues) \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 Blue \u00b7 <kbd>\u21b5</kbd> \u00b7 then the cost line <em>'+R.costRange+'</em> the same way \u2014 blue = typed, black = computed',
       'the EBITDA margins \u2014 <em>'+R.mRowRange+'</em> (EBITDA \u00f7 the Revenue line above) \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> \u2014 one decimal',
       'comma the dollar figures \u2014 select <em>'+R.fRange+'</em> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u2014 thousands separators; negatives flip to (parens)',
-      'circle the OUTPUT \u2014 select the margin row <em>A'+R.mRow+':E'+R.mRow+'</em> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 one perimeter around the row the MD reads',
+      'circle the OUTPUT \u2014 select the margin row <em>A'+R.mRow+':E'+R.mRow+'</em> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> \u2014 one perimeter around the row the MD reads',
       'footnote the margin label \u2014 on <em>A'+R.mRow+'</em> \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>e</kbd> \u2014 superscript stamps the \u00b9',
-      'the EBITDA line carries the page \u2014 select <em>A'+R.tRow+':E'+R.tRow+'</em> \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold with a rule above',
+      'the EBITDA line carries the page \u2014 select <em>A'+R.tRow+':E'+R.tRow+'</em> \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> \u2014 bold with a rule above',
       'the source line whispers \u2014 on <em>A'+R.srcRow+'</em> \u00b7 <kbd>ctrl</kbd>+<kbd>i</kbd> \u2014 italic marks a footnote/source',
     ]; },
     targets:[function(){return 'A1';}, function(){return 'A3:E3';}, function(){return this._R.segRange;}, function(){return this._R.mRowRange;}, function(){return this._R.fRange;}, function(){return 'A'+this._R.mRow+':E'+this._R.mRow;}, function(){return 'A'+this._R.mRow;}, function(){return 'A'+this._R.tRow+':E'+this._R.tRow;}, function(){return 'A'+this._R.srcRow;}],
     demo(){ const R=this._R;
       return [
-        {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('b')]},
+        {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('o')]},
         {sel:'A3:E3', keys:[{key:'Alt'}, L('h'), L('h'), {key:'ArrowRight'}, Kb.enter]},
         {sel:R.segRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
         {sel:R.costRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
         {sel:R.mRowRange, keys:[Kb.pct, {key:'Alt'}, L('h'), D(0)]},
         {sel:R.fRange, keys:[{key:'Alt'}, L('h'), L('k')]},
-        {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'}, L('h'), L('b'), L('o')]},
+        {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'}, L('h'), L('b'), L('s')]},
         {sel:'A'+R.mRow, keys:[{key:'1',ctrl:true}, L('E')]},
-        {sel:'A'+R.tRow+':E'+R.tRow, keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('t')]},
+        {sel:'A'+R.tRow+':E'+R.tRow, keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('p')]},
         {sel:'A'+R.srcRow, keys:[{key:'i',ctrl:true}]},
       ]; },
     build(){
@@ -2216,14 +2217,14 @@ const CHALLENGES = {
       const dressOk=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+R.tRow]; if(!x||!x.bold||!x.bt) return false; } return true; })();
       const srcOk=(()=>{ const s=S.cells['A'+R.srcRow]; return !!(s&&s.it); })();
       return [
-        {label:'Bold A1 and rule it \u2014 ctrl+b, then alt h b b for the bottom border', ok:titleOk},
+        {label:'Bold A1 and rule it \u2014 ctrl+b, then alt h b o for the bottom border', ok:titleOk},
         {label:'Shade the header band A3:E3 gray \u2014 alt h h, pick Gray (header)', ok:hdrFillOk},
         {label:'Blue the hardcodes \u2014 alt h f c on the segment revenues ('+R.segRange+') and the cost line ('+R.costRange+')', ok:blueOk},
         {label:'Percent the EBITDA margins, one decimal \u2014 ctrl+shift+% on '+R.mRowRange, ok:pctOk},
         {label:'Comma the dollar figures ('+R.fRange+') \u2014 alt h k; negatives read as (parens)', ok:comOk},
-        {label:'Circle the output row \u2014 alt h b o around A'+R.mRow+':E'+R.mRow, ok:circleOk},
+        {label:'Circle the output row \u2014 alt h b s around A'+R.mRow+':E'+R.mRow, ok:circleOk},
         {label:'Footnote the margin label \u2014 ctrl+1, e (superscript) stamps the \u00b9 on A'+R.mRow, ok:footOk},
-        {label:'Dress the EBITDA line \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above (alt h b t)', ok:dressOk},
+        {label:'Dress the EBITDA line \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above (alt h b p)', ok:dressOk},
         {label:'Italicize the source line \u2014 ctrl+i on A'+R.srcRow, ok:srcOk},
       ];
     }
@@ -4813,12 +4814,12 @@ const CHALLENGES = {
     name:'Revolver', label:'Sweep the revolver', par:41, parKeys:41,
     aha:'MIN and MAX sweep the revolver — it plugs the shortfall, not your eyes.',
     prompt:'Four year-end sweeps, each with its own cash picture. Sweep = the LESSER of the outstanding balance and the cash above minimum \u2014 never negative \u2014 then prove each year out: revolver after the sweep, cash after the sweep, and the balance row dressed. MIN and MAX nested once, arithmetic twice, one bold rule.',
-    req:'<em>B5</em> <em>=MIN(B3,MAX(0,B2-B4))</em> \u00b7 fill B5:E5 \u2192 \u00b7 <em>B6</em> <em>=B3-B5</em> fill \u2192 \u00b7 <em>B7</em> <em>=B2-B5</em> fill \u2192 \u00b7 dress B6:E6: <em>ctrl+b</em> + <em>alt h b t</em>',
+    req:'<em>B5</em> <em>=MIN(B3,MAX(0,B2-B4))</em> \u00b7 fill B5:E5 \u2192 \u00b7 <em>B6</em> <em>=B3-B5</em> fill \u2192 \u00b7 <em>B7</em> <em>=B2-B5</em> fill \u2192 \u00b7 dress B6:E6: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'the sweep at B5 \u00b7 <kbd>=MIN(B3,MAX(0,B2-B4))</kbd> <kbd>\u21b5</kbd> \u2014 can\u2019t sweep more than the balance, can\u2019t dip below minimum cash',
       'select B5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 one formula sweeps all four years',
       'revolver after the sweep: B6 \u00b7 <kbd>=B3-B5</kbd> \u00b7 fill \u2192 \u00b7 cash after: B7 \u00b7 <kbd>=B2-B5</kbd> \u00b7 fill \u2192',
-      'format the balance row: select B6:E6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'format the balance row: select B6:E6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
     ],
     targets:['B5:E5','B6:E6','B7:E7','B6:E6'],
     demo(){ return [
@@ -4829,7 +4830,7 @@ const CHALLENGES = {
       {sel:'B7', keys:[...T('=B2-B5'), Kb.enter]},
       {sel:'B7:E7', keys:[Kb.fillR]},
       {sel:'B6:E6', keys:[Kb.bold]},
-      {sel:'B6:E6', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B6:E6', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -4874,7 +4875,7 @@ const CHALLENGES = {
       'revolver ending: B7 \u00b7 <kbd>=B5-B6</kbd> \u00b7 fill \u2192 \u00b7 then the roll-forward: C5 \u00b7 <kbd>=B7</kbd> \u2014 next year opens where this year closed \u00b7 fill C5:E5 \u2192',
       'term loan sweeps the REMAINDER: B9 \u00b7 <kbd>=MIN(B8,B3-B6)</kbd> \u00b7 ending B10 \u00b7 <kbd>=B8-B9</kbd> \u00b7 roll-forward C8 \u00b7 <kbd>=B10</kbd> \u00b7 fill all three \u2192',
       'mezz gets the dregs: B12 \u00b7 <kbd>=MIN(B11,B3-B6-B9)</kbd> \u2014 two seniors already ate \u00b7 ending B13 \u00b7 <kbd>=B11-B12</kbd> \u00b7 roll-forward C11 \u00b7 <kbd>=B13</kbd> \u00b7 fill \u2192',
-      'total debt: B14 \u00b7 <kbd>=B7+B10+B13</kbd> \u00b7 fill \u2192 \u00b7 format it: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'total debt: B14 \u00b7 <kbd>=B7+B10+B13</kbd> \u00b7 fill \u2192 \u00b7 format it: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
     ],
     targets:['B6:E6','C5:E5','B9:E9','C8:E8','B12:E12','C11:E11','B14:E14'],
     demo(){ return [
@@ -4899,7 +4900,7 @@ const CHALLENGES = {
       {sel:'B14', keys:[...T('=B7+B10+B13'), Kb.enter]},
       {sel:'B14:E14', keys:[Kb.fillR]},
       {sel:'B14:E14', keys:[Kb.bold]},
-      {sel:'B14:E14', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B14:E14', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -4952,13 +4953,13 @@ const CHALLENGES = {
     name:'13-Week Cash', label:'Run the 13-week', par:45, parKeys:45,
     aha:'Thirteen columns, one pattern — receipts − disbursements, filled right, rolls cash forward.',
     prompt:'The RX desk staple: the front eight weeks of the 13-week cash flow. Receipts and disbursements are in from treasury \u2014 you build the spine: net flow each week, the beginning/ending roll-forward, the cushion against minimum liquidity (anchored \u2014 it does NOT walk), and totals on the FLOWS only. Stocks don\u2019t sum: an ending balance total is how you spot a tourist.',
-    req:'<em>B6</em> <em>=B4-B5</em> fill \u2192 \u00b7 <em>B8</em> <em>=B7+B6</em> fill \u2192 \u00b7 roll-forward <em>C7</em> <em>=B8</em> fill \u2192 \u00b7 cushion <em>B10</em> <em>=B8-$B$12</em> fill \u2192 \u00b7 totals <em>J4</em> <em>=SUM(B4:I4)</em> + fill J4:J6 \u2193 \u00b7 dress <em>B8:I8</em>: <em>ctrl+b</em> + <em>alt h b t</em>',
+    req:'<em>B6</em> <em>=B4-B5</em> fill \u2192 \u00b7 <em>B8</em> <em>=B7+B6</em> fill \u2192 \u00b7 roll-forward <em>C7</em> <em>=B8</em> fill \u2192 \u00b7 cushion <em>B10</em> <em>=B8-$B$12</em> fill \u2192 \u00b7 totals <em>J4</em> <em>=SUM(B4:I4)</em> + fill J4:J6 \u2193 \u00b7 dress <em>B8:I8</em>: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'net flow first: B6 \u00b7 <kbd>=B4-B5</kbd> \u2014 receipts less disbursements \u00b7 fill \u2192 to week 8',
       'ending cash: B8 \u00b7 <kbd>=B7+B6</kbd> \u00b7 fill \u2192 \u00b7 then the roll-forward: C7 \u00b7 <kbd>=B8</kbd> \u2014 next week opens where this one closed \u00b7 fill \u2192',
       'the cushion: B10 \u00b7 <kbd>=B8-$B$12</kbd> \u2014 minimum liquidity is ANCHORED (<kbd>F4</kbd> locks it) \u00b7 fill \u2192 \u00b7 negative weeks are the whole point of this sheet',
       'totals on FLOWS only: J4 \u00b7 <kbd>=SUM(B4:I4)</kbd> \u00b7 select J4:J6 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 receipts, disbursements, net. Ending cash gets NO total',
-      'format the answer row: B8:I8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'format the answer row: B8:I8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
     ],
     targets:['B6:I6','C7:I7','B8:I8','B10:I10','J4:J6','B8:I8'],
     demo(){ return [
@@ -4973,7 +4974,7 @@ const CHALLENGES = {
       {sel:'J4',  keys:[...T('=SUM(B4:I4)'), Kb.enter]},
       {sel:'J4:J6', keys:[Kb.fillD]},
       {sel:'B8:I8', keys:[Kb.bold]},
-      {sel:'B8:I8', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B8:I8', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -5021,15 +5022,15 @@ const CHALLENGES = {
   },
   isbuild:{
     name:'IS Build', label:'Build the income statement', par:51, parKeys:52,
-    aha:'An income statement is subtotals down the page — SUM the blocks, rule each line (Alt H B B).',
+    aha:'An income statement is subtotals down the page — SUM the blocks, rule each line (Alt H B O).',
     prompt:'Five years of income statement, start to finish: COGS off an anchored margin, gross profit, EBIT, net income after the anchored tax rate \u2014 then the net-margin row as a clean percent, and the bottom line bolded and ruled the way it goes in the book. Formulas, fills, a format chord, and the border walk: the whole toolkit on one tab.',
-    req:'<em>B3</em> =-B2*$B$10 fill \u2192 \u00b7 <em>B4</em> =B2+B3 fill \u2192 \u00b7 <em>B6</em> =B4+B5 fill \u2192 \u00b7 <em>B7</em> =B6*(1-$B$11) fill \u2192 \u00b7 <em>B8</em> =B7/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B7:F7: <em>ctrl+b</em> + <em>alt h b t</em>',
+    req:'<em>B3</em> =-B2*$B$10 fill \u2192 \u00b7 <em>B4</em> =B2+B3 fill \u2192 \u00b7 <em>B6</em> =B4+B5 fill \u2192 \u00b7 <em>B7</em> =B6*(1-$B$11) fill \u2192 \u00b7 <em>B8</em> =B7/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B7:F7: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'COGS at B3 \u00b7 <kbd>=-B2*$B$10</kbd> \u2014 margin anchored, revenue walking \u00b7 fill right',
       'gross profit at B4 \u00b7 <kbd>=B2+B3</kbd> (COGS is negative) \u00b7 fill right \u00b7 EBIT at B6 \u00b7 <kbd>=B4+B5</kbd> \u2014 SG&A carries its own sign \u00b7 fill right',
       'net income at B7 \u00b7 <kbd>=B6*(1-$B$11)</kbd> \u2014 tax rate anchored \u00b7 fill right',
       'net margin at B8 \u00b7 <kbd>=B7/B2</kbd> \u00b7 fill right \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 margins read as percents',
-      'format the bottom line: select B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 bold, ruled off',
+      'format the bottom line: select B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> \u2014 bold, ruled off',
     ],
     targets:['B4:F4','B5:F5','B10:B11','B12','B14','B16'],
     demo(){ return [
@@ -5045,7 +5046,7 @@ const CHALLENGES = {
       {sel:'B8:F8', keys:[Kb.fillR]},
       {sel:'B8:F8', keys:[Kb.pct]},
       {sel:'B7:F7', keys:[Kb.bold]},
-      {sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -5088,7 +5089,7 @@ const CHALLENGES = {
         {label:'run gross profit and EBIT, all five years', ok: rowOk(4,e=>e.gp)&&rowOk(6,e=>e.eb)},
         {label:'run net income after the anchored tax rate, all five years', ok: rowOk(7,e=>e.ni)&&refs('B7',['B6','B11'])},
         {label:'run the net margin \u2014 live ratio, formatted as a percent', ok: mOk},
-        {label:'bold the bottom line and add a top border above it (ctrl+b, alt h b t)', ok: dressOk},
+        {label:'bold the bottom line and add a top border above it (ctrl+b, alt h b p)', ok: dressOk},
       ];
     }
   },
@@ -5096,14 +5097,14 @@ const CHALLENGES = {
     name:'Debt Sched.', label:'Run the debt schedule', par:73, parKeys:77,
     aha:'Each tranche rolls BB + draws − paydown — interest reads the balance it just made.',
     prompt:'The roll-forward, five years, and it starts the way real staffing does: the VP gives you the amort rate over the phone \u2014 you type it, you paint it blue, THEN you build. Mandatory amort off your anchored rate, a MIN/MAX cash sweep, interest on the average balance, the year-over-year link \u2014 and the ending row bolded and ruled when the machine ties.',
-    req(){ return 'type <em>'+this._ratePct+'%</em> at B9 \u2192 <em>alt h f c</em> blue \u00b7 <em>B4</em> =-B2*$B$9 \u00b7 <em>B5</em> =-MIN(B2+B4,MAX(0,B3)) \u00b7 <em>B6</em> =B2+B4+B5 \u00b7 <em>B7</em> =$B$10*(B2+B6)/2 \u00b7 <em>C2</em> =B6 \u00b7 fill C2:F2 \u2192 \u00b7 fill B4:F7 \u2192 \u00b7 dress B6:F6: <em>ctrl+b</em> + <em>alt h b t</em>'; },
+    req(){ return 'type <em>'+this._ratePct+'%</em> at B9 \u2192 <em>alt h f c</em> blue \u00b7 <em>B4</em> =-B2*$B$9 \u00b7 <em>B5</em> =-MIN(B2+B4,MAX(0,B3)) \u00b7 <em>B6</em> =B2+B4+B5 \u00b7 <em>B7</em> =$B$10*(B2+B6)/2 \u00b7 <em>C2</em> =B6 \u00b7 fill C2:F2 \u2192 \u00b7 fill B4:F7 \u2192 \u00b7 dress B6:F6: <em>ctrl+b</em> + <em>alt h b p</em>'; },
     guide(){ return [
       'the rate is YOURS: at B9 type <kbd>'+this._ratePct+'%</kbd> <kbd>\u21b5</kbd> \u2014 then back on B9 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means hardcode',
       'amort at B4 \u00b7 <kbd>=-B2*$B$9</kbd> \u2014 YOUR rate, anchored, negative convention',
       'sweep at B5 \u00b7 <kbd>=-MIN(B2+B4,MAX(0,B3))</kbd> \u2014 no more than what\u2019s left, no more than cash allows',
       'ending at B6 \u00b7 <kbd>=B2+B4+B5</kbd> \u00b7 interest at B7 \u00b7 <kbd>=$B$10*(B2+B6)/2</kbd> \u2014 on the average balance',
       'THE LINK: C2 \u00b7 <kbd>=B6</kbd> \u00b7 fill C2:F2 \u2192 \u00b7 then B4:F7 \u2192 \u2014 five years walk across',
-      'format the close: select B6:F6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'format the close: select B6:F6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
     ]; },
     targets:['B9','C2:F2','B4:F4','B5:F5','B6:F7','B6:F6'],
     demo(){ return [
@@ -5117,7 +5118,7 @@ const CHALLENGES = {
       {sel:'C2:F2', keys:[Kb.fillR]},
       {sel:'B4:F7', keys:[Kb.fillR]},
       {sel:'B6:F6', keys:[Kb.bold]},
-      {sel:'B6:F6', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B6:F6', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -5175,13 +5176,13 @@ const CHALLENGES = {
     name:'CFS Link', label:'Link the cash flow statement', par:36, parKeys:36,
     aha:'Link every CFS line to the other statements (=) — type none of them.',
     prompt:'Five years of cash flow, closed end to end: one SUM for the net change, the cash roll-forward linking every year to the last, a cash-conversion memo the MD will actually read \u2014 as a percent \u2014 and the ending row bolded and ruled. Four different muscles: sum, link, ratio, dress.',
-    req:'<em>B6</em> =SUM(B2:B5) fill \u2192 \u00b7 <em>B8</em> =B7+B6 \u00b7 <em>C7</em> =B8 \u00b7 fill C7:F7 \u2192 \u00b7 fill B8:F8 \u2192 \u00b7 memo <em>B10</em> =B6/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B8:F8: <em>ctrl+b</em> + <em>alt h b t</em>',
+    req:'<em>B6</em> =SUM(B2:B5) fill \u2192 \u00b7 <em>B8</em> =B7+B6 \u00b7 <em>C7</em> =B8 \u00b7 fill C7:F7 \u2192 \u00b7 fill B8:F8 \u2192 \u00b7 memo <em>B10</em> =B6/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B8:F8: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'net change at B6 \u00b7 <kbd>=SUM(B2:B5)</kbd> \u2014 NI + D&A + \u0394NWC + capex (signs carried) \u00b7 fill right',
       'ending cash at B8 \u00b7 <kbd>=B7+B6</kbd>',
       'THE LINK at C7 \u00b7 <kbd>=B8</kbd> \u2014 beginning cash = prior ending \u00b7 fill C7:F7 \u2192, then B8:F8 \u2192',
       'the memo the MD reads: B10 \u00b7 <kbd>=B6/B2</kbd> \u2014 cash conversion \u00b7 fill right \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'format the close: select B8:F8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'format the close: select B8:F8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
     ],
     targets:['B6','B10','B11','B16','B20','B21'],
     demo(){ return [
@@ -5195,7 +5196,7 @@ const CHALLENGES = {
       {sel:'B10:F10', keys:[Kb.fillR]},
       {sel:'B10:F10', keys:[Kb.pct]},
       {sel:'B8:F8', keys:[Kb.bold]},
-      {sel:'B8:F8', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B8:F8', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -5247,13 +5248,13 @@ const CHALLENGES = {
     name:'BS Build', label:'Balance the balance sheet', par:60, parKeys:62,
     aha:'The check row is part of the build — a sheet ties or it ships nothing.',
     prompt:'Three years of balance sheet. Total both sides with live SUMs, build the retained-earnings roll ONCE and fill it across \u2014 prior RE + net income \u2212 dividends, walking year to year \u2014 prove it balances with a check row that must read zero three times, then format it: totals bolded, the check row ruled off. If a check cell isn\u2019t 0.0, something upstream is broken.',
-    req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B8</em> =SUM(B6:B7) fill \u2192 \u00b7 <em>C10</em> RE roll =B10+C12-C13 \u00b7 fill C10:D10 \u2192 \u00b7 <em>B11</em> =B8+B9+B10 fill \u2192 \u00b7 <em>B14</em> =B5-B11 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B5:D5 and B11:D11 \u00b7 <em>alt h b t</em> B14:D14',
+    req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B8</em> =SUM(B6:B7) fill \u2192 \u00b7 <em>C10</em> RE roll =B10+C12-C13 \u00b7 fill C10:D10 \u2192 \u00b7 <em>B11</em> =B8+B9+B10 fill \u2192 \u00b7 <em>B14</em> =B5-B11 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B5:D5 and B11:D11 \u00b7 <em>alt h b p</em> B14:D14',
     guide:[
       'total assets at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u00b7 fill right',
       'total liabilities at B8 \u00b7 <kbd>=SUM(B6:B7)</kbd> \u00b7 fill right',
       'THE RE ROLL at C10 \u00b7 <kbd>=B10+C12-C13</kbd> \u2014 prior RE + NI \u2212 dividends \u00b7 fill C10:D10 \u2192 and it walks',
       'total L&E at B11 \u00b7 <kbd>=B8+B9+B10</kbd> \u00b7 fill \u2192 \u00b7 check at B14 \u00b7 <kbd>=B5-B11</kbd> \u00b7 fill \u2192 \u2014 all three years must read 0',
-      'format it: <kbd>ctrl</kbd>+<kbd>b</kbd> the two total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> the check row',
+      'format it: <kbd>ctrl</kbd>+<kbd>b</kbd> the two total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> the check row',
     ],
     targets:['C3:F3','B4:F5','B6:F7','B8:F8'],
     demo(){ return [
@@ -5269,7 +5270,7 @@ const CHALLENGES = {
       {sel:'B14:D14', keys:[Kb.fillR]},
       {sel:'B5:D5', keys:[Kb.bold]},
       {sel:'B11:D11', keys:[Kb.bold]},
-      {sel:'B14:D14', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B14:D14', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -5324,7 +5325,7 @@ const CHALLENGES = {
         {label:'run THE RE ROLL \u2014 prior RE + NI \u2212 dividends, built once, walking across', ok: rollOk},
         {label:'total liabs & equity, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',this._exp[COL[i]].tle))},
         {label:'Check row = assets minus L&E \u2014 reads 0 in all three years', ok: [0,1,2].every(i=>near(COL[i]+'14',0))},
-        {label:'bold the totals and add a top border above the check row (ctrl+b, alt h b t)', ok: boldOk(5)&&boldOk(11)&&ruleOk},
+        {label:'bold the totals and add a top border above the check row (ctrl+b, alt h b p)', ok: boldOk(5)&&boldOk(11)&&ruleOk},
       ];
     }
   },
@@ -5332,13 +5333,13 @@ const CHALLENGES = {
     name:'NWC Sched.', label:'Roll working capital', par:74, parKeys:78,
     aha:'DSO, DIO, DPO drive the balances — working capital rolls on days, not guesses.',
     prompt:'Working capital the way diligence actually hands it to you: three driver assumptions from the data room \u2014 you type them in, paint them blue, THEN build. AR off DSO, inventory off DIO, payables off DPO, each driver anchored and filled across five years, net working capital bolded and ruled, and the year-over-year swing that feeds the cash flow statement.',
-    req(){ return 'type the drivers at B9:B11 \u2014 DSO <em>'+this._dso+'</em> \u00b7 DIO <em>'+this._dio+'</em> \u00b7 DPO <em>'+this._dpo+'</em> \u2014 then <em>alt h f c</em> blue \u00b7 <em>B4</em> =B2/365*$B$9 fill \u2192 \u00b7 <em>B5</em> =B3/365*$B$10 fill \u2192 \u00b7 <em>B6</em> =B3/365*$B$11 fill \u2192 \u00b7 <em>B7</em> =B4+B5-B6 fill \u2192 + <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 <em>C8</em> \u0394 =C7-B7 fill \u2192'; },
+    req(){ return 'type the drivers at B9:B11 \u2014 DSO <em>'+this._dso+'</em> \u00b7 DIO <em>'+this._dio+'</em> \u00b7 DPO <em>'+this._dpo+'</em> \u2014 then <em>alt h f c</em> blue \u00b7 <em>B4</em> =B2/365*$B$9 fill \u2192 \u00b7 <em>B5</em> =B3/365*$B$10 fill \u2192 \u00b7 <em>B6</em> =B3/365*$B$11 fill \u2192 \u00b7 <em>B7</em> =B4+B5-B6 fill \u2192 + <em>ctrl+b</em> + <em>alt h b p</em> \u00b7 <em>C8</em> \u0394 =C7-B7 fill \u2192'; },
     guide(){ return [
       'the data room says DSO <kbd>'+this._dso+'</kbd> \u00b7 DIO <kbd>'+this._dio+'</kbd> \u00b7 DPO <kbd>'+this._dpo+'</kbd> \u2014 type them down B9:B11, <kbd>\u21b5</kbd> walks you down',
       'select B9:B11 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 your hardcodes wear blue',
       'AR at B4 \u00b7 <kbd>=B2/365*$B$9</kbd> \u2014 a day of revenue \u00d7 YOUR anchored DSO \u00b7 fill right',
       'inventory at B5 \u00b7 <kbd>=B3/365*$B$10</kbd> \u00b7 payables at B6 \u00b7 <kbd>=B3/365*$B$11</kbd> \u2014 both off COGS \u00b7 fill each right',
-      'NWC at B7 \u00b7 <kbd>=B4+B5-B6</kbd> \u00b7 fill right \u00b7 then <kbd>ctrl</kbd>+<kbd>b</kbd> and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 the line that matters gets dressed',
+      'NWC at B7 \u00b7 <kbd>=B4+B5-B6</kbd> \u00b7 fill right \u00b7 then <kbd>ctrl</kbd>+<kbd>b</kbd> and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> \u2014 the line that matters gets dressed',
       '\u0394NWC at C8 \u00b7 <kbd>=C7-B7</kbd> \u00b7 fill C8:F8 \u2192 \u2014 the swing that hits cash flow',
     ]; },
     targets:['B5:F5','B6:F6','B10:F10','B11:F11','B13:F14'],
@@ -5356,7 +5357,7 @@ const CHALLENGES = {
       {sel:'B7', keys:[...T('=B4+B5-B6'), Kb.enter]},
       {sel:'B7:F7', keys:[Kb.fillR]},
       {sel:'B7:F7', keys:[Kb.bold]},
-      {sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
       {sel:'C8', keys:[...T('=C7-B7'), Kb.enter]},
       {sel:'C8:F8', keys:[Kb.fillR]},
     ]; },
@@ -5406,14 +5407,14 @@ const CHALLENGES = {
     name:'3-Statement', label:'Tie the three statements', par:59, parKeys:61,
     aha:'NI → cash → balance sheet — three statements, one loop, all links (=).',
     prompt:'The capstone, now three years wide: cash walks from the CFS into the balance sheet, retained earnings absorbs net income year after year, and the check row proves the whole machine ties \u2014 three different LINKS, each built once and filled across. When all three check cells read zero, format the totals and ship it.',
-    req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B7</em> =B6+B5 \u00b7 <em>C6</em> =B7 fill \u2192 \u00b7 fill B7:D7 \u2192 \u00b7 <em>B9</em> =B7 fill \u2192 \u00b7 <em>B11</em> =B9+B10 fill \u2192 \u00b7 <em>C13</em> =B13+C2 fill \u2192 \u00b7 <em>B14</em> =B11-B12-B13 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B11:D11 \u00b7 <em>alt h b t</em> B14:D14',
+    req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B7</em> =B6+B5 \u00b7 <em>C6</em> =B7 fill \u2192 \u00b7 fill B7:D7 \u2192 \u00b7 <em>B9</em> =B7 fill \u2192 \u00b7 <em>B11</em> =B9+B10 fill \u2192 \u00b7 <em>C13</em> =B13+C2 fill \u2192 \u00b7 <em>B14</em> =B11-B12-B13 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B11:D11 \u00b7 <em>alt h b p</em> B14:D14',
     guide:[
       'net change at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 capex already carries its sign; one clean SUM \u00b7 fill right \u00b7 ending cash at B7 \u00b7 <kbd>=B6+B5</kbd>',
       'LINK 1, the roll-forward: C6 \u00b7 <kbd>=B7</kbd> \u00b7 fill C6:D6 \u2192 and B7:D7 \u2192',
       'LINK 2, CFS\u2192BS: cash on the balance sheet at B9 \u00b7 <kbd>=B7</kbd> \u00b7 fill right \u00b7 total assets at B11 \u00b7 <kbd>=B9+B10</kbd> \u00b7 fill \u2192',
       'LINK 3, the RE roll: C13 \u00b7 <kbd>=B13+C2</kbd> \u00b7 fill C13:D13 \u2192 \u2014 RE absorbs NI every year',
       'the check at B14 \u00b7 <kbd>=B11-B12-B13</kbd> \u00b7 fill \u2192 \u2014 all three years must read ZERO',
-      'then format it: <kbd>ctrl</kbd>+<kbd>b</kbd> total assets \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> the check row',
+      'then format it: <kbd>ctrl</kbd>+<kbd>b</kbd> total assets \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> the check row',
     ],
     targets:['B3:F3','B4:F4','B7:F7','B8:F8','B7:F7'],
     demo(){ return [
@@ -5432,7 +5433,7 @@ const CHALLENGES = {
       {sel:'B14', keys:[...T('=B11-B12-B13'), Kb.enter]},
       {sel:'B14:D14', keys:[Kb.fillR]},
       {sel:'B11:D11', keys:[Kb.bold]},
-      {sel:'B14:D14', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B14:D14', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -5949,12 +5950,12 @@ const CHALLENGES = {
     name:'Balance', label:'Make it balance', par:39, parKeys:39,
     aha:'A sheet that won’t tie is wrong somewhere specific — the check row points at where.',
     prompt:'Two years of balance sheet \u2014 and retained earnings is NEVER a plug; it\u2019s earned, so it\u2019s a given like everything else. Foot both sides with live SUMs, build the check row, and format the totals. The check is a DIAGNOSTIC: it reads zero because the sheet is right, not because you forced it.',
-    req:'<em>B6</em> <em>=SUM(B2:B5)</em> fill \u2192 \u00b7 <em>B12</em> <em>=SUM(B8:B11)</em> fill \u2192 \u00b7 <em>B14</em> check <em>=B6-B12</em> fill \u2192 \u00b7 dress: <em>ctrl+b</em> B6:C6 and B12:C12 \u00b7 <em>alt h b t</em> B14:C14',
+    req:'<em>B6</em> <em>=SUM(B2:B5)</em> fill \u2192 \u00b7 <em>B12</em> <em>=SUM(B8:B11)</em> fill \u2192 \u00b7 <em>B14</em> check <em>=B6-B12</em> fill \u2192 \u00b7 dress: <em>ctrl+b</em> B6:C6 and B12:C12 \u00b7 <em>alt h b p</em> B14:C14',
     guide:[
       'total the assets at B6 \u00b7 <kbd>=SUM(B2:B5)</kbd> (<kbd>alt</kbd>+<kbd>=</kbd> proposes it) \u00b7 fill right',
       'foot L&E at B12 \u00b7 <kbd>=SUM(B8:B11)</kbd> \u2014 all four lines are real inputs; nothing gets backed into \u00b7 fill right',
       'the check at B14 \u00b7 <kbd>=B6-B12</kbd> \u00b7 fill right \u2014 a diagnostic, not a construction; zero means the sheet is right',
-      'format it: <kbd>ctrl</kbd>+<kbd>b</kbd> both total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> the check row',
+      'format it: <kbd>ctrl</kbd>+<kbd>b</kbd> both total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> the check row',
     ],
     targets:['B6','B12','B14','B14:C14'],
     demo(){ return [
@@ -5966,7 +5967,7 @@ const CHALLENGES = {
       {sel:'B14:C14', keys:[Kb.fillR]},
       {sel:'B6:C6', keys:[Kb.bold]},
       {sel:'B12:C12', keys:[Kb.bold]},
-      {sel:'B14:C14', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'B14:C14', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -6786,13 +6787,13 @@ const CHALLENGES = {
     name:'SUMIF', label:'Roll up the segments', par:57, parKeys:59,
     aha:'SUMIF reads the labels for you — one formula rolls up an entire segment.',
     prompt:'A raw ledger on the left, a summary the MD can read on the right. One SUMIF with anchored ranges, filled down for the other segments \u2014 only the criteria cell walks. Then total the summary with a live SUM, run % of total off an anchored denominator, and bold the total line. Rollup, ratio, dress: a real summary tab.',
-    req:'<em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> \u00b7 fill E2:E4 \u2193 \u00b7 <em>E5</em> <em>=SUM(E2:E4)</em> \u00b7 <em>F2</em> <em>=E2/$E$5</em> \u00b7 fill F2:F4 \u2193 + <em>ctrl+shift+%</em> \u00b7 dress D5:E5: <em>ctrl+b</em> + <em>alt h b t</em>',
+    req:'<em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> \u00b7 fill E2:E4 \u2193 \u00b7 <em>E5</em> <em>=SUM(E2:E4)</em> \u00b7 <em>F2</em> <em>=E2/$E$5</em> \u00b7 fill F2:F4 \u2193 + <em>ctrl+shift+%</em> \u00b7 dress D5:E5: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'the rollup at E2 \u00b7 <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>\u21b5</kbd> \u2014 ranges $-locked, criteria walking',
       'select E2:E4 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 only D2 walks; that is what the anchors buy you',
       'foot it at E5 \u00b7 <kbd>=SUM(E2:E4)</kbd> \u2014 the summary must tie to the ledger',
       'mix at F2 \u00b7 <kbd>=E2/$E$5</kbd> \u2014 anchored denominator \u00b7 fill F2:F4 \u2193 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'format the total: select D5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'format the total: select D5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
     ],
     targets:['E2:E4','E5','F2:F4','D5:E5'],
     demo(){ return [
@@ -6803,7 +6804,7 @@ const CHALLENGES = {
       {sel:'F2:F4', keys:[Kb.fillD]},
       {sel:'F2:F4', keys:[Kb.pct]},
       {sel:'D5:E5', keys:[Kb.bold]},
-      {sel:'D5:E5', keys:[{key:'Alt'}, L('h'), L('b'), L('t')]},
+      {sel:'D5:E5', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
     ]; },
     build(){
       const cells={};
@@ -6994,12 +6995,12 @@ const CHALLENGES = {
     name:'SUMIFS', label:'Cross the data', par:65, parKeys:68,
     aha:'SUMIFS crosses two labels at once — one mixed-anchor formula fills the grid.',
     prompt:'A raw deal list \u2014 segment, region, revenue \u2014 and the MD wants the CROSS: a segment \u00d7 region grid, four numbers, totaled. One SUMIFS does it: ranges $-locked, the segment criterion column-locked ($F3), the region criterion row-locked (G$2) \u2014 then the SAME formula fills right and down and the grid builds itself. The dcfsens anchor lesson, pointed at data.',
-    req:'<em>G3</em> <em>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</em> \u00b7 fill G3:H3 \u2192 \u00b7 fill G3:H4 \u2193 \u00b7 <em>G5</em> <em>=SUM(G3:G4)</em> fill \u2192 \u00b7 dress F5:H5: <em>ctrl+b</em> + <em>alt h b t</em>',
+    req:'<em>G3</em> <em>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</em> \u00b7 fill G3:H3 \u2192 \u00b7 fill G3:H4 \u2193 \u00b7 <em>G5</em> <em>=SUM(G3:G4)</em> fill \u2192 \u00b7 dress F5:H5: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'the cross at G3 \u00b7 <kbd>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</kbd> <kbd>\u21b5</kbd> \u2014 sum range first, then each (range, criterion) pair; $F3 walks DOWN only, G$2 walks RIGHT only',
       'select G3:H3 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u00b7 then G3:H4 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 four live cells from ONE formula; if a number repeats, an anchor is wrong',
       'foot it: G5 \u00b7 <kbd>=SUM(G3:G4)</kbd> \u00b7 fill G5:H5 \u2192 \u2014 the two feet must re-add the whole tape',
-      'format the total line: select F5:H5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
+      'format the total line: select F5:H5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
     ],
     targets:['G3','G3:H4','G5:H5','F5:H5'],
     demo(){ return [
@@ -7009,7 +7010,7 @@ const CHALLENGES = {
       {sel:'G5', keys:[...T('=SUM(G3:G4)'), Kb.enter]},
       {sel:'G5:H5', keys:[Kb.fillR]},
       {sel:'F5:H5', keys:[Kb.bold]},
-      {sel:'F5:H5', keys:[Kb.alt, L('H'), L('B'), L('T')]},
+      {sel:'F5:H5', keys:[Kb.alt, L('H'), L('B'), L('P')]},
     ]; },
     build(){
       const cells={};
@@ -7060,13 +7061,13 @@ const CHALLENGES = {
   },
   fxconvert:{
     name:'FX Convert', label:'Convert the page — one boxed rate', par:35, parKeys:34,
-    aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention boxes the driver (Alt H B A) while the output table gets an outline (Alt H B O).',
-    prompt:'The revenue table came over from the Frankfurt desk in euros — the book prints in dollars. The desk convention: the FX rate lives in ONE cell, typed blue and BOXED (Alt H B A — all borders on a standalone driver), and every converted number reads off it. Build the USD block from a single anchored formula — fill right, then down — comma it, and OUTLINE the finished table (Alt H B O), never a grid of borders. One rate cell, twelve conversions, zero retyping.',
-    req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), box it (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outline <em>A10:F12</em> (<em>alt h b o</em>)'; },
+    aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention boxes the driver (Alt H B A) while the output table gets an outline (Alt H B S).',
+    prompt:'The revenue table came over from the Frankfurt desk in euros — the book prints in dollars. The desk convention: the FX rate lives in ONE cell, typed blue and BOXED (Alt H B A — all borders on a standalone driver), and every converted number reads off it. Build the USD block from a single anchored formula — fill right, then down — comma it, and OUTLINE the finished table (Alt H B S), never a grid of borders. One rate cell, twelve conversions, zero retyping.',
+    req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), box it (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outline <em>A10:F12</em> (<em>alt h b s</em>)'; },
     guide(){ return [
       'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — a standalone input gets ALL borders; that box says "this cell drives the page"',
       'one formula converts everything: <em>B10</em> · <kbd>=B6*$B$3</kbd> — <kbd>F4</kbd> pins the rate · <kbd>↵</kbd> · select <em>B10:F10</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>B10:F12</em> <kbd>ctrl</kbd>+<kbd>d</kbd> — twelve live conversions off one cell',
-      'format the output: still on <em>B10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · then select <em>A10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> — ONE outline around the table; a grid of borders is never the look',
+      'format the output: still on <em>B10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · then select <em>A10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — ONE outline around the table; a grid of borders is never the look',
     ]; },
     targets:['B3','B3','B10:F12','B10:F12','A10:F12'],
     demo(){ return [
@@ -7077,7 +7078,7 @@ const CHALLENGES = {
       {sel:'B10:F10', keys:[Kb.fillR]},
       {sel:'B10:F12', keys:[Kb.fillD]},
       {sel:'B10:F12', keys:[Kb.alt,L('h'),L('k')]},
-      {sel:'A10:F12', keys:[Kb.alt,L('h'),L('b'),L('o')]},
+      {sel:'A10:F12', keys:[Kb.alt,L('h'),L('b'),L('s')]},
     ]; },
     build(){
       const cells={};
@@ -7128,7 +7129,7 @@ const CHALLENGES = {
         {label:'Box the rate cell (alt h b a) — all borders on a standalone driver, the desk convention', ok:boxOk},
         {label:'Convert with ONE formula — B10 =B6*$B$3, F4-anchored, fill right then down (B10:F12)', ok:usdOk},
         {label:'Comma-format the USD block (alt h k)', ok:usdOk&&comOk},
-        {label:'Outline the finished table A10:F12 (alt h b o) — one perimeter, never a grid of borders', ok:outOk},
+        {label:'Outline the finished table A10:F12 (alt h b s) — one perimeter, never a grid of borders', ok:outOk},
       ];
     }
   },
@@ -7179,7 +7180,7 @@ const CHALLENGES = {
     name:'Model Tour', label:'Chase the marks', par:53, parKeys:54,
     aha:'Subtotals are formulas — fly to each #REF! (Ctrl+arrows) and rebuild it; then the margin rows go in with ONE formula filled RIGHT across the columns.',
     prompt:'The model came back with four subtotals blown out to #REF! — Gross profit, EBITDA, EBIT and Net income each lost a cell. Those are the ruled, bold rows: they are COMPUTED, not typed. Ctrl-arrows fly you to each break — rebuild the FORMULA that sums the lines above it (costs already carry their sign, so it just adds up). Then put in the margin rows: build =subtotal ÷ Revenue in the first column and FILL RIGHT so one formula runs the whole row. Close the bottom line — dollar-format Net income and rule it off — and land at A1 for the meeting.',
-    req(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return m.map(x=>'<em>'+x.k+'</em> → <em>='+x.disp+'</em>').join(' · ')+' · margins <em>B'+MG[0].r+'</em> =B'+MG[0].num+'/B3 fill right <em>B'+MG[0].r+':'+LC+MG[0].r+'</em>, <em>B'+MG[1].r+'</em> =B'+MG[1].num+'/B3 fill right · <em>ctrl+shift+$</em> Net income <em>'+this._niRng+'</em> + <em>bottom border</em> (<em>alt h b b</em>) · finish <em>ctrl+home</em>'; },
+    req(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return m.map(x=>'<em>'+x.k+'</em> → <em>='+x.disp+'</em>').join(' · ')+' · margins <em>B'+MG[0].r+'</em> =B'+MG[0].num+'/B3 fill right <em>B'+MG[0].r+':'+LC+MG[0].r+'</em>, <em>B'+MG[1].r+'</em> =B'+MG[1].num+'/B3 fill right · <em>ctrl+shift+$</em> Net income <em>'+this._niRng+'</em> + <em>bottom border</em> (<em>alt h b o</em>) · finish <em>ctrl+home</em>'; },
     guide(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return [
       'the Gross profit break at '+m[0].k+' — fly there with ctrl-arrows · it’s Revenue plus COGS (COGS is negative, so it just adds): type <kbd>='+m[0].disp+'</kbd> <kbd>↵</kbd>',
       'the EBITDA break at '+m[1].k+' — gross profit plus the two opex lines: <kbd>='+m[1].disp+'</kbd> <kbd>↵</kbd>',
@@ -7187,7 +7188,7 @@ const CHALLENGES = {
       'the Net income break at '+m[3].k+' — EBIT plus interest and taxes: <kbd>='+m[3].disp+'</kbd> <kbd>↵</kbd> — watch the whole column tie',
       'the Gross profit margin — in the FIRST column: <em>B'+MG[0].r+'</em> · <kbd>=B'+MG[0].num+'/B3</kbd> <kbd>↵</kbd> (Gross profit ÷ Revenue) · then select <em>B'+MG[0].r+':'+LC+MG[0].r+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd> — one formula fills RIGHT, each column re-bases to its own quarter',
       'the EBITDA margin the same way: <em>B'+MG[1].r+'</em> · <kbd>=B'+MG[1].num+'/B3</kbd> <kbd>↵</kbd> · fill right <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'close the statement: select Net income '+this._niRng+' · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> dollar-format · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>b</kbd> adds a bottom border — the closing rule under the bottom line',
+      'close the statement: select Net income '+this._niRng+' · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> dollar-format · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> adds a bottom border — the closing rule under the bottom line',
       'meeting time: <kbd>ctrl</kbd>+<kbd>home</kbd> — a clean model greets the reader at A1',
     ]; },
     targets(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return [m[0].k, 'B'+MG[0].r+':'+LC+MG[0].r, 'B'+MG[1].r+':'+LC+MG[1].r, this._niRng, this._niRng, 'A1']; },
@@ -7195,7 +7196,7 @@ const CHALLENGES = {
       const steps=m.map(x=>({sel:x.k, keys:[...T('='+x.disp), Kb.enter]}));
       MG.forEach(g=>{ steps.push({sel:'B'+g.r, keys:[...T('=B'+g.num+'/B3'), Kb.enter]});
                       steps.push({sel:'B'+g.r+':'+LC+g.r, keys:[Kb.fillR]}); });
-      steps.push({sel:this._niRng, keys:[{key:'$',ctrl:true,shift:true}, Kb.alt, {key:'h'}, {key:'b'}, {key:'b'}]});
+      steps.push({sel:this._niRng, keys:[{key:'$',ctrl:true,shift:true}, Kb.alt, {key:'h'}, {key:'b'}, {key:'o'}]});
       steps.push({sel:'A1', keys:[Kb.ctrlHome]});
       return steps; },
     build(){
@@ -7270,7 +7271,7 @@ const CHALLENGES = {
         {label:'Gross profit margin — build =Gross profit ÷ Revenue in column B, then fill right across row '+MG[0].r+' (ctrl+r)', ok: gpmOk},
         {label:'EBITDA margin — build =EBITDA ÷ Revenue in column B, then fill right across row '+MG[1].r, ok: ebmOk},
         {label:'Dollar-format the Net income row ('+this._niRng+') — ctrl+shift+$', ok: curOk},
-        {label:'Rule off Net income — a bottom border under '+this._niRng+' (alt h b b)', ok: borderOk},
+        {label:'Rule off Net income — a bottom border under '+this._niRng+' (alt h b o)', ok: borderOk},
         {label:'Finish at A1 — ctrl+home, a clean model greets the reader', ok: allFixed && gpmOk && ebmOk && curOk && borderOk && S.active.r===1 && S.active.c===1},
       ];
     }
@@ -7890,6 +7891,88 @@ function sortRange(dir, keyCol){
   }
 }
 
+/* ---- r297 FLASH FILL (Ctrl+E) — Excel's pattern fill, the average corporate user's
+   favorite trick (Wolf). Type ONE example beside the data, Ctrl+E writes the rest.
+   Deterministic candidate library (no ML): the example is matched against a fixed,
+   ordered set of transforms of the source column(s); the FIRST transform that
+   reproduces EVERY example wins and fills the blank rows of the block. Results land
+   as VALUES (text), exactly like Excel — Flash Fill never writes formulas. */
+function flashFill(){
+  const tcol=S.active.c;
+  const cellTxt=(r,c)=>{ const x=get(r,c); if(x.value==null||x.value==='') return null;
+    return typeof x.value==='number' ? String(parseFloat(Number(x.value).toPrecision(10))) : String(x.value); };
+  // 1. the block: the contiguous non-empty run in the nearest source column to the LEFT,
+  //    anchored on the active row (Excel fills beside a table; target sits right of source)
+  let scol=tcol-1; while(scol>=1 && cellTxt(S.active.r,scol)==null) scol--;
+  if(scol<1){ showToast('flash fill: put the cursor beside the data, example typed'); return; }
+  let r1=S.active.r, r2=S.active.r;
+  while(r1>1 && cellTxt(r1-1,scol)!=null) r1--;
+  while(r2<S.ROWS && cellTxt(r2+1,scol)!=null) r2++;
+  // 2. source columns: contiguous data columns walking LEFT from scol (cap 3)
+  const scols=[scol];
+  for(let c=scol-1;c>=1 && scols.length<3;c--){
+    let n=0; for(let r=r1;r<=r2;r++) if(cellTxt(r,c)!=null) n++;
+    if(n>=(r2-r1+1)/2) scols.unshift(c); else break; }
+  // a lone text header on the block's top row shouldn't poison inference: if the target
+  // column has no example on row r1 but does below, treat r1 as header when its source
+  // cell differs in kind (Excel's heuristic, simplified)
+  // 3. the examples: target-column cells already typed inside the block
+  const ex=[]; for(let r=r1;r<=r2;r++){ const t=cellTxt(r,tcol); if(t!=null) ex.push({r:r,out:t}); }
+  if(!ex.length){ showToast('flash fill: type one example first, then Ctrl+E'); return; }
+  // 4. the candidate library — unary transforms of one source value
+  const properize=s=>s.toLowerCase().replace(/(^|[^A-Za-z])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+  const UN=[
+    ['id',      s=>s],
+    ['proper',  properize],
+    ['upper',   s=>s.toUpperCase()],
+    ['lower',   s=>s.toLowerCase()],
+    ['tok1',    s=>s.trim().split(/\s+/)[0]],
+    ['tokN',    s=>{ const t=s.trim().split(/\s+/); return t[t.length-1]; }],
+    ['tok1p',   s=>properize(s.trim().split(/\s+/)[0])],
+    ['tokNp',   s=>{ const t=s.trim().split(/\s+/); return properize(t[t.length-1]); }],
+    ['pre@',    s=>s.split('@')[0]],
+    ['post@',   s=>{ const i=s.indexOf('@'); return i<0?s:s.slice(i+1); }],
+    ['pre,',    s=>s.split(',')[0].trim()],
+    ['post,',   s=>{ const i=s.indexOf(','); return i<0?s:s.slice(i+1).trim(); }],
+    ['pre-',    s=>s.split('-')[0].trim()],
+    ['post-',   s=>{ const i=s.indexOf('-'); return i<0?s:s.slice(i+1).trim(); }],
+    ['init1',   s=>(s.trim()[0]||'').toUpperCase()],
+  ];
+  const srcAt=r=>scols.map(c=>cellTxt(r,c)||'');
+  // single-column candidates, in library order per source column (rightmost source first —
+  // it's the column the user is working beside)
+  const cands=[];
+  for(let ci=scols.length-1;ci>=0;ci--) for(const [nm,f] of UN) cands.push({tag:nm+':'+ci, fn:row=>f(row[ci]||'')});
+  // two-part templates: example = A(srcI) + literal + B(srcJ), literal inferred from example 1
+  const e0=ex[0], src0=srcAt(e0.r);
+  for(let i=0;i<scols.length;i++) for(let j=0;j<scols.length;j++){
+    if(i===j && scols.length>1) continue;
+    for(const [na,fa] of UN) for(const [nb,fb] of UN){
+      const A=fa(src0[i]||''), B=fb(src0[j]||'');
+      if(!A||!B) continue;
+      if(e0.out.length>=A.length+B.length && e0.out.startsWith(A) && e0.out.endsWith(B)){
+        const lit=e0.out.slice(A.length, e0.out.length-B.length);
+        cands.push({tag:na+':'+i+'+'+JSON.stringify(lit)+'+'+nb+':'+j, fn:row=>fa(row[i]||'')+lit+fb(row[j]||'')});
+      }
+    }
+  }
+  // 5. first candidate that reproduces EVERY example wins
+  let win=null;
+  for(const c of cands){ if(ex.every(e=>{ try{ return c.fn(srcAt(e.r))===e.out; }catch(_){ return false; } })){ win=c; break; } }
+  if(!win){ showToast('flash fill: no pattern found — give it one more example'); return; }
+  // 6. fill the blanks as VALUES
+  pushUndo();
+  let n=0;
+  for(let r=r1;r<=r2;r++){
+    if(cellTxt(r,tcol)!=null) continue;
+    const out=win.fn(srcAt(r));
+    const cell=ensure(r,tcol);
+    cell.value=out; cell.txt=true; cell.formula=null; n++;   // always TEXT — a flash-filled "7203" is a ticker, not a number (Excel keeps text-derived results as text)
+  }
+  commitAction();
+  showToast(n ? 'flash fill: '+n+' cell'+(n===1?'':'s') : 'flash fill: nothing to fill');
+}
+
 // Fill series across the selection. Detects the step from the first 1-2 cells with values.
 // If exactly one numeric seed → step=1 (Excel default for single-cell series). Two seeds → step = b-a.
 // Walks the selection by row, then by column, filling empty cells with the projected value.
@@ -7986,7 +8069,7 @@ function render(){
       if(cell.uline)cls.push('uline');   // r229: cell underline (Ctrl+U / Alt H 3)
       if(cell.cmt)cls.push('cmt');       // r293: comment triangle (rapid-fire Shift+F2)
       if(cell.wrap)cls.push('wrap'); if(cell.fill)cls.push('fill-'+cell.fill);   // r231: any fill palette key
-      if(cell.bt)cls.push('bt'); if(cell.bb)cls.push('bb'); if(cell.ball)cls.push('ball');
+      if(cell.bt)cls.push('bt'); if(cell.bb)cls.push('bb'); if(cell.ball)cls.push('ball'); if(cell.bdbl)cls.push('bdbl');
       if(cell.align)cls.push('align-'+cell.align);
       if(cell.fontColor)cls.push('fc-'+cell.fontColor);
       const isActive=(r===S.active.r&&c===S.active.c);
@@ -8178,7 +8261,7 @@ const MENUS = {
   'HD': [['R','Delete rows'],['C','Delete columns']],
   'HO': [['I','Autofit width'],['A','Autofit height'],['W','Column width\u2026'],['U','Hide & Unhide']],
   'HOU':[['R','Hide rows'],['O','Unhide rows']],
-  'HB': [['T','Top'],['B','Bottom'],['L','Left'],['R','Right'],['A','All'],['I','Inside'],['S','Outside'],['O','Outside'],['K','Thick box'],['N','No border']],
+  'HB': [['O','Bottom'],['P','Top'],['L','Left'],['R','Right'],['N','No border'],['A','All'],['S','Outside'],['T','Thick box'],['B','Double bottom'],['D','Top & bottom']],   /* r298 (Wolf): CANON — Excel's real access keys. T was top and B bottom here for months; in Excel T is Thick Box, O is Bottom, P is Top. */
   'HU': [['S','Sum']],
   'HA': [['L','Left'],['C','Center'],['R','Right'],['N','$ Accounting']],
   'HF': [['C','Font color'],['G','Grow font'],['K','Shrink font'],['I','Fill']],
@@ -9614,7 +9697,10 @@ function applyRibbon(key){
   const RUN={
     'HW':c=>c.wrap=!c.wrap,   /* r231: 'HH' now opens the fill-colour picker (below), not an instant blue */
     'HK':c=>{c.fmtStyle='comma';c.decimals=2;}, 'HP':c=>{c.fmtStyle='percent';c.decimals=0;}, 'H9':c=>c.decimals=Math.max(0,c.decimals-1),
-    'H0':c=>c.decimals=Math.min(6,c.decimals+1), 'HBT':c=>c.bt=true, 'HBB':c=>c.bb=true,
+    /* r298 CANON (Wolf caught it): Excel's border access keys are O=Bottom, P=Top,
+       D=Top&Bottom, B=DOUBLE bottom (the grand-total rule) — T is the THICK box, not top. */
+    'H0':c=>c.decimals=Math.min(6,c.decimals+1), 'HBP':c=>c.bt=true, 'HBO':c=>c.bb=true,
+    'HBD':c=>{c.bt=true;c.bb=true;}, 'HBB':c=>{c.bb=false;c.bdbl=true;},
     'HBA':c=>c.ball=true, 'HBL':c=>c.bl=true, 'HBR':c=>c.br=true,   // r234: left / right edge (per-cell, like top/bottom)
     'HAL':c=>c.align='l', 'HAC':c=>c.align='c', 'HAR':c=>c.align='r',
     'HAN':c=>{c.fmtStyle='acct';c.decimals=0;},   // r233: Accounting Number Format — Excel's real Alt H A N keytip (ribbon path, not Ctrl+1)
@@ -9652,22 +9738,20 @@ function applyRibbon(key){
   if(np==='H1'){ pushUndo(); toggleAllOrNone('bold'); return exitRibbon(true); }   // r193: mixed-selection semantics, same as Ctrl+B
   if(np==='H2'){ pushUndo(); toggleAllOrNone('it');   return exitRibbon(true); }
   if(np==='H3'){ pushUndo(); toggleAllOrNone('uline'); return exitRibbon(true); }   // r229: Alt H 3 underline (mirrors Ctrl+U)
-  if(np==='HBO' || np==='HBK' || np==='HBS'){   /* r193: OUTSIDE border = the PERIMETER of the selection; a 1\u00d71 perimeter IS the classic box (ball).
-                                     r234: THICK BOX (Alt H B K) = the same perimeter, drawn at 2px via the `thick` flag.
-                                     r292: HBS is Excel's real "Outside Borders" access key \u2014 same perimeter box. */
-    const r=selRange(); pushUndo(); const thick = np==='HBK';
+  if(np==='HBS' || np==='HBT'){   /* r193/r298 CANON: OUTSIDE border = the PERIMETER of the selection; a 1\u00d71 perimeter IS the classic box (ball).
+                                     S = Excel's Outside Borders access key. T = Excel's THICK BOX \u2014 same perimeter at 2px via the `thick` flag.
+                                     (The old nonstandard O/K aliases are gone \u2014 O is Bottom now, T was never top in real Excel.) */
+    const r=selRange(); pushUndo(); const thick = np==='HBT';
     if(r.r1===r.r2 && r.c1===r.c2){ const a=ensure(r.r1,r.c1); a.ball=true; if(thick)a.thick=true; return exitRibbon(true); }
     for(let cc=r.c1;cc<=r.c2;cc++){ const t=ensure(r.r1,cc),b=ensure(r.r2,cc); t.bt=true; b.bb=true; if(thick){t.thick=true;b.thick=true;} }
     for(let rr=r.r1;rr<=r.r2;rr++){ const l=ensure(rr,r.c1),rt=ensure(rr,r.c2); l.bl=true; rt.br=true; if(thick){l.thick=true;rt.thick=true;} }
     return exitRibbon(true);
   }
-  if(np==='HBI'){   /* r234: INSIDE borders \u2014 interior grid only. Right edge of every non-last column, bottom of every non-last row. */
-    const r=selRange(); pushUndo();
-    for(let rr=r.r1;rr<=r.r2;rr++) for(let cc=r.c1;cc<=r.c2;cc++){ const c=ensure(rr,cc); if(cc<r.c2)c.br=true; if(rr<r.r2)c.bb=true; }
-    return exitRibbon(true);
-  }
+  /* r298: the r234 'Inside borders' (HBI) is GONE \u2014 Excel's Alt H B gallery has no Inside
+     access key (that lives in Format Cells), and teaching a chord Excel doesn't have breaks
+     the whole promise of the product. */
   if(np==='HBN'){   /* r234: NO BORDER \u2014 strip every edge in the selection (Excel's clear-borders) */
-    pushUndo(); eachSel(c=>{ c.bt=false; c.bb=false; c.bl=false; c.br=false; c.ball=false; c.thick=false; }); return exitRibbon(true);
+    pushUndo(); eachSel(c=>{ c.bt=false; c.bb=false; c.bl=false; c.br=false; c.ball=false; c.thick=false; c.bdbl=false; }); return exitRibbon(true);
   }
   if(np==='AT'){ pushUndo(); toggleFilter(); return exitRibbon(true); }   // r180: Data \u2192 Filter, the ribbon route for ctrl+shift+L
   if(np==='AH'){ pushUndo(); setDetail(false); return exitRibbon(true); }
@@ -10558,11 +10642,10 @@ document.addEventListener('keydown',hkRawE=>{
   if((k==='PageUp'||k==='PageDown') && (e.altKey||e.ctrlKey) && !editing){
     e.preventDefault(); stepSheetTab(k==='PageDown'?1:-1); return; }   // r57: sheet-tab walk (Ctrl+Pg fires only if the browser lets it through)
 
-  // CHALLENGE SELECT (no-mouse): 1 / 2 / 3 — disabled during a marathon (drills are random)
-  if(gameMode==='classic' && !e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
-    const keys=MENU_ORDER, idx=+k-1;
-    if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); return; }
-  }
+  // r297: the old "1-9 jumps to a drill" branch is GONE — digits are routed to the cell
+  // editor above (type-to-replace) long before this point, so it was dead code, and the
+  // welcome-back card advertising it was a lie (Wolf's report). Drill jumps live in the
+  // picker (\ then 1-9 inside it), where digits can't collide with data entry.
 
   // UNDO / REDO — authentic Excel hotkeys (ctrl+z / ctrl+y / ctrl+shift+z)
   if(e.ctrlKey||e.metaKey){
@@ -10708,6 +10791,7 @@ document.addEventListener('keydown',hkRawE=>{
     if(lk==='u' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+U'); pushUndo(); toggleAllOrNone('uline'); commitAction(); return; }   // r229: underline
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
     if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
+    if(lk==='e' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+E'); flashFill(); return; }   // r297: Flash Fill — type an example, Ctrl+E writes the rest
     if(k==='5' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+5'); pushUndo(); toggleAllOrNone('strike'); commitAction(); return; }   // r193: strikethrough (Excel's chord; Chrome steals ctrl+digit live — ctrl+1 K is the taught fallback)
     if(k==='9' && !e.altKey){ e.preventDefault(); startClock();
       if(e.shiftKey){ logKey('Ctrl+Shift+9'); pushUndo(); unhideRows(); } else { logKey('Ctrl+9'); pushUndo(); hideRows(); }
@@ -10858,7 +10942,7 @@ function toggleWqPop(){
   if(p.classList.contains('show')){ p.classList.remove('show'); return; }
   if(!requirePro('The Weakness Queue')) return;
   const q=buildWeaknessQueue();
-  p.innerHTML='<div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:4px 6px 6px">\u25c6 weakness queue \u00b7 built from your runs</div>'+
+  p.innerHTML='<div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:4px 6px 6px">\u25c8 weakness queue \u00b7 built from your runs</div>'+
     (q.length?q.map(x=>{ const nm=(CHALLENGES[x.k]&&CHALLENGES[x.k].name)||x.k;
       return '<button class="mb-tool" data-wq="'+x.k+'">'+nm+
         ' <span style="margin-left:auto;font-size:9px;color:var(--warn)">'+x.why+'</span></button>'; }).join('')+
@@ -11187,12 +11271,12 @@ const RF_OPS = [
     instr: ()=>'Strip the borders off',
     show: c=>({text:c.text, border:true}),
     solved: c=>({text:c.text, border:false}) },
-  { op:'border_top', label:'Top border', keys:['Alt','H','B','T'], matchSeq: RFM.altSeq(['h','b','t']),
+  { op:'border_top', label:'Top border', keys:['Alt','H','B','P'], matchSeq: RFM.altSeq(['h','b','p']),
     make: ()=> ({text:pickHeader()}),
     instr: ()=>'Add a top border (subtotal line)',
     show: c=>({text:c.text}),
     solved: c=>({text:c.text, borderTop:true}) },
-  { op:'border_bottom', label:'Bottom border', keys:['Alt','H','B','B'], matchSeq: RFM.altSeq(['h','b','b']),
+  { op:'border_bottom', label:'Bottom border', keys:['Alt','H','B','O'], matchSeq: RFM.altSeq(['h','b','o']),
     make: ()=> ({text:pickHeader()}),
     instr: ()=>'Add a bottom border (subtotal line)',
     show: c=>({text:c.text}),
@@ -12516,6 +12600,10 @@ function openCampaign(){
   $('campClose').onclick=()=>m.classList.remove('show');
   $('campX').onclick=()=>m.classList.remove('show');
   m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
+  // r297: Esc closes the campaign like every other modal — it was the ONE modal that
+  // trapped it, breaking the "Esc closes menus & modals" promise the shortcuts sheet makes
+  const __campEsc=e=>{ if(e.key==='Escape'){ e.stopPropagation(); m.classList.remove('show'); document.removeEventListener('keydown',__campEsc,true); } };
+  document.addEventListener('keydown',__campEsc,true);
   m.querySelectorAll('.camp-drill').forEach(d=>d.onclick=()=>{ m.classList.remove('show'); loadChallenge(d.dataset.key); });
   const cp=$('campPro'); if(cp) cp.onclick=()=>{ m.classList.remove('show'); if(window.openUpgrade) window.openUpgrade('Campaign'); };
 }
@@ -13097,7 +13185,7 @@ function showWelcomeBack(key){
         (streak.n>1 ? '<span>\ud83d\udd25 <b>'+streak.n+'-day</b> streak \u2014 alive</span>' : '')+
       '</div>'+
       '<button class="wb-dlogin" id="wbLogin">Log in \u2192</button>'+
-      '<div class="wb-dfoot"><kbd>\\</kbd> drill picker \u00b7 <kbd>1</kbd>\u2013<kbd>9</kbd> jump \u00b7 any key to start</div>'+
+      '<div class="wb-dfoot"><kbd>\\</kbd> pick a drill \u00b7 <kbd>F1</kbd> guided help \u00b7 any key to start</div>'+
     '</div></div>';
   document.body.appendChild(w);
   requestAnimationFrame(()=>w.classList.add('show'));
@@ -13701,7 +13789,7 @@ function paintOnboard(){
   b.classList.toggle('focused', onboardChoice===1);
   // Show the ↵ kbd hint only on the currently-selected button
   a.innerHTML = '▶ Quick warm-up — feel the moves' + (onboardChoice===0 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
-  b.innerHTML = "Skip — I’ll dive in" + (onboardChoice===1 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
+  b.innerHTML = "Skip — straight to the drills" + (onboardChoice===1 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
 }
 function showOnboard(){
   if(onboarded) return;

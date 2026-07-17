@@ -172,9 +172,9 @@ const ALTS = [
   { key: 'dress', name: 'footnote FIRST via alt o e, perimeter EARLY, blue in two passes, source italic mid-pass, header shaded late', moves: `C => { const R=C._R; return [
       {sel:'A'+R.mRow, keys:[{key:'Alt'},L('o'),L('e'),L('e')]},
       {sel:'A3:E3', keys:[{key:'Alt'},L('h'),L('h'),{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
-      {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('o')]},
-      {sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+      {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]},
+      {sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'A'+R.srcRow, keys:[{key:'i',ctrl:true}]},
       {sel:R.costRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       {sel:R.segRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
@@ -234,7 +234,7 @@ const ALTS = [
       {sel:'G5', keys:[...T('=SUM(G3:G4)'),{key:'Enter'}]},
       {sel:'G5:H5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'F5:H5', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'F5:H5', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'F5:H5', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'G3', keys:[...T('=SUMIFS($C$3:$C$11,$B$3:$B$11,G$2,$A$3:$A$11,$F3)'),{key:'Enter'}]},
       {sel:'G3:H3', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'G3:H4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
@@ -272,7 +272,7 @@ const ALTS = [
       {sel:'B7:E7', keys:[{key:'r',ctrl:true}]},
       {sel:'B6', keys:[...T('=B3-B5'),{key:'Enter'}]},
       {sel:'B6:E6', keys:[{key:'r',ctrl:true}]},
-      {sel:'B6:E6', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B6:E6', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B6:E6', keys:[{key:'Alt'},L('h'),D(1)]},
     ]` },
   { key: 'waterfall', name: 'corkscrews linked before block fills, narrower fill geometry than the demo', moves: `C => [
@@ -309,7 +309,7 @@ const ALTS = [
         {sel:c1, keys:[...T('=SUM(B'+r1+':F'+r1+')'),{key:'Enter'}]},
       ]; }` },
   { key: 'balance', name: 'dress BEFORE the build, L&E footed before assets, alt+= sums + ribbon fills', moves: `C => [
-      {sel:'B14:C14', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B14:C14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B6:C6',   keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B12:C12', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B12',     keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
@@ -332,7 +332,7 @@ const ALTS = [
   { key: 'bsbuild', name: 'dress FIRST, RE roll before any footing, assets footed LAST, ribbon fills + alt h 1', moves: `C => [
       {sel:'B5:D5',   keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B11:D11', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'C10', keys:[...T('=B10+C12-C13'),{key:'Enter'}]},
       {sel:'C10:D10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B8',  keys:[...T('=SUM(B6:B7)'),{key:'Enter'}]},
@@ -366,7 +366,7 @@ const ALTS = [
       {sel:'B14', keys:[...T('=B7+B10+B13'),{key:'Enter'}]},
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
     ]` },
   { key: 'cases', name: 'driver built growth-first, model then capture, flip the cases, then the deal-team revision + refresh', moves: `C => { const cap=C._capL, mp=String(Math.round(C._mutG*100)); return [
       {sel:'B9', keys:[...T('=CHOOSE($B$3,B6,C6,D6)'),{key:'Enter'}]},
@@ -384,7 +384,7 @@ const ALTS = [
       {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
     ]; }` },
   { key: 'cfslink', name: 'rule the close FIRST, memo before the corkscrew, alt h p percent, bold last', moves: `C => [
-      {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B6',  keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
       {sel:'B6:F6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B10', keys:[...T('=B6/B2'),{key:'Enter'}]},
@@ -436,13 +436,13 @@ const ALTS = [
       {sel:'C2:F2', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B4:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B6:F6', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B6:F6', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B6:F6', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B9', keys:[...T(C._ratePct+'%'),{key:'Enter'}]},
       {sel:'B9', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
     ]` },
   { key: 'isbuild', name: 'dress FIRST, statement built bottom-up (margin to COGS), alt h p + ribbon fills', moves: `C => [
       {sel:'B7:F7', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B8', keys:[...T('=B7/B2'),{key:'Enter'}]},
       {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('p')]},
@@ -484,7 +484,7 @@ const ALTS = [
       const steps=m.map(x=>({sel:x.k, keys:[...T('='+x.disp),{key:'Enter'}]}));
       MG.forEach(g=>{ steps.push({sel:'B'+g.r, keys:[...T('=B'+g.num+'/B3'),{key:'Enter'}]});
                       steps.push({sel:'B'+g.r+':'+LC+g.r, keys:[{key:'r',ctrl:true}]}); });
-      steps.push({sel:C._niRng, keys:[{key:'1',ctrl:true},L('c'),{key:'Alt'},L('h'),L('b'),L('b')]});
+      steps.push({sel:C._niRng, keys:[{key:'1',ctrl:true},L('c'),{key:'Alt'},L('h'),L('b'),L('o')]});
       steps.push({sel:'A1', keys:[{key:'Home',ctrl:true}]});
       return steps; }` },
   { key: 'nwcsched', name: 'drivers typed bottom-up, NWC + dress before the driver rows, ribbon fills', moves: `C => [
@@ -495,7 +495,7 @@ const ALTS = [
       {sel:'B7', keys:[...T('=B4+B5-B6'),{key:'Enter'}]},
       {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B7:F7', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'C8', keys:[...T('=C7-B7'),{key:'Enter'}]},
       {sel:'C8:F8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B6', keys:[...T('=B3/365*$B$11'),{key:'Enter'}]},
@@ -548,7 +548,7 @@ const ALTS = [
       return st.slice().reverse().map(mk); }` },
   { key: 'sumif', name: 'dress FIRST, foot + mix before the rollup exists, ctrl+1 percent, ribbon fills', moves: `C => [
       {sel:'D5:E5', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'D5:E5', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'D5:E5', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'E5', keys:[...T('=SUM(E2:E4)'),{key:'Enter'}]},
       {sel:'F2', keys:[...T('=E2/$E$5'),{key:'Enter'}]},
       {sel:'F2:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
@@ -572,7 +572,7 @@ const ALTS = [
       {sel:'C6:D6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B7:D7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B11:D11', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
     ]` },
   { key: 'triage', name: 'errors triaged in REVERSE — #VALUE! first, the #REF! it depends on last', moves: `C => { const R=C._R; return [
       {sel:R.valCell, keys:[...T('='+R.valFix+'/'+R.valBase+'-1'),{key:'Enter'}]},
@@ -594,7 +594,7 @@ const ALTS = [
       {sel:'J4', keys:[...T('=SUM(B4:I4)'),{key:'Enter'}]},
       {sel:'J4:J6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:'B8:I8', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B8:I8', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'B8:I8', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B10', keys:[...T('=B8-$B$12'),{key:'Enter'}]},
       {sel:'B10:I10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B6', keys:[...T('=B4-B5'),{key:'Enter'}]},
@@ -617,8 +617,8 @@ const ALTS = [
       {sel:R.srcIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       {sel:R.useTot, keys:[...T('=SUM(E'+(r0+1)+':E'+(r0+4)+')'),{key:'Enter'}]},
       {sel:R.srcTot, keys:[...T('=SUM(B'+(r0+1)+':B'+(r0+4)+')'),{key:'Enter'}]},
-      {sel:R.useTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
-      {sel:R.srcTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:R.useTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:R.srcTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:R.useCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
       {sel:R.srcCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
       {sel:R.useTot, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
@@ -630,36 +630,36 @@ const ALTS = [
       const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
       const steps=[
         {sel:'B7:F7', keys:[{key:'Alt'},L('h'),D(1)]},
-        {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+        {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
         {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('p')]},
         {sel:'B3:F7', keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
         {sel:R.override, keys:BLUE},
       ];
       R.inpRows.slice().reverse().forEach(r=>steps.push({sel:'B'+r+':F'+r, keys:BLUE}));
       steps.push({sel:'B2:F2', keys:[{key:'Alt'},L('h'),D(1)]});
-      steps.push({sel:'B2:F2', keys:[{key:'Alt'},L('h'),L('b'),L('b')]});
+      steps.push({sel:'B2:F2', keys:[{key:'Alt'},L('h'),L('b'),L('o')]});
       steps.push({sel:'A1', keys:[{key:'b',ctrl:true}]});
       return steps; }` },
   { key: 'ruleaudit', name: 'defects fixed in REVERSE (box first), alt h 1 for the bold, pull-through LAST', moves: `C => { const R=C._R;
       const W=(a,b,c2)=>[{key:'Alt'},L(a),L(b),L(c2)];
       const steps=[];
-      if(R.defects.includes('box'))  steps.push({sel:R.focus, keys:W('h','b','o')});
+      if(R.defects.includes('box'))  steps.push({sel:R.focus, keys:W('h','b','s')});
       if(R.defects.includes('gbold'))steps.push({sel:'B'+R.g+':'+R.LC+R.g, keys:[{key:'Alt'},L('h'),D(1)]});
-      if(R.defects.includes('gbt'))  steps.push({sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','t')});
-      if(R.defects.includes('sub2')) steps.push({sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:W('h','b','t')});
-      if(R.defects.includes('sub1')) steps.push({sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:W('h','b','t')});
-      if(R.defects.includes('hdr'))  steps.push({sel:'B2:'+R.LC+'2', keys:W('h','b','b')});
+      if(R.defects.includes('gbt'))  steps.push({sel:'B'+R.g+':'+R.LC+R.g, keys:W('h','b','p')});
+      if(R.defects.includes('sub2')) steps.push({sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:W('h','b','p')});
+      if(R.defects.includes('sub1')) steps.push({sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:W('h','b','p')});
+      if(R.defects.includes('hdr'))  steps.push({sel:'B2:'+R.LC+'2', keys:W('h','b','o')});
       steps.push({sel:R.mcol+R.g, keys:[...T('='+R.mcol+R.sub1+'+'+R.mcol+R.sub2),{key:'Enter'}]});
       return steps; }` },
   { key: 'ruleoff', name: 'EBITDA pulled FIRST via ribbon fill + alt h 1, rulings walked bottom-up, box last', moves: `C => { const R=C._R; return [
       {sel:'B'+R.g, keys:[...T('=B'+R.sub1+'+B'+R.sub2),{key:'Enter'}]},
       {sel:'B'+R.g+':'+R.LC+R.g, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B'+R.g+':'+R.LC+R.g, keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B'+R.g+':'+R.LC+R.g, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
-      {sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
-      {sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
-      {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('b')]},
-      {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('k')]},
+      {sel:'B'+R.g+':'+R.LC+R.g, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:'B'+R.sub2+':'+R.LC+R.sub2, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:'B'+R.sub1+':'+R.LC+R.sub1, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
+      {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
     ]; }` },
   { key: 'navigation', name: 'thread the random maze, grow the block the SLOW way (Shift-by-Shift), then copy → hop to the deck → paste → home', moves: `C => {
       const P=C._path, M=C._model, D=C._deck, DR=C._dirs, cl=colLetter;

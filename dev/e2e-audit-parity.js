@@ -486,7 +486,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     S.cells['H1']={...blankCell(), formula:'=TODAY()', fmtStyle:'date'}; recalc();
     const days=Math.floor((Date.now()-Date.UTC(1899,11,30))/86400000);
     const today = Math.abs(S.cells['H1'].value-days)<=1;
-    setDemoSel('G10:I12'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'b'}); demoKey({key:'o'});   // empty region — foot's own dressed rows must not pollute the probe
+    setDemoSel('G10:I12'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'b'}); demoKey({key:'s'});   // empty region — foot's own dressed rows must not pollute the probe
     const g=(k)=>S.cells[k]||{};
     const perim = !!(g('G10').bt && g('I10').bt && g('G12').bb && g('G10').bl && g('G11').bl && g('I11').br) && !(g('H11').bt||g('H11').bb||g('H11').bl||g('H11').br);
     S.cells['H3']={...blankCell(), value:100}; S.cells['H4']={...blankCell(), value:4200}; recalc(); render();
@@ -503,7 +503,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(z1.italic && z1.italicOff, 'Ctrl+I / Alt H 2 italicize');
   ok(z1.struck && z1.struckOff, 'Ctrl+5 / Ctrl+1 K strike');
   ok(z1.today, 'TODAY() returns the Excel serial');
-  ok(z1.perim, 'Alt H B O draws the selection PERIMETER, interior clean', JSON.stringify(z1));
+  ok(z1.perim, 'Alt H B S draws the selection PERIMETER, interior clean', JSON.stringify(z1));
   ok(z1.divided, 'paste-op Divide lands');
   ok(z1.mixedAll && z1.uniformOff, 'mixed-selection Ctrl+B bolds ALL first (Excel), uniform toggles off');
 
@@ -646,6 +646,41 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(af1.rDesc && af1.rAsc, 'RANK defaults descending; order arg flips it');
   ok(af1.rTie, 'tied values share the top rank (RANK.EQ)');
   ok(af1.rMiss && af1.kOob, 'RANK miss and LARGE k-out-of-range throw into IFERROR');
+
+  console.log('AG. Flash Fill — Ctrl+E (r297)');
+  await fresh();
+  const ag1 = await run(() => {
+    S.ROWS = Math.max(S.ROWS, 14);
+    const bc=()=>({...blankCell()});
+    const set=(k,v)=>{ S.cells[k]={...bc(), value:v, txt:true}; };
+    // one example, case cleanup
+    set('H2','jane doe'); set('H3','JOHN Q SMITH'); set('H4','mary-anne lee');
+    S.cells['I2']={...bc(), value:'Jane Doe', txt:true};
+    S.active={r:2,c:9}; flashFill();
+    const proper = get(3,9).value==='John Q Smith' && get(4,9).value==='Mary-Anne Lee';
+    // extraction before the first space, via the real chord
+    set('H6','AAPL US Equity'); set('H7','7203 JT Equity');
+    S.cells['I6']={...bc(), value:'AAPL', txt:true};
+    setDemoSel('I6'); demoKey({key:'e', ctrl:true});
+    const ticker = get(7,9).value==='7203' && get(7,9).txt===true;   // stays TEXT
+    // two-column template with an inferred literal
+    set('B10','sam'); set('C10','okafor'); set('B11','ana'); set('C11','ruiz');
+    S.cells['D10']={...bc(), value:'Okafor, Sam', txt:true};
+    S.active={r:10,c:4}; flashFill();
+    const concat = get(11,4).value==='Ruiz, Ana';
+    // no pattern → refuses (no garbage fill)
+    set('G13','xyz'); set('G14','abc');
+    S.cells['H13']={...bc(), value:'qqqq', txt:true};
+    S.active={r:13,c:8}; flashFill();
+    const refuses = (get(14,8).value==null || get(14,8).value==='');
+    // undo restores
+    S.active={r:2,c:9}; undoAct(); undoAct(); undoAct(); undoAct();
+    return { proper, ticker, concat, refuses };
+  });
+  ok(ag1.proper, 'Ctrl+E fills a case-cleanup pattern from ONE example');
+  ok(ag1.ticker, 'extraction pattern fills via the real chord; results stay TEXT (a "7203" ticker is not a number)');
+  ok(ag1.concat, 'two-column template with an inferred literal separator ("Last, First")');
+  ok(ag1.refuses, 'no discernible pattern -> Flash Fill refuses rather than guessing');
 
   console.log('J. esc discipline');
   await fresh();

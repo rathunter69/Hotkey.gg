@@ -1,6 +1,8 @@
-/* BORDER-DEPTH E2E (r234) — the expanded Alt H B gallery: Left, Right, Inside,
-   Thick box, No-border. Drives the ribbon via the app dispatcher and asserts the
-   edge flags on the right cells, plus thick-travels-with-paste and clear. */
+/* BORDER-DEPTH E2E (r234, CANON r298) — the Alt H B gallery on Excel's REAL access
+   keys: O bottom · P top · L left · R right · A all · S outside · T thick box ·
+   B double-bottom · D top&bottom · N no border. Drives the ribbon via the app
+   dispatcher and asserts the edge flags, plus thick-travels-with-paste and clear.
+   (r298 removed the nonstandard Inside chord — Excel's gallery has no such key.) */
 'use strict';
 const { chromium } = require('playwright-core');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
@@ -31,7 +33,7 @@ const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
     [[2,2],[2,3],[3,2],[3,3]].forEach(([r,c])=>{ S.cells[ck(r,c)]=Object.assign(blankCell(),{value:r*10+c}); });
     setDemoSel(sel);
     demoKey({key:'Alt'}); for(const ch of keys) demoKey(L(ch));
-    const g=(r,c)=>{ const x=S.cells[ck(r,c)]||{}; return {bt:!!x.bt,bb:!!x.bb,bl:!!x.bl,br:!!x.br,ball:!!x.ball,thick:!!x.thick}; };
+    const g=(r,c)=>{ const x=S.cells[ck(r,c)]||{}; return {bt:!!x.bt,bb:!!x.bb,bl:!!x.bl,br:!!x.br,ball:!!x.ball,thick:!!x.thick,bdbl:!!x.bdbl}; };
     return { b2:g(2,2), c2:g(2,3), b3:g(3,2), c3:g(3,3) };
   }, {sel,keys});
 
@@ -39,15 +41,14 @@ const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
   let r = await walk('B2', ['h','b','l']);   chk('Alt H B L → left edge', r.b2.bl && !r.b2.br, r.b2);
   r = await walk('B2', ['h','b','r']);        chk('Alt H B R → right edge', r.b2.br && !r.b2.bl, r.b2);
 
-  // Inside borders on B2:C3 — interior only: B2 gets br+bb, C2 gets bb, B3 gets br, C3 nothing
-  r = await walk('B2:C3', ['h','b','i']);
-  chk('Inside: B2 interior (br+bb)', r.b2.br && r.b2.bb && !r.b2.bt && !r.b2.bl, r.b2);
-  chk('Inside: C2 bottom only',      r.c2.bb && !r.c2.br && !r.c2.bt, r.c2);
-  chk('Inside: B3 right only',       r.b3.br && !r.b3.bb, r.b3);
-  chk('Inside: C3 no edges',         !r.c3.br && !r.c3.bb && !r.c3.bt && !r.c3.bl, r.c3);
+  // r298 CANON: O bottom, P top, D top&bottom, B double-bottom
+  r = await walk('B2', ['h','b','o']);   chk('Alt H B O → BOTTOM edge (canon)', r.b2.bb && !r.b2.bt, r.b2);
+  r = await walk('B2', ['h','b','p']);   chk('Alt H B P → TOP edge (canon)',    r.b2.bt && !r.b2.bb, r.b2);
+  r = await walk('B2', ['h','b','d']);   chk('Alt H B D → top AND bottom',      r.b2.bt && r.b2.bb, r.b2);
+  r = await walk('B2', ['h','b','b']);   chk('Alt H B B → DOUBLE bottom (grand-total rule)', r.b2.bdbl && !r.b2.bb, r.b2);
 
   // Thick box on B2:C3 — perimeter thick; corners carry two thick edges
-  r = await walk('B2:C3', ['h','b','k']);
+  r = await walk('B2:C3', ['h','b','t']);
   chk('Thick: B2 top+left thick',  r.b2.bt && r.b2.bl && r.b2.thick, r.b2);
   chk('Thick: C3 bottom+right thick', r.c3.bb && r.c3.br && r.c3.thick, r.c3);
   chk('Thick: interior of top-left has no bottom/right', !r.b2.bb && !r.b2.br, r.b2);

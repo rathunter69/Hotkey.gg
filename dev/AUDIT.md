@@ -1,5 +1,80 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r298 — BORDER CHORDS TO EXCEL CANON (Wolf caught it) + insert-seq copy + name-gen + copy quick fixes
+- **THE CANON BUG (Wolf, from live play): our Alt H B letters were WRONG vs real Excel.** We taught
+  T=top and B=bottom for months; Excel's actual access keys are **O=Bottom, P=Top, T=THICK BOX,
+  S=Outside, N=No Border**. For a product whose whole promise is "muscle memory that transfers to
+  real Excel," this was the worst class of bug we can ship. Fixed everywhere in one sweep:
+  · ENGINE: HBP→top, HBO→bottom, HBT→thick box (was K), HBS→outside (kept), HBN→clear (kept, now
+    also clears bdbl). NEW canon items: **HBD = Top & Bottom**, **HBB = DOUBLE BOTTOM** (new `bdbl`
+    cell flag + 3px double render — the grand-total rule bankers actually close a page with).
+    REMOVED: the r234 "Inside borders" chord (Excel's gallery has no such access key) and the
+    nonstandard K/O aliases.
+  · SWEEP: 140 chord references migrated across index.html (drill demos in FOUR key encodings,
+    req/guide/prompt copy, ribbon MENUS labels), dev/e2e-alt-paths.js, dev/e2e-borders.js,
+    dev/e2e-audit-parity.js, reference.html (+ thick box / double bottom / top&bottom rows added).
+    Lesson recorded: demo key sequences exist in spaced AND unspaced AND object-literal AND W()
+    encodings — canon sweeps must grep all four (the first pass missed 19 spaced/object refs and
+    three drills' demos silently hit the NEW double-bottom B).
+  · VERIFIED: e2e-borders rewritten to canon (13 PASS incl. new O/P/D/B asserts) · full
+    demo-replay 81 GREEN · parity 124 · alt-paths 74 · echo 21 · mac 19 · rapidfire 12.
+- **Insert-row sequencing (Wolf):** engine already Excel-true (Ctrl+Shift+= / Ctrl+- only fire on a
+  FULL row/col selection — Shift+Space / Ctrl+Space first), and rowops teaches it; the reference
+  sheet now spells the sequence out on the insert/delete rows.
+- **Handle generator (Wolf: "suggesting names with bulge"):** pools rebuilt — tongue-in-cheek
+  across the whole spreadsheet class (PivotTable_Wizard, RunRate_Consultant, HardCoded_Footnote),
+  IB slang kept where it's funny and safe; 'Bulge'/'Diluted'/'Distressed' gone; compose-time
+  regex guard as a safety net. Server-side moderation stays the real gate.
+- **Copy quick fixes (from dev/COPY_INVENTORY.md, marked resolved there):** ladder-floor copy
+  unified (MBA Associate is the floor); dead onboarding placement button aligned with the live
+  warm-up copy; "dive in" banned phrase out; staffer program templates no longer pin drills
+  deleted in r249 (saves/format/blue → undo/dress/decimals); nav shortcut sheet 'g'→'F1';
+  dead MARATHON_DURS removed. 555-row inventory awaits Wolf's batch markup for the rest.
+- Cache: nav.js 263→264, lb.js 10→11; drill pages + refmap regenerated.
+
+## r297 — Flash Fill, login-shows-account fix, welcome-back honesty, UI+nav polish (Wolf batch)
+- **ENGINE — Flash Fill (Ctrl+E)**, the average corporate user's favorite trick (Wolf's ask).
+  `flashFill()`: infers a transform from ONE typed example beside a data column and fills the
+  block's blanks. Deterministic candidate library (no ML) — case ops (proper/upper/lower),
+  token split (first/last word), delimiter splits (@ , -), initial, and TWO-column templates
+  with an inferred literal separator ("Last, First"). First candidate reproducing EVERY example
+  wins; no pattern → refuses (never guesses). Results land as TEXT, Excel-true (a "7203" ticker
+  stays text). Parity matrix +4 (now 124). RANK/text/finance sections from r296 stay green.
+- **LOGIN NOW SHOWS YOUR ACCOUNT (Wolf: "open my browser, still logged in, but it doesn't show
+  my account; theme feels stale").** Root cause in nav.js boot: `renderAuthBar()` was called ONLY
+  inside the profiles `.single()` fetch, so a slow/failed profile query left the auth slot on the
+  guest "sign in" button forever even though the cached session was valid. Fix: render the
+  signed-in state EAGERLY off `getSession()` (handle refines when the profile lands); `.single()`
+  → `.maybeSingle()`; same eager render on the `onAuthStateChange` sign-in branch. The "stale
+  theme" feeling was the symptom of this — the account theme was applied but the account wasn't
+  showing; with the account rendering, the theme reads as correct (it IS you). Theme stays a
+  device pref by design (survives logout, like onboarding/platform).
+- **WELCOME-BACK told a lie (Wolf).** The returning-user card advertised "1–9 jump" to a drill,
+  but digits route to the cell editor (type-to-replace) long before the drill-jump branch — the
+  branch was dead code and the hint was false. Removed the dead `1-9` classic-mode branch; the
+  card now reads "\\ pick a drill · F1 guided help · any key to start" (drill jumps live in the
+  picker, where digits can't collide with data entry).
+- **UI POLISH (from the visual audit):** (1) account.html "Create an account" CTA rendered
+  accent-on-accent (invisible) — `.state a` out-specified `.acc-cta`; added `.state a.acc-cta`
+  ink rule. (2) leaderboard `.hero.two` never collapsed on mobile (out-specified the media
+  queries) → Top Players clipped off-screen; collapse rules now name `.hero.two`. (3) reference.html
+  key separators + section counts hardcoded `#4a4c48` (invisible on dark) → `var(--faint)`.
+  (4) desks empty guild board rendered two stranded arrows around a void → single centered
+  "no desks yet" line. (5) stats KPI row de-raggedized (dropped the lone leading ⏱).
+- **NAV/IA POLISH (from the nav audit):** (1) top-nav now shows section NAMES at ≥900px (was five
+  unguessable glyphs — "desks"/"reference" icons were ambiguous). (2) campaign modal was the ONE
+  modal that trapped Escape (broke the "Esc closes modals" promise) → Esc handler added. (3) the
+  weakness chip's ◆ glyph collided with the daily-challenge ◆ → weakness is now ◈.
+- DEFERRED to their own rounds (captured, not lost): the Practice/Daily/Compete modes rail (the
+  nav audit's #1 — the mode bar has objectively outgrown one row); the WRONG Excel border chords
+  (T/B → Excel's O/P/S/T/N canon) + a full chord canon-audit; insert-row sequencing copy; the
+  name generator's bad-word filter + broader tone; leaderboard tier sub-buckets; LP-style rank
+  progression; rapid-fire coverage of the new functions; the 34 flagged copy rows in
+  dev/COPY_INVENTORY.md (the batch-review artifact).
+- Cache: nav.js 262→263, nav.css 175→176, lb.js 9→10, lb.css 4→5; drill pages regenerated.
+  Local gate green pre-push (parity 124 · demo-replay 81 · onboard 29 · alt-paths 74 · mac 19 ·
+  echo 21 · rapidfire 12); CI is the authoritative full gate.
+
 ## 0. HEADLINE: the repo is behind the believed feature state
 The deployed code does **not** contain several features PROJECT_CONTEXT/memory said
 were shipped: **no Stripe/Pro/entitlements code, no =PRO() button, no keyboard-profile
