@@ -546,22 +546,9 @@ function heroHtml(){
     {t10:me.t10||0, pod:me.pod||0, crowns:me.crowns||0},
     DATA.fSessions.filter(x=>x.user_id===meId));
   const L=levelOf(xp);
-  // NEXT RANK: first tier above the current with concrete unmet requirements
-  let nextHtml='';
-  const nxt=TIERS[t.i+1];
-  if(nxt){
-    const attOk=me.att>=nxt.att, pctOk=avg!==null&&avg<=nxt.pct;
-    // progress toward the next tier's placement requirement (band position, clamped)
-    const hiB=(t.pct>1?1:t.pct), prog = avg===null?0:Math.max(0,Math.min(100,Math.round(100*(hiB-avg)/Math.max(1e-9,hiB-nxt.pct))));
-    nextHtml='<div class="yc-next">next rank: <b>'+nxt.name+'</b><br>'+
-      '<span class="'+(attOk?'have':'lack')+'">'+(attOk?'\u2713':'\u25cb')+' '+nxt.att+' drills attempted (you: '+me.att+')</span><br>'+
-      '<span class="'+(pctOk?'have':'lack')+'">'+(pctOk?'\u2713':'\u25cb')+' top '+Math.round(nxt.pct*100)+'% avg placement (you: '+(avg===null?'\u2014':'top '+Math.max(1,Math.round(avg*100))+'%')+')</span>'+
-      '<div style="height:5px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:8px"><div style="height:100%;width:'+prog+'%;background:var(--accent);border-radius:99px"></div></div>'+
-      '<div style="font-size:9.5px;color:var(--faint);margin-top:3px">placement progress through '+t.name+' \u2014 buckets: bottom \u2192 middle \u2192 top \u2192 promote</div>'+
-      '<a id="leaveRanked" style="display:inline-block;margin-top:8px;font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
-  } else {
-    nextHtml='<div class="yc-next"><b>Top of the ladder.</b> Rankings stay live \u2014 keep placing to hold it. <a id="leaveRanked" style="font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
-  }
+  /* r293 (Wolf): the persistent next-rank progression block is retired — the opt-in
+     infographic already explains the climb, and the card stays slim. Keep the exit. */
+  const nextHtml='<div class="yc-next"><a id="leaveRanked" style="font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
   return '<div class="panel me"><h4>your card</h4>'+
     '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name,28,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+
     '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
@@ -671,7 +658,7 @@ function featuredHtml(){
 let browseTab = sessionStorage.getItem('hk_lb_tab') || 'drills';
 let browseKey = sessionStorage.getItem('hk_lb_key') || null;
 let rosterTier = null;
-function rosterHtml(){
+function rosterHtml(flush){
   const {names,meId}=DATA; const userStat=DATA.gUserStat||DATA.userStat;
   const users=Object.entries(userStat).map(([u,st])=>{
     const av=st.att?st.avg:null;
@@ -690,7 +677,7 @@ function rosterHtml(){
     '<span class="ros-r">rating '+(x.av*100).toFixed(1)+'</span>'+
     '<span class="ros-a">'+x.st.att+' boards</span></div>').join('');
   if(!inTier.length) rows='<div class="empty">nobody holds this tier yet \u2014 it\u2019s open</div>';
-  return '<div class="panel" style="margin-top:18px"><h4>the field \u00b7 by tier</h4>'+
+  return '<div class="panel" style="margin-top:'+(flush?'0':'18px')+'"><h4>the field \u00b7 by tier</h4>'+
     '<div class="ros-tabs">'+tierNames.map(tn=>'<span class="tab ros-t'+(tn===rosterTier?' on':'')+'" data-tier="'+tn+'">'+tn.replace(' Analyst','')+'</span>').join('')+'</div>'+
     '<div class="ros-list">'+rows+'</div>'+
     '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">rating = stabilized average placement (lower is better) \u00b7 your row is highlighted</div></div>';
@@ -1163,6 +1150,8 @@ try{ const q=new URLSearchParams(location.search);
     location.replace('desks.html'+(q.get('desk')?('?desk='+encodeURIComponent(q.get('desk'))):''));
 }catch(e){}
 function renderAll(){
+  const __sy = window.scrollY;   // r293 (Wolf): tab/chip clicks re-render the page — hold the scroll so it doesn't jump
+
   const root=document.getElementById('boards');
   const h1=document.querySelector('h1');
   if(pageView()==='teams'){
@@ -1185,7 +1174,8 @@ function renderAll(){
   } else {
     if(h1) h1.textContent='Leaderboard';
     root.innerHTML =
-      '<div class="hero">'+heroHtml()+ladderHtml()+topPlayersHtml()+'</div>'+
+      '<div class="hero two">'+heroHtml()+topPlayersHtml()+'</div>'+
+      '<div style="grid-column:1/-1;min-width:0;margin-bottom:18px">'+rosterHtml(true)+'</div>'+
       featuredHtml()+
       '<h3 class="section-title">Browse the boards'+
         '<a href="desks.html" style="float:right;font-size:11px;color:var(--accent);text-decoration:none">\ud83c\udf93 schools & desks \u2192</a></h3>'+
@@ -1196,6 +1186,7 @@ function renderAll(){
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
   const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ try{ localStorage.setItem('hk_ranked','0'); }catch(e){} load(); };
+  try{ window.scrollTo(0, __sy); }catch(e){}
 }
 function wire(){
   const bs=document.getElementById('blSearch');
