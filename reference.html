@@ -181,11 +181,13 @@ const DATA = [
     {k:'Ctrl+Shift+↑/↓/←/→', d:'Extend selection to the edge of data', dr:true},
     {k:'Shift+Space', d:'Select the entire row', dr:true},
     {k:'Ctrl+Space', d:'Select the entire column', dr:true},
+    {k:'Ctrl+Shift+Space', d:'Select the current region \u2014 the whole table under the cursor'},
     {k:'Ctrl+A', d:'Select the current region, then the whole sheet'},
     {k:'Ctrl+Shift+End', d:'Select from here to the last used cell'},
   ]},
   {cat:'Edit & enter', ic:'✎', items:[
     {k:'F2', d:'Edit the active cell (cursor at the end)', dr:true},
+    {k:'Ctrl+Enter', d:'Commit the edit into EVERY selected cell \u2014 formulas translate per cell', dr:true},
     {k:'=', d:'Start a formula', dr:true},
     {k:'Enter', d:'Commit and move down', dr:true},
     {k:'Tab', d:'Commit and move right', dr:true},
