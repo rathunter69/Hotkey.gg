@@ -550,6 +550,13 @@
   .rc-stats{font-size:14px; margin-bottom:11px}
   .result .par{color:var(--muted)}
   /* r256: results-card speed-band row */
+  /* r293 (Wolf): slim card — the detail block folds behind a d-toggle */
+  .rm-more{display:none}
+  .rm-more.open{display:block}
+  .rm-more-t{display:block; font-family:var(--mono); font-size:11px; color:var(--faint); cursor:pointer;
+    margin:2px 0 14px; letter-spacing:.04em}
+  .rm-more-t:hover{color:var(--muted)}
+  .rm-more-t kbd{font-family:var(--mono); font-size:10px; border:1px solid var(--line); border-radius:4px; padding:0 4px; margin-right:5px}
   .rm-band{display:flex; align-items:center; gap:8px; justify-content:center; margin:-4px 0 16px;
     font-family:var(--mono); font-size:12.5px}
   .rm-band-name{letter-spacing:.14em; font-weight:700}
@@ -8532,6 +8539,7 @@ function showResults(o){
     if(ev.key==='Enter'){ ev.preventDefault(); hideResults(); restartDrill(); return; }
     if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
     if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
+    if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':'details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards'; } return; }   // r293: progressive disclosure
   };
   return _showResults(o);
 }
@@ -8638,16 +8646,21 @@ function _showResults(o){
   }
   const flowRow=(o.combo && o.combo>=8)
     ? `<div class="rm-nearmiss" style="color:var(--muted)">🔥 ${o.combo}-key flow streak <span>— you were locked in</span></div>` : '';
+  /* r293 (Wolf): SLIM CARD — the hero is the time + ONE hook + the next action.
+     Keys/band/stalls/boards fold behind a d-toggle so the loop stays fast. */
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
     hookRow+flowRow+
+    `<a class="rm-more-t" id="rmMoreT"><kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards</a>`+
+    `<div class="rm-more">`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     _bandRow(o)+
     ghostDiff(o)+
     ((CHALLENGES[cur]&&CHALLENGES[cur].aha)?'<div class="rm-aha">\ud83d\udca1 '+CHALLENGES[cur].aha+'</div>':'')+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
     `<div class="rm-rank" id="rmRank"></div>`+
+    `</div>`+
     `<div class="rm-opts">`+
     `<button class="rm-key" data-act="again"><kbd>↵ enter</kbd>again</button>`+
     `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
@@ -8657,6 +8670,7 @@ function _showResults(o){
     `</div>`;
   m.classList.add('show');
   // r88: the rm-key buttons rendered but had NO click wiring — keyboard-only card.
+  { const mt=m.querySelector('#rmMoreT'); if(mt) mt.onclick=()=>{ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); mt.innerHTML=(x&&x.classList.contains('open'))?'<kbd>d</kbd> hide the detail':'<kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards'; }; }
   m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
     const a=b.dataset.act;
     if(a==='again'){ hideResults(); restartDrill(); }
