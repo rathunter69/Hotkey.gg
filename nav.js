@@ -643,7 +643,10 @@
       }
       if(ti>=0) localStorage.setItem('hk_seen_tier', String(ti));
     }catch(e){}
-    m.innerHTML = '<div class="pc-card'+(myFlair?' flair-'+myFlair:'')+'">' +
+    // r286: flair is a fixed-picker value but the column takes free text over REST —
+    // sanitize to a safe token so it can never break out of the class attribute (XSS).
+    const flairCls = (myFlair && /^[a-z0-9_-]{1,32}$/i.test(myFlair)) ? ' flair-'+myFlair : '';
+    m.innerHTML = '<div class="pc-card'+flairCls+'">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-head" style="margin-bottom:10px"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
       /* r134: .pc-scroll wrapper — the v3 CSS (max-height 82vh + inner scroll) existed
