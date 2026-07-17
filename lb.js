@@ -898,6 +898,7 @@ async function renderManage(root){
     '<div style="grid-column:1/-1;font-family:var(--mono);font-size:12px;color:var(--muted);margin:-6px 0 4px">⚙ staffer controls for <b>'+esc(d.name)+'</b> · '+d.members+' analyst'+(d.members==1?'':'s')+' · <a href="desks.html" style="color:var(--accent)">← the hall</a></div>'+
     '<div class="panel"><h4>invite link</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">the fast lane — anyone with the link joins instantly</div><div id="mgInvite"></div></div>'+
     '<div class="panel"><h4>applications · the inbox</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">from the guild board — accept seats them, pass clears it</div><div id="mgApps"><div class="loading" style="padding:8px">checking…</div></div></div>'+
+    '<div class="panel" style="grid-column:1/-1"><h4>PRO for the desk</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">unlock every PRO feature for all '+d.members+' analyst'+(d.members==1?'':'s')+' at once — student clubs train free for a recruiting cycle, firms bill the whole desk on one invoice</div><div id="mgPro"><div class="loading" style="padding:8px">checking…</div></div></div>'+
     '<div class="panel" style="grid-column:1/-1"><h4>this week’s quests</h4><div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:9px">up to 3 drills, optional targets — they show in every analyst’s picker and on the hall</div><div id="mgAsg"></div></div>'+
     '<div class="panel" style="grid-column:1/-1"><h4>the roster</h4><div id="mgRoster"></div></div>'+
     '<div class="panel" style="grid-column:1/-1"><h4>the exit</h4><div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px">Leaving hands the desk to the longest-tenured analyst; if you’re the last one out, the desk dissolves.</div><button class="tab" id="mgLeave">leave the desk</button><span class="gb-msg" id="mgLeaveMsg" style="margin-left:10px"></span></div>';
@@ -917,6 +918,37 @@ async function renderManage(root){
         if(error){ say('mgInvMsg',deskErrMsg(error),1); return; }
         renderInvite(data||''); say('mgInvMsg','new code minted — the old invite links are dead.');
       }catch(e){ say('mgInvMsg','something went wrong.',1); } };
+  }
+  // ---- PRO for the desk (r287) — request flow; admin approves as comp or paid ----
+  async function renderPro(){
+    const host=document.getElementById('mgPro'); if(!host) return;
+    let g=null;
+    try{ const {data}=await sb.rpc('my_desk_pro'); g=(data&&data[0])||null; }catch(e){}
+    const st=g&&g.status;
+    if(st==='active'){
+      const exp=g.expires_at?new Date(g.expires_at):null;
+      const dl=exp?Math.max(0,Math.ceil((exp-Date.now())/86400000)):null;
+      host.innerHTML='<div style="font-family:var(--mono);font-size:12.5px;color:var(--accent)">✓ PRO is live for the whole desk'+
+        (g.kind==='comp'?' — free club access':'')+(dl!=null?' · '+dl+' day'+(dl===1?'':'s')+' left':' · no expiry')+'</div>';
+      return;
+    }
+    if(st==='pending'){
+      host.innerHTML='<div style="font-family:var(--mono);font-size:12.5px;color:var(--warn)">⏳ request received — we’ll review and get back to you. Beta desks are approved fast.</div>';
+      return;
+    }
+    const denied = st==='denied' ? '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px">a previous request wasn’t approved — reach out at hello@hotkey.gg if that’s a surprise.</div>' : '';
+    host.innerHTML=denied+
+      '<div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">'+
+      '<button class="tab on" id="mgProReq">request PRO for the desk →</button>'+
+      '<a class="tab" href="enterprise.html" style="text-decoration:none">see desk pricing</a>'+
+      '</div><div class="gb-msg" id="mgProMsg" style="margin-top:7px"></div>';
+    const b=document.getElementById('mgProReq');
+    if(b) b.onclick=async()=>{ b.disabled=true; b.textContent='sending…';
+      try{ const {data,error}=await sb.rpc('request_desk_pro',{p_note:'',p_seats:d.members});
+        if(error){ say('mgProMsg',deskErrMsg(error),1); b.disabled=false; b.textContent='request PRO for the desk →'; return; }
+        try{ ev('desk_pro_request',{}); }catch(e){}
+        renderPro();
+      }catch(e){ say('mgProMsg','something went wrong — try again.',1); b.disabled=false; b.textContent='request PRO for the desk →'; } };
   }
   // ---- applications inbox ----
   async function renderApps(){
@@ -1068,7 +1100,7 @@ async function renderManage(root){
       }catch(e){ say('mgRosMsg','something went wrong.',1); } }; });
   }
   renderInvite(d.invite_code||'');
-  renderApps(); renderQuests(); renderRoster();
+  renderApps(); renderPro(); renderQuests(); renderRoster();
   let lArmed=false; const lv=document.getElementById('mgLeave');
   if(lv) lv.onclick=async()=>{
     if(!lArmed){ lArmed=true; lv.textContent='click again to confirm'; setTimeout(()=>{lArmed=false; lv.textContent='leave the desk';},2600); return; }
