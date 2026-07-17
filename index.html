@@ -10353,8 +10353,21 @@ document.addEventListener('keydown',hkRawE=>{
   // type-to-replace branches, so printable keys started edits mid-tour (Wolf: "it still
   // lets me type during the tour"). It must run before every game branch.
   if(__tourI>=0){
-    const __st=TOUR_STEPS[__tourI];
-    if(__st && __st.doIt && k===__st.doIt.key && !!e.ctrlKey===!!__st.doIt.ctrl && !!e.shiftKey===!!__st.doIt.shift && !e.altKey){
+    const __st=__tourPlan[__tourI];
+    if(__st && __st.entry){
+      // r303 ENTRY beat: the user TYPES into the live sheet (a number, or =/+ a formula).
+      // Let editing keys through and advance when the target cell actually COMMITS.
+      if(k==='Escape' && !editing){ e.preventDefault(); tourShow(__tourPlan.length); return; }
+      if(k==='Enter' && !editing){ e.preventDefault(); tourShow(__tourI+1); return; }   // the exercise is optional — Enter (the documented "next") skips it when you're not mid-edit
+      const __adv=__tourI, __at=__st.at, __ok=__st.commit;
+      setTimeout(()=>{ if(__tourI!==__adv || editing) return;
+        try{ const p=parseRef(__at); const c=get(p.r,p.c); if(__ok && __ok(c)){
+          const d=$('tourDo'); if(d){ d.textContent='⚡ nice — that’s real Excel'; }
+          setTimeout(()=>{ if(__tourI===__adv) tourShow(__adv+1); }, 750);
+        } }catch(_){}
+      }, 0);
+      // fall through — the game's edit/commit path runs for real
+    } else if(__st && __st.doIt && k===__st.doIt.key && !!e.ctrlKey===!!__st.doIt.ctrl && !!e.shiftKey===!!__st.doIt.shift && !e.altKey){
       // r175 DO-IT beat: THIS chord is the lesson — let it hit the live sheet,
       // celebrate, then advance. Everything else stays blocked.
       const __adv=__tourI;
@@ -10363,7 +10376,7 @@ document.addEventListener('keydown',hkRawE=>{
       // fall through — the game handler below executes the chord for real
     } else {
       e.preventDefault();
-      if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourShow(TOUR_STEPS.length); }
+      if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourShow(__tourPlan.length); }
       return;
     }
   }
@@ -13826,12 +13839,15 @@ function dismissLanding(){ landingOpen=false; const l=$('landing'); if(l) l.clas
   // r134: SEQUENCE, don't race — spotlight tour first (input-blocked), THEN the
   // tutorial prompt. They used to fire on independent timers and overlap.
   let tourDone=false; try{ tourDone=!!localStorage.getItem('hk_tour_done'); }catch(e){}
-  if(!tourDone){ __tourAfter=maybeOnboard;
-    // r159: first entry asks the comfort question; "basically none" gets the
-    // excel-from-zero primer BEFORE the product tour.
+  if(!tourDone){
+    // r303: the tour ends on the cleared board — hand off to the real first drill, THEN the prompt.
+    __tourAfter=()=>{ try{ if(sandboxMode){ sandboxMode=false; loadChallenge(MENU_ORDER[0]); } }catch(e){} maybeOnboard(); };
+    // r159/r303: first entry asks the comfort question; the answer only gates how many
+    // fundamentals steps show — the whole intro is now ONE spotlight sequence on a cleared board.
+    const runTour=()=>{ try{ startOnboardBoard(); }catch(e){} tourShow(0); };
     let asked=null; try{ asked=localStorage.getItem('hk_xlv'); }catch(e){}
-    if(asked===null) setTimeout(()=>showKeyboard(()=>showComfort(()=>tourShow(0))), 700);
-    else setTimeout(()=>tourShow(0), 700); }
+    if(asked===null) setTimeout(()=>showKeyboard(()=>showComfort(runTour)), 700);
+    else setTimeout(runTour, 700); }
   else maybeOnboard(); }
 function tryEnter(){ enterRequested=true; ev('enter'); if(!sb){ dismissLanding(); return; } advanceAccess(); }
 
@@ -14241,43 +14257,53 @@ function showComfort(after){
   const pick=(v)=>{ try{ localStorage.setItem('hk_xlv', String(v)); }catch(e){}
     try{ ev('comfort',{v:v}); }catch(e){}
     m.classList.remove('show'); window.__introCardOpen=false; document.removeEventListener('keydown', keys, true);
-    if(v===0) showPrimer(after); else after(); };
+    after(); };   // r303: the primer is folded INTO the tour now (buildTourPlan gates the fundamentals by xlv) — no separate modal
   m.querySelectorAll('[data-xlv]').forEach(b=>{ b.onclick=()=>pick(+b.dataset.xlv); });
   document.addEventListener('keydown', keys, true);
 }
-const PRIMER=[
-  ['the grid', 'Everything in Excel lives in a <b>cell</b>. Every box has an address \u2014 column letter + row number, like <b style="font-family:var(--mono)">B4</b>. The dark outline is <b>you</b>: the arrow keys move it.',
-   '<table style="border-collapse:collapse;margin:10px auto;font-family:var(--mono);font-size:11px"><tr><td></td><td style="padding:2px 10px;color:var(--faint)">A</td><td style="padding:2px 10px;color:var(--faint)">B</td><td style="padding:2px 10px;color:var(--faint)">C</td></tr><tr><td style="padding:2px 8px;color:var(--faint)">3</td><td style="border:1px solid var(--line);padding:3px 14px"></td><td style="border:1px solid var(--line);padding:3px 14px">340</td><td style="border:1px solid var(--line);padding:3px 14px"></td></tr><tr><td style="padding:2px 8px;color:var(--faint)">4</td><td style="border:1px solid var(--line);padding:3px 14px"></td><td style="border:2px solid var(--accent);padding:3px 14px;font-weight:700">B4</td><td style="border:1px solid var(--line);padding:3px 14px"></td></tr></table>'],
-  ['what a cell shows vs what it is', 'A cell can hold a plain number (<b style="font-family:var(--mono)">340</b>) or a <b>formula</b> that computes one (<b style="font-family:var(--mono)">=B2+B3</b> \u2014 formulas always start with <b style="font-family:var(--mono)">=</b>). The grid shows the RESULT; the <b>formula bar</b> above the grid shows what\u2019s really inside.', ''],
-  ['typing', 'Click nothing. Just <b>type</b> \u2014 it replaces what\u2019s in the cell \u2014 and press <kbd class="ob-kbd">\u21b5</kbd> to commit (<kbd class="ob-kbd">Tab</kbd> commits and moves right). Made a mess? <kbd class="ob-kbd">Esc</kbd> backs out safely. <kbd class="ob-kbd">F2</kbd> opens a cell to fix it without retyping.', ''],
-  ['the ribbon', 'Excel\u2019s menus all have <b>keyboard paths</b>. Tap <kbd class="ob-kbd">Alt</kbd> and letters light up: <b style="font-family:var(--mono)">Alt \u2192 H \u2192 O \u2192 I</b> fixes squeezed columns. Nobody memorizes these overnight \u2014 the drills make them reflex.', ''],
-  ['how you win', 'Each drill: make the sheet match the <b>checklist</b> on the right, fast. Any keystroke path that gets there counts. <kbd class="ob-kbd">F1</kbd> is <b>guided mode</b> \u2014 it highlights every key to press, and it\u2019s ON for your first few runs. You\u2019ve got this.', ''],
-];
-function showPrimer(after, i){
-  i=i||0;
-  let m=$('primerCard');
-  if(!m){ m=document.createElement('div'); m.id='primerCard'; m.className='onboard-modal'; document.body.appendChild(m); }
-  if(i>=PRIMER.length){ m.classList.remove('show'); window.__introCardOpen=false; try{ localStorage.setItem('hk_primer_done','1'); }catch(e){}
-    try{ ev('primer_done',{}); }catch(e){} if(after) after(); return; }
-  window.__introCardOpen=true;
-  const p=PRIMER[i];
-  m.innerHTML='<div class="ob-card" style="max-width:470px">'+
-    '<div class="ob-title" style="display:flex;justify-content:space-between;align-items:baseline"><span>excel from zero \u2014 '+p[0]+'</span><span style="font-size:11px;color:var(--faint);font-family:var(--mono)">'+(i+1)+' / '+PRIMER.length+'</span></div>'+
-    '<div class="ob-body" style="font-size:13px;line-height:1.8;text-align:left">'+p[1]+(p[2]||'')+'</div>'+
-    '<div class="ob-opts"><button class="ob-key primary" id="primerNext">'+(i===PRIMER.length-1?'let\u2019s drill':'next')+' <kbd class="ob-kbd">\u21b5</kbd></button></div></div>';
-  m.classList.add('show');
-  const keys=(e)=>{ if(e.key==='Enter'){ e.preventDefault(); e.stopImmediatePropagation(); go(); } };
-  const go=()=>{ document.removeEventListener('keydown', keys, true); showPrimer(after, i+1); };
-  $('primerNext').onclick=go;
-  document.addEventListener('keydown', keys, true);
+/* r303: PRIMER + showPrimer DELETED — the five cards live on as the tour's novice beats. */
+/* r303 ONBOARDING V3 (Wolf) — the primer is FOLDED into the spotlight tour: one dim+highlight
+   sequence for everyone, run on a CLEARED practice board (not the live first drill). The five
+   `novice:true` beats teach the fundamentals — grid, name box, formula bar, typing, and starting
+   a formula with = OR + — and only show for the "basically none" comfort answer; "I get around"
+   and "I live in it" skip straight to the product tour. Spec: dev/ONBOARDING_V3.md. */
+function startOnboardBoard(){
+  sandboxMode=true; placementMode=false; cur='__onboard__';
+  const cells={};
+  cells['A1']=sbCell('Warm-up sheet — nothing here counts. Follow the callouts.',{txt:true, it:true, fontColor:'gray'});
+  cells['A3']=sbCell('Revenue',{bold:true});   cells['B3']=sbCell('Costs',{bold:true});   cells['C3']=sbCell('Profit',{bold:true, fontColor:'gray'});
+  cells['A4']=sbCell(340,{fmtStyle:'comma',decimals:0, fontColor:'blue'});
+  cells['B4']=sbCell(210,{fmtStyle:'comma',decimals:0, fontColor:'blue'});
+  // A5 = the typing target · C4 = the formula target (=A4-B4 or +A4-B4)
+  S={ROWS:8, cells, active:{r:4,c:1}, sel:null, clipboard:null};
+  colW=new Array(COLS+1).fill(COLW_DEFAULT);
+  started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
+  editing=false; editBuf=''; editCaret=0; editPointer=null; guided=false; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
+  clearInterval(tickH);
+  const tm=$('timer'); if(tm){ tm.textContent='—'; tm.classList.remove('run'); }
+  try{ $('par').textContent='—'; $('keyPar').textContent='—'; $('pb').textContent='—'; }catch(e){}
+  const dn=$('dbName'); if(dn) dn.textContent='Warm-up';
+  const dc=$('dbCat'); if(dc) dc.innerHTML='intro';
+  try{ updateGuideBtn(); }catch(e){}
+  drawRibbon(); render();
 }
 const TOUR_STEPS=[
-  /* r292 INTERACTIVE INTRO — plain, professional, succinct. Two DO-IT beats put a real
-     chord under the fingers in the first 15s; the rest points at the actual controls. */
-  {sel:'.gridwrap', cap:'try this', doIt:{key:'ArrowRight',ctrl:true},
-    body:'A mouse takes a few seconds to scroll and click across a sheet. The keyboard takes one press.<br><br><b>Hold <kbd>ctrl</kbd> and tap <kbd>→</kbd></b> — right now.'},
+  /* r303 — the folded-in fundamentals (shown only for the "basically none" answer) */
+  {sel:'.gridwrap', novice:true, cap:'this is the grid', at:'A4',
+    body:'Everything in Excel lives in a <b>cell</b>. Each has an address — column letter + row number, like <b style="font-family:var(--mono)">A4</b>. The bright outline is <b>you</b>.<br><br><b>Tap an arrow key</b> to move it.', doIt:{key:'ArrowRight'}},
+  {sel:'#nameBox', novice:true, cap:'where am I?', at:'A4',
+    body:'The <b>name box</b> always shows the address of the cell you’re on. Watch it as you move:<br><br><b>tap <kbd>→</kbd> again</b> — it updates.', doIt:{key:'ArrowRight'}},
+  {sel:'.fbar', novice:true, cap:'shown vs. inside', at:'A4',
+    body:'A cell can hold a plain number or a <b>formula</b> that computes one. The grid shows the <b>result</b>; the <b>formula bar</b> (here) shows what’s really inside. Press <kbd>↵</kbd> to go on.'},
+  {sel:'.gridwrap', novice:true, cap:'just type', at:'A5', entry:true, commit:(c)=>typeof c.value==='number',
+    body:'No clicking needed. The cursor is on <b style="font-family:var(--mono)">A5</b> — <b>type a number and press <kbd>↵</kbd></b>. (Typing replaces the cell; <kbd>Esc</kbd> backs out; <kbd>F2</kbd> edits without retyping.)'},
+  {sel:'.gridwrap', novice:true, cap:'start a formula', at:'C4', entry:true, commit:(c)=>!!c.formula,
+    body:'Formulas start with <b style="font-family:var(--mono)">=</b> <i>or</i> <b style="font-family:var(--mono)">+</b> (bankers use +). On <b style="font-family:var(--mono)">C4</b>, type <b style="font-family:var(--mono)">=A4-B4</b> and press <kbd>↵</kbd> — profit computes itself.'},
+  /* r292 INTERACTIVE INTRO — the chord beats, now for everyone after the fundamentals. */
+  {sel:'.gridwrap', cap:'now the point', doIt:{key:'ArrowRight',ctrl:true}, at:'A4',
+    body:'A mouse takes seconds to cross a sheet. The keyboard takes one press.<br><br><b>Hold <kbd>ctrl</kbd> and tap <kbd>→</kbd></b> — jump to the edge of the data.'},
   {sel:'.gridwrap', cap:'again — bigger', doIt:{key:'ArrowDown',ctrl:true,shift:true},
-    body:'The cursor jumped to the edge of the data. Now select a whole column of it, no dragging:<br><br><b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd></b> — one chord.'},
+    body:'That jumped to the edge. Now <b>select</b> a whole run of it, no dragging:<br><br><b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd></b> — one chord.'},
   {sel:'.cl-inner',   cap:'your checklist', body:'Each drill gives you a <b>checklist</b> on the right. Every line is one action; it turns green when done. Clear them all and the clock stops — any keystroke path that gets there counts.'},
   {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list — <b>↑↓ arrows</b> move, <b>↵</b> loads. Or hop straight with <b>Alt+←/→</b>. <b>Esc</b> never ends your run.'},
   {sel:'#guideToggle', cap:'stuck? two helpers', body:'<b>Guided mode</b> (this button, or <kbd>F1</kbd>) highlights every key to press — on by default for your first runs. Beside it, <b>watch solution</b> plays the optimal keys, and <b>learn mode</b> hands you the keys one step at a time.'},
@@ -14289,23 +14315,35 @@ const TOUR_STEPS=[
   {sel:'#authSlot',   cap:'the ladder',    signedIn:true,
     body:'<b>LEVEL</b> is your reps — every clean solve earns xp. <b>RANK</b> is the competition — clean, keyboard-only runs post to per-drill <b>leaderboards</b>, with crowns for first.'},
 ];
-let __tourI=-1, __tourAfter=null;
+let __tourI=-1, __tourAfter=null, __tourPlan=[];
+/* r303: precompute the steps that will ACTUALLY show for this user — one place for the
+   novice / audience / element gates, and an honest "n / total" counter (the old inline-skip
+   recursion counted skipped steps). */
+function buildTourPlan(){
+  const signedIn = !!(me_user && !isAnonUser());
+  let xlv=0; try{ xlv=parseInt(localStorage.getItem('hk_xlv')||'0',10)||0; }catch(e){}
+  return TOUR_STEPS.filter(st=>{
+    if(st.novice && xlv>=1) return false;                 // only "basically none" gets the from-zero beats; "I get around" / "I live in it" go straight to the product tour
+    if(st.signedIn && !signedIn) return false;
+    if(st.signedOut && signedIn) return false;
+    if(st.sel){ const el=document.querySelector(st.sel); if(!el) return false;
+      if(st.optional){ const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') return false; } }
+    return true;
+  });
+}
 function tourShow(i){
   const w=$('tourWrap'), ring=$('tourRing'), card=$('tourCard');
   if(!w||!ring||!card) return;
-  if(i>=TOUR_STEPS.length){ w.classList.remove('on'); try{ localStorage.setItem('hk_tour_done','1'); }catch(e){} __tourI=-1;
+  if(i<=0) __tourPlan=buildTourPlan();
+  if(i>=__tourPlan.length){ w.classList.remove('on'); try{ localStorage.setItem('hk_tour_done','1'); }catch(e){} __tourI=-1;
     ev('tour_done');
     const f=__tourAfter; __tourAfter=null; if(f) setTimeout(f, 350); return; }
   __tourI=i;
-  const st=TOUR_STEPS[i];
-  // r292: audience-gated steps — the account step differs signed-in vs signed-out;
-  // optional steps (mac button, ghost) skip when their control isn't on screen.
-  const signedIn = !!(me_user && !isAnonUser());
-  if(st.signedIn && !signedIn){ tourShow(i+1); return; }
-  if(st.signedOut && signedIn){ tourShow(i+1); return; }
+  const st=__tourPlan[i];
+  // r303: park the cursor where the step teaches (name-box demo, typing/formula targets)
+  if(st.at && typeof S!=='undefined' && S && !editing){ const p=parseRef(st.at); if(p){ S.active={r:p.r,c:p.c}; S.sel=null; try{ render(); updateFormulaBar(); }catch(e){} } }
+  __tourBase = (st.entry && st.at) ? JSON.parse(JSON.stringify(get(parseRef(st.at).r, parseRef(st.at).c))) : null;
   const el=st.sel?document.querySelector(st.sel):null;
-  if(st.sel && !el){ tourShow(i+1); return; }
-  if(st.optional && el){ const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden'){ tourShow(i+1); return; } }
   w.classList.add('on');
   if(st.full){
     ring.style.width='0px'; ring.style.height='0px'; ring.style.left='-20px'; ring.style.top='-20px';
@@ -14319,13 +14357,16 @@ function tourShow(i){
   card.style.left=Math.max(12, Math.min(window.innerWidth-346, r.left))+'px';
   card.style.top=(below? r.bottom+14 : Math.max(12, r.top-190))+'px';
   }
-  card.innerHTML='<div class="tour-cap"><span>'+st.cap+'</span><span style="color:var(--faint)">'+(i+1)+' / '+TOUR_STEPS.length+'</span></div>'+
+  const last=(i===__tourPlan.length-1);
+  const cue = st.entry ? '\u25b8 type it \u2014 the sheet is live' : '\u25b8 press it \u2014 the sheet is live';
+  card.innerHTML='<div class="tour-cap"><span>'+st.cap+'</span><span style="color:var(--faint)">'+(i+1)+' / '+__tourPlan.length+'</span></div>'+
     '<div class="tour-body">'+st.body+'</div>'+
-    (st.doIt?'<div class="tour-body" id="tourDo" style="color:var(--accent);font-weight:600">\u25b8 press it \u2014 the sheet is live</div>':'')+
-    '<div class="tour-foot"><span class="tour-next" id="tourNext">'+(i===TOUR_STEPS.length-1?'start drilling':'next \u00b7 \u21b5')+'</span><span class="tour-skip" id="tourSkip">skip tour \u00b7 esc</span></div>';
+    ((st.doIt||st.entry)?'<div class="tour-body" id="tourDo" style="color:var(--accent);font-weight:600">'+cue+'</div>':'')+
+    '<div class="tour-foot"><span class="tour-next" id="tourNext">'+(last?'start drilling':'next \u00b7 \u21b5')+'</span><span class="tour-skip" id="tourSkip">skip tour \u00b7 esc</span></div>';
   const nx=$('tourNext'); if(nx) nx.onclick=()=>tourShow(__tourI+1);
-  const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(TOUR_STEPS.length);
+  const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(__tourPlan.length);
 }
+let __tourBase=null;
 /* r134: maybeStartTour retired — the tour fires from dismissLanding, sequenced
    before the tutorial prompt, never on an independent timer. */
 function rememberDrill(){ try{ localStorage.setItem('hk_last_drill', cur); }catch(e){} }

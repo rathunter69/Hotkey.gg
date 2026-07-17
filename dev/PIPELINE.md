@@ -37,6 +37,17 @@ bubble back-button, responsive nav labels, icon-only level chips) · dev/COPY_IN
 4. **SEED TEST USERS (Wolf):** ~15–25 clearly-marked bot accounts w/ plausible spread of
    per-drill times so boards read lived-in (smoke-u fixture pattern, NEW-timestamp migration;
    decide a flag for later purge/filter).
+4b. **WOLF VISUAL BATCH 2 (2026-07-17 late):** celebration overhaul — confetti/dopamine
+   level-up + richer achievement cards (hkCelebrate) · completion-card DECLUTTER — one
+   animated xp bar (current→next level) replaces the xp text+links; keep next-achievement
+   progress, details, "off your best"; kill duplicated button labels; share link subtle/cut ·
+   GUIDED ON RAILS — lock input to the guided target cell/selection (bounce cue) ·
+   MODE BAR REORDER — modes (daily accent-colored until done · campaign · rapid-fire; drop
+   classic chip + random) → helpers (F1 · learn · solution) → flair (level · streak) →
+   settings (keyboard · ghost w/ source toggle my-PB/all-time/desk-best · gear collapsing
+   sound+misc); rapid-fire button visually oversized — weight ∝ usage · TOP NAV symmetric
+   (tools overhang right vs brand left; nav maxw 1240 vs game 1180 — align or balance) ·
+   picker opens centered on CURRENT drill with NEXT visible (extends the scrollIntoView task).
 5. **QUICK UX:** picker opens AT the current drill (unfold + scrollIntoView) · move the
    keyboard-selector button into the mode bar · Format Cells card gets a visible
    "house letters, not Excel's" marker (canon-audit item — 9 of its letters are inventions;
