@@ -1,8 +1,37 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Refreshed 2026-07-14 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
-New sessions: the repo IS the handover — read this file, dev/AUDIT.md (newest round
-at the bottom), and the dev/ design docs. No manual doc upload needed when the
-session has the GitHub integration (repo clones automatically)._
+_Refreshed 2026-07-17 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+New sessions: the repo IS the handover — read this file, **dev/PIPELINE.md's ⚡ header (the
+live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ design docs._
+
+## SESSION HANDOVER SNAPSHOT (2026-07-17, rounds r296–r302 — the live-feedback marathon)
+- **THE ACTIVE ARC: Wolf plays the live site and fires batches of feedback; the session
+  ships them as small PRs and MERGES EACH ONE (7 today: #134–#140).** HOUSE RULE learned the
+  hard way: a push to a side branch deploys NOTHING (Pages serves main) — a round ends when
+  the PR is merged and main verified moved. Never let work strand unmerged again.
+- **r296–r298**: engine finance/text/sort pack (NPV·IRR·LARGE/SMALL/RANK·LEFT/RIGHT/MID/LEN/
+  TRIM/UPPER/LOWER/PROPER/FIND/CONCATENATE·& operator·string literals) folded into
+  dcfbuild/lbobuild/comps/dashcover; Flash Fill (Ctrl+E, deterministic candidate library);
+  **border chords were WRONG vs Excel for months (T≠top!) — swept to canon O/P/L/R/N/A/S/T/B/D
+  across 140 refs in 4 key encodings**; sign-out wipes all account mirrors + lands home.
+- **r299–r302**: sign-out = "fresh desk, drill one" reset; login hard-reloads (mismatch class
+  dead); held Alt+↓ opens the filter dropdown (dead-chord class fix); hidden-row break-line
+  cue; **ONE RANK EVERYWHERE** — nav.js hand-rolled pct=idx/total vs shared idx/(n-1); now
+  everything uses HK_RANK.standing + write-through pill cache (3rd recurrence, root-caused);
+  rapid-fire overhaul (real ribbon echo, fixed C4 target, 8-row grid, every-route matchers);
+  full canon audit (agent): ONE more wrong chord (Paste Special None=O) fixed, Alt H V V
+  wired; one-row mode bar; collision-checked handle suggestions; COPY_INVENTORY.md (555 rows)
+  awaiting Wolf's batch markup.
+- **WORKFLOW THAT WORKED (keep):** background subagents for playtest/audit sweeps (onboarding
+  flow, visual polish, nav IA, copy inventory, chord canon — each returned file:line-anchored
+  findings); targeted tests while iterating, CI as the authoritative full gate; background
+  gate-watchers + merge-on-green. AVOID: local full-sweeps every iteration (1–2h stalls).
+- **NEXT (the queue with specs): dev/PIPELINE.md ⚡ header.** #1 is ONBOARDING V3
+  (dev/ONBOARDING_V3.md, build-ready: one spotlight sequence, cleared grid, hidden intro
+  drill, = or +). Then ranked opt-in + LP design (mock first), sheet-tabs 2-page rework,
+  seeded test users, quick-UX batch, grid-color A/B, F9 drill, icons.
+- Wolf note: he'll be away from a personal PC for copy edits; keep visual/UI changes coming
+  and batch anything wordy for his later markup. He wants feedback continuously folded into
+  these docs — keep this snapshot and PIPELINE current every round.
 
 ## SESSION HANDOVER SNAPSHOT (2026-07-14, rounds r197-r200 — the polish arc)
 - **THE ACTIVE ARC: Wolf is auditing drills and driving a drill-by-drill
