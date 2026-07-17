@@ -111,6 +111,8 @@ async function load(){
   html+='</div>';
   // reports queue
   html+='<div class="section-title">moderation · report queue</div><div class="panel" id="reps"><div class="loading" style="padding:10px">loading…</div></div>';
+  // r284 (#35): shadow-flagged runs — the integrity trigger's catch, awaiting a verdict
+  html+='<div class="section-title">integrity · flagged runs</div><div class="panel" id="flags"><div class="loading" style="padding:10px">loading…</div></div>';
   root.innerHTML=html;
   // errors
   try{ const {data:ev}=await sb.rpc('admin_events',{p_name:'err',p_limit:25});
@@ -132,6 +134,21 @@ async function load(){
     }catch(e){ $('reps').innerHTML='<div class="row">could not load</div>'; }
   }
   renderReports();
+  // flagged runs — shadow-hidden from boards; clear restores, delete removes
+  async function renderFlags(){
+    try{ const {data:fr}=await sb.rpc('admin_flagged_runs');
+      $('flags').innerHTML=(fr&&fr.length)
+        ? fr.map(r=>'<div class="row"><span>'+esc(r.handle)+'</span><span class="meta">'+esc(r.challenge)+' · '+(r.time_ms/1000).toFixed(2)+'s · '+r.keystrokes+' keys (opt '+esc(String(r.optimal))+') · <b style="color:var(--warn)">'+esc(r.flag_reason)+'</b></span>'+
+            '<span class="t">'+esc(String(r.created_at).slice(0,16).replace('T',' '))+'</span>'+
+            '<span class="tab flg-act" data-id="'+esc(r.id)+'" data-a="clear">clear</span>'+
+            '<span class="tab flg-act" data-id="'+esc(r.id)+'" data-a="delete" style="color:var(--bad)">delete</span></div>').join('')
+        : '<div class="row">nothing flagged — the boards are clean</div>';
+      document.querySelectorAll('.flg-act').forEach(b=>b.onclick=async()=>{
+        b.textContent='…';
+        try{ await sb.rpc('admin_run_verdict',{p_id:b.dataset.id, p_action:b.dataset.a}); renderFlags(); }catch(e){} });
+    }catch(e){ $('flags').innerHTML='<div class="row">could not load</div>'; }
+  }
+  renderFlags();
 }
 load();
 </script>

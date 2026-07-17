@@ -1,0 +1,49 @@
+# r285 (#36) THE GATE, ON CI — the same suites every session runs before shipping,
+# now enforced on every PR and push to main regardless of who (or what) edited.
+# Suites: parity / onboard / replay / alt-paths / mac-input / echo, plus the
+# drill-page drift check (regenerate + diff must be clean).
+name: gate
+on:
+  pull_request:
+  push:
+    branches: [main]
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install playwright-core + chromium
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright-core@1.49.1 >/dev/null
+          npx playwright-core install --with-deps chromium
+          echo "CHROME=$(node -e "console.log(require('playwright-core').chromium.executablePath())")" >> "$GITHUB_ENV"
+      - name: Serve the site
+        run: |
+          python3 -m http.server 8791 &
+          sleep 1.5
+          curl -sfo /dev/null http://127.0.0.1:8791/index.html
+      - name: Parity matrix
+        run: node dev/e2e-audit-parity.js
+      - name: Onboarding audit
+        run: node dev/e2e-audit-onboard.js
+      - name: Demo replay (all drills)
+        run: REPS=1 node dev/e2e-demo-replay.js
+      - name: Alt paths
+        run: node dev/e2e-alt-paths.js
+      - name: Mac input matrix
+        run: node dev/e2e-mac-input.js
+      - name: Echo / follow-along
+        run: node dev/e2e-echo.js
+      - name: Drill pages in sync
+        run: |
+          node dev/build-drill-pages.js
+          git diff --exit-code -- drills sitemap.xml \
+            || { echo '::error::drill pages are stale — run dev/build-drill-pages.js and commit'; exit 1; }

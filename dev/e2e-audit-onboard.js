@@ -2,7 +2,7 @@
    tour → play; second visit: welcome-back. Stubbed supabase so auth paths run. */
 'use strict';
 const { chromium } = require('playwright-core');
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
 
@@ -114,14 +114,19 @@ const STUB = () => {
   ok(t2f, 'after onboarding the grid takes keys immediately');
 
   console.log('T3 second visit: welcome back');
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
+  // domcontentloaded, not load: supabase-js loads async now (r285) — 'load' waits on
+  // the CDN, and if it's slow the card's 12s auto-hide can fire before 'load' returns.
+  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
-  await page.waitForTimeout(700);
-  const t3 = await page.evaluate(() => {
+  // wait for the card explicitly rather than a fixed offset — robust to boot timing
+  const t3up = await page.waitForFunction(() => {
     const w = document.getElementById('wbDlg');
-    return { up: !!(w && getComputedStyle(w).display !== 'none'), gateGone: !document.getElementById('gate').classList.contains('show'),
-      landingGone: document.getElementById('landing').classList.contains('gone') };
-  });
+    return !!(w && getComputedStyle(w).display !== 'none');
+  }, null, { timeout: 8000 }).then(() => true).catch(() => false);
+  const t3 = await page.evaluate(() => ({
+    gateGone: !document.getElementById('gate').classList.contains('show'),
+    landingGone: document.getElementById('landing').classList.contains('gone') }));
+  t3.up = t3up;
   ok(t3.gateGone && t3.landingGone, 'returning visitor skips curtain + landing');
   ok(t3.up, 'welcome-back card greets the return');
   const t3b = await page.evaluate(async () => {
