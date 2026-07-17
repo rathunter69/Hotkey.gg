@@ -305,6 +305,13 @@
   td.sel-r{border-right:2px solid var(--accent)}
   @keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
   td.pasted{animation:pasteflash .5s ease-out}
+  /* r307 (Wolf): the LANDING ZONE — while the clipboard is armed, a dashed ghost shows
+     exactly where the copied/cut block will land from the current cell. Watching a new
+     player, "where do I go next" wasn't readable; now the destination footprint travels
+     with the cursor. */
+  .pastedest{position:absolute; display:none; pointer-events:none; z-index:5;
+    border:2px dashed var(--accent); opacity:.5; border-radius:2px;
+    background:color-mix(in srgb, var(--accent) 7%, transparent)}
   .marquee{position:absolute; display:none; pointer-events:none; z-index:6;
     background-color:var(--accent-glow);
     background-image:
@@ -807,9 +814,11 @@
   .mb-tool.mb-daily{color:var(--accent); font-weight:700; border-color:var(--accent-dim);
     background:var(--accent-glow); letter-spacing:.02em}
   .mb-tool.mb-daily:hover{color:var(--accent); border-color:var(--accent)}
-  /* r302 (Wolf): the expanding outer box-shadow read as a sloppy/broken border. The
-     unplayed cue is now a small breathing dot INSIDE the chip — quiet, contained. */
-  .mb-tool.mb-daily.undone{position:relative}
+  /* r302/r306 (Wolf): unplayed daily = ACCENT chip (the one thing worth highlighting);
+     it reverts to a normal chip once today's sitting is done. Dot cue kept, in ink color. */
+  .mb-tool.mb-daily.undone{position:relative; background:var(--accent); border-color:var(--accent);
+    color:var(--on-accent,#0c0d0e); font-weight:700}
+  .mb-tool.mb-daily.undone::after{background:currentColor}
   .mb-tool.mb-daily.undone::after{content:''; position:absolute; top:4px; right:5px; width:6px; height:6px;
     border-radius:50%; background:var(--accent); animation:dcdot 2.4s ease-in-out infinite}
   @keyframes dcdot{0%,100%{opacity:.35}50%{opacity:1}}
@@ -1400,14 +1409,12 @@
 
   <div class="exrow">
     <div class="mode-bar">
-      <button class="mb-mode active" id="mbClassic" data-mode="classic">
-        <span class="ico">●</span>classic
-      </button>
-      <!-- r292 (Wolf): marathon mode retired from the UI (rapid-fire covers timed play). -->
+      <!-- r306 (Wolf): modes → helpers → flair → settings, weight ∝ usage. Classic chip and
+           random retired (the drill menu covers both); rapid-fire downweighted to a normal chip. -->
+      <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily</button>
+      <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
       <div class="mb-mode-wrap">
-        <button class="mb-mode" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true">
-          <span class="ico">⚡</span>rapid-fire<span class="caret">▾</span>
-        </button>
+        <button class="mb-tool" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true">⚡ rapid-fire<span class="caret">▾</span></button>
         <div class="mb-popover" id="mbRapidPop">
           <div class="mb-deckrow">
             <button class="mb-deck selected" data-deck="all">all chords</button>
@@ -1418,23 +1425,23 @@
           <button class="mb-dur" data-mode="rapidfire" data-dur="120">2 minutes</button>
         </div>
       </div>
-      <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; solution</button>
       <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
-      <button class="mb-tool" id="ghostToggle" data-tip="\u25c6 PRO \u2014 race a live ghost of your PB run \u00b7 pace counter is free \u00b7 click to toggle">\ud83d\udc7b ghost: on</button>
-      <!-- r292 (Wolf): the "sheet" button retired -->
-      <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
-      <span style="position:relative; display:inline-flex">
-      <button class="mb-tool" id="wqBtn" style="display:none" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r302 (Wolf): OFF the bar — one tight row of critical controls; weakness queue lives on (results-card 'n' chain + this dormant popover) until it earns a new home -->
-      <div class="prefs-pop" id="wqPop" style="min-width:300px; flex-direction:column; gap:4px"></div>
-      </span>
-      <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
-      <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
       <span class="mb-tool" id="proBadge" style="display:none; cursor:default; color:var(--warn); font-weight:700; border-color:var(--warn)"></span>
+      <span id="kbSlot" style="display:inline-flex"></span>
+      <button class="mb-tool" id="ghostToggle" data-tip="◆ PRO — race a live ghost of your PB run · pace counter is free · click to toggle">👻 ghost: on</button>
+      <span style="position:relative; display:inline-flex">
+        <button class="mb-tool" id="gearBtn" title="sound &amp; extras" aria-haspopup="true">⚙</button>
+        <div class="prefs-pop" id="gearPop" style="min-width:220px; flex-direction:column; gap:4px"></div>
+      </span>
+      <span style="position:relative; display:inline-flex">
+      <button class="mb-tool" id="wqBtn" style="display:none" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r302 (Wolf): OFF the bar — one tight row of critical controls -->
+      <div class="prefs-pop" id="wqPop" style="min-width:300px; flex-direction:column; gap:4px"></div>
+      </span>
     </div>
   </div>
 
@@ -1461,7 +1468,7 @@
           <span class="fx"><i>fx</i></span>
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
-        <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
+        <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div><div class="pastedest" id="pastedest"></div></div>
       </div>
       <aside class="checklist" id="checklist"></aside>
     </div>
@@ -8174,11 +8181,31 @@ function render(){
     row+='</tr>'; g.innerHTML+=row;
   }
   positionMarquee();
+  positionPasteDest();
   if(pendingFlash){ const f=pendingFlash; pendingFlash=null;
     for(let r=f.r1;r<=f.r2;r++)for(let c=f.c1;c<=f.c2;c++){
       const td=document.querySelector(`td[data-r="${r}"][data-c="${c}"]`); if(td)td.classList.add('pasted'); } }
   updateChecklist();
   updateFormulaBar();
+}
+function positionPasteDest(){
+  const m=document.getElementById('pastedest'); if(!m) return;
+  const cb=S&&S.clipboard;
+  if(!cb || !cb.w || !cb.h || editing || demoPlaying){ m.style.display='none'; return; }
+  const r1=S.active.r, c1=S.active.c;
+  const r2=Math.min(S.ROWS, r1+cb.h-1), c2=Math.min(COLS, c1+cb.w-1);
+  const src=cb.rect;
+  if(src && r1===src.r1 && c1===src.c1){ m.style.display='none'; return; }   // still sitting on the source — the marquee already says it
+  const a=document.querySelector(`td[data-r="${r1}"][data-c="${c1}"]`);
+  const b=document.querySelector(`td[data-r="${r2}"][data-c="${c2}"]`);
+  if(!a||!b){ m.style.display='none'; return; }
+  const wrap=document.getElementById('gridwrap');
+  const wr=wrap.getBoundingClientRect(), ar=a.getBoundingClientRect(), br=b.getBoundingClientRect();
+  m.style.display='block';
+  m.style.left=(ar.left-wr.left+wrap.scrollLeft)+'px';
+  m.style.top=(ar.top-wr.top+wrap.scrollTop)+'px';
+  m.style.width=(br.right-ar.left)+'px';
+  m.style.height=(br.bottom-ar.top)+'px';
 }
 function positionMarquee(){
   const m=document.getElementById('marquee'); if(!m) return;
@@ -10945,14 +10972,12 @@ function cycleSound(){
   if(soundOn) playSuccessBlip(0);   // audible preview of the state you just picked
 }
 function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soundOn) playSuccessBlip(); /* preview */ }
-// sound + keyboard-profile icons live in the shared nav tools, next to ? (nav mounts
-// synchronously right above, so the tools node exists by the time this runs)
-{ const tools=document.querySelector('.topnav-tools');
+// r306 (Wolf): the keyboard control lives in the MODE BAR's settings section now (it was
+// an unguessable header icon); sound lives inside the gear popover beside it.
+{ const tools=document.getElementById('kbSlot');
   if(tools){
-    const mk=(id,tip)=>{ const b=document.createElement('button'); b.className='topnav-icon'; b.id=id; b.setAttribute('data-tip',tip); return b; };
-    const sBtn=mk('soundToggle','sound pack \u2014 click to cycle: classic \u2192 arcade \u2192 thock \u2192 off');
+    const mk=(id,tip)=>{ const b=document.createElement('button'); b.className='mb-tool'; b.id=id; b.setAttribute('data-tip',tip); return b; };
     const pBtn=mk('profileToggle','your keyboard \u2014 layout (Windows / Mac) + shortcut profile (native \u00b7 Macabacus \u00b7 FactSet, \u25c6 PRO)');
-    sBtn.onclick=cycleSound;
     /* r293 (Wolf): ONE keyboard control — shows the CURRENT layout + profile, opens a
        popover with a Windows/Mac choice and a one-or-other plugin layer. The auto-detect
        still picks the starting layout; this makes it visible and reversible. */
@@ -10978,8 +11003,27 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
       document.querySelectorAll('.prefs-pop').forEach(p=>p.classList.remove('show'));
       if(!open){ renderKbPop(); pPop.classList.add('show'); } };
     document.addEventListener('click', e=>{ if(!e.target.closest('#kbPop') && e.target!==pBtn) pPop.classList.remove('show'); });
-    const anchor=document.getElementById('navShortcuts');
-    if(anchor){ anchor.after(pWrap); anchor.after(sBtn); } else { tools.prepend(pWrap); tools.prepend(sBtn); }
+    tools.appendChild(pWrap);
+  } }
+/* r306: THE GEAR — sound + the misc that doesn't earn bar real estate */
+{ const gb=$('gearBtn'), gp=$('gearPop');
+  if(gb && gp){
+    const row=(id,label,fn)=>{ const b=document.createElement('button'); b.className='mb-tool'; if(id)b.id=id;
+      b.textContent=label; b.onclick=(e)=>{ e.stopPropagation(); fn(); }; return b; };
+    function renderGear(){
+      gp.innerHTML='';
+      const sb2=row('soundToggle','', ()=>{ cycleSound(); });
+      gp.appendChild(sb2); try{ updateSoundBtn(); }catch(e){}
+      gp.appendChild(row(null,'\u2318 mac keys guide', ()=>{ try{ if(window.hkMacPopup) window.hkMacPopup(); }catch(e){} gp.classList.remove('show'); }));
+      gp.appendChild(row(null,'\u25b8 replay the intro tour', ()=>{ gp.classList.remove('show');
+        try{ localStorage.removeItem('hk_tour_done'); startOnboardBoard();
+          __tourAfter=()=>{ try{ if(sandboxMode){ sandboxMode=false; loadChallenge(MENU_ORDER[0]); } }catch(e){} };
+          tourShow(0); }catch(e){} }));
+    }
+    gb.onclick=(e)=>{ e.stopPropagation(); const open=gp.classList.contains('show');
+      document.querySelectorAll('.prefs-pop').forEach(p=>p.classList.remove('show'));
+      if(!open){ renderGear(); gp.classList.add('show'); } };
+    document.addEventListener('click', e=>{ if(!e.target.closest('#gearPop') && e.target!==gb) gp.classList.remove('show'); });
   } }
 { const _db=$('dailyBtn'); if(_db) _db.addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); }); }
 /* ---- r157: THE WEAKNESS QUEUE (PRO pillar #2; free in beta via requirePro) ----
@@ -11034,10 +11078,10 @@ function toggleWqPop(){
     loadChallenge(window.__wq[0]); };
 }
 $('wqBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleWqPop(); });
-$('randBtn').addEventListener('click',()=>{   // r113 (#33): random drill — variety is the retention loop
-  const pool=MENU_ORDER.filter(k=>k!==cur && !drillLocked(k));   // r158: the dealer respects the ladder
+{ const __rb=$('randBtn'); if(__rb) __rb.addEventListener('click',()=>{   // r306: random retired from the bar (drill menu covers it); guarded for old markup
+  const pool=MENU_ORDER.filter(k=>k!==cur && !drillLocked(k));
   loadChallenge(pool[Math.floor(Math.random()*pool.length)]);
-});
+}); }
 { const __wb=$('weeklyBtn'); if(__wb) __wb.addEventListener('click',startWeekly); }   // r81 hotfix: button retired; unguarded listener was a boot TypeError
 $('campaignBtn').addEventListener('click',openCampaign);
 { const _dcb=$('dailyChallengeBtn'); if(_dcb) _dcb.addEventListener('click',openDailyChallenge); }
@@ -12005,7 +12049,7 @@ $('modesModal').addEventListener('click', e=>{ if(e.target===$('modesModal')) cl
 // in-trainer mode bar: classic is the default active; marathon/rapidfire open a duration popover
 function closeAllModePops(){
   document.querySelectorAll('.mb-popover').forEach(p=>p.classList.remove('show'));
-  document.querySelectorAll('.mb-mode').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('#mbRapidBtn,.mb-mode').forEach(b=>b.classList.remove('open'));   /* r306: rapid-fire wears mb-tool now */
 }
 function toggleModePop(btn, popId){
   if(demoPlaying) return;
@@ -12016,10 +12060,10 @@ function toggleModePop(btn, popId){
 }
 { const _mb=$('mbMarathonBtn'); if(_mb) _mb.addEventListener('click', e=>{ e.stopPropagation(); toggleModePop(e.currentTarget,'mbMarathonPop'); }); }
 $('mbRapidBtn').addEventListener('click', e=>{ e.stopPropagation(); toggleModePop(e.currentTarget,'mbRapidPop'); });
-$('mbClassic').addEventListener('click', e=>{ e.stopPropagation(); closeAllModePops(); /* classic is the default — no popover, just dismiss any open one */ });
+/* r306: the classic chip is retired — classic is simply "not in a session"; the drill menu covers it */
 // click anywhere outside a mode pill or its popover closes whichever's open
 document.addEventListener('click', e=>{
-  if(!e.target.closest('.mb-mode') && !e.target.closest('.mb-popover')) closeAllModePops();
+  if(!e.target.closest('#mbRapidBtn') && !e.target.closest('.mb-mode') && !e.target.closest('.mb-popover')) closeAllModePops();
 });
 // duration buttons inside the popovers — close the popover then launch the session
 document.querySelectorAll('.mb-dur').forEach(b=>{
