@@ -93,6 +93,12 @@
   .keys{flex:0 0 auto; display:flex; align-items:center; gap:5px; flex-wrap:wrap; min-width:0;}
   .desc{flex:1; font-size:13.5px; color:var(--text); min-width:0;}
   .desc .dr{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:7px; vertical-align:middle;}
+  /* r291: practice link — appears on hover, jumps straight into a drill that trains the chord */
+  .practice{flex:0 0 auto; font-family:var(--mono); font-size:11px; color:var(--accent); text-decoration:none;
+    white-space:nowrap; opacity:0; transition:opacity .12s; padding:2px 8px; border:1px solid var(--accent-dim); border-radius:999px;}
+  .row:hover .practice{opacity:1;}
+  .practice:hover{background:var(--accent-glow);}
+  @media (hover:none){ .practice{opacity:1;} }   /* touch: always visible */
 
   /* ---------- keycaps ---------- */
   .cap{display:inline-flex; align-items:center; justify-content:center; min-width:29px; height:29px; padding:0 9px;
@@ -113,6 +119,7 @@
 
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="drills.js?v=264"></script>
+<script src="refmap.js?v=1"></script>
 <script>
 // Supabase init (kept light — reference doesn't post data, but nav.js needs window.sb for the user menu)
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -321,6 +328,22 @@ const qEl = document.getElementById('q');
 let activeCat = 'all';
 let totalCount = 0;
 
+/* r291: resolve a reference key ('Ctrl+C', 'Alt>H>K', 'Ctrl+↑/↓/←/→') to a drill key
+   via the generated chord map. Normalizes (uppercase, no spaces); for a slash-joined
+   arrow group, tries each arrow so navigation rows still link. */
+function refDrillFor(k){
+  try{
+    const M=window.HK_CHORD_DRILL; if(!M) return null;
+    const norm=s=>String(s).toUpperCase().replace(/\s+/g,'');
+    const direct=M[norm(k)]; if(direct) return direct;
+    if(k.indexOf('/')>=0){
+      // 'Ctrl+↑/↓/←/→' → try Ctrl+↑, Ctrl+↓, ...
+      const m=k.match(/^(.*?)([↑↓←→](?:\/[↑↓←→])+)$/);
+      if(m){ const pre=m[1]; for(const a of m[2].split('/')){ const hit=M[norm(pre+a)]; if(hit) return hit; } }
+    }
+    return null;
+  }catch(e){ return null; }
+}
 DATA.forEach((sec,si)=>{
   totalCount += sec.items.length;
   const card = document.createElement('section');
@@ -329,9 +352,14 @@ DATA.forEach((sec,si)=>{
   card.innerHTML = `<h2><span class="ic">${sec.ic}</span>${sec.cat}<span class="n">${sec.items.length}</span></h2>` +
     sec.items.map(it=>{
       const txt=(it.k+' '+it.d).toLowerCase();
+      // r291: link each shortcut to a drill that trains it (from the generated chord map).
+      // A combined key like 'Ctrl+↑/↓/←/→' tries each single-arrow variant.
+      const dk = refDrillFor(it.k);
+      const practice = dk ? `<a class="practice" href="index.html?drill=${dk}" title="practice this shortcut in a drill">practice →</a>` : '';
       return `<div class="row${it.dr?' drilled':''}" data-s="${txt.replace(/"/g,'')}">
         <span class="keys">${renderCombo(it.k)}</span>
         <span class="desc">${it.d}${it.dr?'<span class="dr" title="drilled in the trainer"></span>':''}</span>
+        ${practice}
       </div>`;
     }).join('');
   grid.appendChild(card);

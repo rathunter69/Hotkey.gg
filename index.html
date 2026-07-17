@@ -1143,7 +1143,9 @@
     flex:1 1 auto; min-height:0; padding:20px 16px;   /* fills the grid area, not the viewport */
   }
   body.rapidfire .checklist{display:none}       /* rapid-fire's task lives on the card, not the rail */
-  body.rapidfire .fbar, body.rapidfire .ribbon{display:none}   /* grid-only chrome */
+  body.rapidfire .fbar{display:none}            /* the formula bar is grid-only; the HUD carries the timer */
+  /* the ribbon STAYS in rapid-fire (Wolf): softens the transition and keeps the available
+     Home/Insert/... options on screen as a reference while you chord one cell at a time */
   body.rapidfire .exrow{display:none}
   .rf-card{background:var(--surface2); border:2px solid var(--faint); border-radius:16px;
     padding:30px 30px 34px; max-width:460px; width:100%; margin:0; text-align:center;
@@ -7446,8 +7448,14 @@ let editAnchor=null, editPointer=null, editPointerStart=-1, editPointerBase=null
 let editMode='enter', editCaret=0;   // Excel distinction: F2 = Edit mode (arrows move the CARET); typing = Enter mode (arrows commit)
 // Last char of editBuf is one of these → arrows enter pointer mode (insert new reference).
 // = + - * / ^ ( , — Excel's standard operator/separator boundaries.
-const MODEL_CODENAMES=['Project Falcon','Project Atlas','Northwind Industrial','Bluepeak Foods','Ironline Logistics','Cascade Materials','Halcyon Health','Redrock Energy','Project Copper','Summit Retail'];
-function codename(){ return MODEL_CODENAMES[rnd(0,MODEL_CODENAMES.length-1)]; }
+/* r291 (Wolf): deal placeholders are unmistakably generic "Project <word>" codenames,
+   randomly generated — no resemblance to any real company, and varied enough that the
+   same board rarely repeats a name. */
+const CODEWORDS=['Falcon','Atlas','Copper','Summit','Aurora','Vanguard','Meridian','Cobalt',
+  'Beacon','Cardinal','Delta','Everest','Granite','Harbor','Ironwood','Juniper','Keystone',
+  'Lantern','Magnolia','Nova','Orion','Pinnacle','Quartz','Redwood','Sable','Titan','Umbra',
+  'Verdant','Willow','Zephyr','Onyx','Sierra','Tundra','Aspen','Basalt','Cirrus','Dune'];
+function codename(){ return 'Project '+CODEWORDS[rnd(0,CODEWORDS.length-1)]; }
 const OPERATOR_BOUNDARY = /[=+\-*/^(,]$/;
 let undoStack=[], redoStack=[], keyLog=[], keyTimes=[], keyCells=[];   // r163: cells feed the ghost cursor
 let gameMode='classic';   // 'classic' | 'marathon'
