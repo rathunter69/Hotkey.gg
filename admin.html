@@ -113,6 +113,8 @@ async function load(){
   html+='<div class="section-title">moderation · report queue</div><div class="panel" id="reps"><div class="loading" style="padding:10px">loading…</div></div>';
   // r284 (#35): shadow-flagged runs — the integrity trigger's catch, awaiting a verdict
   html+='<div class="section-title">integrity · flagged runs</div><div class="panel" id="flags"><div class="loading" style="padding:10px">loading…</div></div>';
+  // r287: desk PRO requests — approve as free club comp or paid enterprise
+  html+='<div class="section-title">desk PRO · requests</div><div class="panel" id="dpro"><div class="loading" style="padding:10px">loading…</div></div>';
   root.innerHTML=html;
   // errors
   try{ const {data:ev}=await sb.rpc('admin_events',{p_name:'err',p_limit:25});
@@ -149,6 +151,33 @@ async function load(){
     }catch(e){ $('flags').innerHTML='<div class="row">could not load</div>'; }
   }
   renderFlags();
+  // desk PRO requests — approve as comp (free, with a day-limit) or paid (seats, no expiry)
+  async function renderDpro(){
+    try{ const {data:dp}=await sb.rpc('admin_desk_pro_requests');
+      $('dpro').innerHTML=(dp&&dp.length)
+        ? dp.map(r=>{
+            const badge=r.status==='active'?'<b style="color:var(--accent)">active'+(r.kind?' · '+esc(r.kind):'')+'</b>':'<b style="color:var(--warn)">pending</b>';
+            const exp=r.expires_at?' · ends '+esc(String(r.expires_at).slice(0,10)):'';
+            const acts=r.status==='pending'
+              ? '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="comp">comp 120d</span>'+
+                '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="paid">paid ∞</span>'+
+                '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="deny" style="color:var(--bad)">deny</span>'
+              : '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="revoke" style="color:var(--bad)">revoke</span>';
+            return '<div class="row"><span>'+esc(r.team_name)+(r.verified?' ✓':'')+'</span>'+
+              '<span class="meta">'+r.members+' seats · '+badge+exp+(r.edu_domain?' · '+esc(r.edu_domain):'')+(r.note?' · “'+esc(r.note)+'”':'')+' · by '+esc(r.captain_handle)+'</span>'+
+              '<span class="t">'+esc(String(r.requested_at).slice(0,10))+'</span>'+acts+'</div>';
+          }).join('')
+        : '<div class="row">no desk PRO requests</div>';
+      document.querySelectorAll('.dp-act').forEach(b=>b.onclick=async()=>{
+        const a=b.dataset.a; b.textContent='…';
+        const args={comp:{p_action:'approve',p_kind:'comp',p_days:120,p_seats:null},
+                    paid:{p_action:'approve',p_kind:'paid',p_days:0,p_seats:null},
+                    deny:{p_action:'deny',p_kind:null,p_days:0,p_seats:null},
+                    revoke:{p_action:'revoke',p_kind:null,p_days:0,p_seats:null}}[a];
+        try{ await sb.rpc('admin_decide_desk_pro',Object.assign({p_team:b.dataset.team},args)); renderDpro(); }catch(e){} });
+    }catch(e){ $('dpro').innerHTML='<div class="row">could not load</div>'; }
+  }
+  renderDpro();
 }
 load();
 </script>

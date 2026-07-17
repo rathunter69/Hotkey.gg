@@ -12850,16 +12850,33 @@ async function updateRankPill(){
    is a config change, not a rebuild. Entitlements written server-side only
    (future stripe-webhook in TEST mode). requirePro() is the single gate.
    ============================================================ */
-let _pro=false;
+let _pro=false, _proSrc=null, _proExp=null;
 async function loadEntitlement(){
   if(!sb || !me_user || isAnonUser()) return;
-  try{ const r=await sb.from('entitlements').select('pro').eq('user_id',me_user.id).single();
-    _pro=!!(r.data&&r.data.pro); }catch(e){}
+  /* r288: PRO now RESOLVES SERVER-SIDE (my_pro_status) \u2014 own paid entitlement,
+     an unexpired .edu trial, OR membership in a desk with an active PRO grant.
+     One RPC returns the flag, the source, and the expiry for the countdown. */
+  try{ const {data}=await sb.rpc('my_pro_status'); const s=(data&&data[0])||null;
+    _pro=!!(s&&s.pro); _proSrc=s&&s.source; _proExp=s&&s.expires_at; }catch(e){}
+  // r288: a fresh .edu account with no PRO and no prior trial gets one automatically \u2014
+  // capture the moment of peak motivation. Silent no-op for non-.edu / already-used.
+  if(!_pro){ try{ const {data:tr}=await sb.rpc('start_pro_trial');
+    if(tr && tr!=='no_edu' && tr!=='trial_used' && tr!=='already_pro'){
+      _pro=true; _proSrc='edu_trial'; _proExp=tr;
+      try{ ev('edu_trial_start',{}); }catch(e){}
+      showToast('\ud83c\udf93 .edu verified \u2014 PRO unlocked free for 7 days. Every feature, on the house.');
+    } }catch(e){} }
   updateProBadge();
 }
 function isPro(){ return BETA_MODE || _pro; }
+function proDaysLeft(){ if(!_proExp) return null;
+  const d=Math.ceil((new Date(_proExp)-Date.now())/86400000); return d>0?d:0; }
 function updateProBadge(){ const el=$('proBadge'); if(!el) return;
-  if(_pro){ el.style.display='inline-flex'; el.textContent='PRO \u2713'; } }
+  if(_pro){ el.style.display='inline-flex';
+    const dl=proDaysLeft();
+    el.textContent = (_proSrc==='edu_trial' && dl!=null) ? ('PRO \u00b7 '+dl+'d') : 'PRO \u2713';
+    el.title = _proSrc==='edu_trial' ? ('.edu trial \u2014 '+dl+' day'+(dl===1?'':'s')+' left. Keep it going anytime.')
+      : _proSrc==='desk' ? 'PRO through your desk' : 'PRO'; } }
 function requirePro(featureName){
   if(isPro()) return true;
   openUpgrade(featureName); return false;
