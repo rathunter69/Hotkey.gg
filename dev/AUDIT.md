@@ -1,5 +1,29 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r301 — RAPID-FIRE OVERHAUL (Wolf's live spec, executed in full)
+- **THE REAL RIBBON, IN RAPID-FIRE.** rapidKey's matchers still own scoring, but every Alt-walk
+  now ECHOES into the classic ribbon strip (same MENUS, same KeyTips, same screen spot): Alt
+  lights the tab strip, H draws the Home menu, the leaf key solves and the strip rests. Verified
+  live: Alt→mode ribbon · h→path [H] + Home menu rendered · k→solve, mode back to sheet, and the
+  REAL grid cell carries fmtStyle comma. Visual only — zero engine dispatch from RF.
+- **ONE FIXED HOME FOR THE TASK — C4.** The wandering random target was the worst regression vs
+  the old one-box mode; rapid-fire tests chord recall, not find-the-cell. Single-cell tasks all
+  land C4 (verified across the bag); layout tasks stay B2-anchored. The redundant cell-ref
+  callout in the caller strip is gone.
+- **THE GRID READS BIG.** RF sheet is 8 rows (was 14) — the row-height fill makes the sheet
+  center-stage, recovering the old mode's one-thing-in-front-of-you feel on the real grid.
+  rfFormulaRef clamped to rows 2–8 so staged refs stay on-sheet.
+- **EVERY LEGIT ROUTE COUNTS (Wolf: "Ctrl+Shift+% isn't working").** The deck had ribbon-route
+  and chord-route cards for the SAME result, and each scored the other's chord as a wrong-op
+  MISS. Cross-alted: num_pct↔percent (Ctrl+Shift+% / Alt H P), num_comma↔comma (Ctrl+Shift+! /
+  Alt H K), bold↔bold_ribbon (Ctrl+B / Alt H 1), paste_values↔paste_vals_es (Alt H V V / Alt E S
+  V ↵). DELETED the true duplicates align_c/align_l/align_r (identical chords to the alignment-
+  group cards — twins meant a legit press could always be a coin-flip miss). Verified live:
+  Ctrl+Shift+% solves the Percent-format card, hits+1, zero misses.
+- **Summary buttons in frame language** — the run-again/back pair dropped the old dark-green/
+  black look for the standard CTA pill + ghost; ↵/esc keycaps kept.
+- GATE: rapidfire 12 PASS (post-change) · parity 124 · live probes above · CI full gate on PR.
+
 ## r300 — unique handle suggestions + rapid-fire canon-border cards (Wolf batch)
 - **HANDLE SUGGESTIONS ARE COLLISION-CHECKED (Wolf: "make sure it's truly unique").**
   New `hkSuggestHandleUnique(n)`: batches candidates, ONE profiles query per deal
