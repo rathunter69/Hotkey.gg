@@ -145,10 +145,13 @@
   .fcontent.isfx{color:var(--accent)}
   .fcontent.empty{color:var(--faint); font-style:italic; font-family:var(--sans); font-size:12px}
 
-  .gridwrap{background:var(--surface); border:0; border-radius:0;
+  .gridwrap{background:transparent; border:0; border-radius:0;
     padding:0 10px 3px 0; overflow:visible; position:relative; min-width:0;   /* r79: sheet flush to the frame's top-left, like the real thing */
     align-self:stretch; display:flex; flex-direction:column}
-  .gridwrap table{flex:1 1 auto; height:100%}   /* r70b: flex-basis alone doesn't stretch display:table in all engines — height:100% against the resolved gridwrap height does. Rows share the surplus; --cellh is the floor. */
+  /* r304 (Wolf): the sheet background paints on the TABLE, not the wrap — the wrap's 10px
+     right padding used to render as a sheet-colored strip beside the checklist on every
+     drill whose grid was narrower than the 880px wrap (~70% of the catalog). */
+  .gridwrap table{flex:1 1 auto; height:100%; background:var(--surface)}   /* r70b: flex-basis alone doesn't stretch display:table in all engines — height:100% against the resolved gridwrap height does. Rows share the surplus; --cellh is the floor. */
   table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}   /* r65: Calibri renders smaller — sized up */
   /* r216 (Wolf): the edit caret used to be a tall block glyph (▏) that grew the row on F2 —
      a visible shift. Now a zero-width CSS bar constrained inside the text's line box, so entering
@@ -9061,14 +9064,21 @@ function renderSheetTabs(){
   if(gcol) host.style.setProperty('--gcol', gcol); else host.style.removeProperty('--gcol');
   const g=DRILL_GROUPS.find(x=>x.name===gname);
   const keys=(g?g.keys:MENU_ORDER).filter(k=>CHALLENGES[k]);
-  host.innerHTML = '<span class="st-lead" title="previous set">\u00ab '+escHtml((gname||'DRILLS').toUpperCase())+'</span>' + keys.map(k=>{
+  host.innerHTML = (function(){
+    const gs=DRILL_GROUPS.filter(x=>x.keys.some(k=>CHALLENGES[k]));
+    const gi=gs.findIndex(x=>x.name===gname);
+    if(gi<=0) return '';   /* r304 (Wolf): FIRST group — no back chip at all; it used to wrap to Full Builds */
+    const pv=gs[gi-1]; const pvCol=(window.HOTKEY_GROUP_COLORS||{})[pv.name]||'';
+    return '<span class="st-lead" '+(pvCol?'style="color:'+pvCol+'"':'')+' title="previous set">\u00ab '+escHtml(pv.name.toUpperCase())+'</span>';
+  })() + keys.map(k=>{
     const C=CHALLENGES[k];
     const pb = PB[k]!==undefined ? '<span class="st-pb">'+PB[k].toFixed(1)+'s</span>' : '';
     return '<span class="st-tab'+(k===cur?' cur':'')+'" data-key="'+k+'">'+escHtml(C.name||k)+pb+'</span>';
   }).join('') + (function(){
     const gs=DRILL_GROUPS.filter(x=>x.keys.some(k=>CHALLENGES[k]));
     const gi=gs.findIndex(x=>x.name===gname);
-    const nx=gs[(gi+1)%gs.length];
+    if(gi>=gs.length-1) return '';   /* r304: last group — nowhere forward; clamp, don't wrap */
+    const nx=gs[gi+1];
     const nxCol=(window.HOTKEY_GROUP_COLORS||{})[nx.name]||'';
     return '<span class="st-next" '+(nxCol?'style="color:'+nxCol+'"':'')+' title="next set (alt+pgdn past the last tab)">'+escHtml(nx.name.toUpperCase())+' \u00bb</span>';
   })();   /* r66: "☰ all" retired — the picker lives on \\ and the drill bar */
@@ -9081,8 +9091,9 @@ function renderSheetTabs(){
 function stepGroup(dir){
   const gs=DRILL_GROUPS.filter(x=>x.keys.some(k=>CHALLENGES[k]));
   const gi=gs.findIndex(x=>x.name===GROUP_OF[cur]);
-  const nx=gs[(gi+dir+gs.length)%gs.length];
-  loadChallenge(nx.keys.find(k=>CHALLENGES[k]));
+  const ni=gi+dir;
+  if(ni<0 || ni>=gs.length) return;   // r304 (Wolf): CLAMP, never wrap — back from Foundations used to dump new users into Full Builds
+  loadChallenge(gs[ni].keys.find(k=>CHALLENGES[k]));
 }
 function stepSheetTab(dir){
   const gname=GROUP_OF[cur];

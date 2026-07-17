@@ -1,5 +1,22 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r304 — tab-bar clamp, the grid strip, queue intake (Wolf live batch 3)
+- **GROUP NAV NEVER WRAPS (Wolf):** the « back chip on Foundations used to wrap to Full
+  Builds — a brand-new user one click from the PRO catalog. stepGroup() clamps at both ends;
+  the « chip now shows the PREVIOUS group's name in its color (mirroring the » chip) and
+  disappears entirely on the first group, » disappears on the last. Verified live: clamped
+  both directions, correct chip labels on first/middle/last groups.
+- **THE 10px SHEET STRIP (Wolf: "a small strip by the checklist on ~70% of drills"):** the
+  gridwrap painted the sheet background across its own 10px right padding — visible as a
+  light strip on dark-chrome themes wherever the grid (870px typical) sat narrower than the
+  880px wrap; wider grids (dress/comps/dcfbuild) covered it, hence "~70%". The sheet now
+  paints on the TABLE; the wrap is transparent, so the padding shows the page background —
+  seamless. (The light-sheet var scoping on .gridwrap is untouched; it cascades to the table.)
+- Verified: replay navigation/dress/comps/foot · onboard 34 · parity 124.
+- INTAKE (queued in PIPELINE 4b + tasks): explainer-popup cleanup (xp/rank modals → tight,
+  icon-led) · STANDARD GRID WIDTH catalog-wide (measured 870/893/913/1015 — normalize, Full
+  Builds + RF exempt; also fixes the dress-class overflow past the 880px wrap).
+
 ## r303 — ONBOARDING V3: one spotlight sequence, on a cleared board (Wolf-approved direction)
 - **THE PRIMER IS DEAD; LONG LIVE THE TOUR.** The 5-card centered-modal primer (with its fake
   drawn 3×3 grid) is DELETED — its content lives on as five `novice:true` SPOTLIGHT beats at
