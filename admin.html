@@ -158,11 +158,13 @@ async function load(){
         ? dp.map(r=>{
             const badge=r.status==='active'?'<b style="color:var(--accent)">active'+(r.kind?' · '+esc(r.kind):'')+'</b>':'<b style="color:var(--warn)">pending</b>';
             const exp=r.expires_at?' · ends '+esc(String(r.expires_at).slice(0,10)):'';
+            const seatInfo=(r.status==='active'&&r.kind==='paid'&&r.seats!=null)?' · '+r.seats+' seats':'';
             const acts=r.status==='pending'
               ? '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="comp">comp 120d</span>'+
-                '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="paid">paid ∞</span>'+
+                '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="paid" title="paid — seats default to current roster; new joiners past that are waitlisted">paid '+r.members+' seats</span>'+
                 '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="deny" style="color:var(--bad)">deny</span>'
-              : '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="revoke" style="color:var(--bad)">revoke</span>';
+              : (r.kind==='paid'?'<span class="tab dp-seats" data-team="'+esc(r.team_id)+'" data-cur="'+esc(String(r.seats||''))+'">set seats</span>':'')+
+                '<span class="tab dp-act" data-team="'+esc(r.team_id)+'" data-a="revoke" style="color:var(--bad)">revoke</span>';
             return '<div class="row"><span>'+esc(r.team_name)+(r.verified?' ✓':'')+'</span>'+
               '<span class="meta">'+r.members+' seats · '+badge+exp+(r.edu_domain?' · '+esc(r.edu_domain):'')+(r.note?' · “'+esc(r.note)+'”':'')+' · by '+esc(r.captain_handle)+'</span>'+
               '<span class="t">'+esc(String(r.requested_at).slice(0,10))+'</span>'+acts+'</div>';
@@ -175,6 +177,13 @@ async function load(){
                     deny:{p_action:'deny',p_kind:null,p_days:0,p_seats:null},
                     revoke:{p_action:'revoke',p_kind:null,p_days:0,p_seats:null}}[a];
         try{ await sb.rpc('admin_decide_desk_pro',Object.assign({p_team:b.dataset.team},args)); renderDpro(); }catch(e){} });
+      // adjust seat count on an active paid grant (a desk buys more/fewer seats)
+      document.querySelectorAll('.dp-seats').forEach(b=>b.onclick=async()=>{
+        const cur=b.dataset.cur||''; const v=prompt('Seats for this desk (blank = uncapped):', cur);
+        if(v===null) return; const n=v.trim()===''?null:parseInt(v,10);
+        if(n!==null && (!Number.isFinite(n)||n<0)) return;
+        b.textContent='…';
+        try{ await sb.rpc('set_desk_pro_seats',{p_team:b.dataset.team, p_seats:n}); renderDpro(); }catch(e){} });
     }catch(e){ $('dpro').innerHTML='<div class="row">could not load</div>'; }
   }
   renderDpro();
