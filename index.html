@@ -316,14 +316,16 @@
   /* r160: applied borders are INK (Excel parity) — accent is the SELECTION language.
      On accent they were near-invisible on light themes and read as selection. */
   /* r202 (Wolf): thin single-rule weight — visible but realistic, closer to Excel's 1px */
-  td.bt{box-shadow:inset 0 1px 0 -0px var(--text)}
-  td.bb{box-shadow:inset 0 -1px 0 -0px var(--text)}
-  td.bt.bb{box-shadow:inset 0 1px 0 var(--text), inset 0 -1px 0 var(--text)}
+  /* r292 (Wolf): accounting borders are REAL borders now, not box-shadow insets sitting
+     next to the faint gridline (that doubled-line look). border-collapse merges each
+     shared edge into a single rule. Coloured brighter than the gridline so they win. */
+  td.bt{border-top:1px solid var(--rule,var(--text))}
+  td.bb{border-bottom:1px solid var(--rule,var(--text))}
   td.it{font-style:italic}
   td.strike{text-decoration:line-through; opacity:.75}
   td.uline{text-decoration:underline; text-underline-offset:2px}
   td.uline.strike{text-decoration:underline line-through}
-  td.ball{box-shadow:inset 0 0 0 1px var(--text)}
+  td.ball{border:1px solid var(--rule,var(--text))}
 
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
      faint at rest, lit in Alt-mode. Mirrors Excel instead of popping a banner. */
@@ -7951,15 +7953,15 @@ function render(){
       if(S.marks && S.marks.length && S.marks.indexOf(refKey)>=0 && !isActive) cls.push('mark');   // r182 go-to-special
       const refColor = refColors[refKey];
       let extraStyle = '';
-      if(cell.bl || cell.br || cell.thick){   // r193/r234: left/right edges (and any THICK edge) compose inline — class shadows can't stack, and thick needs a 2px weight
-        const w = cell.thick ? 2 : 1;   // r234: Thick Box Border renders every set edge at 2px
-        const sh=[];
-        if(cell.bt) sh.push('inset 0 '+w+'px 0 var(--text)');
-        if(cell.bb) sh.push('inset 0 -'+w+'px 0 var(--text)');
-        if(cell.bl) sh.push('inset '+w+'px 0 0 var(--text)');
-        if(cell.br) sh.push('inset -'+w+'px 0 0 var(--text)');
-        if(cell.ball) sh.push('inset 0 0 0 '+w+'px var(--text)');
-        if(sh.length) extraStyle += ';box-shadow:'+sh.join(', ');
+      if(cell.bl || cell.br || cell.thick){   // r292: left/right/thick edges as real borders (collapse merges shared edges, no doubling)
+        const w = cell.thick ? 2 : 1;   // Thick Box Border renders every set edge at 2px
+        if(cell.ball){ extraStyle += ';border:'+w+'px solid var(--rule,var(--text))'; }
+        else{
+          if(cell.bt) extraStyle += ';border-top:'+w+'px solid var(--rule,var(--text))';
+          if(cell.bb) extraStyle += ';border-bottom:'+w+'px solid var(--rule,var(--text))';
+        }
+        if(cell.bl) extraStyle += ';border-left:'+w+'px solid var(--rule,var(--text))';
+        if(cell.br) extraStyle += ';border-right:'+w+'px solid var(--rule,var(--text))';
       }
       if(refColor && !isActive && !(editing && editPointer && r===editPointer.r && c===editPointer.c)){
         extraStyle = `;outline:2px solid ${refColor};outline-offset:-2px;z-index:2`;
