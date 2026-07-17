@@ -8452,7 +8452,19 @@ function checkWin(){
   if(challengeMode){ markChallengeDone(); try{ updateChallengeBtn(); }catch(e){} }   // r219: today's sitting is done — flip the marquee chip
   try{ awardCampaignXP(); }catch(e){}   // r215: a new PB may have just shipped a version — pay the one-time bounty
   let __bandRes=0; try{ __bandRes = awardBandXP(sk, t, C.par); }catch(e){}   // r256: one-time speed-band bounty
+  /* r293 (Wolf): DISCOVERY NUDGE — three clears in, point at rapid-fire once.
+     One toast + a pulse on the mode pill; never repeats. */
   try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
+    try{
+      if(nsol===3 && !localStorage.getItem('hk_rf_nudged')){
+        localStorage.setItem('hk_rf_nudged','1');
+        setTimeout(()=>{ try{
+          showToast('three clears in \u2014 try \u26a1 rapid-fire: one chord at a time, against the clock');
+          const b=$('mbRapidBtn'); if(b){ b.classList.add('nudge'); setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); }
+          ev('rf_nudge',{});
+        }catch(e){} }, 1200);
+      }
+    }catch(e){}
     KV.set('hotkey_solves', String(nsol)); renderLvl(nsol); }); }catch(e){}
   showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed,
     newBand:(__bandRes&&__bandRes.isNew)?__bandRes.band:null, bandXp:(__bandRes&&__bandRes.gained)||0,
@@ -12223,8 +12235,8 @@ setInterval(()=>{ try{
   if(nowOk>window.__stkBase){ window.__stkDone=true; return; }   // they're moving — never interrupt
   if(Date.now()-(window.__stkT||0) < 40000) return;
   window.__stkDone=true;
-  showToast('stuck? \u25b6 watch solution plays the line \u2014 \u2328 learn mode walks you through it');
-  ['demoBtn','echoBtn'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
+  showToast('stuck? \u25b6 watch solution plays the line \u00b7 \u2328 learn mode walks you through it \u00b7 F1 guides every key');
+  ['demoBtn','echoBtn','guideToggle'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
     setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); } });
   try{ ev('stuck_nudge',{d:cur}); }catch(e){}
 }catch(e){} }, 3000);
