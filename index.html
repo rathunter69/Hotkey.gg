@@ -11652,6 +11652,7 @@ function rfSolve(matched){
 }
 function rfMiss(){
   marathon.misses+=1;
+  try{ if(rfTask){ (marathon.missedOps=marathon.missedOps||{})[rfTask.op]=(marathon.missedOps[rfTask.op]||0)+1; } }catch(e){}
   marathon.streak = 0;            // streak breaks immediately on a miss
   updateStreakUI(0);              // hide the counter so the user sees+hears the reset together
   const keys=$('rfKeys'); if(keys){ keys.classList.remove('miss'); void keys.offsetWidth; keys.classList.add('miss'); }
@@ -11661,6 +11662,7 @@ function rfMiss(){
 function rfSkip(){
   if(rfBusy || !rfTask) return;
   marathon.skipped = (marathon.skipped||0) + 1;
+  try{ (marathon.missedOps=marathon.missedOps||{})[rfTask.op]=(marathon.missedOps[rfTask.op]||0)+2; }catch(e){}   // a skip is a louder signal than a wrong chord
   marathon.streak = 0;
   updateStreakUI(0);
   loadNext();
@@ -11831,6 +11833,31 @@ function showSessionSummary(){
     `</div>`+
     guestPrompt+
     `</div>`;
+  /* r293 (Wolf): the BENCHMARK readout — rapid-fire doubles as a skill test (never in
+     onboarding). Misses/skips roll up by category; the weakest one maps to a drill
+     recommendation with a one-click start. */
+  try{
+    if(rapid && s.missedOps && Object.keys(s.missedOps).length){
+      const catScore={};
+      Object.entries(s.missedOps).forEach(([op,w])=>{ const c=RF_CAT[op]||'general'; catScore[c]=(catScore[c]||0)+w; });
+      const worst=Object.entries(catScore).sort((a,b)=>b[1]-a[1])[0];
+      const CAT_DRILL={ styling:'typeset', alignment:'center', numbers:'decimals', borders:'ruleoff',
+        data:'sort', navigation:'navigation', stamps:'editfix', editing:'pastes', formulas:'foot', workflow:'navigation' };
+      const dk=CAT_DRILL[worst[0]];
+      if(dk && CHALLENGES[dk] && !drillLocked(dk)){
+        const nm=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.meta[dk]&&window.HOTKEY_DRILLS.meta[dk].label)||dk;
+        const card=m.querySelector('.ss-card');
+        const d=document.createElement('div');
+        d.style.cssText='font-family:var(--mono);font-size:12px;color:var(--muted);margin:2px 0 12px;text-align:center';
+        d.innerHTML='benchmark: <b style="color:var(--warn)">'+escHtml(worst[0])+'</b> chords cost you the most this run \u2014 '+
+          '<a id="ssTrainRec" style="color:var(--accent);cursor:pointer;text-decoration:underline dotted">train \u201c'+escHtml(nm)+'\u201d \u2192</a>';
+        const opts=card&&card.querySelector('.ss-opts');
+        if(opts) card.insertBefore(d, opts);
+        const tr=document.getElementById('ssTrainRec');
+        if(tr) tr.onclick=()=>{ hideSessionSummary(); exitSession(); loadChallenge(dk); };
+      }
+    }
+  }catch(e){}
   m.classList.add('show'); sessionOpen=true;
   m.querySelectorAll('.ss-key').forEach(b=>b.addEventListener('click', ()=>{
     if(b.dataset.act==='again') startSession(s.mode, s.dur); else exitSession();
