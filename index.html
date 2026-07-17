@@ -8954,7 +8954,9 @@ function fillFrom(dir){ // 'down' | 'up' | 'right' | 'left'
 let keyProfile='native';
 async function loadProfile(){ const v=await KV.get('hotkey_profile'); if(v==='macabacus'||v==='factset') keyProfile=v; }
 function saveProfile(){ KV.set('hotkey_profile', keyProfile); }
-function updateProfileBtn(){ const b=$('profileToggle'); if(b){ b.innerHTML='\u2328 '+keyProfile; b.classList.toggle('on', keyProfile!=='native'); } }
+function updateProfileBtn(){ const b=$('profileToggle'); if(b){
+  b.innerHTML='\u2328 '+(typeof HK_MAC!=='undefined'&&HK_MAC?'mac':'win')+' \u00b7 '+keyProfile;
+  b.classList.toggle('on', keyProfile!=='native'); } }
 function cycleProfile(){
   const next = keyProfile==='native'?'macabacus':(keyProfile==='macabacus'?'factset':'native');
   if(next!=='native' && !requirePro('Plugin keyboard layers (Macabacus / FactSet)')) return;
@@ -10634,11 +10636,35 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
   if(tools){
     const mk=(id,tip)=>{ const b=document.createElement('button'); b.className='topnav-icon'; b.id=id; b.setAttribute('data-tip',tip); return b; };
     const sBtn=mk('soundToggle','sound pack \u2014 click to cycle: classic \u2192 arcade \u2192 thock \u2192 off');
-    const pBtn=mk('profileToggle','\u25c6 PRO \u2014 keyboard profile: native Excel, Macabacus, or FactSet chords');
+    const pBtn=mk('profileToggle','your keyboard \u2014 layout (Windows / Mac) + shortcut profile (native \u00b7 Macabacus \u00b7 FactSet, \u25c6 PRO)');
     sBtn.onclick=cycleSound;
-    pBtn.onclick=cycleProfile;
+    /* r293 (Wolf): ONE keyboard control — shows the CURRENT layout + profile, opens a
+       popover with a Windows/Mac choice and a one-or-other plugin layer. The auto-detect
+       still picks the starting layout; this makes it visible and reversible. */
+    const pWrap=document.createElement('span'); pWrap.style.cssText='position:relative;display:inline-flex';
+    const pPop=document.createElement('div'); pPop.className='prefs-pop'; pPop.id='kbPop';
+    pPop.style.cssText='min-width:240px;flex-direction:column;gap:4px';
+    pWrap.appendChild(pBtn); pWrap.appendChild(pPop);
+    const kbHead=t=>{ const d=document.createElement('div');
+      d.style.cssText='font-family:var(--mono);font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);padding:4px 6px 2px'; d.innerHTML=t; return d; };
+    const kbRow=(label,on,fn)=>{ const b=document.createElement('button'); b.className='mb-tool'+(on?' on':'');
+      b.textContent=label; b.onclick=(e)=>{ e.stopPropagation(); fn(); renderKbPop(); }; return b; };
+    function renderKbPop(){
+      pPop.innerHTML='';
+      pPop.appendChild(kbHead('layout \u2014 detected, switch anytime'));
+      pPop.appendChild(kbRow('\u229e windows', !HK_MAC, ()=>{ hkSetPlatform(false); updateProfileBtn(); }));
+      pPop.appendChild(kbRow('\u2318 mac', HK_MAC, ()=>{ hkSetPlatform(true); updateProfileBtn(); }));
+      pPop.appendChild(kbHead('shortcut profile \u00b7 <span style="color:var(--warn)">\u25c6 PRO</span> \u00b7 one at a time'));
+      pPop.appendChild(kbRow('native Excel', keyProfile==='native', ()=>{ keyProfile='native'; saveProfile(); updateProfileBtn(); }));
+      pPop.appendChild(kbRow('Macabacus', keyProfile==='macabacus', ()=>{ if(!requirePro('Plugin keyboard layers (Macabacus / FactSet)')) return; keyProfile='macabacus'; saveProfile(); updateProfileBtn(); }));
+      pPop.appendChild(kbRow('FactSet', keyProfile==='factset', ()=>{ if(!requirePro('Plugin keyboard layers (Macabacus / FactSet)')) return; keyProfile='factset'; saveProfile(); updateProfileBtn(); }));
+    }
+    pBtn.onclick=(e)=>{ e.stopPropagation(); const open=pPop.classList.contains('show');
+      document.querySelectorAll('.prefs-pop').forEach(p=>p.classList.remove('show'));
+      if(!open){ renderKbPop(); pPop.classList.add('show'); } };
+    document.addEventListener('click', e=>{ if(!e.target.closest('#kbPop') && e.target!==pBtn) pPop.classList.remove('show'); });
     const anchor=document.getElementById('navShortcuts');
-    if(anchor){ anchor.after(pBtn); anchor.after(sBtn); } else { tools.prepend(pBtn); tools.prepend(sBtn); }
+    if(anchor){ anchor.after(pWrap); anchor.after(sBtn); } else { tools.prepend(pWrap); tools.prepend(sBtn); }
   } }
 { const _db=$('dailyBtn'); if(_db) _db.addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); }); }
 /* ---- r157: THE WEAKNESS QUEUE (PRO pillar #2; free in beta via requirePro) ----
@@ -13917,7 +13943,7 @@ const TOUR_STEPS=[
   {sel:'.cl-inner',   cap:'your checklist', body:'Each drill gives you a <b>checklist</b> on the right. Every line is one action; it turns green when done. Clear them all and the clock stops — any keystroke path that gets there counts.'},
   {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list — <b>↑↓ arrows</b> move, <b>↵</b> loads. Or hop straight with <b>Alt+←/→</b>. <b>Esc</b> never ends your run.'},
   {sel:'#guideToggle', cap:'stuck? two helpers', body:'<b>Guided mode</b> (this button, or <kbd>F1</kbd>) highlights every key to press — on by default for your first runs. Beside it, <b>watch solution</b> plays the optimal keys, and <b>learn mode</b> hands you the keys one step at a time.'},
-  {sel:'#macBtn',     cap:'your layout', optional:true, body:'On a Mac? This button shows how the keys map (⌘ and ⌥) and how to switch on KeyTips in real Excel. You can flip Windows/Mac anytime.'},
+  {sel:'#profileToggle', cap:'your keyboard', optional:true, body:'Your layout (Windows or Mac, auto-detected) and shortcut profile (native Excel · Macabacus · FactSet) live here — click to switch either. The drills accept the chords of whichever profile you train.'},
   {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor so you can race your own time. Toggle it here.'},
   {sel:'#navThemes',  cap:'make it yours', body:'Light or dark — <b>themes</b> live here, and every one keeps a clean, readable sheet. Pick one anytime; it saves across sessions.'},
   {sel:'#authSlot',   cap:'save your progress', signedOut:true,
