@@ -1550,9 +1550,8 @@
       <button class="start-btn" id="startBtn">Start training <kbd class="kbd-cta">↵</kbd></button>
       <button class="start-btn ghosted" id="loginBtn" style="background:transparent;border:1px solid var(--line);color:var(--muted)">Log in</button>
       <span class="modes">
-        <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
         <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
-        <span class="mode-chip pick" id="chipMarathon" title="random drills against a clock">⏱ Marathon</span>
+        <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
       </span>
     </div>
     <div class="micro" id="landingMicro">Classic mode. <span class="micro-hint"><kbd>↵</kbd> to begin · everything keyboard</span></div>
@@ -10779,7 +10778,6 @@ if(!sb){
     const mc=$('landingMicro'); if(mc) mc.innerHTML='<b>'+(m==='rapidfire'?'Rapid-fire':(m[0].toUpperCase()+m.slice(1)))+' mode.</b> '+MODE_BLURBS[m];
   }
   const cc=$('chipClassic');  if(cc) cc.addEventListener('click', ()=>pickMode('classic'));
-  const cm=$('chipMarathon'); if(cm) cm.addEventListener('click', ()=>pickMode('marathon'));
   const cr=$('chipRapid');    if(cr) cr.addEventListener('click', ()=>pickMode('rapidfire'));
 }
 $('prevDrill').addEventListener('click', ()=>{ if(!demoPlaying) prevChallenge(); });
