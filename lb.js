@@ -928,8 +928,17 @@ async function renderManage(root){
     if(st==='active'){
       const exp=g.expires_at?new Date(g.expires_at):null;
       const dl=exp?Math.max(0,Math.ceil((exp-Date.now())/86400000)):null;
-      host.innerHTML='<div style="font-family:var(--mono);font-size:12.5px;color:var(--accent)">✓ PRO is live for the whole desk'+
-        (g.kind==='comp'?' — free club access':'')+(dl!=null?' · '+dl+' day'+(dl===1?'':'s')+' left':' · no expiry')+'</div>';
+      const wl=g.waitlisted||0;
+      let seatLine='';
+      if(g.kind==='paid' && g.seats!=null){
+        seatLine='<div style="font-family:var(--mono);font-size:11.5px;color:'+(wl>0?'var(--warn)':'var(--muted)')+';margin-top:5px">'+
+          (g.seated||0)+' / '+g.seats+' seats in use'+
+          (wl>0?' · '+wl+' analyst'+(wl===1?'':'s')+' waitlisted — earliest to join hold the seats. <a href="mailto:hello@hotkey.gg?subject=More%20PRO%20seats%20for%20our%20desk" style="color:var(--accent)">add seats</a>':'')+
+          '</div>';
+      }
+      host.innerHTML='<div style="font-family:var(--mono);font-size:12.5px;color:var(--accent)">✓ PRO is live'+
+        (g.kind==='comp'?' for the whole desk — free club access':' for the desk')+
+        (dl!=null?' · '+dl+' day'+(dl===1?'':'s')+' left':' · no expiry')+'</div>'+seatLine;
       return;
     }
     if(st==='pending'){
