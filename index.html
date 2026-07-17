@@ -1382,7 +1382,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=259"></script>
+<script src="nav.js?v=260"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -12190,7 +12190,10 @@ function lvlDetail(xp){
   return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; }
 function lvlOf(xp){ return lvlDetail(xp).lvl; }
 function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
-  const xp=localXP(nsol); window.__lvlXp=xp;   // r211: keep the progress panel in sync with the badge
+  // r292 (Wolf): when signed in, use the SAME server-computed XP the account/stats/board
+  // pages use (window.__srvXp, set by updateRankPill) so the level number never disagrees
+  // across surfaces. localXP is the guest/offline estimate only.
+  const xp=(typeof window.__srvXp==='number') ? window.__srvXp : localXP(nsol); window.__lvlXp=xp;
   const L=lvlDetail(xp);
   el.style.display='inline-flex';
   el.innerHTML='LVL '+L.lvl+' <span class="lvl-bar"><span style="width:'+L.pct+'%"></span></span>';
@@ -12917,6 +12920,13 @@ async function updateRankPill(){
     const t=tierOf(st.avgPct, st.att, st.wsum);
     show(t);
     try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
+    // r292: compute the canonical XP from the SAME runs + standing the boards use, and
+    // repaint the level badge with it — kills the game-vs-account level mismatch.
+    try{ if(window.HK_RANK && window.HK_RANK.computeXP){
+      const mine=runs.filter(x=>x.user_id===me_user.id);
+      window.__srvXp=window.HK_RANK.computeXP(mine, st);
+      try{ const nsol=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; renderLvl(nsol); }catch(e){}
+    } }catch(e){}
   }catch(e){}
 }
 /* ============================================================

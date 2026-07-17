@@ -918,8 +918,12 @@
     // Auth state — if Supabase is initialized, fetch the session and listen for changes.
     // Pages without Supabase (or with sb=null) skip this and the auth slot stays empty.
     if(window.sb){
-      window.sb.auth.getUser().then(({ data }) => {
-        window._navUser = data && data.user;
+      // r292 (Wolf): use getSession (the locally-cached session) NOT getUser (a network
+      // validation that returns null on any hiccup) — getUser was why the dropdown showed
+      // "logged out" while the page body, which uses getSession, showed logged in. One
+      // source of truth across nav + every page.
+      window.sb.auth.getSession().then(({ data }) => {
+        window._navUser = (data && data.session && data.session.user) || null;
         if(window._navUser){
           // Fetch handle from profiles table for the user-menu display.
           window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).single().then(({ data: prof }) => {

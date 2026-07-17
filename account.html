@@ -75,6 +75,12 @@
   .state{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:38px 28px; text-align:center;
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
+  .acc-cta{display:inline-block; font-family:var(--mono); font-size:13px; text-decoration:none;
+    border:1px solid var(--accent); background:var(--accent); color:var(--on-accent,#0c0d0e); font-weight:700;
+    padding:10px 22px; border-radius:999px; margin:4px 6px; border-bottom:1px solid var(--accent)}
+  .acc-cta:hover{filter:brightness(1.08)}
+  .acc-cta.ghost{background:transparent; color:var(--accent); border-color:var(--accent-dim); font-weight:500}
+  .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
 <link rel="stylesheet" href="nav.css?v=174">
 <script src="drills.js?v=264"></script>
@@ -89,7 +95,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=259"></script>
+<script src="nav.js?v=260"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -109,8 +115,12 @@ async function load(){
   try{ const { data:{ session } } = await sb.auth.getSession(); me = session ? session.user : null; }catch(e){}
   const isAnon = me && (!me.email || (me.app_metadata&&me.app_metadata.provider==='anonymous'));
   if(!me || isAnon){
+    // r292 (Wolf): offer BOTH create-account and log-in here \u2014 a dropped/expired session
+    // used to strand the user on a create-only screen with no way back in.
     root.innerHTML='<div class="state">You\u2019re playing as a guest \u2014 your times live only on this device.<br><br>'+
-      '<a href="index.html?openAuth=signup">Create an account</a> to claim a handle, post to the boards, and start the climb.</div>';
+      '<a class="acc-cta" href="index.html?openAuth=signup">Create an account</a>'+
+      '<a class="acc-cta ghost" href="index.html?openAuth=signin">Log in</a>'+
+      '<div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:14px">Create an account to claim a handle, post to the boards, and start the climb.</div></div>';
     return;
   }
 

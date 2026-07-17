@@ -93,12 +93,13 @@
   .keys{flex:0 0 auto; display:flex; align-items:center; gap:5px; flex-wrap:wrap; min-width:0;}
   .desc{flex:1; font-size:13.5px; color:var(--text); min-width:0;}
   .desc .dr{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:7px; vertical-align:middle;}
-  /* r291: practice link — appears on hover, jumps straight into a drill that trains the chord */
+  /* r292 (Wolf): ALWAYS visible — keyboard-first users won't hover to discover it.
+     Quiet by default, lights up on row hover. Jumps straight into a drill for the chord. */
   .practice{flex:0 0 auto; font-family:var(--mono); font-size:11px; color:var(--accent); text-decoration:none;
-    white-space:nowrap; opacity:0; transition:opacity .12s; padding:2px 8px; border:1px solid var(--accent-dim); border-radius:999px;}
-  .row:hover .practice{opacity:1;}
-  .practice:hover{background:var(--accent-glow);}
-  @media (hover:none){ .practice{opacity:1;} }   /* touch: always visible */
+    white-space:nowrap; opacity:.72; transition:opacity .12s, background .12s; padding:2px 9px;
+    border:1px solid var(--accent-dim); border-radius:999px;}
+  .row:hover .practice{opacity:1; background:var(--accent-glow);}
+  .practice:hover{opacity:1; background:var(--accent);color:var(--on-accent);}
 
   /* ---------- keycaps ---------- */
   .cap{display:inline-flex; align-items:center; justify-content:center; min-width:29px; height:29px; padding:0 9px;
@@ -132,7 +133,7 @@ window.NAV_ACTIVE = 'reference';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=259"></script>
+<script src="nav.js?v=260"></script>
 <div class="wrap">
   <header>
     <h1>Shortcut <span class="em">reference</span></h1>
