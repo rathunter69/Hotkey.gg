@@ -370,12 +370,20 @@
     padding:4px 10px; border-radius:6px}
   .ribbon .rtab, .ribbon .opt{display:inline-flex; align-items:center; gap:7px; color:var(--text);
     background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:6px 10px}
-  .ribbon .opt{color:var(--muted)}
+  .ribbon .opt{color:var(--text)}                          /* r315 (Wolf): readable at rest, not muted */
   .ribbon .opt.on{color:var(--accent)}
   .ribbon .opt.on k{border-color:var(--accent); color:var(--accent)}
   .ribbon .rtab k, .ribbon .opt k{display:inline-grid; place-items:center; min-width:19px; height:19px;
     color:var(--on-accent); background:var(--accent); border:none; border-radius:4px; padding:0 5px;
     font-weight:700; font-size:12px}
+  /* r315 (Wolf): the Alt+H flyout, grouped like Excel's real Home tab — chips over a group
+     name, a thin divider between groups, so the eye can find the tool instead of scanning 20
+     identical chips. Pure layout; letters/behavior unchanged. */
+  .ribbon .rgrp{display:inline-flex; flex-direction:column; align-items:center; gap:3px;
+    padding:1px 10px; border-left:1px solid var(--line)}
+  .ribbon .rgrp:first-of-type{border-left:0; padding-left:2px}
+  .ribbon .rgrp-chips{display:inline-flex; gap:5px; flex-wrap:nowrap}
+  .ribbon .rgrp-l{font-size:8.5px; letter-spacing:.7px; text-transform:uppercase; color:var(--faint); font-weight:600}
 
   .bar{display:flex; align-items:center; gap:20px; margin-top:16px}
   .ftimer{font-family:var(--mono); font-size:16px; font-weight:700; letter-spacing:-.3px; color:var(--muted);
@@ -8403,6 +8411,22 @@ const MENUS = {
   'AS': [['A','Sort A→Z'],['D','Sort Z→A']],
   'E':  [['S','Paste special…']],
 };
+/* r315 (Wolf): the Alt+H flyout dumped all 20 options in one flat wrapping row — unreadable,
+   "nobody could pick out what we're looking at." These groups mirror Excel's REAL Home-tab
+   groups (Clipboard · Font · Alignment · Number · Styles · Cells · Editing); the renderer draws
+   each as a labelled cluster with a divider. Keyboard behavior is identical — pure layout.
+   A menu without an entry here still renders as a single flat cluster. */
+const RIBBON_GROUPS = {
+  'H': [
+    ['Clipboard', ['V']],
+    ['Font',      ['1','2','F','B','H']],
+    ['Alignment', ['A','5','6','W']],
+    ['Number',    ['K','P','9','0']],
+    ['Styles',    ['J']],
+    ['Cells',     ['I','D','O']],
+    ['Editing',   ['U','E']],
+  ],
+};
 /* r177 FORMAT CELLS (Ctrl+1 / legacy Alt O E) — the desk set. Letters apply
    INSTANTLY (this is a speed trainer): number formats via eachSel; F toggles a
    footnote superscript mark on text cells; A centers the anchor cell ACROSS
@@ -8607,8 +8631,23 @@ function __drawRibbon(){
     if(ribbonNote) html+=`<span class="rnote">${ribbonNote}</span>`;
   } else {
     html+=`<span class="path">${tabName(path[0])}${path.length>1?' '+path.slice(1).join(' '):''} →</span>`;
-    const opts=MENUS[path.join('')];
-    if(opts) opts.forEach(([k,lbl])=>html+=`<span class="opt"><k>${k.toLowerCase()}</k>${lbl}</span>`);
+    const key=path.join('');
+    const opts=MENUS[key];
+    const groups=RIBBON_GROUPS[key];
+    if(opts && groups){
+      // r315: draw the flyout as Excel-style labelled groups (chips over a group name, dividers between)
+      const lblOf={}; opts.forEach(([k,l])=>lblOf[k]=l);
+      const used=new Set();
+      groups.forEach(([gname,keys])=>{
+        let chips='';
+        keys.forEach(k=>{ if(lblOf[k]!==undefined){ chips+=`<span class="opt"><k>${k.toLowerCase()}</k>${lblOf[k]}</span>`; used.add(k); } });
+        if(chips) html+=`<span class="rgrp"><span class="rgrp-chips">${chips}</span><span class="rgrp-l">${gname}</span></span>`;
+      });
+      const extra=opts.filter(([k])=>!used.has(k));   // safety: anything not grouped rides a trailing cluster
+      if(extra.length){ let c=''; extra.forEach(([k,l])=>c+=`<span class="opt"><k>${k.toLowerCase()}</k>${l}</span>`);
+        html+=`<span class="rgrp"><span class="rgrp-chips">${c}</span><span class="rgrp-l">More</span></span>`; }
+    }
+    else if(opts) opts.forEach(([k,lbl])=>html+=`<span class="opt"><k>${k.toLowerCase()}</k>${lbl}</span>`);
     else html+='<span class="opt">…</span>';
   }
   el.innerHTML=html;
