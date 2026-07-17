@@ -1140,60 +1140,30 @@
   .kb-desc{color:var(--text); font-family:var(--sans); font-size:13.5px}
   #kbClose kbd{color:inherit; background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10px; margin:0 2px}
 
-  /* ---- rapid-fire: single-cell card, mounted INLINE in the grid's space (r291) ---- */
+  /* ---- rapid-fire: the task strip + the REAL grid as the play surface (r293) ---- */
   #rapidStage{display:none}
-  /* the stage frame, HUD toolbar, and sheet-tab strip all stay put — only the grid
-     itself swaps for the rapid card, so the mode reads as part of the game, not a page. */
-  body.rapidfire #gridwrap{display:none}
-  body.rapidfire #rapidStage{
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    flex:1 1 auto; min-height:0; padding:20px 16px;   /* fills the grid area, not the viewport */
-  }
-  body.rapidfire .checklist{display:none}       /* rapid-fire's task lives on the card, not the rail */
-  body.rapidfire .fbar{display:none}            /* the formula bar is grid-only; the HUD carries the timer */
+  /* r293 (Wolf): rapid-fire runs ON the real sheet — the grid stays live, the ribbon and
+     formula bar stay put, and this strip above the formula bar carries the call: one
+     instruction in large type, the target ref, the keycaps, the streak. */
+  body.rapidfire #rapidStage{display:flex; align-items:center; gap:16px; padding:13px 18px;
+    background:var(--surface2); border-bottom:1px solid var(--line); flex-wrap:wrap}
+  body.rapidfire .checklist{display:none}       /* rapid-fire's task lives on the strip, not the rail */
+  body.rapidfire .ftimer, body.rapidfire .ghost{display:none}   /* the HUD carries the session clock */
+  body.rapidfire .sheettabs{pointer-events:none; opacity:.45}    /* tabs stay as chrome, but a mid-session click must not load a classic drill */
   /* the ribbon STAYS in rapid-fire (Wolf): softens the transition and keeps the available
      Home/Insert/... options on screen as a reference while you chord one cell at a time */
   body.rapidfire .exrow{display:none}
-  .rf-card{background:var(--surface2); border:2px solid var(--faint); border-radius:16px;
-    padding:30px 30px 34px; max-width:460px; width:100%; margin:0; text-align:center;
-    box-shadow:0 28px 70px -24px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.02) inset}
-  .rf-instr{font-family:var(--mono); font-size:15px; color:var(--accent); letter-spacing:.3px; margin-bottom:22px; min-height:20px}
-  .rf-sheet{border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--bg); margin-bottom:26px}
-  .rf-srow{display:grid; grid-template-columns:44px 1fr}
-  .rf-rownum{font-family:var(--mono); font-size:12px; color:var(--faint); background:var(--surface2);
-    display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line)}
-  .rf-cell{font-family:var(--mono); font-size:18px; padding:18px; color:var(--text); min-height:58px;
-    display:flex; align-items:center; box-shadow:inset 0 0 0 2px var(--accent); transition:background .2s, color .2s, font-weight .1s}
-  .rf-cell.bold{font-weight:700}
-  .rf-cell.italic{font-style:italic}
-  .rf-cell.underline{text-decoration:underline}
-  .rf-cell.strike{text-decoration:line-through; color:var(--muted)}
-  .rf-cell.bold.underline{text-decoration:underline}
-  .rf-cell.italic.underline{text-decoration:underline}
-  .rf-cell.fx{color:var(--accent)}
-  .rf-cell.link{color:var(--accent); text-decoration:underline}
-  .rf-cell.border{box-shadow:inset 0 0 0 2px var(--accent), inset 0 0 0 5px var(--surface), inset 0 0 0 7px var(--text)}
-  /* Single-edge border variants — banker-style subtotal/total lines */
-  .rf-cell.border-top   {box-shadow:inset 0  2px 0 0 var(--accent), inset 0  5px 0 0 var(--surface), inset 0  7px 0 0 var(--text)}
-  .rf-cell.border-bottom{box-shadow:inset 0 -2px 0 0 var(--accent), inset 0 -5px 0 0 var(--surface), inset 0 -7px 0 0 var(--text)}
-  /* Comment marker — Excel's red triangle in the top-right corner of a commented cell */
-  .rf-cell.comment{position:relative}
-  .rf-cell.comment::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
-    border-top:9px solid var(--bad); border-left:9px solid transparent}
-  /* success pulse on the rf-cell — sharp flash then quick fade. Faster than transition: feels like the chord SNAPPED into place */
-  @keyframes rfCellFlash {
-    0%   { background:var(--accent); color:#000; transform:scale(1.04); box-shadow:inset 0 0 0 2px var(--accent), 0 0 0 0 var(--accent-glow); }
-    35%  { background:var(--accent); color:#000; transform:scale(1.025); box-shadow:inset 0 0 0 2px var(--accent), 0 0 22px 4px var(--accent-glow); }
-    100% { background:var(--accent-glow); color:var(--text); transform:scale(1.0); box-shadow:inset 0 0 0 2px var(--accent), 0 0 0 0 transparent; }
-  }
-  .rf-cell.flash{ animation: rfCellFlash .42s cubic-bezier(.2,.9,.3,1) both; }
-  /* celebratory outer halo on the card so success registers in peripheral vision too */
-  @keyframes rfCardCelebrate {
-    0%   { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 0 0 var(--accent-glow); }
-    25%  { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 36px 6px var(--accent-glow); }
-    100% { box-shadow:0 24px 60px -30px rgba(0,0,0,.7), 0 0 0 0 transparent; }
-  }
-  .rf-card.celebrate{ animation: rfCardCelebrate .55s ease-out both; }
+  .rf-instr{font-family:var(--mono); font-size:19px; font-weight:700; color:var(--text);
+    letter-spacing:.2px; flex:1 1 auto; min-width:0}
+  .rf-ref{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:8px; padding:4px 10px; flex:none}
+  /* success pulse on the REAL cell — a sharp accent wash that fades, so the chord
+     visibly lands in the sheet (the synthetic card's flash, relocated to the grid) */
+  @keyframes rfTdHit{ 0%{box-shadow:inset 0 0 0 99px var(--accent-glow)} 100%{box-shadow:inset 0 0 0 99px transparent} }
+  #grid td.rfhit{animation:rfTdHit .55s ease-out both}
+  /* Excel's red comment triangle — rapid-fire's add-comment op stamps cell.cmt */
+  td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
+    border-top:8px solid var(--bad); border-left:8px solid transparent}
   /* r241 (Wolf): the streak flame flickers — a little warm pizzazz, GPU-cheap (transform+filter only) */
   .streak-flame{ display:inline-block; transform-origin:50% 85%; animation:streakFlicker 1.7s ease-in-out infinite; will-change:transform,filter }
   @keyframes streakFlicker{
@@ -1207,7 +1177,7 @@
   /* streak counter — appears at ×3, escalates through 5 tiers. Sits above the card so it fills the sparse area
      without competing with the cell content. Hidden by default; the JS adds .show + a tier class. */
   .rf-streak{ font-family:var(--mono); font-size:13px; text-align:center; color:transparent;
-    margin:0 auto 12px; min-height:24px; letter-spacing:1.5px; transition:color .25s, font-size .2s, text-shadow .25s; user-select:none }
+    margin:0 0 0 auto; min-height:24px; letter-spacing:1.5px; transition:color .25s, font-size .2s, text-shadow .25s; user-select:none }
   .rf-streak.show{ color:var(--muted); }
   .rf-streak .num{ font-weight:700 }
   .rf-streak.t1{ color:var(--accent); font-size:14px; }
@@ -1225,17 +1195,6 @@
     100% { transform:scale(1.0); }
   }
   .rf-streak.bump{ animation: rfStreakBump .32s cubic-bezier(.2,.9,.3,1) both; }
-  /* multi-cell layouts (autosum, fill-down, fill-right) */
-  .rf-cell-multi{padding:8px; min-height:58px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; box-shadow:none}
-  .rf-stack{display:flex; flex-direction:column; align-items:stretch; gap:0; min-width:130px}
-  .rf-row{display:flex; flex-direction:row; align-items:stretch; gap:0}
-  .rf-mini{font-family:var(--mono); font-size:14px; padding:9px 14px; text-align:right; min-width:130px;
-    border:1px solid var(--line); background:var(--surface2); color:var(--muted)}
-  .rf-stack .rf-mini + .rf-mini{border-top:none}
-  .rf-row .rf-mini + .rf-mini{border-left:none}
-  .rf-mini.rf-target{background:var(--surface); color:var(--text); box-shadow:inset 0 0 0 2px var(--accent)}
-  .rf-mini.rf-target.fx{color:var(--accent)}
-  .rf-mini.rf-target.flash{background:var(--accent-glow)}
   .rf-keys{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; min-height:40px}
   .rf-keycap{font-family:var(--mono); font-size:13px; color:var(--muted); background:var(--surface2);
     border:1px solid var(--line); border-bottom-width:2px; border-radius:7px; padding:8px 13px; min-width:36px; transition:all .12s}
@@ -1434,7 +1393,7 @@
       <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn mode</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
-      <button class="mb-tool" id="ghostToggle" data-tip="PB pace counter + cursor ghost \u2014 click to toggle">\ud83d\udc7b ghost: on</button>
+      <button class="mb-tool" id="ghostToggle" data-tip="\u25c6 PRO \u2014 race a live ghost of your PB run \u00b7 pace counter is free \u00b7 click to toggle">\ud83d\udc7b ghost: on</button>
       <!-- r292 (Wolf): the "sheet" button retired -->
       <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
       <span style="position:relative; display:inline-flex">
@@ -1454,6 +1413,14 @@
     <div class="stage-row">
       <div class="stage-main">
         <div class="ribbon" id="ribbon"></div>
+        <!-- r293: rapid-fire runs ON the real sheet below — this strip is just the caller:
+             big instruction, the live target ref, keycap hints, streak -->
+        <div id="rapidStage">
+          <div class="rf-instr" id="rfInstr">—</div>
+          <span class="rf-ref" id="rfCellLabel">B4</span>
+          <div class="rf-keys" id="rfKeys"></div>
+          <div class="rf-streak" id="rfStreak"></div>
+        </div>
         <div class="fbar" style="position:relative">
           <div id="fxHint" class="fx-hint"></div>
           <span class="namebox" id="nameBox">A1</span>
@@ -1463,16 +1430,6 @@
           <span class="fcontent empty" id="fContent">empty</span>
         </div>
         <div class="gridwrap" id="gridwrap"><table id="grid"></table><div class="marquee" id="marquee"></div></div>
-        <!-- r291: rapid-fire mounts INLINE here, in the grid's own space — same chrome,
-             large font, one chord at a time (was a full-viewport takeover) -->
-        <div id="rapidStage">
-          <div class="rf-streak" id="rfStreak"></div>
-          <div class="rf-card">
-            <div class="rf-instr" id="rfInstr">—</div>
-            <div class="rf-sheet"><div class="rf-srow"><div class="rf-rownum" id="rfCellLabel">B4</div><div class="rf-cell" id="rfCell"></div></div></div>
-            <div class="rf-keys" id="rfKeys"></div>
-          </div>
-        </div>
       </div>
       <aside class="checklist" id="checklist"></aside>
     </div>
@@ -7843,6 +7800,7 @@ function resolveRange(str){ if(!str) return null; const parts=str.split(':'); co
   return {r1:Math.min(a.r,b.r),r2:Math.max(a.r,b.r),c1:Math.min(a.c,b.c),c2:Math.max(a.c,b.c)}; }
 function currentTargetRange(){
   if(!S||done||sandboxMode) return null;   // r238: the warm-up sandbox has no CHALLENGES entry / no targets
+  if(gameMode==='rapidfire') return null;  // r293: the rapid sheet is NOT the classic drill — its target ring must not paint here
   const C=CHALLENGES[cur]; if(!C||!C.targets) return null;
   const T2=(typeof C.targets==='function') ? C.targets.call(C) : C.targets;
   const items=C.checks(S);
@@ -7894,6 +7852,7 @@ function render(){
       let cls=[]; if(cell.bold)cls.push('bold'); if(cell.txt&&!isNum(cell))cls.push('txt');
       if(cell.it)cls.push('it'); if(cell.strike)cls.push('strike');   // r193
       if(cell.uline)cls.push('uline');   // r229: cell underline (Ctrl+U / Alt H 3)
+      if(cell.cmt)cls.push('cmt');       // r293: comment triangle (rapid-fire Shift+F2)
       if(cell.wrap)cls.push('wrap'); if(cell.fill)cls.push('fill-'+cell.fill);   // r231: any fill palette key
       if(cell.bt)cls.push('bt'); if(cell.bb)cls.push('bb'); if(cell.ball)cls.push('ball');
       if(cell.align)cls.push('align-'+cell.align);
@@ -10654,7 +10613,7 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
   if(tools){
     const mk=(id,tip)=>{ const b=document.createElement('button'); b.className='topnav-icon'; b.id=id; b.setAttribute('data-tip',tip); return b; };
     const sBtn=mk('soundToggle','sound pack \u2014 click to cycle: classic \u2192 arcade \u2192 thock \u2192 off');
-    const pBtn=mk('profileToggle','keyboard profile \u2014 native Excel, Macabacus, or FactSet chords');
+    const pBtn=mk('profileToggle','\u25c6 PRO \u2014 keyboard profile: native Excel, Macabacus, or FactSet chords');
     sBtn.onclick=cycleSound;
     pBtn.onclick=cycleProfile;
     const anchor=document.getElementById('navShortcuts');
@@ -11458,50 +11417,83 @@ function loadRapidCard(){
     type: s.matchSeq ? 'seq' : 'chord',
     test: s.matchSeq ? s.matchSeq() : s.match,
   }));
+  /* r293: the task lives in the REAL sheet now. Column layouts pin to B2.. so the
+     ops' hardcoded formula text (=SUM(B2:Bn)) points at the actual staged cells. */
+  const v0 = op.show(data);
+  let cell;
+  if(v0.layout==='column'){ const n=(v0.context||[]).length; cell={r:2+n, c:2}; }
+  else if(v0.layout==='row'){ const n=(v0.context||[]).length; cell={r:2, c:2+n}; }
+  else if(data.cellLabel && /^[A-J]\d+$/.test(data.cellLabel)){ cell={r:parseInt(data.cellLabel.slice(1),10), c:data.cellLabel.charCodeAt(0)-64}; }
+  else cell={ r:2+Math.floor(Math.random()*6), c:2+Math.floor(Math.random()*4) };
   rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data, matchers,
-    cellLabel: data.cellLabel || (colLetter(2+(Math.random()*4|0))+(2+(Math.random()*6|0))), shownAt:performance.now() };
+    cell, cellLabel: colLetter(cell.c)+cell.r, shownAt:performance.now() };
   rfBusy=false; renderRfCard('show');
+}
+/* r293 REBUILD (Wolf): rapid-fire renders in the REAL grid. Each task stages its
+   pre-state into actual sheet cells; the solve writes the post-state so the chord
+   visibly lands in the sheet — real selection ring, real formula bar, real formats. */
+function rfResetSheet(){ S={ROWS:ROWS_MAX, cells:{}, active:{r:1,c:1}, sel:null, clipboard:null}; }
+function rfWriteCell(r,c,view){
+  const cell=ensure(r,c); Object.assign(cell, blankCell());
+  cell.it=false; cell.strike=false; cell.cmt=false;   // r193/r229/r293 flags live outside blankCell
+  const text=(view.text==null)?'':String(view.text);
+  if(view.fx && text.charAt(0)==='='){
+    /* live formula when every ref resolves to staged content (autosum → the engine
+       computes the real total); otherwise the formula TEXT displays literally,
+       exactly like Excel's formulas view */
+    const refs=text.match(/\$?[A-J]\$?\d+/g)||[];
+    const live=refs.length && refs.every(rf=>{ const m=rf.replace(/\$/g,''); return nonEmpty(parseInt(m.slice(1),10), m.charCodeAt(0)-64); });
+    if(live){ cell.formula=text; } else { cell.value=text; cell.txt=true; }
+  } else if(text!==''){
+    const bare=text.replace(/,/g,''); let m;
+    if(/^-?\d+(\.\d+)?$/.test(bare)){
+      cell.value=parseFloat(bare);
+      cell.decimals=(bare.split('.')[1]||'').length;
+      if(text.indexOf(',')>=0) cell.fmtStyle='comma';
+    }
+    else if((m=text.match(/^(-?[\d,]+(?:\.(\d+))?)%$/))){ cell.value=parseFloat(m[1].replace(/,/g,''))/100; cell.fmtStyle='percent'; cell.decimals=(m[2]||'').length; }
+    else if((m=text.match(/^\$\s?(-?[\d,]+(?:\.(\d+))?)$/))){ cell.value=parseFloat(m[1].replace(/,/g,'')); cell.fmtStyle='currency'; cell.decimals=(m[2]||'').length; }
+    else { cell.value=text; cell.txt=true; }
+  }
+  if(view.bold) cell.bold=true;
+  if(view.italic) cell.it=true;
+  if(view.underline||view.link) cell.uline=true;
+  if(view.strike) cell.strike=true;
+  if(view.border) cell.ball=true;
+  if(view.borderTop) cell.bt=true;
+  if(view.borderBottom) cell.bb=true;
+  if(view.align) cell.align=view.align;
+  if(view.fontColor) cell.fontColor=view.fontColor;
+  else if(view.color||view.link) cell.fontColor='blue';   // the hex from font_blue = our palette blue
+  if(view.comment) cell.cmt=true;
+  return cell;
+}
+function rfPaintView(view, state){
+  if(!rfTask || !rfTask.cell) return;
+  const t=rfTask.cell;
+  if(state!=='solved') rfResetSheet();   // fresh sheet per task; solve mutates in place
+  if(view.layout==='row' || view.layout==='column'){
+    (view.context||[]).forEach((v,i)=>{
+      const rr = view.layout==='column' ? (t.r-(view.context.length-i)) : t.r;
+      const cc = view.layout==='column' ? t.c : (t.c-(view.context.length-i));
+      rfWriteCell(rr, cc, {text:String(v)});
+    });
+  }
+  rfWriteCell(t.r, t.c, view);
+  recalc();
+  S.active={r:t.r, c:t.c}; S.sel=null;
+  render(); updateFormulaBar();
+  if(state==='solved'){
+    const td=document.querySelector('#grid td[data-r="'+t.r+'"][data-c="'+t.c+'"]');
+    if(td){ td.classList.remove('rfhit'); void td.offsetWidth; td.classList.add('rfhit'); }
+  }
 }
 function renderRfCard(state){
   if(!rfTask) return;
   const view = state==='solved' ? rfTask.def.solved(rfTask.data) : rfTask.def.show(rfTask.data);
   const ie=$('rfInstr'); if(ie) ie.textContent = (typeof rfTask.def.instr==='function') ? rfTask.def.instr(rfTask.data) : rfTask.def.instr;
   const le=$('rfCellLabel'); if(le) le.textContent=rfTask.cellLabel;
-  const cell=$('rfCell');
-  if(cell){
-    const layout = view.layout || 'single';
-    if(layout === 'single'){
-      // single-cell render: text + visual flags on the cell itself
-      cell.innerHTML = '';
-      cell.textContent = view.text||'\u00A0';
-      const flags=['bold','italic','underline','strike','fx','link','border','comment']
-        .filter(f=>view[f]).join(' ')
-        + (view.borderTop ? ' border-top' : '')
-        + (view.borderBottom ? ' border-bottom' : '');
-      cell.className='rf-cell'+(flags?' '+flags:'')+(state==='solved'?' flash':'');
-      // alignment override (for the center/right-align RF ops) — flex-based since rf-cell is display:flex
-      cell.style.justifyContent = view.align==='c' ? 'center' : view.align==='r' ? 'flex-end' : '';
-      // font color override (for the blue-input RF op) — look up the swatch hex
-      if(view.fontColor){
-        const sw = FONT_SWATCHES.find(s=>s.k===view.fontColor);
-        cell.style.color = sw ? sw.hex : '';
-      } else cell.style.color = '';
-    } else {
-      // multi-cell: container holds context mini-cells + the target
-      cell.className = 'rf-cell-multi';
-      cell.textContent = '';
-      const wrap = document.createElement('div');
-      wrap.className = layout === 'row' ? 'rf-row' : 'rf-stack';
-      (view.context||[]).forEach(v=>{
-        const m=document.createElement('div'); m.className='rf-mini'; m.textContent=String(v); wrap.appendChild(m);
-      });
-      const t=document.createElement('div');
-      t.className='rf-mini rf-target'+(view.fx?' fx':'')+(state==='solved'?' flash':'');
-      t.textContent = view.text||'\u00A0';
-      wrap.appendChild(t);
-      cell.appendChild(wrap);
-    }
-  }
+  rfPaintView(view, state);   // r293: the task renders in the REAL grid
   const keys=$('rfKeys'); if(keys){ keys.className='rf-keys'+(guided?'':' hardo'); keys.innerHTML='';
     // Default rapid-fire = no keycaps shown (hardo). Pressing `g` reveals them but flags the run as a practice run.
     const showKeys = guided || state==='solved';
@@ -11527,11 +11519,6 @@ function rapidKey(e){
   const k=e.key;
   if(resultsChainKeys){ resultsChainKeys(e); if(e.defaultPrevented) return; }
   if(k==='Escape'){ e.preventDefault(); return; }
-  // 's' (bare, no modifiers) skips the current task — same convention as marathon's drill skip.
-  // Ctrl+S still routes to the save op since the ctrl check above excludes the chord path.
-  if((k==='s'||k==='S') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey){
-    e.preventDefault(); rfSkip(); return;
-  }
   // Keys that browsers love to steal — Alt+Home (homepage), Ctrl+Home (scroll-to-top in some configs),
   // Ctrl+T (new tab), F5 (refresh), etc. Block defaults for ANY modifier-plus-key, navigation key, or function
   // key inside rapid-fire — the session has full keyboard ownership regardless of whether it matches an op.
@@ -11551,6 +11538,12 @@ function rapidKey(e){
     if(res === 'partial') sawPartial = true;
   }
   if(sawPartial){ e.preventDefault(); kickTimer(); return; }
+  // 's' (bare, no modifiers) skips the current task — same convention as marathon's drill skip.
+  // r293: checked AFTER the sequence matchers so the S inside a ribbon walk (tap-Alt
+  // E S V ↵ = legacy paste-values) advances the sequence instead of skipping the task.
+  if((k==='s'||k==='S') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey){
+    e.preventDefault(); rfSkip(); return;
+  }
   // CURRENT-TASK CHORD CHECK — match against any chord solution (primary or alt) of this task.
   for(const m of rfTask.matchers){
     if(m.type === 'chord' && m.test(e)){ e.preventDefault(); kickTimer(); rfSolve(m); return; }
@@ -11583,10 +11576,8 @@ function rfSolve(matched){
   const tier = streakTier(marathon.streak);
   updateStreakUI(marathon.streak);
   renderRfCard('solved'); updateMarathonHud();
-  // dopamine: sound (tier-shifted) + outer-card halo. The rf-cell flash is already wired in renderRfCard('solved').
+  // dopamine: sound (tier-shifted). The real-cell accent flash is wired in rfPaintView('solved').
   playSuccessBlip(tier);
-  const card = document.querySelector('.rf-card');
-  if(card){ card.classList.remove('celebrate'); void card.offsetWidth; card.classList.add('celebrate'); }
   if(marathon.endAt && performance.now() >= marathon.endAt){ setTimeout(endSession, marathon.advance); return; }
   setTimeout(()=>{ if(marathon && marathon.active) loadNext(); }, marathon.advance);
 }
