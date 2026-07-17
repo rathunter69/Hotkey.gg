@@ -1346,13 +1346,13 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
 <script src="drills.js?v=265"></script>
-<link rel="stylesheet" href="nav.css?v=175">
+<link rel="stylesheet" href="nav.css?v=176">
 <script src="themes.js?v=263"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=262"></script>
+<script src="nav.js?v=263"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1405,7 +1405,7 @@
       <!-- r292 (Wolf): the "sheet" button retired -->
       <button class="mb-tool" id="randBtn" title="deal me a random drill — anywhere in the catalog">&#x2684; random</button>
       <span style="position:relative; display:inline-flex">
-      <button class="mb-tool" id="wqBtn" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c6; weakness</button>
+      <button class="mb-tool" id="wqBtn" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r297: ◈ — the ◆ was a glyph collision with the daily challenge chip -->
       <div class="prefs-pop" id="wqPop" style="min-width:300px; flex-direction:column; gap:4px"></div>
       </span>
       <button class="mb-tool" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
@@ -7890,6 +7890,88 @@ function sortRange(dir, keyCol){
   }
 }
 
+/* ---- r297 FLASH FILL (Ctrl+E) — Excel's pattern fill, the average corporate user's
+   favorite trick (Wolf). Type ONE example beside the data, Ctrl+E writes the rest.
+   Deterministic candidate library (no ML): the example is matched against a fixed,
+   ordered set of transforms of the source column(s); the FIRST transform that
+   reproduces EVERY example wins and fills the blank rows of the block. Results land
+   as VALUES (text), exactly like Excel — Flash Fill never writes formulas. */
+function flashFill(){
+  const tcol=S.active.c;
+  const cellTxt=(r,c)=>{ const x=get(r,c); if(x.value==null||x.value==='') return null;
+    return typeof x.value==='number' ? String(parseFloat(Number(x.value).toPrecision(10))) : String(x.value); };
+  // 1. the block: the contiguous non-empty run in the nearest source column to the LEFT,
+  //    anchored on the active row (Excel fills beside a table; target sits right of source)
+  let scol=tcol-1; while(scol>=1 && cellTxt(S.active.r,scol)==null) scol--;
+  if(scol<1){ showToast('flash fill: put the cursor beside the data, example typed'); return; }
+  let r1=S.active.r, r2=S.active.r;
+  while(r1>1 && cellTxt(r1-1,scol)!=null) r1--;
+  while(r2<S.ROWS && cellTxt(r2+1,scol)!=null) r2++;
+  // 2. source columns: contiguous data columns walking LEFT from scol (cap 3)
+  const scols=[scol];
+  for(let c=scol-1;c>=1 && scols.length<3;c--){
+    let n=0; for(let r=r1;r<=r2;r++) if(cellTxt(r,c)!=null) n++;
+    if(n>=(r2-r1+1)/2) scols.unshift(c); else break; }
+  // a lone text header on the block's top row shouldn't poison inference: if the target
+  // column has no example on row r1 but does below, treat r1 as header when its source
+  // cell differs in kind (Excel's heuristic, simplified)
+  // 3. the examples: target-column cells already typed inside the block
+  const ex=[]; for(let r=r1;r<=r2;r++){ const t=cellTxt(r,tcol); if(t!=null) ex.push({r:r,out:t}); }
+  if(!ex.length){ showToast('flash fill: type one example first, then Ctrl+E'); return; }
+  // 4. the candidate library — unary transforms of one source value
+  const properize=s=>s.toLowerCase().replace(/(^|[^A-Za-z])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+  const UN=[
+    ['id',      s=>s],
+    ['proper',  properize],
+    ['upper',   s=>s.toUpperCase()],
+    ['lower',   s=>s.toLowerCase()],
+    ['tok1',    s=>s.trim().split(/\s+/)[0]],
+    ['tokN',    s=>{ const t=s.trim().split(/\s+/); return t[t.length-1]; }],
+    ['tok1p',   s=>properize(s.trim().split(/\s+/)[0])],
+    ['tokNp',   s=>{ const t=s.trim().split(/\s+/); return properize(t[t.length-1]); }],
+    ['pre@',    s=>s.split('@')[0]],
+    ['post@',   s=>{ const i=s.indexOf('@'); return i<0?s:s.slice(i+1); }],
+    ['pre,',    s=>s.split(',')[0].trim()],
+    ['post,',   s=>{ const i=s.indexOf(','); return i<0?s:s.slice(i+1).trim(); }],
+    ['pre-',    s=>s.split('-')[0].trim()],
+    ['post-',   s=>{ const i=s.indexOf('-'); return i<0?s:s.slice(i+1).trim(); }],
+    ['init1',   s=>(s.trim()[0]||'').toUpperCase()],
+  ];
+  const srcAt=r=>scols.map(c=>cellTxt(r,c)||'');
+  // single-column candidates, in library order per source column (rightmost source first —
+  // it's the column the user is working beside)
+  const cands=[];
+  for(let ci=scols.length-1;ci>=0;ci--) for(const [nm,f] of UN) cands.push({tag:nm+':'+ci, fn:row=>f(row[ci]||'')});
+  // two-part templates: example = A(srcI) + literal + B(srcJ), literal inferred from example 1
+  const e0=ex[0], src0=srcAt(e0.r);
+  for(let i=0;i<scols.length;i++) for(let j=0;j<scols.length;j++){
+    if(i===j && scols.length>1) continue;
+    for(const [na,fa] of UN) for(const [nb,fb] of UN){
+      const A=fa(src0[i]||''), B=fb(src0[j]||'');
+      if(!A||!B) continue;
+      if(e0.out.length>=A.length+B.length && e0.out.startsWith(A) && e0.out.endsWith(B)){
+        const lit=e0.out.slice(A.length, e0.out.length-B.length);
+        cands.push({tag:na+':'+i+'+'+JSON.stringify(lit)+'+'+nb+':'+j, fn:row=>fa(row[i]||'')+lit+fb(row[j]||'')});
+      }
+    }
+  }
+  // 5. first candidate that reproduces EVERY example wins
+  let win=null;
+  for(const c of cands){ if(ex.every(e=>{ try{ return c.fn(srcAt(e.r))===e.out; }catch(_){ return false; } })){ win=c; break; } }
+  if(!win){ showToast('flash fill: no pattern found — give it one more example'); return; }
+  // 6. fill the blanks as VALUES
+  pushUndo();
+  let n=0;
+  for(let r=r1;r<=r2;r++){
+    if(cellTxt(r,tcol)!=null) continue;
+    const out=win.fn(srcAt(r));
+    const cell=ensure(r,tcol);
+    cell.value=out; cell.txt=true; cell.formula=null; n++;   // always TEXT — a flash-filled "7203" is a ticker, not a number (Excel keeps text-derived results as text)
+  }
+  commitAction();
+  showToast(n ? 'flash fill: '+n+' cell'+(n===1?'':'s') : 'flash fill: nothing to fill');
+}
+
 // Fill series across the selection. Detects the step from the first 1-2 cells with values.
 // If exactly one numeric seed → step=1 (Excel default for single-cell series). Two seeds → step = b-a.
 // Walks the selection by row, then by column, filling empty cells with the projected value.
@@ -10558,11 +10640,10 @@ document.addEventListener('keydown',hkRawE=>{
   if((k==='PageUp'||k==='PageDown') && (e.altKey||e.ctrlKey) && !editing){
     e.preventDefault(); stepSheetTab(k==='PageDown'?1:-1); return; }   // r57: sheet-tab walk (Ctrl+Pg fires only if the browser lets it through)
 
-  // CHALLENGE SELECT (no-mouse): 1 / 2 / 3 — disabled during a marathon (drills are random)
-  if(gameMode==='classic' && !e.ctrlKey&&!e.altKey&&!e.metaKey&&/^[1-9]$/.test(k)){
-    const keys=MENU_ORDER, idx=+k-1;
-    if(keys[idx]){ e.preventDefault(); loadChallenge(keys[idx]); return; }
-  }
+  // r297: the old "1-9 jumps to a drill" branch is GONE — digits are routed to the cell
+  // editor above (type-to-replace) long before this point, so it was dead code, and the
+  // welcome-back card advertising it was a lie (Wolf's report). Drill jumps live in the
+  // picker (\ then 1-9 inside it), where digits can't collide with data entry.
 
   // UNDO / REDO — authentic Excel hotkeys (ctrl+z / ctrl+y / ctrl+shift+z)
   if(e.ctrlKey||e.metaKey){
@@ -10708,6 +10789,7 @@ document.addEventListener('keydown',hkRawE=>{
     if(lk==='u' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+U'); pushUndo(); toggleAllOrNone('uline'); commitAction(); return; }   // r229: underline
     if(lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+D'); fillFrom('down'); return; }
     if(lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+R'); fillFrom('right'); return; }
+    if(lk==='e' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+E'); flashFill(); return; }   // r297: Flash Fill — type an example, Ctrl+E writes the rest
     if(k==='5' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+5'); pushUndo(); toggleAllOrNone('strike'); commitAction(); return; }   // r193: strikethrough (Excel's chord; Chrome steals ctrl+digit live — ctrl+1 K is the taught fallback)
     if(k==='9' && !e.altKey){ e.preventDefault(); startClock();
       if(e.shiftKey){ logKey('Ctrl+Shift+9'); pushUndo(); unhideRows(); } else { logKey('Ctrl+9'); pushUndo(); hideRows(); }
@@ -10858,7 +10940,7 @@ function toggleWqPop(){
   if(p.classList.contains('show')){ p.classList.remove('show'); return; }
   if(!requirePro('The Weakness Queue')) return;
   const q=buildWeaknessQueue();
-  p.innerHTML='<div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:4px 6px 6px">\u25c6 weakness queue \u00b7 built from your runs</div>'+
+  p.innerHTML='<div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:4px 6px 6px">\u25c8 weakness queue \u00b7 built from your runs</div>'+
     (q.length?q.map(x=>{ const nm=(CHALLENGES[x.k]&&CHALLENGES[x.k].name)||x.k;
       return '<button class="mb-tool" data-wq="'+x.k+'">'+nm+
         ' <span style="margin-left:auto;font-size:9px;color:var(--warn)">'+x.why+'</span></button>'; }).join('')+
@@ -12516,6 +12598,10 @@ function openCampaign(){
   $('campClose').onclick=()=>m.classList.remove('show');
   $('campX').onclick=()=>m.classList.remove('show');
   m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
+  // r297: Esc closes the campaign like every other modal — it was the ONE modal that
+  // trapped it, breaking the "Esc closes menus & modals" promise the shortcuts sheet makes
+  const __campEsc=e=>{ if(e.key==='Escape'){ e.stopPropagation(); m.classList.remove('show'); document.removeEventListener('keydown',__campEsc,true); } };
+  document.addEventListener('keydown',__campEsc,true);
   m.querySelectorAll('.camp-drill').forEach(d=>d.onclick=()=>{ m.classList.remove('show'); loadChallenge(d.dataset.key); });
   const cp=$('campPro'); if(cp) cp.onclick=()=>{ m.classList.remove('show'); if(window.openUpgrade) window.openUpgrade('Campaign'); };
 }
@@ -13097,7 +13183,7 @@ function showWelcomeBack(key){
         (streak.n>1 ? '<span>\ud83d\udd25 <b>'+streak.n+'-day</b> streak \u2014 alive</span>' : '')+
       '</div>'+
       '<button class="wb-dlogin" id="wbLogin">Log in \u2192</button>'+
-      '<div class="wb-dfoot"><kbd>\\</kbd> drill picker \u00b7 <kbd>1</kbd>\u2013<kbd>9</kbd> jump \u00b7 any key to start</div>'+
+      '<div class="wb-dfoot"><kbd>\\</kbd> pick a drill \u00b7 <kbd>F1</kbd> guided help \u00b7 any key to start</div>'+
     '</div></div>';
   document.body.appendChild(w);
   requestAnimationFrame(()=>w.classList.add('show'));

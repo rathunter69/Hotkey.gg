@@ -59,8 +59,8 @@
   #boards > .hero, #boards > .featured, #boards > #secleadMount, #boards > .panel{grid-column:1/-1}
   .hero{display:grid; grid-template-columns:minmax(200px,.75fr) minmax(215px,.8fr) minmax(300px,1.45fr); gap:16px; margin-bottom:18px}   /* r267: floors + the players panel gets the width its rows need */
   .hero.two{grid-template-columns:minmax(240px,.9fr) minmax(320px,1.8fr)}   /* r293: ladder panel retired — card + top players share the row */
-  @media(max-width:1080px){ .hero{grid-template-columns:1fr 1fr} }
-  @media(max-width:820px){ .hero{grid-template-columns:1fr} }
+  @media(max-width:1080px){ .hero, .hero.two{grid-template-columns:1fr 1fr} }   /* r297: .hero.two out-specified the collapse rules — the two-panel hero never stacked on mobile and Top Players clipped off-screen */
+  @media(max-width:820px){ .hero, .hero.two{grid-template-columns:1fr} }
   .ld-row{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:11px; padding:7.5px 8px; border-radius:9px; min-height:38px;
     font-family:var(--mono); font-size:12px; color:var(--muted)}
   .ld-row .ld-req{margin-left:auto; font-size:10px; color:var(--faint); text-align:right; line-height:1.5}

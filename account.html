@@ -76,6 +76,7 @@
   .state{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:38px 28px; text-align:center;
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
+  .state a.acc-cta{color:var(--on-accent,#0c0d0e)}   /* r297: the .state link rule was out-specifying the CTA — its label rendered accent-on-accent, invisible in every theme */
   .acc-cta{display:inline-block; font-family:var(--mono); font-size:13px; text-decoration:none;
     border:1px solid var(--accent); background:var(--accent); color:var(--on-accent,#0c0d0e); font-weight:700;
     padding:10px 22px; border-radius:999px; margin:4px 6px; border-bottom:1px solid var(--accent)}
@@ -83,7 +84,7 @@
   .acc-cta.ghost{background:transparent; color:var(--accent); border-color:var(--accent-dim); font-weight:500}
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
-<link rel="stylesheet" href="nav.css?v=175">
+<link rel="stylesheet" href="nav.css?v=176">
 <script src="drills.js?v=265"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -96,7 +97,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=262"></script>
+<script src="nav.js?v=263"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 

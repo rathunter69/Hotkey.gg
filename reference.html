@@ -83,7 +83,7 @@
     color:var(--muted); min-height:34px; padding:6px 14px; margin-bottom:8px; display:flex; align-items:center; gap:9px;
     background:var(--surface2); border-bottom:1px solid var(--line);}   /* r62: the frame's strip language */
   .card h2 .ic{color:var(--accent);}
-  .card h2 .n{margin-left:auto; color:#4a4c48; font-size:11px; letter-spacing:0;}
+  .card h2 .n{margin-left:auto; color:var(--faint); font-size:11px; letter-spacing:0;}
 
   .row{display:flex; align-items:center; gap:14px; padding:9px 18px; border-top:1px solid rgba(38,40,44,.55); transition:background .12s;}
   .row:hover{background:var(--surface2);}
@@ -108,7 +108,7 @@
     box-shadow:0 2px 0 rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.05);}
   .sep{color:var(--muted); font-family:var(--mono); font-size:12px; padding:0 1px;}
   .sep.arrow{color:var(--accent); font-weight:700;}
-  .alt{color:#4a4c48; font-size:11px; padding:0 1px;}
+  .alt{color:var(--faint); font-size:11px; padding:0 1px;}
 
   /* ---------- footer ---------- */
   footer{border-top:1px solid var(--line); padding:26px 0 50px; color:var(--muted); font-size:13px; display:flex; gap:20px; flex-wrap:wrap; align-items:center;}
@@ -118,7 +118,7 @@
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-family:var(--mono); font-size:14px; padding:50px 0;}
 </style>
 
-<link rel="stylesheet" href="nav.css?v=175">
+<link rel="stylesheet" href="nav.css?v=176">
 <script src="drills.js?v=265"></script>
 <script src="refmap.js?v=1"></script>
 <script>
@@ -133,7 +133,7 @@ window.NAV_ACTIVE = 'reference';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=262"></script>
+<script src="nav.js?v=263"></script>
 <div class="wrap">
   <header>
     <h1>Shortcut <span class="em">reference</span></h1>

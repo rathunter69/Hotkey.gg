@@ -945,15 +945,17 @@
       // source of truth across nav + every page.
       window.sb.auth.getSession().then(({ data }) => {
         window._navUser = (data && data.session && data.session.user) || null;
+        // r297 (Wolf: "open my browser, still logged in, but it doesn't show my account"):
+        // render the signed-in state EAGERLY off the cached session — the handle refines
+        // when the profile lands. Before this, a slow/failed profiles fetch left the auth
+        // slot empty forever even though the session was right there.
+        renderAuthBar();
         if(window._navUser){
-          // Fetch handle from profiles table for the user-menu display.
-          window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).single().then(({ data: prof }) => {
+          window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).maybeSingle().then(({ data: prof }) => {
             window._navProfile = prof || null;
             renderAuthBar();
             try{ navRank(); }catch(e){}   // r228 (Wolf): populate the rank pill on SIGN-IN, not only on the next refresh (the boot poll had already given up)
           });
-        } else {
-          renderAuthBar();
         }
       }).catch(() => renderAuthBar());
       // React to sign-in / sign-out across tabs.
@@ -963,7 +965,8 @@
       window.sb.auth.onAuthStateChange((_evt, session) => { setTimeout(() => { try{
         window._navUser = session && session.user || null;
         if(window._navUser){
-          window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).single().then(({ data: prof }) => {
+          renderAuthBar();   // r297: eager render here too — the sign-in must show even if the profile fetch stalls
+          window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).maybeSingle().then(({ data: prof }) => {
             window._navProfile = prof || null;
             renderAuthBar();
             try{ navRank(); }catch(e){}   // r228 (Wolf): populate the rank pill on SIGN-IN, not only on the next refresh (the boot poll had already given up)

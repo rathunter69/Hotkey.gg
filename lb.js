@@ -814,13 +814,17 @@ function guildHtml(){
         '<span class="gb-or">or</span><input id="gbCode" maxlength="12" placeholder="invite code"><button class="tab" id="gbJoin">join</button><span class="gb-msg" id="gbMsg"></span></div>')
     : '<div class="gb-start" style="color:var(--muted)"><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</div>';
   /* r293 (Wolf): ONE tile + arrows instead of a full grid, tight header, no explainer */
-  return '<h3 class="section-title">The guild board</h3>'+
-    '<div class="gb-caro" style="grid-column:1/-1">'+
-      '<button class="gb-arrow" id="gbPrev" aria-label="previous desk">\u2039</button>'+
-      '<div class="gb-stage" id="gbStage">'+cardHtml+'</div>'+
-      '<button class="gb-arrow" id="gbNext" aria-label="next desk">\u203a</button>'+
-      '<span class="gb-count" id="gbCount"></span>'+
-    '</div>'+
+  /* r297: with ZERO desks the carousel used to render two stranded arrows around an empty
+     stage \u2014 now the empty state is a single centered line and the chrome stays hidden */
+  const caro = cardHtml
+    ? '<div class="gb-caro" style="grid-column:1/-1">'+
+        '<button class="gb-arrow" id="gbPrev" aria-label="previous desk">\u2039</button>'+
+        '<div class="gb-stage" id="gbStage">'+cardHtml+'</div>'+
+        '<button class="gb-arrow" id="gbNext" aria-label="next desk">\u203a</button>'+
+        '<span class="gb-count" id="gbCount"></span>'+
+      '</div>'
+    : '<div style="grid-column:1/-1; text-align:center; padding:26px 0; font-family:var(--mono); font-size:12.5px; color:var(--muted)">no desks yet \u2014 start one below</div>';
+  return '<h3 class="section-title">The guild board</h3>'+ caro +
     '<div style="grid-column:1/-1">'+startRow+'</div>';
 }
 function wireGuild(){

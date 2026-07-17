@@ -1,5 +1,48 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r297 — Flash Fill, login-shows-account fix, welcome-back honesty, UI+nav polish (Wolf batch)
+- **ENGINE — Flash Fill (Ctrl+E)**, the average corporate user's favorite trick (Wolf's ask).
+  `flashFill()`: infers a transform from ONE typed example beside a data column and fills the
+  block's blanks. Deterministic candidate library (no ML) — case ops (proper/upper/lower),
+  token split (first/last word), delimiter splits (@ , -), initial, and TWO-column templates
+  with an inferred literal separator ("Last, First"). First candidate reproducing EVERY example
+  wins; no pattern → refuses (never guesses). Results land as TEXT, Excel-true (a "7203" ticker
+  stays text). Parity matrix +4 (now 124). RANK/text/finance sections from r296 stay green.
+- **LOGIN NOW SHOWS YOUR ACCOUNT (Wolf: "open my browser, still logged in, but it doesn't show
+  my account; theme feels stale").** Root cause in nav.js boot: `renderAuthBar()` was called ONLY
+  inside the profiles `.single()` fetch, so a slow/failed profile query left the auth slot on the
+  guest "sign in" button forever even though the cached session was valid. Fix: render the
+  signed-in state EAGERLY off `getSession()` (handle refines when the profile lands); `.single()`
+  → `.maybeSingle()`; same eager render on the `onAuthStateChange` sign-in branch. The "stale
+  theme" feeling was the symptom of this — the account theme was applied but the account wasn't
+  showing; with the account rendering, the theme reads as correct (it IS you). Theme stays a
+  device pref by design (survives logout, like onboarding/platform).
+- **WELCOME-BACK told a lie (Wolf).** The returning-user card advertised "1–9 jump" to a drill,
+  but digits route to the cell editor (type-to-replace) long before the drill-jump branch — the
+  branch was dead code and the hint was false. Removed the dead `1-9` classic-mode branch; the
+  card now reads "\\ pick a drill · F1 guided help · any key to start" (drill jumps live in the
+  picker, where digits can't collide with data entry).
+- **UI POLISH (from the visual audit):** (1) account.html "Create an account" CTA rendered
+  accent-on-accent (invisible) — `.state a` out-specified `.acc-cta`; added `.state a.acc-cta`
+  ink rule. (2) leaderboard `.hero.two` never collapsed on mobile (out-specified the media
+  queries) → Top Players clipped off-screen; collapse rules now name `.hero.two`. (3) reference.html
+  key separators + section counts hardcoded `#4a4c48` (invisible on dark) → `var(--faint)`.
+  (4) desks empty guild board rendered two stranded arrows around a void → single centered
+  "no desks yet" line. (5) stats KPI row de-raggedized (dropped the lone leading ⏱).
+- **NAV/IA POLISH (from the nav audit):** (1) top-nav now shows section NAMES at ≥900px (was five
+  unguessable glyphs — "desks"/"reference" icons were ambiguous). (2) campaign modal was the ONE
+  modal that trapped Escape (broke the "Esc closes modals" promise) → Esc handler added. (3) the
+  weakness chip's ◆ glyph collided with the daily-challenge ◆ → weakness is now ◈.
+- DEFERRED to their own rounds (captured, not lost): the Practice/Daily/Compete modes rail (the
+  nav audit's #1 — the mode bar has objectively outgrown one row); the WRONG Excel border chords
+  (T/B → Excel's O/P/S/T/N canon) + a full chord canon-audit; insert-row sequencing copy; the
+  name generator's bad-word filter + broader tone; leaderboard tier sub-buckets; LP-style rank
+  progression; rapid-fire coverage of the new functions; the 34 flagged copy rows in
+  dev/COPY_INVENTORY.md (the batch-review artifact).
+- Cache: nav.js 262→263, nav.css 175→176, lb.js 9→10, lb.css 4→5; drill pages regenerated.
+  Local gate green pre-push (parity 124 · demo-replay 81 · onboard 29 · alt-paths 74 · mac 19 ·
+  echo 21 · rapidfire 12); CI is the authoritative full gate.
+
 ## 0. HEADLINE: the repo is behind the believed feature state
 The deployed code does **not** contain several features PROJECT_CONTEXT/memory said
 were shipped: **no Stripe/Pro/entitlements code, no =PRO() button, no keyboard-profile
