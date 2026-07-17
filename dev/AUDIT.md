@@ -1,5 +1,23 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r306 — MODE BAR to Wolf's order: modes → helpers → flair → settings, weight ∝ usage
+- **THE BAR, REORDERED (Wolf #35):** [modes] ◆ daily (ACCENT chip while unplayed — the one
+  thing worth highlighting — reverting to a normal chip once done) · campaign · rapid-fire
+  (downweighted from the oversized mode pill to a normal chip; duration popover kept) →
+  [helpers] solution · learn · F1 guided → [flair] streak · level → [settings] keyboard ·
+  ghost · ⚙ gear. CLASSIC CHIP RETIRED (classic is simply "not in a session"; the drill menu
+  covers it) and RANDOM retired from the bar (handler guarded, loadRandomDrill lives on for
+  sessions).
+- **KEYBOARD CONTROL MOVED INTO THE BAR (Wolf):** the layout+profile button left the
+  unguessable header-icon spot; same popover (Windows/Mac + native/Macabacus/FactSet).
+- **THE GEAR:** sound (full cycle UI preserved), ⌘ mac keys guide, and ▸ replay the intro
+  tour (the ONBOARDING_V3 replayability item — clears the flag and reruns the cleared-board
+  sequence). Sound left the header too.
+- Verified live: one row at 1440, every popover opens (rapid/keyboard/gear), header carries
+  no orphaned icons, screenshot to Wolf. onboard 34 · rapidfire 12 · mac 19 · replays green.
+- REMAINING (#35 second half, queued): ghost SOURCE toggle (my PB / all-time best / desk
+  best) — needs a best-trace fetch from runs; lands with its own round.
+
 ## r305 — completion-card declutter + level-up MOMENT (Wolf spec #33 + #32)
 - **THE COMPLETION CARD, DECLUTTERED (Wolf):** the "+N xp · note · how xp works" text row
   and the separate drip line are replaced by ONE animated xp bar that fills current→next
