@@ -646,7 +646,11 @@
     border:1px solid var(--line); border-radius:9px; padding:11px 14px; cursor:pointer; transition:.15s;
     display:flex; align-items:center; justify-content:space-between; gap:10px}
   .ob-key:hover{border-color:var(--accent); color:var(--accent)}
-  .ob-key.focused{border-color:var(--accent); color:var(--accent); background:var(--accent-glow); box-shadow:0 0 0 2px var(--accent-glow)}
+  /* r292 (Wolf): the selected option must be unmistakable in BOTH themes — accent text
+     on a translucent-accent fill was low-contrast in daylight. Solid accent + on-accent. */
+  .ob-key.focused{border-color:var(--accent); color:var(--on-accent); background:var(--accent); box-shadow:0 0 0 3px var(--accent-glow)}
+  .ob-key.focused .ob-kbd{background:rgba(6,18,12,.2); border-color:rgba(6,18,12,.3); color:var(--on-accent)}
+  .ob-key.focused span{color:var(--on-accent)!important}
   .ob-key.primary{background:var(--accent-dim); border-color:var(--accent); color:var(--text)}
   .ob-key.primary:hover{background:var(--accent); color:var(--on-accent)}
   .ob-key.primary.focused{background:var(--accent); color:var(--on-accent); box-shadow:0 0 0 2px var(--accent-glow)}
@@ -1433,7 +1437,7 @@
       </div>
       <span class="mb-spacer"></span>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; watch solution</button>
-      <button class="mb-tool" id="echoBtn" data-tip="the demo hands YOU the keys — press each highlighted chord to advance">&#9000; follow along</button>
+      <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn mode</button>
       <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <button class="mb-tool" id="ghostToggle" data-tip="PB pace counter + cursor ghost \u2014 click to toggle">\ud83d\udc7b ghost: on</button>
@@ -3560,12 +3564,12 @@ const CHALLENGES = {
     name:'Block Sel.', label:'Assemble & format the summary', par:46, parKeys:47,
     aha:'Ctrl+C copies what stays, Ctrl+X cuts what moves — assemble, then format with borders and a margin note.',
     prompt:'The segment summary is due and the pieces are scattered. COPY the base [Segment · Revenue] that stays filed; CUT the two misfiled metric columns (EBITDA, Op inc) into their slots. Then build it out like a real page: a Margin memo that computes off the block (EBITDA ÷ Revenue, in %), and the banker dress — bold headers, the top line in $ with the rest in commas, figures right, the segment names centred and underlined, the whole table boxed. Read what each loose piece IS, land it in the right column, and finish it clean. The pieces scatter to a new spot every run.',
-    req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b a</em> · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
+    req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b s</em> (outline) · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
     guide(){ const o=this._o; return [
       'COPY the <b>base</b> [Segment · Revenue] at <b>'+o.baseTL+'</b> (it stays filed): <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at '+o.o.seg[0],
       'CUT the misfiled <b>EBITDA</b> at <b>'+o.ebTL+'</b> and <b>Op inc</b> at <b>'+o.opTL+'</b>: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>x</kbd> · paste into their slots — the old spots empty',
       'the <b>Margin</b> memo: at '+o.o.margin[0]+' type <kbd>=</kbd> EBITDA ÷ Revenue (<kbd>='+o.marginF+'</kbd>), fill down, then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>%</kbd> and italic <kbd>ctrl</kbd>+<kbd>i</kbd>',
-      'format it: <b>bold</b> the header row (<kbd>ctrl</kbd>+<kbd>b</kbd>) · box the whole table <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd>',
+      'format it: <b>bold</b> the header row (<kbd>ctrl</kbd>+<kbd>b</kbd>) · select the whole table and box it <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> (outline)',
       'money: the <b>top line</b> in dollars (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>$</kbd>, trim to 0-dec with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd>×2), the rows below in <b>commas</b> (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>!</kbd>, 0-dec)',
       'finish: figures <b>right</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>) · segment names <b>centred + underlined</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> · <kbd>ctrl</kbd>+<kbd>u</kbd>)',
     ]; },
@@ -3583,7 +3587,7 @@ const CHALLENGES = {
         {sel:o.marginRng,  keys:[{key:'d',ctrl:true}]},                  // fill down
         {sel:o.marginRng,  keys:[{key:'%',ctrl:true,shift:true},{key:'i',ctrl:true}]},   // percent + italic
         {sel:o.hdrRng,     keys:[{key:'b',ctrl:true}]},                  // bold header
-        {sel:o.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('a')]},     // box the table
+        {sel:o.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('s')]},     // outline the whole table (Outside Borders)
         {sel:o.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),{key:'9'},{key:'Alt'},L('h'),{key:'9'}]},   // top line $ (0-dec)
         {sel:o.restRng,    keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),{key:'9'},{key:'Alt'},L('h'),{key:'9'}]},   // rest commas (0-dec)
         {sel:o.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},     // figures right
@@ -3661,8 +3665,11 @@ const CHALLENGES = {
       const marginOk = o.o.margin.every((k,i)=>{ const c=cel(k);
         return !!(c.formula && Math.abs((c.value||0)-(o.ebVals[i]/o.revVals[i]))<1e-4 && c.fmtStyle==='percent' && c.it); });
       // 4) header bold + table boxed
-      const dressed = ['A','B','C','D','E'].every(cc=>cel(cc+3).bold) && (function(){ let ok=true;
-        for(let r=3;r<=3+N;r++) for(const cc of ['A','B','C','D','E']){ if(!cel(cc+r).ball) ok=false; } return ok; })();
+      // r292: the ask is an OUTLINE around the whole table (Alt H B S), not a border on
+      // every cell — verify the perimeter: top row bt, bottom row bb, left col bl, right col br.
+      const dressed = ['A','B','C','D','E'].every(cc=>cel(cc+3).bold) && (function(){ let ok=true; const last=3+N;
+        for(const cc of ['A','B','C','D','E']){ if(!cel(cc+3).bt) ok=false; if(!cel(cc+last).bb) ok=false; }
+        for(let r=3;r<=last;r++){ if(!cel('A'+r).bl) ok=false; if(!cel('E'+r).br) ok=false; } return ok; })();
       // 5) money — top line currency @0-dec, the rows below comma @0-dec
       const money = ['B','C','D'].every(cc=>cel(cc+'4').fmtStyle==='currency' && (cel(cc+'4').decimals|0)===0)
         && (function(){ let ok=true; for(let r=5;r<=3+N;r++) for(const cc of ['B','C','D']){ const x=cel(cc+r); if(x.fmtStyle!=='comma'||(x.decimals|0)!==0) ok=false; } return ok; })();
@@ -3673,7 +3680,7 @@ const CHALLENGES = {
         {label:'COPY the [Segment · Revenue] base whole → paste into the summary (the base stays filed)', ok: copied},
         {label:'CUT the two misfiled columns (EBITDA, Op inc) → paste into their slots (old spots empty)', ok: cutBoth},
         {label:'Margin memo — =EBITDA/Revenue down the column, format % and italic (Ctrl+Shift+%, Ctrl+I)', ok: marginOk},
-        {label:'bold the header row (Ctrl+B) and box the whole table (Alt H B A)', ok: dressed},
+        {label:'bold the header row (Ctrl+B) and outline the whole table (Alt H B S)', ok: dressed},
         {label:'money: the top line in $ (Ctrl+Shift+$), the rows below in commas — 0 decimals', ok: money},
         {label:'figures right-aligned (Alt H A R); segment names centred + underlined (Alt H A C, Ctrl+U)', ok: aligned},
       ];
@@ -8090,7 +8097,7 @@ const MENUS = {
   'HD': [['R','Delete rows'],['C','Delete columns']],
   'HO': [['I','Autofit width'],['A','Autofit height'],['W','Column width\u2026'],['U','Hide & Unhide']],
   'HOU':[['R','Hide rows'],['O','Unhide rows']],
-  'HB': [['T','Top'],['B','Bottom'],['L','Left'],['R','Right'],['A','All'],['I','Inside'],['O','Outside'],['K','Thick box'],['N','No border']],
+  'HB': [['T','Top'],['B','Bottom'],['L','Left'],['R','Right'],['A','All'],['I','Inside'],['S','Outside'],['O','Outside'],['K','Thick box'],['N','No border']],
   'HU': [['S','Sum']],
   'HA': [['L','Left'],['C','Center'],['R','Right'],['N','$ Accounting']],
   'HF': [['C','Font color'],['G','Grow font'],['K','Shrink font'],['I','Fill']],
@@ -9517,8 +9524,9 @@ function applyRibbon(key){
   if(np==='H1'){ pushUndo(); toggleAllOrNone('bold'); return exitRibbon(true); }   // r193: mixed-selection semantics, same as Ctrl+B
   if(np==='H2'){ pushUndo(); toggleAllOrNone('it');   return exitRibbon(true); }
   if(np==='H3'){ pushUndo(); toggleAllOrNone('uline'); return exitRibbon(true); }   // r229: Alt H 3 underline (mirrors Ctrl+U)
-  if(np==='HBO' || np==='HBK'){   /* r193: OUTSIDE border = the PERIMETER of the selection; a 1\u00d71 perimeter IS the classic box (ball).
-                                     r234: THICK BOX (Alt H B K) = the same perimeter, drawn at 2px via the `thick` flag. */
+  if(np==='HBO' || np==='HBK' || np==='HBS'){   /* r193: OUTSIDE border = the PERIMETER of the selection; a 1\u00d71 perimeter IS the classic box (ball).
+                                     r234: THICK BOX (Alt H B K) = the same perimeter, drawn at 2px via the `thick` flag.
+                                     r292: HBS is Excel's real "Outside Borders" access key \u2014 same perimeter box. */
     const r=selRange(); pushUndo(); const thick = np==='HBK';
     if(r.r1===r.r2 && r.c1===r.c2){ const a=ensure(r.r1,r.c1); a.ball=true; if(thick)a.thick=true; return exitRibbon(true); }
     for(let cc=r.c1;cc<=r.c2;cc++){ const t=ensure(r.r1,cc),b=ensure(r.r2,cc); t.bt=true; b.bb=true; if(thick){t.thick=true;b.thick=true;} }
@@ -11972,13 +11980,14 @@ function demoSpotTo(sel, stepN, total, keysLab, instant, watch){
       wt.style.width=(Math.max(r1.right,r2.right)-Math.min(r1.left,r2.left)+6)+'px';
       wt.style.height=(Math.max(r1.bottom,r2.bottom)-Math.min(r1.top,r2.top)+6)+'px';
     } else wt.style.display='none';
-    let capY = (B+12+44>window.innerHeight) ? (T-46) : (B+12);
-    try{ // dodge the fx-hint popup — it pops under the cell on formula steps
-      const fh=document.querySelector('.fx-hint');
-      if(fh && fh.offsetParent){ const fr=fh.getBoundingClientRect();
-        if(capY<fr.bottom && capY+44>fr.top) capY=fr.bottom+8; }
-    }catch(e){}
-    cap.style.left=Math.max(10,L)+'px'; cap.style.top=capY+'px';
+    /* r292 (Wolf): the caption used to sit right under the spotlight and could cover the
+       very cells you're watching. Pin it to a fixed bottom-center status strip instead —
+       the ring already shows WHERE; the caption only needs to say the step + chord, and it
+       never blocks the grid. Nudges above the sheet-tab strip if that's on screen. */
+    let capBottom = 74;
+    try{ const st=document.getElementById('sheetTabs'); if(st && st.offsetParent){ capBottom = Math.max(74, window.innerHeight - st.getBoundingClientRect().top + 12); } }catch(e){}
+    cap.style.left='50%'; cap.style.right='auto'; cap.style.top='auto';
+    cap.style.transform='translateX(-50%)'; cap.style.bottom=capBottom+'px';
   }catch(e){}
 }
 function demoSpotSync(){ if(demoSpotCur){ const c=demoSpotCur; demoSpotTo(c.sel, c.stepN, c.total, c.keys, true, c.watch); } }
@@ -12014,7 +12023,7 @@ async function playDemo(){
   if(kf) kf.classList.remove('demo');
   demoPlaying=false; updateDemoBtn();
   loadChallenge(cur);
-  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — or <b>⌨ follow along</b> to walk the steps yourself'; }
+  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — or <b>⌨ learn mode</b> to walk the steps yourself'; }
 }
 $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():(echoOn?echoStop():playDemo()); });
 
@@ -12030,7 +12039,7 @@ $('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():(echoOn?ech
    the replay/parity suites and watch mode out of its way.
    ============================================================ */
 function updateEchoBtn(){ const b=$('echoBtn'); if(b){ b.classList.toggle('on',echoOn);
-  b.innerHTML=echoOn?'<kbd>esc</kbd> stop':'⌨ follow along'; } }
+  b.innerHTML=echoOn?'<kbd>esc</kbd> stop':'⌨ learn mode'; } }
 function echoAbort(){ if(!echoOn) return; echoOn=false; echoState=null;
   try{ demoSpotOff(); updateEchoBtn(); const kf=$('keyflash'); if(kf) kf.classList.remove('demo'); }catch(e){} }
 function echoStop(){ if(!echoOn) return;
@@ -12052,7 +12061,7 @@ function echoStart(){
   try{ ev('echo_start',{d:cur}); }catch(e){}
   updateEchoBtn();
   const kf=$('keyflash'); if(kf) kf.classList.add('demo');
-  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⌨ follow along — press each highlighted chord yourself · <kbd>esc</kbd> bails'; }
+  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⌨ learn mode — press each highlighted chord yourself · <kbd>esc</kbd> bails'; }
   setTimeout(echoStep,150);
 }
 function echoDone(){
@@ -12138,7 +12147,7 @@ setInterval(()=>{ try{
   if(nowOk>window.__stkBase){ window.__stkDone=true; return; }   // they're moving — never interrupt
   if(Date.now()-(window.__stkT||0) < 40000) return;
   window.__stkDone=true;
-  showToast('stuck? \u25b6 watch solution plays the line \u2014 \u2328 follow along walks you through it');
+  showToast('stuck? \u25b6 watch solution plays the line \u2014 \u2328 learn mode walks you through it');
   ['demoBtn','echoBtn'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
     setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); } });
   try{ ev('stuck_nudge',{d:cur}); }catch(e){}
@@ -13807,19 +13816,28 @@ function showKeyboard(after){
   const macGuess=HK_MAC;
   m.innerHTML='<div class="ob-card" style="max-width:470px">'+
     '<div class="ob-title">first — what keyboard are you on?</div>'+
-    '<div class="ob-body" style="font-size:12.5px">Keycaps and shortcuts render for your machine. Same drills, same boards either way.</div>'+
+    '<div class="ob-body" style="font-size:12.5px">Keycaps and shortcuts render for your machine. Same drills either way. <span style="color:var(--faint)">↑↓ to choose · ↵ to confirm</span></div>'+
     '<div class="ob-opts" style="flex-direction:column;gap:8px;align-items:stretch">'+
-      '<button class="ob-key'+(macGuess?'':' primary')+'" data-kb="win" style="text-align:left"><b>⊞ Windows</b> — Ctrl chords, Alt ribbon walks'+(macGuess?'':' <span style="color:var(--faint);font-size:10px">(detected)</span>')+' <kbd class="ob-kbd">1</kbd></button>'+
-      '<button class="ob-key'+(macGuess?' primary':'')+'" data-kb="mac" style="text-align:left"><b>⌘ Mac</b> — ⌘ chords, ⌥ ribbon walks (KeyTips)'+(macGuess?' <span style="color:var(--faint);font-size:10px">(detected)</span>':'')+' <kbd class="ob-kbd">2</kbd></button>'+
+      '<button class="ob-key" data-kb="win" style="text-align:left"><b>⊞ Windows</b> — Ctrl chords, Alt ribbon walks'+(macGuess?'':' <span style="color:var(--faint);font-size:10px">(detected)</span>')+' <kbd class="ob-kbd">1</kbd></button>'+
+      '<button class="ob-key" data-kb="mac" style="text-align:left"><b>⌘ Mac</b> — ⌘ chords, ⌥ ribbon walks (KeyTips)'+(macGuess?' <span style="color:var(--faint);font-size:10px">(detected)</span>':'')+' <kbd class="ob-kbd">2</kbd></button>'+
     '</div></div>';
   m.classList.add('show'); window.__introCardOpen=true;
-  const keys=(e)=>{ if(e.key==='1'||e.key==='2'){ e.preventDefault(); e.stopImmediatePropagation(); pick(e.key==='2'); } };
+  // r292: arrow-key + Enter navigation, defaulting to the detected platform
+  const btns=[...m.querySelectorAll('[data-kb]')];
+  let sel=macGuess?1:0;
+  const paint=()=>btns.forEach((b,i)=>b.classList.toggle('focused', i===sel));
+  paint();
+  const keys=(e)=>{
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); e.stopImmediatePropagation(); sel=sel?0:1; paint(); return; }
+    if(e.key==='Enter'){ e.preventDefault(); e.stopImmediatePropagation(); pick(sel===1); return; }
+    if(e.key==='1'||e.key==='2'){ e.preventDefault(); e.stopImmediatePropagation(); pick(e.key==='2'); }
+  };
   const pick=(mac)=>{
     try{ hkSetPlatform(mac); }catch(e){}
     try{ ev('kb_pick',{mac:mac?1:0}); }catch(e){}
     m.classList.remove('show'); window.__introCardOpen=false; document.removeEventListener('keydown', keys, true);
     after(); };
-  m.querySelectorAll('[data-kb]').forEach(b=>{ b.onclick=()=>pick(b.dataset.kb==='mac'); });
+  btns.forEach((b,i)=>{ b.onclick=()=>pick(b.dataset.kb==='mac'); b.onmouseenter=()=>{ sel=i; paint(); }; });
   document.addEventListener('keydown', keys, true);
 }
 function showComfort(after){
@@ -13869,19 +13887,22 @@ function showPrimer(after, i){
   document.addEventListener('keydown', keys, true);
 }
 const TOUR_STEPS=[
-  /* r175 INTERACTIVE INTRO — sell first, explain later. Two DO-IT beats put a
-     real chord under the user's fingers in the first 20 seconds; the why-card
-     justifies the product; only three explanation spotlights survive. */
+  /* r292 INTERACTIVE INTRO — plain, professional, succinct. Two DO-IT beats put a real
+     chord under the fingers in the first 15s; the rest points at the actual controls. */
   {sel:'.gridwrap', cap:'try this', doIt:{key:'ArrowRight',ctrl:true},
-    body:'Your mouse needs ~4 seconds to scroll-and-click across a model. Your keyboard needs ONE press.<br><br><b>Hold <kbd>ctrl</kbd> and tap <kbd>\u2192</kbd></b> \u2014 right now, on this sheet.'},
-  {sel:'.gridwrap', cap:'again \u2014 bigger', doIt:{key:'ArrowDown',ctrl:true,shift:true},
-    body:'The cursor FLEW to the edge of the data. Now grab a whole column of it \u2014 no dragging:<br><br><b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd></b> \u2014 selection to the edge, one chord.'},
-  {sel:null, cap:'why this exists', full:true,
-    body:'That speed is the product.<br><br>\u00b7 Analysts live in Excel <b>6\u201310 hours a day</b> \u2014 a mouse round-trip costs ~2s, a chord costs ~0.3s. Over a model, that\u2019s hours.<br>\u00b7 Seniors <b>read keyboard pace as a signal</b> \u2014 it says you\u2019ve done the reps.<br>\u00b7 Every drill here is a <b>real desk task</b> \u2014 comps, roll-forwards, tie-outs \u2014 graded on the end state, timed like the desk is watching.<br><br>Play it like a ladder game: solve clean, beat par, climb the rank.'},
-  {sel:'.cl-inner',   cap:'your instructions', body:'The <b>checklist</b> is the ask \u2014 an associate\u2019s markup. Every line is an action; green means done. Finish them all and the clock stops.'},
-  {sel:'.drillbar',   cap:'the trainer',   body:'<b>\\</b> opens the drill map \u00b7 <b>Alt+\u2190/\u2192</b> hops drills \u00b7 <b>F1</b> is guided mode \u2014 it walks you key by key when you\u2019re lost \u00b7 <b>Esc</b> never restarts your run.'},
-  {sel:'#navThemes',  cap:'make it yours', body:'Prefer light or dark? <b>Themes</b> live here \u2014 paper-white to Bloomberg-black, and every one keeps a clean Excel sheet you can actually read. Pick one anytime; it saves across sessions.'},
-  {sel:'#authSlot',   cap:'the ladder',    body:'<b>LEVEL</b> is your reps \u2014 every clean solve earns xp. <b>RANK</b> is the competition \u2014 clean, mouseless runs post to per-drill <b>leaderboards</b>, crowns for first. The desk is watching.'},
+    body:'A mouse takes a few seconds to scroll and click across a sheet. The keyboard takes one press.<br><br><b>Hold <kbd>ctrl</kbd> and tap <kbd>→</kbd></b> — right now.'},
+  {sel:'.gridwrap', cap:'again — bigger', doIt:{key:'ArrowDown',ctrl:true,shift:true},
+    body:'The cursor jumped to the edge of the data. Now select a whole column of it, no dragging:<br><br><b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd></b> — one chord.'},
+  {sel:'.cl-inner',   cap:'your checklist', body:'Each drill gives you a <b>checklist</b> on the right. Every line is one action; it turns green when done. Clear them all and the clock stops — any keystroke path that gets there counts.'},
+  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list — <b>↑↓ arrows</b> move, <b>↵</b> loads. Or hop straight with <b>Alt+←/→</b>. <b>Esc</b> never ends your run.'},
+  {sel:'#guideToggle', cap:'stuck? two helpers', body:'<b>Guided mode</b> (this button, or <kbd>F1</kbd>) highlights every key to press — on by default for your first runs. Beside it, <b>watch solution</b> plays the optimal keys, and <b>learn mode</b> hands you the keys one step at a time.'},
+  {sel:'#macBtn',     cap:'your layout', optional:true, body:'On a Mac? This button shows how the keys map (⌘ and ⌥) and how to switch on KeyTips in real Excel. You can flip Windows/Mac anytime.'},
+  {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor so you can race your own time. Toggle it here.'},
+  {sel:'#navThemes',  cap:'make it yours', body:'Light or dark — <b>themes</b> live here, and every one keeps a clean, readable sheet. Pick one anytime; it saves across sessions.'},
+  {sel:'#authSlot',   cap:'save your progress', signedOut:true,
+    body:'You’re playing as a guest. <b>Create a free account</b> to save your progress, post times to the <b>leaderboards</b>, join <b>ranked</b>, and join a <b>team</b>. Takes a few seconds — or keep playing and sign up whenever.'},
+  {sel:'#authSlot',   cap:'the ladder',    signedIn:true,
+    body:'<b>LEVEL</b> is your reps — every clean solve earns xp. <b>RANK</b> is the competition — clean, keyboard-only runs post to per-drill <b>leaderboards</b>, with crowns for first.'},
 ];
 let __tourI=-1, __tourAfter=null;
 function tourShow(i){
@@ -13892,8 +13913,14 @@ function tourShow(i){
     const f=__tourAfter; __tourAfter=null; if(f) setTimeout(f, 350); return; }
   __tourI=i;
   const st=TOUR_STEPS[i];
+  // r292: audience-gated steps — the account step differs signed-in vs signed-out;
+  // optional steps (mac button, ghost) skip when their control isn't on screen.
+  const signedIn = !!(me_user && !isAnonUser());
+  if(st.signedIn && !signedIn){ tourShow(i+1); return; }
+  if(st.signedOut && signedIn){ tourShow(i+1); return; }
   const el=st.sel?document.querySelector(st.sel):null;
   if(st.sel && !el){ tourShow(i+1); return; }
+  if(st.optional && el){ const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden'){ tourShow(i+1); return; } }
   w.classList.add('on');
   if(st.full){
     ring.style.width='0px'; ring.style.height='0px'; ring.style.left='-20px'; ring.style.top='-20px';
@@ -13910,7 +13937,7 @@ function tourShow(i){
   card.innerHTML='<div class="tour-cap"><span>'+st.cap+'</span><span style="color:var(--faint)">'+(i+1)+' / '+TOUR_STEPS.length+'</span></div>'+
     '<div class="tour-body">'+st.body+'</div>'+
     (st.doIt?'<div class="tour-body" id="tourDo" style="color:var(--accent);font-weight:600">\u25b8 press it \u2014 the sheet is live</div>':'')+
-    '<div class="tour-foot"><span class="tour-next" id="tourNext">'+(i===TOUR_STEPS.length-1?'start drilling':(st.doIt?'skip this one \u00b7 \u21b5':'next \u00b7 \u21b5'))+'</span><span class="tour-skip" id="tourSkip">skip tour \u00b7 esc</span></div>';
+    '<div class="tour-foot"><span class="tour-next" id="tourNext">'+(i===TOUR_STEPS.length-1?'start drilling':'next \u00b7 \u21b5')+'</span><span class="tour-skip" id="tourSkip">skip tour \u00b7 esc</span></div>';
   const nx=$('tourNext'); if(nx) nx.onclick=()=>tourShow(__tourI+1);
   const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(TOUR_STEPS.length);
 }
