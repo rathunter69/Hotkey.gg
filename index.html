@@ -8646,6 +8646,26 @@ function _showResults(o){
   }
   const flowRow=(o.combo && o.combo>=8)
     ? `<div class="rm-nearmiss" style="color:var(--muted)">🔥 ${o.combo}-key flow streak <span>— you were locked in</span></div>` : '';
+  /* r293 (Wolf): TIME SAVED — per-run vs your first try on this drill + lifetime bank,
+     same first-vs-best methodology as the desk report and the stats lead tile */
+  let savedRow='';
+  try{
+    const rl=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]');
+    const ms=Math.round(parseFloat(o.t)*1000);
+    const firstBy={}, bestBy={};
+    rl.forEach(r=>{ if(!r.d) return; if(firstBy[r.d]===undefined) firstBy[r.d]=r.time_ms;
+      if(bestBy[r.d]===undefined||r.time_ms<bestBy[r.d]) bestBy[r.d]=r.time_ms; });
+    if(bestBy[cur]===undefined||ms<bestBy[cur]) bestBy[cur]=ms;
+    if(firstBy[cur]===undefined) firstBy[cur]=ms;
+    let life=0; Object.keys(firstBy).forEach(d=>{ const s=firstBy[d]-bestBy[d]; if(s>0) life+=s; });
+    const dThis=firstBy[cur]-ms;
+    const lifeTxt=life<=0?'':(life<60000?(life/1000).toFixed(0)+'s':(life<3600000?Math.round(life/60000)+'m':Math.floor(life/3600000)+'h '+Math.round((life%3600000)/60000)+'m'));
+    if(dThis>400 || life>0){
+      savedRow='<div class="rm-nearmiss" style="color:var(--muted)">\u23f1 '+
+        (dThis>400?('<b style="color:var(--accent)">'+(dThis/1000).toFixed(1)+'s faster</b> than your first try'):'time banked')+
+        (lifeTxt?' <span>\u00b7 '+lifeTxt+' banked lifetime</span>':'')+'</div>';
+    }
+  }catch(e){}
   /* r293 (Wolf): SLIM CARD — the hero is the time + ONE hook + the next action.
      Keys/band/stalls/boards fold behind a d-toggle so the loop stays fast. */
   m.innerHTML=`<div class="rm-card">`+
@@ -8656,6 +8676,7 @@ function _showResults(o){
     `<div class="rm-more">`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     _bandRow(o)+
+    savedRow+
     ghostDiff(o)+
     ((CHALLENGES[cur]&&CHALLENGES[cur].aha)?'<div class="rm-aha">\ud83d\udca1 '+CHALLENGES[cur].aha+'</div>':'')+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+

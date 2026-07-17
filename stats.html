@@ -217,9 +217,26 @@ async function load(){
       `<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">${st.crowns} crown${st.crowns===1?'':'s'} \u00b7 ${st.pod} podium${st.pod===1?'':'s'} \u00b7 ${st.att}/${D.menuOrder.length} boards</div>`+
       `<div class="yc-next" style="margin-top:auto">defend them on <a href="leaderboard.html" style="color:var(--accent)">the boards \u2192</a> \u00b7 <a href="account.html" style="color:var(--accent)">account \u2192</a></div></div>`;
   }
+  /* r293 (Wolf): TIME SAVED — the professional's core metric, same methodology as the
+     desk report: your first recorded time vs your current best on each re-drilled task,
+     summed. Server runs when signed in (created_at ordering), local history otherwise. */
+  let savedMs=0;
+  try{
+    const firstBy={}, bestBy={};
+    let src2=[];
+    if(mine.length){ src2=mine.slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).map(r=>({d:r.challenge, t:r.time_ms})); }
+    else{ src2=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]').map(r=>({d:r.d, t:r.time_ms})).filter(r=>r.d); }
+    src2.forEach(r=>{ if(firstBy[r.d]===undefined) firstBy[r.d]=r.t;
+      if(bestBy[r.d]===undefined||r.t<bestBy[r.d]) bestBy[r.d]=r.t; });
+    Object.keys(firstBy).forEach(d=>{ const s=firstBy[d]-bestBy[d]; if(s>0) savedMs+=s; });
+  }catch(e){}
+  const savedTxt = savedMs<=0 ? '\u2014'
+    : savedMs<60000 ? (savedMs/1000).toFixed(0)+'<em>s</em>'
+    : savedMs<3600000 ? Math.round(savedMs/60000)+'<em>m</em>'
+    : Math.floor(savedMs/3600000)+'<em>h</em> '+Math.round((savedMs%3600000)/60000)+'<em>m</em>';
   let html = `<div class="hero${tcHtml?'':' solo'}">` + tcHtml + `<div class="cards">
-    <div class="stat lead"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
-    <div class="stat"><div class="big">${bestKps?bestKps.toFixed(1):'—'}</div><div class="lbl">peak keys / sec</div></div>
+    <div class="stat lead"><div class="big">\u23f1 ${savedTxt}</div><div class="lbl">time banked \u2014 first try vs best</div></div>
+    <div class="stat"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
     <div class="stat"><div class="big">${avgEff!==null?avgEff+'<em>%</em>':'—'}</div><div class="lbl">avg keys vs optimal path</div></div>
     <div class="stat"><div class="big">${streakN?'🔥 '+streakN:'—'}</div><div class="lbl">day streak</div></div>
   </div></div>`;
