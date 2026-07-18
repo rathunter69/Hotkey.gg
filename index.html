@@ -9338,7 +9338,39 @@ function recalc(){
     if(!changed) break;
   }
 }
-function commitAction(){ recalc(); if(typeof S!=='undefined' && S && S.markCrit) syncMarks(); render(); checkWin(); }
+/* r318 (Wolf) — GUIDED ON RAILS. In guided mode, place the cursor on the current step's target
+   as each step is cleared, so a beginner always starts the next action in the right spot. Two hard
+   safety rails so it can NEVER break a drill:
+   1. railSafe(): skip any drill whose GRADING depends on the cursor (navigation/cursor drills) —
+      moving the cursor there would auto-complete or corrupt them. Auto-detected + cached.
+   2. Only reposition at STEP TRANSITIONS (the first-unmet target changed) and only when no live
+      selection — so free navigation WITHIN a step (e.g. going to a copy source) is never yanked. */
+function railSafe(C){
+  if(C._railSafe!==undefined) return C._railSafe;
+  // Skip any drill whose GRADER reads the cursor (navigation/cursor drills) — repositioning would
+  // corrupt or auto-complete them. A dynamic probe misses these: a cursor check like
+  // `allFixed && … && S.active.r===1` short-circuits false while the drill is unfinished, so moving
+  // the cursor changes nothing until the very end. A static scan of the checks source is reliable —
+  // cursor grading MUST happen in checks() at grade time, so it always references S.active there.
+  try{ C._railSafe = !/S\.active/.test(String(C.checks)); }
+  catch(e){ C._railSafe=false; }
+  return C._railSafe;
+}
+function railToTarget(){
+  if(!guided || demoPlaying || echoOn || editing || done || sandboxMode || !S) return false;
+  const C=CHALLENGES[cur]; if(!C||!C.targets) return false;
+  if(S.sel) return false;                       // never yank a live selection (range in progress)
+  if(!railSafe(C)) return false;                // never rail cursor/navigation drills
+  const gt=currentTargetRange(); if(!gt) return false;
+  const sig=cur+':'+gt.r1+','+gt.c1+':'+gt.r2+','+gt.c2;
+  if(S._railSig===sig) return false;            // already placed for this step
+  S._railSig=sig;
+  const inside=S.active.r>=gt.r1&&S.active.r<=gt.r2&&S.active.c>=gt.c1&&S.active.c<=gt.c2;
+  if(inside) return false;                      // already on the target — leave them be
+  S.active={r:gt.r1, c:gt.c1}; S.sel=null;
+  return true;
+}
+function commitAction(){ recalc(); if(typeof S!=='undefined' && S && S.markCrit) syncMarks(); render(); checkWin(); if(railToTarget()) render(); }
 
 function translateFormula(f, dr, dc){
   /* r154 EXCEL PARITY: rows clamped at the STATIC ROWS_MAX (14) even when the live
@@ -11127,7 +11159,7 @@ function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn();
   if(!guided){ try{ sessionStorage.setItem('hk_guided_off','1'); }catch(e){} }   // r159: respect an explicit F1-off — training wheels stay off this session
   try{ document.body.classList.toggle('guided-on', guided); }catch(e){}   // r93: the whole frame says so
-  if(S) render();
+  if(S){ if(guided){ S._railSig=null; railToTarget(); } render(); }   // r318: turning guided ON places the cursor on the current step's target
   if(gameMode==='rapidfire' && rfTask) renderRfCard('show');
   else if(!S) updateChecklist();
 }
