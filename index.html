@@ -283,7 +283,12 @@
   @keyframes echoShake{25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}}
   .mb-tool.nudge{animation:hkNudge 1.1s ease-in-out 5; border-color:var(--accent)}
   @keyframes hkNudge{50%{box-shadow:0 0 0 5px var(--accent-glow)}}
-  td.ttarget{outline:1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); outline-offset:-2px}
+  /* r317 (Wolf): the "act here" target zone (paste destination, edit target, …) was a barely-there
+     faint dashed line with guided off — you couldn't tell WHERE the block goes. Now a clear dashed
+     accent frame + faint fill so the target reads in every mode. The range's outer edges carry the
+     frame so a multi-cell paste footprint reads as one zone. */
+  td.ttarget{outline:2px dashed color-mix(in srgb, var(--accent) 78%, transparent); outline-offset:-2px;
+    background:color-mix(in srgb, var(--accent) 9%, transparent)}
   /* r163: GHOST CURSOR - your PB run gliding through its recorded path. Warn-dashed
      so it reads apart from selection (accent) and ink borders; never catches input. */
   #ghostCur{position:absolute; pointer-events:none; z-index:4; display:none;
@@ -314,8 +319,8 @@
   td.sel-r{border-right:1.5px solid var(--cell-cursor)}
   /* r312/r313 (Wolf): the fill-handle square at the current cell's bottom-right. Sits just inside
      the corner (no protruding box-shadow — that was clipped by the cell's overflow:hidden). */
-  td.fh::after{content:''; position:absolute; right:1px; bottom:1px; width:6px; height:6px;
-    background:var(--cell-cursor); border:1px solid var(--surface); z-index:6}
+  td.fh::after{content:''; position:absolute; right:0; bottom:0; width:6px; height:6px;
+    background:var(--cell-cursor); z-index:6}   /* r317 (Wolf): flush + tight in the corner, Excel-style — no inset, no ring */
   td.editing.fh::after, td.point.fh::after{display:none}   /* no handle mid-edit / while pointing */
   @keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
   td.pasted{animation:pasteflash .5s ease-out}
