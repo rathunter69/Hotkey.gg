@@ -305,13 +305,17 @@
 }
   /* ===== r270: GUILD BOARD (deskless view) + STAFFER MANAGE SCREEN ===== */
   /* r293 (Wolf): the guild board is ONE tile + arrows now — compact, no wall of cards */
+  /* r316 (Wolf): 3-across sliding track (was one tile) — fills the width, animates on scroll */
   .gb-caro{display:flex; align-items:center; gap:12px}
-  .gb-stage{flex:1; min-width:0; max-width:430px}
-  .gb-stage .gb-card{display:none}
-  .gb-stage .gb-card.cur{display:block}
+  .gb-stage{flex:1; min-width:0; overflow:hidden}
+  .gb-track{display:flex; gap:12px; transition:transform .38s cubic-bezier(.22,.61,.36,1); will-change:transform}
+  .gb-track .gb-card{flex:0 0 calc((100% - 24px)/3); box-sizing:border-box}
+  @media (max-width:980px){ .gb-track .gb-card{flex-basis:calc((100% - 12px)/2)} }
+  @media (max-width:720px){ .gb-track .gb-card{flex-basis:100%} }
   .gb-arrow{font-family:var(--mono); font-size:20px; line-height:1; color:var(--muted); background:var(--surface);
     border:1px solid var(--line); border-radius:10px; padding:9px 14px; cursor:pointer; flex:none}
   .gb-arrow:hover{color:var(--text); border-color:var(--faint)}
+  .gb-arrow:disabled{opacity:.3; cursor:default}
   .gb-count{font-family:var(--mono); font-size:11px; color:var(--faint); flex:none; min-width:52px}
   /* r293: WSO-style desk grade chips — S warm, A accent, B blue, C muted */
   .dk-grade{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.06em;
@@ -336,13 +340,21 @@
     background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:6px 9px}
   .gb-note .gb-notein:focus{border-color:var(--accent-dim); outline:none}
   .gb-note .tab{font-size:10.5px; padding:5px 11px; white-space:nowrap}
-  .gb-start{display:flex; gap:9px; align-items:center; flex-wrap:wrap; font-family:var(--mono); font-size:12px;
-    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px}
+  /* r316 (Wolf): invite-code first (primary), start-a-desk demoted to a quieter second line */
+  .gb-start{display:flex; flex-direction:column; gap:10px; font-family:var(--mono); font-size:12px;
+    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:13px 15px}
   .gb-start input{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:8px; padding:7px 10px}
   .gb-start input:focus{border-color:var(--accent-dim); outline:none}
-  .gb-start #gbName{flex:1; min-width:210px}
-  .gb-start #gbCode{width:140px}
+  .gb-join{display:flex; gap:9px; align-items:center; flex-wrap:wrap}
+  .gb-join-l{color:var(--text); font-weight:600}
+  .gb-join #gbCode{flex:1; min-width:150px; max-width:230px; letter-spacing:.5px}
+  .gb-found{display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding-top:9px;
+    border-top:1px solid var(--line); font-size:11.5px}
+  .gb-found-l{color:var(--muted)}
+  .gb-found #gbName{flex:1; min-width:190px}
+  .gb-found #gbName{font-size:11.5px; padding:6px 9px}
+  .gb-found .tab{font-size:11px}
   .gb-or{color:var(--faint)}
   .gb-msg{font-family:var(--mono); font-size:11px}
   .mg-app{display:flex; gap:10px; align-items:center; font-family:var(--mono); font-size:12.5px;

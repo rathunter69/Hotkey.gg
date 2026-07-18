@@ -810,17 +810,24 @@ function guildHtml(){
   const startRow = DATA.meId
     ? (window.__meAnon
       ? '<div class="gb-start" style="color:var(--muted)">Desks need a full account \u2014 <a href="account.html" style="color:var(--accent)">add an email &amp; password</a> and your progress comes with you.</div>'
-      : '<div class="gb-start"><input id="gbName" maxlength="40" placeholder="start a desk \u2014 name it (e.g. Wharton UG Finance)"><button class="tab on" id="gbCreate">start a desk</button>'+
-        '<span class="gb-or">or</span><input id="gbCode" maxlength="12" placeholder="invite code"><button class="tab" id="gbJoin">join</button><span class="gb-msg" id="gbMsg"></span></div>')
+      : '<div class="gb-start">'+
+          /* r316 (Wolf): invite code is the PRIMARY action \u2014 most people join, they don\u2019t found.
+             Starting a desk is demoted to a quieter secondary line so the page stops pushing it. */
+          '<div class="gb-join"><span class="gb-join-l">Got an invite code?</span>'+
+            '<input id="gbCode" maxlength="12" placeholder="paste it here"><button class="tab on" id="gbJoin">join desk</button>'+
+            '<span class="gb-msg" id="gbMsg"></span></div>'+
+          '<div class="gb-found"><span class="gb-found-l">or start your own \u2014</span>'+
+            '<input id="gbName" maxlength="40" placeholder="desk name (e.g. Wharton UG Finance)"><button class="tab" id="gbCreate">start a desk</button></div>'+
+        '</div>')
     : '<div class="gb-start" style="color:var(--muted)"><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</div>';
   /* r293 (Wolf): ONE tile + arrows instead of a full grid, tight header, no explainer */
   /* r297: with ZERO desks the carousel used to render two stranded arrows around an empty
      stage \u2014 now the empty state is a single centered line and the chrome stays hidden */
   const caro = cardHtml
-    ? '<div class="gb-caro" style="grid-column:1/-1">'+
-        '<button class="gb-arrow" id="gbPrev" aria-label="previous desk">\u2039</button>'+
-        '<div class="gb-stage" id="gbStage">'+cardHtml+'</div>'+
-        '<button class="gb-arrow" id="gbNext" aria-label="next desk">\u203a</button>'+
+    ? '<div class="gb-caro" style="grid-column:1/-1">'+   /* r316 (Wolf): 3-across sliding track, fills the width */
+        '<button class="gb-arrow" id="gbPrev" aria-label="previous desks">\u2039</button>'+
+        '<div class="gb-stage" id="gbStage"><div class="gb-track" id="gbTrack">'+cardHtml+'</div></div>'+
+        '<button class="gb-arrow" id="gbNext" aria-label="next desks">\u203a</button>'+
         '<span class="gb-count" id="gbCount"></span>'+
       '</div>'
     : '<div style="grid-column:1/-1; text-align:center; padding:26px 0; font-family:var(--mono); font-size:12.5px; color:var(--muted)">no desks yet \u2014 start one below</div>';
@@ -829,16 +836,31 @@ function guildHtml(){
 }
 function wireGuild(){
   const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--warn)':'var(--accent)'; } };
-  // r293: one-tile carousel — arrows walk the listings, counter shows where you are
-  { const stage=document.getElementById('gbStage');
-    if(stage){
-      const cards=[...stage.querySelectorAll('.gb-card')];
+  // r316 (Wolf): 3-across sliding carousel — arrows scroll the track one desk at a time with a
+  // smooth transform; counter shows the visible window; arrows disable at the ends.
+  { const track=document.getElementById('gbTrack');
+    if(track){
+      const cards=[...track.querySelectorAll('.gb-card')];
+      const pv=document.getElementById('gbPrev'), nx=document.getElementById('gbNext'), ct=document.getElementById('gbCount');
+      const perView=()=> window.innerWidth<=720 ? 1 : (window.innerWidth<=980 ? 2 : 3);
       let gi=0;
-      const show=()=>{ cards.forEach((c,i)=>c.classList.toggle('cur', i===gi));
-        const ct=document.getElementById('gbCount'); if(ct) ct.textContent=cards.length?((gi+1)+' / '+cards.length):'no desks yet'; };
-      const pv=document.getElementById('gbPrev'), nx=document.getElementById('gbNext');
-      if(pv) pv.onclick=()=>{ if(cards.length){ gi=(gi-1+cards.length)%cards.length; show(); } };
-      if(nx) nx.onclick=()=>{ if(cards.length){ gi=(gi+1)%cards.length; show(); } };
+      const maxGi=()=>Math.max(0, cards.length - perView());
+      const show=()=>{
+        gi=Math.max(0, Math.min(gi, maxGi()));
+        const first=cards[0];
+        const step=first ? (first.getBoundingClientRect().width + 12) : 0;   // card width + gap
+        track.style.transform='translateX('+(-gi*step)+'px)';
+        if(ct){ const end=Math.min(cards.length, gi+perView()); ct.textContent=cards.length?((gi+1)+(end>gi+1?'–'+end:'')+' / '+cards.length):'no desks yet'; }
+        const atStart=gi<=0, atEnd=gi>=maxGi();
+        if(pv){ pv.disabled=atStart; }
+        if(nx){ nx.disabled=atEnd; }
+        const solo=cards.length<=perView();
+        if(pv) pv.style.display=solo?'none':'';
+        if(nx) nx.style.display=solo?'none':'';
+      };
+      if(pv) pv.onclick=()=>{ gi-=1; show(); };
+      if(nx) nx.onclick=()=>{ gi+=1; show(); };
+      let rz; window.addEventListener('resize', ()=>{ clearTimeout(rz); rz=setTimeout(show, 120); });
       show();
     } }
   document.querySelectorAll('.gb-apply').forEach(b=>b.onclick=()=>{
