@@ -887,12 +887,10 @@
   .mb-tool.mb-daily:hover{color:var(--accent); border-color:var(--accent)}
   /* r302/r306 (Wolf): unplayed daily = ACCENT chip (the one thing worth highlighting);
      it reverts to a normal chip once today's sitting is done. Dot cue kept, in ink color. */
-  .mb-tool.mb-daily.undone{position:relative; background:var(--accent); border-color:var(--accent);
+  /* r326 (Wolf): the whole chip going accent IS the "unplayed today" cue — the extra pulsing
+     corner dot read as a weird little circle on approach/click, so it's gone. */
+  .mb-tool.mb-daily.undone{background:var(--accent); border-color:var(--accent);
     color:var(--on-accent,#0c0d0e); font-weight:700}
-  .mb-tool.mb-daily.undone::after{background:currentColor}
-  .mb-tool.mb-daily.undone::after{content:''; position:absolute; top:4px; right:5px; width:6px; height:6px;
-    border-radius:50%; background:var(--accent); animation:dcdot 2.4s ease-in-out infinite}
-  @keyframes dcdot{0%,100%{opacity:.35}50%{opacity:1}}
   .mb-tool.mb-daily.done::after{content:' ✓'; opacity:.85}
   /* Daily Challenge hero modal */
   .dc-card{max-width:640px; width:94vw; text-align:left; position:relative}
