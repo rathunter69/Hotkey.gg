@@ -552,6 +552,12 @@ window.HK_RANK = {
     const pos = Math.min(1, Math.max(0, (avgPct-lo)/span));  // 0 = best in band
     t.bucket = pos<=1/3 ? 'Top Bucket' : (pos<=2/3 ? 'Middle Bucket' : 'Bottom Bucket');
     t.full = t.name+' \u00b7 '+t.bucket+(provisional?' \u00b7 provisional':'');
+    // r321 (Wolf) \u2014 LP-style progression transparency. Model-safe: no points system, just how far
+    // the live avgPct sits across THIS tier's band. promote = 0..1 toward the next tier's gate.
+    t.pos = pos;                                             // 0 = best in band (at the promotion line)
+    t.promote = t.i+1 < T.length ? Math.round((1-pos)*100) : 100;   // % of the way to the next tier
+    t.nextName = t.i+1 < T.length ? T[t.i+1].name : null;   // null at the summit
+    t.provisional = provisional;
     return t;
   },
   /* r151: THE CANONICAL LEVEL CURVE — six drifted copies (nav.js, leaderboard,
