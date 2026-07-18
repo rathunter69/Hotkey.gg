@@ -876,6 +876,10 @@
   .mb-tool.mb-rapid.on{color:#fff; border-color:var(--h); background:var(--h)}
   .mb-tool kbd{font-family:var(--mono); background:var(--surface2); border:1px solid var(--line);
     border-radius:3px; padding:0 4px; font-size:10px; margin-right:4px; color:inherit}
+  /* r320 (Wolf): icon sweep — line-icon SVGs (matching the top-nav language) replace the color
+     emoji in the mode bar, so the button row reads as one system with the header. currentColor
+     lets each icon inherit its button's tint (campaign blue, rapid amber, …). */
+  .mb-tool .mb-ico{width:13px; height:13px; vertical-align:-2px; margin-right:4px; flex:none; display:inline-block}
   /* r219 (Wolf): the Daily Challenge is the marquee mode — its chip carries the accent
      so it reads as the front door, and a soft pulse when today's sitting is unplayed. */
   .mb-tool.mb-daily{color:var(--accent); font-weight:700; border-color:var(--accent-dim); background:var(--accent-glow);
@@ -1482,9 +1486,9 @@
       <!-- r306 (Wolf): modes → helpers → flair → settings, weight ∝ usage. Classic chip and
            random retired (the drill menu covers both); rapid-fire downweighted to a normal chip. -->
       <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily</button>
-      <button class="mb-tool mb-campaign" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges">📈 campaign</button>
+      <button class="mb-tool mb-campaign" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-6"/></svg>campaign</button>
       <div class="mb-mode-wrap">
-        <button class="mb-tool mb-rapid" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true">⚡ rapid-fire<span class="caret">▾</span></button>
+        <button class="mb-tool mb-rapid" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>rapid-fire<span class="caret">▾</span></button>
         <div class="mb-popover" id="mbRapidPop">
           <div class="mb-deckrow">
             <button class="mb-deck selected" data-deck="all">all chords</button>
@@ -1503,7 +1507,7 @@
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
       <span class="mb-tool" id="proBadge" style="display:none; cursor:default; color:var(--warn); font-weight:700; border-color:var(--warn)"></span>
       <span id="kbSlot" style="display:inline-flex"></span>
-      <button class="mb-tool" id="ghostToggle" data-tip="◆ PRO — race a live ghost of your PB run · pace counter is free · click to toggle">👻 ghost: on</button>
+      <button class="mb-tool" id="ghostToggle" data-tip="◆ PRO — race a live ghost of your PB run · pace counter is free · click to toggle"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V10a7 7 0 0 1 14 0v11l-3-2-2 2-2-2-2 2-3-2Z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>ghost: on</button>
       <span style="position:relative; display:inline-flex">
         <button class="mb-tool" id="gearBtn" title="sound &amp; extras" aria-haspopup="true">⚙</button>
         <div class="prefs-pop" id="gearPop" style="min-width:220px; flex-direction:column; gap:4px"></div>
@@ -8671,7 +8675,8 @@ function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').tex
 let ghostPB=null, ghostTrace=null;
 let ghostOn=false;   // r206: Wolf — the cursor ghost reads as distracting; now OPT-IN (default off), toggle in the toolbar
 async function loadGhostPref(){ try{ const v=await KV.get('hotkey_ghost'); if(v!=null&&v!=='') ghostOn=(v==='1'); }catch(e){} updateGhostBtn(); }
-function updateGhostBtn(){ const b=$('ghostToggle'); if(b){ b.classList.toggle('on',ghostOn); b.textContent='\ud83d\udc7b ghost: '+(ghostOn?'on':'off'); } }
+const GHOST_ICO='<svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V10a7 7 0 0 1 14 0v11l-3-2-2 2-2-2-2 2-3-2Z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>';
+function updateGhostBtn(){ const b=$('ghostToggle'); if(b){ b.classList.toggle('on',ghostOn); b.innerHTML=GHOST_ICO+'ghost: '+(ghostOn?'on':'off'); } }   /* r320: line icon, not the emoji \u2014 innerHTML keeps the SVG */
 function toggleGhost(){ ghostOn=!ghostOn; KV.set('hotkey_ghost',ghostOn?'1':'0'); updateGhostBtn();
   if(!ghostOn){ hideGhostCur(); const el=$('ghostDelta'); if(el) el.style.display='none'; }
   else if(S) armGhost(); }
