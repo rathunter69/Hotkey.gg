@@ -11379,14 +11379,22 @@ function highlightPk(){ const rows=pkRows(); rows.forEach((r,i)=>r.classList.tog
   } }catch(e){}
 }
 /* r147: movePkDir retired — the tree is linear; \u2190/\u2192 fold/unfold instead */
-function openPicker(){ if(demoPlaying) return; buildSheetTabs();
+function openPicker(){ if(demoPlaying) return;
+  // r319 (Wolf): open AT the current drill. If its group is collapsed the row is .hidden and the
+  // picker fell back to the folder — so expand the current drill's group first, then focus + CENTER
+  // the row (other groups keep their fold state).
+  try{ const g=GROUP_OF[cur]; if(g){ let f=JSON.parse(localStorage.getItem('hk_pk_folds')||'[]');
+    if(Array.isArray(f)&&f.includes(g)){ f=f.filter(x=>x!==g); localStorage.setItem('hk_pk_folds', JSON.stringify(f)); } } }catch(e){}
+  buildSheetTabs();
   // r146: the r83 stage-top alignment is RETIRED (Wolf: center it) — margin:auto on
   // .pk-card centers overflow-safe; the inline paddingTop was fighting it.
   try{ const p=$('picker'); if(p) p.style.paddingTop=''; }catch(e){}
   let rows=pkRows(); let i=rows.findIndex(r=>r.dataset.key===cur);
   if(i<0){ const g=GROUP_OF[cur]; i=rows.findIndex(r=>r.classList.contains('pk-folder')&&r.dataset.group===g); }
   pkSel=Math.max(0,i);
-  pickerOpen=true; $('picker').classList.add('show'); highlightPk(); }
+  pickerOpen=true; $('picker').classList.add('show'); highlightPk();
+  try{ const rr=pkRows()[pkSel]; if(rr&&rr.scrollIntoView) rr.scrollIntoView({block:'center'}); }catch(e){}   // r319: land the current drill mid-view
+}
 function closePicker(){ pickerOpen=false; const p=$('picker'); if(p) p.classList.remove('show'); }
 function movePk(d){ const rows=pkRows(); if(!rows.length) return;
   pkSel=(pkSel+d+rows.length)%rows.length; highlightPk(); }
