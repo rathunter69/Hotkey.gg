@@ -13564,7 +13564,13 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
     const r=$('result'); if(r){ r.className='result';
       r.innerHTML='🏁 <b>beat '+escHtml(race.by)+'’s '+race.t.toFixed(2)+'s</b> — type to start the race'; }
   }
-  if(onboarded && !race) showWelcomeBack(startKey);
+  // r324 (Wolf/agent): this init() IIFE runs mid-parse (readyState 'loading'), so appending the
+  // welcome-back card to document.body here orphaned it out of the final DOM — the returning-user
+  // "arrival moment" never showed. Defer to a settled body.
+  if(onboarded && !race){
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', ()=>{ try{ showWelcomeBack(startKey); }catch(e){} }, {once:true});
+    else showWelcomeBack(startKey);
+  }
   initAuth().then(()=>{ updateRankPill(); loadEntitlement();
     // r293: account theme lands on devices with no local pick yet (mobile carry) —
     // mirrors nav.js on the secondary pages; an explicit local choice always wins.
@@ -13586,7 +13592,7 @@ function showWelcomeBack(key){
      so this card IS the arrival moment). Dismissal stays passive: the first keydown fades it
      WITHOUT being swallowed, so the key that closes it is already your first rep. If the
      session hasn't restored a moment later, a Log in button surfaces right on the card. */
-  try{ if(sessionStorage.getItem('hk_wb')) return; sessionStorage.setItem('hk_wb','1'); }catch(e){}
+  try{ if(sessionStorage.getItem('hk_wb')) return; }catch(e){}   // r324: set the once-per-session guard AFTER a successful append (below), not before — a lost append used to burn it
   const label = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.labelOf[key]) || key;
   const best = PB[key]!==undefined ? PB[key].toFixed(2)+'s' : null;
   const pbCount = Object.keys(PB).length;
@@ -13606,6 +13612,7 @@ function showWelcomeBack(key){
       '<div class="wb-dfoot"><kbd>\\</kbd> pick a drill \u00b7 <kbd>F1</kbd> guided help \u00b7 any key to start</div>'+
     '</div></div>';
   document.body.appendChild(w);
+  try{ sessionStorage.setItem('hk_wb','1'); }catch(e){}   // r324: guard set only now that the card is really in the DOM
   requestAnimationFrame(()=>w.classList.add('show'));
   let gone=false;
   const hide=()=>{ if(gone) return; gone=true; w.classList.remove('show'); setTimeout(()=>{ try{ w.remove(); }catch(e){} }, 260); };
