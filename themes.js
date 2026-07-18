@@ -18,9 +18,10 @@ window.THEMES = {
     /* r204 (Wolf): softer warm graphite text (not black) + a punchier, more saturated
        accent so menu tabs, nav, and drill headers POP on the paper background. */
     text:'#38352d', muted:'#6b665d', faint:'#a09a8f',
-    /* r322 (Wolf): lighter, fresher green — the r204 #0e9b57 read too dark/heavy on buttons.
-       #19b06a keeps white button text readable while the fills feel lighter across the app. */
-    accent:'#19b06a', 'accent-dim':'#128a52', 'accent-glow':'rgba(25,176,106,.18)',
+    /* r322/r325 (Wolf): a flat, SLIGHTLY lightened green — the r204 #0e9b57 read heavy; r322's
+       #19b06a was a touch too vivid. #14a25c keeps the original's muted character, just lifted,
+       flat solid fill, white button text still readable. */
+    accent:'#14a25c', 'accent-dim':'#0e7a45', 'accent-glow':'rgba(20,162,92,.16)',
     warn:'#9a6700', bad:'#b3261e' }},
   light: { name:'Light', dark:false, vars:{
     bg:'#f7f7f4', surface:'#ffffff', surface2:'#eeeeea', line:'#d8d8d2',
