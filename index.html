@@ -389,6 +389,18 @@
   .ribbon .rgrp:first-of-type{border-left:0; padding-left:2px}
   .ribbon .rgrp-chips{display:inline-flex; gap:5px; flex-wrap:nowrap}
   .ribbon .rgrp-l{font-size:8.5px; letter-spacing:.7px; text-transform:uppercase; color:var(--faint); font-weight:600}
+  /* r327 (Wolf): ICON-ribbon tiles — icon over name, a KeyTip badge in the corner (Excel-real). */
+  .ribbon .rgrp-ico{padding:1px 8px}
+  .ribbon .rgrp-ico .rgrp-chips{gap:2px; align-items:flex-start}
+  .ribbon .ri-cmd{position:relative; display:inline-flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    gap:3px; width:50px; min-height:44px; padding:5px 2px 4px; border-radius:7px; cursor:default; transition:background .1s}
+  .ribbon .ri-cmd:hover{background:var(--surface2)}
+  .ribbon .ri-ico{height:19px; display:flex; align-items:center; justify-content:center; color:var(--text)}
+  .ribbon .ri-ico svg{width:18px; height:18px}
+  .ribbon .ri-g{font-family:var(--mono); font-size:15px; line-height:1; color:var(--text)}
+  .ribbon .ri-name{font-size:8.5px; line-height:1.1; color:var(--muted); text-align:center; max-width:48px}
+  .ribbon .ri-key{position:absolute; top:1px; right:2px; font-family:var(--mono); font-size:8px; font-weight:700;
+    color:var(--on-accent,#0c0d0e); background:var(--accent); border-radius:3px; padding:0 3px; line-height:1.5}
 
   .bar{display:flex; align-items:center; gap:20px; margin-top:16px}
   .ftimer{font-family:var(--mono); font-size:16px; font-weight:700; letter-spacing:-.3px; color:var(--muted);
@@ -8434,6 +8446,35 @@ const RIBBON_GROUPS = {
     ['Editing',   ['U','E']],
   ],
 };
+/* r327 (Wolf): the Home flyout is now an ICON ribbon (Excel-real) — each command draws its own
+   glyph/line-icon with the access key as a KeyTip badge, so Alt+H reads like the real ribbon
+   instead of a wall of text. Pictorial commands get line-icon SVGs (nav-icon language); the
+   typographic ones (Bold/Italic/%/Σ/decimals) get styled glyphs, exactly as Excel does. */
+const _rs='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+const RIBBON_ICONS = {
+  // typographic glyphs (letters/symbols — Excel renders these as glyphs too)
+  '1':'<span class="ri-g" style="font-weight:800">B</span>',                                   // Bold
+  '2':'<span class="ri-g" style="font-style:italic;font-family:Georgia,\'Times New Roman\',serif">I</span>', // Italic
+  'F':'<span class="ri-g" style="font-family:Georgia,serif;letter-spacing:-1px">A<span style="font-size:.62em;vertical-align:2px">a</span></span>', // Font
+  'K':'<span class="ri-g" style="font-size:10.5px;letter-spacing:-.5px">,000</span>',          // Comma style
+  'P':'<span class="ri-g">%</span>',                                                            // Percent
+  '9':'<span class="ri-g" style="font-size:10px;letter-spacing:-.5px">.0<span style="opacity:.4">◂</span></span>', // Dec −
+  '0':'<span class="ri-g" style="font-size:10px;letter-spacing:-.5px">.00<span style="opacity:.65">▸</span></span>', // Dec +
+  'U':'<span class="ri-g" style="font-weight:700">Σ</span>',                                    // AutoSum
+  // line-icon SVGs (pictorial commands)
+  'V':_rs+'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>', // Paste
+  'A':_rs+'<path d="M4 6h16M7 12h10M4 18h16"/></svg>',                                          // Align (center)
+  '5':_rs+'<path d="M20 6H10M20 18H10M20 12h-9"/><path d="M6 9l-3 3 3 3"/></svg>',              // Indent −
+  '6':_rs+'<path d="M20 6H10M20 18H10M20 12h-9"/><path d="M3 9l3 3-3 3"/></svg>',               // Indent +
+  'H':_rs+'<path d="M12 3s6 6.2 6 10a6 6 0 0 1-12 0c0-3.8 6-10 6-10z"/></svg>',                 // Fill (drop)
+  'B':_rs+'<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 12h18M12 3v18"/></svg>',// Borders (grid)
+  'J':_rs+'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>',         // Cell styles
+  'W':_rs+'<path d="M4 6h16M4 12h12a3 3 0 1 1 0 6h-3"/><path d="M16 15l-3 3 3 3"/><path d="M4 18h5"/></svg>', // Wrap
+  'I':_rs+'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>',  // Insert
+  'D':_rs+'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9l6 6M15 9l-6 6"/></svg>', // Delete
+  'O':_rs+'<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M14 4v6h6"/></svg>',       // Format cells
+  'E':_rs+'<path d="M7 21h11"/><path d="M6 15l6-6 7 7-4 4h-5z"/></svg>',                        // Clear (eraser)
+};
 /* r177 FORMAT CELLS (Ctrl+1 / legacy Alt O E) — the desk set. Letters apply
    INSTANTLY (this is a speed trainer): number formats via eachSel; F toggles a
    footnote superscript mark on text cells; A centers the anchor cell ACROSS
@@ -8642,17 +8683,20 @@ function __drawRibbon(){
     const opts=MENUS[key];
     const groups=RIBBON_GROUPS[key];
     if(opts && groups){
-      // r315: draw the flyout as Excel-style labelled groups (chips over a group name, dividers between)
+      // r327: ICON ribbon — each command is an icon tile (KeyTip badge + glyph/line-icon + name),
+      // clustered into Excel's Home groups with a label + divider under each.
       const lblOf={}; opts.forEach(([k,l])=>lblOf[k]=l);
       const used=new Set();
+      const tile=(k)=>{ const ico=RIBBON_ICONS[k]||('<span class="ri-g">'+k.toLowerCase()+'</span>');
+        return `<span class="ri-cmd" title="${lblOf[k]}"><span class="ri-key">${k.toLowerCase()}</span><span class="ri-ico">${ico}</span><span class="ri-name">${lblOf[k]}</span></span>`; };
       groups.forEach(([gname,keys])=>{
-        let chips='';
-        keys.forEach(k=>{ if(lblOf[k]!==undefined){ chips+=`<span class="opt"><k>${k.toLowerCase()}</k>${lblOf[k]}</span>`; used.add(k); } });
-        if(chips) html+=`<span class="rgrp"><span class="rgrp-chips">${chips}</span><span class="rgrp-l">${gname}</span></span>`;
+        let cells='';
+        keys.forEach(k=>{ if(lblOf[k]!==undefined){ cells+=tile(k); used.add(k); } });
+        if(cells) html+=`<span class="rgrp rgrp-ico"><span class="rgrp-chips">${cells}</span><span class="rgrp-l">${gname}</span></span>`;
       });
       const extra=opts.filter(([k])=>!used.has(k));   // safety: anything not grouped rides a trailing cluster
-      if(extra.length){ let c=''; extra.forEach(([k,l])=>c+=`<span class="opt"><k>${k.toLowerCase()}</k>${l}</span>`);
-        html+=`<span class="rgrp"><span class="rgrp-chips">${c}</span><span class="rgrp-l">More</span></span>`; }
+      if(extra.length){ let c=''; extra.forEach(([k])=>c+=tile(k));
+        html+=`<span class="rgrp rgrp-ico"><span class="rgrp-chips">${c}</span><span class="rgrp-l">More</span></span>`; }
     }
     else if(opts) opts.forEach(([k,lbl])=>html+=`<span class="opt"><k>${k.toLowerCase()}</k>${lbl}</span>`);
     else html+='<span class="opt">…</span>';
