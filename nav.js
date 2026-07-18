@@ -687,7 +687,17 @@
           '<span style="display:inline-flex;line-height:0">'+(window.rankEmblem?window.rankEmblem(tier.name,84,tier.bucket):'')+'</span>' +
           '<div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:13px;background:none;box-shadow:none">'+tier.name+'</div>' +
           '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+standing+'</div>' +
-          '<div class="pc-rankhow" style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:4px;cursor:pointer" title="how rank works">rank \u00b7 speed vs the field \u203a</div>' +
+          /* r321 (Wolf): LP-style promotion progress \u2014 a slim bar + "N% to <next tier>", so the
+             climb is legible. Model-safe: promote is just where avgPct sits across this tier's band.
+             Hidden at the summit (no next tier) and while provisional (rank isn't final yet). */
+          ((tier.nextName && !tier.provisional && typeof tier.promote==='number') ?
+            '<div style="width:118px;margin-top:8px">' +
+              '<div style="height:6px;background:var(--surface);border:1px solid var(--line);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+Math.max(3,Math.min(100,tier.promote))+'%;background:var(--accent);border-radius:99px"></div></div>' +
+              '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;margin-top:4px"><b style="color:var(--text)">'+tier.promote+'%</b> to '+escHtml(tier.nextName)+'</div>' +
+            '</div>'
+            : (tier.provisional ? '<div style="font-family:var(--mono);font-size:9px;color:var(--faint);margin-top:8px">placement \u2014 rank locks in as you play</div>'
+            : '<div style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-top:8px">\u265b top of the ladder</div>')) +
+          '<div class="pc-rankhow" style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:6px;cursor:pointer" title="how rank works">rank \u00b7 speed vs the field \u203a</div>' +
         '</div>' +
         '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
           (window.hkLevelRing?window.hkLevelRing(__L.lvl, __L.pct, 84):'') +
