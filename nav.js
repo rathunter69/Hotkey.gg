@@ -960,7 +960,12 @@
         // ({once:true} per-instance listeners kept dying after one inner click — this
         // delegation is permanent and flag-synced.)
         const t=e.target;
-        if(t && t.classList && t.classList.contains('show') &&
+        // r323 (Wolf/agent): the intro keyboard/comfort cards are REQUIRED choices that own their
+        // own lifecycle (pick() clears __introCardOpen + removes the capture keydown listener). A
+        // backdrop-dismiss here only hid the card, leaving the grid keyboard-captured and FROZEN
+        // with nothing on screen. Never backdrop-close them — the click does nothing.
+        const __introCard = window.__introCardOpen || t.id==='kbCard' || t.id==='comfortCard';
+        if(t && t.classList && t.classList.contains('show') && !__introCard &&
            (t.classList.contains('profile-modal') || t.classList.contains('onboard-modal') || /Modal$/.test(t.id||''))){
           t.classList.remove('show');
           if(t.id==='themesModal') themesOpen=false;
