@@ -260,6 +260,9 @@
   td.gtarget{background:var(--accent-glow); z-index:2}
   td.gt-t{border-top:2px solid var(--accent)} td.gt-b{border-bottom:2px solid var(--accent)}
   td.gt-l{border-left:2px solid var(--accent)} td.gt-r{border-right:2px solid var(--accent)}
+  /* r330 (Wolf): guided HARD rails — the cursor is fenced to the lit target, so everything
+     outside it dims back. Reads as "you can only act here"; the fence looks intentional. */
+  td.goff{opacity:.4; transition:opacity .12s ease}
   /* r271 — watch-solution spotlight (default ON; opt out: localStorage hk_demo_spot='0').
      Dim the page, cut a window around the cells the demo is editing, caption the step. */
   #demoSpot{position:fixed; z-index:24; pointer-events:none; display:none;
@@ -8184,6 +8187,9 @@ function render(){
   const g=$('grid'); g.innerHTML='';
   const sr=selRange();
   const gt=currentTargetRange();
+  // r330 (Wolf): in a guided hard-rail drill the cursor is fenced to the lit target, so dim
+  // everything OUTSIDE it — the playable zone reads at a glance and the fence looks deliberate.
+  const hardRail = !!(guided && gt && typeof hardRailSafe==='function' && CHALLENGES[cur] && hardRailSafe(CHALLENGES[cur]) && !editing && !demoPlaying);
   // Color refs ONLY while editing (from editBuf) — exactly like Excel, which colors a
   // formula's precedents when you're IN the cell (F2/double-click), NOT on plain selection.
   // r206 (Wolf): the passive "select a formula → light up its inputs" overlay hid where the
@@ -8223,6 +8229,7 @@ function render(){
         // r329: the target draws as ONE outer frame around the whole zone (the paste footprint),
         // not a box per cell — tag the range's edge cells so the border rides the perimeter.
         if(r===gt.r1)cls.push('gt-t'); if(r===gt.r2)cls.push('gt-b'); if(c===gt.c1)cls.push('gt-l'); if(c===gt.c2)cls.push('gt-r'); }
+      else if(hardRail) cls.push('goff');   // r330: outside the fenced target zone — dim it
       if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
       // r312 (Wolf): Excel's fill-handle — the tiny green square at the selection's bottom-right
@@ -9432,6 +9439,28 @@ function railToTarget(){
   S.active={r:gt.r1, c:gt.c1}; S.sel=null;
   return true;
 }
+/* r330 (Wolf): HARD rails. The dim-everything-but-the-target visual promised that the lit
+   zone was the ONLY place you could act — but the cursor could still wander off it. Now, in a
+   guided IN-PLACE drill, plain and Ctrl arrows physically can't leave the target rectangle:
+   "you literally can't move out of that area unless you're doing the right action to progress."
+   Two escape valves keep every drill solvable:
+     • shift (building a selection) is never fought — Excel-true range gestures still work.
+     • drills that copy from a DISTANT source (paste-special, block copy) fall back to SOFT rails,
+       because clamping to the paste destination would trap you away from the source. */
+function hardRailSafe(C){
+  if(C._hardRail!==undefined) return C._hardRail;
+  if(!railSafe(C)){ C._hardRail=false; return false; }
+  try{ C._hardRail = !/clipboard|\bcopy\b|\bpaste\b|\bcut\b|ctrl\+c|ctrl\+v/i.test(String(C.checks)+String(C.targets)); }
+  catch(e){ C._hardRail=false; }
+  return C._hardRail;
+}
+function railClamp(nr,nc){
+  if(!guided || demoPlaying || echoOn || editing || done || sandboxMode || !S) return null;
+  if(S.sel) return null;                          // mid-selection — let the range gesture run free
+  const C=CHALLENGES[cur]; if(!C || !hardRailSafe(C)) return null;
+  const gt=currentTargetRange(); if(!gt) return null;
+  return { r:Math.min(gt.r2,Math.max(gt.r1,nr)), c:Math.min(gt.c2,Math.max(gt.c1,nc)) };
+}
 function commitAction(){ recalc(); if(typeof S!=='undefined' && S && S.markCrit) syncMarks(); render(); checkWin(); if(railToTarget()) render(); }
 
 function translateFormula(f, dr, dc){
@@ -10208,7 +10237,7 @@ function move(dr,dc,shift,ctrl){
     nr = dr!==0 ? visStep(S.active.r,dr) : S.active.r;      // r179: plain steps skip hidden rows
   }
   if(shift){ if(!S.sel){ S.sel={r:S.active.r,c:S.active.c}; S.selA=null; } }   /* r308: new shift-selection — the anchor (S.sel) is the DISPLAYED active cell, Excel-true */
-  else S.sel=null;
+  else { S.sel=null; const cl=railClamp(nr,nc); if(cl){ nr=cl.r; nc=cl.c; } }   /* r330: guided hard rails — plain/Ctrl arrows can't leave the lit target zone */
   S.active={r:nr,c:nc};
   render();
   // Cursor-only drills (the navigation tour) need a win check after every Ctrl+arrow jump.
