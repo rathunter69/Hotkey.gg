@@ -263,6 +263,12 @@
   /* r330 (Wolf): guided HARD rails — the cursor is fenced to the lit target, so everything
      outside it dims back. Reads as "you can only act here"; the fence looks intentional. */
   td.goff{opacity:.4; transition:opacity .12s ease}
+  /* r331 (Wolf): nav-maze waypoints read as a TRAIL, not identical dots. Visited stops recede,
+     the next stop is a pulsing accent bullseye (matching the green target frame on the same cell),
+     future stops stay quiet blue — so a new user always sees exactly which cell to land on next. */
+  td.navmark-done{opacity:.28}
+  .gridwrap td.navmark-next, html[data-dark="1"] .gridwrap td.navmark-next{color:var(--accent) !important; font-size:22px; animation:navpulse 1.2s ease-in-out infinite}
+  @keyframes navpulse{0%,100%{text-shadow:0 0 2px var(--accent-glow)} 50%{text-shadow:0 0 12px var(--accent),0 0 5px var(--accent)}}
   /* r271 — watch-solution spotlight (default ON; opt out: localStorage hk_demo_spot='0').
      Dim the page, cut a window around the cells the demo is editing, caption the step. */
   #demoSpot{position:fixed; z-index:24; pointer-events:none; display:none;
@@ -8190,6 +8196,13 @@ function render(){
   // r330 (Wolf): in a guided hard-rail drill the cursor is fenced to the lit target, so dim
   // everything OUTSIDE it — the playable zone reads at a glance and the fence looks deliberate.
   const hardRail = !!(guided && gt && typeof hardRailSafe==='function' && CHALLENGES[cur] && hardRailSafe(CHALLENGES[cur]) && !editing && !demoPlaying);
+  // r331 (Wolf): the nav maze's blue dots all looked alike — a new user couldn't tell which
+  // stop was NEXT or that they had to LAND on it. Classify each marker by progress so the trail
+  // reads: visited dots fade back, the next stop is a pulsing accent bullseye, future dots stay quiet.
+  const __navC = CHALLENGES[cur];
+  const __navPath = (__navC && __navC._path && Array.isArray(__navC._path)) ? __navC._path : null;
+  let __navNext = -1;
+  if(__navPath){ const np=S.navProgress||{}; for(let i=0;i<__navPath.length;i++){ if(!np['m'+i]){ __navNext=i; break; } } }
   // Color refs ONLY while editing (from editBuf) — exactly like Excel, which colors a
   // formula's precedents when you're IN the cell (F2/double-click), NOT on plain selection.
   // r206 (Wolf): the passive "select a formula → light up its inputs" overlay hid where the
@@ -8230,6 +8243,11 @@ function render(){
         // not a box per cell — tag the range's edge cells so the border rides the perimeter.
         if(r===gt.r1)cls.push('gt-t'); if(r===gt.r2)cls.push('gt-b'); if(c===gt.c1)cls.push('gt-l'); if(c===gt.c2)cls.push('gt-r'); }
       else if(hardRail) cls.push('goff');   // r330: outside the fenced target zone — dim it
+      if(__navPath){ for(let i=0;i<__navPath.length;i++){ if(__navPath[i].r===r&&__navPath[i].c===c){
+        cls.push('navmark');
+        if(__navNext===-1 || i<__navNext) cls.push('navmark-done');   // visited — fade back
+        else if(i===__navNext) cls.push('navmark-next');              // THE next stop — pulse
+        break; } } }
       if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
       // r312 (Wolf): Excel's fill-handle — the tiny green square at the selection's bottom-right
