@@ -403,6 +403,12 @@
   /* r327 (Wolf): ICON-ribbon tiles — icon over name, a KeyTip badge in the corner (Excel-real). */
   .ribbon .rgrp-ico{padding:1px 8px}
   .ribbon .rgrp-ico .rgrp-chips{gap:2px; align-items:flex-start}
+  /* r332 (Wolf): the open Alt+H icon ribbon used to cluster left and leave the bar half-empty.
+     Now the groups grow to share the full width (Excel's Home tab spans edge-to-edge), and their
+     chips center so the tiles distribute evenly instead of hugging the left. */
+  .ribbon.ribbon-ico{gap:0}
+  .ribbon.ribbon-ico .rgrp-ico{flex:1 1 auto; justify-content:center}
+  .ribbon.ribbon-ico .rgrp-ico .rgrp-chips{justify-content:center; flex-wrap:wrap}
   .ribbon .ri-cmd{position:relative; display:inline-flex; flex-direction:column; align-items:center; justify-content:flex-start;
     gap:3px; width:50px; min-height:44px; padding:5px 2px 4px; border-radius:7px; cursor:default; transition:background .1s}
   .ribbon .ri-cmd:hover{background:var(--surface2)}
@@ -8712,6 +8718,7 @@ function __drawRibbon(){
     return;
   }
   el.className='ribbon show';
+  let icoRibbon=false;   // r332 (Wolf): the icon ribbon spreads its groups edge-to-edge to fill the bar
   let html='';
   if(path.length===0){
     html+='<span class="path">alt →</span>';
@@ -8723,6 +8730,7 @@ function __drawRibbon(){
     const opts=MENUS[key];
     const groups=RIBBON_GROUPS[key];
     if(opts && groups){
+      icoRibbon=true;
       // r327: ICON ribbon — each command is an icon tile (KeyTip badge + glyph/line-icon + name),
       // clustered into Excel's Home groups with a label + divider under each.
       const lblOf={}; opts.forEach(([k,l])=>lblOf[k]=l);
@@ -8741,6 +8749,7 @@ function __drawRibbon(){
     else if(opts) opts.forEach(([k,lbl])=>html+=`<span class="opt"><k>${k.toLowerCase()}</k>${lbl}</span>`);
     else html+='<span class="opt">…</span>';
   }
+  if(icoRibbon) el.className='ribbon show ribbon-ico';
   el.innerHTML=html;
 }
 
