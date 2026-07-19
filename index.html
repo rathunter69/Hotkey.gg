@@ -255,8 +255,11 @@
     display:flex; align-items:center; padding:0 8px; box-sizing:border-box; background:var(--bg); color:var(--text);
     box-shadow:inset 0 0 0 2px var(--accent); z-index:6}
   td.editing .edin{white-space:nowrap}
-  @keyframes gpulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent)} 50%{box-shadow:inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow)}}
-  td.gtarget{box-shadow:inset 0 0 0 2px var(--accent); animation:gpulse 1.5s ease-in-out infinite; z-index:2}
+  /* r329 (Wolf): the guided target is a FILL + a single outer frame (gt-t/b/l/r on the range's edge
+     cells) instead of a box per cell — so a multi-cell paste footprint reads as one bordered zone. */
+  td.gtarget{background:var(--accent-glow); z-index:2}
+  td.gt-t{border-top:2px solid var(--accent)} td.gt-b{border-bottom:2px solid var(--accent)}
+  td.gt-l{border-left:2px solid var(--accent)} td.gt-r{border-right:2px solid var(--accent)}
   /* r271 — watch-solution spotlight (default ON; opt out: localStorage hk_demo_spot='0').
      Dim the page, cut a window around the cells the demo is editing, caption the step. */
   #demoSpot{position:fixed; z-index:24; pointer-events:none; display:none;
@@ -284,11 +287,10 @@
   .mb-tool.nudge{animation:hkNudge 1.1s ease-in-out 5; border-color:var(--accent)}
   @keyframes hkNudge{50%{box-shadow:0 0 0 5px var(--accent-glow)}}
   /* r317 (Wolf): the "act here" target zone (paste destination, edit target, …) was a barely-there
-     faint dashed line with guided off — you couldn't tell WHERE the block goes. Now a clear dashed
-     accent frame + faint fill so the target reads in every mode. The range's outer edges carry the
-     frame so a multi-cell paste footprint reads as one zone. */
-  td.ttarget{outline:2px dashed color-mix(in srgb, var(--accent) 78%, transparent); outline-offset:-2px;
-    background:color-mix(in srgb, var(--accent) 9%, transparent)}
+     faint dashed line with guided off — you couldn't tell WHERE the block goes. Now a faint fill +
+     a single solid accent frame (the gt-t/b/l/r edges) so the target reads in every mode. The
+     range's outer edges carry the frame so a multi-cell paste footprint reads as one zone. */
+  td.ttarget{background:color-mix(in srgb, var(--accent) 9%, transparent)}   /* r329: fill only; the gt-t/b/l/r edges draw the single outer frame */
   /* r163: GHOST CURSOR - your PB run gliding through its recorded path. Warn-dashed
      so it reads apart from selection (accent) and ink borders; never catches input. */
   #ghostCur{position:absolute; pointer-events:none; z-index:4; display:none;
@@ -1516,6 +1518,7 @@
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
       <span class="mb-tool" id="proBadge" style="display:none; cursor:default; color:var(--warn); font-weight:700; border-color:var(--warn)"></span>
+      <span class="mb-spacer"></span><!-- r328 (Wolf): modes+helpers left, utilities right — the bar now spans the full drill-bar width -->
       <span id="kbSlot" style="display:inline-flex"></span>
       <button class="mb-tool" id="ghostToggle" data-tip="◆ PRO — race a live ghost of your PB run · pace counter is free · click to toggle"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V10a7 7 0 0 1 14 0v11l-3-2-2 2-2-2-2 2-3-2Z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>ghost: on</button>
       <span style="position:relative; display:inline-flex">
@@ -8149,7 +8152,14 @@ function currentTargetRange(){
   const C=CHALLENGES[cur]; if(!C||!C.targets) return null;
   const T2=(typeof C.targets==='function') ? C.targets.call(C) : C.targets;
   const items=C.checks(S);
-  for(let i=0;i<items.length;i++){ if(!items[i].ok){ let t=T2[i]; if(typeof t==='function') t=t.call(C); return resolveRange(t); } }
+  for(let i=0;i<items.length;i++){ if(!items[i].ok){ let t=T2[i]; if(typeof t==='function') t=t.call(C); let r=resolveRange(t);
+    // r329 (Wolf): while a block is on the clipboard, the target zone shows the FULL LANDING
+    // FOOTPRINT anchored at the destination's top-left — so a new user sees the exact shape the
+    // block drops into (a 3×3 border on the paste cell), not just the anchor cell.
+    if(r && S.clipboard && (S.clipboard.w>1 || S.clipboard.h>1)){
+      r={r1:r.r1, c1:r.c1, r2:Math.min(S.ROWS, r.r1+S.clipboard.h-1), c2:Math.min(COLS, r.c1+S.clipboard.w-1)};
+    }
+    return r; } }
   return null;
 }
 function render(){
@@ -8209,7 +8219,10 @@ function render(){
       const isActive=(r===__dA.r&&c===__dA.c);
       const inSel=(r>=sr.r1&&r<=sr.r2&&c>=sr.c1&&c<=sr.c2);
       if(isActive)cls.push('active'); else if(inSel&&S.sel)cls.push('sel');
-      if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2) cls.push(guided?'gtarget':'ttarget');
+      if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2){ cls.push(guided?'gtarget':'ttarget');
+        // r329: the target draws as ONE outer frame around the whole zone (the paste footprint),
+        // not a box per cell — tag the range's edge cells so the border rides the perimeter.
+        if(r===gt.r1)cls.push('gt-t'); if(r===gt.r2)cls.push('gt-b'); if(c===gt.c1)cls.push('gt-l'); if(c===gt.c2)cls.push('gt-r'); }
       if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
       // r312 (Wolf): Excel's fill-handle — the tiny green square at the selection's bottom-right
@@ -8297,7 +8310,9 @@ function render(){
 function positionPasteDest(){
   const m=document.getElementById('pastedest'); if(!m) return;
   const cb=S&&S.clipboard;
-  if(!cb || !cb.w || !cb.h || editing || demoPlaying){ m.style.display='none'; return; }
+  // r329 (Wolf): in guided mode the STATIC target footprint (drawn on the destination) is the guide,
+  // so suppress the cursor-following ghost — two footprints at once read as confusing.
+  if(!cb || !cb.w || !cb.h || editing || demoPlaying || guided){ m.style.display='none'; return; }
   const r1=S.active.r, c1=S.active.c;
   const r2=Math.min(S.ROWS, r1+cb.h-1), c2=Math.min(COLS, c1+cb.w-1);
   const src=cb.rect;
