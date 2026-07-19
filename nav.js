@@ -811,7 +811,11 @@
     let lvlHtml='';
     try{ const xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
       if(xp>0 && window.hkLevelChip){ const L=levelOf(xp);
-        lvlHtml='<span class="nav-lvl" id="navLvl" title="LVL '+L.lvl+' \u00b7 '+L.into+'/'+L.need+' xp \u2014 levels are reps; they never decay">'+window.hkLevelChip(L.lvl,24)+'</span>'; } }catch(e){}   // r302 (Wolf): the chip already carries the number — 'LVL 14' text beside a 14-chip was redundant
+        /* r342 (Wolf): the chip alone hid progress in a tooltip — a slim horizontal bar
+           beside it shows how far into the level you are at a glance. */
+        const pct=Math.max(0, Math.min(100, Math.round(L.pct!=null?L.pct:(L.need?100*L.into/L.need:0))));
+        lvlHtml='<span class="nav-lvl" id="navLvl" title="LVL '+L.lvl+' \u00b7 '+L.into+'/'+L.need+' xp \u2014 levels are reps; they never decay">'+window.hkLevelChip(L.lvl,24)+
+          '<span class="nav-lvl-bar"><i style="width:'+pct+'%"></i></span></span>'; } }catch(e){}   // r302 (Wolf): the chip already carries the number — 'LVL 14' text beside a 14-chip was redundant
     slot.innerHTML = lvlHtml +
       '<div class="user-menu">' +
         '<button class="user-btn" id="userBtn" aria-haspopup="true" aria-expanded="false">' +

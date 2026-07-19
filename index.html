@@ -424,6 +424,8 @@
   .ribbon.ribbon-lean .ri-g{font-size:13px}
   .ribbon.ribbon-lean .ri-key{position:static; font-size:8px; line-height:1.5; order:2}
   .ribbon.ribbon-lean .rgrp-ico{padding:1px 6px}
+  .ribbon.ribbon-open{padding-right:12px}
+  .ribbon.ribbon-open .ri-key{font-size:9px; font-weight:800}
   .rpin{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.08em; color:var(--faint);
     margin-left:auto; padding:2px 9px; border:1px solid var(--line); border-radius:99px; cursor:pointer;
     align-self:center; flex:none; transition:.12s}
@@ -1506,13 +1508,13 @@
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
 <script src="drills.js?v=267"></script>
-<link rel="stylesheet" href="nav.css?v=179">
+<link rel="stylesheet" href="nav.css?v=180">
 <script src="themes.js?v=267"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=273"></script>
+<script src="nav.js?v=274"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1565,8 +1567,7 @@
       <span id="kbSlot" style="display:inline-flex"></span>
       <button class="mb-tool" id="ghostToggle" data-tip="◆ PRO — race a live ghost of your PB run · pace counter is free · click to toggle"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V10a7 7 0 0 1 14 0v11l-3-2-2 2-2-2-2 2-3-2Z"/><path d="M9.5 10h.01M14.5 10h.01"/></svg>ghost: on</button>
       <span style="position:relative; display:inline-flex">
-        <button class="mb-tool" id="gearBtn" title="sound &amp; extras" aria-haspopup="true">⚙</button>
-        <div class="prefs-pop" id="gearPop" style="min-width:220px; flex-direction:column; gap:4px"></div>
+        <button class="mb-tool" id="soundToggle" title="key sounds — click to cycle">🔊</button>
       </span>
       <span style="position:relative; display:inline-flex">
       <button class="mb-tool" id="wqBtn" style="display:none" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r302 (Wolf): OFF the bar — one tight row of critical controls -->
@@ -8752,18 +8753,26 @@ function drawRibbon(){ try{ __drawRibbon(); }catch(err){
    KeyTip badge + icon, names in tooltips — a glanceable chord reference that never leaves the
    screen. Alt still opens the full flyout exactly as before; this only replaces the idle hint. */
 function ribbonBarOn(){ try{ return localStorage.getItem('hk_ribbon_bar')==='1'; }catch(e){ return false; } }
-function __leanRibbonHtml(){
-  const opts=MENUS['H'], groups=RIBBON_GROUPS['H'];
+function __leanRibbonHtml(menuKey, withExtra){
+  menuKey=menuKey||'H';
+  const opts=MENUS[menuKey], groups=RIBBON_GROUPS[menuKey];
   if(!opts || !groups) return '<span class="rhint"><k>alt</k> ribbon</span>';
   const lblOf={}; opts.forEach(([k,l])=>lblOf[k]=l);
+  const chord=menuKey.toLowerCase().split('').join(' ');
+  const used=new Set();
+  const tile=(k)=>{ const ico=RIBBON_ICONS[k]||('<span class="ri-g">'+k.toLowerCase()+'</span>');
+    return '<span class="ri-cmd" title="'+lblOf[k]+' — alt '+chord+' '+k.toLowerCase()+'"><span class="ri-key">'+k.toLowerCase()+'</span><span class="ri-ico">'+ico+'</span></span>'; };
   let html='';
   groups.forEach(([gname,keys])=>{
     let cells='';
-    keys.forEach(k=>{ if(lblOf[k]===undefined) return;
-      const ico=RIBBON_ICONS[k]||('<span class="ri-g">'+k.toLowerCase()+'</span>');
-      cells+='<span class="ri-cmd" title="'+lblOf[k]+' — alt h '+k.toLowerCase()+'"><span class="ri-key">'+k.toLowerCase()+'</span><span class="ri-ico">'+ico+'</span></span>'; });
+    keys.forEach(k=>{ if(lblOf[k]===undefined) return; cells+=tile(k); used.add(k); });
     if(cells) html+='<span class="rgrp rgrp-ico"><span class="rgrp-chips">'+cells+'</span></span>';
   });
+  if(withExtra){
+    const extra=opts.filter(([k])=>!used.has(k));
+    if(extra.length){ let c=''; extra.forEach(([k])=>c+=tile(k));
+      html+='<span class="rgrp rgrp-ico"><span class="rgrp-chips">'+c+'</span></span>'; }
+  }
   return html;
 }
 function __ribbonPin(on){
@@ -8873,25 +8882,16 @@ function __drawRibbon(){
     const groups=RIBBON_GROUPS[key];
     if(opts && groups){
       icoRibbon=true;
-      // r327: ICON ribbon — each command is an icon tile (KeyTip badge + glyph/line-icon + name),
-      // clustered into Excel's Home groups with a label + divider under each.
-      const lblOf={}; opts.forEach(([k,l])=>lblOf[k]=l);
-      const used=new Set();
-      const tile=(k)=>{ const ico=RIBBON_ICONS[k]||('<span class="ri-g">'+k.toLowerCase()+'</span>');
-        return `<span class="ri-cmd" title="${lblOf[k]}"><span class="ri-key">${k.toLowerCase()}</span><span class="ri-ico">${ico}</span><span class="ri-name">${lblOf[k]}</span></span>`; };
-      groups.forEach(([gname,keys])=>{
-        let cells='';
-        keys.forEach(k=>{ if(lblOf[k]!==undefined){ cells+=tile(k); used.add(k); } });
-        if(cells) html+=`<span class="rgrp rgrp-ico"><span class="rgrp-chips">${cells}</span><span class="rgrp-l">${gname}</span></span>`;
-      });
-      const extra=opts.filter(([k])=>!used.has(k));   // safety: anything not grouped rides a trailing cluster
-      if(extra.length){ let c=''; extra.forEach(([k])=>c+=tile(k));
-        html+=`<span class="rgrp rgrp-ico"><span class="rgrp-chips">${c}</span><span class="rgrp-l">More</span></span>`; }
+      /* r341 (Wolf): the open Alt+H used to be a BLOCK — big tiles with names + group labels,
+         nearly triple the strip height. Now it opens as the SAME lean one-row bar the idle
+         pin shows (icon + KeyTip badge, names in tooltips), just tinted .show — the ribbon
+         never changes size, only state. */
+      html+=__leanRibbonHtml(key, true);
     }
     else if(opts) opts.forEach(([k,lbl])=>html+=`<span class="opt"><k>${k.toLowerCase()}</k>${lbl}</span>`);
     else html+='<span class="opt">…</span>';
   }
-  if(icoRibbon) el.className='ribbon show ribbon-ico';
+  if(icoRibbon) el.className='ribbon show ribbon-ico ribbon-lean ribbon-open';
   el.innerHTML=html;
 }
 
@@ -10855,8 +10855,8 @@ setTimeout(function(){ try{
   if(HK_MAC){
     const mb=$('macBtn');
     if(mb){ mb.style.display=''; mb.onclick=function(){ if(window.hkMacPopup) window.hkMacPopup(); }; }
-    let seen=null; try{ seen=localStorage.getItem('hk_mac_seen'); }catch(e){}
-    if(!seen) setTimeout(function(){ try{ if(window.hkMacPopup) window.hkMacPopup(); }catch(e){} }, 2200);
+    /* r342 (Wolf): no auto-popup — the guide shows when the player PICKS the Mac layout
+       (or clicks the mac-keys button); first visits stay uninterrupted. */
   }
 }catch(e){} }, 0);
 document.addEventListener('keydown',hkRawE=>{
@@ -11494,7 +11494,8 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
       pPop.innerHTML='';
       pPop.appendChild(kbHead('layout \u2014 detected, switch anytime'));
       pPop.appendChild(kbRow('\u229e windows', !HK_MAC, ()=>{ hkSetPlatform(false); updateProfileBtn(); }));
-      pPop.appendChild(kbRow('\u2318 mac', HK_MAC, ()=>{ hkSetPlatform(true); updateProfileBtn(); }));
+      pPop.appendChild(kbRow('\u2318 mac', HK_MAC, ()=>{ const was=HK_MAC; hkSetPlatform(true); updateProfileBtn();
+        if(!was){ try{ if(window.hkMacPopup) window.hkMacPopup(); }catch(e){} } }));   /* r342: picking the Mac overlay shows the ⌘ mapping guide right then */
       pPop.appendChild(kbHead('shortcut profile \u00b7 <span style="color:var(--warn)">\u25c6 PRO</span> \u00b7 one at a time'));
       pPop.appendChild(kbRow('native Excel', keyProfile==='native', ()=>{ keyProfile='native'; saveProfile(); updateProfileBtn(); }));
       pPop.appendChild(kbRow('Macabacus', keyProfile==='macabacus', ()=>{ if(!requirePro('Plugin keyboard layers (Macabacus / FactSet)')) return; keyProfile='macabacus'; saveProfile(); updateProfileBtn(); }));
@@ -11507,25 +11508,11 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
     tools.appendChild(pWrap);
   } }
 /* r306: THE GEAR — sound + the misc that doesn't earn bar real estate */
-{ const gb=$('gearBtn'), gp=$('gearPop');
-  if(gb && gp){
-    const row=(id,label,fn)=>{ const b=document.createElement('button'); b.className='mb-tool'; if(id)b.id=id;
-      b.textContent=label; b.onclick=(e)=>{ e.stopPropagation(); fn(); }; return b; };
-    function renderGear(){
-      gp.innerHTML='';
-      const sb2=row('soundToggle','', ()=>{ cycleSound(); });
-      gp.appendChild(sb2); try{ updateSoundBtn(); }catch(e){}
-      gp.appendChild(row(null,'\u2318 mac keys guide', ()=>{ try{ if(window.hkMacPopup) window.hkMacPopup(); }catch(e){} gp.classList.remove('show'); }));
-      gp.appendChild(row(null,'\u25b8 replay the intro tour', ()=>{ gp.classList.remove('show');
-        try{ localStorage.removeItem('hk_tour_done'); startOnboardBoard();
-          __tourAfter=()=>{ try{ if(sandboxMode){ sandboxMode=false; loadChallenge(MENU_ORDER[0]); } }catch(e){} };
-          tourShow(0); }catch(e){} }));
-    }
-    gb.onclick=(e)=>{ e.stopPropagation(); const open=gp.classList.contains('show');
-      document.querySelectorAll('.prefs-pop').forEach(p=>p.classList.remove('show'));
-      if(!open){ renderGear(); gp.classList.add('show'); } };
-    document.addEventListener('click', e=>{ if(!e.target.closest('#gearPop') && e.target!==gb) gp.classList.remove('show'); });
-  } }
+/* r342 (Wolf): the gear is GONE — sound is a direct button again, the mac-keys guide now
+   pops when you pick the Mac layout in the keyboard popover, and the intro-tour replay is
+   retired (the intro stays hidden once done). */
+{ const sb2=$('soundToggle');
+  if(sb2){ sb2.onclick=(e)=>{ e.stopPropagation(); cycleSound(); }; try{ updateSoundBtn(); }catch(e){} } }
 { const _db=$('dailyBtn'); if(_db) _db.addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); }); }
 /* ---- r157: THE WEAKNESS QUEUE (PRO pillar #2; free in beta via requirePro) ----
    The site builds the session: score every drill from LOCAL data only —
