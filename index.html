@@ -1774,7 +1774,7 @@ const CHALLENGES = {
   drill:{
     name:'Hardcode', label:'Hardcode it', par:18, parKeys:15,
     aha:'Ctrl+Alt+V → V pastes values only — the number stays, the live link dies.',
-    prompt:'This page goes in the summary tonight \u2014 and right now every number on it is a LIVE LINK into the model. Break the links before it ships: grab the column, copy, paste-special VALUES straight back onto itself, then paint the remaining rows blue, because hardcodes wear blue. Aim at the column, not the page \u2014 the margin memo below stays LIVE. The pre-send ritual every desk runs.',
+    prompt:'Every number on this page is a live link into the model — break the links before it ships. Select the column, copy, paste-special values back onto itself, then color the hardcoded rows blue (hardcodes wear blue). Aim at the column, not the whole page — the margin memo below must stay live.',
     req:'on <em>B3</em> \u00b7 <em>ctrl+shift+\u2193</em> grabs B3:B8 \u00b7 <em>ctrl+c</em> \u00b7 <em>alt e s v \u21b5</em> values onto themselves \u00b7 then <em>alt h f c</em> \u2192 \u00d74 <em>\u21b5</em> \u2014 the dead numbers wear blue',
     guide:[
       'on B3 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> \u2014 the whole output column in one chord',
@@ -2374,7 +2374,7 @@ const CHALLENGES = {
   margin:{
     name:'Formula', label:'Margins across the page', par:23, parKeys:21,
     aha:'Divide, F4 to lock the base, Ctrl+R to fill, Alt H P for percent — a margin row in four chords.',
-    prompt:'Three comp tables, one skill: EBITDA \u00f7 revenue, built by pointing, filled down, formatted as a percent. The tables land somewhere new every run \u2014 your hands should stop caring where the table lives.',
+    prompt:'Three comp tables, one skill: EBITDA ÷ revenue — build it by pointing, fill it down, format it as a percent. The tables land in a different spot every run; the sequence is what you’re learning, not the location.',
     req(){ return this._sites.map((s,i)=>'<em>'+s.m+s.r0+'</em> \u00b7 ='+s.e+s.r0+'/'+s.v+s.r0+' \u00b7 fill '+s.m+s.r0+':'+s.m+(s.r0+2)+' \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then '); },
     guide(){ return ['<b>read the formula bar</b> \u00b7 the moment you type <kbd>=</kbd>, a red <b style="color:#e0574d">\u2715</b> and green <b style="color:#3fae4f">\u2713</b> light up \u2014 the cell is LIVE. Arrow keys now <b>point</b> (grab a cell\u2019s reference); tap <kbd>F2</kbd> to flip to <b>edit</b> (arrows move the cursor inside the text), <kbd>F2</kbd> again to point. <kbd>\u21b5</kbd> commits \u00b7 <kbd>esc</kbd> cancels'].concat(this._sites.map((s,i)=>['table one','table two','table three'][i]+' at <b>'+s.m+s.r0+'</b> \u00b7 point <kbd>='+s.e+s.r0+'/'+s.v+s.r0+'</kbd> <kbd>\u21b5</kbd> \u00b7 fill down \u00d72 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>'+(i===0?' \u2014 <kbd>ctrl</kbd>+arrows jump between tables':''))); },
     targets(){ return this._sites.map(s=>s.m+s.r0+':'+s.m+(s.r0+2)); },
@@ -2417,7 +2417,7 @@ const CHALLENGES = {
   anchor:{
     name:'Anchors', label:'Pin it with F4', par:16, parKeys:13,
     aha:'F4 cycles the anchors — $A$1 locks both, A$1 the row, $A1 the column; one formula fills the grid.',
-    prompt:'Price points across the top, volumes down the side, and a 3×3 revenue grid to fill from ONE formula. F4 cycles a reference through its four lock states — pin the volume column with $B, pin the price row with $3, and the fill does the other eight cells for you. This is the muscle that later runs every sensitivity table.',
+    prompt:'Fill a 3×3 revenue grid from one formula. Price points run across the top, volumes down the side. F4 cycles a reference through its four lock states — pin the volume column with $B, pin the price row with $3, and the fill builds the other eight cells. The same anchoring runs every sensitivity table later.',
     req(){ const o=this._o; return '<em>'+o.tl+'</em> · =B'+o.r0+' <em>F4 F4 F4</em> → $B'+o.r0+' · * · C'+o.hr+' <em>F4 F4</em> → C$'+o.hr+' · <em>↵</em> · fill '+o.col+' ↓ · fill '+o.grid+' →'; },
     guide(){ const o=this._o; return [
       'at '+o.tl+' · type <kbd>=B'+o.r0+'</kbd> then <kbd>F4</kbd> ×3 — watch it cycle to <b>$B'+o.r0+'</b>: column pinned, row free',
@@ -2471,7 +2471,7 @@ const CHALLENGES = {
   schedule:{
     name:'Schedule', label:'Roll the PP&E forward', par:35, parKeys:34,
     aha:'Every roll-forward is BB + adds − subs = EB — one formula, filled across.',
-    prompt:'Five years of PP&E, two roll-forwards. Each year opens at the prior close, capex adds, depreciation takes its anchored cut of the OPENING balance. Build year 1, link year 2\u2019s opening, fill everything right \u2014 then run the accumulated-depreciation memo underneath, because the auditors will ask for it.',
+    prompt:'Five years of PP&E, two roll-forwards. Each year opens at the prior close, capex adds, and depreciation takes its anchored cut of the opening balance. Build year 1, link year 2’s opening, fill everything right — then run the accumulated-depreciation memo underneath.',
     req:'<em>B4</em> dep <em>=-B2*$B$9</em> \u00b7 <em>B5</em> end <em>=B2+B3+B4</em> \u00b7 <em>C2</em> \u00b7 <em>=B5</em> \u00b7 fill C2:F2 \u2192 \u00b7 fill B4:F5 \u2192 \u00b7 memo: <em>B7</em> <em>=-B4</em> \u00b7 <em>C7</em> <em>=B7-C4</em> \u00b7 fill C7:F7 \u2192',
     guide:[
       'depreciation at B4 \u00b7 <kbd>=-B2*$B$9</kbd> \u2014 anchored rate against the OPENING balance, negative convention',
@@ -2536,7 +2536,7 @@ const CHALLENGES = {
   intsched:{
     name:'Interest', label:'Run the interest schedule', par:29, parKeys:28,
     aha:'Interest ties the debt block to the P&L — rate × the opening balance, then EBITDA ÷ interest is the coverage the covenant reads.',
-    prompt:'A term loan and the schedule that feeds the P&L: each year opens at the prior close, mandatory amort pays it down, and cash interest is the anchored rate on the OPENING balance. Build year 1, link the opening, fill the roll across — then run coverage, EBITDA over interest, because that ratio is what the covenant actually tests.',
+    prompt:'A term loan and the schedule that feeds the P&L: each year opens at the prior close, mandatory amortization pays it down, and cash interest is the anchored rate on the opening balance. Build year 1, link the opening, fill the roll across — then compute coverage: EBITDA over interest.',
     req:'<em>B4</em> ending <em>=B2+B3</em> · <em>C2</em> <em>=B4</em> · fill C2:F2 → · fill B4:F4 → · <em>B6</em> interest <em>=B2*$B$10</em> · fill B6:F6 → · <em>B8</em> coverage <em>=B7/B6</em> · fill B8:F8 →',
     guide:[
       'ending debt at B4 · <kbd>=B2+B3</kbd> — opening less the mandatory amort (already negative)',
@@ -2604,7 +2604,7 @@ const CHALLENGES = {
   percent:{
     name:'% of rev', label:'Common-size both statements', par:17, parKeys:14,
     aha:'Divide by an anchored base — F4 locks the divisor so fill-right can’t drag it.',
-    prompt:'Two statements on one page, both common-sized \u2014 and the second one moves and deepens between runs. The anchor is the whole lesson: each block\u2019s divisor is ITS OWN revenue, locked with F4 so the fill can\u2019t drag it.',
+    prompt:'Common-size two statements on one page — the second block moves and changes size between runs. The lesson is the anchor: each block’s divisor is its own revenue line, locked with F4 so the fill can’t drag it.',
     req(){ const R=this._R; return '<em>C2</em> \u00b7 =B2/$B$2 (F4 locks it) \u00b7 fill C2:C6 \u00b7 <em>ctrl+shift+%</em> \u00b7 then: <em>'+R.pc+R.r0+'</em> \u00b7 ='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0+' \u00b7 fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent'; },
     guide(){ const R=this._R; return [
       'left block: at C2 \u00b7 <kbd>=</kbd> <kbd>\u2190</kbd> <kbd>/</kbd> <kbd>\u2190</kbd> <kbd>F4</kbd> \u2192 <b>$B$2</b> \u00b7 <kbd>\u21b5</kbd> \u00b7 fill C2:C6 \u00b7 percent',
@@ -2659,7 +2659,7 @@ const CHALLENGES = {
   scrub:{
     name:'Scrub', label:'Clean the export', par:21, parKeys:19,
     aha:'Exports come dirty — delete junk rows (Ctrl+−), sort (Alt A S), re-total; the data is yours.',
-    prompt:'The deal list came out of the system DIRTY: a duplicated header row, a "--- PAGE 2 ---" break, and a stale SUBTOTAL row that will double-count the moment anyone totals the column. Scrub it — delete all three junk rows, sort what is real largest-first, and re-total the clean data. Every export you will ever receive needs this pass.',
+    prompt:'The deal list exported dirty: a duplicated header row, a "--- PAGE 2 ---" break, and a stale SUBTOTAL row that will double-count the moment anyone totals the column. Delete all three junk rows, sort the real data largest-first, and re-total it. Every export needs this pass.',
     req(){ const o=this._o; return 'the junk = the second <em>Deal</em> header, <em>--- PAGE 2 ---</em>, and <em>SUBTOTAL</em> — delete each (<em>alt h d r</em>) · select <em>'+o.range+'</em> · <em>alt a s d</em> · foot at <em>'+o.foot+'</em> → <em>alt+=</em> <em>↵</em> · <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'hunt the junk top to bottom: the duplicate header, the page break, the SUBTOTAL trap — on each row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>',
@@ -2733,7 +2733,7 @@ const CHALLENGES = {
   recon:{
     name:'Recon', label:'Two systems, one truth', par:77, parKeys:81,
     aha:'COUNTIF checks presence, INDEX/MATCH checks size — drive every difference to zero.',
-    prompt:'The trading system says seven deals; the finance extract says six — and one amount they DO share does not agree. This is reconciliation, the data job every first-year owns: flag presence with COUNTIF, pull the book amount with INDEX/MATCH, bring the missing deal across, and drive the difference column to zeros. Nothing ships while the recon shows a break.',
+    prompt:'The trading system shows seven deals; the finance extract shows six — and one amount they both hold doesn’t agree. Reconcile them: flag presence with COUNTIF, pull the book amount with INDEX/MATCH, bring the missing deal across, and drive the difference column to zeros. Nothing ships while the recon shows a break.',
     req(){ const o=this._o; return '<em>C4</em> → <em>=COUNTIF($D$4:$D$10,A4)</em> · fill C4:C10 · the 0-flag deal → add it at <em>D10:E10</em> · <em>F4</em> → <em>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</em> · fill F4:F10 · fix the broken amount — every Δ reads 0'; },
     guide(){ const o=this._o; return [
       'presence first: C4 · <kbd>=COUNTIF($D$4:$D$10,A4)</kbd> <kbd>↵</kbd> · select C4:C10 · <kbd>ctrl</kbd>+<kbd>d</kbd> — a 0 means finance never booked it',
@@ -2804,7 +2804,7 @@ const CHALLENGES = {
   grpfold:{
     name:'Group', label:'Fold the detail away', par:15, parKeys:12,
     aha:'Group rows (Shift+Alt+→), never hide them — the ⊞ tells the reader the detail’s still there.',
-    prompt:'The MD wants the SUMMARY view of this build — quarterly totals, not the monthly noise under them. The house rule is absolute: you never HIDE rows, you GROUP them (Shift+Alt+→), then fold the detail (Alt A H) so a ⊞ tells the next reader exactly where it lives. Three months under each quarter; group each block, fold each block, and the totals keep breathing.',
+    prompt:'Produce the summary view: quarterly totals with the monthly detail folded away. House rule — never hide rows; group them (Shift+Alt+→), then fold the detail (Alt A H) so a ⊞ shows the next reader where it lives. Three months under each quarter: group each block, fold each block, and the totals keep computing.',
     req(){ const o=this._o; return o.blocks.map((b,i)=>'<em>A'+b.r1+':A'+b.r2+'</em> → <em>shift+alt+→</em>').join(' · ')+' · then fold each: <em>alt a h</em> — subtotals stay on the page'; },
     guide(){ const o=this._o; return [
       'quarter one: select rows '+o.blocks[0].r1+'-'+o.blocks[0].r2+' (the months) · <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>→</kbd> groups them · <kbd>alt</kbd> <kbd>a</kbd> <kbd>h</kbd> folds the detail',
@@ -2860,7 +2860,7 @@ const CHALLENGES = {
   filterpass:{
     name:'Filter', label:'Work the filtered view', par:13, parKeys:10,
     aha:'Ctrl+Shift+L arms the filter, Alt+↓ opens the picker — hide the noise, the answer reads itself.',
-    prompt:'A live deal list, three statuses deep. The VP wants ONE number: the largest OPEN deal still on the data. Arm the AutoFilter on the header row (Ctrl+Shift+L), open the Status picker (Alt+\u2193), drop everything that is not Open, and the answer reads straight off the visible rows \u2014 type it where the data asks.',
+    prompt:'Find one number in a live deal list: the largest Open deal. Turn on AutoFilter at the header row (Ctrl+Shift+L), open the Status picker (Alt+↓), uncheck everything that isn’t Open, and read the answer off the visible rows — then type it where the sheet asks.',
     req(){ const o=this._o; return '<em>ctrl+shift+L</em> on row 3 arms the \u25be \u00b7 <em>alt+\u2193</em> on Status \u2192 <em>space</em> drops Closed/Dead \u2192 <em>\u21b5</em> \u00b7 type the largest visible Size into <em>B'+o.ansR+'</em>'; },
     guide(){ const o=this._o; return [
       'put the cursor anywhere on row 3 (the header) \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> \u2014 \u25be pickers arm across the whole header block',
@@ -2918,7 +2918,7 @@ const CHALLENGES = {
   hunt:{
     name:'Audit', label:'Hunt the hardcodes', par:45, parKeys:46,
     aha:'F5 → Special → Constants lights up every hardcode a formula should own.',
-    prompt:'The intern\u2019s opex build looks clean \u2014 it even foots. It isn\u2019t: three cells in the calc block are typed-over numbers, stale since the last turn of the model. Eyes can\u2019t find them; the ritual can. F5, Special, Constants \u2014 every raw number on the page lights up and \u21b5 walks the marks. Relink the three crimes to their formulas, then total the corrected build and bold the answer row.',
+    prompt:'The opex build looks clean and even foots — but three cells in the calc block are typed-over numbers, stale since the last update. Use F5 → Special → Constants to light up every raw number, walk the marks with Enter, and relink the three hardcodes to live formulas.',
     req(){ const o=this._o; return '<em>F5</em> \u2192 <em>s</em> \u2192 <em>o</em> marks the constants \u00b7 \u21b5 walks \u00b7 relink '+o.sites.map(s=>'<em>'+s.k+'</em>').join(', ')+' \u00b7 <em>B8</em> <em>=SUM(B3:B7)</em> fill B8:D8 \u2192 \u00b7 <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'run the ritual: <kbd>F5</kbd> \u00b7 <kbd>s</kbd> \u00b7 <kbd>o</kbd> \u2014 every raw number marks up; blue inputs SHOULD light, the calc block should NOT',
@@ -2987,7 +2987,7 @@ const CHALLENGES = {
   unhide:{
     name:'Unhide', label:'Flush the hidden rows', par:15, parKeys:12,
     aha:'Hidden rows lie — unhide them, then group so the detail stays honest.',
-    prompt:'The last analyst HID the monthly detail instead of grouping it \u2014 rows 4 to 7 are just\u2026 gone. No \u229e, no rail, no trace: the row numbers skip and the subtotal reads like magic. The MD wants it done RIGHT. Select across the gap and unhide (Ctrl+Shift+9 \u2014 or Alt H O U O), group the detail properly (Shift+Alt+\u2192), fold it back (Alt A H) so the \u229e tells the next reader where it lives \u2014 and while you\u2019re in there, the Size column is squeezed to hash marks: set it to a real width (Alt H O W).',
+    prompt:'The monthly detail was hidden instead of grouped — rows 4 to 7 are gone with no ⊞ and no trace, and the subtotal reads like magic. Fix it properly: select across the gap and unhide (Ctrl+Shift+9 — or Alt H O U O), group the detail (Shift+Alt+→), and fold it back (Alt A H) so the ⊞ shows where it lives.',
     req(){ const o=this._o; return 'select rows '+(o.h1-1)+':'+(o.h2+1)+' \u00b7 <em>ctrl+shift+9</em> (or <em>alt h o u o</em>) \u00b7 group '+o.h1+':'+o.h2+' <em>shift+alt+\u2192</em> \u00b7 fold <em>alt a h</em> \u00b7 <em>alt h o w</em> \u2192 12 on column B'; },
     guide(){ const o=this._o; return [
       'the row numbers jump '+(o.h1-1)+' \u2192 '+(o.h2+1)+' \u2014 that\u2019s the tell \u00b7 select across the gap (rows '+(o.h1-1)+' to '+(o.h2+1)+') \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>9</kbd> or <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>u</kbd> <kbd>o</kbd> \u2014 the detail returns',
@@ -3863,7 +3863,7 @@ const CHALLENGES = {
   foot:{
     name:'Foot', label:'Foot the table both ways', par:11, parKeys:8,
     aha:'Alt+= proposes the SUM it sees — total the rows, the columns, and the corner.',
-    prompt:'A segment × quarter block: total every row, total every column, land the grand total where they meet. You will not type a single SUM — Alt+= reads the block and proposes it. Total down, total across, and the corner has to tie to BOTH edges.',
+    prompt:'Total a segment × quarter block in every direction: total each row, total each column, and land the grand total where they meet. Don’t type a single SUM — Alt+= reads the block and proposes it. The corner total must tie to both edges.',
     req:'<em>F2</em> · <em>alt+=</em> <em>↵</em> · fill F2:F5 ↓ · <em>B6</em> · <em>alt+=</em> <em>↵</em> · fill B6:E6 → · <em>F6</em> grand · <em>alt+=</em> <em>↵</em>',
     guide:[
       'row totals: F2 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:E2) — it read the row · <kbd>↵</kbd> · select F2:F5 · <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -3909,7 +3909,7 @@ const CHALLENGES = {
   comps:{
     name:'Comps', label:'Run the comps', par:94, parKeys:99,
     aha:'Build one row of logic, then Ctrl+D stamps it down the page \u2014 and LARGE/SMALL read the range with the outliers trimmed off.',
-    prompt:'A real comps page, both panels: compute EV/EBITDA for five peers and fill it down, read the data \u2014 median, high, low, then the TRIMMED read (2nd-high and 2nd-low, because one weird peer shouldn\u2019t set your range) \u2014 then walk the target through the implied chain: EV, equity, per share, premium to market. The multiples aren\u2019t given anymore; you build them.',
+    prompt:'A full comps page, both panels: compute EV/EBITDA for five peers and fill it down; read the data — median, high, low, then the trimmed read (2nd-high and 2nd-low, so one outlier peer doesn’t set the range); then walk the target through the implied chain: EV, equity, per share, premium to market.',
     req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> <em>=MEDIAN(D3:D7)</em> \u00b7 <em>D9</em> <em>=MAX</em> \u00b7 <em>D10</em> <em>=MIN</em> \u00b7 <em>D11</em> <em>=LARGE(D3:D7,2)</em> \u00b7 <em>D12</em> <em>=SMALL(D3:D7,2)</em> \u00b7 <em>G4</em> EV <em>=G3*D8</em> \u00b7 <em>G6</em> equity <em>=G4-G5</em> \u00b7 <em>G8</em> per share <em>=G6/G7</em> \u00b7 <em>G10</em> premium <em>=G8/G9-1</em>',
     guide:[
       'multiple, first peer: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -4054,7 +4054,7 @@ const CHALLENGES = {
   sort:{
     name:'Sort', label:'Sort the table', par:10, parKeys:7,
     aha:'Alt A S D sorts the rows in place — the table stays live, nothing is retyped.',
-    prompt:'Ranking workflow wherever the table lands: sort the six deals by size, largest first, total the column with AutoSum, bold the total. Sort, total, bold \u2014 the whole rep.',
+    prompt:'Sort the six deals by size, largest first, total the column with AutoSum, and bold the total. The table lands somewhere new every run — sort, total, bold, wherever it sits.',
     req(){ const o=this._o; return 'select <em>'+o.range+'</em> (active in the size column) \u00b7 <em>alt a s d</em> sorts Z\u2192A \u00b7 drop to <em>'+o.foot+'</em> \u00b7 <em>alt+=</em> \u2192 <em>\u21b5</em> \u00b7 <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'cursor to '+o.b2+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs the size column \u00b7 <kbd>shift</kbd>+<kbd>\u2190</kbd> pulls in the names',
@@ -4103,7 +4103,7 @@ const CHALLENGES = {
   series:{
     name:'Years', label:'Stub the year header', par:14, parKeys:11,
     aha:'Seed two years, then Fill Series (Alt H F I S) writes the rest of the header.',
-    prompt:'Extend and format a year header wherever it starts this run: two seed years are in, three more to fill with Series, then bold the whole run and right-align it so the years sit over their number columns.',
+    prompt:'Extend and format a year header wherever it starts this run: two seed years are in place — fill the next three with Fill Series, then bold the whole run and right-align it so the years sit over their number columns.',
     req(){ const o=this._o; return 'select <em>'+o.range+'</em> \u00b7 <em>alt h f i s \u21b5</em> fills the missing years \u00b7 selection holds \u2192 <em>ctrl+b</em> \u00b7 <em>alt h a r</em>'; },
     guide(){ const o=this._o; return [
       'the seed years start at '+o.a+' this run \u2014 select '+o.range+' with <kbd>shift</kbd>+<kbd>\u2192</kbd>',
@@ -4142,9 +4142,9 @@ const CHALLENGES = {
     }
   },
   bridge:{
-    name:'Point Mode', label:'Point, don\u2019t type', par:10, parKeys:6,
+    name:'Point Mode', label:'Point-mode formulas', par:10, parKeys:6,
     aha:'Point mode grabs refs with the arrow keys — the fastest formula is one you never typed.',
-    prompt:'Build profit = revenue \u00d7 margin by POINTING \u2014 = then arrow up to grab each reference, never typing a cell address \u2014 and fill it across five years. Point mode is the fastest formula entry there is; the fill proves your references were relative.',
+    prompt:'Build profit = revenue × margin by pointing: type =, then use the arrow keys to grab each reference — never type a cell address — and fill it across five years. Point mode is the fastest way to enter a formula, and the fill confirms the references were relative.',
     req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs revenue \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs margin \u00b7 <em>\u21b5</em> \u00b7 select '+o.rng+' \u00b7 <em>ctrl+r</em>'; },
     guide(){ const o=this._o; return [
       'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
@@ -4198,7 +4198,7 @@ const CHALLENGES = {
   growth:{
     name:'Growth', label:'Run the growth rates', par:36, parKeys:35,
     aha:'Growth = this ÷ last − 1 — one formula, filled across every year.',
-    prompt:'A real revenue build: two segments, a consolidated line, five fiscal years. Total the segments, run YoY growth off the total \u2014 this year \u00f7 last year \u2212 1, filled across, formatted as a percent \u2014 then land the 4-year CAGR with the ^ key. Three different formulas, and every rate reads like a banker wrote it.',
+    prompt:'A revenue build with two segments, a consolidated line, and five fiscal years. Total the segments, run YoY growth off the total — this year ÷ last year − 1, filled across, formatted as a percent — then compute the 4-year CAGR with the ^ key. Three formulas, each formatted to standard.',
     req:'<em>B4</em> total <em>=B2+B3</em> fill \u2192 \u00b7 <em>C5</em> YoY <em>=C4/B4-1</em> \u00b7 fill C5:F5 \u2192 + <em>ctrl+shift+%</em> \u00b7 <em>B7</em> CAGR <em>=(F4/B4)^(1/4)-1</em> + <em>ctrl+shift+%</em> \u00b7 dress B4:F4: <em>ctrl+b</em>',
     guide:[
       'consolidate at B4 \u00b7 <kbd>=B2+B3</kbd> \u2014 both segments \u00b7 fill right',
@@ -4264,7 +4264,7 @@ const CHALLENGES = {
   wacc:{
     name:'WACC', label:'Build the discount rate', par:78, parKeys:82,
     aha:'WACC = weights × costs — build the pieces, one line ties them.',
-    prompt:'The full desk build \u2014 no shortcuts: unlever the peer beta at the peer\u2019s structure, relever it at the target\u2019s OWN debt-to-equity, CAPM the cost of equity, tax-effect the debt side, then weight both sides off one denominator. Five formulas, each feeding the next \u2014 the grader follows the chain, so a retyped number breaks it.',
+    prompt:'Build the discount rate with no shortcuts: unlever the peer beta at the peer’s structure, relever it at the target’s own debt-to-equity, compute cost of equity with CAPM, tax-effect the debt side, then weight both sides off one denominator. Five formulas, each feeding the next — the grader follows the chain, so a retyped number breaks it.',
     req:'<em>B10</em> unlev \u03b2 <em>=B4/(1+(1-B6)*B5)</em> \u00b7 <em>B11</em> relev \u03b2 <em>=B10*(1+(1-B6)*B8/B7)</em> \u00b7 <em>B12</em> Ke <em>=B2+B11*B3</em> \u00b7 <em>B13</em> at-Kd <em>=B9*(1-B6)</em> \u00b7 <em>B14</em> WACC <em>=(B7*B12+B8*B13)/(B7+B8)</em>',
     guide:[
       'unlevered \u03b2 at B10 \u00b7 <kbd>=B4/(1+(1-B6)*B5)</kbd> <kbd>\u21b5</kbd> \u2014 strip the peer\u2019s leverage out',
@@ -4317,7 +4317,7 @@ const CHALLENGES = {
   dcf:{
     name:'DCF', label:'Discount the cash flows', par:62, parKeys:64,
     aha:'Each year ÷ (1+r)^n — discounting is a fill; then add the terminal value.',
-    prompt:'Five years of FCF and the real discounting stack: a discount-factor row built ONCE off the anchored rate, a PV row that just multiplies, a Gordon terminal value \u2014 and the TV discounts with the year-5 factor you already built. Desk rule: never retype a discount factor.',
+    prompt:'Five years of FCF and the full discounting stack: a discount-factor row built once off the anchored rate, a PV row that multiplies against it, a Gordon terminal value — and the TV discounts with the year-5 factor you already built. Never retype a discount factor.',
     req:'<em>B4</em> DF <em>=1/(1+$B$7)^B2</em> \u00b7 fill B4:F4 \u2192 \u00b7 <em>B5</em> PV <em>=B3*B4</em> \u00b7 fill B5:F5 \u2192 \u00b7 <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> \u00b7 <em>B11</em> <em>=B10*F4</em> \u00b7 <em>B12</em> EV <em>=SUM(B5:F5)+B11</em>',
     guide:[
       'discount factor at B4 \u00b7 <kbd>=1/(1+$B$7)^B2</kbd> \u2014 rate anchored, year walking',
@@ -4387,7 +4387,7 @@ const CHALLENGES = {
   fcfbuild:{
     name:'uFCF', label:'Build the unlevered FCF', par:32, parKeys:31,
     aha:'Unlevered FCF is a cascade — NOPAT, add back D&A, take out capex and the NWC build; the row the DCF discounts.',
-    prompt:'A five-year operating case, and the one row a DCF actually needs: unlevered free cash flow. Tax the EBIT (rate anchored), drop to NOPAT, add back the non-cash D&A, then take out what the business really spends — capex and the increase in working capital. Three formula rows, each filled across; the FCF line is what every valuation sits on.',
+    prompt:'From a five-year operating case, build the one row a DCF needs: unlevered free cash flow. Tax the EBIT (rate anchored), arrive at NOPAT, add back the non-cash D&A, then subtract capex and the increase in working capital. Three formula rows, each filled across.',
     req:'<em>B4</em> taxes <em>=-B3*$B$11</em> · fill B4:F4 → · <em>B5</em> NOPAT <em>=B3+B4</em> · fill B5:F5 → · <em>B9</em> uFCF <em>=B5+B6+B7+B8</em> · fill B9:F9 →',
     guide:[
       'cash taxes at B4 · <kbd>=-B3*$B$11</kbd> — EBIT × the anchored tax rate, negative',
@@ -4813,7 +4813,7 @@ const CHALLENGES = {
   dashcover:{
     name:'Model cover', label:'Build the model cover', par:48, parKeys:48,
     aha:'The cover page is all references — pull the model outputs into the headline metrics an IC actually reads, then stamp the title clean off the raw feed.',
-    prompt:'Page one of the summary: the cover box. The model spits out enterprise value, net debt, shares, EBITDA and interest — your job is the summary an IC reads first. Reference the outputs (never retype them) into equity value, value per share, the EV/EBITDA the deal is priced at, net leverage and interest coverage. Then the last inch of polish: the deal name arrived from the data room as a mess of spaces and lowercase — stamp the cover with it CLEANED, by formula, so when the name changes upstream the cover follows.',
+    prompt:'Page one of the summary: the cover box. The model produces enterprise value, net debt, shares, EBITDA and interest — build the summary that gets read first. Reference the outputs (never retype them) into equity value, value per share, the EV/EBITDA the deal prices at, net leverage and interest coverage.',
     req:'<em>B10</em> equity <em>=B3-B4</em> · <em>B11</em> per share <em>=B10/B5</em> · <em>B12</em> EV/EBITDA <em>=B3/B6</em> · <em>B13</em> leverage <em>=B4/B6</em> · <em>B14</em> coverage <em>=B6/B7</em> · <em>B16</em> stamp <em>=UPPER(TRIM(B15))</em> — collapse the junk spaces, then shout it',
     guide:[
       'equity value at B10 · <kbd>=B3-B4</kbd> — enterprise value less net debt (reference, don’t retype)',
@@ -4892,7 +4892,7 @@ const CHALLENGES = {
   lbo:{
     name:'LBO', label:'Run the LBO math', par:54, parKeys:56,
     aha:'Entry, leverage, exit — four lines of math and the IRR falls out.',
-    prompt:'Entry to exit, the whole chain: build enterprise value at entry, lever it, check the equity, mark the exit at the same multiple, land MOIC \u2014 then annualize it over the hold, because the IC never stops at MOIC. Seven formulas; the multiple stays anchored so entry and exit agree, and the IRR compounds off the hold period with the ^ key.',
+    prompt:'Entry to exit, the whole chain: build enterprise value at entry, lever it, check the equity, mark the exit at the same multiple, compute MOIC — then annualize it over the hold for the IRR. Seven formulas; the multiple stays anchored so entry and exit agree.',
     req:'<em>B6</em> entry EV <em>=B2*$B$4</em> \u00b7 <em>B7</em> debt <em>=B6*B5</em> \u00b7 <em>B8</em> entry equity <em>=B6-B7</em> \u00b7 <em>B9</em> exit EV <em>=B3*$B$4</em> \u00b7 <em>B11</em> exit equity <em>=B9-B10</em> \u00b7 <em>B12</em> MOIC <em>=B11/B8</em> \u00b7 <em>B14</em> IRR <em>=B12^(1/B13)-1</em>',
     guide:[
       'entry EV at B6 \u00b7 <kbd>=B2*$B$4</kbd> \u2014 EBITDA \u00d7 the anchored multiple',
@@ -4954,7 +4954,7 @@ const CHALLENGES = {
   revolver:{
     name:'Revolver', label:'Sweep the revolver', par:41, parKeys:41,
     aha:'MIN and MAX sweep the revolver — it plugs the shortfall, not your eyes.',
-    prompt:'Four year-end sweeps, each with its own cash picture. Sweep = the LESSER of the outstanding balance and the cash above minimum \u2014 never negative \u2014 then prove each year out: revolver after the sweep, cash after the sweep, and the balance row dressed. MIN and MAX nested once, arithmetic twice, one bold rule.',
+    prompt:'Four year-end sweeps, each with its own cash picture. The sweep is the lesser of the outstanding balance and the cash above minimum — never negative. Prove each year out: revolver after the sweep, cash after the sweep, and the balance row formatted. MIN and MAX nested once, arithmetic twice.',
     req:'<em>B5</em> <em>=MIN(B3,MAX(0,B2-B4))</em> \u00b7 fill B5:E5 \u2192 \u00b7 <em>B6</em> <em>=B3-B5</em> fill \u2192 \u00b7 <em>B7</em> <em>=B2-B5</em> fill \u2192 \u00b7 dress B6:E6: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'the sweep at B5 \u00b7 <kbd>=MIN(B3,MAX(0,B2-B4))</kbd> <kbd>\u21b5</kbd> \u2014 can\u2019t sweep more than the balance, can\u2019t dip below minimum cash',
@@ -5009,7 +5009,7 @@ const CHALLENGES = {
   cascade:{
     name:'Full Waterfall', label:'Run the full cascade', par:94, parKeys:100,
     aha:'Each tranche pays from the cash left — MIN against the balance, cascade down.',
-    prompt:'The real thing: three tranches, four years, cash flowing strictly by seniority. The revolver drinks first, the term loan takes what\u2019s left, mezz gets the dregs \u2014 some years it gets nothing, and the MIN has to say so. Every tranche roll-forwards its balance across the years, and total debt gets ruled off at the bottom. This is the waterfall AND the debt schedule on one tab.',
+    prompt:'Three tranches, four years, cash flowing strictly by seniority: the revolver is paid first, the term loan takes what’s left, and mezzanine gets the remainder — some years nothing, and the MIN has to say so. Every tranche rolls its balance across the years, and total debt re-ties each year.',
     req:'<em>B6</em> <em>=MIN(B5,B3)</em> fill \u2192 \u00b7 <em>B7</em> <em>=B5-B6</em> fill \u2192 \u00b7 <em>C5</em> <em>=B7</em> fill \u2192 \u00b7 term loan: <em>B9</em> <em>=MIN(B8,B3-B6)</em> \u00b7 <em>B10</em> <em>=B8-B9</em> \u00b7 <em>C8</em> <em>=B10</em> \u00b7 mezz: <em>B12</em> <em>=MIN(B11,B3-B6-B9)</em> \u00b7 <em>B13</em> <em>=B11-B12</em> \u00b7 <em>C11</em> <em>=B13</em> \u00b7 <em>B14</em> <em>=B7+B10+B13</em> fill \u2192 + dress',
     guide:[
       'the revolver drinks first: B6 \u00b7 <kbd>=MIN(B5,B3)</kbd> \u2014 can\u2019t pay down more than the balance \u00b7 fill \u2192',
@@ -5093,7 +5093,7 @@ const CHALLENGES = {
   wk13:{
     name:'13-Week Cash', label:'Run the 13-week', par:45, parKeys:45,
     aha:'Thirteen columns, one pattern — receipts − disbursements, filled right, rolls cash forward.',
-    prompt:'The RX desk staple: the front eight weeks of the 13-week cash flow. Receipts and disbursements are in from treasury \u2014 you build the spine: net flow each week, the beginning/ending roll-forward, the cushion against minimum liquidity (anchored \u2014 it does NOT walk), and totals on the FLOWS only. Stocks don\u2019t sum: an ending balance total is how you spot a tourist.',
+    prompt:'The front eight weeks of a 13-week cash flow. Receipts and disbursements are in from treasury — you build the spine: net flow each week, the beginning/ending roll-forward, the cushion against minimum liquidity (anchored, so it doesn’t walk), and totals on the flows only.',
     req:'<em>B6</em> <em>=B4-B5</em> fill \u2192 \u00b7 <em>B8</em> <em>=B7+B6</em> fill \u2192 \u00b7 roll-forward <em>C7</em> <em>=B8</em> fill \u2192 \u00b7 cushion <em>B10</em> <em>=B8-$B$12</em> fill \u2192 \u00b7 totals <em>J4</em> <em>=SUM(B4:I4)</em> + fill J4:J6 \u2193 \u00b7 dress <em>B8:I8</em>: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'net flow first: B6 \u00b7 <kbd>=B4-B5</kbd> \u2014 receipts less disbursements \u00b7 fill \u2192 to week 8',
@@ -5237,7 +5237,7 @@ const CHALLENGES = {
   debtsched:{
     name:'Debt Sched.', label:'Run the debt schedule', par:73, parKeys:77,
     aha:'Each tranche rolls BB + draws − paydown — interest reads the balance it just made.',
-    prompt:'The roll-forward, five years, and it starts the way real staffing does: the VP gives you the amort rate over the phone \u2014 you type it, you paint it blue, THEN you build. Mandatory amort off your anchored rate, a MIN/MAX cash sweep, interest on the average balance, the year-over-year link \u2014 and the ending row bolded and ruled when the machine ties.',
+    prompt:'The debt roll-forward, five years. The amort rate arrives as an instruction, not a formula: type it, color it blue, then build — mandatory amort off your anchored rate, a MIN/MAX cash sweep, interest on the average balance, and the year-over-year link.',
     req(){ return 'type <em>'+this._ratePct+'%</em> at B9 \u2192 <em>alt h f c</em> blue \u00b7 <em>B4</em> =-B2*$B$9 \u00b7 <em>B5</em> =-MIN(B2+B4,MAX(0,B3)) \u00b7 <em>B6</em> =B2+B4+B5 \u00b7 <em>B7</em> =$B$10*(B2+B6)/2 \u00b7 <em>C2</em> =B6 \u00b7 fill C2:F2 \u2192 \u00b7 fill B4:F7 \u2192 \u00b7 dress B6:F6: <em>ctrl+b</em> + <em>alt h b p</em>'; },
     guide(){ return [
       'the rate is YOURS: at B9 type <kbd>'+this._ratePct+'%</kbd> <kbd>\u21b5</kbd> \u2014 then back on B9 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means hardcode',
@@ -5316,7 +5316,7 @@ const CHALLENGES = {
   cfslink:{
     name:'CFS Link', label:'Link the cash flow statement', par:36, parKeys:36,
     aha:'Link every CFS line to the other statements (=) — type none of them.',
-    prompt:'Five years of cash flow, closed end to end: one SUM for the net change, the cash roll-forward linking every year to the last, a cash-conversion memo the MD will actually read \u2014 as a percent \u2014 and the ending row bolded and ruled. Four different muscles: sum, link, ratio, dress.',
+    prompt:'Five years of cash flow, closed end to end: one SUM for the net change, the cash roll-forward linking every year to the last, a cash-conversion memo as a percent, and the ending row bolded and ruled. Sum, link, ratio, format.',
     req:'<em>B6</em> =SUM(B2:B5) fill \u2192 \u00b7 <em>B8</em> =B7+B6 \u00b7 <em>C7</em> =B8 \u00b7 fill C7:F7 \u2192 \u00b7 fill B8:F8 \u2192 \u00b7 memo <em>B10</em> =B6/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B8:F8: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'net change at B6 \u00b7 <kbd>=SUM(B2:B5)</kbd> \u2014 NI + D&A + \u0394NWC + capex (signs carried) \u00b7 fill right',
@@ -5473,7 +5473,7 @@ const CHALLENGES = {
   nwcsched:{
     name:'NWC Sched.', label:'Roll working capital', par:74, parKeys:78,
     aha:'DSO, DIO, DPO drive the balances — working capital rolls on days, not guesses.',
-    prompt:'Working capital the way diligence actually hands it to you: three driver assumptions from the data room \u2014 you type them in, paint them blue, THEN build. AR off DSO, inventory off DIO, payables off DPO, each driver anchored and filled across five years, net working capital bolded and ruled, and the year-over-year swing that feeds the cash flow statement.',
+    prompt:'Working capital from the drivers: three assumptions from the data room — type them in, color them blue, then build. AR off DSO, inventory off DIO, payables off DPO, each driver anchored and filled across five years; net working capital bolded and ruled.',
     req(){ return 'type the drivers at B9:B11 \u2014 DSO <em>'+this._dso+'</em> \u00b7 DIO <em>'+this._dio+'</em> \u00b7 DPO <em>'+this._dpo+'</em> \u2014 then <em>alt h f c</em> blue \u00b7 <em>B4</em> =B2/365*$B$9 fill \u2192 \u00b7 <em>B5</em> =B3/365*$B$10 fill \u2192 \u00b7 <em>B6</em> =B3/365*$B$11 fill \u2192 \u00b7 <em>B7</em> =B4+B5-B6 fill \u2192 + <em>ctrl+b</em> + <em>alt h b p</em> \u00b7 <em>C8</em> \u0394 =C7-B7 fill \u2192'; },
     guide(){ return [
       'the data room says DSO <kbd>'+this._dso+'</kbd> \u00b7 DIO <kbd>'+this._dio+'</kbd> \u00b7 DPO <kbd>'+this._dpo+'</kbd> \u2014 type them down B9:B11, <kbd>\u21b5</kbd> walks you down',
@@ -5547,7 +5547,7 @@ const CHALLENGES = {
   threestmt:{
     name:'3-Statement', label:'Tie the three statements', par:59, parKeys:61,
     aha:'NI → cash → balance sheet — three statements, one loop, all links (=).',
-    prompt:'The capstone, now three years wide: cash walks from the CFS into the balance sheet, retained earnings absorbs net income year after year, and the check row proves the whole machine ties \u2014 three different LINKS, each built once and filled across. When all three check cells read zero, format the totals and ship it.',
+    prompt:'Three statements, three years wide: cash walks from the CFS into the balance sheet, retained earnings absorbs net income year after year, and the check row proves the whole build ties — three links, each built once and filled across. When all three check cells read zero, format the totals.',
     req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B7</em> =B6+B5 \u00b7 <em>C6</em> =B7 fill \u2192 \u00b7 fill B7:D7 \u2192 \u00b7 <em>B9</em> =B7 fill \u2192 \u00b7 <em>B11</em> =B9+B10 fill \u2192 \u00b7 <em>C13</em> =B13+C2 fill \u2192 \u00b7 <em>B14</em> =B11-B12-B13 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B11:D11 \u00b7 <em>alt h b p</em> B14:D14',
     guide:[
       'net change at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 capex already carries its sign; one clean SUM \u00b7 fill right \u00b7 ending cash at B7 \u00b7 <kbd>=B6+B5</kbd>',
@@ -5630,7 +5630,7 @@ const CHALLENGES = {
   waterfall:{
     name:'Waterfall', label:'Run the paydown waterfall', par:64, parKeys:67,
     aha:'Paydown follows seniority — each tranche MINs against the cash that’s left.',
-    prompt:'Three years of cash, two tranches, strict seniority \u2014 and the balances CORKSCREW: each year opens where the last one closed. Build year 1 top to bottom, link both openings, fill everything right. MIN does the rationing; the cascade proves itself.',
+    prompt:'Three years of cash, two tranches, strict seniority — and the balances corkscrew: each year opens where the last one closed. Build year 1 top to bottom, link both openings, fill everything right. MIN does the rationing.',
     req:'<em>B5</em> FCF <em>=SUM(B2:B4)</em> \u00b7 fill B5:D5 \u2192 \u00b7 <em>B8</em> <em>=MIN(B5,B7)</em> \u00b7 <em>B9</em> <em>=B7-B8</em> \u00b7 <em>B10</em> <em>=B5-B8</em> \u00b7 fill B8:D10 \u2192 \u00b7 link <em>C7</em> <em>=B9</em> fill \u2192 \u00b7 <em>B13</em> <em>=MIN(B10,B12)</em> \u00b7 <em>B14</em> <em>=B12-B13</em> \u00b7 fill B13:D14 \u2192 \u00b7 link <em>C12</em> <em>=B14</em> fill \u2192',
     guide:[
       'free cash, all years: B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 capex and interest already carry their signs \u00b7 fill B5:D5 \u2192',
@@ -5703,7 +5703,7 @@ const CHALLENGES = {
   txncomps:{
     name:'Txn Comps', label:'Run precedent transactions', par:36, parKeys:36,
     aha:'Precedents are comps with dates — same multiples, read in deal order.',
-    prompt:'Five precedent deals, one target. Compute EV/EBITDA paid in each deal, average the multiples off one live formula, then mark the target: implied EV at the average multiple, less net debt, equals implied equity. The comps page every pitch book leans on.',
+    prompt:'Five precedent deals, one target. Compute EV/EBITDA paid in each deal, average the multiples with one live formula, then mark the target: implied EV at the average multiple, less net debt, equals implied equity.',
     req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> median <em>=MEDIAN(D3:D7)</em> \u00b7 <em>B11</em> implied EV <em>=B10*D8</em> \u00b7 <em>B13</em> implied equity <em>=B11-B12</em>',
     guide:[
       'multiple paid, deal one: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -5762,7 +5762,7 @@ const CHALLENGES = {
   sourcesuses:{
     name:'S&U', label:'Balance sources and uses', par:55, parKeys:57,
     aha:'Sources must equal uses — the plug is a formula (=uses−sources), never a typed number.',
-    prompt:'The first page of every deal book \u2014 and now the version the MD actually wants: total the uses, let sponsor equity be THE PLUG, total the sources, prove the check reads zero \u2014 then common-size BOTH sides with an anchored % column that runs straight through 100%. Two anchors, two fills, one funded deal.',
+    prompt:'The first page of every deal book: total the uses, let sponsor equity be the plug, total the sources, and prove the check reads zero — then common-size both sides with an anchored % column that runs through 100%. Two anchors, two fills, one funded deal.',
     req:'<em>B5</em> total uses <em>=SUM(B2:B4)</em> \u00b7 <em>C2</em> % <em>=B2/$B$5</em> fill C2:C5 \u00b7 <em>B9</em> sponsor equity <em>=B5-B7-B8</em> (the plug) \u00b7 <em>B10</em> total sources <em>=SUM(B7:B9)</em> \u00b7 <em>C7</em> % <em>=B7/$B$10</em> fill C7:C10 \u00b7 <em>B12</em> check <em>=B10-B5</em> \u2192 0',
     guide:[
       'total uses at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 equity purchase, refi, fees',
@@ -5824,7 +5824,7 @@ const CHALLENGES = {
   accdil:{
     name:'Acc/Dil', label:'Run accretion / dilution', par:50, parKeys:51,
     aha:'Accretion = pro-forma EPS ÷ standalone − 1 — the verdict is four rows of math.',
-    prompt:'The question every board asks: does the deal ADD to EPS? Now with the part juniors forget \u2014 the financing drag. Cash spent on the deal stops earning; that foregone interest comes OUT of pro forma income before you divide. Combine the income, net the drag, combine the shares, compute both EPS figures, and land the verdict \u2014 synergies push it up, the drag pulls it down.',
+    prompt:'Does the deal add to EPS? Include the part that’s easy to forget — the financing drag: cash spent on the deal stops earning interest, and that foregone interest comes out of pro forma income before you divide. Combine the income, net the drag, combine the shares, compute both EPS figures, and state the verdict.',
     req:'<em>B7</em> foregone interest <em>=-B5*B6</em> \u00b7 <em>B8</em> pro forma NI <em>=SUM(B2:B4)+B7</em> \u00b7 <em>B11</em> shares <em>=B9+B10</em> \u00b7 <em>B12</em> standalone EPS <em>=B2/B9</em> \u00b7 <em>B13</em> pro forma EPS <em>=B8/B11</em> \u00b7 <em>B14</em> accretion <em>=B13/B12-1</em>',
     guide:[
       'the drag first: B7 \u00b7 <kbd>=-B5*B6</kbd> \u2014 cash consideration \u00d7 its after-tax cost, negative convention',
@@ -5883,7 +5883,7 @@ const CHALLENGES = {
   dcfsens:{
     name:'Sensitivity', label:'Run the sensitivity table', par:19, parKeys:17,
     aha:'Mixed anchors run the grid — row-lock the header, column-lock the driver; one formula fills every cell.',
-    prompt:'The real thing: a two-way table \u2014 five WACCs across, three growth rates down, FIFTEEN cells from ONE formula. Only true mixed anchors survive this: FCF locked absolute ($B$2), the WACC header row-locked (C$3), the growth column column-locked ($B4). Build it once, fill right, fill down. Wrong anchors don\u2019t fail quietly here \u2014 they fail fifteen times.',
+    prompt:'A two-way sensitivity table: five WACCs across, three growth rates down, fifteen cells from one formula. Only correct mixed anchors survive it — FCF locked absolute ($B$2), the WACC header row-locked (C$3), the growth column column-locked ($B4). Build the formula once, fill right, fill down.',
     req:'<em>C4</em> \u00b7 <em>=$B$2/(C$3-$B4)</em> \u2014 F4 cycles each ref to its mixed form \u00b7 fill C4:G4 <em>ctrl+r</em> \u00b7 then C4:G6 <em>ctrl+d</em>',
     guide:[
       'at C4 \u00b7 <kbd>=$B$2/(C$3-$B4)</kbd> <kbd>\u21b5</kbd> \u2014 <kbd>F4</kbd> cycles $B$2 \u2192 B$2 \u2192 $B2 \u2192 B2; stop on the form each ref needs',
@@ -5936,7 +5936,7 @@ const CHALLENGES = {
   retbridge:{
     name:'Ret. Bridge', label:'Attribute the returns', par:65, parKeys:68,
     aha:'Split the return into levers — EBITDA growth, multiple, deleveraging, one line each.',
-    prompt:'Where did the equity gain COME from? Decompose it: EBITDA growth at the entry multiple, multiple expansion on exit EBITDA, and deleveraging \u2014 then prove the bridge ties to the actual equity change with a zero check. The page every LP meeting turns to.',
+    prompt:'Decompose the equity gain into its three drivers: EBITDA growth at the entry multiple, multiple expansion on exit EBITDA, and deleveraging — then prove the bridge ties to the actual equity change with a zero check.',
     req:'<em>B9</em> growth <em>=(B3-B2)*B4</em> \u00b7 <em>B10</em> multiple <em>=(B5-B4)*B3</em> \u00b7 <em>B11</em> delever <em>=B6-B7</em> \u00b7 <em>B12</em> total <em>=SUM(B9:B11)</em> \u00b7 <em>B14</em> check <em>=B12-((B3*B5-B7)-(B2*B4-B6))</em> \u2192 0',
     guide:[
       'EBITDA growth effect at B9 \u00b7 <kbd>=(B3-B2)*B4</kbd> \u2014 growth priced at the ENTRY multiple',
@@ -5984,7 +5984,7 @@ const CHALLENGES = {
   football:{
     name:'Football', label:'Build the football field', par:39, parKeys:39,
     aha:'Every method gives a low and a high — the football field is valuation on one axis.',
-    prompt:'Three methodologies, three ranges, one summary: midpoint per method, then the widest view \u2014 the lowest low and the highest high across all three. MIN and MAX earn their keep; the last page of every valuation section.',
+    prompt:'Three methodologies, three ranges, one summary: a midpoint per method, then the widest view — the lowest low and the highest high across all three, with MIN and MAX. The summary page of every valuation section.',
     req:'<em>D3</em> mid <em>=(B3+C3)/2</em> \u00b7 fill D3:D5 \u2193 \u00b7 <em>B7</em> floor <em>=MIN(B3:B5)</em> \u00b7 <em>B8</em> ceiling <em>=MAX(C3:C5)</em> \u00b7 <em>B9</em> width <em>=B8-B7</em>',
     guide:[
       'midpoint, comps: D3 \u00b7 <kbd>=(B3+C3)/2</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D5 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -6037,7 +6037,7 @@ const CHALLENGES = {
   cagr:{
     name:'CAGR', label:'Compound it, three times', par:55, parKeys:57,
     aha:'CAGR = (end ÷ start)^(1÷years) − 1 — the ^ key does the compounding.',
-    prompt:'Three CAGR checks scattered where a real page would leave them \u2014 and they move every run. Same clean formula each time: (End \u00f7 Begin) ^ (1 \u00f7 Years) \u2212 1, percent. Then read your own output like a banker: the deal with the highest CAGR gets flagged bold \u2014 computing the number is half the job; calling the winner is the other half.',
+    prompt:'Three CAGR checks in different spots on the page — they move every run. The formula is the same each time: (End ÷ Begin) ^ (1 ÷ Years) − 1, formatted as a percent. Then read the output: bold the deal with the highest CAGR. Computing the number is half the job; identifying the winner is the rest.',
     req(){ return this._sites.map(s=>'<em>'+s.col+s.ans+'</em> \u00b7 =('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1 \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then ')+' \u00b7 then <em>ctrl+b</em> the HIGHEST of the three'; },
     guide(){ const g=this._sites.map((s,i)=>['block one','block two','block three'][i]+' \u2014 at <b>'+s.col+s.ans+'</b> type <kbd>=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>');
       g.push('now READ them \u2014 the highest CAGR wins the page: back to that cell \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>'); return g; },
@@ -6090,7 +6090,7 @@ const CHALLENGES = {
   balance:{
     name:'Balance', label:'Make it balance', par:39, parKeys:39,
     aha:'A sheet that won’t tie is wrong somewhere specific — the check row points at where.',
-    prompt:'Two years of balance sheet \u2014 and retained earnings is NEVER a plug; it\u2019s earned, so it\u2019s a given like everything else. Foot both sides with live SUMs, build the check row, and format the totals. The check is a DIAGNOSTIC: it reads zero because the sheet is right, not because you forced it.',
+    prompt:'Two years of balance sheet. Retained earnings is never a plug — it’s a given, like every other line. Foot both sides with live SUMs, build the check row, and format the totals. The check reads zero because the sheet is right.',
     req:'<em>B6</em> <em>=SUM(B2:B5)</em> fill \u2192 \u00b7 <em>B12</em> <em>=SUM(B8:B11)</em> fill \u2192 \u00b7 <em>B14</em> check <em>=B6-B12</em> fill \u2192 \u00b7 dress: <em>ctrl+b</em> B6:C6 and B12:C12 \u00b7 <em>alt h b p</em> B14:C14',
     guide:[
       'total the assets at B6 \u00b7 <kbd>=SUM(B2:B5)</kbd> (<kbd>alt</kbd>+<kbd>=</kbd> proposes it) \u00b7 fill right',
@@ -6151,9 +6151,9 @@ const CHALLENGES = {
     }
   },
   audit:{
-    name:'The 4am pass', label:'The 4am pass \u2014 find what\u2019s broken', par:34, parKeys:33,
+    name:'The 4am pass', label:'Find what’s broken', par:34, parKeys:33,
     aha:'Broken models leave fingerprints — hardcodes in formula rows, refs off by one.',
-    prompt:'A divisional P&L someone else built \u2014 seniors sweep pages like this with F5 \u2192 Special \u2192 Constants, a ritual you now have \u2014 and three things are wrong with it: one division\u2019s five-year Total stops a column short, one EBITDA is a stale hardcode, and one EBITDA reads the wrong year\u2019s opex. Nobody tells you which \u2014 read the tab like you\u2019ll have to defend it. This is the pass your associate does at 4am; learn to do it at 4pm.',
+    prompt:'Audit a divisional P&L someone else built. Three things are wrong: one division’s five-year Total stops a column short, one EBITDA is a stale hardcode, and one EBITDA reads the wrong year’s opex. Use F5 → Special → Constants to light up every raw number on the page, find all three, and rebuild them as live formulas.',
     req(){ return '<em>scan the Total column</em> \u00b7 one SUM stops at FY4 \u2014 <em>F2</em>, extend it \u00b7 one EBITDA is a typed number \u2014 rebuild it live \u00b7 one EBITDA crosses columns \u2014 repoint it'; },
     guide:[
       'read the Total column (G) \u2014 one division\u2019s SUM ends a year early \u00b7 <kbd>F2</kbd>, extend the range to column F, <kbd>\u21b5</kbd>',
@@ -6241,9 +6241,9 @@ const CHALLENGES = {
   },
 
   triage:{
-    name:'Error triage', label:'Error triage \u2014 #REF!, #DIV/0!, #VALUE!', par:27, parKeys:25,
+    name:'Error triage', label:'Error triage: #REF!, #DIV/0!, #VALUE!', par:27, parKeys:25,
     aha:'#REF! lost a cell, #DIV/0! lost a base, #VALUE! ate text — each error names its cause.',
-    prompt:'Three classic breaks on one tab: a #REF! where a deleted row took the SUM with it, a #DIV/0! where the denominator points at nothing, and a #VALUE! where a formula grabbed text. Triage all three \u2014 read the error, find the intent, rebuild the formula. The error message is the diagnosis; you\u2019re the fix.',
+    prompt:'Three classic breaks on one tab: a #REF! where a deleted row took the SUM with it, a #DIV/0! where the denominator points at nothing, and a #VALUE! where a formula grabbed text. Read each error, work out the intent, and rebuild the formula. The error message is the diagnosis.',
     req(){ const R=this._R; return '<em>'+R.refCell+'</em> #REF! \u2192 rebuild =SUM('+R.refFix+') \u00b7 <em>'+R.divCell+'</em> #DIV/0! \u2192 denominator is '+R.divFix+' \u00b7 <em>'+R.valCell+'</em> #VALUE! \u2192 point at the NUMBER ('+R.valFix+')'; },
     guide:[
       'the #REF! total lost its range to a deleted row \u00b7 retype it: <kbd>=</kbd>SUM over the block <kbd>\u21b5</kbd>',
@@ -6309,9 +6309,9 @@ const CHALLENGES = {
      failure class: a dead check row hiding breaks (balcheck), links reading a dead
      assumptions block (stalelink), pasted-in positive costs (signerr). */
   balcheck:{
-    name:'Tie-out', label:'Make it tie \u2014 hunt the break', par:28, parKeys:27,
+    name:'Tie-out', label:'Hunt the balance break', par:28, parKeys:27,
     aha:'Tie out by halving — check the subtotal, then only the block that fails.',
-    prompt:'A balance sheet that doesn\u2019t balance \u2014 and someone pasted zeros over the check row so it LOOKS like it does. On real desks the check line reads OK/ERROR; ours reads zero \u2014 same religion. Resurrect the check row live, read which years break, and run both culprits down: one Total assets lost its first line to a later insert, and one equity cell is a typed plug where the roll-forward should be. The check row is the smoke alarm; this sheet shipped with the battery pulled.',
+    prompt:'A balance sheet that doesn’t balance — and someone pasted zeros over the check row so it looks like it does. Rebuild the check row as a live formula, read which years break, and fix both causes: one Total assets lost its first line, and one liability cell is a stale hardcode. The check reads zero because the sheet is right, not because it was forced.',
     req(){ return '<em>B15:E15</em> check \u2192 =B8\u2212B14, filled \u00b7 one <em>Total assets</em> starts a row short \u2014 respan it \u00b7 one <em>Equity</em> cell is typed \u2014 roll-forward it \u00b7 every check reads 0'; },
     guide:[
       'the check row is pasted zeros \u00b7 B15: <kbd>=</kbd>B8-B14 <kbd>\u21b5</kbd> \u00b7 select B15:E15, <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 now read which years break',
@@ -6407,7 +6407,7 @@ const CHALLENGES = {
   stalelink:{
     name:'Stale Links', label:'Re-point the stale links', par:28, parKeys:27,
     aha:'Re-point a stale link (F2, fix the ref) — never retype the number it should read.',
-    prompt:'The assumptions moved to v2 this morning \u2014 but three cells in the build still read the DEAD v1 column. The tab computes, nothing errors, every number is confidently wrong. Hunt the rows whose pattern breaks, F2 the stale refs onto the live block, and prove contribution ties to v2. Silent staleness is worse than a #REF! \u2014 at least the #REF! admits it.',
+    prompt:'The assumptions moved to v2, but three cells in the build still read the dead v1 column. The tab computes, nothing errors, and every number is wrong. Find the rows whose pattern breaks, F2 the stale references onto the live block, and confirm contribution ties to v2. A silently stale link is worse than a #REF! — at least the #REF! announces itself.',
     req(){ const R=this._stale; return '<em>'+R.join('</em> \u00b7 <em>')+'</em> still read the v1 column (C) \u2014 re-point each at the LIVE v2 block ($B$4:$B$6) \u00b7 contribution must tie to v2'; },
     guide:[
       'read each row for the value that breaks the pattern \u2014 that cell\u2019s formula points at column C (v1, dead)',
@@ -6503,7 +6503,7 @@ const CHALLENGES = {
   signerr:{
     name:'Sign Sweep', label:'Flip the signs back', par:22, parKeys:20,
     aha:'Costs are negative or the subtotals lie — sign convention is structure, not style.',
-    prompt:'Someone pasted three cost cells in from a positive-convention deck \u2014 this tab runs costs NEGATIVE and sums straight through, so EBIT is silently rich in three years. Sweep rows 5-7 for costs that lost their sign, flip them back, then prove the fix: EBIT re-ties itself, and you land a margin row as the sign-off. A sign error doesn\u2019t crash; it just lies.',
+    prompt:'Three cost cells were pasted in from a positive-convention source — this tab runs costs negative, so EBIT is overstated in three years. Sweep rows 5–7 for costs that lost their sign, flip them back, and confirm the fix: EBIT re-ties, and a margin row finishes the page.',
     req(){ return 'costs carry their sign \u2014 <em>rows 5-7 all negative</em> \u00b7 EBIT sum-through re-ties every year (row 8) \u00b7 <em>B10:F10</em> margin \u2192 =B8/B4, filled, shown as % (<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>)'; },
     guide:[
       'scan rows 5-7 \u2014 three cost cells read POSITIVE \u00b7 retype each with its minus <kbd>\u21b5</kbd> (type-to-replace)',
@@ -6703,7 +6703,7 @@ const CHALLENGES = {
   wrapfix:{
     name:'IFERROR', label:'Wrap it or fix it', par:70, parKeys:73,
     aha:'IFERROR is a seatbelt, not a blindfold — wrap the truly missing, fix the merely broken.',
-    prompt:'Two lookups are down on the segment data, both reading #N/A — and they are NOT the same problem. One queries a discontinued segment that is genuinely gone: wrap it in IFERROR with a zero fallback so the page stops screaming. The other has a broken MATCH range — it aims at the numbers instead of the names: FIX it, don’t bury it. Suppressing an error is not the same as repairing one.',
+    prompt:'Two lookups read #N/A — and they are not the same problem. One queries a discontinued segment that is genuinely gone: wrap it in IFERROR with a zero fallback. The other has a broken MATCH range that aims at the numbers instead of the names: fix the range, and don’t wrap it. A fallback is for the truly missing; a repair is for the merely broken.',
     req(){ const o=this._o; return '<em>'+o.q1+'</em> → wrap: <em>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</em> · <em>'+o.q2+'</em> → fix the range: MATCH must read <em>A3:A7</em>, not B3:B7 — and NO iferror here'; },
     guide(){ const o=this._o; return [
       o.q1+' hunts a segment that no longer exists — that error is TRUE. Wrap it: <kbd>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</kbd> <kbd>↵</kbd>',
@@ -6755,7 +6755,7 @@ const CHALLENGES = {
   liqbridge:{
     name:'Liq. Bridge', label:'Bridge the liquidity \u2014 three cases', par:40, parKeys:40,
     aha:'Liquidity = cash + revolver − needs — three cases, one bridge.',
-    prompt:'The first page of every RX deck: where does liquidity land, and in which case does it break? Cash plus undrawn revolver is the starting point; the bridge walks burn, asset sales and fees to an ending number; the cushion against minimum liquidity is the answer. Build it once, fill it across Base / Downside / Severe \u2014 the severe case is SUPPOSED to look ugly. That\u2019s why the page exists.',
+    prompt:'The first page of every restructuring deck: where does liquidity land, and in which case does it break? Cash plus undrawn revolver is the start; the bridge walks burn, asset sales and fees to an ending number; the cushion against minimum liquidity is the answer. Build it once, fill it across Base / Downside / Severe.',
     req(){ return '<em>B7:D7</em> availability \u2192 =B5\u2212B6 \u00b7 <em>B8:D8</em> beginning \u2192 =B4+B7 \u00b7 <em>B12:D12</em> ending \u2192 =B8+SUM(B9:B11) \u00b7 <em>B14:D14</em> cushion \u2192 =B12\u2212B13 \u00b7 ending row bold'; },
     guide:[
       'availability = commitment \u2212 drawn \u00b7 B7: <kbd>=</kbd>B5-B6 <kbd>\u21b5</kbd> \u00b7 select B7:D7, <kbd>ctrl</kbd>+<kbd>r</kbd>',
@@ -6840,7 +6840,7 @@ const CHALLENGES = {
   covtable:{
     name:'Cov. Table', label:'Run the covenant table', par:45, parKeys:45,
     aha:'Covenants are ratios with teeth — the table shows headroom before the breach.',
-    prompt:'Leverage is tested every quarter and the covenant STEPS DOWN \u2014 the question is never "are we compliant today", it\'s "which quarter pinches". Covenants test NET leverage: debt less cash, over LTM EBITDA. Compute it, headroom against the stepping max, a 1/0 compliance flag with a real IF, and pull the tightest quarter with MIN. When this table goes red, everyone you\'ve ever met gets on a call.',
+    prompt:'Leverage is tested every quarter and the covenant steps down — the question is never "compliant today?" but "which quarter pinches?". Covenants test net leverage: debt less cash, over LTM EBITDA. Compute it, the headroom against the stepping maximum, and a 1/0 compliance flag with a real IF.',
     req(){ return '<em>B7:F7</em> net leverage \u2192 =(B5-B6)/B4 \u00b7 <em>B9:F9</em> headroom \u2192 =B8\u2212B7 \u00b7 <em>B10:F10</em> compliant \u2192 =IF(B9>=0,1,0) \u00b7 <em>B12</em> tightest \u2192 =MIN(B9:F9)'; },
     guide:[
       'NET leverage = (debt \u2212 cash) over LTM EBITDA \u2014 covenants credit the cash \u00b7 B7: <kbd>=</kbd>(B5-B6)/B4 <kbd>\u21b5</kbd> \u00b7 select B7:F7, <kbd>ctrl</kbd>+<kbd>r</kbd>',
@@ -6921,9 +6921,9 @@ const CHALLENGES = {
   },
 
   versionup:{
-    name:'Roll-forward prep', label:'Kill the hardcodes \u2014 make it roll forward', par:33, parKeys:32,
+    name:'Roll-forward prep', label:'Rebuild the hardcoded rows', par:33, parKeys:32,
     aha:'A hardcode freezes yesterday — relink it (=), then bulk-rename the version tag (Ctrl+H) so the whole page reads v2.',
-    prompt:'You inherited a five-year operating build where someone typed the answers: growth, gross profit, EBITDA, AND the margin are all hardcoded numbers \u2014 right today, silently wrong the moment an input moves. Resurrect every derived row as a live formula, fill it across, and prove nothing drifted. This is versioning discipline: v2 must survive new numbers without a rebuild.',
+    prompt:'A five-year operating build where someone typed the answers: growth, gross profit, EBITDA, and the margin are all hardcoded — right today, wrong the moment an input moves. Rebuild every derived row as a live formula, fill each across, and confirm nothing drifted from the typed values.',
     req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4+B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7+B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 stamp it v2 (<em>ctrl+h</em> v1 \u2192 v2) \u00b7 costs carry their sign \u2014 subtotals are clean sums'; },
     guide:[
       'growth row is typed \u00b7 C5: <kbd>=</kbd>C4/B4-1 <kbd>\u21b5</kbd> \u00b7 select C5:F5, <kbd>ctrl</kbd>+<kbd>r</kbd>',
@@ -6993,7 +6993,7 @@ const CHALLENGES = {
   sumif:{
     name:'SUMIF', label:'Roll up the segments', par:57, parKeys:59,
     aha:'SUMIF reads the labels for you — one formula rolls up an entire segment.',
-    prompt:'A raw ledger on the left, a summary the MD can read on the right. One SUMIF with anchored ranges, filled down for the other segments \u2014 only the criteria cell walks. Then total the summary with a live SUM, run % of total off an anchored denominator, and bold the total line. Rollup, ratio, dress: a real summary tab.',
+    prompt:'A raw ledger on the left, a clean summary on the right. Write one SUMIF with anchored ranges and fill it down for the other segments — only the criteria cell moves. Then total the summary with a live SUM, run % of total off an anchored denominator, and bold the total line.',
     req:'<em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> \u00b7 fill E2:E4 \u2193 \u00b7 <em>E5</em> <em>=SUM(E2:E4)</em> \u00b7 <em>F2</em> <em>=E2/$E$5</em> \u00b7 fill F2:F4 \u2193 + <em>ctrl+shift+%</em> \u00b7 dress D5:E5: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'the rollup at E2 \u00b7 <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>\u21b5</kbd> \u2014 ranges $-locked, criteria walking',
@@ -7057,9 +7057,9 @@ const CHALLENGES = {
     }
   },
   cases:{
-    name:'Sticky switch', label:'Scenario driver — CHOOSE + sticky capture', par:94, parKeys:100,
+    name:'Sticky switch', label:'Scenario switch with CHOOSE', par:94, parKeys:100,
     aha:'A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.',
-    prompt:'This is how a real model switches scenarios. A driver block reads ONE cell — the switch — and CHOOSE pulls the active case’s name and growth into it; the whole model runs off that driver, not a nest of IFs. A CAPTURE cell then reads the locked-year revenue only when its case is live and otherwise references ITSELF to hold the value — so the summary shows all three side by side. Build the driver, run the model off it, flip 1·2·3 to snapshot each case. THEN the twist every analyst gets burned by: the deal team revises an assumption. Watch the snapshot stay frozen at the stale number, and refresh it by revisiting the case — while the others never budge.',
+    prompt:'Build a scenario switch the way a real model does it. A driver block reads one cell — the switch — and CHOOSE pulls the active case’s name and growth rate into it, so the model runs off the driver instead of nested IFs. A capture cell reads the locked-year revenue only while its case is live, and otherwise references itself to hold the last value — so the summary shows all three cases side by side.',
     req(){ const c=this._capL, m=(this._mutG*100).toFixed(1); return 'driver: <em>B8</em> =CHOOSE($B$3,B5,C5,D5) · <em>B9</em> =CHOOSE($B$3,B6,C6,D6) · model: <em>C12</em> =B12*(1+$B$9) F4-anchored, fill <em>C12:F12</em> → · <em>C13</em> =C12/B12-1 fill <em>C13:F13</em> → · capture: <em>C18</em> =IF($B$3=C$17,$'+c+'$12,C18) fill <em>C18:E18</em> → · flip <em>B3</em> → 1 · 2 · 3 · then revise <em>B6</em> → '+m+'% and re-flip <em>B3</em> → 1'; },
     guide(){ const c=this._capL, m=(this._mutG*100).toFixed(1); return [
       'the DRIVER — CHOOSE reads the switch: <em>B8</em> · <kbd>=</kbd>CHOOSE($B$3,B5,C5,D5) — the active case NAME · <kbd>↵</kbd> · <em>B9</em> · <kbd>=</kbd>CHOOSE($B$3,B6,C6,D6) — the active GROWTH · <kbd>↵</kbd>',
@@ -7199,9 +7199,9 @@ const CHALLENGES = {
   },
 
   rollup:{
-    name:'SUMIFS', label:'Cross the data', par:65, parKeys:68,
+    name:'SUMIFS', label:'Cross-tab with SUMIFS', par:65, parKeys:68,
     aha:'SUMIFS crosses two labels at once — one mixed-anchor formula fills the grid.',
-    prompt:'A raw deal list \u2014 segment, region, revenue \u2014 and the MD wants the CROSS: a segment \u00d7 region grid, four numbers, totaled. One SUMIFS does it: ranges $-locked, the segment criterion column-locked ($F3), the region criterion row-locked (G$2) \u2014 then the SAME formula fills right and down and the grid builds itself. The dcfsens anchor lesson, pointed at data.',
+    prompt:'Roll a raw deal list — segment, region, revenue — up into a segment × region grid. One SUMIFS does it: ranges $-locked, the segment criterion column-locked ($F3), the region criterion row-locked (G$2) — then the same formula fills right and down to build the grid.',
     req:'<em>G3</em> <em>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</em> \u00b7 fill G3:H3 \u2192 \u00b7 fill G3:H4 \u2193 \u00b7 <em>G5</em> <em>=SUM(G3:G4)</em> fill \u2192 \u00b7 dress F5:H5: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'the cross at G3 \u00b7 <kbd>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</kbd> <kbd>\u21b5</kbd> \u2014 sum range first, then each (range, criterion) pair; $F3 walks DOWN only, G$2 walks RIGHT only',
@@ -7267,9 +7267,9 @@ const CHALLENGES = {
     }
   },
   fxconvert:{
-    name:'FX Convert', label:'Convert the page — one boxed rate', par:35, parKeys:34,
+    name:'FX Convert', label:'Convert with one FX rate', par:35, parKeys:34,
     aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention boxes the driver (Alt H B A) while the output table gets an outline (Alt H B S).',
-    prompt:'The revenue table came over from the Frankfurt desk in euros — the book prints in dollars. The desk convention: the FX rate lives in ONE cell, typed blue and BOXED (Alt H B A — all borders on a standalone driver), and every converted number reads off it. Build the USD block from a single anchored formula — fill right, then down — comma it, and OUTLINE the finished table (Alt H B S), never a grid of borders. One rate cell, twelve conversions, zero retyping.',
+    prompt:'Convert the euro revenue table to dollars. Desk convention: the FX rate lives in one cell — typed blue and boxed (Alt H B A) — and every converted number reads off it. Build the USD block from a single anchored formula, fill right then down, add commas, and outline the finished table (Alt H B S) instead of ruling a grid of borders.',
     req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), box it (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outline <em>A10:F12</em> (<em>alt h b s</em>)'; },
     guide(){ return [
       'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — a standalone input gets ALL borders; that box says "this cell drives the page"',

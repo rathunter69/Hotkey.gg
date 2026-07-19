@@ -99,7 +99,7 @@
   <div class="eyebrow">◆ Formulas I · drill</div>
   <h1>Scenario switch with CHOOSE</h1>
   <div class="aha">A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.</div>
-  <div class="sub">This is how a real model switches scenarios. A driver block reads ONE cell — the switch — and CHOOSE pulls the active case’s name and growth into it; the whole model runs off that driver, not a nest of IFs. A CAPTURE cell then reads the locked-year revenue only when its case is live and otherwise references ITSELF to hold the value — so the summary shows all three side by side. Build the driver, run the model off it, flip 1·2·3 to snapshot each case. THEN the twist every analyst gets burned by: the deal team revises an assumption. Watch the snapshot stay frozen at the stale number, and refresh it by revisiting the case — while the others never budge.</div>
+  <div class="sub">Build a scenario switch the way a real model does it. A driver block reads one cell — the switch — and CHOOSE pulls the active case’s name and growth rate into it, so the model runs off the driver instead of nested IFs. A capture cell reads the locked-year revenue only while its case is live, and otherwise references itself to hold the last value — so the summary shows all three cases side by side.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=cases">train this drill →</a>
     <span class="par">par 94s · optimal 100 keys · keyboard only · free</span>
