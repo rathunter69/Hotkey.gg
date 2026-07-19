@@ -14916,9 +14916,9 @@ function startOnboardBoard(){
 const TOUR_STEPS=[
   /* r303 — the folded-in fundamentals (shown only for the "basically none" answer) */
   {sel:'.gridwrap', novice:true, cap:'this is the grid', at:'A4',
-    body:'Every cell has an address — <b style="font-family:var(--mono)">A4</b>. The bright box is you. <b>Tap an arrow</b> to move.', doIt:{key:'ArrowRight'}},
+    body:'Every cell has an address — <b style="font-family:var(--mono)">A4</b>. The highlighted box is your active cell. <b>Press an arrow key</b> to move.', doIt:{key:'ArrowRight'}},
   {sel:'#nameBox', novice:true, cap:'where am I?', at:'A4',
-    body:'The <b>name box</b> shows your cell’s address. <b>Tap <kbd>→</kbd></b> — watch it change.', doIt:{key:'ArrowRight'}},
+    body:'The <b>name box</b> shows your cell’s address. <b>Press <kbd>→</kbd></b> — watch it change.', doIt:{key:'ArrowRight'}},
   {sel:'.fbar', novice:true, cap:'shown vs. inside', at:'A4',
     body:'The grid shows the <b>result</b>; the <b>formula bar</b> shows what’s inside. <kbd>↵</kbd> to go on.'},
   {sel:'.gridwrap', novice:true, cap:'just type', at:'A5', entry:true, commit:(c)=>typeof c.value==='number',
@@ -14926,12 +14926,12 @@ const TOUR_STEPS=[
   {sel:'.gridwrap', novice:true, cap:'start a formula', at:'C4', entry:true, commit:(c)=>!!c.formula,
     body:'Formulas start with <b style="font-family:var(--mono)">=</b> or <b style="font-family:var(--mono)">+</b>. On <b style="font-family:var(--mono)">C4</b> type <b style="font-family:var(--mono)">=A4-B4</b>, <kbd>↵</kbd>.'},
   /* r292 INTERACTIVE INTRO — the chord beats, now for everyone after the fundamentals. */
-  {sel:'.gridwrap', cap:'the whole point', doIt:{key:'ArrowRight',ctrl:true}, at:'A7',
-    body:'A mouse drags cell by cell. <b>Hold <kbd>ctrl</kbd>, tap <kbd>→</kbd></b> — fly to the end of the row in one press.'},
+  {sel:'.gridwrap', cap:'why the keyboard wins', doIt:{key:'ArrowRight',ctrl:true}, at:'A7',
+    body:'A mouse drags cell by cell. <b>Hold <kbd>ctrl</kbd>, press <kbd>→</kbd></b> — jump to the end of the row in one press.'},
   {sel:'.gridwrap', cap:'now select it', doIt:{key:'ArrowLeft',ctrl:true,shift:true}, at:'J7',
-    body:'Add <kbd>shift</kbd> and it <b>selects</b> as it jumps. <b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>←</kbd></b> — grab the whole row, no dragging.'},
+    body:'Add <kbd>shift</kbd> and it <b>selects</b> as it jumps. <b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>←</kbd></b> — select the whole row, no dragging.'},
   {sel:'.cl-inner',   cap:'your checklist', body:'Every line is one action — it turns green when done. Clear them all and the clock stops.'},
-  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list (<b>↑↓</b> move, <b>↵</b> loads). <b>Alt+←/→</b> hops drills. <b>Esc</b> never ends a run.'},
+  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list (<b>↑↓</b> move, <b>↵</b> loads). <b>Alt+←/→</b> switches drills. <b>Esc</b> never ends a run.'},
   {sel:'#guideToggle', cap:'stuck?', body:'<b>Guided</b> (<kbd>F1</kbd>) lights up every key to press — on for your first runs. <b>Solution</b> plays the optimal keys; <b>learn</b> hands them to you one at a time.'},
   {sel:'#profileToggle', cap:'your keyboard', optional:true, body:'Your layout and shortcut profile (Excel · Macabacus · FactSet) live here — click to switch.'},
   {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor — race your own time.'},
@@ -14939,7 +14939,7 @@ const TOUR_STEPS=[
   {sel:'#authSlot',   cap:'save your progress', signedOut:true,
     body:'You’re a guest. A <b>free account</b> saves progress, posts to <b>leaderboards</b>, and unlocks <b>ranked</b> + <b>teams</b>. Sign up whenever.'},
   {sel:'#authSlot',   cap:'the ladder',    signedIn:true,
-    body:'<b>LEVEL</b> is reps — every clean solve earns xp. <b>RANK</b> is the competition — keyboard-only runs post to per-drill boards.'},
+    body:'<b>LEVEL</b> grows with practice — every clean solve earns xp. <b>RANK</b> is the competition — keyboard-only runs post to per-drill boards.'},
 ];
 let __tourI=-1, __tourAfter=null, __tourPlan=[];
 /* r303: precompute the steps that will ACTUALLY show for this user — one place for the
