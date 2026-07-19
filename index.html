@@ -3129,7 +3129,7 @@ const CHALLENGES = {
       this._o={ side:'G4:G7', feesRow:'B4:E4', divBlk:'B5:E5', costRow:'B7:E7',
         dressed:'B8:E8', naked:'B6:E6', deck:'B10:E10', helperDiv:'B12', helperNeg:'C12',
         feesVals:feesVals, tradingFeed:tradingFeed, advVals:advVals, costVals:costVals };
-      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:170,2:100,3:100,4:100,5:100,6:34,7:100}};   // F is a thin gutter before the side schedule in G
+      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:148,2:100,3:100,4:100,5:100,6:22,7:100}};   // r333: trimmed label + gutter so the raw 7-digit feed still fits once the standard-width fit scales the sheet; F is a thin gutter before the side schedule in G
     },
     checks(S){
       const o=this._o;
@@ -8186,8 +8186,27 @@ function render(){
   const __gw=$('gridwrap');
   const __availW=__gw ? (__gw.clientWidth-28-30) : 0;      // padding 14×2 + row header
   let __base=0; for(let c=1;c<=COLS;c++) __base+=(colW[c]||72);
-  const __per=(__availW>__base) ? Math.floor((__availW-__base)/COLS) : 0;
-  const __ew={}; for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72)+__per;
+  // r333 (Wolf): STANDARD grid width — the sheet fills the SAME frame on every drill. Elastic fit
+  // used to only GROW narrow drills; wide ones (40 of 81) overflowed the frame and scrolled, so the
+  // board visibly resized drill-to-drill. Now it also SHRINKS proportionally to fit, floored per
+  // column so numbers stay legible — the outer width is constant across the catalog.
+  //   EXCEPT autofit drills: their whole point is "widen the column until #### clears," so a global
+  //   shrink would re-narrow the column the player just fixed and make them unwinnable. Those keep
+  //   natural width (may run a touch wide) — detected by their overflowsCol/#### grading.
+  const __noShrink=(function(){ const C=CHALLENGES[cur]; if(!C||!C.checks) return false;
+    if(C._noShrink!==undefined) return C._noShrink;
+    try{ C._noShrink=/overflowsCol|####/.test(String(C.checks)); }catch(e){ C._noShrink=false; }
+    return C._noShrink; })();
+  const __ew={};
+  if(__availW>__base){
+    const __per=Math.floor((__availW-__base)/COLS);
+    for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72)+__per;
+  } else if(__base>__availW && __availW>0 && !__noShrink){
+    const __scale=__availW/__base;
+    for(let c=1;c<=COLS;c++) __ew[c]=Math.max(40, Math.round((colW[c]||72)*__scale));
+  } else {
+    for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72);
+  }
   S._ew=__ew;                                              // display widths (elastic)
   let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));
   if(__gw && __gw.clientHeight>100){                       // measured: fill the box exactly
