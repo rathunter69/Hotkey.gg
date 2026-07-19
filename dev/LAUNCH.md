@@ -16,8 +16,14 @@ Companion doc: dev/STRATEGY.md (what we build before/after); dev/TRUST_SAFETY.md
    force-rename/suspend scripts written (even if manual SQL).
 5. **Remove the smoke-u fixture** (migration: delete from teams where
    slug='smoke-u') and optionally the smoke accounts (SMOKE_REPORT list).
+5b. **Clear (or keep) the seed field** (r337): 50 seed players + 2 private
+   side desks live under the 5eed… id namespace. `dev/seed-clear.sql` removes
+   every seed row in one transaction. Decide: clear at launch for honest
+   boards, or keep briefly so day-1 boards aren't empty — either way the
+   clear script is the whole cleanup.
 6. **Beta-tools sweep**: hk_dev_unlock ranked-gate bypass on account.html
-   (flagged REMOVE AT LAUNCH since r-early) and any BETA copy that's wrong
+   (flagged REMOVE AT LAUNCH since r-early; the same dev row now also sets
+   hk_ranked — remove both together) and any BETA copy that's wrong
    post-launch. Keep the [beta] brand chip until PRO pricing is real.
 7. Decide PRO posture at launch: BETA_MODE=true currently unlocks PRO for
    everyone — keeping that ON at launch is fine (free-during-beta framing)
@@ -25,10 +31,15 @@ Companion doc: dev/STRATEGY.md (what we build before/after); dev/TRUST_SAFETY.md
 
 ## Phase 1 — LAUNCH DAY (the flip, ~30 minutes)
 1. index.html: `PRELAUNCH_LOCK = false`. That's the launch.
-2. Cache bump (?v=N+1 across all 9 pages) — house rule.
+2. Cache bump (?v=N+1 across all pages that reference the touched files;
+   the page count grew past nine — grep, don't count from memory).
 3. Commit → PR → merge (auto-merge agreement). Pages deploys in minutes.
 4. Verify live: incognito → landing (no curtain) → Enter → tour → placement;
-   sign-up with a real email; run one drill; check the run posts.
+   sign-up with a real email; run one drill; check the run posts. Then the
+   ranking surface (r335-336): leaderboard tier dropdown filters, entering
+   ranked shows the 5-board placement series, the nav pill reads Unranked
+   until entry. (CI covers all of this via dev/e2e-lb.js — this is the
+   live-double-check, not the only check.)
 5. Watch `events` (service role): curtain-less funnel = pv → enter →
    tour_done → first_solve. If enter→first_solve conversion craters vs beta,
    something broke — the flag flip is instantly revertable.
