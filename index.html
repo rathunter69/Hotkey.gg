@@ -972,8 +972,8 @@
     color:var(--gcol, var(--accent)); margin-right:8px; padding:3px 10px; align-self:center; white-space:nowrap; flex:none;
     cursor:pointer; border:1px solid currentColor; border-radius:99px; opacity:.92; transition:.12s}
   .st-lead:hover{opacity:1; background:color-mix(in srgb, currentColor 14%, transparent)}
-  .st-tab{flex:0 1 auto; min-width:52px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;   /* r88: dense groups compress gracefully */
-    font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface);
+  .st-tab{flex:0 0 auto; min-width:52px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;   /* r334 (Wolf): paged to ~half a chapter, tabs no longer shrink — full names read */
+    font-family:var(--mono); font-size:12.5px; color:var(--muted); background:var(--surface);
     border:1px solid var(--line); border-bottom:0; border-top:2.5px solid var(--gcol, var(--line));
     border-radius:7px 7px 0 0; padding:8px 15px 9px; cursor:pointer; white-space:nowrap; transition:.12s}
   .st-tab:hover{color:var(--text)}
@@ -985,6 +985,14 @@
     margin-left:auto; padding:3px 10px; align-self:center; cursor:pointer; white-space:nowrap; flex:none;
     border:1px solid currentColor; border-radius:99px; opacity:.92; transition:.12s; overflow:visible}
   .st-next:hover{opacity:1; background:color-mix(in srgb, currentColor 14%, transparent)}
+  /* r334 (Wolf): page pips — each chapter is two pages of tabs; the pips flip between them so the
+     visible tabs have room to show FULL, readable drill names instead of "Margi…" stubs. */
+  .st-pages{display:inline-flex; gap:3px; align-self:center; margin:0 8px 0 2px; flex:none}
+  .st-pip{font-family:var(--mono); font-size:10px; font-weight:700; line-height:1; min-width:18px; height:18px;
+    display:inline-grid; place-items:center; border-radius:99px; cursor:pointer; color:var(--muted);
+    border:1px solid var(--line); background:var(--surface); transition:.12s}
+  .st-pip:hover{color:var(--text); border-color:var(--gcol, var(--accent-dim))}
+  .st-pip.on{color:var(--on-accent, #fff); background:var(--gcol, var(--accent)); border-color:var(--gcol, var(--accent))}
   /* Monkeytype-scale: the sheet grows into the screen instead of sitting in a box.
      zoom scales the whole grid (cells, fonts, borders) without touching the engine's
      px math — overflow/#### logic keeps working because it reasons in pre-zoom px. */
@@ -9352,6 +9360,16 @@ function _showResults(o){
 
 }
 function hideResults(){ resultsChainKeys=null; const m=$('resultsModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
+/* r334 (Wolf): a chapter of 10-11 drills used to cram into one strip — every tab name truncated
+   to an unreadable stub ("Margi…", "Ancho…"). Now each chapter splits into TWO PAGES (halves)
+   so the fewer tabs on screen show their FULL names; page pips flip between them. sheetPageView
+   holds a preview flip (keyed to the current drill, so it resets the moment you load a new one). */
+let sheetPageView=null;
+function sheetTabPages(keys){
+  const per = keys.length>6 ? Math.ceil(keys.length/2) : keys.length;
+  const pages=[]; for(let i=0;i<keys.length;i+=per) pages.push(keys.slice(i,i+per));
+  return pages.length?pages:[keys];
+}
 function renderSheetTabs(){
   const host=$('sheetTabs'); if(!host) return;
   const gname=GROUP_OF[cur];
@@ -9359,25 +9377,31 @@ function renderSheetTabs(){
   if(gcol) host.style.setProperty('--gcol', gcol); else host.style.removeProperty('--gcol');
   const g=DRILL_GROUPS.find(x=>x.name===gname);
   const keys=(g?g.keys:MENU_ORDER).filter(k=>CHALLENGES[k]);
-  host.innerHTML = (function(){
-    const gs=DRILL_GROUPS.filter(x=>x.keys.some(k=>CHALLENGES[k]));
-    const gi=gs.findIndex(x=>x.name===gname);
-    if(gi<=0) return '';   /* r304 (Wolf): FIRST group — no back chip at all; it used to wrap to Full Builds */
-    const pv=gs[gi-1]; const pvCol=(window.HOTKEY_GROUP_COLORS||{})[pv.name]||'';
-    return '<span class="st-lead" '+(pvCol?'style="color:'+pvCol+'"':'')+' title="previous set">\u00ab '+escHtml(pv.name.toUpperCase())+'</span>';
-  })() + keys.map(k=>{
+  const gs=DRILL_GROUPS.filter(x=>x.keys.some(k=>CHALLENGES[k]));
+  const gi=gs.findIndex(x=>x.name===gname);
+  // previous / next CHAPTER chips (unchanged behaviour — clamp at the ends, never wrap)
+  let lead='';
+  if(gi>0){ const pv=gs[gi-1]; const pvCol=(window.HOTKEY_GROUP_COLORS||{})[pv.name]||'';
+    lead='<span class="st-lead" '+(pvCol?'style="color:'+pvCol+'"':'')+' title="previous set">« '+escHtml(pv.name.toUpperCase())+'</span>'; }
+  let next='';
+  if(gi>=0 && gi<gs.length-1){ const nx=gs[gi+1]; const nxCol=(window.HOTKEY_GROUP_COLORS||{})[nx.name]||'';
+    next='<span class="st-next" '+(nxCol?'style="color:'+nxCol+'"':'')+' title="next set (alt+pgdn past the last tab)">'+escHtml(nx.name.toUpperCase())+' »</span>'; }
+  // split the chapter into pages; show the page holding the current drill (or a previewed flip)
+  const pages=sheetTabPages(keys);
+  let naturalPage=pages.findIndex(pg=>pg.indexOf(cur)>=0); if(naturalPage<0) naturalPage=0;
+  const showPage=(sheetPageView && sheetPageView.cur===cur && sheetPageView.page<pages.length) ? sheetPageView.page : naturalPage;
+  const pageKeys=pages[showPage]||keys;
+  const pips = pages.length>1
+    ? '<span class="st-pages" title="this chapter has '+pages.length+' pages">'+pages.map((_,i)=>
+        '<span class="st-pip'+(i===showPage?' on':'')+'" data-page="'+i+'" title="page '+(i+1)+'">'+(i+1)+'</span>').join('')+'</span>'
+    : '';
+  host.innerHTML = lead + pips + pageKeys.map(k=>{
     const C=CHALLENGES[k];
     const pb = PB[k]!==undefined ? '<span class="st-pb">'+PB[k].toFixed(1)+'s</span>' : '';
     return '<span class="st-tab'+(k===cur?' cur':'')+'" data-key="'+k+'">'+escHtml(C.name||k)+pb+'</span>';
-  }).join('') + (function(){
-    const gs=DRILL_GROUPS.filter(x=>x.keys.some(k=>CHALLENGES[k]));
-    const gi=gs.findIndex(x=>x.name===gname);
-    if(gi>=gs.length-1) return '';   /* r304: last group — nowhere forward; clamp, don't wrap */
-    const nx=gs[gi+1];
-    const nxCol=(window.HOTKEY_GROUP_COLORS||{})[nx.name]||'';
-    return '<span class="st-next" '+(nxCol?'style="color:'+nxCol+'"':'')+' title="next set (alt+pgdn past the last tab)">'+escHtml(nx.name.toUpperCase())+' \u00bb</span>';
-  })();   /* r66: "☰ all" retired — the picker lives on \\ and the drill bar */
+  }).join('') + next;
   host.querySelectorAll('.st-tab').forEach(el=>el.onclick=()=>{ if(!demoPlaying) loadChallenge(el.dataset.key); });
+  host.querySelectorAll('.st-pip').forEach(el=>el.onclick=()=>{ if(demoPlaying) return; sheetPageView={cur, page:+el.dataset.page}; renderSheetTabs(); });
   const nxt=host.querySelector('.st-next'); if(nxt) nxt.onclick=()=>{ if(!demoPlaying) stepGroup(1); };
   const led=host.querySelector('.st-lead'); if(led) led.onclick=()=>{ if(!demoPlaying) stepGroup(-1); };   // r66: left chip walks BACK a set
 }
