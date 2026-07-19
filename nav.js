@@ -289,10 +289,20 @@
   // Rank pill: fetch standing once per session (10-min cache shared with index.html via sessionStorage)
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
+    /* r336 (Wolf): the pill honors the ranked opt-in. Not entered -> a quiet "Unranked" chip;
+       entered but mid-placement -> "placement n/5"; only a finished placement shows a tier.
+       The tier cache is consulted only when opted in, so leaving ranked demotes immediately. */
+    const __opted=(function(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } })();
     try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
-      if(c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n,20):'')+'<span>'+c.n+'</span>';
+      if(__opted && c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n,20):'')+'<span>'+c.n+'</span>';
         el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
     if(!window.sb || !window._navUser) return;
+    if(!__opted){
+      el.innerHTML='<span>Unranked</span>';
+      el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
+      el.title='not in ranked \u2014 enter from the leaderboard'; el.onclick=openProfile;
+      return;
+    }
     try{
       const d = await loadProfileData();
       // r117: LEVEL PERSISTENCE — nav chip & in-game level run on a local estimate
@@ -300,6 +310,14 @@
       // knew better. Hydrate from canonical XP (PB-hydration pattern, r83). SET, not
       // max: a second account on the same machine must not inherit the first's level.
       try{ localStorage.setItem('hk_xp_est', String(computeXP(d, d.myRuns, d.mySessions))); renderAuthBar(); }catch(e){}
+      const P=(window.HK_PLACEMENT?window.HK_PLACEMENT.KEYS:[]);
+      const doneN=P.filter(k=>(d.myRuns||[]).some(r=>r.challenge===k)).length;
+      if(P.length && doneN<P.length){
+        el.innerHTML='<span>\u2694 placement '+doneN+'/'+P.length+'</span>';
+        el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
+        el.title='placement series \u2014 post a time on each of the five standard boards'; el.onclick=openProfile;
+        return;   // no tier cache write mid-placement
+      }
       const t = tierOf(d.avgPct, d.attempted, d.wsum);
       el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name,20):'')+'<span>'+t.name+'</span>';
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
