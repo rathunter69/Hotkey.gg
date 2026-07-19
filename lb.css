@@ -374,3 +374,11 @@
   .mg-pin input:focus{border-color:var(--accent-dim); outline:none}
   #mgQKey{width:190px} #mgQTgt{width:135px} #mgQNote{flex:1; min-width:160px}
   .mg-kick{color:var(--warn)}
+  /* r335 (Wolf): tier sub-menu on the detail board — dropdown + bucket chips */
+  .tier-filter{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 10px}
+  .tier-filter label{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+  .tier-filter select{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer}
+  .tier-filter select:focus{border-color:var(--accent-dim); outline:none}
+  .tier-filter .tf-b{font-size:10.5px; padding:4px 11px}
+  .tf-note{font-family:var(--mono); font-size:10.5px; color:var(--faint); margin:-4px 0 8px}
