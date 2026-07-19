@@ -75,35 +75,38 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
 
   // ---------- B. ranked entry states ----------
   console.log('B. ranked entry: gate -> placement -> tier');
-  const b1 = await page.evaluate(() => {
+  // NOTE: the page's own boot-time load() settles LATE with Supabase blocked and reassigns
+  // DATA — so every section must (re)inject DATA and read the DOM in the SAME evaluate tick.
+  const inject = `DATA = { perDrill: window.__f.perDrill, names: window.__f.names, meId: 'u3',
+    myTeam: null, teamOnly: false, viewDesk: null, myDesk: null,
+    fRuns: window.__f.runs.slice(), fSessions: [], userStat: window.__f.userStat,
+    gUserStat: window.__f.userStat, profs: Object.keys(window.__f.names).map(u => ({ id: u, handle: window.__f.names[u] })),
+    runs: window.__f.runs, sessions: [] };`;
+  const b1 = await page.evaluate((inject) => {
     localStorage.removeItem('hk_ranked'); localStorage.setItem('hk_dev_unlock', '1');
-    renderAll();
+    eval(inject); renderAll();
     return (document.querySelector('.panel.me') || {}).textContent || '';
-  });
+  }, inject);
   ok(/Enter Ranked/.test(b1), 'not opted in: Enter-Ranked gate card');
 
-  const b2 = await page.evaluate((PKEYS) => {
+  const b2 = await page.evaluate(({ PKEYS, inject }) => {
     localStorage.setItem('hk_ranked', '1');
-    const f = window.__f;
-    const done = PKEYS.slice(0, 2);
-    const runs = f.runs.slice();
-    done.forEach(k => runs.push({ user_id: 'u3', challenge: k, time_ms: 9000, created_at: '2026-01-02' }));
-    DATA.fRuns = runs;
+    eval(inject);
+    PKEYS.slice(0, 2).forEach(k => DATA.fRuns.push({ user_id: 'u3', challenge: k, time_ms: 9000, created_at: '2026-01-02' }));
     renderAll();
     const hero = document.querySelector('.panel.me');
     return { text: hero ? hero.textContent : '',
       links: [...document.querySelectorAll('.pl-go')].map(a => a.getAttribute('href')) };
-  }, PKEYS);
+  }, { PKEYS, inject });
   ok(/Placement series — 2\/5/.test(b2.text), 'mid-placement: checklist shows 2/5', b2.text.slice(0, 60));
   ok(b2.links.length === 3 && b2.links.every(h => /index\.html\?drill=/.test(h)), 'remaining boards deep-link into the trainer');
 
-  const b3 = await page.evaluate((PKEYS) => {
-    const runs = DATA.fRuns.slice();
-    PKEYS.forEach(k => runs.push({ user_id: 'u3', challenge: k, time_ms: 9000, created_at: '2026-01-02' }));
-    DATA.fRuns = runs;
+  const b3 = await page.evaluate(({ PKEYS, inject }) => {
+    eval(inject);
+    PKEYS.forEach(k => DATA.fRuns.push({ user_id: 'u3', challenge: k, time_ms: 9000, created_at: '2026-01-02' }));
     renderAll();
     return (document.querySelector('.panel.me') || {}).textContent || '';
-  }, PKEYS);
+  }, { PKEYS, inject });
   ok(!/Placement series/.test(b3) && /LVL /.test(b3), 'all five posted: normal tier card returns');
 
   const b4 = await page.evaluate(() => {

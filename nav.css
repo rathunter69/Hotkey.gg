@@ -343,3 +343,8 @@ html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
 /* r133: the keycap number alone was illegible at nav size — the label carries the read */
 .nav-lvl-t{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--text)}
 @media (max-width:740px){.nav-lvl-t{display:none}}
+/* r342 (Wolf): level progress at a glance — slim bar beside the level chip */
+.nav-lvl-bar{display:inline-block;width:74px;height:6px;border-radius:99px;background:var(--surface2);
+  border:1px solid var(--line);overflow:hidden;vertical-align:middle}
+.nav-lvl-bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s ease}
+@media (max-width:860px){.nav-lvl-bar{display:none}}
