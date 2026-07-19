@@ -1825,7 +1825,7 @@ const CHALLENGES = {
   combo:{
     name:'Combo', label:'Clean the paste', par:24, parKeys:22,
     aha:'Select the whole range, format once — Alt H chords work a block, not a cell.',
-    prompt:'A comp sheet came over as a raw paste: title with no weight, headers slumming it lowercase-left, figures unformatted, the notes column overrunning its neighbors, half the columns showing ####. Make it presentable end to end — which metrics came over, and where the block sits, changes every run.',
+    prompt:'Format a raw pasted comp sheet end to end: bold the title, capitalize and center the headers, format the figures, rein in the notes column that overruns its neighbors, and widen the columns showing ####. Which metrics appear, and where the block sits, changes every run.',
     req(){ const o=this._o; return '<em>'+o.title+'</em> + headers <em>'+o.hdr+'</em> → <em>ctrl+b</em> · metric headers <em>'+o.mh+'</em> → <em>alt h a r</em> · figures <em>'+o.num+'</em> → <em>alt h k</em> + <em>alt h 9</em> ×2 · notes <em>'+o.notes+'</em> → <em>alt h w</em> · then <em>alt h o i</em> — no #### ships'; },
     guide(){ const o=this._o; return [
       'weight first: '+o.title+' · <kbd>ctrl</kbd>+<kbd>b</kbd> · then the header row '+o.hdr+' · <kbd>ctrl</kbd>+<kbd>b</kbd>',
@@ -1894,7 +1894,7 @@ const CHALLENGES = {
   gauntlet:{
     name:'Gauntlet', label:'Make it model-ready', par:63, parKeys:66,
     aha:'Model-ready is one rhythm: bold, comma, border, blue inputs — and the totals in accounting format (Alt H A N).',
-    prompt:'A raw sources & uses \u2014 both sides straight out of a banker\u2019s head: naked numbers, no totals, nothing marked. Full dress, BOTH blocks: inputs blue, SUM each total with alt+=, bold + top border on both, commas at 0 decimals down both money columns, autofit so nothing clips. Every formatting op you know, both sides of the page, no mouse.',
+    prompt:'Format both blocks of a raw sources & uses: inputs in blue, SUM each total with Alt+=, bold with a top border on both totals, commas at 0 decimals down both money columns, and autofit so nothing clips. Every formatting operation you know, both sides of the page, no mouse.',
     req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h f c blue font \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b p</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
     guide(){ const R=this._R; return [
       'both input stacks in blue font: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 Blue <kbd>\u21b5</kbd> \u00b7 then the same on '+R.useIn,
@@ -1970,7 +1970,7 @@ const CHALLENGES = {
   housestyle:{
     name:'House Style', label:'Bring it to standard', par:47, parKeys:48,
     aha:'Blue the inputs, keep formulas black, rule the totals — colour says typed vs computed.',
-    prompt:'A raw P&L fragment just landed from a first-year \u2014 and remember the sibling rule while you format it: center across, never merge; merged cells break every fill and every sort. No title weight, naked headers, inputs invisible among the formulas, decimals everywhere, margins reading as decimals, nothing ruled off. Bring the whole tab to house standard \u2014 the pass a senior runs before ANY page leaves the desk. The inputs move every run, and one of them is a hardcode someone buried in a formula row: paint it or it ships wrong.',
+    prompt:'Bring a raw P&L fragment to house standard: bold the title, format the headers, color the hardcoded inputs blue so they read apart from formulas, standardize the decimals, show margins as percents, and rule off the totals. One rule to remember while you work: center across selection, never merge — merged cells break fills and sorts.',
     req(){ const R=this._R; return '<em>A1</em> <em>ctrl+b</em> \u00b7 headers <em>B2:F2</em> bold + <em>alt h b o</em> \u00b7 inputs blue via <em>alt h f c</em>: <em>'+R.inpRows.map(r=>'B'+r+':F'+r).join('</em> \u00b7 <em>')+'</em> + the buried hardcode <em>'+R.override+'</em> \u00b7 figures <em>B3:F7</em> <em>alt h k</em> + <em>alt h 9</em> \u00d72 \u00b7 margins <em>B8:F8</em> <em>ctrl+shift+%</em> \u00b7 EBITDA <em>B7:F7</em> <em>ctrl+b</em> + <em>alt h b p</em>'; },
     guide(){ const R=this._R; return [
       'the title carries the page: A1 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then headers B2:F2 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 bold, ruled under',
@@ -2046,7 +2046,7 @@ const CHALLENGES = {
   ruleoff:{
     name:'Rule Off', label:'Rule off the schedule', par:29, parKeys:28,
     aha:'Alt H B lays borders where you point — top, bottom, outside, or a THICK box (Alt H B T) around the headline.',
-    prompt:'A segment build is done but naked \u2014 no rulings, and the EBITDA line was never pulled through. Dress it to accounting standard: a line UNDER the headers, a line ABOVE every subtotal (the single-rule convention \u2014 a total earns its line), pull EBITDA across, bold it, rule it, and box the headline figure the MD circles. Sections and the headline year move every run.',
+    prompt:'Add the borders the schedule is missing and pull the EBITDA line through. Accounting standard: a line under the headers, a line above every subtotal, EBITDA pulled across, bolded and ruled, and a box around the headline figure. The sections and the headline year change every run.',
     req(){ const R=this._R; return 'headers <em>B2:'+R.LC+'2</em> <em>alt h b o</em> \u00b7 rule ABOVE both subtotals <em>B'+R.sub1+':'+R.LC+R.sub1+'</em> and <em>B'+R.sub2+':'+R.LC+R.sub2+'</em> <em>alt h b p</em> \u00b7 EBITDA <em>B'+R.g+'</em> = revenue total + cost total, fill right <em>ctrl+r</em>, <em>ctrl+b</em>, <em>alt h b p</em> \u00b7 box the headline <em>'+R.focus+'</em> <em>alt h b t</em> (thick box)'; },
     guide(){ const R=this._R; return [
       'headers get ruled UNDER: B2:'+R.LC+'2 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>',
@@ -2115,9 +2115,9 @@ const CHALLENGES = {
     }
   },
   ruleaudit:{
-    name:'Ruling Pass', label:'The ruling pass', par:18, parKeys:16,
+    name:'Ruling Pass', label:'Audit the rulings', par:18, parKeys:16,
     aha:'Read the rulings before the math — Alt H B O under every subtotal, box the result.',
-    prompt:'This schedule came back “done.” It isn’t. Somewhere on the page rulings are missing, the answer line lost its dress, or a figure was never pulled through — and WHAT’s broken moves every run. Run the pass: scan against the conventions, find what fails, fix only that. The checklist tells you WHICH conventions are broken — the page tells you where.',
+    prompt:'Audit the schedule against the formatting conventions and fix only what fails. What’s broken changes every run — missing rulings, an answer line without its formatting, or a figure that was never pulled through. The checklist names which conventions are broken; find them on the page and repair them.',
     req(){ return 'the house conventions — headers ruled UNDER (<em>alt h b o</em>) · a line ABOVE every total (<em>alt h b p</em>) · EBITDA pulled through as formulas, <em>ctrl+b</em>, ruled · headline boxed (<em>alt h b s</em>). Some hold, some don’t: fix what the checklist flags.'; },
     guide(){ const R=this._R; const out=[];
       if(R.defects.includes('hdr'))  out.push('the header rule is gone: B2:'+R.LC+'2 · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>');
@@ -2211,9 +2211,9 @@ const CHALLENGES = {
     }
   },
   decimals:{
-    name:'Decimals', label:'The decimals pass', par:18, parKeys:15,
+    name:'Decimals', label:'Standardize the decimals', par:18, parKeys:15,
     aha:'Alt H 0 adds a decimal, Alt H 9 drops one — dollars take 0, multiples and percents take 1.',
-    prompt:'A comps page pasted in with the decimals all wrong: dollars showing cents, multiples rounded to integers, margins running three places deep. House rule — dollars take NO decimals, multiples and percents take ONE. Alt H 9 steps a place off, Alt H 0 adds one back. Walk each column to standard.',
+    prompt:'Standardize the decimals on the comps page. House rule: dollars take no decimals; multiples and percents take one. Alt H 9 removes a decimal place, Alt H 0 adds one back. Work each column to the standard.',
     req(){ const o=this._o; return '<em>'+o.evR+'</em> · <em>alt h 9</em> ×2 → whole dollars · <em>'+o.mR+'</em> · <em>alt h 0</em> → one place · <em>'+o.pR+'</em> · <em>alt h 9</em> ×2 → one place'; },
     guide(){ const o=this._o; return [
       'dollars first — select '+o.evR+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: the cents disappear',
@@ -2274,9 +2274,9 @@ const CHALLENGES = {
     }
   },
   dress:{
-    name:'Dress the tab', label:'Dress the tab \u2014 full formatting pass', par:46, parKeys:47,
+    name:'Dress the tab', label:'Full formatting pass', par:46, parKeys:47,
     aha:'A full formatting pass is chords end to end — bold, comma, percent, border, shade, blue, italic — and EBITDA margin is EBITDA over the Revenue line right above it.',
-    prompt:'A finished analysis, zero formatting \u2014 the state every tab is in at 3:58am. Dress it like it\u2019s going in the book: title bolded and ruled, hardcodes in blue, EBITDA margins as clean percents, dollars with commas, the output circled, and the source line whispering in italics. Seven formatting muscles, one pass, and the block moves every run.',
+    prompt:'A finished analysis with zero formatting. Format it for the book: bold and rule the title, color the hardcoded inputs blue, format EBITDA margins as percents, add commas to the dollar figures, box the output, and italicize the source line. Seven formatting operations in one pass; the block moves every run.',
     req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 header <em>A3:E3</em> \u2192 <em>alt h h</em> gray \u00b7 blue the hardcodes '+R.segRange+' + '+R.costRange+' \u2192 <em>alt h f c</em> \u00b7 EBITDA margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 circle the OUTPUT <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b s</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b p</em> \u00b7 source <em>A'+R.srcRow+'</em> \u2192 <em>ctrl+i</em>'; },
     guide(){ const R=this._R; return [
       'the title \u00b7 <em>A1</em> \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 bold, and a rule underneath',
@@ -3081,9 +3081,9 @@ const CHALLENGES = {
     }
   },
   pastes:{
-    name:'Paste Sp.', label:'Alt E S everything', par:40, parKeys:40,
-    aha:'Alt E S is a toolbox: TRANSPOSE turns a column into a row, DIVIDE/MULTIPLY rescale or flip a block, FORMATS clone a look, VALUES freeze the wiring.',
-    prompt:'The feed came in a mess and Paste Special fixes every kind of mess. TRANSPOSE the side fee schedule (it is a column; you need it as a row). DIVIDE the Trading line by 1000 \u2014 it arrived in raw dollars, the page is in $000s. MULTIPLY the cost line by \u22121 \u2014 someone typed the costs positive. Clone the total row FORMATS onto Advisory, then clear the top border it dragged along (that rule belongs only to the total). Finally paste the totals to the summary as VALUES \u2014 dead numbers, no wiring. One dialog, every lever.',
+    name:'Paste Sp.', label:'Paste Everything Special', par:40, parKeys:40,
+    aha:'Paste Special covers more than values: Transpose turns a column into a row, Divide and Multiply rescale a block in place, Formats copies a look, Values freezes formulas into numbers.',
+    prompt:'Paste Special fixes data that arrived in the wrong shape. Transpose the fee schedule from a column into a row. Divide the Trading line by 1000 to convert raw dollars into $000s. Multiply the cost line by −1 to flip its sign. Copy the total row’s formats onto Advisory, then clear the top border it carried over. Finally, paste the totals into the summary as values so they no longer move with the model.',
     req(){ const o=this._o; return 'copy <em>'+o.side+'</em> \u2192 <em>alt e s e</em> (transpose) at <em>'+o.feesRow+'</em> \u00b7 <em>1000</em> at '+o.helperDiv+', copy \u2192 <em>'+o.divBlk+'</em> <em>alt e s i</em> (divide) \u00b7 <em>-1</em> at '+o.helperNeg+', copy \u2192 <em>'+o.costRow+'</em> <em>alt e s m</em> (multiply) \u00b7 copy <em>'+o.dressed+'</em> \u2192 <em>'+o.naked+'</em> <em>alt e s t</em> then <em>alt h b n</em> \u00b7 copy <em>'+o.dressed+'</em> \u2192 <em>'+o.deck+'</em> <em>alt e s v</em>'; },
     guide(){ const o=this._o; return [
       'TRANSPOSE the side schedule into a row: select <em>'+o.side+'</em> (the vertical fee list) \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 click <em>'+o.feesRow.split(':')[0]+'</em> \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>e</kbd> Transpose \u00b7 <kbd>\u21b5</kbd> \u2014 the column lands across the Fees row',
@@ -3168,8 +3168,8 @@ const CHALLENGES = {
   },
   typeset:{
     name:'Typeset', label:'Typeset the memo', par:15, parKeys:12,
-    aha:'Ctrl+B claims, Ctrl+I annotates, Ctrl+5 retires — and =TODAY() dates the page.',
-    prompt:'A coverage memo that reads like nobody owns it: naked headers, a body row shouting in bold it never earned, memo lines that should whisper in italics, one line item that died last quarter still sitting there, and no as-of date. Typeset it: bold the header row, UNBOLD the imposter, italicize the memos (Ctrl+I), strike the dead line (Ctrl+5 \u2014 or Ctrl+1, K), and stamp =TODAY() so the page says when it was true.',
+    aha:'Ctrl+B bolds, Ctrl+I italicizes, Ctrl+5 strikes through — and =TODAY() dates the page.',
+    prompt:'Typeset the coverage memo: bold the header row, remove the bold from the body row that shouldn’t have it, italicize the memo lines (Ctrl+I), strike through the discontinued line item (Ctrl+5 — or Ctrl+1, K), and add =TODAY() so the page shows its as-of date.',
     req(){ const o=this._o; return 'bold <em>A2:D2</em> \u00b7 UNbold row <em>'+o.wb+'</em> \u00b7 <em>ctrl+i</em> the memos <em>'+o.memoRng+'</em> \u00b7 <em>ctrl+5</em> the dead line <em>'+o.deadRng+'</em> \u00b7 <em>=TODAY()</em> at <em>'+o.stamp+'</em>'; },
     guide(){ const o=this._o; return [
       'the header row A2:D2 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 headers carry the page',
@@ -3232,7 +3232,7 @@ const CHALLENGES = {
   editfix:{
     name:'Edit', label:'Fix the typos in place', par:39, parKeys:39,
     aha:'F2 edits inside the cell — fix the typo, don’t retype the whole thing.',
-    prompt:'Three species of broken, one discipline. Two label typos hide in the schedule \u2014 F2 in, fix the word, never retype the cell. Below them, the model column is supposed to TIE to the feed column \u2014 one hardcode drifted; put it back. And the total under it reads one row SHORT \u2014 F2 the SUM, stretch the range. Text, number, range: the F2 muscle covers all three.',
+    prompt:'Three kinds of broken cell, one tool. Two labels have typos — press F2, fix the word in place, don’t retype the cell. One hardcode drifted from the feed column it should tie to — put the number back. And one SUM reads a row short — F2 in and extend the range. F2 covers text, numbers, and ranges.',
     req(){ const o=this._o; return o.sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 ')+' \u00b7 audit <em>'+o.driftCell+'</em> against <em>'+o.feedCell+'</em> \u00b7 stretch <em>'+o.totCell+'</em> to <em>'+o.wantRng+'</em>'; },
     guide(){ const o=this._o; return [
       'the typos: '+o.sites.map(s=>s.cell).join(' and ')+' \u2014 <kbd>F2</kbd> \u00b7 arrow to the mistake \u00b7 fix \u00b7 <kbd>\u21b5</kbd>; only the wrong letters change',
@@ -3316,9 +3316,9 @@ const CHALLENGES = {
     }
   },
   undo:{
-    name:'Undo', label:'Undo is a tool, not a panic', par:10, parKeys:5,
-    aha:'Ctrl+Z rewinds your exact steps — undo is aim, not panic; delete big, rewind, then delete only what deserved it.',
-    prompt:'Two scratch blocks on a live tab, and the note taped to your monitor names the one to clear. You clear it \u2014 and the SECOND note, under the first, says that block feeds Q4 and the OTHER one was the junk. Ctrl+Z brings every cell back exactly as it was; then clear the right block and format the remaining rows. Undo is how fast hands stay fearless.',
+    name:'Undo', label:'Undo the wrong delete', par:10, parKeys:5,
+    aha:'Ctrl+Z rewinds your exact steps — delete, check, rewind if needed, then delete the right thing.',
+    prompt:'Clear the wrong block and Ctrl+Z brings every cell back exactly as it was. The first note says to clear a scratch block; the second note says that block actually feeds Q4 and the other one was the junk. Undo the mistake, clear the right block, then format the remaining rows.',
     req(){ const o=this._o; return 'bold <em>A1</em> \u00b7 italicize the memo <em>'+o.memo+'</em> \u00b7 clear <em>'+o.wrongRng+'</em> (\u201c'+o.wrongName+'\u201d \u2014 the note says so) \u00b7 <em>ctrl+z</em> \u2014 it FED Q4 \u00b7 now clear <em>'+o.rightRng+'</em>'; },
     guide(){ const o=this._o; return [
       'housekeeping first: <kbd>ctrl</kbd>+<kbd>b</kbd> the title \u00b7 the memo at '+o.memo+' goes <kbd>ctrl</kbd>+<kbd>i</kbd> \u2014 memos read italic',
@@ -3374,7 +3374,7 @@ const CHALLENGES = {
   autofit:{
     name:'Autofit', label:'Fix the squeezed columns', par:15, parKeys:12,
     aha:'Alt H O I autofits to content; a print block wants ONE width — set it with Alt H O W.',
-    prompt:'Two problems, two different fixes \u2014 and knowing which is which is the skill. The label block is squeezed to hash marks: Alt H O I fits it to its contents. The four data columns are RAGGED \u2014 every width different, and autofit would keep them uneven. Select across them and set ONE width: Alt H O W, 12, enter. Autofit is for content; uniformity is for print.',
+    prompt:'Two width problems, two different fixes. The label block is squeezed to #### — Alt H O I autofits it to its contents. The four data columns are uneven widths, and autofit would keep them uneven — select across them and set one width: Alt H O W, 12, Enter. Autofit is for content; a uniform width is for print.',
     req(){ const o=this._o; return 'select <em>'+o.a1+':'+o.a2+'</em> \u00b7 <em>alt h o i</em> \u2014 fit to content \u00b7 then <em>'+o.uRng+'</em> \u00b7 <em>alt h o w</em> \u2192 <em>12</em> <em>\u21b5</em> \u2014 ONE width across the print block'; },
     guide(){ const o=this._o; return [
       'the squeezed labels: on '+o.a1+' \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 content decides',
@@ -3419,8 +3419,8 @@ const CHALLENGES = {
   },
   rowops:{
     name:'Rows', label:'Rebuild the schedule', par:26, parKeys:24,
-    aha:'Ctrl++ inserts a row, Ctrl+− deletes one — and the live SUM widens and contracts itself; structure is keyboard work.',
-    prompt:'The opex schedule came back mis-built: a line got DROPPED (the data team staged it off to the side) and a stale PLACEHOLDER is still inflating the total. The Total is a LIVE SUM — watch it re-tie as you fix the structure. Insert a row where the missing line belongs (Shift+Space, then Ctrl + or Alt H I R), COPY the staged pair in, delete the junk row (Ctrl −), then format the pasted value to match the block. The total never gets retyped — the SUM stretches and shrinks with the sheet.',
+    aha:'Ctrl++ inserts a row, Ctrl+− deletes one — a live SUM widens and contracts with the sheet.',
+    prompt:'Fix the structure of the opex schedule: one line is missing (staged off to the side) and a stale placeholder is inflating the total. The total is a live SUM and re-ties as you work. Insert a row where the missing line belongs (Shift+Space, then Ctrl++ or Alt H I R), copy the staged pair in, delete the junk row (Ctrl+−), and format the pasted value to match the block. Never retype the total — the SUM adjusts itself.',
     req(){ const o=this._o; return 'insert a row below <em>'+o.predecessor+'</em> · copy the staged <em>'+o.stagedRng+'</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row · the live Total re-ties to <em>'+o.total.toLocaleString('en-US')+'</em> on its own · format the pasted value: comma + blue (<em>alt h k</em>, <em>alt h f c</em>)'; },
     guide(){ const o=this._o; return [
       'a line is missing — open a slot: select the row below <b>'+o.predecessor+'</b> · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row · <kbd>ctrl</kbd>+<kbd>+</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd>) — and watch the Total’s SUM WIDEN by itself',
@@ -3506,8 +3506,8 @@ const CHALLENGES = {
   },
   colops:{
     name:'Columns', label:'Columns move too', par:16, parKeys:13,
-    aha:'Ctrl+Space grabs the column — Alt H I C inserts, Alt H D C deletes; structure is keyboard work.',
-    prompt:'The quarterly schedule shipped broken: a stale DRAFT column is still sitting in it, and one quarter is missing entirely. Ctrl+Space grabs the whole column, Alt H D C deletes it, Alt H I C opens the gap where the missing quarter belongs — then head the new column and format it to match.',
+    aha:'Ctrl+Space selects the whole column — Alt H I C inserts one, Alt H D C deletes one.',
+    prompt:'Fix the quarterly schedule’s columns: delete the stale draft column and insert the missing quarter. Ctrl+Space selects the whole column, Alt H D C deletes it, Alt H I C opens the gap where the missing quarter belongs — then add the new column’s header and format it to match.',
     req(){ const o=this._o; return 'any cell in DRAFT · <em>ctrl+space</em> · <em>alt h d c</em> · any cell in '+o.nq+' · <em>ctrl+space</em> · <em>alt h i c</em> · type <em>'+o.mq+'</em> in the new header · <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'kill the junk: any DRAFT cell · <kbd>ctrl</kbd>+<kbd>space</kbd> takes the column · <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>c</kbd>',
@@ -3577,7 +3577,7 @@ const CHALLENGES = {
   filldr:{
     name:'Fill', label:'Fill down, fill right', par:37, parKeys:37,
     aha:'Ctrl+D fills down, Ctrl+R fills right — one seed cell builds the whole table.',
-    prompt:'An empty quarterly buildout and a feed row from the data team. Three moves fill the page: PULL the feed (reference it once, fill across), FOOT it (write one SUM, fill it across), then the real trick \u2014 one mixed-anchor formula and a 2D fill: right THEN down, and twelve %-of-revenue cells build themselves. This is how a table gets filled without a table\u2019s worth of typing.',
+    prompt:'Fill an empty quarterly table from a single feed row. Three steps: reference the feed once and fill across; write one SUM and fill it across; then write one mixed-anchor formula and fill right, then down, so all twelve %-of-revenue cells build from a single formula. Filling beats retyping.',
     req(){ const o=this._o; return '<em>'+o.pull0+'</em> <em>='+o.feed0+'</em> \u00b7 fill '+o.pullRng+' \u2192 \u00b7 <em>'+o.fy0+'</em> <em>=SUM('+o.fyArg+')</em> \u00b7 fill '+o.fyRng+' \u2193 \u00b7 <em>'+o.sum0+'</em> <em>=SUM('+o.sumArg+')</em> \u00b7 fill '+o.sumRng+' \u2192 \u00b7 <em>'+o.mix0+'</em> <em>='+o.mixF+'</em> \u00b7 select '+o.blkRow+' <em>ctrl+r</em> \u00b7 select '+o.blk+' <em>ctrl+d</em>'; },
     guide(){ const o=this._o; return [
       'PULL across: at '+o.pull0+' type <kbd>='+o.feed0+'</kbd> <kbd>\u21b5</kbd> \u2014 reference the feed row \u00b7 select '+o.pullRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 four quarters pulled in two moves',
@@ -3664,9 +3664,9 @@ const CHALLENGES = {
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Assemble & format the summary', par:46, parKeys:47,
-    aha:'Ctrl+C copies what stays, Ctrl+X cuts what moves — assemble, then format with borders and a margin note.',
-    prompt:'The segment summary is due and the pieces are scattered. COPY the base [Segment · Revenue] that stays filed; CUT the two misfiled metric columns (EBITDA, Op inc) into their slots. Then build it out like a real page: a Margin memo that computes off the block (EBITDA ÷ Revenue, in %), and the banker dress — bold headers, the top line in $ with the rest in commas, figures right, the segment names centred and underlined, the whole table boxed. Read what each loose piece IS, land it in the right column, and finish it clean. The pieces scatter to a new spot every run.',
+    name:'Block Sel.', label:'Assemble and format the output', par:46, parKeys:47,
+    aha:'Ctrl+C copies data that stays put; Ctrl+X moves data that shouldn’t be duplicated — assemble first, then format.',
+    prompt:'Assemble the segment summary from scattered pieces. Copy the base [Segment · Revenue] block — it stays where it is; cut the two misfiled metric columns (EBITDA, Op inc) into their slots. Then finish the page: add a margin row that computes EBITDA ÷ Revenue in %, bold the headers, format the top line in $ and the rest in commas, right-align the figures, center and underline the segment names, and box the table.',
     req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b s</em> (outline) · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
     guide(){ const o=this._o; return [
       'COPY the <b>base</b> [Segment · Revenue] at <b>'+o.baseTL+'</b> (it stays filed): <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at '+o.o.seg[0],
@@ -3790,9 +3790,9 @@ const CHALLENGES = {
     }
   },
   copyover:{
-    name:'Copyover', label:'Chain the hand-offs', par:13, parKeys:10,
-    aha:'Ctrl+C carries formulas WITH the data — chain it: block to the build, a column off the landed copy, values-only to the summary.',
-    prompt:'A live sub-build feeds the page \u2014 but the hand-offs chain: the FULL block goes to the working area, then one COLUMN peels off the landed copy to the sensitivity strip, and the summary takes values only from the original. Three destinations, two different sources, one discipline: copy deliberately, aim before you paste.',
+    name:'Copyover', label:'Copy to three destinations', par:13, parKeys:10,
+    aha:'Ctrl+C carries formulas with the data — copy the block, copy a column off the landed copy, then paste values only into the summary.',
+    prompt:'Chain three copies to three destinations. Copy the full block into the working area; copy one column from the landed copy into the sensitivity strip; paste values only into the summary from the original. Three destinations, two different sources — check the source and the destination before each paste.',
     req(){ const o=this._o; return 'select <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d1+'</em> \u2192 <em>ctrl+v</em> \u00b7 then select <em>'+o.landedCol+'</em> (the LANDED copy\u2019s first column) \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d2+'</em> \u2192 <em>ctrl+v</em> \u00b7 back to <em>'+o.src+'</em> \u00b7 <em>ctrl+c</em> \u00b7 <em>'+o.d3+'</em> \u2192 <em>alt e s v \u21b5</em>'; },
     guide(){ const o=this._o; return [
       'the block first: select '+o.src+' \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 at '+o.d1+' \u00b7 <kbd>ctrl</kbd>+<kbd>v</kbd> \u2014 formulas and all',
@@ -3994,7 +3994,7 @@ const CHALLENGES = {
   center:{
     name:'Center', label:'Set the alignment', par:18, parKeys:15,
     aha:'Alt H A R right-aligns numbers, A C centers headers — long titles center ACROSS (Ctrl+1), never merged.',
-    prompt:'A pipeline summary pasted in with its alignment scrambled: quarter headers slumped left, deal names floating centered, the total row sitting left like a label. House rule — headers centered over their columns, labels pinned left, numbers and their totals right. And a total row reads BOLD or it isn’t a total. Geometry moves every run.',
+    prompt:'Fix the alignment on the pipeline summary. House rule: headers centered over their columns, labels left-aligned, numbers and their totals right-aligned — and the total row is bold. The layout changes every run.',
     req(){ const o=this._o; return 'quarter headers <em>'+o.hdr+'</em> → <em>alt h a c</em> · deal names <em>'+o.lab+'</em> → <em>alt h a l</em> · total row <em>'+o.tot+'</em> → <em>alt h a r</em> + <em>ctrl+b</em> · title <em>A1:'+o.lc+'1</em> → <em>ctrl+1</em> <em>a</em> — centered ACROSS, never merged'; },
     guide(){ const o=this._o; return [
       'quarter headers first: '+o.hdr+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> — centered over their columns',
@@ -7384,9 +7384,9 @@ const CHALLENGES = {
     }
   },
   modeltour:{
-    name:'Model Tour', label:'Chase the marks', par:53, parKeys:54,
-    aha:'Subtotals are formulas — fly to each #REF! (Ctrl+arrows) and rebuild it; then the margin rows go in with ONE formula filled RIGHT across the columns.',
-    prompt:'The model came back with four subtotals blown out to #REF! — Gross profit, EBITDA, EBIT and Net income each lost a cell. Those are the ruled, bold rows: they are COMPUTED, not typed. Ctrl-arrows fly you to each break — rebuild the FORMULA that sums the lines above it (costs already carry their sign, so it just adds up). Then put in the margin rows: build =subtotal ÷ Revenue in the first column and FILL RIGHT so one formula runs the whole row. Close the bottom line — dollar-format Net income and rule it off — and land at A1 for the meeting.',
+    name:'Model Tour', label:'Rebuild the subtotals', par:53, parKeys:54,
+    aha:'Subtotals are formulas — jump to each #REF! (Ctrl+arrows) and rebuild the broken formula or data; then build the rows to show margin % by inserting a row, adding the margin formula, and filling the formula right across all columns.',
+    prompt:'Four subtotal rows — Gross profit, EBITDA, EBIT and Net income — each lost a cell to #REF!. Subtotals are formulas, not typed numbers: use Ctrl+arrows to jump to each broken cell and rebuild the formula that sums the lines above it (costs already carry their sign). Then add the margin rows: build =subtotal/Revenue in the first column and fill right so one formula covers the whole row. Finish by dollar-formatting Net income and returning to A1.',
     req(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return m.map(x=>'<em>'+x.k+'</em> → <em>='+x.disp+'</em>').join(' · ')+' · margins <em>B'+MG[0].r+'</em> =B'+MG[0].num+'/B3 fill right <em>B'+MG[0].r+':'+LC+MG[0].r+'</em>, <em>B'+MG[1].r+'</em> =B'+MG[1].num+'/B3 fill right · <em>ctrl+shift+$</em> Net income <em>'+this._niRng+'</em> + <em>bottom border</em> (<em>alt h b o</em>) · finish <em>ctrl+home</em>'; },
     guide(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return [
       'the Gross profit break at '+m[0].k+' — fly there with ctrl-arrows · it’s Revenue plus COGS (COGS is negative, so it just adds): type <kbd>='+m[0].disp+'</kbd> <kbd>↵</kbd>',
@@ -7486,14 +7486,14 @@ const CHALLENGES = {
   navigation:{
     name:'Navigate', label:'Navigation tour', par:17, parKeys:14,
     aha:'The keyboard LEAPS — Ctrl+arrow jumps to the data’s edge, Shift+arrow selects across; thread the trail, grab the block, drop it in the summary.',
-    prompt:'The mouse would scroll and hunt. The keyboard flies — in every direction. This sheet is a long scatter of stray cells and the trail zig-zags a DIFFERENT way every time: up, down, left, right, all over the board. Read the lit marker, fire the Ctrl-arrow that LEAPS to it, and thread the whole maze to the model in the corner. Then the hand-off: grab the model (Ctrl+Shift+→, Ctrl+Shift+↓), Ctrl+C, hop to the summary frame and Ctrl+V drops it in — then Ctrl+Home lands you back at A1, clean, for the meeting. No mouse touches the sheet.',
-    req:'<em>ctrl+home</em> → thread the markers with <em>ctrl+↑/↓/←/→</em> → reach the model → grab it <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → hop to the summary → <em>ctrl+v</em> → finish <em>ctrl+home</em>',
+    prompt:'Using the mouse to select cells takes longer than using the keyboard. Use Ctrl+arrow to jump across cell ranges and hit each target cell in order. Then grab the data (Ctrl+Shift+→, Ctrl+Shift+↓), copy it with Ctrl+C, and paste it into the destination range with Ctrl+V. Finish with Ctrl+Home to return to A1.',
+    req:'<em>ctrl+home</em> → hit the target cells with <em>ctrl+↑/↓/←/→</em> → reach the data block → grab the data <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → find the destination range → <em>ctrl+v</em> → finish <em>ctrl+home</em>',
     guide(){ const P=this._path||[]; const g=[
-      '<kbd>ctrl</kbd>+<kbd>home</kbd> — snap to A1, the top-left corner',
-      'the lit marker is your next stop — the Ctrl-arrow toward it LEAPS straight there, no scrolling',
-      'keep reading the trail — it doubles back and climbs; fire the Ctrl-arrow that points at the next lit marker'];
-      for(let i=3;i<P.length;i++) g.push('the trail zig-zags on — one clean Ctrl-arrow leap to the next lit marker');
-      g.push('last leap lands you on the model tucked in the corner');
+      '<kbd>ctrl</kbd>+<kbd>home</kbd> — jump to A1, the top-left corner',
+      'the highlighted cell is your next target — press the Ctrl+arrow pointing toward it to jump straight there',
+      'continue to the next target cell — press the Ctrl+arrow that points at it'];
+      for(let i=3;i<P.length;i++) g.push('keep going — one Ctrl+arrow jump to the next target cell');
+      g.push('the last jump lands you on the data block');
       g.push('grab it — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>: the whole block lights up');
       g.push('<kbd>ctrl</kbd>+<kbd>c</kbd> — copy the model onto your clipboard');
       g.push('hop right to the <b>deck frame</b> (<kbd>ctrl</kbd>+<kbd>→</kbd>) and <kbd>ctrl</kbd>+<kbd>v</kbd> — drop the model into the summary');
@@ -7640,13 +7640,13 @@ const CHALLENGES = {
       if( np.copied && !np.pasted && dcell && dcell.value==='Revenue') np.pasted=true;
       if( np.pasted && !np.home && A.r===1 && A.c===1) np.home=true;
       const beats=[];
-      const mLabels=['leap to the first lit marker (Ctrl-arrow)','fly across to the next marker','thread on — the trail climbs and doubles back','keep reading the trail — leap to the next','the maze roams on — one clean leap','another leap — the trail zig-zags','last marker — one leap before the model'];
-      for(let i=0;i<P.length;i++) beats.push({label:'thread the maze — '+(mLabels[i]||'leap to the next lit marker'), ok: np[mk[i]]});
-      beats.push({label:'last leap lands you on the model in the corner', ok: np.arr});
-      beats.push({label:'grab the model — Ctrl+Shift+→ then Ctrl+Shift+↓ (whole block)', ok: np.grab});
-      beats.push({label:'Ctrl+C — copy the model onto your clipboard', ok: np.copied});
-      beats.push({label:'hop to the summary frame (Ctrl+→) and Ctrl+V — drop it in', ok: np.pasted});
-      beats.push({label:'Ctrl+Home — back to A1, clean, for the meeting', ok: np.home});
+      const mLabels=['jump to the first target cell (Ctrl+arrow)','jump to the next target cell','continue — the path changes direction','jump to the next target cell','one more Ctrl+arrow jump','jump to the next target cell','last target before the data block'];
+      for(let i=0;i<P.length;i++) beats.push({label:(mLabels[i]||'jump to the next target cell'), ok: np[mk[i]]});
+      beats.push({label:'the last jump lands you on the data block', ok: np.arr});
+      beats.push({label:'select the data — Ctrl+Shift+→ then Ctrl+Shift+↓ (whole block)', ok: np.grab});
+      beats.push({label:'Ctrl+C — copy the data', ok: np.copied});
+      beats.push({label:'move to the destination range (Ctrl+→) and paste with Ctrl+V', ok: np.pasted});
+      beats.push({label:'Ctrl+Home — return to A1', ok: np.home});
       return beats;
     }
   }
