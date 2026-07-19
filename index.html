@@ -426,6 +426,17 @@
   .ribbon.ribbon-lean .rgrp-ico{padding:1px 6px}
   .ribbon.ribbon-open{padding-right:12px}
   .ribbon.ribbon-open .ri-key{font-size:9px; font-weight:800}
+  /* r343: menus without icons use badge+label chips — same family, same 34px row */
+  .ribbon.ribbon-lean .ri-cmd.ri-txt{gap:5px}
+  .ribbon.ribbon-lean .ri-lbl{font-family:var(--mono); font-size:11px; color:var(--text); white-space:nowrap}
+  /* r343: anchored color DROPDOWN (Excel-style) under the triggering tile */
+  .rdrop{position:fixed; z-index:40; background:var(--surface); border:1px solid var(--line);
+    border-radius:10px; box-shadow:0 10px 28px rgba(0,0,0,.25); padding:10px 12px; min-width:190px}
+  .rdrop-cap{font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--faint); margin-bottom:7px}
+  .rdrop-sw{display:flex; gap:5px; flex-wrap:wrap; max-width:230px}
+  .rdrop-name{font-family:var(--mono); font-size:11.5px; color:var(--text); margin-top:7px}
+  .rdrop-hint{font-family:var(--mono); font-size:10px; color:var(--faint); margin-top:4px}
   .rpin{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.08em; color:var(--faint);
     margin-left:auto; padding:2px 9px; border:1px solid var(--line); border-radius:99px; cursor:pointer;
     align-self:center; flex:none; transition:.12s}
@@ -8596,6 +8607,10 @@ const MENUS = {
    each as a labelled cluster with a divider. Keyboard behavior is identical — pure layout.
    A menu without an entry here still renders as a single flat cluster. */
 const RIBBON_GROUPS = {
+  'A': [
+    ['Sort & Filter', ['S','T']],
+    ['Outline',       ['H','J']],
+  ],
   'H': [
     ['Clipboard', ['V']],
     ['Font',      ['1','2','F','B','H']],
@@ -8753,22 +8768,34 @@ function drawRibbon(){ try{ __drawRibbon(); }catch(err){
    KeyTip badge + icon, names in tooltips — a glanceable chord reference that never leaves the
    screen. Alt still opens the full flyout exactly as before; this only replaces the idle hint. */
 function ribbonBarOn(){ try{ return localStorage.getItem('hk_ribbon_bar')==='1'; }catch(e){ return false; } }
+/* r343 (Wolf): EVERY menu in the same lean format. Icons are PATH-AWARE (the same letter means
+   different commands on different menus); menus without icons render badge+label text chips in
+   the identical chip family, so Alt through any path stays one 34px row. */
+const RIBBON_MENU_ICONS = { 'H': null /* uses RIBBON_ICONS */, 'A': {
+  'S': _rs+'<path d="M7 4v14M4 15l3 3 3-3"/><text x="14" y="10" font-size="8" font-weight="700" stroke="none" fill="currentColor">AZ</text></svg>',
+  'T': _rs+'<path d="M4 5h16L14 12v6l-4 2v-8L4 5Z"/></svg>',
+  'H': _rs+'<path d="M5 12h14"/><rect x="4" y="5" width="16" height="14" rx="2"/></svg>',
+  'J': _rs+'<path d="M12 8v8M8 12h8"/><rect x="4" y="5" width="16" height="14" rx="2"/></svg>',
+} };
 function __leanRibbonHtml(menuKey, withExtra){
   menuKey=menuKey||'H';
   const opts=MENUS[menuKey], groups=RIBBON_GROUPS[menuKey];
-  if(!opts || !groups) return '<span class="rhint"><k>alt</k> ribbon</span>';
+  if(!opts) return '<span class="rhint"><k>alt</k> ribbon</span>';
   const lblOf={}; opts.forEach(([k,l])=>lblOf[k]=l);
   const chord=menuKey.toLowerCase().split('').join(' ');
+  const icons = menuKey==='H' ? RIBBON_ICONS : (RIBBON_MENU_ICONS[menuKey]||{});
+  const tile=(k)=>{ const ico=icons[k];
+    const tip=String(lblOf[k]).replace(/<[^>]+>/g,'')+' — alt '+chord+' '+k.toLowerCase();
+    if(ico) return '<span class="ri-cmd" data-k="'+k.toLowerCase()+'" title="'+tip+'"><span class="ri-key">'+k.toLowerCase()+'</span><span class="ri-ico">'+ico+'</span></span>';
+    return '<span class="ri-cmd ri-txt" data-k="'+k.toLowerCase()+'" title="'+tip+'"><span class="ri-key">'+k.toLowerCase()+'</span><span class="ri-lbl">'+lblOf[k]+'</span></span>'; };
   const used=new Set();
-  const tile=(k)=>{ const ico=RIBBON_ICONS[k]||('<span class="ri-g">'+k.toLowerCase()+'</span>');
-    return '<span class="ri-cmd" title="'+lblOf[k]+' — alt '+chord+' '+k.toLowerCase()+'"><span class="ri-key">'+k.toLowerCase()+'</span><span class="ri-ico">'+ico+'</span></span>'; };
   let html='';
-  groups.forEach(([gname,keys])=>{
+  (groups||[]).forEach(([gname,keys])=>{
     let cells='';
     keys.forEach(k=>{ if(lblOf[k]===undefined) return; cells+=tile(k); used.add(k); });
     if(cells) html+='<span class="rgrp rgrp-ico"><span class="rgrp-chips">'+cells+'</span></span>';
   });
-  if(withExtra){
+  if(withExtra || !groups){
     const extra=opts.filter(([k])=>!used.has(k));
     if(extra.length){ let c=''; extra.forEach(([k])=>c+=tile(k));
       html+='<span class="rgrp rgrp-ico"><span class="rgrp-chips">'+c+'</span></span>'; }
@@ -8782,8 +8809,21 @@ function __wireRibbonPin(){
   const p=$('ribbonPin'); if(!p) return;
   p.onclick=()=>{ try{ localStorage.setItem('hk_ribbon_bar', ribbonBarOn()?'0':'1'); }catch(e){} drawRibbon(); };
 }
+function __ribbonDropKill(){ const d=document.getElementById('ribbonDrop'); if(d) d.remove(); }
+function __ribbonDrop(tileKey, innerHtml){
+  __ribbonDropKill();
+  const el=$('ribbon'); if(!el) return;
+  const d=document.createElement('div'); d.id='ribbonDrop'; d.className='rdrop'; d.innerHTML=innerHtml;
+  document.body.appendChild(d);
+  let anchor=el.querySelector('.ri-cmd[data-k="'+tileKey+'"]');
+  const ar=(anchor||el).getBoundingClientRect();
+  const dw=d.offsetWidth;
+  d.style.left=Math.max(8, Math.min(window.innerWidth-dw-8, ar.left))+'px';
+  d.style.top=(ar.bottom+4)+'px';
+}
 function __drawRibbon(){
   drawDialog();
+  __ribbonDropKill();
   const el=$('ribbon');
   if(mode!=='ribbon'){
     if(ribbonBarOn()){ el.className='ribbon show ribbon-ico ribbon-lean'; el.innerHTML=__leanRibbonHtml()+__ribbonPin(true); }
@@ -8797,26 +8837,22 @@ function __drawRibbon(){
     // r263: options now live in the floating Format Cells card (drawDialog), not the ribbon strip
     fh+='<span class="opt">letters apply \u00b7 esc cancel</span>';
     el.innerHTML=fh; return; }
-  if(dialog==='fontcolor'){
-    el.className='ribbon show';
-    let html = '<span class="path">font color →</span>';
-    FONT_SWATCHES.forEach((sw, i) => {
-      html += `<span class="fc-swatch${i===fontColorIdx?' on':''}" style="background:${sw.hex}"></span>`;
-    });
-    html += `<span class="fc-name">${FONT_SWATCHES[fontColorIdx].name}</span>`;
-    html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
-    el.innerHTML = html; return;   /* r85: __altFooter was out-of-scope (guided renderer's const) — the crash that "broke the ribbon" */
-  }
-  if(dialog==='fillcolor'){   // r231: Alt H H fill picker — mirrors the font-colour dialog
-    el.className='ribbon show';
-    let html = '<span class="path">fill →</span>';
-    FILL_SWATCHES.forEach((sw, i) => {
-      const bg = sw.k===null ? 'repeating-linear-gradient(45deg,#bbb 0 4px,#eee 4px 8px)' : sw.hex;
-      html += `<span class="fc-swatch${i===fillColorIdx?' on':''}" style="background:${bg}"></span>`;
-    });
-    html += `<span class="fc-name">${FILL_SWATCHES[fillColorIdx].name}</span>`;
-    html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
-    el.innerHTML = html; return;
+  if(dialog==='fontcolor' || dialog==='fillcolor'){
+    /* r343 (Wolf): "font color and background colors actually do a small drop down like how
+       it works in excel — instead of going to a separate menu." The strip keeps showing the
+       lean Home row; a small palette DROPDOWN anchors under the triggering tile (Font for
+       Alt H F C, Fill for Alt H H). Keyboard flow unchanged: ← → pick, ↵ apply, esc cancel. */
+    el.className='ribbon show ribbon-ico ribbon-lean ribbon-open';
+    el.innerHTML=__leanRibbonHtml('H', true);
+    const isFont = dialog==='fontcolor';
+    const SW=isFont?FONT_SWATCHES:FILL_SWATCHES, idx=isFont?fontColorIdx:fillColorIdx;
+    let drop='<div class="rdrop-cap">'+(isFont?'font color':'fill color')+'</div><div class="rdrop-sw">';
+    SW.forEach((sw,i)=>{ const bg=(sw.k===null)?'repeating-linear-gradient(45deg,#bbb 0 4px,#eee 4px 8px)':sw.hex;
+      drop+='<span class="fc-swatch'+(i===idx?' on':'')+'" style="background:'+bg+'"></span>'; });
+    drop+='</div><div class="rdrop-name">'+SW[idx].name+'</div>'+
+      '<div class="rdrop-hint">← → pick · ↵ apply · esc cancel</div>';
+    __ribbonDrop(isFont?'f':'h', drop);
+    return;
   }
   if(dialog==='cellstyle'){   // r237: cell-styles gallery \u2014 chip row, arrows walk it, \u21b5 applies
     el.className='ribbon show';
@@ -8880,15 +8916,14 @@ function __drawRibbon(){
     const key=path.join('');
     const opts=MENUS[key];
     const groups=RIBBON_GROUPS[key];
-    if(opts && groups){
+    if(opts){
       icoRibbon=true;
       /* r341 (Wolf): the open Alt+H used to be a BLOCK — big tiles with names + group labels,
-         nearly triple the strip height. Now it opens as the SAME lean one-row bar the idle
-         pin shows (icon + KeyTip badge, names in tooltips), just tinted .show — the ribbon
-         never changes size, only state. */
+         nearly triple the strip height. r343: EVERY menu path now renders the same lean
+         one-row bar (icon tiles where drawn, badge+label chips otherwise), tinted .show —
+         the ribbon never changes size through any Alt sequence, only state. */
       html+=__leanRibbonHtml(key, true);
     }
-    else if(opts) opts.forEach(([k,lbl])=>html+=`<span class="opt"><k>${k.toLowerCase()}</k>${lbl}</span>`);
     else html+='<span class="opt">…</span>';
   }
   if(icoRibbon) el.className='ribbon show ribbon-ico ribbon-lean ribbon-open';
