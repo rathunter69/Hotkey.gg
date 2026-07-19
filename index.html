@@ -409,6 +409,26 @@
   .ribbon.ribbon-ico{gap:0}
   .ribbon.ribbon-ico .rgrp-ico{flex:1 1 auto; justify-content:center}
   .ribbon.ribbon-ico .rgrp-ico .rgrp-chips{justify-content:center; flex-wrap:wrap}
+  .ribbon.ribbon-lean .rgrp-ico .rgrp-chips{flex-wrap:nowrap}
+  /* r340 (Wolf): LEAN always-on bar — compact tiles (badge + icon, names in tooltips),
+     same strip height as the idle hint so toggling never moves the grid. */
+  .ribbon.ribbon-lean{background:var(--surface2); flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; position:relative; padding-right:74px}
+  .ribbon.ribbon-lean::-webkit-scrollbar{display:none}
+  .ribbon.ribbon-lean .rgrp-ico{flex:0 0 auto; padding:1px 3px}
+  .ribbon.ribbon-lean .rgrp-chips{gap:1px}
+  .ribbon.ribbon-lean .rpin{position:sticky; right:0; background:var(--surface2); box-shadow:-6px 0 8px var(--surface2)}
+  .ribbon.ribbon-lean .ri-cmd{flex-direction:row; align-items:center; gap:2px; padding:2px 3px;
+    width:auto; min-width:0; min-height:0; flex:0 0 auto}
+  .ribbon.ribbon-lean .ri-ico{height:17px}
+  .ribbon.ribbon-lean .ri-ico svg{width:15px; height:15px}
+  .ribbon.ribbon-lean .ri-g{font-size:13px}
+  .ribbon.ribbon-lean .ri-key{position:static; font-size:8px; line-height:1.5; order:2}
+  .ribbon.ribbon-lean .rgrp-ico{padding:1px 6px}
+  .rpin{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.08em; color:var(--faint);
+    margin-left:auto; padding:2px 9px; border:1px solid var(--line); border-radius:99px; cursor:pointer;
+    align-self:center; flex:none; transition:.12s}
+  .rpin:hover{color:var(--text); border-color:var(--accent-dim)}
+  .rpin.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
   .ribbon .ri-cmd{position:relative; display:inline-flex; flex-direction:column; align-items:center; justify-content:flex-start;
     gap:3px; width:50px; min-height:44px; padding:5px 2px 4px; border-radius:7px; cursor:default; transition:background .1s}
   .ribbon .ri-cmd:hover{background:var(--surface2)}
@@ -8727,10 +8747,39 @@ function drawRibbon(){ try{ __drawRibbon(); }catch(err){
   try{ const el=$('ribbon'); if(el){ el.className='ribbon show'; el.innerHTML='<span class="path">'+(path.length?path.join(' '):'alt')+' \u2192</span><span class="opt">\u2026 \u00b7 esc backs out</span>'; } }catch(e2){}
   try{ console.error('ribbon paint:', err); }catch(e3){}
 } }
+/* r340 (Wolf): ALWAYS-ON LEAN RIBBON — prototype behind a per-device toggle (the "bar" pin at
+   the strip's right edge). When on, the idle strip shows the Home tab as a compact icon row —
+   KeyTip badge + icon, names in tooltips — a glanceable chord reference that never leaves the
+   screen. Alt still opens the full flyout exactly as before; this only replaces the idle hint. */
+function ribbonBarOn(){ try{ return localStorage.getItem('hk_ribbon_bar')==='1'; }catch(e){ return false; } }
+function __leanRibbonHtml(){
+  const opts=MENUS['H'], groups=RIBBON_GROUPS['H'];
+  if(!opts || !groups) return '<span class="rhint"><k>alt</k> ribbon</span>';
+  const lblOf={}; opts.forEach(([k,l])=>lblOf[k]=l);
+  let html='';
+  groups.forEach(([gname,keys])=>{
+    let cells='';
+    keys.forEach(k=>{ if(lblOf[k]===undefined) return;
+      const ico=RIBBON_ICONS[k]||('<span class="ri-g">'+k.toLowerCase()+'</span>');
+      cells+='<span class="ri-cmd" title="'+lblOf[k]+' — alt h '+k.toLowerCase()+'"><span class="ri-key">'+k.toLowerCase()+'</span><span class="ri-ico">'+ico+'</span></span>'; });
+    if(cells) html+='<span class="rgrp rgrp-ico"><span class="rgrp-chips">'+cells+'</span></span>';
+  });
+  return html;
+}
+function __ribbonPin(on){
+  return '<span class="rpin'+(on?' on':'')+'" id="ribbonPin" title="'+(on?'switch back to the alt-only flyout':'always show the ribbon as a lean bar')+'">bar: '+(on?'on':'off')+'</span>';
+}
+function __wireRibbonPin(){
+  const p=$('ribbonPin'); if(!p) return;
+  p.onclick=()=>{ try{ localStorage.setItem('hk_ribbon_bar', ribbonBarOn()?'0':'1'); }catch(e){} drawRibbon(); };
+}
 function __drawRibbon(){
   drawDialog();
   const el=$('ribbon');
-  if(mode!=='ribbon'){ el.className='ribbon'; el.innerHTML='<span class="rhint"><k>alt</k> ribbon</span>'; return; }
+  if(mode!=='ribbon'){
+    if(ribbonBarOn()){ el.className='ribbon show ribbon-ico ribbon-lean'; el.innerHTML=__leanRibbonHtml()+__ribbonPin(true); }
+    else { el.className='ribbon'; el.innerHTML='<span class="rhint"><k>alt</k> ribbon</span>'+__ribbonPin(false); }
+    __wireRibbonPin(); return; }
   if(dialog==='paste'){ el.className='ribbon show';
     el.innerHTML='<span class="path">paste special \u2192</span><span class="opt">letters pick \u00b7 m/d set the operation \u00b7 \u21b5 apply \u00b7 esc cancel</span>';   // r191: the floating card carries the options now
     return; }
