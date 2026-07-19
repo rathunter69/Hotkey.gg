@@ -1774,7 +1774,7 @@ const CHALLENGES = {
   drill:{
     name:'Hardcode', label:'Hardcode it', par:18, parKeys:15,
     aha:'Ctrl+Alt+V → V pastes values only — the number stays, the live link dies.',
-    prompt:'This page goes in the summary tonight \u2014 and right now every number on it is a LIVE LINK into the model. Break the links before it ships: grab the column, copy, paste-special VALUES straight back onto itself, then paint the remaining rows blue, because hardcodes wear blue. Aim at the column, not the page \u2014 the margin memo below stays LIVE. The pre-send ritual every desk runs.',
+    prompt:'Every number on this page is a live link into the model — break the links before it ships. Select the column, copy, paste-special values back onto itself, then color the hardcoded rows blue (hardcodes wear blue). Aim at the column, not the whole page — the margin memo below must stay live.',
     req:'on <em>B3</em> \u00b7 <em>ctrl+shift+\u2193</em> grabs B3:B8 \u00b7 <em>ctrl+c</em> \u00b7 <em>alt e s v \u21b5</em> values onto themselves \u00b7 then <em>alt h f c</em> \u2192 \u00d74 <em>\u21b5</em> \u2014 the dead numbers wear blue',
     guide:[
       'on B3 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> \u2014 the whole output column in one chord',
@@ -2374,7 +2374,7 @@ const CHALLENGES = {
   margin:{
     name:'Formula', label:'Margins across the page', par:23, parKeys:21,
     aha:'Divide, F4 to lock the base, Ctrl+R to fill, Alt H P for percent — a margin row in four chords.',
-    prompt:'Three comp tables, one skill: EBITDA \u00f7 revenue, built by pointing, filled down, formatted as a percent. The tables land somewhere new every run \u2014 your hands should stop caring where the table lives.',
+    prompt:'Three comp tables, one skill: EBITDA ÷ revenue — build it by pointing, fill it down, format it as a percent. The tables land in a different spot every run; the sequence is what you’re learning, not the location.',
     req(){ return this._sites.map((s,i)=>'<em>'+s.m+s.r0+'</em> \u00b7 ='+s.e+s.r0+'/'+s.v+s.r0+' \u00b7 fill '+s.m+s.r0+':'+s.m+(s.r0+2)+' \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then '); },
     guide(){ return ['<b>read the formula bar</b> \u00b7 the moment you type <kbd>=</kbd>, a red <b style="color:#e0574d">\u2715</b> and green <b style="color:#3fae4f">\u2713</b> light up \u2014 the cell is LIVE. Arrow keys now <b>point</b> (grab a cell\u2019s reference); tap <kbd>F2</kbd> to flip to <b>edit</b> (arrows move the cursor inside the text), <kbd>F2</kbd> again to point. <kbd>\u21b5</kbd> commits \u00b7 <kbd>esc</kbd> cancels'].concat(this._sites.map((s,i)=>['table one','table two','table three'][i]+' at <b>'+s.m+s.r0+'</b> \u00b7 point <kbd>='+s.e+s.r0+'/'+s.v+s.r0+'</kbd> <kbd>\u21b5</kbd> \u00b7 fill down \u00d72 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>'+(i===0?' \u2014 <kbd>ctrl</kbd>+arrows jump between tables':''))); },
     targets(){ return this._sites.map(s=>s.m+s.r0+':'+s.m+(s.r0+2)); },
@@ -2417,7 +2417,7 @@ const CHALLENGES = {
   anchor:{
     name:'Anchors', label:'Pin it with F4', par:16, parKeys:13,
     aha:'F4 cycles the anchors — $A$1 locks both, A$1 the row, $A1 the column; one formula fills the grid.',
-    prompt:'Price points across the top, volumes down the side, and a 3×3 revenue grid to fill from ONE formula. F4 cycles a reference through its four lock states — pin the volume column with $B, pin the price row with $3, and the fill does the other eight cells for you. This is the muscle that later runs every sensitivity table.',
+    prompt:'Fill a 3×3 revenue grid from one formula. Price points run across the top, volumes down the side. F4 cycles a reference through its four lock states — pin the volume column with $B, pin the price row with $3, and the fill builds the other eight cells. The same anchoring runs every sensitivity table later.',
     req(){ const o=this._o; return '<em>'+o.tl+'</em> · =B'+o.r0+' <em>F4 F4 F4</em> → $B'+o.r0+' · * · C'+o.hr+' <em>F4 F4</em> → C$'+o.hr+' · <em>↵</em> · fill '+o.col+' ↓ · fill '+o.grid+' →'; },
     guide(){ const o=this._o; return [
       'at '+o.tl+' · type <kbd>=B'+o.r0+'</kbd> then <kbd>F4</kbd> ×3 — watch it cycle to <b>$B'+o.r0+'</b>: column pinned, row free',
@@ -2604,7 +2604,7 @@ const CHALLENGES = {
   percent:{
     name:'% of rev', label:'Common-size both statements', par:17, parKeys:14,
     aha:'Divide by an anchored base — F4 locks the divisor so fill-right can’t drag it.',
-    prompt:'Two statements on one page, both common-sized \u2014 and the second one moves and deepens between runs. The anchor is the whole lesson: each block\u2019s divisor is ITS OWN revenue, locked with F4 so the fill can\u2019t drag it.',
+    prompt:'Common-size two statements on one page — the second block moves and changes size between runs. The lesson is the anchor: each block’s divisor is its own revenue line, locked with F4 so the fill can’t drag it.',
     req(){ const R=this._R; return '<em>C2</em> \u00b7 =B2/$B$2 (F4 locks it) \u00b7 fill C2:C6 \u00b7 <em>ctrl+shift+%</em> \u00b7 then: <em>'+R.pc+R.r0+'</em> \u00b7 ='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0+' \u00b7 fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent'; },
     guide(){ const R=this._R; return [
       'left block: at C2 \u00b7 <kbd>=</kbd> <kbd>\u2190</kbd> <kbd>/</kbd> <kbd>\u2190</kbd> <kbd>F4</kbd> \u2192 <b>$B$2</b> \u00b7 <kbd>\u21b5</kbd> \u00b7 fill C2:C6 \u00b7 percent',
@@ -2659,7 +2659,7 @@ const CHALLENGES = {
   scrub:{
     name:'Scrub', label:'Clean the export', par:21, parKeys:19,
     aha:'Exports come dirty — delete junk rows (Ctrl+−), sort (Alt A S), re-total; the data is yours.',
-    prompt:'The deal list came out of the system DIRTY: a duplicated header row, a "--- PAGE 2 ---" break, and a stale SUBTOTAL row that will double-count the moment anyone totals the column. Scrub it — delete all three junk rows, sort what is real largest-first, and re-total the clean data. Every export you will ever receive needs this pass.',
+    prompt:'The deal list exported dirty: a duplicated header row, a "--- PAGE 2 ---" break, and a stale SUBTOTAL row that will double-count the moment anyone totals the column. Delete all three junk rows, sort the real data largest-first, and re-total it. Every export needs this pass.',
     req(){ const o=this._o; return 'the junk = the second <em>Deal</em> header, <em>--- PAGE 2 ---</em>, and <em>SUBTOTAL</em> — delete each (<em>alt h d r</em>) · select <em>'+o.range+'</em> · <em>alt a s d</em> · foot at <em>'+o.foot+'</em> → <em>alt+=</em> <em>↵</em> · <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'hunt the junk top to bottom: the duplicate header, the page break, the SUBTOTAL trap — on each row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>',
@@ -2733,7 +2733,7 @@ const CHALLENGES = {
   recon:{
     name:'Recon', label:'Two systems, one truth', par:77, parKeys:81,
     aha:'COUNTIF checks presence, INDEX/MATCH checks size — drive every difference to zero.',
-    prompt:'The trading system says seven deals; the finance extract says six — and one amount they DO share does not agree. This is reconciliation, the data job every first-year owns: flag presence with COUNTIF, pull the book amount with INDEX/MATCH, bring the missing deal across, and drive the difference column to zeros. Nothing ships while the recon shows a break.',
+    prompt:'The trading system shows seven deals; the finance extract shows six — and one amount they both hold doesn’t agree. Reconcile them: flag presence with COUNTIF, pull the book amount with INDEX/MATCH, bring the missing deal across, and drive the difference column to zeros. Nothing ships while the recon shows a break.',
     req(){ const o=this._o; return '<em>C4</em> → <em>=COUNTIF($D$4:$D$10,A4)</em> · fill C4:C10 · the 0-flag deal → add it at <em>D10:E10</em> · <em>F4</em> → <em>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</em> · fill F4:F10 · fix the broken amount — every Δ reads 0'; },
     guide(){ const o=this._o; return [
       'presence first: C4 · <kbd>=COUNTIF($D$4:$D$10,A4)</kbd> <kbd>↵</kbd> · select C4:C10 · <kbd>ctrl</kbd>+<kbd>d</kbd> — a 0 means finance never booked it',
@@ -2804,7 +2804,7 @@ const CHALLENGES = {
   grpfold:{
     name:'Group', label:'Fold the detail away', par:15, parKeys:12,
     aha:'Group rows (Shift+Alt+→), never hide them — the ⊞ tells the reader the detail’s still there.',
-    prompt:'The MD wants the SUMMARY view of this build — quarterly totals, not the monthly noise under them. The house rule is absolute: you never HIDE rows, you GROUP them (Shift+Alt+→), then fold the detail (Alt A H) so a ⊞ tells the next reader exactly where it lives. Three months under each quarter; group each block, fold each block, and the totals keep breathing.',
+    prompt:'Produce the summary view: quarterly totals with the monthly detail folded away. House rule — never hide rows; group them (Shift+Alt+→), then fold the detail (Alt A H) so a ⊞ shows the next reader where it lives. Three months under each quarter: group each block, fold each block, and the totals keep computing.',
     req(){ const o=this._o; return o.blocks.map((b,i)=>'<em>A'+b.r1+':A'+b.r2+'</em> → <em>shift+alt+→</em>').join(' · ')+' · then fold each: <em>alt a h</em> — subtotals stay on the page'; },
     guide(){ const o=this._o; return [
       'quarter one: select rows '+o.blocks[0].r1+'-'+o.blocks[0].r2+' (the months) · <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>→</kbd> groups them · <kbd>alt</kbd> <kbd>a</kbd> <kbd>h</kbd> folds the detail',
@@ -2860,7 +2860,7 @@ const CHALLENGES = {
   filterpass:{
     name:'Filter', label:'Work the filtered view', par:13, parKeys:10,
     aha:'Ctrl+Shift+L arms the filter, Alt+↓ opens the picker — hide the noise, the answer reads itself.',
-    prompt:'A live deal list, three statuses deep. The VP wants ONE number: the largest OPEN deal still on the data. Arm the AutoFilter on the header row (Ctrl+Shift+L), open the Status picker (Alt+\u2193), drop everything that is not Open, and the answer reads straight off the visible rows \u2014 type it where the data asks.',
+    prompt:'Find one number in a live deal list: the largest Open deal. Turn on AutoFilter at the header row (Ctrl+Shift+L), open the Status picker (Alt+↓), uncheck everything that isn’t Open, and read the answer off the visible rows — then type it where the sheet asks.',
     req(){ const o=this._o; return '<em>ctrl+shift+L</em> on row 3 arms the \u25be \u00b7 <em>alt+\u2193</em> on Status \u2192 <em>space</em> drops Closed/Dead \u2192 <em>\u21b5</em> \u00b7 type the largest visible Size into <em>B'+o.ansR+'</em>'; },
     guide(){ const o=this._o; return [
       'put the cursor anywhere on row 3 (the header) \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> \u2014 \u25be pickers arm across the whole header block',
@@ -2987,7 +2987,7 @@ const CHALLENGES = {
   unhide:{
     name:'Unhide', label:'Flush the hidden rows', par:15, parKeys:12,
     aha:'Hidden rows lie — unhide them, then group so the detail stays honest.',
-    prompt:'The last analyst HID the monthly detail instead of grouping it \u2014 rows 4 to 7 are just\u2026 gone. No \u229e, no rail, no trace: the row numbers skip and the subtotal reads like magic. The MD wants it done RIGHT. Select across the gap and unhide (Ctrl+Shift+9 \u2014 or Alt H O U O), group the detail properly (Shift+Alt+\u2192), fold it back (Alt A H) so the \u229e tells the next reader where it lives \u2014 and while you\u2019re in there, the Size column is squeezed to hash marks: set it to a real width (Alt H O W).',
+    prompt:'The monthly detail was hidden instead of grouped — rows 4 to 7 are gone with no ⊞ and no trace, and the subtotal reads like magic. Fix it properly: select across the gap and unhide (Ctrl+Shift+9 — or Alt H O U O), group the detail (Shift+Alt+→), and fold it back (Alt A H) so the ⊞ shows where it lives.',
     req(){ const o=this._o; return 'select rows '+(o.h1-1)+':'+(o.h2+1)+' \u00b7 <em>ctrl+shift+9</em> (or <em>alt h o u o</em>) \u00b7 group '+o.h1+':'+o.h2+' <em>shift+alt+\u2192</em> \u00b7 fold <em>alt a h</em> \u00b7 <em>alt h o w</em> \u2192 12 on column B'; },
     guide(){ const o=this._o; return [
       'the row numbers jump '+(o.h1-1)+' \u2192 '+(o.h2+1)+' \u2014 that\u2019s the tell \u00b7 select across the gap (rows '+(o.h1-1)+' to '+(o.h2+1)+') \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>9</kbd> or <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>u</kbd> <kbd>o</kbd> \u2014 the detail returns',
@@ -3863,7 +3863,7 @@ const CHALLENGES = {
   foot:{
     name:'Foot', label:'Foot the table both ways', par:11, parKeys:8,
     aha:'Alt+= proposes the SUM it sees — total the rows, the columns, and the corner.',
-    prompt:'A segment × quarter block: total every row, total every column, land the grand total where they meet. You will not type a single SUM — Alt+= reads the block and proposes it. Total down, total across, and the corner has to tie to BOTH edges.',
+    prompt:'Total a segment × quarter block in every direction: total each row, total each column, and land the grand total where they meet. Don’t type a single SUM — Alt+= reads the block and proposes it. The corner total must tie to both edges.',
     req:'<em>F2</em> · <em>alt+=</em> <em>↵</em> · fill F2:F5 ↓ · <em>B6</em> · <em>alt+=</em> <em>↵</em> · fill B6:E6 → · <em>F6</em> grand · <em>alt+=</em> <em>↵</em>',
     guide:[
       'row totals: F2 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:E2) — it read the row · <kbd>↵</kbd> · select F2:F5 · <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -4054,7 +4054,7 @@ const CHALLENGES = {
   sort:{
     name:'Sort', label:'Sort the table', par:10, parKeys:7,
     aha:'Alt A S D sorts the rows in place — the table stays live, nothing is retyped.',
-    prompt:'Ranking workflow wherever the table lands: sort the six deals by size, largest first, total the column with AutoSum, bold the total. Sort, total, bold \u2014 the whole rep.',
+    prompt:'Sort the six deals by size, largest first, total the column with AutoSum, and bold the total. The table lands somewhere new every run — sort, total, bold, wherever it sits.',
     req(){ const o=this._o; return 'select <em>'+o.range+'</em> (active in the size column) \u00b7 <em>alt a s d</em> sorts Z\u2192A \u00b7 drop to <em>'+o.foot+'</em> \u00b7 <em>alt+=</em> \u2192 <em>\u21b5</em> \u00b7 <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'cursor to '+o.b2+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs the size column \u00b7 <kbd>shift</kbd>+<kbd>\u2190</kbd> pulls in the names',
@@ -4103,7 +4103,7 @@ const CHALLENGES = {
   series:{
     name:'Years', label:'Stub the year header', par:14, parKeys:11,
     aha:'Seed two years, then Fill Series (Alt H F I S) writes the rest of the header.',
-    prompt:'Extend and format a year header wherever it starts this run: two seed years are in, three more to fill with Series, then bold the whole run and right-align it so the years sit over their number columns.',
+    prompt:'Extend and format a year header wherever it starts this run: two seed years are in place — fill the next three with Fill Series, then bold the whole run and right-align it so the years sit over their number columns.',
     req(){ const o=this._o; return 'select <em>'+o.range+'</em> \u00b7 <em>alt h f i s \u21b5</em> fills the missing years \u00b7 selection holds \u2192 <em>ctrl+b</em> \u00b7 <em>alt h a r</em>'; },
     guide(){ const o=this._o; return [
       'the seed years start at '+o.a+' this run \u2014 select '+o.range+' with <kbd>shift</kbd>+<kbd>\u2192</kbd>',
@@ -4142,9 +4142,9 @@ const CHALLENGES = {
     }
   },
   bridge:{
-    name:'Point Mode', label:'Point, don\u2019t type', par:10, parKeys:6,
+    name:'Point Mode', label:'Point-mode formulas', par:10, parKeys:6,
     aha:'Point mode grabs refs with the arrow keys — the fastest formula is one you never typed.',
-    prompt:'Build profit = revenue \u00d7 margin by POINTING \u2014 = then arrow up to grab each reference, never typing a cell address \u2014 and fill it across five years. Point mode is the fastest formula entry there is; the fill proves your references were relative.',
+    prompt:'Build profit = revenue × margin by pointing: type =, then use the arrow keys to grab each reference — never type a cell address — and fill it across five years. Point mode is the fastest way to enter a formula, and the fill confirms the references were relative.',
     req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs revenue \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs margin \u00b7 <em>\u21b5</em> \u00b7 select '+o.rng+' \u00b7 <em>ctrl+r</em>'; },
     guide(){ const o=this._o; return [
       'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
@@ -4198,7 +4198,7 @@ const CHALLENGES = {
   growth:{
     name:'Growth', label:'Run the growth rates', par:36, parKeys:35,
     aha:'Growth = this ÷ last − 1 — one formula, filled across every year.',
-    prompt:'A real revenue build: two segments, a consolidated line, five fiscal years. Total the segments, run YoY growth off the total \u2014 this year \u00f7 last year \u2212 1, filled across, formatted as a percent \u2014 then land the 4-year CAGR with the ^ key. Three different formulas, and every rate reads like a banker wrote it.',
+    prompt:'A revenue build with two segments, a consolidated line, and five fiscal years. Total the segments, run YoY growth off the total — this year ÷ last year − 1, filled across, formatted as a percent — then compute the 4-year CAGR with the ^ key. Three formulas, each formatted to standard.',
     req:'<em>B4</em> total <em>=B2+B3</em> fill \u2192 \u00b7 <em>C5</em> YoY <em>=C4/B4-1</em> \u00b7 fill C5:F5 \u2192 + <em>ctrl+shift+%</em> \u00b7 <em>B7</em> CAGR <em>=(F4/B4)^(1/4)-1</em> + <em>ctrl+shift+%</em> \u00b7 dress B4:F4: <em>ctrl+b</em>',
     guide:[
       'consolidate at B4 \u00b7 <kbd>=B2+B3</kbd> \u2014 both segments \u00b7 fill right',
@@ -6037,7 +6037,7 @@ const CHALLENGES = {
   cagr:{
     name:'CAGR', label:'Compound it, three times', par:55, parKeys:57,
     aha:'CAGR = (end ÷ start)^(1÷years) − 1 — the ^ key does the compounding.',
-    prompt:'Three CAGR checks scattered where a real page would leave them \u2014 and they move every run. Same clean formula each time: (End \u00f7 Begin) ^ (1 \u00f7 Years) \u2212 1, percent. Then read your own output like a banker: the deal with the highest CAGR gets flagged bold \u2014 computing the number is half the job; calling the winner is the other half.',
+    prompt:'Three CAGR checks in different spots on the page — they move every run. The formula is the same each time: (End ÷ Begin) ^ (1 ÷ Years) − 1, formatted as a percent. Then read the output: bold the deal with the highest CAGR. Computing the number is half the job; identifying the winner is the rest.',
     req(){ return this._sites.map(s=>'<em>'+s.col+s.ans+'</em> \u00b7 =('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1 \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then ')+' \u00b7 then <em>ctrl+b</em> the HIGHEST of the three'; },
     guide(){ const g=this._sites.map((s,i)=>['block one','block two','block three'][i]+' \u2014 at <b>'+s.col+s.ans+'</b> type <kbd>=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>');
       g.push('now READ them \u2014 the highest CAGR wins the page: back to that cell \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>'); return g; },
@@ -6993,7 +6993,7 @@ const CHALLENGES = {
   sumif:{
     name:'SUMIF', label:'Roll up the segments', par:57, parKeys:59,
     aha:'SUMIF reads the labels for you — one formula rolls up an entire segment.',
-    prompt:'A raw ledger on the left, a summary the MD can read on the right. One SUMIF with anchored ranges, filled down for the other segments \u2014 only the criteria cell walks. Then total the summary with a live SUM, run % of total off an anchored denominator, and bold the total line. Rollup, ratio, dress: a real summary tab.',
+    prompt:'A raw ledger on the left, a clean summary on the right. Write one SUMIF with anchored ranges and fill it down for the other segments — only the criteria cell moves. Then total the summary with a live SUM, run % of total off an anchored denominator, and bold the total line.',
     req:'<em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> \u00b7 fill E2:E4 \u2193 \u00b7 <em>E5</em> <em>=SUM(E2:E4)</em> \u00b7 <em>F2</em> <em>=E2/$E$5</em> \u00b7 fill F2:F4 \u2193 + <em>ctrl+shift+%</em> \u00b7 dress D5:E5: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'the rollup at E2 \u00b7 <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>\u21b5</kbd> \u2014 ranges $-locked, criteria walking',
@@ -7057,9 +7057,9 @@ const CHALLENGES = {
     }
   },
   cases:{
-    name:'Sticky switch', label:'Scenario driver — CHOOSE + sticky capture', par:94, parKeys:100,
+    name:'Sticky switch', label:'Scenario switch with CHOOSE', par:94, parKeys:100,
     aha:'A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.',
-    prompt:'This is how a real model switches scenarios. A driver block reads ONE cell — the switch — and CHOOSE pulls the active case’s name and growth into it; the whole model runs off that driver, not a nest of IFs. A CAPTURE cell then reads the locked-year revenue only when its case is live and otherwise references ITSELF to hold the value — so the summary shows all three side by side. Build the driver, run the model off it, flip 1·2·3 to snapshot each case. THEN the twist every analyst gets burned by: the deal team revises an assumption. Watch the snapshot stay frozen at the stale number, and refresh it by revisiting the case — while the others never budge.',
+    prompt:'Build a scenario switch the way a real model does it. A driver block reads one cell — the switch — and CHOOSE pulls the active case’s name and growth rate into it, so the model runs off the driver instead of nested IFs. A capture cell reads the locked-year revenue only while its case is live, and otherwise references itself to hold the last value — so the summary shows all three cases side by side.',
     req(){ const c=this._capL, m=(this._mutG*100).toFixed(1); return 'driver: <em>B8</em> =CHOOSE($B$3,B5,C5,D5) · <em>B9</em> =CHOOSE($B$3,B6,C6,D6) · model: <em>C12</em> =B12*(1+$B$9) F4-anchored, fill <em>C12:F12</em> → · <em>C13</em> =C12/B12-1 fill <em>C13:F13</em> → · capture: <em>C18</em> =IF($B$3=C$17,$'+c+'$12,C18) fill <em>C18:E18</em> → · flip <em>B3</em> → 1 · 2 · 3 · then revise <em>B6</em> → '+m+'% and re-flip <em>B3</em> → 1'; },
     guide(){ const c=this._capL, m=(this._mutG*100).toFixed(1); return [
       'the DRIVER — CHOOSE reads the switch: <em>B8</em> · <kbd>=</kbd>CHOOSE($B$3,B5,C5,D5) — the active case NAME · <kbd>↵</kbd> · <em>B9</em> · <kbd>=</kbd>CHOOSE($B$3,B6,C6,D6) — the active GROWTH · <kbd>↵</kbd>',
@@ -7199,9 +7199,9 @@ const CHALLENGES = {
   },
 
   rollup:{
-    name:'SUMIFS', label:'Cross the data', par:65, parKeys:68,
+    name:'SUMIFS', label:'Cross-tab with SUMIFS', par:65, parKeys:68,
     aha:'SUMIFS crosses two labels at once — one mixed-anchor formula fills the grid.',
-    prompt:'A raw deal list \u2014 segment, region, revenue \u2014 and the MD wants the CROSS: a segment \u00d7 region grid, four numbers, totaled. One SUMIFS does it: ranges $-locked, the segment criterion column-locked ($F3), the region criterion row-locked (G$2) \u2014 then the SAME formula fills right and down and the grid builds itself. The dcfsens anchor lesson, pointed at data.',
+    prompt:'Roll a raw deal list — segment, region, revenue — up into a segment × region grid. One SUMIFS does it: ranges $-locked, the segment criterion column-locked ($F3), the region criterion row-locked (G$2) — then the same formula fills right and down to build the grid.',
     req:'<em>G3</em> <em>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</em> \u00b7 fill G3:H3 \u2192 \u00b7 fill G3:H4 \u2193 \u00b7 <em>G5</em> <em>=SUM(G3:G4)</em> fill \u2192 \u00b7 dress F5:H5: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
       'the cross at G3 \u00b7 <kbd>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</kbd> <kbd>\u21b5</kbd> \u2014 sum range first, then each (range, criterion) pair; $F3 walks DOWN only, G$2 walks RIGHT only',
@@ -7267,9 +7267,9 @@ const CHALLENGES = {
     }
   },
   fxconvert:{
-    name:'FX Convert', label:'Convert the page — one boxed rate', par:35, parKeys:34,
+    name:'FX Convert', label:'Convert with one FX rate', par:35, parKeys:34,
     aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention boxes the driver (Alt H B A) while the output table gets an outline (Alt H B S).',
-    prompt:'The revenue table came over from the Frankfurt desk in euros — the book prints in dollars. The desk convention: the FX rate lives in ONE cell, typed blue and BOXED (Alt H B A — all borders on a standalone driver), and every converted number reads off it. Build the USD block from a single anchored formula — fill right, then down — comma it, and OUTLINE the finished table (Alt H B S), never a grid of borders. One rate cell, twelve conversions, zero retyping.',
+    prompt:'Convert the euro revenue table to dollars. Desk convention: the FX rate lives in one cell — typed blue and boxed (Alt H B A) — and every converted number reads off it. Build the USD block from a single anchored formula, fill right then down, add commas, and outline the finished table (Alt H B S) instead of ruling a grid of borders.',
     req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), box it (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outline <em>A10:F12</em> (<em>alt h b s</em>)'; },
     guide(){ return [
       'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — a standalone input gets ALL borders; that box says "this cell drives the page"',
