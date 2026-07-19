@@ -8464,25 +8464,12 @@ function render(){
   updateFormulaBar();
 }
 function positionPasteDest(){
-  const m=document.getElementById('pastedest'); if(!m) return;
-  const cb=S&&S.clipboard;
-  // r329 (Wolf): in guided mode the STATIC target footprint (drawn on the destination) is the guide,
-  // so suppress the cursor-following ghost — two footprints at once read as confusing.
-  if(!cb || !cb.w || !cb.h || editing || demoPlaying || guided){ m.style.display='none'; return; }
-  const r1=S.active.r, c1=S.active.c;
-  const r2=Math.min(S.ROWS, r1+cb.h-1), c2=Math.min(COLS, c1+cb.w-1);
-  const src=cb.rect;
-  if(src && r1===src.r1 && c1===src.c1){ m.style.display='none'; return; }   // still sitting on the source — the marquee already says it
-  const a=document.querySelector(`td[data-r="${r1}"][data-c="${c1}"]`);
-  const b=document.querySelector(`td[data-r="${r2}"][data-c="${c2}"]`);
-  if(!a||!b){ m.style.display='none'; return; }
-  const wrap=document.getElementById('gridwrap');
-  const wr=wrap.getBoundingClientRect(), ar=a.getBoundingClientRect(), br=b.getBoundingClientRect();
-  m.style.display='block';
-  m.style.left=(ar.left-wr.left+wrap.scrollLeft)+'px';
-  m.style.top=(ar.top-wr.top+wrap.scrollTop)+'px';
-  m.style.width=(br.right-ar.left)+'px';
-  m.style.height=(br.bottom-ar.top)+'px';
+  /* r344 (Wolf, option A — his call after five iterations): the cursor-following paste
+     preview is RETIRED in every mode. While the clipboard is armed, the only destination
+     visual is the STATIC outline at the drill's landing zone (currentTargetRange expands
+     to the copied block's footprint; the gt-t/b/l/r edges draw one crisp frame there).
+     Excel-true: the source keeps its marching ants, the cursor stays undecorated. */
+  const m=document.getElementById('pastedest'); if(m) m.style.display='none';
 }
 function positionMarquee(){
   const m=document.getElementById('marquee'); if(!m) return;
