@@ -658,6 +658,10 @@ function featuredHtml(){
 let browseTab = sessionStorage.getItem('hk_lb_tab') || 'drills';
 if(browseTab==='marathon') browseTab='drills';   // r293: marathon boards retired — stale saved tab falls back
 let browseKey = sessionStorage.getItem('hk_lb_key') || null;
+/* r335 (Wolf): tier sub-menu on the drill boards — a dropdown scopes the detail board to one
+   rank tier; bucket chips (Bottom/Middle/Top) narrow further once a tier is picked. 'all' = off. */
+let tierFilter = sessionStorage.getItem('hk_lb_tier') || 'all';
+let bucketFilter = sessionStorage.getItem('hk_lb_bucket') || 'all';
 let rosterTier = null;
 function rosterHtml(flush){
   const {names,meId}=DATA; const userStat=DATA.gUserStat||DATA.userStat;
@@ -1199,9 +1203,27 @@ function browserHtml(){
       listRows+='<span class="chip bl-row'+(browseKey===c.key?' on':'')+(mine?' mine':'')+'" data-key="'+c.key+'">'+
         '<span class="bl-nm">'+esc(c.label)+'</span>'+(mine?'<b class="bl-me" title="you have a time here">\u2713</b>':'')+'</span>'; });
     const c=CH.find(x=>x.key===browseKey);
+    // r335: tier scope — map every user on the board to their tier once, filter, re-rank
+    const tierNames=(window.HK_RANK?window.HK_RANK.TIERS.map(t=>t.name):[]);
+    let rows=perDrill[browseKey], fnote='';
+    if(tierFilter!=='all'){
+      const stat=DATA.gUserStat||DATA.userStat;
+      const tof={}; Object.entries(stat).forEach(([u,st])=>{ const av=st.att?st.avg:null;
+        if(av!==null) tof[u]=TIER_OF(av, st.att, st.wsum); });
+      rows=rows.filter(r=>{ const t=tof[r.user_id]; if(!t || t.name!==tierFilter) return false;
+        if(bucketFilter!=='all' && (t.bucket||'')!==bucketFilter+' Bucket') return false; return true; });
+      fnote='<div class="tf-note">'+rows.length+' of '+perDrill[browseKey].length+' on this board '+(rows.length===1?'holds':'hold')+' '+esc(tierFilter)+(bucketFilter!=='all'?' \u00b7 '+esc(bucketFilter)+' Bucket':'')+'</div>';
+    }
+    const tierSel='<div class="tier-filter"><label for="tierSel">tier</label>'+
+      '<select id="tierSel">'+['all'].concat(tierNames).map(tn=>'<option value="'+esc(tn)+'"'+(tierFilter===tn?' selected':'')+'>'+(tn==='all'?'all tiers':esc(tn))+'</option>').join('')+'</select>'+
+      (tierFilter!=='all' ? ['all','Bottom','Middle','Top'].map(b=>'<span class="chip tf-b'+(bucketFilter===b?' on':'')+'" data-bucket="'+b+'">'+(b==='all'?'all buckets':b.toLowerCase())+'</span>').join('') : '')+
+      '</div>';
+    const detailBoard=(tierFilter!=='all' && !rows.length)
+      ? '<div class="board"><div class="board-cap"><h2>'+esc(c.label)+'</h2><span class="lvl">'+esc(c.lvl)+'</span></div><div class="empty" style="padding:14px 18px">nobody holding '+esc(tierFilter)+' has a time on this board yet \u2014 the lane is open</div></div>'
+      : boardHtml(c, rows, DATA.names, meId);
     html+='<div class="browse-wrap">'+
       '<div class="browse-list"><input id="blSearch" placeholder="search drills\u2026" aria-label="search drills">'+listRows+'</div>'+
-      '<div class="browse-detail" id="detail">'+boardHtml(c, perDrill[browseKey], DATA.names, meId)+'</div>'+
+      '<div class="browse-detail" id="detail">'+tierSel+fnote+detailBoard+'</div>'+
     '</div>';
   } else {
     const durs = RAPID_DURS;
@@ -1279,6 +1301,11 @@ function wire(){
     renderAll(); });
   document.querySelectorAll('.chip[data-key]').forEach(c=>c.onclick=()=>{
     browseKey=c.dataset.key; sessionStorage.setItem('hk_lb_key',browseKey); renderAll(); });
+  const ts=document.getElementById('tierSel');
+  if(ts){ ts.onchange=()=>{ tierFilter=ts.value; bucketFilter='all';
+    sessionStorage.setItem('hk_lb_tier',tierFilter); sessionStorage.setItem('hk_lb_bucket','all'); renderAll(); }; }
+  document.querySelectorAll('.chip[data-bucket]').forEach(b=>b.onclick=()=>{
+    bucketFilter=b.dataset.bucket; sessionStorage.setItem('hk_lb_bucket',bucketFilter); renderAll(); });
   const tt=document.getElementById('teamToggle');
   if(tt) tt.onclick=()=>{ sessionStorage.setItem('hk_teamview', DATA.teamOnly?'0':'1'); load();
  };
