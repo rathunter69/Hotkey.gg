@@ -538,6 +538,23 @@ function heroHtml(){
         '</div>';
     }
   }
+  // r336 (Wolf): STANDARDIZED PLACEMENT — once you enter ranked, your first rank is withheld
+  // until you post a keyboard-only time on each of the five standard boards (HK_PLACEMENT):
+  // the same five for every analyst, one from each band of the arc, so early ranks compare.
+  {
+    const pset=(window.HK_PLACEMENT?window.HK_PLACEMENT.KEYS:[]).filter(k=>CH.some(c=>c.key===k));
+    const done=pset.filter(k=>DATA.fRuns.some(r=>r.user_id===meId && r.challenge===k));
+    if(pset.length && done.length<pset.length){
+      const rows=pset.map(k=>{ const c=CH.find(x=>x.key===k); const ok=done.indexOf(k)>=0;
+        return '<div class="pl-row'+(ok?' ok':'')+'"><span class="pl-tick">'+(ok?'\u2713':'\u00b7')+'</span>'+
+          '<span class="pl-nm">'+esc(c?c.label:k)+'</span>'+
+          (ok?'<span class="pl-done">posted</span>':'<a class="pl-go" href="index.html?drill='+encodeURIComponent(k)+'">run it \u2192</a>')+'</div>'; }).join('');
+      return '<div class="panel me"><h4>your card</h4>'+
+        '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.7">\u2694 <b style="color:var(--text)">Placement series \u2014 '+done.length+'/'+pset.length+'</b><br>'+
+        'Post a keyboard-only time on each of the five standard boards \u2014 the same five for every analyst, one from each band of the catalog \u2014 and your first rank is placed off one yardstick.</div>'+
+        '<div class="pl-list">'+rows+'</div></div>';
+    }
+  }
   const avg=me.att?me.avg:null;
   const t=tierOf(avg, me.att, me.wsum);
   // r116: XP v4 — ONE implementation (HK_RANK.computeXP); the old inline mirror had drifted
@@ -571,6 +588,8 @@ function rankedInfographic(){
   m.innerHTML='<div class="panel" style="max-width:460px;width:100%">'+
     '<h4>welcome to ranked</h4>'+
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.8;margin-bottom:12px">'+
+    'Entry starts with a <b>placement series</b> \u2014 the same five standard boards for every analyst '+
+    '(one from each band of the catalog); your first rank shows once all five are posted.<br><br>'+
     'Your rank = your <b>average placement</b> across the boards you\u2019ve entered \u2014 stabilized two ways: '+
     'with only a few boards, your rating starts near the middle and your results pull it toward your true level (so two fast drills alone can\u2019t crown you); '+
     'and small fields count for less than big ones (1st of 2 says less than 4th of 40). Until you\u2019ve faced enough real competition, your rank is capped and tagged <b>provisional</b> \u2014 everyone starts low and earns altitude. Breadth + placement is the climb.<br><br>'+

@@ -15,6 +15,11 @@
    All consumers read window.HOTKEY_DRILLS, never define their own copy.
    ============================================================ */
 
+/* r336 (Wolf): the STANDARDIZED placement series — the same five boards for everyone entering
+   ranked, one from each band of the arc (move → format → formula → data → model), so a first
+   rank is placed off one yardstick whether you're early in the catalog or deep into it. */
+window.HK_PLACEMENT = { KEYS: ['navigation','dress','margin','sort','opmodel'] };
+
 window.HOTKEY_DRILLS = {
 
   // ---------------------------------------------------------------
