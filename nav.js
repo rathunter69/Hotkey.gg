@@ -1163,7 +1163,10 @@ window.hkCelebrate = function(o){
   w.addEventListener('click', close);
   const key=(e)=>{
     if(e.key==='Enter'||e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); document.removeEventListener('keydown',key,true); return; }
-    if((e.key==='v'||e.key==='V') && window.openProfile){ e.preventDefault(); e.stopPropagation(); close(); document.removeEventListener('keydown',key,true); try{ window.openProfile(); }catch(_){ } return; }
+    /* r338: plain 'v' ONLY — a chorded v (Ctrl+V paste, Ctrl+Shift+V) mid-celebration used to
+       hijack the paste into "view profile"; the orphaned profile modal then silently ate the
+       next Escape (nav's overlay-close swallows it), wedging exit-edit until a second Esc. */
+    if((e.key==='v'||e.key==='V') && !e.ctrlKey && !e.metaKey && !e.altKey && window.openProfile){ e.preventDefault(); e.stopPropagation(); close(); document.removeEventListener('keydown',key,true); try{ window.openProfile(); }catch(_){ } return; }
   };
   document.addEventListener('keydown', key, true);
   setTimeout(close, 4200);

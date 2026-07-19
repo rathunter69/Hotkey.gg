@@ -1485,14 +1485,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=266"></script>
+<script src="drills.js?v=267"></script>
 <link rel="stylesheet" href="nav.css?v=179">
 <script src="themes.js?v=267"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=272"></script>
+<script src="nav.js?v=273"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -6634,6 +6634,72 @@ const CHALLENGES = {
       ];
     }
   },
+  tieout:{
+    name:'Tie-out', label:'F9 the suspect', par:30, parKeys:16,
+    aha:'F9 evaluates a formula IN the editor — the dead number tells you which link is stale; Esc keeps the formula live.',
+    prompt:'The deck total and the support block disagree, and nothing is labeled. Ride Ctrl+[ from the tie-out into the wiring, then interrogate the legs: F2 opens one, F9 collapses it to the number it actually pulls, Esc keeps the formula alive. Two legs read the fresh Q2 feed; one still points at the Q1 column — the dead number gives it away instantly. Repoint the stale leg and the check lands at zero. Auditors call it a tie-out; F9 is how you run one without printing anything.',
+    req(){ const o=this._o; return 'on <em>'+o.tie+'</em> · <em>ctrl+[</em> ×2 rides into the legs · <em>F2</em> a leg, <em>F9</em> shows its dead value, <em>esc</em> · the stale one reads Q1 — retype <em>'+o.fixF+'</em> ↵ · the check ties to 0'; },
+    guide(){ const o=this._o; return [
+      'start on the tie-out '+o.tie+' — it is not zero · <kbd>ctrl</kbd>+<kbd>[</kbd> lands you on the total it reads',
+      '<kbd>ctrl</kbd>+<kbd>[</kbd> again — into the legs. Each leg pulls one feed cell, and one of them is STALE',
+      'interrogate: <kbd>F2</kbd> opens '+o.bad+' · <kbd>F9</kbd> — the formula collapses to the number it pulls · <kbd>esc</kbd> keeps it live',
+      'that number is the Q1 column — repoint it: type <kbd>'+o.fixF+'</kbd> <kbd>↵</kbd>',
+      'the total repriced and the tie-out reads 0 — the page ties',
+    ]; },
+    targets(){ const o=this._o; return [o.tie, o.bad, o.bad, o.tie]; },
+    demo(){ const o=this._o;
+      const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
+      for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
+      keys.push({key:'F2'},{key:'F9'},{key:'Escape'});
+      keys.push(...T(o.fixF), Kb.enter);
+      return [{sel:o.tie, keys:keys}];
+    },
+    build(){
+      const cells={};
+      cells['A1']={...blankCell(),value:codename()+' — the deck and the block disagree (one leg is stale)',txt:true,bold:true};
+      const pool=['Consumer','Industrial','Services','Energy','Retail'];
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const labels=pool.slice(0,3);
+      const r0=4;
+      cells['F3']={...blankCell(),value:'Q1 (old)',txt:true,bold:true,align:'r'};
+      cells['G3']={...blankCell(),value:'Q2 feed',txt:true,bold:true,align:'r'};
+      const q1=[],q2=[];
+      for(let i=0;i<3;i++){ const a=rnd(30,90)*10, b=a+(rnd(0,1)?1:-1)*rnd(2,9)*10;
+        q1.push(a); q2.push(b);
+        cells['E'+(r0+i)]={...blankCell(),value:labels[i],txt:true};
+        cells['F'+(r0+i)]={...blankCell(),value:a,fmtStyle:'comma',decimals:0};
+        cells['G'+(r0+i)]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      cells['A3']={...blankCell(),value:'Support block ($000s)',txt:true,bold:true};
+      const bi=rnd(0,2);
+      for(let i=0;i<3;i++){
+        cells['A'+(r0+i)]={...blankCell(),value:labels[i],txt:true};
+        const stale=(i===bi);
+        cells['B'+(r0+i)]={...blankCell(),formula:stale?('=F'+(r0+i)):('=G'+(r0+i)), value:stale?q1[i]:q2[i], fmtStyle:'comma',decimals:0};
+      }
+      const totBad=q2.reduce((a,b,i)=>a+(i===bi?q1[i]:b),0), totGood=q2.reduce((a,b)=>a+b,0);
+      cells['A'+(r0+3)]={...blankCell(),value:'Total',txt:true,bold:true};
+      cells['B'+(r0+3)]={...blankCell(),formula:'=SUM(B'+r0+':B'+(r0+2)+')',value:totBad,bold:true,fmtStyle:'comma',decimals:0,bt:true};
+      cells['D1']={...blankCell(),value:'Deck says',txt:true,bold:true};
+      cells['E1']={...blankCell(),value:totGood,fontColor:'blue',fmtStyle:'comma',decimals:0,bold:true};
+      cells['D2']={...blankCell(),value:'Tie-out',txt:true,bold:true};
+      cells['E2']={...blankCell(),formula:'=B'+(r0+3)+'-E1',value:totBad-totGood,bold:true,fmtStyle:'comma',decimals:0};
+      this._o={ tie:'E2', tot:'B'+(r0+3), bad:'B'+(r0+bi), bi:bi, fixF:'=G'+(r0+bi), goodV:q2[bi], totGood:totGood };
+      return {ROWS:10, cells, active:{r:2,c:5}, sel:null, colW:{1:110,4:90,5:96,6:90,7:90}};
+    },
+    checks(S){
+      const o=this._o;
+      const num=k=>{ const c=S.cells[k]; return (c&&typeof c.value==='number')?c.value:NaN; };
+      const badC=S.cells[o.bad]||{};
+      const fixRef=o.fixF.slice(1).toUpperCase();
+      const fixed = !!badC.formula && new RegExp('(^|[^A-J0-9])'+fixRef+'(?![0-9])').test(String(badC.formula).toUpperCase().replace(/\$/g,'').replace(/^=/,' ')) && Math.abs(num(o.bad)-o.goodV)<0.5;
+      return [
+        {label:'ride the trace — ctrl+[ ×2 from the tie-out into the legs', ok:(S.traceN||0)>=2},
+        {label:'interrogate with F9 — evaluate a leg in place; esc keeps it live', ok:(S.f9N||0)>=1},
+        {label:'repoint the stale leg to the Q2 feed ('+o.fixF+')', ok:fixed},
+        {label:'the page ties — the check lands at 0', ok:Math.abs(num(o.tie))<0.5},
+      ];
+    }
+  },
   wrapfix:{
     name:'IFERROR', label:'Wrap it or fix it', par:70, parKeys:73,
     aha:'IFERROR is a seatbelt, not a blindfold — wrap the truly missing, fix the merely broken.',
@@ -10959,6 +11025,19 @@ document.addEventListener('keydown',hkRawE=>{
       if(cycleAnchor()){ logKey('F4'); render(); }
       return;
     }
+    if(k==='F9'){
+      /* r338 (Wolf #21): F9 EVALUATE — while editing a formula, F9 collapses it to the number
+         it computes, IN the editor (Excel's tie-out gesture). Esc restores the live formula;
+         Enter would commit the hardcode. S.f9N latches so audit drills can grade the gesture. */
+      if(editBuf[0]==='='||editBuf[0]==='+'){
+        try{ const v=evalFormula(editBuf[0]==='+'?('='+editBuf.slice(1)):editBuf);
+          if(v!==undefined && v!==null && !(typeof v==='number' && !isFinite(v))){
+            editBuf=String(v); editCaret=editBuf.length;
+            editPointer=null; editPointerStart=-1; editPointerBase=null;
+            S.f9N=(S.f9N||0)+1; logKey('F9'); render(); } }catch(err){}
+      }
+      return;
+    }
     if(k==='Backspace'){
       // If we're in pointer mode, Backspace removes the whole reference at once (Excel parity).
       if(editPointer){
@@ -11278,8 +11357,8 @@ document.addEventListener('keydown',hkRawE=>{
       mode='ribbon'; path=[]; dialog='fmt'; ribbonNote=''; drawRibbon(); return; }
     if(lk==='h' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+H');   // r236: Find & Replace
       mode='ribbon'; path=[]; dialog='findrep'; findBuf=''; repBuf=''; frField=0; frCount=null; ribbonNote=''; drawRibbon(); return; }
-    if(k==='['){ e.preventDefault(); startClock(); logKey('Ctrl+['); jumpPrecedent(); return; }
-    if(k===']'){ e.preventDefault(); startClock(); logKey('Ctrl+]'); jumpDependent(); return; }
+    if(k==='['){ e.preventDefault(); startClock(); logKey('Ctrl+['); jumpPrecedent(); checkWin(); return; }   /* r338: trace hops re-grade so guided targets advance live (latch drills) */
+    if(k===']'){ e.preventDefault(); startClock(); logKey('Ctrl+]'); jumpDependent(); checkWin(); return; }
     if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
     if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
     if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }
@@ -13131,15 +13210,22 @@ function openCampaign(){
     proCta+
     '<div class="ob-opts"><button class="ob-key" id="campClose">close</button></div></div>';
   m.classList.add('show');
-  $('campClose').onclick=()=>m.classList.remove('show');
-  $('campX').onclick=()=>m.classList.remove('show');
-  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); },{once:true});
-  // r297: Esc closes the campaign like every other modal — it was the ONE modal that
-  // trapped it, breaking the "Esc closes menus & modals" promise the shortcuts sheet makes
-  const __campEsc=e=>{ if(e.key==='Escape'){ e.stopPropagation(); m.classList.remove('show'); document.removeEventListener('keydown',__campEsc,true); } };
+  /* r338: EVERY dismissal routes through close() so the capture Esc listener is always
+     de-registered. The old paths (buttons, backdrop, drill click) only hid the modal and
+     LEAKED the listener — after that, an invisible dead modal ate every Escape in the app
+     (exit-edit, clear-clipboard, close-ribbon all stopped working until a reload). The
+     daily-challenge and tier-gate modals always had this shape; the campaign now matches.
+     A stored handle also de-registers any listener a prior open left behind. */
+  try{ if(window.__campEscL){ document.removeEventListener('keydown',window.__campEscL,true); window.__campEscL=null; } }catch(e){}
+  const __campEsc=e=>{ if(e.key==='Escape'){ e.stopPropagation(); close(); } };
+  const close=()=>{ m.classList.remove('show'); document.removeEventListener('keydown',__campEsc,true); if(window.__campEscL===__campEsc) window.__campEscL=null; };
   document.addEventListener('keydown',__campEsc,true);
-  m.querySelectorAll('.camp-drill').forEach(d=>d.onclick=()=>{ m.classList.remove('show'); loadChallenge(d.dataset.key); });
-  const cp=$('campPro'); if(cp) cp.onclick=()=>{ m.classList.remove('show'); if(window.openUpgrade) window.openUpgrade('Campaign'); };
+  window.__campEscL=__campEsc;
+  $('campClose').onclick=close;
+  $('campX').onclick=close;
+  m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
+  m.querySelectorAll('.camp-drill').forEach(d=>d.onclick=()=>{ close(); loadChallenge(d.dataset.key); });
+  const cp=$('campPro'); if(cp) cp.onclick=()=>{ close(); if(window.openUpgrade) window.openUpgrade('Campaign'); };
 }
 /* r211 (Wolf): clicking the level badge used to open the "how xp works" EXPLANATION.
    Players want their PROGRESS first, like a game — level ring, an xp bar, and how far

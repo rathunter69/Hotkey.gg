@@ -38,7 +38,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'dress', 'housestyle', 'gauntlet'] },
     { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases'] },
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
-    { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'hunt', 'signerr', 'versionup', 'balance'] },
+    { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'tieout', 'hunt', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
     { name: 'Models II',      keys: ['schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'cascade', 'debtsched'] },
     { name: 'Full Builds',    keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt', 'opmodel', 'dcfbuild', 'lbobuild', 'debtblock', 'dashcover'] },
@@ -129,6 +129,7 @@ window.HOTKEY_DRILLS = {
     balcheck:   { name:'Tie-out',    label:'Make it tie \u2014 hunt the break', tab:'Tie-out', desc:'The check row was pasted over \u2014 resurrect it, run both breaks down' },
     stalelink:  { name:'Stale Links',label:'Re-point the stale links', tab:'Stale', desc:'Assumptions moved to v2 \u2014 three cells still read the dead block' },
     wirewalk:   { name:'Trace',    label:'Trace the precedents',       tab:'Trace',   desc:'Ctrl+[ rides to the source, Ctrl+] rides back \u2014 fix it upstream' },
+    tieout:     { name:'Tie-out',  label:'F9 the suspect leg',         tab:'Tie-out', desc:'Ctrl+[ into the wiring, F9 collapses each leg to its dead value \u2014 find the stale link, repoint it' },
     hunt:       { name:'Audit',    label:'Hunt the hardcodes',  tab:'Audit',   desc:'F5 \u2192 special \u2192 constants \u2014 every number a formula should own lights up' },
     wrapfix:    { name:'IFERROR',  label:'Wrap it or fix it',   tab:'IFERROR', desc:'Wrap the truly missing, fix the merely broken \u2014 never bury errors' },
     signerr:    { name:'Sign Sweep', label:'Flip the signs back', tab:'Signs', desc:'Pasted costs came in positive \u2014 sweep the signs, prove EBIT, margin it' },
@@ -248,7 +249,7 @@ window.HK_BAND = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
-window.HOTKEY_PARS = {"navigation":17,"modeltour":53,"blocksel":46,"filldr":37,"pastes":40,"rowops":26,"colops":16,"editfix":39,"undo":10,"copyover":13,"housestyle":47,"ruleoff":29,"ruleaudit":18,"dress":46,"typeset":15,"decimals":18,"center":18,"autofit":15,"combo":24,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":17,"modeltour":53,"blocksel":46,"filldr":37,"pastes":40,"rowops":26,"colops":16,"editfix":39,"undo":10,"copyover":13,"housestyle":47,"ruleoff":29,"ruleaudit":18,"dress":46,"typeset":15,"decimals":18,"center":18,"autofit":15,"combo":24,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
