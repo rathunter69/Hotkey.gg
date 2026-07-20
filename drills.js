@@ -34,7 +34,7 @@ window.HOTKEY_DRILLS = {
   // deleted outright, their value covered by survivors (copyover, housestyle, dress, decimals,
   // the Alt-H drills, pastes). Catalog is now exactly the 80 grouped drills.
   groups: [
-    { name: 'Foundations',    keys: ['navigation', 'modeltour', 'filldr', 'pastes', 'blocksel', 'rowops', 'colops', 'editfix', 'undo', 'copyover'] },
+    { name: 'Foundations',    keys: ['navigation', 'filldr', 'pastes', 'blocksel', 'rowops', 'colops', 'editfix', 'undo', 'copyover', 'modeltour'] },   /* r367: modeltour moved from #2 to capstone — it demands cascades + formatting no fresh player has yet */
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'dress', 'housestyle', 'gauntlet'] },
     { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases'] },
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
@@ -63,13 +63,13 @@ window.HOTKEY_DRILLS = {
     blocksel:   { name:'Block Sel.',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves into a headed output, add a margin note, then format it to match' },
     editfix:    { name:'Edit',     label:'Fix the typos in place',  tab:'Edit',     desc:'Three typos, three F2 repairs — never retype a cell' },
     undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete big, Ctrl+Z, then delete only what deserved it' },
-    pastes:     { name:'Paste Sp.',label:'Alt E S everything',      tab:'Paste Sp.',desc:'One copy, two pastes — values then formats' },
+    pastes:     { name:'Paste Sp.',label:'Alt E S everything',      tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'3-yr cascade: MIN rations, both tranches corkscrew across' },
     cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche corkscrews, total debt ruled off' },
     wk13:       { name:'13-Week Cash', label:'Run the 13-week', tab:'13-Week', desc:'The restructuring staple: a weekly roll-forward, an anchored liquidity cushion, totals on flows only' },
     liqbridge:  { name:'Liq. Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash + undrawn to ending liquidity, Base / Downside / Severe \u2014 read which cases breach' },
     covtable:   { name:'Cov. Table',  label:'Run the covenant table', tab:'Covenants', desc:'Net leverage vs a stepping max \u2014 headroom, a real IF flag, MIN pulls the pinch quarter' },
-    txncomps:   { name:'Txn Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the average, and the implied equity' },
+    txncomps:   { name:'Txn Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the median, and the implied equity' },
     sourcesuses:{ name:'S&U',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
     accdil:     { name:'Acc/Dil',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
     dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
@@ -77,7 +77,7 @@ window.HOTKEY_DRILLS = {
     football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
     copyover:   { name:'Copyover', label:'Chain the hand-offs', tab:'Copy',  desc:'Formulas travel with Ctrl+C \u2014 chain a block, a peeled column, then values-only for the summary' },
 
-    // Formatting
+    // Formatting group — plus triage/versionup, which live in Formulas II now (groups[] above is authoritative)
     housestyle: { name:'House Style', label:'Clean it to standard', tab:'House Style', desc:'A full cleanup pass: title, headers, blue inputs (one buried), commas, %, ruled off' },
     ruleoff:    { name:'Rule Off',  label:'Rule off the schedule', tab:'Rule Off',  desc:'Accounting rulings: line under headers, line above every total, box the headline' },
     ruleaudit:  { name:'Ruling Pass', label:'The ruling pass', tab:'Ruling Pass', desc:'The page says done \u2014 the pass disagrees. Find the missing rulings, fix only those' },
@@ -90,7 +90,7 @@ window.HOTKEY_DRILLS = {
     center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Center, left, right — three alignment passes, house style' },
     gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Model',       desc:'A full model-ready formatting pass' },
 
-    // Values
+    // Values-hygiene pair — both live in Data & Lookups now
     drill:      { name:'Hardcode', label:'Hardcode it',         tab:'Hardcode',    desc:'Break the links before it ships — ESV in place, painted blue' },
     series:     { name:'Series',   label:'Stub the year header',tab:'Years',       desc:'Fill the year header, then bold + right-align it' },
 
@@ -102,7 +102,7 @@ window.HOTKEY_DRILLS = {
     filterpass: { name:'Filter',   label:'Work the filtered view', tab:'Filter',    desc:'Ctrl+Shift+L turns on filters, Alt+\u2193 opens the picker \u2014 the answer reads itself' },
     unhide:     { name:'Unhide',   label:'Unhide the rows',  tab:'Unhide',    desc:'Hidden rows lie \u2014 unhide the sins, group them right, set a real width' },
 
-    // Formulas
+    // Formulas & auditing — spans Formulas I and Formulas II, plus the Models drills
     margin:     { name:'Margins',  label:'Margins across the page', tab:'Margin',  desc:'EBITDA ÷ revenue, three comp tables — pointed, filled, %' },
     anchor:     { name:'Anchors',  label:'Pin it with F4',          tab:'F4',      desc:'F4 cycles the locks — one pinned formula prices the whole grid' },
     growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'Consolidate, YoY as %, CAGR with ^ — a real revenue build' },
@@ -126,7 +126,7 @@ window.HOTKEY_DRILLS = {
     foot:       { name:'Foot',     label:'Total it both ways',  tab:'Cross-foot',  desc:'SUM across and down, tie out the corner' },
     balance:    { name:'Balance',  label:'Make it balance',     tab:'Balance',     desc:'2 yrs SUM-footed both sides, check at zero, totals dressed' },
     audit:      { name:'Review Pass', label:'Review pass \u2014 find what\u2019s broken', tab:'Audit', desc:'Three planted breaks in a real P&L \u2014 find them all' },
-    balcheck:   { name:'Tie-out',    label:'Make it tie \u2014 hunt the break', tab:'Tie-out', desc:'The check row was pasted over \u2014 resurrect it, run both breaks down' },
+    balcheck:   { name:'Make It Tie', label:'Make it tie \u2014 hunt the break', tab:'Make It Tie', desc:'The check row was pasted over \u2014 resurrect it, run both breaks down' },
     stalelink:  { name:'Stale Links',label:'Re-point the stale links', tab:'Stale', desc:'Assumptions moved to v2 \u2014 three cells still read the dead block' },
     wirewalk:   { name:'Trace',    label:'Trace the precedents',       tab:'Trace',   desc:'Ctrl+[ rides to the source, Ctrl+] rides back \u2014 fix it upstream' },
     tieout:     { name:'Tie-out',  label:'F9 the suspect leg',         tab:'Tie-out', desc:'Ctrl+[ into the wiring, F9 collapses each leg to its dead value \u2014 find the stale link, repoint it' },
@@ -138,7 +138,7 @@ window.HOTKEY_DRILLS = {
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'5-yr roll: linked openings + the accumulated-dep memo' },
     comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the summary \u2014 median, high/low and the LARGE/SMALL trimmed range \u2014 land per share and premium' },
 
-    // Lookups
+    // Full Builds — plus lookup/lookup2, which live in Data & Lookups
     isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'5-yr IS: anchored drivers, margin row as %, bottom line ruled' },
     bsbuild:    { name:'BS Build',  label:'Balance the balance sheet',  tab:'BS Build',  desc:'3 yrs: SUM both sides, RE roll filled across, dressed to zero' },
     nwcsched:   { name:'NWC Sched.',label:'Roll working capital',       tab:'NWC',       desc:'Type the drivers, paint them blue, roll NWC five years' },

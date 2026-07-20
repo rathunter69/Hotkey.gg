@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Run precedent transactions — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Multiples paid, the average, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Multiples paid, the median, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Run precedent transactions — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Multiples paid, the average, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Multiples paid, the median, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/txncomps.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Run precedent transactions — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Multiples paid, the average, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Multiples paid, the median, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/txncomps.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -79,9 +79,13 @@
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
-  .grouphead small{color:var(--faint); font-weight:400}</style>
+  .grouphead small{color:var(--faint); font-weight:400}
+  .trackhead{margin:36px 0 4px; padding:14px 16px; background:var(--surface); border:1px solid var(--accent-dim); border-radius:12px; font-size:15.5px; font-weight:700}
+  .trackhead .tk{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; font-weight:700}
+  .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
+  .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=271"></script>
+<script src="drills.js?v=272"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -89,17 +93,17 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=269"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run precedent transactions","description":"Multiples paid, the average, and the implied equity","url":"https://www.hotkey.gg/drills/txncomps.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Precedents are comps with dates — same multiples, read in deal order.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT36S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run precedent transactions","item":"https://www.hotkey.gg/drills/txncomps.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run precedent transactions","description":"Multiples paid, the median, and the implied equity","url":"https://www.hotkey.gg/drills/txncomps.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Precedents are comps with dates — same multiples, read in deal order.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT36S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run precedent transactions","item":"https://www.hotkey.gg/drills/txncomps.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=280"></script>
+<script src="nav.js?v=281"></script>
 <div class="wrap">
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / models i</div>
-  <div class="eyebrow">◆ Models I · drill</div>
+  <div class="eyebrow">◆ Models I · drill · Financial Modeling Keyboard Mastery track</div>
   <h1>Run precedent transactions</h1>
   <div class="aha">Precedents are comps with dates — same multiples, read in deal order.</div>
-  <div class="sub">Five precedent deals, one target. Compute EV/EBITDA paid in each deal, average the multiples with one live formula, then mark the target: implied EV at the average multiple, less net debt, equals implied equity.</div>
+  <div class="sub">Five precedent deals, one target. Compute EV/EBITDA paid in each deal, take the MEDIAN of the multiples with one live formula — outliers can’t drag it — then mark the target: implied EV at the median multiple, less net debt, equals implied equity.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=txncomps">train this drill →</a>
     <span class="par">par 36s · optimal 36 keys · keyboard only · free</span>

@@ -79,9 +79,13 @@
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
-  .grouphead small{color:var(--faint); font-weight:400}</style>
+  .grouphead small{color:var(--faint); font-weight:400}
+  .trackhead{margin:36px 0 4px; padding:14px 16px; background:var(--surface); border:1px solid var(--accent-dim); border-radius:12px; font-size:15.5px; font-weight:700}
+  .trackhead .tk{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; font-weight:700}
+  .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
+  .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=271"></script>
+<script src="drills.js?v=272"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -89,17 +93,17 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=269"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the paper LBO","description":"Sources & uses sizes the equity plug, entry to exit lands MOIC — then prove the IRR twice: compounded, and =IRR() over the raw equity flows","url":"https://www.hotkey.gg/drills/lbobuild.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"A paper LBO is two blocks — sources & uses sizes the equity check, entry-to-exit turns it into MOIC — and IRR has two roads that MUST agree: compound the MOIC, or hand the raw equity flows to =IRR().","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT82S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the paper LBO","item":"https://www.hotkey.gg/drills/lbobuild.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the paper LBO","description":"Sources & uses sizes the equity plug, entry to exit lands MOIC — then prove the IRR twice: compounded, and =IRR() over the raw equity flows","url":"https://www.hotkey.gg/drills/lbobuild.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"A paper LBO is two blocks — sources & uses sizes the equity check, entry-to-exit turns it into MOIC — and IRR has two roads that MUST agree: compound the MOIC, or hand the raw equity flows to =IRR().","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT82S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the paper LBO","item":"https://www.hotkey.gg/drills/lbobuild.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=280"></script>
+<script src="nav.js?v=281"></script>
 <div class="wrap">
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / full builds</div>
-  <div class="eyebrow">◆ Full Builds · drill</div>
+  <div class="eyebrow">◆ Full Builds · drill · Financial Modeling Keyboard Mastery track</div>
   <h1>Build the paper LBO</h1>
   <div class="aha">A paper LBO is two blocks — sources & uses sizes the equity check, entry-to-exit turns it into MOIC — and IRR has two roads that MUST agree: compound the MOIC, or hand the raw equity flows to =IRR().</div>
-  <div class="sub">The whole paper LBO — a leveraged buyout: buy with debt, sell at exit, keep the spread — on one tab. Size the deal: purchase EV off the entry multiple, add fees for total uses, lever it, and the sponsor equity is the PLUG that makes sources tie to uses. Then run it to exit: exit EV at the exit multiple, net debt out for exit equity, MOIC against the check you wrote, and IRR compounded over the hold. Then prove it the way the fund model does — lay the equity out as CASH FLOWS (your check out at year 0, exit proceeds in at the end) and let =IRR() read the line. No interim flows means the two answers match to the decimal; when they don’t, someone fat-fingered the hold.</div>
+  <div class="sub">The whole paper LBO — a leveraged buyout: buy with debt, sell at exit, keep the spread — on one tab. Size the deal: purchase EV off the entry multiple, add fees for total uses, lever it, and the sponsor equity is the PLUG that makes sources tie to uses. Then run it to exit: exit EV at the exit multiple, net debt out for exit equity, MOIC (multiple on invested capital — cash out over cash in) against the check you wrote, and IRR compounded over the hold. Then prove it the way the fund model does — lay the equity out as CASH FLOWS (your check out at year 0, exit proceeds in at the end) and let =IRR() read the line. No interim flows means the two answers match to the decimal; when they don’t, someone fat-fingered the hold.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=lbobuild">train this drill →</a>
     <span class="par">par 82s · optimal 85 keys · keyboard only · free</span>

@@ -510,9 +510,14 @@ function rankedOptedIn(){ try{ return localStorage.getItem('hk_ranked')==='1'; }
 function heroHtml(){
   const {userStat,meId,mySolves,perDrill}=DATA;
   if(!meId){
-    return '<div class="panel me"><h4>your card</h4>'+
-      '<div style="font-family:var(--mono);font-size:13.5px;color:var(--muted);line-height:1.8">Times only count on the boards for signed-in accounts. '+
-      '<a href="index.html" style="color:var(--accent)">Sign in and post a time</a> to see your rank, level, and progress toward the next tier.</div></div>';
+    /* r368: the signed-out card was a tall box with two lines glued to the bottom —
+       center the pitch and give it a real CTA so the space reads intentional */
+    return '<div class="panel me" style="display:flex;flex-direction:column"><h4>your card</h4>'+
+      '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;padding:10px 6px">'+
+      '<div style="font-family:var(--mono);font-size:13.5px;color:var(--muted);line-height:1.8;max-width:300px">Times only count on the boards for signed-in accounts.</div>'+
+      '<a href="index.html" class="fd-play" style="margin-left:0">sign in &amp; post a time →</a>'+
+      '<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);line-height:1.7;max-width:300px">your rank, level and progress toward the next tier land here</div>'+
+      '</div></div>';
   }
   const me=userStat[meId]||{att:0,sum:0,crowns:0,pod:0,t10:0};
   // RANKED GATE: level 3 unlocks Ranked; entering it shows the season-start infographic.
@@ -532,8 +537,8 @@ function heroHtml(){
       return '<div class="panel me"><h4>your card</h4>'+
         '<div style="font-family:var(--mono);font-size:13px;color:var(--muted);line-height:1.8">'+
         (eligible
-          ? 'Ranked is unlocked ('+(campDone?'campaign complete':'LVL '+lvl0)+'). Entering shows your placement on every board you\u2019ve run \u2014 nothing is lost by waiting.'
-          : 'Ranked unlocks at <b style="color:var(--warn)">LVL '+RANKED_MIN_LVL+'</b> or by completing the campaign. You\u2019re LVL '+lvl0+'.')+
+          ? 'Ranked is unlocked ('+(campDone?'all milestones shipped':'LVL '+lvl0)+'). Entering shows your placement on every board you\u2019ve run \u2014 nothing is lost by waiting.'
+          : 'Ranked unlocks at <b style="color:var(--warn)">LVL '+RANKED_MIN_LVL+'</b> or by shipping every track milestone. You\u2019re LVL '+lvl0+'.')+
         '</div>'+
         (!eligible?'<div style="margin-top:10px"><div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-bottom:4px">progress to LVL '+RANKED_MIN_LVL+'</div><div style="height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+lvlPct+'%;background:var(--accent);border-radius:99px"></div></div></div>':'')+
         (eligible?'<div style="display:flex;gap:10px;margin-top:14px"><button class="tab on" id="enterRanked" style="font-size:13px;padding:10px 22px">\u2694 Enter Ranked</button><button class="tab" id="waitRanked" style="font-size:12px;padding:10px 18px">Not yet</button></div>':'')+
@@ -854,7 +859,7 @@ function guildHtml(){
   }).join('');
   const startRow = DATA.meId
     ? (window.__meAnon
-      ? '<div class="gb-start" style="color:var(--muted)">Desks need a full account \u2014 <a href="account.html" style="color:var(--accent)">add an email &amp; password</a> and your progress comes with you.</div>'
+      ? '<div class="gb-start" style="color:var(--muted);align-items:center;text-align:center"><span>Desks need a full account \u2014 <a href="account.html" style="color:var(--accent)">add an email &amp; password</a> and your progress comes with you.</span></div>'
       : '<div class="gb-start">'+
           /* r316 (Wolf): invite code is the PRIMARY action \u2014 most people join, they don\u2019t found.
              Starting a desk is demoted to a quieter secondary line so the page stops pushing it. */
@@ -864,7 +869,7 @@ function guildHtml(){
           '<div class="gb-found"><span class="gb-found-l">or start your own \u2014</span>'+
             '<input id="gbName" maxlength="40" placeholder="desk name (e.g. Wharton UG Finance)"><button class="tab" id="gbCreate">start a desk</button></div>'+
         '</div>')
-    : '<div class="gb-start" style="color:var(--muted)"><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</div>';
+    : '<div class="gb-start" style="color:var(--muted);align-items:center;text-align:center"><span><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</span></div>';   /* r368: one centered line — the left-glued note left the panel mostly blank */
   /* r293 (Wolf): ONE tile + arrows instead of a full grid, tight header, no explainer */
   /* r297: with ZERO desks the carousel used to render two stranded arrows around an empty
      stage \u2014 now the empty state is a single centered line and the chrome stays hidden */
@@ -1247,17 +1252,30 @@ function browserHtml(){
     // r335: tier scope — map every user on the board to their tier once, filter, re-rank
     const tierNames=(window.HK_RANK?window.HK_RANK.TIERS.map(t=>t.name):[]);
     let rows=perDrill[browseKey], fnote='';
-    if(tierFilter!=='all'){
+    /* r366 (Wolf: 'we didn't have sub menu buttons to filter ranks by bucket'): the chips
+       existed but hid until a tier was picked — invisible IS missing. They're always on now:
+       tier picked → thirds WITHIN that tier (r335 behavior); 'all tiers' → thirds of the
+       whole ranked field by average percentile. */
+    if(tierFilter!=='all' || bucketFilter!=='all'){
       const stat=DATA.gUserStat||DATA.userStat;
       const tof={}; Object.entries(stat).forEach(([u,st])=>{ const av=st.att?st.avg:null;
         if(av!==null) tof[u]=TIER_OF(av, st.att, st.wsum); });
-      rows=rows.filter(r=>{ const t=tof[r.user_id]; if(!t || t.name!==tierFilter) return false;
-        if(bucketFilter!=='all' && (t.bucket||'')!==bucketFilter+' Bucket') return false; return true; });
-      fnote='<div class="tf-note">'+rows.length+' of '+perDrill[browseKey].length+' on this board '+(rows.length===1?'holds':'hold')+' '+esc(tierFilter)+(bucketFilter!=='all'?' \u00b7 '+esc(bucketFilter)+' Bucket':'')+'</div>';
+      const fieldBucket=u=>{ const st=stat[u]; if(!st||!st.att) return null;
+        return st.avg<=1/3 ? 'Top' : (st.avg<=2/3 ? 'Middle' : 'Bottom'); };
+      rows=rows.filter(r=>{
+        const t=tof[r.user_id];
+        if(tierFilter!=='all'){ if(!t || t.name!==tierFilter) return false;
+          if(bucketFilter!=='all' && (t.bucket||'')!==bucketFilter+' Bucket') return false; }
+        else if(bucketFilter!=='all'){ if(fieldBucket(r.user_id)!==bucketFilter) return false; }
+        return true; });
+      fnote='<div class="tf-note">'+rows.length+' of '+perDrill[browseKey].length+' on this board '+
+        (rows.length===1?'holds':'hold')+' '+
+        (tierFilter!=='all' ? esc(tierFilter)+(bucketFilter!=='all'?' \u00b7 '+esc(bucketFilter)+' Bucket':'')
+                            : 'the field\u2019s '+esc(bucketFilter)+' bucket')+'</div>';
     }
     const tierSel='<div class="tier-filter"><label for="tierSel">tier</label>'+
       '<select id="tierSel">'+['all'].concat(tierNames).map(tn=>'<option value="'+esc(tn)+'"'+(tierFilter===tn?' selected':'')+'>'+(tn==='all'?'all tiers':esc(tn))+'</option>').join('')+'</select>'+
-      (tierFilter!=='all' ? ['all','Bottom','Middle','Top'].map(b=>'<span class="chip tf-b'+(bucketFilter===b?' on':'')+'" data-bucket="'+b+'">'+(b==='all'?'all buckets':b.toLowerCase())+'</span>').join('') : '')+
+      ['all','Bottom','Middle','Top'].map(b=>'<span class="chip tf-b'+(bucketFilter===b?' on':'')+'" data-bucket="'+b+'" title="'+(tierFilter!=='all'?'thirds within '+esc(tierFilter):'thirds of the whole ranked field')+'">'+(b==='all'?'all buckets':b.toLowerCase())+'</span>').join('')+
       '</div>';
     const detailBoard=(tierFilter!=='all' && !rows.length)
       ? '<div class="board"><div class="board-cap"><h2>'+esc(c.label)+'</h2><span class="lvl">'+esc(c.lvl)+'</span></div><div class="empty" style="padding:14px 18px">nobody holding '+esc(tierFilter)+' has a time on this board yet \u2014 the lane is open</div></div>'

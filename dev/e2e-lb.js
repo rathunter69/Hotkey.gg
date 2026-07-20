@@ -71,7 +71,9 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
     return { rows: document.querySelectorAll('.browse-detail .board .row:not(.open)').length,
       chips: document.querySelectorAll('.chip[data-bucket]').length };
   });
-  ok(a3.rows === 10 && a3.chips === 0, 'tier=all restores the board and hides the chips');
+  /* r366: the chips are ALWAYS visible now (Wolf: hidden read as missing) — tier=all restores
+     the full board while the bucket sub-menu stays on screen, scoping the whole field. */
+  ok(a3.rows === 10 && a3.chips === 4, 'tier=all restores the board; bucket chips stay visible', 'rows='+a3.rows+' chips='+a3.chips);
 
   // ---------- B. ranked entry states ----------
   console.log('B. ranked entry: gate -> placement -> tier');

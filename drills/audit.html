@@ -79,9 +79,13 @@
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
-  .grouphead small{color:var(--faint); font-weight:400}</style>
+  .grouphead small{color:var(--faint); font-weight:400}
+  .trackhead{margin:36px 0 4px; padding:14px 16px; background:var(--surface); border:1px solid var(--accent-dim); border-radius:12px; font-size:15.5px; font-weight:700}
+  .trackhead .tk{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; font-weight:700}
+  .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
+  .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=271"></script>
+<script src="drills.js?v=272"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -89,14 +93,14 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=269"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Review pass — find what’s broken","description":"Three planted breaks in a real P&L — find them all","url":"https://www.hotkey.gg/drills/audit.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"Broken models leave fingerprints — hardcodes in formula rows, refs off by one.","about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT34S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Review pass — find what’s broken","item":"https://www.hotkey.gg/drills/audit.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Review pass — find what’s broken","description":"Three planted breaks in a real P&L — find them all","url":"https://www.hotkey.gg/drills/audit.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"Broken models leave fingerprints — hardcodes in formula rows, refs off by one.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT34S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Review pass — find what’s broken","item":"https://www.hotkey.gg/drills/audit.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=280"></script>
+<script src="nav.js?v=281"></script>
 <div class="wrap">
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / formulas ii</div>
-  <div class="eyebrow">◆ Formulas II · drill</div>
+  <div class="eyebrow">◆ Formulas II · drill · Spreadsheet Formulas &amp; Data track</div>
   <h1>Review pass — find what’s broken</h1>
   <div class="aha">Broken models leave fingerprints — hardcodes in formula rows, refs off by one.</div>
   <div class="sub">Audit a divisional P&L someone else built. Three things are wrong: one division’s five-year Total stops a column short, one EBITDA (operating profit before depreciation and amortization) is a stale hardcode, and one EBITDA reads the wrong year’s opex. Use F5 → Special → Constants to light up every raw number on the page, find all three, and rebuild them as live formulas.</div>

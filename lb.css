@@ -207,7 +207,10 @@
     background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:7px 10px; margin-bottom:6px}
   #blSearch:focus{border-color:var(--accent-dim); outline:none}
   @media(max-width:680px){ .browse-wrap{grid-template-columns:1fr} .browse-list{max-height:240px} }   /* r267: tier rides as the small crest (tooltip carries the name) — a full text pill starved the name column */
-  .featured{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px}
+  .featured{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:0}
+  /* r368: the weekly gauntlet spans the full row — a half-width card left the right side blank */
+  .featured > .board{grid-column:1/-1}
+  .featured + .section-title{margin-top:18px}   /* r368: matches the ~38px section rhythm above */
   .seclead{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:18px}
   .seclead .sl{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px}
   .seclead .sl .sl-sec{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:5px}
