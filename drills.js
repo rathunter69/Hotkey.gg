@@ -353,10 +353,8 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'hse1', glyph:'brush', tier:'r', name:'House Style',      desc:'Beat par on House Style — the senior’s pass', test:c=>{ const ok=c.pb['housestyle']!==undefined&&c.pars['housestyle']&&c.pb['housestyle']<=c.pars['housestyle']; return {done:ok, prog:ok?1:0, goal:1}; } },
   { id:'rce1', glyph:'flag',  tier:'r', name:'Called Out',       desc:'Win a challenge race',                   test:c=>({done:(c.raceWins||0)>=1, prog:Math.min(c.raceWins||0,1), goal:1}) },
   { id:'rce2', glyph:'flag',  tier:'e', name:'Undefeated',       desc:'Win 5 challenge races',                  test:c=>({done:(c.raceWins||0)>=5, prog:Math.min(c.raceWins||0,5), goal:5}) },
-  /* r363: the morning sheet is retired — its ritual (and these feats) repoint to the Daily
-     Mix; old sheetClears counts carry over so nobody loses earned progress. */
-  { id:'sht1', glyph:'sheet', tier:'r', name:'Clean Sheet',      desc:'Complete the Daily Mix — all three drills + the finale',  test:c=>({done:((c.mixClears||0)+(c.sheetClears||0))>=1, prog:Math.min((c.mixClears||0)+(c.sheetClears||0),1), goal:1}) },
-  { id:'sht2', glyph:'sheet', tier:'e', name:'Standing Order',   desc:'Complete 10 Daily Mixes',                                 test:c=>({done:((c.mixClears||0)+(c.sheetClears||0))>=10, prog:Math.min((c.mixClears||0)+(c.sheetClears||0),10), goal:10}) },
+  /* r364: Clean Sheet / Standing Order are RETIRED — their driver (sheet, then mix) is
+     gone; a feat nobody can progress is sprawl. Earned ids persist harmlessly in hk_ach_seen. */
   { id:'ice1', glyph:'ice',   tier:'r', name:'Ice in the Veins', desc:'Bank a streak freeze (every 5-day streak earns one)', test:c=>({done:(c.frzBanked||0)>=1, prog:Math.min(c.frzBanked||0,1), goal:1}) },
   { id:'nav2', glyph:'map',   tier:'r', name:'Tour Guide',       desc:'Beat par on both navigation drills',     test:c=>{ const ks=['navigation','modeltour']; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=ks.length, prog:n, goal:ks.length}; } },
   { id:'kbd1', glyph:'keys',  tier:'r', name:'Chord Library',    desc:'Use 25 distinct shortcuts in clean runs', test:c=>({done:(c.chordKinds||0)>=25, prog:Math.min(c.chordKinds||0,25), goal:25}) },

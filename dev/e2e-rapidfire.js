@@ -109,29 +109,6 @@ function check(name, ok, extra) {
   check('exitSession returns to classic', after.classic && after.bodyClean);
   check('a classic drill reloads with content', after.drillLoaded && after.gridHasContent);
 
-  // ---------- r360: the DAILY MIX rides rapid-fire as its finale ----------
-  const mixR = await page.evaluate(async () => {
-    const out = {};
-    try{
-      localStorage.removeItem('hk_mix_done');
-      document.getElementById('dailyMixBtn').click();
-      out.q3 = !!(mix && mix.q.length === 3);
-      out.onFirst = mix && cur === mix.q[0];
-      for (let i = 0; i < 3; i++) {
-        showResults({ t:'9.99', keys:10, par:9, pb:false, mouse:false, guided:false });
-        document.querySelector('.rm-key.primary').click();
-      }
-      out.finale = gameMode === 'rapidfire' && marathon && marathon.active && mix && mix.rf === true;
-      endSession();
-      out.done = mix === null && !!localStorage.getItem('hk_mix_done');
-      out.chipDone = /\u2713/.test(document.getElementById('dailyMixBtn').textContent);
-      try{ exitSession(); }catch(e){}
-    }catch(e){ out.threw = String(e).slice(0,120); }
-    return out;
-  });
-  check('daily mix builds a 3-drill queue and loads the first', mixR.q3 && mixR.onFirst, mixR.threw);
-  check('the mix chain lands on the rapid-fire finale', mixR.finale, mixR.threw);
-  check('finishing the finale completes the mix (latch + chip)', mixR.done && mixR.chipDone, mixR.threw);
 
   check('zero page errors through the suite', pageErrors.length === 0, pageErrors.join(' | '));
   await browser.close();

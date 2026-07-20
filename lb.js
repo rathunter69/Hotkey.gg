@@ -677,10 +677,17 @@ function featuredHtml(){
     .map(u=>({user_id:u, time_ms:legs.reduce((s,k)=>s+per[u][k],0)})).sort((a,b)=>a.time_ms-b.time_ms);
   const midnight=new Date(); midnight.setHours(24,0,0,0);
   const hrsLeft=Math.max(0, Math.round((midnight-new Date())/36e5));
+  /* r364: yesterday's podium — the honor roll rides the hero card */
+  const yDate=new Date(Date.now()-86400e3).toISOString().slice(0,10);
+  const seenY={}, bestY=[];
+  fRuns.filter(x=>x.challenge==='challenge-'+yDate).sort((a,b)=>a.time_ms-b.time_ms)
+    .forEach(x=>{ if(!seenY[x.user_id]){ seenY[x.user_id]=true; bestY.push(x); } });
+  const gl=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'];
+  const podium=bestY.slice(0,3).map((r,i)=>gl[i]+' '+esc(names[r.user_id]||'analyst')+' '+fmt(r.time_ms)).join(' \u00b7 ');
   return '<div class="featured">'+
     '<div class="featured-daily">'+
       '<div class="fd-head"><span class="fd-live">\u25cf live</span><b>\u25c6 the Daily Challenge \u00b7 '+dl+'</b>'+
-      '<span class="fd-meta">resets in ~'+hrsLeft+'h \u00b7 top 3 medal \u00b7 top 10 wear it on their card</span>'+
+      '<span class="fd-meta">resets in ~'+hrsLeft+'h \u00b7 top 3 medal \u00b7 top 10 wear it on their card'+(podium?' \u00b7 yesterday: '+podium:'')+'</span>'+
       '<a class="fd-play" href="index.html?daily=1">play it \u2192</a></div>'+
       boardHtml({label:'today\u2019s global field', lvl:dailyDate}, bestD, names, meId, {medals:true})+
     '</div>'+
