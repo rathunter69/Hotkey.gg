@@ -681,15 +681,21 @@
   .results-modal{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none;
     align-items:center; justify-content:center; z-index:40}
   .results-modal.show{display:flex}
+  /* r354 (Wolf): the open details fold could grow the card past the viewport — the menu
+     spilled off the page. Two guards: the card itself can never exceed the window, and the
+     details fold scrolls INTERNALLY so the time + action buttons always stay on screen. */
   .rm-card{background:var(--surface); border:1px solid var(--line); border-radius:14px;
-    padding:26px 30px; width:340px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55)}
+    padding:22px 26px; width:340px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55);
+    max-height:calc(100vh - 48px); overflow-y:auto; display:flex; flex-direction:column}
+  .rm-card>*{flex:0 0 auto}
+  .rm-more.open{max-height:44vh; overflow-y:auto; flex:0 1 auto}
   .rm-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
     letter-spacing:1px; margin-bottom:8px}
   .rm-time{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--text);
     line-height:1; letter-spacing:-1.5px}
   .rm-time span{font-size:18px; color:var(--muted); font-weight:400; margin-left:2px}
   /* r146: ghost diff — where the time went */
-  .gd{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:10px 14px; margin:10px 0 4px; text-align:left}
+  .gd{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:8px 12px; margin:8px 0 4px; text-align:left}
   .gd-h{font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:6px}
   .gd-head{font-family:var(--mono); font-size:12px; color:var(--text); margin-bottom:6px}
   .gd-head b{color:var(--warn)}
@@ -9231,7 +9237,7 @@ function ghostDiff(o){
     };
     stalls.sort((a,b)=>b.g-a.g);
     let rows='';
-    stalls.slice(0,3).forEach(x=>{
+    stalls.slice(0,2).forEach(x=>{   /* r354: two worst stalls carry the story — the third was noise on a card fighting for height */
       rows+='<div class="gd-row"><b>'+(x.g/1000).toFixed(1)+'s</b> stall, then <kbd>'+escHtml(x.key.length===1?x.key.toUpperCase():x.key)+'</kbd> <span>\u2014 '+why(x.key)+'</span></div>';
     });
     const head = stalls.length
