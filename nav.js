@@ -1161,6 +1161,11 @@ window.hkCelebrate = function(o){
   if(o.big) window.hkConfetti(w, o.colors, 80);   /* r305: level/rank moments rain across the whole overlay, not just the card */
   let done=false;
   const close=()=>{ if(done) return; done=true;
+    /* r352: EVERY close path detaches the key handler. It used to self-remove only when a
+       key dismissed the card — a timeout/click close left it armed at capture, and the next
+       Enter or Escape anywhere in the app was silently eaten (one stolen keystroke per card:
+       an exit-edit Esc, a formula-commit Enter). */
+    try{ document.removeEventListener('keydown', key, true); }catch(e){}
     try{ w.remove(); }catch(e){}
     window.__hkCelOpen=false;
     const nx=window.__hkCelQ.shift(); if(nx) setTimeout(()=>window.hkCelebrate(nx), 220); };
