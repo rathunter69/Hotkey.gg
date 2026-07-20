@@ -1537,7 +1537,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=268"></script>
+<script src="drills.js?v=269"></script>
 <link rel="stylesheet" href="nav.css?v=182">
 <script src="themes.js?v=269"></script>
 
@@ -1790,7 +1790,7 @@ let dailyMode=false;
 // skips the gate + unlocks the full board). Distinct seed + board key from the
 // casual morning-sheet daily so the two never collide. ----
 let challengeMode=false;
-const CHALLENGE_POOL=['gauntlet','combo','cascade','threestmt','debtsched','comps','waterfall','sourcesuses','football','retbridge','housestyle','dcfsens','revolver','schedule'];
+const CHALLENGE_POOL=(window.HOTKEY_CHALLENGE_POOL||[]).slice();   /* r362: single source in drills.js — the leaderboard reads the same list */
 const CHALLENGE_MIN_LVL=3;
 function challengeKey(){ return 'challenge-'+dailyDateStr(); }
 function challengeSeed(){ return (dailySeed()^0x9e3779b9)>>>0; }   // deterministic worldwide, distinct from the daily
@@ -9118,6 +9118,14 @@ function checkWin(){
      One toast + a pulse on the mode pill; never repeats. */
   try{ KV.get('hotkey_solves').then(v=>{ const nsol=(parseInt(v||'0',10)||0)+1;
     try{
+      if(nsol>=3 && challengeEligible() && !challengeDoneToday() && !challengeMode
+         && localStorage.getItem('hk_dc_nudge')!==challengeKey()){
+        localStorage.setItem('hk_dc_nudge', challengeKey());
+        setTimeout(()=>{ try{
+          showToast('\u25c6 today\u2019s Daily Challenge is live \u2014 one hard board, same worldwide, top 10 wear it on their card');
+          const b=$('dailyChallengeBtn'); if(b){ b.classList.add('nudge'); setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); }
+        }catch(e){} }, 1600);
+      }
       if(nsol===3 && !localStorage.getItem('hk_rf_nudged')){
         localStorage.setItem('hk_rf_nudged','1');
         setTimeout(()=>{ try{
@@ -9135,7 +9143,22 @@ function checkWin(){
   if(sb && me_user && !isAnonUser() && !mouseUsed && !guidedUsed){
     recordRun(t).then(async ok=>{
       const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); }
-      if(ok){ const rk=await fetchRank(cur, t*1000); if(rk) showRankBadge(rk); }
+      if(ok){ const rk=await fetchRank(scoreKey(), t*1000); if(rk) showRankBadge(rk);   /* r362: rank on the board the run POSTED to — a daily-challenge run used to rank against the plain drill board */
+        /* r362 TOP-10 REWARD: a posted challenge run that lands top-10 on today's global
+           field pays a one-time (per day) bounty + counts toward the podium achievements. */
+        try{
+          if(challengeMode && rk && rk.rank<=10 && localStorage.getItem('hk_dc_top10')!==challengeKey()){
+            localStorage.setItem('hk_dc_top10', challengeKey());
+            const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+            localStorage.setItem('hk_xp_est', String(est+40));
+            const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+            fl.dailyTop10=(fl.dailyTop10||0)+1; localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+            try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}
+            showToast('\u25c6 top 10 on today\u2019s field \u2014 +40 xp \u00b7 rank #'+rk.rank+' of '+rk.total);
+            try{ playSuccessBlip(3); }catch(e){}
+          }
+        }catch(e){}
+      }
       try{ maybeOfferCertificate(); }catch(e){}   /* r359: a posted run may have completed a certificate track */
     });
   }
@@ -9409,6 +9432,8 @@ function _showResults(o){
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
     (o.pb ? `<button class="rm-key" data-act="share">\ud83d\udcf8 share</button>` : '')+
     `</div>`+
+    ((typeof challengeEligible==='function' && challengeEligible() && !challengeDoneToday() && !challengeMode && !mix)
+      ? `<div class="guest-cta" style="cursor:pointer" id="rmDaily">\u25c6 today\u2019s daily challenge is live \u2014 play it \u2192</div>` : '')+
     guestPrompt+
     `</div>`;
   m.classList.add('show');
@@ -9440,6 +9465,7 @@ function _showResults(o){
   const si=$('rmSignin'); if(si) si.onclick=openAuth;
   const sp=$('rmSaveProg'); if(sp) sp.onclick=()=>openAuth('signup');
   const spi=$('rmSaveProgInline'); if(spi) spi.onclick=()=>openAuth('signup');
+  const rmd=$('rmDaily'); if(rmd) rmd.onclick=()=>{ hideResults(); openDailyChallenge(); };   /* r362 */
   $('result').innerHTML='';
   // placement verdict + share card (appended post-render; independent of the modal template)
   try{
@@ -13768,6 +13794,11 @@ async function fetchChallengeBoard(){
 function closeDailyChallenge(){ const m=$('dcModal'); if(m){ m.classList.remove('show'); }
   if(_dcTimer){ clearInterval(_dcTimer); _dcTimer=null; } }
 
+/* r362: ?daily=1 (the leaderboard's play-it CTA) opens the challenge card after boot */
+window.addEventListener('load', ()=>{ try{
+  if(new URLSearchParams(location.search).get('daily')==='1')
+    setTimeout(()=>{ try{ openDailyChallenge(); }catch(e){} }, 900);
+}catch(e){} });
 function openDailyChallenge(){
   const dk=challengeOfDay(), C=CHALLENGES[dk];
   const label=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.labelOf&&window.HOTKEY_DRILLS.labelOf[dk])||(C&&C.label)||dk;

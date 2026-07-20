@@ -278,6 +278,10 @@ window.HOTKEY_PARS = {"navigation":17,"modeltour":53,"blocksel":46,"filldr":37,"
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
    and returns {done, prog, goal}. Rendered as medals on the player card. ---- */
+/* r362: the daily-challenge pool is SHARED — index launches from it, the leaderboard
+   labels today's board from it. One list, no drift. */
+window.HOTKEY_CHALLENGE_POOL=['gauntlet','combo','cascade','threestmt','debtsched','comps','waterfall','sourcesuses','football','retbridge','housestyle','dcfsens','revolver','schedule'];
+
 window.HOTKEY_ACHIEVEMENTS = [
   /* ---- r79: the creative twenty (incl. anti-achievements — mouse slips, slow burns) ---- */
   { id:'x_tour',   glyph:'c1', name:'Tourist',            desc:'Attempt 10 different drills',            test:c=>({done:c.att>=10, prog:Math.min(c.att,10), goal:10}) },
@@ -291,6 +295,10 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'x_night',  glyph:'day', tier:'r', name:'Night Shift',       desc:'Clean solve between midnight and 4am',   test:c=>({done:!!c.nightWin, prog:c.nightWin?1:0, goal:1}) },
   { id:'x_dawn',   glyph:'day', tier:'r', name:'Dawn Patrol',       desc:'Clean solve between 5 and 7am',          test:c=>({done:!!c.dawnWin, prog:c.dawnWin?1:0, goal:1}) },
   { id:'x_wknd',   glyph:'day', name:'Weekend Warrior',   desc:'Clean solve on a Saturday or Sunday',    test:c=>({done:!!c.weekendWin, prog:c.weekendWin?1:0, goal:1}) },
+  /* r362: daily-challenge podium feats — dailyTop10 is counted by the trainer when a posted
+     challenge run lands top-10 on today's global field (one count per day). */
+  { id:'x_dc10',  glyph:'spd', tier:'r', name:'Daily Contender',  desc:'Finish top 10 in a Daily Challenge',      test:c=>({done:(c.dailyTop10||0)>=1, prog:Math.min(c.dailyTop10||0,1), goal:1}) },
+  { id:'x_dc10x5',glyph:'spd', tier:'e', name:'Daily Fixture',    desc:'Finish top 10 in five Daily Challenges',  test:c=>({done:(c.dailyTop10||0)>=5, prog:Math.min(c.dailyTop10||0,5), goal:5}) },
   { id:'x_run200', glyph:'vol', tier:'e', name:'Volume Business',   desc:'200 recorded runs',                      test:c=>{ const n=(c.runs||[]).length; return {done:n>=200, prog:Math.min(n,200), goal:200}; } },
   { id:'x_found',  glyph:'c6', tier:'r', name:'Foundations Poured', desc:'PB on every Foundations drill',          test:c=>{ const ks=(c.groups['Foundations']||[]); const n=ks.filter(k=>c.pb[k]!==undefined).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
   { id:'x_stack',  glyph:'c3', tier:'r', name:'Full Stack',         desc:'At least one PB in every group',         test:c=>{ const gs=Object.keys(c.groups); const n=gs.filter(g=>(c.groups[g]||[]).some(k=>c.pb[k]!==undefined)).length; return {done:n>=gs.length, prog:n, goal:gs.length}; } },
