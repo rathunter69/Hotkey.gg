@@ -758,9 +758,11 @@
   .ghost.ahead{color:var(--accent); background:var(--accent-glow)}
   .ghost.behind{color:var(--bad); background:rgba(200,83,63,.14)}
   /* ---- rank pill in the HUD: progression, always visible ---- */
-  .rank-emblem{margin-right:7px; flex:none}
+  /* r374: this page's .rank-emblem copy (margin-right:7px — vs lb.css's 6px, the drift
+     Wolf flagged) is retired; alignment lives in nav.css's shared icon system and the
+     gap belongs to each container (.rank-pill below owns its own) */
   .emblem-max{/* flat by design — the radiant cap carries its own drama */}
-  .rank-pill{display:inline-flex; align-items:center; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:1px;
+  .rank-pill{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:1px;
     text-transform:uppercase; border-radius:999px !important; padding:6px 13px !important;
     border:1px solid; transition:transform .12s, box-shadow .12s}
   .rank-pill:hover{transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.3)}
@@ -1552,8 +1554,8 @@
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=274"></script>
-<link rel="stylesheet" href="nav.css?v=183">
-<script src="themes.js?v=271"></script>
+<link rel="stylesheet" href="nav.css?v=184">
+<script src="themes.js?v=272"></script>
 
 </head>
 <body>

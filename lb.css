@@ -159,7 +159,7 @@
   .dk-r.hd:hover{background:none}
   .dk-r.idle .nm, .dk-r.idle .wk{color:var(--muted)}
   .dk-r .nm{font-weight:700} .dk-r .you{color:var(--accent); font-weight:400}
-  .dk-r .tr{display:inline-flex; align-items:center; gap:5px; font-size:10.5px; color:var(--muted)}
+  .dk-r .tr{display:inline-flex; align-items:center; gap:6px; font-size:10.5px; color:var(--muted)}   /* r374: 6px is THE icon-to-label gap (was 5px + the emblem's retired 6px margin = 11) */
   .dk-r .wk{color:var(--accent)} .dk-r.idle .wk{color:var(--warn)}
   .dk-foot{font-family:var(--mono); font-size:10px; color:var(--faint); padding:10px 20px 16px}
   @media (max-width:760px){ .dk-r{grid-template-columns:1fr 90px 50px 60px} .dk-r span:nth-child(3),.dk-r span:nth-child(6){display:none} }
@@ -256,7 +256,8 @@
   .section-title{margin-top:30px}
   .tabrow{margin-top:16px}
   .chips{margin-top:2px}
-  .rank-emblem{margin-right:6px; flex:none; vertical-align:-2px}
+  /* r374: this page's .rank-emblem copy (margin-right:6px, va:-2px) is retired —
+     alignment + gaps live in nav.css's shared icon system; containers own their gaps */
   @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 9px currentColor)}}
   .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
   .yc-top .pc-tier{font-size:10px; padding:6px 13px}

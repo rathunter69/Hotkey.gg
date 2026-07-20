@@ -351,7 +351,12 @@ window.rankEmblem = (function(){
   function svgOpen(sz,bk,max){
     const vb = bk ? '0 0 100 114' : '0 0 100 100';
     const h = bk ? Math.round(sz*1.14) : sz;
-    return '<svg class="rank-emblem'+(max?' emblem-max':'')+'" viewBox="'+vb+'" width="'+sz+'" height="'+h+'" aria-hidden="true">';
+    /* r374: bucketed crests carry .rk-pips so the shared CSS (nav.css) can re-center
+       the CREST square on the text line — the pip zone (y 100-114) hangs below it.
+       Without the class a bucketed emblem flex-centers on its FULL box and the crest
+       rides ~6% high next to an unbucketed one of the same size. Class only — art
+       and API unchanged. */
+    return '<svg class="rank-emblem'+(bk?' rk-pips':'')+(max?' emblem-max':'')+'" viewBox="'+vb+'" width="'+sz+'" height="'+h+'" aria-hidden="true">';
   }
   function t_mba(sz,bk,gl){ const id='rk'+(UID++), P=IRON, o2=bk>=2, hot=bk===3;
     const sq='M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z';

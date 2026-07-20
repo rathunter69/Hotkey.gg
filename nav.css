@@ -103,7 +103,8 @@ body{padding-top:14px}
 .pc-foot a:hover{color:var(--accent)}
 .pc-msg{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:30px 10px; line-height:1.6}
 .pc-tier{font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
-  padding:7px 14px; border-radius:999px; border:1px solid; white-space:nowrap}
+  padding:7px 14px; border-radius:999px; border:1px solid; white-space:nowrap;
+  display:inline-flex; align-items:center; gap:6px}   /* r374: the chip owns its icon-to-label gap — was per-call inline styles + the emblem's own margin */
 .tier-unranked{color:var(--muted); border-color:var(--line); background:var(--surface2)}
 .tier-bronze{color:#c08457; border-color:#7a5638; background:rgba(192,132,87,.12)}
 .tier-silver{color:#c3c8cf; border-color:#717880; background:rgba(195,200,207,.10)}
@@ -203,6 +204,20 @@ html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
 .pc-badge.off{opacity:.22; filter:grayscale(1)}
 
 /* ---- achievement medals + card legend ---- */
+/* r374 (Wolf: crests/badges looked eyeballed per surface) — ONE alignment system for
+   the shared icons, defined HERE and nowhere else. Rules:
+   1. Icons never shrink and never invent their own gap — the icon-to-label gap
+      belongs to the CONTAINER (flex/grid gap, or .pc-tier's 6px below). The old
+      per-page .rank-emblem margin-right copies (lb.css 6px, index.html 7px) stacked
+      on top of container gaps, so every site had a different gap — retired.
+   2. In inline flow both icons center on the text line (vertical-align:middle);
+      in flex rows align-items:center does the same job.
+   3. Bucketed crests (.rk-pips, viewBox 100x114) paint division pips BELOW the
+      crest square: translateY(7/114 = 6.14%) re-centers the CREST on the line and
+      lets the pips hang, so bucketed and plain emblems of one size share a baseline. */
+.rank-emblem{flex:none; vertical-align:middle}
+.rank-emblem.rk-pips{transform:translateY(6.14%)}
+.hk-badge{flex:none; vertical-align:middle}
 .hk-badge.earned{/* flat */}
 .hk-badge.off{opacity:.5}
 .pc-badge{cursor:default; display:inline-flex}
