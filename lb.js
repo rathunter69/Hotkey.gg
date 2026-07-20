@@ -23,13 +23,15 @@ const CH = (window.HOTKEY_DRILLS ? window.HOTKEY_DRILLS.menuOrder : []).map(key 
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmt(ms){ return (ms/1000).toFixed(2)+'s'; }
 
-function rowHtml(r,i,names,meId,extra,leaderMs){
+function rowHtml(r,i,names,meId,extra,leaderMs,opts){
   const me = meId && r.user_id===meId;
   const medal = i<3 ? ' r'+(i+1) : '';
   // the chase: show your gap to the leader right on your row — the number to beat
   const gap = (me && i>0 && leaderMs) ? `<span class="gap">+${((r.time_ms-leaderMs)/1000).toFixed(2)}</span>` : '';
-  return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
-    `<span class="rk${medal}">${i+1}</span>`+
+  /* r362: reward boards (the daily) medal the podium outright and tint the whole top 10 */
+  const glyph = (opts&&opts.medals&&i<3) ? ['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'][i] : (i+1);
+  return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}${(opts&&opts.medals&&i<10)?' t10':''}">`+
+    `<span class="rk${medal}">${glyph}</span>`+
     `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChipByUid(r.user_id)}</span>`+
     `<span class="tm">${fmt(r.time_ms)}${gap}</span></div>`;
 }
@@ -40,7 +42,7 @@ function schoolChipByUid(uid, size){
   if(!t) return '';
   return window.schoolChip ? window.schoolChip(t, size||15) : '<span class="sch">'+esc(t)+'</span>';
 }
-function boardHtml(c, best, names, meId){
+function boardHtml(c, best, names, meId, opts){
   let body;
   if(!best.length){
     body='<div class="empty" style="padding:14px 18px 6px">open board \u2014 <b>first run sets the bar</b></div>';
@@ -48,10 +50,10 @@ function boardHtml(c, best, names, meId){
   }
   else {
     const leaderMs = best[0].time_ms;
-    body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId,false,leaderMs)).join('');
+    body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId,false,leaderMs,opts)).join('');
     for(let k=best.length;k<5;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';
     const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
-    if(myIdx>=10){ body += '<div class="you-gap">···</div>' + rowHtml(best[myIdx], myIdx, names, meId, true, leaderMs); }
+    if(myIdx>=10){ body += '<div class="you-gap">···</div>' + rowHtml(best[myIdx], myIdx, names, meId, true, leaderMs, opts); }
   }
   return `<div class="board"><div class="board-cap"><h2>${esc(c.label)}</h2><span class="lvl">${esc(c.lvl)}</span></div>${body}</div>`;
 }
@@ -645,13 +647,19 @@ function topPlayersHtml(){
 
 function featuredHtml(){
   const {fRuns,names,meId}=DATA;
-  // daily
+  /* r362 (Wolf: the daily belongs FRONT AND CENTER here): this board used to read the retired
+     'daily-<date>' key — nothing has posted there since the morning sheet was retired, so the
+     board sat permanently empty. It reads the REAL Daily Challenge ('challenge-<date>') now,
+     labels it from the shared pool, and wears the hero styling + top-10 medals. */
   const dailyDate=new Date().toISOString().slice(0,10);
   let dSeed=0; for(const ch of dailyDate) dSeed=(dSeed*31+ch.charCodeAt(0))>>>0;
-  const dk=(window.HOTKEY_DRILLS?window.HOTKEY_DRILLS.menuOrder:[])[dSeed%(window.HOTKEY_DRILLS?window.HOTKEY_DRILLS.menuOrder.length:1)];
-  const dl=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.labelOf[dk])||'Daily';
+  const cSeed=(dSeed^0x9e3779b9)>>>0;   // = index.html challengeSeed()
+  const pool=(window.HOTKEY_CHALLENGE_POOL||[]).filter(k=>window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.labelOf[k]);
+  const dk=pool.length?pool[cSeed%pool.length]:null;
+  const dl=(dk&&window.HOTKEY_DRILLS.labelOf[dk])||'Daily Challenge';
   const seenD={}, bestD=[];
-  fRuns.filter(x=>x.challenge==='daily-'+dailyDate).forEach(x=>{ if(!seenD[x.user_id]){ seenD[x.user_id]=true; bestD.push(x); } });
+  fRuns.filter(x=>x.challenge==='challenge-'+dailyDate).forEach(x=>{ if(!seenD[x.user_id]){ seenD[x.user_id]=true; bestD.push(x); } });
+  bestD.sort((a,b)=>a.time_ms-b.time_ms);
   // weekly
   const d=new Date(); const onejan=new Date(d.getUTCFullYear(),0,1);
   const wk=Math.ceil((((d-onejan)/864e5)+onejan.getUTCDay()+1)/7);
@@ -667,8 +675,15 @@ function featuredHtml(){
       (per[x.user_id]=per[x.user_id]||{})[k]=x.time_ms; }); });
   const combined=Object.keys(per).filter(u=>legs.every(k=>per[u][k]!==undefined))
     .map(u=>({user_id:u, time_ms:legs.reduce((s,k)=>s+per[u][k],0)})).sort((a,b)=>a.time_ms-b.time_ms);
+  const midnight=new Date(); midnight.setHours(24,0,0,0);
+  const hrsLeft=Math.max(0, Math.round((midnight-new Date())/36e5));
   return '<div class="featured">'+
-    boardHtml({label:'\u26a1 today \u00b7 '+dl, lvl:dailyDate}, bestD, names, meId)+
+    '<div class="featured-daily">'+
+      '<div class="fd-head"><span class="fd-live">\u25cf live</span><b>\u25c6 the Daily Challenge \u00b7 '+dl+'</b>'+
+      '<span class="fd-meta">resets in ~'+hrsLeft+'h \u00b7 top 3 medal \u00b7 top 10 wear it on their card</span>'+
+      '<a class="fd-play" href="index.html?daily=1">play it \u2192</a></div>'+
+      boardHtml({label:'today\u2019s global field', lvl:dailyDate}, bestD, names, meId, {medals:true})+
+    '</div>'+
     boardHtml({label:'\ud83c\udfc1 weekly gauntlet \u00b7 '+legs.length+' legs, one clock', lvl:'wk '+wkStr}, combined, names, meId)+
     '</div>';
 }
