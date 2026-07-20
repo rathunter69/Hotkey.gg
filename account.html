@@ -98,7 +98,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=278"></script>
+<script src="nav.js?v=279"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -177,6 +177,10 @@ async function load(){
       <div class="msg" id="acHandleMsg"></div>
       <div id="schoolRow" style="margin-top:10px"></div>
       <div class="rowline" style="margin-top:14px"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
+      <div class="rowline"><span class="k">weekly recap email</span>
+        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+          <input type="checkbox" id="acRecap" style="width:auto;accent-color:var(--accent)"> <span id="acRecapL">off</span>
+        </label></div>
     </div>
 
     <div class="card"><h4>Data</h4>
@@ -341,6 +345,16 @@ async function load(){
     '<div style="font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:10px; line-height:1.7">A track certifies when every drill in it has a clean recorded run (no mouse, no guided). Certificates are public, verifiable pages with one-click \u201cAdd to LinkedIn.\u201d</div>';
   }
   renderCerts();
+  /* r360: weekly-recap opt-in — degrades silently until dev/migrate-email-prefs.sql runs */
+  (async()=>{ try{
+    const box=document.getElementById('acRecap'), lb=document.getElementById('acRecapL');
+    if(!box) return;
+    try{ const {data}=await sb.from('profiles').select('email_recap').eq('id', me.id).maybeSingle();
+      box.checked=!!(data&&data.email_recap); lb.textContent=box.checked?'on':'off'; }catch(e){}
+    box.onchange=async()=>{ lb.textContent=box.checked?'on':'off';
+      try{ const {error}=await sb.from('profiles').update({email_recap:box.checked}).eq('id', me.id);
+        if(error){ box.checked=!box.checked; lb.textContent=box.checked?'on':'off'; } }catch(e){} };
+  }catch(e){} })();
   async function renderDesk(){
     const el=document.getElementById('deskBody'); if(!el) return;
     let d=null;

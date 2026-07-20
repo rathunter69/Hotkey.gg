@@ -2,10 +2,13 @@
 -- Run this at launch. Seed ids are namespaced (5eed…) so nothing real matches.
 begin;
 -- the runs table carries a runs_guard() trigger (anti-cheat: rejects rows that don't come
--- through the app). Seeding is exactly that, on purpose — run the transaction with triggers
--- off (postgres/service role only; also skips FK triggers, which our namespaced ids satisfy).
-set local session_replication_role = replica;
+-- through the app). Seeding is exactly that, on purpose. session_replication_role needs
+-- SUPERUSER — which the Supabase SQL editor's postgres role is NOT (Wolf hit RUN_REJECTED
+-- twice) — so we disable the table's user triggers instead: plain table-owner privilege,
+-- re-enabled before commit either way.
+alter table public.runs disable trigger user;
 delete from public.runs         where user_id::text like '5eed0000-%';
+alter table public.runs enable trigger user;
 delete from public.team_members where user_id::text like '5eed0000-%';
 delete from public.teams        where id::text      like '5eedde5c-%';
 delete from public.profiles     where id::text      like '5eed0000-%';

@@ -3,11 +3,12 @@
 -- Idempotent: clears existing seed rows first. Remove everything with dev/seed-clear.sql.
 -- runs_guard() (anti-cheat trigger) rejects direct inserts — seeding runs with triggers off.
 begin;
-set local session_replication_role = replica;
+alter table public.runs disable trigger user;
 -- the runs table carries a runs_guard() trigger (anti-cheat: rejects rows that don't come
--- through the app). Seeding is exactly that, on purpose — run the transaction with triggers
--- off (postgres/service role only; also skips FK triggers, which our namespaced ids satisfy).
-set local session_replication_role = replica;
+-- through the app). Seeding is exactly that, on purpose. session_replication_role needs
+-- SUPERUSER — which the Supabase SQL editor's postgres role is NOT (Wolf hit RUN_REJECTED
+-- twice) — so we disable the table's user triggers instead: plain table-owner privilege,
+-- re-enabled before commit either way.
 delete from public.runs         where user_id::text like '5eed0000-%';
 delete from public.team_members where user_id::text like '5eed0000-%';
 delete from public.teams        where id::text      like '5eedde5c-%';
@@ -1841,4 +1842,5 @@ values
   ('5eed0000-0000-4000-8000-000000000049', 'triage', 82226, false, '2026-06-23T00:07:36.337Z'),
   ('5eed0000-0000-4000-8000-000000000049', 'triage', 118772, false, '2026-06-22T00:00:00.000Z'),
   ('5eed0000-0000-4000-8000-000000000049', 'fcfbuild', 102827, false, '2026-07-01T20:24:47.585Z');
+alter table public.runs enable trigger user;
 commit;
