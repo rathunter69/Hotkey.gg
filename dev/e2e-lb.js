@@ -248,8 +248,19 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
     (window.HK_PLACEMENT.KEYS || []).forEach(k => { if (!cat.has(k)) out.bad.push('placement ' + k); });
     (window.HK_TRACKS || []).forEach(t => t.keys.forEach(k => { if (!cat.has(k)) out.bad.push('track ' + t.id + ':' + k); }));
     D.menuOrder.forEach(k => { if (window.HOTKEY_PARS[k] === undefined) out.bad.push('par missing ' + k); });
-    // chapter groups mirror the catalog groups 1:1 (the campaign IS the spine)
+    // chapter groups mirror the catalog groups 1:1 (the milestone spine)
     if ((window.HOTKEY_CAMPAIGN.chapters || []).length !== D.groups.length) out.bad.push('chapter/group count drift');
+    // r363: milestones PARTITION into the tracks — every chapter owned by exactly one track,
+    // and every milestone's drills belong to its track's drill set
+    const owned = {};
+    (window.HK_TRACKS || []).forEach(t => (t.milestones || []).forEach(id => { owned[id] = (owned[id] || 0) + 1; }));
+    (window.HOTKEY_CAMPAIGN.chapters || []).forEach(c => { if (owned[c.id] !== 1) out.bad.push('milestone ownership ' + c.id + '=' + (owned[c.id] || 0)); });
+    (window.HK_TRACKS || []).forEach(t => {
+      const tset = new Set(t.keys);
+      (t.milestones || []).forEach(id => { const ch = (window.HOTKEY_CAMPAIGN.chapters || []).find(x => x.id === id);
+        (ch ? ch.keys : []).forEach(k => { if (!tset.has(k)) out.bad.push('milestone ' + id + ' key outside track ' + t.id + ': ' + k); }); });
+    });
+    (window.HOTKEY_CHALLENGE_POOL || []).forEach(k => { if (!cat.has(k)) out.bad.push('challenge pool ' + k); });
     return out;
   });
   ok(g1.bad.length === 0, 'campaign/gates/placement/tracks/pars all resolve against the catalog', g1.bad.slice(0, 5).join(' | '));

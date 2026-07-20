@@ -541,11 +541,11 @@
         const earned=chs.filter(c=>c.done);
         const allDone=earned.length===chs.length;
         const gateTxt=' \u2014 clear every drill under par \u00d7 '+CAMP.GATE+' to earn it';
-        /* r72: chapter medals read as MODEL VERSIONS — a labeled strip, v-numbers under each */
-        badgesHtml='<div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:2px 0 6px">the build \u00b7 '+earned.length+' / '+chs.length+' versions</div>'+
+        /* r72 medal strip; r363: 'versions' language retired — these are the TRACK MILESTONES now */
+        badgesHtml='<div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:2px 0 6px">milestones \u00b7 '+earned.length+' / '+chs.length+'</div>'+
           '<div class="pc-badges" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;margin-bottom:14px">'+
-          chs.map((c,ci)=>'<span class="pc-badge" data-tip="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;color:'+(c.done?'var(--muted)':'var(--faint)')+'">'+(window.hkBadge?window.hkBadge(c.id, c.done, 30, (window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]):c.badge)+'v'+(ci+1)+'</span>').join('')+
-          '<span class="pc-badge" data-tip="Model complete \u2014 every version shipped" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;color:var(--faint);margin-left:auto">'+(window.hkBadge?window.hkBadge('fin', allDone, 30):CAMP.finisher.badge)+'ship</span>'+
+          chs.map((c,ci)=>'<span class="pc-badge" data-tip="'+c.name+(c.done?' \u2014 EARNED':gateTxt)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;color:'+(c.done?'var(--muted)':'var(--faint)')+'">'+(window.hkBadge?window.hkBadge(c.id, c.done, 30, (window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]):c.badge)+'m'+(ci+1)+'</span>').join('')+
+          '<span class="pc-badge" data-tip="Catalog complete \u2014 every milestone shipped" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;color:var(--faint);margin-left:auto">'+(window.hkBadge?window.hkBadge('fin', allDone, 30):CAMP.finisher.badge)+'ship</span>'+
           '</div>'+
           (function(){
             const AC=window.HOTKEY_ACHIEVEMENTS;

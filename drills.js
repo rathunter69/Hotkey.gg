@@ -188,6 +188,9 @@ window.HOTKEY_DRILLS = {
   window.HK_TRACKS.forEach(t => {
     t.keys = D.groups.filter(g => t.groups.includes(g.name)).flatMap(g => g.keys);
   });
+  /* r363: each track owns its pace-gated milestones (the former campaign chapters) */
+  const MS = { fluency:['c1','c2'], formulas:['c3','c4','c5'], modeling:['c6','c7','c8'] };
+  window.HK_TRACKS.forEach(t => { t.milestones = MS[t.id] || []; });
 
   // Convenience maps so consumers don't have to dig into .meta[k].label every time.
   D.labelOf = {};
@@ -212,6 +215,11 @@ window.HOTKEY_DRILLS = {
 /* ---- CAMPAIGN: ordered chapters with time gates. A drill is 'cleared' when the
    local PB beats par * GATE (clean run). Chapter N unlocks when N-1 is fully cleared.
    Badges derive from cleared chapters — rendered on the player card. ---- */
+/* r363 CONSOLIDATION (Wolf: 'so many systems — replace v1/v2/v3'): the campaign brand is
+   RETIRED. These chapters live on as the PACE-GATED MILESTONES inside the three certificate
+   tracks (HK_TRACKS[].milestones below) — same keys, same par×1.5 gate, same one-time xp
+   bounties, same medals, same hk_camp_xp claim flags (no user data lost). One ladder now:
+   Track → milestones → certificate. The store keeps its name for engine compatibility. */
 window.HOTKEY_CAMPAIGN = {
   GATE: 1.5,
   /* r215 (Wolf): each shipped version pays a ONE-TIME xp bounty (awarded once, on top of the
@@ -221,16 +229,16 @@ window.HOTKEY_CAMPAIGN = {
   // r242 \u2014 chapters mirror the v2.1 groups 1:1 (the campaign IS the spine). Escalating XP:
   // the free tiers (c1-c3) hook, the PRO tiers (c5-c8) carry the fat bounties that funnel to PRO.
   chapters: [
-    { id:'c1', name:'v1 \u00b7 Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'] },
-    { id:'c2', name:'v2 \u00b7 Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','dress','gauntlet'] },
-    { id:'c3', name:'v3 \u00b7 Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
-    { id:'c4', name:'v4 \u00b7 Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
-    { id:'c5', name:'v5 \u00b7 Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
-    { id:'c6', name:'v6 \u00b7 Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
-    { id:'c7', name:'v7 \u00b7 Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'] },
-    { id:'c8', name:'v8 \u00b7 Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
+    { id:'c1', name:'Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'] },
+    { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','dress','gauntlet'] },
+    { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
+    { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
+    { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
+    { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
+    { id:'c7', name:'Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'] },
+    { id:'c8', name:'Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
   ],
-  finisher: { badge:'\u2b50', name:'Model complete', xp:600 },
+  finisher: { badge:'\u2b50', name:'Catalog complete', xp:600 },
 };
 
 /* ---- TIME BANDS (r256, Wolf) — per-drill speed medals anchored to the (now brutal)
@@ -345,8 +353,10 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'hse1', glyph:'brush', tier:'r', name:'House Style',      desc:'Beat par on House Style — the senior’s pass', test:c=>{ const ok=c.pb['housestyle']!==undefined&&c.pars['housestyle']&&c.pb['housestyle']<=c.pars['housestyle']; return {done:ok, prog:ok?1:0, goal:1}; } },
   { id:'rce1', glyph:'flag',  tier:'r', name:'Called Out',       desc:'Win a challenge race',                   test:c=>({done:(c.raceWins||0)>=1, prog:Math.min(c.raceWins||0,1), goal:1}) },
   { id:'rce2', glyph:'flag',  tier:'e', name:'Undefeated',       desc:'Win 5 challenge races',                  test:c=>({done:(c.raceWins||0)>=5, prog:Math.min(c.raceWins||0,5), goal:5}) },
-  { id:'sht1', glyph:'sheet', tier:'r', name:'Clean Sheet',      desc:'Clear the morning sheet — all three',    test:c=>({done:(c.sheetClears||0)>=1, prog:Math.min(c.sheetClears||0,1), goal:1}) },
-  { id:'sht2', glyph:'sheet', tier:'e', name:'Standing Order',   desc:'Clear 10 morning sheets',                test:c=>({done:(c.sheetClears||0)>=10, prog:Math.min(c.sheetClears||0,10), goal:10}) },
+  /* r363: the morning sheet is retired — its ritual (and these feats) repoint to the Daily
+     Mix; old sheetClears counts carry over so nobody loses earned progress. */
+  { id:'sht1', glyph:'sheet', tier:'r', name:'Clean Sheet',      desc:'Complete the Daily Mix — all three drills + the finale',  test:c=>({done:((c.mixClears||0)+(c.sheetClears||0))>=1, prog:Math.min((c.mixClears||0)+(c.sheetClears||0),1), goal:1}) },
+  { id:'sht2', glyph:'sheet', tier:'e', name:'Standing Order',   desc:'Complete 10 Daily Mixes',                                 test:c=>({done:((c.mixClears||0)+(c.sheetClears||0))>=10, prog:Math.min((c.mixClears||0)+(c.sheetClears||0),10), goal:10}) },
   { id:'ice1', glyph:'ice',   tier:'r', name:'Ice in the Veins', desc:'Bank a streak freeze (every 5-day streak earns one)', test:c=>({done:(c.frzBanked||0)>=1, prog:Math.min(c.frzBanked||0,1), goal:1}) },
   { id:'nav2', glyph:'map',   tier:'r', name:'Tour Guide',       desc:'Beat par on both navigation drills',     test:c=>{ const ks=['navigation','modeltour']; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=ks.length, prog:n, goal:ks.length}; } },
   { id:'kbd1', glyph:'keys',  tier:'r', name:'Chord Library',    desc:'Use 25 distinct shortcuts in clean runs', test:c=>({done:(c.chordKinds||0)>=25, prog:Math.min(c.chordKinds||0,25), goal:25}) },
