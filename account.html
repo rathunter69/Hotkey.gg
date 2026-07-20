@@ -86,7 +86,7 @@
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=267"></script>
+<script src="drills.js?v=268"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -98,7 +98,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=277"></script>
+<script src="nav.js?v=278"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -163,6 +163,10 @@ async function load(){
 
     <div class="card" id="desk"><h4>Your desk</h4>
       <div id="deskBody"><div class="msg">loading\u2026</div></div>
+    </div>
+
+    <div class="card" id="certs"><h4>Certificates</h4>
+      <div id="certBody"><div class="msg">loading\u2026</div></div>
     </div>
 
     <div class="card"><h4>Profile</h4>
@@ -313,6 +317,30 @@ async function load(){
     return 'Something went wrong.'; };
   // r270: assignments + program templates moved to the staffer screen (desks.html?manage=1) —
   // this card is a summary with pointers now, plus create/join for the deskless.
+  /* r359 CERTIFICATES card — track progress from the runs table (the same source the
+     issuing RPC checks), issued certs with view links + LinkedIn on the cert page. */
+  async function renderCerts(){
+    const el=document.getElementById('certBody'); if(!el || !window.HK_TRACKS) return;
+    let have=new Set(), certs={};
+    try{ const {data}=await sb.from('runs').select('challenge').eq('user_id', me.id).eq('mouse_used', false).limit(5000);
+      (data||[]).forEach(r=>have.add(r.challenge)); }catch(e){}
+    try{ const {data}=await sb.from('certificates').select('id,track').eq('user_id', me.id);
+      (data||[]).forEach(c=>certs[c.track]=c.id); }catch(e){}
+    el.innerHTML = window.HK_TRACKS.map(t=>{
+      const n=t.keys.filter(k=>have.has(k)).length, N=t.keys.length, done=certs[t.id];
+      const pct=Math.round(100*n/N);
+      return `<div class="rowline" style="align-items:center; gap:12px">
+        <span style="min-width:0"><b style="font-size:13.5px">${esc(t.name)}</b>
+          <span class="k" style="display:block">${done?'certified \u2713':n+' / '+N+' drills posted clean'}</span></span>
+        <span class="tc-bar" style="max-width:130px"><i style="width:${pct}%"></i></span>
+        ${done
+          ? `<a class="btn ghost" style="margin:0; padding:7px 14px" href="cert.html?id=${done}" target="_blank" rel="noopener">view \u2192</a>`
+          : `<span style="font-family:var(--mono); font-size:12px; color:var(--muted); white-space:nowrap">${pct}%</span>`}
+      </div>`;
+    }).join('') +
+    '<div style="font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:10px; line-height:1.7">A track certifies when every drill in it has a clean recorded run (no mouse, no guided). Certificates are public, verifiable pages with one-click \u201cAdd to LinkedIn.\u201d</div>';
+  }
+  renderCerts();
   async function renderDesk(){
     const el=document.getElementById('deskBody'); if(!el) return;
     let d=null;

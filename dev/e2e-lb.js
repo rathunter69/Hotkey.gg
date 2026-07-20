@@ -220,6 +220,37 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
   ok(e1.sameDay === 6, 'same-day streak takes the higher count');
   ok(e1.pushIsFn, 'hkStatePush is wired');
 
+  // ---------- F. certificate tracks + share card (r359) ----------
+  console.log('F. certificate tracks + share card');
+  const f1 = await page.evaluate(() => {
+    const T = window.HK_TRACKS || [];
+    const all = new Set(T.flatMap(t => t.keys));
+    return { n: T.length, sizes: T.map(t => t.keys.length),
+      coversAll: (window.HOTKEY_DRILLS.menuOrder || []).every(k => all.has(k)),
+      shareFn: typeof window.hkShareCard === 'function',
+      ids: T.map(t => t.id).join(',') };
+  });
+  ok(f1.n === 3 && f1.ids === 'fluency,formulas,modeling', 'three tracks, stable ids', f1.ids);
+  ok(String(f1.sizes) === '20,32,30', 'track lengths 20/32/30', String(f1.sizes));
+  ok(f1.coversAll, 'every drill belongs to a track');
+  ok(f1.shareFn, 'hkShareCard renderer is loaded');
+  // the SQL migration's arrays must match drills.js (they are generated from it)
+  const certSql = fs.readFileSync('dev/migrate-certificates.sql', 'utf8');
+  const f2 = await page.evaluate(() => (window.HK_TRACKS || []).map(t => ({ id: t.id, keys: t.keys })));
+  let sqlOk = true;
+  for (const t of f2) { for (const k of t.keys) { if (!certSql.includes("'" + k + "'")) { sqlOk = false; break; } } }
+  ok(sqlOk, 'migrate-certificates.sql arrays cover every track drill');
+  // cert page renders its empty state without page errors
+  const certPage = await browser.newPage();
+  const certErrs = [];
+  certPage.on('pageerror', e => certErrs.push(String(e.message).slice(0, 120)));
+  await certPage.goto(URL.replace('leaderboard.html', 'cert.html'), { waitUntil: 'load' });
+  await certPage.waitForTimeout(600);
+  const f3 = await certPage.evaluate(() => (document.getElementById('root') || {}).textContent || '');
+  ok(/No certificate id|loading/i.test(f3), 'cert.html renders the no-id state', f3.slice(0, 60));
+  ok(certErrs.length === 0, 'cert.html zero page errors', certErrs.join(' | '));
+  await certPage.close();
+
   ok(errs.length === 0, 'zero page errors', errs.join(' | '));
   console.log(fail === 0 ? ('LB SUITE: ALL ' + pass + ' PASS') : ('LB SUITE: ' + fail + ' FAILURE(S) of ' + (pass + fail)));
   await browser.close();

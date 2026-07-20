@@ -295,7 +295,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
 <style>${CSS}</style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=265"><\/script>
+<script src="drills.js?v=268"><\/script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -307,7 +307,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=277"><\/script>
+<script src="nav.js?v=278"><\/script>
 <div class="wrap">`;
 
   const FOOT = `
@@ -416,7 +416,7 @@ ${data.groups.map(g => `
 
   // ---- sitemap ----
   const staticPages = ['', 'About.html', 'leaderboard.html', 'desks.html', 'stats.html', 'reference.html',
-    'contact.html', 'enterprise.html', 'terms.html', 'privacy.html', 'security.html'];
+    'contact.html', 'enterprise.html', 'terms.html', 'privacy.html', 'security.html', 'cert.html'];
   const urls = [
     ...staticPages.map(p => `  <url><loc>${SITE}/${p}</loc></url>`),
     `  <url><loc>${SITE}/drills/</loc></url>`,
