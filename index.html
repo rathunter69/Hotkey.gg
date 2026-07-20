@@ -1551,14 +1551,14 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=273"></script>
+<script src="drills.js?v=274"></script>
 <link rel="stylesheet" href="nav.css?v=182">
 <script src="themes.js?v=270"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=282"></script>
+<script src="nav.js?v=283"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -9195,7 +9195,10 @@ function checkWin(){
             const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
             localStorage.setItem('hk_xp_est', String(est+40));
             const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
-            fl.dailyTop10=(fl.dailyTop10||0)+1; localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+            fl.dailyTop10=(fl.dailyTop10||0)+1;
+            if(rk.rank<=3) fl.dailyPod=(fl.dailyPod||0)+1;      /* r372: podium + win rungs */
+            if(rk.rank===1) fl.dailyWins=(fl.dailyWins||0)+1;
+            localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
             try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}
             showToast('\u25c6 top 10 on today\u2019s field \u2014 +40 xp \u00b7 rank #'+rk.rank+' of '+rk.total);
             try{ playSuccessBlip(3); }catch(e){}
@@ -9240,6 +9243,10 @@ async function maybeOfferCertificate(){
         return;
       }
       localStorage.setItem('hk_cert_'+t.id, String(data));
+      try{ const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+        fl.certTracks=fl.certTracks||{}; fl.certTracks[t.id]=1;
+        localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+        window.hkStatePush&&window.hkStatePush(); }catch(e){}   /* r372: certificate feats */
       try{ if(window.hkCelebrate) hkCelebrate({cap:'track complete', big:true, title:t.name,
         sub:'all '+t.keys.length+' drills \u00b7 certificate issued'}); }catch(e){}
       setTimeout(()=>{ try{ certModal('cert.html?id='+encodeURIComponent(String(data)), t); }catch(e){} }, 1600);
@@ -15251,7 +15258,8 @@ function buildAchCtx(){
     __kl=parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10) || Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
   return { pb:PB, pars:window.HOTKEY_PARS||{}, runs:lite, streak:streakN, solves:solvesN,
     crowns:0, groups, att:Object.keys(PB).filter(k=>CHALLENGES[k]).length, menuOrder:MENU_ORDER,   /* r371: challenge-/wk- PB keys don't count as drills attempted */
-    dailyTop10:fl.dailyTop10||0,
+    dailyTop10:fl.dailyTop10||0, dailyPod:fl.dailyPod||0, dailyWins:fl.dailyWins||0,
+    certs:Object.keys(fl.certTracks||{}).length,
     mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
     nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin,
     raceWins:fl.raceWins||0, sheetClears:fl.sheetClears||0, frzBanked:fl.frzBanked||0,

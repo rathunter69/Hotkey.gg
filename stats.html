@@ -102,7 +102,7 @@
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=273"></script>
+<script src="drills.js?v=274"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -114,7 +114,7 @@ window.NAV_ACTIVE = 'stats';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=282"></script>
+<script src="nav.js?v=283"></script>
 
 <header class="head">
   <div class="wrap">
@@ -280,6 +280,7 @@ async function load(){
         nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
         raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0,
         chordKinds:__ck, keysLifetime:__kl, dailyTop10:flags.dailyTop10||0,   // r150/r151 · r371
+        dailyPod:flags.dailyPod||0, dailyWins:flags.dailyWins||0, certs:Object.keys(flags.certTracks||{}).length,
         crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
       // global rarity (Steam-style): evaluate run-derivable achievements for every player
       const globalPct=(function(){
