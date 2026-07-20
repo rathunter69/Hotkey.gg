@@ -1552,13 +1552,13 @@
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=274"></script>
-<link rel="stylesheet" href="nav.css?v=182">
-<script src="themes.js?v=270"></script>
+<link rel="stylesheet" href="nav.css?v=183">
+<script src="themes.js?v=271"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=283"></script>
+<script src="nav.js?v=284"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -9119,6 +9119,10 @@ function checkWin(){
       if(hr>=0&&hr<4) fl.nightWin=true;
       if(hr>=5&&hr<7) fl.dawnWin=true;
       if(dy===0||dy===6) fl.weekendWin=true;
+      /* r373 BONE FRAME: a clean win at PERFECT efficiency — every keystroke optimal
+         (same keys/par pair the results card shows). Latched once; hydration ORs it
+         across devices. The frame itself unlocks in the account picker. */
+      if(keyLog.length===C.parKeys) fl.perfectRun=1;
     }
     localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
     try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}   /* r358: flags ride the account */

@@ -85,7 +85,7 @@
   .state a.acc-cta.ghost{color:var(--accent)}   /* r355: the r297 on-accent fix out-specified the ghost variant — 'Log in' rendered white-on-light, invisible */
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
-<link rel="stylesheet" href="nav.css?v=182">
+<link rel="stylesheet" href="nav.css?v=183">
 <script src="drills.js?v=274"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -94,11 +94,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=270"></script>
+<script src="themes.js?v=271"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=283"></script>
+<script src="nav.js?v=284"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -144,6 +144,30 @@ async function load(){
   const xp = R.computeXP(mine, plBoards, mySes);   /* r371: full signature — same level everywhere */
   const L = R.levelOf(xp);
   const joined = me.created_at ? new Date(me.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—';
+
+  /* r373 FRAME PICKER — unlock context for hkFrameUnlocked. Level from the same xp
+     already computed above; the rest from hk_ach_flags (tierBest is latched by nav.js
+     on every rank fetch — max'd with the live tier here so a fresh device isn't
+     behind); charter = the account predates the beta cutoff (auth created_at). */
+  let __fl={}; try{ __fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+  const frameU = { lvl:L.lvl, tierBest:Math.max(__fl.tierBest|0, tier.i|0),
+    dailyWins:__fl.dailyWins|0, certs:Object.keys(__fl.certTracks||{}).length,
+    charter:!!(me.created_at && String(me.created_at) < '2026-10-01'),
+    perfectRun:__fl.perfectRun?1:0 };
+  const FRAME_TIER_C={common:'var(--muted)', rare:'#3f7fe0', epic:'#d64a3f', legendary:'#d99a1f', egg:'#8a6d3b'};
+  const frameCards=[{id:'none', name:'None', tier:'', desc:'plain card', earn:'', unlocked:true}]
+    .concat((window.HK_FRAMES||[]).map(f=>({...f, unlocked:window.hkFrameUnlocked && window.hkFrameUnlocked(f.id, frameU)})));
+  const frameGridHtml=frameCards.map(f=>{
+    const on = (prof.flair||'none')===f.id;
+    return '<button class="flair-opt'+(on?' on':'')+'" data-flair="'+f.id+'" data-locked="'+(f.unlocked?'0':'1')+'"'+
+      ' style="text-align:left;font-family:var(--mono);background:var(--bg);border:1px solid '+(on?'var(--accent)':'var(--line)')+
+      ';border-radius:10px;padding:10px 12px;color:var(--text);cursor:'+(f.unlocked?'pointer':'default')+(f.unlocked?'':';opacity:.45')+'">'+
+      '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'"></span>'+
+      '<b style="font-size:12px">'+esc(f.name)+'</b>'+
+      (f.tier?' <i style="font-style:normal;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:'+FRAME_TIER_C[f.tier]+'">'+f.tier+'</i>':'')+
+      '<span style="display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">'+
+      (f.unlocked ? esc(f.desc||'') : '🔒 '+esc(f.earn)) + '</span></button>';
+  }).join('');
 
   root.innerHTML = `
     <div class="card tc">
@@ -215,10 +239,9 @@ async function load(){
     </div>
 
     <div class="card"><h4>Card flair <span id="proTagFlair" style="color:var(--warn);font-size:9px;letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO · free in beta</span></h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">A border style for your player card, shown wherever your card appears.</div>
-      <div id="flairRow" style="display:flex;gap:10px;flex-wrap:wrap">
-        ${['none','gold','emerald','holo'].map(f=>`<button class="btn ghost flair-opt${(prof.flair||'none')===f?' on':''}" data-flair="${f}" style="text-transform:capitalize${f==='gold'?';border-color:#e3b341;color:#e3b341':f==='emerald'?';border-color:#2ea36f;color:#2ea36f':f==='holo'?';border-color:#8ab4ff;color:#8ab4ff':''}">${f}</button>`).join('')}
-      </div><div class="msg" id="flairMsg"></div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Earned frames for your player card, shown wherever your card appears. Locked frames show how to get them.</div>
+      <div id="flairRow" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px">${frameGridHtml}</div>
+      <div class="msg" id="flairMsg"></div>
     </div>
 
     <div class="card" id="betaTools"><h4>Beta tools <span style="color:var(--faint);font-size:9px">testing only — removed at launch</span></h4>
@@ -504,12 +527,20 @@ async function load(){
   // r156: PRO touchpoints — plan card button + the flair PRO tag open the offer sheet
   { const pb=document.getElementById('proSheetBtn'); if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); };
     const pt=document.getElementById('proTagFlair'); if(pt) pt.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Pro cosmetics'); }; }
+  /* r373: frame-picker save \u2014 same update pattern the flat buttons used; locked
+     swatches answer with their earn line instead of writing anything. */
   document.querySelectorAll('.flair-opt').forEach(b=>b.onclick=async()=>{
+    if(b.dataset.locked==='1'){
+      const fr=(window.HK_FRAMES||[]).find(x=>x.id===b.dataset.flair);
+      say('flairMsg','Locked \u2014 '+((fr&&fr.earn)||'keep playing.'),true); return;
+    }
     const f=b.dataset.flair==='none'?null:b.dataset.flair;
     try{ const {error}=await sb.from('profiles').update({flair:f}).eq('id',me.id);
       if(error){ say('flairMsg','Couldn\u2019t save \u2014 try again.',true); return; }
-      document.querySelectorAll('.flair-opt').forEach(x=>x.classList.toggle('on',x===b));
-      say('flairMsg','Flair set \u2713'); }catch(e){ say('flairMsg','Something went wrong.',true); }
+      prof.flair=f;
+      document.querySelectorAll('.flair-opt').forEach(x=>{ x.classList.toggle('on',x===b);
+        x.style.borderColor = x===b ? 'var(--accent)' : 'var(--line)'; });
+      say('flairMsg','Frame set \u2713 \u2014 it rides wherever your card appears.'); }catch(e){ say('flairMsg','Something went wrong.',true); }
   });
   { const dv=document.getElementById('devRanked'), dro=document.getElementById('devRankedOff');
     if(dv) dv.onclick=()=>{ try{ localStorage.setItem('hk_dev_unlock','1'); localStorage.setItem('hk_ranked','1'); }catch(e){}

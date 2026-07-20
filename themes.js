@@ -262,6 +262,9 @@ window.rankEmblem = (function(){
   const PLAT ={hi:'#e0fdf7',mid:'#86dcca',lo:'#3d9c8e',deep:'#173f3a',plateHi:'#25453f',plateLo:'#152522',core:'#8ef2df'};
   const CRIM ={hi:'#ffb3a1',mid:'#e65843',lo:'#9c2a1c',deep:'#3a0f0b',plateHi:'#3b1d19',plateLo:'#1f0f0e',core:'#ff6248'};
   const DIAM ={hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',plateHi:'#21404f',plateLo:'#12232c',core:'#a8ecff'};
+  // r373: the profile-frame system (HK_FRAMES below) borrows the emblem metals —
+  // ONE palette source, so a plaque frame can never drift off its rank tier's crest.
+  window.HK_METALS={BRONZE:BRONZE,SILVER:SILVER,GOLD:GOLD,PLAT:PLAT,DIAM:DIAM};
   function defs(id,P,glow){
     return '<defs><linearGradient id="'+id+'m" x1="0" y1="0" x2="0" y2="1">'+
       '<stop offset="0" stop-color="'+P.hi+'"/><stop offset=".45" stop-color="'+P.mid+'"/>'+
@@ -651,6 +654,138 @@ window.HK_RANK = {
             crowns, pod, t10, per, entries, wsum};
   }
 };
+
+/* ---- r373 PROFILE FRAME SYSTEM — earned card frames (Wolf-approved board v2) ----
+   The flair column graduates from three flat borders to a suite of EARNED frames.
+   A frame = a nav.css class (.hk-frame-<id>: border/background/shadow layers) plus
+   optional ornament HTML (corner SVGs / medallion / tier tab) injected as the card's
+   FIRST child. Ornaments are absolutely positioned and overflow the card edge on
+   purpose — they never move layout. Unlocks are checked ONLY at pick time
+   (account.html); display trusts the stored profiles.flair value. Legacy flair
+   values (gold/emerald/holo) keep their old .flair-* classes on existing rows. */
+window.HK_FRAMES = [
+  {id:'engraved',      name:'Engraved',        tier:'common',
+   desc:'steel certificate corners + rosettes',       earn:'reach LVL 5'},
+  {id:'plaque-bronze', name:'Bronze Plaque',   tier:'rare',
+   desc:'beveled bronze + corner screws',             earn:'reach Summer Analyst'},
+  {id:'plaque-silver', name:'Silver Plaque',   tier:'rare',
+   desc:'beveled silver + corner screws',             earn:'reach First-Year Analyst'},
+  {id:'plaque-gold',   name:'Gold Plaque',     tier:'rare',
+   desc:'beveled gold + corner screws',               earn:'reach Associate'},
+  {id:'plaque-plat',   name:'Platinum Plaque', tier:'rare',
+   desc:'beveled platinum + corner screws',           earn:'reach VP'},
+  {id:'plaque-diam',   name:'Diamond Plaque',  tier:'rare',
+   desc:'beveled diamond + corner screws',            earn:'reach Second-Year Analyst'},
+  {id:'foil',          name:'Foil',            tier:'epic',
+   desc:'conic sheen + fan corners',                  earn:'win a Daily Challenge or earn a certificate'},
+  {id:'heraldic',      name:'Heraldic',        tier:'legendary',
+   desc:'crimson filigree + lozenge medallion',       earn:'Daily Dynasty (5 daily wins) or Triple Crown (3 certificates)'},
+  {id:'charter',       name:'Charter Analyst', tier:'rare',
+   desc:'steel-navy laurels — the beta-tester class', earn:'account created during the beta'},
+  {id:'bone',          name:'Bone',            tier:'egg',
+   desc:'subtle off-white coloring, tasteful thickness', earn:'post a run at perfect efficiency — every keystroke optimal'},
+];
+/* u = {lvl, tierBest, dailyWins, certs, charter, perfectRun}. tierBest is a
+   HK_RANK.TIERS index (highest tier ever DISPLAYED — nav.js persists it into
+   hk_ach_flags.tierBest on every rank fetch; hydration maxes it across devices). */
+window.hkFrameUnlocked = function(id, u){
+  u = u || {};
+  const tb = u.tierBest|0;
+  switch(id){
+    case 'engraved':      return (u.lvl|0) >= 5;
+    case 'plaque-bronze': return tb >= 2;   // Summer Analyst
+    case 'plaque-silver': return tb >= 3;   // First-Year Analyst
+    case 'plaque-gold':   return tb >= 4;   // Associate
+    case 'plaque-plat':   return tb >= 5;   // VP (MD is a higher rung — counts too)
+    case 'plaque-diam':   return tb >= 7;   // Second-Year Analyst — the true final boss
+    case 'foil':          return (u.dailyWins|0) >= 1 || (u.certs|0) >= 1;
+    case 'heraldic':      return (u.dailyWins|0) >= 5 || (u.certs|0) >= 3;
+    case 'charter':       return !!u.charter;
+    case 'bone':          return !!u.perfectRun;
+  }
+  return false;
+};
+/* Ornament HTML per frame — '' for frames that are pure CSS (bone). Corner SVGs
+   ride .hkf-cn/.hkf-c1..c4 (c2-c4 mirror via CSS transforms); plaque screws ride
+   .hkf-scr/.hkf-s1..s4; the tier tab is an .hkf-tab <i> colored inline from
+   HK_METALS. .hkf-glint is the specular-sweep layer (animation lives in nav.css,
+   reduced-motion guarded); charter and bone ship none — bone stays PERFECTLY
+   still, that is the joke. */
+window.hkFrameOrnaments = (function(){
+  let UID=0;
+  const GLINT='<i class="hkf-glint" aria-hidden="true"></i>';
+  function corners(inner){
+    return ['hkf-c1','hkf-c2','hkf-c3','hkf-c4'].map(c=>
+      '<svg class="hkf-cn '+c+'" viewBox="0 0 56 56" aria-hidden="true">'+inner+'</svg>').join('');
+  }
+  // engraved — bracket arcs + rotated-square rosette (board v2, steel)
+  const ENG='<path d="M4 44 V12 Q4 4 12 4 H44" fill="none" stroke="#767983" stroke-width="2"/>'+
+    '<path d="M9 40 V14 Q9 9 14 9 H40" fill="none" stroke="#565860" stroke-width="1"/>'+
+    '<rect x="2" y="2" width="8" height="8" fill="none" stroke="#767983" stroke-width="1.4" transform="rotate(45 6 6)"/>'+
+    '<circle cx="6" cy="6" r="1.6" fill="#9a9da8"/>';
+  // foil — nested fan arcs + corner pearl
+  const FOIL='<g stroke="#8ef2df" stroke-width="1.3" opacity=".9" fill="none">'+
+    '<path d="M4 30 Q4 4 30 4"/><path d="M4 22 Q4 4 22 4"/><path d="M4 14 Q4 4 14 4"/>'+
+    '<path d="M4 38 Q4 4 38 4" opacity=".5"/></g><circle cx="7" cy="7" r="2" fill="#d8fff5"/>';
+  // heraldic — dense crimson filigree + ember dots
+  const HER='<g fill="none" stroke="#e65843" stroke-width="1.5" opacity=".9">'+
+    '<path d="M2 54 C2 18 18 2 54 2"/><path d="M6 54 C6 22 22 6 54 6"/>'+
+    '<path d="M2 30 Q12 27 15 15 Q27 12 30 2"/><path d="M2 42 Q19 38 22 22 Q38 19 42 2" opacity=".55"/></g>'+
+    '<circle cx="15" cy="15" r="2.6" fill="#ffb3a1"/><circle cx="22" cy="22" r="1.7" fill="#ffb3a1" opacity=".7"/>';
+  // charter — laurel-line corner: steel-navy arc with leaf ticks along it
+  const CHA=(function(){
+    let leaves='';
+    for(let l=0;l<4;l++){ const t=0.16+l*0.22;
+      // points along the quarter-arc x=4+? — parametrize the Q curve M4 44 Q4 4 44 4
+      const x=(4*(1-t)*(1-t)+2*4*t*(1-t)+44*t*t).toFixed(1);
+      const y=(44*(1-t)*(1-t)+2*4*t*(1-t)+4*t*t).toFixed(1);
+      leaves+='<ellipse cx="'+x+'" cy="'+y+'" rx="4.2" ry="1.7" fill="#8fa3c0" stroke="#3d4c66" stroke-width=".5" transform="rotate('+(-58+l*30)+' '+x+' '+y+')"/>';
+    }
+    return '<path d="M4 44 Q4 4 44 4" fill="none" stroke="#55688a" stroke-width="1.6"/>'+
+      '<path d="M9 42 Q9 9 42 9" fill="none" stroke="#3d4c66" stroke-width="1" opacity=".8"/>'+
+      leaves+'<circle cx="5.5" cy="5.5" r="2" fill="#c8d4e6"/>';
+  })();
+  function screws(P){
+    return ['hkf-s1','hkf-s2','hkf-s3','hkf-s4'].map((c,i)=>{
+      const id='hkscr'+(UID++);
+      const slot=(i%2===0)?'M10.5 10.5 L17.5 17.5':'M10.5 17.5 L17.5 10.5';   // slot angle alternates like real hardware
+      return '<svg class="hkf-scr '+c+'" viewBox="0 0 28 28" aria-hidden="true">'+
+        '<defs><radialGradient id="'+id+'" cx=".35" cy=".3">'+
+        '<stop offset="0" stop-color="'+P.hi+'"/><stop offset=".7" stop-color="'+P.lo+'"/>'+
+        '<stop offset="1" stop-color="'+P.deep+'"/></radialGradient></defs>'+
+        '<circle cx="14" cy="14" r="7.5" fill="'+P.deep+'"/>'+
+        '<circle cx="14" cy="14" r="6" fill="url(#'+id+')"/>'+
+        '<path d="'+slot+'" stroke="'+P.deep+'" stroke-width="1.6" stroke-linecap="round"/></svg>';
+    }).join('');
+  }
+  function tab(txt, fg, bg, bc){
+    return '<i class="hkf-tab" aria-hidden="true" style="color:'+fg+';background:'+bg+';border-color:'+bc+'">'+txt+'</i>';
+  }
+  const PLQ={bronze:['BRONZE','BRONZE'], silver:['SILVER','SILVER'], gold:['GOLD','GOLD'],
+             plat:['PLAT','PLATINUM'], diam:['DIAM','DIAMOND']};
+  return function(id){
+    const M=window.HK_METALS||{};
+    if(id==='engraved') return GLINT+corners(ENG);
+    if(id==='foil')     return GLINT+corners(FOIL);
+    if(id==='heraldic'){
+      /* r373 (Wolf): the medallion wears the BRAND LOZENGE — a ◆ diamond in the ring, never a star */
+      return GLINT+'<svg class="hkf-med" viewBox="0 0 34 34" aria-hidden="true">'+
+        '<circle cx="17" cy="17" r="15" fill="var(--surface,#232427)" stroke="#e65843" stroke-width="2"/>'+
+        '<path d="M17 7.5 L25.5 17 L17 26.5 L8.5 17 Z" fill="#ffb3a1"/>'+
+        '<path d="M17 11.2 L22.2 17 L17 22.8 L11.8 17 Z" fill="none" stroke="#9c2a1c" stroke-width="1.1"/>'+
+        '</svg>'+corners(HER);
+    }
+    if(id==='charter')  // no glint, no ◆ — the beta class keeps a quiet uniform
+      return corners(CHA)+tab('BETA TESTER','#c8d4e6','linear-gradient(180deg,#2a3550,#1a2334)','#55688a');
+    if(id.indexOf('plaque-')===0){
+      const m=PLQ[id.slice(7)]; if(!m) return '';
+      const P=M[m[0]]; if(!P) return '';
+      return GLINT+screws(P)+
+        tab('◆ '+m[1]+' TIER', P.core, 'linear-gradient(180deg,'+P.plateHi+','+P.plateLo+')', P.lo);
+    }
+    return '';   // bone (pure CSS) + unknown ids
+  };
+})();
 
 /* ---- achievement badges: hex medals, single source (inline copy in index — sync) ---- */
 window.hkBadge = function(id, earned, size, color, rarity){
