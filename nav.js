@@ -589,6 +589,7 @@
               nightWin:!!__xflags.nightWin, dawnWin:!!__xflags.dawnWin, weekendWin:!!__xflags.weekendWin,
               raceWins:__xflags.raceWins||0, sheetClears:__xflags.sheetClears||0,
               frzBanked:__xflags.frzBanked||0, chordKinds:__ck, keysLifetime:__kl, dailyTop10:__xflags.dailyTop10||0,
+              dailyPod:__xflags.dailyPod||0, dailyWins:__xflags.dailyWins||0, certs:Object.keys(__xflags.certTracks||{}).length,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
             // STEAM-STYLE GLOBAL RARITY: evaluate run-derivable achievements for every
