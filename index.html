@@ -1537,7 +1537,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=270"></script>
+<script src="drills.js?v=271"></script>
 <link rel="stylesheet" href="nav.css?v=182">
 <script src="themes.js?v=269"></script>
 
@@ -1573,7 +1573,6 @@
       <!-- r306 (Wolf): modes → helpers → flair → settings, weight ∝ usage. Classic chip and
            random retired (the drill menu covers both); rapid-fire downweighted to a normal chip. -->
       <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily</button>
-      <button class="mb-tool" id="dailyMixBtn" data-tip="the Daily Mix — three quick drills + a one-minute rapid-fire finale, ~5 minutes end to end">☕ mix</button>
       <button class="mb-tool mb-campaign" id="campaignBtn" title="the tracks — pace-gated milestones, xp bounties, and a certificate at the end of each"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-6"/></svg>tracks</button>
       <div class="mb-mode-wrap">
         <button class="mb-tool mb-rapid" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>rapid-fire<span class="caret">▾</span></button>
@@ -9277,7 +9276,7 @@ function showResults(o){
     // the toast, not restart the drill underneath (Wolf's report).
     if(window.__hkCelOpen || ev.defaultPrevented) return;
     if(ev.key==='Enter'){ ev.preventDefault(); hideResults(); restartDrill(); return; }
-    if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); if(mix && mixAdvance()) return; hideResults(); loadChallenge(nextDrillKey()); return; }
+    if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
     if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
     if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':'details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards'; } return; }   // r293: progressive disclosure
   };
@@ -9424,14 +9423,11 @@ function _showResults(o){
     `</div>`+
     `<div class="rm-opts">`+
     `<button class="rm-key" data-act="again"><kbd>↵</kbd>again</button>`+
-    `<button class="rm-key primary" data-act="next"><kbd>n</kbd>${
-      mix && !mix.rf
-        ? (mix.i+1 < mix.q.length ? 'mix '+(mix.i+2)+'/3 \u2192' : 'mix finale: \u26a1 rapid-fire \u2192')
-        : 'next: '+((CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next')+' \u2192'}</button>`+
+    `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
     (o.pb ? `<button class="rm-key" data-act="share">\ud83d\udcf8 share</button>` : '')+
     `</div>`+
-    ((typeof challengeEligible==='function' && challengeEligible() && !challengeDoneToday() && !challengeMode && !mix)
+    ((typeof challengeEligible==='function' && challengeEligible() && !challengeDoneToday() && !challengeMode)
       ? `<div class="guest-cta" style="cursor:pointer" id="rmDaily">\u25c6 today\u2019s daily challenge is live \u2014 play it \u2192</div>` : '')+
     guestPrompt+
     `</div>`;
@@ -9441,7 +9437,7 @@ function _showResults(o){
   m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
     const a=b.dataset.act;
     if(a==='again'){ hideResults(); restartDrill(); }
-    else if(a==='next'){ if(mix && mixAdvance()) return; hideResults(); loadChallenge(nextDrillKey()); }
+    else if(a==='next'){ hideResults(); loadChallenge(nextDrillKey()); }
     else if(a==='menu'){ hideResults(); openPicker(); }
     else if(a==='share'){ /* r359: PB share card — canvas PNG via the shared renderer */
       try{
@@ -11781,7 +11777,6 @@ $('wqBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleWqPop(); }
 { const __wb=$('weeklyBtn'); if(__wb) __wb.addEventListener('click',startWeekly); }   // r81 hotfix: button retired; unguarded listener was a boot TypeError
 $('campaignBtn').addEventListener('click',openCampaign);
 { const _dcb=$('dailyChallengeBtn'); if(_dcb) _dcb.addEventListener('click',openDailyChallenge); }
-{ const _dmb=$('dailyMixBtn'); if(_dmb){ _dmb.addEventListener('click',()=>{ try{ startDailyMix(); }catch(e){} }); try{ updateMixBtn(); }catch(e){} } }   /* r360 */
 $('startBtn').addEventListener('click', tryEnter);
 { const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); };
   const lb=$('loginBtn'); if(lb) lb.onclick=()=>{ openAuth('signin'); }; }
@@ -12965,7 +12960,6 @@ function endSession(){
   }
   marathon.practice = guidedUsed;   // surfaced in the summary so user knows why no leaderboard
   showSessionSummary();
-  try{ if(mix && mix.rf) mixFinish(); }catch(e){}   /* r360: the rapid-fire finale closes the daily mix */
 }
 function exitSession(){
   if(marathon){ clearInterval(marathon.tickH); }
@@ -13700,56 +13694,9 @@ function restartDrill(){
 function scoreKey(){ if(challengeMode) return challengeKey(); if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return cur; }
 /* r363: drillOfDay/startDaily are GONE with the morning sheet — the Daily Mix and the
    Daily Challenge are the two daily rituals now. */
-/* r360 DAILY MIX (Wolf-approved roadmap: session shape for the 5-minute player).
-   One button: three quick drills (deterministic per day — one you haven't cleared if
-   possible, all short-par) then a one-minute rapid-fire finale. Wins tick the streak
-   like any win; leaving the queue (picker, another drill) quietly cancels the mix. */
-let mix=null;   // {q:[k,k,k], i, rf}
-function mixDateStr(){ return dailyDateStr(); }
-function mixDoneToday(){ try{ return localStorage.getItem('hk_mix_done')===mixDateStr(); }catch(e){ return false; } }
-function buildMixQueue(){
-  const rng=mulberry32(dailySeed()+7077);
-  let played={}; try{ played=JSON.parse(localStorage.getItem('hk_clears')||'{}'); }catch(e){}
-  const short=MENU_ORDER.filter(k=>CHALLENGES[k] && CHALLENGES[k].par<=30 && !drillLocked(k));
-  const pool=short.length?short:MENU_ORDER.slice(0,6);
-  const fresh=pool.filter(k=>!played[k]);
-  const pick=arr=>arr.length?arr[Math.floor(rng()*arr.length)]:null;
-  const q=[]; const a=pick(fresh)||pick(pool); if(a) q.push(a);
-  let guard=0;
-  while(q.length<3 && guard++<40){ const c=pick(pool); if(c && !q.includes(c)) q.push(c); }
-  return q;
-}
-function startDailyMix(){
-  if(demoPlaying) return;
-  if(marathon && marathon.active){ showToast('finish the session first \u2014 then the mix'); return; }
-  mix={ q:buildMixQueue(), i:0, rf:false };
-  if(!mix.q.length){ mix=null; return; }
-  loadChallenge(mix.q[0], {mix:true});
-  showToast('\u2615 daily mix 1/3 \u2014 three quick drills, then a one-minute rapid-fire finale');
-  updateMixBtn();
-}
-function mixAdvance(){
-  if(!mix || mix.rf) return false;
-  mix.i++;
-  if(mix.i < mix.q.length){ hideResults(); loadChallenge(mix.q[mix.i], {mix:true}); showToast('\u2615 mix '+(mix.i+1)+'/3'); return true; }
-  hideResults(); mix.rf=true; startSession('rapidfire', 60);
-  showToast('\u26a1 the finale \u2014 one minute of rapid-fire');
-  return true;
-}
-function mixFinish(){
-  if(!mix) return;
-  mix=null;
-  try{ localStorage.setItem('hk_mix_done', mixDateStr()); }catch(e){}
-  try{ const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');   /* r363: the mix inherits the Clean Sheet feats */
-    fl.mixClears=(fl.mixClears||0)+1; localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
-    window.hkStatePush&&window.hkStatePush(); }catch(e){}
-  updateMixBtn();
-  setTimeout(()=>{ try{ showToast('\u2615 daily mix complete \u2014 same time tomorrow'); playWinFanfare(); }catch(e){} }, 600);
-}
-function updateMixBtn(){ const b=$('dailyMixBtn'); if(!b) return;
-  const done=mixDoneToday();
-  b.textContent = done ? '\u2615 mix \u2713' : '\u2615 mix';
-  b.classList.toggle('done', done); }
+/* r364 (Wolf): the Daily Mix is RETIRED — charming, but a third daily system with an
+   unexplained entry point; the retention budget goes to the Daily Challenge instead.
+   (Full implementation lives in git history at r360 if it ever earns its way back.) */
 
 /* ============================================================
    r219 (Wolf): THE DAILY CHALLENGE — the marquee mode
@@ -13864,6 +13811,25 @@ function openDailyChallenge(){
       if(mine && mine.rank>cap){ html+='<div class="dc-row me"><span class="rk">'+mine.rank+'</span><span class="nm">'+escHtml(mine.name)+' (you)</span><span class="tm">'+(mine.ms/1000).toFixed(2)+'s</span></div>'; }
     }
     bd.innerHTML=html;
+    /* r364 (Wolf: the retention budget goes to the daily): YESTERDAY'S PODIUM — the honor
+       roll under today's field. Winning the day should be seen the next day. */
+    (async()=>{ try{
+      if(!sb) return;
+      const y=new Date(Date.now()-86400e3).toISOString().slice(0,10);
+      const { data:yr } = await sb.from('runs').select('user_id,time_ms').eq('challenge','challenge-'+y)
+        .eq('mouse_used', false).order('time_ms',{ascending:true}).limit(60);
+      if(!yr || !yr.length) return;
+      const seen={}, best=[];
+      yr.forEach(r=>{ if(!seen[r.user_id]){ seen[r.user_id]=true; best.push(r); } });
+      const top=best.slice(0,3); if(!top.length) return;
+      const ids=top.map(r=>r.user_id);
+      const { data:ps } = await sb.from('profiles').select('id,handle').in('id', ids);
+      const nm={}; (ps||[]).forEach(p=>nm[p.id]=p.handle||'analyst');
+      const g=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'];
+      const line=top.map((r,i)=>g[i]+' '+escHtml(nm[r.user_id]||'analyst')+' '+(r.time_ms/1000).toFixed(2)+'s').join(' \u00b7 ');
+      const bd2=$('dcBoard'); if(bd2) bd2.insertAdjacentHTML('beforeend',
+        '<div class="dc-empty" style="color:var(--muted)">yesterday\u2019s podium \u00b7 '+line+'</div>');
+    }catch(e){} })();
   }).catch(()=>{});
 }
 function updateDailyBtn(){}   /* r363: retired with the morning sheet */
@@ -13939,7 +13905,7 @@ function loadChallenge(key, opts){
   // r158: progression gate — daily runs and armed races ride through (community
   // moments); everything else locked-tier bounces to the explainer, state untouched.
   try{
-    if(!(opts&&(opts.daily||opts.weekly||opts.challenge||opts.mix)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
+    if(!(opts&&(opts.daily||opts.weekly||opts.challenge)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
       const __gn=drillLocked(key);
       if(__gn){
         openGateInfo(__gn);
@@ -13960,7 +13926,6 @@ function loadChallenge(key, opts){
   weeklyMode = !!(opts && opts.weekly);
   challengeMode = !!(opts && opts.challenge);
   updateDailyBtn(); updateWeeklyBtn(); try{ updateChallengeBtn(); }catch(e){}
-  if(mix && !mix.rf && key!==mix.q[mix.i]){ mix=null; try{ updateMixBtn(); }catch(e){} }   /* r360: wandering off the queue quietly ends the mix */
   cur=key; const C=CHALLENGES[key];
   if(challengeMode){ _rand = mulberry32(challengeSeed()); }         // r219: same extra-hard board worldwide
   if(weeklyMode){ _rand = mulberry32(weekSeed() + weeklyIdx*7919); } // deterministic per gauntlet leg
