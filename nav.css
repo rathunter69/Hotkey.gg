@@ -15,7 +15,7 @@ body{padding-top:14px}
 
 /* ---------- TOP NAV (three sections: brand · pages · tools) ---------- */
 .topnav{width:100%; background:var(--bg); margin-bottom:30px; position:relative}
-.topnav-in{max-width:1240px; margin:0 auto; padding:0 28px; height:60px; display:flex; align-items:center; gap:18px}
+.topnav-in{max-width:1180px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:18px}   /* r355: SAME box as .wrap — the rail and the content edge used to misalign by ~26px */
 .topnav-brand{font-family:var(--mono); font-weight:700; font-size:16px; letter-spacing:-.5px; color:var(--text); text-decoration:none}
 .topnav-brand b{color:var(--accent); font-weight:700}
 .topnav-pages{display:flex; align-items:center; gap:4px; margin-left:14px}   /* Monkeytype: icons sit WITH the brand */
@@ -163,7 +163,7 @@ html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
 
 /* ---------- SITE FOOTER (shared: leaderboard, reference, legal pages) ---------- */
 .site-footer{border-top:1px solid var(--line); margin-top:64px; padding:30px 0 40px}
-.sf-in{max-width:1240px; margin:0 auto; padding:0 28px; display:flex; align-items:flex-start;
+.sf-in{max-width:1180px; margin:0 auto; padding:0 24px;   /* r355: same box as .wrap */ display:flex; align-items:flex-start;
   justify-content:space-between; gap:24px; flex-wrap:wrap}
 .sf-left{display:flex; flex-direction:column; gap:8px; max-width:520px}
 .sf-brand{font-family:var(--mono); font-weight:700; font-size:15px; letter-spacing:-.4px; color:var(--text); text-decoration:none}
@@ -172,6 +172,9 @@ html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
 .sf-links{display:flex; flex-wrap:wrap; gap:6px 18px; align-items:center}
 .sf-links a{font-family:var(--mono); font-size:12.5px; color:var(--muted); text-decoration:none; letter-spacing:.2px; transition:color .15s}
 .sf-links a:hover{color:var(--accent)}
+/* r355 (phone audit): footer/legal links were ~14-20px tall on touch — give them a real
+   tap height without changing the desktop look. */
+@media (pointer:coarse){ .sf-links a{padding:9px 2px; display:inline-block} }
 @media (max-width:640px){ .sf-in{flex-direction:column; gap:18px} }
 
 /* ---------- LEGAL / DOC PAGES (terms, privacy, security) ---------- */
@@ -334,7 +337,7 @@ html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
 .hk-pro-msg{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-align:center; min-height:15px; margin-top:8px}
 
 /* r81: beta tag on the brand — inherits the adaptive palette */
-.brand-beta{font-family:var(--mono); font-size:8.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+.brand-beta{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;   /* r355: 8.5px was below the phone readability floor */
   color:var(--accent); border:1px solid var(--accent-dim); border-radius:5px; padding:1.5px 5px;
   margin-left:8px; vertical-align:3px}
 
