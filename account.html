@@ -82,9 +82,10 @@
     padding:10px 22px; border-radius:999px; margin:4px 6px; border-bottom:1px solid var(--accent)}
   .acc-cta:hover{filter:brightness(1.08)}
   .acc-cta.ghost{background:transparent; color:var(--accent); border-color:var(--accent-dim); font-weight:500}
+  .state a.acc-cta.ghost{color:var(--accent)}   /* r355: the r297 on-accent fix out-specified the ghost variant — 'Log in' rendered white-on-light, invisible */
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
-<link rel="stylesheet" href="nav.css?v=180">
+<link rel="stylesheet" href="nav.css?v=181">
 <script src="drills.js?v=267"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -93,7 +94,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=268"></script>
+<script src="themes.js?v=269"></script>
 </head>
 <body>
 <div id="navMount"></div>

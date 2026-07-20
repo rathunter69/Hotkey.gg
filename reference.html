@@ -100,6 +100,18 @@
     border:1px solid var(--accent-dim); border-radius:999px;}
   .row:hover .practice{opacity:1; background:var(--accent-glow);}
   .practice:hover{opacity:1; background:var(--accent);color:var(--on-accent);}
+  /* r355 (phone audit): at phone widths the no-wrap rows crushed .desc to 0px (keys + practice
+     pill ate the row) and the 7-row chip toolbar went sticky at 339px tall — 40% of the screen.
+     Rows stack keys/pill above a full-width description; chips collapse to ONE horizontally
+     scrollable sticky row; practice pills grow to a real tap target. */
+  @media(max-width:520px){
+    .row{flex-wrap:wrap; row-gap:4px;}
+    .desc{flex-basis:100%; order:2;}
+    .keys{order:1;} .practice{order:1; margin-left:auto; padding:8px 12px;}
+    .chips{flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch;}
+    .chip{flex:0 0 auto; padding:8px 12px;}
+    .toolbar{padding:10px 0;}
+  }
 
   /* ---------- keycaps ---------- */
   .cap{display:inline-flex; align-items:center; justify-content:center; min-width:29px; height:29px; padding:0 9px;
@@ -118,7 +130,7 @@
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-family:var(--mono); font-size:14px; padding:50px 0;}
 </style>
 
-<link rel="stylesheet" href="nav.css?v=180">
+<link rel="stylesheet" href="nav.css?v=181">
 <script src="drills.js?v=267"></script>
 <script src="refmap.js?v=1"></script>
 <script>
@@ -129,7 +141,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'reference';
 </script>
-<script src="themes.js?v=268"></script>
+<script src="themes.js?v=269"></script>
 </head>
 <body>
 <div id="navMount"></div>
