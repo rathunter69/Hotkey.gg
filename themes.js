@@ -497,7 +497,7 @@ window.hkLevelRing = function(lvl, pct, size){
   size=size||56;
   const r=24, C=2*Math.PI*r, off=C*(1-Math.max(0,Math.min(100,pct))/100);
   return '<svg viewBox="0 0 56 56" width="'+size+'" height="'+size+'" aria-hidden="true">'+
-    '<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="var(--surface)" stroke-width="5"/>'+
+    '<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="var(--surface2)" stroke-width="5"/>'+
     '<circle cx="28" cy="28" r="'+r+'" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" '+
       'stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 28 28)">'+
       /* r85: the fitness-app sweep — SMIL animates on mount, no wiring anywhere */

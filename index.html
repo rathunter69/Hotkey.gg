@@ -885,7 +885,7 @@
   .auth-card input:focus{border-color:var(--accent-dim)}
   .auth-go{width:100%; font-family:var(--mono); font-weight:700; font-size:13px; color:var(--on-accent);
     background:var(--accent); border:none; border-radius:8px; padding:11px; cursor:pointer; transition:background .15s}
-  .auth-go:hover{background:#37b97e}
+  .auth-go:hover{filter:brightness(1.08)}   /* r356: no hardcoded greens outside themes.js */
   .auth-x{margin-top:13px; text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--faint); cursor:pointer}
   .auth-x:hover{color:var(--muted)}
   .auth-msg{font-family:var(--mono); font-size:12.5px; line-height:1.5; color:var(--accent)}
@@ -1502,7 +1502,7 @@
   .landing-cta{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
   .start-btn{font-family:var(--mono); font-size:15px; font-weight:700; color:var(--on-accent); background:var(--accent);
     border:none; border-radius:10px; padding:14px 26px; cursor:pointer; transition:.16s; display:inline-flex; align-items:center; gap:10px}
-  .start-btn:hover{background:#37b97e; box-shadow:0 10px 34px var(--accent-glow); transform:translateY(-1px)}
+  .start-btn:hover{filter:brightness(1.08); box-shadow:0 10px 34px var(--accent-glow); transform:translateY(-1px)}
   .start-btn .kbd-cta{font-family:var(--mono); font-size:13px; font-weight:600; color:var(--on-accent);
     background:rgba(6,18,12,.18); border:1px solid rgba(6,18,12,.3); border-radius:5px; padding:2px 7px; line-height:1}
   .micro-hint{display:block; margin-top:6px; color:var(--faint); font-size:11.5px}
@@ -1515,7 +1515,7 @@
   .mode-chip.pick:hover{color:var(--accent); border-color:var(--accent); background:var(--accent-glow)}
   .mode-chip.selected{color:var(--on-accent); background:var(--accent); border-color:var(--accent); font-weight:700}
   .mode-chip.selected:hover{color:var(--on-accent); background:var(--accent); border-color:var(--accent)}
-  #guestBanner{position:fixed; bottom:14px; left:50%; transform:translateX(-50%); z-index:200;
+  #guestBanner{position:fixed; bottom:14px; left:50%; transform:translateX(-50%); z-index:25;   /* r356: below the dialogs (z30) and results card (z40) — it used to cover their footers on short screens */
     background:var(--surface); border:1px solid var(--warn); border-radius:8px; padding:8px 14px;
     font-family:var(--mono); font-size:11.5px; color:var(--warn); box-shadow:0 8px 24px rgba(0,0,0,.5)}
   #guestBanner b{color:var(--text); font-weight:700}
@@ -1536,7 +1536,7 @@
 </style>
 <script src="drills.js?v=267"></script>
 <link rel="stylesheet" href="nav.css?v=181">
-<script src="themes.js?v=268"></script>
+<script src="themes.js?v=269"></script>
 
 </head>
 <body>
@@ -9592,7 +9592,9 @@ function syncTabs(){
   // r92: LEARN FROM ZERO — a genuinely new player (no runs, no PBs) gets guided ON
   // for their very first drill, with a gentle note. One time; F1 hands over control.
   try{
-    if(!localStorage.getItem('hk_learn_done')){
+    if(!localStorage.getItem('hk_learn_done') && localStorage.getItem('hotkey_onboarded')){
+      /* r356 (sweep): the one-shot used to fire on the BOOT load underneath the beta gate —
+         toast invisible, flag burned, and the post-tour handoff owned nothing. Onboarded only. */
       const fresh = !localStorage.getItem('hk_runs_lite') && Object.keys(PB||{}).length===0;
       if(fresh && !guided){ toggleGuided();
         setTimeout(()=>showToast('guided mode is on for your first run \u2014 follow the highlighted keys \u00b7 F1 turns it off'), 800); }
@@ -10041,7 +10043,7 @@ function updateChecklist(){
   let nextDone=false;
   let html=`<div class="cl-inner"><div class="cl-colhdr">\u2713</div><div class="cl-body">`+
     `<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
-  const __altFooter = guided ? '<div class="cl-alt">many chords, one sheet \u2014 the grader only checks the result. live alternates: fills <b>ctrl+r/d</b> \u21d4 <b>alt h f i r/d</b> \u00b7 autosum <b>alt+=</b> \u21d4 <b>alt h u s</b> \u00b7 paste special <b>ctrl+alt+v</b> \u21d4 <b>alt e s</b> \u00b7 rows/cols <b>ctrl+\u00b1</b> \u21d4 <b>alt h i r / h d r</b> \u00b7 plugin profiles (\u2328) add Macabacus / FactSet chords</div>' : '';
+  const __altFooter = guided ? '<div class="cl-alt">many chords, one sheet \u2014 the grader only checks the result. live alternates: fills <b>ctrl+r/d</b> \u21d4 <b>alt h f i r/d</b> \u00b7 autosum <b>alt+=</b> \u21d4 <b>alt h u s</b> \u00b7 paste special <b>ctrl+alt+v</b> \u21d4 <b>alt e s</b> \u00b7 format cells <b>ctrl+1</b> \u21d4 <b>alt o e</b> \u00b7 rows/cols <b>ctrl+\u00b1</b> \u21d4 <b>alt h i r / h d r</b> \u00b7 plugin profiles (\u2328) add Macabacus / FactSet chords</div>' : '';
   html+=`<div class="cl-bar"><div class="cl-bar-fill" style="width:${items.length?Math.round(100*n/items.length):0}%"></div></div>`;
   items.forEach((i,idx)=>{
     // The next incomplete task is ALWAYS highlighted (not just in guided mode) —
@@ -10052,6 +10054,7 @@ function updateChecklist(){
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
+  html+=__altFooter;   /* r356 (sweep): the alt-routes line was BUILT since r-old but never appended — the whole 'many chords, one sheet' promise was invisible */
   html+=`<div class="cl-esc">stuck or off the rails? <kbd>esc</kbd><kbd>esc</kbd> or <kbd>shift+f11</kbd> restarts the drill</div>`;
   el.innerHTML=html;
   try{ if(window.hkMacifyKbds) window.hkMacifyKbds(el); }catch(e){}   // r279: Mac keycap language
@@ -10073,6 +10076,9 @@ const GUIDE_ALTS=[
   [/alt<\/kbd>\+<kbd>=/i, 'alt h u s'],
   [/ctrl<\/kbd>\+<kbd>alt<\/kbd>\+<kbd>v/i, 'alt e s'],
   [/<kbd>e<\/kbd> <kbd>s<\/kbd>/i, 'ctrl+alt+v'],
+  [/ctrl<\/kbd>\+<kbd>i<\/kbd>/i, 'alt h 2'],   /* r356: engine-live since r229/r351 — the guide never said so */
+  [/ctrl<\/kbd>\+<kbd>u<\/kbd>/i, 'alt h 3'],
+  [/ctrl<\/kbd>\+<kbd>1<\/kbd>/i, 'alt o e'],
 ];
 /* r143: the plugin layer follows you into guided mode — when a profile is active,
    steps that have a live plugin chord say so (verified engine-live chords only). */
@@ -10081,8 +10087,9 @@ const PLUGIN_ALTS={
     [/ctrl<\/kbd>\+<kbd>d<\/kbd>/i, 'mcb ctrl+shift+d'],
     [/ctrl<\/kbd>\+<kbd>r<\/kbd>/i, 'mcb ctrl+shift+r'],
     [/<kbd>h<\/kbd> <kbd>f<\/kbd> <kbd>c<\/kbd>/i, 'mcb ctrl+alt+a autocolors'],
-    [/ctrl<\/kbd>\+<kbd>shift<\/kbd>\+<kbd>%/i, 'mcb cas+5'],
-    [/<kbd>h<\/kbd> <kbd>k<\/kbd>/i, 'mcb cas+1'],
+    /* r356: the cas+5 / cas+1 rows are GONE — r197 removed those bindings as phantom
+       (no such Macabacus default); the real cycles ARE Excel's Ctrl+Shift+1/4/5. */
+    [/<kbd>h<\/kbd> <kbd>k<\/kbd>/i, 'mcb ctrl+shift+1'],
     [/<kbd>e<\/kbd> <kbd>s<\/kbd>|ctrl<\/kbd>\+<kbd>alt<\/kbd>\+<kbd>v/i, 'mcb ctrl+shift+v'],
   ],
   factset:[
@@ -11269,6 +11276,13 @@ document.addEventListener('keydown',hkRawE=>{
        && S.filter && S.active.r===S.filter.hr && S.active.c>=S.filter.c1 && S.active.c<=S.filter.c2){
       startClock(); logKey('Alt+↓'); mode='sheet'; openFilterPicker(S.active.c); return;
     }
+    /* r356 (sweep): Alt+←/→ drill-switch — the tour documents it, but the bare-Alt keydown had
+       already entered ribbon mode by the time the arrow arrived (same r143/r299 dead-chord class).
+       Fresh ribbon (no path, no dialog), Alt still held → that's the drill-switch chord. */
+    if((k==='ArrowLeft'||k==='ArrowRight') && e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey
+       && !path.length && !dialog && gameMode==='classic' && !demoPlaying){
+      exitRibbon(false); k==='ArrowRight' ? nextChallenge() : prevChallenge(); return;
+    }
     // paste special: arrows cycle the options (they used to be swallowed — "arrows dead")
     if(dialog==='paste'){
       if(k==='ArrowDown'||k==='ArrowRight'){ logKey('\u2193'); const i=PASTE_OPTS.findIndex(o=>o[2]===(pasteKind||'all'));
@@ -12389,7 +12403,7 @@ function applyTheme(name){
   const t = THEMES[name] || THEMES.default;
   const root = document.documentElement;
   for(const k in t.vars) root.style.setProperty('--' + k, t.vars[k]);
-  try{ root.style.setProperty('--on-accent', window.hkOnAccent ? window.hkOnAccent(t.vars.accent||'#6ec9a0') : '#0d1013'); }catch(e){}   // r252: readable accent-button label per theme
+  try{ root.style.setProperty('--on-accent', (t.vars&&t.vars.onAccent) || (window.hkOnAccent ? window.hkOnAccent(t.vars.accent||'#6ec9a0') : '#0d1013')); }catch(e){}   /* r356 (sweep): the theme's PINNED onAccent wins (daylight pins white, r346) — this local copy recomputed via the contrast formula and painted every trainer CTA near-black-on-green while the satellite pages showed white */
   root.setAttribute('data-dark', t.dark ? '1' : '0');   // drives cell-color visibility overrides
   currentTheme = name;
   window.currentTheme = name;                                            // r220: keep the shared state in sync so...
@@ -12413,7 +12427,7 @@ function closeThemes(){ themesOpen=false; const m=$('themesModal'); if(m) m.clas
 const APP_SHORTCUTS = [
   { title:'navigating drills', rows: [
     ['\\',         'open the drill picker'],
-    ['1 – 9',      'jump straight to drill # (classic only)'],
+    ['1 – 9',      'in the drill picker: jump to that chapter folder'],
     ['Shift + F11','restart the current drill'],
   ]},
   { title:'while training', rows: [
@@ -12428,7 +12442,9 @@ const APP_SHORTCUTS = [
   ]},
   { title:'after solving', rows: [
     ['Enter',      'run it again'],
-    ['Space',      'next drill (classic)'],
+    ['n / Space',  'next drill (classic)'],
+    ['d',          'expand the details — keys · band · stalls · boards'],
+    ['v',          'on a celebration card: open your profile'],
     ['Esc',        'back to the menu'],
   ]},
   { title:'anywhere', rows: [
@@ -13828,6 +13844,7 @@ function loadChallenge(key, opts){
       if(fin){ try{ ev('wq_done',{}); }catch(e){} showToast('weakness queue cleared \u2014 the gaps got smaller'); } }
   }
   dailyMode = !!(opts && opts.daily);
+  window.__wantGuided = !!(opts && opts.guided);   /* r356: the tour-end path passes {guided:true}; honored after state resets below */
   weeklyMode = !!(opts && opts.weekly);
   challengeMode = !!(opts && opts.challenge);
   updateDailyBtn(); updateWeeklyBtn(); try{ updateChallengeBtn(); }catch(e){}
@@ -13848,6 +13865,7 @@ function loadChallenge(key, opts){
   editing=false; editBuf=''; editCaret=0; editPointer=null; editPointerStart=-1;   // r106: never inherit a stale edit from the prior drill
   mouseUsed=false; guidedUsed=false; clearInterval(tickH); undoStack=[]; redoStack=[]; keyLog=[]; keyTimes=[]; keyCells=[];
   updateGuideBtn();
+  try{ if(window.__wantGuided && !guided){ window.__wantGuided=false; toggleGuided(); } window.__wantGuided=false; }catch(e){}   /* r356: {guided:true} was dead code — the end-of-tour toast promised guided while it stayed off for non-novices */
   $('mouseBadge').style.display='none';
   $('timer').textContent='0.00'; $('timer').classList.remove('run');
   $('par').textContent=C.par+'s';
@@ -15153,7 +15171,7 @@ function startOnboardBoard(){
 const TOUR_STEPS=[
   /* r303 — the folded-in fundamentals (shown only for the "basically none" answer) */
   {sel:'.gridwrap', novice:true, cap:'this is the grid', at:'A4',
-    body:'Every cell has an address — <b style="font-family:var(--mono)">A4</b>. The highlighted box is your active cell. <b>Press an arrow key</b> to move.', doIt:{key:'ArrowRight'}},
+    body:'Every cell has an address — <b style="font-family:var(--mono)">A4</b>. The highlighted box is your active cell. <b>Press <kbd>→</kbd></b> to move.', doIt:{key:'ArrowRight'}},
   {sel:'#nameBox', novice:true, cap:'where am I?', at:'A4',
     body:'The <b>name box</b> shows your cell’s address. <b>Press <kbd>→</kbd></b> — watch it change.', doIt:{key:'ArrowRight'}},
   {sel:'.fbar', novice:true, cap:'shown vs. inside', at:'A4',
@@ -15168,7 +15186,7 @@ const TOUR_STEPS=[
   {sel:'.gridwrap', cap:'now select it', doIt:{key:'ArrowLeft',ctrl:true,shift:true}, at:'J7',
     body:'Add <kbd>shift</kbd> and it <b>selects</b> as it jumps. <b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>←</kbd></b> — select the whole row, no dragging.'},
   {sel:'.cl-inner',   cap:'your checklist', body:'Every line is one action — it turns green when done. Clear them all and the clock stops.'},
-  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list (<b>↑↓</b> move, <b>↵</b> loads). <b>Alt+←/→</b> switches drills. <b>Esc</b> never ends a run.'},
+  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list (<b>↑↓</b> move, <b>↵</b> loads). <b>Alt+←/→</b> switches drills. A single <b>Esc</b> never ends a run — <b>Esc·Esc</b> restarts the board.'},
   {sel:'#guideToggle', cap:'stuck?', body:'<b>Guided</b> (<kbd>F1</kbd>) lights up every key to press — on for your first runs. <b>Solution</b> plays the optimal keys; <b>learn</b> hands them to you one at a time.'},
   {sel:'#profileToggle', cap:'your keyboard', optional:true, body:'Your layout and shortcut profile (Excel · Macabacus · FactSet) live here — click to switch.'},
   {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor — race your own time.'},
@@ -15207,7 +15225,7 @@ function tourShow(i){
     setTimeout(()=>{
       try{ if(sandboxMode){ sandboxMode=false; loadChallenge(MENU_ORDER[0], {guided:true}); } }catch(e){}
       if(f){ try{ f(); }catch(e){} }        // f re-checks sandboxMode (won't double-load); its maybeOnboard() now no-ops via onboarded=true
-      try{ if(typeof showToast==='function') showToast('You’re set — first drill’s loaded, guided’s on. Clear the checklist · press \\ for the full list.'); }catch(e){}
+      try{ if(typeof showToast==='function') showToast(guided ? 'You’re set — first drill’s loaded, guided’s on. Clear the checklist · press \\ for the full list.' : 'You’re set — first drill’s loaded. Clear the checklist · press \\ for the full list.'); }catch(e){}
     }, 350);
     return; }
   __tourI=i;
@@ -15236,6 +15254,11 @@ function tourShow(i){
     '<div class="tour-body">'+st.body+'</div>'+
     ((st.doIt||st.entry)?'<div class="tour-body" id="tourDo" style="color:var(--accent);font-weight:600">'+cue+'</div>':'')+
     '<div class="tour-foot"><span class="tour-next" id="tourNext">'+(last?'start drilling':'next \u00b7 \u21b5')+'</span><span class="tour-skip" id="tourSkip">skip tour \u00b7 esc</span></div>';
+  /* r356 (sweep): re-place from the card's real height — the hardcoded -190 overlapped the
+     spotlight ring by ~23px on the tall gridwrap steps. */
+  try{ if(!st.full && el){ const r2=el.getBoundingClientRect();
+    const below2=r2.bottom+14+card.offsetHeight<window.innerHeight;
+    card.style.top=(below2? r2.bottom+14 : Math.max(12, r2.top-card.offsetHeight-14))+'px'; } }catch(e){}
   const nx=$('tourNext'); if(nx) nx.onclick=()=>tourShow(__tourI+1);
   const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(__tourPlan.length);
 }

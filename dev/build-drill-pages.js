@@ -230,7 +230,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
   .cta-row{display:flex; gap:12px; flex-wrap:wrap; margin:20px 0 8px; align-items:center}
   .cta{font-family:var(--mono); font-size:13px; padding:11px 22px; border-radius:999px; text-decoration:none;
     border:1px solid var(--accent-dim); color:var(--accent)}
-  .cta.solid{background:var(--accent); color:#0c0d0e; border-color:var(--accent); font-weight:700}
+  .cta.solid{background:var(--accent); color:var(--on-accent,#0c0d0e); border-color:var(--accent); font-weight:700}
   .cta:hover{background:var(--accent-glow)} .cta.solid:hover{background:var(--accent); filter:brightness(1.08)}
   .par{font-family:var(--mono); font-size:12px; color:var(--muted)}
   .section-title{font-family:var(--mono); font-size:12px; color:var(--muted); text-transform:uppercase;
@@ -302,7 +302,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
   window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
   window.NAV_ACTIVE='';
 <\/script>
-<script src="themes.js?v=267"><\/script>
+<script src="themes.js?v=269"><\/script>
 <script type="application/ld+json">${ld}</script>
 </head>
 <body>
