@@ -1530,7 +1530,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=274"></script>
+<script src="nav.js?v=275"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2763,7 +2763,7 @@ const CHALLENGES = {
         {label:'delete the "--- PAGE 2 ---" print-break row', ok: pageGone},
         {label:'delete the SUBTOTAL row — it double-counts the moment anyone totals the column', ok: subGone},
         {label:'sort the seven real deals largest-first ('+o.range+')', ok: sorted},
-        {label:'re-total the clean data — live SUM at '+o.foot+', bold', ok: !!(f&&f.formula&&/SUM/i.test(String(f.formula))&&Math.abs((f.value||0)-tot)<0.5&&f.bold)},
+        {label:'re-total the clean data — live SUM at '+o.foot+', bold', ok: !!(f&&f.formula&&sumishF(f.formula)&&Math.abs((f.value||0)-tot)<0.5&&f.bold)},
       ];
     }
   },
@@ -2886,7 +2886,7 @@ const CHALLENGES = {
       const covered=b=>gs.some(g=>g.r1===b.r1&&g.r2===b.r2);
       const folded=b=>gs.some(g=>g.r1===b.r1&&g.r2===b.r2&&g.collapsed);
       const subsOk=o.blocks.every(b=>{ const c=S.cells['B'+b.sub];
-        return !(S.hidden&&S.hidden.has(b.sub)) && !!(c&&c.formula&&/SUM/i.test(String(c.formula))&&Math.abs((c.value||0)-b.sum)<0.5); });
+        return !(S.hidden&&S.hidden.has(b.sub)) && !!(c&&c.formula&&sumishF(c.formula)&&Math.abs((c.value||0)-b.sum)<0.5); });
       return [
         {label:'group each quarter’s months — three groups, exactly the detail rows, shift+alt+→', ok: o.blocks.every(covered) && gs.length===3},
         {label:'fold all three away — alt a h; the ⊞ marks where the detail lives', ok: o.blocks.every(folded)},
@@ -3011,7 +3011,7 @@ const CHALLENGES = {
         const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
       const fixed=o.sites.every(s=>live(s.k, s.exp, [s.prev, s.g]));
       const footed=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8'];
-        return !!(c&&c.formula&&/SUM/i.test(String(c.formula))&&typeof c.value==='number'&&Math.abs(c.value-o.tot[cl])<0.5); });
+        return !!(c&&c.formula&&sumishF(c.formula)&&typeof c.value==='number'&&Math.abs(c.value-o.tot[cl])<0.5); });
       const boldOk=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8']; return !!(c&&c.bold); });
       return [
         {label:'Run F5 \u2192 Special \u2192 Constants to mark every hardcoded number', ok:(S.markN||0)>=1},
@@ -3528,7 +3528,7 @@ const CHALLENGES = {
       const labs=body.map(x=>x.lab);
       const missIn=body.find(x=>x.lab===o.missing && typeof x.val==='number' && Math.abs(x.val-o.missVal)<0.5);
       const junkGone=!labs.some(l=>/PLACEHOLDER/i.test(l));
-      const tieOk=!!(totCell && totCell.formula && /SUM/i.test(String(totCell.formula)) &&
+      const tieOk=!!(totCell && totCell.formula && sumishF(totCell.formula) &&
         typeof totCell.value==='number' && Math.abs(totCell.value-o.total)<0.5);
       const mCell=missIn ? (S.cells['B'+missIn.r]||{}) : {};
       const dressOk=!!(missIn && mCell.fmtStyle==='comma' && mCell.fontColor==='blue');
@@ -3678,12 +3678,12 @@ const CHALLENGES = {
       // FY column, filled DOWN: F5 = full-year revenue, F6:F8 = full-year costs
       const fyOk=[5,6,7,8].every(r=>{ const c=cel('F'+r);
         const want = r===5 ? feedSum : costSum(r-6);
-        return !!(c.formula && /SUM/i.test(String(c.formula)) && Math.abs((c.value||0)-want)<0.5); });
+        return !!(c.formula && sumishF(c.formula) && Math.abs((c.value||0)-want)<0.5); });
       // FOOT across, now including the FY total at F9
       const sumOk=[0,1,2,3,4].every(i=>{ const c=cel(colLetter(2+i)+9);
         const want = i<4 ? (o.feed[i]+o.costVals[0][i]+o.costVals[1][i]+o.costVals[2][i])
                          : (feedSum+costSum(0)+costSum(1)+costSum(2));
-        return !!(c.formula && /SUM/i.test(String(c.formula)) && Math.abs((c.value||0)-want)<0.5); });
+        return !!(c.formula && sumishF(c.formula) && Math.abs((c.value||0)-want)<0.5); });
       // 2D % block now spans the FY column \u2014 one mixed-anchor cell fills a 3\u00d75 grid
       const mixOk=(()=>{ for(let j=0;j<3;j++) for(let i=0;i<5;i++){
         const c=cel(colLetter(2+i)+(11+j));
@@ -3933,7 +3933,7 @@ const CHALLENGES = {
     },
     checks(S){
       const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:NaN; };
-      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&/SUM/i.test(String(c.formula))); };
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&sumishF(c.formula)); };
       const rowOk=r=>live('F'+r)&&Math.abs(val('F'+r)-(val('B'+r)+val('C'+r)+val('D'+r)+val('E'+r)))<1e-6;
       const colOk=cc=>{ const L2=colLetter(cc); return live(L2+'6')&&Math.abs(val(L2+'6')-(val(L2+'2')+val(L2+'3')+val(L2+'4')+val(L2+'5')))<1e-6; };
       return [
@@ -7293,7 +7293,7 @@ const CHALLENGES = {
       const anchOk=f.includes('SUMIFS')&&f.includes('$C$3:$C$11')&&f.includes('$F3')&&f.includes('G$2');
       const gridOk=['G3','H3','G4','H4'].every(k=>live(k,o.grid[k]));
       const feetOk=['G5','H5'].every(k=>{ const c=S.cells[k];
-        return live(k,o.feet[k]) && /SUM/i.test(String(c.formula)); });
+        return live(k,o.feet[k]) && sumishF(c.formula); });
       const dressOk=['F5','G5','H5'].every(k=>{ const c=S.cells[k]; return !!(c&&c.bold&&c.bt); });
       return [
         {label:'build ONE SUMIFS at G3 \u2014 ranges $-locked, $F3 column-locked, G$2 row-locked', ok: anchOk&&live('G3',o.grid.G3)},
@@ -8329,9 +8329,12 @@ function render(){
   const g=$('grid'); g.innerHTML='';
   const sr=selRange();
   const gt=currentTargetRange();
-  // r330 (Wolf): in a guided hard-rail drill the cursor is fenced to the lit target, so dim
-  // everything OUTSIDE it — the playable zone reads at a glance and the fence looks deliberate.
-  const hardRail = !!(guided && gt && typeof hardRailSafe==='function' && CHALLENGES[cur] && hardRailSafe(CHALLENGES[cur]) && !editing && !demoPlaying);
+  // r330/r350 (Wolf): in a guided drill the cursor is fenced to the drill's working area
+  // (S._railZone), so dim everything OUTSIDE the ZONE — the playable area reads at a glance.
+  // Cells inside the zone but outside the current step's target stay live: that's where
+  // alternate routes (copy a finished formula forward, revisit a source) happen.
+  const __rz = (guided && !editing && !demoPlaying && S._railZone &&
+    CHALLENGES[cur] && typeof railSafe==='function' && railSafe(CHALLENGES[cur])) ? S._railZone : null;
   // r331 (Wolf): the nav maze's blue dots all looked alike — a new user couldn't tell which
   // stop was NEXT or that they had to LAND on it. Classify each marker by progress so the trail
   // reads: visited dots fade back, the next stop is a pulsing accent bullseye, future dots stay quiet.
@@ -8378,7 +8381,7 @@ function render(){
         // r329: the target draws as ONE outer frame around the whole zone (the paste footprint),
         // not a box per cell — tag the range's edge cells so the border rides the perimeter.
         if(r===gt.r1)cls.push('gt-t'); if(r===gt.r2)cls.push('gt-b'); if(c===gt.c1)cls.push('gt-l'); if(c===gt.c2)cls.push('gt-r'); }
-      else if(hardRail) cls.push('goff');   // r330: outside the fenced target zone — dim it
+      else if(__rz && !(r>=__rz.r1&&r<=__rz.r2&&c>=__rz.c1&&c<=__rz.c2)) cls.push('goff');   // r350: outside the fenced working area — dim it
       if(__navPath){ for(let i=0;i<__navPath.length;i++){ if(__navPath[i].r===r&&__navPath[i].c===c){
         cls.push('navmark');
         if(__navNext===-1 || i<__navNext) cls.push('navmark-done');   // visited — fade back
@@ -9014,7 +9017,8 @@ function checkWin(){
   if(!gradePass()) return;
   const t=(performance.now()-started)/1000;
   stopClock(); done=true; $('timer').textContent=t.toFixed(2);
-  if(marathon && marathon.active){ sessionSolved(t); return; }
+  if(marathon && marathon.active){ try{ playSuccessBlip(1); }catch(e){} sessionSolved(t); return; }   /* r349: marathon solves get the quick blip — the session keeps its pace */
+  try{ playWinFanfare(); }catch(e){}   /* r349: a classic win is a MOMENT — the fanfare lands with the results card */
   const C=CHALLENGES[cur];
   let pb=false;
   const sk=scoreKey();
@@ -9619,6 +9623,12 @@ function recalc(){
     if(!changed) break;
   }
 }
+/* r350 (Wolf): totals grade the RESULT, not the chord that built them. Every total check pairs
+   this with an exact value assertion — this only decides whether the cell is a LIVE build:
+   =SUM(range), an addition chain (=C3+C4+…), or a copied/filled variant all count; a hardcode
+   dressed as a formula (=4470) or a single cross-link (=B8) does not. */
+function sumishF(f){ if(!f) return false; const s=String(f).toUpperCase();
+  return /SUM/.test(s) || ((s.match(/[A-J]\$?\d+/g)||[]).length>=2); }
 /* r318 (Wolf) — GUIDED ON RAILS. In guided mode, place the cursor on the current step's target
    as each step is cleared, so a beginner always starts the next action in the right spot. Two hard
    safety rails so it can NEVER break a drill:
@@ -9651,29 +9661,49 @@ function railToTarget(){
   S.active={r:gt.r1, c:gt.c1}; S.sel=null;
   return true;
 }
-/* r330 (Wolf): HARD rails. The dim-everything-but-the-target visual promised that the lit
-   zone was the ONLY place you could act — but the cursor could still wander off it. Now, in a
-   guided IN-PLACE drill, plain and Ctrl arrows physically can't leave the target rectangle:
-   "you literally can't move out of that area unless you're doing the right action to progress."
-   Two escape valves keep every drill solvable:
-     • shift (building a selection) is never fought — Excel-true range gestures still work.
-     • drills that copy from a DISTANT source (paste-special, block copy) fall back to SOFT rails,
-       because clamping to the paste destination would trap you away from the source. */
-function hardRailSafe(C){
-  if(C._hardRail!==undefined) return C._hardRail;
-  if(!railSafe(C)){ C._hardRail=false; return false; }
-  try{ C._hardRail = !/clipboard|\bcopy\b|\bpaste\b|\bcut\b|ctrl\+c|ctrl\+v/i.test(String(C.checks)+String(C.targets)); }
-  catch(e){ C._hardRail=false; }
-  return C._hardRail;
+/* r330 (Wolf): HARD rails — the cursor physically can't leave the fenced zone in guided mode.
+   r350 REWORK (Wolf: "it's still not restricting the user to the given area but also isn't
+   incorporating alternative ways to solve"): the r330 fence was the CURRENT STEP's target
+   rectangle, which broke both ways at once —
+     · too tight: you couldn't walk back to a formula you'd already built to copy it forward
+       (every alternate route — copy-right, paste cell-to-next — needs the finished work), and
+     · too loose: clipboard drills dropped the fence entirely (the source sat outside the
+       step target), so exactly the drills with the most wandering had no rails at all.
+   The fence is now the DRILL'S WHOLE WORKING AREA, computed once per board: the bounding box
+   of every graded target (all steps), every seeded cell (copy sources and tables live there),
+   and every cell the scripted solution touches (helper cells). Inside it, movement is free —
+   alternates, revisits, any order. Outside it is off the table. Escape valves unchanged:
+   shift-selections are never fought, and cursor-graded drills (railSafe) have no rails. */
+function railZoneCompute(){
+  try{
+    S._railZone=null;
+    const C=CHALLENGES[cur]; if(!C || sandboxMode || !railSafe(C)) return;
+    let r1=Infinity,c1=Infinity,r2=-1,c2=-1;
+    const eat=rr=>{ if(!rr) return; r1=Math.min(r1,rr.r1); c1=Math.min(c1,rr.c1); r2=Math.max(r2,rr.r2); c2=Math.max(c2,rr.c2); };
+    try{ const T2=(typeof C.targets==='function')?C.targets.call(C):C.targets;
+      (T2||[]).forEach(t=>{ try{ if(typeof t==='function') t=t.call(C); eat(resolveRange(t)); }catch(e){} }); }catch(e){}
+    for(const k in S.cells){ try{ eat(resolveRange(k)); }catch(e){} }
+    try{ const mv=(typeof C.demo==='function')?C.demo.call(C):C.demo;
+      (mv||[]).forEach(m2=>{ try{ eat(resolveRange(m2.sel)); }catch(e){} }); }catch(e){}
+    if(r2<0) return;
+    /* r2 is NOT clamped to S.ROWS: growth drills (isbuild, cfslink) grade targets below the
+       load-time frame — rows the player creates by inserting. Movement is already bounded by
+       the live sheet, so a fence that anticipates the growth is correct, not loose. */
+    S._railZone={r1:Math.max(1,r1), c1:Math.max(1,c1), r2:r2, c2:Math.min(COLS,c2)};
+  }catch(e){ S._railZone=null; }
 }
 function railClamp(nr,nc){
   if(!guided || demoPlaying || echoOn || editing || done || sandboxMode || !S) return null;
   if(S.sel) return null;                          // mid-selection — let the range gesture run free
-  const C=CHALLENGES[cur]; if(!C || !hardRailSafe(C)) return null;
-  const gt=currentTargetRange(); if(!gt) return null;
-  return { r:Math.min(gt.r2,Math.max(gt.r1,nr)), c:Math.min(gt.c2,Math.max(gt.c1,nc)) };
+  const C=CHALLENGES[cur]; if(!C || !railSafe(C)) return null;
+  const z=S._railZone; if(!z) return null;
+  return { r:Math.min(z.r2,Math.max(z.r1,nr)), c:Math.min(z.c2,Math.max(z.c1,nc)) };
 }
-function commitAction(){ recalc(); if(typeof S!=='undefined' && S && S.markCrit) syncMarks(); render(); checkWin(); if(railToTarget()) render(); }
+function commitAction(){ recalc();
+  /* r350: structural ops (row/col insert-delete) shift the working area after load — the fence
+     follows the content so a guided rowops drill can't strand its own bottom row outside it. */
+  try{ if(S && S._railZone) railZoneCompute(); }catch(e){}
+  if(typeof S!=='undefined' && S && S.markCrit) syncMarks(); render(); checkWin(); if(railToTarget()) render(); }
 
 function translateFormula(f, dr, dc){
   /* r154 EXCEL PARITY: rows clamped at the STATIC ROWS_MAX (14) even when the live
@@ -9822,6 +9852,7 @@ function commitEdit(dr,dc){
     if(!__ok){
       try{ const td=document.querySelector('td.editing'); if(td){ td.classList.remove('fx-badformula'); void td.offsetWidth; td.classList.add('fx-badformula'); } }catch(e){}
       try{ showToast('There\u2019s a problem with this formula \u2014 fix it or press esc to discard'); }catch(e){}
+      try{ playErrThud(); }catch(e){}   /* r349: the refusal is audible too \u2014 shake + toast + thud, one beat */
       logKey('\u26a0');
       return;   // still editing — buffer and caret untouched
     }
@@ -9990,6 +10021,12 @@ function updateChecklist(){
   const C=CHALLENGES[cur];
   const items=C.checks(S);
   const n=items.filter(i=>i.ok).length;
+  /* r349: the objective ding — a checklist item just flipped to done in a LIVE run. Baselined
+     per board (S._sndOkN) so loading a half-done layout never chirps; the final item stays
+     silent here because checkWin's fanfare owns that beat. */
+  if(running && !done && !demoPlaying && !echoOn && gameMode!=='rapidfire' &&
+     S._sndOkN!==undefined && n>S._sndOkN && n<items.length){ try{ playObjectiveDing(); }catch(e){} }
+  S._sndOkN=n;
   let nextDone=false;
   let html=`<div class="cl-inner"><div class="cl-colhdr">\u2713</div><div class="cl-body">`+
     `<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
@@ -11387,7 +11424,9 @@ document.addEventListener('keydown',hkRawE=>{
     const ctrl = e.ctrlKey||e.metaKey;
     logKey(ctrl ? (e.shiftKey?'Ctrl+Shift+Home':'Ctrl+Home') : (e.shiftKey?'Shift+Home':'Home'));
     if(e.shiftKey){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; } else S.sel = null;
-    S.active = ctrl ? {r:1, c:1} : {r:S.active.r, c:1};
+    let __hd = ctrl ? {r:1, c:1} : {r:S.active.r, c:1};
+    if(!e.shiftKey){ const cl=railClamp(__hd.r,__hd.c); if(cl) __hd=cl; }   /* r350: the rails hold on Home/Ctrl+Home too — arrows-only was an open gate */
+    S.active = __hd;
     render(); commitAction(); return;
   }
   if(k==='End' && (e.ctrlKey||e.metaKey)){
@@ -11395,7 +11434,9 @@ document.addEventListener('keydown',hkRawE=>{
     logKey(e.shiftKey?'Ctrl+Shift+End':'Ctrl+End');
     const u = usedRange();
     if(e.shiftKey){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; } else S.sel = null;
-    S.active = {r:u.r, c:u.c};
+    let __ed = {r:u.r, c:u.c};
+    if(!e.shiftKey){ const cl=railClamp(__ed.r,__ed.c); if(cl) __ed=cl; }   /* r350 */
+    S.active = __ed;
     render(); commitAction(); return;
   }
 
@@ -11789,7 +11830,7 @@ const RFM = {
   //   'no'      — unrelated keystroke (dispatcher checks other ops)
   // Tokens are lowercased event.key strings: 'h', 'enter', 'arrowright', etc. Handles both
   // Excel patterns: holding Alt while typing AND tap-Alt-then-type.
-  altSeq: (tokens) => () => {
+  altSeq: (tokens) => { const factory = () => {
     const seq = tokens.map(s=>s.toLowerCase());
     let pos = 0;          // next letter index expected
     let altLatched = false;
@@ -11813,6 +11854,28 @@ const RFM = {
       // wrong key mid-sequence — reset state but report 'no' so dispatcher can check chord ops
       pos = 0; altLatched = false;
       return 'no';
+    };
+  };
+  /* r351: the tokens ride on the factory so the dispatcher's ribbon-walk path check can
+     compare the VISIBLE walked path against each solution (typo recovery after a reset). */
+  factory.tokens = tokens.map(s=>s.toLowerCase());
+  return factory; },
+  /* r351: chord-then-keys sequences — Ctrl+Alt+V (Paste Special dialog) then V then Enter is a
+     fully legit paste-values route; the plain altSeq can't express a chord opener. Fresh state
+     per task, same 'match'/'partial'/'no' contract. */
+  chordSeq: (chord, tokens) => () => {
+    const seq = tokens.map(s=>s.toLowerCase());
+    let pos = -1;   // -1 = waiting for the opening chord
+    return (e) => {
+      const k = e.key;
+      if(k==='Control'||k==='Shift'||k==='Meta'||k==='Alt') return pos>=0 ? 'partial' : 'no';
+      if(pos < 0){ if(chord(e)){ pos = 0; return 'partial'; } return 'no'; }
+      if(!e.ctrlKey && !e.metaKey && !e.altKey && k.toLowerCase()===seq[pos]){
+        pos++;
+        if(pos===seq.length){ pos=-1; return 'match'; }
+        return 'partial';
+      }
+      pos = -1; return 'no';
     };
   },
 };
@@ -11851,7 +11914,8 @@ const RF_OPS = [
     show: c=>({text:c.text}), solved: c=>({text:c.text.replace(' \u2014 cut off\u2026','')}) },
   { op:'paste_vals_es', label:'Paste values', keys:['Alt','E','S','V','\u21b5'], matchSeq: RFM.altSeq(['e','s','v','enter']),
     match: e=> keyProfile==='macabacus'&&e.ctrlKey&&e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='v',   // r143
-    alts:[ { keys:['Alt','H','V','V'], matchSeq: RFM.altSeq(['h','v','v']) } ],   /* r301 */
+    alts:[ { keys:['Alt','H','V','V'], matchSeq: RFM.altSeq(['h','v','v']) },   /* r301 */
+           { keys:['Ctrl','Alt','V','V','\u21b5'], matchSeq: RFM.chordSeq(e=>(e.ctrlKey||e.metaKey)&&e.altKey&&!e.shiftKey&&e.key.toLowerCase()==='v', ['v','enter']) } ],   /* r351 */
     make: ()=> ({text:String(rfBig())}),
     instr: ()=>'Clipboard\u2019s loaded \u2014 paste VALUES only',
     show: c=>({text:''}), solved: c=>({text:c.text}) },
@@ -11863,11 +11927,13 @@ const RF_OPS = [
     show: c=>({text:c.text, bold:c.bold}),
     solved: c=>({text:c.text, bold:!c.bold}) },
   { op:'italic', label:'Italic', keys:['Ctrl','I'], match: RFM.ctrl('i'),
+    alts:[ { keys:['Alt','H','2'], matchSeq: RFM.altSeq(['h','2']) } ],   /* r351 (Wolf): every legit route counts — engine-live Alt H 2 */
     make: ()=> ({text:pickHeader(), italic:Math.random()<.3}),
     instr: c=> c.italic?'Remove the italic':'Italicize this',
     show: c=>({text:c.text, italic:c.italic}),
     solved: c=>({text:c.text, italic:!c.italic}) },
   { op:'underline', label:'Underline', keys:['Ctrl','U'], match: RFM.ctrl('u'),
+    alts:[ { keys:['Alt','H','3'], matchSeq: RFM.altSeq(['h','3']) } ],   /* r351: engine-live Alt H 3 */
     make: ()=> ({text:pickHeader(), underline:Math.random()<.3}),
     instr: c=> c.underline?'Remove the underline':'Underline this',
     show: c=>({text:c.text, underline:c.underline}),
@@ -11954,6 +12020,7 @@ const RF_OPS = [
   // Filter activation — pure muscle-memory drill for Ctrl+Shift+L. No filter engine; the ▼ caret
   // on solve signals "filter dropdown now available" the same way Excel's header changes after activation.
   { op:'filter', label:'Filter', keys:['Ctrl','Shift','L'], match: RFM.ctrlShift('L','l'),
+    alts:[ { keys:['Alt','A','T'], matchSeq: RFM.altSeq(['a','t']) } ],   /* r351: the Data-tab route (engine-live Alt A T) */
     make: ()=> ({text:pickHeader()}),
     instr: ()=>'Activate filter on this column',
     show: c=>({text:c.text, bold:true}),
@@ -11999,6 +12066,8 @@ const RF_OPS = [
 
   // — MULTI-CELL OPS (the card renders adjacent context cells) —
   { op:'autosum', label:'AutoSum', keys:['Alt','='], match: RFM.alt('='),
+    alts:[ { keys:['Alt','H','U','S'], matchSeq: RFM.altSeq(['h','u','s']) },
+           { keys:['Alt','M','U','S'], matchSeq: RFM.altSeq(['m','u','s']) } ],   /* r351: both ribbon AutoSum routes are engine-live */
     make: ()=> { const n = 3 + Math.floor(Math.random()*2); const vals=Array(n).fill(0).map(()=>rfMid()); return {vals, n}; },
     instr: ()=>'AutoSum the column',
     show: c=>({layout:'column', context:c.vals.map(v=>v.toLocaleString('en-US')), text:''}),
@@ -12006,12 +12075,14 @@ const RF_OPS = [
                  text:`=SUM(B2:B${1+c.n})`, fx:true}) },
   { op:'fill_down', label:'Fill down', keys:['Ctrl','D'],
     match: e=> RFM.ctrl('d')(e) || (keyProfile==='factset'&&e.ctrlKey&&e.altKey&&e.shiftKey&&e.key.toLowerCase()==='d'),
+    alts:[ { keys:['Alt','H','F','I','D'], matchSeq: RFM.altSeq(['h','f','i','d']) } ],   /* r351: the Fill-submenu route (engine-live) */
     make: ()=> ({val:rfBig().toLocaleString('en-US')}),
     instr: ()=>'Fill the value down',
     show: c=>({layout:'column', context:[c.val], text:''}),
     solved: c=>({layout:'column', context:[c.val], text:c.val}) },
   { op:'fill_right', label:'Fill right', keys:['Ctrl','R'],
     match: e=> RFM.ctrl('r')(e) || (keyProfile==='macabacus'&&e.ctrlKey&&e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='r') || (keyProfile==='factset'&&e.ctrlKey&&e.altKey&&e.shiftKey&&e.key.toLowerCase()==='k'),
+    alts:[ { keys:['Alt','H','F','I','R'], matchSeq: RFM.altSeq(['h','f','i','r']) } ],   /* r351 */
     make: ()=> ({val:rfBig().toLocaleString('en-US')}),
     instr: ()=>'Fill the value right',
     show: c=>({layout:'row', context:[c.val], text:''}),
@@ -12074,6 +12145,7 @@ const RF_OPS = [
     show: ()=>({text:''}),
     solved: ()=>({text:'Go To  \u2192'}) },
   { op:'format_cells', label:'Format cells', keys:['Ctrl','1'], match: RFM.ctrl('1'),
+    alts:[ { keys:['Alt','O','E'], matchSeq: RFM.altSeq(['o','e']) } ],   /* r351: the legacy menu route (engine-live Alt O E) */
     make: ()=> ({}),
     instr: ()=>'Open Format Cells',
     show: ()=>({text:''}),
@@ -12126,13 +12198,15 @@ const RF_OPS = [
 
   // — CLIPBOARD —
   { op:'copy', label:'Copy', keys:['Ctrl','C'], match: RFM.ctrl('c'),
+    alts:[ { keys:['Ctrl','Ins'], match: e=>(e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&e.key==='Insert' } ],   /* r351: Ctrl+Insert, the old-guard copy */
     make: ()=> ({text:pickHeader()}),
     instr: ()=>'Copy this cell',
     show: c=>({text:c.text}),
     solved: c=>({text:c.text+'  \u2713', italic:true}) },
   // Paste values — the most-used paste-special variant in banking models (kills the formula, keeps the number).
   { op:'paste_values', label:'Paste values', keys:['Alt','H','V','V'], matchSeq: RFM.altSeq(['h','v','v']),
-    alts:[ { keys:['Alt','E','S','V','\u21b5'], matchSeq: RFM.altSeq(['e','s','v','enter']) } ],   /* r301 */
+    alts:[ { keys:['Alt','E','S','V','\u21b5'], matchSeq: RFM.altSeq(['e','s','v','enter']) },   /* r301 */
+           { keys:['Ctrl','Alt','V','V','\u21b5'], matchSeq: RFM.chordSeq(e=>(e.ctrlKey||e.metaKey)&&e.altKey&&!e.shiftKey&&e.key.toLowerCase()==='v', ['v','enter']) } ],   /* r351: the Paste Special dialog chord */
     make: ()=> { const ref=rfFormulaRef(); const v=rfBig(); return {ref, formula:'='+ref+'*1.05', val:v.toLocaleString('en-US')}; },
     instr: ()=>'Paste as values only',
     show: c=>({text:c.formula, fx:true}),
@@ -12165,7 +12239,7 @@ const RF_CAT = {
   save:'workflow', new_sheet:'workflow', freeze_panes:'workflow',
 };
 const rfMid = () => Math.floor(Math.random()*900) + 100;     // 100–999, fits cleanly in a mini cell
-let rfBusy=false;
+let rfBusy=false, rfBusyAt=0;   /* r351: rfBusyAt anchors the dead-session watchdog in rapidKey */
 let hardoMode=false;
 async function loadHardo(){ const v = await KV.get('hotkey_hardo'); if(v==='1') hardoMode = true; }
 function saveHardo(){ KV.set('hotkey_hardo', hardoMode?'1':'0'); }
@@ -12225,6 +12299,40 @@ function playSuccessBlip(tier){
   tone(1175 * pitch, 0.06, 0.11, 0.14);   // overlapping fourth — chord-feel, not melody
   if(t === 4){ tone(440 * pitch, 0, 0.18, 0.10); }  // tier-4 bass octave below the main note → "you're cooking" feel
 }
+
+/* r349 (Wolf): sound leaves rapid-fire-only duty — the MAIN loop carries the dopamine now.
+   Three cues in the same synthesized family as the blip (short sines, never abrasive, all
+   gated on the one soundOn toggle):
+     · objective ding — a checklist item flips to done mid-run
+     · win fanfare  — the drill completes (three-note rise + a low fifth under the landing)
+     · error thud   — a refused action (bad formula commit, rapid-fire miss): low, short, "no" */
+function __sTone(freq, start, dur, gain, type){
+  const ctx=audioCtx(); if(!ctx) return;
+  if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
+  const t0=ctx.currentTime;
+  const osc=ctx.createOscillator(); const g=ctx.createGain();
+  osc.type=type||'sine'; osc.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001, t0+start);
+  g.gain.exponentialRampToValueAtTime(gain, t0+start+0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+start+dur);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(t0+start); osc.stop(t0+start+dur+0.02);
+}
+function playObjectiveDing(){ if(!soundOn) return; try{
+  const b = soundPack==='arcade' ? 1.19 : 1;
+  __sTone(1046*b, 0, 0.09, 0.13);
+}catch(e){} }
+function playWinFanfare(){ if(!soundOn) return; try{
+  const b = soundPack==='arcade' ? 1.12 : 1;
+  __sTone(660*b,  0,    0.12, 0.15);
+  __sTone(880*b,  0.09, 0.12, 0.15);
+  __sTone(1175*b, 0.18, 0.22, 0.16);
+  __sTone(587*b,  0.18, 0.26, 0.08);   // low fifth under the last note — the "landed" weight
+}catch(e){} }
+function playErrThud(){ if(!soundOn) return; try{
+  __sTone(196, 0,    0.10, 0.20);
+  __sTone(147, 0.05, 0.12, 0.16);
+}catch(e){} }
 
 // Streak tier: 0 = hidden, 1-5 are visible escalation levels.
 // Thresholds: 0-2 hidden, 3-4 t1, 5-9 t2, 10-14 t3, 15-19 t4, 20+ t5.
@@ -12375,6 +12483,7 @@ function loadRapidCard(){
     keys: s.keys,
     type: s.matchSeq ? 'seq' : 'chord',
     test: s.matchSeq ? s.matchSeq() : s.match,
+    tokens: (s.matchSeq && s.matchSeq.tokens) || null,   /* r351: for the ribbon-walk path check */
   }));
   /* r293: the task lives in the REAL sheet now. Column layouts pin to B2.. so the
      ops' hardcoded formula text (=SUM(B2:Bn)) points at the actual staged cells. */
@@ -12388,7 +12497,8 @@ function loadRapidCard(){
                               raw chord recall, not find-the-cell. (Layout tasks stay B2-anchored.) */
   rfTask={ def:op, op:op.op, label:op.label, keys:op.keys, data, matchers,
     cell, cellLabel: colLetter(cell.c)+cell.r, shownAt:performance.now() };
-  rfBusy=false; renderRfCard('show');
+  rfBusy=false;
+  try{ renderRfCard('show'); }catch(e){}   /* r351: a paint error must never strand the deal — inputs stay live, skip still works */
 }
 /* r293 REBUILD (Wolf): rapid-fire renders in the REAL grid. Each task stages its
    pre-state into actual sheet cells; the solve writes the post-state so the chord
@@ -12486,9 +12596,10 @@ function rfEchoStep(k){
     const lk=String(k).toLowerCase();
     if(/^[a-z0-9]$/.test(lk)){
       const cand=rfEchoPath.concat(lk.toUpperCase());
-      const key=cand.join('');
-      if(MENUS[key]!==undefined || rfEchoPath.length){ rfEchoPath.push(lk.toUpperCase()); path=rfEchoPath; }
-      drawRibbon();
+      /* r351: only walk into REAL menus — a command letter (or a dead key) leaves the current
+         menu on screen instead of pushing the path onto a key MENUS doesn't know (which drew
+         a blank strip and read as "the ribbon stopped expanding"). */
+      if(MENUS[cand.join('')]!==undefined){ rfEchoPath.push(lk.toUpperCase()); path=rfEchoPath; drawRibbon(); }
     }
   }catch(e){}
 }
@@ -12496,13 +12607,19 @@ function rfEchoReset(){ try{ if(mode==='ribbon'){ mode='sheet'; path=[]; dialog=
 function rapidKey(e){
   const k=e.key;
   if(resultsChainKeys){ resultsChainKeys(e); if(e.defaultPrevented) return; }
-  if(k==='Escape'){ e.preventDefault(); return; }
+  if(k==='Escape'){ e.preventDefault(); rfEchoReset(); return; }   /* r351: Esc closes the echo ribbon — it used to freeze open */
   // Keys that browsers love to steal — Alt+Home (homepage), Ctrl+Home (scroll-to-top in some configs),
   // Ctrl+T (new tab), F5 (refresh), etc. Block defaults for ANY modifier-plus-key, navigation key, or function
   // key inside rapid-fire — the session has full keyboard ownership regardless of whether it matches an op.
   const couldHijack = e.ctrlKey || e.altKey || e.metaKey ||
     k==='Home' || k==='End' || k==='PageUp' || k==='PageDown' || k==='Tab' || /^F\d+$/.test(k);
-  if(rfBusy || !rfTask){ if(couldHijack) e.preventDefault(); return; }
+  if(rfBusy || !rfTask){
+    /* r351 WATCHDOG (Wolf: "mid run and no longer can give any inputs"): if a solve set rfBusy
+       but its advance timer never fired (an exception anywhere in the pipeline), every keystroke
+       lands here forever. Past the advance window + grace, self-heal into the next task. */
+    if(rfBusy && rfTask && marathon && marathon.active && rfBusyAt &&
+       performance.now()-rfBusyAt > (marathon.advance||650)+1500){ rfBusy=false; loadNext(); }
+    if(couldHijack) e.preventDefault(); return; }
   if(couldHijack) e.preventDefault();
   // first-keystroke timer kick — any matched/partial keystroke counts as session start
   const kickTimer = () => { if(marathon && marathon.active && !marathon.endAt){ marathon.startAt=performance.now(); marathon.endAt=marathon.startAt+marathon.dur*1000; } };
@@ -12516,7 +12633,25 @@ function rapidKey(e){
     if(res === 'partial') sawPartial = true;
   }
   if(sawPartial){ e.preventDefault(); kickTimer(); rfEchoStep(k); return; }
-  rfEchoReset();   // any non-sequence keystroke ends the walk — the strip goes back to rest
+  /* r351 (Wolf: "mid-run the ribbon stops expanding"): the echo used to open ONLY while the
+     current task's own sequence matcher said 'partial' — on chord-only tasks (half the deck)
+     Alt did nothing, and one detour letter slammed the strip shut. Excel-true now: Alt ALWAYS
+     opens KeyTips, and letters walk whatever real menu they name, task-independent. Scoring
+     stays with the matchers; a walk that lands exactly on a solution path still solves via the
+     path check below (typo recovery — the matchers reset on a wrong letter, but the visible
+     path is the truth of what was walked). */
+  if(k==='Alt'){ e.preventDefault(); rfEchoStep('Alt'); return; }
+  if(mode==='ribbon' && !e.ctrlKey && !e.metaKey && !e.altKey && /^[a-zA-Z0-9]$/.test(k)){
+    e.preventDefault(); kickTimer();
+    const cand=rfEchoPath.map(x=>x.toLowerCase()); cand.push(k.toLowerCase());
+    for(const m of rfTask.matchers){
+      if(m.type!=='seq' || !m.tokens) continue;
+      if(m.tokens.length===cand.length && m.tokens.every((x,i)=>x===cand[i])){ rfEchoReset(); rfSolve(m); return; }
+    }
+    rfEchoStep(k);
+    return;   // letters inside a ribbon walk are menu navigation, never chord misses
+  }
+  rfEchoReset();   // a chord (or non-letter) ends the walk — the strip goes back to rest
   // 's' (bare, no modifiers) skips the current task — same convention as marathon's drill skip.
   // r293: checked AFTER the sequence matchers so the S inside a ribbon walk (tap-Alt
   // E S V ↵ = legacy paste-values) advances the sequence instead of skipping the task.
@@ -12543,7 +12678,7 @@ function rapidKey(e){
   rfMiss();
 }
 function rfSolve(matched){
-  rfBusy=true;
+  rfBusy=true; rfBusyAt=performance.now();   /* r351: watchdog anchor — if the advance path dies, rapidKey self-heals */
   const t=(performance.now()-rfTask.shownAt)/1000;
   // par = keys.length of the solution path the user actually took (chord vs ribbon may differ in length)
   const par=(matched && matched.keys ? matched.keys.length : rfTask.keys.length);
@@ -12553,17 +12688,18 @@ function rfSolve(matched){
   marathon.streak = (marathon.streak||0) + 1;
   if(marathon.streak > (marathon.bestStreak||0)) marathon.bestStreak = marathon.streak;
   const tier = streakTier(marathon.streak);
-  updateStreakUI(marathon.streak);
-  renderRfCard('solved'); updateMarathonHud();
-  // dopamine: sound (tier-shifted). The real-cell accent flash is wired in rfPaintView('solved').
-  playSuccessBlip(tier);
+  /* r351 (Wolf: "mid run and no longer can give any inputs"): a paint error here used to
+     strand the session — rfBusy stayed true and the advance timer was never scheduled. The
+     solve pipeline is now fail-open: paint/HUD/sound are best-effort, the advance ALWAYS runs. */
+  try{ updateStreakUI(marathon.streak); renderRfCard('solved'); updateMarathonHud(); playSuccessBlip(tier); }catch(e){}
   if(marathon.endAt && performance.now() >= marathon.endAt){ setTimeout(endSession, marathon.advance); return; }
-  setTimeout(()=>{ if(marathon && marathon.active) loadNext(); }, marathon.advance);
+  setTimeout(()=>{ try{ if(marathon && marathon.active) loadNext(); }catch(e){ rfBusy=false; } }, marathon.advance);
 }
 function rfMiss(){
   marathon.misses+=1;
   try{ if(rfTask){ (marathon.missedOps=marathon.missedOps||{})[rfTask.op]=(marathon.missedOps[rfTask.op]||0)+1; } }catch(e){}
   marathon.streak = 0;            // streak breaks immediately on a miss
+  try{ playErrThud(); }catch(e){}   /* r349: the miss is audible — pairs with the keycap shake */
   updateStreakUI(0);              // hide the counter so the user sees+hears the reset together
   const keys=$('rfKeys'); if(keys){ keys.classList.remove('miss'); void keys.offsetWidth; keys.classList.add('miss'); }
 }
@@ -12692,6 +12828,7 @@ function sessionSolved(t){
 function endSession(){
   if(!marathon) return;
   marathon.active=false;
+  try{ rfEchoReset(); }catch(e){}   /* r351: never carry a half-open echo ribbon (mode='ribbon') into the summary/classic */
   clearInterval(marathon.tickH); clearInterval(tickH); running=false;
   $('timer').classList.remove('run');
   marathon.elapsed = marathon.startAt ? Math.min((performance.now()-marathon.startAt)/1000, marathon.dur) : 0;
@@ -12706,6 +12843,7 @@ function endSession(){
 }
 function exitSession(){
   if(marathon){ clearInterval(marathon.tickH); }
+  try{ rfEchoReset(); }catch(e){}   /* r351: same guard on the exit path */
   marathon=null; rfTask=null; gameMode='classic';
   document.body.classList.remove('session');
   document.body.classList.remove('rapidfire');
@@ -13705,6 +13843,7 @@ function loadChallenge(key, opts){
   $('keyPar').textContent=C.parKeys;
   $('pb').textContent = PB[scoreKey()]!==undefined ? PB[scoreKey()].toFixed(2)+'s' : '—';
   armGhost();
+  try{ railZoneCompute(); }catch(e){}   /* r350: fence = the drill's whole working area, fixed at load */
   $('result').className='result'; $('result').innerHTML='';
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
 }

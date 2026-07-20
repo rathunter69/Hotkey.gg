@@ -46,6 +46,8 @@ jobs:
         run: node dev/e2e-rapidfire.js
       - name: Leaderboard (tier filter, placement, seed field)
         run: node dev/e2e-lb.js
+      - name: Guided contract (rails contain, alternates count, every drill solvable)
+        run: node dev/e2e-guided.js
       - name: Drill pages in sync
         run: |
           node dev/build-drill-pages.js
