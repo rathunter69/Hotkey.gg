@@ -1247,17 +1247,30 @@ function browserHtml(){
     // r335: tier scope — map every user on the board to their tier once, filter, re-rank
     const tierNames=(window.HK_RANK?window.HK_RANK.TIERS.map(t=>t.name):[]);
     let rows=perDrill[browseKey], fnote='';
-    if(tierFilter!=='all'){
+    /* r366 (Wolf: 'we didn't have sub menu buttons to filter ranks by bucket'): the chips
+       existed but hid until a tier was picked — invisible IS missing. They're always on now:
+       tier picked → thirds WITHIN that tier (r335 behavior); 'all tiers' → thirds of the
+       whole ranked field by average percentile. */
+    if(tierFilter!=='all' || bucketFilter!=='all'){
       const stat=DATA.gUserStat||DATA.userStat;
       const tof={}; Object.entries(stat).forEach(([u,st])=>{ const av=st.att?st.avg:null;
         if(av!==null) tof[u]=TIER_OF(av, st.att, st.wsum); });
-      rows=rows.filter(r=>{ const t=tof[r.user_id]; if(!t || t.name!==tierFilter) return false;
-        if(bucketFilter!=='all' && (t.bucket||'')!==bucketFilter+' Bucket') return false; return true; });
-      fnote='<div class="tf-note">'+rows.length+' of '+perDrill[browseKey].length+' on this board '+(rows.length===1?'holds':'hold')+' '+esc(tierFilter)+(bucketFilter!=='all'?' \u00b7 '+esc(bucketFilter)+' Bucket':'')+'</div>';
+      const fieldBucket=u=>{ const st=stat[u]; if(!st||!st.att) return null;
+        return st.avg<=1/3 ? 'Top' : (st.avg<=2/3 ? 'Middle' : 'Bottom'); };
+      rows=rows.filter(r=>{
+        const t=tof[r.user_id];
+        if(tierFilter!=='all'){ if(!t || t.name!==tierFilter) return false;
+          if(bucketFilter!=='all' && (t.bucket||'')!==bucketFilter+' Bucket') return false; }
+        else if(bucketFilter!=='all'){ if(fieldBucket(r.user_id)!==bucketFilter) return false; }
+        return true; });
+      fnote='<div class="tf-note">'+rows.length+' of '+perDrill[browseKey].length+' on this board '+
+        (rows.length===1?'holds':'hold')+' '+
+        (tierFilter!=='all' ? esc(tierFilter)+(bucketFilter!=='all'?' \u00b7 '+esc(bucketFilter)+' Bucket':'')
+                            : 'the field\u2019s '+esc(bucketFilter)+' bucket')+'</div>';
     }
     const tierSel='<div class="tier-filter"><label for="tierSel">tier</label>'+
       '<select id="tierSel">'+['all'].concat(tierNames).map(tn=>'<option value="'+esc(tn)+'"'+(tierFilter===tn?' selected':'')+'>'+(tn==='all'?'all tiers':esc(tn))+'</option>').join('')+'</select>'+
-      (tierFilter!=='all' ? ['all','Bottom','Middle','Top'].map(b=>'<span class="chip tf-b'+(bucketFilter===b?' on':'')+'" data-bucket="'+b+'">'+(b==='all'?'all buckets':b.toLowerCase())+'</span>').join('') : '')+
+      ['all','Bottom','Middle','Top'].map(b=>'<span class="chip tf-b'+(bucketFilter===b?' on':'')+'" data-bucket="'+b+'" title="'+(tierFilter!=='all'?'thirds within '+esc(tierFilter):'thirds of the whole ranked field')+'">'+(b==='all'?'all buckets':b.toLowerCase())+'</span>').join('')+
       '</div>';
     const detailBoard=(tierFilter!=='all' && !rows.length)
       ? '<div class="board"><div class="board-cap"><h2>'+esc(c.label)+'</h2><span class="lvl">'+esc(c.lvl)+'</span></div><div class="empty" style="padding:14px 18px">nobody holding '+esc(tierFilter)+' has a time on this board yet \u2014 the lane is open</div></div>'
