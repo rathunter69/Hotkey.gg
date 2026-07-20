@@ -598,7 +598,7 @@ function rankedInfographic(){
     '<div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:10px">Ranks are live: they can fall as well as rise when other players improve.</div>'+
     '<div style="display:flex;gap:10px;margin-top:16px"><button class="tab on" id="rankedGo" style="flex:1;text-align:center;font-size:13px;padding:11px">Enter Ranked \u2694</button>'+
     '<button class="tab" id="rankedWait" style="padding:11px 18px;font-size:12px">Not yet</button></div></div>';
-  document.getElementById('rankedGo').onclick=()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){} m.remove(); load(); };
+  document.getElementById('rankedGo').onclick=()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){} try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} m.remove(); load(); };
   document.getElementById('rankedWait').onclick=()=>m.remove();
   m.addEventListener('click',e=>{ if(e.target===m) m.remove(); },{once:true});
 }
@@ -1304,7 +1304,7 @@ function renderAll(){
   document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; renderAll(); });
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
-  const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ try{ localStorage.setItem('hk_ranked','0'); }catch(e){} load(); };
+  const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ try{ localStorage.setItem('hk_ranked','0'); }catch(e){} try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} load(); };
   try{ window.scrollTo(0, __sy); }catch(e){}
 }
 function wire(){
