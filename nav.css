@@ -354,3 +354,146 @@ html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
   border:1px solid var(--line);overflow:hidden;vertical-align:middle}
 .nav-lvl-bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s ease}
 @media (max-width:860px){.nav-lvl-bar{display:none}}
+
+/* ============================================================
+   r373 PROFILE FRAME SYSTEM — earned card frames (Wolf-approved board v2 port).
+   Applied to the profile modal's .pc-card and the leaderboard's .panel.me; the
+   ornament HTML (corners / screws / medallion / tab) comes from themes.js
+   hkFrameOrnaments and is injected as the card's first child. Every frame rule
+   is DOUBLED (.hk-frame-x.hk-frame-x) to out-specify .pc-card / .panel.me
+   without !important. Frames never move layout: position:relative + absolutely
+   positioned ornaments that overflow the edge on purpose. Metal hexes mirror
+   themes.js HK_METALS (one palette source). Legacy .flair-* borders above stay
+   untouched — old rows keep rendering.
+   ============================================================ */
+[class*="hk-frame-"]{position:relative}
+.hkf-cn{position:absolute; width:56px; height:56px; pointer-events:none; z-index:2}
+.hkf-c1{top:-6px; left:-6px}
+.hkf-c2{top:-6px; right:-6px; transform:scaleX(-1)}
+.hkf-c3{bottom:-6px; left:-6px; transform:scaleY(-1)}
+.hkf-c4{bottom:-6px; right:-6px; transform:scale(-1)}
+.hkf-scr{position:absolute; width:28px; height:28px; pointer-events:none; z-index:3}
+.hkf-s1{top:-14px; left:-14px}
+.hkf-s2{top:-14px; right:-14px}
+.hkf-s3{bottom:-14px; left:-14px}
+.hkf-s4{bottom:-14px; right:-14px}
+.hkf-med{position:absolute; top:-16px; left:50%; transform:translateX(-50%); width:34px; height:34px;
+  z-index:3; pointer-events:none}
+.hkf-tab{position:absolute; top:-11px; left:50%; transform:translateX(-50%); z-index:3; pointer-events:none;
+  font-style:normal; font-family:var(--mono,ui-monospace,monospace); font-size:8.5px; font-weight:700;
+  letter-spacing:.22em; white-space:nowrap; border:1px solid; border-radius:99px; padding:3px 12px}
+
+/* -- specular glint layer: an overflow-clipped strip that translates across the card.
+   transform + opacity ONLY (compositor-cheap, zero reflow); all animation is
+   reduced-motion guarded below. Charter and bone ship no glint element at all. -- */
+.hkf-glint{position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none; z-index:2}
+.hkf-glint::before{content:""; position:absolute; top:-40%; bottom:-40%; left:-45%; width:40%;
+  background:linear-gradient(105deg, transparent, rgba(255,255,255,.14) 42%, rgba(255,255,255,.30) 50%, rgba(255,255,255,.14) 58%, transparent);
+  transform:translateX(0) rotate(8deg); opacity:0}
+
+/* 1 · ENGRAVED (common) — certificate corners + edge ticks */
+.hk-frame-engraved.hk-frame-engraved{border:1px solid #565860}
+.hk-frame-engraved.hk-frame-engraved::before{content:""; position:absolute; inset:5px; border:1px solid #4a4c52;
+  border-radius:10px; pointer-events:none}
+.hk-frame-engraved.hk-frame-engraved::after{content:""; position:absolute; inset:9px; border:1px dashed #3f4147;
+  border-radius:7px; pointer-events:none; opacity:.8}
+
+/* 2 · METAL PLAQUES (rare) — beveled metal border (padding-box/border-box gradient
+   trick keeps the card surface intact), brushed texture overlay, corner screws +
+   tier tab from the ornament HTML. One class per metal; hexes = HK_METALS. */
+.hk-frame-plaque-bronze.hk-frame-plaque-bronze, .hk-frame-plaque-silver.hk-frame-plaque-silver,
+.hk-frame-plaque-gold.hk-frame-plaque-gold, .hk-frame-plaque-plat.hk-frame-plaque-plat,
+.hk-frame-plaque-diam.hk-frame-plaque-diam{border:5px solid transparent;
+  box-shadow:0 22px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.35)}
+.hk-frame-plaque-bronze.hk-frame-plaque-bronze::before, .hk-frame-plaque-silver.hk-frame-plaque-silver::before,
+.hk-frame-plaque-gold.hk-frame-plaque-gold::before, .hk-frame-plaque-plat.hk-frame-plaque-plat::before,
+.hk-frame-plaque-diam.hk-frame-plaque-diam::before{content:""; position:absolute; inset:-5px;
+  border-radius:inherit; pointer-events:none;
+  background:repeating-linear-gradient(115deg, transparent 0 3px, rgba(255,255,255,.045) 3px 4px);
+  mix-blend-mode:overlay}
+.hk-frame-plaque-bronze.hk-frame-plaque-bronze{background:
+  linear-gradient(var(--surface), var(--surface)) padding-box,
+  linear-gradient(165deg,#f4c088,#cf8e4c 30%,#95602c 55%,#432a12 75%,#cf8e4c) border-box}
+.hk-frame-plaque-silver.hk-frame-plaque-silver{background:
+  linear-gradient(var(--surface), var(--surface)) padding-box,
+  linear-gradient(165deg,#f4f7fc,#c9d0dc 30%,#8e96a5 55%,#454c59 75%,#c9d0dc) border-box}
+.hk-frame-plaque-gold.hk-frame-plaque-gold{background:
+  linear-gradient(var(--surface), var(--surface)) padding-box,
+  linear-gradient(165deg,#ffefb3,#f4c754 30%,#bf8e20 55%,#523a05 75%,#f4c754) border-box}
+.hk-frame-plaque-plat.hk-frame-plaque-plat{background:
+  linear-gradient(var(--surface), var(--surface)) padding-box,
+  linear-gradient(165deg,#e0fdf7,#86dcca 30%,#3d9c8e 55%,#173f3a 75%,#86dcca) border-box}
+.hk-frame-plaque-diam.hk-frame-plaque-diam{background:
+  linear-gradient(var(--surface), var(--surface)) padding-box,
+  linear-gradient(165deg,#f4fdff,#9be0f7 30%,#4aa6cc 55%,#153c50 75%,#9be0f7) border-box}
+
+/* 3 · FOIL (epic) — conic sheen border + fan corners + scalloped inner edge */
+.hk-frame-foil.hk-frame-foil{border:4px solid transparent; background:
+  linear-gradient(var(--surface), var(--surface)) padding-box,
+  conic-gradient(from 130deg,#8ef2df,#86dcca,#3d9c8e,#d8fff5,#8ef2df) border-box}
+.hk-frame-foil.hk-frame-foil::after{content:""; position:absolute; inset:6px; border-radius:10px;
+  pointer-events:none; opacity:.65; background:
+  radial-gradient(circle at 12px 12px, transparent 10px, rgba(142,242,223,.16) 10.5px 11.5px, transparent 12px),
+  radial-gradient(circle at calc(100% - 12px) 12px, transparent 10px, rgba(142,242,223,.16) 10.5px 11.5px, transparent 12px),
+  radial-gradient(circle at 12px calc(100% - 12px), transparent 10px, rgba(142,242,223,.16) 10.5px 11.5px, transparent 12px),
+  radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), transparent 10px, rgba(142,242,223,.16) 10.5px 11.5px, transparent 12px)}
+/* continuous slow sheen — a wide gradient sliding via background-position (allowed
+   channel), riding ::before so the scallops keep ::after */
+.hk-frame-foil.hk-frame-foil::before{content:""; position:absolute; inset:-4px; border-radius:inherit;
+  pointer-events:none; mix-blend-mode:screen; opacity:.55; background:
+  linear-gradient(115deg, transparent 30%, rgba(142,242,223,.10) 42%, rgba(216,255,245,.22) 50%, rgba(142,242,223,.10) 58%, transparent 70%);
+  background-size:300% 100%; background-position:0% 0}
+
+/* 4 · HERALDIC (legendary) — crimson filigree + lozenge medallion */
+.hk-frame-heraldic.hk-frame-heraldic{border:2px solid #9c2a1c;
+  box-shadow:0 22px 60px rgba(0,0,0,.45), 0 0 34px rgba(230,88,67,.28), inset 0 0 44px rgba(230,88,67,.07)}
+
+/* 5 · CHARTER (rare) — the beta-tester frame: steel-navy bevel, laurel corners,
+   BETA TESTER tab. Deliberately animation-free — a quiet uniform. */
+.hk-frame-charter.hk-frame-charter{border:3px solid transparent;
+  box-shadow:0 22px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(200,212,230,.28);
+  background:
+  linear-gradient(var(--surface), var(--surface)) padding-box,
+  linear-gradient(165deg,#c8d4e6,#8fa3c0 30%,#3d4c66 60%,#22304a 80%,#8fa3c0) border-box}
+
+/* 6 · BONE (easter egg) — re-scope the palette vars on the card so every inner
+   var() reads bone-on-bone; the frame itself stays PERFECTLY still (that's the
+   joke). Copperplate on the name line only. */
+.hk-frame-bone.hk-frame-bone{--surface:#f2ead9; --surface2:#e9dfc9; --text:#3c342a; --muted:#7c705c;
+  --faint:#a3987e; --line:#d7cdb7; --accent:#8a6d3b; --accent-dim:#b7a67e; --accent-glow:rgba(138,109,59,.12);
+  background:#f2ead9; border:1px solid #d7cdb7; color:#3c342a;
+  box-shadow:0 22px 60px rgba(0,0,0,.45), inset 0 0 34px rgba(60,52,42,.06)}
+.hk-frame-bone.hk-frame-bone::after{content:"SILIAN RAIL \00B7  BONE"; position:absolute; bottom:8px; right:12px;
+  font-family:var(--mono,ui-monospace,monospace); font-size:7.5px; letter-spacing:.2em; color:#c5b795; pointer-events:none}
+.hk-frame-bone .pc-name{font-family:'Copperplate','Copperplate Gothic Light','Trajan Pro',serif;
+  letter-spacing:.18em; font-weight:600}
+
+/* -- ANIMATION, escalating by tier (r373, Wolf). CSS-only, compositor-cheap:
+   transform / opacity / background-position ONLY — no backdrop-filter, no
+   animated shadow blurs, nothing that reflows. Frames render on 1-2 cards per
+   page. engraved/plaques: hover glint; foil: continuous sheen + hover glint;
+   heraldic: ember pulse + a periodic glint every ~7s; charter/bone: static. -- */
+@media (prefers-reduced-motion: no-preference){
+  .hk-frame-engraved:hover .hkf-glint::before,
+  .hk-frame-plaque-bronze:hover .hkf-glint::before, .hk-frame-plaque-silver:hover .hkf-glint::before,
+  .hk-frame-plaque-gold:hover .hkf-glint::before, .hk-frame-plaque-plat:hover .hkf-glint::before,
+  .hk-frame-plaque-diam:hover .hkf-glint::before,
+  .hk-frame-foil:hover .hkf-glint::before{animation:hkfGlint 1.2s ease}
+  .hk-frame-foil.hk-frame-foil::before{animation:hkfSheen 7s linear infinite}
+  .hk-frame-heraldic .hkf-cn, .hk-frame-heraldic .hkf-med{animation:hkfEmber 3s ease-in-out infinite alternate}
+  .hk-frame-heraldic .hkf-glint::before{animation:hkfGlint7 7s ease-in-out infinite}
+}
+@keyframes hkfGlint{0%{transform:translateX(0) rotate(8deg); opacity:0}
+  10%{opacity:1} 90%{opacity:1}
+  100%{transform:translateX(370%) rotate(8deg); opacity:0}}
+@keyframes hkfGlint7{0%, 84%{transform:translateX(0) rotate(8deg); opacity:0}
+  86%{opacity:.9} 98%{opacity:.9}
+  100%{transform:translateX(370%) rotate(8deg); opacity:0}}
+@keyframes hkfSheen{0%{background-position:300% 0} 100%{background-position:0% 0}}
+@keyframes hkfEmber{from{opacity:.72} to{opacity:1}}
+
+/* -- account.html frame picker: mini swatch — the frame class paints the chrome,
+   ornaments stay off (they'd swamp a 34px strip; bone's ::after tag fits and is
+   a nice tell). Inline styles must NOT set background — the frame class owns it. -- */
+.fs-mini{display:block; height:34px; border-radius:8px; margin-bottom:8px; position:relative;
+  overflow:hidden; background:var(--surface); border:1px solid var(--line)}

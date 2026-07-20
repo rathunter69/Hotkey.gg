@@ -286,6 +286,22 @@
       const c=$('pcClose'); if(c) c.onclick=closeProfile;
     }
   }
+  /* r373: HIGHEST TIER EVER REACHED — the plaque frames unlock on the best tier you've
+     ever DISPLAYED, not the one you hold today (ranks can fall; earned cosmetics don't).
+     Persisted as a TIERS index in hk_ach_flags.tierBest — a number, so the r358
+     client-state hydration maxes it across devices for free. Called wherever the rank
+     fetch computes a live tier (navRank + the card renderer). */
+  function persistTierBest(i){
+    try{
+      if(typeof i!=='number' || i<=0) return;
+      const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+      if((fl.tierBest|0) >= i) return;
+      fl.tierBest=i;
+      localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+      try{ window.hkStatePush && window.hkStatePush(); }catch(e){}
+    }catch(e){}
+  }
+
   // Rank pill: fetch standing once per session (10-min cache shared with index.html via sessionStorage)
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
@@ -330,6 +346,7 @@
         return;   // no tier cache write mid-placement
       }
       const t = tierOf(d.avgPct, d.attempted, d.wsum);
+      persistTierBest(t.i);   // r373: plaque-frame unlocks latch the high-water tier
       el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name,20):'')+'<span>'+t.name+'</span>';
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
       try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
@@ -520,6 +537,7 @@
   }
   function renderProfile(m, d){
     const tier = tierOf(d.avgPct, d.attempted, d.wsum);
+    persistTierBest(tier.i);   // r373: the card render is a rank fetch too — latch here as well
     const fmtMs = ms => (ms/1000).toFixed(2) + 's';
     const handle = (window._navProfile && window._navProfile.handle) || 'set a name';
     // r70b: 'set a name' is a real state (profile without a handle) — make it actionable
@@ -718,8 +736,14 @@
     }catch(e){}
     // r286: flair is a fixed-picker value but the column takes free text over REST —
     // sanitize to a safe token so it can never break out of the class attribute (XSS).
-    const flairCls = (myFlair && /^[a-z0-9_-]{1,32}$/i.test(myFlair)) ? ' flair-'+myFlair : '';
-    m.innerHTML = '<div class="pc-card'+flairCls+'">' +
+    /* r373 FRAME SYSTEM: a flair value matching an HK_FRAMES id renders as an earned
+       frame (.hk-frame-<id> + ornament HTML as the card's FIRST child). Legacy values
+       (gold/emerald/holo) keep their old .flair-* classes — existing rows don't break. */
+    const __safeFlair = (myFlair && /^[a-z0-9_-]{1,32}$/i.test(myFlair)) ? myFlair : null;
+    const __isFrame = !!(__safeFlair && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__safeFlair));
+    const flairCls = __safeFlair ? (__isFrame ? ' hk-frame-'+__safeFlair : ' flair-'+__safeFlair) : '';
+    const flairOrn = (__isFrame && window.hkFrameOrnaments) ? window.hkFrameOrnaments(__safeFlair) : '';
+    m.innerHTML = '<div class="pc-card'+flairCls+'">' + flairOrn +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-head" style="margin-bottom:10px"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
       /* r134: .pc-scroll wrapper — the v3 CSS (max-height 82vh + inner scroll) existed

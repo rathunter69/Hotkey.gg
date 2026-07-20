@@ -130,7 +130,7 @@ async function load(){
       meAnon = !!(u && (u.is_anonymous===true || (Array.isArray(u.identities)&&u.identities.length===0)));   // r271: mirrors nav.js isAnonUser
       window.__meAnon=meAnon; }catch(e){}
     const [p, r, se, tm, tt] = await Promise.all([
-      sb.from('profiles').select('id,handle,team_code,school_tag,show_school,featured_ach'),
+      sb.from('profiles').select('id,handle,team_code,school_tag,show_school,featured_ach,flair'),   /* r373: flair feeds the hero card's frame */
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
       sb.from('team_members').select('team_id,user_id,role'),
@@ -571,7 +571,20 @@ function heroHtml(){
   /* r293 (Wolf): the persistent next-rank progression block is retired — the opt-in
      infographic already explains the climb, and the card stays slim. Keep the exit. */
   const nextHtml='<div class="yc-next"><a id="leaveRanked" style="font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
-  return '<div class="panel me"><h4>your card</h4>'+
+  /* r373 FRAME SYSTEM: the signed-in hero wears the same earned frame as the profile
+     card — .hk-frame-<id> + ornaments first. Same sanitize + legacy split as nav.js. */
+  let __fCls='', __fOrn='';
+  try{
+    const __mp=(DATA.profs||[]).find(p=>p.id===meId);
+    const __fv=__mp && __mp.flair;
+    if(__fv && /^[a-z0-9_-]{1,32}$/i.test(__fv)){
+      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__fv)){
+        __fCls=' hk-frame-'+__fv;
+        __fOrn=window.hkFrameOrnaments ? window.hkFrameOrnaments(__fv) : '';
+      } else __fCls=' flair-'+__fv;   // legacy gold/emerald/holo — harmless no-op on .panel
+    }
+  }catch(e){}
+  return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+
     '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name,28,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+
     '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
     '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+L.into+'/'+L.need+' xp</span></div>'+
