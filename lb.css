@@ -207,9 +207,10 @@
     background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:7px 10px; margin-bottom:6px}
   #blSearch:focus{border-color:var(--accent-dim); outline:none}
   @media(max-width:680px){ .browse-wrap{grid-template-columns:1fr} .browse-list{max-height:240px} }   /* r267: tier rides as the small crest (tooltip carries the name) — a full text pill starved the name column */
-  .featured{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:0}
-  /* r368: the weekly gauntlet spans the full row — a half-width card left the right side blank */
-  .featured > .board{grid-column:1/-1}
+  .featured{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:0; align-items:start}
+  /* r369: weekly + tier roster pair up in the featured grid — no more lone half-width
+     card with a blank side, no more full-width strips of mostly whitespace */
+  .featured > .panel{margin-top:0; min-width:0}
   .featured + .section-title{margin-top:18px}   /* r368: matches the ~38px section rhythm above */
   .seclead{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:18px}
   .seclead .sl{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px}
@@ -221,7 +222,10 @@
   @media(max-width:820px){ .featured{grid-template-columns:1fr} }
   .ros-tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px}
   .ros-tabs .tab{font-size:11px; padding:6px 13px}
-  .ros-list{max-height:340px; overflow-y:auto; padding-right:6px}
+  /* r369: on wide hosts (desks page) the roster flows into two columns instead of
+     one sparse full-width list; in the half-width lb panel it stays a single column */
+  .ros-list{max-height:340px; overflow-y:auto; padding-right:6px; columns:2 430px; column-gap:26px}
+  .ros-row{break-inside:avoid}
   .ros-row{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.5px;
     padding:8px 10px; border-radius:8px; color:var(--muted)}
   .ros-row.me{background:var(--accent-glow); color:var(--text); border:1px solid var(--accent-dim)}

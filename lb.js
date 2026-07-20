@@ -46,12 +46,12 @@ function boardHtml(c, best, names, meId, opts){
   let body;
   if(!best.length){
     body='<div class="empty" style="padding:14px 18px 6px">open board \u2014 <b>first run sets the bar</b></div>';
-    for(let k=0;k<5;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';
+    for(let k=0;k<3;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';   /* r369: 3 placeholder lanes, not 5 — reclaim the vertical space */
   }
   else {
     const leaderMs = best[0].time_ms;
     body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId,false,leaderMs,opts)).join('');
-    for(let k=best.length;k<5;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';
+    for(let k=best.length;k<3;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';
     const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
     if(myIdx>=10){ body += '<div class="you-gap">···</div>' + rowHtml(best[myIdx], myIdx, names, meId, true, leaderMs, opts); }
   }
@@ -697,6 +697,7 @@ function featuredHtml(){
       boardHtml({label:'today\u2019s global field', lvl:dailyDate}, bestD, names, meId, {medals:true})+
     '</div>'+
     boardHtml({label:'\ud83c\udfc1 weekly gauntlet \u00b7 '+legs.length+' legs, one clock', lvl:'wk '+wkStr}, combined, names, meId)+
+    rosterHtml(true)+   /* r369: the field-by-tier panel fills the other half of the row */
     '</div>';
 }
 
@@ -1332,9 +1333,10 @@ function renderAll(){
       (DATA.viewDesk ? ('<h3 class="section-title">This desk\u2019s boards \u2014 members only</h3><div class="browse" style="grid-column:1/-1">'+browserHtml()+'</div>') : '');
   } else {
     if(h1) h1.textContent='Leaderboard';
+    /* r369 (Wolf): tighter dashboard — the tier roster rides beside the weekly gauntlet
+       inside .featured instead of spreading as its own full-width strip */
     root.innerHTML =
       '<div class="hero two">'+heroHtml()+topPlayersHtml()+'</div>'+
-      '<div style="grid-column:1/-1;min-width:0;margin-bottom:18px">'+rosterHtml(true)+'</div>'+
       featuredHtml()+
       '<h3 class="section-title">Browse the boards'+
         '<a href="desks.html" style="float:right;font-size:11px;color:var(--accent);text-decoration:none">\ud83c\udf93 schools & desks \u2192</a></h3>'+
