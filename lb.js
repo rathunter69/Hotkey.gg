@@ -455,8 +455,8 @@ function showPublicCard(uid){
     '<div class="pub-cap"><span>PLAYER CARD</span><span>'+(meId&&uid!==meId?'<a class="pub-rep" style="cursor:pointer;color:var(--faint);font-size:9px;margin-right:12px">report</a>':'')+'<a class="pub-x">\u00d7</a></span></div>'+
     '<div class="pub-hero">'+(window.rankEmblem?window.rankEmblem(t.name,54,t.bucket):'')+
       '<div><div class="pub-nm">'+esc(names[uid])+(uid===meId?' <span class="pub-you">(you)</span>':'')+'</div>'+
-      '<div class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center;margin-top:4px">'+
-        (window.rankEmblem?window.rankEmblem(t.name,13,t.bucket):'')+'<span>'+(t.full||t.name)+(t.provisional?' \u00b7 provisional':'')+'</span></div>'+
+      '<div class="pc-tier '+t.cls+'" style="margin-top:4px">'+   /* r374: chip layout + gap live on .pc-tier (nav.css); crest at the 16 chip scale (was 13) */
+        (window.rankEmblem?window.rankEmblem(t.name,16,t.bucket):'')+'<span>'+(t.full||t.name)+(t.provisional?' \u00b7 provisional':'')+'</span></div>'+
       (deskNm?'<div class="pub-desk">\u25c6 '+esc(deskNm)+'</div>':'')+
       ((window.__schoolOf||{})[uid]?'<div class="pub-desk" style="color:var(--muted);display:flex;align-items:center;gap:6px">'+schoolChipByUid(uid,16)+esc((window.schoolResolve&&window.schoolResolve(window.__schoolOf[uid])||{}).name||window.__schoolOf[uid])+'</div>':'')+'</div></div>'+
     '<div class="pub-tiles">'+
@@ -585,7 +585,7 @@ function heroHtml(){
     }
   }catch(e){}
   return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+
-    '<div class="yc-top"><span class="pc-tier '+t.cls+'" style="display:inline-flex;align-items:center">'+(window.rankEmblem?window.rankEmblem(t.name,28,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+
+    '<div class="yc-top"><span class="pc-tier '+t.cls+'">'+(window.rankEmblem?window.rankEmblem(t.name,28,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+   /* r374: chip layout lives on .pc-tier (nav.css); 28 = the your-card hero scale */
     '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
     '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+L.into+'/'+L.need+' xp</span></div>'+
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">'+
@@ -600,8 +600,8 @@ function rankedInfographic(){
     document.body.appendChild(m); }
   const T=window.HK_RANK.TIERS;
   let rows='';
-  T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:12px;padding:7px 4px;font-family:var(--mono);font-size:12.5px">'+
-    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,24):'')+'</span>'+
+  T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:10px;padding:7px 4px;font-family:var(--mono);font-size:12.5px">'+   /* r374: 22 @ gap 10 — same row scale as the tier roster */
+    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,22):'')+'</span>'+
     '<span>'+t.name+'</span><span style="margin-left:auto;color:var(--faint);font-size:10.5px">'+(t.att?t.att+' drills \u00b7 top '+Math.round(Math.min(1,t.pct)*100)+'%':'start here')+'</span></div>'; });
   m.innerHTML='<div class="panel" style="max-width:460px;width:100%">'+
     '<h4>welcome to ranked</h4>'+
@@ -643,19 +643,23 @@ function topPlayersHtml(){
   const {userStat,names,meId}=DATA;
   const ranked=Object.keys(userStat).map(u=>({u, ...userStat[u]}))
     .filter(x=>x.att>=5).sort((a,b)=>a.avg-b.avg || b.att-a.att);
+  /* r374 icon scale (Wolf: sizes were eyeballed per site — 16/18/22/24 across four row
+     surfaces): field rows (top players, tier roster, ranked-modal ladder) all render the
+     crest at 22; dense desk tables stay 16 (10.5px labels); card chips are 16; heroes
+     keep their own art sizes (54 pub / 84 profile / 28 your-card pill). */
   let rows='';
   ranked.slice(0,8).forEach((x,i)=>{
     const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="tp-row'+(x.u===meId?' me':'')+'"><span class="rk'+(i<3?' r'+(i+1):'')+'">'+(i+1)+'</span>'+
       '<span class="nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
-      '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,18,t.bucket):'')+'</span>'+
+      '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,22,t.bucket):'')+'</span>'+
       '<span class="pct"><b>top '+Math.max(1,Math.round(x.avg*100))+'%</b><i>'+x.att+' drills</i></span></div>';
   });
   const myIdx=meId?ranked.findIndex(x=>x.u===meId):-1;
   if(myIdx>=8){ const x=ranked[myIdx]; const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="you-gap">\u00b7\u00b7\u00b7</div><div class="tp-row me"><span class="rk">'+(myIdx+1)+'</span>'+
       '<span class="nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
-      '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,18,t.bucket):'')+'</span>'+
+      '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,22,t.bucket):'')+'</span>'+
       '<span class="pct"><b>top '+Math.max(1,Math.round(x.avg*100))+'%</b><i>'+x.att+' drills</i></span></div>'; }
   if(!rows) rows='<div class="empty">nobody has placed yet (5+ drills) \u2014 <b>be the first name here</b></div>';
   return '<div class="panel"><h4>top players \u00b7 the field</h4>'+rows+'</div>';

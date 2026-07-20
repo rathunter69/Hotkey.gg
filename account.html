@@ -85,7 +85,7 @@
   .state a.acc-cta.ghost{color:var(--accent)}   /* r355: the r297 on-accent fix out-specified the ghost variant — 'Log in' rendered white-on-light, invisible */
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
-<link rel="stylesheet" href="nav.css?v=183">
+<link rel="stylesheet" href="nav.css?v=184">
 <script src="drills.js?v=274"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -94,7 +94,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=271"></script>
+<script src="themes.js?v=272"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -175,7 +175,7 @@ async function load(){
         <span class="tc-emblem" style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,54,tier.bucket):''}</span>
         <div>
           <div class="tc-name">${esc(prof.handle||'set a handle')}</div>
-          <span class="pc-tier ${tier.cls}" style="display:inline-flex;align-items:center;margin-top:4px">${window.rankEmblem?window.rankEmblem(tier.name,13):''}<span>${tier.name}</span></span>
+          <span class="pc-tier ${tier.cls}" style="margin-top:4px">${/* r374: chip layout+gap live on .pc-tier (nav.css); 16 = the chip scale (was an eyeballed 13) */''}${window.rankEmblem?window.rankEmblem(tier.name,16):''}<span>${tier.name}</span></span>
         </div>
         ${prof.team_code?`<span class="tc-team">${esc(prof.team_code)}</span>`:''}
       </div>
