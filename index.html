@@ -1537,14 +1537,14 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=269"></script>
+<script src="drills.js?v=270"></script>
 <link rel="stylesheet" href="nav.css?v=182">
 <script src="themes.js?v=269"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=279"></script>
+<script src="nav.js?v=280"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1574,7 +1574,7 @@
            random retired (the drill menu covers both); rapid-fire downweighted to a normal chip. -->
       <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily</button>
       <button class="mb-tool" id="dailyMixBtn" data-tip="the Daily Mix — three quick drills + a one-minute rapid-fire finale, ~5 minutes end to end">☕ mix</button>
-      <button class="mb-tool mb-campaign" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-6"/></svg>campaign</button>
+      <button class="mb-tool mb-campaign" id="campaignBtn" title="the tracks — pace-gated milestones, xp bounties, and a certificate at the end of each"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-6"/></svg>tracks</button>
       <div class="mb-mode-wrap">
         <button class="mb-tool mb-rapid" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>rapid-fire<span class="caret">▾</span></button>
         <div class="mb-popover" id="mbRapidPop">
@@ -1783,7 +1783,7 @@ function mulberry32(a){ return function(){ a|=0; a=(a+0x6D2B79F5)|0;
 function dailyDateStr(){ return new Date().toISOString().slice(0,10); }
 function dailyKey(){ return 'daily-'+dailyDateStr(); }
 function dailySeed(){ const s=dailyDateStr(); let x=0; for(const ch of s) x=(x*31+ch.charCodeAt(0))>>>0; return x; }
-let dailyMode=false;
+/* r363: dailyMode is GONE — the sheet was its only launcher. dailyKey/dailySeed stay (mix + challenge seeds). */
 // ---- r219 (Wolf): THE DAILY CHALLENGE — one EXTRA-HARD, daily-seeded sitting, the
 // SAME board for everyone worldwide (the NYT-games model), on its own standalone
 // leaderboard. Drawn from the toughest catalog boards; level-gated to enter (PRO
@@ -9042,8 +9042,7 @@ function checkWin(){
   try{ const cl=JSON.parse(localStorage.getItem('hk_clears')||'{}'); cl[cur]=(cl[cur]||0)+1;
     localStorage.setItem('hk_clears', JSON.stringify(cl)); }catch(e){}
   if(!mouseUsed && !guidedUsed){
-    if(dailyMode){ xpGain=30; xpNote='daily challenge'; }
-    else if(weeklyMode){ xpGain=25; xpNote='gauntlet leg'; }
+    if(weeklyMode){ xpGain=25; xpNote='gauntlet leg'; }
     else {
       // r116 XP v4: the decay ladder is DAILY now (hk_clears_day) — resets at midnight,
       // breadth beats spam; +25 warm-up on the first solve of each day. Canonical math
@@ -9324,7 +9323,7 @@ function ghostDiff(o){
 }
 /* r256: award the one-time xp bounty when a clean run reaches a new speed band.
    Bands key off PB÷par; only clean (non-mouse, non-guided) runs qualify. Local
-   estimate only — same model as the campaign version bounties. */
+   estimate only — same model as the milestone bounties. */
 function awardBandXP(key, tSec, parSec){
   try{
     if(mouseUsed || guidedUsed) return 0;
@@ -9532,7 +9531,7 @@ function _showResults(o){
       const row=document.createElement('div');
       row.style.cssText='display:flex;gap:12px;margin-top:9px;justify-content:center;align-items:center';
       let sh=null;
-      if(dailyMode||weeklyMode){
+      if(weeklyMode){
         sh=document.createElement('button');
         sh.className='ob-key'; sh.style.cssText='flex:1';
         sh.textContent='\u2b07 share card';
@@ -9704,7 +9703,7 @@ function syncTabs(){
     }
   }catch(e){}
   if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450); }   // r80: between drills — gameplay moment, zero overlap
-  const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(dailyMode?' \u26a1':'')+(weeklyMode?' 🏁':'');
+  const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
       const reqTxt=(typeof C.req==='function') ? C.req.call(C) : (C.req||C.prompt||'');
@@ -11723,7 +11722,6 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
    retired (the intro stays hidden once done). */
 { const sb2=$('soundToggle');
   if(sb2){ sb2.onclick=(e)=>{ e.stopPropagation(); cycleSound(); }; try{ updateSoundBtn(); }catch(e){} } }
-{ const _db=$('dailyBtn'); if(_db) _db.addEventListener('click',(e)=>{ e.stopPropagation(); toggleSheetPop(); }); }
 /* ---- r157: THE WEAKNESS QUEUE (PRO pillar #2; free in beta via requirePro) ----
    The site builds the session: score every drill from LOCAL data only —
    PB vs par (known weakness), never-cleared (unknown weakness, progression-
@@ -13504,31 +13502,34 @@ function awardCampaignXP(){
       localStorage.setItem('hk_xp_est', String(est+gained));
       window.__lvlXp=(typeof window.__lvlXp==='number'?window.__lvlXp:est)+gained;
       try{ const nsol=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; renderLvl(nsol); }catch(e){}
-      if(window.hkCelebrate) window.hkCelebrate({cap:'version shipped', title:'+'+gained+' xp', sub:names.join(' · ')+' — complete'});
-      else showToast('🎉 version shipped — +'+gained+' xp');
+      if(window.hkCelebrate) window.hkCelebrate({cap:'milestone shipped', title:'+'+gained+' xp', sub:names.join(' · ')+' — complete'});
+      else showToast('🎉 milestone shipped — +'+gained+' xp');
     }
   }catch(e){}
 }
 function openCampaign(){
+  /* r363 (Wolf): ONE ladder — Track → milestones → certificate. The old campaign modal's
+     two parallel ladders are unified: each certificate track renders its pace-gated
+     milestones (the former v1..v8 chapters — same mechanics, bounties, and claim flags)
+     with the certificate as the track's finish line. */
   let m=$('campaignModal');
   if(!m){ m=document.createElement('div'); m.id='campaignModal'; m.className='onboard-modal'; document.body.appendChild(m); }
   const st=campState(); const G=window.HOTKEY_CAMPAIGN.GATE;
+  const byId={}; st.forEach(c=>byId[c.id]=c);
   const allDone=st.every(c=>c.done);
   let claimed={}; try{ claimed=JSON.parse(localStorage.getItem('hk_camp_xp')||'{}'); }catch(e){}
-  // overall progress: versions shipped, drills cleared, xp earned vs on the table
-  const versShipped=st.filter(c=>c.done).length, versTotal=st.length;
+  const msShipped=st.filter(c=>c.done).length, msTotal=st.length;
   const drillsCleared=st.reduce((a,c)=>a+c.clearedN,0), drillsTotal=st.reduce((a,c)=>a+c.keys.length,0);
   const xpEarned=st.reduce((a,c)=>a+(c.done&&claimed[c.id]?(c.xp||0):0),0)+((allDone&&claimed.finisher)?(window.HOTKEY_CAMPAIGN.finisher.xp||0):0);
   const xpTotal=st.reduce((a,c)=>a+(c.xp||0),0)+(window.HOTKEY_CAMPAIGN.finisher.xp||0);
   const pctDrills=Math.round(100*drillsCleared/Math.max(1,drillsTotal));
-  let rows='';
-  st.forEach(c=>{
+  const chRow=c=>{
     const cCol=(window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]||'var(--line)';
     const chPct=Math.round(100*c.clearedN/Math.max(1,c.keys.length));
     const xpCls=c.done?(claimed[c.id]?'claimed':'unclaimed'):(c.unlocked?'unclaimed':'lockedxp');
-    const xpTxt=(c.done&&claimed[c.id])?('\u2713 +'+c.xp+' xp'):('+'+c.xp+' xp');
-    rows+='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'">'+
-      '<div class="camp-hd"><span class="camp-badge">'+(window.hkBadge?window.hkBadge(c.id, c.done, 20, cCol):(c.done?c.badge:'\u25b8'))+'</span>'+
+    const xpTxt=(c.done&&claimed[c.id])?('✓ +'+c.xp+' xp'):('+'+c.xp+' xp');
+    let r='<div class="camp-ch'+(c.done?' done':'')+(c.unlocked?'':' locked')+'">'+
+      '<div class="camp-hd"><span class="camp-badge">'+(window.hkBadge?window.hkBadge(c.id, c.done, 20, cCol):(c.done?c.badge:'▸'))+'</span>'+
       '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+cCol+';margin-right:2px"></span>'+
       '<b>'+c.name+'</b>'+
       '<span class="camp-xp '+xpCls+'">'+xpTxt+'</span>'+
@@ -13539,54 +13540,46 @@ function openCampaign(){
         const C=CHALLENGES[k]; if(!C) return;
         const gate=(C.par*G).toFixed(0);
         const ok=campCleared(k);
-        rows+='<div class="camp-drill'+(ok?' ok':'')+'" data-key="'+k+'">'+
-          '<span><span style="color:var(--faint)">\u2013</span> '+(ok?'\u2713 ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
+        r+='<div class="camp-drill'+(ok?' ok':'')+'" data-key="'+k+'">'+
+          '<span><span style="color:var(--faint)">–</span> '+(ok?'✓ ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
           '<span class="camp-gate">'+(ok?PB[k].toFixed(2)+'s':'beat '+gate+'s')+'</span></div>';
       });
     }
+    return r+'</div>';
+  };
+  let rows='';
+  (window.HK_TRACKS||[]).forEach(tr=>{
+    const n=tr.keys.filter(k=>PB[k]!==undefined).length, N=tr.keys.length;
+    const certId=localStorage.getItem('hk_cert_'+tr.id);
+    const certDone=certId && certId!=='pending';
+    rows+='<div class="camp-track"><div class="camp-hd" style="margin-top:10px">'+
+      '<span class="camp-badge">'+(certDone?'🎓':'◈')+'</span>'+
+      '<b style="font-size:14px">'+tr.name+'</b>'+
+      (certDone
+        ? '<a class="camp-xp claimed" style="cursor:pointer" href="cert.html?id='+encodeURIComponent(certId)+'" target="_blank" rel="noopener">view certificate →</a>'
+        : '<span class="camp-n" style="margin-left:auto" title="clean recorded runs toward the certificate (any speed)">🎓 '+n+'/'+N+'</span>')+
+      '</div>'+
+      '<div class="camp-chprog"><span style="width:'+Math.round(100*n/Math.max(1,N))+'%"></span></div>';
+    (tr.milestones||[]).forEach(id=>{ if(byId[id]) rows+=chRow(byId[id]); });
     rows+='</div>';
   });
   const header='<div class="camp-top">'+
-    '<div class="camp-top-row"><b>'+versShipped+' / '+versTotal+' versions shipped</b>'+
-      '<span class="camp-xpsum">'+xpEarned.toLocaleString()+' / '+xpTotal.toLocaleString()+' campaign xp</span></div>'+
+    '<div class="camp-top-row"><b>'+msShipped+' / '+msTotal+' milestones shipped</b>'+
+      '<span class="camp-xpsum">'+xpEarned.toLocaleString()+' / '+xpTotal.toLocaleString()+' milestone xp</span></div>'+
     '<div class="camp-prog"><span style="width:'+pctDrills+'%"></span></div>'+
-    '<div class="camp-sub2">'+drillsCleared+' / '+drillsTotal+' drills cleared under the pace gate (par \u00d7 '+G+', clean run)</div>'+
+    '<div class="camp-sub2">'+drillsCleared+' / '+drillsTotal+' milestone drills under the pace gate (par × '+G+', clean run) · certificates count EVERY drill in the track, any speed</div>'+
     '</div>';
   const proCta=allDone
-    ? '<div class="camp-pro"><b>\u2b50 Model complete</b> \u2014 every version shipped.</div>'
-    : '<div class="camp-pro">The <b>Models</b> &amp; <b>Full Builds</b> versions carry the biggest bounties \u2014 <a id="campPro">go PRO</a> to own the whole model.</div>';
-  m.innerHTML='<div class="ob-card camp-card"><a class="modal-x" id="campX">\u00d7</a><div class="ob-title">the campaign'+(allDone?' \u2b50':'')+'</div>'+
-    '<div class="ob-body" style="text-align:left;font-size:12px;color:var(--muted);margin-bottom:2px">Ship the model version by version. Clear every drill in a version under its pace gate and the next unlocks \u2014 each shipped version pays a <b style="color:var(--warn)">one-time xp bounty</b> and stamps a medal on your card.</div>'+
+    ? '<div class="camp-pro"><b>⭐ Catalog complete</b> — every milestone shipped.</div>'
+    : '<div class="camp-pro">The <b>Models</b> &amp; <b>Full Builds</b> milestones carry the biggest bounties — <a id="campPro">go PRO</a> to own the whole catalog.</div>';
+  m.innerHTML='<div class="ob-card camp-card"><a class="modal-x" id="campX">×</a><div class="ob-title">the tracks'+(allDone?' ⭐':'')+'</div>'+
+    '<div class="ob-body" style="text-align:left;font-size:12px;color:var(--muted);margin-bottom:2px">Three tracks, one ladder each: ship the <b>milestones</b> (every drill under its pace gate — each pays a <b style="color:var(--warn)">one-time xp bounty</b> and stamps a medal), and clear <b>every drill in the track</b> for its certificate — public, verifiable, one-click LinkedIn.</div>'+
     header+
     '<div class="camp-list">'+rows+'</div>'+
-    /* r361 (Wolf: 'changes flow through all avenues'): the certificate tracks live IN the
-       campaign view — same spine, two ladders. Progress = local clean bests (advisory; the
-       claim re-verifies server-side), claimed certs deep-link to their public pages. */
-    (function(){ try{
-      if(!window.HK_TRACKS) return '';
-      let t='<div class="ob-title" style="margin-top:14px">certificate tracks</div>'+
-        '<div class="ob-body" style="text-align:left;font-size:12px;color:var(--muted);margin-bottom:2px">Three long tracks over the same chapters — clear every drill in one (clean, recorded) and the certificate is yours: public, verifiable, one-click LinkedIn.</div>';
-      window.HK_TRACKS.forEach(tr=>{
-        const n=tr.keys.filter(k=>PB[k]!==undefined).length, N=tr.keys.length;
-        const id=localStorage.getItem('hk_cert_'+tr.id);
-        const done=id && id!=='pending';
-        t+='<div class="camp-ch'+(done?' done':'')+'"><div class="camp-hd">'+
-          '<span class="camp-badge">'+(done?'\ud83c\udf93':'\u25b8')+'</span><b>'+tr.name+'</b>'+
-          (done?'<a class="camp-xp claimed" style="cursor:pointer" href="cert.html?id='+encodeURIComponent(id)+'" target="_blank" rel="noopener">view certificate \u2192</a>'
-               :'<span class="camp-n" style="margin-left:auto">'+n+'/'+N+'</span>')+
-          '</div><div class="camp-chprog"><span style="width:'+Math.round(100*n/N)+'%"></span></div></div>';
-      });
-      return t;
-    }catch(e){ return ''; } })()+
     proCta+
     '<div class="ob-opts"><button class="ob-key" id="campClose">close</button></div></div>';
   m.classList.add('show');
-  /* r338: EVERY dismissal routes through close() so the capture Esc listener is always
-     de-registered. The old paths (buttons, backdrop, drill click) only hid the modal and
-     LEAKED the listener — after that, an invisible dead modal ate every Escape in the app
-     (exit-edit, clear-clipboard, close-ribbon all stopped working until a reload). The
-     daily-challenge and tier-gate modals always had this shape; the campaign now matches.
-     A stored handle also de-registers any listener a prior open left behind. */
+  /* r338: EVERY dismissal routes through close() so the capture Esc listener is always de-registered. */
   try{ if(window.__campEscL){ document.removeEventListener('keydown',window.__campEscL,true); window.__campEscL=null; } }catch(e){}
   const __campEsc=e=>{ if(e.key==='Escape'){ e.stopPropagation(); close(); } };
   const close=()=>{ m.classList.remove('show'); document.removeEventListener('keydown',__campEsc,true); if(window.__campEscL===__campEsc) window.__campEscL=null; };
@@ -13596,7 +13589,7 @@ function openCampaign(){
   $('campX').onclick=close;
   m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
   m.querySelectorAll('.camp-drill').forEach(d=>d.onclick=()=>{ close(); loadChallenge(d.dataset.key); });
-  const cp=$('campPro'); if(cp) cp.onclick=()=>{ close(); if(window.openUpgrade) window.openUpgrade('Campaign'); };
+  const cp=$('campPro'); if(cp) cp.onclick=()=>{ close(); if(window.openUpgrade) window.openUpgrade('Tracks'); };
 }
 /* r211 (Wolf): clicking the level badge used to open the "how xp works" EXPLANATION.
    Players want their PROGRESS first, like a game — level ring, an xp bar, and how far
@@ -13702,11 +13695,11 @@ function xpEarnFor(key){
   return (nth<=LAD.length ? LAD[nth-1] : 2) + warm;
 }
 function restartDrill(){
-  loadChallenge(cur, {daily:dailyMode, weekly:weeklyMode});   // same drill, same mode; daily/weekly reseed identically
+  loadChallenge(cur, {weekly:weeklyMode});   // same drill, same mode; weekly reseeds identically
 }
-function scoreKey(){ if(challengeMode) return challengeKey(); if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return dailyMode ? dailyKey() : cur; }
-function drillOfDay(){ return MENU_ORDER[dailySeed() % MENU_ORDER.length]; }
-function startDaily(){ loadChallenge(drillOfDay(), {daily:true}); updateDailyBtn(); }
+function scoreKey(){ if(challengeMode) return challengeKey(); if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return cur; }
+/* r363: drillOfDay/startDaily are GONE with the morning sheet — the Daily Mix and the
+   Daily Challenge are the two daily rituals now. */
 /* r360 DAILY MIX (Wolf-approved roadmap: session shape for the 5-minute player).
    One button: three quick drills (deterministic per day — one you haven't cleared if
    possible, all short-par) then a one-minute rapid-fire finale. Wins tick the streak
@@ -13747,6 +13740,9 @@ function mixFinish(){
   if(!mix) return;
   mix=null;
   try{ localStorage.setItem('hk_mix_done', mixDateStr()); }catch(e){}
+  try{ const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');   /* r363: the mix inherits the Clean Sheet feats */
+    fl.mixClears=(fl.mixClears||0)+1; localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+    window.hkStatePush&&window.hkStatePush(); }catch(e){}
   updateMixBtn();
   setTimeout(()=>{ try{ showToast('\u2615 daily mix complete \u2014 same time tomorrow'); playWinFanfare(); }catch(e){} }, 600);
 }
@@ -13870,9 +13866,7 @@ function openDailyChallenge(){
     bd.innerHTML=html;
   }).catch(()=>{});
 }
-function updateDailyBtn(){ const b=$('dailyBtn'); if(b){ b.classList.toggle('on', dailyMode);
-  try{ const sh=getSheet(); const n=sh.done.length;
-    b.innerHTML='\u26a1 sheet <span style="opacity:.8">'+n+'/3</span>'+(n===3?' \u2713':''); }catch(e){} } }
+function updateDailyBtn(){}   /* r363: retired with the morning sheet */
 /* ---------- r140: THE MORNING SHEET — three drills a day, one ritual ----------
    item 1 = the seeded DAILY (everyone's, keeps its board) · item 2 = SHARPEN
    (your worst PB-vs-par) · item 3 = FRESH GROUND (never drilled) or CHASE
@@ -13915,10 +13909,10 @@ function openGateInfo(gname){
     '<a class="modal-x" id="gateX">\u00d7</a>'+
     '<div class="ob-title">'+gname+' \u2014 locked, for now</div>'+
     '<div class="ob-body" style="text-align:left;font-size:12.5px;line-height:1.9">'+
-      'This tier opens when the climb says you\u2019re ready \u2014 both bars, or ship the campaign:<br><br>'+
+      'This tier opens when the climb says you\u2019re ready \u2014 both bars, or ship the track milestones:<br><br>'+
       '<b style="color:'+(lvOK?'var(--accent)':'var(--warn)')+'">'+(lvOK?'\u2713':'\u25cb')+' LVL '+g.lvl+'</b> <span style="color:var(--muted)">\u2014 you\u2019re LVL '+lv+'</span><br>'+
       '<b style="color:'+(clOK?'var(--accent)':'var(--warn)')+'">'+(clOK?'\u2713':'\u25cb')+' '+g.clears+' pace clears</b> <span style="color:var(--muted)">\u2014 you have '+cl+' \u00b7 a pace clear = beat par \u00d7'+(window.HOTKEY_GATES.PACE)+' on a clean run</span><br>'+
-      '<span style="color:var(--muted)">or</span> <b>\ud83d\udcc8 ship the campaign</b> <span style="color:var(--muted)">through the earlier versions \u2014 pure speed, no waiting</span>'+
+      '<span style="color:var(--muted)">or</span> <b>\ud83d\udcc8 ship the milestones</b> <span style="color:var(--muted)">through the earlier chapters \u2014 pure speed, no waiting</span>'+
     '</div>'+
     '<div class="ob-opts" style="display:flex;gap:10px;flex-wrap:wrap">'+
       '<button class="ob-key primary" id="gateGo">keep training \u2192</button>'+
@@ -13933,70 +13927,12 @@ function openGateInfo(gname){
   m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
   try{ ev('gate_hit',{g:gname, lvl:lv, clears:cl}); }catch(e){}
 }
-function getSheet(){
-  const k='hk_sheet_'+dailyDateStr();
-  try{ const v=JSON.parse(localStorage.getItem(k)||'null'); if(v && v.items && v.items.length===3) return v; }catch(e){}
-  const PARS=window.HOTKEY_PARS||{};
-  const items=[drillOfDay()];
-  let worst=null;
-  Object.keys(PB).forEach(d=>{ if(!CHALLENGES[d]||items.includes(d)||!PARS[d]) return;
-    const r=PB[d]/PARS[d]; if(!worst||r>worst.r) worst={d,r}; });
-  if(worst) items.push(worst.d);
-  const start=dailySeed()%MENU_ORDER.length;
-  for(let i=0;i<MENU_ORDER.length && items.length<3;i++){
-    const d=MENU_ORDER[(start+i)%MENU_ORDER.length];
-    if(!items.includes(d) && PB[d]===undefined && !drillLocked(d)) items.push(d);   // r158
-  }
-  if(items.length<3){ let chase=null;
-    Object.keys(PB).forEach(d=>{ if(!CHALLENGES[d]||items.includes(d)||!PARS[d]) return;
-      const r=PB[d]/PARS[d]; if(r>1 && (!chase||r<chase.r)) chase={d,r}; });
-    if(chase) items.push(chase.d); }
-  for(let i=0;i<MENU_ORDER.length && items.length<3;i++){
-    const d=MENU_ORDER[(start+i)%MENU_ORDER.length];
-    if(!items.includes(d)) items.push(d); }
-  const sh={items:items.slice(0,3), done:[]};
-  try{ localStorage.setItem(k, JSON.stringify(sh)); }catch(e){}
-  return sh;
-}
-function sheetTag(sh,i){ const d=sh.items[i];
-  if(i===0) return 'the daily';
-  return PB[d]===undefined ? 'fresh ground' : ((window.HOTKEY_PARS||{})[d] && PB[d]>(window.HOTKEY_PARS||{})[d] ? 'sharpen' : 'chase par'); }
-function toggleSheetPop(){
-  const p=$('sheetPop'); if(!p) return;
-  if(p.classList.contains('show')){ p.classList.remove('show'); return; }
-  const sh=getSheet();
-  p.innerHTML='<div style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:4px 6px 6px">\u26a1 morning sheet \u00b7 '+sh.done.length+'/3'+(sh.done.length===3?' \u2014 cleared':'')+'</div>'+
-    sh.items.map((d,i)=>{ const done=sh.done.includes(d); const nm=(CHALLENGES[d]&&CHALLENGES[d].name)||d;
-      return '<button class="mb-tool" data-sheet="'+d+'" data-i="'+i+'" style="'+(done?'opacity:.55':'')+'">'+
-        '<span style="color:'+(done?'var(--accent)':'var(--faint)')+';width:14px;display:inline-block">'+(done?'\u2713':'\u00b7')+'</span> '+
-        nm+' <span style="margin-left:auto;font-size:9px;color:var(--faint)">'+sheetTag(sh,i)+'</span></button>'; }).join('')+
-    '<div style="font-family:var(--mono);font-size:9px;color:var(--faint);padding:5px 6px 2px">clear all three \u2014 the sheet is your day\u2019s signature</div>';
-  p.classList.add('show');
-  p.querySelectorAll('[data-sheet]').forEach(b=>{ b.onclick=(e2)=>{ e2.stopPropagation();
-    p.classList.remove('show');
-    const d=b.getAttribute('data-sheet');
-    loadChallenge(d, b.getAttribute('data-i')==='0'?{daily:true}:undefined);
-    updateDailyBtn(); }; });
-}
-document.addEventListener('click',(e)=>{ const p=$('sheetPop');
-  if(p && p.classList.contains('show') && !e.target.closest('#sheetPop') && !e.target.closest('#dailyBtn')) p.classList.remove('show'); });
+/* r363: getSheet/sheetTag/toggleSheetPop deleted — the morning sheet's button left the
+   DOM long ago; this was dead code whose leaderboard key ('daily-') caused the empty
+   daily-board bug (r362). The Daily Mix owns the ritual now. */
 document.addEventListener('click',(e)=>{ const p=$('wqPop');   // r157: same closer for the weakness queue
   if(p && p.classList.contains('show') && !e.target.closest('#wqPop') && !e.target.closest('#wqBtn')) p.classList.remove('show'); });
-function sheetMarkWin(){
-  try{
-    const k='hk_sheet_'+dailyDateStr(); const sh=getSheet();
-    if(!sh.items.includes(cur) || sh.done.includes(cur)) return;
-    sh.done.push(cur); localStorage.setItem(k, JSON.stringify(sh)); updateDailyBtn();
-    if(sh.done.length===3){
-      ev('sheet_clear');
-      try{ const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');   // r150: Clean Sheet ladder
-        fl.sheetClears=(fl.sheetClears||0)+1; localStorage.setItem('hk_ach_flags', JSON.stringify(fl)); try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} }catch(e){}
-      if(window.hkCelebrate) hkCelebrate({cap:'morning sheet', title:'Sheet cleared',
-        sub:'all three signed off \u2014 the desk runs on people like you', iconHtml:'<span style="font-size:44px">\u26a1</span>'});
-      else showToast('\u26a1 morning sheet cleared');
-    } else showToast('\u26a1 sheet: '+sh.done.length+'/3 signed off');
-  }catch(e){}
-}
+function sheetMarkWin(){ /* r363: retired with the sheet — kept as a no-op for one release so any stale caller can't throw */ }
 function loadChallenge(key, opts){
   try{ echoAbort(); }catch(e){}
   try{ window.__stkT=Date.now(); window.__stkBase=null; window.__stkDone=false; }catch(e){}
@@ -14020,17 +13956,15 @@ function loadChallenge(key, opts){
     else { const fin=window.__wqI>=q.length-1; window.__wq=null;
       if(fin){ try{ ev('wq_done',{}); }catch(e){} showToast('weakness queue cleared \u2014 the gaps got smaller'); } }
   }
-  dailyMode = !!(opts && opts.daily);
   window.__wantGuided = !!(opts && opts.guided);   /* r356: the tour-end path passes {guided:true}; honored after state resets below */
   weeklyMode = !!(opts && opts.weekly);
   challengeMode = !!(opts && opts.challenge);
   updateDailyBtn(); updateWeeklyBtn(); try{ updateChallengeBtn(); }catch(e){}
   if(mix && !mix.rf && key!==mix.q[mix.i]){ mix=null; try{ updateMixBtn(); }catch(e){} }   /* r360: wandering off the queue quietly ends the mix */
   cur=key; const C=CHALLENGES[key];
-  if(dailyMode){ _rand = mulberry32(dailySeed()); }                 // deterministic build for the day
   if(challengeMode){ _rand = mulberry32(challengeSeed()); }         // r219: same extra-hard board worldwide
   if(weeklyMode){ _rand = mulberry32(weekSeed() + weeklyIdx*7919); } // deterministic per gauntlet leg
-  try{ if(!dailyMode && !weeklyMode) KV.set('hotkey_last_drill', key); }catch(e){}  // resume point (daily doesn't override it)
+  try{ if(!weeklyMode) KV.set('hotkey_last_drill', key); }catch(e){}  // resume point
   const built=C.build();
   _rand = Math.random;                                              // seeded only for the daily build
   S={ROWS:Math.max(built.ROWS, ROWS_MAX), cells:built.cells, active:built.active, sel:null, clipboard:null};
@@ -15150,7 +15084,6 @@ function chordifyLog(log){
 }
 // r80: lite local run ledger — feeds in-game achievement checks (server runs stay canonical)
 function logRunLite(t){
-  try{ sheetMarkWin(); }catch(e){}
   try{ ev('solve',{d:cur, ms:Math.round(t*1000)});
     if(!localStorage.getItem('hk_ev_first')){ localStorage.setItem('hk_ev_first','1'); ev('first_solve',{d:cur}); }
   }catch(e){}
