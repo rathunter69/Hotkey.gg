@@ -307,7 +307,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=278"><\/script>
+<script src="nav.js?v=279"><\/script>
 <div class="wrap">`;
 
   const FOOT = `

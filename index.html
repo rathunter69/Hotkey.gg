@@ -587,7 +587,10 @@
   .mb-tool:hover{border-color:var(--line)}
   #streakBadge,#lvlBadge,#proBadge{border-color:var(--line)}
   /* r134: the xp bar floated above the text baseline — flex centers it with the label */
-  #lvlBadge{display:inline-flex !important; align-items:center; gap:7px}
+  #lvlBadge{display:inline-flex !important; align-items:center; gap:7px; height:27px; padding-top:0; padding-bottom:0}   /* r360: same box as the mode chips beside it */
+  .mb-lvl-bar{display:inline-block; width:62px; height:5px; border-radius:99px; background:var(--surface2);
+    border:1px solid var(--line); overflow:hidden; vertical-align:middle}
+  .mb-lvl-bar i{display:block; height:100%; background:var(--accent); border-radius:99px; transition:width .3s ease}
   #lvlBadge .lvl-bar{margin-left:0; vertical-align:initial}
 
   #hkToast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(8px);
@@ -1541,7 +1544,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=278"></script>
+<script src="nav.js?v=279"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1570,6 +1573,7 @@
       <!-- r306 (Wolf): modes → helpers → flair → settings, weight ∝ usage. Classic chip and
            random retired (the drill menu covers both); rapid-fire downweighted to a normal chip. -->
       <button class="mb-tool mb-daily" id="dailyChallengeBtn" data-tip="the Daily Challenge — one extra-hard sitting, same board worldwide, live leaderboard">◆ daily</button>
+      <button class="mb-tool" id="dailyMixBtn" data-tip="the Daily Mix — three quick drills + a one-minute rapid-fire finale, ~5 minutes end to end">☕ mix</button>
       <button class="mb-tool mb-campaign" id="campaignBtn" title="the campaign — ordered chapters, time gates, badges"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-6"/></svg>campaign</button>
       <div class="mb-mode-wrap">
         <button class="mb-tool mb-rapid" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>rapid-fire<span class="caret">▾</span></button>
@@ -3957,7 +3961,7 @@ const CHALLENGES = {
   comps:{
     name:'Comps', label:'Run the comps', par:94, parKeys:99,
     aha:'Build one row of logic, then Ctrl+D stamps it down the page \u2014 and LARGE/SMALL read the range with the outliers trimmed off.',
-    prompt:'A full comps page, both panels: compute EV/EBITDA for five peers and fill it down; read the data — median, high, low, then the trimmed read (2nd-high and 2nd-low, so one outlier peer doesn’t set the range); then walk the target through the implied chain: EV, equity, per share, premium to market.',
+    prompt:'A full comps page (trading comparables — what the market pays for businesses like this), both panels: compute EV/EBITDA for five peers and fill it down; read the data — median, high, low, then the trimmed read (2nd-high and 2nd-low, so one outlier peer doesn’t set the range); then walk the target through the implied chain: EV, equity, per share, premium to market.',
     req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> <em>=MEDIAN(D3:D7)</em> \u00b7 <em>D9</em> <em>=MAX</em> \u00b7 <em>D10</em> <em>=MIN</em> \u00b7 <em>D11</em> <em>=LARGE(D3:D7,2)</em> \u00b7 <em>D12</em> <em>=SMALL(D3:D7,2)</em> \u00b7 <em>G4</em> EV <em>=G3*D8</em> \u00b7 <em>G6</em> equity <em>=G4-G5</em> \u00b7 <em>G8</em> per share <em>=G6/G7</em> \u00b7 <em>G10</em> premium <em>=G8/G9-1</em>',
     guide:[
       'multiple, first peer: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -4312,7 +4316,7 @@ const CHALLENGES = {
   wacc:{
     name:'WACC', label:'Build the discount rate', par:78, parKeys:82,
     aha:'WACC = weights × costs — build the pieces, one line ties them.',
-    prompt:'Build the discount rate with no shortcuts: unlever the peer beta at the peer’s structure, relever it at the target’s own debt-to-equity, compute cost of equity with CAPM, tax-effect the debt side, then weight both sides off one denominator. Five formulas, each feeding the next — the grader follows the chain, so a retyped number breaks it.',
+    prompt:'Build the discount rate — WACC, the blended cost of debt and equity capital — with no shortcuts: unlever the peer beta at the peer’s structure, relever it at the target’s own debt-to-equity, compute cost of equity with CAPM, tax-effect the debt side, then weight both sides off one denominator. Five formulas, each feeding the next — the grader follows the chain, so a retyped number breaks it.',
     req:'<em>B10</em> unlev \u03b2 <em>=B4/(1+(1-B6)*B5)</em> \u00b7 <em>B11</em> relev \u03b2 <em>=B10*(1+(1-B6)*B8/B7)</em> \u00b7 <em>B12</em> Ke <em>=B2+B11*B3</em> \u00b7 <em>B13</em> at-Kd <em>=B9*(1-B6)</em> \u00b7 <em>B14</em> WACC <em>=(B7*B12+B8*B13)/(B7+B8)</em>',
     guide:[
       'unlevered \u03b2 at B10 \u00b7 <kbd>=B4/(1+(1-B6)*B5)</kbd> <kbd>\u21b5</kbd> \u2014 strip the peer\u2019s leverage out',
@@ -4365,7 +4369,7 @@ const CHALLENGES = {
   dcf:{
     name:'DCF', label:'Discount the cash flows', par:62, parKeys:64,
     aha:'Each year ÷ (1+r)^n — discounting is a fill; then add the terminal value.',
-    prompt:'Five years of FCF and the full discounting stack: a discount-factor row built once off the anchored rate, a PV row that multiplies against it, a Gordon terminal value — and the TV discounts with the year-5 factor you already built. Never retype a discount factor.',
+    prompt:'Five years of FCF and the full discounting stack: a discount-factor row built once off the anchored rate, a PV row that multiplies against it, a Gordon terminal value (the perpetuity standing in for every year past five) — and the TV discounts with the year-5 factor you already built. Never retype a discount factor.',
     req:'<em>B4</em> DF <em>=1/(1+$B$7)^B2</em> \u00b7 fill B4:F4 \u2192 \u00b7 <em>B5</em> PV <em>=B3*B4</em> \u00b7 fill B5:F5 \u2192 \u00b7 <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> \u00b7 <em>B11</em> <em>=B10*F4</em> \u00b7 <em>B12</em> EV <em>=SUM(B5:F5)+B11</em>',
     guide:[
       'discount factor at B4 \u00b7 <kbd>=1/(1+$B$7)^B2</kbd> \u2014 rate anchored, year walking',
@@ -4435,7 +4439,7 @@ const CHALLENGES = {
   fcfbuild:{
     name:'uFCF', label:'Build the unlevered FCF', par:32, parKeys:31,
     aha:'Unlevered FCF is a cascade — NOPAT, add back D&A, take out capex and the NWC build; the row the DCF discounts.',
-    prompt:'From a five-year operating case, build the one row a DCF needs: unlevered free cash flow. Tax the EBIT (rate anchored), arrive at NOPAT, add back the non-cash D&A, then subtract capex and the increase in working capital. Three formula rows, each filled across.',
+    prompt:'From a five-year operating case, build the one row a DCF needs: unlevered free cash flow. Tax the EBIT (rate anchored), arrive at NOPAT (net operating profit after tax), add back the non-cash D&A, then subtract capex and the increase in working capital. Three formula rows, each filled across.',
     req:'<em>B4</em> taxes <em>=-B3*$B$11</em> · fill B4:F4 → · <em>B5</em> NOPAT <em>=B3+B4</em> · fill B5:F5 → · <em>B9</em> uFCF <em>=B5+B6+B7+B8</em> · fill B9:F9 →',
     guide:[
       'cash taxes at B4 · <kbd>=-B3*$B$11</kbd> — EBIT × the anchored tax rate, negative',
@@ -4593,7 +4597,7 @@ const CHALLENGES = {
   lbobuild:{
     name:'Paper LBO', label:'Build the paper LBO', par:82, parKeys:85,
     aha:'A paper LBO is two blocks — sources & uses sizes the equity check, entry-to-exit turns it into MOIC — and IRR has two roads that MUST agree: compound the MOIC, or hand the raw equity flows to =IRR().',
-    prompt:'The whole paper LBO on one tab. Size the deal: purchase EV off the entry multiple, add fees for total uses, lever it, and the sponsor equity is the PLUG that makes sources tie to uses. Then run it to exit: exit EV at the exit multiple, net debt out for exit equity, MOIC against the check you wrote, and IRR compounded over the hold. Then prove it the way the fund model does — lay the equity out as CASH FLOWS (your check out at year 0, exit proceeds in at the end) and let =IRR() read the line. No interim flows means the two answers match to the decimal; when they don’t, someone fat-fingered the hold.',
+    prompt:'The whole paper LBO — a leveraged buyout: buy with debt, sell at exit, keep the spread — on one tab. Size the deal: purchase EV off the entry multiple, add fees for total uses, lever it, and the sponsor equity is the PLUG that makes sources tie to uses. Then run it to exit: exit EV at the exit multiple, net debt out for exit equity, MOIC against the check you wrote, and IRR compounded over the hold. Then prove it the way the fund model does — lay the equity out as CASH FLOWS (your check out at year 0, exit proceeds in at the end) and let =IRR() read the line. No interim flows means the two answers match to the decimal; when they don’t, someone fat-fingered the hold.',
     req:'<em>B6</em> EV <em>=B4*B5</em> · <em>B8</em> uses <em>=B6+B7</em> · <em>B10</em> debt <em>=B4*B9</em> · <em>B11</em> equity <em>=B8-B10</em> · <em>B16</em> exit EV <em>=B14*B15</em> · <em>B18</em> exit eq <em>=B16-B17</em> · <em>B20</em> MOIC <em>=B18/B11</em> · <em>B21</em> IRR <em>=B20^(1/B19)-1</em> · flows: <em>B24</em> <em>=-B11</em> · exit-year cell <em>=B18</em> · <em>B25</em> <em>=IRR(</em>flow row<em>)</em> — ties to B21',
     guide:[
       'size the deal: purchase EV at B6 · <kbd>=B4*B5</kbd> — EBITDA × entry multiple · total uses at B8 · <kbd>=B6+B7</kbd>',
@@ -4940,7 +4944,7 @@ const CHALLENGES = {
   lbo:{
     name:'LBO', label:'Run the LBO math', par:54, parKeys:56,
     aha:'Entry, leverage, exit — four lines of math and the IRR falls out.',
-    prompt:'Entry to exit, the whole chain: build enterprise value at entry, lever it, check the equity, mark the exit at the same multiple, compute MOIC — then annualize it over the hold for the IRR. Seven formulas; the multiple stays anchored so entry and exit agree.',
+    prompt:'Entry to exit, the whole chain: build enterprise value at entry, lever it, check the equity, mark the exit at the same multiple, compute MOIC (multiple of invested capital — cash out over cash in) — then annualize it over the hold for the IRR. Seven formulas; the multiple stays anchored so entry and exit agree.',
     req:'<em>B6</em> entry EV <em>=B2*$B$4</em> \u00b7 <em>B7</em> debt <em>=B6*B5</em> \u00b7 <em>B8</em> entry equity <em>=B6-B7</em> \u00b7 <em>B9</em> exit EV <em>=B3*$B$4</em> \u00b7 <em>B11</em> exit equity <em>=B9-B10</em> \u00b7 <em>B12</em> MOIC <em>=B11/B8</em> \u00b7 <em>B14</em> IRR <em>=B12^(1/B13)-1</em>',
     guide:[
       'entry EV at B6 \u00b7 <kbd>=B2*$B$4</kbd> \u2014 EBITDA \u00d7 the anchored multiple',
@@ -5521,7 +5525,7 @@ const CHALLENGES = {
   nwcsched:{
     name:'NWC Sched.', label:'Roll working capital', par:74, parKeys:78,
     aha:'DSO, DIO, DPO drive the balances — working capital rolls on days, not guesses.',
-    prompt:'Working capital from the drivers: three assumptions from the data room — type them in, color them blue, then build. AR off DSO, inventory off DIO, payables off DPO, each driver anchored and filled across five years; net working capital bolded and ruled.',
+    prompt:'Working capital from the drivers: three assumptions from the data room — type them in, color them blue, then build. AR off DSO (days customers take to pay), inventory off DIO (days stock sits), payables off DPO (days you take to pay), each driver anchored and filled across five years; net working capital bolded and ruled.',
     req(){ return 'type the drivers at B9:B11 \u2014 DSO <em>'+this._dso+'</em> \u00b7 DIO <em>'+this._dio+'</em> \u00b7 DPO <em>'+this._dpo+'</em> \u2014 then <em>alt h f c</em> blue \u00b7 <em>B4</em> =B2/365*$B$9 fill \u2192 \u00b7 <em>B5</em> =B3/365*$B$10 fill \u2192 \u00b7 <em>B6</em> =B3/365*$B$11 fill \u2192 \u00b7 <em>B7</em> =B4+B5-B6 fill \u2192 + <em>ctrl+b</em> + <em>alt h b p</em> \u00b7 <em>C8</em> \u0394 =C7-B7 fill \u2192'; },
     guide(){ return [
       'the data room says DSO <kbd>'+this._dso+'</kbd> \u00b7 DIO <kbd>'+this._dio+'</kbd> \u00b7 DPO <kbd>'+this._dpo+'</kbd> \u2014 type them down B9:B11, <kbd>\u21b5</kbd> walks you down',
@@ -5678,7 +5682,7 @@ const CHALLENGES = {
   waterfall:{
     name:'Waterfall', label:'Run the paydown waterfall', par:64, parKeys:67,
     aha:'Paydown follows seniority — each tranche MINs against the cash that’s left.',
-    prompt:'Three years of cash, two tranches, strict seniority — and the balances corkscrew: each year opens where the last one closed. Build year 1 top to bottom, link both openings, fill everything right. MIN does the rationing.',
+    prompt:'Three years of cash, two tranches (layers of debt — senior gets paid first), strict seniority — and the balances corkscrew: each year opens where the last one closed. Build year 1 top to bottom, link both openings, fill everything right. MIN does the rationing.',
     req:'<em>B5</em> FCF <em>=SUM(B2:B4)</em> \u00b7 fill B5:D5 \u2192 \u00b7 <em>B8</em> <em>=MIN(B5,B7)</em> \u00b7 <em>B9</em> <em>=B7-B8</em> \u00b7 <em>B10</em> <em>=B5-B8</em> \u00b7 fill B8:D10 \u2192 \u00b7 link <em>C7</em> <em>=B9</em> fill \u2192 \u00b7 <em>B13</em> <em>=MIN(B10,B12)</em> \u00b7 <em>B14</em> <em>=B12-B13</em> \u00b7 fill B13:D14 \u2192 \u00b7 link <em>C12</em> <em>=B14</em> fill \u2192',
     guide:[
       'free cash, all years: B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 capex and interest already carry their signs \u00b7 fill B5:D5 \u2192',
@@ -5810,7 +5814,7 @@ const CHALLENGES = {
   sourcesuses:{
     name:'S&U', label:'Balance sources and uses', par:55, parKeys:57,
     aha:'Sources must equal uses — the plug is a formula (=uses−sources), never a typed number.',
-    prompt:'The first page of every deal book: total the uses, let sponsor equity be the plug, total the sources, and prove the check reads zero — then common-size both sides with an anchored % column that runs through 100%. Two anchors, two fills, one funded deal.',
+    prompt:'The first page of every deal book: total the uses, let sponsor equity (the buyer’s own check) be the plug, total the sources, and prove the check reads zero — then common-size both sides with an anchored % column that runs through 100%. Two anchors, two fills, one funded deal.',
     req:'<em>B5</em> total uses <em>=SUM(B2:B4)</em> \u00b7 <em>C2</em> % <em>=B2/$B$5</em> fill C2:C5 \u00b7 <em>B9</em> sponsor equity <em>=B5-B7-B8</em> (the plug) \u00b7 <em>B10</em> total sources <em>=SUM(B7:B9)</em> \u00b7 <em>C7</em> % <em>=B7/$B$10</em> fill C7:C10 \u00b7 <em>B12</em> check <em>=B10-B5</em> \u2192 0',
     guide:[
       'total uses at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 equity purchase, refi, fees',
@@ -5872,7 +5876,7 @@ const CHALLENGES = {
   accdil:{
     name:'Acc/Dil', label:'Run accretion / dilution', par:50, parKeys:51,
     aha:'Accretion = pro-forma EPS ÷ standalone − 1 — the verdict is four rows of math.',
-    prompt:'Does the deal add to EPS? Include the part that’s easy to forget — the financing drag: cash spent on the deal stops earning interest, and that foregone interest comes out of pro forma income before you divide. Combine the income, net the drag, combine the shares, compute both EPS figures, and state the verdict.',
+    prompt:'Does the deal add to EPS (earnings per share)? Include the part that’s easy to forget — the financing drag: cash spent on the deal stops earning interest, and that foregone interest comes out of pro forma income before you divide. Combine the income, net the drag, combine the shares, compute both EPS figures, and state the verdict.',
     req:'<em>B7</em> foregone interest <em>=-B5*B6</em> \u00b7 <em>B8</em> pro forma NI <em>=SUM(B2:B4)+B7</em> \u00b7 <em>B11</em> shares <em>=B9+B10</em> \u00b7 <em>B12</em> standalone EPS <em>=B2/B9</em> \u00b7 <em>B13</em> pro forma EPS <em>=B8/B11</em> \u00b7 <em>B14</em> accretion <em>=B13/B12-1</em>',
     guide:[
       'the drag first: B7 \u00b7 <kbd>=-B5*B6</kbd> \u2014 cash consideration \u00d7 its after-tax cost, negative convention',
@@ -6201,7 +6205,7 @@ const CHALLENGES = {
   audit:{
     name:'The 4am pass', label:'Find what’s broken', par:34, parKeys:33,
     aha:'Broken models leave fingerprints — hardcodes in formula rows, refs off by one.',
-    prompt:'Audit a divisional P&L someone else built. Three things are wrong: one division’s five-year Total stops a column short, one EBITDA is a stale hardcode, and one EBITDA reads the wrong year’s opex. Use F5 → Special → Constants to light up every raw number on the page, find all three, and rebuild them as live formulas.',
+    prompt:'Audit a divisional P&L someone else built. Three things are wrong: one division’s five-year Total stops a column short, one EBITDA (operating profit before depreciation and amortization) is a stale hardcode, and one EBITDA reads the wrong year’s opex. Use F5 → Special → Constants to light up every raw number on the page, find all three, and rebuild them as live formulas.',
     req(){ return '<em>scan the Total column</em> \u00b7 one SUM stops at FY4 \u2014 <em>F2</em>, extend it \u00b7 one EBITDA is a typed number \u2014 rebuild it live \u00b7 one EBITDA crosses columns \u2014 repoint it'; },
     guide:[
       'read the Total column (G) \u2014 one division\u2019s SUM ends a year early \u00b7 <kbd>F2</kbd>, extend the range to column F, <kbd>\u21b5</kbd>',
@@ -6888,7 +6892,7 @@ const CHALLENGES = {
   covtable:{
     name:'Cov. Table', label:'Run the covenant table', par:45, parKeys:45,
     aha:'Covenants are ratios with teeth — the table shows headroom before the breach.',
-    prompt:'Leverage is tested every quarter and the covenant steps down — the question is never "compliant today?" but "which quarter pinches?". Covenants test net leverage: debt less cash, over LTM EBITDA. Compute it, the headroom against the stepping maximum, and a 1/0 compliance flag with a real IF.',
+    prompt:'Leverage is tested every quarter and the covenant (the lender’s leverage ceiling) steps down — the question is never "compliant today?" but "which quarter pinches?". Covenants test net leverage: debt less cash, over LTM EBITDA. Compute it, the headroom against the stepping maximum, and a 1/0 compliance flag with a real IF.',
     req(){ return '<em>B7:F7</em> net leverage \u2192 =(B5-B6)/B4 \u00b7 <em>B9:F9</em> headroom \u2192 =B8\u2212B7 \u00b7 <em>B10:F10</em> compliant \u2192 =IF(B9>=0,1,0) \u00b7 <em>B12</em> tightest \u2192 =MIN(B9:F9)'; },
     guide:[
       'NET leverage = (debt \u2212 cash) over LTM EBITDA \u2014 covenants credit the cash \u00b7 B7: <kbd>=</kbd>(B5-B6)/B4 <kbd>\u21b5</kbd> \u00b7 select B7:F7, <kbd>ctrl</kbd>+<kbd>r</kbd>',
@@ -9251,7 +9255,7 @@ function showResults(o){
     // the toast, not restart the drill underneath (Wolf's report).
     if(window.__hkCelOpen || ev.defaultPrevented) return;
     if(ev.key==='Enter'){ ev.preventDefault(); hideResults(); restartDrill(); return; }
-    if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
+    if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); if(mix && mixAdvance()) return; hideResults(); loadChallenge(nextDrillKey()); return; }
     if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
     if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':'details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards'; } return; }   // r293: progressive disclosure
   };
@@ -9398,7 +9402,10 @@ function _showResults(o){
     `</div>`+
     `<div class="rm-opts">`+
     `<button class="rm-key" data-act="again"><kbd>↵</kbd>again</button>`+
-    `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
+    `<button class="rm-key primary" data-act="next"><kbd>n</kbd>${
+      mix && !mix.rf
+        ? (mix.i+1 < mix.q.length ? 'mix '+(mix.i+2)+'/3 \u2192' : 'mix finale: \u26a1 rapid-fire \u2192')
+        : 'next: '+((CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next')+' \u2192'}</button>`+
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
     (o.pb ? `<button class="rm-key" data-act="share">\ud83d\udcf8 share</button>` : '')+
     `</div>`+
@@ -9410,7 +9417,7 @@ function _showResults(o){
   m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
     const a=b.dataset.act;
     if(a==='again'){ hideResults(); restartDrill(); }
-    else if(a==='next'){ hideResults(); loadChallenge(nextDrillKey()); }
+    else if(a==='next'){ if(mix && mixAdvance()) return; hideResults(); loadChallenge(nextDrillKey()); }
     else if(a==='menu'){ hideResults(); openPicker(); }
     else if(a==='share'){ /* r359: PB share card — canvas PNG via the shared renderer */
       try{
@@ -11618,8 +11625,9 @@ $('grid').addEventListener('mousedown',e=>{
 // results-card buttons (mouse path mirrors the keyboard options)
 $('result').addEventListener('click',e=>{ const b=e.target.closest('.rc-key'); if(!b)return;
   const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
-$('resultsModal').addEventListener('click',e=>{ const b=e.target.closest('.rm-key'); if(!b)return;
-  const a=b.dataset.act; if(a==='again')loadChallenge(cur); else if(a==='next')nextChallenge(); else if(a==='menu')toMenu(); });
+/* r360: the legacy delegated rm-key listener is GONE — r88 wired direct onclicks on these
+   buttons, so every mouse click fired BOTH paths (a hidden double-advance: 'next' skipped a
+   drill for mouse users, and it clobbered the daily-mix queue advance). */
 function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>F1</kbd> guided: '+(guided?'on':'off'); } }
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn();
   if(!guided){ try{ sessionStorage.setItem('hk_guided_off','1'); }catch(e){} }   // r159: respect an explicit F1-off — training wheels stay off this session
@@ -11749,6 +11757,7 @@ $('wqBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleWqPop(); }
 { const __wb=$('weeklyBtn'); if(__wb) __wb.addEventListener('click',startWeekly); }   // r81 hotfix: button retired; unguarded listener was a boot TypeError
 $('campaignBtn').addEventListener('click',openCampaign);
 { const _dcb=$('dailyChallengeBtn'); if(_dcb) _dcb.addEventListener('click',openDailyChallenge); }
+{ const _dmb=$('dailyMixBtn'); if(_dmb){ _dmb.addEventListener('click',()=>{ try{ startDailyMix(); }catch(e){} }); try{ updateMixBtn(); }catch(e){} } }   /* r360 */
 $('startBtn').addEventListener('click', tryEnter);
 { const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); };
   const lb=$('loginBtn'); if(lb) lb.onclick=()=>{ openAuth('signin'); }; }
@@ -12932,6 +12941,7 @@ function endSession(){
   }
   marathon.practice = guidedUsed;   // surfaced in the summary so user knows why no leaderboard
   showSessionSummary();
+  try{ if(mix && mix.rf) mixFinish(); }catch(e){}   /* r360: the rapid-fire finale closes the daily mix */
 }
 function exitSession(){
   if(marathon){ clearInterval(marathon.tickH); }
@@ -13416,7 +13426,11 @@ function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
   // r302 (Wolf): the CHIP carries the number \u2014 "LVL 14" text + a wide xp bar beside a
   // 14-chip was redundant AND the widest thing on the row (it forced the wrap). Icon+number
   // only; the bar/progress detail lives one click away (openLevelProgress) + in the title.
-  el.innerHTML=(window.hkLevelChip ? window.hkLevelChip(L.lvl,22) : 'LVL '+L.lvl);
+  /* r360 (Wolf): the top-nav level bar moves HERE — chip + slim progress bar in the mode
+     bar, same button height as its neighbors; the top bar sheds the duplicate chip. */
+  const __pct=Math.max(0, Math.min(100, Math.round(L.need ? 100*L.into/L.need : 0)));
+  el.innerHTML=(window.hkLevelChip ? window.hkLevelChip(L.lvl,16) : 'LVL '+L.lvl)+
+    '<span class="mb-lvl-bar"><i style="width:'+__pct+'%"></i></span>';
   el.style.cursor='pointer'; el.onclick=openLevelProgress;   // r211: show progress first, not the xp explanation
   el.title='LVL '+L.lvl+' \u00b7 '+L.into+' / '+L.need+' xp \u00b7 '+Math.max(0,L.need-L.into)+' to LVL '+(L.lvl+1); }
   /* r101: a stale second el.title line here referenced bare `l` (not L.lvl) \u2014 ReferenceError
@@ -13519,6 +13533,25 @@ function openCampaign(){
     '<div class="ob-body" style="text-align:left;font-size:12px;color:var(--muted);margin-bottom:2px">Ship the model version by version. Clear every drill in a version under its pace gate and the next unlocks \u2014 each shipped version pays a <b style="color:var(--warn)">one-time xp bounty</b> and stamps a medal on your card.</div>'+
     header+
     '<div class="camp-list">'+rows+'</div>'+
+    /* r361 (Wolf: 'changes flow through all avenues'): the certificate tracks live IN the
+       campaign view — same spine, two ladders. Progress = local clean bests (advisory; the
+       claim re-verifies server-side), claimed certs deep-link to their public pages. */
+    (function(){ try{
+      if(!window.HK_TRACKS) return '';
+      let t='<div class="ob-title" style="margin-top:14px">certificate tracks</div>'+
+        '<div class="ob-body" style="text-align:left;font-size:12px;color:var(--muted);margin-bottom:2px">Three long tracks over the same chapters — clear every drill in one (clean, recorded) and the certificate is yours: public, verifiable, one-click LinkedIn.</div>';
+      window.HK_TRACKS.forEach(tr=>{
+        const n=tr.keys.filter(k=>PB[k]!==undefined).length, N=tr.keys.length;
+        const id=localStorage.getItem('hk_cert_'+tr.id);
+        const done=id && id!=='pending';
+        t+='<div class="camp-ch'+(done?' done':'')+'"><div class="camp-hd">'+
+          '<span class="camp-badge">'+(done?'\ud83c\udf93':'\u25b8')+'</span><b>'+tr.name+'</b>'+
+          (done?'<a class="camp-xp claimed" style="cursor:pointer" href="cert.html?id='+encodeURIComponent(id)+'" target="_blank" rel="noopener">view certificate \u2192</a>'
+               :'<span class="camp-n" style="margin-left:auto">'+n+'/'+N+'</span>')+
+          '</div><div class="camp-chprog"><span style="width:'+Math.round(100*n/N)+'%"></span></div></div>';
+      });
+      return t;
+    }catch(e){ return ''; } })()+
     proCta+
     '<div class="ob-opts"><button class="ob-key" id="campClose">close</button></div></div>';
   m.classList.add('show');
@@ -13648,6 +13681,53 @@ function restartDrill(){
 function scoreKey(){ if(challengeMode) return challengeKey(); if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return dailyMode ? dailyKey() : cur; }
 function drillOfDay(){ return MENU_ORDER[dailySeed() % MENU_ORDER.length]; }
 function startDaily(){ loadChallenge(drillOfDay(), {daily:true}); updateDailyBtn(); }
+/* r360 DAILY MIX (Wolf-approved roadmap: session shape for the 5-minute player).
+   One button: three quick drills (deterministic per day — one you haven't cleared if
+   possible, all short-par) then a one-minute rapid-fire finale. Wins tick the streak
+   like any win; leaving the queue (picker, another drill) quietly cancels the mix. */
+let mix=null;   // {q:[k,k,k], i, rf}
+function mixDateStr(){ return dailyDateStr(); }
+function mixDoneToday(){ try{ return localStorage.getItem('hk_mix_done')===mixDateStr(); }catch(e){ return false; } }
+function buildMixQueue(){
+  const rng=mulberry32(dailySeed()+7077);
+  let played={}; try{ played=JSON.parse(localStorage.getItem('hk_clears')||'{}'); }catch(e){}
+  const short=MENU_ORDER.filter(k=>CHALLENGES[k] && CHALLENGES[k].par<=30 && !drillLocked(k));
+  const pool=short.length?short:MENU_ORDER.slice(0,6);
+  const fresh=pool.filter(k=>!played[k]);
+  const pick=arr=>arr.length?arr[Math.floor(rng()*arr.length)]:null;
+  const q=[]; const a=pick(fresh)||pick(pool); if(a) q.push(a);
+  let guard=0;
+  while(q.length<3 && guard++<40){ const c=pick(pool); if(c && !q.includes(c)) q.push(c); }
+  return q;
+}
+function startDailyMix(){
+  if(demoPlaying) return;
+  if(marathon && marathon.active){ showToast('finish the session first \u2014 then the mix'); return; }
+  mix={ q:buildMixQueue(), i:0, rf:false };
+  if(!mix.q.length){ mix=null; return; }
+  loadChallenge(mix.q[0], {mix:true});
+  showToast('\u2615 daily mix 1/3 \u2014 three quick drills, then a one-minute rapid-fire finale');
+  updateMixBtn();
+}
+function mixAdvance(){
+  if(!mix || mix.rf) return false;
+  mix.i++;
+  if(mix.i < mix.q.length){ hideResults(); loadChallenge(mix.q[mix.i], {mix:true}); showToast('\u2615 mix '+(mix.i+1)+'/3'); return true; }
+  hideResults(); mix.rf=true; startSession('rapidfire', 60);
+  showToast('\u26a1 the finale \u2014 one minute of rapid-fire');
+  return true;
+}
+function mixFinish(){
+  if(!mix) return;
+  mix=null;
+  try{ localStorage.setItem('hk_mix_done', mixDateStr()); }catch(e){}
+  updateMixBtn();
+  setTimeout(()=>{ try{ showToast('\u2615 daily mix complete \u2014 same time tomorrow'); playWinFanfare(); }catch(e){} }, 600);
+}
+function updateMixBtn(){ const b=$('dailyMixBtn'); if(!b) return;
+  const done=mixDoneToday();
+  b.textContent = done ? '\u2615 mix \u2713' : '\u2615 mix';
+  b.classList.toggle('done', done); }
 
 /* ============================================================
    r219 (Wolf): THE DAILY CHALLENGE — the marquee mode
@@ -13892,7 +13972,7 @@ function loadChallenge(key, opts){
   // r158: progression gate — daily runs and armed races ride through (community
   // moments); everything else locked-tier bounces to the explainer, state untouched.
   try{
-    if(!(opts&&(opts.daily||opts.weekly||opts.challenge)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
+    if(!(opts&&(opts.daily||opts.weekly||opts.challenge||opts.mix)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
       const __gn=drillLocked(key);
       if(__gn){
         openGateInfo(__gn);
@@ -13914,6 +13994,7 @@ function loadChallenge(key, opts){
   weeklyMode = !!(opts && opts.weekly);
   challengeMode = !!(opts && opts.challenge);
   updateDailyBtn(); updateWeeklyBtn(); try{ updateChallengeBtn(); }catch(e){}
+  if(mix && !mix.rf && key!==mix.q[mix.i]){ mix=null; try{ updateMixBtn(); }catch(e){} }   /* r360: wandering off the queue quietly ends the mix */
   cur=key; const C=CHALLENGES[key];
   if(dailyMode){ _rand = mulberry32(dailySeed()); }                 // deterministic build for the day
   if(challengeMode){ _rand = mulberry32(challengeSeed()); }         // r219: same extra-hard board worldwide
