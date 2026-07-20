@@ -510,9 +510,14 @@ function rankedOptedIn(){ try{ return localStorage.getItem('hk_ranked')==='1'; }
 function heroHtml(){
   const {userStat,meId,mySolves,perDrill}=DATA;
   if(!meId){
-    return '<div class="panel me"><h4>your card</h4>'+
-      '<div style="font-family:var(--mono);font-size:13.5px;color:var(--muted);line-height:1.8">Times only count on the boards for signed-in accounts. '+
-      '<a href="index.html" style="color:var(--accent)">Sign in and post a time</a> to see your rank, level, and progress toward the next tier.</div></div>';
+    /* r368: the signed-out card was a tall box with two lines glued to the bottom —
+       center the pitch and give it a real CTA so the space reads intentional */
+    return '<div class="panel me" style="display:flex;flex-direction:column"><h4>your card</h4>'+
+      '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;padding:10px 6px">'+
+      '<div style="font-family:var(--mono);font-size:13.5px;color:var(--muted);line-height:1.8;max-width:300px">Times only count on the boards for signed-in accounts.</div>'+
+      '<a href="index.html" class="fd-play" style="margin-left:0">sign in &amp; post a time →</a>'+
+      '<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);line-height:1.7;max-width:300px">your rank, level and progress toward the next tier land here</div>'+
+      '</div></div>';
   }
   const me=userStat[meId]||{att:0,sum:0,crowns:0,pod:0,t10:0};
   // RANKED GATE: level 3 unlocks Ranked; entering it shows the season-start infographic.
@@ -854,7 +859,7 @@ function guildHtml(){
   }).join('');
   const startRow = DATA.meId
     ? (window.__meAnon
-      ? '<div class="gb-start" style="color:var(--muted)">Desks need a full account \u2014 <a href="account.html" style="color:var(--accent)">add an email &amp; password</a> and your progress comes with you.</div>'
+      ? '<div class="gb-start" style="color:var(--muted);align-items:center;text-align:center"><span>Desks need a full account \u2014 <a href="account.html" style="color:var(--accent)">add an email &amp; password</a> and your progress comes with you.</span></div>'
       : '<div class="gb-start">'+
           /* r316 (Wolf): invite code is the PRIMARY action \u2014 most people join, they don\u2019t found.
              Starting a desk is demoted to a quieter secondary line so the page stops pushing it. */
@@ -864,7 +869,7 @@ function guildHtml(){
           '<div class="gb-found"><span class="gb-found-l">or start your own \u2014</span>'+
             '<input id="gbName" maxlength="40" placeholder="desk name (e.g. Wharton UG Finance)"><button class="tab" id="gbCreate">start a desk</button></div>'+
         '</div>')
-    : '<div class="gb-start" style="color:var(--muted)"><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</div>';
+    : '<div class="gb-start" style="color:var(--muted);align-items:center;text-align:center"><span><a href="index.html" style="color:var(--accent)">Sign in</a> to apply to a desk or start your own.</span></div>';   /* r368: one centered line — the left-glued note left the panel mostly blank */
   /* r293 (Wolf): ONE tile + arrows instead of a full grid, tight header, no explainer */
   /* r297: with ZERO desks the carousel used to render two stranded arrows around an empty
      stage \u2014 now the empty state is a single centered line and the chrome stays hidden */
