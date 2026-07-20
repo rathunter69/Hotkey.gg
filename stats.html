@@ -102,7 +102,7 @@
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=271"></script>
+<script src="drills.js?v=272"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -114,7 +114,7 @@ window.NAV_ACTIVE = 'stats';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=280"></script>
+<script src="nav.js?v=281"></script>
 
 <header class="head">
   <div class="wrap">
@@ -463,6 +463,22 @@ async function load(){
       kpsTop.forEach(([k,v])=>{ html += `<div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;padding:4px 0"><span>${esc(D.labelOf[k]||k)}</span><b style="color:var(--accent)">${v.toFixed(1)} k/s</b></div>`; });
       html += `</div>`;
     }
+  }
+  /* r367: the three certificate tracks get a progress module here — before this, the
+     track story lived only inside the trainer's tracks modal */
+  if(window.HK_TRACKS && window.HK_TRACKS.length){
+    html += `<h3 class="section-title">Certificate tracks</h3><div class="grid" style="grid-template-columns:1fr;margin-bottom:6px">`;
+    window.HK_TRACKS.forEach(t=>{
+      const ks=t.keys||[];
+      const done=ks.filter(k=> localPB[k]!==undefined || mine.some(r=>r.challenge===k)).length;
+      const pct=ks.length?Math.round(100*done/ks.length):0;
+      const full=ks.length&&done>=ks.length;
+      html += `<div class="stat"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-family:var(--mono)">`+
+        `<span style="font-size:12.5px;color:var(--text)"><b>${esc(t.name)}</b> <span style="color:var(--faint);font-size:11px">→ “${esc(t.cert)}”</span></span>`+
+        `<span style="font-size:12px;color:${full?'var(--accent)':'var(--muted)'}">${done} / ${ks.length}${full?' · complete — claim the certificate in the trainer':''}</span></div>`+
+        `<div style="height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:8px"><span style="display:block;height:100%;width:${pct}%;background:var(--accent);border-radius:99px"></span></div></div>`;
+    });
+    html += `</div>`;
   }
   html += `<h3 class="section-title">Per-drill</h3>`;
   let lastG=null;

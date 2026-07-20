@@ -97,11 +97,14 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
         chords: chords.slice(0, 8), fns: [...fns].slice(0, 6)
       };
     }));
-    return { groups, drills };
+    return { groups, drills,
+      tracks: (window.HK_TRACKS || []).map(t => ({ id: t.id, name: t.name, cert: t.cert, blurb: t.blurb, groups: t.groups })) };
   });
   await browser.close();
 
   const all = data.groups.flatMap(g => g.keys);
+  // r367: group → certificate track, so the read/SEO surfaces tell the track story too
+  const trackOf = {}; (data.tracks || []).forEach(t => (t.groups || []).forEach(gn => { trackOf[gn] = t; }));
   console.log('drills:', all.length);
   fs.mkdirSync(OUT, { recursive: true });
 
@@ -263,7 +266,11 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
   .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:30px; line-height:1.8}
   .fine a{color:var(--muted)}
   .grouphead{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text); margin:26px 0 10px}
-  .grouphead small{color:var(--faint); font-weight:400}`;
+  .grouphead small{color:var(--faint); font-weight:400}
+  .trackhead{margin:36px 0 4px; padding:14px 16px; background:var(--surface); border:1px solid var(--accent-dim); border-radius:12px; font-size:15.5px; font-weight:700}
+  .trackhead .tk{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; font-weight:700}
+  .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
+  .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}`;
 
   const HEAD = (title, desc, url, ld) => `<!DOCTYPE html>
 <html lang="en">
@@ -295,7 +302,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
 <style>${CSS}</style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=271"><\/script>
+<script src="drills.js?v=272"><\/script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -307,7 +314,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=280"><\/script>
+<script src="nav.js?v=281"><\/script>
 <div class="wrap">`;
 
   const FOOT = `
@@ -333,6 +340,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
         name: d.label, description: strip(d.desc || d.aha), url,
         learningResourceType: 'Interactive keyboard drill', interactivityType: 'active',
         educationalLevel: d.group, teaches: strip(d.aha) || strip(d.desc),
+        ...(trackOf[d.group] ? { isPartOf: { '@type': 'Course', name: trackOf[d.group].cert, url: SITE + '/drills/', provider: { '@type': 'Organization', name: 'hotkey.gg', url: SITE + '/' } } } : {}),
         about: { '@type': 'Thing', name: 'Microsoft Excel keyboard shortcuts' },
         timeRequired: 'PT' + (d.par || 30) + 'S',
         provider: { '@type': 'Organization', name: 'hotkey.gg', url: SITE + '/' },
@@ -350,7 +358,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
       const related = g.keys.filter(x => x !== k).slice(0, 4).map(x => data.drills[x]);
       const html = HEAD(title, mdesc, url, ld) + `
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / ${esc(d.group.toLowerCase())}</div>
-  <div class="eyebrow">◆ ${esc(d.group)} · drill</div>
+  <div class="eyebrow">◆ ${esc(d.group)} · drill${trackOf[d.group] ? ` · ${esc(trackOf[d.group].name)} track` : ''}</div>
   <h1>${esc(d.label)}</h1>
   ${d.aha ? `<div class="aha">${d.aha}</div>` : ''}
   ${d.prompt ? `<div class="sub">${d.prompt}</div>` : `<div class="sub">${esc(strip(d.desc))}</div>`}
@@ -406,11 +414,25 @@ ${related.length ? `
     <a class="cta solid" href="index.html">start training →</a>
     <a class="cta" href="reference.html">the shortcut compendium</a>
   </div>
-${data.groups.map(g => `
+${(() => {
+  const groupHtml = g => `
   <div class="grouphead">${esc(g.name)} <small>· ${g.keys.length} drills</small></div>
   <div class="rel">
     ${g.keys.map(k => { const d = data.drills[k]; return `<a href="drills/${k}.html"><div class="rn">${esc(d.label)}</div><div class="rd">${esc(strip(d.desc).slice(0, 90))}</div></a>`; }).join('\n    ')}
-  </div>`).join('\n')}` + FOOT;
+  </div>`;
+  // r367: the library tells the three-track story — each certificate track heads its groups
+  if (!(data.tracks || []).length) return data.groups.map(groupHtml).join('\n');
+  const claimed = new Set();
+  const bands = data.tracks.map(t => {
+    const tgs = data.groups.filter(g => (t.groups || []).includes(g.name));
+    tgs.forEach(g => claimed.add(g.name));
+    const n = tgs.reduce((a, g) => a + g.keys.length, 0);
+    return `
+  <div class="trackhead"><span class="tk">certificate track</span>${esc(t.name)} <small>· ${n} drills → “${esc(t.cert)}”</small><div class="tb">${esc(t.blurb)} Finish every drill in the track with clean recorded runs to earn the certificate.</div></div>` + tgs.map(groupHtml).join('\n');
+  }).join('\n');
+  const orphans = data.groups.filter(g => !claimed.has(g.name));
+  return bands + orphans.map(groupHtml).join('\n');
+})()}` + FOOT;
     fs.writeFileSync(path.join(OUT, 'index.html'), html);
   }
 
