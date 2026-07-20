@@ -705,6 +705,20 @@
   .gd-row{font-family:var(--mono); font-size:11px; color:var(--muted); margin:3px 0}
   .gd-row b{color:var(--warn)} .gd-row span{color:var(--faint)}
   .gd-row kbd{background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:10px}
+  /* r365 READY STATE (Wolf: 'not intuitive how it starts') — the standard drill open:
+     a quiet ready line where messages live, and the start cell breathes so it reads
+     'you're already here — type', not 'click me'. Both die on the first keystroke. */
+  .result.ready{font-family:var(--mono); font-size:12px; color:var(--muted)}
+  .result.ready b{color:var(--accent)}
+  .result.ready kbd{font-family:var(--mono); font-size:10.5px; border:1px solid var(--line); border-radius:4px; padding:0 5px}
+  td.active.startcell{animation:hkStartPulse 1.5s ease-in-out infinite}
+  @keyframes hkStartPulse{0%,100%{box-shadow:none} 50%{box-shadow:0 0 0 4px var(--accent-glow)}}
+  #startCoach{position:absolute; z-index:24; background:var(--surface); border:1px solid var(--accent-dim);
+    border-radius:12px; padding:14px 18px; width:min(340px,80%); box-shadow:0 14px 40px rgba(0,0,0,.25);
+    font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.9}
+  #startCoach b{color:var(--text)}
+  #startCoach .sc-t{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:4px}
+  #startCoach .sc-x{position:absolute; top:8px; right:12px; cursor:pointer; color:var(--faint)}
   .rowhdr.grp{box-shadow:inset 3px 0 0 var(--accent)}
   .rowhdr.hidcut{border-top:3px double var(--accent)}   /* r299: hidden rows above — Excel's break-line cue */
   .rm-aha{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
@@ -8390,7 +8404,9 @@ function render(){
       if(cell.fontColor)cls.push('fc-'+cell.fontColor);
       const isActive=(r===__dA.r&&c===__dA.c);
       const inSel=(r>=sr.r1&&r<=sr.r2&&c>=sr.c1&&c<=sr.c2);
-      if(isActive)cls.push('active'); else if(inSel&&S.sel)cls.push('sel');
+      if(isActive){ cls.push('active');
+        if(!running && !started && !done && !demoPlaying && !echoOn && !sandboxMode && gameMode==='classic') cls.push('startcell'); }   /* r365: the breathing start cell */
+      else if(inSel&&S.sel)cls.push('sel');
       if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2){ cls.push(guided?'gtarget':'ttarget');
         // r329: the target draws as ONE outer frame around the whole zone (the paste footprint),
         // not a box per cell — tag the range's edge cells so the border rides the perimeter.
@@ -8942,7 +8958,34 @@ function __drawRibbon(){
 /* ============================================================
    ACTIONS
    ============================================================ */
+/* r365: FIRST-DRILL COACH — one card, once ever, for a player with zero solves landing on
+   their first real board after onboarding. Pure visual: any key both dismisses it AND counts
+   (the overlay never swallows input). */
+function maybeStartCoach(){
+  if(demoPlaying || echoOn || sandboxMode || gameMode!=='classic') return;
+  if(localStorage.getItem('hk_start_coach')) return;
+  if(!localStorage.getItem('hotkey_onboarded')) return;   // the tour is still teaching
+  const solves=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0;
+  if(solves>0){ localStorage.setItem('hk_start_coach','1'); return; }
+  const gw=document.querySelector('.gridwrap'); if(!gw) return;
+  const old=document.getElementById('startCoach'); if(old) old.remove();
+  const c=document.createElement('div'); c.id='startCoach';
+  c.innerHTML='<div class="sc-t">how a drill works</div>'+
+    '<a class="sc-x">\u00d7</a>'+
+    '<b>1.</b> read the task on the right \u2014 nothing is timed yet<br>'+
+    '<b>2.</b> the glowing cell is your start \u2014 you\u2019re already on it, <b>just type</b><br>'+
+    '<b>3.</b> clear every checklist line \u2014 the clock stops itself';
+  gw.style.position='relative';
+  c.style.left='18px'; c.style.bottom='16px';
+  gw.appendChild(c);
+  c.querySelector('.sc-x').onclick=()=>{ try{ c.remove(); localStorage.setItem('hk_start_coach','1'); }catch(e){} };
+  /* first keystroke dismisses via startClock's cleanup; latch so it never returns */
+  const latch=()=>{ try{ localStorage.setItem('hk_start_coach','1'); }catch(e){} document.removeEventListener('keydown', latch, true); };
+  document.addEventListener('keydown', latch, true);
+}
 function startClock(){ if(running||done||sandboxMode)return; running=true; started=performance.now();   // r238: the onboarding sandbox never times
+  try{ const r=$('result'); if(r && r.classList.contains('ready')){ r.className='result'; r.innerHTML=''; } }catch(e){}   /* r365 */
+  try{ const c=document.getElementById('startCoach'); if(c) c.remove(); }catch(e){}
   if(marathon && marathon.active && !marathon.endAt){
     marathon.startAt=started; marathon.endAt=started+marathon.dur*1000; }
   $('timer').classList.add('run'); tickH=setInterval(updateTimer,40); }
@@ -13950,8 +13993,26 @@ function loadChallenge(key, opts){
   $('pb').textContent = PB[scoreKey()]!==undefined ? PB[scoreKey()].toFixed(2)+'s' : '—';
   armGhost();
   try{ railZoneCompute(); }catch(e){}   /* r350: fence = the drill's whole working area, fixed at load */
-  $('result').className='result'; $('result').innerHTML='';
+  /* r365 STANDARD START (Wolf: 'some drills start in a separate cell implying I should click'):
+     the cursor opens on the SCRIPTED SOLUTION'S FIRST CELL — the one place the authorial route
+     actually begins — so the breathing start cell is never a decoy. Cursor-graded drills
+     (railSafe=false, e.g. the nav maze) keep their designed start; drills whose demo already
+     begins at the build's active cell are unchanged by construction. */
+  try{
+    if(railSafe(C)){
+      const __mv=(typeof C.demo==='function')?C.demo.call(C):C.demo;
+      if(__mv && __mv[0] && __mv[0].sel){
+        const __r0=resolveRange(String(__mv[0].sel));
+        if(__r0 && (S.active.r!==__r0.r1 || S.active.c!==__r0.c1)){ S.active={r:__r0.r1, c:__r0.c1}; S.sel=null; }
+      }
+    }
+  }catch(e){}
+  /* r365: the STANDARD OPEN — same line on every drill. Read the task, then type;
+     nothing is clocked until the first key. Cleared by startClock. */
+  $('result').className='result ready';
+  $('result').innerHTML='\u23f1 <b>ready</b> \u2014 read the task, then just type \u00b7 the clock starts on your first key';
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
+  try{ maybeStartCoach(); }catch(e){}
 }
 /* ---- drill picker: catalog comes from drills.js (single source of truth across the app) ----
    All the maps below are thin aliases. If you're adding a new drill, edit drills.js — not here.
