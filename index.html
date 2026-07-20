@@ -175,7 +175,7 @@
      cell; the text still spills as display. .sphi width is now the cell's own width (set in render). */
   td.active.spill, td.sel.spill{outline:none; background:transparent}
   td.spill .sphi{position:absolute; left:0; top:0; bottom:0; pointer-events:none}
-  td.active.spill .sphi{outline:1.5px solid var(--cell-cursor); outline-offset:-1px; background:var(--active-fill)}
+  td.active.spill .sphi{outline:1.5px solid var(--cell-cursor); outline-offset:-1px}
   td.sel.spill .sphi{background:var(--sel-grey)}
   td.wrap{white-space:normal; line-height:1.18; font-size:12px}
   td.bold{font-weight:700}
@@ -293,6 +293,9 @@
     border:1px solid var(--line); border-radius:5px; padding:0 5px}
   #demoSpotCap.echo-miss{animation:echoShake .3s; border-color:var(--bad)}
   @keyframes echoShake{25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}}
+  /* r348: rejected-formula shake — the cell says no, the editor stays open */
+  td.fx-badformula .edbox{animation:echoShake .28s ease 2}
+  td.fx-badformula{outline-color:var(--bad)}
   .mb-tool.nudge{animation:hkNudge 1.1s ease-in-out 5; border-color:var(--accent)}
   @keyframes hkNudge{50%{box-shadow:0 0 0 5px var(--accent-glow)}}
   /* r317 (Wolf): the "act here" target zone (paste destination, edit target, …) was a barely-there
@@ -318,12 +321,14 @@
   html[data-dark="1"]{ --cell-cursor:#7ee0ad; --active-fill:rgba(126,224,173,.16); --sel-grey:rgba(220,225,235,.13); }
   /* r313 (Wolf): thinner than r312 — the 2.5px box read as "very thick" and its offset clipped
      against neighbors. 1.5px inset by 1px sits cleanly like Excel's cursor. */
-  td.active{outline:1.5px solid var(--cell-cursor); outline-offset:-1px; background:var(--active-fill); z-index:4}
+  /* r345 (Wolf): the active cell is OUTLINE ONLY — Excel never shades the cursor cell. Inside a
+     drag-selection the anchor stays unfilled (Excel's white window) while the rest reads grey. */
+  td.active{outline:1.5px solid var(--cell-cursor); outline-offset:-1px; z-index:4}
   /* Formula pointer — appears on the cell whose reference is currently being inserted into the formula bar.
      Dashed border reads distinct from the solid active-cell outline, and the warn color marks "this is where the formula is grabbing from". */
   td.point{outline:2px dashed var(--warn); outline-offset:-2px; background:rgba(224,175,104,.12); z-index:3}
   td.sel{background:var(--sel-grey)}                                  /* r312: grey selection fill */
-  td.active.sel{background:var(--active-fill)}                        /* the anchor keeps its green, not grey */
+  td.active.sel{background:transparent}                               /* r345: the anchor is the white window inside the grey selection */
   td.sel-t{border-top:1.5px solid var(--cell-cursor)}                 /* green range border, Excel-like (r313: thinner) */
   td.sel-b{border-bottom:1.5px solid var(--cell-cursor)}
   td.sel-l{border-left:1.5px solid var(--cell-cursor)}
@@ -477,9 +482,9 @@
   .ribbon .rtab.dim k{color:var(--faint); background:var(--surface2)}
   .ribbon .rnote{color:var(--warn); margin-left:6px}
   /* font color swatch picker — rendered inline in the ribbon when dialog === 'fontcolor' */
-  .ribbon .fc-swatch{display:inline-block; width:20px; height:20px; border:2px solid var(--line); border-radius:4px;
+  .ribbon .fc-swatch, .rdrop .fc-swatch{display:inline-block; width:20px; height:20px; border:2px solid var(--line); border-radius:4px;
     vertical-align:middle; margin:0 1px; transition:.1s; cursor:pointer}
-  .ribbon .fc-swatch.on{border-color:var(--accent); outline:2px solid var(--accent-glow); transform:scale(1.18)}
+  .ribbon .fc-swatch.on, .rdrop .fc-swatch.on{border-color:var(--accent); outline:2px solid var(--accent-glow); transform:scale(1.18)}
   .ribbon .fc-name{color:var(--accent); font-family:var(--mono); font-size:11.5px; margin:0 8px 0 4px; min-width:54px}
   /* AutoFilter (r180): value chips in the ribbon picker + \u25be markers on armed header cells */
   .ribbon .fl-chip{display:inline-block; padding:1px 7px; margin:0 2px; border-radius:4px; border:1px solid var(--line);
@@ -1520,7 +1525,7 @@
 </style>
 <script src="drills.js?v=267"></script>
 <link rel="stylesheet" href="nav.css?v=180">
-<script src="themes.js?v=267"></script>
+<script src="themes.js?v=268"></script>
 
 </head>
 <body>
@@ -9803,6 +9808,24 @@ function commitEdit(dr,dc){
     if(opens>closes) editBuf += ')'.repeat(opens-closes);   // Excel parity: auto-close
   }
   const buf=editBuf.trim();
+  /* r348 (Wolf): a formula the engine can't parse used to commit a silent 0 — no feedback,
+     wrong number. Excel refuses the commit ("There's a problem with this formula") and returns
+     you to the editor; we do the same as ONE reaction beat — stay in edit with the buffer
+     intact, shake the cell, one toast. Semantic errors that still produce a value commit as
+     before (the error-triage drills depend on that). Demos keep the old lenient path so a
+     replay can never wedge in an edit loop. */
+  if(buf!=='' && buf[0]==='=' && !demoPlaying){
+    /* throw = SYNTAX problem (trailing operator, malformed range, junk chars) -> refuse.
+       NaN/Infinity = forward references to empty cells (0/0 while building in any order) ->
+       commit as before; Excel accepts those too. */
+    let __ok=true; try{ if(evalFormula(buf)===undefined) __ok=false; }catch(_){ __ok=false; }
+    if(!__ok){
+      try{ const td=document.querySelector('td.editing'); if(td){ td.classList.remove('fx-badformula'); void td.offsetWidth; td.classList.add('fx-badformula'); } }catch(e){}
+      try{ showToast('There\u2019s a problem with this formula \u2014 fix it or press esc to discard'); }catch(e){}
+      logKey('\u26a0');
+      return;   // still editing — buffer and caret untouched
+    }
+  }
   editing=false; editBuf='';
   editAnchor=null; editPointer=null; editPointerStart=-1; editPointerBase=null;
   if(buf!==''){
@@ -13309,13 +13332,19 @@ function openLevelProgress(){
       '</div>'+
       (rankName?'<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px">current rank · <b style="color:var(--text)">'+escHtml(rankName)+'</b></div>':'')+
     '</div>'+
-    '<div class="ob-opts" style="margin-top:16px"><button class="ob-key primary" id="lvGo">keep climbing</button></div>'+
+    /* r347 (Wolf): a guest's level lives only on this device — the card says so and offers
+       the account right where the pride is. Signed-in users just get keep-climbing. */
+    '<div class="ob-opts" style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+      '<button class="ob-key primary" id="lvGo">keep climbing</button>'+
+      ((!me_user)?'<button class="ob-key" id="lvSave" style="color:var(--accent);border-color:var(--accent-dim)">save my progress →</button>':'')+
+    '</div>'+
     '<div style="text-align:center;margin-top:9px"><a id="lvHow" style="font-family:var(--mono);font-size:10.5px;color:var(--muted);cursor:pointer;text-decoration:underline">how xp works ›</a></div>'+
     '</div>';
   m.classList.add('show');
   const close=()=>m.classList.remove('show');
-  const x=$('lvX'), g=$('lvGo'), h=$('lvHow');
+  const x=$('lvX'), g=$('lvGo'), h=$('lvHow'), sv=$('lvSave');
   if(x) x.onclick=close; if(g) g.onclick=close;
+  if(sv) sv.onclick=()=>{ close(); try{ openAuth('signup'); }catch(e){} };
   if(h) h.onclick=()=>{ close(); openXpInfo(); };
   m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
 }

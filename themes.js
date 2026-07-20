@@ -21,7 +21,7 @@ window.THEMES = {
     /* r322/r325 (Wolf): a flat, SLIGHTLY lightened green — the r204 #0e9b57 read heavy; r322's
        #19b06a was a touch too vivid. #14a25c keeps the original's muted character, just lifted,
        flat solid fill, white button text still readable. */
-    accent:'#14a25c', 'accent-dim':'#0e7a45', 'accent-glow':'rgba(20,162,92,.16)',
+    accent:'#16a862', 'accent-dim':'#0e7a45', 'accent-glow':'rgba(22,168,98,.16)', onAccent:'#ffffff',   /* r346 (Wolf): Supabase-style CTA — green background, white text */
     warn:'#9a6700', bad:'#b3261e' }},
   light: { name:'Light', dark:false, vars:{
     bg:'#f7f7f4', surface:'#ffffff', surface2:'#eeeeea', line:'#d8d8d2',
@@ -211,7 +211,10 @@ window.applyTheme = function(name){
   const t = window.THEMES[name] || window.THEMES.default;
   const root = document.documentElement;
   for(const k in t.vars) root.style.setProperty('--' + k, t.vars[k]);
-  root.style.setProperty('--on-accent', window.hkOnAccent(t.vars.accent || '#6ec9a0'));
+  /* r346 (Wolf): themes may pin the CTA text color explicitly — the contrast formula chose
+     near-black on daylight's green, but the Supabase-style read (green + WHITE text) is the
+     look; white on #14a25c holds ~3.4:1, fine for bold button text. Formula stays the fallback. */
+  root.style.setProperty('--on-accent', t.vars.onAccent || window.hkOnAccent(t.vars.accent || '#6ec9a0'));
   root.setAttribute('data-dark', t.dark ? '1' : '0');   // drives cell-color visibility overrides
   window.currentTheme = name;
   window.syncThemeLabels();
