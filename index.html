@@ -1551,14 +1551,14 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=272"></script>
+<script src="drills.js?v=273"></script>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="themes.js?v=269"></script>
+<script src="themes.js?v=270"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=281"></script>
+<script src="nav.js?v=282"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -9095,8 +9095,10 @@ function checkWin(){
       const warm = Object.keys(cd.counts).length===0 && Object.values(cd.counts).reduce((a,b)=>a+b,0)===0;
       const nthToday=(cd.counts[cur]=(cd.counts[cur]||0)+1);
       try{ localStorage.setItem('hk_clears_day', JSON.stringify(cd)); }catch(e){}
-      if(PB[sk]===undefined){ const adv=(CHALLENGES[cur].par>=55);
-        xpGain=50+(adv?15:0); xpNote='first clear'+(adv?' \u00b7 advanced bonus':''); }
+      if(PB[sk]===undefined){
+        const isDc=sk.indexOf('challenge-')===0;   /* r371: daily pays a flat 50 (matches computeXP) */
+        const adv=(!isDc && CHALLENGES[cur].par>=55);
+        xpGain=50+(adv?15:0); xpNote=isDc?'daily challenge':'first clear'+(adv?' \u00b7 advanced bonus':''); }
       else {
         const LAD=[15,10,7,5];
         xpGain = nthToday<=LAD.length ? LAD[nthToday-1] : 2;
@@ -13677,7 +13679,8 @@ function xpRankModal(tab){
   const XP_ROWS=[
     ['\u25c9','new drill','first clean solve','+50'],
     ['\u21bb','repeat','solves 2\u201310 of a drill','+15'],
-    ['\u25c6','daily','the morning sheet','+30'],
+    ['\u25c6','daily','the Daily Challenge','+50'],
+    ['\ud83c\udfc5','daily top 10','land top-10 on the field','+40'],
     ['\u26a1','rapid-fire','a timed sitting','+10'],
   ];
   const BOARD_ROWS=[
@@ -13735,8 +13738,8 @@ function restartDrill(){
   loadChallenge(cur, {weekly:weeklyMode});   // same drill, same mode; weekly reseeds identically
 }
 function scoreKey(){ if(challengeMode) return challengeKey(); if(weeklyMode) return 'wk-'+weekStr()+'-'+cur; return cur; }
-/* r363: drillOfDay/startDaily are GONE with the morning sheet — the Daily Mix and the
-   Daily Challenge are the two daily rituals now. */
+/* r363: drillOfDay/startDaily are GONE with the morning sheet. r364: the Daily Mix
+   followed — the Daily Challenge is the one daily ritual. */
 /* r364 (Wolf): the Daily Mix is RETIRED — charming, but a third daily system with an
    unexplained entry point; the retention budget goes to the Daily Challenge instead.
    (Full implementation lives in git history at r360 if it ever earns its way back.) */
@@ -13784,7 +13787,84 @@ function closeDailyChallenge(){ const m=$('dcModal'); if(m){ m.classList.remove(
 window.addEventListener('load', ()=>{ try{
   if(new URLSearchParams(location.search).get('daily')==='1')
     setTimeout(()=>{ try{ openDailyChallenge(); }catch(e){} }, 900);
+  else {
+    /* r371: boot-time surfacing — before this, nothing but a button tint promoted the
+       daily to a returning player. Once per day, if you're eligible and haven't run it,
+       the card opens itself. Deep links (?drill=) and fresh players are left alone. */
+    const q=new URLSearchParams(location.search);
+    if(!q.get('drill') && !q.get('feedback')){
+      setTimeout(()=>{ try{
+        if(challengeEligible() && !challengeDoneToday()
+           && localStorage.getItem('hk_dc_seen')!==challengeKey()
+           && !document.querySelector('.ob-card')){
+          localStorage.setItem('hk_dc_seen', challengeKey());
+          openDailyChallenge();
+        }
+      }catch(e){} }, 1400);
+    }
+  }
 }catch(e){} });
+/* r370 DRILL FEEDBACK — the reviewer's channel. ?feedback=1 arms it (sticky via
+   localStorage, ?feedback=0 disarms); a small ✎ button floats bottom-right and files a
+   note against the CURRENT drill into public.drill_feedback (dev/migrate-drill-feedback.sql).
+   Signed-in only; a failed insert falls back to a local queue that retries next note. */
+(function(){
+  try{
+    const q=new URLSearchParams(location.search).get('feedback');
+    if(q==='1') localStorage.setItem('hk_feedback','1');
+    if(q==='0') localStorage.removeItem('hk_feedback');
+    if(localStorage.getItem('hk_feedback')!=='1') return;
+  }catch(e){ return; }
+  const btn=document.createElement('button');
+  btn.id='fbBtn'; btn.textContent='✎';
+  btn.title='file a note on this drill';
+  btn.style.cssText='position:fixed;right:16px;bottom:16px;z-index:9000;width:38px;height:38px;border-radius:50%;'+
+    'border:1px solid var(--line);background:var(--surface2);color:var(--muted);font-size:16px;cursor:pointer;opacity:.75';
+  btn.onmouseenter=()=>btn.style.opacity='1'; btn.onmouseleave=()=>btn.style.opacity='.75';
+  document.body.appendChild(btn);
+  btn.onclick=()=>{
+    if(document.getElementById('fbCard')) return;
+    const key=(typeof cur!=='undefined'&&cur)||'?';
+    const card=document.createElement('div');
+    card.id='fbCard';
+    card.style.cssText='position:fixed;right:16px;bottom:62px;z-index:9001;width:320px;background:var(--surface);'+
+      'border:1px solid var(--accent-dim);border-radius:12px;padding:14px;box-shadow:0 12px 30px rgba(0,0,0,.25);font-family:var(--mono)';
+    card.innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:8px">note on <b style="color:var(--accent)">'+key+'</b>'+
+      ' <span id="fbX" style="float:right;cursor:pointer;color:var(--faint)">×</span></div>'+
+      '<textarea id="fbTxt" rows="4" maxlength="2000" placeholder="what should change about this drill?" '+
+        'style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:12.5px;background:var(--surface2);'+
+        'color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical"></textarea>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">'+
+      '<span id="fbMsg" style="font-size:10.5px;color:var(--faint)"></span>'+
+      '<button id="fbSend" style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--on-accent,#fff);'+
+        'background:var(--accent);border:none;border-radius:8px;padding:7px 14px;cursor:pointer">file it</button></div>';
+    document.body.appendChild(card);
+    const txt=card.querySelector('#fbTxt'); txt.focus();
+    txt.addEventListener('keydown',e=>e.stopPropagation());   // the trainer must not see these keys
+    const close=()=>card.remove();
+    card.querySelector('#fbX').onclick=close;
+    card.querySelector('#fbSend').onclick=async()=>{
+      const note=txt.value.trim(); if(!note) return;
+      const msg=card.querySelector('#fbMsg');
+      let uid=null; try{ const {data}=await sb.auth.getUser(); uid=data&&data.user&&data.user.id; }catch(e){}
+      if(!sb||!uid){ msg.textContent='sign in to file notes'; return; }
+      const rows=[{user_id:uid, drill:key, note:note}];
+      try{ const held=JSON.parse(localStorage.getItem('hk_fb_queue')||'[]');
+        held.forEach(h=>rows.push({...h, user_id:uid})); }catch(e){}
+      try{
+        const {error}=await sb.from('drill_feedback').insert(rows);
+        if(error){ throw error; }
+        localStorage.removeItem('hk_fb_queue');
+        msg.textContent='filed ✓'; setTimeout(close, 600);
+      }catch(e){
+        try{ const held=JSON.parse(localStorage.getItem('hk_fb_queue')||'[]');
+          held.push({drill:key, note:note}); localStorage.setItem('hk_fb_queue',JSON.stringify(held)); }catch(_){}
+        msg.textContent='held locally — retries with your next note';
+        setTimeout(close, 1200);
+      }
+    };
+  };
+})();
 function openDailyChallenge(){
   const dk=challengeOfDay(), C=CHALLENGES[dk];
   const label=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.labelOf&&window.HOTKEY_DRILLS.labelOf[dk])||(C&&C.label)||dk;
@@ -14277,11 +14357,12 @@ async function updateRankPill(){
     if(c && c.exp>Date.now()){ show({name:c.n, cls:c.c}); return; } }catch(e){}
   if(!sb || !me_user || isAnonUser()){ show({name:'MBA Associate', cls:'tier-mba'}); return; }
   try{
-    const [p,r] = await Promise.all([
+    const [p,r,se] = await Promise.all([
       sb.from('profiles').select('id'),
-      sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true})
+      sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true}),
+      sb.from('sessions').select('user_id,mode').eq('user_id', me_user.id)   /* r371: sessions pay xp — every caller must pass them */
     ]);
-    const runs=r.data||[];
+    const runs=r.data||[]; const mySes=(se&&se.data)||[];
     // r112: the pill used a RAW average while every board uses the SHRUNK rating the
     // tier thresholds are calibrated for — same player, different tier. One path now.
     const st=window.HK_RANK ? window.HK_RANK.standing(runs, me_user.id, MENU_ORDER) : {avgPct:null, att:0, wsum:0};
@@ -14292,7 +14373,8 @@ async function updateRankPill(){
     // repaint the level badge with it — kills the game-vs-account level mismatch.
     try{ if(window.HK_RANK && window.HK_RANK.computeXP){
       const mine=runs.filter(x=>x.user_id===me_user.id);
-      window.__srvXp=window.HK_RANK.computeXP(mine, st);
+      const pl=window.HK_RANK.boardCounts ? window.HK_RANK.boardCounts(runs, me_user.id, MENU_ORDER) : st;
+      window.__srvXp=window.HK_RANK.computeXP(mine, pl, mySes);   /* r371: full signature — board bonuses + sessions */
       try{ const nsol=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; renderLvl(nsol); }catch(e){}
     } }catch(e){}
   }catch(e){}
@@ -15115,7 +15197,8 @@ function logRunLite(t){
   }catch(e){}
   try{
     const a=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]');
-    a.push({time_ms:Math.round(t*1000), keystrokes:keyLog.length, optimal:CHALLENGES[cur].parKeys, d:cur, ts:Date.now()});   // r157: d+ts feed the weakness queue
+    a.push({time_ms:Math.round(t*1000), keystrokes:keyLog.length, optimal:CHALLENGES[cur].parKeys, d:cur, ts:Date.now(),
+      challenge:(typeof scoreKey==='function'?scoreKey():cur), created_at:new Date().toISOString()});   // r157: d+ts feed the weakness queue · r371: challenge+created_at feed the gauntlet/daily feats in-game
     // r90/r272: keystroke heatmap feed — semantic units only (see chordifyLog above)
     try{
       const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
@@ -15167,7 +15250,8 @@ function buildAchCtx(){
     __ck=Object.keys(kc).filter(isChordUnit).length;   // r272: semantic units
     __kl=parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10) || Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
   return { pb:PB, pars:window.HOTKEY_PARS||{}, runs:lite, streak:streakN, solves:solvesN,
-    crowns:0, groups, att:Object.keys(PB).length, menuOrder:MENU_ORDER,
+    crowns:0, groups, att:Object.keys(PB).filter(k=>CHALLENGES[k]).length, menuOrder:MENU_ORDER,   /* r371: challenge-/wk- PB keys don't count as drills attempted */
+    dailyTop10:fl.dailyTop10||0,
     mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
     nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin,
     raceWins:fl.raceWins||0, sheetClears:fl.sheetClears||0, frzBanked:fl.frzBanked||0,

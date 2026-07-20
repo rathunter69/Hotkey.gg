@@ -111,8 +111,6 @@ function tierOf(avgPct, att, wsum){
      killed; pass it through. */
   if(window.HK_RANK){ const t=window.HK_RANK.tierOf(avgPct, att, wsum); return {...t, i:t.i-1}; }  // HK_RANK indexes incl. Candidate; local TIERS excludes it
   return {...TIERS[0], i:0};
-  for(let i=TIERS.length-1;i>=0;i--){ if(att>=TIERS[i].att && avgPct<=TIERS[i].pct) return {...TIERS[i], i}; }
-  return {...TIERS[0], i:0};
 }
 function levelOf(xp){   // r151: delegates to the canonical curve (HK_RANK, themes.js)
   if(window.HK_RANK && window.HK_RANK.levelOf) return window.HK_RANK.levelOf(xp);
@@ -520,14 +518,14 @@ function heroHtml(){
       '</div></div>';
   }
   const me=userStat[meId]||{att:0,sum:0,crowns:0,pod:0,t10:0};
-  // RANKED GATE: level 3 unlocks Ranked; entering it shows the season-start infographic.
+  // RANKED GATE: RANKED_MIN_LVL unlocks Ranked; entering it shows the season-start infographic.
   {
-    const perD0={}; let xp0=0;
-    DATA.fRuns.filter(x=>x.user_id===meId).forEach(r=>{ const ch=r.challenge||'';
-      if(ch.indexOf('daily-')===0){ xp0+=30; return; } if(ch.indexOf('wk-')===0){ xp0+=25; return; }
-      const nth=(perD0[ch]=(perD0[ch]||0)+1); xp0 += nth===1?(50+(((window.HOTKEY_PARS||{})[ch]||0)>=55?15:0)):(nth<=10?15:3); });
-    DATA.fSessions.filter(x=>x.user_id===meId).forEach(x=>{ xp0 += x.mode==='marathon'?20:10; });
-    xp0 += 25*me.t10+100*me.pod+250*me.crowns;
+    /* r371: the gate ran a RETIRED lifetime xp ladder while every other surface uses
+       HK_RANK.computeXP — same player, different level, Enter Ranked wrongly withheld. */
+    const xp0=window.HK_RANK ? window.HK_RANK.computeXP(
+      DATA.fRuns.filter(x=>x.user_id===meId),
+      {t10:me.t10, pod:me.pod, crowns:me.crowns},
+      DATA.fSessions.filter(x=>x.user_id===meId)) : 0;
     const lvl0=levelOf(xp0).lvl;
     if(!rankedOptedIn()){
       const campDone = campaignComplete();
@@ -692,7 +690,7 @@ function featuredHtml(){
   return '<div class="featured">'+
     '<div class="featured-daily">'+
       '<div class="fd-head"><span class="fd-live">\u25cf live</span><b>\u25c6 the Daily Challenge \u00b7 '+dl+'</b>'+
-      '<span class="fd-meta">resets in ~'+hrsLeft+'h \u00b7 top 3 medal \u00b7 top 10 wear it on their card'+(podium?' \u00b7 yesterday: '+podium:'')+'</span>'+
+      '<span class="fd-meta">resets in ~'+hrsLeft+'h \u00b7 top 3 medal \u00b7 top 10 +40 xp & wear it on their card'+(podium?' \u00b7 yesterday: '+podium:'')+'</span>'+
       '<a class="fd-play" href="index.html?daily=1">play it \u2192</a></div>'+
       boardHtml({label:'today\u2019s global field', lvl:dailyDate}, bestD, names, meId, {medals:true})+
     '</div>'+
