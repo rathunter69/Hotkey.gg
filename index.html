@@ -13785,6 +13785,67 @@ window.addEventListener('load', ()=>{ try{
   if(new URLSearchParams(location.search).get('daily')==='1')
     setTimeout(()=>{ try{ openDailyChallenge(); }catch(e){} }, 900);
 }catch(e){} });
+/* r370 DRILL FEEDBACK — the reviewer's channel. ?feedback=1 arms it (sticky via
+   localStorage, ?feedback=0 disarms); a small ✎ button floats bottom-right and files a
+   note against the CURRENT drill into public.drill_feedback (dev/migrate-drill-feedback.sql).
+   Signed-in only; a failed insert falls back to a local queue that retries next note. */
+(function(){
+  try{
+    const q=new URLSearchParams(location.search).get('feedback');
+    if(q==='1') localStorage.setItem('hk_feedback','1');
+    if(q==='0') localStorage.removeItem('hk_feedback');
+    if(localStorage.getItem('hk_feedback')!=='1') return;
+  }catch(e){ return; }
+  const btn=document.createElement('button');
+  btn.id='fbBtn'; btn.textContent='✎';
+  btn.title='file a note on this drill';
+  btn.style.cssText='position:fixed;right:16px;bottom:16px;z-index:9000;width:38px;height:38px;border-radius:50%;'+
+    'border:1px solid var(--line);background:var(--surface2);color:var(--muted);font-size:16px;cursor:pointer;opacity:.75';
+  btn.onmouseenter=()=>btn.style.opacity='1'; btn.onmouseleave=()=>btn.style.opacity='.75';
+  document.body.appendChild(btn);
+  btn.onclick=()=>{
+    if(document.getElementById('fbCard')) return;
+    const key=(typeof cur!=='undefined'&&cur)||'?';
+    const card=document.createElement('div');
+    card.id='fbCard';
+    card.style.cssText='position:fixed;right:16px;bottom:62px;z-index:9001;width:320px;background:var(--surface);'+
+      'border:1px solid var(--accent-dim);border-radius:12px;padding:14px;box-shadow:0 12px 30px rgba(0,0,0,.25);font-family:var(--mono)';
+    card.innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:8px">note on <b style="color:var(--accent)">'+key+'</b>'+
+      ' <span id="fbX" style="float:right;cursor:pointer;color:var(--faint)">×</span></div>'+
+      '<textarea id="fbTxt" rows="4" maxlength="2000" placeholder="what should change about this drill?" '+
+        'style="width:100%;box-sizing:border-box;font-family:var(--mono);font-size:12.5px;background:var(--surface2);'+
+        'color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical"></textarea>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">'+
+      '<span id="fbMsg" style="font-size:10.5px;color:var(--faint)"></span>'+
+      '<button id="fbSend" style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--on-accent,#fff);'+
+        'background:var(--accent);border:none;border-radius:8px;padding:7px 14px;cursor:pointer">file it</button></div>';
+    document.body.appendChild(card);
+    const txt=card.querySelector('#fbTxt'); txt.focus();
+    txt.addEventListener('keydown',e=>e.stopPropagation());   // the trainer must not see these keys
+    const close=()=>card.remove();
+    card.querySelector('#fbX').onclick=close;
+    card.querySelector('#fbSend').onclick=async()=>{
+      const note=txt.value.trim(); if(!note) return;
+      const msg=card.querySelector('#fbMsg');
+      let uid=null; try{ const {data}=await sb.auth.getUser(); uid=data&&data.user&&data.user.id; }catch(e){}
+      if(!sb||!uid){ msg.textContent='sign in to file notes'; return; }
+      const rows=[{user_id:uid, drill:key, note:note}];
+      try{ const held=JSON.parse(localStorage.getItem('hk_fb_queue')||'[]');
+        held.forEach(h=>rows.push({...h, user_id:uid})); }catch(e){}
+      try{
+        const {error}=await sb.from('drill_feedback').insert(rows);
+        if(error){ throw error; }
+        localStorage.removeItem('hk_fb_queue');
+        msg.textContent='filed ✓'; setTimeout(close, 600);
+      }catch(e){
+        try{ const held=JSON.parse(localStorage.getItem('hk_fb_queue')||'[]');
+          held.push({drill:key, note:note}); localStorage.setItem('hk_fb_queue',JSON.stringify(held)); }catch(_){}
+        msg.textContent='held locally — retries with your next note';
+        setTimeout(close, 1200);
+      }
+    };
+  };
+})();
 function openDailyChallenge(){
   const dk=challengeOfDay(), C=CHALLENGES[dk];
   const label=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.labelOf&&window.HOTKEY_DRILLS.labelOf[dk])||(C&&C.label)||dk;
