@@ -272,6 +272,47 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
   let sqlOk = true;
   for (const t of f2) { for (const k of t.keys) { if (!certSql.includes("'" + k + "'")) { sqlOk = false; break; } } }
   ok(sqlOk, 'migrate-certificates.sql arrays cover every track drill');
+  /* r371: SET-equality per track — membership-only let a drill sit in the WRONG track's
+     SQL array (or stale extras linger) without failing. Parse each when-arm exactly. */
+  let sqlSetOk = true, sqlSetWhy = '';
+  for (const t of f2) {
+    const m = new RegExp("when '" + t.id + "'\\s+then array\\[([^\\]]*)\\]").exec(certSql);
+    const sqlKeys = m ? m[1].split(',').map(x => x.trim().replace(/'/g, '')).filter(Boolean) : [];
+    const a = new Set(sqlKeys), b = new Set(t.keys);
+    const extra = sqlKeys.filter(k => !b.has(k)), missing = t.keys.filter(k => !a.has(k));
+    if (extra.length || missing.length) { sqlSetOk = false; sqlSetWhy = t.id + ' extra:' + extra.join('/') + ' missing:' + missing.join('/'); break; }
+  }
+  ok(sqlSetOk, 'migrate-certificates.sql arrays EQUAL each track set (no strays, no gaps)', sqlSetWhy);
+  /* r371: daily-challenge seed parity — trainer and board must derive the same pick.
+     Lock the shared ingredients: the xor constant, the *31 date fold, and the shared pool. */
+  const idxSrc = fs.readFileSync('index.html', 'utf8');
+  const lbSrc = fs.readFileSync('lb.js', 'utf8');
+  ok(idxSrc.includes('0x9e3779b9') && lbSrc.includes('0x9e3779b9')
+     && idxSrc.includes('x*31+ch.charCodeAt(0)') && lbSrc.includes('dSeed*31+ch.charCodeAt(0)')
+     && lbSrc.includes('HOTKEY_CHALLENGE_POOL') && idxSrc.includes('HOTKEY_CHALLENGE_POOL'),
+     'daily seed ingredients match between trainer and boards (xor constant + *31 fold + shared pool)');
+  /* r371: computeXP call-signature lock — a call that drops the sessions arg makes the
+     level disagree between surfaces (the exact bug this suite now guards). Every call
+     site outside themes.js must pass all three args. */
+  const sigBad = [];
+  for (const f of ['index.html', 'lb.js', 'nav.js', 'stats.html', 'account.html']) {
+    const src = fs.readFileSync(f, 'utf8');
+    let i = 0;
+    while ((i = src.indexOf('computeXP(', i)) !== -1) {
+      const before = src.slice(Math.max(0, i - 40), i);
+      i += 'computeXP('.length;
+      if (/function\s*$|\bcomputeXP\s*$/.test(before)) continue;           // definition/wrapper decl
+      let depth = 1, commas = 0, j = i;
+      while (j < src.length && depth > 0) {
+        const c = src[j];
+        if (c === '(') depth++; else if (c === ')') depth--;
+        else if (c === ',' && depth === 1) commas++;
+        j++;
+      }
+      if (commas < 2) sigBad.push(f + '@' + i);
+    }
+  }
+  ok(sigBad.length === 0, 'every computeXP call site passes (runs, pl, sessions)', sigBad.join(' | '));
   // cert page renders its empty state without page errors
   const certPage = await browser.newPage();
   const certErrs = [];

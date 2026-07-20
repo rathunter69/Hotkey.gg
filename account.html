@@ -86,7 +86,7 @@
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=272"></script>
+<script src="drills.js?v=273"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -94,11 +94,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=269"></script>
+<script src="themes.js?v=270"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=281"></script>
+<script src="nav.js?v=282"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -139,7 +139,9 @@ async function load(){
   const st = R.standing(runs, me.id, D.menuOrder);
   const tier = R.tierOf(st.avgPct, st.att, st.wsum);
   const mine = runs.filter(x=>x.user_id===me.id);
-  const xp = R.computeXP(mine, st);
+  let mySes=[]; try{ const se=await sb.from('sessions').select('user_id,mode').eq('user_id', me.id); mySes=se.data||[]; }catch(e){}
+  const plBoards = R.boardCounts ? R.boardCounts(runs, me.id, D.menuOrder) : st;
+  const xp = R.computeXP(mine, plBoards, mySes);   /* r371: full signature — same level everywhere */
   const L = R.levelOf(xp);
   const joined = me.created_at ? new Date(me.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—';
 

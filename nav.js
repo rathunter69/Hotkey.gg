@@ -309,7 +309,18 @@
       // (hk_xp_est); a returning player on a fresh device read LVL 1 while their card
       // knew better. Hydrate from canonical XP (PB-hydration pattern, r83). SET, not
       // max: a second account on the same machine must not inherit the first's level.
-      try{ localStorage.setItem('hk_xp_est', String(computeXP(d, d.myRuns, d.mySessions))); renderAuthBar(); }catch(e){}
+      try{
+        /* r371: same account -> take max(server, local est) so local-only bounty xp
+           (daily top-10 +40, milestone bounties) survives the refresh; a DIFFERENT
+           account on this machine still resets (the r117 concern). */
+        const srvXp=computeXP(d, d.myRuns, d.mySessions);
+        const owner=localStorage.getItem('hk_xp_uid')||'';
+        const prev=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+        const uid=(window._navUser&&window._navUser.id)||'';
+        localStorage.setItem('hk_xp_est', String(owner===uid ? Math.max(srvXp,prev) : srvXp));
+        if(uid) localStorage.setItem('hk_xp_uid', uid);
+        renderAuthBar();
+      }catch(e){}
       const P=(window.HK_PLACEMENT?window.HK_PLACEMENT.KEYS:[]);
       const doneN=P.filter(k=>(d.myRuns||[]).some(r=>r.challenge===k)).length;
       if(P.length && doneN<P.length){
@@ -363,7 +374,7 @@
 
   async function loadProfileData(){
     const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach,school_tag,show_school');
-    const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true});
+    const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at,keystrokes,optimal').eq('mouse_used',false).order('time_ms',{ascending:true});   /* r371: keystrokes+optimal feed the efficiency feats */
     let mySessions=[];
     try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', window._navUser.id);
       mySessions=se.data||[]; }catch(e){}
@@ -570,13 +581,14 @@
             let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
             let __xflags={}; try{ __xflags=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
             let __ck=0, __kl=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
-              __ck=Object.keys(kc).filter(k=>/\+|^Alt$|^F\d+$/.test(k)).length;
+              const __unit=k=>/^alt( [a-z0-9]){1,6}$/.test(k) || /\(\)$/.test(k) || /^F[0-9]+$/.test(k) || /^Ctrl\+/.test(k);   /* r371: same semantic-unit rule as index/stats */
+              __ck=Object.keys(kc).filter(__unit).length;
               __kl=Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
             const ctx={ pb:PBl, pars:window.HOTKEY_PARS||{}, runs:d.myRuns||[], streak:streakN, solves:solvesN,
               mouseRuns:__xflags.mouseRuns||0, slowWins:__xflags.slowWins||0,
               nightWin:!!__xflags.nightWin, dawnWin:!!__xflags.dawnWin, weekendWin:!!__xflags.weekendWin,
               raceWins:__xflags.raceWins||0, sheetClears:__xflags.sheetClears||0,
-              frzBanked:__xflags.frzBanked||0, chordKinds:__ck, keysLifetime:__kl,
+              frzBanked:__xflags.frzBanked||0, chordKinds:__ck, keysLifetime:__kl, dailyTop10:__xflags.dailyTop10||0,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
             // STEAM-STYLE GLOBAL RARITY: evaluate run-derivable achievements for every
@@ -627,7 +639,7 @@
                   sub:fresh[0].a.desc+(fresh.length>1?' \u00b7 +'+(fresh.length-1)+' more unlocked':''),
                   iconHtml:(window.hkBadge?window.hkBadge(fresh[0].a.glyph,true,60):'')});
               }
-              localStorage.setItem('hk_ach_seen', JSON.stringify(earnedList.map(e=>e.a.id)));
+              localStorage.setItem('hk_ach_seen', JSON.stringify([...new Set([...seen, ...earnedList.map(e=>e.a.id)])]));   /* r371: union — this surface can't evaluate every feat, so it must never shrink the list */
             }catch(e){}
             // r135: SHOWCASE — the player's picked medals lead (profiles.featured_ach,
             // curated on the stats page); rarest-3 remains the fallback. The full grid
@@ -1100,12 +1112,14 @@
    explicit local leave still pushes false (leaving ranked is a global act).
    ============================================================ */
 (function(){
-  const K={flags:'hk_ach_flags', seen:'hk_ach_seen', streak:'hotkey_streak', ranked:'hk_ranked'};
+  const K={flags:'hk_ach_flags', seen:'hk_ach_seen', streak:'hotkey_streak', ranked:'hk_ranked', dcDone:'hk_dc_done', dcTop:'hk_dc_top10'};
   let dead=false, t=null;
   const gj=(k,d)=>{ try{ return JSON.parse(localStorage.getItem(k)||d); }catch(e){ try{ return JSON.parse(d); }catch(_){ return null; } } };
   function snapshot(){ return { v:1,
     ach_flags: gj(K.flags,'{}')||{}, ach_seen: gj(K.seen,'[]')||[],
-    streak: gj(K.streak,'{}')||{}, ranked: (function(){ try{ return localStorage.getItem(K.ranked)==='1'; }catch(e){ return false; } })() }; }
+    streak: gj(K.streak,'{}')||{}, ranked: (function(){ try{ return localStorage.getItem(K.ranked)==='1'; }catch(e){ return false; } })(),
+    dc_done: (function(){ try{ return localStorage.getItem(K.dcDone)||''; }catch(e){ return ''; } })(),
+    dc_top10: (function(){ try{ return localStorage.getItem(K.dcTop)||''; }catch(e){ return ''; } })() }; }
   async function pushNow(){
     try{
       if(dead || !window.sb) return;
@@ -1130,6 +1144,11 @@
       let st=lst;
       if(sst.d && (!lst.d || sst.d>lst.d || (sst.d===lst.d && (sst.n||0)>(lst.n||0)))){
         st=sst; if(JSON.stringify(sst)!==JSON.stringify(lst)) changed=true; }
+      /* r371: daily latches — 'challenge-YYYY-MM-DD' strings, so lexicographic later-wins IS chronological */
+      ['dc_done','dc_top10'].forEach((f,i)=>{ try{
+        const lk=i===0?K.dcDone:K.dcTop; const lv=localStorage.getItem(lk)||'', sv=cs[f]||'';
+        if(sv && sv>lv){ localStorage.setItem(lk, sv); changed=true; }
+      }catch(e){} });
       let rk=null; try{ rk=localStorage.getItem(K.ranked); }catch(e){}
       const setRanked = cs.ranked && rk===null;
       if(setRanked) changed=true;

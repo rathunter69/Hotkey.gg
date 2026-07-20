@@ -590,7 +590,8 @@ window.HK_RANK = {
       const ch=r.challenge||'';
       const day=String(r.created_at||'').slice(0,10)||'x';
       days[day]=1;
-      if(ch.indexOf('daily-')===0){ xp+=30; return; }
+      if(ch.indexOf('challenge-')===0){ xp+=50; return; }   /* r371: the Daily Challenge pays a flat 50 server-side (matches the trainer estimate) */
+      if(ch.indexOf('daily-')===0){ xp+=30; return; }   /* legacy morning-sheet runs keep their old value */
       if(ch.indexOf('wk-')===0){ xp+=25; return; }
       const k=day+'|'+ch;
       const nthToday=(buckets[k]=(buckets[k]||0)+1);
@@ -623,6 +624,18 @@ window.HK_RANK = {
     return (s + K*0.5) / (wsum + K);
   },
   // per-user placements from a full best-sorted runs list (mouse_used=false, time asc)
+  /* r371: board-bonus counts (t10/pod/crowns) from the same dedup the boards use —
+     one path, so every computeXP caller can pass a REAL pl instead of dropping bonuses */
+  boardCounts(runs, meId, menuOrder){
+    const per={}; menuOrder.forEach(k=>per[k]=[]);
+    const seen={};
+    (runs||[]).forEach(x=>{ if(per[x.challenge]===undefined) return; const key=x.challenge+'|'+x.user_id;
+      if(seen[key]) return; seen[key]=1; per[x.challenge].push(x); });
+    let t10=0,pod=0,crowns=0;
+    Object.values(per).forEach(list=>{ const i=list.findIndex(x=>x.user_id===meId);
+      if(i<0) return; if(i===0) crowns++; if(i<3) pod++; if(i<10) t10++; });
+    return {t10:t10,pod:pod,crowns:crowns};
+  },
   standing(runs, meId, menuOrder){
     const per={}; menuOrder.forEach(k=>per[k]=[]);
     const seen={};

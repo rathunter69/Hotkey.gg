@@ -102,7 +102,7 @@
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
 <link rel="stylesheet" href="nav.css?v=182">
-<script src="drills.js?v=272"></script>
+<script src="drills.js?v=273"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -110,11 +110,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=269"></script>
+<script src="themes.js?v=270"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=281"></script>
+<script src="nav.js?v=282"></script>
 
 <header class="head">
   <div class="wrap">
@@ -213,7 +213,9 @@ async function load(){
       if(window.navRefreshAuth){} const rp=document.getElementById('navRankPill');
       if(rp){ rp.innerHTML=(window.rankEmblem?window.rankEmblem(tier.name,20):'')+'<span>'+tier.name+'</span>';
         rp.className='pc-tier '+tier.cls+' topnav-rank'; rp.style.display='inline-flex'; } }catch(e){}
-    const xp = window.HK_RANK.computeXP(mine, st);
+    let mySes=[]; try{ const se=await sb.from('sessions').select('user_id,mode').eq('user_id', me.id); mySes=se.data||[]; }catch(e){}
+    const plBoards = window.HK_RANK.boardCounts ? window.HK_RANK.boardCounts(all, me.id, D.menuOrder) : st;
+    const xp = window.HK_RANK.computeXP(mine, plBoards, mySes);   /* r371: full signature — board bonuses + sessions, same as nav/lb */
     const L = window.HK_RANK.levelOf(xp);
     /* r269: same card the leaderboard hero deals — tier pill, level bar, trophy line */
     tcHtml = `<div class="panel me"><h4>your card</h4>`+
@@ -277,7 +279,7 @@ async function load(){
         mouseRuns:flags.mouseRuns||0, slowWins:flags.slowWins||0,
         nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
         raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0,
-        chordKinds:__ck, keysLifetime:__kl,   // r150/r151
+        chordKinds:__ck, keysLifetime:__kl, dailyTop10:flags.dailyTop10||0,   // r150/r151 · r371
         crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
       // global rarity (Steam-style): evaluate run-derivable achievements for every player
       const globalPct=(function(){
@@ -470,7 +472,7 @@ async function load(){
     html += `<h3 class="section-title">Certificate tracks</h3><div class="grid" style="grid-template-columns:1fr;margin-bottom:6px">`;
     window.HK_TRACKS.forEach(t=>{
       const ks=t.keys||[];
-      const done=ks.filter(k=> localPB[k]!==undefined || mine.some(r=>r.challenge===k)).length;
+      const done=ks.filter(k=> mine.some(r=>r.challenge===k)).length;   /* r371: certificates verify POSTED runs — local-only clears no longer overpromise here */
       const pct=ks.length?Math.round(100*done/ks.length):0;
       const full=ks.length&&done>=ks.length;
       html += `<div class="stat"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-family:var(--mono)">`+
@@ -515,7 +517,7 @@ async function load(){
     const recent = mine.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,10);
     html += `<h3 class="section-title">Recent runs</h3>`;
     recent.forEach(r=>{
-      const label = (D.labelOf[r.challenge]) || (r.challenge.indexOf('daily-')===0?'\u26a1 daily':(r.challenge.indexOf('wk-')===0?'\ud83c\udfc1 gauntlet leg':r.challenge));
+      const label = (D.labelOf[r.challenge]) || (r.challenge.indexOf('challenge-')===0?'\u25c6 daily challenge':(r.challenge.indexOf('daily-')===0?'\u26a1 daily':(r.challenge.indexOf('wk-')===0?'\ud83c\udfc1 gauntlet leg':r.challenge)));
       const when = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
       html += `<div class="drow"><span class="nm">${esc(label)}</span><span class="pb">${fmtS(r.time_ms)}</span><span class="eff">${r.keystrokes||'\u2014'} keys</span><span class="eff">${when}</span></div>`;
     });
