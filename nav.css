@@ -249,8 +249,11 @@ html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
 
 
 /* ---- r77: celebrations — level-ups, rank-ups, achievement unlocks ---- */
+/* r357 (Wolf: "laggy on the celebration animations"): NO backdrop-filter here — a full-viewport
+   blur re-renders the whole page every frame while the confetti falls and the card scale-pops,
+   which is exactly the jank window. A slightly deeper scrim reads the same at zero per-frame cost. */
 .hk-cel-wrap{position:fixed; inset:0; z-index:520; display:flex; align-items:center; justify-content:center;
-  background:rgba(20,21,26,.45); backdrop-filter:blur(2px)}
+  background:rgba(20,21,26,.58)}
 .hk-cel{background:var(--surface); border:1px solid var(--line); border-radius:12px; min-width:300px; max-width:380px;
   overflow:hidden; position:relative; animation:hkPop .38s cubic-bezier(.2,1.4,.4,1); cursor:pointer}
 .hk-cel-cap{min-height:34px; display:flex; align-items:center; padding:6px 14px; background:var(--surface2);

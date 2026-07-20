@@ -390,7 +390,7 @@
   .ribbon .path{color:var(--on-accent); background:var(--accent); font-weight:700; margin-right:4px; letter-spacing:.2px;
     padding:4px 10px; border-radius:6px}
   .ribbon .rtab, .ribbon .opt{display:inline-flex; align-items:center; gap:7px; color:var(--text);
-    background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:6px 10px}
+    background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:4px 10px}   /* r357 (Wolf): 6px vertical made the Alt tab-strip 38px vs the 34px lean rows — the ribbon visibly breathed between states */
   .ribbon .opt{color:var(--text)}                          /* r315 (Wolf): readable at rest, not muted */
   .ribbon .opt.on{color:var(--accent)}
   .ribbon .opt.on k{border-color:var(--accent); color:var(--accent)}
@@ -1535,13 +1535,13 @@
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=267"></script>
-<link rel="stylesheet" href="nav.css?v=181">
+<link rel="stylesheet" href="nav.css?v=182">
 <script src="themes.js?v=269"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=275"></script>
+<script src="nav.js?v=276"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -9714,8 +9714,10 @@ function railClamp(nr,nc){
 }
 function commitAction(){ recalc();
   /* r350: structural ops (row/col insert-delete) shift the working area after load — the fence
-     follows the content so a guided rowops drill can't strand its own bottom row outside it. */
-  try{ if(S && S._railZone) railZoneCompute(); }catch(e){}
+     follows the content so a guided rowops drill can't strand its own bottom row outside it.
+     r357: GUIDED ONLY — this was recomputing (targets + full cell scan + demo parse) on every
+     committed action in every mode, paying the fence tax with the fence off. */
+  try{ if(guided && S && S._railZone) railZoneCompute(); }catch(e){}
   if(typeof S!=='undefined' && S && S.markCrit) syncMarks(); render(); checkWin(); if(railToTarget()) render(); }
 
 function translateFormula(f, dr, dc){
@@ -11559,7 +11561,7 @@ function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('
 function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn();
   if(!guided){ try{ sessionStorage.setItem('hk_guided_off','1'); }catch(e){} }   // r159: respect an explicit F1-off — training wheels stay off this session
   try{ document.body.classList.toggle('guided-on', guided); }catch(e){}   // r93: the whole frame says so
-  if(S){ if(guided){ S._railSig=null; railToTarget(); } render(); }   // r318: turning guided ON places the cursor on the current step's target
+  if(S){ if(guided){ try{ railZoneCompute(); }catch(e){} S._railSig=null; railToTarget(); } render(); }   /* r318 cursor placement; r357: refresh the fence on enable — commitAction only recomputes it while guided is on */
   if(gameMode==='rapidfire' && rfTask) renderRfCard('show');
   else if(!S) updateChecklist();
 }

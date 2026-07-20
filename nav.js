@@ -1158,7 +1158,7 @@ window.hkCelebrate = function(o){
   document.body.appendChild(w);
   try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}   // r176: a focused results button must not act on Enter
   window.hkConfetti(w.querySelector('.hk-cel-body'), o.colors);
-  if(o.big) window.hkConfetti(w, o.colors, 80);   /* r305: level/rank moments rain across the whole overlay, not just the card */
+  if(o.big) window.hkConfetti(w, o.colors, 52);   /* r305 big-moment rain; r357: 80→52 bits — indistinguishable at speed, meaningfully cheaper on integrated GPUs */
   let done=false;
   const close=()=>{ if(done) return; done=true;
     /* r352: EVERY close path detaches the key handler. It used to self-remove only when a
