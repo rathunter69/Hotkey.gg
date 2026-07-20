@@ -4,7 +4,7 @@
      A. tier sub-menu on the drill boards (r335): dropdown, bucket chips, n-of-m note, restore
      B. ranked entry (r336): gate card -> placement checklist -> tier card; enter-ranked copy
      C. nav rank pill (r336): Unranked -> placement n/5 -> tier (stubbed sb + auth)
-     D. seed-field sanity: dev/seed-field.sql parses back and renders non-empty boards
+     D. seed-field sanity: dev/seed-field.sql parses back and renders non-empty boards\n     E. account-state sync (r358): hkStateHydrate merge rules — flags/seen/streak/ranked
    Run: python3 -m http.server 8791 &  ·  node dev/e2e-lb.js */
 'use strict';
 const { chromium } = require('playwright-core');
@@ -180,6 +180,45 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
   }, { profs, runs });
   ok(d1.firstBoard >= 8, 'seed field fills the detail board', 'rows=' + d1.firstBoard);
   ok(d1.rosterRows > 0, 'seed field populates the tier roster');
+
+  // ---------- E. account-state sync (r358): merge rules, pure client ----------
+  console.log('E. account-state sync merge rules');
+  const e1 = await page.evaluate(() => {
+    const out = {};
+    localStorage.setItem('hk_ach_flags', JSON.stringify({ mouseRuns: 2, nightWin: false, slowWins: 1 }));
+    localStorage.setItem('hk_ach_seen', JSON.stringify(['a1', 'a2']));
+    localStorage.setItem('hotkey_streak', JSON.stringify({ d: '2026-07-18', n: 3 }));
+    localStorage.removeItem('hk_ranked');
+    const changed = window.hkStateHydrate({ v: 1,
+      ach_flags: { mouseRuns: 5, nightWin: true, weekendWin: true },
+      ach_seen: ['a2', 'a3'],
+      streak: { d: '2026-07-19', n: 1 },
+      ranked: true });
+    out.changed = changed;
+    out.flags = JSON.parse(localStorage.getItem('hk_ach_flags'));
+    out.seen = JSON.parse(localStorage.getItem('hk_ach_seen')).sort();
+    out.streak = JSON.parse(localStorage.getItem('hotkey_streak'));
+    out.ranked = localStorage.getItem('hk_ranked');
+    // explicit local leave is respected (server true must not resurrect an explicit '0')
+    localStorage.setItem('hk_ranked', '0');
+    window.hkStateHydrate({ v: 1, ranked: true });
+    out.rankedAfterLeave = localStorage.getItem('hk_ranked');
+    // same-day streak: higher count wins
+    localStorage.setItem('hotkey_streak', JSON.stringify({ d: '2026-07-20', n: 2 }));
+    window.hkStateHydrate({ v: 1, streak: { d: '2026-07-20', n: 6 } });
+    out.sameDay = JSON.parse(localStorage.getItem('hotkey_streak')).n;
+    out.pushIsFn = typeof window.hkStatePush === 'function';
+    return out;
+  });
+  ok(e1.changed === true, 'hydrate reports a merge happened');
+  ok(e1.flags.mouseRuns === 5 && e1.flags.slowWins === 1 && e1.flags.nightWin === true && e1.flags.weekendWin === true,
+    'flags merge: counters max, booleans OR, local-only keys kept', JSON.stringify(e1.flags));
+  ok(String(e1.seen) === 'a1,a2,a3', 'seen achievements union', String(e1.seen));
+  ok(e1.streak.d === '2026-07-19' && e1.streak.n === 1, 'later streak day wins', JSON.stringify(e1.streak));
+  ok(e1.ranked === '1', 'ranked opt-in follows the account');
+  ok(e1.rankedAfterLeave === '0', 'an explicit local leave is not resurrected');
+  ok(e1.sameDay === 6, 'same-day streak takes the higher count');
+  ok(e1.pushIsFn, 'hkStatePush is wired');
 
   ok(errs.length === 0, 'zero page errors', errs.join(' | '));
   console.log(fail === 0 ? ('LB SUITE: ALL ' + pass + ' PASS') : ('LB SUITE: ' + fail + ' FAILURE(S) of ' + (pass + fail)));

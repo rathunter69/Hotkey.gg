@@ -778,6 +778,11 @@
         if(window._navUser){
           try{ const p = await window.sb.from('profiles').select('handle,flair,theme').eq('id', window._navUser.id).maybeSingle();
             window._navProfile = p && p.data ? p.data : null; }catch(e){}
+          /* r358: merge the account's cross-device state down BEFORE the pill/streak render.
+             Separate query on purpose — if the migration hasn't run, ONLY this fails, never
+             the handle/theme fetch above. */
+          try{ const cs = await window.sb.from('profiles').select('client_state').eq('id', window._navUser.id).maybeSingle();
+            if(cs && cs.data && cs.data.client_state && window.hkStateHydrate) window.hkStateHydrate(cs.data.client_state); }catch(e){}
           // r293: account theme lands on devices with no local pick yet (mobile carry)
           try{ const th=window._navProfile && window._navProfile.theme;
             if(th && window.THEMES && window.THEMES[th] && !localStorage.getItem('hotkey_theme')){
@@ -1073,6 +1078,62 @@
 
 
 /* ---- r77: celebration engine (shared by every page) ---- */
+/* ============================================================
+   r358 ACCOUNT-STATE SYNC — achievements, the daily streak and the ranked opt-in used to
+   live ONLY in this browser's localStorage: clear the browser or switch devices and they
+   were gone (the sweep's finding). They ride profiles.client_state (jsonb) now — pushed
+   debounced after every change, merged down on every page boot. Requires
+   dev/migrate-client-state.sql; without the column the module goes quiet on first error.
+   Merge rules: counters take the max, booleans OR, seen-achievements union, the streak's
+   later day wins (same day: higher count), ranked follows any device's opt-in but an
+   explicit local leave still pushes false (leaving ranked is a global act).
+   ============================================================ */
+(function(){
+  const K={flags:'hk_ach_flags', seen:'hk_ach_seen', streak:'hotkey_streak', ranked:'hk_ranked'};
+  let dead=false, t=null;
+  const gj=(k,d)=>{ try{ return JSON.parse(localStorage.getItem(k)||d); }catch(e){ try{ return JSON.parse(d); }catch(_){ return null; } } };
+  function snapshot(){ return { v:1,
+    ach_flags: gj(K.flags,'{}')||{}, ach_seen: gj(K.seen,'[]')||[],
+    streak: gj(K.streak,'{}')||{}, ranked: (function(){ try{ return localStorage.getItem(K.ranked)==='1'; }catch(e){ return false; } })() }; }
+  async function pushNow(){
+    try{
+      if(dead || !window.sb) return;
+      const u=window._navUser; if(!u || !u.id) return;   // guests sync too — the anon row upgrades WITH them
+      const { error } = await window.sb.from('profiles')
+        .update({ client_state: snapshot(), client_state_at: new Date().toISOString() }).eq('id', u.id);
+      if(error && /client_state|column|schema/i.test(error.message||'')) dead=true;   // migration not run yet
+    }catch(e){}
+  }
+  window.hkStatePush=function(){ try{ clearTimeout(t); t=setTimeout(pushNow, 2500); }catch(e){} };
+  window.hkStateHydrate=function(cs){
+    try{
+      if(!cs || typeof cs!=='object') return false;
+      let changed=false;
+      const lf=gj(K.flags,'{}')||{}, sf=cs.ach_flags||{};
+      for(const k in sf){ const a=lf[k], b=sf[k];
+        const m=(typeof b==='number'||typeof a==='number') ? Math.max(a||0,b||0) : (a||b);
+        if(m!==a){ lf[k]=m; changed=true; } }
+      const ls=gj(K.seen,'[]')||[], un=[...new Set([...ls, ...(cs.ach_seen||[])])];
+      if(un.length!==ls.length) changed=true;
+      const lst=gj(K.streak,'{}')||{}, sst=cs.streak||{};
+      let st=lst;
+      if(sst.d && (!lst.d || sst.d>lst.d || (sst.d===lst.d && (sst.n||0)>(lst.n||0)))){
+        st=sst; if(JSON.stringify(sst)!==JSON.stringify(lst)) changed=true; }
+      let rk=null; try{ rk=localStorage.getItem(K.ranked); }catch(e){}
+      const setRanked = cs.ranked && rk===null;
+      if(setRanked) changed=true;
+      try{
+        localStorage.setItem(K.flags, JSON.stringify(lf));
+        localStorage.setItem(K.seen, JSON.stringify(un));
+        if(st && st.d) localStorage.setItem(K.streak, JSON.stringify(st));
+        if(setRanked) localStorage.setItem(K.ranked,'1');
+      }catch(e){}
+      if(changed){ try{ window.dispatchEvent(new CustomEvent('hk-state-hydrated')); }catch(e){} }
+      return changed;
+    }catch(e){ return false; }
+  };
+})();
+
 window.hkConfetti = function(host, colors, count){
   if(!host) return;
   colors = colors && colors.length ? colors : ['#6ec9a0','#e3b341','#8ab4ff','#e0879e','#7fd4c1','#e0cf7a'];
