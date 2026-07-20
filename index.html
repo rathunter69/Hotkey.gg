@@ -13533,6 +13533,25 @@ function openCampaign(){
     '<div class="ob-body" style="text-align:left;font-size:12px;color:var(--muted);margin-bottom:2px">Ship the model version by version. Clear every drill in a version under its pace gate and the next unlocks \u2014 each shipped version pays a <b style="color:var(--warn)">one-time xp bounty</b> and stamps a medal on your card.</div>'+
     header+
     '<div class="camp-list">'+rows+'</div>'+
+    /* r361 (Wolf: 'changes flow through all avenues'): the certificate tracks live IN the
+       campaign view — same spine, two ladders. Progress = local clean bests (advisory; the
+       claim re-verifies server-side), claimed certs deep-link to their public pages. */
+    (function(){ try{
+      if(!window.HK_TRACKS) return '';
+      let t='<div class="ob-title" style="margin-top:14px">certificate tracks</div>'+
+        '<div class="ob-body" style="text-align:left;font-size:12px;color:var(--muted);margin-bottom:2px">Three long tracks over the same chapters — clear every drill in one (clean, recorded) and the certificate is yours: public, verifiable, one-click LinkedIn.</div>';
+      window.HK_TRACKS.forEach(tr=>{
+        const n=tr.keys.filter(k=>PB[k]!==undefined).length, N=tr.keys.length;
+        const id=localStorage.getItem('hk_cert_'+tr.id);
+        const done=id && id!=='pending';
+        t+='<div class="camp-ch'+(done?' done':'')+'"><div class="camp-hd">'+
+          '<span class="camp-badge">'+(done?'\ud83c\udf93':'\u25b8')+'</span><b>'+tr.name+'</b>'+
+          (done?'<a class="camp-xp claimed" style="cursor:pointer" href="cert.html?id='+encodeURIComponent(id)+'" target="_blank" rel="noopener">view certificate \u2192</a>'
+               :'<span class="camp-n" style="margin-left:auto">'+n+'/'+N+'</span>')+
+          '</div><div class="camp-chprog"><span style="width:'+Math.round(100*n/N)+'%"></span></div></div>';
+      });
+      return t;
+    }catch(e){ return ''; } })()+
     proCta+
     '<div class="ob-opts"><button class="ob-key" id="campClose">close</button></div></div>';
   m.classList.add('show');

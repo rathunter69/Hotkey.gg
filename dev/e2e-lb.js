@@ -234,6 +234,25 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
   ok(String(f1.sizes) === '20,32,30', 'track lengths 20/32/30', String(f1.sizes));
   ok(f1.coversAll, 'every drill belongs to a track');
   ok(f1.shareFn, 'hkShareCard renderer is loaded');
+  // r361 FRAMEWORK COHERENCE — every structure that references drills must resolve against
+  // the catalog: campaign chapters (v1..v8), progression gates, placement, tracks, pars.
+  const g1 = await page.evaluate(() => {
+    const D = window.HOTKEY_DRILLS, cat = new Set(D.menuOrder), out = { bad: [] };
+    (window.HOTKEY_CAMPAIGN.chapters || []).forEach(c =>
+      c.keys.forEach(k => { if (!cat.has(k)) out.bad.push('campaign ' + c.id + ':' + k); }));
+    const gnames = new Set(D.groups.map(g => g.name));
+    Object.keys(window.HOTKEY_GATES.groups || {}).forEach(g => { if (!gnames.has(g)) out.bad.push('gate group ' + g); });
+    const chIds = new Set((window.HOTKEY_CAMPAIGN.chapters || []).map(c => c.id));
+    Object.values(window.HOTKEY_GATES.groups || {}).forEach(g =>
+      (g.chapters || []).forEach(c => { if (!chIds.has(c)) out.bad.push('gate chapter ' + c); }));
+    (window.HK_PLACEMENT.KEYS || []).forEach(k => { if (!cat.has(k)) out.bad.push('placement ' + k); });
+    (window.HK_TRACKS || []).forEach(t => t.keys.forEach(k => { if (!cat.has(k)) out.bad.push('track ' + t.id + ':' + k); }));
+    D.menuOrder.forEach(k => { if (window.HOTKEY_PARS[k] === undefined) out.bad.push('par missing ' + k); });
+    // chapter groups mirror the catalog groups 1:1 (the campaign IS the spine)
+    if ((window.HOTKEY_CAMPAIGN.chapters || []).length !== D.groups.length) out.bad.push('chapter/group count drift');
+    return out;
+  });
+  ok(g1.bad.length === 0, 'campaign/gates/placement/tracks/pars all resolve against the catalog', g1.bad.slice(0, 5).join(' | '));
   // the SQL migration's arrays must match drills.js (they are generated from it)
   const certSql = fs.readFileSync('dev/migrate-certificates.sql', 'utf8');
   const f2 = await page.evaluate(() => (window.HK_TRACKS || []).map(t => ({ id: t.id, keys: t.keys })));
