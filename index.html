@@ -1534,14 +1534,14 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=267"></script>
+<script src="drills.js?v=268"></script>
 <link rel="stylesheet" href="nav.css?v=182">
 <script src="themes.js?v=269"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=277"></script>
+<script src="nav.js?v=278"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -9132,6 +9132,7 @@ function checkWin(){
     recordRun(t).then(async ok=>{
       const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); }
       if(ok){ const rk=await fetchRank(cur, t*1000); if(rk) showRankBadge(rk); }
+      try{ maybeOfferCertificate(); }catch(e){}   /* r359: a posted run may have completed a certificate track */
     });
   }
 }
@@ -9148,6 +9149,49 @@ async function fetchRank(challenge, timeMs){
     const leader = best[0].time_ms;
     return { rank, total, leader, isFirst: rank===1, gap: rank>1 ? (timeMs-leader)/1000 : 0 };
   }catch(e){ return null; }
+}
+/* r359 CERTIFICATES (Wolf: long tracks, one specific reward each, LinkedIn-ready).
+   Local PB coverage is only the TRIGGER — issue_certificate() re-verifies the caller's
+   recorded runs server-side, so a stale/foreign PB map can never mint a cert. One offer
+   per track (hk_cert_<id>); a failed claim clears the latch so it can retry later. */
+async function maybeOfferCertificate(){
+  if(!window.HK_TRACKS || !sb || !me_user || isAnonUser()) return;
+  for(const t of window.HK_TRACKS){
+    if(localStorage.getItem('hk_cert_'+t.id)) continue;
+    if(!t.keys.every(k=>PB[k]!==undefined)) continue;
+    localStorage.setItem('hk_cert_'+t.id,'pending');
+    try{
+      const { data, error } = await sb.rpc('issue_certificate', { p_track: t.id });
+      if(error){
+        localStorage.removeItem('hk_cert_'+t.id);
+        const msg=String(error.message||'');
+        if(/TRACK_INCOMPLETE/.test(msg)) showToast('certificate almost ready \u2014 some clears never posted (guest runs from before sign-in don\u2019t count). Re-run the missing drills.');
+        else if(/GUEST/.test(msg)) showToast('create a full account to claim certificates \u2014 your progress carries over');
+        return;
+      }
+      localStorage.setItem('hk_cert_'+t.id, String(data));
+      try{ if(window.hkCelebrate) hkCelebrate({cap:'track complete', big:true, title:t.name,
+        sub:'all '+t.keys.length+' drills \u00b7 certificate issued'}); }catch(e){}
+      setTimeout(()=>{ try{ certModal('cert.html?id='+encodeURIComponent(String(data)), t); }catch(e){} }, 1600);
+    }catch(e){ localStorage.removeItem('hk_cert_'+t.id); }
+    return;   // one track per win is plenty
+  }
+}
+function certModal(url, t){
+  const m=document.createElement('div'); m.className='wb-dlg show'; m.style.zIndex=530;
+  m.innerHTML='<div class="wb-dcard" style="padding:24px 26px; text-align:center; width:min(440px,92vw)">'+
+    '<div style="font-family:var(--mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)">certificate issued</div>'+
+    '<div style="font-size:20px; font-weight:700; margin:8px 0 4px">'+escHtml(t.cert)+'</div>'+
+    '<div style="color:var(--muted); font-size:13px">All '+t.keys.length+' drills, clean recorded runs. The certificate page is public, verifiable, and has a one-click \u201cAdd to LinkedIn\u201d button.</div>'+
+    '<div style="display:flex; gap:10px; justify-content:center; margin-top:16px">'+
+      '<a class="ob-key primary" style="text-decoration:none" href="'+url+'" target="_blank" rel="noopener"><span>view certificate \u2192</span></a>'+
+      '<button class="ob-key" id="certLater"><span>later</span></button>'+
+    '</div></div>';
+  document.body.appendChild(m);
+  const cl=()=>{ try{ m.remove(); }catch(e){} };
+  m.addEventListener('click', e=>{ if(e.target===m) cl(); });
+  const b=m.querySelector('#certLater'); if(b) b.onclick=cl;
+  const a=m.querySelector('a.ob-key'); if(a) a.addEventListener('click', ()=>setTimeout(cl,300));
 }
 function showRankBadge(rk){
   const el=$('rmRank'); if(!el) return;
@@ -9356,6 +9400,7 @@ function _showResults(o){
     `<button class="rm-key" data-act="again"><kbd>↵</kbd>again</button>`+
     `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
+    (o.pb ? `<button class="rm-key" data-act="share">\ud83d\udcf8 share</button>` : '')+
     `</div>`+
     guestPrompt+
     `</div>`;
@@ -9367,6 +9412,23 @@ function _showResults(o){
     if(a==='again'){ hideResults(); restartDrill(); }
     else if(a==='next'){ hideResults(); loadChallenge(nextDrillKey()); }
     else if(a==='menu'){ hideResults(); openPicker(); }
+    else if(a==='share'){ /* r359: PB share card — canvas PNG via the shared renderer */
+      try{
+        let life=''; try{
+          const rl=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]');
+          const firstBy={}, bestBy={};
+          rl.forEach(r=>{ if(!r.d) return; if(firstBy[r.d]===undefined) firstBy[r.d]=r.time_ms;
+            if(bestBy[r.d]===undefined||r.time_ms<bestBy[r.d]) bestBy[r.d]=r.time_ms; });
+          let l=0; Object.keys(firstBy).forEach(d=>{ const sv=firstBy[d]-bestBy[d]; if(sv>0) l+=sv; });
+          if(l>0) life = l<60000 ? (l/1000).toFixed(0)+'s' : (l<3600000 ? Math.round(l/60000)+'m' : Math.floor(l/3600000)+'h '+Math.round((l%3600000)/60000)+'m');
+        }catch(e){}
+        const C2=CHALLENGES[cur];
+        window.hkShareCard && hkShareCard({
+          big: o.t+'s', title: (C2&&(C2.name||C2.label)||cur)+' \u2014 new personal best',
+          lines: [ life?('\u23f1 '+life+' saved vs my first tries'):null,
+                   (streak&&streak.n>1)?('\ud83d\udd25 '+streak.n+'-day streak'):null ].filter(Boolean) });
+      }catch(e){}
+    }
   }; });
   const si=$('rmSignin'); if(si) si.onclick=openAuth;
   const sp=$('rmSaveProg'); if(sp) sp.onclick=()=>openAuth('signup');

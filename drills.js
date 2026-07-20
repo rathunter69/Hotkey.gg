@@ -165,6 +165,30 @@ window.HOTKEY_DRILLS = {
   D.groupOf = {};
   D.groups.forEach(g => g.keys.forEach(k => { D.groupOf[k] = g.name; }));
 
+  /* r359 CERTIFICATE TRACKS (Wolf: "longer tracks that reward a more specific thing" —
+     three long tracks over the existing catalog, each certifying ONE named competency;
+     lean by design, no per-chapter badges). A track is complete when EVERY drill in it
+     has a clean recorded run (no mouse, no guided — i.e. a row in the runs table); the
+     issue_certificate RPC re-verifies that server-side, so completion here is advisory.
+     If chapters change, update dev/migrate-certificates.sql's arrays to match. */
+  window.HK_TRACKS = [
+    { id:'fluency',  name:'Excel Keyboard Fluency',
+      cert:'Excel Keyboard Fluency',
+      blurb:'Navigation, editing and formatting \u2014 the full keyboard loop, at speed.',
+      groups:['Foundations','Formatting'] },
+    { id:'formulas', name:'Spreadsheet Formulas & Data',
+      cert:'Spreadsheet Formulas & Data Analysis',
+      blurb:'Live formulas, lookups, data hygiene and formula auditing \u2014 built and checked without the mouse.',
+      groups:['Formulas I','Data & Lookups','Formulas II'] },
+    { id:'modeling', name:'Financial Modeling Keyboard Mastery',
+      cert:'Financial Modeling Keyboard Mastery',
+      blurb:'DCF, LBO, three-statement builds and debt schedules \u2014 full working models, keyboard only.',
+      groups:['Models I','Models II','Full Builds'] },
+  ];
+  window.HK_TRACKS.forEach(t => {
+    t.keys = D.groups.filter(g => t.groups.includes(g.name)).flatMap(g => g.keys);
+  });
+
   // Convenience maps so consumers don't have to dig into .meta[k].label every time.
   D.labelOf = {};
   D.nameOf  = {};

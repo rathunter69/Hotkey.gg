@@ -1134,6 +1134,42 @@
   };
 })();
 
+/* r359 SHARE CARD — one canvas renderer for every "share this" moment (PB results now;
+   stats/cert surfaces can reuse it). Draws a 1200x630 brand card and hands it to the OS
+   share sheet when available, else downloads a PNG. Payload: {big, title, lines[], url?}. */
+window.hkShareCard = async function(o){
+  try{
+    o = o || {};
+    const W=1200, H=630, cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+    const x=cv.getContext('2d');
+    const css=k=>{ try{ return getComputedStyle(document.documentElement).getPropertyValue(k).trim(); }catch(e){ return ''; } };
+    const accent=css('--accent')||'#16a862';
+    // dark card regardless of theme — it travels to feeds, not to the app
+    x.fillStyle='#0c0d0e'; x.fillRect(0,0,W,H);
+    x.fillStyle=accent; x.fillRect(0,0,10,H);
+    x.textBaseline='alphabetic';
+    x.font='700 44px "JetBrains Mono", monospace';
+    x.fillStyle='#e9e8e3'; x.fillText('hotkey', 70, 96);
+    x.fillStyle=accent;    x.fillText('.gg', 70+x.measureText('hotkey').width, 96);
+    x.font='500 26px "JetBrains Mono", monospace'; x.fillStyle='#7c7d77';
+    x.fillText((o.title||'').slice(0,52), 70, 210);
+    x.font='700 150px "JetBrains Mono", monospace'; x.fillStyle='#e9e8e3';
+    x.fillText(String(o.big||''), 70, 370);
+    x.font='500 28px "JetBrains Mono", monospace'; x.fillStyle='#a8ada7';
+    let y=440; (o.lines||[]).slice(0,3).forEach(l=>{ x.fillText(String(l).slice(0,60), 70, y); y+=46; });
+    x.fillStyle=accent; x.font='700 26px "JetBrains Mono", monospace';
+    x.fillText(o.url||'hotkey.gg \u2014 excel keyboard training', 70, 576);
+    const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+    if(!blob) return;
+    const file=new File([blob],'hotkey-gg.png',{type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:'hotkey.gg', text:(o.title||'')+' \u00b7 hotkey.gg'}); return; }catch(e){ if(e && e.name==='AbortError') return; }
+    }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hotkey-gg.png';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ try{ URL.revokeObjectURL(a.href); a.remove(); }catch(e){} }, 800);
+  }catch(e){}
+};
+
 window.hkConfetti = function(host, colors, count){
   if(!host) return;
   colors = colors && colors.length ? colors : ['#6ec9a0','#e3b341','#8ab4ff','#e0879e','#7fd4c1','#e0cf7a'];
