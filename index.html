@@ -500,23 +500,23 @@
      the page never dims and the card is exactly content-sized (no inset stretch) */
   .pd-backdrop{display:none; z-index:50}
   .pd-sect{padding:5px 2px 2px; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint)}
-  .pd-box{background:var(--surface); border:1px solid var(--line); border-radius:12px; width:312px;
-    overflow:hidden}   /* r60 flat: border carries the depth */
-  .pd-title{padding:12px 16px; border-bottom:1px solid var(--line); font-size:14px; font-weight:600;
+  .pd-box{background:var(--surface); border:1px solid var(--line); border-radius:10px; width:280px;
+    overflow:hidden; box-shadow:0 8px 22px rgba(0,0,0,.14)}   /* r353: ONE card, one soft lift */
+  .pd-title{padding:9px 13px; border-bottom:1px solid var(--line); font-size:13px; font-weight:600;
     display:flex; justify-content:space-between; align-items:center}
   .pd-title .x{color:var(--muted); font-family:var(--mono); font-size:11px; font-weight:400}
-  .pd-group{padding:11px 14px}
-  .pd-group h4{font-size:10.5px; color:var(--muted); font-weight:500; margin:0 0 6px 4px;
+  .pd-group{padding:8px 11px}
+  .pd-group h4{font-size:10.5px; color:var(--muted); font-weight:500; margin:0 0 5px 4px;
     text-transform:uppercase; letter-spacing:.6px}
-  .pd-opt{display:flex; align-items:center; gap:9px; padding:5px 8px; border-radius:7px; font-size:13px; color:var(--text)}
+  .pd-opt{display:flex; align-items:center; gap:9px; padding:3px 7px; border-radius:6px; font-size:12.5px; color:var(--text)}
   .pd-opt.on{background:var(--accent-glow); color:var(--accent)}
   .pd-radio{font-family:var(--mono); width:12px; text-align:center; color:var(--faint)}
   .pd-opt.on .pd-radio{color:var(--accent)}
   .pd-key{font-family:var(--mono); font-size:11px; background:var(--surface2); border:1px solid var(--line);
     border-radius:4px; padding:0 6px; color:var(--muted)}
   .pd-opt.on .pd-key{border-color:var(--accent); color:var(--accent)}
-  .pd-foot{display:flex; justify-content:flex-end; gap:8px; padding:11px 14px; border-top:1px solid var(--line)}
-  .pd-btn{font-family:var(--mono); font-size:12px; padding:6px 13px; border-radius:7px;
+  .pd-foot{display:flex; justify-content:flex-end; gap:8px; padding:8px 11px; border-top:1px solid var(--line)}
+  .pd-btn{font-family:var(--mono); font-size:11.5px; padding:5px 11px; border-radius:6px;
     border:1px solid var(--line); background:var(--surface2); color:var(--muted)}
   .pd-btn kbd{font-size:10px}
   .pd-btn.ok{border-color:var(--accent); color:var(--accent)}
@@ -801,11 +801,15 @@
   .ob-key.focused{border-color:var(--accent); color:var(--on-accent); background:var(--accent); box-shadow:0 0 0 3px var(--accent-glow)}
   .ob-key.focused .ob-kbd{background:rgba(6,18,12,.2); border-color:rgba(6,18,12,.3); color:var(--on-accent)}
   .ob-key.focused span{color:var(--on-accent)!important}
-  /* r313 (Wolf): the recommended option filled with accent-dim + --text read as muddy/unreadable
-     on light sheets. Now it's a normal readable chip with a left accent bar marking it. */
-  .ob-key.primary{background:var(--surface2); border-color:var(--accent); color:var(--text); box-shadow:inset 3px 0 0 0 var(--accent)}
-  .ob-key.primary:hover{background:color-mix(in srgb, var(--accent) 12%, var(--surface2)); color:var(--text)}
-  .ob-key.primary.focused{background:var(--accent); color:var(--on-accent); box-shadow:0 0 0 2px var(--accent-glow)}
+  /* r353 (Wolf, doubling down on the Supabase-green CTA): the recommended option is a SOLID
+     green button — accent fill + on-accent (white on daylight) text — matching the site's CTAs.
+     The r313 muddy-green problem was accent-dim + dark text; this is the bright accent + white
+     pairing that fixed the CTAs in r346, applied to the intro/onboarding sequence. */
+  .ob-key.primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+  .ob-key.primary span{color:var(--on-accent)!important}
+  .ob-key.primary .ob-kbd{background:rgba(6,18,12,.2); border-color:rgba(6,18,12,.3); color:var(--on-accent)}
+  .ob-key.primary:hover{background:var(--accent-dim); border-color:var(--accent-dim); color:var(--on-accent)}
+  .ob-key.primary.focused{background:var(--accent); color:var(--on-accent); box-shadow:0 0 0 3px var(--accent-glow)}
   .ob-kbd{font-family:var(--mono); font-size:11px; font-weight:600;
     background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.22); border-radius:4px; padding:1px 6px; line-height:1}
   .ob-key.primary.focused .ob-kbd{background:rgba(6,18,12,.2); border-color:rgba(6,18,12,.3); color:var(--on-accent)}
@@ -1518,10 +1522,11 @@
   /* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
   #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
   #grid th{font-size:10.5px}
-  #pasteDialog,#fmtDialog{position:fixed; z-index:30;   /* r191/r263: float over the SHEET — drawDialog sets left/top */
-    background:var(--surface2); border:1px solid var(--line); border-radius:12px;
-    padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
+  /* r353 (Wolf: "weird drop shadow thing" on Ctrl+1): the wrapper used to be a SECOND card —
+     its own surface, border, padding and a heavy 30px shadow AROUND the inner .pd-box card,
+     reading as a doubled frame. The wrapper is positioning-only now; .pd-box carries the one
+     tight card look. */
+  #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=267"></script>
 <link rel="stylesheet" href="nav.css?v=180">
@@ -8747,7 +8752,7 @@ function positionDialog(d){
   // float the card over the SHEET like Excel \u2014 lower half so source rows stay readable
   try{ const gw=document.querySelector('.gridwrap');
     if(gw){ const wr=gw.getBoundingClientRect();
-      d.style.left=Math.max(8, wr.left+wr.width/2-150)+'px';
+      d.style.left=Math.max(8, wr.left+wr.width/2-140)+'px';
       const want=Math.round(wr.top+wr.height*0.30);
       d.style.top=Math.max(8, Math.min(want, window.innerHeight-(d.offsetHeight||360)-14))+'px'; } }catch(e){}
 }
