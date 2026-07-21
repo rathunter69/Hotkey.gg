@@ -812,11 +812,11 @@ window.HK_FRAMES = [
    desc:'steel certificate corners + rosettes',       earn:'reach LVL 5'},
   /* r376: plaque descs follow the screw → gemset corner swap (art round 2) */
   {id:'plaque-bronze', name:'Bronze Plaque',   tier:'rare',
-   desc:'beveled bronze + gemset corners',            earn:'reach Summer Analyst'},
+   desc:'beveled bronze + gemset corners',            earn:'reach Candidate'},
   {id:'plaque-silver', name:'Silver Plaque',   tier:'rare',
-   desc:'beveled silver + gemset corners',            earn:'reach First-Year Analyst'},
+   desc:'beveled silver + gemset corners',            earn:'reach Summer Analyst'},
   {id:'plaque-gold',   name:'Gold Plaque',     tier:'rare',
-   desc:'beveled gold + gemset corners',              earn:'reach Associate'},
+   desc:'beveled gold + gemset corners',              earn:'reach First-Year Analyst'},
   {id:'plaque-plat',   name:'Platinum Plaque', tier:'rare',
    desc:'beveled platinum + gemset corners',          earn:'reach VP'},
   {id:'plaque-diam',   name:'Diamond Plaque',  tier:'rare',
@@ -838,9 +838,11 @@ window.hkFrameUnlocked = function(id, u){
   const tb = u.tierBest|0;
   switch(id){
     case 'engraved':      return (u.lvl|0) >= 5;
-    case 'plaque-bronze': return tb >= 2;   // Summer Analyst
-    case 'plaque-silver': return tb >= 3;   // First-Year Analyst
-    case 'plaque-gold':   return tb >= 4;   // Associate
+    /* r380 (Wolf, option A): unlocks shifted down a rung so the plaque metal always
+       matches the crest metal the r377 ladder gave that tier */
+    case 'plaque-bronze': return tb >= 1;   // Candidate — bronze crest, bronze plaque
+    case 'plaque-silver': return tb >= 2;   // Summer Analyst
+    case 'plaque-gold':   return tb >= 3;   // First-Year Analyst
     case 'plaque-plat':   return tb >= 5;   // VP (MD is a higher rung — counts too)
     case 'plaque-diam':   return tb >= 7;   // Second-Year Analyst — the true final boss
     case 'foil':          return (u.dailyWins|0) >= 1 || (u.certs|0) >= 1;
