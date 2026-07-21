@@ -13523,6 +13523,21 @@ function renderStreak(){ const el=$('streakBadge'); if(!el) return;
   el.title=streak.n+'-day streak \u2014 solve a drill every day to keep it alive'+
     (frz?' \u00b7 '+frz+' freeze'+(frz>1?'s':'')+' banked (auto-covers a missed day)':' \u00b7 every 5 days banks a freeze'); }
 
+/* r387 (Wolf): logout \u2192 guest was inheriting the previous account's progress. On the
+   REACTIVE SIGNED_OUT path (another tab, or a dropped/expired session) nav.js's
+   clearAccountUI wipes storage but never reloads the trainer, so the in-memory
+   globals (PB, streak) survived \u2014 the next guest solve counted the old account's
+   drills and showed an inflated level + fired the "10 drills" medal. Zero the
+   in-memory state here (storage is already wiped by the time nav.js calls this) and
+   re-render from the clean slate. Safe to call anytime; it never touches prefs. */
+window.__hkResetProgress = function(){
+  try{ PB = {}; }catch(e){}
+  try{ streak = {d:'',n:0}; }catch(e){}
+  try{ renderLvl(0); }catch(e){}
+  try{ renderStreak(); }catch(e){}
+  try{ renderSheetTabs(); }catch(e){}
+};
+
 let _toastT=null;
 function showToast(msg){
   let el=$('hkToast');

@@ -403,6 +403,11 @@
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
         if(k && (/^sb-.*-auth-token$/.test(k) || k==='supabase.auth.token')) localStorage.removeItem(k); }
     }catch(e){}
+    // r387 (Wolf): the reactive SIGNED_OUT path clears storage but doesn't reload the
+    // trainer, so its in-memory progress (PB, streak, level) survived and the next
+    // guest solve inherited the old account's drills. Let the trainer zero its own
+    // in-memory state so a guest always starts from a clean slate, reload or not.
+    try{ if(window.__hkResetProgress) window.__hkResetProgress(); }catch(e){}
   }
   window.clearAccountUI = clearAccountUI;   // pages (index.html) share the same wipe on their own sign-out path
   // user state lands async — poll briefly, then give up quietly
