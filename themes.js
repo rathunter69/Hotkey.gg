@@ -1148,6 +1148,48 @@ window.hkInitCardFx = function(root){
   }catch(e){}
 };
 
+/* ---- r386: hkPlayerCard — the ONE unified player-card component. The public card
+   AND the leaderboard hero both render through this, so the earned skin IS the
+   surface (no nested container boxes). d carries pre-rendered emblem HTML (caller
+   passes window.rankEmblem(...)); opts.scale is 'full' (public card) or 'compact'
+   (the your-card hero). When d.flair is a valid HK_FRAMES id we add .hk-frame-<id>
+   (+ .hk-frame-lg at full scale) and prepend hkFrameOrnaments — pass flair=null when
+   the host element already carries the skin class (avoids a double frame). Compact
+   keeps head + stats only; full adds the divider, achievements and boards.
+   Dependency-light: only optional window.hkFrameOrnaments. ---- */
+window.hkPlayerCard = function(d, opts){
+  d = d || {}; opts = opts || {};
+  const full = opts.scale !== 'compact';   // 'full' | 'compact' (default full)
+  const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let cls = 'uc' + (full ? '' : ' compact'), orn = '';
+  const fv = d.flair;
+  if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
+    cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
+    orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full}) : '';
+  }
+  const stats = (d.stats||[]).map(s=>
+    '<span class="s"><b>'+esc(s.n)+'</b><span>'+esc(s.label)+'</span></span>').join('');
+  let h = '<div class="'+cls+'">'+orn+
+    '<div class="uc-head"><span class="uc-crest">'+(d.tierEmblem||'')+'</span>'+
+      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+
+        '<div class="uc-tier">'+(d.tierChipEmblem||'')+'<span>'+esc(d.tierLabel)+'</span></div></div>'+
+      '<div class="uc-lvlwrap"><div class="uc-lvl">LVL '+esc(d.lvl)+'</div>'+
+        '<div class="uc-bar"><i style="width:'+(d.pct||0)+'%"></i></div>'+
+        '<div class="uc-xp">'+esc(d.xpLine)+'</div></div>'+
+    '</div>';
+  if(full){
+    h += '<hr class="uc-div"><div class="uc-stats">'+stats+'</div>';
+    if(d.achHtml) h += '<div class="uc-ach">'+d.achHtml+'</div>';
+    if(d.boards && d.boards.length) h += '<hr class="uc-div"><div class="uc-boards">'+
+      d.boards.map(b=>'<div class="uc-brow"><span>'+esc(b.name)+'</span><b>'+esc(b.time)+'</b></div>').join('')+'</div>';
+  } else {
+    h += '<div class="uc-stats">'+stats+'</div>';
+  }
+  if(d.footHtml) h += d.footHtml;
+  h += '</div>';
+  return h;
+};
+
 /* ---- achievement badges: hex medals, single source ---- */
 /* r376: THE RARITY PALETTE — one map for every surface that speaks rarity (badge
    rings, the stats-wall .rr tags + legend). Classic gaming ladder: common green ·

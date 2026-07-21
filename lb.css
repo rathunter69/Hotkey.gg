@@ -459,3 +459,7 @@
    exact r114 box — zero layout shift. */
 .pub-card[class*="hk-frame-"]{overflow:visible}
 .pub-card[class*="hk-frame-"] .pub-cap{border-radius:11px 11px 0 0}
+/* r386: skinned public card — the .uc now carries the skin, so the holder drops its
+   own surface/border (no double box) and lets the ornaments overflow. Frameless cards
+   keep the r114 surface box. */
+.pub-card.pub-bare{background:transparent;border:0;overflow:visible}

@@ -756,3 +756,40 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   .hk-frame-molten .hkf-crack path{animation:hkfCrackPulse 2.4s ease-in-out infinite}
 }
 @keyframes hkfCrackPulse{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* ---- r386: unified player card (.uc) — layout only; the skin bg/border/vars come
+   from the .hk-frame-<id> rules above. Public card renders at full scale, the
+   your-card hero at compact. ---- */
+.uc{position:relative;border-radius:16px;padding:22px 24px 18px}
+.uc>*:not(.hk-fx):not(.hkf-tab):not(.hkf-serial):not(.hkf-sun):not(.hkf-vgrid){position:relative;z-index:2}
+.uc-head{display:flex;align-items:center;gap:16px}
+.uc-crest{line-height:0;flex:none}
+.uc-id{min-width:0;flex:1}
+.uc-nm{font-size:24px;font-weight:700;letter-spacing:.3px;line-height:1.05}
+.uc.compact .uc-nm{font-size:18px}
+.uc-tier{font-size:11px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.uc-lvlwrap{flex:none;text-align:right;min-width:120px}
+.uc-lvl{font-size:12px;font-weight:700;color:var(--accent)}
+.uc-bar{height:6px;border-radius:99px;background:rgba(0,0,0,.35);overflow:hidden;margin-top:5px;border:1px solid var(--line)}
+.uc-bar>i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.uc-xp{font-size:9px;color:var(--muted);margin-top:3px}
+.uc-div{height:1px;background:var(--line);border:0;margin:16px 0}
+.uc-stats{display:flex;gap:26px;flex-wrap:wrap}
+.uc.compact .uc-stats{gap:18px;margin-top:2px}
+.uc-stats .s{display:flex;flex-direction:column;gap:1px}
+.uc-stats b{font-size:19px;font-weight:700;color:var(--text)}
+.uc.compact .uc-stats b{font-size:15px}
+.uc-stats .s>span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.uc-ach{display:flex;gap:10px;margin-top:16px}
+.uc-boards{margin-top:0;display:flex;flex-direction:column;gap:5px;font-size:11px}
+.uc-brow{display:flex;justify-content:space-between;color:var(--muted)}
+.uc-brow b{color:var(--text);font-weight:600}
+.uc-foot{display:flex;gap:16px;margin-top:18px;font-size:11px}
+.uc-foot a{color:var(--muted);cursor:pointer;text-decoration:none}
+.uc-foot a:hover{color:var(--accent)}
+
+/* ---- r386: leaderboard row skin indicator — 3px left accent bar + tiny dot in the
+   player's skin color, so the lean rows hint at earned skins without a full frame. ---- */
+.row.has-skin{position:relative}
+.row.has-skin::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:var(--skin-accent,#6ec9a0)}
+.row .skin-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--skin-accent,#6ec9a0);margin-left:6px;vertical-align:middle;box-shadow:0 0 5px var(--skin-accent,#6ec9a0)}
