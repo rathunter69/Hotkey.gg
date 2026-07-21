@@ -19,7 +19,8 @@ ctx=ssl.create_default_context(cafile='/root/.ccr/ca-bundle.crt')
 req=urllib.request.Request(
   'https://api.supabase.com/v1/projects/vshtftzrlepedydmkcnm/database/query',
   data=json.dumps({'query':sql}).encode(),
-  headers={'Authorization':'Bearer '+sys.argv[2],'Content-Type':'application/json'},method='POST')
+  headers={'Authorization':'Bearer '+sys.argv[2],'Content-Type':'application/json',
+           'User-Agent':'hotkey-gg-migrate/1.0'},method='POST')
 try:
     with urllib.request.urlopen(req,context=ctx) as r:
         print('OK',r.status,r.read().decode()[:300])
