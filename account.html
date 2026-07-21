@@ -85,8 +85,8 @@
   .state a.acc-cta.ghost{color:var(--accent)}   /* r355: the r297 on-accent fix out-specified the ghost variant — 'Log in' rendered white-on-light, invisible */
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
-<link rel="stylesheet" href="nav.css?v=184">
-<script src="drills.js?v=274"></script>
+<link rel="stylesheet" href="nav.css?v=185">
+<script src="drills.js?v=275"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -94,11 +94,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=272"></script>
+<script src="themes.js?v=273"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=284"></script>
+<script src="nav.js?v=285"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -155,14 +155,24 @@ async function load(){
     charter:!!(me.created_at && String(me.created_at) < '2026-10-01'),
     perfectRun:__fl.perfectRun?1:0 };
   const FRAME_TIER_C={common:'var(--muted)', rare:'#3f7fe0', epic:'#d64a3f', legendary:'#d99a1f', egg:'#8a6d3b'};
+  /* r376: the gem-cut bucket for plaque swatches — the packed latch (nav.js
+     persistTierBest) maxed against the live tier the same way tierBest is above,
+     so a fresh device previews the right cut before the async latch lands. */
+  const __liveBk = tier.bucket==='Top Bucket' ? 2 : tier.bucket==='Middle Bucket' ? 1 : 0;
+  const __gemBk = (__fl.tierBestBucket!=null || (tier.i|0)>0)
+    ? (Math.max(__fl.tierBestBucket|0, (tier.i|0)*3+__liveBk) % 3) : 1;
   const frameCards=[{id:'none', name:'None', tier:'', desc:'plain card', earn:'', unlocked:true}]
     .concat((window.HK_FRAMES||[]).map(f=>({...f, unlocked:window.hkFrameUnlocked && window.hkFrameUnlocked(f.id, frameU)})));
   const frameGridHtml=frameCards.map(f=>{
     const on = (prof.flair||'none')===f.id;
+    /* r376: plaque minis carry the gemset corners (scaled by nav.css .fs-mini rules)
+       so the picker previews YOUR cut; other frames keep the chrome-only swatch */
+    const orn = (f.id.indexOf('plaque-')===0 && window.hkFrameOrnaments)
+      ? window.hkFrameOrnaments(f.id, {bucket:__gemBk}) : '';
     return '<button class="flair-opt'+(on?' on':'')+'" data-flair="'+f.id+'" data-locked="'+(f.unlocked?'0':'1')+'"'+
       ' style="text-align:left;font-family:var(--mono);background:var(--bg);border:1px solid '+(on?'var(--accent)':'var(--line)')+
       ';border-radius:10px;padding:10px 12px;color:var(--text);cursor:'+(f.unlocked?'pointer':'default')+(f.unlocked?'':';opacity:.45')+'">'+
-      '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'"></span>'+
+      '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'">'+orn+'</span>'+
       '<b style="font-size:12px">'+esc(f.name)+'</b>'+
       (f.tier?' <i style="font-style:normal;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:'+FRAME_TIER_C[f.tier]+'">'+f.tier+'</i>':'')+
       '<span style="display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">'+

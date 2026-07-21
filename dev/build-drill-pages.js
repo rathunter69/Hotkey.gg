@@ -301,20 +301,20 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
 <style>${CSS}</style>
-<link rel="stylesheet" href="nav.css?v=184">
-<script src="drills.js?v=274"><\/script>
+<link rel="stylesheet" href="nav.css?v=185">
+<script src="drills.js?v=275"><\/script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
   window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
   window.NAV_ACTIVE='';
 <\/script>
-<script src="themes.js?v=272"><\/script>
+<script src="themes.js?v=273"><\/script>
 <script type="application/ld+json">${ld}</script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=284"><\/script>
+<script src="nav.js?v=285"><\/script>
 <div class="wrap">`;
 
   const FOOT = `

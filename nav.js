@@ -290,13 +290,21 @@
      ever DISPLAYED, not the one you hold today (ranks can fall; earned cosmetics don't).
      Persisted as a TIERS index in hk_ach_flags.tierBest — a number, so the r358
      client-state hydration maxes it across devices for free. Called wherever the rank
-     fetch computes a live tier (navRank + the card renderer). */
-  function persistTierBest(i){
+     fetch computes a live tier (navRank + the card renderer).
+     r376: also latches the BUCKET held at that best tier — the gemset plaque corners
+     cut their stone from it. Packed as ONE monotonic number (tierBestBucket =
+     tier*3 + bucket, bucket 0..2) so the hydration max keeps the true high-water
+     PAIR; two separately-maxed fields could stitch an old device's top bucket onto
+     a newly reached tier. Decode: bucket = tierBestBucket % 3 (themes.js hkFrameBucket). */
+  function persistTierBest(i, bucket){
     try{
       if(typeof i!=='number' || i<=0) return;
+      const bk = bucket==='Top Bucket' ? 2 : bucket==='Middle Bucket' ? 1 : 0;
+      const packed = i*3 + bk;
       const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
-      if((fl.tierBest|0) >= i) return;
-      fl.tierBest=i;
+      if((fl.tierBest|0) >= i && (fl.tierBestBucket|0) >= packed) return;
+      fl.tierBest=Math.max(fl.tierBest|0, i);
+      fl.tierBestBucket=Math.max(fl.tierBestBucket|0, packed);
       localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
       try{ window.hkStatePush && window.hkStatePush(); }catch(e){}
     }catch(e){}
@@ -346,7 +354,7 @@
         return;   // no tier cache write mid-placement
       }
       const t = tierOf(d.avgPct, d.attempted, d.wsum);
-      persistTierBest(t.i);   // r373: plaque-frame unlocks latch the high-water tier
+      persistTierBest(t.i, t.bucket);   // r373: plaque-frame unlocks latch the high-water tier (r376: + its bucket)
       el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name,20):'')+'<span>'+t.name+'</span>';
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
       try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
@@ -537,7 +545,7 @@
   }
   function renderProfile(m, d){
     const tier = tierOf(d.avgPct, d.attempted, d.wsum);
-    persistTierBest(tier.i);   // r373: the card render is a rank fetch too — latch here as well
+    persistTierBest(tier.i, tier.bucket);   // r373: the card render is a rank fetch too — latch here as well (r376: + bucket)
     const fmtMs = ms => (ms/1000).toFixed(2) + 's';
     const handle = (window._navProfile && window._navProfile.handle) || 'set a name';
     // r70b: 'set a name' is a real state (profile without a handle) — make it actionable
@@ -608,6 +616,9 @@
               raceWins:__xflags.raceWins||0, sheetClears:__xflags.sheetClears||0,
               frzBanked:__xflags.frzBanked||0, chordKinds:__ck, keysLifetime:__kl, dailyTop10:__xflags.dailyTop10||0,
               dailyPod:__xflags.dailyPod||0, dailyWins:__xflags.dailyWins||0, certs:Object.keys(__xflags.certTracks||{}).length,
+              /* r376: mythic-class keys — beta-era account + the packed rank latch + the S+++ desk latch */
+              charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
+              tierBest:__xflags.tierBest|0, tierBestBucket:__xflags.tierBestBucket|0, deskPeak:__xflags.deskPeak||0,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
             // STEAM-STYLE GLOBAL RARITY: evaluate run-derivable achievements for every
@@ -742,7 +753,9 @@
     const __safeFlair = (myFlair && /^[a-z0-9_-]{1,32}$/i.test(myFlair)) ? myFlair : null;
     const __isFrame = !!(__safeFlair && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__safeFlair));
     const flairCls = __safeFlair ? (__isFrame ? ' hk-frame-'+__safeFlair : ' flair-'+__safeFlair) : '';
-    const flairOrn = (__isFrame && window.hkFrameOrnaments) ? window.hkFrameOrnaments(__safeFlair) : '';
+    /* r376: plaque corners cut their gem from the bucket held at your best tier */
+    const flairOrn = (__isFrame && window.hkFrameOrnaments)
+      ? window.hkFrameOrnaments(__safeFlair, {bucket:(window.hkFrameBucket?window.hkFrameBucket():1)}) : '';
     m.innerHTML = '<div class="pc-card'+flairCls+'">' + flairOrn +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-head" style="margin-bottom:10px"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +

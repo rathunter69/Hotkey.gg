@@ -580,7 +580,8 @@ function heroHtml(){
     if(__fv && /^[a-z0-9_-]{1,32}$/i.test(__fv)){
       if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__fv)){
         __fCls=' hk-frame-'+__fv;
-        __fOrn=window.hkFrameOrnaments ? window.hkFrameOrnaments(__fv) : '';
+        /* r376: gem cut = the bucket held at the best tier (hk_ach_flags, via nav.js) */
+        __fOrn=window.hkFrameOrnaments ? window.hkFrameOrnaments(__fv, {bucket:(window.hkFrameBucket?window.hkFrameBucket():1)}) : '';
       } else __fCls=' flair-'+__fv;   // legacy gold/emerald/holo — harmless no-op on .panel
     }
   }catch(e){}
@@ -827,6 +828,20 @@ function deskGrade(meanRating, competing){
   for(const [cap,g] of DESK_GRADES){ if(meanRating<=cap) return g; }
   return 'C-';
 }
+/* r376: BULGE BRACKET latch — when the signed-in analyst's OWN desk grades S+++
+   (the top of DESK_GRADES), hk_ach_flags.deskPeak latches 1 for the mythic feat.
+   Numeric, so the r358 hydration max carries it across devices — and like every
+   earned cosmetic it doesn't fall when the desk later slips. */
+function latchDeskPeak(grade){
+  try{
+    if(grade!==DESK_GRADES[0][1]) return;
+    const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+    if(fl.deskPeak) return;
+    fl.deskPeak=1;
+    localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+    try{ window.hkStatePush && window.hkStatePush(); }catch(e){}
+  }catch(e){}
+}
 function deskGradeChip(g){
   if(!g) return '<span class="dk-grade unrated" title="grades unlock at 3 competing analysts">unrated</span>';
   const cls=g[0]==='S'?'s':(g[0]==='A'?'a':(g[0]==='B'?'b':'c'));
@@ -850,6 +865,9 @@ function guildHtml(){
     return {t:t, n:ids.length, crowns:crowns, boards:boards, bestU:bestU,
       grade:deskGrade(competing?rsum/competing:null, competing)};
   }).sort((a,b)=> b.crowns-a.crowns || b.n-a.n || a.t.name.localeCompare(b.t.name));
+  // r376: the guild board computes every desk's grade with rosters in hand — latch
+  // Bulge Bracket here too, so the feat lands wherever the grade first renders
+  try{ if(DATA.meId) cards.forEach(c=>{ if((memBy[c.t.id]||[]).indexOf(DATA.meId)>=0) latchDeskPeak(c.grade); }); }catch(e){}
   const canApply=!!DATA.meId;
   const cardHtml=cards.map(c=>{
     const t=c.t, applied=!!apps[t.id];
@@ -987,6 +1005,8 @@ function deskStandingsHtml(){
   rows.sort((a,b)=> b.crowns-a.crowns || b.pod-a.pod || b.competing-a.competing || b.n-a.n
     || ((a.best==null?9:a.best)-(b.best==null?9:b.best)) || a.name.localeCompare(b.name));
   const mineId=DATA.myDesk&&DATA.myDesk.id;
+  // r376: my desk at the top grade → the Bulge Bracket latch
+  { const mine=rows.find(e=>e.id===mineId); if(mine) latchDeskPeak(mine.grade); }
   const body=rows.slice(0,12).map((e,i)=>{
     const champ=e.bestU?('top analyst '+esc(names[e.bestU])):(e.competing?'':'no ranked runs yet');
     return '<a class="st-row'+(mineId===e.id?' mine':'')+'" href="desks.html?desk='+encodeURIComponent(e.slug)+'">'+
