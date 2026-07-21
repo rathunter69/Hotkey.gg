@@ -461,8 +461,24 @@ function showPublicCard(uid){
   best.sort((a,b)=>a.i-b.i || a.ms-b.ms);
   const lab={}; CH.forEach(c=>lab[c.key]=c.label||c.key);
   const old=document.getElementById('pubCard'); if(old) old.remove();
+  /* r383 (Wolf): PUBLIC CARDS WEAR FRAMES — the profiles select has carried flair
+     since r373 but this card ignored it. Same sanitize + legacy split as nav.js /
+     the hero card, at the BASE (small) frame scale; the plaque gem cut prices off
+     THEIR current bucket (their tierBest latch is their device's, not ours). */
+  let fCls='', fOrn='';
+  try{
+    const pp=(DATA.profs||[]).find(p=>p.id===uid);
+    const fv=pp && pp.flair;
+    if(fv && /^[a-z0-9_-]{1,32}$/i.test(fv)){
+      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
+        fCls=' hk-frame-'+fv;
+        const bk = t.bucket==='Top Bucket' ? 2 : t.bucket==='Bottom Bucket' ? 0 : 1;
+        fOrn=window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {bucket:bk}) : '';
+      } else fCls=' flair-'+fv;   // legacy gold/emerald/holo rows keep their old classes
+    }
+  }catch(e){}
   const m=document.createElement('div'); m.id='pubCard'; m.className='pub-wrap';
-  m.innerHTML='<div class="pub-card">'+
+  m.innerHTML='<div class="pub-card'+fCls+'">'+fOrn+
     '<div class="pub-cap"><span>PLAYER CARD</span><span>'+(meId&&uid!==meId?'<a class="pub-rep" style="cursor:pointer;color:var(--faint);font-size:9px;margin-right:12px">report</a>':'')+'<a class="pub-x">\u00d7</a></span></div>'+
     '<div class="pub-hero">'+(window.rankEmblem?window.rankEmblem(t.name,64,t.bucket):'')+   /* r381: bigger hero */
       '<div><div class="pub-nm">'+esc(names[uid])+(uid===meId?' <span class="pub-you">(you)</span>':'')+'</div>'+
@@ -543,7 +559,10 @@ function heroHtml(){
       const devUnlock=(function(){ try{ return localStorage.getItem('hk_dev_unlock')==='1'; }catch(e){ return false; } })();
       const eligible = lvl0>=RANKED_MIN_LVL || campDone || devUnlock;
       const lvlPct = Math.min(100, Math.round(100*lvl0/RANKED_MIN_LVL));
-      return '<div class="panel me"><h4>your card</h4>'+
+      /* r383 (Wolf: the gate copy sat at the top of a tall panel with a dead bottom):
+         .gate-body centers the pitch + CTA vertically \u2014 the same treatment the r368
+         signed-out card got. Copy, gate logic and CTAs unchanged. */
+      return '<div class="panel me"><h4>your card</h4><div class="gate-body">'+
         '<div style="font-family:var(--mono);font-size:13px;color:var(--muted);line-height:1.8">'+
         (eligible
           ? 'Ranked is unlocked ('+(campDone?'all milestones shipped':'LVL '+lvl0)+'). Entering shows your placement on every board you\u2019ve run \u2014 nothing is lost by waiting.'
@@ -551,7 +570,7 @@ function heroHtml(){
         '</div>'+
         (!eligible?'<div style="margin-top:10px"><div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-bottom:4px">progress to LVL '+RANKED_MIN_LVL+'</div><div style="height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+lvlPct+'%;background:var(--accent);border-radius:99px"></div></div></div>':'')+
         (eligible?'<div style="display:flex;gap:10px;margin-top:14px"><button class="tab on" id="enterRanked" style="font-size:13px;padding:10px 22px">\u2694 Enter Ranked</button><button class="tab" id="waitRanked" style="font-size:12px;padding:10px 18px">Not yet</button></div>':'')+
-        '</div>';
+        '</div></div>';
     }
   }
   // r336 (Wolf): STANDARDIZED PLACEMENT — once you enter ranked, your first rank is withheld
@@ -561,14 +580,21 @@ function heroHtml(){
     const pset=(window.HK_PLACEMENT?window.HK_PLACEMENT.KEYS:[]).filter(k=>CH.some(c=>c.key===k));
     const done=pset.filter(k=>DATA.fRuns.some(r=>r.user_id===meId && r.challenge===k));
     if(pset.length && done.length<pset.length){
+      /* r383 (Wolf: dead middles on the checklist too): each row's stretch between the
+         drill and its action carries the catalog band in muted mono \u2014 the "one from
+         each band" claim in the copy, made legible per row. The .pl-foot note takes
+         the panel's :last-child margin-top:auto so the list rides right under the
+         copy instead of leaving a hole mid-panel. */
       const rows=pset.map(k=>{ const c=CH.find(x=>x.key===k); const ok=done.indexOf(k)>=0;
         return '<div class="pl-row'+(ok?' ok':'')+'"><span class="pl-tick">'+(ok?'\u2713':'\u00b7')+'</span>'+
           '<span class="pl-nm">'+esc(c?c.label:k)+'</span>'+
+          '<span class="pl-mid">'+esc(c?c.lvl:'')+'</span>'+
           (ok?'<span class="pl-done">posted</span>':'<a class="pl-go" href="index.html?drill='+encodeURIComponent(k)+'">run it \u2192</a>')+'</div>'; }).join('');
       return '<div class="panel me"><h4>your card</h4>'+
         '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.7">\u2694 <b style="color:var(--text)">Placement series \u2014 '+done.length+'/'+pset.length+'</b><br>'+
         'Post a keyboard-only time on each of the five standard boards \u2014 the same five for every analyst, one from each band of the catalog \u2014 and your first rank is placed off one yardstick.</div>'+
-        '<div class="pl-list">'+rows+'</div></div>';
+        '<div class="pl-list">'+rows+'</div>'+
+        '<div class="pl-foot">your first rank posts the moment the fifth board does</div></div>';
     }
   }
   const avg=me.att?me.avg:null;
@@ -762,10 +788,15 @@ function rosterHtml(flush){
   if(rosterTier===null) rosterTier = myTier || TIERS[0].name;
   const tierNames=window.HK_RANK.TIERS.map(t=>t.name);
   const inTier=users.filter(x=>x.tier.name===rosterTier).sort((a,b)=>a.av-b.av);
+  /* r383 (Wolf: same density grammar as the r382 board rows): the roster's dead
+     stretch between name and bucket carries a muted .ros-mid now — crowns plus the
+     rating gap to the tier's leader (same chase number the tp rows speak). */
   let rows=inTier.map((x,i)=>'<div class="ros-row'+(x.u===meId?' me':'')+'">'+
     '<span class="ros-n">'+(i+1)+'</span>'+
     (window.rankEmblem?window.rankEmblem(x.tier.name,22,x.tier.bucket):'')+
     '<span class="ros-nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
+    '<span class="ros-mid">'+(x.st.crowns?x.st.crowns+' ♛ · ':'')+
+      (i===0?'leads the tier':'+'+((x.av-inTier[0].av)*100).toFixed(1)+' rtg')+'</span>'+
     '<span class="ros-b">'+(x.tier.bucket||'')+'</span>'+
     '<span class="ros-r">rating '+(x.av*100).toFixed(1)+'</span>'+
     '<span class="ros-a">'+x.st.att+' boards</span></div>').join('');

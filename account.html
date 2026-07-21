@@ -57,6 +57,25 @@
   .tc-bar{flex:1; min-width:130px; height:7px; background:var(--surface2); border-radius:99px; overflow:hidden}
   .tc-bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
   .tc-sub{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:10px}
+  /* r383 (Wolf: big crest + a dead right half): the tc-sub counters graduate to an
+     N-up stat strip on the top row's right edge (r382 stat-grid grammar); the sub
+     line keeps only member-since. Strip drops under the name ≤820px. */
+  .tc-stats{display:grid; grid-template-columns:repeat(4,minmax(78px,auto)); gap:8px; margin-left:auto}
+  .tc-stat{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:8px 12px;
+    text-align:center; font-family:var(--mono)}
+  .tc-stat b{display:block; font-size:17px; font-variant-numeric:tabular-nums}
+  .tc-stat span{font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
+  @media(max-width:820px){ .tc-stats{margin-left:0; width:100%; grid-template-columns:repeat(4,1fr)} }
+  /* r383 (Wolf: the whole page was ONE full-width column — every rowline a
+     label-left/value-right pair with a 300–930px dead middle): 2-up card grid at
+     ≥1080px. Cards pair off at half width and the rowline middles collapse with
+     them; the title card and the frame gallery keep the full row. One column again
+     below 1080px, where the cards were already dense. */
+  @media(min-width:1080px){
+    #root{display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start}
+    #root > .card{margin-bottom:0; min-width:0}
+    #root > .span2, #root > .state{grid-column:1/-1}
+  }
   .rank-emblem{}
   .emblem-max{}
   /* form bits */
@@ -180,7 +199,7 @@ async function load(){
   }).join('');
 
   root.innerHTML = `
-    <div class="card tc">
+    <div class="card tc span2">
       <div class="tc-top">
         <span class="tc-emblem" style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):''}</span>
         <div>
@@ -188,13 +207,19 @@ async function load(){
           <span class="pc-tier ${tier.cls}" style="margin-top:4px">${/* r374: chip layout+gap live on .pc-tier (nav.css); 16 = the chip scale (was an eyeballed 13) */''}${window.rankEmblem?window.rankEmblem(tier.name,16):''}<span>${tier.name}</span></span>
         </div>
         ${prof.team_code?`<span class="tc-team">${esc(prof.team_code)}</span>`:''}
+        <div class="tc-stats">${/* r383: the tc-sub counters, promoted to the dead right (same numbers) */''}
+          <span class="tc-stat"><b>${st.crowns}</b><span>crown${st.crowns===1?'':'s'}</span></span>
+          <span class="tc-stat"><b>${st.pod}</b><span>podiums</span></span>
+          <span class="tc-stat"><b>${st.att}/${D.menuOrder.length}</b><span>drills</span></span>
+          <span class="tc-stat"><b>${mine.length}</b><span>clean solves</span></span>
+        </div>
       </div>
       <div class="tc-meta">
         <span class="tc-lvl">${window.hkLevelChip?window.hkLevelChip(L.lvl,24):''} LVL ${L.lvl}</span>
         <span class="tc-bar"><i style="width:${L.pct}%"></i></span>
         <span style="font-size:11px;color:var(--muted)">${L.into}/${L.need} xp</span>
       </div>
-      <div class="tc-sub">${st.crowns} crown${st.crowns===1?'':'s'} · ${st.pod} podiums · ${st.att}/${D.menuOrder.length} drills · ${mine.length} clean solves · member since ${joined}</div>
+      <div class="tc-sub">member since ${joined}</div>
     </div>
 
     <div class="card" id="desk"><h4>Your desk</h4>
@@ -205,14 +230,17 @@ async function load(){
       <div id="certBody"><div class="msg">loading\u2026</div></div>
     </div>
 
-    <div class="card"><h4>Profile</h4>
+    <div class="card"><h4>Profile</h4>${/* r383: the email address + inbox toggles moved to their own Email card — this card is handle + colors, its half-grid partner */''}
       <label>handle — how you appear on every board</label>
       <input id="acHandle" maxlength="24" value="${esc(prof.handle||'')}" placeholder="pick a handle \u2014 letters, numbers, underscores">
       <button class="btn" id="acHandleSave">Save handle</button>
       <a id="acHandleSugg" style="font-family:var(--mono);font-size:11.5px;color:var(--accent);cursor:pointer;margin-left:10px">&#x2684; suggest one</a>
       <div class="msg" id="acHandleMsg"></div>
       <div id="schoolRow" style="margin-top:10px"></div>
-      <div class="rowline" style="margin-top:14px"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
+    </div>
+
+    <div class="card"><h4>Email</h4>
+      <div class="rowline"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
       <div class="rowline"><span class="k">weekly recap email</span>
         <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
           <input type="checkbox" id="acRecap" style="width:auto;accent-color:var(--accent)"> <span id="acRecapL">off</span>
@@ -248,17 +276,17 @@ async function load(){
       <div style="margin-top:10px"><button class="btn ghost" id="proSheetBtn" style="margin:0">See what comes with PRO</button></div>
     </div>
 
-    <div class="card"><h4>Card flair <span id="proTagFlair" style="color:var(--warn);font-size:9px;letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO · free in beta</span></h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Earned frames for your player card, shown wherever your card appears. Locked frames show how to get them.</div>
-      <div id="flairRow" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px">${frameGridHtml}</div>
-      <div class="msg" id="flairMsg"></div>
-    </div>
-
     <div class="card" id="betaTools"><h4>Beta tools <span style="color:var(--faint);font-size:9px">testing only — removed at launch</span></h4>
       <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Bypass the LVL-10 ranked gate so you can test ranked without grinding. Cosmetic only — your real rating and boards are untouched.</div>
       <button class="btn ghost" id="devRanked">Unlock ranked gate (test)</button>
       <button class="btn ghost" id="devRankedOff" style="margin-left:8px">Reset</button>
       <div class="msg" id="devMsg"></div>
+    </div>
+
+    <div class="card span2"><h4>Card flair <span id="proTagFlair" style="color:var(--warn);font-size:9px;letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO · free in beta</span></h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Earned frames for your player card, shown wherever your card appears. Locked frames show how to get them.</div>
+      <div id="flairRow" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px">${frameGridHtml}</div>
+      <div class="msg" id="flairMsg"></div>
     </div>
 
     <div class="card"><h4>Security</h4>
