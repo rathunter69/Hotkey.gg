@@ -1047,10 +1047,10 @@ window.hkFrameOrnaments = (function(){
       // the tiny picker swatch shows interior+border only — no notch/canvas
       if(mini) return '';
       let h='';
+      /* r385.2 (Wolf): the fracture/crack lines obscured the card — the pure particle
+         animation (snow / embers) carries fire+ice better. Cracks retired. */
       if(s[4]) h+='<canvas class="hk-fx" data-kind="'+s[4]+'" aria-hidden="true"></canvas>';
       if(id==='vaporwave') h+='<span class="hkf-sun" aria-hidden="true"></span><span class="hkf-vgrid" aria-hidden="true"></span>';
-      if(id==='molten')  h+='<svg class="hkf-crack" viewBox="0 0 360 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 L100 48 L165 86 L250 58 M165 86 L215 122 M100 48 L72 112 M250 58 L360 66"/></svg>';
-      if(id==='frostbite') h+='<svg class="hkf-crack" viewBox="0 0 360 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 50 L90 66 L150 46 L240 84 M150 46 L200 118 M240 84 L360 74"/></svg>';
       h+=tab(s[0], s[1], s[2], s[3]);
       if(id==='founder') h+='<i class="hkf-serial" aria-hidden="true">FOUNDER · 007 / 200</i>';
       return h;
