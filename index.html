@@ -1559,13 +1559,13 @@
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=275"></script>
-<link rel="stylesheet" href="nav.css?v=187">
-<script src="themes.js?v=279"></script>
+<link rel="stylesheet" href="nav.css?v=188">
+<script src="themes.js?v=280"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=287"></script>
+<script src="nav.js?v=288"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -14371,9 +14371,18 @@ async function updateRankPill(){
     el.title=(t.full||t.name)+' \u2014 the ladder runs MBA Associate \u2192 Second-Year Analyst. Click for your card.';
     el.className='mb-tool rank-pill '+t.cls; el.style.display='inline-flex';
     el.onclick=()=>{ try{ openProfile(); }catch(e){} }; };
+  /* r384 (Wolf: signed-out mobile wore "MBA Associate"): guests get NO default rank —
+     a muted sign-in cue instead. Checked BEFORE the cache read so a stale hk_rank3
+     can never dress up a signed-out visitor. */
+  if(!sb || !me_user || isAnonUser()){
+    el.innerHTML='<span>sign in</span>';
+    el.title='sign in — get on the ladder';
+    el.className='mb-tool rank-pill tier-unranked'; el.style.display='inline-flex';
+    el.onclick=()=>{ try{ openAuth('signin'); }catch(e){} };
+    return;
+  }
   try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
     if(c && c.exp>Date.now()){ show({name:c.n, cls:c.c}); return; } }catch(e){}
-  if(!sb || !me_user || isAnonUser()){ show({name:'MBA Associate', cls:'tier-mba'}); return; }
   try{
     const [p,r,se] = await Promise.all([
       sb.from('profiles').select('id'),

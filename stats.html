@@ -105,9 +105,22 @@
   .state{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:36px 28px; text-align:center;
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.7}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
+  /* r384 (Wolf: signed-out looked like a stats dashboard): the anon view leads with the
+     .state sign-in placeholder + real CTAs (the account-page pattern, incl. its r297/r355
+     specificity fixes so the labels stay legible in every theme); any local-PB tiles that
+     follow are captioned as THIS DEVICE's data. */
+  .acc-cta{display:inline-block; font-family:var(--mono); font-size:13px; text-decoration:none;
+    border:1px solid var(--accent); background:var(--accent); color:var(--on-accent,#0c0d0e); font-weight:700;
+    padding:10px 22px; border-radius:999px; margin:4px 6px}
+  .acc-cta:hover{filter:brightness(1.08)}
+  .acc-cta.ghost{background:transparent; color:var(--accent); border-color:var(--accent-dim); font-weight:500}
+  .state a.acc-cta{border-bottom:1px solid var(--accent); color:var(--on-accent,#0c0d0e)}
+  .state a.acc-cta.ghost{border-bottom:1px solid var(--accent-dim); color:var(--accent)}
+  .local-cap{font-family:var(--mono); font-size:10.5px; color:var(--faint); text-transform:uppercase;
+    letter-spacing:.12em; margin:18px 0 0}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=187">
+<link rel="stylesheet" href="nav.css?v=188">
 <script src="drills.js?v=275"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -116,11 +129,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=279"></script>
+<script src="themes.js?v=280"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=287"></script>
+<script src="nav.js?v=288"></script>
 
 <header class="head">
   <div class="wrap">
@@ -248,24 +261,38 @@ async function load(){
     : savedMs<60000 ? (savedMs/1000).toFixed(0)+'<em>s</em>'
     : savedMs<3600000 ? Math.round(savedMs/60000)+'<em>m</em>'
     : Math.floor(savedMs/3600000)+'<em>h</em> '+Math.round((savedMs%3600000)/60000)+'<em>m</em>';
-  let html = `<div class="hero${tcHtml?'':' solo'}">` + tcHtml + `<div class="cards">
+  const cardsHtml = `<div class="cards">
     <div class="stat lead"><div class="big">${savedTxt}</div><div class="lbl">time banked \u2014 first try vs best</div></div>
     <div class="stat"><div class="big">${drilled.size}<em> / ${D.menuOrder.length}</em></div><div class="lbl">drills on your board</div></div>
     <div class="stat"><div class="big">${avgEff!==null?avgEff+'<em>%</em>':'—'}</div><div class="lbl">avg keys vs optimal path</div></div>
     <div class="stat"><div class="big">${streakN?'🔥 '+streakN:'—'}</div><div class="lbl">day streak</div></div>
-  </div></div>`;
-
+  </div>`;
+  /* r384 (Wolf): signed-out leads with the sign-in placeholder, not a dashboard.
+     Local practice tiles only render when this device actually holds some, under a
+     THIS-DEVICE caption; a fresh anon visitor gets the placeholder alone. No rank
+     renders anywhere on the anon path (the title card is signed-in only). */
+  let html = '';
   if(!me){
-    html += `<div class="state">You're viewing local bests only. <a href="index.html">Sign in with a real account</a> and every run posts — ranks, efficiency history, and the ladder all live here.</div>`;
+    const hasLocal = drilled.size>0 || streakN>0 || savedMs>0;
+    html += `<div class="state" style="margin:22px 0 16px">Sign in to see your stats — ranks, run history, efficiency, and the ladder all live on your account.<br><br>`+
+      `<a class="acc-cta" href="index.html?openAuth=signin">Sign in</a>`+
+      `<a class="acc-cta ghost" href="index.html?openAuth=signup">Create an account</a></div>`;
+    if(hasLocal){
+      html += `<div class="local-cap">this device only — local practice, not posted to an account</div>`+
+        `<div class="hero solo" style="margin-top:8px">${cardsHtml}</div>`;
+    }
+  } else {
+    html += `<div class="hero${tcHtml?'':' solo'}">` + tcHtml + cardsHtml + `</div>`;
   }
 
   // ================= r135/r138: ACHIEVEMENTS — prominent, tipped, rarity-tiered =================
   // Earned medals are clickable — pick up to 3 to SHOWCASE on your player card.
   // r138: instant data-tip overlays (name · what it is · global rarity), computed
-  // Steam-style from every player's runs. r376: the glyph keeps its family color;
-  // an outer RING carries the rarity tier — colors from the shared window.HK_RARITY
-  // map (common green · rare blue · epic purple · legendary orange · mythic red —
-  // the hand-set 'm' class, ornate ring + crest crown).
+  // Steam-style from every player's runs. r384 (Wolf): ONE color axis — glyphs are
+  // uniform engraved steel (themes.js hkBadge); the outer RING alone carries rarity,
+  // colors from the shared window.HK_RARITY map (common green · rare blue · epic
+  // purple · legendary orange · mythic red — the hand-set 'm' class keeps its
+  // ornate ring + crest crown).
   try{
     const AC=window.HOTKEY_ACHIEVEMENTS;
     if(AC && window.hkBadge){

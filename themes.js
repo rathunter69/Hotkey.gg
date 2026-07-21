@@ -1013,18 +1013,22 @@ window.hkFrameBucket = function(){
   }catch(e){ return 1; }
 };
 
-/* ---- achievement badges: hex medals, single source (inline copy in index — sync) ---- */
+/* ---- achievement badges: hex medals, single source ---- */
 /* r376: THE RARITY PALETTE — one map for every surface that speaks rarity (badge
-   rings, the stats-wall .rr tags + legend). Classic gaming ladder, desaturated to
-   sit in the site's grammar and read on light AND dark themes: common green ·
+   rings, the stats-wall .rr tags + legend). Classic gaming ladder: common green ·
    rare blue · epic purple · legendary orange · mythic red (the 'm' class —
-   drills.js reserves it for the rarest handful of feats). */
-window.HK_RARITY = { c:'#3fae4f', r:'#3f7fe0', e:'#9c5fd0', l:'#d9821f', m:'#d64a3f' };
+   drills.js reserves it for the rarest handful of feats).
+   r384 (Wolf): quieted a notch — the r376 values fought the glyph colors and the
+   wall read as a rainbow. Same ladder, desaturated toward the site's engraved
+   grammar; still legible on light AND dark themes. */
+window.HK_RARITY = { c:'#5a9a64', r:'#5f83bd', e:'#8d6cb5', l:'#c58a3a', m:'#bd5a4e' };
 window.hkBadge = function(id, earned, size, color, rarity){
   /* r376: 'glyph keeps family color, ring carries rarity' — the r138 metal tint
-     REPLACED the family identity (audit finding); now the glyph always wears its
-     family color and an outer hex RING wears the rarity. rarity = % of players
-     holding it (run-derived); explicit `color` (campaign groups) still wins. */
+     REPLACED the family identity (audit finding). r384 (Wolf): that combo was TWO
+     color systems fighting — the wall read as a rainbow. ONE color axis now: every
+     glyph+frame wears the same engraved steel (the wireframe heritage), and rarity
+     lives on the RING alone. Explicit `color` (campaign track chips, keyed to the
+     group dot beside them) still wins — that's a caller's system, not rarity's. */
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
   const G={
@@ -1089,25 +1093,17 @@ window.hkBadge = function(id, earned, size, color, rarity){
       ring='<path d="'+hexS(1.26)+'" fill="none" stroke="'+RARE.e+'" stroke-width="1.15"/>'+
         '<path d="'+hexS(1.13)+'" fill="none" stroke="'+RARE.e+'" stroke-width=".5" opacity=".5"/>';
     } else if(w==='rare'){
-      ring='<path d="'+hexS(1.24)+'" fill="none" stroke="'+RARE.r+'" stroke-width=".9"/>';
+      /* r384: common/rare rings stay THIN — color volume scales with rarity */
+      ring='<path d="'+hexS(1.24)+'" fill="none" stroke="'+RARE.r+'" stroke-width=".7" opacity=".85"/>';
     } else {
-      ring='<path d="'+hexS(1.22)+'" fill="none" stroke="'+RARE.c+'" stroke-width=".7" opacity=".55"/>';
+      ring='<path d="'+hexS(1.22)+'" fill="none" stroke="'+RARE.c+'" stroke-width=".55" opacity=".45"/>';
     }
   }
-  /* r240 (Wolf): per-FAMILY colour so the glyph wall isn't one gold hue. Explicit
-     `color` (campaign groups) still wins; this is the base tint (r376: rarity no
-     longer overrides it — the ring carries the tier). */
-  /* r240 (Wolf): spread the palette so it isn't a wall of gold — colour by sub-family. */
-  const FAM={ spd:'#4a90e2', gnt:'#37a866', vol:'#37a866',            // speed=blue · efficiency=green
-    day:'#9b6ef0', ice:'#3fb6c4',                                     // time=violet · freeze=cyan
-    c1:'#e0a52a', c2:'#e0a52a',                                       // income-statement build = gold
-    c3:'#2fa79f', rx:'#2fa79f',                                       // waterfall / flows = teal
-    c4:'#4a90e2', c5:'#4a90e2',                                       // links / debt corkscrew = blue
-    c6:'#7e8794',                                                     // working-capital gears = slate
-    c7:'#e0a52a', c8:'#e0842a',                                       // three-statement gold · ship-it orange
-    crn:'#e0842a', str:'#9b6ef0', fin:'#9b6ef0',                      // crown=orange · streak/star=violet
-    flag:'#e0653a', sheet:'#3fae8f', map:'#3fae8f', brush:'#c05fb0', keys:'#6d8fe6' };
-  const col = earned ? (color||FAM[id]||'var(--warn)') : 'var(--faint)';
+  /* r384 (Wolf): the r240 per-family palette is RETIRED, not patched — every earned
+     medal engraves in one muted steel (a fixed hex on purpose: the engraved field
+     must read identical in light and dark, like the frame art's steel). Earned vs
+     locked stays an opacity/dim read, exactly as before. */
+  const col = earned ? (color||'#828896') : 'var(--faint)';
   /* r240 (Wolf): FLAT + OUTLINED — a transparent hex with a coloured FRAME and a
      matching coloured glyph. No solid fill, no tint. Locked is the same shape
      ghosted. r376: earned medals add the rarity ring outside the frame. */
