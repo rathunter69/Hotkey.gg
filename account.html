@@ -104,7 +104,7 @@
   .state a.acc-cta.ghost{color:var(--accent)}   /* r355: the r297 on-accent fix out-specified the ghost variant — 'Log in' rendered white-on-light, invisible */
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
-<link rel="stylesheet" href="nav.css?v=187">
+<link rel="stylesheet" href="nav.css?v=188">
 <script src="drills.js?v=275"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -113,11 +113,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=279"></script>
+<script src="themes.js?v=280"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=287"></script>
+<script src="nav.js?v=288"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -185,17 +185,16 @@ async function load(){
   const frameGridHtml=frameCards.map(f=>{
     const on = (prof.flair||'none')===f.id;
     /* r376: plaque minis carry the gemset corners (scaled by nav.css .fs-mini rules)
-       so the picker previews YOUR cut; other frames keep the chrome-only swatch */
+       so the picker previews YOUR cut; other frames keep the chrome-only swatch.
+       r384 (Wolf): compact swatch tile — name + tier color only; the desc/earn prose
+       moved to the shared .fo-hint line (hover/click) and the locked-click message. */
     const orn = (f.id.indexOf('plaque-')===0 && window.hkFrameOrnaments)
       ? window.hkFrameOrnaments(f.id, {bucket:__gemBk}) : '';
-    return '<button class="flair-opt'+(on?' on':'')+'" data-flair="'+f.id+'" data-locked="'+(f.unlocked?'0':'1')+'"'+
-      ' style="text-align:left;font-family:var(--mono);background:var(--bg);border:1px solid '+(on?'var(--accent)':'var(--line)')+
-      ';border-radius:10px;padding:10px 12px;color:var(--text);cursor:'+(f.unlocked?'pointer':'default')+(f.unlocked?'':';opacity:.45')+'">'+
-      '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'">'+orn+'</span>'+
-      '<b style="font-size:12px">'+esc(f.name)+'</b>'+
-      (f.tier?' <i style="font-style:normal;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:'+FRAME_TIER_C[f.tier]+'">'+f.tier+'</i>':'')+
-      '<span style="display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">'+
-      (f.unlocked ? esc(f.desc||'') : '🔒 '+esc(f.earn)) + '</span></button>';
+    return '<button class="flair-opt'+(on?' on':'')+(f.unlocked?'':' locked')+'" data-flair="'+f.id+'" data-locked="'+(f.unlocked?'0':'1')+'">'+
+      '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'">'+orn+(f.unlocked?'':'<span class="fo-lock">🔒</span>')+'</span>'+
+      '<b class="fo-name">'+esc(f.name)+'</b>'+
+      (f.tier?'<i class="fo-tier" style="color:'+FRAME_TIER_C[f.tier]+'">'+f.tier+'</i>':'')+
+      '</button>';
   }).join('');
 
   root.innerHTML = `
@@ -284,8 +283,9 @@ async function load(){
     </div>
 
     <div class="card span2"><h4>Card flair <span id="proTagFlair" style="color:var(--warn);font-size:9px;letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO · free in beta</span></h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Earned frames for your player card, shown wherever your card appears. Locked frames show how to get them.</div>
-      <div id="flairRow" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px">${frameGridHtml}</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Earned frames for your player card, shown wherever your card appears. Locked frames are dimmed — click or hover one for how to get it.</div>
+      <div id="flairRow" class="fo-grid">${frameGridHtml}</div>
+      <div class="fo-hint" id="flairHint">hover a frame — how it&#39;s earned shows here</div>
       <div class="msg" id="flairMsg"></div>
     </div>
 
@@ -566,8 +566,17 @@ async function load(){
   { const pb=document.getElementById('proSheetBtn'); if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); };
     const pt=document.getElementById('proTagFlair'); if(pt) pt.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Pro cosmetics'); }; }
   /* r373: frame-picker save \u2014 same update pattern the flat buttons used; locked
-     swatches answer with their earn line instead of writing anything. */
-  document.querySelectorAll('.flair-opt').forEach(b=>b.onclick=async()=>{
+     swatches answer with their earn line instead of writing anything. r384: the .on
+     class carries the picked border now (compact tiles ship no inline border), and
+     hover/click surfaces the earn text in the single hint line under the grid. */
+  const flairHint=b=>{ const el=document.getElementById('flairHint'); if(!el) return;
+    const fr=frameCards.find(x=>x.id===b.dataset.flair); if(!fr) return;
+    el.textContent = fr.id==='none' ? 'None \u2014 plain card'
+      : (b.dataset.locked==='1' ? '\ud83d\udd12 '+fr.name+' \u2014 '+(fr.earn||'keep playing.')
+        : fr.name+' \u2014 '+(fr.desc||'yours to wear')); };
+  document.querySelectorAll('.flair-opt').forEach(b=>{ b.onmouseenter=()=>flairHint(b);
+    b.onclick=async()=>{
+    flairHint(b);
     if(b.dataset.locked==='1'){
       const fr=(window.HK_FRAMES||[]).find(x=>x.id===b.dataset.flair);
       say('flairMsg','Locked \u2014 '+((fr&&fr.earn)||'keep playing.'),true); return;
@@ -576,10 +585,9 @@ async function load(){
     try{ const {error}=await sb.from('profiles').update({flair:f}).eq('id',me.id);
       if(error){ say('flairMsg','Couldn\u2019t save \u2014 try again.',true); return; }
       prof.flair=f;
-      document.querySelectorAll('.flair-opt').forEach(x=>{ x.classList.toggle('on',x===b);
-        x.style.borderColor = x===b ? 'var(--accent)' : 'var(--line)'; });
+      document.querySelectorAll('.flair-opt').forEach(x=>x.classList.toggle('on',x===b));
       say('flairMsg','Frame set \u2713 \u2014 it rides wherever your card appears.'); }catch(e){ say('flairMsg','Something went wrong.',true); }
-  });
+  }; });
   { const dv=document.getElementById('devRanked'), dro=document.getElementById('devRankedOff');
     if(dv) dv.onclick=()=>{ try{ localStorage.setItem('hk_dev_unlock','1'); localStorage.setItem('hk_ranked','1'); }catch(e){}
       say('devMsg','Ranked unlocked for testing ✓ — open the leaderboard.'); };

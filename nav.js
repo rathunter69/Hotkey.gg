@@ -317,10 +317,21 @@
        entered but mid-placement -> "placement n/5"; only a finished placement shows a tier.
        The tier cache is consulted only when opted in, so leaving ranked demotes immediately. */
     const __opted=(function(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } })();
+    /* r384 (Wolf: signed-out mobile wore a rank): guests get NO rank — a muted
+       sign-in cue instead. Checked BEFORE the cache read so a guest session that
+       somehow inherited hk_rank3 can never wear it. Fully signed-out visitors
+       keep the hidden pill (the auth slot already says "sign in"). */
+    if(!window.sb || !window._navUser) return;
+    if(isAnonUser()){
+      el.innerHTML='<span>sign in</span>';
+      el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
+      el.title='sign in — get on the ladder';
+      el.onclick=()=>goToTrainer('openAuth=signin');
+      return;
+    }
     try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
       if(__opted && c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n,20):'')+'<span>'+c.n+'</span>';
         el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
-    if(!window.sb || !window._navUser) return;
     if(!__opted){
       el.innerHTML='<span>Unranked</span>';
       el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
@@ -820,23 +831,23 @@
       const TIER_C={common:'var(--muted)', rare:'#3f7fe0', epic:'#d64a3f', legendary:'#d99a1f', egg:'#8a6d3b'};
       const cells=cards.map(f=>{
         const on=(myFlair||'none')===f.id;
-        /* plaque minis preview YOUR gem cut; other frames are chrome-only (r376 rule) */
+        /* plaque minis preview YOUR gem cut; other frames are chrome-only (r376 rule).
+           r384 (Wolf): compact swatch tile, same markup as the account gallery \u2014 name +
+           tier color only; desc/earn prose lives in the .fo-hint line + locked-click. */
         const orn=(f.id.indexOf('plaque-')===0 && window.hkFrameOrnaments) ? window.hkFrameOrnaments(f.id,{bucket:bk}) : '';
-        return '<button class="flair-opt'+(on?' on':'')+'" data-flair="'+f.id+'" data-locked="'+(f.unlocked?'0':'1')+'"'+
-          ' style="text-align:left;font-family:var(--mono);background:var(--bg);border:1px solid '+(on?'var(--accent)':'var(--line)')+
-          ';border-radius:10px;padding:10px 12px;color:var(--text);cursor:'+(f.unlocked?'pointer':'default')+(f.unlocked?'':';opacity:.45')+'">'+
-          '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'">'+orn+'</span>'+
-          '<b style="font-size:12px">'+escHtml(f.name)+'</b>'+
-          (f.tier?' <i style="font-style:normal;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:'+TIER_C[f.tier]+'">'+f.tier+'</i>':'')+
-          '<span style="display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">'+
-          (f.unlocked ? escHtml(f.desc||'') : '\ud83d\udd12 '+escHtml(f.earn)) + '</span></button>';
+        return '<button class="flair-opt'+(on?' on':'')+(f.unlocked?'':' locked')+'" data-flair="'+f.id+'" data-locked="'+(f.unlocked?'0':'1')+'">'+
+          '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'">'+orn+(f.unlocked?'':'<span class="fo-lock">\ud83d\udd12</span>')+'</span>'+
+          '<b class="fo-name">'+escHtml(f.name)+'</b>'+
+          (f.tier?'<i class="fo-tier" style="color:'+TIER_C[f.tier]+'">'+f.tier+'</i>':'')+
+          '</button>';
       }).join('');
       const g=document.createElement('div'); g.id='frameGallery'; g.className='profile-modal show';
       g.style.zIndex='80';   // over the profile modal (62) \u2014 the card stays visible behind
-      g.innerHTML='<div class="pc-card" style="width:560px"><a class="modal-x" id="fgX">\u00d7</a>'+
+      g.innerHTML='<div class="pc-card" style="width:700px"><a class="modal-x" id="fgX">\u00d7</a>'+   /* r384: 700 seats the compact grid 4-up (max-width:96vw still guards phones) */
         '<div class="pc-ach-h" style="margin-bottom:8px">card frames \u00b7 earned, worn wherever your card shows</div>'+
-        '<div class="pc-scroll"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">'+cells+'</div></div>'+
-        '<div id="fgMsg" style="font-family:var(--mono);font-size:11.5px;min-height:16px;margin-top:10px;color:var(--accent)"></div>'+
+        '<div class="pc-scroll"><div class="fo-grid">'+cells+'</div></div>'+
+        '<div class="fo-hint" id="fgHint">hover a frame \u2014 how it\u2019s earned shows here</div>'+
+        '<div id="fgMsg" style="font-family:var(--mono);font-size:11.5px;min-height:16px;margin-top:6px;color:var(--accent)"></div>'+
         '<div class="pc-foot"><a href="account.html" style="font-size:10.5px">full picker on the account page \u2197</a><a id="fgClose">close</a></div></div>';
       document.body.appendChild(g);
       const close=()=>{ g.remove(); document.removeEventListener('keydown', escKey, true); };
@@ -846,7 +857,16 @@
       const gx=g.querySelector('#fgX'); if(gx) gx.onclick=close;
       const gc=g.querySelector('#fgClose'); if(gc) gc.onclick=close;
       const sayFg=(t,bad)=>{ const el2=g.querySelector('#fgMsg'); if(el2){ el2.textContent=t; el2.style.color=bad?'#c8533f':'var(--accent)'; } };
-      g.querySelectorAll('.flair-opt').forEach(b=>b.onclick=async()=>{
+      /* r384: the hint line carries the prose the tiles shed \u2014 hover (or any click)
+         answers with the frame's earn/desc text */
+      const hintFg=b=>{ const el2=g.querySelector('#fgHint'); if(!el2) return;
+        const fr=cards.find(x=>x.id===b.dataset.flair); if(!fr) return;
+        el2.textContent = fr.id==='none' ? 'None \u2014 plain card'
+          : (b.dataset.locked==='1' ? '\ud83d\udd12 '+fr.name+' \u2014 '+(fr.earn||'keep playing.')
+            : fr.name+' \u2014 '+(fr.desc||'yours to wear')); };
+      g.querySelectorAll('.flair-opt').forEach(b=>{ b.onmouseenter=()=>hintFg(b);
+        b.onclick=async()=>{
+        hintFg(b);
         if(b.dataset.locked==='1'){
           const fr=(window.HK_FRAMES||[]).find(x=>x.id===b.dataset.flair);
           sayFg('Locked \u2014 '+((fr&&fr.earn)||'keep playing.'), true); return;
@@ -858,12 +878,11 @@
           myFlair=f;
           try{ const meRow=(d._profs||[]).find(x=>x.id===window._navUser.id); if(meRow) meRow.flair=f; }catch(e){}
           try{ if(window._navProfile) window._navProfile.flair=f; }catch(e){}
-          g.querySelectorAll('.flair-opt').forEach(x=>{ x.classList.toggle('on', x===b);
-            x.style.borderColor = x===b ? 'var(--accent)' : 'var(--line)'; });
+          g.querySelectorAll('.flair-opt').forEach(x=>x.classList.toggle('on', x===b));   /* r384: .on owns the border now */
           renderProfile(m, d);   // the open card wears it before the gallery closes
           sayFg('Frame set \u2713 \u2014 it rides wherever your card appears.');
         }catch(e){ sayFg('Something went wrong.', true); }
-      });
+      }; });
     }
     m.addEventListener('click', e => { if(e.target === m) closeProfile(); }, { once: true });
   }
