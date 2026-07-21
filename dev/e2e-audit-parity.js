@@ -507,6 +507,25 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(z1.divided, 'paste-op Divide lands');
   ok(z1.mixedAll && z1.uniformOff, 'mixed-selection Ctrl+B bolds ALL first (Excel), uniform toggles off');
 
+  console.log('AA. alt+= 2D flood (r196)');
+  await fresh();
+  const aa1 = await run(() => {
+    S.cells['G2']={...blankCell(), value:10}; S.cells['H2']={...blankCell(), value:20};
+    S.cells['G3']={...blankCell(), value:30}; S.cells['H3']={...blankCell(), value:40}; recalc(); render();
+    setDemoSel('G2:I4'); demoKey({key:'=',alt:true,code:'Equal'});
+    const g=(k)=>S.cells[k]||{};
+    const live=k=>!!(g(k).formula && /SUM/i.test(String(g(k).formula)));
+    const flood = live('I2') && live('I3') && live('G4') && live('H4') && live('I4')
+      && g('I2').value===30 && g('I3').value===70 && g('G4').value===40 && g('H4').value===60 && g('I4').value===100;
+    // 1D range form unchanged: column through its empty cell still fills the single SUM
+    S.cells['G6']={...blankCell(), value:5}; S.cells['G7']={...blankCell(), value:7}; recalc(); render();
+    setDemoSel('G6:G8'); demoKey({key:'=',alt:true,code:'Equal'});
+    const oneD = live('G8') && g('G8').value===12 && !g('H8').formula;
+    return { flood, oneD };
+  });
+  ok(aa1.flood, 'alt+= floods a 2D block through both empty edges — rows, columns, corner tie', JSON.stringify(aa1));
+  ok(aa1.oneD, '1D range form unchanged after the flood branch');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

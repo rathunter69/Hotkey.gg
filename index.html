@@ -32,9 +32,9 @@
   // pre-init: returning users skip the marketing landing entirely (no flash before render)
   try { if(localStorage.getItem('hotkey_onboarded')) document.documentElement.classList.add('hk-returning'); } catch(e){}
 </script>
-<link rel="icon" href="favicon.ico?v=165" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=165">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=165">
+<link rel="icon" href="favicon.ico?v=166" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=166">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=166">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -1143,14 +1143,14 @@
     padding:12px 14px; display:none; flex-direction:column; gap:2px; font-size:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.35); max-width:300px}
 </style>
-<script src="drills.js?v=165"></script>
-<link rel="stylesheet" href="nav.css?v=165">
-<script src="themes.js?v=165"></script>
+<script src="drills.js?v=166"></script>
+<link rel="stylesheet" href="nav.css?v=166">
+<script src="themes.js?v=166"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=165"></script>
+<script src="nav.js?v=166"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1890,35 +1890,41 @@ const CHALLENGES = {
     }
   },
   decimals:{
-    name:'Decimals', label:'The decimals pass', par:42, parKeys:15,
-    aha:'alt h 9 and alt h 0 walk decimals down and up — dollars take none, multiples and percents take one',
-    prompt:'A comps page pasted in with the decimals all wrong: dollars showing cents, multiples rounded to integers, margins running three places deep. House rule — dollars take NO decimals, multiples and percents take ONE. Alt H 9 steps a place off, Alt H 0 adds one back. Walk each column to standard.',
-    req(){ const o=this._o; return '<em>'+o.evR+'</em> · <em>alt h 9</em> ×2 → whole dollars · <em>'+o.mR+'</em> · <em>alt h 0</em> → one place · <em>'+o.pR+'</em> · <em>alt h 9</em> ×2 → one place'; },
+    name:'Decimals', label:'The decimals pass', par:60, parKeys:25,
+    aha:'alt h 9 walks places off, ctrl+1 x casts multiples in one chord \u2014 and the mean row re-renders as you go',
+    prompt:'A comps page pasted in with the decimals all wrong \u2014 and a live AVERAGE row at the bottom re-rendering with every fix. House rules: dollars take NO decimals (and the net-debt negatives flip to parens as the format lands), multiples read 8.2x via the format dialog, margins take ONE place. Include the mean row in each column pass, then bold and rule it off \u2014 the mean is what the page is FOR.',
+    req(){ const o=this._o; return '<em>'+o.evR+'</em> \u00b7 <em>alt h 9</em> \u00d72 \u00b7 <em>'+o.mR+'</em> \u00b7 <em>ctrl+1</em> <em>x</em> \u2192 8.2x \u00b7 <em>'+o.pR+'</em> \u00b7 <em>alt h 9</em> \u00d72 \u00b7 <em>'+o.nR+'</em> \u00b7 <em>alt h 9</em> \u00d72 \u2192 (parens) \u00b7 mean row <em>'+o.meanRng+'</em> \u2192 <em>ctrl+b</em> + <em>alt h b t</em>'; },
     guide(){ const o=this._o; return [
-      'dollars first — select '+o.evR+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: the cents disappear',
-      'multiples — '+o.mR+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>: 8x becomes 8.2x, one place of precision',
-      'margins — '+o.pR+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: three places down to one',
+      'dollars first \u2014 select '+o.evR+' THROUGH the mean \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: the cents disappear, mean included',
+      'multiples \u2014 '+o.mR+' \u00b7 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>x</kbd>: the dialog casts 8.2x with one place in ONE chord',
+      'margins \u2014 '+o.pR+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: three places down to one',
+      'net debt \u2014 '+o.nR+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice \u2014 and watch the negatives flip to (parens), the desk convention',
+      'the mean row is LIVE \u2014 it re-rendered with every pass. Rule it off: '+o.meanRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd>',
     ]; },
-    targets(){ const o=this._o; return [o.evR, o.mR, o.pR]; },
+    targets(){ const o=this._o; return [o.evR, o.mR, o.pR, o.nR, o.meanRng]; },
     demo(){ const o=this._o; return [
       {sel:o.evR, keys:[Kb.alt,L('H'),L('9'), Kb.alt,L('H'),L('9')]},
-      {sel:o.mR, keys:[Kb.alt,L('H'),L('0')]},
+      {sel:o.mR, keys:[{key:'1',ctrl:true}, L('X')]},
       {sel:o.pR, keys:[Kb.alt,L('H'),L('9'), Kb.alt,L('H'),L('9')]},
+      {sel:o.nR, keys:[Kb.alt,L('H'),L('9'), Kb.alt,L('H'),L('9')]},
+      {sel:o.meanRng, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('T')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — comps page (fix the decimals)',txt:true,bold:true};
-      const hr=3, n=5;
+      cells['A1']={...blankCell(),value:codename()+' \u2014 comps page (fix the decimals)',txt:true,bold:true};
+      const hr=3, n=5, mr=hr+n+1;
       const cols=[
-        {h:'EV ($mm)', style:'comma', dec:2, target:0},
-        {h:'EV/EBITDA', style:'comma', dec:0, target:1},
-        {h:'Margin', style:'percent', dec:3, target:1},
+        {h:'EV ($mm)',   style:'comma',   dec:2, tstyle:'comma',   target:0},
+        {h:'EV/EBITDA',  style:'comma',   dec:0, tstyle:'mult',    target:1},
+        {h:'Margin',     style:'percent', dec:3, tstyle:'percent', target:1},
+        {h:'Net debt',   style:'comma',   dec:2, tstyle:'comma',   target:0},
       ];
       for(let k=cols.length-1;k>0;k--){ const j=rnd(0,k); [cols[k],cols[j]]=[cols[j],cols[k]]; }
       const peers=['Falcon Ind.','Atlas Group','Copper Peak','Summit Co.','Ironline','Redrock Ltd.'];
       for(let k=peers.length-1;k>0;k--){ const j=rnd(0,k); [peers[k],peers[j]]=[peers[j],peers[k]]; }
       cells['A'+hr]={...blankCell(),value:'Peer',txt:true,bold:true};
       for(let i=0;i<n;i++) cells['A'+(hr+1+i)]={...blankCell(),value:peers[i],txt:true};
+      cells['A'+mr]={...blankCell(),value:'Mean',txt:true};
       this._cols=[];
       cols.forEach((col,j)=>{
         const c=2+j, L2=colLetter(c);
@@ -1928,27 +1934,35 @@ const CHALLENGES = {
           let v;
           if(col.h==='EV ($mm)') v=rnd(80,900)*10+rnd(0,99)/100;
           else if(col.h==='EV/EBITDA') v=rnd(55,140)/10;
-          else v=rnd(80,380)/1000;
+          else if(col.h==='Margin') v=rnd(80,380)/1000;
+          else v=-(rnd(15,85)*10+rnd(0,99)/100);
           vals.push(v);
           cells[L2+(hr+1+i)]={...blankCell(),value:v,fmtStyle:col.style,decimals:col.dec};
         }
-        this._cols.push({h:col.h, c:c, L:L2, target:col.target, style:col.style, vals:vals});
+        const mean=vals.reduce((a,b)=>a+b,0)/n;
+        cells[L2+mr]={...blankCell(),formula:'=AVERAGE('+L2+(hr+1)+':'+L2+(hr+n)+')',value:mean,fmtStyle:col.style,decimals:col.dec};
+        this._cols.push({h:col.h, c:c, L:L2, target:col.target, tstyle:col.tstyle, vals:vals});
       });
       const F=h=>this._cols.find(x=>x.h===h);
-      this._o={ evR:F('EV ($mm)').L+(hr+1)+':'+F('EV ($mm)').L+(hr+n),
-        mR:F('EV/EBITDA').L+(hr+1)+':'+F('EV/EBITDA').L+(hr+n),
-        pR:F('Margin').L+(hr+1)+':'+F('Margin').L+(hr+n), hr:hr, n:n };
-      return {ROWS:Math.max(9,hr+n+1), cells, active:{r:hr+1,c:F('EV ($mm)').c}, sel:null, colW:{1:104,2:92,3:92,4:92}};
+      const rng=h=>F(h).L+(hr+1)+':'+F(h).L+mr;   // THROUGH the mean row
+      this._o={ evR:rng('EV ($mm)'), mR:rng('EV/EBITDA'), pR:rng('Margin'), nR:rng('Net debt'),
+        meanRng:'A'+mr+':E'+mr, hr:hr, n:n, mr:mr };
+      return {ROWS:Math.max(10,mr+1), cells, active:{r:hr+1,c:F('EV ($mm)').c}, sel:null, colW:{1:104,2:92,3:92,4:92,5:92}};
     },
     checks(S){
       const o=this._o;
-      const colOk=(h,label)=>{ const col=this._cols.find(x=>x.h===h);
-        return col.vals.every((v,i)=>{ const cc=S.cells[col.L+(o.hr+1+i)];
-          return !!(cc&&cc.value===v&&cc.decimals===col.target&&cc.fmtStyle===col.style); }); };
+      const colOk=h=>{ const col=this._cols.find(x=>x.h===h);
+        const dataOk=col.vals.every((v,i)=>{ const cc=S.cells[col.L+(o.hr+1+i)];
+          return !!(cc&&cc.value===v&&cc.decimals===col.target&&cc.fmtStyle===col.tstyle); });
+        const m=S.cells[col.L+o.mr];
+        return dataOk && !!(m&&m.decimals===col.target&&m.fmtStyle===col.tstyle); };
+      const meanDress=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+o.mr]; if(!x||!x.bold||!x.bt) return false; } return true; })();
       return [
-        {label:'strip the EV column to ZERO decimals — values untouched', ok: colOk('EV ($mm)')},
-        {label:'give the multiples ONE decimal — 8x becomes 8.2x down the column', ok: colOk('EV/EBITDA')},
+        {label:'strip the EV column to ZERO decimals, mean included \u2014 values untouched', ok: colOk('EV ($mm)')},
+        {label:'cast the multiples 8.2x \u2014 ctrl+1, x: one chord, one place', ok: colOk('EV/EBITDA')},
         {label:'walk the margins back to ONE decimal place', ok: colOk('Margin')},
+        {label:'zero decimals on net debt \u2014 the negatives flip to (parens)', ok: colOk('Net debt')},
+        {label:'bold + rule the mean row ('+o.meanRng+') \u2014 the line the page exists for', ok: meanDress},
       ];
     }
   },
@@ -3508,26 +3522,24 @@ const CHALLENGES = {
     }
   },
   foot:{
-    name:'Foot', label:'Foot the table both ways', par:48, parKeys:8,
-    aha:'alt+= proposes the sum it sees — foot rows, columns, and the corner in five chords',
-    prompt:'A segment × quarter block: total every row, total every column, land the grand total where they meet. You will not type a single SUM — Alt+= reads the block and proposes it. Foot down, foot across, and the corner has to tie to BOTH edges.',
-    req:'<em>F2</em> · <em>alt+=</em> <em>↵</em> · fill F2:F5 ↓ · <em>B6</em> · <em>alt+=</em> <em>↵</em> · fill B6:E6 → · <em>F6</em> grand · <em>alt+=</em> <em>↵</em>',
+    name:'Foot', label:'Foot the table both ways', par:48, parKeys:11,
+    aha:'select the block THROUGH its empty edges and ONE alt+= floods every sum \u2014 then you dress what it built',
+    prompt:'A segment \u00d7 quarter block with its totals row and column still empty. You will not type a single SUM \u2014 select the whole block THROUGH both empty edges and ONE Alt+= floods row totals, column totals, and the corner, all live. Then make it read like an exhibit: bold + rule the total row, and circle the table.',
+    req:'<em>B2:F6</em> \u00b7 <em>alt+=</em> \u2014 nine sums, one chord \u00b7 <em>A6:F6</em> \u2192 <em>ctrl+b</em> + <em>alt h b t</em> \u00b7 <em>A1:F6</em> \u2192 <em>alt h b o</em>',
     guide:[
-      'row totals: F2 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:E2) — it read the row · <kbd>↵</kbd> · select F2:F5 · <kbd>ctrl</kbd>+<kbd>d</kbd>',
-      'column totals: B6 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:B5) · <kbd>↵</kbd> · select B6:E6 · <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'the corner: F6 · <kbd>alt</kbd>+<kbd>=</kbd> — it sums the row totals above, and that must agree with the column edge',
+      'select B2:F6 \u2014 the data plus the EMPTY totals row and column \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> \u2014 Excel reads the block: rows foot down F, columns foot across 6, the corner ties BOTH edges',
+      'dress what it built: A6:F6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>t</kbd> \u2014 totals carry the page',
+      'the MD circles the exhibit: A1:F6 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 one perimeter around the whole table',
     ],
-    targets:['F2:F5','B6:E6','F6'],
+    targets:['B2:F6','A6:F6','A1:F6'],
     demo(){ return [
-      {sel:'F2', keys:[Kb.eq, Kb.enter]},
-      {sel:'F2:F5', keys:[Kb.fillD]},
-      {sel:'B6', keys:[Kb.eq, Kb.enter]},
-      {sel:'B6:E6', keys:[Kb.fillR]},
-      {sel:'F6', keys:[Kb.eq, Kb.enter]},
+      {sel:'B2:F6', keys:[Kb.eq]},
+      {sel:'A6:F6', keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('T')]},
+      {sel:'A1:F6', keys:[Kb.alt,L('H'),L('B'),L('O')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — segment × quarter ($mm)',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' \u2014 segment \u00d7 quarter ($mm)',txt:true,bold:true};
       const segs=['Industrial','Consumer','Services','Energy'];
       ['Q1','Q2','Q3','Q4'].forEach((q,j)=>cells[colLetter(2+j)+1]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
       cells['F1']={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
@@ -3536,20 +3548,26 @@ const CHALLENGES = {
         for(let j=0;j<4;j++){ const v=rnd(10,90)*10; this._g+=v;
           cells[colLetter(2+j)+(2+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
         cells['F'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0}; }
-      cells['A6']={...blankCell(),value:'Total',txt:true,bold:true};
-      for(let j=0;j<4;j++) cells[colLetter(2+j)+6]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      cells['F6']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      return {ROWS:8, cells, active:{r:2,c:6}, sel:null, colW:{1:104}};
+      cells['A6']={...blankCell(),value:'Total',txt:true};
+      for(let j=0;j<4;j++) cells[colLetter(2+j)+6]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['F6']={...blankCell(),fmtStyle:'comma',decimals:0};
+      return {ROWS:8, cells, active:{r:2,c:2}, sel:null, colW:{1:104}};
     },
     checks(S){
       const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:NaN; };
       const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&/SUM/i.test(String(c.formula))); };
       const rowOk=r=>live('F'+r)&&Math.abs(val('F'+r)-(val('B'+r)+val('C'+r)+val('D'+r)+val('E'+r)))<1e-6;
       const colOk=cc=>{ const L2=colLetter(cc); return live(L2+'6')&&Math.abs(val(L2+'6')-(val(L2+'2')+val(L2+'3')+val(L2+'4')+val(L2+'5')))<1e-6; };
+      const dressOk=(()=>{ for(let c=1;c<=6;c++){ const x=S.cells[colLetter(c)+'6']; if(!x||!x.bold||!x.bt) return false; } return true; })();
+      const boxOk=(()=>{ const a=S.cells['A1']||{}, f1=S.cells['F1']||{}, a6=S.cells['A6']||{}, f6=S.cells['F6']||{};
+        if(!(a.bt&&a.bl)||!(f1.bt&&f1.br)||!(a6.bb&&a6.bl)||!(f6.bb&&f6.br)) return false;
+        for(let c=1;c<=6;c++){ const t=S.cells[colLetter(c)+'1']||{}, b=S.cells[colLetter(c)+'6']||{}; if(!t.bt||!b.bb) return false; } return true; })();
       return [
-        {label:'Total every row down column F — live SUMs, not typed numbers', ok: [2,3,4,5].every(rowOk)},
-        {label:'Total every column across row 6 — live SUMs', ok: [2,3,4,5].every(c=>colOk(c))},
-        {label:'tie the corner — F6 must agree with BOTH edges', ok: live('F6')&&Math.abs(val('F6')-this._g)<1e-6},
+        {label:'flood the block \u2014 ONE alt+= through the empty edges; every row foots down column F', ok: [2,3,4,5].every(rowOk)},
+        {label:'every column foots across row 6 \u2014 live SUMs, same chord', ok: [2,3,4,5].every(c=>colOk(c))},
+        {label:'the corner ties BOTH edges (F6)', ok: live('F6')&&Math.abs(val('F6')-this._g)<1e-6},
+        {label:'bold + rule the total row (A6:F6) \u2014 dress what the flood built', ok: dressOk},
+        {label:'circle the exhibit \u2014 one perimeter (alt h b o) around A1:F6', ok: boxOk},
       ];
     }
   },
@@ -3692,23 +3710,30 @@ const CHALLENGES = {
     }
   },
   blue:{
-    name:'Inputs', label:'Blue the inputs, everywhere', par:62, parKeys:36,
-    aha:'the moment a number is typed, paint it blue \u2014 inputs get flagged as they are born',
-    prompt:'A model page the way you actually inherit one: hardcodes scattered across four spots \u2014 different spots every run \u2014 plus formula cells that must stay untouched. Color every hardcode blue; leave the formulas alone. The grader checks both directions.',
-    req(){ const s=this._scatter; return 'blue these: <em>'+s.b1.a+':'+s.b1.b+'</em> \u00b7 <em>'+s.b2.a+':'+s.b2.b+'</em> \u00b7 singles <em>'+s.s1+'</em> and <em>'+s.s2+'</em> (alt h f c \u00b7 \u2192\u00d74 \u00b7 \u21b5) \u00b7 formulas at '+s.d1+' / '+s.d2+' stay default'; },
+    name:'Inputs', label:'Color the convention', par:108, parKeys:61,
+    aha:'the font color IS the audit trail \u2014 blue typed, green linked, red suspect, black computed',
+    prompt:'A model page the way you inherit one \u2014 hardcodes scattered in four spots, a cell LINKED from the tax tab, one number too crazy to trust, and a formula somebody wrongly painted blue. The desk convention is a full palette: BLUE for typed inputs, GREEN for links from another tab, RED for numbers you\u2019re flagging, BLACK for formulas. Paint each cell what it IS \u2014 then dress the headers and sign the memo.',
+    req(){ const s=this._scatter; return 'blue: <em>'+s.b1.a+':'+s.b1.b+'</em> \u00b7 <em>'+s.b2.a+':'+s.b2.b+'</em> \u00b7 <em>'+s.s1+'</em> \u00b7 <em>'+s.s2+'</em> (alt h f c \u00b7 \u2192\u00d74 \u00b7 \u21b5) \u00b7 GREEN the link <em>'+s.lk+'</em> (\u2190\u00d72 wraps) \u00b7 RED the flag <em>'+s.rk+'</em> (\u2192\u00d75) \u00b7 <em>'+s.d1+'</em> back to BLACK (\u21b5 on open) \u00b7 bold both block headers \u00b7 <em>ctrl+i</em> the memo'; },
     guide(){ const s=this._scatter; return [
-      'block one: '+s.b1.a+', <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs it \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 \u2192\u00d74 \u00b7 <kbd>\u21b5</kbd>',
-      'block two at '+s.b2.a+':'+s.b2.b+' \u2014 <kbd>ctrl</kbd>+arrows across \u00b7 same chord',
-      'the loose singles this run: '+s.s1+' and '+s.s2+' \u2014 real pages hide hardcodes in corners',
-      s.d1+' and '+s.d2+' are FORMULAS \u2014 blueing them fails the drill',
+      'the hardcodes: '+s.b1.a+':'+s.b1.b+', '+s.b2.a+':'+s.b2.b+', singles '+s.s1+' and '+s.s2+' \u2014 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 \u2192\u00d74 \u00b7 <kbd>\u21b5</kbd> \u2014 blue means TYPED',
+      s.lk+' pulls from the tax tab \u2014 links wear GREEN: the picker wraps, <kbd>\u2190</kbd><kbd>\u2190</kbd> lands it',
+      s.rk+' reads 900%+ \u2014 nobody grows like that. Flag it RED (<kbd>\u2192</kbd>\u00d75) so the next pair of eyes stops there',
+      s.d1+' is a FORMULA someone painted blue \u2014 open the picker, <kbd>\u21b5</kbd> on Black walks it back \u00b7 '+s.d2+' stays default either way',
+      'then the page: <kbd>ctrl</kbd>+<kbd>b</kbd> both block headers \u00b7 <kbd>ctrl</kbd>+<kbd>i</kbd> the data-room memo \u2014 sourced pages get sent, unsourced pages get questions',
     ]; },
-    targets(){ const s=this._scatter; return [s.b1.a+':'+s.b1.b, s.b2.a+':'+s.b2.b, s.s1, s.s2]; },
+    targets(){ const s=this._scatter; return [s.b1.a+':'+s.b1.b, s.b2.a+':'+s.b2.b, s.s1, s.s2, s.lk, s.rk, s.d1, s.memo]; },
     demo(){ const s=this._scatter; const chord=[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter];
       return [
         {sel:s.b1.a+':'+s.b1.b, keys:chord},
         {sel:s.b2.a+':'+s.b2.b, keys:chord},
         {sel:s.s1, keys:chord},
         {sel:s.s2, keys:chord},
+        {sel:s.lk, keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowLeft'},{key:'ArrowLeft'},Kb.enter]},
+        {sel:s.rk, keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+        {sel:s.d1, keys:[Kb.alt,L('H'),L('F'),L('C'),Kb.enter]},
+        {sel:s.h1, keys:[Kb.bold]},
+        {sel:s.h2, keys:[Kb.bold]},
+        {sel:s.memo, keys:[{key:'i',ctrl:true}]},
       ]; },
     build(){
       const cells={};
@@ -3716,13 +3741,13 @@ const CHALLENGES = {
       const b1=b1pool[rnd(0,2)], b2=b2pool[rnd(0,2)];
       const names1=['Volume','Price','Growth'], names2=['Tax','Discount','Terminal g'];
       const B1=colLetter(b1.c), B2=colLetter(b2.c);
-      cells[colLetter(b1.c-1)+(b1.r-1)]={...blankCell(),value:'Assumptions',txt:true,bold:true};
+      const h1k=colLetter(b1.c-1)+(b1.r-1), h2k=colLetter(b2.c-1)+(b2.r-1);
+      cells[h1k]={...blankCell(),value:'Assumptions',txt:true};
       names1.forEach((n,i)=>{ cells[colLetter(b1.c-1)+(b1.r+i)]={...blankCell(),value:n,txt:true};
         cells[B1+(b1.r+i)]={...blankCell(),value:rnd(5,95)*10,fmtStyle:'comma',decimals:0}; });
-      cells[colLetter(b2.c-1)+(b2.r-1)]={...blankCell(),value:'Rates',txt:true,bold:true};
+      cells[h2k]={...blankCell(),value:'Rates',txt:true};
       names2.forEach((n,i)=>{ cells[colLetter(b2.c-1)+(b2.r+i)]={...blankCell(),value:n,txt:true};
         cells[B2+(b2.r+i)]={...blankCell(),value:rnd(2,30)/100,fmtStyle:'percent',decimals:1}; });
-      // two loose singles + two formula decoys from a spot pool, non-colliding
       const taken=new Set();
       const key=(c,r)=>colLetter(c)+r;
       [b1,b2].forEach(b=>{ for(let i=-1;i<3;i++){ taken.add(key(b.c,b.r+i)); taken.add(key(b.c-1,b.r+i)); } });
@@ -3733,24 +3758,34 @@ const CHALLENGES = {
       singles.forEach(([n,v,d],i)=>{ cells[key(sp[i].c-1,sp[i].r)]={...blankCell(),value:n,txt:true};
         cells[key(sp[i].c,sp[i].r)]={...blankCell(),value:v,fmtStyle:'comma',decimals:d}; });
       cells[key(dp[0].c-1,dp[0].r)]={...blankCell(),value:'Revenue',txt:true};
-      cells[key(dp[0].c,dp[0].r)]={...blankCell(),formula:'='+B1+b1.r+'*'+B1+(b1.r+1),value:0,fmtStyle:'comma',decimals:0};
+      cells[key(dp[0].c,dp[0].r)]={...blankCell(),formula:'='+B1+b1.r+'*'+B1+(b1.r+1),value:0,fmtStyle:'comma',decimals:0,fontColor:'blue'};   // WRONGLY blue \u2014 walk it back
       cells[key(dp[1].c-1,dp[1].r)]={...blankCell(),value:'After-tax',txt:true};
       cells[key(dp[1].c,dp[1].r)]={...blankCell(),formula:'=1-'+B2+b2.r,value:0,fmtStyle:'percent',decimals:1};
+      // the convention strip: a tab link, a crazy number, the sign-off memo
+      cells['A13']={...blankCell(),value:'Tax rate \u2014 LINK from tax tab',txt:true};
+      cells['C13']={...blankCell(),formula:'='+B2+b2.r,value:0,fmtStyle:'percent',decimals:1};
+      cells['E13']={...blankCell(),value:'YoY growth',txt:true};
+      cells['F13']={...blankCell(),value:rnd(80,140)/10,fmtStyle:'percent',decimals:0};   // r196 fit: 1,380.0% overflowed 78px; whole percents read louder anyway
+      cells['A14']={...blankCell(),value:'Per data room v'+rnd(2,5)+'.'+rnd(0,9)+' \u2014 final',txt:true};
       this._scatter={ b1:{a:B1+b1.r, b:B1+(b1.r+2), keys:[0,1,2].map(i=>B1+(b1.r+i))},
                       b2:{a:B2+b2.r, b:B2+(b2.r+2), keys:[0,1,2].map(i=>B2+(b2.r+i))},
                       s1:key(sp[0].c,sp[0].r), s2:key(sp[1].c,sp[1].r),
-                      d1:key(dp[0].c,dp[0].r), d2:key(dp[1].c,dp[1].r) };
-      return {ROWS:12, cells, active:{r:b1.r, c:b1.c}, sel:null, colW:{1:78}};
+                      d1:key(dp[0].c,dp[0].r), d2:key(dp[1].c,dp[1].r),
+                      lk:'C13', rk:'F13', memo:'A14', h1:h1k, h2:h2k };
+      return {ROWS:14, cells, active:{r:b1.r, c:b1.c}, sel:null, colW:{1:150}};
     },
     checks(S){
       const s=this._scatter;
-      const blue=k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); };
+      const col=(k,want)=>{ const c=S.cells[k]; return !!(c&&c.fontColor===want); };
       const notBlue=k=>{ const c=S.cells[k]; return !(c&&c.fontColor==='blue'); };
       return [
-        {label:'paint the assumptions block blue ('+s.b1.a+':'+s.b1.b+')', ok: s.b1.keys.every(blue)},
-        {label:'paint the rates block blue ('+s.b2.a+':'+s.b2.b+')', ok: s.b2.keys.every(blue)},
-        {label:'paint the loose hardcodes too \u2014 '+s.s1+' and '+s.s2, ok: blue(s.s1)&&blue(s.s2)},
-        {label:'leave the formula cells ('+s.d1+', '+s.d2+') DEFAULT \u2014 convention cuts both ways', ok: notBlue(s.d1)&&notBlue(s.d2)},
+        {label:'BLUE the typed blocks ('+s.b1.a+':'+s.b1.b+', '+s.b2.a+':'+s.b2.b+') \u2014 blue means hardcoded', ok: s.b1.keys.every(k=>col(k,'blue'))&&s.b2.keys.every(k=>col(k,'blue'))},
+        {label:'BLUE the loose hardcodes too \u2014 '+s.s1+' and '+s.s2, ok: col(s.s1,'blue')&&col(s.s2,'blue')},
+        {label:'GREEN the tab link at '+s.lk+' \u2014 pulled from another tab, not typed here', ok: col(s.lk,'green')},
+        {label:'RED the 900% growth at '+s.rk+' \u2014 flag what you don\u2019t trust', ok: col(s.rk,'red')},
+        {label:'walk the wrongly-blue formula at '+s.d1+' back to BLACK \u2014 computed cells stay quiet', ok: col(s.d1,'black')},
+        {label:'and '+s.d2+' stays default \u2014 the convention cuts both ways', ok: notBlue(s.d2)},
+        {label:'dress the page \u2014 bold both block headers, italicize the data-room memo', ok: (()=>{ const h1=S.cells[s.h1],h2=S.cells[s.h2],m=S.cells[s.memo]; return !!(h1&&h1.bold&&h2&&h2.bold&&m&&m.it); })()},
       ];
     }
   },
@@ -3804,20 +3839,21 @@ const CHALLENGES = {
     }
   },
   series:{
-    name:'Years', label:'Stub the year header', par:30, parKeys:11,
-    aha:'two seed years select the pattern — the series dialog writes the rest of the header',
-    prompt:'Extend and dress a year header wherever it starts this run: two seed years are in, three more to fill with Series, then bold the whole run and right-align it so the years sit over their number columns.',
-    req(){ const o=this._o; return 'select <em>'+o.range+'</em> \u00b7 <em>alt h f i s \u21b5</em> fills the missing years \u00b7 selection holds \u2192 <em>ctrl+b</em> \u00b7 <em>alt h a r</em>'; },
+    name:'Years', label:'Stub the year header', par:56, parKeys:24,
+    aha:'two seeds select the pattern \u2014 years step by one, month-ends step by serial, Series writes both',
+    prompt:'Two headers to stub wherever they start this run. The year row: two seed years in, three to fill with Series, then bold + right-align the run. Below it, the month-end row does the SAME trick with date serials \u2014 two seeds set the step, Series extends it, and ctrl+1 casts the serials to Mmm-yy so they read like closes, not numbers. One dialog, two species of header.',
+    req(){ const o=this._o; return 'years <em>'+o.range+'</em> \u00b7 <em>alt h f i s \u21b5</em> \u00b7 <em>ctrl+b</em> \u00b7 <em>alt h a r</em> \u00b7 months <em>'+o.mRange+'</em> \u00b7 <em>alt h f i s \u21b5</em> \u00b7 <em>ctrl+1</em> <em>d</em> \u2192 Mmm-yy \u00b7 <em>ctrl+b</em> \u00b7 <em>alt h a r</em>'; },
     guide(){ const o=this._o; return [
-      'the seed years start at '+o.a+' this run \u2014 select '+o.range+' with <kbd>shift</kbd>+<kbd>\u2192</kbd>',
-      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> opens Series \u00b7 apply with <kbd>\u21b5</kbd>',
-      'selection is still live \u2014 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
+      'the seed years start at '+o.a+' \u2014 select '+o.range+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> \u00b7 <kbd>\u21b5</kbd> \u00b7 selection holds: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
+      'the month row at '+o.mA+' is date SERIALS \u2014 same dialog: select '+o.mRange+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> \u00b7 <kbd>\u21b5</kbd> \u2014 the two seeds set the step',
+      'serials aren\u2019t sendable \u2014 <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>d</kbd> casts the run to Mmm-yy \u00b7 then <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> \u2014 headers match headers',
     ]; },
-    targets(){ const o=this._o; return [o.range,o.range,o.range,o.range]; },
+    targets(){ const o=this._o; return [o.range, o.range, o.mRange, o.mRange]; },
     demo(){ const o=this._o; return [
       {sel:o.range, active:o.a, keys:[Kb.alt,L('H'),L('F'),L('I'),L('S'),Kb.enter]},
-      {sel:o.range, keys:[Kb.bold]},
-      {sel:o.range, keys:[Kb.alt,L('H'),L('A'),L('R')]},
+      {sel:o.range, keys:[Kb.bold, Kb.alt,L('H'),L('A'),L('R')]},
+      {sel:o.mRange, active:o.mA, keys:[Kb.alt,L('H'),L('F'),L('I'),L('S'),Kb.enter]},
+      {sel:o.mRange, keys:[{key:'1',ctrl:true},L('D'), Kb.bold, Kb.alt,L('H'),L('A'),L('R')]},
     ]; },
     build(){
       const cells={};
@@ -3832,37 +3868,52 @@ const CHALLENGES = {
       cells[colLetter(sp.c)+sp.r]={...blankCell(),value:y0,decimals:0};
       cells[colLetter(sp.c+1)+sp.r]={...blankCell(),value:y0+1,decimals:0};
       for(let j=2;j<5;j++) cells[colLetter(sp.c+j)+sp.r]={...blankCell(),decimals:0};
-      this._o={ a:colLetter(sp.c)+sp.r, range:colLetter(sp.c)+sp.r+':'+colLetter(sp.c+4)+sp.r, r:sp.r, c:sp.c, y0:y0 };
-      return {ROWS:Math.max(8,sp.r+4), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{}};
+      // the month-end strip \u2014 same dialog, serial step
+      const mRow=sp.r+4, m0=45322+31*rnd(0,10);
+      cells[colLetter(sp.c-1)+mRow]={...blankCell(),value:'Month-end',txt:true};
+      cells[colLetter(sp.c)+mRow]={...blankCell(),value:m0,decimals:0};
+      cells[colLetter(sp.c+1)+mRow]={...blankCell(),value:m0+31,decimals:0};
+      for(let j=2;j<5;j++) cells[colLetter(sp.c+j)+mRow]={...blankCell(),decimals:0};
+      this._o={ a:colLetter(sp.c)+sp.r, range:colLetter(sp.c)+sp.r+':'+colLetter(sp.c+4)+sp.r, r:sp.r, c:sp.c, y0:y0,
+        mA:colLetter(sp.c)+mRow, mRange:colLetter(sp.c)+mRow+':'+colLetter(sp.c+4)+mRow, mRow:mRow, m0:m0 };
+      return {ROWS:Math.max(9,mRow+1), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{}};
     },
     checks(S){
       const o=this._o;
-      const cellsOK=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r];
-        return !!(c&&c.value===o.y0+j&&c.bold&&c.align==='r'); });
+      const yFill=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r]; return !!(c&&c.value===o.y0+j); });
+      const yDress=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r]; return !!(c&&c.bold&&c.align==='r'); });
+      const mFill=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.mRow]; return !!(c&&c.value===o.m0+31*j&&c.fmtStyle==='date'); });
+      const mDress=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.mRow]; return !!(c&&c.bold&&c.align==='r'); });
       return [
-        {label:'run five sequential years across '+o.range+' \u2014 fill, bold, right-align', ok: cellsOK},
+        {label:'run five sequential years across '+o.range+' \u2014 Series reads the two seeds', ok: yFill},
+        {label:'dress the year run \u2014 bold, right-aligned over the number columns', ok: yDress},
+        {label:'extend the month-ends and cast them Mmm-yy \u2014 same dialog, serial step, then ctrl+1 d', ok: mFill},
+        {label:'dress the month run to match \u2014 headers read as one family', ok: mDress},
       ];
     }
   },
   bridge:{
-    name:'Point Mode', label:'Point, don\u2019t type', par:40, parKeys:6,
-    aha:'point mode grabs refs with arrows \u2014 the fastest formula is the one you never typed',
-    prompt:'Build profit = revenue \u00d7 margin by POINTING \u2014 = then arrow up to grab each reference, never typing a cell address \u2014 and fill it across five years. Point mode is the fastest formula entry there is; the fill proves your references were relative.',
-    req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs revenue \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs margin \u00b7 <em>\u21b5</em> \u00b7 select '+o.rng+' \u00b7 <em>ctrl+r</em>'; },
+    name:'Point Mode', label:'Point, don\u2019t type', par:64, parKeys:21,
+    aha:'point mode grabs refs with arrows \u2014 and the growth memo is the same muscle pointed twice',
+    prompt:'Build profit = revenue \u00d7 margin by POINTING \u2014 = then arrows, never typing an address \u2014 and fill it across five years. Then the memo row UNDER it: growth = this year over last, minus one, pointed the same way off the EBITDA you just built, filled, cast to percent, and italicized. Two rows, one muscle, and the second row only exists because of the first.',
+    req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> <em>\u2191\u2191</em> <em>*</em> <em>\u2191</em> <em>\u21b5</em> \u00b7 fill '+o.rng+' \u2192 \u00b7 then <em>'+o.g1+'</em> \u00b7 <em>=</em> <em>\u2191\u2191</em> <em>/</em> <em>\u2191\u2191\u2190</em> <em>-1</em> <em>\u21b5</em> \u00b7 fill '+o.gRng+' \u2192 \u00b7 <em>ctrl+shift+%</em> +1 dec \u00b7 <em>ctrl+i</em> the memo row'; },
     guide(){ const o=this._o; return [
-      'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
-      '<kbd>\u2191</kbd> \u2014 one hop to margin \u00b7 <kbd>\u21b5</kbd>',
-      'select '+o.rng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 five years from one pointed formula',
+      'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> climbs to revenue \u00b7 <kbd>*</kbd> \u00b7 <kbd>\u2191</kbd> grabs margin \u00b7 <kbd>\u21b5</kbd> \u00b7 fill '+o.rng+' with <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'the memo points at what you JUST BUILT: at '+o.g1+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> this year\u2019s EBITDA \u00b7 <kbd>/</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd><kbd>\u2190</kbd> last year\u2019s \u00b7 type <kbd>-1</kbd> \u00b7 <kbd>\u21b5</kbd>',
+      'fill '+o.gRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 then cast it: <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>',
+      'memos whisper \u2014 select the label through the last growth cell \u00b7 <kbd>ctrl</kbd>+<kbd>i</kbd>',
     ]; },
-    targets(){ const o=this._o; return [o.f, o.rng]; },
+    targets(){ const o=this._o; return [o.f, o.rng, o.g1, o.gRng]; },
     demo(){ const o=this._o; return [
       {sel:o.f, keys:[{key:'='}, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
       {sel:o.rng, keys:[Kb.fillR]},
+      {sel:o.g1, keys:[{key:'='}, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'/'}, {key:'ArrowUp'},{key:'ArrowUp'},{key:'ArrowLeft'}, ...T('-1'), Kb.enter]},
+      {sel:o.gRng, keys:[Kb.fillR]},
+      {sel:o.gRng, keys:[Kb.pct, Kb.alt,L('H'),D(0)]},
+      {sel:o.memoRng, keys:[{key:'i',ctrl:true}]},
     ]; },
     build(){
       const cells={};
-      // r187: the block MOVES per seed (\u00a72.1 \u2014 sites randomize, not just values);
-      // point-mode keystrokes are identical from any anchor, so par is untouched.
       const [c0,hr]=[[2,1],[3,2],[2,3],[4,2]][rnd(0,3)];
       const lc=colLetter(c0-1);
       cells['A1']={...blankCell(),value:codename()+' \u2014 profit build ($mm)',txt:true,bold:true};
@@ -3878,13 +3929,14 @@ const CHALLENGES = {
         cells[L2+(hr+1)]={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
         cells[L2+(hr+2)]={...blankCell(),value:m,fontColor:'blue',fmtStyle:'percent',decimals:1};
         cells[L2+(hr+3)]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        if(j<4) cells[colLetter(c0+1+j)+(hr+5)]={...blankCell(),value:rnd(3,9)/100,fmtStyle:'percent',decimals:1};
         this._exp.push({rev:rev, m:m});
         rev=Math.round(rev*(1+rnd(3,9)/100));
       }
-      this._o={c0:c0, hr:hr, f:colLetter(c0)+(hr+3), rng:colLetter(c0)+(hr+3)+':'+colLetter(c0+4)+(hr+3)};
+      this._o={c0:c0, hr:hr, f:colLetter(c0)+(hr+3), rng:colLetter(c0)+(hr+3)+':'+colLetter(c0+4)+(hr+3),
+        g1:colLetter(c0+1)+(hr+5), gRng:colLetter(c0+1)+(hr+5)+':'+colLetter(c0+4)+(hr+5),
+        memoRng:lc+(hr+5)+':'+colLetter(c0+4)+(hr+5)};
       const cw={}; cw[c0-1]=118;
-      return {ROWS:Math.max(7,hr+6), cells, active:{r:hr+3,c:c0}, sel:null, colW:cw};
+      return {ROWS:Math.max(8,hr+6), cells, active:{r:hr+3,c:c0}, sel:null, colW:cw};
     },
     checks(S){
       const o=this._o;
@@ -3892,9 +3944,18 @@ const CHALLENGES = {
         const f=String(c.formula).toUpperCase().replace(/[\s$]/g,'');
         const refs=f.includes(L2+(o.hr+1))&&f.includes(L2+(o.hr+2));
         return refs && typeof c.value==='number' && Math.abs(c.value-this._exp[j].rev*this._exp[j].m)<0.5; };
+      const gOk=j=>{ const L2=colLetter(o.c0+j), P2=colLetter(o.c0+j-1), c=S.cells[L2+(o.hr+5)]; if(!c||!c.formula) return false;
+        const f=String(c.formula).toUpperCase().replace(/[\s$]/g,'');
+        const refs=f.includes(L2+(o.hr+3))&&f.includes(P2+(o.hr+3));
+        const e=this._exp, want=(e[j].rev*e[j].m)/(e[j-1].rev*e[j-1].m)-1;
+        return refs && typeof c.value==='number' && Math.abs(c.value-want)<0.005 && c.fmtStyle==='percent' && c.decimals===1; };
+      const itOk=(()=>{ const lbl=S.cells[o.memoRng.split(':')[0]]; if(!lbl||!lbl.it) return false;
+        for(let j=1;j<5;j++){ const x=S.cells[colLetter(o.c0+j)+(o.hr+5)]; if(!x||!x.it) return false; } return true; })();
       return [
         {label:'build EBITDA at '+o.f+' \u2014 revenue \u00d7 margin, both refs pointed in-column', ok: okCol(0)},
         {label:'fill it across all five years \u2014 relative refs walked with the fill', ok: [1,2,3,4].every(okCol)},
+        {label:'point the growth memo off the EBITDA you built \u2014 this year \u00f7 last \u2212 1, filled, as percents', ok: [1,2,3,4].every(gOk)},
+        {label:'memos whisper \u2014 italicize the label through the last growth cell', ok: itOk},
       ];
     }
   },
@@ -6762,6 +6823,22 @@ function autoSum(){
      STAYS on the cell so bold/border follows without re-navigating. */
   if(S.sel){
     const r2=selRange();
+    if(r2.r2>r2.r1 && r2.c2>r2.c1){   /* r196: Excel's 2D flood — data + empty edges, one chord */
+      let rowEmpty=true, colEmpty=true, hasNum=false;
+      for(let cc=r2.c1;cc<=r2.c2;cc++) if(nonEmpty(r2.r2,cc)) rowEmpty=false;
+      for(let rr=r2.r1;rr<=r2.r2;rr++) if(nonEmpty(rr,r2.c2)) colEmpty=false;
+      for(let rr=r2.r1;rr<=r2.r2;rr++) for(let cc=r2.c1;cc<=r2.c2;cc++) if(typeof get(rr,cc).value==='number') hasNum=true;
+      if((rowEmpty||colEmpty) && hasNum){
+        pushUndo();
+        const dr = rowEmpty ? r2.r2-1 : r2.r2, dc = colEmpty ? r2.c2-1 : r2.c2;
+        const put=(rr,cc,f)=>{ const cell=ensure(rr,cc); cell.formula=f;
+          try{ cell.value=evalFormula(f); }catch(_){ cell.value=0; } };
+        if(colEmpty) for(let rr=r2.r1;rr<=dr;rr++) put(rr, r2.c2, '=SUM('+colLetter(r2.c1)+rr+':'+colLetter(dc)+rr+')');
+        if(rowEmpty) for(let cc=r2.c1;cc<=dc;cc++) put(r2.r2, cc, '=SUM('+colLetter(cc)+r2.r1+':'+colLetter(cc)+dr+')');
+        if(rowEmpty && colEmpty) put(r2.r2, r2.c2, '=SUM('+colLetter(r2.c2)+r2.r1+':'+colLetter(r2.c2)+dr+')');
+        commitAction(); return;
+      }
+    }
     if(r2.c1===r2.c2 && r2.r2>r2.r1 && !nonEmpty(r2.r2,r2.c1)){
       let n=0; for(let rr=r2.r1;rr<r2.r2;rr++) if(typeof get(rr,r2.c1).value==='number') n++;
       if(n){ pushUndo(); const cell=ensure(r2.r2,r2.c1);

@@ -4797,3 +4797,37 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   route + ribbon bold/italic; format: +italic beat; dress: perimeter
   EARLY permutation), 3/3. Pars 21-seed foreground, dead flat.
   CACHE v164 -> v165. Wolf playtest round 3 fully shipped.
+
+## r196 — Wolf-test audit Tranche 1 (decimals, blue, foot, bridge, series)
+- ENGINE: Alt+= 2D FLOOD (Excel parity) — select the data block THROUGH
+  its empty totals row and/or column and one chord fills every SUM
+  committed: rows down the empty col, columns across the empty row, the
+  corner tied off the row-totals column. 1D range form and the
+  single-cell proposal are untouched. Parity 94 -> 96 (section AA).
+- DECIMALS v2 (was one chord family ×3): four columns, four casts —
+  alt h 9 walks, ctrl+1 X multiples in one chord, a NEGATIVE net-debt
+  column that flips to (parens) as the format lands, and a live
+  AVERAGE row included in every pass then bolded + ruled. par 60/25.
+- BLUE v2 (Wolf, live): the FULL desk palette — blue typed blocks and
+  loose singles, GREEN the tab-link, RED the 900% growth, one
+  wrongly-blue formula walked BACK to black, headers bolded, data-room
+  memo italicized. Negative case smoked: skipping the walk-back stays
+  unsolved. par 108/61.
+- FOOT v2 (was parKeys 8, totals pre-dressed): the flood is the star —
+  ONE alt+= through both empty edges lands nine live SUMs (smoked:
+  keys=2), then the player dresses the total row and circles the
+  exhibit with alt h b o. par 48/11.
+- BRIDGE v2 (was parKeys 6): second pointed row — growth = this year
+  over last MINUS one, pointed off the EBITDA row the player just
+  built (chain smoked: skipping the EBITDA fill kills it), filled,
+  cast percent, memo italicized. par 64/21.
+- SERIES v2 (was ONE check): checks split fill/dress, plus a second
+  series in the same vein — month-end date SERIALS stepped by the two
+  seeds, cast Mmm-yy via ctrl+1 d, dressed to match. par 56/24.
+- Five alts rewritten (dialog casts, picker wrapped the long way,
+  typed-SUM no-flood route, ribbon fills), 5/5 pass. Pars 21-seed
+  foreground, dead flat. CACHE v165 -> v166.
+- Gate postscript: the first full gate flagged blue's red-flag cell —
+  "1,380.0%" overflowed its 78px column on load. Whole percents
+  (decimals 0) read louder for a crazy-number flag anyway; fixed,
+  fit-sweep re-run clean, full gate re-run before ship.

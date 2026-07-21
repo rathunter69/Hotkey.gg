@@ -67,17 +67,21 @@ const ALTS = [
       {sel:o.pull0, keys:[...T('='+o.feed0),{key:'Enter'}]},
       {sel:o.pullRng, keys:[{key:'r',ctrl:true}]},
     ]; }` },
-  { key: 'foot', name: 'typed SUMs (no alt+=), columns before rows', moves: `C => [
+  { key: 'foot', name: 'typed SUMs (no flood), columns before rows, ribbon dress + perimeter', moves: `C => [
       {sel:'B6', keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
       {sel:'B6:E6', keys:[{key:'r',ctrl:true}]},
       {sel:'F2', keys:[...T('=SUM(B2:E2)'),{key:'Enter'}]},
       {sel:'F2:F5', keys:[{key:'d',ctrl:true}]},
       {sel:'F6', keys:[...T('=SUM(F2:F5)'),{key:'Enter'}]},
+      {sel:'A6:F6', keys:[{key:'Alt'},L('h'),D(1), {key:'Alt'},L('h'),L('b'),L('t')]},
+      {sel:'A1:F6', keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
     ]` },
-  { key: 'decimals', name: 'columns walked in reverse order', moves: `C => { const o=C._o; return [
-      {sel:o.pR, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
-      {sel:o.mR, keys:[{key:'Alt'},L('h'),D(0)]},
-      {sel:o.evR, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+  { key: 'decimals', name: 'dialog casts (alt o e n/x, ctrl+1 p), columns reversed, mean via ribbon', moves: `C => { const o=C._o; return [
+      {sel:o.nR, keys:[{key:'Alt'},L('o'),L('e'),L('n')]},
+      {sel:o.pR, keys:[{key:'1',ctrl:true},L('p')]},
+      {sel:o.mR, keys:[{key:'Alt'},L('o'),L('e'),L('x')]},
+      {sel:o.evR, keys:[{key:'Alt'},L('o'),L('e'),L('n')]},
+      {sel:o.meanRng, keys:[{key:'Alt'},L('h'),D(1), {key:'Alt'},L('h'),L('b'),L('t')]},
     ]; }` },
   { key: 'colops', name: 'insert the quarter BEFORE deleting DRAFT', moves: `C => { const o=C._o;
       const dc2 = o.dc + (o.ni<=o.dc ? 1 : 0);
@@ -104,10 +108,11 @@ const ALTS = [
         {sel:o.foot, keys:[{key:'b',ctrl:true}]},
         {sel:o.sc+m[2]+':'+o.sc+m[4], keys:[{key:'Alt'},L('a'),L('s'),L('d'),L('e')]},
       ]; }` },
-  { key: 'series', name: 'dress first, series last', moves: `C => { const o=C._o; return [
-      {sel:o.range, keys:[{key:'b',ctrl:true}]},
-      {sel:o.range, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.range, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+  { key: 'series', name: 'months FIRST with alt o e d cast, years last, ribbon bold', moves: `C => { const o=C._o; return [
+      {sel:o.mRange, active:o.mA, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+      {sel:o.mRange, keys:[{key:'Alt'},L('o'),L('e'),L('d'), {key:'Alt'},L('h'),D(1), {key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:o.range, active:o.a, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+      {sel:o.range, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('a'),L('r')]},
     ]; }` },
   // --- T-A tranche 2 additions (r170) ---
   { key: 'lookup', name: 'the two-way INDEX form (block + double MATCH)', moves: `C => [
@@ -122,11 +127,15 @@ const ALTS = [
       {sel:'C2', keys:[...T('=B2/$B$2'),{key:'Enter'}]},
       {sel:'C2:C6', keys:[{key:'d',ctrl:true},{key:'%',ctrl:true,shift:true}]},
     ]; }` },
-  { key: 'bridge', name: 'typed refs (no pointing) + ribbon fill right, geometry-derived', moves: `C => { const o=C._o;
-      const L2=colLetter(o.c0);
+  { key: 'bridge', name: 'typed refs (no pointing), ribbon fills, ctrl+1 percent, alt h 2 italic', moves: `C => { const o=C._o;
+      const L2=colLetter(o.c0), G2=colLetter(o.c0+1);
       return [
         {sel:o.f, keys:[...T('='+L2+(o.hr+1)+'*'+L2+(o.hr+2)),{key:'Enter'}]},
         {sel:o.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.g1, keys:[...T('='+G2+(o.hr+3)+'/'+L2+(o.hr+3)+'-1'),{key:'Enter'}]},
+        {sel:o.gRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.gRng, keys:[{key:'1',ctrl:true},L('p')]},
+        {sel:o.memoRng, keys:[{key:'Alt'},L('h'),D(2)]},
       ]; }` },
   { key: 'autofit', name: 'uniform width FIRST, then content-fit; both via ribbon', moves: `C => { const o=C._o; return [
       {sel:o.uRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]},
@@ -327,9 +336,17 @@ const ALTS = [
         {sel:'B15', keys:[...T('=B8-B14'),{key:'Enter'}]},
         {sel:'B15:E15', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       ]; }` },
-  { key: 'blue', name: 'scatter painted in REVERSE — loose singles before the blocks', moves: `C => { const s=C._scatter;
+  { key: 'blue', name: 'convention strip FIRST, picker wrapped the long way, ribbon bold/italic', moves: `C => { const s=C._scatter;
       const chord=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
+      const wrapL=n=>{ const a=[{key:'Alt'},L('h'),L('f'),L('c')]; for(let i=0;i<n;i++) a.push({key:'ArrowLeft'}); a.push({key:'Enter'}); return a; };
+      const wrapR=n=>{ const a=[{key:'Alt'},L('h'),L('f'),L('c')]; for(let i=0;i<n;i++) a.push({key:'ArrowRight'}); a.push({key:'Enter'}); return a; };
       return [
+        {sel:s.lk, keys:wrapR(8)},
+        {sel:s.rk, keys:wrapL(5)},
+        {sel:s.d1, keys:wrapL(10)},
+        {sel:s.memo, keys:[{key:'Alt'},L('h'),D(2)]},
+        {sel:s.h2, keys:[{key:'Alt'},L('h'),D(1)]},
+        {sel:s.h1, keys:[{key:'Alt'},L('h'),D(1)]},
         {sel:s.s2, keys:chord},
         {sel:s.s1, keys:chord},
         {sel:s.b2.a+':'+s.b2.b, keys:chord},
