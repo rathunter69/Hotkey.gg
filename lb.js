@@ -516,6 +516,7 @@ function showPublicCard(uid){
     pr.textContent='reported \u2713'; pr.style.pointerEvents='none'; }catch(e){} };
   document.addEventListener('keydown', esch, true);
   document.body.appendChild(m);
+  try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(m)); }catch(e){}  // r385: card-skin particles (public card)
 }
 document.addEventListener('click', e=>{
   const el=e.target.closest ? e.target.closest('[data-uid]') : null;
@@ -1434,6 +1435,7 @@ function renderAll(){
       '<div class="browse" style="grid-column:1/-1">'+browserHtml()+'</div>';
   }
   wire(); wireGuild();
+  try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx()); }catch(e){}  // r385: card-skin particles (hero)
   document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; renderAll(); });
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};

@@ -816,6 +816,7 @@
        cached profile row, re-run renderProfile, and the frame is on before the
        gallery closes. */
     const cz=$('pcCustomize'); if(cz) cz.onclick=()=>{ try{ openFrameGallery(); }catch(e){} };
+    try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(m)); }catch(e){}  // r385: card-skin particles (player card)
     function openFrameGallery(){
       const stale=document.getElementById('frameGallery'); if(stale) stale.remove();
       let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}

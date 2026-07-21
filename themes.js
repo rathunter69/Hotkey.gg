@@ -830,6 +830,34 @@ window.HK_FRAMES = [
    desc:'steel-navy laurels — the beta-tester class', earn:'account created during the beta'},
   {id:'bone',          name:'Bone',            tier:'egg',
    desc:'subtle off-white coloring, tasteful thickness', earn:'post a run at perfect efficiency — every keystroke optimal'},
+  /* ---- r385 CARD SKINS (Wolf board) — full-interior title skins. Each themes the
+     whole card (interior + border + a top-notch title + optional particle animation),
+     not just the border. hkFrameOrnaments emits the notch tab + fx canvas; nav.css
+     carries the interior + border + name treatment; hkInitCardFx drives the canvas. ---- */
+  {id:'circuit',    name:'Circuit',      tier:'epic',
+   desc:'neural grid wash + glowing chips',            earn:'clear a full rapid-fire set'},
+  {id:'neon',       name:'Neon',         tier:'epic',
+   desc:'cyberpunk magenta/cyan glow',                 earn:'hold a 10-win daily streak'},
+  {id:'blueprint',  name:'Blueprint',    tier:'rare',
+   desc:'drafting grid + dashed chips',                earn:'reach First-Year Analyst'},
+  {id:'crt',        name:'CRT Terminal', tier:'rare',
+   desc:'phosphor scanlines, terminal green',          earn:'complete the reference tour'},
+  {id:'constellation', name:'Constellation', tier:'epic',
+   desc:'animated starfield + Cinzel name',            earn:'reach Associate'},
+  {id:'vaporwave',  name:'Vaporwave',    tier:'epic',
+   desc:'retro synth sunset + grid horizon',           earn:'reach Summer Analyst'},
+  {id:'terminal',   name:'Terminal',     tier:'epic',
+   desc:'bloomberg amber + live ticker',               earn:'finish a timed sprint set'},
+  {id:'pro',        name:'PRO · Cosmic', tier:'epic',
+   desc:'deep space + gilt border',                    earn:'upgrade to PRO'},
+  {id:'noir',       name:'Noir',         tier:'legendary',
+   desc:'murdered-out black — zero color',             earn:'reach a top rank (VP or above)'},
+  {id:'frostbite',  name:'Frostbite',    tier:'legendary',
+   desc:'glacial ice + drifting snow',                 earn:'post a perfect-efficiency run'},
+  {id:'molten',     name:'Molten',       tier:'legendary',
+   desc:'magma cracks + rising embers',                earn:'hold a 30-day streak (5 daily wins)'},
+  {id:'founder',    name:'Founder',      tier:'legendary',
+   desc:'holographic foil — first 200 PRO, serialized', earn:'charter / first-200 PRO member'},
 ];
 /* u = {lvl, tierBest, dailyWins, certs, charter, perfectRun}. tierBest is a
    HK_RANK.TIERS index (highest tier ever DISPLAYED — nav.js persists it into
@@ -850,6 +878,20 @@ window.hkFrameUnlocked = function(id, u){
     case 'heraldic':      return (u.dailyWins|0) >= 5 || (u.certs|0) >= 3;
     case 'charter':       return !!u.charter;
     case 'bone':          return !!u.perfectRun;
+    /* r385 card skins — earn thresholds off the same signals (lvl/tierBest/dailyWins/
+       certs/charter/perfectRun). Display always trusts stored flair; this gates PICKING. */
+    case 'circuit':       return (u.dailyWins|0) >= 1 || (u.lvl|0) >= 8;
+    case 'neon':          return (u.dailyWins|0) >= 10;
+    case 'blueprint':     return tb >= 3;
+    case 'crt':           return (u.lvl|0) >= 12;
+    case 'constellation': return tb >= 4;
+    case 'vaporwave':     return tb >= 2;
+    case 'terminal':      return (u.certs|0) >= 1;
+    case 'pro':           return tb >= 6 || !!u.pro;
+    case 'noir':          return tb >= 5;
+    case 'frostbite':     return !!u.perfectRun;
+    case 'molten':        return (u.dailyWins|0) >= 5;
+    case 'founder':       return !!u.charter || !!u.founder;
   }
   return false;
 };
@@ -978,10 +1020,41 @@ window.hkFrameOrnaments = (function(){
   /* r382: opts.lg — the large-card variant (the 640px profile card wears
      .hk-frame-lg). Only heraldic draws EXTRA art for it (denser filigree);
      everything else scales through the nav.css ornament sizes. */
+  /* r385 skins: [title, tab-fg, tab-bg, tab-border, fx-kind|'' , extraFlags]
+     fx-kind drives hkInitCardFx (snow/fire/prism/stars/none). */
+  const SKINS={
+    circuit:      ['NEURAL',      '#04222a', 'linear-gradient(90deg,#1c6a68,#2aa89c)', '#2aa89c', ''],
+    neon:         ['OVERCLOCK',   '#0b0410', 'linear-gradient(120deg,#ff2d95,#2edcff)', '#ff2d95', ''],
+    blueprint:    ['SHEET 01',    '#0c1a26', 'linear-gradient(90deg,#2f5b86,#4f7aa8)', '#4f7aa8', ''],
+    crt:          ['C:\\ READY',  '#04140a', 'linear-gradient(90deg,#1c6a38,#2fae5c)', '#2fae5c', ''],
+    constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','stars'],
+    vaporwave:    ['SYNTHWAVE',   '#1a0722', 'linear-gradient(120deg,#ff5db1,#2ee6e6)', '#ff5db1', 'sun'],
+    terminal:     ['● LIVE', '#1a1204', 'linear-gradient(90deg,#3a2a08,#7a5a12)', '#e0a02f', ''],
+    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'stars'],
+    noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
+    frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
+    molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
+    founder:      ['★ FOUNDER','#100f18','linear-gradient(120deg,#ff5db1,#8fe0ff,#c89bff)','#c89bff','prism']
+  };
   return function(id, opts){
     const M=window.HK_METALS||{};
     const bk=(opts && typeof opts.bucket==='number') ? Math.max(0, Math.min(2, opts.bucket|0)) : 1;
     const lg=!!(opts && opts.lg);
+    const mini=!!(opts && opts.mini);
+    if(SKINS[id]){
+      const s=SKINS[id];
+      if(window.hkEnsureSkinFonts) window.hkEnsureSkinFonts();
+      // the tiny picker swatch shows interior+border only — no notch/canvas
+      if(mini) return '';
+      let h='';
+      if(s[4]) h+='<canvas class="hk-fx" data-kind="'+s[4]+'" aria-hidden="true"></canvas>';
+      if(id==='vaporwave') h+='<span class="hkf-sun" aria-hidden="true"></span><span class="hkf-vgrid" aria-hidden="true"></span>';
+      if(id==='molten')  h+='<svg class="hkf-crack" viewBox="0 0 360 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 L100 48 L165 86 L250 58 M165 86 L215 122 M100 48 L72 112 M250 58 L360 66"/></svg>';
+      if(id==='frostbite') h+='<svg class="hkf-crack" viewBox="0 0 360 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 50 L90 66 L150 46 L240 84 M150 46 L200 118 M240 84 L360 74"/></svg>';
+      h+=tab(s[0], s[1], s[2], s[3]);
+      if(id==='founder') h+='<i class="hkf-serial" aria-hidden="true">FOUNDER · 007 / 200</i>';
+      return h;
+    }
     if(id==='engraved') return GLINT+corners(ENG);
     if(id==='foil')     return GLINT+corners(FOIL);
     if(id==='heraldic'){
@@ -1011,6 +1084,68 @@ window.hkFrameBucket = function(){
     const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
     return fl.tierBestBucket==null ? 1 : ((fl.tierBestBucket|0)%3);
   }catch(e){ return 1; }
+};
+
+/* ---- r385: display-fonts for the card skins (Orbitron/VT323/Cinzel). Injected once,
+   idempotent, display=swap so the card never blocks on them. ---- */
+window.hkEnsureSkinFonts = function(){
+  try{
+    if(document.getElementById('hk-skin-fonts')) return;
+    const l=document.createElement('link'); l.id='hk-skin-fonts'; l.rel='stylesheet';
+    l.href='https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Orbitron:wght@700&family=VT323&display=swap';
+    document.head.appendChild(l);
+  }catch(e){}
+};
+
+/* ---- r385: particle systems behind the animated skins. Finds every .hk-fx canvas
+   inside `root` (default document), sizes to its card, and runs a compositor-light
+   rAF loop. Reduced-motion → a single calm static field, no loop. Idempotent per
+   canvas (marks _hkfx). Kinds: snow · fire (embers+ash) · prism · stars · sun. ---- */
+window.hkInitCardFx = function(root){
+  try{
+    root = root || document;
+    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canv = [].slice.call(root.querySelectorAll ? root.querySelectorAll('canvas.hk-fx') : []);
+    if(!canv.length) return;
+    window.hkEnsureSkinFonts();
+    const R=(a,b)=>a+Math.random()*(b-a);
+    function fit(cv){
+      const box=cv.parentElement; if(!box) return null;
+      const r=box.getBoundingClientRect(); const dpr=Math.min(2, window.devicePixelRatio||1);
+      cv.width=Math.max(1,Math.floor(r.width*dpr)); cv.height=Math.max(1,Math.floor(r.height*dpr));
+      cv.style.width='100%'; cv.style.height='100%';   // keep the display box glued to the card, never the buffer size
+      return {ctx:cv.getContext('2d'), w:cv.width, h:cv.height, dpr};
+    }
+    function snow(w,h){const n=Math.round(w*h/9000)+16,p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,2.3),vy:R(.2,.8),ph:R(0,6.28),amp:R(.2,.8),o:R(.35,.95)});return p;}
+    function ember(w,h){const ash=Math.random()<.34;return{x:R(0,w),y:h+R(0,16),r:ash?R(1,2.5):R(.7,2),vy:ash?R(.3,.7):R(.7,1.5),drift:R(-.25,.25),ph:R(0,6.28),ash,life:0,max:R(55,140)};}
+    function fire(w,h){const n=Math.round(w/7)+16,p=[];for(let i=0;i<n;i++)p.push(ember(w,h));return p;}
+    function prism(w,h){const n=Math.round(w*h/17000)+6,cols=['#ff9ed4','#a8e6ff','#c9b8ff','#8ff0c8','#ffe0a0'],p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.8),ph:R(0,6.28),sp:R(.6,1.6),c:cols[i%cols.length]});return p;}
+    function stars(w,h){const n=Math.round(w*h/6500)+10,cols=['#ffffff','#cfd6ff','#ffe9b8'],p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.5,1.6),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
+    const sys=[];
+    canv.forEach(cv=>{
+      if(cv._hkfx) return; cv._hkfx=1;
+      const kind=cv.dataset.kind, S=fit(cv); if(!S) return;
+      let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?prism(S.w,S.h) : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
+      sys.push({cv,kind,S,parts});
+    });
+    if(!sys.length) return;
+    function draw(o,t){
+      const S=o.S, ctx=S.ctx, w=S.w, h=S.h, dpr=S.dpr; ctx.clearRect(0,0,w,h);
+      if(o.kind==='snow'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=Math.sin(t/900+s.ph)*s.amp*.5; if(s.y>h+3){s.y=-3;s.x=R(0,w);}}
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(224,244,255,'+s.o+')';ctx.shadowBlur=6*dpr;ctx.shadowColor='rgba(170,220,255,.7)';ctx.fill(); } ctx.shadowBlur=0; }
+      else if(o.kind==='fire'){ for(let i=0;i<o.parts.length;i++){ let e=o.parts[i];
+        if(!reduce){e.y-=e.vy*dpr; e.x+=(e.drift+Math.sin(t/500+e.ph)*.3)*dpr; e.life++; if(e.y<-4||e.life>e.max){o.parts[i]=ember(w,h);continue;}}
+        const k=e.life/e.max,a=Math.max(0,1-k); ctx.beginPath();ctx.arc(e.x,e.y,e.r*dpr,0,6.28);
+        if(e.ash){ctx.fillStyle='rgba(120,108,98,'+(a*.5)+')';ctx.shadowBlur=0;}
+        else{const hot=Math.max(0,1-k*1.4);ctx.fillStyle='rgba(255,'+Math.round(150+hot*90)+','+Math.round(40+hot*60)+','+a+')';ctx.shadowBlur=7*dpr;ctx.shadowColor='rgba(255,140,50,.9)';}
+        ctx.fill(); } ctx.shadowBlur=0; }
+      else { for(const s of o.parts){ const a=reduce?.7:(.35+.55*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
+    }
+    if(reduce){ sys.forEach(o=>draw(o,0)); return; }
+    (function loop(t){ let alive=false; sys.forEach(o=>{ if(o.cv.isConnected){ alive=true; draw(o,t); } });
+      if(alive) requestAnimationFrame(loop); })(0);
+  }catch(e){}
 };
 
 /* ---- achievement badges: hex medals, single source ---- */
