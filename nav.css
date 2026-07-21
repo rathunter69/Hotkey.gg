@@ -622,11 +622,19 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 /* particle layer sits behind the content; readable content is lifted, absolute
    controls (✕) are only raised in z, never re-positioned. */
 [class*="hk-frame-"] .hk-fx{position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit}
-[class*="hk-frame-"] .pc-head,[class*="hk-frame-"] .pc-body,[class*="hk-frame-"] .pc-name,
-[class*="hk-frame-"] .pub-cap,[class*="hk-frame-"] .pub-hero,[class*="hk-frame-"] .pub-nm,[class*="hk-frame-"] .pub-body,
-[class*="hk-frame-"] .yc-top,[class*="hk-frame-"] .yc-mid,[class*="hk-frame-"] .yc-bot,
-[class*="hk-frame-"] .tc-top,[class*="hk-frame-"] .tc-meta,[class*="hk-frame-"] .tc-sub{position:relative; z-index:1}
+[class*="hk-frame-"] .pc-scroll,[class*="hk-frame-"] .pc-head,[class*="hk-frame-"] .pc-body,[class*="hk-frame-"] .pc-name,[class*="hk-frame-"] .pc-foot,
+[class*="hk-frame-"] .pub-cap,[class*="hk-frame-"] .pub-hero,[class*="hk-frame-"] .pub-tiles,[class*="hk-frame-"] .pub-best,[class*="hk-frame-"] .pub-nm,[class*="hk-frame-"] .pub-body,
+[class*="hk-frame-"] .yc-top,[class*="hk-frame-"] .yc-mid,[class*="hk-frame-"] .yc-bot,[class*="hk-frame-"] h4,
+[class*="hk-frame-"] .tc-top,[class*="hk-frame-"] .tc-meta,[class*="hk-frame-"] .tc-sub{position:relative; z-index:2}
 [class*="hk-frame-"] .pc-x{z-index:6}
+/* the elite skins are self-contained dark cards: inner stat/crest/level panels must
+   stay dark regardless of the viewer's page theme (default is the light 'daylight').
+   Translucent-black tints darken whatever the skin interior is, staying cohesive. */
+.hk-frame-circuit,.hk-frame-neon,.hk-frame-blueprint,.hk-frame-crt,.hk-frame-constellation,
+.hk-frame-vaporwave,.hk-frame-terminal,.hk-frame-pro,.hk-frame-noir,.hk-frame-frostbite,
+.hk-frame-molten,.hk-frame-founder{--surface2:rgba(0,0,0,.32); --surface:rgba(0,0,0,.4); --faint:rgba(255,255,255,.34)}
+/* decorative crack sits BEHIND content, ambient not a slash */
+.hkf-crack{z-index:0; opacity:.7}
 /* the skin title notch — reshape the pill tab into an inlaid nameplate */
 .hk-frame-circuit .hkf-tab,.hk-frame-neon .hkf-tab,.hk-frame-blueprint .hkf-tab,.hk-frame-crt .hkf-tab,
 .hk-frame-constellation .hkf-tab,.hk-frame-vaporwave .hkf-tab,.hk-frame-terminal .hkf-tab,.hk-frame-pro .hkf-tab,
