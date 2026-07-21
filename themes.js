@@ -895,6 +895,54 @@ window.hkFrameUnlocked = function(id, u){
   }
   return false;
 };
+/* ---- r387: flair carries the whole card loadout, not just the frame. Historically
+   profiles.flair held a bare frame id ("molten"). To let the Profile customizer
+   persist the extended loadout (which elements show, which stats to highlight, the
+   equipped title) WITHOUT a schema migration, flair may ALSO be a JSON blob:
+     {"f":"molten","sh":{"rank":1,"level":1,"streak":1,"desk":0},"st":["solves","crowns","streak"],"ti":"pro"}
+   hkFlair(raw) normalizes EITHER shape to {frame, show, stats, title}. Every legacy
+   read site that only wants the frame stays correct by reading .frame — the bare-id
+   path is preserved verbatim. hkFlairPack() round-trips: it emits a bare id when no
+   extended prefs are set (keeps the column clean + old readers happy) and JSON only
+   when the user has actually customized beyond the frame. Both are dependency-free. */
+window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy'];
+window.hkFlair = function(raw){
+  const FR = window.HK_FRAMES || [];
+  const validFrame = id => id && /^[a-z0-9_-]{1,32}$/i.test(id) && FR.some(f=>f.id===id) ? id : null;
+  const def = { frame:null, show:{rank:true, level:true, streak:true, desk:false}, stats:[], title:null };
+  if(raw==null || raw==='') return def;
+  const s = String(raw).trim();
+  if(s.charAt(0) === '{'){
+    let o=null; try{ o=JSON.parse(s); }catch(e){ o=null; }
+    if(o && typeof o==='object'){
+      const show = Object.assign({}, def.show);
+      if(o.sh && typeof o.sh==='object'){ ['rank','level','streak','desk'].forEach(k=>{ if(k in o.sh) show[k]=!!o.sh[k]; }); }
+      const stats = Array.isArray(o.st) ? o.st.filter(k=>window.HK_STAT_KEYS.indexOf(k)>=0).slice(0,3) : [];
+      const title = (typeof o.ti==='string' && /^[a-z0-9_-]{1,32}$/i.test(o.ti)) ? o.ti : null;
+      return { frame: validFrame(o.f), show, stats, title };
+    }
+    return def;
+  }
+  // legacy bare frame id
+  return { frame: validFrame(s), show: Object.assign({}, def.show), stats: [], title: null };
+};
+window.hkFlairPack = function(l){
+  l = l || {};
+  const frame = (l.frame && /^[a-z0-9_-]{1,32}$/i.test(l.frame)) ? l.frame : null;
+  const show = l.show || {};
+  const stats = Array.isArray(l.stats) ? l.stats.filter(k=>(window.HK_STAT_KEYS||[]).indexOf(k)>=0).slice(0,3) : [];
+  const title = (l.title && /^[a-z0-9_-]{1,32}$/i.test(l.title)) ? l.title : null;
+  // does the loadout differ from the defaults? if not, keep it a bare id (or null).
+  const shOff = ('rank' in show && !show.rank) || ('level' in show && !show.level) ||
+                ('streak' in show && !show.streak) || (!!show.desk);
+  if(!stats.length && !title && !shOff) return frame;   // clean bare-id path
+  const o = { f: frame };
+  if(shOff) o.sh = { rank: show.rank!==false?1:0, level: show.level!==false?1:0,
+                     streak: show.streak!==false?1:0, desk: show.desk?1:0 };
+  if(stats.length) o.st = stats;
+  if(title) o.ti = title;
+  return JSON.stringify(o);
+};
 /* Ornament HTML per frame — '' for frames that are pure CSS (bone). Corner SVGs
    ride .hkf-cn/.hkf-c1..c4 (c2-c4 mirror via CSS transforms); the tier tab is an
    .hkf-tab <i> colored inline from HK_METALS. .hkf-glint is the specular-sweep
@@ -1162,20 +1210,27 @@ window.hkPlayerCard = function(d, opts){
   const full = opts.scale !== 'compact';   // 'full' | 'compact' (default full)
   const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let cls = 'uc' + (full ? '' : ' compact'), orn = '';
-  const fv = d.flair;
+  // r387: d.flair may be a bare frame id, a full loadout JSON, or null (host carries
+  // the skin). Normalize to the frame id for the class/ornaments either way.
+  const fv = (d.flair && window.hkFlair) ? window.hkFlair(d.flair).frame : d.flair;
   if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
     cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
     orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full}) : '';
   }
+  // r387: show-on-card toggles. Absent d.show => show everything (legacy callers).
+  const show = d.show || {};
+  const showRank = show.rank !== false, showLevel = show.level !== false;
   const stats = (d.stats||[]).map(s=>
     '<span class="s"><b>'+esc(s.n)+'</b><span>'+esc(s.label)+'</span></span>').join('');
-  let h = '<div class="'+cls+'">'+orn+
-    '<div class="uc-head"><span class="uc-crest">'+(d.tierEmblem||'')+'</span>'+
-      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+
-        '<div class="uc-tier">'+(d.tierChipEmblem||'')+'<span>'+esc(d.tierLabel)+'</span></div></div>'+
-      '<div class="uc-lvlwrap"><div class="uc-lvl">LVL '+esc(d.lvl)+'</div>'+
+  const crestHtml = showRank ? '<span class="uc-crest">'+(d.tierEmblem||'')+'</span>' : '';
+  const tierHtml = showRank ? '<div class="uc-tier">'+(d.tierChipEmblem||'')+'<span>'+esc(d.tierLabel)+'</span></div>' : '';
+  const lvlHtml = showLevel ? '<div class="uc-lvlwrap"><div class="uc-lvl">LVL '+esc(d.lvl)+'</div>'+
         '<div class="uc-bar"><i style="width:'+(d.pct||0)+'%"></i></div>'+
-        '<div class="uc-xp">'+esc(d.xpLine)+'</div></div>'+
+        '<div class="uc-xp">'+esc(d.xpLine)+'</div></div>' : '';
+  let h = '<div class="'+cls+(showRank?'':' no-rank')+(showLevel?'':' no-lvl')+'">'+orn+
+    '<div class="uc-head">'+crestHtml+
+      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+tierHtml+'</div>'+
+      lvlHtml+
     '</div>';
   if(full){
     h += '<hr class="uc-div"><div class="uc-stats">'+stats+'</div>';

@@ -669,8 +669,8 @@
               localStorage.setItem('hk_ach_seen', JSON.stringify([...new Set([...seen, ...earnedList.map(e=>e.a.id)])]));   /* r371: union — this surface can't evaluate every feat, so it must never shrink the list */
             }catch(e){}
             // r135: SHOWCASE — the player's picked medals lead (profiles.featured_ach,
-            // curated on the stats page); rarest-3 remains the fallback. The full grid
-            // moved to stats.html — the card stays a highlight reel.
+            // curated on the PROFILE page as of r387); rarest-3 remains the fallback.
+            // The full analytics grid still lives on stats.html — the card is a reel.
             let picks=[];
             try{ const meP2=(d._profs||[]).find(x=>x.id===window._navUser.id);
               if(meP2 && meP2.featured_ach!=null) picks=String(meP2.featured_ach).split(',').filter(Boolean); }catch(e){}
@@ -679,7 +679,7 @@
             const showcase = picks.map(id=>earnedById[id]).filter(Boolean).slice(0,3);
             const shown = showcase.length ? showcase : earnedList.slice(0,3);
             let out='<div class="pc-ach-h">achievements <span style="color:var(--faint)">'+earnedList.length+' / '+AC.length+'</span>'+
-              '<a href="stats.html#achievements" style="float:right;font-size:9.5px;color:var(--accent);text-decoration:none">'+(showcase.length?'edit showcase':'pick your showcase')+' \u2197</a></div>';
+              '<a href="profile.html#showcase" style="float:right;font-size:9.5px;color:var(--accent);text-decoration:none">'+(showcase.length?'edit showcase':'pick your showcase')+' \u2197</a></div>';
             if(shown.length){
               out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+shown.map(e=>
                 /* r150: the % is only honest at field scale \u2014 below that, speak in tier words */
@@ -786,7 +786,11 @@
        is the fast lane. Saving re-renders the OPEN card immediately: mutate the
        cached profile row, re-run renderProfile, and the frame is on before the
        gallery closes. */
-    const cz=$('pcCustomize'); if(cz) cz.onclick=()=>{ try{ openFrameGallery(); }catch(e){} };
+    /* r387: the ✎ now routes to the dedicated Profile page (the full loadout
+       customizer — frame, title, what-shows, medals, highlight stats) instead of the
+       in-modal frame-only gallery. openFrameGallery stays defined below as the legacy
+       quick-swap fallback (unused by default). */
+    const cz=$('pcCustomize'); if(cz) cz.onclick=()=>{ location.href='profile.html'; };
     try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(m)); }catch(e){}  // r385: card-skin particles (player card)
     function openFrameGallery(){
       const stale=document.getElementById('frameGallery'); if(stale) stale.remove();
@@ -924,6 +928,7 @@
           '<svg class="um-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</button>' +
         '<div class="user-dropdown" id="userDropdown" role="menu">' +
+          (anon ? '' : '<a href="profile.html" title="your player card, cosmetics &amp; showcase">Your profile</a>') +
           '<a href="stats.html">Your numbers</a>' +
           (anon ? '' : '<a href="desks.html" title="your desk\u2019s hall \u2014 quests, roster, standings">Your desk</a>') +
           saveItem +

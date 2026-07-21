@@ -386,7 +386,7 @@ async function load(){
           '<button class="ach-f" data-f="prog">in progress</button>'+
           '<button class="ach-f" data-f="locked">locked</button>'+
         '</span></h3>'+
-        '<div class="ach-hint">medals sort rarest-first \u00b7 click an earned one to <b style="color:var(--warn)">\u2605 showcase</b> it on your player card \u00b7 up to 3 (oldest pick swaps out)'+(me?'':' \u00b7 sign in to show them on the boards')+
+        '<div class="ach-hint">medals sort rarest-first \u00b7 pick which to <b style="color:var(--warn)">\u2605 showcase</b> on your player card from <a href="profile.html#showcase" style="color:var(--accent)">your profile \u2197</a>'+(me?'':' \u00b7 sign in to show them on the boards')+
         /* r376: legend rides the shared HK_RARITY map \u2014 same colors the badge rings wear */
         (function(){ const RC=window.HK_RARITY||{};
           return '<br>ring = rarity: <b style="color:'+RC.c+'">COMMON</b> \u00b7 <b style="color:'+RC.r+'">RARE</b> (\u226425% of players) \u00b7 <b style="color:'+RC.e+'">EPIC</b> (\u226410%) \u00b7 <b style="color:'+RC.l+'">LEGENDARY</b> (\u22643%) \u00b7 <b style="color:'+RC.m+'">MYTHIC</b> (the rarest handful)</div>'; })()+
@@ -572,20 +572,10 @@ async function load(){
   document.querySelectorAll('.ach-f').forEach(b=>b.onclick=(ev)=>{ ev.stopPropagation();
     document.querySelectorAll('.ach-f').forEach(x=>x.classList.toggle('on', x===b));
     const g=document.querySelector('.ach-grid'); if(g){ if(b.dataset.f==='all') g.removeAttribute('data-f'); else g.setAttribute('data-f', b.dataset.f); } });
-  // wire the showcase picker (delegated once — root is re-rendered wholesale)
-  try{
-    const rootEl=document.getElementById('root');
-    rootEl.addEventListener('click', async (ev)=>{
-      const el=ev.target.closest ? ev.target.closest('.ach-pick.earned') : null;
-      if(!el) return;
-      const id=el.getAttribute('data-ach');
-      if(feat.includes(id)) feat=feat.filter(x=>x!==id);
-      else { if(feat.length>=3) feat.shift(); feat.push(id); }
-      try{ localStorage.setItem('hk_feat_ach', JSON.stringify(feat)); }catch(e){}
-      if(sb && me){ try{ await sb.from('profiles').update({featured_ach:feat.join(',')}).eq('id',me.id); }catch(e){} }
-      document.querySelectorAll('.ach-pick').forEach(x=>x.classList.toggle('feat', feat.includes(x.getAttribute('data-ach')) && x.classList.contains('earned')));
-    });
-  }catch(e){}
+  // r387 (Wolf): the achievements WALL stays here as analytics (full grid, rarity,
+  // progress) but SHOWCASE PICKING moved to the Profile page — this wall is now
+  // display-only. The featured picks still render (the .feat class above), you just
+  // choose them on profile.html#showcase now.
 }
 load();
 </script>
