@@ -557,7 +557,7 @@ window.rankEmblem = (function(){
      the shatter cracks — the model survived its #REF! beginnings. */
   /* r378 (Wolf): quoted #REF! · COOKED · the locked ref moves to First-Year · LOCKED IN ·
      SHEET SHOW · GLAZED at the summit */
-  const MOTTO=['\u201c#REF!\u201d','ESC','COOKED','$A$1','LOCKED IN','SHEET SHOW','CTRL FREAK','GLAZED'];
+  const MOTTO=['\u201c#REF!\u201d','ESC ARTIST','COOKED','$A$1','LOCKED IN','BALDING','CTRL FREAK','GLAZED'];   /* r379 (Wolf): the Candidate escaped, the VP is balding */
   /* r377 BUCKET-SCALED FURNITURE — the dress grid. Row = tier, column = bucket
      (bottom/middle/top; no-bucket renders the middle column). Keys: r rivets ·
      bd bordure · m mantling stage (1 upper curl, 2 full) · b banner ·
