@@ -761,6 +761,10 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    from the .hk-frame-<id> rules above. Public card renders at full scale, the
    your-card hero at compact. ---- */
 .uc{position:relative;border-radius:16px;padding:22px 24px 18px}
+/* inside the owner modal the .pc-card shell already pads + carries the skin, so the
+   nested unified card drops its own frame padding (no double box) */
+.pc-card .uc{padding:0;border-radius:0}
+.pc-card .pc-scroll{position:relative;z-index:2}
 .uc>*:not(.hk-fx):not(.hkf-tab):not(.hkf-serial):not(.hkf-sun):not(.hkf-vgrid){position:relative;z-index:2}
 .uc-head{display:flex;align-items:center;gap:16px}
 .uc-crest{line-height:0;flex:none}
