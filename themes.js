@@ -1276,11 +1276,23 @@ window.HK_GLYPHS2 = {
   daily:'<circle cx="20" cy="20" r="6"/><path d="M20 6 V10 M20 30 V34 M6 20 H10 M30 20 H34 M10 10 L13 13 M27 27 L30 30 M30 10 L27 13 M13 27 L10 30"/>',
   crown:'<path d="M9 30 L9 15 L16 22 L20 9 L24 22 L31 15 L31 30 Z"/>',
   mastery:'<path d="M4 16 L20 9 L36 16 L20 23 Z"/><path d="M12 19 V26 C12 29.5 28 29.5 28 26 V19"/><path d="M36 16 V25 L34 29"/>',
-  moon:'<path d="M27 6 A14 14 0 1 0 27 34 A11 11 0 1 1 27 6 Z" fill="currentColor" stroke="none"/>',
+  moon:'<path fill-rule="evenodd" fill="currentColor" stroke="none" d="M3 20 A14 14 0 1 0 31 20 A14 14 0 1 0 3 20 Z M12 20 A13 13 0 1 0 38 20 A13 13 0 1 0 12 20 Z"/>',
   people:'<circle cx="14" cy="15" r="4.2"/><circle cx="26" cy="15" r="4.2"/><path d="M6 31 C6 24.5 22 24.5 22 31 M18 31 C18 25 34 25 34 31"/>',
   founder:'<circle cx="14" cy="14" r="5.4" fill="#e0503f" stroke="none"/><circle cx="26" cy="14" r="5.4" fill="#e0902f" stroke="none"/><circle cx="14" cy="26" r="5.4" fill="#3fae6a" stroke="none"/><circle cx="26" cy="26" r="5.4" fill="#3f8fe0" stroke="none"/>',
   keycap:'<rect x="7" y="7" width="26" height="26" rx="5"/><rect x="11" y="11" width="18" height="14" rx="2"/><path d="M11 29 H29"/>',
-  mouse:'<path d="M20 8 C13.9 8 11 12 11 20 C11 28 14 33 20 33 C26 33 29 28 29 20 C29 12 26.1 8 20 8 Z"/><path d="M20 8 V19 M11 19 H29"/>'
+  mouse:'<path d="M20 8 C13.9 8 11 12 11 20 C11 28 14 33 20 33 C26 33 29 28 29 20 C29 12 26.1 8 20 8 Z"/><path d="M20 8 V19 M11 19 H29"/>',
+  ice:'<path d="M20 5 V35 M7 12 L33 28 M33 12 L7 28 M20 5 L16.5 8.5 M20 5 L23.5 8.5 M20 35 L16.5 31.5 M20 35 L23.5 31.5 M7 12 L11.5 12.6 M7 12 L7.6 16.5 M33 28 L28.5 27.4 M33 28 L32.4 23.5 M33 12 L32.4 16.5 M33 12 L28.5 12.6 M7 28 L7.6 23.5 M7 28 L11.5 27.4"/>'
+};
+/* r387 (Wolf): the FINAL-PASS icons are clean glyphs meant to blend into the title
+   skin — NOT the old engraved hexagon. hkGlyph draws just the glyph (no hex, no
+   rarity ring); rarity is carried by the medal's halo (hkMedalCard). Used on the card
+   / showcase; the stats analytics wall still uses hkBadge's hex medal. */
+window.hkGlyph = function(id, size, color){
+  const g = (window.HK_GLYPHS2||{})[id];
+  if(!g) return '';
+  size = size || 34; color = color || 'currentColor';
+  return '<svg class="hk-glyph" viewBox="0 0 40 40" width="'+size+'" height="'+size+'" style="color:'+color+';overflow:visible">'+
+    '<g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">'+g+'</g></svg>';
 };
 window.hkBadge = function(id, earned, size, color, rarity){
   /* r376: 'glyph keeps family color, ring carries rarity' — the r138 metal tint
@@ -1421,14 +1433,19 @@ window.hkEffRarity = function(tier, dataPct, fieldN){
 window.hkMedalCard = function(glyph, rarityPct, name, size, bare){
   size = size || 34;
   const meta = window.hkRarityMeta ? window.hkRarityMeta(rarityPct) : { color:'#8a8f98', weight:4, word:'' };
-  const rare = meta.weight <= 3;   // rare/epic/legendary/mythic get the halo
-  // bare (picker/slots on a light panel): the rarity glyph inherits currentColor so it
-  // reads on light; the full tray (on a card skin) uses light steel for skin contrast.
-  const badge = window.hkBadge ? window.hkBadge(glyph, true, size, bare?'currentColor':'#cfd2d8', rarityPct) : '';
+  const rare = meta.weight <= 3;   // rare/epic/legendary/mythic show the rarity dot
+  // r387 (Wolf): the CLEAN glyph — no old hexagon, and NO halo (it fuzzed the vector
+  // and read low-quality). Rarity is a crisp corner dot, exactly like the r385 scratch
+  // tiles. bare (light picker/slots) inherits currentColor; the dark tray uses light
+  // steel for skin contrast. Falls back to hkBadge only for legacy non-family glyphs.
+  const badge = (window.hkGlyph && window.HK_GLYPHS2 && window.HK_GLYPHS2[glyph])
+    ? window.hkGlyph(glyph, size+4, bare?'currentColor':'#d2d5db')
+    : (window.hkBadge ? window.hkBadge(glyph, true, size, bare?'currentColor':'#cfd2d8', rarityPct) : '');
   const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const dot = rare ? '<i class="hk-medc-dot" style="background:'+meta.color+'"></i>' : '';
   return '<span class="hk-medc'+(bare?' bare':'')+'" style="--rc:'+meta.color+'"'+
       (name?(' title="'+esc(name)+(meta.word?' — '+meta.word:'')+'"'):'')+'>'+
-    '<span class="hk-medc-h'+(rare?' rare':'')+'">'+badge+'</span>'+
+    '<span class="hk-medc-h">'+badge+dot+'</span>'+
     (name?'<b class="hk-medc-nm">'+esc(name)+'</b>':'')+
   '</span>';
 };

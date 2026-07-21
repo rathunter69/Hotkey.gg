@@ -791,8 +791,9 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   width:78px;min-height:74px;padding:8px 6px 7px;border-radius:11px;box-sizing:border-box;
   background:rgba(12,13,17,.60);border:1px solid rgba(255,255,255,.11);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 2px 8px rgba(0,0,0,.38)}
-.hk-medc-h{display:grid;place-items:center;border-radius:50%;padding:3px}
-.hk-medc-h.rare{background:radial-gradient(circle, color-mix(in srgb, var(--rc) 55%, transparent), transparent 66%)}
+.hk-medc-h{position:relative;display:grid;place-items:center;padding:2px}
+.hk-medc-dot{position:absolute;top:-1px;right:-1px;width:8px;height:8px;border-radius:50%;border:1.5px solid rgba(0,0,0,.45)}
+.hk-medc.bare .hk-medc-dot{border-color:rgba(0,0,0,.18)}
 .hk-medc-nm{font-family:var(--mono);font-size:8.5px;color:#c9ccd2;text-align:center;line-height:1.2;width:100%;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 /* bare: no dark tray — just the halo'd badge, for the light customizer picker/slots */
