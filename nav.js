@@ -434,19 +434,12 @@
     const avgPct = __st ? __st.avgPct
       : (attempted.length ? attempted.reduce((a,d) => a + d.pct, 0) / attempted.length : null);
     const myRuns = runs.filter(x => x.user_id === me_id);
-    let _chordFreq={}, _totKeys=0;
-    try{
-      /* r148: was `meId` — a ReferenceError the try/catch swallowed since r72, so the
-         chord-frequency fetch never ran and coach's notes always saw an empty map */
-      const tr=await window.sb.from('runs').select('trace,keystrokes').eq('user_id', me_id)
-        .eq('mouse_used',false).order('created_at',{ascending:false}).limit(40);
-      (tr.data||[]).forEach(row=>{ _totKeys+=(row.keystrokes||0);
-        (Array.isArray(row.trace)?row.trace:[]).forEach(k=>{ const key=(k&&k.k)||k;
-          if(typeof key==='string' && /\+|^Alt$|^F\d+$/.test(key)) _chordFreq[key]=(_chordFreq[key]||0)+1; }); });
-    }catch(e){}
+    /* r382 (lean card): the last-40-runs trace fetch is retired with the card's
+       most-used-shortcuts block — stats.html owns that analysis (and its query).
+       One less round-trip before the card paints. */
     const _perBoard={}; MENU_ORDER.forEach(k=>{ _perBoard[k]=[]; const seenB={};
       runs.forEach(x=>{ if(x.challenge===k && !seenB[x.user_id]){ seenB[x.user_id]=true; _perBoard[k].push(x.user_id); } }); });
-    return { drills, attempted: __st ? __st.att : attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs, _allRuns: runs, _perBoard, _chordFreq, _totKeys,
+    return { drills, attempted: __st ? __st.att : attempted.length, avgPct, mySolves: myRuns.length, myRuns, mySessions, _profs: profs, _allRuns: runs, _perBoard,
       wsum: __st ? __st.wsum : drills.reduce((a,x)=>a+(x.rank!==null?Math.min(1,Math.log2((x.total||1)+1)/Math.log2(9)):0),0) };   /* r302: att + wsum + avgPct all come from the ONE shared standing */
   }
   /* ---- XP & LEVELS ----
@@ -577,28 +570,21 @@
         const chs=CAMP.chapters.map(c=>({...c, done:c.keys.every(cleared)}));
         const earned=chs.filter(c=>c.done);
         const allDone=earned.length===chs.length;
-        const gateTxt=' \u2014 clear every drill under par \u00d7 '+CAMP.GATE+' to earn it';
-        /* r72 medal strip; r363: 'versions' language retired — TRACK MILESTONES.
-           r367: chips banded under their three certificate tracks, so the strip tells the same
-           story as the tracks modal instead of a flat m1..m8. */
-        const chipHtml=(c,ci)=>'<span class="pc-badge" data-tip="'+c.name+(c.done?' — EARNED':gateTxt)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;color:'+(c.done?'var(--muted)':'var(--faint)')+'">'+(window.hkBadge?window.hkBadge(c.id, c.done, 30, (window.HOTKEY_GROUP_COLORS||{})[(window.HOTKEY_DRILLS.groupOf[c.keys[0]])]):c.badge)+'m'+(ci+1)+'</span>';
+        /* r382 (Wolf: with the 96px crest the card is a TITLE CARD, not a dashboard):
+           the boxed milestone chip band (r72 strip, r367 track banding) COLLAPSES to
+           one line — the count plus per-track ticks. The chips live on in the
+           trainer's tracks modal and the account page; the crest keeps the stage. */
         const SHORT={fluency:'Fluency', formulas:'Formulas & Data', modeling:'Modeling'};
         const tracks=(window.HK_TRACKS||[]).filter(t=>t.milestones&&t.milestones.length);
-        const bandsHtml = tracks.length
-          ? tracks.map(t=>{
-              const seg=chs.map((c,ci)=>({c:c,ci:ci})).filter(x=>t.milestones.indexOf(x.c.id)>=0);
-              if(!seg.length) return '';
-              const segDone=seg.every(x=>x.c.done);
-              return '<span style="display:flex;flex-direction:column;gap:4px">'+
-                '<span style="font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:'+(segDone?'var(--accent)':'var(--faint)')+'">'+(SHORT[t.id]||t.name)+(segDone?' ✓':'')+'</span>'+
-                '<span style="display:flex;gap:10px">'+seg.map(x=>chipHtml(x.c,x.ci)).join('')+'</span>'+
-                '</span>';
-            }).join('')
-          : chs.map(chipHtml).join('');
-        badgesHtml='<div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin:2px 0 6px">milestones · '+earned.length+' / '+chs.length+'</div>'+
-          '<div class="pc-badges" style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;padding:10px 12px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;margin-bottom:14px">'+
-          bandsHtml+
-          '<span class="pc-badge" data-tip="Catalog complete — every milestone shipped" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;color:var(--faint);margin-left:auto">'+(window.hkBadge?window.hkBadge('fin', allDone, 30):CAMP.finisher.badge)+'ship</span>'+
+        const trackLine=tracks.map(t=>{
+          const seg=chs.filter(c=>t.milestones.indexOf(c.id)>=0);
+          const dn=seg.filter(c=>c.done).length;
+          const full=seg.length && dn===seg.length;
+          return '<span style="color:'+(full?'var(--accent)':'var(--muted)')+'">'+(SHORT[t.id]||t.name)+' '+(full?'\u2713':dn+'/'+seg.length)+'</span>';
+        }).join('<span style="color:var(--faint)">\u00b7</span>');
+        badgesHtml='<div style="display:flex;gap:6px 12px;flex-wrap:wrap;align-items:baseline;font-family:var(--mono);font-size:10.5px;margin:2px 0 12px">'+
+          '<span style="font-size:9.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.12em">milestones '+earned.length+' / '+chs.length+(allDone?' \u00b7 shipped \u2713':'')+'</span>'+
+          trackLine+
           '</div>'+
           (function(){
             const AC=window.HOTKEY_ACHIEVEMENTS;
@@ -693,26 +679,9 @@
                 '</span>').join('')+'</div>';
             }
             out+='<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin:0 0 4px">full grid + progress on <a href="stats.html#achievements" style="color:var(--accent)">your numbers \u2192</a></div>';
-            // ---- most-used shortcuts + coach's notes (directional, never prescriptive) ----
-            try{
-              const cf=d._chordFreq||{};
-              const top=Object.entries(cf).sort((a,b)=>b[1]-a[1]).slice(0,5);
-              if(top.length){
-                out+='<div class="pc-ach-h">most-used shortcuts <span style="color:var(--faint)">\u00b7 last 40 clean runs</span></div>'+
-                  '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 2px">'+
-                  top.map(([k,c])=>'<span style="font-family:var(--mono);font-size:10.5px;background:var(--surface2);border:1px solid var(--line);border-radius:7px;padding:3px 8px">'+k+' <span style="color:var(--faint)">\u00d7'+c+'</span></span>').join('')+'</div>';
-                const tips=[];
-                const hasAny=re=>Object.keys(cf).some(k=>re.test(k));
-                if(!hasAny(/^F4$/)) tips.push('F4 barely shows up in your play \u2014 the Models and Full Builds tiers lean on anchor cycling');
-                if(!hasAny(/^Alt$|^Alt\+/) && !hasAny(/^H/)) tips.push('no Alt-ribbon walks in your recent runs \u2014 alt h o i (autofit) and alt e s (paste special) are desk staples');
-                if(!hasAny(/Ctrl\+(\u2192|\u2190|\u2191|\u2193|Shift)/)) tips.push('mostly single arrows \u2014 ctrl+arrows jump to data edges, ctrl+shift+arrows grab whole ranges');
-                if(!hasAny(/Ctrl\+Alt\+V/)) tips.push('paste special (ctrl+alt+v) is missing from your rotation \u2014 values-only paste is everywhere in real models');
-                if(tips.length){
-                  out+='<div class="pc-ach-h" style="margin-top:10px">coach\u2019s notes</div>'+
-                    tips.slice(0,2).map(t=>'<div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6;margin:3px 0"><span style="color:var(--faint)">\u2013</span> '+t+'</div>').join('');
-                }
-              }
-            }catch(e){}
+            /* r382 (lean card): most-used shortcuts + coach's notes rolled OFF the
+               card — dashboard diagnostics; stats.html's Analytics panel carries the
+               full, better-sourced version (account key tally, chordified traces). */
             return out;
           })() +
           '';
@@ -752,13 +721,18 @@
        (gold/emerald/holo) keep their old .flair-* classes — existing rows don't break. */
     const __safeFlair = (myFlair && /^[a-z0-9_-]{1,32}$/i.test(myFlair)) ? myFlair : null;
     const __isFrame = !!(__safeFlair && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__safeFlair));
-    const flairCls = __safeFlair ? (__isFrame ? ' hk-frame-'+__safeFlair : ' flair-'+__safeFlair) : '';
+    /* r382: the 640px profile card is the BIG frame host — .hk-frame-lg scales borders,
+       ornaments, tabs and glow (nav.css), and opts.lg buys heraldic its denser filigree.
+       The lb hero and picker minis keep the base scale. */
+    const flairCls = __safeFlair ? (__isFrame ? ' hk-frame-'+__safeFlair+' hk-frame-lg' : ' flair-'+__safeFlair) : '';
     /* r376: plaque corners cut their gem from the bucket held at your best tier */
     const flairOrn = (__isFrame && window.hkFrameOrnaments)
-      ? window.hkFrameOrnaments(__safeFlair, {bucket:(window.hkFrameBucket?window.hkFrameBucket():1)}) : '';
+      ? window.hkFrameOrnaments(__safeFlair, {bucket:(window.hkFrameBucket?window.hkFrameBucket():1), lg:true}) : '';
     m.innerHTML = '<div class="pc-card'+flairCls+'">' + flairOrn +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
-      '<div class="pc-head" style="margin-bottom:10px"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div></div>' +
+      '<div class="pc-head" style="margin-bottom:10px"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div>' +
+      /* r382: one-click cosmetics — YOUR card carries the door to the frame gallery */
+      '<a class="pc-customize" id="pcCustomize" title="pick your card frame">\u270e customize</a></div>' +
       /* r134: .pc-scroll wrapper — the v3 CSS (max-height 82vh + inner scroll) existed
          but the renderer never emitted it, so long cards overflowed the frame */
       '<div class="pc-scroll">' +
@@ -823,6 +797,74 @@
       else location.href='index.html?openUpgrade=1'; };
     const sn=$('pcSetName'); if(sn) sn.onclick=()=>{ closeProfile();
       if(window.promptHandle) window.promptHandle(); else location.href='index.html'; };
+    /* r382 ONE-CLICK COSMETICS \u2014 \u270e on YOUR card opens the frame gallery as a modal
+       right here (this renderer only ever draws the owner's card; the lb.js public
+       card never gets the chip). Same unlock rules + profiles.flair write as the
+       account picker \u2014 account.html keeps its full copy with the earn ledger; this
+       is the fast lane. Saving re-renders the OPEN card immediately: mutate the
+       cached profile row, re-run renderProfile, and the frame is on before the
+       gallery closes. */
+    const cz=$('pcCustomize'); if(cz) cz.onclick=()=>{ try{ openFrameGallery(); }catch(e){} };
+    function openFrameGallery(){
+      const stale=document.getElementById('frameGallery'); if(stale) stale.remove();
+      let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+      /* unlock context \u2014 the account.html frameU recipe: live level, the tierBest
+         latch maxed with the tier on screen, flag-carried wins/certs, beta charter */
+      const u={ lvl:__L.lvl, tierBest:Math.max(fl.tierBest|0, tier.i|0),
+        dailyWins:fl.dailyWins|0, certs:Object.keys(fl.certTracks||{}).length,
+        charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
+        perfectRun:fl.perfectRun?1:0 };
+      const bk=window.hkFrameBucket?window.hkFrameBucket():1;
+      const cards=[{id:'none', name:'None', tier:'', desc:'plain card', earn:'', unlocked:true}]
+        .concat((window.HK_FRAMES||[]).map(f=>({...f, unlocked:!!(window.hkFrameUnlocked && window.hkFrameUnlocked(f.id, u))})));
+      const TIER_C={common:'var(--muted)', rare:'#3f7fe0', epic:'#d64a3f', legendary:'#d99a1f', egg:'#8a6d3b'};
+      const cells=cards.map(f=>{
+        const on=(myFlair||'none')===f.id;
+        /* plaque minis preview YOUR gem cut; other frames are chrome-only (r376 rule) */
+        const orn=(f.id.indexOf('plaque-')===0 && window.hkFrameOrnaments) ? window.hkFrameOrnaments(f.id,{bucket:bk}) : '';
+        return '<button class="flair-opt'+(on?' on':'')+'" data-flair="'+f.id+'" data-locked="'+(f.unlocked?'0':'1')+'"'+
+          ' style="text-align:left;font-family:var(--mono);background:var(--bg);border:1px solid '+(on?'var(--accent)':'var(--line)')+
+          ';border-radius:10px;padding:10px 12px;color:var(--text);cursor:'+(f.unlocked?'pointer':'default')+(f.unlocked?'':';opacity:.45')+'">'+
+          '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'">'+orn+'</span>'+
+          '<b style="font-size:12px">'+escHtml(f.name)+'</b>'+
+          (f.tier?' <i style="font-style:normal;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:'+TIER_C[f.tier]+'">'+f.tier+'</i>':'')+
+          '<span style="display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">'+
+          (f.unlocked ? escHtml(f.desc||'') : '\ud83d\udd12 '+escHtml(f.earn)) + '</span></button>';
+      }).join('');
+      const g=document.createElement('div'); g.id='frameGallery'; g.className='profile-modal show';
+      g.style.zIndex='80';   // over the profile modal (62) \u2014 the card stays visible behind
+      g.innerHTML='<div class="pc-card" style="width:560px"><a class="modal-x" id="fgX">\u00d7</a>'+
+        '<div class="pc-ach-h" style="margin-bottom:8px">card frames \u00b7 earned, worn wherever your card shows</div>'+
+        '<div class="pc-scroll"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">'+cells+'</div></div>'+
+        '<div id="fgMsg" style="font-family:var(--mono);font-size:11.5px;min-height:16px;margin-top:10px;color:var(--accent)"></div>'+
+        '<div class="pc-foot"><a href="account.html" style="font-size:10.5px">full picker on the account page \u2197</a><a id="fgClose">close</a></div></div>';
+      document.body.appendChild(g);
+      const close=()=>{ g.remove(); document.removeEventListener('keydown', escKey, true); };
+      const escKey=e=>{ if(e.key==='Escape'){ e.stopImmediatePropagation(); close(); } };
+      document.addEventListener('keydown', escKey, true);
+      g.addEventListener('click', e=>{ if(e.target===g) close(); });
+      const gx=g.querySelector('#fgX'); if(gx) gx.onclick=close;
+      const gc=g.querySelector('#fgClose'); if(gc) gc.onclick=close;
+      const sayFg=(t,bad)=>{ const el2=g.querySelector('#fgMsg'); if(el2){ el2.textContent=t; el2.style.color=bad?'#c8533f':'var(--accent)'; } };
+      g.querySelectorAll('.flair-opt').forEach(b=>b.onclick=async()=>{
+        if(b.dataset.locked==='1'){
+          const fr=(window.HK_FRAMES||[]).find(x=>x.id===b.dataset.flair);
+          sayFg('Locked \u2014 '+((fr&&fr.earn)||'keep playing.'), true); return;
+        }
+        const f=b.dataset.flair==='none'?null:b.dataset.flair;
+        try{
+          const {error}=await window.sb.from('profiles').update({flair:f}).eq('id', window._navUser.id);
+          if(error){ sayFg('Couldn\u2019t save \u2014 try again.', true); return; }
+          myFlair=f;
+          try{ const meRow=(d._profs||[]).find(x=>x.id===window._navUser.id); if(meRow) meRow.flair=f; }catch(e){}
+          try{ if(window._navProfile) window._navProfile.flair=f; }catch(e){}
+          g.querySelectorAll('.flair-opt').forEach(x=>{ x.classList.toggle('on', x===b);
+            x.style.borderColor = x===b ? 'var(--accent)' : 'var(--line)'; });
+          renderProfile(m, d);   // the open card wears it before the gallery closes
+          sayFg('Frame set \u2713 \u2014 it rides wherever your card appears.');
+        }catch(e){ sayFg('Something went wrong.', true); }
+      });
+    }
     m.addEventListener('click', e => { if(e.target === m) closeProfile(); }, { once: true });
   }
 
