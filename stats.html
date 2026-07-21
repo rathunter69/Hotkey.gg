@@ -101,8 +101,8 @@
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=184">
-<script src="drills.js?v=274"></script>
+<link rel="stylesheet" href="nav.css?v=185">
+<script src="drills.js?v=275"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -110,11 +110,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=272"></script>
+<script src="themes.js?v=273"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=284"></script>
+<script src="nav.js?v=285"></script>
 
 <header class="head">
   <div class="wrap">
@@ -255,9 +255,11 @@ async function load(){
 
   // ================= r135/r138: ACHIEVEMENTS — prominent, tipped, rarity-tiered =================
   // Earned medals are clickable — pick up to 3 to SHOWCASE on your player card.
-  // r138: instant data-tip overlays (name · what it is · global rarity) and rarity
-  // METALS on the badge itself (blue rare <=25% · crimson epic <=10% · radiant
-  // legendary <=3%) — computed Steam-style from every player's runs.
+  // r138: instant data-tip overlays (name · what it is · global rarity), computed
+  // Steam-style from every player's runs. r376: the glyph keeps its family color;
+  // an outer RING carries the rarity tier — colors from the shared window.HK_RARITY
+  // map (common green · rare blue · epic purple · legendary orange · mythic red —
+  // the hand-set 'm' class, ornate ring + crest crown).
   try{
     const AC=window.HOTKEY_ACHIEVEMENTS;
     if(AC && window.hkBadge){
@@ -281,6 +283,9 @@ async function load(){
         raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0,
         chordKinds:__ck, keysLifetime:__kl, dailyTop10:flags.dailyTop10||0,   // r150/r151 · r371
         dailyPod:flags.dailyPod||0, dailyWins:flags.dailyWins||0, certs:Object.keys(flags.certTracks||{}).length,
+        /* r376: mythic-class keys — beta-era account + the packed rank latch + the S+++ desk latch */
+        charter:!!(me && me.created_at && String(me.created_at) < '2026-10-01'),
+        tierBest:flags.tierBest|0, tierBestBucket:flags.tierBestBucket|0, deskPeak:flags.deskPeak||0,
         crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
       // global rarity (Steam-style): evaluate run-derivable achievements for every player
       const globalPct=(function(){
@@ -349,7 +354,9 @@ async function load(){
           '<button class="ach-f" data-f="locked">locked</button>'+
         '</span></h3>'+
         '<div class="ach-hint">medals sort rarest-first \u00b7 click an earned one to <b style="color:var(--warn)">\u2605 showcase</b> it on your player card \u00b7 up to 3 (oldest pick swaps out)'+(me?'':' \u00b7 sign in to show them on the boards')+
-        '<br>tiers: <b style="color:var(--warn)">gold</b> earned \u00b7 <b style="color:#3f7fe0">RARE</b> (\u226425% of players) \u00b7 <b style="color:#d64a3f">EPIC</b> (\u226410%) \u00b7 <b style="color:#d99a1f">LEGENDARY</b> (\u22643%)</div>'+
+        /* r376: legend rides the shared HK_RARITY map \u2014 same colors the badge rings wear */
+        (function(){ const RC=window.HK_RARITY||{};
+          return '<br>ring = rarity: <b style="color:'+RC.c+'">COMMON</b> \u00b7 <b style="color:'+RC.r+'">RARE</b> (\u226425% of players) \u00b7 <b style="color:'+RC.e+'">EPIC</b> (\u226410%) \u00b7 <b style="color:'+RC.l+'">LEGENDARY</b> (\u22643%) \u00b7 <b style="color:'+RC.m+'">MYTHIC</b> (the rarest handful)</div>'; })()+
         '<div class="ach-grid">'+grid+'</div>';
     }
   }catch(e){}

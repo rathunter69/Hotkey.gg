@@ -285,7 +285,12 @@ window.HOTKEY_PARS = {"navigation":17,"modeltour":53,"blocksel":46,"filldr":37,"
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
-   and returns {done, prog, goal}. Rendered as medals on the player card. ---- */
+   and returns {done, prog, goal}. Rendered as medals on the player card.
+   r376: tier = hand-set rarity floor for the badge RING (themes.js hkEffRarity /
+   HK_RARITY): omitted = common (green) · 'r' rare (blue) · 'e' epic (purple) ·
+   'l' legendary (orange) · 'm' mythic (red, ornate ring + crest crown) — the
+   rarest class on the wall: Daily Dynasty, Corner Office, Charter, Summit,
+   Bulge Bracket. ---- */
 /* r362: the daily-challenge pool is SHARED — index launches from it, the leaderboard
    labels today's board from it. One list, no drift. */
 window.HOTKEY_CHALLENGE_POOL=['gauntlet','combo','cascade','threestmt','debtsched','comps','waterfall','sourcesuses','football','retbridge','housestyle','dcfsens','revolver','schedule'];
@@ -310,7 +315,7 @@ window.HOTKEY_ACHIEVEMENTS = [
   /* r372: the full daily placement ladder — top 10 → podium → win → dynasty */
   { id:'dc_pod',  glyph:'crn', tier:'r', name:'Daily Podium',     desc:'Finish top 3 in a Daily Challenge',       test:c=>({done:(c.dailyPod||0)>=1, prog:Math.min(c.dailyPod||0,1), goal:1}) },
   { id:'dc_win',  glyph:'crn', tier:'e', name:'Daily Champion',   desc:'Win a Daily Challenge — #1 on the day', test:c=>({done:(c.dailyWins||0)>=1, prog:Math.min(c.dailyWins||0,1), goal:1}) },
-  { id:'dc_win5', glyph:'crn', tier:'l', name:'Daily Dynasty',    desc:'Win five Daily Challenges',               test:c=>({done:(c.dailyWins||0)>=5, prog:Math.min(c.dailyWins||0,5), goal:5}) },
+  { id:'dc_win5', glyph:'crn', tier:'m', name:'Daily Dynasty',    desc:'Win five Daily Challenges',               test:c=>({done:(c.dailyWins||0)>=5, prog:Math.min(c.dailyWins||0,5), goal:5}) },   /* r376: promoted to mythic */
   /* r372: certificate feats — the tracks' capstones show on the wall too */
   { id:'cert1',   glyph:'c6',  tier:'e', name:'Certified',        desc:'Earn your first certificate',             test:c=>({done:(c.certs||0)>=1, prog:Math.min(c.certs||0,1), goal:1}) },
   { id:'cert3',   glyph:'c8',  tier:'l', name:'Triple Crown',     desc:'Earn all three certificates',             test:c=>({done:(c.certs||0)>=3, prog:Math.min(c.certs||0,3), goal:3}) },
@@ -329,7 +334,7 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'str2', glyph:'str', tier:'e', name:'Quarter Close',           desc:'30-day streak',                         test:c=>({done:c.streak>=30, prog:Math.min(c.streak,30), goal:30}) },
   { id:'str3', glyph:'str', tier:'l', name:'Institution',      desc:'100-day streak',                        test:c=>({done:c.streak>=100, prog:Math.min(c.streak,100), goal:100}) },
   { id:'crn1', glyph:'crn', tier:'r', name:'First Blood',      desc:'Hold #1 on any board',                  test:c=>({done:c.crowns>=1, prog:Math.min(c.crowns,1), goal:1}) },
-  { id:'crn2', glyph:'crn', tier:'e', name:'Corner Office',          desc:'Hold 5 crowns at once',                 test:c=>({done:c.crowns>=5, prog:Math.min(c.crowns,5), goal:5}) },
+  { id:'crn2', glyph:'crn', tier:'m', name:'Corner Office',          desc:'Hold 5 crowns at once',                 test:c=>({done:c.crowns>=5, prog:Math.min(c.crowns,5), goal:5}) },   /* r376: promoted to mythic */
   { id:'dc1',  glyph:'day', name:'Day One',          desc:'Run your first Daily Challenge',        test:c=>{ const n=new Set(c.runs.map(r=>r.challenge).filter(ch=>/^(challenge|daily)-/.test(ch||''))).size; return {done:n>=1, prog:Math.min(n,1), goal:1}; } },
   { id:'dc7',  glyph:'day', tier:'r', name:'Seven Sittings',   desc:'Run the Daily Challenge on 7 different days', test:c=>{ const n=new Set(c.runs.map(r=>r.challenge).filter(ch=>/^(challenge|daily)-/.test(ch||''))).size; return {done:n>=7, prog:Math.min(n,7), goal:7}; } },
   { id:'day1', glyph:'day', name:'Regular',          desc:'Run 10 daily challenges',               test:c=>{ const n=new Set(c.runs.map(r=>r.challenge).filter(ch=>/^(challenge|daily)-/.test(ch||''))).size; return {done:n>=10, prog:Math.min(n,10), goal:10}; } },   /* r372: distinct days — re-runs of one day don't inflate */
@@ -368,6 +373,14 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'nav2', glyph:'map',   tier:'r', name:'Tour Guide',       desc:'Beat par on both navigation drills',     test:c=>{ const ks=['navigation','modeltour']; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=ks.length, prog:n, goal:ks.length}; } },
   { id:'kbd1', glyph:'keys',  tier:'r', name:'Chord Library',    desc:'Use 25 distinct shortcuts in clean runs', test:c=>({done:(c.chordKinds||0)>=25, prog:Math.min(c.chordKinds||0,25), goal:25}) },
   { id:'bld1', glyph:'c8',    tier:'e', name:'Shipped It',       desc:'Beat par on the three-statement capstone', test:c=>{ const ok=c.pb['threestmt']!==undefined&&c.pars['threestmt']&&c.pb['threestmt']<=c.pars['threestmt']; return {done:ok, prog:ok?1:0, goal:1}; } },
+  /* ---- r376 (Wolf): THE MYTHIC CLASS — the rarest things on the wall (red ring +
+     crest crown). ctx keys: charter (auth created_at before the beta cutoff, same
+     gate as the charter frame — unobtainable once beta ends), tierBest /
+     tierBestBucket (the packed high-water latch from nav.js persistTierBest),
+     deskPeak (latched by lb.js when your own desk grades S+++). ---- */
+  { id:'x_charter', glyph:'day', tier:'m', name:'Charter',        desc:'Account opened during the beta — you were on the desk before the desk was cool', test:c=>({done:!!c.charter, prog:c.charter?1:0, goal:1}) },
+  { id:'x_summit',  glyph:'crn', tier:'m', name:'Summit',         desc:'Hold the top rank tier in its Top Bucket', test:c=>{ const top=(((window.HK_RANK||{}).TIERS)||{length:8}).length-1; const ok=(c.tierBest|0)>=top && (c.tierBestBucket|0)>=top*3+2; return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'x_bulge',   glyph:'gnt', tier:'m', name:'Bulge Bracket',  desc:'Sit on a desk graded S+++ — the top of the guild scale', test:c=>({done:!!c.deskPeak, prog:c.deskPeak?1:0, goal:1}) },
 ];
 
 /* ---- group color identity: one muted hue per skill family. Used as accents only

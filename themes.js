@@ -477,6 +477,74 @@ window.rankEmblem = (function(){
     {sh:'M50 2 L65 17 L90 21 L77 45 L81 61 L59 88 L50 98 L41 88 L19 61 L23 45 L10 21 L35 17 Z', col:'#6d9be6', gl:'rocket'}, // Second-Year — summit star
   ];
   const FLAT_P={hi:'#ffffff',mid:'#ffffff',lo:'#ffffff',deep:'rgba(20,22,26,.42)',plateHi:'#ffffff',plateLo:'rgba(20,22,26,.34)',core:'#ffffff'};
+  /* r376 (Wolf, board B): TOP-TIER FURNITURE — Warhammer-crest dress for the two
+     summit tiers, drawn BEHIND the untouched crest in the tier's own metal
+     (CRIM / DIAM): gothic spread wings with THREE feather ranks (separated tips +
+     rachis lines), a cross-hatched finial with curled arms, and a fork-tailed
+     banner scroll with inner curls. Monochrome-engraved — no new colors. Size
+     branch: below 28px the finest hatching (rachis, rules, curls, cross-hatch)
+     drops and minimum strokes thicken so 16-22px board rows stay crisp. */
+  function crestFurniture(P, sz){
+    const id='fu'+(UID++), fine=sz>=28, th=fine?1:1.6;
+    let s='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="'+P.hi+'"/><stop offset=".5" stop-color="'+P.mid+'"/>'+
+      '<stop offset="1" stop-color="'+P.lo+'"/></linearGradient></defs>';
+    // ---- right wing (mirrored below): pivot at the crest shoulder. Three ranks
+    // of SOLID scalloped fans (primaries under secondaries under coverts), each
+    // tip a separated point, engraved apart by the deep stroke + rachis lines.
+    const px=56, py=28;
+    const dirp=(ang,r)=>[px+Math.cos(ang*Math.PI/180)*r, py+Math.sin(ang*Math.PI/180)*r];
+    function fan(a0,a1,n,R,notch){
+      const step=(a1-a0)/(n-1), pts=[];
+      for(let f2=0;f2<n;f2++){
+        if(f2>0) pts.push(dirp(a0+step*(f2-0.5), R*notch));
+        pts.push(dirp(a0+step*f2, R));
+      }
+      let d='M'+dirp(a0,7).map(v=>v.toFixed(1)).join(' ');
+      pts.forEach(p=>{ d+=' L'+p[0].toFixed(1)+' '+p[1].toFixed(1); });
+      d+=' L'+dirp(a1,7).map(v=>v.toFixed(1)).join(' ')+' Z';
+      return '<path d="'+d+'" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width="'+(0.7*th).toFixed(1)+'" stroke-linejoin="round"/>';
+    }
+    let wing='';
+    wing+=fan(-24, 70, 6, 41, 0.74);   // primaries — the long rank
+    wing+=fan(-18, 60, 5, 30, 0.72);   // secondaries
+    wing+=fan(-12, 50, 4, 20, 0.70);   // coverts
+    if(fine){
+      // rachis lines — one quill per primary tip, drawn through the stack
+      let rch='';
+      for(let f3=0;f3<6;f3++){ const a3=-24+(94/5)*f3;
+        rch+='M'+dirp(a3,10).map(v=>v.toFixed(1)).join(' ')+' L'+dirp(a3,38).map(v=>v.toFixed(1)).join(' ')+' ';
+      }
+      wing+='<path d="'+rch+'" fill="none" stroke="'+P.deep+'" stroke-width=".45" opacity=".55"/>';
+      // covert scallop hairline
+      wing+='<path d="'+fanEdge(-12,50,4,21)+'" fill="none" stroke="'+P.hi+'" stroke-width=".55" opacity=".5"/>';
+    }
+    // shoulder arch over the stack + a polish hairline
+    wing+='<path d="M52 20 Q72 3 95 11" fill="none" stroke="url(#'+id+')" stroke-width="'+(2*th).toFixed(1)+'" stroke-linecap="round"/>';
+    if(fine) wing+='<path d="M54 24 Q72 10 91 14" fill="none" stroke="'+P.hi+'" stroke-width=".6" opacity=".5"/>';
+    function fanEdge(a0,a1,n,R){   // the scalloped outer edge alone, for hairlines
+      const step=(a1-a0)/(n-1); let d='M'+dirp(a0,R).map(v=>v.toFixed(1)).join(' ');
+      for(let f4=1;f4<n;f4++){
+        const m2=dirp(a0+step*(f4-0.5), R*0.7), t2=dirp(a0+step*f4, R);
+        d+=' L'+m2[0].toFixed(1)+' '+m2[1].toFixed(1)+' L'+t2[0].toFixed(1)+' '+t2[1].toFixed(1);
+      }
+      return d;
+    }
+    // banner fork end (right; mirror makes the left) — swallowtail + inner curl
+    wing+='<path d="M84 87 L96 89 L90.5 91.5 L95 94.5 L84 96 Z" fill="none" stroke="'+P.mid+'" stroke-width="'+(1.3*th).toFixed(1)+'" stroke-linejoin="round"/>';
+    if(fine) wing+='<path d="M84 87 q3.5 2 2.5 4.5" fill="none" stroke="'+P.mid+'" stroke-width=".8" opacity=".8"/>';
+    // finial arm (right): curled gothic sweep + tip bead
+    wing+='<path d="M57 14 q8 -1.5 11 -8.5" fill="none" stroke="'+P.mid+'" stroke-width="'+(1.1*th).toFixed(1)+'" opacity=".85"/>'+
+      '<circle cx="68" cy="5.5" r="1" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".4"/>';
+    s+='<g>'+wing+'</g><g transform="translate(100 0) scale(-1 1)">'+wing+'</g>';
+    // ---- symmetric center pieces: banner body + finial spire ----
+    s+='<path d="M16 87 L84 87 L84 96 L16 96 Z" fill="none" stroke="url(#'+id+')" stroke-width="'+(1.6*th).toFixed(1)+'"/>';
+    if(fine) s+='<path d="M20 89.6 H80 M20 93.4 H80" stroke="'+P.lo+'" stroke-width=".6" opacity=".7"/>';
+    s+='<path d="M50 16 V3" stroke="url(#'+id+')" stroke-width="'+(2*th).toFixed(1)+'" stroke-linecap="round"/>'+
+      '<rect x="47.4" y="4.4" width="5.2" height="5.2" transform="rotate(45 50 7)" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".6"/>';
+    if(fine) s+='<path d="M48.6 5.6 l2.8 2.8 M48.6 8.4 l2.8 -2.8" stroke="'+P.deep+'" stroke-width=".45" opacity=".6"/>';
+    return '<g class="furniture">'+s+'</g>';
+  }
   function flatPips(col,bk){ if(!bk) return ''; let o=''; for(let i=0;i<3;i++){ const x=50+(i-1)*11, on=i<bk;
     o+='<circle cx="'+x+'" cy="107" r="3" fill="'+(on?col:'none')+'" stroke="'+col+'" stroke-width="1.5" opacity="'+(on?'1':'.4')+'"/>'; } return o; }
   function flatGlyph(gl){
@@ -495,7 +563,9 @@ window.rankEmblem = (function(){
         '<path d="M43 43 L57 57 M57 43 L43 57" stroke="#7c828e" stroke-width="3" stroke-linecap="round"/></svg>';
     }
     const i = window.RANK_EMBLEM_IDX[tierName] ?? 0, T=FLAT[i]||FLAT[0];
-    return svgOpen(size,bk,false)+wm+
+    // r376: the two summit tiers wear the Warhammer furniture BEHIND the crest
+    const furn = i===6 ? crestFurniture(CRIM, size) : i===7 ? crestFurniture(DIAM, size) : '';
+    return svgOpen(size,bk,false)+wm+furn+
       '<path d="'+T.sh+'" fill="'+T.col+'" stroke="rgba(20,22,26,.30)" stroke-width="2" stroke-linejoin="round"/>'+
       flatGlyph(T.gl)+flatPips(T.col,bk)+'</svg>';
   };
@@ -671,16 +741,17 @@ window.HK_RANK = {
 window.HK_FRAMES = [
   {id:'engraved',      name:'Engraved',        tier:'common',
    desc:'steel certificate corners + rosettes',       earn:'reach LVL 5'},
+  /* r376: plaque descs follow the screw → gemset corner swap (art round 2) */
   {id:'plaque-bronze', name:'Bronze Plaque',   tier:'rare',
-   desc:'beveled bronze + corner screws',             earn:'reach Summer Analyst'},
+   desc:'beveled bronze + gemset corners',            earn:'reach Summer Analyst'},
   {id:'plaque-silver', name:'Silver Plaque',   tier:'rare',
-   desc:'beveled silver + corner screws',             earn:'reach First-Year Analyst'},
+   desc:'beveled silver + gemset corners',            earn:'reach First-Year Analyst'},
   {id:'plaque-gold',   name:'Gold Plaque',     tier:'rare',
-   desc:'beveled gold + corner screws',               earn:'reach Associate'},
+   desc:'beveled gold + gemset corners',              earn:'reach Associate'},
   {id:'plaque-plat',   name:'Platinum Plaque', tier:'rare',
-   desc:'beveled platinum + corner screws',           earn:'reach VP'},
+   desc:'beveled platinum + gemset corners',          earn:'reach VP'},
   {id:'plaque-diam',   name:'Diamond Plaque',  tier:'rare',
-   desc:'beveled diamond + corner screws',            earn:'reach Second-Year Analyst'},
+   desc:'beveled diamond + gemset corners',           earn:'reach Second-Year Analyst'},
   {id:'foil',          name:'Foil',            tier:'epic',
    desc:'conic sheen + fan corners',                  earn:'win a Daily Challenge or earn a certificate'},
   {id:'heraldic',      name:'Heraldic',        tier:'legendary',
@@ -711,11 +782,18 @@ window.hkFrameUnlocked = function(id, u){
   return false;
 };
 /* Ornament HTML per frame — '' for frames that are pure CSS (bone). Corner SVGs
-   ride .hkf-cn/.hkf-c1..c4 (c2-c4 mirror via CSS transforms); plaque screws ride
-   .hkf-scr/.hkf-s1..s4; the tier tab is an .hkf-tab <i> colored inline from
-   HK_METALS. .hkf-glint is the specular-sweep layer (animation lives in nav.css,
-   reduced-motion guarded); charter and bone ship none — bone stays PERFECTLY
-   still, that is the joke. */
+   ride .hkf-cn/.hkf-c1..c4 (c2-c4 mirror via CSS transforms); the tier tab is an
+   .hkf-tab <i> colored inline from HK_METALS. .hkf-glint is the specular-sweep
+   layer (animation lives in nav.css, reduced-motion guarded); charter and bone
+   ship none — bone stays PERFECTLY still, that is the joke.
+   r376 (Wolf): the plaque screws are retired — corners read as bolt icons. The
+   plaques now wear the GEMSET CHAMFER family from concept board A: a chamfered
+   corner facet + a cut stone. The BUCKET picks the cut (0 bottom: cabochon dot ·
+   1 middle: step cut + edge leaves · 2 top: brilliant, 3 prongs + rays — the pip
+   logic moved into the ornament); the TIER escalates the setting (hairline →
+   beads → filigree arcs → aura + sparks). Stable classes for the nav.css motion
+   layer: .gem (the stone), .gem-facets (facet hairline), .gem-rays (top-bucket
+   rays — the 8s shimmer target). */
 window.hkFrameOrnaments = (function(){
   let UID=0;
   const GLINT='<i class="hkf-glint" aria-hidden="true"></i>';
@@ -750,26 +828,72 @@ window.hkFrameOrnaments = (function(){
       '<path d="M9 42 Q9 9 42 9" fill="none" stroke="#3d4c66" stroke-width="1" opacity=".8"/>'+
       leaves+'<circle cx="5.5" cy="5.5" r="2" fill="#c8d4e6"/>';
   })();
-  function screws(P){
-    return ['hkf-s1','hkf-s2','hkf-s3','hkf-s4'].map((c,i)=>{
-      const id='hkscr'+(UID++);
-      const slot=(i%2===0)?'M10.5 10.5 L17.5 17.5':'M10.5 17.5 L17.5 10.5';   // slot angle alternates like real hardware
-      return '<svg class="hkf-scr '+c+'" viewBox="0 0 28 28" aria-hidden="true">'+
-        '<defs><radialGradient id="'+id+'" cx=".35" cy=".3">'+
-        '<stop offset="0" stop-color="'+P.hi+'"/><stop offset=".7" stop-color="'+P.lo+'"/>'+
-        '<stop offset="1" stop-color="'+P.deep+'"/></radialGradient></defs>'+
-        '<circle cx="14" cy="14" r="7.5" fill="'+P.deep+'"/>'+
-        '<circle cx="14" cy="14" r="6" fill="url(#'+id+')"/>'+
-        '<path d="'+slot+'" stroke="'+P.deep+'" stroke-width="1.6" stroke-linecap="round"/></svg>';
-    }).join('');
+  /* one gemset corner (board A, family 1) — t = tier 0..4 (bronze..diamond),
+     b = bucket cut 1..3 (cabochon / step cut / brilliant). Each corner svg gets
+     its own gradient id so multiple framed cards on one page never collide. */
+  function gemCorner(P,t,b){
+    const id='hkgem'+(UID++);
+    let s='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1">'+
+      '<stop offset="0" stop-color="'+P.hi+'"/><stop offset=".5" stop-color="'+P.mid+'"/>'+
+      '<stop offset="1" stop-color="'+P.lo+'"/></linearGradient></defs>';
+    // the chamfered corner facet + its polish hairline
+    s+='<path d="M1 15 L15 1 L26 1 L1 26 Z" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width="1.1" stroke-linejoin="round"/>';
+    s+='<path class="gem-facets" d="M3.5 21.5 L21.5 3.5" stroke="'+P.hi+'" stroke-width=".8" opacity=".55"/>';
+    // tier setting: hairline → beads → filigree arcs → aura arc + sparks
+    if(t>=1)s+='<path d="M1 30 L30 1" fill="none" stroke="'+P.mid+'" stroke-width=".9" opacity=".75"/>';
+    if(t>=2)s+='<circle cx="27.6" cy="3" r="1.7" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".6"/>'+
+               '<circle cx="3" cy="27.6" r="1.7" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".6"/>';
+    if(t>=3)s+='<path d="M33 3 Q41 5.5 48 3" fill="none" stroke="'+P.mid+'" stroke-width="1" opacity=".85"/>'+
+               '<path d="M3 33 Q5.5 41 3 48" fill="none" stroke="'+P.mid+'" stroke-width="1" opacity=".85"/>';
+    if(t>=4)s+='<path d="M1 37 Q16 32 22 22 Q32 16 37 1" fill="none" stroke="'+P.hi+'" stroke-width=".7" opacity=".55"/>'+
+               '<path d="M50 2.2 l1.5 1.5 M2.2 50 l1.5 1.5" stroke="'+P.hi+'" stroke-width="1" opacity=".7"/>';
+    const cx=10.4,cy=10.4,r=6+t*0.35;
+    const dia=k=>'M'+cx+' '+(cy-k)+' L'+(cx+k)+' '+cy+' L'+cx+' '+(cy+k)+' L'+(cx-k)+' '+cy+' Z';
+    // top bucket only: the ray fan draws UNDER the stone (shimmer target)
+    if(b>=3){
+      s+='<g class="gem-rays" stroke="'+P.hi+'" stroke-width="1.1" stroke-linecap="round" opacity=".9">'+
+         '<path d="M'+(cx+r+2.5)+' '+(cy+r+2.5)+' L'+(cx+r+7)+' '+(cy+r+7)+'"/>'+
+         '<path d="M'+(cx+r+3.5)+' '+cy+' L'+(cx+r+8)+' '+cy+'"/>'+
+         '<path d="M'+cx+' '+(cy+r+3.5)+' L'+cx+' '+(cy+r+8)+'"/></g>';
+    }
+    // the cut stone
+    let g='<path d="'+dia(r)+'" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width="1" stroke-linejoin="round"/>';
+    if(b===1) g+='<circle cx="'+cx+'" cy="'+cy+'" r="1.4" fill="'+P.hi+'" opacity=".95"/>';
+    if(b>=2){
+      g+='<path class="gem-facets" d="'+dia(r*0.52)+'" fill="none" stroke="'+P.hi+'" stroke-width=".8" opacity=".9"/>'+
+         '<path class="gem-facets" d="M'+cx+' '+(cy-r)+' L'+cx+' '+(cy-r*0.52)+' M'+(cx+r)+' '+cy+' L'+(cx+r*0.52)+' '+cy+
+         ' M'+cx+' '+(cy+r)+' L'+cx+' '+(cy+r*0.52)+' M'+(cx-r)+' '+cy+' L'+(cx-r*0.52)+' '+cy+'" stroke="'+P.deep+'" stroke-width=".6" opacity=".8"/>';
+      // edge leaves along the frame lip
+      s+='<ellipse cx="27" cy="4.6" rx="4.4" ry="1.8" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".55" transform="rotate(-8 27 4.6)"/>'+
+         '<ellipse cx="4.6" cy="27" rx="1.8" ry="4.4" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".55" transform="rotate(8 4.6 27)"/>';
+    }
+    if(b>=3){
+      s+='<ellipse cx="35.5" cy="4.4" rx="3.4" ry="1.5" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".5" transform="rotate(-8 35.5 4.4)"/>'+
+         '<ellipse cx="4.4" cy="35.5" rx="1.5" ry="3.4" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".5" transform="rotate(8 4.4 35.5)"/>';
+      // three prongs — the pip echo — then the brilliant's white cross sparkle
+      g+='<g fill="'+P.hi+'">'+
+         '<path d="M'+cx+' '+(cy-r-0.6)+' l1.6 2.4 h-3.2 Z"/>'+
+         '<path d="M'+(cx-r-0.6)+' '+cy+' l2.4 -1.6 v3.2 Z"/>'+
+         '<path d="M'+(cx+r*0.71+0.8)+' '+(cy+r*0.71+0.8)+' l-0.4 2.6 2.6-0.4 Z"/></g>';
+      g+='<path d="M'+cx+' '+(cy-2.6)+' V'+(cy+2.6)+' M'+(cx-2.6)+' '+cy+' H'+(cx+2.6)+'" stroke="#ffffff" stroke-width=".9" opacity=".95"/>';
+    }
+    return s+'<g class="gem">'+g+'</g>';
+  }
+  function gems(P,t,b){
+    return ['hkf-c1','hkf-c2','hkf-c3','hkf-c4'].map(c=>
+      '<svg class="hkf-cn '+c+'" viewBox="0 0 56 56" aria-hidden="true">'+gemCorner(P,t,b)+'</svg>').join('');
   }
   function tab(txt, fg, bg, bc){
     return '<i class="hkf-tab" aria-hidden="true" style="color:'+fg+';background:'+bg+';border-color:'+bc+'">'+txt+'</i>';
   }
-  const PLQ={bronze:['BRONZE','BRONZE'], silver:['SILVER','SILVER'], gold:['GOLD','GOLD'],
-             plat:['PLAT','PLATINUM'], diam:['DIAM','DIAMOND']};
-  return function(id){
+  const PLQ={bronze:['BRONZE','BRONZE',0], silver:['SILVER','SILVER',1], gold:['GOLD','GOLD',2],
+             plat:['PLAT','PLATINUM',3], diam:['DIAM','DIAMOND',4]};
+  /* r376: opts.bucket (0 bottom · 1 middle · 2 top, default 1) picks the gem cut on
+     plaque frames — the bucket you held at your best tier (hk_ach_flags.tierBestBucket,
+     latched by nav.js persistTierBest). Non-plaque frames ignore it. */
+  return function(id, opts){
     const M=window.HK_METALS||{};
+    const bk=(opts && typeof opts.bucket==='number') ? Math.max(0, Math.min(2, opts.bucket|0)) : 1;
     if(id==='engraved') return GLINT+corners(ENG);
     if(id==='foil')     return GLINT+corners(FOIL);
     if(id==='heraldic'){
@@ -785,28 +909,45 @@ window.hkFrameOrnaments = (function(){
     if(id.indexOf('plaque-')===0){
       const m=PLQ[id.slice(7)]; if(!m) return '';
       const P=M[m[0]]; if(!P) return '';
-      return GLINT+screws(P)+
+      return GLINT+gems(P, m[2], bk+1)+
         tab('◆ '+m[1]+' TIER', P.core, 'linear-gradient(180deg,'+P.plateHi+','+P.plateLo+')', P.lo);
     }
     return '';   // bone (pure CSS) + unknown ids
   };
 })();
+/* r376: the gem-cut bucket for plaque ornaments, decoded from the packed
+   hk_ach_flags.tierBestBucket (tier*3 + bucket — see nav.js persistTierBest).
+   Default is the middle cut: a frame should never look BEST-dressed unearned. */
+window.hkFrameBucket = function(){
+  try{
+    const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+    return fl.tierBestBucket==null ? 1 : ((fl.tierBestBucket|0)%3);
+  }catch(e){ return 1; }
+};
 
 /* ---- achievement badges: hex medals, single source (inline copy in index — sync) ---- */
+/* r376: THE RARITY PALETTE — one map for every surface that speaks rarity (badge
+   rings, the stats-wall .rr tags + legend). Classic gaming ladder, desaturated to
+   sit in the site's grammar and read on light AND dark themes: common green ·
+   rare blue · epic purple · legendary orange · mythic red (the 'm' class —
+   drills.js reserves it for the rarest handful of feats). */
+window.HK_RARITY = { c:'#3fae4f', r:'#3f7fe0', e:'#9c5fd0', l:'#d9821f', m:'#d64a3f' };
 window.hkBadge = function(id, earned, size, color, rarity){
-  // r138: RARITY METALS — rarity = % of players holding it (from run-derived
-  // global stats). <=25% rare (platinum blue), <=10% epic (crimson), <=3%
-  // legendary (radiant gold + rays). Explicit `color` (campaign groups) wins.
+  /* r376: 'glyph keeps family color, ring carries rarity' — the r138 metal tint
+     REPLACED the family identity (audit finding); now the glyph always wears its
+     family color and an outer hex RING wears the rarity. rarity = % of players
+     holding it (run-derived); explicit `color` (campaign groups) still wins. */
   size=size||26;
   // hexagonal medal, video-game achievement style. Earned = gold + glow; locked = ghost outline.
   const G={
     spd:'<path d="M13.8 6 L9 13.8 H12.2 L11.4 20 L17 12.4 H13.8 L14.8 6 Z"/>',   // r240: centred on the hex
-    vol:'<path d="M8.5 17.5h9 M8.5 14h9 M8.5 10.5h9"/>',
+    vol:'<path d="M10.2 8.8h5.6 M8.4 13h9.2 M6.8 17.2h12.4"/>',   // r376: reps stack — centered pyramid, the count reads
+
     str:'<path d="M13 7c2.6 2 4.4 4.2 4.4 7a4.4 4.4 0 0 1-8.8 0c0-1.4.6-2.6 1.5-3.7.2 1 .8 1.8 1.7 2.2-.3-2 .2-4 1.2-5.5z"/>',
     crn:'<path d="M8 17l-1-6 3.4 2.4L13 9.5l2.6 3.9L19 11l-1 6z"/>',
     day:'<circle cx="13" cy="13" r="4.4"/><path d="M13 5.6v1.8 M13 18.6v1.8 M5.6 13h1.8 M18.6 13h1.8"/>',
-    gnt:'<path d="M8 8v10 M8 8h8l-2 2.5 2 2.5H8"/>',
-    c1:'<path d="M8 9.5h10 M8 13h10 M8 16.5h6"/>',                                                         // v1 — the statement takes shape
+    gnt:'<path d="M7 7h12 M9.3 7v9.6l3.7-2.6 3.7 2.6V7"/><path d="M13 10v2.6" stroke-width="1.2"/>',       // r376: centered gonfalon banner — hangs from the bar, swallowtail drop
+    c1:'<path d="M8 5.8h10v14.4H8z"/><path d="M10.4 9.4h5.2 M10.4 12.6h5.2 M10.4 15.8h3.4" stroke-width="1.3"/>',   // r376 v1 — the statement takes shape: outlined card holds the ruled lines
     c2:'<path d="M13 7v3 M13 10c-3 0-5 1.4-5 3.2 0 1.6 1.4 2.8 3.2 2.8H14.8c1.8 0 3.2 1.2 3.2 2.8"/><path d="M8 19h10"/>',  // v2 — balance
     c3:'<path d="M7 9h4v3h4v3h4v3H7z"/>',                                                                   // v3 — the waterfall steps down
     c4:'<path d="M10.5 15.5a3 3 0 0 1 0-4.2l1.8-1.8a3 3 0 0 1 4.2 4.2 M15.5 10.5a3 3 0 0 1 0 4.2l-1.8 1.8a3 3 0 0 1-4.2-4.2"/>',  // v4 — the statements link
@@ -816,30 +957,58 @@ window.hkBadge = function(id, earned, size, color, rarity){
     c8:'<path d="M13 6.5c2.4 2 3.4 4.6 3.4 7.4l-1.6 2.6h-3.6l-1.6-2.6c0-2.8 1-5.4 3.4-7.4z M11.6 16.5l-1.6 3 M14.4 16.5l1.6 3 M13 10.5v2"/>',  // v8 — ship it
     /* r150: the new class — every new achievement family gets its own mark */
     rx:'<path d="M7.5 8.5h3v3h3v3h3 M7.5 17.5h11"/>',                                                        // rx — the waterfall steps to the floor
-    flag:'<path d="M10.5 6.5v13 M10.5 7.5h6l-1.6 2.4 1.6 2.4h-6"/>', // r240: race flag, centred
+    flag:'<path d="M8.5 5.8v14.4 M8.5 6.8h10.6l-2.6 3.4 2.6 3.4H8.5"/><path d="M11.5 8.5v3.2 M14.8 8.7v3.4" stroke-width="1.1"/>', // r376: swallowtail spans the hex, checks add weight
     sheet:'<path d="M9 6.5h6l2.5 2.5V19.5H9z M15 6.5V9h2.5"/><path d="M10.8 14.2l1.6 1.8 3-3.6"/>',          // morning sheet — page + tick
     ice:'<path d="M13 6.5v13 M7.4 9.8l11.2 6.4 M18.6 9.8L7.4 16.2 M13 6.5l-1.6 1.8 M13 6.5l1.6 1.8 M13 19.5l-1.6-1.8 M13 19.5l1.6-1.8"/>', // freeze
     map:'<path d="M7.5 8.5l3.5-1.5 4 1.5 3.5-1.5v10l-3.5 1.5-4-1.5-3.5 1.5z M11 7v10 M15 8.5v10"/>',          // model tour — the map fold
-    brush:'<rect x="7.3" y="10.6" width="7.4" height="7.4" rx="1.6"/><path d="M10 8.1h5.1a1.9 1.9 0 0 1 1.9 1.9v5.1"/>',  // r240: house style — stacked style-cards (the swatch gallery)
+    brush:'<path d="M13 5.6 L20.4 13 L13 20.4 L5.6 13 Z"/><path d="M9.9 13 L13 9.9 L16.1 13 L13 16.1 Z" stroke-width="1.2"/>',  // r376: house style — one strong lozenge swatch, centered
     keys:'<path d="M7 10.5h12v6H7z M9.5 13h1 M12.5 13h1 M15.5 13h1 M9.5 15h7"/>',                             // chord library — keyboard
     fin:'<path d="M13 7.4l1.5 3.4 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="currentColor" stroke="none"/>' // star
   };
   const hex='M13 2.8 L21.7 7.9 V18.1 L13 23.2 L4.3 18.1 V7.9 Z';
-  const hexIn='M13 5.1 L19.7 9 V17 L13 20.9 L6.3 17 V9 Z';
-  let metal=null, regalia='';
+  /* r376: rarity RING — a scaled outer hex in the tier's palette color, escalating
+     common (subtle thin) → rare → epic (+inner echo) → legendary (+vertex beads)
+     → mythic (+side fins). Drawn OUTSIDE the 26-grid; the svg ships
+     overflow:visible so the ring rides the margin instead of shrinking the medal. */
+  const RARE=window.HK_RARITY||{};
+  const hexPt=k=>[[13,2.8],[21.7,7.9],[21.7,18.1],[13,23.2],[4.3,18.1],[4.3,7.9]]
+    .map(p=>[((p[0]-13)*k+13), ((p[1]-13)*k+13)]);
+  const hexS=k=>'M'+hexPt(k).map(p=>p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' L')+' Z';
+  let ring='';
   if(earned && rarity!==undefined && rarity!==null && isFinite(rarity)){
-    // r293 (Wolf): mid-saturated metals so the tier reads on BOTH dark and light
-    // themes — the old pale gold/blue washed out to invisible on Daylight/Newsprint.
-    if(rarity<=3){ metal='#d99a1f';   // LEGENDARY — radiant gold: apex rays + shoulder sparks
-      regalia='<path d="M13 -.2v2.6 M7.8 1l1 2.2 M18.2 1l-1 2.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>'+
-              '<path d="M2.6 4.2l1.6 1.3 M23.4 4.2l-1.6 1.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".9"/>'; }
-    else if(rarity<=10){ metal='#d64a3f';  // EPIC — crimson, side fins
-      regalia='<path d="M1.8 10.6l2.2 1.1 M1.8 15.2l2.2-1.1 M24.2 10.6L22 11.7 M24.2 15.2L22 14.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".85"/>'; }
-    else if(rarity<=25){ metal='#3f7fe0';  // RARE — platinum blue, second inner ring
-      regalia='<path d="M13 6.4 L18.6 9.7 V16.3 L13 19.6 L7.4 16.3 V9.7 Z" fill="none" stroke="currentColor" stroke-width=".6" opacity=".4"/>'; }
+    const w=window.hkRarityTier ? window.hkRarityTier(rarity) : null;
+    if(w==='mythic'){
+      /* the strongest treatment (board C ladder, in red): ornate engraved ring —
+         vertex beads, edge-midpoint notch ticks — plus the crest crown at the apex */
+      const V=hexPt(1.30);
+      let notches='';
+      for(let i2=0;i2<6;i2++){ const a2=V[i2], b2=V[(i2+1)%6];
+        const mx=(a2[0]+b2[0])/2, my=(a2[1]+b2[1])/2, dx=mx-13, dy=my-13, L2=Math.hypot(dx,dy)||1;
+        notches+='<path d="M'+(mx+dx/L2*0.6).toFixed(1)+' '+(my+dy/L2*0.6).toFixed(1)+
+          ' L'+(mx+dx/L2*2.2).toFixed(1)+' '+(my+dy/L2*2.2).toFixed(1)+'" stroke="'+RARE.m+'" stroke-width=".8"/>'; }
+      ring='<path d="'+hexS(1.30)+'" fill="none" stroke="'+RARE.m+'" stroke-width="1.5"/>'+
+        '<path d="'+hexS(1.16)+'" fill="none" stroke="'+RARE.m+'" stroke-width=".55" opacity=".55"/>'+
+        V.map(p=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r=".95" fill="'+RARE.m+'"/>').join('')+
+        notches+
+        '<g transform="translate(13 -5.2) scale(.55)" stroke="'+RARE.m+'" stroke-width="2" fill="none" stroke-linejoin="round">'+
+        '<path d="M-6 2.2 L-7.4 -4.6 L-3.4 -1.8 L0 -6.4 L3.4 -1.8 L7.4 -4.6 L6 2.2 Z"/></g>'+
+        '<path d="M6.6 -7.2l1.7 1.4 M19.4 -7.2l-1.7 1.4" stroke="'+RARE.m+'" stroke-width="1" stroke-linecap="round"/>';
+    } else if(w==='legendary'){
+      ring='<path d="'+hexS(1.28)+'" fill="none" stroke="'+RARE.l+'" stroke-width="1.3"/>'+
+        '<path d="'+hexS(1.14)+'" fill="none" stroke="'+RARE.l+'" stroke-width=".55" opacity=".55"/>'+
+        hexPt(1.28).map(p=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r=".9" fill="'+RARE.l+'"/>').join('');
+    } else if(w==='epic'){
+      ring='<path d="'+hexS(1.26)+'" fill="none" stroke="'+RARE.e+'" stroke-width="1.15"/>'+
+        '<path d="'+hexS(1.13)+'" fill="none" stroke="'+RARE.e+'" stroke-width=".5" opacity=".5"/>';
+    } else if(w==='rare'){
+      ring='<path d="'+hexS(1.24)+'" fill="none" stroke="'+RARE.r+'" stroke-width=".9"/>';
+    } else {
+      ring='<path d="'+hexS(1.22)+'" fill="none" stroke="'+RARE.c+'" stroke-width=".7" opacity=".55"/>';
+    }
   }
   /* r240 (Wolf): per-FAMILY colour so the glyph wall isn't one gold hue. Explicit
-     `color` (campaign groups) and rarity `metal` still win; this is the base tint. */
+     `color` (campaign groups) still wins; this is the base tint (r376: rarity no
+     longer overrides it — the ring carries the tier). */
   /* r240 (Wolf): spread the palette so it isn't a wall of gold — colour by sub-family. */
   const FAM={ spd:'#4a90e2', gnt:'#37a866', vol:'#37a866',            // speed=blue · efficiency=green
     day:'#9b6ef0', ice:'#3fb6c4',                                     // time=violet · freeze=cyan
@@ -850,39 +1019,48 @@ window.hkBadge = function(id, earned, size, color, rarity){
     c7:'#e0a52a', c8:'#e0842a',                                       // three-statement gold · ship-it orange
     crn:'#e0842a', str:'#9b6ef0', fin:'#9b6ef0',                      // crown=orange · streak/star=violet
     flag:'#e0653a', sheet:'#3fae8f', map:'#3fae8f', brush:'#c05fb0', keys:'#6d8fe6' };
-  const col = earned ? (color||metal||FAM[id]||'var(--warn)') : 'var(--faint)';
-  // r67: earned medals wear the regalia — double ring + apex notches; locked stays a ghost.
+  const col = earned ? (color||FAM[id]||'var(--warn)') : 'var(--faint)';
   /* r240 (Wolf): FLAT + OUTLINED — a transparent hex with a coloured FRAME and a
-     matching coloured glyph. No solid fill, no tint, no crown notches, no rings
-     (that soft-tint stack was the "fuzzy edges"). Locked is the same shape ghosted. */
+     matching coloured glyph. No solid fill, no tint. Locked is the same shape
+     ghosted. r376: earned medals add the rarity ring outside the frame. */
   const op = earned ? '' : ' opacity=".5"';
-  return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+'">'+
+  return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+';overflow:visible">'+
+    ring+
     '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.7"'+op+'/>'+
     '<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'+op+'>'+(G[id]||G.fin)+'</g>'+
     '</svg>';
 };
 // r138: shared rarity helpers — tier word + tooltip fragment (stats grid + cards)
+/* r376: mythic (<=0.5%) joins the ladder. In practice the hand-set 'm' floor is
+   what lands there — the live % is integer-rounded, so an EARNED feat can't read
+   <=0.5 until the field tops ~200 players. */
 window.hkRarityTier = function(pct){
   if(pct===undefined||pct===null||!isFinite(pct)) return null;
-  if(pct<=3) return 'legendary'; if(pct<=10) return 'epic'; if(pct<=25) return 'rare'; return null;
+  if(pct<=0.5) return 'mythic'; if(pct<=3) return 'legendary'; if(pct<=10) return 'epic'; if(pct<=25) return 'rare'; return null;
 };
-/* r293 (Wolf): one source of truth for the rarity word + its (cross-theme) metal +
+/* r293 (Wolf): one source of truth for the rarity word + its (cross-theme) color +
    a sort weight, so the wall can ORGANISE by rarity and every label/legend matches
-   the colour painted on the badge. weight: 0 legendary … 3 common (sort ascending). */
+   the colour painted on the badge ring. weight: 0 mythic … 4 common (sort ascending).
+   r376: colors come from HK_RARITY — the same map the rings and .rr tags paint. */
 window.hkRarityMeta = function(pct){
-  const t=window.hkRarityTier(pct);
-  if(t==='legendary') return { word:'legendary', abbr:'LEG', color:'#d99a1f', weight:0 };
-  if(t==='epic')      return { word:'epic',      abbr:'EPIC', color:'#d64a3f', weight:1 };
-  if(t==='rare')      return { word:'rare',      abbr:'RARE', color:'#3f7fe0', weight:2 };
-  return { word:'common', abbr:'', color:'var(--warn)', weight:3 };
+  const t=window.hkRarityTier(pct), C=window.HK_RARITY||{};
+  if(t==='mythic')    return { word:'mythic',    abbr:'MYTH', color:C.m, weight:0 };
+  if(t==='legendary') return { word:'legendary', abbr:'LEG',  color:C.l, weight:1 };
+  if(t==='epic')      return { word:'epic',      abbr:'EPIC', color:C.e, weight:2 };
+  if(t==='rare')      return { word:'rare',      abbr:'RARE', color:C.r, weight:3 };
+  return { word:'common', abbr:'', color:C.c, weight:4 };
 };
-/* r150: EFFECTIVE RARITY — metals were pure data (% of players holding it), which at
-   beta scale reads all-gold (1 of 3 players = 33% = common). Each achievement now
-   carries a hand-set difficulty tier ('r'/'e'/'l') as the DISPLAY FLOOR; live data
-   takes over once the field is big enough to mean something (>= 20 players). */
+/* r150: EFFECTIVE RARITY — rarity was pure data (% of players holding it), which at
+   beta scale reads all-common (1 of 3 players = 33%). Each achievement now
+   carries a hand-set difficulty tier ('r'/'e'/'l'/'m') as the DISPLAY FLOOR;
+   live data takes over once the field is big enough to mean something
+   (>= 20 players). */
 window.hkEffRarity = function(tier, dataPct, fieldN){
-  if((fieldN|0)>=20 && dataPct!==undefined && dataPct!==null && isFinite(dataPct)) return dataPct;
-  return tier==='l' ? 3 : tier==='e' ? 10 : tier==='r' ? 25 : 100;
+  /* r376: a live 0% is "no holder the run-derived sweep can SEE" — flag-based feats
+     (night wins, race wins…) always read 0 globally even when earned, and 0 would
+     fall into the reserved mythic band. Zero falls back to the hand-set floor. */
+  if((fieldN|0)>=20 && dataPct!==undefined && dataPct!==null && isFinite(dataPct) && dataPct>0) return dataPct;
+  return tier==='m' ? 0.5 : tier==='l' ? 3 : tier==='e' ? 10 : tier==='r' ? 25 : 100;
 };
 
 /* =====================================================================

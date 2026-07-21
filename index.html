@@ -1553,14 +1553,14 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=274"></script>
-<link rel="stylesheet" href="nav.css?v=184">
-<script src="themes.js?v=272"></script>
+<script src="drills.js?v=275"></script>
+<link rel="stylesheet" href="nav.css?v=185">
+<script src="themes.js?v=273"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=284"></script>
+<script src="nav.js?v=285"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -15269,7 +15269,11 @@ function buildAchCtx(){
     mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
     nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin,
     raceWins:fl.raceWins||0, sheetClears:fl.sheetClears||0, frzBanked:fl.frzBanked||0,
-    chordKinds:__ck, keysLifetime:__kl };   // r150/r151
+    chordKinds:__ck, keysLifetime:__kl,   // r150/r151
+    /* r376: the mythic class — charter (beta-era account, same cutoff as the charter
+       frame), the packed rank high-water latch, and the S+++ desk latch (lb.js) */
+    charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
+    tierBest:fl.tierBest|0, tierBestBucket:fl.tierBestBucket|0, deskPeak:fl.deskPeak||0 };
 }
 function achSweepInGame(){
   try{
