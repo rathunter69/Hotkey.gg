@@ -1254,6 +1254,34 @@ window.hkPlayerCard = function(d, opts){
    wall read as a rainbow. Same ladder, desaturated toward the site's engraved
    grammar; still legible on light AND dark themes. */
 window.HK_RARITY = { c:'#5a9a64', r:'#5f83bd', e:'#8d6cb5', l:'#c58a3a', m:'#bd5a4e' };
+/* r387 (Wolf): the achievement icon FINAL PASS (workshopped in r385 as achv5 — moon
+   for night owl, filled flame for streak, chevrons for combo, people for desk,
+   brand-dots for founder, plus mastery/accuracy/perfect/speed/rapid/comeback/cert/
+   formula/volume/daily/explorer/crown). Distinct per family — no more 13 achievements
+   sharing one 'sun'. These are authored on a 40×40 grid; hkBadge scales them into the
+   26-grid hex (translate(1 1) scale(.6), stroke-width 3 → ~1.8 effective). Fill parts
+   are explicit currentColor; founder keeps the four brand colors as a mythic pop. */
+window.HK_GLYPHS2 = {
+  explorer:'<path d="M20 4 C26.6 4 32 9.4 32 16 C32 25 20 36 20 36 C20 36 8 25 8 16 C8 9.4 13.4 4 20 4 Z"/><circle cx="20" cy="16" r="5"/>',
+  speed:'<path d="M7 28 A14 14 0 0 1 33 28"/><path d="M20 10 V13 M9.5 17 L11.5 19 M30.5 17 L28.5 19"/><path d="M20 28 L27 17"/><circle cx="20" cy="28" r="2.2" fill="currentColor" stroke="none"/>',
+  accuracy:'<circle cx="20" cy="20" r="13"/><circle cx="20" cy="20" r="7"/><circle cx="20" cy="20" r="1.6" fill="currentColor" stroke="none"/>',
+  perfect:'<path d="M20 5 L32 18 L20 35 L8 18 Z"/><path d="M8 18 H32 M20 5 L15 18 L20 35 M20 5 L25 18 L20 35"/>',
+  rapid:'<circle cx="20" cy="23" r="11"/><path d="M20 23 V16 M20 6 V11 M16 6 H24 M31 12 L33 14"/>',
+  streak:'<path d="M22 4 C21 10 24 12 26 16 C28 20 28 25 25 29 C23.5 31 21 33 20 34 C15 33 11 29 11 23 C11 19 13 15 16 13 C16 16 18 17 19 15 C20.5 12 21 8 22 4 Z" fill="currentColor" stroke="none"/>',
+  combo:'<path d="M9 11 L17 20 L9 29 M18 11 L26 20 L18 29 M27 11 L35 20 L27 29"/>',
+  comeback:'<path d="M6 29 L16 19 L22 25 L34 13"/><path d="M26 13 H34 V21"/>',
+  cert:'<circle cx="20" cy="15" r="7"/><path d="M15 22 L12 35 L20 30 L28 35 L25 22"/>',
+  formula:'<path d="M28 8 H12 L21 20 L12 32 H28"/>',
+  volume:'<path d="M11 31 V22 M20 31 V13 M29 31 V18"/>',
+  daily:'<circle cx="20" cy="20" r="6"/><path d="M20 6 V10 M20 30 V34 M6 20 H10 M30 20 H34 M10 10 L13 13 M27 27 L30 30 M30 10 L27 13 M13 27 L10 30"/>',
+  crown:'<path d="M9 30 L9 15 L16 22 L20 9 L24 22 L31 15 L31 30 Z"/>',
+  mastery:'<path d="M4 16 L20 9 L36 16 L20 23 Z"/><path d="M12 19 V26 C12 29.5 28 29.5 28 26 V19"/><path d="M36 16 V25 L34 29"/>',
+  moon:'<path d="M27 6 A14 14 0 1 0 27 34 A11 11 0 1 1 27 6 Z" fill="currentColor" stroke="none"/>',
+  people:'<circle cx="14" cy="15" r="4.2"/><circle cx="26" cy="15" r="4.2"/><path d="M6 31 C6 24.5 22 24.5 22 31 M18 31 C18 25 34 25 34 31"/>',
+  founder:'<circle cx="14" cy="14" r="5.4" fill="#e0503f" stroke="none"/><circle cx="26" cy="14" r="5.4" fill="#e0902f" stroke="none"/><circle cx="14" cy="26" r="5.4" fill="#3fae6a" stroke="none"/><circle cx="26" cy="26" r="5.4" fill="#3f8fe0" stroke="none"/>',
+  keycap:'<rect x="7" y="7" width="26" height="26" rx="5"/><rect x="11" y="11" width="18" height="14" rx="2"/><path d="M11 29 H29"/>',
+  mouse:'<path d="M20 8 C13.9 8 11 12 11 20 C11 28 14 33 20 33 C26 33 29 28 29 20 C29 12 26.1 8 20 8 Z"/><path d="M20 8 V19 M11 19 H29"/>'
+};
 window.hkBadge = function(id, earned, size, color, rarity){
   /* r376: 'glyph keeps family color, ring carries rarity' — the r138 metal tint
      REPLACED the family identity (audit finding). r384 (Wolf): that combo was TWO
@@ -1343,7 +1371,11 @@ window.hkBadge = function(id, earned, size, color, rarity){
   return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+';overflow:visible">'+
     ring+
     '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.7"'+op+'/>'+
-    '<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'+op+'>'+(G[id]||G.fin)+'</g>'+
+    '<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'+op+'>'+
+      ((window.HK_GLYPHS2 && window.HK_GLYPHS2[id])
+        ? '<g transform="translate(1 1) scale(0.6)" stroke-width="3">'+window.HK_GLYPHS2[id]+'</g>'
+        : (G[id]||G.fin))+
+    '</g>'+
     '</svg>';
 };
 // r138: shared rarity helpers — tier word + tooltip fragment (stats grid + cards)
