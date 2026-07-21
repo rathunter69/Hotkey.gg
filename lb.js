@@ -26,14 +26,20 @@ function fmt(ms){ return (ms/1000).toFixed(2)+'s'; }
 function rowHtml(r,i,names,meId,extra,leaderMs,opts){
   const me = meId && r.user_id===meId;
   const medal = i<3 ? ' r'+(i+1) : '';
-  // the chase: show your gap to the leader right on your row — the number to beat
-  const gap = (me && i>0 && leaderMs) ? `<span class="gap">+${((r.time_ms-leaderMs)/1000).toFixed(2)}</span>` : '';
+  /* r382 (Wolf: dead horizontal middles): EVERY row carries a .mid column now —
+     efficiency (optimal/keystrokes, when the run logged them) and the gap to #1,
+     muted mono. The old me-only .gap suffix is retired; the chase number lives on
+     every lane, and the leader row says so. */
+  const eff = (r.keystrokes>0 && r.optimal>0) ? Math.min(100, Math.round(100*r.optimal/r.keystrokes)) : null;
+  const chase = (i>0 && leaderMs) ? '+'+((r.time_ms-leaderMs)/1000).toFixed(2)+'s' : (i===0 ? 'leader' : '');
+  const mid = [eff!==null ? eff+'% eff' : '', chase].filter(Boolean).join(' \u00b7 ');
   /* r362: reward boards (the daily) medal the podium outright and tint the whole top 10 */
   const glyph = (opts&&opts.medals&&i<3) ? ['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'][i] : (i+1);
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}${(opts&&opts.medals&&i<10)?' t10':''}">`+
     `<span class="rk${medal}">${glyph}</span>`+
     `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChipByUid(r.user_id)}</span>`+
-    `<span class="tm">${fmt(r.time_ms)}${gap}</span></div>`;
+    `<span class="mid">${mid}</span>`+
+    `<span class="tm">${fmt(r.time_ms)}</span></div>`;
 }
 // r252: colored-monogram chip (themes.js window.schoolChip). Named *ByUid to avoid
 // clobbering the global component — a top-level `function schoolChip` would shadow it.
@@ -44,18 +50,22 @@ function schoolChipByUid(uid, size){
 }
 function boardHtml(c, best, names, meId, opts){
   let body;
+  /* r382: placeholder lanes carry an empty .mid so the 4-column row template holds */
+  const openLane='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="mid"></span><span class="tm">\u2014</span></div>';
   if(!best.length){
     body='<div class="empty" style="padding:14px 18px 6px">open board \u2014 <b>first run sets the bar</b></div>';
-    for(let k=0;k<3;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';   /* r369: 3 placeholder lanes, not 5 — reclaim the vertical space */
+    for(let k=0;k<3;k++) body+=openLane;   /* r369: 3 placeholder lanes, not 5 — reclaim the vertical space */
   }
   else {
     const leaderMs = best[0].time_ms;
     body = best.slice(0,10).map((r,i)=>rowHtml(r,i,names,meId,false,leaderMs,opts)).join('');
-    for(let k=best.length;k<3;k++) body+='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="tm">\u2014</span></div>';
+    for(let k=best.length;k<3;k++) body+=openLane;
     const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
     if(myIdx>=10){ body += '<div class="you-gap">···</div>' + rowHtml(best[myIdx], myIdx, names, meId, true, leaderMs, opts); }
   }
-  return `<div class="board"><div class="board-cap"><h2>${esc(c.label)}</h2><span class="lvl">${esc(c.lvl)}</span></div>${body}</div>`;
+  /* r382 (Wolf): a fully OPEN board stops stretching its lanes edge to edge —
+     .board-open caps it at ~640px and centers it (lb.css) */
+  return `<div class="board${best.length?'':' board-open'}"><div class="board-cap"><h2>${esc(c.label)}</h2><span class="lvl">${esc(c.lvl)}</span></div>${body}</div>`;
 }
 
 /* Session boards (marathon + rapid-fire) share rendering but format the score column differently. */
@@ -65,6 +75,7 @@ function sessionRowHtml(r,i,names,meId,labelFn,extra){
   return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}">`+
     `<span class="rk${medal}">${i+1}</span>`+
     `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChipByUid(r.user_id)}</span>`+
+    `<span class="mid"></span>`+   /* r382: hold the 4-column row template */
     `<span class="tm">${labelFn(r)}</span></div>`;
 }
 function sessionBoardHtml(title, sublabel, best, names, meId, labelFn){
@@ -75,7 +86,7 @@ function sessionBoardHtml(title, sublabel, best, names, meId, labelFn){
     const myIdx = meId ? best.findIndex(r=>r.user_id===meId) : -1;
     if(myIdx>=10){ body += '<div class="you-gap">···</div>' + sessionRowHtml(best[myIdx], myIdx, names, meId, labelFn, true); }
   }
-  return `<div class="board"><div class="board-cap"><h2>${esc(title)}</h2><span class="lvl">${esc(sublabel)}</span></div>${body}</div>`;
+  return `<div class="board${best.length?'':' board-open'}"><div class="board-cap"><h2>${esc(title)}</h2><span class="lvl">${esc(sublabel)}</span></div>${body}</div>`;   /* r382: empty boards cap + center */
 }
 function bestPerUser(rows, mode, dur){
   const seen={}, best=[];
@@ -131,7 +142,7 @@ async function load(){
       window.__meAnon=meAnon; }catch(e){}
     const [p, r, se, tm, tt] = await Promise.all([
       sb.from('profiles').select('id,handle,team_code,school_tag,show_school,featured_ach,flair'),   /* r373: flair feeds the hero card's frame */
-      sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
+      sb.from('runs').select('user_id,challenge,time_ms,created_at,keystrokes,optimal').eq('mouse_used',false).order('time_ms',{ascending:true}),   /* r382: keystrokes+optimal price the board rows' efficiency column */
       sb.from('sessions').select('user_id,mode,duration_sec,score,keystrokes,misses,optimal,created_at'),
       sb.from('team_members').select('team_id,user_id,role'),
       sb.from('teams').select('id,name,slug,verified,is_private,recruiting'),   // EXPLICIT columns — invite_code is grant-revoked (r110); select * would 403
@@ -649,10 +660,17 @@ function topPlayersHtml(){
      crest at 22; dense desk tables stay 16 (10.5px labels); card chips are 16; heroes
      keep their own art sizes (54 pub / 84 profile / 28 your-card pill). */
   let rows='';
+  /* r382 (Wolf: dead horizontal middles): the name column no longer stretches empty —
+     a muted .tp-mid carries crowns + the rating gap to #1 (rating = avg placement
+     \u00d7100, the same number the tier roster prints; the leader sets the pace). */
+  const lead=ranked[0];
+  const tpMid=(x,i)=>'<span class="tp-mid">'+(x.crowns?x.crowns+' \u265b \u00b7 ':'')+
+    (i===0?'sets the pace':'+'+((x.avg-lead.avg)*100).toFixed(1)+' rtg')+'</span>';
   ranked.slice(0,8).forEach((x,i)=>{
     const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="tp-row'+(x.u===meId?' me':'')+'"><span class="rk'+(i<3?' r'+(i+1):'')+'">'+(i+1)+'</span>'+
       '<span class="nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
+      tpMid(x,i)+
       '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,22,t.bucket):'')+'</span>'+
       '<span class="pct"><b>top '+Math.max(1,Math.round(x.avg*100))+'%</b><i>'+x.att+' drills</i></span></div>';
   });
@@ -660,6 +678,7 @@ function topPlayersHtml(){
   if(myIdx>=8){ const x=ranked[myIdx]; const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="you-gap">\u00b7\u00b7\u00b7</div><div class="tp-row me"><span class="rk">'+(myIdx+1)+'</span>'+
       '<span class="nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
+      tpMid(x,myIdx)+
       '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,22,t.bucket):'')+'</span>'+
       '<span class="pct"><b>top '+Math.max(1,Math.round(x.avg*100))+'%</b><i>'+x.att+' drills</i></span></div>'; }
   if(!rows) rows='<div class="empty">nobody has placed yet (5+ drills) \u2014 <b>be the first name here</b></div>';
@@ -693,9 +712,15 @@ function featuredHtml(){
   const per={};
   legs.forEach(k=>{ const ck='wk-'+wkStr+'-'+k; const seen={};
     fRuns.filter(x=>x.challenge===ck).forEach(x=>{ if(seen[x.user_id]) return; seen[x.user_id]=true;
-      (per[x.user_id]=per[x.user_id]||{})[k]=x.time_ms; }); });
+      (per[x.user_id]=per[x.user_id]||{})[k]={t:x.time_ms, ks:x.keystrokes||0, opt:x.optimal||0}; }); });
+  /* r382: the combined row sums keystrokes/optimal too — but only when EVERY leg
+     logged them, so the weekly board's efficiency never prices a partial picture */
   const combined=Object.keys(per).filter(u=>legs.every(k=>per[u][k]!==undefined))
-    .map(u=>({user_id:u, time_ms:legs.reduce((s,k)=>s+per[u][k],0)})).sort((a,b)=>a.time_ms-b.time_ms);
+    .map(u=>{ const row={user_id:u, time_ms:legs.reduce((s,k)=>s+per[u][k].t,0)};
+      if(legs.every(k=>per[u][k].ks>0 && per[u][k].opt>0)){
+        row.keystrokes=legs.reduce((s,k)=>s+per[u][k].ks,0);
+        row.optimal=legs.reduce((s,k)=>s+per[u][k].opt,0); }
+      return row; }).sort((a,b)=>a.time_ms-b.time_ms);
   const midnight=new Date(); midnight.setHours(24,0,0,0);
   const hrsLeft=Math.max(0, Math.round((midnight-new Date())/36e5));
   /* r364: yesterday's podium — the honor roll rides the hero card */

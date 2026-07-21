@@ -887,6 +887,18 @@ window.hkFrameOrnaments = (function(){
     '<path d="M2 54 C2 18 18 2 54 2"/><path d="M6 54 C6 22 22 6 54 6"/>'+
     '<path d="M2 30 Q12 27 15 15 Q27 12 30 2"/><path d="M2 42 Q19 38 22 22 Q38 19 42 2" opacity=".55"/></g>'+
     '<circle cx="15" cy="15" r="2.6" fill="#ffb3a1"/><circle cx="22" cy="22" r="1.7" fill="#ffb3a1" opacity=".7"/>';
+  /* r382: the BIG card earns DENSER filigree — a third rail, echo scrolls, leaf curls
+     and extra embers layered over HER when the host passes opts.lg (nav.js sets it on
+     the 640px profile card only). Same 56-grid, so the detail rides the .hk-frame-lg
+     ornament scale-up instead of inventing its own coordinates. */
+  const HER_LG='<g fill="none" stroke="#e65843" stroke-width="1.1" opacity=".8">'+
+    '<path d="M10 54 C10 26 26 10 54 10"/>'+
+    '<path d="M2 22 Q9 20 11 11 Q20 9 22 2"/>'+
+    '<path d="M2 48 Q26 44 29 29 Q44 26 48 2" opacity=".5"/>'+
+    '<path d="M30 2 Q33 8 40 9 M2 30 Q8 33 9 40" stroke-width=".9" opacity=".7"/></g>'+
+    '<circle cx="29" cy="29" r="1.9" fill="#ffb3a1" opacity=".85"/>'+
+    '<circle cx="40" cy="9" r="1.3" fill="#ffb3a1" opacity=".6"/>'+
+    '<circle cx="9" cy="40" r="1.3" fill="#ffb3a1" opacity=".6"/>';
   // charter — laurel-line corner: steel-navy arc with leaf ticks along it
   const CHA=(function(){
     let leaves='';
@@ -963,9 +975,13 @@ window.hkFrameOrnaments = (function(){
   /* r376: opts.bucket (0 bottom · 1 middle · 2 top, default 1) picks the gem cut on
      plaque frames — the bucket you held at your best tier (hk_ach_flags.tierBestBucket,
      latched by nav.js persistTierBest). Non-plaque frames ignore it. */
+  /* r382: opts.lg — the large-card variant (the 640px profile card wears
+     .hk-frame-lg). Only heraldic draws EXTRA art for it (denser filigree);
+     everything else scales through the nav.css ornament sizes. */
   return function(id, opts){
     const M=window.HK_METALS||{};
     const bk=(opts && typeof opts.bucket==='number') ? Math.max(0, Math.min(2, opts.bucket|0)) : 1;
+    const lg=!!(opts && opts.lg);
     if(id==='engraved') return GLINT+corners(ENG);
     if(id==='foil')     return GLINT+corners(FOIL);
     if(id==='heraldic'){
@@ -974,7 +990,7 @@ window.hkFrameOrnaments = (function(){
         '<circle cx="17" cy="17" r="15" fill="var(--surface,#232427)" stroke="#e65843" stroke-width="2"/>'+
         '<path d="M17 7.5 L25.5 17 L17 26.5 L8.5 17 Z" fill="#ffb3a1"/>'+
         '<path d="M17 11.2 L22.2 17 L17 22.8 L11.8 17 Z" fill="none" stroke="#9c2a1c" stroke-width="1.1"/>'+
-        '</svg>'+corners(HER);
+        '</svg>'+corners(lg ? HER+HER_LG : HER);
     }
     if(id==='charter')  // no glint, no ◆ — the beta class keeps a quiet uniform
       return corners(CHA)+tab('BETA TESTER','#c8d4e6','linear-gradient(180deg,#2a3550,#1a2334)','#55688a');

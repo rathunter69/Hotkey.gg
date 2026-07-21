@@ -529,3 +529,59 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .fs-mini .hkf-c3{bottom:-2px; left:-2px}
 .fs-mini .hkf-c4{bottom:-2px; right:-2px}
 .fs-mini .hkf-tab{display:none}
+
+/* ============================================================
+   r382 FRAME PROMINENCE — .hk-frame-lg, applied by nav.js to the 640px profile
+   card only. The r373 frames were tuned on ~380px hosts (the lb hero, the
+   picker minis) and read thin on the real card; a class modifier beats
+   container queries here — exactly two known hosts. At LG: ornaments scale
+   (corners 56→92, medallion 34→54, tier tab up a step), borders thicken, the
+   glint strip widens/brightens, and HERALDIC gets its top-frame pass — denser
+   filigree (themes.js HER_LG rides opts.lg), hotter ember glow, and a
+   theatrical two-beat glint. All motion stays transform/opacity only and
+   reduced-motion guarded. These rules sit LAST so they out-order the
+   doubled-class base borders at equal specificity. */
+.hk-frame-lg .hkf-cn{width:92px; height:92px}
+.hk-frame-lg .hkf-c1{top:-8px; left:-8px}
+.hk-frame-lg .hkf-c2{top:-8px; right:-8px}
+.hk-frame-lg .hkf-c3{bottom:-8px; left:-8px}
+.hk-frame-lg .hkf-c4{bottom:-8px; right:-8px}
+.hk-frame-lg .hkf-med{width:54px; height:54px; top:-26px}
+.hk-frame-lg .hkf-tab{font-size:10.5px; padding:5px 18px; top:-15px; letter-spacing:.26em}
+.hk-frame-lg.hk-frame-engraved{border-width:2px}
+.hk-frame-lg.hk-frame-engraved::before{inset:7px; border-width:2px}
+.hk-frame-lg.hk-frame-engraved::after{inset:13px}
+.hk-frame-lg[class*="hk-frame-plaque-"]{border-width:9px}
+.hk-frame-lg[class*="hk-frame-plaque-"]::before{inset:-9px}
+.hk-frame-lg.hk-frame-foil{border-width:7px}
+.hk-frame-lg.hk-frame-foil::before{inset:-7px}
+.hk-frame-lg.hk-frame-charter{border-width:6px}
+.hk-frame-lg.hk-frame-bone::after{font-size:9px}   /* bone stays PERFECTLY still — only the tag grows */
+.hk-frame-lg.hk-frame-heraldic{border-width:3px;
+  box-shadow:0 22px 60px rgba(0,0,0,.45), 0 0 58px rgba(230,88,67,.42), inset 0 0 74px rgba(230,88,67,.11)}
+/* wider, brighter specular strip on the big card */
+.hk-frame-lg .hkf-glint::before{width:52%;
+  background:linear-gradient(105deg, transparent, rgba(255,255,255,.18) 42%, rgba(255,255,255,.40) 50%, rgba(255,255,255,.18) 58%, transparent)}
+@media (prefers-reduced-motion: no-preference){
+  /* heraldic at LG: the glint sweeps in, CATCHES mid-card, then snaps through —
+     two beats every 7s; the medallion pulses with the second beat. */
+  .hk-frame-lg.hk-frame-heraldic .hkf-glint::before{animation:hkfGlintHer 7s ease-in-out infinite}
+  .hk-frame-lg.hk-frame-heraldic .hkf-med{animation:hkfEmber 3s ease-in-out infinite alternate, hkfMedBeat 7s ease-in-out infinite}
+}
+@keyframes hkfGlintHer{0%, 76%{transform:translateX(0) rotate(8deg); opacity:0}
+  79%{opacity:1}
+  86%{transform:translateX(180%) rotate(8deg); opacity:.5}
+  89%{transform:translateX(195%) rotate(8deg); opacity:1}
+  97%{opacity:.95}
+  100%{transform:translateX(360%) rotate(8deg); opacity:0}}
+@keyframes hkfMedBeat{0%, 76%, 100%{transform:translateX(-50%) scale(1)}
+  84%{transform:translateX(-50%) scale(1.12)}
+  92%{transform:translateX(-50%) scale(1)}}
+
+/* r382 ONE-CLICK COSMETICS — the quiet customize chip on YOUR OWN card
+   (nav.js renders it only in the owner renderer; public cards never get it).
+   margin-right clears the pinned ✕. */
+.pc-customize{font-family:var(--mono); font-size:10.5px; color:var(--muted); cursor:pointer;
+  border:1px solid var(--line); border-radius:999px; padding:4px 12px; margin-right:34px;
+  white-space:nowrap; text-decoration:none; flex:none; transition:all .13s}
+.pc-customize:hover{color:var(--accent); border-color:var(--accent-dim)}
