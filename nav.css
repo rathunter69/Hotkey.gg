@@ -113,6 +113,10 @@ body{padding-top:14px}
 .tier-diamond{color:#7db8ff; border-color:#3a6196; background:rgba(125,184,255,.14)}
 .tier-crimson{color:#e06a55; border-color:#7c3328; background:rgba(224,106,85,.13)}
 .tier-mba{color:#a89e88; border-color:#4c473c; background:rgba(168,158,136,.10)}
+/* r377 (Wolf): the shifted metal ladder — Associate now wears AMETHYST; the
+   emerald chip is cut and ready but unassigned, awaiting Wolf's placement. */
+.tier-amethyst{color:#b78ae8; border-color:#66489c; background:rgba(183,138,232,.13)}
+.tier-emerald{color:#4ecb7e; border-color:#27784b; background:rgba(78,203,126,.12)}
 /* r210 (Wolf): the tier text colors above are tuned for DARK sheets and go invisible on
    light themes (Daylight is the default light theme). Darker, saturated variants for
    data-dark="0" so the rank pill reads on a light bar. */
@@ -123,6 +127,8 @@ html[data-dark="0"] .tier-platinum{color:#1f8574; border-color:#6fc0b3}
 html[data-dark="0"] .tier-diamond {color:#2f6bc4; border-color:#84acdf}
 html[data-dark="0"] .tier-crimson {color:#b23520; border-color:#dd8a7c}
 html[data-dark="0"] .tier-mba     {color:#6b6250; border-color:#b3ab97}
+html[data-dark="0"] .tier-amethyst{color:#7a43ba; border-color:#b697dd}
+html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 
 /* ---------- THEMES MODAL ---------- */
 .th-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0 4px}

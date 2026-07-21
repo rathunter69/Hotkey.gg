@@ -240,50 +240,78 @@ window.applyTheme = function(name){
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', window.syncThemeLabels);
 else window.syncThemeLabels();
 
-/* ---- rank emblems v3 (r128): LoL-grade layered crests, iteration-8 art ----
-   Ported from art/rank-proto.html (Wolf-approved iteration 8). Single source for
-   every page. API unchanged: rankEmblem(tierName, size, bucket) — bucket is the
-   HK_RANK string ('Bottom/Middle/Top Bucket') or null; with a bucket the canvas
-   grows a division-pip zone (viewBox 100x114, height = size*1.14) and the emblem
-   ESCALATES: bottom = clean frame+glyph, middle = +ornaments, top = ignited
-   (jewel, sparks, hot rim, brighter glow). 'MBA Associate' arrives bucket-null
-   in-game (placement pending) so it renders the iron #REF! plate, no pips.
-   Animation layers for the rank-up moment: .aura .frame .glyph .ornament .jewel
-   .pips .sparks. Glow filters switch off under 24px (crisper, cheaper rows). */
+/* ---- rank emblems v4 (r377): ONE SHIELD FAMILY — the heraldic ladder ----
+   Ported from the approved concept round 3 (art3 board, Wolf-signed). Every
+   tier wears the SAME heater plate, engraved monochrome in its tier metal
+   (deep understroke → plate fill → metal-gradient stroke → hi hairline
+   polish). Identity comes from two dials:
+     CHARGE — keyboard-warrior devices, one per tier, no repeats: #REF! ·
+       blank keycap · #### overflow chevron · arrow-key saltire · ↵ enter ·
+       crossed keycap-pommel swords (+ the $ F4 chief) · the bull · the
+       faceted gem (bearing the ladder's single Σ — Wolf's cap: at most one).
+     FURNITURE — bare plate → rivets → bordure → mantling → banner scroll →
+       wings (small/mid/full/grand) → finial (bead/diamond/star), and it now
+       scales with BUCKET inside each tier: bottom = the tier's base dress,
+       middle = +one stage, top = full dress. The absolute prime crest —
+       grand three-rank spread + star finial + memento banner — is
+       exclusively TOP-BUCKET Second-Year. No-bucket calls render the tier's
+       MIDDLE dress (no pips, no heat rim).
+   Banner scrolls carry a fixed per-tier engraved motto (Wolf: no custom
+   title system this round); text drops in coarse mode. Below 28px the
+   coarse branch kicks in: simplified charges, thicker strokes, solid
+   mid-metal plate fill — 16/22px board rows stay crisp.
+   API unchanged: rankEmblem(tierName, size, bucket) — bucket is the HK_RANK
+   string ('Bottom/Middle/Top Bucket'), a number 1..3, or absent. With a
+   bucket the canvas grows the division-pip zone (viewBox 100x114, height =
+   size*1.14). 'MBA Associate' arrives bucket-null in-game (placement
+   pending) so it renders the iron plate at middle dress, no pips.
+   Animation layers for the rank-up moment keep their stable classes:
+   .frame .glyph .ornament .jewel .pips. */
 window.RANK_EMBLEM_IDX = {'MBA Associate':0,'Candidate':1,'Summer Analyst':2,
   'First-Year Analyst':3,'Associate':4,'VP':5,'MD':6,'Second-Year Analyst':7};
 window.rankEmblem = (function(){
   let UID=0;
+  /* r377: THE METAL LADDER, shifted down one rung (Wolf) — SLATE is retired.
+     Candidate wears BRONZE, Summer SILVER, First-Year GOLD; Associate takes
+     the new AMETHYST; VP keeps its teal-platinum; MD crimson and the summit
+     diamond stand. EMER (a true rich emerald) is cut and exposed in
+     HK_METALS but UNASSIGNED — it awaits Wolf's placement call. */
   const IRON ={hi:'#a9aeb9',mid:'#7c828e',lo:'#525761',deep:'#26282e',plateHi:'#33363d',plateLo:'#1f2126',core:'#8b919d'};
-  const SLATE={hi:'#c4c9d3',mid:'#9299a6',lo:'#5f6570',deep:'#2c2f36',plateHi:'#3a3d45',plateLo:'#24262c',core:'#a5abb8'};
   const BRONZE={hi:'#f4c088',mid:'#cf8e4c',lo:'#95602c',deep:'#432a12',plateHi:'#453425',plateLo:'#271e16',core:'#e8a45f'};
   const SILVER={hi:'#f4f7fc',mid:'#c9d0dc',lo:'#8e96a5',deep:'#454c59',plateHi:'#454b57',plateLo:'#262a32',core:'#dde2ea'};
   const GOLD ={hi:'#ffefb3',mid:'#f4c754',lo:'#bf8e20',deep:'#523a05',plateHi:'#4a3f20',plateLo:'#282112',core:'#ffd968'};
+  const AMET ={hi:'#efe0ff',mid:'#b78ae8',lo:'#7a4fb8',deep:'#2f1b50',plateHi:'#382b52',plateLo:'#1f172e',core:'#c9a2ff'};
+  const EMER ={hi:'#d2f7dc',mid:'#57d183',lo:'#1f9455',deep:'#0c3d22',plateHi:'#1c4230',plateLo:'#11271b',core:'#6ff0a0'};
   const PLAT ={hi:'#e0fdf7',mid:'#86dcca',lo:'#3d9c8e',deep:'#173f3a',plateHi:'#25453f',plateLo:'#152522',core:'#8ef2df'};
   const CRIM ={hi:'#ffb3a1',mid:'#e65843',lo:'#9c2a1c',deep:'#3a0f0b',plateHi:'#3b1d19',plateLo:'#1f0f0e',core:'#ff6248'};
   const DIAM ={hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',plateHi:'#21404f',plateLo:'#12232c',core:'#a8ecff'};
   // r373: the profile-frame system (HK_FRAMES below) borrows the emblem metals —
   // ONE palette source, so a plaque frame can never drift off its rank tier's crest.
-  window.HK_METALS={BRONZE:BRONZE,SILVER:SILVER,GOLD:GOLD,PLAT:PLAT,DIAM:DIAM};
-  function defs(id,P,glow){
+  // r377 adds AMET (Associate's new metal) + the unassigned EMER to the exposed set.
+  window.HK_METALS={BRONZE:BRONZE,SILVER:SILVER,GOLD:GOLD,AMET:AMET,EMER:EMER,PLAT:PLAT,DIAM:DIAM};
+  const PALS=[IRON,BRONZE,SILVER,GOLD,AMET,PLAT,CRIM,DIAM];
+  const SH  ='M27 22 L73 22 L73 50 Q73 68 50 84 Q27 68 27 50 Z';   // the heater plate
+  const SHIN='M31 26 L69 26 L69 49 Q69 63 50 79 Q31 63 31 49 Z';   // bordure inset
+  const MONO='JetBrains Mono,ui-monospace,monospace';
+  function defs(id,P){
     return '<defs><linearGradient id="'+id+'m" x1="0" y1="0" x2="0" y2="1">'+
       '<stop offset="0" stop-color="'+P.hi+'"/><stop offset=".45" stop-color="'+P.mid+'"/>'+
       '<stop offset=".55" stop-color="'+P.lo+'"/><stop offset="1" stop-color="'+P.deep+'"/></linearGradient>'+
       '<linearGradient id="'+id+'p" x1="0" y1="0" x2="0" y2="1">'+
       '<stop offset="0" stop-color="'+P.plateHi+'"/><stop offset="1" stop-color="'+P.plateLo+'"/></linearGradient>'+
-      '<radialGradient id="'+id+'core" cx=".5" cy=".4">'+
-      '<stop offset="0" stop-color="'+P.core+'" stop-opacity=".55"/><stop offset="1" stop-color="'+P.core+'" stop-opacity="0"/></radialGradient>'+
-      '<radialGradient id="'+id+'a"><stop offset=".25" stop-color="'+P.core+'" stop-opacity=".5"/><stop offset="1" stop-color="'+P.core+'" stop-opacity="0"/></radialGradient>'+
-      (glow?'<filter id="'+id+'g" x="-45%" y="-45%" width="190%" height="190%">'+
-      '<feGaussianBlur stdDeviation="'+glow+'" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>':'')+
-      '</defs>';
+      '<radialGradient id="'+id+'c" cx=".5" cy=".42">'+
+      '<stop offset="0" stop-color="'+P.core+'" stop-opacity=".38"/><stop offset="1" stop-color="'+P.core+'" stop-opacity="0"/></radialGradient>'+
+      '<clipPath id="'+id+'clip"><path d="'+SH+'"/></clipPath></defs>';
   }
-  function frame(id,P,path,glow,sw,hot){
-    return '<g class="frame"'+(glow?' filter="url(#'+id+'g)"':'')+'>'+
-      '<path d="'+path+'" fill="none" stroke="'+P.deep+'" stroke-width="'+((sw||3.4)+2.6)+'" stroke-linejoin="round"/>'+
-      '<path d="'+path+'" fill="url(#'+id+'p)" stroke="url(#'+id+'m)" stroke-width="'+(sw||3.4)+'" stroke-linejoin="round"/>'+
-      (hot?'<path d="'+path+'" fill="none" stroke="'+P.hi+'" stroke-width="1" opacity=".8" stroke-linejoin="round"/>':'')+
-      '</g>';
+  // engraved element: deep understroke, plate (or given) fill, metal stroke
+  function eng(id,P,d,sw,fill){
+    return '<path d="'+d+'" fill="none" stroke="'+P.deep+'" stroke-width="'+(sw+1.8).toFixed(1)+'" stroke-linejoin="round"/>'+
+      '<path d="'+d+'" fill="'+(fill||('url(#'+id+'p)'))+'" stroke="url(#'+id+'m)" stroke-width="'+sw.toFixed(1)+'" stroke-linejoin="round"/>';
+  }
+  // engraved line-work (no fill): deep under + metal over
+  function engLine(id,P,d,sw){
+    return '<path d="'+d+'" fill="none" stroke="'+P.deep+'" stroke-width="'+(sw+1.6).toFixed(1)+'" stroke-linecap="round" stroke-linejoin="round"/>'+
+      '<path d="'+d+'" fill="none" stroke="url(#'+id+'m)" stroke-width="'+sw.toFixed(1)+'" stroke-linecap="round" stroke-linejoin="round"/>';
   }
   function pips(id,P,bk){
     if(!bk) return '';
@@ -296,58 +324,256 @@ window.rankEmblem = (function(){
     }
     return '<g class="pips">'+out+'</g>';
   }
-  function sparks(P,pts){
-    return '<g class="sparks">'+pts.map(function(q){ const x=q[0],y=q[1],s=q[2];
-      return '<path d="M'+x+' '+(y-s)+' L'+(x+s*.3)+' '+(y-s*.3)+' L'+(x+s)+' '+y+' L'+(x+s*.3)+' '+(y+s*.3)+' L'+x+' '+(y+s)+' L'+(x-s*.3)+' '+(y+s*.3)+' L'+(x-s)+' '+y+' L'+(x-s*.3)+' '+(y-s*.3)+' Z" fill="#ffffff" opacity=".9"/>'; }).join('')+'</g>';
+  /* ---- wings: scalloped feather fans (r376 grammar), parameterised per stage ---- */
+  function wings(id,P,cfg,th,fine){
+    const px=cfg.px, py=cfg.py;
+    const dirp=(a,r)=>[px+Math.cos(a*Math.PI/180)*r, py+Math.sin(a*Math.PI/180)*r];
+    function fan(a0,a1,n,R,notch){
+      const step=(a1-a0)/(n-1), pts=[];
+      for(let f=0;f<n;f++){
+        if(f>0) pts.push(dirp(a0+step*(f-0.5), R*notch));
+        pts.push(dirp(a0+step*f, R));
+      }
+      let d='M'+dirp(a0,7).map(v=>v.toFixed(1)).join(' ');
+      pts.forEach(p=>{ d+=' L'+p[0].toFixed(1)+' '+p[1].toFixed(1); });
+      d+=' L'+dirp(a1,7).map(v=>v.toFixed(1)).join(' ')+' Z';
+      return '<path d="'+d+'" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="'+(0.7*th).toFixed(1)+'" stroke-linejoin="round"/>';
+    }
+    let w='';
+    cfg.ranks.forEach(r=>{ w+=fan(r[0],r[1],r[2],r[3],r[4]); });
+    if(fine && cfg.rachis){
+      const r0=cfg.ranks[0]; let rch='';
+      for(let f=0;f<r0[2];f++){
+        const a=r0[0]+((r0[1]-r0[0])/(r0[2]-1))*f;
+        rch+='M'+dirp(a,10).map(v=>v.toFixed(1)).join(' ')+' L'+dirp(a,r0[3]-3).map(v=>v.toFixed(1)).join(' ')+' ';
+      }
+      w+='<path d="'+rch+'" fill="none" stroke="'+P.deep+'" stroke-width=".45" opacity=".55"/>';
+    }
+    if(cfg.arch){
+      w+='<path d="'+cfg.arch+'" fill="none" stroke="url(#'+id+'m)" stroke-width="'+(2*th).toFixed(1)+'" stroke-linecap="round"/>';
+      if(fine && cfg.archHi) w+='<path d="'+cfg.archHi+'" fill="none" stroke="'+P.hi+'" stroke-width=".6" opacity=".5"/>';
+    }
+    return '<g>'+w+'</g><g transform="translate(100 0) scale(-1 1)">'+w+'</g>';
   }
-  const GLY={
-    book:function(id,P){ return '<g class="glyph" transform="translate(50 50) scale(1.12)">'+
-      '<path d="M-12 7.5 Q -6.5 4 0 5 Q 6.5 4 12 7.5 L12 -6 Q 6.5 -9.5 0 -8.5 Q -6.5 -9.5 -12 -6 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1"/>'+
-      '<path d="M0 5 L0 -8.5" stroke="'+P.deep+'" stroke-width="1.1"/>'+
-      '<path d="M-9 -3.5 Q -5 -5.5 -2.5 -4.5 M-9 0 Q -5 -2 -2.5 -1 M2.5 -4.5 Q 5 -5.5 9 -3.5 M2.5 -1 Q 5 -2 9 0" stroke="'+P.plateLo+'" stroke-width=".9" fill="none"/></g>'; },
-    sun:function(id,P){ let rays='';
-      for(let i=0;i<8;i++){ const a=i*Math.PI/4, L=(i%2?16.5:20), w=.21, R=11;
-        rays+='<path d="M'+(Math.cos(a-w)*R).toFixed(1)+' '+(Math.sin(a-w)*R).toFixed(1)+' L'+(Math.cos(a)*L).toFixed(1)+' '+(Math.sin(a)*L).toFixed(1)+' L'+(Math.cos(a+w)*R).toFixed(1)+' '+(Math.sin(a+w)*R).toFixed(1)+' Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".7"/>'; }
-      return '<g class="glyph" transform="translate(50 48)">'+rays+
-        '<circle r="9.2" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.1"/>'+
-        '<circle r="5.2" fill="'+P.hi+'" opacity=".65"/></g>'; },
-    keycap:function(id,P){ return '<g class="glyph" transform="translate(50 50)">'+
-      '<rect x="-13" y="-12.5" width="26" height="25" rx="4.5" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.2"/>'+
-      '<rect x="-9.5" y="-9.5" width="19" height="17" rx="3" fill="'+P.plateLo+'" stroke="'+P.deep+'" stroke-width=".8"/>'+
-      '<text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="10.5" fill="'+P.hi+'">F4</text></g>'; },
-    briefcase:function(id,P){ return '<g class="glyph" transform="translate(50 50.5)">'+
-      '<path d="M-5 -9.5 L-5 -12 Q-5 -13.8 -3.2 -13.8 L3.2 -13.8 Q5 -13.8 5 -12 L5 -9.5" fill="none" stroke="'+P.deep+'" stroke-width="2.4"/>'+
-      '<rect x="-14" y="-9.5" width="28" height="21" rx="2.5" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.2"/>'+
-      '<path d="M-14 -2.8 L14 -2.8" stroke="'+P.deep+'" stroke-width="1"/>'+
-      '<rect x="-3.2" y="-5" width="6.4" height="4.8" rx="1" fill="'+P.plateLo+'" stroke="'+P.deep+'" stroke-width=".8"/>'+
-      '<path d="M-10.5 -2.8 L-10.5 .5 M10.5 -2.8 L10.5 .5" stroke="'+P.deep+'" stroke-width="1.4"/>'+
-      '<path d="M-12.5 -8 L12.5 -8" stroke="'+P.hi+'" stroke-width=".9" opacity=".6"/></g>'; },
-    chart:function(id,P){ return '<g class="glyph" transform="translate(50 53)">'+
-      '<rect x="-12" y="3" width="5.2" height="10" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
-      '<rect x="-3.5" y="-2" width="5.2" height="15" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
-      '<rect x="5" y="-7" width="5.2" height="20" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
-      '<path d="M-12 -6 L-1 -11 L5 -14.5 L12 -17.5" fill="none" stroke="'+P.hi+'" stroke-width="2.1" stroke-linecap="round"/>'+
-      '<path d="M7 -19.5 L12.8 -17.8 L10.3 -12.6" fill="none" stroke="'+P.hi+'" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></g>'; },
-    bull:function(id,P){ return '<g class="glyph" transform="translate(50 52)">'+
-      '<path d="M-9.5 -6 Q-21.5 -8 -20.5 -22.5 Q-13 -16 -7.5 -11.5 Z" fill="#f3ead9" stroke="'+P.deep+'" stroke-width="1"/>'+
-      '<path d="M9.5 -6 Q21.5 -8 20.5 -22.5 Q13 -16 7.5 -11.5 Z" fill="#f3ead9" stroke="'+P.deep+'" stroke-width="1"/>'+
-      '<path d="M-10.5 -12.5 L10.5 -12.5 L14 -5 L8.5 4 L5 13 L-5 13 L-8.5 4 L-14 -5 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.2" stroke-linejoin="round"/>'+
-      '<path d="M-5 -12.5 Q0 -9 5 -12.5" fill="none" stroke="'+P.deep+'" stroke-width=".9" opacity=".8"/>'+
-      '<path d="M-8.7 -4.8 L-3.2 -2.6 L-3.8 -.4 L-8.7 -2.2 Z" fill="#ffe1d6"/>'+
-      '<path d="M8.7 -4.8 L3.2 -2.6 L3.8 -.4 L8.7 -2.2 Z" fill="#ffe1d6"/>'+
-      '<path d="M-7.5 5 Q0 8 7.5 5 L5 13 Q0 15.2 -5 13 Z" fill="'+P.lo+'" stroke="'+P.deep+'" stroke-width=".9"/>'+
-      '<ellipse cx="-3.1" cy="9.6" rx="1.5" ry="2" fill="'+P.deep+'"/>'+
-      '<ellipse cx="3.1" cy="9.6" rx="1.5" ry="2" fill="'+P.deep+'"/></g>'; },
-    rocket:function(id,P){ return '<g class="glyph" transform="translate(50 48.5)">'+
-      '<path d="M-7.2 3 L-13.5 12.5 L-6 9.8 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
-      '<path d="M7.2 3 L13.5 12.5 L6 9.8 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'+
-      '<path d="M-2.8 10.5 L0 19.5 L2.8 10.5 Z" fill="'+P.hi+'"/>'+
-      '<path d="M-1.3 10.5 L0 15.5 L1.3 10.5 Z" fill="#ffffff"/>'+
-      '<path d="M0 -18.5 Q7.2 -9.5 7.2 .5 Q7.2 6.5 5.2 10.5 L-5.2 10.5 Q-7.2 6.5 -7.2 .5 Q-7.2 -9.5 0 -18.5 Z" fill="#f6feff" stroke="'+P.lo+'" stroke-width="1.1"/>'+
-      '<path d="M0 -18.5 Q-7.2 -9.5 -7.2 .5 Q-7.2 6.5 -5.2 10.5 L-2 10.5 Q-3.6 5 -3.6 -1 Q-3.6 -11 0 -18.5 Z" fill="'+P.mid+'" opacity=".35"/>'+
-      '<circle cx="0" cy="-4.5" r="3.1" fill="'+P.plateLo+'" stroke="'+P.deep+'" stroke-width="1"/>'+
-      '<circle cx="0" cy="-4.5" r="1.4" fill="'+P.hi+'" opacity=".8"/></g>'; },
+  const WINGS={
+    small:{px:60,py:33, ranks:[[-8,50,4,27,.72]]},
+    mid:  {px:58,py:32, ranks:[[-16,58,5,35,.73],[-10,48,4,23,.70]], rachis:1,
+           arch:'M55 26 Q70 13 88 16'},
+    full: {px:57,py:30, ranks:[[-24,70,6,40,.74],[-18,60,5,29,.72],[-12,50,4,19,.70]], rachis:1,
+           arch:'M53 22 Q70 6 93 13', archHi:'M55 25 Q70 12 89 15'},
+    grand:{px:57,py:30, ranks:[[-28,72,7,42,.75],[-20,62,5,31,.72],[-13,52,4,21,.70]], rachis:1,
+           arch:'M53 21 Q70 4 95 11', archHi:'M55 24 Q70 10 91 13'}
   };
+  /* ---- banner scroll with fork tails. txt = the tier motto (engraved, drops in
+     coarse); no txt = plain ruled scroll; memento adds the shatter cracks —
+     the summit's memento-of-beginnings, top bucket only. ---- */
+  function banner(id,P,th,fine,txt,memento){
+    const x0=21,x1=79,y0=87,y1=96;
+    const bf=fine?null:P.lo;   // coarse: solid mid metal so the scroll reads as a bar
+    const tail='M'+x1+' '+y0+' L'+(x1+9)+' '+(y0+1.7)+' L'+(x1+4.6)+' 91.5 L'+(x1+8.2)+' '+(y1-1.7)+' L'+x1+' '+y1+' Z';
+    const tailL='M'+x0+' '+y0+' L'+(x0-9)+' '+(y0+1.7)+' L'+(x0-4.6)+' 91.5 L'+(x0-8.2)+' '+(y1-1.7)+' L'+x0+' '+y1+' Z';
+    let s=eng(id,P,tail,1.1*th,bf)+eng(id,P,tailL,1.1*th,bf)+
+      eng(id,P,'M'+x0+' '+y0+' H'+x1+' V'+y1+' H'+x0+' Z',1.4*th,bf);
+    if(fine){
+      if(txt){
+        const fs=txt.length>8?6.2:7.4, ls=txt.length>8?'.35':'.6';
+        s+='<text x="50.5" y="94.1" text-anchor="middle" font-family="'+MONO+'" font-weight="800" font-size="'+fs+'" letter-spacing="'+ls+'" fill="'+P.deep+'">'+txt+'</text>'+
+           '<text x="50" y="93.6" text-anchor="middle" font-family="'+MONO+'" font-weight="800" font-size="'+fs+'" letter-spacing="'+ls+'" fill="'+P.hi+'">'+txt+'</text>';
+      } else {
+        s+='<path d="M26 89.8 H74 M26 93.4 H74" stroke="'+P.lo+'" stroke-width=".6" opacity=".75"/>';
+      }
+      if(memento){
+        s+='<path d="M33 86.5 l1.8 3.2 l-2.4 2.8 l1.6 3.8 M67.5 86.5 l-2 3 l2.5 3 l-1.7 3.6" fill="none" stroke="'+P.deep+'" stroke-width=".9"/>'+
+           '<path d="M33.7 86.5 l1.8 3.2 l-2.4 2.8 M66.8 86.5 l-2 3 l2.5 3" fill="none" stroke="'+P.hi+'" stroke-width=".45" opacity=".6"/>';
+      }
+    }
+    return s;
+  }
+  /* ---- finials above the plate: bead → diamond → star (the summit's alone) ---- */
+  function finial(id,P,th,fine,kind){
+    if(kind==='bead')
+      return engLine(id,P,'M50 22 V13',1.8*th)+
+        '<circle cx="50" cy="11.6" r="1.9" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>';
+    if(kind==='diamond'){
+      let s=engLine(id,P,'M50 22 V6',1.8*th)+
+        '<rect x="47.4" y="4.4" width="5.2" height="5.2" transform="rotate(45 50 7)" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>';
+      if(fine) s+='<path d="M48.6 5.6 l2.8 2.8 M48.6 8.4 l2.8 -2.8" stroke="'+P.deep+'" stroke-width=".45" opacity=".6"/>'+
+        engArm(id,P,th);
+      return s;
+    }
+    // star — top-bucket Second-Year only
+    let s=engLine(id,P,'M50 22 V11',1.8*th)+
+      '<path d="M50 0 L51.7 4.3 L56 6 L51.7 7.7 L50 12 L48.3 7.7 L44 6 L48.3 4.3 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>';
+    if(fine) s+='<circle cx="50" cy="6" r="1" fill="'+P.hi+'" opacity=".9"/>'+engArm(id,P,th);
+    return s;
+  }
+  function engArm(id,P,th){ // curled gothic side arms + tip beads
+    const a='<path d="M54 16 q7.5 -1.5 10.5 -8" fill="none" stroke="url(#'+id+'m)" stroke-width="'+(1.1*th).toFixed(1)+'" opacity=".85"/>'+
+      '<circle cx="65" cy="7.5" r="1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".4"/>';
+    return '<g>'+a+'</g><g transform="translate(100 0) scale(-1 1)">'+a+'</g>';
+  }
+  /* mantling curls off the shoulders — stage 1 = the upper curl only (the
+     half-step between bordure and full mantling), stage 2 = the full set */
+  function mantling(id,P,th,stage){
+    const up='M73 25 q11 1 14 11 q-5.5 -2.5 -8 -6.5 q1.5 7 6.5 11.5 q-8 -1.5 -11.5 -9';
+    const curl=stage>=2 ? up+' M72 51 q8 3 8.5 11 q-5 -3 -7.5 -7' : up;
+    return '<g>'+engLine(id,P,curl,1.5*th)+'</g><g transform="translate(100 0) scale(-1 1)">'+engLine(id,P,curl,1.5*th)+'</g>';
+  }
+  function rivets(id,P){
+    return [[31,26],[69,26],[31,47],[69,47]].map(function(q){
+      return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="1.4" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".5"/>';
+    }).join('');
+  }
+  /* ---- the CHARGES — keyboard-warrior devices, engraved in the tier metal ---- */
+  const DEV={
+    // engraved cell grid, the shield field texture (fine sizes only)
+    grid:function(id,P,op){
+      return '<g clip-path="url(#'+id+'clip)" opacity="'+op+'">'+
+        '<path d="M36 22 V84 M50 22 V84 M64 22 V84 M27 37 H73 M27 52 H73 M27 67 H73" '+
+        'stroke="'+P.mid+'" stroke-width=".65" fill="none"/>'+
+        '<path d="M36.5 22.5 V83 M27.5 37.5 H72.5" stroke="'+P.hi+'" stroke-width=".3" opacity=".4"/></g>';
+    },
+    // #REF! — the memento of beginnings, MBA's charge and nowhere else
+    ref:function(id,P,fine){
+      return '<text x="50.6" y="56.4" text-anchor="middle" font-family="'+MONO+'" font-weight="800" font-size="13" fill="'+P.deep+'">#REF!</text>'+
+        '<text x="50" y="55.7" text-anchor="middle" font-family="'+MONO+'" font-weight="800" font-size="13" fill="'+P.hi+'">#REF!</text>';
+    },
+    // blank keycap as the shield boss
+    keycap:function(id,P,fine){
+      let s=eng(id,P,'M42 41 H58 Q61 41 61 44 V58 Q61 61 58 61 H42 Q39 61 39 58 V44 Q39 41 42 41 Z',1.5,
+        fine?null:P.deep);
+      if(fine) s+='<path d="M42.5 44.2 H57.5" stroke="'+P.hi+'" stroke-width=".7" opacity=".6"/>'+
+        '<path d="M43 57.8 H57" stroke="'+P.deep+'" stroke-width=".7" opacity=".7"/>';
+      else s+='<path d="M42.5 44.8 H57.5" stroke="'+P.hi+'" stroke-width="1.6" opacity=".8"/>';
+      return s;
+    },
+    // #### overflow bars worn as a chevron
+    chev:function(id,P,fine){
+      let s=eng(id,P,'M30 47 L50 35 L70 47 L70 56 L50 44 L30 56 Z',1.3,fine?null:P.deep);
+      if(fine) s+='<path d="M38 44.4 V49.8 M44 40.8 V46.2 M56 40.8 V46.2 M62 44.4 V49.8" stroke="'+P.deep+'" stroke-width="1.7" opacity=".85"/>'+
+        '<path d="M30.5 46.6 L50 34.9 L69.5 46.6" fill="none" stroke="'+P.hi+'" stroke-width=".55" opacity=".55"/>';
+      else s+='<path d="M30.5 46.4 L50 34.7 L69.5 46.4" fill="none" stroke="'+P.hi+'" stroke-width="1.4" opacity=".8"/>';
+      return s;
+    },
+    // crossed arrow keys — the saltire
+    saltire:function(id,P,fine){
+      if(!fine)
+        return '<path d="M38.5 39.5 L61.5 62.5 M61.5 39.5 L38.5 62.5" fill="none" stroke="'+P.deep+'" stroke-width="7.4" stroke-linecap="round"/>'+
+          '<path d="M38.5 39.5 L61.5 62.5 M61.5 39.5 L38.5 62.5" fill="none" stroke="'+P.hi+'" stroke-width="3.6" stroke-linecap="round"/>';
+      const key='M46.5 35 H53.5 Q56 35 56 38 V64 Q56 67 53.5 67 H46.5 Q44 67 44 64 V38 Q44 35 46.5 35 Z';
+      function baton(rot){
+        return '<g transform="rotate('+rot+' 50 51)">'+eng(id,P,key,1.4)+
+          '<path d="M50 38.8 L53.8 45.4 H46.2 Z" fill="'+P.deep+'" opacity=".92"/>'+
+          '<path d="M46.8 37.4 H53.2" stroke="'+P.hi+'" stroke-width=".6" opacity=".6"/></g>';
+      }
+      return baton(-45)+baton(45);
+    },
+    // ↵ enter-return — the keystroke that commits the model
+    enter:function(id,P,fine){
+      if(!fine)
+        return '<path d="M62.5 37.5 V53 H48" fill="none" stroke="'+P.deep+'" stroke-width="7.6" stroke-linecap="round" stroke-linejoin="round"/>'+
+          '<path d="M62.5 37.5 V53 H48" fill="none" stroke="'+P.hi+'" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>'+
+          '<path d="M49.5 44.5 L35.5 53 L49.5 61.5 Z" fill="'+P.hi+'" stroke="'+P.deep+'" stroke-width="1.6" stroke-linejoin="round"/>';
+      return engLine(id,P,'M62.5 37.5 V53 H46.5',3.2)+
+        eng(id,P,'M47.5 46 L36 53 L47.5 60 Z',1.2,'url(#'+id+'m)')+
+        '<path d="M61.3 39 V51.6" stroke="'+P.hi+'" stroke-width=".6" opacity=".6"/>';
+    },
+    // crossed swords, keycap pommels — the desk militant
+    swords:function(id,P,fine){
+      if(!fine)
+        return '<path d="M63.5 37.5 L36.5 64.5 M36.5 37.5 L63.5 64.5" fill="none" stroke="'+P.deep+'" stroke-width="7.4" stroke-linecap="round"/>'+
+          '<path d="M63.5 37.5 L36.5 64.5 M36.5 37.5 L63.5 64.5" fill="none" stroke="'+P.hi+'" stroke-width="3.4" stroke-linecap="round"/>'+
+          '<circle cx="37.6" cy="63.4" r="3.4" fill="'+P.hi+'" stroke="'+P.deep+'" stroke-width="1.4"/>'+
+          '<circle cx="62.4" cy="63.4" r="3.4" fill="'+P.hi+'" stroke="'+P.deep+'" stroke-width="1.4"/>';
+      function sword(rot){
+        return '<g transform="rotate('+rot+' 50 51)">'+
+          eng(id,P,'M50 31 L52.4 36.5 L52.4 56.5 L47.6 56.5 L47.6 36.5 Z',1.2)+          // blade
+          eng(id,P,'M43.2 56.5 H56.8 V59.4 H43.2 Z',1.1)+                                // crossguard
+          eng(id,P,'M48.3 59.4 H51.7 V64.6 H48.3 Z',1)+                                  // grip
+          eng(id,P,'M46.2 64.8 H53.8 Q55.4 64.8 55.4 66.4 V69.6 Q55.4 71.2 53.8 71.2 H46.2 Q44.6 71.2 44.6 69.6 V66.4 Q44.6 64.8 46.2 64.8 Z',1.1)+  // keycap pommel
+          '<path d="M50 34 V54.5" stroke="'+P.deep+'" stroke-width=".6" opacity=".6"/>'+ // fuller
+          '<path d="M46.4 66.4 H53.6" stroke="'+P.hi+'" stroke-width=".55" opacity=".6"/></g>';
+      }
+      return sword(-45)+sword(45);
+    },
+    // Σ — reserved: the ladder is allowed exactly ONE sigma (Wolf), and the
+    // summit gem carries it. Nothing else may call this.
+    sigma:function(id,P,fine,scale,cy){
+      const k=scale||1, cx=50; cy=cy||51.5;
+      const d='M'+(cx+10*k)+' '+(cy-11*k)+' H'+(cx-10*k)+' L'+(cx+2*k)+' '+cy+' L'+(cx-10*k)+' '+(cy+11*k)+' H'+(cx+10*k);
+      let s='<path d="'+d+'" fill="none" stroke="'+P.deep+'" stroke-width="'+(fine?5.6:6.6)+'" stroke-linecap="square" stroke-linejoin="miter"/>'+
+        '<path d="'+d+'" fill="none" stroke="'+(fine?('url(#'+id+'m)'):P.hi)+'" stroke-width="'+(fine?3.6:4)+'" stroke-linecap="square" stroke-linejoin="miter"/>';
+      if(fine) s+='<path d="M'+(cx+9.4*k)+' '+(cy-12.2*k)+' H'+(cx-9*k)+'" stroke="'+P.hi+'" stroke-width=".7" opacity=".65"/>';
+      return s;
+    },
+    // $ chief — F4, the absolute reference (VP's mark of the anchor; fine only)
+    lock:function(id,P,fine){
+      if(!fine) return '';
+      return eng(id,P,'M50 28.6 A5.6 5.6 0 1 1 49.9 28.6 Z',1.1)+
+        '<text x="50.4" y="37.6" text-anchor="middle" font-family="'+MONO+'" font-weight="800" font-size="8" fill="'+P.deep+'">$</text>'+
+        '<text x="50" y="37.2" text-anchor="middle" font-family="'+MONO+'" font-weight="800" font-size="8" fill="'+P.hi+'">$</text>';
+    },
+    // the bull — kept for the corner office, re-cut in engraved metal
+    bull:function(id,P,fine){
+      const horn=function(s){ return '<path d="M'+(s*-9.5)+' -6 Q'+(s*-21.5)+' -8 '+(s*-20.5)+' -22.5 Q'+(s*-13)+' -16 '+(s*-7.5)+' -11.5 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1"/>'; };
+      let s='<g transform="translate(50 52.5) scale(.88)">'+horn(1)+horn(-1)+
+        '<path d="M-10.5 -12.5 L10.5 -12.5 L14 -5 L8.5 4 L5 13 L-5 13 L-8.5 4 L-14 -5 Z" fill="none" stroke="'+P.deep+'" stroke-width="3.4" stroke-linejoin="round"/>'+
+        '<path d="M-10.5 -12.5 L10.5 -12.5 L14 -5 L8.5 4 L5 13 L-5 13 L-8.5 4 L-14 -5 Z" fill="'+(fine?('url(#'+id+'p)'):P.deep)+'" stroke="url(#'+id+'m)" stroke-width="1.4" stroke-linejoin="round"/>'+
+        '<path d="M-8.7 -4.8 L-3.2 -2.6 L-3.8 -.4 L-8.7 -2.2 Z" fill="'+P.hi+'" opacity=".92"/>'+
+        '<path d="M8.7 -4.8 L3.2 -2.6 L3.8 -.4 L8.7 -2.2 Z" fill="'+P.hi+'" opacity=".92"/>'+
+        '<path d="M-7.5 5 Q0 8 7.5 5 L5 13 Q0 15.2 -5 13 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".9"/>';
+      if(fine) s+='<path d="M-5 -12.5 Q0 -9 5 -12.5" fill="none" stroke="'+P.deep+'" stroke-width=".9" opacity=".8"/>'+
+        '<ellipse cx="-3.1" cy="9.6" rx="1.3" ry="1.8" fill="'+P.deep+'"/>'+
+        '<ellipse cx="3.1" cy="9.6" rx="1.3" ry="1.8" fill="'+P.deep+'"/>'+
+        '<path d="M-9.5 -13.5 H9.5" stroke="'+P.hi+'" stroke-width=".7" opacity=".55"/>';
+      return s+'</g>';
+    },
+    // summit charge: faceted lozenge gem bearing the sigma — the rocket stays dead
+    gem:function(id,P,fine){
+      let s=eng(id,P,'M50 33 L65 51.5 L50 70 L35 51.5 Z',1.5,fine?null:P.deep);
+      if(fine) s+='<path d="M50 33 V70 M35 51.5 H65" stroke="'+P.deep+'" stroke-width=".55" opacity=".6"/>'+
+        '<path d="M49 36.6 L52.6 41 L49 45.5" fill="none" stroke="'+P.hi+'" stroke-width=".6" opacity=".7"/>';
+      s+=DEV.sigma(id,P,fine,0.72,51.5);
+      return s;
+    }
+  };
+  /* tier table: the charge + grid-field opacity (+ VP's $ chief) */
+  const TIERS=[
+    {chg:'ref',    op:.6},            // MBA Associate — the floor remembers
+    {chg:'keycap', op:.55},           // Candidate — the blank key
+    {chg:'chev',   op:.55},           // Summer Analyst — #### overflow
+    {chg:'saltire',op:.42},           // First-Year — crossed arrow keys
+    {chg:'enter',  op:.42},           // Associate — ↵ ships the model
+    {chg:'swords', op:.36, lock:1},   // VP — crossed swords under the $ chief
+    {chg:'bull',   op:.3},            // MD — the corner office
+    {chg:'gem',    op:.3}             // Second-Year — the gem bearing the Σ
+  ];
+  /* r377 MOTTOS — fixed per-tier scroll text (Wolf: no custom-title system,
+     no desk jargon; short playful Excel-culture swagger, escalating gravitas,
+     the summit dignified). One per tier; only tiers whose dress includes the
+     banner (First-Year up) ever show theirs — the lower three are reserved
+     against future dress. Text drops in coarse mode. The summit's scroll
+     stays plain until top bucket, where the memento banner reads CLEAN over
+     the shatter cracks — the model survived its #REF! beginnings. */
+  const MOTTO=['#REF!','ESC','FILL DOWN','A1','NO MOUSE','$A$1','CTRL FREAK','CLEAN'];
+  /* r377 BUCKET-SCALED FURNITURE — the dress grid. Row = tier, column = bucket
+     (bottom/middle/top; no-bucket renders the middle column). Keys: r rivets ·
+     bd bordure · m mantling stage (1 upper curl, 2 full) · b banner ·
+     plain (scroll without motto) · mem memento cracks · w wing stage ·
+     f finial. Top column is exactly the Wolf-approved board ladder; each
+     column steps down one stage so escalation reads incremental and
+     monotonic inside every tier. Top-bucket Second-Year alone gets the
+     grand spread + star + memento banner. */
+  const DRESS=[
+    [ {},                  {r:1},                        {r:1} ],
+    [ {},                  {r:1},                        {bd:1} ],
+    [ {bd:1},              {bd:1,m:1},                   {m:2} ],
+    [ {bd:1,m:1},          {m:2},                        {b:1} ],
+    [ {b:1},               {b:1,m:2},                    {b:1,w:'small'} ],
+    [ {b:1,w:'small'},     {b:1,w:'mid'},                {b:1,w:'mid',f:'bead'} ],
+    [ {b:1,w:'mid'},       {b:1,w:'full'},               {b:1,w:'full',f:'diamond'} ],
+    [ {b:1,plain:1},       {b:1,plain:1,w:'mid',f:'diamond'}, {b:1,mem:1,w:'grand',f:'star'} ]
+  ];
   function svgOpen(sz,bk,max){
     const vb = bk ? '0 0 100 114' : '0 0 100 100';
     const h = bk ? Math.round(sz*1.14) : sz;
@@ -358,216 +584,48 @@ window.rankEmblem = (function(){
        and API unchanged. */
     return '<svg class="rank-emblem'+(bk?' rk-pips':'')+(max?' emblem-max':'')+'" viewBox="'+vb+'" width="'+sz+'" height="'+h+'" aria-hidden="true">';
   }
-  function t_mba(sz,bk,gl){ const id='rk'+(UID++), P=IRON, o2=bk>=2, hot=bk===3;
-    const sq='M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z';
-    return svgOpen(sz,bk,false)+defs(id,P,gl&&hot?0.8:0)+
-      (o2?'<g class="ornament"><circle cx="25.5" cy="25.5" r="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/><circle cx="74.5" cy="25.5" r="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/><circle cx="25.5" cy="74.5" r="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/><circle cx="74.5" cy="74.5" r="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/></g>':'')+
-      frame(id,P,sq,gl&&hot?0.8:0,3.2,hot)+
-      '<path d="M21 42 L79 42 M21 60 L79 60 M41 21 L41 79 M61 21 L61 79" stroke="'+P.mid+'" stroke-width=".8" opacity=".28"/>'+
-      '<path d="M34 16 L55 43 L45 51 L64 84" fill="none" stroke="'+P.deep+'" stroke-width="1.8" opacity=".75"/>'+
-      '<path d="M28.5 22.8 L71.5 22.8" stroke="#ffffff" stroke-width="1.2" opacity=".5"/>'+
-      (hot?'<g class="jewel"><path d="M46.8 21 L50 14.5 L53.2 21 L50 24 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".7"/></g>':'')+
-      '<g class="glyph"><text x="50" y="55.8" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="14" fill="'+P.deep+'">#REF!</text>'+
-      '<text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="14" fill="'+P.hi+'">#REF!</text></g>'+
-      (hot?sparks(P,[[21,17,3],[79,17,3]]):'')+pips(id,P,bk)+'</svg>'; }
-  function t_candidate(sz,bk,gl){ const id='rk'+(UID++), P=SLATE, o2=bk>=2, hot=bk===3, g=gl?[0,0,.4,.9][bk||1]:0;
-    let notch=''; if(o2) for(let i=0;i<8;i++){ const a=i*45*Math.PI/180;
-      notch+='<line x1="'+(50+Math.cos(a)*34).toFixed(1)+'" y1="'+(50+Math.sin(a)*34).toFixed(1)+'" x2="'+(50+Math.cos(a)*38.5).toFixed(1)+'" y2="'+(50+Math.sin(a)*38.5).toFixed(1)+'" stroke="url(#'+id+'m)" stroke-width="4.2"/>'; }
-    return svgOpen(sz,bk,false)+defs(id,P,g)+
-      (o2?'<g class="ornament">'+notch+'</g>':'')+
-      frame(id,P,'M50 17 A33 33 0 1 1 49.9 17 Z',g,3.4,hot)+
-      '<circle cx="50" cy="50" r="26.5" fill="none" stroke="'+P.mid+'" stroke-width="1" opacity="'+(o2?'.8':'.45')+'"/>'+
-      '<path d="M26 39 A27 27 0 0 1 74 39" fill="none" stroke="#ffffff" stroke-width="1.3" opacity=".5"/>'+
-      (hot?'<g class="jewel"><circle cx="50" cy="15.8" r="2.6" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><circle cx="50" cy="15.8" r="1.1" fill="#ffffff" opacity=".85"/></g>':'')+
-      GLY.book(id,P)+(hot?sparks(P,[[22,26,3],[78,26,3]]):'')+pips(id,P,bk)+'</svg>'; }
-  function t_summer(sz,bk,gl){ const id='rk'+(UID++), P=BRONZE, o2=bk>=2, hot=bk===3, g=gl?[0,0,.5,1][bk||1]:0;
-    const sh='M50 10 L82 20 L79 54 L50 90 L21 54 L18 20 Z';
-    return svgOpen(sz,bk,false)+defs(id,P,g)+
-      '<circle cx="50" cy="48" r="29" fill="url(#'+id+'core)" opacity="'+(hot?1:o2?.7:.45)+'"/>'+
-      (o2?'<g class="ornament"><path d="M18 22 L8 17 L15 33 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><path d="M82 22 L92 17 L85 33 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><circle cx="25" cy="24.5" r="2" fill="url(#'+id+'m)"/><circle cx="75" cy="24.5" r="2" fill="url(#'+id+'m)"/><circle cx="23.5" cy="50" r="2" fill="url(#'+id+'m)"/><circle cx="76.5" cy="50" r="2" fill="url(#'+id+'m)"/></g>':'')+
-      frame(id,P,sh,g,3.4,hot)+
-      '<path d="M21 19.2 L50 11 L79 19.2" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".65"/>'+
-      (hot?'<g class="jewel"><path d="M46 12.2 L50 5.5 L54 12.2 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><circle cx="50" cy="10" r="1.1" fill="#ffffff" opacity=".85"/></g>':'')+
-      GLY.sun(id,P)+(hot?sparks(P,[[18,17,3.2],[82,17,3.2]]):'')+pips(id,P,bk)+'</svg>'; }
-  function t_firstyear(sz,bk,gl){ const id='rk'+(UID++), P=SILVER, o2=bk>=2, hot=bk===3, g=gl?[0,0,.6,1.1][bk||1]:0;
-    const hx='M50 8 L82 26 L82 62 L50 92 L18 62 L18 26 Z';
-    return svgOpen(sz,bk,false)+defs(id,P,g)+
-      '<circle cx="50" cy="49" r="30" fill="url(#'+id+'core)" opacity="'+(hot?1:o2?.7:.45)+'"/>'+
-      (o2?'<g class="ornament"><path d="M18 26 L8 21 L18 36 M82 26 L92 21 L82 36" fill="none" stroke="url(#'+id+'m)" stroke-width="2.8"/></g>':'')+
-      (hot?'<g class="ornament"><path d="M18 62 L10 70 M82 62 L90 70" stroke="url(#'+id+'m)" stroke-width="2.8"/></g>':'')+
-      frame(id,P,hx,g,3.4,hot)+
-      '<path d="M50 12.5 L78 28 M50 12.5 L22 28" stroke="#ffffff" stroke-width="1.3" opacity=".55"/>'+
-      (hot?'<g class="jewel"><path d="M46.5 10 L50 3.5 L53.5 10 L50 13 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/></g>':'')+
-      GLY.keycap(id,P)+(hot?sparks(P,[[10,20,3.2],[90,20,3.2]]):'')+pips(id,P,bk)+'</svg>'; }
-  function t_associate(sz,bk,gl){ const id='rk'+(UID++), P=GOLD, o2=bk>=2, hot=bk===3, g=gl?[0,.7,1.1,1.6][bk||1]:0;
-    const cr='M50 11 L63 21 L84 16 L80 46 L68 78 L50 88 L32 78 L20 46 L16 16 L37 21 Z';
-    let lr=''; if(o2) for(let s of [-1,1]){
-      lr+='<path d="M'+(50+s*31)+' 78 q '+(s*17)+' -12 '+(s*18)+' -38" fill="none" stroke="url(#'+id+'m)" stroke-width="2.5" stroke-linecap="round"/>';
-      for(let l=0;l<5;l++){ const t2=l/4.4, x=50+s*(31+16*t2*(2-t2)*0.95), y=77-38*t2;
-        lr+='<ellipse cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" rx="5" ry="2.1" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".5" transform="rotate('+(s*(-54+t2*70)).toFixed(1)+' '+x.toFixed(1)+' '+y.toFixed(1)+')"/>'; } }
-    return svgOpen(sz,bk,false)+defs(id,P,g)+
-      '<circle cx="50" cy="48" r="31" fill="url(#'+id+'core)" opacity="'+(hot?1:o2?.8:.55)+'"/>'+
-      (o2?'<g class="ornament">'+lr+'</g>':'')+
-      frame(id,P,cr,g,3.4,hot)+
-      '<path d="M37 21.6 L50 12 L63 21.6" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".7"/>'+
-      (hot?'<g class="jewel"><circle cx="50" cy="16.5" r="2.4" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/><circle cx="50" cy="16.5" r="1" fill="#ffffff" opacity=".9"/></g>':'')+
-      GLY.briefcase(id,P)+(hot?sparks(P,[[16,13,3.4],[84,13,3.4]]):'')+pips(id,P,bk)+'</svg>'; }
-  function t_vp(sz,bk,gl){ const id='rk'+(UID++), P=PLAT, o2=bk>=2, hot=bk===3, g=gl?[0,1,1.5,2][bk||1]:0;
-    const cr='M50 10 L60 20 L84 14 L78 40 L82 52 L62 84 L50 92 L38 84 L18 52 L22 40 L16 14 L40 20 Z';
-    return svgOpen(sz,bk,false)+defs(id,P,g)+
-      (hot?'<g class="aura" opacity=".7"><circle cx="50" cy="50" r="48" fill="url(#'+id+'a)"/></g>':'')+
-      '<circle cx="50" cy="48" r="33" fill="url(#'+id+'core)" opacity="'+(hot?1:o2?.8:.55)+'"/>'+
-      (o2?'<g class="ornament"><path d="M16 14 L4 8 L14 26 L8 24 L18 38" fill="none" stroke="url(#'+id+'m)" stroke-width="2.8" stroke-linejoin="round"/><path d="M84 14 L96 8 L86 26 L92 24 L82 38" fill="none" stroke="url(#'+id+'m)" stroke-width="2.8" stroke-linejoin="round"/></g>':'')+
-      (hot?'<g class="ornament"><path d="M38 84 L30 94 M62 84 L70 94" stroke="url(#'+id+'m)" stroke-width="2.4"/></g>':'')+
-      frame(id,P,cr,g,3.4,hot)+
-      '<path d="M40 20.5 L50 11 L60 20.5" fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".75"/>'+
-      (hot?'<g class="jewel"><path d="M50 10 L50 3" stroke="url(#'+id+'m)" stroke-width="2.4"/><circle cx="50" cy="2.5" r="2" fill="'+P.hi+'"/></g>':'')+
-      GLY.chart(id,P)+(hot?sparks(P,[[4,8,3.6],[96,8,3.6]]):'')+pips(id,P,bk)+'</svg>'; }
-  function t_md(sz,bk,gl){ const id='rk'+(UID++), P=CRIM, o2=bk>=2, hot=bk===3, g=gl?[0,1.6,2.1,2.6][bk||1]:0;
-    const cr='M50 14 L64 22 L88 10 L80 38 L86 50 L64 86 L50 94 L36 86 L14 50 L20 38 L12 10 L36 22 Z';
-    let horns='';
-    for(let s of [-1,1]){
-      horns+='<path d="M'+(50+s*38)+' 26 Q '+(50+s*58)+' 14 '+(50+s*62)+' -2 Q '+(50+s*50)+' 8 '+(50+s*42)+' 10 Q '+(50+s*46)+' 16 '+(50+s*38)+' 26 Z" transform="translate(0 14)" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1"/>';
-      horns+='<path d="M'+(50+s*36)+' 60 Q '+(50+s*52)+' 62 '+(50+s*56)+' 74 Q '+(50+s*44)+' 70 '+(50+s*40)+' 66 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".8"/>'; }
-    return svgOpen(sz,bk,false)+defs(id,P,g)+
-      '<g class="aura" opacity="'+(hot?1:o2?.8:.55)+'"><circle cx="50" cy="50" r="49" fill="url(#'+id+'a)"/></g>'+
-      '<circle cx="50" cy="50" r="34" fill="url(#'+id+'core)"/>'+
-      (o2?'<g class="ornament">'+horns+'</g>':'')+
-      frame(id,P,cr,g,3.6,hot)+
-      '<g class="ornament"'+(hot&&g?' filter="url(#'+id+'g)"':'')+'>'+
-      '<path d="M35 21 L38 7 L46 15 L50 4 L54 15 L62 7 L65 21 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width="1.1"/>'+
-      (hot?'<circle cx="50" cy="3" r="2.3" fill="#ffd9cf"/><circle cx="38.4" cy="6.2" r="1.5" fill="#ffd9cf"/><circle cx="61.6" cy="6.2" r="1.5" fill="#ffd9cf"/>':'')+'</g>'+
-      GLY.bull(id,P)+(hot?sparks(P,[[12,10,3.8],[88,10,3.8],[50,-1,3]]):'')+pips(id,P,bk)+'</svg>'; }
-  function t_summit(sz,bk,gl){ const id='rk'+(UID++), P=DIAM, o2=bk>=2, hot=bk===3, g=gl?[0,1.8,2.3,2.8][bk||1]:0;
-    const sp='M50 2 L65 17 L90 21 L77 45 L81 61 L59 88 L50 98 L41 88 L19 61 L23 45 L10 21 L35 17 Z';
-    const rop=o2?1:.45;
-    let rays=''; for(let i=0;i<20;i++){ const a=(i*18-90)*Math.PI/180, big=i%5===0;
-      rays+='<line x1="'+(50+Math.cos(a)*(big?39:42)).toFixed(1)+'" y1="'+(50+Math.sin(a)*(big?39:42)).toFixed(1)+'" x2="'+(50+Math.cos(a)*(big?50:46.5)).toFixed(1)+'" y2="'+(50+Math.sin(a)*(big?50:46.5)).toFixed(1)+'" stroke="'+(big?'#ffd968':P.hi)+'" stroke-width="'+(big?2.6:0.9)+'" stroke-linecap="round" opacity="'+((big?0.95:0.5)*rop).toFixed(2)+'"/>'; }
-    let shards=''; for(let s of [-1,1]){
-      shards+='<path d="M'+(50+s*44)+' 29 L'+(50+s*51)+' 23 L'+(50+s*48)+' 33 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>'+
-        '<path d="M'+(50+s*46)+' 51 L'+(50+s*54)+' 49 L'+(50+s*48)+' 59 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>'+
-        (hot?'<path d="M'+(50+s*37)+' 77 L'+(50+s*45)+' 83 L'+(50+s*36)+' 85 Z" fill="url(#'+id+'m)" stroke="'+P.deep+'" stroke-width=".6"/>':''); }
-    return svgOpen(sz,bk,true)+defs(id,P,g)+
-      '<g class="aura" opacity="'+(hot?1:o2?.8:.6)+'"><circle cx="50" cy="50" r="49" fill="url(#'+id+'a)"/>'+rays+'</g>'+
-      '<circle cx="50" cy="50" r="34" fill="url(#'+id+'core)"/>'+
-      (o2?'<g class="ornament">'+shards+'</g>':'')+
-      frame(id,P,sp,g,3.6,hot)+
-      '<path d="M35 17.8 L50 3.5 L65 17.8" fill="none" stroke="#ffffff" stroke-width="1.5" opacity=".85"/>'+
-      (hot?'<g class="jewel"><path d="M50 -3 L51.6 1.4 L56 3 L51.6 4.6 L50 9 L48.4 4.6 L44 3 L48.4 1.4 Z" fill="#ffd968" stroke="#523a05" stroke-width=".6"/></g>':'')+
-      GLY.rocket(id,P)+(hot?sparks(P,[[10,21,3.8],[90,21,3.8],[50,-2,3.2]]):'')+pips(id,P,bk)+'</svg>'; }
-  const BUILD=[t_mba,t_candidate,t_summer,t_firstyear,t_associate,t_vp,t_md,t_summit];
-  // tier accent colors for celebration confetti etc. — same palettes as the emblems
-  window.RANK_COLORS={'MBA Associate':[IRON.mid,IRON.hi],'Candidate':[SLATE.mid,SLATE.hi],
-    'Summer Analyst':[BRONZE.mid,BRONZE.hi],'First-Year Analyst':[SILVER.mid,SILVER.hi],
-    'Associate':[GOLD.mid,GOLD.hi],'VP':[PLAT.mid,PLAT.hi],'MD':[CRIM.mid,CRIM.hi],
+  window.RANK_COLORS={'MBA Associate':[IRON.mid,IRON.hi],'Candidate':[BRONZE.mid,BRONZE.hi],
+    'Summer Analyst':[SILVER.mid,SILVER.hi],'First-Year Analyst':[GOLD.mid,GOLD.hi],
+    'Associate':[AMET.mid,AMET.hi],'VP':[PLAT.mid,PLAT.hi],'MD':[CRIM.mid,CRIM.hi],
     'Second-Year Analyst':[DIAM.mid,DIAM.hi,'#ffd968']};
-  /* r240 (Wolf): FLAT rank emblems — each tier keeps its distinct silhouette
-     (square / circle / shield / hex / crown / star) and its glyph, but rendered
-     flat: a solid tier colour, a white glyph with a soft ink outline, and 3 flat
-     bucket pips. No gradients, glow, sparks, or jewels — favicon-sleek, matching
-     the level chips. */
-  const FLAT=[
-    {sh:'M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z', col:'#5f6672', gl:'ref'},        // MBA — rounded square
-    {sh:'M50 17 A33 33 0 1 1 49.9 17 Z', col:'#8b93a1', gl:'book'},                                   // Candidate — disc
-    {sh:'M50 10 L82 20 L79 54 L50 90 L21 54 L18 20 Z', col:'#c0793c', gl:'sun'},                       // Summer — shield
-    {sh:'M50 8 L82 26 L82 62 L50 92 L18 62 L18 26 Z', col:'#7e8794', gl:'keycap'},                     // First-Year — hex
-    {sh:'M27 17 H73 Q76 17 76 20 V50 Q76 58 50 85 Q24 58 24 50 V20 Q24 17 27 17 Z', col:'#e0a52a', gl:'briefcase'}, // Associate — rounded-top crest (holds the wide briefcase cleanly)
-    {sh:'M50 10 L60 20 L84 14 L78 40 L82 52 L62 84 L50 92 L38 84 L18 52 L22 40 L16 14 L40 20 Z', col:'#33b0a1', gl:'chart'}, // VP — spiked crown
-    {sh:'M50 14 L64 22 L88 10 L80 38 L86 50 L64 86 L50 94 L36 86 L14 50 L20 38 L12 10 L36 22 Z', col:'#d14b3b', gl:'bull'},  // MD — jagged crown
-    {sh:'M50 2 L65 17 L90 21 L77 45 L81 61 L59 88 L50 98 L41 88 L19 61 L23 45 L10 21 L35 17 Z', col:'#6d9be6', gl:'rocket'}, // Second-Year — summit star
-  ];
-  const FLAT_P={hi:'#ffffff',mid:'#ffffff',lo:'#ffffff',deep:'rgba(20,22,26,.42)',plateHi:'#ffffff',plateLo:'rgba(20,22,26,.34)',core:'#ffffff'};
-  /* r376 (Wolf, board B): TOP-TIER FURNITURE — Warhammer-crest dress for the two
-     summit tiers, drawn BEHIND the untouched crest in the tier's own metal
-     (CRIM / DIAM): gothic spread wings with THREE feather ranks (separated tips +
-     rachis lines), a cross-hatched finial with curled arms, and a fork-tailed
-     banner scroll with inner curls. Monochrome-engraved — no new colors. Size
-     branch: below 28px the finest hatching (rachis, rules, curls, cross-hatch)
-     drops and minimum strokes thicken so 16-22px board rows stay crisp. */
-  function crestFurniture(P, sz){
-    const id='fu'+(UID++), fine=sz>=28, th=fine?1:1.6;
-    let s='<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1">'+
-      '<stop offset="0" stop-color="'+P.hi+'"/><stop offset=".5" stop-color="'+P.mid+'"/>'+
-      '<stop offset="1" stop-color="'+P.lo+'"/></linearGradient></defs>';
-    // ---- right wing (mirrored below): pivot at the crest shoulder. Three ranks
-    // of SOLID scalloped fans (primaries under secondaries under coverts), each
-    // tip a separated point, engraved apart by the deep stroke + rachis lines.
-    const px=56, py=28;
-    const dirp=(ang,r)=>[px+Math.cos(ang*Math.PI/180)*r, py+Math.sin(ang*Math.PI/180)*r];
-    function fan(a0,a1,n,R,notch){
-      const step=(a1-a0)/(n-1), pts=[];
-      for(let f2=0;f2<n;f2++){
-        if(f2>0) pts.push(dirp(a0+step*(f2-0.5), R*notch));
-        pts.push(dirp(a0+step*f2, R));
-      }
-      let d='M'+dirp(a0,7).map(v=>v.toFixed(1)).join(' ');
-      pts.forEach(p=>{ d+=' L'+p[0].toFixed(1)+' '+p[1].toFixed(1); });
-      d+=' L'+dirp(a1,7).map(v=>v.toFixed(1)).join(' ')+' Z';
-      return '<path d="'+d+'" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width="'+(0.7*th).toFixed(1)+'" stroke-linejoin="round"/>';
-    }
-    let wing='';
-    wing+=fan(-24, 70, 6, 41, 0.74);   // primaries — the long rank
-    wing+=fan(-18, 60, 5, 30, 0.72);   // secondaries
-    wing+=fan(-12, 50, 4, 20, 0.70);   // coverts
-    if(fine){
-      // rachis lines — one quill per primary tip, drawn through the stack
-      let rch='';
-      for(let f3=0;f3<6;f3++){ const a3=-24+(94/5)*f3;
-        rch+='M'+dirp(a3,10).map(v=>v.toFixed(1)).join(' ')+' L'+dirp(a3,38).map(v=>v.toFixed(1)).join(' ')+' ';
-      }
-      wing+='<path d="'+rch+'" fill="none" stroke="'+P.deep+'" stroke-width=".45" opacity=".55"/>';
-      // covert scallop hairline
-      wing+='<path d="'+fanEdge(-12,50,4,21)+'" fill="none" stroke="'+P.hi+'" stroke-width=".55" opacity=".5"/>';
-    }
-    // shoulder arch over the stack + a polish hairline
-    wing+='<path d="M52 20 Q72 3 95 11" fill="none" stroke="url(#'+id+')" stroke-width="'+(2*th).toFixed(1)+'" stroke-linecap="round"/>';
-    if(fine) wing+='<path d="M54 24 Q72 10 91 14" fill="none" stroke="'+P.hi+'" stroke-width=".6" opacity=".5"/>';
-    function fanEdge(a0,a1,n,R){   // the scalloped outer edge alone, for hairlines
-      const step=(a1-a0)/(n-1); let d='M'+dirp(a0,R).map(v=>v.toFixed(1)).join(' ');
-      for(let f4=1;f4<n;f4++){
-        const m2=dirp(a0+step*(f4-0.5), R*0.7), t2=dirp(a0+step*f4, R);
-        d+=' L'+m2[0].toFixed(1)+' '+m2[1].toFixed(1)+' L'+t2[0].toFixed(1)+' '+t2[1].toFixed(1);
-      }
-      return d;
-    }
-    // banner fork end (right; mirror makes the left) — swallowtail + inner curl
-    wing+='<path d="M84 87 L96 89 L90.5 91.5 L95 94.5 L84 96 Z" fill="none" stroke="'+P.mid+'" stroke-width="'+(1.3*th).toFixed(1)+'" stroke-linejoin="round"/>';
-    if(fine) wing+='<path d="M84 87 q3.5 2 2.5 4.5" fill="none" stroke="'+P.mid+'" stroke-width=".8" opacity=".8"/>';
-    // finial arm (right): curled gothic sweep + tip bead
-    wing+='<path d="M57 14 q8 -1.5 11 -8.5" fill="none" stroke="'+P.mid+'" stroke-width="'+(1.1*th).toFixed(1)+'" opacity=".85"/>'+
-      '<circle cx="68" cy="5.5" r="1" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".4"/>';
-    s+='<g>'+wing+'</g><g transform="translate(100 0) scale(-1 1)">'+wing+'</g>';
-    // ---- symmetric center pieces: banner body + finial spire ----
-    s+='<path d="M16 87 L84 87 L84 96 L16 96 Z" fill="none" stroke="url(#'+id+')" stroke-width="'+(1.6*th).toFixed(1)+'"/>';
-    if(fine) s+='<path d="M20 89.6 H80 M20 93.4 H80" stroke="'+P.lo+'" stroke-width=".6" opacity=".7"/>';
-    s+='<path d="M50 16 V3" stroke="url(#'+id+')" stroke-width="'+(2*th).toFixed(1)+'" stroke-linecap="round"/>'+
-      '<rect x="47.4" y="4.4" width="5.2" height="5.2" transform="rotate(45 50 7)" fill="url(#'+id+')" stroke="'+P.deep+'" stroke-width=".6"/>';
-    if(fine) s+='<path d="M48.6 5.6 l2.8 2.8 M48.6 8.4 l2.8 -2.8" stroke="'+P.deep+'" stroke-width=".45" opacity=".6"/>';
-    return '<g class="furniture">'+s+'</g>';
-  }
-  function flatPips(col,bk){ if(!bk) return ''; let o=''; for(let i=0;i<3;i++){ const x=50+(i-1)*11, on=i<bk;
-    o+='<circle cx="'+x+'" cy="107" r="3" fill="'+(on?col:'none')+'" stroke="'+col+'" stroke-width="1.5" opacity="'+(on?'1':'.4')+'"/>'; } return o; }
-  function flatGlyph(gl){
-    if(gl==='ref') return '<text x="50" y="55.5" text-anchor="middle" font-family="JetBrains Mono,ui-monospace,monospace" font-weight="800" font-size="13.5" fill="#ffffff">#REF!</text>';
-    return GLY[gl] ? GLY[gl]('flat', FLAT_P) : '';
-  }
   return function(tierName, size, bucket){
     size = size || 16;
     const bk = typeof bucket==='number' ? bucket
       : bucket==='Top Bucket' ? 3 : bucket==='Middle Bucket' ? 2 : bucket==='Bottom Bucket' ? 1 : 0;
-    // white m-gradient so the reused GLY glyph paths (which fill via url(#flatm)) render solid white
-    const wm='<defs><linearGradient id="flatm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>';
     if(tierName==='Unranked'){
       return svgOpen(size,0,false)+
         '<path d="M28 21 L72 21 L79 28 L79 72 L72 79 L28 79 L21 72 L21 28 Z" fill="none" stroke="#7c828e" stroke-width="2.4" stroke-linejoin="round" stroke-dasharray="5 4"/>'+
         '<path d="M43 43 L57 57 M57 43 L43 57" stroke="#7c828e" stroke-width="3" stroke-linecap="round"/></svg>';
     }
-    const i = window.RANK_EMBLEM_IDX[tierName] ?? 0, T=FLAT[i]||FLAT[0];
-    // r376: the two summit tiers wear the Warhammer furniture BEHIND the crest
-    const furn = i===6 ? crestFurniture(CRIM, size) : i===7 ? crestFurniture(DIAM, size) : '';
-    return svgOpen(size,bk,false)+wm+furn+
-      '<path d="'+T.sh+'" fill="'+T.col+'" stroke="rgba(20,22,26,.30)" stroke-width="2" stroke-linejoin="round"/>'+
-      flatGlyph(T.gl)+flatPips(T.col,bk)+'</svg>';
+    const i = window.RANK_EMBLEM_IDX[tierName] ?? 0;
+    const P=PALS[i], T=TIERS[i], D=DRESS[i][(bk||2)-1], id='rk'+(UID++);
+    const fine=size>=28, th=fine?1:1.6, hot=bk===3, warm=bk===2;
+    let s=svgOpen(size,bk,false)+defs(id,P);
+    // furniture BEHIND the plate
+    let orn='';
+    if(D.w) orn+=wings(id,P,WINGS[D.w],th,fine);
+    if(D.m) orn+=mantling(id,P,th,D.m);
+    if(D.b) orn+=banner(id,P,th,fine, D.plain?'':MOTTO[i], D.mem);
+    if(orn) s+='<g class="ornament">'+orn+'</g>';
+    if(D.f) s+='<g class="jewel">'+finial(id,P,th,fine,D.f)+'</g>';
+    // the plate — coarse rows brighten to the solid mid metal so charges cut dark
+    s+='<g class="frame"><path d="'+SH+'" fill="none" stroke="'+P.deep+'" stroke-width="6" stroke-linejoin="round"/>'+
+       '<path d="'+SH+'" fill="'+(fine?('url(#'+id+'p)'):P.lo)+'" stroke="url(#'+id+'m)" stroke-width="3.4" stroke-linejoin="round"/></g>';
+    // field texture: the grid + the top polish hairline
+    if(fine) s+='<circle cx="50" cy="50" r="27" fill="url(#'+id+'c)"/>'+DEV.grid(id,P,T.op)+
+      '<path d="M29.5 24 H70.5" stroke="#ffffff" stroke-width="1" opacity=".4"/>';
+    // furniture ON the plate
+    let orn2='';
+    if(D.r && fine) orn2+=rivets(id,P);
+    if(D.bd) orn2+='<path d="'+SHIN+'" fill="none" stroke="url(#'+id+'m)" stroke-width="'+(1.3*th).toFixed(1)+'"/>'+
+      (fine?'<path d="'+SHIN+'" fill="none" stroke="'+P.deep+'" stroke-width=".5" opacity=".6" transform="translate(0 .9)"/>':'');
+    if(orn2) s+='<g class="ornament">'+orn2+'</g>';
+    // the charge (+ VP's $ chief)
+    s+='<g class="glyph">'+(T.lock?DEV.lock(id,P,fine):'')+DEV[T.chg](id,P,fine)+'</g>';
+    // bucket heat: hairline rim
+    if(hot)  s+='<path d="'+SH+'" fill="none" stroke="'+P.hi+'" stroke-width="1" opacity=".85" stroke-linejoin="round"/>';
+    if(warm) s+='<path d="'+SH+'" fill="none" stroke="'+P.hi+'" stroke-width=".8" opacity=".4" stroke-linejoin="round"/>';
+    return s+pips(id,P,bk)+'</svg>';
   };
 })();
 
@@ -604,11 +662,14 @@ window.HK_RANK = {
      pct thresholds live on the SHRUNK rating scale (see ratingOf): each equals the
      advertised raw performance at that tier's gate att: rating=(att*raw+K/2)/(att+K). */
   TIERS:[
+    /* r377 (Wolf): tier chips follow the shifted metal ladder — Candidate wears
+       bronze, Summer silver, First-Year gold, Associate the new amethyst; VP
+       keeps platinum. .tier-unranked returns to meaning ONLY unranked. */
     {name:'MBA Associate',       cls:'tier-mba',      att:0,  pct:9,    req:'everyone starts here \u2014 yes, everyone'},
-    {name:'Candidate',           cls:'tier-unranked', att:5,  pct:1.01, req:'5 drills attempted, any placement'},
-    {name:'Summer Analyst',      cls:'tier-bronze',   att:8,  pct:0.53, req:'8 drills \u00b7 top 55% avg placement'},
-    {name:'First-Year Analyst',  cls:'tier-silver',   att:10, pct:0.375, req:'10 drills \u00b7 top 30%'},
-    {name:'Associate',           cls:'tier-gold',     att:12, pct:0.31, req:'12 drills \u00b7 top 22%'},
+    {name:'Candidate',           cls:'tier-bronze',   att:5,  pct:1.01, req:'5 drills attempted, any placement'},
+    {name:'Summer Analyst',      cls:'tier-silver',   att:8,  pct:0.53, req:'8 drills \u00b7 top 55% avg placement'},
+    {name:'First-Year Analyst',  cls:'tier-gold',     att:10, pct:0.375, req:'10 drills \u00b7 top 30%'},
+    {name:'Associate',           cls:'tier-amethyst', att:12, pct:0.31, req:'12 drills \u00b7 top 22%'},
     {name:'VP',                  cls:'tier-platinum', att:14, pct:0.255, req:'14 drills \u00b7 top 15%'},
     {name:'MD',                  cls:'tier-crimson',  att:16, pct:0.195, req:'16 drills \u00b7 top 8% \u2014 the corner office'},
     {name:'Second-Year Analyst', cls:'tier-diamond',  att:18, pct:0.15, req:'18 drills \u00b7 top 3% \u2014 the true final boss'},
@@ -737,7 +798,13 @@ window.HK_RANK = {
    FIRST child. Ornaments are absolutely positioned and overflow the card edge on
    purpose — they never move layout. Unlocks are checked ONLY at pick time
    (account.html); display trusts the stored profiles.flair value. Legacy flair
-   values (gold/emerald/holo) keep their old .flair-* classes on existing rows. */
+   values (gold/emerald/holo) keep their old .flair-* classes on existing rows.
+   r377 NOTE: the crest metal ladder shifted down one rung (Candidate bronze,
+   Summer silver, First-Year gold, Associate amethyst) but the plaque earns
+   below were NOT remapped — a bronze plaque still unlocks at Summer Analyst,
+   whose crest now wears silver. Changing unlock thresholds is a progression
+   call, not an art call; the metal-to-tier re-pairing (and whether an
+   amethyst/emerald plaque joins the suite) awaits Wolf. */
 window.HK_FRAMES = [
   {id:'engraved',      name:'Engraved',        tier:'common',
    desc:'steel certificate corners + rosettes',       earn:'reach LVL 5'},
