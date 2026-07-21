@@ -509,9 +509,14 @@ function showPublicCard(uid){
       const byId={}; AC.forEach(a=>byId[a.id]=a);
       const items=picks.map(id=>byId[id]).filter(Boolean);
       if(!items.length) return '';
-      return items.map(a=>
-        '<span title="'+esc(a.name)+' — '+esc(a.desc)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:8.5px;color:var(--muted);max-width:72px;text-align:center">'+
-        window.hkBadge(a.glyph,true,34)+'★ '+esc(a.name)+'</span>').join('');
+      return items.map(a=>{
+        /* r387: rarity for the halo — lb has no live global %, so fall back to the
+           achievement's static difficulty tier (hkEffRarity floor). */
+        const pct = window.hkEffRarity ? window.hkEffRarity(a.tier) : undefined;
+        return '<span title="'+esc(a.name)+' — '+esc(a.desc)+'" style="display:inline-flex">'+
+          (window.hkMedalCard ? window.hkMedalCard(a.glyph, pct, a.name, 34)
+            : window.hkBadge(a.glyph,true,34)+esc(a.name))+'</span>';
+      }).join('');
     }catch(e){ return ''; }
   })();
   const schoolTag=(window.__schoolOf||{})[uid];

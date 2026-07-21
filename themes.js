@@ -1378,6 +1378,26 @@ window.hkEffRarity = function(tier, dataPct, fieldN){
   if((fieldN|0)>=20 && dataPct!==undefined && dataPct!==null && isFinite(dataPct) && dataPct>0) return dataPct;
   return tier==='m' ? 0.5 : tier==='l' ? 3 : tier==='e' ? 10 : tier==='r' ? 25 : 100;
 };
+/* r387 (Wolf): FEATURED MEDAL ON A CARD — inlaid tray + rarity HALO. The engraved
+   badge is tuned for the neutral stats wall — on a colored card SKIN it reads
+   grey/legacy and its thin rarity ring vanishes. hkMedalCard seats the badge in a
+   dark recessed slot (consistent contrast on ANY skin — and a self-contained chip on
+   a plain light-theme card) and carries rarity as a soft rarity-colored HALO glow
+   behind the badge (rare-or-better). No rarity label on the tray — just the
+   achievement name (Wolf). rarityPct is an EFFECTIVE-rarity % (hkEffRarity), same
+   input hkBadge takes. CSS lives in nav.css (.hk-medc*). */
+window.hkMedalCard = function(glyph, rarityPct, name, size){
+  size = size || 34;
+  const meta = window.hkRarityMeta ? window.hkRarityMeta(rarityPct) : { color:'#8a8f98', weight:4, word:'' };
+  const rare = meta.weight <= 3;   // rare/epic/legendary/mythic get the halo
+  const badge = window.hkBadge ? window.hkBadge(glyph, true, size, '#cfd2d8', rarityPct) : '';
+  const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return '<span class="hk-medc" style="--rc:'+meta.color+'"'+
+      (name?(' title="'+esc(name)+(meta.word?' — '+meta.word:'')+'"'):'')+'>'+
+    '<span class="hk-medc-h'+(rare?' rare':'')+'">'+badge+'</span>'+
+    (name?'<b class="hk-medc-nm">'+esc(name)+'</b>':'')+
+  '</span>';
+};
 
 /* =====================================================================
    SCHOOL FLAIR — Phase 1 (T-Q, Wolf r251)  ·  r252

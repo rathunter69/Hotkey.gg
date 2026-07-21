@@ -785,6 +785,17 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .uc.compact .uc-stats b{font-size:15px}
 .uc-stats .s>span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
 .uc-ach{display:flex;gap:10px;margin-top:16px}
+/* r387 (Wolf): featured medal = inlaid dark tray + rarity HALO (readable on any skin).
+   Built by window.hkMedalCard; --rc is the rarity color. */
+.hk-medc{display:inline-flex;flex-direction:column;align-items:center;gap:5px;padding:8px 10px 6px;border-radius:11px;
+  background:rgba(12,13,17,.60);border:1px solid rgba(255,255,255,.11);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 2px 8px rgba(0,0,0,.38)}
+.hk-medc-h{display:grid;place-items:center;border-radius:50%;padding:3px}
+.hk-medc-h.rare{background:radial-gradient(circle, color-mix(in srgb, var(--rc) 55%, transparent), transparent 66%)}
+.hk-medc-nm{font-family:var(--mono);font-size:8.5px;color:#c9ccd2;text-align:center;line-height:1.15;max-width:86px}
+@supports not (background: color-mix(in srgb, red, blue)){
+  .hk-medc-h.rare{background:radial-gradient(circle, var(--rc), transparent 66%);opacity:.9}
+}
 .uc-boards{margin-top:0;display:flex;flex-direction:column;gap:5px;font-size:11px}
 .uc-brow{display:flex;justify-content:space-between;color:var(--muted)}
 .uc-brow b{color:var(--text);font-weight:600}

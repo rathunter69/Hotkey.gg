@@ -685,8 +685,9 @@
                 /* r150: the % is only honest at field scale \u2014 below that, speak in tier words */
                 '<span data-tip="'+e.a.name+' \u2014 '+e.a.desc+(function(){ const w=window.hkRarityTier?window.hkRarityTier(e.gp):null;
                   if(__fieldN>=20 && e.gp!==undefined) return ' \u00b7 '+e.gp+'% of players have this'+(w?' ('+w+')':'');
-                  return w?' \u00b7 '+w:''; })()+'" style="display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;max-width:76px">'+
-                (window.hkBadge?window.hkBadge(e.a.glyph,true,46,null,e.gp):'')+(showcase.length?'\u2605 ':'')+e.a.name+
+                  return w?' \u00b7 '+w:''; })()+'" style="display:inline-flex">'+
+                (window.hkMedalCard?window.hkMedalCard(e.a.glyph,e.gp,e.a.name,38)
+                  :(window.hkBadge?window.hkBadge(e.a.glyph,true,46,null,e.gp)+e.a.name:''))+
                 '</span>').join('')+'</div>';
             }
             out+='<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin:0 0 4px">full grid + progress on <a href="stats.html#achievements" style="color:var(--accent)">your numbers \u2192</a></div>';

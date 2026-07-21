@@ -76,9 +76,14 @@ window.NAV_ACTIVE = 'profile';
   /* the live card: the earned skin IS the surface — no nested box around .uc.
      When a frame is equipped the .uc paints its own bg/border edge-to-edge;
      with no frame the holder supplies a plain surface behind the transparent .uc. */
+  /* r387 (Wolf): preview at the REAL card size — the shareable leaderboard card is
+     min(430px, …), not the full page width. Centered so it reads as the actual card
+     others see, not a stretched banner. */
   .pc-card.pc-live{background:var(--surface); border:1px solid var(--line); border-radius:16px;
-    padding:0; margin-bottom:16px; max-height:none; display:block; overflow:visible; position:relative}
+    width:min(430px, 96vw); margin:0 auto 20px; padding:0; max-height:none; display:block; overflow:visible; position:relative}
   .pc-card.pc-live .uc{padding:22px 24px 20px; border-radius:16px}
+  .pc-live-cap{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--faint); text-align:center; margin:-8px 0 18px}
 
   .cz{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px 24px 24px}
   .cz-h{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
@@ -378,7 +383,8 @@ async function load(){
     const holder=document.getElementById('liveCard'); if(!holder) return;
     const statsArr=(loadout.stats&&loadout.stats.length?loadout.stats:['solves','crowns','streak']).slice(0,3);
     const achHtml=(feat||[]).filter(id=>earned.has(id)).map(id=>{ const a=ACById[id]; if(!a) return '';
-      const m=achMeta[id]||{}; try{ return window.hkBadge(a.glyph, true, 34, null, m.rarity); }catch(e){ return ''; } }).join('');
+      const m=achMeta[id]||{}; try{ return window.hkMedalCard ? window.hkMedalCard(a.glyph, m.rarity, a.name, 34)
+        : window.hkBadge(a.glyph, true, 34, null, m.rarity); }catch(e){ return ''; } }).join('');
     const d={ name:prof.handle||'set a handle', flair:loadout.frame, show:loadout.show,
       tierEmblem:window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):'',
       tierChipEmblem:window.rankEmblem?window.rankEmblem(tier.name,16):'',
@@ -508,6 +514,7 @@ async function load(){
 
   root.innerHTML =
     '<div class="pc-card pc-live" id="liveCard"></div>'+
+    '<div class="pc-live-cap">your card — as it appears on the leaderboard &amp; desks</div>'+
     '<div class="cz">'+
       '<div class="cz-h"><h2>Customize your card</h2><span class="cz-saved" id="czSaved"></span></div>'+
       '<div class="cz-sub">Your card loadout — frame, title, what shows, featured medals, highlighted stats. Everything applies live and saves instantly.</div>'+
