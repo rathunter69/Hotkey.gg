@@ -787,12 +787,17 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .uc-ach{display:flex;gap:10px;margin-top:16px}
 /* r387 (Wolf): featured medal = inlaid dark tray + rarity HALO (readable on any skin).
    Built by window.hkMedalCard; --rc is the rarity color. */
-.hk-medc{display:inline-flex;flex-direction:column;align-items:center;gap:5px;padding:8px 10px 6px;border-radius:11px;
+.hk-medc{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;
+  width:78px;min-height:74px;padding:8px 6px 7px;border-radius:11px;box-sizing:border-box;
   background:rgba(12,13,17,.60);border:1px solid rgba(255,255,255,.11);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 2px 8px rgba(0,0,0,.38)}
 .hk-medc-h{display:grid;place-items:center;border-radius:50%;padding:3px}
 .hk-medc-h.rare{background:radial-gradient(circle, color-mix(in srgb, var(--rc) 55%, transparent), transparent 66%)}
-.hk-medc-nm{font-family:var(--mono);font-size:8.5px;color:#c9ccd2;text-align:center;line-height:1.15;max-width:86px}
+.hk-medc-nm{font-family:var(--mono);font-size:8.5px;color:#c9ccd2;text-align:center;line-height:1.2;width:100%;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* bare: no dark tray — just the halo'd badge, for the light customizer picker/slots */
+.hk-medc.bare{width:auto;min-height:0;padding:0;background:none;border:none;box-shadow:none}
+.hk-medc.bare .hk-medc-nm{color:inherit}
 @supports not (background: color-mix(in srgb, red, blue)){
   .hk-medc-h.rare{background:radial-gradient(circle, var(--rc), transparent 66%);opacity:.9}
 }

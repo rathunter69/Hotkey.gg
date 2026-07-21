@@ -1386,13 +1386,15 @@ window.hkEffRarity = function(tier, dataPct, fieldN){
    behind the badge (rare-or-better). No rarity label on the tray — just the
    achievement name (Wolf). rarityPct is an EFFECTIVE-rarity % (hkEffRarity), same
    input hkBadge takes. CSS lives in nav.css (.hk-medc*). */
-window.hkMedalCard = function(glyph, rarityPct, name, size){
+window.hkMedalCard = function(glyph, rarityPct, name, size, bare){
   size = size || 34;
   const meta = window.hkRarityMeta ? window.hkRarityMeta(rarityPct) : { color:'#8a8f98', weight:4, word:'' };
   const rare = meta.weight <= 3;   // rare/epic/legendary/mythic get the halo
-  const badge = window.hkBadge ? window.hkBadge(glyph, true, size, '#cfd2d8', rarityPct) : '';
+  // bare (picker/slots on a light panel): the rarity glyph inherits currentColor so it
+  // reads on light; the full tray (on a card skin) uses light steel for skin contrast.
+  const badge = window.hkBadge ? window.hkBadge(glyph, true, size, bare?'currentColor':'#cfd2d8', rarityPct) : '';
   const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  return '<span class="hk-medc" style="--rc:'+meta.color+'"'+
+  return '<span class="hk-medc'+(bare?' bare':'')+'" style="--rc:'+meta.color+'"'+
       (name?(' title="'+esc(name)+(meta.word?' — '+meta.word:'')+'"'):'')+'>'+
     '<span class="hk-medc-h'+(rare?' rare':'')+'">'+badge+'</span>'+
     (name?'<b class="hk-medc-nm">'+esc(name)+'</b>':'')+

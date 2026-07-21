@@ -470,7 +470,8 @@ async function load(){
   function medalSlotsHtml(){
     let h='';
     for(let i=0;i<3;i++){ const id=feat[i]; const a=id?ACById[id]:null;
-      if(a){ const m=achMeta[id]||{}; let badge=''; try{ badge=window.hkBadge(a.glyph,true,40,null,m.rarity); }catch(e){}
+      if(a){ const m=achMeta[id]||{}; let badge=''; try{ badge=window.hkMedalCard ? window.hkMedalCard(a.glyph, m.rarity, null, 38, true)
+          : window.hkBadge(a.glyph,true,40,null,m.rarity); }catch(e){}
         h+='<div class="cz-slot filled" data-idx="'+i+'" data-ach="'+esc(id)+'" title="'+esc(a.name)+' — click to change · ✕ to clear">'+
              badge+'<b class="cz-slotn">'+esc(a.name)+'</b><span class="cz-slotx" title="remove">✕</span></div>';
       } else {
@@ -487,7 +488,8 @@ async function load(){
       '<button type="button" class="cz-fchip'+(r===filter?' on':'')+'" data-filter="'+r+'">'+(r==='all'?'All':r)+'</button>').join('');
     const list=earnedMedals.filter(e=> filter==='all' || e.rarity===filter || (filter==='legendary'&&e.rarity==='mythic'));
     const cells=list.map(e=>{ const id=e.a.id, on=feat.includes(id);
-      let badge=''; try{ badge=window.hkBadge(e.a.glyph,true,34,null,e.m.rarity); }catch(x){}
+      let badge=''; try{ badge=window.hkMedalCard ? window.hkMedalCard(e.a.glyph, e.m.rarity, null, 32, true)
+        : window.hkBadge(e.a.glyph,true,34,null,e.m.rarity); }catch(x){}
       const tip=e.a.name+' — '+e.a.desc+' · '+e.rarity.toUpperCase()+(on?' · featured (click to remove)':' · click to feature');
       return '<button type="button" class="cz-med earned'+(on?' feat':'')+'" data-ach="'+esc(id)+'" title="'+esc(tip)+'">'+
         '<span class="cz-mstar">✦</span>'+badge+'<b class="cz-mn">'+esc(e.a.name)+'</b></button>';
