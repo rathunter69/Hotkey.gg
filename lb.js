@@ -23,9 +23,22 @@ const CH = (window.HOTKEY_DRILLS ? window.HOTKEY_DRILLS.menuOrder : []).map(key 
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmt(ms){ return (ms/1000).toFixed(2)+'s'; }
 
+/* r386: per-skin accent for the lean-row skin indicator (.has-skin bar + .skin-dot).
+   Keyed to the 12 card skins (themes.js SKINS); ids not in this table stay plain. */
+const SKIN_ACCENT = {circuit:'#40e0d0',neon:'#ff2d95',blueprint:'#5a9fd0',crt:'#3cf078',
+  constellation:'#6a74c0',vaporwave:'#ff5db1',terminal:'#e0a02f',pro:'#e6c86e',
+  noir:'#c8ccd2',frostbite:'#6fc0ec',molten:'#ff7a2a',founder:'#c89bff'};
 function rowHtml(r,i,names,meId,extra,leaderMs,opts){
   const me = meId && r.user_id===meId;
   const medal = i<3 ? ' r'+(i+1) : '';
+  /* r386: skin indicator — look up this player's flair; if it's one of the 12 card
+     skins, tint a 3px left bar + a dot after the name (row structure unchanged). */
+  let skinCls='', skinStyle='', skinDot='';
+  try{
+    const sp=(DATA&&DATA.profs||[]).find(p=>p.id===r.user_id);
+    const sc=sp && SKIN_ACCENT[sp.flair];
+    if(sc){ skinCls=' has-skin'; skinStyle=' style="--skin-accent:'+sc+'"'; skinDot='<span class="skin-dot"></span>'; }
+  }catch(e){}
   /* r382 (Wolf: dead horizontal middles): EVERY row carries a .mid column now —
      efficiency (optimal/keystrokes, when the run logged them) and the gap to #1,
      muted mono. The old me-only .gap suffix is retired; the chase number lives on
@@ -35,9 +48,9 @@ function rowHtml(r,i,names,meId,extra,leaderMs,opts){
   const mid = [eff!==null ? eff+'% eff' : '', chase].filter(Boolean).join(' \u00b7 ');
   /* r362: reward boards (the daily) medal the podium outright and tint the whole top 10 */
   const glyph = (opts&&opts.medals&&i<3) ? ['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'][i] : (i+1);
-  return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}${(opts&&opts.medals&&i<10)?' t10':''}">`+
+  return `<div class="row${i===0?' top':''}${me?' me':''}${extra?' you-extra':''}${(opts&&opts.medals&&i<10)?' t10':''}${skinCls}"${skinStyle}>`+
     `<span class="rk${medal}">${glyph}</span>`+
-    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChipByUid(r.user_id)}</span>`+
+    `<span class="nm" data-uid="${r.user_id}">${esc(names[r.user_id])}${schoolChipByUid(r.user_id)}${skinDot}</span>`+
     `<span class="mid">${mid}</span>`+
     `<span class="tm">${fmt(r.time_ms)}</span></div>`;
 }
@@ -465,47 +478,66 @@ function showPublicCard(uid){
      since r373 but this card ignored it. Same sanitize + legacy split as nav.js /
      the hero card, at the BASE (small) frame scale; the plaque gem cut prices off
      THEIR current bucket (their tierBest latch is their device's, not ours). */
-  let fCls='', fOrn='';
+  /* r386: PUBLIC CARD = the ONE unified card (themes.js hkPlayerCard) at full scale.
+     The earned skin IS the surface — hkPlayerCard applies .hk-frame-<id> + ornaments
+     itself, so .pub-card is now just a width-constrained holder (bare when skinned so
+     the skin shows through with no double box; a plain surface otherwise). Legacy
+     gold/emerald/holo flairs keep their old .flair-<id> class on that holder. */
+  let fv=null, isSkin=false, legacyCls='';
   try{
     const pp=(DATA.profs||[]).find(p=>p.id===uid);
-    const fv=pp && pp.flair;
-    if(fv && /^[a-z0-9_-]{1,32}$/i.test(fv)){
-      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
-        fCls=' hk-frame-'+fv;
-        const bk = t.bucket==='Top Bucket' ? 2 : t.bucket==='Bottom Bucket' ? 0 : 1;
-        fOrn=window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {bucket:bk}) : '';
-      } else fCls=' flair-'+fv;   // legacy gold/emerald/holo rows keep their old classes
+    const raw=pp && pp.flair;
+    if(raw && /^[a-z0-9_-]{1,32}$/i.test(raw)){
+      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===raw)){ fv=raw; isSkin=true; }
+      else legacyCls=' flair-'+raw;
     }
   }catch(e){}
+  // level/xp for this player — the canonical curve (same helpers the hero card uses)
+  let lvl='', pct=0, xpLine='';
+  try{
+    const xp=window.HK_RANK.computeXP(
+      (DATA.fRuns||[]).filter(x=>x.user_id===uid),
+      {t10:(st&&st.t10)||0, pod:(st&&st.pod)||0, crowns:(st&&st.crowns)||0},
+      (DATA.fSessions||[]).filter(x=>x.user_id===uid));
+    const L=levelOf(xp); lvl=L.lvl; pct=L.pct; xpLine=L.into+' / '+L.need+' xp';
+  }catch(e){}
+  // featured medals -> the .uc-ach spans (hkPlayerCard wraps them in .uc-ach)
+  const achHtml=(function(){
+    try{
+      const AC=window.HOTKEY_ACHIEVEMENTS; const picks=(window.__featOf||{})[uid];
+      if(!AC||!picks||!picks.length||!window.hkBadge) return '';
+      const byId={}; AC.forEach(a=>byId[a.id]=a);
+      const items=picks.map(id=>byId[id]).filter(Boolean);
+      if(!items.length) return '';
+      return items.map(a=>
+        '<span title="'+esc(a.name)+' — '+esc(a.desc)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:8.5px;color:var(--muted);max-width:72px;text-align:center">'+
+        window.hkBadge(a.glyph,true,34)+'★ '+esc(a.name)+'</span>').join('');
+    }catch(e){ return ''; }
+  })();
+  const schoolTag=(window.__schoolOf||{})[uid];
+  const schoolBit=schoolTag?'<span style="display:flex;align-items:center;gap:6px;color:var(--muted)">'+schoolChipByUid(uid,15)+esc((window.schoolResolve&&window.schoolResolve(schoolTag)||{}).name||schoolTag)+'</span>':'';
+  const footHtml='<div class="uc-foot">'+
+    (deskNm?'<span style="color:var(--accent)">◆ '+esc(deskNm)+'</span>':'')+schoolBit+
+    '<span style="margin-left:auto;display:flex;gap:16px;align-items:center">'+
+      (meId&&uid!==meId?'<a class="pub-rep" style="cursor:pointer;color:var(--faint);font-size:10px">report</a>':'')+
+      '<a class="pub-x" style="cursor:pointer;font-size:15px;font-weight:700;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:2px 10px;line-height:1.3">close ✕</a>'+
+    '</span></div>';
+  const d={
+    name:names[uid]+(uid===meId?' (you)':''),
+    tierEmblem:window.rankEmblem?window.rankEmblem(t.name,60,t.bucket):'',
+    tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
+    tierLabel:(t.full||t.name)+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':''),
+    lvl:lvl, pct:pct, xpLine:xpLine,
+    stats:[{n:(st&&st.crowns)||0,label:'crowns'},{n:(st&&st.pod)||0,label:'podiums'},
+      {n:(st&&st.t10)||0,label:'top-10s'},{n:(st&&st.att)||0,label:'boards'}],
+    achHtml:achHtml,
+    boards:best.slice(0,3).map(x=>({name:lab[x.k]||x.k, time:'#'+(x.i+1)+' · '+(x.ms/1000).toFixed(2)+'s of '+x.n})),
+    footHtml:footHtml,
+    flair:fv
+  };
   const m=document.createElement('div'); m.id='pubCard'; m.className='pub-wrap';
-  m.innerHTML='<div class="pub-card'+fCls+'">'+fOrn+
-    '<div class="pub-cap"><span>PLAYER CARD</span><span>'+(meId&&uid!==meId?'<a class="pub-rep" style="cursor:pointer;color:var(--faint);font-size:9px;margin-right:12px">report</a>':'')+'<a class="pub-x">\u00d7</a></span></div>'+
-    '<div class="pub-hero">'+(window.rankEmblem?window.rankEmblem(t.name,64,t.bucket):'')+   /* r381: bigger hero */
-      '<div><div class="pub-nm">'+esc(names[uid])+(uid===meId?' <span class="pub-you">(you)</span>':'')+'</div>'+
-      '<div class="pc-tier '+t.cls+'" style="margin-top:4px">'+   /* r374: chip layout + gap live on .pc-tier (nav.css); crest at the 16 chip scale (was 13) */
-        (window.rankEmblem?window.rankEmblem(t.name,16,t.bucket):'')+'<span>'+(t.full||t.name)+(t.provisional?' \u00b7 provisional':'')+'</span></div>'+
-      (deskNm?'<div class="pub-desk">\u25c6 '+esc(deskNm)+'</div>':'')+
-      ((window.__schoolOf||{})[uid]?'<div class="pub-desk" style="color:var(--muted);display:flex;align-items:center;gap:6px">'+schoolChipByUid(uid,16)+esc((window.schoolResolve&&window.schoolResolve(window.__schoolOf[uid])||{}).name||window.__schoolOf[uid])+'</div>':'')+'</div></div>'+
-    '<div class="pub-tiles">'+
-      '<span><b>'+((st&&st.crowns)||0)+'</b> crowns</span><span><b>'+((st&&st.pod)||0)+'</b> podiums</span>'+
-      '<span><b>'+((st&&st.t10)||0)+'</b> top-10s</span><span><b>'+((st&&st.att)||0)+'</b> boards</span></div>'+
-    (function(){ // r135: their showcase — picked medals, rendered as-is (cosmetic)
-      try{
-        const AC=window.HOTKEY_ACHIEVEMENTS; const picks=(window.__featOf||{})[uid];
-        if(!AC||!picks||!picks.length||!window.hkBadge) return '';
-        const byId={}; AC.forEach(a=>byId[a.id]=a);
-        const items=picks.map(id=>byId[id]).filter(Boolean);
-        if(!items.length) return '';
-        return '<div style="display:flex;gap:12px;justify-content:center;margin:2px 0 10px">'+items.map(a=>
-          '<span title="'+esc(a.name)+' \u2014 '+esc(a.desc)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:8.5px;color:var(--muted);max-width:72px;text-align:center">'+
-          window.hkBadge(a.glyph,true,34)+'\u2605 '+esc(a.name)+'</span>').join('')+'</div>';
-      }catch(e){ return ''; }
-    })()+
-    (best.length?'<div class="pub-best">'+best.slice(0,3).map(x=>
-      '<div class="pub-row"><span class="rk'+(x.i<3?' r'+(x.i+1):'')+'">'+(x.i+1)+'</span>'+
-      '<span class="nm">'+esc(lab[x.k]||x.k)+'</span><span class="tm">'+(x.ms/1000).toFixed(2)+'s \u00b7 of '+x.n+'</span></div>').join('')+'</div>'
-      :'<div class="pub-best" style="color:var(--faint)">no board entries yet</div>')+
-    '</div>';
+  m.innerHTML='<div class="pub-card'+(isSkin?' pub-bare':legacyCls)+'">'+
+    (window.hkPlayerCard?window.hkPlayerCard(d,{scale:'full'}):'')+'</div>';
   const close=()=>{ m.remove(); document.removeEventListener('keydown', esch, true); };
   const esch=(e)=>{ if(e.key==='Escape'){ e.stopImmediatePropagation(); close(); } };
   m.addEventListener('click', e=>{ if(e.target===m) close(); });
@@ -516,6 +548,7 @@ function showPublicCard(uid){
     pr.textContent='reported \u2713'; pr.style.pointerEvents='none'; }catch(e){} };
   document.addEventListener('keydown', esch, true);
   document.body.appendChild(m);
+  try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(m)); }catch(e){}  // r385: card-skin particles (public card)
 }
 document.addEventListener('click', e=>{
   const el=e.target.closest ? e.target.closest('[data-uid]') : null;
@@ -622,13 +655,21 @@ function heroHtml(){
       } else __fCls=' flair-'+__fv;   // legacy gold/emerald/holo — harmless no-op on .panel
     }
   }catch(e){}
-  return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+
-    '<div class="yc-top"><span class="pc-tier '+t.cls+'">'+(window.rankEmblem?window.rankEmblem(t.name,32,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+   /* r374 chip layout on .pc-tier · r381: 32 hero scale */
-    '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
-    '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+L.into+'/'+L.need+' xp</span></div>'+
-    '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">'+
-      me.crowns+' crown'+(me.crowns===1?'':'s')+' \u00b7 '+me.pod+' podiums \u00b7 '+me.att+'/'+CH.length+' drills \u00b7 '+mySolves+' clean solves</div>'+
-    nextHtml+'</div>';
+  /* r386: the your-card hero renders through the SAME unified card (hkPlayerCard) at
+     compact scale. .panel.me already carries the skin class + ornaments (__fCls/__fOrn
+     above), so we pass flair=null here — no double frame. The rendered text keeps
+     "LVL <n>" and the crown/podium/drill/solve counts. */
+  const heroCard = window.hkPlayerCard ? window.hkPlayerCard({
+    name:(DATA.names||{})[meId],
+    tierEmblem:window.rankEmblem?window.rankEmblem(t.name,40,t.bucket):'',
+    tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
+    tierLabel:(t.full||t.name)+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':''),
+    lvl:L.lvl, pct:L.pct, xpLine:L.into+' / '+L.need+' xp',
+    stats:[{n:me.crowns,label:me.crowns===1?'crown':'crowns'},{n:me.pod,label:'podiums'},
+      {n:me.att+'/'+CH.length,label:'drills'},{n:mySolves,label:'clean solves'}],
+    flair:null
+  },{scale:'compact'}) : '';
+  return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+heroCard+nextHtml+'</div>';
 }
 
 function rankedInfographic(){
@@ -1434,6 +1475,7 @@ function renderAll(){
       '<div class="browse" style="grid-column:1/-1">'+browserHtml()+'</div>';
   }
   wire(); wireGuild();
+  try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx()); }catch(e){}  // r385: card-skin particles (hero)
   document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; renderAll(); });
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};

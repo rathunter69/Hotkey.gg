@@ -608,3 +608,188 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   border:1px solid var(--line); border-radius:999px; padding:4px 12px; margin-right:34px;
   white-space:nowrap; text-decoration:none; flex:none; transition:all .13s}
 .pc-customize:hover{color:var(--accent); border-color:var(--accent-dim)}
+
+/* =====================================================================
+   r385 CARD SKINS — full-interior title skins (Wolf board). Each themes
+   the whole card: interior + border (padding-box/border-box so the surface
+   is the skin, the gradient rides the border), a top-notch title (.hkf-tab
+   reshaped into an inlaid nameplate), name treatment, and — for the animated
+   skins — a particle canvas (.hk-fx, driven by hkInitCardFx). Applies on every
+   framed host (.pc-card / .panel.me / .pub-card / .card.tc / .fs-mini) because
+   the class is doubled to out-specify the base card. All interiors are dark, so
+   the rank crest stays legible; a soft glow gives it pop.
+   ===================================================================== */
+/* particle layer sits behind the content; readable content is lifted, absolute
+   controls (✕) are only raised in z, never re-positioned. */
+[class*="hk-frame-"] .hk-fx{position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit}
+[class*="hk-frame-"] .pc-scroll,[class*="hk-frame-"] .pc-head,[class*="hk-frame-"] .pc-body,[class*="hk-frame-"] .pc-name,[class*="hk-frame-"] .pc-foot,
+[class*="hk-frame-"] .pub-cap,[class*="hk-frame-"] .pub-hero,[class*="hk-frame-"] .pub-tiles,[class*="hk-frame-"] .pub-best,[class*="hk-frame-"] .pub-nm,[class*="hk-frame-"] .pub-body,
+[class*="hk-frame-"] .yc-top,[class*="hk-frame-"] .yc-mid,[class*="hk-frame-"] .yc-bot,[class*="hk-frame-"] h4,
+[class*="hk-frame-"] .tc-top,[class*="hk-frame-"] .tc-meta,[class*="hk-frame-"] .tc-sub{position:relative; z-index:2}
+[class*="hk-frame-"] .pc-x{z-index:6}
+/* the elite skins are self-contained dark cards: inner stat/crest/level panels must
+   stay dark regardless of the viewer's page theme (default is the light 'daylight').
+   Translucent-black tints darken whatever the skin interior is, staying cohesive. */
+.hk-frame-circuit,.hk-frame-neon,.hk-frame-blueprint,.hk-frame-crt,.hk-frame-constellation,
+.hk-frame-vaporwave,.hk-frame-terminal,.hk-frame-pro,.hk-frame-noir,.hk-frame-frostbite,
+.hk-frame-molten,.hk-frame-founder{--surface2:rgba(0,0,0,.32); --surface:rgba(0,0,0,.4); --faint:rgba(255,255,255,.34)}
+/* decorative crack sits BEHIND content, ambient not a slash */
+.hkf-crack{z-index:0; opacity:.7}
+/* the skin title notch — reshape the pill tab into an inlaid nameplate */
+.hk-frame-circuit .hkf-tab,.hk-frame-neon .hkf-tab,.hk-frame-blueprint .hkf-tab,.hk-frame-crt .hkf-tab,
+.hk-frame-constellation .hkf-tab,.hk-frame-vaporwave .hkf-tab,.hk-frame-terminal .hkf-tab,.hk-frame-pro .hkf-tab,
+.hk-frame-noir .hkf-tab,.hk-frame-frostbite .hkf-tab,.hk-frame-molten .hkf-tab,.hk-frame-founder .hkf-tab{
+  border:0; border-radius:0; padding:4px 16px; box-shadow:0 2px 6px rgba(0,0,0,.45);
+  clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 100%,0 100%)}
+/* founder serial — inlaid in the lower-left */
+.hkf-serial{position:absolute; left:8px; bottom:-3px; z-index:4; font-family:var(--mono,ui-monospace,monospace);
+  font-size:7.5px; font-weight:700; letter-spacing:.12em; padding:3px 9px; color:#e6ddff;
+  background:rgba(15,14,22,.92); border:1px solid #4d426b; border-top:0;
+  clip-path:polygon(0 0,100% 0,calc(100% - 6px) 100%,0 100%); pointer-events:none}
+.hk-frame-lg .hkf-serial{font-size:9px; padding:4px 12px}
+/* skin name fonts (fonts injected by hkEnsureSkinFonts; graceful fallbacks) */
+.hk-frame-circuit .pc-name span,.hk-frame-neon .pc-name span,.hk-frame-vaporwave .pc-name span,
+.hk-frame-circuit .pub-nm,.hk-frame-neon .pub-nm,.hk-frame-vaporwave .pub-nm,
+.hk-frame-circuit .tc-name,.hk-frame-neon .tc-name,.hk-frame-vaporwave .tc-name{font-family:'Orbitron',system-ui,sans-serif; letter-spacing:.5px}
+.hk-frame-crt .pc-name span,.hk-frame-terminal .pc-name span,.hk-frame-crt .pub-nm,.hk-frame-terminal .pub-nm,
+.hk-frame-crt .tc-name,.hk-frame-terminal .tc-name{font-family:'VT323','Courier New',monospace; letter-spacing:1px; font-size:1.25em}
+.hk-frame-constellation .pc-name span,.hk-frame-pro .pc-name span,.hk-frame-heraldic .pc-name span,
+.hk-frame-constellation .pub-nm,.hk-frame-pro .pub-nm,.hk-frame-constellation .tc-name,.hk-frame-pro .tc-name{font-family:'Cinzel',Georgia,serif; letter-spacing:1px}
+/* rank crest keeps its metal; a soft ring lifts it off any skin */
+[class*="hk-frame-circuit"] svg,[class*="hk-frame-neon"] svg,[class*="hk-frame-vaporwave"] svg,
+[class*="hk-frame-frostbite"] svg,[class*="hk-frame-molten"] svg,[class*="hk-frame-founder"] svg{}
+.hk-frame-circuit .pc-hero svg,.hk-frame-neon .pc-hero svg{filter:drop-shadow(0 1px 4px rgba(0,0,0,.6))}
+
+/* decorative layers shared */
+.hkf-crack{position:absolute; inset:0; z-index:1; width:100%; height:100%; fill:none; pointer-events:none}
+.hkf-sun{position:absolute; right:18px; top:14px; z-index:1; width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(#ffe36a,#ff6ab3); box-shadow:0 0 18px rgba(255,120,180,.5); pointer-events:none}
+.hk-frame-lg .hkf-sun{width:64px; height:64px; right:26px; top:20px}
+.hkf-vgrid{position:absolute; left:0; right:0; bottom:0; height:42%; z-index:0; pointer-events:none; opacity:.65;
+  background-image:linear-gradient(rgba(46,230,230,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(46,230,230,.5) 1px,transparent 1px);
+  background-size:24px 18px; transform:perspective(120px) rotateX(52deg); transform-origin:bottom}
+
+/* ---- per-skin interior + border ---- */
+.hk-frame-circuit.hk-frame-circuit{--text:#dff7f2; --muted:#3a8f86; --line:#154a48; --accent:#5fe9d4; --accent-dim:#2aa89c;
+  border:2px solid transparent; color:#dff7f2;
+  background:linear-gradient(#0a1518,#0d1a1e) padding-box, linear-gradient(120deg,#1c6a68,#2aa89c) border-box;
+  box-shadow:0 0 20px rgba(64,224,208,.12),0 20px 60px rgba(0,0,0,.55)}
+.hk-frame-circuit.hk-frame-circuit::before{content:""; position:absolute; inset:0; border-radius:inherit; z-index:0; pointer-events:none;
+  background-image:linear-gradient(rgba(64,224,208,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(64,224,208,.05) 1px,transparent 1px); background-size:22px 22px; opacity:.5}
+.hk-frame-circuit .pc-name span,.hk-frame-circuit .pub-nm{color:#7ff0e0; text-shadow:0 0 8px rgba(64,224,208,.5)}
+
+.hk-frame-neon.hk-frame-neon{--text:#ffd3ea; --muted:#7a5a86; --line:#3a0a4a; --accent:#ff6ab3; --accent-dim:#2edcff;
+  border:2px solid transparent; color:#ffd3ea;
+  background:linear-gradient(135deg,#1a0620,#15121e) padding-box, linear-gradient(120deg,#ff2d95,#2edcff) border-box;
+  box-shadow:0 0 20px rgba(255,45,149,.28),0 0 34px rgba(46,220,255,.14),0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-neon .pc-name span,.hk-frame-neon .pub-nm{color:#ff6ab3; text-shadow:0 0 8px rgba(255,45,149,.6)}
+
+.hk-frame-blueprint.hk-frame-blueprint{--text:#cfe2f8; --muted:#6c8fb5; --line:#2f5b86; --accent:#8fbfe8; --accent-dim:#4f7aa8;
+  border:2px solid transparent; color:#cfe2f8;
+  background:linear-gradient(#152230,#152230) padding-box, linear-gradient(120deg,#2f5b86,#4f7aa8) border-box;
+  box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.hk-frame-blueprint.hk-frame-blueprint::before{content:""; position:absolute; inset:0; border-radius:inherit; z-index:0; pointer-events:none;
+  background-image:repeating-linear-gradient(0deg,transparent 0 21px,rgba(120,170,225,.08) 21px 22px),repeating-linear-gradient(90deg,transparent 0 21px,rgba(120,170,225,.08) 21px 22px)}
+.hk-frame-blueprint .pc-name span,.hk-frame-blueprint .pub-nm{letter-spacing:1px}
+
+.hk-frame-crt.hk-frame-crt{--text:#5bf08a; --muted:#3a9a5a; --line:#0c3a1c; --accent:#5bf08a; --accent-dim:#2fae5c;
+  border:2px solid transparent; color:#5bf08a;
+  background:linear-gradient(#08110b,#08110b) padding-box, linear-gradient(120deg,#0c3a1c,#2fae5c) border-box;
+  box-shadow:0 0 20px rgba(60,240,120,.14),0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-crt.hk-frame-crt::before{content:""; position:absolute; inset:0; border-radius:inherit; z-index:0; pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(80,255,140,.06) 0 2px,transparent 2px 4px)}
+.hk-frame-crt .pc-name span,.hk-frame-crt .pub-nm{color:#5bf08a; text-shadow:0 0 8px rgba(60,240,120,.5)}
+
+.hk-frame-constellation.hk-frame-constellation{--text:#eef1ff; --muted:#8d96c8; --line:#33385a; --accent:#aeb6f0; --accent-dim:#6a74c0;
+  border:2px solid transparent; color:#eef1ff;
+  background:radial-gradient(ellipse at 28% 6%,rgba(110,80,190,.42),transparent 55%),linear-gradient(#080a18,#0e1128) padding-box, linear-gradient(120deg,#3a4270,#9aa4e0) border-box;
+  box-shadow:0 0 20px rgba(90,90,180,.2),0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-constellation .pc-name span,.hk-frame-constellation .pub-nm{color:#eef1ff; text-shadow:0 0 10px rgba(150,160,255,.4)}
+
+.hk-frame-vaporwave.hk-frame-vaporwave{--text:#f6e6ff; --muted:#c79ad8; --line:#5a1f66; --accent:#ff8fd0; --accent-dim:#2ee6e6;
+  border:2px solid transparent; color:#f6e6ff;
+  background:linear-gradient(180deg,#2a1140,#5a1f66 55%,#c0316f) padding-box, linear-gradient(120deg,#ff5db1,#7b5cff,#2ee6e6) border-box;
+  box-shadow:0 0 22px rgba(255,90,180,.24),0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-vaporwave .pc-name span,.hk-frame-vaporwave .pub-nm{color:#fff; text-shadow:0 2px 0 #ff5db1,0 0 12px rgba(120,90,255,.7)}
+
+.hk-frame-terminal.hk-frame-terminal{--text:#ffce8a; --muted:#7a5f24; --line:#4a3810; --accent:#ffb52e; --accent-dim:#8a6a2a;
+  border:2px solid transparent; color:#ffce8a;
+  background:linear-gradient(#0a0906,#0a0906) padding-box, linear-gradient(120deg,#3a2a08,#7a5a12) border-box;
+  box-shadow:0 0 18px rgba(224,160,47,.14),0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-terminal .pc-name span,.hk-frame-terminal .pub-nm{color:#ffb52e; text-shadow:0 0 8px rgba(224,160,47,.4)}
+
+.hk-frame-pro.hk-frame-pro{--text:#f6ecca; --muted:#b6a886; --line:#4a3f1e; --accent:#f0dfa8; --accent-dim:#a08a3a;
+  border:2px solid transparent; color:#f6ecca;
+  background:radial-gradient(ellipse at 28% 6%,rgba(120,90,190,.38),transparent 55%),linear-gradient(#0a0a18,#111022) padding-box, conic-gradient(from 210deg,#d9c27a,#f3e6b0,#8fe0b8,#d9c27a,#f3e6b0,#d9c27a) border-box;
+  box-shadow:0 0 22px rgba(217,194,122,.2),0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-pro .pc-name span,.hk-frame-pro .pub-nm{color:#f6ecca; text-shadow:0 0 12px rgba(230,200,120,.45)}
+
+.hk-frame-noir.hk-frame-noir{--text:#f4f6fa; --muted:#5a5e66; --line:#2c2e33; --accent:#c8ccd2; --accent-dim:#6a6e78;
+  border:2px solid transparent; color:#f4f6fa;
+  background:radial-gradient(ellipse at 60% 0%,rgba(255,255,255,.05),transparent 55%),linear-gradient(#050506,#050506) padding-box, linear-gradient(135deg,#b8bec8,#54585f) border-box;
+  box-shadow:0 0 20px rgba(180,190,210,.08),0 20px 60px rgba(0,0,0,.7)}
+.hk-frame-noir .pc-name span,.hk-frame-noir .pub-nm{color:#f4f6fa; letter-spacing:3px; font-weight:700}
+
+.hk-frame-frostbite.hk-frame-frostbite{--text:#e6f6ff; --muted:#7fb0cf; --line:#2a5a7a; --accent:#bfe8ff; --accent-dim:#4a90c0;
+  border:2px solid transparent; color:#e6f6ff;
+  background:radial-gradient(ellipse at 30% 0%,rgba(180,225,255,.22),transparent 55%),linear-gradient(160deg,#0f2c46,#0b1a2b 55%,#124055) padding-box, linear-gradient(120deg,#e6f8ff,#6fc0ec 45%,#2a6a9a 80%,#a8ecff) border-box;
+  box-shadow:0 0 22px rgba(120,200,255,.18),0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-frostbite .hkf-crack{stroke:rgba(215,242,255,.55); stroke-width:1.1; filter:drop-shadow(0 0 3px rgba(160,220,255,.7))}
+.hk-frame-frostbite .pc-name span,.hk-frame-frostbite .pub-nm{color:#eefaff; text-shadow:0 0 14px rgba(150,215,255,.55)}
+
+.hk-frame-molten.hk-frame-molten{--text:#ffcfa8; --muted:#b47a54; --line:#5a2a18; --accent:#ffb56a; --accent-dim:#c0502f;
+  border:2px solid transparent; color:#ffcfa8;
+  background:radial-gradient(ellipse at 50% 122%,rgba(255,110,30,.5),transparent 55%),linear-gradient(160deg,#1c0a06,#250f08 55%,#0e0503) padding-box, linear-gradient(120deg,#ffd15a,#ff6a2a 45%,#c0261a 80%,#ffb52e) border-box;
+  box-shadow:0 0 24px rgba(255,90,30,.22),0 20px 60px rgba(0,0,0,.62)}
+.hk-frame-molten .hkf-crack{stroke:#ff7a2a; stroke-width:1.5; filter:drop-shadow(0 0 4px rgba(255,120,40,.9))}
+.hk-frame-molten .pc-name span,.hk-frame-molten .pub-nm{color:#ffcea0; text-shadow:0 0 14px rgba(255,120,40,.6)}
+
+.hk-frame-founder.hk-frame-founder{--text:#efeaff; --muted:#a99fce; --line:#3c3556; --accent:#c9b8ff; --accent-dim:#8f7fd0;
+  border:2px solid transparent; color:#efeaff;
+  background:linear-gradient(150deg,#15141d,#0c0c13) padding-box, conic-gradient(from 0deg,#ff5db1,#ffd27a,#8fe0ff,#c89bff,#5df0c0,#ff9ed4,#ff5db1) border-box;
+  box-shadow:0 0 26px rgba(180,140,255,.24),0 22px 60px rgba(0,0,0,.62)}
+.hk-frame-founder .hkf-glint-sheen{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; border-radius:inherit}
+.hk-frame-founder .pc-name span,.hk-frame-founder .pub-nm{color:#f0e9ff; text-shadow:0 0 10px rgba(200,160,255,.5)}
+
+/* keyframes — canvas carries the heavy motion; CSS handles the founder sheen only */
+@media (prefers-reduced-motion: no-preference){
+  .hk-frame-molten .hkf-crack path{animation:hkfCrackPulse 2.4s ease-in-out infinite}
+}
+@keyframes hkfCrackPulse{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* ---- r386: unified player card (.uc) — layout only; the skin bg/border/vars come
+   from the .hk-frame-<id> rules above. Public card renders at full scale, the
+   your-card hero at compact. ---- */
+.uc{position:relative;border-radius:16px;padding:22px 24px 18px}
+.uc>*:not(.hk-fx):not(.hkf-tab):not(.hkf-serial):not(.hkf-sun):not(.hkf-vgrid){position:relative;z-index:2}
+.uc-head{display:flex;align-items:center;gap:16px}
+.uc-crest{line-height:0;flex:none}
+.uc-id{min-width:0;flex:1}
+.uc-nm{font-size:24px;font-weight:700;letter-spacing:.3px;line-height:1.05}
+.uc.compact .uc-nm{font-size:18px}
+.uc-tier{font-size:11px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.uc-lvlwrap{flex:none;text-align:right;min-width:120px}
+.uc-lvl{font-size:12px;font-weight:700;color:var(--accent)}
+.uc-bar{height:6px;border-radius:99px;background:rgba(0,0,0,.35);overflow:hidden;margin-top:5px;border:1px solid var(--line)}
+.uc-bar>i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.uc-xp{font-size:9px;color:var(--muted);margin-top:3px}
+.uc-div{height:1px;background:var(--line);border:0;margin:16px 0}
+.uc-stats{display:flex;gap:26px;flex-wrap:wrap}
+.uc.compact .uc-stats{gap:18px;margin-top:2px}
+.uc-stats .s{display:flex;flex-direction:column;gap:1px}
+.uc-stats b{font-size:19px;font-weight:700;color:var(--text)}
+.uc.compact .uc-stats b{font-size:15px}
+.uc-stats .s>span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.uc-ach{display:flex;gap:10px;margin-top:16px}
+.uc-boards{margin-top:0;display:flex;flex-direction:column;gap:5px;font-size:11px}
+.uc-brow{display:flex;justify-content:space-between;color:var(--muted)}
+.uc-brow b{color:var(--text);font-weight:600}
+.uc-foot{display:flex;gap:16px;margin-top:18px;font-size:11px}
+.uc-foot a{color:var(--muted);cursor:pointer;text-decoration:none}
+.uc-foot a:hover{color:var(--accent)}
+
+/* ---- r386: leaderboard row skin indicator — 3px left accent bar + tiny dot in the
+   player's skin color, so the lean rows hint at earned skins without a full frame. ---- */
+.row.has-skin{position:relative}
+.row.has-skin::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:var(--skin-accent,#6ec9a0)}
+.row .skin-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--skin-accent,#6ec9a0);margin-left:6px;vertical-align:middle;box-shadow:0 0 5px var(--skin-accent,#6ec9a0)}

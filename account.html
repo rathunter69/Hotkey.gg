@@ -180,8 +180,14 @@ async function load(){
   const __liveBk = tier.bucket==='Top Bucket' ? 2 : tier.bucket==='Middle Bucket' ? 1 : 0;
   const __gemBk = (__fl.tierBestBucket!=null || (tier.i|0)>0)
     ? (Math.max(__fl.tierBestBucket|0, (tier.i|0)*3+__liveBk) % 3) : 1;
+  /* r385: the founder account unlocks every frame for testing — email is the reliable key */
+  const isWolf = (me && me.email ? String(me.email).toLowerCase() : '') === 'wolfcdrake@gmail.com';
+  /* r385: the account overview card wears the chosen skin too (Wolf) */
+  const __tcFlair = (prof.flair && /^[a-z0-9_-]{1,32}$/i.test(prof.flair) && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===prof.flair)) ? prof.flair : null;
+  const tcFrameCls = __tcFlair ? ' hk-frame-'+__tcFlair : (prof.flair && /^[a-z0-9_-]{1,32}$/i.test(prof.flair) ? ' flair-'+prof.flair : '');
+  const tcFrameOrn = (__tcFlair && window.hkFrameOrnaments) ? window.hkFrameOrnaments(__tcFlair, {bucket:__gemBk}) : '';
   const frameCards=[{id:'none', name:'None', tier:'', desc:'plain card', earn:'', unlocked:true}]
-    .concat((window.HK_FRAMES||[]).map(f=>({...f, unlocked:window.hkFrameUnlocked && window.hkFrameUnlocked(f.id, frameU)})));
+    .concat((window.HK_FRAMES||[]).map(f=>({...f, unlocked:isWolf || (window.hkFrameUnlocked && window.hkFrameUnlocked(f.id, frameU))})));
   const frameGridHtml=frameCards.map(f=>{
     const on = (prof.flair||'none')===f.id;
     /* r376: plaque minis carry the gemset corners (scaled by nav.css .fs-mini rules)
@@ -198,7 +204,7 @@ async function load(){
   }).join('');
 
   root.innerHTML = `
-    <div class="card tc span2">
+    <div class="card tc span2${tcFrameCls}">${tcFrameOrn}
       <div class="tc-top">
         <span class="tc-emblem" style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):''}</span>
         <div>
@@ -218,7 +224,7 @@ async function load(){
         <span class="tc-bar"><i style="width:${L.pct}%"></i></span>
         <span style="font-size:11px;color:var(--muted)">${L.into}/${L.need} xp</span>
       </div>
-      <div class="tc-sub">member since ${joined}</div>
+      <div class="tc-sub">member since ${joined} · <a id="tcCustomize" style="cursor:pointer;color:var(--accent);text-decoration:none">✎ customize card</a></div>
     </div>
 
     <div class="card" id="desk"><h4>Your desk</h4>
@@ -309,6 +315,10 @@ async function load(){
       <div class="msg" id="acDelMsg"></div>
     </div>`;
 
+  /* r385: card-skin particles on the account overview + a fast lane to the frame picker */
+  try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(root)); }catch(e){}
+  { const tcz=document.getElementById('tcCustomize'); if(tcz) tcz.onclick=()=>{
+      const fr=document.getElementById('flairRow'); if(fr) fr.scrollIntoView({behavior:'smooth',block:'center'}); }; }
   const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--bad)':'var(--accent)'; } };
   // r81: security + appearance wiring
   const pw=document.getElementById('acPwReset');
@@ -586,6 +596,7 @@ async function load(){
       if(error){ say('flairMsg','Couldn\u2019t save \u2014 try again.',true); return; }
       prof.flair=f;
       document.querySelectorAll('.flair-opt').forEach(x=>x.classList.toggle('on',x===b));
+      try{ render(); }catch(e){}  // r385: reskin the account overview card live
       say('flairMsg','Frame set \u2713 \u2014 it rides wherever your card appears.'); }catch(e){ say('flairMsg','Something went wrong.',true); }
   }; });
   { const dv=document.getElementById('devRanked'), dro=document.getElementById('devRankedOff');
