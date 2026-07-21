@@ -453,7 +453,7 @@ function showPublicCard(uid){
   const m=document.createElement('div'); m.id='pubCard'; m.className='pub-wrap';
   m.innerHTML='<div class="pub-card">'+
     '<div class="pub-cap"><span>PLAYER CARD</span><span>'+(meId&&uid!==meId?'<a class="pub-rep" style="cursor:pointer;color:var(--faint);font-size:9px;margin-right:12px">report</a>':'')+'<a class="pub-x">\u00d7</a></span></div>'+
-    '<div class="pub-hero">'+(window.rankEmblem?window.rankEmblem(t.name,54,t.bucket):'')+
+    '<div class="pub-hero">'+(window.rankEmblem?window.rankEmblem(t.name,64,t.bucket):'')+   /* r381: bigger hero */
       '<div><div class="pub-nm">'+esc(names[uid])+(uid===meId?' <span class="pub-you">(you)</span>':'')+'</div>'+
       '<div class="pc-tier '+t.cls+'" style="margin-top:4px">'+   /* r374: chip layout + gap live on .pc-tier (nav.css); crest at the 16 chip scale (was 13) */
         (window.rankEmblem?window.rankEmblem(t.name,16,t.bucket):'')+'<span>'+(t.full||t.name)+(t.provisional?' \u00b7 provisional':'')+'</span></div>'+
@@ -586,7 +586,7 @@ function heroHtml(){
     }
   }catch(e){}
   return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+
-    '<div class="yc-top"><span class="pc-tier '+t.cls+'">'+(window.rankEmblem?window.rankEmblem(t.name,28,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+   /* r374: chip layout lives on .pc-tier (nav.css); 28 = the your-card hero scale */
+    '<div class="yc-top"><span class="pc-tier '+t.cls+'">'+(window.rankEmblem?window.rankEmblem(t.name,32,t.bucket):'')+'<span>'+(t.full||t.name)+'</span></span>'+   /* r374 chip layout on .pc-tier · r381: 32 hero scale */
     '<span class="yc-lvl">LVL '+L.lvl+'</span><span class="yc-bar"><i style="width:'+L.pct+'%"></i></span>'+
     '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">'+L.into+'/'+L.need+' xp</span></div>'+
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted)">'+

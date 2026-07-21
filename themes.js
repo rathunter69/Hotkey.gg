@@ -607,7 +607,8 @@ window.rankEmblem = (function(){
     let orn='';
     if(D.w) orn+=wings(id,P,WINGS[D.w],th,fine);
     if(D.m) orn+=mantling(id,P,th,D.m);
-    if(D.b) orn+=banner(id,P,th,fine, D.plain?'':MOTTO[i], D.mem);
+    /* r381 (Wolf): banner scrolls retired — the crests stand on their iconography,
+       and the freed space lets the hero renders run larger */
     if(orn) s+='<g class="ornament">'+orn+'</g>';
     if(D.f) s+='<g class="jewel">'+finial(id,P,th,fine,D.f)+'</g>';
     // the plate — coarse rows brighten to the solid mid metal so charges cut dark

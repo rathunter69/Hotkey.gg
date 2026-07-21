@@ -94,11 +94,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=277"></script>
+<script src="themes.js?v=278"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=285"></script>
+<script src="nav.js?v=286"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -182,7 +182,7 @@ async function load(){
   root.innerHTML = `
     <div class="card tc">
       <div class="tc-top">
-        <span class="tc-emblem" style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,54,tier.bucket):''}</span>
+        <span class="tc-emblem" style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):''}</span>
         <div>
           <div class="tc-name">${esc(prof.handle||'set a handle')}</div>
           <span class="pc-tier ${tier.cls}" style="margin-top:4px">${/* r374: chip layout+gap live on .pc-tier (nav.css); 16 = the chip scale (was an eyeballed 13) */''}${window.rankEmblem?window.rankEmblem(tier.name,16):''}<span>${tier.name}</span></span>
