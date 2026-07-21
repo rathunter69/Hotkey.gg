@@ -1263,11 +1263,11 @@ window.HK_RARITY = { c:'#5a9a64', r:'#5f83bd', e:'#8d6cb5', l:'#c58a3a', m:'#bd5
    are explicit currentColor; founder keeps the four brand colors as a mythic pop. */
 window.HK_GLYPHS2 = {
   explorer:'<path d="M20 4 C26.6 4 32 9.4 32 16 C32 25 20 36 20 36 C20 36 8 25 8 16 C8 9.4 13.4 4 20 4 Z"/><circle cx="20" cy="16" r="5"/>',
-  speed:'<path d="M7 28 A14 14 0 0 1 33 28"/><path d="M20 10 V13 M9.5 17 L11.5 19 M30.5 17 L28.5 19"/><path d="M20 28 L27 17"/><circle cx="20" cy="28" r="2.2" fill="currentColor" stroke="none"/>',
+  speed:'<path d="M23 4 L11 23 H18 L16 36 L29 16 H21 Z" fill="currentColor" stroke="none"/>',
   accuracy:'<circle cx="20" cy="20" r="13"/><circle cx="20" cy="20" r="7"/><circle cx="20" cy="20" r="1.6" fill="currentColor" stroke="none"/>',
   perfect:'<path d="M20 5 L32 18 L20 35 L8 18 Z"/><path d="M8 18 H32 M20 5 L15 18 L20 35 M20 5 L25 18 L20 35"/>',
   rapid:'<circle cx="20" cy="23" r="11"/><path d="M20 23 V16 M20 6 V11 M16 6 H24 M31 12 L33 14"/>',
-  streak:'<path d="M22 4 C21 10 24 12 26 16 C28 20 28 25 25 29 C23.5 31 21 33 20 34 C15 33 11 29 11 23 C11 19 13 15 16 13 C16 16 18 17 19 15 C20.5 12 21 8 22 4 Z" fill="currentColor" stroke="none"/>',
+  streak:'<path d="M20 20 c3.33 -4.93 0 -11.67 -1.67 -13.33 c0 5.06 -2.96 7.9 -5 10 c-2.04 2.1 -3.33 5.4 -3.33 8.33 a10 10 0 1 0 20 0 c0 -2.55 -1.76 -6.57 -3.33 -8.33 c-2.98 5 -4.65 5 -6.67 3.33z"/>',
   combo:'<path d="M9 11 L17 20 L9 29 M18 11 L26 20 L18 29 M27 11 L35 20 L27 29"/>',
   comeback:'<path d="M6 29 L16 19 L22 25 L34 13"/><path d="M26 13 H34 V21"/>',
   cert:'<circle cx="20" cy="15" r="7"/><path d="M15 22 L12 35 L20 30 L28 35 L25 22"/>',
@@ -1276,7 +1276,7 @@ window.HK_GLYPHS2 = {
   daily:'<circle cx="20" cy="20" r="6"/><path d="M20 6 V10 M20 30 V34 M6 20 H10 M30 20 H34 M10 10 L13 13 M27 27 L30 30 M30 10 L27 13 M13 27 L10 30"/>',
   crown:'<path d="M9 30 L9 15 L16 22 L20 9 L24 22 L31 15 L31 30 Z"/>',
   mastery:'<path d="M4 16 L20 9 L36 16 L20 23 Z"/><path d="M12 19 V26 C12 29.5 28 29.5 28 26 V19"/><path d="M36 16 V25 L34 29"/>',
-  moon:'<path fill-rule="evenodd" fill="currentColor" stroke="none" d="M3 20 A14 14 0 1 0 31 20 A14 14 0 1 0 3 20 Z M12 20 A13 13 0 1 0 38 20 A13 13 0 1 0 12 20 Z"/>',
+  moon:'<path fill="currentColor" stroke="none" d="M35 21.3 A15 15 0 1 1 18.7 5 A11.67 11.67 0 0 0 35 21.3 Z"/>',
   people:'<circle cx="14" cy="15" r="4.2"/><circle cx="26" cy="15" r="4.2"/><path d="M6 31 C6 24.5 22 24.5 22 31 M18 31 C18 25 34 25 34 31"/>',
   founder:'<circle cx="14" cy="14" r="5.4" fill="#e0503f" stroke="none"/><circle cx="26" cy="14" r="5.4" fill="#e0902f" stroke="none"/><circle cx="14" cy="26" r="5.4" fill="#3fae6a" stroke="none"/><circle cx="26" cy="26" r="5.4" fill="#3f8fe0" stroke="none"/>',
   keycap:'<rect x="7" y="7" width="26" height="26" rx="5"/><rect x="11" y="11" width="18" height="14" rx="2"/><path d="M11 29 H29"/>',
@@ -1442,10 +1442,23 @@ window.hkMedalCard = function(glyph, rarityPct, name, size, bare){
     ? window.hkGlyph(glyph, size+4, bare?'currentColor':'#d2d5db')
     : (window.hkBadge ? window.hkBadge(glyph, true, size, bare?'currentColor':'#cfd2d8', rarityPct) : '');
   const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const dot = rare ? '<i class="hk-medc-dot" style="background:'+meta.color+'"></i>' : '';
+  // r387 (Wolf): rarity = a row of tier-colored DIAMOND pips just under the glyph
+  // (rare 2 · epic 3 · legendary 4), and a distinct CROWN pip for the top rank
+  // (mythic). Common shows none. w: 0 myth · 1 leg · 2 epic · 3 rare · 4 common.
+  let pips = '';
+  if(rare){
+    const w = meta.weight;
+    if(w===0){ // mythic — the pinnacle gets its own mark
+      pips = '<span class="hk-medc-pips"><svg class="hk-medc-crown" viewBox="0 0 14 11" width="15" height="12" style="overflow:visible">'+
+        '<path d="M1.5 10 L1.5 4 L5 6.8 L7 1.5 L9 6.8 L12.5 4 L12.5 10 Z" fill="'+meta.color+'" stroke="none"/></svg></span>';
+    } else {
+      let d=''; for(let i=0;i<(5-w);i++) d+='<i class="hk-medc-pip" style="background:'+meta.color+'"></i>';
+      pips = '<span class="hk-medc-pips">'+d+'</span>';
+    }
+  }
   return '<span class="hk-medc'+(bare?' bare':'')+'" style="--rc:'+meta.color+'"'+
       (name?(' title="'+esc(name)+(meta.word?' — '+meta.word:'')+'"'):'')+'>'+
-    '<span class="hk-medc-h">'+badge+dot+'</span>'+
+    '<span class="hk-medc-h">'+badge+'</span>'+pips+
     (name?'<b class="hk-medc-nm">'+esc(name)+'</b>':'')+
   '</span>';
 };
