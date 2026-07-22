@@ -62,12 +62,12 @@
   /* r383 (Wolf: big crest + a dead right half): the tc-sub counters graduate to an
      N-up stat strip on the top row's right edge (r382 stat-grid grammar); the sub
      line keeps only member-since. Strip drops under the name ≤820px. */
-  .tc-stats{display:grid; grid-template-columns:repeat(4,minmax(78px,auto)); gap:8px; margin-left:auto}
+  .tc-stats{display:grid; grid-template-columns:repeat(5,minmax(72px,auto)); gap:8px; margin-left:auto}
   .tc-stat{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:8px 12px;
     text-align:center; font-family:var(--mono)}
   .tc-stat b{display:block; font-size:17px; font-variant-numeric:tabular-nums}
   .tc-stat span{font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px}
-  @media(max-width:820px){ .tc-stats{margin-left:0; width:100%; grid-template-columns:repeat(4,1fr)} }
+  @media(max-width:820px){ .tc-stats{margin-left:0; width:100%; grid-template-columns:repeat(5,1fr)} }
   /* r383 (Wolf: the whole page was ONE full-width column — every rowline a
      label-left/value-right pair with a 300–930px dead middle): 2-up card grid at
      ≥1080px. Cards pair off at half width and the rowline middles collapse with
@@ -169,6 +169,10 @@ async function load(){
   const xp = R.computeXP(mine, plBoards, mySes);   /* r371: full signature — same level everywhere */
   const L = R.levelOf(xp);
   const joined = me.created_at ? new Date(me.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—';
+  /* r393 (Wolf): the hero had a dead middle — identity left, stats far right. A 5th tile
+     (streak) widens the strip so it reads across, not pinned to the edge. */
+  let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+  const t10 = (st && (st.t10!=null)) ? st.t10 : null;
 
   /* r387 (Wolf): card cosmetics — frames, showcase, the whole loadout — moved to the
      dedicated Profile page. Account is now pure admin (identity, email, plan, security,
@@ -188,6 +192,7 @@ async function load(){
           <span class="tc-stat"><b>${st.pod}</b><span>podiums</span></span>
           <span class="tc-stat"><b>${st.att}/${D.menuOrder.length}</b><span>drills</span></span>
           <span class="tc-stat"><b>${mine.length}</b><span>clean solves</span></span>
+          <span class="tc-stat"><b>${streakN?'🔥 '+streakN:'—'}</b><span>day streak</span></span>
         </div>
       </div>
       <div class="tc-meta">
@@ -242,8 +247,8 @@ async function load(){
     </div>
 
     <div class="card"><h4>Appearance</h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:8px">Theme applies everywhere, instantly.</div>
-      <div id="acThemes" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Theme applies everywhere, instantly — it also lives on the top bar.</div>
+      <select id="acThemeSel" aria-label="theme" style="width:auto;min-width:220px;max-width:100%;font-family:var(--mono);font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;cursor:pointer"></select>
     </div>
 
     <div class="card"><h4>Your plan</h4>
@@ -317,13 +322,16 @@ async function load(){
   };
   const so=document.getElementById('acSignoutAll');
   if(so) so.onclick=async()=>{ try{ if(window.clearAccountUI) window.clearAccountUI(); }catch(e){} try{ await Promise.race([sb.auth.signOut({scope:'global'}), new Promise(r=>setTimeout(r,1200))]); }catch(e){} location.href='index.html'; };   // r293: revokes EVERY device's session; plain sign-out lives in the nav menu. r296: shares the nav.js account wipe — this path used to leave every local mirror behind
-  const th=document.getElementById('acThemes');
-  if(th && window.THEMES){ Object.entries(window.THEMES).forEach(([k,t])=>{
-    const b=document.createElement('button'); b.className='btn'; b.style.margin='0'; b.textContent=t.name||k;
-    b.onclick=()=>{ try{ window.applyTheme(k); }catch(e){}
+  /* r393 (Wolf): the ~25-button theme grid was the tallest thing on the page and duplicated
+     the top-bar theme picker. It's a compact dropdown now — same persist-to-account behavior. */
+  const th=document.getElementById('acThemeSel');
+  if(th && window.THEMES){
+    let cur=''; try{ cur=localStorage.getItem('hotkey_theme')||''; }catch(e){}
+    th.innerHTML=Object.entries(window.THEMES).map(([k,t])=>'<option value="'+esc(k)+'"'+(k===cur?' selected':'')+'>'+esc(t.name||k)+'</option>').join('');
+    th.onchange=()=>{ const k=th.value; try{ window.applyTheme(k); }catch(e){}
       try{ localStorage.setItem('hotkey_theme', k); }catch(e){}
       try{ if(sb && me) sb.from('profiles').update({theme:k}).eq('id', me.id).then(()=>{}); }catch(e){} };   // r293: the pick persists + follows the account
-    th.appendChild(b); }); }
+  }
     { const sg=document.getElementById('acHandleSugg');
     if(sg) sg.onclick=()=>{ const el=document.getElementById('acHandle');
       if(el && window.hkSuggestHandle){ el.value=window.hkSuggestHandle(); el.focus();
