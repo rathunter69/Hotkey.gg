@@ -414,7 +414,7 @@
   { let tries=0; const iv=setInterval(()=>{ if(window._navUser){ clearInterval(iv); navRank(); } else if(++tries>12) clearInterval(iv); }, 700); }
 
   async function loadProfileData(){
-    const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach,school_tag,show_school');
+    const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach,school_tag,show_school,team_code');
     const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at,keystrokes,optimal').eq('mouse_used',false).order('time_ms',{ascending:true});   /* r371: keystrokes+optimal feed the efficiency feats */
     let mySessions=[];
     try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', window._navUser.id);
@@ -620,6 +620,8 @@
               dailyPod:__xflags.dailyPod||0, dailyWins:__xflags.dailyWins||0, certs:Object.keys(__xflags.certTracks||{}).length,
               /* r376: mythic-class keys — beta-era account + the packed rank latch + the S+++ desk latch */
               charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
+              foundingClass:!!(window.hkFoundingFlags&&window.hkFoundingFlags().class),
+              foundingPartner:!!(window.hkFoundingFlags&&window.hkFoundingFlags().partner),
               tierBest:__xflags.tierBest|0, tierBestBucket:__xflags.tierBestBucket|0, deskPeak:__xflags.deskPeak||0,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
@@ -736,7 +738,12 @@
     /* r373 FRAME SYSTEM: a flair value matching an HK_FRAMES id renders as an earned
        frame (.hk-frame-<id> + ornament HTML as the card's FIRST child). Legacy values
        (gold/emerald/holo) keep their old .flair-* classes — existing rows don't break. */
-    const __safeFlair = (myFlair && /^[a-z0-9_-]{1,32}$/i.test(myFlair)) ? myFlair : null;
+    /* r389 (Wolf): flair is now often a JSON loadout blob (the profile customizer) —
+       parse it via hkFlair so the rank-click card shows the equipped skin + honors the
+       show toggles, instead of failing the bare-id test and rendering a plain (broken-
+       looking) card. hkFlair.frame is already validated against HK_FRAMES (XSS-safe). */
+    const __lo = window.hkFlair ? window.hkFlair(myFlair) : {frame:null, show:{}, stats:[]};
+    const __safeFlair = __lo.frame;
     const __isFrame = !!(__safeFlair && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__safeFlair));
     /* r382: the 640px profile card is the BIG frame host — .hk-frame-lg scales borders,
        ornaments, tabs and glow (nav.css), and opts.lg buys heraldic its denser filigree.
@@ -752,14 +759,23 @@
     let __crowns=0,__pods=0; try{ (d.drills||[]).forEach(x=>{ if(x.rank===1)__crowns++; if(x.rank!==null&&x.rank<=3)__pods++; }); }catch(e){}
     let __streak=0; try{ __streak=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
     const __promo=(tier.nextName && !tier.provisional && typeof tier.promote==='number') ? ' · '+tier.promote+'% to '+tier.nextName : (tier.provisional?' · placement':'');
+    /* r389 (Wolf): school + desk chips ride high on the card, matching the profile
+       page. Honor the customizer's show toggles so the modal reads exactly as others
+       see the card. */
+    let __tagBits='';
+    try{ const meT=(d._profs||[]).find(x=>x.id===window._navUser.id)||{};
+      if(meT.show_school && mySchoolTag){ const nm=((window.schoolResolve&&window.schoolResolve(mySchoolTag))||{}).name||mySchoolTag;
+        __tagBits+='<span class="uc-tag">'+(window.schoolChip?window.schoolChip(mySchoolTag,20):'')+'<span>'+escHtml(nm)+'</span></span>'; }
+      if(__lo.show && __lo.show.desk && meT.team_code) __tagBits+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+escHtml(meT.team_code)+'</span></span>';
+    }catch(e){}
     const __pcCard = window.hkPlayerCard ? window.hkPlayerCard({
-      name: handle,
+      name: handle, show: __lo.show,
       tierEmblem: (window.rankEmblem?window.rankEmblem(tier.name,60,tier.bucket):''),
       tierChipEmblem: (window.rankEmblem?window.rankEmblem(tier.name,15,tier.bucket):''),
       tierLabel: tier.name+' · '+standing,
       lvl: __L.lvl, pct: __L.pct, xpLine: __L.into+' / '+__L.need+' xp'+__promo,
       stats: [{n:(d.mySolves||0),label:'clean solves'},{n:__crowns,label:'crowns'},{n:__pods,label:'podiums'},{n:(__streak?'🔥 '+__streak:'—'),label:'streak'}],
-      achHtml: badgesHtml, boards: [], flair: null
+      tagsHtml: __tagBits, achHtml: badgesHtml, boards: [], flair: null
     },{scale:'full'}) : '';
     m.innerHTML = '<div class="pc-card'+flairCls+'">' + flairOrn +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
@@ -885,6 +901,7 @@
         const { data } = await window.sb.auth.getSession();
         window._navUser = data && data.session ? data.session.user : null;
         if(window._navUser){
+          try{ if(window.hkFoundingRank) window.hkFoundingRank(window.sb, window._navUser); }catch(e){}   // r389: founding-cohort flag, cached for every page's ctx
           try{ const p = await window.sb.from('profiles').select('handle,flair,theme').eq('id', window._navUser.id).maybeSingle();
             window._navProfile = p && p.data ? p.data : null; }catch(e){}
           /* r358: merge the account's cross-device state down BEFORE the pill/streak render.
