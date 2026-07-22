@@ -9679,10 +9679,11 @@ function hideResults(){ resultsChainKeys=null; const m=$('resultsModal'); if(m){
    holds a preview flip (keyed to the current drill, so it resets the moment you load a new one). */
 let sheetPageView=null;
 function sheetTabPages(keys){
-  /* r390 (Wolf): one chapter = ONE set of tabs. The row scrolls (overflow-x) and tabs
-     no longer shrink, so full names read without the page pips. (If a chapter ever
-     overflows uncomfortably the pip-paging is one revert away.) */
-  return [keys];
+  /* r391 (Wolf): reverted the r390 one-strip merge — it overflowed badly on a real
+     desktop. Back to the r334 two-page split (halves) with the little page-pip bubbles. */
+  const per = keys.length>6 ? Math.ceil(keys.length/2) : keys.length;
+  const pages=[]; for(let i=0;i<keys.length;i+=per) pages.push(keys.slice(i,i+per));
+  return pages.length?pages:[keys];
 }
 function renderSheetTabs(){
   const host=$('sheetTabs'); if(!host) return;
@@ -9693,18 +9694,24 @@ function renderSheetTabs(){
   const keys=(g?g.keys:MENU_ORDER).filter(k=>CHALLENGES[k]);
   const gs=DRILL_GROUPS.filter(x=>x.keys.some(k=>CHALLENGES[k]));
   const gi=gs.findIndex(x=>x.name===gname);
-  // previous / next CHAPTER chips (unchanged behaviour — clamp at the ends, never wrap)
-  let lead='';
-  if(gi>0){ const pv=gs[gi-1]; const pvCol=(window.HOTKEY_GROUP_COLORS||{})[pv.name]||'';
-    lead='<span class="st-lead" '+(pvCol?'style="color:'+pvCol+'"':'')+' title="previous set">« '+escHtml(pv.name.toUpperCase())+'</span>'; }
-  let next='';
-  if(gi>=0 && gi<gs.length-1){ const nx=gs[gi+1]; const nxCol=(window.HOTKEY_GROUP_COLORS||{})[nx.name]||'';
-    next='<span class="st-next" '+(nxCol?'style="color:'+nxCol+'"':'')+' title="next set (alt+pgdn past the last tab)">'+escHtml(nx.name.toUpperCase())+' »</span>'; }
   // split the chapter into pages; show the page holding the current drill (or a previewed flip)
   const pages=sheetTabPages(keys);
   let naturalPage=pages.findIndex(pg=>pg.indexOf(cur)>=0); if(naturalPage<0) naturalPage=0;
   const showPage=(sheetPageView && sheetPageView.cur===cur && sheetPageView.page<pages.length) ? sheetPageView.page : naturalPage;
   const pageKeys=pages[showPage]||keys;
+  /* r391 (Wolf): the « / » chips are PAGE-aware. When the chapter has another page,
+     the arrow scrolls WITHIN the chapter first ("FORMATTING 2/2 »") and only jumps to
+     the neighbouring chapter once you're on the chapter's first/last page. */
+  let lead='';
+  if(showPage>0){
+    lead='<span class="st-lead" '+(gcol?'style="color:'+gcol+'"':'')+' data-pageto="'+(showPage-1)+'" title="previous page">« '+showPage+'/'+pages.length+' '+escHtml(gname.toUpperCase())+'</span>';
+  } else if(gi>0){ const pv=gs[gi-1]; const pvCol=(window.HOTKEY_GROUP_COLORS||{})[pv.name]||'';
+    lead='<span class="st-lead" '+(pvCol?'style="color:'+pvCol+'"':'')+' title="previous set">« '+escHtml(pv.name.toUpperCase())+'</span>'; }
+  let next='';
+  if(showPage<pages.length-1){
+    next='<span class="st-next" '+(gcol?'style="color:'+gcol+'"':'')+' data-pageto="'+(showPage+1)+'" title="next page">'+(showPage+2)+'/'+pages.length+' '+escHtml(gname.toUpperCase())+' »</span>';
+  } else if(gi>=0 && gi<gs.length-1){ const nx=gs[gi+1]; const nxCol=(window.HOTKEY_GROUP_COLORS||{})[nx.name]||'';
+    next='<span class="st-next" '+(nxCol?'style="color:'+nxCol+'"':'')+' title="next set (alt+pgdn past the last tab)">'+escHtml(nx.name.toUpperCase())+' »</span>'; }
   const pips = pages.length>1
     ? '<span class="st-pages" title="this set has '+pages.length+' pages">'+pages.map((_,i)=>
         '<span class="st-pip'+(i===showPage?' on':'')+'" data-page="'+i+'" title="page '+(i+1)+'">'+(i+1)+'</span>').join('')+'</span>'
@@ -9716,8 +9723,10 @@ function renderSheetTabs(){
   }).join('') + next;
   host.querySelectorAll('.st-tab').forEach(el=>el.onclick=()=>{ if(!demoPlaying) loadChallenge(el.dataset.key); });
   host.querySelectorAll('.st-pip').forEach(el=>el.onclick=()=>{ if(demoPlaying) return; sheetPageView={cur, page:+el.dataset.page}; renderSheetTabs(); });
-  const nxt=host.querySelector('.st-next'); if(nxt) nxt.onclick=()=>{ if(!demoPlaying) stepGroup(1); };
-  const led=host.querySelector('.st-lead'); if(led) led.onclick=()=>{ if(!demoPlaying) stepGroup(-1); };   // r66: left chip walks BACK a set
+  const nxt=host.querySelector('.st-next'); if(nxt) nxt.onclick=()=>{ if(demoPlaying) return;
+    if(nxt.dataset.pageto!=null){ sheetPageView={cur, page:+nxt.dataset.pageto}; renderSheetTabs(); } else stepGroup(1); };
+  const led=host.querySelector('.st-lead'); if(led) led.onclick=()=>{ if(demoPlaying) return;   // r66: left chip walks BACK a set (or a page)
+    if(led.dataset.pageto!=null){ sheetPageView={cur, page:+led.dataset.pageto}; renderSheetTabs(); } else stepGroup(-1); };
 }
 // Alt+PgUp/PgDn walks the current group's tabs (Ctrl+Pg is reserved by browsers
 // for THEIR tabs — attempted below, but Alt is the dependable chord).
