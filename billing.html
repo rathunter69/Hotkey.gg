@@ -36,6 +36,9 @@
   main{padding-bottom:90px}
   .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px 24px; margin-bottom:16px}
   .card h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:14px}
+  .row{display:flex; gap:16px; align-items:stretch; margin-bottom:16px}
+  .row .card{flex:1 1 300px; min-width:0; margin-bottom:0; display:flex; flex-direction:column}
+  @media(max-width:719px){ .row{flex-wrap:wrap} }
   .plan{border-color:var(--warn); background:linear-gradient(180deg, rgba(217,164,65,.10), var(--surface) 46%)}
   .plan h4{color:var(--warn)}
   .fieldrow{display:flex; align-items:baseline; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-family:var(--mono); font-size:13px}
@@ -54,6 +57,11 @@
   table.inv td{padding:11px 10px 11px 0; border-bottom:1px dashed var(--line); color:var(--text)}
   table.inv tr:last-child td{border-bottom:none}
   .empty{font-family:var(--mono); font-size:12.5px; color:var(--muted); padding:26px 8px; text-align:center; line-height:1.8}
+  .lnk{font-family:var(--mono); font-size:12px; color:var(--accent); cursor:pointer; white-space:nowrap}
+  .lnk:hover{text-decoration:underline}
+  .lnk.danger{color:var(--bad)}
+  .msg{font-family:var(--mono); font-size:11.5px; color:var(--muted); min-height:15px; margin-top:2px}
+  #invBody{overflow-x:auto}
   .state{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:38px 28px; text-align:center;
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8; margin-top:6px}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
@@ -95,33 +103,81 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
       '<a href="index.html?openAuth=signup">Create an account</a> or <a href="index.html?openAuth=signin">log in</a> to see your plan and invoices.</div>';
     return;
   }
+  // plan tier — reads profiles.plan when it exists; everyone is PRO (free) during beta
+  let plan='pro';
+  try{ const {data}=await sb.from('profiles').select('plan').eq('id',me.id).maybeSingle(); if(data&&data.plan) plan=String(data.plan).toLowerCase(); }catch(e){}
+  const isPro = plan==='pro';
   root.innerHTML =
-    '<div class="card plan"><h4>Current plan</h4>'+
-      '<div class="fieldrow"><span class="fk">plan</span><span class="fv"><b style="color:var(--warn);font-size:15px">PRO</b> <span class="badge">free during beta</span></span></div>'+
-      '<div class="fieldrow"><span class="fk">status</span><span class="fv">active &mdash; you won’t be charged during the beta</span></div>'+
-      '<div class="fieldrow"><span class="fk">at launch</span><span class="fv">beta players lock in <b>founder pricing</b> for life</span></div>'+
-      '<div class="fieldrow"><span class="fk">renews</span><span class="fv">&mdash;</span></div>'+
-      '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn ghost" id="proBtn" style="margin-top:14px">What comes with PRO</button></div>'+
-      '<div class="note">Founder pricing and payment collection go live when the beta ends. We’ll email you before anything is ever charged.</div>'+
+    '<div class="row">'+
+      '<div class="card plan"><h4>Current plan</h4>'+
+        '<div class="fieldrow"><span class="fk">plan</span><span class="fv">'+(isPro?'<b style="color:var(--warn);font-size:15px">PRO</b> <span class="badge">free during beta</span>':'<b style="font-size:15px">Free</b>')+'</span></div>'+
+        '<div class="fieldrow"><span class="fk">status</span><span class="fv">'+(isPro?'active &mdash; not billed during beta':'the basics, free forever')+'</span></div>'+
+        '<div class="fieldrow"><span class="fk">at launch</span><span class="fv">'+(isPro?'founder pricing, locked for life':'upgrade anytime to go PRO')+'</span></div>'+
+        '<div class="fieldrow"><span class="fk">renews</span><span class="fv">&mdash;</span></div>'+
+        (isPro
+          ? '<button class="btn ghost" id="proBtn" style="margin-top:14px">What comes with PRO</button>'
+          : '<button class="btn" id="upgradeBtn" style="margin-top:14px">Upgrade to PRO</button>')+
+        '<div class="note" style="margin-top:auto">'+(isPro?'Founder pricing and payment collection go live when the beta ends &mdash; we’ll email you before anything is ever charged.':'PRO unlocks ranked cosmetics, certificates, and the full drill library.')+'</div>'+
+      '</div>'+
+
+      '<div class="card"><h4>Payment method</h4>'+
+        '<div class="fieldrow"><span class="fk">card on file</span><span class="fv">none <span style="color:var(--faint)">&mdash; not needed yet</span></span></div>'+
+        '<div class="fieldrow"><span class="fk">billing email</span><span class="fv">'+esc(me.email||'—')+'</span></div>'+
+        '<div class="fieldrow"><span class="fk">receipts</span><span class="fv"><a href="account.html" style="color:var(--accent)">manage on account</a></span></div>'+
+        '<button class="btn ghost" disabled title="Available at launch" style="margin-top:14px">Add payment method</button>'+
+        '<div class="note" style="margin-top:auto">Cards are handled by our payment processor at launch &mdash; hotkey.gg never stores your card number.</div>'+
+      '</div>'+
     '</div>'+
 
-    '<div class="card"><h4>Payment method</h4>'+
-      '<div class="fieldrow"><span class="fk">card on file</span><span class="fv">none <span style="color:var(--faint)">&mdash; not needed during beta</span></span></div>'+
-      '<button class="btn ghost" disabled title="Available at launch">Add payment method</button>'+
-      '<div class="note">Cards are added at launch through our payment processor. hotkey.gg never stores your full card number.</div>'+
+    '<div class="row">'+
+      '<div class="card"><h4>Invoices &amp; payment history</h4>'+
+        '<div id="invBody"><div class="empty">No payments yet &mdash; you’re on the free beta.<br>Invoices and receipts show up here once billing goes live.</div></div>'+
+      '</div>'+
+
+      '<div class="card"><h4>Manage plan</h4>'+
+        (isPro
+          ? '<div class="fieldrow"><span class="fk">pause</span><span class="fv"><a class="lnk" id="pauseBtn">pause subscription</a></span></div>'+
+            '<div class="msg" id="pauseMsg">Keep your account &amp; data, stop billing. Resume anytime.</div>'+
+            '<div class="fieldrow"><span class="fk">cancel</span><span class="fv"><a class="lnk danger" id="cancelBtn">cancel subscription</a></span></div>'+
+            '<div class="msg" id="cancelMsg">Drops you to Free at the end of the period. Your account, runs, and boards stay.</div>'+
+            '<div class="note" style="margin-top:auto">Cancelling only ends PRO &mdash; to erase everything, use Delete account on the <a href="account.html" style="color:var(--accent)">account page</a>.</div>'
+          : '<div class="fieldrow"><span class="fk">you’re on</span><span class="fv"><b>Free</b></span></div>'+
+            '<button class="btn" id="upgradeBtn2" style="margin-top:12px">Upgrade to PRO</button>'+
+            '<div class="note" style="margin-top:auto">Go PRO for ranked cosmetics, certificates, and every drill. Founder pricing is locked in for beta players.</div>')+
+      '</div>'+
     '</div>'+
 
-    '<div class="card"><h4>Invoices &amp; payment history</h4>'+
-      '<div id="invBody"><div class="empty">No payments yet.<br>You’re on the free beta &mdash; invoices show up here once billing goes live.</div></div>'+
-    '</div>'+
+    '<div class="note" style="text-align:center;margin-top:2px">Questions about billing? Email <a href="mailto:hello@hotkey.gg" style="color:var(--accent)">hello@hotkey.gg</a>.</div>';
 
-    '<div class="card"><h4>Billing contact</h4>'+
-      '<div class="fieldrow"><span class="fk">receipts to</span><span class="fv">'+esc(me.email||'—')+' <a href="account.html" style="color:var(--accent);font-size:11.5px">change on account</a></span></div>'+
-      '<div class="note">Questions about billing? Email <a href="mailto:hello@hotkey.gg" style="color:var(--accent)">hello@hotkey.gg</a>.</div>'+
-    '</div>';
-
+  const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--bad)':'var(--muted)'; } };
   const pb=document.getElementById('proBtn');
   if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); };
+  ['upgradeBtn','upgradeBtn2'].forEach(id=>{ const b=document.getElementById(id);
+    if(b) b.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); }; });
+
+  // Pause / cancel — arm-to-confirm, wired to RPCs when they exist; beta-aware until then.
+  // At launch, pause_subscription / cancel_subscription (or the Stripe portal) replace the notes.
+  function armAction(btnId, msgId, verb, run){
+    const btn=document.getElementById(btnId); if(!btn) return;
+    const base=btn.textContent; let armed=false, t=null;
+    btn.onclick=async()=>{
+      if(!armed){ armed=true; btn.textContent='click again to '+verb; t=setTimeout(()=>{armed=false; btn.textContent=base;},4000); return; }
+      clearTimeout(t); armed=false; btn.textContent=base; say(msgId,'Working…');
+      try{ await run(msgId); }catch(e){ say(msgId,'Something went wrong — email hello@hotkey.gg.',true); }
+    };
+  }
+  armAction('pauseBtn','pauseMsg','pause', async(mid)=>{
+    try{ const {error}=await sb.rpc('pause_subscription');
+      say(mid, error ? 'You’re on the free beta — nothing is billing yet. Pause opens here the day PRO goes paid.'
+                     : 'Subscription paused — you won’t be billed. Resume anytime.'); }
+    catch(e){ say(mid,'You’re on the free beta — nothing is billing yet. Pause opens here the day PRO goes paid.'); }
+  });
+  armAction('cancelBtn','cancelMsg','cancel', async(mid)=>{
+    try{ const {error}=await sb.rpc('cancel_subscription');
+      say(mid, error ? 'You’re on the free beta — there’s no paid subscription to cancel yet.'
+                     : 'Subscription cancelled — you stay PRO until the period ends, then drop to Free.'); }
+    catch(e){ say(mid,'You’re on the free beta — there’s no paid subscription to cancel yet.'); }
+  });
 
   // r396: when billing goes live, an `invoices` table (or the processor's API) fills #invBody.
   // Rendered as a table so the empty state and the live state share one layout:
