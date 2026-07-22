@@ -931,6 +931,17 @@
      stage growing into the bottom whitespace — most of the room comes from the bottom.
      Scoped to #navMount so other pages keep their full 30px nav gap. */
   #navMount .topnav{margin-bottom:20px}
+  /* r400 (Wolf): fullscreen drops the top site header entirely — that ~80px of dead chrome
+     above the sheet (logo + page nav) flows straight into taller cells via render()'s fit.
+     Keep the drill selector + mode bar + game; a hair of top padding stops the drill bar from
+     butting the screen edge. */
+  html.hk-fs #navMount{display:none}
+  html.hk-fs .drillbar{margin-top:12px}
+  /* the stage reserves 330px for top chrome + bottom band; fullscreen removed the ~84px site
+     header, so shrink the reserve by that much (330->250) — otherwise the reclaimed space just
+     sits as whitespace and cells never grow. Balanced, so no scroll returns; max raised so big
+     screens keep growing. */
+  html.hk-fs .stage-row{min-height:clamp(400px, calc(100vh - 262px), 900px)}
 
   /* In-trainer mode switcher — three first-class mode pills; marathon/rapid open a duration popover */
   .mode-bar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:var(--mono); font-size:12.5px}
@@ -1628,6 +1639,7 @@
       <span style="position:relative; display:inline-flex">
         <button class="mb-tool" id="soundToggle" title="key sounds — click to cycle">🔊</button>
       </span>
+      <button class="mb-tool" id="fsToggle" data-tip="fullscreen — reclaims the browser bars so the sheet gets bigger cells (Esc to exit)"><svg class="mb-ico" id="fsIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>full</button>
       <span style="position:relative; display:inline-flex">
       <button class="mb-tool" id="wqBtn" style="display:none" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r302 (Wolf): OFF the bar — one tight row of critical controls -->
       <div class="prefs-pop" id="wqPop" style="min-width:300px; flex-direction:column; gap:4px"></div>
@@ -11830,6 +11842,40 @@ function toggleSound(){ soundOn=!soundOn; saveSound(); updateSoundBtn(); if(soun
    retired (the intro stays hidden once done). */
 { const sb2=$('soundToggle');
   if(sb2){ sb2.onclick=(e)=>{ e.stopPropagation(); cycleSound(); }; try{ updateSoundBtn(); }catch(e){} } }
+/* r400 (Wolf): FULLSCREEN — the readability lever for small screens. Entering fullscreen frees
+   the browser's toolbar/tab strip, so .gridwrap measures a taller box and render()'s fixed-canvas
+   fit hands every row more height (bigger cells + font) with zero engine changes. Uses the
+   Fullscreen API on <html> so nav/ribbon come along; the grid just re-fits on fullscreenchange.
+   Distinct from native F11 (deliberately swallowed mid-drill) — this is an explicit, safe toggle. */
+function fsActive(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function updateFsBtn(){ const b=$('fsToggle'); if(!b) return;
+  const on=fsActive();
+  document.documentElement.classList.toggle('hk-fs',on);   // r400: drop the site header in fullscreen → that space becomes taller cells
+  b.classList.toggle('on',on);
+  const ico=$('fsIco'); if(ico) ico.innerHTML = on
+    ? '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>'   // inward arrows = "exit"
+    : '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>';  // outward arrows = "enter"
+  b.lastChild && b.lastChild.nodeType===3 ? (b.lastChild.textContent = on?'exit':'full') : null;
+}
+function toggleFullscreen(){
+  try{
+    if(fsActive()){ (document.exitFullscreen||document.webkitExitFullscreen).call(document); }
+    else { const el=document.documentElement; (el.requestFullscreen||el.webkitRequestFullscreen).call(el); }
+  }catch(e){}
+}
+{ const fb=$('fsToggle');
+  if(fb){
+    // hide the control where the API isn't offered (rare) so it never dead-ends
+    if(!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)) fb.style.display='none';
+    else fb.onclick=(e)=>{ e.stopPropagation(); toggleFullscreen(); };
+  }
+  // the viewport only reports its new size a frame or two AFTER the event, so re-fit across a
+  // couple of ticks — render() reads .gridwrap's freshly-laid-out height each pass.
+  const __fsRefit=()=>{ try{ updateFsBtn(); render(); requestAnimationFrame(()=>{ try{ render(); }catch(e){} }); setTimeout(()=>{ try{ render(); }catch(e){} },120); }catch(e){} };
+  document.addEventListener('fullscreenchange', __fsRefit);
+  document.addEventListener('webkitfullscreenchange', __fsRefit);
+  try{ updateFsBtn(); }catch(e){}
+}
 /* ---- r157: THE WEAKNESS QUEUE (PRO pillar #2; free in beta via requirePro) ----
    The site builds the session: score every drill from LOCAL data only —
    PB vs par (known weakness), never-cleared (unknown weakness, progression-
