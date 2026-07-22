@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="lb.css?v=15">
+<link rel="stylesheet" href="lb.css?v=16">
 <style>
   html{scrollbar-gutter:stable}   /* r68: content filters change page height — without this the centered wrap jumps horizontally */
   :root{
@@ -103,6 +103,13 @@
   .drow .eff{text-align:right; color:var(--muted)}
   .drow .eff b{color:var(--accent)}
   .drow.untried{opacity:.45}
+  /* r393 (Wolf): chapter picker rides the section title, right-aligned, so Per-drill shows
+     one chapter at a time instead of the whole catalog as a flat wall */
+  .section-title.pd-title{display:flex; align-items:center; justify-content:space-between; gap:14px}
+  .pd-pick{font-family:var(--mono); font-size:11.5px; text-transform:none; letter-spacing:0;
+    color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:8px;
+    padding:5px 10px; cursor:pointer; max-width:60%}
+  .pd-pick:hover{border-color:var(--faint)}
   .drow .bar{grid-column:1/-1; height:3px; background:var(--surface2); border-radius:99px; overflow:hidden; margin-top:-2px}
   .drow .bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
   .state{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:36px 28px; text-align:center;
@@ -535,36 +542,45 @@ async function load(){
     });
     html += `</div>`;
   }
-  html += `<h3 class="section-title">Per-drill</h3>`;
-  let lastG=null;
-  D.menuOrder.forEach(k=>{
+  /* r393 (Wolf): the Per-drill wall used to print EVERY drill in the catalog as a flat
+     ~80-row strip — the single biggest source of dead length on the page. It's now behind
+     a chapter picker: one group at a time, defaulting to where you've been most active.
+     "prioritize stats … use a drop down to show the drill individual feedback." */
+  const pdRow = (k)=>{
     const grp = D.groupOf[k]||'';
-    if(grp!==lastG){ html+=`<div style="font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin:18px 0 8px">${esc(grp)}</div>`; lastG=grp; }
     const label = D.labelOf[k]||k;
-    // my best posted run for this drill (mine[] is time-sorted)
-    const best = mine.find(x=>x.challenge===k) || null;
+    const best = mine.find(x=>x.challenge===k) || null;   // mine[] is time-sorted → first is PB
     const pbLocal = localPB[k]!==undefined ? localPB[k]*1000 : null;
     const pbMs = best ? best.time_ms : pbLocal;
     if(pbMs==null){
-      html += `<div class="drow untried"><span class="nm">${esc(label)}<span class="grp">${esc(grp)}</span></span><span class="pb">—</span><span class="eff">untried</span><span class="eff"></span></div>`;
-      return;
+      return `<div class="drow untried"><span class="nm">${esc(label)}</span><span class="pb">—</span><span class="eff">untried</span><span class="eff"></span></div>`;
     }
     const eff = (best && best.keystrokes>0 && best.optimal>0) ? Math.min(100, Math.round(100*best.optimal/best.keystrokes)) : null;
-    // rank among posted bests for this drill
     let rankTxt='';
-    if(best){
+    if(best && me){
       const seen={}, board=[];
       all.filter(x=>x.challenge===k).forEach(x=>{ if(!seen[x.user_id]){ seen[x.user_id]=true; board.push(x); } });
       const idx = board.findIndex(x=>x.user_id===me.id);
       if(idx>=0) rankTxt = '#'+(idx+1)+' of '+board.length;
     } else rankTxt = 'local only';
-    html += `<div class="drow"><span class="nm">${esc(label)}<span class="grp">${esc(grp)}</span></span>`+
+    return `<div class="drow"><span class="nm">${esc(label)}</span>`+
       `<span class="pb">${fmtS(pbMs)}</span>`+
       `<span class="eff">${eff!==null?'<b>'+eff+'%</b> eff':'—'}</span>`+
       `<span class="eff">${rankTxt}</span>`+
       (eff!==null?`<span class="bar"><i style="width:${eff}%"></i></span>`:'')+
       `</div>`;
-  });
+  };
+  // group order + per-group done/total, and the default view (most of my activity)
+  const pdGroups=[], gseen={};
+  D.menuOrder.forEach(k=>{ const g=D.groupOf[k]||''; if(!gseen[g]){gseen[g]=1; pdGroups.push(g);} });
+  const pdTouched = k => mine.some(x=>x.challenge===k) || localPB[k]!==undefined;
+  const pdCount = g => { let done=0,tot=0; D.menuOrder.forEach(k=>{ if((D.groupOf[k]||'')===g){ tot++; if(pdTouched(k)) done++; } }); return {done,tot}; };
+  let pdDef=pdGroups[0], pdBest=-1;
+  pdGroups.forEach(g=>{ const c=pdCount(g).done; if(c>pdBest){pdBest=c; pdDef=g;} });
+  window.__pdRow=pdRow; window.__pdGroupHtml=(g)=>D.menuOrder.filter(k=>(D.groupOf[k]||'')===g).map(pdRow).join('');
+  const pdOpts=pdGroups.map(g=>{ const c=pdCount(g); return `<option value="${esc(g)}"${g===pdDef?' selected':''}>${esc(g)} · ${c.done}/${c.tot}</option>`; }).join('');
+  html += `<h3 class="section-title pd-title">Per-drill<select id="pdPick" class="pd-pick" aria-label="pick a chapter">${pdOpts}</select></h3>`;
+  html += `<div id="pdRows">${window.__pdGroupHtml(pdDef)}</div>`;
 
   if(mine.length){
     const recent = mine.slice().sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,10);
@@ -576,6 +592,9 @@ async function load(){
     });
   }
   root.innerHTML = html;
+  // r393 (Wolf): per-drill chapter picker — swap the row block on change, no reload
+  { const pk=document.getElementById('pdPick'), rows=document.getElementById('pdRows');
+    if(pk && rows) pk.onchange=()=>{ rows.innerHTML=window.__pdGroupHtml(pk.value); }; }
   // r156: the analytics PRO tag opens the shared offer sheet
   document.querySelectorAll('.proTag').forEach(t=>t.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Deep analytics'); });
   // r267: achievements wall filters — chips set data-f on the grid; CSS does the hiding

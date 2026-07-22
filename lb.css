@@ -202,6 +202,11 @@
   .browse-wrap{display:grid; grid-template-columns:280px minmax(0,1fr); gap:16px; align-items:start}
   .browse-list{max-height:560px; overflow-y:auto; border:1px solid var(--line); border-radius:12px;
     background:var(--surface); padding:8px; display:flex; flex-direction:column; gap:2px}
+  /* r393 (Wolf): with the tier-filter bar removed, the detail board's top now sits flush with
+     the drill list's top (both at the row's top edge). It fills down to roughly the list's
+     height so a full board doesn't read short beside the long drill list. */
+  .browse-detail{min-width:0}
+  .browse-detail .board{min-height:540px}
   .browse-list .bl-row{display:flex; justify-content:space-between; align-items:center; gap:8px;
     border:1px solid transparent; background:none; padding:6px 9px; border-radius:7px; font-size:12px; margin:0}
   .browse-list .bl-row:hover{background:var(--surface2)}
@@ -266,6 +271,40 @@
   .featured .board .empty{padding:16px 18px 4px}
   .hero .panel{display:flex; flex-direction:column}
   .hero .panel > :last-child{margin-top:auto}
+  /* r392 (Wolf): your-card medal showcase fills the column beside the tall daily board */
+  .yc-medals{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; justify-content:center}
+  /* r392 (Wolf: "still a weird gap / mismatch"): your best three standings, filling the
+     column with signal instead of stretch-air. Rows echo the board list styling. */
+  .yc-boards{margin-top:16px; border-top:1px dashed var(--line); padding-top:12px}
+  .yc-btitle{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); margin-bottom:8px}
+  .yc-brow{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.5px; padding:5px 2px; border-bottom:1px solid var(--line)}
+  .yc-brow:last-child{border-bottom:0}
+  .yc-bpl{color:var(--faint); min-width:34px; font-variant-numeric:tabular-nums}
+  .yc-brow.pod .yc-bpl{color:var(--accent)}
+  .yc-brow.gold .yc-bpl{color:var(--gold,#e0b45a)}
+  .yc-bnm{flex:1; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .yc-bfd{color:var(--faint); font-size:10.5px}
+  /* r392 (Wolf): compact-always leaderboard. The your-card sidebar sits snug to its
+     content (no stretch gap to match the tall Top Players board). Daily + weekly are two
+     EQUAL fixed cards — the daily box no longer spans full width as a near-empty banner. */
+  .hero.two > .panel.me{align-self:start}
+  .hero.two > .panel.me > :last-child{margin-top:14px}
+  .featured-2{grid-template-columns:1fr 1fr; align-items:stretch}
+  .featured-2 .featured-daily{grid-column:auto; margin:0}
+  .featured-2 .featured-daily .board, .featured-2 .fx-compact .board{min-height:200px}
+  .featured-2 .fx-compact{min-width:0; display:flex; flex-direction:column}
+  /* r393 (Wolf): the Daily Challenge now rides the HERO row. Inside .hero.two it must NOT
+     inherit .featured-daily's grid-column:1/-1 (that spanned both hero columns) — snap it to
+     the second hero cell. It fills the cell height beside the your-card. */
+  .hero.two > .featured-daily{grid-column:auto; margin:0; align-self:stretch; display:flex; flex-direction:column}
+  .hero.two > .featured-daily .board{flex:1; min-height:300px}
+  /* r393 (Wolf): featured row = overall field (box 1) + Top Desks (box 2), two EQUAL boxes.
+     Box 1 defaults to the WHOLE ranked field, kept compact by a fixed-height internal scroll;
+     the desk list scrolls too so both boxes stay compact and level. */
+  .featured-2 .tp-panel, .featured-2 .standings{min-width:0}
+  .tp-scroll{max-height:330px; overflow-y:auto; margin:0 -4px; padding:0 4px}
+  .featured-2 .standings .st-list{max-height:330px; overflow-y:auto}
+  .featured-2 .panel .empty{color:var(--faint)}
   .tp-row .rk{text-align:center}
   .board{margin-bottom:0}
   .section-title{margin-top:30px}
@@ -276,7 +315,9 @@
   @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 9px currentColor)}}
   .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
   .yc-top .pc-tier{font-size:10px; padding:6px 13px}
-  .chip.mine::after{content:'\2713'; color:var(--accent); margin-left:6px}
+  /* r393 (Wolf: "two checkmarks on the left?"): the drill list row carries an explicit
+     <b class="bl-me">✓</b> already; this generic .chip.mine::after was doubling it up
+     (bl-row also carries .chip). The explicit tick owns the tooltip — drop the pseudo. */
   .empty b{color:var(--accent); font-weight:700}
   /* your-standing strip — the scoreboard of scoreboards */
   .standing{grid-column:1/-1; background:var(--surface); border:1px solid var(--accent-dim);
@@ -397,14 +438,8 @@
   .mg-pin input:focus{border-color:var(--accent-dim); outline:none}
   #mgQKey{width:190px} #mgQTgt{width:135px} #mgQNote{flex:1; min-width:160px}
   .mg-kick{color:var(--warn)}
-  /* r335 (Wolf): tier sub-menu on the detail board — dropdown + bucket chips */
-  .tier-filter{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 10px}
-  .tier-filter label{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
-  .tier-filter select{font-family:var(--mono); font-size:12px; color:var(--text); background:var(--surface2);
-    border:1px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer}
-  .tier-filter select:focus{border-color:var(--accent-dim); outline:none}
-  .tier-filter .tf-b{font-size:10.5px; padding:4px 11px}
-  .tf-note{font-family:var(--mono); font-size:10.5px; color:var(--faint); margin:-4px 0 8px}
+  /* r393 (Wolf): the per-board tier sub-menu (dropdown + bucket chips) is retired — its
+     .tier-filter / .tf-note styles are gone with the markup. */
   /* r336 (Wolf): placement-series checklist on "your card" */
   .pl-list{margin-top:12px; display:flex; flex-direction:column; gap:2px}
   .pl-row{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.5px;
