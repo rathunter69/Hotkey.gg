@@ -926,7 +926,13 @@
   .gate-brand b{color:var(--accent)}
   .gate .auth-card p b{color:var(--text)}
   /* ---- top exercise row + bottom sheet tabs ---- */
-  .exrow{margin-bottom:10px}
+  .exrow{margin-bottom:6px}
+  /* r398 (Wolf #99): reclaim ~30px of top-bar whitespace on the TRAINER page only so a tall
+     model clears the fold on 1080p-at-125% (1536×864) laptops and the result bar + a little
+     bottom breathing room stay on-screen. Scoped to #navMount so every other page keeps its
+     roomier 30px nav gap. No grid scaling — cell sizing + the insert/autofit/width math are
+     untouched. */
+  #navMount .topnav{margin-bottom:14px}
 
   /* In-trainer mode switcher — three first-class mode pills; marathon/rapid open a duration popover */
   .mode-bar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:var(--mono); font-size:12.5px}
@@ -1106,7 +1112,7 @@
   }
 
   /* compact drill selector (replaces the bottom sheet-tab strip) */
-  .drillbar{display:flex; align-items:center; gap:6px; margin-bottom:8px}
+  .drillbar{display:flex; align-items:center; gap:6px; margin-bottom:5px}
   .db-nav{font-family:var(--mono); font-size:15px; line-height:1; color:var(--muted); background:var(--surface);
     border:1px solid var(--line); border-radius:8px; padding:8px 11px; cursor:pointer; transition:.13s}
   .db-nav:hover{color:var(--accent); border-color:var(--accent-dim)}
