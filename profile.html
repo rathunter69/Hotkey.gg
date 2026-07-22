@@ -84,6 +84,33 @@ window.NAV_ACTIVE = 'profile';
   .pc-card.pc-live .uc{padding:22px 24px 20px; border-radius:16px}
   .pc-live-cap{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
     color:var(--faint); text-align:center; margin:-8px 0 18px}
+  /* r389 (Wolf): the skin CAROUSEL — arrows flank the card in the page's dead
+     side-space; ← → also drive it. Landing on an UNLOCKED skin equips it live;
+     a LOCKED skin previews (skin + animation) but never saves. */
+  .pc-stage{position:relative; display:flex; align-items:center; justify-content:center; gap:22px; margin-bottom:10px}
+  .pc-arrow{flex:none; width:46px; height:46px; border-radius:50%; background:var(--surface); border:1px solid var(--line);
+    color:var(--text); font-size:24px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:border-color .13s, color .13s, box-shadow .13s, transform .08s; user-select:none; -webkit-user-select:none}
+  .pc-arrow:hover{border-color:var(--accent); color:var(--accent); box-shadow:0 0 16px var(--accent-glow)}
+  .pc-arrow:active{transform:scale(.9)}
+  .pc-lockbadge{position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:9;
+    font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#fff;
+    background:rgba(200,83,63,.94); padding:4px 13px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.35);
+    opacity:0; pointer-events:none; transition:opacity .16s}
+  .pc-stage.locked .pc-lockbadge{opacity:1}
+  .pc-live-cap b{color:var(--text); font-size:12px; letter-spacing:.02em; text-transform:none}
+  .pc-live-cap .fc-idx{color:var(--faint); margin-left:2px}
+  .pc-live-cap .fc-lock{color:var(--warn); text-transform:none; letter-spacing:.02em; margin-left:6px}
+  .pc-live-cap .fc-eq{color:var(--accent); margin-left:6px; letter-spacing:.1em}
+  .pc-live-cap .fc-count{display:block; color:var(--faint); margin-top:5px; font-size:9px}
+  /* narrow: the card eats the row width, so the arrows overlay its edges */
+  @media (max-width:560px){
+    .pc-stage{gap:0}
+    .pc-arrow{position:absolute; top:50%; transform:translateY(-50%); z-index:7; width:38px; height:38px; font-size:20px;
+      background:rgba(20,22,26,.6); border-color:rgba(255,255,255,.25); color:#fff}
+    .pc-arrow.prev{left:2px} .pc-arrow.next{right:2px}
+    .pc-arrow:active{transform:translateY(-50%) scale(.9)}
+  }
 
   .cz{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px 24px 24px}
   .cz-h{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
@@ -408,6 +435,16 @@ async function load(){
   function flash(){ const el=document.getElementById('czSaved'); if(!el) return; el.textContent='saved ✓';
     el.classList.add('show'); clearTimeout(_flashT); _flashT=setTimeout(()=>el.classList.remove('show'), 1400); }
 
+  // ---- SKIN CAROUSEL preview state ----
+  // previewIdx points into frameOpts (built below). The card renders the PREVIEW
+  // frame; landing on an unlocked one equips it (loadout.frame), a locked one is
+  // preview-only. Initialized properly once frameOpts exists.
+  let previewIdx = 0;
+  function previewFrameId(){
+    const f = (typeof frameOpts!=='undefined' && frameOpts[previewIdx]) ? frameOpts[previewIdx].id : (loadout.frame||'__none');
+    return f==='__none' ? null : f;
+  }
+
   // ---- THE LIVE CARD (re-renderable) ----
   function renderCard(){
     const holder=document.getElementById('liveCard'); if(!holder) return;
@@ -423,7 +460,7 @@ async function load(){
       const chip=window.schoolChip?window.schoolChip(prof.school_tag,20):'';
       tagBits+='<span class="uc-tag">'+chip+'<span>'+esc(nm)+'</span></span>'; }
     if(loadout.show.desk && prof.team_code) tagBits+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+esc(prof.team_code)+'</span></span>';
-    const d={ name:prof.handle||'set a handle', flair:loadout.frame, show:loadout.show,
+    const d={ name:prof.handle||'set a handle', flair:previewFrameId(), show:loadout.show,
       tierEmblem:window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):'',
       tierChipEmblem:window.rankEmblem?window.rankEmblem(tier.name,16):'',
       tierLabel:tier.name+(tier.bucket?(' · '+tier.bucket):'')+(st.rank?(' · #'+st.rank):''),
@@ -553,17 +590,18 @@ async function load(){
     '</div>') : '';
 
   root.innerHTML =
-    '<div class="pc-card pc-live" id="liveCard"></div>'+
-    '<div class="pc-live-cap">your card — as it appears on the leaderboard &amp; desks</div>'+
+    // r389 (Wolf): the skin CAROUSEL — arrows in the side whitespace + ← → keys drive
+    // the live card; the frame filmstrip is retired (this is the frame picker now).
+    '<div class="pc-stage" id="pcStage">'+
+      '<button type="button" class="pc-arrow prev" id="pcPrev" aria-label="previous skin">‹</button>'+
+      '<div class="pc-card pc-live" id="liveCard"></div>'+
+      '<button type="button" class="pc-arrow next" id="pcNext" aria-label="next skin">›</button>'+
+      '<span class="pc-lockbadge">🔒 Locked — preview only</span>'+
+    '</div>'+
+    '<div class="pc-live-cap" id="frameCap"></div>'+
     '<div class="cz">'+
       '<div class="cz-h"><h2>Customize your card</h2><span class="cz-saved" id="czSaved"></span></div>'+
-      '<div class="cz-sub">Your card loadout — frame, title, what shows, featured medals, highlighted stats. Everything applies live and saves instantly.</div>'+
-
-      '<div class="cz-sec">'+
-        '<div class="cz-sechd"><span class="cz-lab">Frame</span><span class="cz-count">'+frameUnlockedN+' OF '+frameTotal+' UNLOCKED</span></div>'+
-        '<div class="cz-strip" id="czStrip">'+frameStripHtml()+'</div>'+
-        '<div class="cz-hint" id="czFrameHint">hover a frame — how it’s earned shows here</div>'+
-      '</div>'+
+      '<div class="cz-sub">Arrow through your skins on the card (or use ← →). Everything else applies live and saves instantly.</div>'+
 
       '<div class="cz-sec">'+
         '<div class="cz-sechd"><span class="cz-lab">Title</span><span class="cz-manage" id="czTitleManage">MANAGE →</span></div>'+
@@ -588,24 +626,35 @@ async function load(){
   renderCard();
 
   // ================= WIRING =================
-  const setFrameHint=(txt)=>{ const el=document.getElementById('czFrameHint'); if(el) el.textContent=txt; };
-  function frameHint(b){
-    const f=frameOpts.find(x=>x.id===b.dataset.frame); if(!f) return;
-    setFrameHint( f.id==='__none' ? 'None — plain card'
-      : (b.dataset.locked==='1' ? '🔒 '+f.name+' — '+(f.earn||'keep playing.')
-        : f.name+' — yours to wear') );
+  // ---- SKIN CAROUSEL: arrows + ← → keys. Landing on an unlocked skin equips +
+  // saves it; a locked skin previews (skin + animation) but never saves. ----
+  function updateFrameCap(){
+    const cap=document.getElementById('frameCap'); if(!cap) return;
+    const f=frameOpts[previewIdx]||frameOpts[0];
+    let s='<b>'+esc(f.name)+'</b><span class="fc-idx">· '+(previewIdx+1)+' / '+frameOpts.length+'</span>';
+    if(!f.unlocked) s+='<span class="fc-lock">🔒 '+esc(f.earn||'keep playing')+'</span>';
+    else if(f.id!=='__none') s+='<span class="fc-eq">✓ EQUIPPED</span>';
+    s+='<span class="fc-count">'+frameUnlockedN+' of '+frameTotal+' skins unlocked · your card as others see it</span>';
+    cap.innerHTML=s;
+    const stage=document.getElementById('pcStage'); if(stage) stage.classList.toggle('locked', !f.unlocked);
   }
-  const strip=document.getElementById('czStrip');
-  if(strip) strip.querySelectorAll('.cz-frame').forEach(b=>{
-    b.onmouseenter=()=>frameHint(b);
-    b.onclick=()=>{
-      frameHint(b);
-      if(b.dataset.locked==='1') return;   // locked frames answer with the earn line only
-      loadout.frame = b.dataset.frame==='__none' ? null : b.dataset.frame;
-      strip.querySelectorAll('.cz-frame').forEach(x=>x.classList.toggle('on', x.dataset.frame===(loadout.frame||'__none')));
-      renderCard(); saveFlair(); flash();
-    };
-  });
+  function setFramePreview(idx){
+    previewIdx = (idx % frameOpts.length + frameOpts.length) % frameOpts.length;   // wrap
+    const f=frameOpts[previewIdx];
+    if(f.unlocked){ loadout.frame = f.id==='__none' ? null : f.id; saveFlair(); flash(); }
+    renderCard(); updateFrameCap();
+  }
+  previewIdx = Math.max(0, frameOpts.findIndex(f=>f.id===(loadout.frame||'__none')));
+  renderCard(); updateFrameCap();
+  { const pv=document.getElementById('pcPrev'), nx=document.getElementById('pcNext');
+    if(pv) pv.onclick=()=>setFramePreview(previewIdx-1);
+    if(nx) nx.onclick=()=>setFramePreview(previewIdx+1);
+    document.addEventListener('keydown',(e)=>{
+      const t=e.target; if(t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+      if(e.key==='ArrowLeft'){ setFramePreview(previewIdx-1); e.preventDefault(); }
+      else if(e.key==='ArrowRight'){ setFramePreview(previewIdx+1); e.preventDefault(); }
+    });
+  }
 
   // TITLE
   { const tm=document.getElementById('czTitleManage');
