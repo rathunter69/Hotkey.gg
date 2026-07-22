@@ -1561,13 +1561,13 @@
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=276"></script>
-<link rel="stylesheet" href="nav.css?v=189">
-<script src="themes.js?v=281"></script>
+<link rel="stylesheet" href="nav.css?v=190">
+<script src="themes.js?v=282"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=289"></script>
+<script src="nav.js?v=290"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -9778,7 +9778,8 @@ function syncTabs(){
       if(__solves<3 && !guided && !demoPlaying) toggleGuided();
     }
   }catch(e){}
-  if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450); }   // r80: between drills — gameplay moment, zero overlap
+  if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450);
+    setTimeout(skinSweepInGame, 900); }   // r80: between drills — gameplay moment, zero overlap; r393: skin unlocks queue after the ach card
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
@@ -15365,6 +15366,50 @@ function achSweepInGame(){
         iconHtml:(window.hkBadge?window.hkBadge(fresh[0].glyph,true,60):'')});
       localStorage.setItem('hk_ach_seen', JSON.stringify(seen.concat(fresh.map(a=>a.id))));
       try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}   /* r358: unlocks ride the account */
+    }
+  }catch(e){}
+}
+/* r393 (Wolf #75): "for celebrations on pivotal achievements that would unlock a title skin
+   we have that skin unlock integrated into the celebration with the option to equip it now."
+   The card skins earn off progression signals (hkFrameEarned, beta-free). This sweep runs on
+   the same between-drills beat as the achievement sweep, diffs genuinely-earned frames against
+   a seen-set, and celebrates each new one with an equip-now button. First-ever run SEEDS the
+   set silently so existing players don't get a retroactive flood. */
+function buildSkinCtx(){
+  let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+  let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+  let lvl=1; try{ const est=(typeof window.__lvlXp==='number'?window.__lvlXp:(parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0)); lvl=lvlOf(est); }catch(e){}
+  let chaptersCleared=[]; try{ chaptersCleared=campState().filter(c=>c.done).map(c=>c.id); }catch(e){}
+  return { lvl:lvl, tierBest:fl.tierBest|0, dailyWins:fl.dailyWins|0,
+    certs:Object.keys(fl.certTracks||{}).length,
+    charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
+    perfectRun:fl.perfectRun?1:0, streak:streakN, chaptersCleared:chaptersCleared };
+}
+function skinPreviewHtml(id){
+  try{
+    const orn=(id.indexOf('plaque-')===0 && window.hkFrameOrnaments) ? window.hkFrameOrnaments(id,{bucket:(window.hkFrameBucket?window.hkFrameBucket():1)}) : '';
+    return '<span class="hk-cel-skin hk-frame-'+id+'">'+orn+'</span>';
+  }catch(e){ return ''; }
+}
+function skinSweepInGame(){
+  try{
+    if(!window.HK_FRAMES || !window.hkFrameEarned || !window.hkCelebrate) return;
+    const u=buildSkinCtx();
+    const earned=window.HK_FRAMES.filter(f=>window.hkFrameEarned(f.id,u)).map(f=>f.id);
+    let seen=null; try{ const raw=localStorage.getItem('hk_skin_seen'); if(raw!=null) seen=JSON.parse(raw); }catch(e){ seen=null; }
+    if(!Array.isArray(seen)){
+      localStorage.setItem('hk_skin_seen', JSON.stringify(earned));   // first run: seed, no retroactive flood
+      return;
+    }
+    const fresh=window.HK_FRAMES.filter(f=>earned.indexOf(f.id)>=0 && seen.indexOf(f.id)<0);
+    if(fresh.length){
+      localStorage.setItem('hk_skin_seen', JSON.stringify(seen.concat(fresh.map(f=>f.id))));
+      const f=fresh[0];
+      window.hkCelebrate({ cap:'card skin unlocked', big:true, title:f.name,
+        sub:(f.desc||'a new look for your card')+(fresh.length>1?' · +'+(fresh.length-1)+' more':''),
+        iconHtml:skinPreviewHtml(f.id),
+        equip:{ frameId:f.id, frameName:f.name } });
+      try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}
     }
   }catch(e){}
 }

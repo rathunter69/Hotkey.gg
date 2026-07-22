@@ -29,11 +29,52 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'lead
     else console.log('  PASS ' + p + ' — loaded, zero page errors');
     await page.close();
   }
+  // r393 (Wolf #75): skin-unlock celebration + equip-now. Drives the in-game sweep and the
+  // celebration render on a real index.html, asserting the invariants that keep it safe:
+  // genuine earn ignores the beta grant, the sweep seeds silently then fires on a fresh earn,
+  // equipping preserves the rest of the saved loadout, and the card shows an equip button.
+  {
+    const page = await browser.newPage();
+    const errs = [];
+    page.on('pageerror', e => errs.push('PAGEERROR: ' + e.message));
+    await page.route('**/@supabase/**', r => r.abort());
+    try {
+      await page.goto(BASE + '/index.html', { waitUntil: 'load', timeout: 30000 });
+      await page.waitForTimeout(1000);
+      const r = await page.evaluate(() => {
+        const o = {};
+        try { localStorage.setItem('hk_beta_unlock', '1'); } catch (e) {}
+        o.earnIgnoresBeta = window.hkFrameEarned('onyx', { tierBest: 2 }) === false && window.hkFrameUnlocked('onyx', { tierBest: 2 }) === true;
+        try { localStorage.setItem('hk_beta_unlock', '0'); } catch (e) {}
+        const l = window.hkFlair('{"f":"molten","st":["solves","crowns"],"ti":"pro"}'); l.frame = 'onyx';
+        const back = window.hkFlair(window.hkFlairPack(l));
+        o.loadoutPreserved = back.frame === 'onyx' && back.title === 'pro' && (back.stats || []).join(',') === 'solves,crowns';
+        const calls = []; const real = window.hkCelebrate; window.hkCelebrate = c => calls.push(c);
+        localStorage.removeItem('hk_skin_seen');
+        localStorage.setItem('hk_ach_flags', JSON.stringify({ tierBest: 2 }));
+        window.skinSweepInGame(); o.seedSilent = calls.length === 0;
+        localStorage.setItem('hk_ach_flags', JSON.stringify({ tierBest: 4 }));
+        window.skinSweepInGame();
+        o.freshFires = calls.length === 1 && !!(calls[0].equip && calls[0].equip.frameId);
+        window.hkCelebrate = real;
+        window.hkCelebrate({ cap: 'x', title: 'x', equip: { frameId: 'cottoncandy', frameName: 'C' } });
+        o.equipBtn = !!document.querySelector('.hk-cel-equip');
+        return o;
+      });
+      const checks = ['earnIgnoresBeta', 'loadoutPreserved', 'seedSilent', 'freshFires', 'equipBtn'];
+      const bad = checks.filter(k => !r[k]);
+      if (bad.length) errs.push('skin-unlock invariants failed: ' + bad.join(', '));
+      if (errs.length) fails.push({ p: 'skin-unlock', errs });
+      else console.log('  PASS skin-unlock — earn/seed/fresh/equip invariants hold');
+    } catch (e) { fails.push({ p: 'skin-unlock', errs: ['THREW: ' + String(e).slice(0, 160)] }); }
+    await page.close();
+  }
+
   await browser.close();
   if (fails.length) {
     console.error('\nSMOKE FAILED:');
     fails.forEach(f => console.error('  ' + f.p + '\n    ' + f.errs.join('\n    ')));
     process.exit(1);
   }
-  console.log('SMOKE: ALL ' + PAGES.length + ' PAGES CLEAN');
+  console.log('SMOKE: ALL ' + PAGES.length + ' PAGES CLEAN + skin-unlock');
 })().catch(e => { console.error('SMOKE HARNESS FAIL', e); process.exit(1); });

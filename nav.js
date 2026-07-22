@@ -1385,13 +1385,18 @@ window.hkCelebrate = function(o){
   if(window.__hkCelOpen){ window.__hkCelQ.push(o); return; }
   window.__hkCelOpen=true;
   const w=document.createElement('div'); w.className='hk-cel-wrap'+(o.rankUp?' hk-cel-rank':'')+(o.big?' hk-cel-big':'');
+  /* r393 (Wolf #75): a skin-unlock celebration carries o.equip = {frameId, frameName}.
+     It renders an "equip now" button (and an 'e' shortcut) that writes the frame onto the
+     account WITHOUT clobbering the rest of the saved loadout (hkFlair/hkFlairPack round-trip). */
+  const eq=o.equip;
   w.innerHTML='<div class="hk-cel">'+
     '<div class="hk-cel-cap">'+(o.cap||'nice')+'</div>'+
     '<div class="hk-cel-body">'+
       (o.iconHtml?'<div class="hk-cel-icon">'+o.iconHtml+'</div>':'')+
       '<div class="hk-cel-title">'+(o.title||'')+'</div>'+
       (o.sub?'<div class="hk-cel-sub">'+o.sub+'</div>':'')+
-      '<div class="hk-cel-hint">\u21b5 continue \u00b7 v \u2014 see it on your card</div>'+
+      (eq?'<div class="hk-cel-eqrow"><button class="hk-cel-equip" type="button">equip now</button><span class="hk-cel-eqmsg"></span></div>':'')+
+      '<div class="hk-cel-hint">'+(eq?'e \u2014 equip \u00b7 \u21b5 continue \u00b7 v \u2014 see your card':'\u21b5 continue \u00b7 v \u2014 see it on your card')+'</div>'+
     '</div></div>';
   document.body.appendChild(w);
   try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}   // r176: a focused results button must not act on Enter
@@ -1408,13 +1413,43 @@ window.hkCelebrate = function(o){
     window.__hkCelOpen=false;
     const nx=window.__hkCelQ.shift(); if(nx) setTimeout(()=>window.hkCelebrate(nx), 220); };
   w.addEventListener('click', close);
+  /* r393 (Wolf #75): equip-now — read the CURRENT flair fresh (the nav cache only holds
+     id+handle, not flair, so we must fetch to avoid dropping a saved loadout), swap only the
+     frame, pack it back. Preserves title / shown-elements / highlighted stats. */
+  let equipping=false;
+  const doEquip=async(btn)=>{
+    if(!eq || equipping) return;
+    const msg=w.querySelector('.hk-cel-eqmsg');
+    if(!window.sb || !window._navUser){ if(msg) msg.textContent='sign in to equip'; return; }
+    equipping=true; if(btn){ btn.disabled=true; btn.textContent='equipping…'; }
+    try{
+      let curRaw=null;
+      try{ const {data}=await window.sb.from('profiles').select('flair').eq('id',window._navUser.id).maybeSingle(); curRaw=(data&&data.flair)||null; }catch(_){}
+      const l = window.hkFlair ? window.hkFlair(curRaw) : {frame:null};
+      l.frame = eq.frameId;
+      const packed = window.hkFlairPack ? window.hkFlairPack(l) : eq.frameId;
+      const {error} = await window.sb.from('profiles').update({flair:packed}).eq('id', window._navUser.id);
+      if(error){ equipping=false; if(msg) msg.textContent='couldn’t save — try again'; if(btn){ btn.disabled=false; btn.textContent='equip now'; } return; }
+      try{ if(window._navProfile) window._navProfile.flair=packed; }catch(_){}
+      try{ if(window.navRefreshAuth) window.navRefreshAuth(); }catch(_){}
+      if(btn){ btn.textContent='equipped ✓'; btn.classList.add('done'); }
+      if(msg) msg.textContent='it rides wherever your card shows';
+      setTimeout(close, 1500);
+    }catch(_){ equipping=false; if(msg) msg.textContent='something went wrong'; if(btn){ btn.disabled=false; btn.textContent='equip now'; } }
+  };
+  if(eq){ const eb=w.querySelector('.hk-cel-equip');
+    if(eb) eb.addEventListener('click', ev=>{ ev.stopPropagation(); doEquip(eb); });
+    const em=w.querySelector('.hk-cel-eqmsg'); if(em) em.addEventListener('click', ev=>ev.stopPropagation()); }
   const key=(e)=>{
     if(e.key==='Enter'||e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); document.removeEventListener('keydown',key,true); return; }
+    /* r393: 'e' equips the just-unlocked skin (skin-unlock cards only) */
+    if(eq && (e.key==='e'||e.key==='E') && !e.ctrlKey && !e.metaKey && !e.altKey){ e.preventDefault(); e.stopPropagation(); doEquip(w.querySelector('.hk-cel-equip')); return; }
     /* r338: plain 'v' ONLY — a chorded v (Ctrl+V paste, Ctrl+Shift+V) mid-celebration used to
        hijack the paste into "view profile"; the orphaned profile modal then silently ate the
        next Escape (nav's overlay-close swallows it), wedging exit-edit until a second Esc. */
     if((e.key==='v'||e.key==='V') && !e.ctrlKey && !e.metaKey && !e.altKey && window.openProfile){ e.preventDefault(); e.stopPropagation(); close(); document.removeEventListener('keydown',key,true); try{ window.openProfile(); }catch(_){ } return; }
   };
   document.addEventListener('keydown', key, true);
-  setTimeout(close, 4200);
+  /* skin-unlock cards give the user longer to decide to equip; others keep the quick 4.2s */
+  setTimeout(close, eq?9000:4200);
 };
