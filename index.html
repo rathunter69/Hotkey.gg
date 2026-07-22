@@ -8366,17 +8366,19 @@ function render(){
     for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72);
   }
   S._ew=__ew;                                              // display widths (elastic)
-  /* r399 PROTOTYPE (Wolf): fixed Excel-like canvas. Instead of scaling cell height to the
-     drill's row count (short drills → big cells, tall → small), render a CONSTANT ~target-px
-     row and fill the stage with as many rows as fit — the drill's data sits on top, the rest
-     are empty grid rows, exactly like a real sheet. Consistent cell size for every drill, no
-     scaling, more room to build. Tall models (rows > what fits at target) auto-densify. */
-  const __PROTO_TARGET = 26;   // tune me: standard cell height
-  let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));
+  /* r399 (Wolf): fixed Excel-like canvas — the catalog standard. Instead of scaling cell height
+     to the drill's row count (short drills → big cells, tall → small, inconsistent), render a
+     CONSTANT target-px row and fill the stage with as many rows as fit: the drill's data sits on
+     top, the rest are empty grid rows, exactly like a real sheet. Every drill reads at the same
+     cell size on a given screen, nothing scales per-drill, and there's far more room to build.
+     Tall models (more content rows than fit at target) auto-densify so nothing scrolls and no
+     content is ever cut — canvas rows = max(content, rows-that-fit), so 1..S.ROWS always render. */
+  const __CELL_TARGET = 26;   // catalog-standard cell height (px) — one knob for the whole grid
+  let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));   // pre-measure fallback
   let __VR = S.ROWS;
   if(__gw && __gw.clientHeight>100){                       // measured: fill the box exactly
     const __availH = __gw.clientHeight - 17 - 31;          // usable height minus header
-    __VR = Math.max(S.ROWS, Math.round(__availH / __PROTO_TARGET));   // canvas rows: content + empty filler
+    __VR = Math.max(S.ROWS, Math.round(__availH / __CELL_TARGET));   // canvas rows: content + empty filler
     __rowH = Math.max(18, Math.min(40, Math.floor(__availH / __VR)));
   }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
@@ -8411,7 +8413,7 @@ function render(){
      a selection used to march the ring to the far end; native Excel keeps it at the start */
   const __dA = S.sel ? (S.selA && S.selA.r>=1 ? S.selA : {r:S.sel.r, c:S.sel.c}) : S.active;
   for(let r=1;r<=__VR;r++){
-    if(r>S.ROWS){   // r399 PROTOTYPE: empty Excel-style filler rows below the drill's content
+    if(r>S.ROWS){   // r399: empty Excel-style filler rows below the drill's content (visual only — cursor clamps at S.ROWS)
       let fr='<tr><th class="rowhdr">'+r+'</th>';
       for(let c=1;c<=COLS;c++) fr+='<td class="fillcell"></td>';
       g.innerHTML+=fr+'</tr>'; continue;
