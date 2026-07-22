@@ -685,7 +685,27 @@ function heroHtml(){
         .map(a=>window.hkMedalCard?window.hkMedalCard(a.glyph, window.hkEffRarity?window.hkEffRarity(a.tier):undefined, a.name, 30):'').join('');
       if(cells) myMedals='<div class="yc-medals">'+cells+'</div>'; }
   }catch(e){}
-  return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+heroCard+myMedals+nextHtml+'</div>';
+  /* r392 (Wolf: "still a weird gap / mismatch"): the your-card column sat ~90px short of
+     the tall daily board. Rather than shrink the daily, grow the card with useful signal —
+     the analyst's three strongest standings (best placement first, biggest field breaks
+     ties). Fills the height and reinforces the "post times, climb boards" loop. */
+  let myBoards='';
+  try{
+    const pd=DATA.perDrill||{}, mine=[];
+    CH.forEach(c=>{ const arr=pd[c.key]; if(!arr) return;
+      const i=arr.findIndex(r=>r.user_id===meId);
+      if(i>=0) mine.push({label:c.label, place:i+1, n:arr.length}); });
+    mine.sort((a,b)=> a.place-b.place || b.n-a.n);
+    const top=mine.slice(0,3);
+    if(top.length){
+      const rows=top.map(b=>{ const cls=b.place===1?' gold':b.place<=3?' pod':'';
+        return '<div class="yc-brow'+cls+'"><span class="yc-bpl">#'+b.place+'</span>'+
+          '<span class="yc-bnm">'+esc(b.label)+'</span>'+
+          '<span class="yc-bfd">of '+b.n+'</span></div>'; }).join('');
+      myBoards='<div class="yc-boards"><div class="yc-btitle">your best boards</div>'+rows+'</div>';
+    }
+  }catch(e){}
+  return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+heroCard+myMedals+myBoards+nextHtml+'</div>';
 }
 
 function rankedInfographic(){

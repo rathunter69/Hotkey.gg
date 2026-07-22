@@ -273,6 +273,17 @@
   .hero .panel > :last-child{margin-top:auto}
   /* r392 (Wolf): your-card medal showcase fills the column beside the tall daily board */
   .yc-medals{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; justify-content:center}
+  /* r392 (Wolf: "still a weird gap / mismatch"): your best three standings, filling the
+     column with signal instead of stretch-air. Rows echo the board list styling. */
+  .yc-boards{margin-top:16px; border-top:1px dashed var(--line); padding-top:12px}
+  .yc-btitle{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); margin-bottom:8px}
+  .yc-brow{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.5px; padding:5px 2px; border-bottom:1px solid var(--line)}
+  .yc-brow:last-child{border-bottom:0}
+  .yc-bpl{color:var(--faint); min-width:34px; font-variant-numeric:tabular-nums}
+  .yc-brow.pod .yc-bpl{color:var(--accent)}
+  .yc-brow.gold .yc-bpl{color:var(--gold,#e0b45a)}
+  .yc-bnm{flex:1; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .yc-bfd{color:var(--faint); font-size:10.5px}
   /* r392 (Wolf): compact-always leaderboard. The your-card sidebar sits snug to its
      content (no stretch gap to match the tall Top Players board). Daily + weekly are two
      EQUAL fixed cards — the daily box no longer spans full width as a near-empty banner. */
@@ -304,7 +315,9 @@
   @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 9px currentColor)}}
   .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
   .yc-top .pc-tier{font-size:10px; padding:6px 13px}
-  .chip.mine::after{content:'\2713'; color:var(--accent); margin-left:6px}
+  /* r393 (Wolf: "two checkmarks on the left?"): the drill list row carries an explicit
+     <b class="bl-me">✓</b> already; this generic .chip.mine::after was doubling it up
+     (bl-row also carries .chip). The explicit tick owns the tooltip — drop the pseudo. */
   .empty b{color:var(--accent); font-weight:700}
   /* your-standing strip — the scoreboard of scoreboards */
   .standing{grid-column:1/-1; background:var(--surface); border:1px solid var(--accent-dim);
