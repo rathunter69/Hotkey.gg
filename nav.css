@@ -286,6 +286,17 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   animation:hkDing .7s cubic-bezier(.2,1.6,.4,1) .15s both}
 .hk-cel-sub{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:8px}
 .hk-cel-hint{font-family:var(--mono); font-size:9.5px; color:var(--faint); margin-top:14px}
+/* r393 (Wolf #75): skin-unlock celebration — the equip-now action + a framed preview swatch */
+.hk-cel-eqrow{display:flex; flex-direction:column; align-items:center; gap:7px; margin-top:16px}
+.hk-cel-equip{font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:.02em;
+  color:var(--on-accent,#0c0d0e); background:var(--accent); border:none; border-radius:999px;
+  padding:10px 26px; cursor:pointer; transition:filter .12s}
+.hk-cel-equip:hover{filter:brightness(1.08)}
+.hk-cel-equip:disabled{cursor:default; opacity:.85}
+.hk-cel-equip.done{background:transparent; color:var(--accent); border:1px solid var(--accent-dim)}
+.hk-cel-eqmsg{font-family:var(--mono); font-size:10.5px; color:var(--accent); min-height:13px}
+.hk-cel-skin{display:inline-flex; align-items:center; justify-content:center; width:78px; height:78px;
+  border-radius:12px; position:relative; background:var(--surface2); overflow:hidden}
 @keyframes hkPop{0%{transform:scale(.82); opacity:0} 100%{transform:scale(1); opacity:1}}
 @keyframes hkDing{0%{transform:scale(.4)} 55%{transform:scale(1.22)} 100%{transform:scale(1)}}
 .hk-confetti{position:absolute; inset:0; overflow:hidden; pointer-events:none}

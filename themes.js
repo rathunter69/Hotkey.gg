@@ -889,6 +889,12 @@ window.HK_FRAMES = [
 window.hkBetaUnlocked = function(){ try{ return localStorage.getItem('hk_beta_unlock')==='1'; }catch(e){ return false; } };
 window.hkFrameUnlocked = function(id, u){
   if(window.hkBetaUnlocked && window.hkBetaUnlocked()) return true;   // beta: every frame unlocked
+  return window.hkFrameEarned(id, u);
+};
+/* r393 (Wolf #75): the GENUINE earn check, with NO beta short-circuit. hkFrameUnlocked
+   (picker gating) still says "yes" to everything in beta; the skin-unlock celebration
+   sweep needs the real thing so it fires on an actual earn, not on the blanket beta grant. */
+window.hkFrameEarned = function(id, u){
   u = u || {};
   const tb = u.tierBest|0;
   switch(id){

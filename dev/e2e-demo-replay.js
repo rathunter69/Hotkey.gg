@@ -52,7 +52,16 @@ const REPS = parseInt(process.env.REPS || '3', 10);
     for (let rep = 0; rep < REPS; rep++) {
       const r = await page.evaluate((k) => {
         try {
-          // close anything modal-ish left over, then a fresh build
+          // close anything modal-ish left over, then a fresh build. r393: the between-drills
+          // achievement/skin-unlock celebration installs a CAPTURE-phase keydown listener on
+          // document — if one is still open from a prior drill's win it eats this drill's demo
+          // keys (e.g. a commit Enter), failing the solve. Real play shows the card on the result
+          // screen and the user dismisses it before the next drill; the back-to-back replay never
+          // does. Empty the queue first, then CLICK each open card so its own close() runs and
+          // detaches that listener (just removing the node would leave the listener leaked).
+          try { window.__hkCelQ = []; } catch (e) {}
+          document.querySelectorAll('.hk-cel-wrap').forEach(n => { try { n.click(); } catch (e) {} n.remove(); });
+          try { window.__hkCelOpen = false; } catch (e) {}
           document.querySelectorAll('.wb-dlg').forEach(n => n.remove());
           loadChallenge(k);
           const C = CHALLENGES[k];
