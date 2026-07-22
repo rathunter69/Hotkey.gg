@@ -873,6 +873,13 @@ window.HK_FRAMES = [
    desc:'pastel spring — floating petals',             earn:'reach Associate'},
   {id:'cottoncandy',name:'Cotton Candy', tier:'rare',
    desc:'pink-blue pastel + soft bokeh',               earn:'reach Summer Analyst'},
+  /* r391 (Wolf) chapter/cert capstone skins — earn rules pending the progression audit */
+  {id:'architect',  name:'Architect',    tier:'legendary',
+   desc:'navy blueprint + gold drafting scan',         earn:'clear the Full Builds chapter'},
+  {id:'boutique',   name:'Elite Boutique',tier:'legendary',
+   desc:'tailored gold pinstripe + shimmer',           earn:'earn the Financial Modeling certificate'},
+  {id:'emerald',    name:'Emerald',      tier:'epic',
+   desc:'deep green gem + prism shimmer',              earn:'clear the Formulas II chapter'},
 ];
 /* u = {lvl, tierBest, dailyWins, certs, charter, perfectRun}. tierBest is a
    HK_RANK.TIERS index (highest tier ever DISPLAYED — nav.js persists it into
@@ -1109,7 +1116,11 @@ window.hkFrameOrnaments = (function(){
     goldenhour:   ['☀ GOLDEN HOUR','#3a1c10','linear-gradient(120deg,#ffd9a0,#ff9e7a)','#ffb488','bokeh'],
     pearl:        ['◗ PEARL','#2a2634','linear-gradient(120deg,#f0e6ff,#cfe6ff)','#e6d9ff','pearl'],
     bloom:        ['✿ BLOOM','#1e2e1a','linear-gradient(120deg,#c8f0b0,#f6c8e0)','#dcb0e0','petals'],
-    cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','bokeh']
+    cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','bokeh'],
+    /* r391 (Wolf) chapter/cert capstone skins */
+    architect:    ['⟁ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],
+    boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','pinstripe'],
+    emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','prism']
   };
   return function(id, opts){
     const M=window.HK_METALS||{};
@@ -1234,6 +1245,8 @@ window.hkInitCardFx = function(root){
     function drive(w,h){return{hz:Math.round(h*.40)};}
     function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
+    function draft(w,h){return{gs:Math.max(22,Math.round(w/14))};}
+    function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
     const sys=[];
     canv.forEach(cv=>{
       if(cv._hkfx) return; cv._hkfx=1;
@@ -1242,7 +1255,7 @@ window.hkInitCardFx = function(root){
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
         : kind==='galaxy'?galaxy(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
-        : kind==='gold'?gold(S.w,S.h)
+        : kind==='gold'?gold(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
       sys.push({cv,kind,S,parts});
     });
@@ -1327,6 +1340,24 @@ window.hkInitCardFx = function(root){
           const a=reduce?.6:(.22+.58*(.5+.5*Math.sin(t/650*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor='rgba(245,205,110,.9)';ctx.fill();ctx.globalAlpha=1; }
         ctx.shadowBlur=0; }
+      else if(o.kind==='draft'){
+        // architect: faint gold blueprint grid + a drafting scan line sweeping down
+        const gs=o.parts.gs; ctx.strokeStyle='rgba(214,180,110,.13)'; ctx.lineWidth=1*dpr; ctx.beginPath();
+        for(let x=gs;x<w;x+=gs){ ctx.moveTo(x,0); ctx.lineTo(x,h); }
+        for(let y=gs;y<h;y+=gs){ ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke();
+        const sy=reduce?h*.42:((t/3000)%1)*(h+40*dpr)-20*dpr;
+        const bg=ctx.createLinearGradient(0,sy-26*dpr,0,sy+2*dpr);
+        bg.addColorStop(0,'rgba(245,212,120,0)'); bg.addColorStop(1,'rgba(245,212,120,.16)');
+        ctx.fillStyle=bg; ctx.fillRect(0,sy-26*dpr,w,28*dpr);
+        ctx.strokeStyle='rgba(250,224,150,.55)'; ctx.lineWidth=1.4*dpr; ctx.beginPath(); ctx.moveTo(0,sy); ctx.lineTo(w,sy); ctx.stroke(); }
+      else if(o.kind==='pinstripe'){
+        // bulge: tailored gold pinstripes + a diagonal shimmer band passing over them
+        const sp=o.parts.sp; ctx.strokeStyle='rgba(210,175,95,.16)'; ctx.lineWidth=1*dpr; ctx.beginPath();
+        for(let x=sp/2;x<w;x+=sp){ ctx.moveTo(x,0); ctx.lineTo(x,h); } ctx.stroke();
+        if(!reduce){ ctx.globalCompositeOperation='lighter'; const off=((t/3600)%1),cx=(-.3+off*1.6)*w;
+          const g=ctx.createLinearGradient(cx-.2*w,0,cx+.2*w,h);
+          g.addColorStop(0,'rgba(245,214,130,0)');g.addColorStop(.5,'rgba(245,214,130,.11)');g.addColorStop(1,'rgba(245,214,130,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } }
       else if(o.kind==='drive'){ const hz=o.parts.hz,vx=w/2; ctx.strokeStyle='rgba(255,93,177,.30)';ctx.lineWidth=1*dpr;
         ctx.beginPath(); for(let i=-7;i<=7;i++){ ctx.moveTo(vx,hz); ctx.lineTo(vx+i*(w/7),h); } ctx.stroke();
         const scroll=reduce?0:(t/650)%1;

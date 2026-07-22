@@ -793,6 +793,19 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   border:2px solid transparent; color:#ffe6f4;
   background:radial-gradient(ellipse at 30% 0%,rgba(255,194,232,.22),transparent 60%),linear-gradient(160deg,#1e1430,#140d22) padding-box, linear-gradient(120deg,#ffc2e8,#b5d8ff 70%,#c8b0ff) border-box;
   box-shadow:0 0 22px rgba(220,180,255,.18),0 20px 60px rgba(0,0,0,.56)}
+/* r391 chapter/cert capstone skins */
+.hk-frame-architect.hk-frame-architect{--text:#e8edf6; --muted:#8fa4c2; --line:#1c3050; --accent:#e0b45a; --accent-dim:#9a7a34;
+  border:2px solid transparent; color:#e8edf6;
+  background:radial-gradient(ellipse at 50% 0%,rgba(90,130,190,.2),transparent 60%),linear-gradient(160deg,#0c1728,#07101d) padding-box, linear-gradient(120deg,#e6c86e,#b8892f 55%,#6a5220) border-box;
+  box-shadow:0 0 22px rgba(200,160,80,.16),0 20px 60px rgba(0,0,0,.64)}
+.hk-frame-boutique.hk-frame-boutique{--text:#f2ecd8; --muted:#a89772; --line:#33301f; --accent:#d8b25a; --accent-dim:#8a6d2f;
+  border:2px solid transparent; color:#f2ecd8;
+  background:linear-gradient(160deg,#0d0d12,#07070a) padding-box, linear-gradient(120deg,#f0dd9a,#8a6d2f 52%,#4a3a18 80%,#e8cf88) border-box;
+  box-shadow:0 0 20px rgba(210,170,90,.15),0 20px 60px rgba(0,0,0,.68)}
+.hk-frame-emerald.hk-frame-emerald{--text:#d8f7e6; --muted:#7fc0a0; --line:#124030; --accent:#4fd89a; --accent-dim:#2f8f66;
+  border:2px solid transparent; color:#d8f7e6;
+  background:radial-gradient(ellipse at 40% 0%,rgba(80,220,150,.22),transparent 60%),linear-gradient(160deg,#08281d,#041710) padding-box, linear-gradient(120deg,#5fe0a6,#2f8f66 55%,#1a5a40) border-box;
+  box-shadow:0 0 22px rgba(70,210,150,.2),0 20px 60px rgba(0,0,0,.58)}
 
 /* keyframes — canvas carries the heavy motion; CSS handles the founder sheen only */
 @media (prefers-reduced-motion: no-preference){
