@@ -94,9 +94,9 @@
   .acc-card{width:100%; max-width:462px; background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden}
   .acc-card.pc-bare{background:transparent; border:0; overflow:visible}
   .acc-card .uc{padding:22px 24px 20px; border-radius:16px}
-  .acc-cardbtns{display:flex; gap:10px; width:100%; max-width:462px}
+  .acc-cardbtns{display:flex; gap:10px; width:100%; max-width:462px; margin-top:auto}
   .acc-cardbtns .btn{flex:1; margin:0; text-align:center}
-  .acc-since{font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:.04em; margin-top:auto}
+  .acc-since{font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:.04em; margin-top:0}
   .acc-delete{margin-top:0}
   .acc-certs{border-color:var(--accent-dim)}
   .acc-certs h4{color:var(--accent)}
@@ -108,6 +108,31 @@
   .cert-tile .bar{height:7px; background:var(--bg); border-radius:99px; overflow:hidden}
   .cert-tile .bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
   .cert-tile .meta{display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:auto}
+  /* r396 (Wolf): tight credential/field rows — label left, value + inline actions grouped
+     next to it (no dead middle), progressive-disclosure reveals for change-email / new
+     password / 2FA so the card stays compact until you act. */
+  .fieldrow{display:flex; align-items:baseline; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line)}
+  .fieldrow:last-child{border-bottom:none}
+  .fieldrow .fk{flex:0 0 92px; font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:.4px}
+  .fieldrow .fv{flex:1 1 auto; min-width:0; font-family:var(--mono); font-size:13px; display:flex; flex-wrap:wrap; align-items:center; gap:8px}
+  .lnk{font-family:var(--mono); font-size:11.5px; color:var(--accent); cursor:pointer; white-space:nowrap}
+  .lnk:hover{text-decoration:underline}
+  .badge{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.6px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted)}
+  .badge.ok{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+  .badge.warn{color:var(--warn); border-color:var(--warn)}
+  .reveal{margin-top:10px}
+  .reveal[hidden]{display:none}
+  .acc-bill{border-color:var(--warn)}
+  .acc-bill h4{color:var(--warn)}
+  /* account-setup checklist in the Profile card */
+  .setup{margin-top:16px; border-top:1px dashed var(--line); padding-top:13px}
+  .setup-h{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; display:flex; justify-content:space-between; margin-bottom:9px}
+  .setup-i{display:flex; align-items:center; gap:9px; font-family:var(--mono); font-size:12.5px; padding:4px 0}
+  .setup-i .dot{flex:0 0 16px; height:16px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:9px; border:1px solid var(--line); color:var(--faint)}
+  .setup-i.on .dot{background:var(--accent); border-color:var(--accent); color:var(--on-accent,#fff)}
+  .setup-i .sl{flex:1}
+  .setup-i.on .sl{color:var(--muted)}
+  .setup-i a{color:var(--accent); cursor:pointer}
   .rank-emblem{}
   .emblem-max{}
   /* form bits */
@@ -254,6 +279,7 @@ async function load(){
         <div id="schoolRow" style="margin-top:10px"></div>
         <label>theme</label>
         <select id="acThemeSel" aria-label="theme" style="width:auto;min-width:220px;max-width:100%;font-family:var(--mono);font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;cursor:pointer"></select>
+        <div id="acSetup" class="setup"></div>
       </div>
     </div>
 
@@ -262,49 +288,63 @@ async function load(){
     </div>
 
     <div class="acc-row">
-      <div class="card acc-grow"><h4>Email &amp; notifications</h4>
-        <div class="rowline"><span class="k">email</span><span>${esc(me.email||'-')}</span></div>
-        <div class="rowline"><span class="k">weekly recap email</span>
-          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
-            <input type="checkbox" id="acRecap" style="width:auto;accent-color:var(--accent)"> <span id="acRecapL">off</span>
-          </label></div>
-        <div class="rowline"><span class="k">streak nudge email</span>
-          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
-            <input type="checkbox" id="acStreak" style="width:auto;accent-color:var(--accent)"> <span id="acStreakL">off</span>
-          </label></div>
-        <div class="rowline"><span class="k">certificate email</span>
-          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
-            <input type="checkbox" id="acCerts" style="width:auto;accent-color:var(--accent)"> <span id="acCertsL">on</span>
-          </label></div>
-        <div class="rowline"><span class="k">weekly desk digest</span>
-          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
-            <input type="checkbox" id="acDigest" ${prof.digest_optout?'':'checked'} style="width:auto;accent-color:var(--accent)"> <span>Monday desk digest</span>
-          </label></div>
+      <div class="card acc-grow acc-bill"><h4>Billing</h4>
+        <div class="fieldrow"><span class="fk">plan</span><span class="fv"><b style="color:var(--warn);font-size:14px">PRO</b> <span class="badge warn">free during beta</span></span></div>
+        <div class="fieldrow"><span class="fk">at launch</span><span class="fv" style="color:var(--muted)">beta players lock in founder pricing</span></div>
+        <div class="fieldrow"><span class="fk">payment</span><span class="fv">none on file <span style="color:var(--faint)">&mdash; added at launch</span></span></div>
+        <div class="fieldrow"><span class="fk">next charge</span><span class="fv">&mdash;</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+          <a class="btn" href="billing.html" style="margin:0">Billing &amp; invoices &rarr;</a>
+          <button class="btn ghost" id="proSheetBtn" style="margin:0">What comes with PRO</button>
+        </div>
       </div>
 
-      <div class="card acc-grow"><h4>Security</h4>
-        <label style="margin-top:0">password</label>
-        <button class="btn" id="acPwReset" style="margin:0">Email me a reset link</button>
-        <div class="msg" id="acPwMsg"></div>
-        <label>sessions</label>
-        <button class="btn ghost" id="acSignoutAll" style="margin:0">Sign out of all devices</button>
-        <label>new password (8+ characters)</label>
-        <input id="acP1" type="password" autocomplete="new-password">
-        <label>confirm</label>
-        <input id="acP2" type="password" autocomplete="new-password">
-        <button class="btn" id="acPassSave">Update password</button><div class="msg" id="acPassMsg"></div>
+      <div class="card acc-grow" id="desk"><h4>Your desk</h4>
+        <div id="deskBody"><div class="msg">loading&hellip;</div></div>
       </div>
     </div>
 
     <div class="acc-row">
-      <div class="card acc-grow" id="desk"><h4>Your desk</h4>
-        <div id="deskBody"><div class="msg">loading&hellip;</div></div>
+      <div class="card acc-grow"><h4>Account &amp; security</h4>
+        <div class="fieldrow"><span class="fk">email</span><span class="fv"><span id="acEmailShow">${esc(me.email||'-')}</span><span id="acEmailBadge"></span><a class="lnk" id="acEmailToggle">change</a></span></div>
+        <div class="reveal" id="acEmailWrap" hidden>
+          <label style="margin-top:0">new email address</label>
+          <input id="acEmailNew" type="email" placeholder="you@school.edu" autocomplete="email">
+          <button class="btn" id="acEmailSave" style="margin-top:8px">Send confirmation link</button>
+          <div class="msg" id="acEmailMsg"></div>
+        </div>
+        <div class="fieldrow"><span class="fk">password</span><span class="fv"><a class="lnk" id="acPwReset">email me a reset link</a><a class="lnk" id="acPwToggle">set a new one</a></span></div>
+        <div class="msg" id="acPwMsg" style="margin-top:0"></div>
+        <div class="reveal" id="acPwWrap" hidden>
+          <label style="margin-top:0">new password (8+ characters)</label>
+          <input id="acP1" type="password" autocomplete="new-password">
+          <label>confirm</label>
+          <input id="acP2" type="password" autocomplete="new-password">
+          <button class="btn" id="acPassSave" style="margin-top:8px">Update password</button><div class="msg" id="acPassMsg"></div>
+        </div>
+        <div class="fieldrow"><span class="fk">two-factor</span><span class="fv"><span id="acMfaStat" class="badge">off</span><a class="lnk" id="acMfaBtn">enable</a></span></div>
+        <div class="reveal" id="acMfaWrap" hidden><div id="acMfaBody" style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7"></div></div>
+        <div class="fieldrow"><span class="fk">sessions</span><span class="fv"><a class="lnk" id="acSignoutAll">sign out of all devices</a></span></div>
       </div>
 
-      <div class="card acc-grow"><h4>Your plan</h4>
-        <div class="rowline"><span class="k">plan</span><span style="font-family:var(--mono)"><b style="color:var(--warn)">PRO</b> &middot; free during beta</span></div>
-        <div class="rowline"><span class="k">at launch</span><span style="font-family:var(--mono);font-size:11.5px;color:var(--muted)">beta players lock in founder pricing</span></div>
-        <div style="margin-top:10px"><button class="btn ghost" id="proSheetBtn" style="margin:0">See what comes with PRO</button></div>
+      <div class="card acc-grow"><h4>Notifications</h4>
+        <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:4px">Email me when&hellip;</div>
+        <div class="rowline"><span class="k">weekly recap</span>
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+            <input type="checkbox" id="acRecap" style="width:auto;accent-color:var(--accent)"> <span id="acRecapL">off</span>
+          </label></div>
+        <div class="rowline"><span class="k">streak nudge</span>
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+            <input type="checkbox" id="acStreak" style="width:auto;accent-color:var(--accent)"> <span id="acStreakL">off</span>
+          </label></div>
+        <div class="rowline"><span class="k">certificate earned</span>
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+            <input type="checkbox" id="acCerts" style="width:auto;accent-color:var(--accent)"> <span id="acCertsL">on</span>
+          </label></div>
+        <div class="rowline"><span class="k">Monday desk digest</span>
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+            <input type="checkbox" id="acDigest" ${prof.digest_optout?'':'checked'} style="width:auto;accent-color:var(--accent)"> <span id="acDigestL">on</span>
+          </label></div>
       </div>
     </div>
 
@@ -343,7 +383,9 @@ async function load(){
     say('acPwMsg', error?('Could not send: '+error.message):'Reset link sent \u2014 check your inbox.', !!error);
   }catch(e){ say('acPwMsg','Could not send the reset email.',true); } };
   const dg=document.getElementById('acDigest');
-  if(dg) dg.onchange=async()=>{ try{ await sb.from('profiles').update({digest_optout:!dg.checked}).eq('id',me.id); }catch(e){} };
+  if(dg){ const dl=document.getElementById('acDigestL'); if(dl) dl.textContent=dg.checked?'on':'off';
+    dg.onchange=async()=>{ if(dl) dl.textContent=dg.checked?'on':'off';
+      try{ await sb.from('profiles').update({digest_optout:!dg.checked}).eq('id',me.id); }catch(e){} }; }
   const ex=document.getElementById('acExport');
   if(ex) ex.onclick=()=>{ try{
     const dump={}; ['hotkey_pb','hotkey_streak','hotkey_solves','hk_ach_flags','hk_ach_seen','hk_xp_est','hk_runs_lite','hk_clears'].forEach(k=>dump[k]=localStorage.getItem(k));
@@ -588,6 +630,81 @@ async function load(){
       if(error){ say('acPassMsg',error.message||'Couldn\u2019t update.',true); return; }
       say('acPassMsg','Password updated \u2713'); }catch(e){ say('acPassMsg','Something went wrong.',true); }
   };
+  // ---- r396: email verification badge + resend ----
+  (function(){
+    const badge=document.getElementById('acEmailBadge'); if(!badge) return;
+    const verified=!!(me.email_confirmed_at||me.confirmed_at);
+    if(verified){ badge.innerHTML='<span class="badge ok">verified</span>'; return; }
+    badge.innerHTML='<span class="badge warn">unverified</span> <a class="lnk" id="acEmailResend">resend link</a>';
+    const rs=document.getElementById('acEmailResend');
+    if(rs) rs.onclick=async()=>{ rs.textContent='sending…';
+      try{ const {error}=await sb.auth.resend({type:'signup', email:me.email}); rs.textContent=error?'try again':'sent ✓'; }
+      catch(e){ rs.textContent='try again'; } };
+  })();
+  // ---- r396: change email (Supabase updateUser -> confirmation link) ----
+  { const tg=document.getElementById('acEmailToggle'), wrap=document.getElementById('acEmailWrap');
+    if(tg&&wrap) tg.onclick=()=>{ wrap.hidden=!wrap.hidden; tg.textContent=wrap.hidden?'change':'cancel';
+      if(!wrap.hidden){ const i=document.getElementById('acEmailNew'); if(i) i.focus(); } };
+    const sv=document.getElementById('acEmailSave');
+    if(sv) sv.onclick=async()=>{ const v=(document.getElementById('acEmailNew').value||'').trim();
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){ say('acEmailMsg','Enter a valid email address.',true); return; }
+      if(v.toLowerCase()===String(me.email||'').toLowerCase()){ say('acEmailMsg','That’s already your email.',true); return; }
+      sv.disabled=true; say('acEmailMsg','Sending…');
+      try{ const {error}=await sb.auth.updateUser({email:v});
+        if(error){ say('acEmailMsg',error.message||'Couldn’t send the link.',true); sv.disabled=false; return; }
+        say('acEmailMsg','Confirmation link sent to '+v+' — click it to finish. Your current email keeps working until then.'); }
+      catch(e){ say('acEmailMsg','Something went wrong.',true); sv.disabled=false; } }; }
+  // ---- r396: reveal the set-a-new-password fields ----
+  { const tg=document.getElementById('acPwToggle'), wrap=document.getElementById('acPwWrap');
+    if(tg&&wrap) tg.onclick=()=>{ wrap.hidden=!wrap.hidden; tg.textContent=wrap.hidden?'set a new one':'cancel';
+      if(!wrap.hidden){ const i=document.getElementById('acP1'); if(i) i.focus(); } }; }
+  // ---- r396: two-factor (TOTP via Supabase MFA when available; deferred cleanly otherwise) ----
+  { const btn=document.getElementById('acMfaBtn'), wrap=document.getElementById('acMfaWrap'),
+        body=document.getElementById('acMfaBody'), stat=document.getElementById('acMfaStat');
+    const mfa=sb&&sb.auth&&sb.auth.mfa;
+    async function refreshMfa(){ if(!mfa) return;
+      try{ const {data}=await mfa.listFactors();
+        const on=!!(data&&data.totp&&data.totp.length&&data.totp.some(f=>f.status==='verified'));
+        if(stat){ stat.textContent=on?'on':'off'; stat.className='badge'+(on?' ok':''); }
+        if(btn) btn.textContent=on?'manage':'enable'; }catch(e){} }
+    if(btn) btn.onclick=async()=>{ wrap.hidden=!wrap.hidden; if(wrap.hidden) return;
+      if(!mfa){ body.innerHTML='Two-factor turns on at launch — it needs a verified email on the account first.'; return; }
+      body.textContent='Starting…';
+      try{ const {data,error}=await mfa.enroll({factorType:'totp'});
+        if(error){ body.textContent=error.message||'Couldn’t start enrollment.'; return; }
+        const qr=(data&&data.totp&&data.totp.qr_code)||'', secret=(data&&data.totp&&data.totp.secret)||'', fid=data&&data.id;
+        body.innerHTML='<div style="line-height:1.7;margin-bottom:8px">Scan this in your authenticator app, then enter the 6-digit code.</div>'+
+          (qr?'<img src="'+qr+'" alt="2FA QR" style="width:150px;height:150px;background:#fff;border-radius:8px;margin-bottom:8px">':'')+
+          (secret?'<div style="font-size:11px;color:var(--faint);word-break:break-all;margin-bottom:8px">'+esc(secret)+'</div>':'')+
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="mfaCode" inputmode="numeric" maxlength="6" placeholder="000000" style="width:120px"><button class="btn" id="mfaVerify" style="margin:0">Verify</button></div><div class="msg" id="mfaMsg"></div>';
+        const vb=document.getElementById('mfaVerify');
+        if(vb) vb.onclick=async()=>{ const code=(document.getElementById('mfaCode').value||'').trim();
+          try{ const ch=await mfa.challenge({factorId:fid}); if(ch.error){ say('mfaMsg',ch.error.message,true); return; }
+            const vr=await mfa.verify({factorId:fid, challengeId:ch.data.id, code});
+            if(vr.error){ say('mfaMsg',vr.error.message||'Wrong code — try again.',true); return; }
+            say('mfaMsg','Two-factor is on ✓'); refreshMfa(); }
+          catch(e){ say('mfaMsg','Something went wrong.',true); } }; }
+      catch(e){ body.textContent='Two-factor isn’t available yet.'; } };
+    refreshMfa();
+  }
+  // ---- r396: account-setup checklist (fills the Profile card, surfaces verify status) ----
+  (function(){
+    const el=document.getElementById('acSetup'); if(!el) return;
+    const verified=!!(me.email_confirmed_at||me.confirmed_at);
+    const items=[
+      {on:!!prof.handle, t:'Handle claimed'},
+      {on:verified, t:'Email verified', act:verified?null:{id:'setupResend', lbl:'resend'}},
+      {on:!!prof.school_tag, t:'School colors set'},
+      {on:!!(prof.flair&&String(prof.flair).length), t:'Card personalized', act:(prof.flair&&String(prof.flair).length)?null:{href:'profile.html', lbl:'customize'}},
+      {on:!!prof.team_code, t:'Joined a desk', act:prof.team_code?null:{href:'desks.html', lbl:'find one'}}
+    ];
+    const done=items.filter(i=>i.on).length;
+    el.innerHTML='<div class="setup-h"><span>account setup</span><span>'+done+' / '+items.length+'</span></div>'+
+      items.map(i=>{ let a=''; if(!i.on&&i.act){ a=i.act.href?'<a href="'+i.act.href+'">'+i.act.lbl+'</a>':'<a id="'+i.act.id+'">'+i.act.lbl+'</a>'; }
+        return '<div class="setup-i'+(i.on?' on':'')+'"><span class="dot">'+(i.on?'✓':'')+'</span><span class="sl">'+i.t+'</span>'+a+'</div>'; }).join('');
+    const sr=document.getElementById('setupResend');
+    if(sr) sr.onclick=()=>{ const r=document.getElementById('acEmailResend'); if(r){ r.click(); sr.textContent='sent ✓'; } };
+  })();
   // r156: PRO touchpoints — plan card button + the flair PRO tag open the offer sheet
   { const pb=document.getElementById('proSheetBtn'); if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); }; }
   { const dv=document.getElementById('devRanked'), dro=document.getElementById('devRankedOff');

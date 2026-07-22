@@ -6,7 +6,7 @@
    Run: node dev/e2e-smoke.js   (server on 127.0.0.1:8791) */
 const { chromium } = require('playwright-core');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
-const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'leaderboard.html', 'desks.html'];
+const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'billing.html', 'leaderboard.html', 'desks.html'];
 
 (async () => {
   const exe = process.env.CHROME || chromium.executablePath();

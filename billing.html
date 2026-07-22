@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billing · hotkey.gg</title>
+<meta name="description" content="Your plan, payment method, and invoice history.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://www.hotkey.gg/billing.html">
+<link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  html{scrollbar-gutter:stable}
+  :root{
+    --bg:#292b31; --surface:#383b42; --surface2:#43474f; --line:#5a5e68;
+    --text:#f0f1ec; --muted:#a8adb3; --faint:#767d87;
+    --accent:#6ec9a0; --accent-dim:#4a8f72; --accent-glow:rgba(110,201,160,.2);
+    --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Hanken Grotesk',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0; padding:0; box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px; position:relative; z-index:1}
+  a{color:inherit; text-decoration:none}
+  header.head{padding:12px 0 10px}
+  h1{font-size:22px; font-weight:700; letter-spacing:-.4px}
+  .crumb{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:4px}
+  .crumb a{color:var(--accent)}
+  main{padding-bottom:90px}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px 24px; margin-bottom:16px}
+  .card h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:14px}
+  .plan{border-color:var(--warn); background:linear-gradient(180deg, rgba(217,164,65,.10), var(--surface) 46%)}
+  .plan h4{color:var(--warn)}
+  .fieldrow{display:flex; align-items:baseline; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-family:var(--mono); font-size:13px}
+  .fieldrow:last-child{border-bottom:none}
+  .fieldrow .fk{flex:0 0 118px; font-size:11px; color:var(--muted); letter-spacing:.4px}
+  .fieldrow .fv{flex:1 1 auto; min-width:0; display:flex; flex-wrap:wrap; align-items:center; gap:8px}
+  .badge{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.6px; padding:2px 8px; border-radius:999px; border:1px solid var(--warn); color:var(--warn)}
+  .note{font-family:var(--mono); font-size:11.5px; color:var(--muted); line-height:1.7; margin-top:12px}
+  .btn{display:inline-flex; align-items:center; justify-content:center; line-height:1; text-decoration:none;
+    font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--on-accent,#0c0d0e);
+    background:var(--accent); border:none; border-radius:9px; padding:11px 20px; margin-top:12px; cursor:pointer}
+  .btn.ghost{background:transparent; color:var(--muted); border:1px solid var(--line)}
+  .btn[disabled]{opacity:.5; cursor:not-allowed}
+  table.inv{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12.5px}
+  table.inv th{text-align:left; font-weight:500; color:var(--muted); font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; padding:0 10px 9px 0; border-bottom:1px solid var(--line)}
+  table.inv td{padding:11px 10px 11px 0; border-bottom:1px dashed var(--line); color:var(--text)}
+  table.inv tr:last-child td{border-bottom:none}
+  .empty{font-family:var(--mono); font-size:12.5px; color:var(--muted); padding:26px 8px; text-align:center; line-height:1.8}
+  .state{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:38px 28px; text-align:center;
+    font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8; margin-top:6px}
+  .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
+</style>
+<link rel="stylesheet" href="nav.css?v=192">
+<script>
+const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+window.NAV_ACTIVE = '';
+</script>
+<script src="themes.js?v=284"></script>
+</head>
+<body>
+<div id="navMount"></div>
+<script src="nav.js?v=291"></script>
+
+<header class="head"><div class="wrap">
+  <div class="crumb"><a href="account.html">&larr; account</a></div>
+  <h1>Billing</h1>
+</div></header>
+
+<main><div class="wrap" id="root">
+  <div class="state">loading&hellip;</div>
+</div></main>
+
+<div id="siteFooter"></div>
+
+<script>
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+(async function(){
+  const root=document.getElementById('root');
+  let me=null;
+  try{ const { data:{ session } } = await sb.auth.getSession(); me = session ? session.user : null; }catch(e){}
+  const isAnon = me && (!me.email || (me.app_metadata&&me.app_metadata.provider==='anonymous'));
+  if(!me || isAnon){
+    root.innerHTML='<div class="state">Billing lives on your account.<br><br>'+
+      '<a href="index.html?openAuth=signup">Create an account</a> or <a href="index.html?openAuth=signin">log in</a> to see your plan and invoices.</div>';
+    return;
+  }
+  root.innerHTML =
+    '<div class="card plan"><h4>Current plan</h4>'+
+      '<div class="fieldrow"><span class="fk">plan</span><span class="fv"><b style="color:var(--warn);font-size:15px">PRO</b> <span class="badge">free during beta</span></span></div>'+
+      '<div class="fieldrow"><span class="fk">status</span><span class="fv">active &mdash; you won’t be charged during the beta</span></div>'+
+      '<div class="fieldrow"><span class="fk">at launch</span><span class="fv">beta players lock in <b>founder pricing</b> for life</span></div>'+
+      '<div class="fieldrow"><span class="fk">renews</span><span class="fv">&mdash;</span></div>'+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn ghost" id="proBtn" style="margin-top:14px">What comes with PRO</button></div>'+
+      '<div class="note">Founder pricing and payment collection go live when the beta ends. We’ll email you before anything is ever charged.</div>'+
+    '</div>'+
+
+    '<div class="card"><h4>Payment method</h4>'+
+      '<div class="fieldrow"><span class="fk">card on file</span><span class="fv">none <span style="color:var(--faint)">&mdash; not needed during beta</span></span></div>'+
+      '<button class="btn ghost" disabled title="Available at launch">Add payment method</button>'+
+      '<div class="note">Cards are added at launch through our payment processor. hotkey.gg never stores your full card number.</div>'+
+    '</div>'+
+
+    '<div class="card"><h4>Invoices &amp; payment history</h4>'+
+      '<div id="invBody"><div class="empty">No payments yet.<br>You’re on the free beta &mdash; invoices show up here once billing goes live.</div></div>'+
+    '</div>'+
+
+    '<div class="card"><h4>Billing contact</h4>'+
+      '<div class="fieldrow"><span class="fk">receipts to</span><span class="fv">'+esc(me.email||'—')+' <a href="account.html" style="color:var(--accent);font-size:11.5px">change on account</a></span></div>'+
+      '<div class="note">Questions about billing? Email <a href="mailto:hello@hotkey.gg" style="color:var(--accent)">hello@hotkey.gg</a>.</div>'+
+    '</div>';
+
+  const pb=document.getElementById('proBtn');
+  if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); };
+
+  // r396: when billing goes live, an `invoices` table (or the processor's API) fills #invBody.
+  // Rendered as a table so the empty state and the live state share one layout:
+  //   <table class="inv"><thead><tr><th>date<th>description<th>amount<th></tr>...</table>
+  try{
+    const { data } = await sb.from('invoices').select('id,created_at,description,amount_cents,currency,hosted_url,status')
+      .eq('user_id', me.id).order('created_at',{ascending:false}).limit(50);
+    if(data && data.length){
+      const money=(c,cur)=>((c||0)/100).toLocaleString('en-US',{style:'currency',currency:(cur||'USD').toUpperCase()});
+      document.getElementById('invBody').innerHTML =
+        '<table class="inv"><thead><tr><th>date</th><th>description</th><th>amount</th><th></th></tr></thead><tbody>'+
+        data.map(r=>'<tr><td>'+new Date(r.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})+'</td>'+
+          '<td>'+esc(r.description||'PRO subscription')+'</td>'+
+          '<td>'+money(r.amount_cents,r.currency)+(r.status&&r.status!=='paid'?' <span style="color:var(--warn)">('+esc(r.status)+')</span>':'')+'</td>'+
+          '<td>'+(r.hosted_url?'<a href="'+esc(r.hosted_url)+'" target="_blank" rel="noopener" style="color:var(--accent)">receipt &rarr;</a>':'')+'</td></tr>').join('')+
+        '</tbody></table>';
+    }
+  }catch(e){ /* no invoices table yet (beta) — the empty state stands */ }
+})();
+</script>
+</body>
+</html>
