@@ -1231,10 +1231,32 @@ window.hkPlayerCard = function(d, opts){
     '<div class="uc-head">'+crestHtml+
       '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+tierHtml+'</div>'+
       lvlHtml+
-    '</div>';
+    '</div>'+
+    // r387 (Wolf): school + desk ride HIGH on the card (right under the identity),
+    // prominent — not buried in the footer.
+    (d.tagsHtml ? '<div class="uc-tags">'+d.tagsHtml+'</div>' : '');
   if(full){
     h += '<hr class="uc-div"><div class="uc-stats">'+stats+'</div>';
-    if(d.achHtml) h += '<div class="uc-ach">'+d.achHtml+'</div>';
+    // r387 (Wolf): the showcase is a fixed row of slots (default 5) — filled medals +
+    // dashed placeholders so the card never reads sparse, on every surface. Pass
+    // d.medals=[{glyph,rarity,name}]; d.medalSlots overrides the count. Legacy callers
+    // that still pass a pre-rendered d.achHtml keep working.
+    if(Array.isArray(d.medals)){
+      const slots = d.medalSlots || 5;
+      let mh = '';
+      for(let i=0;i<slots;i++){ const m=d.medals[i];
+        mh += (m && window.hkMedalCard) ? window.hkMedalCard(m.glyph, m.rarity, m.name, m.size||30)
+          : '<span class="hk-medc empty" aria-hidden="true"></span>'; }
+      h += '<div class="uc-ach">'+mh+'</div>';
+    } else if(d.achHtml){ h += '<div class="uc-ach">'+d.achHtml+'</div>'; }
+    // r387 (Wolf): campaign + certificate completion on the card (owner cards carry
+    // the data; public cards simply omit it). d.progress=[{label,val,pct}].
+    if(Array.isArray(d.progress) && d.progress.length){
+      h += '<div class="uc-prog">'+d.progress.map(p=>
+        '<div class="uc-pr"><span class="uc-prl">'+esc(p.label)+'</span>'+
+        '<span class="uc-prbar"><i style="width:'+Math.max(0,Math.min(100,p.pct||0))+'%"></i></span>'+
+        '<b class="uc-prv">'+esc(p.val)+'</b></div>').join('')+'</div>';
+    }
     if(d.boards && d.boards.length) h += '<hr class="uc-div"><div class="uc-boards">'+
       d.boards.map(b=>'<div class="uc-brow"><span>'+esc(b.name)+'</span><b>'+esc(b.time)+'</b></div>').join('')+'</div>';
   } else {
@@ -1439,8 +1461,8 @@ window.hkMedalCard = function(glyph, rarityPct, name, size, bare){
   // tiles. bare (light picker/slots) inherits currentColor; the dark tray uses light
   // steel for skin contrast. Falls back to hkBadge only for legacy non-family glyphs.
   const badge = (window.hkGlyph && window.HK_GLYPHS2 && window.HK_GLYPHS2[glyph])
-    ? window.hkGlyph(glyph, size+4, bare?'currentColor':'#d2d5db')
-    : (window.hkBadge ? window.hkBadge(glyph, true, size, bare?'currentColor':'#cfd2d8', rarityPct) : '');
+    ? window.hkGlyph(glyph, size+4, 'currentColor')
+    : (window.hkBadge ? window.hkBadge(glyph, true, size, 'currentColor', rarityPct) : '');
   const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   // r387 (Wolf): rarity = a row of tier-colored DIAMOND pips just under the glyph
   // (rare 2 · epic 3 · legendary 4), and a distinct CROWN pip for the top rank

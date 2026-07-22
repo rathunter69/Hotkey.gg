@@ -152,7 +152,7 @@ window.NAV_ACTIVE = 'profile';
   .cz-pill.on .cz-knob::after{transform:translateX(13px); background:#fff}
 
   /* 4 — featured medals grid */
-  .cz-medgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); gap:12px 6px}
+  .cz-medgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:12px 6px}
   .cz-med{position:relative; background:none; border:none; padding:8px 4px; border-radius:10px; cursor:default;
     display:flex; flex-direction:column; align-items:center; gap:5px; color:inherit}
   .cz-med.earned{cursor:pointer}
@@ -168,16 +168,18 @@ window.NAV_ACTIVE = 'profile';
   .cz-medmore:hover{color:var(--accent)}
   .cz-medempty{grid-column:1/-1; font-family:var(--mono); font-size:12px; color:var(--muted); padding:4px 0}
   /* 4b — the showcase slots (game loadout) + the click-to-open picker */
-  .cz-slots{display:flex; gap:12px; flex-wrap:wrap}
-  .cz-slot{position:relative; flex:0 0 auto; width:132px; min-height:74px; display:flex; align-items:center; gap:10px;
-    padding:10px 12px; border-radius:12px; cursor:pointer; color:inherit; background:var(--surface2);
+  .cz-slots{display:flex; gap:10px; flex-wrap:wrap}
+  /* r387 (Wolf): slots are vertical tiles the same size as the card + picker medals */
+  .cz-slot{position:relative; flex:0 0 auto; width:88px; min-height:86px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:5px;
+    padding:8px 6px; border-radius:12px; cursor:pointer; color:inherit; background:var(--surface2);
     border:1px solid var(--line); transition:border-color .12s, background .12s}
   .cz-slot:hover{border-color:var(--faint)}
   .cz-slot.empty{border-style:dashed; background:transparent; justify-content:center; color:var(--faint)}
   .cz-slot.empty:hover{color:var(--accent); border-color:var(--accent-dim)}
   .cz-slot.filled{border-color:var(--accent-dim); background:var(--accent-glow)}
   .cz-slotplus{font-size:20px; line-height:1; font-weight:400}
-  .cz-slotn{font-family:var(--mono); font-size:10px; line-height:1.25; color:var(--muted)}
+  .cz-slotn{font-family:var(--mono); font-size:9px; line-height:1.2; color:var(--muted); text-align:center; max-width:100%; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
   .cz-slot.filled .cz-slotn{color:var(--text)}
   .cz-slotx{position:absolute; top:5px; right:8px; font-size:11px; color:var(--faint); opacity:0; transition:opacity .12s}
   .cz-slot.filled:hover .cz-slotx{opacity:1}
@@ -354,7 +356,7 @@ async function load(){
   // ---- THE LOADOUT (themes.js persistence contract) ----
   const loadout = window.hkFlair ? window.hkFlair(prof.flair) : {frame:null,show:{rank:true,level:true,streak:true,desk:false},stats:[],title:null};
   if(!loadout.show) loadout.show={rank:true,level:true,streak:true,desk:false};
-  if(!Array.isArray(loadout.stats) || !loadout.stats.length) loadout.stats=['solves','crowns','streak'];
+  if(!Array.isArray(loadout.stats) || !loadout.stats.length) loadout.stats=['solves','crowns','streak','boards'];
 
   // stat value + label maps (keyed by HK_STAT_KEYS)
   const statVal={
@@ -381,17 +383,25 @@ async function load(){
   // ---- THE LIVE CARD (re-renderable) ----
   function renderCard(){
     const holder=document.getElementById('liveCard'); if(!holder) return;
-    const statsArr=(loadout.stats&&loadout.stats.length?loadout.stats:['solves','crowns','streak']).slice(0,3);
-    const achHtml=(feat||[]).filter(id=>earned.has(id)).map(id=>{ const a=ACById[id]; if(!a) return '';
-      const m=achMeta[id]||{}; try{ return window.hkMedalCard ? window.hkMedalCard(a.glyph, m.rarity, a.name, 34)
-        : window.hkBadge(a.glyph, true, 34, null, m.rarity); }catch(e){ return ''; } }).join('');
+    const statsArr=(loadout.stats&&loadout.stats.length?loadout.stats:['solves','crowns','streak','boards']).slice(0,4);
+    // r387: featured medals as an array (up to 5) — hkPlayerCard pads with placeholders
+    const medals=(feat||[]).filter(id=>earned.has(id)).slice(0,5).map(id=>{ const a=ACById[id]; const m=achMeta[id]||{};
+      return a ? { glyph:a.glyph, rarity:m.rarity, name:a.name, size:30 } : null; }).filter(Boolean);
+    // r387 (Wolf): school + desk chips ride HIGH on the card (uc-tags), prominent —
+    // only when the user shows them. (Campaign/cert progress bars were cut.)
+    let tagBits='';
+    if(prof.show_school && prof.school_tag){
+      const nm=(window.schoolResolve&&window.schoolResolve(prof.school_tag)||{}).name||prof.school_tag;
+      const chip=window.schoolChip?window.schoolChip(prof.school_tag,16):'';
+      tagBits+='<span class="uc-tag">'+chip+esc(nm)+'</span>'; }
+    if(loadout.show.desk && prof.team_code) tagBits+='<span class="uc-tag">◆ '+esc(prof.team_code)+'</span>';
     const d={ name:prof.handle||'set a handle', flair:loadout.frame, show:loadout.show,
       tierEmblem:window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):'',
       tierChipEmblem:window.rankEmblem?window.rankEmblem(tier.name,16):'',
       tierLabel:tier.name+(tier.bucket?(' · '+tier.bucket):'')+(st.rank?(' · #'+st.rank):''),
       lvl:L.lvl, pct:L.pct, xpLine:L.into+' / '+L.need+' xp',
       stats:statsArr.map(k=>({ n:(statVal[k]!=null?statVal[k]:'—'), label:(statLabel[k]||k) })),
-      achHtml:achHtml, boards:[] };
+      medals:medals, medalSlots:5, tagsHtml:tagBits, boards:[] };
     try{ holder.innerHTML = window.hkPlayerCard ? window.hkPlayerCard(d,{scale:'full'}) : ''; }catch(e){ holder.innerHTML=''; }
     try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(holder)); }catch(e){}
   }
@@ -454,7 +464,7 @@ async function load(){
     }).join('');
   }
 
-  /* r387 (Wolf): the showcase is a GAME LOADOUT — three slots on the card, click a
+  /* r387 (Wolf): the showcase is a GAME LOADOUT — five slots on the card, click a
      slot to open a medal picker (rarity-filtered) below. Only EARNED medals are
      pickable; the full locked/progress wall stays on the stats page. This replaced a
      flat 58-medal grid that duplicated stats and buried the card. */
@@ -469,8 +479,8 @@ async function load(){
 
   function medalSlotsHtml(){
     let h='';
-    for(let i=0;i<3;i++){ const id=feat[i]; const a=id?ACById[id]:null;
-      if(a){ const m=achMeta[id]||{}; let badge=''; try{ badge=window.hkMedalCard ? window.hkMedalCard(a.glyph, m.rarity, null, 38, true)
+    for(let i=0;i<5;i++){ const id=feat[i]; const a=id?ACById[id]:null;
+      if(a){ const m=achMeta[id]||{}; let badge=''; try{ badge=window.hkMedalCard ? window.hkMedalCard(a.glyph, m.rarity, null, 30, true)
           : window.hkBadge(a.glyph,true,40,null,m.rarity); }catch(e){}
         h+='<div class="cz-slot filled" data-idx="'+i+'" data-ach="'+esc(id)+'" title="'+esc(a.name)+' — click to change · ✕ to clear">'+
              badge+'<b class="cz-slotn">'+esc(a.name)+'</b><span class="cz-slotx" title="remove">✕</span></div>';
@@ -488,7 +498,7 @@ async function load(){
       '<button type="button" class="cz-fchip'+(r===filter?' on':'')+'" data-filter="'+r+'">'+(r==='all'?'All':r)+'</button>').join('');
     const list=earnedMedals.filter(e=> filter==='all' || e.rarity===filter || (filter==='legendary'&&e.rarity==='mythic'));
     const cells=list.map(e=>{ const id=e.a.id, on=feat.includes(id);
-      let badge=''; try{ badge=window.hkMedalCard ? window.hkMedalCard(e.a.glyph, e.m.rarity, null, 32, true)
+      let badge=''; try{ badge=window.hkMedalCard ? window.hkMedalCard(e.a.glyph, e.m.rarity, null, 30, true)
         : window.hkBadge(e.a.glyph,true,34,null,e.m.rarity); }catch(x){}
       const tip=e.a.name+' — '+e.a.desc+' · '+e.rarity.toUpperCase()+(on?' · featured (click to remove)':' · click to feature');
       return '<button type="button" class="cz-med earned'+(on?' feat':'')+'" data-ach="'+esc(id)+'" title="'+esc(tip)+'">'+
@@ -509,7 +519,7 @@ async function load(){
   // ---- assemble root ----
   const medalsSection = medalsOK ? (
     '<div class="cz-sec" id="czMedals">'+
-      '<div class="cz-sechd"><span class="cz-lab">Featured medals · showcase</span><span class="cz-count" id="czFeatCount">'+feat.length+' / 3</span></div>'+
+      '<div class="cz-sechd"><span class="cz-lab">Featured medals · showcase</span><span class="cz-count" id="czFeatCount">'+feat.length+' / 5</span></div>'+
       '<div class="cz-slots" id="czSlots">'+medalSlotsHtml()+'</div>'+
       '<div class="cz-picker" id="czPicker" hidden>'+medalPickerHtml('all')+'</div>'+
     '</div>') : '';
@@ -540,7 +550,7 @@ async function load(){
       medalsSection+
 
       '<div class="cz-sec">'+
-        '<div class="cz-sechd"><span class="cz-lab">Highlight stats · pick up to 3</span><span class="cz-count" id="czStatCount">'+loadout.stats.length+' / 3</span></div>'+
+        '<div class="cz-sechd"><span class="cz-lab">Highlight stats · pick up to 4</span><span class="cz-count" id="czStatCount">'+loadout.stats.length+' / 4</span></div>'+
         '<div class="cz-chips" id="czStats">'+statChipsHtml()+'</div>'+
       '</div>'+
 
@@ -596,7 +606,7 @@ async function load(){
     };
   });
 
-  // FEATURED MEDALS — 3 showcase slots + a click-to-open, rarity-filtered picker
+  // FEATURED MEDALS — 5 showcase slots + a click-to-open, rarity-filtered picker
   if(medalsOK){
     const slotsEl=document.getElementById('czSlots');
     const picker=document.getElementById('czPicker');
@@ -605,14 +615,14 @@ async function load(){
     function refreshMedals(){
       if(slotsEl) slotsEl.innerHTML=medalSlotsHtml();
       if(picker) picker.innerHTML=medalPickerHtml(pickerFilter);
-      if(cnt) cnt.textContent=feat.length+' / 3';
+      if(cnt) cnt.textContent=feat.length+' / 5';
       wireSlots(); wirePicker();
       renderCard();
     }
     function toggleFeat(id){
       if(!id) return;
       if(feat.includes(id)) feat=feat.filter(x=>x!==id);
-      else { if(feat.length>=3) feat.shift(); feat.push(id); }
+      else { if(feat.length>=5) feat.shift(); feat.push(id); }
       saveFeat(); refreshMedals(); flash();
     }
     function openPicker(){ if(picker){ picker.hidden=false; try{ picker.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(e){} } }
@@ -641,9 +651,9 @@ async function load(){
     b.onclick=()=>{
       const k=b.dataset.stat;
       if(loadout.stats.includes(k)) loadout.stats=loadout.stats.filter(x=>x!==k);
-      else { if(loadout.stats.length>=3) loadout.stats.shift(); loadout.stats.push(k); }
+      else { if(loadout.stats.length>=4) loadout.stats.shift(); loadout.stats.push(k); }
       statsEl.querySelectorAll('.cz-statchip').forEach(x=>x.classList.toggle('on', loadout.stats.includes(x.dataset.stat)));
-      if(statCnt) statCnt.textContent=loadout.stats.length+' / 3';
+      if(statCnt) statCnt.textContent=loadout.stats.length+' / 4';
       renderCard(); saveFlair(); flash();
     };
   });
