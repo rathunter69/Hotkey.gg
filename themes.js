@@ -1137,7 +1137,7 @@ window.hkFrameOrnaments = (function(){
     bloom:        ['✿ BLOOM','#1e2e1a','linear-gradient(120deg,#c8f0b0,#f6c8e0)','#dcb0e0','petals'],
     cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','bokeh'],
     /* r391 (Wolf) chapter/cert capstone skins */
-    architect:    ['⟁ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],
+    architect:    ['△ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],  /* r393 (Wolf): ⟁ fell back to a ⚠-looking glyph in most fonts — a clean drafting triangle reads right */
     boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','pinstripe'],
     emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','prism']
   };
