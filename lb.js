@@ -525,7 +525,7 @@ function showPublicCard(uid){
     name:names[uid]+(uid===meId?' (you)':''),
     tierEmblem:window.rankEmblem?window.rankEmblem(t.name,60,t.bucket):'',
     tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
-    tierLabel:(t.full||t.name)+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':''),
+    tierLabel:t.full||(t.name+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':'')),   /* r390 (Wolf): t.full already carries bucket+provisional — don't append again (double-bucket) */
     lvl:lvl, pct:pct, xpLine:xpLine,
     stats:[{n:(st&&st.crowns)||0,label:'crowns'},{n:(st&&st.pod)||0,label:'podiums'},
       {n:(st&&st.t10)||0,label:'top-10s'},{n:(st&&st.att)||0,label:'boards'}],
@@ -662,7 +662,7 @@ function heroHtml(){
     name:(DATA.names||{})[meId],
     tierEmblem:window.rankEmblem?window.rankEmblem(t.name,40,t.bucket):'',
     tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
-    tierLabel:(t.full||t.name)+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':''),
+    tierLabel:t.full||(t.name+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':'')),   /* r390 (Wolf): t.full already carries bucket+provisional — don't append again (double-bucket) */
     lvl:L.lvl, pct:L.pct, xpLine:L.into+' / '+L.need+' xp',
     stats:[{n:me.crowns,label:me.crowns===1?'crown':'crowns'},{n:me.pod,label:'podiums'},
       {n:me.att+'/'+CH.length,label:'drills'},{n:mySolves,label:'clean solves'}],

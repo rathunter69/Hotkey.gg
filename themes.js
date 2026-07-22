@@ -1544,7 +1544,9 @@ window.hkMedalCard = function(glyph, rarityPct, name, size, bare){
   // r387 (Wolf): rarity = a row of tier-colored DIAMOND pips just under the glyph
   // (rare 2 · epic 3 · legendary 4), and a distinct CROWN pip for the top rank
   // (mythic). Common shows none. w: 0 myth · 1 leg · 2 epic · 3 rare · 4 common.
-  let pips = '';
+  // r390 (Wolf): ALWAYS reserve the pip-row height (empty for common) so common-tier
+  // medals line up with pipped ones — no more glyphs sitting lower on the card.
+  let pips = '<span class="hk-medc-pips" aria-hidden="true"></span>';
   if(rare){
     const w = meta.weight;
     if(w===0){ // mythic — the pinnacle gets its own mark
