@@ -1071,18 +1071,18 @@ window.hkFrameOrnaments = (function(){
   /* r385 skins: [title, tab-fg, tab-bg, tab-border, fx-kind|'' , extraFlags]
      fx-kind drives hkInitCardFx (snow/fire/prism/stars/none). */
   const SKINS={
-    circuit:      ['NEURAL',      '#04222a', 'linear-gradient(90deg,#1c6a68,#2aa89c)', '#2aa89c', ''],
+    circuit:      ['NEURAL',      '#04222a', 'linear-gradient(90deg,#1c6a68,#2aa89c)', '#2aa89c', 'circuit'],
     neon:         ['OVERCLOCK',   '#0b0410', 'linear-gradient(120deg,#ff2d95,#2edcff)', '#ff2d95', ''],
     blueprint:    ['SHEET 01',    '#0c1a26', 'linear-gradient(90deg,#2f5b86,#4f7aa8)', '#4f7aa8', ''],
-    crt:          ['C:\\ READY',  '#04140a', 'linear-gradient(90deg,#1c6a38,#2fae5c)', '#2fae5c', ''],
+    crt:          ['C:\\ READY',  '#04140a', 'linear-gradient(90deg,#1c6a38,#2fae5c)', '#2fae5c', 'matrix'],
     constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','stars'],
     vaporwave:    ['SYNTHWAVE',   '#1a0722', 'linear-gradient(120deg,#ff5db1,#2ee6e6)', '#ff5db1', 'sun'],
     terminal:     ['● LIVE', '#1a1204', 'linear-gradient(90deg,#3a2a08,#7a5a12)', '#e0a02f', ''],
-    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'stars'],
+    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'cosmic'],
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
     molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
-    founder:      ['★ FOUNDER','#100f18','linear-gradient(120deg,#ff5db1,#8fe0ff,#c89bff)','#c89bff','prism']
+    founder:      ['★ FOUNDER','#100f18','linear-gradient(120deg,#ff5db1,#8fe0ff,#c89bff)','#c89bff','holo']
   };
   return function(id, opts){
     const M=window.HK_METALS||{};
@@ -1165,15 +1165,32 @@ window.hkInitCardFx = function(root){
       return {ctx:cv.getContext('2d'), w:cv.width, h:cv.height, dpr};
     }
     function snow(w,h){const n=Math.round(w*h/9000)+16,p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,2.3),vy:R(.2,.8),ph:R(0,6.28),amp:R(.2,.8),o:R(.35,.95)});return p;}
-    function ember(w,h){const ash=Math.random()<.34;return{x:R(0,w),y:h+R(0,16),r:ash?R(1,2.5):R(.7,2),vy:ash?R(.3,.7):R(.7,1.5),drift:R(-.25,.25),ph:R(0,6.28),ash,life:0,max:R(55,140)};}
-    function fire(w,h){const n=Math.round(w/7)+16,p=[];for(let i=0;i<n;i++)p.push(ember(w,h));return p;}
+    function ember(w,h){const ash=Math.random()<.30;return{x:R(0,w),y:h+R(0,20),r:ash?R(1,2.6):R(.8,2.3),vy:ash?R(.35,.8):R(.9,1.9),drift:R(-.3,.3),ph:R(0,6.28),ash,life:0,max:R(90,210)};}
+    // r389 (Wolf): denser field + longer life so embers ride HIGHER up the card; seed
+    // with a partial-life spread so they don't all launch from the floor at once.
+    function fire(w,h){const n=Math.round(w/4.2)+30,p=[];for(let i=0;i<n;i++){const e=ember(w,h);e.y=R(0,h);e.life=R(0,e.max*.6);p.push(e);}return p;}
+    // r389 traveling-pulse (circuit) · matrix rain (crt) · nebula+comets (cosmic) · holo-foil sweep (founder)
+    function comet(w,h){return{x:R(w*.3,w),y:R(0,h*.5),vx:R(-1.1,-2.4),vy:R(.4,1.1),len:R(26,60),life:0,max:R(45,95)};}
+    function cosmic(w,h){return{st:stars(w,h),cm:[]};}
+    function circ(w,h){const gx=Math.max(3,Math.round(w/64)),gy=Math.max(2,Math.round(h/64)),nodes=[],tr=[];
+      for(let i=0;i<gx;i++)for(let j=0;j<=gy;j++){if(Math.random()<.5)tr.push({x1:i/gx*w,y1:j/gy*h,x2:(i+1)/gx*w,y2:j/gy*h});}
+      for(let i=0;i<=gx;i++)for(let j=0;j<gy;j++){if(Math.random()<.5)tr.push({x1:i/gx*w,y1:j/gy*h,x2:i/gx*w,y2:(j+1)/gy*h});}
+      for(let i=0;i<=gx;i++)for(let j=0;j<=gy;j++){if(Math.random()<.5)nodes.push({x:i/gx*w,y:j/gy*h});}
+      const pulses=[],np=Math.max(4,Math.round(w/80));
+      for(let i=0;i<np&&tr.length;i++)pulses.push({t:tr[(Math.random()*tr.length)|0],p:R(0,1),sp:R(.006,.015)});
+      return{tr,nodes,pulses};}
+    function matrix(w,h){const fs=Math.max(9,Math.round(w/40)),nc=Math.min(40,Math.max(6,Math.floor(w/(fs*.85)))),cols=[];
+      for(let i=0;i<nc;i++)cols.push({x:i*(w/nc)+w/nc/2,y:R(-h,0),sp:R(.9,2.3),len:Math.round(R(6,15))});
+      return{fs,cols};}
     function prism(w,h){const n=Math.round(w*h/17000)+6,cols=['#ff9ed4','#a8e6ff','#c9b8ff','#8ff0c8','#ffe0a0'],p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.8),ph:R(0,6.28),sp:R(.6,1.6),c:cols[i%cols.length]});return p;}
     function stars(w,h){const n=Math.round(w*h/6500)+10,cols=['#ffffff','#cfd6ff','#ffe9b8'],p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.5,1.6),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
     const sys=[];
     canv.forEach(cv=>{
       if(cv._hkfx) return; cv._hkfx=1;
       const kind=cv.dataset.kind, S=fit(cv); if(!S) return;
-      let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?prism(S.w,S.h) : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
+      let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?prism(S.w,S.h)
+        : kind==='cosmic'?cosmic(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
+        : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
       sys.push({cv,kind,S,parts});
     });
     if(!sys.length) return;
@@ -1181,12 +1198,48 @@ window.hkInitCardFx = function(root){
       const S=o.S, ctx=S.ctx, w=S.w, h=S.h, dpr=S.dpr; ctx.clearRect(0,0,w,h);
       if(o.kind==='snow'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=Math.sin(t/900+s.ph)*s.amp*.5; if(s.y>h+3){s.y=-3;s.x=R(0,w);}}
         ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(224,244,255,'+s.o+')';ctx.shadowBlur=6*dpr;ctx.shadowColor='rgba(170,220,255,.7)';ctx.fill(); } ctx.shadowBlur=0; }
-      else if(o.kind==='fire'){ for(let i=0;i<o.parts.length;i++){ let e=o.parts[i];
+      else if(o.kind==='fire'){
+        // r389: warm updraft glow rising ~55% up the card — the fire reads HIGHER
+        const gg=ctx.createLinearGradient(0,h,0,h*.45); gg.addColorStop(0,'rgba(255,120,36,.30)'); gg.addColorStop(1,'rgba(255,120,36,0)');
+        ctx.fillStyle=gg; ctx.fillRect(0,h*.45,w,h*.55);
+        for(let i=0;i<o.parts.length;i++){ let e=o.parts[i];
         if(!reduce){e.y-=e.vy*dpr; e.x+=(e.drift+Math.sin(t/500+e.ph)*.3)*dpr; e.life++; if(e.y<-4||e.life>e.max){o.parts[i]=ember(w,h);continue;}}
         const k=e.life/e.max,a=Math.max(0,1-k); ctx.beginPath();ctx.arc(e.x,e.y,e.r*dpr,0,6.28);
         if(e.ash){ctx.fillStyle='rgba(120,108,98,'+(a*.5)+')';ctx.shadowBlur=0;}
         else{const hot=Math.max(0,1-k*1.4);ctx.fillStyle='rgba(255,'+Math.round(150+hot*90)+','+Math.round(40+hot*60)+','+a+')';ctx.shadowBlur=7*dpr;ctx.shadowColor='rgba(255,140,50,.9)';}
         ctx.fill(); } ctx.shadowBlur=0; }
+      else if(o.kind==='cosmic'){ const P=o.parts;
+        for(const s of P.st){ const a=reduce?.7:(.3+.5*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0;
+        if(!reduce){ if(P.cm.length<2 && Math.random()<.025) P.cm.push(comet(w,h));
+          for(let i=P.cm.length-1;i>=0;i--){ const c=P.cm[i]; c.x+=c.vx*dpr*1.6; c.y+=c.vy*dpr*1.6; c.life++;
+            const a=Math.max(0,1-c.life/c.max), tx=c.x-c.vx*c.len, ty=c.y-c.vy*c.len;
+            const g=ctx.createLinearGradient(c.x,c.y,tx,ty); g.addColorStop(0,'rgba(210,230,255,'+a+')'); g.addColorStop(1,'rgba(210,230,255,0)');
+            ctx.strokeStyle=g; ctx.lineWidth=1.5*dpr; ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.lineTo(tx,ty); ctx.stroke();
+            if(c.life>c.max||c.x<-50||c.y>h+50) P.cm.splice(i,1); } } }
+      else if(o.kind==='circuit'){ const P=o.parts; ctx.lineWidth=1*dpr;
+        ctx.strokeStyle='rgba(42,168,156,.15)'; ctx.beginPath();
+        for(const s of P.tr){ ctx.moveTo(s.x1,s.y1); ctx.lineTo(s.x2,s.y2); } ctx.stroke();
+        ctx.fillStyle='rgba(42,168,156,.45)'; for(const nd of P.nodes){ ctx.beginPath(); ctx.arc(nd.x,nd.y,1.3*dpr,0,6.28); ctx.fill(); }
+        for(const pu of P.pulses){ if(!reduce) pu.p+=pu.sp; if(pu.p>1){ pu.p=0; pu.t=P.tr[(Math.random()*P.tr.length)|0]; }
+          const s=pu.t; if(!s) continue; const x=s.x1+(s.x2-s.x1)*pu.p, y=s.y1+(s.y2-s.y1)*pu.p;
+          ctx.beginPath(); ctx.arc(x,y,2.3*dpr,0,6.28); ctx.fillStyle='rgba(130,255,238,.95)'; ctx.shadowBlur=9*dpr; ctx.shadowColor='rgba(42,220,200,.9)'; ctx.fill(); } ctx.shadowBlur=0; }
+      else if(o.kind==='matrix'){ const P=o.parts; ctx.font=P.fs+'px VT323, monospace'; ctx.textAlign='center';
+        for(const c of P.cols){ if(!reduce) c.y+=c.sp*dpr*1.4;
+          for(let k=0;k<c.len;k++){ const yy=c.y-k*P.fs; if(yy<-P.fs||yy>h+P.fs) continue;
+            const ch=String.fromCharCode(0x30A0+((Math.floor(t/90)+k+((c.x)|0))%96)), head=k===0;
+            if(head){ctx.fillStyle='rgba(190,255,200,.95)';ctx.shadowBlur=8*dpr;ctx.shadowColor='rgba(80,255,120,.8)';}
+            else{ctx.fillStyle='rgba(46,174,92,'+Math.max(.06,.6-k*.05)+')';ctx.shadowBlur=0;}
+            ctx.fillText(ch,c.x,yy); }
+          if(c.y-c.len*P.fs>h){ c.y=R(-h*.4,0); c.sp=R(.9,2.3); } }
+        ctx.shadowBlur=0; ctx.textAlign='start'; }
+      else if(o.kind==='holo'){ const P=o.parts;
+        for(let b=0;b<3;b++){ const off=((t/2600 + b/3)%1), cx=(-.4+off*1.8)*w, hue=(t/40+b*90)%360;
+          const g=ctx.createLinearGradient(cx-.25*w,0,cx+.25*w,h);
+          g.addColorStop(0,'hsla('+hue+',90%,70%,0)'); g.addColorStop(.5,'hsla('+hue+',92%,72%,.15)'); g.addColorStop(1,'hsla('+((hue+60)%360)+',90%,70%,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
+        for(const s of P){ const a=reduce?.7:(.3+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
       else { for(const s of o.parts){ const a=reduce?.7:(.35+.55*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
         ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
     }

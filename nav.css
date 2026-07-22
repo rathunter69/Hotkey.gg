@@ -786,7 +786,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    slots — columns divide evenly and long values (e.g. a chord) ellipsis instead
    of blowing out the row. Compact/legacy cards keep the natural flex flow. */
 .uc-stats .s{display:flex;flex-direction:column;gap:1px;min-width:0}
-.uc:not(.compact) .uc-stats .s{flex:1 1 0}
+.uc:not(.compact) .uc-stats .s{flex:1 1 0;align-items:center;text-align:center}
 .uc-stats b{font-size:19px;font-weight:700;color:var(--text);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .uc:not(.compact) .uc-stats b{font-size:17px}
 .uc.compact .uc-stats b{font-size:15px}
