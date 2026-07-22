@@ -356,7 +356,29 @@ async function load(){
   // ---- THE LOADOUT (themes.js persistence contract) ----
   const loadout = window.hkFlair ? window.hkFlair(prof.flair) : {frame:null,show:{rank:true,level:true,streak:true,desk:false},stats:[],title:null};
   if(!loadout.show) loadout.show={rank:true,level:true,streak:true,desk:false};
-  if(!Array.isArray(loadout.stats) || !loadout.stats.length) loadout.stats=['solves','crowns','streak','boards'];
+  if(!Array.isArray(loadout.stats) || !loadout.stats.length) loadout.stats=['solves','crowns','streak','boards','saved'];
+
+  // time banked — first recorded time vs current best on each re-drilled task, summed
+  // (mirrors stats.html 250-263). Powers the "time saved" highlight stat.
+  let savedMs=0;
+  try{ const firstBy={}, bestBy={};
+    const src2 = mine.length
+      ? mine.slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).map(r=>({d:r.challenge,t:r.time_ms}))
+      : (JSON.parse(localStorage.getItem('hk_runs_lite')||'[]').map(r=>({d:r.d,t:r.time_ms})).filter(r=>r.d));
+    src2.forEach(r=>{ if(firstBy[r.d]===undefined) firstBy[r.d]=r.t;
+      if(bestBy[r.d]===undefined||r.t<bestBy[r.d]) bestBy[r.d]=r.t; });
+    Object.keys(firstBy).forEach(d=>{ const s=firstBy[d]-bestBy[d]; if(s>0) savedMs+=s; });
+  }catch(e){}
+  const savedTxt = savedMs<=0 ? '—'
+    : savedMs<60000   ? (savedMs/1000).toFixed(0)+'s'
+    : savedMs<3600000 ? Math.round(savedMs/60000)+'m'
+    : Math.floor(savedMs/3600000)+'h '+Math.round((savedMs%3600000)/60000)+'m';
+  // favorite hotkey by usage — top chord from the local/synced key tally
+  let favKey='—';
+  try{ const kc=(srvKeys&&srvKeys.counts) || JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+    const te=Object.entries(kc).filter(([k])=>isChordUnit(k)).sort((a,b)=>b[1]-a[1]);
+    if(te.length) favKey=te[0][0];
+  }catch(e){}
 
   // stat value + label maps (keyed by HK_STAT_KEYS)
   const statVal={
@@ -367,9 +389,15 @@ async function load(){
     top10s: (st.t10!=null ? String(st.t10) : '—'),   // best available — board top-10 count (no dedicated daily-top10 series on this page)
     boards: st.att+' / '+D.menuOrder.length,
     accuracy: (avgEff!=null ? avgEff+'%' : '—'),
+    saved: savedTxt,
+    favkey: favKey,
   };
   const statLabel={ solves:'clean solves', crowns:'crowns', streak:'streak', podiums:'podiums',
-    top10s:'top-10s', boards:'boards', accuracy:'accuracy' };
+    top10s:'top-10s', boards:'boards', accuracy:'accuracy', saved:'time banked', favkey:'top hotkey' };
+  // tight card runs 5 across — the uppercase labels get their own short forms so
+  // they never truncate; the customizer chips keep the descriptive statLabel.
+  const statShort={ solves:'solves', crowns:'crowns', streak:'streak', podiums:'podiums',
+    top10s:'top-10s', boards:'boards', accuracy:'accuracy', saved:'banked', favkey:'top key' };
 
   // ---- SAVES (fire-and-forget, guarded) ----
   async function saveFlair(){ try{ const packed=window.hkFlairPack?window.hkFlairPack(loadout):loadout.frame;
@@ -383,7 +411,7 @@ async function load(){
   // ---- THE LIVE CARD (re-renderable) ----
   function renderCard(){
     const holder=document.getElementById('liveCard'); if(!holder) return;
-    const statsArr=(loadout.stats&&loadout.stats.length?loadout.stats:['solves','crowns','streak','boards']).slice(0,4);
+    const statsArr=(loadout.stats&&loadout.stats.length?loadout.stats:['solves','crowns','streak','boards','saved']).slice(0,5);
     // r387: featured medals as an array (up to 5) — hkPlayerCard pads with placeholders
     const medals=(feat||[]).filter(id=>earned.has(id)).slice(0,5).map(id=>{ const a=ACById[id]; const m=achMeta[id]||{};
       return a ? { glyph:a.glyph, rarity:m.rarity, name:a.name, size:30 } : null; }).filter(Boolean);
@@ -392,15 +420,15 @@ async function load(){
     let tagBits='';
     if(prof.show_school && prof.school_tag){
       const nm=(window.schoolResolve&&window.schoolResolve(prof.school_tag)||{}).name||prof.school_tag;
-      const chip=window.schoolChip?window.schoolChip(prof.school_tag,16):'';
-      tagBits+='<span class="uc-tag">'+chip+esc(nm)+'</span>'; }
-    if(loadout.show.desk && prof.team_code) tagBits+='<span class="uc-tag">◆ '+esc(prof.team_code)+'</span>';
+      const chip=window.schoolChip?window.schoolChip(prof.school_tag,20):'';
+      tagBits+='<span class="uc-tag">'+chip+'<span>'+esc(nm)+'</span></span>'; }
+    if(loadout.show.desk && prof.team_code) tagBits+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+esc(prof.team_code)+'</span></span>';
     const d={ name:prof.handle||'set a handle', flair:loadout.frame, show:loadout.show,
       tierEmblem:window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):'',
       tierChipEmblem:window.rankEmblem?window.rankEmblem(tier.name,16):'',
       tierLabel:tier.name+(tier.bucket?(' · '+tier.bucket):'')+(st.rank?(' · #'+st.rank):''),
       lvl:L.lvl, pct:L.pct, xpLine:L.into+' / '+L.need+' xp',
-      stats:statsArr.map(k=>({ n:(statVal[k]!=null?statVal[k]:'—'), label:(statLabel[k]||k) })),
+      stats:statsArr.map(k=>({ n:(statVal[k]!=null?statVal[k]:'—'), label:(statShort[k]||statLabel[k]||k) })),
       medals:medals, medalSlots:5, tagsHtml:tagBits, boards:[] };
     try{ holder.innerHTML = window.hkPlayerCard ? window.hkPlayerCard(d,{scale:'full'}) : ''; }catch(e){ holder.innerHTML=''; }
     try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(holder)); }catch(e){}
@@ -550,7 +578,7 @@ async function load(){
       medalsSection+
 
       '<div class="cz-sec">'+
-        '<div class="cz-sechd"><span class="cz-lab">Highlight stats · pick up to 4</span><span class="cz-count" id="czStatCount">'+loadout.stats.length+' / 4</span></div>'+
+        '<div class="cz-sechd"><span class="cz-lab">Highlight stats · pick up to 5</span><span class="cz-count" id="czStatCount">'+loadout.stats.length+' / 5</span></div>'+
         '<div class="cz-chips" id="czStats">'+statChipsHtml()+'</div>'+
       '</div>'+
 
@@ -651,9 +679,9 @@ async function load(){
     b.onclick=()=>{
       const k=b.dataset.stat;
       if(loadout.stats.includes(k)) loadout.stats=loadout.stats.filter(x=>x!==k);
-      else { if(loadout.stats.length>=4) loadout.stats.shift(); loadout.stats.push(k); }
+      else { if(loadout.stats.length>=5) loadout.stats.shift(); loadout.stats.push(k); }
       statsEl.querySelectorAll('.cz-statchip').forEach(x=>x.classList.toggle('on', loadout.stats.includes(x.dataset.stat)));
-      if(statCnt) statCnt.textContent=loadout.stats.length+' / 4';
+      if(statCnt) statCnt.textContent=loadout.stats.length+' / 5';
       renderCard(); saveFlair(); flash();
     };
   });

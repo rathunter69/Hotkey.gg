@@ -905,7 +905,7 @@ window.hkFrameUnlocked = function(id, u){
    path is preserved verbatim. hkFlairPack() round-trips: it emits a bare id when no
    extended prefs are set (keeps the column clean + old readers happy) and JSON only
    when the user has actually customized beyond the frame. Both are dependency-free. */
-window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy'];
+window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy','saved','favkey'];
 window.hkFlair = function(raw){
   const FR = window.HK_FRAMES || [];
   const validFrame = id => id && /^[a-z0-9_-]{1,32}$/i.test(id) && FR.some(f=>f.id===id) ? id : null;
@@ -917,7 +917,7 @@ window.hkFlair = function(raw){
     if(o && typeof o==='object'){
       const show = Object.assign({}, def.show);
       if(o.sh && typeof o.sh==='object'){ ['rank','level','streak','desk'].forEach(k=>{ if(k in o.sh) show[k]=!!o.sh[k]; }); }
-      const stats = Array.isArray(o.st) ? o.st.filter(k=>window.HK_STAT_KEYS.indexOf(k)>=0).slice(0,3) : [];
+      const stats = Array.isArray(o.st) ? o.st.filter(k=>window.HK_STAT_KEYS.indexOf(k)>=0).slice(0,5) : [];
       const title = (typeof o.ti==='string' && /^[a-z0-9_-]{1,32}$/i.test(o.ti)) ? o.ti : null;
       return { frame: validFrame(o.f), show, stats, title };
     }
@@ -930,7 +930,7 @@ window.hkFlairPack = function(l){
   l = l || {};
   const frame = (l.frame && /^[a-z0-9_-]{1,32}$/i.test(l.frame)) ? l.frame : null;
   const show = l.show || {};
-  const stats = Array.isArray(l.stats) ? l.stats.filter(k=>(window.HK_STAT_KEYS||[]).indexOf(k)>=0).slice(0,3) : [];
+  const stats = Array.isArray(l.stats) ? l.stats.filter(k=>(window.HK_STAT_KEYS||[]).indexOf(k)>=0).slice(0,5) : [];
   const title = (l.title && /^[a-z0-9_-]{1,32}$/i.test(l.title)) ? l.title : null;
   // does the loadout differ from the defaults? if not, keep it a bare id (or null).
   const shOff = ('rank' in show && !show.rank) || ('level' in show && !show.level) ||

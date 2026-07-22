@@ -174,7 +174,7 @@ async function load(){
         <span class="tc-emblem" style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):''}</span>
         <div>
           <div class="tc-name">${esc(prof.handle||'set a handle')}</div>
-          <span class="pc-tier ${tier.cls}" style="margin-top:4px">${/* r374: chip layout+gap live on .pc-tier (nav.css); 16 = the chip scale (was an eyeballed 13) */''}${window.rankEmblem?window.rankEmblem(tier.name,16):''}<span>${tier.name}</span></span>
+          <span class="pc-tier ${tier.cls}" style="margin-top:4px">${/* r374: chip layout+gap live on .pc-tier (nav.css); 16 = the chip scale (was an eyeballed 13) */''}${window.rankEmblem?window.rankEmblem(tier.name,16):''}<span>${tier.name}${tier.bucket?' · '+tier.bucket:''}</span></span>
         </div>
         ${prof.team_code?`<span class="tc-team">${esc(prof.team_code)}</span>`:''}
         <div class="tc-stats">${/* r383: the tc-sub counters, promoted to the dead right (same numbers) */''}
