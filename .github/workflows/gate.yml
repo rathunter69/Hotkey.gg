@@ -16,6 +16,33 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # r392: need history to diff the changed files for scope-gating
+      # r392 (Wolf): PATH-BASED GATING. The heavy engine matrix (parity/onboard/replay/
+      # alt-paths/mac-input/echo/rapid-fire/guided + drill-page drift) only runs when the
+      # DRILL ENGINE could have changed — index.html, drills.js, the test harnesses, or the
+      # workflow itself. Cosmetic-only pushes (themes.js / nav.* / other pages / css / md /
+      # sql) skip it and run the fast SMOKE (every page loads, zero page errors — catches a
+      # syntax break in any shared script) + the leaderboard suite. Nothing that can break a
+      # drill ships unchecked; nothing that can't pays the 8-minute tax.
+      - name: Determine change scope
+        id: scope
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"; HEAD="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE="${{ github.event.before }}"; HEAD="${{ github.sha }}"
+          fi
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE" 2>/dev/null; then
+            echo "engine=true" >> "$GITHUB_OUTPUT"; echo "unknown/new base -> full gate"; exit 0
+          fi
+          CHANGED="$(git diff --name-only "$BASE" "$HEAD")"
+          echo "Changed files:"; echo "$CHANGED"
+          if echo "$CHANGED" | grep -qE '^(index\.html|drills\.js|dev/|\.github/workflows/)'; then
+            echo "engine=true"  >> "$GITHUB_OUTPUT"; echo '=> engine matrix WILL run'
+          else
+            echo "engine=false" >> "$GITHUB_OUTPUT"; echo '=> cosmetic-only: smoke + lb only'
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -30,25 +57,38 @@ jobs:
           python3 -m http.server 8791 &
           sleep 1.5
           curl -sfo /dev/null http://127.0.0.1:8791/index.html
-      - name: Parity matrix
-        run: node dev/e2e-audit-parity.js
-      - name: Onboarding audit
-        run: node dev/e2e-audit-onboard.js
-      - name: Demo replay (all drills)
-        run: REPS=1 node dev/e2e-demo-replay.js
-      - name: Alt paths
-        run: node dev/e2e-alt-paths.js
-      - name: Mac input matrix
-        run: node dev/e2e-mac-input.js
-      - name: Echo / follow-along
-        run: node dev/e2e-echo.js
-      - name: Rapid-fire on the real grid
-        run: node dev/e2e-rapidfire.js
+      # ---- always-on fast net (both paths) ----
+      - name: Smoke (every page loads, zero page errors)
+        run: node dev/e2e-smoke.js
       - name: Leaderboard (tier filter, placement, seed field)
         run: node dev/e2e-lb.js
+      # ---- engine matrix — only when a drill-affecting file changed ----
+      - name: Parity matrix
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-audit-parity.js
+      - name: Onboarding audit
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-audit-onboard.js
+      - name: Demo replay (all drills)
+        if: steps.scope.outputs.engine == 'true'
+        run: REPS=1 node dev/e2e-demo-replay.js
+      - name: Alt paths
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-alt-paths.js
+      - name: Mac input matrix
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-mac-input.js
+      - name: Echo / follow-along
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-echo.js
+      - name: Rapid-fire on the real grid
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-rapidfire.js
       - name: Guided contract (rails contain, alternates count, every drill solvable)
+        if: steps.scope.outputs.engine == 'true'
         run: node dev/e2e-guided.js
       - name: Drill pages in sync
+        if: steps.scope.outputs.engine == 'true'
         run: |
           node dev/build-drill-pages.js
           git diff --exit-code -- drills sitemap.xml \

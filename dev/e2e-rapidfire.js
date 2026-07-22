@@ -96,6 +96,19 @@ function check(name, ok, extra) {
   check('HUD hits == rounds', hud.hits === results.length, hud.hits + ' vs ' + results.length);
   check('zero misses from primary paths', hud.misses === 0, String(hud.misses));
 
+  // r392 (Wolf): the Alt-walk echo must DESCEND into ribbon sub-menus / dialog openers
+  // instead of freezing at the parent menu (the "ribbon stops working" bug — alt e s v,
+  // alt h f c). Drive rfEchoStep directly and assert the dialog state opens.
+  const sub = await page.evaluate(() => {
+    const walk = (path) => { try { rfEchoReset(); } catch (e) {} rfEchoStep('Alt'); for (const c of path) rfEchoStep(c); return { dialog: typeof dialog !== 'undefined' ? dialog : null, path: (rfEchoPath || []).join('') }; };
+    const es = walk(['E', 'S']);        // legacy paste-special
+    const hfc = walk(['H', 'F', 'C']);  // font-color picker
+    try { rfEchoReset(); } catch (e) {}
+    return { es, hfc };
+  });
+  check('ribbon walk descends into paste-special sub-menu (alt·e·s)', sub.es.dialog === 'paste' && sub.es.path === 'ES', JSON.stringify(sub.es));
+  check('ribbon walk descends into font-color sub-menu (alt·h·f·c)', sub.hfc.dialog === 'fontcolor' && sub.hfc.path === 'HFC', JSON.stringify(sub.hfc));
+
   // exit → classic restores
   const after = await page.evaluate(() => {
     exitSession();
