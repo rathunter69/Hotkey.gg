@@ -1611,7 +1611,8 @@
       </div>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; solution</button>
       <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn</button>
-      <button class="mb-tool" id="guideToggle"><kbd>F1</kbd> guided: off</button>
+      <button class="mb-tool" id="hintsToggle" data-tip="show the key hints for each step — no cursor lock"><kbd>F1</kbd> hints: off</button>
+      <button class="mb-tool" id="guideToggle" data-tip="guided — hints PLUS the cursor fenced to the working area">&#9932; guided: off</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
@@ -7733,6 +7734,10 @@ let S, cur='drill', colW=[], started=0, finished=0, running=false, tickH=null;
 const IS_STANDALONE = !!(window.matchMedia && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone));
 let mouseUsed=false, mode='normal', path=[], dialog=null, done=false, pasteKind=null, pendingFlash=null;
 let guided=false, guidedUsed=false;
+/* r392 (Wolf): THREE progressive help levels, decoupled — F1 'hints' shows the key
+   hints on the checklist (no cursor lock); 'guided' adds the hard rails (fences the
+   cursor to the working area); 'watch solution' plays it. hints is implied by guided. */
+let hints=false;
 let demoPlaying=false;
 let echoOn=false, echoState=null;   // r281 (#27) echo mode — you press the demo's keys
 let editing=false, editBuf='';
@@ -9763,7 +9768,7 @@ function syncTabs(){
          toast invisible, flag burned, and the post-tour handoff owned nothing. Onboarded only. */
       const fresh = !localStorage.getItem('hk_runs_lite') && Object.keys(PB||{}).length===0;
       if(fresh && !guided){ toggleGuided();
-        setTimeout(()=>showToast('guided mode is on for your first run \u2014 follow the highlighted keys \u00b7 F1 turns it off'), 800); }
+        setTimeout(()=>showToast('guided mode is on for your first run \u2014 follow the highlighted keys \u00b7 click \u201cguided\u201d to turn it off (F1 = hints only, no lock)'), 800); }
       localStorage.setItem('hk_learn_done','1');
     }
     // r159: FROM-ZERO RAMP — a self-declared novice (comfort fork) keeps the
@@ -10211,14 +10216,15 @@ function updateChecklist(){
   let nextDone=false;
   let html=`<div class="cl-inner"><div class="cl-colhdr">\u2713</div><div class="cl-body">`+
     `<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
-  const __altFooter = guided ? '<div class="cl-alt">many chords, one sheet \u2014 the grader only checks the result. live alternates: fills <b>ctrl+r/d</b> \u21d4 <b>alt h f i r/d</b> \u00b7 autosum <b>alt+=</b> \u21d4 <b>alt h u s</b> \u00b7 paste special <b>ctrl+alt+v</b> \u21d4 <b>alt e s</b> \u00b7 format cells <b>ctrl+1</b> \u21d4 <b>alt o e</b> \u00b7 rows/cols <b>ctrl+\u00b1</b> \u21d4 <b>alt h i r / h d r</b> \u00b7 plugin profiles (\u2328) add Macabacus / FactSet chords</div>' : '';
+  const __altFooter = (hints||guided) ? '<div class="cl-alt">many chords, one sheet \u2014 the grader only checks the result. live alternates: fills <b>ctrl+r/d</b> \u21d4 <b>alt h f i r/d</b> \u00b7 autosum <b>alt+=</b> \u21d4 <b>alt h u s</b> \u00b7 paste special <b>ctrl+alt+v</b> \u21d4 <b>alt e s</b> \u00b7 format cells <b>ctrl+1</b> \u21d4 <b>alt o e</b> \u00b7 rows/cols <b>ctrl+\u00b1</b> \u21d4 <b>alt h i r / h d r</b> \u00b7 plugin profiles (\u2328) add Macabacus / FactSet chords</div>' : '';
   html+=`<div class="cl-bar"><div class="cl-bar-fill" style="width:${items.length?Math.round(100*n/items.length):0}%"></div></div>`;
   items.forEach((i,idx)=>{
     // The next incomplete task is ALWAYS highlighted (not just in guided mode) —
-    // the player should never wonder what to do next. Guided adds the key hints on top.
+    // the player should never wonder what to do next. r392: hints OR guided adds the key
+    // hints on top (F1 hints = keys without the lock; guided = keys + the cursor fence).
     const isNext = !i.ok && !nextDone; if(isNext) nextDone=true;
     const __g = (typeof C.guide==='function') ? (C.__gCache || (C.__gCache=C.guide.call(C))) : C.guide;
-    const keys = (guided && __g && __g[idx]) ? `<div class="cl-keys">${__g[idx]}${guideAltNote(__g[idx])}</div>` : '';
+    const keys = ((hints||guided) && __g && __g[idx]) ? `<div class="cl-keys">${__g[idx]}${guideAltNote(__g[idx])}</div>` : '';
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
@@ -11506,7 +11512,7 @@ document.addEventListener('keydown',hkRawE=>{
   }
 
   // HINTS — 'g' toggles guided in classic mode. (The session-mode g handler runs earlier and catches it during marathon/rapid-fire.)
-  if(k==='F1'){ e.preventDefault(); toggleGuided(); return; }   // r49: 'g' now types into cells (type-to-replace); F1 = Excel's help key
+  if(k==='F1'){ e.preventDefault(); toggleHints(); return; }   // r392: F1 = hints (tips, no lock); guided (the cursor lock) is its own control
   if(k==='F5' && !editing && !e.ctrlKey && !e.altKey && mode!=='ribbon'){   // r182: Go To \u2014 the Special door (browser refresh loses to Excel parity here)
     e.preventDefault(); startClock(); logKey('F5');
     mode='ribbon'; path=[]; dialog='goto'; ribbonNote=''; drawRibbon(); return; }
@@ -11724,15 +11730,25 @@ $('result').addEventListener('click',e=>{ const b=e.target.closest('.rc-key'); i
 /* r360: the legacy delegated rm-key listener is GONE — r88 wired direct onclicks on these
    buttons, so every mouse click fired BOTH paths (a hidden double-advance: 'next' skipped a
    drill for mouse users, and it clobbered the daily-mix queue advance). */
-function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='<kbd>F1</kbd> guided: '+(guided?'on':'off'); } }
-function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided) guidedUsed=true; updateGuideBtn();
-  if(!guided){ try{ sessionStorage.setItem('hk_guided_off','1'); }catch(e){} }   // r159: respect an explicit F1-off — training wheels stay off this session
+function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='⤲ guided: '+(guided?'on':'off'); } }
+function updateHintsBtn(){ const b=$('hintsToggle'); if(b){ const on=hints||guided; b.classList.toggle('on',on); b.innerHTML='<kbd>F1</kbd> hints: '+(on?'on':'off'); } }
+/* r392 (Wolf): F1 toggles HINTS only — the step keys light up on the checklist, but the
+   cursor stays free (no rails). Turning hints off also drops guided (guided implies hints). */
+function toggleHints(){ if(demoPlaying) return; hints=!hints;
+  if(!hints && guided){ guided=false; try{ sessionStorage.setItem('hk_guided_off','1'); document.body.classList.remove('guided-on'); }catch(e){} updateGuideBtn(); }
+  updateHintsBtn();
+  if(S){ render(); } else { updateChecklist(); }
+  if(gameMode==='rapidfire' && rfTask) renderRfCard('show');
+}
+function toggleGuided(){ if(demoPlaying) return; guided=!guided; if(guided){ guidedUsed=true; hints=true; } updateGuideBtn(); updateHintsBtn();
+  if(!guided){ try{ sessionStorage.setItem('hk_guided_off','1'); }catch(e){} }   // r159: respect an explicit off — training wheels stay off this session
   try{ document.body.classList.toggle('guided-on', guided); }catch(e){}   // r93: the whole frame says so
   if(S){ if(guided){ try{ railZoneCompute(); }catch(e){} S._railSig=null; railToTarget(); } render(); }   /* r318 cursor placement; r357: refresh the fence on enable — commitAction only recomputes it while guided is on */
   if(gameMode==='rapidfire' && rfTask) renderRfCard('show');
   else if(!S) updateChecklist();
 }
 $('guideToggle').addEventListener('click',toggleGuided);
+{ const hb=$('hintsToggle'); if(hb) hb.addEventListener('click',toggleHints); }
 { const gb=$('ghostToggle'); if(gb) gb.addEventListener('click',toggleGhost); }
 function soundStateLabel(){
   if(!soundOn) return '\ud83d\udd07 off';
@@ -12785,16 +12801,31 @@ function renderRfCard(state){
    Alt-walk mirrors into the classic strip (same MENUS, same KeyTips, same spot), so RF reads
    as the same product as classic instead of a silent black box. Visual only — no dispatch. */
 let rfEchoPath=[];
+/* r352 (Wolf: "it's getting stuck on the sub-menus of the ribbon" — alt e s v, alt h f c): a walk
+   descends PAST the deepest MENUS *container* into a leaf/dialog node that isn't itself a MENUS key
+   (HFC=font-color picker, ES/HVS=paste-special, HH=fill, HJ=cell styles, OE=format cells,
+   HFIS=series). The old MENUS-only gate dropped that letter, so the strip froze at the parent menu
+   while the matcher silently kept scoring. Mirror the classic ribbon's dialog openers (applyRibbon,
+   ~10503) here — VIEW ONLY, no dispatch/mutation; the matchers still own the solve — so the sub-menu
+   actually shows and the walk reads as the real ribbon expanding step by step. */
+const RF_ECHO_DIALOG = { 'ES':'paste', 'HVS':'paste', 'HFC':'fontcolor', 'HH':'fillcolor',
+                         'HJ':'cellstyle', 'OE':'fmt', 'HFIS':'series' };
 function rfEchoStep(k){
   try{
     if(k==='Alt'){ rfEchoPath=[]; mode='ribbon'; path=rfEchoPath; dialog=null; drawRibbon(); return; }
     const lk=String(k).toLowerCase();
     if(/^[a-z0-9]$/.test(lk)){
-      const cand=rfEchoPath.concat(lk.toUpperCase());
+      const cand=rfEchoPath.concat(lk.toUpperCase()), key=cand.join('');
       /* r351: only walk into REAL menus — a command letter (or a dead key) leaves the current
          menu on screen instead of pushing the path onto a key MENUS doesn't know (which drew
          a blank strip and read as "the ribbon stopped expanding"). */
-      if(MENUS[cand.join('')]!==undefined){ rfEchoPath.push(lk.toUpperCase()); path=rfEchoPath; drawRibbon(); }
+      if(MENUS[key]!==undefined){ rfEchoPath.push(lk.toUpperCase()); path=rfEchoPath; drawRibbon(); return; }
+      /* r352: known dialog/leaf opener — descend into the real sub-menu view (no mutation). */
+      const dlg=RF_ECHO_DIALOG[key];
+      if(dlg){ rfEchoPath.push(lk.toUpperCase()); path=rfEchoPath; dialog=dlg;
+               if(dlg==='fontcolor') fontColorIdx=0; else if(dlg==='fillcolor') fillColorIdx=0;
+               else if(dlg==='cellstyle') cellStyleIdx=0; else if(dlg==='paste'){ pasteKind='all'; pasteOp='none'; }
+               drawRibbon(); }
     }
   }catch(e){}
 }
@@ -13466,7 +13497,7 @@ setInterval(()=>{ try{
   if(nowOk>window.__stkBase){ window.__stkDone=true; return; }   // they're moving — never interrupt
   if(Date.now()-(window.__stkT||0) < 40000) return;
   window.__stkDone=true;
-  showToast('stuck? \u25b6 watch solution plays the line \u00b7 \u2328 learn mode walks you through it \u00b7 F1 guides every key');
+  showToast('stuck? \u25b6 watch solution plays the line \u00b7 \u2328 learn mode walks you through it \u00b7 F1 shows the keys \u00b7 guided fences the cursor');
   ['demoBtn','echoBtn','guideToggle'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
     setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); } });
   try{ ev('stuck_nudge',{d:cur}); }catch(e){}
@@ -14369,7 +14400,7 @@ function showWelcomeBack(key){
         (streak.n>1 ? '<span>\ud83d\udd25 <b>'+streak.n+'-day</b> streak \u2014 alive</span>' : '')+
       '</div>'+
       '<button class="wb-dlogin" id="wbLogin">Log in \u2192</button>'+
-      '<div class="wb-dfoot"><kbd>\\</kbd> pick a drill \u00b7 <kbd>F1</kbd> guided help \u00b7 any key to start</div>'+
+      '<div class="wb-dfoot"><kbd>\\</kbd> pick a drill \u00b7 <kbd>F1</kbd> hints \u00b7 any key to start</div>'+
     '</div></div>';
   document.body.appendChild(w);
   try{ sessionStorage.setItem('hk_wb','1'); }catch(e){}   // r324: guard set only now that the card is really in the DOM
@@ -15309,12 +15340,16 @@ function buildAchCtx(){
     certs:Object.keys(fl.certTracks||{}).length,
     mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
     nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin,
-    raceWins:fl.raceWins||0, sheetClears:fl.sheetClears||0, frzBanked:fl.frzBanked||0,
+    raceWins:fl.raceWins||0, frzBanked:fl.frzBanked||0,   /* r391: dropped orphan sheetClears (retired achievements, read by no test) */
     chordKinds:__ck, keysLifetime:__kl,   // r150/r151
     /* r376: the mythic class — charter (beta-era account, same cutoff as the charter
        frame), the packed rank high-water latch, and the S+++ desk latch (lb.js) */
     charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
-    tierBest:fl.tierBest|0, tierBestBucket:fl.tierBestBucket|0, deskPeak:fl.deskPeak||0 };
+    tierBest:fl.tierBest|0, tierBestBucket:fl.tierBestBucket|0, deskPeak:fl.deskPeak||0,
+    /* r391 (Wolf): the founding-cohort mythics (First Analyst Class / Founding Partner)
+       read these — without them the two x_first100/x_foundpro medals never fired in-game */
+    foundingClass:(function(){ try{ return !!(window.hkFoundingFlags&&window.hkFoundingFlags().class); }catch(e){ return false; } })(),
+    foundingPartner:(function(){ try{ return !!(window.hkFoundingFlags&&window.hkFoundingFlags().partner); }catch(e){ return false; } })() };
 }
 function achSweepInGame(){
   try{
@@ -15468,7 +15503,7 @@ const TOUR_STEPS=[
     body:'Add <kbd>shift</kbd> and it <b>selects</b> as it jumps. <b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>←</kbd></b> — select the whole row, no dragging.'},
   {sel:'.cl-inner',   cap:'your checklist', body:'Every line is one action — it turns green when done. Clear them all and the clock stops.'},
   {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list (<b>↑↓</b> move, <b>↵</b> loads). <b>Alt+←/→</b> switches drills. A single <b>Esc</b> never ends a run — <b>Esc·Esc</b> restarts the board.'},
-  {sel:'#guideToggle', cap:'stuck?', body:'<b>Guided</b> (<kbd>F1</kbd>) lights up every key to press — on for your first runs. <b>Solution</b> plays the optimal keys; <b>learn</b> hands them to you one at a time.'},
+  {sel:'#hintsToggle', cap:'stuck?', body:'Three levels of help: <b>hints</b> (<kbd>F1</kbd>) lights up the keys to press — cursor stays free. <b>Guided</b> adds a fence that keeps the cursor on the target. <b>Solution</b> plays the optimal keys; <b>learn</b> hands them to you one at a time.'},
   {sel:'#profileToggle', cap:'your keyboard', optional:true, body:'Your layout and shortcut profile (Excel · Macabacus · FactSet) live here — click to switch.'},
   {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor — race your own time.'},
   {sel:'#navThemes',  cap:'make it yours', body:'<b>Themes</b> — light or dark — live here. Pick one anytime; it saves.'},

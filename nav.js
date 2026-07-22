@@ -784,9 +784,12 @@
       tierLabel: tier.name+' · '+standing,
       lvl: __L.lvl, pct: __L.pct, xpLine: __L.into+' / '+__L.need+' xp'+__promo,
       stats: [{n:(d.mySolves||0),label:'clean solves'},{n:__crowns,label:'crowns'},{n:__pods,label:'podiums'},{n:__boards,label:'boards'},{n:(__streak?'🔥 '+__streak:'—'),label:'streak'}],
-      tagsHtml: __tagBits, medals: __medals, medalSlots: 5, boards: [], flair: null
+      tagsHtml: __tagBits, medals: __medals, medalSlots: 5, boards: [],
+      /* r391 (Wolf): render EXACTLY like the profile card — the skin rides the .uc
+         (pass the flair), not the 640px shell. .pc-owner sizes the holder to 430px. */
+      flair: __safeFlair, owner: true
     },{scale:'full'}) : '';
-    m.innerHTML = '<div class="pc-card'+flairCls+'">' + flairOrn +
+    m.innerHTML = '<div class="pc-card pc-owner">' +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
       '<div class="pc-scroll">' + __pcCard +
       (window.__hkNoHandle?'<div style="margin-top:10px;text-align:center"><a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a></div>':'') +
