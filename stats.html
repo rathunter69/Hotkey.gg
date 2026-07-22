@@ -81,6 +81,9 @@
   .ach-pick.earned{color:var(--muted); cursor:pointer}
   .ach-pick.earned:hover{background:var(--surface2); border-color:var(--line)}
   .ach-pick.feat{border-color:var(--accent-dim); background:var(--accent-glow)}
+  /* r389 (Wolf): clean glyph icon in place of the engraved hexagon */
+  .ach-ic{display:inline-flex; line-height:0}
+  .ach-ic.dim{opacity:.4}
   .ach-pick .st{position:absolute; top:3px; right:5px; font-size:10px; color:var(--warn); display:none}
   .ach-pick.feat .st{display:block}
   .ach-pick i{position:absolute; top:32px; right:8px; font-style:normal; font-size:7.5px; color:var(--faint);
@@ -371,7 +374,12 @@ async function load(){
         const cellHtml='<span class="ach-pick'+(r.done?' earned':'')+(isFeat?' feat':'')+'" data-ach="'+a.id+'" data-state="'+__state+'" data-rarity="'+(tierW||'common')+'"'+
           ' data-tip="'+esc(a.name)+' \u2014 '+esc(a.desc)+(r.done?' \u2713 EARNED':' \u00b7 '+(r.prog||0)+'/'+(r.goal||1))+rareTxt+(r.done?' \u00b7 click to showcase':'')+'">'+
           '<span class="st">\u2605</span>'+
-          window.hkBadge(a.glyph, r.done, 40, null, r.done?gp:undefined)+
+          /* r389 (Wolf): clean glyph, no engraved hexagon \u2014 matches the player card.
+             Earned wears its rarity color; locked/in-progress dim. Falls back to the
+             legacy badge only if a glyph id somehow isn't in the new set. */
+          (function(){ const gl=window.hkGlyph?window.hkGlyph(a.glyph,40,(r.done?rm.color:'var(--faint)')):'';
+            return gl ? '<span class="ach-ic'+(r.done?'':' dim')+'">'+gl+'</span>'
+              : window.hkBadge(a.glyph, r.done, 40, null, r.done?gp:undefined); })()+
           (r.done?'':'<i>'+Math.min(99,Math.round(100*(r.prog||0)/(r.goal||1)))+'%</i>')+
           esc(a.name)+rlabel+'</span>';
         // earned float to the top, then rarest-first, then catalog order
@@ -389,7 +397,7 @@ async function load(){
         '<div class="ach-hint">medals sort rarest-first \u00b7 pick which to <b style="color:var(--warn)">\u2605 showcase</b> on your player card from <a href="profile.html#showcase" style="color:var(--accent)">your profile \u2197</a>'+(me?'':' \u00b7 sign in to show them on the boards')+
         /* r376: legend rides the shared HK_RARITY map \u2014 same colors the badge rings wear */
         (function(){ const RC=window.HK_RARITY||{};
-          return '<br>ring = rarity: <b style="color:'+RC.c+'">COMMON</b> \u00b7 <b style="color:'+RC.r+'">RARE</b> (\u226425% of players) \u00b7 <b style="color:'+RC.e+'">EPIC</b> (\u226410%) \u00b7 <b style="color:'+RC.l+'">LEGENDARY</b> (\u22643%) \u00b7 <b style="color:'+RC.m+'">MYTHIC</b> (the rarest handful)</div>'; })()+
+          return '<br>color = rarity: <b style="color:'+RC.c+'">COMMON</b> \u00b7 <b style="color:'+RC.r+'">RARE</b> (\u226425% of players) \u00b7 <b style="color:'+RC.e+'">EPIC</b> (\u226410%) \u00b7 <b style="color:'+RC.l+'">LEGENDARY</b> (\u22643%) \u00b7 <b style="color:'+RC.m+'">MYTHIC</b> (the rarest handful)</div>'; })()+
         '<div class="ach-grid">'+grid+'</div>';
     }
   }catch(e){}
