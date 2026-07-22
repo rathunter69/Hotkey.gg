@@ -24,8 +24,8 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof renderAll === 'function' && typeof CH !== 'undefined' && !!window.HK_PLACEMENT);
 
-  // ---------- A. tier sub-menu ----------
-  console.log('A. tier sub-menu on the boards');
+  // ---------- A. drill boards (r393: per-board tier filter removed) ----------
+  console.log('A. drill boards render without a by-rank filter');
   const a1 = await page.evaluate(() => {
     const users = []; for (let i = 0; i < 12; i++) users.push('u' + i);
     const names = {}; users.forEach((u, i) => names[u] = 'Player_' + i);
@@ -43,37 +43,19 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
       fRuns: runs, fSessions: [], userStat, gUserStat: userStat,
       profs: users.map(u => ({ id: u, handle: names[u] })), runs, sessions: [] };
     try { localStorage.setItem('hk_ranked', '1'); } catch (e) {}
-    sessionStorage.removeItem('hk_lb_tier'); sessionStorage.removeItem('hk_lb_bucket');
-    tierFilter = 'all'; bucketFilter = 'all';
     renderAll();
-    const sel = document.getElementById('tierSel');
-    return { hasSel: !!sel, opts: sel ? sel.options.length : 0,
+    return { hasSel: !!document.getElementById('tierSel'),
+      chips: document.querySelectorAll('.chip[data-bucket]').length,
+      hasNote: !!document.querySelector('.tf-note'),
       rows: document.querySelectorAll('.browse-detail .board .row:not(.open)').length };
   });
-  ok(a1.hasSel, 'tier dropdown renders on the drill board');
-  ok(a1.opts >= 9, 'dropdown lists the full ladder', 'opts=' + a1.opts);
-  ok(a1.rows === 10, 'unfiltered board shows the top 10', 'rows=' + a1.rows);
-
-  const a2 = await page.evaluate(() => {
-    const st = DATA.userStat['u3']; const t = TIER_OF(st.avg, st.att, st.wsum);
-    const sel = document.getElementById('tierSel'); sel.value = t.name; sel.onchange();
-    return { tier: t.name,
-      rows: document.querySelectorAll('.browse-detail .board .row:not(.open)').length,
-      chips: document.querySelectorAll('.chip[data-bucket]').length,
-      note: (document.querySelector('.tf-note') || {}).textContent || '' };
-  });
-  ok(a2.rows > 0 && a2.rows < 12, 'picking a tier narrows and re-ranks the board', 'rows=' + a2.rows);
-  ok(a2.chips === 4, 'bucket chips appear once a tier is picked');
-  ok(/of 12 on this board/.test(a2.note), 'n-of-m note reports the filtered field');
-
-  const a3 = await page.evaluate(() => {
-    const sel = document.getElementById('tierSel'); sel.value = 'all'; sel.onchange();
-    return { rows: document.querySelectorAll('.browse-detail .board .row:not(.open)').length,
-      chips: document.querySelectorAll('.chip[data-bucket]').length };
-  });
-  /* r366: the chips are ALWAYS visible now (Wolf: hidden read as missing) — tier=all restores
-     the full board while the bucket sub-menu stays on screen, scoping the whole field. */
-  ok(a3.rows === 10 && a3.chips === 4, 'tier=all restores the board; bucket chips stay visible', 'rows='+a3.rows+' chips='+a3.chips);
+  /* r393 (Wolf): the individual drill leaderboards no longer carry a by-rank filter — the tier
+     dropdown, the bucket chips, and the n-of-m note are all gone. The board shows the whole
+     field for the picked drill (capped at the board's top 10). */
+  ok(!a1.hasSel, 'no per-board tier dropdown (filter removed)');
+  ok(a1.chips === 0, 'no per-board bucket chips (filter removed)', 'chips=' + a1.chips);
+  ok(!a1.hasNote, 'no n-of-m filter note (filter removed)');
+  ok(a1.rows === 10, 'drill board shows the top 10', 'rows=' + a1.rows);
 
   // ---------- B. ranked entry states ----------
   console.log('B. ranked entry: gate -> placement -> tier');

@@ -740,7 +740,10 @@ function topPlayersHtml(){
   const lead=ranked[0];
   const tpMid=(x,i)=>'<span class="tp-mid">'+(x.crowns?x.crowns+' \u265b \u00b7 ':'')+
     (i===0?'sets the pace':'+'+((x.avg-lead.avg)*100).toFixed(1)+' rtg')+'</span>';
-  ranked.slice(0,8).forEach((x,i)=>{
+  /* r393 (Wolf): the overall field is the featured box now — it defaults to the WHOLE ranked
+     field (many names), not a top-8 slice. A fixed-height scroll (.tp-scroll, lb.css) keeps it
+     compact; the you-row still highlights inline. */
+  ranked.forEach((x,i)=>{
     const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="tp-row'+(x.u===meId?' me':'')+'"><span class="rk'+(i<3?' r'+(i+1):'')+'">'+(i+1)+'</span>'+
       '<span class="nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
@@ -749,22 +752,21 @@ function topPlayersHtml(){
       '<span class="pct"><b>top '+Math.max(1,Math.round(x.avg*100))+'%</b><i>'+x.att+' drills</i></span></div>';
   });
   const myIdx=meId?ranked.findIndex(x=>x.u===meId):-1;
-  if(myIdx>=8){ const x=ranked[myIdx]; const t=tierOf(x.avg,x.att,x.wsum);
+  if(myIdx>=ranked.length){ const x=ranked[myIdx]; const t=tierOf(x.avg,x.att,x.wsum);
     rows+='<div class="you-gap">\u00b7\u00b7\u00b7</div><div class="tp-row me"><span class="rk">'+(myIdx+1)+'</span>'+
       '<span class="nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
       tpMid(x,myIdx)+
       '<span class="tp-emb" title="'+t.name+'">'+(window.rankEmblem?window.rankEmblem(t.name,22,t.bucket):'')+'</span>'+
       '<span class="pct"><b>top '+Math.max(1,Math.round(x.avg*100))+'%</b><i>'+x.att+' drills</i></span></div>'; }
   if(!rows) rows='<div class="empty">nobody has placed yet (5+ drills) \u2014 <b>be the first name here</b></div>';
-  return '<div class="panel"><h4>top players \u00b7 the field</h4>'+rows+'</div>';
+  return '<div class="panel tp-panel"><h4>the field \u00b7 overall ranking</h4><div class="tp-scroll">'+rows+'</div></div>';
 }
 
-function featuredHtml(){
+/* r393 (Wolf): the Daily Challenge rides the HERO row (right of the your-card) as its own
+   board. Extracted from the old featuredHtml() — the weekly gauntlet is dropped from the main
+   dashboard entirely; the overall field + top desks fill the featured row below. */
+function dailyHeroHtml(){
   const {fRuns,names,meId}=DATA;
-  /* r362 (Wolf: the daily belongs FRONT AND CENTER here): this board used to read the retired
-     'daily-<date>' key — nothing has posted there since the morning sheet was retired, so the
-     board sat permanently empty. It reads the REAL Daily Challenge ('challenge-<date>') now,
-     labels it from the shared pool, and wears the hero styling + top-10 medals. */
   const dailyDate=new Date().toISOString().slice(0,10);
   let dSeed=0; for(const ch of dailyDate) dSeed=(dSeed*31+ch.charCodeAt(0))>>>0;
   const cSeed=(dSeed^0x9e3779b9)>>>0;   // = index.html challengeSeed()
@@ -774,27 +776,6 @@ function featuredHtml(){
   const seenD={}, bestD=[];
   fRuns.filter(x=>x.challenge==='challenge-'+dailyDate).forEach(x=>{ if(!seenD[x.user_id]){ seenD[x.user_id]=true; bestD.push(x); } });
   bestD.sort((a,b)=>a.time_ms-b.time_ms);
-  // weekly
-  const d=new Date(); const onejan=new Date(d.getUTCFullYear(),0,1);
-  const wk=Math.ceil((((d-onejan)/864e5)+onejan.getUTCDay()+1)/7);
-  const wkStr=d.getUTCFullYear()+'-'+String(wk).padStart(2,'0');
-  let seed=0; for(const ch of wkStr) seed=(seed*31+ch.charCodeAt(0))>>>0;
-  const mul=(a=>()=>{a|=0;a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;})(seed);
-  const bag=(window.HOTKEY_DRILLS?window.HOTKEY_DRILLS.menuOrder.slice():[]);
-  for(let i=bag.length-1;i>0;i--){ const j=Math.floor(mul()*(i+1)); [bag[i],bag[j]]=[bag[j],bag[i]]; }
-  const legs=bag.slice(0,5);
-  const per={};
-  legs.forEach(k=>{ const ck='wk-'+wkStr+'-'+k; const seen={};
-    fRuns.filter(x=>x.challenge===ck).forEach(x=>{ if(seen[x.user_id]) return; seen[x.user_id]=true;
-      (per[x.user_id]=per[x.user_id]||{})[k]={t:x.time_ms, ks:x.keystrokes||0, opt:x.optimal||0}; }); });
-  /* r382: the combined row sums keystrokes/optimal too — but only when EVERY leg
-     logged them, so the weekly board's efficiency never prices a partial picture */
-  const combined=Object.keys(per).filter(u=>legs.every(k=>per[u][k]!==undefined))
-    .map(u=>{ const row={user_id:u, time_ms:legs.reduce((s,k)=>s+per[u][k].t,0)};
-      if(legs.every(k=>per[u][k].ks>0 && per[u][k].opt>0)){
-        row.keystrokes=legs.reduce((s,k)=>s+per[u][k].ks,0);
-        row.optimal=legs.reduce((s,k)=>s+per[u][k].opt,0); }
-      return row; }).sort((a,b)=>a.time_ms-b.time_ms);
   const midnight=new Date(); midnight.setHours(24,0,0,0);
   const hrsLeft=Math.max(0, Math.round((midnight-new Date())/36e5));
   /* r364: yesterday's podium — the honor roll rides the hero card */
@@ -802,31 +783,31 @@ function featuredHtml(){
   const seenY={}, bestY=[];
   fRuns.filter(x=>x.challenge==='challenge-'+yDate).sort((a,b)=>a.time_ms-b.time_ms)
     .forEach(x=>{ if(!seenY[x.user_id]){ seenY[x.user_id]=true; bestY.push(x); } });
-  const gl=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'];
-  const podium=bestY.slice(0,3).map((r,i)=>gl[i]+' '+esc(names[r.user_id]||'analyst')+' '+fmt(r.time_ms)).join(' \u00b7 ');
-  /* r392 (Wolf): compact-always, fixed layout. Daily + weekly ride as two EQUAL compact
-     cards (fixed height, top-3 shown, internal scroll if a live field runs long) \u2014 no more
-     one wide near-empty box. The field-by-tier (sub-rank) panel moved UP under the main
-     board (see renderAll), so this row is just the two challenge cards. */
-  return '<div class="featured featured-2">'+
-    '<div class="featured-daily fx-compact">'+
-      '<div class="fd-head"><span class="fd-live">\u25cf live</span><b>\u25c6 the Daily Challenge \u00b7 '+dl+'</b>'+
-      '<span class="fd-meta">resets in ~'+hrsLeft+'h \u00b7 top 3 medal \u00b7 top 10 +40 xp & wear it on their card'+(podium?' \u00b7 yesterday: '+podium:'')+'</span>'+
-      '<a class="fd-play" href="index.html?daily=1">play it \u2192</a></div>'+
-      boardHtml({label:'today\u2019s global field', lvl:dailyDate}, bestD.slice(0,3), names, meId, {medals:true})+
-    '</div>'+
-    '<div class="fx-compact">'+boardHtml({label:'\ud83c\udfc1 weekly gauntlet \u00b7 '+legs.length+' legs, one clock', lvl:'wk '+wkStr}, combined.slice(0,3), names, meId)+'</div>'+
+  const gl=['🥇','🥈','🥉'];
+  const podium=bestY.slice(0,3).map((r,i)=>gl[i]+' '+esc(names[r.user_id]||'analyst')+' '+fmt(r.time_ms)).join(' · ');
+  /* r393 (Wolf): up to ~8 rows so the board reads populated in the hero spot (was 3). */
+  return '<div class="featured-daily fx-compact">'+
+      '<div class="fd-head"><span class="fd-live">● live</span><b>◆ the Daily Challenge · '+dl+'</b>'+
+      '<span class="fd-meta">resets in ~'+hrsLeft+'h · top 3 medal · top 10 +40 xp & wear it on their card'+(podium?' · yesterday: '+podium:'')+'</span>'+
+      '<a class="fd-play" href="index.html?daily=1">play it →</a></div>'+
+      boardHtml({label:'today’s global field', lvl:dailyDate}, bestD.slice(0,8), names, meId, {medals:true})+
     '</div>';
+}
+/* r393 (Wolf): Top Desks for the featured row — reuses deskStandingsHtml(); when there is no
+   desk data yet it still shows a titled panel with an empty state (never a blank column). */
+function topDesksHtml(){
+  const inner=deskStandingsHtml();
+  if(inner) return inner;
+  return '<div class="panel standings" style="margin-top:0"><h4>◆ Top Desks</h4>'+
+    '<div class="empty">no desks ranked yet — <a href="account.html#desk" style="color:var(--accent)">start or join a desk</a></div></div>';
 }
 
 /* ---- drill browser: tabs + chips + one detail board ---- */
 let browseTab = sessionStorage.getItem('hk_lb_tab') || 'drills';
 if(browseTab==='marathon') browseTab='drills';   // r293: marathon boards retired — stale saved tab falls back
 let browseKey = sessionStorage.getItem('hk_lb_key') || null;
-/* r335 (Wolf): tier sub-menu on the drill boards — a dropdown scopes the detail board to one
-   rank tier; bucket chips (Bottom/Middle/Top) narrow further once a tier is picked. 'all' = off. */
-let tierFilter = sessionStorage.getItem('hk_lb_tier') || 'all';
-let bucketFilter = sessionStorage.getItem('hk_lb_bucket') || 'all';
+/* r393 (Wolf): the per-board tier/bucket filter (r335) is retired — the individual drill
+   leaderboards no longer scope by rank, so tierFilter/bucketFilter and their handlers are gone. */
 let rosterTier = null;
 function rosterHtml(flush){
   const {names,meId}=DATA; const userStat=DATA.gUserStat||DATA.userStat;
@@ -1392,40 +1373,15 @@ function browserHtml(){
       listRows+='<span class="chip bl-row'+(browseKey===c.key?' on':'')+(mine?' mine':'')+'" data-key="'+c.key+'">'+
         '<span class="bl-nm">'+esc(c.label)+'</span>'+(mine?'<b class="bl-me" title="you have a time here">\u2713</b>':'')+'</span>'; });
     const c=CH.find(x=>x.key===browseKey);
-    // r335: tier scope — map every user on the board to their tier once, filter, re-rank
-    const tierNames=(window.HK_RANK?window.HK_RANK.TIERS.map(t=>t.name):[]);
-    let rows=perDrill[browseKey], fnote='';
-    /* r366 (Wolf: 'we didn't have sub menu buttons to filter ranks by bucket'): the chips
-       existed but hid until a tier was picked — invisible IS missing. They're always on now:
-       tier picked → thirds WITHIN that tier (r335 behavior); 'all tiers' → thirds of the
-       whole ranked field by average percentile. */
-    if(tierFilter!=='all' || bucketFilter!=='all'){
-      const stat=DATA.gUserStat||DATA.userStat;
-      const tof={}; Object.entries(stat).forEach(([u,st])=>{ const av=st.att?st.avg:null;
-        if(av!==null) tof[u]=TIER_OF(av, st.att, st.wsum); });
-      const fieldBucket=u=>{ const st=stat[u]; if(!st||!st.att) return null;
-        return st.avg<=1/3 ? 'Top' : (st.avg<=2/3 ? 'Middle' : 'Bottom'); };
-      rows=rows.filter(r=>{
-        const t=tof[r.user_id];
-        if(tierFilter!=='all'){ if(!t || t.name!==tierFilter) return false;
-          if(bucketFilter!=='all' && (t.bucket||'')!==bucketFilter+' Bucket') return false; }
-        else if(bucketFilter!=='all'){ if(fieldBucket(r.user_id)!==bucketFilter) return false; }
-        return true; });
-      fnote='<div class="tf-note">'+rows.length+' of '+perDrill[browseKey].length+' on this board '+
-        (rows.length===1?'holds':'hold')+' '+
-        (tierFilter!=='all' ? esc(tierFilter)+(bucketFilter!=='all'?' \u00b7 '+esc(bucketFilter)+' Bucket':'')
-                            : 'the field\u2019s '+esc(bucketFilter)+' bucket')+'</div>';
-    }
-    const tierSel='<div class="tier-filter"><label for="tierSel">tier</label>'+
-      '<select id="tierSel">'+['all'].concat(tierNames).map(tn=>'<option value="'+esc(tn)+'"'+(tierFilter===tn?' selected':'')+'>'+(tn==='all'?'all tiers':esc(tn))+'</option>').join('')+'</select>'+
-      ['all','Bottom','Middle','Top'].map(b=>'<span class="chip tf-b'+(bucketFilter===b?' on':'')+'" data-bucket="'+b+'" title="'+(tierFilter!=='all'?'thirds within '+esc(tierFilter):'thirds of the whole ranked field')+'">'+(b==='all'?'all buckets':b.toLowerCase())+'</span>').join('')+
-      '</div>';
-    const detailBoard=(tierFilter!=='all' && !rows.length)
-      ? '<div class="board"><div class="board-cap"><h2>'+esc(c.label)+'</h2><span class="lvl">'+esc(c.lvl)+'</span></div><div class="empty" style="padding:14px 18px">nobody holding '+esc(tierFilter)+' has a time on this board yet \u2014 the lane is open</div></div>'
-      : boardHtml(c, rows, DATA.names, meId);
+    /* r393 (Wolf): the per-board tier dropdown + bucket chips are GONE — individual drill
+       leaderboards no longer carry a by-rank filter. The detail board shows the whole field
+       for the picked drill; its top aligns with the drill list on the left (no filter bar
+       pushing it down), and it fills to roughly the list's height (lb.css .browse-detail). */
+    const rows=perDrill[browseKey];
+    const detailBoard=boardHtml(c, rows, DATA.names, meId);
     html+='<div class="browse-wrap">'+
-      '<div class="browse-list"><input id="blSearch" placeholder="search drills\u2026" aria-label="search drills">'+listRows+'</div>'+
-      '<div class="browse-detail" id="detail">'+tierSel+fnote+detailBoard+'</div>'+
+      '<div class="browse-list"><input id="blSearch" placeholder="search drills…" aria-label="search drills">'+listRows+'</div>'+
+      '<div class="browse-detail" id="detail">'+detailBoard+'</div>'+
     '</div>';
   } else {
     const durs = RAPID_DURS;
@@ -1475,15 +1431,14 @@ function renderAll(){
       (DATA.viewDesk ? ('<h3 class="section-title">This desk\u2019s boards \u2014 members only</h3><div class="browse" style="grid-column:1/-1">'+browserHtml()+'</div>') : '');
   } else {
     if(h1) h1.textContent='Leaderboard';
-    /* r369 (Wolf): tighter dashboard — the tier roster rides beside the weekly gauntlet
-       inside .featured instead of spreading as its own full-width strip */
-    /* r392 (Wolf): the sub-rank (field-by-tier) panel rides DIRECTLY under the main
-       ranking board \u2014 filter the field where the field is. Daily + weekly follow as the
-       compact challenge row. Everything compact-always; live seeds fill any gaps. */
+    /* r393 (Wolf): the Daily Challenge rides the HERO row beside the your-card (was Top
+       Players). The featured row below is two EQUAL boxes — the overall field (whole ranked
+       field, scrollable) + Top Desks. The field-by-tier roster follows full-width; the weekly
+       gauntlet is dropped from the dashboard. Everything compact-always; live seeds fill gaps. */
     root.innerHTML =
-      '<div class="hero two">'+heroHtml()+topPlayersHtml()+'</div>'+
+      '<div class="hero two">'+heroHtml()+dailyHeroHtml()+'</div>'+
+      '<div class="featured featured-2">'+topPlayersHtml()+topDesksHtml()+'</div>'+
       '<div style="grid-column:1/-1;min-width:0">'+rosterHtml(true)+'</div>'+
-      featuredHtml()+
       '<h3 class="section-title">Browse the boards'+
         '<a href="desks.html" style="float:right;font-size:11px;color:var(--accent);text-decoration:none">\ud83c\udf93 schools & desks \u2192</a></h3>'+
       '<div class="browse" style="grid-column:1/-1">'+browserHtml()+'</div>';
@@ -1509,11 +1464,7 @@ function wire(){
     renderAll(); });
   document.querySelectorAll('.chip[data-key]').forEach(c=>c.onclick=()=>{
     browseKey=c.dataset.key; sessionStorage.setItem('hk_lb_key',browseKey); renderAll(); });
-  const ts=document.getElementById('tierSel');
-  if(ts){ ts.onchange=()=>{ tierFilter=ts.value; bucketFilter='all';
-    sessionStorage.setItem('hk_lb_tier',tierFilter); sessionStorage.setItem('hk_lb_bucket','all'); renderAll(); }; }
-  document.querySelectorAll('.chip[data-bucket]').forEach(b=>b.onclick=()=>{
-    bucketFilter=b.dataset.bucket; sessionStorage.setItem('hk_lb_bucket',bucketFilter); renderAll(); });
+  /* r393 (Wolf): per-board tier dropdown + bucket-chip handlers retired with the filter. */
   const tt=document.getElementById('teamToggle');
   if(tt) tt.onclick=()=>{ sessionStorage.setItem('hk_teamview', DATA.teamOnly?'0':'1'); load();
  };
