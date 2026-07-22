@@ -75,6 +75,19 @@
   .ach-grid[data-f="earned"] .ach-pick:not([data-state="earned"]),
   .ach-grid[data-f="prog"]   .ach-pick:not([data-state="prog"]),
   .ach-grid[data-f="locked"] .ach-pick:not([data-state="locked"]){display:none}
+  /* r393 (Wolf #91): rarity-tier chips (match the profile picker). data-r composes with
+     data-f — a cell hidden by EITHER axis stays hidden. */
+  .ach-grid[data-r="common"]    .ach-pick:not([data-rarity="common"]),
+  .ach-grid[data-r="rare"]      .ach-pick:not([data-rarity="rare"]),
+  .ach-grid[data-r="epic"]      .ach-pick:not([data-rarity="epic"]),
+  .ach-grid[data-r="legendary"] .ach-pick:not([data-rarity="legendary"]),
+  .ach-grid[data-r="mythic"]    .ach-pick:not([data-rarity="mythic"]){display:none}
+  .ach-fdiv{display:inline-block; width:1px; align-self:stretch; background:var(--line); margin:0 2px}
+  .ach-rf{font-family:var(--mono); font-size:10.5px; padding:3px 10px; border-radius:99px; cursor:pointer;
+    background:var(--surface); color:var(--rc,var(--muted)); border:1px solid var(--line); text-transform:capitalize}
+  .ach-rf:hover{border-color:var(--rc,var(--faint))}
+  .ach-rf.on{color:var(--on-accent,#0c0d0e); background:var(--rc,var(--accent)); border-color:var(--rc,var(--accent))}
+  .ach-rf[data-r="all"]{color:var(--muted)} .ach-rf[data-r="all"].on{color:var(--on-accent,#0c0d0e); background:var(--accent); border-color:var(--accent)}
   .ach-pick{position:relative; display:flex; flex-direction:column; align-items:center; gap:4px;
     font-family:var(--mono); font-size:8.5px; color:var(--faint); text-align:center; line-height:1.25;
     padding:8px 2px 6px; border-radius:10px; border:1px solid transparent}
@@ -364,7 +377,7 @@ async function load(){
           return out;
         }catch(e){ return {}; }
       })();
-      let earnedN=0; const cells=[];
+      let earnedN=0; const cells=[]; const rarPresent={};   /* r393 (Wolf #91): which rarity tiers actually appear, for the picker-style chip row */
       AC.forEach((a,ord)=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
         if(r.done) earnedN++;
         const isFeat=r.done && feat.includes(a.id);
@@ -373,6 +386,7 @@ async function load(){
         const __fN=globalPct.__n||0;
         const gp=window.hkEffRarity?window.hkEffRarity(a.tier, globalPct[a.id], __fN):globalPct[a.id];
         const tierW=(window.hkRarityTier?window.hkRarityTier(gp):null);
+        rarPresent[tierW||'common']=1;
         const rm=(window.hkRarityMeta?window.hkRarityMeta(gp):{abbr:'',color:'var(--warn)',weight:3});
         const rareTxt=(__fN>=20 && globalPct[a.id]!==undefined)
           ? (' \u00b7 '+(tierW?tierW.toUpperCase()+' \u2014 ':'')+globalPct[a.id]+'% of players have this')
@@ -396,12 +410,21 @@ async function load(){
       });
       cells.sort((x,y)=>x.sort-y.sort);
       const grid=cells.map(c=>c.html).join('');
+      /* r393 (Wolf #91): a rarity-tier chip row beside the state chips, mirroring the profile
+         medal picker. Each chip is tinted its rarity color (same HK_RARITY map the rings wear);
+         only tiers that actually appear on the wall get a chip. State + rarity filters compose. */
+      const __RCq=window.HK_RARITY||{};
+      const __rarChips=['common','rare','epic','legendary','mythic'].filter(t=>rarPresent[t]).map(t=>{
+        const col={common:__RCq.c,rare:__RCq.r,epic:__RCq.e,legendary:__RCq.l,mythic:__RCq.m}[t]||'var(--muted)';
+        return '<button class="ach-rf" data-r="'+t+'" style="--rc:'+col+'">'+t+'</button>'; }).join('');
       html += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span>'+
         '<span class="ach-filters">'+
           '<button class="ach-f on" data-f="all">all</button>'+
           '<button class="ach-f" data-f="earned">earned</button>'+
           '<button class="ach-f" data-f="prog">in progress</button>'+
           '<button class="ach-f" data-f="locked">locked</button>'+
+          '<span class="ach-fdiv"></span>'+
+          '<button class="ach-rf on" data-r="all">any rarity</button>'+__rarChips+
         '</span></h3>'+
         '<div class="ach-hint">medals sort rarest-first \u00b7 pick which to <b style="color:var(--warn)">\u2605 showcase</b> on your player card from <a href="profile.html#showcase" style="color:var(--accent)">your profile \u2197</a>'+(me?'':' \u00b7 sign in to show them on the boards')+
         /* r376: legend rides the shared HK_RARITY map \u2014 same colors the badge rings wear */
@@ -601,6 +624,10 @@ async function load(){
   document.querySelectorAll('.ach-f').forEach(b=>b.onclick=(ev)=>{ ev.stopPropagation();
     document.querySelectorAll('.ach-f').forEach(x=>x.classList.toggle('on', x===b));
     const g=document.querySelector('.ach-grid'); if(g){ if(b.dataset.f==='all') g.removeAttribute('data-f'); else g.setAttribute('data-f', b.dataset.f); } });
+  // r393 (Wolf #91): rarity-tier chips — set data-r on the grid; composes with the state data-f
+  document.querySelectorAll('.ach-rf').forEach(b=>b.onclick=(ev)=>{ ev.stopPropagation();
+    document.querySelectorAll('.ach-rf').forEach(x=>x.classList.toggle('on', x===b));
+    const g=document.querySelector('.ach-grid'); if(g){ if(b.dataset.r==='all') g.removeAttribute('data-r'); else g.setAttribute('data-r', b.dataset.r); } });
   // r387 (Wolf): the achievements WALL stays here as analytics (full grid, rarity,
   // progress) but SHOWCASE PICKING moved to the Profile page — this wall is now
   // display-only. The featured picks still render (the .feat class above), you just
