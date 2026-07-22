@@ -951,10 +951,42 @@ window.hkFrameEarned = function(id, u){
    extended prefs are set (keeps the column clean + old readers happy) and JSON only
    when the user has actually customized beyond the frame. Both are dependency-free. */
 window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy','saved','favkey','keys'];
+/* r393 (Wolf #79): CUSTOM TITLE SAFETY. A custom title is free text the analyst types, so
+   it needs a gate before it can ride the card. hkSafeTitle(raw) → {ok, clean, reason}:
+     · trims + collapses whitespace, strips control / zero-width / bidi / combining marks
+       (anti-zalgo), caps 2–18 chars, allows letters·numbers·space·& . ' -
+     · blocks profanity + platform/authority impersonation (substring, leet-normalized)
+     · blocks EXACT reserved titles/cosmetics so a custom title can't fake an earned one
+   Client-side only — advisory. A server trigger stays the real gate (same as handles). */
+(function(){
+  var SUB = ['fuck','shit','cunt','bitch','nigger','nigga','faggot','retard','rape','slut',
+    'whore','dick','cock','pussy','asshole','bastard','wank','twat','kike','spic','chink',
+    'tranny','nazi','hitler','pedo','molest','kkk',
+    'admin','moderator','staff','official','support','verified','hotkey','anthropic','claude'];
+  var EXACT = ['pro','analyst','crownholder','centurion','founder','charter','beta','owner',
+    'ceo','mod','system','root','bot','null','undefined'];
+  window.hkSafeTitle = function(raw){
+    var MIN = 2, MAX = 18;
+    if(raw == null) return {ok:false, clean:'', reason:'enter a title'};
+    var s = String(raw)
+      .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060\ufeff\u0300-\u036f]/g,'')
+      .replace(/\s+/g,' ').trim();
+    if(!s) return {ok:false, clean:'', reason:'enter a title'};
+    if(s.length < MIN) return {ok:false, clean:s, reason:'too short'};
+    if(s.length > MAX) return {ok:false, clean:s.slice(0,MAX), reason:'max '+MAX+' characters'};
+    if(!/^[A-Za-z0-9 &.'\-]+$/.test(s)) return {ok:false, clean:s, reason:'letters, numbers & spaces only'};
+    if(!/[A-Za-z]/.test(s)) return {ok:false, clean:s, reason:'needs a letter'};
+    var norm = s.toLowerCase().replace(/[0@]/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e')
+      .replace(/\$/g,'s').replace(/[^a-z]/g,'');
+    for(var i=0;i<SUB.length;i++){ if(norm.indexOf(SUB[i])>=0) return {ok:false, clean:s, reason:'let’s keep it clean'}; }
+    for(var j=0;j<EXACT.length;j++){ if(norm===EXACT[j]) return {ok:false, clean:s, reason:'that title is reserved'}; }
+    return {ok:true, clean:s, reason:''};
+  };
+})();
 window.hkFlair = function(raw){
   const FR = window.HK_FRAMES || [];
   const validFrame = id => id && /^[a-z0-9_-]{1,32}$/i.test(id) && FR.some(f=>f.id===id) ? id : null;
-  const def = { frame:null, show:{rank:true, level:true, streak:true, desk:false}, stats:[], title:null };
+  const def = { frame:null, show:{rank:true, level:true, streak:true, desk:false}, stats:[], title:null, customTitle:null };
   if(raw==null || raw==='') return def;
   const s = String(raw).trim();
   if(s.charAt(0) === '{'){
@@ -964,12 +996,16 @@ window.hkFlair = function(raw){
       if(o.sh && typeof o.sh==='object'){ ['rank','level','streak','desk'].forEach(k=>{ if(k in o.sh) show[k]=!!o.sh[k]; }); }
       const stats = Array.isArray(o.st) ? o.st.filter(k=>window.HK_STAT_KEYS.indexOf(k)>=0).slice(0,5) : [];
       const title = (typeof o.ti==='string' && /^[a-z0-9_-]{1,32}$/i.test(o.ti)) ? o.ti : null;
-      return { frame: validFrame(o.f), show, stats, title };
+      /* r393 (Wolf #79): a stored custom title is RE-VALIDATED on read — a blocklist that
+         grows, or a title saved before the filter existed, is caught at display time. */
+      let customTitle = null;
+      if(typeof o.tc==='string' && window.hkSafeTitle){ const v=window.hkSafeTitle(o.tc); if(v.ok) customTitle=v.clean; }
+      return { frame: validFrame(o.f), show, stats, title, customTitle };
     }
     return def;
   }
   // legacy bare frame id
-  return { frame: validFrame(s), show: Object.assign({}, def.show), stats: [], title: null };
+  return { frame: validFrame(s), show: Object.assign({}, def.show), stats: [], title: null, customTitle: null };
 };
 window.hkFlairPack = function(l){
   l = l || {};
@@ -977,15 +1013,19 @@ window.hkFlairPack = function(l){
   const show = l.show || {};
   const stats = Array.isArray(l.stats) ? l.stats.filter(k=>(window.HK_STAT_KEYS||[]).indexOf(k)>=0).slice(0,5) : [];
   const title = (l.title && /^[a-z0-9_-]{1,32}$/i.test(l.title)) ? l.title : null;
+  /* r393 (Wolf #79): a custom title is re-validated at pack time — never persist unsafe text */
+  let customTitle = null;
+  if(l.customTitle && window.hkSafeTitle){ const v=window.hkSafeTitle(l.customTitle); if(v.ok) customTitle=v.clean; }
   // does the loadout differ from the defaults? if not, keep it a bare id (or null).
   const shOff = ('rank' in show && !show.rank) || ('level' in show && !show.level) ||
                 ('streak' in show && !show.streak) || (!!show.desk);
-  if(!stats.length && !title && !shOff) return frame;   // clean bare-id path
+  if(!stats.length && !title && !customTitle && !shOff) return frame;   // clean bare-id path
   const o = { f: frame };
   if(shOff) o.sh = { rank: show.rank!==false?1:0, level: show.level!==false?1:0,
                      streak: show.streak!==false?1:0, desk: show.desk?1:0 };
   if(stats.length) o.st = stats;
   if(title) o.ti = title;
+  if(customTitle) o.tc = customTitle;
   return JSON.stringify(o);
 };
 /* Ornament HTML per frame — '' for frames that are pure CSS (bone). Corner SVGs

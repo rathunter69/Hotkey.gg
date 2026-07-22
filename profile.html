@@ -66,7 +66,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'profile';
 </script>
-<script src="themes.js?v=283"></script>
+<script src="themes.js?v=284"></script>
 <style>
   /* ============================================================
      PROFILE CUSTOMIZER — page-local classes. Loaded AFTER nav.css so the
@@ -164,6 +164,16 @@ window.NAV_ACTIVE = 'profile';
   .cz-chip.lock:hover{border-color:var(--line); color:var(--muted)}
   .cz-chip.pro{border-color:var(--warn); color:var(--warn)}
   .cz-statchip.on::before{content:"\2713 "}
+  /* r393 (Wolf #79): custom-title input — appears under the chips when CUSTOM is picked */
+  .cz-ctwrap{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:10px}
+  .cz-ctwrap[hidden]{display:none}
+  .cz-ctwrap input{flex:1 1 200px; min-width:0; font-family:var(--mono); font-size:12.5px; color:var(--text);
+    background:var(--bg); border:1px solid var(--line); border-radius:9px; padding:9px 12px; outline:none}
+  .cz-ctwrap input:focus{border-color:var(--accent-dim)}
+  .cz-ctsave{font-family:var(--mono); font-size:11.5px; font-weight:700; color:var(--on-accent,#0c0d0e);
+    background:var(--accent); border:none; border-radius:9px; padding:9px 16px; cursor:pointer}
+  .cz-ctsave:disabled{opacity:.4; cursor:default}
+  .cz-ctmsg{flex-basis:100%; font-family:var(--mono); font-size:10.5px; min-height:13px; color:var(--warn)}
 
   /* show-on-card pills with a sliding knob */
   .cz-pills{display:flex; flex-wrap:wrap; gap:10px}
@@ -546,7 +556,9 @@ async function load(){
   ];
   function titleChipsHtml(){
     return TITLES.map(t=>{
-      const on = (loadout.title||null)===(t.id||null);
+      /* r393 (Wolf #79): the CUSTOM chip lights when a custom title is set (it lives in
+         loadout.customTitle, not loadout.title) */
+      const on = t.pro ? !!loadout.customTitle : ((loadout.title||null)===(t.id||null) && !loadout.customTitle);
       const locked = !!t.locked;
       return '<button type="button" class="cz-chip'+(on?' on':'')+(locked?' lock':'')+(t.pro?' pro':'')+'" '+
         'data-title="'+(t.id==null?'':t.id)+'" data-locked="'+(locked?'1':'0')+'" data-pro="'+(t.pro?'1':'0')+'">'+
@@ -641,6 +653,13 @@ async function load(){
       '<div class="cz-sec">'+
         '<div class="cz-sechd"><span class="cz-lab">Title</span><span class="cz-manage" id="czTitleManage">MANAGE →</span></div>'+
         '<div class="cz-chips" id="czTitles">'+titleChipsHtml()+'</div>'+
+        /* r393 (Wolf #79): the CUSTOM chip reveals a safe free-text input (unlocked users);
+           hkSafeTitle validates live — length 2–18, no profanity, no staff/reserved impersonation. */
+        '<div class="cz-ctwrap" id="czCustomWrap"'+(loadout.customTitle?'':' hidden')+'>'+
+          '<input id="czCustomTitle" maxlength="18" autocomplete="off" spellcheck="false" placeholder="your title — 2–18 characters" value="'+esc(loadout.customTitle||'')+'">'+
+          '<button type="button" class="cz-ctsave" id="czCustomSave">set</button>'+
+          '<span class="cz-ctmsg" id="czCustomMsg"></span>'+
+        '</div>'+
       '</div>'+
 
       '<div class="cz-sec">'+
@@ -696,14 +715,50 @@ async function load(){
   { const tm=document.getElementById('czTitleManage');
     if(tm) tm.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Custom title'); }; }
   const titlesEl=document.getElementById('czTitles');
+  const czCustomWrap=document.getElementById('czCustomWrap');
+  const czCustomIn=document.getElementById('czCustomTitle');
+  const czCustomSave=document.getElementById('czCustomSave');
+  const czCustomMsg=document.getElementById('czCustomMsg');
+  /* r393 (Wolf #79): live-validate the custom title against hkSafeTitle. The card's title-notch
+     render lands in a later round; picking/typing persists through hkFlairPack now. */
+  function czValidateTitle(){
+    if(!czCustomIn) return {ok:false};
+    const raw=czCustomIn.value;
+    const v=(window.hkSafeTitle?window.hkSafeTitle(raw):{ok:false,reason:'unavailable',clean:''});
+    if(czCustomMsg){ czCustomMsg.textContent = raw.trim() ? (v.ok?'looks good ✓':v.reason) : '';
+      czCustomMsg.style.color = v.ok ? 'var(--accent)' : 'var(--warn)'; }
+    if(czCustomSave) czCustomSave.disabled = !v.ok;
+    return v;
+  }
+  function czCommitTitle(){
+    const v=czValidateTitle(); if(!v.ok) return;
+    loadout.customTitle=v.clean; loadout.title=null;
+    if(titlesEl) titlesEl.querySelectorAll('.cz-chip').forEach(x=>x.classList.toggle('on', x.dataset.pro==='1'));
+    saveFlair(); flash();
+    if(czCustomMsg){ czCustomMsg.textContent='saved ✓'; czCustomMsg.style.color='var(--accent)'; }
+  }
+  if(czCustomIn){ czCustomIn.oninput=czValidateTitle;
+    czCustomIn.onkeydown=(e)=>{ if(e.key==='Enter'){ e.preventDefault(); czCommitTitle(); } }; }
+  if(czCustomSave) czCustomSave.onclick=czCommitTitle;
+  if(loadout.customTitle) czValidateTitle();   // pre-fill state on open
   if(titlesEl) titlesEl.querySelectorAll('.cz-chip').forEach(b=>{
     b.onclick=()=>{
       if(b.dataset.locked==='1') return;
+      if(b.dataset.pro==='1'){
+        // CUSTOM: unlocked (beta/PRO) → reveal the safe input; otherwise the PRO upsell
+        if(betaOpen){
+          if(czCustomWrap) czCustomWrap.hidden=false;
+          titlesEl.querySelectorAll('.cz-chip').forEach(x=>x.classList.toggle('on', x===b));
+          if(czCustomIn){ czCustomIn.focus(); czValidateTitle(); }
+        } else if(window.hkProSheet){ try{ window.hkProSheet('Custom title'); }catch(e){} }
+        return;
+      }
+      // predefined title — switching away from custom clears it + hides the input
       loadout.title = b.dataset.title || null;
+      loadout.customTitle = null;
+      if(czCustomWrap) czCustomWrap.hidden=true;
       titlesEl.querySelectorAll('.cz-chip').forEach(x=>x.classList.toggle('on', (x.dataset.title||'')===(loadout.title||'')));
-      if(b.dataset.pro==='1' && window.hkProSheet){ try{ window.hkProSheet('Custom title'); }catch(e){} }
       saveFlair(); flash();
-      // NOTE: the card's title-notch render lands in a later round — the pick is persisted now.
     };
   });
 
