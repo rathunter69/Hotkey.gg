@@ -1639,7 +1639,7 @@
       <span style="position:relative; display:inline-flex">
         <button class="mb-tool" id="soundToggle" title="key sounds — click to cycle">🔊</button>
       </span>
-      <button class="mb-tool" id="fsToggle" data-tip="fullscreen — reclaims the browser bars so the sheet gets bigger cells (Esc to exit)"><svg class="mb-ico" id="fsIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>full</button>
+      <button class="mb-tool mb-icon" id="fsToggle" data-tip="fullscreen — hides the site header so the sheet gets bigger cells (Esc to exit)"><svg class="mb-ico" id="fsIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       <span style="position:relative; display:inline-flex">
       <button class="mb-tool" id="wqBtn" style="display:none" data-tip="PRO — the site builds your session: slowest vs par, never-cleared, gone-stale drills first">&#x25c8; weakness</button><!-- r302 (Wolf): OFF the bar — one tight row of critical controls -->
       <div class="prefs-pop" id="wqPop" style="min-width:300px; flex-direction:column; gap:4px"></div>
@@ -11855,7 +11855,7 @@ function updateFsBtn(){ const b=$('fsToggle'); if(!b) return;
   const ico=$('fsIco'); if(ico) ico.innerHTML = on
     ? '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>'   // inward arrows = "exit"
     : '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>';  // outward arrows = "enter"
-  b.lastChild && b.lastChild.nodeType===3 ? (b.lastChild.textContent = on?'exit':'full') : null;
+  b.setAttribute('data-tip', on ? 'exit fullscreen (Esc)' : 'fullscreen — hides the site header so the sheet gets bigger cells (Esc to exit)');
 }
 function toggleFullscreen(){
   try{
