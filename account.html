@@ -73,15 +73,41 @@
      ≥1080px. Cards pair off at half width and the rowline middles collapse with
      them; the title card and the frame gallery keep the full row. One column again
      below 1080px, where the cards were already dense. */
-  @media(min-width:1080px){
-    /* r393 (Wolf: "no big gaps"): the 2-up GRID paired cards by row, so a short card beside a
-       tall one (Your desk vs Certificates · Data vs the Appearance theme grid) left a dead
-       vertical gap under the short one. Masonry via CSS columns packs cards top-to-bottom and
-       balances the two columns, so there are no row gaps. The title card + state span both. */
-    #root{column-count:2; column-gap:16px}
-    #root > .card{break-inside:avoid; margin:0 0 16px; min-width:0}
-    #root > .span2, #root > .state{column-span:all}
+  /* r393 (Wolf): the account leads with the REAL player card as a left-side block ("people see
+     their super cool card and are less ready to cancel"); the admin sections fill the right;
+     Delete account is pinned full-width at the very bottom. Two explicit balanced columns. */
+  /* r395 (Wolf): flush rows, not a masonry. Each .acc-row is a flex pair whose cards
+     stretch to equal height, so every object's top and bottom line up with its neighbour's
+     and nothing sits as a tall standalone column. Rows wrap to one column under 1024px. */
+  #root{display:block}
+  .acc-row{display:flex; gap:16px; align-items:stretch; margin-bottom:16px}
+  .acc-row .card{margin:0}
+  .acc-grow{flex:1 1 320px; min-width:0}
+  .acc-stack{flex:1 1 320px; min-width:0; display:flex; flex-direction:column; gap:16px}
+  .acc-stack > .card{flex:1; margin:0}
+  @media(max-width:1023px){
+    .acc-row{flex-wrap:wrap}
+    .acc-cardblock, .acc-grow, .acc-stack{flex:1 1 100%}
   }
+  /* the player-card block (card + buttons + member-since) */
+  .acc-cardblock{flex:0 0 462px; display:flex; flex-direction:column; align-items:center; gap:12px; margin:0}
+  .acc-card{width:100%; max-width:462px; background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden}
+  .acc-card.pc-bare{background:transparent; border:0; overflow:visible}
+  .acc-card .uc{padding:22px 24px 20px; border-radius:16px}
+  .acc-cardbtns{display:flex; gap:10px; width:100%; max-width:462px}
+  .acc-cardbtns .btn{flex:1; margin:0; text-align:center}
+  .acc-since{font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:.04em; margin-top:auto}
+  .acc-delete{margin-top:0}
+  .acc-certs{border-color:var(--accent-dim)}
+  .acc-certs h4{color:var(--accent)}
+  .cert-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  @media(max-width:720px){ .cert-grid{grid-template-columns:1fr} }
+  .cert-tile{background:var(--surface2); border:1px solid var(--line); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:9px}
+  .cert-tile.done{border-color:var(--accent-dim)}
+  .cert-tile .t{font-size:13px; font-weight:600; line-height:1.3}
+  .cert-tile .bar{height:7px; background:var(--bg); border-radius:99px; overflow:hidden}
+  .cert-tile .bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
+  .cert-tile .meta{display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:auto}
   .rank-emblem{}
   .emblem-max{}
   /* form bits */
@@ -95,7 +121,12 @@
   .btn.ghost{background:transparent; color:var(--muted); border:1px solid var(--line)}
   .btn.danger{background:transparent; color:var(--bad); border:1px solid var(--bad)}
   .msg{font-family:var(--mono); font-size:12px; min-height:16px; margin-top:8px}
-  .rowline{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--mono); font-size:13px; padding:6px 0; border-bottom:1px dashed var(--line)}
+  /* r393 (Wolf): the rowlines stretched label-left / value-right across the wide right cards,
+     leaving a dead horizontal middle. Group them left (label, then value) so each row is tight;
+     .rowline.spread opts back into edge-to-edge for the few rows that want a right-pinned action. */
+  .rowline{display:flex; justify-content:flex-start; align-items:baseline; gap:16px; font-family:var(--mono); font-size:13px; padding:6px 0; border-bottom:1px dashed var(--line)}
+  .rowline .k{min-width:150px}
+  .rowline.spread{justify-content:space-between; gap:12px}
   .rowline:last-child{border-bottom:none}
   .rowline .k{color:var(--muted); font-size:11.5px}
   .state{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:38px 28px; text-align:center;
@@ -155,7 +186,7 @@ async function load(){
   let prof={handle:'',team_code:null}, runs=[];
   try{
     const [p,r] = await Promise.all([
-      sb.from('profiles').select('handle,team_code,flair,show_school,school_tag,digest_optout').eq('id',me.id).single(),
+      sb.from('profiles').select('handle,team_code,flair,show_school,school_tag,digest_optout,featured_ach').eq('id',me.id).single(),
       sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
     ]);
     if(p.data) prof=p.data; runs=r.data||[];
@@ -172,117 +203,137 @@ async function load(){
   /* r393 (Wolf): the hero had a dead middle — identity left, stats far right. A 5th tile
      (streak) widens the strip so it reads across, not pinned to the edge. */
   let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
-  const t10 = (st && (st.t10!=null)) ? st.t10 : null;
 
-  /* r387 (Wolf): card cosmetics — frames, showcase, the whole loadout — moved to the
-     dedicated Profile page. Account is now pure admin (identity, email, plan, security,
-     data, deletion). The overview card below is a plain identity strip, no skin. */
+  /* r393 (Wolf): the account leads with the REAL player card (the one profile/leaderboard show)
+     as a left-side block — "people see their super cool card and are less ready to cancel."
+     Same unified component (hkPlayerCard) + skin + medals as everywhere else. */
+  const cardFlair = (window.hkFlair ? window.hkFlair(prof.flair).frame : null);
+  const cardIsSkin = !!(cardFlair && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===cardFlair));
+  let cardMedals=[];
+  try{ const AC=window.HOTKEY_ACHIEVEMENTS;
+    let picks=[]; if(prof.featured_ach!=null) picks=String(prof.featured_ach).split(',').filter(Boolean);
+    if(!picks.length){ try{ picks=JSON.parse(localStorage.getItem('hk_feat_ach')||'[]'); }catch(e){} }
+    const byId={}; (AC||[]).forEach(a=>byId[a.id]=a);
+    cardMedals=picks.map(id=>byId[id]).filter(Boolean).slice(0,5).map(a=>({glyph:a.glyph,name:a.name,size:30,
+      rarity:window.hkEffRarity?window.hkEffRarity(a.tier):undefined}));
+  }catch(e){}
+  let cardTags='';
+  try{ if(prof.show_school && prof.school_tag){ const nm=((window.schoolResolve&&window.schoolResolve(prof.school_tag))||{}).name||prof.school_tag;
+      cardTags+='<span class="uc-tag">'+(window.schoolChip?window.schoolChip(prof.school_tag,20):'')+'<span>'+esc(nm)+'</span></span>'; }
+    if(prof.team_code) cardTags+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+esc(prof.team_code)+'</span></span>';
+  }catch(e){}
+  const playerCard = window.hkPlayerCard ? window.hkPlayerCard({
+    name: prof.handle||'set a handle', show:(window.hkFlair?window.hkFlair(prof.flair).show:undefined),
+    tierEmblem: window.rankEmblem?window.rankEmblem(tier.name,60,tier.bucket):'',
+    tierChipEmblem: window.rankEmblem?window.rankEmblem(tier.name,15,tier.bucket):'',
+    tierLabel: tier.full||(tier.name+(tier.bucket?' · '+tier.bucket:'')),
+    lvl:L.lvl, pct:L.pct, xpLine:L.into+' / '+L.need+' xp',
+    stats:[{n:st.crowns,label:st.crowns===1?'crown':'crowns'},{n:st.pod,label:'podiums'},
+      {n:st.att+'/'+D.menuOrder.length,label:'drills'},{n:mine.length,label:'clean solves'},
+      {n:(streakN?'🔥 '+streakN:'—'),label:'streak'}],
+    tagsHtml:cardTags, medals:cardMedals, medalSlots:5, boards:[], flair:cardFlair, owner:true
+  },{scale:'full'}) : '';
 
   root.innerHTML = `
-    <div class="card tc span2">
-      <div class="tc-top">
-        <span class="tc-emblem" style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,48,tier.bucket):''}</span>
-        <div>
-          <div class="tc-name">${esc(prof.handle||'set a handle')}</div>
-          <span class="pc-tier ${tier.cls}" style="margin-top:4px">${/* r374: chip layout+gap live on .pc-tier (nav.css); 16 = the chip scale (was an eyeballed 13) */''}${window.rankEmblem?window.rankEmblem(tier.name,16):''}<span>${tier.name}${tier.bucket?' · '+tier.bucket:''}</span></span>
+    <div class="acc-row acc-hero">
+      <div class="acc-cardblock">
+        <div class="acc-card${cardIsSkin?' pc-bare':''}">${playerCard}</div>
+        <div class="acc-cardbtns">
+          <a class="btn" href="profile.html">&#x270e; Customize card</a>
+          <a class="btn ghost" href="index.html">Keep training &rarr;</a>
         </div>
-        ${prof.team_code?`<span class="tc-team">${esc(prof.team_code)}</span>`:''}
-        <div class="tc-stats">${/* r383: the tc-sub counters, promoted to the dead right (same numbers) */''}
-          <span class="tc-stat"><b>${st.crowns}</b><span>crown${st.crowns===1?'':'s'}</span></span>
-          <span class="tc-stat"><b>${st.pod}</b><span>podiums</span></span>
-          <span class="tc-stat"><b>${st.att}/${D.menuOrder.length}</b><span>drills</span></span>
-          <span class="tc-stat"><b>${mine.length}</b><span>clean solves</span></span>
-          <span class="tc-stat"><b>${streakN?'🔥 '+streakN:'—'}</b><span>day streak</span></span>
-        </div>
+        <div class="acc-since">member since ${joined}</div>
       </div>
-      <div class="tc-meta">
-        <span class="tc-lvl">${window.hkLevelChip?window.hkLevelChip(L.lvl,24):''} LVL ${L.lvl}</span>
-        <span class="tc-bar"><i style="width:${L.pct}%"></i></span>
-        <span style="font-size:11px;color:var(--muted)">${L.into}/${L.need} xp</span>
+
+      <div class="card acc-grow"><h4>Profile</h4>
+        <label style="margin-top:0">handle &mdash; how you appear on every board</label>
+        <input id="acHandle" maxlength="24" value="${esc(prof.handle||'')}" placeholder="pick a handle &mdash; letters, numbers, underscores">
+        <button class="btn" id="acHandleSave">Save handle</button>
+        <a id="acHandleSugg" style="font-family:var(--mono);font-size:11.5px;color:var(--accent);cursor:pointer;margin-left:10px">&#x2684; suggest one</a>
+        <div class="msg" id="acHandleMsg"></div>
+        <div id="schoolRow" style="margin-top:10px"></div>
+        <label>theme</label>
+        <select id="acThemeSel" aria-label="theme" style="width:auto;min-width:220px;max-width:100%;font-family:var(--mono);font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;cursor:pointer"></select>
       </div>
-      <div class="tc-sub">member since ${joined} · <a href="profile.html" style="color:var(--accent);text-decoration:none">✎ customize your card on your profile ↗</a></div>
     </div>
 
-    <div class="card" id="desk"><h4>Your desk</h4>
-      <div id="deskBody"><div class="msg">loading\u2026</div></div>
+    <div class="card acc-certs"><h4>Certificate progress</h4>
+      <div id="certBody"><div class="msg">loading&hellip;</div></div>
     </div>
 
-    <div class="card" id="certs"><h4>Certificates</h4>
-      <div id="certBody"><div class="msg">loading\u2026</div></div>
+    <div class="acc-row">
+      <div class="card acc-grow"><h4>Email &amp; notifications</h4>
+        <div class="rowline"><span class="k">email</span><span>${esc(me.email||'-')}</span></div>
+        <div class="rowline"><span class="k">weekly recap email</span>
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+            <input type="checkbox" id="acRecap" style="width:auto;accent-color:var(--accent)"> <span id="acRecapL">off</span>
+          </label></div>
+        <div class="rowline"><span class="k">streak nudge email</span>
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+            <input type="checkbox" id="acStreak" style="width:auto;accent-color:var(--accent)"> <span id="acStreakL">off</span>
+          </label></div>
+        <div class="rowline"><span class="k">certificate email</span>
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+            <input type="checkbox" id="acCerts" style="width:auto;accent-color:var(--accent)"> <span id="acCertsL">on</span>
+          </label></div>
+        <div class="rowline"><span class="k">weekly desk digest</span>
+          <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
+            <input type="checkbox" id="acDigest" ${prof.digest_optout?'':'checked'} style="width:auto;accent-color:var(--accent)"> <span>Monday desk digest</span>
+          </label></div>
+      </div>
+
+      <div class="card acc-grow"><h4>Security</h4>
+        <label style="margin-top:0">password</label>
+        <button class="btn" id="acPwReset" style="margin:0">Email me a reset link</button>
+        <div class="msg" id="acPwMsg"></div>
+        <label>sessions</label>
+        <button class="btn ghost" id="acSignoutAll" style="margin:0">Sign out of all devices</button>
+        <label>new password (8+ characters)</label>
+        <input id="acP1" type="password" autocomplete="new-password">
+        <label>confirm</label>
+        <input id="acP2" type="password" autocomplete="new-password">
+        <button class="btn" id="acPassSave">Update password</button><div class="msg" id="acPassMsg"></div>
+      </div>
     </div>
 
-    <div class="card"><h4>Profile</h4>${/* r383: the email address + inbox toggles moved to their own Email card — this card is handle + colors, its half-grid partner */''}
-      <label>handle — how you appear on every board</label>
-      <input id="acHandle" maxlength="24" value="${esc(prof.handle||'')}" placeholder="pick a handle \u2014 letters, numbers, underscores">
-      <button class="btn" id="acHandleSave">Save handle</button>
-      <a id="acHandleSugg" style="font-family:var(--mono);font-size:11.5px;color:var(--accent);cursor:pointer;margin-left:10px">&#x2684; suggest one</a>
-      <div class="msg" id="acHandleMsg"></div>
-      <div id="schoolRow" style="margin-top:10px"></div>
+    <div class="acc-row">
+      <div class="card acc-grow" id="desk"><h4>Your desk</h4>
+        <div id="deskBody"><div class="msg">loading&hellip;</div></div>
+      </div>
+
+      <div class="card acc-grow"><h4>Your plan</h4>
+        <div class="rowline"><span class="k">plan</span><span style="font-family:var(--mono)"><b style="color:var(--warn)">PRO</b> &middot; free during beta</span></div>
+        <div class="rowline"><span class="k">at launch</span><span style="font-family:var(--mono);font-size:11.5px;color:var(--muted)">beta players lock in founder pricing</span></div>
+        <div style="margin-top:10px"><button class="btn ghost" id="proSheetBtn" style="margin:0">See what comes with PRO</button></div>
+      </div>
     </div>
 
-    <div class="card"><h4>Email</h4>
-      <div class="rowline"><span class="k">email</span><span>${esc(me.email||'—')}</span></div>
-      <div class="rowline"><span class="k">weekly recap email</span>
-        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
-          <input type="checkbox" id="acRecap" style="width:auto;accent-color:var(--accent)"> <span id="acRecapL">off</span>
-        </label></div>
-      <div class="rowline"><span class="k">streak nudge email</span>
-        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
-          <input type="checkbox" id="acStreak" style="width:auto;accent-color:var(--accent)"> <span id="acStreakL">off</span>
-        </label></div>
-      <div class="rowline"><span class="k">certificate email</span>
-        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:12.5px">
-          <input type="checkbox" id="acCerts" style="width:auto;accent-color:var(--accent)"> <span id="acCertsL">on</span>
-        </label></div>
+    <div class="acc-row">
+      <div class="card acc-grow"><h4>Data</h4>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Your runs live on the server under this account. Local device data (PBs cache, streak, achievement flags) can be exported or cleared.</div>
+        <button class="btn ghost" id="acExport">Export local data</button>
+        <button class="btn ghost" id="acClearLocal" style="margin-left:8px">Clear local cache</button>
+        <div class="msg" id="acDataMsg"></div>
+      </div>
+
+      <div class="card acc-grow" id="betaTools"><h4>Beta tools <span style="color:var(--faint);font-size:9px">testing only &mdash; removed at launch</span></h4>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Bypass the LVL-10 ranked gate so you can test ranked without grinding. Cosmetic only &mdash; your real rating and boards are untouched.</div>
+        <button class="btn ghost" id="devRanked">Unlock ranked gate (test)</button>
+        <button class="btn ghost" id="devRankedOff" style="margin-left:8px">Reset</button>
+        <div class="msg" id="devMsg"></div>
+      </div>
     </div>
 
-    <div class="card"><h4>Data</h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Your runs live on the server under this account. Local device data (PBs cache, streak, achievement flags) can be exported or cleared.</div>
-      <div class="rowline" style="margin-bottom:8px"><span class="k">weekly desk digest</span>
-        <label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px">
-        <input type="checkbox" id="acDigest" ${prof.digest_optout?'':'checked'}> email me Monday desk standings &amp; quests</label></div>
-      <button class="btn ghost" id="acExport">Export local data</button>
-      <button class="btn ghost" id="acClearLocal" style="margin-left:8px">Clear local cache</button>
-      <div class="msg" id="acDataMsg"></div>
-    </div>
-
-    <div class="card"><h4>Appearance</h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Theme applies everywhere, instantly — it also lives on the top bar.</div>
-      <select id="acThemeSel" aria-label="theme" style="width:auto;min-width:220px;max-width:100%;font-family:var(--mono);font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;cursor:pointer"></select>
-    </div>
-
-    <div class="card"><h4>Your plan</h4>
-      <div class="rowline"><span class="k">plan</span><span style="font-family:var(--mono)"><b style="color:var(--warn)">PRO</b> · free during beta</span></div>
-      <div class="rowline"><span class="k">at launch</span><span style="font-family:var(--mono);font-size:11.5px;color:var(--muted)">beta players lock in founder pricing</span></div>
-      <div style="margin-top:10px"><button class="btn ghost" id="proSheetBtn" style="margin:0">See what comes with PRO</button></div>
-    </div>
-
-    <div class="card" id="betaTools"><h4>Beta tools <span style="color:var(--faint);font-size:9px">testing only — removed at launch</span></h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Bypass the LVL-10 ranked gate so you can test ranked without grinding. Cosmetic only — your real rating and boards are untouched.</div>
-      <button class="btn ghost" id="devRanked">Unlock ranked gate (test)</button>
-      <button class="btn ghost" id="devRankedOff" style="margin-left:8px">Reset</button>
-      <div class="msg" id="devMsg"></div>
-    </div>
-
-    <div class="card"><h4>Security</h4>
-      <div class="rowline"><span class="k">password</span><span><button class="btn" id="acPwReset" style="margin:0">Email me a reset link</button></span></div>
-      <div class="msg" id="acPwMsg"></div>
-      <div class="rowline" style="margin-top:10px;margin-bottom:12px"><span class="k">sessions</span><span><button class="btn ghost" id="acSignoutAll" style="margin:0">Sign out of all devices</button></span></div>
-      <label>new password (8+ characters)</label>
-      <input id="acP1" type="password" autocomplete="new-password">
-      <label>confirm</label>
-      <input id="acP2" type="password" autocomplete="new-password">
-      <button class="btn" id="acPassSave">Update password</button><div class="msg" id="acPassMsg"></div>
-    </div>
-
-    <div class="card" style="border-color:var(--bad)"><h4 style="color:var(--bad)">Delete account</h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.7">Permanent. Your profile, runs, boards entries, desk membership, and analytics are erased immediately. If you\u2019re a desk staffer, the desk passes to the longest-tenured analyst first. This cannot be undone.</div>
+    <div class="card acc-delete" style="border-color:var(--bad)"><h4 style="color:var(--bad)">Delete account</h4>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.7">Permanent. Your profile, runs, boards entries, desk membership, and analytics are erased immediately. If you&rsquo;re a desk staffer, the desk passes to the longest-tenured analyst first. This cannot be undone.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <input id="delConfirm" placeholder="type DELETE to confirm" autocomplete="off" style="width:220px">
         <button class="btn danger" id="acDelete" style="margin:0">Delete my account</button>
       </div>
       <div class="msg" id="acDelMsg"></div>
     </div>`;
+  /* r393: animate the card skin (particles) like every other surface that shows the card */
+  try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(root)); }catch(e){}
 
   const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--bad)':'var(--accent)'; } };
   // r81: security + appearance wiring
@@ -379,19 +430,17 @@ async function load(){
       (data||[]).forEach(r=>have.add(r.challenge)); }catch(e){}
     try{ const {data}=await sb.from('certificates').select('id,track').eq('user_id', me.id);
       (data||[]).forEach(c=>certs[c.track]=c.id); }catch(e){}
-    el.innerHTML = window.HK_TRACKS.map(t=>{
+    el.innerHTML = '<div class="cert-grid">'+window.HK_TRACKS.map(t=>{
       const n=t.keys.filter(k=>have.has(k)).length, N=t.keys.length, done=certs[t.id];
       const pct=Math.round(100*n/N);
-      return `<div class="rowline" style="align-items:center; gap:12px">
-        <span style="min-width:0"><b style="font-size:13.5px">${esc(t.name)}</b>
-          <span class="k" style="display:block">${done?'certified \u2713':n+' / '+N+' drills posted clean'}</span></span>
-        <span class="tc-bar" style="max-width:130px"><i style="width:${pct}%"></i></span>
-        ${done
-          ? `<a class="btn ghost" style="margin:0; padding:7px 14px" href="cert.html?id=${done}" target="_blank" rel="noopener">view \u2192</a>`
-          : `<span style="font-family:var(--mono); font-size:12px; color:var(--muted); white-space:nowrap">${pct}%</span>`}
-      </div>`;
-    }).join('') +
-    '<div style="font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:10px; line-height:1.7">A track certifies when every drill in it has a clean recorded run (no mouse, no guided). Certificates are public, verifiable pages with one-click \u201cAdd to LinkedIn.\u201d</div>';
+      return '<div class="cert-tile'+(done?' done':'')+'">'+
+        '<span class="t">'+esc(t.name)+'</span>'+
+        '<span class="bar"><i style="width:'+pct+'%"></i></span>'+
+        '<span class="meta"><span>'+(done?'certified':n+' / '+N+' clean')+'</span>'+
+        (done?'<a href="cert.html?id='+done+'" target="_blank" rel="noopener" style="color:var(--accent)">view &rarr;</a>':'<b style="color:var(--text)">'+pct+'%</b>')+
+        '</span></div>';
+    }).join('')+'</div>'+
+    '<div style="font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:12px; line-height:1.7">A track certifies when every drill in it has a clean recorded run (no mouse, no guided). Certificates are public, verifiable pages with one-click Add-to-LinkedIn.</div>';
   }
   renderCerts();
   /* r360/r370: email prefs — three toggles, one pattern; degrades silently until
@@ -478,14 +527,13 @@ async function load(){
     function render(){
       const chip = (tag && window.schoolChip) ? window.schoolChip(tag,22) : '';
       row.innerHTML =
-        '<div class="rowline" style="align-items:center"><span class="k">school</span>'+
-        '<span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end">'+
-          (tag ? '<span style="display:flex;gap:7px;align-items:center">'+chip+'<b style="font-family:var(--mono);font-size:12.5px">'+esc(nmeOf(tag))+'</b></span>'
-               : '<span style="font-family:var(--mono);font-size:12px;color:var(--faint)">not set</span>')+
-          '<button class="btn ghost" id="schChange" style="margin:0;padding:4px 11px;font-size:11px">'+(pickerOpen?'done':(tag?'change':'pick your school'))+'</button>'+
-          '<label style="font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;white-space:nowrap">'+
-          '<input type="checkbox" id="showSchool" style="width:auto" '+(prof.show_school?'checked':'')+'> show on card &amp; boards</label>'+
-        '</span></div>'+
+        '<label style="margin-top:12px">school</label>'+
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">'+
+          (tag ? '<span style="display:flex;gap:7px;align-items:center">'+chip+'<b style="font-family:var(--mono);font-size:13px">'+esc(nmeOf(tag))+'</b></span>'
+               : '<span style="font-family:var(--mono);font-size:12px;color:var(--faint)">not set yet</span>')+
+          '<a id="schChange" style="font-family:var(--mono);font-size:11.5px;color:var(--accent);cursor:pointer">'+(pickerOpen?'done':(tag?'change':'pick your school'))+'</a>'+
+        '</div>'+
+        '<label style="font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;margin:0"><input type="checkbox" id="showSchool" style="width:auto" '+(prof.show_school?'checked':'')+'> show on card &amp; boards</label>'+
         '<div id="schPickerMount" style="margin-top:'+(pickerOpen?'10px':'0')+'"></div>';
       const cb=document.getElementById('showSchool');
       if(cb) cb.onchange=async()=>{ try{ await sb.from('profiles').update({show_school:cb.checked}).eq('id',me.id);
