@@ -170,7 +170,7 @@ async function load(){
   // r122: opt-in school chips (v1.5) — tag derives server-side from the auth email
   window.__schoolOf={}; profs.forEach(p=>{ if(p.show_school&&p.school_tag) window.__schoolOf[p.id]=p.school_tag; });
   // r135: featured-achievement picks (cosmetic, curated on the stats page)
-  window.__featOf={}; profs.forEach(p=>{ if(p.featured_ach) window.__featOf[p.id]=String(p.featured_ach).split(',').filter(Boolean).slice(0,3); });
+  window.__featOf={}; profs.forEach(p=>{ if(p.featured_ach) window.__featOf[p.id]=String(p.featured_ach).split(',').filter(Boolean).slice(0,5); });
   // section leaders: fastest clean run on each advanced section's flagship.
   // runs arrive time-sorted asc, so first hit per drill IS the leader.
   const SECTION_FLAGSHIPS=[['Full Builds','threestmt','tie the three statements'],
@@ -501,18 +501,17 @@ function showPublicCard(uid){
       (DATA.fSessions||[]).filter(x=>x.user_id===uid));
     const L=levelOf(xp); lvl=L.lvl; pct=L.pct; xpLine=L.into+' / '+L.need+' xp';
   }catch(e){}
-  // featured medals -> the .uc-ach spans (hkPlayerCard wraps them in .uc-ach)
-  const achHtml=(function(){
+  // r387: featured medals -> a medals ARRAY; hkPlayerCard fills 5 slots + placeholders.
+  // lb has no live global %, so rarity falls back to each feat's static difficulty tier.
+  const medals=(function(){
     try{
       const AC=window.HOTKEY_ACHIEVEMENTS; const picks=(window.__featOf||{})[uid];
-      if(!AC||!picks||!picks.length||!window.hkBadge) return '';
+      if(!AC||!picks||!picks.length) return [];
       const byId={}; AC.forEach(a=>byId[a.id]=a);
-      const items=picks.map(id=>byId[id]).filter(Boolean);
-      if(!items.length) return '';
-      return items.map(a=>
-        '<span title="'+esc(a.name)+' — '+esc(a.desc)+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--mono);font-size:8.5px;color:var(--muted);max-width:72px;text-align:center">'+
-        window.hkBadge(a.glyph,true,34)+'★ '+esc(a.name)+'</span>').join('');
-    }catch(e){ return ''; }
+      return picks.map(id=>byId[id]).filter(Boolean).slice(0,5).map(a=>({
+        glyph:a.glyph, name:a.name, size:30,
+        rarity: window.hkEffRarity ? window.hkEffRarity(a.tier) : undefined }));
+    }catch(e){ return []; }
   })();
   const schoolTag=(window.__schoolOf||{})[uid];
   const schoolBit=schoolTag?'<span style="display:flex;align-items:center;gap:6px;color:var(--muted)">'+schoolChipByUid(uid,15)+esc((window.schoolResolve&&window.schoolResolve(schoolTag)||{}).name||schoolTag)+'</span>':'';
@@ -530,7 +529,7 @@ function showPublicCard(uid){
     lvl:lvl, pct:pct, xpLine:xpLine,
     stats:[{n:(st&&st.crowns)||0,label:'crowns'},{n:(st&&st.pod)||0,label:'podiums'},
       {n:(st&&st.t10)||0,label:'top-10s'},{n:(st&&st.att)||0,label:'boards'}],
-    achHtml:achHtml,
+    medals:medals, medalSlots:5,
     boards:best.slice(0,3).map(x=>({name:lab[x.k]||x.k, time:'#'+(x.i+1)+' · '+(x.ms/1000).toFixed(2)+'s of '+x.n})),
     footHtml:footHtml,
     flair:fv

@@ -403,6 +403,11 @@
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
         if(k && (/^sb-.*-auth-token$/.test(k) || k==='supabase.auth.token')) localStorage.removeItem(k); }
     }catch(e){}
+    // r387 (Wolf): the reactive SIGNED_OUT path clears storage but doesn't reload the
+    // trainer, so its in-memory progress (PB, streak, level) survived and the next
+    // guest solve inherited the old account's drills. Let the trainer zero its own
+    // in-memory state so a guest always starts from a clean slate, reload or not.
+    try{ if(window.__hkResetProgress) window.__hkResetProgress(); }catch(e){}
   }
   window.clearAccountUI = clearAccountUI;   // pages (index.html) share the same wipe on their own sign-out path
   // user state lands async — poll briefly, then give up quietly
@@ -669,8 +674,8 @@
               localStorage.setItem('hk_ach_seen', JSON.stringify([...new Set([...seen, ...earnedList.map(e=>e.a.id)])]));   /* r371: union — this surface can't evaluate every feat, so it must never shrink the list */
             }catch(e){}
             // r135: SHOWCASE — the player's picked medals lead (profiles.featured_ach,
-            // curated on the stats page); rarest-3 remains the fallback. The full grid
-            // moved to stats.html — the card stays a highlight reel.
+            // curated on the PROFILE page as of r387); rarest-3 remains the fallback.
+            // The full analytics grid still lives on stats.html — the card is a reel.
             let picks=[];
             try{ const meP2=(d._profs||[]).find(x=>x.id===window._navUser.id);
               if(meP2 && meP2.featured_ach!=null) picks=String(meP2.featured_ach).split(',').filter(Boolean); }catch(e){}
@@ -679,14 +684,15 @@
             const showcase = picks.map(id=>earnedById[id]).filter(Boolean).slice(0,3);
             const shown = showcase.length ? showcase : earnedList.slice(0,3);
             let out='<div class="pc-ach-h">achievements <span style="color:var(--faint)">'+earnedList.length+' / '+AC.length+'</span>'+
-              '<a href="stats.html#achievements" style="float:right;font-size:9.5px;color:var(--accent);text-decoration:none">'+(showcase.length?'edit showcase':'pick your showcase')+' \u2197</a></div>';
+              '<a href="profile.html#showcase" style="float:right;font-size:9.5px;color:var(--accent);text-decoration:none">'+(showcase.length?'edit showcase':'pick your showcase')+' \u2197</a></div>';
             if(shown.length){
               out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+shown.map(e=>
                 /* r150: the % is only honest at field scale \u2014 below that, speak in tier words */
                 '<span data-tip="'+e.a.name+' \u2014 '+e.a.desc+(function(){ const w=window.hkRarityTier?window.hkRarityTier(e.gp):null;
                   if(__fieldN>=20 && e.gp!==undefined) return ' \u00b7 '+e.gp+'% of players have this'+(w?' ('+w+')':'');
-                  return w?' \u00b7 '+w:''; })()+'" style="display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;max-width:76px">'+
-                (window.hkBadge?window.hkBadge(e.a.glyph,true,46,null,e.gp):'')+(showcase.length?'\u2605 ':'')+e.a.name+
+                  return w?' \u00b7 '+w:''; })()+'" style="display:inline-flex">'+
+                (window.hkMedalCard?window.hkMedalCard(e.a.glyph,e.gp,e.a.name,38)
+                  :(window.hkBadge?window.hkBadge(e.a.glyph,true,46,null,e.gp)+e.a.name:''))+
                 '</span>').join('')+'</div>';
             }
             out+='<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin:0 0 4px">full grid + progress on <a href="stats.html#achievements" style="color:var(--accent)">your numbers \u2192</a></div>';
@@ -739,62 +745,33 @@
     /* r376: plaque corners cut their gem from the bucket held at your best tier */
     const flairOrn = (__isFrame && window.hkFrameOrnaments)
       ? window.hkFrameOrnaments(__safeFlair, {bucket:(window.hkFrameBucket?window.hkFrameBucket():1), lg:true}) : '';
+    /* r386 round2: the owner card renders through the ONE unified component
+       (hkPlayerCard). The skin + ornaments ride the .pc-card shell (flairCls/flairOrn),
+       so we pass flair=null to the component to avoid a double frame; content sits on
+       the skin with no inner boxes. */
+    let __crowns=0,__pods=0; try{ (d.drills||[]).forEach(x=>{ if(x.rank===1)__crowns++; if(x.rank!==null&&x.rank<=3)__pods++; }); }catch(e){}
+    let __streak=0; try{ __streak=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+    const __promo=(tier.nextName && !tier.provisional && typeof tier.promote==='number') ? ' · '+tier.promote+'% to '+tier.nextName : (tier.provisional?' · placement':'');
+    const __pcCard = window.hkPlayerCard ? window.hkPlayerCard({
+      name: handle,
+      tierEmblem: (window.rankEmblem?window.rankEmblem(tier.name,60,tier.bucket):''),
+      tierChipEmblem: (window.rankEmblem?window.rankEmblem(tier.name,15,tier.bucket):''),
+      tierLabel: tier.name+' · '+standing,
+      lvl: __L.lvl, pct: __L.pct, xpLine: __L.into+' / '+__L.need+' xp'+__promo,
+      stats: [{n:(d.mySolves||0),label:'clean solves'},{n:__crowns,label:'crowns'},{n:__pods,label:'podiums'},{n:(__streak?'🔥 '+__streak:'—'),label:'streak'}],
+      achHtml: badgesHtml, boards: [], flair: null
+    },{scale:'full'}) : '';
     m.innerHTML = '<div class="pc-card'+flairCls+'">' + flairOrn +
       '<a class="pc-x" id="pcX">\u00d7</a>' +
-      '<div class="pc-head" style="margin-bottom:10px"><div class="pc-name" style="font-size:20px;letter-spacing:-.3px;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0">' + '<span>'+escHtml(handle)+'</span>' + mySchoolChip + (window.__hkNoHandle?' <a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a>':'') + '</div>' +
-      /* r382: one-click cosmetics — YOUR card carries the door to the frame gallery */
-      '<a class="pc-customize" id="pcCustomize" title="pick your card frame">\u270e customize</a></div>' +
-      /* r134: .pc-scroll wrapper — the v3 CSS (max-height 82vh + inner scroll) existed
-         but the renderer never emitted it, so long cards overflowed the frame */
-      '<div class="pc-scroll">' +
-      /* r70: RANK HERO — the crest gets real estate */
-      /* r72: rank + LEVEL live together — crest left, tier center, level+progress right */
-        /* r76: APEX-STYLE SHOWCASE — handle banner on top, two prominent circulars
-         side by side beneath (crest tile | level-ring tile), labels under each. */
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 14px">' +
-        '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
-          '<span style="display:inline-flex;line-height:0">'+(window.rankEmblem?window.rankEmblem(tier.name,96,tier.bucket):'')+'</span>' +
-          '<div class="pc-tier '+tier.cls+'" style="border:0;padding:0;font-size:13px;background:none;box-shadow:none">'+tier.name+'</div>' +
-          '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+standing+'</div>' +
-          /* r321 (Wolf): LP-style promotion progress \u2014 a slim bar + "N% to <next tier>", so the
-             climb is legible. Model-safe: promote is just where avgPct sits across this tier's band.
-             Hidden at the summit (no next tier) and while provisional (rank isn't final yet). */
-          ((tier.nextName && !tier.provisional && typeof tier.promote==='number') ?
-            '<div style="width:118px;margin-top:8px">' +
-              '<div style="height:6px;background:var(--surface);border:1px solid var(--line);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+Math.max(3,Math.min(100,tier.promote))+'%;background:var(--accent);border-radius:99px"></div></div>' +
-              '<div style="font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;margin-top:4px"><b style="color:var(--text)">'+tier.promote+'%</b> to '+escHtml(tier.nextName)+'</div>' +
-            '</div>'
-            : (tier.provisional ? '<div style="font-family:var(--mono);font-size:9px;color:var(--faint);margin-top:8px">placement \u2014 rank locks in as you play</div>'
-            : '<div style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-top:8px">\u265b top of the ladder</div>')) +
-          '<div class="pc-rankhow" style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:6px;cursor:pointer" title="how rank works">rank \u00b7 speed vs the field \u203a</div>' +
-        '</div>' +
-        '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:12px">' +
-          (window.hkLevelRing?window.hkLevelRing(__L.lvl, __L.pct, 84):'') +
-          '<div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)">LEVEL '+__L.lvl+'</div>' +
-          '<div style="font-family:var(--mono);font-size:10.5px;color:var(--muted)">'+__L.into+' / '+__L.need+' xp</div>' +
-          '<div style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:4px">level \u00b7 earned from reps</div>' +
-        '</div>' +
+      '<div class="pc-scroll">' + __pcCard +
+      (window.__hkNoHandle?'<div style="margin-top:10px;text-align:center"><a id="pcSetName" style="font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline">set your name</a></div>':'') +
+      '<div class="pc-rankhow" style="font-family:var(--mono);font-size:8.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:14px;cursor:pointer;text-align:center" title="how rank works">rank · speed vs the field ›</div>' +
+      '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);text-align:center;margin:8px 0 2px">the card downloads as a PNG · <a id="pcProThemes" style="color:var(--warn);cursor:pointer" data-tip="custom card themes land with PRO at launch">card themes — PRO</a></div>' +
       '</div>' +
-      badgesHtml +
-      (function(){
-        const xp = computeXP(d, d.myRuns, d.mySessions);
-        const L = levelOf(xp);
-        let crowns=0, podiums=0; d.drills.forEach(x=>{ if(x.rank===1) crowns++; if(x.rank!==null&&x.rank<=3) podiums++; });
-        let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
-        return ''+   /* r72: level row moved into the rank hero */
-        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;font-family:var(--mono);text-align:center">'+
-          '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+(d.mySolves||0)+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">clean solves</div></div>'+
-          '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:'+(crowns?'var(--warn)':'var(--text)')+'">'+crowns+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">crowns</div></div>'+
-          '<div style="background:var(--surface2);border-radius:10px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:var(--text)">'+(streakN?'\ud83d\udd25 '+streakN:'\u2014')+'</div><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">streak</div></div>'+
-        '</div>';
-      })() +
-      /* r70: drill-by-drill list retired from the card — stats page carries it */
-      /* r148: share row \u2014 the rank card is the proof artifact that leaves the product */
-      '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);text-align:center;margin:6px 0 2px">the card downloads as a PNG \u00b7 <a id="pcProThemes" style="color:var(--warn);cursor:pointer" data-tip="custom card themes land with PRO at launch">card themes \u2014 PRO</a></div>' +
-      '</div>' +
-      '<div class="pc-foot"><a href="leaderboard.html">full leaderboard \u2197</a><a id="pcShare">\u2b07 share your rank card</a><a id="pcClose">close</a></div>' +
+      '<div class="pc-foot"><a class="pc-customize" id="pcCustomize" title="pick your card frame">✎ customize card</a><a href="leaderboard.html">full leaderboard ↗</a><a id="pcShare">⬇ share</a><a id="pcClose">close</a></div>' +
       '</div>';
     const c = $('pcClose'); if(c) c.onclick = closeProfile;
+    const px = $('pcX'); if(px) px.onclick = closeProfile;   // r386: the corner ✕ closes too
     /* r309: the card's rank label opens the how-rank-works explainer */
     try{ const rh=m.querySelector('.pc-rankhow'); if(rh) rh.onclick=()=>{ closeProfile(); if(window.openRankInfo) window.openRankInfo(); else if(window.__openRankInfo) window.__openRankInfo(); }; }catch(e){}
     /* r150: the click TALKS BACK — Wolf hit a silent no-op and read it as broken */
@@ -815,7 +792,11 @@
        is the fast lane. Saving re-renders the OPEN card immediately: mutate the
        cached profile row, re-run renderProfile, and the frame is on before the
        gallery closes. */
-    const cz=$('pcCustomize'); if(cz) cz.onclick=()=>{ try{ openFrameGallery(); }catch(e){} };
+    /* r387: the ✎ now routes to the dedicated Profile page (the full loadout
+       customizer — frame, title, what-shows, medals, highlight stats) instead of the
+       in-modal frame-only gallery. openFrameGallery stays defined below as the legacy
+       quick-swap fallback (unused by default). */
+    const cz=$('pcCustomize'); if(cz) cz.onclick=()=>{ location.href='profile.html'; };
     try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(m)); }catch(e){}  // r385: card-skin particles (player card)
     function openFrameGallery(){
       const stale=document.getElementById('frameGallery'); if(stale) stale.remove();
@@ -953,6 +934,7 @@
           '<svg class="um-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</button>' +
         '<div class="user-dropdown" id="userDropdown" role="menu">' +
+          (anon ? '' : '<a href="profile.html" title="your player card, cosmetics &amp; showcase">Your profile</a>') +
           '<a href="stats.html">Your numbers</a>' +
           (anon ? '' : '<a href="desks.html" title="your desk\u2019s hall \u2014 quests, roster, standings">Your desk</a>') +
           saveItem +

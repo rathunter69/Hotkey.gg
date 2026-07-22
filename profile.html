@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile · hotkey.gg</title>
+<meta name="description" content="Your player card, cosmetics, and achievement showcase.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="hotkey.gg">
+<meta property="og:title" content="Profile · hotkey.gg">
+<meta property="og:description" content="Your player card, cosmetics, and achievement showcase.">
+<meta property="og:url" content="https://www.hotkey.gg/profile.html">
+<meta property="og:image" content="https://www.hotkey.gg/art/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Profile · hotkey.gg">
+<meta name="twitter:description" content="Your player card, cosmetics, and achievement showcase.">
+<meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
+<link rel="canonical" href="https://www.hotkey.gg/profile.html">
+<link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=174">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=174">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  html{scrollbar-gutter:stable}   /* r68: content filters change page height — without this the centered wrap jumps horizontally */
+  :root{
+    --bg:#292b31; --surface:#383b42; --surface2:#43474f; --line:#5a5e68;
+    --text:#f0f1ec; --muted:#a8adb3; --faint:#767d87;
+    --accent:#6ec9a0; --accent-dim:#4a8f72; --accent-glow:rgba(110,201,160,.2);
+    --warn:#d9a441; --bad:#c8533f;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Hanken Grotesk',system-ui,sans-serif;
+    --maxw:1180px;   /* r66: = game space */
+  }
+  *{margin:0; padding:0; box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px; position:relative; z-index:1}
+  a{color:inherit; text-decoration:none}
+  header.head{padding:12px 0 10px}   /* r67: flush with the game box */
+  h1{font-size:22px; font-weight:700; letter-spacing:-.4px}
+  main{padding-bottom:90px}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px 26px; margin-bottom:16px}
+  .card h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; margin-bottom:14px}
+  .state{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:38px 28px; text-align:center;
+    font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8}
+  .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
+  .state a.acc-cta{color:var(--on-accent,#0c0d0e)}   /* r297: the .state link rule was out-specifying the CTA — its label rendered accent-on-accent, invisible in every theme */
+  .acc-cta{display:inline-block; font-family:var(--mono); font-size:13px; text-decoration:none;
+    border:1px solid var(--accent); background:var(--accent); color:var(--on-accent,#0c0d0e); font-weight:700;
+    padding:10px 22px; border-radius:999px; margin:4px 6px; border-bottom:1px solid var(--accent)}
+  .acc-cta:hover{filter:brightness(1.08)}
+  .acc-cta.ghost{background:transparent; color:var(--accent); border-color:var(--accent-dim); font-weight:500}
+  .state a.acc-cta.ghost{color:var(--accent)}   /* r355: the r297 on-accent fix out-specified the ghost variant — 'Log in' rendered white-on-light, invisible */
+  .acc-cta.ghost:hover{background:var(--accent-glow)}
+</style>
+<link rel="stylesheet" href="nav.css?v=188">
+<script src="drills.js?v=275"></script>
+<script>
+const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
+window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+window.NAV_ACTIVE = 'profile';
+</script>
+<script src="themes.js?v=280"></script>
+<style>
+  /* ============================================================
+     PROFILE CUSTOMIZER — page-local classes. Loaded AFTER nav.css so the
+     .pc-card.pc-live overrides out-specify nav.css's owner-modal .pc-card rules.
+     All colors ride the theme tokens (--surface/--line/--accent/…) so the page
+     reads on the default daylight theme AND every dark theme. ============ */
+  /* the live card: the earned skin IS the surface — no nested box around .uc.
+     When a frame is equipped the .uc paints its own bg/border edge-to-edge;
+     with no frame the holder supplies a plain surface behind the transparent .uc. */
+  /* r387 (Wolf): preview at the REAL card size — the shareable leaderboard card is
+     min(430px, …), not the full page width. Centered so it reads as the actual card
+     others see, not a stretched banner. */
+  .pc-card.pc-live{background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    width:min(430px, 96vw); margin:0 auto 20px; padding:0; max-height:none; display:block; overflow:visible; position:relative}
+  .pc-card.pc-live .uc{padding:22px 24px 20px; border-radius:16px}
+  .pc-live-cap{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--faint); text-align:center; margin:-8px 0 18px}
+
+  .cz{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px 24px 24px}
+  .cz-h{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+  .cz h2{font-size:18px; font-weight:700; letter-spacing:-.3px}
+  .cz-saved{font-family:var(--mono); font-size:11px; color:var(--accent); opacity:0; transition:opacity .2s}
+  .cz-saved.show{opacity:1}
+  .cz-sub{font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.6; margin:6px 0 4px}
+
+  .cz-sec{padding:16px 0; border-top:1px dashed var(--line)}
+  .cz-sechd{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:12px}
+  .cz-lab{font-family:var(--mono); font-size:11px; font-weight:700; color:var(--muted);
+    text-transform:uppercase; letter-spacing:1.6px}
+  .cz-count{font-family:var(--mono); font-size:10px; color:var(--faint); text-transform:uppercase; letter-spacing:1.2px}
+  .cz-manage{font-family:var(--mono); font-size:10px; color:var(--accent); cursor:pointer;
+    letter-spacing:1px; text-transform:uppercase}
+  .cz-manage:hover{text-decoration:underline}
+
+  /* 1 — FRAME filmstrip */
+  .cz-strip{display:flex; gap:10px; overflow-x:auto; padding:4px 2px 12px}
+  .cz-strip::-webkit-scrollbar{height:8px}
+  .cz-strip::-webkit-scrollbar-track{background:transparent}
+  .cz-strip::-webkit-scrollbar-thumb{background:var(--line); border-radius:99px}
+  .cz-frame{flex:0 0 auto; width:106px; background:none; border:none; padding:0; cursor:pointer; text-align:center; color:inherit}
+  .cz-sw{display:block; height:62px; border-radius:10px; background:var(--bg); border:1px solid var(--line);
+    position:relative; overflow:hidden; margin-bottom:7px; transition:box-shadow .15s, border-color .15s}
+  .cz-frame:hover .cz-sw{border-color:var(--faint)}
+  .cz-frame.on .cz-sw{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent), 0 0 14px var(--accent-glow)}
+  .cz-frame.lock .cz-sw{filter:grayscale(.7) brightness(.5)}
+  .cz-lk{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:6}
+  /* mini-swatch ornament sizing (mirror of nav.css .fs-mini) — corners shrink,
+     tab/medallion/serial/glint hide so the swatch reads as a clean skin preview */
+  .cz-sw .hkf-cn{width:30px; height:30px}
+  .cz-sw .hkf-c1{top:-3px; left:-3px}
+  .cz-sw .hkf-c2{top:-3px; right:-3px}
+  .cz-sw .hkf-c3{bottom:-3px; left:-3px}
+  .cz-sw .hkf-c4{bottom:-3px; right:-3px}
+  .cz-sw .hkf-tab,.cz-sw .hkf-med,.cz-sw .hkf-serial,.cz-sw .hkf-sun,.cz-sw .hkf-glint{display:none}
+  .cz-sw canvas.hk-fx{opacity:.7}
+  .cz-fn{display:block; font-family:var(--mono); font-size:10px; font-weight:700; color:var(--muted);
+    line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .cz-frame.on .cz-fn{color:var(--accent)}
+  .cz-hint{font-family:var(--mono); font-size:10.5px; color:var(--muted); min-height:15px; margin-top:2px}
+
+  /* chips (titles + highlight stats) */
+  .cz-chips{display:flex; flex-wrap:wrap; gap:8px}
+  .cz-chip{font-family:var(--mono); font-size:11.5px; font-weight:600; color:var(--muted); background:var(--bg);
+    border:1px solid var(--line); border-radius:999px; padding:7px 14px; cursor:pointer; transition:all .15s}
+  .cz-chip:hover{border-color:var(--faint); color:var(--text)}
+  .cz-chip.on{color:var(--accent); border-color:var(--accent); background:var(--accent-glow); box-shadow:0 0 10px var(--accent-glow)}
+  .cz-chip.lock{opacity:.45; cursor:default}
+  .cz-chip.lock:hover{border-color:var(--line); color:var(--muted)}
+  .cz-chip.pro{border-color:var(--warn); color:var(--warn)}
+  .cz-statchip.on::before{content:"\2713 "}
+
+  /* show-on-card pills with a sliding knob */
+  .cz-pills{display:flex; flex-wrap:wrap; gap:10px}
+  .cz-pill{display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-size:11.5px; font-weight:600;
+    color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:999px;
+    padding:6px 15px 6px 6px; cursor:pointer; transition:color .15s, border-color .15s}
+  .cz-knob{width:30px; height:17px; border-radius:99px; background:var(--surface2); border:1px solid var(--line);
+    position:relative; transition:background .15s; flex:none}
+  .cz-knob::after{content:""; position:absolute; top:1px; left:1px; width:13px; height:13px; border-radius:50%;
+    background:var(--faint); transition:transform .15s, background .15s}
+  .cz-pill.on{color:var(--text); border-color:var(--accent-dim)}
+  .cz-pill.on .cz-knob{background:var(--accent)}
+  .cz-pill.on .cz-knob::after{transform:translateX(13px); background:#fff}
+
+  /* 4 — featured medals grid */
+  .cz-medgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:12px 6px}
+  .cz-med{position:relative; background:none; border:none; padding:8px 4px; border-radius:10px; cursor:default;
+    display:flex; flex-direction:column; align-items:center; gap:5px; color:inherit}
+  .cz-med.earned{cursor:pointer}
+  .cz-med.earned:hover{background:var(--bg)}
+  .cz-med.lock{opacity:.5}
+  .cz-med.feat{background:var(--accent-glow); box-shadow:inset 0 0 0 1px var(--accent-dim)}
+  .cz-mstar{position:absolute; top:2px; right:7px; font-size:12px; color:var(--warn); opacity:0}
+  .cz-med.feat .cz-mstar{opacity:1}
+  .cz-mn{font-family:var(--mono); font-size:9px; color:var(--muted); line-height:1.2; text-align:center; max-width:80px}
+  .cz-med.feat .cz-mn{color:var(--accent)}
+  .cz-medmore{grid-column:1/-1; justify-self:start; align-self:center; font-family:var(--mono); font-size:10px;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--faint); padding:8px 2px 2px}
+  .cz-medmore:hover{color:var(--accent)}
+  .cz-medempty{grid-column:1/-1; font-family:var(--mono); font-size:12px; color:var(--muted); padding:4px 0}
+  /* 4b — the showcase slots (game loadout) + the click-to-open picker */
+  .cz-slots{display:flex; gap:10px; flex-wrap:wrap}
+  /* r387 (Wolf): slots are vertical tiles the same size as the card + picker medals */
+  .cz-slot{position:relative; flex:0 0 auto; width:88px; min-height:86px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:5px;
+    padding:8px 6px; border-radius:12px; cursor:pointer; color:inherit; background:var(--surface2);
+    border:1px solid var(--line); transition:border-color .12s, background .12s}
+  .cz-slot:hover{border-color:var(--faint)}
+  .cz-slot.empty{border-style:dashed; background:transparent; justify-content:center; color:var(--faint)}
+  .cz-slot.empty:hover{color:var(--accent); border-color:var(--accent-dim)}
+  .cz-slot.filled{border-color:var(--accent-dim); background:var(--accent-glow)}
+  .cz-slotplus{font-size:20px; line-height:1; font-weight:400}
+  .cz-slotn{font-family:var(--mono); font-size:9px; line-height:1.2; color:var(--muted); text-align:center; max-width:100%; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .cz-slot.filled .cz-slotn{color:var(--text)}
+  .cz-slotx{position:absolute; top:5px; right:8px; font-size:11px; color:var(--faint); opacity:0; transition:opacity .12s}
+  .cz-slot.filled:hover .cz-slotx{opacity:1}
+  .cz-slotx:hover{color:var(--bad)}
+  .cz-picker{margin-top:14px; padding:14px; border-radius:12px; background:var(--bg); border:1px solid var(--line)}
+  .cz-picker[hidden]{display:none}
+  .cz-fchips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px}
+  .cz-fchip{font-family:var(--mono); font-size:10px; letter-spacing:.05em; text-transform:uppercase; cursor:pointer;
+    padding:4px 11px; border-radius:999px; background:var(--surface); border:1px solid var(--line); color:var(--muted)}
+  .cz-fchip:hover{border-color:var(--faint); color:var(--text)}
+  .cz-fchip.on{background:var(--accent-glow); border-color:var(--accent-dim); color:var(--accent)}
+
+  .cz-foot{font-family:var(--mono); font-size:10.5px; color:var(--faint); line-height:1.6;
+    margin-top:18px; border-top:1px dashed var(--line); padding-top:14px}
+</style>
+</head>
+<body>
+<div id="navMount"></div>
+<script src="nav.js?v=288"></script>
+
+<header class="head"><div class="wrap"><h1>Profile</h1></div></header>
+
+<main><div class="wrap" id="root">
+  <div class="state">loading…</div>
+</div></main>
+
+<div id="siteFooter"></div>
+
+<script>
+const R = window.HK_RANK, D = window.HOTKEY_DRILLS;
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+/* r272 — semantic shortcut units (mirror of stats.html/index.html; kept in sync) */
+function isChordUnit(k){
+  return /^alt( [a-z0-9]){1,6}$/.test(k) || /\(\)$/.test(k) || /^F[0-9]+$/.test(k) || /^Ctrl\+/.test(k);
+}
+
+async function load(){
+  const root=document.getElementById('root');
+  let me=null;
+  try{ const { data:{ session } } = await sb.auth.getSession(); me = session ? session.user : null; }catch(e){}
+  const isAnon = me && (!me.email || (me.app_metadata&&me.app_metadata.provider==='anonymous'));
+  if(!me || isAnon){
+    // same guest-gate as account.html — offer BOTH create-account and log-in
+    root.innerHTML='<div class="state">You’re playing as a guest — your card lives only on this device.<br><br>'+
+      '<a class="acc-cta" href="index.html?openAuth=signup">Create an account</a>'+
+      '<a class="acc-cta ghost" href="index.html?openAuth=signin">Log in</a>'+
+      '<div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:14px">Create an account to claim a handle, earn frames, and showcase medals on your card.</div></div>';
+    return;
+  }
+
+  // ---- DATA (mirrors account.html lines 149-207 + stats.html 189-222 achievement inputs) ----
+  let prof={handle:'',team_code:null,flair:null,featured_ach:null,school_tag:null,show_school:false}, all=[];
+  try{
+    const [p,r] = await Promise.all([
+      sb.from('profiles').select('handle,team_code,flair,featured_ach,school_tag,show_school').eq('id',me.id).single(),
+      sb.from('runs').select('user_id,challenge,time_ms,keystrokes,optimal,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),
+    ]);
+    if(p.data) prof=Object.assign(prof,p.data); all=r.data||[];
+  }catch(e){}
+  const mine = all.filter(x=>x.user_id===me.id);
+  let mySes=[]; try{ const se=await sb.from('sessions').select('user_id,mode').eq('user_id', me.id); mySes=se.data||[]; }catch(e){}
+  let srvKeys=null;
+  try{ const {data}=await sb.from('key_stats').select('counts,keys_lifetime').eq('user_id',me.id).maybeSingle();
+    if(data && data.counts && Object.keys(data.counts).length) srvKeys=data; }catch(e){}
+
+  const st   = R.standing(all, me.id, D.menuOrder);
+  const tier = R.tierOf(st.avgPct, st.att, st.wsum);
+  const plBoards = R.boardCounts ? R.boardCounts(all, me.id, D.menuOrder) : st;
+  const xp = R.computeXP(mine, plBoards, mySes);   /* r371: full signature — same level everywhere */
+  const L  = R.levelOf(xp);
+
+  /* FRAME-picker unlock context — copied from account.html lines 171-184 */
+  let __fl={}; try{ __fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+  const frameU = { lvl:L.lvl, tierBest:Math.max(__fl.tierBest|0, tier.i|0),
+    dailyWins:__fl.dailyWins|0, certs:Object.keys(__fl.certTracks||{}).length,
+    charter:!!(me.created_at && String(me.created_at) < '2026-10-01'),
+    perfectRun:__fl.perfectRun?1:0 };
+  const __liveBk = tier.bucket==='Top Bucket' ? 2 : tier.bucket==='Middle Bucket' ? 1 : 0;
+  const __gemBk = (__fl.tierBestBucket!=null || (tier.i|0)>0)
+    ? (Math.max(__fl.tierBestBucket|0, (tier.i|0)*3+__liveBk) % 3) : 1;
+  const isWolf = (me && me.email ? String(me.email).toLowerCase() : '') === 'wolfcdrake@gmail.com';
+
+  // local PBs + streak (anon-friendly caches, still relevant when signed in)
+  let localPB={}; try{ localPB = JSON.parse(localStorage.getItem('hotkey_pb')||'{}'); }catch(e){}
+  let streakN=0; try{ const s=JSON.parse(localStorage.getItem('hotkey_streak')||'{}'); streakN=s.n||0; }catch(e){}
+
+  // drilled set (mirrors stats.html 204-205) — used by the achievement ctx
+  const drilled = new Set(mine.map(x=>x.challenge).filter(k=>D.meta[k]));
+  Object.keys(localPB).forEach(k=>{ if(D.meta[k]) drilled.add(k); });
+
+  // avg efficiency (stats.html 207-212) — powers the "accuracy" highlight stat
+  let effSum=0, effN=0;
+  mine.forEach(x=>{ if(x.keystrokes>0 && x.optimal>0){ effSum += Math.min(1, x.optimal/x.keystrokes); effN++; } });
+  const avgEff = effN ? Math.round(100*effSum/effN) : null;
+
+  // ---- FEATURED-MEDAL ENGINE (ported from stats.html lines 296-378) ----
+  const AC = window.HOTKEY_ACHIEVEMENTS;
+  const ACById = {}; (AC||[]).forEach(a=>ACById[a.id]=a);
+  const earned = new Set();
+  const achMeta = {};   // id -> {done, prog, goal, rarity}
+  const medalsOK = !!(AC && window.hkBadge);
+  if(medalsOK){ try{
+    let solvesN=0; try{ solvesN=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){}
+    let runsL=mine.length?mine:[]; if(!runsL.length){ try{ runsL=JSON.parse(localStorage.getItem('hk_runs_lite')||'[]'); }catch(e){} }
+    let flags={}; try{ flags=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
+    const pbCtx={...localPB};
+    mine.forEach(r=>{ const t=r.time_ms/1000; if(pbCtx[r.challenge]===undefined||t<pbCtx[r.challenge]) pbCtx[r.challenge]=t; });
+    let crowns=0;
+    if(all.length){ const seen={};
+      all.forEach(r=>{ if(!D.meta[r.challenge]) return; if(seen[r.challenge]) return; seen[r.challenge]=r.user_id; });
+      crowns=Object.values(seen).filter(u=>u===me.id).length; }
+    const groups={}; Object.entries(D.groupOf).forEach(([k,g])=>{(groups[g]=groups[g]||[]).push(k);});
+    let __ck=0, __kl=0; try{ const kc=(srvKeys&&srvKeys.counts) || JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+      __ck=Object.keys(kc).filter(isChordUnit).length;
+      __kl=Math.max((srvKeys&&srvKeys.keys_lifetime)||0,
+        parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10) || Object.values(kc).reduce((a,b)=>a+(b|0),0)); }catch(e){}
+    const ctx={ pb:pbCtx, pars:window.HOTKEY_PARS||{}, runs:runsL, streak:streakN, solves:solvesN,
+      mouseRuns:flags.mouseRuns||0, slowWins:flags.slowWins||0,
+      nightWin:!!flags.nightWin, dawnWin:!!flags.dawnWin, weekendWin:!!flags.weekendWin,
+      raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0,
+      chordKinds:__ck, keysLifetime:__kl, dailyTop10:flags.dailyTop10||0,
+      dailyPod:flags.dailyPod||0, dailyWins:flags.dailyWins||0, certs:Object.keys(flags.certTracks||{}).length,
+      charter:!!(me.created_at && String(me.created_at) < '2026-10-01'),
+      tierBest:flags.tierBest|0, tierBestBucket:flags.tierBestBucket|0, deskPeak:flags.deskPeak||0,
+      crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
+    // global rarity (Steam-style) — evaluate run-derivable achievements for every player
+    const globalPct=(function(){
+      try{
+        if(!all.length) return {};
+        const byUser={}; all.forEach(r=>{ (byUser[r.user_id]=byUser[r.user_id]||[]).push(r); });
+        const uids=Object.keys(byUser); if(uids.length<2) return {};
+        const PARS2=window.HOTKEY_PARS||{}; const out={};
+        const perBoard={}; { const seen={};
+          all.forEach(r=>{ if(!D.meta[r.challenge]) return; const k2=r.challenge;
+            if(!perBoard[k2]) perBoard[k2]=[]; const kk=k2+'|'+r.user_id;
+            if(!seen[kk]){ seen[kk]=1; perBoard[k2].push(r.user_id); } }); }
+        uids.forEach(u=>{
+          const runs=byUser[u]; const best={}; const days=new Set();
+          runs.forEach(r=>{ const ch=r.challenge;
+            if(best[ch]===undefined||r.time_ms<best[ch]) best[ch]=r.time_ms;
+            if(r.created_at) days.add(String(r.created_at).slice(0,10)); });
+          const pbU={}; Object.keys(best).forEach(k2=>pbU[k2]=best[k2]/1000);
+          const ds=[...days].sort(); let streakU=ds.length?1:0, cur=1;
+          for(let i=1;i<ds.length;i++){ const gap=(new Date(ds[i])-new Date(ds[i-1]))/86400000;
+            cur = gap===1 ? cur+1 : 1; if(cur>streakU) streakU=cur; }
+          let crownsU=0; D.menuOrder.forEach(k2=>{ const b=perBoard[k2]||[]; if(b.length&&b[0]===u) crownsU++; });
+          const attU=D.menuOrder.filter(k2=>pbU[k2]!==undefined).length;
+          const ctxU={ pb:pbU, pars:PARS2, runs, streak:streakU, solves:runs.length, crowns:crownsU, att:attU, menuOrder:D.menuOrder, groups };
+          AC.forEach(a=>{ let ru; try{ ru=a.test(ctxU); }catch(e){ ru={done:false}; }
+            if(ru.done) out[a.id]=(out[a.id]||0)+1; });
+        });
+        Object.keys(out).forEach(k2=>out[k2]=Math.round(100*out[k2]/uids.length));
+        AC.forEach(a=>{ if(out[a.id]===undefined) out[a.id]=0; });
+        out.__n=uids.length;
+        return out;
+      }catch(e){ return {}; }
+    })();
+    const __fN=globalPct.__n||0;
+    AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
+      if(r.done) earned.add(a.id);
+      const gp=window.hkEffRarity?window.hkEffRarity(a.tier, globalPct[a.id], __fN):globalPct[a.id];
+      achMeta[a.id]={ done:!!r.done, prog:r.prog||0, goal:r.goal||1, rarity:gp };
+    });
+  }catch(e){} }
+
+  // featured picks — server copy wins (stats.html 216-222), else local mirror
+  let feat=[];
+  try{
+    if(prof.featured_ach!=null){ feat=String(prof.featured_ach).split(',').filter(Boolean);
+      try{ localStorage.setItem('hk_feat_ach', JSON.stringify(feat)); }catch(e){} }
+    else feat=JSON.parse(localStorage.getItem('hk_feat_ach')||'[]');
+  }catch(e){}
+
+  // ---- THE LOADOUT (themes.js persistence contract) ----
+  const loadout = window.hkFlair ? window.hkFlair(prof.flair) : {frame:null,show:{rank:true,level:true,streak:true,desk:false},stats:[],title:null};
+  if(!loadout.show) loadout.show={rank:true,level:true,streak:true,desk:false};
+  if(!Array.isArray(loadout.stats) || !loadout.stats.length) loadout.stats=['solves','crowns','streak','boards','saved'];
+
+  // time banked — first recorded time vs current best on each re-drilled task, summed
+  // (mirrors stats.html 250-263). Powers the "time saved" highlight stat.
+  let savedMs=0;
+  try{ const firstBy={}, bestBy={};
+    const src2 = mine.length
+      ? mine.slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).map(r=>({d:r.challenge,t:r.time_ms}))
+      : (JSON.parse(localStorage.getItem('hk_runs_lite')||'[]').map(r=>({d:r.d,t:r.time_ms})).filter(r=>r.d));
+    src2.forEach(r=>{ if(firstBy[r.d]===undefined) firstBy[r.d]=r.t;
+      if(bestBy[r.d]===undefined||r.t<bestBy[r.d]) bestBy[r.d]=r.t; });
+    Object.keys(firstBy).forEach(d=>{ const s=firstBy[d]-bestBy[d]; if(s>0) savedMs+=s; });
+  }catch(e){}
+  const savedTxt = savedMs<=0 ? '—'
+    : savedMs<60000   ? (savedMs/1000).toFixed(0)+'s'
+    : savedMs<3600000 ? Math.round(savedMs/60000)+'m'
+    : Math.floor(savedMs/3600000)+'h '+Math.round((savedMs%3600000)/60000)+'m';
+  // favorite hotkey by usage — top chord from the local/synced key tally
+  let favKey='—';
+  try{ const kc=(srvKeys&&srvKeys.counts) || JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+    const te=Object.entries(kc).filter(([k])=>isChordUnit(k)).sort((a,b)=>b[1]-a[1]);
+    if(te.length) favKey=te[0][0];
+  }catch(e){}
+
+  // stat value + label maps (keyed by HK_STAT_KEYS)
+  const statVal={
+    solves: String(mine.length),
+    crowns: String(st.crowns),
+    streak: streakN ? ('🔥 '+streakN) : '—',
+    podiums: String(st.pod),
+    top10s: (st.t10!=null ? String(st.t10) : '—'),   // best available — board top-10 count (no dedicated daily-top10 series on this page)
+    boards: st.att+' / '+D.menuOrder.length,
+    accuracy: (avgEff!=null ? avgEff+'%' : '—'),
+    saved: savedTxt,
+    favkey: favKey,
+  };
+  const statLabel={ solves:'clean solves', crowns:'crowns', streak:'streak', podiums:'podiums',
+    top10s:'top-10s', boards:'boards', accuracy:'accuracy', saved:'time banked', favkey:'top hotkey' };
+  // tight card runs 5 across — the uppercase labels get their own short forms so
+  // they never truncate; the customizer chips keep the descriptive statLabel.
+  const statShort={ solves:'solves', crowns:'crowns', streak:'streak', podiums:'podiums',
+    top10s:'top-10s', boards:'boards', accuracy:'accuracy', saved:'banked', favkey:'top key' };
+
+  // ---- SAVES (fire-and-forget, guarded) ----
+  async function saveFlair(){ try{ const packed=window.hkFlairPack?window.hkFlairPack(loadout):loadout.frame;
+    prof.flair=packed; if(sb&&me) await sb.from('profiles').update({flair:packed}).eq('id',me.id); }catch(e){} }
+  async function saveFeat(){ try{ localStorage.setItem('hk_feat_ach', JSON.stringify(feat)); }catch(e){}
+    try{ if(sb&&me) await sb.from('profiles').update({featured_ach:feat.join(',')}).eq('id',me.id); }catch(e){} }
+  let _flashT=null;
+  function flash(){ const el=document.getElementById('czSaved'); if(!el) return; el.textContent='saved ✓';
+    el.classList.add('show'); clearTimeout(_flashT); _flashT=setTimeout(()=>el.classList.remove('show'), 1400); }
+
+  // ---- THE LIVE CARD (re-renderable) ----
+  function renderCard(){
+    const holder=document.getElementById('liveCard'); if(!holder) return;
+    const statsArr=(loadout.stats&&loadout.stats.length?loadout.stats:['solves','crowns','streak','boards','saved']).slice(0,5);
+    // r387: featured medals as an array (up to 5) — hkPlayerCard pads with placeholders
+    const medals=(feat||[]).filter(id=>earned.has(id)).slice(0,5).map(id=>{ const a=ACById[id]; const m=achMeta[id]||{};
+      return a ? { glyph:a.glyph, rarity:m.rarity, name:a.name, size:30 } : null; }).filter(Boolean);
+    // r387 (Wolf): school + desk chips ride HIGH on the card (uc-tags), prominent —
+    // only when the user shows them. (Campaign/cert progress bars were cut.)
+    let tagBits='';
+    if(prof.show_school && prof.school_tag){
+      const nm=(window.schoolResolve&&window.schoolResolve(prof.school_tag)||{}).name||prof.school_tag;
+      const chip=window.schoolChip?window.schoolChip(prof.school_tag,20):'';
+      tagBits+='<span class="uc-tag">'+chip+'<span>'+esc(nm)+'</span></span>'; }
+    if(loadout.show.desk && prof.team_code) tagBits+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+esc(prof.team_code)+'</span></span>';
+    const d={ name:prof.handle||'set a handle', flair:loadout.frame, show:loadout.show,
+      tierEmblem:window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):'',
+      tierChipEmblem:window.rankEmblem?window.rankEmblem(tier.name,16):'',
+      tierLabel:tier.name+(tier.bucket?(' · '+tier.bucket):'')+(st.rank?(' · #'+st.rank):''),
+      lvl:L.lvl, pct:L.pct, xpLine:L.into+' / '+L.need+' xp',
+      stats:statsArr.map(k=>({ n:(statVal[k]!=null?statVal[k]:'—'), label:(statShort[k]||statLabel[k]||k) })),
+      medals:medals, medalSlots:5, tagsHtml:tagBits, boards:[] };
+    try{ holder.innerHTML = window.hkPlayerCard ? window.hkPlayerCard(d,{scale:'full'}) : ''; }catch(e){ holder.innerHTML=''; }
+    try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(holder)); }catch(e){}
+  }
+
+  // ================= BUILD THE CUSTOMIZER =================
+  const HK_FRAMES = window.HK_FRAMES || [];
+  const HK_STAT_KEYS = window.HK_STAT_KEYS || ['solves','crowns','streak','podiums','top10s','boards','accuracy'];
+  /* r387: lead the strip with the r385 full-interior SKINS (the star of the feature),
+     then the classic plaque/foil/heraldic family. Order is cosmetic only — a frame
+     not in this list just sorts after the skins in its native HK_FRAMES order. */
+  const SKIN_ORDER=['founder','molten','frostbite','noir','vaporwave','constellation','neon','pro','terminal','crt','circuit','blueprint'];
+  const frameRank=f=>{ const i=SKIN_ORDER.indexOf(f.id); return i<0 ? 100 : i; };
+  const frameOpts = [{id:'__none', name:'None', earn:'', unlocked:true}]
+    .concat(HK_FRAMES.map((f,idx)=>({ id:f.id, name:f.name, earn:f.earn, _o:frameRank(f)*1000+idx,
+      unlocked: isWolf || (window.hkFrameUnlocked && window.hkFrameUnlocked(f.id, frameU)) }))
+      .sort((a,b)=>a._o-b._o));
+  const frameUnlockedN = HK_FRAMES.filter(f=>isWolf||(window.hkFrameUnlocked&&window.hkFrameUnlocked(f.id,frameU))).length;
+  const frameTotal = HK_FRAMES.length;
+
+  function frameStripHtml(){
+    return frameOpts.map(f=>{
+      const on = (loadout.frame||'__none')===f.id;
+      const locked = !f.unlocked;
+      const orn = (f.id!=='__none' && window.hkFrameOrnaments)
+        ? (f.id.indexOf('plaque-')===0 ? window.hkFrameOrnaments(f.id,{bucket:__gemBk}) : window.hkFrameOrnaments(f.id,{}))
+        : '';
+      return '<button type="button" class="cz-frame'+(on?' on':'')+(locked?' lock':'')+'" '+
+        'data-frame="'+f.id+'" data-locked="'+(locked?'1':'0')+'" data-earn="'+esc(f.earn||'')+'">'+
+        '<span class="cz-sw'+(f.id!=='__none'?' hk-frame-'+f.id:'')+'">'+orn+(locked?'<span class="cz-lk">🔒</span>':'')+'</span>'+
+        '<b class="cz-fn">'+esc(f.name)+'</b>'+
+      '</button>';
+    }).join('');
+  }
+
+  /* TITLE chips — a few rank/earned titles + a CUSTOM (PRO) chip. NOTE: the card's
+     title NOTCH rendering lands in a later round; persisting loadout.title here is
+     enough for now (the pick round-trips through hkFlairPack). */
+  const TITLES=[
+    { id:null,          name:'None',          locked:false },
+    { id:'analyst',     name:'Analyst',       locked:false },
+    { id:'crownholder', name:'Crownholder',   locked: st.crowns<1 },
+    { id:'centurion',   name:'Centurion',     locked: mine.length<100 },
+    { id:'pro',         name:'CUSTOM (PRO)',  locked:false, pro:true },
+  ];
+  function titleChipsHtml(){
+    return TITLES.map(t=>{
+      const on = (loadout.title||null)===(t.id||null);
+      const locked = !!t.locked;
+      return '<button type="button" class="cz-chip'+(on?' on':'')+(locked?' lock':'')+(t.pro?' pro':'')+'" '+
+        'data-title="'+(t.id==null?'':t.id)+'" data-locked="'+(locked?'1':'0')+'" data-pro="'+(t.pro?'1':'0')+'">'+
+        (locked?'🔒 ':'')+esc(t.name)+'</button>';
+    }).join('');
+  }
+
+  const SHOWS=[['rank','Rank crest'],['level','Level'],['streak','Streak'],['desk','Desk tag']];
+  function showPillsHtml(){
+    return SHOWS.map(([k,label])=>{
+      const onv = k==='desk' ? !!loadout.show.desk : loadout.show[k]!==false;
+      return '<button type="button" class="cz-pill'+(onv?' on':'')+'" data-show="'+k+'"><i class="cz-knob"></i>'+esc(label)+'</button>';
+    }).join('');
+  }
+
+  /* r387 (Wolf): the showcase is a GAME LOADOUT — five slots on the card, click a
+     slot to open a medal picker (rarity-filtered) below. Only EARNED medals are
+     pickable; the full locked/progress wall stays on the stats page. This replaced a
+     flat 58-medal grid that duplicated stats and buried the card. */
+  const earnedMedals = (medalsOK ? AC : []).filter(a=>(achMeta[a.id]||{}).done).map(a=>{
+    const m=achMeta[a.id]||{};
+    const w=(window.hkRarityTier?window.hkRarityTier(m.rarity):null)||'common';
+    const wt=(window.hkRarityMeta?window.hkRarityMeta(m.rarity).weight:4);
+    return { a, m, rarity:w, weight:(wt==null?4:wt) };
+  }).sort((x,y)=>x.weight-y.weight || x.a.name.localeCompare(y.a.name));
+  const RAR_SEQ=['legendary','epic','rare','common'];   // mythic sorts into legendary chip visually via weight; keep the 4 core chips
+  const earnedRarities = RAR_SEQ.filter(r=>earnedMedals.some(e=>e.rarity===r||(r==='legendary'&&e.rarity==='mythic')));
+
+  function medalSlotsHtml(){
+    let h='';
+    for(let i=0;i<5;i++){ const id=feat[i]; const a=id?ACById[id]:null;
+      if(a){ const m=achMeta[id]||{}; let badge=''; try{ badge=window.hkMedalCard ? window.hkMedalCard(a.glyph, m.rarity, null, 30, true)
+          : window.hkBadge(a.glyph,true,40,null,m.rarity); }catch(e){}
+        h+='<div class="cz-slot filled" data-idx="'+i+'" data-ach="'+esc(id)+'" title="'+esc(a.name)+' — click to change · ✕ to clear">'+
+             badge+'<b class="cz-slotn">'+esc(a.name)+'</b><span class="cz-slotx" title="remove">✕</span></div>';
+      } else {
+        h+='<div class="cz-slot empty" data-idx="'+i+'" title="click to add a medal"><span class="cz-slotplus">＋</span><b class="cz-slotn">add medal</b></div>';
+      }
+    }
+    return h;
+  }
+  function medalPickerHtml(filter){
+    filter=filter||'all';
+    if(!earnedMedals.length)
+      return '<div class="cz-medempty">No medals earned yet — <a href="stats.html#achievements" style="color:var(--accent)">see the full wall ↗</a> and go get some.</div>';
+    const chips=['all'].concat(earnedRarities).map(r=>
+      '<button type="button" class="cz-fchip'+(r===filter?' on':'')+'" data-filter="'+r+'">'+(r==='all'?'All':r)+'</button>').join('');
+    const list=earnedMedals.filter(e=> filter==='all' || e.rarity===filter || (filter==='legendary'&&e.rarity==='mythic'));
+    const cells=list.map(e=>{ const id=e.a.id, on=feat.includes(id);
+      let badge=''; try{ badge=window.hkMedalCard ? window.hkMedalCard(e.a.glyph, e.m.rarity, null, 30, true)
+        : window.hkBadge(e.a.glyph,true,34,null,e.m.rarity); }catch(x){}
+      const tip=e.a.name+' — '+e.a.desc+' · '+e.rarity.toUpperCase()+(on?' · featured (click to remove)':' · click to feature');
+      return '<button type="button" class="cz-med earned'+(on?' feat':'')+'" data-ach="'+esc(id)+'" title="'+esc(tip)+'">'+
+        '<span class="cz-mstar">✦</span>'+badge+'<b class="cz-mn">'+esc(e.a.name)+'</b></button>';
+    }).join('');
+    return '<div class="cz-fchips">'+chips+'</div>'+
+      '<div class="cz-medgrid">'+(cells||'<div class="cz-medempty">none in this tier</div>')+'</div>'+
+      '<a class="cz-medmore" href="stats.html#achievements" title="the full achievement wall lives on your stats page">full achievement wall ↗</a>';
+  }
+
+  function statChipsHtml(){
+    return HK_STAT_KEYS.map(k=>{
+      const on = loadout.stats.includes(k);
+      return '<button type="button" class="cz-chip cz-statchip'+(on?' on':'')+'" data-stat="'+k+'">'+esc(statLabel[k]||k)+'</button>';
+    }).join('');
+  }
+
+  // ---- assemble root ----
+  const medalsSection = medalsOK ? (
+    '<div class="cz-sec" id="czMedals">'+
+      '<div class="cz-sechd"><span class="cz-lab">Featured medals · showcase</span><span class="cz-count" id="czFeatCount">'+feat.length+' / 5</span></div>'+
+      '<div class="cz-slots" id="czSlots">'+medalSlotsHtml()+'</div>'+
+      '<div class="cz-picker" id="czPicker" hidden>'+medalPickerHtml('all')+'</div>'+
+    '</div>') : '';
+
+  root.innerHTML =
+    '<div class="pc-card pc-live" id="liveCard"></div>'+
+    '<div class="pc-live-cap">your card — as it appears on the leaderboard &amp; desks</div>'+
+    '<div class="cz">'+
+      '<div class="cz-h"><h2>Customize your card</h2><span class="cz-saved" id="czSaved"></span></div>'+
+      '<div class="cz-sub">Your card loadout — frame, title, what shows, featured medals, highlighted stats. Everything applies live and saves instantly.</div>'+
+
+      '<div class="cz-sec">'+
+        '<div class="cz-sechd"><span class="cz-lab">Frame</span><span class="cz-count">'+frameUnlockedN+' OF '+frameTotal+' UNLOCKED</span></div>'+
+        '<div class="cz-strip" id="czStrip">'+frameStripHtml()+'</div>'+
+        '<div class="cz-hint" id="czFrameHint">hover a frame — how it’s earned shows here</div>'+
+      '</div>'+
+
+      '<div class="cz-sec">'+
+        '<div class="cz-sechd"><span class="cz-lab">Title</span><span class="cz-manage" id="czTitleManage">MANAGE →</span></div>'+
+        '<div class="cz-chips" id="czTitles">'+titleChipsHtml()+'</div>'+
+      '</div>'+
+
+      '<div class="cz-sec">'+
+        '<div class="cz-sechd"><span class="cz-lab">Show on card</span></div>'+
+        '<div class="cz-pills" id="czShow">'+showPillsHtml()+'</div>'+
+      '</div>'+
+
+      medalsSection+
+
+      '<div class="cz-sec">'+
+        '<div class="cz-sechd"><span class="cz-lab">Highlight stats · pick up to 5</span><span class="cz-count" id="czStatCount">'+loadout.stats.length+' / 5</span></div>'+
+        '<div class="cz-chips" id="czStats">'+statChipsHtml()+'</div>'+
+      '</div>'+
+
+      '<div class="cz-foot">Locked frames &amp; medals stay greyed with how they’re earned on hover · nothing here touches your Account or Stats pages.</div>'+
+    '</div>';
+
+  renderCard();
+
+  // ================= WIRING =================
+  const setFrameHint=(txt)=>{ const el=document.getElementById('czFrameHint'); if(el) el.textContent=txt; };
+  function frameHint(b){
+    const f=frameOpts.find(x=>x.id===b.dataset.frame); if(!f) return;
+    setFrameHint( f.id==='__none' ? 'None — plain card'
+      : (b.dataset.locked==='1' ? '🔒 '+f.name+' — '+(f.earn||'keep playing.')
+        : f.name+' — yours to wear') );
+  }
+  const strip=document.getElementById('czStrip');
+  if(strip) strip.querySelectorAll('.cz-frame').forEach(b=>{
+    b.onmouseenter=()=>frameHint(b);
+    b.onclick=()=>{
+      frameHint(b);
+      if(b.dataset.locked==='1') return;   // locked frames answer with the earn line only
+      loadout.frame = b.dataset.frame==='__none' ? null : b.dataset.frame;
+      strip.querySelectorAll('.cz-frame').forEach(x=>x.classList.toggle('on', x.dataset.frame===(loadout.frame||'__none')));
+      renderCard(); saveFlair(); flash();
+    };
+  });
+
+  // TITLE
+  { const tm=document.getElementById('czTitleManage');
+    if(tm) tm.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Custom title'); }; }
+  const titlesEl=document.getElementById('czTitles');
+  if(titlesEl) titlesEl.querySelectorAll('.cz-chip').forEach(b=>{
+    b.onclick=()=>{
+      if(b.dataset.locked==='1') return;
+      loadout.title = b.dataset.title || null;
+      titlesEl.querySelectorAll('.cz-chip').forEach(x=>x.classList.toggle('on', (x.dataset.title||'')===(loadout.title||'')));
+      if(b.dataset.pro==='1' && window.hkProSheet){ try{ window.hkProSheet('Custom title'); }catch(e){} }
+      saveFlair(); flash();
+      // NOTE: the card's title-notch render lands in a later round — the pick is persisted now.
+    };
+  });
+
+  // SHOW ON CARD
+  const showEl=document.getElementById('czShow');
+  if(showEl) showEl.querySelectorAll('.cz-pill').forEach(b=>{
+    b.onclick=()=>{
+      const k=b.dataset.show;
+      const cur = k==='desk' ? !!loadout.show.desk : loadout.show[k]!==false;
+      loadout.show[k]=!cur;
+      b.classList.toggle('on', !cur);
+      renderCard(); saveFlair(); flash();
+    };
+  });
+
+  // FEATURED MEDALS — 5 showcase slots + a click-to-open, rarity-filtered picker
+  if(medalsOK){
+    const slotsEl=document.getElementById('czSlots');
+    const picker=document.getElementById('czPicker');
+    const cnt=document.getElementById('czFeatCount');
+    let pickerFilter='all';
+    function refreshMedals(){
+      if(slotsEl) slotsEl.innerHTML=medalSlotsHtml();
+      if(picker) picker.innerHTML=medalPickerHtml(pickerFilter);
+      if(cnt) cnt.textContent=feat.length+' / 5';
+      wireSlots(); wirePicker();
+      renderCard();
+    }
+    function toggleFeat(id){
+      if(!id) return;
+      if(feat.includes(id)) feat=feat.filter(x=>x!==id);
+      else { if(feat.length>=5) feat.shift(); feat.push(id); }
+      saveFeat(); refreshMedals(); flash();
+    }
+    function openPicker(){ if(picker){ picker.hidden=false; try{ picker.scrollIntoView({behavior:'smooth',block:'nearest'}); }catch(e){} } }
+    function wireSlots(){
+      if(!slotsEl) return;
+      slotsEl.querySelectorAll('.cz-slot').forEach(s=>{
+        s.onclick=(ev)=>{
+          const x = ev.target.closest ? ev.target.closest('.cz-slotx') : null;
+          if(x){ ev.stopPropagation(); const id=s.dataset.ach; if(id){ feat=feat.filter(v=>v!==id); saveFeat(); refreshMedals(); flash(); } return; }
+          openPicker();
+        };
+      });
+    }
+    function wirePicker(){
+      if(!picker) return;
+      picker.querySelectorAll('.cz-fchip').forEach(c=>{ c.onclick=()=>{ pickerFilter=c.dataset.filter; refreshMedals(); openPicker(); }; });
+      picker.querySelectorAll('.cz-med.earned').forEach(b=>{ b.onclick=()=>toggleFeat(b.dataset.ach); });
+    }
+    wireSlots(); wirePicker();
+  }
+
+  // HIGHLIGHT STATS
+  const statsEl=document.getElementById('czStats');
+  const statCnt=document.getElementById('czStatCount');
+  if(statsEl) statsEl.querySelectorAll('.cz-statchip').forEach(b=>{
+    b.onclick=()=>{
+      const k=b.dataset.stat;
+      if(loadout.stats.includes(k)) loadout.stats=loadout.stats.filter(x=>x!==k);
+      else { if(loadout.stats.length>=5) loadout.stats.shift(); loadout.stats.push(k); }
+      statsEl.querySelectorAll('.cz-statchip').forEach(x=>x.classList.toggle('on', loadout.stats.includes(x.dataset.stat)));
+      if(statCnt) statCnt.textContent=loadout.stats.length+' / 5';
+      renderCard(); saveFlair(); flash();
+    };
+  });
+
+  // deep-link — jump to the featured medals showcase
+  if(location.hash==='#showcase'){
+    const m=document.getElementById('czMedals');
+    if(m) requestAnimationFrame(()=>m.scrollIntoView({behavior:'smooth', block:'center'}));
+  }
+}
+load();
+</script>
+</body>
+</html>

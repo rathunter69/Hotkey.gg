@@ -164,52 +164,17 @@ async function load(){
   const L = R.levelOf(xp);
   const joined = me.created_at ? new Date(me.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—';
 
-  /* r373 FRAME PICKER — unlock context for hkFrameUnlocked. Level from the same xp
-     already computed above; the rest from hk_ach_flags (tierBest is latched by nav.js
-     on every rank fetch — max'd with the live tier here so a fresh device isn't
-     behind); charter = the account predates the beta cutoff (auth created_at). */
-  let __fl={}; try{ __fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
-  const frameU = { lvl:L.lvl, tierBest:Math.max(__fl.tierBest|0, tier.i|0),
-    dailyWins:__fl.dailyWins|0, certs:Object.keys(__fl.certTracks||{}).length,
-    charter:!!(me.created_at && String(me.created_at) < '2026-10-01'),
-    perfectRun:__fl.perfectRun?1:0 };
-  const FRAME_TIER_C={common:'var(--muted)', rare:'#3f7fe0', epic:'#d64a3f', legendary:'#d99a1f', egg:'#8a6d3b'};
-  /* r376: the gem-cut bucket for plaque swatches — the packed latch (nav.js
-     persistTierBest) maxed against the live tier the same way tierBest is above,
-     so a fresh device previews the right cut before the async latch lands. */
-  const __liveBk = tier.bucket==='Top Bucket' ? 2 : tier.bucket==='Middle Bucket' ? 1 : 0;
-  const __gemBk = (__fl.tierBestBucket!=null || (tier.i|0)>0)
-    ? (Math.max(__fl.tierBestBucket|0, (tier.i|0)*3+__liveBk) % 3) : 1;
-  /* r385: the founder account unlocks every frame for testing — email is the reliable key */
-  const isWolf = (me && me.email ? String(me.email).toLowerCase() : '') === 'wolfcdrake@gmail.com';
-  /* r385: the account overview card wears the chosen skin too (Wolf) */
-  const __tcFlair = (prof.flair && /^[a-z0-9_-]{1,32}$/i.test(prof.flair) && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===prof.flair)) ? prof.flair : null;
-  const tcFrameCls = __tcFlair ? ' hk-frame-'+__tcFlair : (prof.flair && /^[a-z0-9_-]{1,32}$/i.test(prof.flair) ? ' flair-'+prof.flair : '');
-  const tcFrameOrn = (__tcFlair && window.hkFrameOrnaments) ? window.hkFrameOrnaments(__tcFlair, {bucket:__gemBk}) : '';
-  const frameCards=[{id:'none', name:'None', tier:'', desc:'plain card', earn:'', unlocked:true}]
-    .concat((window.HK_FRAMES||[]).map(f=>({...f, unlocked:isWolf || (window.hkFrameUnlocked && window.hkFrameUnlocked(f.id, frameU))})));
-  const frameGridHtml=frameCards.map(f=>{
-    const on = (prof.flair||'none')===f.id;
-    /* r376: plaque minis carry the gemset corners (scaled by nav.css .fs-mini rules)
-       so the picker previews YOUR cut; other frames keep the chrome-only swatch.
-       r384 (Wolf): compact swatch tile — name + tier color only; the desc/earn prose
-       moved to the shared .fo-hint line (hover/click) and the locked-click message. */
-    const orn = (f.id.indexOf('plaque-')===0 && window.hkFrameOrnaments)
-      ? window.hkFrameOrnaments(f.id, {bucket:__gemBk}) : '';
-    return '<button class="flair-opt'+(on?' on':'')+(f.unlocked?'':' locked')+'" data-flair="'+f.id+'" data-locked="'+(f.unlocked?'0':'1')+'">'+
-      '<span class="fs-mini'+(f.id!=='none'?' hk-frame-'+f.id:'')+'">'+orn+(f.unlocked?'':'<span class="fo-lock">🔒</span>')+'</span>'+
-      '<b class="fo-name">'+esc(f.name)+'</b>'+
-      (f.tier?'<i class="fo-tier" style="color:'+FRAME_TIER_C[f.tier]+'">'+f.tier+'</i>':'')+
-      '</button>';
-  }).join('');
+  /* r387 (Wolf): card cosmetics — frames, showcase, the whole loadout — moved to the
+     dedicated Profile page. Account is now pure admin (identity, email, plan, security,
+     data, deletion). The overview card below is a plain identity strip, no skin. */
 
   root.innerHTML = `
-    <div class="card tc span2${tcFrameCls}">${tcFrameOrn}
+    <div class="card tc span2">
       <div class="tc-top">
         <span class="tc-emblem" style="line-height:0">${window.rankEmblem?window.rankEmblem(tier.name,64,tier.bucket):''}</span>
         <div>
           <div class="tc-name">${esc(prof.handle||'set a handle')}</div>
-          <span class="pc-tier ${tier.cls}" style="margin-top:4px">${/* r374: chip layout+gap live on .pc-tier (nav.css); 16 = the chip scale (was an eyeballed 13) */''}${window.rankEmblem?window.rankEmblem(tier.name,16):''}<span>${tier.name}</span></span>
+          <span class="pc-tier ${tier.cls}" style="margin-top:4px">${/* r374: chip layout+gap live on .pc-tier (nav.css); 16 = the chip scale (was an eyeballed 13) */''}${window.rankEmblem?window.rankEmblem(tier.name,16):''}<span>${tier.name}${tier.bucket?' · '+tier.bucket:''}</span></span>
         </div>
         ${prof.team_code?`<span class="tc-team">${esc(prof.team_code)}</span>`:''}
         <div class="tc-stats">${/* r383: the tc-sub counters, promoted to the dead right (same numbers) */''}
@@ -224,7 +189,7 @@ async function load(){
         <span class="tc-bar"><i style="width:${L.pct}%"></i></span>
         <span style="font-size:11px;color:var(--muted)">${L.into}/${L.need} xp</span>
       </div>
-      <div class="tc-sub">member since ${joined} · <a id="tcCustomize" style="cursor:pointer;color:var(--accent);text-decoration:none">✎ customize card</a></div>
+      <div class="tc-sub">member since ${joined} · <a href="profile.html" style="color:var(--accent);text-decoration:none">✎ customize your card on your profile ↗</a></div>
     </div>
 
     <div class="card" id="desk"><h4>Your desk</h4>
@@ -288,13 +253,6 @@ async function load(){
       <div class="msg" id="devMsg"></div>
     </div>
 
-    <div class="card span2"><h4>Card flair <span id="proTagFlair" style="color:var(--warn);font-size:9px;letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO · free in beta</span></h4>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Earned frames for your player card, shown wherever your card appears. Locked frames are dimmed — click or hover one for how to get it.</div>
-      <div id="flairRow" class="fo-grid">${frameGridHtml}</div>
-      <div class="fo-hint" id="flairHint">hover a frame — how it&#39;s earned shows here</div>
-      <div class="msg" id="flairMsg"></div>
-    </div>
-
     <div class="card"><h4>Security</h4>
       <div class="rowline"><span class="k">password</span><span><button class="btn" id="acPwReset" style="margin:0">Email me a reset link</button></span></div>
       <div class="msg" id="acPwMsg"></div>
@@ -315,10 +273,6 @@ async function load(){
       <div class="msg" id="acDelMsg"></div>
     </div>`;
 
-  /* r385: card-skin particles on the account overview + a fast lane to the frame picker */
-  try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(root)); }catch(e){}
-  { const tcz=document.getElementById('tcCustomize'); if(tcz) tcz.onclick=()=>{
-      const fr=document.getElementById('flairRow'); if(fr) fr.scrollIntoView({behavior:'smooth',block:'center'}); }; }
   const say=(id,t,bad)=>{ const el=document.getElementById(id); if(el){ el.textContent=t; el.style.color=bad?'var(--bad)':'var(--accent)'; } };
   // r81: security + appearance wiring
   const pw=document.getElementById('acPwReset');
@@ -573,32 +527,7 @@ async function load(){
       say('acPassMsg','Password updated \u2713'); }catch(e){ say('acPassMsg','Something went wrong.',true); }
   };
   // r156: PRO touchpoints — plan card button + the flair PRO tag open the offer sheet
-  { const pb=document.getElementById('proSheetBtn'); if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); };
-    const pt=document.getElementById('proTagFlair'); if(pt) pt.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Pro cosmetics'); }; }
-  /* r373: frame-picker save \u2014 same update pattern the flat buttons used; locked
-     swatches answer with their earn line instead of writing anything. r384: the .on
-     class carries the picked border now (compact tiles ship no inline border), and
-     hover/click surfaces the earn text in the single hint line under the grid. */
-  const flairHint=b=>{ const el=document.getElementById('flairHint'); if(!el) return;
-    const fr=frameCards.find(x=>x.id===b.dataset.flair); if(!fr) return;
-    el.textContent = fr.id==='none' ? 'None \u2014 plain card'
-      : (b.dataset.locked==='1' ? '\ud83d\udd12 '+fr.name+' \u2014 '+(fr.earn||'keep playing.')
-        : fr.name+' \u2014 '+(fr.desc||'yours to wear')); };
-  document.querySelectorAll('.flair-opt').forEach(b=>{ b.onmouseenter=()=>flairHint(b);
-    b.onclick=async()=>{
-    flairHint(b);
-    if(b.dataset.locked==='1'){
-      const fr=(window.HK_FRAMES||[]).find(x=>x.id===b.dataset.flair);
-      say('flairMsg','Locked \u2014 '+((fr&&fr.earn)||'keep playing.'),true); return;
-    }
-    const f=b.dataset.flair==='none'?null:b.dataset.flair;
-    try{ const {error}=await sb.from('profiles').update({flair:f}).eq('id',me.id);
-      if(error){ say('flairMsg','Couldn\u2019t save \u2014 try again.',true); return; }
-      prof.flair=f;
-      document.querySelectorAll('.flair-opt').forEach(x=>x.classList.toggle('on',x===b));
-      try{ render(); }catch(e){}  // r385: reskin the account overview card live
-      say('flairMsg','Frame set \u2713 \u2014 it rides wherever your card appears.'); }catch(e){ say('flairMsg','Something went wrong.',true); }
-  }; });
+  { const pb=document.getElementById('proSheetBtn'); if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); }; }
   { const dv=document.getElementById('devRanked'), dro=document.getElementById('devRankedOff');
     if(dv) dv.onclick=()=>{ try{ localStorage.setItem('hk_dev_unlock','1'); localStorage.setItem('hk_ranked','1'); }catch(e){}
       say('devMsg','Ranked unlocked for testing ✓ — open the leaderboard.'); };

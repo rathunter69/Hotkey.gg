@@ -895,6 +895,54 @@ window.hkFrameUnlocked = function(id, u){
   }
   return false;
 };
+/* ---- r387: flair carries the whole card loadout, not just the frame. Historically
+   profiles.flair held a bare frame id ("molten"). To let the Profile customizer
+   persist the extended loadout (which elements show, which stats to highlight, the
+   equipped title) WITHOUT a schema migration, flair may ALSO be a JSON blob:
+     {"f":"molten","sh":{"rank":1,"level":1,"streak":1,"desk":0},"st":["solves","crowns","streak"],"ti":"pro"}
+   hkFlair(raw) normalizes EITHER shape to {frame, show, stats, title}. Every legacy
+   read site that only wants the frame stays correct by reading .frame — the bare-id
+   path is preserved verbatim. hkFlairPack() round-trips: it emits a bare id when no
+   extended prefs are set (keeps the column clean + old readers happy) and JSON only
+   when the user has actually customized beyond the frame. Both are dependency-free. */
+window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy','saved','favkey'];
+window.hkFlair = function(raw){
+  const FR = window.HK_FRAMES || [];
+  const validFrame = id => id && /^[a-z0-9_-]{1,32}$/i.test(id) && FR.some(f=>f.id===id) ? id : null;
+  const def = { frame:null, show:{rank:true, level:true, streak:true, desk:false}, stats:[], title:null };
+  if(raw==null || raw==='') return def;
+  const s = String(raw).trim();
+  if(s.charAt(0) === '{'){
+    let o=null; try{ o=JSON.parse(s); }catch(e){ o=null; }
+    if(o && typeof o==='object'){
+      const show = Object.assign({}, def.show);
+      if(o.sh && typeof o.sh==='object'){ ['rank','level','streak','desk'].forEach(k=>{ if(k in o.sh) show[k]=!!o.sh[k]; }); }
+      const stats = Array.isArray(o.st) ? o.st.filter(k=>window.HK_STAT_KEYS.indexOf(k)>=0).slice(0,5) : [];
+      const title = (typeof o.ti==='string' && /^[a-z0-9_-]{1,32}$/i.test(o.ti)) ? o.ti : null;
+      return { frame: validFrame(o.f), show, stats, title };
+    }
+    return def;
+  }
+  // legacy bare frame id
+  return { frame: validFrame(s), show: Object.assign({}, def.show), stats: [], title: null };
+};
+window.hkFlairPack = function(l){
+  l = l || {};
+  const frame = (l.frame && /^[a-z0-9_-]{1,32}$/i.test(l.frame)) ? l.frame : null;
+  const show = l.show || {};
+  const stats = Array.isArray(l.stats) ? l.stats.filter(k=>(window.HK_STAT_KEYS||[]).indexOf(k)>=0).slice(0,5) : [];
+  const title = (l.title && /^[a-z0-9_-]{1,32}$/i.test(l.title)) ? l.title : null;
+  // does the loadout differ from the defaults? if not, keep it a bare id (or null).
+  const shOff = ('rank' in show && !show.rank) || ('level' in show && !show.level) ||
+                ('streak' in show && !show.streak) || (!!show.desk);
+  if(!stats.length && !title && !shOff) return frame;   // clean bare-id path
+  const o = { f: frame };
+  if(shOff) o.sh = { rank: show.rank!==false?1:0, level: show.level!==false?1:0,
+                     streak: show.streak!==false?1:0, desk: show.desk?1:0 };
+  if(stats.length) o.st = stats;
+  if(title) o.ti = title;
+  return JSON.stringify(o);
+};
 /* Ornament HTML per frame — '' for frames that are pure CSS (bone). Corner SVGs
    ride .hkf-cn/.hkf-c1..c4 (c2-c4 mirror via CSS transforms); the tier tab is an
    .hkf-tab <i> colored inline from HK_METALS. .hkf-glint is the specular-sweep
@@ -1162,24 +1210,53 @@ window.hkPlayerCard = function(d, opts){
   const full = opts.scale !== 'compact';   // 'full' | 'compact' (default full)
   const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   let cls = 'uc' + (full ? '' : ' compact'), orn = '';
-  const fv = d.flair;
+  // r387: d.flair may be a bare frame id, a full loadout JSON, or null (host carries
+  // the skin). Normalize to the frame id for the class/ornaments either way.
+  const fv = (d.flair && window.hkFlair) ? window.hkFlair(d.flair).frame : d.flair;
   if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
     cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
     orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full}) : '';
   }
+  // r387: show-on-card toggles. Absent d.show => show everything (legacy callers).
+  const show = d.show || {};
+  const showRank = show.rank !== false, showLevel = show.level !== false;
   const stats = (d.stats||[]).map(s=>
     '<span class="s"><b>'+esc(s.n)+'</b><span>'+esc(s.label)+'</span></span>').join('');
-  let h = '<div class="'+cls+'">'+orn+
-    '<div class="uc-head"><span class="uc-crest">'+(d.tierEmblem||'')+'</span>'+
-      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+
-        '<div class="uc-tier">'+(d.tierChipEmblem||'')+'<span>'+esc(d.tierLabel)+'</span></div></div>'+
-      '<div class="uc-lvlwrap"><div class="uc-lvl">LVL '+esc(d.lvl)+'</div>'+
+  const crestHtml = showRank ? '<span class="uc-crest">'+(d.tierEmblem||'')+'</span>' : '';
+  const tierHtml = showRank ? '<div class="uc-tier">'+(d.tierChipEmblem||'')+'<span>'+esc(d.tierLabel)+'</span></div>' : '';
+  const lvlHtml = showLevel ? '<div class="uc-lvlwrap"><div class="uc-lvl">LVL '+esc(d.lvl)+'</div>'+
         '<div class="uc-bar"><i style="width:'+(d.pct||0)+'%"></i></div>'+
-        '<div class="uc-xp">'+esc(d.xpLine)+'</div></div>'+
-    '</div>';
+        '<div class="uc-xp">'+esc(d.xpLine)+'</div></div>' : '';
+  let h = '<div class="'+cls+(showRank?'':' no-rank')+(showLevel?'':' no-lvl')+'">'+orn+
+    '<div class="uc-head">'+crestHtml+
+      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+tierHtml+'</div>'+
+      lvlHtml+
+    '</div>'+
+    // r387 (Wolf): school + desk ride HIGH on the card (right under the identity),
+    // prominent — not buried in the footer.
+    (d.tagsHtml ? '<div class="uc-tags">'+d.tagsHtml+'</div>' : '');
   if(full){
     h += '<hr class="uc-div"><div class="uc-stats">'+stats+'</div>';
-    if(d.achHtml) h += '<div class="uc-ach">'+d.achHtml+'</div>';
+    // r387 (Wolf): the showcase is a fixed row of slots (default 5) — filled medals +
+    // dashed placeholders so the card never reads sparse, on every surface. Pass
+    // d.medals=[{glyph,rarity,name}]; d.medalSlots overrides the count. Legacy callers
+    // that still pass a pre-rendered d.achHtml keep working.
+    if(Array.isArray(d.medals)){
+      const slots = d.medalSlots || 5;
+      let mh = '';
+      for(let i=0;i<slots;i++){ const m=d.medals[i];
+        mh += (m && window.hkMedalCard) ? window.hkMedalCard(m.glyph, m.rarity, m.name, m.size||30)
+          : '<span class="hk-medc empty" aria-hidden="true"></span>'; }
+      h += '<div class="uc-ach">'+mh+'</div>';
+    } else if(d.achHtml){ h += '<div class="uc-ach">'+d.achHtml+'</div>'; }
+    // r387 (Wolf): campaign + certificate completion on the card (owner cards carry
+    // the data; public cards simply omit it). d.progress=[{label,val,pct}].
+    if(Array.isArray(d.progress) && d.progress.length){
+      h += '<div class="uc-prog">'+d.progress.map(p=>
+        '<div class="uc-pr"><span class="uc-prl">'+esc(p.label)+'</span>'+
+        '<span class="uc-prbar"><i style="width:'+Math.max(0,Math.min(100,p.pct||0))+'%"></i></span>'+
+        '<b class="uc-prv">'+esc(p.val)+'</b></div>').join('')+'</div>';
+    }
     if(d.boards && d.boards.length) h += '<hr class="uc-div"><div class="uc-boards">'+
       d.boards.map(b=>'<div class="uc-brow"><span>'+esc(b.name)+'</span><b>'+esc(b.time)+'</b></div>').join('')+'</div>';
   } else {
@@ -1199,6 +1276,46 @@ window.hkPlayerCard = function(d, opts){
    wall read as a rainbow. Same ladder, desaturated toward the site's engraved
    grammar; still legible on light AND dark themes. */
 window.HK_RARITY = { c:'#5a9a64', r:'#5f83bd', e:'#8d6cb5', l:'#c58a3a', m:'#bd5a4e' };
+/* r387 (Wolf): the achievement icon FINAL PASS (workshopped in r385 as achv5 — moon
+   for night owl, filled flame for streak, chevrons for combo, people for desk,
+   brand-dots for founder, plus mastery/accuracy/perfect/speed/rapid/comeback/cert/
+   formula/volume/daily/explorer/crown). Distinct per family — no more 13 achievements
+   sharing one 'sun'. These are authored on a 40×40 grid; hkBadge scales them into the
+   26-grid hex (translate(1 1) scale(.6), stroke-width 3 → ~1.8 effective). Fill parts
+   are explicit currentColor; founder keeps the four brand colors as a mythic pop. */
+window.HK_GLYPHS2 = {
+  explorer:'<path d="M20 4 C26.6 4 32 9.4 32 16 C32 25 20 36 20 36 C20 36 8 25 8 16 C8 9.4 13.4 4 20 4 Z"/><circle cx="20" cy="16" r="5"/>',
+  speed:'<path d="M23 4 L11 23 H18 L16 36 L29 16 H21 Z" fill="currentColor" stroke="none"/>',
+  accuracy:'<circle cx="20" cy="20" r="13"/><circle cx="20" cy="20" r="7"/><circle cx="20" cy="20" r="1.6" fill="currentColor" stroke="none"/>',
+  perfect:'<path d="M20 5 L32 18 L20 35 L8 18 Z"/><path d="M8 18 H32 M20 5 L15 18 L20 35 M20 5 L25 18 L20 35"/>',
+  rapid:'<circle cx="20" cy="23" r="11"/><path d="M20 23 V16 M20 6 V11 M16 6 H24 M31 12 L33 14"/>',
+  streak:'<path d="M20 20 c3.33 -4.93 0 -11.67 -1.67 -13.33 c0 5.06 -2.96 7.9 -5 10 c-2.04 2.1 -3.33 5.4 -3.33 8.33 a10 10 0 1 0 20 0 c0 -2.55 -1.76 -6.57 -3.33 -8.33 c-2.98 5 -4.65 5 -6.67 3.33z"/>',
+  combo:'<path d="M9 11 L17 20 L9 29 M18 11 L26 20 L18 29 M27 11 L35 20 L27 29"/>',
+  comeback:'<path d="M6 29 L16 19 L22 25 L34 13"/><path d="M26 13 H34 V21"/>',
+  cert:'<circle cx="20" cy="15" r="7"/><path d="M15 22 L12 35 L20 30 L28 35 L25 22"/>',
+  formula:'<path d="M28 8 H12 L21 20 L12 32 H28"/>',
+  volume:'<path d="M11 31 V22 M20 31 V13 M29 31 V18"/>',
+  daily:'<circle cx="20" cy="20" r="6"/><path d="M20 6 V10 M20 30 V34 M6 20 H10 M30 20 H34 M10 10 L13 13 M27 27 L30 30 M30 10 L27 13 M13 27 L10 30"/>',
+  crown:'<path d="M9 30 L9 15 L16 22 L20 9 L24 22 L31 15 L31 30 Z"/>',
+  mastery:'<path d="M4 16 L20 9 L36 16 L20 23 Z"/><path d="M12 19 V26 C12 29.5 28 29.5 28 26 V19"/><path d="M36 16 V25 L34 29"/>',
+  moon:'<path fill="currentColor" stroke="none" d="M35 21.3 A15 15 0 1 1 18.7 5 A11.67 11.67 0 0 0 35 21.3 Z"/>',
+  people:'<circle cx="14" cy="15" r="4.2"/><circle cx="26" cy="15" r="4.2"/><path d="M6 31 C6 24.5 22 24.5 22 31 M18 31 C18 25 34 25 34 31"/>',
+  founder:'<circle cx="14" cy="14" r="5.4" fill="#e0503f" stroke="none"/><circle cx="26" cy="14" r="5.4" fill="#e0902f" stroke="none"/><circle cx="14" cy="26" r="5.4" fill="#3fae6a" stroke="none"/><circle cx="26" cy="26" r="5.4" fill="#3f8fe0" stroke="none"/>',
+  keycap:'<rect x="7" y="7" width="26" height="26" rx="5"/><rect x="11" y="11" width="18" height="14" rx="2"/><path d="M11 29 H29"/>',
+  mouse:'<path d="M20 8 C13.9 8 11 12 11 20 C11 28 14 33 20 33 C26 33 29 28 29 20 C29 12 26.1 8 20 8 Z"/><path d="M20 8 V19 M11 19 H29"/>',
+  ice:'<path d="M20 5 V35 M7 12 L33 28 M33 12 L7 28 M20 5 L16.5 8.5 M20 5 L23.5 8.5 M20 35 L16.5 31.5 M20 35 L23.5 31.5 M7 12 L11.5 12.6 M7 12 L7.6 16.5 M33 28 L28.5 27.4 M33 28 L32.4 23.5 M33 12 L32.4 16.5 M33 12 L28.5 12.6 M7 28 L7.6 23.5 M7 28 L11.5 27.4"/>'
+};
+/* r387 (Wolf): the FINAL-PASS icons are clean glyphs meant to blend into the title
+   skin — NOT the old engraved hexagon. hkGlyph draws just the glyph (no hex, no
+   rarity ring); rarity is carried by the medal's halo (hkMedalCard). Used on the card
+   / showcase; the stats analytics wall still uses hkBadge's hex medal. */
+window.hkGlyph = function(id, size, color){
+  const g = (window.HK_GLYPHS2||{})[id];
+  if(!g) return '';
+  size = size || 34; color = color || 'currentColor';
+  return '<svg class="hk-glyph" viewBox="0 0 40 40" width="'+size+'" height="'+size+'" style="color:'+color+';overflow:visible">'+
+    '<g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">'+g+'</g></svg>';
+};
 window.hkBadge = function(id, earned, size, color, rarity){
   /* r376: 'glyph keeps family color, ring carries rarity' — the r138 metal tint
      REPLACED the family identity (audit finding). r384 (Wolf): that combo was TWO
@@ -1288,7 +1405,11 @@ window.hkBadge = function(id, earned, size, color, rarity){
   return '<svg class="hk-badge'+(earned?' earned':' off')+'" viewBox="0 0 26 26" width="'+size+'" height="'+size+'" style="color:'+col+';overflow:visible">'+
     ring+
     '<path d="'+hex+'" fill="none" stroke="currentColor" stroke-width="1.7"'+op+'/>'+
-    '<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'+op+'>'+(G[id]||G.fin)+'</g>'+
+    '<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'+op+'>'+
+      ((window.HK_GLYPHS2 && window.HK_GLYPHS2[id])
+        ? '<g transform="translate(1 1) scale(0.6)" stroke-width="3">'+window.HK_GLYPHS2[id]+'</g>'
+        : (G[id]||G.fin))+
+    '</g>'+
     '</svg>';
 };
 // r138: shared rarity helpers — tier word + tooltip fragment (stats grid + cards)
@@ -1322,6 +1443,46 @@ window.hkEffRarity = function(tier, dataPct, fieldN){
      fall into the reserved mythic band. Zero falls back to the hand-set floor. */
   if((fieldN|0)>=20 && dataPct!==undefined && dataPct!==null && isFinite(dataPct) && dataPct>0) return dataPct;
   return tier==='m' ? 0.5 : tier==='l' ? 3 : tier==='e' ? 10 : tier==='r' ? 25 : 100;
+};
+/* r387 (Wolf): FEATURED MEDAL ON A CARD — inlaid tray + rarity HALO. The engraved
+   badge is tuned for the neutral stats wall — on a colored card SKIN it reads
+   grey/legacy and its thin rarity ring vanishes. hkMedalCard seats the badge in a
+   dark recessed slot (consistent contrast on ANY skin — and a self-contained chip on
+   a plain light-theme card) and carries rarity as a soft rarity-colored HALO glow
+   behind the badge (rare-or-better). No rarity label on the tray — just the
+   achievement name (Wolf). rarityPct is an EFFECTIVE-rarity % (hkEffRarity), same
+   input hkBadge takes. CSS lives in nav.css (.hk-medc*). */
+window.hkMedalCard = function(glyph, rarityPct, name, size, bare){
+  size = size || 34;
+  const meta = window.hkRarityMeta ? window.hkRarityMeta(rarityPct) : { color:'#8a8f98', weight:4, word:'' };
+  const rare = meta.weight <= 3;   // rare/epic/legendary/mythic show the rarity dot
+  // r387 (Wolf): the CLEAN glyph — no old hexagon, and NO halo (it fuzzed the vector
+  // and read low-quality). Rarity is a crisp corner dot, exactly like the r385 scratch
+  // tiles. bare (light picker/slots) inherits currentColor; the dark tray uses light
+  // steel for skin contrast. Falls back to hkBadge only for legacy non-family glyphs.
+  const badge = (window.hkGlyph && window.HK_GLYPHS2 && window.HK_GLYPHS2[glyph])
+    ? window.hkGlyph(glyph, size+4, 'currentColor')
+    : (window.hkBadge ? window.hkBadge(glyph, true, size, 'currentColor', rarityPct) : '');
+  const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // r387 (Wolf): rarity = a row of tier-colored DIAMOND pips just under the glyph
+  // (rare 2 · epic 3 · legendary 4), and a distinct CROWN pip for the top rank
+  // (mythic). Common shows none. w: 0 myth · 1 leg · 2 epic · 3 rare · 4 common.
+  let pips = '';
+  if(rare){
+    const w = meta.weight;
+    if(w===0){ // mythic — the pinnacle gets its own mark
+      pips = '<span class="hk-medc-pips"><svg class="hk-medc-crown" viewBox="0 0 14 11" width="15" height="12" style="overflow:visible">'+
+        '<path d="M1.5 10 L1.5 4 L5 6.8 L7 1.5 L9 6.8 L12.5 4 L12.5 10 Z" fill="'+meta.color+'" stroke="none"/></svg></span>';
+    } else {
+      let d=''; for(let i=0;i<(5-w);i++) d+='<i class="hk-medc-pip" style="background:'+meta.color+'"></i>';
+      pips = '<span class="hk-medc-pips">'+d+'</span>';
+    }
+  }
+  return '<span class="hk-medc'+(bare?' bare':'')+'" style="--rc:'+meta.color+'"'+
+      (name?(' title="'+esc(name)+(meta.word?' — '+meta.word:'')+'"'):'')+'>'+
+    '<span class="hk-medc-h">'+badge+'</span>'+pips+
+    (name?'<b class="hk-medc-nm">'+esc(name)+'</b>':'')+
+  '</span>';
 };
 
 /* =====================================================================
