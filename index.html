@@ -1558,6 +1558,7 @@
   /* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
   #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
   #grid th{font-size:10.5px}
+  #grid td.fillcell{pointer-events:none}   /* r399 PROTOTYPE: empty canvas rows below the drill's data — inert, purely visual */
   /* r353 (Wolf: "weird drop shadow thing" on Ctrl+1): the wrapper used to be a SECOND card —
      its own surface, border, padding and a heavy 30px shadow AROUND the inner .pd-box card,
      reading as a doubled frame. The wrapper is positioning-only now; .pd-box carries the one
@@ -8365,10 +8366,18 @@ function render(){
     for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72);
   }
   S._ew=__ew;                                              // display widths (elastic)
+  /* r399 PROTOTYPE (Wolf): fixed Excel-like canvas. Instead of scaling cell height to the
+     drill's row count (short drills → big cells, tall → small), render a CONSTANT ~target-px
+     row and fill the stage with as many rows as fit — the drill's data sits on top, the rest
+     are empty grid rows, exactly like a real sheet. Consistent cell size for every drill, no
+     scaling, more room to build. Tall models (rows > what fits at target) auto-densify. */
+  const __PROTO_TARGET = 26;   // tune me: standard cell height
   let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));
+  let __VR = S.ROWS;
   if(__gw && __gw.clientHeight>100){                       // measured: fill the box exactly
-    const __availH = __gw.clientHeight - 28 - 31;          // padding 14×2 + header row
-    __rowH = Math.max(22, Math.min(56, Math.floor((__gw.clientHeight - 17 - 31) / S.ROWS)));   // r70b: ceiling 56 — with height:100% distribution the cap is a comfort bound, not the fill mechanism
+    const __availH = __gw.clientHeight - 17 - 31;          // usable height minus header
+    __VR = Math.max(S.ROWS, Math.round(__availH / __PROTO_TARGET));   // canvas rows: content + empty filler
+    __rowH = Math.max(18, Math.min(40, Math.floor(__availH / __VR)));
   }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
   S._colW = colW;                                          // ENGINE widths — graders (autofit) read these; r55 wrongly pointed this at __ew
@@ -8401,7 +8410,12 @@ function render(){
   /* r308 (Wolf): the DISPLAYED active cell is the selection ANCHOR (Excel-true) — extending
      a selection used to march the ring to the far end; native Excel keeps it at the start */
   const __dA = S.sel ? (S.selA && S.selA.r>=1 ? S.selA : {r:S.sel.r, c:S.sel.c}) : S.active;
-  for(let r=1;r<=S.ROWS;r++){
+  for(let r=1;r<=__VR;r++){
+    if(r>S.ROWS){   // r399 PROTOTYPE: empty Excel-style filler rows below the drill's content
+      let fr='<tr><th class="rowhdr">'+r+'</th>';
+      for(let c=1;c<=COLS;c++) fr+='<td class="fillcell"></td>';
+      g.innerHTML+=fr+'</tr>'; continue;
+    }
     if(rowHidden(r)) continue;   // r179: collapsed group detail
     let grpCls='', grpGlyph='';
     if(S.rowGroups){ for(const g of S.rowGroups){
