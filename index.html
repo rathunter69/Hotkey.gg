@@ -1625,10 +1625,11 @@
           <button class="mb-dur" data-mode="rapidfire" data-dur="120">2 minutes</button>
         </div>
       </div>
-      <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; solution</button>
-      <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn</button>
+      <!-- r401 (Wolf): the help ladder, lightest-first — F1 hints, then guided, then watch solution.
+           'learn' (echo mode) retired from the bar; it overlapped guided/solution and read as clutter. -->
       <button class="mb-tool" id="hintsToggle" data-tip="F1 — light up the keys for each step (no cursor lock)"><kbd>F1</kbd> hints</button>
       <button class="mb-tool" id="guideToggle" data-tip="guided — hints PLUS the cursor fenced to the working area">&#9932; guided</button>
+      <button class="mb-tool" id="demoBtn" data-tip="watch the optimal keystrokes replay through the real engine">&#x25b6; solution</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
@@ -13545,7 +13546,7 @@ document.addEventListener('keydown', function(e){
 document.addEventListener('mouseup', function(e){
   if(echoOn && e.target && e.target.closest && e.target.closest('#grid')) setTimeout(echoStep, 60);
 }, true);
-$('echoBtn').addEventListener('click',()=>{ echoOn?echoStop():echoStart(); });
+{ const eb=$('echoBtn'); if(eb) eb.addEventListener('click',()=>{ echoOn?echoStop():echoStart(); }); }   /* r401: 'learn' button retired from the bar — guard the wiring so its absence never throws */
 
 /* r283 STUCK NUDGE (Wolf) — a fresh player staring at a drill with zero checklist
    progress for 40s doesn't know the trainers exist. One quiet pointer per drill
