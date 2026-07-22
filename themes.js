@@ -857,7 +857,22 @@ window.HK_FRAMES = [
   {id:'molten',     name:'Molten',       tier:'legendary',
    desc:'magma cracks + rising embers',                earn:'hold a 30-day streak (5 daily wins)'},
   {id:'founder',    name:'Founder',      tier:'legendary',
-   desc:'holographic foil — first 200 PRO, serialized', earn:'charter / first-200 PRO member'},
+   desc:'aurora foil — first 200 PRO, serialized',      earn:'charter / first-200 PRO member'},
+  /* r390 (Wolf) new title skins — mock lineup (earn rules provisional, tune later) */
+  {id:'amethyst',   name:'Amethyst',     tier:'rare',
+   desc:'deep purple gem + prism shimmer',             earn:'reach VP'},
+  {id:'onyx',       name:'Onyx',         tier:'legendary',
+   desc:'murdered-out black + gold veins',             earn:'reach Second-Year Analyst'},
+  {id:'sakura',     name:'Sakura',       tier:'epic',
+   desc:'cherry blossom — drifting petals',            earn:'hold a 14-day streak'},
+  {id:'goldenhour', name:'Golden Hour',  tier:'epic',
+   desc:'warm sunset wash + soft bokeh',               earn:'clean solve at dawn or dusk'},
+  {id:'pearl',      name:'Pearl',        tier:'epic',
+   desc:'iridescent mother-of-pearl sheen',            earn:'post a perfect-efficiency run'},
+  {id:'bloom',      name:'Bloom',        tier:'rare',
+   desc:'pastel spring — floating petals',             earn:'reach Associate'},
+  {id:'cottoncandy',name:'Cotton Candy', tier:'rare',
+   desc:'pink-blue pastel + soft bokeh',               earn:'reach Summer Analyst'},
 ];
 /* u = {lvl, tierBest, dailyWins, certs, charter, perfectRun}. tierBest is a
    HK_RANK.TIERS index (highest tier ever DISPLAYED — nav.js persists it into
@@ -909,7 +924,7 @@ window.hkFrameUnlocked = function(id, u){
    path is preserved verbatim. hkFlairPack() round-trips: it emits a bare id when no
    extended prefs are set (keeps the column clean + old readers happy) and JSON only
    when the user has actually customized beyond the frame. Both are dependency-free. */
-window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy','saved','favkey'];
+window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy','saved','favkey','keys'];
 window.hkFlair = function(raw){
   const FR = window.HK_FRAMES || [];
   const validFrame = id => id && /^[a-z0-9_-]{1,32}$/i.test(id) && FR.some(f=>f.id===id) ? id : null;
@@ -1080,13 +1095,21 @@ window.hkFrameOrnaments = (function(){
     blueprint:    ['SHEET 01',    '#0c1a26', 'linear-gradient(90deg,#2f5b86,#4f7aa8)', '#4f7aa8', ''],
     crt:          ['C:\\ READY',  '#04140a', 'linear-gradient(90deg,#1c6a38,#2fae5c)', '#2fae5c', 'matrix'],
     constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','stars'],
-    vaporwave:    ['SYNTHWAVE',   '#1a0722', 'linear-gradient(120deg,#ff5db1,#2ee6e6)', '#ff5db1', 'sun'],
+    vaporwave:    ['SYNTHWAVE',   '#1a0722', 'linear-gradient(120deg,#ff5db1,#2ee6e6)', '#ff5db1', 'drive'],
     terminal:     ['● LIVE', '#1a1204', 'linear-gradient(90deg,#3a2a08,#7a5a12)', '#e0a02f', ''],
-    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'cosmic'],
+    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'galaxy'],
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
     molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
-    founder:      ['★ FOUNDER','#100f18','linear-gradient(120deg,#ff5db1,#8fe0ff,#c89bff)','#c89bff','holo']
+    founder:      ['★ FOUNDER','#100f18','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c89bff','aurora'],
+    /* r390 (Wolf) new title skins */
+    amethyst:     ['◆ AMETHYST','#180a2a','linear-gradient(120deg,#a06cff,#d0a8ff)','#c49bff','prism'],
+    onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','gold'],
+    sakura:       ['❀ SAKURA','#3a1420','linear-gradient(120deg,#ffc2dc,#ff8fb8)','#ff8fb8','petals'],
+    goldenhour:   ['☀ GOLDEN HOUR','#3a1c10','linear-gradient(120deg,#ffd9a0,#ff9e7a)','#ffb488','bokeh'],
+    pearl:        ['◗ PEARL','#2a2634','linear-gradient(120deg,#f0e6ff,#cfe6ff)','#e6d9ff','pearl'],
+    bloom:        ['✿ BLOOM','#1e2e1a','linear-gradient(120deg,#c8f0b0,#f6c8e0)','#dcb0e0','petals'],
+    cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','bokeh']
   };
   return function(id, opts){
     const M=window.HK_METALS||{};
@@ -1104,7 +1127,14 @@ window.hkFrameOrnaments = (function(){
       if(s[4]) h+='<canvas class="hk-fx" data-kind="'+s[4]+'" aria-hidden="true"></canvas>';
       if(id==='vaporwave') h+='<span class="hkf-sun" aria-hidden="true"></span><span class="hkf-vgrid" aria-hidden="true"></span>';
       h+=tab(s[0], s[1], s[2], s[3]);
-      if(id==='founder') h+='<i class="hkf-serial" aria-hidden="true">FOUNDER · 007 / 200</i>';
+      if(id==='founder'){
+        // r391 (Wolf): the founder card wears its real serial. Explicit opts.serial wins;
+        // else the viewer's own founding rank (opts.owner) — never a stranger's number.
+        let sn=(opts&&opts.serial|0)||0;
+        if(!sn && opts && opts.owner && window.hkFoundingFlags){ sn=window.hkFoundingFlags().rank|0; }
+        const label = (sn>0 && sn<=200) ? ('FOUNDER · '+String(sn).padStart(3,'0')+' / 200') : 'FOUNDER · CHARTER';
+        h+='<i class="hkf-serial" aria-hidden="true">'+label+'</i>';
+      }
       return h;
     }
     if(id==='engraved') return GLINT+corners(ENG);
@@ -1188,12 +1218,31 @@ window.hkInitCardFx = function(root){
       return{fs,cols};}
     function prism(w,h){const n=Math.round(w*h/17000)+6,cols=['#ff9ed4','#a8e6ff','#c9b8ff','#8ff0c8','#ffe0a0'],p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.8),ph:R(0,6.28),sp:R(.6,1.6),c:cols[i%cols.length]});return p;}
     function stars(w,h){const n=Math.round(w*h/6500)+10,cols=['#ffffff','#cfd6ff','#ffe9b8'],p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.5,1.6),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
+    /* r390 (Wolf) new skin systems: falling petals (sakura/bloom) · soft bokeh (golden
+       hour/cotton candy) · pastel pearl sheen · spiral galaxy (pro) · aurora curtains
+       (founder) · synthwave drive grid (vaporwave). */
+    function petals(w,h){const n=Math.round(w*h/12000)+9,cols=['rgba(255,183,213,','rgba(255,150,196,','rgba(255,214,230,'],p=[];
+      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(3,6.5),vy:R(.3,.95),drift:R(-.5,.5),rot:R(0,6.28),vr:R(-.035,.035),ph:R(0,6.28),o:R(.5,.92),c:cols[i%cols.length]});return p;}
+    function bokeh(w,h){const n=Math.round(w*h/24000)+5,cols=['#ffd9a0','#ffb6c1','#b5d8ff','#fff0c0','#ffc2e8'],p=[];
+      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(10,28),vy:R(-.5,-.18),ph:R(0,6.28),sp:R(.4,1),c:cols[i%cols.length]});return p;}
+    function pearl(w,h){const n=Math.round(w*h/22000)+6,p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.6),ph:R(0,6.28),sp:R(.5,1.3)});return p;}
+    function galaxy(w,h){const n=Math.round(w*h/2400)+50,cx=w*.5,cy=h*.52,cols=['#ffffff','#cfd6ff','#ffd9a0','#c9b8ff','#a8e6ff'],p=[];
+      for(let i=0;i<n;i++){const arm=i%2,rad=R(.04,.62)*Math.min(w,h),ang=rad*0.028+arm*Math.PI+R(-.35,.35);
+        p.push({rad,ang,r:R(.4,1.5),c:cols[i%cols.length],ph:R(0,6.28),sp:R(.5,1.4)});}
+      return{cx,cy,p};}
+    function aurora(w,h){return{b:[{hue:150,off:0,sp:1},{hue:285,off:2.1,sp:.72},{hue:190,off:4.2,sp:1.35}]};}
+    function drive(w,h){return{hz:Math.round(h*.40)};}
+    function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
+      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
     const sys=[];
     canv.forEach(cv=>{
       if(cv._hkfx) return; cv._hkfx=1;
       const kind=cv.dataset.kind, S=fit(cv); if(!S) return;
       let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?prism(S.w,S.h)
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
+        : kind==='petals'?petals(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
+        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
+        : kind==='gold'?gold(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
       sys.push({cv,kind,S,parts});
     });
@@ -1244,6 +1293,45 @@ window.hkInitCardFx = function(root){
           ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
         for(const s of P){ const a=reduce?.7:(.3+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
+      else if(o.kind==='petals'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=(s.drift+Math.sin(t/800+s.ph)*.4)*dpr; s.rot+=s.vr; if(s.y>h+8){s.y=-8;s.x=R(0,w);}}
+        ctx.save();ctx.translate(s.x,s.y);ctx.rotate(s.rot);ctx.beginPath();ctx.ellipse(0,0,s.r*dpr,s.r*.5*dpr,0,0,6.28);ctx.fillStyle=s.c+s.o+')';ctx.fill();ctx.restore(); } }
+      else if(o.kind==='bokeh'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=Math.sin(t/1400+s.ph)*.3*dpr; if(s.y<-s.r*dpr){s.y=h+s.r*dpr;s.x=R(0,w);}}
+        const a=(reduce?.22:.11+.14*(.5+.5*Math.sin(t/1000*s.sp+s.ph)));
+        const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*dpr); g.addColorStop(0,s.c); g.addColorStop(1,'transparent');
+        ctx.globalAlpha=a;ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fill();ctx.globalAlpha=1; } }
+      else if(o.kind==='pearl'){ for(let bi=0;bi<3;bi++){ const off=((t/3400+bi/3)%1),cx=(-.4+off*1.8)*w,hue=(t/70+bi*70)%360;
+          const g=ctx.createLinearGradient(cx-.3*w,0,cx+.3*w,h);
+          g.addColorStop(0,'hsla('+hue+',70%,85%,0)');g.addColorStop(.5,'hsla('+hue+',75%,88%,.12)');g.addColorStop(1,'hsla('+((hue+50)%360)+',70%,85%,0)');
+          ctx.fillStyle=g;ctx.fillRect(0,0,w,h); }
+        for(const s of o.parts){ const a=reduce?.5:(.25+.4*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.shadowBlur=5*dpr;ctx.shadowColor='rgba(220,210,255,.7)';ctx.fill();} ctx.shadowBlur=0; }
+      else if(o.kind==='galaxy'){ const P=o.parts,rot=reduce?0:t/9000;
+        const cg=ctx.createRadialGradient(P.cx,P.cy,0,P.cx,P.cy,Math.min(w,h)*.24);
+        cg.addColorStop(0,'rgba(240,230,255,.5)');cg.addColorStop(.4,'rgba(180,160,255,.16)');cg.addColorStop(1,'transparent');
+        ctx.fillStyle=cg;ctx.fillRect(0,0,w,h);
+        for(const s of P.p){ const a2=s.ang+rot,x=P.cx+Math.cos(a2)*s.rad,y=P.cy+Math.sin(a2)*s.rad*.62,tw=reduce?.7:(.4+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(x,y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=tw;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
+      else if(o.kind==='aurora'){ ctx.globalCompositeOperation='lighter';
+        for(const bd of o.parts.b){ const cx=w*(.5+.36*Math.sin(t/4200*bd.sp+bd.off)),hue=bd.hue+18*Math.sin(t/6000+bd.off);
+          const g=ctx.createLinearGradient(cx-.22*w,0,cx+.22*w,h);
+          g.addColorStop(0,'hsla('+hue+',85%,60%,0)');g.addColorStop(.5,'hsla('+hue+',85%,63%,'+(reduce?.1:.15)+')');g.addColorStop(1,'hsla('+((hue+40)%360)+',85%,60%,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
+        ctx.globalCompositeOperation='source-over'; }
+      else if(o.kind==='gold'){
+        // onyx: slow diagonal gold shimmer sweep + rising gold dust that twinkles
+        const off=(t/5200)%1, cx=(-.3+off*1.6)*w;
+        const g=ctx.createLinearGradient(cx-.28*w,0,cx+.28*w,h);
+        g.addColorStop(0,'rgba(245,214,122,0)');g.addColorStop(.5,'rgba(245,214,122,'+(reduce?.06:.13)+')');g.addColorStop(1,'rgba(200,150,60,0)');
+        ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+        for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr;s.x+=(s.drift+Math.sin(t/1200+s.ph)*.3)*dpr;if(s.y<-4){s.y=h+4;s.x=R(0,w);}}
+          const a=reduce?.6:(.22+.58*(.5+.5*Math.sin(t/650*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor='rgba(245,205,110,.9)';ctx.fill();ctx.globalAlpha=1; }
+        ctx.shadowBlur=0; }
+      else if(o.kind==='drive'){ const hz=o.parts.hz,vx=w/2; ctx.strokeStyle='rgba(255,93,177,.30)';ctx.lineWidth=1*dpr;
+        ctx.beginPath(); for(let i=-7;i<=7;i++){ ctx.moveTo(vx,hz); ctx.lineTo(vx+i*(w/7),h); } ctx.stroke();
+        const scroll=reduce?0:(t/650)%1;
+        for(let i=0;i<11;i++){ let f=(i+scroll)/11; f=f*f; const y=hz+(h-hz)*f; ctx.globalAlpha=Math.min(.5,f*1.4); ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
+        ctx.globalAlpha=1; }
       else { for(const s of o.parts){ const a=reduce?.7:(.35+.55*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
         ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
     }
@@ -1272,7 +1360,7 @@ window.hkPlayerCard = function(d, opts){
   const fv = (d.flair && window.hkFlair) ? window.hkFlair(d.flair).frame : d.flair;
   if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
     cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
-    orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full}) : '';
+    orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full, owner:!!d.owner, serial:d.serial|0}) : '';
   }
   // r387: show-on-card toggles. Absent d.show => show everything (legacy callers).
   const show = d.show || {};

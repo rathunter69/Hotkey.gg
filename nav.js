@@ -751,7 +751,7 @@
     const flairCls = __safeFlair ? (__isFrame ? ' hk-frame-'+__safeFlair+' hk-frame-lg' : ' flair-'+__safeFlair) : '';
     /* r376: plaque corners cut their gem from the bucket held at your best tier */
     const flairOrn = (__isFrame && window.hkFrameOrnaments)
-      ? window.hkFrameOrnaments(__safeFlair, {bucket:(window.hkFrameBucket?window.hkFrameBucket():1), lg:true}) : '';
+      ? window.hkFrameOrnaments(__safeFlair, {bucket:(window.hkFrameBucket?window.hkFrameBucket():1), lg:true, owner:true}) : '';
     /* r386 round2: the owner card renders through the ONE unified component
        (hkPlayerCard). The skin + ornaments ride the .pc-card shell (flairCls/flairOrn),
        so we pass flair=null to the component to avoid a double frame; content sits on

@@ -763,6 +763,37 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-founder .hkf-glint-sheen{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; border-radius:inherit}
 .hk-frame-founder .pc-name span,.hk-frame-founder .pub-nm{color:#f0e9ff; text-shadow:0 0 10px rgba(200,160,255,.5)}
 
+/* r390 (Wolf) new title skins — dark tinted interiors + themed borders so light text
+   reads on every one; the canvas (petals/bokeh/pearl/galaxy) carries the motion. */
+.hk-frame-amethyst.hk-frame-amethyst{--text:#efe0ff; --muted:#b79ad8; --line:#3a2358; --accent:#c49bff; --accent-dim:#7a4fd0;
+  border:2px solid transparent; color:#efe0ff;
+  background:radial-gradient(ellipse at 50% 0%,rgba(160,108,255,.28),transparent 60%),linear-gradient(160deg,#180a2a,#0f0620) padding-box, linear-gradient(120deg,#d0a8ff,#a06cff 55%,#6a3fb0) border-box;
+  box-shadow:0 0 24px rgba(150,90,255,.22),0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-onyx.hk-frame-onyx{--text:#efe6d2; --muted:#9a8a5e; --line:#3a2f16; --accent:#d8b25a; --accent-dim:#8a6d2f;
+  border:2px solid transparent; color:#efe6d2;
+  background:linear-gradient(160deg,#0c0c0e,#060607) padding-box, linear-gradient(120deg,#e8c874,#8a6d2f 50%,#4a3a18 78%,#d8b25a) border-box;
+  box-shadow:0 0 20px rgba(200,160,80,.14),0 20px 60px rgba(0,0,0,.66)}
+.hk-frame-sakura.hk-frame-sakura{--text:#ffe0ec; --muted:#d79ab0; --line:#5a2a3c; --accent:#ff8fb8; --accent-dim:#d05a86;
+  border:2px solid transparent; color:#ffe0ec;
+  background:radial-gradient(ellipse at 30% 0%,rgba(255,150,196,.26),transparent 58%),linear-gradient(160deg,#2a0f1a,#1c0a12) padding-box, linear-gradient(120deg,#ffc2dc,#ff8fb8 55%,#c95a86) border-box;
+  box-shadow:0 0 22px rgba(255,140,190,.2),0 20px 60px rgba(0,0,0,.58)}
+.hk-frame-goldenhour.hk-frame-goldenhour{--text:#ffe8d0; --muted:#d3a883; --line:#5a3320; --accent:#ffb488; --accent-dim:#d07a4a;
+  border:2px solid transparent; color:#ffe8d0;
+  background:radial-gradient(ellipse at 50% 118%,rgba(255,160,110,.34),transparent 55%),linear-gradient(160deg,#2a1408,#1c0d06) padding-box, linear-gradient(120deg,#ffd9a0,#ff9e7a 55%,#c85a3a) border-box;
+  box-shadow:0 0 22px rgba(255,150,90,.2),0 20px 60px rgba(0,0,0,.58)}
+.hk-frame-pearl.hk-frame-pearl{--text:#f0ecff; --muted:#aeb0cc; --line:#3c3a52; --accent:#e6d9ff; --accent-dim:#9a94c8;
+  border:2px solid transparent; color:#f0ecff;
+  background:radial-gradient(ellipse at 30% 0%,rgba(210,220,255,.2),transparent 60%),linear-gradient(160deg,#20202c,#161620) padding-box, linear-gradient(120deg,#f0e6ff,#cfe6ff 45%,#e6d0ff 75%,#fff0f8) border-box;
+  box-shadow:0 0 22px rgba(200,200,255,.18),0 20px 60px rgba(0,0,0,.56)}
+.hk-frame-bloom.hk-frame-bloom{--text:#eaf6e4; --muted:#a8c49a; --line:#2e4426; --accent:#dcb0e0; --accent-dim:#8aab6a;
+  border:2px solid transparent; color:#eaf6e4;
+  background:radial-gradient(ellipse at 70% 0%,rgba(246,200,224,.2),transparent 60%),linear-gradient(160deg,#162014,#0f180d) padding-box, linear-gradient(120deg,#c8f0b0,#f6c8e0 60%,#b088c0) border-box;
+  box-shadow:0 0 20px rgba(180,220,150,.16),0 20px 60px rgba(0,0,0,.56)}
+.hk-frame-cottoncandy.hk-frame-cottoncandy{--text:#ffe6f4; --muted:#c9a6d0; --line:#3a2a58; --accent:#ffc2e8; --accent-dim:#8fb8e0;
+  border:2px solid transparent; color:#ffe6f4;
+  background:radial-gradient(ellipse at 30% 0%,rgba(255,194,232,.22),transparent 60%),linear-gradient(160deg,#1e1430,#140d22) padding-box, linear-gradient(120deg,#ffc2e8,#b5d8ff 70%,#c8b0ff) border-box;
+  box-shadow:0 0 22px rgba(220,180,255,.18),0 20px 60px rgba(0,0,0,.56)}
+
 /* keyframes — canvas carries the heavy motion; CSS handles the founder sheen only */
 @media (prefers-reduced-motion: no-preference){
   .hk-frame-molten .hkf-crack path{animation:hkfCrackPulse 2.4s ease-in-out infinite}
