@@ -487,9 +487,13 @@ function showPublicCard(uid){
   try{
     const pp=(DATA.profs||[]).find(p=>p.id===uid);
     const raw=pp && pp.flair;
-    if(raw && /^[a-z0-9_-]{1,32}$/i.test(raw)){
-      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===raw)){ fv=raw; isSkin=true; }
-      else legacyCls=' flair-'+raw;
+    /* r390 (Wolf): flair is now often a JSON loadout blob (the customizer). Parse it via
+       hkFlair so the equipped skin shows on the public card, instead of failing the
+       bare-id test and rendering a plain (broken-looking) card. */
+    const frame=window.hkFlair ? window.hkFlair(raw).frame : (raw && /^[a-z0-9_-]{1,32}$/i.test(raw) ? raw : null);
+    if(frame){
+      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===frame)){ fv=frame; isSkin=true; }
+      else legacyCls=' flair-'+frame;
     }
   }catch(e){}
   // level/xp for this player — the canonical curve (same helpers the hero card uses)
@@ -525,7 +529,7 @@ function showPublicCard(uid){
     name:names[uid]+(uid===meId?' (you)':''),
     tierEmblem:window.rankEmblem?window.rankEmblem(t.name,60,t.bucket):'',
     tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
-    tierLabel:(t.full||t.name)+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':''),
+    tierLabel:t.full||(t.name+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':'')),   /* r390 (Wolf): t.full already carries bucket+provisional — don't append again (double-bucket) */
     lvl:lvl, pct:pct, xpLine:xpLine,
     stats:[{n:(st&&st.crowns)||0,label:'crowns'},{n:(st&&st.pod)||0,label:'podiums'},
       {n:(st&&st.t10)||0,label:'top-10s'},{n:(st&&st.att)||0,label:'boards'}],
@@ -662,7 +666,7 @@ function heroHtml(){
     name:(DATA.names||{})[meId],
     tierEmblem:window.rankEmblem?window.rankEmblem(t.name,40,t.bucket):'',
     tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
-    tierLabel:(t.full||t.name)+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':''),
+    tierLabel:t.full||(t.name+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':'')),   /* r390 (Wolf): t.full already carries bucket+provisional — don't append again (double-bucket) */
     lvl:L.lvl, pct:L.pct, xpLine:L.into+' / '+L.need+' xp',
     stats:[{n:me.crowns,label:me.crowns===1?'crown':'crowns'},{n:me.pod,label:'podiums'},
       {n:me.att+'/'+CH.length,label:'drills'},{n:mySolves,label:'clean solves'}],

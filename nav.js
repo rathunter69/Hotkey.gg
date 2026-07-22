@@ -756,8 +756,17 @@
        (hkPlayerCard). The skin + ornaments ride the .pc-card shell (flairCls/flairOrn),
        so we pass flair=null to the component to avoid a double frame; content sits on
        the skin with no inner boxes. */
-    let __crowns=0,__pods=0; try{ (d.drills||[]).forEach(x=>{ if(x.rank===1)__crowns++; if(x.rank!==null&&x.rank<=3)__pods++; }); }catch(e){}
+    let __crowns=0,__pods=0,__boards=0; try{ (d.drills||[]).forEach(x=>{ if(x.rank===1)__crowns++; if(x.rank!==null&&x.rank<=3)__pods++; if(x.rank!==null)__boards++; }); }catch(e){}
     let __streak=0; try{ __streak=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+    /* r390 (Wolf): the rank-click card now renders the SAME streamlined showcase as the
+       profile page — featured medals as a 5-slot array (not the old 3-medal reel). */
+    const __medals=(function(){ try{ const AC=window.HOTKEY_ACHIEVEMENTS; if(!AC) return [];
+      let picks=[]; const meF=(d._profs||[]).find(x=>x.id===window._navUser.id);
+      if(meF && meF.featured_ach!=null) picks=String(meF.featured_ach).split(',').filter(Boolean);
+      if(!picks.length){ try{ picks=JSON.parse(localStorage.getItem('hk_feat_ach')||'[]'); }catch(e){} }
+      const byId={}; AC.forEach(a=>byId[a.id]=a);
+      return picks.map(id=>byId[id]).filter(Boolean).slice(0,5).map(a=>({glyph:a.glyph,name:a.name,size:30,
+        rarity:window.hkEffRarity?window.hkEffRarity(a.tier):undefined})); }catch(e){ return []; } })();
     const __promo=(tier.nextName && !tier.provisional && typeof tier.promote==='number') ? ' · '+tier.promote+'% to '+tier.nextName : (tier.provisional?' · placement':'');
     /* r389 (Wolf): school + desk chips ride high on the card, matching the profile
        page. Honor the customizer's show toggles so the modal reads exactly as others
@@ -774,8 +783,8 @@
       tierChipEmblem: (window.rankEmblem?window.rankEmblem(tier.name,15,tier.bucket):''),
       tierLabel: tier.name+' · '+standing,
       lvl: __L.lvl, pct: __L.pct, xpLine: __L.into+' / '+__L.need+' xp'+__promo,
-      stats: [{n:(d.mySolves||0),label:'clean solves'},{n:__crowns,label:'crowns'},{n:__pods,label:'podiums'},{n:(__streak?'🔥 '+__streak:'—'),label:'streak'}],
-      tagsHtml: __tagBits, achHtml: badgesHtml, boards: [], flair: null
+      stats: [{n:(d.mySolves||0),label:'clean solves'},{n:__crowns,label:'crowns'},{n:__pods,label:'podiums'},{n:__boards,label:'boards'},{n:(__streak?'🔥 '+__streak:'—'),label:'streak'}],
+      tagsHtml: __tagBits, medals: __medals, medalSlots: 5, boards: [], flair: null
     },{scale:'full'}) : '';
     m.innerHTML = '<div class="pc-card'+flairCls+'">' + flairOrn +
       '<a class="pc-x" id="pcX">\u00d7</a>' +

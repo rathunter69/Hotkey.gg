@@ -318,7 +318,9 @@
      the active cell (lighter green on dark sheets so it stays the brightest mark). The active
      cell has no grey fill (it reads as the anchor); the range border is green like Excel. */
   :root{ --cell-cursor:#1a7a45; --active-fill:rgba(26,122,69,.13); --sel-grey:rgba(64,68,78,.15); }
-  html[data-dark="1"]{ --cell-cursor:#7ee0ad; --active-fill:rgba(126,224,173,.16); --sel-grey:rgba(220,225,235,.13); }
+  /* r390 (Wolf): the dark-mode sheet is a LIGHT off-white (see .gridwrap re-scope), so the
+     old light-mint cursor washed out on it. Keep the darker Excel-green outline in dark
+     mode too — it reads crisply on the light sheet. (Override removed on purpose.) */
   /* r313 (Wolf): thinner than r312 — the 2.5px box read as "very thick" and its offset clipped
      against neighbors. 1.5px inset by 1px sits cleanly like Excel's cursor. */
   /* r345 (Wolf): the active cell is OUTLINE ONLY — Excel never shades the cursor cell. Inside a
@@ -9677,9 +9679,10 @@ function hideResults(){ resultsChainKeys=null; const m=$('resultsModal'); if(m){
    holds a preview flip (keyed to the current drill, so it resets the moment you load a new one). */
 let sheetPageView=null;
 function sheetTabPages(keys){
-  const per = keys.length>6 ? Math.ceil(keys.length/2) : keys.length;
-  const pages=[]; for(let i=0;i<keys.length;i+=per) pages.push(keys.slice(i,i+per));
-  return pages.length?pages:[keys];
+  /* r390 (Wolf): one chapter = ONE set of tabs. The row scrolls (overflow-x) and tabs
+     no longer shrink, so full names read without the page pips. (If a chapter ever
+     overflows uncomfortably the pip-paging is one revert away.) */
+  return [keys];
 }
 function renderSheetTabs(){
   const host=$('sheetTabs'); if(!host) return;
