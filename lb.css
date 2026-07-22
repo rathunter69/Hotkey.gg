@@ -271,6 +271,8 @@
   .featured .board .empty{padding:16px 18px 4px}
   .hero .panel{display:flex; flex-direction:column}
   .hero .panel > :last-child{margin-top:auto}
+  /* r392 (Wolf): your-card medal showcase fills the column beside the tall daily board */
+  .yc-medals{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; justify-content:center}
   /* r392 (Wolf): compact-always leaderboard. The your-card sidebar sits snug to its
      content (no stretch gap to match the tall Top Players board). Daily + weekly are two
      EQUAL fixed cards — the daily box no longer spans full width as a near-empty banner. */

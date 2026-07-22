@@ -676,7 +676,16 @@ function heroHtml(){
       {n:me.att+'/'+CH.length,label:'drills'},{n:mySolves,label:'clean solves'}],
     flair:null
   },{scale:'compact'}) : '';
-  return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+heroCard+nextHtml+'</div>';
+  /* r392 (Wolf): fill the your-card column (it sat short beside the tall daily board) with
+     the equipped medal showcase — the cards/medals he wants surfaced everywhere. */
+  let myMedals='';
+  try{ const AC=window.HOTKEY_ACHIEVEMENTS, picks=(window.__featOf||{})[meId];
+    if(AC && picks && picks.length){ const byId={}; AC.forEach(a=>byId[a.id]=a);
+      const cells=picks.map(id=>byId[id]).filter(Boolean).slice(0,5)
+        .map(a=>window.hkMedalCard?window.hkMedalCard(a.glyph, window.hkEffRarity?window.hkEffRarity(a.tier):undefined, a.name, 30):'').join('');
+      if(cells) myMedals='<div class="yc-medals">'+cells+'</div>'; }
+  }catch(e){}
+  return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+heroCard+myMedals+nextHtml+'</div>';
 }
 
 function rankedInfographic(){
