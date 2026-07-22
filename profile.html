@@ -298,6 +298,17 @@ async function load(){
   // local PBs + streak (anon-friendly caches, still relevant when signed in)
   let localPB={}; try{ localPB = JSON.parse(localStorage.getItem('hotkey_pb')||'{}'); }catch(e){}
   let streakN=0; try{ const s=JSON.parse(localStorage.getItem('hotkey_streak')||'{}'); streakN=s.n||0; }catch(e){}
+  /* r391 (Wolf): chapter-tied skin unlocks. A chapter is cleared when the best time
+     (local PB + server runs) beats par*GATE on EVERY drill in it — the same rule the
+     trainer's campaign uses. Expose the cleared chapter ids + streak so hkFrameUnlocked
+     can gate the chapter/cert capstone skins. */
+  frameU.streak = streakN;
+  try{ const CAMP=window.HOTKEY_CAMPAIGN, PARS=window.HOTKEY_PARS||{};
+    if(CAMP){ const pbAll={...localPB}; (mine||[]).forEach(r=>{ const t=r.time_ms/1000; if(pbAll[r.challenge]===undefined||t<pbAll[r.challenge]) pbAll[r.challenge]=t; });
+      const cl=k=>pbAll[k]!==undefined && (!PARS[k] || pbAll[k]<=PARS[k]*CAMP.GATE);
+      frameU.chaptersCleared = CAMP.chapters.filter(c=>c.keys.every(cl)).map(c=>c.id); }
+    else frameU.chaptersCleared=[];
+  }catch(e){ frameU.chaptersCleared=[]; }
 
   // drilled set (mirrors stats.html 204-205) — used by the achievement ctx
   const drilled = new Set(mine.map(x=>x.challenge).filter(k=>D.meta[k]));

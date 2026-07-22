@@ -15309,12 +15309,16 @@ function buildAchCtx(){
     certs:Object.keys(fl.certTracks||{}).length,
     mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
     nightWin:!!fl.nightWin, dawnWin:!!fl.dawnWin, weekendWin:!!fl.weekendWin,
-    raceWins:fl.raceWins||0, sheetClears:fl.sheetClears||0, frzBanked:fl.frzBanked||0,
+    raceWins:fl.raceWins||0, frzBanked:fl.frzBanked||0,   /* r391: dropped orphan sheetClears (retired achievements, read by no test) */
     chordKinds:__ck, keysLifetime:__kl,   // r150/r151
     /* r376: the mythic class — charter (beta-era account, same cutoff as the charter
        frame), the packed rank high-water latch, and the S+++ desk latch (lb.js) */
     charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
-    tierBest:fl.tierBest|0, tierBestBucket:fl.tierBestBucket|0, deskPeak:fl.deskPeak||0 };
+    tierBest:fl.tierBest|0, tierBestBucket:fl.tierBestBucket|0, deskPeak:fl.deskPeak||0,
+    /* r391 (Wolf): the founding-cohort mythics (First Analyst Class / Founding Partner)
+       read these — without them the two x_first100/x_foundpro medals never fired in-game */
+    foundingClass:(function(){ try{ return !!(window.hkFoundingFlags&&window.hkFoundingFlags().class); }catch(e){ return false; } })(),
+    foundingPartner:(function(){ try{ return !!(window.hkFoundingFlags&&window.hkFoundingFlags().partner); }catch(e){ return false; } })() };
 }
 function achSweepInGame(){
   try{

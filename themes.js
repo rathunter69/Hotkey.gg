@@ -866,7 +866,7 @@ window.HK_FRAMES = [
   {id:'sakura',     name:'Sakura',       tier:'epic',
    desc:'cherry blossom — drifting petals',            earn:'hold a 14-day streak'},
   {id:'goldenhour', name:'Golden Hour',  tier:'epic',
-   desc:'warm sunset wash + soft bokeh',               earn:'clean solve at dawn or dusk'},
+   desc:'warm sunset wash + soft bokeh',               earn:'hold a 7-day streak'},
   {id:'pearl',      name:'Pearl',        tier:'epic',
    desc:'iridescent mother-of-pearl sheen',            earn:'post a perfect-efficiency run'},
   {id:'bloom',      name:'Bloom',        tier:'rare',
@@ -877,7 +877,7 @@ window.HK_FRAMES = [
   {id:'architect',  name:'Architect',    tier:'legendary',
    desc:'navy blueprint + gold drafting scan',         earn:'clear the Full Builds chapter'},
   {id:'boutique',   name:'Elite Boutique',tier:'legendary',
-   desc:'tailored gold pinstripe + shimmer',           earn:'earn the Financial Modeling certificate'},
+   desc:'tailored gold pinstripe + shimmer',           earn:'earn all three certificates'},
   {id:'emerald',    name:'Emerald',      tier:'epic',
    desc:'deep green gem + prism shimmer',              earn:'clear the Formulas II chapter'},
 ];
@@ -918,6 +918,19 @@ window.hkFrameUnlocked = function(id, u){
     case 'frostbite':     return !!u.perfectRun;
     case 'molten':        return (u.dailyWins|0) >= 5;
     case 'founder':       return !!u.charter || !!u.founder;
+    /* r390/r391 (Wolf) new skins — rank / streak / perfect-run / chapter / cert gated.
+       u.chaptersCleared is an array of cleared campaign chapter ids (profile.html
+       builds it from local PB + server runs vs par*GATE). Earn rules provisional. */
+    case 'amethyst':      return tb >= 5;                                  // VP
+    case 'onyx':          return tb >= 7;                                  // Second-Year Analyst
+    case 'sakura':        return (u.streak|0) >= 14;
+    case 'goldenhour':    return (u.streak|0) >= 7;
+    case 'pearl':         return !!u.perfectRun;
+    case 'bloom':         return tb >= 4;                                  // Associate
+    case 'cottoncandy':   return tb >= 2;                                  // Summer Analyst
+    case 'emerald':       return (u.chaptersCleared||[]).indexOf('c5') >= 0;  // Formulas II
+    case 'architect':     return (u.chaptersCleared||[]).indexOf('c8') >= 0;  // Full Builds
+    case 'boutique':      return (u.certs|0) >= 3;                         // all three certificates
   }
   return false;
 };
