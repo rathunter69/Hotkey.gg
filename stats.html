@@ -321,6 +321,8 @@ async function load(){
         dailyPod:flags.dailyPod||0, dailyWins:flags.dailyWins||0, certs:Object.keys(flags.certTracks||{}).length,
         /* r376: mythic-class keys — beta-era account + the packed rank latch + the S+++ desk latch */
         charter:!!(me && me.created_at && String(me.created_at) < '2026-10-01'),
+        foundingClass:!!(window.hkFoundingFlags&&window.hkFoundingFlags().class),
+        foundingPartner:!!(window.hkFoundingFlags&&window.hkFoundingFlags().partner),
         tierBest:flags.tierBest|0, tierBestBucket:flags.tierBestBucket|0, deskPeak:flags.deskPeak||0,
         crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
       // global rarity (Steam-style): evaluate run-derivable achievements for every player

@@ -221,6 +221,11 @@ window.NAV_ACTIVE = 'profile';
 
   .cz-foot{font-family:var(--mono); font-size:10.5px; color:var(--faint); line-height:1.6;
     margin-top:18px; border-top:1px dashed var(--line); padding-top:14px}
+  /* r389 (Wolf): beta unlock-all button */
+  .cz-beta{display:inline-block; margin-top:10px; font-family:var(--mono); font-size:11px; color:var(--warn);
+    cursor:pointer; border:1px dashed color-mix(in srgb, var(--warn) 50%, transparent); border-radius:999px; padding:5px 13px}
+  .cz-beta:hover{background:color-mix(in srgb, var(--warn) 12%, transparent)}
+  .cz-beta.on{color:var(--accent); border-color:var(--accent-dim); cursor:default}
 </style>
 </head>
 <body>
@@ -267,6 +272,7 @@ async function load(){
     if(p.data) prof=Object.assign(prof,p.data); all=r.data||[];
   }catch(e){}
   const mine = all.filter(x=>x.user_id===me.id);
+  try{ if(window.hkFoundingRank) window.hkFoundingRank(sb, me); }catch(e){}   // r389: cache the founding-cohort flag
   let mySes=[]; try{ const se=await sb.from('sessions').select('user_id,mode').eq('user_id', me.id); mySes=se.data||[]; }catch(e){}
   let srvKeys=null;
   try{ const {data}=await sb.from('key_stats').select('counts,keys_lifetime').eq('user_id',me.id).maybeSingle();
@@ -330,6 +336,8 @@ async function load(){
       chordKinds:__ck, keysLifetime:__kl, dailyTop10:flags.dailyTop10||0,
       dailyPod:flags.dailyPod||0, dailyWins:flags.dailyWins||0, certs:Object.keys(flags.certTracks||{}).length,
       charter:!!(me.created_at && String(me.created_at) < '2026-10-01'),
+      foundingClass:!!(window.hkFoundingFlags&&window.hkFoundingFlags().class),
+      foundingPartner:!!(window.hkFoundingFlags&&window.hkFoundingFlags().partner),
       tierBest:flags.tierBest|0, tierBestBucket:flags.tierBestBucket|0, deskPeak:flags.deskPeak||0,
       crowns, att:drilled.size, menuOrder:D.menuOrder, groups };
     // global rarity (Steam-style) — evaluate run-derivable achievements for every player
@@ -501,14 +509,16 @@ async function load(){
     }).join('');
   }
 
+  // r389 (Wolf): beta unlock — friends can open every cosmetic with the beta button below
+  const betaOpen = !!(window.hkBetaUnlocked && window.hkBetaUnlocked());
   /* TITLE chips — a few rank/earned titles + a CUSTOM (PRO) chip. NOTE: the card's
      title NOTCH rendering lands in a later round; persisting loadout.title here is
      enough for now (the pick round-trips through hkFlairPack). */
   const TITLES=[
     { id:null,          name:'None',          locked:false },
     { id:'analyst',     name:'Analyst',       locked:false },
-    { id:'crownholder', name:'Crownholder',   locked: st.crowns<1 },
-    { id:'centurion',   name:'Centurion',     locked: mine.length<100 },
+    { id:'crownholder', name:'Crownholder',   locked: betaOpen?false:(st.crowns<1) },
+    { id:'centurion',   name:'Centurion',     locked: betaOpen?false:(mine.length<100) },
     { id:'pro',         name:'CUSTOM (PRO)',  locked:false, pro:true },
   ];
   function titleChipsHtml(){
@@ -620,7 +630,8 @@ async function load(){
         '<div class="cz-chips" id="czStats">'+statChipsHtml()+'</div>'+
       '</div>'+
 
-      '<div class="cz-foot">Locked frames &amp; medals stay greyed with how they’re earned on hover · nothing here touches your Account or Stats pages.</div>'+
+      '<div class="cz-foot">Locked frames &amp; medals stay greyed with how they’re earned on hover · nothing here touches your Account or Stats pages.'+
+        '<br><a id="czBeta" class="cz-beta'+(betaOpen?' on':'')+'">'+(betaOpen?'🔓 Beta unlock active — every skin & title is open':'🔓 Beta: unlock everything')+'</a></div>'+
     '</div>';
 
   renderCard();
@@ -734,6 +745,19 @@ async function load(){
       renderCard(); saveFlair(); flash();
     };
   });
+
+  // BETA UNLOCK — password opens every skin + title for friends during beta
+  { const bt=document.getElementById('czBeta');
+    if(bt) bt.onclick=()=>{
+      if(betaOpen) return;
+      const pw=window.prompt('Beta access code:');
+      if(pw==null) return;
+      if(pw.trim().toLowerCase()==='chicagosux'){
+        try{ localStorage.setItem('hk_beta_unlock','1'); }catch(e){}
+        location.reload();
+      } else { bt.textContent='🔒 wrong code'; setTimeout(()=>{ bt.textContent='🔓 Beta: unlock everything'; }, 1600); }
+    };
+  }
 
   // deep-link — jump to the featured medals showcase
   if(location.hash==='#showcase'){

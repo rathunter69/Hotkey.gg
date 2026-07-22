@@ -862,7 +862,11 @@ window.HK_FRAMES = [
 /* u = {lvl, tierBest, dailyWins, certs, charter, perfectRun}. tierBest is a
    HK_RANK.TIERS index (highest tier ever DISPLAYED — nav.js persists it into
    hk_ach_flags.tierBest on every rank fetch; hydration maxes it across devices). */
+/* r389 (Wolf): BETA UNLOCK — a password-gated flag that opens every cosmetic for
+   beta testers/friends. Set by the profile customizer's beta button. */
+window.hkBetaUnlocked = function(){ try{ return localStorage.getItem('hk_beta_unlock')==='1'; }catch(e){ return false; } };
 window.hkFrameUnlocked = function(id, u){
+  if(window.hkBetaUnlocked && window.hkBetaUnlocked()) return true;   // beta: every frame unlocked
   u = u || {};
   const tb = u.tierBest|0;
   switch(id){
@@ -1491,12 +1495,32 @@ window.hkRarityMeta = function(pct){
    live data takes over once the field is big enough to mean something
    (>= 20 players). */
 window.hkEffRarity = function(tier, dataPct, fieldN){
+  /* r389 (Wolf): MYTHIC is a curated pinnacle, never data-driven — a founding-cohort
+     feat must not demote to "rare" as more of the first-100 hold it. Pin tier 'm'. */
+  if(tier==='m') return 0.5;
   /* r376: a live 0% is "no holder the run-derived sweep can SEE" — flag-based feats
      (night wins, race wins…) always read 0 globally even when earned, and 0 would
      fall into the reserved mythic band. Zero falls back to the hand-set floor. */
   if((fieldN|0)>=20 && dataPct!==undefined && dataPct!==null && isFinite(dataPct) && dataPct>0) return dataPct;
-  return tier==='m' ? 0.5 : tier==='l' ? 3 : tier==='e' ? 10 : tier==='r' ? 25 : 100;
+  return tier==='l' ? 3 : tier==='e' ? 10 : tier==='r' ? 25 : 100;
 };
+/* r389 (Wolf): FOUNDING COHORT — the first-100 mythics. One cheap count query (accounts
+   created at/before you), cached so every page's achievement ctx reads the same flag.
+   window.hkFoundingFlags() → {rank, class:boolean, partner:boolean}. Founding Partner
+   (first-100 PRO) arms post-beta once PRO purchases are tracked + ordered server-side;
+   until then `partner` stays false (the medal shows as a locked mythic goal). */
+window.hkFoundingRank = function(sb, me){
+  try{
+    if(!sb || !me || !me.created_at) return;
+    sb.from('profiles').select('id',{count:'exact',head:true}).lte('created_at', me.created_at)
+      .then(r=>{ const c=(r && r.count); if(c!=null){
+        try{ const prev=JSON.parse(localStorage.getItem('hk_founding')||'{}');
+          localStorage.setItem('hk_founding', JSON.stringify({rank:c, class:c<=100, partner:!!prev.partner})); }catch(e){}
+      } })
+      .catch(function(){});
+  }catch(e){}
+};
+window.hkFoundingFlags = function(){ try{ return JSON.parse(localStorage.getItem('hk_founding')||'{}'); }catch(e){ return {}; } };
 /* r387 (Wolf): FEATURED MEDAL ON A CARD — inlaid tray + rarity HALO. The engraved
    badge is tuned for the neutral stats wall — on a colored card SKIN it reads
    grey/legacy and its thin rarity ring vanishes. hkMedalCard seats the badge in a

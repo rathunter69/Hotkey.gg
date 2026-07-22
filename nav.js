@@ -620,6 +620,8 @@
               dailyPod:__xflags.dailyPod||0, dailyWins:__xflags.dailyWins||0, certs:Object.keys(__xflags.certTracks||{}).length,
               /* r376: mythic-class keys — beta-era account + the packed rank latch + the S+++ desk latch */
               charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
+              foundingClass:!!(window.hkFoundingFlags&&window.hkFoundingFlags().class),
+              foundingPartner:!!(window.hkFoundingFlags&&window.hkFoundingFlags().partner),
               tierBest:__xflags.tierBest|0, tierBestBucket:__xflags.tierBestBucket|0, deskPeak:__xflags.deskPeak||0,
               crowns:(function(){let c2=0; d.drills.forEach(x=>{ if(x.rank===1) c2++; }); return c2;})(), groups:(function(){ const g={}; Object.entries(window.HOTKEY_DRILLS.groupOf).forEach(([k,gr])=>{(g[gr]=g[gr]||[]).push(k);}); return g; })(),
               att:d.attempted, menuOrder:MENU_ORDER };
@@ -899,6 +901,7 @@
         const { data } = await window.sb.auth.getSession();
         window._navUser = data && data.session ? data.session.user : null;
         if(window._navUser){
+          try{ if(window.hkFoundingRank) window.hkFoundingRank(window.sb, window._navUser); }catch(e){}   // r389: founding-cohort flag, cached for every page's ctx
           try{ const p = await window.sb.from('profiles').select('handle,flair,theme').eq('id', window._navUser.id).maybeSingle();
             window._navProfile = p && p.data ? p.data : null; }catch(e){}
           /* r358: merge the account's cross-device state down BEFORE the pill/streak render.

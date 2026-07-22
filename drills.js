@@ -381,6 +381,12 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'x_charter', glyph:'founder', tier:'m', name:'Charter',        desc:'Account opened during the beta — you were on the desk before the desk was cool', test:c=>({done:!!c.charter, prog:c.charter?1:0, goal:1}) },
   { id:'x_summit',  glyph:'crown', tier:'m', name:'Summit',         desc:'Hold the top rank tier in its Top Bucket', test:c=>{ const top=(((window.HK_RANK||{}).TIERS)||{length:8}).length-1; const ok=(c.tierBest|0)>=top && (c.tierBestBucket|0)>=top*3+2; return {done:ok, prog:ok?1:0, goal:1}; } },
   { id:'x_bulge',   glyph:'mastery', tier:'m', name:'Bulge Bracket',  desc:'Sit on a desk graded S+++ — the top of the guild scale', test:c=>({done:!!c.deskPeak, prog:c.deskPeak?1:0, goal:1}) },
+  /* r389 (Wolf): the founding-cohort + completionist mythics. foundingClass/foundingPartner
+     ride the ctx (themes.js hkFoundingFlags — one count query, cached). Founding Partner
+     arms post-beta when PRO purchases are tracked + ordered; until then it's a locked goal. */
+  { id:'x_allach',  glyph:'mastery', tier:'m', name:'The Full Set',         desc:'Earn every other medal on the wall — the complete collection',            test:c=>{ const AC=window.HOTKEY_ACHIEVEMENTS||[]; const others=AC.filter(a=>a.id!=='x_allach'&&a.tier!=='m'); let n=0; others.forEach(a=>{ try{ if(a.test(c).done) n++; }catch(e){} }); return {done:others.length>0&&n>=others.length, prog:n, goal:others.length||1}; } },
+  { id:'x_first100',glyph:'founder',  tier:'m', name:'First Analyst Class', desc:'One of the first 100 accounts on hotkey.gg — the founding class',         test:c=>({done:!!c.foundingClass, prog:c.foundingClass?1:0, goal:1}) },
+  { id:'x_foundpro',glyph:'crown',    tier:'m', name:'Founding Partner',    desc:'One of the first 100 to go PRO — a permanent founding badge',             test:c=>({done:!!c.foundingPartner, prog:c.foundingPartner?1:0, goal:1}) },
 ];
 
 /* ---- group color identity: one muted hue per skill family. Used as accents only
