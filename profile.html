@@ -80,20 +80,30 @@ window.NAV_ACTIVE = 'profile';
      min(430px, …), not the full page width. Centered so it reads as the actual card
      others see, not a stretched banner. */
   .pc-card.pc-live{background:var(--surface); border:1px solid var(--line); border-radius:16px;
-    width:min(430px, 96vw); margin:0 auto 20px; padding:0; max-height:none; display:block; overflow:visible; position:relative}
+    width:min(462px, 96vw); margin:0 auto 20px; padding:0; max-height:none; display:block; overflow:visible; position:relative}
   .pc-card.pc-live .uc{padding:22px 24px 20px; border-radius:16px}
   .pc-live-cap{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
     color:var(--faint); text-align:center; margin:-8px 0 18px}
   /* r389 (Wolf): the skin CAROUSEL — arrows flank the card in the page's dead
      side-space; ← → also drive it. Landing on an UNLOCKED skin equips it live;
      a LOCKED skin previews (skin + animation) but never saves. */
-  .pc-stage{position:relative; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:10px}
+  .pc-stage{position:relative; display:flex; align-items:center; justify-content:center; gap:14px; max-width:584px; margin:0 auto 10px}
+  /* r397 (Wolf #87): first-visit intro — one-time, dismiss persists in localStorage */
+  .pc-intro{max-width:640px; margin:0 auto 20px; background:linear-gradient(180deg,var(--accent-glow),var(--surface) 62%);
+    border:1px solid var(--accent-dim); border-radius:14px; padding:15px 18px; display:flex; gap:16px;
+    align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .pc-intro[hidden]{display:none}
+  .pc-intro p{margin:0; flex:1 1 340px; font-size:13.5px; line-height:1.6; color:var(--text)}
+  .pc-intro p b{color:var(--accent)}
+  .pc-intro button{flex:none; margin:0; font-family:var(--mono); font-size:12px; font-weight:700; cursor:pointer;
+    color:var(--on-accent,#0c0d0e); background:var(--accent); border:none; border-radius:9px; padding:9px 18px}
+  .pc-intro button:hover{filter:brightness(1.07)}
   .pc-arrow{flex:none; width:46px; height:46px; border-radius:50%; background:var(--surface); border:1px solid var(--line);
     color:var(--text); font-size:24px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;
     transition:border-color .13s, color .13s, box-shadow .13s, transform .08s; user-select:none; -webkit-user-select:none}
   .pc-arrow:hover{border-color:var(--accent); color:var(--accent); box-shadow:0 0 16px var(--accent-glow)}
   .pc-arrow:active{transform:scale(.9)}
-  .pc-lockbadge{position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:9;
+  .pc-lockbadge{position:absolute; bottom:14px; left:50%; transform:translateX(-50%); z-index:9;
     font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#fff;
     background:rgba(200,83,63,.94); padding:4px 13px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.35);
     opacity:0; pointer-events:none; transition:opacity .16s}
@@ -637,6 +647,11 @@ async function load(){
     '</div>') : '';
 
   root.innerHTML =
+    // r397 (Wolf #87): first-visit intro — shown once, then dismissed to localStorage
+    '<div class="pc-intro" id="pcIntro" hidden>'+
+      '<p><b>This is your card.</b> It’s what everyone sees next to your name — on the boards, in your desk, on your certificates. Arrow through skins, choose what shows, and feature up to five medals. Everything saves the instant you touch it.</p>'+
+      '<button type="button" id="pcIntroX">Got it</button>'+
+    '</div>'+
     // r389 (Wolf): the skin CAROUSEL — arrows in the side whitespace + ← → keys drive
     // the live card; the frame filmstrip is retired (this is the frame picker now).
     '<div class="pc-stage" id="pcStage">'+
@@ -679,6 +694,14 @@ async function load(){
     '</div>';
 
   renderCard();
+
+  // r397 (Wolf #87): one-time first-visit intro
+  (function(){ const el=document.getElementById('pcIntro'); if(!el) return;
+    let seen=false; try{ seen=localStorage.getItem('hk_prof_intro')==='1'; }catch(e){}
+    if(!seen) el.hidden=false;
+    const x=document.getElementById('pcIntroX');
+    if(x) x.onclick=()=>{ el.hidden=true; try{ localStorage.setItem('hk_prof_intro','1'); }catch(e){} };
+  })();
 
   // ================= WIRING =================
   // ---- SKIN CAROUSEL: arrows + ← → keys. Landing on an unlocked skin equips +
