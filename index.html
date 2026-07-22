@@ -12801,16 +12801,31 @@ function renderRfCard(state){
    Alt-walk mirrors into the classic strip (same MENUS, same KeyTips, same spot), so RF reads
    as the same product as classic instead of a silent black box. Visual only — no dispatch. */
 let rfEchoPath=[];
+/* r352 (Wolf: "it's getting stuck on the sub-menus of the ribbon" — alt e s v, alt h f c): a walk
+   descends PAST the deepest MENUS *container* into a leaf/dialog node that isn't itself a MENUS key
+   (HFC=font-color picker, ES/HVS=paste-special, HH=fill, HJ=cell styles, OE=format cells,
+   HFIS=series). The old MENUS-only gate dropped that letter, so the strip froze at the parent menu
+   while the matcher silently kept scoring. Mirror the classic ribbon's dialog openers (applyRibbon,
+   ~10503) here — VIEW ONLY, no dispatch/mutation; the matchers still own the solve — so the sub-menu
+   actually shows and the walk reads as the real ribbon expanding step by step. */
+const RF_ECHO_DIALOG = { 'ES':'paste', 'HVS':'paste', 'HFC':'fontcolor', 'HH':'fillcolor',
+                         'HJ':'cellstyle', 'OE':'fmt', 'HFIS':'series' };
 function rfEchoStep(k){
   try{
     if(k==='Alt'){ rfEchoPath=[]; mode='ribbon'; path=rfEchoPath; dialog=null; drawRibbon(); return; }
     const lk=String(k).toLowerCase();
     if(/^[a-z0-9]$/.test(lk)){
-      const cand=rfEchoPath.concat(lk.toUpperCase());
+      const cand=rfEchoPath.concat(lk.toUpperCase()), key=cand.join('');
       /* r351: only walk into REAL menus — a command letter (or a dead key) leaves the current
          menu on screen instead of pushing the path onto a key MENUS doesn't know (which drew
          a blank strip and read as "the ribbon stopped expanding"). */
-      if(MENUS[cand.join('')]!==undefined){ rfEchoPath.push(lk.toUpperCase()); path=rfEchoPath; drawRibbon(); }
+      if(MENUS[key]!==undefined){ rfEchoPath.push(lk.toUpperCase()); path=rfEchoPath; drawRibbon(); return; }
+      /* r352: known dialog/leaf opener — descend into the real sub-menu view (no mutation). */
+      const dlg=RF_ECHO_DIALOG[key];
+      if(dlg){ rfEchoPath.push(lk.toUpperCase()); path=rfEchoPath; dialog=dlg;
+               if(dlg==='fontcolor') fontColorIdx=0; else if(dlg==='fillcolor') fillColorIdx=0;
+               else if(dlg==='cellstyle') cellStyleIdx=0; else if(dlg==='paste'){ pasteKind='all'; pasteOp='none'; }
+               drawRibbon(); }
     }
   }catch(e){}
 }
