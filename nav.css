@@ -488,6 +488,15 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-bone .pc-name{font-family:'Copperplate','Copperplate Gothic Light','Trajan Pro',serif;
   letter-spacing:.18em; font-weight:600}
 
+/* r389 (Wolf): the dark legacy frames were border-only — designed to wrap a card
+   that already had a surface. On the transparent unified card their interior read
+   as bare page + dark (unreadable) name. Give them a solid interior + light text
+   vars (bone-style palette re-scope) so they read like the new full-card skins. */
+.uc.hk-frame-engraved{background:linear-gradient(160deg,#282a30,#191b20); color:#e9ebf1;
+  --text:#e9ebf1; --muted:#969cab; --faint:#5e6470; --line:#3a3d45; --surface2:#22242b}
+.uc.hk-frame-heraldic{background:linear-gradient(160deg,#241113,#180b0d); color:#f4e8e6;
+  --text:#f4e8e6; --muted:#c9a39c; --faint:#8f6b66; --line:#4a2420; --surface2:#2a1618}
+
 /* -- ANIMATION, escalating by tier (r373, Wolf). CSS-only, compositor-cheap:
    transform / opacity / background-position ONLY — no backdrop-filter, no
    animated shadow blurs, nothing that reflows. Frames render on 1-2 cards per
@@ -564,12 +573,15 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    theatrical two-beat glint. All motion stays transform/opacity only and
    reduced-motion guarded. These rules sit LAST so they out-order the
    doubled-class base borders at equal specificity. */
-.hk-frame-lg .hkf-cn{width:92px; height:92px}
-.hk-frame-lg .hkf-c1{top:-8px; left:-8px}
-.hk-frame-lg .hkf-c2{top:-8px; right:-8px}
-.hk-frame-lg .hkf-c3{bottom:-8px; left:-8px}
-.hk-frame-lg .hkf-c4{bottom:-8px; right:-8px}
-.hk-frame-lg .hkf-med{width:54px; height:54px; top:-26px}
+/* r389 (Wolf): the r382 jump to 92px overshot badly — the 430px profile card is
+   barely wider than the 380px compact hosts, so a 92px corner read as a grotesque
+   oversized laurel. Right-size to a gentle upscale over the 56px base. */
+.hk-frame-lg .hkf-cn{width:60px; height:60px}
+.hk-frame-lg .hkf-c1{top:-6px; left:-6px}
+.hk-frame-lg .hkf-c2{top:-6px; right:-6px}
+.hk-frame-lg .hkf-c3{bottom:-6px; left:-6px}
+.hk-frame-lg .hkf-c4{bottom:-6px; right:-6px}
+.hk-frame-lg .hkf-med{width:42px; height:42px; top:-20px}
 .hk-frame-lg .hkf-tab{font-size:10.5px; padding:5px 18px; top:-15px; letter-spacing:.26em}
 .hk-frame-lg.hk-frame-engraved{border-width:2px}
 .hk-frame-lg.hk-frame-engraved::before{inset:7px; border-width:2px}
@@ -765,7 +777,10 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    nested unified card drops its own frame padding (no double box) */
 .pc-card .uc{padding:0;border-radius:0}
 .pc-card .pc-scroll{position:relative;z-index:2}
-.uc>*:not(.hk-fx):not(.hkf-tab):not(.hkf-serial):not(.hkf-sun):not(.hkf-vgrid){position:relative;z-index:2}
+/* r389 (Wolf): the legacy ornament layers (corners, medallion, glint) are ABSOLUTE
+   by design — they must stay excluded here or they drop into flow and shove the
+   card content down (the "wrong sizes / big top gap" on old title skins). */
+.uc>*:not(.hk-fx):not(.hkf-tab):not(.hkf-serial):not(.hkf-sun):not(.hkf-vgrid):not(.hkf-cn):not(.hkf-med):not(.hkf-glint){position:relative;z-index:2}
 .uc-head{display:flex;align-items:center;gap:16px}
 /* r387 (Wolf): school + desk chips ride high, right under the identity */
 .uc-tags{display:flex;gap:10px;margin-top:14px}
