@@ -821,6 +821,14 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    nested unified card drops its own frame padding (no double box) */
 .pc-card .uc{padding:0;border-radius:0}
 .pc-card .pc-scroll{position:relative;z-index:2}
+/* r391 (Wolf): the owner rank-click card matches the PROFILE card exactly — a plain
+   430px holder with the skin riding the .uc (not the wide 640px shell), same insets.
+   Kills the "wider card / different card on the hotbar" inconsistency. */
+.pc-card.pc-owner{width:min(430px,94vw); padding:14px 0 0; background:var(--surface)}
+.pc-card.pc-owner .uc{padding:22px 24px 20px; border-radius:16px}
+.pc-card.pc-owner .pc-scroll{padding:0 16px}
+.pc-card.pc-owner .pc-foot{padding:0 18px}
+.pc-card.pc-owner .pc-x{top:22px; right:22px; z-index:5}
 /* r389 (Wolf): the legacy ornament layers (corners, medallion, glint) are ABSOLUTE
    by design — they must stay excluded here or they drop into flow and shove the
    card content down (the "wrong sizes / big top gap" on old title skins). */

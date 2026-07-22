@@ -531,10 +531,14 @@ function showPublicCard(uid){
     tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
     tierLabel:t.full||(t.name+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':'')),   /* r390 (Wolf): t.full already carries bucket+provisional — don't append again (double-bucket) */
     lvl:lvl, pct:pct, xpLine:xpLine,
-    stats:[{n:(st&&st.crowns)||0,label:'crowns'},{n:(st&&st.pod)||0,label:'podiums'},
+    /* r391 (Wolf): match the profile card's structure exactly — 5 stats across, no
+       trailing boards block (that "stats on the bottom" section made this card read as
+       a different shape than the profile/hotbar cards). */
+    stats:[{n:(DATA.fRuns||[]).filter(x=>x.user_id===uid).length,label:'clean solves'},
+      {n:(st&&st.crowns)||0,label:'crowns'},{n:(st&&st.pod)||0,label:'podiums'},
       {n:(st&&st.t10)||0,label:'top-10s'},{n:(st&&st.att)||0,label:'boards'}],
     medals:medals, medalSlots:5,
-    boards:best.slice(0,3).map(x=>({name:lab[x.k]||x.k, time:'#'+(x.i+1)+' · '+(x.ms/1000).toFixed(2)+'s of '+x.n})),
+    boards:[],
     footHtml:footHtml,
     flair:fv
   };
