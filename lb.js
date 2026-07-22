@@ -66,7 +66,7 @@ function boardHtml(c, best, names, meId, opts){
   /* r382: placeholder lanes carry an empty .mid so the 4-column row template holds */
   const openLane='<div class="row open"><span class="rk">\u00b7</span><span class="nm">open lane</span><span class="mid"></span><span class="tm">\u2014</span></div>';
   if(!best.length){
-    body='<div class="empty" style="padding:14px 18px 6px">open board \u2014 <b>first run sets the bar</b></div>';
+    body='<div class="empty" style="padding:14px 18px 6px">open board \u2014 <b>no times posted yet</b></div>';
     for(let k=0;k<3;k++) body+=openLane;   /* r369: 3 placeholder lanes, not 5 — reclaim the vertical space */
   }
   else {
@@ -209,7 +209,7 @@ async function load(){
     host.innerHTML='<div class="section-title">\u25c6 section leaders</div><div class="seclead">'+
       window.__sectionLeaders.map(s=>'<div class="sl"><div class="sl-sec"><span class="dia">\u25c6</span>'+s.sec+'</div>'+
         (s.name?('<div class="sl-name">'+s.name+'</div><div class="sl-t">'+s.t+'s clean</div>')
-               :'<div class="sl-name" style="color:var(--faint)">unclaimed</div><div class="sl-t">be first</div>')+
+               :'<div class="sl-name" style="color:var(--faint)">unclaimed</div><div class="sl-t">no time yet</div>')+
         '<div class="sl-lab">'+s.lab+'</div></div>').join('')+'</div>';
   }catch(e){} }, 0);
   const baseIds = viewDesk ? viewDesk.ids : (teamOnly ? teamIds : null);
@@ -581,7 +581,7 @@ function heroHtml(){
       '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;padding:10px 6px">'+
       '<div style="font-family:var(--mono);font-size:13.5px;color:var(--muted);line-height:1.8;max-width:300px">Times only count on the boards for signed-in accounts.</div>'+
       '<a href="index.html" class="fd-play" style="margin-left:0">sign in &amp; post a time →</a>'+
-      '<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);line-height:1.7;max-width:300px">your rank, level and progress toward the next tier land here</div>'+
+      '<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);line-height:1.7;max-width:300px">your rank, level and progress to the next tier</div>'+
       '</div></div>';
   }
   const me=userStat[meId]||{att:0,sum:0,crowns:0,pod:0,t10:0};
@@ -632,7 +632,7 @@ function heroHtml(){
           (ok?'<span class="pl-done">posted</span>':'<a class="pl-go" href="index.html?drill='+encodeURIComponent(k)+'">run it \u2192</a>')+'</div>'; }).join('');
       return '<div class="panel me"><h4>your card</h4>'+
         '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.7">\u2694 <b style="color:var(--text)">Placement series \u2014 '+done.length+'/'+pset.length+'</b><br>'+
-        'Post a keyboard-only time on each of the five standard boards \u2014 the same five for every analyst, one from each band of the catalog \u2014 and your first rank is placed off one yardstick.</div>'+
+        'Post a keyboard-only time on each of the five standard boards \u2014 the same five for every analyst, one from each band of the catalog \u2014 and your first rank is set from those five boards.</div>'+
         '<div class="pl-list">'+rows+'</div>'+
         '<div class="pl-foot">your first rank posts the moment the fifth board does</div></div>';
     }
@@ -724,8 +724,8 @@ function rankedInfographic(){
     'Entry starts with a <b>placement series</b> \u2014 the same five standard boards for every analyst '+
     '(one from each band of the catalog); your first rank shows once all five are posted.<br><br>'+
     'Your rank = your <b>average placement</b> across the boards you\u2019ve entered \u2014 stabilized two ways: '+
-    'with only a few boards, your rating starts near the middle and your results pull it toward your true level (so two fast drills alone can\u2019t crown you); '+
-    'and small fields count for less than big ones (1st of 2 says less than 4th of 40). Until you\u2019ve faced enough real competition, your rank is capped and tagged <b>provisional</b> \u2014 everyone starts low and earns altitude. Breadth + placement is the climb.<br><br>'+
+    'with only a few boards, your rating starts near the middle and your results pull it toward your true level (so two fast drills alone can\u2019t rank you high); '+
+    'and small fields count for less than big ones (1st of 2 says less than 4th of 40). Until you\u2019ve faced enough real competition, your rank is capped and tagged <b>provisional</b> \u2014 everyone starts low and climbs from there. Breadth and placement both count.<br><br>'+
     'Each tier splits into three <b>buckets</b> by where you sit inside that tier\u2019s band: '+
     'you enter at <b>Bottom Bucket</b>, pass through <b>Middle</b>, and reach <b>Top Bucket</b> as your average placement improves \u2014 clear the band and you promote to the next tier.</div>'+rows+
     '<div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:10px">Ranks are live: they can fall as well as rise when other players improve.</div>'+
@@ -817,7 +817,7 @@ function dailyHeroHtml(){
   /* r393 (Wolf): up to ~8 rows so the board reads populated in the hero spot (was 3). */
   return '<div class="featured-daily fx-compact">'+
       '<div class="fd-head"><span class="fd-live">● live</span><b>◆ the Daily Challenge · '+dl+'</b>'+
-      '<span class="fd-meta">resets in ~'+hrsLeft+'h · top 3 medal · top 10 +40 xp & wear it on their card'+(podium?' · yesterday: '+podium:'')+'</span>'+
+      '<span class="fd-meta">resets in ~'+hrsLeft+'h · top 3 medal · top 10 +40 xp and a card badge'+(podium?' · yesterday: '+podium:'')+'</span>'+
       '<a class="fd-play" href="index.html?daily=1">play it →</a></div>'+
       boardHtml({label:'today’s global field', lvl:dailyDate}, bestD.slice(0,8), names, meId, {medals:true})+
     '</div>';
@@ -865,7 +865,7 @@ function rosterHtml(flush){
   return '<div class="panel" style="margin-top:'+(flush?'0':'18px')+'"><h4>the field \u00b7 by tier</h4>'+
     '<div class="ros-tabs">'+tierNames.map(tn=>'<span class="tab ros-t'+(tn===rosterTier?' on':'')+'" data-tier="'+tn+'">'+tn.replace(' Analyst','')+'</span>').join('')+'</div>'+
     '<div class="ros-list">'+rows+'</div>'+
-    '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">rating = stabilized average placement (lower is better) \u00b7 your row is highlighted</div></div>';
+    '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">rating = average placement across your boards (lower is better)</div></div>';
 }
 function TIER_OF(av,att,w){ return window.HK_RANK.tierOf(av,att,w); }
 /* r252: SCHOOL STANDINGS — school-vs-school aggregate of opted-in analysts.
@@ -911,7 +911,7 @@ function schoolStandingsHtml(){
   return '<div class="panel standings"><h4>🎓 School Standings</h4>'+
     '<div class="st-list">'+body+'</div>'+
     '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">'+
-      'schools ranked by crowns (board #1s), then depth · opt in from your account to fly your colors</div></div>';
+      'schools ranked by crowns (board #1s), then depth · opt in from your account to show your school</div></div>';
 }
 /* r270: shared desk-error copy (mirrors account.html's map + the application codes) */
 function deskErrMsg(e){ const m=String((e&&e.message)||e||'');
@@ -1138,7 +1138,7 @@ function deskStandingsHtml(){
       '</span></a>';
   }).join('');
   return '<div class="panel standings" style="margin-top:0"><h4>\u25c6 Desk Standings</h4><div class="st-list">'+body+'</div>'+
-    '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">desks ranked by crowns (board #1s), then depth \u00b7 click a desk for its hall \u00b7 <a href="account.html#desk" style="color:var(--accent)">start or join a desk</a></div></div>';
+    '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">desks ranked by crowns (board #1s), then depth \u00b7 click a desk to open it \u00b7 <a href="account.html#desk" style="color:var(--accent)">start or join a desk</a></div></div>';
 }
 /* r270: STAFFER CONTROLS — the manager's standalone screen (desks.html?manage=1).
    Everything the captain runs lives here: invite link, application inbox, weekly
@@ -1224,7 +1224,7 @@ async function renderManage(root){
     let rows=null;
     try{ const {data,error}=await sb.rpc('desk_applications'); if(error) throw error; rows=data||[]; }
     catch(e){ host.innerHTML='<div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.7">applications aren’t enabled on the server yet — the invite link still works.</div>'; return; }
-    if(!rows.length){ host.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--muted)">no applications waiting — the guild board sends them here.</div>'; return; }
+    if(!rows.length){ host.innerHTML='<div style="font-family:var(--mono);font-size:12px;color:var(--muted)">No applications yet.</div>'; return; }
     const days=x=>Math.max(0,Math.floor((Date.now()-new Date(x))/86400000));
     host.innerHTML=rows.map(r=>'<div class="mg-app"><span class="mg-app-nm" data-uid="'+r.user_id+'">'+esc(r.handle||('analyst-'+String(r.user_id).slice(0,4)))+'</span>'+
       (r.note?'<span class="mg-app-note">“'+esc(r.note)+'”</span>':'')+
