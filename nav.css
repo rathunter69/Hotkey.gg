@@ -846,8 +846,22 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    the .uc; with the scroll flush to the top, overflow-y:auto clipped it (~13px cut). A top
    pad ≥ the notch height gives it room INSIDE the scroll's padding box — sides stay flush. */
 .pc-card.pc-owner .pc-scroll{padding:16px 0 0}
-.pc-card.pc-owner .pc-foot{padding:0 18px}
 .pc-card.pc-owner .pc-x{top:22px; right:22px; z-index:5}
+/* r393 (Wolf: "one card we just click different places to display" — the header card must
+   pop like the leaderboard name-click card): when a SKIN is equipped the holder goes BARE
+   (transparent, no box) exactly like the public card's .pub-bare, so the skin IS the whole
+   modal with no light band under it. The owner actions ride INSIDE the card now (.uc-foot
+   via footHtml), not on an external light strip. Plain (no-skin) cards keep the surface. */
+.pc-card.pc-owner.pc-bare{background:transparent; border:0; box-shadow:none}
+.uc-foot-owner{flex-wrap:wrap; align-items:center; justify-content:center; gap:10px 16px; margin-top:20px;
+  padding-top:14px; border-top:1px solid color-mix(in srgb, currentColor 16%, transparent)}
+.uc-foot-owner .ucf-gap{display:none}
+.uc-foot-owner a{color:inherit; opacity:.72; white-space:nowrap}
+.uc-foot-owner a:hover{opacity:1; color:inherit}
+.uc-foot-owner .pc-customize{opacity:1; font-weight:700}
+.uc-foot-owner .pc-rankhow{font-size:10px; letter-spacing:.08em; text-transform:uppercase; opacity:.6; cursor:pointer}
+.ucf-note{font-family:var(--mono); font-size:9.5px; text-align:center; opacity:.5; margin-top:12px}
+.ucf-note a{color:var(--warn); cursor:pointer; opacity:1}
 /* r389 (Wolf): the legacy ornament layers (corners, medallion, glint) are ABSOLUTE
    by design — they must stay excluded here or they drop into flow and shove the
    card content down (the "wrong sizes / big top gap" on old title skins). */
