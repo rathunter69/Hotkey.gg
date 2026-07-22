@@ -804,15 +804,18 @@ function featuredHtml(){
     .forEach(x=>{ if(!seenY[x.user_id]){ seenY[x.user_id]=true; bestY.push(x); } });
   const gl=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'];
   const podium=bestY.slice(0,3).map((r,i)=>gl[i]+' '+esc(names[r.user_id]||'analyst')+' '+fmt(r.time_ms)).join(' \u00b7 ');
-  return '<div class="featured">'+
-    '<div class="featured-daily">'+
+  /* r392 (Wolf): compact-always, fixed layout. Daily + weekly ride as two EQUAL compact
+     cards (fixed height, top-3 shown, internal scroll if a live field runs long) \u2014 no more
+     one wide near-empty box. The field-by-tier (sub-rank) panel moved UP under the main
+     board (see renderAll), so this row is just the two challenge cards. */
+  return '<div class="featured featured-2">'+
+    '<div class="featured-daily fx-compact">'+
       '<div class="fd-head"><span class="fd-live">\u25cf live</span><b>\u25c6 the Daily Challenge \u00b7 '+dl+'</b>'+
       '<span class="fd-meta">resets in ~'+hrsLeft+'h \u00b7 top 3 medal \u00b7 top 10 +40 xp & wear it on their card'+(podium?' \u00b7 yesterday: '+podium:'')+'</span>'+
       '<a class="fd-play" href="index.html?daily=1">play it \u2192</a></div>'+
-      boardHtml({label:'today\u2019s global field', lvl:dailyDate}, bestD, names, meId, {medals:true})+
+      boardHtml({label:'today\u2019s global field', lvl:dailyDate}, bestD.slice(0,3), names, meId, {medals:true})+
     '</div>'+
-    boardHtml({label:'\ud83c\udfc1 weekly gauntlet \u00b7 '+legs.length+' legs, one clock', lvl:'wk '+wkStr}, combined, names, meId)+
-    rosterHtml(true)+   /* r369: the field-by-tier panel fills the other half of the row */
+    '<div class="fx-compact">'+boardHtml({label:'\ud83c\udfc1 weekly gauntlet \u00b7 '+legs.length+' legs, one clock', lvl:'wk '+wkStr}, combined.slice(0,3), names, meId)+'</div>'+
     '</div>';
 }
 
@@ -1474,8 +1477,12 @@ function renderAll(){
     if(h1) h1.textContent='Leaderboard';
     /* r369 (Wolf): tighter dashboard — the tier roster rides beside the weekly gauntlet
        inside .featured instead of spreading as its own full-width strip */
+    /* r392 (Wolf): the sub-rank (field-by-tier) panel rides DIRECTLY under the main
+       ranking board \u2014 filter the field where the field is. Daily + weekly follow as the
+       compact challenge row. Everything compact-always; live seeds fill any gaps. */
     root.innerHTML =
       '<div class="hero two">'+heroHtml()+topPlayersHtml()+'</div>'+
+      '<div style="grid-column:1/-1;min-width:0">'+rosterHtml(true)+'</div>'+
       featuredHtml()+
       '<h3 class="section-title">Browse the boards'+
         '<a href="desks.html" style="float:right;font-size:11px;color:var(--accent);text-decoration:none">\ud83c\udf93 schools & desks \u2192</a></h3>'+
