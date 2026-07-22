@@ -415,6 +415,17 @@ async function load(){
     if(te.length) favKey=te[0][0];
   }catch(e){}
 
+  // r391 (Wolf): total keystrokes drilled — a pure performance stat (an alternative to
+  // showcasing streak). Sums the same key tally favKey reads from.
+  let totalKeys=0;
+  try{ const kc=(srvKeys&&srvKeys.counts) || JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
+    for(const v of Object.values(kc)) totalKeys += (+v||0);
+  }catch(e){}
+  const keysTxt = totalKeys<=0 ? '—'
+    : totalKeys<1000 ? String(totalKeys)
+    : totalKeys<1e6  ? (totalKeys/1000).toFixed(totalKeys<1e4?1:0).replace(/\.0$/,'')+'k'
+    : (totalKeys/1e6).toFixed(1).replace(/\.0$/,'')+'m';
+
   // stat value + label maps (keyed by HK_STAT_KEYS)
   const statVal={
     solves: String(mine.length),
@@ -426,13 +437,14 @@ async function load(){
     accuracy: (avgEff!=null ? avgEff+'%' : '—'),
     saved: savedTxt,
     favkey: favKey,
+    keys: keysTxt,
   };
   const statLabel={ solves:'clean solves', crowns:'crowns', streak:'streak', podiums:'podiums',
-    top10s:'top-10s', boards:'boards', accuracy:'accuracy', saved:'time banked', favkey:'top hotkey' };
+    top10s:'top-10s', boards:'boards', accuracy:'accuracy', saved:'time banked', favkey:'top hotkey', keys:'keystrokes' };
   // tight card runs 5 across — the uppercase labels get their own short forms so
   // they never truncate; the customizer chips keep the descriptive statLabel.
   const statShort={ solves:'solves', crowns:'crowns', streak:'streak', podiums:'podiums',
-    top10s:'top-10s', boards:'boards', accuracy:'accuracy', saved:'banked', favkey:'top key' };
+    top10s:'top-10s', boards:'boards', accuracy:'accuracy', saved:'banked', favkey:'top key', keys:'keys' };
 
   // ---- SAVES (fire-and-forget, guarded) ----
   async function saveFlair(){ try{ const packed=window.hkFlairPack?window.hkFlairPack(loadout):loadout.frame;
@@ -481,7 +493,7 @@ async function load(){
 
   // ================= BUILD THE CUSTOMIZER =================
   const HK_FRAMES = window.HK_FRAMES || [];
-  const HK_STAT_KEYS = window.HK_STAT_KEYS || ['solves','crowns','streak','podiums','top10s','boards','accuracy'];
+  const HK_STAT_KEYS = window.HK_STAT_KEYS || ['solves','crowns','streak','podiums','top10s','boards','accuracy','saved','favkey','keys'];
   /* r387: lead the strip with the r385 full-interior SKINS (the star of the feature),
      then the classic plaque/foil/heraldic family. Order is cosmetic only — a frame
      not in this list just sorts after the skins in its native HK_FRAMES order. */
@@ -499,7 +511,7 @@ async function load(){
       const on = (loadout.frame||'__none')===f.id;
       const locked = !f.unlocked;
       const orn = (f.id!=='__none' && window.hkFrameOrnaments)
-        ? (f.id.indexOf('plaque-')===0 ? window.hkFrameOrnaments(f.id,{bucket:__gemBk}) : window.hkFrameOrnaments(f.id,{}))
+        ? (f.id.indexOf('plaque-')===0 ? window.hkFrameOrnaments(f.id,{bucket:__gemBk}) : window.hkFrameOrnaments(f.id,{owner:true}))
         : '';
       return '<button type="button" class="cz-frame'+(on?' on':'')+(locked?' lock':'')+'" '+
         'data-frame="'+f.id+'" data-locked="'+(locked?'1':'0')+'" data-earn="'+esc(f.earn||'')+'">'+
@@ -531,11 +543,13 @@ async function load(){
     }).join('');
   }
 
-  const SHOWS=[['rank','Rank crest'],['level','Level'],['streak','Streak'],['desk','Desk tag']];
+  // r391 (Wolf): the old 'streak' pill was dead (nothing read show.streak — streak is a
+  // pickable STAT now). Replaced with a real School toggle so a user can hide their school.
+  const SHOWS=[['rank','Rank crest'],['level','Level'],['school','School'],['desk','Desk tag']];
+  function showState(k){ return k==='school' ? !!prof.show_school : k==='desk' ? !!loadout.show.desk : loadout.show[k]!==false; }
   function showPillsHtml(){
     return SHOWS.map(([k,label])=>{
-      const onv = k==='desk' ? !!loadout.show.desk : loadout.show[k]!==false;
-      return '<button type="button" class="cz-pill'+(onv?' on':'')+'" data-show="'+k+'"><i class="cz-knob"></i>'+esc(label)+'</button>';
+      return '<button type="button" class="cz-pill'+(showState(k)?' on':'')+'" data-show="'+k+'"><i class="cz-knob"></i>'+esc(label)+'</button>';
     }).join('');
   }
 
@@ -687,10 +701,12 @@ async function load(){
   if(showEl) showEl.querySelectorAll('.cz-pill').forEach(b=>{
     b.onclick=()=>{
       const k=b.dataset.show;
-      const cur = k==='desk' ? !!loadout.show.desk : loadout.show[k]!==false;
-      loadout.show[k]=!cur;
-      b.classList.toggle('on', !cur);
-      renderCard(); saveFlair(); flash();
+      const nv=!showState(k);
+      b.classList.toggle('on', nv);
+      if(k==='school'){ prof.show_school=nv;
+        try{ if(sb&&me) sb.from('profiles').update({show_school:nv}).eq('id',me.id); }catch(e){}
+      } else { loadout.show[k]=nv; saveFlair(); }
+      renderCard(); flash();
     };
   });
 

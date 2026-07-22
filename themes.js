@@ -924,7 +924,7 @@ window.hkFrameUnlocked = function(id, u){
    path is preserved verbatim. hkFlairPack() round-trips: it emits a bare id when no
    extended prefs are set (keeps the column clean + old readers happy) and JSON only
    when the user has actually customized beyond the frame. Both are dependency-free. */
-window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy','saved','favkey'];
+window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','accuracy','saved','favkey','keys'];
 window.hkFlair = function(raw){
   const FR = window.HK_FRAMES || [];
   const validFrame = id => id && /^[a-z0-9_-]{1,32}$/i.test(id) && FR.some(f=>f.id===id) ? id : null;
@@ -1127,7 +1127,14 @@ window.hkFrameOrnaments = (function(){
       if(s[4]) h+='<canvas class="hk-fx" data-kind="'+s[4]+'" aria-hidden="true"></canvas>';
       if(id==='vaporwave') h+='<span class="hkf-sun" aria-hidden="true"></span><span class="hkf-vgrid" aria-hidden="true"></span>';
       h+=tab(s[0], s[1], s[2], s[3]);
-      if(id==='founder') h+='<i class="hkf-serial" aria-hidden="true">FOUNDER · 007 / 200</i>';
+      if(id==='founder'){
+        // r391 (Wolf): the founder card wears its real serial. Explicit opts.serial wins;
+        // else the viewer's own founding rank (opts.owner) — never a stranger's number.
+        let sn=(opts&&opts.serial|0)||0;
+        if(!sn && opts && opts.owner && window.hkFoundingFlags){ sn=window.hkFoundingFlags().rank|0; }
+        const label = (sn>0 && sn<=200) ? ('FOUNDER · '+String(sn).padStart(3,'0')+' / 200') : 'FOUNDER · CHARTER';
+        h+='<i class="hkf-serial" aria-hidden="true">'+label+'</i>';
+      }
       return h;
     }
     if(id==='engraved') return GLINT+corners(ENG);
@@ -1353,7 +1360,7 @@ window.hkPlayerCard = function(d, opts){
   const fv = (d.flair && window.hkFlair) ? window.hkFlair(d.flair).frame : d.flair;
   if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
     cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
-    orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full}) : '';
+    orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full, owner:!!d.owner, serial:d.serial|0}) : '';
   }
   // r387: show-on-card toggles. Absent d.show => show everything (legacy callers).
   const show = d.show || {};
