@@ -32,7 +32,8 @@ window.HOTKEY_DRILLS = {
   // Formulas II / Models I / Models II / Full Builds (PRO).
   // r249 — the 6 folded legacy drills (saves, ribbon, polish, format, blue, transpose) were
   // deleted outright, their value covered by survivors (copyover, housestyle, dress, decimals,
-  // the Alt-H drills, pastes). Catalog is now exactly the 80 grouped drills.
+  // the Alt-H drills, pastes). Catalog is 82 grouped drills (Formulas I & II carry 11 each);
+  // menuOrder.length is the source of truth — do not hardcode the total elsewhere.
   groups: [
     { name: 'Foundations',    keys: ['navigation', 'filldr', 'pastes', 'blocksel', 'rowops', 'colops', 'editfix', 'undo', 'copyover', 'modeltour'] },   /* r367: modeltour moved from #2 to capstone — it demands cascades + formatting no fresh player has yet */
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'dress', 'housestyle', 'gauntlet'] },

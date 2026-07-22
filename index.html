@@ -4,21 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
-<meta name="description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="description" content="Keyboard-only Excel training: 82 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
-<meta property="og:description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:description" content="Keyboard-only Excel training: 82 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
-<meta name="twitter:description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:description" content="Keyboard-only Excel training: 82 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 81 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 82 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
 <script>
   // BOOT BEACON: if anything fatal happens while the game loads, paint the error on
   // screen instead of failing silent ("all the elements are gone" must never be a mystery).
@@ -8340,7 +8340,7 @@ function render(){
   const __availW=__gw ? (__gw.clientWidth-28-30) : 0;      // padding 14×2 + row header
   let __base=0; for(let c=1;c<=COLS;c++) __base+=(colW[c]||72);
   // r333 (Wolf): STANDARD grid width — the sheet fills the SAME frame on every drill. Elastic fit
-  // used to only GROW narrow drills; wide ones (40 of 81) overflowed the frame and scrolled, so the
+  // used to only GROW narrow drills; wide ones (~half the catalog) overflowed the frame and scrolled, so the
   // board visibly resized drill-to-drill. Now it also SHRINKS proportionally to fit, floored per
   // column so numbers stay legible — the outer width is constant across the catalog.
   //   EXCEPT autofit drills: their whole point is "widen the column until #### clears," so a global
