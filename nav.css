@@ -586,7 +586,10 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-lg.hk-frame-engraved{border-width:2px}
 .hk-frame-lg.hk-frame-engraved::before{inset:7px; border-width:2px}
 .hk-frame-lg.hk-frame-engraved::after{inset:13px}
-.hk-frame-lg[class*="hk-frame-plaque-"]{border-width:9px}
+/* r392 (Wolf): the lg plaque border used to balloon to 9px (+ a -5px outset ::before) so
+   plaque cards read visibly BIGGER than every other skin. Matched to the new-skin footprint:
+   a 3px metal edge (still reads as a plaque, not a hairline) with the texture contained. */
+.hk-frame-lg[class*="hk-frame-plaque-"]{border-width:3px}
 .hk-frame-lg[class*="hk-frame-plaque-"]::before{inset:-9px}
 .hk-frame-lg.hk-frame-foil{border-width:7px}
 .hk-frame-lg.hk-frame-foil::before{inset:-7px}
@@ -826,7 +829,9 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    Kills the "wider card / different card on the hotbar" inconsistency. */
 .pc-card.pc-owner{width:min(430px,94vw); padding:14px 0 0; background:var(--surface)}
 .pc-card.pc-owner .uc{padding:22px 24px 20px; border-radius:16px}
-.pc-card.pc-owner .pc-scroll{padding:0 16px}
+/* r392 (Wolf): the scroll's 16px side padding squeezed the .uc to ~396px while the skin
+   border sat at 430 — content read wider than the frame. Flush now, matching profile/public. */
+.pc-card.pc-owner .pc-scroll{padding:0}
 .pc-card.pc-owner .pc-foot{padding:0 18px}
 .pc-card.pc-owner .pc-x{top:22px; right:22px; z-index:5}
 /* r389 (Wolf): the legacy ornament layers (corners, medallion, glint) are ABSOLUTE

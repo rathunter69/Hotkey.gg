@@ -1560,14 +1560,14 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=275"></script>
-<link rel="stylesheet" href="nav.css?v=188">
-<script src="themes.js?v=280"></script>
+<script src="drills.js?v=276"></script>
+<link rel="stylesheet" href="nav.css?v=189">
+<script src="themes.js?v=281"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=288"></script>
+<script src="nav.js?v=289"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -1611,8 +1611,8 @@
       </div>
       <button class="mb-tool" id="demoBtn" data-tip="replays the optimal keystrokes through the real engine">&#x25b6; solution</button>
       <button class="mb-tool" id="echoBtn" data-tip="learn mode — the demo hands YOU the keys, one chord at a time">&#9000; learn</button>
-      <button class="mb-tool" id="hintsToggle" data-tip="show the key hints for each step — no cursor lock"><kbd>F1</kbd> hints: off</button>
-      <button class="mb-tool" id="guideToggle" data-tip="guided — hints PLUS the cursor fenced to the working area">&#9932; guided: off</button>
+      <button class="mb-tool" id="hintsToggle" data-tip="F1 — light up the keys for each step (no cursor lock)"><kbd>F1</kbd> hints</button>
+      <button class="mb-tool" id="guideToggle" data-tip="guided — hints PLUS the cursor fenced to the working area">&#9932; guided</button>
       <button class="mb-tool" id="macBtn" style="display:none" title="how the keys map on a Mac + enabling KeyTips in real Excel">&#8984; mac keys</button>
       <span class="mb-tool" id="streakBadge" style="display:none; cursor:default"></span>
       <span class="mb-tool" id="lvlBadge" style="display:none; cursor:default; color:var(--accent); font-weight:700"></span>
@@ -11730,8 +11730,8 @@ $('result').addEventListener('click',e=>{ const b=e.target.closest('.rc-key'); i
 /* r360: the legacy delegated rm-key listener is GONE — r88 wired direct onclicks on these
    buttons, so every mouse click fired BOTH paths (a hidden double-advance: 'next' skipped a
    drill for mouse users, and it clobbered the daily-mix queue advance). */
-function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='⤲ guided: '+(guided?'on':'off'); } }
-function updateHintsBtn(){ const b=$('hintsToggle'); if(b){ const on=hints||guided; b.classList.toggle('on',on); b.innerHTML='<kbd>F1</kbd> hints: '+(on?'on':'off'); } }
+function updateGuideBtn(){ const b=$('guideToggle'); if(b){ b.classList.toggle('on',guided); b.innerHTML='⤲ guided'; } }   /* r392: label stays compact — the .on highlight shows state (keeps the mode bar one tight row) */
+function updateHintsBtn(){ const b=$('hintsToggle'); if(b){ const on=hints||guided; b.classList.toggle('on',on); b.innerHTML='<kbd>F1</kbd> hints'; } }
 /* r392 (Wolf): F1 toggles HINTS only — the step keys light up on the checklist, but the
    cursor stays free (no rails). Turning hints off also drops guided (guided implies hints). */
 function toggleHints(){ if(demoPlaying) return; hints=!hints;

@@ -1,7 +1,111 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Refreshed 2026-07-17 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+_Refreshed 2026-07-22 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
 New sessions: the repo IS the handover — read this file, **dev/PIPELINE.md's ⚡ header (the
 live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ design docs._
+
+## SESSION HANDOVER SNAPSHOT (2026-07-22, rounds r389–r392 — the COSMETICS / PLAYER-CARD marathon)
+
+**⚠️ CRITICAL CACHE BUG found end of session (fix in flight): the asset `?v=` query strings in
+all 16 HTML files were NEVER bumped across r390/r391/r392 (themes.js?v=280, nav.js?v=288,
+lb.js?v=26, drills.js?v=275, nav.css?v=188, lb.css?v=14). Cloudflare deploys `main` fine — the
+bare files ARE updated live — but returning visitors keep serving their cached `?v=280` copy at
+that unchanged URL, so Wolf saw NONE of the recent skins/changes on the live site even after a
+hard refresh. NEW HOUSE RULE: bump every changed asset's `?v=` in ALL HTML on every round that
+touches JS/CSS (no service worker exists; the version query is the only cache-bust). Automate in
+the gate if possible.**
+
+**THE ARC:** the cosmetic / player-card system — title skins, the unified player card, chapter/
+cert progression cosmetics — plus two live gameplay-bug fixes. Shipped via PRs #203–#206, each
+MERGED to live. Branch `claude/pipeline-engine-integration-laki0l`, restarted off main after each
+merge (force-with-lease is fine: the old branch commits are squashed into main).
+
+**SHIPPED LIVE (r389–r392):**
+- **Title-skin system** — `SKINS` map in themes.js (inside the hkFrameOrnaments closure): each
+  entry = `[notch-title, interior-bg, border-gradient, accent, fx-kind]`. Animated by
+  `window.hkInitCardFx` (per-`.hk-fx`-canvas rAF particle loop). FX-kinds: snow/fire/prism/cosmic/
+  circuit/matrix/holo/stars/sun + NEW petals/bokeh/pearl/galaxy/aurora/drive/gold/draft/pinstripe.
+  New skins: amethyst, onyx (gold shimmer+dust), sakura, goldenhour, pearl, bloom, cottoncandy,
+  architect (navy blueprint + gold draft-scan), **boutique ("◈ ELITE BOUTIQUE" — Wolf renamed
+  from "Bulge"; charcoal + gold pinstripe)**, emerald. PRO cosmic→galaxy (distinct from
+  Constellation); Founder holo→seamless aurora; Vaporwave sun→synthwave `drive` grid.
+- **Chapter/cert unlock wiring (#86)** — `hkFrameUnlocked(id,u)` now consumes `u.chaptersCleared`
+  (array of cleared campaign chapter ids) + `u.streak`, threaded into the profile.html frame-
+  picker `frameU` builder (derived from local PB + server runs vs par*GATE — same rule the
+  campaign uses). Earn rules PROVISIONAL: amethyst=VP, onyx=2nd-Year, bloom=Associate,
+  cottoncandy=Summer, sakura=14-day streak, goldenhour=7-day, pearl=perfect run, emerald=clear
+  Formulas II(c5), architect=clear Full Builds(c8), boutique=3 certs.
+- **Unified player card** — the two "click-a-name" cards now match the profile card. nav.js rank-
+  click modal: 640px shell → 430px `.pc-owner` holder with the skin on the `.uc` (pass flair, not
+  the shell). lb.js public card: dropped the trailing boards block, 4→5 stats. Founder serial is
+  dynamic (`FOUNDER · 001/200` for owner via hkFoundingFlags; `CHARTER` fallback on others).
+- **F1 = hints / guided = the lock (GAMEPLAY)** — three progressive help levels SPLIT: F1→`hints`
+  (step keys light up, cursor FREE), `guided`→hints + hard rails (cursor fenced to the area),
+  watch-solution. Was fused (F1 wired straight to guided → trapped the cursor). New `hints` state
+  in index.html; guided implies hints; own buttons #hintsToggle + #guideToggle.
+- **Rapid-fire ribbon fix (GAMEPLAY)** — the Alt-walk echo froze on ribbon SUB-MENUS (alt e s v,
+  alt h f c) because rfEchoStep only advanced on `MENUS[path]` container keys, not leaf/dialog
+  openers. Added `RF_ECHO_DIALOG` (ES/HVS→paste, HFC→fontcolor, HH→fillcolor, HJ→cellstyle,
+  OE→fmt, HFIS→series), view-only; matchers still own the solve. +2 regression asserts in the gate.
+- **Progression cleanup (#76 partial)** — buildAchCtx now sets foundingClass/foundingPartner (the
+  two founding mythics never fired in-game); dropped the orphan sheetClears write.
+- **Path-based gating** — gate.yml scope step: heavy engine matrix runs only when index.html/
+  drills.js/dev/ changed; cosmetic-only pushes run the new dev/e2e-smoke.js (all pages load, zero
+  page errors) + the lb suite. Cosmetic pushes ~8min → ~1min.
+- Also: MYTHIC tier (crown; x_allach/x_first100/x_foundpro), beta unlock-all button (password
+  `chicagosux` → localStorage `hk_beta_unlock`), dark cursor kept green, tab-merge REVERTED (Wolf:
+  overflowed on his desktop) to the 2-page split + page-aware «/» chips (walk 1/2→2/2 within a
+  chapter, then jump), show-on-card school toggle + total-keystrokes stat.
+
+**WOLF'S FEEDBACK / DIRECTION — CAPTURED ACROSS ALL ITERATIONS (the part to preserve):**
+- *Cards/branding:* loves the skins ("absolute fire"); wants MANY, tied to chapters/certs, not
+  overloaded. Cards look "so good" → wants them in MORE places (small versions on account +
+  stats). Naming is personal: **"Elite Boutique" not "Bulge Bracket" ("I'm biased")**. Founder
+  card title = the 001/200 serial. Onyx needs a gold animation. PRO should feel like a galaxy
+  (not too like Constellation). Founder animation must be seamless (aurora). Wants a **feminine
+  skin set** (cherry blossom = sakura + goldenhour/pearl/bloom/cottoncandy). MYTHIC tier above
+  legendary (crown), gated on completionist / first-100-signups ("First Analyst Class") / first-
+  100-PRO ("Founding Partner") — numbers at 100 so a "N of 100 left" counter shows on the go-pro tab.
+- *Compact-always (his LAW for boards):* "default to compact-always or consistent — don't make
+  things expand; set layouts, and I'll fill empty spaces with LIVE SEEDS even on live." Fixed card
+  sizes; seed the gaps; never expand-to-content.
+- *Trainer UI:* he's 98% happy — **grid sizing is the fragile part, approach with hesitation**.
+  Full-model drills (24 rows) scroll off-screen; wants them shorter (no scroll) but still full;
+  explore a middle-ground standard grid size (#99, LAST, high caution). Sheet-tab one-strip merge
+  "looked terrible on my home PC" → reverted to page bubbles.
+- *Gameplay:* three help levels (F1 tips / guided lock / watch) — lock ONLY on guided (done).
+  Ribbon must work in rapid-fire incl. sub-menus (done). Progression: KEEP the 8-chapter/3-cert
+  mapping; make it SINGLE-SOURCE-OF-TRUTH (derive chapter membership from the ONE `groups` spine;
+  kill the 3 hand-maintained copies — HOTKEY_CAMPAIGN.chapters[].keys, HOTKEY_GATES, HK_TRACKS
+  milestones; honest-relabel the "RETIRED" HOTKEY_CAMPAIGN which is the LIVE milestone/gate store;
+  sync dev/migrate-certificates.sql). Reordering comes through drill dev, not now (#76).
+- *Process:* **MOCK FIRST** for page reworks — he reacts to rendered screenshots, not prose (render
+  pages with seeded DATA via the scratchpad/r392/shot-lb.js pattern so he doesn't screenshot).
+  Nothing ships live without his merge approval on visual reworks. #75 skin-unlock celebration =
+  bake the unlock into the achievement celebration with an "equip now" button.
+
+**IN-FLIGHT — LEADERBOARD REWORK (#77), NOT MERGED (mock iterations, latest wins):**
+1. moving the field-by-tier panel under the main board → became a thin half-empty strip (rejected).
+2. per-tier board opening on the user's tier+bucket → "only 2 names, useless" (default too sparse).
+3. **LATEST SPEC** (a subagent is building it + rendering lb_rebuild.png, uncommitted): Hero = your
+   card + DAILY CHALLENGE board (prominent, populated). Featured = 2 equal boxes: OVERALL FIELD
+   (full ranked leaderboard, defaults to the WHOLE field so never sparse, your row highlighted;
+   tier/bucket chips optional, not the default) + TOP DESKS (a non-weekly second board); DROP the
+   weekly gauntlet from the dashboard. Browse-the-boards: drill leaderboards LOSE the tier/bucket
+   filter; board top aligns with the drill list; rows extend to match the list height (update the
+   lb gate's section A accordingly). Then give account + stats the same compact-always treatment +
+   a small card, tidy spacing (no big gaps / tight squeezes / misaligned elements).
+
+**PENDING QUEUE (Wolf's priority: #77 → #76 → #75 → polish → #99 last):** #77 pages (leaderboard
+in flight, then account + stats) · #76 progression single-source-of-truth · #75 skin-unlock
+celebration ("equip now") · #95 heraldic animation · #96 legacy skin art rework · #97 feminine set
+· #91 stats-wall rarity chips · #87 profile polish + first-visit intro · #78 iconography align ·
+#79 custom-title safety filter · #99 grid-height (high caution).
+
+**KEY TECH:** index.html ~15k lines, ONE global scope (a cosmetic edit can break every drill).
+Assets cache-busted by `?v=N` per HTML — BUMP ON EVERY JS/CSS CHANGE. Deploy = Cloudflare Pages
+from main, no staging → the gate is the only net. Gate: parity(124)/lb(41)/guided(85)/rapidfire(14)/
+onboard/alt-paths/mac-input/echo/demo-replay + smoke(6) + drill-page drift; server
+`python3 -m http.server 8791`, `CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`.
 
 ## SESSION HANDOVER SNAPSHOT (2026-07-17, rounds r296–r302 — the live-feedback marathon)
 - **THE ACTIVE ARC: Wolf plays the live site and fires batches of feedback; the session
