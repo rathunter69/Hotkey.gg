@@ -838,11 +838,14 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 /* r391 (Wolf): the owner rank-click card matches the PROFILE card exactly — a plain
    430px holder with the skin riding the .uc (not the wide 640px shell), same insets.
    Kills the "wider card / different card on the hotbar" inconsistency. */
-.pc-card.pc-owner{width:min(430px,94vw); padding:14px 0 0; background:var(--surface)}
+.pc-card.pc-owner{width:min(430px,94vw); padding:2px 0 0; background:var(--surface)}
 .pc-card.pc-owner .uc{padding:22px 24px 20px; border-radius:16px}
-/* r392 (Wolf): the scroll's 16px side padding squeezed the .uc to ~396px while the skin
-   border sat at 430 — content read wider than the frame. Flush now, matching profile/public. */
-.pc-card.pc-owner .pc-scroll{padding:0}
+/* r392 (Wolf): the scroll's 16px SIDE padding squeezed the .uc to ~396px while the skin
+   border sat at 430 — content read wider than the frame. Sides flush now (matching
+   profile/public). r393 (Wolf: "still broken"): the skin title notch rides at top:-15px on
+   the .uc; with the scroll flush to the top, overflow-y:auto clipped it (~13px cut). A top
+   pad ≥ the notch height gives it room INSIDE the scroll's padding box — sides stay flush. */
+.pc-card.pc-owner .pc-scroll{padding:16px 0 0}
 .pc-card.pc-owner .pc-foot{padding:0 18px}
 .pc-card.pc-owner .pc-x{top:22px; right:22px; z-index:5}
 /* r389 (Wolf): the legacy ornament layers (corners, medallion, glint) are ABSOLUTE
