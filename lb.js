@@ -487,9 +487,13 @@ function showPublicCard(uid){
   try{
     const pp=(DATA.profs||[]).find(p=>p.id===uid);
     const raw=pp && pp.flair;
-    if(raw && /^[a-z0-9_-]{1,32}$/i.test(raw)){
-      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===raw)){ fv=raw; isSkin=true; }
-      else legacyCls=' flair-'+raw;
+    /* r390 (Wolf): flair is now often a JSON loadout blob (the customizer). Parse it via
+       hkFlair so the equipped skin shows on the public card, instead of failing the
+       bare-id test and rendering a plain (broken-looking) card. */
+    const frame=window.hkFlair ? window.hkFlair(raw).frame : (raw && /^[a-z0-9_-]{1,32}$/i.test(raw) ? raw : null);
+    if(frame){
+      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===frame)){ fv=frame; isSkin=true; }
+      else legacyCls=' flair-'+frame;
     }
   }catch(e){}
   // level/xp for this player — the canonical curve (same helpers the hero card uses)
