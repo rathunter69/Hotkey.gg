@@ -983,6 +983,24 @@ window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','a
     return {ok:true, clean:s, reason:''};
   };
 })();
+/* r397 (Wolf #78): one on-brand line-icon set for the ancillary glyphs that were
+   colourful emoji (lock / unlock / timer / target), matching the site's nav-icon
+   style — fill:none, stroke:currentColor, 2px round. Inherits font-size + colour of
+   its context, so a locked swatch, a locked title, and a locked catalog row all read
+   the same everywhere. (Streak stays 🔥 — it's meaningful and already consistent.) */
+window.hkIcon = function(name, size){
+  const D = {
+    lock:   '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    unlock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.7-1.5"/>',
+    timer:  '<path d="M10 2h4"/><circle cx="12" cy="13" r="8"/><path d="M12 13V9"/>',
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>'
+  };
+  const d = D[name]; if(!d) return '';
+  const s = size || '1em';
+  return '<svg class="hk-ic" viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" '+
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '+
+    'style="vertical-align:-0.14em;flex:0 0 auto">'+d+'</svg>';
+};
 window.hkFlair = function(raw){
   const FR = window.HK_FRAMES || [];
   const validFrame = id => id && /^[a-z0-9_-]{1,32}$/i.test(id) && FR.some(f=>f.id===id) ? id : null;

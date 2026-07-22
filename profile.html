@@ -66,7 +66,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'profile';
 </script>
-<script src="themes.js?v=284"></script>
+<script src="themes.js?v=285"></script>
 <style>
   /* ============================================================
      PROFILE CUSTOMIZER — page-local classes. Loaded AFTER nav.css so the
@@ -139,7 +139,7 @@ window.NAV_ACTIVE = 'profile';
   .cz-frame:hover .cz-sw{border-color:var(--faint)}
   .cz-frame.on .cz-sw{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent), 0 0 14px var(--accent-glow)}
   .cz-frame.lock .cz-sw{filter:grayscale(.7) brightness(.5)}
-  .cz-lk{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:6}
+  .cz-lk{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; z-index:6; color:#fff; filter:drop-shadow(0 1px 2px rgba(0,0,0,.7))}
   /* mini-swatch ornament sizing (mirror of nav.css .fs-mini) — corners shrink,
      tab/medallion/serial/glint hide so the swatch reads as a clean skin preview */
   .cz-sw .hkf-cn{width:30px; height:30px}
@@ -536,7 +536,7 @@ async function load(){
         : '';
       return '<button type="button" class="cz-frame'+(on?' on':'')+(locked?' lock':'')+'" '+
         'data-frame="'+f.id+'" data-locked="'+(locked?'1':'0')+'" data-earn="'+esc(f.earn||'')+'">'+
-        '<span class="cz-sw'+(f.id!=='__none'?' hk-frame-'+f.id:'')+'">'+orn+(locked?'<span class="cz-lk">🔒</span>':'')+'</span>'+
+        '<span class="cz-sw'+(f.id!=='__none'?' hk-frame-'+f.id:'')+'">'+orn+(locked?'<span class="cz-lk">'+window.hkIcon('lock')+'</span>':'')+'</span>'+
         '<b class="cz-fn">'+esc(f.name)+'</b>'+
       '</button>';
     }).join('');
@@ -562,7 +562,7 @@ async function load(){
       const locked = !!t.locked;
       return '<button type="button" class="cz-chip'+(on?' on':'')+(locked?' lock':'')+(t.pro?' pro':'')+'" '+
         'data-title="'+(t.id==null?'':t.id)+'" data-locked="'+(locked?'1':'0')+'" data-pro="'+(t.pro?'1':'0')+'">'+
-        (locked?'🔒 ':'')+esc(t.name)+'</button>';
+        (locked?window.hkIcon('lock')+' ':'')+esc(t.name)+'</button>';
     }).join('');
   }
 
@@ -643,7 +643,7 @@ async function load(){
       '<button type="button" class="pc-arrow prev" id="pcPrev" aria-label="previous skin">‹</button>'+
       '<div class="pc-card pc-live" id="liveCard"></div>'+
       '<button type="button" class="pc-arrow next" id="pcNext" aria-label="next skin">›</button>'+
-      '<span class="pc-lockbadge">🔒 Locked — preview only</span>'+
+      '<span class="pc-lockbadge">'+window.hkIcon('lock')+' Locked — preview only</span>'+
     '</div>'+
     '<div class="pc-live-cap" id="frameCap"></div>'+
     '<div class="cz">'+
@@ -675,7 +675,7 @@ async function load(){
       '</div>'+
 
       '<div class="cz-foot">Locked frames &amp; medals stay greyed with how they’re earned on hover · nothing here touches your Account or Stats pages.'+
-        '<br><a id="czBeta" class="cz-beta'+(betaOpen?' on':'')+'">'+(betaOpen?'🔓 Beta unlock active — every skin & title is open':'🔓 Beta: unlock everything')+'</a></div>'+
+        '<br><a id="czBeta" class="cz-beta'+(betaOpen?' on':'')+'">'+(betaOpen?window.hkIcon('unlock')+' Beta unlock active — every skin & title is open':window.hkIcon('unlock')+' Beta: unlock everything')+'</a></div>'+
     '</div>';
 
   renderCard();
@@ -687,7 +687,7 @@ async function load(){
     const cap=document.getElementById('frameCap'); if(!cap) return;
     const f=frameOpts[previewIdx]||frameOpts[0];
     let s='<b>'+esc(f.name)+'</b><span class="fc-idx">· '+(previewIdx+1)+' / '+frameOpts.length+'</span>';
-    if(!f.unlocked) s+='<span class="fc-lock">🔒 '+esc(f.earn||'keep playing')+'</span>';
+    if(!f.unlocked) s+='<span class="fc-lock">'+window.hkIcon('lock')+' '+esc(f.earn||'keep playing')+'</span>';
     else if(f.id!=='__none') s+='<span class="fc-eq">✓ EQUIPPED</span>';
     s+='<span class="fc-count">'+frameUnlockedN+' of '+frameTotal+' skins unlocked · your card as others see it</span>';
     cap.innerHTML=s;
@@ -837,7 +837,7 @@ async function load(){
       if(pw.trim().toLowerCase()==='chicagosux'){
         try{ localStorage.setItem('hk_beta_unlock','1'); }catch(e){}
         location.reload();
-      } else { bt.textContent='🔒 wrong code'; setTimeout(()=>{ bt.textContent='🔓 Beta: unlock everything'; }, 1600); }
+      } else { bt.innerHTML=window.hkIcon('lock')+' wrong code'; setTimeout(()=>{ bt.innerHTML=window.hkIcon('unlock')+' Beta: unlock everything'; }, 1600); }
     };
   }
 
