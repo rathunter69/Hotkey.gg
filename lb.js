@@ -725,7 +725,7 @@ function rankedInfographic(){
   m.innerHTML='<div class="panel" style="max-width:440px;width:100%;max-height:calc(100vh - 40px);display:flex;flex-direction:column;padding:0;overflow:hidden">'+
     '<div style="padding:20px 22px 12px"><h4 style="margin:0 0 10px">welcome to ranked</h4>'+
     '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.65">'+
-    'Post a time on the <b>five placement boards</b> (one per band) and you get a rank. Your rank is your '+
+    'Post a time on the <b>placement series</b> — five standard boards, one per band — and you get a rank. Your rank is your '+
     '<b>average placement</b> across the boards you enter — stabilized so a couple of fast drills can’t '+
     'vault you, and big fields count more than small ones. Each tier has <b>Bottom / Middle / Top</b> buckets; '+
     'clear the band to promote. Ranks are live — they move as others improve.</div></div>'+
