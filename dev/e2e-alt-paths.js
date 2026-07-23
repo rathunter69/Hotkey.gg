@@ -661,26 +661,20 @@ const ALTS = [
       {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
       {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
     ]; }` },
-  { key: 'navigation', name: 'thread the random maze, grow the block the SLOW way (Shift-by-Shift), then copy → hop to the deck → paste → home', moves: `C => {
-      const P=C._path, M=C._model, D=C._deck, DR=C._dirs, cl=colLetter;
-      const K={D:{key:'ArrowDown',ctrl:true},U:{key:'ArrowUp',ctrl:true},R:{key:'ArrowRight',ctrl:true},L:{key:'ArrowLeft',ctrl:true}};
-      const steps=[{sel:'C3', keys:[{key:'Home',ctrl:true}]}];   // → A1
-      let cur='A1';
-      for(let i=0;i<P.length;i++){ steps.push({sel:cur, keys:[K[DR[i]]]}); cur=cl(P[i].c)+P[i].r; }   // leap each marker (random dirs)
-      steps.push({sel:cur, keys:[K[DR[P.length]]]});             // last leap → model corner
-      const c0=M.c0, r0=M.r0, corner=cl(c0)+r0;
-      const across=[]; for(let j=0;j<M.w-1;j++) across.push({key:'ArrowRight',shift:true});
-      steps.push({sel:corner, keys:across});                     // Shift+→ ×(w-1) → wide (slow route)
-      const wide=corner+':'+cl(c0+M.w-1)+r0;
-      const down=[]; for(let j=0;j<M.h-1;j++) down.push({key:'ArrowDown',shift:true});
-      steps.push({sel:wide, keys:down});                         // Shift+↓ ×(h-1) → whole block (slow route)
-      const full=corner+':'+cl(c0+M.w-1)+(r0+M.h-1);
-      steps.push({sel:full, keys:[{key:'c',ctrl:true}]});        // Ctrl+C → copy
-      steps.push({sel:full, keys:[{key:'ArrowRight',ctrl:true}]});// hop right to the deck frame
-      const deck=cl(D.c)+D.r;
-      steps.push({sel:deck, keys:[{key:'v',ctrl:true}]});        // Ctrl+V → drop it in the deck
-      steps.push({sel:deck, keys:[{key:'Home',ctrl:true}]});     // Ctrl+Home → finish at A1 (goal)
-      return steps; }` },
+  { key: 'navigation', name: 'thread the maze the SLOW way — single-arrow steps (not Ctrl+arrow), collecting every pip, then grab → weave → drop', moves: `C => {
+      // r402 maze: the alternate route is single-cell arrow-stepping the corridor instead of the
+      // canonical Ctrl+arrow shooting. Same win (pips collected + model grabbed + pasted).
+      const M=C._maze, cl=colLetter, T=M.table, D=M.paste, p1=M.p1, p2=M.p2;
+      const sk=(a,b)=>{ const dr=b[0]-a[0], dc=b[1]-a[1]; return dr===1?{key:'ArrowDown'}:dr===-1?{key:'ArrowUp'}:dc===1?{key:'ArrowRight'}:{key:'ArrowLeft'}; };
+      const nav1=[]; for(let i=1;i<p1.length;i++) nav1.push(sk(p1[i-1],p1[i]));   // walk to the model, one cell at a time (collects pips)
+      const nav2=[]; for(let i=1;i<p2.length;i++) nav2.push(sk(p2[i-1],p2[i]));   // walk to the drop zone
+      const corner=cl(T.c0)+T.r0, full=corner+':'+cl(T.c0+T.w-1)+(T.r0+T.h-1);
+      return [
+        {sel:cl(p1[0][1])+p1[0][0], keys:nav1},                                                          // slow single-step thread to the model room
+        {sel:corner, keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]},   // grab the block + copy
+        {sel:cl(p2[0][1])+p2[0][0], keys:nav2},                                                          // slow single-step weave to the drop zone
+        {sel:cl(D.c0)+D.r0, keys:[{key:'v',ctrl:true}]}                                                  // paste
+      ]; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
       const steps=C._sites.slice().reverse().flatMap(s=>[
