@@ -437,7 +437,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    with a sheen canvas raking across. One class per metal; sizes like every other skin. */
 .hk-frame-plaque-bronze.hk-frame-plaque-bronze, .hk-frame-plaque-silver.hk-frame-plaque-silver,
 .hk-frame-plaque-gold.hk-frame-plaque-gold, .hk-frame-plaque-plat.hk-frame-plaque-plat,
-.hk-frame-plaque-md.hk-frame-plaque-md, .hk-frame-plaque-diam.hk-frame-plaque-diam{border:2px solid transparent;
+.hk-frame-plaque-diam.hk-frame-plaque-diam{border:2px solid transparent;
   box-shadow:0 0 20px rgba(0,0,0,.25),0 20px 60px rgba(0,0,0,.55)}
 .hk-frame-plaque-bronze.hk-frame-plaque-bronze{--text:#f4dcc0;--muted:#b08a64;--line:#5a3a1e;--accent:#e0a35a;--accent-dim:#a5701f; color:#f4dcc0;
   background:radial-gradient(ellipse at 30% 4%,rgba(224,163,90,.16),transparent 55%),linear-gradient(#1a0f07,#160c05) padding-box, linear-gradient(150deg,#f4c088,#cf8e4c 32%,#95602c 60%,#e0a35a) border-box}
@@ -448,10 +448,6 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 /* r404.4 (Wolf): PLATINUM (VP) — cooler, an icy blue-white platinum with a frost cast. */
 .hk-frame-plaque-plat.hk-frame-plaque-plat{--text:#e6f2ff;--muted:#93b0cc;--line:#2e4256;--accent:#dbecff;--accent-dim:#7fa8d8; color:#e6f2ff;
   background:radial-gradient(ellipse at 30% 4%,rgba(150,200,255,.18),transparent 55%),linear-gradient(#0a0f16,#070b12) padding-box, linear-gradient(150deg,#eaf4ff,#a8c8e8 32%,#5a82ad 60%,#c8e2ff) border-box}
-/* r404.4 (Wolf): MD — the corner office. Oxblood + brass executive card, distinct from
-   heraldic's bright crimson (warmer mahogany hue) and onyx's black. */
-.hk-frame-plaque-md.hk-frame-plaque-md{--text:#f4dcc4;--muted:#c09472;--line:#5a2420;--accent:#e0b070;--accent-dim:#a5561f; color:#f4dcc4;
-  background:radial-gradient(ellipse at 30% 4%,rgba(224,176,112,.16),transparent 55%),linear-gradient(#1a0608,#140406) padding-box, linear-gradient(150deg,#f0c884,#c07840 30%,#7a1420 62%,#e0b070) border-box}
 /* r404.4 (Wolf): DIAMOND (Second-Year, the final boss) — brilliant full-spectrum prism. */
 .hk-frame-plaque-diam.hk-frame-plaque-diam{--text:#eaf8ff;--muted:#9fc8dc;--line:#2a4a5a;--accent:#eaf8ff;--accent-dim:#8fd0e8; color:#eaf8ff;
   background:radial-gradient(ellipse at 30% 4%,rgba(223,244,255,.2),transparent 55%),linear-gradient(#0a1418,#081014) padding-box, linear-gradient(135deg,#ffffff,#9be0f7 24%,#7fa8ff 44%,#c9a8ff 64%,#ffc2e8 82%,#dff4ff) border-box}
@@ -643,7 +639,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-circuit,.hk-frame-neon,.hk-frame-blueprint,.hk-frame-crt,.hk-frame-constellation,
 .hk-frame-vaporwave,.hk-frame-terminal,.hk-frame-pro,.hk-frame-noir,.hk-frame-frostbite,
 .hk-frame-molten,.hk-frame-founder,
-.hk-frame-plaque-bronze,.hk-frame-plaque-silver,.hk-frame-plaque-gold,.hk-frame-plaque-plat,.hk-frame-plaque-md,.hk-frame-plaque-diam,
+.hk-frame-plaque-bronze,.hk-frame-plaque-silver,.hk-frame-plaque-gold,.hk-frame-plaque-plat,.hk-frame-plaque-diam,
 .hk-frame-engraved,.hk-frame-foil,.hk-frame-heraldic,.hk-frame-charter{--surface2:rgba(0,0,0,.32); --surface:rgba(0,0,0,.4); --faint:rgba(255,255,255,.34)}
 /* decorative crack sits BEHIND content, ambient not a slash */
 .hkf-crack{z-index:0; opacity:.7}
@@ -651,7 +647,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-circuit .hkf-tab,.hk-frame-neon .hkf-tab,.hk-frame-blueprint .hkf-tab,.hk-frame-crt .hkf-tab,
 .hk-frame-constellation .hkf-tab,.hk-frame-vaporwave .hkf-tab,.hk-frame-terminal .hkf-tab,.hk-frame-pro .hkf-tab,
 .hk-frame-noir .hkf-tab,.hk-frame-frostbite .hkf-tab,.hk-frame-molten .hkf-tab,.hk-frame-founder .hkf-tab,
-.hk-frame-plaque-bronze .hkf-tab,.hk-frame-plaque-silver .hkf-tab,.hk-frame-plaque-gold .hkf-tab,.hk-frame-plaque-plat .hkf-tab,.hk-frame-plaque-md .hkf-tab,.hk-frame-plaque-diam .hkf-tab,
+.hk-frame-plaque-bronze .hkf-tab,.hk-frame-plaque-silver .hkf-tab,.hk-frame-plaque-gold .hkf-tab,.hk-frame-plaque-plat .hkf-tab,.hk-frame-plaque-diam .hkf-tab,
 .hk-frame-engraved .hkf-tab,.hk-frame-foil .hkf-tab,.hk-frame-heraldic .hkf-tab,.hk-frame-charter .hkf-tab{
   border:0; border-radius:0; padding:4px 16px; box-shadow:0 2px 6px rgba(0,0,0,.45);
   clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 100%,0 100%)}

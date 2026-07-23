@@ -820,14 +820,12 @@ window.HK_FRAMES = [
    desc:'beveled gold + gemset corners',              earn:'reach First-Year Analyst'},
   {id:'plaque-plat',   name:'Platinum Plaque', tier:'rare',
    desc:'icy platinum theme card + polished sheen',    earn:'reach VP'},
-  {id:'plaque-md',     name:'MD · Corner Office', tier:'epic',
-   desc:'oxblood + brass executive theme card',        earn:'reach MD'},
   {id:'plaque-diam',   name:'Diamond Plaque',  tier:'legendary',
    desc:'brilliant prismatic diamond theme card',      earn:'reach Second-Year Analyst'},
   {id:'foil',          name:'Foil',            tier:'epic',
    desc:'conic sheen + fan corners',                  earn:'win a Daily Challenge or earn a certificate'},
   {id:'heraldic',      name:'Heraldic',        tier:'legendary',
-   desc:'crimson filigree + lozenge medallion',       earn:'Daily Dynasty (5 daily wins) or Triple Crown (3 certificates)'},
+   desc:'crimson-and-gold theme card — the MD crest',  earn:'reach MD, or Daily Dynasty (5 daily wins) / Triple Crown (3 certificates)'},
   {id:'charter',       name:'Charter Analyst', tier:'rare',
    desc:'steel-navy laurels — the beta-tester class', earn:'account created during the beta'},
   {id:'bone',          name:'Bone',            tier:'egg',
@@ -907,10 +905,9 @@ window.hkFrameEarned = function(id, u){
     case 'plaque-silver': return tb >= 2;   // Summer Analyst
     case 'plaque-gold':   return tb >= 3;   // First-Year Analyst
     case 'plaque-plat':   return tb >= 5;   // VP
-    case 'plaque-md':     return tb >= 6;   // MD — the corner office
     case 'plaque-diam':   return tb >= 7;   // Second-Year Analyst — the true final boss
     case 'foil':          return (u.dailyWins|0) >= 1 || (u.certs|0) >= 1;
-    case 'heraldic':      return (u.dailyWins|0) >= 5 || (u.certs|0) >= 3;
+    case 'heraldic':      return tb >= 6 || (u.dailyWins|0) >= 5 || (u.certs|0) >= 3;   // r404.4 (Wolf): heraldic IS the MD card — reach MD earns it (+ the Dynasty/Triple-Crown paths)
     case 'charter':       return !!u.charter;
     case 'bone':          return !!u.perfectRun;
     /* r385 card skins — earn thresholds off the same signals (lvl/tierBest/dailyWins/
@@ -1207,7 +1204,6 @@ window.hkFrameOrnaments = (function(){
     'plaque-silver':['◆ SILVER',  '#101318','linear-gradient(120deg,#e4ebf2,#8a929c)','#e4ebf2','sheen'],
     'plaque-gold':  ['◆ GOLD',    '#1a1404','linear-gradient(120deg,#f5d878,#a5791f)','#f5d878','sheen'],
     'plaque-plat':  ['◆ PLATINUM','#0a0f16','linear-gradient(120deg,#eaf4ff,#7fa8d8)','#dbecff','sheen'],   /* r404.4 (Wolf): cooler, icy platinum (VP) */
-    'plaque-md':    ['◆ MD',      '#160406','linear-gradient(120deg,#e0b070,#7a1420)','#e0b070','sheen'],   /* r404.4 (Wolf): MD = the corner office — was un-carded (fell through to platinum) */
     'plaque-diam':  ['◆ DIAMOND', '#0a1418','linear-gradient(120deg,#dff4ff,#9be0f7,#c9b8ff)','#eaf8ff','sheen'],   /* Second-Year — the brilliant final boss */
     engraved:       ['ENGRAVED',  '#12141a','linear-gradient(120deg,#c8ccd4,#5a5e68)','#c8ccd4','sheen'],
     foil:           ['◆ FOIL',    '#160a24','linear-gradient(120deg,#c77dff,#7b2ff7,#ff6ad5)','#c77dff','holo'],   /* r404.4 (Wolf): foil → purple holographic */
