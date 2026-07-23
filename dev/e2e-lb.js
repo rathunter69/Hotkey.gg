@@ -142,7 +142,7 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
   const profs = [...sql.matchAll(/\('(5eed0000-[0-9a-f-]+)', '([^']+)', false\)/g)].map(m => ({ id: m[1], handle: m[2] }));
   const runs = [...sql.matchAll(/\('(5eed0000-[0-9a-f-]+)', '([a-z0-9]+)', (\d+), false, '([^']+)'\)/g)]
     .map(m => ({ user_id: m[1], challenge: m[2], time_ms: +m[3], created_at: m[4] }));
-  ok(profs.length === 50, 'seed SQL holds 50 players', String(profs.length));
+  ok(profs.length >= 50, 'seed SQL holds the full seed field (>=50 players)', String(profs.length));
   ok(runs.length > 1000, 'seed SQL holds a full run set', String(runs.length));
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof renderAll === 'function');

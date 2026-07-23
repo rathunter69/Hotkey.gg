@@ -173,13 +173,18 @@ async function load(){
   window.__featOf={}; profs.forEach(p=>{ if(p.featured_ach) window.__featOf[p.id]=String(p.featured_ach).split(',').filter(Boolean).slice(0,5); });
   // section leaders: fastest clean run on each advanced section's flagship.
   // runs arrive time-sorted asc, so first hit per drill IS the leader.
-  const SECTION_FLAGSHIPS=[['Full Builds','threestmt','tie the three statements'],
-                           ['Models \u00b7 LBO','lbo','run the LBO math'],
-                           ['Models \u00b7 RX','waterfall','the paydown waterfall'],
-                           ['Models \u00b7 Comps','txncomps','precedent transactions']];
-  window.__sectionLeaders = SECTION_FLAGSHIPS.map(([sec,key,lab])=>{
-    const r=runs.find(x=>x.challenge===key);
-    return {sec:sec, key:key, lab:lab, name:r?names[r.user_id]:null, t:r?(r.time_ms/1000).toFixed(2):null};
+  /* r409 (Wolf): retire the old RX/LBO/Comps basket \u2014 every model is PRO-gated now, so that
+     bundling is dead. Section leaders mirror the three CERTIFICATE PATHS instead: the fastest
+     clean run on each track's capstone (its last, hardest drill). runs arrive time-sorted asc,
+     so the first hit per capstone IS that track's leader. */
+  const __trk = window.HK_TRACKS || [];
+  const __certShort = { fluency:'Keyboard Fluency', formulas:'Formulas & Data', modeling:'Financial Modeling' };
+  const __labelOf = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.labelOf) || {};
+  window.__sectionLeaders = __trk.map(t=>{
+    const key = (t.keys && t.keys.length) ? t.keys[t.keys.length-1] : null;   // track capstone
+    const r = key ? runs.find(x=>x.challenge===key) : null;
+    return { sec:(__certShort[t.id]||t.name), key:key, lab:(__labelOf[key]||''),
+             uid:r?r.user_id:null, name:r?names[r.user_id]:null, t:r?(r.time_ms/1000).toFixed(2):null };
   });
   // DESKS (r111): real membership drives the filter; legacy team_code is the fallback
   // until its holders migrate. ?desk=slug turns the whole page into that desk's boards.
@@ -207,10 +212,10 @@ async function load(){
     if(!host){ const feat=document.querySelector('.featured'); if(!feat) return;
       host=document.createElement('div'); host.id='secleadMount'; feat.parentNode.insertBefore(host, feat); }
     host.innerHTML='<div class="section-title">\u25c6 section leaders</div><div class="seclead">'+
-      window.__sectionLeaders.map(s=>'<div class="sl"><div class="sl-sec"><span class="dia">\u25c6</span>'+s.sec+'</div>'+
-        (s.name?('<div class="sl-name">'+s.name+'</div><div class="sl-t">'+s.t+'s clean</div>')
+      window.__sectionLeaders.map(s=>'<div class="sl"><div class="sl-sec"><span class="dia">\u25c6</span>'+esc(s.sec)+'</div>'+
+        (s.name?('<div class="sl-name" data-uid="'+s.uid+'" style="cursor:pointer">'+esc(s.name)+'</div><div class="sl-t">'+s.t+'s clean</div>')
                :'<div class="sl-name" style="color:var(--faint)">unclaimed</div><div class="sl-t">no time yet</div>')+
-        '<div class="sl-lab">'+s.lab+'</div></div>').join('')+'</div>';
+        '<div class="sl-lab">'+esc(s.lab)+'</div></div>').join('')+'</div>';
   }catch(e){} }, 0);
   const baseIds = viewDesk ? viewDesk.ids : (teamOnly ? teamIds : null);
   const fRuns = baseIds ? runs.filter(r=>baseIds.has(r.user_id)) : runs;
@@ -893,7 +898,7 @@ function rosterHtml(flush){
   const bucketChips = inBand.length
     ? '<div class="ros-buckets"><span class="tab ros-bk'+(rosterBucket===null?' on':'')+'" data-bucket="">All</span>'+
         ROSTER_BUCKETS.map(b=>
-          '<span class="tab ros-bk'+(rosterBucket===b?' on':'')+'" data-bucket="'+b+'">'+b+' <em>'+(bandCounts[b]||0)+'</em></span>').join('')+'</div>'
+          '<span class="tab ros-bk'+(rosterBucket===b?' on':'')+'" data-bucket="'+b+'">'+b+' Bucket <em>'+(bandCounts[b]||0)+'</em></span>').join('')+'</div>'
     : '';
   return '<div class="panel" style="margin-top:'+(flush?'0':'18px')+'"><h4>the field \u00b7 by tier</h4>'+
     '<div class="ros-tabs">'+tierNames.map(tn=>'<span class="tab ros-t'+(tn===rosterTier?' on':'')+'" data-tier="'+tn+'">'+tn.replace(' Analyst','')+'</span>').join('')+'</div>'+
