@@ -29,10 +29,14 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
     else console.log('  PASS ' + p + ' — loaded, zero page errors');
     await page.close();
   }
-  // r393 (Wolf #75): skin-unlock celebration + equip-now. Drives the in-game sweep and the
-  // celebration render on a real index.html, asserting the invariants that keep it safe:
-  // genuine earn ignores the beta grant, the sweep seeds silently then fires on a fresh earn,
-  // equipping preserves the rest of the saved loadout, and the card shows an equip button.
+  // r393 (Wolf #75) / r411: skin-unlock celebration + equip-now. Drives the PAGE-LOAD sweep
+  // (window.hkSkinUnlockSweep, nav.js) and the celebration render on a real index.html,
+  // asserting the invariants that keep it safe: genuine earn ignores the beta grant, the sweep
+  // seeds silently on first run then fires on a fresh earn, equipping preserves the rest of the
+  // saved loadout, and the card shows an equip button.
+  // r411: the reveal moved OUT of the drill-solve path — the old in-game skinSweepInGame (which
+  // fired mid-solve, whose equip CTA navigated the page under synthetic input) is now a no-op
+  // book-keeper; hkSkinUnlockSweep runs only on page load. This drives that new path.
   {
     const page = await browser.newPage();
     const errs = [];
@@ -50,19 +54,27 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
         const back = window.hkFlair(window.hkFlairPack(l));
         o.loadoutPreserved = back.frame === 'onyx' && back.title === 'pro' && (back.stats || []).join(',') === 'solves,crowns';
         const calls = []; const real = window.hkCelebrate; window.hkCelebrate = c => calls.push(c);
-        localStorage.removeItem('hk_skin_seen');
+        // r411: exercise the PAGE-LOAD sweep. It runs once per load (guarded by __hkSweepDone) and
+        // keys on hk_seen_frames — so reset that guard between the two drives and control the state.
+        localStorage.setItem('hk_xp_est', '0');                 // pin level so only tierBest drives the earn
+        localStorage.removeItem('hk_seen_frames');
         localStorage.setItem('hk_ach_flags', JSON.stringify({ tierBest: 2 }));
-        window.skinSweepInGame(); o.seedSilent = calls.length === 0;
-        localStorage.setItem('hk_ach_flags', JSON.stringify({ tierBest: 4 }));
-        window.skinSweepInGame();
-        o.freshFires = calls.length === 1 && !!(calls[0].equip && calls[0].equip.frameId);
+        window.__hkSweepDone = false; window.hkSkinUnlockSweep();
+        o.seedSilent = calls.length === 0;                      // first run (no seen-set) seeds silently
+        localStorage.setItem('hk_ach_flags', JSON.stringify({ tierBest: 4 }));   // now plaque-gold/blueprint/constellation newly earn
+        window.__hkSweepDone = false; window.hkSkinUnlockSweep();
+        o.freshFires = calls.length >= 1 && calls.length <= 2   // fires on the fresh earn, capped at 2 reveals
+          && !!(calls[0].equip && calls[0].equip.frameId) && !!calls[0].skinReveal;
+        // the neutered in-game sweep must NEVER pop a reveal (it only advances the seen-set)
+        const before = calls.length; try { window.skinSweepInGame(); } catch (e) {}
+        o.inGameSilent = calls.length === before;
         window.hkCelebrate = real;
         window.hkCelebrate({ cap: 'x', title: 'x', equip: { frameId: 'cottoncandy', frameName: 'C' } });
         o.equipBtn = !!document.querySelector('.hk-cel-equip');
         o.drills = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.menuOrder || []).length;
         return o;
       });
-      const checks = ['earnIgnoresBeta', 'loadoutPreserved', 'seedSilent', 'freshFires', 'equipBtn'];
+      const checks = ['earnIgnoresBeta', 'loadoutPreserved', 'seedSilent', 'freshFires', 'inGameSilent', 'equipBtn'];
       const bad = checks.filter(k => !r[k]);
       if (bad.length) errs.push('skin-unlock invariants failed: ' + bad.join(', '));
       if (errs.length) fails.push({ p: 'skin-unlock', errs });
