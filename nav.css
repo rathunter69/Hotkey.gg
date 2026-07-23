@@ -705,14 +705,29 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-engraved,.hk-frame-foil,.hk-frame-heraldic{--surface2:rgba(0,0,0,.32); --surface:rgba(0,0,0,.4); --faint:rgba(255,255,255,.34)}
 /* decorative crack sits BEHIND content, ambient not a slash */
 .hkf-crack{z-index:0; opacity:.7}
-/* the skin title notch — reshape the pill tab into an inlaid nameplate */
+/* r414 (#121 · Wolf): NOTCH TAXONOMY BY SKIN CLASS.
+   ANGULAR chamfered nameplate = STATUS (founder/pro) + ACHIEVEMENT skins — the "prestige"
+   language — PLUS the two Second-Year pinnacle ladder cards (onyx + diamond), which Wolf
+   promoted into the angular set so the very top of the climb crosses into prestige.
+   ROUNDED nameplate = the level/rank LADDER BASE (engraved → bronze/silver/gold/plat), so the
+   shape itself signals "this is the climb." The r390/r391 achievement skins (amethyst, onyx,
+   sakura, goldenhour, pearl, bloom, cottoncandy, architect, boutique, emerald) were never in
+   this list and had wrongly fallen back to the base pill — folded into ANGULAR here. */
 .hk-frame-circuit .hkf-tab,.hk-frame-neon .hkf-tab,.hk-frame-blueprint .hkf-tab,.hk-frame-crt .hkf-tab,
 .hk-frame-constellation .hkf-tab,.hk-frame-vaporwave .hkf-tab,.hk-frame-terminal .hkf-tab,.hk-frame-pro .hkf-tab,
 .hk-frame-noir .hkf-tab,.hk-frame-frostbite .hkf-tab,.hk-frame-molten .hkf-tab,.hk-frame-founder .hkf-tab,
-.hk-frame-plaque-bronze .hkf-tab,.hk-frame-plaque-silver .hkf-tab,.hk-frame-plaque-gold .hkf-tab,.hk-frame-plaque-plat .hkf-tab,.hk-frame-plaque-diam .hkf-tab,
-.hk-frame-engraved .hkf-tab,.hk-frame-foil .hkf-tab,.hk-frame-heraldic .hkf-tab{
+.hk-frame-amethyst .hkf-tab,.hk-frame-onyx .hkf-tab,.hk-frame-sakura .hkf-tab,.hk-frame-goldenhour .hkf-tab,
+.hk-frame-pearl .hkf-tab,.hk-frame-bloom .hkf-tab,.hk-frame-cottoncandy .hkf-tab,.hk-frame-architect .hkf-tab,
+.hk-frame-boutique .hkf-tab,.hk-frame-emerald .hkf-tab,.hk-frame-plaque-diam .hkf-tab,
+.hk-frame-foil .hkf-tab,.hk-frame-heraldic .hkf-tab{
   border:0; border-radius:0; padding:4px 16px; box-shadow:0 2px 6px rgba(0,0,0,.45);
   clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 100%,0 100%)}
+/* ROUNDED nameplate — the level/rank ladder base. Same inlaid treatment, soft-rounded corners,
+   no chamfer, so the ladder reads as one calm family distinct from the angular prestige set. */
+.hk-frame-engraved .hkf-tab,.hk-frame-plaque-bronze .hkf-tab,.hk-frame-plaque-silver .hkf-tab,
+.hk-frame-plaque-gold .hkf-tab,.hk-frame-plaque-plat .hkf-tab{
+  border:0; border-radius:10px; padding:4px 16px; box-shadow:0 2px 6px rgba(0,0,0,.45);
+  clip-path:none}
 /* founder serial — inlaid in the lower-left */
 .hkf-serial{position:absolute; left:8px; bottom:-3px; z-index:4; font-family:var(--mono,ui-monospace,monospace);
   font-size:7.5px; font-weight:700; letter-spacing:.12em; padding:3px 9px; color:#e6ddff;
