@@ -8378,11 +8378,18 @@ function render(){
      Tall models (more content rows than fit at target) auto-densify so nothing scrolls and no
      content is ever cut — canvas rows = max(content, rows-that-fit), so 1..S.ROWS always render. */
   const __CELL_TARGET = 26;   // catalog-standard cell height (px) — one knob for the whole grid
+  /* r413 (Wolf): ANCHOR the sheet at 20 rows. The fill math (availH / 26px) packed MORE empty
+     filler rows on a taller monitor — a hi-res screen ballooned to 26 rows, stranding a band of
+     empty rows under the shorter drills (the nav maze is exactly 20 rows: RN=20). Cap the filler
+     at 20 so every drill reads the same ~20-row sheet at any resolution; on a bigger screen the
+     rows grow instead of multiplying. Drills with MORE than 20 content rows still render in full
+     (max with S.ROWS), so nothing is ever cut or scrolled. */
+  const __ROW_CAP = 20;
   let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));   // pre-measure fallback
   let __VR = S.ROWS;
   if(__gw && __gw.clientHeight>100){                       // measured: fill the box exactly
     const __availH = __gw.clientHeight - 17 - 31;          // usable height minus header
-    __VR = Math.max(S.ROWS, Math.round(__availH / __CELL_TARGET));   // canvas rows: content + empty filler
+    __VR = Math.max(S.ROWS, Math.min(__ROW_CAP, Math.round(__availH / __CELL_TARGET)));   // canvas rows: content + filler, capped at the 20-row standard
     __rowH = Math.max(18, Math.min(40, Math.floor(__availH / __VR)));
     S._renderedGwH = __gw.clientHeight;                    // r409: record what we fit to; the ResizeObserver re-fits when the stage settles to a different height
   } else if(__gw && !S._gridMeasureRetry){
