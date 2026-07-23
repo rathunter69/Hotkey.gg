@@ -3,6 +3,50 @@ _Refreshed 2026-07-23 against the live repo (github.com/rathunter69/Hotkey.gg @ 
 New sessions: the repo IS the handover — read this file, **dev/PIPELINE.md's ⚡ header (the
 live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ design docs._
 
+## ⚡ NEXT-SESSION HANDOFF (2026-07-23, rounds r411–r413 — CI fixes + fragility hardening + card round)
+
+**LIVE NOW (merged to main, deployed via Cloudflare):**
+- **#221** — card titles (equippable name-plate + earn catalog, impersonation-locked custom titles),
+  skin-unlock Rise→Lock reveal **relocated to a page-load sweep** (`window.hkSkinUnlockSweep`, nav.js)
+  so it never opens mid-drill, Growth starter skin + early level gates, uniform 5px card borders.
+- **#222** — `recordRun` **retry outbox** (`hk_run_outbox`: failed leaderboard posts re-send on next
+  run + at login, never silently lost); **`hkLevelXp()`** = one canonical level source (chip + skin
+  gates + PRO gate all read it; `updateRankPill` reconciles `hk_xp_est` up to server XP) — ends the
+  "level 4 in game / 13 on card" class of bug; **20-row grid cap** (`__ROW_CAP` in index.html
+  `render()`) so the sheet can't balloon past 20 rows on hi-res monitors (nav maze is exactly 20 rows).
+- **#223** — heraldic Cylon border 2.6s→6s; **PRO** nebula made legibly alive; **founder → prismatic
+  platinum** (light silver bg + rainbow foil); **no-theme card** got a matching 5px border (`hk-frame-none`).
+- **#224** — **founder oil-slick**: `platinum` fx = saturated rainbow blobs on incommensurate lissajous
+  paths (no visible loop) + metallic specular + silver glints.
+- **#225** — **BLACK DIAMOND** (Second-Year `plaque-diam`): Wolf picked option ④. New `blackdiam` fx
+  (themes.js: init ~1477, dispatch ~1522, render branch ~1714) = white brilliance glints twinkling on
+  near-black carbon + a slow prismatic caustic; card bg darkened to near-black in nav.css
+  (`.hk-frame-plaque-diam`) + registry tuple repointed to `blackdiam`. The old matrix `diamondfx`
+  is now UNUSED (left in place; safe to delete in a cleanup pass).
+
+**⏳ PENDING WOLF DECISION — NOTCH SHAPE BY SKIN CLASS (task #121, the one open thread):**
+- Proposed 3-class taxonomy (awaiting his confirm): **Status** (founder/pro/beta) + **Achievement/feat**
+  (heraldic, boutique, architect, emerald, bone, frostbite, pearl, molten, neon, terminal, sakura,
+  goldenhour, foil) → **ANGULAR notch, richest fx**; **Progression ladder** (growth/cottoncandy/
+  vaporwave/engraved/circuit/crt + rank plaques bronze→diamond, blueprint, navigator, amethyst,
+  noir, onyx) → **ROUNDED notch, cleaner fx**. Open Q he must answer: do top rank cards (onyx/diamond)
+  stay rounded or bump to angular? Then build the two notch shapes + fx-elaborateness tiers in one pass.
+  Notch markup: `.uc-titlechip` (nav.css ~921) + `hkPlayerCard` title notch (themes.js ~1915).
+
+**ASSET VERSIONS after r413 (bump on next JS/CSS change):** themes.js **v303**, nav.css **v205**,
+nav.js **v296**, drills.js v278, lb.js v37, lb.css v20. (sed the `?v=` across all `*.html`.)
+
+**CADENCE:** branch `claude/pipeline-engine-integration-laki0l`; after each merge RESTART off main
+(`git fetch origin main && git checkout -B <branch> origin/main`), push with `--force-with-lease`.
+Run the FULL local gate before pushing (smoke is the fast net for cosmetic pushes; it ALSO validates
+the skin-unlock invariant via `hkSkinUnlockSweep`). Chromium at
+`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`; server `python3 -m http.server 8791`.
+Merge cadence via `send_later` check-ins that re-check the gate then squash-merge when green.
+Card-preview harness pattern: a tiny standalone HTML that loads `/nav.css`+`/themes.js`, calls
+`window.hkPlayerCard({flair:'<id>',...},{scale:'full'})` + `hkInitCardFx`, screenshot via playwright-core.
+
+---
+
 ## SESSION HANDOVER SNAPSHOT (2026-07-23, rounds r393–r407 — RANKED CARD + CARD-ART round 2 + ENGINE playtest)
 
 **PIPELINE / HOUSE RULES (current, important):**

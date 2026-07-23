@@ -479,9 +479,11 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 /* r404.4 (Wolf): PLATINUM (VP) — cooler, an icy blue-white platinum with a frost cast. */
 .hk-frame-plaque-plat.hk-frame-plaque-plat{--text:#e6f2ff;--muted:#93b0cc;--line:#2e4256;--accent:#dbecff;--accent-dim:#7fa8d8; color:#e6f2ff;
   background:radial-gradient(ellipse at 30% 4%,rgba(150,200,255,.18),transparent 55%),linear-gradient(#0a0f16,#070b12) padding-box, linear-gradient(150deg,#eaf4ff,#a8c8e8 32%,#5a82ad 60%,#c8e2ff) border-box}
-/* r404.4 (Wolf): DIAMOND (Second-Year, the final boss) — brilliant full-spectrum prism. */
-.hk-frame-plaque-diam.hk-frame-plaque-diam{--text:#eaf8ff;--muted:#9fc8dc;--line:#2a4a5a;--accent:#eaf8ff;--accent-dim:#8fd0e8; color:#eaf8ff;
-  background:radial-gradient(ellipse at 30% 4%,rgba(223,244,255,.2),transparent 55%),linear-gradient(#0a1418,#081014) padding-box, conic-gradient(from var(--hkang,135deg),#ffffff,#9be0f7,#7fa8ff,#c9a8ff,#ffc2e8,#ffffff) border-box}
+/* r413 (Wolf): DIAMOND (Second-Year, the final boss) — BLACK DIAMOND. Near-black carbon body with a
+   brilliant full-spectrum prism border; the blackdiam fx twinkles white brilliance + rakes a slow
+   prismatic caustic across the facets. (Replaced the old matrix-style number cascade.) */
+.hk-frame-plaque-diam.hk-frame-plaque-diam{--text:#eef4fb;--muted:#9aa6b6;--line:#26303c;--accent:#eef4fb;--accent-dim:#8fb0d0; color:#eef4fb;
+  background:radial-gradient(ellipse at 30% 2%,rgba(200,225,255,.12),transparent 58%),linear-gradient(150deg,#0a0b10,#060709 55%,#08090e) padding-box, conic-gradient(from var(--hkang,135deg),#ffffff,#9be0f7,#7fa8ff,#c9a8ff,#ffc2e8,#ffffff) border-box}
 
 /* 3 · FOIL (epic) — conic sheen border + fan corners + scalloped inner edge */
 /* r404.5 (Wolf): FOIL → a "super diamond" holographic THEME card — the diamond/Second-Year
