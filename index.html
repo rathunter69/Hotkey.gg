@@ -1602,13 +1602,13 @@
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=278"></script>
-<link rel="stylesheet" href="nav.css?v=200">
-<script src="themes.js?v=297"></script>
+<link rel="stylesheet" href="nav.css?v=201">
+<script src="themes.js?v=298"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=294"></script>
+<script src="nav.js?v=295"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -9224,6 +9224,31 @@ function checkWin(){
         big:true,   /* r305 (Wolf): a level-up is a MOMENT — full-screen burst, popped card */
         iconHtml:(window.hkLevelChip?window.hkLevelChip(lv(nxt), 64):(window.hkLevelRing?window.hkLevelRing(lv(nxt), 4, 84):''))});
     }
+    /* r411 (Wolf): SKIN UNLOCKS on level-up. Any frame newly earned at the NEW level (delta vs the
+       old level, so a brand-new guest hitting Level 2 gets Growth) plays the Rise->Lock reveal,
+       queued so it lands after the level-up burst. Guests see it too, with a sign-up equip CTA. */
+    if(lv(nxt)>lv(est) && window.HK_FRAMES && window.hkFrameEarned && window.hkCelebrate){ try{
+      let fl2={}; try{ fl2=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(_){}
+      const __strk=(function(){ try{ return JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n|0; }catch(_){ return 0; } })();
+      const mkU=L=>({ lvl:L, tierBest:fl2.tierBest|0, dailyWins:fl2.dailyWins|0,
+        certs:Object.keys(fl2.certTracks||{}).length, perfectRun:fl2.perfectRun?1:0,
+        streak:__strk, chaptersCleared:fl2.chaptersCleared||[] });
+      const earnAt=L=>window.HK_FRAMES.filter(f=>{ try{ return window.hkFrameEarned(f.id, mkU(L)); }catch(_){ return false; } }).map(f=>f.id);
+      const before=earnAt(lv(est)), after=earnAt(lv(nxt));
+      let seenF=[]; try{ seenF=JSON.parse(localStorage.getItem('hk_seen_frames')||'[]'); }catch(_){}
+      const fresh=after.filter(id=>before.indexOf(id)<0 && seenF.indexOf(id)<0);
+      if(fresh.length){
+        const signedIn=!!window._navUser;
+        const nm=((localStorage.getItem('hk_handle_cache')||'').trim())||'You';
+        fresh.forEach(id=>{ const f=(window.HK_FRAMES.find(x=>x.id===id))||{};
+          window.hkCelebrate({ cap:'skin unlocked', title:(f.name||'New skin')+' unlocked',
+            sub: signedIn ? 'a new skin for your card, wherever it shows'
+                          : 'create a free account to keep it on your card',
+            skinReveal:true, guest:!signedIn, equip:{frameId:id, frameName:f.name||id},
+            cardData:{ name:nm, lvl:lv(nxt), tierLabel:'' } }); });
+      }
+      try{ localStorage.setItem('hk_seen_frames', JSON.stringify([...new Set([...seenF, ...after])])); }catch(_){}
+    }catch(e){} }
   }catch(e){} }
   let __prevBest=null, __pbDelta=null;
   if(!mouseUsed && !guidedUsed){ const prev=PB[sk];

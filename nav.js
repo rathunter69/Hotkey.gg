@@ -1447,27 +1447,62 @@ window.hkProCheckout = async function(plan){
   say('Checkout isn\u2019t live yet \u2014 the beta keeps everything free.');
 };
 window.__hkCelQ=[]; window.__hkCelOpen=false;
+/* r411 (Wolf: "don't overlap or collide with other pop-out menus"): a celebration waits not just
+   for another celebration but for any OTHER pop-out to clear first — the ranked nudge, the PRO
+   sheet, the auth modal. The queue drains automatically once the screen is free. */
+window.__hkCelBlocked = function(){
+  try{ return !!document.querySelector('.hkru-scrim, #hkProWrap, .auth-modal.show'); }catch(e){ return false; }
+};
 window.hkCelebrate = function(o){
-  if(window.__hkCelOpen){ window.__hkCelQ.push(o); return; }
+  if(window.__hkCelOpen || window.__hkCelBlocked()){
+    window.__hkCelQ.push(o);
+    if(!window.__hkCelTimer){ window.__hkCelTimer=setInterval(function(){
+      if(window.__hkCelOpen || window.__hkCelBlocked() || !window.__hkCelQ.length) return;
+      clearInterval(window.__hkCelTimer); window.__hkCelTimer=null;
+      var nx=window.__hkCelQ.shift(); if(nx) window.hkCelebrate(nx);
+    }, 600); }
+    return;
+  }
   window.__hkCelOpen=true;
   const w=document.createElement('div'); w.className='hk-cel-wrap'+(o.rankUp?' hk-cel-rank':'')+(o.big?' hk-cel-big':'');
   /* r393 (Wolf #75): a skin-unlock celebration carries o.equip = {frameId, frameName}.
      It renders an "equip now" button (and an 'e' shortcut) that writes the frame onto the
      account WITHOUT clobbering the rest of the saved loadout (hkFlair/hkFlairPack round-trip). */
   const eq=o.equip;
-  w.innerHTML='<div class="hk-cel">'+
+  /* r411 (Wolf): SKIN-UNLOCK REVEAL. When a skin unlocks we render the actual animated card and
+     play the Rise->Lock choreography (rises to reveal, confetti, then locks into place). Guests
+     see the same reveal but the equip button becomes a "create an account to equip" conversion. */
+  const isSkin = !!(o.skinReveal && eq && window.hkPlayerCard);
+  const guest = !!o.guest;
+  let skinHtml='';
+  if(isSkin){
+    const cd=o.cardData||{};
+    const cardInner = window.hkPlayerCard({ name:(cd.name||'You'), lvl:(cd.lvl||1), flair:eq.frameId,
+      tierLabel:(cd.tierLabel||''), show:{rank:!!cd.tierLabel, level:true} }, {scale:'compact'});
+    skinHtml='<div class="hk-cel-sr"><div class="hk-cel-srcard">'+cardInner+
+      '<span class="hk-cel-flash"></span><span class="hk-cel-cn tl"></span><span class="hk-cel-cn tr"></span>'+
+      '<span class="hk-cel-cn bl"></span><span class="hk-cel-cn br"></span></div></div>';
+  }
+  w.innerHTML='<div class="hk-cel'+(isSkin?' hk-cel-skinmode':'')+'">'+
     '<div class="hk-cel-cap">'+(o.cap||'nice')+'</div>'+
     '<div class="hk-cel-body">'+
-      (o.iconHtml?'<div class="hk-cel-icon">'+o.iconHtml+'</div>':'')+
+      (skinHtml || (o.iconHtml?'<div class="hk-cel-icon">'+o.iconHtml+'</div>':''))+
       '<div class="hk-cel-title">'+(o.title||'')+'</div>'+
       (o.sub?'<div class="hk-cel-sub">'+o.sub+'</div>':'')+
-      (eq?'<div class="hk-cel-eqrow"><button class="hk-cel-equip" type="button">equip now</button><span class="hk-cel-eqmsg"></span></div>':'')+
+      (eq?'<div class="hk-cel-eqrow"><button class="hk-cel-equip'+(guest?' guest':'')+'" type="button">'+(guest?'create an account to equip':'equip now')+'</button><span class="hk-cel-eqmsg"></span></div>':'')+
       '<div class="hk-cel-hint">'+(eq?'e \u2014 equip \u00b7 \u21b5 continue \u00b7 v \u2014 see your card':'\u21b5 continue \u00b7 v \u2014 see it on your card')+'</div>'+
     '</div></div>';
   document.body.appendChild(w);
   try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}   // r176: a focused results button must not act on Enter
-  window.hkConfetti(w.querySelector('.hk-cel-body'), o.colors);
-  if(o.big) window.hkConfetti(w, o.colors, 52);   /* r305 big-moment rain; r357: 80→52 bits — indistinguishable at speed, meaningfully cheaper on integrated GPUs */
+  if(isSkin){
+    try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(w)); }catch(_){}   // r411: ignite the skin's particles
+    const __inner=w.querySelector('.hk-cel-srcard');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(__inner) __inner.classList.add('play'); }));   // kick the Rise->Lock after paint
+    setTimeout(()=>{ try{ window.hkConfetti(w.querySelector('.hk-cel-body'), o.colors, 46); }catch(_){}}, 860);   // confetti between the rise and the lock
+  } else {
+    window.hkConfetti(w.querySelector('.hk-cel-body'), o.colors);
+    if(o.big) window.hkConfetti(w, o.colors, 52);   /* r305 big-moment rain; r357: 80→52 bits — indistinguishable at speed, meaningfully cheaper on integrated GPUs */
+  }
   let done=false;
   const close=()=>{ if(done) return; done=true;
     /* r352: EVERY close path detaches the key handler. It used to self-remove only when a
@@ -1486,7 +1521,15 @@ window.hkCelebrate = function(o){
   const doEquip=async(btn)=>{
     if(!eq || equipping) return;
     const msg=w.querySelector('.hk-cel-eqmsg');
-    if(!window.sb || !window._navUser){ if(msg) msg.textContent='sign in to equip'; return; }
+    /* r411 (Wolf): a guest can't own a skin yet — the equip CTA converts to sign-up. Close the
+       celebration first so the auth modal isn't stacked underneath it. */
+    if(guest || !window._navUser){
+      try{ close(); }catch(_){}
+      try{ if(typeof goToTrainer==='function'){ goToTrainer('openAuth=signup'); return; } }catch(_){}
+      try{ location.href='index.html?openAuth=signup'; }catch(_){}
+      return;
+    }
+    if(!window.sb){ if(msg) msg.textContent='sign in to equip'; return; }
     equipping=true; if(btn){ btn.disabled=true; btn.textContent='equipping…'; }
     try{
       let curRaw=null;

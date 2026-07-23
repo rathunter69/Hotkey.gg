@@ -297,6 +297,37 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-cel-eqmsg{font-family:var(--mono); font-size:10.5px; color:var(--accent); min-height:13px}
 .hk-cel-skin{display:inline-flex; align-items:center; justify-content:center; width:78px; height:78px;
   border-radius:12px; position:relative; background:var(--surface2); overflow:hidden}
+/* r411 (Wolf): SKIN-UNLOCK REVEAL — the celebration renders the actual animated card and plays
+   Rise->Lock: the card rises to reveal with a light rake, confetti bursts (JS-timed), then it
+   locks into place with a flash + snapping corner brackets. Copy fades in after it lands. */
+.hk-cel.hk-cel-skinmode{max-width:432px; min-width:344px}
+.hk-cel-skinmode .hk-cel-body{padding:20px 20px 22px}
+.hk-cel-sr{position:relative; display:flex; justify-content:center; margin-bottom:16px}
+.hk-cel-srcard{position:relative; width:100%}
+.hk-cel-srcard.play{animation:hkSrCombo 1.55s cubic-bezier(.16,.9,.24,1) both}
+@keyframes hkSrCombo{0%{transform:translateY(40px) scale(.92);opacity:0}46%{transform:translateY(0) scale(1);opacity:1}68%{transform:scale(1.035)}80%{transform:scale(.984)}100%{transform:scale(1)}}
+.hk-cel-srcard::before{content:''; position:absolute; inset:0; z-index:10; pointer-events:none; border-radius:14px; opacity:0;
+  background:linear-gradient(105deg, transparent 42%, rgba(255,255,255,.5) 50%, transparent 58%); background-size:250% 100%; background-position:130% 0}
+.hk-cel-srcard.play::before{opacity:1; animation:hkSrRake .9s ease .1s both}
+@keyframes hkSrRake{from{background-position:130% 0}to{background-position:-60% 0}}
+.hk-cel-flash{position:absolute; inset:-3px; z-index:11; border-radius:16px; pointer-events:none;
+  background:radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,.85), transparent 70%); opacity:0; mix-blend-mode:screen}
+.hk-cel-srcard.play .hk-cel-flash{animation:hkSrFlash 1.55s ease both}
+@keyframes hkSrFlash{0%,70%{opacity:0}79%{opacity:.85}100%{opacity:0}}
+.hk-cel-cn{position:absolute; z-index:11; width:22px; height:22px; border:2px solid var(--accent); opacity:0; pointer-events:none}
+.hk-cel-cn.tl{top:6px;left:6px;border-right:0;border-bottom:0}
+.hk-cel-cn.tr{top:6px;right:6px;border-left:0;border-bottom:0}
+.hk-cel-cn.bl{bottom:6px;left:6px;border-right:0;border-top:0}
+.hk-cel-cn.br{bottom:6px;right:6px;border-left:0;border-top:0}
+.hk-cel-srcard.play .hk-cel-cn{animation:hkSrCn 1.55s ease both}
+@keyframes hkSrCn{0%,66%{opacity:0;transform:scale(1.5)}82%{opacity:1;transform:scale(1)}100%{opacity:0}}
+/* copy waits for the card to land */
+.hk-cel-skinmode .hk-cel-title{animation-delay:1.5s}
+.hk-cel-skinmode .hk-cel-sub,.hk-cel-skinmode .hk-cel-eqrow,.hk-cel-skinmode .hk-cel-hint{animation:hkSrFade .5s ease 1.62s both}
+@keyframes hkSrFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){
+  .hk-cel-srcard.play,.hk-cel-srcard.play::before,.hk-cel-srcard.play .hk-cel-flash,.hk-cel-srcard.play .hk-cel-cn,
+  .hk-cel-skinmode .hk-cel-sub,.hk-cel-skinmode .hk-cel-eqrow,.hk-cel-skinmode .hk-cel-hint{animation-duration:.001s!important; animation-delay:0s!important} }
 @keyframes hkPop{0%{transform:scale(.82); opacity:0} 100%{transform:scale(1); opacity:1}}
 @keyframes hkDing{0%{transform:scale(.4)} 55%{transform:scale(1.22)} 100%{transform:scale(1)}}
 .hk-confetti{position:absolute; inset:0; overflow:hidden; pointer-events:none}

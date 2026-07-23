@@ -835,8 +835,8 @@ window.HK_FRAMES = [
    desc:'phosphor scanlines, terminal green',          earn:'complete the reference tour'},
   {id:'cottoncandy',name:'Cotton Candy', tier:'rare',
    desc:'pink-blue pastel + soft puffs',               earn:'reach Summer Analyst'},
-  {id:'bloom',      name:'Bloom',        tier:'rare',
-   desc:'pastel spring — floating green petals',       earn:'reach Associate'},
+  {id:'bloom',      name:'Growth',       tier:'rare',
+   desc:'green leaves drifting up — your first skin',   earn:'reach Level 2'},   /* r411 (Wolf): the starter skin — early level gate so a new analyst gets an animated card fast */
   {id:'amethyst',   name:'Amethyst',     tier:'rare',
    desc:'deep purple gem + prism glow',                earn:'reach VP'},
   /* epic */
@@ -917,7 +917,7 @@ window.hkFrameEarned = function(id, u){
     case 'blueprint':     return tb >= 3;
     case 'crt':           return (u.lvl|0) >= 12;
     case 'constellation': return tb >= 4;
-    case 'vaporwave':     return tb >= 2;
+    case 'vaporwave':     return tb >= 2 || (u.lvl|0) >= 4;   // r411 (Wolf): or Level 4
     case 'terminal':      return (u.certs|0) >= 1;
     case 'pro':           return tb >= 6 || !!u.pro;
     case 'noir':          return tb >= 5;
@@ -930,10 +930,11 @@ window.hkFrameEarned = function(id, u){
     case 'amethyst':      return tb >= 5;                                  // VP
     case 'onyx':          return tb >= 7;                                  // Second-Year Analyst
     case 'sakura':        return (u.streak|0) >= 14;
+    /* r411 (Wolf): early LEVEL gates so the first few levels each hand out an animated skin */
     case 'goldenhour':    return (u.streak|0) >= 7;
     case 'pearl':         return !!u.perfectRun;
-    case 'bloom':         return tb >= 4;                                  // Associate
-    case 'cottoncandy':   return tb >= 2;                                  // Summer Analyst
+    case 'bloom':         return (u.lvl|0) >= 2;                            // r411 (Wolf): Growth — the Level-2 starter skin
+    case 'cottoncandy':   return tb >= 2 || (u.lvl|0) >= 3;                 // Summer Analyst — r411: or Level 3
     case 'emerald':       return (u.chaptersCleared||[]).indexOf('c5') >= 0;  // Formulas II
     case 'architect':     return (u.chaptersCleared||[]).indexOf('c8') >= 0;  // Full Builds
     case 'boutique':      return (u.certs|0) >= 3;                         // all three certificates
@@ -1268,7 +1269,7 @@ window.hkFrameOrnaments = (function(){
     sakura:       ['❀ SAKURA','#3a1a26','linear-gradient(120deg,#ffd6e6,#ffaccb)','#ffb6d4','petals'],   /* r404 (Wolf): lighter, softer pink */
     goldenhour:   ['☀ GOLDEN HOUR','#3a1c10','linear-gradient(120deg,#ffd9a0,#ff9e7a)','#ffb488','bokeh'],
     pearl:        ['◗ PEARL','#2a2634','linear-gradient(120deg,#f0e6ff,#cfe6ff)','#e6d9ff','pearl'],
-    bloom:        ['✿ BLOOM','#14260f','linear-gradient(120deg,#a8e88a,#d8f4b8)','#b8e89a','bloom'],   /* r404 (Wolf): green blossoms — pink petals didn't read against the green */
+    bloom:        ['❧ GROWTH','#14260f','linear-gradient(120deg,#a8e88a,#d8f4b8)','#b8e89a','bloom'],   /* r411 (Wolf): Growth — the Level-2 green falling-leaves starter (id stays 'bloom' so saved flairs survive) */
     cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','candy'],   /* r404 (Wolf): defined puffs, less blur */
     /* r391 (Wolf) chapter/cert capstone skins */
     architect:    ['△ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],  /* r393 (Wolf): ⟁ fell back to a ⚠-looking glyph in most fonts — a clean drafting triangle reads right */
