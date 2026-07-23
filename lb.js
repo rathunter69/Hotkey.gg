@@ -791,6 +791,28 @@ function topPlayersHtml(){
   return '<div class="panel tp-panel"><h4>the field \u00b7 overall ranking</h4><div class="tp-scroll">'+rows+'</div></div>';
 }
 
+/* r404 (Wolf): the daily board is a TWO-COLUMN list now — the long horizontal "lanes"
+   are gone, and the compact rows fit ~20 names in the hero spot instead of 8. Rank +
+   name + time only; podium medals on the top three, top-10 tint carried across. */
+function dailyTwoColHtml(best, names, meId){
+  if(!best.length){
+    return '<div class="board board-open"><div class="board-cap"><h2>today’s global field</h2></div>'+
+      '<div class="empty" style="padding:14px 18px 10px">open board — <b>no times posted yet</b> · be the first →</div></div>';
+  }
+  const N=20, gl=['🥇','🥈','🥉'];
+  const cell=(r,i)=>{ const me=meId&&r.user_id===meId, medal=i<3?(' r'+(i+1)):'';
+    return '<div class="d2-row'+(me?' me':'')+(i<10?' t10':'')+'">'+
+      '<span class="d2-rk'+medal+'">'+(i<3?gl[i]:(i+1))+'</span>'+
+      '<span class="d2-nm" data-uid="'+r.user_id+'">'+esc(names[r.user_id])+schoolChipByUid(r.user_id,13)+'</span>'+
+      '<span class="d2-tm">'+fmt(r.time_ms)+'</span></div>'; };
+  const rows=best.slice(0,N).map(cell).join('');
+  let extra='';
+  const myIdx=meId?best.findIndex(r=>r.user_id===meId):-1;
+  if(myIdx>=N){ const r=best[myIdx];
+    extra='<div class="d2-you"><span class="d2-rk">'+(myIdx+1)+'</span><span class="d2-nm">'+esc(names[r.user_id])+'</span><span class="d2-tm">'+fmt(r.time_ms)+'</span></div>'; }
+  return '<div class="board"><div class="board-cap"><h2>today’s global field</h2><span class="lvl">'+best.length+' in today</span></div>'+
+    '<div class="daily-2col">'+rows+'</div>'+extra+'</div>';
+}
 /* r393 (Wolf): the Daily Challenge rides the HERO row (right of the your-card) as its own
    board. Extracted from the old featuredHtml() — the weekly gauntlet is dropped from the main
    dashboard entirely; the overall field + top desks fill the featured row below. */
@@ -819,7 +841,7 @@ function dailyHeroHtml(){
       '<div class="fd-head"><span class="fd-live">● live</span><b>◆ the Daily Challenge · '+dl+'</b>'+
       '<span class="fd-meta">resets in ~'+hrsLeft+'h · top 3 medal · top 10 +40 xp and a card badge'+(podium?' · yesterday: '+podium:'')+'</span>'+
       '<a class="fd-play" href="index.html?daily=1">play it →</a></div>'+
-      boardHtml({label:'today’s global field', lvl:dailyDate}, bestD.slice(0,8), names, meId, {medals:true})+
+      dailyTwoColHtml(bestD, names, meId)+
     '</div>';
 }
 /* r393 (Wolf): Top Desks for the featured row — reuses deskStandingsHtml(); when there is no
@@ -838,6 +860,8 @@ let browseKey = sessionStorage.getItem('hk_lb_key') || null;
 /* r393 (Wolf): the per-board tier/bucket filter (r335) is retired — the individual drill
    leaderboards no longer scope by rank, so tierFilter/bucketFilter and their handlers are gone. */
 let rosterTier = null;
+let rosterBucket = null;   /* r404 (Wolf): sub-tier chip — null = All, else 'Top'|'Middle'|'Bottom' */
+const ROSTER_BUCKETS=['Top','Middle','Bottom'];   // display order: top of the band first
 function rosterHtml(flush){
   const {names,meId}=DATA; const userStat=DATA.gUserStat||DATA.userStat;
   const users=Object.entries(userStat).map(([u,st])=>{
@@ -848,22 +872,39 @@ function rosterHtml(flush){
   const myTier = meId && users.find(x=>x.u===meId) ? users.find(x=>x.u===meId).tier.name : null;
   if(rosterTier===null) rosterTier = myTier || TIERS[0].name;
   const tierNames=window.HK_RANK.TIERS.map(t=>t.name);
-  const inTier=users.filter(x=>x.tier.name===rosterTier).sort((a,b)=>a.av-b.av);
+  /* the sub-tier chips filter WITHIN the selected tier by bucket. 'inBand' is the whole
+     tier (drives the chip counts + the rating chase); 'inTier' is what the list renders. */
+  const bkOf=x=>(x.tier.bucket||'').replace(/\s*bucket\s*/i,'').trim();   // 'Top Bucket' -> 'Top'
+  const inBand=users.filter(x=>x.tier.name===rosterTier).sort((a,b)=>a.av-b.av);
+  const bandCounts={}; ROSTER_BUCKETS.forEach(b=>bandCounts[b]=inBand.filter(x=>bkOf(x)===b).length);
+  // a tier only splits into buckets once someone actually holds more than one — hide chips otherwise
+  const bucketsPresent=ROSTER_BUCKETS.filter(b=>bandCounts[b]>0);
+  if(rosterBucket && !bandCounts[rosterBucket]) rosterBucket=null;   // stale pick after tier switch
+  const inTier=(rosterBucket ? inBand.filter(x=>bkOf(x)===rosterBucket) : inBand);
   /* r383 (Wolf: same density grammar as the r382 board rows): the roster's dead
      stretch between name and bucket carries a muted .ros-mid now — crowns plus the
      rating gap to the tier's leader (same chase number the tp rows speak). */
-  let rows=inTier.map((x,i)=>'<div class="ros-row'+(x.u===meId?' me':'')+'">'+
-    '<span class="ros-n">'+(i+1)+'</span>'+
+  const lead=inBand[0];   // rating chase always references the tier leader, even inside a bucket
+  let rows=inTier.map((x)=>'<div class="ros-row'+(x.u===meId?' me':'')+'">'+
+    '<span class="ros-n">'+(inBand.indexOf(x)+1)+'</span>'+
     (window.rankEmblem?window.rankEmblem(x.tier.name,22,x.tier.bucket):'')+
     '<span class="ros-nm" data-uid="'+x.u+'">'+esc(names[x.u])+'</span>'+
     '<span class="ros-mid">'+(x.st.crowns?x.st.crowns+' ♛ · ':'')+
-      (i===0?'leads the tier':'+'+((x.av-inTier[0].av)*100).toFixed(1)+' rtg')+'</span>'+
+      (x===lead?'leads the tier':'+'+((x.av-lead.av)*100).toFixed(1)+' rtg')+'</span>'+
     '<span class="ros-b">'+(x.tier.bucket||'')+'</span>'+
     '<span class="ros-r">rating '+(x.av*100).toFixed(1)+'</span>'+
     '<span class="ros-a">'+x.st.att+' boards</span></div>').join('');
-  if(!inTier.length) rows='<div class="empty">nobody holds this tier yet \u2014 it\u2019s open</div>';
+  if(!inTier.length) rows='<div class="empty">'+(rosterBucket?'nobody sits in the '+rosterBucket.toLowerCase()+' bucket yet':'nobody holds this tier yet \u2014 it\u2019s open')+'</div>';
+  /* r404 (Wolf): sub-tier chips \u2014 filter the tier roster by bucket band (Top/Middle/Bottom).
+     Only shown when the tier actually splits across more than one bucket; 'All' is the default. */
+  const bucketChips = bucketsPresent.length>1
+    ? '<div class="ros-buckets"><span class="tab ros-bk'+(rosterBucket===null?' on':'')+'" data-bucket="">All</span>'+
+        ROSTER_BUCKETS.filter(b=>bandCounts[b]>0).map(b=>
+          '<span class="tab ros-bk'+(rosterBucket===b?' on':'')+'" data-bucket="'+b+'">'+b+' <em>'+bandCounts[b]+'</em></span>').join('')+'</div>'
+    : '';
   return '<div class="panel" style="margin-top:'+(flush?'0':'18px')+'"><h4>the field \u00b7 by tier</h4>'+
     '<div class="ros-tabs">'+tierNames.map(tn=>'<span class="tab ros-t'+(tn===rosterTier?' on':'')+'" data-tier="'+tn+'">'+tn.replace(' Analyst','')+'</span>').join('')+'</div>'+
+    bucketChips+
     '<div class="ros-list">'+rows+'</div>'+
     '<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px">rating = average placement across your boards (lower is better)</div></div>';
 }
@@ -1474,7 +1515,8 @@ function renderAll(){
   }
   wire(); wireGuild();
   try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx()); }catch(e){}  // r385: card-skin particles (hero)
-  document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; renderAll(); });
+  document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; rosterBucket=null; renderAll(); });
+  document.querySelectorAll('.ros-bk').forEach(b=>b.onclick=()=>{ rosterBucket=b.dataset.bucket||null; renderAll(); });
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
   const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ try{ localStorage.setItem('hk_ranked','0'); }catch(e){} try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} load(); };

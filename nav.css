@@ -494,8 +494,9 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   --faint:#a3987e; --line:#d7cdb7; --accent:#8a6d3b; --accent-dim:#b7a67e; --accent-glow:rgba(138,109,59,.12);
   background:#f2ead9; border:1px solid #d7cdb7; color:#3c342a;
   box-shadow:0 22px 60px rgba(0,0,0,.45), inset 0 0 34px rgba(60,52,42,.06)}
-.hk-frame-bone.hk-frame-bone::after{content:"SILIAN RAIL \00B7  BONE"; position:absolute; bottom:8px; right:12px;
-  font-family:var(--mono,ui-monospace,monospace); font-size:7.5px; letter-spacing:.2em; color:#c5b795; pointer-events:none}
+.hk-frame-bone.hk-frame-bone::after{content:"SILIAN RAIL \00B7 BONE \00B7 EGGSHELL"; position:absolute; bottom:9px; right:13px;
+  font-family:'Copperplate','Copperplate Gothic Light','Trajan Pro',serif; font-size:10.5px; font-weight:600;
+  letter-spacing:.16em; color:#8a7a54; text-shadow:0 1px 0 rgba(255,255,255,.5); pointer-events:none}
 .hk-frame-bone .pc-name{font-family:'Copperplate','Copperplate Gothic Light','Trajan Pro',serif;
   letter-spacing:.18em; font-weight:600}
 
@@ -605,7 +606,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-lg.hk-frame-foil{border-width:7px}
 .hk-frame-lg.hk-frame-foil::before{inset:-7px}
 .hk-frame-lg.hk-frame-charter{border-width:6px}
-.hk-frame-lg.hk-frame-bone::after{font-size:9px}   /* bone stays PERFECTLY still — only the tag grows */
+.hk-frame-lg.hk-frame-bone::after{font-size:12.5px}   /* bone stays PERFECTLY still — only the tag grows */
 .hk-frame-lg.hk-frame-heraldic{border-width:3px;
   box-shadow:0 22px 60px rgba(0,0,0,.45), 0 0 58px rgba(230,88,67,.42), inset 0 0 74px rgba(230,88,67,.11)}
 /* wider, brighter specular strip on the big card */

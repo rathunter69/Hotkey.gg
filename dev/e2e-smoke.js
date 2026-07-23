@@ -6,7 +6,7 @@
    Run: node dev/e2e-smoke.js   (server on 127.0.0.1:8791) */
 const { chromium } = require('playwright-core');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
-const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'leaderboard.html', 'desks.html'];
+const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'billing.html', 'leaderboard.html', 'desks.html'];
 
 (async () => {
   const exe = process.env.CHROME || chromium.executablePath();
@@ -59,6 +59,7 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'lead
         window.hkCelebrate = real;
         window.hkCelebrate({ cap: 'x', title: 'x', equip: { frameId: 'cottoncandy', frameName: 'C' } });
         o.equipBtn = !!document.querySelector('.hk-cel-equip');
+        o.drills = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.menuOrder || []).length;
         return o;
       });
       const checks = ['earnIgnoresBeta', 'loadoutPreserved', 'seedSilent', 'freshFires', 'equipBtn'];
@@ -66,6 +67,23 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'lead
       if (bad.length) errs.push('skin-unlock invariants failed: ' + bad.join(', '));
       if (errs.length) fails.push({ p: 'skin-unlock', errs });
       else console.log('  PASS skin-unlock — earn/seed/fresh/equip invariants hold');
+
+      // r398 (#76): the hand-written marketing copy must not drift from the live catalog.
+      // "banker-grade drills" is the unambiguous full-catalog phrase (smaller "N drills"
+      // counts are chapter/feature sizes), so any "N banker-grade drills" must == menuOrder.
+      const total = r.drills;
+      const cerr = [];
+      if (!total) cerr.push('menuOrder.length came back 0 — could not verify');
+      else {
+        const fs = require('fs');
+        for (const f of ['index.html', 'About.html', 'enterprise.html']) {
+          let txt = ''; try { txt = fs.readFileSync(f, 'utf8'); } catch (e) { continue; }
+          let m; const re = /(\d+)\s+banker-grade\s+drills/g;
+          while ((m = re.exec(txt))) if (+m[1] !== total) cerr.push(f + ': "' + m[0] + '" != ' + total + ' (menuOrder)');
+        }
+      }
+      if (cerr.length) fails.push({ p: 'drill-count', errs: cerr });
+      else console.log('  PASS drill-count — marketing copy matches menuOrder (' + r.drills + ')');
     } catch (e) { fails.push({ p: 'skin-unlock', errs: ['THREW: ' + String(e).slice(0, 160)] }); }
     await page.close();
   }
