@@ -1178,9 +1178,9 @@ window.hkFrameOrnaments = (function(){
     neon:         ['OVERCLOCK',   '#0b0410', 'linear-gradient(120deg,#ff2d95,#2edcff)', '#ff2d95', ''],
     blueprint:    ['SHEET 01',    '#0c1a26', 'linear-gradient(90deg,#2f5b86,#4f7aa8)', '#4f7aa8', ''],
     crt:          ['C:\\ READY',  '#04140a', 'linear-gradient(90deg,#1c6a38,#2fae5c)', '#2fae5c', 'matrix'],
-    constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','stars'],
+    constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','cosmic'],   /* r403 (Wolf #95): the built-but-unused comet starfield — a true "animated starfield", and distinct from PRO's spiral galaxy */
     vaporwave:    ['SYNTHWAVE',   '#1a0722', 'linear-gradient(120deg,#ff5db1,#2ee6e6)', '#ff5db1', 'drive'],
-    terminal:     ['● LIVE', '#1a1204', 'linear-gradient(90deg,#3a2a08,#7a5a12)', '#e0a02f', ''],
+    terminal:     ['● LIVE', '#1a1204', 'linear-gradient(90deg,#3a2a08,#7a5a12)', '#e0a02f', 'ticker'],   /* r403 (Wolf): the promised live ticker, now real */
     pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'galaxy'],
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
@@ -1324,6 +1324,10 @@ window.hkInitCardFx = function(root){
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
     function draft(w,h){return{gs:Math.max(22,Math.round(w/14))};}
     function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
+    /* r403 (Wolf): terminal "live ticker" — a Bloomberg-amber tape scrolling along the bottom
+       edge, each quote a green ▲ / red ▼ against an amber price. */
+    function ticker(w,h){const gap=Math.max(46,w/3.2),items=[];let x=0;while(x<w+gap){items.push({x,up:Math.random()<.5,v:R(1,99)});x+=gap;}
+      return{items,gap,w0:x,sp:Math.max(.3,w/1600+.3),y:h-Math.max(9,Math.round(h*.12)),fs:Math.max(8,Math.round(h*.085))};}
     const sys=[];
     canv.forEach(cv=>{
       if(cv._hkfx) return; cv._hkfx=1;
@@ -1333,6 +1337,7 @@ window.hkInitCardFx = function(root){
         : kind==='petals'?petals(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
         : kind==='galaxy'?galaxy(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
         : kind==='gold'?gold(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h)
+        : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
       sys.push({cv,kind,S,parts});
     });
@@ -1440,6 +1445,14 @@ window.hkInitCardFx = function(root){
         const scroll=reduce?0:(t/650)%1;
         for(let i=0;i<11;i++){ let f=(i+scroll)/11; f=f*f; const y=hz+(h-hz)*f; ctx.globalAlpha=Math.min(.5,f*1.4); ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
         ctx.globalAlpha=1; }
+      else if(o.kind==='ticker'){ const P=o.parts; ctx.textBaseline='middle'; ctx.font=P.fs+'px VT323, monospace';
+        ctx.strokeStyle='rgba(224,160,47,.16)'; ctx.lineWidth=1*dpr; ctx.beginPath(); ctx.moveTo(0,P.y-P.fs); ctx.lineTo(w,P.y-P.fs); ctx.stroke();
+        for(const it of P.items){ if(!reduce){ it.x-=P.sp*dpr; if(it.x<-P.gap){ it.x+=P.w0; it.up=Math.random()<.5; it.v=R(1,99); } }
+          ctx.fillStyle= it.up?'rgba(120,214,120,.92)':'rgba(232,120,96,.92)';
+          ctx.fillText(it.up?'▲':'▼', it.x, P.y);
+          ctx.fillStyle='rgba(226,170,64,.85)'; ctx.shadowBlur=4*dpr; ctx.shadowColor='rgba(224,160,47,.55)';
+          ctx.fillText(it.v.toFixed(1), it.x+P.fs*.85, P.y); ctx.shadowBlur=0; }
+        ctx.textBaseline='alphabetic'; }
       else { for(const s of o.parts){ const a=reduce?.7:(.35+.55*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
         ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
     }
