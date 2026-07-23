@@ -1602,13 +1602,13 @@
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=278"></script>
-<link rel="stylesheet" href="nav.css?v=199">
-<script src="themes.js?v=295"></script>
+<link rel="stylesheet" href="nav.css?v=203">
+<script src="themes.js?v=300"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=294"></script>
+<script src="nav.js?v=296"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -9224,6 +9224,9 @@ function checkWin(){
         big:true,   /* r305 (Wolf): a level-up is a MOMENT — full-screen burst, popped card */
         iconHtml:(window.hkLevelChip?window.hkLevelChip(lv(nxt), 64):(window.hkLevelRing?window.hkLevelRing(lv(nxt), 4, 84):''))});
     }
+    /* r411 (Wolf): a level-up may cross a skin's level gate, but the skin-unlock REVEAL is fired by
+       the shared page-load sweep (hkSkinUnlockSweep, nav.js) on the NEXT render — never here in the
+       hot drill-solve path, so the celebration overlay can't open mid-solve. */
   }catch(e){} }
   let __prevBest=null, __pbDelta=null;
   if(!mouseUsed && !guidedUsed){ const prev=PB[sk];
@@ -9848,8 +9851,11 @@ function syncTabs(){
       if(__solves<3 && !guided && !demoPlaying) toggleGuided();
     }
   }catch(e){}
-  if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450);
-    setTimeout(skinSweepInGame, 900); }   // r80: between drills — gameplay moment, zero overlap; r393: skin unlocks queue after the ach card
+  if(__achPending){ __achPending=false; setTimeout(achSweepInGame, 450); }   // r80: between drills — gameplay moment, zero overlap
+  /* r411 (Wolf): the skin-unlock REVEAL no longer fires from the drill loop. Its equip CTA is a
+     live control (guest → sign-up nav), and firing it between solves opened the overlay under the
+     next solve's synthetic input, navigating the page out from under an in-flight drill. The reveal
+     is now driven ONLY by hkSkinUnlockSweep (nav.js) on page load, never during a solve. */
   const nel=$('dbName'); if(nel) nel.textContent=(C.label||C.name||cur)+(weeklyMode?' 🏁':'');
   { const tl=$('taskLine'); if(tl){
       const gc=(window.HOTKEY_GROUP_COLORS||{})[GROUP_OF[cur]]||'var(--accent)';
@@ -15573,26 +15579,21 @@ function skinPreviewHtml(id){
     return '<span class="hk-cel-skin hk-frame-'+id+'">'+orn+'</span>';
   }catch(e){ return ''; }
 }
+/* r411 (Wolf): SUPERSEDED. The in-game skin sweep fired the equip-CTA celebration between
+   solves; its live equip button (guest → sign-up nav) opened under the next solve's synthetic
+   input and navigated the page mid-drill. The reveal now lives solely in hkSkinUnlockSweep
+   (nav.js), which runs on page load — never inside the solve loop. Kept as a no-op so any stray
+   caller is inert; buildSkinCtx/skinPreviewHtml remain for reference/reuse. */
 function skinSweepInGame(){
   try{
     if(!window.HK_FRAMES || !window.hkFrameEarned || !window.hkCelebrate) return;
     const u=buildSkinCtx();
     const earned=window.HK_FRAMES.filter(f=>window.hkFrameEarned(f.id,u)).map(f=>f.id);
     let seen=null; try{ const raw=localStorage.getItem('hk_skin_seen'); if(raw!=null) seen=JSON.parse(raw); }catch(e){ seen=null; }
-    if(!Array.isArray(seen)){
-      localStorage.setItem('hk_skin_seen', JSON.stringify(earned));   // first run: seed, no retroactive flood
-      return;
-    }
+    // keep the local seen-set current (so nothing floods later) but NEVER pop a reveal here.
+    if(!Array.isArray(seen)){ localStorage.setItem('hk_skin_seen', JSON.stringify(earned)); return; }
     const fresh=window.HK_FRAMES.filter(f=>earned.indexOf(f.id)>=0 && seen.indexOf(f.id)<0);
-    if(fresh.length){
-      localStorage.setItem('hk_skin_seen', JSON.stringify(seen.concat(fresh.map(f=>f.id))));
-      const f=fresh[0];
-      window.hkCelebrate({ cap:'card skin unlocked', big:true, title:f.name,
-        sub:(f.desc||'a new look for your card')+(fresh.length>1?' · +'+(fresh.length-1)+' more':''),
-        iconHtml:skinPreviewHtml(f.id),
-        equip:{ frameId:f.id, frameName:f.name } });
-      try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}
-    }
+    if(fresh.length) localStorage.setItem('hk_skin_seen', JSON.stringify(seen.concat(fresh.map(f=>f.id))));
   }catch(e){}
 }
 // r83: STAT RETENTION — local PBs hydrate from server runs on login, so a new

@@ -835,8 +835,8 @@ window.HK_FRAMES = [
    desc:'phosphor scanlines, terminal green',          earn:'complete the reference tour'},
   {id:'cottoncandy',name:'Cotton Candy', tier:'rare',
    desc:'pink-blue pastel + soft puffs',               earn:'reach Summer Analyst'},
-  {id:'bloom',      name:'Bloom',        tier:'rare',
-   desc:'pastel spring — floating green petals',       earn:'reach Associate'},
+  {id:'bloom',      name:'Growth',       tier:'rare',
+   desc:'green leaves drifting up — your first skin',   earn:'reach Level 2'},   /* r411 (Wolf): the starter skin — early level gate so a new analyst gets an animated card fast */
   {id:'amethyst',   name:'Amethyst',     tier:'rare',
    desc:'deep purple gem + prism glow',                earn:'reach VP'},
   /* epic */
@@ -917,7 +917,7 @@ window.hkFrameEarned = function(id, u){
     case 'blueprint':     return tb >= 3;
     case 'crt':           return (u.lvl|0) >= 12;
     case 'constellation': return tb >= 4;
-    case 'vaporwave':     return tb >= 2;
+    case 'vaporwave':     return tb >= 2 || (u.lvl|0) >= 4;   // r411 (Wolf): or Level 4
     case 'terminal':      return (u.certs|0) >= 1;
     case 'pro':           return tb >= 6 || !!u.pro;
     case 'noir':          return tb >= 5;
@@ -930,15 +930,71 @@ window.hkFrameEarned = function(id, u){
     case 'amethyst':      return tb >= 5;                                  // VP
     case 'onyx':          return tb >= 7;                                  // Second-Year Analyst
     case 'sakura':        return (u.streak|0) >= 14;
+    /* r411 (Wolf): early LEVEL gates so the first few levels each hand out an animated skin */
     case 'goldenhour':    return (u.streak|0) >= 7;
     case 'pearl':         return !!u.perfectRun;
-    case 'bloom':         return tb >= 4;                                  // Associate
-    case 'cottoncandy':   return tb >= 2;                                  // Summer Analyst
+    case 'bloom':         return (u.lvl|0) >= 2;                            // r411 (Wolf): Growth — the Level-2 starter skin
+    case 'cottoncandy':   return tb >= 2 || (u.lvl|0) >= 3;                 // Summer Analyst — r411: or Level 3
     case 'emerald':       return (u.chaptersCleared||[]).indexOf('c5') >= 0;  // Formulas II
     case 'architect':     return (u.chaptersCleared||[]).indexOf('c8') >= 0;  // Full Builds
     case 'boutique':      return (u.certs|0) >= 3;                         // all three certificates
   }
   return false;
+};
+/* ---- r410 (Wolf): TITLES — an equippable name-plate the card wears in a notch under the
+   identity, earned across four buckets: ACCOUNT STATUS (Founder / PRO / Beta Tester),
+   CERTIFICATE PATHS (one per track + Chartered for all three), the HARDEST MEDALS (every
+   mythic/legendary achievement doubles as a title — its name IS the title), and a couple
+   of GENERAL milestones (Analyst / Crownholder / Centurion). Rank is deliberately NOT a
+   title — the crest + motto already carry it (Wolf's call). Three dependency-light hooks:
+     hkTitleLabel(id)     id -> display text (static ids + achievement-derived ids)
+     hkTitleEarned(id,u)  gates the pick; u carries certTracks{}, achDone, flags
+     hkTitleCatalog(u)    the ordered {id,name,cat,earned} list the customizer draws  ---- */
+window.HK_TITLE_LABELS = {
+  founder:'Founder', pro:'PRO', beta:'Beta Tester',
+  cert_fluency:'Keyboard Fluent', cert_formulas:'Formula Analyst', cert_modeling:'Modeler', chartered:'Chartered',
+  analyst:'Analyst', crownholder:'Crownholder', centurion:'Centurion'
+};
+/* the mythic + legendary medals double as titles — their names ARE the title text */
+window.hkTitleMedalIds = function(){
+  var AC = window.HOTKEY_ACHIEVEMENTS || [];
+  return AC.filter(function(a){ return a.tier==='m' || a.tier==='l'; }).map(function(a){ return a.id; });
+};
+window.hkTitleLabel = function(id){
+  if(!id) return '';
+  if(window.HK_TITLE_LABELS[id]) return window.HK_TITLE_LABELS[id];
+  var AC = window.HOTKEY_ACHIEVEMENTS || [];              // achievement-derived title: label = medal name
+  for(var i=0;i<AC.length;i++){ if(AC[i].id===id) return AC[i].name; }
+  return '';
+};
+window.hkTitleEarned = function(id, u){
+  u = u || {};
+  if(!id || id==='analyst') return true;                 // Analyst is the baseline (every signed-in analyst)
+  var ct = u.certTracks || {};
+  switch(id){
+    case 'founder':       return !!u.founder || !!u.charter;
+    case 'pro':           return !!u.pro;
+    case 'beta':          return !!u.beta || !!u.charter; // beta-unlock flag OR a beta-era account
+    case 'cert_fluency':  return !!ct.fluency;
+    case 'cert_formulas': return !!ct.formulas;
+    case 'cert_modeling': return !!ct.modeling;
+    case 'chartered':     return !!ct.fluency && !!ct.formulas && !!ct.modeling;
+    case 'crownholder':   return (u.crowns|0) >= 1;
+    case 'centurion':     return (u.solves|0) >= 100;
+  }
+  var done = u.achDone;                                   // achievement-derived: earned iff the medal is done
+  if(done){ if(Array.isArray(done)) return done.indexOf(id) >= 0;
+            if(typeof done==='object') return !!done[id]; }
+  return false;
+};
+window.hkTitleCatalog = function(u){
+  var out = [{id:null, name:'None', cat:'', earned:true}];
+  var push = function(id, cat){ out.push({id:id, name:window.hkTitleLabel(id), cat:cat, earned:window.hkTitleEarned(id,u)}); };
+  ['founder','pro','beta'].forEach(function(id){ push(id,'status'); });
+  ['cert_fluency','cert_formulas','cert_modeling','chartered'].forEach(function(id){ push(id,'cert'); });
+  window.hkTitleMedalIds().forEach(function(id){ push(id,'medal'); });
+  ['analyst','crownholder','centurion'].forEach(function(id){ push(id,'general'); });
+  return out;
 };
 /* ---- r387: flair carries the whole card loadout, not just the frame. Historically
    profiles.flair held a bare frame id ("molten"). To let the Profile customizer
@@ -964,7 +1020,26 @@ window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','a
     'tranny','nazi','hitler','pedo','molest','kkk',
     'admin','moderator','staff','official','support','verified','hotkey','anthropic','claude'];
   var EXACT = ['pro','analyst','crownholder','centurion','founder','charter','beta','owner',
-    'ceo','mod','system','root','bot','null','undefined'];
+    'ceo','mod','system','root','bot','null','undefined',
+    /* r410: the new earned title labels (normalized: spaces stripped) so a custom title can't fake one */
+    'betatester','keyboardfluent','formulaanalyst','modeler','chartered'];
+  /* r410 (Wolf: "can't just write the same thing as an achievement — really restrict it"): the
+     custom title is checked against the LIVE set of earned names — every title label, every
+     achievement name, and every rank tier — so free text can never impersonate an earned title.
+     Exact (normalized) match blocks the name itself; a substring pass blocks near-variants of the
+     DISTINCTIVE (9+ char) names so "The Untouchable" / "Untouchablex" are caught too. */
+  function normR(x){ return String(x||'').toLowerCase().replace(/[0@]/g,'o').replace(/[1!|]/g,'i')
+    .replace(/3/g,'e').replace(/4/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/[^a-z]/g,''); }
+  function reservedNames(){
+    var ex = {}, sub = [], seen = {};
+    EXACT.forEach(function(w){ ex[w]=1; if(w.length>=9 && !seen[w]){ seen[w]=1; sub.push(w); } });
+    var add = function(name){ var n=normR(name); if(!n || ex[n]) { if(n) ex[n]=1; return; } ex[n]=1;
+      if(n.length>=9 && !seen[n]){ seen[n]=1; sub.push(n); } };
+    var TL = window.HK_TITLE_LABELS||{}; for(var k in TL){ add(TL[k]); add(k); }
+    (window.HOTKEY_ACHIEVEMENTS||[]).forEach(function(a){ if(a&&a.name) add(a.name); });
+    (((window.HK_RANK||{}).TIERS)||[]).forEach(function(t){ if(t&&t.name) add(t.name); });
+    return {ex:ex, sub:sub};
+  }
   window.hkSafeTitle = function(raw){
     var MIN = 2, MAX = 18;
     if(raw == null) return {ok:false, clean:'', reason:'enter a title'};
@@ -977,9 +1052,11 @@ window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','a
     if(!/^[A-Za-z0-9 &.'\-]+$/.test(s)) return {ok:false, clean:s, reason:'letters, numbers & spaces only'};
     if(!/[A-Za-z]/.test(s)) return {ok:false, clean:s, reason:'needs a letter'};
     var norm = s.toLowerCase().replace(/[0@]/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e')
-      .replace(/\$/g,'s').replace(/[^a-z]/g,'');
+      .replace(/4/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/[^a-z]/g,'');
     for(var i=0;i<SUB.length;i++){ if(norm.indexOf(SUB[i])>=0) return {ok:false, clean:s, reason:'let’s keep it clean'}; }
-    for(var j=0;j<EXACT.length;j++){ if(norm===EXACT[j]) return {ok:false, clean:s, reason:'that title is reserved'}; }
+    var RES = reservedNames();
+    if(RES.ex[norm]) return {ok:false, clean:s, reason:'that’s an earned title — pick something else'};
+    for(var r=0;r<RES.sub.length;r++){ if(norm.indexOf(RES.sub[r])>=0) return {ok:false, clean:s, reason:'that’s an earned title — pick something else'}; }
     return {ok:true, clean:s, reason:''};
   };
 })();
@@ -1185,14 +1262,14 @@ window.hkFrameOrnaments = (function(){
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
     molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
-    founder:      ['★ FOUNDER','#100f18','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c89bff','aurora'],
+    founder:      ['★ FOUNDER','#0a0910','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c89bff','holorain'],   /* r411 (Wolf): aurora wash overshadowed the stats — swapped to a dark HOLO-FOIL rainbow (cool, not literal cracks) */
     /* r390 (Wolf) new title skins */
     amethyst:     ['◆ AMETHYST','#180a2a','linear-gradient(120deg,#a06cff,#d0a8ff)','#c49bff','prism'],
     onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','onyxfx'],   /* r404.2 (Wolf): black marble + gold veins (was gold dust, looked like boutique) */
     sakura:       ['❀ SAKURA','#3a1a26','linear-gradient(120deg,#ffd6e6,#ffaccb)','#ffb6d4','petals'],   /* r404 (Wolf): lighter, softer pink */
     goldenhour:   ['☀ GOLDEN HOUR','#3a1c10','linear-gradient(120deg,#ffd9a0,#ff9e7a)','#ffb488','bokeh'],
     pearl:        ['◗ PEARL','#2a2634','linear-gradient(120deg,#f0e6ff,#cfe6ff)','#e6d9ff','pearl'],
-    bloom:        ['✿ BLOOM','#14260f','linear-gradient(120deg,#a8e88a,#d8f4b8)','#b8e89a','bloom'],   /* r404 (Wolf): green blossoms — pink petals didn't read against the green */
+    bloom:        ['❧ GROWTH','#14260f','linear-gradient(120deg,#a8e88a,#d8f4b8)','#b8e89a','bloom'],   /* r411 (Wolf): Growth — the Level-2 green falling-leaves starter (id stays 'bloom' so saved flairs survive) */
     cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','candy'],   /* r404 (Wolf): defined puffs, less blur */
     /* r391 (Wolf) chapter/cert capstone skins */
     architect:    ['△ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],  /* r393 (Wolf): ⟁ fell back to a ⚠-looking glyph in most fonts — a clean drafting triangle reads right */
@@ -1340,6 +1417,13 @@ window.hkInitCardFx = function(root){
     /* r406 (Wolf: "founder still no good animation"): richer aurora — five drifting curtains
        (brighter, wider hue spread) over a slow-twinkling star field. */
     function aurora(w,h){return{b:[{hue:150,off:0,sp:1},{hue:285,off:2.1,sp:.72},{hue:190,off:4.2,sp:1.35},{hue:330,off:1.1,sp:.9},{hue:50,off:3.3,sp:1.15}],st:stars(w,h)};}
+    /* r411 (Wolf: founder aurora too bright — wants it "cracked" = COOL, not shattered): a
+       refined dark HOLO-FOIL. The card stays near-black so the stats read; two narrow rainbow
+       sheen bands drift across on different phases (confined bands, not a full-bleed wash) with
+       a fine dim sparkle. Premium holographic-card feel, spectrum without the glare. */
+    function holorain(w,h){ const n=Math.round(w*h/26000)+5, st=[];
+      for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.4),ph:R(0,6.28),sp:R(.5,1.3)});
+      return {st}; }
     function drive(w,h){return{hz:Math.round(h*.40)};}
     function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
@@ -1426,7 +1510,7 @@ window.hkInitCardFx = function(root){
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
         : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h) : kind==='diamondfx'?diamondfx(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
-        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
+        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='holorain'?holorain(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
         : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
@@ -1528,6 +1612,23 @@ window.hkInitCardFx = function(root){
           if(!reduce){ const gp=((t/3000*v.sp+v.ph/6.28)%1), idx=gp*(v.pts.length-1), i0=Math.floor(idx), f=idx-i0;
             const p0=v.pts[i0], p1=v.pts[Math.min(v.pts.length-1,i0+1)], gx=p0.x+(p1.x-p0.x)*f, gy=p0.y+(p1.y-p0.y)*f;
             ctx.beginPath(); ctx.arc(gx,gy,2.2*dpr,0,6.28); ctx.fillStyle='rgba(255,240,190,.92)'; ctx.shadowBlur=8*dpr; ctx.shadowColor='rgba(245,205,110,.9)'; ctx.fill(); ctx.shadowBlur=0; } } }
+      else if(o.kind==='holorain'){ const P=o.parts;
+        /* r411 (Wolf): HOLO-FOIL — "cool" rainbow, not a shattered card. Two narrow spectral sheen
+           bands drift across on different speeds (banded, so most of the dark body stays clear and
+           the stats read), plus a fine dim sparkle. Reads like a premium holographic card. */
+        ctx.globalCompositeOperation='lighter';
+        for(let k=0;k<2;k++){
+          const sp=((t/(k?7200:5200)+k*.5)%1), bx=(-.3+sp*1.6)*w, hue=(t/22+k*150)%360;
+          const g=ctx.createLinearGradient(bx-.15*w,0,bx+.15*w,h);
+          g.addColorStop(0,'hsla('+hue+',85%,62%,0)');
+          g.addColorStop(.5,'hsla('+((hue+45)%360)+',88%,64%,'+(reduce?.07:.15)+')');
+          g.addColorStop(1,'hsla('+((hue+95)%360)+',85%,62%,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        }
+        ctx.globalCompositeOperation='source-over';
+        if(P.st) for(const s of P.st){ const a=reduce?.3:(.12+.42*(.5+.5*Math.sin(t/620*s.sp+s.ph)));
+          ctx.beginPath(); ctx.arc(s.x,s.y,s.r*dpr,0,6.28); ctx.fillStyle='rgba(230,235,255,'+a+')';
+          ctx.shadowBlur=4*dpr; ctx.shadowColor='rgba(200,190,255,.8)'; ctx.fill(); ctx.shadowBlur=0; } }
       else if(o.kind==='sheen'){
         // polished-metal highlight bar rakes diagonally every ~4.5s
         const gp=reduce?.5:((t/4500)%1);
@@ -1803,7 +1904,16 @@ window.hkPlayerCard = function(d, opts){
   let cls = 'uc' + (full ? '' : ' compact'), orn = '';
   // r387: d.flair may be a bare frame id, a full loadout JSON, or null (host carries
   // the skin). Normalize to the frame id for the class/ornaments either way.
-  const fv = (d.flair && window.hkFlair) ? window.hkFlair(d.flair).frame : d.flair;
+  const flObj = (d.flair && window.hkFlair) ? window.hkFlair(d.flair) : null;
+  const fv = flObj ? flObj.frame : d.flair;
+  /* r410 (Wolf): the equipped TITLE — a custom (PRO) title wins, else the earned title id
+     resolves to its label. Callers may override with d.titleText. Rendered in a notch under
+     the identity so it reads on every surface (profile / header / leaderboard) at once. */
+  /* r411 (Wolf): the custom free-text PRO title is CUT — only earned titles ride the card now
+     (a free-text title that can show "whatever you want" was more risk than reward). Any legacy
+     stored customTitle is simply ignored at render. */
+  const titleText = (d.titleText != null) ? d.titleText
+    : (flObj ? (flObj.title && window.hkTitleLabel ? window.hkTitleLabel(flObj.title) : '') : '');
   if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
     cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
     orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full, owner:!!d.owner, serial:d.serial|0}) : '';
@@ -1818,9 +1928,10 @@ window.hkPlayerCard = function(d, opts){
   /* r407 (Wolf): drop the tiny xp bar + xp line on every card — just a big, legible LVL
      badge in a tray, top-right. */
   const lvlHtml = showLevel ? '<div class="uc-lvlwrap"><div class="uc-lvl">LVL '+esc(d.lvl)+'</div></div>' : '';
+  const titleHtml = titleText ? '<div class="uc-titlechip"><span>'+esc(titleText)+'</span></div>' : '';
   let h = '<div class="'+cls+(showRank?'':' no-rank')+(showLevel?'':' no-lvl')+'">'+orn+
     '<div class="uc-head">'+crestHtml+
-      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+tierHtml+'</div>'+
+      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+tierHtml+titleHtml+'</div>'+
       lvlHtml+
     '</div>'+
     // r387 (Wolf): school + desk ride HIGH on the card (right under the identity),

@@ -57,7 +57,7 @@
   .state a.acc-cta.ghost{color:var(--accent)}   /* r355: the r297 on-accent fix out-specified the ghost variant — 'Log in' rendered white-on-light, invisible */
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
-<link rel="stylesheet" href="nav.css?v=199">
+<link rel="stylesheet" href="nav.css?v=203">
 <script src="drills.js?v=278"></script>
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
@@ -66,7 +66,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'profile';
 </script>
-<script src="themes.js?v=295"></script>
+<script src="themes.js?v=300"></script>
 <style>
   /* ============================================================
      PROFILE CUSTOMIZER — page-local classes. Loaded AFTER nav.css so the
@@ -166,6 +166,11 @@ window.NAV_ACTIVE = 'profile';
 
   /* chips (titles + highlight stats) */
   .cz-chips{display:flex; flex-wrap:wrap; gap:8px}
+  /* r410 (Wolf): title-catalog group headings — break to their own row inside the wrap so
+     Account / Certificates / Elite medals / Milestones read as sections. */
+  .cz-tgroup{flex-basis:100%; width:100%; font-family:var(--mono); font-size:9.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--faint); margin:8px 0 -1px}
+  .cz-tgroup:first-child{margin-top:0}
   .cz-chip{font-family:var(--mono); font-size:11.5px; font-weight:600; color:var(--muted); background:var(--bg);
     border:1px solid var(--line); border-radius:999px; padding:7px 14px; cursor:pointer; transition:all .15s}
   .cz-chip:hover{border-color:var(--faint); color:var(--text)}
@@ -250,7 +255,7 @@ window.NAV_ACTIVE = 'profile';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=294"></script>
+<script src="nav.js?v=296"></script>
 
 <header class="head"><div class="wrap"><h1>Profile</h1></div></header>
 
@@ -557,22 +562,42 @@ async function load(){
   /* TITLE chips — a few rank/earned titles + a CUSTOM (PRO) chip. NOTE: the card's
      title NOTCH rendering lands in a later round; persisting loadout.title here is
      enough for now (the pick round-trips through hkFlairPack). */
-  const TITLES=[
-    { id:null,          name:'None',          locked:false },
-    { id:'analyst',     name:'Analyst',       locked:false },
-    { id:'crownholder', name:'Crownholder',   locked: betaOpen?false:(st.crowns<1) },
-    { id:'centurion',   name:'Centurion',     locked: betaOpen?false:(mine.length<100) },
-    { id:'pro',         name:'CUSTOM (PRO)',  locked:false, pro:true },
-  ];
+  /* r410 (Wolf): the full TITLE catalog — account status · certificate paths · the hardest
+     (mythic/legendary) medals · general milestones. Rank is intentionally NOT a title (the
+     crest + motto carry it). Built from the shared hkTitleCatalog(); beta-unlock opens every
+     title the way it opens every frame. The CUSTOM (PRO) chip is appended last with a sentinel
+     id so it never collides with the earned 'pro' (PRO) status title. */
+  const __ct = (__fl && __fl.certTracks) || {};
+  const __achDone = {}; (medalsOK?AC:[]).forEach(a=>{ if((achMeta[a.id]||{}).done) __achDone[a.id]=true; });
+  const titleU = {
+    founder: !!frameU.charter || !!(__fl && __fl.founder),
+    pro:     !!(__fl && __fl.pro),
+    beta:    betaOpen || !!frameU.charter,
+    charter: !!frameU.charter,
+    certTracks: __ct,
+    crowns:  (st && st.crowns)|0,
+    solves:  mine.length|0,
+    achDone: __achDone
+  };
+  const CAT_LABEL = { status:'Account', cert:'Certificates', medal:'Elite medals', general:'Milestones' };
+  const CAT_ORDER = ['', 'status', 'cert', 'medal', 'general', 'custom'];
+  const TITLES = (window.hkTitleCatalog ? window.hkTitleCatalog(titleU) : [{id:null,name:'None',cat:'',earned:true}])
+    .filter(t=> t.id==null || t.name)   // drop any title whose label didn't resolve
+    .map(t=>({ id:t.id, name:t.name, cat:t.cat, locked: t.id!=null && !t.earned && !betaOpen }));
+  /* r411 (Wolf): the CUSTOM (PRO) free-text title is CUT — only earned titles are pickable now. */
   function titleChipsHtml(){
-    return TITLES.map(t=>{
-      /* r393 (Wolf #79): the CUSTOM chip lights when a custom title is set (it lives in
-         loadout.customTitle, not loadout.title) */
-      const on = t.pro ? !!loadout.customTitle : ((loadout.title||null)===(t.id||null) && !loadout.customTitle);
-      const locked = !!t.locked;
-      return '<button type="button" class="cz-chip'+(on?' on':'')+(locked?' lock':'')+(t.pro?' pro':'')+'" '+
-        'data-title="'+(t.id==null?'':t.id)+'" data-locked="'+(locked?'1':'0')+'" data-pro="'+(t.pro?'1':'0')+'">'+
-        (locked?window.hkIcon('lock')+' ':'')+esc(t.name)+'</button>';
+    const byCat = {}; TITLES.forEach(t=>{ (byCat[t.cat||'']=byCat[t.cat||'']||[]).push(t); });
+    return CAT_ORDER.filter(c=>byCat[c]).map(c=>{
+      const head = CAT_LABEL[c] ? '<div class="cz-tgroup">'+esc(CAT_LABEL[c])+'</div>' : '';
+      return head + byCat[c].map(t=>{
+        /* r393 (Wolf #79): the CUSTOM chip lights when a custom title is set (it lives in
+           loadout.customTitle, not loadout.title) */
+        const on = t.pro ? !!loadout.customTitle : ((loadout.title||null)===(t.id||null) && !loadout.customTitle);
+        const locked = !!t.locked;
+        return '<button type="button" class="cz-chip'+(on?' on':'')+(locked?' lock':'')+(t.pro?' pro':'')+'" '+
+          'data-title="'+(t.id==null?'':t.id)+'" data-locked="'+(locked?'1':'0')+'" data-pro="'+(t.pro?'1':'0')+'">'+
+          (locked?window.hkIcon('lock')+' ':'')+esc(t.name)+'</button>';
+      }).join('');
     }).join('');
   }
 
