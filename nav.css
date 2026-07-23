@@ -465,7 +465,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    dark crimson border, an ominous red glow. Border animates (see .hk-anim-border below). */
 .hk-frame-heraldic.hk-frame-heraldic{--text:#f7d6ce;--muted:#c98a82;--line:#5a1414;--accent:#e8443a;--accent-dim:#8a1410; color:#f7d6ce;
   border:2px solid transparent; box-shadow:0 0 26px rgba(200,24,24,.26),0 20px 60px rgba(0,0,0,.66);
-  background:radial-gradient(ellipse at 50% 8%,rgba(180,20,20,.24),transparent 58%),linear-gradient(#140608,#0c0305) padding-box, conic-gradient(from var(--hkang,120deg),#c02a1a,#5a0a0c,#8a1010,#3a0406,#c02a1a) border-box}
+  background:radial-gradient(ellipse at 50% 8%,rgba(180,20,20,.24),transparent 58%),linear-gradient(#140608,#0c0305) padding-box, conic-gradient(from var(--hkang,120deg),#e8be62,#7a1410,#c02a1a,#3a0406,#d8a24a,#5a0a0c,#e8be62) border-box}   /* r407 (Wolf): Blood Angels — crimson with GILT trim in the border */
 /* r404.6 (Wolf): charter retired. */
 
 /* 6 · BONE (easter egg) — re-scope the palette vars on the card so every inner
@@ -584,8 +584,10 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    heraldic sat at 2-3px where the conic spin was barely visible. 4px is the middle ground:
    thick enough that the rotating gradient reads, matched so every card is the same footprint. */
 .hk-frame-lg.hk-frame-foil, .hk-frame-lg.hk-frame-founder, .hk-frame-lg.hk-frame-heraldic,
-.hk-frame-lg.hk-frame-plaque-diam, .hk-frame-lg.hk-frame-molten, .hk-frame-lg.hk-frame-noir{border-width:4px}
-.hk-frame-lg.hk-frame-foil::before{inset:-4px}
+.hk-frame-lg.hk-frame-plaque-diam, .hk-frame-lg.hk-frame-molten, .hk-frame-lg.hk-frame-noir,
+.hk-frame-lg.hk-frame-pro, .hk-frame-lg.hk-frame-onyx, .hk-frame-lg.hk-frame-boutique,
+.hk-frame-lg.hk-frame-architect{border-width:5px}   /* r407 (Wolf): 5px so the animated border actually reads */
+.hk-frame-lg.hk-frame-foil::before{inset:-5px}
 .hk-frame-lg.hk-frame-charter{border-width:6px}
 .hk-frame-lg.hk-frame-bone::after{font-size:12.5px}   /* bone stays PERFECTLY still — only the tag grows */
 .hk-frame-lg.hk-frame-heraldic{
@@ -826,12 +828,22 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    conic palette via `from var(--hkang)`. */
 @property --hkang{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
 @keyframes hkBorderSpin{ to{ --hkang:360deg; } }
+/* r407 (Wolf: "the shiny borders loop too obviously"): DESYNC + slow the spin — each card
+   gets its own (prime-ish, incommensurate) period so no two resolve together and none reads
+   as a fast mechanical loop. */
 @media (prefers-reduced-motion: no-preference){
   .hk-frame-founder.hk-frame-founder, .hk-frame-plaque-diam.hk-frame-plaque-diam,
   .hk-frame-foil.hk-frame-foil, .hk-frame-heraldic.hk-frame-heraldic,
   .hk-frame-onyx.hk-frame-onyx, .hk-frame-molten.hk-frame-molten,
   .hk-frame-boutique.hk-frame-boutique, .hk-frame-architect.hk-frame-architect,
-  .hk-frame-noir.hk-frame-noir{ animation:hkBorderSpin 9s linear infinite }
+  .hk-frame-noir.hk-frame-noir{ animation:hkBorderSpin 16s linear infinite }
+  .hk-frame-founder.hk-frame-founder{ animation-duration:13s }
+  .hk-frame-plaque-diam.hk-frame-plaque-diam{ animation-duration:19s }
+  .hk-frame-foil.hk-frame-foil{ animation-duration:23s }
+  .hk-frame-heraldic.hk-frame-heraldic{ animation-duration:17s }
+  .hk-frame-molten.hk-frame-molten{ animation-duration:14s }
+  .hk-frame-noir.hk-frame-noir{ animation-duration:29s }
+  .hk-frame-pro.hk-frame-pro{ animation:hkBorderSpin 25s linear infinite }
 }
 
 /* ---- r386: unified player card (.uc) — layout only; the skin bg/border/vars come
@@ -885,11 +897,14 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .uc-nm{font-size:24px;font-weight:700;letter-spacing:.3px;line-height:1.05}
 .uc.compact .uc-nm{font-size:18px}
 .uc-tier{font-size:11px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.uc-lvlwrap{flex:none;text-align:right;min-width:120px}
-.uc-lvl{font-size:12px;font-weight:700;color:var(--accent)}
-.uc-bar{height:6px;border-radius:99px;background:rgba(0,0,0,.35);overflow:hidden;margin-top:5px;border:1px solid var(--line)}
-.uc-bar>i{display:block;height:100%;background:var(--accent);border-radius:99px}
-.uc-xp{font-size:9px;color:var(--muted);margin-top:3px}
+/* r407 (Wolf): the LVL badge is the whole level UI now (xp bar + xp line retired) — a big,
+   legible tray pill, top-right. */
+.uc-lvlwrap{flex:none;text-align:right}
+.uc-lvl{display:inline-flex;align-items:center;font-size:19px;font-weight:800;letter-spacing:.02em;color:var(--accent);
+  background:color-mix(in srgb, currentColor 12%, transparent);border:1px solid color-mix(in srgb, currentColor 34%, transparent);
+  border-radius:10px;padding:5px 11px;line-height:1}
+.uc.compact .uc-lvl{font-size:15px;padding:4px 9px}
+.uc-div{height:1px;background:var(--line);border:0;margin:16px 0}
 .uc-div{height:1px;background:var(--line);border:0;margin:16px 0}
 .uc-stats{display:flex;gap:14px;flex-wrap:wrap}
 .uc.compact .uc-stats{gap:18px;margin-top:2px}
