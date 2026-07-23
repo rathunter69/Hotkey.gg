@@ -1181,14 +1181,14 @@ window.hkFrameOrnaments = (function(){
     constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','navchart'],   /* r404 (Wolf #95): a star-chart — constellation lines trace between stars under a slow compass reticle. Wholly distinct from PRO's Milky Way galaxy. */
     vaporwave:    ['SYNTHWAVE',   '#1a0722', 'linear-gradient(120deg,#ff5db1,#2ee6e6)', '#ff5db1', 'drive'],
     terminal:     ['● LIVE', '#1a1204', 'linear-gradient(90deg,#3a2a08,#7a5a12)', '#e0a02f', 'ticker'],   /* r403 (Wolf): the promised live ticker, now real */
-    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'galaxy'],
+    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'nebula'],   /* r404.2 (Wolf): soft zoomed-out nebula, not the hard spiral */
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
     molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
     founder:      ['★ FOUNDER','#100f18','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c89bff','aurora'],
     /* r390 (Wolf) new title skins */
     amethyst:     ['◆ AMETHYST','#180a2a','linear-gradient(120deg,#a06cff,#d0a8ff)','#c49bff','prism'],
-    onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','gold'],
+    onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','onyxfx'],   /* r404.2 (Wolf): black marble + gold veins (was gold dust, looked like boutique) */
     sakura:       ['❀ SAKURA','#3a1a26','linear-gradient(120deg,#ffd6e6,#ffaccb)','#ffb6d4','petals'],   /* r404 (Wolf): lighter, softer pink */
     goldenhour:   ['☀ GOLDEN HOUR','#3a1c10','linear-gradient(120deg,#ffd9a0,#ff9e7a)','#ffb488','bokeh'],
     pearl:        ['◗ PEARL','#2a2634','linear-gradient(120deg,#f0e6ff,#cfe6ff)','#e6d9ff','pearl'],
@@ -1196,7 +1196,7 @@ window.hkFrameOrnaments = (function(){
     cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','candy'],   /* r404 (Wolf): defined puffs, less blur */
     /* r391 (Wolf) chapter/cert capstone skins */
     architect:    ['△ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],  /* r393 (Wolf): ⟁ fell back to a ⚠-looking glyph in most fonts — a clean drafting triangle reads right */
-    boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','lux'],   /* r404 (Wolf): champagne spotlight + floating gold sequins (not pinstripes) */
+    boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','quilt'],   /* r404.2 (Wolf): quilted monogram lattice — foundational redesign, distinct from the gold-dust skins */
     emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','emerald']
   };
   return function(id, opts){
@@ -1328,6 +1328,19 @@ window.hkInitCardFx = function(root){
     function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
     function draft(w,h){return{gs:Math.max(22,Math.round(w/14))};}
+    /* r404.2 (Wolf) — PRO: a soft, zoomed-out nebula (drifting translucent colour clouds
+       over fine star dust) instead of the hard spiral galaxy. */
+    function nebula(w,h){const cols=[[150,120,255],[90,140,255],[255,200,120],[200,110,230]],blobs=[];
+      for(let i=0;i<4;i++)blobs.push({x:R(.2,.8)*w,y:R(.2,.8)*h,r:R(.32,.55)*Math.max(w,h),c:cols[i%cols.length],ph:R(0,6.28),sp:R(.3,.7),dx:R(-.05,.05),dy:R(-.04,.04)});
+      return{blobs,st:stars(w,h)};}
+    /* r404.2 (Wolf) — ELITE BOUTIQUE, foundational redesign: a quilted monogram lattice
+       (think a luxury handbag) with a diagonal sheen sweeping over the gold studs. */
+    function quilt(w,h){return{sp:Math.max(20,Math.round(w/9))};}
+    /* r404.2 (Wolf) — ONYX: black marble with luminous gold veins + a glint travelling each
+       vein. Distinct from the gold-dust skins (onyx/boutique/gold looked alike). */
+    function onyxfx(w,h){const veins=[];for(let i=0;i<5;i++){const pts=[];let x=R(0,w),y=R(-.1,.05)*h;
+      for(let s=0;s<8;s++){pts.push({x,y});x+=R(-.18,.18)*w;y+=h/6.5;} veins.push({pts,ph:R(0,6.28),sp:R(.4,.9)});}
+      return{veins};}
     function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
     /* r404 (Wolf #95) — NAVIGATOR star-chart: stars joined by faint constellation lines
        with a light pulse tracing each edge, under a slow-rotating compass reticle. */
@@ -1372,8 +1385,8 @@ window.hkInitCardFx = function(root){
         : kind==='emerald'?facet(S.w,S.h) : kind==='neon'?neonfx(S.w,S.h) : kind==='sheet'?sheetfx(S.w,S.h)
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
-        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
-        : kind==='gold'?gold(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h)
+        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
+        : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
       sys.push({cv,kind,S,parts});
@@ -1451,6 +1464,29 @@ window.hkInitCardFx = function(root){
         const a=(reduce?.5:.32+.28*(.5+.5*Math.sin(t/900*s.sp+s.ph)));
         const g=ctx.createRadialGradient(s.x,s.y,s.r*dpr*.25,s.x,s.y,s.r*dpr); g.addColorStop(0,s.c); g.addColorStop(.65,s.c); g.addColorStop(1,'transparent');
         ctx.globalAlpha=a;ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fill();ctx.globalAlpha=1; } }
+      else if(o.kind==='quilt'){ const sp=o.parts.sp;
+        // elite boutique: a quilted monogram lattice (diamonds) with gold studs, a diagonal
+        // sheen sweeping across and igniting the studs it crosses
+        ctx.strokeStyle='rgba(210,178,90,.13)'; ctx.lineWidth=1*dpr; ctx.beginPath();
+        for(let x=-h;x<w+h;x+=sp){ ctx.moveTo(x,0); ctx.lineTo(x+h,h); }
+        for(let x=0;x<w+h+h;x+=sp){ ctx.moveTo(x,0); ctx.lineTo(x-h,h); } ctx.stroke();
+        const sx=reduce?w*.5:(((t/4200)%1)*(w+h)-h);   // diagonal sweep front (x at y=0)
+        for(let gy=sp/2, ry=0; gy<h; gy+=sp, ry++){
+          for(let gx=(ry%2?sp:sp/2); gx<w; gx+=sp){
+            const d=Math.abs(gx-(sx+gy)), near=Math.max(0,1-d/(sp*1.6));
+            ctx.globalAlpha=reduce?.3:(.2+near*.6);
+            ctx.beginPath(); ctx.arc(gx,gy,(1.3+near*1.7)*dpr,0,6.28);
+            ctx.fillStyle='rgba(235,205,125,1)'; ctx.shadowBlur=near*7*dpr; ctx.shadowColor='rgba(245,215,140,.85)'; ctx.fill(); } }
+        ctx.globalAlpha=1; ctx.shadowBlur=0; }
+      else if(o.kind==='onyxfx'){ const P=o.parts;
+        // black marble + luminous gold veins, a glint travelling each vein
+        for(const v of P.veins){ ctx.strokeStyle='rgba(201,162,74,.30)'; ctx.lineWidth=1.4*dpr;
+          ctx.beginPath(); ctx.moveTo(v.pts[0].x,v.pts[0].y);
+          for(let i=1;i<v.pts.length;i++){ const p=v.pts[i],pm=v.pts[i-1]; ctx.quadraticCurveTo(pm.x,(pm.y+p.y)/2,p.x,p.y); }
+          ctx.stroke();
+          if(!reduce){ const gp=((t/3000*v.sp+v.ph/6.28)%1), idx=gp*(v.pts.length-1), i0=Math.floor(idx), f=idx-i0;
+            const p0=v.pts[i0], p1=v.pts[Math.min(v.pts.length-1,i0+1)], gx=p0.x+(p1.x-p0.x)*f, gy=p0.y+(p1.y-p0.y)*f;
+            ctx.beginPath(); ctx.arc(gx,gy,2.2*dpr,0,6.28); ctx.fillStyle='rgba(255,240,190,.92)'; ctx.shadowBlur=8*dpr; ctx.shadowColor='rgba(245,205,110,.9)'; ctx.fill(); ctx.shadowBlur=0; } } }
       else if(o.kind==='lux'){
         const off=reduce?.5:((t/5000)%1), lx=off*w;   // champagne spotlight travels L→R
         const rg=ctx.createRadialGradient(lx,h*.42,0,lx,h*.42,w*.42);
@@ -1490,6 +1526,16 @@ window.hkInitCardFx = function(root){
         ctx.fillStyle=cg;ctx.fillRect(0,0,w,h);
         for(const s of P.p){ const a2=s.ang+rot,x=P.cx+Math.cos(a2)*s.rad,y=P.cy+Math.sin(a2)*s.rad*.62,tw=reduce?.7:(.4+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(x,y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=tw;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
+      else if(o.kind==='nebula'){ const P=o.parts;
+        ctx.globalCompositeOperation='lighter';
+        for(const b of P.blobs){ if(!reduce){ b.x+=b.dx*dpr; b.y+=b.dy*dpr; if(b.x<w*.1||b.x>w*.9)b.dx*=-1; if(b.y<h*.1||b.y>h*.9)b.dy*=-1; }
+          const a=(reduce?.10:.06+.05*(.5+.5*Math.sin(t/2400*b.sp+b.ph)));
+          const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+          g.addColorStop(0,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+a+')'); g.addColorStop(1,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+',0)');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,6.28); ctx.fill(); }
+        ctx.globalCompositeOperation='source-over';
+        for(const s of P.st){ const a=reduce?.5:(.22+.5*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*.8*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.fill();ctx.globalAlpha=1; } }
       else if(o.kind==='aurora'){ ctx.globalCompositeOperation='lighter';
         for(const bd of o.parts.b){ const cx=w*(.5+.36*Math.sin(t/4200*bd.sp+bd.off)),hue=bd.hue+18*Math.sin(t/6000+bd.off);
           const g=ctx.createLinearGradient(cx-.22*w,0,cx+.22*w,h);
@@ -1560,29 +1606,22 @@ window.hkInitCardFx = function(root){
           ctx.fillText(it.v.toFixed(1), it.x+P.fs*.85, P.y); ctx.shadowBlur=0; }
         ctx.textBaseline='alphabetic'; }
       else if(o.kind==='prism'||o.kind==='emerald'){ const P=o.parts;
-        // amethyst = violet refraction · emerald = green refraction (same system, tinted)
+        // r404.2 (Wolf): the radial beams read as static "burst lines" — dropped. Now a soft
+        // breathing gem-glow (colour drifts) under drifting facet sparkles.
         const em=o.kind==='emerald';
-        const beamC=em?'150,232,184':'201,168,255', sparkC=em?['#7fe8b8','#b8f0d0','#ffffff','#4fd89a']:['#c9a8ff','#e0c0ff','#ffffff','#a880ff'];
-        ctx.globalCompositeOperation='lighter';
-        for(const b of P.beams){ if(!reduce) b.ang+=b.sp*(t-(b._pt||t)); b._pt=t;
-          const dx=Math.cos(b.ang),dy=Math.sin(b.ang),len=Math.max(w,h);
-          const g=ctx.createLinearGradient(P.cx,P.cy,P.cx+dx*len,P.cy+dy*len);
-          g.addColorStop(0,'rgba('+beamC+','+(reduce?.10:.16)+')'); g.addColorStop(1,'rgba('+beamC+',0)');
-          const px=-dy*b.wid*len, py=dx*b.wid*len;
-          ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(P.cx,P.cy);
-          ctx.lineTo(P.cx+dx*len+px,P.cy+dy*len+py); ctx.lineTo(P.cx+dx*len-px,P.cy+dy*len-py); ctx.closePath(); ctx.fill(); }
-        ctx.globalCompositeOperation='source-over';
-        for(let i=0;i<P.p.length;i++){ const s=P.p[i]; const a=reduce?.7:(.3+.6*(.5+.5*Math.sin(t/560*s.sp+s.ph)));
+        const sparkC=em?['#7fe8b8','#b8f0d0','#ffffff','#4fd89a']:['#c9a8ff','#e0c0ff','#ffffff','#a880ff'];
+        const hue=em?(140+18*Math.sin(t/3600)):(272+22*Math.sin(t/3600));
+        const glow=reduce?.12:(.10+.06*(.5+.5*Math.sin(t/2600)));
+        const cg=ctx.createRadialGradient(P.cx,P.cy,0,P.cx,P.cy,Math.max(w,h)*.55);
+        cg.addColorStop(0,'hsla('+hue+',70%,72%,'+glow+')'); cg.addColorStop(.6,'hsla('+hue+',65%,60%,'+(glow*.4)+')'); cg.addColorStop(1,'hsla('+hue+',60%,50%,0)');
+        ctx.fillStyle=cg; ctx.fillRect(0,0,w,h);
+        for(let i=0;i<P.p.length;i++){ const s=P.p[i];
+          if(!reduce){ s.y-=s.sp*.25*dpr; s.x+=Math.sin(t/1500+s.ph)*.2*dpr; if(s.y<-3){s.y=h+3;s.x=R(0,w);} }
+          const a=reduce?.7:(.28+.62*(.5+.5*Math.sin(t/560*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=sparkC[i%sparkC.length];ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=sparkC[i%sparkC.length];ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
       else if(o.kind==='neon'){ const P=o.parts;
-        // perspective floor grid (magenta), receding
-        ctx.strokeStyle='rgba(255,45,149,.22)'; ctx.lineWidth=1*dpr;
-        const vx=w/2, hz=P.hz; ctx.beginPath();
-        for(let i=-8;i<=8;i++){ ctx.moveTo(vx,hz); ctx.lineTo(vx+i*(w/8),h); } ctx.stroke();
-        const scroll=reduce?0:(t/620)%1;
-        ctx.strokeStyle='rgba(46,220,255,.28)';
-        for(let i=0;i<10;i++){ let f=(i+scroll)/10; f=f*f; const y=hz+(h-hz)*f; ctx.globalAlpha=Math.min(.6,f*1.5); ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); } ctx.globalAlpha=1;
-        // neon data-rain (magenta + cyan), fast
+        // r404.2 (Wolf): floor grid removed — it duplicated SYNTHWAVE. Pure neon data-rain + glitch now.
+        // neon data-rain (magenta + cyan), fast, full height
         ctx.lineWidth=1.6*dpr;
         for(const d of P.drops){ if(!reduce){ d.y+=d.sp*dpr; if(d.y-d.len*dpr>h){ d.y=R(-h*.3,0); d.x=R(0,w); d.cy=Math.random()<.5; } }
           const col=d.cy?'46,220,255':'255,45,149';

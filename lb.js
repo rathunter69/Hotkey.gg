@@ -791,6 +791,28 @@ function topPlayersHtml(){
   return '<div class="panel tp-panel"><h4>the field \u00b7 overall ranking</h4><div class="tp-scroll">'+rows+'</div></div>';
 }
 
+/* r404 (Wolf): the daily board is a TWO-COLUMN list now — the long horizontal "lanes"
+   are gone, and the compact rows fit ~20 names in the hero spot instead of 8. Rank +
+   name + time only; podium medals on the top three, top-10 tint carried across. */
+function dailyTwoColHtml(best, names, meId){
+  if(!best.length){
+    return '<div class="board board-open"><div class="board-cap"><h2>today’s global field</h2></div>'+
+      '<div class="empty" style="padding:14px 18px 10px">open board — <b>no times posted yet</b> · be the first →</div></div>';
+  }
+  const N=20, gl=['🥇','🥈','🥉'];
+  const cell=(r,i)=>{ const me=meId&&r.user_id===meId, medal=i<3?(' r'+(i+1)):'';
+    return '<div class="d2-row'+(me?' me':'')+(i<10?' t10':'')+'">'+
+      '<span class="d2-rk'+medal+'">'+(i<3?gl[i]:(i+1))+'</span>'+
+      '<span class="d2-nm" data-uid="'+r.user_id+'">'+esc(names[r.user_id])+schoolChipByUid(r.user_id,13)+'</span>'+
+      '<span class="d2-tm">'+fmt(r.time_ms)+'</span></div>'; };
+  const rows=best.slice(0,N).map(cell).join('');
+  let extra='';
+  const myIdx=meId?best.findIndex(r=>r.user_id===meId):-1;
+  if(myIdx>=N){ const r=best[myIdx];
+    extra='<div class="d2-you"><span class="d2-rk">'+(myIdx+1)+'</span><span class="d2-nm">'+esc(names[r.user_id])+'</span><span class="d2-tm">'+fmt(r.time_ms)+'</span></div>'; }
+  return '<div class="board"><div class="board-cap"><h2>today’s global field</h2><span class="lvl">'+best.length+' in today</span></div>'+
+    '<div class="daily-2col">'+rows+'</div>'+extra+'</div>';
+}
 /* r393 (Wolf): the Daily Challenge rides the HERO row (right of the your-card) as its own
    board. Extracted from the old featuredHtml() — the weekly gauntlet is dropped from the main
    dashboard entirely; the overall field + top desks fill the featured row below. */
@@ -819,7 +841,7 @@ function dailyHeroHtml(){
       '<div class="fd-head"><span class="fd-live">● live</span><b>◆ the Daily Challenge · '+dl+'</b>'+
       '<span class="fd-meta">resets in ~'+hrsLeft+'h · top 3 medal · top 10 +40 xp and a card badge'+(podium?' · yesterday: '+podium:'')+'</span>'+
       '<a class="fd-play" href="index.html?daily=1">play it →</a></div>'+
-      boardHtml({label:'today’s global field', lvl:dailyDate}, bestD.slice(0,8), names, meId, {medals:true})+
+      dailyTwoColHtml(bestD, names, meId)+
     '</div>';
 }
 /* r393 (Wolf): Top Desks for the featured row — reuses deskStandingsHtml(); when there is no

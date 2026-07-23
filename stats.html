@@ -152,7 +152,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=287"></script>
+<script src="themes.js?v=288"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -417,10 +417,14 @@ async function load(){
       const __rarChips=['common','rare','epic','legendary','mythic'].filter(t=>rarPresent[t]).map(t=>{
         const col={common:__RCq.c,rare:__RCq.r,epic:__RCq.e,legendary:__RCq.l,mythic:__RCq.m}[t]||'var(--muted)';
         return '<button class="ach-rf" data-r="'+t+'" style="--rc:'+col+'">'+t+'</button>'; }).join('');
+      /* r404 (Wolf): default to the EARNED view (any rarity) — a streamlined "what I've won"
+         wall; chips still open all/in-progress/locked. New users with nothing earned fall
+         back to "all" so the wall never looks empty on first visit. */
+      const __defF = earnedN>0 ? 'earned' : 'all';
       html += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span>'+
         '<span class="ach-filters">'+
-          '<button class="ach-f on" data-f="all">all</button>'+
-          '<button class="ach-f" data-f="earned">earned</button>'+
+          '<button class="ach-f'+(__defF==='all'?' on':'')+'" data-f="all">all</button>'+
+          '<button class="ach-f'+(__defF==='earned'?' on':'')+'" data-f="earned">earned</button>'+
           '<button class="ach-f" data-f="prog">in progress</button>'+
           '<button class="ach-f" data-f="locked">locked</button>'+
           '<span class="ach-fdiv"></span>'+
@@ -430,7 +434,7 @@ async function load(){
         /* r376: legend rides the shared HK_RARITY map \u2014 same colors the badge rings wear */
         (function(){ const RC=window.HK_RARITY||{};
           return '<br>color = rarity: <b style="color:'+RC.c+'">COMMON</b> \u00b7 <b style="color:'+RC.r+'">RARE</b> (\u226425% of players) \u00b7 <b style="color:'+RC.e+'">EPIC</b> (\u226410%) \u00b7 <b style="color:'+RC.l+'">LEGENDARY</b> (\u22643%) \u00b7 <b style="color:'+RC.m+'">MYTHIC</b> (the rarest handful)</div>'; })()+
-        '<div class="ach-grid">'+grid+'</div>';
+        '<div class="ach-grid"'+(__defF==='earned'?' data-f="earned"':'')+'>'+grid+'</div>';
     }
   }catch(e){}
 
