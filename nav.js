@@ -777,20 +777,10 @@
         __tagBits+='<span class="uc-tag">'+(window.schoolChip?window.schoolChip(mySchoolTag,20):'')+'<span>'+escHtml(nm)+'</span></span>'; }
       if(__lo.show && __lo.show.desk && meT.team_code) __tagBits+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+escHtml(meT.team_code)+'</span></span>';
     }catch(e){}
-    /* r393 (Wolf): the owner card must POP UP LIKE THE PUBLIC (leaderboard name-click)
-       card — one card, no light box under it. The public card renders BARE when skinned
-       (.pub-bare) and carries its footer INSIDE the .uc via footHtml. Mirror that: the rank
-       link + owner actions + PNG note ride the card as an .uc-foot block, and the .pc-owner
-       holder goes bare when a skin is equipped so the skin IS the whole modal. */
-    const __ownerFoot = '<div class="uc-foot uc-foot-owner">' +
-        '<a class="pc-rankhow" title="how rank works">rank · speed ›</a>' +
-        '<span class="ucf-gap"></span>' +
-        '<a class="pc-customize" id="pcCustomize" title="customize your card">✎ customize</a>' +
-        '<a href="leaderboard.html">leaderboard ↗</a>' +
-        '<a id="pcShare">⬇ share</a>' +
-        (window.__hkNoHandle?'<a id="pcSetName" style="color:var(--accent)">set name</a>':'') +
-      '</div>' +
-      '<div class="ucf-note">the card downloads as a PNG · <a id="pcProThemes" data-tip="custom card themes land with PRO at launch">card themes — PRO</a></div>';
+    /* r406 (Wolf): "one specific exact object that should display and scale the same
+       way … just get rid of them." The rank-click card is now the profile card and
+       NOTHING else — no owner action bar, no footer. Just the pixel-identical .uc + the
+       corner ✕. (Customize/share/leaderboard all live on their own pages.) */
     const __pcCard = window.hkPlayerCard ? window.hkPlayerCard({
       name: handle, show: __lo.show,
       tierEmblem: (window.rankEmblem?window.rankEmblem(tier.name,60,tier.bucket):''),
@@ -799,9 +789,8 @@
       lvl: __L.lvl, pct: __L.pct, xpLine: __L.into+' / '+__L.need+' xp'+__promo,
       stats: [{n:(d.mySolves||0),label:'clean solves'},{n:__crowns,label:'crowns'},{n:__pods,label:'podiums'},{n:__boards,label:'boards'},{n:(__streak?'🔥 '+__streak:'—'),label:'streak'}],
       tagsHtml: __tagBits, medals: __medals, medalSlots: 5, boards: [],
-      footHtml: __ownerFoot,
-      /* r391 (Wolf): render EXACTLY like the profile card — the skin rides the .uc
-         (pass the flair), not the 640px shell. .pc-owner sizes the holder to 430px. */
+      /* r406 (Wolf): render EXACTLY like the profile card — the skin rides the .uc,
+         with NO footer baked inside (actions moved to the external .uc-ownerbar below). */
       flair: __safeFlair, owner: true
     },{scale:'full'}) : '';
     m.innerHTML = '<div class="pc-card pc-owner'+(__isFrame?' pc-bare':'')+'">' +

@@ -56,14 +56,14 @@ window.HOTKEY_DRILLS = {
   // ---------------------------------------------------------------
   meta: {
     // Foundations
-    navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'A literal maze of bold walls — Ctrl+arrow shoots down a corridor to the next wall, single arrows step around corners. Collect every pip, grab the model, and weave it back to the drop zone' },
-    autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — Alt H O I fits the columns' },
+    navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'A literal maze of bold walls — shoot down a corridor to the next wall, or step around corners one cell at a time. Collect every pip, grab the model, and weave it back to the drop zone' },
+    autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — autofit the columns to their content' },
     rowops:     { name:'Rows',     label:'Rebuild the schedule',    tab:'Rows',     desc:'Insert a row and paste the staged line in, delete the junk \u2014 the live SUM widens and contracts itself' },
-    colops:     { name:'Columns',  label:'Columns move too',        tab:'Columns',  desc:'Ctrl+Space selects it, Alt H D C deletes it, Alt H I C inserts one' },
-    filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Ctrl+D and Ctrl+R — one formula, whole block' },
+    colops:     { name:'Columns',  label:'Columns move too',        tab:'Columns',  desc:'Select the whole column, delete the stale one, insert the one that is missing' },
+    filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Fill down and fill right — one formula, whole block' },
     blocksel:   { name:'Block Sel.',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves into a headed output, add a margin note, then format it to match' },
-    editfix:    { name:'Edit',     label:'Fix the typos in place',  tab:'Edit',     desc:'Three typos, three F2 repairs — never retype a cell' },
-    undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete big, Ctrl+Z, then delete only what deserved it' },
+    editfix:    { name:'Edit',     label:'Fix the typos in place',  tab:'Edit',     desc:'Three typos, three in-place repairs — never retype a cell' },
+    undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete big, undo, then delete only what deserved it' },
     pastes:     { name:'Paste Sp.',label:'Alt E S everything',      tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'3-yr cascade: MIN rations, both tranches corkscrew across' },
     cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche corkscrews, total debt ruled off' },
@@ -76,7 +76,7 @@ window.HOTKEY_DRILLS = {
     dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
     retbridge:  { name:'Ret. Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
     football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
-    copyover:   { name:'Copyover', label:'Chain the hand-offs', tab:'Copy',  desc:'Formulas travel with Ctrl+C \u2014 chain a block, a peeled column, then values-only for the summary' },
+    copyover:   { name:'Copyover', label:'Chain the hand-offs', tab:'Copy',  desc:'Formulas travel when you copy them \u2014 chain a block, a peeled column, then values-only for the summary' },
 
     // Formatting group — plus triage/versionup, which live in Formulas II now (groups[] above is authoritative)
     housestyle: { name:'House Style', label:'Clean it to standard', tab:'House Style', desc:'A full cleanup pass: title, headers, blue inputs (one buried), commas, %, ruled off' },
@@ -84,7 +84,7 @@ window.HOTKEY_DRILLS = {
     ruleaudit:  { name:'Ruling Pass', label:'The ruling pass', tab:'Ruling Pass', desc:'The page says done \u2014 the pass disagrees. Find the missing rulings, fix only those' },
     combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Bold, comma, wrap and autofit a pasted table' },
     typeset:    { name:'Typeset',  label:'Typeset the memo',    tab:'Typeset',     desc:'Bold, unbold, italic memos, strike the dead line, =TODAY() stamp' },
-    decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Alt H 9 / Alt H 0 — dollars none, multiples and percents one' },
+    decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Add and remove decimal places — dollars none, multiples and percents one' },
     dress:      { name:'Format tab', label:'Full formatting pass', tab:'Dress', desc:'Title ruled, inputs blue, percents, commas \u2014 book-ready' },
     triage:     { name:'Error triage', label:'Error triage \u2014 #REF! #DIV/0! #VALUE!', tab:'Triage', desc:'Three classic breaks \u2014 read the error, rebuild the intent' },
     versionup:  { name:'Roll-forward prep', label:'Replace hardcodes so it rolls forward', tab:'Rollfwd', desc:'Typed answers \u2192 live formulas; v2 must survive new numbers' },
@@ -92,21 +92,21 @@ window.HOTKEY_DRILLS = {
     gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Model',       desc:'A full model-ready formatting pass' },
 
     // Values-hygiene pair — both live in Data & Lookups now
-    drill:      { name:'Hardcode', label:'Hardcode it',         tab:'Hardcode',    desc:'Break the links before it ships — ESV in place, painted blue' },
+    drill:      { name:'Hardcode', label:'Hardcode it',         tab:'Hardcode',    desc:'Break the links before it ships — paste values in place, painted blue' },
     series:     { name:'Series',   label:'Stub the year header',tab:'Years',       desc:'Fill the year header, then bold + right-align it' },
 
     // Data
     sort:       { name:'Sort',     label:'Sort the table',tab:'Sort',       desc:'Sort the table, total it, bold the total' },
     scrub:      { name:'Scrub',    label:'Clean the export',     tab:'Scrub',      desc:'A system export with a duplicate header, a page-break row, and a stale SUBTOTAL \u2014 delete all three, sort, re-total' },
     recon:      { name:'Recon',    label:'Two systems, one truth',tab:'Recon',     desc:'COUNTIF for presence, INDEX/MATCH for amounts \u2014 drive \u0394 to zero' },
-    grpfold:    { name:'Group',    label:'Fold the detail away', tab:'Group',      desc:'Shift+Alt+\u2192 groups the months \u2014 never hide, always group' },
-    filterpass: { name:'Filter',   label:'Work the filtered view', tab:'Filter',    desc:'Ctrl+Shift+L turns on filters, Alt+\u2193 opens the picker \u2014 the answer reads itself' },
+    grpfold:    { name:'Group',    label:'Fold the detail away', tab:'Group',      desc:'Group the months \u2014 never hide, always group' },
+    filterpass: { name:'Filter',   label:'Work the filtered view', tab:'Filter',    desc:'Turn on the filter, open the picker \u2014 the answer reads itself' },
     unhide:     { name:'Unhide',   label:'Unhide the rows',  tab:'Unhide',    desc:'Hidden rows lie \u2014 unhide the sins, group them right, set a real width' },
 
     // Formulas & auditing — spans Formulas I and Formulas II, plus the Models drills
     margin:     { name:'Margins',  label:'Margins across the page', tab:'Margin',  desc:'EBITDA ÷ revenue, three comp tables — pointed, filled, %' },
-    anchor:     { name:'Anchors',  label:'Pin it with F4',          tab:'F4',      desc:'F4 cycles the locks — one pinned formula prices the whole grid' },
-    growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'Consolidate, YoY as %, CAGR with ^ — a real revenue build' },
+    anchor:     { name:'Anchors',  label:'Pin it with F4',          tab:'F4',      desc:'Cycle the reference locks — one pinned formula prices the whole grid' },
+    growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'Consolidate, YoY as %, CAGR — a real revenue build' },
     wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
     fcfbuild:   { name:'uFCF',     label:'Build the unlevered FCF', tab:'uFCF',    desc:'EBIT \u2192 less taxes \u2192 NOPAT \u2192 plus D&A, less capex and the NWC build: the row every DCF discounts, filled across five years' },
     dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'DF row \u00d7 PV row; the TV reuses the year-5 factor' },
@@ -116,7 +116,7 @@ window.HOTKEY_DRILLS = {
     debtblock:  { name:'Debt block',label:'Build the debt & interest block',tab:'Debt block',desc:'Two tranches, each rolling on its own anchored rate — senior and sub corkscrews, both interest lines, then total debt and total interest' },
     dashcover:  { name:'Model cover',label:'Build the model cover',  tab:'Model cover',desc:'The page-one output box: reference the model into the headline metrics, then stamp the cover title clean with UPPER(TRIM())' },
     lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — then IRR over the hold' },
-    modeltour:  { name:'Model Tour', label:'Follow the markers', tab:'Model Tour', desc:'Four subtotals blown to #REF! \u2014 ctrl-jump to each, rebuild the cascade formula' },
+    modeltour:  { name:'Model Tour', label:'Follow the markers', tab:'Model Tour', desc:'Four subtotals blown to #REF! \u2014 jump to each, rebuild the cascade formula' },
     revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'MIN/MAX sweep ×4 years, then prove out both balances' },
     cagr:       { name:'CAGR',     label:'Compound it, three times', tab:'CAGR',   desc:'(End÷Begin)^(1÷yrs)−1 — three scattered blocks' },
     sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'SUMIF rollup + live foot + % of total, summary dressed' },
@@ -129,9 +129,9 @@ window.HOTKEY_DRILLS = {
     audit:      { name:'Review Pass', label:'Review pass \u2014 find what\u2019s broken', tab:'Audit', desc:'Three planted breaks in a real P&L \u2014 find them all' },
     balcheck:   { name:'Make It Tie', label:'Make it tie \u2014 hunt the break', tab:'Make It Tie', desc:'The check row was pasted over \u2014 resurrect it, run both breaks down' },
     stalelink:  { name:'Stale Links',label:'Re-point the stale links', tab:'Stale', desc:'Assumptions moved to v2 \u2014 three cells still read the dead block' },
-    wirewalk:   { name:'Trace',    label:'Trace the precedents',       tab:'Trace',   desc:'Ctrl+[ rides to the source, Ctrl+] rides back \u2014 fix it upstream' },
-    tieout:     { name:'Tie-out',  label:'F9 the suspect leg',         tab:'Tie-out', desc:'Ctrl+[ into the wiring, F9 collapses each leg to its dead value \u2014 find the stale link, repoint it' },
-    hunt:       { name:'Audit',    label:'Hunt the hardcodes',  tab:'Audit',   desc:'F5 \u2192 special \u2192 constants \u2014 every number a formula should own lights up' },
+    wirewalk:   { name:'Trace',    label:'Trace the precedents',       tab:'Trace',   desc:'Trace to the source and ride back \u2014 fix it upstream' },
+    tieout:     { name:'Tie-out',  label:'F9 the suspect leg',         tab:'Tie-out', desc:'Trace into the wiring, collapse each leg to its dead value \u2014 find the stale link, repoint it' },
+    hunt:       { name:'Audit',    label:'Hunt the hardcodes',  tab:'Audit',   desc:'Go To Special \u2192 constants \u2014 every number a formula should own lights up' },
     wrapfix:    { name:'IFERROR',  label:'Wrap it or fix it',   tab:'IFERROR', desc:'Wrap the truly missing, fix the merely broken \u2014 never bury errors' },
     signerr:    { name:'Sign Sweep', label:'Flip the signs back', tab:'Signs', desc:'Pasted costs came in positive \u2014 sweep the signs, prove EBIT, margin it' },
     percent:    { name:'% of rev', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
