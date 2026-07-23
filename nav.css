@@ -453,12 +453,13 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   background:radial-gradient(ellipse at 30% 4%,rgba(223,244,255,.2),transparent 55%),linear-gradient(#0a1418,#081014) padding-box, linear-gradient(135deg,#ffffff,#9be0f7 24%,#7fa8ff 44%,#c9a8ff 64%,#ffc2e8 82%,#dff4ff) border-box}
 
 /* 3 · FOIL (epic) — conic sheen border + fan corners + scalloped inner edge */
-/* r404.4 (Wolf #96): FOIL → a purple holographic THEME card (iridescent violet/magenta
-   border, dark violet interior; the holo canvas rides over it). */
-.hk-frame-foil.hk-frame-foil{--text:#f0e2ff;--muted:#b795d8;--line:#42285a;--accent:#d0a8ff;--accent-dim:#7b2ff7; color:#f0e2ff;
-  border:2px solid transparent; box-shadow:0 0 22px rgba(150,80,240,.24),0 20px 60px rgba(0,0,0,.6);
-  background:radial-gradient(ellipse at 28% 6%,rgba(150,80,240,.34),transparent 55%),linear-gradient(#160a24,#12081c) padding-box, linear-gradient(120deg,#c77dff,#7b2ff7 45%,#ff6ad5) border-box}
-.hk-frame-foil .pc-name span,.hk-frame-foil .pub-nm{color:#e0c0ff; text-shadow:0 0 10px rgba(180,110,255,.5)}
+/* r404.5 (Wolf): FOIL → a "super diamond" holographic THEME card — the diamond/Second-Year
+   palette (icy prismatic), a brilliant full-spectrum edge, and a holographic sheen. Not the
+   old teal, not purple, not starfield (constellation + pro already own space). */
+.hk-frame-foil.hk-frame-foil{--text:#eaf6ff;--muted:#9fc4dc;--line:#274458;--accent:#eaf8ff;--accent-dim:#8fd0e8; color:#eaf6ff;
+  border:2px solid transparent; box-shadow:0 0 24px rgba(140,200,255,.22),0 20px 60px rgba(0,0,0,.6);
+  background:radial-gradient(ellipse at 28% 6%,rgba(150,210,255,.22),transparent 55%),linear-gradient(#0a1418,#08101a) padding-box, linear-gradient(135deg,#ffffff,#9be0f7 22%,#7fa8ff 44%,#c9a8ff 66%,#ffc2e8 84%,#eaf8ff) border-box}
+.hk-frame-foil .pc-name span,.hk-frame-foil .pub-nm{color:#eaf6ff; text-shadow:0 0 10px rgba(150,210,255,.5)}
 
 /* 4 · HERALDIC (legendary) — r404.4 (Wolf #96): crimson-and-gold heraldic THEME card. */
 .hk-frame-heraldic.hk-frame-heraldic{--text:#f6e2d2;--muted:#c99a86;--line:#5a221a;--accent:#e6b84a;--accent-dim:#9c2a1c; color:#f6e2d2;
