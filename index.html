@@ -1608,7 +1608,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=293"></script>
+<script src="nav.js?v=294"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -8384,6 +8384,7 @@ function render(){
     const __availH = __gw.clientHeight - 17 - 31;          // usable height minus header
     __VR = Math.max(S.ROWS, Math.round(__availH / __CELL_TARGET));   // canvas rows: content + empty filler
     __rowH = Math.max(18, Math.min(40, Math.floor(__availH / __VR)));
+    S._renderedGwH = __gw.clientHeight;                    // r409: record what we fit to; the ResizeObserver re-fits when the stage settles to a different height
   } else if(__gw && !S._gridMeasureRetry){
     /* r406 (Wolf: "every drill other than navigate is in the old grid sizing"): most drills
        render the FIRST time before the grid box has laid out (clientHeight ~0), so they fell
@@ -11967,6 +11968,26 @@ function toggleFullscreen(){
   document.addEventListener('fullscreenchange', __fsRefit);
   document.addEventListener('webkitfullscreenchange', __fsRefit);
   try{ updateFsBtn(); }catch(e){}
+  /* r409 (Wolf: "every other drill is still the legacy 14 row layout"): the one-shot post-layout
+     retry wasn't enough — a drill can first render at an INTERMEDIATE stage height (>100px but
+     mid-layout), take the measured branch, fit to that too-short height, and never re-measure —
+     leaving the old ~14-row look with dead space below. Nav only self-corrected because it
+     re-renders on navProgress. A ResizeObserver on the gridwrap re-fits EVERY drill whenever the
+     stage settles to (or changes to) a different height — initial layout, window resize, fullscreen.
+     render() only sets --cellh/rows and never changes the gridwrap's own flex height, so this can't loop. */
+  try{
+    if(window.ResizeObserver && !S._gridRO){
+      const __gwEl=$('gridwrap');
+      if(__gwEl){
+        S._gridRO=new ResizeObserver(()=>{
+          if(S._gridROpend) return; S._gridROpend=1;
+          requestAnimationFrame(()=>{ S._gridROpend=0;
+            try{ const w=$('gridwrap'); if(w && w.clientHeight>100 && Math.abs(w.clientHeight-(S._renderedGwH||0))>6) render(); }catch(e){} });
+        });
+        S._gridRO.observe(__gwEl);
+      }
+    }
+  }catch(e){}
 }
 /* ---- r157: THE WEAKNESS QUEUE (PRO pillar #2; free in beta via requirePro) ----
    The site builds the session: score every drill from LOCAL data only —

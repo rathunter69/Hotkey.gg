@@ -364,6 +364,9 @@
         let __ch=false;
         if(localStorage.getItem('hk_ranked')!=='1'){ localStorage.setItem('hk_ranked','1'); __ch=true; }
         if(localStorage.getItem('hk_beta_unlock')!=='1'){ localStorage.setItem('hk_beta_unlock','1'); __ch=true; }
+        /* r408 (Wolf): mark placements DONE for his account so the real tier shows and he can
+           verify the level/rank wiring end-to-end (his rank still computes from his real runs). */
+        if(localStorage.getItem('hk_placement_done')!=='1'){ localStorage.setItem('hk_placement_done','1'); __ch=true; }
         if(__ch){ try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} }
       } }catch(e){}
     /* r336 (Wolf): the pill honors the ranked opt-in. Not entered -> a quiet "Unranked" chip;
@@ -413,7 +416,8 @@
       }catch(e){}
       const P=(window.HK_PLACEMENT?window.HK_PLACEMENT.KEYS:[]);
       const doneN=P.filter(k=>(d.myRuns||[]).some(r=>r.challenge===k)).length;
-      if(P.length && doneN<P.length){
+      const __plDone=(function(){ try{ return localStorage.getItem('hk_placement_done')==='1'; }catch(e){ return false; } })();   // r408 (Wolf): owner override to verify wiring
+      if(P.length && doneN<P.length && !__plDone){
         el.innerHTML='<span>\u2694 placement '+doneN+'/'+P.length+'</span>';
         el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
         el.title='placement series \u2014 post a time on each of the five standard boards'; el.onclick=openProfile;
@@ -446,7 +450,7 @@
       ['hotkey_pb','hk_runs_lite','hotkey_solves','hotkey_streak','hk_camp_xp','hk_clears',
        'hk_clears_day','hk_key_counts','hk_keys_lifetime','hk_keystats_seeded','hk_ach_flags',
        'hk_ach_seen','hk_feat_ach','hk_band_best','hk_dc_done','hk_ranked','hk_seen_tier',
-       'hk_xlv','hk_last_drill'].forEach(k=>localStorage.removeItem(k));
+       'hk_xlv','hk_last_drill','hk_placement_done'].forEach(k=>localStorage.removeItem(k));
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
         if(k && k.indexOf('hk_ghost_')===0) localStorage.removeItem(k); }   // per-drill ghost replays
     }catch(e){}

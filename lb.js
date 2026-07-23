@@ -619,7 +619,8 @@ function heroHtml(){
   {
     const pset=(window.HK_PLACEMENT?window.HK_PLACEMENT.KEYS:[]).filter(k=>CH.some(c=>c.key===k));
     const done=pset.filter(k=>DATA.fRuns.some(r=>r.user_id===meId && r.challenge===k));
-    if(pset.length && done.length<pset.length){
+    const plDone=(function(){ try{ return localStorage.getItem('hk_placement_done')==='1'; }catch(e){ return false; } })();   // r408 (Wolf): owner override to verify wiring
+    if(pset.length && done.length<pset.length && !plDone){
       /* r383 (Wolf: dead middles on the checklist too): each row's stretch between the
          drill and its action carries the catalog band in muted mono \u2014 the "one from
          each band" claim in the copy, made legible per row. The .pl-foot note takes
