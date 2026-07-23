@@ -715,26 +715,29 @@ function rankedInfographic(){
     document.body.appendChild(m); }
   const T=window.HK_RANK.TIERS;
   let rows='';
-  T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:10px;padding:7px 4px;font-family:var(--mono);font-size:12.5px">'+   /* r374: 22 @ gap 10 — same row scale as the tier roster */
-    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,22):'')+'</span>'+
-    '<span>'+t.name+'</span><span style="margin-left:auto;color:var(--faint);font-size:10.5px">'+(t.att?t.att+' drills \u00b7 top '+Math.round(Math.min(1,t.pct)*100)+'%':'start here')+'</span></div>'; });
-  m.innerHTML='<div class="panel" style="max-width:460px;width:100%">'+
-    '<h4>welcome to ranked</h4>'+
-    '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.8;margin-bottom:12px">'+
-    'Entry starts with a <b>placement series</b> \u2014 the same five standard boards for every analyst '+
-    '(one from each band of the catalog); your first rank shows once all five are posted.<br><br>'+
-    'Your rank = your <b>average placement</b> across the boards you\u2019ve entered \u2014 stabilized two ways: '+
-    'with only a few boards, your rating starts near the middle and your results pull it toward your true level (so two fast drills alone can\u2019t rank you high); '+
-    'and small fields count for less than big ones (1st of 2 says less than 4th of 40). Until you\u2019ve faced enough real competition, your rank is capped and tagged <b>provisional</b> \u2014 everyone starts low and climbs from there. Breadth and placement both count.<br><br>'+
-    'Each tier splits into three <b>buckets</b> by where you sit inside that tier\u2019s band: '+
-    'you enter at <b>Bottom Bucket</b>, pass through <b>Middle</b>, and reach <b>Top Bucket</b> as your average placement improves \u2014 clear the band and you promote to the next tier.</div>'+rows+
-    '<div style="font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:10px">Ranks are live: they can fall as well as rise when other players improve.</div>'+
-    '<div style="display:flex;gap:10px;margin-top:16px"><button class="tab on" id="rankedGo" style="flex:1;text-align:center;font-size:13px;padding:11px">Enter Ranked \u2694</button>'+
+  T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:10px;padding:6px 2px;font-family:var(--mono);font-size:12px">'+
+    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,20):'')+'</span>'+
+    '<span>'+t.name+'</span><span style="margin-left:auto;color:var(--faint);font-size:10px">'+(t.att?t.att+' drills · top '+Math.round(Math.min(1,t.pct)*100)+'%':'start here')+'</span></div>'; });
+  /* r406 (Wolf): the old panel had no height cap or inner scroll, so on a short viewport the
+     tall copy overflowed the center-aligned parent and the buttons fell off-screen ("thin,
+     runs past the page, no button"). Flex column: header + SCROLLABLE tier list + pinned
+     footer, capped at the viewport. Copy tightened to one pithy paragraph. */
+  m.innerHTML='<div class="panel" style="max-width:440px;width:100%;max-height:calc(100vh - 40px);display:flex;flex-direction:column;padding:0;overflow:hidden">'+
+    '<div style="padding:20px 22px 12px"><h4 style="margin:0 0 10px">welcome to ranked</h4>'+
+    '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.65">'+
+    'Post a time on the <b>placement series</b> — five standard boards, one per band — and you get a rank. Your rank is your '+
+    '<b>average placement</b> across the boards you enter — stabilized so a couple of fast drills can’t '+
+    'vault you, and big fields count more than small ones. Each tier has <b>Bottom / Middle / Top</b> buckets; '+
+    'clear the band to promote. Ranks are live — they move as others improve.</div></div>'+
+    '<div style="overflow-y:auto;padding:2px 22px 6px;flex:1;min-height:0">'+rows+'</div>'+
+    '<div style="display:flex;gap:10px;padding:14px 22px 18px;border-top:1px solid var(--line)">'+
+    '<button class="tab on" id="rankedGo" style="flex:1;text-align:center;font-size:13px;padding:11px">Enter Ranked ⚔</button>'+
     '<button class="tab" id="rankedWait" style="padding:11px 18px;font-size:12px">Not yet</button></div></div>';
   document.getElementById('rankedGo').onclick=()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){} try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} m.remove(); load(); };
   document.getElementById('rankedWait').onclick=()=>m.remove();
   m.addEventListener('click',e=>{ if(e.target===m) m.remove(); },{once:true});
 }
+
 function ladderHtml(){
   const {userStat,meId}=DATA;
   const me=(meId&&userStat[meId])||{att:0,sum:0};

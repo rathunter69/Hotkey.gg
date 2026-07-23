@@ -1598,14 +1598,14 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=276"></script>
-<link rel="stylesheet" href="nav.css?v=195">
+<script src="drills.js?v=277"></script>
+<link rel="stylesheet" href="nav.css?v=196">
 <script src="themes.js?v=291"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=291"></script>
+<script src="nav.js?v=292"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2009,7 +2009,7 @@ const CHALLENGES = {
   gauntlet:{
     name:'Gauntlet', label:'Make it model-ready', par:63, parKeys:66,
     aha:'Model-ready is one rhythm: bold, comma, border, blue inputs — and the totals in accounting format (Alt H A N).',
-    prompt:'Format both blocks of a raw sources & uses (the two-sided table of where deal money comes from and where it goes): inputs in blue, SUM each total with Alt+=, bold with a top border on both totals, commas at 0 decimals down both money columns, and autofit so nothing clips. Every formatting operation you know, both sides of the page, no mouse.',
+    prompt:'Format both blocks of a raw sources & uses (the two-sided table of where deal money comes from and where it goes): inputs in blue, SUM each total, bold with a top border on both totals, commas at 0 decimals down both money columns, and autofit so nothing clips. Every formatting operation you know, both sides of the page, no mouse.',
     req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h f c blue font \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b p</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
     guide(){ const R=this._R; return [
       'both input stacks in blue font: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 Blue <kbd>\u21b5</kbd> \u00b7 then the same on '+R.useIn,
@@ -2073,11 +2073,11 @@ const CHALLENGES = {
       const acct=!!(tS&&tS.fmtStyle==='acct')&&!!(tU&&tU.fmtStyle==='acct');
       const af=!overflowsCol(S,2)&&!overflowsCol(S,5);
       return [
-        {label:'Blue the inputs on BOTH stacks (alt h f c) — blue font marks typed data', ok:fill},
-        {label:'SUM both totals \u2014 alt+= twice', ok:sum},
+        {label:'Blue the inputs on BOTH stacks — blue font marks typed data', ok:fill},
+        {label:'SUM both totals \u2014 one per side', ok:sum},
         {label:'bold both total rows and add a top border above them', ok:tot},
         {label:'comma-format both money BODIES, 0 decimals', ok:cf},
-        {label:'the two totals in accounting format \u2014 alt h a n, the S&U convention', ok:acct},
+        {label:'the two totals in accounting format \u2014 the S&U convention', ok:acct},
         {label:'Autofit \u2014 no #### left on either side', ok:af},
       ];
     }
@@ -2225,7 +2225,7 @@ const CHALLENGES = {
         {label:'add a top border above each subtotal row \u2014 rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
         {label:'pull EBITDA through \u2014 formulas, not typed numbers', ok: ebOk},
         {label:'bold the EBITDA line and add a top border above it', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
-        {label:'box the MD headline at '+R.focus+' with a THICK box (alt h b t)', ok: !!(cell(R.focus).ball && cell(R.focus).thick)},
+        {label:'box the MD headline at '+R.focus+' with a THICK box', ok: !!(cell(R.focus).ball && cell(R.focus).thick)},
       ];
     }
   },
@@ -2328,7 +2328,7 @@ const CHALLENGES = {
   decimals:{
     name:'Decimals', label:'Standardize the decimals', par:18, parKeys:15,
     aha:'Alt H 0 adds a decimal, Alt H 9 drops one — dollars take 0, multiples and percents take 1.',
-    prompt:'Standardize the decimals on the comps page (comparable-company multiples — EV/EBITDA and friends). House rule: dollars take no decimals; multiples and percents take one. Alt H 9 removes a decimal place, Alt H 0 adds one back. Work each column to the standard.',
+    prompt:'Standardize the decimals on the comps page (comparable-company multiples — EV/EBITDA and friends). House rule: dollars take no decimals; multiples and percents take one. Add or remove decimal places to work each column to the standard.',
     req(){ const o=this._o; return '<em>'+o.evR+'</em> · <em>alt h 9</em> ×2 → whole dollars · <em>'+o.mR+'</em> · <em>alt h 0</em> → one place · <em>'+o.pR+'</em> · <em>alt h 9</em> ×2 → one place'; },
     guide(){ const o=this._o; return [
       'dollars first — select '+o.evR+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: the cents disappear',
@@ -2473,15 +2473,15 @@ const CHALLENGES = {
       const dressOk=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+R.tRow]; if(!x||!x.bold||!x.bt) return false; } return true; })();
       const srcOk=(()=>{ const s=S.cells['A'+R.srcRow]; return !!(s&&s.it); })();
       return [
-        {label:'Bold A1 and rule it \u2014 ctrl+b, then alt h b o for the bottom border', ok:titleOk},
-        {label:'Shade the header band A3:E3 gray \u2014 alt h h, pick Gray (header)', ok:hdrFillOk},
-        {label:'Blue the hardcodes \u2014 alt h f c on the segment revenues ('+R.segRange+') and the cost line ('+R.costRange+')', ok:blueOk},
-        {label:'Percent the EBITDA margins, one decimal \u2014 ctrl+shift+% on '+R.mRowRange, ok:pctOk},
-        {label:'Comma the dollar figures ('+R.fRange+') \u2014 alt h k; negatives read as (parens)', ok:comOk},
-        {label:'Circle the output row \u2014 alt h b s around A'+R.mRow+':E'+R.mRow, ok:circleOk},
-        {label:'Footnote the margin label \u2014 ctrl+1, e (superscript) stamps the \u00b9 on A'+R.mRow, ok:footOk},
-        {label:'Dress the EBITDA line \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above (alt h b p)', ok:dressOk},
-        {label:'Italicize the source line \u2014 ctrl+i on A'+R.srcRow, ok:srcOk},
+        {label:'Bold A1 and rule it \u2014 weight, then a bottom border', ok:titleOk},
+        {label:'Shade the header band A3:E3 gray \u2014 the Gray (header) fill', ok:hdrFillOk},
+        {label:'Blue the hardcodes \u2014 the segment revenues ('+R.segRange+') and the cost line ('+R.costRange+')', ok:blueOk},
+        {label:'Percent the EBITDA margins, one decimal, on '+R.mRowRange, ok:pctOk},
+        {label:'Comma the dollar figures ('+R.fRange+'); negatives read as (parens)', ok:comOk},
+        {label:'Circle the output row around A'+R.mRow+':E'+R.mRow, ok:circleOk},
+        {label:'Footnote the margin label \u2014 a superscript \u00b9 on A'+R.mRow, ok:footOk},
+        {label:'Dress the EBITDA line \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above', ok:dressOk},
+        {label:'Italicize the source line on A'+R.srcRow, ok:srcOk},
       ];
     }
   },
@@ -2532,7 +2532,7 @@ const CHALLENGES = {
   anchor:{
     name:'Anchors', label:'Pin it with F4', par:16, parKeys:13,
     aha:'F4 cycles the anchors — $A$1 locks both, A$1 the row, $A1 the column; one formula fills the grid.',
-    prompt:'Fill a 3×3 revenue grid from one formula. Price points run across the top, volumes down the side. F4 cycles a reference through its four lock states — pin the volume column with $B, pin the price row with $3, and the fill builds the other eight cells. The same anchoring runs every sensitivity table later.',
+    prompt:'Fill a 3×3 revenue grid from one formula. Price points run across the top, volumes down the side. A reference has four lock states — pin the volume column with $B, pin the price row with $3, and the fill builds the other eight cells. The same anchoring runs every sensitivity table later.',
     req(){ const o=this._o; return '<em>'+o.tl+'</em> · =B'+o.r0+' <em>F4 F4 F4</em> → $B'+o.r0+' · * · C'+o.hr+' <em>F4 F4</em> → C$'+o.hr+' · <em>↵</em> · fill '+o.col+' ↓ · fill '+o.grid+' →'; },
     guide(){ const o=this._o; return [
       'at '+o.tl+' · type <kbd>=B'+o.r0+'</kbd> then <kbd>F4</kbd> ×3 — watch it cycle to <b>$B'+o.r0+'</b>: column pinned, row free',
@@ -2719,7 +2719,7 @@ const CHALLENGES = {
   percent:{
     name:'% of rev', label:'Common-size both statements', par:17, parKeys:14,
     aha:'Divide by an anchored base — F4 locks the divisor so fill-right can’t drag it.',
-    prompt:'Common-size — every line as a % of revenue — two statements on one page; the second block moves and changes size between runs. The lesson is the anchor: each block’s divisor is its own revenue line, locked with F4 so the fill can’t drag it.',
+    prompt:'Common-size — every line as a % of revenue — two statements on one page; the second block moves and changes size between runs. The lesson is the anchor: each block’s divisor is its own revenue line, locked so the fill can’t drag it.',
     req(){ const R=this._R; return '<em>C2</em> \u00b7 =B2/$B$2 (F4 locks it) \u00b7 fill C2:C6 \u00b7 <em>ctrl+shift+%</em> \u00b7 then: <em>'+R.pc+R.r0+'</em> \u00b7 ='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0+' \u00b7 fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent'; },
     guide(){ const R=this._R; return [
       'left block: at C2 \u00b7 <kbd>=</kbd> <kbd>\u2190</kbd> <kbd>/</kbd> <kbd>\u2190</kbd> <kbd>F4</kbd> \u2192 <b>$B$2</b> \u00b7 <kbd>\u21b5</kbd> \u00b7 fill C2:C6 \u00b7 percent',
@@ -2919,7 +2919,7 @@ const CHALLENGES = {
   grpfold:{
     name:'Group', label:'Fold the detail away', par:15, parKeys:12,
     aha:'Group rows (Shift+Alt+→), never hide them — the ⊞ tells the reader the detail’s still there.',
-    prompt:'Produce the summary view: quarterly totals with the monthly detail folded away. House rule — never hide rows; group them (Shift+Alt+→), then fold the detail (Alt A H) so a ⊞ shows the next reader where it lives. Three months under each quarter: group each block, fold each block, and the totals keep computing.',
+    prompt:'Produce the summary view: quarterly totals with the monthly detail folded away. House rule — never hide rows; group them, then fold the detail away so a ⊞ shows the next reader where it lives. Three months under each quarter: group each block, fold each block, and the totals keep computing.',
     req(){ const o=this._o; return o.blocks.map((b,i)=>'<em>A'+b.r1+':A'+b.r2+'</em> → <em>shift+alt+→</em>').join(' · ')+' · then fold each: <em>alt a h</em> — subtotals stay on the page'; },
     guide(){ const o=this._o; return [
       'quarter one: select rows '+o.blocks[0].r1+'-'+o.blocks[0].r2+' (the months) · <kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>→</kbd> groups them · <kbd>alt</kbd> <kbd>a</kbd> <kbd>h</kbd> folds the detail',
@@ -2966,8 +2966,8 @@ const CHALLENGES = {
       const subsOk=o.blocks.every(b=>{ const c=S.cells['B'+b.sub];
         return !(S.hidden&&S.hidden.has(b.sub)) && !!(c&&c.formula&&sumishF(c.formula)&&Math.abs((c.value||0)-b.sum)<0.5); });
       return [
-        {label:'group each quarter’s months — three groups, exactly the detail rows, shift+alt+→', ok: o.blocks.every(covered) && gs.length===3},
-        {label:'fold all three away — alt a h; the ⊞ marks where the detail lives', ok: o.blocks.every(folded)},
+        {label:'group each quarter’s months — three groups, exactly the detail rows', ok: o.blocks.every(covered) && gs.length===3},
+        {label:'fold all three away; the ⊞ marks where the detail lives', ok: o.blocks.every(folded)},
         {label:'Keep the quarter-total rows visible, their SUM formulas intact', ok: subsOk},
       ];
     }
@@ -2975,7 +2975,7 @@ const CHALLENGES = {
   filterpass:{
     name:'Filter', label:'Work the filtered view', par:13, parKeys:10,
     aha:'Ctrl+Shift+L arms the filter, Alt+↓ opens the picker — hide the noise, the answer reads itself.',
-    prompt:'Find one number in a live deal list: the largest Open deal. Turn on AutoFilter at the header row (Ctrl+Shift+L), open the Status picker (Alt+↓), uncheck everything that isn’t Open, and read the answer off the visible rows — then type it where the sheet asks.',
+    prompt:'Find one number in a live deal list: the largest Open deal. Turn on AutoFilter at the header row, open the Status picker, uncheck everything that isn’t Open, and read the answer off the visible rows — then type it where the sheet asks.',
     req(){ const o=this._o; return '<em>ctrl+shift+L</em> on row 3 arms the \u25be \u00b7 <em>alt+\u2193</em> on Status \u2192 <em>space</em> drops Closed/Dead \u2192 <em>\u21b5</em> \u00b7 type the largest visible Size into <em>B'+o.ansR+'</em>'; },
     guide(){ const o=this._o; return [
       'put the cursor anywhere on row 3 (the header) \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> \u2014 \u25be pickers arm across the whole header block',
@@ -3024,8 +3024,8 @@ const CHALLENGES = {
       const hidOk=o.rows.every(x=> x.st==='Open' ? !(S.hidden&&S.hidden.has(x.r)) : !!(S.hidden&&S.hidden.has(x.r)) );
       const a=S.cells['B'+o.ansR];
       return [
-        {label:'arm the AutoFilter on the header row \u2014 ctrl+shift+L with the cursor on row 3', ok: armed},
-        {label:'drop Closed and Dead through the Status picker \u2014 alt+\u2193 on C3, space, \u21b5; only Open rows stay', ok: armed && hidOk},
+        {label:'arm the AutoFilter on the header row, with the cursor on row 3', ok: armed},
+        {label:'drop Closed and Dead through the Status picker on C3; only Open rows stay', ok: armed && hidOk},
         {label:'type the largest OPEN size into B'+o.ansR+' \u2014 read it straight off the filtered view', ok: !!(a && Math.abs((+a.value||0)-o.maxOpen)<0.5)},
       ];
     }
@@ -3033,7 +3033,7 @@ const CHALLENGES = {
   hunt:{
     name:'Audit', label:'Hunt the hardcodes', par:45, parKeys:46,
     aha:'F5 → Special → Constants lights up every hardcode a formula should own.',
-    prompt:'The opex build looks clean and even foots — but three cells in the calc block are typed-over numbers, stale since the last update. Use F5 → Special → Constants to light up every raw number, walk the marks with Enter, and relink the three hardcodes to live formulas.',
+    prompt:'The opex build looks clean and even foots — but three cells in the calc block are typed-over numbers, stale since the last update. Use Go To Special → Constants to light up every raw number, walk the marks one by one, and relink the three hardcodes to live formulas.',
     req(){ const o=this._o; return '<em>F5</em> \u2192 <em>s</em> \u2192 <em>o</em> marks the constants \u00b7 \u21b5 walks \u00b7 relink '+o.sites.map(s=>'<em>'+s.k+'</em>').join(', ')+' \u00b7 <em>B8</em> <em>=SUM(B3:B7)</em> fill B8:D8 \u2192 \u00b7 <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'run the ritual: <kbd>F5</kbd> \u00b7 <kbd>s</kbd> \u00b7 <kbd>o</kbd> \u2014 every raw number marks up; blue inputs SHOULD light, the calc block should NOT',
@@ -3092,7 +3092,7 @@ const CHALLENGES = {
         return !!(c&&c.formula&&sumishF(c.formula)&&typeof c.value==='number'&&Math.abs(c.value-o.tot[cl])<0.5); });
       const boldOk=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8']; return !!(c&&c.bold); });
       return [
-        {label:'Run F5 \u2192 Special \u2192 Constants to mark every hardcoded number', ok:(S.markN||0)>=1},
+        {label:'Run Go To Special \u2192 Constants to mark every hardcoded number', ok:(S.markN||0)>=1},
         {label:'relink the three hardcodes \u2014 prior year \u00d7 (1 + growth); formulas own the calc block again', ok: fixed},
         {label:'total the corrected build \u2014 =SUM(B3:B7) at B8, fill B8:D8 across', ok: footed},
         {label:'bold the total row \u2014 B8:D8 carries the corrected page', ok: boldOk},
@@ -3102,7 +3102,7 @@ const CHALLENGES = {
   unhide:{
     name:'Unhide', label:'Flush the hidden rows', par:15, parKeys:12,
     aha:'Hidden rows lie — unhide them, then group so the detail stays honest.',
-    prompt:'The monthly detail was hidden instead of grouped — rows 4 to 7 are gone with no ⊞ and no trace, and the subtotal reads like magic. Fix it properly: select across the gap and unhide (Ctrl+Shift+9 — or Alt H O U O), group the detail (Shift+Alt+→), and fold it back (Alt A H) so the ⊞ shows where it lives.',
+    prompt:'The monthly detail was hidden instead of grouped — rows 4 to 7 are gone with no ⊞ and no trace, and the subtotal reads like magic. Fix it properly: select across the gap and unhide, group the detail, and fold it back so the ⊞ shows where it lives.',
     req(){ const o=this._o; return 'select rows '+(o.h1-1)+':'+(o.h2+1)+' \u00b7 <em>ctrl+shift+9</em> (or <em>alt h o u o</em>) \u00b7 group '+o.h1+':'+o.h2+' <em>shift+alt+\u2192</em> \u00b7 fold <em>alt a h</em> \u00b7 <em>alt h o w</em> \u2192 12 on column B'; },
     guide(){ const o=this._o; return [
       'the row numbers jump '+(o.h1-1)+' \u2192 '+(o.h2+1)+' \u2014 that\u2019s the tell \u00b7 select across the gap (rows '+(o.h1-1)+' to '+(o.h2+1)+') \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>9</kbd> or <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>u</kbd> <kbd>o</kbd> \u2014 the detail returns',
@@ -3144,9 +3144,9 @@ const CHALLENGES = {
       const folded=!!g && g.collapsed && !!(sub && sub.formula && Math.abs((sub.value||0)-o.sum)<0.5);
       const wOk=(S.colwN||0)>=1 && colW[2]>=Math.round(12*7)+5-8;
       return [
-        {label:'unhide the buried detail \u2014 select across the gap, ctrl+shift+9 or alt h o u o', ok: unhid},
-        {label:'group rows '+o.h1+':'+o.h2+' the HOUSE way \u2014 shift+alt+\u2192, then fold with alt a h; the \u229e owns the page', ok: grouped && folded},
-        {label:'set column B to width 12 \u2014 alt h o w; the data reads again', ok: wOk},
+        {label:'unhide the buried detail \u2014 select across the gap and unhide', ok: unhid},
+        {label:'group rows '+o.h1+':'+o.h2+' the HOUSE way, then fold them away; the \u229e owns the page', ok: grouped && folded},
+        {label:'set column B to width 12; the data reads again', ok: wOk},
       ];
     }
   },
@@ -3273,18 +3273,18 @@ const CHALLENGES = {
       const deckOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'10');
         return c.value!=null && !c.formula && typeof c.value==='number'; });
       return [
-        {label:'Transpose the side fee schedule into the Fees row \u2014 copy '+o.side+', then paste-special TRANSPOSE (alt e s e) at '+o.feesRow.split(':')[0], ok: transOk},
-        {label:'Divide Trading by 1000 \u2014 copy a typed 1000, select '+o.divBlk+', paste-special DIVIDE (alt e s i); raw $ becomes $000s', ok: divOk},
-        {label:'Multiply the costs by \u22121 \u2014 copy a typed -1, select '+o.costRow+', paste-special MULTIPLY (alt e s m); the signs flip', ok: negOk},
-        {label:'Clone the total-row look onto Advisory \u2014 copy '+o.dressed+', paste FORMATS (alt e s t) onto '+o.naked+', then clear the top border it carried (alt h b n)', ok: fmtOk},
-        {label:'Freeze the totals for the summary \u2014 copy '+o.dressed+', paste VALUES (alt e s v) onto '+o.deck+': dead numbers', ok: deckOk},
+        {label:'Transpose the side fee schedule into the Fees row \u2014 copy '+o.side+', then paste-special TRANSPOSE at '+o.feesRow.split(':')[0], ok: transOk},
+        {label:'Divide Trading by 1000 \u2014 copy a typed 1000, select '+o.divBlk+', paste-special DIVIDE; raw $ becomes $000s', ok: divOk},
+        {label:'Multiply the costs by \u22121 \u2014 copy a typed -1, select '+o.costRow+', paste-special MULTIPLY; the signs flip', ok: negOk},
+        {label:'Clone the total-row look onto Advisory \u2014 copy '+o.dressed+', paste FORMATS onto '+o.naked+', then clear the top border it carried', ok: fmtOk},
+        {label:'Freeze the totals for the summary \u2014 copy '+o.dressed+', paste VALUES onto '+o.deck+': dead numbers', ok: deckOk},
       ];
     }
   },
   typeset:{
     name:'Typeset', label:'Typeset the memo', par:15, parKeys:12,
     aha:'Ctrl+B bolds, Ctrl+I italicizes, Ctrl+5 strikes through — and =TODAY() dates the page.',
-    prompt:'Typeset the coverage memo: bold the header row, remove the bold from the body row that shouldn’t have it, italicize the memo lines (Ctrl+I), strike through the discontinued line item (Ctrl+5 — or Ctrl+1, K), and add =TODAY() so the page shows its as-of date.',
+    prompt:'Typeset the coverage memo: bold the header row, remove the bold from the body row that shouldn’t have it, italicize the memo lines, strike through the discontinued line item, and add =TODAY() so the page shows its as-of date.',
     req(){ const o=this._o; return 'bold <em>A2:D2</em> \u00b7 UNbold row <em>'+o.wb+'</em> \u00b7 <em>ctrl+i</em> the memos <em>'+o.memoRng+'</em> \u00b7 <em>ctrl+5</em> the dead line <em>'+o.deadRng+'</em> \u00b7 <em>=TODAY()</em> at <em>'+o.stamp+'</em>'; },
     guide(){ const o=this._o; return [
       'the header row A2:D2 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 headers carry the page',
@@ -3337,9 +3337,9 @@ const CHALLENGES = {
       const stampOk=!!(st.formula && /TODAY/i.test(String(st.formula)));
       return [
         {label:'bold the header row \u2014 A2:D2 carries the page', ok: hdrOk},
-        {label:'UNbold row '+o.wb+' \u2014 it never earned it; ctrl+b toggles both ways', ok: unOk},
-        {label:'italicize the memo lines \u2014 ctrl+i on '+o.memoRng, ok: memoOk},
-        {label:'strike the discontinued line \u2014 ctrl+5 across '+o.deadRng+'; retired, not erased', ok: strikeOk},
+        {label:'UNbold row '+o.wb+' \u2014 it never earned it', ok: unOk},
+        {label:'italicize the memo lines on '+o.memoRng, ok: memoOk},
+        {label:'strike the discontinued line across '+o.deadRng+'; retired, not erased', ok: strikeOk},
         {label:'stamp =TODAY() at '+o.stamp+' \u2014 the page signs its own date', ok: stampOk},
       ];
     }
@@ -3347,7 +3347,7 @@ const CHALLENGES = {
   editfix:{
     name:'Edit', label:'Fix the typos in place', par:39, parKeys:39,
     aha:'F2 edits inside the cell — fix the typo, don’t retype the whole thing.',
-    prompt:'Three kinds of broken cell, one tool. Two labels have typos — press F2, fix the word in place, don’t retype the cell. One hardcode drifted from the feed column it should tie to — put the number back. And one SUM reads a row short — F2 in and extend the range. F2 covers text, numbers, and ranges.',
+    prompt:'Three kinds of broken cell, one tool. Two labels have typos — edit them in place, fix the word, don’t retype the cell. One hardcode drifted from the feed column it should tie to — put the number back. And one SUM reads a row short — edit it in place and extend the range. Editing in place covers text, numbers, and ranges.',
     req(){ const o=this._o; return o.sites.map(s=>'<em>'+s.cell+'</em> \u00b7 F2 \u00b7 \u201c'+s.bad+'\u201d \u2192 \u201c'+s.good+'\u201d').join(' \u00b7 ')+' \u00b7 audit <em>'+o.driftCell+'</em> against <em>'+o.feedCell+'</em> \u00b7 stretch <em>'+o.totCell+'</em> to <em>'+o.wantRng+'</em>'; },
     guide(){ const o=this._o; return [
       'the typos: '+o.sites.map(s=>s.cell).join(' and ')+' \u2014 <kbd>F2</kbd> \u00b7 arrow to the mistake \u00b7 fix \u00b7 <kbd>\u21b5</kbd>; only the wrong letters change',
@@ -3426,14 +3426,14 @@ const CHALLENGES = {
       const totOk=f.includes('C11:C12') && Math.abs((t.value||0)-(o.feed[0]+o.feed[1]))<0.5;
       return typoChecks.concat([
         {label:'audit the model column against the feed \u2014 put '+o.driftCell+' back to '+o.feedCell+'\u2019s number', ok: tieOk},
-        {label:'stretch the short total \u2014 F2 at C13, =SUM(C11:C12); it must re-total WITH your audit fix', ok: totOk},
+        {label:'stretch the short total at C13 to =SUM(C11:C12); it must re-total WITH your audit fix', ok: totOk},
       ]);
     }
   },
   undo:{
     name:'Undo', label:'Undo the wrong delete', par:10, parKeys:5,
     aha:'Ctrl+Z rewinds your exact steps — delete, check, rewind if needed, then delete the right thing.',
-    prompt:'Clear the wrong block and Ctrl+Z brings every cell back exactly as it was. The first note says to clear a scratch block; the second note says that block actually feeds Q4 and the other one was the junk. Undo the mistake, clear the right block, then format the remaining rows.',
+    prompt:'Clear the wrong block and a single undo brings every cell back exactly as it was. The first note says to clear a scratch block; the second note says that block actually feeds Q4 and the other one was the junk. Undo the mistake, clear the right block, then format the remaining rows.',
     req(){ const o=this._o; return 'bold <em>A1</em> \u00b7 italicize the memo <em>'+o.memo+'</em> \u00b7 clear <em>'+o.wrongRng+'</em> (\u201c'+o.wrongName+'\u201d \u2014 the note says so) \u00b7 <em>ctrl+z</em> \u2014 it FED Q4 \u00b7 now clear <em>'+o.rightRng+'</em>'; },
     guide(){ const o=this._o; return [
       'housekeeping first: <kbd>ctrl</kbd>+<kbd>b</kbd> the title \u00b7 the memo at '+o.memo+' goes <kbd>ctrl</kbd>+<kbd>i</kbd> \u2014 memos read italic',
@@ -3481,7 +3481,7 @@ const CHALLENGES = {
       const liveBack=o.wrongCells.every((k,i)=>cel(k).value===o.wrongVals[i]);
       return [
         {label:'format the remaining rows \u2014 bold A1, italicize the memo at '+o.memo, ok: !!cel('A1').bold && !!cel(o.memo).it},
-        {label:'walk the scripted mistake \u2014 clear '+o.wrongName+', then ctrl+z until every value is BACK', ok: liveBack && (S.undoN||0)>=1},
+        {label:'walk the scripted mistake \u2014 clear '+o.wrongName+', then undo until every value is BACK', ok: liveBack && (S.undoN||0)>=1},
         {label:'now aim \u2014 clear the real junk: '+o.rightName+' at '+o.rightRng, ok: o.rightCells.every(k=>empty(cel(k).value))},
       ];
     }
@@ -3489,7 +3489,7 @@ const CHALLENGES = {
   autofit:{
     name:'Autofit', label:'Fix the squeezed columns', par:15, parKeys:12,
     aha:'Alt H O I autofits to content; a print block wants ONE width — set it with Alt H O W.',
-    prompt:'Two width problems, two different fixes. The label block is squeezed to #### — Alt H O I autofits it to its contents. The four data columns are uneven widths, and autofit would keep them uneven — select across them and set one width: Alt H O W, 12, Enter. Autofit is for content; a uniform width is for print.',
+    prompt:'Two width problems, two different fixes. The label block is squeezed to #### — autofit it to its contents. The four data columns are uneven widths, and autofit would keep them uneven — select across them and set one uniform width of 12. Autofit is for content; a uniform width is for print.',
     req(){ const o=this._o; return 'select <em>'+o.a1+':'+o.a2+'</em> \u00b7 <em>alt h o i</em> \u2014 fit to content \u00b7 then <em>'+o.uRng+'</em> \u00b7 <em>alt h o w</em> \u2192 <em>12</em> <em>\u21b5</em> \u2014 ONE width across the print block'; },
     guide(){ const o=this._o; return [
       'the squeezed labels: on '+o.a1+' \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 content decides',
@@ -3527,15 +3527,15 @@ const CHALLENGES = {
       const fit=c=>(w[c]||0)>=neededWidth(c)-1;
       const uW=Math.round(12*7)+5;
       return [
-        {label:'fit the squeezed label pair to its CONTENT \u2014 alt h o i', ok: this._o.ac.every(fit)},
-        {label:'set the four data columns to ONE width \u2014 alt h o w, 12: uniform beats autofit for print', ok: this._o.uc.every(c=>(w[c]||0)===uW)},
+        {label:'fit the squeezed label pair to its CONTENT \u2014 autofit', ok: this._o.ac.every(fit)},
+        {label:'set the four data columns to ONE width of 12: uniform beats autofit for print', ok: this._o.uc.every(c=>(w[c]||0)===uW)},
       ];
     }
   },
   rowops:{
     name:'Rows', label:'Rebuild the schedule', par:26, parKeys:24,
     aha:'Ctrl++ inserts a row, Ctrl+− deletes one — a live SUM widens and contracts with the sheet.',
-    prompt:'Fix the structure of the opex schedule: one line is missing (staged off to the side) and a stale placeholder is inflating the total. The total is a live SUM and re-ties as you work. Insert a row where the missing line belongs (Shift+Space, then Ctrl++ or Alt H I R), copy the staged pair in, delete the junk row (Ctrl+−), and format the pasted value to match the block. Never retype the total — the SUM adjusts itself.',
+    prompt:'Fix the structure of the opex schedule: one line is missing (staged off to the side) and a stale placeholder is inflating the total. The total is a live SUM and re-ties as you work. Insert a row where the missing line belongs, copy the staged pair in, delete the junk row, and format the pasted value to match the block. Never retype the total — the SUM adjusts itself.',
     req(){ const o=this._o; return 'insert a row below <em>'+o.predecessor+'</em> · copy the staged <em>'+o.stagedRng+'</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row · the live Total re-ties to <em>'+o.total.toLocaleString('en-US')+'</em> on its own · format the pasted value: comma + blue (<em>alt h k</em>, <em>alt h f c</em>)'; },
     guide(){ const o=this._o; return [
       'a line is missing — open a slot: select the row below <b>'+o.predecessor+'</b> · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row · <kbd>ctrl</kbd>+<kbd>+</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd>) — and watch the Total’s SUM WIDEN by itself',
@@ -3615,14 +3615,14 @@ const CHALLENGES = {
           ok: !!missIn && (S.insRowN||0)>=1 && (S.pasteN||0)>=1},
         {label:'Delete the PLACEHOLDER row — the block closes up and the SUM contracts', ok: junkGone && (S.delRowN||0)>=1},
         {label:'The live Total re-ties to '+o.total.toLocaleString('en-US')+' — no retyping; the structure did it', ok: tieOk},
-        {label:'Dress the pasted value like the block — commas (alt h k) and blue font (alt h f c)', ok: dressOk},
+        {label:'Dress the pasted value like the block — commas and blue font', ok: dressOk},
       ];
     }
   },
   colops:{
     name:'Columns', label:'Columns move too', par:16, parKeys:13,
     aha:'Ctrl+Space selects the whole column — Alt H I C inserts one, Alt H D C deletes one.',
-    prompt:'Fix the quarterly schedule’s columns: delete the stale draft column and insert the missing quarter. Ctrl+Space selects the whole column, Alt H D C deletes it, Alt H I C opens the gap where the missing quarter belongs — then add the new column’s header and format it to match.',
+    prompt:'Fix the quarterly schedule’s columns: delete the stale draft column and insert the missing quarter. Select the whole column, delete it, then open the gap where the missing quarter belongs — then add the new column’s header and format it to match.',
     req(){ const o=this._o; return 'any cell in DRAFT · <em>ctrl+space</em> · <em>alt h d c</em> · any cell in '+o.nq+' · <em>ctrl+space</em> · <em>alt h i c</em> · type <em>'+o.mq+'</em> in the new header · <em>ctrl+b</em>'; },
     guide(){ const o=this._o; return [
       'kill the junk: any DRAFT cell · <kbd>ctrl</kbd>+<kbd>space</kbd> takes the column · <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>c</kbd>',
@@ -3682,7 +3682,7 @@ const CHALLENGES = {
         return this._q[q].every((v,i)=>{ const cc=S.cells[colLetter(h.c)+(hr+1+i)]; return !!(cc&&cc.value===v); }); });
       const mqh=hdrs.find(x=>x.v===o.mq);
       return [
-        {label:'delete the whole DRAFT column — Ctrl+Space grabs it, Alt H D C removes it', ok: draftGone},
+        {label:'delete the whole DRAFT column — select the column and remove it', ok: draftGone},
         {label:'insert the missing '+o.mq+' column where it belongs and type its data — every value with its quarter', ok: noDraft && dataOk},
         {label:'line the header up — Q1 Q2 Q3 Q4 in order', ok: ordered},
         {label:'bold the new '+o.mq+' header to match the row', ok: !!(mqh&&mqh.bold)},
@@ -3897,10 +3897,10 @@ const CHALLENGES = {
       return [
         {label:'COPY the [Segment · Revenue] base whole → paste into the summary (the base stays filed)', ok: copied},
         {label:'CUT the two misfiled columns (EBITDA, Op inc) → paste into their slots (old spots empty)', ok: cutBoth},
-        {label:'Margin memo — =EBITDA/Revenue down the column, format % and italic (Ctrl+Shift+%, Ctrl+I)', ok: marginOk},
-        {label:'bold the header row (Ctrl+B) and outline the whole table (Alt H B S)', ok: dressed},
-        {label:'money: the top line in $ (Ctrl+Shift+$), the rows below in commas — 0 decimals', ok: money},
-        {label:'figures right-aligned (Alt H A R); segment names centred + underlined (Alt H A C, Ctrl+U)', ok: aligned},
+        {label:'Margin memo — =EBITDA/Revenue down the column, format % and italic', ok: marginOk},
+        {label:'bold the header row and outline the whole table', ok: dressed},
+        {label:'money: the top line in $, the rows below in commas — 0 decimals', ok: money},
+        {label:'figures right-aligned; segment names centred + underlined', ok: aligned},
       ];
     }
   },
@@ -3971,14 +3971,14 @@ const CHALLENGES = {
       return [
         {label:'land the FULL block at '+o.d1+' \u2014 formulas travel, the SUM row stays live', ok: blockAt(o.D1[0],o.D1[1],true)},
         {label:'peel the first column OFF THE LANDED COPY \u2014 '+o.landedCol+' \u2192 '+o.d2+', still live', ok: colAt(o.D2[0],o.D2[1])},
-        {label:'hand the summary values only, no formulas \u2014 alt e s v at '+o.d3+': values, zero wiring', ok: blockAt(o.D3[0],o.D3[1],false)},
+        {label:'hand the summary values only, no formulas, at '+o.d3+': values, zero wiring', ok: blockAt(o.D3[0],o.D3[1],false)},
       ];
     }
   },
   foot:{
     name:'Foot', label:'Foot the table both ways', par:11, parKeys:8,
     aha:'Alt+= proposes the SUM it sees — total the rows, the columns, and the corner.',
-    prompt:'Total a segment × quarter block in every direction: total each row, total each column, and land the grand total where they meet. Don’t type a single SUM — Alt+= reads the block and proposes it. The corner total must tie to both edges.',
+    prompt:'Total a segment × quarter block in every direction: total each row, total each column, and land the grand total where they meet. Don’t type a single SUM — AutoSum reads the block and proposes it. The corner total must tie to both edges.',
     req:'<em>F2</em> · <em>alt+=</em> <em>↵</em> · fill F2:F5 ↓ · <em>B6</em> · <em>alt+=</em> <em>↵</em> · fill B6:E6 → · <em>F6</em> grand · <em>alt+=</em> <em>↵</em>',
     guide:[
       'row totals: F2 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:E2) — it read the row · <kbd>↵</kbd> · select F2:F5 · <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -4161,7 +4161,7 @@ const CHALLENGES = {
         {label:'pin the deal names LEFT', ok: Array.from({length:o.rt-o.r1},(_,k)=>o.r1+k).every(r=>cell('A'+r).align==='l')},
         {label:'align the total row RIGHT — numbers never sit left', ok: cell('A'+o.rt).align==='r' && cols.every(c=>cell(c+o.rt).align==='r')},
         {label:'bold the total row', ok: cols.every(c=>cell(c+o.rt).bold) && !!cell('A'+o.rt).bold},
-        {label:'center the title ACROSS the model \u2014 ctrl+1, a; merged cells are banned (A1)',
+        {label:'center the title ACROSS the model \u2014 center across selection, not merge; merged cells are banned (A1)',
           ok: (cell('A1').ca|0) >= o.nq+1},
       ];
     }
@@ -4259,7 +4259,7 @@ const CHALLENGES = {
   bridge:{
     name:'Point Mode', label:'Point-mode formulas', par:10, parKeys:6,
     aha:'Point mode grabs refs with the arrow keys — the fastest formula is one you never typed.',
-    prompt:'Build profit = revenue × margin by pointing: type =, then use the arrow keys to grab each reference — never type a cell address — and fill it across five years. Point mode is the fastest way to enter a formula, and the fill confirms the references were relative.',
+    prompt:'Build profit = revenue × margin by pointing: start the formula, then point at each reference — never type a cell address — and fill it across five years. Point mode is the fastest way to enter a formula, and the fill confirms the references were relative.',
     req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs revenue \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs margin \u00b7 <em>\u21b5</em> \u00b7 select '+o.rng+' \u00b7 <em>ctrl+r</em>'; },
     guide(){ const o=this._o; return [
       'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
@@ -4313,7 +4313,7 @@ const CHALLENGES = {
   growth:{
     name:'Growth', label:'Run the growth rates', par:36, parKeys:35,
     aha:'Growth = this ÷ last − 1 — one formula, filled across every year.',
-    prompt:'A revenue build with two segments, a consolidated line, and five fiscal years. Total the segments, run YoY growth off the total — this year ÷ last year − 1, filled across, formatted as a percent — then compute the 4-year CAGR with the ^ key. Three formulas, each formatted to standard.',
+    prompt:'A revenue build with two segments, a consolidated line, and five fiscal years. Total the segments, run YoY growth off the total — this year ÷ last year − 1, filled across, formatted as a percent — then compute the 4-year CAGR. Three formulas, each formatted to standard.',
     req:'<em>B4</em> total <em>=B2+B3</em> fill \u2192 \u00b7 <em>C5</em> YoY <em>=C4/B4-1</em> \u00b7 fill C5:F5 \u2192 + <em>ctrl+shift+%</em> \u00b7 <em>B7</em> CAGR <em>=(F4/B4)^(1/4)-1</em> + <em>ctrl+shift+%</em> \u00b7 dress B4:F4: <em>ctrl+b</em>',
     guide:[
       'consolidate at B4 \u00b7 <kbd>=B2+B3</kbd> \u2014 both segments \u00b7 fill right',
@@ -4371,7 +4371,7 @@ const CHALLENGES = {
       return [
         {label:'consolidate the segments live at B4 \u2014 fill across all five years', ok: totOk&&refs('B4',['B2','B3'])},
         {label:'run YoY growth at C5 \u2014 this year over last, fill C5:F5 and percent it', ok: yoyOk&&refs('C5',['C4','B4'])},
-        {label:'compound the CAGR at B7 with the ^ key \u2014 first and last totals, as a percent', ok: cagrOk&&refs('B7',['F4','B4'])},
+        {label:'compound the CAGR at B7 \u2014 first and last totals, as a percent', ok: cagrOk&&refs('B7',['F4','B4'])},
         {label:'bold the consolidated line \u2014 B4:F4 carries the page', ok: boldOk},
       ];
     }
@@ -5345,7 +5345,7 @@ const CHALLENGES = {
         {label:'run gross profit and EBIT, all five years', ok: rowOk(4,e=>e.gp)&&rowOk(6,e=>e.eb)},
         {label:'run net income after the anchored tax rate, all five years', ok: rowOk(7,e=>e.ni)&&refs('B7',['B6','B11'])},
         {label:'run the net margin \u2014 live ratio, formatted as a percent', ok: mOk},
-        {label:'bold the bottom line and add a top border above it (ctrl+b, alt h b p)', ok: dressOk},
+        {label:'bold the bottom line and add a top border above it', ok: dressOk},
       ];
     }
   },
@@ -5581,7 +5581,7 @@ const CHALLENGES = {
         {label:'run THE RE ROLL \u2014 prior RE + NI \u2212 dividends, built once, walking across', ok: rollOk},
         {label:'total liabs & equity, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',this._exp[COL[i]].tle))},
         {label:'Check row = assets minus L&E \u2014 reads 0 in all three years', ok: [0,1,2].every(i=>near(COL[i]+'14',0))},
-        {label:'bold the totals and add a top border above the check row (ctrl+b, alt h b p)', ok: boldOk(5)&&boldOk(11)&&ruleOk},
+        {label:'bold the totals and add a top border above the check row', ok: boldOk(5)&&boldOk(11)&&ruleOk},
       ];
     }
   },
@@ -5651,7 +5651,7 @@ const CHALLENGES = {
       const drv=(k,exp)=>{ const c=S.cells[k]; return !!(c&&!c.formula&&typeof c.value==='number'&&c.value===exp&&c.fontColor==='blue'); };
       const dressOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'7']; return !!(c&&c.bold&&c.bt); });
       return [
-        {label:'Type DSO / DIO / DPO into B9:B11 and blue-font them (alt h f c)', ok: drv('B9',this._dso)&&drv('B10',this._dio)&&drv('B11',this._dpo)},
+        {label:'Type DSO / DIO / DPO into B9:B11 and blue-font them', ok: drv('B9',this._dso)&&drv('B10',this._dio)&&drv('B11',this._dpo)},
         {label:'run AR off YOUR anchored DSO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'4',this._exp[i].ar))&&refs('B4',['B2','B9'])},
         {label:'run inventory and payables off anchored DIO / DPO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'5',this._exp[i].inv)&&near(COL[i]+'6',this._exp[i].ap))},
         {label:'run net working capital, then bold the row and add a top border above it', ok: [0,1,2,3,4].every(i=>near(COL[i]+'7',this._exp[i].nwc))&&dressOk},
@@ -6268,7 +6268,7 @@ const CHALLENGES = {
   audit:{
     name:'The 4am pass', label:'Find what’s broken', par:34, parKeys:33,
     aha:'Broken models leave fingerprints — hardcodes in formula rows, refs off by one.',
-    prompt:'Audit a divisional P&L someone else built. Three things are wrong: one division’s five-year Total stops a column short, one EBITDA (operating profit before depreciation and amortization) is a stale hardcode, and one EBITDA reads the wrong year’s opex. Use F5 → Special → Constants to light up every raw number on the page, find all three, and rebuild them as live formulas.',
+    prompt:'Audit a divisional P&L someone else built. Three things are wrong: one division’s five-year Total stops a column short, one EBITDA (operating profit before depreciation and amortization) is a stale hardcode, and one EBITDA reads the wrong year’s opex. Use Go To Special → Constants to light up every raw number on the page, find all three, and rebuild them as live formulas.',
     req(){ return '<em>scan the Total column</em> \u00b7 one SUM stops at FY4 \u2014 <em>F2</em>, extend it \u00b7 one EBITDA is a typed number \u2014 rebuild it live \u00b7 one EBITDA crosses columns \u2014 repoint it'; },
     guide:[
       'read the Total column (G) \u2014 one division\u2019s SUM ends a year early \u00b7 <kbd>F2</kbd>, extend the range to column F, <kbd>\u21b5</kbd>',
@@ -6522,7 +6522,7 @@ const CHALLENGES = {
   stalelink:{
     name:'Stale Links', label:'Re-point the stale links', par:28, parKeys:27,
     aha:'Re-point a stale link (F2, fix the ref) — never retype the number it should read.',
-    prompt:'The assumptions moved to v2, but three cells in the build still read the dead v1 column. The tab computes, nothing errors, and every number is wrong. Find the rows whose pattern breaks, F2 the stale references onto the live block, and confirm contribution ties to v2. A silently stale link is worse than a #REF! — at least the #REF! announces itself.',
+    prompt:'The assumptions moved to v2, but three cells in the build still read the dead v1 column. The tab computes, nothing errors, and every number is wrong. Find the rows whose pattern breaks, edit the stale references onto the live block, and confirm contribution ties to v2. A silently stale link is worse than a #REF! — at least the #REF! announces itself.',
     req(){ const R=this._stale; return '<em>'+R.join('</em> \u00b7 <em>')+'</em> still read the v1 column (C) \u2014 re-point each at the LIVE v2 block ($B$4:$B$6) \u00b7 contribution must tie to v2'; },
     guide:[
       'read each row for the value that breaks the pattern \u2014 that cell\u2019s formula points at column C (v1, dead)',
@@ -6694,7 +6694,7 @@ const CHALLENGES = {
   wirewalk:{
     name:'Trace', label:'Walk the wire', par:10, parKeys:6,
     aha:'Ctrl+[ jumps to a formula’s source, Ctrl+] back — a wrong number is a trail, not a mystery.',
-    prompt:'The deck figure is wrong, and the VP’s note says which input to blame — three links upstream. Do not hunt by eye: Ctrl+[ jumps to a formula’s first precedent, hop by hop, until you’re standing on the source. Fix it there, and Ctrl+] rides the wire back down while everything reprices. Auditors call it tracing; the desk calls it Tuesday.',
+    prompt:'The deck figure is wrong, and the VP’s note says which input to blame — three links upstream. Do not hunt by eye: trace precedents to jump to a formula’s first input, hop by hop, until you’re standing on the source. Fix it there, and ride the wire back down through the dependents while everything reprices. Auditors call it tracing; the desk calls it Tuesday.',
     req(){ const o=this._o; return 'on <em>'+o.deck+'</em> · <em>ctrl+[</em> to the subtotal · <em>ctrl+[</em> again to the source block · fix <em>'+o.badLbl+'</em> to <em>'+o.good+'</em> · <em>ctrl+]</em> ×2 rides back down'; },
     guide(){ const o=this._o; return [
       'start on the summary figure '+o.deck+' · <kbd>ctrl</kbd>+<kbd>[</kbd> — you land on the subtotal it reads',
@@ -6745,14 +6745,14 @@ const CHALLENGES = {
       return [
         {label:'fix it at the SOURCE — '+o.bad+' back to '+o.good, ok: bad.value===o.good},
         {label:'let the wire reprice — subtotal and deck figure land right', ok: Math.abs(num(o.mid)-o.sumGood)<0.5 && Math.abs(num(o.deck)-o.deckGood)<0.5},
-        {label:'walk the wire — ctrl+[ / ctrl+] hops, not eye-hunting', ok: (S.traceN||0)>=2},
+        {label:'walk the wire — trace precedents and dependents, not eye-hunting', ok: (S.traceN||0)>=2},
       ];
     }
   },
   tieout:{
     name:'Tie-out', label:'F9 the suspect', par:30, parKeys:8,
     aha:'F9 evaluates a formula IN the editor — the dead number tells you which link is stale; Esc keeps the formula live.',
-    prompt:'The deck total and the support block disagree, and nothing is labeled. Ride Ctrl+[ from the tie-out into the wiring, then interrogate the legs: F2 opens one, F9 collapses it to the number it actually pulls, Esc keeps the formula alive. Two legs read the fresh Q2 feed; one still points at the Q1 column — the dead number gives it away instantly. Repoint the stale leg and the check lands at zero. Auditors call it a tie-out; F9 is how you run one without printing anything.',
+    prompt:'The deck total and the support block disagree, and nothing is labeled. Trace from the tie-out into the wiring, then interrogate the legs: open one, collapse it to the number it actually pulls, and back out without changing the formula. Two legs read the fresh Q2 feed; one still points at the Q1 column — the dead number gives it away instantly. Repoint the stale leg and the check lands at zero. Auditors call it a tie-out; collapsing a leg to its value is how you run one without printing anything.',
     req(){ const o=this._o; return 'on <em>'+o.tie+'</em> · <em>ctrl+[</em> ×2 rides into the legs · <em>F2</em> a leg, <em>F9</em> shows its dead value, <em>esc</em> · the stale one reads Q1 — retype <em>'+o.fixF+'</em> ↵ · the check ties to 0'; },
     guide(){ const o=this._o; return [
       'start on the tie-out '+o.tie+' — it is not zero · <kbd>ctrl</kbd>+<kbd>[</kbd> lands you on the total it reads',
@@ -6808,8 +6808,8 @@ const CHALLENGES = {
       const fixRef=o.fixF.slice(1).toUpperCase();
       const fixed = !!badC.formula && new RegExp('(^|[^A-J0-9])'+fixRef+'(?![0-9])').test(String(badC.formula).toUpperCase().replace(/\$/g,'').replace(/^=/,' ')) && Math.abs(num(o.bad)-o.goodV)<0.5;
       return [
-        {label:'ride the trace — ctrl+[ ×2 from the tie-out into the legs', ok:(S.traceN||0)>=2},
-        {label:'interrogate with F9 — evaluate a leg in place; esc keeps it live', ok:(S.f9N||0)>=1},
+        {label:'ride the trace — from the tie-out into the legs', ok:(S.traceN||0)>=2},
+        {label:'interrogate a leg — evaluate it in place; back out and it stays live', ok:(S.f9N||0)>=1},
         {label:'repoint the stale leg to the Q2 feed ('+o.fixF+')', ok:fixed},
         {label:'the page ties — the check lands at 0', ok:Math.abs(num(o.tie))<0.5},
       ];
@@ -7100,7 +7100,7 @@ const CHALLENGES = {
         {label:'Compute gross profit \u2014 revenue plus signed COGS, every year (B7:F7)', ok:gpOk},
         {label:'Compute EBITDA \u2014 gross profit plus signed opex, every year (B9:F9)', ok:eOk},
         {label:'Run the margin live \u2014 nothing drifts, rebuilt values match v1 exactly (B10:F10)', ok:mOk},
-        {label:'Stamp the roll-forward \u2014 ctrl+h to bulk-rename v1 \u2192 v2 across the page (A12:A13)', ok:tagOk},
+        {label:'Stamp the roll-forward \u2014 bulk-rename v1 \u2192 v2 across the page (A12:A13)', ok:tagOk},
       ];
     }
   },
@@ -7304,7 +7304,7 @@ const CHALLENGES = {
       const mutApplied = Math.abs(gcell('B6')-this._mutG)<1e-9;
       return [
         {label:'Build the DRIVER via CHOOSE — B8 =CHOOSE($B$3,B5,C5,D5) (active case), B9 =CHOOSE($B$3,B6,C6,D6) (active growth)', ok:driverOk},
-        {label:'Run the model off the driver — C12 =B12*(1+$B$9), F4-anchored, fill C12:F12', ok:modelOk},
+        {label:'Run the model off the driver — C12 =B12*(1+$B$9), anchored, fill C12:F12', ok:modelOk},
         {label:'Read the % growth under revenue — C13 =C12/B12-1, fill C13:F13', ok:growthOk},
         {label:'Build the sticky capture — C18 =IF($B$3=C$17,$'+capL+'$12,C18), fill C18:E18', ok:captureOk},
         {label:'Flip 1·2·3 to snapshot each case — Upside & Downside anchor and hold', ok:driverOk && captureOk && snapOk[1] && snapOk[2]},
@@ -7384,7 +7384,7 @@ const CHALLENGES = {
   fxconvert:{
     name:'FX Convert', label:'Convert with one FX rate', par:35, parKeys:34,
     aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention boxes the driver (Alt H B A) while the output table gets an outline (Alt H B S).',
-    prompt:'Convert the euro revenue table to dollars. Desk convention: the FX rate lives in one cell — typed blue and boxed (Alt H B A) — and every converted number reads off it. Build the USD block from a single anchored formula, fill right then down, add commas, and outline the finished table (Alt H B S) instead of ruling a grid of borders.',
+    prompt:'Convert the euro revenue table to dollars. Desk convention: the FX rate lives in one cell — typed blue and boxed — and every converted number reads off it. Build the USD block from a single anchored formula, fill right then down, add commas, and outline the finished table instead of ruling a grid of borders.',
     req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), box it (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outline <em>A10:F12</em> (<em>alt h b s</em>)'; },
     guide(){ return [
       'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — a standalone input gets ALL borders; that box says "this cell drives the page"',
@@ -7447,11 +7447,11 @@ const CHALLENGES = {
         for(let r=10;r<=12;r++){ const l=S.cells['A'+r]||{}, rr=S.cells['F'+r]||{};
           if(!l.bl||!rr.br) return false; } return true; })();
       return [
-        {label:'Type the desk rate '+this._rateStr+' at B3 and blue it (alt h f c) — the one hardcode on the page', ok:rateOk},
-        {label:'Box the rate cell (alt h b a) — all borders on a standalone driver, the desk convention', ok:boxOk},
-        {label:'Convert with ONE formula — B10 =B6*$B$3, F4-anchored, fill right then down (B10:F12)', ok:usdOk},
-        {label:'Comma-format the USD block (alt h k)', ok:usdOk&&comOk},
-        {label:'Outline the finished table A10:F12 (alt h b s) — one perimeter, never a grid of borders', ok:outOk},
+        {label:'Type the desk rate '+this._rateStr+' at B3 and blue it — the one hardcode on the page', ok:rateOk},
+        {label:'Box the rate cell — all borders on a standalone driver, the desk convention', ok:boxOk},
+        {label:'Convert with ONE formula — B10 =B6*$B$3, anchored, fill right then down (B10:F12)', ok:usdOk},
+        {label:'Comma-format the USD block', ok:usdOk&&comOk},
+        {label:'Outline the finished table A10:F12 — one perimeter, never a grid of borders', ok:outOk},
       ];
     }
   },
@@ -7501,7 +7501,7 @@ const CHALLENGES = {
   modeltour:{
     name:'Model Tour', label:'Rebuild the subtotals', par:53, parKeys:54,
     aha:'Subtotals are formulas, not typed numbers — Ctrl+arrows fly you to each #REF!, you rebuild the sum, and one margin formula filled right covers the whole row.',
-    prompt:'Four subtotal rows — Gross profit, EBITDA (operating profit before depreciation and amortization), EBIT (after it) and Net income — each lost a cell to #REF!, Excel’s broken-reference error. Subtotals are formulas, not typed numbers: use Ctrl+arrows to jump to each broken cell and rebuild the formula that sums the lines above it (costs already carry their sign). Then add the margin rows: build =subtotal/Revenue in the first column and fill right so one formula covers the whole row. Finish by dollar-formatting Net income and returning to A1.',
+    prompt:'Four subtotal rows — Gross profit, EBITDA (operating profit before depreciation and amortization), EBIT (after it) and Net income — each lost a cell to #REF!, Excel’s broken-reference error. Subtotals are formulas, not typed numbers: jump to each broken cell and rebuild the formula that sums the lines above it (costs already carry their sign). Then add the margin rows: build =subtotal/Revenue in the first column and fill right so one formula covers the whole row. Finish by dollar-formatting Net income and returning to A1.',
     req(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return m.map(x=>'<em>'+x.k+'</em> → <em>='+x.disp+'</em>').join(' · ')+' · margins <em>B'+MG[0].r+'</em> =B'+MG[0].num+'/B3 fill right <em>B'+MG[0].r+':'+LC+MG[0].r+'</em>, <em>B'+MG[1].r+'</em> =B'+MG[1].num+'/B3 fill right · <em>ctrl+shift+$</em> Net income <em>'+this._niRng+'</em> + <em>bottom border</em> (<em>alt h b o</em>) · finish <em>ctrl+home</em>'; },
     guide(){ const m=this._m, MG=this._marg, LC=colLetter(1+this._NC); return [
       'the Gross profit break at '+m[0].k+' — fly there with ctrl-arrows · it’s Revenue plus COGS (COGS is negative, so it just adds): type <kbd>='+m[0].disp+'</kbd> <kbd>↵</kbd>',
@@ -7590,18 +7590,18 @@ const CHALLENGES = {
       for(let c=2;c<2+NC;c++){ const x=S.cells[colLetter(c)+15]||{}; if(x.fmtStyle!=='currency') curOk=false; if(!x.bb) borderOk=false; }
       return [
         {label:'Rebuild the four broken subtotals — the cascade FORMULA, not a typed number ('+m.map(x=>x.k).join(', ')+')', ok: allFixed},
-        {label:'Gross profit margin — build =Gross profit ÷ Revenue in column B, then fill right across row '+MG[0].r+' (ctrl+r)', ok: gpmOk},
+        {label:'Gross profit margin — build =Gross profit ÷ Revenue in column B, then fill right across row '+MG[0].r, ok: gpmOk},
         {label:'EBITDA margin — build =EBITDA ÷ Revenue in column B, then fill right across row '+MG[1].r, ok: ebmOk},
-        {label:'Dollar-format the Net income row ('+this._niRng+') — ctrl+shift+$', ok: curOk},
-        {label:'Rule off Net income — a bottom border under '+this._niRng+' (alt h b o)', ok: borderOk},
-        {label:'Finish at A1 — ctrl+home, a clean model greets the reader', ok: allFixed && gpmOk && ebmOk && curOk && borderOk && S.active.r===1 && S.active.c===1},
+        {label:'Dollar-format the Net income row ('+this._niRng+')', ok: curOk},
+        {label:'Rule off Net income — a bottom border under '+this._niRng, ok: borderOk},
+        {label:'Finish at A1 — a clean model greets the reader', ok: allFixed && gpmOk && ebmOk && curOk && borderOk && S.active.r===1 && S.active.c===1},
       ];
     }
   },
   navigation:{
     name:'Navigate', label:'Navigation maze', par:35, parKeys:45,
     aha:'The keyboard is your only way through — Ctrl+arrow shoots down a corridor until it hits a wall, then you turn. Thread the maze, grab the model, and weave it back to the drop zone.',
-    prompt:'Bold walls box you into a maze. Use the arrow keys to step one cell and Ctrl+arrow to shoot down a corridor until it hits a wall. Collect every pip on the way to the model room, grab the model (Ctrl+Shift+→, Ctrl+Shift+↓), copy it with Ctrl+C, then weave back through the maze to the drop zone and paste with Ctrl+V.',
+    prompt:'Bold walls box you into a maze. Step one cell at a time, or shoot down a corridor until it hits a wall. Collect every pip on the way to the model room, grab the whole model, copy it, then weave back through the maze to the drop zone and paste it.',
     req:'thread the maze with <em>ctrl+↑/↓/←/→</em> and single <em>↑/↓/←/→</em> (walls stop you) → collect the pips → grab the model <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → weave to the drop zone → <em>ctrl+v</em>',
     guide(){ return [
       'the walls are solid — <kbd>ctrl</kbd>+<kbd>→/↓/←/↑</kbd> shoots down a corridor to the next wall; a single <kbd>→</kbd> steps one cell',
@@ -7718,9 +7718,9 @@ const CHALLENGES = {
       if(pr.copied && !pr.pasted && dcell && dcell.value==='Revenue') pr.pasted=true;
       return [
         {label:'thread the maze, collecting every pip ('+nGot+'/'+mz.pips.length+')', ok:!!pr.pips},
-        {label:'enter the model room and grab it — Ctrl+Shift+→ then Ctrl+Shift+↓', ok:!!pr.grab},
-        {label:'Ctrl+C — copy the model', ok:!!pr.copied},
-        {label:'weave to the drop zone and paste — Ctrl+V', ok:!!pr.pasted}
+        {label:'enter the model room and grab the whole model', ok:!!pr.grab},
+        {label:'copy the model', ok:!!pr.copied},
+        {label:'weave to the drop zone and paste it', ok:!!pr.pasted}
       ];
     }
   }
@@ -8383,6 +8383,16 @@ function render(){
     const __availH = __gw.clientHeight - 17 - 31;          // usable height minus header
     __VR = Math.max(S.ROWS, Math.round(__availH / __CELL_TARGET));   // canvas rows: content + empty filler
     __rowH = Math.max(18, Math.min(40, Math.floor(__availH / __VR)));
+  } else if(__gw && !S._gridMeasureRetry){
+    /* r406 (Wolf: "every drill other than navigate is in the old grid sizing"): most drills
+       render the FIRST time before the grid box has laid out (clientHeight ~0), so they fell
+       to the coarse pre-measure fallback (32/29/26/24px). Nav only looked right because it
+       re-renders after layout and hit the measured branch. Schedule ONE post-layout re-render
+       so EVERY drill lands on the same 26px standard canvas. Guarded against loops; re-arms if
+       the box still isn't measurable. */
+    S._gridMeasureRetry = 1;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ S._gridMeasureRetry = 0;
+      try{ const w=$('gridwrap'); if(w && w.clientHeight>100) render(); }catch(e){} }));
   }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
   S._colW = colW;                                          // ENGINE widths — graders (autofit) read these; r55 wrongly pointed this at __ew
