@@ -499,13 +499,19 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   background:radial-gradient(ellipse at 50% 8%,rgba(180,20,20,.24),transparent 58%),linear-gradient(#140608,#0c0305) padding-box, conic-gradient(from var(--hkang,120deg),#e8be62,#7a1410,#c02a1a,#3a0406,#d8a24a,#5a0a0c,#e8be62) border-box}   /* r407 (Wolf): Blood Angels — crimson with GILT trim in the border */
 /* r408 (Wolf): a CYLON red scanner sweeps the top edge — the menacing red eye of a Basestar. */
 .hk-frame-heraldic.hk-frame-heraldic{position:relative}
-.hk-frame-heraldic::after{content:''; position:absolute; top:-4px; left:6%; width:34%; height:5px; z-index:6; pointer-events:none;
-  border-radius:99px; background:linear-gradient(90deg,transparent,#ff2a1e 45%,#ff6a4a 50%,#ff2a1e 55%,transparent);
-  box-shadow:0 0 12px 2px rgba(255,40,20,.8); filter:blur(.5px)}
+/* r411 (Wolf): the Cylon red scanner now CIRCLES the whole card instead of a top bar that
+   collided with the title. A bright red arc rides around the 5px border ring (masked to the
+   ring, z-index UNDER the notch tab so it never covers the title), over the slow crimson+gold
+   spin — reads as a scanning eye orbiting the card. */
+@property --hkcyl{ syntax:'<angle>'; inherits:false; initial-value:0deg }
+.hk-frame-heraldic::after{content:''; position:absolute; inset:0; z-index:1; pointer-events:none; border-radius:inherit; padding:5px;
+  background:conic-gradient(from var(--hkcyl,0deg), transparent 0deg 292deg, rgba(255,42,26,.5) 316deg, #ff7a4a 338deg, #ffd8bc 350deg, #ff7a4a 358deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;
+  filter:drop-shadow(0 0 5px rgba(255,54,26,.85))}
 @media (prefers-reduced-motion: no-preference){
-  .hk-frame-heraldic::after{animation:hkCylon 2.6s ease-in-out infinite alternate}
+  .hk-frame-heraldic::after{animation:hkCylonCircle 2.6s linear infinite}
 }
-@keyframes hkCylon{ from{transform:translateX(-10%)} to{transform:translateX(190%)} }
+@keyframes hkCylonCircle{ to{ --hkcyl:360deg } }
 /* r404.6 (Wolf): charter retired. */
 
 /* 6 · BONE (easter egg) — re-scope the palette vars on the card so every inner
@@ -789,7 +795,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 
 .hk-frame-pro.hk-frame-pro{--text:#f6ecca; --muted:#b6a886; --line:#4a3f1e; --accent:#f0dfa8; --accent-dim:#a08a3a;
   border:2px solid transparent; color:#f6ecca;
-  background:radial-gradient(ellipse at 28% 6%,rgba(120,90,190,.38),transparent 55%),linear-gradient(#0a0a18,#111022) padding-box, conic-gradient(from var(--hkang,210deg),#d9c27a,#f3e6b0,#8fe0b8,#d9c27a,#f3e6b0,#d9c27a) border-box;   /* r408 (Wolf): var(--hkang) so PRO's border ACTUALLY spins (was a fixed 210deg — the bug) */
+  background:radial-gradient(ellipse at 28% 6%,rgba(120,90,190,.38),transparent 55%),linear-gradient(#0a0a18,#111022) padding-box, conic-gradient(from var(--hkang,210deg),#f3e6b0,#8f7fff,#4fd0ff,#c98fff,#5fe0c0,#ffd98a,#6f8fff,#f3e6b0) border-box;   /* r408 var(--hkang) spins; r411 (Wolf): cooler COSMIC iridescence — gilt threaded through deep violet / cyan / aurora-green, not the old flat gold+mint */
   box-shadow:0 0 22px rgba(217,194,122,.2),0 20px 60px rgba(0,0,0,.6)}
 .hk-frame-pro .pc-name span,.hk-frame-pro .pub-nm{color:#f6ecca; text-shadow:0 0 12px rgba(230,200,120,.45)}
 
@@ -818,7 +824,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    border pop; bolder, more saturated rainbow border. */
 .hk-frame-founder.hk-frame-founder{--text:#efeaff; --muted:#a99fce; --line:#3c3556; --accent:#c9b8ff; --accent-dim:#8f7fd0;
   border:3px solid transparent; color:#efeaff;
-  background:linear-gradient(150deg,#0a0912,#040308) padding-box, conic-gradient(from var(--hkang,0deg),#ff4da6,#ffc14d,#5fe0ff,#b46bff,#3df0a8,#ff7ec8,#ff4da6) border-box;
+  background:linear-gradient(150deg,#0a0912,#040308) padding-box, conic-gradient(from var(--hkang,0deg),#ff2f6e,#ff7a2f,#ffd23b,#5bff8f,#37e0ff,#5b7bff,#b45bff,#ff45c2,#ff2f6e) border-box;   /* r411 (Wolf): fuller, more saturated rainbow — the full spectrum in nine stops so the pinnacle border reads as a true prism */
   box-shadow:0 0 34px rgba(180,120,255,.4),0 22px 60px rgba(0,0,0,.66)}
 .hk-frame-founder .hkf-glint-sheen{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; border-radius:inherit}
 .hk-frame-founder .pc-name span,.hk-frame-founder .pub-nm{color:#f0e9ff; text-shadow:0 0 10px rgba(200,160,255,.5)}
