@@ -272,6 +272,13 @@
   .pipEaten{display:inline-block; color:var(--accent); opacity:.9; line-height:1; filter:drop-shadow(0 0 2px var(--accent-glow))}
   #grid td.pippop .pipEaten{animation:pipPop .36s ease-out}
   @keyframes pipPop{0%{transform:scale(2.3);opacity:1} 55%{transform:scale(.7);opacity:1} 100%{transform:scale(1);opacity:.9}}
+  /* r402 (Wolf): NAV MAZE — bold impassable walls + the collectible blue pip. */
+  #grid td.mzt{border-top:3px solid var(--text) !important}
+  #grid td.mzb{border-bottom:3px solid var(--text) !important}
+  #grid td.mzl{border-left:3px solid var(--text) !important}
+  #grid td.mzr{border-right:3px solid var(--text) !important}
+  .mzpip{display:inline-block; color:#2f6bd8; font-size:16px; line-height:1; filter:drop-shadow(0 0 2px rgba(47,107,216,.5))}
+  html[data-dark="1"] .mzpip{color:#7db0ff}
   .gridwrap td.navmark-next, html[data-dark="1"] .gridwrap td.navmark-next{color:var(--accent) !important; font-size:22px; animation:navpulse 1.2s ease-in-out infinite}
   @keyframes navpulse{0%,100%{text-shadow:0 0 2px var(--accent-glow)} 50%{text-shadow:0 0 12px var(--accent),0 0 5px var(--accent)}}
   /* r271 — watch-solution spotlight (default ON; opt out: localStorage hk_demo_spot='0').
@@ -7582,66 +7589,61 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation tour', par:17, parKeys:14,
-    aha:'The keyboard LEAPS — Ctrl+arrow jumps to the data’s edge, Shift+arrow selects across; thread the trail, grab the block, drop it in the summary.',
-    prompt:'Using the mouse to select cells takes longer than using the keyboard. Use Ctrl+arrow to jump across cell ranges and hit each target cell in order. Then grab the data (Ctrl+Shift+→, Ctrl+Shift+↓), copy it with Ctrl+C, and paste it into the destination range with Ctrl+V. Finish with Ctrl+Home to return to A1.',
-    req:'<em>ctrl+home</em> → hit the target cells with <em>ctrl+↑/↓/←/→</em> → reach the data block → grab the data <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → find the destination range → <em>ctrl+v</em> → finish <em>ctrl+home</em>',
-    guide(){ const P=this._path||[]; const g=[
-      '<kbd>ctrl</kbd>+<kbd>home</kbd> — jump to A1, the top-left corner',
-      'the highlighted cell is your next target — press the Ctrl+arrow pointing toward it to jump straight there',
-      'continue to the next target cell — press the Ctrl+arrow that points at it'];
-      for(let i=3;i<P.length;i++) g.push('keep going — one Ctrl+arrow jump to the next target cell');
-      g.push('the last jump lands you on the data block');
-      g.push('grab it — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>: the whole block lights up');
-      g.push('<kbd>ctrl</kbd>+<kbd>c</kbd> — copy the model onto your clipboard');
-      g.push('hop right to the <b>deck frame</b> (<kbd>ctrl</kbd>+<kbd>→</kbd>) and <kbd>ctrl</kbd>+<kbd>v</kbd> — drop the model into the summary');
-      g.push('<kbd>ctrl</kbd>+<kbd>home</kbd> — back to A1, clean, for the meeting');
-      return g; },
-    targets(){ const P=this._path||[], M=this._model, D=this._deck; if(!M||!D) return [];
-      const ref=p=>colLetter(p.c)+p.r;
-      const corner=colLetter(M.c0)+M.r0, wide=corner+':'+colLetter(M.c0+M.w-1)+M.r0,
-            full=corner+':'+colLetter(M.c0+M.w-1)+(M.r0+M.h-1);
-      const deck=colLetter(D.c)+D.r;
-      return [...P.map(ref), corner, full, full, deck, 'A1']; },
-    demo(){ const P=this._path, M=this._model, D=this._deck, DR=this._dirs;
-      const K={D:Kb.ctrlDown,U:Kb.ctrlUp,R:Kb.ctrlRight,L:Kb.ctrlLeft};
-      const ref=p=>colLetter(p.c)+p.r;
-      const steps=[{sel:'C3', keys:[Kb.ctrlHome]}];
-      let cur='A1';
-      for(let i=0;i<P.length;i++){ steps.push({sel:cur, keys:[K[DR[i]]]}); cur=ref(P[i]); }
-      const c0=M.c0,r0=M.r0, corner=colLetter(c0)+r0;
-      const wide=corner+':'+colLetter(c0+M.w-1)+r0, full=corner+':'+colLetter(c0+M.w-1)+(r0+M.h-1);
-      steps.push({sel:corner, keys:[{key:'ArrowRight',ctrl:true,shift:true}]});   // grab across
-      steps.push({sel:wide,   keys:[{key:'ArrowDown',ctrl:true,shift:true}]});    // grab down
-      steps.push({sel:full,   keys:[Kb.copy]});                                   // copy
-      steps.push({sel:full,   keys:[Kb.ctrlRight]});                              // hop to the summary frame
-      const deck=colLetter(D.c)+D.r;
-      steps.push({sel:deck,   keys:[Kb.paste]});                                  // drop it in the summary
-      steps.push({sel:deck,   keys:[Kb.ctrlHome]});                               // finish at A1
-      return steps; },
+    name:'Navigate', label:'Navigation maze', par:35, parKeys:45,
+    aha:'The keyboard is your only way through — Ctrl+arrow shoots down a corridor until it hits a wall, then you turn. Thread the maze, grab the model, and weave it back to the drop zone.',
+    prompt:'Bold walls box you into a maze. Use the arrow keys to step one cell and Ctrl+arrow to shoot down a corridor until it hits a wall. Collect every pip on the way to the model room, grab the model (Ctrl+Shift+→, Ctrl+Shift+↓), copy it with Ctrl+C, then weave back through the maze to the drop zone and paste with Ctrl+V.',
+    req:'thread the maze with <em>ctrl+↑/↓/←/→</em> and single <em>↑/↓/←/→</em> (walls stop you) → collect the pips → grab the model <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → weave to the drop zone → <em>ctrl+v</em>',
+    guide(){ return [
+      'the walls are solid — <kbd>ctrl</kbd>+<kbd>→/↓/←/↑</kbd> shoots down a corridor to the next wall; a single <kbd>→</kbd> steps one cell',
+      'follow the corridor, collecting each pip as you pass it',
+      'keep weaving toward the model room — turn at every wall',
+      'at the model, grab it — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>',
+      '<kbd>ctrl</kbd>+<kbd>c</kbd> — copy the model',
+      'weave back through the maze to the <b>drop zone</b>',
+      '<kbd>ctrl</kbd>+<kbd>v</kbd> — paste the model into the drop zone' ]; },
+    targets(){ return []; },
+    // ---- maze geometry helpers (shared by build + demo) ----
+    _mz(r,c,nr,nc){ const a=r*100+c,b=nr*100+nc; return a<b?(r+':'+c+'|'+nr+':'+nc):(nr+':'+nc+'|'+r+':'+c); },
+    demo(){
+      const M=this._maze; if(!M) return [];
+      const pass=M.pass, T=M.table, D=M.paste;
+      const RN=20, CN=10, self=this;
+      const passable=(r,c,nr,nc)=> nr>=1&&nr<=RN&&nc>=1&&nc<=CN && pass.has(self._mz(r,c,nr,nc));
+      const shoot=(r,c,dr,dc)=>{ let cr=r,cc=c; while(passable(cr,cc,cr+dr,cc+dc)){cr+=dr;cc+=dc;} return [cr,cc]; };
+      const bfs=(a,b)=>{ const q=[a],prev={}; prev[a[0]+','+a[1]]=null;
+        while(q.length){ const [r,c]=q.shift(); if(r===b[0]&&c===b[1]){ const p=[]; let cur=[r,c]; while(cur){p.unshift(cur);cur=prev[cur[0]+','+cur[1]];} return p; }
+          for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){ const nr=r+dr,nc=c+dc; if(!passable(r,c,nr,nc)) continue; const k=nr+','+nc; if(prev[k]!==undefined) continue; prev[k]=[r,c]; q.push([nr,nc]); } }
+        return null; };
+      const dK=(dr,dc)=> dr===1?Kb.ctrlDown:dr===-1?Kb.ctrlUp:dc===1?Kb.ctrlRight:Kb.ctrlLeft;
+      const sK=(dr,dc)=> dr===1?{key:'ArrowDown'}:dr===-1?{key:'ArrowUp'}:dc===1?{key:'ArrowRight'}:{key:'ArrowLeft'};
+      const ref=(r,c)=>colLetter(c)+r;
+      const steps=[];
+      const walkKeys=(path)=>{ let i=0;
+        while(i<path.length-1){ const [r,c]=path[i]; const dr=Math.sign(path[i+1][0]-r), dc=Math.sign(path[i+1][1]-c);
+          let j=i+1; while(j+1<path.length && Math.sign(path[j+1][0]-path[j][0])===dr && Math.sign(path[j+1][1]-path[j][1])===dc) j++;
+          const end=path[j], sh=shoot(r,c,dr,dc);
+          if(sh[0]===end[0]&&sh[1]===end[1]){ steps.push({sel:ref(r,c), keys:[dK(dr,dc)]}); }
+          else { for(let k=i;k<j;k++){ const [rr,cc]=path[k]; steps.push({sel:ref(rr,cc), keys:[sK(dr,dc)]}); } }
+          i=j; } };
+      // 1) start -> model corner (collect pips en route)
+      const toModel=(M.p1&&M.p1.length>1)?M.p1:bfs([1,1],[T.r0,T.c0]); if(toModel) walkKeys(toModel);   // r402: follow the pip path exactly (braid loops make BFS pick alternates that skip pips)
+      // 2) grab + copy
+      const corner=ref(T.r0,T.c0), wide=corner+':'+ref(T.r0,T.c0+T.w-1), full=corner+':'+ref(T.r0+T.h-1,T.c0+T.w-1);
+      steps.push({sel:corner, keys:[{key:'ArrowRight',ctrl:true,shift:true}]});
+      steps.push({sel:wide,   keys:[{key:'ArrowDown',ctrl:true,shift:true}]});
+      steps.push({sel:full,   keys:[Kb.copy]});
+      // 3) far corner (post-grab active) -> drop corner, then paste
+      const toDrop=(M.p2&&M.p2.length>1)?M.p2:bfs([T.r0+T.h-1,T.c0+T.w-1],[D.r0,D.c0]); if(toDrop) walkKeys(toDrop);
+      steps.push({sel:ref(D.r0,D.c0), keys:[Kb.paste]});
+      return steps;
+    },
     build(){
-      // r223/r401 (Wolf): the flagship maze. LONGER (7 marker leaps + the model = 8 jumps), and
-      // now ROOMIER on the fixed-canvas grid — a 20-row sheet. The extra rows are the point: the
-      // random walk has far more space to place its leaps, so it busts less and reaches a verified
-      // random maze on nearly every seed (the fixed fallback is now almost never needed → real
-      // variety run-to-run). The model still sits inside a guaranteed blank MOAT so Ctrl+Shift+→/↓
-      // grab EXACTLY the model — no stray marker swept in (Wolf's engine catch that once made the
-      // keystrokes-to-win differ across seeds). Directions stay fully random (up/down/left/right).
-      // A ctrlJump replica verifies the whole thread + deck hop before shipping; re-rolls busts.
-      const RN=20, CN=10;
-      const isF=(m,r,c)=>{ const x=m[colLetter(c)+r]; return !!(x && ((x.value!==null&&x.value!=='')||x.formula)); };
-      function sim(m,r,c,dr,dc){ let nr=r+dr,nc=c+dc; const ib=(rr,cc)=>rr>=1&&rr<=RN&&cc>=1&&cc<=CN;
-        if(!ib(nr,nc)) return {r,c};
-        if(isF(m,r,c)&&isF(m,nr,nc)){ while(ib(nr+dr,nc+dc)&&isF(m,nr+dr,nc+dc)){nr+=dr;nc+=dc;} }
-        else { while(ib(nr,nc)&&!isF(m,nr,nc)){ if(!ib(nr+dr,nc+dc))break; nr+=dr;nc+=dc;} }
-        return {r:nr,c:nc}; }
-      const DV={D:[1,0],U:[-1,0],R:[0,1],L:[0,-1]}, DK=['D','U','R','L'];
-      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
-      const rangeArr=(lo,hi)=>{ const o=[]; for(let v=lo;v<=hi;v++) o.push(v); return o; };
-      const NMARK=7;   // 7 marker leaps + the model corner = 8 jumps — a long, roaming maze
-
-      function mkModelCells(mr,mc){
-        const cells={}, mL=colLetter(mc), yrs=[colLetter(mc+1),colLetter(mc+2)];
+      const RN=20, CN=10, self=this;
+      const table={r0:15,c0:2,w:3,h:4}, paste={r0:2,c0:7,w:3,h:4};
+      const inRoom=(rm,r,c)=> r>=rm.r0&&r<rm.r0+rm.h&&c>=rm.c0&&c<rm.c0+rm.w;
+      const roomCell=(r,c)=> inRoom(table,r,c)||inRoom(paste,r,c);
+      const K=(r,c)=>r+':'+c;
+      function mkModelCells(mr,mc){ const cells={}, mL=colLetter(mc), yrs=[colLetter(mc+1),colLetter(mc+2)];
         cells[mL+mr]={...blankCell(),value:'Revenue',txt:true};
         cells[mL+(mr+1)]={...blankCell(),value:'COGS',txt:true};
         cells[mL+(mr+2)]={...blankCell(),value:'Gross profit',txt:true,bold:true};
@@ -7652,101 +7654,64 @@ const CHALLENGES = {
           cells[Y+(mr+2)]={...blankCell(),formula:'='+Y+mr+'+'+Y+(mr+1),value:gp,fmtStyle:'comma',decimals:0,bold:true,bt:true};
           cells[Y+(mr+3)]={...blankCell(),value:ebit,fmtStyle:'comma',decimals:0,bold:true,bt:true}; });
         return cells; }
-
-      for(let attempt=0; attempt<9000; attempt++){
-        // 1) free random-direction walk: NMARK markers + a final cell = the model corner
-        const occ={}, put=(r,c)=>{occ[r+','+c]=true;}, has=(r,c)=>!!occ[r+','+c];
-        let cur={r:1,c:1}; const pts=[], dirs=[]; let bust=false;
-        for(let i=0;i<NMARK+1;i++){
-          const order=shuffle(DK.slice()); let placed=false;
-          for(const d of order){ const dr=DV[d][0], dc=DV[d][1];
-            const dmax = d==='D'?RN-cur.r : d==='U'?cur.r-1 : d==='R'?CN-cur.c : cur.c-1;
-            if(dmax<2) continue;
-            for(const dist of shuffle(rangeArr(2,dmax))){
-              const tr=cur.r+dr*dist, tc=cur.c+dc*dist;
-              if(tr<1||tr>RN||tc<1||tc>CN||has(tr,tc)) continue;
-              let clear=true; for(let s=1;s<dist;s++){ if(has(cur.r+dr*s,cur.c+dc*s)){clear=false;break;} }
-              if(!clear) continue;
-              put(tr,tc); pts.push({r:tr,c:tc}); dirs.push(d); cur={r:tr,c:tc}; placed=true; break;
-            }
-            if(placed) break; }
-          if(!placed){ bust=true; break; }
-        }
-        if(bust) continue;
-        const corner=pts[NMARK], mr=corner.r, mc=corner.c;
-        if(mr+3>RN || mc+2>CN) continue;
-        const gap=rnd(2,3), cdeck=mc+2+gap, deckRow=mr+3;
-        if(cdeck+2>CN) continue;
-        if(deckRow+3>RN) continue;
-        // 2) THE MOAT (Wolf): every marker must stay OUT of the model's bordering ring so
-        //    Ctrl+Shift+→/↓ grab exactly the model, no stray marker swept in. Ring = one cell
-        //    out on every side of the 3x4 model. The deck sits beyond the ring (gap>=2).
-        const inRing=(r,c)=> r>=mr-1 && r<=mr+4 && c>=mc-1 && c<=mc+3;
-        let ringClash=false;
-        for(let i=0;i<NMARK;i++){ if(inRing(pts[i].r,pts[i].c)){ ringClash=true; break; } }
-        if(ringClash) continue;
-        // 3) collision: model + deck anchor + pasted deck region must not sit on any marker
-        const clash=(r1,c1,r2,c2)=>{ for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++) if(has(r,c)&&!(r===mr&&c===mc)) return true; return false; };
-        if(clash(mr,mc,mr+3,mc+2)) continue;
-        if(clash(deckRow,cdeck,deckRow+3,cdeck+2)) continue;
-        // 4) build + VERIFY the full thread and the summary hop through the engine replica
-        const cells={};
-        for(let i=0;i<NMARK;i++) cells[colLetter(pts[i].c)+pts[i].r]={...blankCell(),value:'●',txt:true,bold:true,align:'c',fontColor:'blue'};
-        Object.assign(cells, mkModelCells(mr,mc));
-        cells[colLetter(cdeck)+deckRow]={...blankCell(),value:'deck ▸',txt:true,bold:true,align:'c',fontColor:'green',bb:true,bt:true,bl:true,br:true};
-        let ok=true, c2={r:1,c:1};
-        for(let i=0;i<=NMARK;i++){ const d=DV[dirs[i]]; const nx=sim(cells,c2.r,c2.c,d[0],d[1]);
-          const want=pts[i]; if(nx.r!==want.r||nx.c!==want.c){ ok=false; break; } c2=nx; }
-        if(!ok) continue;
-        const hop=sim(cells, mr+3, mc+2, 0, 1);
-        if(hop.r!==deckRow || hop.c!==cdeck) continue;
-        this._path=pts.slice(0,NMARK);
-        this._dirs=dirs;
-        this._model={r0:mr,c0:mc,w:3,h:4};
-        this._deck={r:deckRow,c:cdeck};
-        return {ROWS:RN, cells, active:{r:1,c:1}, sel:null,
-          colW:{1:80,2:80,3:80,4:80,5:80,6:80,7:80,8:80,9:80,10:80}}   // r229: STANDARD grid — even columns;
-      }
-      // fallback: a guaranteed-clean fixed maze (5 markers incl an up-leap) — the moat holds here too.
-      const fp=[{r:5,c:1},{r:5,c:6},{r:2,c:6},{r:2,c:3},{r:5,c:3}], fmr=9, fmc=3;
-      const cF={};
-      fp.forEach(p=>cF[colLetter(p.c)+p.r]={...blankCell(),value:'●',txt:true,bold:true,align:'c',fontColor:'blue'});
-      Object.assign(cF, mkModelCells(fmr,fmc));
-      const fcdeck=7, fdeckRow=fmr+3;   // G12
-      cF[colLetter(fcdeck)+fdeckRow]={...blankCell(),value:'deck ▸',txt:true,bold:true,align:'c',fontColor:'green',bb:true,bt:true,bl:true,br:true};
-      this._path=fp; this._dirs=['D','R','U','L','D','D'];
-      this._model={r0:fmr,c0:fmc,w:3,h:4}; this._deck={r:fdeckRow,c:fcdeck};
-      return {ROWS:RN, cells:cF, active:{r:1,c:1}, sel:null,
-        colW:{1:80,2:80,3:80,4:80,5:80,6:80,7:80,8:80,9:80,10:80}}   // r229: STANDARD grid — even columns;
+      // ---- perfect maze via recursive backtracker (linear; every cell reachable) ----
+      const pass=new Set(), channel=new Set(), nbrs=new Map();
+      const addN=(r,c,nr,nc)=>{ const k=K(r,c); if(!nbrs.has(k))nbrs.set(k,[]); nbrs.get(k).push([nr,nc]); };
+      const link=(r,c,nr,nc)=>{ pass.add(self._mz(r,c,nr,nc)); addN(r,c,nr,nc); addN(nr,nc,r,c); };
+      const has=(r,c,nr,nc)=> (nbrs.get(K(r,c))||[]).some(x=>x[0]===nr&&x[1]===nc);
+      for(let r=1;r<=RN;r++)for(let c=1;c<=CN;c++) channel.add(K(r,c));
+      const DD=[[-1,0],[1,0],[0,-1],[0,1]];
+      const vis=Array.from({length:RN+1},()=>new Array(CN+1).fill(false));
+      const st=[[1,1]]; vis[1][1]=true;
+      while(st.length){ const cur=st[st.length-1], r=cur[0], c=cur[1], opt=[];
+        for(const d of DD){ const nr=r+d[0],nc=c+d[1]; if(nr>=1&&nr<=RN&&nc>=1&&nc<=CN&&!vis[nr][nc]) opt.push([nr,nc]); }
+        if(!opt.length){ st.pop(); continue; }
+        const nx=opt[rnd(0,opt.length-1)]; link(r,c,nx[0],nx[1]); vis[nx[0]][nx[1]]=true; st.push(nx); }
+      // braid: open ~half the dead-ends to add loops/shortcuts (shorter, less tedious paths)
+      for(let r=1;r<=RN;r++)for(let c=1;c<=CN;c++){ if(roomCell(r,c)) continue;
+        if((nbrs.get(K(r,c))||[]).length<=1 && rnd(0,99)<55){
+          const cand=DD.map(d=>[r+d[0],c+d[1]]).filter(([nr,nc])=>nr>=1&&nr<=RN&&nc>=1&&nc<=CN&&!has(r,c,nr,nc));
+          if(cand.length){ const nx=cand[rnd(0,cand.length-1)]; link(r,c,nx[0],nx[1]); } } }
+      // open the two rooms (roam freely inside)
+      const openRoom=rm=>{ for(let r=rm.r0;r<rm.r0+rm.h;r++)for(let c=rm.c0;c<rm.c0+rm.w;c++){
+        if(c+1<rm.c0+rm.w && !has(r,c,r,c+1)) link(r,c,r,c+1);
+        if(r+1<rm.r0+rm.h && !has(r,c,r+1,c)) link(r,c,r+1,c); } };
+      openRoom(table); openRoom(paste);
+      // BFS solution paths (for the demo + pip placement)
+      const bfs=(a,b)=>{ const q=[a],prev={}; prev[a[0]+','+a[1]]=null;
+        while(q.length){ const [r,c]=q.shift(); if(r===b[0]&&c===b[1]){ const p=[]; let x=[r,c]; while(x){p.unshift(x);x=prev[x[0]+','+x[1]];} return p; }
+          for(const nb of (nbrs.get(K(r,c))||[])){ const k=nb[0]+','+nb[1]; if(prev[k]!==undefined) continue; prev[k]=[r,c]; q.push(nb); } }
+        return null; };
+      const p1=bfs([1,1],[table.r0,table.c0]) || [[1,1]];
+      const p2=bfs([table.r0+table.h-1,table.c0+table.w-1],[paste.r0,paste.c0]) || [[paste.r0,paste.c0]];
+      // pips along the start->model route (skip endpoints + room cells)
+      const pips=[]; const inner=p1.filter(([r,c])=>!roomCell(r,c)).slice(1,-1);
+      const stepN=Math.max(1,Math.floor(inner.length/6));
+      for(let i=Math.floor(stepN/2); i<inner.length && pips.length<6; i+=stepN) pips.push([inner[i][0],inner[i][1]]);
+      // cells: model + drop-zone label
+      const cells=Object.assign({}, mkModelCells(table.r0,table.c0));
+      cells[colLetter(paste.c0)+paste.r0]={...blankCell(),value:'drop ▸',txt:true,bold:true,align:'c',fontColor:'green'};
+      this._maze={pass,channel,pips,table,paste,p1,p2};
+      return {ROWS:RN, cells, active:{r:1,c:1}, sel:null,
+        colW:{1:80,2:80,3:80,4:80,5:80,6:80,7:80,8:80,9:80,10:80},
+        maze:{pass,channel,pips,table,paste,got:{},prog:{}}};
     },
-    // r223: latches thread the maze in order (active ON each marker, no selection), then the model
-    // corner, the block grab, the copy, the PASTE into the summary, and the finish at A1. Marker beats
-    // scale to however many jumps the maze shipped.
     checks(S){
-      const P=this._path, M=this._model, D=this._deck;
-      if(!S.navProgress) S.navProgress={};
-      const np=S.navProgress, A=S.active, sel=S.sel, s=selRange();
-      const at=(r,c)=> A.r===r && A.c===c && !sel;
-      const cb=S.clipboard&&S.clipboard.rect;
-      const mk=P.map((_,i)=>'m'+i);
-      for(let i=0;i<P.length;i++){ const prev=i===0?true:np[mk[i-1]];
-        if(prev && !np[mk[i]] && at(P[i].r,P[i].c)) np[mk[i]]=true; }
-      const lastM=np[mk[mk.length-1]];
-      if( lastM && !np.arr  && at(M.r0,M.c0)) np.arr=true;
-      if( np.arr && !np.grab && !!sel && s.r1===M.r0 && s.r2===M.r0+M.h-1 && s.c1===M.c0 && s.c2===M.c0+M.w-1) np.grab=true;
-      if( np.grab&& !np.copied && !!cb && cb.r1===M.r0 && cb.c1===M.c0 && cb.r2>=M.r0+M.h-1 && cb.c2>=M.c0+M.w-1) np.copied=true;
-      const dcell=S.cells[colLetter(D.c)+D.r];
-      if( np.copied && !np.pasted && dcell && dcell.value==='Revenue') np.pasted=true;
-      if( np.pasted && !np.home && A.r===1 && A.c===1) np.home=true;
-      const beats=[];
-      const mLabels=['jump to the first target cell (Ctrl+arrow)','jump to the next target cell','continue — the path changes direction','jump to the next target cell','one more Ctrl+arrow jump','jump to the next target cell','last target before the data block'];
-      for(let i=0;i<P.length;i++) beats.push({label:(mLabels[i]||'jump to the next target cell'), ok: np[mk[i]]});
-      beats.push({label:'the last jump lands you on the data block', ok: np.arr});
-      beats.push({label:'select the data — Ctrl+Shift+→ then Ctrl+Shift+↓ (whole block)', ok: np.grab});
-      beats.push({label:'Ctrl+C — copy the data', ok: np.copied});
-      beats.push({label:'move to the destination range (Ctrl+→) and paste with Ctrl+V', ok: np.pasted});
-      beats.push({label:'Ctrl+Home — return to A1', ok: np.home});
-      return beats;
+      const mz=S.maze; if(!mz) return [];
+      if(!mz.got) mz.got={}; if(!mz.prog) mz.prog={};
+      const pr=mz.prog, A=S.active, sel=S.sel, s=selRange(), cb=S.clipboard&&S.clipboard.rect, T=mz.table, D=mz.paste;
+      const nGot=mz.pips.filter((_,i)=>mz.got[i]).length;
+      if(mz.pips.length===0 || nGot===mz.pips.length) pr.pips=true;
+      if(pr.pips && !pr.grab && !!sel && s.r1===T.r0 && s.r2===T.r0+T.h-1 && s.c1===T.c0 && s.c2===T.c0+T.w-1) pr.grab=true;
+      if(pr.grab && !pr.copied && !!cb && cb.r1===T.r0 && cb.c1===T.c0 && cb.r2>=T.r0+T.h-1 && cb.c2>=T.c0+T.w-1) pr.copied=true;
+      const dcell=S.cells[colLetter(D.c0)+D.r0];
+      if(pr.copied && !pr.pasted && dcell && dcell.value==='Revenue') pr.pasted=true;
+      return [
+        {label:'thread the maze, collecting every pip ('+nGot+'/'+mz.pips.length+')', ok:!!pr.pips},
+        {label:'enter the model room and grab it — Ctrl+Shift+→ then Ctrl+Shift+↓', ok:!!pr.grab},
+        {label:'Ctrl+C — copy the model', ok:!!pr.copied},
+        {label:'weave to the drop zone and paste — Ctrl+V', ok:!!pr.pasted}
+      ];
     }
   }
 };
@@ -7810,6 +7775,15 @@ function ensure(r,c){ const k=ck(r,c); if(!S.cells[k]) S.cells[k]=blankCell(); r
 function nonEmpty(r,c){ const x=get(r,c); return (x.value!==null&&x.value!=='')||!!x.formula; }
 function inb(r,c){ return r>=1&&r<=S.ROWS&&c>=1&&c<=COLS; }
 
+/* r402 (Wolf): NAV-MAZE movement. Bold-border walls carve corridors between the model room and
+   the drop zone. A "passage" is an open edge between two adjacent cells; an edge with no passage
+   is a wall the cursor can't cross. Ctrl+arrow shoots along passages to the next wall; a single
+   arrow steps one cell; junction branches make you slow to single-steps around a corner. Pips
+   collect on pass-through. mzEdge is the canonical (order-independent) key for an edge. */
+function mzEdge(r,c,nr,nc){ const a=r*100+c, b=nr*100+nc; return a<b ? (r+':'+c+'|'+nr+':'+nc) : (nr+':'+nc+'|'+r+':'+c); }
+function mazePassable(r,c,nr,nc){ if(!S.maze) return false; if(nr<1||nr>S.ROWS||nc<1||nc>COLS) return false; return S.maze.pass.has(mzEdge(r,c,nr,nc)); }
+function mazePip(r,c){ const mz=S.maze; if(!mz||!mz.pips) return; if(!mz.got) mz.got={};
+  for(let i=0;i<mz.pips.length;i++){ if(mz.pips[i][0]===r && mz.pips[i][1]===c && !mz.got[i]){ mz.got[i]=true; mz._fresh=i; } } }
 function ctrlJump(r,c,dr,dc){
   let nr=r+dr,nc=c+dc;
   if(!inb(nr,nc)) return {r,c};
@@ -8475,6 +8449,14 @@ function render(){
         if(__navNext===-1 || i<__navNext) cls.push('navmark-done');   // visited — fade back
         else if(i===__navNext) cls.push('navmark-next');              // THE next stop — pulse
         break; } } }
+      // r402 (Wolf): NAV MAZE — bold walls on any channel-cell edge without a passage. Only channel
+      // cells get walls so the sealed-off area stays plain; the corridors read as bordered tubes.
+      if(S.maze && S.maze.channel && S.maze.channel.has(r+':'+c)){
+        if(!mazePassable(r,c,r-1,c)) cls.push('mzt');
+        if(!mazePassable(r,c,r+1,c)) cls.push('mzb');
+        if(!mazePassable(r,c,r,c-1)) cls.push('mzl');
+        if(!mazePassable(r,c,r,c+1)) cls.push('mzr');
+      }
       if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
       if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
       // r312 (Wolf): Excel's fill-handle — the tiny green square at the selection's bottom-right
@@ -8554,6 +8536,12 @@ function render(){
       if(cls.indexOf('navmark')>=0){
         txt = (cls.indexOf('navmark-done')>=0) ? '<span class="pipEaten">●</span>' : '●';
       }
+      // r402 (Wolf): maze pip — blue dot ahead, green once collected (pac-man trail), pop on collect.
+      if(S.maze && S.maze.pips){ for(let pi=0; pi<S.maze.pips.length; pi++){ if(S.maze.pips[pi][0]===r && S.maze.pips[pi][1]===c){
+        const got = S.maze.got && S.maze.got[pi];
+        txt = got ? '<span class="pipEaten">●</span>' : '<span class="mzpip">●</span>';
+        if(S.maze._fresh===pi) cls.push('pippop');
+        break; } } }
       row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${__ew[c]}px;max-width:${__ew[c]}px${extraStyle}">${txt}</td>`;
     }
     row+='</tr>'; g.innerHTML+=row;
@@ -8565,6 +8553,7 @@ function render(){
     const __td=document.querySelector('#grid td[data-r="'+__pp.r+'"][data-c="'+__pp.c+'"]');
     if(__td) __td.classList.add('pippop');
   }
+  if(S.maze) S.maze._fresh=undefined;   // r402: one-shot pip pop consumed this render
   positionMarquee();
   positionPasteDest();
   if(pendingFlash){ const f=pendingFlash; pendingFlash=null;
@@ -10740,6 +10729,16 @@ function copySel(){
 function visStep(r,dr){ let nr=r+dr; while(nr>=1&&nr<=S.ROWS&&rowHidden(nr)) nr+=dr;
   return (nr<1||nr>S.ROWS)? r : nr; }
 function move(dr,dc,shift,ctrl){
+  // r402 (Wolf): MAZE navigation — walls block, pips collect. Ctrl+arrow shoots along the corridor
+  // to the next wall; a plain arrow steps one cell (or no-op into a wall). Shift (the block-grab at
+  // the model) falls through to the normal engine so Ctrl+Shift+arrow selects the data block.
+  if(S.maze && !shift){
+    let cr=S.active.r, cc=S.active.c;
+    if(ctrl){ while(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); } }
+    else { if(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); } }
+    S.active={r:cr,c:cc}; S.sel=null;
+    render(); checkWin(); return;
+  }
   // Excel parity: when a multi-cell selection is active and you press a plain arrow key
   // (no Shift, no Ctrl), the selection collapses AND the active cell steps one in that
   // direction — in a SINGLE press (not two). We just clear the selection here and fall
@@ -14228,6 +14227,7 @@ function loadChallenge(key, opts){
   S._ROWS0=S.ROWS;   // r101: the loaded frame size — row ops shift cells, never this frame
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
+  if(built.maze){ S.maze=built.maze; }   // r402: nav-maze walls/pips ride on S for this drill only
   if(built.hiddenRows){ S.hiddenRows=built.hiddenRows.slice(); syncHidden(); }   // r185: inherited sins load pre-hidden
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   sandboxMode=false;   // r238: loading any real drill exits the warm-up sandbox (covers the picker escape-hatch)
