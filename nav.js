@@ -1562,3 +1562,61 @@ window.hkCelebrate = function(o){
   /* skin-unlock cards give the user longer to decide to equip; others keep the quick 4.2s */
   setTimeout(close, eq?9000:4200);
 };
+
+/* ---- r411 (Wolf): SKIN-UNLOCK SWEEP — the shared, page-load-only reveal driver ----
+   A level-up or rank fetch can cross a skin's earn gate, but firing the Rise->Lock reveal
+   from the hot drill-solve path let its overlay open mid-solve (and, for a guest, the equip
+   CTA's sign-up nav destroyed the page under synthetic input). So the reveal lives HERE:
+   called once per page load, never while a drill is being solved. It diffs the genuinely
+   earned frames against hk_seen_frames and plays the reveal only for what's NEW.
+
+   FIRST-RUN is silent: if hk_seen_frames has never been written, we seed it with everything
+   currently earned and pop nothing — an existing player with progress isn't spammed with a
+   reveal for every skin they already own. Only earns that happen AFTER this point reveal. */
+window.hkSkinUnlockSweep = function(){
+  try{
+    if(window.__hkSweepDone) return; window.__hkSweepDone = true;
+    if(!(window.HK_FRAMES && window.hkFrameEarned && window.hkCelebrate && window.hkPlayerCard)) return;
+    let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(_){}
+    const xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+    const lvl=(window.HK_RANK && window.HK_RANK.levelOf) ? (window.HK_RANK.levelOf(xp).lvl|0) : 1;
+    let streak=0; try{ streak=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)|0; }catch(_){}
+    const u={ lvl, tierBest:fl.tierBest|0, dailyWins:fl.dailyWins|0,
+      certs:Object.keys(fl.certTracks||{}).length, perfectRun:fl.perfectRun?1:0,
+      streak, chaptersCleared:fl.chaptersCleared||[],
+      charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
+      founder:!!(window.hkFoundingFlags && (window.hkFoundingFlags().rank|0)),
+      pro:!!fl.pro };
+    const earned=window.HK_FRAMES.filter(f=>{ try{ return window.hkFrameEarned(f.id, u); }catch(_){ return false; } }).map(f=>f.id);
+    const raw=localStorage.getItem('hk_seen_frames');
+    if(raw==null){   // first run ever — seed silently, reveal nothing
+      try{ localStorage.setItem('hk_seen_frames', JSON.stringify(earned)); }catch(_){}
+      return;
+    }
+    let seen=[]; try{ seen=JSON.parse(raw)||[]; }catch(_){}
+    const fresh=earned.filter(id=>seen.indexOf(id)<0);
+    // always advance the seen set to everything earned so a fresh skin never re-pops
+    try{ localStorage.setItem('hk_seen_frames', JSON.stringify([...new Set([...seen, ...earned])])); }catch(_){}
+    if(!fresh.length) return;
+    const signedIn=!!window._navUser;
+    const nm=((localStorage.getItem('hk_handle_cache')||'').trim())||(window._navProfile&&window._navProfile.handle)||'You';
+    /* cap the burst: reveal at most the first 2 new skins (already seeded as seen above);
+       crossing several gates at once shouldn't chain 20s+ of celebrations */
+    fresh.slice(0,2).forEach(id=>{ const f=(window.HK_FRAMES.find(x=>x.id===id))||{};
+      window.hkCelebrate({ cap:'skin unlocked', title:(f.name||'New skin')+' unlocked',
+        sub: signedIn ? 'a new skin for your card, wherever it shows'
+                      : 'create a free account to keep it on your card',
+        skinReveal:true, guest:!signedIn, equip:{frameId:id, frameName:f.name||id},
+        cardData:{ name:nm, lvl, tierLabel:'' } }); });
+  }catch(e){}
+};
+
+/* r411: kick the sweep once per page load, after boot settles so onboarding / welcome-back
+   cards claim the foreground first — hkCelebrate's queue + __hkCelBlocked guard serialize any
+   overlap. The delay also gives getSession() time to land so the guest-vs-signed-in equip CTA
+   is right. NEVER runs during a drill solve: it's tied to page load, not the solve loop. */
+(function(){
+  const kick=()=>{ setTimeout(function(){ try{ if(window.hkSkinUnlockSweep) window.hkSkinUnlockSweep(); }catch(e){} }, 1800); };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', kick);
+  else kick();
+})();
