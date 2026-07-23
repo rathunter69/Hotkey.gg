@@ -1622,12 +1622,21 @@ window.hkInitCardFx = function(root){
            NORMAL blend (they tint the silver with real colour — 'lighter' would vanish on white),
            a bright specular streak rakes across like light off brushed metal, and fine silver
            glints sparkle. Vibrant + elite, distinct from the old dark-space founder. */
-        for(let k=0;k<3;k++){
-          const sp=((t/(6000+k*1400)+k*.33)%1), bx=(-.35+sp*1.7)*w, hue=(t/26+k*120)%360;
-          const g=ctx.createLinearGradient(bx-.2*w,0,bx+.2*w,h);
-          g.addColorStop(0,'hsla('+hue+',88%,58%,0)');
-          g.addColorStop(.5,'hsla('+((hue+40)%360)+',90%,56%,'+(reduce?.1:.22)+')');
-          g.addColorStop(1,'hsla('+((hue+95)%360)+',88%,58%,0)');
+        /* r413 (Wolf: "more rainbow/prismatic"): FOUR wide, saturated foil bands sweeping the
+           silver on offset phases, so the whole card shimmers a full spectrum, plus a slow
+           breathing prismatic wash that keeps colour present even between the bands. */
+        { const br=(t/7000)%1, bhue=(t/22)%360;   // full-card prismatic breath
+          const gb=ctx.createLinearGradient(0,0,w,h);
+          gb.addColorStop(0,'hsla('+bhue+',85%,60%,'+(reduce?.06:.12)+')');
+          gb.addColorStop(.5,'hsla('+((bhue+120)%360)+',85%,60%,'+(reduce?.05:.1)+')');
+          gb.addColorStop(1,'hsla('+((bhue+240)%360)+',85%,60%,'+(reduce?.06:.12)+')');
+          ctx.fillStyle=gb; ctx.fillRect(0,0,w,h); }
+        for(let k=0;k<4;k++){
+          const sp=((t/(5200+k*1200)+k*.27)%1), bx=(-.4+sp*1.8)*w, hue=(t/24+k*90)%360;
+          const g=ctx.createLinearGradient(bx-.26*w,0,bx+.26*w,h);
+          g.addColorStop(0,'hsla('+hue+',90%,58%,0)');
+          g.addColorStop(.5,'hsla('+((hue+40)%360)+',92%,56%,'+(reduce?.13:.3)+')');
+          g.addColorStop(1,'hsla('+((hue+95)%360)+',90%,58%,0)');
           ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
         }
         if(!reduce){ const sp=(t/4200)%1, sx=(-.2+sp*1.5)*w, sa=(1-Math.abs(sp-.5)/.5);
