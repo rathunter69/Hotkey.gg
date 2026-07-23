@@ -1175,10 +1175,10 @@ window.hkFrameOrnaments = (function(){
      fx-kind drives hkInitCardFx (snow/fire/prism/stars/none). */
   const SKINS={
     circuit:      ['NEURAL',      '#04222a', 'linear-gradient(90deg,#1c6a68,#2aa89c)', '#2aa89c', 'circuit'],
-    neon:         ['OVERCLOCK',   '#0b0410', 'linear-gradient(120deg,#ff2d95,#2edcff)', '#ff2d95', ''],
-    blueprint:    ['SHEET 01',    '#0c1a26', 'linear-gradient(90deg,#2f5b86,#4f7aa8)', '#4f7aa8', ''],
+    neon:         ['OVERCLOCK',   '#0b0410', 'linear-gradient(120deg,#ff2d95,#2edcff)', '#ff2d95', 'neon'],   /* r404 (Wolf): cyberpunk neon-chaos rain + glitch bars */
+    blueprint:    ['SHEET 01',    '#0c1a26', 'linear-gradient(90deg,#2f5b86,#4f7aa8)', '#4f7aa8', 'sheet'],   /* r404 (Wolf): blueprint grid building itself, cell by cell */
     crt:          ['C:\\ READY',  '#04140a', 'linear-gradient(90deg,#1c6a38,#2fae5c)', '#2fae5c', 'matrix'],
-    constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','cosmic'],   /* r403 (Wolf #95): the built-but-unused comet starfield — a true "animated starfield", and distinct from PRO's spiral galaxy */
+    constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','navchart'],   /* r404 (Wolf #95): a star-chart — constellation lines trace between stars under a slow compass reticle. Wholly distinct from PRO's Milky Way galaxy. */
     vaporwave:    ['SYNTHWAVE',   '#1a0722', 'linear-gradient(120deg,#ff5db1,#2ee6e6)', '#ff5db1', 'drive'],
     terminal:     ['● LIVE', '#1a1204', 'linear-gradient(90deg,#3a2a08,#7a5a12)', '#e0a02f', 'ticker'],   /* r403 (Wolf): the promised live ticker, now real */
     pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'galaxy'],
@@ -1189,15 +1189,15 @@ window.hkFrameOrnaments = (function(){
     /* r390 (Wolf) new title skins */
     amethyst:     ['◆ AMETHYST','#180a2a','linear-gradient(120deg,#a06cff,#d0a8ff)','#c49bff','prism'],
     onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','gold'],
-    sakura:       ['❀ SAKURA','#3a1420','linear-gradient(120deg,#ffc2dc,#ff8fb8)','#ff8fb8','petals'],
+    sakura:       ['❀ SAKURA','#3a1a26','linear-gradient(120deg,#ffd6e6,#ffaccb)','#ffb6d4','petals'],   /* r404 (Wolf): lighter, softer pink */
     goldenhour:   ['☀ GOLDEN HOUR','#3a1c10','linear-gradient(120deg,#ffd9a0,#ff9e7a)','#ffb488','bokeh'],
     pearl:        ['◗ PEARL','#2a2634','linear-gradient(120deg,#f0e6ff,#cfe6ff)','#e6d9ff','pearl'],
-    bloom:        ['✿ BLOOM','#1e2e1a','linear-gradient(120deg,#c8f0b0,#f6c8e0)','#dcb0e0','petals'],
-    cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','bokeh'],
+    bloom:        ['✿ BLOOM','#14260f','linear-gradient(120deg,#a8e88a,#d8f4b8)','#b8e89a','bloom'],   /* r404 (Wolf): green blossoms — pink petals didn't read against the green */
+    cottoncandy:  ['⊛ COTTON CANDY','#241636','linear-gradient(120deg,#ffc2e8,#b5d8ff)','#ffc2e8','candy'],   /* r404 (Wolf): defined puffs, less blur */
     /* r391 (Wolf) chapter/cert capstone skins */
     architect:    ['△ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],  /* r393 (Wolf): ⟁ fell back to a ⚠-looking glyph in most fonts — a clean drafting triangle reads right */
-    boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','pinstripe'],
-    emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','prism']
+    boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','lux'],   /* r404 (Wolf): champagne spotlight + floating gold sequins (not pinstripes) */
+    emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','emerald']
   };
   return function(id, opts){
     const M=window.HK_METALS||{};
@@ -1214,15 +1214,16 @@ window.hkFrameOrnaments = (function(){
          animation (snow / embers) carries fire+ice better. Cracks retired. */
       if(s[4]) h+='<canvas class="hk-fx" data-kind="'+s[4]+'" aria-hidden="true"></canvas>';
       if(id==='vaporwave') h+='<span class="hkf-sun" aria-hidden="true"></span><span class="hkf-vgrid" aria-hidden="true"></span>';
-      h+=tab(s[0], s[1], s[2], s[3]);
+      let ttl=s[0];
       if(id==='founder'){
-        // r391 (Wolf): the founder card wears its real serial. Explicit opts.serial wins;
-        // else the viewer's own founding rank (opts.owner) — never a stranger's number.
+        // r404 (Wolf): the serial IS the title now — the ★ FOUNDER 001/200 chip reads as
+        // the headline, not a whisper in the corner. Explicit opts.serial wins; else the
+        // viewer's own founding rank (opts.owner) — never a stranger's number.
         let sn=(opts&&opts.serial|0)||0;
         if(!sn && opts && opts.owner && window.hkFoundingFlags){ sn=window.hkFoundingFlags().rank|0; }
-        const label = (sn>0 && sn<=200) ? ('FOUNDER · '+String(sn).padStart(3,'0')+' / 200') : 'FOUNDER · CHARTER';
-        h+='<i class="hkf-serial" aria-hidden="true">'+label+'</i>';
+        ttl = (sn>0 && sn<=200) ? ('★ FOUNDER '+String(sn).padStart(3,'0')+' / 200') : '★ FOUNDER · CHARTER';
       }
+      h+=tab(ttl, s[1], s[2], s[3]);
       return h;
     }
     if(id==='engraved') return GLINT+corners(ENG);
@@ -1309,10 +1310,14 @@ window.hkInitCardFx = function(root){
     /* r390 (Wolf) new skin systems: falling petals (sakura/bloom) · soft bokeh (golden
        hour/cotton candy) · pastel pearl sheen · spiral galaxy (pro) · aurora curtains
        (founder) · synthwave drive grid (vaporwave). */
-    function petals(w,h){const n=Math.round(w*h/12000)+9,cols=['rgba(255,183,213,','rgba(255,150,196,','rgba(255,214,230,'],p=[];
+    function petals(w,h){const n=Math.round(w*h/12000)+9,cols=['rgba(255,208,228,','rgba(255,182,212,','rgba(255,226,238,'],p=[];   // r404: lighter sakura pinks
+      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(3,6.5),vy:R(.3,.95),drift:R(-.5,.5),rot:R(0,6.28),vr:R(-.035,.035),ph:R(0,6.28),o:R(.5,.92),c:cols[i%cols.length]});return p;}
+    function bloomfx(w,h){const n=Math.round(w*h/12000)+9,cols=['rgba(180,230,150,','rgba(210,240,180,','rgba(238,250,222,'],p=[];   // r404: green blossom petals
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(3,6.5),vy:R(.3,.95),drift:R(-.5,.5),rot:R(0,6.28),vr:R(-.035,.035),ph:R(0,6.28),o:R(.5,.92),c:cols[i%cols.length]});return p;}
     function bokeh(w,h){const n=Math.round(w*h/24000)+5,cols=['#ffd9a0','#ffb6c1','#b5d8ff','#fff0c0','#ffc2e8'],p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(10,28),vy:R(-.5,-.18),ph:R(0,6.28),sp:R(.4,1),c:cols[i%cols.length]});return p;}
+    function candy(w,h){const n=Math.round(w*h/16000)+7,cols=['#ffc2e8','#b5d8ff','#fff0c0','#ffd0ec','#c8e6ff'],p=[];   // r404: cotton candy — smaller, defined puffs
+      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(5,13),vy:R(-.5,-.2),ph:R(0,6.28),sp:R(.4,1),c:cols[i%cols.length]});return p;}
     function pearl(w,h){const n=Math.round(w*h/22000)+6,p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.6),ph:R(0,6.28),sp:R(.5,1.3)});return p;}
     function galaxy(w,h){const n=Math.round(w*h/2400)+50,cx=w*.5,cy=h*.52,cols=['#ffffff','#cfd6ff','#ffd9a0','#c9b8ff','#a8e6ff'],p=[];
       for(let i=0;i<n;i++){const arm=i%2,rad=R(.04,.62)*Math.min(w,h),ang=rad*0.028+arm*Math.PI+R(-.35,.35);
@@ -1324,6 +1329,37 @@ window.hkInitCardFx = function(root){
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
     function draft(w,h){return{gs:Math.max(22,Math.round(w/14))};}
     function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
+    /* r404 (Wolf #95) — NAVIGATOR star-chart: stars joined by faint constellation lines
+       with a light pulse tracing each edge, under a slow-rotating compass reticle. */
+    function navchart(w,h){const n=Math.round(w*h/8000)+10,cols=['#ffffff','#cfd6ff','#9fb0ff'],st=[];
+      for(let i=0;i<n;i++)st.push({x:R(0,w),y:R(0,h),r:R(.5,1.7),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});
+      // link each star to its nearest neighbour → sparse constellation graph
+      const links=[]; for(let i=0;i<st.length;i++){ let bj=-1,bd=1e9;
+        for(let j=0;j<st.length;j++){ if(j===i) continue; const dx=st[i].x-st[j].x,dy=st[i].y-st[j].y,d=dx*dx+dy*dy;
+          if(d<bd){bd=d;bj=j;} }
+        if(bj>=0 && bd<(w*.34)*(w*.34) && i<bj) links.push({a:i,b:bj,ph:R(0,1),sp:R(.004,.011)}); }
+      return{st,links,cx:w*.5,cy:h*.5,rr:Math.min(w,h)*.34};}
+    /* r404 (Wolf) — ELITE BOUTIQUE: a champagne spotlight sweeps the card while gold
+       sequins drift up and glint brightest as the light crosses them. */
+    function lux(w,h){const n=Math.round(w*h/13000)+8,cols=['#f0d68a','#fff0c8','#e8c0a0','#d8b25a'],p=[];
+      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(1,2.6),vy:R(-.35,-.1),drift:R(-.25,.25),ph:R(0,6.28),sp:R(.5,1.3),c:cols[i%cols.length]});return p;}
+    /* r404 (Wolf) — refracting gem (amethyst/emerald): slow light beams sweeping from
+       the stone's heart + facet sparkles. Palette picked by kind in the draw branch. */
+    function facet(w,h){const n=Math.round(w*h/9000)+10,p=[];
+      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.7,2.2),ph:R(0,6.28),sp:R(.7,1.7)});
+      const beams=[];for(let i=0;i<4;i++)beams.push({ang:R(0,6.28),sp:R(.00018,.00042)*(Math.random()<.5?1:-1),wid:R(.12,.22)});
+      return{p,beams,cx:w*.5,cy:h*.48};}
+    /* r404 (Wolf) — OVERCLOCK cyberpunk chaos: neon data-rain in magenta/cyan + a
+       perspective floor grid + periodic full-width glitch bars that RGB-split. */
+    function neonfx(w,h){const n=Math.max(14,Math.round(w/12)),drops=[];
+      for(let i=0;i<n;i++)drops.push({x:R(0,w),y:R(-h,h),len:R(10,34),sp:R(2.2,5.2),cy:Math.random()<.5,o:R(.5,1)});
+      const bars=[];for(let i=0;i<3;i++)bars.push({y:R(0,h),life:R(0,120),max:R(70,150),off:0});
+      return{drops,bars,hz:Math.round(h*.62)};}
+    /* r404 (Wolf) — SHEET 01 blueprint: an Excel grid that builds itself. A diagonal
+       fill-wave lights cells blueprint-cyan as it passes, and a green cell-cursor hops. */
+    function sheetfx(w,h){const cw=Math.max(16,Math.round(w/12)),ch=Math.max(12,Math.round(h/8));
+      const cols=Math.ceil(w/cw)+1, rows=Math.ceil(h/ch)+1;
+      return{cw,ch,cols,rows,cur:{c:0,r:0,t:0}};}
     /* r403 (Wolf): terminal "live ticker" — a Bloomberg-amber tape scrolling along the bottom
        edge, each quote a green ▲ / red ▼ against an amber price. */
     function ticker(w,h){const gap=Math.max(46,w/3.2),items=[];let x=0;while(x<w+gap){items.push({x,up:Math.random()<.5,v:R(1,99)});x+=gap;}
@@ -1332,11 +1368,12 @@ window.hkInitCardFx = function(root){
     canv.forEach(cv=>{
       if(cv._hkfx) return; cv._hkfx=1;
       const kind=cv.dataset.kind, S=fit(cv); if(!S) return;
-      let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?prism(S.w,S.h)
-        : kind==='cosmic'?cosmic(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
-        : kind==='petals'?petals(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
+      let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?facet(S.w,S.h)
+        : kind==='emerald'?facet(S.w,S.h) : kind==='neon'?neonfx(S.w,S.h) : kind==='sheet'?sheetfx(S.w,S.h)
+        : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
+        : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
         : kind==='galaxy'?galaxy(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
-        : kind==='gold'?gold(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h)
+        : kind==='gold'?gold(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
       sys.push({cv,kind,S,parts});
@@ -1365,6 +1402,26 @@ window.hkInitCardFx = function(root){
             const g=ctx.createLinearGradient(c.x,c.y,tx,ty); g.addColorStop(0,'rgba(210,230,255,'+a+')'); g.addColorStop(1,'rgba(210,230,255,0)');
             ctx.strokeStyle=g; ctx.lineWidth=1.5*dpr; ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.lineTo(tx,ty); ctx.stroke();
             if(c.life>c.max||c.x<-50||c.y>h+50) P.cm.splice(i,1); } } }
+      else if(o.kind==='navchart'){ const P=o.parts;
+        // slow compass reticle: two faint rings + rotating tick spokes
+        const rot=reduce?0:t/14000;
+        ctx.strokeStyle='rgba(159,176,255,.10)'; ctx.lineWidth=1*dpr;
+        ctx.beginPath(); ctx.arc(P.cx,P.cy,P.rr,0,6.28); ctx.stroke();
+        ctx.beginPath(); ctx.arc(P.cx,P.cy,P.rr*.66,0,6.28); ctx.stroke();
+        ctx.save(); ctx.translate(P.cx,P.cy); ctx.rotate(rot);
+        for(let i=0;i<8;i++){ const a=i/8*6.28, lng=(i%2===0); ctx.strokeStyle='rgba(159,176,255,'+(lng?.16:.08)+')';
+          ctx.beginPath(); ctx.moveTo(Math.cos(a)*P.rr*(lng?.5:.82),Math.sin(a)*P.rr*(lng?.5:.82)); ctx.lineTo(Math.cos(a)*P.rr,Math.sin(a)*P.rr); ctx.stroke(); }
+        ctx.restore();
+        // constellation edges + a light pulse tracing each
+        for(const L of P.links){ const a=P.st[L.a],b=P.st[L.b]; if(!a||!b) continue;
+          ctx.strokeStyle='rgba(150,168,240,.22)'; ctx.lineWidth=1*dpr; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+          if(!reduce){ L.ph+=L.sp; if(L.ph>1) L.ph=0; }
+          const px=a.x+(b.x-a.x)*L.ph, py=a.y+(b.y-a.y)*L.ph;
+          ctx.beginPath(); ctx.arc(px,py,1.6*dpr,0,6.28); ctx.fillStyle='rgba(200,214,255,.9)'; ctx.shadowBlur=6*dpr; ctx.shadowColor='rgba(140,170,255,.9)'; ctx.fill(); }
+        ctx.shadowBlur=0;
+        // the stars themselves
+        for(const s of P.st){ const a=reduce?.7:(.3+.55*(.5+.5*Math.sin(t/620*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
       else if(o.kind==='circuit'){ const P=o.parts; ctx.lineWidth=1*dpr;
         ctx.strokeStyle='rgba(42,168,156,.15)'; ctx.beginPath();
         for(const s of P.tr){ ctx.moveTo(s.x1,s.y1); ctx.lineTo(s.x2,s.y2); } ctx.stroke();
@@ -1388,9 +1445,31 @@ window.hkInitCardFx = function(root){
           ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
         for(const s of P){ const a=reduce?.7:(.3+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
-      else if(o.kind==='petals'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=(s.drift+Math.sin(t/800+s.ph)*.4)*dpr; s.rot+=s.vr; if(s.y>h+8){s.y=-8;s.x=R(0,w);}}
+      else if(o.kind==='petals'||o.kind==='bloom'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=(s.drift+Math.sin(t/800+s.ph)*.4)*dpr; s.rot+=s.vr; if(s.y>h+8){s.y=-8;s.x=R(0,w);}}
         ctx.save();ctx.translate(s.x,s.y);ctx.rotate(s.rot);ctx.beginPath();ctx.ellipse(0,0,s.r*dpr,s.r*.5*dpr,0,0,6.28);ctx.fillStyle=s.c+s.o+')';ctx.fill();ctx.restore(); } }
-      else if(o.kind==='bokeh'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=Math.sin(t/1400+s.ph)*.3*dpr; if(s.y<-s.r*dpr){s.y=h+s.r*dpr;s.x=R(0,w);}}
+      else if(o.kind==='candy'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=Math.sin(t/1200+s.ph)*.35*dpr; if(s.y<-s.r*dpr){s.y=h+s.r*dpr;s.x=R(0,w);}}
+        const a=(reduce?.5:.32+.28*(.5+.5*Math.sin(t/900*s.sp+s.ph)));
+        const g=ctx.createRadialGradient(s.x,s.y,s.r*dpr*.25,s.x,s.y,s.r*dpr); g.addColorStop(0,s.c); g.addColorStop(.65,s.c); g.addColorStop(1,'transparent');
+        ctx.globalAlpha=a;ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fill();ctx.globalAlpha=1; } }
+      else if(o.kind==='lux'){
+        const off=reduce?.5:((t/5000)%1), lx=off*w;   // champagne spotlight travels L→R
+        const rg=ctx.createRadialGradient(lx,h*.42,0,lx,h*.42,w*.42);
+        rg.addColorStop(0,'rgba(245,222,150,'+(reduce?.06:.15)+')'); rg.addColorStop(.6,'rgba(232,192,120,.05)'); rg.addColorStop(1,'rgba(232,192,120,0)');
+        ctx.fillStyle=rg; ctx.fillRect(0,0,w,h);
+        for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=(s.drift+Math.sin(t/1300+s.ph)*.3)*dpr; if(s.y<-4){s.y=h+4;s.x=R(0,w);}}
+          const near=1-Math.min(1,Math.abs(s.x-lx)/(w*.42));   // sequins near the light glint brightest
+          const a=reduce?.5:(.2+.35*(.5+.5*Math.sin(t/700*s.sp+s.ph))+near*.4);
+          ctx.beginPath();ctx.arc(s.x,s.y,(s.r+near*.8)*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=Math.min(1,a);ctx.shadowBlur=(4+near*6)*dpr;ctx.shadowColor='rgba(245,215,130,.9)';ctx.fill();ctx.globalAlpha=1; }
+        ctx.shadowBlur=0; }
+      else if(o.kind==='bokeh'){
+        // r404 (Wolf): warm god-rays raking from the top corner so golden hour reads golden
+        ctx.globalCompositeOperation='lighter';
+        for(let i=0;i<4;i++){ const a0=(-.5+i*.16)+ (reduce?0:Math.sin(t/5000+i)*.05);
+          const g=ctx.createLinearGradient(w*.9,0,w*.9-Math.cos(a0)*h,Math.sin(a0)*h+h);
+          g.addColorStop(0,'rgba(255,210,140,'+(reduce?.05:.08)+')'); g.addColorStop(1,'rgba(255,180,110,0)');
+          ctx.fillStyle=g; ctx.save(); ctx.translate(w*.92,-h*.05); ctx.rotate(a0); ctx.fillRect(-6*dpr,0,12*dpr,h*1.6); ctx.restore(); }
+        ctx.globalCompositeOperation='source-over';
+        for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=Math.sin(t/1400+s.ph)*.3*dpr; if(s.y<-s.r*dpr){s.y=h+s.r*dpr;s.x=R(0,w);}}
         const a=(reduce?.22:.11+.14*(.5+.5*Math.sin(t/1000*s.sp+s.ph)));
         const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*dpr); g.addColorStop(0,s.c); g.addColorStop(1,'transparent');
         ctx.globalAlpha=a;ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fill();ctx.globalAlpha=1; } }
@@ -1401,8 +1480,13 @@ window.hkInitCardFx = function(root){
         for(const s of o.parts){ const a=reduce?.5:(.25+.4*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.shadowBlur=5*dpr;ctx.shadowColor='rgba(220,210,255,.7)';ctx.fill();} ctx.shadowBlur=0; }
       else if(o.kind==='galaxy'){ const P=o.parts,rot=reduce?0:t/9000;
+        // r404 (Wolf): a Milky Way band — a bright diagonal galactic river of light behind the spiral
+        ctx.save(); ctx.translate(P.cx,P.cy); ctx.rotate(-0.5);
+        const bg=ctx.createLinearGradient(0,-h*.5,0,h*.5);
+        bg.addColorStop(0,'rgba(200,190,255,0)'); bg.addColorStop(.5,'rgba(220,210,255,'+(reduce?.10:.16)+')'); bg.addColorStop(1,'rgba(200,190,255,0)');
+        ctx.fillStyle=bg; ctx.fillRect(-w,-h*.22,w*2,h*.44); ctx.restore();
         const cg=ctx.createRadialGradient(P.cx,P.cy,0,P.cx,P.cy,Math.min(w,h)*.24);
-        cg.addColorStop(0,'rgba(240,230,255,.5)');cg.addColorStop(.4,'rgba(180,160,255,.16)');cg.addColorStop(1,'transparent');
+        cg.addColorStop(0,'rgba(255,248,230,.62)');cg.addColorStop(.35,'rgba(200,180,255,.2)');cg.addColorStop(1,'transparent');
         ctx.fillStyle=cg;ctx.fillRect(0,0,w,h);
         for(const s of P.p){ const a2=s.ang+rot,x=P.cx+Math.cos(a2)*s.rad,y=P.cy+Math.sin(a2)*s.rad*.62,tw=reduce?.7:(.4+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(x,y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=tw;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
@@ -1418,6 +1502,12 @@ window.hkInitCardFx = function(root){
         const g=ctx.createLinearGradient(cx-.28*w,0,cx+.28*w,h);
         g.addColorStop(0,'rgba(245,214,122,0)');g.addColorStop(.5,'rgba(245,214,122,'+(reduce?.06:.13)+')');g.addColorStop(1,'rgba(200,150,60,0)');
         ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+        // r404 (Wolf: de-bland) a bright hard glint streak rakes across every ~4.5s
+        if(!reduce){ const gp=(t/4500)%1; if(gp<.34){ const gx=(-.2+gp*1.7)*w, ga=(1-Math.abs(gp-.17)/.17);
+          ctx.globalCompositeOperation='lighter';
+          const g2=ctx.createLinearGradient(gx-.09*w,0,gx+.09*w,h);
+          g2.addColorStop(0,'rgba(255,240,190,0)');g2.addColorStop(.5,'rgba(255,240,190,'+(ga*.34)+')');g2.addColorStop(1,'rgba(255,240,190,0)');
+          ctx.fillStyle=g2; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } }
         for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr;s.x+=(s.drift+Math.sin(t/1200+s.ph)*.3)*dpr;if(s.y<-4){s.y=h+4;s.x=R(0,w);}}
           const a=reduce?.6:(.22+.58*(.5+.5*Math.sin(t/650*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor='rgba(245,205,110,.9)';ctx.fill();ctx.globalAlpha=1; }
@@ -1431,15 +1521,31 @@ window.hkInitCardFx = function(root){
         const bg=ctx.createLinearGradient(0,sy-26*dpr,0,sy+2*dpr);
         bg.addColorStop(0,'rgba(245,212,120,0)'); bg.addColorStop(1,'rgba(245,212,120,.16)');
         ctx.fillStyle=bg; ctx.fillRect(0,sy-26*dpr,w,28*dpr);
-        ctx.strokeStyle='rgba(250,224,150,.55)'; ctx.lineWidth=1.4*dpr; ctx.beginPath(); ctx.moveTo(0,sy); ctx.lineTo(w,sy); ctx.stroke(); }
+        ctx.strokeStyle='rgba(250,224,150,.55)'; ctx.lineWidth=1.4*dpr; ctx.beginPath(); ctx.moveTo(0,sy); ctx.lineTo(w,sy); ctx.stroke();
+        // r404 (Wolf: de-bland) drafting registration marks in the corners + a slow vertical guide
+        const mk=10*dpr, pad=8*dpr, pulse=reduce?.4:(.28+.28*(.5+.5*Math.sin(t/1400)));
+        ctx.strokeStyle='rgba(230,196,120,'+pulse+')'; ctx.lineWidth=1.2*dpr;
+        const corners=[[pad,pad,1,1],[w-pad,pad,-1,1],[pad,h-pad,1,-1],[w-pad,h-pad,-1,-1]];
+        ctx.beginPath(); for(const c of corners){ ctx.moveTo(c[0],c[1]); ctx.lineTo(c[0]+mk*c[2],c[1]); ctx.moveTo(c[0],c[1]); ctx.lineTo(c[0],c[1]+mk*c[3]); } ctx.stroke();
+        const vx2=reduce?w*.5:((t/4200)%1)*w; ctx.strokeStyle='rgba(230,196,120,.12)'; ctx.beginPath(); ctx.moveTo(vx2,0); ctx.lineTo(vx2,h); ctx.stroke(); }
       else if(o.kind==='pinstripe'){
-        // bulge: tailored gold pinstripes + a diagonal shimmer band passing over them
-        const sp=o.parts.sp; ctx.strokeStyle='rgba(210,175,95,.16)'; ctx.lineWidth=1*dpr; ctx.beginPath();
-        for(let x=sp/2;x<w;x+=sp){ ctx.moveTo(x,0); ctx.lineTo(x,h); } ctx.stroke();
-        if(!reduce){ ctx.globalCompositeOperation='lighter'; const off=((t/3600)%1),cx=(-.3+off*1.6)*w;
-          const g=ctx.createLinearGradient(cx-.2*w,0,cx+.2*w,h);
-          g.addColorStop(0,'rgba(245,214,130,0)');g.addColorStop(.5,'rgba(245,214,130,.11)');g.addColorStop(1,'rgba(245,214,130,0)');
-          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } }
+        // elite boutique: tailored gold pinstripes under a raking spotlight that
+        // ignites the threads it crosses, plus a slow diagonal shimmer + drifting sequins
+        const sp=o.parts.sp;
+        const off=reduce?.5:((t/5200)%1), lx=off*w;   // spotlight centre travels L→R
+        ctx.strokeStyle='rgba(210,175,95,.14)'; ctx.lineWidth=1*dpr;
+        ctx.beginPath(); for(let x=sp/2;x<w;x+=sp){ ctx.moveTo(x,0); ctx.lineTo(x,h); } ctx.stroke();
+        // brighter threads within the spotlight cone
+        ctx.globalCompositeOperation='lighter';
+        for(let x=sp/2;x<w;x+=sp){ const d=Math.abs(x-lx)/(w*.28); if(d<1){ const a=(1-d)*(reduce?.18:.5);
+          ctx.strokeStyle='rgba(250,222,140,'+a+')'; ctx.lineWidth=1.3*dpr; ctx.shadowBlur=5*dpr; ctx.shadowColor='rgba(245,205,110,.7)';
+          ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); } }
+        ctx.shadowBlur=0;
+        // the spotlight glow itself
+        const rg=ctx.createRadialGradient(lx,h*.5,0,lx,h*.5,w*.34);
+        rg.addColorStop(0,'rgba(245,214,130,'+(reduce?.05:.12)+')'); rg.addColorStop(1,'rgba(245,214,130,0)');
+        ctx.fillStyle=rg; ctx.fillRect(0,0,w,h);
+        ctx.globalCompositeOperation='source-over'; }
       else if(o.kind==='drive'){ const hz=o.parts.hz,vx=w/2; ctx.strokeStyle='rgba(255,93,177,.30)';ctx.lineWidth=1*dpr;
         ctx.beginPath(); for(let i=-7;i<=7;i++){ ctx.moveTo(vx,hz); ctx.lineTo(vx+i*(w/7),h); } ctx.stroke();
         const scroll=reduce?0:(t/650)%1;
@@ -1453,6 +1559,57 @@ window.hkInitCardFx = function(root){
           ctx.fillStyle='rgba(226,170,64,.85)'; ctx.shadowBlur=4*dpr; ctx.shadowColor='rgba(224,160,47,.55)';
           ctx.fillText(it.v.toFixed(1), it.x+P.fs*.85, P.y); ctx.shadowBlur=0; }
         ctx.textBaseline='alphabetic'; }
+      else if(o.kind==='prism'||o.kind==='emerald'){ const P=o.parts;
+        // amethyst = violet refraction · emerald = green refraction (same system, tinted)
+        const em=o.kind==='emerald';
+        const beamC=em?'150,232,184':'201,168,255', sparkC=em?['#7fe8b8','#b8f0d0','#ffffff','#4fd89a']:['#c9a8ff','#e0c0ff','#ffffff','#a880ff'];
+        ctx.globalCompositeOperation='lighter';
+        for(const b of P.beams){ if(!reduce) b.ang+=b.sp*(t-(b._pt||t)); b._pt=t;
+          const dx=Math.cos(b.ang),dy=Math.sin(b.ang),len=Math.max(w,h);
+          const g=ctx.createLinearGradient(P.cx,P.cy,P.cx+dx*len,P.cy+dy*len);
+          g.addColorStop(0,'rgba('+beamC+','+(reduce?.10:.16)+')'); g.addColorStop(1,'rgba('+beamC+',0)');
+          const px=-dy*b.wid*len, py=dx*b.wid*len;
+          ctx.fillStyle=g; ctx.beginPath(); ctx.moveTo(P.cx,P.cy);
+          ctx.lineTo(P.cx+dx*len+px,P.cy+dy*len+py); ctx.lineTo(P.cx+dx*len-px,P.cy+dy*len-py); ctx.closePath(); ctx.fill(); }
+        ctx.globalCompositeOperation='source-over';
+        for(let i=0;i<P.p.length;i++){ const s=P.p[i]; const a=reduce?.7:(.3+.6*(.5+.5*Math.sin(t/560*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=sparkC[i%sparkC.length];ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=sparkC[i%sparkC.length];ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
+      else if(o.kind==='neon'){ const P=o.parts;
+        // perspective floor grid (magenta), receding
+        ctx.strokeStyle='rgba(255,45,149,.22)'; ctx.lineWidth=1*dpr;
+        const vx=w/2, hz=P.hz; ctx.beginPath();
+        for(let i=-8;i<=8;i++){ ctx.moveTo(vx,hz); ctx.lineTo(vx+i*(w/8),h); } ctx.stroke();
+        const scroll=reduce?0:(t/620)%1;
+        ctx.strokeStyle='rgba(46,220,255,.28)';
+        for(let i=0;i<10;i++){ let f=(i+scroll)/10; f=f*f; const y=hz+(h-hz)*f; ctx.globalAlpha=Math.min(.6,f*1.5); ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); } ctx.globalAlpha=1;
+        // neon data-rain (magenta + cyan), fast
+        ctx.lineWidth=1.6*dpr;
+        for(const d of P.drops){ if(!reduce){ d.y+=d.sp*dpr; if(d.y-d.len*dpr>h){ d.y=R(-h*.3,0); d.x=R(0,w); d.cy=Math.random()<.5; } }
+          const col=d.cy?'46,220,255':'255,45,149';
+          const g=ctx.createLinearGradient(d.x,d.y-d.len*dpr,d.x,d.y);
+          g.addColorStop(0,'rgba('+col+',0)'); g.addColorStop(1,'rgba('+col+','+d.o+')');
+          ctx.strokeStyle=g; ctx.shadowBlur=6*dpr; ctx.shadowColor='rgba('+col+',.8)';
+          ctx.beginPath(); ctx.moveTo(d.x,d.y-d.len*dpr); ctx.lineTo(d.x,d.y); ctx.stroke(); }
+        ctx.shadowBlur=0;
+        // periodic glitch bars: an RGB-split flash slab that jumps
+        for(const b of P.bars){ if(!reduce){ b.life++; if(b.life>b.max){ b.life=0; b.max=R(70,150); b.y=R(0,h); b.off=R(3,9); } }
+          const k=b.life/b.max; if(k<.16){ const a=(.16-k)*2.2, bh=Math.max(3,h*.05);
+            ctx.globalAlpha=a; ctx.fillStyle='rgba(46,220,255,.5)'; ctx.fillRect(-b.off*dpr,b.y,w,bh);
+            ctx.fillStyle='rgba(255,45,149,.5)'; ctx.fillRect(b.off*dpr,b.y,w,bh);
+            ctx.fillStyle='rgba(240,240,255,.6)'; ctx.fillRect(0,b.y,w,bh*.5); ctx.globalAlpha=1; } } }
+      else if(o.kind==='sheet'){ const P=o.parts, cw=P.cw*dpr, ch=P.ch*dpr;
+        // faint Excel grid
+        ctx.strokeStyle='rgba(79,122,168,.20)'; ctx.lineWidth=1;
+        ctx.beginPath(); for(let x=cw;x<w;x+=cw){ ctx.moveTo(x,0); ctx.lineTo(x,h); }
+        for(let y=ch;y<h;y+=ch){ ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke();
+        // diagonal fill-wave: cells glow blueprint-cyan as the front passes
+        if(!reduce){ const period=3400, front=((t%period)/period)*(P.cols+P.rows+6)-3;
+          for(let c=0;c<P.cols;c++)for(let r=0;r<P.rows;r++){ const d=c+r, dist=Math.abs(d-front);
+            if(dist<2.2){ const a=(1-dist/2.2)*.35; ctx.fillStyle='rgba(120,200,255,'+a+')'; ctx.fillRect(c*cw+1,r*ch+1,cw-2,ch-2); } } }
+        // green cell-cursor hops (the Excel selection box), 1 step ~ every 520ms
+        const cur=P.cur; if(!reduce){ cur.t+=16; if(cur.t>520){ cur.t=0; if(Math.random()<.5) cur.c=(cur.c+1)%(P.cols-1); else cur.r=(cur.r+1)%(P.rows-1); } }
+        ctx.strokeStyle='rgba(80,220,130,.9)'; ctx.lineWidth=2*dpr; ctx.shadowBlur=6*dpr; ctx.shadowColor='rgba(80,220,130,.7)';
+        ctx.strokeRect(cur.c*cw+1,cur.r*ch+1,cw-2,ch-2); ctx.shadowBlur=0; }
       else { for(const s of o.parts){ const a=reduce?.7:(.35+.55*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
         ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
     }
