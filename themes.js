@@ -940,6 +940,61 @@ window.hkFrameEarned = function(id, u){
   }
   return false;
 };
+/* ---- r410 (Wolf): TITLES — an equippable name-plate the card wears in a notch under the
+   identity, earned across four buckets: ACCOUNT STATUS (Founder / PRO / Beta Tester),
+   CERTIFICATE PATHS (one per track + Chartered for all three), the HARDEST MEDALS (every
+   mythic/legendary achievement doubles as a title — its name IS the title), and a couple
+   of GENERAL milestones (Analyst / Crownholder / Centurion). Rank is deliberately NOT a
+   title — the crest + motto already carry it (Wolf's call). Three dependency-light hooks:
+     hkTitleLabel(id)     id -> display text (static ids + achievement-derived ids)
+     hkTitleEarned(id,u)  gates the pick; u carries certTracks{}, achDone, flags
+     hkTitleCatalog(u)    the ordered {id,name,cat,earned} list the customizer draws  ---- */
+window.HK_TITLE_LABELS = {
+  founder:'Founder', pro:'PRO', beta:'Beta Tester',
+  cert_fluency:'Keyboard Fluent', cert_formulas:'Formula Analyst', cert_modeling:'Modeler', chartered:'Chartered',
+  analyst:'Analyst', crownholder:'Crownholder', centurion:'Centurion'
+};
+/* the mythic + legendary medals double as titles — their names ARE the title text */
+window.hkTitleMedalIds = function(){
+  var AC = window.HOTKEY_ACHIEVEMENTS || [];
+  return AC.filter(function(a){ return a.tier==='m' || a.tier==='l'; }).map(function(a){ return a.id; });
+};
+window.hkTitleLabel = function(id){
+  if(!id) return '';
+  if(window.HK_TITLE_LABELS[id]) return window.HK_TITLE_LABELS[id];
+  var AC = window.HOTKEY_ACHIEVEMENTS || [];              // achievement-derived title: label = medal name
+  for(var i=0;i<AC.length;i++){ if(AC[i].id===id) return AC[i].name; }
+  return '';
+};
+window.hkTitleEarned = function(id, u){
+  u = u || {};
+  if(!id || id==='analyst') return true;                 // Analyst is the baseline (every signed-in analyst)
+  var ct = u.certTracks || {};
+  switch(id){
+    case 'founder':       return !!u.founder || !!u.charter;
+    case 'pro':           return !!u.pro;
+    case 'beta':          return !!u.beta || !!u.charter; // beta-unlock flag OR a beta-era account
+    case 'cert_fluency':  return !!ct.fluency;
+    case 'cert_formulas': return !!ct.formulas;
+    case 'cert_modeling': return !!ct.modeling;
+    case 'chartered':     return !!ct.fluency && !!ct.formulas && !!ct.modeling;
+    case 'crownholder':   return (u.crowns|0) >= 1;
+    case 'centurion':     return (u.solves|0) >= 100;
+  }
+  var done = u.achDone;                                   // achievement-derived: earned iff the medal is done
+  if(done){ if(Array.isArray(done)) return done.indexOf(id) >= 0;
+            if(typeof done==='object') return !!done[id]; }
+  return false;
+};
+window.hkTitleCatalog = function(u){
+  var out = [{id:null, name:'None', cat:'', earned:true}];
+  var push = function(id, cat){ out.push({id:id, name:window.hkTitleLabel(id), cat:cat, earned:window.hkTitleEarned(id,u)}); };
+  ['founder','pro','beta'].forEach(function(id){ push(id,'status'); });
+  ['cert_fluency','cert_formulas','cert_modeling','chartered'].forEach(function(id){ push(id,'cert'); });
+  window.hkTitleMedalIds().forEach(function(id){ push(id,'medal'); });
+  ['analyst','crownholder','centurion'].forEach(function(id){ push(id,'general'); });
+  return out;
+};
 /* ---- r387: flair carries the whole card loadout, not just the frame. Historically
    profiles.flair held a bare frame id ("molten"). To let the Profile customizer
    persist the extended loadout (which elements show, which stats to highlight, the
@@ -964,7 +1019,9 @@ window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','a
     'tranny','nazi','hitler','pedo','molest','kkk',
     'admin','moderator','staff','official','support','verified','hotkey','anthropic','claude'];
   var EXACT = ['pro','analyst','crownholder','centurion','founder','charter','beta','owner',
-    'ceo','mod','system','root','bot','null','undefined'];
+    'ceo','mod','system','root','bot','null','undefined',
+    /* r410: the new earned title labels (normalized: spaces stripped) so a custom title can't fake one */
+    'betatester','keyboardfluent','formulaanalyst','modeler','chartered'];
   window.hkSafeTitle = function(raw){
     var MIN = 2, MAX = 18;
     if(raw == null) return {ok:false, clean:'', reason:'enter a title'};
@@ -1803,7 +1860,13 @@ window.hkPlayerCard = function(d, opts){
   let cls = 'uc' + (full ? '' : ' compact'), orn = '';
   // r387: d.flair may be a bare frame id, a full loadout JSON, or null (host carries
   // the skin). Normalize to the frame id for the class/ornaments either way.
-  const fv = (d.flair && window.hkFlair) ? window.hkFlair(d.flair).frame : d.flair;
+  const flObj = (d.flair && window.hkFlair) ? window.hkFlair(d.flair) : null;
+  const fv = flObj ? flObj.frame : d.flair;
+  /* r410 (Wolf): the equipped TITLE — a custom (PRO) title wins, else the earned title id
+     resolves to its label. Callers may override with d.titleText. Rendered in a notch under
+     the identity so it reads on every surface (profile / header / leaderboard) at once. */
+  const titleText = (d.titleText != null) ? d.titleText
+    : (flObj ? (flObj.customTitle || (flObj.title && window.hkTitleLabel ? window.hkTitleLabel(flObj.title) : '')) : '');
   if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
     cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
     orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full, owner:!!d.owner, serial:d.serial|0}) : '';
@@ -1818,9 +1881,10 @@ window.hkPlayerCard = function(d, opts){
   /* r407 (Wolf): drop the tiny xp bar + xp line on every card — just a big, legible LVL
      badge in a tray, top-right. */
   const lvlHtml = showLevel ? '<div class="uc-lvlwrap"><div class="uc-lvl">LVL '+esc(d.lvl)+'</div></div>' : '';
+  const titleHtml = titleText ? '<div class="uc-titlechip"><span>'+esc(titleText)+'</span></div>' : '';
   let h = '<div class="'+cls+(showRank?'':' no-rank')+(showLevel?'':' no-lvl')+'">'+orn+
     '<div class="uc-head">'+crestHtml+
-      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+tierHtml+'</div>'+
+      '<div class="uc-id"><div class="uc-nm">'+esc(d.name)+'</div>'+tierHtml+titleHtml+'</div>'+
       lvlHtml+
     '</div>'+
     // r387 (Wolf): school + desk ride HIGH on the card (right under the identity),
