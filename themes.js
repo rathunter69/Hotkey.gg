@@ -1022,6 +1022,23 @@ window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','a
     'ceo','mod','system','root','bot','null','undefined',
     /* r410: the new earned title labels (normalized: spaces stripped) so a custom title can't fake one */
     'betatester','keyboardfluent','formulaanalyst','modeler','chartered'];
+  /* r410 (Wolf: "can't just write the same thing as an achievement — really restrict it"): the
+     custom title is checked against the LIVE set of earned names — every title label, every
+     achievement name, and every rank tier — so free text can never impersonate an earned title.
+     Exact (normalized) match blocks the name itself; a substring pass blocks near-variants of the
+     DISTINCTIVE (9+ char) names so "The Untouchable" / "Untouchablex" are caught too. */
+  function normR(x){ return String(x||'').toLowerCase().replace(/[0@]/g,'o').replace(/[1!|]/g,'i')
+    .replace(/3/g,'e').replace(/4/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/[^a-z]/g,''); }
+  function reservedNames(){
+    var ex = {}, sub = [], seen = {};
+    EXACT.forEach(function(w){ ex[w]=1; if(w.length>=9 && !seen[w]){ seen[w]=1; sub.push(w); } });
+    var add = function(name){ var n=normR(name); if(!n || ex[n]) { if(n) ex[n]=1; return; } ex[n]=1;
+      if(n.length>=9 && !seen[n]){ seen[n]=1; sub.push(n); } };
+    var TL = window.HK_TITLE_LABELS||{}; for(var k in TL){ add(TL[k]); add(k); }
+    (window.HOTKEY_ACHIEVEMENTS||[]).forEach(function(a){ if(a&&a.name) add(a.name); });
+    (((window.HK_RANK||{}).TIERS)||[]).forEach(function(t){ if(t&&t.name) add(t.name); });
+    return {ex:ex, sub:sub};
+  }
   window.hkSafeTitle = function(raw){
     var MIN = 2, MAX = 18;
     if(raw == null) return {ok:false, clean:'', reason:'enter a title'};
@@ -1034,9 +1051,11 @@ window.HK_STAT_KEYS = ['solves','crowns','streak','podiums','top10s','boards','a
     if(!/^[A-Za-z0-9 &.'\-]+$/.test(s)) return {ok:false, clean:s, reason:'letters, numbers & spaces only'};
     if(!/[A-Za-z]/.test(s)) return {ok:false, clean:s, reason:'needs a letter'};
     var norm = s.toLowerCase().replace(/[0@]/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e')
-      .replace(/\$/g,'s').replace(/[^a-z]/g,'');
+      .replace(/4/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/[^a-z]/g,'');
     for(var i=0;i<SUB.length;i++){ if(norm.indexOf(SUB[i])>=0) return {ok:false, clean:s, reason:'let’s keep it clean'}; }
-    for(var j=0;j<EXACT.length;j++){ if(norm===EXACT[j]) return {ok:false, clean:s, reason:'that title is reserved'}; }
+    var RES = reservedNames();
+    if(RES.ex[norm]) return {ok:false, clean:s, reason:'that’s an earned title — pick something else'};
+    for(var r=0;r<RES.sub.length;r++){ if(norm.indexOf(RES.sub[r])>=0) return {ok:false, clean:s, reason:'that’s an earned title — pick something else'}; }
     return {ok:true, clean:s, reason:''};
   };
 })();
