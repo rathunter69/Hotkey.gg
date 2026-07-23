@@ -41,7 +41,7 @@ const rnd = () => { _s |= 0; _s = (_s + 0x6D2B79F5) | 0; let t = Math.imul(_s ^ 
 const between = (a, b) => a + rnd() * (b - a);
 const pick = arr => arr[Math.floor(rnd() * arr.length)];
 
-// ---- the field: 50 clean desk-culture handles ----
+// ---- the field: 100 clean desk-culture handles (r409 Wolf: "more seeds across the board") ----
 const HANDLES = [
   'PasteSpecialist','CtrlFreak','MarginCall','DeskJockey','AltHero','SumProduct','FillDown','TraceKing',
   'ModelCitizen','ParBreaker','VLookupVet','PivotPilot','NoMouseNed','GridLock','AnchorMan','FirstYearFrank',
@@ -49,15 +49,22 @@ const HANDLES = [
   'SheetShow','WaccWizard','DcfDynamo','LboLegend','CompsCrusher','AccretionAce','BridgeBuilder','CagrCadet',
   'SumIfSam','RollupRick','FxPhantom','SortShark','ScrubDaddy','RowOpsRex','ColColonel','UndoKing',
   'FormatPhantom','BorderPatrol','DecimalDiva','AutofitAndy','GauntletGrace','FootnoteFred','PercentPete',
-  'GrowthGuru','SeriesStar','AuditAnnie'
+  'GrowthGuru','SeriesStar','AuditAnnie',
+  'CtrlEnter','NamedRange','DollarSign','GoalSeeker','SolverSage','ArrayApex','SpillZone','LambdaLord',
+  'IndexMatch','OffsetOwl','IndirectIvy','ChooseChamp','SwitchSmith','TextJoiner','ConcatCat','TrimTide',
+  'RoundRobin','CeilingCat','FloorForge','ModMaster','PowerQuery','MacroMaven','SolveForX','HotkeyHawk',
+  'KeyStroker','ShortcutSid','AltTabTom','CtrlShiftV','PasteValue','FreezePane','SplitScreen','ZoomZane',
+  'WrapText','MergeMonarch','FilterFox','SlicerSlick','SparkLine','GanttGuru','WaterfallWes','BridgeBoss',
+  'EbitdaEddie','FreeCashFin','NwcNina','DebtDrew','EquityEve','TerminalTom','SensitivitySue','ScenarioSam',
+  'CapTableCal','DiligenceDan'
 ];
 
 // skill bands: [count, timeFactor lo-hi (× par), catalog coverage lo-hi]
 const BANDS = [
-  { n: 8,  name: 'shark',     f: [0.72, 0.98], cov: [0.60, 0.90] },
-  { n: 15, name: 'solid',     f: [0.95, 1.50], cov: [0.45, 0.75] },
-  { n: 17, name: 'middle',    f: [1.40, 2.20], cov: [0.30, 0.55] },
-  { n: 10, name: 'straggler', f: [1.90, 3.20], cov: [0.15, 0.35] },
+  { n: 16, name: 'shark',     f: [0.72, 0.98], cov: [0.60, 0.90] },
+  { n: 30, name: 'solid',     f: [0.95, 1.50], cov: [0.45, 0.75] },
+  { n: 34, name: 'middle',    f: [1.40, 2.20], cov: [0.30, 0.55] },
+  { n: 20, name: 'straggler', f: [1.90, 3.20], cov: [0.15, 0.35] },
 ];
 
 const uid  = i => '5eed0000-0000-4000-8000-' + String(i).padStart(12, '0');
