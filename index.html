@@ -8378,11 +8378,18 @@ function render(){
      Tall models (more content rows than fit at target) auto-densify so nothing scrolls and no
      content is ever cut — canvas rows = max(content, rows-that-fit), so 1..S.ROWS always render. */
   const __CELL_TARGET = 26;   // catalog-standard cell height (px) — one knob for the whole grid
+  /* r413 (Wolf): ANCHOR the sheet at 20 rows. The fill math (availH / 26px) packed MORE empty
+     filler rows on a taller monitor — a hi-res screen ballooned to 26 rows, stranding a band of
+     empty rows under the shorter drills (the nav maze is exactly 20 rows: RN=20). Cap the filler
+     at 20 so every drill reads the same ~20-row sheet at any resolution; on a bigger screen the
+     rows grow instead of multiplying. Drills with MORE than 20 content rows still render in full
+     (max with S.ROWS), so nothing is ever cut or scrolled. */
+  const __ROW_CAP = 20;
   let __rowH = S.ROWS<=8 ? 32 : (S.ROWS<=10 ? 29 : (S.ROWS<=12 ? 26 : 24));   // pre-measure fallback
   let __VR = S.ROWS;
   if(__gw && __gw.clientHeight>100){                       // measured: fill the box exactly
     const __availH = __gw.clientHeight - 17 - 31;          // usable height minus header
-    __VR = Math.max(S.ROWS, Math.round(__availH / __CELL_TARGET));   // canvas rows: content + empty filler
+    __VR = Math.max(S.ROWS, Math.min(__ROW_CAP, Math.round(__availH / __CELL_TARGET)));   // canvas rows: content + filler, capped at the 20-row standard
     __rowH = Math.max(18, Math.min(40, Math.floor(__availH / __VR)));
     S._renderedGwH = __gw.clientHeight;                    // r409: record what we fit to; the ResizeObserver re-fits when the stage settles to a different height
   } else if(__gw && !S._gridMeasureRetry){
@@ -9276,7 +9283,8 @@ function checkWin(){
   try{ hkComboReset(); }catch(e){}
   if(sb && me_user && !isAnonUser() && !mouseUsed && !guidedUsed){
     recordRun(t).then(async ok=>{
-      const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'couldn’t post — check your connection'; el.className='rm-posted'+(ok?' ok':''); }
+      const el=$('rmPost'); if(el){ el.textContent=ok?'posted to the leaderboard ✓':'offline — your time is saved, we’ll post it when you reconnect'; el.className='rm-posted'+(ok?' ok':''); }
+      if(!ok){ try{ showToast('couldn’t reach the leaderboard — your time is saved and will post automatically when you’re back online'); }catch(e){} }
       if(ok){ const rk=await fetchRank(scoreKey(), t*1000); if(rk) showRankBadge(rk);   /* r362: rank on the board the run POSTED to — a daily-challenge run used to rank against the plain drill board */
         /* r362 TOP-10 REWARD: a posted challenge run that lands top-10 on today's global
            field pays a one-time (per day) bounty + counts toward the podium achievements. */
@@ -13728,11 +13736,24 @@ function lvlDetail(xp){
   while(xp>=floor+need){ floor+=need; lvl++; need=Math.min(150*lvl, 600); }
   return {lvl, into:xp-floor, need, pct:Math.min(100,Math.round(100*(xp-floor)/need))}; }
 function lvlOf(xp){ return lvlDetail(xp).lvl; }
+/* r412 (Wolf: "collapse the level to one source"): ONE canonical XP read for the whole trainer,
+   so the LVL chip, the skin-unlock gates and the PRO/xp gate can never compute level from
+   different numbers again (the "level 4 in game / 13 on the card" class of bug). Precedence:
+   server XP (HK_RANK.computeXP, published to window.__srvXp by updateRankPill — the SAME number
+   the profile card reprices from) wins the moment it lands; a signed-in player who hasn't synced
+   yet rides the local per-solve estimate (hk_xp_est, which updateRankPill/nav both reconcile UP
+   to server truth); a guest rides the solve-count estimate. Every level readout goes through this. */
+function hkLevelXp(nsol){
+  if(typeof window.__srvXp==='number') return Math.max(0, window.__srvXp);
+  if(sb && me_user && !isAnonUser()){ try{ return parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){ return 0; } }
+  if(nsol==null){ try{ nsol=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){ nsol=0; } }
+  return localXP(nsol);
+}
+window.hkLevelXp = hkLevelXp;
 function renderLvl(nsol){ const el=$('lvlBadge'); if(!el) return;
-  // r292 (Wolf): when signed in, use the SAME server-computed XP the account/stats/board
-  // pages use (window.__srvXp, set by updateRankPill) so the level number never disagrees
-  // across surfaces. localXP is the guest/offline estimate only.
-  const xp=(typeof window.__srvXp==='number') ? window.__srvXp : localXP(nsol); window.__lvlXp=xp;
+  // r412: single source — hkLevelXp() returns server XP when it's landed (same as the card),
+  // else the signed-in estimate, else the guest solve-count estimate. No surface computes its own.
+  const xp=hkLevelXp(nsol); window.__lvlXp=xp;
   const L=lvlDetail(xp);
   el.style.display='inline-flex';
   // r302 (Wolf): the CHIP carries the number \u2014 "LVL 14" text + a wide xp bar beside a
@@ -14229,10 +14250,12 @@ function updateDailyBtn(){}   /* r363: retired with the morning sheet */
    Unlock = (level AND pace clears) OR campaign coverage OR PB grandfather OR a
    REAL pro entitlement (_pro — deliberately not BETA_MODE: the ladder runs in
    beta because the climb IS the game). Daily and armed races are exempt. ---- */
-function myXpEst(){ let xp=0; try{ xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){}
-  // r221 (Wolf): the gate must read the SAME xp the visible LVL chip shows (window.__lvlXp,
-  // the local solves+breadth estimate) so a player can never see "LVL 5" yet stay gated.
-  try{ const lx=window.__lvlXp|0; if(lx>xp) xp=lx; }catch(e){} return xp; }
+function myXpEst(){
+  // r412: read the ONE canonical XP (hkLevelXp) so the gate can never disagree with the visible
+  // LVL chip. Kept as max() with the raw stored estimate so a gate never drops BELOW what a
+  // prior session already granted (monotonic — a player who saw "LVL 5" stays unlocked).
+  let xp=0; try{ xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){}
+  try{ const lx=hkLevelXp()|0; if(lx>xp) xp=lx; }catch(e){} return xp; }
 function paceClears(){ let n=0; try{ MENU_ORDER.forEach(k=>{ if(campCleared(k)) n++; }); }catch(e){} return n; }
 function groupUnlocked(gname){
   const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return true;
@@ -14649,6 +14672,13 @@ async function updateRankPill(){
       const mine=runs.filter(x=>x.user_id===me_user.id);
       const pl=window.HK_RANK.boardCounts ? window.HK_RANK.boardCounts(runs, me_user.id, MENU_ORDER) : st;
       window.__srvXp=window.HK_RANK.computeXP(mine, pl, mySes);   /* r371: full signature — board bonuses + sessions */
+      /* r412 (Wolf): reconcile the local estimate UP to server truth here too (nav.js does this in
+         hydrateLevel; doing it in the trainer's own sync removes the script-timing dependency, so
+         the skin gates + PRO gate that read hk_xp_est track the same number the chip/card show).
+         uid-guarded: a different account on this machine resets the estimate instead of maxing. */
+      try{ const owner=localStorage.getItem('hk_xp_uid')||'', prev=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+        localStorage.setItem('hk_xp_est', String(owner===me_user.id ? Math.max(window.__srvXp, prev) : window.__srvXp));
+        localStorage.setItem('hk_xp_uid', me_user.id); }catch(e){}
       try{ const nsol=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; renderLvl(nsol); }catch(e){}
     } }catch(e){}
   }catch(e){}
@@ -14736,6 +14766,7 @@ async function onSession(session){
     // (the r71 version only fired while the landing was visible — Wolf still saw 'set a name')
     setTimeout(()=>{ try{ if(!isAnonUser() && me_member && !me_handle) promptHandle(); }catch(e){} }, 900);
     setTimeout(()=>{ try{ hydratePBFromServer(); }catch(e){} }, 1200);   // r83: bests follow the account
+    setTimeout(()=>{ try{ flushRunOutbox(); }catch(e){} }, 1500);         // r412: re-post any runs stranded offline last session
     // DESKS v1 (r110): a pending invite joins as soon as a REAL session lands.
     // Kept across the signup round-trip; cleared only on success or a terminal error.
     setTimeout(async ()=>{ try{
@@ -15566,7 +15597,7 @@ function achSweepInGame(){
 function buildSkinCtx(){
   let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
   let streakN=0; try{ streakN=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
-  let lvl=1; try{ const est=(typeof window.__lvlXp==='number'?window.__lvlXp:(parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0)); lvl=lvlOf(est); }catch(e){}
+  let lvl=1; try{ lvl=lvlOf(hkLevelXp()); }catch(e){}   // r412: same canonical XP the LVL chip shows — skin gates can't disagree with it
   let chaptersCleared=[]; try{ chaptersCleared=campState().filter(c=>c.done).map(c=>c.id); }catch(e){}
   return { lvl:lvl, tierBest:fl.tierBest|0, dailyWins:fl.dailyWins|0,
     certs:Object.keys(fl.certTracks||{}).length,
@@ -15810,19 +15841,50 @@ let __tourBase=null;
 /* r134: maybeStartTour retired — the tour fires from dismissLanding, sequenced
    before the tutorial prompt, never on an independent timer. */
 function rememberDrill(){ try{ localStorage.setItem('hk_last_drill', cur); }catch(e){} }
+/* r412 (Wolf): a failed leaderboard post used to vanish silently — score looked like it "didn't
+   count." Runs that can't reach the server are now stashed in a small OUTBOX and re-posted on the
+   next successful run and at login, so a network blip never loses a real time. Duplicate re-posts
+   are harmless (the board takes each user's best), so at-least-once delivery is the safe trade. */
+const HK_OUTBOX_KEY='hk_run_outbox', HK_OUTBOX_MAX=25;
+function _outboxRead(){ try{ const a=JSON.parse(localStorage.getItem(HK_OUTBOX_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function _outboxWrite(a){ try{ localStorage.setItem(HK_OUTBOX_KEY, JSON.stringify(a.slice(-HK_OUTBOX_MAX))); }catch(e){} }
+function _outboxEnqueue(payload){ const a=_outboxRead(); a.push(payload); _outboxWrite(a); }
+// Best-effort, silent flush of queued runs. Removes each row that posts (or that errors as a
+// permanent/duplicate conflict); keeps rows that fail on transient/connection errors for next time.
+async function flushRunOutbox(){
+  try{
+    if(!sb || !me_user || isAnonUser()) return;
+    let q=_outboxRead(); if(!q.length) return;
+    const keep=[];
+    for(const row of q){
+      try{ const { error } = await sb.from('runs').insert(row);
+        if(error && !/duplicate|conflict|unique/i.test(error.message||'')) keep.push(row);   // transient → retry later
+      }catch(e){ keep.push(row); }
+    }
+    _outboxWrite(keep);
+  }catch(e){}
+}
 async function recordRun(t){
   // Anon sessions don't post to the leaderboard — scores need a permanent account behind them.
   // This keeps the leaderboard clean (no ghost/disposable entries) and creates a real value prop for signing up.
   if(!sb || !me_user || isAnonUser() || mouseUsed || guidedUsed) return false;
-  try{
-    const { error } = await sb.from('runs').insert({
-      user_id: me_user.id, challenge: scoreKey(),
-      time_ms: Math.round(t*1000), keystrokes: keyLog.length,
-      optimal: CHALLENGES[cur].parKeys, mouse_used: false,
-      trace: keyLog.map((k,i)=>({k, t: keyTimes[i]||0, c: keyCells[i]||undefined}))   // r163: +cell — the ghost cursor's path
-    });
-    return !error;
-  }catch(e){ return false; }
+  const payload={
+    user_id: me_user.id, challenge: scoreKey(),
+    time_ms: Math.round(t*1000), keystrokes: keyLog.length,
+    optimal: CHALLENGES[cur].parKeys, mouse_used: false,
+    trace: keyLog.map((k,i)=>({k, t: keyTimes[i]||0, c: keyCells[i]||undefined}))   // r163: +cell — the ghost cursor's path
+  };
+  // one inline retry, then queue for later — a transient blip shouldn't drop the score
+  for(let attempt=0; attempt<2; attempt++){
+    try{
+      const { error } = await sb.from('runs').insert(payload);
+      if(!error){ flushRunOutbox(); return true; }   // opportunistically drain any backlog on success
+      console.warn('run record failed (attempt '+(attempt+1)+'):', error.message);
+    }catch(e){ console.warn('run record exception (attempt '+(attempt+1)+'):', e); }
+    if(attempt===0) await new Promise(r=>setTimeout(r, 700));
+  }
+  _outboxEnqueue(payload);   // couldn't reach the board — keep it, re-post next time
+  return false;
 }
 
 async function recordSession(mode, durationSec, score, keystrokes, misses, optimal){
