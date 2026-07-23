@@ -1414,7 +1414,9 @@ window.hkInitCardFx = function(root){
     /* r403 (Wolf): terminal "live ticker" — a Bloomberg-amber tape scrolling along the bottom
        edge, each quote a green ▲ / red ▼ against an amber price. */
     function ticker(w,h){const gap=Math.max(46,w/3.2),items=[];let x=0;while(x<w+gap){items.push({x,up:Math.random()<.5,v:R(1,99)});x+=gap;}
-      return{items,gap,w0:x,sp:Math.max(.3,w/1600+.3),y:h-Math.max(9,Math.round(h*.12)),fs:Math.max(8,Math.round(h*.085))};}
+      /* r408 (Wolf): ride the very BOTTOM EDGE (a real Bloomberg tape) so it sits BELOW the
+         medals/awards row instead of over it; a touch smaller. */
+      return{items,gap,w0:x,sp:Math.max(.3,w/1600+.3),y:h-Math.max(6,Math.round(h*.045)),fs:Math.max(7,Math.round(h*.07))};}
     const sys=[];
     canv.forEach(cv=>{
       if(cv._hkfx) return; cv._hkfx=1;
@@ -1556,12 +1558,14 @@ window.hkInitCardFx = function(root){
           const g2=ctx.createLinearGradient(gx-.08*w,0,gx+.08*w,h);
           g2.addColorStop(0,'rgba(240,200,110,0)');g2.addColorStop(.5,'rgba(240,200,110,'+(ga*.2)+')');g2.addColorStop(1,'rgba(240,200,110,0)');
           ctx.fillStyle=g2; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } }
-        // the crest — a GOLD outer lozenge over a blood-red inner, ominous double-beat
-        const beat=Math.pow(.5+.5*Math.sin(t/900),3), pulse=reduce?.8:(.6+.4*beat), rad=P.rad*dpr;
+        /* r408 (Wolf: "the yellow icon makes it harder to read"): the crest is a FAINT gothic
+           watermark now — a thin dim gilt lozenge that only breathes, so it never competes with
+           the card text. The menace lives in the Cylon border + the red pulse, not a bright icon. */
+        const beat=Math.pow(.5+.5*Math.sin(t/900),3), pulse=reduce?.3:(.16+.16*beat), rad=P.rad*dpr;
         ctx.save(); ctx.translate(P.cx,P.cy);
-        ctx.strokeStyle='rgba(234,192,98,'+(reduce?.85:(.62+.32*beat))+')'; ctx.lineWidth=3.2*dpr; ctx.shadowBlur=(14+12*beat)*dpr; ctx.shadowColor='rgba(222,168,72,'+pulse+')';
+        ctx.strokeStyle='rgba(224,176,84,'+(reduce?.22:(.14+.12*beat))+')'; ctx.lineWidth=1.6*dpr; ctx.shadowBlur=(6+6*beat)*dpr; ctx.shadowColor='rgba(200,150,70,'+(pulse*.6)+')';
         ctx.beginPath(); ctx.moveTo(0,-rad); ctx.lineTo(rad*.7,0); ctx.lineTo(0,rad); ctx.lineTo(-rad*.7,0); ctx.closePath(); ctx.stroke();
-        ctx.shadowBlur=8*dpr; ctx.shadowColor='rgba(220,24,24,'+pulse+')'; ctx.strokeStyle='rgba(228,54,46,'+pulse+')'; ctx.lineWidth=1.8*dpr;
+        ctx.shadowBlur=5*dpr; ctx.shadowColor='rgba(200,24,24,'+(pulse*.7)+')'; ctx.strokeStyle='rgba(210,50,44,'+(pulse+.05)+')'; ctx.lineWidth=1*dpr;
         ctx.beginPath(); ctx.moveTo(0,-rad*.62); ctx.lineTo(rad*.44,0); ctx.lineTo(0,rad*.62); ctx.lineTo(-rad*.44,0); ctx.closePath(); ctx.stroke();
         ctx.restore(); ctx.shadowBlur=0; }
       else if(o.kind==='diamondfx'){ const P=o.parts;
@@ -1728,12 +1732,13 @@ window.hkInitCardFx = function(root){
         for(let i=0;i<11;i++){ let f=(i+scroll)/11; f=f*f; const y=hz+(h-hz)*f; ctx.globalAlpha=Math.min(.5,f*1.4); ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
         ctx.globalAlpha=1; }
       else if(o.kind==='ticker'){ const P=o.parts; ctx.textBaseline='middle'; ctx.font=P.fs+'px VT323, monospace';
-        ctx.strokeStyle='rgba(224,160,47,.16)'; ctx.lineWidth=1*dpr; ctx.beginPath(); ctx.moveTo(0,P.y-P.fs); ctx.lineTo(w,P.y-P.fs); ctx.stroke();
+        /* r408 (Wolf): a FAINT ambient tape (behind glass) so it never competes with the medals /
+           awards it rides behind — no glow, low alpha. */
         for(const it of P.items){ if(!reduce){ it.x-=P.sp*dpr; if(it.x<-P.gap){ it.x+=P.w0; it.up=Math.random()<.5; it.v=R(1,99); } }
-          ctx.fillStyle= it.up?'rgba(120,214,120,.92)':'rgba(232,120,96,.92)';
+          ctx.fillStyle= it.up?'rgba(120,214,120,.3)':'rgba(232,120,96,.3)';
           ctx.fillText(it.up?'▲':'▼', it.x, P.y);
-          ctx.fillStyle='rgba(226,170,64,.85)'; ctx.shadowBlur=4*dpr; ctx.shadowColor='rgba(224,160,47,.55)';
-          ctx.fillText(it.v.toFixed(1), it.x+P.fs*.85, P.y); ctx.shadowBlur=0; }
+          ctx.fillStyle='rgba(226,170,64,.28)';
+          ctx.fillText(it.v.toFixed(1), it.x+P.fs*.85, P.y); }
         ctx.textBaseline='alphabetic'; }
       else if(o.kind==='prism'||o.kind==='emerald'){ const P=o.parts;
         // r404.2 (Wolf): the radial beams read as static "burst lines" — dropped. Now a soft
