@@ -861,7 +861,7 @@ let browseKey = sessionStorage.getItem('hk_lb_key') || null;
    leaderboards no longer scope by rank, so tierFilter/bucketFilter and their handlers are gone. */
 let rosterTier = null;
 let rosterBucket = null;   /* r404 (Wolf): sub-tier chip — null = All, else 'Top'|'Middle'|'Bottom' */
-const ROSTER_BUCKETS=['Top','Middle','Bottom'];   // display order: top of the band first
+const ROSTER_BUCKETS=['Bottom','Middle','Top'];   // r405 (Wolf): ascending — bottom → top
 function rosterHtml(flush){
   const {names,meId}=DATA; const userStat=DATA.gUserStat||DATA.userStat;
   const users=Object.entries(userStat).map(([u,st])=>{
@@ -895,12 +895,12 @@ function rosterHtml(flush){
     '<span class="ros-r">rating '+(x.av*100).toFixed(1)+'</span>'+
     '<span class="ros-a">'+x.st.att+' boards</span></div>').join('');
   if(!inTier.length) rows='<div class="empty">'+(rosterBucket?'nobody sits in the '+rosterBucket.toLowerCase()+' bucket yet':'nobody holds this tier yet \u2014 it\u2019s open')+'</div>';
-  /* r404 (Wolf): sub-tier chips \u2014 filter the tier roster by bucket band (Top/Middle/Bottom).
-     Only shown when the tier actually splits across more than one bucket; 'All' is the default. */
-  const bucketChips = bucketsPresent.length>1
+  /* r405 (Wolf): sub-tier chips \u2014 All \u00b7 Bottom \u00b7 Middle \u00b7 Top, ascending, ALWAYS all four
+     (a bucket with nobody in it still shows a 0 chip) so the row is consistent tier to tier. */
+  const bucketChips = inBand.length
     ? '<div class="ros-buckets"><span class="tab ros-bk'+(rosterBucket===null?' on':'')+'" data-bucket="">All</span>'+
-        ROSTER_BUCKETS.filter(b=>bandCounts[b]>0).map(b=>
-          '<span class="tab ros-bk'+(rosterBucket===b?' on':'')+'" data-bucket="'+b+'">'+b+' <em>'+bandCounts[b]+'</em></span>').join('')+'</div>'
+        ROSTER_BUCKETS.map(b=>
+          '<span class="tab ros-bk'+(rosterBucket===b?' on':'')+'" data-bucket="'+b+'">'+b+' <em>'+(bandCounts[b]||0)+'</em></span>').join('')+'</div>'
     : '';
   return '<div class="panel" style="margin-top:'+(flush?'0':'18px')+'"><h4>the field \u00b7 by tier</h4>'+
     '<div class="ros-tabs">'+tierNames.map(tn=>'<span class="tab ros-t'+(tn===rosterTier?' on':'')+'" data-tier="'+tn+'">'+tn.replace(' Analyst','')+'</span>').join('')+'</div>'+

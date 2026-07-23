@@ -257,7 +257,11 @@
   td.editing .edin{white-space:nowrap}
   /* r329 (Wolf): the guided target is a FILL + a single outer frame (gt-t/b/l/r on the range's edge
      cells) instead of a box per cell — so a multi-cell paste footprint reads as one bordered zone. */
-  td.gtarget{background:var(--accent-glow); z-index:2}
+  td.gtarget{z-index:2}
+  /* r405 (Wolf): the green target FILL only paints when the cell isn't selected — so a grey
+     selection reads cleanly on top (no fill-vs-fill clip). The gt-t/b/l/r frame always marks
+     the target. */
+  td.gtarget:not(.sel){background:var(--accent-glow)}
   td.gt-t{border-top:2px solid var(--accent)} td.gt-b{border-bottom:2px solid var(--accent)}
   td.gt-l{border-left:2px solid var(--accent)} td.gt-r{border-right:2px solid var(--accent)}
   /* r330 (Wolf): guided HARD rails — the cursor is fenced to the lit target, so everything
@@ -273,10 +277,16 @@
   #grid td.pippop .pipEaten{animation:pipPop .36s ease-out}
   @keyframes pipPop{0%{transform:scale(2.3);opacity:1} 55%{transform:scale(.7);opacity:1} 100%{transform:scale(1);opacity:.9}}
   /* r402 (Wolf): NAV MAZE — bold impassable walls + the collectible blue pip. */
-  #grid td.mzt{border-top:3px solid var(--text) !important}
-  #grid td.mzb{border-bottom:3px solid var(--text) !important}
-  #grid td.mzl{border-left:3px solid var(--text) !important}
-  #grid td.mzr{border-right:3px solid var(--text) !important}
+  /* r405 (Wolf): softer gridline — the flat full-weight rule read as harsh/strict once cells
+     shrank; a lower-contrast line lets the green cursor + ink content pop. Applied borders and
+     the selection frame set their own per-edge colors, so they still win. */
+  #grid td{border-color:color-mix(in srgb, var(--line) 52%, transparent)}
+  /* r405 (Wolf): maze walls are a slate blue-grey now (were near-black) so they no longer
+     merge with the dark-green cursor — the wall reads as a wall, the cursor pops against it. */
+  #grid td.mzt{border-top:3px solid #38445e !important}
+  #grid td.mzb{border-bottom:3px solid #38445e !important}
+  #grid td.mzl{border-left:3px solid #38445e !important}
+  #grid td.mzr{border-right:3px solid #38445e !important}
   .mzpip{display:inline-block; color:#2f6bd8; font-size:16px; line-height:1; filter:drop-shadow(0 0 2px rgba(47,107,216,.5))}
   html[data-dark="1"] .mzpip{color:#7db0ff}
   .gridwrap td.navmark-next, html[data-dark="1"] .gridwrap td.navmark-next{color:var(--accent) !important; font-size:22px; animation:navpulse 1.2s ease-in-out infinite}
@@ -314,7 +324,7 @@
      faint dashed line with guided off — you couldn't tell WHERE the block goes. Now a faint fill +
      a single solid accent frame (the gt-t/b/l/r edges) so the target reads in every mode. The
      range's outer edges carry the frame so a multi-cell paste footprint reads as one zone. */
-  td.ttarget{background:color-mix(in srgb, var(--accent) 9%, transparent)}   /* r329: fill only; the gt-t/b/l/r edges draw the single outer frame */
+  td.ttarget:not(.sel){background:color-mix(in srgb, var(--accent) 9%, transparent)}   /* r405 (Wolf): fill only when not selected — selection reads clean on top */
   /* r163: GHOST CURSOR - your PB run gliding through its recorded path. Warn-dashed
      so it reads apart from selection (accent) and ink borders; never catches input. */
   #ghostCur{position:absolute; pointer-events:none; z-index:4; display:none;
@@ -1589,8 +1599,8 @@
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
 <script src="drills.js?v=276"></script>
-<link rel="stylesheet" href="nav.css?v=194">
-<script src="themes.js?v=290"></script>
+<link rel="stylesheet" href="nav.css?v=195">
+<script src="themes.js?v=291"></script>
 
 </head>
 <body>

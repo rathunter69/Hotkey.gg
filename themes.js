@@ -808,78 +808,79 @@ window.HK_RANK = {
    whose crest now wears silver. Changing unlock thresholds is a progression
    call, not an art call; the metal-to-tier re-pairing (and whether an
    amethyst/emerald plaque joins the suite) awaits Wolf. */
+/* r404.6 (Wolf): ordered by increasing rarity / difficulty, with the RANK cards clustered
+   first (the ranked progression, in rank order), then cosmetic skins by rarity tier, the
+   Founder pinnacle, and Bone (the easter egg) last. Charter retired. */
 window.HK_FRAMES = [
+  /* ── RANK CARDS — the ranked ladder, clustered, in rank order ── */
   {id:'engraved',      name:'Engraved',        tier:'common',
-   desc:'steel certificate corners + rosettes',       earn:'reach LVL 5'},
-  /* r376: plaque descs follow the screw → gemset corner swap (art round 2) */
+   desc:'brushed-steel certificate theme card',        earn:'reach LVL 5'},
   {id:'plaque-bronze', name:'Bronze Plaque',   tier:'rare',
-   desc:'beveled bronze + gemset corners',            earn:'reach Candidate'},
+   desc:'bronze metallic theme card + sheen',          earn:'reach Candidate'},
   {id:'plaque-silver', name:'Silver Plaque',   tier:'rare',
-   desc:'beveled silver + gemset corners',            earn:'reach Summer Analyst'},
-  {id:'plaque-gold',   name:'Gold Plaque',     tier:'rare',
-   desc:'beveled gold + gemset corners',              earn:'reach First-Year Analyst'},
-  {id:'plaque-plat',   name:'Platinum Plaque', tier:'rare',
+   desc:'silver metallic theme card + sheen',          earn:'reach Summer Analyst'},
+  {id:'plaque-gold',   name:'Gold Plaque',     tier:'epic',
+   desc:'gold metallic theme card + sheen',            earn:'reach First-Year Analyst'},
+  {id:'plaque-plat',   name:'Platinum Plaque', tier:'epic',
    desc:'icy platinum theme card + polished sheen',    earn:'reach VP'},
+  {id:'heraldic',      name:'Heraldic · MD',   tier:'legendary',
+   desc:'the MD crest — blood-red, an ominous lozenge', earn:'reach MD (or Daily Dynasty / Triple Crown)'},
   {id:'plaque-diam',   name:'Diamond Plaque',  tier:'legendary',
-   desc:'brilliant prismatic diamond theme card',      earn:'reach Second-Year Analyst'},
-  {id:'foil',          name:'Foil',            tier:'epic',
-   desc:'conic sheen + fan corners',                  earn:'win a Daily Challenge or earn a certificate'},
-  {id:'heraldic',      name:'Heraldic',        tier:'legendary',
-   desc:'crimson-and-gold theme card — the MD crest',  earn:'reach MD, or Daily Dynasty (5 daily wins) / Triple Crown (3 certificates)'},
-  {id:'charter',       name:'Charter Analyst', tier:'rare',
-   desc:'steel-navy laurels — the beta-tester class', earn:'account created during the beta'},
-  {id:'bone',          name:'Bone',            tier:'egg',
-   desc:'subtle off-white coloring, tasteful thickness', earn:'post a run at perfect efficiency — every keystroke optimal'},
-  /* ---- r385 CARD SKINS (Wolf board) — full-interior title skins. Each themes the
-     whole card (interior + border + a top-notch title + optional particle animation),
-     not just the border. hkFrameOrnaments emits the notch tab + fx canvas; nav.css
-     carries the interior + border + name treatment; hkInitCardFx drives the canvas. ---- */
+   desc:'brilliant prismatic diamond — the final boss', earn:'reach Second-Year Analyst'},
+  /* ── COSMETIC SKINS — by increasing rarity ── */
+  /* rare */
+  {id:'blueprint',  name:'Blueprint',    tier:'rare',
+   desc:'drafting grid that builds itself',            earn:'reach First-Year Analyst'},
+  {id:'crt',        name:'CRT Terminal', tier:'rare',
+   desc:'phosphor scanlines, terminal green',          earn:'complete the reference tour'},
+  {id:'cottoncandy',name:'Cotton Candy', tier:'rare',
+   desc:'pink-blue pastel + soft puffs',               earn:'reach Summer Analyst'},
+  {id:'bloom',      name:'Bloom',        tier:'rare',
+   desc:'pastel spring — floating green petals',       earn:'reach Associate'},
+  {id:'amethyst',   name:'Amethyst',     tier:'rare',
+   desc:'deep purple gem + prism glow',                earn:'reach VP'},
+  /* epic */
   {id:'circuit',    name:'Circuit',      tier:'epic',
    desc:'neural grid wash + glowing chips',            earn:'clear a full rapid-fire set'},
   {id:'neon',       name:'Neon',         tier:'epic',
-   desc:'cyberpunk magenta/cyan glow',                 earn:'hold a 10-win daily streak'},
-  {id:'blueprint',  name:'Blueprint',    tier:'rare',
-   desc:'drafting grid + dashed chips',                earn:'reach First-Year Analyst'},
-  {id:'crt',        name:'CRT Terminal', tier:'rare',
-   desc:'phosphor scanlines, terminal green',          earn:'complete the reference tour'},
-  {id:'constellation', name:'Constellation', tier:'epic',
-   desc:'animated starfield + Cinzel name',            earn:'reach Associate'},
+   desc:'cyberpunk neon rain',                         earn:'hold a 10-win daily streak'},
   {id:'vaporwave',  name:'Vaporwave',    tier:'epic',
    desc:'retro synth sunset + grid horizon',           earn:'reach Summer Analyst'},
+  {id:'constellation', name:'Navigator', tier:'epic',
+   desc:'a star-chart + slow compass reticle',         earn:'reach Associate'},
   {id:'terminal',   name:'Terminal',     tier:'epic',
    desc:'bloomberg amber + live ticker',               earn:'finish a timed sprint set'},
+  {id:'sakura',     name:'Sakura',       tier:'epic',
+   desc:'cherry blossom — drifting petals',            earn:'hold a 14-day streak'},
+  {id:'goldenhour', name:'Golden Hour',  tier:'epic',
+   desc:'warm sunset wash + god-rays',                 earn:'hold a 7-day streak'},
+  {id:'pearl',      name:'Pearl',        tier:'epic',
+   desc:'iridescent mother-of-pearl sheen',            earn:'post a perfect-efficiency run'},
+  {id:'emerald',    name:'Emerald',      tier:'epic',
+   desc:'deep green gem + prism glow',                 earn:'clear the Formulas II chapter'},
+  {id:'foil',       name:'Foil',         tier:'epic',
+   desc:'super-diamond holographic + brilliant edges', earn:'win a Daily Challenge or earn a certificate'},
   {id:'pro',        name:'PRO · Cosmic', tier:'epic',
-   desc:'deep space + gilt border',                    earn:'upgrade to PRO'},
+   desc:'a deep-space nebula + gilt border',           earn:'upgrade to PRO'},
+  /* legendary */
   {id:'noir',       name:'Noir',         tier:'legendary',
    desc:'murdered-out black — zero color',             earn:'reach a top rank (VP or above)'},
   {id:'frostbite',  name:'Frostbite',    tier:'legendary',
    desc:'glacial ice + drifting snow',                 earn:'post a perfect-efficiency run'},
   {id:'molten',     name:'Molten',       tier:'legendary',
    desc:'magma cracks + rising embers',                earn:'hold a 30-day streak (5 daily wins)'},
-  {id:'founder',    name:'Founder',      tier:'legendary',
-   desc:'aurora foil — first 200 PRO, serialized',      earn:'charter / first-200 PRO member'},
-  /* r390 (Wolf) new title skins — mock lineup (earn rules provisional, tune later) */
-  {id:'amethyst',   name:'Amethyst',     tier:'rare',
-   desc:'deep purple gem + prism shimmer',             earn:'reach VP'},
   {id:'onyx',       name:'Onyx',         tier:'legendary',
-   desc:'murdered-out black + gold veins',             earn:'reach Second-Year Analyst'},
-  {id:'sakura',     name:'Sakura',       tier:'epic',
-   desc:'cherry blossom — drifting petals',            earn:'hold a 14-day streak'},
-  {id:'goldenhour', name:'Golden Hour',  tier:'epic',
-   desc:'warm sunset wash + soft bokeh',               earn:'hold a 7-day streak'},
-  {id:'pearl',      name:'Pearl',        tier:'epic',
-   desc:'iridescent mother-of-pearl sheen',            earn:'post a perfect-efficiency run'},
-  {id:'bloom',      name:'Bloom',        tier:'rare',
-   desc:'pastel spring — floating petals',             earn:'reach Associate'},
-  {id:'cottoncandy',name:'Cotton Candy', tier:'rare',
-   desc:'pink-blue pastel + soft bokeh',               earn:'reach Summer Analyst'},
-  /* r391 (Wolf) chapter/cert capstone skins — earn rules pending the progression audit */
+   desc:'black marble + luminous gold veins',          earn:'reach Second-Year Analyst'},
   {id:'architect',  name:'Architect',    tier:'legendary',
    desc:'navy blueprint + gold drafting scan',         earn:'clear the Full Builds chapter'},
   {id:'boutique',   name:'Elite Boutique',tier:'legendary',
-   desc:'tailored gold pinstripe + shimmer',           earn:'earn all three certificates'},
-  {id:'emerald',    name:'Emerald',      tier:'epic',
-   desc:'deep green gem + prism shimmer',              earn:'clear the Formulas II chapter'},
+   desc:'a quilted monogram lattice + spotlight',      earn:'earn all three certificates'},
+  /* pinnacle */
+  {id:'founder',    name:'Founder',      tier:'legendary',
+   desc:'aurora foil — first 200 PRO, serialized',      earn:'charter / first-200 PRO member'},
+  /* easter egg */
+  {id:'bone',       name:'Bone',         tier:'egg',
+   desc:'subtle off-white — and perfectly still',       earn:'post a run at perfect efficiency — every keystroke optimal'},
 ];
 /* u = {lvl, tierBest, dailyWins, certs, charter, perfectRun}. tierBest is a
    HK_RANK.TIERS index (highest tier ever DISPLAYED — nav.js persists it into
@@ -908,7 +909,6 @@ window.hkFrameEarned = function(id, u){
     case 'plaque-diam':   return tb >= 7;   // Second-Year Analyst — the true final boss
     case 'foil':          return (u.dailyWins|0) >= 1 || (u.certs|0) >= 1;
     case 'heraldic':      return tb >= 6 || (u.dailyWins|0) >= 5 || (u.certs|0) >= 3;   // r404.4 (Wolf): heraldic IS the MD card — reach MD earns it (+ the Dynasty/Triple-Crown paths)
-    case 'charter':       return !!u.charter;
     case 'bone':          return !!u.perfectRun;
     /* r385 card skins — earn thresholds off the same signals (lvl/tierBest/dailyWins/
        certs/charter/perfectRun). Display always trusts stored flair; this gates PICKING. */
@@ -1204,11 +1204,10 @@ window.hkFrameOrnaments = (function(){
     'plaque-silver':['◆ SILVER',  '#101318','linear-gradient(120deg,#e4ebf2,#8a929c)','#e4ebf2','sheen'],
     'plaque-gold':  ['◆ GOLD',    '#1a1404','linear-gradient(120deg,#f5d878,#a5791f)','#f5d878','sheen'],
     'plaque-plat':  ['◆ PLATINUM','#0a0f16','linear-gradient(120deg,#eaf4ff,#7fa8d8)','#dbecff','sheen'],   /* r404.4 (Wolf): cooler, icy platinum (VP) */
-    'plaque-diam':  ['◆ DIAMOND', '#0a1418','linear-gradient(120deg,#dff4ff,#9be0f7,#c9b8ff)','#eaf8ff','sheen'],   /* Second-Year — the brilliant final boss */
+    'plaque-diam':  ['◆ DIAMOND', '#0a1418','linear-gradient(120deg,#dff4ff,#9be0f7,#c9b8ff)','#eaf8ff','diamondfx'],   /* Second-Year — brilliant final boss, crystalline facet flashes */
     engraved:       ['ENGRAVED',  '#12141a','linear-gradient(120deg,#c8ccd4,#5a5e68)','#c8ccd4','sheen'],
     foil:           ['◆ FOIL',    '#0a1418','linear-gradient(135deg,#ffffff,#9be0f7,#7fa8ff,#c9a8ff,#ffc2e8)','#eaf8ff','foilfx'],   /* r404.5 (Wolf): "super diamond" holographic — diamond palette, brilliant edges, NOT space */
-    heraldic:       ['⬧ HERALDIC','#1a090b','linear-gradient(120deg,#f0c060,#9c2a1c)','#e6b84a','heraldic'],   /* r404.5 (Wolf): the MD crest — glowing lozenge + gold embers + grand glint */
-    charter:        ['CHARTER',   '#0e1626','linear-gradient(120deg,#aab8d4,#3a4a68)','#aab8d4','sheen']
+    heraldic:       ['⬧ HERALDIC','#12060a','linear-gradient(120deg,#c02a1a,#5a0a0c)','#d8322a','heraldic']   /* r404.6 (Wolf): the MD crest — red/evil, blood lozenge + menace */
   };
   return function(id, opts){
     const M=window.HK_METALS||{};
@@ -1366,6 +1365,11 @@ window.hkInitCardFx = function(root){
        (diamond) palette — a prismatic rainbow sheen with brilliant-cut sparkles hugging the
        edges. Deliberately NOT starfield (constellation + pro already own space). */
     function foilfx(w,h){return{};}   // stateless — perimeter glints + prismatic wash computed from time
+    /* r404.6 (Wolf) — DIAMOND: a cooler, crystalline animation — icy prismatic shimmer + sharp
+       4-point facet sparkles that flash like light off a brilliant cut. */
+    function diamondfx(w,h){const n=Math.round(w*h/15000)+7,p=[];
+      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.8,2.2),ph:R(0,6.28),sp:R(.5,1.3)});
+      return{p};}
     function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
     /* r404 (Wolf #95) — NAVIGATOR star-chart: stars joined by faint constellation lines
        with a light pulse tracing each edge, under a slow-rotating compass reticle. */
@@ -1409,7 +1413,7 @@ window.hkInitCardFx = function(root){
       let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?facet(S.w,S.h)
         : kind==='emerald'?facet(S.w,S.h) : kind==='neon'?neonfx(S.w,S.h) : kind==='sheet'?sheetfx(S.w,S.h)
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
-        : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h)
+        : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h) : kind==='diamondfx'?diamondfx(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
         : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
         : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
@@ -1522,37 +1526,53 @@ window.hkInitCardFx = function(root){
           g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(.5,'rgba(255,255,255,'+a+')'); g.addColorStop(1,'rgba(255,255,255,0)');
           ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } }
       else if(o.kind==='heraldic'){ const P=o.parts;
-        // rising gold embers
-        for(const s of P.sparks){ if(!reduce){ s.y+=s.vy*dpr; s.x+=(s.drift+Math.sin(t/1100+s.ph)*.3)*dpr; if(s.y<-4){s.y=h+4;s.x=R(0,w);} }
-          const a=reduce?.5:(.2+.55*(.5+.5*Math.sin(t/650*s.sp+s.ph)));
-          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(245,205,110,'+a+')';ctx.shadowBlur=6*dpr;ctx.shadowColor='rgba(230,120,60,.8)';ctx.fill(); }
+        // r404.6 (Wolf): red/EVIL, not flame — an ominous blood-red menace breathing from the heart
+        const men=reduce?.16:(.11+.1*(.5+.5*Math.sin(t/1500)));
+        const bg=ctx.createRadialGradient(P.cx,P.cy,0,P.cx,P.cy,Math.max(w,h)*.62);
+        bg.addColorStop(0,'rgba(170,22,22,'+men+')'); bg.addColorStop(.55,'rgba(95,8,12,'+(men*.55)+')'); bg.addColorStop(1,'rgba(40,0,6,0)');
+        ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+        // slow drifting blood-red motes (dying-ember menace, not cheerful fire)
+        for(const s of P.sparks){ if(!reduce){ s.y+=s.vy*.5*dpr; s.x+=(s.drift+Math.sin(t/1500+s.ph)*.25)*dpr; if(s.y<-4){s.y=h+4;s.x=R(0,w);} }
+          const a=reduce?.35:(.12+.4*(.5+.5*Math.sin(t/800*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(212,40,38,'+a+')';ctx.shadowBlur=7*dpr;ctx.shadowColor='rgba(180,18,18,.9)';ctx.fill(); }
         ctx.shadowBlur=0; ctx.globalAlpha=1;
-        // the heraldic lozenge crest — a gold diamond-in-diamond, glowing on a slow pulse
-        const pulse=reduce?.55:(.35+.4*(.5+.5*Math.sin(t/1800))), rad=P.rad*dpr;
+        // the heraldic lozenge crest — blood-red, glowing ominously on a slow pulse
+        const pulse=reduce?.6:(.42+.42*(.5+.5*Math.sin(t/1400))), rad=P.rad*dpr;
         ctx.save(); ctx.translate(P.cx,P.cy);
-        ctx.strokeStyle='rgba(240,196,90,'+pulse+')'; ctx.lineWidth=2*dpr; ctx.shadowBlur=12*dpr; ctx.shadowColor='rgba(230,120,60,'+(pulse*.9)+')';
+        ctx.strokeStyle='rgba(232,52,46,'+pulse+')'; ctx.lineWidth=2.2*dpr; ctx.shadowBlur=18*dpr; ctx.shadowColor='rgba(205,20,20,'+pulse+')';
         ctx.beginPath(); ctx.moveTo(0,-rad); ctx.lineTo(rad*.7,0); ctx.lineTo(0,rad); ctx.lineTo(-rad*.7,0); ctx.closePath(); ctx.stroke();
-        ctx.shadowBlur=0; ctx.lineWidth=1.2*dpr; ctx.strokeStyle='rgba(240,196,90,'+(pulse*.7)+')';
-        ctx.beginPath(); ctx.moveTo(0,-rad*.62); ctx.lineTo(rad*.44,0); ctx.lineTo(0,rad*.62); ctx.lineTo(-rad*.44,0); ctx.closePath(); ctx.stroke();
-        ctx.restore();
-        // a grand gilt glint sweeps every ~6s
-        if(!reduce){ const gp=(t/6000)%1; if(gp<.22){ const gx=(-.2+gp*1.8)*w, ga=(1-Math.abs(gp-.11)/.11)*.32;
-          ctx.globalCompositeOperation='lighter'; const g=ctx.createLinearGradient(gx-.1*w,0,gx+.1*w,h);
-          g.addColorStop(0,'rgba(250,220,150,0)');g.addColorStop(.5,'rgba(250,220,150,'+ga+')');g.addColorStop(1,'rgba(250,220,150,0)');
-          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } } }
-      else if(o.kind==='foilfx'){
-        // strong prismatic holographic wash — 3 rainbow bands drifting (diamond FIRE, not stars)
+        ctx.shadowBlur=0; ctx.lineWidth=1.3*dpr; ctx.strokeStyle='rgba(150,12,12,'+(pulse*.85)+')';
+        ctx.beginPath(); ctx.moveTo(0,-rad*.6); ctx.lineTo(rad*.42,0); ctx.lineTo(0,rad*.6); ctx.lineTo(-rad*.42,0); ctx.closePath(); ctx.stroke();
+        ctx.restore(); }
+      else if(o.kind==='diamondfx'){ const P=o.parts;
+        // icy prismatic shimmer wash (slow)
         ctx.globalCompositeOperation='lighter';
-        for(let b=0;b<3;b++){ const off=reduce?.5:((t/3200+b/3)%1), cx=(-.3+off*1.6)*w, hue=(t/22+b*120)%360;
+        for(let b=0;b<2;b++){ const off=reduce?.5:((t/5200+b/2)%1), cx=(-.3+off*1.6)*w, hue=(200+44*Math.sin(t/3200+b))%360;
+          const g=ctx.createLinearGradient(cx-.3*w,0,cx+.3*w,h);
+          g.addColorStop(0,'hsla('+hue+',90%,80%,0)');g.addColorStop(.5,'hsla('+hue+',90%,82%,'+(reduce?.06:.12)+')');g.addColorStop(1,'hsla('+((hue+50)%360)+',90%,80%,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
+        ctx.globalCompositeOperation='source-over';
+        // sharp 4-point facet sparkles that flash (brilliant-cut fire)
+        for(const s of P.p){ const tw=.5+.5*Math.sin(t/560*s.sp+s.ph); if(tw<.55) continue;
+          const a=(tw-.55)/.45, rr=s.r*dpr*(1+a*.8);
+          ctx.save(); ctx.translate(s.x,s.y); ctx.globalAlpha=a; ctx.fillStyle='rgba(232,248,255,'+a+')'; ctx.shadowBlur=9*dpr; ctx.shadowColor='rgba(150,210,255,.95)';
+          ctx.beginPath(); ctx.moveTo(0,-rr*2.6); ctx.lineTo(rr*.5,0); ctx.lineTo(0,rr*2.6); ctx.lineTo(-rr*.5,0); ctx.closePath();
+          ctx.moveTo(-rr*2.6,0); ctx.lineTo(0,rr*.5); ctx.lineTo(rr*2.6,0); ctx.lineTo(0,-rr*.5); ctx.closePath();
+          ctx.fill(); ctx.restore(); }
+        ctx.globalAlpha=1; ctx.shadowBlur=0; }
+      else if(o.kind==='foilfx'){
+        // strong prismatic holographic wash — 3 rainbow bands drifting slowly (diamond FIRE, not stars)
+        ctx.globalCompositeOperation='lighter';
+        for(let b=0;b<3;b++){ const off=reduce?.5:((t/6400+b/3)%1), cx=(-.3+off*1.6)*w, hue=(t/45+b*120)%360;
           const g=ctx.createLinearGradient(cx-.32*w,0,cx+.32*w,h);
           g.addColorStop(0,'hsla('+hue+',95%,72%,0)'); g.addColorStop(.5,'hsla('+hue+',95%,74%,'+(reduce?.08:.17)+')'); g.addColorStop(1,'hsla('+((hue+90)%360)+',95%,72%,0)');
           ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
         ctx.globalCompositeOperation='source-over';
-        // brilliant-cut glints MARCHING around the perimeter — the diamond edges catching light
+        // brilliant-cut glints MARCHING slowly around the perimeter — the diamond edges catching light
         const per=2*(w+h), NG=12;
-        for(let i=0;i<NG;i++){ const pp=((reduce?i/NG:(t/2600+i/NG)%1))*per; let x,y;
+        for(let i=0;i<NG;i++){ const pp=((reduce?i/NG:(t/5200+i/NG)%1))*per; let x,y;
           if(pp<w){x=pp;y=0;} else if(pp<w+h){x=w;y=pp-w;} else if(pp<2*w+h){x=w-(pp-w-h);y=h;} else {x=0;y=h-(pp-2*w-h);}
-          const tw=.5+.5*Math.sin(t/280+i*1.7), a=reduce?.7:(.28+.62*tw), r=(1.1+tw*1.7)*dpr;
+          const tw=.5+.5*Math.sin(t/520+i*1.7), a=reduce?.7:(.28+.62*tw), r=(1.1+tw*1.7)*dpr;
           ctx.beginPath();ctx.arc(x,y,r,0,6.28);ctx.fillStyle='rgba(240,250,255,'+a+')';ctx.shadowBlur=9*dpr;ctx.shadowColor='rgba(170,220,255,.95)';ctx.fill(); }
         ctx.shadowBlur=0; }
       else if(o.kind==='lux'){
@@ -1595,15 +1615,16 @@ window.hkInitCardFx = function(root){
         for(const s of P.p){ const a2=s.ang+rot,x=P.cx+Math.cos(a2)*s.rad,y=P.cy+Math.sin(a2)*s.rad*.62,tw=reduce?.7:(.4+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(x,y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=tw;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
       else if(o.kind==='nebula'){ const P=o.parts;
+        // r404.6 (Wolf): richer — brighter, more visibly drifting clouds + a twinkling field
         ctx.globalCompositeOperation='lighter';
-        for(const b of P.blobs){ if(!reduce){ b.x+=b.dx*dpr; b.y+=b.dy*dpr; if(b.x<w*.1||b.x>w*.9)b.dx*=-1; if(b.y<h*.1||b.y>h*.9)b.dy*=-1; }
-          const a=(reduce?.10:.06+.05*(.5+.5*Math.sin(t/2400*b.sp+b.ph)));
+        for(const b of P.blobs){ if(!reduce){ b.x+=b.dx*1.7*dpr; b.y+=b.dy*1.7*dpr; if(b.x<w*.08||b.x>w*.92)b.dx*=-1; if(b.y<h*.08||b.y>h*.92)b.dy*=-1; }
+          const a=(reduce?.14:.1+.08*(.5+.5*Math.sin(t/2200*b.sp+b.ph)));
           const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
-          g.addColorStop(0,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+a+')'); g.addColorStop(1,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+',0)');
+          g.addColorStop(0,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+a+')'); g.addColorStop(.55,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+(a*.35)+')'); g.addColorStop(1,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+',0)');
           ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,6.28); ctx.fill(); }
         ctx.globalCompositeOperation='source-over';
-        for(const s of P.st){ const a=reduce?.5:(.22+.5*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
-          ctx.beginPath();ctx.arc(s.x,s.y,s.r*.8*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.fill();ctx.globalAlpha=1; } }
+        for(const s of P.st){ const a=reduce?.6:(.28+.6*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=4*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
       else if(o.kind==='aurora'){ ctx.globalCompositeOperation='lighter';
         for(const bd of o.parts.b){ const cx=w*(.5+.36*Math.sin(t/4200*bd.sp+bd.off)),hue=bd.hue+18*Math.sin(t/6000+bd.off);
           const g=ctx.createLinearGradient(cx-.22*w,0,cx+.22*w,h);
@@ -1697,13 +1718,7 @@ window.hkInitCardFx = function(root){
           g.addColorStop(0,'rgba('+col+',0)'); g.addColorStop(1,'rgba('+col+','+d.o+')');
           ctx.strokeStyle=g; ctx.shadowBlur=6*dpr; ctx.shadowColor='rgba('+col+',.8)';
           ctx.beginPath(); ctx.moveTo(d.x,d.y-d.len*dpr); ctx.lineTo(d.x,d.y); ctx.stroke(); }
-        ctx.shadowBlur=0;
-        // periodic glitch bars: an RGB-split flash slab that jumps
-        for(const b of P.bars){ if(!reduce){ b.life++; if(b.life>b.max){ b.life=0; b.max=R(70,150); b.y=R(0,h); b.off=R(3,9); } }
-          const k=b.life/b.max; if(k<.16){ const a=(.16-k)*2.2, bh=Math.max(3,h*.05);
-            ctx.globalAlpha=a; ctx.fillStyle='rgba(46,220,255,.5)'; ctx.fillRect(-b.off*dpr,b.y,w,bh);
-            ctx.fillStyle='rgba(255,45,149,.5)'; ctx.fillRect(b.off*dpr,b.y,w,bh);
-            ctx.fillStyle='rgba(240,240,255,.6)'; ctx.fillRect(0,b.y,w,bh*.5); ctx.globalAlpha=1; } } }
+        ctx.shadowBlur=0; }   /* r404.6 (Wolf): horizontal glitch bars removed — the neon rain carries it */
       else if(o.kind==='sheet'){ const P=o.parts, cw=P.cw*dpr, ch=P.ch*dpr;
         // faint Excel grid
         ctx.strokeStyle='rgba(79,122,168,.20)'; ctx.lineWidth=1;
