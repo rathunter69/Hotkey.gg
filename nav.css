@@ -630,6 +630,12 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-lg.hk-frame-terminal{border-width:5px}   /* r407/r408 (Wolf): ALL animated borders match the foil width (5px) */
 .hk-frame-lg.hk-frame-foil::before{inset:-5px}
 .hk-frame-lg.hk-frame-charter{border-width:6px}
+/* r411 (Wolf: "make sure again ALL cards have uniform borders/shape"): the per-skin border
+   shorthands (border:2px solid transparent, etc.) sit AFTER the earlier 5px normalization and
+   were silently overriding it — leaving a 1/2/3/5px scatter across the catalog. This one
+   authoritative rule (higher specificity, placed last) forces every full skin card to the same
+   5px width + 16px radius, so the footprint is identical card-to-card. */
+.uc.hk-frame-lg[class*="hk-frame-"]{border-width:5px; border-radius:16px}
 .hk-frame-lg.hk-frame-bone::after{font-size:12.5px}   /* bone stays PERFECTLY still — only the tag grows */
 .hk-frame-lg.hk-frame-heraldic{
   box-shadow:0 22px 60px rgba(0,0,0,.45), 0 0 58px rgba(230,88,67,.42), inset 0 0 74px rgba(230,88,67,.11)}

@@ -1885,8 +1885,11 @@ window.hkPlayerCard = function(d, opts){
   /* r410 (Wolf): the equipped TITLE — a custom (PRO) title wins, else the earned title id
      resolves to its label. Callers may override with d.titleText. Rendered in a notch under
      the identity so it reads on every surface (profile / header / leaderboard) at once. */
+  /* r411 (Wolf): the custom free-text PRO title is CUT — only earned titles ride the card now
+     (a free-text title that can show "whatever you want" was more risk than reward). Any legacy
+     stored customTitle is simply ignored at render. */
   const titleText = (d.titleText != null) ? d.titleText
-    : (flObj ? (flObj.customTitle || (flObj.title && window.hkTitleLabel ? window.hkTitleLabel(flObj.title) : '')) : '');
+    : (flObj ? (flObj.title && window.hkTitleLabel ? window.hkTitleLabel(flObj.title) : '') : '');
   if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
     cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
     orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full, owner:!!d.owner, serial:d.serial|0}) : '';
