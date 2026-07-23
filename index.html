@@ -8383,6 +8383,16 @@ function render(){
     const __availH = __gw.clientHeight - 17 - 31;          // usable height minus header
     __VR = Math.max(S.ROWS, Math.round(__availH / __CELL_TARGET));   // canvas rows: content + empty filler
     __rowH = Math.max(18, Math.min(40, Math.floor(__availH / __VR)));
+  } else if(__gw && !S._gridMeasureRetry){
+    /* r406 (Wolf: "every drill other than navigate is in the old grid sizing"): most drills
+       render the FIRST time before the grid box has laid out (clientHeight ~0), so they fell
+       to the coarse pre-measure fallback (32/29/26/24px). Nav only looked right because it
+       re-renders after layout and hit the measured branch. Schedule ONE post-layout re-render
+       so EVERY drill lands on the same 26px standard canvas. Guarded against loops; re-arms if
+       the box still isn't measurable. */
+    S._gridMeasureRetry = 1;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ S._gridMeasureRetry = 0;
+      try{ const w=$('gridwrap'); if(w && w.clientHeight>100) render(); }catch(e){} }));
   }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
   S._colW = colW;                                          // ENGINE widths — graders (autofit) read these; r55 wrongly pointed this at __ew
