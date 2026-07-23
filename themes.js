@@ -1373,9 +1373,9 @@ window.hkInitCardFx = function(root){
     const R=(a,b)=>a+Math.random()*(b-a);
     /* r414 (#121 · Wolf): scale fx ELABORATENESS by skin CLASS — the particle-field density
        tracks the card's rarity tier, so the prestige gradient the notch shape encodes is
-       reinforced by how busy the animation is. Pronounced class gradient (Wolf: "dial it up"):
-       legendary much busier (1.45), epic slightly rich (1.12), rare calmer (0.88), common
-       calmest (0.78). Applied centrally to the generated particle ARRAYS below (applyEL) so Wolf's
+       reinforced by how busy the animation is. Epic (the largest, most hand-tuned bucket)
+       stays at the authored baseline (1.0); rare is nudged calmer, legendary busier, common
+       calmest. Applied centrally to the generated particle ARRAYS below (applyEL) so Wolf's
        15 bespoke generators are untouched; object-based fx (nebula/aurora/galaxy/heraldic)
        keep their bespoke tuning. EL is set per-canvas from the frame class. */
     const TIER={}; (window.HK_FRAMES||[]).forEach(f=>{ TIER[f.id]=f.tier; });
@@ -1386,7 +1386,7 @@ window.hkInitCardFx = function(root){
         const cls=(host.className||'').split(/\s+/);
         for(const c of cls){ if(c.indexOf('hk-frame-')!==0) continue; const id=c.slice(9);
           const t=TIER[id]; if(!t) continue;   // skips hk-frame-lg / hk-frame-none
-          return t==='legendary'?1.45 : t==='epic'?1.12 : t==='rare'?0.88 : t==='common'?0.78 : 1.0; }
+          return t==='legendary'?1.15 : t==='epic'?1.0 : t==='rare'?0.9 : t==='common'?0.85 : 1.0; }
       }catch(e){}
       return 1;
     }
@@ -1980,7 +1980,11 @@ window.hkInitCardFx = function(root){
     }
     if(reduce){ sys.forEach(o=>draw(o,0)); return; }
     (function loop(t){ let alive=false; sys.forEach(o=>{ if(o.cv.isConnected){ alive=true; draw(o,t); } });
-      if(alive) requestAnimationFrame(loop); })(0);
+      if(alive) requestAnimationFrame(loop);
+      // r414-review B3: when the loop ends (all canvases detached), clear the init flag so a
+      // card re-inserted later (e.g. a re-opened modal reusing the node) re-animates instead
+      // of staying frozen (cv._hkfx used to latch permanently).
+      else sys.forEach(o=>{ try{ o.cv._hkfx=0; }catch(e){} }); })(0);
   }catch(e){}
 };
 

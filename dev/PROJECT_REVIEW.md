@@ -46,6 +46,8 @@ One unified card `hkPlayerCard(themes.js:1996)` everywhere. Layers: skin (`hkFla
 ## PART III — SEGMENTED NEXT-STEPS PIPELINE
 _Each block is sized to be one focused session. Tags: **[auto]** safe to run autonomously / **[Wolf]** needs your decision or visual sign-off · **P0/P1/P2** priority · **S/M/L** effort · gate lane._
 
+> **STATUS (shipped this session — r415):** Segment **A** complete (A1 cache-bump CI guard · A2 secret scan · A3 sessions_guard migration · A4 `_headers` CSP · A5 CDN pin+SRI · A6 one-drill behavioral smoke), **B3** done (fx re-open bug), Segment **C** guards done (C1 membership · C2 PARS parity · C3 skin-notch coverage · C4 de-hint — all now enforced in the gate). **Deferred with cause:** B1/B2 bulk dead-code deletion (verification found the live `nebula` PRO skin shares the `stars()` helper with dead generators → needs per-skin visual validation in its own PR) and C5 clipboard `copyFormat` helper (engine refactor, own PR). Drift discovered while pinning A5: the drill-page generator hard-codes **stale** asset versions (nav.css v188 / drills.js v275 / themes.js v280 / nav.js v288) — the 82 SEO pages serve old JS/CSS; fold into a "generator reads versions from a shared source" follow-up.
+
 ### SEGMENT A — CI / Safety hardening  ·  P0  ·  mostly [auto]
 The highest-leverage, lowest-visual-risk work. Prevents the failures this project has actually hit.
 - **A1 [auto·S·cosmetic-lane]** CI **cache-bump assertion**: when a shared asset changed in the diff, fail unless (a) its `?v=` differs from base and (b) every `*.html` agrees on one version. Pure git-diff+grep. *Directly prevents the r390-392 "nothing reached live" class.*

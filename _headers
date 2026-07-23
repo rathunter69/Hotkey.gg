@@ -1,0 +1,12 @@
+# Cloudflare Pages response headers (A4, r414-review Segment A).
+# Applies to every path. CSP is deliberately permissive on inline (the app is
+# inline-script/style heavy) and on connect/img (avoid breaking any live
+# endpoint with no staging to test against), while still locking the highest-
+# value vectors: script FILES load only from self + the pinned jsdelivr CDN,
+# no plugins (object-src none), no base-tag hijack, and the site can't be framed.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; frame-src https:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'

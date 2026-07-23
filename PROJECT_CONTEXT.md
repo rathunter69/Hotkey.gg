@@ -43,8 +43,20 @@ live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ d
   confirms rounded ladder base vs angular prestige set. Notch markup: `.hkf-tab` (nav.css ~444 base pill,
   ~708 per-class override); `hkPlayerCard` tab via `hkFrameOrnaments` (themes.js ~1317).
 
-**ASSET VERSIONS after r414 (bump on next JS/CSS change):** themes.js **v305**, nav.css **v207**,
-nav.js **v296**, drills.js v278, lb.js v37, lb.css v20. (sed the `?v=` across all `*.html`.)
+**ASSET VERSIONS after r415 (bump on next JS/CSS change):** themes.js **v306**, nav.css **v207**,
+nav.js **v296**, drills.js v278, lb.js v37, lb.css v20. (sed the `?v=` across all `*.html` — now
+also GATE-ENFORCED by `dev/check-cache-versions.js`, so a forgotten/partial bump fails CI.)
+
+**r415 — PROJECT REVIEW + SAFETY/ANTI-DRIFT BATCH (see `dev/PROJECT_REVIEW.md`):** a 6-track
+subsystem audit produced `dev/PROJECT_REVIEW.md` (system map + segmented pipeline). Shipped
+Segment A (cache-bump CI guard, committed-secret scan, `sessions_guard` migration [sessions boards
+were client-forgeable], `_headers` CSP, Supabase CDN pinned+SRI, one-drill behavioral smoke in the
+cosmetic lane), B3 (fx re-open bug), and Segment C drift guards (drill membership / PARS parity /
+skin-notch coverage / de-hint copy — all enforced in the gate now via `dev/check-invariants.js` +
+smoke). Deferred with cause: B1/B2 bulk dead-fx/ornament deletion (live `nebula` shares `stars()`
+with dead code — needs a visual-validated PR) and C5 clipboard `copyFormat` helper. The **fx
+"dial-up"** (legendary 1.45/epic 1.12/rare 0.88/common 0.78) is drafted but held pending Wolf's
+render approval — NOT in this batch (reverted to the live 1.15/1.0/0.9/0.85).
 
 **CADENCE:** branch `claude/pipeline-engine-integration-laki0l`; after each merge RESTART off main
 (`git fetch origin main && git checkout -B <branch> origin/main`), push with `--force-with-lease`.
