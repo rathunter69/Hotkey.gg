@@ -1197,7 +1197,14 @@ window.hkFrameOrnaments = (function(){
     /* r391 (Wolf) chapter/cert capstone skins */
     architect:    ['△ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],  /* r393 (Wolf): ⟁ fell back to a ⚠-looking glyph in most fonts — a clean drafting triangle reads right */
     boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','quilt'],   /* r404.2 (Wolf): quilted monogram lattice — foundational redesign, distinct from the gold-dust skins */
-    emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','emerald']
+    emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','emerald'],
+    /* r404.3 (Wolf #96): the legacy RANK plaques, reborn as full theme cards (were
+       ornament-frames). Metallic interior + a polished-metal sheen sweeping across. */
+    'plaque-bronze':['◆ BRONZE',  '#1a0f07','linear-gradient(120deg,#e0a35a,#7a4a1e)','#e0a35a','sheen'],
+    'plaque-silver':['◆ SILVER',  '#101318','linear-gradient(120deg,#e4ebf2,#8a929c)','#e4ebf2','sheen'],
+    'plaque-gold':  ['◆ GOLD',    '#1a1404','linear-gradient(120deg,#f5d878,#a5791f)','#f5d878','sheen'],
+    'plaque-plat':  ['◆ PLATINUM','#0e1014','linear-gradient(120deg,#f0f4f8,#9aa6b2)','#f0f4f8','sheen'],
+    'plaque-diam':  ['◆ DIAMOND', '#0a1418','linear-gradient(120deg,#dff4ff,#7fd0e8,#c9b8ff)','#dff4ff','sheen']
   };
   return function(id, opts){
     const M=window.HK_METALS||{};
@@ -1341,6 +1348,10 @@ window.hkInitCardFx = function(root){
     function onyxfx(w,h){const veins=[];for(let i=0;i<5;i++){const pts=[];let x=R(0,w),y=R(-.1,.05)*h;
       for(let s=0;s<8;s++){pts.push({x,y});x+=R(-.18,.18)*w;y+=h/6.5;} veins.push({pts,ph:R(0,6.28),sp:R(.4,.9)});}
       return{veins};}
+    /* r404.3 (Wolf #96) — polished-metal sheen for the rank plaques: a bright highlight bar
+       rakes diagonally across the metal every few seconds. Neutral white so it reads on any
+       plaque colour (bronze/silver/gold/platinum/diamond). */
+    function sheen(w,h){return{};}
     function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
     /* r404 (Wolf #95) — NAVIGATOR star-chart: stars joined by faint constellation lines
        with a light pulse tracing each edge, under a slow-rotating compass reticle. */
@@ -1386,7 +1397,7 @@ window.hkInitCardFx = function(root){
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
         : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
-        : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h)
+        : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
       sys.push({cv,kind,S,parts});
@@ -1487,6 +1498,14 @@ window.hkInitCardFx = function(root){
           if(!reduce){ const gp=((t/3000*v.sp+v.ph/6.28)%1), idx=gp*(v.pts.length-1), i0=Math.floor(idx), f=idx-i0;
             const p0=v.pts[i0], p1=v.pts[Math.min(v.pts.length-1,i0+1)], gx=p0.x+(p1.x-p0.x)*f, gy=p0.y+(p1.y-p0.y)*f;
             ctx.beginPath(); ctx.arc(gx,gy,2.2*dpr,0,6.28); ctx.fillStyle='rgba(255,240,190,.92)'; ctx.shadowBlur=8*dpr; ctx.shadowColor='rgba(245,205,110,.9)'; ctx.fill(); ctx.shadowBlur=0; } } }
+      else if(o.kind==='sheen'){
+        // polished-metal highlight bar rakes diagonally every ~4.5s
+        const gp=reduce?.5:((t/4500)%1);
+        if(gp<.4){ const gx=(-.15+gp*1.5)*w, a=(1-Math.abs(gp-.2)/.2)*(reduce?.12:.4);
+          ctx.globalCompositeOperation='lighter';
+          const g=ctx.createLinearGradient(gx-.14*w,0,gx+.14*w,h);
+          g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(.5,'rgba(255,255,255,'+a+')'); g.addColorStop(1,'rgba(255,255,255,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } }
       else if(o.kind==='lux'){
         const off=reduce?.5:((t/5000)%1), lx=off*w;   // champagne spotlight travels L→R
         const rg=ctx.createRadialGradient(lx,h*.42,0,lx,h*.42,w*.42);
