@@ -1262,7 +1262,7 @@ window.hkFrameOrnaments = (function(){
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
     molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
-    founder:      ['★ FOUNDER','#0a0910','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c89bff','cracks'],   /* r411 (Wolf): aurora wash overshadowed the stats — swapped to a dark CRACKED-RAINBOW fracture fx */
+    founder:      ['★ FOUNDER','#0a0910','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c89bff','holorain'],   /* r411 (Wolf): aurora wash overshadowed the stats — swapped to a dark HOLO-FOIL rainbow (cool, not literal cracks) */
     /* r390 (Wolf) new title skins */
     amethyst:     ['◆ AMETHYST','#180a2a','linear-gradient(120deg,#a06cff,#d0a8ff)','#c49bff','prism'],
     onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','onyxfx'],   /* r404.2 (Wolf): black marble + gold veins (was gold dust, looked like boutique) */
@@ -1417,20 +1417,13 @@ window.hkInitCardFx = function(root){
     /* r406 (Wolf: "founder still no good animation"): richer aurora — five drifting curtains
        (brighter, wider hue spread) over a slow-twinkling star field. */
     function aurora(w,h){return{b:[{hue:150,off:0,sp:1},{hue:285,off:2.1,sp:.72},{hue:190,off:4.2,sp:1.35},{hue:330,off:1.1,sp:.9},{hue:50,off:3.3,sp:1.15}],st:stars(w,h)};}
-    /* r411 (Wolf: founder aurora too bright — "make it a cracked rainbow"): the card stays DARK
-       (no full-bleed wash overpowering the stats) and the spectrum lives ONLY in thin prismatic
-       fracture veins radiating from an off-centre impact, each shard a different hue, a light
-       pulse racing out along it. Legible stats, still a one-of-one pinnacle. */
-    function cracksInit(w,h){
-      const cx=w*(.50+R(-.05,.05)), cy=h*(.11+R(0,.05)), N=10, cracks=[];
-      for(let i=0;i<N;i++){
-        const ang=(i/N)*6.28+R(-.14,.14), seg=Math.round(R(4,6)), len=R(.44,.72)*Math.max(w,h)/seg;
-        let x=cx,y=cy,a=ang; const pts=[{x,y}];
-        for(let s=0;s<seg;s++){ a+=R(-.30,.30); x+=Math.cos(a)*len; y+=Math.sin(a)*len; pts.push({x,y}); }
-        cracks.push({pts, hue:(i/N)*360, ph:R(0,6.28), sp:R(.6,1.1)});
-      }
-      return {cracks, cx, cy};
-    }
+    /* r411 (Wolf: founder aurora too bright — wants it "cracked" = COOL, not shattered): a
+       refined dark HOLO-FOIL. The card stays near-black so the stats read; two narrow rainbow
+       sheen bands drift across on different phases (confined bands, not a full-bleed wash) with
+       a fine dim sparkle. Premium holographic-card feel, spectrum without the glare. */
+    function holorain(w,h){ const n=Math.round(w*h/26000)+5, st=[];
+      for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.4),ph:R(0,6.28),sp:R(.5,1.3)});
+      return {st}; }
     function drive(w,h){return{hz:Math.round(h*.40)};}
     function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
@@ -1517,7 +1510,7 @@ window.hkInitCardFx = function(root){
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
         : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h) : kind==='diamondfx'?diamondfx(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
-        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='cracks'?cracksInit(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
+        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='holorain'?holorain(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
         : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
@@ -1619,33 +1612,23 @@ window.hkInitCardFx = function(root){
           if(!reduce){ const gp=((t/3000*v.sp+v.ph/6.28)%1), idx=gp*(v.pts.length-1), i0=Math.floor(idx), f=idx-i0;
             const p0=v.pts[i0], p1=v.pts[Math.min(v.pts.length-1,i0+1)], gx=p0.x+(p1.x-p0.x)*f, gy=p0.y+(p1.y-p0.y)*f;
             ctx.beginPath(); ctx.arc(gx,gy,2.2*dpr,0,6.28); ctx.fillStyle='rgba(255,240,190,.92)'; ctx.shadowBlur=8*dpr; ctx.shadowColor='rgba(245,205,110,.9)'; ctx.fill(); ctx.shadowBlur=0; } } }
-      else if(o.kind==='cracks'){ const P=o.parts;
-        /* r411 (Wolf): CRACKED RAINBOW — dark obsidian, prismatic fracture veins. Each crack is
-           its own hue (slowly drifting), laid over a soft dark shadow line for depth, with a
-           bright same-hue glint racing outward from the impact. No lighter full-bleed → stats
-           stay perfectly readable; the colour is confined to the fractures. */
-        for(const c of P.cracks){
-          const hue=(c.hue+18*Math.sin(t/4200+c.ph))%360;
-          ctx.lineCap='round';
-          // dark under-shadow for a chiselled, in-the-glass look
-          ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.lineWidth=2.6*dpr;
-          ctx.beginPath(); ctx.moveTo(c.pts[0].x,c.pts[0].y);
-          for(let i=1;i<c.pts.length;i++) ctx.lineTo(c.pts[i].x,c.pts[i].y); ctx.stroke();
-          // the rainbow fracture itself
-          ctx.strokeStyle='hsla('+hue+',88%,64%,'+(reduce?.32:.5)+')'; ctx.lineWidth=1.3*dpr;
-          ctx.beginPath(); ctx.moveTo(c.pts[0].x,c.pts[0].y);
-          for(let i=1;i<c.pts.length;i++) ctx.lineTo(c.pts[i].x,c.pts[i].y); ctx.stroke();
-          // glint pulse racing out along the crack
-          if(!reduce){ const gp=((t/2600*c.sp+c.ph/6.28)%1), tot=c.pts.length-1, idx=gp*tot, i0=Math.floor(idx), f=idx-i0;
-            const p0=c.pts[i0], p1=c.pts[Math.min(tot,i0+1)], gx=p0.x+(p1.x-p0.x)*f, gy=p0.y+(p1.y-p0.y)*f;
-            ctx.beginPath(); ctx.arc(gx,gy,2*dpr,0,6.28); ctx.fillStyle='hsla('+hue+',95%,82%,.95)';
-            ctx.shadowBlur=9*dpr; ctx.shadowColor='hsla('+hue+',95%,70%,.9)'; ctx.fill(); ctx.shadowBlur=0; }
+      else if(o.kind==='holorain'){ const P=o.parts;
+        /* r411 (Wolf): HOLO-FOIL — "cool" rainbow, not a shattered card. Two narrow spectral sheen
+           bands drift across on different speeds (banded, so most of the dark body stays clear and
+           the stats read), plus a fine dim sparkle. Reads like a premium holographic card. */
+        ctx.globalCompositeOperation='lighter';
+        for(let k=0;k<2;k++){
+          const sp=((t/(k?7200:5200)+k*.5)%1), bx=(-.3+sp*1.6)*w, hue=(t/22+k*150)%360;
+          const g=ctx.createLinearGradient(bx-.15*w,0,bx+.15*w,h);
+          g.addColorStop(0,'hsla('+hue+',85%,62%,0)');
+          g.addColorStop(.5,'hsla('+((hue+45)%360)+',88%,64%,'+(reduce?.07:.15)+')');
+          g.addColorStop(1,'hsla('+((hue+95)%360)+',85%,62%,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
         }
-        ctx.lineCap='butt';
-        // faint prismatic bloom at the impact core — small, low-alpha, never washes the body
-        const cg=ctx.createRadialGradient(P.cx,P.cy,0,P.cx,P.cy,Math.min(w,h)*.26);
-        cg.addColorStop(0,'hsla('+((t/45)%360)+',88%,68%,'+(reduce?.05:.10)+')'); cg.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.fillStyle=cg; ctx.fillRect(0,0,w,h); }
+        ctx.globalCompositeOperation='source-over';
+        if(P.st) for(const s of P.st){ const a=reduce?.3:(.12+.42*(.5+.5*Math.sin(t/620*s.sp+s.ph)));
+          ctx.beginPath(); ctx.arc(s.x,s.y,s.r*dpr,0,6.28); ctx.fillStyle='rgba(230,235,255,'+a+')';
+          ctx.shadowBlur=4*dpr; ctx.shadowColor='rgba(200,190,255,.8)'; ctx.fill(); ctx.shadowBlur=0; } }
       else if(o.kind==='sheen'){
         // polished-metal highlight bar rakes diagonally every ~4.5s
         const gp=reduce?.5:((t/4500)%1);
