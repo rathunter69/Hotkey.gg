@@ -579,11 +579,16 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    a 3px metal edge (still reads as a plaque, not a hairline) with the texture contained. */
 .hk-frame-lg[class*="hk-frame-plaque-"]{border-width:3px}
 .hk-frame-lg[class*="hk-frame-plaque-"]::before{inset:-9px}
-.hk-frame-lg.hk-frame-foil{border-width:7px}
-.hk-frame-lg.hk-frame-foil::before{inset:-7px}
+/* r406 (Wolf): ONE medium border width (4px) across the animated-border cards — foil was
+   7px and read oversized (threw the sizing off vs every other card), while founder/diamond/
+   heraldic sat at 2-3px where the conic spin was barely visible. 4px is the middle ground:
+   thick enough that the rotating gradient reads, matched so every card is the same footprint. */
+.hk-frame-lg.hk-frame-foil, .hk-frame-lg.hk-frame-founder, .hk-frame-lg.hk-frame-heraldic,
+.hk-frame-lg.hk-frame-plaque-diam, .hk-frame-lg.hk-frame-molten, .hk-frame-lg.hk-frame-noir{border-width:4px}
+.hk-frame-lg.hk-frame-foil::before{inset:-4px}
 .hk-frame-lg.hk-frame-charter{border-width:6px}
 .hk-frame-lg.hk-frame-bone::after{font-size:12.5px}   /* bone stays PERFECTLY still — only the tag grows */
-.hk-frame-lg.hk-frame-heraldic{border-width:3px;
+.hk-frame-lg.hk-frame-heraldic{
   box-shadow:0 22px 60px rgba(0,0,0,.45), 0 0 58px rgba(230,88,67,.42), inset 0 0 74px rgba(230,88,67,.11)}
 /* wider, brighter specular strip on the big card */
 .hk-frame-lg .hkf-glint::before{width:52%;
@@ -719,6 +724,11 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   background:linear-gradient(180deg,#2a1140,#5a1f66 55%,#c0316f) padding-box, linear-gradient(120deg,#ff5db1,#7b5cff,#2ee6e6) border-box;
   box-shadow:0 0 22px rgba(255,90,180,.24),0 20px 60px rgba(0,0,0,.6)}
 .hk-frame-vaporwave .pc-name span,.hk-frame-vaporwave .pub-nm{color:#fff; text-shadow:0 2px 0 #ff5db1,0 0 12px rgba(120,90,255,.7)}
+/* r406 (Wolf: "can't see level text on synthwave"): the LVL / xp text ran pink-on-magenta —
+   force high contrast so it reads over the neon gradient. */
+.hk-frame-vaporwave .uc-lvl{color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.hk-frame-vaporwave .uc-xp{color:#f6e6ff; text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.hk-frame-vaporwave .uc-bar{background:rgba(0,0,0,.5); border-color:rgba(255,255,255,.4)}
 
 .hk-frame-terminal.hk-frame-terminal{--text:#ffce8a; --muted:#7a5f24; --line:#4a3810; --accent:#ffb52e; --accent-dim:#8a6a2a;
   border:2px solid transparent; color:#ffce8a;

@@ -1231,7 +1231,11 @@ window.hkFrameOrnaments = (function(){
         // viewer's own founding rank (opts.owner) — never a stranger's number.
         let sn=(opts&&opts.serial|0)||0;
         if(!sn && opts && opts.owner && window.hkFoundingFlags){ sn=window.hkFoundingFlags().rank|0; }
-        ttl = (sn>0 && sn<=200) ? ('★ FOUNDER '+String(sn).padStart(3,'0')+' / 200') : '★ FOUNDER · CHARTER';
+        /* r406 (Wolf): the serial IS the number out of 200 — the owner always sees theirs
+           (0/200 is fine on his account); only a generic/preview card falls back to CHARTER. */
+        sn=Math.max(0,Math.min(200,sn));
+        ttl = (opts&&opts.owner) ? ('★ FOUNDER '+String(sn).padStart(3,'0')+' / 200')
+            : (sn>0 ? ('★ FOUNDER '+String(sn).padStart(3,'0')+' / 200') : '★ FOUNDER · CHARTER');
       }
       h+=tab(ttl, s[1], s[2], s[3]);
       return h;
@@ -1333,7 +1337,9 @@ window.hkInitCardFx = function(root){
       for(let i=0;i<n;i++){const arm=i%2,rad=R(.04,.62)*Math.min(w,h),ang=rad*0.028+arm*Math.PI+R(-.35,.35);
         p.push({rad,ang,r:R(.4,1.5),c:cols[i%cols.length],ph:R(0,6.28),sp:R(.5,1.4)});}
       return{cx,cy,p};}
-    function aurora(w,h){return{b:[{hue:150,off:0,sp:1},{hue:285,off:2.1,sp:.72},{hue:190,off:4.2,sp:1.35}]};}
+    /* r406 (Wolf: "founder still no good animation"): richer aurora — five drifting curtains
+       (brighter, wider hue spread) over a slow-twinkling star field. */
+    function aurora(w,h){return{b:[{hue:150,off:0,sp:1},{hue:285,off:2.1,sp:.72},{hue:190,off:4.2,sp:1.35},{hue:330,off:1.1,sp:.9},{hue:50,off:3.3,sp:1.15}],st:stars(w,h)};}
     function drive(w,h){return{hz:Math.round(h*.40)};}
     function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
@@ -1369,7 +1375,9 @@ window.hkInitCardFx = function(root){
        4-point facet sparkles that flash like light off a brilliant cut. */
     function diamondfx(w,h){const n=Math.round(w*h/15000)+7,p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.8,2.2),ph:R(0,6.28),sp:R(.5,1.3)});
-      return{p};}
+      // r406 (Wolf): a jagged lightning bolt (top→bottom) — the pinnacle beat, flashed periodically
+      const bolt=[]; let bx=R(.34,.66)*w; for(let y=0;y<=h+1;y+=h/9){ bolt.push({x:bx,y:Math.min(y,h)}); bx+=R(-.13,.13)*w; bx=Math.max(w*.12,Math.min(w*.88,bx)); }
+      return{p,bolt};}
     function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
     /* r404 (Wolf #95) — NAVIGATOR star-chart: stars joined by faint constellation lines
        with a light pulse tracing each edge, under a slow-rotating compass reticle. */
@@ -1537,9 +1545,11 @@ window.hkInitCardFx = function(root){
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(212,40,38,'+a+')';ctx.shadowBlur=7*dpr;ctx.shadowColor='rgba(180,18,18,.9)';ctx.fill(); }
         ctx.shadowBlur=0; ctx.globalAlpha=1;
         // the heraldic lozenge crest — blood-red, glowing ominously on a slow pulse
-        const pulse=reduce?.6:(.42+.42*(.5+.5*Math.sin(t/1400))), rad=P.rad*dpr;
+        // r406 (Wolf: "dull pulsating"): higher floor + a sharper double-beat so the crest
+        // reads as an ominous heartbeat, not a slow fade.
+        const beat=Math.pow(.5+.5*Math.sin(t/900),3), pulse=reduce?.8:(.6+.4*beat), rad=P.rad*dpr;
         ctx.save(); ctx.translate(P.cx,P.cy);
-        ctx.strokeStyle='rgba(232,52,46,'+pulse+')'; ctx.lineWidth=2.2*dpr; ctx.shadowBlur=18*dpr; ctx.shadowColor='rgba(205,20,20,'+pulse+')';
+        ctx.strokeStyle='rgba(240,64,52,'+pulse+')'; ctx.lineWidth=2.8*dpr; ctx.shadowBlur=(16+14*beat)*dpr; ctx.shadowColor='rgba(220,24,24,'+pulse+')';
         ctx.beginPath(); ctx.moveTo(0,-rad); ctx.lineTo(rad*.7,0); ctx.lineTo(0,rad); ctx.lineTo(-rad*.7,0); ctx.closePath(); ctx.stroke();
         ctx.shadowBlur=0; ctx.lineWidth=1.3*dpr; ctx.strokeStyle='rgba(150,12,12,'+(pulse*.85)+')';
         ctx.beginPath(); ctx.moveTo(0,-rad*.6); ctx.lineTo(rad*.42,0); ctx.lineTo(0,rad*.6); ctx.lineTo(-rad*.42,0); ctx.closePath(); ctx.stroke();
@@ -1552,14 +1562,20 @@ window.hkInitCardFx = function(root){
           g.addColorStop(0,'hsla('+hue+',90%,80%,0)');g.addColorStop(.5,'hsla('+hue+',90%,82%,'+(reduce?.06:.12)+')');g.addColorStop(1,'hsla('+((hue+50)%360)+',90%,80%,0)');
           ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
         ctx.globalCompositeOperation='source-over';
-        // sharp 4-point facet sparkles that flash (brilliant-cut fire)
-        for(const s of P.p){ const tw=.5+.5*Math.sin(t/560*s.sp+s.ph); if(tw<.55) continue;
-          const a=(tw-.55)/.45, rr=s.r*dpr*(1+a*.8);
-          ctx.save(); ctx.translate(s.x,s.y); ctx.globalAlpha=a; ctx.fillStyle='rgba(232,248,255,'+a+')'; ctx.shadowBlur=9*dpr; ctx.shadowColor='rgba(150,210,255,.95)';
-          ctx.beginPath(); ctx.moveTo(0,-rr*2.6); ctx.lineTo(rr*.5,0); ctx.lineTo(0,rr*2.6); ctx.lineTo(-rr*.5,0); ctx.closePath();
-          ctx.moveTo(-rr*2.6,0); ctx.lineTo(0,rr*.5); ctx.lineTo(rr*2.6,0); ctx.lineTo(0,-rr*.5); ctx.closePath();
-          ctx.fill(); ctx.restore(); }
-        ctx.globalAlpha=1; ctx.shadowBlur=0; }
+        // r406 (Wolf: "the little diamond icons suck"): soft ROUND icy twinkles, not 4-point facets
+        for(const s of P.p){ const tw=.5+.5*Math.sin(t/620*s.sp+s.ph);
+          const a=reduce?.5:(.14+.5*tw), r=s.r*dpr;
+          ctx.beginPath(); ctx.arc(s.x,s.y,r,0,6.28); ctx.fillStyle='rgba(232,248,255,'+a+')';
+          ctx.shadowBlur=7*dpr; ctx.shadowColor='rgba(150,210,255,.9)'; ctx.fill(); }
+        ctx.globalAlpha=1; ctx.shadowBlur=0;
+        // r406 (Wolf): the PINNACLE — a bright jagged lightning strike arcs down every ~4.2s
+        if(P.bolt && !reduce){ const cyc=(t/4200)%1, flash=cyc<.11 ? Math.pow(1-cyc/.11,1.4) : 0;
+          if(flash>0.03){ ctx.save(); ctx.globalCompositeOperation='lighter';
+            ctx.lineJoin='round'; ctx.lineCap='round';
+            ctx.strokeStyle='rgba(200,236,255,'+(.8*flash)+')'; ctx.lineWidth=2.4*dpr; ctx.shadowBlur=18*dpr; ctx.shadowColor='rgba(150,210,255,'+flash+')';
+            ctx.beginPath(); P.bolt.forEach((pt,i)=> i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y)); ctx.stroke();
+            ctx.lineWidth=1*dpr; ctx.strokeStyle='rgba(255,255,255,'+flash+')'; ctx.shadowBlur=6*dpr; ctx.stroke();
+            ctx.restore(); ctx.globalCompositeOperation='source-over'; ctx.shadowBlur=0; } } }
       else if(o.kind==='foilfx'){
         // strong prismatic holographic wash — 3 rainbow bands drifting slowly (diamond FIRE, not stars)
         ctx.globalCompositeOperation='lighter';
@@ -1626,11 +1642,15 @@ window.hkInitCardFx = function(root){
         for(const s of P.st){ const a=reduce?.6:(.28+.6*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=4*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
       else if(o.kind==='aurora'){ ctx.globalCompositeOperation='lighter';
-        for(const bd of o.parts.b){ const cx=w*(.5+.36*Math.sin(t/4200*bd.sp+bd.off)),hue=bd.hue+18*Math.sin(t/6000+bd.off);
-          const g=ctx.createLinearGradient(cx-.22*w,0,cx+.22*w,h);
-          g.addColorStop(0,'hsla('+hue+',85%,60%,0)');g.addColorStop(.5,'hsla('+hue+',85%,63%,'+(reduce?.1:.15)+')');g.addColorStop(1,'hsla('+((hue+40)%360)+',85%,60%,0)');
+        // brighter, wider drifting curtains
+        for(const bd of o.parts.b){ const cx=w*(.5+.4*Math.sin(t/3600*bd.sp+bd.off)),hue=bd.hue+26*Math.sin(t/5200+bd.off);
+          const g=ctx.createLinearGradient(cx-.24*w,0,cx+.24*w,h);
+          g.addColorStop(0,'hsla('+hue+',88%,62%,0)');g.addColorStop(.5,'hsla('+hue+',88%,66%,'+(reduce?.12:.22)+')');g.addColorStop(1,'hsla('+((hue+40)%360)+',88%,62%,0)');
           ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
-        ctx.globalCompositeOperation='source-over'; }
+        // slow-twinkling star field behind the curtains
+        if(o.parts.st) for(const s of o.parts.st){ const a=reduce?.5:(.2+.5*(.5+.5*Math.sin(t/620*s.sp+s.ph)));
+          ctx.beginPath(); ctx.arc(s.x,s.y,s.r*dpr,0,6.28); ctx.fillStyle='rgba(240,236,255,'+a+')'; ctx.shadowBlur=4*dpr; ctx.shadowColor='rgba(200,180,255,.9)'; ctx.fill(); }
+        ctx.globalCompositeOperation='source-over'; ctx.shadowBlur=0; }
       else if(o.kind==='gold'){
         // onyx: slow diagonal gold shimmer sweep + rising gold dust that twinkles
         const off=(t/5200)%1, cx=(-.3+off*1.6)*w;
