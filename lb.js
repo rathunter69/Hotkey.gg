@@ -518,32 +518,32 @@ function showPublicCard(uid){
     }catch(e){ return []; }
   })();
   const schoolTag=(window.__schoolOf||{})[uid];
-  const schoolBit=schoolTag?'<span style="display:flex;align-items:center;gap:6px;color:var(--muted)">'+schoolChipByUid(uid,15)+esc((window.schoolResolve&&window.schoolResolve(schoolTag)||{}).name||schoolTag)+'</span>':'';
-  const footHtml='<div class="uc-foot">'+
-    (deskNm?'<span style="color:var(--accent)">◆ '+esc(deskNm)+'</span>':'')+schoolBit+
-    '<span style="margin-left:auto;display:flex;gap:16px;align-items:center">'+
-      (meId&&uid!==meId?'<a class="pub-rep" style="cursor:pointer;color:var(--faint);font-size:10px">report</a>':'')+
-      '<a class="pub-x" style="cursor:pointer;font-size:15px;font-weight:700;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:2px 10px;line-height:1.3">close ✕</a>'+
-    '</span></div>';
+  const schoolName=(window.schoolResolve&&window.schoolResolve(schoolTag)||{}).name||schoolTag;
+  /* r407 (Wolf: "the leaderboard card STILL isn't the same as the profile / header card"):
+     match the profile card EXACTLY. Desk + school ride HIGH as .uc-tags (the profile grammar),
+     NOT a footer baked inside the .uc; and the close/report actions live OUTSIDE the card. No
+     footHtml → the .uc is the same object everywhere. */
+  let tagBits='';
+  if(schoolTag){ tagBits+='<span class="uc-tag">'+schoolChipByUid(uid,20)+'<span>'+esc(schoolName)+'</span></span>'; }
+  if(deskNm){ tagBits+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+esc(deskNm)+'</span></span>'; }
   const d={
     name:names[uid]+(uid===meId?' (you)':''),
     tierEmblem:window.rankEmblem?window.rankEmblem(t.name,60,t.bucket):'',
     tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
     tierLabel:t.full||(t.name+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':'')),   /* r390 (Wolf): t.full already carries bucket+provisional — don't append again (double-bucket) */
-    lvl:lvl, pct:pct, xpLine:xpLine,
-    /* r391 (Wolf): match the profile card's structure exactly — 5 stats across, no
-       trailing boards block (that "stats on the bottom" section made this card read as
-       a different shape than the profile/hotbar cards). */
+    lvl:lvl,
     stats:[{n:(DATA.fRuns||[]).filter(x=>x.user_id===uid).length,label:'clean solves'},
       {n:(st&&st.crowns)||0,label:'crowns'},{n:(st&&st.pod)||0,label:'podiums'},
       {n:(st&&st.t10)||0,label:'top-10s'},{n:(st&&st.att)||0,label:'boards'}],
     medals:medals, medalSlots:5,
     boards:[],
-    footHtml:footHtml,
+    tagsHtml:tagBits,
     flair:fv
   };
   const m=document.createElement('div'); m.id='pubCard'; m.className='pub-wrap';
   m.innerHTML='<div class="pub-card'+(isSkin?' pub-bare':legacyCls)+'">'+
+    '<a class="pub-x" title="close">✕</a>'+
+    (meId&&uid!==meId?'<a class="pub-rep" title="report">report</a>':'')+
     (window.hkPlayerCard?window.hkPlayerCard(d,{scale:'full'}):'')+'</div>';
   const close=()=>{ m.remove(); document.removeEventListener('keydown', esch, true); };
   const esch=(e)=>{ if(e.key==='Escape'){ e.stopImmediatePropagation(); close(); } };

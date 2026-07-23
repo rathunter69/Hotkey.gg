@@ -123,7 +123,13 @@
   .nm[data-uid]:hover, .ros-nm[data-uid]:hover, span[data-uid]:hover{text-decoration:underline; text-underline-offset:3px}
   .pub-wrap{position:fixed; inset:0; z-index:220; background:color-mix(in srgb, var(--bg) 55%, transparent);
     backdrop-filter:blur(5px); display:flex; align-items:flex-start; justify-content:center; padding-top:12vh}
-  .pub-card{width:min(430px, 92vw); background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden}
+  .pub-card{position:relative; width:min(462px, 96vw); background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden}
+  /* r407 (Wolf): close/report ride OUTSIDE the .uc so the card object matches the profile exactly */
+  .pub-card>.pub-x{position:absolute; top:11px; right:13px; z-index:6; cursor:pointer; font-family:var(--mono); font-size:14px; line-height:1;
+    color:var(--text); background:color-mix(in srgb, var(--surface) 78%, transparent); border:1px solid var(--line); border-radius:8px; padding:3px 8px}
+  .pub-card>.pub-x:hover{background:var(--surface2)}
+  .pub-card>.pub-rep{position:absolute; bottom:11px; right:14px; z-index:6; cursor:pointer; font-family:var(--mono); font-size:10px; color:var(--faint)}
+  .pub-card>.pub-rep:hover{color:var(--warn)}
   .pub-cap{height:34px; background:var(--surface2); border-bottom:1px solid var(--line); display:flex; align-items:center;
     justify-content:space-between; padding:0 13px; font-family:var(--mono); font-size:10px; letter-spacing:1.6px; color:var(--muted)}
   .pub-cap .pub-x{cursor:pointer; font-size:15px; color:var(--muted)}

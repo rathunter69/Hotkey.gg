@@ -281,6 +281,9 @@
      shrank; a lower-contrast line lets the green cursor + ink content pop. Applied borders and
      the selection frame set their own per-edge colors, so they still win. */
   #grid td{border-color:color-mix(in srgb, var(--line) 52%, transparent)}
+  /* r407 (Wolf): Alt W G — hide the sheet gridlines for a cleaner canvas (default cell borders
+     only; explicit formatting borders on .bt/.bb/etc. keep their !important edges). */
+  body.hide-gridlines #grid td{border-color:transparent}
   /* r405 (Wolf): maze walls are a slate blue-grey now (were near-black) so they no longer
      merge with the dark-green cursor — the wall reads as a wall, the cursor pops against it. */
   #grid td.mzt{border-top:3px solid #38445e !important}
@@ -1598,9 +1601,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=277"></script>
-<link rel="stylesheet" href="nav.css?v=197">
-<script src="themes.js?v=293"></script>
+<script src="drills.js?v=278"></script>
+<link rel="stylesheet" href="nav.css?v=198">
+<script src="themes.js?v=294"></script>
 
 </head>
 <body>
@@ -1637,11 +1640,9 @@
       <button class="mb-tool mb-campaign" id="campaignBtn" title="the tracks — pace-gated milestones, xp bounties, and a certificate at the end of each"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-6"/></svg>tracks</button>
       <div class="mb-mode-wrap">
         <button class="mb-tool mb-rapid" id="mbRapidBtn" data-mode="rapidfire" aria-haspopup="true"><svg class="mb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>rapid-fire<span class="caret">▾</span></button>
+        <!-- r407 (Wolf): the chord-subset choice (all vs dialog chords) is retired — it was a
+             needless cognitive lift. Rapid-fire is always the full deck; just pick a duration. -->
         <div class="mb-popover" id="mbRapidPop">
-          <div class="mb-deckrow">
-            <button class="mb-deck selected" data-deck="all">all chords</button>
-            <button class="mb-deck" data-deck="dialogs">dialog chords</button>
-          </div>
           <button class="mb-dur" data-mode="rapidfire" data-dur="30">30 seconds</button>
           <button class="mb-dur" data-mode="rapidfire" data-dur="60">1 minute</button>
           <button class="mb-dur" data-mode="rapidfire" data-dur="120">2 minutes</button>
@@ -3534,13 +3535,13 @@ const CHALLENGES = {
   },
   rowops:{
     name:'Rows', label:'Rebuild the schedule', par:26, parKeys:24,
-    aha:'Ctrl++ inserts a row, Ctrl+− deletes one — a live SUM widens and contracts with the sheet.',
-    prompt:'Fix the structure of the opex schedule: one line is missing (staged off to the side) and a stale placeholder is inflating the total. The total is a live SUM and re-ties as you work. Insert a row where the missing line belongs, copy the staged pair in, delete the junk row, and format the pasted value to match the block. Never retype the total — the SUM adjusts itself.',
-    req(){ const o=this._o; return 'insert a row below <em>'+o.predecessor+'</em> · copy the staged <em>'+o.stagedRng+'</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row · the live Total re-ties to <em>'+o.total.toLocaleString('en-US')+'</em> on its own · format the pasted value: comma + blue (<em>alt h k</em>, <em>alt h f c</em>)'; },
+    aha:'Ctrl++ inserts a row, Ctrl+− deletes one — the Total re-sums automatically as rows come and go.',
+    prompt:'Fix the structure of the opex schedule: one line is missing (staged off to the side) and a stale placeholder is inflating the total. The Total is a live SUM — it re-totals on its own as you add and remove rows. Insert a row where the missing line belongs, copy the staged pair in, delete the junk row, and format the pasted value to match the block. Never retype the Total — it updates itself.',
+    req(){ const o=this._o; return 'insert a row below <em>'+o.predecessor+'</em> · copy the staged <em>'+o.stagedRng+'</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row · the Total re-sums to <em>'+o.total.toLocaleString('en-US')+'</em> on its own · format the pasted value: comma + blue (<em>alt h k</em>, <em>alt h f c</em>)'; },
     guide(){ const o=this._o; return [
-      'a line is missing — open a slot: select the row below <b>'+o.predecessor+'</b> · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row · <kbd>ctrl</kbd>+<kbd>+</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd>) — and watch the Total’s SUM WIDEN by itself',
+      'a line is missing — open a slot: select the row below <b>'+o.predecessor+'</b> · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row · <kbd>ctrl</kbd>+<kbd>+</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd>) — and watch the Total re-sum on its own',
       'the data team staged the line at <b>'+o.stagedRng+'</b>: select it · <kbd>ctrl</kbd>+<kbd>c</kbd> · land on the new row’s label cell · <kbd>ctrl</kbd>+<kbd>v</kbd> — label and value drop in together',
-      'the stale line: on the <b>PLACEHOLDER</b> row · <kbd>shift</kbd>+<kbd>space</kbd> · <kbd>ctrl</kbd>+<kbd>−</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>) — the block closes up and the SUM CONTRACTS; the Total now ties to <b>'+o.total.toLocaleString('en-US')+'</b>',
+      'the stale line: on the <b>PLACEHOLDER</b> row · <kbd>shift</kbd>+<kbd>space</kbd> · <kbd>ctrl</kbd>+<kbd>−</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>) — the block closes up and the Total re-sums; it now ties to <b>'+o.total.toLocaleString('en-US')+'</b>',
       'the pasted value arrived naked — format it to the block: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> — typed data wears blue',
     ]; },
     targets(){ const o=this._o; return [o.stagedRng, 'A'+o.junkRow0, 'B'+o.totRow0, 'B'+(o.predRow0+1)]; },
@@ -8686,7 +8687,7 @@ const TABS = [
   {k:'M',name:'Formulas',live:true},
   {k:'A',name:'Data',live:true},
   {k:'R',name:'Review',live:false},
-  {k:'W',name:'View',live:false},
+  {k:'W',name:'View',live:true},   /* r407 (Wolf): View is live now — Alt W G toggles gridlines */
 ];
 const MENUS = {
   'H':  [['V','Paste'],['1','Bold'],['2','Italic'],['F','Font'],['A','Align'],['5','Indent −'],['6','Indent +'],['H','Fill'],['B','Borders'],['J','Cell styles'],['W','Wrap'],['K','Comma'],['P','Percent'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['E','Clear'],['U','Σ Sum']],
@@ -8706,6 +8707,7 @@ const MENUS = {
   'A':  [['S','Sort'],['T','Filter'],['H','Hide detail'],['J','Show detail']],
   'AS': [['A','Sort A→Z'],['D','Sort Z→A']],
   'E':  [['S','Paste special…']],
+  'W':  [['G','Gridlines']],   /* r407 (Wolf): View → Gridlines show/hide */
 };
 /* r315 (Wolf): the Alt+H flyout dumped all 20 options in one flat wrapping row — unreadable,
    "nobody could pick out what we're looking at." These groups mirror Excel's REAL Home-tab
@@ -9866,6 +9868,10 @@ function recalc(){
   for(let pass=0; pass<8; pass++){
     let changed=false;
     for(const k in S.cells){ const c=S.cells[k]; if(c && c.formula){
+      /* r407 (Wolf audit): a formula an insert/delete rewrote to #REF! must show the ERROR, not
+         silently keep its old value (which read as plausibly-correct). Detect the orphan in the
+         formula string and set the #REF! sentinel so it renders and propagates, like Excel. */
+      if(/#REF!/.test(c.formula)){ if(c.value!=='#REF!'){ c.value='#REF!'; changed=true; } continue; }
       let v; try{ v=evalFormula(c.formula); }catch(_){ v=c.value; }
       // r257: accept text results too (CHOOSE/OFFSET can pull a case NAME) — store finite
       // numbers OR non-null non-numbers; skip NaN/Infinity/undefined so a bad eval can't poison a cell.
@@ -9975,13 +9981,25 @@ function translateFormula(f, dr, dc){
 function fillFrom(dir){ // 'down' | 'up' | 'right' | 'left'
   const r=selRange();
   const vertical = dir==='down'||dir==='up';
-  if(vertical && r.r1===r.r2) return;
-  if(!vertical && r.c1===r.c2) return;
-  pushUndo();
-  const copyFmt=(dst,src)=>{ dst.bold=src.bold;dst.fill=src.fill;dst.wrap=src.wrap;dst.fmtStyle=src.fmtStyle;dst.decimals=src.decimals;dst.bt=src.bt;dst.bb=src.bb;dst.ball=src.ball;dst.txt=src.txt;dst.align=src.align;dst.fontColor=src.fontColor; };
+  /* r407 (Wolf audit F1): copy the FULL cell format (italic, underline, every border edge,
+     indent, size, double-border, comment) — the same field set paste uses — not a subset.
+     Fill and paste must agree on what "format" means. */
+  const copyFmt=(dst,src)=>{ dst.bold=src.bold;dst.it=src.it;dst.strike=src.strike;dst.fill=src.fill;dst.wrap=src.wrap;dst.fmtStyle=src.fmtStyle;dst.decimals=src.decimals;dst.bt=src.bt;dst.bb=src.bb;dst.bl=src.bl;dst.br=src.br;dst.ball=src.ball;dst.align=src.align;dst.fontColor=src.fontColor;dst.uline=src.uline;dst.indent=src.indent|0;dst.scale=src.scale|0;dst.thick=!!src.thick;dst.fsz=src.fsz||null;dst.bdbl=!!src.bdbl;dst.cmt=!!src.cmt;dst.txt=src.txt; };
   const stamp=(cell,src,dr,dc)=>{ copyFmt(cell,src);
     if(src.formula){ cell.formula=translateFormula(src.formula, dr, dc); cell.value=0; }
     else { cell.formula=null; cell.value=src.value; } };
+  /* r407 (Wolf audit F2): a SINGLE-CELL Ctrl+D copies the cell ABOVE into it, Ctrl+R the cell
+     to the LEFT — Excel's most-used fill. Previously a dead no-op. (up/left have no single-cell
+     chord in Excel, so they stay no-ops.) */
+  if(vertical && r.r1===r.r2){
+    if(dir!=='down' || r.r1<=1) return;
+    pushUndo(); stamp(ensure(r.r1,r.c1), get(r.r1-1,r.c1), 1, 0); commitAction(); return;
+  }
+  if(!vertical && r.c1===r.c2){
+    if(dir!=='right' || r.c1<=1) return;
+    pushUndo(); stamp(ensure(r.r1,r.c1), get(r.r1,r.c1-1), 0, 1); commitAction(); return;
+  }
+  pushUndo();
   if(dir==='down'){
     for(let c=r.c1;c<=r.c2;c++){ const src=get(r.r1,c);
       for(let rr=r.r1+1;rr<=r.r2;rr++) stamp(ensure(rr,c), src, rr-r.r1, 0); }
@@ -10567,6 +10585,12 @@ function applyRibbon(key){
   }
   // inside a tab/menu
   const np=path.join('')+key;
+  if(np==='WG'){ /* r407 (Wolf): Alt W G toggles the sheet gridlines (a visibility preference) */
+    const off=!document.body.classList.contains('hide-gridlines');
+    document.body.classList.toggle('hide-gridlines', off);
+    try{ localStorage.setItem('hk_gridlines', off?'0':'1'); }catch(e){}
+    showToast(off?'gridlines hidden — Alt W G to show':'gridlines shown');
+    return exitRibbon(true); }
   if(np==='HVV'){ pushUndo(); doPaste('values'); commitAction(); return exitRibbon(true); }   /* r302: real Excel Alt H V V — paste values without the dialog */
   if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; pasteOp='none'; drawRibbon(); return; }
   if(np==='OE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route
@@ -10697,7 +10721,7 @@ function doPaste(kind, op){
       const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
       cell.formula=s.formula; cell.value=s.value;
       cell.bold=s.bold; cell.fill=s.fill; cell.wrap=s.wrap; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals;
-      cell.bt=s.bt; cell.bb=s.bb; cell.bl=s.bl; cell.br=s.br; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor; cell.it=s.it; cell.strike=s.strike; cell.uline=s.uline; cell.indent=s.indent|0; cell.scale=s.scale|0; cell.thick=!!s.thick; cell.fsz=s.fsz||null;
+      cell.bt=s.bt; cell.bb=s.bb; cell.bl=s.bl; cell.br=s.br; cell.ball=s.ball; cell.align=s.align; cell.fontColor=s.fontColor; cell.it=s.it; cell.strike=s.strike; cell.uline=s.uline; cell.indent=s.indent|0; cell.scale=s.scale|0; cell.thick=!!s.thick; cell.fsz=s.fsz||null; cell.txt=s.txt; cell.bdbl=!!s.bdbl; cell.cmt=!!s.cmt;   /* r407 (Wolf audit F3/F5): a cut MOVE carries the cell wholesale — text-type, double border, comment */
     }
     S.clipboard=null; try{ const mq=$('marquee'); if(mq) mq.style.display='none'; }catch(e){}
     pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
@@ -10708,7 +10732,7 @@ function doPaste(kind, op){
   const xl=f=>(f&&(dr||dc))?translateFormula(f,dr,dc):f;
   for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
     const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
-    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;cell.scale=s.scale|0;cell.thick=!!s.thick;cell.fsz=s.fsz||null;cell.bdbl=!!s.bdbl;cell.cmt=!!s.cmt;};   /* r308: bdbl + comments travel — paste EVERYTHING means everything */
+    const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;cell.scale=s.scale|0;cell.thick=!!s.thick;cell.fsz=s.fsz||null;cell.bdbl=!!s.bdbl;cell.cmt=!!s.cmt;cell.txt=s.txt;};   /* r308: bdbl + comments travel — paste EVERYTHING means everything. r407 (Wolf audit F3): +txt so a pasted label stays TEXT (left-aligned, spills, excluded from constants-hunt) */
     if(kind==='values'){ cell.formula=null; cell.value=s.value; }
     else if(kind==='formulas'){ cell.formula=xl(s.formula); cell.value=s.value; }
     else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; cell.scale=s.scale|0; }
@@ -10738,7 +10762,7 @@ function enterRibbon(){ if(done)return; startClock(); mode='ribbon'; path=[]; di
 function copySel(){
   const r=selRange(); const data=[];
   for(let rr=r.r1;rr<=r.r2;rr++){ const row=[]; for(let cc=r.c1;cc<=r.c2;cc++){ const c=get(rr,cc);
-    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent,scale:c.scale,thick:c.thick,fsz:c.fsz,bdbl:c.bdbl,cmt:c.cmt}); } data.push(row); }
+    row.push({value:c.value,formula:c.formula,bold:c.bold,it:c.it,strike:c.strike,fill:c.fill,wrap:c.wrap,fmtStyle:c.fmtStyle,decimals:c.decimals,bt:c.bt,bb:c.bb,bl:c.bl,br:c.br,ball:c.ball,align:c.align,fontColor:c.fontColor,uline:c.uline,indent:c.indent,scale:c.scale,thick:c.thick,fsz:c.fsz,bdbl:c.bdbl,cmt:c.cmt,txt:c.txt}); } data.push(row); }   /* r407 (Wolf audit F3): capture the text-type flag so paste preserves it */
   const cols=[]; for(let cc=r.c1;cc<=r.c2;cc++) cols.push(colW[cc]);
   S.clipboard={data,cols,h:r.r2-r.r1+1,w:r.c2-r.c1+1,rect:{r1:r.r1,c1:r.c1,r2:r.r2,c2:r.c2}};
 }
@@ -11045,7 +11069,10 @@ function shiftColWidths(atCol, count, ins){
   // Excel parity: column geometry travels with the content on column insert/delete.
   // colW is the 1-indexed engine width array; snapshot()/restore() already carry it for undo.
   if(ins){ for(let c=COLS;c>=atCol+count;c--) colW[c]=colW[c-count];
-           for(let c=atCol;c<atCol+count&&c<=COLS;c++) colW[c]=COLW_DEFAULT; }
+           /* r407 (Wolf audit): an inserted column inherits the width of the column to its LEFT
+              (Excel), not the default. */
+           const inh=(atCol>1?colW[atCol-1]:0)||COLW_DEFAULT;
+           for(let c=atCol;c<atCol+count&&c<=COLS;c++) colW[c]=inh; }
   else   { for(let c=atCol;c<=COLS-count;c++) colW[c]=colW[c+count];
            for(let c=Math.max(atCol,COLS-count+1);c<=COLS;c++) colW[c]=COLW_DEFAULT; }
 }
@@ -11356,10 +11383,11 @@ document.addEventListener('keydown',hkRawE=>{
   // covers entire rows or columns; otherwise no-op (Excel would show a dialog, which we skip).
   // Must come BEFORE the browser-zoom block below, which swallows the same Ctrl+=/+/- keystrokes.
   if((e.ctrlKey||e.metaKey) && !demoPlaying && !done){
-    // Input completeness: '+' means insert whether it came from Shift+= or the numpad
-    // (Excel accepts both; requiring shift made numpad users feel the grid had frozen).
-    const isInsert = (k==='+') || (e.shiftKey && k==='=');
-    const isDelete = !e.shiftKey && k==='-';
+    // r407 (Wolf playtest): FORGIVE THE MODIFIER. He expected Ctrl+= to insert (only
+    // Ctrl+Shift+= worked) and Ctrl+Shift+- to delete (only Ctrl+- worked). Accept every
+    // natural variant: '=' / '+' insert; '-' / '_' (Shift+-) delete. Excel takes both too.
+    const isInsert = (k==='+') || (k==='=');
+    const isDelete = (k==='-') || (k==='_');
     if(isInsert || isDelete){
       const r = selRange();
       const isFullRow = r.c1===1 && r.c2===COLS;
@@ -11663,7 +11691,17 @@ document.addEventListener('keydown',hkRawE=>{
   if(k==='F11'){ e.preventDefault(); return; }   // fullscreen sits next to F2 — swallow it; too costly a misfire mid-drill
   if(k==='Escape' && !e.ctrlKey && !e.altKey){
     e.preventDefault();
-    if(S && S.clipboard){ S.clipboard=null; const mq=$('marquee'); if(mq) mq.style.display='none'; logKey('Esc'); render(); window.__escT=0; return; }
+    /* r407 (Wolf playtest: "the rotating hovering outline remains after Esc"): clear the copy
+       visuals UNCONDITIONALLY \u2014 even if a paste already consumed S.clipboard, a stale marquee /
+       paste-dest element could still be display:block. Hide both and drop any clipboard so no
+       marching-ants frame can linger past an Esc. */
+    {
+      let cleared=false;
+      try{ const mq=$('marquee'); if(mq && mq.style.display!=='none'){ mq.style.display='none'; cleared=true; } }catch(_e){}
+      try{ const pd=$('pastedest'); if(pd && pd.style.display!=='none'){ pd.style.display='none'; cleared=true; } }catch(_e){}
+      if(S && S.clipboard){ S.clipboard=null; cleared=true; }
+      if(cleared){ logKey('Esc'); render(); window.__escT=0; return; }
+    }
     if(S && S.marks && S.marks.length){ S.marks=[]; S.markCrit=null; logKey('Esc'); render(); window.__escT=0; return; }   // r182: second duty \u2014 clear the hunt
     window.__autoSumEdit=false;   // r192: a canceled Alt+= proposal must not make the NEXT commit sticky
     // r146: DOUBLE-TAP Esc restarts (Wolf: shift+f11 is a stretch). Single Esc still
@@ -11746,7 +11784,16 @@ document.addEventListener('keydown',hkRawE=>{
     if(e.altKey){ e.preventDefault(); return; }
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
       S.selA={r:S.active.r,c:S.active.c};   /* r308: Excel keeps the active cell where it was */
-      const u=usedRange(); S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; render(); commitAction(); return; }
+      /* r407 (Wolf audit F4): first Ctrl+A selects the CURRENT REGION (the contiguous block
+         around the cursor, Excel's behavior — reusing regionAround, same as Ctrl+Shift+Space);
+         a second Ctrl+A (selection already equals that region) expands to the whole used range.
+         The old code always grabbed A1:used-bottom-right, over-selecting on multi-block sheets. */
+      const u=usedRange(), rg=regionAround(S.active.r,S.active.c);
+      const cur=selRange();
+      const isRegion = rg && cur.r1===rg.r1 && cur.c1===rg.c1 && cur.r2===rg.r2 && cur.c2===rg.c2;
+      if(rg && !isRegion){ S.sel={r:rg.r1,c:rg.c1}; S.active={r:rg.r2,c:rg.c2}; }
+      else { S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; }
+      render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); checkWin(); return; }   /* r213: a copy can be a drill's goal (navigation) — run the win check; no-op for every other drill */
     if(lk==='x'){ e.preventDefault(); startClock(); logKey('Ctrl+X'); copySel(); if(S.clipboard) S.clipboard.cut=true; render(); return; }
     if(keyProfile==='macabacus' && e.shiftKey && !e.altKey && lk==='v'){
@@ -13102,6 +13149,8 @@ document.querySelectorAll('.mb-deck').forEach(b=>{
   });
 });
 $('mhStop').addEventListener('click', ()=>{ endSession(); });
+/* r407 (Wolf): restore the gridlines-visibility preference (Alt W G) on load */
+try{ if(localStorage.getItem('hk_gridlines')==='0') document.body.classList.add('hide-gridlines'); }catch(e){}
 
 function loadRandomDrill(){
   const pool=MENU_ORDER.filter(k=>k!==lastKey && !drillLocked(k));   // r158: sessions honor the ladder

@@ -1,7 +1,115 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Refreshed 2026-07-22 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+_Refreshed 2026-07-23 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
 New sessions: the repo IS the handover — read this file, **dev/PIPELINE.md's ⚡ header (the
 live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ design docs._
+
+## SESSION HANDOVER SNAPSHOT (2026-07-23, rounds r393–r407 — RANKED CARD + CARD-ART round 2 + ENGINE playtest)
+
+**PIPELINE / HOUSE RULES (current, important):**
+- Branch `claude/pipeline-engine-integration-laki0l`. Cadence: build → PR to `main` → gate (CI) →
+  merge → Cloudflare deploys `main` to production (hotkey.gg). After each merge, RESTART the branch
+  off main (`git fetch origin main && git checkout -B <branch> origin/main`); a `git stash push -u`
+  then `stash pop` around the restart carries uncommitted WIP over cleanly (main == the squashed
+  branch tip, so no conflict). Push restarted branches with `--force-with-lease`.
+- **Wolf enabled repo AUTO-MERGE (Settings → Pull Requests → Allow auto-merge) this session.** Green
+  PRs now merge themselves. BUT the GitHub API `enable_pr_auto_merge` refuses while checks are still
+  "unstable"/pending right after PR creation — so the reliable pattern is still: create PR → subscribe
+  → arm a `send_later` check-in (~8-9 min) → on the check-in, if `mergeable_state:clean`, merge (squash).
+  The earlier "nothing reached live" problem was auto-merge being OFF at the repo level; it's on now.
+- **CACHE-BUMP RULE (still critical):** every round touching JS/CSS must bump that asset's `?v=` in
+  ALL *.html (sed across `*.html`). No service worker; the version query is the only cache-bust.
+  Current versions after r407: themes.js v294, nav.js v293, nav.css v198, lb.js v35, lb.css v19 (+ a
+  pinned v16 in stats.html — leave it), drills.js v278.
+- **GATES** (all must pass; run locally before pushing — start `python3 -m http.server 8791`
+  with `dangerouslyDisableSandbox:true`, then `URL=http://127.0.0.1:8791/<page> node dev/e2e-*.js`):
+  e2e-guided (every drill solvable + rails; ~85 checks), e2e-rapidfire (14), e2e-lb (36, needs
+  leaderboard.html), e2e-alt-paths (74), e2e-mac-input (19), + a **drill-pages staleness guard**
+  (`node dev/build-drill-pages.js` then `git diff --exit-code drills sitemap.xml`) — so ANY drill
+  copy change (prompt/label/desc) requires regenerating the 82 drill pages and committing them.
+  Chromium at `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. Background `python3 -m http.server`
+  can throw exit 144 (SIGURG) — benign; use `run_in_background:true` for long e2e runs.
+- Commit trailer: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>` + `Claude-Session:`.
+
+**SHIPPED LIVE THIS SESSION (PRs #213–#218 merged; #219 in flight at handover):**
+- **Grid engine / nav-maze / leaderboard / skin fx rounds** (#213), **legacy rank cards → full theme
+  cards** (#214), **skin art round 3 + foundation visibility trio** (#215).
+- **De-hinted drill copy** (#216): stripped embedded hotkeys from player-facing `prompt`/checklist
+  `label`/`desc` (24+62+17 strings) — the point is to DO the action, not read the chord. Hint ladder
+  (`req`/`guide`/`aha`/`demo`, all `keys`) + `ok:`/`build` logic untouched.
+- **Card PARITY** (#216 + #219): the header rank-click card, the profile card, AND the leaderboard
+  name-click (public) card are now the SAME `hkPlayerCard` object — 462px, no owner/footer buttons
+  baked inside the `.uc`, desk/school as `.uc-tags`, close/report OUTSIDE the card. Wolf reported this
+  3× ("STILL not the same"); the recurring cause was a `footHtml` param passed into hkPlayerCard.
+- **Level mismatch fix** (#216): the in-game HUD level was only hydrated from canonical XP inside the
+  RANKED path, so an un-opted account showed a stale local `hk_xp_est` (4) vs the card's 13.
+  `nav.js hydrateLevel()` now runs for ANY signed-in user (memoized fetch).
+- **Grid sizing fix** (#216): non-nav drills rendered before layout (clientHeight~0) → coarse fallback
+  (32/29px); now a guarded post-layout re-render (`S._gridMeasureRetry`) lands every drill on the
+  measured ~26px canvas.
+- **RANKED UNLOCKED card** (#218): new `window.hkRankedCard(opts)` in themes.js (Variant C Wolf picked)
+  — hero crest, 8-tier emblem ladder, Place/Rank/Climb beats, a bucket byline, "every tier unlocks its
+  card skin", primary **Enter Ranked** + de-emphasized "maybe later". Wired to (a) the leaderboard
+  (`rankedInfographic()` renders it) and (b) a **login nudge** (`nav.js maybeRankedNudge()` — fires once
+  a signed-in player hits Level 10 without opting in; once/session, "maybe later" snoozes 3 days,
+  suppressed on leaderboard). Headline "Ranked Unlocked" (accomplishment framing, Wolf's call).
+- **CARD-ART round 2** (#219): **Diamond** = icy NUMBER CASCADE (matrix vibe; retired the "little
+  diamond icon" facet flashes); **Founder** = brighter undulating aurora + holographic sweep + stars,
+  serial ALWAYS "★ FOUNDER NNN / 200" (no CHARTER fallback); **Foil** = desynced shimmer bands
+  (incommensurate periods, no obvious loop); **Heraldic (MD)** = Blood Angels crimson+GILT (red/gold
+  embers, gold glint rake, gold-edged crest, red+gold border); **borders** = one medium 5px + per-card
+  incommensurate spin durations; **XP bar retired on ALL cards → a big LVL tray badge, top-right.**
+- **Wolf account unlock** (#219): `nav.js` shim scoped to `wolfcdrake@gmail.com` sets `hk_ranked='1'`
+  AND `hk_beta_unlock='1'` (the master frame-unlock switch `hkFrameUnlocked` honors) so he sees the
+  full animated site. (`account.html` already calls `hkInitCardFx(root)` at ~line 379.)
+- **ENGINE / playtest fixes** (#219), from two foundation-drill audit agents + Wolf's playtest notes:
+  insert/delete rows forgive the modifier (`Ctrl+=` and `Ctrl+Shift+-`); **Escape clears the
+  marching-ants marquee + paste-dest unconditionally**; fill (Ctrl+D/R) copies the FULL cell format +
+  single-cell fill copies the neighbor (Excel); copy/paste preserve the `txt` flag; cut-move carries
+  `bdbl`+`cmt`; **Ctrl+A = current region first, whole sheet second** (reuses `regionAround`); a
+  `#REF!`-orphaned formula shows the error not a stale value; inserted column inherits the LEFT
+  neighbor's width; rowops copy reworded (killed "the SUM widens itself"); **rapid-fire dropped the
+  all/dialog chord-subset choice** (always full deck); **Alt W G toggles gridlines** (View tab now
+  live; `body.hide-gridlines`; pref persists in `hk_gridlines`).
+
+**WOLF PREFERENCES / DECISIONS (this session):**
+- Cards: the animations he likes are **matrix / circuit** (dynamic, moving) — NOT literal moving text,
+  just that energy. Wants animated borders VISIBLE (hence 5px + desync). Wants ONE card object shown
+  identically everywhere — "no extra buttons, no nothing." Wants the LVL as a big badge, no tiny xp bar.
+  Heraldic should evoke Warhammer / Blood Angels (crimson + gold gothic). Founder serial as N/200.
+- Ranked: KEEP the opt-in gate but make it a prominent celebration card ("Ranked Unlocked") that also
+  nudges on login when eligible. **Unlock stays at Level 10** (`lb.js RANKED_MIN_LVL`), which ≈ where
+  finishing all the FREE drills lands you — so it already means "you've done the free content." Placement
+  = 5 standard boards (`HK_PLACEMENT.KEYS = ['navigation','dress','margin','sort','opmodel']`).
+- Drills: instructions must NOT embed the hotkey (do the action). Copy should be plain, not cute.
+- Prefers me to run autonomously and ship in batched PRs; validate against the gate; use agents to
+  playtest-audit drills for GLOBAL engine bugs (Excel-divergence that applies to all drills).
+
+**KEY CODE POINTERS (this session):**
+- Cards: `themes.js` — `hkPlayerCard(d,opts)` (~1773; the ONE unified card), `hkFrameOrnaments`
+  closure with `SKINS` map + founder serial (~1228), fx generators + draw branches (nebula/diamondfx/
+  foilfx/heraldicfx/aurora/etc ~1330–1670), `hkRankedCard` (~1760). `nav.css` — per-`.hk-frame-*`
+  interior + border rules (~435–825), `@property --hkang` + `hkBorderSpin` + per-card durations (~825),
+  `.uc-lvl` tray (~888). `nav.js` — Wolf shim (~360), `hydrateLevel`/`maybeRankedNudge` (~318–355),
+  rank-click card (~795). `lb.js` — public card `showPublicCard`/`d` (~480–555), your-card hero (~640),
+  `rankedInfographic` (~711). `lb.css` — `.pub-card` (~126). `HK_RANK.TIERS` (8 tiers) + `levelOf`
+  (150/300/450→flat 600) + `computeXP` in themes.js (~667–745). `hkFrameEarned`/`hkBetaUnlocked` (~890).
+- Engine: `index.html` — `render()`/grid sizing (~8341/8382), `regionAround` (7826), `fillFrom` (~9975),
+  `recalc` (~9865), `doPaste`/`copySel`/`fmt` (~10690–10745), the big keydown handler (~11200–11790:
+  insert/delete ~11360, Escape ~11665, Ctrl+A ~11770), ribbon `TABS`/`MENUS`/`applyRibbon` (~8680/10477).
+- Drill audits (both this session, in scratchpad transcripts): copy/paste/marquee/block-select and
+  fill/Ctrl+A found the fill+Ctrl+A+#REF! bugs (all fixed in #219). Engine is otherwise Excel-faithful.
+
+**OPEN / NOT YET DONE (backlog):**
+- #219 must merge (gate was green locally; drive to green if CI differs). After merge, restart branch.
+- Card art is iterative — Wolf will likely react to the round-2 animations live; be ready to tune
+  diamond/founder/heraldic/foil further (he keeps pushing "more dynamic").
+- Deferred: cosmic/PRO vs constellation differentiation (#95), cherry-blossom/feminine skin set (#97),
+  in-card profile customizer (#100), colored-block bonus beat (#102), capstone drills (#103).
+- Lower-severity audit findings NOT applied (by choice): undo doesn't move cursor back (cosmetic);
+  out-of-bounds relative ref clamps instead of #REF! (edge); copy-then-Enter doesn't paste (minor);
+  partial-selection Ctrl+= / Ctrl+0 dead (by design). Revisit if a drill needs them.
+
+---
 
 ## SESSION HANDOVER SNAPSHOT (2026-07-22, rounds r389–r392 — the COSMETICS / PLAYER-CARD marathon)
 

@@ -58,7 +58,7 @@ window.HOTKEY_DRILLS = {
     // Foundations
     navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'A literal maze of bold walls — shoot down a corridor to the next wall, or step around corners one cell at a time. Collect every pip, grab the model, and weave it back to the drop zone' },
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — autofit the columns to their content' },
-    rowops:     { name:'Rows',     label:'Rebuild the schedule',    tab:'Rows',     desc:'Insert a row and paste the staged line in, delete the junk \u2014 the live SUM widens and contracts itself' },
+    rowops:     { name:'Rows',     label:'Rebuild the schedule',    tab:'Rows',     desc:'Insert a row and paste the staged line in, delete the junk \u2014 the Total re-sums itself as rows come and go' },
     colops:     { name:'Columns',  label:'Columns move too',        tab:'Columns',  desc:'Select the whole column, delete the stale one, insert the one that is missing' },
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Fill down and fill right — one formula, whole block' },
     blocksel:   { name:'Block Sel.',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves into a headed output, add a margin note, then format it to match' },

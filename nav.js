@@ -356,11 +356,16 @@
   // Rank pill: fetch standing once per session (10-min cache shared with index.html via sessionStorage)
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
-    /* r406 (Wolf): flip the owner account to ranked-on directly (his explicit ask). Scoped
-       to his email so it never touches anyone else's opt choice; syncs to the account. */
+    /* r406/r407 (Wolf): the owner account sees the WHOLE site — ranked on + every gateway/
+       cosmetic unlocked (hk_beta_unlock is the master switch hkFrameUnlocked honors), so his
+       card can wear any animated skin. Scoped to his email; never touches anyone else. */
     try{ const __em=((window._navUser&&window._navUser.email)||'').toLowerCase();
-      if(__em==='wolfcdrake@gmail.com' && localStorage.getItem('hk_ranked')!=='1'){
-        localStorage.setItem('hk_ranked','1'); try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} } }catch(e){}
+      if(__em==='wolfcdrake@gmail.com'){
+        let __ch=false;
+        if(localStorage.getItem('hk_ranked')!=='1'){ localStorage.setItem('hk_ranked','1'); __ch=true; }
+        if(localStorage.getItem('hk_beta_unlock')!=='1'){ localStorage.setItem('hk_beta_unlock','1'); __ch=true; }
+        if(__ch){ try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} }
+      } }catch(e){}
     /* r336 (Wolf): the pill honors the ranked opt-in. Not entered -> a quiet "Unranked" chip;
        entered but mid-placement -> "placement n/5"; only a finished placement shows a tier.
        The tier cache is consulted only when opted in, so leaving ranked demotes immediately. */
