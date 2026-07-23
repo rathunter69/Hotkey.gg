@@ -1424,11 +1424,17 @@ window.hkInitCardFx = function(root){
     function holorain(w,h){ const n=Math.round(w*h/26000)+5, st=[];
       for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.4),ph:R(0,6.28),sp:R(.5,1.3)});
       return {st}; }
-    /* r413 (Wolf: founder on a platinum/elite LIGHT bg, more vibrant): silver sparkle for the
-       PLATINUM holo-foil — the rainbow bands + metallic catch-light are drawn in the render. */
-    function platinum(w,h){ const n=Math.round(w*h/22000)+6, st=[];
+    /* r413 (Wolf: founder = shiny OIL-SLICK, must not visibly loop): saturated rainbow blobs that
+       flow on INCOMMENSURATE lissajous paths (fx/fy are irrational-ish ratios, so the combined
+       motion has no short period — never an obvious loop), their hue slowly drifting. Layered over
+       the pale-rainbow platinum bg they swirl like oil on water; a bright specular sweep keeps it
+       shiny. The `st` field is the silver glint field. */
+    function platinum(w,h){
+      const blobs=[], N=6, fr=[[1.00,1.31],[1.19,0.83],[0.77,1.07],[1.41,0.62],[0.91,1.23],[1.13,0.71]];
+      for(let i=0;i<N;i++) blobs.push({fx:fr[i][0], fy:fr[i][1], px:R(0,6.28), py:R(0,6.28), r:R(.42,.66)*Math.max(w,h), hue:(i/N)*360, hs:R(6,14)});
+      const n=Math.round(w*h/22000)+6, st=[];
       for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.5),ph:R(0,6.28),sp:R(.5,1.3)});
-      return {st}; }
+      return {blobs, st}; }
     function drive(w,h){return{hz:Math.round(h*.40)};}
     function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
@@ -1622,27 +1628,23 @@ window.hkInitCardFx = function(root){
            NORMAL blend (they tint the silver with real colour — 'lighter' would vanish on white),
            a bright specular streak rakes across like light off brushed metal, and fine silver
            glints sparkle. Vibrant + elite, distinct from the old dark-space founder. */
-        /* r413 (Wolf: "more rainbow/prismatic"): FOUR wide, saturated foil bands sweeping the
-           silver on offset phases, so the whole card shimmers a full spectrum, plus a slow
-           breathing prismatic wash that keeps colour present even between the bands. */
-        { const br=(t/7000)%1, bhue=(t/22)%360;   // full-card prismatic breath
-          const gb=ctx.createLinearGradient(0,0,w,h);
-          gb.addColorStop(0,'hsla('+bhue+',85%,60%,'+(reduce?.06:.12)+')');
-          gb.addColorStop(.5,'hsla('+((bhue+120)%360)+',85%,60%,'+(reduce?.05:.1)+')');
-          gb.addColorStop(1,'hsla('+((bhue+240)%360)+',85%,60%,'+(reduce?.06:.12)+')');
-          ctx.fillStyle=gb; ctx.fillRect(0,0,w,h); }
-        for(let k=0;k<4;k++){
-          const sp=((t/(5200+k*1200)+k*.27)%1), bx=(-.4+sp*1.8)*w, hue=(t/24+k*90)%360;
-          const g=ctx.createLinearGradient(bx-.26*w,0,bx+.26*w,h);
-          g.addColorStop(0,'hsla('+hue+',90%,58%,0)');
-          g.addColorStop(.5,'hsla('+((hue+40)%360)+',92%,56%,'+(reduce?.13:.3)+')');
-          g.addColorStop(1,'hsla('+((hue+95)%360)+',90%,58%,0)');
-          ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        /* r413 (Wolf: "shiny oil-slick, doesn't loop too visibly — like a CS oil-slick skin"):
+           saturated rainbow blobs FLOW on incommensurate lissajous paths (no short period → no
+           visible loop), tinting the pale platinum like oil on water; a bright specular streak
+           rakes across for the metallic shine; silver glints sparkle. */
+        for(const b of (P.blobs||[])){
+          const cx=w*(.5+.34*Math.sin(t/4300*b.fx+b.px)), cy=h*(.5+.34*Math.sin(t/3700*b.fy+b.py));
+          const hue=(b.hue + b.hs*Math.sin(t/5200+b.px) + t/40)%360;
+          const g=ctx.createRadialGradient(cx,cy,0,cx,cy,b.r);
+          g.addColorStop(0,'hsla('+hue+',98%,56%,'+(reduce?.12:.27)+')');
+          g.addColorStop(.5,'hsla('+((hue+50)%360)+',95%,55%,'+(reduce?.06:.14)+')');
+          g.addColorStop(1,'hsla('+((hue+100)%360)+',92%,56%,0)');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,b.r,0,6.28); ctx.fill();
         }
-        if(!reduce){ const sp=(t/4200)%1, sx=(-.2+sp*1.5)*w, sa=(1-Math.abs(sp-.5)/.5);
+        if(!reduce){ const sp=(t/5300)%1, sx=(-.22+sp*1.55)*w, sa=(1-Math.abs(sp-.5)/.5);
           ctx.globalCompositeOperation='lighter';
-          const g2=ctx.createLinearGradient(sx-.08*w,0,sx+.08*w,h);
-          g2.addColorStop(0,'rgba(255,255,255,0)'); g2.addColorStop(.5,'rgba(255,255,255,'+(sa*.5)+')'); g2.addColorStop(1,'rgba(255,255,255,0)');
+          const g2=ctx.createLinearGradient(sx-.07*w,0,sx+.07*w,h);
+          g2.addColorStop(0,'rgba(255,255,255,0)'); g2.addColorStop(.5,'rgba(255,255,255,'+(sa*.62)+')'); g2.addColorStop(1,'rgba(255,255,255,0)');
           ctx.fillStyle=g2; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; }
         for(const s of P.st){ const a=reduce?.35:(.14+.5*(.5+.5*Math.sin(t/560*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.shadowBlur=4*dpr;ctx.shadowColor='rgba(150,180,255,.7)';ctx.fill();ctx.shadowBlur=0; } }
