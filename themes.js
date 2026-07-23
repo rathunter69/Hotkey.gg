@@ -819,9 +819,11 @@ window.HK_FRAMES = [
   {id:'plaque-gold',   name:'Gold Plaque',     tier:'rare',
    desc:'beveled gold + gemset corners',              earn:'reach First-Year Analyst'},
   {id:'plaque-plat',   name:'Platinum Plaque', tier:'rare',
-   desc:'beveled platinum + gemset corners',          earn:'reach VP'},
-  {id:'plaque-diam',   name:'Diamond Plaque',  tier:'rare',
-   desc:'beveled diamond + gemset corners',           earn:'reach Second-Year Analyst'},
+   desc:'icy platinum theme card + polished sheen',    earn:'reach VP'},
+  {id:'plaque-md',     name:'MD · Corner Office', tier:'epic',
+   desc:'oxblood + brass executive theme card',        earn:'reach MD'},
+  {id:'plaque-diam',   name:'Diamond Plaque',  tier:'legendary',
+   desc:'brilliant prismatic diamond theme card',      earn:'reach Second-Year Analyst'},
   {id:'foil',          name:'Foil',            tier:'epic',
    desc:'conic sheen + fan corners',                  earn:'win a Daily Challenge or earn a certificate'},
   {id:'heraldic',      name:'Heraldic',        tier:'legendary',
@@ -904,7 +906,8 @@ window.hkFrameEarned = function(id, u){
     case 'plaque-bronze': return tb >= 1;   // Candidate — bronze crest, bronze plaque
     case 'plaque-silver': return tb >= 2;   // Summer Analyst
     case 'plaque-gold':   return tb >= 3;   // First-Year Analyst
-    case 'plaque-plat':   return tb >= 5;   // VP (MD is a higher rung — counts too)
+    case 'plaque-plat':   return tb >= 5;   // VP
+    case 'plaque-md':     return tb >= 6;   // MD — the corner office
     case 'plaque-diam':   return tb >= 7;   // Second-Year Analyst — the true final boss
     case 'foil':          return (u.dailyWins|0) >= 1 || (u.certs|0) >= 1;
     case 'heraldic':      return (u.dailyWins|0) >= 5 || (u.certs|0) >= 3;
@@ -1198,13 +1201,18 @@ window.hkFrameOrnaments = (function(){
     architect:    ['△ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],  /* r393 (Wolf): ⟁ fell back to a ⚠-looking glyph in most fonts — a clean drafting triangle reads right */
     boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','quilt'],   /* r404.2 (Wolf): quilted monogram lattice — foundational redesign, distinct from the gold-dust skins */
     emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','emerald'],
-    /* r404.3 (Wolf #96): the legacy RANK plaques, reborn as full theme cards (were
-       ornament-frames). Metallic interior + a polished-metal sheen sweeping across. */
+    /* r404.3/.4 (Wolf #96): the legacy RANK plaques + prestige frames, reborn as full
+       theme cards (were ornament-frames). Themed interior + a sheen or holo sweep. */
     'plaque-bronze':['◆ BRONZE',  '#1a0f07','linear-gradient(120deg,#e0a35a,#7a4a1e)','#e0a35a','sheen'],
     'plaque-silver':['◆ SILVER',  '#101318','linear-gradient(120deg,#e4ebf2,#8a929c)','#e4ebf2','sheen'],
     'plaque-gold':  ['◆ GOLD',    '#1a1404','linear-gradient(120deg,#f5d878,#a5791f)','#f5d878','sheen'],
-    'plaque-plat':  ['◆ PLATINUM','#0e1014','linear-gradient(120deg,#f0f4f8,#9aa6b2)','#f0f4f8','sheen'],
-    'plaque-diam':  ['◆ DIAMOND', '#0a1418','linear-gradient(120deg,#dff4ff,#7fd0e8,#c9b8ff)','#dff4ff','sheen']
+    'plaque-plat':  ['◆ PLATINUM','#0a0f16','linear-gradient(120deg,#eaf4ff,#7fa8d8)','#dbecff','sheen'],   /* r404.4 (Wolf): cooler, icy platinum (VP) */
+    'plaque-md':    ['◆ MD',      '#160406','linear-gradient(120deg,#e0b070,#7a1420)','#e0b070','sheen'],   /* r404.4 (Wolf): MD = the corner office — was un-carded (fell through to platinum) */
+    'plaque-diam':  ['◆ DIAMOND', '#0a1418','linear-gradient(120deg,#dff4ff,#9be0f7,#c9b8ff)','#eaf8ff','sheen'],   /* Second-Year — the brilliant final boss */
+    engraved:       ['ENGRAVED',  '#12141a','linear-gradient(120deg,#c8ccd4,#5a5e68)','#c8ccd4','sheen'],
+    foil:           ['◆ FOIL',    '#160a24','linear-gradient(120deg,#c77dff,#7b2ff7,#ff6ad5)','#c77dff','holo'],   /* r404.4 (Wolf): foil → purple holographic */
+    heraldic:       ['⬧ HERALDIC','#1a090b','linear-gradient(120deg,#f0c060,#9c2a1c)','#e6b84a','sheen'],
+    charter:        ['CHARTER',   '#0e1626','linear-gradient(120deg,#aab8d4,#3a4a68)','#aab8d4','sheen']
   };
   return function(id, opts){
     const M=window.HK_METALS||{};
