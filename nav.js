@@ -310,9 +310,32 @@
     }catch(e){}
   }
 
+  /* r406 (Wolf: "level 4 in game but level 13 on my card"): the in-game HUD + nav level
+     run on the local hk_xp_est estimate; the card reprices from canonical server XP. They
+     diverged because the estimate was only hydrated inside the RANKED path — a player who
+     hadn't opted into ranked never got the sync. Level is universal progression, not a
+     competitive-ranked concept, so hydrate it for ANY signed-in user. Memoized fetch. */
+  async function hydrateLevel(){
+    try{
+      const d = await loadProfileData();
+      const srvXp=computeXP(d, d.myRuns, d.mySessions);
+      const owner=localStorage.getItem('hk_xp_uid')||'';
+      const prev=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+      const uid=(window._navUser&&window._navUser.id)||'';
+      localStorage.setItem('hk_xp_est', String(owner===uid ? Math.max(srvXp,prev) : srvXp));
+      if(uid) localStorage.setItem('hk_xp_uid', uid);
+      renderAuthBar();
+    }catch(e){}
+  }
+
   // Rank pill: fetch standing once per session (10-min cache shared with index.html via sessionStorage)
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
+    /* r406 (Wolf): flip the owner account to ranked-on directly (his explicit ask). Scoped
+       to his email so it never touches anyone else's opt choice; syncs to the account. */
+    try{ const __em=((window._navUser&&window._navUser.email)||'').toLowerCase();
+      if(__em==='wolfcdrake@gmail.com' && localStorage.getItem('hk_ranked')!=='1'){
+        localStorage.setItem('hk_ranked','1'); try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} } }catch(e){}
     /* r336 (Wolf): the pill honors the ranked opt-in. Not entered -> a quiet "Unranked" chip;
        entered but mid-placement -> "placement n/5"; only a finished placement shows a tier.
        The tier cache is consulted only when opted in, so leaving ranked demotes immediately. */
@@ -333,6 +356,7 @@
       if(__opted && c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n,20):'')+'<span>'+c.n+'</span>';
         el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
     if(!__opted){
+      hydrateLevel();   // r406 (Wolf): sync level even when not opted into ranked \u2014 fire-and-forget so the chip paints now
       el.innerHTML='<span>Unranked</span>';
       el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
       el.title='not in ranked \u2014 enter from the leaderboard'; el.onclick=openProfile;
@@ -413,7 +437,15 @@
   // user state lands async — poll briefly, then give up quietly
   { let tries=0; const iv=setInterval(()=>{ if(window._navUser){ clearInterval(iv); navRank(); } else if(++tries>12) clearInterval(iv); }, 700); }
 
+  /* r406: memoized for the page view — navRank now hydrates XP for EVERY signed-in user
+     (not just opted-in), and the rank-click card also loads it; one fetch, reused. */
+  let __pdCache=null;
   async function loadProfileData(){
+    if(__pdCache) return __pdCache;
+    __pdCache = await __loadProfileData();
+    return __pdCache;
+  }
+  async function __loadProfileData(){
     const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach,school_tag,show_school,team_code');
     const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at,keystrokes,optimal').eq('mouse_used',false).order('time_ms',{ascending:true});   /* r371: keystrokes+optimal feed the efficiency feats */
     let mySessions=[];
