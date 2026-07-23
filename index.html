@@ -266,7 +266,12 @@
   /* r331 (Wolf): nav-maze waypoints read as a TRAIL, not identical dots. Visited stops recede,
      the next stop is a pulsing accent bullseye (matching the green target frame on the same cell),
      future stops stay quiet blue — so a new user always sees exactly which cell to land on next. */
-  td.navmark-done{opacity:.28}
+  /* r401 (Wolf): PAC-MAN pips — collected markers become a faint green hollow (a ghost of the
+     trail you've eaten) instead of just a dimmed dot, so progress reads at a glance. */
+  td.navmark-done{opacity:1}
+  .pipEaten{display:inline-block; color:var(--accent); opacity:.9; line-height:1; filter:drop-shadow(0 0 2px var(--accent-glow))}
+  #grid td.pippop .pipEaten{animation:pipPop .36s ease-out}
+  @keyframes pipPop{0%{transform:scale(2.3);opacity:1} 55%{transform:scale(.7);opacity:1} 100%{transform:scale(1);opacity:.9}}
   .gridwrap td.navmark-next, html[data-dark="1"] .gridwrap td.navmark-next{color:var(--accent) !important; font-size:22px; animation:navpulse 1.2s ease-in-out infinite}
   @keyframes navpulse{0%,100%{text-shadow:0 0 2px var(--accent-glow)} 50%{text-shadow:0 0 12px var(--accent),0 0 5px var(--accent)}}
   /* r271 — watch-solution spotlight (default ON; opt out: localStorage hk_demo_spot='0').
@@ -7615,14 +7620,15 @@ const CHALLENGES = {
       steps.push({sel:deck,   keys:[Kb.ctrlHome]});                               // finish at A1
       return steps; },
     build(){
-      // r223 (Wolf): the flagship maze, v3. LONGER (7 marker leaps + the model = 8 jumps),
-      // roomier (a 16-row sheet — rows auto-shrink so it feels spacious), and the model now
-      // sits inside a guaranteed blank MOAT so Ctrl+Shift+→/↓ always grab EXACTLY the model —
-      // no stray marker to the right ever gets swept into the selection (Wolf's engine catch:
-      // that made the keystrokes-to-win differ across random seeds). Directions stay fully
-      // random (up/down/left/right). A ctrlJump replica verifies the whole thread + deck hop
-      // before shipping; re-rolls busts, with a guaranteed-clean fallback.
-      const RN=16, CN=10;
+      // r223/r401 (Wolf): the flagship maze. LONGER (7 marker leaps + the model = 8 jumps), and
+      // now ROOMIER on the fixed-canvas grid — a 20-row sheet. The extra rows are the point: the
+      // random walk has far more space to place its leaps, so it busts less and reaches a verified
+      // random maze on nearly every seed (the fixed fallback is now almost never needed → real
+      // variety run-to-run). The model still sits inside a guaranteed blank MOAT so Ctrl+Shift+→/↓
+      // grab EXACTLY the model — no stray marker swept in (Wolf's engine catch that once made the
+      // keystrokes-to-win differ across seeds). Directions stay fully random (up/down/left/right).
+      // A ctrlJump replica verifies the whole thread + deck hop before shipping; re-rolls busts.
+      const RN=20, CN=10;
       const isF=(m,r,c)=>{ const x=m[colLetter(c)+r]; return !!(x && ((x.value!==null&&x.value!=='')||x.formula)); };
       function sim(m,r,c,dr,dc){ let nr=r+dr,nc=c+dc; const ib=(rr,cc)=>rr>=1&&rr<=RN&&cc>=1&&cc<=CN;
         if(!ib(nr,nc)) return {r,c};
@@ -8412,6 +8418,11 @@ function render(){
   const __navPath = (__navC && __navC._path && Array.isArray(__navC._path)) ? __navC._path : null;
   let __navNext = -1;
   if(__navPath){ const np=S.navProgress||{}; for(let i=0;i<__navPath.length;i++){ if(!np['m'+i]){ __navNext=i; break; } } }
+  // r401 (Wolf): PAC-MAN pips — detect the marker collected THIS keystroke so we can pop it once.
+  // Pips collect strictly in order, so the count of done markers is __navNext (or all, if none left).
+  const __pipDone = __navPath ? ((__navNext===-1) ? __navPath.length : __navNext) : 0;
+  let __pipFresh = -1;
+  if(__navPath){ if(__pipDone > (S._pipDone||0)) __pipFresh = __pipDone-1; S._pipDone = __pipDone; }
   // Color refs ONLY while editing (from editBuf) — exactly like Excel, which colors a
   // formula's precedents when you're IN the cell (F2/double-click), NOT on plain selection.
   // r206 (Wolf): the passive "select a formula → light up its inputs" overlay hid where the
@@ -8536,9 +8547,23 @@ function render(){
         extraStyle += (cell.align==='r') ? (';padding-right:'+pad+'px') : (';padding-left:'+pad+'px');
       }
       if(cell.fsz){ extraStyle += ';font-size:'+cell.fsz+'px'; }   // r235: grow/shrink font (Alt H F G/K)
+      // r401 (Wolf): PAC-MAN pips — the glyph tells the marker's state at a glance so progress is
+      // visible as you thread the maze: a solid dot is still ahead, hollow means already collected
+      // (the pulsing next-stop keeps its solid dot + accent glow). Display-only — cell.value stays
+      // '●', so the Ctrl+arrow jump math the seed was verified against never changes.
+      if(cls.indexOf('navmark')>=0){
+        txt = (cls.indexOf('navmark-done')>=0) ? '<span class="pipEaten">●</span>' : '●';
+      }
       row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${__ew[c]}px;max-width:${__ew[c]}px${extraStyle}">${txt}</td>`;
     }
     row+='</tr>'; g.innerHTML+=row;
+  }
+  // r401 (Wolf): pop the pip that was just eaten — one-shot, added after the grid is built so it
+  // isn't wiped by the innerHTML rebuild, and only on the render right after a fresh collect.
+  if(__pipFresh>=0 && __navPath && __navPath[__pipFresh]){
+    const __pp=__navPath[__pipFresh];
+    const __td=document.querySelector('#grid td[data-r="'+__pp.r+'"][data-c="'+__pp.c+'"]');
+    if(__td) __td.classList.add('pippop');
   }
   positionMarquee();
   positionPasteDest();

@@ -78,9 +78,9 @@ jobs:
       - name: Mac input matrix
         if: steps.scope.outputs.engine == 'true'
         run: node dev/e2e-mac-input.js
-      - name: Echo / follow-along
-        if: steps.scope.outputs.engine == 'true'
-        run: node dev/e2e-echo.js
+      # r401 (Wolf): 'learn' (echo) mode retired from the mode bar — its only UI trigger is gone,
+      # so the follow-along gate (which drives #echoBtn) no longer applies. Echo code is left
+      # dormant/guarded for possible future re-exposure; re-add this step if it returns.
       - name: Rapid-fire on the real grid
         if: steps.scope.outputs.engine == 'true'
         run: node dev/e2e-rapidfire.js
