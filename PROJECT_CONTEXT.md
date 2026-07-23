@@ -3,7 +3,7 @@ _Refreshed 2026-07-23 against the live repo (github.com/rathunter69/Hotkey.gg @ 
 New sessions: the repo IS the handover — read this file, **dev/PIPELINE.md's ⚡ header (the
 live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ design docs._
 
-## ⚡ NEXT-SESSION HANDOFF (2026-07-23, rounds r411–r413 — CI fixes + fragility hardening + card round)
+## ⚡ NEXT-SESSION HANDOFF (2026-07-23, rounds r411–r414 — CI fixes + fragility hardening + card round + NOTCH TAXONOMY)
 
 **LIVE NOW (merged to main, deployed via Cloudflare):**
 - **#221** — card titles (equippable name-plate + earn catalog, impersonation-locked custom titles),
@@ -24,16 +24,26 @@ live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ d
   (`.hk-frame-plaque-diam`) + registry tuple repointed to `blackdiam`. The old matrix `diamondfx`
   is now UNUSED (left in place; safe to delete in a cleanup pass).
 
-**⏳ PENDING WOLF DECISION — NOTCH SHAPE BY SKIN CLASS (task #121, the one open thread):**
-- Proposed 3-class taxonomy (awaiting his confirm): **Status** (founder/pro/beta) + **Achievement/feat**
-  (heraldic, boutique, architect, emerald, bone, frostbite, pearl, molten, neon, terminal, sakura,
-  goldenhour, foil) → **ANGULAR notch, richest fx**; **Progression ladder** (growth/cottoncandy/
-  vaporwave/engraved/circuit/crt + rank plaques bronze→diamond, blueprint, navigator, amethyst,
-  noir, onyx) → **ROUNDED notch, cleaner fx**. Open Q he must answer: do top rank cards (onyx/diamond)
-  stay rounded or bump to angular? Then build the two notch shapes + fx-elaborateness tiers in one pass.
-  Notch markup: `.uc-titlechip` (nav.css ~921) + `hkPlayerCard` title notch (themes.js ~1915).
+**✅ RESOLVED / SHIPPED — NOTCH SHAPE BY SKIN CLASS (task #121) — r414 (PR in flight):**
+- Wolf confirmed a **2-class** taxonomy (simplified from the 3-class draft): **ANGULAR** chamfered
+  nameplate = STATUS (founder/pro) + ALL ACHIEVEMENT/cosmetic skins (heraldic, foil, amethyst, sakura,
+  goldenhour, pearl, boutique, architect, emerald, molten, frostbite, noir, neon, terminal, circuit,
+  crt, blueprint, constellation, vaporwave, cottoncandy, bloom, …); **ROUNDED** nameplate = the
+  level/rank LADDER BASE only (engraved + rank plaques bronze/silver/gold/plat). **Wolf's open-Q call:
+  the two Second-Year pinnacle cards — onyx + plaque-diam — BUMP TO ANGULAR** (top of the climb crosses
+  into prestige). The r390/r391 achievement skins had wrongly fallen back to the base pill — now angular.
+- Implementation: **nav.css ~708** — one ANGULAR selector list (`clip-path` chamfer) + one ROUNDED rule
+  (`border-radius:10px; clip-path:none`) for the ladder base. **fx-elaborateness by class**: themes.js
+  `hkInitCardFx` — a per-canvas `EL` density multiplier keyed to the frame's rarity tier (common 0.85 ·
+  rare 0.9 · **epic 1.0 baseline, untouched** · legendary 1.15), applied centrally to the generated
+  particle ARRAYS (`applyEL`) so Wolf's 15 bespoke generators stay as-authored; object-based fx
+  (nebula/aurora/galaxy/heraldic/onyx veins) keep their bespoke tuning. Ladder plaques use `sheen`
+  (no particle field), so density scaling never over-animates the calm ladder — shape carries that.
+- Verified: local gate green (smoke 7/7 + skin-unlock, lb 36/36); montage render clean (0 page errors)
+  confirms rounded ladder base vs angular prestige set. Notch markup: `.hkf-tab` (nav.css ~444 base pill,
+  ~708 per-class override); `hkPlayerCard` tab via `hkFrameOrnaments` (themes.js ~1317).
 
-**ASSET VERSIONS after r413 (bump on next JS/CSS change):** themes.js **v303**, nav.css **v205**,
+**ASSET VERSIONS after r414 (bump on next JS/CSS change):** themes.js **v305**, nav.css **v207**,
 nav.js **v296**, drills.js v278, lb.js v37, lb.css v20. (sed the `?v=` across all `*.html`.)
 
 **CADENCE:** branch `claude/pipeline-engine-integration-laki0l`; after each merge RESTART off main

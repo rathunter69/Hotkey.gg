@@ -1371,6 +1371,34 @@ window.hkInitCardFx = function(root){
     if(!canv.length) return;
     window.hkEnsureSkinFonts();
     const R=(a,b)=>a+Math.random()*(b-a);
+    /* r414 (#121 · Wolf): scale fx ELABORATENESS by skin CLASS — the particle-field density
+       tracks the card's rarity tier, so the prestige gradient the notch shape encodes is
+       reinforced by how busy the animation is. Epic (the largest, most hand-tuned bucket)
+       stays at the authored baseline (1.0); rare is nudged calmer, legendary busier, common
+       calmest. Applied centrally to the generated particle ARRAYS below (applyEL) so Wolf's
+       15 bespoke generators are untouched; object-based fx (nebula/aurora/galaxy/heraldic)
+       keep their bespoke tuning. EL is set per-canvas from the frame class. */
+    const TIER={}; (window.HK_FRAMES||[]).forEach(f=>{ TIER[f.id]=f.tier; });
+    let EL=1;
+    function elabFor(cv){
+      try{
+        const host=cv.closest && cv.closest('[class*="hk-frame-"]'); if(!host) return 1;
+        const cls=(host.className||'').split(/\s+/);
+        for(const c of cls){ if(c.indexOf('hk-frame-')!==0) continue; const id=c.slice(9);
+          const t=TIER[id]; if(!t) continue;   // skips hk-frame-lg / hk-frame-none
+          return t==='legendary'?1.15 : t==='epic'?1.0 : t==='rare'?0.9 : t==='common'?0.85 : 1.0; }
+      }catch(e){}
+      return 1;
+    }
+    // trim (EL<1) or pad-by-cloning (EL>1) an array particle field to the class density.
+    function applyEL(parts, S){
+      if(EL===1 || !Array.isArray(parts) || parts.length<2) return parts;
+      const cur=parts.length, tgt=Math.max(1, Math.round(cur*EL));
+      if(tgt<cur) return parts.slice(0, tgt);
+      for(let i=cur;i<tgt;i++){ const src=parts[(Math.random()*cur)|0], c=Object.assign({}, src);
+        if('x' in c) c.x=R(0,S.w); if('y' in c) c.y=R(0,S.h); if('ph' in c) c.ph=R(0,6.28); parts.push(c); }
+      return parts;
+    }
     function fit(cv){
       const box=cv.parentElement; if(!box) return null;
       const r=box.getBoundingClientRect(); const dpr=Math.min(2, window.devicePixelRatio||1);
@@ -1522,6 +1550,7 @@ window.hkInitCardFx = function(root){
     canv.forEach(cv=>{
       if(cv._hkfx) return; cv._hkfx=1;
       const kind=cv.dataset.kind, S=fit(cv); if(!S) return;
+      EL = elabFor(cv);   // r414 (#121): class-scaled particle density
       let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?facet(S.w,S.h)
         : kind==='emerald'?facet(S.w,S.h) : kind==='neon'?neonfx(S.w,S.h) : kind==='sheet'?sheetfx(S.w,S.h)
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
@@ -1531,6 +1560,7 @@ window.hkInitCardFx = function(root){
         : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
+      parts = applyEL(parts, S);   // r414 (#121): scale particle-field density by class
       sys.push({cv,kind,S,parts});
     });
     if(!sys.length) return;
