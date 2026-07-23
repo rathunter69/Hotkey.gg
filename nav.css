@@ -509,7 +509,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;
   filter:drop-shadow(0 0 5px rgba(255,54,26,.85))}
 @media (prefers-reduced-motion: no-preference){
-  .hk-frame-heraldic::after{animation:hkCylonCircle 2.6s linear infinite}
+  .hk-frame-heraldic::after{animation:hkCylonCircle 6s linear infinite}   /* r413 (Wolf): slower, statelier sweep — 2.6s read too frantic */
 }
 @keyframes hkCylonCircle{ to{ --hkcyl:360deg } }
 /* r404.6 (Wolf): charter retired. */
@@ -642,6 +642,9 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    authoritative rule (higher specificity, placed last) forces every full skin card to the same
    5px width + 16px radius, so the footprint is identical card-to-card. */
 .uc.hk-frame-lg[class*="hk-frame-"]{border-width:5px; border-radius:16px}
+/* r413 (Wolf): the "no theme" card wears a plain 5px neutral border so its footprint matches the
+   skinned cards (which all carry a 5px animated/gradient border) — no more size mismatch. */
+.uc.hk-frame-none{border:5px solid var(--line); border-radius:16px}
 .hk-frame-lg.hk-frame-bone::after{font-size:12.5px}   /* bone stays PERFECTLY still — only the tag grows */
 .hk-frame-lg.hk-frame-heraldic{
   box-shadow:0 22px 60px rgba(0,0,0,.45), 0 0 58px rgba(230,88,67,.42), inset 0 0 74px rgba(230,88,67,.11)}
@@ -822,12 +825,15 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 /* r404.6 (Wolf): founder wears a BOLD, animated rainbow border (3px, spins). */
 /* r408 (Wolf): founder bg was too light — DARKEN to near-black so the vivid aurora + rainbow
    border pop; bolder, more saturated rainbow border. */
-.hk-frame-founder.hk-frame-founder{--text:#efeaff; --muted:#a99fce; --line:#3c3556; --accent:#c9b8ff; --accent-dim:#8f7fd0;
-  border:3px solid transparent; color:#efeaff;
-  background:linear-gradient(150deg,#0a0912,#040308) padding-box, conic-gradient(from var(--hkang,0deg),#ff2f6e,#ff7a2f,#ffd23b,#5bff8f,#37e0ff,#5b7bff,#b45bff,#ff45c2,#ff2f6e) border-box;   /* r411 (Wolf): fuller, more saturated rainbow — the full spectrum in nine stops so the pinnacle border reads as a true prism */
-  box-shadow:0 0 34px rgba(180,120,255,.4),0 22px 60px rgba(0,0,0,.66)}
+/* r413 (Wolf): PLATINUM ELITE founder — the rainbow now rides a LIGHT brushed-silver bg (was the
+   dark space theme), more vibrant, with DARK text so the stats read on the bright metal. The 5px
+   rainbow prism border stays. */
+.hk-frame-founder.hk-frame-founder{--text:#24263a; --muted:#5b6079; --line:#c6ccdb; --accent:#7a5fd0; --accent-dim:#9a8fd6;
+  border:5px solid transparent; color:#24263a;
+  background:linear-gradient(150deg,#f5f7fc,#e2e7f1 52%,#eceff6) padding-box, conic-gradient(from var(--hkang,0deg),#ff2f6e,#ff7a2f,#ffd23b,#5bff8f,#37e0ff,#5b7bff,#b45bff,#ff45c2,#ff2f6e) border-box;
+  box-shadow:0 0 30px rgba(150,120,230,.34),0 22px 60px rgba(0,0,0,.5)}
 .hk-frame-founder .hkf-glint-sheen{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; border-radius:inherit}
-.hk-frame-founder .pc-name span,.hk-frame-founder .pub-nm{color:#f0e9ff; text-shadow:0 0 10px rgba(200,160,255,.5)}
+.hk-frame-founder .pc-name span,.hk-frame-founder .pub-nm{color:#1c1e30; text-shadow:0 1px 0 rgba(255,255,255,.5)}
 
 /* r390 (Wolf) new title skins — dark tinted interiors + themed borders so light text
    reads on every one; the canvas (petals/bokeh/pearl/galaxy) carries the motion. */

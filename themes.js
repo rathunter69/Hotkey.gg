@@ -1262,7 +1262,7 @@ window.hkFrameOrnaments = (function(){
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
     molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
-    founder:      ['★ FOUNDER','#0a0910','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c89bff','holorain'],   /* r411 (Wolf): aurora wash overshadowed the stats — swapped to a dark HOLO-FOIL rainbow (cool, not literal cracks) */
+    founder:      ['★ FOUNDER','#eef1f7','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#8a6fd8','platinum'],   /* r413 (Wolf): PLATINUM elite — light silver bg + vibrant rainbow foil (was dark space) */
     /* r390 (Wolf) new title skins */
     amethyst:     ['◆ AMETHYST','#180a2a','linear-gradient(120deg,#a06cff,#d0a8ff)','#c49bff','prism'],
     onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','onyxfx'],   /* r404.2 (Wolf): black marble + gold veins (was gold dust, looked like boutique) */
@@ -1424,6 +1424,11 @@ window.hkInitCardFx = function(root){
     function holorain(w,h){ const n=Math.round(w*h/26000)+5, st=[];
       for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.4),ph:R(0,6.28),sp:R(.5,1.3)});
       return {st}; }
+    /* r413 (Wolf: founder on a platinum/elite LIGHT bg, more vibrant): silver sparkle for the
+       PLATINUM holo-foil — the rainbow bands + metallic catch-light are drawn in the render. */
+    function platinum(w,h){ const n=Math.round(w*h/22000)+6, st=[];
+      for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.5),ph:R(0,6.28),sp:R(.5,1.3)});
+      return {st}; }
     function drive(w,h){return{hz:Math.round(h*.40)};}
     function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
@@ -1510,7 +1515,7 @@ window.hkInitCardFx = function(root){
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
         : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h) : kind==='diamondfx'?diamondfx(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
-        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='holorain'?holorain(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
+        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='holorain'?holorain(S.w,S.h) : kind==='platinum'?platinum(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
         : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
@@ -1612,6 +1617,26 @@ window.hkInitCardFx = function(root){
           if(!reduce){ const gp=((t/3000*v.sp+v.ph/6.28)%1), idx=gp*(v.pts.length-1), i0=Math.floor(idx), f=idx-i0;
             const p0=v.pts[i0], p1=v.pts[Math.min(v.pts.length-1,i0+1)], gx=p0.x+(p1.x-p0.x)*f, gy=p0.y+(p1.y-p0.y)*f;
             ctx.beginPath(); ctx.arc(gx,gy,2.2*dpr,0,6.28); ctx.fillStyle='rgba(255,240,190,.92)'; ctx.shadowBlur=8*dpr; ctx.shadowColor='rgba(245,205,110,.9)'; ctx.fill(); ctx.shadowBlur=0; } } }
+      else if(o.kind==='platinum'){ const P=o.parts;
+        /* r413 (Wolf): PLATINUM elite holo-foil on a LIGHT silver bg. Rainbow foil bands drift in
+           NORMAL blend (they tint the silver with real colour — 'lighter' would vanish on white),
+           a bright specular streak rakes across like light off brushed metal, and fine silver
+           glints sparkle. Vibrant + elite, distinct from the old dark-space founder. */
+        for(let k=0;k<3;k++){
+          const sp=((t/(6000+k*1400)+k*.33)%1), bx=(-.35+sp*1.7)*w, hue=(t/26+k*120)%360;
+          const g=ctx.createLinearGradient(bx-.2*w,0,bx+.2*w,h);
+          g.addColorStop(0,'hsla('+hue+',88%,58%,0)');
+          g.addColorStop(.5,'hsla('+((hue+40)%360)+',90%,56%,'+(reduce?.1:.22)+')');
+          g.addColorStop(1,'hsla('+((hue+95)%360)+',88%,58%,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+        }
+        if(!reduce){ const sp=(t/4200)%1, sx=(-.2+sp*1.5)*w, sa=(1-Math.abs(sp-.5)/.5);
+          ctx.globalCompositeOperation='lighter';
+          const g2=ctx.createLinearGradient(sx-.08*w,0,sx+.08*w,h);
+          g2.addColorStop(0,'rgba(255,255,255,0)'); g2.addColorStop(.5,'rgba(255,255,255,'+(sa*.5)+')'); g2.addColorStop(1,'rgba(255,255,255,0)');
+          ctx.fillStyle=g2; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; }
+        for(const s of P.st){ const a=reduce?.35:(.14+.5*(.5+.5*Math.sin(t/560*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.shadowBlur=4*dpr;ctx.shadowColor='rgba(150,180,255,.7)';ctx.fill();ctx.shadowBlur=0; } }
       else if(o.kind==='holorain'){ const P=o.parts;
         /* r411 (Wolf): HOLO-FOIL — "cool" rainbow, not a shattered card. Two narrow spectral sheen
            bands drift across on different speeds (banded, so most of the dark body stays clear and
@@ -1752,16 +1777,24 @@ window.hkInitCardFx = function(root){
         for(const s of P.p){ const a2=s.ang+rot,x=P.cx+Math.cos(a2)*s.rad,y=P.cy+Math.sin(a2)*s.rad*.62,tw=reduce?.7:(.4+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(x,y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=tw;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
       else if(o.kind==='nebula'){ const P=o.parts;
-        // r404.6 (Wolf): richer — brighter, more visibly drifting clouds + a twinkling field
+        /* r413 (Wolf: "PRO still not animated"): the drift was there but too faint to read next to
+           the bold pinnacle borders. PRO is the paid tier — make the cosmos unmistakably ALIVE:
+           brighter faster-drifting nebula clouds, a slow luminous aurora band sweeping the deep
+           space, and a brighter twinkling star field. */
         ctx.globalCompositeOperation='lighter';
-        for(const b of P.blobs){ if(!reduce){ b.x+=b.dx*1.7*dpr; b.y+=b.dy*1.7*dpr; if(b.x<w*.08||b.x>w*.92)b.dx*=-1; if(b.y<h*.08||b.y>h*.92)b.dy*=-1; }
-          const a=(reduce?.14:.1+.08*(.5+.5*Math.sin(t/2200*b.sp+b.ph)));
+        // slow cosmic aurora band raking across (the big, obvious motion)
+        if(!reduce){ const sp=(t/9000)%1, bx=(-.35+sp*1.7)*w, hue=(t/40)%360;
+          const g0=ctx.createLinearGradient(bx-.28*w,0,bx+.28*w,h);
+          g0.addColorStop(0,'hsla('+hue+',80%,62%,0)'); g0.addColorStop(.5,'hsla('+((hue+40)%360)+',82%,64%,.13)'); g0.addColorStop(1,'hsla('+((hue+90)%360)+',80%,62%,0)');
+          ctx.fillStyle=g0; ctx.fillRect(0,0,w,h); }
+        for(const b of P.blobs){ if(!reduce){ b.x+=b.dx*2.7*dpr; b.y+=b.dy*2.7*dpr; if(b.x<w*.08||b.x>w*.92)b.dx*=-1; if(b.y<h*.08||b.y>h*.92)b.dy*=-1; }
+          const a=(reduce?.16:.16+.13*(.5+.5*Math.sin(t/2000*b.sp+b.ph)));
           const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
-          g.addColorStop(0,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+a+')'); g.addColorStop(.55,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+(a*.35)+')'); g.addColorStop(1,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+',0)');
+          g.addColorStop(0,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+a+')'); g.addColorStop(.55,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+(a*.4)+')'); g.addColorStop(1,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+',0)');
           ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,6.28); ctx.fill(); }
         ctx.globalCompositeOperation='source-over';
-        for(const s of P.st){ const a=reduce?.6:(.28+.6*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
-          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=4*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
+        for(const s of P.st){ const a=reduce?.6:(.34+.62*(.5+.5*Math.sin(t/520*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
       else if(o.kind==='aurora'){ ctx.globalCompositeOperation='lighter';
         /* r407 (Wolf: "founder STILL not animated — more dynamic"): bright UNDULATING rainbow
            curtains (sway on x and y) + a holographic sweep bar raking across every ~3.4s +
@@ -1917,6 +1950,8 @@ window.hkPlayerCard = function(d, opts){
   if(fv && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===fv)){
     cls += ' hk-frame-'+fv + (full ? ' hk-frame-lg' : '');
     orn = window.hkFrameOrnaments ? window.hkFrameOrnaments(fv, {lg:full, owner:!!d.owner, serial:d.serial|0}) : '';
+  } else if(full){
+    cls += ' hk-frame-none';   /* r413 (Wolf): the plain card carried no frame class, so it missed the 5px border and read a size smaller than every skinned card — give it a neutral bordered footprint that matches */
   }
   // r387: show-on-card toggles. Absent d.show => show everything (legacy callers).
   const show = d.show || {};
