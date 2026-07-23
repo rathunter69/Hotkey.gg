@@ -1281,7 +1281,7 @@ window.hkFrameOrnaments = (function(){
     'plaque-silver':['◆ SILVER',  '#101318','linear-gradient(120deg,#e4ebf2,#8a929c)','#e4ebf2','sheen'],
     'plaque-gold':  ['◆ GOLD',    '#1a1404','linear-gradient(120deg,#f5d878,#a5791f)','#f5d878','sheen'],
     'plaque-plat':  ['◆ PLATINUM','#0a0f16','linear-gradient(120deg,#eaf4ff,#7fa8d8)','#dbecff','sheen'],   /* r404.4 (Wolf): cooler, icy platinum (VP) */
-    'plaque-diam':  ['◆ DIAMOND', '#0a1418','linear-gradient(120deg,#dff4ff,#9be0f7,#c9b8ff)','#eaf8ff','diamondfx'],   /* Second-Year — brilliant final boss, crystalline facet flashes */
+    'plaque-diam':  ['◆ DIAMOND', '#08090e','linear-gradient(120deg,#dff4ff,#9be0f7,#c9b8ff)','#eaf8ff','blackdiam'],   /* r413 (Wolf): BLACK DIAMOND — near-black carbon + white brilliance glints + prismatic caustic (was the matrix number-cascade) */
     engraved:       ['ENGRAVED',  '#12141a','linear-gradient(120deg,#c8ccd4,#5a5e68)','#c8ccd4','sheen'],
     foil:           ['◆ FOIL',    '#0a1418','linear-gradient(135deg,#ffffff,#9be0f7,#7fa8ff,#c9a8ff,#ffc2e8)','#eaf8ff','foilfx'],   /* r404.5 (Wolf): "super diamond" holographic — diamond palette, brilliant edges, NOT space */
     heraldic:       ['⬧ HERALDIC','#12060a','linear-gradient(120deg,#c02a1a,#5a0a0c)','#d8322a','heraldic']   /* r404.6 (Wolf): the MD crest — red/evil, blood lozenge + menace */
@@ -1474,6 +1474,12 @@ window.hkInitCardFx = function(root){
     function diamondfx(w,h){const cw=Math.max(15,Math.round(w/18)),cols=Math.ceil(w/cw),streams=[];
       for(let i=0;i<cols;i++)streams.push({x:i*cw+cw*.5, y:R(-h,h), sp:R(.5,1.25), len:Math.round(R(4,9))});
       return{cw,streams};}
+    /* r413 (Wolf) — BLACK DIAMOND (Second-Year final boss, replaces the matrix number-cascade):
+       white brilliance glints twinkle across the near-black carbon, and a slow prismatic caustic
+       rakes the facets. Elite, dark, rare. */
+    function blackdiam(w,h){const st=[], n=Math.round(w*h/9000)+20;
+      for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,2),ph:R(0,6.28),sp:R(.5,1.5)});
+      return {st};}
     function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
     /* r404 (Wolf #95) — NAVIGATOR star-chart: stars joined by faint constellation lines
        with a light pulse tracing each edge, under a slow-rotating compass reticle. */
@@ -1519,7 +1525,7 @@ window.hkInitCardFx = function(root){
       let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?facet(S.w,S.h)
         : kind==='emerald'?facet(S.w,S.h) : kind==='neon'?neonfx(S.w,S.h) : kind==='sheet'?sheetfx(S.w,S.h)
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
-        : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h) : kind==='diamondfx'?diamondfx(S.w,S.h)
+        : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h) : kind==='diamondfx'?diamondfx(S.w,S.h) : kind==='blackdiam'?blackdiam(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
         : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='holorain'?holorain(S.w,S.h) : kind==='platinum'?platinum(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
         : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
@@ -1705,6 +1711,22 @@ window.hkInitCardFx = function(root){
         ctx.shadowBlur=5*dpr; ctx.shadowColor='rgba(200,24,24,'+(pulse*.7)+')'; ctx.strokeStyle='rgba(210,50,44,'+(pulse+.05)+')'; ctx.lineWidth=1*dpr;
         ctx.beginPath(); ctx.moveTo(0,-rad*.62); ctx.lineTo(rad*.44,0); ctx.lineTo(0,rad*.62); ctx.lineTo(-rad*.44,0); ctx.closePath(); ctx.stroke();
         ctx.restore(); ctx.shadowBlur=0; }
+      else if(o.kind==='blackdiam'){ const P=o.parts;
+        /* r413 (Wolf) — BLACK DIAMOND: white brilliance glints twinkle across the near-black carbon
+           (sharp sparkle via a squared sine), and one slow prismatic caustic rakes the facets,
+           its hue cycling the full spectrum. Additive so it reads over the dark body. */
+        ctx.globalCompositeOperation='lighter';
+        for(const s of P.st){ const tw=reduce?.5:Math.pow(.5+.5*Math.sin(t/520*s.sp+s.ph),2); if(tw<.05) continue;
+          ctx.beginPath(); ctx.arc(s.x,s.y,s.r*dpr*(.6+.7*tw),0,6.28);
+          ctx.fillStyle='rgba(255,255,255,'+(tw*.95)+')'; ctx.shadowBlur=7*dpr; ctx.shadowColor='rgba(200,225,255,.9)'; ctx.fill(); }
+        ctx.shadowBlur=0;
+        if(!reduce){ const sp=(t/5200)%1, sx=(-.25+sp*1.6)*w, sa=(1-Math.abs(sp-.5)/.5), hue=(t/18)%360;
+          const g=ctx.createLinearGradient(sx-.16*w,0,sx+.16*w,h);
+          g.addColorStop(0,'hsla('+hue+',92%,66%,0)');
+          g.addColorStop(.5,'hsla('+hue+',92%,70%,'+(sa*.38)+')');
+          g.addColorStop(1,'hsla('+((hue+70)%360)+',92%,66%,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
+        ctx.globalCompositeOperation='source-over'; }
       else if(o.kind==='diamondfx'){ const P=o.parts;
         /* r407 (Wolf: "cooler — matrix/circuit vibe, dynamic"): an icy NUMBER CASCADE — the
            Second-Year analyst's data streaming down the card in diamond-blue, each column at
