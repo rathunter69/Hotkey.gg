@@ -1832,6 +1832,93 @@ window.hkPlayerCard = function(d, opts){
   return h;
 };
 
+/* ---- r407 (Wolf): RANKED UNLOCKED card. The eligibility celebration + opt-in prompt,
+   shared by the leaderboard (rankedInfographic) and the login nudge (nav.js). Variant C:
+   a hero crest, the full 8-tier ladder rendered from real rank emblems, three tight beats
+   (place · rank · climb), a bucket byline, and ONE primary CTA with a de-emphasized "later".
+   Dependency-light: window.rankEmblem + window.HK_RANK.TIERS. Callbacks:
+     opts.onEnter()  — opt in (default: set hk_ranked, push, reload)
+     opts.onLater()  — dismiss (default: just close)
+     opts.reason     — eyebrow text (e.g. 'Level 10 reached')  ---- */
+window.hkRankedCard = function(opts){
+  opts = opts || {};
+  const T = (window.HK_RANK && window.HK_RANK.TIERS) || [];
+  const em = (t,sz)=> '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;line-height:0">'+
+    (window.rankEmblem?window.rankEmblem(t.name, sz, 'Top Bucket'):'')+'</span>';
+  if(!document.getElementById('hkru-css')){
+    const st=document.createElement('style'); st.id='hkru-css';
+    st.textContent=
+      '.hkru-scrim{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;z-index:320;padding:20px}'+
+      '.hkru{position:relative;width:100%;max-width:452px;max-height:calc(100vh - 40px);overflow-y:auto;border-radius:18px;'+
+        'background:radial-gradient(ellipse at 50% -8%,var(--accent-glow),transparent 60%),var(--surface);border:1px solid var(--line);'+
+        'box-shadow:0 30px 80px rgba(0,0,0,.55);padding:24px 24px 20px;text-align:center}'+
+      '.hkru-x{position:absolute;top:12px;right:14px;font-family:var(--mono);font-size:19px;color:var(--faint);cursor:pointer;line-height:1;padding:3px 7px;border-radius:8px}'+
+      '.hkru-x:hover{color:var(--text);background:var(--surface2)}'+
+      '.hkru-eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}'+
+      '.hkru-hero{width:76px;height:76px;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;'+
+        'border-radius:50%;background:radial-gradient(circle,var(--accent-glow),transparent 70%)}'+
+      '.hkru-h{font-size:23px;font-weight:800;letter-spacing:.3px;margin:2px 0 12px}'+
+      '.hkru-lad{display:flex;align-items:center;justify-content:space-between;gap:2px;background:var(--surface2);'+
+        'border:1px solid var(--line);border-radius:12px;padding:11px 10px;margin:2px 0 14px}'+
+      '.hkru-cr{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;flex:none}'+
+      '.hkru-arw{color:var(--faint);font-size:11px;flex:none}'+
+      '.hkru-beats{display:flex;gap:9px;margin:0 0 12px}'+
+      '.hkru-beat{flex:1;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:10px 7px;text-align:center}'+
+      '.hkru-beat b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}'+
+      '.hkru-beat span{font-size:11px;color:var(--muted);line-height:1.35}'+
+      '.hkru-byline{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.55;margin:2px 4px 4px}'+
+      '.hkru-byline b{color:var(--text)}'+
+      '.hkru-rew{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin:8px 0 2px}'+
+      '.hkru-rew b{color:var(--accent-dim,var(--accent))}'+
+      '.hkru-cta{margin-top:15px}'+
+      '.hkru-go{width:100%;text-align:center;font-family:var(--mono);font-weight:700;font-size:14px;padding:13px;border-radius:11px;cursor:pointer;'+
+        'background:var(--accent);color:var(--on-accent,#0c0d0e);border:none}'+
+      '.hkru-go:hover{filter:brightness(1.06)}'+
+      '.hkru-later{display:inline-block;margin-top:11px;font-family:var(--mono);font-size:11px;color:var(--faint);cursor:pointer;text-decoration:underline dotted;opacity:.75}'+
+      '.hkru-later:hover{opacity:1;color:var(--muted)}';
+    document.head.appendChild(st);
+  }
+  const stale=document.getElementById('hkru-modal'); if(stale) stale.remove();
+  const m=document.createElement('div'); m.id='hkru-modal'; m.className='hkru-scrim';
+  const hero = T.length ? em(T[T.length-1], 58) : '';
+  let lad='';
+  T.forEach((t,i)=>{ lad += (i?'<span class="hkru-arw">›</span>':'')+'<span class="hkru-cr">'+em(t,24)+'</span>'; });
+  m.innerHTML='<div class="hkru">'+
+    '<span class="hkru-x" id="hkruX">×</span>'+
+    '<div class="hkru-eyebrow">◆ '+esc(opts.reason||'you’ve unlocked ranked')+'</div>'+
+    '<div class="hkru-hero">'+hero+'</div>'+
+    '<h2 class="hkru-h">Ranked Unlocked</h2>'+
+    '<div class="hkru-lad">'+lad+'</div>'+
+    '<div class="hkru-beats">'+
+      '<div class="hkru-beat"><b>Place</b><span>the placement series — 5 standard boards</span></div>'+
+      '<div class="hkru-beat"><b>Rank</b><span>your average placement sets your tier</span></div>'+
+      '<div class="hkru-beat"><b>Climb</b><span>beat the field to promote</span></div>'+
+    '</div>'+
+    '<div class="hkru-byline">Every tier splits into three <b>buckets</b> — you enter at <b>Bottom</b>, climb to <b>Top</b>, then promote to the next tier.</div>'+
+    '<div class="hkru-rew">every tier unlocks its own <b>card skin</b></div>'+
+    '<div class="hkru-cta"><button class="hkru-go" id="hkruGo">Enter Ranked</button>'+
+      '<div><a class="hkru-later" id="hkruLater">maybe later</a></div></div>'+
+    '</div>';
+  document.body.appendChild(m);
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  const close=()=>m.remove();
+  const later=()=>{ try{ opts.onLater && opts.onLater(); }catch(e){} close(); };
+  m.querySelector('#hkruX').onclick=later;
+  m.querySelector('#hkruLater').onclick=later;
+  m.querySelector('#hkruGo').onclick=()=>{
+    try{
+      if(opts.onEnter){ opts.onEnter(); }
+      else { localStorage.setItem('hk_ranked','1'); try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} location.reload(); }
+    }catch(e){}
+    close();
+  };
+  m.addEventListener('click',e=>{ if(e.target===m) later(); });
+  try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(m)); }catch(e){}
+  return m;
+};
+/* esc used inside hkRankedCard is hoisted above; define a module-level fallback too so
+   the eyebrow/label sanitize never throws if called before the inner declaration binds. */
+
 /* ---- achievement badges: hex medals, single source ---- */
 /* r376: THE RARITY PALETTE — one map for every surface that speaks rarity (badge
    rings, the stats-wall .rr tags + legend). Classic gaming ladder: common green ·

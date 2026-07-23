@@ -95,11 +95,13 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
 
   const b4 = await page.evaluate(() => {
     rankedInfographic();
+    // r407: the Ranked Unlocked card (themes.js hkRankedCard) — names the placement series
+    // and carries the primary Enter Ranked button.
     const has = /placement series/i.test(document.body.textContent);
-    const go = document.getElementById('rankedGo');
-    let m = go; while (m && m.parentElement !== document.body) m = m.parentElement;
+    const hasBtn = !!document.getElementById('hkruGo');
+    const m = document.getElementById('hkru-modal') || document.getElementById('rankedModal');
     if (m) m.remove();
-    return has;
+    return has && hasBtn;
   });
   ok(b4, 'enter-ranked infographic names the placement series');
 

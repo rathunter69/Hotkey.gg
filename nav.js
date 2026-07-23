@@ -328,6 +328,31 @@
     }catch(e){}
   }
 
+  /* r407 (Wolf): LOGIN NUDGE — once a signed-in player is eligible (Level 10, mirroring
+     lb.js RANKED_MIN_LVL) but hasn't opted into ranked, surface the "Ranked Unlocked" card.
+     Fires at most once per session; "maybe later" snoozes it 3 days; entering ranked ends it.
+     Suppressed on the leaderboard (the your-card gate already prompts there). */
+  const RANKED_MIN_LVL = 10;
+  async function maybeRankedNudge(){
+    try{
+      if(/leaderboard\./.test(location.pathname)) return;
+      if(sessionStorage.getItem('hk_ru_nudged')==='1') return;
+      if(localStorage.getItem('hk_ranked')==='1') return;
+      const snooze=parseInt(localStorage.getItem('hk_ru_snooze')||'0',10)||0;
+      if(snooze>Date.now()) return;
+      const d=await loadProfileData();
+      const lvl=levelOf(computeXP(d, d.myRuns, d.mySessions)).lvl;
+      if(lvl < RANKED_MIN_LVL || !window.hkRankedCard) return;
+      sessionStorage.setItem('hk_ru_nudged','1');
+      window.hkRankedCard({
+        reason:'Level '+lvl+' reached',
+        onEnter:()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){}
+          try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} try{ navRank(); }catch(e){} },
+        onLater:()=>{ try{ localStorage.setItem('hk_ru_snooze', String(Date.now()+3*24*3600*1000)); }catch(e){} }
+      });
+    }catch(e){}
+  }
+
   // Rank pill: fetch standing once per session (10-min cache shared with index.html via sessionStorage)
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
@@ -360,6 +385,7 @@
       el.innerHTML='<span>Unranked</span>';
       el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
       el.title='not in ranked \u2014 enter from the leaderboard'; el.onclick=openProfile;
+      maybeRankedNudge();   // r407 (Wolf): nudge eligible players who haven't opted in
       return;
     }
     try{

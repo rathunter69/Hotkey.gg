@@ -709,33 +709,22 @@ function heroHtml(){
 }
 
 function rankedInfographic(){
-  let m=document.getElementById('rankedModal');
-  if(!m){ m=document.createElement('div'); m.id='rankedModal';
-    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px';
-    document.body.appendChild(m); }
-  const T=window.HK_RANK.TIERS;
-  let rows='';
-  T.forEach(t=>{ rows+='<div style="display:flex;align-items:center;gap:10px;padding:6px 2px;font-family:var(--mono);font-size:12px">'+
-    '<span class="'+t.cls+'" style="display:inline-flex;color:inherit;">'+(window.rankEmblem?window.rankEmblem(t.name,20):'')+'</span>'+
-    '<span>'+t.name+'</span><span style="margin-left:auto;color:var(--faint);font-size:10px">'+(t.att?t.att+' drills · top '+Math.round(Math.min(1,t.pct)*100)+'%':'start here')+'</span></div>'; });
-  /* r406 (Wolf): the old panel had no height cap or inner scroll, so on a short viewport the
-     tall copy overflowed the center-aligned parent and the buttons fell off-screen ("thin,
-     runs past the page, no button"). Flex column: header + SCROLLABLE tier list + pinned
-     footer, capped at the viewport. Copy tightened to one pithy paragraph. */
-  m.innerHTML='<div class="panel" style="max-width:440px;width:100%;max-height:calc(100vh - 40px);display:flex;flex-direction:column;padding:0;overflow:hidden">'+
-    '<div style="padding:20px 22px 12px"><h4 style="margin:0 0 10px">welcome to ranked</h4>'+
-    '<div style="font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:1.65">'+
-    'Post a time on the <b>placement series</b> — five standard boards, one per band — and you get a rank. Your rank is your '+
-    '<b>average placement</b> across the boards you enter — stabilized so a couple of fast drills can’t '+
-    'vault you, and big fields count more than small ones. Each tier has <b>Bottom / Middle / Top</b> buckets; '+
-    'clear the band to promote. Ranks are live — they move as others improve.</div></div>'+
-    '<div style="overflow-y:auto;padding:2px 22px 6px;flex:1;min-height:0">'+rows+'</div>'+
-    '<div style="display:flex;gap:10px;padding:14px 22px 18px;border-top:1px solid var(--line)">'+
-    '<button class="tab on" id="rankedGo" style="flex:1;text-align:center;font-size:13px;padding:11px">Enter Ranked ⚔</button>'+
-    '<button class="tab" id="rankedWait" style="padding:11px 18px;font-size:12px">Not yet</button></div></div>';
-  document.getElementById('rankedGo').onclick=()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){} try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} m.remove(); load(); };
-  document.getElementById('rankedWait').onclick=()=>m.remove();
-  m.addEventListener('click',e=>{ if(e.target===m) m.remove(); },{once:true});
+  /* r407 (Wolf): the "Ranked Unlocked" card — the shared themes.js component (Variant C:
+     hero crest, 8-tier ladder, place/rank/climb beats, bucket byline). Opting in re-renders
+     the board (load()). Falls back to a bare opt-in if the component is missing. */
+  let reason='you’ve unlocked ranked';
+  try{ const me=(DATA&&DATA.meId&&DATA.userStat[DATA.meId])||null;
+    if(me){ const xp0=window.HK_RANK.computeXP(DATA.fRuns.filter(x=>x.user_id===DATA.meId),
+        {t10:me.t10,pod:me.pod,crowns:me.crowns}, DATA.fSessions.filter(x=>x.user_id===DATA.meId));
+      reason='Level '+levelOf(xp0).lvl+' reached'; }
+  }catch(e){}
+  if(window.hkRankedCard){
+    window.hkRankedCard({ reason,
+      onEnter:()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){} try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} load(); } });
+    return;
+  }
+  // fallback: bare opt-in (component not loaded)
+  try{ localStorage.setItem('hk_ranked','1'); window.hkStatePush&&window.hkStatePush(); load(); }catch(e){}
 }
 
 function ladderHtml(){
