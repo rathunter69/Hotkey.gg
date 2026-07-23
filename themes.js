@@ -819,13 +819,13 @@ window.HK_FRAMES = [
   {id:'plaque-gold',   name:'Gold Plaque',     tier:'rare',
    desc:'beveled gold + gemset corners',              earn:'reach First-Year Analyst'},
   {id:'plaque-plat',   name:'Platinum Plaque', tier:'rare',
-   desc:'beveled platinum + gemset corners',          earn:'reach VP'},
-  {id:'plaque-diam',   name:'Diamond Plaque',  tier:'rare',
-   desc:'beveled diamond + gemset corners',           earn:'reach Second-Year Analyst'},
+   desc:'icy platinum theme card + polished sheen',    earn:'reach VP'},
+  {id:'plaque-diam',   name:'Diamond Plaque',  tier:'legendary',
+   desc:'brilliant prismatic diamond theme card',      earn:'reach Second-Year Analyst'},
   {id:'foil',          name:'Foil',            tier:'epic',
    desc:'conic sheen + fan corners',                  earn:'win a Daily Challenge or earn a certificate'},
   {id:'heraldic',      name:'Heraldic',        tier:'legendary',
-   desc:'crimson filigree + lozenge medallion',       earn:'Daily Dynasty (5 daily wins) or Triple Crown (3 certificates)'},
+   desc:'crimson-and-gold theme card — the MD crest',  earn:'reach MD, or Daily Dynasty (5 daily wins) / Triple Crown (3 certificates)'},
   {id:'charter',       name:'Charter Analyst', tier:'rare',
    desc:'steel-navy laurels — the beta-tester class', earn:'account created during the beta'},
   {id:'bone',          name:'Bone',            tier:'egg',
@@ -904,10 +904,10 @@ window.hkFrameEarned = function(id, u){
     case 'plaque-bronze': return tb >= 1;   // Candidate — bronze crest, bronze plaque
     case 'plaque-silver': return tb >= 2;   // Summer Analyst
     case 'plaque-gold':   return tb >= 3;   // First-Year Analyst
-    case 'plaque-plat':   return tb >= 5;   // VP (MD is a higher rung — counts too)
+    case 'plaque-plat':   return tb >= 5;   // VP
     case 'plaque-diam':   return tb >= 7;   // Second-Year Analyst — the true final boss
     case 'foil':          return (u.dailyWins|0) >= 1 || (u.certs|0) >= 1;
-    case 'heraldic':      return (u.dailyWins|0) >= 5 || (u.certs|0) >= 3;
+    case 'heraldic':      return tb >= 6 || (u.dailyWins|0) >= 5 || (u.certs|0) >= 3;   // r404.4 (Wolf): heraldic IS the MD card — reach MD earns it (+ the Dynasty/Triple-Crown paths)
     case 'charter':       return !!u.charter;
     case 'bone':          return !!u.perfectRun;
     /* r385 card skins — earn thresholds off the same signals (lvl/tierBest/dailyWins/
@@ -1197,7 +1197,18 @@ window.hkFrameOrnaments = (function(){
     /* r391 (Wolf) chapter/cert capstone skins */
     architect:    ['△ ARCHITECT','#0a1424','linear-gradient(120deg,#e6c86e,#b8892f)','#e0b45a','draft'],  /* r393 (Wolf): ⟁ fell back to a ⚠-looking glyph in most fonts — a clean drafting triangle reads right */
     boutique:     ['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)','#d8b25a','quilt'],   /* r404.2 (Wolf): quilted monogram lattice — foundational redesign, distinct from the gold-dust skins */
-    emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','emerald']
+    emerald:      ['❂ EMERALD','#06231a','linear-gradient(120deg,#5fe0a6,#2f8f66)','#4fd89a','emerald'],
+    /* r404.3/.4 (Wolf #96): the legacy RANK plaques + prestige frames, reborn as full
+       theme cards (were ornament-frames). Themed interior + a sheen or holo sweep. */
+    'plaque-bronze':['◆ BRONZE',  '#1a0f07','linear-gradient(120deg,#e0a35a,#7a4a1e)','#e0a35a','sheen'],
+    'plaque-silver':['◆ SILVER',  '#101318','linear-gradient(120deg,#e4ebf2,#8a929c)','#e4ebf2','sheen'],
+    'plaque-gold':  ['◆ GOLD',    '#1a1404','linear-gradient(120deg,#f5d878,#a5791f)','#f5d878','sheen'],
+    'plaque-plat':  ['◆ PLATINUM','#0a0f16','linear-gradient(120deg,#eaf4ff,#7fa8d8)','#dbecff','sheen'],   /* r404.4 (Wolf): cooler, icy platinum (VP) */
+    'plaque-diam':  ['◆ DIAMOND', '#0a1418','linear-gradient(120deg,#dff4ff,#9be0f7,#c9b8ff)','#eaf8ff','sheen'],   /* Second-Year — the brilliant final boss */
+    engraved:       ['ENGRAVED',  '#12141a','linear-gradient(120deg,#c8ccd4,#5a5e68)','#c8ccd4','sheen'],
+    foil:           ['◆ FOIL',    '#0a1418','linear-gradient(135deg,#ffffff,#9be0f7,#7fa8ff,#c9a8ff,#ffc2e8)','#eaf8ff','foilfx'],   /* r404.5 (Wolf): "super diamond" holographic — diamond palette, brilliant edges, NOT space */
+    heraldic:       ['⬧ HERALDIC','#1a090b','linear-gradient(120deg,#f0c060,#9c2a1c)','#e6b84a','heraldic'],   /* r404.5 (Wolf): the MD crest — glowing lozenge + gold embers + grand glint */
+    charter:        ['CHARTER',   '#0e1626','linear-gradient(120deg,#aab8d4,#3a4a68)','#aab8d4','sheen']
   };
   return function(id, opts){
     const M=window.HK_METALS||{};
@@ -1341,6 +1352,20 @@ window.hkInitCardFx = function(root){
     function onyxfx(w,h){const veins=[];for(let i=0;i<5;i++){const pts=[];let x=R(0,w),y=R(-.1,.05)*h;
       for(let s=0;s<8;s++){pts.push({x,y});x+=R(-.18,.18)*w;y+=h/6.5;} veins.push({pts,ph:R(0,6.28),sp:R(.4,.9)});}
       return{veins};}
+    /* r404.3 (Wolf #96) — polished-metal sheen for the rank plaques: a bright highlight bar
+       rakes diagonally across the metal every few seconds. Neutral white so it reads on any
+       plaque colour (bronze/silver/gold/platinum/diamond). */
+    function sheen(w,h){return{};}
+    /* r404.5 (Wolf) — HERALDIC / the MD crest: the accoutrements of the old frame, reborn
+       for the theme card — a glowing gold lozenge crest, rising gold embers, and a grand
+       periodic gilt glint. */
+    function heraldicfx(w,h){const n=Math.round(w/6)+14,sparks=[];
+      for(let i=0;i<n;i++)sparks.push({x:R(0,w),y:R(0,h),r:R(.6,2),vy:R(-.5,-.14),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.3)});
+      return{sparks,cx:w*.5,cy:h*.46,rad:Math.min(w,h)*.2};}
+    /* r404.5 (Wolf) — FOIL: a "super diamond" holographic card matching the Second-Year
+       (diamond) palette — a prismatic rainbow sheen with brilliant-cut sparkles hugging the
+       edges. Deliberately NOT starfield (constellation + pro already own space). */
+    function foilfx(w,h){return{};}   // stateless — perimeter glints + prismatic wash computed from time
     function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
     /* r404 (Wolf #95) — NAVIGATOR star-chart: stars joined by faint constellation lines
        with a light pulse tracing each edge, under a slow-rotating compass reticle. */
@@ -1384,9 +1409,10 @@ window.hkInitCardFx = function(root){
       let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?facet(S.w,S.h)
         : kind==='emerald'?facet(S.w,S.h) : kind==='neon'?neonfx(S.w,S.h) : kind==='sheet'?sheetfx(S.w,S.h)
         : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
+        : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
         : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
-        : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h)
+        : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
         : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
       sys.push({cv,kind,S,parts});
@@ -1487,6 +1513,48 @@ window.hkInitCardFx = function(root){
           if(!reduce){ const gp=((t/3000*v.sp+v.ph/6.28)%1), idx=gp*(v.pts.length-1), i0=Math.floor(idx), f=idx-i0;
             const p0=v.pts[i0], p1=v.pts[Math.min(v.pts.length-1,i0+1)], gx=p0.x+(p1.x-p0.x)*f, gy=p0.y+(p1.y-p0.y)*f;
             ctx.beginPath(); ctx.arc(gx,gy,2.2*dpr,0,6.28); ctx.fillStyle='rgba(255,240,190,.92)'; ctx.shadowBlur=8*dpr; ctx.shadowColor='rgba(245,205,110,.9)'; ctx.fill(); ctx.shadowBlur=0; } } }
+      else if(o.kind==='sheen'){
+        // polished-metal highlight bar rakes diagonally every ~4.5s
+        const gp=reduce?.5:((t/4500)%1);
+        if(gp<.4){ const gx=(-.15+gp*1.5)*w, a=(1-Math.abs(gp-.2)/.2)*(reduce?.12:.4);
+          ctx.globalCompositeOperation='lighter';
+          const g=ctx.createLinearGradient(gx-.14*w,0,gx+.14*w,h);
+          g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(.5,'rgba(255,255,255,'+a+')'); g.addColorStop(1,'rgba(255,255,255,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } }
+      else if(o.kind==='heraldic'){ const P=o.parts;
+        // rising gold embers
+        for(const s of P.sparks){ if(!reduce){ s.y+=s.vy*dpr; s.x+=(s.drift+Math.sin(t/1100+s.ph)*.3)*dpr; if(s.y<-4){s.y=h+4;s.x=R(0,w);} }
+          const a=reduce?.5:(.2+.55*(.5+.5*Math.sin(t/650*s.sp+s.ph)));
+          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(245,205,110,'+a+')';ctx.shadowBlur=6*dpr;ctx.shadowColor='rgba(230,120,60,.8)';ctx.fill(); }
+        ctx.shadowBlur=0; ctx.globalAlpha=1;
+        // the heraldic lozenge crest — a gold diamond-in-diamond, glowing on a slow pulse
+        const pulse=reduce?.55:(.35+.4*(.5+.5*Math.sin(t/1800))), rad=P.rad*dpr;
+        ctx.save(); ctx.translate(P.cx,P.cy);
+        ctx.strokeStyle='rgba(240,196,90,'+pulse+')'; ctx.lineWidth=2*dpr; ctx.shadowBlur=12*dpr; ctx.shadowColor='rgba(230,120,60,'+(pulse*.9)+')';
+        ctx.beginPath(); ctx.moveTo(0,-rad); ctx.lineTo(rad*.7,0); ctx.lineTo(0,rad); ctx.lineTo(-rad*.7,0); ctx.closePath(); ctx.stroke();
+        ctx.shadowBlur=0; ctx.lineWidth=1.2*dpr; ctx.strokeStyle='rgba(240,196,90,'+(pulse*.7)+')';
+        ctx.beginPath(); ctx.moveTo(0,-rad*.62); ctx.lineTo(rad*.44,0); ctx.lineTo(0,rad*.62); ctx.lineTo(-rad*.44,0); ctx.closePath(); ctx.stroke();
+        ctx.restore();
+        // a grand gilt glint sweeps every ~6s
+        if(!reduce){ const gp=(t/6000)%1; if(gp<.22){ const gx=(-.2+gp*1.8)*w, ga=(1-Math.abs(gp-.11)/.11)*.32;
+          ctx.globalCompositeOperation='lighter'; const g=ctx.createLinearGradient(gx-.1*w,0,gx+.1*w,h);
+          g.addColorStop(0,'rgba(250,220,150,0)');g.addColorStop(.5,'rgba(250,220,150,'+ga+')');g.addColorStop(1,'rgba(250,220,150,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } } }
+      else if(o.kind==='foilfx'){
+        // strong prismatic holographic wash — 3 rainbow bands drifting (diamond FIRE, not stars)
+        ctx.globalCompositeOperation='lighter';
+        for(let b=0;b<3;b++){ const off=reduce?.5:((t/3200+b/3)%1), cx=(-.3+off*1.6)*w, hue=(t/22+b*120)%360;
+          const g=ctx.createLinearGradient(cx-.32*w,0,cx+.32*w,h);
+          g.addColorStop(0,'hsla('+hue+',95%,72%,0)'); g.addColorStop(.5,'hsla('+hue+',95%,74%,'+(reduce?.08:.17)+')'); g.addColorStop(1,'hsla('+((hue+90)%360)+',95%,72%,0)');
+          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
+        ctx.globalCompositeOperation='source-over';
+        // brilliant-cut glints MARCHING around the perimeter — the diamond edges catching light
+        const per=2*(w+h), NG=12;
+        for(let i=0;i<NG;i++){ const pp=((reduce?i/NG:(t/2600+i/NG)%1))*per; let x,y;
+          if(pp<w){x=pp;y=0;} else if(pp<w+h){x=w;y=pp-w;} else if(pp<2*w+h){x=w-(pp-w-h);y=h;} else {x=0;y=h-(pp-2*w-h);}
+          const tw=.5+.5*Math.sin(t/280+i*1.7), a=reduce?.7:(.28+.62*tw), r=(1.1+tw*1.7)*dpr;
+          ctx.beginPath();ctx.arc(x,y,r,0,6.28);ctx.fillStyle='rgba(240,250,255,'+a+')';ctx.shadowBlur=9*dpr;ctx.shadowColor='rgba(170,220,255,.95)';ctx.fill(); }
+        ctx.shadowBlur=0; }
       else if(o.kind==='lux'){
         const off=reduce?.5:((t/5000)%1), lx=off*w;   // champagne spotlight travels L→R
         const rg=ctx.createRadialGradient(lx,h*.42,0,lx,h*.42,w*.42);

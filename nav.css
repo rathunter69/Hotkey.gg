@@ -422,70 +422,55 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   background:linear-gradient(105deg, transparent, rgba(255,255,255,.14) 42%, rgba(255,255,255,.30) 50%, rgba(255,255,255,.14) 58%, transparent);
   transform:translateX(0) rotate(8deg); opacity:0}
 
-/* 1 · ENGRAVED (common) — certificate corners + edge ticks */
-.hk-frame-engraved.hk-frame-engraved{border:1px solid #565860}
-.hk-frame-engraved.hk-frame-engraved::before{content:""; position:absolute; inset:5px; border:1px solid #4a4c52;
-  border-radius:10px; pointer-events:none}
-.hk-frame-engraved.hk-frame-engraved::after{content:""; position:absolute; inset:9px; border:1px dashed #3f4147;
-  border-radius:7px; pointer-events:none; opacity:.8}
+/* 1 · ENGRAVED (common) — r404.4 (Wolf #96): brushed-steel certificate THEME card. */
+.hk-frame-engraved.hk-frame-engraved{--text:#e9ebf1;--muted:#969cab;--line:#3a3d45;--accent:#c8ccd4;--accent-dim:#6a6e78; color:#e9ebf1;
+  border:2px solid transparent; box-shadow:0 0 20px rgba(0,0,0,.25),0 20px 60px rgba(0,0,0,.55);
+  background:radial-gradient(ellipse at 30% 4%,rgba(200,204,212,.1),transparent 55%),linear-gradient(#14161c,#101218) padding-box, linear-gradient(150deg,#dfe3ea,#9aa0ac 40%,#4a4e58 72%,#c8ccd4) border-box}
+.hk-frame-engraved.hk-frame-engraved::before{content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:0;
+  background:repeating-linear-gradient(115deg,transparent 0 5px,rgba(255,255,255,.03) 5px 6px)}
 
 /* 2 · METAL PLAQUES (rare) — beveled metal border (padding-box/border-box gradient
    trick keeps the card surface intact), brushed texture overlay, corner screws +
    tier tab from the ornament HTML. One class per metal; hexes = HK_METALS. */
+/* r404.3 (Wolf #96): the rank plaques are FULL THEME CARDS now (were ornament-frames) —
+   a dark metallic interior (inner panels stay legible) inside a polished metal border,
+   with a sheen canvas raking across. One class per metal; sizes like every other skin. */
 .hk-frame-plaque-bronze.hk-frame-plaque-bronze, .hk-frame-plaque-silver.hk-frame-plaque-silver,
 .hk-frame-plaque-gold.hk-frame-plaque-gold, .hk-frame-plaque-plat.hk-frame-plaque-plat,
-.hk-frame-plaque-diam.hk-frame-plaque-diam{border:5px solid transparent;
-  box-shadow:0 22px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.35)}
-.hk-frame-plaque-bronze.hk-frame-plaque-bronze::before, .hk-frame-plaque-silver.hk-frame-plaque-silver::before,
-.hk-frame-plaque-gold.hk-frame-plaque-gold::before, .hk-frame-plaque-plat.hk-frame-plaque-plat::before,
-.hk-frame-plaque-diam.hk-frame-plaque-diam::before{content:""; position:absolute; inset:-5px;
-  border-radius:inherit; pointer-events:none;
-  background:repeating-linear-gradient(115deg, transparent 0 3px, rgba(255,255,255,.045) 3px 4px);
-  mix-blend-mode:overlay}
-.hk-frame-plaque-bronze.hk-frame-plaque-bronze{background:
-  linear-gradient(var(--surface), var(--surface)) padding-box,
-  linear-gradient(165deg,#f4c088,#cf8e4c 30%,#95602c 55%,#432a12 75%,#cf8e4c) border-box}
-.hk-frame-plaque-silver.hk-frame-plaque-silver{background:
-  linear-gradient(var(--surface), var(--surface)) padding-box,
-  linear-gradient(165deg,#f4f7fc,#c9d0dc 30%,#8e96a5 55%,#454c59 75%,#c9d0dc) border-box}
-.hk-frame-plaque-gold.hk-frame-plaque-gold{background:
-  linear-gradient(var(--surface), var(--surface)) padding-box,
-  linear-gradient(165deg,#ffefb3,#f4c754 30%,#bf8e20 55%,#523a05 75%,#f4c754) border-box}
-.hk-frame-plaque-plat.hk-frame-plaque-plat{background:
-  linear-gradient(var(--surface), var(--surface)) padding-box,
-  linear-gradient(165deg,#e0fdf7,#86dcca 30%,#3d9c8e 55%,#173f3a 75%,#86dcca) border-box}
-.hk-frame-plaque-diam.hk-frame-plaque-diam{background:
-  linear-gradient(var(--surface), var(--surface)) padding-box,
-  linear-gradient(165deg,#f4fdff,#9be0f7 30%,#4aa6cc 55%,#153c50 75%,#9be0f7) border-box}
+.hk-frame-plaque-diam.hk-frame-plaque-diam{border:2px solid transparent;
+  box-shadow:0 0 20px rgba(0,0,0,.25),0 20px 60px rgba(0,0,0,.55)}
+.hk-frame-plaque-bronze.hk-frame-plaque-bronze{--text:#f4dcc0;--muted:#b08a64;--line:#5a3a1e;--accent:#e0a35a;--accent-dim:#a5701f; color:#f4dcc0;
+  background:radial-gradient(ellipse at 30% 4%,rgba(224,163,90,.16),transparent 55%),linear-gradient(#1a0f07,#160c05) padding-box, linear-gradient(150deg,#f4c088,#cf8e4c 32%,#95602c 60%,#e0a35a) border-box}
+.hk-frame-plaque-silver.hk-frame-plaque-silver{--text:#eef1f6;--muted:#9aa2ad;--line:#3a4048;--accent:#e4ebf2;--accent-dim:#9aa2ad; color:#eef1f6;
+  background:radial-gradient(ellipse at 30% 4%,rgba(228,235,242,.14),transparent 55%),linear-gradient(#12151a,#0e1116) padding-box, linear-gradient(150deg,#f4f7fc,#c9d0dc 32%,#8e96a5 60%,#e4ebf2) border-box}
+.hk-frame-plaque-gold.hk-frame-plaque-gold{--text:#f6e6b0;--muted:#c0a860;--line:#5a4410;--accent:#f5d878;--accent-dim:#bf8e20; color:#f6e6b0;
+  background:radial-gradient(ellipse at 30% 4%,rgba(245,216,120,.16),transparent 55%),linear-gradient(#1a1404,#140f02) padding-box, linear-gradient(150deg,#ffefb3,#f4c754 32%,#bf8e20 60%,#f5d878) border-box}
+/* r404.4 (Wolf): PLATINUM (VP) — cooler, an icy blue-white platinum with a frost cast. */
+.hk-frame-plaque-plat.hk-frame-plaque-plat{--text:#e6f2ff;--muted:#93b0cc;--line:#2e4256;--accent:#dbecff;--accent-dim:#7fa8d8; color:#e6f2ff;
+  background:radial-gradient(ellipse at 30% 4%,rgba(150,200,255,.18),transparent 55%),linear-gradient(#0a0f16,#070b12) padding-box, linear-gradient(150deg,#eaf4ff,#a8c8e8 32%,#5a82ad 60%,#c8e2ff) border-box}
+/* r404.4 (Wolf): DIAMOND (Second-Year, the final boss) — brilliant full-spectrum prism. */
+.hk-frame-plaque-diam.hk-frame-plaque-diam{--text:#eaf8ff;--muted:#9fc8dc;--line:#2a4a5a;--accent:#eaf8ff;--accent-dim:#8fd0e8; color:#eaf8ff;
+  background:radial-gradient(ellipse at 30% 4%,rgba(223,244,255,.2),transparent 55%),linear-gradient(#0a1418,#081014) padding-box, linear-gradient(135deg,#ffffff,#9be0f7 24%,#7fa8ff 44%,#c9a8ff 64%,#ffc2e8 82%,#dff4ff) border-box}
 
 /* 3 · FOIL (epic) — conic sheen border + fan corners + scalloped inner edge */
-.hk-frame-foil.hk-frame-foil{border:4px solid transparent; background:
-  linear-gradient(var(--surface), var(--surface)) padding-box,
-  conic-gradient(from 130deg,#8ef2df,#86dcca,#3d9c8e,#d8fff5,#8ef2df) border-box}
-.hk-frame-foil.hk-frame-foil::after{content:""; position:absolute; inset:6px; border-radius:10px;
-  pointer-events:none; opacity:.65; background:
-  radial-gradient(circle at 12px 12px, transparent 10px, rgba(142,242,223,.16) 10.5px 11.5px, transparent 12px),
-  radial-gradient(circle at calc(100% - 12px) 12px, transparent 10px, rgba(142,242,223,.16) 10.5px 11.5px, transparent 12px),
-  radial-gradient(circle at 12px calc(100% - 12px), transparent 10px, rgba(142,242,223,.16) 10.5px 11.5px, transparent 12px),
-  radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), transparent 10px, rgba(142,242,223,.16) 10.5px 11.5px, transparent 12px)}
-/* continuous slow sheen — a wide gradient sliding via background-position (allowed
-   channel), riding ::before so the scallops keep ::after */
-.hk-frame-foil.hk-frame-foil::before{content:""; position:absolute; inset:-4px; border-radius:inherit;
-  pointer-events:none; mix-blend-mode:screen; opacity:.55; background:
-  linear-gradient(115deg, transparent 30%, rgba(142,242,223,.10) 42%, rgba(216,255,245,.22) 50%, rgba(142,242,223,.10) 58%, transparent 70%);
-  background-size:300% 100%; background-position:0% 0}
+/* r404.5 (Wolf): FOIL → a "super diamond" holographic THEME card — the diamond/Second-Year
+   palette (icy prismatic), a brilliant full-spectrum edge, and a holographic sheen. Not the
+   old teal, not purple, not starfield (constellation + pro already own space). */
+.hk-frame-foil.hk-frame-foil{--text:#eaf6ff;--muted:#9fc4dc;--line:#274458;--accent:#eaf8ff;--accent-dim:#8fd0e8; color:#eaf6ff;
+  border:2px solid transparent; box-shadow:0 0 24px rgba(140,200,255,.22),0 20px 60px rgba(0,0,0,.6);
+  background:radial-gradient(ellipse at 28% 6%,rgba(150,210,255,.22),transparent 55%),linear-gradient(#0a1418,#08101a) padding-box, linear-gradient(135deg,#ffffff,#9be0f7 22%,#7fa8ff 44%,#c9a8ff 66%,#ffc2e8 84%,#eaf8ff) border-box}
+.hk-frame-foil .pc-name span,.hk-frame-foil .pub-nm{color:#eaf6ff; text-shadow:0 0 10px rgba(150,210,255,.5)}
 
-/* 4 · HERALDIC (legendary) — crimson filigree + lozenge medallion */
-.hk-frame-heraldic.hk-frame-heraldic{border:2px solid #9c2a1c;
-  box-shadow:0 22px 60px rgba(0,0,0,.45), 0 0 34px rgba(230,88,67,.28), inset 0 0 44px rgba(230,88,67,.07)}
+/* 4 · HERALDIC (legendary) — r404.4 (Wolf #96): crimson-and-gold heraldic THEME card. */
+.hk-frame-heraldic.hk-frame-heraldic{--text:#f6e2d2;--muted:#c99a86;--line:#5a221a;--accent:#e6b84a;--accent-dim:#9c2a1c; color:#f6e2d2;
+  border:2px solid transparent; box-shadow:0 0 24px rgba(230,88,67,.24),0 20px 60px rgba(0,0,0,.6);
+  background:radial-gradient(ellipse at 30% 4%,rgba(230,120,60,.18),transparent 55%),linear-gradient(#1a090b,#150608) padding-box, linear-gradient(150deg,#f0c060,#c04a2a 40%,#7a1810 72%,#e6b84a) border-box}
 
-/* 5 · CHARTER (rare) — the beta-tester frame: steel-navy bevel, laurel corners,
-   BETA TESTER tab. Deliberately animation-free — a quiet uniform. */
-.hk-frame-charter.hk-frame-charter{border:3px solid transparent;
-  box-shadow:0 22px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(200,212,230,.28);
-  background:
-  linear-gradient(var(--surface), var(--surface)) padding-box,
-  linear-gradient(165deg,#c8d4e6,#8fa3c0 30%,#3d4c66 60%,#22304a 80%,#8fa3c0) border-box}
+/* 5 · CHARTER (rare) — r404.4 (Wolf #96): re-themed as a steel-navy "beta charter"
+   THEME card, quiet and uniform (still animation-light: just a slow sheen). */
+.hk-frame-charter.hk-frame-charter{--text:#dce6f5;--muted:#8ea0bc;--line:#2a3a54;--accent:#aab8d4;--accent-dim:#5a6d90; color:#dce6f5;
+  border:2px solid transparent; box-shadow:0 0 20px rgba(0,0,0,.25),0 20px 60px rgba(0,0,0,.55);
+  background:radial-gradient(ellipse at 30% 4%,rgba(140,160,200,.12),transparent 55%),linear-gradient(#0e1626,#0a1120) padding-box, linear-gradient(150deg,#c8d4e6,#7f92b4 40%,#33445e 72%,#aab8d4) border-box}
 
 /* 6 · BONE (easter egg) — re-scope the palette vars on the card so every inner
    var() reads bone-on-bone; the frame itself stays PERFECTLY still (that's the
@@ -500,14 +485,9 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-bone .pc-name{font-family:'Copperplate','Copperplate Gothic Light','Trajan Pro',serif;
   letter-spacing:.18em; font-weight:600}
 
-/* r389 (Wolf): the dark legacy frames were border-only — designed to wrap a card
-   that already had a surface. On the transparent unified card their interior read
-   as bare page + dark (unreadable) name. Give them a solid interior + light text
-   vars (bone-style palette re-scope) so they read like the new full-card skins. */
-.uc.hk-frame-engraved{background:linear-gradient(160deg,#282a30,#191b20); color:#e9ebf1;
-  --text:#e9ebf1; --muted:#969cab; --faint:#5e6470; --line:#3a3d45; --surface2:#22242b}
-.uc.hk-frame-heraldic{background:linear-gradient(160deg,#241113,#180b0d); color:#f4e8e6;
-  --text:#f4e8e6; --muted:#c9a39c; --faint:#8f6b66; --line:#4a2420; --surface2:#2a1618}
+/* r404.4 (Wolf #96): engraved/heraldic (and every legacy frame) are full theme cards
+   now — the per-skin interior rules above own the background, so the old .uc overrides
+   are retired. */
 
 /* -- ANIMATION, escalating by tier (r373, Wolf). CSS-only, compositor-cheap:
    transform / opacity / background-position ONLY — no backdrop-filter, no
@@ -659,13 +639,17 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    Translucent-black tints darken whatever the skin interior is, staying cohesive. */
 .hk-frame-circuit,.hk-frame-neon,.hk-frame-blueprint,.hk-frame-crt,.hk-frame-constellation,
 .hk-frame-vaporwave,.hk-frame-terminal,.hk-frame-pro,.hk-frame-noir,.hk-frame-frostbite,
-.hk-frame-molten,.hk-frame-founder{--surface2:rgba(0,0,0,.32); --surface:rgba(0,0,0,.4); --faint:rgba(255,255,255,.34)}
+.hk-frame-molten,.hk-frame-founder,
+.hk-frame-plaque-bronze,.hk-frame-plaque-silver,.hk-frame-plaque-gold,.hk-frame-plaque-plat,.hk-frame-plaque-diam,
+.hk-frame-engraved,.hk-frame-foil,.hk-frame-heraldic,.hk-frame-charter{--surface2:rgba(0,0,0,.32); --surface:rgba(0,0,0,.4); --faint:rgba(255,255,255,.34)}
 /* decorative crack sits BEHIND content, ambient not a slash */
 .hkf-crack{z-index:0; opacity:.7}
 /* the skin title notch — reshape the pill tab into an inlaid nameplate */
 .hk-frame-circuit .hkf-tab,.hk-frame-neon .hkf-tab,.hk-frame-blueprint .hkf-tab,.hk-frame-crt .hkf-tab,
 .hk-frame-constellation .hkf-tab,.hk-frame-vaporwave .hkf-tab,.hk-frame-terminal .hkf-tab,.hk-frame-pro .hkf-tab,
-.hk-frame-noir .hkf-tab,.hk-frame-frostbite .hkf-tab,.hk-frame-molten .hkf-tab,.hk-frame-founder .hkf-tab{
+.hk-frame-noir .hkf-tab,.hk-frame-frostbite .hkf-tab,.hk-frame-molten .hkf-tab,.hk-frame-founder .hkf-tab,
+.hk-frame-plaque-bronze .hkf-tab,.hk-frame-plaque-silver .hkf-tab,.hk-frame-plaque-gold .hkf-tab,.hk-frame-plaque-plat .hkf-tab,.hk-frame-plaque-diam .hkf-tab,
+.hk-frame-engraved .hkf-tab,.hk-frame-foil .hkf-tab,.hk-frame-heraldic .hkf-tab,.hk-frame-charter .hkf-tab{
   border:0; border-radius:0; padding:4px 16px; box-shadow:0 2px 6px rgba(0,0,0,.45);
   clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 100%,0 100%)}
 /* founder serial — inlaid in the lower-left */
@@ -681,7 +665,8 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-crt .pc-name span,.hk-frame-terminal .pc-name span,.hk-frame-crt .pub-nm,.hk-frame-terminal .pub-nm,
 .hk-frame-crt .tc-name,.hk-frame-terminal .tc-name{font-family:'VT323','Courier New',monospace; letter-spacing:1px; font-size:1.25em}
 .hk-frame-constellation .pc-name span,.hk-frame-pro .pc-name span,.hk-frame-heraldic .pc-name span,
-.hk-frame-constellation .pub-nm,.hk-frame-pro .pub-nm,.hk-frame-constellation .tc-name,.hk-frame-pro .tc-name{font-family:'Cinzel',Georgia,serif; letter-spacing:1px}
+.hk-frame-constellation .pub-nm,.hk-frame-pro .pub-nm,.hk-frame-constellation .tc-name,.hk-frame-pro .tc-name,
+[class*="hk-frame-plaque-"] .pc-name span,[class*="hk-frame-plaque-"] .pub-nm,[class*="hk-frame-plaque-"] .tc-name{font-family:'Cinzel',Georgia,serif; letter-spacing:1px}
 /* rank crest keeps its metal; a soft ring lifts it off any skin */
 [class*="hk-frame-circuit"] svg,[class*="hk-frame-neon"] svg,[class*="hk-frame-vaporwave"] svg,
 [class*="hk-frame-frostbite"] svg,[class*="hk-frame-molten"] svg,[class*="hk-frame-founder"] svg{}
