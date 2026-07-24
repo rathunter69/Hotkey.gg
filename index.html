@@ -1604,7 +1604,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=278"></script>
+<script src="drills.js?v=279"></script>
 <link rel="stylesheet" href="nav.css?v=208">
 <script src="themes.js?v=309"></script>
 
@@ -1893,7 +1893,7 @@ const CHALLENGES = {
   drill:{
     name:'Hardcode', label:'Hardcode it', par:18, parKeys:15,
     aha:'Alt E S V pastes values only — the number stays, the live link dies. (Ctrl+Alt+V lands the same dialog.)',
-    prompt:'Every number on this page is a live link into the model — break the links before it ships. Select the column, copy, paste-special values back onto itself, then color the hardcoded rows blue (hardcodes wear blue). Aim at the column, not the whole page — the margin memo below must stay live.',
+    prompt:'Every number on this page is a live link into the model — break the links before it ships. Select the output column B3:B8, copy it, and paste-special values back onto itself, then color the hardcoded cells blue (hardcodes wear blue). Aim at that column only, not the whole page — the margin memo below must stay live.',
     req:'on <em>B3</em> \u00b7 <em>ctrl+shift+\u2193</em> grabs B3:B8 \u00b7 <em>ctrl+c</em> \u00b7 <em>alt e s v \u21b5</em> values onto themselves \u00b7 then <em>alt h f c</em> \u2192 \u00d74 <em>\u21b5</em> \u2014 the dead numbers wear blue',
     guide:[
       'on B3 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> \u2014 the whole output column in one chord',
@@ -1936,7 +1936,7 @@ const CHALLENGES = {
       const blue=Object.keys(this._exp).every(k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); });
       return [
         {label:'break the links in B3:B8 \u2014 values only, and the margin memo at B10 keeps its wire', ok: dead && !!(S.cells['B10']&&S.cells['B10'].formula)},
-        {label:'Blue-font the now-hardcoded numbers in B3:B8 \u2014 blue marks dead values', ok: blue},
+        {label:'blue-font the now-hardcoded numbers in B3:B8 \u2014 blue marks dead values', ok: blue},
       ];
     }
   },
@@ -2077,18 +2077,18 @@ const CHALLENGES = {
       const acct=!!(tS&&tS.fmtStyle==='acct')&&!!(tU&&tU.fmtStyle==='acct');
       const af=!overflowsCol(S,2)&&!overflowsCol(S,5);
       return [
-        {label:'Blue the inputs on BOTH stacks — blue font marks typed data', ok:fill},
+        {label:'paint the inputs on BOTH stacks blue — blue font marks typed data', ok:fill},
         {label:'SUM both totals \u2014 one per side', ok:sum},
         {label:'bold both total rows and add a top border above them', ok:tot},
         {label:'comma-format both money BODIES, 0 decimals', ok:cf},
-        {label:'the two totals in accounting format \u2014 the S&U convention', ok:acct},
-        {label:'Autofit \u2014 no #### left on either side', ok:af},
+        {label:'cast both totals in accounting format \u2014 the S&U convention', ok:acct},
+        {label:'autofit both sides \u2014 no #### left anywhere', ok:af},
       ];
     }
   },
   housestyle:{
     name:'House Style', label:'Bring it to standard', par:47, parKeys:48,
-    aha:'Blue the inputs, keep formulas black, rule the totals — colour says typed vs computed.',
+    aha:'Blue the inputs, keep formulas black, rule the totals — color says typed vs computed.',
     prompt:'Bring a raw P&L (profit & loss — the income statement) fragment to house standard: bold the title, format the headers, color the hardcoded inputs blue so they read apart from formulas, standardize the decimals, show margins as percents, and rule off the totals. One rule to remember while you work: center across selection, never merge — merged cells break fills and sorts.',
     req(){ const R=this._R; return '<em>A1</em> <em>ctrl+b</em> \u00b7 headers <em>B2:F2</em> bold + <em>alt h b o</em> \u00b7 inputs blue via <em>alt h f c</em>: <em>'+R.inpRows.map(r=>'B'+r+':F'+r).join('</em> \u00b7 <em>')+'</em> + the buried hardcode <em>'+R.override+'</em> \u00b7 figures <em>B3:F7</em> <em>alt h k</em> + <em>alt h 9</em> \u00d72 \u00b7 margins <em>B8:F8</em> <em>ctrl+shift+%</em> \u00b7 EBITDA <em>B7:F7</em> <em>ctrl+b</em> + <em>alt h b p</em>'; },
     guide(){ const R=this._R; return [
@@ -2156,7 +2156,7 @@ const CHALLENGES = {
         {label:'bold A1 \u2014 the title carries weight', ok: !!cell('A1').bold},
         {label:'bold the header row and add a bottom border under it', ok: COL.every(c=>{ const x=cell(c+'2'); return x.bold&&x.bb; })},
         {label:'paint every INPUT blue \u2014 including the one buried at '+R.override, ok: blueOk},
-        {label:'comma-format the figures, trim the decimals', ok: comOk},
+        {label:'comma-format the figures and take the decimals to zero', ok: comOk},
         {label:'cast the margins as percents', ok: pctOk},
         {label:'bold the EBITDA row and add a top border above it', ok: COL.every(c=>{ const x=cell(c+'7'); return x.bold&&x.bt; })},
       ];
@@ -2165,7 +2165,7 @@ const CHALLENGES = {
   ruleoff:{
     name:'Rule Off', label:'Rule off the schedule', par:29, parKeys:28,
     aha:'Alt H B lays borders where you point — top, bottom, outside, or a THICK box (Alt H B T) around the headline.',
-    prompt:'Add the borders the schedule is missing and pull the EBITDA line through. Accounting standard: a line under the headers, a line above every subtotal, EBITDA pulled across, bolded and ruled, and a box around the headline figure. The sections and the headline year change every run.',
+    prompt:'Add the borders the schedule is missing and pull the EBITDA line through. Accounting standard: a line under the headers, a line above every subtotal, EBITDA pulled across, bolded and ruled, and a thick outside border around the headline figure. The sections and the headline year change every run.',
     req(){ const R=this._R; return 'headers <em>B2:'+R.LC+'2</em> <em>alt h b o</em> \u00b7 rule ABOVE both subtotals <em>B'+R.sub1+':'+R.LC+R.sub1+'</em> and <em>B'+R.sub2+':'+R.LC+R.sub2+'</em> <em>alt h b p</em> \u00b7 EBITDA <em>B'+R.g+'</em> = revenue total + cost total, fill right <em>ctrl+r</em>, <em>ctrl+b</em>, <em>alt h b p</em> \u00b7 box the headline <em>'+R.focus+'</em> <em>alt h b t</em> (thick box)'; },
     guide(){ const R=this._R; return [
       'headers get ruled UNDER: B2:'+R.LC+'2 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd>',
@@ -2229,7 +2229,7 @@ const CHALLENGES = {
         {label:'add a top border above each subtotal row \u2014 rows '+R.sub1+' and '+R.sub2, ok: cols.every(c2=>cell(c2+R.sub1).bt&&cell(c2+R.sub2).bt)},
         {label:'pull EBITDA through \u2014 formulas, not typed numbers', ok: ebOk},
         {label:'bold the EBITDA line and add a top border above it', ok: cols.every(c2=>{ const x=cell(c2+R.g); return x.bold&&x.bt; })},
-        {label:'box the MD headline at '+R.focus+' with a THICK box', ok: !!(cell(R.focus).ball && cell(R.focus).thick)},
+        {label:'add a thick outside border around the headline at '+R.focus, ok: !!(cell(R.focus).ball && cell(R.focus).thick)},
       ];
     }
   },
@@ -2393,9 +2393,9 @@ const CHALLENGES = {
     }
   },
   dress:{
-    name:'Dress the tab', label:'Full formatting pass', par:46, parKeys:47,
+    name:'Format tab', label:'Full formatting pass', par:46, parKeys:47,
     aha:'A full formatting pass is chords end to end — bold, comma, percent, border, shade, blue, italic — and EBITDA margin is EBITDA over the Revenue line right above it.',
-    prompt:'A finished analysis with zero formatting. Format it for the book: bold and rule the title, color the hardcoded inputs blue, format EBITDA margins as percents, add commas to the dollar figures, box the output, and italicize the source line. Seven formatting operations in one pass; the block moves every run.',
+    prompt:'A finished analysis with zero formatting. Format it for the book: bold and rule the title, color the hardcoded inputs blue, format EBITDA margins as percents, add commas to the dollar figures, outline the output row, and italicize the source line. Seven formatting operations in one pass; the block moves every run.',
     req(){ const R=this._R; return '<em>A1</em> bold + <em>alt h b o</em> \u00b7 header <em>A3:E3</em> \u2192 <em>alt h h</em> gray \u00b7 blue the hardcodes '+R.segRange+' + '+R.costRange+' \u2192 <em>alt h f c</em> \u00b7 EBITDA margins row '+R.mRow+' \u2192 <em>ctrl+shift+%</em> +1 dec \u00b7 figures '+R.fRange+' \u2192 <em>alt h k</em> \u00b7 circle the OUTPUT <em>A'+R.mRow+':E'+R.mRow+'</em> \u2192 <em>alt h b s</em> \u00b7 footnote <em>A'+R.mRow+'</em> \u2192 <em>ctrl+1</em> <em>e</em> \u00b7 EBITDA row \u2192 <em>ctrl+b</em> + <em>alt h b p</em> \u00b7 source <em>A'+R.srcRow+'</em> \u2192 <em>ctrl+i</em>'; },
     guide(){ const R=this._R; return [
       'the title \u00b7 <em>A1</em> \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> \u2014 bold, and a rule underneath',
@@ -2477,15 +2477,15 @@ const CHALLENGES = {
       const dressOk=(()=>{ for(let c=1;c<=5;c++){ const x=S.cells[colLetter(c)+R.tRow]; if(!x||!x.bold||!x.bt) return false; } return true; })();
       const srcOk=(()=>{ const s=S.cells['A'+R.srcRow]; return !!(s&&s.it); })();
       return [
-        {label:'Bold A1 and rule it \u2014 weight, then a bottom border', ok:titleOk},
-        {label:'Shade the header band A3:E3 gray \u2014 the Gray (header) fill', ok:hdrFillOk},
-        {label:'Blue the hardcodes \u2014 the segment revenues ('+R.segRange+') and the cost line ('+R.costRange+')', ok:blueOk},
-        {label:'Percent the EBITDA margins, one decimal, on '+R.mRowRange, ok:pctOk},
-        {label:'Comma the dollar figures ('+R.fRange+'); negatives read as (parens)', ok:comOk},
-        {label:'Circle the output row around A'+R.mRow+':E'+R.mRow, ok:circleOk},
-        {label:'Footnote the margin label \u2014 a superscript \u00b9 on A'+R.mRow, ok:footOk},
-        {label:'Dress the EBITDA line \u2014 bold A'+R.tRow+':E'+R.tRow+' with a rule above', ok:dressOk},
-        {label:'Italicize the source line on A'+R.srcRow, ok:srcOk},
+        {label:'bold A1 and add a bottom border under it', ok:titleOk},
+        {label:'shade the header band A3:E3 gray \u2014 the Gray (header) fill', ok:hdrFillOk},
+        {label:'paint the hardcodes blue \u2014 the segment revenues ('+R.segRange+') and the cost line ('+R.costRange+')', ok:blueOk},
+        {label:'percent the EBITDA margins, one decimal, on '+R.mRowRange, ok:pctOk},
+        {label:'comma the dollar figures ('+R.fRange+'); negatives read as (parens)', ok:comOk},
+        {label:'add an outside border around the output row A'+R.mRow+':E'+R.mRow, ok:circleOk},
+        {label:'footnote the margin label \u2014 a superscript \u00b9 on A'+R.mRow, ok:footOk},
+        {label:'bold the EBITDA line A'+R.tRow+':E'+R.tRow+' and add a top border above it', ok:dressOk},
+        {label:'italicize the source line on A'+R.srcRow, ok:srcOk},
       ];
     }
   },
@@ -2534,7 +2534,7 @@ const CHALLENGES = {
     }
   },
   anchor:{
-    name:'Anchors', label:'Pin it with F4', par:16, parKeys:13,
+    name:'Anchors', label:'Pin the reference', par:16, parKeys:13,
     aha:'F4 cycles the anchors — $A$1 locks both, A$1 the row, $A1 the column; one formula fills the grid.',
     prompt:'Fill a 3×3 revenue grid from one formula. Price points run across the top, volumes down the side. A reference has four lock states — pin the volume column with $B, pin the price row with $3, and the fill builds the other eight cells. The same anchoring runs every sensitivity table later.',
     req(){ const o=this._o; return '<em>'+o.tl+'</em> · =B'+o.r0+' <em>F4 F4 F4</em> → $B'+o.r0+' · * · C'+o.hr+' <em>F4 F4</em> → C$'+o.hr+' · <em>↵</em> · fill '+o.col+' ↓ · fill '+o.grid+' →'; },
@@ -2583,7 +2583,7 @@ const CHALLENGES = {
       }
       return [
         {label:'pin the driver formula both ways — $B locks the volume, $'+o.hr+' locks the price row', ok: pinOk},
-        {label:'run the grid from ONE formula — nine cells live, every price × volume right', ok: gridOk},
+        {label:'fill the grid — all nine cells live, every price × volume right', ok: gridOk},
       ];
     }
   },
@@ -2916,7 +2916,7 @@ const CHALLENGES = {
       return [
         {label:'flag presence down C4:C10 — live COUNTIF against the finance list, no zeros left', ok: flagsOk},
         {label:'bring the missing deal into finance — name AND the book amount (D10:E10)', ok: missOk},
-        {label:'Drive every Δ to 0 (F4:F10) — INDEX/MATCH the other system, never retype', ok: diffOk},
+        {label:'drive every Δ to 0 (F4:F10) — INDEX/MATCH the other system, never retype', ok: diffOk},
       ];
     }
   },
@@ -2972,7 +2972,7 @@ const CHALLENGES = {
       return [
         {label:'group each quarter’s months — three groups, exactly the detail rows', ok: o.blocks.every(covered) && gs.length===3},
         {label:'fold all three away; the ⊞ marks where the detail lives', ok: o.blocks.every(folded)},
-        {label:'Keep the quarter-total rows visible, their SUM formulas intact', ok: subsOk},
+        {label:'leave the quarter-total rows out of the folds — visible, their SUM formulas intact', ok: subsOk},
       ];
     }
   },
@@ -3028,7 +3028,7 @@ const CHALLENGES = {
       const hidOk=o.rows.every(x=> x.st==='Open' ? !(S.hidden&&S.hidden.has(x.r)) : !!(S.hidden&&S.hidden.has(x.r)) );
       const a=S.cells['B'+o.ansR];
       return [
-        {label:'arm the AutoFilter on the header row, with the cursor on row 3', ok: armed},
+        {label:'arm the AutoFilter across the header row (row 3)', ok: armed},
         {label:'drop Closed and Dead through the Status picker on C3; only Open rows stay', ok: armed && hidOk},
         {label:'type the largest OPEN size into B'+o.ansR+' \u2014 read it straight off the filtered view', ok: !!(a && Math.abs((+a.value||0)-o.maxOpen)<0.5)},
       ];
@@ -3096,7 +3096,7 @@ const CHALLENGES = {
         return !!(c&&c.formula&&sumishF(c.formula)&&typeof c.value==='number'&&Math.abs(c.value-o.tot[cl])<0.5); });
       const boldOk=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8']; return !!(c&&c.bold); });
       return [
-        {label:'Run Go To Special \u2192 Constants to mark every hardcoded number', ok:(S.markN||0)>=1},
+        {label:'run Go To Special \u2192 Constants to mark every hardcoded number', ok:(S.markN||0)>=1},
         {label:'relink the three hardcodes \u2014 prior year \u00d7 (1 + growth); formulas own the calc block again', ok: fixed},
         {label:'total the corrected build \u2014 =SUM(B3:B7) at B8, fill B8:D8 across', ok: footed},
         {label:'bold the total row \u2014 B8:D8 carries the corrected page', ok: boldOk},
@@ -3146,7 +3146,7 @@ const CHALLENGES = {
       const sub=S.cells['B3'];
       const grouped=!!g && !stillHidden;
       const folded=!!g && g.collapsed && !!(sub && sub.formula && Math.abs((sub.value||0)-o.sum)<0.5);
-      const wOk=(S.colwN||0)>=1 && colW[2]>=Math.round(12*7)+5-8;
+      const wOk=(S.colwN||0)>=1 && ((S._colW||{})[2]||0)===Math.round(12*7)+5;   /* r419: read the session's _colW (the global colW was stale drift) and demand the exact width-12 px, matching autofit's === */
       return [
         {label:'unhide the buried detail \u2014 select across the gap and unhide', ok: unhid},
         {label:'group rows '+o.h1+':'+o.h2+' the HOUSE way, then fold them away; the \u229e owns the page', ok: grouped && folded},
@@ -3194,7 +3194,7 @@ const CHALLENGES = {
       const usesIM=f.includes('INDEX(')&&f.includes('MATCH(');
       const valOk=!!(g&&g.formula)&&expected!=null&&Math.abs(g.value-expected)<1e-6;
       return [
-        {label:'Pull the queried figure with INDEX + MATCH \u2014 no eyeballing, no hardcode', ok: usesIM},
+        {label:'pull the queried figure with INDEX + MATCH \u2014 no eyeballing, no hardcode', ok: usesIM},
         {label:'match the answer to the queried company × metric', ok: valOk},
       ];
     }
@@ -3277,11 +3277,11 @@ const CHALLENGES = {
       const deckOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'10');
         return c.value!=null && !c.formula && typeof c.value==='number'; });
       return [
-        {label:'Transpose the side fee schedule into the Fees row \u2014 copy '+o.side+', then paste-special TRANSPOSE at '+o.feesRow.split(':')[0], ok: transOk},
-        {label:'Divide Trading by 1000 \u2014 copy a typed 1000, select '+o.divBlk+', paste-special DIVIDE; raw $ becomes $000s', ok: divOk},
-        {label:'Multiply the costs by \u22121 \u2014 copy a typed -1, select '+o.costRow+', paste-special MULTIPLY; the signs flip', ok: negOk},
-        {label:'Clone the total-row look onto Advisory \u2014 copy '+o.dressed+', paste FORMATS onto '+o.naked+', then clear the top border it carried', ok: fmtOk},
-        {label:'Freeze the totals for the summary \u2014 copy '+o.dressed+', paste VALUES onto '+o.deck+': dead numbers', ok: deckOk},
+        {label:'transpose the side fee schedule into the Fees row \u2014 '+o.side+' lands across '+o.feesRow+' as plain values', ok: transOk},
+        {label:'rescale Trading into $000s \u2014 paste-special DIVIDE the feed by 1000 across '+o.divBlk, ok: divOk},
+        {label:'flip the costs negative \u2014 paste-special MULTIPLY '+o.costRow+' by \u22121 so they carry their sign', ok: negOk},
+        {label:'clone the total-row look onto Advisory \u2014 paste FORMATS onto '+o.naked+', then clear the top border it carried', ok: fmtOk},
+        {label:'hand the summary dead numbers \u2014 paste VALUES onto '+o.deck+', no formulas', ok: deckOk},
       ];
     }
   },
@@ -3615,11 +3615,11 @@ const CHALLENGES = {
       const mCell=missIn ? (S.cells['B'+missIn.r]||{}) : {};
       const dressOk=!!(missIn && mCell.fmtStyle==='comma' && mCell.fontColor==='blue');
       return [
-        {label:'Insert a row below '+o.predecessor+' and paste the staged '+o.missing+' line in (copy '+o.stagedRng+') — the SUM widens itself',
+        {label:'insert a row below '+o.predecessor+' and paste the staged '+o.missing+' line into it — the SUM widens itself',
           ok: !!missIn && (S.insRowN||0)>=1 && (S.pasteN||0)>=1},
-        {label:'Delete the PLACEHOLDER row — the block closes up and the SUM contracts', ok: junkGone && (S.delRowN||0)>=1},
-        {label:'The live Total re-ties to '+o.total.toLocaleString('en-US')+' — no retyping; the structure did it', ok: tieOk},
-        {label:'Dress the pasted value like the block — commas and blue font', ok: dressOk},
+        {label:'delete the PLACEHOLDER row — the block closes up and the SUM contracts', ok: junkGone && (S.delRowN||0)>=1},
+        {label:'prove the Total — the live SUM re-ties to '+o.total.toLocaleString('en-US')+' without a single retype', ok: tieOk},
+        {label:'format the pasted value like the block — commas and blue font', ok: dressOk},
       ];
     }
   },
@@ -3776,7 +3776,7 @@ const CHALLENGES = {
         return true; })();
       return [
         {label:'PULL the feed \u2014 reference B3 once at B5, fill B5:E5 across', ok: pullOk},
-        {label:'FY total DOWN the column \u2014 =SUM(B5:E5) at F5, fill F5:F8 down; every line totals for the year', ok: fyOk},
+        {label:'run the FY total DOWN the column \u2014 =SUM(B5:E5) at F5, fill F5:F8 down; every line totals for the year', ok: fyOk},
         {label:'FOOT it \u2014 one =SUM(B5:B8) at B9, filled across B9:F9 (the FY total ties too)', ok: sumOk},
         {label:'fill the whole % block from ONE mixed-anchor cell \u2014 B11 right then down, FY column included (B$5 holds)', ok: mixOk},
       ];
@@ -3785,7 +3785,7 @@ const CHALLENGES = {
   blocksel:{
     name:'Block Sel.', label:'Assemble and format the output', par:46, parKeys:47,
     aha:'Ctrl+C copies data that stays put; Ctrl+X moves data that shouldn’t be duplicated — assemble first, then format.',
-    prompt:'Assemble the segment summary from scattered pieces. Copy the base [Segment · Revenue] block — it stays where it is; cut the two misfiled metric columns (EBITDA, Op inc) into their slots. Then finish the page: add a margin row that computes EBITDA ÷ Revenue in %, bold the headers, format the top line in $ and the rest in commas, right-align the figures, center and underline the segment names, and box the table.',
+    prompt:'Assemble the segment summary from scattered pieces. Copy the base [Segment · Revenue] block — it stays where it is; cut the two misfiled metric columns (EBITDA, Op inc) into their slots. Then finish the page: add a margin row that computes EBITDA ÷ Revenue in %, bold the headers, format the top line in $ and the rest in commas, right-align the figures, center and underline the segment names, and outline the whole table.',
     req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b s</em> (outline) · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
     guide(){ const o=this._o; return [
       'COPY the <b>base</b> [Segment · Revenue] at <b>'+o.baseTL+'</b> (it stays filed): <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at '+o.o.seg[0],
@@ -3895,16 +3895,19 @@ const CHALLENGES = {
       // 5) money — top line currency @0-dec, the rows below comma @0-dec
       const money = ['B','C','D'].every(cc=>cel(cc+'4').fmtStyle==='currency' && (cel(cc+'4').decimals|0)===0)
         && (function(){ let ok=true; for(let r=5;r<=3+N;r++) for(const cc of ['B','C','D']){ const x=cel(cc+r); if(x.fmtStyle!=='comma'||(x.decimals|0)!==0) ok=false; } return ok; })();
-      // 6) figures right-aligned + segment labels centred & underlined
-      const aligned = (function(){ let ok=true;
-        for(let r=4;r<=3+N;r++){ for(const cc of ['B','C','D','E']) if(cel(cc+r).align!=='r') ok=false; if(cel('A'+r).align!=='c'||!cel('A'+r).uline) ok=false; } return ok; })();
+      // 6-7) figures right-aligned; segment labels centered & underlined (r419: split checks)
+      const figsRight = (function(){ let ok=true;
+        for(let r=4;r<=3+N;r++){ for(const cc of ['B','C','D','E']) if(cel(cc+r).align!=='r') ok=false; } return ok; })();
+      const namesCentered = (function(){ let ok=true;
+        for(let r=4;r<=3+N;r++){ if(cel('A'+r).align!=='c'||!cel('A'+r).uline) ok=false; } return ok; })();
       return [
         {label:'COPY the [Segment · Revenue] base whole → paste into the summary (the base stays filed)', ok: copied},
         {label:'CUT the two misfiled columns (EBITDA, Op inc) → paste into their slots (old spots empty)', ok: cutBoth},
-        {label:'Margin memo — =EBITDA/Revenue down the column, format % and italic', ok: marginOk},
+        {label:'build the margin memo — =EBITDA/Revenue down the column, formatted % and italic', ok: marginOk},
         {label:'bold the header row and outline the whole table', ok: dressed},
-        {label:'money: the top line in $, the rows below in commas — 0 decimals', ok: money},
-        {label:'figures right-aligned; segment names centred + underlined', ok: aligned},
+        {label:'format the money — top line in $, the rows below in commas, 0 decimals', ok: money},
+        {label:'right-align every figure in the summary body', ok: figsRight},
+        {label:'center the segment names and underline them', ok: namesCentered},
       ];
     }
   },
@@ -3982,7 +3985,7 @@ const CHALLENGES = {
   foot:{
     name:'Foot', label:'Foot the table both ways', par:11, parKeys:8,
     aha:'Alt+= proposes the SUM it sees — total the rows, the columns, and the corner.',
-    prompt:'Total a segment × quarter block in every direction: total each row, total each column, and land the grand total where they meet. Don’t type a single SUM — AutoSum reads the block and proposes it. The corner total must tie to both edges.',
+    prompt:'Total a segment × quarter block in every direction: total each row, total each column, and land the grand total where they meet. AutoSum reads the block and proposes each SUM for you — faster than typing it out. The corner total must tie to both edges.',
     req:'<em>F2</em> · <em>alt+=</em> <em>↵</em> · fill F2:F5 ↓ · <em>B6</em> · <em>alt+=</em> <em>↵</em> · fill B6:E6 → · <em>F6</em> grand · <em>alt+=</em> <em>↵</em>',
     guide:[
       'row totals: F2 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:E2) — it read the row · <kbd>↵</kbd> · select F2:F5 · <kbd>ctrl</kbd>+<kbd>d</kbd>',
@@ -4019,8 +4022,8 @@ const CHALLENGES = {
       const rowOk=r=>live('F'+r)&&Math.abs(val('F'+r)-(val('B'+r)+val('C'+r)+val('D'+r)+val('E'+r)))<1e-6;
       const colOk=cc=>{ const L2=colLetter(cc); return live(L2+'6')&&Math.abs(val(L2+'6')-(val(L2+'2')+val(L2+'3')+val(L2+'4')+val(L2+'5')))<1e-6; };
       return [
-        {label:'Total every row down column F — live SUMs, not typed numbers', ok: [2,3,4,5].every(rowOk)},
-        {label:'Total every column across row 6 — live SUMs', ok: [2,3,4,5].every(c=>colOk(c))},
+        {label:'total every row down column F — live SUMs, not typed numbers', ok: [2,3,4,5].every(rowOk)},
+        {label:'total every column across row 6 — live SUMs', ok: [2,3,4,5].every(c=>colOk(c))},
         {label:'tie the corner — F6 must agree with BOTH edges', ok: live('F6')&&Math.abs(val('F6')-this._g)<1e-6},
       ];
     }
@@ -4100,11 +4103,11 @@ const CHALLENGES = {
       return [
         {label:'COMPUTE the multiples for all five peers \u2014 EV over EBITDA, filled down (D3:D7)',
           ok: [0,1,2,3,4].every(i=>live('D'+(3+i),this._m[i],0.05,'C'+(3+i)))},
-        {label:'Read the data \u2014 MEDIAN at D8, MAX high at D9, MIN low at D10',
-          ok: live('D8',e.mean)&&fnRef('D8','MEDIAN')&&live('D9',e.hi)&&fnRef('D9','MAX')&&live('D10',e.lo)&&fnRef('D10','MIN')},
-        {label:'The TRIMMED read \u2014 =LARGE(D3:D7,2) at D11 and =SMALL(D3:D7,2) at D12; one outlier peer never sets the range',
+        {label:'take the MEDIAN of the multiples at D8 \u2014 live off the column', ok: live('D8',e.mean)&&fnRef('D8','MEDIAN')},
+        {label:'mark the high with MAX at D9 and the low with MIN at D10', ok: live('D9',e.hi)&&fnRef('D9','MAX')&&live('D10',e.lo)&&fnRef('D10','MIN')},
+        {label:'trim the range \u2014 =LARGE(D3:D7,2) at D11 and =SMALL(D3:D7,2) at D12; one outlier peer never sets it',
           ok: live('D11',e.hi2)&&fnRef('D11','LARGE')&&live('D12',e.lo2)&&fnRef('D12','SMALL')},
-        {label:'Run implied EV off the LIVE median \u2014 G4 must reference D8', ok: live('G4',e.ev,0.5,'D8')},
+        {label:'run implied EV off the LIVE median \u2014 G4 must reference D8', ok: live('G4',e.ev,0.5,'D8')},
         {label:'back into implied equity after net debt (G6)', ok: live('G6',e.eq,0.5,'G4')},
         {label:'run per share and the premium to market (G8, G10)', ok: live('G8',e.ps,0.01,'G7')&&live('G10',e.prem,0.001,'G9')},
       ];
@@ -4198,19 +4201,22 @@ const CHALLENGES = {
       const names=['Falcon','Atlas','Copper','Summit','Ridge','Delta'];
       const sizes=[]; while(sizes.length<6){ const v=rnd(5,95)*10; if(!sizes.includes(v)) sizes.push(v); }
       this._sizes=sizes.slice();
+      this._byName={}; names.forEach((n,i)=>this._byName[n]=sizes[i]);   /* r419: bind name\u2194size so a sizes-only sort can't pass (scrub's row-integrity pattern) */
       names.forEach((n,i)=>{
         cells[NC+(r0+1+i)]={...blankCell(),value:n,txt:true};
         cells[SC+(r0+1+i)]={...blankCell(),value:sizes[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};
       });
       cells[SC+(r0+7)]={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._o={ b2:SC+(r0+1), range:NC+(r0+1)+':'+SC+(r0+6), foot:SC+(r0+7), sc:SC, r0:r0 };
+      this._o={ b2:SC+(r0+1), range:NC+(r0+1)+':'+SC+(r0+6), foot:SC+(r0+7), sc:SC, nc:NC, r0:r0 };
       this._sum=sizes.reduce((a,b)=>a+b,0);
       return {ROWS:Math.max(10,r0+8), cells, active:{r:r0+1,c:c0+1}, sel:null, colW:{}};
     },
     checks(S){
       const o=this._o;
       const vals=[0,1,2,3,4,5].map(i=>{ const c=S.cells[o.sc+(o.r0+1+i)]; return c?c.value:null; });
-      const sorted=vals.every(v=>typeof v==='number') && vals.every((v,i)=>i===0||vals[i-1]>=v);
+      const paired=[0,1,2,3,4,5].every(i=>{ const a=S.cells[o.nc+(o.r0+1+i)], b=S.cells[o.sc+(o.r0+1+i)];
+        return !!(a&&b)&&this._byName[a.value]===b.value; });   /* r419: rows must move WHOLE \u2014 name and size together */
+      const sorted=vals.every(v=>typeof v==='number') && vals.every((v,i)=>i===0||vals[i-1]>=v) && paired;
       const f=S.cells[o.foot];
       return [
         {label:'sort the six deals largest-first ('+o.range+')', ok: sorted},
@@ -4253,17 +4259,20 @@ const CHALLENGES = {
     },
     checks(S){
       const o=this._o;
-      const cellsOK=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r];
-        return !!(c&&c.value===o.y0+j&&c.bold&&c.align==='r'); });
+      const yearsOK=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r];
+        return !!(c&&c.value===o.y0+j); });
+      const dressOK=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r];
+        return !!(c&&c.bold&&c.align==='r'); });
       return [
-        {label:'run five sequential years across '+o.range+' \u2014 fill, bold, right-align', ok: cellsOK},
+        {label:'fill five sequential years across '+o.range+' \u2014 Series extends the two seeds', ok: yearsOK},
+        {label:'bold the year run and right-align it over the numbers', ok: dressOK},
       ];
     }
   },
   bridge:{
     name:'Point Mode', label:'Point-mode formulas', par:10, parKeys:6,
     aha:'Point mode grabs refs with the arrow keys — the fastest formula is one you never typed.',
-    prompt:'Build profit = revenue × margin by pointing: start the formula, then point at each reference — never type a cell address — and fill it across five years. Point mode is the fastest way to enter a formula, and the fill confirms the references were relative.',
+    prompt:'Build profit = revenue × margin: start the formula, point at each reference with the arrow keys, and fill it across five years. Point mode is the fastest way to enter a formula, and the fill confirms the references were relative.',
     req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs revenue \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs margin \u00b7 <em>\u21b5</em> \u00b7 select '+o.rng+' \u00b7 <em>ctrl+r</em>'; },
     guide(){ const o=this._o; return [
       'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
@@ -4309,7 +4318,7 @@ const CHALLENGES = {
         const refs=f.includes(L2+(o.hr+1))&&f.includes(L2+(o.hr+2));
         return refs && typeof c.value==='number' && Math.abs(c.value-this._exp[j].rev*this._exp[j].m)<0.5; };
       return [
-        {label:'build EBITDA at '+o.f+' \u2014 revenue \u00d7 margin, both refs pointed in-column', ok: okCol(0)},
+        {label:'build EBITDA at '+o.f+' \u2014 a live revenue \u00d7 margin formula reading its own column', ok: okCol(0)},
         {label:'fill it across all five years \u2014 relative refs walked with the fill', ok: [1,2,3,4].every(okCol)},
       ];
     }
@@ -4651,13 +4660,13 @@ const CHALLENGES = {
       const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
       const COL=['B','C','D','E','F'];
       return [
-        {label:'discount-factor row — one anchored formula filled across all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',E.df[i])) && refs('B4',['B7','B2'])},
-        {label:'PV row — cash × factor, filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'5',E.pv[i])) && refs('B5',['B3','B4'])},
-        {label:'terminal value and its PV — Gordon off year 5, discounted on the year-5 factor', ok:near('B10',E.tv) && near('B11',E.pvtv) && refs('B11',['B10','F4'])},
+        {label:'run the discount-factor row — one anchored formula filled across all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',E.df[i])) && refs('B4',['B7','B2'])},
+        {label:'run the PV row — cash × factor, filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'5',E.pv[i])) && refs('B5',['B3','B4'])},
+        {label:'run terminal value and its PV — Gordon off year 5, discounted on the year-5 factor', ok:near('B10',E.tv) && near('B11',E.pvtv) && refs('B11',['B10','F4'])},
         {label:'sum to Enterprise Value — the PV row plus the discounted TV', ok:near('B12',E.ev) && refs('B12',['SUM(','B11'])},
         {label:'bridge to equity value — EV less net debt', ok:near('B14',E.equity) && refs('B14',['B12','B13'])},
         {label:'divide to value per share — equity over shares', ok:near('B16',E.ps) && refs('B16',['B14','B15'])},
-        {label:'the audit line — =NPV($B$7,B3:F3) reproduces the PV row in one formula', ok:near('B18',E.pvsum) && refs('B18',['NPV(','B7','B3:F3'])},
+        {label:'prove the PV row — =NPV($B$7,B3:F3) reproduces it in one formula', ok:near('B18',E.pvsum) && refs('B18',['NPV(','B7','B3:F3'])},
       ];
     }
   },
@@ -4756,13 +4765,13 @@ const CHALLENGES = {
       return [
         {label:'size the uses — purchase EV (=B4*B5) plus fees to total uses', ok:near('B6',E.purchEV) && near('B8',E.uses) && refs('B8',['B6','B7'])},
         {label:'lever it — debt as turns of EBITDA (=B4*B9)', ok:near('B10',E.debt) && refs('B10',['B4','B9'])},
-        {label:'the equity PLUG — sponsor equity ties sources to uses (=B8-B10)', ok:near('B11',E.equity) && refs('B11',['B8','B10'])},
-        {label:'exit equity — exit EV (=B14*B15) less net debt', ok:near('B16',E.exitEV) && near('B18',E.exitEq) && refs('B18',['B16','B17'])},
-        {label:'MOIC — exit equity over the entry check (=B18/B11)', ok:near('B20',E.moic) && refs('B20',['B18','B11'])},
-        {label:'IRR — MOIC compounded over the hold (=B20^(1/B19)-1)', ok:near('B21',E.irr) && refs('B21',['B20','B19'])},
+        {label:'plug the sponsor equity — it ties sources to uses (=B8-B10)', ok:near('B11',E.equity) && refs('B11',['B8','B10'])},
+        {label:'back into exit equity — exit EV (=B14*B15) less net debt', ok:near('B16',E.exitEV) && near('B18',E.exitEq) && refs('B18',['B16','B17'])},
+        {label:'run MOIC — exit equity over the entry check (=B18/B11)', ok:near('B20',E.moic) && refs('B20',['B18','B11'])},
+        {label:'compound the IRR — MOIC over the hold (=B20^(1/B19)-1)', ok:near('B21',E.irr) && refs('B21',['B20','B19'])},
         {label:'lay out the equity flows — the check OUT at year 0 (=-B11), exit proceeds IN at year '+E.hold+' (=B18)',
           ok:near('B24',-E.equity) && refs('B24',['B11']) && near(colLetter(2+E.hold)+'24',E.exitEq) && refs(colLetter(2+E.hold)+'24',['B18'])},
-        {label:'the second road — =IRR() over the flow row lands on the SAME number as B21',
+        {label:'prove it a second way — =IRR() over the flow row lands on the SAME number as B21',
           ok:near('B25',E.irr) && refs('B25',['IRR(','B24'])},
       ];
     }
@@ -4998,12 +5007,12 @@ const CHALLENGES = {
       const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*2e-3,1e-2); };
       const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
       return [
-        {label:'equity value — enterprise value less net debt, referenced not retyped (=B3-B4)', ok:near('B10',E.equity) && refs('B10',['B3','B4'])},
-        {label:'value per share — equity over shares (=B10/B5)', ok:near('B11',E.ps) && refs('B11',['B10','B5'])},
-        {label:'the priced multiple — EV / EBITDA (=B3/B6)', ok:near('B12',E.evEbitda) && refs('B12',['B3','B6'])},
-        {label:'net leverage — net debt / EBITDA (=B4/B6)', ok:near('B13',E.lev) && refs('B13',['B4','B6'])},
-        {label:'interest coverage — EBITDA / interest (=B6/B7)', ok:near('B14',E.cov) && refs('B14',['B6','B7'])},
-        {label:'the cover stamp — =UPPER(TRIM(B15)) cleans the raw feed by FORMULA, not by retyping',
+        {label:'run equity value — enterprise value less net debt, referenced not retyped (=B3-B4)', ok:near('B10',E.equity) && refs('B10',['B3','B4'])},
+        {label:'run value per share — equity over shares (=B10/B5)', ok:near('B11',E.ps) && refs('B11',['B10','B5'])},
+        {label:'price the multiple — EV / EBITDA (=B3/B6)', ok:near('B12',E.evEbitda) && refs('B12',['B3','B6'])},
+        {label:'run net leverage — net debt / EBITDA (=B4/B6)', ok:near('B13',E.lev) && refs('B13',['B4','B6'])},
+        {label:'run interest coverage — EBITDA / interest (=B6/B7)', ok:near('B14',E.cov) && refs('B14',['B6','B7'])},
+        {label:'stamp the cover clean — =UPPER(TRIM(B15)) fixes the raw feed by FORMULA, not by retyping',
           ok:(()=>{ const c=S.cells['B16']; return !!(c && c.formula && c.value===E.stamp && refs('B16',['UPPER(','TRIM(','B15'])); })()},
       ];
     }
@@ -5059,7 +5068,7 @@ const CHALLENGES = {
       const e=this._exp;
       return [
         {label:'run entry EV and debt \u2014 EBITDA \u00d7 anchored multiple, levered', ok: near('B6',e.entryEV)&&near('B7',e.debt)},
-        {label:'Entry equity \u2014 EV less debt (B8)', ok: near('B8',e.entryEq)},
+        {label:'back into entry equity \u2014 EV less debt (B8)', ok: near('B8',e.entryEq)},
         {label:'mark exit EV at the SAME multiple', ok: near('B9',e.exitEV)},
         {label:'back into exit equity after remaining debt', ok: near('B11',e.exitEq)},
         {label:'run MOIC \u2014 exit equity over entry equity', ok: near('B12',e.moic)},
@@ -5199,11 +5208,11 @@ const CHALLENGES = {
       const all=(row,key)=>[0,1,2,3].every(i=>near(COL[i]+row,this._exp[i][key]));
       const dressOk=[0,1,2,3].every(i=>{ const c=S.cells[COL[i]+'14']; return !!(c&&c.bold&&c.bt); });
       return [
-        {label:'Pay the revolver first (most senior) \u2014 MIN of balance and cash, all four years', ok: all(6,'rvPd')&&refs('B6',['MIN('])},
+        {label:'pay the revolver first (most senior) \u2014 MIN of balance and cash, all four years', ok: all(6,'rvPd')&&refs('B6',['MIN('])},
         {label:'roll forward the revolver \u2014 each year opens where the last closed', ok: all(7,'rvE')&&[1,2,3].every(i=>refs(COL[i]+'5',[COL[i-1]+'7']))},
         {label:'sweep the term loan with only the REMAINDER after the revolver', ok: all(9,'tlPd')&&refs('B9',['MIN(','B6'])},
         {label:'roll forward the term loan across', ok: all(10,'tlE')&&[1,2,3].every(i=>refs(COL[i]+'8',[COL[i-1]+'10']))},
-        {label:'Pay the mezzanine from the cash left after BOTH seniors', ok: all(12,'mzPd')&&refs('B12',['MIN(','B6','B9'])},
+        {label:'pay the mezzanine from the cash left after BOTH seniors', ok: all(12,'mzPd')&&refs('B12',['MIN(','B6','B9'])},
         {label:'roll forward the mezz across', ok: all(13,'mzE')&&[1,2,3].every(i=>refs(COL[i]+'11',[COL[i-1]+'13']))},
         {label:'total the debt \u2014 three endings, bold with a top border above', ok: all(14,'tot')&&dressOk},
       ];
@@ -5211,7 +5220,7 @@ const CHALLENGES = {
   },
   wk13:{
     name:'13-Week Cash', label:'Run the 13-week', par:45, parKeys:45,
-    aha:'Thirteen columns, one pattern — receipts − disbursements, filled right, rolls cash forward.',
+    aha:'One pattern runs the whole sheet — receipts − disbursements, filled right, rolls cash forward.',
     prompt:'The front eight weeks of a 13-week cash flow. Receipts and disbursements are in from treasury — you build the spine: net flow each week, the beginning/ending roll-forward, the cushion against minimum liquidity (anchored, so it doesn’t walk), and totals on the flows only.',
     req:'<em>B6</em> <em>=B4-B5</em> fill \u2192 \u00b7 <em>B8</em> <em>=B7+B6</em> fill \u2192 \u00b7 roll-forward <em>C7</em> <em>=B8</em> fill \u2192 \u00b7 cushion <em>B10</em> <em>=B8-$B$12</em> fill \u2192 \u00b7 totals <em>J4</em> <em>=SUM(B4:I4)</em> + fill J4:J6 \u2193 \u00b7 dress <em>B8:I8</em>: <em>ctrl+b</em> + <em>alt h b p</em>',
     guide:[
@@ -5355,7 +5364,7 @@ const CHALLENGES = {
   },
   debtsched:{
     name:'Debt Sched.', label:'Run the debt schedule', par:73, parKeys:77,
-    aha:'Each tranche rolls BB + draws − paydown — interest reads the balance it just made.',
+    aha:'Each tranche rolls beginning balance + draws − paydown — interest reads the balance it just made.',
     prompt:'The debt roll-forward, five years. The amort rate arrives as an instruction, not a formula: type it, color it blue, then build — mandatory amort off your anchored rate, a MIN/MAX cash sweep, interest on the average balance, and the year-over-year link.',
     req(){ return 'type <em>'+this._ratePct+'%</em> at B9 \u2192 <em>alt h f c</em> blue \u00b7 <em>B4</em> =-B2*$B$9 \u00b7 <em>B5</em> =-MIN(B2+B4,MAX(0,B3)) \u00b7 <em>B6</em> =B2+B4+B5 \u00b7 <em>B7</em> =$B$10*(B2+B6)/2 \u00b7 <em>C2</em> =B6 \u00b7 fill C2:F2 \u2192 \u00b7 fill B4:F7 \u2192 \u00b7 dress B6:F6: <em>ctrl+b</em> + <em>alt h b p</em>'; },
     guide(){ return [
@@ -5499,7 +5508,7 @@ const CHALLENGES = {
         {label:'run net change in cash \u2014 one SUM over the four lines, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'6',this._exp[i].ch))&&refs('B6',['SUM('])},
         {label:'build THE LINK \u2014 beginning cash = prior year\u2019s ending cash', ok: linkOk},
         {label:'tie out ending cash through year 5', ok: [0,1,2,3,4].every(i=>near(COL[i]+'8',this._exp[i].end))},
-        {label:'Cash conversion memo \u2014 net change \u00f7 net income, formatted as a percent', ok: cvOk},
+        {label:'run the cash conversion memo \u2014 net change \u00f7 net income, formatted as a percent', ok: cvOk},
         {label:'bold the ending row and add a top border above it', ok: dressOk},
       ];
     }
@@ -5584,7 +5593,7 @@ const CHALLENGES = {
         {label:'total liabilities \u2014 live SUM, all three years', ok: [0,1,2].every(i=>near(COL[i]+'8',this._exp[COL[i]].tl))&&refs('B8',['SUM('])},
         {label:'run THE RE ROLL \u2014 prior RE + NI \u2212 dividends, built once, walking across', ok: rollOk},
         {label:'total liabs & equity, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',this._exp[COL[i]].tle))},
-        {label:'Check row = assets minus L&E \u2014 reads 0 in all three years', ok: [0,1,2].every(i=>near(COL[i]+'14',0))},
+        {label:'run the check row \u2014 assets minus L&E, landing at 0 in all three years', ok: [0,1,2].every(i=>near(COL[i]+'14',0))},
         {label:'bold the totals and add a top border above the check row', ok: boldOk(5)&&boldOk(11)&&ruleOk},
       ];
     }
@@ -5655,7 +5664,7 @@ const CHALLENGES = {
       const drv=(k,exp)=>{ const c=S.cells[k]; return !!(c&&!c.formula&&typeof c.value==='number'&&c.value===exp&&c.fontColor==='blue'); };
       const dressOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'7']; return !!(c&&c.bold&&c.bt); });
       return [
-        {label:'Type DSO / DIO / DPO into B9:B11 and blue-font them', ok: drv('B9',this._dso)&&drv('B10',this._dio)&&drv('B11',this._dpo)},
+        {label:'type DSO / DIO / DPO into B9:B11 and blue-font them', ok: drv('B9',this._dso)&&drv('B10',this._dio)&&drv('B11',this._dpo)},
         {label:'run AR off YOUR anchored DSO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'4',this._exp[i].ar))&&refs('B4',['B2','B9'])},
         {label:'run inventory and payables off anchored DIO / DPO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'5',this._exp[i].inv)&&near(COL[i]+'6',this._exp[i].ap))},
         {label:'run net working capital, then bold the row and add a top border above it', ok: [0,1,2,3,4].every(i=>near(COL[i]+'7',this._exp[i].nwc))&&dressOk},
@@ -5742,7 +5751,7 @@ const CHALLENGES = {
         {label:'build LINK 2 \u2014 BS cash pulls from the CFS, all three years', ok: [0,1,2].every(i=> refs(COL[i]+'9',[COL[i]+'7']) && near(COL[i]+'9',e.end[i]))},
         {label:'total assets, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',e.ta[i]))},
         {label:'build LINK 3 \u2014 the RE roll absorbs net income, both later years', ok: [1,2].every(i=> refs(COL[i]+'13',[COL[i-1]+'13',COL[i]+'2']) && near(COL[i]+'13',e.re[i]))},
-        {label:'All three check cells read ZERO \u2014 then bold the totals and rule the check row', ok: [0,1,2].every(i=>near(COL[i]+'14',0))&&dressOk},
+        {label:'drive all three check cells to ZERO \u2014 then bold the totals and add a top border above the check row', ok: [0,1,2].every(i=>near(COL[i]+'14',0))&&dressOk},
       ];
     }
   },
@@ -5872,7 +5881,7 @@ const CHALLENGES = {
       return [
         {label:'run the multiple paid on every deal \u2014 EV over EBITDA, fill down D3:D7',
           ok: [0,1,2,3,4].every(i=>near('D'+(3+i),this._m[i]))},
-        {label:'Take the MEDIAN of the multiples at D8 \u2014 live off the column, never hand-typed', ok: near('D8',this._exp.avg)},
+        {label:'take the MEDIAN of the multiples at D8 \u2014 live off the column, never hand-typed', ok: near('D8',this._exp.avg)},
         {label:'mark implied EV at B11 \u2014 target EBITDA \u00d7 the median multiple', ok: near('B11',this._exp.ev,0.5)},
         {label:'back into implied equity at B13 \u2014 take net debt off the implied EV', ok: near('B13',this._exp.eq,0.5)},
       ];
@@ -6048,7 +6057,7 @@ const CHALLENGES = {
       return [
         {label:'build the base formula \u2014 $B$2 absolute, C$3 row-locked, $B4 column-locked (C4)', ok: cellOk(0,0)},
         {label:'fill it RIGHT \u2014 the WACC ref walked, the anchors held (C4:G4)', ok: [0,1,2,3,4].every(j=>cellOk(0,j))},
-        {label:'fill it DOWN \u2014 the growth ref walked; fifteen live cells from one formula (C4:G6)', ok: [0,1,2].every(i=>[0,1,2,3,4].every(j=>cellOk(i,j)))},
+        {label:'fill it DOWN \u2014 the growth ref walks; all fifteen cells land live (C4:G6)', ok: [0,1,2].every(i=>[0,1,2,3,4].every(j=>cellOk(i,j)))},
       ];
     }
   },
@@ -6264,7 +6273,7 @@ const CHALLENGES = {
       return [
         {label:'total assets \u2014 a live SUM over all four lines, both years', ok: COL.every(c=>near(c+'6',this._exp[c].ta))&&refs('B6',['SUM('])},
         {label:'total L&E with SUM \u2014 RE is a given not a plug, both years', ok: COL.every(c=>near(c+'12',this._exp[c].tle))&&refs('B12',['SUM('])},
-        {label:'Check row = assets minus L&E \u2014 reads 0 in both years', ok: COL.every(c=>near(c+'14',0))&&refs('B14',['B6','B12'])},
+        {label:'run the check row \u2014 assets minus L&E, landing at 0 in both years', ok: COL.every(c=>near(c+'14',0))&&refs('B14',['B6','B12'])},
         {label:'bold the totals and add a top border above the check row', ok: dressOk},
       ];
     }
@@ -6352,9 +6361,9 @@ const CHALLENGES = {
         if(!f.includes(L+'12') || Math.abs((eb.value||0)-(((tot&&tot.value)||0)+ox))>1e-6) ownOk=false;
       }
       return [
-        {label:'Extend each division\u2019s Total SUM to cover all five years \u2014 one row stops a year short (column G)', ok:totOk},
-        {label:'Make EBITDA a LIVE formula in every year \u2014 one is a stale typed number (row 13)', ok:liveOk},
-        {label:'Point every EBITDA at its OWN year\u2019s opex \u2014 one column crossed wires (row 13)', ok:ownOk},
+        {label:'extend each division\u2019s Total SUM to cover all five years \u2014 one row stops a year short (column G)', ok:totOk},
+        {label:'make EBITDA a LIVE formula in every year \u2014 one is a stale typed number (row 13)', ok:liveOk},
+        {label:'point every EBITDA at its OWN year\u2019s opex \u2014 one column crossed wires (row 13)', ok:ownOk},
       ];
     }
   },
@@ -6416,9 +6425,9 @@ const CHALLENGES = {
       const wantVal=refOk? c8/b8-1 : null;
       const valOk=!!(val&&val.formula&&/C8/i.test(val.formula)&&/B8/i.test(val.formula)&&refOk&&isFinite(val.value)&&Math.abs((val.value||0)-wantVal)<1e-4);
       return [
-        {label:'Rebuild the #REF! total \u2014 =SUM over the Q1 block (B8)', ok:refOk},
-        {label:'Fix the #DIV/0! margin \u2014 the denominator is Services revenue, C5 (B10)', ok:divOk},
-        {label:'Fix the #VALUE! growth \u2014 totals, not labels: C8 over B8 (B11; fix B8 first)', ok:valOk},
+        {label:'rebuild the #REF! total \u2014 =SUM over the Q1 block (B8)', ok:refOk},
+        {label:'fix the #DIV/0! margin \u2014 the denominator is Services revenue, C5 (B10)', ok:divOk},
+        {label:'fix the #VALUE! growth \u2014 totals, not labels: C8 over B8 (B11; fix B8 first)', ok:valOk},
       ];
     }
   },
@@ -6515,10 +6524,10 @@ const CHALLENGES = {
         }
       }
       return [
-        {label:'Make the check row LIVE \u2014 =Total assets \u2212 Total L&E, all four years (row 15)', ok:liveOk},
-        {label:'Stretch every Total assets over ALL four asset lines \u2014 one range starts a row short (row 8)', ok:totOk},
-        {label:'Corkscrew the equity \u2014 prior year + NI memo in every roll year; one is a typed plug (row 12)', ok:eqOk},
-        {label:'Make it tie \u2014 every check reads dead zero (row 15)', ok:zeroOk&&liveOk},
+        {label:'make the check row LIVE \u2014 =Total assets \u2212 Total L&E, all four years (row 15)', ok:liveOk},
+        {label:'stretch every Total assets over ALL four asset lines \u2014 one range starts a row short (row 8)', ok:totOk},
+        {label:'roll the equity forward \u2014 prior year + NI memo in every roll year; one is a typed plug (row 12)', ok:eqOk},
+        {label:'make it tie \u2014 every check reads dead zero (row 15)', ok:zeroOk&&liveOk},
       ];
     }
   },
@@ -6611,10 +6620,10 @@ const CHALLENGES = {
            || Math.abs(((x&&x.value)||0)-this._truth[Lc])>1e-6) tieOk=false;
       }
       return [
-        {label:'Re-point revenue at the LIVE price \u2014 $B$4 \u00d7 units in every year (row 11)', ok:revOk},
-        {label:'Re-point cost at the LIVE rate \u2014 $B$5 \u00d7 revenue in every year (row 12)', ok:costOk},
-        {label:'Re-point royalty at the LIVE rate \u2014 $B$6 \u00d7 revenue in every year (row 13)', ok:royOk},
-        {label:'Tie contribution to the v2 assumptions in every year (row 14)', ok:tieOk},
+        {label:'re-point revenue at the LIVE price \u2014 $B$4 \u00d7 units in every year (row 11)', ok:revOk},
+        {label:'re-point cost at the LIVE rate \u2014 $B$5 \u00d7 revenue in every year (row 12)', ok:costOk},
+        {label:'re-point royalty at the LIVE rate \u2014 $B$6 \u00d7 revenue in every year (row 13)', ok:royOk},
+        {label:'tie contribution to the v2 assumptions in every year (row 14)', ok:tieOk},
       ];
     }
   },
@@ -6685,9 +6694,9 @@ const CHALLENGES = {
            || Math.abs(((m&&m.value)||0)-this._truth[Lc]/rev)>1e-6) mgOk=false;
       }
       return [
-        {label:'Flip the costs negative \u2014 COGS, Opex and D&A in every year (rows 5-7)', ok:signOk},
-        {label:'Prove EBIT TRUE \u2014 the sum-through equals revenue less real costs, every year (row 8)', ok:ebitOk},
-        {label:'Run the margin row live and % \u2014 EBIT \u00f7 revenue across all five years (row 10)', ok:mgOk},
+        {label:'flip the costs negative \u2014 COGS, Opex and D&A in every year (rows 5-7)', ok:signOk},
+        {label:'prove EBIT TRUE \u2014 the sum-through equals revenue less real costs, every year (row 8)', ok:ebitOk},
+        {label:'run the margin row live and % \u2014 EBIT \u00f7 revenue across all five years (row 10)', ok:mgOk},
       ];
     }
   },
@@ -6749,12 +6758,12 @@ const CHALLENGES = {
       return [
         {label:'fix it at the SOURCE — '+o.bad+' back to '+o.good, ok: bad.value===o.good},
         {label:'let the wire reprice — subtotal and deck figure land right', ok: Math.abs(num(o.mid)-o.sumGood)<0.5 && Math.abs(num(o.deck)-o.deckGood)<0.5},
-        {label:'walk the wire — trace precedents and dependents, not eye-hunting', ok: (S.traceN||0)>=2},
+        {label:'walk the wire — at least two trace jumps through the chain, no eye-hunting', ok: (S.traceN||0)>=2},
       ];
     }
   },
   tieout:{
-    name:'Tie-out', label:'F9 the suspect', par:30, parKeys:8,
+    name:'Tie-out', label:'Collapse the suspect leg', par:30, parKeys:8,
     aha:'F9 evaluates a formula IN the editor — the dead number tells you which link is stale; Esc keeps the formula live.',
     prompt:'The deck total and the support block disagree, and nothing is labeled. Trace from the tie-out into the wiring, then interrogate the legs: open one, collapse it to the number it actually pulls, and back out without changing the formula. Two legs read the fresh Q2 feed; one still points at the Q1 column — the dead number gives it away instantly. Repoint the stale leg and the check lands at zero. Auditors call it a tie-out; collapsing a leg to its value is how you run one without printing anything.',
     req(){ const o=this._o; return 'on <em>'+o.tie+'</em> · <em>ctrl+[</em> ×2 rides into the legs · <em>F2</em> a leg, <em>F9</em> shows its dead value, <em>esc</em> · the stale one reads Q1 — retype <em>'+o.fixF+'</em> ↵ · the check ties to 0'; },
@@ -6812,10 +6821,10 @@ const CHALLENGES = {
       const fixRef=o.fixF.slice(1).toUpperCase();
       const fixed = !!badC.formula && new RegExp('(^|[^A-J0-9])'+fixRef+'(?![0-9])').test(String(badC.formula).toUpperCase().replace(/\$/g,'').replace(/^=/,' ')) && Math.abs(num(o.bad)-o.goodV)<0.5;
       return [
-        {label:'ride the trace — from the tie-out into the legs', ok:(S.traceN||0)>=2},
-        {label:'interrogate a leg — evaluate it in place; back out and it stays live', ok:(S.f9N||0)>=1},
+        {label:'trace from the tie-out into the legs — two jumps down the wiring', ok:(S.traceN||0)>=2},
+        {label:'collapse a leg to its dead value in the editor — then back out with the formula still live', ok:(S.f9N||0)>=1},
         {label:'repoint the stale leg to the Q2 feed ('+o.fixF+')', ok:fixed},
-        {label:'the page ties — the check lands at 0', ok:Math.abs(num(o.tie))<0.5},
+        {label:'land the tie-out at 0 — the page ties', ok:Math.abs(num(o.tie))<0.5},
       ];
     }
   },
@@ -6947,11 +6956,11 @@ const CHALLENGES = {
       const cushOk =rowChk('14',Lc=>({refs:[Lc+'12',Lc+'13'], v:V(Lc+'12')-V(Lc+'13')}));
       let boldOk=true; for(let c=2;c<=4;c++){ const x=S.cells[colLetter(c)+'12']; if(!x||!x.bold) boldOk=false; }
       return [
-        {label:'Run availability live \u2014 commitment \u2212 drawn, every case (row 7)', ok:availOk},
-        {label:'Run beginning liquidity \u2014 cash + availability, every case (row 8)', ok:begOk},
-        {label:'Run ending liquidity \u2014 beginning + SUM of the whole bridge (row 12)', ok:endOk},
-        {label:'Run cushion / (shortfall) \u2014 ending \u2212 minimum, every case (row 14)', ok:cushOk},
-        {label:'Dress the answer \u2014 ending liquidity row bold (B12:D12)', ok:boldOk},
+        {label:'run availability live \u2014 commitment \u2212 drawn, every case (row 7)', ok:availOk},
+        {label:'run beginning liquidity \u2014 cash + availability, every case (row 8)', ok:begOk},
+        {label:'run ending liquidity \u2014 beginning + SUM of the whole bridge (row 12)', ok:endOk},
+        {label:'run cushion / (shortfall) \u2014 ending \u2212 minimum, every case (row 14)', ok:cushOk},
+        {label:'bold the ending liquidity row \u2014 the answer line (B12:D12)', ok:boldOk},
       ];
     }
   },
@@ -7031,10 +7040,10 @@ const CHALLENGES = {
       let wantT=Infinity; for(let c=2;c<=6;c++) wantT=Math.min(wantT, V(colLetter(c)+'9'));
       const tqOk=!!(ft && ft.indexOf('MIN(')>=0 && ft.indexOf('B9:F9')>=0 && hdOk && Math.abs(((tq&&tq.value)||0)-wantT)<1e-6);
       return [
-        {label:'Run NET leverage live \u2014 (debt \u2212 cash) \u00f7 LTM EBITDA, every quarter (row 7)', ok:levOk},
-        {label:'Run headroom against the STEPPING max \u2014 covenant \u2212 net leverage (row 9)', ok:hdOk},
-        {label:'Build the compliance flag as a real IF \u2014 1 in the clear, 0 in breach (row 10)', ok:flagOk},
-        {label:'Pull the tightest quarter with MIN over the headroom row (B12; needs row 9 live)', ok:tqOk},
+        {label:'run NET leverage live \u2014 (debt \u2212 cash) \u00f7 LTM EBITDA, every quarter (row 7)', ok:levOk},
+        {label:'run headroom against the STEPPING max \u2014 covenant \u2212 net leverage (row 9)', ok:hdOk},
+        {label:'build the compliance flag as a real IF \u2014 1 in the clear, 0 in breach (row 10)', ok:flagOk},
+        {label:'pull the tightest quarter with MIN over the headroom row (B12; needs row 9 live)', ok:tqOk},
       ];
     }
   },
@@ -7042,7 +7051,7 @@ const CHALLENGES = {
   versionup:{
     name:'Roll-forward prep', label:'Rebuild the hardcoded rows', par:33, parKeys:32,
     aha:'A hardcode freezes yesterday — relink it (=), then bulk-rename the version tag (Ctrl+H) so the whole page reads v2.',
-    prompt:'A five-year operating build where someone typed the answers: growth, gross profit, EBITDA, and the margin are all hardcoded — right today, wrong the moment an input moves. Rebuild every derived row as a live formula, fill each across, and confirm nothing drifted from the typed values.',
+    prompt:'A five-year operating build where someone typed the answers: growth, gross profit, EBITDA, and the margin are all hardcoded — right today, wrong the moment an input moves. Rebuild every derived row as a live formula and fill each across — the page lands on the same numbers, now computed instead of typed.',
     req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4+B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7+B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 stamp it v2 (<em>ctrl+h</em> v1 \u2192 v2) \u00b7 costs carry their sign \u2014 subtotals are clean sums'; },
     guide:[
       'growth row is typed \u00b7 C5: <kbd>=</kbd>C4/B4-1 <kbd>\u21b5</kbd> \u00b7 select C5:F5, <kbd>ctrl</kbd>+<kbd>r</kbd>',
@@ -7100,11 +7109,11 @@ const CHALLENGES = {
       const mOk=row(10,(c,L2)=>V(L2+'9')/V(L2+'4'),(L2)=>L2+'9');
       const tagOk=['A12','A13'].every(k=>{ const c=S.cells[k]; return c&&typeof c.value==='string'&&c.value.indexOf('v2')>=0&&c.value.indexOf('v1')<0; });
       return [
-        {label:'Make growth a LIVE formula across all four years \u2014 no typed percents (C5:F5)', ok:gOk},
-        {label:'Compute gross profit \u2014 revenue plus signed COGS, every year (B7:F7)', ok:gpOk},
-        {label:'Compute EBITDA \u2014 gross profit plus signed opex, every year (B9:F9)', ok:eOk},
-        {label:'Run the margin live \u2014 nothing drifts, rebuilt values match v1 exactly (B10:F10)', ok:mOk},
-        {label:'Stamp the roll-forward \u2014 bulk-rename v1 \u2192 v2 across the page (A12:A13)', ok:tagOk},
+        {label:'make growth a LIVE formula across all four years \u2014 no typed percents (C5:F5)', ok:gOk},
+        {label:'compute gross profit \u2014 revenue plus signed COGS, every year (B7:F7)', ok:gpOk},
+        {label:'compute EBITDA \u2014 gross profit plus signed opex, every year (B9:F9)', ok:eOk},
+        {label:'run the margin live \u2014 EBITDA \u00f7 revenue, rebuilt as a formula in every year (B10:F10)', ok:mOk},
+        {label:'stamp the roll-forward \u2014 bulk-rename v1 \u2192 v2 across the page (A12:A13)', ok:tagOk},
       ];
     }
   },
@@ -7307,12 +7316,12 @@ const CHALLENGES = {
       // the revision + refresh: Base growth reset to the revised number, and the Base snapshot refreshed to match
       const mutApplied = Math.abs(gcell('B6')-this._mutG)<1e-9;
       return [
-        {label:'Build the DRIVER via CHOOSE — B8 =CHOOSE($B$3,B5,C5,D5) (active case), B9 =CHOOSE($B$3,B6,C6,D6) (active growth)', ok:driverOk},
-        {label:'Run the model off the driver — C12 =B12*(1+$B$9), anchored, fill C12:F12', ok:modelOk},
-        {label:'Read the % growth under revenue — C13 =C12/B12-1, fill C13:F13', ok:growthOk},
-        {label:'Build the sticky capture — C18 =IF($B$3=C$17,$'+capL+'$12,C18), fill C18:E18', ok:captureOk},
-        {label:'Flip 1·2·3 to snapshot each case — Upside & Downside anchor and hold', ok:driverOk && captureOk && snapOk[1] && snapOk[2]},
-        {label:'Revise Base growth to '+(this._mutG*100).toFixed(1)+'% and refresh Base — the frozen snapshot only updates when you revisit it', ok:mutApplied && snapOk[0]},
+        {label:'build the DRIVER via CHOOSE — B8 =CHOOSE($B$3,B5,C5,D5) (active case), B9 =CHOOSE($B$3,B6,C6,D6) (active growth)', ok:driverOk},
+        {label:'run the model off the driver — C12 =B12*(1+$B$9), anchored, fill C12:F12', ok:modelOk},
+        {label:'read the % growth under revenue — C13 =C12/B12-1, fill C13:F13', ok:growthOk},
+        {label:'build the sticky capture — C18 =IF($B$3=C$17,$'+capL+'$12,C18), fill C18:E18', ok:captureOk},
+        {label:'flip 1·2·3 to snapshot each case — Upside & Downside anchor and hold', ok:driverOk && captureOk && snapOk[1] && snapOk[2]},
+        {label:'revise Base growth to '+(this._mutG*100).toFixed(1)+'% and refresh Base — the frozen snapshot only updates when you revisit it', ok:mutApplied && snapOk[0]},
       ];
     }
   },
@@ -7451,11 +7460,11 @@ const CHALLENGES = {
         for(let r=10;r<=12;r++){ const l=S.cells['A'+r]||{}, rr=S.cells['F'+r]||{};
           if(!l.bl||!rr.br) return false; } return true; })();
       return [
-        {label:'Type the desk rate '+this._rateStr+' at B3 and blue it — the one hardcode on the page', ok:rateOk},
-        {label:'Box the rate cell — all borders on a standalone driver, the desk convention', ok:boxOk},
-        {label:'Convert with ONE formula — B10 =B6*$B$3, anchored, fill right then down (B10:F12)', ok:usdOk},
-        {label:'Comma-format the USD block', ok:usdOk&&comOk},
-        {label:'Outline the finished table A10:F12 — one perimeter, never a grid of borders', ok:outOk},
+        {label:'type the desk rate '+this._rateStr+' at B3 and blue it — the one hardcode on the page', ok:rateOk},
+        {label:'add an outside border around the rate cell — the standalone-driver convention', ok:boxOk},
+        {label:'convert with ONE formula — B10 =B6*$B$3, anchored, fill right then down (B10:F12)', ok:usdOk},
+        {label:'comma-format the USD block', ok:usdOk&&comOk},
+        {label:'outline the finished table A10:F12 — one perimeter, never a grid of borders', ok:outOk},
       ];
     }
   },
@@ -7593,19 +7602,19 @@ const CHALLENGES = {
       let curOk=true, borderOk=true;
       for(let c=2;c<2+NC;c++){ const x=S.cells[colLetter(c)+15]||{}; if(x.fmtStyle!=='currency') curOk=false; if(!x.bb) borderOk=false; }
       return [
-        {label:'Rebuild the four broken subtotals — the cascade FORMULA, not a typed number ('+m.map(x=>x.k).join(', ')+')', ok: allFixed},
-        {label:'Gross profit margin — build =Gross profit ÷ Revenue in column B, then fill right across row '+MG[0].r, ok: gpmOk},
-        {label:'EBITDA margin — build =EBITDA ÷ Revenue in column B, then fill right across row '+MG[1].r, ok: ebmOk},
-        {label:'Dollar-format the Net income row ('+this._niRng+')', ok: curOk},
-        {label:'Rule off Net income — a bottom border under '+this._niRng, ok: borderOk},
-        {label:'Finish at A1 — a clean model greets the reader', ok: allFixed && gpmOk && ebmOk && curOk && borderOk && S.active.r===1 && S.active.c===1},
+        {label:'rebuild the four broken subtotals — the cascade FORMULA, not a typed number ('+m.map(x=>x.k).join(', ')+')', ok: allFixed},
+        {label:'build Gross profit margin — =Gross profit ÷ Revenue in column B, then fill right across row '+MG[0].r, ok: gpmOk},
+        {label:'build EBITDA margin — =EBITDA ÷ Revenue in column B, then fill right across row '+MG[1].r, ok: ebmOk},
+        {label:'dollar-format the Net income row ('+this._niRng+')', ok: curOk},
+        {label:'add a bottom border under Net income — close the statement at '+this._niRng, ok: borderOk},
+        {label:'finish at A1 — a clean model greets the reader', ok: allFixed && gpmOk && ebmOk && curOk && borderOk && S.active.r===1 && S.active.c===1},
       ];
     }
   },
   navigation:{
     name:'Navigate', label:'Navigation maze', par:35, parKeys:45,
     aha:'The keyboard is your only way through — Ctrl+arrow shoots down a corridor until it hits a wall, then you turn. Thread the maze, grab the model, and weave it back to the drop zone.',
-    prompt:'Bold walls box you into a maze. Step one cell at a time, or shoot down a corridor until it hits a wall. Collect every pip on the way to the model room, grab the whole model, copy it, then weave back through the maze to the drop zone and paste it.',
+    prompt:'Bold walls pen you into a maze. Step one cell at a time, or shoot down a corridor until it hits a wall. Collect every pip on the way to the model room, select the whole model, copy it, then weave back through the maze to the drop zone and paste it.',
     req:'thread the maze with <em>ctrl+↑/↓/←/→</em> and single <em>↑/↓/←/→</em> (walls stop you) → collect the pips → grab the model <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → weave to the drop zone → <em>ctrl+v</em>',
     guide(){ return [
       'the walls are solid — <kbd>ctrl</kbd>+<kbd>→/↓/←/↑</kbd> shoots down a corridor to the next wall; a single <kbd>→</kbd> steps one cell',
@@ -7722,7 +7731,7 @@ const CHALLENGES = {
       if(pr.copied && !pr.pasted && dcell && dcell.value==='Revenue') pr.pasted=true;
       return [
         {label:'thread the maze, collecting every pip ('+nGot+'/'+mz.pips.length+')', ok:!!pr.pips},
-        {label:'enter the model room and grab the whole model', ok:!!pr.grab},
+        {label:'enter the model room and select the whole model', ok:!!pr.grab},
         {label:'copy the model', ok:!!pr.copied},
         {label:'weave to the drop zone and paste it', ok:!!pr.pasted}
       ];
