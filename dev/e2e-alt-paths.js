@@ -105,7 +105,6 @@ const ALTS = [
       {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
       {sel:o.deck, keys:[{key:'Alt'},L('e'),L('s'),L('v'),{key:'Enter'}]},
     ]; }` },
-  { key: 'filldr', name: '2D block FIRST (recalc closes it), ribbon fills, FY column down, then sum + pull — no ☆ (the bonus must never gate the win)', moves: `C => { const o=C._o; return [
   /* r422 (pastes rework, DEPTH_PASS §4.3): op-ORDER alt — formats land on the naked Subtotal
      FIRST (its live SUM only re-ties later; end-state grading must hold), then the value ops.
      The 1-cell helper DIVIDE over the four-cell Trading row doubles as the r419 paste-TILING
