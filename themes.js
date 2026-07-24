@@ -1262,7 +1262,7 @@ window.hkFrameOrnaments = (function(){
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
     molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
-    founder:      ['★ FOUNDER','#eef1f7','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#8a6fd8','platinum'],   /* r413 (Wolf): PLATINUM elite — light silver bg + vibrant rainbow foil (was dark space) */
+    founder:      ['★ FOUNDER','#0e0d18','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c9b8ff','platinum'],   /* r416 (Wolf): DARK oil-slick — near-black iridescent base so the rainbow sheen glows like oil on wet asphalt (was light platinum) */
     /* r390 (Wolf) new title skins */
     amethyst:     ['◆ AMETHYST','#180a2a','linear-gradient(120deg,#a06cff,#d0a8ff)','#c49bff','prism'],
     onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','onyxfx'],   /* r404.2 (Wolf): black marble + gold veins (was gold dust, looked like boutique) */
@@ -1373,9 +1373,9 @@ window.hkInitCardFx = function(root){
     const R=(a,b)=>a+Math.random()*(b-a);
     /* r414 (#121 · Wolf): scale fx ELABORATENESS by skin CLASS — the particle-field density
        tracks the card's rarity tier, so the prestige gradient the notch shape encodes is
-       reinforced by how busy the animation is. Epic (the largest, most hand-tuned bucket)
-       stays at the authored baseline (1.0); rare is nudged calmer, legendary busier, common
-       calmest. Applied centrally to the generated particle ARRAYS below (applyEL) so Wolf's
+       reinforced by how busy the animation is. Pronounced class gradient (Wolf approved r416):
+       legendary much busier (1.45), epic slightly rich (1.12), rare calmer (0.88), common
+       calmest (0.78). Applied centrally to the generated particle ARRAYS below (applyEL) so Wolf's
        15 bespoke generators are untouched; object-based fx (nebula/aurora/galaxy/heraldic)
        keep their bespoke tuning. EL is set per-canvas from the frame class. */
     const TIER={}; (window.HK_FRAMES||[]).forEach(f=>{ TIER[f.id]=f.tier; });
@@ -1386,7 +1386,7 @@ window.hkInitCardFx = function(root){
         const cls=(host.className||'').split(/\s+/);
         for(const c of cls){ if(c.indexOf('hk-frame-')!==0) continue; const id=c.slice(9);
           const t=TIER[id]; if(!t) continue;   // skips hk-frame-lg / hk-frame-none
-          return t==='legendary'?1.15 : t==='epic'?1.0 : t==='rare'?0.9 : t==='common'?0.85 : 1.0; }
+          return t==='legendary'?1.45 : t==='epic'?1.12 : t==='rare'?0.88 : t==='common'?0.78 : 1.0; }
       }catch(e){}
       return 1;
     }
@@ -1458,8 +1458,10 @@ window.hkInitCardFx = function(root){
        the pale-rainbow platinum bg they swirl like oil on water; a bright specular sweep keeps it
        shiny. The `st` field is the silver glint field. */
     function platinum(w,h){
-      const blobs=[], N=6, fr=[[1.00,1.31],[1.19,0.83],[0.77,1.07],[1.41,0.62],[0.91,1.23],[1.13,0.71]];
-      for(let i=0;i<N;i++) blobs.push({fx:fr[i][0], fy:fr[i][1], px:R(0,6.28), py:R(0,6.28), r:R(.42,.66)*Math.max(w,h), hue:(i/N)*360, hs:R(6,14)});
+      // r416 (Wolf: more oil-slick): 9 overlapping blobs on incommensurate lissajous paths so the
+      // iridescent sheen swirls richer without a short loop period.
+      const blobs=[], N=7, fr=[[1.00,1.31],[1.19,0.83],[0.77,1.07],[1.41,0.62],[0.91,1.23],[1.13,0.71],[0.63,1.17]];
+      for(let i=0;i<N;i++) blobs.push({fx:fr[i][0], fy:fr[i][1], px:R(0,6.28), py:R(0,6.28), r:R(.40,.62)*Math.max(w,h), hue:(i/N)*360, hs:R(6,14)});
       const n=Math.round(w*h/22000)+6, st=[];
       for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.5),ph:R(0,6.28),sp:R(.5,1.3)});
       return {blobs, st}; }
@@ -1668,19 +1670,22 @@ window.hkInitCardFx = function(root){
            saturated rainbow blobs FLOW on incommensurate lissajous paths (no short period → no
            visible loop), tinting the pale platinum like oil on water; a bright specular streak
            rakes across for the metallic shine; silver glints sparkle. */
+        /* r416 (Wolf: darker + more oil-slick): saturated rainbow blobs TINT the near-black base in
+           NORMAL blend — so overlaps read as deeper colour (oil on wet asphalt), never an additive
+           white blowout — flowing on incommensurate lissajous paths so it never loops. */
         for(const b of (P.blobs||[])){
-          const cx=w*(.5+.34*Math.sin(t/4300*b.fx+b.px)), cy=h*(.5+.34*Math.sin(t/3700*b.fy+b.py));
+          const cx=w*(.5+.36*Math.sin(t/4300*b.fx+b.px)), cy=h*(.5+.36*Math.sin(t/3700*b.fy+b.py));
           const hue=(b.hue + b.hs*Math.sin(t/5200+b.px) + t/40)%360;
           const g=ctx.createRadialGradient(cx,cy,0,cx,cy,b.r);
-          g.addColorStop(0,'hsla('+hue+',98%,56%,'+(reduce?.12:.27)+')');
-          g.addColorStop(.5,'hsla('+((hue+50)%360)+',95%,55%,'+(reduce?.06:.14)+')');
-          g.addColorStop(1,'hsla('+((hue+100)%360)+',92%,56%,0)');
+          g.addColorStop(0,'hsla('+hue+',88%,48%,'+(reduce?.16:.42)+')');
+          g.addColorStop(.55,'hsla('+((hue+55)%360)+',84%,44%,'+(reduce?.08:.20)+')');
+          g.addColorStop(1,'hsla('+((hue+110)%360)+',80%,42%,0)');
           ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,b.r,0,6.28); ctx.fill();
         }
         if(!reduce){ const sp=(t/5300)%1, sx=(-.22+sp*1.55)*w, sa=(1-Math.abs(sp-.5)/.5);
           ctx.globalCompositeOperation='lighter';
-          const g2=ctx.createLinearGradient(sx-.07*w,0,sx+.07*w,h);
-          g2.addColorStop(0,'rgba(255,255,255,0)'); g2.addColorStop(.5,'rgba(255,255,255,'+(sa*.62)+')'); g2.addColorStop(1,'rgba(255,255,255,0)');
+          const g2=ctx.createLinearGradient(sx-.06*w,0,sx+.06*w,h);
+          g2.addColorStop(0,'rgba(214,226,255,0)'); g2.addColorStop(.5,'rgba(214,226,255,'+(sa*.30)+')'); g2.addColorStop(1,'rgba(214,226,255,0)');
           ctx.fillStyle=g2; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; }
         for(const s of P.st){ const a=reduce?.35:(.14+.5*(.5+.5*Math.sin(t/560*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.shadowBlur=4*dpr;ctx.shadowColor='rgba(150,180,255,.7)';ctx.fill();ctx.shadowBlur=0; } }
