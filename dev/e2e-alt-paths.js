@@ -20,7 +20,7 @@ const REPS = 3;
 const only = process.argv.slice(2);
 
 const ALTS = [
-  { key: 'rowops', name: 'ctrl chords for insert/delete (shift+space rows), dress BEFORE the junk dies', moves: `C => { const o=C._o;
+  { key: 'rowops', name: 'ctrl chords for insert/delete (shift+space rows), dress BEFORE the junk dies, border via Alt H B D', moves: `C => { const o=C._o;
       const pr=o.predRow0, jr=o.junkRow0, insAt=pr+1;
       const jr2=jr+(jr>=insAt?1:0);       // the insert shifts the junk down if it sat below
       return [
@@ -29,6 +29,19 @@ const ALTS = [
         {sel:'A'+insAt, keys:[{key:'v',ctrl:true}]},
         {sel:'B'+insAt, keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
         {sel:'A'+jr2, keys:[{key:' ',shift:true},{key:'-',ctrl:true}]},
+        {sel:'A'+o.totRow0+':B'+o.totRow0, keys:[{key:'Alt'},L('h'),L('b'),L('d')]},   // top-and-bottom route — bb lands the same
+      ]; }` },
+  { key: 'rowops', name: 'border FIRST (it rides the row through the ops), ribbon insert/delete, comma via ctrl+shift+1', moves: `C => { const o=C._o;
+      const pr=o.predRow0, jr=o.junkRow0, insAt=pr+1;
+      const jr2=jr+(jr>=insAt?1:0);
+      const insAt2=insAt-(jr2<insAt?1:0);
+      return [
+        {sel:'A'+o.totRow0+':B'+o.totRow0, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},   // close the schedule before touching a single row
+        {sel:'A'+insAt, keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('i'),L('r')]},
+        {sel:o.stagedRng, keys:[{key:'c',ctrl:true}]},
+        {sel:'A'+insAt, keys:[{key:'v',ctrl:true}]},
+        {sel:'A'+jr2, keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('d'),L('r')]},
+        {sel:'B'+insAt2, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       ]; }` },
   { key: 'blocksel', name: 'CUT first / COPY last, margin via typed refs, dress via RIBBON variants (Alt H 1/2/K/P) + box before bold', moves: `C => { const O=C._o; return [
       {sel:O.ebTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT EBITDA first
@@ -44,8 +57,25 @@ const ALTS = [
       {sel:O.hdrRng,     keys:[{key:'Alt'},L('h'),D(1)]},                                            // bold header via ribbon (Alt H 1)
       {sel:O.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},   // top line $ 0-dec
       {sel:O.restRng,    keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},        // rest commas via Alt H K + trim
-      {sel:O.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:O.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'Alt'},L('h'),D(3)]},          // centre + underline via ribbon (Alt H 3)
+      {sel:O.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'Alt'},L('h'),D(3)]},          // ☆ centre + underline via ribbon (Alt H 3) — before the final core beat
+      {sel:O.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},                                  // final core — win fires here
+    ]; }` },
+  { key: 'blocksel', name: 'Op inc cut before EBITDA, margin in POINTER MODE, ribbon fill down, dress walked backwards (align → money → bold → box)', moves: `C => { const O=C._o; return [
+      {sel:O.baseTL,     keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]}, // COPY base first (canonical)
+      {sel:O.o.seg[0],   keys:[{key:'v',ctrl:true}]},
+      {sel:O.opTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // Op inc FIRST this time
+      {sel:O.o.opinc[0], keys:[{key:'v',ctrl:true}]},
+      {sel:O.ebTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},
+      {sel:O.o.ebitda[0],keys:[{key:'v',ctrl:true}]},
+      {sel:O.o.margin[0],keys:[{key:'='},{key:'ArrowLeft'},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowLeft'},{key:'ArrowLeft'},{key:'Enter'}]},  // margin via pointer mode (arrows grab the refs)
+      {sel:O.marginRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                           // fill down via ribbon
+      {sel:O.marginRng,  keys:[{key:'%',ctrl:true,shift:true},{key:'i',ctrl:true}]},
+      {sel:O.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'u',ctrl:true}]},              // ☆ mid-run — never blocks anything
+      {sel:O.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},                                  // alignment BEFORE the money formats
+      {sel:O.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:O.restRng,    keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:O.hdrRng,     keys:[{key:'b',ctrl:true}]},
+      {sel:O.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('s')]},                                  // box LAST — win fires here
     ]; }` },
   { key: 'undo', name: 'the mistake walked FIRST, dressing last, italic via alt h 2', moves: `C => { const o=C._o; return [
       {sel:o.wrongRng, keys:[{key:'Delete'},{key:'z',ctrl:true}]},
@@ -60,7 +90,7 @@ const ALTS = [
       {sel:o.landedCol, keys:[{key:'c',ctrl:true}]},
       {sel:o.d2, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('a'),{key:'Enter'}]},
     ]; }` },
-  { key: 'pastes', name: 'transpose + multiply first via ctrl+alt+v, divide via alt h v s, formats then border-clear, deck values last', moves: `C => { const o=C._o; return [
+  { key: 'pastes', name: 'transpose + multiply first via ctrl+alt+v, divide via alt h v s, formats then border-clear, deck values last (chord-ROUTE alt)', moves: `C => { const o=C._o; return [
       {sel:o.side, keys:[{key:'c',ctrl:true}]},
       {sel:o.feesRow.split(':')[0], keys:[{key:'v',ctrl:true,alt:true},L('e'),{key:'Enter'}]},
       {sel:o.helperNeg, keys:[...T('-1'),{key:'Enter'}]},
@@ -70,21 +100,52 @@ const ALTS = [
       {sel:o.helperDiv, keys:[{key:'c',ctrl:true}]},
       {sel:o.divBlk, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('i'),{key:'Enter'}]},
       {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
-      {sel:o.naked, keys:[{key:'v',ctrl:true,alt:true},L('t'),{key:'Enter'}]},
-      {sel:o.naked, keys:[{key:'Alt'},L('h'),L('b'),L('n')]},
+      {sel:o.sub, keys:[{key:'v',ctrl:true,alt:true},L('t'),{key:'Enter'}]},
+      {sel:o.sub, keys:[{key:'Alt'},L('h'),L('b'),L('n')]},
       {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
       {sel:o.deck, keys:[{key:'Alt'},L('e'),L('s'),L('v'),{key:'Enter'}]},
     ]; }` },
+  /* r422 (pastes rework, DEPTH_PASS §4.3): op-ORDER alt — formats land on the naked Subtotal
+     FIRST (its live SUM only re-ties later; end-state grading must hold), then the value ops.
+     The 1-cell helper DIVIDE over the four-cell Trading row doubles as the r419 paste-TILING
+     regression: the op path must broadcast the helper once per cell, never double-apply. */
+  { key: 'pastes', name: 'formats FIRST onto the naked Subtotal, helpers batched, divide tiles ×1 across Trading (r419 tiling regression), deck via ctrl+alt+v', moves: `C => { const o=C._o; return [
+      {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
+      {sel:o.sub, keys:[{key:'Alt'},L('e'),L('s'),L('t'),{key:'Enter'}]},
+      {sel:o.sub, keys:[{key:'Alt'},L('h'),L('b'),L('n')]},
+      {sel:o.helperDiv, keys:[...T('1000'),{key:'Enter'}]},
+      {sel:o.helperNeg, keys:[...T('-1'),{key:'Enter'}]},
+      {sel:o.helperDiv, keys:[{key:'c',ctrl:true}]},
+      {sel:o.divBlk, keys:[{key:'Alt'},L('e'),L('s'),L('i'),{key:'Enter'}]},
+      {sel:o.helperNeg, keys:[{key:'c',ctrl:true}]},
+      {sel:o.costRow, keys:[{key:'Alt'},L('e'),L('s'),L('m'),{key:'Enter'}]},
+      {sel:o.side, keys:[{key:'c',ctrl:true}]},
+      {sel:'B4', keys:[{key:'Alt'},L('e'),L('s'),L('e'),{key:'Enter'}]},
+      {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
+      {sel:o.deck, keys:[{key:'v',ctrl:true,alt:true},L('v'),{key:'Enter'}]},
+    ]; }` },
   { key: 'filldr', name: '2D block FIRST (recalc closes it), ribbon fills, FY column down, then sum + pull', moves: `C => { const o=C._o; return [
       {sel:o.mix0, keys:[...T('='+o.mixF),{key:'Enter'}]},
-      {sel:'B11:B13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.mixCol, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:o.blk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:o.fy0, keys:[...T('=SUM('+o.fyArg+')'),{key:'Enter'}]},
       {sel:o.fyRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:o.sum0, keys:[...T('=SUM(B5:B8)'),{key:'Enter'}]},
+      {sel:o.sum0, keys:[...T('=SUM('+o.sumArg+')'),{key:'Enter'}]},
       {sel:o.sumRng, keys:[{key:'r',ctrl:true}]},
       {sel:o.pull0, keys:[...T('='+o.feed0),{key:'Enter'}]},
       {sel:o.pullRng, keys:[{key:'r',ctrl:true}]},
+    ]; }` },
+  { key: 'filldr', name: 'AutoSum route (alt+=) for both totals, ☆ via ribbon bold (alt h 1) + top border, canonical order', moves: `C => { const o=C._o; return [
+      {sel:o.pull0, keys:[...T('='+o.feed0),{key:'Enter'}]},
+      {sel:o.pullRng, keys:[{key:'r',ctrl:true}]},
+      {sel:o.fy0, keys:[{key:'=',alt:true},{key:'Enter'}]},
+      {sel:o.fyRng, keys:[{key:'d',ctrl:true}]},
+      {sel:o.sum0, keys:[{key:'=',alt:true},{key:'Enter'}]},
+      {sel:o.sumRng, keys:[{key:'r',ctrl:true}]},
+      {sel:o.sumRng, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.mix0, keys:[...T('='+o.mixF),{key:'Enter'}]},
+      {sel:o.blkRow, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.blk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
     ]; }` },
   { key: 'foot', name: 'typed SUMs (no alt+=), columns before rows', moves: `C => [
       {sel:'B6', keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
@@ -675,6 +736,31 @@ const ALTS = [
         {sel:cl(p2[0][1])+p2[0][0], keys:nav2},                                                          // slow single-step weave to the drop zone
         {sel:cl(D.c0)+D.r0, keys:[{key:'v',ctrl:true}]}                                                  // paste
       ]; }` },
+  { key: 'navigation', name: 'ctrl-shot thread + SLOW GRAB — the model spanned with plain shift+arrows (no ctrl+shift jumps)', moves: `C => {
+      // r422 (§1.8): second route — canonical corridor shooting, but the block-grab is plain
+      // Shift+arrow spans (2 right, 3 down), one cell at a time. Same end state, different chords.
+      const M=C._maze, cl=colLetter, T=M.table, D=M.paste, p1=M.p1, p2=M.p2, RN=20, CN=10;
+      const ek=(r,c,nr,nc)=>{ const a=r*100+c,b=nr*100+nc; return a<b?(r+':'+c+'|'+nr+':'+nc):(nr+':'+nc+'|'+r+':'+c); };
+      const can=(r,c,nr,nc)=> nr>=1&&nr<=RN&&nc>=1&&nc<=CN&&M.pass.has(ek(r,c,nr,nc));
+      const shoot=(r,c,dr,dc)=>{ let cr=r,cc=c; while(can(cr,cc,cr+dr,cc+dc)){cr+=dr;cc+=dc;} return [cr,cc]; };
+      const dK=(dr,dc)=> dr===1?{key:'ArrowDown',ctrl:true}:dr===-1?{key:'ArrowUp',ctrl:true}:dc===1?{key:'ArrowRight',ctrl:true}:{key:'ArrowLeft',ctrl:true};
+      const sK=(dr,dc)=> dr===1?{key:'ArrowDown'}:dr===-1?{key:'ArrowUp'}:dc===1?{key:'ArrowRight'}:{key:'ArrowLeft'};
+      const steps=[];
+      const walk=(path)=>{ let i=0;
+        while(i<path.length-1){ const [r,c]=path[i]; const dr=Math.sign(path[i+1][0]-r), dc=Math.sign(path[i+1][1]-c);
+          let j=i+1; while(j+1<path.length && Math.sign(path[j+1][0]-path[j][0])===dr && Math.sign(path[j+1][1]-path[j][1])===dc) j++;
+          const end=path[j], sh=shoot(r,c,dr,dc);
+          if(sh[0]===end[0]&&sh[1]===end[1]){ steps.push({sel:cl(c)+r, keys:[dK(dr,dc)]}); }
+          else { for(let k=i;k<j;k++){ const [rr,cc]=path[k]; steps.push({sel:cl(cc)+rr, keys:[sK(dr,dc)]}); } }
+          i=j; } };
+      walk(p1);                                                                                          // ctrl-shot thread to the model room (collects pips)
+      const g=[]; for(let i=0;i<T.w-1;i++) g.push({key:'ArrowRight',shift:true});
+      for(let i=0;i<T.h-1;i++) g.push({key:'ArrowDown',shift:true});
+      g.push({key:'c',ctrl:true});
+      steps.push({sel:cl(T.c0)+T.r0, keys:g});                                                           // slow grab + copy (active ends at the far corner, where p2 starts)
+      walk(p2);                                                                                          // ctrl-shot weave to the drop zone
+      steps.push({sel:cl(D.c0)+D.r0, keys:[{key:'v',ctrl:true}]});
+      return steps; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
       const steps=C._sites.slice().reverse().flatMap(s=>[
@@ -738,7 +824,7 @@ const ALTS = [
   } catch (e) {} });
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 120)));
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
+  await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r422: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided pattern) */
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 

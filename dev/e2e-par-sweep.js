@@ -24,11 +24,12 @@ const VARIANCE_OK = new Set(['editfix']);
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
     localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
+  await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r422: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided pattern) */
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 
-  const keys = await page.evaluate(() => Object.keys(CHALLENGES));
+  const only = process.argv.slice(2);   /* r422: optional per-drill filter — sweep one drill after its rework */
+  const keys = (await page.evaluate(() => Object.keys(CHALLENGES))).filter(k => !only.length || only.includes(k));
   const rows = [];
   for (const key of keys) {
     const counts = [];
