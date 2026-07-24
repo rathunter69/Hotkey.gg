@@ -2,7 +2,8 @@
 
 Four subagents swept the engine, cards/XP, nav/leaderboard, and drills for real defects (each verifying
 findings + skipping documented-intentional Excel divergences). **Graders came back clean** — no drill
-misgrades. 10 real bugs found; the code-level ones are **FIXED** in the r416 bug-fix batch.
+misgrades. 10 real bugs found; the code-level ones (8) are **FIXED and LIVE** (PR #231, merged
+2026-07-24). Only **#6** (stale drill `targets[]`) and **#10** (unreachable sort grader) remain — see below.
 
 ## FIXED (r416 bug-fix batch)
 
