@@ -114,5 +114,83 @@ try {
   bad('C3 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
+/* ---- C7 (r421, DEPTH_PASS §2.8): split-capture + bonus-☆ wiring stays wired.
+   The runtime law (`S.splits.length === checks.length` at the win snapshot, and the
+   bonus never blocking the win) is asserted live in dev/e2e-depth-mechanics.js; this
+   static guard makes sure the wiring those assertions depend on can't be deleted or
+   detached in a refactor without CI noticing. Also: HOTKEY_CLOCKS keys ⊆ real drills
+   (the §2.1 override map can't drift from the catalog). ---- */
+try {
+  const idx = fs.readFileSync('index.html', 'utf8');
+  const need = [
+    ['function hkSplitTick', 'the §2.1 split-capture latch (hkSplitTick) is gone from index.html'],
+    ['hkSplitTick(items)', 'updateChecklist no longer feeds the grading pass into hkSplitTick — splits stop capturing'],
+    ['c.ok||c.bonus', 'gradePass no longer filters bonus beats — a ☆ line would BLOCK the win (§2.2 regression)'],
+    ['function hkTierTick', 'the §2.5 tier-ladder reveal (hkTierTick) is gone from index.html'],
+    ['function hkTouchTick', 'the §2.6 touch-list latch (hkTouchTick) is gone from index.html'],
+  ];
+  let miss = 0;
+  for (const [tok, msg] of need) if (!idx.includes(tok)) { miss++; bad('C7: ' + msg); }
+  if (!miss) ok('index.html: depth-pass §2 wiring present (splits · bonus filter · tiers · touch-lists)');
+
+  const sb7 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sb7);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb7);
+  const valid7 = new Set(((sb7.window.HOTKEY_DRILLS || {}).groups || []).flatMap(g => g.keys || []));
+  const clocks = sb7.window.HOTKEY_CLOCKS || {};
+  let cbad = 0;
+  for (const k of Object.keys(clocks)) {
+    if (!valid7.has(k)) { cbad++; bad(`C7: HOTKEY_CLOCKS.'${k}' is not a real drill key`); }
+    const o = clocks[k] || {};
+    for (const f of Object.keys(o)) if (!['pass', 'pro', 'leg'].includes(f)) { cbad++; bad(`C7: HOTKEY_CLOCKS.${k}.${f} — clocks are {pass, pro, leg} seconds only`); }
+  }
+  if (!cbad) ok(`drills.js: HOTKEY_CLOCKS ${Object.keys(clocks).length} override(s), all real drills, right shape`);
+} catch (e) {
+  bad('C7 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C8 (r421, DEPTH_PASS §2.8 + §1.7): bare-range LINT on check labels — a label that
+   is ONLY coordinates with no board-label noun ("select B4", "fill A1:E1") flags for
+   review; beats reference the real-world item, never the bare cell (Wolf, round 1).
+   WARN-ONLY by design ("CI warns, human merges") — never fails the gate. Maze-class
+   drills are allowlisted (§1.7 R2(a): obstacle boards where coordinates ARE the game);
+   additions to the allowlist require the drill's §4 page claiming the R2(a) exemption. ---- */
+try {
+  const BARE_RANGE_ALLOW = new Set(['navigation']);
+  const idx = fs.readFileSync('index.html', 'utf8');
+  const start = idx.indexOf('const CHALLENGES = {');
+  const end = idx.indexOf('STATE + ENGINE', start);
+  let warned = 0, scanned = 0;
+  if (start < 0 || end < 0) { console.warn('  warn C8: CHALLENGES block not found — bare-range lint skipped'); }
+  else {
+    const body = idx.slice(start, end);
+    // split the object into per-drill chunks on top-level `  key:{` lines
+    const parts = body.split(/\n  ([a-z][a-z0-9_]*):\s*\{/);
+    for (let i = 1; i < parts.length; i += 2) {
+      const key = parts[i], chunk = parts[i + 1] || '';
+      if (BARE_RANGE_ALLOW.has(key)) continue;
+      const re = /label:\s*'((?:[^'\\]|\\.)*)'/g;
+      let m;
+      while ((m = re.exec(chunk))) {
+        scanned++;
+        let lab = m[1];
+        // strip refs/ranges + row/column coordinates, then ask what nouns are left
+        const stripped = lab
+          .replace(/\$?[A-J]\$?\d{1,2}(\s*:\s*\$?[A-J]\$?\d{1,2})?/g, ' ')
+          .replace(/\b(row|rows|column|columns|col|cols|cell|cells|range)\b\s*\d*/gi, ' ')
+          .replace(/\b[A-J]\b/g, ' ');
+        const words = (stripped.match(/[a-zA-Z]{2,}/g) || []);
+        if (words.length < 2 && /[A-J]\$?\d/.test(lab)) {
+          warned++;
+          console.warn(`  warn C8 bare-range: ${key} check label is coordinates with no board-label noun: "${lab.slice(0, 70)}"`);
+        }
+      }
+    }
+    console.log(`  ok  C8 bare-range lint: ${scanned} static labels scanned, ${warned} flagged (warn-only — §1.7 semantic rule)`);
+  }
+} catch (e) {
+  console.warn('  warn C8 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');
