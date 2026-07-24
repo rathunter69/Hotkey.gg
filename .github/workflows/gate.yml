@@ -102,6 +102,14 @@ jobs:
       - name: Guided contract (rails contain, alternates count, every drill solvable)
         if: steps.scope.outputs.engine == 'true'
         run: node dev/e2e-guided.js
+      # r415-review Segment D: the new formula pack (VLOOKUP/HLOOKUP/AND/OR/NOT/date math) and
+      # the grid-height regression invariants (cell-height band · all rows · determinism · fill).
+      - name: Formula pack (lookup / logical / date)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-formulas.js
+      - name: Grid-height regression
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-grid-height.js
       - name: Drill pages in sync
         if: steps.scope.outputs.engine == 'true'
         run: |
