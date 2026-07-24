@@ -13,16 +13,27 @@ leaderboards, desks for teams & schools. Taglines: *"Drills, not lessons. Fastes
 run takes thirty seconds."* Static site (HTML + vanilla JS) → Supabase (Postgres/RLS/Edge Fns) + Stripe,
 deployed by Cloudflare Pages from `main`. **No build step, no framework.**
 
-**Why it exists.** Excel-keyboard fluency (no mouse) is a skill every IB/PE/finance seat screens for
-informally, but nobody *trains* it as a game with *proof*. The core is a genuinely-good 30-second loop:
-**drill → end-state grading → results → next.** The identity layer (ranks, levels, cosmetic cards,
-desks, certs) is deep. The thin part — the current roadmap focus — is everything *between* sessions:
-reasons to return tomorrow, proof to show others, and funnel instrumentation.
+**Why it exists.** Most people who live in spreadsheets were **never actually taught Excel** — they
+learned by osmosis, copy-paste, and the mouse, and stayed slow. Excel-keyboard fluency (no mouse) is a
+skill every IB/PE/finance seat screens for informally, yet nobody *trains* it as a game with *proof* —
+and the same gap exists for the far larger population of everyday business users. The core is a
+genuinely-good 30-second loop: **drill → end-state grading → results → next.** The identity layer (ranks,
+levels, cosmetic cards, desks, certs) is deep. The thin part — the current roadmap focus — is everything
+*between* sessions: reasons to return tomorrow, proof to show others, and funnel instrumentation.
 
-**Target customers.** Primary: **finance/IB/PE analysts + recruiting candidates** ("you say you're fast
-in Excel on your resume — here's the receipt"). Distribution engine = **desks/clubs**: one captain
-(MBA/undergrad finance club officer, EB cohort self-organizer, bank training lead) = 10–150 players. B2B
-= "PRO for the whole desk" + a future cheat-resistant benchmark for recruiting.
+**Target customers.** **Beachhead** (the wedge — high intensity, tight community, willing to pay for
+proof): **finance/IB/PE analysts + recruiting candidates** ("you say you're fast in Excel on your resume
+— here's the receipt"). Distribution engine = **desks/clubs**: one captain (MBA/undergrad finance club
+officer, EB cohort self-organizer, bank training lead) = 10–150 players. B2B = "PRO for the whole desk"
++ a future cheat-resistant recruiting benchmark.
+**Broader ambition (the real TAM):** the *huge* population of **business professionals who were never
+formally taught Excel but live in it daily** — consultants, ops/RevOps, accounting/FP&A, sales, PMs,
+founders, small-business owners, students — self-taught, mouse-dependent, and slower than they'd like.
+The product should be **accessible and attractive to them, not just banker-hardcore**: an approachable,
+game-y on-ramp (no jargon wall, gentle early drills, "look how fast you got" wins) that makes
+keyboard-fluency learnable and fun for anyone who uses spreadsheets — while the finance framing stays as
+the credibility/proof spike, not a gate. Keep this dual audience in mind for copy, onboarding, drill
+difficulty curves, and cosmetic/theme breadth (not everything should read as investment-banking).
 
 **Business model.** Freemium B2C sub — **PRO ($7/mo · $19/season)** — + **B2B per-seat "PRO for the
 desk"** + free comped PRO for verified student clubs. Strongest planned conversion surface = **Interview
