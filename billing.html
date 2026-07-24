@@ -136,10 +136,11 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 
       '<div class="card"><h4>Manage plan</h4>'+
         (isPro
-          ? '<div class="fieldrow"><span class="fk">pause</span><span class="fv"><a class="lnk" id="pauseBtn">pause subscription</a></span></div>'+
-            '<div class="msg" id="pauseMsg">Keep your account &amp; data, stop billing. Resume anytime.</div>'+
-            '<div class="fieldrow"><span class="fk">cancel</span><span class="fv"><a class="lnk danger" id="cancelBtn">cancel subscription</a></span></div>'+
-            '<div class="msg" id="cancelMsg">Drops you to Free at the end of the period. Your account, runs, and boards stay.</div>'+
+          ? '<div class="fieldrow"><span class="fk">pause</span><span class="fv" style="color:var(--faint)">available at launch</span></div>'+
+            '<div class="msg">Keep your account &amp; data, stop billing. Resume anytime.</div>'+
+            '<div class="fieldrow"><span class="fk">cancel</span><span class="fv" style="color:var(--faint)">available at launch</span></div>'+
+            '<div class="msg">Drops you to Free at the end of the period. Your account, runs, and boards stay.</div>'+
+            '<div class="msg" style="color:var(--warn)">Billing isn&rsquo;t live during beta &mdash; there&rsquo;s no subscription to pause or cancel yet.</div>'+
             '<div class="note" style="margin-top:auto">Cancelling only ends PRO &mdash; to erase everything, use Delete account on the <a href="account.html" style="color:var(--accent)">account page</a>.</div>'
           : '<div class="fieldrow"><span class="fk">you’re on</span><span class="fv"><b>Free</b></span></div>'+
             '<button class="btn" id="upgradeBtn2" style="margin-top:12px">Upgrade to PRO</button>'+
@@ -155,29 +156,14 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
   ['upgradeBtn','upgradeBtn2'].forEach(id=>{ const b=document.getElementById(id);
     if(b) b.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); }; });
 
-  // Pause / cancel — arm-to-confirm, wired to RPCs when they exist; beta-aware until then.
-  // At launch, pause_subscription / cancel_subscription (or the Stripe portal) replace the notes.
-  function armAction(btnId, msgId, verb, run){
-    const btn=document.getElementById(btnId); if(!btn) return;
-    const base=btn.textContent; let armed=false, t=null;
-    btn.onclick=async()=>{
-      if(!armed){ armed=true; btn.textContent='click again to '+verb; t=setTimeout(()=>{armed=false; btn.textContent=base;},4000); return; }
-      clearTimeout(t); armed=false; btn.textContent=base; say(msgId,'Working…');
-      try{ await run(msgId); }catch(e){ say(msgId,'Something went wrong — email hello@hotkey.gg.',true); }
-    };
-  }
-  armAction('pauseBtn','pauseMsg','pause', async(mid)=>{
-    try{ const {error}=await sb.rpc('pause_subscription');
-      say(mid, error ? 'You’re on the free beta — nothing is billing yet. Pause opens here the day PRO goes paid.'
-                     : 'Subscription paused — you won’t be billed. Resume anytime.'); }
-    catch(e){ say(mid,'You’re on the free beta — nothing is billing yet. Pause opens here the day PRO goes paid.'); }
-  });
-  armAction('cancelBtn','cancelMsg','cancel', async(mid)=>{
-    try{ const {error}=await sb.rpc('cancel_subscription');
-      say(mid, error ? 'You’re on the free beta — there’s no paid subscription to cancel yet.'
-                     : 'Subscription cancelled — you stay PRO until the period ends, then drop to Free.'); }
-    catch(e){ say(mid,'You’re on the free beta — there’s no paid subscription to cancel yet.'); }
-  });
+  // H1 (AUDIT r417 §B): pause/cancel used to call pause_subscription / cancel_subscription
+  // RPCs that DO NOT EXIST, and the catch branch printed beta copy that would have masked
+  // REAL failures at launch. While billing is scaffold (no Stripe live) the actions are
+  // rendered disabled above with a plain "billing isn't live during beta" note — no dead
+  // RPC calls at all.
+  // TODO(Segment E2 — dev/PROJECT_REVIEW.md): real billing backend. When Stripe goes live,
+  // wire pause/cancel here to the real pause_subscription / cancel_subscription RPCs (or
+  // the Stripe billing portal), with honest error surfacing — no beta-copy fallbacks.
 
   // r396: when billing goes live, an `invoices` table (or the processor's API) fills #invBody.
   // Rendered as a table so the empty state and the live state share one layout:
@@ -195,7 +181,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
           '<td>'+(r.hosted_url?'<a href="'+esc(r.hosted_url)+'" target="_blank" rel="noopener" style="color:var(--accent)">receipt &rarr;</a>':'')+'</td></tr>').join('')+
         '</tbody></table>';
     }
-  }catch(e){ /* no invoices table yet (beta) — the empty state stands */ }
+  }catch(e){ console.warn('billing: invoices read failed (expected during beta — no invoices table yet):', e); /* the empty state stands */ }
 })();
 </script>
 </body>

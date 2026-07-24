@@ -348,7 +348,11 @@ async function load(){
 
     // ---- evaluation roster ----
     const roster=ids.map(id=>{ const st=DATA.userStat[id]; const e=eco[id];
-      const t=st?tierOf(st.avg, st.att, st.wsum):window.HK_RANK.tierOf(null,0);
+      /* r417 audit: rank identity from the GLOBAL standing (gUserStat) — userStat is
+         desk-filtered here, which showed a different tier than every other surface.
+         boards/crowns stay desk-scoped (this is the desk's evaluation roster). */
+      const gst=(DATA.gUserStat||DATA.userStat)[id];
+      const t=gst?tierOf(gst.avg, gst.att, gst.wsum):window.HK_RANK.tierOf(null,0);
       return {id, name:DATA.names[id], tier:t, att:(st&&st.att)||0, crowns:(st&&st.crowns)||0,
         week:e.week, saved:e.savedMs, cap:id===captainId}; })
       .sort((a,b2)=> b2.week-a.week || b2.crowns-a.crowns || b2.att-a.att);
@@ -468,7 +472,11 @@ function showPublicCard(uid){
   if(!DATA) return;
   const {userStat,names,meId}=DATA;
   const st=userStat[uid];
-  const t=st ? tierOf(st.avg, st.att, st.wsum) : window.HK_RANK.tierOf(null, 0);
+  /* r417 audit: tier/rank IDENTITY always computes from the GLOBAL field (gUserStat) — on a
+     desk view userStat is desk-FILTERED, and the same player showed a different tier here than
+     on every other surface. Times/boards/counts below stay desk-scoped on purpose. */
+  const gst=(DATA.gUserStat||userStat)[uid];
+  const t=gst ? tierOf(gst.avg, gst.att, gst.wsum) : window.HK_RANK.tierOf(null, 0);
   let deskNm=null;
   try{ const m=(window.__deskMembers||[]).find(x=>x.user_id===uid);
     if(m){ const tt=(window.__deskTeams||[]).find(x=>x.id===m.team_id); deskNm=tt&&tt.name; } }catch(e){}

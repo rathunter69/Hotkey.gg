@@ -13814,7 +13814,16 @@ function lvlOf(xp){ return lvlDetail(xp).lvl; }
    yet rides the local per-solve estimate (hk_xp_est, which updateRankPill/nav both reconcile UP
    to server truth); a guest rides the solve-count estimate. Every level readout goes through this. */
 function hkLevelXp(nsol){
-  if(typeof window.__srvXp==='number') return Math.max(0, window.__srvXp);
+  if(typeof window.__srvXp==='number'){
+    /* r418: max(server, local estimate) — the same monotonic semantics myXpEst uses for the
+       unlock gates, so the visible LVL chip can never DROP on server sync while local-only XP
+       (bounties/milestones that reprice later server-side) keeps a gate unlocked. uid-guarded:
+       hk_xp_est is only trusted when hk_xp_uid tags it to the signed-in account (the reconcile
+       in the trainer sync + nav hydrateLevel stamps that uid the moment __srvXp lands). */
+    let est=0;
+    try{ if(me_user && localStorage.getItem('hk_xp_uid')===me_user.id) est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){}
+    return Math.max(0, window.__srvXp, est);
+  }
   if(sb && me_user && !isAnonUser()){ try{ return parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){ return 0; } }
   if(nsol==null){ try{ nsol=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0; }catch(e){ nsol=0; } }
   return localXP(nsol);
@@ -14324,7 +14333,13 @@ function myXpEst(){
   // r412: read the ONE canonical XP (hkLevelXp) so the gate can never disagree with the visible
   // LVL chip. Kept as max() with the raw stored estimate so a gate never drops BELOW what a
   // prior session already granted (monotonic — a player who saw "LVL 5" stays unlocked).
-  let xp=0; try{ xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0; }catch(e){}
+  // r418: uid-guarded like hkLevelXp — an estimate hk_xp_uid tags to a DIFFERENT account is
+  // ignored so a previous login's XP can't hold gates open. An UNTAGGED estimate stays trusted
+  // (guests and fresh sign-ins accumulate hk_xp_est before the first server reconcile stamps it).
+  let xp=0;
+  try{ const owner=localStorage.getItem('hk_xp_uid')||'';
+    if(!owner || (me_user && owner===me_user.id)) xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+  }catch(e){}
   try{ const lx=hkLevelXp()|0; if(lx>xp) xp=lx; }catch(e){} return xp; }
 function paceClears(){ let n=0; try{ MENU_ORDER.forEach(k=>{ if(campCleared(k)) n++; }); }catch(e){} return n; }
 function groupUnlocked(gname){
@@ -14868,8 +14883,18 @@ async function onSession(session){
       // it never clobbers a school this account already has.
       let pending=null; try{ pending=localStorage.getItem('hk_pending_school')||null; }catch(e){}
       if(uid && pending && !existing){
-        try{ await sb.from('profiles').update({school_tag:pending, show_school:true}).eq('id',uid);
-          existing=pending; localStorage.removeItem('hk_pending_school'); }catch(e){}
+        // r418: direct school_tag writes were revoked in r122 — the old combined update
+        // 403'd wholesale and the sign-up pick was silently lost. Ride the set_school_tag
+        // RPC (same path account.html uses), then opt in via show_school, which IS granted.
+        try{
+          const {error}=await sb.rpc('set_school_tag',{p_tag:pending});
+          if(!error){
+            existing=pending; localStorage.removeItem('hk_pending_school');
+            try{ await sb.from('profiles').update({show_school:true}).eq('id',uid); }catch(e){}
+          } else if(/TAG_RESERVED|TAG_FORMAT/.test(String(error.message||''))){
+            localStorage.removeItem('hk_pending_school');   // a rejected pick never gets better — stop retrying
+          }
+        }catch(e){}
       }
       if(!existing) await sb.rpc('refresh_school_tag');
       if(sessionStorage.getItem('hk_home_nudged')) return;
@@ -15926,7 +15951,16 @@ async function flushRunOutbox(){
     if(!sb || !me_user || isAnonUser()) return;
     let q=_outboxRead(); if(!q.length) return;
     const posted=new Set();
+    /* r418 hardening: (a) a row stamped with a DIFFERENT user_id can never insert under RLS
+       (with check auth.uid() = user_id) — it 403s on every flush forever; drop it instead of
+       retrying. (b) runs_guard rate-limits inserts at 20/60s — cap one flush at 15 rows so a
+       full 25-row outbox can't trip RATE_LIMITED and fail the whole batch; the remainder
+       simply rides the next flush. */
+    const FLUSH_CAP=15; let sent=0;
     for(const row of q){
+      if(row && row.user_id && row.user_id!==me_user.id){ posted.add(JSON.stringify(row)); continue; }   // foreign-user row → drop (RLS-uninsertable)
+      if(sent>=FLUSH_CAP) break;
+      sent++;
       try{ const { error } = await sb.from('runs').insert(row);
         if(!error || /duplicate|conflict|unique/i.test(error.message||'')) posted.add(JSON.stringify(row));   // posted or permanent → drop
       }catch(e){ /* transient → leave it in the outbox for next time */ }
