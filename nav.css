@@ -59,6 +59,9 @@ body{padding-top:14px}
 .topnav-rank{font-size:9.5px; padding:5px 11px; cursor:pointer; align-items:center; margin-right:4px;
   transition:transform .12s, box-shadow .12s}
 .topnav-rank:hover{transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.3)}
+/* r423 (Wolf): the pill names rank AND bucket — "VP · top". The bucket rides quieter
+   than the tier name so the one-row nav holds. */
+.topnav-rank .pill-bk{font-style:normal; opacity:.72; letter-spacing:.02em; white-space:nowrap}
 @media (max-width:760px){ .topnav-rank{display:none !important} }
 
 /* ---------- AUTH SLOT + USER MENU DROPDOWN ---------- */

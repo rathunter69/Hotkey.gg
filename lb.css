@@ -80,7 +80,7 @@
      featured/seclead strips were falling into a single column of the 2-col board grid */
   #boards > .hero, #boards > .featured, #boards > #secleadMount, #boards > .panel{grid-column:1/-1}
   .hero{display:grid; grid-template-columns:minmax(200px,.75fr) minmax(215px,.8fr) minmax(300px,1.45fr); gap:16px; margin-bottom:18px}   /* r267: floors + the players panel gets the width its rows need */
-  .hero.two{grid-template-columns:minmax(240px,.9fr) minmax(320px,1.8fr)}   /* r293: ladder panel retired — card + top players share the row */
+  .hero.two{grid-template-columns:minmax(0,462px) minmax(320px,1fr)}   /* r293: ladder panel retired — card + top players share the row. r423 (Wolf, ONE-CARD LAW): the card column seats the canonical 462px hkPlayerCard */
   @media(max-width:1080px){ .hero, .hero.two{grid-template-columns:1fr 1fr} }   /* r297: .hero.two out-specified the collapse rules — the two-panel hero never stacked on mobile and Top Players clipped off-screen */
   @media(max-width:820px){ .hero, .hero.two{grid-template-columns:1fr} }
   .ld-row{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:11px; padding:7.5px 8px; border-radius:9px; min-height:38px;
@@ -201,13 +201,18 @@
   .panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 14px}   /* r84: rhythm */
   .panel.me{border-color:var(--accent-dim); background:var(--surface)}   /* r62 flat — border carries it */
   .panel h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; margin:0 0 12px}
-  .yc-top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:10px}
-  .yc-lvl{font-family:var(--mono); font-size:24px; font-weight:700; color:var(--accent)}
-  .yc-bar{flex:1; min-width:120px; height:7px; background:var(--surface2); border-radius:99px; overflow:hidden}
-  .yc-bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
-  .yc-next{font-family:var(--mono); font-size:12.5px; color:var(--muted); line-height:1.7; border-top:1px dashed var(--line); padding-top:10px; margin-top:8px}
-  .yc-next b{color:var(--text)}
-  .yc-next .have{color:var(--accent)} .yc-next .lack{color:var(--warn)}
+  /* r423 (Wolf, ONE-CARD LAW): .me-card is the SAME holder the profile page and the
+     header rank-click modal give the card — width min(462px,·), plain surface + 1px line
+     border, .uc insets 22/24/20; skinned cards go BARE (.me-bare, the pc-bare/pub-bare
+     rule) so the skin IS the surface. Shared by the lb hero and the stats hero. The h4
+     caption and the yc-* dressing (yc-top/lvl/bar/next/medals/boards) retired with their
+     markup — no surface-specific expansion. .me-col is the chrome-less hero cell that
+     seats the card + the external owner bar. */
+  .panel.me.me-col{background:transparent; border:0; padding:0; box-shadow:none}
+  .me-card{position:relative; width:min(462px,100%); background:var(--surface); border:1px solid var(--line); border-radius:16px}
+  .me-card .uc{padding:22px 24px 20px; border-radius:16px}
+  .me-card.me-bare{background:transparent; border:0}
+  .me-col .uc-ownerbar{padding:0 4px}
   .tp-row{display:grid; grid-template-columns:26px minmax(0,1fr) auto auto auto; gap:10px; align-items:center;
     font-family:var(--mono); font-size:13px; padding:7px 4px; border-bottom:1px solid var(--line)}   /* r267: tier chip rides its own column — it used to clip mid-ellipsis inside the name. r382: + the .tp-mid stat */
   .tp-row .tp-mid{color:var(--faint); font-size:10.5px; white-space:nowrap; justify-self:end; font-variant-numeric:tabular-nums}
@@ -307,19 +312,7 @@
   .featured .board .empty{padding:16px 18px 4px}
   .hero .panel{display:flex; flex-direction:column}
   .hero .panel > :last-child{margin-top:auto}
-  /* r392 (Wolf): your-card medal showcase fills the column beside the tall daily board */
-  .yc-medals{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; justify-content:center}
-  /* r392 (Wolf: "still a weird gap / mismatch"): your best three standings, filling the
-     column with signal instead of stretch-air. Rows echo the board list styling. */
-  .yc-boards{margin-top:16px; border-top:1px dashed var(--line); padding-top:12px}
-  .yc-btitle{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); margin-bottom:8px}
-  .yc-brow{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.5px; padding:5px 2px; border-bottom:1px solid var(--line)}
-  .yc-brow:last-child{border-bottom:0}
-  .yc-bpl{color:var(--faint); min-width:34px; font-variant-numeric:tabular-nums}
-  .yc-brow.pod .yc-bpl{color:var(--accent)}
-  .yc-brow.gold .yc-bpl{color:var(--gold,#e0b45a)}
-  .yc-bnm{flex:1; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .yc-bfd{color:var(--faint); font-size:10.5px}
+  /* r423: yc-medals / yc-boards attachments retired — the ONE card carries the showcase */
   /* r392 (Wolf): compact-always leaderboard. The your-card sidebar sits snug to its
      content (no stretch gap to match the tall Top Players board). Daily + weekly are two
      EQUAL fixed cards — the daily box no longer spans full width as a near-empty banner. */
@@ -350,7 +343,6 @@
      alignment + gaps live in nav.css's shared icon system; containers own their gaps */
   @keyframes emblemPulse{0%,100%{filter:drop-shadow(0 0 3px currentColor)}50%{filter:drop-shadow(0 0 9px currentColor)}}
   .emblem-max{animation:emblemPulse 2.2s ease-in-out infinite}
-  .yc-top .pc-tier{font-size:10px; padding:6px 13px}
   /* r393 (Wolf: "two checkmarks on the left?"): the drill list row carries an explicit
      <b class="bl-me">✓</b> already; this generic .chip.mine::after was doubling it up
      (bl-row also carries .chip). The explicit tick owns the tooltip — drop the pseudo. */

@@ -354,6 +354,14 @@
   }
 
   // Rank pill: fetch standing once per session (10-min cache shared with index.html via sessionStorage)
+  /* r423 (Wolf): the pill names rank AND bucket — "VP · top". Short bucket words keep the
+     one-row nav; the emblem's division pips carry the same bucket visually. */
+  function bkShort(b){ return b==='Top Bucket'?'top' : b==='Middle Bucket'?'mid' : b==='Bottom Bucket'?'bottom' : ''; }
+  function pillHtml(name, bucket){
+    const bk=bkShort(bucket);
+    return (window.rankEmblem?window.rankEmblem(name,20,bucket):'')+
+      '<span>'+name+(bk?' <em class="pill-bk">· '+bk+'</em>':'')+'</span>';
+  }
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
     /* r406/r407 (Wolf): the owner account sees the WHOLE site — ranked on + every gateway/
@@ -386,7 +394,7 @@
       return;
     }
     try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
-      if(__opted && c && c.exp>Date.now()){ el.innerHTML=(window.rankEmblem?window.rankEmblem(c.n,20):'')+'<span>'+c.n+'</span>';
+      if(__opted && c && c.exp>Date.now()){ el.innerHTML=pillHtml(c.n, c.b);   /* r423: cache carries the bucket; an old bucketless cache renders rank-only until refresh */
         el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
     if(!__opted){
       hydrateLevel();   // r406 (Wolf): sync level even when not opted into ranked \u2014 fire-and-forget so the chip paints now
@@ -425,9 +433,9 @@
       }
       const t = tierOf(d.avgPct, d.attempted, d.wsum);
       persistTierBest(t.i, t.bucket);   // r373: plaque-frame unlocks latch the high-water tier (r376: + its bucket)
-      el.innerHTML=(window.rankEmblem?window.rankEmblem(t.name,20):'')+'<span>'+t.name+'</span>';
+      el.innerHTML=pillHtml(t.name, t.bucket);   /* r423 (Wolf): rank AND bucket on the pill */
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
-      try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,exp:Date.now()+6e5})); }catch(e){}
+      try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,b:t.bucket,exp:Date.now()+6e5})); }catch(e){}
     }catch(e){}
   }
   // r226 (Wolf): on sign-out the top bar kept the old rank + level because the caches that

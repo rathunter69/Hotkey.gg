@@ -659,73 +659,47 @@ function heroHtml(){
     {t10:me.t10||0, pod:me.pod||0, crowns:me.crowns||0},
     DATA.fSessions.filter(x=>x.user_id===meId));
   const L=levelOf(xp);
-  /* r293 (Wolf): the persistent next-rank progression block is retired — the opt-in
-     infographic already explains the climb, and the card stays slim. Keep the exit. */
-  const nextHtml='<div class="yc-next"><a id="leaveRanked" style="font-size:10px;color:var(--faint);cursor:pointer;text-decoration:underline dotted">leave ranked</a></div>';
-  /* r373 FRAME SYSTEM: the signed-in hero wears the same earned frame as the profile
-     card — .hk-frame-<id> + ornaments first. Same sanitize + legacy split as nav.js. */
-  let __fCls='', __fOrn='';
+  /* r423 (Wolf, ONE-CARD LAW): the your-card hero is the SAME 462px hkPlayerCard object
+     as the header rank-click card — full scale, the skin riding the .uc itself, the
+     5-slot medal showcase, the rank-click stat grammar. The compact variant plus the
+     yc-medals / yc-boards attachments EXPANDED the card on this surface and are retired.
+     The one owner action (leave ranked) rides OUTSIDE the card on a slim bar, exactly
+     like the rank-click card's .uc-ownerbar. */
+  let __fv=null, __lo={frame:null, show:{}, stats:[]};
   try{
     const __mp=(DATA.profs||[]).find(p=>p.id===meId);
-    const __raw=__mp && __mp.flair;
-    /* r417 audit: flair is now often a JSON loadout blob (the customizer) — parse it via
-       hkFlair (same as showPublicCard above / nav.js rank-click card) so the hero wears the
-       equipped skin, instead of failing the bare-id test and rendering UNSKINNED.
-       hkFlair.frame is already validated against HK_FRAMES (XSS-safe). */
-    const __fv=window.hkFlair ? window.hkFlair(__raw).frame
-      : (__raw && /^[a-z0-9_-]{1,32}$/i.test(__raw) ? __raw : null);
-    if(__fv){
-      if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__fv)){
-        __fCls=' hk-frame-'+__fv;
-        /* r376: gem cut = the bucket held at the best tier (hk_ach_flags, via nav.js) */
-        __fOrn=window.hkFrameOrnaments ? window.hkFrameOrnaments(__fv, {bucket:(window.hkFrameBucket?window.hkFrameBucket():1)}) : '';
-      } else __fCls=' flair-'+__fv;   // legacy gold/emerald/holo — harmless no-op on .panel
-    }
+    if(window.hkFlair) __lo=window.hkFlair(__mp && __mp.flair);
+    /* hkFlair.frame is already validated against HK_FRAMES (XSS-safe) */
+    if(__lo.frame && window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__lo.frame)) __fv=__lo.frame;
   }catch(e){}
-  /* r386: the your-card hero renders through the SAME unified card (hkPlayerCard) at
-     compact scale. .panel.me already carries the skin class + ornaments (__fCls/__fOrn
-     above), so we pass flair=null here — no double frame. The rendered text keeps
-     "LVL <n>" and the crown/podium/drill/solve counts. */
+  let __streak=0; try{ __streak=(JSON.parse(localStorage.getItem('hotkey_streak')||'{}').n)||0; }catch(e){}
+  // featured medals -> the same 5-slot array the public / rank-click cards deal
+  const __medals=(function(){ try{
+    const AC=window.HOTKEY_ACHIEVEMENTS, picks=(window.__featOf||{})[meId];
+    if(!AC||!picks||!picks.length) return [];
+    const byId={}; AC.forEach(a=>byId[a.id]=a);
+    return picks.map(id=>byId[id]).filter(Boolean).slice(0,5).map(a=>({glyph:a.glyph,name:a.name,size:30,
+      rarity:window.hkEffRarity?window.hkEffRarity(a.tier):undefined})); }catch(e){ return []; } })();
+  // school + desk chips ride high on the card, honoring the customizer's show toggles
+  let __tagBits='';
+  try{ const meT=(DATA.profs||[]).find(p=>p.id===meId)||{};
+    if(meT.show_school && meT.school_tag){ const nm=((window.schoolResolve&&window.schoolResolve(meT.school_tag))||{}).name||meT.school_tag;
+      __tagBits+='<span class="uc-tag">'+(window.schoolChip?window.schoolChip(meT.school_tag,20):'')+'<span>'+esc(nm)+'</span></span>'; }
+    if(__lo.show && __lo.show.desk && meT.team_code) __tagBits+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+esc(meT.team_code)+'</span></span>';
+  }catch(e){}
   const heroCard = window.hkPlayerCard ? window.hkPlayerCard({
-    name:(DATA.names||{})[meId],
-    tierEmblem:window.rankEmblem?window.rankEmblem(t.name,40,t.bucket):'',
+    name:(DATA.names||{})[meId], show:__lo.show,
+    tierEmblem:window.rankEmblem?window.rankEmblem(t.name,60,t.bucket):'',
     tierChipEmblem:window.rankEmblem?window.rankEmblem(t.name,15,t.bucket):'',
     tierLabel:t.full||(t.name+(t.bucket?' · '+t.bucket:'')+(t.provisional?' · provisional':'')),   /* r390 (Wolf): t.full already carries bucket+provisional — don't append again (double-bucket) */
     lvl:L.lvl, pct:L.pct, xpLine:L.into+' / '+L.need+' xp',
-    stats:[{n:me.crowns,label:me.crowns===1?'crown':'crowns'},{n:me.pod,label:'podiums'},
-      {n:me.att+'/'+CH.length,label:'drills'},{n:mySolves,label:'clean solves'}],
-    flair:null
-  },{scale:'compact'}) : '';
-  /* r392 (Wolf): fill the your-card column (it sat short beside the tall daily board) with
-     the equipped medal showcase — the cards/medals he wants surfaced everywhere. */
-  let myMedals='';
-  try{ const AC=window.HOTKEY_ACHIEVEMENTS, picks=(window.__featOf||{})[meId];
-    if(AC && picks && picks.length){ const byId={}; AC.forEach(a=>byId[a.id]=a);
-      const cells=picks.map(id=>byId[id]).filter(Boolean).slice(0,5)
-        .map(a=>window.hkMedalCard?window.hkMedalCard(a.glyph, window.hkEffRarity?window.hkEffRarity(a.tier):undefined, a.name, 30):'').join('');
-      if(cells) myMedals='<div class="yc-medals">'+cells+'</div>'; }
-  }catch(e){}
-  /* r392 (Wolf: "still a weird gap / mismatch"): the your-card column sat ~90px short of
-     the tall daily board. Rather than shrink the daily, grow the card with useful signal —
-     the analyst's three strongest standings (best placement first, biggest field breaks
-     ties). Fills the height and reinforces the "post times, climb boards" loop. */
-  let myBoards='';
-  try{
-    const pd=DATA.perDrill||{}, mine=[];
-    CH.forEach(c=>{ const arr=pd[c.key]; if(!arr) return;
-      const i=arr.findIndex(r=>r.user_id===meId);
-      if(i>=0) mine.push({label:c.label, place:i+1, n:arr.length}); });
-    mine.sort((a,b)=> a.place-b.place || b.n-a.n);
-    const top=mine.slice(0,3);
-    if(top.length){
-      const rows=top.map(b=>{ const cls=b.place===1?' gold':b.place<=3?' pod':'';
-        return '<div class="yc-brow'+cls+'"><span class="yc-bpl">#'+b.place+'</span>'+
-          '<span class="yc-bnm">'+esc(b.label)+'</span>'+
-          '<span class="yc-bfd">of '+b.n+'</span></div>'; }).join('');
-      myBoards='<div class="yc-boards"><div class="yc-btitle">your best boards</div>'+rows+'</div>';
-    }
-  }catch(e){}
-  return '<div class="panel me'+__fCls+'">'+__fOrn+'<h4>your card</h4>'+heroCard+myMedals+myBoards+nextHtml+'</div>';
+    stats:[{n:mySolves,label:'clean solves'},{n:me.crowns,label:me.crowns===1?'crown':'crowns'},
+      {n:me.pod,label:'podiums'},{n:me.att,label:'boards'},{n:(__streak?'🔥 '+__streak:'—'),label:'streak'}],
+    medals:__medals, medalSlots:5, boards:[],
+    tagsHtml:__tagBits, flair:__fv, owner:true
+  },{scale:'full'}) : '';
+  return '<div class="panel me me-col"><div class="me-card'+(__fv?' me-bare':'')+'">'+heroCard+'</div>'+
+    '<div class="uc-ownerbar"><a id="leaveRanked">leave ranked</a></div></div>';
 }
 
 function rankedInfographic(){
