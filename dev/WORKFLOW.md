@@ -1,4 +1,4 @@
-# WORKFLOW.md — how we build hotkey.gg (process standards, v1 · 2026-07-24)
+# WORKFLOW.md — how we build hotkey.gg (process standards, v1.1 · 2026-07-24)
 
 _This is the operating system for every session. PROJECT_CONTEXT.md = what the product is +
 the live handoff. PIPELINE.md = WHAT to build next. AUDIT.md = what each round did.
@@ -108,3 +108,28 @@ feel. Spend where judgment compounds; economize where execution is mechanical.**
   don't burn agent time on full local sweeps the gate runs for free).
 - **Don't gold-plate:** inert-code refactors, cosmetic-only rewrites, and "while I'm here" scope
   creep are the token sinks that bought nothing before (see PROJECT_REVIEW B1/B2 verdicts).
+
+## 8 · Batch aftermath + handoff durability (Wolf standing rules, 2026-07-24 · playtest round 1)
+
+- **POST-BATCH BRIEF.** After every large batch implementation, the session delivers Wolf an
+  INCREMENTAL change-brief in chat: what changed, where (files/drills/surfaces), what he should
+  test, and which of his feedback items it closes (cite the feedback doc's item numbers, e.g.
+  ROUND1_FEEDBACK B1–B7). Never make Wolf diff the site to find his own feedback. The brief is
+  part of the round's definition of done (§3 gains this implicitly — a batch without a brief is
+  unshipped).
+- **PROPAGATION SWEEP.** Any change to a CONVENTION or STANDARD (e.g. totals wear TOP borders,
+  helper cells yellow+bordered, a copy rule, a card-size contract) triggers a site-wide
+  propagation checklist in the same round or an explicitly queued follow-up: enumerate every
+  surface the convention touches (all drills, docs, SEO pages, reference tables, CI checks),
+  sweep or schedule each, and record the sweep's scope in AUDIT.md. Implementations must flow
+  across the ENTIRE platform — a convention changed on one surface and not the rest is a new
+  bug class, and where possible it gets a CI invariant like any other (§3.3).
+- **MODEL-PROOF HANDOFF.** All specs, agent prompts, context files, and process docs are written
+  so a LESS-CAPABLE model (Opus-tier executor) can carry them out faithfully. Assume the executor
+  CANNOT re-derive design intent: embed the full decision rationale (the WHY, with date + owner),
+  the detailed execution logic (exact steps, exact predicates, exact file:line anchors, worked
+  examples of right and wrong output), and the failure modes to avoid — inline, in the artifact
+  itself, not in session memory. Wolf may downgrade agents/sessions for the remainder of the
+  project; anything a Fable session would "just know" must be written down where the work is
+  specced. This extends §1's "vague prompts produce vague sweeps" and §7's spec-then-execute:
+  the spec page IS the intelligence; the executor only has to follow it.

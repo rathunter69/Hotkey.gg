@@ -1,12 +1,14 @@
-# DEPTH_PASS — the catalog rework specification (r420b — Wolf review round 1 applied, 2026-07-24)
+# DEPTH_PASS — the catalog rework specification (r420c — playtest round 1 integrated, 2026-07-24)
 
-_The master build document for the depth pass. Binding inputs: Wolf's locked parameters (PROJECT_CONTEXT "WOLF DECISIONS — DEPTH PASS", 2026-07-24), **Wolf review round 1 (2026-07-24: semantic references over cell ranges · vague-verb ban · Full Builds as a separate build pass · per-beat sub-clocks · all eight taste calls resolved)**, AUDIT_R417 §A/§D/§G, DRILL_DOCTRINE.md, and the three depth-research reports (finance canon · competitive Excel · course design + language standard). Where a beat descends from a research pattern it is tagged inline, e.g. [Origami Ladder]. Former open taste calls are all RESOLVED and collected in the decision log at the end._
+_The master build document for the depth pass. Binding inputs: Wolf's locked parameters (PROJECT_CONTEXT "WOLF DECISIONS — DEPTH PASS", 2026-07-24), **Wolf review round 1 (2026-07-24: semantic references over cell ranges · vague-verb ban · Full Builds as a separate build pass · per-beat sub-clocks · all eight taste calls resolved)**, **Wolf PLAYTEST round 1 (2026-07-24, wave 1 — dev/ROUND1_FEEDBACK.md: the §1.0 binding rules, the mystery-☆, the Ctrl+S universal closer, the rowops⊕colops merge, and the five ROUND-2 wave-1 spec pages)**, AUDIT_R417 §A/§D/§G, DRILL_DOCTRINE.md, and the three depth-research reports (finance canon · competitive Excel · course design + language standard). Where a beat descends from a research pattern it is tagged inline, e.g. [Origami Ladder]. Former open taste calls are all RESOLVED and collected in the decision log at the end._
 
 ---
 
 ## 0 · How to use this doc
 
 One agent builds one drill, in catalog order, Foundations first. The agent reads §1 (the anatomy standard — non-negotiable), the §2 mechanics its drill consumes, and its own §4 page; it does NOT need the research reports — every pattern it needs is restated here. The §4 beat lines are the spec: the agent ships those lines as the literal check labels (typo-level deviations only; a structural deviation gets a code comment naming why + a note in the PR). Capstones (§2.4) build after their chapter's other drills so they can chain the reworked boards.
+
+**MODEL-PROOF PROTOCOL (WORKFLOW.md §8, r420c):** this doc is written to be executed by a LESS-CAPABLE agent than the one that wrote it — every rule carries its rationale inline (the WHY, dated, with owner), every §4 page states exact beats/predicates/randomization, and nothing load-bearing lives only in session memory. A build agent must never have to re-derive design intent: if a page under-specifies something the agent needs, that is a SPEC BUG — stop and escalate to the orchestrator, do not improvise. All future wave agents build to the r420c rules (§1.0 below), which OVERRIDE any older line in this doc where they conflict.
 
 **Per-drill definition of done** (all nine, in the PR):
 1. `build()` / `checks()` / `guide()` / `req` / `targets()` / `demo()` reworked to this page; beats = the page's lines.
@@ -24,6 +26,21 @@ One agent builds one drill, in catalog order, Foundations first. The agent reads
 ## 1 · THE DRILL ANATOMY STANDARD
 
 Every drill in the catalog — no chapter-scaled shortcuts — meets ALL of:
+
+### 1.0 PLAYTEST ROUND-1 LAW (r420c, Wolf 2026-07-24 — BINDING; where any older line in this doc conflicts, §1.0 wins)
+Source: dev/ROUND1_FEEDBACK.md (Wolf's wave-1 playtest + his four follow-up decisions). Six rules, all catalog-wide:
+
+**(a) FORMAT-AS-YOU-GO.** A formatting beat directly FOLLOWS the beat that created or touched the cells it formats — never batched at the end of the drill. (Wolf: sum a row → format that row before moving on.) WHY: the habit being trained is format-in-line, not "do all the work, dress later". Page authors sequence every dress beat immediately after its parent work beat; a trailing catch-all formatting beat is a spec bug.
+
+**(b) OUTCOME-VAGUE INSTRUCTIONS.** Checklist lines state the OUTCOME, not the route. The user is ALLOWED to struggle; the TIMER (and slow time) teaches that they should be faster, and HINTS (guide/F1) teach the hotkey route. This recalibrates §1.7: the closed verb list and semantic references STAND, but step-by-step prescription is STRIPPED — "Total all four quarters to get to Fiscal Year totals", NOT "one SUM beside the Revenue line, filled down". A line that names the mechanism (which cell to start in, which direction to fill, which formula shape) is over-prescriptive; the mechanism lives in `guide`/`req`/demo.
+
+**(c) FREEDOM RE-AFFIRMED.** Every check is gradeable by ANY route, including slow typing (typing values instead of referencing, entering minus signs instead of paste-special-multiply). No core check may REQUIRE the fast route — the player is never penalized for the slow way; the clock shows them the cost. (The only sanctioned fast-route grading is the ☆ bonus, rule (d), and doctrine's explicit anchor-text exception where anchoring IS the lesson.)
+
+**(d) ☆ LAW — THE MYSTERY SLOT.** Bonuses are HIDDEN EFFICIENCY discoveries. Display: the checklist shows a dim **"☆ ?"** line with NO text; the label reveals on earn (mid-run) or on the results card (§2.2). Content: a ☆ rewards a MASTERY MOVE — proper anchoring so one copy-down/copy-right fills a block, one paste-special-multiply pass covering every conversion, whole-row/column selection discipline — NEVER a formatting task. Existing formatting-☆s die as their drill's round-2/wave rework lands.
+
+**(e) UNIVERSAL CLOSER — "Save your work".** Every classic drill's REQUIRED final beat is "Save your work" (Ctrl+S); the WIN FIRES ON THE SAVE. WHY: a standard ending, a good desk habit, and an unambiguous finish signal. The closer is a core check but is EXEMPT from the 4–6 core-beat count (§1.1), and §1.6's finish-state beat becomes the last WORK beat, with the save after it. Pars re-measure (+~2 keys per drill) as the waves roll — no big-bang retune; each wave's par sweep absorbs it. (Sanctioned exception: navigation §4.1, where Wolf's own beat sketch places a final bottom-right flight AFTER the save — the save stays required; the win fires on the last core beat there.)
+
+**(f) CONVENTIONS.** Two board-dress laws, everywhere: **totals take TOP borders** — never a bottom border under a total (a total earns the line ABOVE it); and **helper/assumption cells are styled LIGHT YELLOW + ALL BORDERS** — the input convention — and ship POPULATED, so the player can see they're there to be used. Any existing page line that says "bottom border under the Total row" is superseded; wave agents apply (f) as they build (WORKFLOW.md §8 propagation sweep).
 
 ### 1.1 Beats
 - **4–6 core graded beats + exactly 1 bonus beat** (☆). Core beats win the drill; the bonus never blocks the win (§2.2). Fewer than 4 core beats is allowed ONLY for pure-reflex Foundations drills explicitly marked on their §4 page (none currently are).
@@ -53,10 +70,11 @@ After a rework: run the par sweep, set parKeys to the median, retune par seconds
 `aha` is mandatory, surfaced on the results card: one nameable insight, lowercase, em-dash voice. The aha's MOMENT must exist inside the run — a beat where the insight lands (the fill that proves relative refs; the undo that resurrects the block; the delete that proves values went dead). Name that beat on the §4 page.
 
 ### 1.6 Finish-state beat
-The LAST core beat leaves the artifact sendable: a dress/close motion (bold + rule the bottom line, outside border, set the width, return to A1) or a prove-out (check row reads zero, total re-ties). "Finish at A1 — a clean model greets the reader" is the house closer for build drills; don't use it where a dress beat closes better.
+The last WORK beat leaves the artifact sendable: a dress/close motion (bold + rule the bottom line, outside border, set the width, return to A1) or a prove-out (check row reads zero, total re-ties). "Finish at A1 — a clean model greets the reader" is the house closer for build drills; don't use it where a dress beat closes better. **r420c:** the §1.0(e) save closer ("Save your work") follows the finish-state beat as the true final line — the finish-state beat is now second-to-last, and the win fires on the save.
 
 ### 1.7 Language — THE LANGUAGE STANDARD (R1–R10, binding on every line you write)
-**Wolf decision (review round 1, 2026-07-24) — CLOSED: a beat references the real-world item and its data, never the bare cell.** The platform builds real-world Excel instinct — players should think in line items, not coordinates. NOT "Add a total row C1:C5 and sum the columns" → "Add a total row under the Revenue line and add the revenues and costs". NOT "divide B5/B1" → "Calculate the EBITDA margin by dividing EBITDA by revenue" (verb-list form: "Build the EBITDA margin — EBITDA divided by revenue"). Bare cell references are the FALLBACK, not the default — R2/R9 below carry the rule; §1.3's labeled-target requirement guarantees a semantic name always exists. This reverses the pre-r420b explicit-range default; all 88 §4 pages are written to the semantic style.
+**Wolf decision (review round 1, 2026-07-24) — CLOSED: a beat references the real-world item and its data, never the bare cell.** The platform builds real-world Excel instinct — players should think in line items, not coordinates. NOT "Add a total row C1:C5 and sum the columns" → "Add a total row under the Revenue line and add the revenues and costs". NOT "divide B5/B1" → "Calculate the EBITDA margin by dividing EBITDA by revenue" (verb-list form: "Build the EBITDA margin — EBITDA divided by revenue"). Bare cell references are the FALLBACK, not the default — R2/R9 below carry the rule; §1.3's labeled-target requirement guarantees a semantic name always exists. This reverses the pre-r420b explicit-range default; all §4 pages are written to the semantic style.
+**r420c RECALIBRATION (playtest round 1 — §1.0(b) governs):** semantic references + closed verbs STAND, but the lines got too prescriptive — they were teaching the route, not naming the outcome. Strip step-by-step prescription from every check label: no start-cell, no fill-direction, no formula-shape in the line unless the outcome is unintelligible without it. "Total all four quarters to get to Fiscal Year totals" — not "one SUM beside the Revenue line, filled down". The route belongs to `guide`/`req`/demo (the hint ladder is the teacher); the clock is the pressure. Where a §4 page below still carries a route-flavored line, the wave agent rewrites it to the outcome form under §1.0(b) — the five wave-1 ROUND-2 pages (§4.1–4.5) are the exemplars.
 - **R1** Imperative verb first, from the CLOSED VERB LIST below. One verb = one gradeable beat; "and" → two lines (tight-pair exception in 1.1).
 - **R2** Specific object, named by its BOARD LABEL: "the Revenue line", "the Costs block", "the EBITDA margin cell", "under the Q3 column". Never "the data", "the top part". Bare cell/range refs are allowed ONLY as fallback: (a) the board genuinely has no label for the target — navigation/maze/obstacle boards (colored blocks, checkpoints) where coordinates ARE the game; or (b) a parenthetical disambiguator after the semantic name, where it genuinely helps — "the check cell (F14)". §1.3's labeled-target rule makes case (a) rare by construction.
 - **R3** Observable END STATE, never the gesture. "Freeze the header row", not the menu path. The hotkey is the solution and lives in `guide`/`req` — NEVER in a check label.
@@ -102,7 +120,7 @@ Build order: 2.1 → 2.2 → 2.3 → 2.5/2.6/2.7 land as one platform PR batch B
 ### 2.2 Bonus objectives (☆)
 - **Declare:** a check entry gains `bonus:true`: `{label:'…', ok:…, bonus:true}`. Exactly one per drill (§1.1).
 - **Grade:** win condition = every non-bonus check ok (winCheck filters `!c.bonus`). The bonus is evaluated like any check; its state is LATCHED at the win moment — doing it costs live seconds, which is the intended tension with the clocks [Accuracy-Gated Overdrive, inverted].
-- **Display:** rendered last in the checklist, ☆ prefix, dimmer ink; results card shows "☆ bonus cleared" gold or "☆ bonus missed" neutral (never red). PB rows carry a ☆ flag when the PB run cleared it.
+- **Display (r420c — THE MYSTERY SLOT, §1.0(d)):** rendered last in the checklist as a dim **"☆ ?"** line with NO label text. The label REVEALS on earn (the line flips to its text + gold the moment the latch fires) and on the results card; an unearned ☆ stays "☆ ?" through the run and shows "☆ ? — undiscovered" neutral on the results card (never red, never spoiled). PB rows carry a ☆ flag when the PB run cleared it. Content law: hidden EFFICIENCY discoveries only — mastery moves, never formatting (§1.0(d)).
 - **Reward:** one-time +15 xp per drill's first bonus clear (localStorage latch + outbox like band XP). No medal/campaign/leaderboard effect — a bonus can never gate anything.
 - **Guided/demo:** guide line exists for the bonus; demo performs it (so replay covers it); guided rails include its zone.
 
@@ -166,78 +184,101 @@ Every add/designate/move/rename of the pass. Keys are immutable (PBs, leaderboar
 | D14 | unhide meta | ALIGN label to index ('Flush the hidden rows') + desc language pass | label drift between drills.js and CHALLENGES | meta only |
 | D15 | series meta | RENAME label 'Stub the year header'→'Serve the year table', desc rewrite | drill scope grows (§4 page); old name undersells it | meta only |
 | D16 | placement series | NO CHANGE (navigation/dress/margin/sort/opmodel) | margin + sort rework keeps their band roles; verify pars post-sweep | HK_PLACEMENT untouched; re-verify gates after par re-sweep |
+| D17 | **colops → rowops** | **RETIRE colops; rowops ABSORBS it** (playtest round 1, Wolf 2026-07-24) | two thin structure drills teach ONE lesson — row AND column insert/delete + the formatting-inheritance behavior belong in one fulsome drill (§4.5 round 2) | menuOrder/groups c1 −1 (colops key removed); PARS entry removed; TRACKS + migrate-certificates.sql arrays updated in the SAME PR (r359 drift rule); LB board orphaned (history kept; unreachable once the key leaves menuOrder — no migration); SPINE c1 list updated if colops appears; ACH auto via groups; POOL n/a. Catalog 82→81 live; the freed slot stays OPEN for a future add |
 
-Catalog after pass: **88 drills** (82 + 6 adds), 8 chapters, capstone last in each. Chapter counts: 10 · 10 · 12 · 12 · 12 · 11 · 10 · 11. `menuOrder.length` stays the single source of truth — nothing hardcodes 82 (CI already guards).
+Catalog after pass: **87 drills** (82 − 1 retire [D17] + 6 adds), 8 chapters, capstone last in each. Chapter counts: 9 · 10 · 12 · 12 · 12 · 11 · 10 · 11. `menuOrder.length` stays the single source of truth — nothing hardcodes a count (CI already guards).
 
 Explicitly considered and REJECTED: merging lookup2 into lookup (the one-way → legacy → two-way trilogy is a real progression once D2 lands); deleting series/undo (both clear the bar after rework); splitting pastes (five paste kinds are one lesson, and it already chains); adding F4-repeat-last-action or multi-sheet drills (engine gaps — PIPELINE items, not catalog deltas).
 
 ---
 
-## 4 · PER-DRILL SPEC PAGES (final catalog order, 88 pages)
+## 4 · PER-DRILL SPEC PAGES (final catalog order, 87 pages + the retired-colops stub)
+
+_r420c: §4.1–4.5 are the wave-1 **ROUND-2** pages — rebuilt from Wolf's playtest (dev/ROUND1_FEEDBACK.md); they are also the house exemplars of the §1.0 rules (outcome-vague lines, format-as-you-go ordering, mystery ☆, save closer, conventions). Every later page still shows its pre-playtest beats — wave agents apply §1.0 on top as they build (§1.0 wins on conflict)._
 
 Page grammar: **Now** = current beats/checks + weakness · **Beats** = the new core list (these ARE the check labels) + ☆ bonus · **Random** = randomization axes · **Aha/Finish** = insight moment + closing beat · **Clocks** = std (derive per §1.4) unless noted · **Engine** = r419+ dependencies · **Effort** S/M/L.
 
-### CH 1 · FOUNDATIONS (10)
+### CH 1 · FOUNDATIONS (9 — colops retired, D17)
 
-#### 4.1 navigation — "Navigation maze" · S
-**Now:** the depth bar itself — 20×10 maze, pips, grab/copy/weave/paste, 4 checks with live pip counter. Weak only in language and the missing bonus.
-**Reference style:** §1.7 R2(a) exemption — an obstacle board with no line-item labels; pip/zone coordinates stay wherever guide/targets need them. The beat labels below are already object-named (pips, model room, drop zone).
-**Beats (language pass + bonus only):**
-1. Collect every pip on the way to the model room (0/6)
-2. Select the whole model — the room's full block
-3. Copy the model
-4. Paste the model at the drop zone corner
-☆ Finish with zero wall bumps — a clean line through the maze
-**Random:** as-is (recursive-backtracker maze + braid). **Aha:** unchanged; lands at the first Ctrl-arrow corridor shot. **Finish:** beat 4 (the paste IS the deliverable). **Clocks:** std. **Engine:** bonus needs a wall-bump latch (`S.bumpN` — keydown swallowed by a wall increments; ~5 lines) [Penalty Seconds → clean-run ace]. Migrate pip machinery to §2.6 touch-lists when it lands (no behavior change).
+#### 4.1 navigation — "Navigation maze" · M — **ROUND 2 (playtest r1)**
+**Round-1 verdict (Wolf):** the maze is idiosyncratic in a bad way — lots of single-arrow maneuvering around true-maze corners, which isn't the lesson; it reads "look how long a maze takes me", not fun. Pips are cool. REDESIGN as a **winding corridor** (his reference: "the scary game" trend) — the lesson is Ctrl-arrow flight, so the geometry must make Ctrl-arrow the natural move.
+**Reference style:** §1.7 R2(a) exemption stands — an obstacle board; coordinates allowed in guide/targets.
+**Board (round 2):** long straight corridor legs walled by data cells, each leg one Ctrl-arrow flight; corners TURN (one keypress reorients), they never wiggle; single-arrow steps are rare doorways, not the norm. The corridor leads to the model data block. The A1 region ships EMPTY — it is the paste destination (Wolf: "leave the place in the model empty where you would want to paste"). Pips KEPT, placed at leg ends so collection rides the corridor flow (never forces a detour off the Ctrl-arrow line).
+**Beats (Wolf's sketch, verbatim-adapted — outcome-vague per §1.0(b)):**
+1. Navigate to the model data — collect every pip on the way (0/N)
+2. Select and copy the whole block of data
+3. Return to A1 and paste the data
+4. Save your work
+5. Finish at the bottom-right corner of the active area
+☆ ? (hidden — §1.0(d)): a clean line — zero wall bumps through the corridor. **Latch fix (Wolf):** a Ctrl-arrow flight STOPPING at a wall is NOT a bump; only a keypress swallowed while already flush against the wall (or a single-arrow step into it) increments `S.bumpN`.
+**Closer note:** the sanctioned §1.0(e) exception — Wolf's sketch places the bottom-right flight AFTER the save; the save (beat 4) stays required, the win fires on beat 5 (the flight also proves the paste joined the active area — Ctrl+End now includes it).
+**Left out (future note):** PgUp/PgDn "elevator" legs (the x-in-row-A/B fast-travel pattern) — Wolf floated them but flagged overload; keep as a later corridor variant, not this round.
+**Random:** corridor generator replaces the recursive-backtracker maze — leg count/lengths/turn directions per seed + pip placement + model-block content pools; every seed still self-verifies with the ctrlJump replica before shipping (kept from r217).
+**Aha:** "a corridor is four flights, not forty steps — Ctrl-arrow eats the straightaways." **Finish:** beat 5. **Clocks:** re-sweep (new geometry + save). **Engine (fix wave):** BUG B1 — Ctrl-arrow rides THROUGH wall/border cells; walls must stop the jump (blocking geometry regression + parity assert). Bump latch per ☆ note (B7). Migrate pip machinery to §2.6 touch-lists when it lands (no behavior change).
 
-#### 4.2 filldr — "Fill down, fill right" · S
-**Now:** 4 chained checks (pull → FY column → cross-total → 2D mixed-anchor block), randomized values, real P&L shape. Meets bar.
-**Semantic pass (all 4 lines) + bonus:**
-1. "Build the Revenue pull — reference the feed's Revenue cell once, fill it across the four quarters"
-2. "Total the full year down the FY column — one SUM beside the Revenue line, filled down the P&L"
-3. "FOOT it —" is banned vocab → "Total each quarter across the Total row — one SUM under the first quarter, filled across"
-4. "Fill the % block from one cell — right then down; the lock on the Revenue row holds"
-☆ Bold the EBITDA row and add a top border above it — the computed-row rule
-**Random:** add site jitter (block anchor from {B2, B3} pool; values already rnd). **Aha:** lands at beat 4's 15-cell fill. **Finish:** ☆ doubles as dress; beat 4 closes core. **Clocks:** std. **Engine:** none. (Macabacus fast-fill stays an ALT route.)
+#### 4.2 filldr — "Fill down, fill right" · M — **ROUND 2 (playtest r1)**
+**Round-1 verdict (Wolf):** lines too descriptive (they prescribed the route — "one SUM beside the Revenue line, filled down"); too few fill reps; D&A signed wrong for an add-back; EBITDA formatting was the optional ☆ (must be mandatory); margin row misnamed.
+**Board (round 2):** revenue feed row up top; build block below with COGS / Opex / **D&A POSITIVE** (it's an add-back — a negative D&A would mean subtracting a negative to reach EBITDA); EBITDA line; FY column; ratio block (COGS % / Opex % / D&A % rows + the row now labeled **"EBITDA margin %"** — renamed from "EBITDA % of revenue").
+**Beats (outcome-vague per §1.0(b) — Wolf's sketch lines used where he gave them):**
+1. Reference the revenue feed cells onto the top row of the build — the model starts live
+2. Fill the cost lines across all four quarters — COGS, Opex and D&A
+3. Build EBITDA for every quarter — costs out, D&A added back
+4. Format the EBITDA row — bold, with a top border above it (MANDATORY, and it lands HERE: §1.0(a) format-as-you-go, directly after the row exists)
+5. Total all four quarters to get to Fiscal Year totals — every line of the build
+6. Build the ratio rows — COGS %, Opex %, D&A % and the EBITDA margin %, across the quarters
+7. Save your work (§1.0(e))
+☆ ? (hidden — §1.0(d)): the three cost-ratio rows land from ONE properly-anchored formula, copied down and copied right — reward anchoring the right cells the FIRST time. Graded by formula census + fill latches at the win; the slow route (three formulas, or typed values) still clears core per §1.0(c).
+**Random:** existing value pools + site jitter {B2,B3} kept; Wolf: "struggling to see more variation here — up to you if truly necessary" → no new axes forced; the added reps (beats 2/5/6) are the depth.
+**Aha:** relocates to the ☆ moment — "one $ pass, fifteen cells; anchors are where the speed lives" (lands for non-☆ runs at beat 6's fills). **Finish:** beat 6 is the last work beat; save closes. **Clocks:** re-sweep (scope up: +reps +save). **Engine (fix wave):** BUG B2 — Ctrl+Shift+R smart-fills right without a plugin overlay but Ctrl+Shift+D fill-down is dead; fix + parity assert. (Macabacus fast-fill stays an ALT route.)
 
-#### 4.3 pastes — "Paste Special everything" · S
-**Now:** 5 checks, all five paste kinds chained on one fee schedule, helpers, decoy border. Meets bar.
-**Semantic pass (2 lines) + bonus:**
-- check 4 → "Paste FORMATS from the Total row onto the Subtotal row — then clear the top border it carried" (one line, R5 single clause — the carried-border fix is the same motion's second half)
-- check 5 → "Paste the totals into the deck row as values only — numbers, no formulas" (the deck row carries its own board title per §1.3)
-☆ Color the transposed Fees row blue — pasted values are inputs now
-**Random:** add site variance: the side feed column draws from {G, H} and the deck row from {10, 11}. **Aha:** unchanged. **Finish:** beat 5 (values hand-off). **Clocks:** std. **Engine:** r419 paste TILING must not break the ×1 helper paste onto B5:E5 (regression-listed in this drill's replay). drills.js desc de-hint (D13).
+#### 4.3 pastes — "Paste Special everything" · M — **ROUND 2 (playtest r1)**
+**Round-1 verdict (Wolf):** the transpose was ambiguous (the vertical fees could belong to any quarter); the helper cells were invisible as tools; the deck row didn't read values-only; the guided ring flipped targets early; the total row shipped border-less in a fill grey identical to the selection grey. New challenge (☆) needed.
+**Board (round 2):** **Q1–Q4 labels beside the vertical fees feed** (vertical→horizontal transpose now legible); the two **helper cells POPULATED and dressed to the §1.0(f) input convention — light yellow, all borders** (the scale factor + the −1, so it's obvious they exist to multiply/divide with); the deck hand-off row LABELED **"values only"**; the Total row ships with a **TOP border** (§1.0(f)) and a fill grey DISTINCT from the selection-highlight grey (style token — bug B5); Subtotal row inconsistently formatted (the formats-paste target).
+**Beats (Wolf's sketch, verbatim-adapted — outcome-vague per §1.0(b)):**
+1. Transpose the fees from the vertical feed into the fee row — the Q labels say which quarter is which
+2. Convert the trading, advisory and subtotal rows to dollars — their units are inconsistent; the yellow helper is an input
+3. Make the costs line negative — a cash outflow
+4. Paste the formats from the Total row onto the Subtotal row, then unbold it
+5. Paste the totals into the "values only" deck row — numbers, no formulas
+6. Save your work (§1.0(e))
+☆ ? (hidden — §1.0(d), NEW per Wolf's follow-up decision): every inconsistent row converted in **ONE paste-special-multiply pass** — copy the yellow helper once, select all the scale rows, one pass covers both conversions. (The old "color the Fees row blue" formatting ☆ is DEAD.) Typing the converted values or minus signs by hand still clears core — slower, per §1.0(c).
+**Guided:** ring-ordering law — the guided ring HOLDS on the active beat's target until its check grades; it never advances early (the round-1 bug: the green marker flipped to the Q1'24 column before the transpose completed — B3).
+**Random:** NEW scale-conversion axis (Wolf) — per seed the inconsistent rows are e.g. in 1000s (÷1000) or in raw $ (×100); the helper value, row units and row labels co-vary so the board always states its own problem. Plus the existing side-feed column {G,H} + deck row {10,11} variance.
+**Aha:** "the clipboard is an operator — paste-special multiplies, it doesn't just move." **Finish:** beat 5 (the values hand-off) is the last work beat; save closes. **Clocks:** re-sweep. **Engine (fix wave):** B3 guided-ring latch · B4 paste-FORMATS must carry borders (the Total-row formats paste showed none) · B5 style token. r419 paste TILING regression stays listed in this drill's replay. drills.js desc de-hint (D13).
 
-#### 4.4 blocksel — "Assemble and format the summary" · S
-**Now:** 7 checks — one over the core cap; assembly + margin + dress. Otherwise the bar.
-**Rework: demote check 7 to the bonus; language pass on 2 lines:**
-1. Copy the [Segment · Revenue] base into the summary — the base stays filed
-2. Cut the EBITDA and Op inc columns into their slots — the old spots empty
-3. Build the margin column — =EBITDA÷Revenue filled down, percent, italic
-4. Bold the header row and add an outside border around the table
-5. Dollar-format the top line, comma-format the rows below — 0 decimals
-6. Right-align every figure in the summary body
-☆ Center the segment names and underline them
-**Random:** as-is (band shuffle + segment pools). **Aha:** unchanged; lands when the CUT empties the misfiled source. **Finish:** beats 4–6 are the dress cascade. **Clocks:** std (re-sweep — bonus demotion shortens core). **Engine:** none.
+#### 4.4 blocksel — "Assemble and format the summary" · M — **ROUND 2 (playtest r1)**
+**Round-1 verdict (Wolf):** copy never said the EBITDA / operating-income feeds arrive in the SAME segment order (they could be out of order — make it explicit); comma formatting requirements out; the header/data alignment standard in (headers bold + centered-across, data right-aligned); a whole-table selection lesson (Ctrl+A) missing; the EBITDA cut grabbed two columns (bug). New non-formatting ☆ needed.
+**Beats (outcome-vague per §1.0(b); Wolf's sketch lines used where he gave them):**
+1. Copy all of the segment and revenue data into the summary block
+2. Bold the top headers and center each across its columns — never merge (§1.0(a): the dress follows the beat that landed them)
+3. Right-align the figures under the headers
+4. Cut the EBITDA numbers into their summary column — the feed is in the SAME segment order as the summary (the copy now says so)
+5. Cut the operating income into its column — same segment order, same motion
+6. Add an outside border around the entire table (the hint route teaches whole-table selection — Ctrl+A — then the border; any selection route grades)
+7. Save your work (§1.0(e))
+☆ ? (hidden — §1.0(d), NEW): both misfiled columns traveled by CUT — each landed in one motion, sources emptied by the move itself, nothing retyped. (Retyping the numbers cell-by-cell still clears core, slower — §1.0(c). The old "center + underline the segment names" formatting ☆ is DEAD.)
+**Dropped (Wolf):** the comma/dollar formatting requirements (old beat 5) and the margin-column build (not in his round-2 sketch; margins live in filldr/margin — keeps core at 6).
+**Random:** as-is (band shuffle + segment pools) + the EBITDA/Op-inc feed blocks shuffle sides.
+**Aha:** "cut is a move — the old spot empties itself, and segment order rides along." **Finish:** beat 6 (the bordered table); save closes. **Clocks:** re-sweep (scope reshaped). **Engine (fix wave):** BUG B6 — cutting the EBITDA selected TWO columns instead of the one data column; fix board geometry/column moats so edge-selection stops at the data column, and verify the cut-paste lands single-column (column-width carry checked).
 
-#### 4.5 rowops — "Rebuild the schedule" · S
-**Now:** 4 chained checks, live SUM re-totals through structure ops, staged paste, dress beat. Meets bar.
-**Language pass (2 lines) + bonus:**
-- check 2 → "Delete the PLACEHOLDER row — the block closes and the SUM contracts" (keep; verb-first already)
-- check 3 is a state-report (AUDIT §D Class C) with no action of its own: fold the total-ties prove-out into check 2's ok, and give the freed slot to a real finish beat — "Add a bottom border under the Total row — the schedule closes". Final core: insert+paste · delete (ok also requires the total re-tie to [N]) · format the pasted value · the new border beat
-☆ Undo the row delete, then delete it again — the stack survives structure ops
-**Random:** as-is (pool shuffle, junk position, missing-line index). **Aha:** lands when the Total re-sums on the insert. **Finish:** the new border beat. **Clocks:** std. **Engine:** ☆ depends on undo covering row ops (works today; snapshot widening in AUDIT §A-8 unaffected).
+#### 4.5 rowops — "Rebuild the schedule" · M — **ROUND 2 (playtest r1 — ABSORBS colops, D17)**
+**Round-1 verdict (Wolf):** merge this and the column drill into one fulsome structure drill (row AND column inserts/deletions); the placeholder delete felt like deleting a real number (live-looking data sat in the FY26E column); totals wore BOTTOM borders (wrong — §1.0(f)); formatting arrived too late (§1.0(a)); teach that structure ops INHERIT formatting.
+**The inheritance lesson (VALIDATED real Excel behavior):** an inserted ROW inherits the formatting of the row ABOVE it; an inserted COLUMN inherits the column to its LEFT (Excel's default — the Insert Options floaty can flip to below/right/clear; we teach the default). The board stages dressed neighbors at every insertion point so the inserted row/column visibly arrives pre-dressed — the lesson lands by seeing it.
+**Board (round 2):** the schedule (opex lines × quarters, Total row + FY column) with: a missing [line] (staged row block at the side), a **PLACEHOLDER row that reads CLEARLY EXTRANEOUS** — greyed italic, labeled "PLACEHOLDER — remove", NO values in any live column (the FY26E-data awkwardness dies in build()), a DRAFT column, and a missing [Qn] (staged quarter block, header included). Total row grades with a **TOP border** (§1.0(f)).
+**Beats (outcome-vague per §1.0(b)):**
+1. Insert a row where the missing [line] belongs and paste the staged line in — it arrives wearing the row above's dress
+2. Format the pasted figures to match the schedule (§1.0(a): straight away — the number format is the one thing inheritance can't know; ok also requires the Total re-tie)
+3. Delete the PLACEHOLDER row — extraneous by design; the Total contracts
+4. Add a top border above the Total row — totals rule on TOP, never underneath (§1.0(f); format-as-you-go: the Total just re-summed twice)
+5. Delete the DRAFT column — the schedule closes the gap
+6. Insert a column where the missing [Qn] belongs and paste the staged quarter in — it arrives wearing the left column's dress; Q1–Q4 read in order (order guard folds into ok)
+7. Save your work (§1.0(e))
+☆ ? (hidden — §1.0(d), NEW): every structure op fired from a FULL row / FULL column selection — the whole-row discipline (selection latch at op time; menu/ribbon per-cell routes still clear core, slower — §1.0(c)). The old undo-the-delete ☆ retires (one ☆ per drill; undo keeps its own drill).
+**Random:** the UNION of both retired pages' axes — line-pool shuffle, missing-line index, placeholder position (rowops) + which quarter is missing {Q2,Q3}, DRAFT slot, staged-block sides {G,I}, 6 opex lines from an 8-label pool (colops).
+**Aha:** "structure ops inherit — a new row dresses like the one above it, a new column like the one to its left." **Finish:** beat 6 (the schedule whole again); save closes. **Clocks:** fresh measure (merged scope ≈ two old drills + save). **Engine (fix wave):** VERIFY/IMPLEMENT insert-inheritance to the Excel default (row-above / column-left) — the lesson depends on it; parity assert lands with it. Undo-over-structure-ops unaffected (AUDIT §A-8). **Plumbing:** D17.
 
-#### 4.6 colops — "Columns move too" · M
-**Now:** 4 checks (delete DRAFT, insert+type quarter, header order, bold) but the board is 3 rows deep on a 9-row sheet — under-dense; typing a whole quarter's data is retype-grunt, not the lesson.
-**Beats:**
-1. Delete the whole DRAFT column — the schedule closes the gap
-2. Insert a blank column where [Qn] belongs — before [Qn+1]
-3. Paste the staged [Qn] column into the gap — header and data together (staged block on the right, like rowops)
-4. Bold the [Qn] header — Q1 Q2 Q3 Q4 read in order (order guard folds into ok)
-5. Add a bottom border under the header row — the schedule reads ruled
-☆ Set every quarter column to one width of 10 — a print-even block
-**Random:** which quarter is missing {Q2,Q3} (as-is) + DRAFT slot (as-is) + NEW: 6 opex lines from an 8-label pool (board grows to ~10 rows) + staged-block side {G,I}. **Aha:** unchanged (Ctrl+Space owns the column). **Finish:** beat 5. **Clocks:** re-sweep (paste replaces typing — par drops). **Engine:** none. [Paste-Special Chain]
+#### 4.6 colops — **RETIRED (D17, playtest round 1 — merged into rowops §4.5)**
+Wolf (2026-07-24): "combine this and the column drill to have a more fulsome drill that teaches you row inserts and deletions and column inserts and deletions." Row and column structure ops + the formatting-inheritance lesson are ONE drill — rowops (§4.5 round 2) carries all of it, including this page's former beats (DRAFT-column delete, quarter insert+paste, header order) and its randomization axes. The colops key leaves menuOrder/groups; PARS/TRACKS/cert arrays update in the same PR; its leaderboard board keeps history but goes unreachable; catalog 82→81 live (87 post-pass); the freed slot stays OPEN for a future add. The old spec is superseded — do not build.
 
 #### 4.7 editfix — "Fix the typos in place" · S
 **Now:** 4 checks (2 typos in-place, drift audit, stretch the short SUM) — chained, randomized, dense pools. Meets bar except the missing bonus (guide/checks align 4v4 — fine).
@@ -1011,6 +1052,7 @@ _Wolf review round 1 (2026-07-24): Full Builds get their OWN build pass (**H6b-F
 ## 5 · ROLLOUT
 
 ### 5.1 Build order
+0. **r420c — WAVE-1 ROUND 2 (the FIX WAVE) PRECEDES WAVE 2.** Wolf playtested wave 1 (P1: navigation · filldr · pastes · blocksel · rowops) — feedback in dev/ROUND1_FEEDBACK.md. The fix wave rebuilds those five drills to their ROUND-2 §4 pages + ships the seven playtest engine fixes (B1–B7) + the D17 colops retirement, BEFORE P2 opens. **All future wave agents build to the r420c rules (§1.0)** — every batch from P2 on applies §1.0 (outcome-vague lines, format-as-you-go, mystery ☆, save closer, conventions) on top of its §4 pages, and each wave's par sweep absorbs the +~2-key save closer.
 1. **Platform PR first** (§2.1 clocks display · §2.2 bonus plumbing · §2.3 meter · §2.5 tiers · §2.6 touch-lists · §2.7 mistakes-replay · §2.8 invariants). Nothing drill-facing ships before this merges — every drill agent consumes it.
 2. **Foundations** (4.1–4.10), catalog order, modeltour (capstone) last.
 3. **Chapter by chapter** in catalog order — within a chapter: regular drills in order, capstone LAST (it chains the reworked boards). New drills (qclose/vlookup/cleanroom/redflags/pitchpage) build in their catalog slot.
@@ -1021,8 +1063,8 @@ _Wolf review round 1 (2026-07-24): Full Builds get their OWN build pass (**H6b-F
 | PR | contents |
 |----|----------|
 | P0 | platform mechanics (§2) + invariants + this doc committed to dev/DEPTH_PASS.md |
-| P1 | navigation, filldr, pastes, blocksel, rowops |
-| P2 | colops, editfix, undo, copyover + modeltour★ (c1 gate on) |
+| P1 | navigation, filldr, pastes, blocksel, rowops — **BUILT + Wolf-playtested; ROUND-2 FIX WAVE (P1b) re-ships these five to the r420c pages + engine fixes B1–B7 + D17 before P2 opens** |
+| P2 | editfix, undo, copyover + modeltour★ (c1 gate on) — _colops removed (D17: retired into rowops, which ships in P1b)_ |
 | P3 | typeset, decimals, center, autofit, ruleoff |
 | P4 | ruleaudit, combo, dress, housestyle + gauntlet★ (c2 gate on) |
 | P5 | margin, foot, anchor, percent, growth |
@@ -1056,6 +1098,7 @@ Each PR: cache-bump ?v= across the 9 pages when index.html/drills.js change (CI-
 ### 5.4 Wolf checkpoints
 1. **THIS DOC** — Wolf reviewed (round 1, 2026-07-24): the §3 delta table stands, all taste calls resolved (decision log below), semantic-reference standard applied. Round-2 comments graft per drill as they come. Nothing builds before P0 scaffolding lands behind flags.
 2. **Post-P0 playtest** — clocks strip, per-beat splits (in-run + results table), ☆ display, meter UI on one prototype drill (ruleaudit) before the fleet consumes them.
+2b. **Wave-1 playtest — DONE (2026-07-24).** Wolf played P1 live; feedback transcribed + tagged in dev/ROUND1_FEEDBACK.md; the four follow-up decisions landed in the round-2 decision log below; the fix wave (P1b, §5.1 #0) executes it before P2. Each wave's playtest now also closes with a POST-BATCH BRIEF + propagation sweep per WORKFLOW.md §8.
 3. **Per-chapter screenshot batches** — each chapter's PRs land → one batch post (fresh/mid/win ×N + capstone gate flow) → Wolf plays live → feedback lands as fixups in the NEXT chapter's window (rolling, per the r417 H6 cadence).
 4. **Post-c4 mid-pass review** — halfway checkpoint: par distribution, clock feel, bonus uptake, capstone gate friction; recalibrate the standard if the data disagrees with it.
 5. **Pre-H6b-FB review** — before P18 opens: Wolf playtests the ch-8 provisional specs against each page's **Wolf playtest** flags, locks line items, beat counts, interest conventions and the difficulty target (set off threestmt); pages shed the [SEPARATE PASS — spec provisional] mark as they're approved.
@@ -1070,5 +1113,12 @@ Formerly the open-questions list. Every item is DECIDED and folded into its sect
 6. **§2.3 error counts:** N is FIXED per drill — honest prompt strings beat per-seed variance.
 7. **D9 cascade move:** accepted — the 1–9 hotkey re-mapping in Models II is cosmetic; capstone-last stays uniform.
 8. **§2.7 mistakes-replay:** ships in P0.
-9. **§1.7 references (the round-1 headline): SEMANTIC-FIRST** — beats name the labeled real-world item ("the Revenue line", "the EBITDA margin cell"), never the bare cell; coordinates only where the board has no label (maze/obstacle mechanics) or as a parenthetical disambiguator. Recorded in §1.7's preamble; §1.3 labeled-target rule added; all 88 pages swept.
+9. **§1.7 references (the round-1 headline): SEMANTIC-FIRST** — beats name the labeled real-world item ("the Revenue line", "the EBITDA margin cell"), never the bare cell; coordinates only where the board has no label (maze/obstacle mechanics) or as a parenthetical disambiguator. Recorded in §1.7's preamble; §1.3 labeled-target rule added; all pages swept.
 10. **Full Builds (round-1 edit): SEPARATE BUILD PASS (H6b-FB)** — ch-8 pages upgraded to real-world model builds now, built later under Wolf guidance (§5.1 #5, §5.4 #5).
+
+### RESOLVED — WOLF DECISION LOG, PLAYTEST ROUND 1 (2026-07-24 · r420c — source: dev/ROUND1_FEEDBACK.md)
+11. **☆ = MYSTERY SLOT.** The checklist shows a dim "☆ ?" line with no text; the label reveals on earn or on the results card. Bonuses are HIDDEN EFFICIENCY discoveries — mastery moves (proper anchoring for one-copy fills, one-pass paste-special-multiply, whole-row/column op discipline), NEVER formatting tasks. → §1.0(d) + §2.2 display; wave-1 formatting-☆s replaced in §4.3/§4.4/§4.5.
+12. **Ctrl+S = REQUIRED FINAL BEAT on all classic drills.** "Save your work" is the universal closer; the win fires on the save; pars re-measure (+~2 keys per drill) as the waves roll — no big-bang retune. → §1.0(e); navigation §4.1 carries the one sanctioned post-save beat (Wolf's own sketch).
+13. **rowops ABSORBS colops.** Row AND column insert/delete + the formatting-inheritance lesson (validated Excel default: inserted rows inherit the row above; inserted columns the column to the left) are one drill under the rowops key. colops RETIRES — catalog 82→81 live (87 post-pass); the freed slot stays open for a future add. → §3 D17 + §4.5/§4.6.
+14. **pastes gets a NEW hidden efficiency ☆:** one paste-special-multiply pass covers both scale conversions (copy the yellow helper once, one multi-row selection, one pass); the blue-the-row formatting ☆ dies. → §4.3.
+15. **The §1.0 global law (from the playtest headline feedback):** format-as-you-go beat ordering · outcome-vague checklist lines (timer teaches speed, hints teach the route) · any-route grading re-affirmed · totals wear TOP borders, never bottom-under · helper/assumption cells populated + light yellow + all borders. Binding on every page; §1.0 wins on conflict; wave agents propagate per WORKFLOW.md §8.

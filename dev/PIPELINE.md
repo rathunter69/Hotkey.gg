@@ -2,8 +2,26 @@
 
 ## ⚡ STATE OF THE QUEUE (r417, 2026-07-24 — READ FIRST)
 _Process standards now live in **dev/WORKFLOW.md** (orchestrator+agent-fleet model, decision
-protocol, definition of done). Findings base: **dev/AUDIT_R417.md** (6-domain platform audit,
-live-verified). One segment ≈ one session ≈ one PR; check findings off in AUDIT_R417 as you fix._
+protocol, definition of done, **NEW §8: post-batch briefs · propagation sweeps · model-proof
+specs**). Findings base: **dev/AUDIT_R417.md** (6-domain platform audit, live-verified). One
+segment ≈ one session ≈ one PR; check findings off in AUDIT_R417 as you fix._
+
+**⚡ r420c UPDATE (2026-07-24 — DEPTH-PASS PLAYTEST ROUND 1):** Wave 1 (P1: navigation, filldr,
+pastes, blocksel, rowops) built and Wolf-playtested → feedback transcribed + tagged in
+**dev/ROUND1_FEEDBACK.md**. **Wave-1 ROUND-2 FIX WAVE (P1b) is in flight and PRECEDES wave 2 (P2).**
+dev/DEPTH_PASS.md bumped to **r420c**: new §1.0 binding law (format-as-you-go · outcome-vague lines ·
+freedom re-affirmed · mystery-☆ · Ctrl+S universal closer · totals-top-border + yellow-input
+conventions) + the five wave-1 §4 pages rewritten to ROUND-2 specs. **Wolf's four decisions:**
+☆ = mystery slot ("☆ ?", hidden-efficiency only) · Ctrl+S required closer (win fires on save; pars
++~2 keys, re-measured as waves roll) · **colops RETIRED — merged into rowops** (catalog 82→81; P2
+loses colops; slot open for a future add) · pastes' new hidden paste-special-multiply ☆. Engine
+fixes riding P1b (ROUND1_FEEDBACK §3): ctrl-arrow rides through nav walls · Ctrl+Shift+D fill-down
+dead · guided-ring early flip · paste-formats drops borders · total-row grey == selection grey ·
+blocksel two-column cut · wall-bump latch over-counts. **Platform items from the same playtest
+(ROUND1_FEEDBACK §4):** Ctrl+Space 20-row selection bug → platform round (in flight) · leaderboard/
+stats card-size violations, pace-chart numbers, busiest-day stat, collapsed drill list, last-5-runs
++ expand, header rank AND bucket → cosmetics/stats round (in flight) · card-customizer rework →
+QUEUED (item 9 below) · data-retention policy → Wolf-pending.
 
 **✅ H0 · BACKEND TRUTH — SHIPPED r417** (branch `claude/platform-audit-framework-1hf2v7`):
 ad-hoc SQL reconciled into migrations, desk_name_guard + apply_to_desk security regressions
@@ -61,14 +79,35 @@ repaired, profiles column grants (theme/client_state/email_* — three features 
    FOUNDATIONS (drill 1 sets the reference template; consistency pass included even where already
    strong). Each agent: build+beats+checks+copy+alts+par re-measure per its spec page, full replay
    ×3 + par-sweep + alt registration. Batch ~5 drills/PR with the standard gate.
+   **STATUS r420c (2026-07-24): P1 (wave 1) BUILT + WOLF-PLAYTESTED → dev/ROUND1_FEEDBACK.md.
+   The ROUND-2 FIX WAVE (P1b: the five drills to their r420c §4 pages + engine fixes B1–B7 + the
+   colops→rowops merge D17) is in flight and PRECEDES P2. Spec is now DEPTH_PASS r420c — every
+   subsequent wave agent builds to §1.0 (mystery-☆, Ctrl+S closer, outcome-vague lines,
+   format-as-you-go, totals-top-border/yellow-input conventions); each wave closes with a
+   post-batch brief + propagation sweep (WORKFLOW.md §8).**
 7. **H7 · ENGINE PARITY PACK 2 [Wolf priorities]** — undo widening (hide/group/filter), cut-move
    ref rewrite, Enter/Tab-in-selection, F4 repeat-last-action, date entry parsing, transpose formulas.
 8. **H8 · LAUNCH RUNBOOK [Wolf-gated]** — AUDIT_R417 §F ordered list (creds rotation, email
    domain→Resend→SMTP, _headers HSTS/CSP/immutable, events rate limit, seed/fixture purge, the
    flip, backdoor removal, then E1/E2 Stripe+billing).
+9. **CARD CUSTOMIZER 2.0 [QUEUED per Wolf, 2026-07-24 — ROUND1_FEEDBACK G9; screenshot-first]** —
+   "queue a return to the card customization." Wolf's full spec, captured verbatim-adapted:
+   (a) **titles still not updating** — fix first; (b) **some titles LOCK to their skin** — PRO and
+   founder specifically — while **other titles populate on the title cutouts**; (c) the current
+   achievement picker is annoying — you can't control achievement ORDER or slot one to a specific
+   tray (you rotate through selections until the order happens to work); rework: **lock each tray
+   to ONE achievement TYPE** so the card reads standardized (see at a glance if someone is
+   accurate vs completionist etc.), with **mythics and legendaries WILD** — able to populate any
+   tray slot; (d) stats page: don't show the trays for what's currently on the card (distracting)
+   — only keep if it becomes editable IN-LINE there. Design-first per WORKFLOW §2: mock →
+   screenshot → Wolf → build.
 
-**Wolf-pending (r419):** fx dial-up render approval (held from r415) · lean ribbon bar default-ON
-(playtest, §G) · About.html restyle direction (H5) · DEPTH_PASS.md review when it lands (H6a).
+**Wolf-pending (r420c):** fx dial-up render approval (held from r415) · lean ribbon bar default-ON
+(playtest, §G) · About.html restyle direction (H5) · **DATA-RETENTION POLICY (open product
+decision, ROUND1_FEEDBACK G10)** — how much per-user run history do we keep? Wolf's working
+assumption: stats shows recent runs up to ~a week, last ~5 visible with an expand/see-more for
+deeper drill run history; needs a real retention decision (storage + privacy + stats surfaces)
+before the stats round hardens display around it.
 
 <!-- ————————————————— history below ————————————————— -->
 ## ⚡ prior state (r302, 2026-07-17 evening)
