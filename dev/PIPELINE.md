@@ -45,7 +45,7 @@ repaired, profiles column grants (theme/client_state/email_* — three features 
    shell; Excel-grid immersion set (§G): selected-header highlight, centered errors, normal-ink ####,
    monochrome ants, sheet-tab green, name-box RxC count. [Wolf]: lean ribbon bar default ON.
 6. **H6 · DRILL DEPTH — RE-SCOPED (Wolf, 07-24). Two phases:**
-   **H6a [auto·L] THE DEPTH-PASS SPEC** — synthesize the 3-track research (finance canon · competitive
+   **H6a ✅ DONE r420 — dev/DEPTH_PASS.md AWAITS WOLF REVIEW.** Original brief: — synthesize the 3-track research (finance canon · competitive
    Excel · course/game design, scratchpad/depth-research/) + Wolf's recorded intent + the Foundations
    bar into **dev/DEPTH_PASS.md**: a per-drill build spec for the WHOLE catalog. **Wolf's locked
    parameters:** (1) every drill to the FOUNDATIONS BAR (4-6 graded beats, randomized sites, aha,
