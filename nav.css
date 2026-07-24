@@ -59,6 +59,9 @@ body{padding-top:14px}
 .topnav-rank{font-size:9.5px; padding:5px 11px; cursor:pointer; align-items:center; margin-right:4px;
   transition:transform .12s, box-shadow .12s}
 .topnav-rank:hover{transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.3)}
+/* r423 (Wolf): the pill names rank AND bucket — "VP · top". The bucket rides quieter
+   than the tier name so the one-row nav holds. */
+.topnav-rank .pill-bk{font-style:normal; opacity:.72; letter-spacing:.02em; white-space:nowrap}
 @media (max-width:760px){ .topnav-rank{display:none !important} }
 
 /* ---------- AUTH SLOT + USER MENU DROPDOWN ---------- */
@@ -939,7 +942,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 /* ---- r386: unified player card (.uc) — layout only; the skin bg/border/vars come
    from the .hk-frame-<id> rules above. Public card renders at full scale, the
    your-card hero at compact. ---- */
-.uc{position:relative;border-radius:16px;padding:22px 24px 18px}
+.uc{position:relative;border-radius:16px;padding:22px 24px 20px} /* r423: 20px bottom = the one-card canon everywhere (pub-card was the last 18px holdout) */
 /* inside the owner modal the .pc-card shell already pads + carries the skin, so the
    nested unified card drops its own frame padding (no double box) */
 .pc-card .uc{padding:0;border-radius:0}

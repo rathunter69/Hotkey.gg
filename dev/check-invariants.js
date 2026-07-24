@@ -196,7 +196,11 @@ try {
    (guide.length === checks.length === targets.length, ☆ bonus line included) and EXACTLY ONE
    bonus:true per reworked drill. Static proxy over the drill's source chunk: checks counted as
    `{label:` entries, guide/targets counted as top-level elements of their returned array
-   literal (string-aware bracket scan). Drills join REWORKED as their depth-pass page ships. ---- */
+   literal (string-aware bracket scan). Drills join REWORKED as their depth-pass page ships.
+   r423 (Wolf round-2 §1): reworked drills also declare saveClose:true — the engine APPENDS the
+   "Save your work" beat (+1 to checks/guide/targets/demo) AT RUNTIME via hkSaveCloseWire, so the
+   STATIC counts asserted here stay the hand-written tri-length; C9 asserts the declaration is
+   present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
   const REWORKED = ['navigation','blocksel','filldr','pastes','rowops'];   // r422 H6b-1 wave 1
   const idx = fs.readFileSync('index.html', 'utf8');
@@ -236,8 +240,13 @@ try {
       if (guideN !== checksN || targetsN !== checksN)
         bad(`C9: ${key} — tri-length broken: checks=${checksN} guide=${guideN} targets=${targetsN} (§1.9 index alignment)`);
       if (bonusN !== 1) bad(`C9: ${key} — expected exactly one bonus:true beat, found ${bonusN}`);
-      if (checksN && guideN === checksN && targetsN === checksN && bonusN === 1)
-        ok(`C9 ${key}: guide/checks/targets tri-length ${checksN}, one ☆ bonus`);
+      /* r423 §1: the Ctrl+S closer — declared, never hand-written (the engine appends it at runtime) */
+      const hasSaveClose = /saveClose\s*:\s*true/.test(chunk);
+      const handWritten = /label\s*:\s*'Save your work'/.test(chunk) || /savedN/.test(chunk);
+      if (!hasSaveClose) bad(`C9: ${key} — reworked drill must declare saveClose:true (the engine-appended Ctrl+S closer)`);
+      if (handWritten) bad(`C9: ${key} — hand-written save beat found; hkSaveCloseWire owns the closer (would double-append)`);
+      if (checksN && guideN === checksN && targetsN === checksN && bonusN === 1 && hasSaveClose && !handWritten)
+        ok(`C9 ${key}: guide/checks/targets tri-length ${checksN} (+1 saveClose beat at runtime), one ☆ bonus`);
     }
   }
 } catch (e) {

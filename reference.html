@@ -130,7 +130,7 @@
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); font-family:var(--mono); font-size:14px; padding:50px 0;}
 </style>
 
-<link rel="stylesheet" href="nav.css?v=208">
+<link rel="stylesheet" href="nav.css?v=209">
 <script src="drills.js?v=281"></script>
 <script src="refmap.js?v=1"></script>
 <script>
@@ -145,7 +145,7 @@ window.NAV_ACTIVE = 'reference';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=298"></script>
+<script src="nav.js?v=299"></script>
 <div class="wrap">
   <header>
     <h1>Shortcut <span class="em">reference</span></h1>
@@ -181,12 +181,12 @@ const DATA = [
   {cat:'Navigate', ic:'⤢', items:[
     {k:'↑/↓/←/→', d:'Move one cell', dr:true},
     {k:'Ctrl+↑/↓/←/→', d:'Jump to the edge of the data region', dr:true},
-    {k:'Ctrl+Home', d:'Go to A1'},
-    {k:'Ctrl+End', d:'Go to the last used cell'},
+    {k:'Ctrl+Home', d:'Go to A1 <span class="alt">· compact keyboards: Ctrl+Fn+←</span>'},
+    {k:'Ctrl+End', d:'Go to the last used cell <span class="alt">· compact keyboards: Ctrl+Fn+→</span>'},
     {k:'Tab', d:'Move right (Shift+Tab to move left)', dr:true},
     {k:'Enter', d:'Move down (Shift+Enter to move up)', dr:true},
-    {k:'Page Up/Page Down', d:'Scroll one screen up / down'},
-    {k:'Ctrl+Page Up/Page Down', d:'Previous / next worksheet'},
+    {k:'Page Up/Page Down', d:'Scroll one screen up / down <span class="alt">· compact keyboards: Fn+↑ / Fn+↓</span>'},
+    {k:'Ctrl+Page Up/Page Down', d:'Previous / next worksheet <span class="alt">· compact keyboards: Ctrl+Fn+↑ / Ctrl+Fn+↓</span>'},
   ]},
   {cat:'Select', ic:'▦', items:[
     {k:'Shift+↑/↓/←/→', d:'Extend selection one cell', dr:true},
@@ -195,7 +195,7 @@ const DATA = [
     {k:'Ctrl+Space', d:'Select the entire column', dr:true},
     {k:'Ctrl+Shift+Space', d:'Select the current region \u2014 the whole table under the cursor'},
     {k:'Ctrl+A', d:'Select the current region, then the whole sheet'},
-    {k:'Ctrl+Shift+End', d:'Select from here to the last used cell'},
+    {k:'Ctrl+Shift+End', d:'Select from here to the last used cell <span class="alt">· compact keyboards: Ctrl+Shift+Fn+→</span>'},
   ]},
   {cat:'Edit & enter', ic:'✎', items:[
     {k:'F2', d:'Edit the active cell (cursor at the end)', dr:true},

@@ -841,6 +841,10 @@ const ALTS = [
           const C = CHALLENGES[key];
           const moves = eval('(' + movesSrc + ')')(C);
           for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+          /* r423 §1: saveClose drills close on the universal Ctrl+S beat — every alt route
+             ends with the same save keystroke a player would press (the routes themselves
+             stay chord-diverse; the closer is engine-owned and route-independent) */
+          if (!done && C.saveClose) demoKey({ key: 's', ctrl: true });
           if (done) return { won: true, keys: keyLog.length };
           const failing = C.checks(S).filter(x => !x.ok).map(x => x.label);
           return { won: false, failing };

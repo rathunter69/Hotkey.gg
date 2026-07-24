@@ -16,6 +16,26 @@ dev/AUDIT.md (newest round at the TOP), and the dev/ design docs._
 - Checklist language mandate: imperative "Do XYZ" + observable end state; metaphor verbs banned
   ("tie the line", "grab the block"); enforced by the extended de-hint/voice CI check (H4).
 
+## ⚡ DEPTH PASS — PLAYTEST ROUND 1 INTEGRATED (2026-07-24, r420c)
+**WAVE 1 (P1: navigation · filldr · pastes · blocksel · rowops): ROUND-2 FIXES IN FLIGHT** per
+**dev/ROUND1_FEEDBACK.md** (Wolf's playtest, transcribed + tagged: global standards / per-drill /
+bugs B1–B7 / general platform items G1–G10). **dev/DEPTH_PASS.md is now r420c** — new §1.0 binding
+law + the five wave-1 §4 pages rewritten to ROUND-2 specs; the fix wave (P1b) precedes wave 2, and
+ALL future wave agents build to r420c.
+**WOLF'S FOUR FOLLOW-UP DECISIONS (2026-07-24, resolved):**
+- **☆ = MYSTERY SLOT** — checklist shows a dim "☆ ?" line, no text; revealed on earn/results.
+  Bonuses = HIDDEN EFFICIENCY discoveries (anchoring mastery, one-pass paste-special) — never formatting.
+- **Ctrl+S = UNIVERSAL CLOSER** — every classic drill ends "Save your work", required, win fires on
+  the save; pars re-measure (+~2 keys) as the waves roll.
+- **colops RETIRED — rowops absorbs it** (row+column structure ops + the validated Excel
+  formatting-inheritance lesson). Catalog 82→81 live (87 post-pass); slot open for a future add.
+- **pastes: NEW hidden efficiency ☆** — one paste-special-multiply pass covers both scale
+  conversions; the blue-the-row formatting ☆ dies.
+Also binding now (DEPTH_PASS §1.0): format-as-you-go · outcome-vague checklist lines (timer teaches
+speed, hints teach the route) · any-route grading re-affirmed · totals wear TOP borders · helper/
+assumption cells populated + light yellow + all borders. New process law in **WORKFLOW.md §8**:
+post-batch briefs + convention propagation sweeps + model-proof (Opus-executable) specs.
+
 ## ⚡ NEXT-SESSION HANDOFF (2026-07-24, r417 — THE PLATFORM AUDIT + WORKFLOW FRAMEWORK)
 
 **WHAT r417 IS:** Wolf commissioned a full pre-launch platform audit + a new process framework.
