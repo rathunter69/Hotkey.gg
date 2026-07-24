@@ -87,3 +87,24 @@ INTAKE → BATCH → VERIFY → SHIP → RECONCILE. A round is DONE only when AL
 
 Lives in dev/PIPELINE.md ⚡ header (segments H1–H8, built from dev/AUDIT_R417.md). One segment ≈
 one session ≈ one PR.
+
+## 7 · Token economy (Wolf standing rule, 2026-07-24)
+
+**The balance: token spend must buy Excel-fidelity or gamified-experience quality the player can
+feel. Spend where judgment compounds; economize where execution is mechanical.**
+
+- **Model routing:** Fable-tier (session model) for design/spec/judgment work — depth-pass specs,
+  curriculum restructuring, engine-behavior decisions, security reasoning, anything touching the
+  15.9k-line engine's semantics. Route MECHANICAL batches to cheaper models (`model: sonnet` or
+  `haiku` on the Agent call): copy sweeps against a locked standard, drill-page regeneration,
+  invariant-check runs, screenshot harness runs, formatting passes, straightforward test execution.
+- **Fleet sizing:** one agent per DISTINCT workstream, not per file. No redundant N-agent verify
+  passes unless the finding is security-critical or Wolf-visible (then 2-3 skeptics max).
+- **Research is spent once:** the depth-pass research + AUDIT_R417 are the findings base — future
+  sessions READ them instead of re-auditing. Re-audit only what a change invalidated.
+- **Spec-then-execute:** expensive synthesis produces a tight per-drill/per-task spec page; the
+  build agent gets the spec, not the research corpus — execution agents never re-derive design.
+- **Targeted tests locally, CI is the full gate** (existing house rule — it's also the token rule:
+  don't burn agent time on full local sweeps the gate runs for free).
+- **Don't gold-plate:** inert-code refactors, cosmetic-only rewrites, and "while I'm here" scope
+  creep are the token sinks that bought nothing before (see PROJECT_REVIEW B1/B2 verdicts).

@@ -682,6 +682,165 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(ag1.concat, 'two-column template with an inferred literal separator ("Last, First")');
   ok(ag1.refuses, 'no discernible pattern -> Flash Fill refuses rather than guessing');
 
+  console.log('AH. clipboard lifecycle — tiling, ants, copy-then-Enter, Ctrl+F (r418)');
+  await fresh();
+  const ah1 = await run(() => {
+    const bc=()=>({...blankCell()});
+    // exact-multiple tiling: copy 1 cell, select 3 -> Ctrl+V fills all three (Excel)
+    S.cells['H2']={...bc(), value:7}; render();
+    setDemoSel('H2'); demoKey({key:'c',ctrl:true});
+    setDemoSel('H4:H6'); demoKey({key:'v',ctrl:true});
+    const tiled = S.cells['H4'].value===7 && S.cells['H5'].value===7 && S.cells['H6'].value===7;
+    const R = selRange();
+    const selFootprint = R.r1===4 && R.r2===6 && R.c1===8 && R.c2===8;   // the FULL tiled block is selected
+    // per-tile formula translation: each repeat translates relative to ITS landing spot
+    setDemoSel('C9'); for (const ch of '=B4+1') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('C9'); demoKey({key:'c',ctrl:true});
+    setDemoSel('D10:D11'); demoKey({key:'v',ctrl:true});
+    const tf = (S.cells['D10']||{}).formula==='=C5+1' && (S.cells['D11']||{}).formula==='=C6+1';
+    // NON-multiple selection: single paste anchored top-left, no spill (also Excel)
+    S.cells['I2']={...bc(), value:1}; S.cells['I3']={...bc(), value:2}; render();
+    setDemoSel('I2:I3'); demoKey({key:'c',ctrl:true});
+    setDemoSel('I5:I7'); demoKey({key:'v',ctrl:true});
+    const single = S.cells['I5'].value===1 && S.cells['I6'].value===2 && !(S.cells['I7'] && S.cells['I7'].value);
+    // ants lifecycle: starting an edit (type-to-replace -> startEdit) kills ants + clipboard
+    setDemoSel('H2'); demoKey({key:'c',ctrl:true});
+    const armed = !!S.clipboard;
+    setDemoSel('G2'); demoKey({key:'5'});
+    const clearedByEdit = armed && !S.clipboard && editing;
+    demoKey({key:'Escape'});
+    // row insert (keyboard chord) invalidates the copied rect
+    setDemoSel('H2'); demoKey({key:'c',ctrl:true});
+    setDemoSel('A12'); demoKey({key:' ',shift:true});
+    demoKey({key:'=',ctrl:true,shift:true});
+    const clearedByIns = !S.clipboard;
+    demoKey({key:'z',ctrl:true});
+    // row delete (ribbon route) too
+    setDemoSel('H2'); demoKey({key:'c',ctrl:true});
+    setDemoSel('A12'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'d'}); demoKey({key:'r'});
+    const clearedByDel = !S.clipboard;
+    demoKey({key:'z',ctrl:true});
+    // COPY-THEN-ENTER: plain Enter pastes at the cursor and CONSUMES the clipboard
+    setDemoSel('H2'); demoKey({key:'c',ctrl:true});
+    setDemoSel('G7'); demoKey({key:'Enter'});
+    const enterPasted = S.cells['G7'] && S.cells['G7'].value===7;
+    const consumed = !S.clipboard;
+    const antsGone = (document.getElementById('marquee')||{style:{display:'none'}}).style.display==='none';
+    // with no clipboard armed, plain Enter still just moves down
+    setDemoSel('G9'); demoKey({key:'Enter'});
+    const stillMoves = S.active.r===10 && S.active.c===7;
+    // Ctrl+F: swallowed (never reaches the browser find bar) and opens Find & Replace
+    const ev=new KeyboardEvent('keydown',{key:'f',ctrlKey:true,bubbles:true,cancelable:true});
+    document.dispatchEvent(ev);
+    const ctrlF = ev.defaultPrevented && mode==='ribbon' && dialog==='findrep';
+    demoKey({key:'Escape'});
+    const chordDialogOneEsc = mode==='normal' && dialog===null;   // chord-opened dialog (no KeyTip path) closes to the grid in ONE press
+    return { tiled, selFootprint, tf, single, clearedByEdit, clearedByIns, clearedByDel,
+             enterPasted, consumed, antsGone, stillMoves, ctrlF, chordDialogOneEsc };
+  });
+  ok(ah1.tiled, 'paste TILES: 1 copied cell fills an exact-multiple 3-cell selection', JSON.stringify(ah1));
+  ok(ah1.selFootprint, 'the full tiled footprint is selected after paste');
+  ok(ah1.tf, 'each tiled repeat translates relative refs to ITS OWN landing spot');
+  ok(ah1.single, 'non-multiple selection keeps the single paste anchored top-left');
+  ok(ah1.clearedByEdit, 'starting an edit kills the marching ants + clipboard (startEdit)');
+  ok(ah1.clearedByIns, 'row insert (Ctrl+Shift+=) invalidates the copied rect');
+  ok(ah1.clearedByDel, 'row delete (Alt H D R) invalidates the copied rect');
+  ok(ah1.enterPasted && ah1.consumed, 'copy-then-Enter pastes at the cursor and consumes the clipboard');
+  ok(ah1.antsGone, 'the ants frame is hidden after the Enter-paste');
+  ok(ah1.stillMoves, 'plain Enter with no clipboard armed still moves down');
+  ok(ah1.ctrlF, 'Ctrl+F is swallowed and opens Find & Replace (no browser find bar)');
+  ok(ah1.chordDialogOneEsc, 'Esc closes a chord-opened dialog straight back to the grid');
+
+  console.log('AI. ribbon canon — W V G, H 3, Subtract, H O E, M P / M D (r418)');
+  await fresh();
+  const ai1 = await run(() => {
+    const bc=()=>({...blankCell()});
+    // Alt W V G is Excel canon (View -> Show -> Gridlines)
+    const had = document.body.classList.contains('hide-gridlines');
+    demoKey({key:'Alt'}); demoKey({key:'w'});
+    const wMenu = mode==='ribbon' && path.join('')==='W' && (MENUS['W']||[]).some(o=>o[0]==='V');
+    demoKey({key:'v'});
+    const wvMenu = path.join('')==='WV';
+    demoKey({key:'g'});
+    const toggled = document.body.classList.contains('hide-gridlines')!==had && mode==='normal';
+    // Alt W G stays a silent alias
+    demoKey({key:'Alt'}); demoKey({key:'w'}); demoKey({key:'g'});
+    const aliased = document.body.classList.contains('hide-gridlines')===had && mode==='normal';
+    // Alt H 3 (Underline) is now LISTED, not just wired
+    const h3Listed = (MENUS['H']||[]).some(o=>o[0]==='3')
+      && RIBBON_GROUPS['H'].some(g=>g[0]==='Font' && g[1].indexOf('3')>=0);
+    setDemoSel('C5'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'3', code:'Digit3'});
+    const uline = !!S.cells['C5'].uline;
+    // Paste Special SUBTRACT: dest - src on values, =(F)-k wrap on formulas
+    S.cells['H2']={...bc(), value:7};
+    S.cells['H3']={...bc(), value:100};
+    S.cells['H4']={...bc(), formula:'=H3*2', value:200};
+    recalc(); render();
+    setDemoSel('H2'); demoKey({key:'c',ctrl:true});
+    setDemoSel('H3'); demoKey({key:'Alt'}); demoKey({key:'e'}); demoKey({key:'s'}); demoKey({key:'s'}); demoKey({key:'Enter'});
+    const sub = S.cells['H3'].value===93;
+    setDemoSel('H4'); demoKey({key:'Alt'}); demoKey({key:'e'}); demoKey({key:'s'}); demoKey({key:'s'}); demoKey({key:'Enter'});
+    const subWrap = S.cells['H4'].formula==='=(H3*2)-7';
+    // Alt H O E — the ribbon route to Format Cells
+    setDemoSel('D3'); for (const ch of '46200') demoKey({key:ch}); demoKey({key:'Enter'});
+    setDemoSel('D3'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'e'});
+    const hoe = mode==='ribbon' && dialog==='fmt';
+    demoKey({key:'d'});
+    const dated = /^[A-Z][a-z]{2}-\d{2}$/.test(dispText(S.cells['D3'])) && mode==='normal';
+    // Alt M P / M D alias the Ctrl+[ / Ctrl+] trace jumps
+    S.cells['J2']={...bc(), value:5}; S.cells['J3']={...bc(), formula:'=J2*2'}; recalc(); render();
+    setDemoSel('J3'); demoKey({key:'Alt'}); demoKey({key:'m'}); demoKey({key:'p'});
+    const prec = colLetter(S.active.c)+S.active.r==='J2' && mode==='normal';
+    demoKey({key:'Alt'}); demoKey({key:'m'}); demoKey({key:'d'});
+    const dep = colLetter(S.active.c)+S.active.r==='J3' && mode==='normal';
+    return { wMenu, wvMenu, toggled, aliased, h3Listed, uline, sub, subWrap, hoe, dated, prec, dep };
+  });
+  ok(ai1.wMenu && ai1.wvMenu, 'Alt W shows the Show group; V descends (Excel canon path)', JSON.stringify(ai1));
+  ok(ai1.toggled, 'Alt W V G toggles gridlines');
+  ok(ai1.aliased, 'Alt W G still works as a silent alias');
+  ok(ai1.h3Listed, 'the H 3 Underline keytip is visible in MENUS + the Font group');
+  ok(ai1.uline, 'Alt H 3 underlines');
+  ok(ai1.sub, 'paste-special Subtract lands dest − src', JSON.stringify({v:ai1.sub}));
+  ok(ai1.subWrap, 'Subtract wraps formula cells =(F)-k like the other ops');
+  ok(ai1.hoe, 'Alt H O E opens Format Cells');
+  ok(ai1.dated, 'the H O E dialog applies (serial → Mmm-yy)');
+  ok(ai1.prec, 'Alt M P rides to the precedent (Ctrl+[ alias)');
+  ok(ai1.dep, 'Alt M D rides to the dependent (Ctrl+] alias)');
+
+  console.log('AJ. Esc one-level + uppercase KeyTips (r418)');
+  await fresh();
+  const aj1 = await run(() => {
+    // menu path: Esc pops ONE key per press, then exits
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'b'});
+    const depth2 = mode==='ribbon' && path.join('')==='HB';
+    demoKey({key:'Escape'}); const popped = mode==='ribbon' && path.join('')==='H';
+    demoKey({key:'Escape'}); const strip  = mode==='ribbon' && path.length===0;
+    demoKey({key:'Escape'}); const out    = mode==='normal';
+    // dialog opened over a KeyTip path: first Esc closes the dialog only
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'v'}); demoKey({key:'s'});
+    const dlgOpen = dialog==='paste' && path.join('')==='HV';
+    demoKey({key:'Escape'});
+    const dlgClosed = dialog===null && mode==='ribbon' && path.join('')==='HV';
+    demoKey({key:'Escape'}); demoKey({key:'Escape'}); demoKey({key:'Escape'});
+    const backOut = mode==='normal';
+    // uppercase KeyTip badges — tab strip and command tiles
+    demoKey({key:'Alt'});
+    const tabsUpper = Array.from(document.querySelectorAll('#ribbon .rtab k'))
+      .every(el=>/^[A-Z]$/.test(el.textContent)) && document.querySelectorAll('#ribbon .rtab k').length>0;
+    demoKey({key:'h'});
+    const badges = Array.from(document.querySelectorAll('#ribbon .ri-key')).map(el=>el.textContent);
+    const badgesUpper = badges.length>0 && badges.every(t=>/^[A-Z0-9]$/.test(t));
+    demoKey({key:'Escape'}); demoKey({key:'Escape'});
+    return { depth2, popped, strip, out, dlgOpen, dlgClosed, backOut, tabsUpper, badgesUpper };
+  });
+  ok(aj1.depth2 && aj1.popped, 'Esc pops one menu level (H B → H)', JSON.stringify(aj1));
+  ok(aj1.strip, 'second Esc lands on the tab strip');
+  ok(aj1.out, 'third Esc exits the ribbon');
+  ok(aj1.dlgOpen && aj1.dlgClosed, 'Esc on a path-opened dialog closes the dialog, stays at the menu');
+  ok(aj1.backOut, 'then Esc walks the rest of the way out');
+  ok(aj1.tabsUpper, 'tab-strip KeyTips render UPPERCASE');
+  ok(aj1.badgesUpper, 'command-tile KeyTip badges render UPPERCASE');
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

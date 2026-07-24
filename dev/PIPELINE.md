@@ -44,17 +44,31 @@ repaired, profiles column grants (theme/client_state/email_* — three features 
    stats .ach-filters wrap, canvas culling, tokens.css (light-first), About.html onto the shared
    shell; Excel-grid immersion set (§G): selected-header highlight, centered errors, normal-ink ####,
    monochrome ants, sheet-tab green, name-box RxC count. [Wolf]: lean ribbon bar default ON.
-6. **H6 · DRILL DEPTH (rolling) [Wolf-collaborative]** — AUDIT_R417 §D depth ranking: enrich the
-   15 shallowest (series, lookup, lookup2, bridge, autofit, wrapfix, drill, anchor, foot, percent,
-   sort, unhide, margin, dcfsens, grpfold) ~5/round per DOCTRINE §5 playbook, to the Foundations bar.
+6. **H6 · DRILL DEPTH — RE-SCOPED (Wolf, 07-24). Two phases:**
+   **H6a [auto·L] THE DEPTH-PASS SPEC** — synthesize the 3-track research (finance canon · competitive
+   Excel · course/game design, scratchpad/depth-research/) + Wolf's recorded intent + the Foundations
+   bar into **dev/DEPTH_PASS.md**: a per-drill build spec for the WHOLE catalog. **Wolf's locked
+   parameters:** (1) every drill to the FOUNDATIONS BAR (4-6 graded beats, randomized sites, aha,
+   finish-state beat, full 20-row grid); (2) new mechanics platform-wide: TIERED TIME MEDALS
+   (pass/pro/legendary clocks), BONUS OBJECTIVES (optional extra-credit beat), DISCLOSED-ERROR-COUNT
+   audits ("7 errors — find all 7" + progress meter), CHAPTER BOSS drills (capstone gauntlet gates
+   the next chapter, unlimited retakes); (3) catalog shape = **OPEN SEASON** — the spec may freely
+   restructure (renames/merges/splits/new drills) where it makes the curriculum better; every delta
+   lands in the spec for Wolf's review, INCLUDING the plumbing impact map (campaign spine, cert
+   tracks, PARS, boards, achievements); (4) checklist language per the H4 standard everywhere.
+   **WOLF REVIEWS DEPTH_PASS.md BEFORE ANY BUILD** — his per-drill comments graft onto the spec.
+   **H6b [auto·rolling] THE BUILDS** — ONE DEDICATED AGENT PER DRILL, in catalog order STARTING AT
+   FOUNDATIONS (drill 1 sets the reference template; consistency pass included even where already
+   strong). Each agent: build+beats+checks+copy+alts+par re-measure per its spec page, full replay
+   ×3 + par-sweep + alt registration. Batch ~5 drills/PR with the standard gate.
 7. **H7 · ENGINE PARITY PACK 2 [Wolf priorities]** — undo widening (hide/group/filter), cut-move
    ref rewrite, Enter/Tab-in-selection, F4 repeat-last-action, date entry parsing, transpose formulas.
 8. **H8 · LAUNCH RUNBOOK [Wolf-gated]** — AUDIT_R417 §F ordered list (creds rotation, email
    domain→Resend→SMTP, _headers HSTS/CSP/immutable, events rate limit, seed/fixture purge, the
    flip, backdoor removal, then E1/E2 Stripe+billing).
 
-**Wolf-pending questions (r417):** deploy vector for H0 (PR now?) · learn-mode restore-vs-scrub ·
-H-segment order confirmation · fx dial-up render approval (held from r415).
+**Wolf-pending (r419):** fx dial-up render approval (held from r415) · lean ribbon bar default-ON
+(playtest, §G) · About.html restyle direction (H5) · DEPTH_PASS.md review when it lands (H6a).
 
 <!-- ————————————————— history below ————————————————— -->
 ## ⚡ prior state (r302, 2026-07-17 evening)

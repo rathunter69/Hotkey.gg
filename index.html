@@ -7912,6 +7912,16 @@ function rangeRefs(a,b){ const pa=parseRef(a),pb=parseRef(b); const out=[]; if(!
 function cellNum(ref){ const c=S.cells[ref]; return c&&typeof c.value==='number'?c.value:0; }
 function cellRaw(ref){ const c=S.cells[ref]; return c?c.value:null; }
 function eqLoose(a,b){ return (typeof a==='number'&&typeof b==='number')?a===b:String(a).trim().toLowerCase()===String(b).trim().toLowerCase(); }
+/* ---- r418 H3-A: ERROR-VALUE SENTINELS (AUDIT_R417 §A #1/#3) ----
+   Errors are VALUES, extending the r407 #REF! string-sentinel pattern: they commit,
+   display, and PROPAGATE through operators/aggregates instead of being refused at
+   commit or silently coerced to 0. Inside evalFormula an error travels as a tagged
+   throw (err.__errval) so it unwinds any enclosing expression; evalFormula's top-level
+   catch converts it back to the sentinel STRING — which is what commit, recalc and
+   IFERROR all see. */
+const FX_ERR_SET=['#REF!','#N/A','#DIV/0!','#VALUE!','#NAME?'];
+function isErrVal(v){ return typeof v==='string' && FX_ERR_SET.indexOf(v)>=0; }
+function fxErr(code){ const e=new Error(code); e.__errval=code; return e; }
 function evalFormula(expr){
   let s=String(expr).replace(/^=/,''), i=0;
   /* r173 IFERROR — outermost form. Every other function pre-evaluates its
@@ -7932,33 +7942,39 @@ function evalFormula(expr){
       if(d===0&&cut>0&&s.slice(j+1).trim()===''){
         const argA=s.slice(mIE[0].length,cut), argB=s.slice(cut+1,j);
         let v; try{ v=evalFormula('='+argA); }catch(_){ v=undefined; }
-        if(v===undefined||(typeof v==='number'&&!isFinite(v))) return evalFormula('='+argB);
+        if(v===undefined||isErrVal(v)||(typeof v==='number'&&!isFinite(v))) return evalFormula('='+argB);   /* r418 H3-A: error sentinels are values now — IFERROR catches them all */
         return v;
       }
     }
   }
   const skip=()=>{ while(s[i]===' ') i++; };
-  const flat=args=>args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellNum):[typeof a.val==='number'?a.val:0]).flat();   /* r296: non-numeric scalar args contribute 0 (text can reach here now that refs carry raw strings) */
+  const flat=args=>args.map(a=>{
+    if(a.range) return rangeRefs(a.range[0],a.range[1]).map(rf=>{ const rv=cellRaw(rf); if(isErrVal(rv)) throw fxErr(rv); return typeof rv==='number'?rv:0; });   /* r418 H3-A: an error cell in the range poisons the aggregate (Excel) */
+    if(isErrVal(a.val)) throw fxErr(a.val);
+    return [typeof a.val==='number'?a.val:0];   /* r296: non-numeric scalar args contribute 0 (text can reach here now that refs carry raw strings) */
+  }).flat();
   const rawOf=a=>a.ref!==undefined?cellRaw(a.ref):(a.val!==undefined?a.val:null);
   /* r296 text plumbing: General-format text of any value (numbers shed float noise),
      and the numeric read of an arg for count/position parameters */
-  const txtOf=v=>{ if(v==null||v==='') return ''; if(typeof v==='number') return String(parseFloat(Number(v).toPrecision(10))); return String(v); };
+  const txtOf=v=>{ if(isErrVal(v)) throw fxErr(v); if(v==null||v==='') return ''; if(typeof v==='number') return String(parseFloat(Number(v).toPrecision(10))); return String(v); };   /* r418 H3-A: errors propagate through text ops too */
   const argTxt=a=>txtOf(rawOf(a));
-  const argNum=a=>{ if(!a) return 0; const v=(a.val!==undefined)?a.val:rawOf(a); if(typeof v==='number') return v; const p=parseFloat(v); return isNaN(p)?0:p; };
-  const numsIn=a=>{ if(!a||!a.range) throw new Error('range'); return rangeRefs(a.range[0],a.range[1]).map(cellRaw).filter(v=>typeof v==='number'); };   /* numbers only — text/blanks ignored, Excel-style */
+  const argNum=a=>{ if(!a) return 0; const v=(a.val!==undefined)?a.val:rawOf(a); if(isErrVal(v)) throw fxErr(v); if(typeof v==='number') return v; const p=parseFloat(v); return isNaN(p)?0:p; };
+  const numsIn=a=>{ if(!a||!a.range) throw new Error('range'); return rangeRefs(a.range[0],a.range[1]).map(cellRaw).map(v=>{ if(isErrVal(v)) throw fxErr(v); return v; }).filter(v=>typeof v==='number'); };   /* numbers only — text/blanks ignored, Excel-style; errors propagate (r418) */
   function fn(name,args){
     if(name==='MATCH'){ const lk=rawOf(args[0]); if(!args[1].range) throw new Error('m-range');
       const refs=rangeRefs(args[1].range[0],args[1].range[1]);
-      for(let p=0;p<refs.length;p++){ if(eqLoose(cellRaw(refs[p]),lk)) return p+1; } throw new Error('MATCH#N/A'); }
+      for(let p=0;p<refs.length;p++){ if(eqLoose(cellRaw(refs[p]),lk)) return p+1; } throw fxErr('#N/A'); }   /* r418 H3-A: a miss is the #N/A VALUE, not a refusal */
     if(name==='INDEX'){ if(!args[0].range) throw new Error('i-range');
       const a=parseRef(args[0].range[0]), b=parseRef(args[0].range[1]);
       const r1=Math.min(a.r,b.r), c1=Math.min(a.c,b.c), r2=Math.max(a.r,b.r), c2=Math.max(a.c,b.c);
-      const toN=v=>typeof v==='number'?v:(parseFloat(v)||0);
-      if(args.length>=3){ const rn=Math.round(args[1].val), cn=Math.round(args[2].val); return toN(cellRaw(colLetter(c1+cn-1)+(r1+rn-1))); }
+      /* r418 H3-A (AUDIT §A #13): INDEX returns text results AS TEXT — the old toN coercion
+         turned label pulls (INDEX/MATCH on names) into 0. Matches VLOOKUP/OFFSET/CHOOSE. */
+      const pick=v=>{ if(isErrVal(v)) throw fxErr(v); return v==null?0:v; };
+      if(args.length>=3){ const rn=Math.round(args[1].val), cn=Math.round(args[2].val); return pick(cellRaw(colLetter(c1+cn-1)+(r1+rn-1))); }
       const rn=Math.round(args[1].val);
-      if(c1===c2) return toN(cellRaw(colLetter(c1)+(r1+rn-1)));
-      if(r1===r2) return toN(cellRaw(colLetter(c1+rn-1)+r1));
-      return toN(rangeRefs(args[0].range[0],args[0].range[1]).map(cellRaw)[rn-1]); }
+      if(c1===c2) return pick(cellRaw(colLetter(c1)+(r1+rn-1)));
+      if(r1===r2) return pick(cellRaw(colLetter(c1+rn-1)+r1));
+      return pick(rangeRefs(args[0].range[0],args[0].range[1]).map(cellRaw)[rn-1]); }
     if(name==='SUMIF'){
       if(!args[0].range || !args[2] || !args[2].range) throw new Error('sumif-args');
       const crit = rawOf(args[1]);
@@ -7995,7 +8011,7 @@ function evalFormula(expr){
     }
     if(name==='CHOOSE'){   /* r257: scenario selector — CHOOSE(index, v1, v2, …) picks the index-th value (1-based) */
       const idx = Math.round(args[0] ? (args[0].val||0) : 0);
-      if(idx<1 || idx>=args.length) throw new Error('CHOOSE#VALUE');
+      if(idx<1 || idx>=args.length) throw fxErr('#VALUE!');   /* r418 H3-A: sentinel, not refusal */
       const v = rawOf(args[idx]);
       return typeof v==='number' ? v : (typeof v==='string' ? v : (v==null?0:v));
     }
@@ -8008,7 +8024,7 @@ function evalFormula(expr){
       const w  = args[4] ? Math.round(args[4].val||1) : 1;
       if(h!==1 || w!==1) throw new Error('OFFSET#range');   // single-cell only for now
       const rr=p.r+dr, cc=p.c+dc;
-      if(rr<1 || cc<1) throw new Error('OFFSET#REF');
+      if(rr<1 || cc<1) throw fxErr('#REF!');   /* r418 H3-A: sentinel, not refusal */
       const v = cellRaw(colLetter(cc)+rr);
       return v==null ? 0 : v;   // preserve text (pick the active case NAME) and numbers alike
     }
@@ -8040,7 +8056,7 @@ function evalFormula(expr){
     }
     if(name==='RANK'){   /* r296: RANK(number, range, [order]) — RANK.EQ semantics, ties share the top rank */
       const x=argNum(args[0]); const vals=numsIn(args[1]);
-      if(!vals.some(v=>v===x)) throw new Error('RANK#N/A');
+      if(!vals.some(v=>v===x)) throw fxErr('#N/A');   /* r418 H3-A: sentinel, not refusal */
       const asc=args[2] ? Math.round(argNum(args[2]))!==0 : false;
       return vals.filter(v=>asc ? v<x : v>x).length+1;
     }
@@ -8052,20 +8068,20 @@ function evalFormula(expr){
     if(name==='PROPER')return argTxt(args[0]).toLowerCase().replace(/(^|[^A-Za-z])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
     if(name==='LEFT'||name==='RIGHT'){
       const t=argTxt(args[0]); const n=args.length>1?Math.round(argNum(args[1])):1;
-      if(n<0) throw new Error(name+'#VALUE');
+      if(n<0) throw fxErr('#VALUE!');   /* r418 H3-A: sentinel, not refusal */
       return name==='LEFT' ? t.slice(0,n) : (n===0?'':t.slice(Math.max(0,t.length-n)));
     }
     if(name==='MID'){
       const t=argTxt(args[0]); const st2=Math.round(argNum(args[1])), n=Math.round(argNum(args[2]));
-      if(st2<1 || n<0) throw new Error('MID#VALUE');
+      if(st2<1 || n<0) throw fxErr('#VALUE!');   /* r418 H3-A: sentinel, not refusal */
       return t.substr(st2-1,n);
     }
     if(name==='FIND'){   /* case-sensitive, 1-based; a miss ERRORS (wrap it in IFERROR — that's the lesson) */
       const needle=argTxt(args[0]), hay=argTxt(args[1]);
       const st3=args.length>2?Math.round(argNum(args[2])):1;
-      if(st3<1) throw new Error('FIND#VALUE');
+      if(st3<1) throw fxErr('#VALUE!');
       const p=hay.indexOf(needle, st3-1);
-      if(p<0) throw new Error('FIND#VALUE');
+      if(p<0) throw fxErr('#VALUE!');   /* r418 H3-A: a FIND miss is the #VALUE! value — IFERROR still the lesson */
       return p+1;
     }
     if(name==='CONCATENATE'||name==='CONCAT'){
@@ -8080,7 +8096,7 @@ function evalFormula(expr){
       const r1=Math.min(a.r,b.r), c1=Math.min(a.c,b.c), r2=Math.max(a.r,b.r), c2=Math.max(a.c,b.c);
       const idx=Math.round(argNum(args[2])), vert=(name==='VLOOKUP');
       const approx = args.length>3 ? (argNum(args[3])!==0) : false;   // taught form is exact (FALSE); default exact
-      if(idx<1 || idx>(vert?(c2-c1+1):(r2-r1+1))) throw new Error(name+'#REF');
+      if(idx<1 || idx>(vert?(c2-c1+1):(r2-r1+1))) throw fxErr('#REF!');   /* r418 H3-A: sentinel, not refusal */
       const keys = vert ? Array.from({length:r2-r1+1},(_,k)=>cellRaw(colLetter(c1)+(r1+k)))
                         : Array.from({length:c2-c1+1},(_,k)=>cellRaw(colLetter(c1+k)+r1));
       let hit=-1;
@@ -8088,7 +8104,7 @@ function evalFormula(expr){
           if(typeof kv==='number'&&typeof key==='number'){ if(kv<=key) hit=k; else break; }
           else if(eqLoose(kv,key)){ hit=k; break; } } }
       else { for(let k=0;k<keys.length;k++){ if(eqLoose(keys[k],key)){ hit=k; break; } } }
-      if(hit<0) throw new Error(name+'#N/A');
+      if(hit<0) throw fxErr('#N/A');   /* r418 H3-A: an unwrapped miss COMMITS as #N/A (AUDIT §A #1) */
       const v = vert ? cellRaw(colLetter(c1+idx-1)+(r1+hit)) : cellRaw(colLetter(c1+hit)+(r1+idx-1));
       return v==null?0:v;   // preserve text + numbers
     }
@@ -8113,6 +8129,25 @@ function evalFormula(expr){
       const y1=A.getUTCFullYear(), m1=A.getUTCMonth()+1, y2=B.getUTCFullYear(), m2=B.getUTCMonth()+1;
       if(d1===31) d1=30; if(d2===31 && d1===30) d2=30;
       return ((y2-y1)*360+(m2-m1)*30+(d2-d1))/360; }
+    /* ---- r418 H3-A NEW FUNCTIONS (AUDIT §A #11) — COUNT/COUNTA/MOD/ROUNDUP/ROUNDDOWN ---- */
+    if(name==='COUNT'){   /* numbers only — text/blanks/errors don't count (Excel) */
+      let n=0; for(const a of args){
+        if(a.range){ for(const rf of rangeRefs(a.range[0],a.range[1])){ if(typeof cellRaw(rf)==='number') n++; } }
+        else if(typeof (a.val!==undefined?a.val:rawOf(a))==='number') n++; }
+      return n; }
+    if(name==='COUNTA'){   /* anything non-empty counts — text, numbers, even error values (Excel) */
+      let n=0; for(const a of args){
+        if(a.range){ for(const rf of rangeRefs(a.range[0],a.range[1])){ const v=cellRaw(rf); if(v!=null && v!=='') n++; } }
+        else { const v=(a.val!==undefined)?a.val:rawOf(a); if(v!=null && v!=='') n++; } }
+      return n; }
+    if(name==='MOD'){ const n=argNum(args[0]), d=argNum(args[1]);
+      if(d===0) throw fxErr('#DIV/0!');
+      return n-d*Math.floor(n/d); }   /* Excel: the result carries the DIVISOR's sign */
+    if(name==='ROUNDUP'||name==='ROUNDDOWN'){   /* Excel semantics: UP = away from zero, DOWN = toward zero */
+      const x=argNum(args[0]), p=Math.pow(10,Math.round(argNum(args[1])));
+      const t=+(Math.abs(x)*p).toPrecision(12);   // shed binary float noise so 3.1×10 isn't 31.000000000000004
+      const m=(name==='ROUNDUP')?Math.ceil(t):Math.floor(t);
+      return (x<0?-m:m)/p; }
     const xs=flat(args);
     switch(name){
       case 'SUM': return xs.reduce((a,b)=>a+b,0);
@@ -8123,15 +8158,15 @@ function evalFormula(expr){
       case 'MAX': return Math.max(...xs);
       case 'ABS': return Math.abs(xs[0]);
       case 'ROUND': return Math.round(xs[0]*Math.pow(10,xs[1]||0))/Math.pow(10,xs[1]||0);
-      case 'IF': return (args[0]&&args[0].val) ? (args[1]?args[1].val:0) : (args[2]?args[2].val:0);   /* r96: eager IF — branches pre-evaluated */
-      case 'IFERROR': { const a=args[0]?args[0].val:undefined;
-        return (typeof a==='number'&&isFinite(a))?a:(args[1]?args[1].val:0); }   /* r173: nested form; throwing args are caught at the outermost layer */
-      default: throw new Error('fn '+name);
+      /* IF / IFERROR never reach this switch — fac() intercepts them by name for LAZY
+         argument evaluation (r418 H3-A, AUDIT §A #12): the untaken IF branch is never
+         evaluated, and IFERROR catches thrown AND sentinel-valued errors at any depth. */
+      default: throw fxErr('#NAME?');   /* r418 H3-A: an unknown function name is Excel's #NAME? VALUE — it commits and displays (AUDIT §A #1, §G tier N) */
     } }
   /* r296: arithmetic coercion — text reads 0 (the engine's long-standing rule) EXCEPT a
      fully-numeric string, which reads as its number (Excel-true). Applied only where an
      operator actually fires, so bare refs still pass text through to & and the text pack. */
-  const nm=v=>{ if(typeof v==='number') return v; if(v==null||v==='') return 0;
+  const nm=v=>{ if(typeof v==='number') return v; if(isErrVal(v)) throw fxErr(v); if(v==null||v==='') return 0;   /* r418 H3-A: a ref to an error cell propagates the error (used to coerce to 0) */
     const p=parseFloat(v); return (!isNaN(p) && /^\s*-?\d*\.?\d+\s*$/.test(String(v))) ? p : 0; };
   /* r96: comparators — Excel's lowest precedence; TRUE/FALSE land as 1/0 */
   function cmp_(){ let v=cat_(); skip();
@@ -8143,15 +8178,50 @@ function evalFormula(expr){
     return v; }
   function cat_(){ let v=expr_(); skip(); while(s[i]==='&'){ i++; const r2=expr_(); v=txtOf(v)+txtOf(r2); skip(); } return v; }   /* r296: & — Excel's concat operator, between comparison and +/- in precedence */
   function expr_(){ let v=term(); skip(); while(s[i]==='+'||s[i]==='-'){ const o=s[i++]; const t=term(); v=o==='+'?nm(v)+nm(t):nm(v)-nm(t); skip(); } return v; }
-  function term(){ let v=pow_(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=pow_(); v=o==='*'?nm(v)*nm(f):nm(v)/nm(f); skip(); } return v; }
+  function term(){ let v=pow_(); skip(); while(s[i]==='*'||s[i]==='/'){ const o=s[i++]; const f=pow_();
+    if(o==='*') v=nm(v)*nm(f);
+    else { const d=nm(f); if(d===0) throw fxErr('#DIV/0!'); v=nm(v)/d; }   /* r418 H3-A (AUDIT §A #3): x/0 is the #DIV/0! VALUE — not Infinity-then-stale-0 */
+    skip(); } return v; }
   function pow_(){ let v=fac(); skip(); while(s[i]==='^'){ i++; const e=fac(); v=Math.pow(nm(v),nm(e)); skip(); } return v; }
-  function fac(){ skip();
+  function fac(){ let v=facCore(); skip();
+    while(s[i]==='%'){ i++; v=nm(v)/100; skip(); }   /* r418 H3-A (AUDIT §A #15): Excel's postfix % operator (=50%, =B2*10%) — binds tightest */
+    return v; }
+  function facCore(){ skip();
     if(s[i]==='('){ i++; const v=cmp_(); skip(); if(s[i]!==')') throw new Error('paren'); i++; return v; }   /* r96: parens admit comparisons */
     if(s[i]==='-'){ i++; return -nm(fac()); }
     if(s[i]==='+'){ i++; return fac(); }
     let q=/^"([^"]*)"/.exec(s.slice(i)); if(q){ i+=q[0].length; return q[1]; }   /* r296: string literals live in expressions now (="FY"&B2) */
     let m=/^\d*\.?\d+/.exec(s.slice(i)); if(m){ i+=m[0].length; return parseFloat(m[0]); }
-    let f=/^([A-Za-z]+)\s*\(/.exec(s.slice(i)); if(f){ i+=f[1].length; skip(); i++; const a=argList(); skip(); if(s[i]!==')') throw new Error('fnparen'); i++; return fn(f[1].toUpperCase(),a); }
+    let f=/^([A-Za-z]+)\s*\(/.exec(s.slice(i));
+    if(f){
+      const FN=f[1].toUpperCase();
+      if(FN==='IF'||FN==='IFERROR'){
+        /* r418 H3-A (AUDIT §A #12): LAZY IF / IFERROR — capture the raw argument slices
+           (quote-aware, balanced parens) and evaluate ONLY what's needed: the untaken IF
+           branch never runs, so an error there is harmless (Excel). IFERROR at any nesting
+           depth catches thrown errors, sentinel values, and non-finite numbers alike. */
+        i+=f[0].length; let d2=1; const st4=i, cuts=[];
+        for(; i<s.length; i++){ const ch=s[i];
+          if(ch==='"'){ i++; while(i<s.length && s[i]!=='"') i++; continue; }
+          if(ch==='(') d2++;
+          else if(ch===')'){ d2--; if(d2===0) break; }
+          else if(ch===','&&d2===1) cuts.push(i); }
+        if(d2!==0) throw new Error('fnparen');
+        const parts=[]; let pv=st4; for(const cp of cuts){ parts.push(s.slice(pv,cp)); pv=cp+1; } parts.push(s.slice(pv,i)); i++;
+        const sub=t=>evalFormula('='+t);
+        if(FN==='IF'){
+          if(parts.length<2||parts.length>3) throw new Error('if-args');
+          const c0=sub(parts[0]); if(isErrVal(c0)) throw fxErr(c0);   // an erroring CONDITION still propagates
+          const takeA=(typeof c0==='number') ? c0!==0 : !!c0;
+          return takeA ? sub(parts[1]) : (parts.length>2 ? sub(parts[2]) : 0);
+        }
+        if(parts.length!==2) throw new Error('iferror-args');
+        let v0; try{ v0=sub(parts[0]); }catch(_){ v0=undefined; }
+        if(v0===undefined || isErrVal(v0) || (typeof v0==='number'&&!isFinite(v0))) return sub(parts[1]);
+        return v0;
+      }
+      i+=f[1].length; skip(); i++; const a=argList(); skip(); if(s[i]!==')') throw new Error('fnparen'); i++; return fn(FN,a);
+    }
     let cr=/^\$?[A-Za-z]+\$?\d+/.exec(s.slice(i)); if(cr){ i+=cr[0].length; const rv=cellRaw(cr[0].replace(/\$/g,'').toUpperCase()); return typeof rv==='string'&&rv!==''?rv:(typeof rv==='number'?rv:0); }   /* r296: refs carry raw text through (for & / text fns); operators coerce via nm() exactly as before */
     throw new Error('unexpected'); }
   function argList(){ const a=[]; skip(); if(s[i]===')') return a; a.push(arg()); skip(); while(s[i]===','){ i++; a.push(arg()); skip(); } return a; }
@@ -8162,8 +8232,54 @@ function evalFormula(expr){
     const st=i; const v=cmp_(); const cons=s.slice(st,i).trim();   /* r96: args parse comparisons (IF conditions) */
     if(/^\$?[A-Za-z]+\$?\d+$/.test(cons)) return {val:v, ref:cons.replace(/\$/g,'').toUpperCase()};
     return {val:v}; }
-  const r=cmp_(); skip(); if(i<s.length) throw new Error('trailing'); return r;
+  /* r418 H3-A: the top-level catch turns a tagged error throw back into its sentinel STRING —
+     errors are ordinary values from here out (commit, recalc, display, IFERROR). Untagged
+     throws (true syntax problems) keep unwinding to the r348 commit gate as before. */
+  let r; try{ r=cmp_(); }catch(err){ if(err && err.__errval) return err.__errval; throw err; }
+  skip(); if(i<s.length) throw new Error('trailing'); return r;
 }
+/* ---- r418 H3-A: FORMULA AUTOCORRECT LADDER (AUDIT_R417 §G build-ready spec) ----
+   Pure classifier for a formula buffer at commit time. Returns {kind, buf, fixed}:
+     ok   — evaluates as-is after SILENT case-normalization; commit the normalized form.
+            Error sentinels (#N/A, #DIV/0!, …) are values, so they land here too.
+     name — evaluates but the result is #NAME? (unknown function name): commits the sentinel,
+            exactly like Excel ("=FOO(A1)" is a legal formula that errors, not a typo gate).
+     fix  — a mechanical repair makes it evaluate: PROPOSE it (↵ accept · esc keep editing).
+     bad  — nothing works: refuse (the r348 beat, unchanged).
+   Repair candidates, per spec: ;→, · trailing operator · ",)" · leading "==" · unmatched
+   trailing ")" · doubled binary operators (* / ^ &) — NEVER unary --/++ (those are legal). */
+function fxOutsideStrings(str,f){
+  // apply f only to the segments OUTSIDE "…" string literals (quotes are opaque)
+  return String(str).split(/("[^"]*"?)/).map((seg,k)=>k%2?seg:f(seg)).join('');
+}
+function fxNormalizeFormula(str){
+  // case-normalize cell refs and function names outside string literals (tier S — silent)
+  return fxOutsideStrings(String(str), seg=>seg
+    .replace(/\$?[A-Za-z]+\$?\d+/g, m2=>m2.toUpperCase())
+    .replace(/[A-Za-z][A-Za-z0-9.]*(?=\s*\()/g, m2=>m2.toUpperCase()));
+}
+function autocorrectFormula(buf){
+  const norm=fxNormalizeFormula(String(buf).trim());
+  const evalsTo=f=>{ try{ const v=evalFormula(f); return v===undefined?null:{v:v}; }catch(_){ return null; } };
+  const r0=evalsTo(norm);
+  if(r0) return {kind: r0.v==='#NAME?' ? 'name' : 'ok', buf:norm, fixed:null};
+  const semi   =f=>fxOutsideStrings(f, sg=>sg.replace(/;/g,','));                      // European separators
+  const dblEq  =f=>f.replace(/^=\s*=+/,'=');                                           // leading ==
+  const commaP =f=>fxOutsideStrings(f, sg=>sg.replace(/,\s*\)/g,')'));                 // dangling ",)"
+  const dblOp  =f=>fxOutsideStrings(f, sg=>sg.replace(/([*\/^&])\1+/g,'$1'));          // doubled BINARY ops — never --/++
+  const trailOp=f=>f.replace(/[+\-*\/^&,]+\s*$/,'');                                   // trailing operator
+  const unbal  =f=>{ let out=f;                                                        // unmatched trailing ")"
+    for(;;){ const o=(out.match(/\(/g)||[]).length, c=(out.match(/\)/g)||[]).length;
+      if(c<=o || !/\)\s*$/.test(out)) break; out=out.replace(/\)\s*$/,''); }
+    return out; };
+  const steps=[semi,dblEq,commaP,dblOp,trailOp,unbal];
+  const seen={}; const cands=[];
+  for(const st of steps){ const c=st(norm); if(c!==norm && !seen[c]){ seen[c]=1; cands.push(c); } }
+  { let c=norm; for(const st of steps) c=st(c); if(c!==norm && !seen[c]){ seen[c]=1; cands.push(c); } }   // all repairs stacked (multi-defect buffers)
+  for(const c of cands){ if(evalsTo(c)) return {kind:'fix', buf:norm, fixed:c}; }
+  return {kind:'bad', buf:norm, fixed:null};
+}
+let fxfixPend=null;   // r418 H3-A: the live 'fix' proposal behind dialog==='fxfix' — {fixed, dr, dc, all}
 function autoSum(){
   /* r192 (Wolf): Excel's RANGE form — select a column/row THROUGH its empty
      total cell and Alt+= fills the sum COMMITTED, selection preserved. The
@@ -8504,6 +8620,7 @@ function render(){
     for(let c=1;c<=COLS;c++){
       const cell=get(r,c);
       let cls=[]; if(cell.bold)cls.push('bold'); if(cell.txt&&!isNum(cell))cls.push('txt');
+      if(isErrVal(cell.value))cls.push('err');   /* r418 H3-A: error sentinels tagged for the visual pass (centered errors are another segment's restyle — class only for now) */
       if(cell.it)cls.push('it'); if(cell.strike)cls.push('strike');   // r193
       if(cell.uline)cls.push('uline');   // r229: cell underline (Ctrl+U / Alt H 3)
       if(cell.cmt)cls.push('cmt');       // r293: comment triangle (rapid-fire Shift+F2)
@@ -8746,24 +8863,25 @@ const TABS = [
   {k:'W',name:'View',live:true},   /* r407 (Wolf): View is live now — Alt W G toggles gridlines */
 ];
 const MENUS = {
-  'H':  [['V','Paste'],['1','Bold'],['2','Italic'],['F','Font'],['A','Align'],['5','Indent −'],['6','Indent +'],['H','Fill'],['B','Borders'],['J','Cell styles'],['W','Wrap'],['K','Comma'],['P','Percent'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['E','Clear'],['U','Σ Sum']],
+  'H':  [['V','Paste'],['1','Bold'],['2','Italic'],['3','Underline'],['F','Font'],['A','Align'],['5','Indent −'],['6','Indent +'],['H','Fill'],['B','Borders'],['J','Cell styles'],['W','Wrap'],['K','Comma'],['P','Percent'],['9','Dec −'],['0','Dec +'],['I','Insert'],['D','Delete'],['O','Cells'],['E','Clear'],['U','Σ Sum']],
   'HV': [['V','Paste values'],['S','Paste special…']],   /* r302: HVV is real Excel — RF taught it but classic dead-ended */
   'HE': [['A','Clear all'],['F','Clear formats'],['C','Clear contents']],
   'HI': [['R','Insert rows'],['C','Insert columns']],
   'HD': [['R','Delete rows'],['C','Delete columns']],
-  'HO': [['I','Autofit width'],['A','Autofit height'],['W','Column width\u2026'],['U','Hide & Unhide']],
+  'HO': [['I','Autofit width'],['A','Autofit height'],['W','Column width\u2026'],['U','Hide & Unhide'],['E','Format cells\u2026']],   /* r418 (audit G): Alt H O E \u2014 Excel's ribbon route to Format Cells */
   'HOU':[['R','Hide rows'],['O','Unhide rows']],
   'HB': [['O','Bottom'],['P','Top'],['L','Left'],['R','Right'],['N','No border'],['A','All'],['S','Outside'],['T','Thick box'],['B','Double bottom'],['D','Top & bottom']],   /* r298 (Wolf): CANON — Excel's real access keys. T was top and B bottom here for months; in Excel T is Thick Box, O is Bottom, P is Top. */
   'HU': [['S','Sum']],
   'HA': [['L','Left'],['C','Center'],['R','Right'],['N','$ Accounting']],
   'HF': [['C','Font color'],['G','Grow font'],['K','Shrink font'],['I','Fill']],
   'HFI':[['S','Series…'],['D','Down'],['R','Right']],
-  'M':  [['U','Σ AutoSum']],
+  'M':  [['U','Σ AutoSum'],['P','Trace precedents'],['D','Trace dependents']],   /* r418 (audit G): Alt M P / M D — ribbon aliases of Ctrl+[ / Ctrl+] */
   'MU': [['S','Sum']],
   'A':  [['S','Sort'],['T','Filter'],['H','Hide detail'],['J','Show detail']],
   'AS': [['A','Sort A→Z'],['D','Sort Z→A']],
   'E':  [['S','Paste special…']],
-  'W':  [['G','Gridlines']],   /* r407 (Wolf): View → Gridlines show/hide */
+  'W':  [['V','Show']],        /* r418 (audit G): Excel canon is Alt W V G — the Show group's V, then G */
+  'WV': [['G','Gridlines']],   /* r407/r418: View → Show → Gridlines (Alt W G still works as a silent alias) */
 };
 /* r315 (Wolf): the Alt+H flyout dumped all 20 options in one flat wrapping row — unreadable,
    "nobody could pick out what we're looking at." These groups mirror Excel's REAL Home-tab
@@ -8777,7 +8895,7 @@ const RIBBON_GROUPS = {
   ],
   'H': [
     ['Clipboard', ['V']],
-    ['Font',      ['1','2','F','B','H']],
+    ['Font',      ['1','2','3','F','B','H']],
     ['Alignment', ['A','5','6','W']],
     ['Number',    ['K','P','9','0']],
     ['Styles',    ['J']],
@@ -8794,6 +8912,7 @@ const RIBBON_ICONS = {
   // typographic glyphs (letters/symbols — Excel renders these as glyphs too)
   '1':'<span class="ri-g" style="font-weight:800">B</span>',                                   // Bold
   '2':'<span class="ri-g" style="font-style:italic;font-family:Georgia,\'Times New Roman\',serif">I</span>', // Italic
+  '3':'<span class="ri-g" style="text-decoration:underline">U</span>',                          // Underline (r418: the handler existed since r229 — the keytip was hidden)
   'F':'<span class="ri-g" style="font-family:Georgia,serif;letter-spacing:-1px">A<span style="font-size:.62em;vertical-align:2px">a</span></span>', // Font
   'K':'<span class="ri-g" style="font-size:10.5px;letter-spacing:-.5px">,000</span>',          // Comma style
   'P':'<span class="ri-g">%</span>',                                                            // Percent
@@ -8824,7 +8943,7 @@ const FMT_OPTS = [
   ['E','superscript \u00b9'],['K','strikethrough'],['A','center across'],
 ];
 const PASTE_OP_OPTS = [
-  ['O','None','none'],['M','Multiply','multiply'],['D','Add','add'],['I','Divide','divide'],   // r302 canon audit: O None / M Multiply / D Add / I Divide — N was WRONG (it's Validation in the real dialog)
+  ['O','None','none'],['M','Multiply','multiply'],['D','Add','add'],['S','Subtract','subtract'],['I','Divide','divide'],   // r302 canon audit: O None / M Multiply / D Add / I Divide — N was WRONG (it's Validation in the real dialog). r418: S Subtract — the 5th real op we'd been missing.
 ];
 let pasteOp='none';
 const PASTE_OPTS = [
@@ -8950,8 +9069,11 @@ function __leanRibbonHtml(menuKey, withExtra){
   const icons = menuKey==='H' ? RIBBON_ICONS : (RIBBON_MENU_ICONS[menuKey]||{});
   const tile=(k)=>{ const ico=icons[k];
     const tip=String(lblOf[k]).replace(/<[^>]+>/g,'')+' — alt '+chord+' '+k.toLowerCase();
-    if(ico) return '<span class="ri-cmd" data-k="'+k.toLowerCase()+'" title="'+tip+'"><span class="ri-key">'+k.toLowerCase()+'</span><span class="ri-ico">'+ico+'</span></span>';
-    return '<span class="ri-cmd ri-txt" data-k="'+k.toLowerCase()+'" title="'+tip+'"><span class="ri-key">'+k.toLowerCase()+'</span><span class="ri-lbl">'+lblOf[k]+'</span></span>'; };
+    /* r418 (audit G3): KeyTip BADGES render UPPERCASE — Excel's keytips are capital letters.
+       data-k stays lowercase (it's a lookup key for the dropdown anchors), tooltips keep the
+       lowercase "alt h b" chord prose. */
+    if(ico) return '<span class="ri-cmd" data-k="'+k.toLowerCase()+'" title="'+tip+'"><span class="ri-key">'+k.toUpperCase()+'</span><span class="ri-ico">'+ico+'</span></span>';
+    return '<span class="ri-cmd ri-txt" data-k="'+k.toLowerCase()+'" title="'+tip+'"><span class="ri-key">'+k.toUpperCase()+'</span><span class="ri-lbl">'+lblOf[k]+'</span></span>'; };
   const used=new Set();
   let html='';
   (groups||[]).forEach(([gname,keys])=>{
@@ -8989,6 +9111,17 @@ function __drawRibbon(){
   drawDialog();
   __ribbonDropKill();
   const el=$('ribbon');
+  if(dialog==='fxfix'){
+    /* r418 H3-A: the FORMULA AUTOCORRECT proposal card (sortwarn's sibling). It must sit
+       ABOVE the mode guard — it shows while still in cell-edit (mode==='normal',
+       editing===true), the one dialog that does. ↵ accepts+commits · esc keeps editing. */
+    el.className='ribbon show';
+    const __fesc=s2=>String(s2).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML='<span class="path">formula autocorrect →</span>'+
+      '<span class="opt" style="font-family:var(--mono)">'+__fesc(fxfixPend?fxfixPend.fixed:'')+'</span>'+
+      '<span class="opt">↵ accept · esc keep editing</span>';
+    return;
+  }
   if(mode!=='ribbon'){
     if(ribbonBarOn()){ el.className='ribbon show ribbon-ico ribbon-lean'; el.innerHTML=__leanRibbonHtml()+__ribbonPin(true); }
     else { el.className='ribbon'; el.innerHTML='<span class="rhint"><k>alt</k> ribbon</span>'+__ribbonPin(false); }
@@ -9073,7 +9206,7 @@ function __drawRibbon(){
   let html='';
   if(path.length===0){
     html+='<span class="path">alt →</span>';
-    TABS.forEach(t=>{ html+=`<span class="rtab${t.live?'':' dim'}"><k>${t.k.toLowerCase()}</k>${t.name}</span>`; });
+    TABS.forEach(t=>{ html+=`<span class="rtab${t.live?'':' dim'}"><k>${t.k}</k>${t.name}</span>`; });   /* r418 (audit G3): uppercase KeyTips, Excel-true */
     if(ribbonNote) html+=`<span class="rnote">${ribbonNote}</span>`;
   } else {
     html+=`<span class="path">${tabName(path[0])}${path.length>1?' '+path.slice(1).join(' '):''} →</span>`;
@@ -10171,8 +10304,18 @@ function editRetarget(){
     S.active={r:a.r, c:a.c}; S.selA={r:a.r, c:a.c};
   }catch(e){}
 }
+/* r418 (audit A#5): the clipboard LIFECYCLE kill-switch. Excel drops the marching ants —
+   and the clipboard with them — the moment you start an edit or restructure the sheet
+   (a stale rect mis-translates relative refs on the next paste). Esc-clear and new-copy
+   keep their existing homes; this is the shared clear those new invalidation points use. */
+function clearClipboard(){
+  if(S && S.clipboard) S.clipboard=null;
+  try{ const mq=$('marquee'); if(mq) mq.style.display='none'; }catch(e){}
+  try{ const pd=$('pastedest'); if(pd) pd.style.display='none'; }catch(e){}
+}
 function startEdit(initial, mode){
   if(done) return; startClock();
+  clearClipboard();   /* r418 (audit A#5): ANY entry into edit mode kills the ants — typing, F2, backspace, '='. All entry paths funnel here. */
   editRetarget();
   editing=true; editBuf=initial;
   editMode = mode || 'enter';
@@ -10194,19 +10337,23 @@ function commitEdit(dr,dc){
     const opens=(editBuf.match(/\(/g)||[]).length, closes=(editBuf.match(/\)/g)||[]).length;
     if(opens>closes) editBuf += ')'.repeat(opens-closes);   // Excel parity: auto-close
   }
-  const buf=editBuf.trim();
-  /* r348 (Wolf): a formula the engine can't parse used to commit a silent 0 — no feedback,
-     wrong number. Excel refuses the commit ("There's a problem with this formula") and returns
-     you to the editor; we do the same as ONE reaction beat — stay in edit with the buffer
-     intact, shake the cell, one toast. Semantic errors that still produce a value commit as
-     before (the error-triage drills depend on that). Demos keep the old lenient path so a
-     replay can never wedge in an edit loop. */
+  let buf=editBuf.trim();
+  /* r348 (Wolf) → r418 H3-A (AUDIT §G): the single "refuse anything that throws" gate is now
+     the AUTOCORRECT LADDER. ok → commit (silently case-normalized); name → commit the #NAME?
+     sentinel (Excel does); fix → PROPOSE the repair (↵ accept · esc keep editing, Hook B);
+     bad → the r348 refusal beat unchanged: stay in edit with the buffer intact, shake the
+     cell, one toast. Error VALUES (#N/A, #DIV/0!, …) evaluate fine now, so they commit —
+     the gate no longer conflates runtime errors with syntax errors. Demos keep the lenient
+     path so a replay can never wedge in an edit loop. */
   if(buf!=='' && buf[0]==='=' && !demoPlaying){
-    /* throw = SYNTAX problem (trailing operator, malformed range, junk chars) -> refuse.
-       NaN/Infinity = forward references to empty cells (0/0 while building in any order) ->
-       commit as before; Excel accepts those too. */
-    let __ok=true; try{ if(evalFormula(buf)===undefined) __ok=false; }catch(_){ __ok=false; }
-    if(!__ok){
+    const __ac=autocorrectFormula(buf);
+    if(__ac.kind==='fix'){
+      fxfixPend={fixed:__ac.fixed, dr:dr, dc:dc, all:false};
+      dialog='fxfix'; drawRibbon(); render();
+      return;   // still editing — ↵ accepts the proposal, esc returns to the editor untouched
+    }
+    if(__ac.kind!=='bad'){ buf=__ac.buf; }   // ok/name: store the case-NORMALIZED formula
+    else{
       try{ const td=document.querySelector('td.editing'); if(td){ td.classList.remove('fx-badformula'); void td.offsetWidth; td.classList.add('fx-badformula'); } }catch(e){}
       try{ showToast('There\u2019s a problem with this formula \u2014 fix it or press esc to discard'); }catch(e){}
       try{ playErrThud(); }catch(e){}   /* r349: the refusal is audible too \u2014 shake + toast + thud, one beat */
@@ -10221,7 +10368,11 @@ function commitEdit(dr,dc){
     const cell=ensure(S.active.r,S.active.c);
     if(buf[0]==='='){ cell.formula=buf; let v; try{ v=evalFormula(buf); }catch(_){ v=NaN; }
       cell.value=(typeof v==='number')?(isFinite(v)?v:0):(v!=null?v:0); cell.txt=false; }   /* r296: text results commit as text (mirrors recalc's r257 rule) — the text pack & the & operator need it */
-    else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf); cell.txt=false; }
+    else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null;
+      /* r418 H3-A (AUDIT §A #4): Excel auto-scales BARE numeric entry into an already
+         percent-formatted cell — typing 8 must read 8%, not 800%. Only this branch:
+         "8%"-style entry and formula results are already right. */
+      const __n=parseFloat(buf); cell.value=(cell.fmtStyle==='percent')?__n/100:__n; cell.txt=false; }
     /* r95 audit (Excel parity): bankers type these — they must land as NUMBERS, not text */
     else if(/^-?[\d,]+\.?\d*$/.test(buf) && /,/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf.replace(/,/g,'')); cell.txt=false; cell.fmtStyle=cell.fmtStyle||'comma'; if(cell.decimals===undefined) cell.decimals=0; }
     else if(/^-?\d*\.?\d+%$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf)/100; cell.txt=false; cell.fmtStyle='percent'; if(cell.decimals===undefined) cell.decimals=/\./.test(buf)?1:0; }
@@ -10242,7 +10393,27 @@ function commitEditAll(){
     const opens=(editBuf.match(/\(/g)||[]).length, closes=(editBuf.match(/\)/g)||[]).length;
     if(opens>closes) editBuf += ')'.repeat(opens-closes);
   }
-  const buf=editBuf.trim();
+  let buf=editBuf.trim();
+  /* r418 H3-A Hook C (AUDIT §G): Ctrl+Enter runs the SAME ladder as commitEdit — this path
+     had NO gate, so junk formulas silently committed 0 across the whole selection. A 'fix'
+     proposal applies to the anchor buffer ONCE; accepting re-enters here with the repaired
+     buffer and translates per cell as usual. Demos keep the lenient path. */
+  if(buf!=='' && buf[0]==='=' && !demoPlaying){
+    const __ac=autocorrectFormula(buf);
+    if(__ac.kind==='fix'){
+      fxfixPend={fixed:__ac.fixed, dr:0, dc:0, all:true};
+      dialog='fxfix'; drawRibbon(); render();
+      return;   // still editing — ↵ accepts, esc returns to the editor untouched
+    }
+    if(__ac.kind!=='bad'){ buf=__ac.buf; }   // ok/name: store the case-NORMALIZED formula
+    else{
+      try{ const td=document.querySelector('td.editing'); if(td){ td.classList.remove('fx-badformula'); void td.offsetWidth; td.classList.add('fx-badformula'); } }catch(e){}
+      try{ showToast('There’s a problem with this formula — fix it or press esc to discard'); }catch(e){}
+      try{ playErrThud(); }catch(e){}
+      logKey('⚠');
+      return;   // still editing — buffer and caret untouched (r348 beat, now on Ctrl+Enter too)
+    }
+  }
   const ar=S.active.r, ac=S.active.c;
   editing=false; editBuf='';
   editAnchor=null; editPointer=null; editPointerStart=-1; editPointerBase=null;
@@ -10601,6 +10772,21 @@ function applyRibbon(key){
     if(key==='ENTER'){ doFindReplace(); return; }
     return;
   }
+  /* r418 H3-A: formula autocorrect proposal — ENTER accepts the repair and commits it through
+     the normal ladder (which now passes). Esc never reaches here: the editing-branch keydown
+     guard owns it and returns to the editor with the ORIGINAL buffer (r348 invariant).
+     Dismissal-safe: if another path cleared `dialog`/editing first, this is a no-op. */
+  if(dialog==='fxfix'){
+    if(key==='ENTER'){
+      const p=fxfixPend; fxfixPend=null; dialog=null;
+      if(!p || !editing){ drawRibbon(); render(); return; }
+      editBuf=p.fixed; editCaret=editBuf.length;
+      editPointer=null; editPointerStart=-1; editPointerBase=null;
+      if(p.all) commitEditAll(); else commitEdit(p.dr, p.dc);
+      drawRibbon(); return;
+    }
+    return;
+  }
   // sort warning — E/Enter expands to the contiguous block (Excel's default), C sorts the lone column
   if(dialog==='sortwarn'){
     if(key==='E'||key==='ENTER'){
@@ -10670,15 +10856,21 @@ function applyRibbon(key){
   }
   // inside a tab/menu
   const np=path.join('')+key;
-  if(np==='WG'){ /* r407 (Wolf): Alt W G toggles the sheet gridlines (a visibility preference) */
+  if(np==='WVG'||np==='WG'){ /* r418 (audit G): Excel canon is Alt W V G (View → Show → Gridlines).
+       The old house route Alt W G stays as a SILENT alias (it's Zoom-to-Selection in real Excel,
+       but months of muscle memory don't get punished) — only V G is advertised. */
     const off=!document.body.classList.contains('hide-gridlines');
     document.body.classList.toggle('hide-gridlines', off);
     try{ localStorage.setItem('hk_gridlines', off?'0':'1'); }catch(e){}
-    showToast(off?'gridlines hidden — Alt W G to show':'gridlines shown');
+    showToast(off?'gridlines hidden — Alt W V G to show':'gridlines shown');
     return exitRibbon(true); }
   if(np==='HVV'){ pushUndo(); doPaste('values'); commitAction(); return exitRibbon(true); }   /* r302: real Excel Alt H V V — paste values without the dialog */
   if(np==='HVS'||np==='ES'){ dialog='paste'; pasteKind='all'; pasteOp='none'; drawRibbon(); return; }
-  if(np==='OE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route
+  if(np==='OE'||np==='HOE'){ dialog='fmt'; drawRibbon(); return; }   // r177: legacy Format Cells route · r418 (audit G): Alt H O E, Excel's ribbon route to the same dialog
+  /* r418 (audit G): Alt M P / M D — the Formulas tab's Trace Precedents / Dependents,
+     aliased onto the same jump handlers Ctrl+[ / Ctrl+] use (checkWin: trace hops re-grade). */
+  if(np==='MP'){ exitRibbon(false); jumpPrecedent(); checkWin(); return; }
+  if(np==='MD'){ exitRibbon(false); jumpDependent(); checkWin(); return; }
   if(np==='HFC'){ dialog='fontcolor'; fontColorIdx=0; drawRibbon(); return; }
   if(np==='HFG'){ pushUndo(); eachSel(c=>c.fsz=stepFsz(c.fsz, 1)); return exitRibbon(true); }   // r235: grow font (Alt H F G)
   if(np==='HFK'){ pushUndo(); eachSel(c=>c.fsz=stepFsz(c.fsz,-1)); return exitRibbon(true); }   // r235: shrink font (Alt H F K)
@@ -10717,6 +10909,7 @@ function applyRibbon(key){
   if(np==='HIR'||np==='HDR'||np==='HIC'||np==='HDC'){
     const ins = np[1]==='I', rows = np[2]==='R';
     const r = selRange(); pushUndo();
+    clearClipboard();   /* r418 (audit A#5): a structure op invalidates the copied rect — Excel drops ants + clipboard */
     if(rows){
       const count=r.r2-r.r1+1;
       S.cells=shiftCellsRows(r.r1, ins?count:-count);
@@ -10787,9 +10980,9 @@ function doPaste(kind, op){
       if(typeof s.value!=='number') continue;
       const cell=ensure(rr,cc); const k=s.value;
       if(op==='divide' && !k) continue;   // divide by a blank/zero clip cell: skip, never poison the sheet
-      const sym = op==='multiply' ? '*' : (op==='divide' ? '/' : '+');
+      const sym = op==='multiply' ? '*' : (op==='divide' ? '/' : (op==='subtract' ? '-' : '+'));   /* r418 (audit G): Subtract joins — dest − src, the 5th real op */
       if(cell.formula){ cell.formula='=('+String(cell.formula).replace(/^=/,'')+')'+sym+k; }
-      else if(typeof cell.value==='number'){ cell.value = op==='multiply' ? cell.value*k : (op==='divide' ? cell.value/k : cell.value+k); }
+      else if(typeof cell.value==='number'){ cell.value = op==='multiply' ? cell.value*k : (op==='divide' ? cell.value/k : (op==='subtract' ? cell.value-k : cell.value+k)); }
     }
     S.pasteOpN=(S.pasteOpN||0)+1;
     pendingFlash={r1:sr.r1,c1:sr.c1,r2:sr.r2,c2:sr.c2};
@@ -10813,16 +11006,25 @@ function doPaste(kind, op){
     S.sel={r:r0,c:c0}; S.active={r:r0+cb.h-1,c:c0+cb.w-1}; S.selA=null;   // the landed block is selected; top-left displays active (r308)
     return;
   }
-  const dr=cb.rect?r0-cb.rect.r1:0, dc=cb.rect?c0-cb.rect.c1:0;
-  const xl=f=>(f&&(dr||dc))?translateFormula(f,dr,dc):f;
-  for(let i=0;i<cb.h;i++) for(let j=0;j<cb.w;j++){
-    const cell=ensure(r0+i,c0+j); const s=cb.data[i][j];
+  /* r418 (audit A#2): PASTE TILES. When the selection is an exact multiple of the copied
+     block in BOTH dimensions, the paste repeats the block across the whole selection
+     (Excel: copy one cell, select ten, Ctrl+V fills all ten — the paste-op path above
+     always broadcast like this; plain paste never did). A non-multiple selection keeps
+     the single paste anchored top-left — also Excel. Each tiled block's formulas
+     translate relative to ITS OWN landing spot, so relatives shift per repeat. */
+  const selH=sr.r2-sr.r1+1, selW=sr.c2-sr.c1+1;
+  let tileH=cb.h, tileW=cb.w;
+  if(kind!=='transpose' && selH%cb.h===0 && selW%cb.w===0){ tileH=selH; tileW=selW; }
+  for(let i=0;i<tileH;i++) for(let j=0;j<tileW;j++){
+    const cell=ensure(r0+i,c0+j); const s=cb.data[i%cb.h][j%cb.w];
+    const fdr=cb.rect?(r0+i)-(cb.rect.r1+(i%cb.h)):0, fdc=cb.rect?(c0+j)-(cb.rect.c1+(j%cb.w)):0;
+    const xl=f=>(f&&(fdr||fdc))?translateFormula(f,fdr,fdc):f;
     const fmt=()=>{cell.bold=s.bold;cell.it=s.it;cell.strike=s.strike;cell.fill=s.fill;cell.wrap=s.wrap;cell.fmtStyle=s.fmtStyle;cell.decimals=s.decimals;cell.bt=s.bt;cell.bb=s.bb;cell.bl=s.bl;cell.br=s.br;cell.ball=s.ball;cell.align=s.align;cell.fontColor=s.fontColor;cell.uline=s.uline;cell.indent=s.indent|0;cell.scale=s.scale|0;cell.thick=!!s.thick;cell.fsz=s.fsz||null;cell.bdbl=!!s.bdbl;cell.cmt=!!s.cmt;cell.txt=s.txt;};   /* r308: bdbl + comments travel — paste EVERYTHING means everything. r407 (Wolf audit F3): +txt so a pasted label stays TEXT (left-aligned, spills, excluded from constants-hunt) */
     if(kind==='values'){ cell.formula=null; cell.value=s.value; }
     else if(kind==='formulas'){ cell.formula=xl(s.formula); cell.value=s.value; }
     else if(kind==='valuesnum'){ cell.formula=null; cell.value=s.value; cell.fmtStyle=s.fmtStyle; cell.decimals=s.decimals; cell.scale=s.scale|0; }
     else if(kind==='formats'){ fmt(); }
-    else if(kind==='colwidths'){ colW[c0+j]=cb.cols[j]; }
+    else if(kind==='colwidths'){ colW[c0+j]=cb.cols[j%cb.w]; }
     else if(kind==='transpose'){ /* handled below, skip per-cell loop */ }
     else { cell.formula=xl(s.formula); cell.value=s.value; fmt(); }   // all
   }
@@ -10835,8 +11037,8 @@ function doPaste(kind, op){
     pendingFlash={r1:r0,c1:c0,r2:r0+cb.w-1,c2:c0+cb.h-1};
     return;   // r106: clipboard persists (see below)
   }
-  pendingFlash={r1:r0,c1:c0,r2:r0+cb.h-1,c2:c0+cb.w-1};
-  S.sel={r:r0,c:c0}; S.active={r:r0+cb.h-1,c:c0+cb.w-1}; S.selA=null;   // r174: Excel selects what it pasted; top-left displays active (r308)
+  pendingFlash={r1:r0,c1:c0,r2:r0+tileH-1,c2:c0+tileW-1};
+  S.sel={r:r0,c:c0}; S.active={r:r0+tileH-1,c:c0+tileW-1}; S.selA=null;   // r174: Excel selects what it pasted (the full tiled footprint); top-left displays active (r308)
   S.pasteN=(S.pasteN||0)+1;   // r265: structural drills grade "content was PASTED in", not retyped
   // r106: clipboard PERSISTS across pastes (Excel parity — Ctrl+V keeps it; Esc/new copy clears).
   // Nulling here broke the 'one copy, two pastes' contract copyover + pastes both teach.
@@ -11481,6 +11683,7 @@ document.addEventListener('keydown',hkRawE=>{
         e.preventDefault(); startClock();
         logKey(isInsert ? (e.shiftKey?'Ctrl+Shift+=':'Ctrl++') : 'Ctrl+-');
         pushUndo();
+        clearClipboard();   /* r418 (audit A#5): insert/delete invalidates the copied rect — Excel drops ants + clipboard */
         S.lastRowOp = isInsert ? 'ins' : 'del';   // action-sourced: drills latch on THIS, not on row-count diffs
         if(isFullRow){
           if(isInsert) S.insRowN=(S.insRowN||0)+1; else S.delRowN=(S.delRowN||0)+1;   // r198: structural-drill latches
@@ -11507,6 +11710,16 @@ document.addEventListener('keydown',hkRawE=>{
   // CELL EDITING — captures all typing until commit/cancel
   if(editing){
     e.preventDefault();
+    /* r418 H3-A Hook B: the formula-autocorrect proposal is up — ↵ accepts (applyRibbon owns
+       the accept+commit), esc dismisses back to the editor with the ORIGINAL buffer intact
+       (the r348 invariant). Everything else is swallowed while the card shows. Dismissal-safe
+       by construction: any path that clears `dialog` just drops us back into this live editor,
+       because editing/editBuf were never touched when the proposal opened. */
+    if(dialog==='fxfix'){
+      if(k==='Enter'){ logKey('↵'); applyRibbon('ENTER'); return; }
+      if(k==='Escape'){ dialog=null; fxfixPend=null; drawRibbon(); render(); return; }
+      return;
+    }
     if(k==='F2'){ editMode = editMode==='edit' ? 'enter' : 'edit'; logKey('F2'); render(); return; }   // Excel: F2 toggles Edit/Enter while editing
     if(editMode==='edit'){
       // EDIT MODE: arrows navigate the TEXT (Excel: F2 stops the arrows from pointing).
@@ -11628,7 +11841,18 @@ document.addEventListener('keydown',hkRawE=>{
   // SHIFT+F11 restarts the run (Excel: "insert new sheet" — fresh start). ESC no longer restarts.
   if(k==='F11' && e.shiftKey){ e.preventDefault(); loadChallenge(cur); return; }
   // ESC only backs out of the ribbon now (matches Excel; frees Esc for normal use)
-  if(k==='Escape' && mode==='ribbon'){ e.preventDefault(); exitRibbon(false); return; }   // normal-mode Esc falls through to marquee-cancel / restart below
+  if(k==='Escape' && mode==='ribbon'){ e.preventDefault();
+    /* r418 (audit A#21 / G2): Esc backs out ONE level per press, Excel-true — an open dialog
+       closes first (generically: any dialog, including ones added later, just clears), then
+       one menu key pops per press, then the ribbon exits. A dialog entered straight from a
+       chord (Ctrl+1, Ctrl+H, F5 — no KeyTip path behind it) closes all the way back to the
+       grid in one press, exactly like Excel's modals. Normal-mode Esc still falls through
+       to marquee-cancel / restart below. */
+    if(dialog){ dialog=null; pasteKind=null; ribbonNote='';
+      if(path.length){ drawRibbon(); return; }
+      exitRibbon(false); return; }
+    if(path.length){ path.pop(); ribbonNote=''; drawRibbon(); return; }
+    exitRibbon(false); return; }
 
   // RIBBON MODE — read physical key code so Mac Option / non-US layouts still work
   if(mode==='ribbon'){
@@ -11799,6 +12023,14 @@ document.addEventListener('keydown',hkRawE=>{
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey && S && S.marks && S.marks.length){
     e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+\u21b5':'\u21b5');
     gotoNextMark(e.shiftKey?-1:1); return; }   // r182: while marks are live, Enter rides the marked set
+  /* r418 (audit A, the #5 rider): COPY-THEN-ENTER — with the ants armed and no edit open,
+     plain Enter PASTES at the cursor and consumes the clipboard (ants die) — Excel's
+     single most-used clipboard gesture. Only the bare key fires: shift/ctrl'd Enters and
+     the marks-walk above keep their jobs; cut clipboards complete their move (doPaste). */
+  if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && S && S.clipboard){
+    e.preventDefault(); startClock(); logKey('↵');
+    doPaste('all'); clearClipboard(); commitAction(); return;
+  }
   // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+↵':'↵');
@@ -11900,6 +12132,8 @@ document.addEventListener('keydown',hkRawE=>{
     if(k==='1'){ e.preventDefault(); startClock(); logKey('Ctrl+1');
       mode='ribbon'; path=[]; dialog='fmt'; ribbonNote=''; drawRibbon(); return; }
     if(lk==='h' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+H');   // r236: Find & Replace
+      mode='ribbon'; path=[]; dialog='findrep'; findBuf=''; repBuf=''; frField=0; frCount=null; ribbonNote=''; drawRibbon(); return; }
+    if(lk==='f' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+F');   /* r418 (audit A#10): Ctrl+F used to fall through to the BROWSER find bar mid-drill — jarring. Excel's Ctrl+F and Ctrl+H open the same dialog on different tabs; ours opens the shared Find & Replace card (leave Replace empty to just find). */
       mode='ribbon'; path=[]; dialog='findrep'; findBuf=''; repBuf=''; frField=0; frCount=null; ribbonNote=''; drawRibbon(); return; }
     if(k==='['){ e.preventDefault(); startClock(); logKey('Ctrl+['); jumpPrecedent(); checkWin(); return; }   /* r338: trace hops re-grade so guided targets advance live (latch drills) */
     if(k===']'){ e.preventDefault(); startClock(); logKey('Ctrl+]'); jumpDependent(); checkWin(); return; }
@@ -13073,7 +13307,7 @@ let rfEchoPath=[];
    ~10503) here — VIEW ONLY, no dispatch/mutation; the matchers still own the solve — so the sub-menu
    actually shows and the walk reads as the real ribbon expanding step by step. */
 const RF_ECHO_DIALOG = { 'ES':'paste', 'HVS':'paste', 'HFC':'fontcolor', 'HH':'fillcolor',
-                         'HJ':'cellstyle', 'OE':'fmt', 'HFIS':'series' };
+                         'HJ':'cellstyle', 'OE':'fmt', 'HOE':'fmt', 'HFIS':'series' };   /* r418: HOE mirrors the new Alt H O E route */
 function rfEchoStep(k){
   try{
     if(k==='Alt'){ rfEchoPath=[]; mode='ribbon'; path=rfEchoPath; dialog=null; drawRibbon(); return; }
