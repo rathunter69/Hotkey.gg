@@ -121,6 +121,42 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
           { label: 'enter the Deep figure', ok: has2('C9') },
         ]; },
     };
+    /* r423 round-2 synthetics: __mys (mystery-☆ ring skip — the bonus sits BETWEEN two cores
+       so the ring's skip is observable) and __ring (gesture latch — beat 0 grades off a window
+       flag we flip mid-edit). */
+    CHALLENGES.__mys = {
+      name: 'Mys test', label: 'Mys test', par: 10, parKeys: 6,
+      prompt: 'test', req: 'test', aha: 'test',
+      guide() { return ['a', 'b', 'c']; },
+      targets() { return ['B2', 'C3', 'D4']; },
+      demo() { return [
+        { sel: 'B2', keys: [{ key: '1' }, { key: 'Enter' }] },
+        { sel: 'D4', keys: [{ key: '3' }, { key: 'Enter' }] },
+      ]; },
+      build() { return { ROWS: 14, cells: mkCells(), active: { r: 2, c: 2 }, sel: null }; },
+      checks(S) { const has = ref => { const x = S.cells[ref]; return !!(x && x.value !== null && x.value !== ''); };
+        return [
+          { label: 'enter the first figure', ok: has('B2') },
+          { label: 'enter the secret memo', ok: has('C3'), bonus: true },
+          { label: 'enter the last figure', ok: has('D4') },
+        ]; },
+    };
+    CHALLENGES.__ring = {
+      name: 'Ring test', label: 'Ring test', par: 10, parKeys: 6,
+      prompt: 'test', req: 'test', aha: 'test',
+      guide() { return ['a', 'b']; },
+      targets() { return ['B2', 'C3']; },
+      demo() { return [
+        { sel: 'B2', keys: [{ key: '1' }, { key: 'Enter' }] },
+        { sel: 'C3', keys: [{ key: '2' }, { key: 'Enter' }] },
+      ]; },
+      build() { window.__rflag = false; return { ROWS: 14, cells: mkCells(), active: { r: 2, c: 2 }, sel: null }; },
+      checks(S) { const has = ref => { const x = S.cells[ref]; return !!(x && x.value !== null && x.value !== ''); };
+        return [
+          { label: 'flip the flag figure', ok: !!window.__rflag },
+          { label: 'enter the closing figure', ok: has('C3') },
+        ]; },
+    };
     // celebration overlays install CAPTURE-phase key listeners that eat replay keys (the
     // r393 class) — clear them before every load, exactly like e2e-demo-replay does
     window.__clearCel = () => {
@@ -130,7 +166,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       document.querySelectorAll('.wb-dlg').forEach(n => n.remove());
     };
     // register the synthetic drills in a real group so the sheet-tab strip renders for them
-    ['__depth', '__err', '__touch', '__tiers'].forEach(k => {
+    ['__depth', '__err', '__touch', '__tiers', '__mys', '__ring'].forEach(k => {
       window.HOTKEY_DRILLS.groupOf[k] = 'Foundations';
       const g = window.HOTKEY_DRILLS.groups.find(x => x.name === 'Foundations');
       if (g && g.keys.indexOf(k) < 0) g.keys.push(k);
@@ -191,13 +227,13 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       const items = CHALLENGES.__depth.checks(S);
       return {
         done, running, bonusOk: items[3].ok,
-        missed: !!(m && m.innerHTML.indexOf('☆ bonus missed') >= 0),
+        missed: !!(m && m.innerHTML.indexOf('☆ hidden bonus:') >= 0 && m.innerHTML.indexOf('— missed') >= 0),   /* r423 §2: the card names the hidden bonus */
         splitsLen: (S.splits || []).length, bonusSplit: S.splits && S.splits[3],
         star: !!JSON.parse(localStorage.getItem('hk_bonus_star') || '{}').__depth,
       };
     });
     ok(r.done === true && r.running === false && r.bonusOk === false, 'core beats alone stop the clock — ☆ left undone', r);
-    ok(r.missed, 'card reads "☆ bonus missed" (neutral, never red)', r);
+    ok(r.missed, 'card reveals the mystery ☆: "☆ hidden bonus: <label> — missed" (neutral, never red)', r);
     ok(r.splitsLen === 4 && r.bonusSplit == null, 'split array keeps the ☆ slot (null when missed)', r);
     ok(r.star === false, 'no bonus latch on a missed ☆', r);
     const r2 = await run(() => {
@@ -213,12 +249,12 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       const m = document.getElementById('resultsModal');
       const xp1 = parseInt(localStorage.getItem('hk_xp_est') || '0', 10);
       return { preDone, headStar, bonusRow, done,
-        cleared: !!(m && m.innerHTML.indexOf('☆ bonus cleared') >= 0),
+        cleared: !!(m && m.innerHTML.indexOf('☆ hidden bonus:') >= 0 && m.innerHTML.indexOf('— found') >= 0),   /* r423 §2 */
         xpDelta: xp1 - xp0,
         star: !!JSON.parse(localStorage.getItem('hk_bonus_star') || '{}').__depth };
     });
     ok(r2.preDone === false && r2.headStar && r2.bonusRow, '☆ line renders + header star lights; bonus alone never wins', r2);
-    ok(r2.done === true && r2.cleared && r2.star, 'card reads "☆ bonus cleared", latch stored', r2);
+    ok(r2.done === true && r2.cleared && r2.star, 'card reads "☆ hidden bonus: … — found", latch stored', r2);
     ok(r2.xpDelta >= 15, 'first bonus clear pays the one-time +15 xp', r2);
     await run(() => { window.__clearCel(); hideResults(); loadChallenge('__depth'); });
     // the r2 win queues staggered celebrations (band tier, level-up) whose CAPTURE listeners
@@ -433,6 +469,244 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     });
     ok(r2.done && /Legendary/.test(r2.row || ''), 'results card names the clock the run beat', r2);
     ok(r2.ico, 'PB chip wears the best clock icon', r2);
+  }
+
+  console.log('I. universal Ctrl+S closer (r423 round-2 §1)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 31; loadChallenge('pastes');   // saveClose:true wave-1 drill
+      const C = CHALLENGES.pastes;
+      const items0 = C.checks(S), g = C.guide(), t = C.targets();
+      const out = {
+        triLen: g.length === items0.length && t.length === items0.length,
+        lastLabel: items0[items0.length - 1].label,
+        lastTargetNull: t[t.length - 1] == null,
+        guideHasChord: /ctrl.*s/i.test(String(g[g.length - 1])),
+      };
+      // the browser save dialog is suppressed in EVERY state
+      const fire = () => { const ev = new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true, bubbles: true });
+        document.dispatchEvent(ev); return ev.defaultPrevented; };
+      out.swallowedInDrill = fire();                       // saveClose drill (this also tries an EARLY save)
+      out.earlyBeat = C.checks(S)[items0.length - 1].ok;   // early Ctrl+S must not arm the closer
+      setDemoSel('B4'); demoKey({ key: '9' });             // open a live edit…
+      out.swallowedEditing = fire();                       // …still swallowed
+      demoKey({ key: 'Escape' });
+      return out;
+    });
+    ok(r.triLen && r.lastLabel === 'Save your work' && r.lastTargetNull, 'engine appends the save beat — tri-length holds, targets get a null (no ring)', r);
+    ok(r.guideHasChord, 'guide auto-appends the Ctrl+S hint line', r);
+    ok(r.swallowedInDrill && r.swallowedEditing, 'Ctrl+S is swallowed everywhere — the browser save dialog can never appear', r);
+    ok(r.earlyBeat === false, 'an early Ctrl+S does not arm the closer (save FINISHED work)', r);
+    const r2 = await run(() => {
+      const C = CHALLENGES.pastes;
+      const moves = C.demo();
+      const lastIsSave = JSON.stringify(moves[moves.length - 1].keys) === JSON.stringify([{ key: 's', ctrl: true }]);
+      for (let i = 0; i < moves.length - 1; i++) { const mv = moves[i]; setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+      const coresDone = C.checks(S).every(x => x.ok || x.bonus || x.save);
+      const preDone = done;                                // cores complete — the win must WAIT for the save
+      const mv = moves[moves.length - 1]; setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk);
+      return { lastIsSave, coresDone, preDone, done, splitsLen: (S.splits || []).length, checksLen: C.checks(S).length };
+    });
+    ok(r2.lastIsSave, 'demo() gets the Ctrl+S keystroke appended engine-side (replays stay green)', r2);
+    ok(r2.coresDone && r2.preDone === false, 'all cores complete — the win gates on the save beat', r2);
+    ok(r2.done === true && r2.splitsLen === r2.checksLen, 'Ctrl+S fires the win; the save beat carries a split slot', r2);
+    const r3 = await run(() => {   // non-saveClose drills keep the restart behavior, still swallowed
+      window.__clearCel(); hideResults(); loadChallenge('foot');
+      setDemoSel('C5'); demoKey({ key: '7' }); demoKey({ key: 'Enter' });
+      const hadWork = keyLog.length > 0;
+      const ev = new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true, bubbles: true });
+      document.dispatchEvent(ev);
+      const fresh = keyLog.length === 0 && done === false;   // loadChallenge wipes the key log — the board restarted
+      return { hadWork, prevented: ev.defaultPrevented, fresh };
+    });
+    ok(r3.hadWork && r3.prevented && r3.fresh, 'non-saveClose drill: Ctrl+S still swallowed + restarts (unchanged contract)', r3);
+  }
+
+  console.log('J. mystery-☆ display (r423 round-2 §2)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults(); loadChallenge('__mys');
+      const lab0 = (document.querySelector('#checklist .cl-item.cl-bonus .cl-label') || {}).textContent || '';
+      hints = true; render();
+      const keysUnderBonus = !!document.querySelector('#checklist .cl-item.cl-bonus .cl-keys');
+      const coreKeys = document.querySelectorAll('#checklist .cl-item:not(.cl-bonus) .cl-keys').length;
+      hints = false; render();
+      // guided ring skips the ☆: beat 0 done → ring must sit on beat 2 (D4), never C3
+      setDemoSel('B2'); demoKey({ key: '1' }); demoKey({ key: 'Enter' });
+      const gt = currentTargetRange();
+      // earn it → label + star flip
+      setDemoSel('C3'); demoKey({ key: '2' }); demoKey({ key: 'Enter' });
+      const lab1 = (document.querySelector('#checklist .cl-item.cl-bonus .cl-label') || {}).textContent || '';
+      const star = !!document.querySelector('#checklist .cl-star.on');
+      return { lab0, keysUnderBonus, coreKeys, gt, lab1, star, done };
+    });
+    ok(r.lab0 === '☆ ?', 'unearned bonus renders as a dim "☆ ?" — no label text leaks', r);
+    ok(!r.keysUnderBonus && r.coreKeys > 0, 'hints/guided never print the ☆ guide line (cores keep theirs)', r);
+    ok(r.gt && r.gt.r1 === 4 && r.gt.c1 === 4, 'the target ring skips the ☆ beat — lands on the next core (D4)', r.gt);
+    ok(/secret memo/.test(r.lab1) && r.star, 'earning the ☆ flips the row to the real label + lit star', r);
+    ok(r.done === false, 'the ☆ alone still never wins', r);
+  }
+
+  console.log('K. guided ring stays on an incomplete check (r423 round-2 §3)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults(); loadChallenge('__ring');
+      const rect0 = currentTargetRange();
+      setDemoSel('E9'); demoKey({ key: '5' });     // a live edit opens — mid-gesture
+      window.__rflag = true;                       // beat 0's ok() now reads true…
+      render();
+      const midEdit = currentTargetRange();        // …but the ring must NOT advance mid-gesture
+      demoKey({ key: 'Enter' });                   // commit — the action lands, the beat grades
+      const settled = currentTargetRange();
+      // and a regress at a settled state pulls the ring BACK
+      window.__rflag = false; render();
+      const back = currentTargetRange();
+      window.__rflag = true; render();
+      return { rect0, midEdit, settled, back };
+    });
+    ok(r.rect0 && r.rect0.r1 === 2 && r.rect0.c1 === 2, 'ring opens on beat 0 (B2)', r.rect0);
+    ok(r.midEdit && r.midEdit.r1 === 2 && r.midEdit.c1 === 2, 'ok() flickering true mid-edit cannot advance the ring', r.midEdit);
+    ok(r.settled && r.settled.r1 === 3 && r.settled.c1 === 3, 'the ring advances only when the beat grades at a settled state', r.settled);
+    ok(r.back && r.back.r1 === 2 && r.back.c1 === 2, 'a settled regress pulls the ring back to the dropped beat', r.back);
+    const r2 = await run(() => {   // §3 pastes sighting: multi-cell targets never wear the raw clipboard footprint
+      window.__forceSeed = 17; loadChallenge('pastes');
+      const o = CHALLENGES.pastes._o;
+      setDemoSel(o.side); demoKey({ key: 'c', ctrl: true });   // 4×1 column armed for a TRANSPOSE
+      const g1 = currentTargetRange();                          // target B4:E4 must stay B4:E4
+      const want = resolveRange(o.feesRow);
+      // single-cell anchors still show the landing footprint (the r329 feature)
+      loadChallenge('__depth');
+      S.clipboard = { data: [[{}, {}], [{}, {}]], cols: [72, 72], h: 2, w: 2, rect: { r1: 1, c1: 1, r2: 2, c2: 2 } };
+      const g2 = currentTargetRange();   // target B2 (single cell) → 2×2 footprint
+      S.clipboard = null;
+      return { g1, want, g2 };
+    });
+    ok(r2.g1 && JSON.stringify(r2.g1) === JSON.stringify(r2.want), 'multi-cell target keeps its own shape while a block is on the clipboard (no vertical-strip flip)', r2);
+    ok(r2.g2 && r2.g2.r2 === 3 && r2.g2.c2 === 3, 'single-cell anchor still expands to the landing footprint (r329 kept)', r2.g2);
+  }
+
+  console.log('L. maze wall integrity + bump fairness (r423 round-2 §5/§6)');
+  {
+    const r = await run(() => {
+      window.__forceSeed = 4242; loadChallenge('navigation');
+      const mz = S.maze, T = mz.table;
+      const edge = (r0, c0, nr, nc) => { const a = r0 * 100 + c0, b = nr * 100 + nc; return a < b ? (r0 + ':' + c0 + '|' + nr + ':' + nc) : (nr + ':' + nc + '|' + r0 + ':' + c0); };
+      const passable = (r0, c0, nr, nc) => nr >= 1 && nr <= S.ROWS && nc >= 1 && nc <= 10 && mz.pass.has(edge(r0, c0, nr, nc));
+      // a corridor cell with a WALL to its right, in the table's row band ("next to the table")
+      let cell = null;
+      for (let r0 = T.r0; r0 < T.r0 + T.h && !cell; r0++) for (let c0 = 1; c0 < T.c0; c0++) if (!passable(r0, c0, r0, c0 + 1)) { cell = { r: r0, c: c0 }; break; }
+      const out = { cell };
+      S.active = { r: cell.r, c: cell.c }; S.sel = null; render();
+      demoKey({ key: 'ArrowRight', ctrl: true, shift: true });
+      out.csBlocked = S.active.r === cell.r && S.active.c === cell.c;
+      S.active = { r: cell.r, c: cell.c }; S.sel = null; render();
+      demoKey({ key: 'ArrowRight', shift: true });
+      out.sBlocked = S.active.c === cell.c;
+      S.active = { r: T.r0, c: T.c0 }; S.sel = null; render();
+      demoKey({ key: 'Home', ctrl: true });
+      out.homeInert = S.active.r === T.r0 && S.active.c === T.c0;
+      demoKey({ key: 'End', ctrl: true });
+      out.endInert = S.active.r === T.r0 && S.active.c === T.c0;
+      // the model grab still lands exactly on the block
+      S.active = { r: T.r0, c: T.c0 }; S.sel = null; render();
+      demoKey({ key: 'ArrowRight', ctrl: true, shift: true });
+      demoKey({ key: 'ArrowDown', ctrl: true, shift: true });
+      const s = selRange();
+      out.grabExact = s.r1 === T.r0 && s.c1 === T.c0 && s.r2 === T.r0 + T.h - 1 && s.c2 === T.c0 + T.w - 1;
+      // §6 bump fairness — a ctrl-shot that MOVES then stops at a wall is not a bump;
+      // a press the wall fully swallows is
+      let shot = null;
+      for (let r0 = 1; r0 <= S.ROWS && !shot; r0++) for (let c0 = 1; c0 <= 10; c0++)
+        if (passable(r0, c0, r0, c0 + 1)) { shot = { r: r0, c: c0 }; break; }
+      S.active = { r: shot.r, c: shot.c }; S.sel = null; render();
+      const b0 = S.bumpN | 0;
+      demoKey({ key: 'ArrowRight', ctrl: true });
+      out.moved = S.active.c > shot.c;
+      out.stopNoBump = (S.bumpN | 0) === b0;
+      let stuck = null;
+      for (let r0 = 1; r0 <= S.ROWS && !stuck; r0++) for (let c0 = 1; c0 <= 10; c0++)
+        if (!passable(r0, c0, r0, c0 + 1)) { stuck = { r: r0, c: c0 }; break; }
+      S.active = { r: stuck.r, c: stuck.c }; S.sel = null; render();
+      const b1 = S.bumpN | 0;
+      demoKey({ key: 'ArrowRight', ctrl: true });
+      out.zeroMoveBumps = S.active.c === stuck.c && (S.bumpN | 0) === b1 + 1;
+      return out;
+    });
+    ok(r.csBlocked, 'Ctrl+Shift+arrow can no longer jump through a maze wall beside the table', r);
+    ok(r.sBlocked, 'plain Shift+arrow respects the wall too', r);
+    ok(r.homeInert && r.endInert, 'Ctrl+Home / Ctrl+End wall-teleports are inert on maze boards', r);
+    ok(r.grabExact, 'the model block-grab still lands exactly on the block (data-edge stop)', r);
+    ok(r.moved && r.stopNoBump, 'a ctrl-shot that stops AT a wall is not a bump (§6 fairness)', r);
+    ok(r.zeroMoveBumps, 'a press the wall swallows (zero movement) still counts one bump', r);
+    const r2 = await run(() => {   // full demo replay through the new maze branch (+ the Ctrl+S closer)
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 606; loadChallenge('navigation');
+      const C = CHALLENGES.navigation;
+      for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+      return { done };
+    });
+    ok(r2.done === true, 'navigation demo still wins under wall-tight shift chords + save closer', r2);
+  }
+
+  console.log('M. fill-chord symmetry (r423 round-2 §7)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults(); loadChallenge('__depth');
+      // guide column: A2:A5 carry text; B-column empty. Seed B2, then Fast-Fill probes at B3 / C2.
+      setDemoSel('B2'); demoKey({ key: '7' }); demoKey({ key: 'Enter' });
+      keyProfile = 'native';
+      const out = { logs0: keyLog.length };
+      const fire = (key) => { const ev = new KeyboardEvent('keydown', { key, ctrlKey: true, shiftKey: true, cancelable: true, bubbles: true });
+        document.dispatchEvent(ev); return ev.defaultPrevented; };
+      setDemoSel('B3');
+      out.dPrevented = fire('d');
+      out.b3Untouched = !(S.cells['B3'] && S.cells['B3'].value !== null && S.cells['B3'].value !== '');
+      setDemoSel('C2');
+      out.rPrevented = fire('r');
+      out.c2Untouched = !(S.cells['C2'] && S.cells['C2'].value !== null && S.cells['C2'].value !== '');
+      out.noPhantomLog = !/Ctrl\+(R|D)$/.test(String(keyLog[keyLog.length - 1] || ''));
+      // macabacus: BOTH directions smart-extend along the guide line (Fast Fill runs FROM the seed cell)
+      keyProfile = 'macabacus';
+      setDemoSel('B2'); demoKey({ key: 'd', ctrl: true, shift: true });   // guide col A has data rows 2..5 → extent B2:B5
+      out.smartDown = ['B3', 'B4', 'B5'].every(k => S.cells[k] && S.cells[k].value === 7);
+      setDemoSel('C2'); demoKey({ key: 'r', ctrl: true, shift: true });   // guide row... A2? row 1: A1 only → extent from row above
+      out.logTail = keyLog.slice(-2);
+      keyProfile = 'native';
+      return out;
+    });
+    ok(r.dPrevented && r.b3Untouched, 'native Ctrl+Shift+D: inert AND swallowed (no browser bookmark-all, no phantom fill)', r);
+    ok(r.rPrevented && r.c2Untouched && r.noPhantomLog, 'native Ctrl+Shift+R: inert AND swallowed (no hard-reload, no mislogged Ctrl+R)', r);
+    ok(r.smartDown, 'macabacus Ctrl+Shift+D = Fast Fill Down with smart extent — symmetric with Ctrl+Shift+R', r);
+    ok(String(r.logTail).indexOf('Ctrl+Shift+D') >= 0, 'plugin chords log under their own names', r);
+  }
+
+  console.log('N. Ctrl+Space / Shift+Space cover the rendered grid (r423 round-2 §8)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults(); loadChallenge('colops');   // 9 content rows on the 20-row canvas
+      setDemoSel('B5');
+      demoKey({ key: ' ', ctrl: true });
+      const sr = selRange();
+      let painted = 0;
+      for (let r0 = 1; r0 <= S.ROWS; r0++) {
+        const td = document.querySelector('#grid td[data-r="' + r0 + '"][data-c="2"]');
+        if (td && (td.classList.contains('sel') || td.classList.contains('active'))) painted++;
+      }
+      const fillerSel = document.querySelectorAll('#grid td.fillcell.sel').length;
+      const fillerBottom = document.querySelectorAll('#grid td.fillcell.sel-b').length;
+      const out = { vr: S._VR, rows: S.ROWS, sr, painted, fillerSel, fillerBottom };
+      demoKey({ key: 'ArrowDown' });   // collapse; then the row mirror
+      setDemoSel('C4');
+      demoKey({ key: ' ', shift: true });
+      out.rowSr = selRange();
+      return out;
+    });
+    ok(r.sr.r1 === 1 && r.sr.r2 === r.rows, 'Ctrl+Space selects the full engine column (ops/graders untouched)', r.sr);
+    ok(r.painted === r.rows, 'every content row in the column paints selected', r);
+    ok(r.vr <= r.rows || (r.fillerSel === (r.vr - r.rows) && r.fillerBottom === 1),
+      'the selection reads on down the filler rows to the canvas bottom — the column never looks half-selected', r);
+    ok(r.rowSr.c1 === 1 && r.rowSr.c2 === 10, 'Shift+Space covers every rendered column (mirror parity)', r.rowSr);
   }
 
   console.log('Z. page errors');

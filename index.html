@@ -387,7 +387,9 @@
   /* r312 (Wolf): the exact Excel model — GREY fill for the selection range, DARK-GREEN box for
      the active cell (lighter green on dark sheets so it stays the brightest mark). The active
      cell has no grey fill (it reads as the anchor); the range border is green like Excel. */
-  :root{ --cell-cursor:#1a7a45; --active-fill:rgba(26,122,69,.13); --sel-grey:rgba(64,68,78,.15); }
+  /* r423 (Wolf round-2 §4): --sel-grey raised .15 → .22 — at .15 the tint over a seeded grey
+     fill (#d4d4d4 total rows) was a ~1.02:1 non-event; .22 reads on white AND on every fill. */
+  :root{ --cell-cursor:#1a7a45; --active-fill:rgba(26,122,69,.13); --sel-grey:rgba(58,62,72,.22); }
   /* r390 (Wolf): the dark-mode sheet is a LIGHT off-white (see .gridwrap re-scope), so the
      old light-mint cursor washed out on it. Keep the darker Excel-green outline in dark
      mode too — it reads crisply on the light sheet. (Override removed on purpose.) */
@@ -399,8 +401,15 @@
   /* Formula pointer — appears on the cell whose reference is currently being inserted into the formula bar.
      Dashed border reads distinct from the solid active-cell outline, and the warn color marks "this is where the formula is grabbing from". */
   td.point{outline:2px dashed var(--warn); outline-offset:-2px; background:rgba(224,175,104,.12); z-index:3}
-  td.sel{background:var(--sel-grey)}                                  /* r312: grey selection fill */
-  td.active.sel{background:transparent}                               /* r345: the anchor is the white window inside the grey selection */
+  /* r423 (Wolf round-2 §4): SELECTION-TINT COLLISION — the grey selection used to be a plain
+     background rule, so any seeded fill (td.fill-gray on total rows, all !important) beat it
+     and dragging across a filled row showed NO selection at all. The tint is now an OVERLAY
+     (::before veil) that paints ON TOP of any cell background — filled or not, light sheet or
+     dark chrome — one general fix, no per-drill recoloring. ::after stays owned by the
+     fill-handle (td.fh) and touch-pips (td.touchcell). */
+  td.sel::before{content:''; position:absolute; inset:0; background:var(--sel-grey); pointer-events:none}
+  td.active.sel::before{display:none}                                 /* r345: the anchor is the white window inside the grey selection */
+  td.sel.spill::before{display:none}                                  /* spill cells keep their single-cell .sphi highlight (r312) */
   td.sel-t{border-top:1.5px solid var(--cell-cursor)}                 /* green range border, Excel-like (r313: thinner) */
   td.sel-b{border-bottom:1.5px solid var(--cell-cursor)}
   td.sel-l{border-left:1.5px solid var(--cell-cursor)}
@@ -3246,7 +3255,7 @@ const CHALLENGES = {
        SUBTOTAL row as the formats target (the spec's literal check-4 line), the deck-row
        values hand-off as the finish beat, ☆ bonus (blue the landed fees), and two site
        axes — the side feed parks in G or H, the deck row draws from an 11/12 pool. */
-    name:'Paste Sp.', label:'Paste Special everything', par:49, parKeys:49,
+    name:'Paste Sp.', label:'Paste Special everything', par:49, parKeys:49, saveClose:true,   /* r423 §1: Ctrl+S closer (engine-appended final beat) */
     aha:'Paste Special covers more than values: Transpose turns a column into a row, Divide and Multiply rescale a block in place, Formats copies a look, Values freezes formulas into numbers.',
     prompt:'Paste Special fixes data that arrived in the wrong shape. Transpose the fee feed from a column into the Fees row. Divide the Trading line by 1000 to turn raw dollars into $000s. Multiply the Costs line by −1 to flip its sign. Copy the Total row’s formats onto the naked Subtotal row, then clear the top border that came along — a subtotal is not a total. Finish by pasting the totals into the deck row as values, so the hand-off no longer moves with the model.',
     req(){ const o=this._o; return 'copy <em>'+o.side+'</em> → <em>alt e s e</em> (transpose) at <em>B4</em> · <em>alt h f c</em> blue on the landed fees · <em>1000</em> at '+o.helperDiv+', copy → <em>'+o.divBlk+'</em> <em>alt e s i</em> (divide) · <em>-1</em> at '+o.helperNeg+', copy → <em>'+o.costRow+'</em> <em>alt e s m</em> (multiply) · copy <em>'+o.dressed+'</em> → <em>'+o.sub+'</em> <em>alt e s t</em> then <em>alt h b n</em> · copy <em>'+o.dressed+'</em> → <em>'+o.deck+'</em> <em>alt e s v</em>'; },
@@ -3612,7 +3621,7 @@ const CHALLENGES = {
     }
   },
   rowops:{
-    name:'Rows', label:'Rebuild the schedule', par:34, parKeys:31,   /* r422 depth pass: border close + ☆ undo beat — measured 31 keys ×9 seeds, par retuned at the house ~1.1 s/key */
+    name:'Rows', label:'Rebuild the schedule', par:34, parKeys:31, saveClose:true,   /* r423 §1: Ctrl+S closer · r422 depth pass: border close + ☆ undo beat — measured 31 keys ×9 seeds, par retuned at the house ~1.1 s/key */
     aha:'Ctrl++ inserts a row, Ctrl+− deletes one — the Total re-sums automatically as rows come and go.',
     prompt:'Fix the structure of the opex schedule: one line is missing (staged off to the side) and a stale placeholder is inflating the total. The Total is a live SUM — it re-totals on its own as you add and remove rows. Insert a row where the missing line belongs, copy the staged pair in, delete the junk row, format the pasted value to match the block, and close the schedule with a bottom border under the Total. Never retype the Total — it updates itself.',
     req(){ const o=this._o; return 'insert a row below <em>'+o.predecessor+'</em> · copy the staged <em>'+o.stagedRng+'</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row — the Total re-sums to <em>'+o.total.toLocaleString('en-US')+'</em> on its own · comma + blue the pasted value (<em>alt h k</em>, <em>alt h f c</em>) · bottom border under the Total (<em>alt h b o</em>) · ☆ <em>ctrl+z</em> the delete, then delete it again'; },
@@ -3781,7 +3790,7 @@ const CHALLENGES = {
     }
   },
   filldr:{
-    name:'Fill', label:'Fill down, fill right', par:42, parKeys:42,
+    name:'Fill', label:'Fill down, fill right', par:42, parKeys:42, saveClose:true,   /* r423 §1: Ctrl+S closer (engine-appended final beat) */
     aha:'Ctrl+D fills down, Ctrl+R fills right — one seed cell builds the whole table.',
     prompt:'Fill an empty quarterly P&L from a single feed row. Reference the feed once and fill it across the quarters; total the year down the FY column; total each quarter across the EBITDA row; then one mixed-anchor formula fills the whole %-of-revenue block — right, then down. Filling beats retyping. For the ☆, set the EBITDA row apart: bold, with a top border.',
     req(){ const o=this._o; return '<em>'+o.pull0+'</em> <em>='+o.feed0+'</em> · fill '+o.pullRng+' → · <em>'+o.fy0+'</em> <em>=SUM('+o.fyArg+')</em> · fill '+o.fyRng+' ↓ · <em>'+o.sum0+'</em> <em>=SUM('+o.sumArg+')</em> · fill '+o.sumRng+' → · <em>'+o.mix0+'</em> <em>='+o.mixF+'</em> · select '+o.blkRow+' <em>ctrl+r</em> · select '+o.blk+' <em>ctrl+d</em> · ☆ '+o.sumRng+' <em>ctrl+b</em> + <em>alt h b p</em>'; },
@@ -3882,7 +3891,7 @@ const CHALLENGES = {
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Assemble and format the summary', par:41, parKeys:47,   /* r422: par retuned — the ☆ demotion took the label dress out of the core win (42-key core × 0.98 s/key); parKeys stays the demo's measured length, ☆ included */
+    name:'Block Sel.', label:'Assemble and format the summary', par:41, parKeys:47, saveClose:true,   /* r423 §1: Ctrl+S closer (engine-appended final beat) */   /* r422: par retuned — the ☆ demotion took the label dress out of the core win (42-key core × 0.98 s/key); parKeys stays the demo's measured length, ☆ included */
     aha:'Ctrl+C copies data that stays put; Ctrl+X moves data that shouldn’t be duplicated — assemble first, then format.',
     prompt:'Assemble the segment summary from scattered pieces. Copy the base [Segment · Revenue] block — it stays where it is; cut the two misfiled metric columns (EBITDA, Op inc) into their slots. Then finish the page: build the margin column (EBITDA ÷ Revenue, percent), bold the headers, format the top line in $ and the rest in commas, right-align the figures, and outline the whole table. The ☆ bonus: center and underline the segment names.',
     req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b s</em> (outline) · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · ☆ labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
@@ -7715,7 +7724,7 @@ const CHALLENGES = {
     }
   },
   navigation:{
-    name:'Navigate', label:'Navigation maze', par:35, parKeys:45,
+    name:'Navigate', label:'Navigation maze', par:35, parKeys:45, saveClose:true,   /* r423 §1: Ctrl+S closer (engine-appended final beat) */
     aha:'The keyboard is your only way through — Ctrl+arrow shoots down a corridor until it hits a wall, then you turn. Thread the maze, grab the model, and weave it back to the drop zone.',
     prompt:'Bold walls pen you into a maze. Step one cell at a time, or shoot down a corridor until it hits a wall. Collect every pip on the way to the model room, select the whole model, copy it, then weave back through the maze to the drop zone and paste it.',
     req:'thread the maze with <em>ctrl+↑/↓/←/→</em> and single <em>↑/↓/←/→</em> (walls stop you) → collect the pips → grab the model <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → weave to the drop zone → <em>ctrl+v</em>',
@@ -8627,11 +8636,25 @@ function currentTargetRange(){
   const C=CHALLENGES[cur]; if(!C||!C.targets) return null;
   const T2=(typeof C.targets==='function') ? C.targets.call(C) : C.targets;
   const items=C.checks(S);
-  for(let i=0;i<items.length;i++){ if(!items[i].ok){ let t=T2[i]; if(typeof t==='function') t=t.call(C); let r=resolveRange(t);
+  /* r423 (Wolf round-2 §3): GESTURE LATCH — the ring must stay on check i until check i GRADES.
+     render() runs on every keystroke, including mid-gesture states (an open cell edit, an open
+     ribbon dialog), where an ok() can read true off uncommitted state and flip the ring to the
+     next area before the current task lands. Beat states latch only at SETTLED renders (no live
+     edit, no open ribbon walk); mid-gesture renders reuse the latched vector, so the ring can
+     neither advance nor retreat until the action commits and regrades. */
+  const __settled = !editing && mode!=='ribbon';
+  if(__settled || !S._ringOk || S._ringOk.length!==items.length) S._ringOk=items.map(x=>!!x.ok);
+  for(let i=0;i<items.length;i++){
+    if(items[i].bonus) continue;   /* r423 (Wolf round-2 §2): the mystery ☆ is never targeted — no ring, no rails */
+    if(!S._ringOk[i]){ let t=T2[i]; if(typeof t==='function') t=t.call(C); let r=resolveRange(t);
     // r329 (Wolf): while a block is on the clipboard, the target zone shows the FULL LANDING
     // FOOTPRINT anchored at the destination's top-left — so a new user sees the exact shape the
     // block drops into (a 3×3 border on the paste cell), not just the anchor cell.
-    if(r && S.clipboard && (S.clipboard.w>1 || S.clipboard.h>1)){
+    // r423 (Wolf round-2 §3, pastes report): SINGLE-CELL anchors only. A multi-cell target names
+    // the landing range itself; stamping the raw clipboard shape over it (a 4×1 column copied for
+    // a TRANSPOSE paste) painted a vertical strip down the NEXT beats' rows — the "ring flipped
+    // to the next area" sighting.
+    if(r && r.r1===r.r2 && r.c1===r.c2 && S.clipboard && (S.clipboard.w>1 || S.clipboard.h>1)){
       r={r1:r.r1, c1:r.c1, r2:Math.min(S.ROWS, r.r1+S.clipboard.h-1), c2:Math.min(COLS, r.c1+S.clipboard.w-1)};
     }
     return r; } }
@@ -8702,6 +8725,7 @@ function render(){
       try{ const w=$('gridwrap'); if(w && w.clientHeight>100) render(); }catch(e){} }));
   }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
+  S._VR = __VR;   /* r423 (Wolf round-2 §8): the RENDERED canvas rows — Ctrl+Space parity reads this */
   S._colW = colW;                                          // ENGINE widths — graders (autofit) read these; r55 wrongly pointed this at __ew
   try{ hkTouchTick(); }catch(e){}   /* r421 §2.6: render runs after every action — latch a checkpoint the moment the cursor lands on it */
   const g=$('grid'); g.innerHTML='';
@@ -8738,10 +8762,24 @@ function render(){
   /* r308 (Wolf): the DISPLAYED active cell is the selection ANCHOR (Excel-true) — extending
      a selection used to march the ring to the far end; native Excel keeps it at the start */
   const __dA = S.sel ? (S.selA && S.selA.r>=1 ? S.selA : {r:S.sel.r, c:S.sel.c}) : S.active;
+  /* r423 (Wolf round-2 §8): FULL-COLUMN selection reads to the BOTTOM OF THE CANVAS. Ctrl+Space
+     selects rows 1..S.ROWS (the engine frame — ops and graders are untouched), but the rendered
+     sheet is __VR rows (the 20-row standard), so the column looked only partially selected. The
+     filler rows now carry the selection tint + side/bottom edges whenever the selection spans the
+     full engine height, and the green bottom edge rides the LAST RENDERED row, not the frame seam. */
+  const __fullColSel = !!(S.sel && sr.r1<=1 && sr.r2>=S.ROWS && __VR>S.ROWS);
   for(let r=1;r<=__VR;r++){
     if(r>S.ROWS){   // r399: empty Excel-style filler rows below the drill's content (visual only — cursor clamps at S.ROWS)
       let fr='<tr><th class="rowhdr">'+r+'</th>';
-      for(let c=1;c<=COLS;c++) fr+='<td class="fillcell"></td>';
+      for(let c=1;c<=COLS;c++){
+        let fcls='fillcell';
+        if(__fullColSel && c>=sr.c1 && c<=sr.c2){
+          fcls+=' sel';
+          if(c===sr.c1) fcls+=' sel-l'; if(c===sr.c2) fcls+=' sel-r';
+          if(r===__VR) fcls+=' sel-b';
+        }
+        fr+='<td class="'+fcls+'"></td>';
+      }
       g.innerHTML+=fr+'</tr>'; continue;
     }
     if(rowHidden(r)) continue;   // r179: collapsed group detail
@@ -8787,7 +8825,7 @@ function render(){
         if(!mazePassable(r,c,r,c+1)) cls.push('mzr');
       }
       if(editing && editPointer && r===editPointer.r && c===editPointer.c) cls.push('point');
-      if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }
+      if(S.sel&&inSel){ if(r===sr.r1)cls.push('sel-t'); if(r===sr.r2&&!__fullColSel)cls.push('sel-b'); if(c===sr.c1)cls.push('sel-l'); if(c===sr.c2)cls.push('sel-r'); }   /* r423 §8: on a full-column selection the bottom edge moves to the canvas's last row */
       // r312 (Wolf): Excel's fill-handle — the tiny green square at the selection's bottom-right
       // (or on the lone active cell when nothing's ranged) that marks the current cell.
       if(S.sel){ if(r===sr.r2&&c===sr.c2) cls.push('fh'); } else if(isActive){ cls.push('fh'); }
@@ -9870,7 +9908,9 @@ function checkWin(){
     hkSplitTick(__winItems);
     const bi=__winItems.findIndex(x=>x.bonus);
     if(bi>=0){
-      __bonus={ok:!!__winItems[bi].ok};
+      /* r423 (Wolf round-2 §2): the card names the hidden bonus whether found or missed —
+         the reveal is the results card's job, never the in-run checklist's */
+      __bonus={ok:!!__winItems[bi].ok, label:String(__winItems[bi].label||'').replace(/<[^>]*>/g,'')};
       if(__bonus.ok && !mouseUsed && !guidedUsed && !hkBonusStar(cur)){
         try{
           const bs=JSON.parse(localStorage.getItem('hk_bonus_star')||'{}');
@@ -10279,7 +10319,8 @@ function _showResults(o){
      Keys/band/stalls/boards fold behind a d-toggle so the loop stays fast. */
   /* r421 §2.1/§2.2: the clock this run beats (+ the next one), and the ☆ verdict — never red */
   const clockRow=(!o.mouse && !o.guided) ? hkClockRow(cur, (o.tSec!=null?o.tSec:parseFloat(o.t))) : '';
-  const bonusRow=o.bonus ? `<div class="rm-bonus${o.bonus.ok?' ok':''}">${o.bonus.ok?('☆ bonus cleared'+(o.bonus.xp?' · +'+o.bonus.xp+' xp':'')):'☆ bonus missed'}</div>` : '';
+  /* r423 (Wolf round-2 §2): the mystery ☆ reveals its label HERE, found or missed */
+  const bonusRow=o.bonus ? `<div class="rm-bonus${o.bonus.ok?' ok':''}">☆ hidden bonus: ${escHtml(o.bonus.label||'')} — ${o.bonus.ok?('found'+(o.bonus.xp?' · +'+o.bonus.xp+' xp':'')):'missed'}</div>` : '';
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
@@ -10792,6 +10833,9 @@ function fillFrom(dir){ // 'down' | 'up' | 'right' | 'left'
    KEYBOARD PROFILES — native Excel / Macabacus / FactSet.
    Verified against the CFI×Macabacus cheat sheet (r197 T-G egress pass):
      Macabacus:  Ctrl+Shift+R Fast Fill Right (smart extent) · Ctrl+Shift+L Fast Fill Left
+                 Ctrl+Shift+D Fast Fill Down (smart extent — r423: symmetric with R/L)
+                 (plugin-layer only: on the native profile these chords are INERT, never
+                 a fallthrough to bare Ctrl+R/Ctrl+D — native Excel has no Ctrl+Shift fills)
                  Ctrl+Alt+A AutoColor selection · Ctrl+Alt+S AutoColor sheet
                  number cycles = Ctrl+Shift+1/4/5 (SAME keys as native format chords
                  — handled below un-gated, not a separate Macabacus binding)
@@ -10813,6 +10857,10 @@ function cycleProfile(){
 // Macabacus Fast Fill: from a single cell, extend to the data extent of the guide row
 // (the row above if it has data, else the row below), then fill. Multi-cell selection
 // behaves like a plain directional fill.
+// r423 (Wolf round-2 §7): VERTICAL Fast Fill — Ctrl+Shift+D used to route to a plain
+// fillFrom('down') while Ctrl+Shift+R got the smart extent, an in-layer asymmetry. Down/up
+// now mirror right/left exactly: the guide COLUMN beside the cell (left if it has data,
+// else right) sets the extent, then the fill runs. One canon for all four Fast Fills.
 function smartFill(dir){
   const r=selRange();
   const single = r.r1===r.r2 && r.c1===r.c2;
@@ -10820,12 +10868,21 @@ function smartFill(dir){
     const row=S.active.r, col=S.active.c;
     const has=(rr,cc)=>{ if(rr<1||rr>S.ROWS||cc<1||cc>COLS) return false;
       const c=S.cells[ck(rr,cc)]; return !!(c&&((c.value!==null&&c.value!=='')||c.formula)); };
-    const guide = has(row-1,col) ? row-1 : (has(row+1,col) ? row+1 : 0);
-    if(!guide) return;
-    if(dir==='right'){ let c2=col; while(c2+1<=COLS && has(guide,c2+1)) c2++;
-      if(c2===col) return; S.sel={r:row,c:col}; S.active={r:row,c:c2}; }
-    else { let c1=col; while(c1-1>=1 && has(guide,c1-1)) c1--;
-      if(c1===col) return; S.sel={r:row,c:col}; S.active={r:row,c:c1}; }
+    if(dir==='right'||dir==='left'){
+      const guide = has(row-1,col) ? row-1 : (has(row+1,col) ? row+1 : 0);
+      if(!guide) return;
+      if(dir==='right'){ let c2=col; while(c2+1<=COLS && has(guide,c2+1)) c2++;
+        if(c2===col) return; S.sel={r:row,c:col}; S.active={r:row,c:c2}; }
+      else { let c1=col; while(c1-1>=1 && has(guide,c1-1)) c1--;
+        if(c1===col) return; S.sel={r:row,c:col}; S.active={r:row,c:c1}; }
+    } else {
+      const gcol = has(row,col-1) ? col-1 : (has(row,col+1) ? col+1 : 0);
+      if(!gcol) return;
+      if(dir==='down'){ let r2=row; while(r2+1<=S.ROWS && has(r2+1,gcol)) r2++;
+        if(r2===row) return; S.sel={r:row,c:col}; S.active={r:r2,c:col}; }
+      else { let r1=row; while(r1-1>=1 && has(r1-1,gcol)) r1--;
+        if(r1===row) return; S.sel={r:row,c:col}; S.active={r:r1,c:col}; }
+    }
   }
   fillFrom(dir);
   render();
@@ -11139,9 +11196,12 @@ function updateChecklist(){
     // hints on top (F1 hints = keys without the lock; guided = keys + the cursor fence).
     const isBonus=!!i.bonus;
     const isTarget=!microRun || microRun.targets.indexOf(idx)>=0;   // §2.7: the rep grades only its targets
-    const isNext = !i.ok && !nextDone && isTarget && (!isBonus || coreDone); if(isNext) nextDone=true;
+    /* r423 (Wolf round-2 §2): the ☆ is a MYSTERY slot — never the highlighted next beat,
+       never guide-lit. (A mistakes-replay that targets the missed ☆ is the one exception:
+       the results card already named it, so the rep shows it openly.) */
+    const isNext = !i.ok && !nextDone && isTarget && !isBonus; if(isNext) nextDone=true;
     const __g = (typeof C.guide==='function') ? (C.__gCache || (C.__gCache=C.guide.call(C))) : C.guide;
-    const keys = ((hints||guided) && __g && __g[idx]) ? `<div class="cl-keys">${__g[idx]}${guideAltNote(__g[idx])}</div>` : '';
+    const keys = ((hints||guided) && __g && __g[idx] && !isBonus) ? `<div class="cl-keys">${__g[idx]}${guideAltNote(__g[idx])}</div>` : '';
     /* r421 §2.1: a completed row shows its split beside the ✓ — dim ink, PB-delta tinted
        (ahead = accent, behind = neutral; never red mid-run) */
     let split='';
@@ -11149,7 +11209,11 @@ function updateChecklist(){
       const ah=hkPbAhead(idx);
       split=`<span class="cl-split${ah===true?' ahead':''}">${hkSplitFmt(S.splits[idx])}</span>`;
     }
-    const lab=isBonus?('☆ '+i.label):i.label;   /* §2.2: the bonus renders as a ☆ line, dimmer ink */
+    /* §2.2: the bonus renders as a ☆ line, dimmer ink.
+       r423 (Wolf round-2 §2): MYSTERY until earned — an unearned ☆ shows "☆ ?" with NO label
+       text (truly hidden); earning it latches the real label + lit star. Inside a mistakes
+       replay that targets it, the label shows (the results card already revealed it). */
+    const lab=isBonus?((i.ok || (microRun && isTarget))?('☆ '+i.label):'☆ ?'):i.label;
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${isBonus?' cl-bonus':''}${!isTarget?' cl-pre':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${lab}</span>${split}${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
@@ -11644,14 +11708,31 @@ function visStep(r,dr){ let nr=r+dr; while(nr>=1&&nr<=S.ROWS&&rowHidden(nr)) nr+
   return (nr<1||nr>S.ROWS)? r : nr; }
 function move(dr,dc,shift,ctrl){
   // r402 (Wolf): MAZE navigation — walls block, pips collect. Ctrl+arrow shoots along the corridor
-  // to the next wall; a plain arrow steps one cell (or no-op into a wall). Shift (the block-grab at
-  // the model) falls through to the normal engine so Ctrl+Shift+arrow selects the data block.
-  if(S.maze && !shift){
+  // to the next wall; a plain arrow steps one cell (or no-op into a wall).
+  // r423 (Wolf round-2 §5): WALL INTEGRITY — shift chords used to fall through to the normal
+  // engine, whose ctrlJump/step ignores walls entirely: Ctrl+Shift+→ beside the model jumped
+  // THROUGH the border wall onto the table (and a plain Shift+step crossed any wall), teleporting
+  // the cursor past walls plain arrows respect. Shift-selection now extends INSIDE the maze,
+  // wall-respecting like every other move. The model block-grab keeps its Excel data semantics:
+  // a ctrl+shift shot riding data stops at the BLOCK EDGE (so a carved doorway on the room border
+  // can never overshoot the grab), and a shot along empties lands ON the first data cell it can
+  // legally reach through open passages.
+  if(S.maze){
     let cr=S.active.r, cc=S.active.c;
-    if(ctrl){ while(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); } }
+    if(ctrl && shift){
+      if(mazePassable(cr,cc,cr+dr,cc+dc) && nonEmpty(cr,cc) && nonEmpty(cr+dr,cc+dc)){
+        while(mazePassable(cr,cc,cr+dr,cc+dc) && nonEmpty(cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); }   // riding data: stop at the block edge (the grab)
+      } else {
+        while(mazePassable(cr,cc,cr+dr,cc+dc) && !nonEmpty(cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); }  // riding empties: shoot the corridor
+        if(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); }                               // …landing ON a block edge only through an OPEN passage
+      }
+    }
+    else if(ctrl){ while(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); } }
     else { if(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); } }
-    if(cr===S.active.r && cc===S.active.c && !done) S.bumpN=(S.bumpN||0)+1;   // r422 (§4.1 ☆): a keydown the wall swallowed — the zero-bump bonus reads this latch
-    S.active={r:cr,c:cc}; S.sel=null;
+    if(cr===S.active.r && cc===S.active.c && !done) S.bumpN=(S.bumpN||0)+1;   // r422 (§4.1 ☆): a keydown the wall swallowed — the zero-bump bonus reads this latch (movement that merely STOPS at a wall is never a bump)
+    if(shift){ if(!S.sel){ S.sel={r:S.active.r,c:S.active.c}; S.selA=null; } }   // r423: anchor the wall-respecting selection exactly like the normal engine (r308)
+    else S.sel=null;
+    S.active={r:cr,c:cc};
     render(); checkWin(); return;
   }
   // Excel parity: when a multi-cell selection is active and you press a plain arrow key
@@ -12527,10 +12608,19 @@ document.addEventListener('keydown',hkRawE=>{
   if(e.ctrlKey||e.metaKey){
     const lk=k.toLowerCase();
     if(lk==='s' && !e.altKey && !e.shiftKey){ e.preventDefault();
-      // Ctrl+S: inside a save-training drill it SAVES (action-latched); everywhere else it restarts.
-      if(CHALLENGES[cur] && CHALLENGES[cur].usesSave && !done){
-        startClock(); logKey('Ctrl+S'); S.saveN=(S.saveN||0)+1; commitAction();
-        showToast('saved ('+S.saveN+')'); return; }
+      // Ctrl+S is ALWAYS swallowed (preventDefault above \u2014 the browser save dialog must never
+      // appear mid-drill). r423 (Wolf round-2 \u00a71): inside a saveClose/usesSave drill it SAVES \u2014
+      // S.savedN latches and the engine-appended "Save your work" closer grades off it (the beat
+      // only becomes satisfiable once every other core check passes: save FINISHED work, the
+      // Excel habit). Everywhere else it restarts, as before.
+      if(CHALLENGES[cur] && (CHALLENGES[cur].saveClose || CHALLENGES[cur].usesSave) && !done){
+        startClock(); logKey('Ctrl+S');
+        /* only FINISHED work takes a save — an early Ctrl+S must not pre-arm the closer
+           (else finishing the cores would auto-win without the final beat) */
+        let __fin=true; try{ const __it=CHALLENGES[cur].checks(S); __fin=__it.every(x=>x.ok||x.bonus||x.save); }catch(err){}
+        if(__fin){ S.savedN=(S.savedN||0)+1; S.saveN=S.savedN; commitAction(); if(!done) showToast('saved'); }
+        else showToast('nothing saved — finish the work first, then Ctrl+S');
+        return; }
       logKey('Ctrl+S'); restartDrill(); showToast('drill restarted \u2014 Ctrl+S works here'); return; }
     if(lk==='z'&&e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+Y'); redoAct(); return; }
     if(lk==='z'){ e.preventDefault(); startClock(); logKey('Ctrl+Z'); undoAct(); return; }
@@ -12636,7 +12726,9 @@ document.addEventListener('keydown',hkRawE=>{
   // Home / End — navigation primitives. Ctrl+Home → A1, Ctrl+End → last cell of used range, Home → col A.
   // Shift modifier extends the selection (Excel parity). Plain "End" is no-op (Excel's End mode is too obscure).
   if(k==='Home'){
-    e.preventDefault(); startClock();
+    e.preventDefault();
+    if(S && S.maze){ return; }   /* r423 (Wolf round-2 §5): no wall teleports — Home/Ctrl+Home would beam the cursor through the maze walls (the touch-list latch already refused to collect on it; now the jump itself is inert) */
+    startClock();
     const ctrl = e.ctrlKey||e.metaKey;
     logKey(ctrl ? (e.shiftKey?'Ctrl+Shift+Home':'Ctrl+Home') : (e.shiftKey?'Shift+Home':'Home'));
     if(e.shiftKey){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; } else S.sel = null;
@@ -12646,7 +12738,9 @@ document.addEventListener('keydown',hkRawE=>{
     render(); commitAction(); return;
   }
   if(k==='End' && (e.ctrlKey||e.metaKey)){
-    e.preventDefault(); startClock();
+    e.preventDefault();
+    if(S && S.maze){ return; }   /* r423 (Wolf round-2 §5): Ctrl+End is a through-the-walls teleport on maze boards — inert */
+    startClock();
     logKey(e.shiftKey?'Ctrl+Shift+End':'Ctrl+End');
     const u = usedRange();
     if(e.shiftKey){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; } else S.sel = null;
@@ -12660,7 +12754,13 @@ document.addEventListener('keydown',hkRawE=>{
     const lk=k.toLowerCase();
     // ---- keyboard-profile chords (checked first; native chords still work below) ----
     if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='r'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+R'); smartFill('right'); return; }
-    if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+D'); fillFrom('down'); render(); return; }
+    if(keyProfile==='macabacus' && !e.altKey && e.shiftKey && lk==='d'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+D'); smartFill('down'); return; }   /* r423 §7: Fast Fill Down — smart extent, symmetric with Ctrl+Shift+R (was a plain fillFrom) */
+    /* r423 (Wolf round-2 §7): Ctrl+Shift+R/D are PLUGIN-LAYER chords (Macabacus Fast Fill) — on
+       the native profile they used to FALL THROUGH to the bare Ctrl+R/Ctrl+D handlers below and
+       fill anyway (mislogged as Ctrl+R/Ctrl+D), teaching a chord native Excel doesn't have. Both
+       are now inert on native — swallowed, never the browser's (Ctrl+Shift+R is hard-reload,
+       Ctrl+Shift+D bookmark-all: either one mid-drill is fatal), and never a phantom fill. */
+    if(keyProfile!=='macabacus' && !e.altKey && e.shiftKey && (lk==='r'||lk==='d')){ e.preventDefault(); return; }
     /* r197 (T-G canon verify): Macabacus number cycles are Ctrl+Shift+1/4/5 — the
        SAME keys as native Excel's format chords (that's the whole design). Those
        are handled un-gated below (Ctrl+Shift+!/$/%). The old Ctrl+Alt+Shift+1/4/5
@@ -15328,6 +15428,45 @@ const MENU_ORDER = (()=>{
       CHALLENGES[k].label = meta[k].label;
       CHALLENGES[k].name  = meta[k].name;
     }
+  }
+})();
+
+/* r423 (Wolf round-2 §1): UNIVERSAL Ctrl+S CLOSER. A drill that declares `saveClose:true`
+   gets the "Save your work" final beat APPENDED BY THE ENGINE — no hand-written check:
+     · checks(): +1 core beat {label:'Save your work', ok: cores-pass && S.savedN>0} — the
+       beat is only SATISFIABLE once every other core check grades (save FINISHED work, the
+       Excel habit; the ☆ bonus never gates it), and Ctrl+S latches S.savedN (keydown handler).
+     · guide(): +1 hint line (the Ctrl+S line lives here, not in the beat label — de-hint).
+     · targets(): +1 null slot — no ring, no rails target; the tri-length invariant
+       (guide.length === checks.length === targets.length) stays satisfied mechanically.
+     · demo(): +1 scripted Ctrl+S at the end, so demos / replays / echo win under the closer.
+   The wrapped functions keep the ORIGINAL source for String()-scanners via toString overrides:
+   railSafe() greps checks-source for 'S.active' (navigation MUST stay unrailed) and the smoke
+   de-hint scan greps checks-source labels — both must keep reading the real grader. */
+(function hkSaveCloseWire(){
+  for(const k in CHALLENGES){
+    const C=CHALLENGES[k];
+    if(!C || !C.saveClose || C.__saveWired) continue;
+    C.__saveWired=true;
+    const keep=(wrapped, orig)=>{ try{ wrapped.toString=()=>String(orig); }catch(e){} return wrapped; };
+    const oC=C.checks;
+    C.checks=keep(function(S2){
+      const items=oC.call(this,S2)||[];
+      const coresOk=items.length>0 && items.every(x=>x.ok||x.bonus);
+      items.push({label:'Save your work', ok: coresOk && ((S2&&S2.savedN)|0)>0, save:true});
+      return items;
+    }, oC);
+    if(C.guide){ const oG=C.guide;
+      C.guide=keep(function(){ const g=(((typeof oG==='function')?oG.call(this):oG)||[]).slice();
+        g.push('everything ties out — <kbd>ctrl</kbd>+<kbd>s</kbd> saves the finished work; unfinished work won’t take a save');
+        return g; }, oG); }
+    if(C.targets){ const oT=C.targets;
+      C.targets=keep(function(){ const t=(((typeof oT==='function')?oT.call(this):oT)||[]).slice(); t.push(null); return t; }, oT); }
+    if(C.demo){ const oD=C.demo;
+      C.demo=keep(function(){ const d=(((typeof oD==='function')?oD.call(this):oD)||[]).slice();
+        const last=d.length?d[d.length-1]:null;
+        d.push({sel:(last&&last.sel)||'A1', keys:[{key:'s',ctrl:true}]});   // the closer keystroke — replays stay green engine-side
+        return d; }, oD); }
   }
 })();
 
