@@ -8068,6 +8068,48 @@ function evalFormula(expr){
     if(name==='CONCATENATE'||name==='CONCAT'){
       return args.map(a=>a.range?rangeRefs(a.range[0],a.range[1]).map(cellRaw).map(txtOf).join(''):argTxt(a)).join('');
     }
+    /* ---- D1 (r415-review) LOOKUP + LOGICAL + DATE pack — daily desk muscles the engine
+       lacked. Additive: new names only, existing eval unchanged. Misses throw #N/A so
+       IFERROR still catches them (the wrap-it lesson). ---- */
+    if(name==='VLOOKUP'||name==='HLOOKUP'){
+      const key=rawOf(args[0]); if(!args[1]||!args[1].range) throw new Error(name+'-range');
+      const a=parseRef(args[1].range[0]), b=parseRef(args[1].range[1]);
+      const r1=Math.min(a.r,b.r), c1=Math.min(a.c,b.c), r2=Math.max(a.r,b.r), c2=Math.max(a.c,b.c);
+      const idx=Math.round(argNum(args[2])), vert=(name==='VLOOKUP');
+      const approx = args.length>3 ? (argNum(args[3])!==0) : false;   // taught form is exact (FALSE); default exact
+      if(idx<1 || idx>(vert?(c2-c1+1):(r2-r1+1))) throw new Error(name+'#REF');
+      const keys = vert ? Array.from({length:r2-r1+1},(_,k)=>cellRaw(colLetter(c1)+(r1+k)))
+                        : Array.from({length:c2-c1+1},(_,k)=>cellRaw(colLetter(c1+k)+r1));
+      let hit=-1;
+      if(approx){ for(let k=0;k<keys.length;k++){ const kv=keys[k];
+          if(typeof kv==='number'&&typeof key==='number'){ if(kv<=key) hit=k; else break; }
+          else if(eqLoose(kv,key)){ hit=k; break; } } }
+      else { for(let k=0;k<keys.length;k++){ if(eqLoose(keys[k],key)){ hit=k; break; } } }
+      if(hit<0) throw new Error(name+'#N/A');
+      const v = vert ? cellRaw(colLetter(c1+idx-1)+(r1+hit)) : cellRaw(colLetter(c1+hit)+(r1+idx-1));
+      return v==null?0:v;   // preserve text + numbers
+    }
+    if(name==='AND'||name==='OR'){ const bs=flat(args);
+      return (name==='AND' ? bs.every(x=>x!==0) : bs.some(x=>x!==0)) ? 1 : 0; }
+    if(name==='NOT'){ return (args[0] && argNum(args[0])!==0) ? 0 : 1; }
+    if(name==='DATE'){ const y=Math.round(argNum(args[0])), mo=Math.round(argNum(args[1])), d=Math.round(argNum(args[2]));
+      return Math.floor((Date.UTC(y,mo-1,d)-Date.UTC(1899,11,30))/86400000); }
+    if(name==='YEAR'||name==='MONTH'||name==='DAY'){
+      const dt=new Date(Date.UTC(1899,11,30)+Math.round(argNum(args[0]))*86400000);
+      return name==='YEAR'?dt.getUTCFullYear():name==='MONTH'?dt.getUTCMonth()+1:dt.getUTCDate(); }
+    if(name==='EDATE'||name==='EOMONTH'){
+      const dt=new Date(Date.UTC(1899,11,30)+Math.round(argNum(args[0]))*86400000);
+      const y=dt.getUTCFullYear(), m=dt.getUTCMonth()+Math.round(argNum(args[1])), d=dt.getUTCDate();
+      if(name==='EOMONTH'){ return Math.floor((Date.UTC(y,m+1,0)-Date.UTC(1899,11,30))/86400000); }
+      const lastDay=new Date(Date.UTC(y,m+1,0)).getUTCDate();
+      return Math.floor((Date.UTC(y,m,Math.min(d,lastDay))-Date.UTC(1899,11,30))/86400000); }
+    if(name==='YEARFRAC'){   // basis 0 — US 30/360, the banker default
+      const A=new Date(Date.UTC(1899,11,30)+Math.round(argNum(args[0]))*86400000);
+      const B=new Date(Date.UTC(1899,11,30)+Math.round(argNum(args[1]))*86400000);
+      let d1=A.getUTCDate(), d2=B.getUTCDate();
+      const y1=A.getUTCFullYear(), m1=A.getUTCMonth()+1, y2=B.getUTCFullYear(), m2=B.getUTCMonth()+1;
+      if(d1===31) d1=30; if(d2===31 && d1===30) d2=30;
+      return ((y2-y1)*360+(m2-m1)*30+(d2-d1))/360; }
     const xs=flat(args);
     switch(name){
       case 'SUM': return xs.reduce((a,b)=>a+b,0);
@@ -9883,7 +9925,11 @@ function syncTabs(){
 }
 
 function recalc(){
-  for(let pass=0; pass<8; pass++){
+  /* r415-review D3: cap raised 8 -> 24 so a long dependency spine (deep roll-forwards) has
+     headroom to converge; curated drills settle in a handful of passes, so this never changes
+     a convergent result, it only removes a silent under-computation ceiling. */
+  const CAP=24; let converged=false;
+  for(let pass=0; pass<CAP; pass++){
     let changed=false;
     for(const k in S.cells){ const c=S.cells[k]; if(c && c.formula){
       /* r407 (Wolf audit): a formula an insert/delete rewrote to #REF! must show the ERROR, not
@@ -9896,7 +9942,19 @@ function recalc(){
       const okv = (typeof v==='number') ? isFinite(v) : (v!=null);
       if(okv && v!==c.value){ c.value=v; changed=true; }
     }}
-    if(!changed) break;
+    if(!changed){ converged=true; break; }
+  }
+  /* r415-review D3: a genuine CIRCULAR reference never converges. Rather than leave the loop's
+     half-computed garbage, do what Excel does with iterative calc off — the cycle reads 0. Only
+     the still-oscillating formula cells are zeroed (converged cells recompute to the same value,
+     so they're untouched). Curated drills always converge, so this fires only on a real cycle. */
+  if(!converged){
+    for(const k in S.cells){ const c=S.cells[k]; if(c && c.formula && !/#REF!/.test(c.formula)){
+      let v; try{ v=evalFormula(c.formula); }catch(_){ v=undefined; }
+      const differs = (typeof v==='number') ? (isFinite(v) && v!==c.value) : (v!=null && v!==c.value);
+      if(differs) c.value=0;
+    }}
+    try{ console.warn('recalc: non-convergence (circular reference?) — oscillating cells zeroed'); }catch(e){}
   }
 }
 /* r350 (Wolf): totals grade the RESULT, not the chord that built them. Every total check pairs
