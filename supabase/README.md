@@ -3,15 +3,15 @@
 Database changes live in `supabase/migrations/*.sql` and deploy automatically
 on push via GitHub Actions.
 
-> **STATUS 2026-07-12 (r131): THE PIPELINE HAS NEVER RUN SUCCESSFULLY.**
-> Every deploy since 2026-07-07 failed at "Access token not provided" — the
-> one-time setup below was never completed, so NOTHING in
-> `supabase/migrations/` from `20260707000000_team_code.sql` onward exists in
-> the live database. Full findings: `dev/SMOKE_REPORT.md`. Complete the setup,
-> then re-run the workflow (Actions tab → "Deploy Supabase migrations" →
-> Run workflow) — all migrations are idempotent and apply in one pass.
+> **STATUS 2026-07-24: the pipeline WORKS.** The one-time setup was completed
+> and deploys have run green since 2026-07-13 (verified against the live DB
+> 2026-07-24: all tables, functions, and triggers through the 20260723
+> migration are deployed). The four ad-hoc `dev/migrate-*.sql` files
+> (certificates, client-state, email-prefs, drill-feedback) are now
+> reconciled into `supabase/migrations/20260724100000_reconcile_adhoc.sql`,
+> so `supabase/migrations/` is again the complete source of truth.
 
-## One-time setup (3 minutes, Wolf) — TWO secrets
+## One-time setup (kept for reference — completed 2026-07-13) — TWO secrets
 1. Get a Supabase access token: app.supabase.com → account icon → Access Tokens →
    Generate new token. COPY it.
 2. Get the database password: Supabase dashboard → Project Settings → Database →

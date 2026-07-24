@@ -1,2 +1,9 @@
 # Supabase project link — hotkey.gg
 project_id = "vshtftzrlepedydmkcnm"
+
+# weekly-digest is called by pg_cron via pg_net with only the x-digest-secret
+# header (no JWT) — the function checks DIGEST_CRON_SECRET itself. Without this
+# stanza a CI redeploy resets the function to default JWT verification and the
+# cron POST 401s.
+[functions.weekly-digest]
+verify_jwt = false
