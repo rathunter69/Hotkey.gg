@@ -4,6 +4,18 @@ New sessions: the repo IS the handover — read this file, **dev/WORKFLOW.md (th
 standards — READ FIRST, new r417)**, **dev/PIPELINE.md's ⚡ header (the live queue)**,
 dev/AUDIT.md (newest round at the TOP), and the dev/ design docs._
 
+## WOLF DECISIONS — DEPTH PASS (2026-07-24, r419, binding for H6)
+- **Depth target:** EVERY drill to the Foundations bar (4-6 beats, randomized sites, aha,
+  finish-state beat, full 20-row grid). No chapter-scaled shortcuts.
+- **Mechanics (all four approved):** tiered time medals · bonus objectives · disclosed-error-count
+  audit format · chapter boss drills (mastery-gate the next chapter).
+- **Catalog: OPEN SEASON** — depth-pass spec may rename/merge/split/add drills freely; Wolf approves
+  every delta at the DEPTH_PASS.md review (spec must carry the plumbing impact map).
+- **Execution: ONE AGENT PER DRILL, catalog order, Foundations first.** Spec doc → Wolf review →
+  builds. Wolf has per-drill comments he'll graft onto the spec at review.
+- Checklist language mandate: imperative "Do XYZ" + observable end state; metaphor verbs banned
+  ("tie the line", "grab the block"); enforced by the extended de-hint/voice CI check (H4).
+
 ## ⚡ NEXT-SESSION HANDOFF (2026-07-24, r417 — THE PLATFORM AUDIT + WORKFLOW FRAMEWORK)
 
 **WHAT r417 IS:** Wolf commissioned a full pre-launch platform audit + a new process framework.
