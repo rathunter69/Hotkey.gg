@@ -58,6 +58,18 @@ with dead code — needs a visual-validated PR) and C5 clipboard `copyFormat` he
 "dial-up"** (legendary 1.45/epic 1.12/rare 0.88/common 0.78) is drafted but held pending Wolf's
 render approval — NOT in this batch (reverted to the live 1.15/1.0/0.9/0.85).
 
+**r416 — SEGMENT D (engine depth) + SEGMENT E HELD.** Shipped Segment D: **D1** formula pack in
+`evalFormula` (VLOOKUP/HLOOKUP · AND/OR/NOT · DATE/YEAR/MONTH/DAY/EDATE/EOMONTH/YEARFRAC 30/360 —
+additive, misses throw #N/A; `dev/e2e-formulas.js` 19 checks), **D3** `recalc` cap 8→24 + circular-ref
+zeroing, **D2** `dev/e2e-grid-height.js` grid-sizing regression (cell-height band · all rows ·
+determinism · fill) — both new suites in the engine lane. Deferred: **D4** (CHARPX→measureText),
+**D5** new-drill content + SUBTOTAL(9). **SEGMENT E (Stripe go-live E1 · billing backend E2 · the
+BETA/PRELAUNCH/backdoor go-live flip E3 · interview mode E4) is HELD UNTIL LAUNCH per Wolf** — none
+of it is autonomous; do NOT start any E item until Wolf explicitly opens the launch. **Remaining safe
+[auto] work for future sessions:** B1/B2 dead-code deletion (map: live `nebula` shares `stars()`),
+C5 clipboard `copyFormat`, the drill-page stale-asset-version fix, D4. The full system map + segmented
+pipeline lives in `dev/PROJECT_REVIEW.md`.
+
 **CADENCE:** branch `claude/pipeline-engine-integration-laki0l`; after each merge RESTART off main
 (`git fetch origin main && git checkout -B <branch> origin/main`), push with `--force-with-lease`.
 Run the FULL local gate before pushing (smoke is the fast net for cosmetic pushes; it ALSO validates

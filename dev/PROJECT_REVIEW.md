@@ -48,7 +48,11 @@ _Each block is sized to be one focused session. Tags: **[auto]** safe to run aut
 
 > **STATUS (shipped — r415):** Segment **A** complete (A1 cache-bump CI guard · A2 secret scan · A3 sessions_guard migration · A4 `_headers` CSP · A5 CDN pin+SRI · A6 one-drill behavioral smoke), **B3** done (fx re-open bug), Segment **C** guards done (C1 membership · C2 PARS parity · C3 skin-notch coverage · C4 de-hint — all now enforced in the gate).
 >
-> **STATUS (shipped — r416, Segment D):** **D1** formula pack added to `evalFormula` (VLOOKUP/HLOOKUP · AND/OR/NOT · DATE/YEAR/MONTH/DAY/EDATE/EOMONTH/YEARFRAC — additive, misses throw #N/A for IFERROR) + `dev/e2e-formulas.js` (19 checks). **D3** `recalc` cap 8→24 + circular-reference detection (non-convergent cells zero like Excel). **D2** `dev/e2e-grid-height.js` — grid-sizing regression (cell-height band · all rows rendered · **determinism/no-oscillation** · fill at tall viewports). Both new suites wired into the engine lane. **Deferred with cause:** D4 (CHARPX→`measureText` — couples grading + `####` overflow, needs isolated visual PR), D5 new-drill content incl. SUBTOTAL(9) (Wolf-collaborative; SUBTOTAL needs hidden-row-aware eval). **Deferred with cause:** B1/B2 bulk dead-code deletion (verification found the live `nebula` PRO skin shares the `stars()` helper with dead generators → needs per-skin visual validation in its own PR) and C5 clipboard `copyFormat` helper (engine refactor, own PR). Drift discovered while pinning A5: the drill-page generator hard-codes **stale** asset versions (nav.css v188 / drills.js v275 / themes.js v280 / nav.js v288) — the 82 SEO pages serve old JS/CSS; fold into a "generator reads versions from a shared source" follow-up.
+> **STATUS (shipped — r416, Segment D):** **D1** formula pack added to `evalFormula` (VLOOKUP/HLOOKUP · AND/OR/NOT · DATE/YEAR/MONTH/DAY/EDATE/EOMONTH/YEARFRAC — additive, misses throw #N/A for IFERROR) + `dev/e2e-formulas.js` (19 checks). **D3** `recalc` cap 8→24 + circular-reference detection (non-convergent cells zero like Excel). **D2** `dev/e2e-grid-height.js` — grid-sizing regression (cell-height band · all rows rendered · **determinism/no-oscillation** · fill at tall viewports). Both new suites wired into the engine lane. **Deferred with cause:** D4 (CHARPX→`measureText` — couples grading + `####` overflow, needs isolated visual PR), D5 new-drill content incl. SUBTOTAL(9) (Wolf-collaborative; SUBTOTAL needs hidden-row-aware eval).
+>
+> **SEGMENT E — ⏸ HELD UNTIL LAUNCH (Wolf, r416).** All launch/monetization/product-gated; do not start until Wolf opens the launch. See Segment E below.
+>
+> **NEXT UP (safe, autonomous, no business decisions):** the remaining [auto] deferrals — **B1/B2** (dead fx/ornament deletion, now that the `stars()` live-helper entanglement is mapped), **C5** (clipboard `copyFormat` helper), the **drill-page stale-asset-version** fix (generator hard-codes nav.css v188 / drills.js v275 / themes.js v280 / nav.js v288), and **D4** (CHARPX→`measureText`, with visual validation). Plus the held **fx dial-up** awaiting Wolf's render approval. **Deferred with cause:** B1/B2 bulk dead-code deletion (verification found the live `nebula` PRO skin shares the `stars()` helper with dead generators → needs per-skin visual validation in its own PR) and C5 clipboard `copyFormat` helper (engine refactor, own PR). Drift discovered while pinning A5: the drill-page generator hard-codes **stale** asset versions (nav.css v188 / drills.js v275 / themes.js v280 / nav.js v288) — the 82 SEO pages serve old JS/CSS; fold into a "generator reads versions from a shared source" follow-up.
 
 ### SEGMENT A — CI / Safety hardening  ·  P0  ·  mostly [auto]
 The highest-leverage, lowest-visual-risk work. Prevents the failures this project has actually hit.
@@ -81,8 +85,12 @@ Needs your call on which muscles matter for the target user / drill roadmap.
 - **D4 [auto·M]** Replace `CHARPX=8.6` char-count width with canvas `measureText` (it couples display-width + `####` overflow + grading; a font change silently desyncs eye from grader).
 - **D5 [auto·S]** Named-canon **drill gaps** (`DRILL_DOCTRINE.md:203`): Go To Special variants, SUBTOTAL(9), copy-formula-above, hide row/col.
 
-### SEGMENT E — Product / monetization un-scaffold  ·  P0-when-launching  ·  [Wolf]
-Business-gated; do when flipping out of beta.
+### SEGMENT E — Product / monetization un-scaffold  ·  P0-when-launching  ·  [Wolf]  ·  ⏸ HELD UNTIL LAUNCH
+**Wolf's decision (r416): HOLD all of Segment E until launch.** None of it is autonomous — E1
+changes the payment/auth flow, E2 needs product intent on what pause/cancel do, E3 IS the go-live
+flip (remove beta/curtain/owner-backdoor — never do without an explicit go), E4 is a large product
+build. Do NOT start any E item until Wolf explicitly opens the launch. Business-gated; do when
+flipping out of beta.
 - **E1 [Wolf·L·supabase]** Stripe go-live: **derive `user_id` from the verified JWT** in `create-checkout` (not the request body — confused-deputy bug before the webhook lands), validate the webhook signing secret, build the `entitlements`-writing webhook.
 - **E2 [Wolf·M]** Build the real `billing.html` backend (`invoices` table, `pause_subscription`/`cancel_subscription` RPCs — all currently point at nonexistent objects).
 - **E3 [Wolf·S]** Launch flags: flip `BETA_MODE`/`PRELAUNCH_LOCK`, remove the `wolfcdrake@gmail.com` backdoor (`nav.js:363`) + beta unlock tools, decide the marketing (`About.html`) vs app landing path.
