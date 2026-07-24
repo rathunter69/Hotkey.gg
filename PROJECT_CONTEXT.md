@@ -40,9 +40,9 @@ sign-out leaks hk_dev_unlock/outbox/cert-latches to the next account; learn-mode
 under the tour scrim; %-cell entry renders 800%; "problem with this formula" refusal is
 over-broad → becomes error sentinels + Excel-style autocorrect (Wolf ask).
 
-**WOLF-PENDING (ask in chat, per WORKFLOW protocol):** H0 deploy vector · learn-mode
-restore-vs-scrub · segment order · fx dial-up (held from r415) · creds rotation (token pasted in
-chat again this session — rotate after).
+**WOLF DECISIONS (07-24, in chat):** H0 → PR immediately · learn-mode → SCRUB the 3 copy sites
+(retire echoStart) · segment order H1→H5 approved, H6 rolling · mgmt token stays live for session
+use (Wolf's call; rotation still recommended eventually). Still held: fx dial-up (r415).
 
 **ASSET VERSIONS (unchanged this round — docs+SQL only, no cache bump needed):** themes.js v306,
 nav.css v207, nav.js v296, drills.js v278, lb.js v37, lb.css v20.

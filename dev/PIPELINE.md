@@ -22,7 +22,8 @@ repaired, profiles column grants (theme/client_state/email_* — three features 
 2. **H2 · GUIDANCE ALIGNMENT [auto·M + 1 Wolf choice]** — AUDIT_R417 §C: guide[]↔checks[] realign
    (43 drills!) + targets[]↔checks[] (11 drills, `cases` rings the WRONG CELL from step 2) + BOTH
    as new invariants; Ctrl+Shift+V must paste VALUES (today silently pastes formulas); learn-mode
-   ghost (⚠ Wolf: restore #echoBtn or scrub the 3 copy sites); ALTS for the 9 zero-alt drills +
+   ghost (**DECIDED Wolf 07-24: SCRUB the 3 copy sites**, retire echoStart as dead code — rapid-fire
+   echo untouched); ALTS for the 9 zero-alt drills +
    guided=true in the alt harness; onboarding formula-cell beat; any-arrow doIt; replay-tour
    affordance; Ctrl+Shift+&/_ border chords.
 3. **H3 · ENGINE PARITY PACK 1 [auto·M-L]** — AUDIT_R417 §A: error-value sentinels (#N/A, #DIV/0!,
