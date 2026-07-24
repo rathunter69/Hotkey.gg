@@ -1,96 +1,173 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Refreshed 2026-07-23 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+_Refreshed 2026-07-24 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
 New sessions: the repo IS the handover — read this file, **dev/PIPELINE.md's ⚡ header (the
 live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ design docs._
 
-## ⚡ NEXT-SESSION HANDOFF (2026-07-23, rounds r411–r414 — CI fixes + fragility hardening + card round + NOTCH TAXONOMY)
 
-**LIVE NOW (merged to main, deployed via Cloudflare):**
-- **#221** — card titles (equippable name-plate + earn catalog, impersonation-locked custom titles),
-  skin-unlock Rise→Lock reveal **relocated to a page-load sweep** (`window.hkSkinUnlockSweep`, nav.js)
-  so it never opens mid-drill, Growth starter skin + early level gates, uniform 5px card borders.
-- **#222** — `recordRun` **retry outbox** (`hk_run_outbox`: failed leaderboard posts re-send on next
-  run + at login, never silently lost); **`hkLevelXp()`** = one canonical level source (chip + skin
-  gates + PRO gate all read it; `updateRankPill` reconciles `hk_xp_est` up to server XP) — ends the
-  "level 4 in game / 13 on card" class of bug; **20-row grid cap** (`__ROW_CAP` in index.html
-  `render()`) so the sheet can't balloon past 20 rows on hi-res monitors (nav maze is exactly 20 rows).
-- **#223** — heraldic Cylon border 2.6s→6s; **PRO** nebula made legibly alive; **founder → prismatic
-  platinum** (light silver bg + rainbow foil); **no-theme card** got a matching 5px border (`hk-frame-none`).
-- **#224** — **founder oil-slick**: `platinum` fx = saturated rainbow blobs on incommensurate lissajous
-  paths (no visible loop) + metallic specular + silver glints.
-- **#225** — **BLACK DIAMOND** (Second-Year `plaque-diam`): Wolf picked option ④. New `blackdiam` fx
-  (themes.js: init ~1477, dispatch ~1522, render branch ~1714) = white brilliance glints twinkling on
-  near-black carbon + a slow prismatic caustic; card bg darkened to near-black in nav.css
-  (`.hk-frame-plaque-diam`) + registry tuple repointed to `blackdiam`. The old matrix `diamondfx`
-  is now UNUSED (left in place; safe to delete in a cleanup pass).
+## 🎯 PROJECT NORTH STAR (the "why" — read this first if you're new)
+_Stable across sessions; deeper detail in `dev/STRATEGY.md`, `dev/LAUNCH.md`, `dev/INTERVIEW.md`,
+`dev/TEAMS_DESIGN.md`, `dev/XP_DESIGN.md`, `dev/DRILL_DOCTRINE.md`._
 
-**✅ RESOLVED / SHIPPED — NOTCH SHAPE BY SKIN CLASS (task #121) — r414 (PR in flight):**
-- Wolf confirmed a **2-class** taxonomy (simplified from the 3-class draft): **ANGULAR** chamfered
-  nameplate = STATUS (founder/pro) + ALL ACHIEVEMENT/cosmetic skins (heraldic, foil, amethyst, sakura,
-  goldenhour, pearl, boutique, architect, emerald, molten, frostbite, noir, neon, terminal, circuit,
-  crt, blueprint, constellation, vaporwave, cottoncandy, bloom, …); **ROUNDED** nameplate = the
-  level/rank LADDER BASE only (engraved + rank plaques bronze/silver/gold/plat). **Wolf's open-Q call:
-  the two Second-Year pinnacle cards — onyx + plaque-diam — BUMP TO ANGULAR** (top of the climb crosses
-  into prestige). The r390/r391 achievement skins had wrongly fallen back to the base pill — now angular.
-- Implementation: **nav.css ~708** — one ANGULAR selector list (`clip-path` chamfer) + one ROUNDED rule
-  (`border-radius:10px; clip-path:none`) for the ladder base. **fx-elaborateness by class**: themes.js
-  `hkInitCardFx` — a per-canvas `EL` density multiplier keyed to the frame's rarity tier (common 0.85 ·
-  rare 0.9 · **epic 1.0 baseline, untouched** · legendary 1.15), applied centrally to the generated
-  particle ARRAYS (`applyEL`) so Wolf's 15 bespoke generators stay as-authored; object-based fx
-  (nebula/aurora/galaxy/heraldic/onyx veins) keep their bespoke tuning. Ladder plaques use `sheen`
-  (no particle field), so density scaling never over-animates the calm ladder — shape carries that.
-- Verified: local gate green (smoke 7/7 + skin-unlock, lb 36/36); montage render clean (0 page errors)
-  confirms rounded ladder base vs angular prestige set. Notch markup: `.hkf-tab` (nav.css ~444 base pill,
-  ~708 per-class override); `hkPlayerCard` tab via `hkFrameOrnaments` (themes.js ~1317).
+**What it is.** hotkey.gg — a **keyboard-only Excel speedrun trainer**. 82 banker-grade drills, live
+leaderboards, desks for teams & schools. Taglines: *"Drills, not lessons. Fastest hands win. Your first
+run takes thirty seconds."* Static site (HTML + vanilla JS) → Supabase (Postgres/RLS/Edge Fns) + Stripe,
+deployed by Cloudflare Pages from `main`. **No build step, no framework.**
 
-**ASSET VERSIONS after r415 (bump on next JS/CSS change):** themes.js **v306**, nav.css **v207**,
-nav.js **v296**, drills.js v278, lb.js v37, lb.css v20. (sed the `?v=` across all `*.html` — now
-also GATE-ENFORCED by `dev/check-cache-versions.js`, so a forgotten/partial bump fails CI.)
+**Why it exists.** Most people who live in spreadsheets were **never actually taught Excel** — they
+learned by osmosis, copy-paste, and the mouse, and stayed slow. Excel-keyboard fluency (no mouse) is a
+skill every IB/PE/finance seat screens for informally, yet nobody *trains* it as a game with *proof* —
+and the same gap exists for the far larger population of everyday business users. The core is a
+genuinely-good 30-second loop: **drill → end-state grading → results → next.** The identity layer (ranks,
+levels, cosmetic cards, desks, certs) is deep. The thin part — the current roadmap focus — is everything
+*between* sessions: reasons to return tomorrow, proof to show others, and funnel instrumentation.
 
-**r415 — PROJECT REVIEW + SAFETY/ANTI-DRIFT BATCH (see `dev/PROJECT_REVIEW.md`):** a 6-track
-subsystem audit produced `dev/PROJECT_REVIEW.md` (system map + segmented pipeline). Shipped
-Segment A (cache-bump CI guard, committed-secret scan, `sessions_guard` migration [sessions boards
-were client-forgeable], `_headers` CSP, Supabase CDN pinned+SRI, one-drill behavioral smoke in the
-cosmetic lane), B3 (fx re-open bug), and Segment C drift guards (drill membership / PARS parity /
-skin-notch coverage / de-hint copy — all enforced in the gate now via `dev/check-invariants.js` +
-smoke). Deferred with cause: B1/B2 bulk dead-fx/ornament deletion (live `nebula` shares `stars()`
-with dead code — needs a visual-validated PR) and C5 clipboard `copyFormat` helper. The **fx
-"dial-up"** (legendary 1.45/epic 1.12/rare 0.88/common 0.78) is drafted but held pending Wolf's
-render approval — NOT in this batch (reverted to the live 1.15/1.0/0.9/0.85).
+**Target customers.** **Beachhead** (the wedge — high intensity, tight community, willing to pay for
+proof): **finance/IB/PE analysts + recruiting candidates** ("you say you're fast in Excel on your resume
+— here's the receipt"). Distribution engine = **desks/clubs**: one captain (MBA/undergrad finance club
+officer, EB cohort self-organizer, bank training lead) = 10–150 players. B2B = "PRO for the whole desk"
++ a future cheat-resistant recruiting benchmark.
+**Broader ambition (the real TAM):** the *huge* population of **business professionals who were never
+formally taught Excel but live in it daily** — consultants, ops/RevOps, accounting/FP&A, sales, PMs,
+founders, small-business owners, students — self-taught, mouse-dependent, and slower than they'd like.
+The product should be **accessible and attractive to them, not just banker-hardcore**: an approachable,
+game-y on-ramp (no jargon wall, gentle early drills, "look how fast you got" wins) that makes
+keyboard-fluency learnable and fun for anyone who uses spreadsheets — while the finance framing stays as
+the credibility/proof spike, not a gate. Keep this dual audience in mind for copy, onboarding, drill
+difficulty curves, and cosmetic/theme breadth (not everything should read as investment-banking).
 
-**r416 — SEGMENT D (engine depth) + SEGMENT E HELD.** Shipped Segment D: **D1** formula pack in
-`evalFormula` (VLOOKUP/HLOOKUP · AND/OR/NOT · DATE/YEAR/MONTH/DAY/EDATE/EOMONTH/YEARFRAC 30/360 —
-additive, misses throw #N/A; `dev/e2e-formulas.js` 19 checks), **D3** `recalc` cap 8→24 + circular-ref
-zeroing, **D2** `dev/e2e-grid-height.js` grid-sizing regression (cell-height band · all rows ·
-determinism · fill) — both new suites in the engine lane. Deferred: **D4** (CHARPX→measureText),
-**D5** new-drill content + SUBTOTAL(9). **SEGMENT E (Stripe go-live E1 · billing backend E2 · the
-BETA/PRELAUNCH/backdoor go-live flip E3 · interview mode E4) is HELD UNTIL LAUNCH per Wolf** — none
-of it is autonomous; do NOT start any E item until Wolf explicitly opens the launch. **Remaining safe
-[auto] work for future sessions:** B1/B2 dead-code deletion (map: live `nebula` shares `stars()`),
-C5 clipboard `copyFormat`, the drill-page stale-asset-version fix, D4. The full system map + segmented
-pipeline lives in `dev/PROJECT_REVIEW.md`.
+**Business model.** Freemium B2C sub — **PRO ($7/mo · $19/season)** — + **B2B per-seat "PRO for the
+desk"** + free comped PRO for verified student clubs. Strongest planned conversion surface = **Interview
+Mode** (a certified "superday" run: *"training is free-ish, proof costs money"*). **Stage: PRIVATE BETA,
+pre-revenue.** `BETA_MODE=true` unlocks PRO free for all; payments are a Stripe **test** scaffold (paywall
+held until an internship constraint lifts). New devices hit an access-code curtain (`PRELAUNCH_LOCK`).
+**Launch = ONE flag flip** (`PRELAUNCH_LOCK=false`) once the pre-launch gates are met (funnel data,
+Morning Sheet, a pilot cohort, T&S) — see `dev/LAUNCH.md`.
 
-**r416b — DRILL-PAGE STALE-VERSION FIX (shipped) + remaining cleanups re-classified.** The drill-page
-generator now derives shared-asset `?v=` from index.html (was hard-pinned at nav.css v188 / drills.js
-v275 / themes.js v280 / nav.js v288 → the 82 SEO pages served stale JS/CSS); regenerated to current.
-Investigated the remaining "safe [auto]" deferrals and found they're NOT clean wins: **B1** ornament
-deletion is entangled with live plaque rendering (`hkFrameBucket`/`{bucket}` passed from nav.js/lb.js/
-index.html/profile.html frame picker); **B2** fx generators share live helpers (`nebula`/`navchart`
-call `stars()`; `prism` kind→`facet` vs `prism()` gen name-collision); **C5** — a correct `copyFmt`
-already exists (index.html:10063), unifying paste paths risks behavior; **D4** CHARPX couples grading.
-All are INERT-or-WORKING refactors with ZERO user benefit → left in place (fine at runtime); if ever
-touched, do a dedicated PR with the all-31-frame render harness (`scratchpad/shot-allskins.js`).
-**No autonomous high-value work remains** — next is Wolf-gated: the held **fx dial-up** (render
-approval) and **Segment E** (launch).
+**Core progression (two ladders).** **LEVEL** = volume/reps, never resets. **RANK** = competitive, opt-in
+at Level 10, a 5-board placement series, 8 tiers. Plus **3 certificate tracks** (fluency / formulas /
+modeling) and the **cosmetic card/skin economy** (the identity layer — deep, and the owner's passion).
 
-**CADENCE:** branch `claude/pipeline-engine-integration-laki0l`; after each merge RESTART off main
-(`git fetch origin main && git checkout -B <branch> origin/main`), push with `--force-with-lease`.
-Run the FULL local gate before pushing (smoke is the fast net for cosmetic pushes; it ALSO validates
-the skin-unlock invariant via `hkSkinUnlockSweep`). Chromium at
-`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`; server `python3 -m http.server 8791`.
-Merge cadence via `send_later` check-ins that re-check the gate then squash-merge when green.
-Card-preview harness pattern: a tiny standalone HTML that loads `/nav.css`+`/themes.js`, calls
-`window.hkPlayerCard({flair:'<id>',...},{scale:'full'})` + `hkInitCardFx`, screenshot via playwright-core.
+**Product doctrine (the laws that shape every change).** ① **Freedom Doctrine** — grade the END STATE,
+not the keystrokes (any legit Excel route wins). ② **Do the action, don't read the chord** — player copy
+never embeds hotkeys (de-hinting; now CI-guarded). ③ **Excel-faithful engine** — divergences are
+deliberate + documented (`dev/AUDIT.md`). ④ **Compact-always** layouts; fixed card sizes; seed empty
+space, never expand-to-content. ⑤ **MOCK-FIRST for visual reworks** — the owner reacts to rendered
+screenshots, not prose; nothing ships live on a visual rework without his sign-off.
+
+**Who "Wolf" is.** The owner/founder/PM (`wolfcdrake@gmail.com`) — every decision runs through his
+feedback and sign-off. He iterates live on rendered card mockups, is personal about branding ("Elite
+Boutique" not "Bulge Bracket"), and prefers batched autonomous work validated against the gate. His email
+is special-cased in prod (`nav.js` owner shim) to see the full unlocked site — **remove at launch (E3).**
+
+**Roadmap (where it's headed — `dev/STRATEGY.md` is the opinionated version).** The between-sessions layer:
+**Morning Sheet** daily ritual (highest retention ROI), **ghost-diff** on the results card (traces exist
+since r9, unused), **mastery stars**, **events/funnel table** (must precede launch — can't measure a
+launch retroactively), **streak insurance**. Then **Interview Mode** (PRO conversion), **Seasons**
+(design-first, DAU-gated), **Teams V2** (corporate/B2B analytics). Do-NOT-build-yet items are flagged in
+the docs.
+
+---
+
+## ⚡ NEXT-SESSION HANDOFF (2026-07-24 — NOTCH TAXONOMY → ENGINE DEPTH → SAFETY/GUARDS → BUG-FIX marathon)
+
+**ONBOARD (read in this order):** this block · **`dev/PROJECT_REVIEW.md`** (full system map + the
+segmented forward pipeline — the roadmap) · **`dev/BUG_SCAN.md`** (the r416 4-agent bug sweep + what's
+fixed vs deferred) · `dev/AUDIT.md` (engine audit, newest at top) · `dev/PIPELINE.md`. The repo IS the
+handover.
+
+**LIVE NOW — shipped this session (PRs #226–#231, all merged to `main` → Cloudflare):**
+- **#226 — NOTCH TAXONOMY by skin class (task #121) + fx-elaborateness by tier.** `nav.css ~708`: ANGULAR
+  chamfered `.hkf-tab` = status (founder/pro) + all achievement skins **+ onyx + plaque-diam** (Wolf's
+  call: the two Second-Year pinnacle cards cross into prestige); ROUNDED (`border-radius:10px`) = the
+  ladder base (engraved + plaque bronze/silver/gold/plat). Fixed a latent bug where r390/r391 skins fell
+  back to the base pill. `hkInitCardFx` gained a per-canvas `EL` density multiplier by rarity tier
+  (`applyEL`, applied to particle ARRAYS only; object-fx untouched).
+- **#227 — SAFETY + ANTI-DRIFT batch (review Segments A/B3/C).** See "GUARD INFRA" below — this added
+  most of the CI guards. Also B3 (fx re-open bug: `cv._hkfx` cleared when the rAF loop ends).
+- **#228 — SEGMENT D engine depth.** **D1 formula pack** added to `evalFormula`: VLOOKUP/HLOOKUP,
+  AND/OR/NOT, DATE/YEAR/MONTH/DAY/EDATE/EOMONTH/YEARFRAC (30/360). **D3** `recalc` cap raised + circular-
+  ref zeroing. **D2** grid-height regression suite. New gated suites: `dev/e2e-formulas.js`,
+  `dev/e2e-grid-height.js`.
+- **#229 — drill-page stale-version fix.** `dev/build-drill-pages.js` now DERIVES the shared-asset `?v=`
+  from index.html (was hard-pinned at v188/v275/v280/v288 → the 82 SEO pages served stale JS/CSS). A
+  future cache-bump auto-regenerates them via the drift guard.
+- **#230 — Founder → DARK OIL-SLICK + fx dial-up (Wolf-approved).** Founder card: near-black iridescent
+  base (nav.css `.hk-frame-founder`), `platinum` fx reworked to TINT the dark base in normal blend
+  (7 blobs, no additive white blowout), light text. fx-elaborateness dialed UP to **legendary 1.45 /
+  epic 1.12 / rare 0.88 / common 0.78** (`hkInitCardFx elabFor`, themes.js ~1389).
+- **#231 — BUG-FIX batch (r416 4-agent scan, 8 fixes).** Highlights: (HIGH) trainer XP query was missing
+  `created_at` → `computeXP` under-counted XP → reintroduced the level-4-in-game/13-on-card divergence
+  (index.html:14720, now fixed); (HIGH) `flushRunOutbox` read-modify-write race dropped posted runs
+  (fixed to re-read + remove only posted); (MED) PRO paid skin unlocked free at MD (`themes.js` case
+  'pro' → `!!u.pro`); IFERROR string-literal splitter; single-line Ctrl+D/R fill; `loadProfileData`
+  promise memoization; sign-out wipes `hk_beta_unlock`; recalc cap sized to #formula cells. Full list +
+  repros in `dev/BUG_SCAN.md`.
+
+**ASSET VERSIONS (LIVE):** themes.js **v308** · nav.js **v297** · nav.css **v208** · drills.js v278 ·
+lb.js v37 · lb.css v20. **Bump is now GATE-ENFORCED** (`dev/check-cache-versions.js`): any shared asset
+that changed vs base must have a bumped `?v=`, consistent across all `*.html`. Bumping index.html also
+requires `node dev/build-drill-pages.js` + commit (the generator derives versions from it).
+
+**GUARD / SAFETY INFRA added this session (all wired into `.github/workflows/gate.yml`):**
+- `dev/check-cache-versions.js` — the `?v=` bump/consistency guard (kills the r390-392 "nothing reached
+  live" class). ALWAYS-ON lane.
+- `dev/check-secrets.sh` — value-shaped committed-secret scan. ALWAYS-ON.
+- `dev/check-invariants.js` — SSOT drift guards: drill membership (campaign/gate/track ⊆ groups; tracks
+  partition the catalog; PARS keys valid) + every SKINS key has a per-class notch (guards the #121
+  pill-fallback class). ALWAYS-ON.
+- `dev/e2e-smoke.js` extended with **C2** (HOTKEY_PARS === CHALLENGES.par) + **C4** (de-hint: no chord in
+  player copy — matches modifier-combos/Alt-walks, NOT cell refs like F4).
+- `REPS=1 node dev/e2e-demo-replay.js navigation combo foot` — a **one-drill behavioral smoke** in the
+  ALWAYS-ON lane so cosmetic (themes/nav) changes can't skip all behavioral tests.
+- `supabase/migrations/20260723000000_sessions_guard.sql` — sessions leaderboard was client-forgeable;
+  now mirrors `runs_guard` (hard rejects + rate-limit + shadow-flag + admin queue). **NOTE:** deploys via
+  `supabase-deploy.yml` on merge, but that pipeline has historically failed (missing token) — verify it
+  actually applied live (see G3 in PROJECT_REVIEW).
+- `_headers` — Cloudflare CSP + X-Frame-Options:DENY + nosniff + Referrer/Permissions-Policy.
+- Supabase CDN **pinned** `@2 → @2.110.8` + **SRI** across all HTML, the index.html async loader, and the
+  drill-page generator.
+
+**CADENCE / HOUSE RULES (current):** build → **local gate** (`python3 -m http.server 8791` with
+`dangerouslyDisableSandbox:true` + `run_in_background:true` to survive SIGURG; chromium at
+`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`; `NODE_PATH=<repo>/node_modules`) → **cache-bump**
+`?v=` (now gate-enforced) + regen drill pages if index.html changed → PR to `main` → **merge on green**
+(engine matrix ~8min; cosmetic lane ~2min) → **restart branch off main** (`git fetch origin main &&
+git checkout -B <branch> origin/main`; `git stash push -u`/`pop` around it to carry WIP; push
+`--force-with-lease`). Repo auto-merge is ON but the API refuses while checks are pending, so the
+reliable pattern is: create PR → poll the gate → squash-merge when `success`. Commit trailer:
+`Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>` + `Claude-Session:` (set
+`git config user.email noreply@anthropic.com` so commits verify).
+
+**OPEN ITEMS / BACKLOG (nothing is blocking; priority order):**
+1. **Bug #6 (deferred from the scan)** — 9 model/build drills (`opmodel`, `isbuild`, `cfslink`, `bsbuild`,
+   `threestmt`, `lbobuild`, `dcfbuild`, `debtblock`, `nwcsched`) have stale `targets[]` arrays → the
+   on-board next-step ring + guided-mode rail point at wrong/empty cells. **No misgrade** (checks are
+   correct). Needs a per-drill `targets` rebuild to match each drill's `checks` order + real cells (use
+   debtsched/dcf/wacc/fcfbuild/schedule/revolver/cascade/wk13/dashcover as the correct pattern). Details
+   in `dev/BUG_SCAN.md`.
+2. **Wolf-gated visual tuning** — the founder oil-slick + the dialed-up fx are live; Wolf may react and
+   want further tuning (he iterates on renders). Render harness: `scratchpad/shot-allskins.js` renders
+   all 31 frames; `shot-founder.js` for a focused card.
+3. **Deferred cleanups (inert/low-value, NOT urgent — see PROJECT_REVIEW Segment B/C/D):** B1/B2 dead
+   fx-generator + ornament deletion (⚠️ NOT cleanly dead — `hkFrameBucket`/`{bucket}` feed live plaque
+   rendering from 4 files; `nebula`/`navchart` share `stars()`; do only in a dedicated all-31-frame
+   render-validated PR), C5 clipboard `copyFormat`, D4 CHARPX→`measureText`. All are zero-user-benefit
+   refactors — fine to leave.
+4. **SEGMENT E — ⏸ HELD UNTIL LAUNCH (Wolf).** Stripe go-live (E1 JWT-derive user_id first), billing
+   backend (E2), the go-live flag flip + remove the `wolfcdrake@gmail.com` backdoor (E3), interview mode
+   (E4). Do NOT start any E item until Wolf explicitly opens the launch.
+
+**KEY CODE POINTERS (updated this session):**
+- Engine: `index.html` — `evalFormula`/`fn` (~7915, +D1 lookup/logical/date pack ~8071), `recalc`
+  (~9930, dynamic cap), `fillFrom` (~10063, `copyFmt` helper + single-line fix ~10070), `flushRunOutbox`
+  (~15915, race fix), canonical-XP query (~14720, `created_at`), `render`/grid-sizing (~8342, `__ROW_CAP`).
+- Cards: `themes.js` — `hkInitCardFx` (~1366; `elabFor`/`applyEL` EL by tier ~1374; `platinum` founder
+  oil-slick gen ~1460 + draw ~1662), `SKINS` map (~1253; founder tuple ~1265), `hkFrameEarned` (~898;
+  pro gate ~922), `HK_RANK` levelOf/computeXP (~662-745), `hkPlayerCard` (~1996). `nav.css` — `.hkf-tab`
+  notch taxonomy (~708), `.hk-frame-founder` dark base (~848).
+- Nav/data: `nav.js` — `loadProfileData` promise memo (~478), sign-out wipe (~452), owner shim (~360),
+  `hydrateLevel`/`maybeRankedNudge` (~318-355).
+- CI/guards: `.github/workflows/gate.yml`, `dev/check-*.js`, `dev/e2e-formulas.js`, `dev/e2e-grid-height.js`.
 
 ---
 
