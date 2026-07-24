@@ -1606,12 +1606,12 @@
 </style>
 <script src="drills.js?v=278"></script>
 <link rel="stylesheet" href="nav.css?v=208">
-<script src="themes.js?v=307"></script>
+<script src="themes.js?v=308"></script>
 
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=296"></script>
+<script src="nav.js?v=297"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -7923,6 +7923,9 @@ function evalFormula(expr){
     if(mIE){
       let d=1, j=mIE[0].length, cut=-1;
       for(; j<s.length; j++){ const ch=s[j];
+        /* r416 bugfix: a "…" string literal is opaque to the arg splitter — a comma/paren INSIDE
+           quotes (=IFERROR(A1&", "&B1,"") · =IFERROR(FIND(")",A1),0)) must not be read as structure. */
+        if(ch==='"'){ j++; while(j<s.length && s[j]!=='"') j++; continue; }
         if(ch==='(') d++;
         else if(ch===')'){ d--; if(d===0) break; }
         else if(ch===','&&d===1&&cut<0) cut=j; }
@@ -9925,10 +9928,12 @@ function syncTabs(){
 }
 
 function recalc(){
-  /* r415-review D3: cap raised 8 -> 24 so a long dependency spine (deep roll-forwards) has
-     headroom to converge; curated drills settle in a handful of passes, so this never changes
-     a convergent result, it only removes a silent under-computation ceiling. */
-  const CAP=24; let converged=false;
+  /* r415-review D3 + r416 bugfix: an ACYCLIC dependency chain converges in at most (#formula cells)
+     passes even in the worst evaluation order (each pass finalizes ≥1 more cell), so cap at that +
+     margin. A fixed 24 could mis-diagnose a legit >24-deep chain as circular and wrongly ZERO its
+     frontier cells; sizing the cap to the sheet guarantees only a REAL cycle fails to converge. */
+  let fcount=0; for(const k in S.cells){ if(S.cells[k] && S.cells[k].formula) fcount++; }
+  const CAP=Math.min(300, fcount+4); let converged=false;
   for(let pass=0; pass<CAP; pass++){
     let changed=false;
     for(const k in S.cells){ const c=S.cells[k]; if(c && c.formula){
@@ -10067,13 +10072,17 @@ function fillFrom(dir){ // 'down' | 'up' | 'right' | 'left'
   /* r407 (Wolf audit F2): a SINGLE-CELL Ctrl+D copies the cell ABOVE into it, Ctrl+R the cell
      to the LEFT — Excel's most-used fill. Previously a dead no-op. (up/left have no single-cell
      chord in Excel, so they stay no-ops.) */
+  /* r416 bugfix: a ONE-ROW-tall selection under Ctrl+D (or one-column-wide under Ctrl+R) fills EVERY
+     cell in the line from its above/left neighbour — not just the first. The old code stamped only
+     (r1,c1), leaving the rest of a single-line multi-cell selection blank (Excel fills them all). A
+     true single cell is just the length-1 case of these loops. */
   if(vertical && r.r1===r.r2){
     if(dir!=='down' || r.r1<=1) return;
-    pushUndo(); stamp(ensure(r.r1,r.c1), get(r.r1-1,r.c1), 1, 0); commitAction(); return;
+    pushUndo(); for(let c=r.c1;c<=r.c2;c++) stamp(ensure(r.r1,c), get(r.r1-1,c), 1, 0); commitAction(); return;
   }
   if(!vertical && r.c1===r.c2){
     if(dir!=='right' || r.c1<=1) return;
-    pushUndo(); stamp(ensure(r.r1,r.c1), get(r.r1,r.c1-1), 0, 1); commitAction(); return;
+    pushUndo(); for(let rr=r.r1;rr<=r.r2;rr++) stamp(ensure(rr,r.c1), get(rr,r.c1-1), 0, 1); commitAction(); return;
   }
   pushUndo();
   if(dir==='down'){
@@ -14717,7 +14726,7 @@ async function updateRankPill(){
   try{
     const [p,r,se] = await Promise.all([
       sb.from('profiles').select('id'),
-      sb.from('runs').select('user_id,challenge,time_ms').eq('mouse_used',false).order('time_ms',{ascending:true}),
+      sb.from('runs').select('user_id,challenge,time_ms,created_at').eq('mouse_used',false).order('time_ms',{ascending:true}),   /* r416 bugfix: created_at is REQUIRED — computeXP buckets by UTC day; omitting it collapsed every run into one bucket and under-counted XP (the level-4-in-game/13-on-card divergence). Matches nav.js:485. */
       sb.from('sessions').select('user_id,mode').eq('user_id', me_user.id)   /* r371: sessions pay xp — every caller must pass them */
     ]);
     const runs=r.data||[]; const mySes=(se&&se.data)||[];
@@ -15916,13 +15925,17 @@ async function flushRunOutbox(){
   try{
     if(!sb || !me_user || isAnonUser()) return;
     let q=_outboxRead(); if(!q.length) return;
-    const keep=[];
+    const posted=new Set();
     for(const row of q){
       try{ const { error } = await sb.from('runs').insert(row);
-        if(error && !/duplicate|conflict|unique/i.test(error.message||'')) keep.push(row);   // transient → retry later
-      }catch(e){ keep.push(row); }
+        if(!error || /duplicate|conflict|unique/i.test(error.message||'')) posted.add(JSON.stringify(row));   // posted or permanent → drop
+      }catch(e){ /* transient → leave it in the outbox for next time */ }
     }
-    _outboxWrite(keep);
+    /* r416 bugfix: RE-READ at write time and remove only the rows we actually posted. The old code
+       overwrote the outbox with a snapshot taken BEFORE the awaits, silently dropping any run
+       enqueued while we were posting — the exact "network blip loses a real time" the outbox exists
+       to prevent. Match by value (fresh objects from a re-parse won't share identity). */
+    _outboxWrite(_outboxRead().filter(r=>!posted.has(JSON.stringify(r))));
   }catch(e){}
 }
 async function recordRun(t){

@@ -450,7 +450,7 @@
       ['hotkey_pb','hk_runs_lite','hotkey_solves','hotkey_streak','hk_camp_xp','hk_clears',
        'hk_clears_day','hk_key_counts','hk_keys_lifetime','hk_keystats_seeded','hk_ach_flags',
        'hk_ach_seen','hk_feat_ach','hk_band_best','hk_dc_done','hk_ranked','hk_seen_tier',
-       'hk_xlv','hk_last_drill','hk_placement_done'].forEach(k=>localStorage.removeItem(k));
+       'hk_xlv','hk_last_drill','hk_placement_done','hk_beta_unlock'].forEach(k=>localStorage.removeItem(k));   /* r416 bugfix: hk_beta_unlock (the master cosmetic-unlock flag the owner shim sets) was NOT wiped on sign-out, so the next account on a shared machine inherited every skin unlocked */
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
         if(k && k.indexOf('hk_ghost_')===0) localStorage.removeItem(k); }   // per-drill ghost replays
     }catch(e){}
@@ -475,11 +475,11 @@
   /* r406: memoized for the page view — navRank now hydrates XP for EVERY signed-in user
      (not just opted-in), and the rank-click card also loads it; one fetch, reused. */
   let __pdCache=null;
-  async function loadProfileData(){
-    if(__pdCache) return __pdCache;
-    __pdCache = await __loadProfileData();
-    return __pdCache;
-  }
+  /* r416 bugfix: memoize the PROMISE, not the resolved value. The old code assigned __pdCache only
+     AFTER the await, so the burst of concurrent callers on page load (navRank, hydrateLevel,
+     maybeRankedNudge, renderProfile) each saw null and fired a full profiles+ENTIRE-runs-table+
+     sessions fetch. Caching the in-flight promise collapses them to one. */
+  function loadProfileData(){ return __pdCache || (__pdCache = __loadProfileData()); }
   async function __loadProfileData(){
     const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach,school_tag,show_school,team_code');
     const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at,keystrokes,optimal').eq('mouse_used',false).order('time_ms',{ascending:true});   /* r371: keystrokes+optimal feed the efficiency feats */
