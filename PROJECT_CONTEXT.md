@@ -70,6 +70,19 @@ of it is autonomous; do NOT start any E item until Wolf explicitly opens the lau
 C5 clipboard `copyFormat`, the drill-page stale-asset-version fix, D4. The full system map + segmented
 pipeline lives in `dev/PROJECT_REVIEW.md`.
 
+**r416b — DRILL-PAGE STALE-VERSION FIX (shipped) + remaining cleanups re-classified.** The drill-page
+generator now derives shared-asset `?v=` from index.html (was hard-pinned at nav.css v188 / drills.js
+v275 / themes.js v280 / nav.js v288 → the 82 SEO pages served stale JS/CSS); regenerated to current.
+Investigated the remaining "safe [auto]" deferrals and found they're NOT clean wins: **B1** ornament
+deletion is entangled with live plaque rendering (`hkFrameBucket`/`{bucket}` passed from nav.js/lb.js/
+index.html/profile.html frame picker); **B2** fx generators share live helpers (`nebula`/`navchart`
+call `stars()`; `prism` kind→`facet` vs `prism()` gen name-collision); **C5** — a correct `copyFmt`
+already exists (index.html:10063), unifying paste paths risks behavior; **D4** CHARPX couples grading.
+All are INERT-or-WORKING refactors with ZERO user benefit → left in place (fine at runtime); if ever
+touched, do a dedicated PR with the all-31-frame render harness (`scratchpad/shot-allskins.js`).
+**No autonomous high-value work remains** — next is Wolf-gated: the held **fx dial-up** (render
+approval) and **Segment E** (launch).
+
 **CADENCE:** branch `claude/pipeline-engine-integration-laki0l`; after each merge RESTART off main
 (`git fetch origin main && git checkout -B <branch> origin/main`), push with `--force-with-lease`.
 Run the FULL local gate before pushing (smoke is the fast net for cosmetic pushes; it ALSO validates

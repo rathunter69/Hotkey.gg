@@ -52,7 +52,9 @@ _Each block is sized to be one focused session. Tags: **[auto]** safe to run aut
 >
 > **SEGMENT E — ⏸ HELD UNTIL LAUNCH (Wolf, r416).** All launch/monetization/product-gated; do not start until Wolf opens the launch. See Segment E below.
 >
-> **NEXT UP (safe, autonomous, no business decisions):** the remaining [auto] deferrals — **B1/B2** (dead fx/ornament deletion, now that the `stars()` live-helper entanglement is mapped), **C5** (clipboard `copyFormat` helper), the **drill-page stale-asset-version** fix (generator hard-codes nav.css v188 / drills.js v275 / themes.js v280 / nav.js v288), and **D4** (CHARPX→`measureText`, with visual validation). Plus the held **fx dial-up** awaiting Wolf's render approval. **Deferred with cause:** B1/B2 bulk dead-code deletion (verification found the live `nebula` PRO skin shares the `stars()` helper with dead generators → needs per-skin visual validation in its own PR) and C5 clipboard `copyFormat` helper (engine refactor, own PR). Drift discovered while pinning A5: the drill-page generator hard-codes **stale** asset versions (nav.css v188 / drills.js v275 / themes.js v280 / nav.js v288) — the 82 SEO pages serve old JS/CSS; fold into a "generator reads versions from a shared source" follow-up.
+> **STATUS (r416b):** ✅ **drill-page stale-version fix shipped** (generator derives `?v=` from index.html). The other "safe deferrals" were investigated and **re-classified as low-value/high-risk to rush to live** — see the ⚠️ notes on Segment B (B1/B2 proven live-entanglement) and C5 (a correct `copyFmt` already exists; unifying paste paths risks behavior). **D4** (CHARPX→`measureText`) still couples grading+`####` overflow → dedicated visual-validated PR. All are **inert-or-working refactors with zero user benefit** — fine to leave until there's a reason to touch them.
+>
+> **TRULY NEXT (needs Wolf):** the held **fx dial-up** (awaiting render approval) and **Segment E** (launch). No autonomous high-value work remains without a business/product decision — the codebase is in good shape. **Deferred with cause:** B1/B2 bulk dead-code deletion (verification found the live `nebula` PRO skin shares the `stars()` helper with dead generators → needs per-skin visual validation in its own PR) and C5 clipboard `copyFormat` helper (engine refactor, own PR). Drift discovered while pinning A5: the drill-page generator hard-codes **stale** asset versions (nav.css v188 / drills.js v275 / themes.js v280 / nav.js v288) — the 82 SEO pages serve old JS/CSS; fold into a "generator reads versions from a shared source" follow-up.
 
 ### SEGMENT A — CI / Safety hardening  ·  P0  ·  mostly [auto]
 The highest-leverage, lowest-visual-risk work. Prevents the failures this project has actually hit.
@@ -63,8 +65,19 @@ The highest-leverage, lowest-visual-risk work. Prevents the failures this projec
 - **A5 [auto·S]** **Pin the Supabase CDN** script to an exact version + SRI (`integrity`), or self-host — floating `@2` tag with no SRI is a supply-chain hole.
 - **A6 [auto·S]** Widen the cosmetic lane: add `themes.js|nav.js|nav.css` to the engine-scope path set, OR add a one-drill behavioral smoke — most real traffic is cosmetic rounds that skip the deep matrix.
 
-### SEGMENT B — Dead-code & tech-debt subtraction  ·  P1  ·  [auto]
-Pure removal, verified unreachable, smoke-gated. Big maintainability win, near-zero risk.
+### SEGMENT B — Dead-code & tech-debt subtraction  ·  P1  ·  ⚠️ NOT as clean as it looked
+**r416 re-scoping (do NOT rush to live):** B3 shipped (#227). B1/B2 are **inert** (never run → zero
+user benefit) yet carry real silent-break risk, and verification found entanglement:
+- **B1 ornament machinery is NOT cleanly dead.** `hkFrameBucket()` + `{bucket}` are passed to
+  `hkFrameOrnaments` for plaque frames from **4 live files** (nav.js:821/904/913, lb.js:667,
+  index.html:15670, profile.html:550 — the frame picker). True unreachability depends on every
+  caller's SKINS/`mini`/opts path; must be traced before deleting.
+- **B2 fx generators share live helpers** — the shipping `nebula` (PRO) + `navchart` call `stars()`,
+  `tab()`/`facet()` are live, and there's a `prism` KIND (→`facet`) vs `prism()` GENERATOR (via dead
+  `holo`) name-collision. Removal is per-generator surgery, not a bulk delete.
+Verdict: only do B1/B2 in a **dedicated PR** with a full before/after render of all 31 frames
+(baseline harness: `scratchpad/shot-allskins.js` → 31/31, 29 canvases, 0 errors) + Wolf's eye. The
+inert code costs nothing at runtime, so leaving it is a valid choice.
 - **B1 [auto·M·cosmetic]** Delete the **dead ornament machinery** in themes.js (unreachable since plaques/engraved/foil/heraldic became SKINS): the `if(id==='engraved'/'foil'/'heraldic'/'plaque-'/'charter')` tail (`~1320-1337`), `GLINT`/`corners`/`ENG`/`FOIL`/`HER`/`CHA` consts, `gemCorner`/`gems`/`PLQ`, `hkFrameBucket`, + orphaned `nav.css` `.hkf-cn/.hkf-med/.gem*/.hkf-serial/.hk-frame-charter` rules.
 - **B2 [auto·M·cosmetic]** Prune **dead fx generators + draw branches**: `diamondfx, galaxy, aurora, holorain, gold, lux, pin/pinstripe, cosmic/comet, holo` + the `stars/sun` dispatch tail (~200 lines, ~8 generators no SKIN references).
 - **B3 [auto·S·cosmetic]** Fix the **fx re-open bug**: `cv._hkfx` is set permanently, so a card re-inserted (same node, e.g. a re-opened modal) won't re-animate — reset it on detach or key idempotency off "loop running."
@@ -75,7 +88,7 @@ Kills the recurring "hand-copied fact drifted" bug class (Theme II.1).
 - **C2 [auto·S]** Assert `HOTKEY_PARS[k]===CHALLENGES[k].par` for all 82 in the gate (or auto-derive it) — removes a 5th hand-synced copy.
 - **C3 [auto·M·cosmetic]** Collapse the **3 parallel skin lists** (`HK_FRAMES`/`SKINS`/notch-selector/border-spin) into one registry (extend each `HK_FRAMES` entry with its render tuple + notch shape + spin flag; derive CSS/SKINS or assert agreement) — prevents the #121 "achievement skins fell to the pill" class.
 - **C4 [auto·S]** Add a **de-hinting CI check** — fail if any `prompt`/checklist `label`/`meta.desc` contains a chord token (Ctrl+/Alt+/F-key). Enforces the most-repeated-in-review convention.
-- **C5 [auto·S]** Add a single `copyFormat(dst,src)` helper for the clipboard format-field set (dup'd ≥4 places; caused the r407 fill bug).
+- **C5 [auto·S]** Add a single `copyFormat(dst,src)` helper for the clipboard format-field set (dup'd ≥4 places; caused the r407 fill bug). **r416 finding:** a correct full-field `copyFmt(dst,src)` ALREADY exists at `index.html:10063` (in `fillFrom`); C5 is only extracting it to also cover `copySel`/`doPaste`. LOW value + real risk: each paste path may copy an *intentional* subset (paste-formats vs cut-carry vs fill), so blind unification can change paste behavior. Deferred — do only if a concrete paste-format bug appears, with per-path verification.
 
 ### SEGMENT D — Engine depth  ·  P1/P2  ·  [Wolf] priorities
 Needs your call on which muscles matter for the target user / drill roadmap.
