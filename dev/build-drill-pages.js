@@ -379,7 +379,7 @@ ${d.chords.length ? `
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">${d.chords.some(c => c.startsWith('Alt>')) ? `
     <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>` : ''}
-${d.chords.map(c => { const what = refLookup(c); const use = useLookup(c); return `    <div class="scb"><div class="sch"><kbd>${esc(dispWin(c))}</kbd><span class="m">${esc(macForm(c))} on mac</span>${what ? `<span class="what">${esc(what)}</span>` : ''}</div>${use ? `<div class="use">${esc(use)}</div>` : ''}</div>`; }).join('\n')}${d.fns.length ? `
+${d.chords.map(c => { const what = (refLookup(c)||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim(); const use = useLookup(c); return `    <div class="scb"><div class="sch"><kbd>${esc(dispWin(c))}</kbd><span class="m">${esc(macForm(c))} on mac</span>${what ? `<span class="what">${esc(what)}</span>` : ''}</div>${use ? `<div class="use">${esc(use)}</div>` : ''}</div>`; }).join('\n')}${d.fns.length ? `
     <div class="fnline">functions you'll type: ${d.fns.map(f => `<b style="color:var(--text)">${esc(f)}()</b>`).join(' · ')}</div>` : ''}
   </div>` : ''}
 ${d.req ? `
