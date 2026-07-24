@@ -11242,6 +11242,11 @@ const GUIDE_ALTS=[
   [/ctrl<\/kbd>\+<kbd>i<\/kbd>/i, 'alt h 2'],   /* r356: engine-live since r229/r351 — the guide never said so */
   [/ctrl<\/kbd>\+<kbd>u<\/kbd>/i, 'alt h 3'],
   [/ctrl<\/kbd>\+<kbd>1<\/kbd>/i, 'alt o e'],
+  /* r423 (Wolf round-2 §9): compact keyboards (laptops, 60-75% boards) have no dedicated
+     Home/End — the hardware sends the real key for Fn+arrow (Fn+→ = End), so the engine
+     already hears it; these ladder notes teach the finger position. */
+  [/ctrl<\/kbd>\+<kbd>home<\/kbd>/i, 'laptop: ctrl+fn+←'],
+  [/ctrl<\/kbd>\+<kbd>end<\/kbd>/i, 'laptop: ctrl+fn+→'],
 ];
 /* r143: the plugin layer follows you into guided mode — when a profile is active,
    steps that have a live plugin chord say so (verified engine-live chords only). */

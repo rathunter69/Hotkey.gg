@@ -709,6 +709,73 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r.rowSr.c1 === 1 && r.rowSr.c2 === 10, 'Shift+Space covers every rendered column (mirror parity)', r.rowSr);
   }
 
+  console.log('P. selection tint reads on seeded fills (r423 round-2 §4)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 21; loadChallenge('pastes');   // Total row B9:E9 ships fill:'gray'
+      setDemoSel('B9:E9');
+      const td = document.querySelector('#grid td.sel.fill-gray') || document.querySelector('#grid td[data-r="9"][data-c="3"]');
+      const ov = td ? getComputedStyle(td, '::before') : null;
+      const bg = ov ? ov.backgroundColor : '';
+      const a = (m => m ? (m[4] !== undefined ? parseFloat(m[4]) : 1) : 0)(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bg));
+      const light = { cls: td ? td.className : '', bg, a };
+      document.documentElement.setAttribute('data-dark', '1'); render();
+      const td2 = document.querySelector('#grid td.sel.fill-gray');
+      const ov2 = td2 ? getComputedStyle(td2, '::before') : null;
+      const bg2 = ov2 ? ov2.backgroundColor : '';
+      const a2 = (m => m ? (m[4] !== undefined ? parseFloat(m[4]) : 1) : 0)(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(bg2));
+      document.documentElement.removeAttribute('data-dark'); render();
+      // the anchor stays the clear window — it renders .active (never .sel), so no veil paints on it
+      setDemoSel('B9:E9');
+      const anchor = document.querySelector('#grid td.active');
+      const aOv = anchor ? getComputedStyle(anchor, '::before') : null;
+      const anchorClear = !!anchor && !anchor.classList.contains('sel') &&
+        (!aOv || aOv.backgroundColor === 'rgba(0, 0, 0, 0)' || aOv.display === 'none' || aOv.content === 'none');
+      return { light, a2, anchorClear };
+    });
+    ok(/sel/.test(r.light.cls) && /fill-gray/.test(r.light.cls) && r.light.a >= 0.15,
+      'dragging across the grey total row paints a visible veil OVER the seeded fill (light sheet)', r.light);
+    ok(r.a2 >= 0.15, 'the veil holds on the dark-chrome sheet too (general overlay, no per-drill recolor)', r);
+    ok(r.anchorClear, 'the anchor cell keeps its clear window inside the selection (r345 kept)', r);
+  }
+
+  console.log('O. compact-keyboard Home/End (r423 round-2 §9 — Fn+arrow arrives as the real key)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults(); loadChallenge('foot');
+      // a 60-75% board's Fn+→ arrives as key='End' with NO meaningful code — the handlers
+      // must be e.key-based, so an event without a physical End key still lands
+      const fire = (init) => { const ev = new KeyboardEvent('keydown', Object.assign({ cancelable: true, bubbles: true }, init));
+        document.dispatchEvent(ev); return ev.defaultPrevented; };
+      setDemoSel('C5');
+      const u = usedRange();
+      const endP = fire({ key: 'End', ctrlKey: true, code: '' });
+      const atEnd = S.active.r === u.r && S.active.c === u.c;
+      const homeP = fire({ key: 'Home', ctrlKey: true, code: '' });
+      const atHome = S.active.r === 1 && S.active.c === 1;
+      // shift extension rides the same key path
+      fire({ key: 'End', ctrlKey: true, shiftKey: true, code: '' });
+      const shiftSel = !!S.sel && selRange().r2 === u.r && selRange().c2 === u.c;
+      // mac: ⌘+Fn+→ arrives as key='End' with metaKey — hkMacAdapt maps meta→ctrl
+      hkSetPlatform(true);
+      setDemoSel('C5');
+      fire({ key: 'End', metaKey: true, code: '' });
+      const macEnd = S.active.r === u.r && S.active.c === u.c;
+      hkSetPlatform(false);
+      // and the hint ladder carries the compact-keyboard note on Ctrl+Home/Ctrl+End steps
+      const note1 = guideAltNote('<kbd>ctrl</kbd>+<kbd>home</kbd>');
+      const note2 = guideAltNote('<kbd>ctrl</kbd>+<kbd>end</kbd>');
+      return { endP, atEnd, homeP, atHome, shiftSel, macEnd,
+        lad1: /ctrl\+fn\+←/.test(note1), lad2: /ctrl\+fn\+→/.test(note2) };
+    });
+    ok(r.endP && r.atEnd, 'Ctrl+End with key="End" and no physical code jumps to the used range (key-based path)', r);
+    ok(r.homeP && r.atHome, 'Ctrl+Home with key="Home" and no physical code snaps to A1', r);
+    ok(r.shiftSel, 'Ctrl+Shift+End extends the selection off the same key-based path', r);
+    ok(r.macEnd, 'mac layer: ⌘+End (Fn+→ on a MacBook) rides hkMacAdapt into the same jump', r);
+    ok(r.lad1 && r.lad2, 'hint ladder carries the compact-keyboard note (laptop: ctrl+fn+←/→)', r);
+  }
+
   console.log('Z. page errors');
   ok(errs.length === 0, 'zero page errors across the suite', errs.slice(0, 4));
 
