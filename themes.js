@@ -678,6 +678,7 @@ window.HK_RANK = {
     {name:'Second-Year Analyst', cls:'tier-diamond',  att:18, pct:0.15, req:'18 drills \u00b7 top 3% \u2014 the true final boss'},
   ],
   PROVISIONAL_W: 6,   // weighted-board exposure needed before ranks above Summer Analyst unlock
+  RANKED_MIN_LVL: 10, // r417 audit: level gate for Ranked opt-in — SSOT here; nav.js + lb.js read it (was comment-synced duplicates)
   tierOf(avgPct, att, wsum){
     const T=this.TIERS;
     if(avgPct===null || (att||0)<5) return {...T[0], i:0, bucket:null, full:T[0].name, provisional:false};   // MBA Associate — the floor

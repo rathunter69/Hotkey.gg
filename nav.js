@@ -332,7 +332,7 @@
      lb.js RANKED_MIN_LVL) but hasn't opted into ranked, surface the "Ranked Unlocked" card.
      Fires at most once per session; "maybe later" snoozes it 3 days; entering ranked ends it.
      Suppressed on the leaderboard (the your-card gate already prompts there). */
-  const RANKED_MIN_LVL = 10;
+  const RANKED_MIN_LVL = (window.HK_RANK&&HK_RANK.RANKED_MIN_LVL)||10;   // r417 audit: SSOT in themes.js HK_RANK (was a comment-synced duplicate)
   async function maybeRankedNudge(){
     try{
       if(/leaderboard\./.test(location.pathname)) return;
@@ -450,9 +450,10 @@
       ['hotkey_pb','hk_runs_lite','hotkey_solves','hotkey_streak','hk_camp_xp','hk_clears',
        'hk_clears_day','hk_key_counts','hk_keys_lifetime','hk_keystats_seeded','hk_ach_flags',
        'hk_ach_seen','hk_feat_ach','hk_band_best','hk_dc_done','hk_ranked','hk_seen_tier',
-       'hk_xlv','hk_last_drill','hk_placement_done','hk_beta_unlock'].forEach(k=>localStorage.removeItem(k));   /* r416 bugfix: hk_beta_unlock (the master cosmetic-unlock flag the owner shim sets) was NOT wiped on sign-out, so the next account on a shared machine inherited every skin unlocked */
+       'hk_xlv','hk_last_drill','hk_placement_done','hk_beta_unlock',
+       'hk_dev_unlock','hk_dc_top10','hk_seen_frames','hk_run_outbox'].forEach(k=>localStorage.removeItem(k));   /* r416 bugfix: hk_beta_unlock (the master cosmetic-unlock flag the owner shim sets) was NOT wiped on sign-out, so the next account on a shared machine inherited every skin unlocked. r417 audit: hk_dev_unlock (ranked-gate bypass leaked to the next account), hk_dc_top10 (blocked the next account's daily bounty), hk_seen_frames (stale reveal diff), hk_run_outbox (foreign-user rows retried forever under RLS) */
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
-        if(k && k.indexOf('hk_ghost_')===0) localStorage.removeItem(k); }   // per-drill ghost replays
+        if(k && (k.indexOf('hk_ghost_')===0 || k.indexOf('hk_cert_')===0)) localStorage.removeItem(k); }   // per-drill ghost replays + cert-offer latches (r417 audit: a surviving hk_cert_<track> latch blocked the next account's cert offers)
     }catch(e){}
     // r311 (Wolf): sign-out kept "coming back" because the race that redirects after 1200ms
     // can fire BEFORE supabase's network signOut clears its persisted token — the reload then

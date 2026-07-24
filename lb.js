@@ -567,7 +567,7 @@ document.addEventListener('click', e=>{
   if(el && DATA){ showPublicCard(el.getAttribute('data-uid')); }
 });
 
-const RANKED_MIN_LVL = 10;
+const RANKED_MIN_LVL = (window.HK_RANK&&HK_RANK.RANKED_MIN_LVL)||10;   // r417 audit: SSOT in themes.js HK_RANK (was a comment-synced duplicate)
 function campaignComplete(){
   try{
     const PB=JSON.parse(localStorage.getItem('hotkey_pb')||'{}');
@@ -659,8 +659,14 @@ function heroHtml(){
   let __fCls='', __fOrn='';
   try{
     const __mp=(DATA.profs||[]).find(p=>p.id===meId);
-    const __fv=__mp && __mp.flair;
-    if(__fv && /^[a-z0-9_-]{1,32}$/i.test(__fv)){
+    const __raw=__mp && __mp.flair;
+    /* r417 audit: flair is now often a JSON loadout blob (the customizer) — parse it via
+       hkFlair (same as showPublicCard above / nav.js rank-click card) so the hero wears the
+       equipped skin, instead of failing the bare-id test and rendering UNSKINNED.
+       hkFlair.frame is already validated against HK_FRAMES (XSS-safe). */
+    const __fv=window.hkFlair ? window.hkFlair(__raw).frame
+      : (__raw && /^[a-z0-9_-]{1,32}$/i.test(__raw) ? __raw : null);
+    if(__fv){
       if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__fv)){
         __fCls=' hk-frame-'+__fv;
         /* r376: gem cut = the bucket held at the best tier (hk_ach_flags, via nav.js) */
