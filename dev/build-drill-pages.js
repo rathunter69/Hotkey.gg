@@ -17,6 +17,15 @@ const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'drills');
 const SITE = 'https://www.hotkey.gg';
 
+/* r416-review: DERIVE the shared-asset ?v= from index.html so the 82 drill pages can never
+   serve a stale version again — they had been hard-pinned at nav.css v188 / drills.js v275 /
+   themes.js v280 / nav.js v288 while the live site moved on. Because the drill-page drift guard
+   regenerates + diffs on any index.html change, a future cache-bump now forces the pages back
+   into lockstep automatically instead of silently leaving them behind. */
+const IDX = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+const ver = (asset, fallback) => { const m = IDX.match(new RegExp(asset.replace('.', '\\.') + '\\?v=(\\d+)')); return m ? m[1] : fallback; };
+const VER = { navcss: ver('nav.css', '207'), drills: ver('drills.js', '278'), themes: ver('themes.js', '306'), navjs: ver('nav.js', '296') };
+
 const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const strip = s => String(s == null ? '' : s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
 const jstr = s => JSON.stringify(String(s == null ? '' : s));
@@ -301,20 +310,20 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.8" integrity="sha384-Tve8O+C6PBzsIMK/IRCwHbi8fyEzXIlIs6OfVBZHubplwYhaQF/4Mzxqgg+pp/oy" crossorigin="anonymous"><\/script>
 <style>${CSS}</style>
-<link rel="stylesheet" href="nav.css?v=188">
-<script src="drills.js?v=275"><\/script>
+<link rel="stylesheet" href="nav.css?v=${VER.navcss}">
+<script src="drills.js?v=${VER.drills}"><\/script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
   window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
   window.NAV_ACTIVE='';
 <\/script>
-<script src="themes.js?v=280"><\/script>
+<script src="themes.js?v=${VER.themes}"><\/script>
 <script type="application/ld+json">${ld}</script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=288"><\/script>
+<script src="nav.js?v=${VER.navjs}"><\/script>
 <div class="wrap">`;
 
   const FOOT = `
