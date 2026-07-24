@@ -751,6 +751,21 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(ah1.ctrlF, 'Ctrl+F is swallowed and opens Find & Replace (no browser find bar)');
   ok(ah1.chordDialogOneEsc, 'Esc closes a chord-opened dialog straight back to the grid');
 
+  /* r422 (pastes rework, DEPTH_PASS §4.3 engine note): the r418/r419 paste-TILING change must
+     never route paste-OPS through the tile loop — a 1-cell helper over an exact-multiple
+     selection broadcasts ONCE per destination cell (pastes' ×1000 divide across B5:E5). */
+  console.log('AH2. paste-op broadcast ×1 over an exact-multiple selection (r422 pastes regression)');
+  await fresh();
+  const ah2 = await run(() => {
+    const bc=()=>({...blankCell()});
+    S.cells['H4']={...bc(), value:2000}; S.cells['H5']={...bc(), value:5000}; S.cells['H6']={...bc(), value:9000};
+    S.cells['J2']={...bc(), value:1000}; render();
+    setDemoSel('J2'); demoKey({key:'c',ctrl:true});
+    setDemoSel('H4:H6'); demoKey({key:'Alt'}); demoKey({key:'e'}); demoKey({key:'s'}); demoKey({key:'i'}); demoKey({key:'Enter'});
+    return { a:S.cells['H4'].value, b:S.cells['H5'].value, c:S.cells['H6'].value };
+  });
+  ok(ah2.a===2 && ah2.b===5 && ah2.c===9, 'a 1-cell clip DIVIDE over a 3-cell selection divides each cell exactly once', JSON.stringify(ah2));
+
   console.log('AI. ribbon canon — W V G, H 3, Subtract, H O E, M P / M D (r418)');
   await fresh();
   const ai1 = await run(() => {

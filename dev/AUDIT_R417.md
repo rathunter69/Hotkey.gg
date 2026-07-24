@@ -171,7 +171,7 @@ Full report in session transcript. Key structure:
 - Class A re-hinting in drills.js picker metadata (NOT index.html): pastes label "Alt E S everything" (drills.js:67), anchor label "Pin it with F4" + tab "F4" (drills.js:108), tieout "F9 the suspect leg" (drills.js:133 + stale name index.html:6757).
 - Class B text≠grading: dcf desc wrong math "DF row × PV row" (drills.js:112); wk13 aha says 13 columns, build makes 8 (index.html:5214); foot prompt bans typed SUM but sumishF accepts (3985 vs 4018); bridge "never type a cell address"/"pointed" ungradeable (4266/4312); wirewalk "precedents and dependents" but ok=traceN>=2 (6752); versionup "match v1 exactly" recomputed live (7100/7106); unhide width 12 graded ≥~11 via GLOBAL colW (3149); drill prompt says "the column" → trap (1896); housestyle "trim the decimals" directionless (2159); filterpass cursor rider not graded (3031).
 - Class C banned verbs / non-imperative: ruleoff "box" (2232), dress "Circle"(2485)/"Dress"(2487)/"rule it"(2480, also ok accepts ball), liqbridge "Dress"(6954), grpfold do-nothing guard line (2975), rowops state-line (3621), gauntlet no-verb (2084), blocksel "centred" + bundle (3907), threestmt/balance/bsbuild state-report labels.
-- Class D jargon: balcheck "Corkscrew" (6520), debtsched "BB" (5358), housestyle "colour" (2091), series 3-op single line (4259), comps triple bundle (4103), pastes route-script labels (3281–3283).
+- Class D jargon: balcheck "Corkscrew" (6520), debtsched "BB" (5358), housestyle "colour" (2091), series 3-op single line (4259), comps triple bundle (4103), ~~pastes route-script labels (3281–3283)~~ ✔ r422 H6b-1: semantic beat labels per DEPTH_PASS §4.3.
 
 ## 15 shallowest drills (rank, drill, line, checks, one-line enrichment)
 1 series 4229 (1) — table to serve + metric row + split checks
@@ -192,7 +192,7 @@ Full report in session transcript. Key structure:
 Watchlist: retbridge 6055, football 6103, fcfbuild 4506.
 
 ## Label↔check mismatches (11)
-sort names not bound to sizes (4213, port scrub's _byName); bridge/foot/wirewalk/versionup/unhide/filterpass as above; pastes CHECK2 latch neither enforces nor frees (3269); anchor CHECK2 (2586) / dcfsens CHECK3 (6051) "one formula" without fill latch — systemic; tieout CHECK2 f9N>=1 only (6816); dress CHECK1 lenient (2460).
+sort names not bound to sizes (4213, port scrub's _byName); bridge/foot/wirewalk/versionup/unhide/filterpass as above; ~~pastes CHECK2 latch neither enforces nor frees (3269)~~ ✔ r422 H6b-1: pasteOpN latch dropped, CHECK2 grades pure end state; anchor CHECK2 (2586) / dcfsens CHECK3 (6051) "one formula" without fill latch — systemic; tieout CHECK2 f9N>=1 only (6816); dress CHECK1 lenient (2460).
 Clean exemplars: drill CHECK1, scrub, comps, cases, retbridge.
 
 ## Systemic patterns

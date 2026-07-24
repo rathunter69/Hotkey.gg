@@ -1,5 +1,35 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r422 H6b-1 — pastes depth-pass rework (DEPTH_PASS.md §4.3, wave 1)
+- **BEATS:** 5 core + ☆, chained on one fee schedule: transpose the Fees feed → divide
+  Trading into $000s → multiply Costs by −1 → paste FORMATS from the Total row onto the
+  new naked SUBTOTAL row + clear the carried top border (the spec's literal check-4 line)
+  → paste the totals into the deck row as values (finish beat). ☆ = color the transposed
+  Fees row blue (the feed now arrives raw/black so the ☆ is a real action); demo performs
+  the ☆ right after the transpose, before the final core beat (§2.2 authoring rule).
+- **LANGUAGE:** all six labels semantic (board labels: Fees feed / Trading / Costs /
+  Subtotal / Total / Deck hand-off), closed-verb first words (transpose · fix · flip ·
+  paste · paste · color), zero bare ranges — kills the AUDIT_R417 §D "route-script
+  labels" finding; CHECK2's half-latch (pasteOpN>=1) dropped for pure end-state grading
+  (§D label↔check finding also closed). CHALLENGES label aligned to drills.js
+  ('Paste Special everything').
+- **RANDOM (2 site axes + values):** feed column ∈ {G,H} (thin-gutter moat either way),
+  deck row ∈ {11,12} (spec's {10,11} pool +1 for the added Subtotal row; helpers ride
+  2 below), all figures rnd(), year jitter. Subtotal/Total seed their LIVE initial
+  values (no recalc runs at load — no more 0-rows on the fresh board).
+- **PAR:** 40/40 → 49/49 (5-seed sweep median 49 keys, 0% drift; house 1.00 s/key kept).
+  HOTKEY_PARS mirrored, drills.js?v=280→281 everywhere, drill pages regenerated.
+- **TESTS:** replay pastes 3/3 + full catalog ALL GREEN · guided PASS (railed, contained,
+  solvable) · depth-mechanics 55/55 · smoke 7 pages clean · static invariants clean ·
+  fit-sweep 78 clean · parity 155 PASS incl. NEW AH2 (a 1-cell clip paste-op DIVIDE over
+  an exact-multiple selection broadcasts exactly once — the r419 tiling regression the
+  spec page names) · alt-paths ALL 75 PASS with TWO pastes entries (chord-route alt via
+  ctrl+alt+v / alt h v s; op-order alt with formats FIRST on the naked Subtotal).
+  Harness QoL: URL env override added to alt-paths/par-sweep/fit-sweep (parallel
+  checkouts serve on their own ports, matching the r421 harnesses).
+- Pre-existing, untouched: tieout par-sweep REP FAIL and navigation drift flag appear
+  identically on the r421 baseline (maze-length seed noise / F9 drill known issue).
+
 ## r307 — the LANDING ZONE + tight bar (Wolf, watching a friend play)
 - **PASTE/MOVE DESTINATION GHOST:** while the clipboard is armed, a dashed accent outline
   shows exactly where the copied/cut block will land from the current cell (footprint =
@@ -5782,3 +5812,105 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   rapidfire 12 · par-sweep: 4 edited drills re-measured, declared = measured, drift ≤2% (lbobuild
   −8%→0 after re-declare) · drill pages regenerated (descs updated for the 4 drills). Cache: nav.js
   ?v 261→262, drills.js ?v 264→265 across all pages.
+
+## r422 — H6b-1: navigation depth-pass rework (DEPTH_PASS §4.1)
+- **BEATS (language pass, spec lines verbatim):** the 4 core beats now open with closed-list verbs
+  and name the board's objects — "Collect every pip on the way to the model room (n/6)" ·
+  "Select the whole model — the room's full block" · "Copy the model" · "Paste the model at the
+  drop zone corner". Chain and graders unchanged (pips → grab → copy → paste).
+- **☆ BONUS (new):** "Finish with zero wall bumps — a clean line through the maze"
+  [Penalty Seconds → clean-run ace]. Engine: S.bumpN latches every keydown a wall swallows
+  (move()'s maze branch, plain arrows AND zero-travel ctrl-shots); ok = pasted && bumpN 0, so the
+  ☆ lands at the finish, never blocks the win, and the demo (bump-free by construction) clears it.
+- **§2.6 TOUCH-LIST ADOPTION (flagship):** build() now declares touch:{cells:pips}; mazePip feeds
+  the generalized hkTouchLatch on pass-through (ctrl-shots collect mid-flight, which the render
+  tick can't see), hkTouchTick stands down on maze boards (a Home teleport must not collect), and
+  the pip counter reads S.touchGot. No behavior change; maze keeps its full-size pip glyphs (the
+  §2.6 corner dot is suppressed under S.maze — two dots on one cell would read as two objectives).
+- **TRI-LENGTH (kills the r417 §D 7v4 finding):** guide/targets rebuilt index-aligned at 5
+  (bonus included); targets are live functions — beat 1's ring rides the next uncollected pip,
+  the paste ring shows the 3×4 landing footprint. Registered as C9 in check-invariants.js
+  (static tri-length + exactly-one-☆ for reworked drills; navigation is entry #1).
+- **ALTS 1→2 (§1.8):** new route — ctrl-shot thread + SLOW GRAB (the model spanned with plain
+  shift+arrows, no ctrl+shift jumps). Both navigation alts green ×3 seeds.
+- **PAR:** demo untouched; sweep median swings 39–45 keys across maze seeds (braid variance),
+  declared parKeys 45 / par 35 stand, 0 flagged. Clocks std (52/40/35 via HK_BAND derivation).
+- **SUITE FLAKE FIX (base-reproducible):** e2e-depth-mechanics §G pressed 'r' while the r1 win's
+  async achievement card (Old Habits — first mouse-flagged win) could be open; its capture-phase
+  listener ate the key on slow machines (52/55 on UNMODIFIED base). The test now dismisses the
+  card first, exactly like a real player. 55/55 ×3 after.
+- GATE (all green): demo-replay navigation 3/3 WIN (self-verifying maze build green) · guided 1/1 ·
+  alt-paths 2/2 · depth-mechanics 55/55 ×3 · smoke 7 pages clean · check-invariants clean (incl.
+  new C9) · live negative check: bumped run wins with "☆ bonus missed", clean run "☆ bonus
+  cleared · +15 xp", splits 5/5, touchGot 6/6.
+
+## r422 — DEPTH PASS H6b-1: blocksel reworked to the §4.4 spec (first catalog drill on the r421 mechanics)
+- **blocksel "Assemble and format the summary"** — 7 core checks → **6 core + the catalog's first live ☆ bonus**
+  (the segment-name center+underline demoted per DEPTH_PASS §4.4: never blocks the win, latches at the win
+  moment, pays the one-time +15xp). Check labels are the §4.4 page's lines verbatim — verb-first from the
+  closed list, semantic board-label references (Copy the [Segment · Revenue] base · Cut the EBITDA and Op inc
+  columns · Build the margin column · Bold/Dollar-format/Right-align/Center). AUDIT_R417 §D Class C finding
+  (blocksel "centred" + bundled dress label) cleared.
+- **guide/targets re-aligned 7v7 with checks** (bonus line included, §1.9): the money beat gets its own target
+  rect (the B:D body) instead of riding the figures range; the ☆ gets its own guide line. demo() performs the
+  ☆ BEFORE the final core beat (§2.2 authoring rule — the win fires when the cores complete). prompt/req
+  updated to match (margin column, ☆ called out). Randomization as-is per spec: band shuffle × metric-column
+  shuffle × segment pool × rnd values.
+- **par retuned 46→41** — the ☆ demotion took the label dress out of the core win (42-key core × 0.98 s/key);
+  parKeys stays 47 = the measured demo median (☆ included, house rule). HOTKEY_PARS + CHALLENGES par moved
+  together; drill pages regenerated (par copy, prompt, JSON-LD), drills.js ?v 280→281 across all pages.
+- **ALTS 1→2**: the ribbon-variant route (labels step moved before the final core, mirroring the ☆ rule) + a
+  NEW different-op-order route — Op inc cut before EBITDA, margin built in POINTER MODE, ribbon fill down,
+  dress walked backwards (align → money → bold → box last).
+- **check-invariants C9 — the depth-pass rework registry** (§0 DoD #2): every reworked drill registers its
+  beat count; the guard statically asserts guide/checks/targets tri-length equality + exactly one bonus:true.
+  blocksel registered first; wave agents append theirs.
+- **e2e-depth-mechanics §G flake fixed** (pre-existing — clean r421 failed 2 of 3 runs): G's mouseUsed win
+  freshens "Old Habits", and the 450ms-staggered achievement sweep could pop its celebration between the win
+  and the 'r' keypress, whose CAPTURE listener ate the launch key. Drained across a few ticks like section C
+  already does. Tooling: URL env override on alt-paths/par-sweep/fit-sweep (parallel checkouts serve their own
+  ports); par-sweep gains a per-drill filter arg.
+- GATE (all green): demo-replay full catalog (82) + blocksel ×3 · guided blocksel (railed, contained,
+  solvable) · alt-paths blocksel 2/2 · depth-mechanics 55/55 ×3 · smoke 7 pages + parity · fit-sweep 78 ·
+  invariants clean (C8 0 flagged · C9 new) · cache-bump guard clean.
+
+## r422 — H6b wave 1: filldr reworked to the depth-pass anatomy standard (DEPTH_PASS §4.2)
+- **BEATS (semantic pass, §1.7):** the four chained checks re-labeled to board-label references —
+  "Build the Revenue pull — reference the feed's Revenue cell once, fill it across the four
+  quarters" · "Total the full year down the FY column — one SUM beside the Revenue line, filled
+  down the P&L" · "Total each quarter across the EBITDA row — one SUM under the first quarter,
+  filled across" (the §4.2 draft's "Total row" yields to the board's EBITDA label per §1.3/R4;
+  code comment in checks()) · "Fill the % block from one cell — right then down; the lock on the
+  Revenue row holds". "FOOT it" and every bare-range label are gone.
+- **☆ BONUS (§2.2, first catalog adopter):** "Bold the EBITDA row and add a top border above it —
+  the computed-row rule" — the EBITDA row now ships UNDRESSED (build() no longer pre-sets
+  bold/bt) and the player rules it off for the star; never blocks the win (verified: core-only
+  replay wins with ☆ open). demo() performs the ☆ BEFORE the final core beat per the r421
+  authoring rule, so replay covers it and no keys trail the win.
+- **LABELED TARGETS (§1.3):** the % block gains its own board title row ("% of revenue", italic)
+  so beat 4's semantic reference resolves; all five graded targets now carry visible labels.
+- **RANDOMIZATION (§1.2, 2 axes):** NEW site jitter — the whole block anchors at B2 or B3
+  (rnd(0,1) row shift, ROWS 14/15) — on top of the existing rnd() value axis (feed 300–1,200,
+  cost %s per line). Same-seed determinism verified; both anchors exercised in tests.
+- **HINT LADDER (§1.9):** guide/targets re-indexed to 5 entries each (bonus line included) —
+  tri-length holds; req() gains the ☆ chord tail; prompt rewritten to the four-beat + ☆ story.
+- **PAR:** demo grew by the ☆ dress (ctrl+b · alt h b p) — par sweep median 42 keys (was 37);
+  par 37s→42s (house 1.00 s/key held), parKeys 37→42, HOTKEY_PARS.filldr mirrored, drift 0%.
+  Clocks derive std (§1.4): pass 1:03 · pro 0:48 · legendary 0:42 — verified on the start strip.
+- **ALTS (§1.8):** now 2 registered — (1) existing 2D-block-first ribbon route, de-hardcoded
+  (B11:B13 → o.mixCol, which the new site jitter would have broken) and explicitly ☆-less (proves
+  the bonus never gates); (2) NEW AutoSum route — alt+= for both totals, ☆ via ribbon bold
+  (alt h 1) + alt h b p, canonical order. Both also replayed under guided=true, 3 seeds, all win.
+- **INVARIANTS:** check-invariants.js gains C9 — the depth-pass per-drill registry (starts with
+  filldr): exactly one bonus:true + static guide/checks/targets tri-length per registered drill.
+- **HARNESS:** par-sweep / alt-paths / fit-sweep gain the URL env override e2e-guided already had
+  (parallel worktree checkouts serve on their own ports). e2e-depth-mechanics G-section flake
+  fixed: r1's win can pop a level-up celebration (XP-state dependent) whose capture handler ate
+  the 'r' launch key — __clearCel() before the keypress; suite 52/55 → 55/55 in this environment.
+- GATE (all green): demo-replay filldr 3/3 + full catalog ALL GREEN · guided filldr railed/
+  contained/solvable · alt-paths 2/2 · depth-mechanics 55/55 · par-sweep FLAGGED 0 (filldr
+  42/42/42, 0% drift; tieout logged 1 flaky rep of 5, pre-existing) · fit-sweep 78 clean · smoke
+  7 pages + invariants clean · static invariants clean (incl. new C9). Screenshots on file
+  (fresh/mid/win; win passes the sendable-page read — dressed EBITDA rule, % block filled).
+  Cache: drills.js ?v 280→281 across all 97 pages; drill pages + sitemap + refmap regenerated
+  (refmap: CTRL+B / ALT>H>B>P representative drill now filldr, first-in-order rule).

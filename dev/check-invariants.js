@@ -192,5 +192,57 @@ try {
   console.warn('  warn C8 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
+/* ---- C9 (r422, DEPTH_PASS §0 DoD #2 + §2.8): reworked-drill anatomy — tri-length equality
+   (guide.length === checks.length === targets.length, ☆ bonus line included) and EXACTLY ONE
+   bonus:true per reworked drill. Static proxy over the drill's source chunk: checks counted as
+   `{label:` entries, guide/targets counted as top-level elements of their returned array
+   literal (string-aware bracket scan). Drills join REWORKED as their depth-pass page ships. ---- */
+try {
+  const REWORKED = ['navigation','blocksel','filldr','pastes','rowops'];   // r422 H6b-1 wave 1
+  const idx = fs.readFileSync('index.html', 'utf8');
+  const start = idx.indexOf('const CHALLENGES = {');
+  const end = idx.indexOf('STATE + ENGINE', start);
+  // count top-level elements of the FIRST array literal returned by fn `name(){ return [ ... ]; }`
+  const arrLen = (chunk, name) => {
+    const m = new RegExp(name + '\\s*\\(\\)\\s*\\{[^\\[]*?return\\s*\\[').exec(chunk);
+    if (!m) return null;
+    let i = m.index + m[0].length, depth = 1, elems = 0, sawTok = false, q = null;
+    for (; i < chunk.length && depth > 0; i++) {
+      const ch = chunk[i];
+      if (q) { if (ch === '\\') i++; else if (ch === q) q = null; continue; }
+      if (ch === "'" || ch === '"' || ch === '`') { q = ch; sawTok = true; continue; }
+      if (ch === '[' || ch === '{' || ch === '(') { depth += (ch === '[' ? 1 : 0); if (ch !== '[') { let d2 = 1; const op = ch, clx = ch === '{' ? '}' : ')'; for (i++; i < chunk.length && d2 > 0; i++) { const c2 = chunk[i]; if (q) { if (c2 === '\\') i++; else if (c2 === q) q = null; continue; } if (c2 === "'" || c2 === '"' || c2 === '`') q = c2; else if (c2 === op) d2++; else if (c2 === clx) d2--; } i--; } sawTok = true; continue; }
+      if (ch === ']') { depth--; continue; }
+      if (ch === ',' && depth === 1) { if (sawTok) elems++; sawTok = false; continue; }
+      if (!/\s/.test(ch)) sawTok = true;
+    }
+    return elems + (sawTok ? 1 : 0);
+  };
+  if (start < 0 || end < 0) bad('C9: CHALLENGES block not found');
+  else {
+    const body = idx.slice(start, end);
+    const parts = body.split(/\n  ([a-z][a-z0-9_]*):\s*\{/);
+    const chunks = {};
+    for (let i = 1; i < parts.length; i += 2) chunks[parts[i]] = parts[i + 1] || '';
+    for (const key of REWORKED) {
+      const chunk = chunks[key];
+      if (!chunk) { bad(`C9: reworked drill '${key}' not found in CHALLENGES`); continue; }
+      const ci = chunk.indexOf('checks(');
+      const checksN = ci >= 0 ? (chunk.slice(ci).match(/\{\s*label:/g) || []).length : 0;
+      const guideN = arrLen(chunk, 'guide');
+      const targetsN = arrLen(chunk, 'targets');
+      const bonusN = (chunk.match(/bonus\s*:\s*true/g) || []).length;
+      if (!checksN) bad(`C9: ${key} — no check labels parsed`);
+      if (guideN !== checksN || targetsN !== checksN)
+        bad(`C9: ${key} — tri-length broken: checks=${checksN} guide=${guideN} targets=${targetsN} (§1.9 index alignment)`);
+      if (bonusN !== 1) bad(`C9: ${key} — expected exactly one bonus:true beat, found ${bonusN}`);
+      if (checksN && guideN === checksN && targetsN === checksN && bonusN === 1)
+        ok(`C9 ${key}: guide/checks/targets tri-length ${checksN}, one ☆ bonus`);
+    }
+  }
+} catch (e) {
+  bad('C9 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');

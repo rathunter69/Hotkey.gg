@@ -1646,7 +1646,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=280"></script>
+<script src="drills.js?v=281"></script>
 <link rel="stylesheet" href="nav.css?v=208">
 <script src="themes.js?v=309"></script>
 
@@ -3242,21 +3242,29 @@ const CHALLENGES = {
     }
   },
   pastes:{
-    name:'Paste Sp.', label:'Paste Everything Special', par:40, parKeys:40,
+    /* r422 H6b-1 depth-pass rework (DEPTH_PASS.md §4.3): semantic beat labels, a naked
+       SUBTOTAL row as the formats target (the spec's literal check-4 line), the deck-row
+       values hand-off as the finish beat, ☆ bonus (blue the landed fees), and two site
+       axes — the side feed parks in G or H, the deck row draws from an 11/12 pool. */
+    name:'Paste Sp.', label:'Paste Special everything', par:49, parKeys:49,
     aha:'Paste Special covers more than values: Transpose turns a column into a row, Divide and Multiply rescale a block in place, Formats copies a look, Values freezes formulas into numbers.',
-    prompt:'Paste Special fixes data that arrived in the wrong shape. Transpose the fee schedule from a column into a row. Divide the Trading line by 1000 to convert raw dollars into $000s. Multiply the cost line by −1 to flip its sign. Copy the total row’s formats onto Advisory, then clear the top border it carried over. Finally, paste the totals into the summary as values so they no longer move with the model.',
-    req(){ const o=this._o; return 'copy <em>'+o.side+'</em> \u2192 <em>alt e s e</em> (transpose) at <em>'+o.feesRow+'</em> \u00b7 <em>1000</em> at '+o.helperDiv+', copy \u2192 <em>'+o.divBlk+'</em> <em>alt e s i</em> (divide) \u00b7 <em>-1</em> at '+o.helperNeg+', copy \u2192 <em>'+o.costRow+'</em> <em>alt e s m</em> (multiply) \u00b7 copy <em>'+o.dressed+'</em> \u2192 <em>'+o.naked+'</em> <em>alt e s t</em> then <em>alt h b n</em> \u00b7 copy <em>'+o.dressed+'</em> \u2192 <em>'+o.deck+'</em> <em>alt e s v</em>'; },
+    prompt:'Paste Special fixes data that arrived in the wrong shape. Transpose the fee feed from a column into the Fees row. Divide the Trading line by 1000 to turn raw dollars into $000s. Multiply the Costs line by −1 to flip its sign. Copy the Total row’s formats onto the naked Subtotal row, then clear the top border that came along — a subtotal is not a total. Finish by pasting the totals into the deck row as values, so the hand-off no longer moves with the model.',
+    req(){ const o=this._o; return 'copy <em>'+o.side+'</em> → <em>alt e s e</em> (transpose) at <em>B4</em> · <em>alt h f c</em> blue on the landed fees · <em>1000</em> at '+o.helperDiv+', copy → <em>'+o.divBlk+'</em> <em>alt e s i</em> (divide) · <em>-1</em> at '+o.helperNeg+', copy → <em>'+o.costRow+'</em> <em>alt e s m</em> (multiply) · copy <em>'+o.dressed+'</em> → <em>'+o.sub+'</em> <em>alt e s t</em> then <em>alt h b n</em> · copy <em>'+o.dressed+'</em> → <em>'+o.deck+'</em> <em>alt e s v</em>'; },
     guide(){ const o=this._o; return [
-      'TRANSPOSE the side schedule into a row: select <em>'+o.side+'</em> (the vertical fee list) \u00b7 <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 click <em>'+o.feesRow.split(':')[0]+'</em> \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>e</kbd> Transpose \u00b7 <kbd>\u21b5</kbd> \u2014 the column lands across the Fees row',
-      'DIVIDE to rescale: type <kbd>1000</kbd> at '+o.helperDiv+' <kbd>\u21b5</kbd> \u00b7 copy it \u00b7 select <em>'+o.divBlk+'</em> (Trading, in raw $) \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>i</kbd> Divide \u00b7 <kbd>\u21b5</kbd> \u2014 $ becomes $000s in place, the total re-ties',
-      'MULTIPLY to flip the sign: type <kbd>-1</kbd> at '+o.helperNeg+' <kbd>\u21b5</kbd> \u00b7 copy it \u00b7 select <em>'+o.costRow+'</em> (costs typed positive) \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> \u00b7 <kbd>m</kbd> Multiply \u00b7 <kbd>\u21b5</kbd> \u2014 the costs turn negative and the total drops',
-      'CLONE the look, then fix it: copy the dressed total row <em>'+o.dressed+'</em> \u00b7 select <em>'+o.naked+'</em> \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> Formats <kbd>\u21b5</kbd> \u2014 bold, fill and commas travel \u00b7 but the TOP BORDER came too, and Advisory is not a total: still selected \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>n</kbd> No Border',
-      'FREEZE for the summary: copy <em>'+o.dressed+'</em> \u00b7 select <em>'+o.deck+'</em> \u00b7 <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> Values <kbd>\u21b5</kbd> \u2014 dead numbers, none of the wiring',
+      'TRANSPOSE the feed into a row: select <em>'+o.side+'</em> (the vertical fee list) · <kbd>ctrl</kbd>+<kbd>c</kbd> · click <em>B4</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>e</kbd> Transpose · <kbd>↵</kbd> — the column lands across the Fees row',
+      'DIVIDE to rescale: type <kbd>1000</kbd> at '+o.helperDiv+' <kbd>↵</kbd> · copy it · select <em>'+o.divBlk+'</em> (Trading, in raw $) · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>i</kbd> Divide · <kbd>↵</kbd> — $ becomes $000s in place, the Subtotal re-ties',
+      'MULTIPLY to flip the sign: type <kbd>-1</kbd> at '+o.helperNeg+' <kbd>↵</kbd> · copy it · select <em>'+o.costRow+'</em> (costs typed positive) · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>m</kbd> Multiply · <kbd>↵</kbd> — the costs turn negative and the Total drops',
+      'CLONE the look, then fix it: copy the dressed Total row <em>'+o.dressed+'</em> · select the Subtotal row <em>'+o.sub+'</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> Formats <kbd>↵</kbd> — bold, fill and commas travel · but the TOP BORDER came too, and a subtotal is not the Total: still selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>n</kbd> No Border',
+      'FREEZE for the hand-off: copy <em>'+o.dressed+'</em> · select the deck row <em>'+o.deck+'</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> Values <kbd>↵</kbd> — dead numbers, none of the wiring',
+      'bonus ☆ — the landed fees are hardcodes now: select <em>'+o.feesRow+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 to Blue · <kbd>↵</kbd> — inputs wear blue',
     ]; },
-    targets(){ const o=this._o; return [o.feesRow, o.divBlk, o.costRow, o.naked, o.deck]; },
+    targets(){ const o=this._o; return [o.feesRow, o.divBlk, o.costRow, o.sub, o.deck, o.feesRow]; },
     demo(){ const o=this._o; return [
       {sel:o.side, keys:[Kb.copy]},
-      {sel:o.feesRow.split(':')[0], keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'e'}, Kb.enter]},
+      {sel:'B4', keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'e'}, Kb.enter]},
+      // ☆ performed here — BEFORE the final core beat (§2.2 authoring rule: the win
+      // fires the moment the cores complete, so a trailing ☆ would break the replay)
+      {sel:o.feesRow, keys:[Kb.alt, {key:'h'}, {key:'f'}, {key:'c'}, {key:'ArrowRight'}, {key:'ArrowRight'}, {key:'ArrowRight'}, {key:'ArrowRight'}, Kb.enter]},
       {sel:o.helperDiv, keys:[...T('1000'), Kb.enter]},
       {sel:o.helperDiv, keys:[Kb.copy]},
       {sel:o.divBlk, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'i'}, Kb.enter]},
@@ -3264,21 +3272,25 @@ const CHALLENGES = {
       {sel:o.helperNeg, keys:[Kb.copy]},
       {sel:o.costRow, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'m'}, Kb.enter]},
       {sel:o.dressed, keys:[Kb.copy]},
-      {sel:o.naked, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'t'}, Kb.enter]},
-      {sel:o.naked, keys:[Kb.alt, {key:'h'}, {key:'b'}, {key:'n'}]},
+      {sel:o.sub, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'t'}, Kb.enter]},
+      {sel:o.sub, keys:[Kb.alt, {key:'h'}, {key:'b'}, {key:'n'}]},
       {sel:o.dressed, keys:[Kb.copy]},
       {sel:o.deck, keys:[Kb.alt, {key:'e'}, {key:'s'}, {key:'v'}, Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 paste-special cleanup ($000s; the feed came in raw)',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' — paste-special cleanup ($000s; the feed came in raw)',txt:true,bold:true};
       const y0=23+rnd(0,2);
       cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
       for(let j=0;j<4;j++) cells[colLetter(2+j)+'3']={...blankCell(),value:'Q'+(j+1)+'-'+y0,txt:true,bold:true,align:'r'};
-      // the side schedule — a vertical fee list the player TRANSPOSES into the Fees row
-      cells['G3']={...blankCell(),value:'Fees feed ↓',txt:true,bold:true};
+      /* r422 site axis 1: the side feed parks in G or H. F stays a thin gutter moat, and
+         when the feed sits in H, G thins too — the feed island stays visually offset and
+         its rect disjoint from the P&L in both seeds. */
+      const fc=6+rnd(1,2), fL=colLetter(fc);
+      cells[fL+'3']={...blankCell(),value:'Fees feed ↓',txt:true,bold:true};
+      // the feed arrives RAW (no blue) — the ☆ colors the LANDED row: pasted values are inputs now
       const feesVals=[]; for(let i=0;i<4;i++){ const v=rnd(40,300)*5; feesVals.push(v);
-        cells['G'+(4+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+        cells[fL+(4+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; }
       cells['A4']={...blankCell(),value:'Fees ($000s)',txt:true};
       for(let j=0;j<4;j++) cells[colLetter(2+j)+'4']={...blankCell(),fmtStyle:'comma',decimals:0};
       cells['A5']={...blankCell(),value:'Trading (feed, $)',txt:true};
@@ -3287,43 +3299,64 @@ const CHALLENGES = {
       cells['A6']={...blankCell(),value:'Advisory ($000s)',txt:true};
       const advVals=[]; for(let j=0;j<4;j++){ const v=rnd(40,300)*5; advVals.push(v);
         cells[colLetter(2+j)+'6']={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      cells['A7']={...blankCell(),value:'Costs (entered +)',txt:true};
+      // the naked SUBTOTAL row (spec §4.3 beat 4's labeled target) — a live SUM wearing
+      // nothing; beat 4 clones the Total's dress onto it, minus the carried top border
+      cells['A7']={...blankCell(),value:'Subtotal ($000s)',txt:true};
+      for(let j=0;j<4;j++){ const col=colLetter(2+j);   // seed the LIVE initial value (no recalc runs at load): fees still blank, trading still raw
+        cells[col+'7']={...blankCell(),formula:'=SUM('+col+'4:'+col+'6)',value:tradingFeed[j]+advVals[j]}; }
+      cells['A8']={...blankCell(),value:'Costs (entered +)',txt:true};
       const costVals=[]; for(let j=0;j<4;j++){ const v=rnd(30,150)*5; costVals.push(v);
-        cells[colLetter(2+j)+'7']={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      cells['A8']={...blankCell(),value:'Total',txt:true,bold:true};
+        cells[colLetter(2+j)+'8']={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      cells['A9']={...blankCell(),value:'Total',txt:true,bold:true};
       for(let j=0;j<4;j++){ const col=colLetter(2+j);
-        cells[col+'8']={...blankCell(),formula:'=SUM('+col+'4:'+col+'7)',value:0,fmtStyle:'comma',decimals:0,bold:true,bt:true,fill:'gray'}; }
-      cells['A10']={...blankCell(),value:'Deck hand-off (values)',txt:true};
-      cells['A12']={...blankCell(),value:'Helper',txt:true};
-      this._o={ side:'G4:G7', feesRow:'B4:E4', divBlk:'B5:E5', costRow:'B7:E7',
-        dressed:'B8:E8', naked:'B6:E6', deck:'B10:E10', helperDiv:'B12', helperNeg:'C12',
-        feesVals:feesVals, tradingFeed:tradingFeed, advVals:advVals, costVals:costVals };
-      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:148,2:100,3:100,4:100,5:100,6:22,7:100}};   // r333: trimmed label + gutter so the raw 7-digit feed still fits once the standard-width fit scales the sheet; F is a thin gutter before the side schedule in G
+        cells[col+'9']={...blankCell(),formula:'='+col+'7+'+col+'8',value:tradingFeed[j]+advVals[j]+costVals[j],fmtStyle:'comma',decimals:0,bold:true,bt:true,fill:'gray'}; }
+      /* r422 site axis 2: the deck row draws from {11,12} — the spec page's {10,11} pool
+         shifted +1 for the Subtotal row this rework added (structural note per §0: same
+         pool size, same moat, one row lower). The helper pair rides 2 below, so the
+         destination rects stay disjoint across both seeds. */
+      const dr=11+rnd(0,1), hr=dr+2;
+      cells['A'+dr]={...blankCell(),value:'Deck hand-off',txt:true};
+      cells['A'+hr]={...blankCell(),value:'Helper',txt:true};
+      this._o={ side:fL+'4:'+fL+'7', feesRow:'B4:E4', divBlk:'B5:E5', costRow:'B8:E8',
+        sub:'B7:E7', dressed:'B9:E9', deck:'B'+dr+':E'+dr, helperDiv:'B'+hr, helperNeg:'C'+hr,
+        feesVals:feesVals, tradingFeed:tradingFeed, advVals:advVals, costVals:costVals, dr:dr };
+      const cw={1:148,2:100,3:100,4:100,5:100,6:22}; cw[fc]=100; if(fc===8) cw[7]=22;   // r333: trimmed label + gutter so the raw 7-digit feed still fits once the standard-width fit scales the sheet
+      return {ROWS:hr, cells, active:{r:4,c:2}, sel:null, colW:cw};
     },
     checks(S){
       const o=this._o;
       const cel=k=>S.cells[k]||{};
-      // 1. TRANSPOSE: the vertical side schedule landed across the Fees row as plain values
-      const transOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'4');
+      const COLS=['B','C','D','E'];
+      // 1. TRANSPOSE: the vertical feed landed across the Fees row as plain values
+      const transOk=COLS.every((cl,j)=>{ const c=cel(cl+'4');
         return c.value!=null && !c.formula && Math.abs((c.value||0)-o.feesVals[j])<0.5; });
-      // 2. DIVIDE: Trading rescaled from raw $ to $000s
-      const divOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'5');
-        return typeof c.value==='number' && Math.abs(c.value-o.tradingFeed[j]/1000)<0.5; }) && (S.pasteOpN||0)>=1;
-      // 3. MULTIPLY -1: costs flipped negative
-      const negOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'7');
+      // 2. DIVIDE: Trading rescaled from raw $ to $000s. r422 (AUDIT_R417 §G): the old
+      //    (S.pasteOpN>=1) latch neither enforced the divide route nor freed the typed
+      //    one — dropped; checks grade END STATE, any honest route counts.
+      const divOk=COLS.every((cl,j)=>{ const c=cel(cl+'5');
+        return typeof c.value==='number' && Math.abs(c.value-o.tradingFeed[j]/1000)<0.5; });
+      // 3. MULTIPLY −1: costs flipped negative
+      const negOk=COLS.every((cl,j)=>{ const c=cel(cl+'8');
         return typeof c.value==='number' && Math.abs(c.value+o.costVals[j])<0.5; });
-      // 4. FORMATS cloned onto Advisory (bold + fill + commas), then the dragged-along top border cleared; values untouched
-      const fmtOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'6');
-        return c.bold && c.fill==='gray' && c.fmtStyle==='comma' && !c.bt && Math.abs((c.value||0)-o.advVals[j])<0.5; });
-      // 5. VALUES on the summary: dead numbers, no formulas
-      const deckOk=[0,1,2,3].every(j=>{ const c=cel(colLetter(2+j)+'10');
-        return c.value!=null && !c.formula && typeof c.value==='number'; });
+      // 4. FORMATS cloned onto the Subtotal row (bold + fill + commas), the carried top
+      //    border cleared, and the live SUM kept (the leave-the-formula guard folds into ok)
+      const subExp=j=>o.feesVals[j]+o.tradingFeed[j]/1000+o.advVals[j];
+      const fmtOk=COLS.every((cl,j)=>{ const c=cel(cl+'7');
+        return c.bold && c.fill==='gray' && c.fmtStyle==='comma' && !c.bt && !!c.formula
+          && Math.abs((c.value||0)-subExp(j))<0.5; });
+      // 5. VALUES into the deck row: the finished totals, dead — the hand-off closes the drill
+      const deckOk=COLS.every((cl,j)=>{ const c=cel(cl+o.dr);
+        return c.value!=null && !c.formula && typeof c.value==='number'
+          && Math.abs(c.value-(subExp(j)-o.costVals[j]))<0.5; });
+      // ☆ the landed fees wear blue — never blocks the win (§2.2)
+      const starOk=transOk && COLS.every(cl=>cel(cl+'4').fontColor==='blue');
       return [
-        {label:'transpose the side fee schedule into the Fees row \u2014 '+o.side+' lands across '+o.feesRow+' as plain values', ok: transOk},
-        {label:'rescale Trading into $000s \u2014 paste-special DIVIDE the feed by 1000 across '+o.divBlk, ok: divOk},
-        {label:'flip the costs negative \u2014 paste-special MULTIPLY '+o.costRow+' by \u22121 so they carry their sign', ok: negOk},
-        {label:'clone the total-row look onto Advisory \u2014 paste FORMATS onto '+o.naked+', then clear the top border it carried', ok: fmtOk},
-        {label:'hand the summary dead numbers \u2014 paste VALUES onto '+o.deck+', no formulas', ok: deckOk},
+        {label:'transpose the Fees feed into the Fees row — the column lands as plain values', ok: transOk},
+        {label:'fix the Trading line into $000s — divide the feed by 1000 in place', ok: divOk},
+        {label:'flip the Costs line negative — multiply by −1 so costs carry their sign', ok: negOk},
+        {label:'paste FORMATS from the Total row onto the Subtotal row — then clear the top border it carried', ok: fmtOk},
+        {label:'paste the totals into the deck row as values only — numbers, no formulas', ok: deckOk},
+        {label:'color the transposed Fees row blue — pasted values are inputs now', ok: starOk, bonus:true},
       ];
     }
   },
@@ -3579,17 +3612,18 @@ const CHALLENGES = {
     }
   },
   rowops:{
-    name:'Rows', label:'Rebuild the schedule', par:26, parKeys:24,
+    name:'Rows', label:'Rebuild the schedule', par:34, parKeys:31,   /* r422 depth pass: border close + ☆ undo beat — measured 31 keys ×9 seeds, par retuned at the house ~1.1 s/key */
     aha:'Ctrl++ inserts a row, Ctrl+− deletes one — the Total re-sums automatically as rows come and go.',
-    prompt:'Fix the structure of the opex schedule: one line is missing (staged off to the side) and a stale placeholder is inflating the total. The Total is a live SUM — it re-totals on its own as you add and remove rows. Insert a row where the missing line belongs, copy the staged pair in, delete the junk row, and format the pasted value to match the block. Never retype the Total — it updates itself.',
-    req(){ const o=this._o; return 'insert a row below <em>'+o.predecessor+'</em> · copy the staged <em>'+o.stagedRng+'</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row · the Total re-sums to <em>'+o.total.toLocaleString('en-US')+'</em> on its own · format the pasted value: comma + blue (<em>alt h k</em>, <em>alt h f c</em>)'; },
+    prompt:'Fix the structure of the opex schedule: one line is missing (staged off to the side) and a stale placeholder is inflating the total. The Total is a live SUM — it re-totals on its own as you add and remove rows. Insert a row where the missing line belongs, copy the staged pair in, delete the junk row, format the pasted value to match the block, and close the schedule with a bottom border under the Total. Never retype the Total — it updates itself.',
+    req(){ const o=this._o; return 'insert a row below <em>'+o.predecessor+'</em> · copy the staged <em>'+o.stagedRng+'</em> → paste into the new row · delete the <em>PLACEHOLDER</em> row — the Total re-sums to <em>'+o.total.toLocaleString('en-US')+'</em> on its own · comma + blue the pasted value (<em>alt h k</em>, <em>alt h f c</em>) · bottom border under the Total (<em>alt h b o</em>) · ☆ <em>ctrl+z</em> the delete, then delete it again'; },
     guide(){ const o=this._o; return [
-      'a line is missing — open a slot: select the row below <b>'+o.predecessor+'</b> · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row · <kbd>ctrl</kbd>+<kbd>+</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd>) — and watch the Total re-sum on its own',
-      'the data team staged the line at <b>'+o.stagedRng+'</b>: select it · <kbd>ctrl</kbd>+<kbd>c</kbd> · land on the new row’s label cell · <kbd>ctrl</kbd>+<kbd>v</kbd> — label and value drop in together',
-      'the stale line: on the <b>PLACEHOLDER</b> row · <kbd>shift</kbd>+<kbd>space</kbd> · <kbd>ctrl</kbd>+<kbd>−</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>) — the block closes up and the Total re-sums; it now ties to <b>'+o.total.toLocaleString('en-US')+'</b>',
+      'a line is missing — open a slot: select the row below <b>'+o.predecessor+'</b> · <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row · <kbd>ctrl</kbd>+<kbd>+</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>i</kbd> <kbd>r</kbd>) — then the staged pair at <b>'+o.stagedRng+'</b>: <kbd>ctrl</kbd>+<kbd>c</kbd> · land on the new row’s label cell · <kbd>ctrl</kbd>+<kbd>v</kbd> — label and value together',
+      'the stale line: on the <b>PLACEHOLDER</b> row · <kbd>shift</kbd>+<kbd>space</kbd> · <kbd>ctrl</kbd>+<kbd>−</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>) — the block closes and the Total re-ties to <b>'+o.total.toLocaleString('en-US')+'</b> on its own',
       'the pasted value arrived naked — format it to the block: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> — typed data wears blue',
+      'close the schedule: from the <b>Total opex</b> label · <kbd>shift</kbd>+<kbd>→</kbd> takes the pair · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> — a bottom border under the Total row',
+      '☆ prove the stack: <kbd>ctrl</kbd>+<kbd>z</kbd> — the deleted PLACEHOLDER row returns, value and all · <kbd>shift</kbd>+<kbd>space</kbd> · <kbd>ctrl</kbd>+<kbd>−</kbd> deletes it again — undo survives structure ops',
     ]; },
-    targets(){ const o=this._o; return [o.stagedRng, 'A'+o.junkRow0, 'B'+o.totRow0, 'B'+(o.predRow0+1)]; },
+    targets(){ const o=this._o; return [o.stagedRng, 'A'+o.junkRow0, 'B'+(o.predRow0+1), 'A'+o.totRow0+':B'+o.totRow0, 'A'+o.junkRow0]; },
     demo(){ const o=this._o;
       const pr=o.predRow0, jr=o.junkRow0, insAt=pr+1;
       const steps=[{sel:'A'+insAt, keys:[{key:' ',shift:true}, Kb.alt,{key:'h'},{key:'i'},{key:'r'}], watch:'@A~^Total:B'}];
@@ -3597,9 +3631,14 @@ const CHALLENGES = {
       steps.push({sel:'A'+insAt, keys:[Kb.paste]});
       const jr2 = jr + (jr>=insAt?1:0);
       steps.push({sel:'A'+jr2, keys:[{key:' ',shift:true}, Kb.alt,{key:'h'},{key:'d'},{key:'r'}], watch:'@A~^Total:B'});
+      // ☆ before the final core beat (§2.2 authoring rule): undo resurrects the junk row whole…
+      steps.push({sel:'A'+jr2, keys:[{key:'z',ctrl:true}]});
+      // …then it dies again — the ctrl chord this time
+      steps.push({sel:'A'+jr2, keys:[{key:' ',shift:true},{key:'-',ctrl:true}], watch:'@A~^Total:B'});
       const insAt2 = insAt - (jr2<insAt?1:0);   // the junk delete pulls the pasted row up when it sat above
       steps.push({sel:'B'+insAt2, keys:[Kb.alt,{key:'h'},{key:'k'}]});
       steps.push({sel:'B'+insAt2, keys:[Kb.alt,{key:'h'},{key:'f'},{key:'c'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]});
+      steps.push({sel:'A'+o.totRow0+':B'+o.totRow0, keys:[Kb.alt,{key:'h'},{key:'b'},{key:'o'}]});
       return steps; },
     build(){
       const cells={};
@@ -3656,12 +3695,18 @@ const CHALLENGES = {
         typeof totCell.value==='number' && Math.abs(totCell.value-o.total)<0.5);
       const mCell=missIn ? (S.cells['B'+missIn.r]||{}) : {};
       const dressOk=!!(missIn && mCell.fmtStyle==='comma' && mCell.fontColor==='blue');
+      const closeOk=!!(totRow && (S.cells['A'+totRow]||{}).bb && (S.cells['B'+totRow]||{}).bb);
       return [
         {label:'insert a row below '+o.predecessor+' and paste the staged '+o.missing+' line into it — the SUM widens itself',
           ok: !!missIn && (S.insRowN||0)>=1 && (S.pasteN||0)>=1},
-        {label:'delete the PLACEHOLDER row — the block closes up and the SUM contracts', ok: junkGone && (S.delRowN||0)>=1},
-        {label:'prove the Total — the live SUM re-ties to '+o.total.toLocaleString('en-US')+' without a single retype', ok: tieOk},
+        /* r422 depth pass (§4.5): the old "prove the Total" line was a state-report with no action of
+           its own (AUDIT_R417 §D Class C) — its re-tie prove-out folds into this ok (tieOk), and the
+           freed slot became the border finish beat below. */
+        {label:'delete the PLACEHOLDER row — the block closes and the SUM contracts', ok: junkGone && (S.delRowN||0)>=1 && tieOk},
         {label:'format the pasted value like the block — commas and blue font', ok: dressOk},
+        {label:'add a bottom border under the Total row — the schedule closes', ok: closeOk},
+        {label:'undo the row delete, then delete it again — the stack survives structure ops',
+          ok: (S.delRowN||0)>=2 && (S.undoN||0)>=1 && junkGone, bonus:true},
       ];
     }
   },
@@ -3736,17 +3781,18 @@ const CHALLENGES = {
     }
   },
   filldr:{
-    name:'Fill', label:'Fill down, fill right', par:37, parKeys:37,
+    name:'Fill', label:'Fill down, fill right', par:42, parKeys:42,
     aha:'Ctrl+D fills down, Ctrl+R fills right — one seed cell builds the whole table.',
-    prompt:'Fill an empty quarterly table from a single feed row. Three steps: reference the feed once and fill across; write one SUM and fill it across; then write one mixed-anchor formula and fill right, then down, so all twelve %-of-revenue cells build from a single formula. Filling beats retyping.',
-    req(){ const o=this._o; return '<em>'+o.pull0+'</em> <em>='+o.feed0+'</em> \u00b7 fill '+o.pullRng+' \u2192 \u00b7 <em>'+o.fy0+'</em> <em>=SUM('+o.fyArg+')</em> \u00b7 fill '+o.fyRng+' \u2193 \u00b7 <em>'+o.sum0+'</em> <em>=SUM('+o.sumArg+')</em> \u00b7 fill '+o.sumRng+' \u2192 \u00b7 <em>'+o.mix0+'</em> <em>='+o.mixF+'</em> \u00b7 select '+o.blkRow+' <em>ctrl+r</em> \u00b7 select '+o.blk+' <em>ctrl+d</em>'; },
+    prompt:'Fill an empty quarterly P&L from a single feed row. Reference the feed once and fill it across the quarters; total the year down the FY column; total each quarter across the EBITDA row; then one mixed-anchor formula fills the whole %-of-revenue block — right, then down. Filling beats retyping. For the ☆, set the EBITDA row apart: bold, with a top border.',
+    req(){ const o=this._o; return '<em>'+o.pull0+'</em> <em>='+o.feed0+'</em> · fill '+o.pullRng+' → · <em>'+o.fy0+'</em> <em>=SUM('+o.fyArg+')</em> · fill '+o.fyRng+' ↓ · <em>'+o.sum0+'</em> <em>=SUM('+o.sumArg+')</em> · fill '+o.sumRng+' → · <em>'+o.mix0+'</em> <em>='+o.mixF+'</em> · select '+o.blkRow+' <em>ctrl+r</em> · select '+o.blk+' <em>ctrl+d</em> · ☆ '+o.sumRng+' <em>ctrl+b</em> + <em>alt h b p</em>'; },
     guide(){ const o=this._o; return [
-      'PULL across: at '+o.pull0+' type <kbd>='+o.feed0+'</kbd> <kbd>\u21b5</kbd> \u2014 reference the feed row \u00b7 select '+o.pullRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 four quarters pulled in two moves',
-      'FY total, down the column: at '+o.fy0+' type <kbd>=SUM('+o.fyArg+')</kbd> <kbd>\u21b5</kbd> \u2014 the full-year revenue \u00b7 select '+o.fyRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 one formula totals every line for the year',
-      'FOOT across: at '+o.sum0+' write <kbd>=SUM('+o.sumArg+')</kbd> <kbd>\u21b5</kbd> \u00b7 select '+o.sumRng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 EBITDA all the way across, the FY column included',
-      'THE 2D FILL: at '+o.mix0+' type <kbd>='+o.mixF+'</kbd> \u2014 the $-lock on row '+o.pullR+' is the whole trick \u00b7 select '+o.blkRow+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u00b7 then '+o.blk+' \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 fifteen live ratios from one cell',
+      'PULL across: at '+o.pull0+' type <kbd>='+o.feed0+'</kbd> <kbd>↵</kbd> — reference the feed row · select '+o.pullRng+' · <kbd>ctrl</kbd>+<kbd>r</kbd> — four quarters pulled in two moves',
+      'FY total, down the column: at '+o.fy0+' type <kbd>=SUM('+o.fyArg+')</kbd> <kbd>↵</kbd> — the full-year revenue · select '+o.fyRng+' · <kbd>ctrl</kbd>+<kbd>d</kbd> — one formula totals every line for the year',
+      'EBITDA across: at '+o.sum0+' write <kbd>=SUM('+o.sumArg+')</kbd> <kbd>↵</kbd> · select '+o.sumRng+' · <kbd>ctrl</kbd>+<kbd>r</kbd> — every quarter totals, the FY column included',
+      'THE 2D FILL: at '+o.mix0+' type <kbd>='+o.mixF+'</kbd> — the $-lock on row '+o.pullR+' is the whole trick · select '+o.blkRow+' · <kbd>ctrl</kbd>+<kbd>r</kbd> · then '+o.blk+' · <kbd>ctrl</kbd>+<kbd>d</kbd> — fifteen live ratios from one cell',
+      '☆ select the EBITDA row '+o.sumRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> · top border <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — computed rows read apart from inputs',
     ]; },
-    targets(){ const o=this._o; return [o.pullRng, o.fyRng, o.sumRng, o.blk]; },
+    targets(){ const o=this._o; return [o.pullRng, o.fyRng, o.sumRng, o.blk, o.sumRng]; },
     demo(){ const o=this._o; return [
       {sel:o.pull0, keys:[...T('='+o.feed0), Kb.enter]},
       {sel:o.pullRng, keys:[{key:'r',ctrl:true}]},
@@ -3754,90 +3800,102 @@ const CHALLENGES = {
       {sel:o.fyRng, keys:[{key:'d',ctrl:true}]},
       {sel:o.sum0, keys:[...T('=SUM('+o.sumArg+')'), Kb.enter]},
       {sel:o.sumRng, keys:[{key:'r',ctrl:true}]},
+      {sel:o.sumRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},   /* the ☆ rides BEFORE the last core beat — the win latches its state (r421 §2.2 authoring rule) */
       {sel:o.mix0, keys:[...T('='+o.mixF), Kb.enter]},
       {sel:o.blkRow, keys:[{key:'r',ctrl:true}]},
       {sel:o.blk, keys:[{key:'d',ctrl:true}]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 quarterly buildout ($mm)',txt:true,bold:true};
-      ['Q1','Q2','Q3','Q4','FY'].forEach((q,i)=>cells[colLetter(2+i)+2]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
-      cells['A3']={...blankCell(),value:'Revenue feed (data team)',txt:true};
+      /* r422 (DEPTH_PASS §4.2): site jitter — the whole block anchors at B2 or B3 (§1.2 axis a,
+         the page's declared pool), on top of the existing rnd() value axis (§1.2 axis c). */
+      const d=rnd(0,1);
+      const hr=2+d, fr=3+d, rr=5+d, er=9+d, pt=10+d, p1=11+d;
+      cells['A1']={...blankCell(),value:codename()+' — quarterly buildout ($mm)',txt:true,bold:true};
+      ['Q1','Q2','Q3','Q4','FY'].forEach((q,i)=>cells[colLetter(2+i)+hr]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
+      cells['A'+fr]={...blankCell(),value:'Revenue feed (data team)',txt:true};
       const feed=[];
       for(let i=0;i<4;i++){ const v=rnd(60,240)*5; feed.push(v);
-        cells[colLetter(2+i)+3]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      cells['A5']={...blankCell(),value:'Revenue',txt:true,bold:true};
-      for(let i=0;i<4;i++) cells[colLetter(2+i)+5]={...blankCell(),fmtStyle:'comma',decimals:0};   // pulled cells pre-formatted so the row reads consistent with the FY total
+        cells[colLetter(2+i)+fr]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      cells['A'+rr]={...blankCell(),value:'Revenue',txt:true,bold:true};
+      for(let i=0;i<4;i++) cells[colLetter(2+i)+rr]={...blankCell(),fmtStyle:'comma',decimals:0};   // pulled cells pre-formatted so the row reads consistent with the FY total
       const COSTS=[['COGS',35,45],['Opex',15,25],['D&A',5,10]];
       const costVals=[];
-      COSTS.forEach(([n,lo,hi],j)=>{ const r=6+j;
+      COSTS.forEach(([n,lo,hi],j)=>{ const r=rr+1+j;
         cells['A'+r]={...blankCell(),value:n,txt:true};
         const row=[];
         for(let i=0;i<4;i++){ const v=-Math.round(feed[i]*rnd(lo,hi)/100); row.push(v);
           cells[colLetter(2+i)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
         costVals.push(row);
       });
-      cells['A9']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      for(let i=0;i<5;i++) cells[colLetter(2+i)+9]={...blankCell(),fmtStyle:'comma',decimals:0,bt:true,bold:true};   // incl the FY total at F9 (FOOT fills right into it)
-      for(let r=5;r<=8;r++) cells['F'+r]={...blankCell(),fmtStyle:'comma',decimals:0};   // FY column — player builds F5 then fills DOWN
-      cells['A11']={...blankCell(),value:'% of revenue',txt:true,it:true};
-      ['COGS %','Opex %','D&A %'].forEach((n,j)=>{ const r=11+j;
-        if(j>0) cells['A'+r]={...blankCell(),value:n,txt:true,it:true};
-        for(let i=0;i<5;i++) cells[colLetter(2+i)+r]={...blankCell(),fmtStyle:'percent',decimals:1,it:true}; });   // % block now spans the FY column too
-      cells['A11'].value='COGS %';
-      this._o={ feed:feed, costVals:costVals,
-        pull0:'B5', feed0:'B3', pullRng:'B5:E5', pullR:5,
-        fy0:'F5', fyArg:'B5:E5', fyRng:'F5:F8',
-        sum0:'B9', sumArg:'B5:B8', sumRng:'B9:F9',
-        mix0:'B11', mixF:'B6/B$5', blkRow:'B11:F11', blk:'B11:F13' };
-      return {ROWS:14, cells, active:{r:5,c:2}, sel:null, colW:{1:150,2:76,3:76,4:76,5:76,6:76}};
+      cells['A'+er]={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      for(let i=0;i<5;i++) cells[colLetter(2+i)+er]={...blankCell(),fmtStyle:'comma',decimals:0};   // UNDRESSED on purpose (r422) — the ☆ bonus bolds + rules this row; FY total included (the quarter totals fill right into it)
+      for(let r=rr;r<=rr+3;r++) cells['F'+r]={...blankCell(),fmtStyle:'comma',decimals:0};   // FY column — player builds the Revenue FY then fills DOWN
+      cells['A'+pt]={...blankCell(),value:'% of revenue',txt:true,it:true};   // §1.3 labeled target (r422) — the % block carries its own board title
+      ['COGS %','Opex %','D&A %'].forEach((n,j)=>{ const r=p1+j;
+        cells['A'+r]={...blankCell(),value:n,txt:true,it:true};
+        for(let i=0;i<5;i++) cells[colLetter(2+i)+r]={...blankCell(),fmtStyle:'percent',decimals:1,it:true}; });   // % block spans the FY column too
+      this._o={ feed:feed, costVals:costVals, d:d, rr:rr, er:er, p1:p1,
+        pull0:'B'+rr, feed0:'B'+fr, pullRng:'B'+rr+':E'+rr, pullR:rr,
+        fy0:'F'+rr, fyArg:'B'+rr+':E'+rr, fyRng:'F'+rr+':F'+(rr+3),
+        sum0:'B'+er, sumArg:'B'+rr+':B'+(rr+3), sumRng:'B'+er+':F'+er,
+        mix0:'B'+p1, mixF:'B'+(rr+1)+'/B$'+rr, blkRow:'B'+p1+':F'+p1, blk:'B'+p1+':F'+(p1+2),
+        mixCol:'B'+p1+':B'+(p1+2) };
+      return {ROWS:14+d, cells, active:{r:rr,c:2}, sel:null, colW:{1:150,2:76,3:76,4:76,5:76,6:76}};
     },
     checks(S){
       const o=this._o;
       const cel=k=>S.cells[k]||{};
       const feedSum=o.feed.reduce((s,v)=>s+v,0);
       const costSum=j=>o.costVals[j].reduce((s,v)=>s+v,0);
-      const pullOk=[0,1,2,3].every(i=>{ const c=cel(colLetter(2+i)+5);
+      const pullOk=[0,1,2,3].every(i=>{ const c=cel(colLetter(2+i)+o.rr);
         return !!(c.formula && Math.abs((c.value||0)-o.feed[i])<0.5); });
-      // FY column, filled DOWN: F5 = full-year revenue, F6:F8 = full-year costs
-      const fyOk=[5,6,7,8].every(r=>{ const c=cel('F'+r);
-        const want = r===5 ? feedSum : costSum(r-6);
+      // FY column, filled DOWN: the Revenue FY, then the three cost lines below it
+      const fyOk=[0,1,2,3].every(j=>{ const c=cel('F'+(o.rr+j));
+        const want = j===0 ? feedSum : costSum(j-1);
         return !!(c.formula && sumishF(c.formula) && Math.abs((c.value||0)-want)<0.5); });
-      // FOOT across, now including the FY total at F9
-      const sumOk=[0,1,2,3,4].every(i=>{ const c=cel(colLetter(2+i)+9);
+      // quarter totals across the EBITDA row, the FY total included
+      const sumOk=[0,1,2,3,4].every(i=>{ const c=cel(colLetter(2+i)+o.er);
         const want = i<4 ? (o.feed[i]+o.costVals[0][i]+o.costVals[1][i]+o.costVals[2][i])
                          : (feedSum+costSum(0)+costSum(1)+costSum(2));
         return !!(c.formula && sumishF(c.formula) && Math.abs((c.value||0)-want)<0.5); });
-      // 2D % block now spans the FY column \u2014 one mixed-anchor cell fills a 3\u00d75 grid
+      // 2D % block spans the FY column — one mixed-anchor cell fills a 3×5 grid
       const mixOk=(()=>{ for(let j=0;j<3;j++) for(let i=0;i<5;i++){
-        const c=cel(colLetter(2+i)+(11+j));
+        const c=cel(colLetter(2+i)+(o.p1+j));
         const rev = i<4 ? o.feed[i] : feedSum;
         const cost= i<4 ? o.costVals[j][i] : costSum(j);
         const want=cost/rev;
-        if(!c.formula || !String(c.formula).includes('$5') || Math.abs((c.value||0)-want)>1e-4) return false; }
+        if(!c.formula || !String(c.formula).includes('$'+o.rr) || Math.abs((c.value||0)-want)>1e-4) return false; }
         return true; })();
+      // ☆ — bold + top border across the EBITDA row (the A-column label ships bold; B–F graded)
+      const starOk=[0,1,2,3,4].every(i=>{ const c=cel(colLetter(2+i)+o.er); return !!(c.bold&&c.bt); });
+      /* DEPTH_PASS §4.2 beats. One naming deviation, per §1.3/R4: the spec page's beat-3 draft
+         says "the Total row", but the board labels that row EBITDA (and the ☆ names it EBITDA
+         too) — a beat may only reference a term the sheet shows, so the board label wins. */
       return [
-        {label:'PULL the feed \u2014 reference B3 once at B5, fill B5:E5 across', ok: pullOk},
-        {label:'run the FY total DOWN the column \u2014 =SUM(B5:E5) at F5, fill F5:F8 down; every line totals for the year', ok: fyOk},
-        {label:'FOOT it \u2014 one =SUM(B5:B8) at B9, filled across B9:F9 (the FY total ties too)', ok: sumOk},
-        {label:'fill the whole % block from ONE mixed-anchor cell \u2014 B11 right then down, FY column included (B$5 holds)', ok: mixOk},
+        {label:'Build the Revenue pull — reference the feed’s Revenue cell once, fill it across the four quarters', ok: pullOk},
+        {label:'Total the full year down the FY column — one SUM beside the Revenue line, filled down the P&L', ok: fyOk},
+        {label:'Total each quarter across the EBITDA row — one SUM under the first quarter, filled across', ok: sumOk},
+        {label:'Fill the % block from one cell — right then down; the lock on the Revenue row holds', ok: mixOk},
+        {label:'Bold the EBITDA row and add a top border above it — the computed-row rule', ok: starOk, bonus:true},
       ];
     }
   },
   blocksel:{
-    name:'Block Sel.', label:'Assemble and format the output', par:46, parKeys:47,
+    name:'Block Sel.', label:'Assemble and format the summary', par:41, parKeys:47,   /* r422: par retuned — the ☆ demotion took the label dress out of the core win (42-key core × 0.98 s/key); parKeys stays the demo's measured length, ☆ included */
     aha:'Ctrl+C copies data that stays put; Ctrl+X moves data that shouldn’t be duplicated — assemble first, then format.',
-    prompt:'Assemble the segment summary from scattered pieces. Copy the base [Segment · Revenue] block — it stays where it is; cut the two misfiled metric columns (EBITDA, Op inc) into their slots. Then finish the page: add a margin row that computes EBITDA ÷ Revenue in %, bold the headers, format the top line in $ and the rest in commas, right-align the figures, center and underline the segment names, and outline the whole table.',
-    req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b s</em> (outline) · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
+    prompt:'Assemble the segment summary from scattered pieces. Copy the base [Segment · Revenue] block — it stays where it is; cut the two misfiled metric columns (EBITDA, Op inc) into their slots. Then finish the page: build the margin column (EBITDA ÷ Revenue, percent), bold the headers, format the top line in $ and the rest in commas, right-align the figures, and outline the whole table. The ☆ bonus: center and underline the segment names.',
+    req(){ const o=this._o; return 'COPY base '+o.baseTL+' → '+o.o.seg[0]+' · CUT EBITDA '+o.ebTL+' → '+o.o.ebitda[0]+' · CUT Op inc '+o.opTL+' → '+o.o.opinc[0]+' · Margin '+o.o.margin[0]+' <em>=EBITDA/Rev</em> ⤓, <em>ctrl+⇧+%</em>, <em>ctrl+i</em> · header <em>ctrl+b</em> · box <em>alt h b s</em> (outline) · top row <em>ctrl+⇧+$</em>, rest <em>ctrl+⇧+!</em> (0-dec) · figures <em>alt h a r</em> · ☆ labels <em>alt h a c</em> + <em>ctrl+u</em>'; },
     guide(){ const o=this._o; return [
       'COPY the <b>base</b> [Segment · Revenue] at <b>'+o.baseTL+'</b> (it stays filed): <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>c</kbd> · paste at '+o.o.seg[0],
       'CUT the misfiled <b>EBITDA</b> at <b>'+o.ebTL+'</b> and <b>Op inc</b> at <b>'+o.opTL+'</b>: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> <kbd>ctrl</kbd>+<kbd>x</kbd> · paste into their slots — the old spots empty',
-      'the <b>Margin</b> memo: at '+o.o.margin[0]+' type <kbd>=</kbd> EBITDA ÷ Revenue (<kbd>='+o.marginF+'</kbd>), fill down, then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>%</kbd> and italic <kbd>ctrl</kbd>+<kbd>i</kbd>',
-      'format it: <b>bold</b> the header row (<kbd>ctrl</kbd>+<kbd>b</kbd>) · select the whole table and box it <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> (outline)',
+      'the <b>Margin</b> column: at '+o.o.margin[0]+' type <kbd>=</kbd> EBITDA ÷ Revenue (<kbd>='+o.marginF+'</kbd>), fill down <kbd>ctrl</kbd>+<kbd>d</kbd>, then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>%</kbd> and italic <kbd>ctrl</kbd>+<kbd>i</kbd>',
+      'frame it: <b>bold</b> the header row (<kbd>ctrl</kbd>+<kbd>b</kbd>) · select the whole table and box it <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> (outline)',
       'money: the <b>top line</b> in dollars (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>$</kbd>, trim to 0-dec with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd>×2), the rows below in <b>commas</b> (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>!</kbd>, 0-dec)',
-      'finish: figures <b>right</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>) · segment names <b>centred + underlined</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> · <kbd>ctrl</kbd>+<kbd>u</kbd>)',
+      'figures read <b>right</b>: select the summary body · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
+      '☆ the segment names: <b>centred + underlined</b> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> · <kbd>ctrl</kbd>+<kbd>u</kbd>) — extra credit, never blocks the win',
     ]; },
-    targets(){ const o=this._o; return [o.baseTL, o.ebTL, o.o.margin[0], o.hdrRng, o.figRng, o.labelRng]; },
+    targets(){ const o=this._o; return [o.baseTL, o.ebTL, o.o.margin[0], o.hdrRng, o.moneyRng, o.figRng, o.labelRng]; },
     demo(){ const o=this._o;
       const gd=[{key:'ArrowDown',ctrl:true,shift:true}], gr=[{key:'ArrowRight',ctrl:true,shift:true}];
       const steps=[
@@ -3854,8 +3912,8 @@ const CHALLENGES = {
         {sel:o.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('s')]},     // outline the whole table (Outside Borders)
         {sel:o.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),{key:'9'},{key:'Alt'},L('h'),{key:'9'}]},   // top line $ (0-dec)
         {sel:o.restRng,    keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),{key:'9'},{key:'Alt'},L('h'),{key:'9'}]},   // rest commas (0-dec)
-        {sel:o.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},     // figures right
-        {sel:o.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'u',ctrl:true}]},   // labels centred + underlined
+        {sel:o.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'u',ctrl:true}]},   // ☆ labels centred + underlined — scripted BEFORE the final core beat (§2.2 authoring rule)
+        {sel:o.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},     // figures right — the final core beat; the win fires here
       ];
       return steps; },
     build(){
@@ -3912,6 +3970,7 @@ const CHALLENGES = {
         marginF:'C'+(oR+1)+'/B'+(oR+1), marginRng:'E'+(oR+1)+':E'+(oR+N),
         hdrRng:'A'+oR+':E'+oR, tableRng:'A'+oR+':E'+(oR+N),
         topRowRng:'B'+(oR+1)+':D'+(oR+1), restRng:'B'+(oR+2)+':D'+(oR+N),
+        moneyRng:'B'+(oR+1)+':D'+(oR+N),
         figRng:'B'+(oR+1)+':E'+(oR+N), labelRng:'A'+(oR+1)+':A'+(oR+N) };
       return {ROWS:16, cells, active:{r:oR+1,c:1}, sel:null,
         colW:{1:88,2:80,3:80,4:80,5:80,6:34,7:88,8:80,9:80,10:80}};
@@ -3942,14 +4001,16 @@ const CHALLENGES = {
         for(let r=4;r<=3+N;r++){ for(const cc of ['B','C','D','E']) if(cel(cc+r).align!=='r') ok=false; } return ok; })();
       const namesCentered = (function(){ let ok=true;
         for(let r=4;r<=3+N;r++){ if(cel('A'+r).align!=='c'||!cel('A'+r).uline) ok=false; } return ok; })();
+      /* r422 depth pass (DEPTH_PASS §4.4): 6 core beats + the segment-name dress demoted to
+         the ☆ bonus — labels are the §4 page's lines verbatim (semantic references, R1-R10). */
       return [
-        {label:'COPY the [Segment · Revenue] base whole → paste into the summary (the base stays filed)', ok: copied},
-        {label:'CUT the two misfiled columns (EBITDA, Op inc) → paste into their slots (old spots empty)', ok: cutBoth},
-        {label:'build the margin memo — =EBITDA/Revenue down the column, formatted % and italic', ok: marginOk},
-        {label:'bold the header row and outline the whole table', ok: dressed},
-        {label:'format the money — top line in $, the rows below in commas, 0 decimals', ok: money},
-        {label:'right-align every figure in the summary body', ok: figsRight},
-        {label:'center the segment names and underline them', ok: namesCentered},
+        {label:'Copy the [Segment · Revenue] base into the summary — the base stays filed', ok: copied},
+        {label:'Cut the EBITDA and Op inc columns into their slots — the old spots empty', ok: cutBoth},
+        {label:'Build the margin column — =EBITDA÷Revenue filled down, percent, italic', ok: marginOk},
+        {label:'Bold the header row and add an outside border around the table', ok: dressed},
+        {label:'Dollar-format the top line, comma-format the rows below — 0 decimals', ok: money},
+        {label:'Right-align every figure in the summary body', ok: figsRight},
+        {label:'Center the segment names and underline them', ok: namesCentered, bonus:true},
       ];
     }
   },
@@ -7658,15 +7719,24 @@ const CHALLENGES = {
     aha:'The keyboard is your only way through — Ctrl+arrow shoots down a corridor until it hits a wall, then you turn. Thread the maze, grab the model, and weave it back to the drop zone.',
     prompt:'Bold walls pen you into a maze. Step one cell at a time, or shoot down a corridor until it hits a wall. Collect every pip on the way to the model room, select the whole model, copy it, then weave back through the maze to the drop zone and paste it.',
     req:'thread the maze with <em>ctrl+↑/↓/←/→</em> and single <em>↑/↓/←/→</em> (walls stop you) → collect the pips → grab the model <em>ctrl+⇧+→</em> · <em>ctrl+⇧+↓</em> → <em>ctrl+c</em> → weave to the drop zone → <em>ctrl+v</em>',
+    /* r422 (DEPTH_PASS §4.1): guide/targets index-aligned with checks — 4 core + the ☆ bonus
+       (the r417 §D 7v4 misalignment dies here). Targets are functions: the maze randomizes,
+       and beat 1's ring rides the NEXT uncollected pip (§1.9 — guided ring on the right cell). */
     guide(){ return [
-      'the walls are solid — <kbd>ctrl</kbd>+<kbd>→/↓/←/↑</kbd> shoots down a corridor to the next wall; a single <kbd>→</kbd> steps one cell',
-      'follow the corridor, collecting each pip as you pass it',
-      'keep weaving toward the model room — turn at every wall',
-      'at the model, grab it — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>',
+      'the walls are solid — <kbd>ctrl</kbd>+<kbd>→/↓/←/↑</kbd> shoots down a corridor to the next wall, a single arrow steps one cell; ride over every pip on the way to the model room',
+      'at the model room corner, grab the whole block — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>',
       '<kbd>ctrl</kbd>+<kbd>c</kbd> — copy the model',
-      'weave back through the maze to the <b>drop zone</b>',
-      '<kbd>ctrl</kbd>+<kbd>v</kbd> — paste the model into the drop zone' ]; },
-    targets(){ return []; },
+      'weave back through the maze to the <b>drop ▸</b> corner, then <kbd>ctrl</kbd>+<kbd>v</kbd>',
+      'an arrow the wall swallows is a bump — read the corridor before you press, and the line stays clean' ]; },
+    targets(){ const self=this; return [
+      function(){ const M=self._maze; if(!M) return 'A1';
+        try{ const got=(typeof S!=='undefined' && S && S.touch) ? S.touch.got : ((S && S.maze && S.maze.got)||{});
+          for(let i=0;i<M.pips.length;i++){ if(!got[i]) return colLetter(M.pips[i][1])+M.pips[i][0]; } }catch(e){}
+        return colLetter(M.table.c0)+M.table.r0; },
+      function(){ const T=self._maze.table; return colLetter(T.c0)+T.r0+':'+colLetter(T.c0+T.w-1)+(T.r0+T.h-1); },
+      function(){ const T=self._maze.table; return colLetter(T.c0)+T.r0+':'+colLetter(T.c0+T.w-1)+(T.r0+T.h-1); },
+      function(){ const D=self._maze.paste; return colLetter(D.c0)+D.r0; },
+      function(){ const D=self._maze.paste; return colLetter(D.c0)+D.r0; } ]; },
     // ---- maze geometry helpers (shared by build + demo) ----
     _mz(r,c,nr,nc){ const a=r*100+c,b=nr*100+nc; return a<b?(r+':'+c+'|'+nr+':'+nc):(nr+':'+nc+'|'+r+':'+c); },
     demo(){
@@ -7757,25 +7827,37 @@ const CHALLENGES = {
       const cells=Object.assign({}, mkModelCells(table.r0,table.c0));
       cells[colLetter(paste.c0)+paste.r0]={...blankCell(),value:'drop ▸',txt:true,bold:true,align:'c',fontColor:'green'};
       this._maze={pass,channel,pips,table,paste,p1,p2};
+      /* r422 (§2.6): the pips ARE the checkpoint touch-list — one latch, one counter.
+         mazePip feeds hkTouchLatch on pass-through (a ctrl-shot collects mid-flight,
+         which the render-time cursor tick can't see), so hkTouchTick stands down on
+         maze boards; the maze keeps drawing its own full-size pip glyphs. */
       return {ROWS:RN, cells, active:{r:1,c:1}, sel:null,
         colW:{1:80,2:80,3:80,4:80,5:80,6:80,7:80,8:80,9:80,10:80},
-        maze:{pass,channel,pips,table,paste,got:{},prog:{}}};
+        maze:{pass,channel,pips,table,paste,got:{},prog:{}},
+        touch:{cells:pips.map(p=>colLetter(p[1])+p[0]), label:'pips'}};
     },
     checks(S){
       const mz=S.maze; if(!mz) return [];
       if(!mz.got) mz.got={}; if(!mz.prog) mz.prog={};
+      // A=S.active — load-bearing: railSafe() scans this source for 'S.active' to keep the
+      // guided rails OFF cursor-graded boards (rails would wall off the maze itself).
       const pr=mz.prog, A=S.active, sel=S.sel, s=selRange(), cb=S.clipboard&&S.clipboard.rect, T=mz.table, D=mz.paste;
-      const nGot=mz.pips.filter((_,i)=>mz.got[i]).length;
+      /* r422 (§2.6): the pip count reads the generalized touch-list latch; the legacy
+         mz.got tally covers harnesses that build S without loadChallenge's hkTouchInit. */
+      const nGot=S.touch ? (S.touchGot|0) : mz.pips.filter((_,i)=>mz.got[i]).length;
       if(mz.pips.length===0 || nGot===mz.pips.length) pr.pips=true;
       if(pr.pips && !pr.grab && !!sel && s.r1===T.r0 && s.r2===T.r0+T.h-1 && s.c1===T.c0 && s.c2===T.c0+T.w-1) pr.grab=true;
       if(pr.grab && !pr.copied && !!cb && cb.r1===T.r0 && cb.c1===T.c0 && cb.r2>=T.r0+T.h-1 && cb.c2>=T.c0+T.w-1) pr.copied=true;
       const dcell=S.cells[colLetter(D.c0)+D.r0];
       if(pr.copied && !pr.pasted && dcell && dcell.value==='Revenue') pr.pasted=true;
       return [
-        {label:'thread the maze, collecting every pip ('+nGot+'/'+mz.pips.length+')', ok:!!pr.pips},
-        {label:'enter the model room and select the whole model', ok:!!pr.grab},
-        {label:'copy the model', ok:!!pr.copied},
-        {label:'weave to the drop zone and paste it', ok:!!pr.pasted}
+        {label:'Collect every pip on the way to the model room ('+nGot+'/'+mz.pips.length+')', ok:!!pr.pips},
+        {label:'Select the whole model — the room’s full block', ok:!!pr.grab},
+        {label:'Copy the model', ok:!!pr.copied},
+        {label:'Paste the model at the drop zone corner', ok:!!pr.pasted},
+        /* §4.1 ☆ [Penalty Seconds → clean-run ace]: zero wall bumps, latched at the finish —
+           S.bumpN counts every keydown a wall swallowed (move() maze branch). */
+        {label:'Finish with zero wall bumps — a clean line through the maze', ok:!!pr.pasted && (S.bumpN|0)===0, bonus:true}
       ];
     }
   }
@@ -7848,7 +7930,8 @@ function inb(r,c){ return r>=1&&r<=S.ROWS&&c>=1&&c<=COLS; }
 function mzEdge(r,c,nr,nc){ const a=r*100+c, b=nr*100+nc; return a<b ? (r+':'+c+'|'+nr+':'+nc) : (nr+':'+nc+'|'+r+':'+c); }
 function mazePassable(r,c,nr,nc){ if(!S.maze) return false; if(nr<1||nr>S.ROWS||nc<1||nc>COLS) return false; return S.maze.pass.has(mzEdge(r,c,nr,nc)); }
 function mazePip(r,c){ const mz=S.maze; if(!mz||!mz.pips) return; if(!mz.got) mz.got={};
-  for(let i=0;i<mz.pips.length;i++){ if(mz.pips[i][0]===r && mz.pips[i][1]===c && !mz.got[i]){ mz.got[i]=true; mz._fresh=i; } } }
+  for(let i=0;i<mz.pips.length;i++){ if(mz.pips[i][0]===r && mz.pips[i][1]===c && !mz.got[i]){ mz.got[i]=true; mz._fresh=i; } }
+  try{ hkTouchLatch(r,c); }catch(e){}   /* r422 (§2.6): the maze's pips ride the generalized touch-list — pass-through collects, so the latch fires here, not on the render tick */ }
 function ctrlJump(r,c,dr,dc){
   let nr=r+dr,nc=c+dc;
   if(!inb(nr,nc)) return {r,c};
@@ -8755,8 +8838,10 @@ function render(){
       // Skip the active cell itself (would conflict with the active outline) and the pointer cell (point class wins).
       const refKey = colLetter(c)+r;
       if(S.marks && S.marks.length && S.marks.indexOf(refKey)>=0 && !isActive) cls.push('mark');   // r182 go-to-special
-      /* r421 §2.6: touch-list checkpoint pips — blue dot ahead, accent once visited */
-      if(S.touch){ const __ti=S.touch.cells.indexOf(refKey);
+      /* r421 §2.6: touch-list checkpoint pips — blue dot ahead, accent once visited.
+         r422: maze boards skip the corner dot — the maze draws its own full-size pip glyphs
+         (same latch underneath; two dots on one cell would read as two objectives). */
+      if(S.touch && !S.maze){ const __ti=S.touch.cells.indexOf(refKey);
         if(__ti>=0){ cls.push('touchcell'); if(S.touch.got[__ti]) cls.push('touchgot'); } }
       /* r421 §2.5: a still-parked tier region dims; its anchor cell wears the "▸ unlocks" tag.
          A freshly revealed region flashes once (reduced-motion safe — CSS-gated). */
@@ -9603,10 +9688,10 @@ function hkTouchInit(built){
   S.touch={ cells:built.touch.cells.map(String), label:String(built.touch.label||''), got:{}, times:{} };
   S.touchGot=0;
 }
-function hkTouchTick(){
+function hkTouchLatch(r,c){   // core latch — shared by the render tick and pass-through collectors (mazePip)
   if(!S||!S.touch||done) return;
   try{
-    const ref=colLetter(S.active.c)+S.active.r;
+    const ref=colLetter(c)+r;
     const i=S.touch.cells.indexOf(ref);
     if(i>=0 && !S.touch.got[i]){
       S.touch.got[i]=true;
@@ -9614,6 +9699,13 @@ function hkTouchTick(){
     }
     S.touchGot=S.touch.cells.reduce((a,_,j)=>a+(S.touch.got[j]?1:0),0);
   }catch(e){}
+}
+function hkTouchTick(){
+  if(!S||!S.touch||done) return;
+  /* r422: maze boards collect on PASS-THROUGH via mazePip (a ctrl-shot eats pips mid-flight,
+     and a Home teleport through the walls must NOT collect) — the cursor tick stands down there. */
+  if(S.maze) return;
+  hkTouchLatch(S.active.r, S.active.c);
 }
 
 /* ---- §2.5 origami tier ladder ---- */
@@ -11558,6 +11650,7 @@ function move(dr,dc,shift,ctrl){
     let cr=S.active.r, cc=S.active.c;
     if(ctrl){ while(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); } }
     else { if(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); } }
+    if(cr===S.active.r && cc===S.active.c && !done) S.bumpN=(S.bumpN||0)+1;   // r422 (§4.1 ☆): a keydown the wall swallowed — the zero-bump bonus reads this latch
     S.active={r:cr,c:cc}; S.sel=null;
     render(); checkWin(); return;
   }

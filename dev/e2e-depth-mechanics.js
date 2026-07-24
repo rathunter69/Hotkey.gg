@@ -335,8 +335,20 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     });
     ok(r1.done === true && String(r1.offer) === '3', 'non-clean run offers the rep on the dropped ☆ beat', r1);
     ok(/redo the beats you dropped/.test(r1.btnTxt || ''), 'card carries "redo the beats you dropped" (r)', r1);
+    // r422: r1's mouseUsed win freshens the "Old Habits" achievement, and the 450ms-staggered
+    // sweep (scheduled at the PRIOR loadChallenge) can pop its celebration right here — whose
+    // CAPTURE listener would eat the 'r'. Same wall-clock race section C drains; drain it here
+    // too, WITHOUT closing the results card (its ☆ offer is what 'r' launches).
+    for (let i = 0; i < 4; i++) { await page.waitForTimeout(250); await run(() => { try { window.__hkCelQ = [];
+      document.querySelectorAll('.hk-cel-wrap').forEach(n => { n.click(); n.remove(); });
+      window.__hkCelOpen = false; } catch (e) {} }); }
     const r2 = await run(() => {
       const xp0 = parseInt(localStorage.getItem('hk_xp_est') || '0', 10);
+      /* r422 flake fix: the r1 win is this profile's first MOUSE-flagged win, so the achievement
+         sweep opens a celebration card ("Old Habits") asynchronously — when the machine is slow
+         enough its capture-phase keydown listener is live by now and EATS the 'r' (base-reproducible,
+         timing-dependent). A real player dismisses the card on the results screen; do the same. */
+      window.__clearCel();
       demoKey({ key: 'r' });   // launch from the results card
       const items = CHALLENGES.__depth.checks(S);
       return {
