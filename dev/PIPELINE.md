@@ -29,7 +29,9 @@ repaired, profiles column grants (theme/client_state/email_* — three features 
 3. **H3 · ENGINE PARITY PACK 1 [auto·M-L]** — AUDIT_R417 §A: error-value sentinels (#N/A, #DIV/0!,
    #NAME? display + propagation — replaces the over-broad "problem with this formula" refusal and
    unlocks the FORMULA-AUTOCORRECT feature Wolf asked for 2026-07-24: Excel-style typo-fix
-   proposals; spec incoming from the ribbon/aesthetics audit agent); %-cell entry auto-scale (the
+   proposals — BUILD-READY SPEC now in AUDIT_R417 §G, incl. the Ctrl+Enter silent-0 hole and #NAME?
+   sentinel); ribbon canon fixes (§G: Alt W V G, show H 3, Paste Special Subtract, H O E, M P/M D,
+   Esc one-level, uppercase KeyTips); %-cell entry auto-scale (the
    800% bug); paste tiling; ants lifecycle + copy-then-Enter paste; Ctrl+F swallow; commitEditAll
    parse ladder; COUNT/COUNTA/MOD/ROUNDUP/ROUNDDOWN; INDEX text fix; lazy IF. Each with new parity letters.
 4. **H4 · DRILL COPY & CHECKS BATCH [auto·S]** — AUDIT_R417 §D: 30 copy defects (incl. 3 drills
@@ -39,7 +41,9 @@ repaired, profiles column grants (theme/client_state/email_* — three features 
    pages render 1180px instead of their 880-980 measures — 1-line root cause), hkToast z≥530
    (feedback invisible mid-tour), certModal Esc + defer, one modal helper (Esc/backdrop/focus/
    scroll-lock ×15 modals), de-dupe themesModal/kbdModal, reduced-motion for lb.css+index pulses,
-   stats .ach-filters wrap, canvas culling, tokens.css (light-first), About.html onto the shared shell.
+   stats .ach-filters wrap, canvas culling, tokens.css (light-first), About.html onto the shared
+   shell; Excel-grid immersion set (§G): selected-header highlight, centered errors, normal-ink ####,
+   monochrome ants, sheet-tab green, name-box RxC count. [Wolf]: lean ribbon bar default ON.
 6. **H6 · DRILL DEPTH (rolling) [Wolf-collaborative]** — AUDIT_R417 §D depth ranking: enrich the
    15 shallowest (series, lookup, lookup2, bridge, autofit, wrapfix, drill, anchor, foot, percent,
    sort, unhide, margin, dcfsens, grpfold) ~5/round per DOCTRINE §5 playbook, to the Foundations bar.

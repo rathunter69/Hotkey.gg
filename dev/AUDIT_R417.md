@@ -319,3 +319,61 @@ Launch day: 9) [Wolf go] PRELAUNCH_LOCK=false (index:1804) 10) [Wolf] BETA_MODE 
 buttons + lb.js:604 hk_dev_unlock honor 12) [auto] deactivate hags beta code + INVITE_AUTO_CODE
 13) [auto] cache-bump sweep + PR + verify live 14) post-launch: E1 Stripe JWT-derive + webhook,
 E2 billing backend (invoices/pause/cancel), email campaigns.
+
+---
+## G. RIBBON / EXCEL AESTHETICS / FORMULA AUTOCORRECT (→ segments H3/H5; Wolf ask 07-24)
+Grounded in 15 live renders (scratchpad 01–15) + live commit-path probes. r298 border canon VERIFIED HELD.
+
+### Ribbon keytips (canon verdicts)
+- **Alt W G for gridlines is a HOUSE INVENTION** — Excel canon is Alt W V G (W G = Zoom to Selection).
+  Fix: add 'WV':[['G','Gridlines']] (MENUS 8766, applyRibbon 10673); keep WG as silent alias. XS.
+- Alt H 3 (Underline) WORKS but is hidden — handler 10746 exists, MENUS['H'] 8749 omits it. XS.
+- Paste Special missing Subtract (S) — we ship 4 of Excel's 5 ops (PASTE_OP_OPTS 8826, doPaste 10776). S.
+- Alt H O E (Format Cells via ribbon) not wired — only legacy Alt O E + Ctrl+1 (MENUS['HO'] 8754). XS.
+- Alt M P / M D trace precedents/dependents missing — alias onto existing Ctrl+[/] handlers (8761). S.
+- Alt H N number-format dropdown absent (M, defensible cut); AutoSum dropdown lacks A/C/M/I (S);
+  Alt H F D / H O U C/L absent (M, low).
+- Verified canon-correct: tab letters H/N/P/M/A/R/W; the whole Home inventory incl. A N accounting;
+  legacy Alt E S / Alt O E; PASTE_OP_OPTS O/M/D/I. Format Cells house letters = documented, fine.
+
+### Ribbon visuals
+1. Lean always-on Home bar (r340) is the discoverability answer and defaults OFF behind the "bar" pin
+   (8934/8969) — DEFAULT IT ON for new accounts (zero height cost per 8933 comment). [Wolf playtest]
+2. Esc exits whole KeyTip chain (11631) — back out ONE level (= parity finding #21). S.
+3. KeyTip badges lowercase (8949-8954, 9076) — Excel uses uppercase. One-char fix.
+4. Lean rows lost group labels (Clipboard/Font/…) — consider labels in ribbon-open state only (sub-8px caveat).
+5. Icon tiles have mouse-only tooltips in a keyboard product — echo highlighted command name in strip edge.
+6. Dim not-wired tabs = good honest UX, keep.
+
+### Grid aesthetics (ranked by immersion)
+1. **Selected row/col headers get NO highlight** (render 8484-8486/8503, th CSS 166-169) — Excel shades
+   them + green edge/text; THE peripheral cue. S effort, biggest grid win.
+2. Error values left-aligned (txt:true seeds 6391-6397) — Excel CENTERS errors. XS (.err class).
+3. #### overflow painted amber+letterspaced (251, 8578) — Excel uses normal ink. XS.
+4. Marching ants accent-GREEN (382-392) — Excel monochrome; green collides with selection language. XS.
+5. Sheet-tab active state lacks the green text/underline (1092). XS.
+6. Name box doesn't live-count "3R x 2C" during shift-extension (8725). S.
+7. Fill handle missing 1px white notch (368-369); selection tint could take a faint green cast (348). XS.
+- Verified Excel-real, no action: active-cell outline+handle, anchor-white-in-range, gridline grey,
+  number/text alignment, parens negatives, accounting $ flush, edit pop-out + ref coloring, fx buttons.
+
+### FORMULA AUTOCORRECT — build-ready spec (H3, pairs with error sentinels)
+Current: one blunt gate (commitEdit 10204-10216). Probes: =A1++A2 accepted silently; lowercase fns
+stored lowercase (10222); =SUM(A1:A2 auto-closed ✓; ;-separators/trailing-op/,)/==/unmatched-) refused;
+=FOO(A1) refused (Excel: commits #NAME?); **commitEditAll (Ctrl+Enter, 10240-10261) has NO gate —
+junk formulas silently commit 0 across the selection.**
+Target tiers: S silent-fix (parens ✓ + case-normalize outside string literals) · P propose-dialog
+("↵ accept · esc keep editing"; repairs: ;→, · trailing op · ,) · == · unmatched ")" · doubled binary
+ops but never unary --/+) · N commit #NAME? sentinel (string-sentinel house pattern, recalc 9944
+extension; forward-compatible with #N/A/#DIV/0! sentinel work) · R refuse (keep r348 beat).
+Plan: (1) pure autocorrectFormula(buf) helper near 7914 returning {kind, buf, fixed};
+(2) Hook A commitEdit ladder; (3) Hook B proposal render branch beside sortwarn ~9041 + applyRibbon
+keys ~10605 + Escape guard 11631 case; (4) Hook C same ladder in commitEditAll; (5) e2e-formulas.js
+matrix block (each class × Enter/Ctrl+Enter, normalization, #NAME? recalc stability, Esc-returns,
+demoPlaying lenient guard stays).
+
+### Section G top-10
+1. Alt W V G canon fix · 2. autocorrect ladder (one build round) · 3. header highlight ·
+4. show Alt H 3 · 5. Esc one-level · 6. Paste Special Subtract · 7. lean bar default ON [Wolf] ·
+8. error display polish (center + normal-ink ####) · 9. Sort Warning as a card dialog ·
+10. Alt H O E + Alt M P aliases. (+ uppercase KeyTips, monochrome ants — one-liners.)
