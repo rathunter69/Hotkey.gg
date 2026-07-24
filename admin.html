@@ -60,11 +60,11 @@
   window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
   window.NAV_ACTIVE='';
 </script>
-<script src="themes.js?v=308"></script>
+<script src="themes.js?v=309"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=297"></script>
+<script src="nav.js?v=298"></script>
 
 <div class="wrap">
   <header class="head">
@@ -113,6 +113,8 @@ async function load(){
   html+='<div class="section-title">moderation · report queue</div><div class="panel" id="reps"><div class="loading" style="padding:10px">loading…</div></div>';
   // r284 (#35): shadow-flagged runs — the integrity trigger's catch, awaiting a verdict
   html+='<div class="section-title">integrity · flagged runs</div><div class="panel" id="flags"><div class="loading" style="padding:10px">loading…</div></div>';
+  // H1 (AUDIT r417 §B): shadow-flagged SESSIONS — sessions_guard's catch (20260723000000_sessions_guard.sql), same queue pattern as runs
+  html+='<div class="section-title">integrity · flagged sessions</div><div class="panel" id="sflags"><div class="loading" style="padding:10px">loading…</div></div>';
   // r287: desk PRO requests — approve as free club comp or paid enterprise
   html+='<div class="section-title">desk PRO · requests</div><div class="panel" id="dpro"><div class="loading" style="padding:10px">loading…</div></div>';
   root.innerHTML=html;
@@ -151,6 +153,21 @@ async function load(){
     }catch(e){ $('flags').innerHTML='<div class="row">could not load</div>'; }
   }
   renderFlags();
+  // flagged sessions — shadow-hidden from the marathon/rapid-fire boards; clear restores, delete removes
+  async function renderSessFlags(){
+    try{ const {data:fs}=await sb.rpc('admin_flagged_sessions');
+      $('sflags').innerHTML=(fs&&fs.length)
+        ? fs.map(s=>'<div class="row"><span>'+esc(s.handle)+'</span><span class="meta">'+esc(s.mode)+' · '+s.duration_sec+'s · score '+s.score+' · '+s.keystrokes+' keys / '+s.misses+' misses · <b style="color:var(--warn)">'+esc(s.flag_reason)+'</b></span>'+
+            '<span class="t">'+esc(String(s.created_at).slice(0,16).replace('T',' '))+'</span>'+
+            '<span class="tab sflg-act" data-id="'+esc(s.id)+'" data-a="clear">clear</span>'+
+            '<span class="tab sflg-act" data-id="'+esc(s.id)+'" data-a="delete" style="color:var(--bad)">delete</span></div>').join('')
+        : '<div class="row">nothing flagged — the session boards are clean</div>';
+      document.querySelectorAll('.sflg-act').forEach(b=>b.onclick=async()=>{
+        b.textContent='…';
+        try{ await sb.rpc('admin_session_verdict',{p_id:b.dataset.id, p_action:b.dataset.a}); renderSessFlags(); }catch(e){} });
+    }catch(e){ $('sflags').innerHTML='<div class="row">could not load</div>'; }
+  }
+  renderSessFlags();
   // desk PRO requests — approve as comp (free, with a day-limit) or paid (seats, no expiry)
   async function renderDpro(){
     try{ const {data:dp}=await sb.rpc('admin_desk_pro_requests');

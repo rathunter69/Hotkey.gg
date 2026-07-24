@@ -176,11 +176,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=308"></script>
+<script src="themes.js?v=309"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=297"></script>
+<script src="nav.js?v=298"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -246,7 +246,9 @@ async function load(){
   let cardTags='';
   try{ if(prof.show_school && prof.school_tag){ const nm=((window.schoolResolve&&window.schoolResolve(prof.school_tag))||{}).name||prof.school_tag;
       cardTags+='<span class="uc-tag">'+(window.schoolChip?window.schoolChip(prof.school_tag,20):'')+'<span>'+esc(nm)+'</span></span>'; }
-    if(prof.team_code) cardTags+='<span class="uc-tag"><b style="font-size:15px;line-height:1">◆</b><span>'+esc(prof.team_code)+'</span></span>';
+    /* H1 (AUDIT r417 §B): team_code is the LEGACY desk column — immediate paint only.
+       my_desk() (fetched by renderDesk below) is the SSOT and overrides via syncDeskUi. */
+    if(prof.team_code) cardTags+='<span class="uc-tag" id="accDeskTag"><b style="font-size:15px;line-height:1">◆</b><span>'+esc(prof.team_code)+'</span></span>';
   }catch(e){}
   const playerCard = window.hkPlayerCard ? window.hkPlayerCard({
     name: prof.handle||'set a handle', show:(window.hkFlair?window.hkFlair(prof.flair).show:undefined),
@@ -466,6 +468,31 @@ async function load(){
     return 'Something went wrong.'; };
   // r270: assignments + program templates moved to the staffer screen (desks.html?manage=1) —
   // this card is a summary with pointers now, plus create/join for the deskless.
+  /* H1 (AUDIT r417 §B): desk membership SSOT. prof.team_code is the legacy column — a member
+     who joined via the modern team_members flow has it NULL, so it read as deskless here while
+     the desk card below (my_desk RPC) knew better. The my_desk() result renderDesk already
+     fetches is cached and re-syncs both surfaces (card desk tag + setup checklist) when it
+     resolves; team_code stays only as the immediate-paint fallback until then. */
+  let deskKnown=false, deskRow=null;                    // deskKnown = my_desk() has answered
+  const deskJoined=()=> deskKnown ? !!deskRow : !!prof.team_code;
+  function syncDeskUi(d){
+    deskKnown=true; deskRow=d||null;
+    try{
+      const card=root.querySelector('.acc-card');
+      let tag=document.getElementById('accDeskTag');
+      if(deskRow){
+        const inner='<b style="font-size:15px;line-height:1">◆</b><span>'+esc(deskRow.name)+'</span>';
+        if(tag){ tag.innerHTML=inner; }
+        else if(card){
+          let tags=card.querySelector('.uc-tags');
+          if(!tags){ tags=document.createElement('div'); tags.className='uc-tags';
+            const head=card.querySelector('.uc-head'); if(head) head.insertAdjacentElement('afterend', tags); }
+          if(tags){ tag=document.createElement('span'); tag.className='uc-tag'; tag.id='accDeskTag'; tag.innerHTML=inner; tags.appendChild(tag); }
+        }
+      } else if(tag){ tag.remove(); }                   // stale legacy team_code, no live membership — my_desk wins
+    }catch(e){}
+    try{ renderSetup(); }catch(e){}                     // checklist "Joined a desk" follows the SSOT
+  }
   /* r359 CERTIFICATES card — track progress from the runs table (the same source the
      issuing RPC checks), issued certs with view links + LinkedIn on the cert page. */
   async function renderCerts(){
@@ -478,14 +505,30 @@ async function load(){
     el.innerHTML = '<div class="cert-grid">'+window.HK_TRACKS.map(t=>{
       const n=t.keys.filter(k=>have.has(k)).length, N=t.keys.length, done=certs[t.id];
       const pct=Math.round(100*n/N);
+      /* H1 (AUDIT r417 §B): server-side claim path. Issuance used to fire ONLY from
+         index.html's local-PB check, so a player who finished a track across two devices
+         (or cleared cache) sat at 100% here with no cert. When server-run coverage is
+         complete and no certificates row exists, offer the claim; issue_certificate
+         re-verifies the runs server-side and is idempotent. */
+      const claimable = !done && N>0 && n===N;
       return '<div class="cert-tile'+(done?' done':'')+'">'+
         '<span class="t">'+esc(t.name)+'</span>'+
         '<span class="bar"><i style="width:'+pct+'%"></i></span>'+
+        (claimable?'<button class="btn cert-claim" data-track="'+esc(t.id)+'" style="margin:0;padding:9px 14px">Claim certificate</button>':'')+
         '<span class="meta"><span>'+(done?'certified':n+' / '+N+' clean')+'</span>'+
         (done?'<a href="cert.html?id='+done+'" target="_blank" rel="noopener" style="color:var(--accent)">view &rarr;</a>':'<b style="color:var(--text)">'+pct+'%</b>')+
         '</span></div>';
     }).join('')+'</div>'+
+    '<div class="msg" id="certClaimMsg"></div>'+
     '<div style="font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:12px; line-height:1.7">A track certifies when every drill in it has a clean recorded run (no mouse, no guided). Certificates are public, verifiable pages with one-click Add-to-LinkedIn.</div>';
+    el.querySelectorAll('.cert-claim').forEach(b=>b.onclick=async()=>{
+      b.disabled=true; b.textContent='Claiming…';
+      try{
+        const {error}=await sb.rpc('issue_certificate',{p_track:b.dataset.track});
+        if(error){ b.disabled=false; b.textContent='Claim certificate'; say('certClaimMsg', String(error.message||'Couldn’t issue — try again.'), true); return; }
+        renderCerts();   // re-fetch + re-render: the fresh certificates row paints the tile certified with its view link
+      }catch(e){ b.disabled=false; b.textContent='Claim certificate'; say('certClaimMsg','Something went wrong — try again.',true); }
+    });
   }
   renderCerts();
   /* r360/r370: email prefs — three toggles, one pattern; degrades silently until
@@ -511,7 +554,8 @@ async function load(){
   async function renderDesk(){
     const el=document.getElementById('deskBody'); if(!el) return;
     let d=null;
-    try{ const {data}=await sb.rpc('my_desk'); d=(data&&data[0])||null; }catch(e){}
+    try{ const {data,error}=await sb.rpc('my_desk'); if(error) throw error;
+      d=(data&&data[0])||null; syncDeskUi(d); }catch(e){}   // H1: only a clean answer overrides the team_code paint
     if(d){
       el.innerHTML = `<div class="rowline"><span class="k">desk</span><b>${esc(d.name)}</b></div>
         <div class="rowline"><span class="k">analysts</span><span>${d.members} / 200</span></div>
@@ -691,7 +735,9 @@ async function load(){
     refreshMfa();
   }
   // ---- r396: account-setup checklist (fills the Profile card, surfaces verify status) ----
-  (function(){
+  // H1 (AUDIT r417 §B): named + re-runnable — syncDeskUi re-renders it once my_desk() answers,
+  // and "Joined a desk" reads deskJoined() (my_desk SSOT, team_code as pre-resolve fallback).
+  function renderSetup(){
     const el=document.getElementById('acSetup'); if(!el) return;
     const verified=!!(me.email_confirmed_at||me.confirmed_at);
     const items=[
@@ -699,7 +745,7 @@ async function load(){
       {on:verified, t:'Email verified', act:verified?null:{id:'setupResend', lbl:'resend'}},
       {on:!!prof.school_tag, t:'School colors set'},
       {on:!!(prof.flair&&String(prof.flair).length), t:'Card personalized', act:(prof.flair&&String(prof.flair).length)?null:{href:'profile.html', lbl:'customize'}},
-      {on:!!prof.team_code, t:'Joined a desk', act:prof.team_code?null:{href:'desks.html', lbl:'find one'}}
+      {on:deskJoined(), t:'Joined a desk', act:deskJoined()?null:{href:'desks.html', lbl:'find one'}}
     ];
     const done=items.filter(i=>i.on).length;
     el.innerHTML='<div class="setup-h"><span>account setup</span><span>'+done+' / '+items.length+'</span></div>'+
@@ -707,7 +753,8 @@ async function load(){
         return '<div class="setup-i'+(i.on?' on':'')+'"><span class="dot">'+(i.on?'✓':'')+'</span><span class="sl">'+i.t+'</span>'+a+'</div>'; }).join('');
     const sr=document.getElementById('setupResend');
     if(sr) sr.onclick=()=>{ const r=document.getElementById('acEmailResend'); if(r){ r.click(); sr.textContent='sent ✓'; } };
-  })();
+  }
+  renderSetup();
   // r156: PRO touchpoints — plan card button + the flair PRO tag open the offer sheet
   { const pb=document.getElementById('proSheetBtn'); if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); }; }
   { const dv=document.getElementById('devRanked'), dro=document.getElementById('devRankedOff');

@@ -348,7 +348,11 @@ async function load(){
 
     // ---- evaluation roster ----
     const roster=ids.map(id=>{ const st=DATA.userStat[id]; const e=eco[id];
-      const t=st?tierOf(st.avg, st.att, st.wsum):window.HK_RANK.tierOf(null,0);
+      /* r417 audit: rank identity from the GLOBAL standing (gUserStat) — userStat is
+         desk-filtered here, which showed a different tier than every other surface.
+         boards/crowns stay desk-scoped (this is the desk's evaluation roster). */
+      const gst=(DATA.gUserStat||DATA.userStat)[id];
+      const t=gst?tierOf(gst.avg, gst.att, gst.wsum):window.HK_RANK.tierOf(null,0);
       return {id, name:DATA.names[id], tier:t, att:(st&&st.att)||0, crowns:(st&&st.crowns)||0,
         week:e.week, saved:e.savedMs, cap:id===captainId}; })
       .sort((a,b2)=> b2.week-a.week || b2.crowns-a.crowns || b2.att-a.att);
@@ -468,7 +472,11 @@ function showPublicCard(uid){
   if(!DATA) return;
   const {userStat,names,meId}=DATA;
   const st=userStat[uid];
-  const t=st ? tierOf(st.avg, st.att, st.wsum) : window.HK_RANK.tierOf(null, 0);
+  /* r417 audit: tier/rank IDENTITY always computes from the GLOBAL field (gUserStat) — on a
+     desk view userStat is desk-FILTERED, and the same player showed a different tier here than
+     on every other surface. Times/boards/counts below stay desk-scoped on purpose. */
+  const gst=(DATA.gUserStat||userStat)[uid];
+  const t=gst ? tierOf(gst.avg, gst.att, gst.wsum) : window.HK_RANK.tierOf(null, 0);
   let deskNm=null;
   try{ const m=(window.__deskMembers||[]).find(x=>x.user_id===uid);
     if(m){ const tt=(window.__deskTeams||[]).find(x=>x.id===m.team_id); deskNm=tt&&tt.name; } }catch(e){}
@@ -567,7 +575,7 @@ document.addEventListener('click', e=>{
   if(el && DATA){ showPublicCard(el.getAttribute('data-uid')); }
 });
 
-const RANKED_MIN_LVL = 10;
+const RANKED_MIN_LVL = (window.HK_RANK&&HK_RANK.RANKED_MIN_LVL)||10;   // r417 audit: SSOT in themes.js HK_RANK (was a comment-synced duplicate)
 function campaignComplete(){
   try{
     const PB=JSON.parse(localStorage.getItem('hotkey_pb')||'{}');
@@ -659,8 +667,14 @@ function heroHtml(){
   let __fCls='', __fOrn='';
   try{
     const __mp=(DATA.profs||[]).find(p=>p.id===meId);
-    const __fv=__mp && __mp.flair;
-    if(__fv && /^[a-z0-9_-]{1,32}$/i.test(__fv)){
+    const __raw=__mp && __mp.flair;
+    /* r417 audit: flair is now often a JSON loadout blob (the customizer) — parse it via
+       hkFlair (same as showPublicCard above / nav.js rank-click card) so the hero wears the
+       equipped skin, instead of failing the bare-id test and rendering UNSKINNED.
+       hkFlair.frame is already validated against HK_FRAMES (XSS-safe). */
+    const __fv=window.hkFlair ? window.hkFlair(__raw).frame
+      : (__raw && /^[a-z0-9_-]{1,32}$/i.test(__raw) ? __raw : null);
+    if(__fv){
       if(window.HK_FRAMES && window.HK_FRAMES.some(f=>f.id===__fv)){
         __fCls=' hk-frame-'+__fv;
         /* r376: gem cut = the bucket held at the best tier (hk_ach_flags, via nav.js) */
