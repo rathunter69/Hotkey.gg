@@ -5,6 +5,13 @@
           tracks partition the whole catalog; menuOrder + HOTKEY_PARS line up.
      C3 — skin-list coverage: every SKINS key wears a per-class notch (.hkf-tab)
           override in nav.css, so a new skin can't silently fall back to the base pill.
+     C5 — de-hint the picker metadata (r419 H4): drills.js meta name/label/tab/desc are
+          player-visible before a drill even opens, so they must never leak a chord
+          (the AUDIT_R417 §D Class A regression: "Alt E S everything", tab "F4",
+          "F9 the suspect leg"). e2e-smoke's runtime de-hint covers index.html prompt/
+          checklist/desc but never scanned these fields, and its pattern skips bare
+          F-keys (cell refs there are content); picker metadata has no cell refs, so
+          bare F1-F12 are flagged here too.
    Run: node dev/check-invariants.js */
 'use strict';
 const fs = require('fs');
@@ -58,6 +65,29 @@ try {
   for (const k of valid) if (!(k in pars)) bad(`HOTKEY_PARS: missing entry for drill '${k}'`);
 } catch (e) {
   bad('C1 drills.js could not be evaluated: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C5: drills.js picker metadata carries no keyboard chords (de-hint) ---- */
+try {
+  const sb = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sb);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb);
+  const meta = (sb.window.HOTKEY_DRILLS || {}).meta || {};
+  const keys = Object.keys(meta);
+  if (!keys.length) bad('C5: no meta entries parsed from drills.js (shape changed?)');
+  const CHORD  = /\b(ctrl|alt|cmd|shift)\s*\+/i;            // modifier combos: Ctrl+C, alt+=
+  const ALTWALK = /\b[Aa]lt(\s+[A-Za-z0-9]\b){2,}/;         // ribbon walks: "Alt E S", "alt h k"
+  const FKEY   = /\bF([1-9]|1[0-2])\b/;                     // bare function keys: F4, F9
+  let hits = 0;
+  for (const k of keys) for (const f of ['name', 'label', 'tab', 'desc']) {
+    const t = String(meta[k][f] || '');
+    if (CHORD.test(t) || ALTWALK.test(t) || FKEY.test(t) || t.includes('⌘')) {
+      hits++; bad(`C5 de-hint: drills.js meta.${k}.${f} leaks a chord token: "${t.slice(0, 70)}"`);
+    }
+  }
+  if (keys.length && !hits) ok(`drills.js: ${keys.length} meta entries carry no chord tokens (de-hint)`);
+} catch (e) {
+  bad('C5 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
 /* ---- C3: every SKINS key has a per-class notch override in nav.css ---- */
