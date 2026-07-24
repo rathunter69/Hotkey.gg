@@ -4,6 +4,59 @@ New sessions: the repo IS the handover — read this file, **dev/PIPELINE.md's �
 live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ design docs._
 
 
+## 🎯 PROJECT NORTH STAR (the "why" — read this first if you're new)
+_Stable across sessions; deeper detail in `dev/STRATEGY.md`, `dev/LAUNCH.md`, `dev/INTERVIEW.md`,
+`dev/TEAMS_DESIGN.md`, `dev/XP_DESIGN.md`, `dev/DRILL_DOCTRINE.md`._
+
+**What it is.** hotkey.gg — a **keyboard-only Excel speedrun trainer**. 82 banker-grade drills, live
+leaderboards, desks for teams & schools. Taglines: *"Drills, not lessons. Fastest hands win. Your first
+run takes thirty seconds."* Static site (HTML + vanilla JS) → Supabase (Postgres/RLS/Edge Fns) + Stripe,
+deployed by Cloudflare Pages from `main`. **No build step, no framework.**
+
+**Why it exists.** Excel-keyboard fluency (no mouse) is a skill every IB/PE/finance seat screens for
+informally, but nobody *trains* it as a game with *proof*. The core is a genuinely-good 30-second loop:
+**drill → end-state grading → results → next.** The identity layer (ranks, levels, cosmetic cards,
+desks, certs) is deep. The thin part — the current roadmap focus — is everything *between* sessions:
+reasons to return tomorrow, proof to show others, and funnel instrumentation.
+
+**Target customers.** Primary: **finance/IB/PE analysts + recruiting candidates** ("you say you're fast
+in Excel on your resume — here's the receipt"). Distribution engine = **desks/clubs**: one captain
+(MBA/undergrad finance club officer, EB cohort self-organizer, bank training lead) = 10–150 players. B2B
+= "PRO for the whole desk" + a future cheat-resistant benchmark for recruiting.
+
+**Business model.** Freemium B2C sub — **PRO ($7/mo · $19/season)** — + **B2B per-seat "PRO for the
+desk"** + free comped PRO for verified student clubs. Strongest planned conversion surface = **Interview
+Mode** (a certified "superday" run: *"training is free-ish, proof costs money"*). **Stage: PRIVATE BETA,
+pre-revenue.** `BETA_MODE=true` unlocks PRO free for all; payments are a Stripe **test** scaffold (paywall
+held until an internship constraint lifts). New devices hit an access-code curtain (`PRELAUNCH_LOCK`).
+**Launch = ONE flag flip** (`PRELAUNCH_LOCK=false`) once the pre-launch gates are met (funnel data,
+Morning Sheet, a pilot cohort, T&S) — see `dev/LAUNCH.md`.
+
+**Core progression (two ladders).** **LEVEL** = volume/reps, never resets. **RANK** = competitive, opt-in
+at Level 10, a 5-board placement series, 8 tiers. Plus **3 certificate tracks** (fluency / formulas /
+modeling) and the **cosmetic card/skin economy** (the identity layer — deep, and the owner's passion).
+
+**Product doctrine (the laws that shape every change).** ① **Freedom Doctrine** — grade the END STATE,
+not the keystrokes (any legit Excel route wins). ② **Do the action, don't read the chord** — player copy
+never embeds hotkeys (de-hinting; now CI-guarded). ③ **Excel-faithful engine** — divergences are
+deliberate + documented (`dev/AUDIT.md`). ④ **Compact-always** layouts; fixed card sizes; seed empty
+space, never expand-to-content. ⑤ **MOCK-FIRST for visual reworks** — the owner reacts to rendered
+screenshots, not prose; nothing ships live on a visual rework without his sign-off.
+
+**Who "Wolf" is.** The owner/founder/PM (`wolfcdrake@gmail.com`) — every decision runs through his
+feedback and sign-off. He iterates live on rendered card mockups, is personal about branding ("Elite
+Boutique" not "Bulge Bracket"), and prefers batched autonomous work validated against the gate. His email
+is special-cased in prod (`nav.js` owner shim) to see the full unlocked site — **remove at launch (E3).**
+
+**Roadmap (where it's headed — `dev/STRATEGY.md` is the opinionated version).** The between-sessions layer:
+**Morning Sheet** daily ritual (highest retention ROI), **ghost-diff** on the results card (traces exist
+since r9, unused), **mastery stars**, **events/funnel table** (must precede launch — can't measure a
+launch retroactively), **streak insurance**. Then **Interview Mode** (PRO conversion), **Seasons**
+(design-first, DAU-gated), **Teams V2** (corporate/B2B analytics). Do-NOT-build-yet items are flagged in
+the docs.
+
+---
+
 ## ⚡ NEXT-SESSION HANDOFF (2026-07-24 — NOTCH TAXONOMY → ENGINE DEPTH → SAFETY/GUARDS → BUG-FIX marathon)
 
 **ONBOARD (read in this order):** this block · **`dev/PROJECT_REVIEW.md`** (full system map + the
