@@ -282,6 +282,21 @@ window.HK_BAND = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
+/* ---- r421 DEPTH-PASS §2.1 — MEDAL CLOCKS override map. The three named clocks
+   (pass / pro / legendary) are a DISPLAY layer over HK_BAND — nothing new is stored:
+   they derive at render from HOTKEY_PARS (pass = par×1.5 · pro = par×1.15 ·
+   legendary = par×1.0, the Silver/Gold/Elite thresholds). A drill overrides its
+   displayed clocks here — { pass, pro, leg } in SECONDS — only with cause on its
+   DEPTH_PASS §4 page (capstones set pass = par×2.0). Keys must be real drills
+   (dev/check-invariants.js guards). Grading is untouched: HK_BAND.of() stays the
+   one ladder (r363 consolidation law).
+     Also declared per drill in `meta` (below): `errorCount: N` — the §2.3
+   disclosed-error-count format. Setting it puts the "N errors — found k/N"
+   N-segment meter on the drill rail; the drill's checks() carry the aggregate
+   counter label "(k/N)" (or latch per-error ids on S.errGot). N is FIXED per
+   drill, never per seed (Wolf, 2026-07-24). ---- */
+window.HOTKEY_CLOCKS = {};
+
 window.HOTKEY_PARS = {"navigation":35,"modeltour":53,"blocksel":46,"filldr":37,"pastes":40,"rowops":26,"colops":16,"editfix":39,"undo":10,"copyover":13,"housestyle":47,"ruleoff":29,"ruleaudit":18,"dress":46,"typeset":15,"decimals":18,"center":18,"autofit":15,"combo":24,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets

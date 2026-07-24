@@ -295,6 +295,48 @@
   #grid td.mzr{border-right:3px solid #38445e !important}
   .mzpip{display:inline-block; color:#2f6bd8; font-size:16px; line-height:1; filter:drop-shadow(0 0 2px rgba(47,107,216,.5))}
   html[data-dark="1"] .mzpip{color:#7db0ff}
+  /* ---- r421 DEPTH-PASS P0 (§2): medal clocks · per-beat splits · bonus ☆ · error meter ·
+     touch-list pips · tier parking · mistakes replay. All opt-in per drill. ---- */
+  .hk-clocks{font-family:var(--mono); font-size:11px; white-space:nowrap}
+  .hk-clocks b{font-weight:700}
+  .cl-split{margin-left:auto; font-family:var(--mono); font-size:10px; color:var(--faint); flex:none; padding-left:6px}
+  .cl-split.ahead{color:var(--accent)}
+  .cl-item.cl-bonus .cl-label{color:var(--faint)}
+  .cl-item.cl-bonus .cl-box{border-style:dashed}
+  .cl-item.cl-bonus.ok .cl-label{color:var(--warn); text-decoration:none}
+  .cl-item.cl-bonus.ok .cl-box{border-color:var(--warn); color:var(--warn); background:transparent}
+  .cl-star{color:var(--faint); font-weight:700} .cl-star.on{color:var(--warn)}
+  .cl-item.cl-pre{opacity:.45}
+  .hk-errmeter{margin:2px 0 8px; font-family:var(--mono); font-size:10.5px; color:var(--muted)}
+  .hk-errmeter .em-lab{display:block; margin-bottom:4px; letter-spacing:.04em}
+  .hk-errmeter .em-segs{display:flex; gap:3px}
+  .hk-errmeter .em-seg{flex:1; height:6px; border-radius:2px; background:var(--surface2); border:1px solid var(--line)}
+  .hk-errmeter .em-seg.on{background:var(--accent); border-color:var(--accent); box-shadow:0 0 6px var(--accent-glow)}
+  #grid td.touchcell{position:relative}
+  #grid td.touchcell::after{content:'●'; position:absolute; top:0; right:2px; font-size:7px; line-height:1.7; color:#2f6bd8; opacity:.9}
+  html[data-dark="1"] #grid td.touchcell::after{color:#7db0ff}
+  #grid td.touchcell.touchgot::after{color:var(--accent); opacity:.55}
+  #grid td.parked{background:color-mix(in srgb, var(--muted) 12%, transparent) !important}
+  #grid td.parked .hk-parked-lab{color:var(--faint); font-family:var(--mono); font-size:10px; letter-spacing:.06em; white-space:nowrap}
+  @media (prefers-reduced-motion: no-preference){
+    #grid td.revealed{animation:hkReveal .55s ease-out}
+    @keyframes hkReveal{0%{filter:brightness(1.8)} 100%{filter:none}}
+  }
+  .rm-clock{font-family:var(--mono); font-size:12.5px; margin:2px 0 4px}
+  .rm-clock span{color:var(--muted)}
+  .rm-bonus{font-family:var(--mono); font-size:12px; color:var(--muted); margin:2px 0}
+  .rm-bonus.ok{color:var(--warn)}
+  .rm-splits{margin-top:8px; font-family:var(--mono); font-size:10.5px; text-align:left}
+  .rm-splits .rm-split, .rm-splits .rs-h{display:flex; gap:6px; align-items:baseline; padding:1px 2px}
+  .rm-splits .rs-h{color:var(--faint); text-transform:uppercase; letter-spacing:.08em; font-size:9.5px; border-bottom:1px solid var(--line); margin-bottom:2px}
+  .rm-splits .rs-lab{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .rm-splits .rs-t,.rm-splits .rs-pb{width:46px; text-align:right; flex:none}
+  .rm-splits .rs-d{width:50px; text-align:right; flex:none; color:var(--muted)}
+  .rm-splits .rs-d.ahead{color:var(--accent)}
+  .rm-splits .rm-split.worst{background:var(--accent-glow); border-radius:3px}
+  .rm-splits .rm-split.worst .rs-d{color:var(--warn); font-weight:700}
+  .rm-splits .rm-split.bonus{opacity:.7}
+  .st-pb .hk-clockico{margin-right:3px; font-size:9px}
   .gridwrap td.navmark-next, html[data-dark="1"] .gridwrap td.navmark-next{color:var(--accent) !important; font-size:22px; animation:navpulse 1.2s ease-in-out infinite}
   @keyframes navpulse{0%,100%{text-shadow:0 0 2px var(--accent-glow)} 50%{text-shadow:0 0 12px var(--accent),0 0 5px var(--accent)}}
   /* r271 — watch-solution spotlight (default ON; opt out: localStorage hk_demo_spot='0').
@@ -1604,7 +1646,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=279"></script>
+<script src="drills.js?v=280"></script>
 <link rel="stylesheet" href="nav.css?v=208">
 <script src="themes.js?v=309"></script>
 
@@ -8578,6 +8620,7 @@ function render(){
   }
   if(__gw) __gw.style.setProperty('--cellh', __rowH+'px');
   S._colW = colW;                                          // ENGINE widths — graders (autofit) read these; r55 wrongly pointed this at __ew
+  try{ hkTouchTick(); }catch(e){}   /* r421 §2.6: render runs after every action — latch a checkpoint the moment the cursor lands on it */
   const g=$('grid'); g.innerHTML='';
   const sr=selRange();
   const gt=currentTargetRange();
@@ -8712,6 +8755,15 @@ function render(){
       // Skip the active cell itself (would conflict with the active outline) and the pointer cell (point class wins).
       const refKey = colLetter(c)+r;
       if(S.marks && S.marks.length && S.marks.indexOf(refKey)>=0 && !isActive) cls.push('mark');   // r182 go-to-special
+      /* r421 §2.6: touch-list checkpoint pips — blue dot ahead, accent once visited */
+      if(S.touch){ const __ti=S.touch.cells.indexOf(refKey);
+        if(__ti>=0){ cls.push('touchcell'); if(S.touch.got[__ti]) cls.push('touchgot'); } }
+      /* r421 §2.5: a still-parked tier region dims; its anchor cell wears the "▸ unlocks" tag.
+         A freshly revealed region flashes once (reduced-motion safe — CSS-gated). */
+      if(S.tiers){ const __pk=hkParkedAt(r,c);
+        if(__pk){ cls.push('parked');
+          if(__pk.anchor && (cell.value==null||cell.value==='')) txt='<span class="hk-parked-lab">▸ '+escHtml(__pk.label||'unlocks')+'</span>'; }
+        else if(S._tierFresh && r>=S._tierFresh.r1&&r<=S._tierFresh.r2&&c>=S._tierFresh.c1&&c<=S._tierFresh.c2) cls.push('revealed'); }
       const refColor = refColors[refKey];
       let extraStyle = '';
       if(cell.bl || cell.br || cell.thick){   // r292: left/right/thick edges as real borders (collapse merges shared edges, no doubling)
@@ -8757,6 +8809,7 @@ function render(){
     if(__td) __td.classList.add('pippop');
   }
   if(S.maze) S.maze._fresh=undefined;   // r402: one-shot pip pop consumed this render
+  if(S.tiers && S._tierFresh) S._tierFresh=null;   // r421 §2.5: one-shot reveal flash consumed this render
   positionMarquee();
   positionPasteDest();
   if(pendingFlash){ const f=pendingFlash; pendingFlash=null;
@@ -9270,7 +9323,9 @@ function startClock(){ if(running||done||sandboxMode)return; running=true; start
   if(marathon && marathon.active && !marathon.endAt){
     marathon.startAt=started; marathon.endAt=started+marathon.dur*1000; }
   $('timer').classList.add('run'); tickH=setInterval(updateTimer,40); }
-function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); ghostTick(t); }
+function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); ghostTick(t);
+  /* r421 §2.7: the mistakes replay is a 30-SECOND rep — at the cap it ends quietly, full board back */
+  if(microRun && running && !done && t>microRun.cap){ microExit('30 seconds — the rep is over · full board reloaded'); return; } }
 /* PB pace ghost: while you run, the gap to your own best counts down beside the clock.
    Green while you're ahead of the PB, red the instant it slips away. */
 let ghostPB=null, ghostTrace=null;
@@ -9350,8 +9405,364 @@ function ghostTick(t){
 function stopClock(){ running=false; clearInterval(tickH); finished=performance.now();
   $('timer').classList.remove('run'); }
 
+/* ============================================================
+   r421 DEPTH-PASS P0 — PLATFORM MECHANICS (dev/DEPTH_PASS.md §2)
+   Build-once pieces the ~88 per-drill reworks consume. Everything
+   here is OPT-IN per drill; no existing drill's grading changes.
+     · §2.1 medal clocks — pass/pro/legendary as a DISPLAY layer
+       over HK_BAND (par×1.5 / ×1.15 / ×1.0; HOTKEY_CLOCKS overrides)
+     · §2.1 rider — per-beat splits (S.splits[i], speedrun style):
+       in-run split beside each done checklist row, post-run
+       splits-vs-PB table, PB splits persisted (hk_pb_splits)
+     · §2.2 bonus beats — a check flagged {bonus:true} renders as a
+       ☆ line, graded + celebrated, NEVER blocking the win (gradePass
+       filters it; its state latches at the win moment; one-time
+       +15 xp on a drill's first clean bonus clear). AUTHORING RULE:
+       the demo() script performs the ☆ BEFORE the final core beat —
+       the win fires the moment the cores complete, so a demo that
+       saves the ☆ for last would demonstrate a missed bonus and its
+       trailing keys would land on the results card (breaking replay).
+     · §2.3 disclosed-error meter — drills.js meta.<key>.errorCount=N
+       puts the "N errors — found k/N" segment meter on the rail;
+       found parses from the aggregate counter label "(k/N)" or
+       counts S.errGot ids; segments latch (never un-fill in a run)
+     · §2.6 touch-lists — build() may return touch:{cells,label};
+       the engine latches visits (S.touch.got / S.touchGot) with a
+       per-checkpoint time each (navigation's pip machinery,
+       generalized — counter labels read S.touchGot)
+     · §2.5 tier ladder — build() may return tiers:[{checks,reveal,
+       label}]; a tier's region parks dim ("▸ unlocks") until its
+       gating checks grade clean, then paints in live; guided rails
+       fence to the active tier (railZoneCompute skips parked rects)
+     · §2.7 mistakes-replay — post-run micro-rerun of only the
+       dropped / worst-split beats: same seed, demo-prefilled to the
+       first dropped beat, 30s cap, no XP, no posts, no PB.
+   ============================================================ */
+let microRun=null, microPrefill=false, __lastSeed=null;
+
+/* ---- §2.1 clocks (display only; HK_BAND stays the one graded ladder) ---- */
+const HK_CLOCK_TIERS=[
+  {k:'leg',  n:'Legendary', color:'#b98bff', ico:'★'},
+  {k:'pro',  n:'Pro',       color:'#e0b341', ico:'◆'},
+  {k:'pass', n:'Pass',      color:'#aeb6c0', ico:'●'},
+];
+function hkClocksFor(key){
+  const C=CHALLENGES[key];
+  const par=(window.HOTKEY_PARS&&window.HOTKEY_PARS[key])||(C&&C.par)||0;
+  if(!par) return null;
+  const o=(window.HOTKEY_CLOCKS||{})[key]||{};
+  return { pass:+o.pass||par*1.5, pro:+o.pro||par*1.15, leg:+o.leg||par*1.0 };
+}
+function hkClockFmt(sec){ sec=Math.round(sec); return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }
+function hkClockStrip(key){
+  const c=hkClocksFor(key); if(!c) return '';
+  return '<span class="hk-clocks">'+
+    '<b style="color:#aeb6c0">pass '+hkClockFmt(c.pass)+'</b> · '+
+    '<b style="color:#e0b341">pro '+hkClockFmt(c.pro)+'</b> · '+
+    '<b style="color:#b98bff">legendary '+hkClockFmt(c.leg)+'</b></span>';
+}
+function hkClockBeat(key, tSec){   // the clock this time beats + the next one up (next=null past legendary)
+  const c=hkClocksFor(key); if(!c||tSec==null||!isFinite(tSec)) return null;
+  const T=[Object.assign({t:c.leg},HK_CLOCK_TIERS[0]), Object.assign({t:c.pro},HK_CLOCK_TIERS[1]), Object.assign({t:c.pass},HK_CLOCK_TIERS[2])];
+  if(tSec<=T[0].t) return {beat:T[0], next:null};
+  if(tSec<=T[1].t) return {beat:T[1], next:T[0]};
+  if(tSec<=T[2].t) return {beat:T[2], next:T[1]};
+  return {beat:null, next:T[2]};
+}
+function hkClockRow(key, tSec){   // results card: the clock you beat + the next one with its time
+  try{
+    const cb=hkClockBeat(key, tSec); if(!cb) return '';
+    if(!cb.beat) return '<div class="rm-clock">⏱ off the clocks <span>— pass at '+hkClockFmt(cb.next.t)+'</span></div>';
+    const nxt=cb.next ? ' <span>— '+cb.next.n.toLowerCase()+' at '+hkClockFmt(cb.next.t)+'</span>'
+                      : ' <span>— the ceiling</span>';
+    return '<div class="rm-clock">⏱ <b style="color:'+cb.beat.color+'">'+cb.beat.n+' '+hkClockFmt(tSec)+'</b>'+nxt+'</div>';
+  }catch(e){ return ''; }
+}
+function hkClockIcon(key, pbSec){   // PB chip: the best clock the held PB beats
+  try{
+    const cb=hkClockBeat(key, pbSec); if(!cb||!cb.beat) return '';
+    return '<span class="hk-clockico" style="color:'+cb.beat.color+'" title="'+cb.beat.n.toLowerCase()+' clock held">'+cb.beat.ico+'</span>';
+  }catch(e){ return ''; }
+}
+
+/* ---- §2.1 rider: per-beat splits. The grading loop (updateChecklist) already
+   re-evaluates checks after every action — latch the elapsed time the moment a
+   beat flips ok (S.splits[i]); a beat that un-flips mid-run clears its split
+   (re-latched on re-completion) and is recorded as a DROPPED beat for §2.7.
+   Display/telemetry only — no XP, no band effect, no fifth progression system. ---- */
+function hkSplitTick(items){
+  if(!S||!items) return;
+  if(!S.splits || S.splits.length!==items.length) S.splits=new Array(items.length).fill(null);
+  const now=performance.now();
+  const el = started ? ((((running||!finished) ? now : finished) - started)/1000) : 0;
+  items.forEach((c,i)=>{
+    if(c.ok){ if(S.splits[i]==null) S.splits[i]=el; }
+    else if(!done){
+      if(S.splits[i]!=null && running){ if(!S._dropped) S._dropped={}; S._dropped[i]=true; }
+      S.splits[i]=null;
+    }
+  });
+}
+function hkSplitFmt(sec){ if(sec==null||!isFinite(sec)) return '—';
+  const m=Math.floor(sec/60), s=sec-m*60;
+  return m+':'+(s<10?'0':'')+s.toFixed(1); }
+function hkSegAt(arr,i){   // segment duration for beat i (cumulative splits → per-beat time)
+  if(!arr||arr[i]==null) return null;
+  let prev=0; for(let j=i-1;j>=0;j--){ if(arr[j]!=null){ prev=arr[j]; break; } }
+  return arr[i]-prev;
+}
+function hkPbAhead(idx){   // in-run tint: true = ahead of the PB run at this beat (never red mid-run)
+  const p=S&&S._pbSplits; if(!p||!S.splits) return null;
+  const a=S.splits[idx], b=p[idx];
+  if(a==null||b==null) return null;
+  return a<b;
+}
+function hkWorstSplitIdx(items){   // §2.7 default target: the worst split vs PB (or the slowest beat outright)
+  try{
+    if(!S||!S.splits) return null;
+    const pb=S._pbSplits;
+    let w=null, wd=-Infinity;
+    items.forEach((c,i)=>{ if(c.bonus) return;
+      const a=hkSegAt(S.splits,i); if(a==null) return;
+      const b=pb?hkSegAt(pb,i):null;
+      const d=(b!=null)?a-b:a;
+      if(d>wd){ wd=d; w=i; } });
+    return w;
+  }catch(e){ return null; }
+}
+function hkPbSplitsLoad(sk){
+  try{ const a=JSON.parse(localStorage.getItem('hk_pb_splits')||'{}'); const e=a[sk];
+    return (e&&Array.isArray(e.splits)) ? e.splits.map(x=>x==null?null:x/1000) : null;
+  }catch(e){ return null; }
+}
+function hkPbSplitsSave(sk, tSec, star){
+  try{
+    const a=JSON.parse(localStorage.getItem('hk_pb_splits')||'{}');
+    a[sk]={ ms:Math.round(tSec*1000),
+            splits:(S.splits||[]).map(x=>x==null?null:Math.round(x*1000)),
+            star:!!star };
+    localStorage.setItem('hk_pb_splits', JSON.stringify(a));
+    try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}   /* rides the account like the PB map */
+  }catch(e){}
+}
+function hkSplitsTable(){   // results card (details): this run's splits vs the PB run's, worst delta lit
+  try{
+    if(!S||!S.splits||!S.splits.filter(x=>x!=null).length) return '';
+    const items=CHALLENGES[cur].checks(S);
+    const pb=S._pbSplits;
+    let worst=-1, worstD=0;
+    if(pb){ items.forEach((c,i)=>{ if(c.bonus) return;
+      const a=hkSegAt(S.splits,i), b=hkSegAt(pb,i);
+      if(a==null||b==null) return;
+      const d=a-b; if(d>worstD){ worstD=d; worst=i; } }); }
+    let rows='';
+    items.forEach((c,i)=>{
+      const t=S.splits[i], p=pb?pb[i]:null;
+      const a=hkSegAt(S.splits,i), b=pb?hkSegAt(pb,i):null;
+      const d=(a!=null&&b!=null)?a-b:null;
+      let lab=String(c.label||'').replace(/<[^>]*>/g,'').replace(/\s*\([^)]*\)/g,'').trim();
+      if(lab.length>34) lab=lab.slice(0,33)+'…';
+      rows+='<div class="rm-split'+(i===worst?' worst':'')+(c.bonus?' bonus':'')+'">'+
+        '<span class="rs-lab">'+(c.bonus?'☆ ':'')+escHtml(lab)+'</span>'+
+        '<span class="rs-t">'+hkSplitFmt(t)+'</span>'+
+        '<span class="rs-pb">'+(p!=null?hkSplitFmt(p):'—')+'</span>'+
+        '<span class="rs-d'+(d!=null?(d<=0?' ahead':''):'')+'">'+(d!=null?((d<=0?'−':'+')+Math.abs(d).toFixed(1)+'s'):'')+'</span></div>';
+    });
+    return '<div class="rm-splits"><div class="rs-h"><span class="rs-lab">splits — this run vs your best</span>'+
+      '<span class="rs-t">run</span><span class="rs-pb">best</span><span class="rs-d">Δ</span></div>'+rows+'</div>';
+  }catch(e){ return ''; }
+}
+
+/* ---- §2.2 bonus ☆ helpers ---- */
+function hkBonusStar(key){ try{ return !!(JSON.parse(localStorage.getItem('hk_bonus_star')||'{}')[key]); }catch(e){ return false; } }
+
+/* ---- §2.3 disclosed-error meter ---- */
+function hkErrMeterHtml(items){
+  try{
+    const meta=(window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.meta)||{};
+    const N=(meta[cur]&&meta[cur].errorCount)|0;
+    if(!N||!S) return '';
+    let k=0;
+    if(S.errGot){ for(const id in S.errGot){ if(S.errGot[id]) k++; } }
+    else{
+      const re=new RegExp('(\\d+)\\s*/\\s*'+N+'\\b');
+      for(const it of items){ const m=re.exec(String(it.label||'')); if(m){ k=parseInt(m[1],10)||0; break; } }
+    }
+    if(!S._errLatch || k>S._errLatch) S._errLatch=k;   // segments never un-fill within a run
+    k=Math.min(N, S._errLatch||0);
+    let seg=''; for(let i=0;i<N;i++) seg+='<span class="em-seg'+(i<k?' on':'')+'"></span>';
+    return '<div class="hk-errmeter" role="img" aria-label="'+N+' errors — found '+k+' of '+N+'">'+
+      '<span class="em-lab">'+N+' error'+(N===1?'':'s')+' — found '+k+'/'+N+'</span>'+
+      '<span class="em-segs">'+seg+'</span></div>';
+  }catch(e){ return ''; }
+}
+
+/* ---- §2.6 checkpoint touch-lists ---- */
+function hkTouchInit(built){
+  if(!built||!built.touch||!Array.isArray(built.touch.cells)||!built.touch.cells.length) return;
+  S.touch={ cells:built.touch.cells.map(String), label:String(built.touch.label||''), got:{}, times:{} };
+  S.touchGot=0;
+}
+function hkTouchTick(){
+  if(!S||!S.touch||done) return;
+  try{
+    const ref=colLetter(S.active.c)+S.active.r;
+    const i=S.touch.cells.indexOf(ref);
+    if(i>=0 && !S.touch.got[i]){
+      S.touch.got[i]=true;
+      S.touch.times[i]=(running&&started)?(performance.now()-started)/1000:0;   // per-checkpoint split (§2.1 synergy)
+    }
+    S.touchGot=S.touch.cells.reduce((a,_,j)=>a+(S.touch.got[j]?1:0),0);
+  }catch(e){}
+}
+
+/* ---- §2.5 origami tier ladder ---- */
+function hkTiersInit(built){
+  if(!built||!Array.isArray(built.tiers)||!built.tiers.length) return;
+  S.tiers=built.tiers.map(t=>{
+    const refs=Object.keys(t.reveal||{});
+    let r1=Infinity,c1=Infinity,r2=-1,c2=-1;
+    refs.forEach(k=>{ const p=resolveRange(k); if(p){ r1=Math.min(r1,p.r1); c1=Math.min(c1,p.c1); r2=Math.max(r2,p.r2); c2=Math.max(c2,p.c2); } });
+    return { checks:(t.checks||[]).slice(), reveal:t.reveal||{}, label:String(t.label||''),
+             open:!refs.length, rect:(r2>=0?{r1,c1,r2,c2}:null) };
+  });
+}
+function hkTierTick(items){
+  if(!S||!S.tiers||!items) return;
+  let opened=false;
+  for(const t of S.tiers){
+    if(t.open) continue;
+    if(!(t.checks||[]).every(i=>items[i]&&items[i].ok)) break;   // the ladder opens in order
+    for(const ref in t.reveal){ S.cells[ref]=Object.assign({}, blankCell(), t.reveal[ref]); }
+    if(t.rect && t.rect.r2>S.ROWS) S.ROWS=t.rect.r2;
+    t.open=true; opened=true;
+    S._tierFresh=t.rect;
+  }
+  if(opened){
+    try{ recalc(); }catch(e){}
+    try{ if(guided) railZoneCompute(); }catch(e){}   // the fence follows the reveal — rails cover the newly active tier
+    try{ if(!window.__hkMute && running && !done) playObjectiveDing(); }catch(e){}
+    if(!S._tierRepaint){ S._tierRepaint=1;
+      setTimeout(()=>{ try{ S._tierRepaint=0; render(); }catch(e){} }, 0); }   // repaint OUTSIDE this grading pass (updateChecklist runs inside render)
+  }
+}
+function hkParkedAt(r,c){   // is (r,c) inside a still-parked tier region?
+  if(!S||!S.tiers) return null;
+  for(const t of S.tiers){
+    if(t.open||!t.rect) continue;
+    if(r>=t.rect.r1&&r<=t.rect.r2&&c>=t.rect.c1&&c<=t.rect.c2)
+      return { anchor:(r===t.rect.r1&&c===t.rect.c1), label:t.label };
+  }
+  return null;
+}
+
+/* ---- §2.7 mistakes-replay micro-drill ---- */
+function hkMicroOffer(items, tSec){   // post-win: offer the rep? on which beats?
+  try{
+    if(gameMode!=='classic' || challengeMode || weeklyMode || (marathon&&marathon.active) ||
+       (typeof race!=='undefined'&&race&&race.drill===cur) || __lastSeed==null) return null;
+    const C=CHALLENGES[cur];
+    const moves=(typeof C.demo==='function')?C.demo.call(C):C.demo;
+    if(!moves||!moves.length) return null;   // the prefill rides the demo script
+    const dropped=[];
+    items.forEach((c,i)=>{ if(!c.bonus && S._dropped && S._dropped[i]) dropped.push(i); });
+    const bi=items.findIndex(c=>c.bonus);
+    if(bi>=0 && !items[bi].ok) dropped.push(bi);
+    const clean=!mouseUsed&&!guidedUsed;
+    const subPass=C.par ? tSec>C.par*1.5 : false;
+    if(clean && !subPass && !dropped.length) return null;
+    let targets=dropped.slice(), why='dropped';
+    if(!targets.length){ const w=hkWorstSplitIdx(items); if(w==null) return null; targets=[w]; why='slow'; }
+    return { targets, why };
+  }catch(e){ return null; }
+}
+function startMicroRun(targets){
+  try{
+    if(!targets||!targets.length||!S) return;
+    hideResults();
+    const key=cur;
+    window.__forceSeed=__lastSeed;               // same board, same seed
+    loadChallenge(key);
+    const C=CHALLENGES[key];
+    const moves=((typeof C.demo==='function')?C.demo.call(C):C.demo)||[];
+    const first=Math.min.apply(null,targets);
+    const preOk=()=>{ try{ const it=C.checks(S);
+      for(let i=0;i<first;i++){ if(!it[i].bonus && !it[i].ok) return false; } return true;
+    }catch(e){ return true; } };
+    // never pre-play a TARGETED beat: a demo move whose sel lands inside a target's
+    // rect (targets() is index-aligned with checks, §1.9) is skipped, so the rep's own
+    // beats stay open for the player even when the demo interleaves them (☆ mid-script)
+    let tRects=[];
+    try{
+      const T2=(typeof C.targets==='function')?C.targets.call(C):C.targets;
+      tRects=targets.map(i=>{ let t=T2&&T2[i]; if(typeof t==='function') t=t.call(C);
+        return t?resolveRange(String(t)):null; }).filter(Boolean);
+    }catch(e){}
+    const hitsTarget=(sel)=>{ try{ const r=resolveRange(String(sel||'')); if(!r) return false;
+      return tRects.some(z=>!(r.r2<z.r1||r.r1>z.r2||r.c2<z.c1||r.c1>z.c2)); }catch(e){ return false; } };
+    microPrefill=true; window.__hkMute=true;     // silent prefill: the demo plays the beats BEFORE the first dropped one
+    try{
+      outer: for(const mv of moves){ if(preOk()) break;
+        if(hitsTarget(mv.sel)) continue;
+        setDemoSel(mv.sel);
+        for(const kk of mv.keys){ demoKey(kk); if(preOk()) break outer; } }
+    }finally{ microPrefill=false; window.__hkMute=false; }
+    // hand the board over — fresh clock, nothing scored
+    running=false; clearInterval(tickH); started=0; finished=0; done=false;
+    mouseUsed=false; guidedUsed=false; keyLog=[]; keyTimes=[]; keyCells=[]; undoStack=[]; redoStack=[];
+    S.splits=null; S._dropped=null; S._sndOkN=undefined;
+    $('timer').textContent='0.00'; $('timer').classList.remove('run');
+    microRun={ key, targets:targets.slice(), cap:30 };
+    const r=$('result'); if(r){ r.className='result ready';
+      r.innerHTML='⚡ <b>mistakes replay</b> — redo the '+targets.length+' beat'+(targets.length===1?'':'s')+
+        ' below · 30 seconds, nothing scored · <kbd>shift+f11</kbd> loads the full drill'; }
+    try{ ev('micro_run',{d:key, n:targets.length}); }catch(e){}
+    render();
+  }catch(e){ microRun=null; microPrefill=false; window.__hkMute=false; }
+}
+function microExit(msg){
+  const key=(microRun&&microRun.key)||cur;
+  microRun=null;
+  loadChallenge(key);
+  if(msg){ try{ showToast(msg); }catch(e){} }
+}
+function microCheckWin(){   // the rep's own win: ONLY the targeted beats grade
+  if(!microRun) return;
+  const C=CHALLENGES[cur];
+  let items; try{ items=C.checks(S); }catch(e){ return; }
+  if(!microRun.targets.every(i=>items[i]&&items[i].ok)) return;
+  const t=started?(performance.now()-started)/1000:0;
+  stopClock(); done=true; $('timer').textContent=t.toFixed(2);
+  try{ hkSplitTick(items); }catch(e){}
+  try{ playSuccessBlip(2); }catch(e){}
+  const n=microRun.targets.length;
+  const m=$('resultsModal'); if(m){
+    m.innerHTML='<div class="rm-card">'+
+      '<div class="rm-title">rep complete</div>'+
+      '<div class="rm-time">'+t.toFixed(2)+'<span>s</span></div>'+
+      '<div class="rm-nearmiss" style="color:var(--muted)">'+n+' beat'+(n===1?'':'s')+' redone — pure rep, nothing scored</div>'+
+      '<div class="rm-opts">'+
+      '<button class="rm-key primary" data-act="full"><kbd>↵</kbd>run the full drill</button>'+
+      '<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>'+
+      '</div></div>';
+    m.classList.add('show');
+    m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
+      const a=b.dataset.act; hideResults(); microRun=null;
+      if(a==='full') restartDrill(); else { loadChallenge(cur); openPicker(); }
+    }; });
+  }
+  resultsChainKeys=(ev2)=>{
+    if(window.__hkCelOpen || ev2.defaultPrevented) return;
+    if(ev2.key==='Enter'){ ev2.preventDefault(); hideResults(); microRun=null; restartDrill(); return; }
+    if(ev2.key==='Escape'){ ev2.preventDefault(); hideResults(); microRun=null; loadChallenge(cur); openPicker(); return; }
+    if(ev2.key==='n'||ev2.key==='N'||ev2.key===' '){ ev2.preventDefault(); hideResults(); microRun=null; loadChallenge(nextDrillKey()); return; }
+  };
+  try{ ev('micro_done',{d:cur, t:Math.round(t*100)/100}); }catch(e){}
+}
+
 function checkWin(){
-  if(done||demoPlaying||sandboxMode||echoOn) return;   // r238: the sandbox is a free-play scratch sheet — never wins, never scores
+  if(done||demoPlaying||sandboxMode||echoOn||microPrefill) return;   // r238: the sandbox is a free-play scratch sheet — never wins, never scores
+  if(microRun){ microCheckWin(); return; }                           // r421 §2.7: the rep grades only its targeted beats
   if(!gradePass()) return;
   const t=(performance.now()-started)/1000;
   stopClock(); done=true; $('timer').textContent=t.toFixed(2);
@@ -9360,6 +9771,26 @@ function checkWin(){
   const C=CHALLENGES[cur];
   let pb=false;
   const sk=scoreKey();
+  /* r421 §2.1/§2.2: final split snapshot + the ☆ state LATCHED at the win moment */
+  let __winItems=null, __bonus=null;
+  try{
+    __winItems=C.checks(S);
+    hkSplitTick(__winItems);
+    const bi=__winItems.findIndex(x=>x.bonus);
+    if(bi>=0){
+      __bonus={ok:!!__winItems[bi].ok};
+      if(__bonus.ok && !mouseUsed && !guidedUsed && !hkBonusStar(cur)){
+        try{
+          const bs=JSON.parse(localStorage.getItem('hk_bonus_star')||'{}');
+          bs[cur]=1; localStorage.setItem('hk_bonus_star', JSON.stringify(bs));
+          const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+          localStorage.setItem('hk_xp_est', String(est+15));
+          __bonus.xp=15;   // one-time bounty — a bonus can never gate anything
+          try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}
+        }catch(e){}
+      }
+    }
+  }catch(e){}
   // client-side XP estimate for the results card (server math is canonical; decay not shown here)
   let xpGain=0, xpNote='';
   try{ const cl=JSON.parse(localStorage.getItem('hk_clears')||'{}'); cl[cur]=(cl[cur]||0)+1;
@@ -9429,6 +9860,7 @@ function checkWin(){
   if(!mouseUsed && !guidedUsed){ const prev=PB[sk];
     __prevBest = (prev===undefined) ? null : prev;
     if(prev===undefined||t<prev){ PB[sk]=t; savePB(); pb=true; $('pb').textContent=t.toFixed(2)+'s';
+      try{ hkPbSplitsSave(sk, t, __bonus&&__bonus.ok); }catch(e){}   /* r421 §2.1: the PB run's splits ride beside the PB time (S._pbSplits keeps the OLD run for this card's table) */
       if(prev!==undefined) __pbDelta = prev - t;   // how much faster than the old best
       // r163: GHOST REPLAY — keep the PB run's cursor path on this device (consecutive
       // duplicate cells collapse; capped). Next run, the ghost glides through it live.
@@ -9467,9 +9899,12 @@ function checkWin(){
       }
     }catch(e){}
     KV.set('hotkey_solves', String(nsol)); renderLvl(nsol); }); }catch(e){}
+  let __micro=null; try{ __micro=__winItems?hkMicroOffer(__winItems, t):null; }catch(e){}
+  window.__microOffer=__micro;   // the results card's r-key reads this (r421 §2.7)
   showResults({t:t.toFixed(2), keys:keyLog.length, par:C.parKeys, pb, mouse:mouseUsed, guided:guidedUsed,
     newBand:(__bandRes&&__bandRes.isNew)?__bandRes.band:null, bandXp:(__bandRes&&__bandRes.gained)||0,
-    prevBest:__prevBest, pbDelta:__pbDelta, combo:hkComboMax});
+    prevBest:__prevBest, pbDelta:__pbDelta, combo:hkComboMax,
+    bonus:__bonus, micro:__micro, tSec:t});
   try{ hkComboReset(); }catch(e){}
   if(sb && me_user && !isAnonUser() && !mouseUsed && !guidedUsed){
     recordRun(t).then(async ok=>{
@@ -9619,7 +10054,9 @@ function showResults(o){
     if(ev.key==='Enter'){ ev.preventDefault(); hideResults(); restartDrill(); return; }
     if(ev.key==='n'||ev.key==='N'||ev.key===' '){ ev.preventDefault(); hideResults(); loadChallenge(nextDrillKey()); return; }
     if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
-    if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':'details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards'; } return; }   // r293: progressive disclosure
+    if((ev.key==='r'||ev.key==='R') && window.__microOffer){ ev.preventDefault();
+      const mo=window.__microOffer; window.__microOffer=null; startMicroRun(mo.targets); return; }   // r421 §2.7: launch the mistakes replay
+    if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':'details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards'; } return; }   // r293: progressive disclosure
   };
   return _showResults(o);
 }
@@ -9748,15 +10185,20 @@ function _showResults(o){
   }catch(e){}
   /* r293 (Wolf): SLIM CARD — the hero is the time + ONE hook + the next action.
      Keys/band/stalls/boards fold behind a d-toggle so the loop stays fast. */
+  /* r421 §2.1/§2.2: the clock this run beats (+ the next one), and the ☆ verdict — never red */
+  const clockRow=(!o.mouse && !o.guided) ? hkClockRow(cur, (o.tSec!=null?o.tSec:parseFloat(o.t))) : '';
+  const bonusRow=o.bonus ? `<div class="rm-bonus${o.bonus.ok?' ok':''}">${o.bonus.ok?('☆ bonus cleared'+(o.bonus.xp?' · +'+o.bonus.xp+' xp':'')):'☆ bonus missed'}</div>` : '';
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
+    clockRow+bonusRow+
     hookRow+flowRow+
-    `<a class="rm-more-t" id="rmMoreT"><kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards</a>`+
+    `<a class="rm-more-t" id="rmMoreT"><kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards</a>`+
     `<div class="rm-more">`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     _bandRow(o)+
     savedRow+
+    hkSplitsTable()+
     ghostDiff(o)+
     ((CHALLENGES[cur]&&CHALLENGES[cur].aha)?'<div class="rm-aha">\ud83d\udca1 '+CHALLENGES[cur].aha+'</div>':'')+
     `<div class="rm-scores"><span class="rm-scores-h">leaderboard</span>${postRow}</div>`+
@@ -9766,6 +10208,7 @@ function _showResults(o){
     `<button class="rm-key" data-act="again"><kbd>↵</kbd>again</button>`+
     `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`+
     `<button class="rm-key" data-act="menu"><kbd>esc</kbd>menu</button>`+
+    (o.micro ? `<button class="rm-key" data-act="micro"><kbd>r</kbd>${o.micro.why==='slow'?'redo the slow beat':'redo the beats you dropped'}</button>` : '')+
     (o.pb ? `<button class="rm-key" data-act="share">\ud83d\udcf8 share</button>` : '')+
     `</div>`+
     ((typeof challengeEligible==='function' && challengeEligible() && !challengeDoneToday() && !challengeMode)
@@ -9774,12 +10217,13 @@ function _showResults(o){
     `</div>`;
   m.classList.add('show');
   // r88: the rm-key buttons rendered but had NO click wiring — keyboard-only card.
-  { const mt=m.querySelector('#rmMoreT'); if(mt) mt.onclick=()=>{ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); mt.innerHTML=(x&&x.classList.contains('open'))?'<kbd>d</kbd> hide the detail':'<kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 stalls \u00b7 boards'; }; }
+  { const mt=m.querySelector('#rmMoreT'); if(mt) mt.onclick=()=>{ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); mt.innerHTML=(x&&x.classList.contains('open'))?'<kbd>d</kbd> hide the detail':'<kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards'; }; }
   m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
     const a=b.dataset.act;
     if(a==='again'){ hideResults(); restartDrill(); }
     else if(a==='next'){ hideResults(); loadChallenge(nextDrillKey()); }
     else if(a==='menu'){ hideResults(); openPicker(); }
+    else if(a==='micro'){ window.__microOffer=null; hideResults(); startMicroRun(o.micro.targets); }   /* r421 §2.7 */
     else if(a==='share'){ /* r359: PB share card — canvas PNG via the shared renderer */
       try{
         let life=''; try{
@@ -9994,7 +10438,8 @@ function renderSheetTabs(){
     : '';
   host.innerHTML = lead + pips + pageKeys.map(k=>{
     const C=CHALLENGES[k];
-    const pb = PB[k]!==undefined ? '<span class="st-pb">'+PB[k].toFixed(1)+'s</span>' : '';
+    /* r421 §2.1: the PB chip wears the best clock's icon (★ legendary · ◆ pro · ● pass) */
+    const pb = PB[k]!==undefined ? '<span class="st-pb">'+hkClockIcon(k, PB[k])+PB[k].toFixed(1)+'s</span>' : '';
     return '<span class="st-tab'+(k===cur?' cur':'')+'" data-key="'+k+'">'+escHtml(C.name||k)+pb+'</span>';
   }).join('') + next;
   host.querySelectorAll('.st-tab').forEach(el=>el.onclick=()=>{ if(!demoPlaying) loadChallenge(el.dataset.key); });
@@ -10161,11 +10606,19 @@ function railZoneCompute(){
     const C=CHALLENGES[cur]; if(!C || sandboxMode || !railSafe(C)) return;
     let r1=Infinity,c1=Infinity,r2=-1,c2=-1;
     const eat=rr=>{ if(!rr) return; r1=Math.min(r1,rr.r1); c1=Math.min(c1,rr.c1); r2=Math.max(r2,rr.r2); c2=Math.max(c2,rr.c2); };
+    /* r421 §2.5: guided rails fence to the ACTIVE tier — targets/demo cells inside a
+       still-parked tier region stay out of the zone until that region reveals (this
+       recomputes on every reveal). Seeded cells only exist once revealed, so the plain
+       cell scan below is already tier-correct. */
+    const __parked=(S.tiers||[]).filter(t=>!t.open&&t.rect).map(t=>t.rect);
+    const eatOpen=rr=>{ if(!rr) return;
+      if(__parked.some(z=>!(rr.r2<z.r1||rr.r1>z.r2||rr.c2<z.c1||rr.c1>z.c2))) return;
+      eat(rr); };
     try{ const T2=(typeof C.targets==='function')?C.targets.call(C):C.targets;
-      (T2||[]).forEach(t=>{ try{ if(typeof t==='function') t=t.call(C); eat(resolveRange(t)); }catch(e){} }); }catch(e){}
+      (T2||[]).forEach(t=>{ try{ if(typeof t==='function') t=t.call(C); eatOpen(resolveRange(t)); }catch(e){} }); }catch(e){}
     for(const k in S.cells){ try{ eat(resolveRange(k)); }catch(e){} }
     try{ const mv=(typeof C.demo==='function')?C.demo.call(C):C.demo;
-      (mv||[]).forEach(m2=>{ try{ eat(resolveRange(m2.sel)); }catch(e){} }); }catch(e){}
+      (mv||[]).forEach(m2=>{ try{ eatOpen(resolveRange(m2.sel)); }catch(e){} }); }catch(e){}
     if(r2<0) return;
     /* r2 is NOT clamped to S.ROWS: growth drills (isbuild, cfslink) grade targets below the
        load-time frame — rows the player creates by inserting. Movement is already bounded by
@@ -10548,7 +11001,7 @@ function cycleAnchor(){
   return true;
 }
 
-function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok); }
+function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok||c.bonus); }   /* r421 §2.2: the ☆ bonus beat NEVER blocks the win — core beats alone stop the clock */
 (function(){ const _r=render; render=function(){ _r.apply(this,arguments);
   try{ updateFxHint(); const fc=document.querySelector('.fcontent'); if(fc && editing) fc.scrollLeft=fc.scrollWidth; }catch(e){} }; })();   // r91
 function updateChecklist(){
@@ -10557,26 +11010,55 @@ function updateChecklist(){
   el.classList.toggle('dense', (CHALLENGES[cur].checks(S)||[]).length>=5 || guided);
   const C=CHALLENGES[cur];
   const items=C.checks(S);
+  try{ hkSplitTick(items); }catch(e){}   /* r421 §2.1: latch per-beat splits off this grading pass */
+  try{ hkTierTick(items); }catch(e){}    /* r421 §2.5: a completed tier paints its next region in live */
+  const coreItems=items.filter(x=>!x.bonus);
+  const nCore=coreItems.filter(x=>x.ok).length;
+  const coreDone=coreItems.length>0 && nCore===coreItems.length;
   const n=items.filter(i=>i.ok).length;
   /* r349: the objective ding — a checklist item just flipped to done in a LIVE run. Baselined
      per board (S._sndOkN) so loading a half-done layout never chirps; the final item stays
      silent here because checkWin's fanfare owns that beat. */
   if(running && !done && !demoPlaying && !echoOn && gameMode!=='rapidfire' &&
-     S._sndOkN!==undefined && n>S._sndOkN && n<items.length){ try{ playObjectiveDing(); }catch(e){} }
+     S._sndOkN!==undefined && n>S._sndOkN && n<items.length && !coreDone){ try{ playObjectiveDing(); }catch(e){} }
   S._sndOkN=n;
   let nextDone=false;
+  /* r421: the header counts CORE beats (the win condition); a declared ☆ shows beside it,
+     lit once cleared (§2.2). A live mistakes-replay (§2.7) counts only its targeted beats. */
+  const __bonusItem=items.find(x=>x.bonus);
+  let __headTxt, __barPct;
+  if(microRun){
+    const gotT=microRun.targets.filter(ix=>items[ix]&&items[ix].ok).length;
+    __headTxt=`replay <span>${gotT}/${microRun.targets.length}</span>`;
+    __barPct=microRun.targets.length?Math.round(100*gotT/microRun.targets.length):0;
+  } else {
+    __headTxt=`checklist <span>${nCore}/${coreItems.length}</span>`+
+      (__bonusItem?` <b class="cl-star${__bonusItem.ok?' on':''}" title="bonus — never blocks the win">☆</b>`:'');
+    __barPct=coreItems.length?Math.round(100*nCore/coreItems.length):0;
+  }
   let html=`<div class="cl-inner"><div class="cl-colhdr">\u2713</div><div class="cl-body">`+
-    `<div class="cl-head">checklist <span>${n}/${items.length}</span></div>`;
+    `<div class="cl-head">${__headTxt}</div>`;
   const __altFooter = (hints||guided) ? '<div class="cl-alt">many chords, one sheet \u2014 the grader only checks the result. live alternates: fills <b>ctrl+r/d</b> \u21d4 <b>alt h f i r/d</b> \u00b7 autosum <b>alt+=</b> \u21d4 <b>alt h u s</b> \u00b7 paste special <b>ctrl+alt+v</b> \u21d4 <b>alt e s</b> \u00b7 format cells <b>ctrl+1</b> \u21d4 <b>alt o e</b> \u00b7 rows/cols <b>ctrl+\u00b1</b> \u21d4 <b>alt h i r / h d r</b> \u00b7 plugin profiles (\u2328) add Macabacus / FactSet chords</div>' : '';
-  html+=`<div class="cl-bar"><div class="cl-bar-fill" style="width:${items.length?Math.round(100*n/items.length):0}%"></div></div>`;
+  html+=`<div class="cl-bar"><div class="cl-bar-fill" style="width:${__barPct}%"></div></div>`;
+  html+=hkErrMeterHtml(items);   /* r421 §2.3: the disclosed-error meter (drills.js meta.errorCount) */
   items.forEach((i,idx)=>{
     // The next incomplete task is ALWAYS highlighted (not just in guided mode) —
     // the player should never wonder what to do next. r392: hints OR guided adds the key
     // hints on top (F1 hints = keys without the lock; guided = keys + the cursor fence).
-    const isNext = !i.ok && !nextDone; if(isNext) nextDone=true;
+    const isBonus=!!i.bonus;
+    const isTarget=!microRun || microRun.targets.indexOf(idx)>=0;   // §2.7: the rep grades only its targets
+    const isNext = !i.ok && !nextDone && isTarget && (!isBonus || coreDone); if(isNext) nextDone=true;
     const __g = (typeof C.guide==='function') ? (C.__gCache || (C.__gCache=C.guide.call(C))) : C.guide;
     const keys = ((hints||guided) && __g && __g[idx]) ? `<div class="cl-keys">${__g[idx]}${guideAltNote(__g[idx])}</div>` : '';
-    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${i.label}</span>${keys}</div>`;
+    /* r421 §2.1: a completed row shows its split beside the ✓ — dim ink, PB-delta tinted
+       (ahead = accent, behind = neutral; never red mid-run) */
+    let split='';
+    if(!microRun && i.ok && S.splits && S.splits[idx]!=null && S.splits[idx]>0){
+      const ah=hkPbAhead(idx);
+      split=`<span class="cl-split${ah===true?' ahead':''}">${hkSplitFmt(S.splits[idx])}</span>`;
+    }
+    const lab=isBonus?('☆ '+i.label):i.label;   /* §2.2: the bonus renders as a ☆ line, dimmer ink */
+    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${isBonus?' cl-bonus':''}${!isTarget?' cl-pre':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${lab}</span>${split}${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
   html+=__altFooter;   /* r356 (sweep): the alt-routes line was BUILT since r-old but never appended — the whole 'many chords, one sheet' promise was invisible */
@@ -12971,6 +13453,7 @@ function saveSoundPrefs(){ KV.set('hotkey_soundpack', soundPack); KV.set('hotkey
 /* key tick: a 12ms filtered-noise 'thock' — the Monkeytype signature. Cheap, per-keystroke. */
 let _tickBuf=null;
 function playTick(){
+  if(window.__hkMute) return;   /* r421 §2.7: the mistakes-replay prefill plays demo keys silently */
   if(!soundOn || !keyTicks) return;
   const ctx=audioCtx(); if(!ctx) return;
   if(ctx.state==='suspended'){ try{ ctx.resume(); }catch(e){} }
@@ -13034,7 +13517,7 @@ function __sTone(freq, start, dur, gain, type){
   osc.connect(g).connect(ctx.destination);
   osc.start(t0+start); osc.stop(t0+start+dur+0.02);
 }
-function playObjectiveDing(){ if(!soundOn) return; try{
+function playObjectiveDing(){ if(!soundOn || window.__hkMute) return; try{
   const b = soundPack==='arcade' ? 1.19 : 1;
   __sTone(1046*b, 0, 0.09, 0.13);
 }catch(e){} }
@@ -14665,17 +15148,29 @@ function loadChallenge(key, opts){
   challengeMode = !!(opts && opts.challenge);
   updateDailyBtn(); updateWeeklyBtn(); try{ updateChallengeBtn(); }catch(e){}
   cur=key; const C=CHALLENGES[key];
-  if(challengeMode){ _rand = mulberry32(challengeSeed()); }         // r219: same extra-hard board worldwide
-  if(weeklyMode){ _rand = mulberry32(weekSeed() + weeklyIdx*7919); } // deterministic per gauntlet leg
+  microRun=null; window.__microOffer=null;   /* r421 §2.7: any load leaves a live rep — the rep never survives a board change */
+  if(challengeMode){ _rand = mulberry32(challengeSeed()); __lastSeed=null; }         // r219: same extra-hard board worldwide
+  if(weeklyMode){ _rand = mulberry32(weekSeed() + weeklyIdx*7919); __lastSeed=null; } // deterministic per gauntlet leg
+  if(!challengeMode && !weeklyMode){
+    /* r421 §2.7: EVERY classic build is seeded now (mulberry32, the daily's own PRNG) so the
+       mistakes replay can rebuild THIS board identically. Same distribution, same drills —
+       only the source of randomness changes; same-seed determinism was already doctrine. */
+    __lastSeed = (window.__forceSeed!=null) ? (window.__forceSeed|0) : ((Math.random()*0x7fffffff)|0);
+    _rand = mulberry32(__lastSeed);
+  }
+  window.__forceSeed=null;
   try{ if(!weeklyMode) KV.set('hotkey_last_drill', key); }catch(e){}  // resume point
   const built=C.build();
-  _rand = Math.random;                                              // seeded only for the daily build
+  _rand = Math.random;                                              // seeded only for the build
   S={ROWS:Math.max(built.ROWS, ROWS_MAX), cells:built.cells, active:built.active, sel:null, clipboard:null};
   S._ROWS0=S.ROWS;   // r101: the loaded frame size — row ops shift cells, never this frame
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   if(built.colW){ for(const i in built.colW) colW[i]=built.colW[i]; }
   if(built.maze){ S.maze=built.maze; }   // r402: nav-maze walls/pips ride on S for this drill only
   if(built.hiddenRows){ S.hiddenRows=built.hiddenRows.slice(); syncHidden(); }   // r185: inherited sins load pre-hidden
+  try{ hkTouchInit(built); }catch(e){}   // r421 §2.6: checkpoint touch-list declaration (touch:{cells,label})
+  try{ hkTiersInit(built); }catch(e){}   // r421 §2.5: tier-ladder declaration (tiers:[{checks,reveal,label}])
+  try{ S._pbSplits=hkPbSplitsLoad(scoreKey()); }catch(e){}   // r421 §2.1: the PB run's splits, for in-run deltas + the results table
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   sandboxMode=false;   // r238: loading any real drill exits the warm-up sandbox (covers the picker escape-hatch)
   editing=false; editBuf=''; editCaret=0; editPointer=null; editPointerStart=-1;   // r106: never inherit a stale edit from the prior drill
@@ -14706,7 +15201,9 @@ function loadChallenge(key, opts){
   /* r365: the STANDARD OPEN — same line on every drill. Read the task, then type;
      nothing is clocked until the first key. Cleared by startClock. */
   $('result').className='result ready';
-  $('result').innerHTML='\u23f1 <b>ready</b> \u2014 read the task, then just type \u00b7 the clock starts on your first key';
+  /* r421 \u00a72.1: the drill-start line carries the three medal clocks as a strip */
+  { const __cs=hkClockStrip(cur);
+    $('result').innerHTML='\u23f1 <b>ready</b> \u2014 read the task, then just type \u00b7 the clock starts on your first key'+(__cs?' \u00b7 '+__cs:''); }
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
   try{ maybeStartCoach(); }catch(e){}
 }

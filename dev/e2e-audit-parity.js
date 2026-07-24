@@ -15,7 +15,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
   } catch (e) {} });
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
+  await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r421: URL override — parallel checkouts serve on their own ports */
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   // r159: the matrix probes gated-tier drills ('foot' = Formulas) — flip the real
   // pro entitlement so r158's progression gates never bounce a fresh() board.

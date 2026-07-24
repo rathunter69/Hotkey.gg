@@ -30,7 +30,7 @@ const only = process.argv.slice(2);
   } catch (e) {} });
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 120)));
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
+  await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r421: URL override — parallel checkouts serve on their own ports */
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 
