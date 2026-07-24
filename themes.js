@@ -919,7 +919,7 @@ window.hkFrameEarned = function(id, u){
     case 'constellation': return tb >= 4;
     case 'vaporwave':     return tb >= 2 || (u.lvl|0) >= 4;   // r411 (Wolf): or Level 4
     case 'terminal':      return (u.certs|0) >= 1;
-    case 'pro':           return tb >= 6 || !!u.pro;
+    case 'pro':           return !!u.pro;   /* r416 bugfix (Wolf: "pro is the PAID tier skin, not for MD"): dropped the tb>=6 clause that unlocked the paid cosmetic for free at MD — a monetization leak (copy-paste from the adjacent heraldic case). */
     case 'noir':          return tb >= 5;
     case 'frostbite':     return !!u.perfectRun;
     case 'molten':        return (u.dailyWins|0) >= 5;
