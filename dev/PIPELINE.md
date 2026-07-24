@@ -1,6 +1,63 @@
 # PIPELINE — the Fable task queue
 
-## ⚡ STATE OF THE QUEUE (r302, 2026-07-17 evening — READ FIRST)
+## ⚡ STATE OF THE QUEUE (r417, 2026-07-24 — READ FIRST)
+_Process standards now live in **dev/WORKFLOW.md** (orchestrator+agent-fleet model, decision
+protocol, definition of done). Findings base: **dev/AUDIT_R417.md** (6-domain platform audit,
+live-verified). One segment ≈ one session ≈ one PR; check findings off in AUDIT_R417 as you fix._
+
+**✅ H0 · BACKEND TRUTH — SHIPPED r417** (branch `claude/platform-audit-framework-1hf2v7`):
+ad-hoc SQL reconciled into migrations, desk_name_guard + apply_to_desk security regressions
+repaired, profiles column grants (theme/client_state/email_* — three features were silently
+403ing in prod), issue_certificate flagged-run exclusion, weekly-digest verify_jwt pin.
+**Deploys to prod when the PR merges** (supabase-deploy workflow on main).
+
+**THE SEGMENTS (priority order · tags per WORKFLOW.md):**
+1. **H1 · ACCOUNT-WIRING BATCH [auto·M]** — AUDIT_R417 §B top-10: signup school_tag→RPC
+   (index:15195, silently loses the picked school), sign-out wipe += hk_dev_unlock/hk_run_outbox/
+   hk_dc_top10/hk_cert_*/hk_seen_frames, hkLevelXp max() (chip can drop below gates), lb.js:663
+   hkFlair hero parse (skins stripped on lb "your card"), account desk-status via my_desk not
+   team_code, outbox foreign-row skip + created_at carry + rate-cap, billing honest-error,
+   RANKED_MIN_LVL single source, desks.html tier from gUserStat, server-side cert claim path,
+   admin flagged-sessions panel.
+2. **H2 · GUIDANCE ALIGNMENT [auto·M + 1 Wolf choice]** — AUDIT_R417 §C: guide[]↔checks[] realign
+   (43 drills!) + targets[]↔checks[] (11 drills, `cases` rings the WRONG CELL from step 2) + BOTH
+   as new invariants; Ctrl+Shift+V must paste VALUES (today silently pastes formulas); learn-mode
+   ghost (**DECIDED Wolf 07-24: SCRUB the 3 copy sites**, retire echoStart as dead code — rapid-fire
+   echo untouched); ALTS for the 9 zero-alt drills +
+   guided=true in the alt harness; onboarding formula-cell beat; any-arrow doIt; replay-tour
+   affordance; Ctrl+Shift+&/_ border chords.
+3. **H3 · ENGINE PARITY PACK 1 [auto·M-L]** — AUDIT_R417 §A: error-value sentinels (#N/A, #DIV/0!,
+   #NAME? display + propagation — replaces the over-broad "problem with this formula" refusal and
+   unlocks the FORMULA-AUTOCORRECT feature Wolf asked for 2026-07-24: Excel-style typo-fix
+   proposals — BUILD-READY SPEC now in AUDIT_R417 §G, incl. the Ctrl+Enter silent-0 hole and #NAME?
+   sentinel); ribbon canon fixes (§G: Alt W V G, show H 3, Paste Special Subtract, H O E, M P/M D,
+   Esc one-level, uppercase KeyTips); %-cell entry auto-scale (the
+   800% bug); paste tiling; ants lifecycle + copy-then-Enter paste; Ctrl+F swallow; commitEditAll
+   parse ladder; COUNT/COUNTA/MOD/ROUNDUP/ROUNDDOWN; INDEX text fix; lazy IF. Each with new parity letters.
+4. **H4 · DRILL COPY & CHECKS BATCH [auto·S]** — AUDIT_R417 §D: 30 copy defects (incl. 3 drills
+   re-hinted by drills.js picker metadata — extend the de-hint CI check to drills.js fields),
+   11 label↔check mismatches (port scrub's _byName into sort), banned-verb sweep, voice pass.
+5. **H5 · VISUAL COHERENCE [auto·M, About=Wolf visual]** — AUDIT_R417 §E: .wrap cascade fix (4
+   pages render 1180px instead of their 880-980 measures — 1-line root cause), hkToast z≥530
+   (feedback invisible mid-tour), certModal Esc + defer, one modal helper (Esc/backdrop/focus/
+   scroll-lock ×15 modals), de-dupe themesModal/kbdModal, reduced-motion for lb.css+index pulses,
+   stats .ach-filters wrap, canvas culling, tokens.css (light-first), About.html onto the shared
+   shell; Excel-grid immersion set (§G): selected-header highlight, centered errors, normal-ink ####,
+   monochrome ants, sheet-tab green, name-box RxC count. [Wolf]: lean ribbon bar default ON.
+6. **H6 · DRILL DEPTH (rolling) [Wolf-collaborative]** — AUDIT_R417 §D depth ranking: enrich the
+   15 shallowest (series, lookup, lookup2, bridge, autofit, wrapfix, drill, anchor, foot, percent,
+   sort, unhide, margin, dcfsens, grpfold) ~5/round per DOCTRINE §5 playbook, to the Foundations bar.
+7. **H7 · ENGINE PARITY PACK 2 [Wolf priorities]** — undo widening (hide/group/filter), cut-move
+   ref rewrite, Enter/Tab-in-selection, F4 repeat-last-action, date entry parsing, transpose formulas.
+8. **H8 · LAUNCH RUNBOOK [Wolf-gated]** — AUDIT_R417 §F ordered list (creds rotation, email
+   domain→Resend→SMTP, _headers HSTS/CSP/immutable, events rate limit, seed/fixture purge, the
+   flip, backdoor removal, then E1/E2 Stripe+billing).
+
+**Wolf-pending questions (r417):** deploy vector for H0 (PR now?) · learn-mode restore-vs-scrub ·
+H-segment order confirmation · fx dial-up render approval (held from r415).
+
+<!-- ————————————————— history below ————————————————— -->
+## ⚡ prior state (r302, 2026-07-17 evening)
 **Seven PRs merged today (#134–#140), all Wolf-live-feedback driven.** Shipped: engine
 finance/text/sort pack (NPV·IRR·LARGE/SMALL/RANK·text pack·& operator) folded into
 dcfbuild/lbobuild/comps/dashcover · Flash Fill (Ctrl+E) · border chords to EXCEL CANON

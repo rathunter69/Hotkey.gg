@@ -1,9 +1,55 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Refreshed 2026-07-23 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
-New sessions: the repo IS the handover — read this file, **dev/PIPELINE.md's ⚡ header (the
-live queue)**, dev/AUDIT.md (newest round at the TOP since r296), and the dev/ design docs._
+_Refreshed 2026-07-24 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+New sessions: the repo IS the handover — read this file, **dev/WORKFLOW.md (the process
+standards — READ FIRST, new r417)**, **dev/PIPELINE.md's ⚡ header (the live queue)**,
+dev/AUDIT.md (newest round at the TOP), and the dev/ design docs._
 
-## ⚡ NEXT-SESSION HANDOFF (2026-07-23, rounds r411–r414 — CI fixes + fragility hardening + card round + NOTCH TAXONOMY)
+## ⚡ NEXT-SESSION HANDOFF (2026-07-24, r417 — THE PLATFORM AUDIT + WORKFLOW FRAMEWORK)
+
+**WHAT r417 IS:** Wolf commissioned a full pre-launch platform audit + a new process framework.
+Seven parallel audit agents swept: drill copy/depth · engine Excel-parity · account↔backend
+wiring · help systems/alt-paths · visuals/modals/animations · backend/security/email/Cloudflare/
+launch · ribbon/Excel-aesthetics+formula-autocorrect (last one landing async). Everything was
+live-verified where possible (live-DB queries via Management API, headless renders, full e2e runs).
+
+**THE THREE NEW DOCS (this round's spine):**
+- **dev/WORKFLOW.md** — the operating system: orchestrator+agent-fleet model (batch work goes to
+  parallel agents, orchestrator synthesizes/reviews/ships), the Wolf decision protocol (questions
+  in CHAT with a recommendation, never buried in docs), definition-of-done (every fixed bug class
+  lands a CI invariant in the same PR), consolidated house law.
+- **dev/AUDIT_R417.md** — the findings base (6 domains, ~120 ranked findings, file:line). Segments
+  H1–H8 in PIPELINE cite it; check findings off there as they ship.
+- **dev/PIPELINE.md ⚡** — the new queue: H0 backend truth (✅ shipped) → H1 account wiring → H2
+  guidance alignment → H3 engine parity 1 (+ formula autocorrect, Wolf ask 07-24) → H4 drill copy →
+  H5 visual coherence → H6 drill depth (rolling) → H7 parity 2 → H8 launch runbook.
+
+**SHIPPED r417 (branch `claude/platform-audit-framework-1hf2v7`, needs PR+merge to deploy):**
+The BACKEND-TRUTH batch — two LIVE-CONFIRMED security regressions repaired (desk_name_guard lost
+the protected-firm-names layer; apply_to_desk lost the anon guard — both from last-wins
+`create or replace` rewrites off stale copies → new house rule: diff-before-replace), profiles
+column UPDATE grants added (theme / client_state / email_* — theme-follows-account, cross-device
+sync, and email toggles were ALL silently 403ing in prod), issue_certificate now excludes flagged
+runs, the four dev/migrate-*.sql reconciled into supabase/migrations/, weekly-digest
+verify_jwt=false pinned (cron was one CI redeploy away from 401ing forever), README banner un-staled.
+
+**HEADLINE OPEN FINDINGS (full list in AUDIT_R417.md):** 43/82 drills have guide[]↔checks[]
+index-misalignment (wrong/missing hints late in drills); native Ctrl+Shift+V silently pastes
+FORMULAS not values; sign-up school choice silently lost (direct write revoked since r122);
+sign-out leaks hk_dev_unlock/outbox/cert-latches to the next account; learn-mode is a ghost
+(3 copy sites sell a button r401 deleted); .wrap cascade breaks 4 pages' layout; toast z-index
+under the tour scrim; %-cell entry renders 800%; "problem with this formula" refusal is
+over-broad → becomes error sentinels + Excel-style autocorrect (Wolf ask).
+
+**WOLF DECISIONS (07-24, in chat):** H0 → PR immediately · learn-mode → SCRUB the 3 copy sites
+(retire echoStart) · segment order H1→H5 approved, H6 rolling · mgmt token stays live for session
+use (Wolf's call; rotation still recommended eventually). Still held: fx dial-up (r415).
+
+**ASSET VERSIONS (unchanged this round — docs+SQL only, no cache bump needed):** themes.js v306,
+nav.css v207, nav.js v296, drills.js v278, lb.js v37, lb.css v20.
+
+---
+
+## PRIOR HANDOFF (2026-07-23, rounds r411–r414 — CI fixes + fragility hardening + card round + NOTCH TAXONOMY)
 
 **LIVE NOW (merged to main, deployed via Cloudflare):**
 - **#221** — card titles (equippable name-plate + earn catalog, impersonation-locked custom titles),
