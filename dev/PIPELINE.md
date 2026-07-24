@@ -51,7 +51,7 @@ repaired, profiles column grants (theme/client_state/email_* — three features 
    parameters:** (1) every drill to the FOUNDATIONS BAR (4-6 graded beats, randomized sites, aha,
    finish-state beat, full 20-row grid); (2) new mechanics platform-wide: TIERED TIME MEDALS
    (pass/pro/legendary clocks), BONUS OBJECTIVES (optional extra-credit beat), DISCLOSED-ERROR-COUNT
-   audits ("7 errors — find all 7" + progress meter), CHAPTER BOSS drills (capstone gauntlet gates
+   audits ("7 errors — find all 7" + progress meter), CAPSTONE drills (chapter capstone gates
    the next chapter, unlimited retakes); (3) catalog shape = **OPEN SEASON** — the spec may freely
    restructure (renames/merges/splits/new drills) where it makes the curriculum better; every delta
    lands in the spec for Wolf's review, INCLUDING the plumbing impact map (campaign spine, cert
