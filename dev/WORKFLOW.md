@@ -109,6 +109,13 @@ feel. Spend where judgment compounds; economize where execution is mechanical.**
 - **Don't gold-plate:** inert-code refactors, cosmetic-only rewrites, and "while I'm here" scope
   creep are the token sinks that bought nothing before (see PROJECT_REVIEW B1/B2 verdicts).
 
+### Worktree-agent hygiene (r423 incident)
+Worktree agents MUST kill any HTTP server they started before finishing (`pkill -f "http.server <port>"`),
+and NEVER serve on 8791 (the main checkout's port). A stale worktree server that wins the 8791 bind race
+makes the main tree's browser tests silently run against old code (76/21 "regressions" that don't exist).
+Orchestrator: before any browser-test run, verify `readlink /proc/$(pgrep -f "http.server 8791")/cwd`
+is the main checkout.
+
 ## 8 · Batch aftermath + handoff durability (Wolf standing rules, 2026-07-24 · playtest round 1)
 
 - **POST-BATCH BRIEF.** After every large batch implementation, the session delivers Wolf an
