@@ -58,10 +58,25 @@ jobs:
           sleep 1.5
           curl -sfo /dev/null http://127.0.0.1:8791/index.html
       # ---- always-on fast net (both paths) ----
-      - name: Smoke (every page loads, zero page errors)
+      # r414-review Segment A/C: static guards that need no browser — the cache-bump
+      # discipline (the r390-392 "nothing reached live" class), a committed-secret scan,
+      # and the SSOT invariants (drill membership + skin notch coverage).
+      - name: Static guards (cache-bump · secrets · SSOT invariants)
+        env:
+          GATE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          node dev/check-cache-versions.js
+          bash dev/check-secrets.sh
+          node dev/check-invariants.js
+      - name: Smoke (every page loads, zero page errors + drill invariants)
         run: node dev/e2e-smoke.js
       - name: Leaderboard (tier filter, placement, seed field)
         run: node dev/e2e-lb.js
+      # r414-review A6: a fast behavioral net for the COSMETIC lane — shared-script
+      # (themes.js/nav.js) changes skip the engine matrix, so drive one drill per core
+      # group through the real engine on every push to catch a silent behavioral break.
+      - name: Behavioral smoke (one drill per core group, real engine)
+        run: REPS=1 node dev/e2e-demo-replay.js navigation combo foot
       # ---- engine matrix — only when a drill-affecting file changed ----
       - name: Parity matrix
         if: steps.scope.outputs.engine == 'true'

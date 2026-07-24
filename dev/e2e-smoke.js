@@ -96,6 +96,32 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
       }
       if (cerr.length) fails.push({ p: 'drill-count', errs: cerr });
       else console.log('  PASS drill-count — marketing copy matches menuOrder (' + r.drills + ')');
+
+      // Segment C guards (r414-review): C2 — HOTKEY_PARS must mirror CHALLENGES[k].par (a
+      // 5th hand-synced copy that has drifted before); C4 — de-hint: player-facing prompt /
+      // checklist label / meta desc must carry NO keyboard chord (the point is to DO the
+      // action, not read it). Cell refs like F4/F5 are content, not chords, so the pattern
+      // only flags modifier-combos (Ctrl+/Alt+/⌘) and Alt-walk letter sequences.
+      const inv = await page.evaluate(() => {
+        const out = { parsMissing: [], parsMismatch: [], dehint: [] };
+        const D = window.HOTKEY_DRILLS || {}, pars = D.pars || window.HOTKEY_PARS || {}, meta = D.meta || {};
+        for (const k of Object.keys(CHALLENGES)) { const c = CHALLENGES[k];
+          if (!(k in pars)) { out.parsMissing.push(k); continue; }
+          if (Number(pars[k]) !== Number(c.par)) out.parsMismatch.push(k + ':' + pars[k] + '!=' + c.par); }
+        const CHORD = /\b(Ctrl|Alt|Cmd|Shift)\s*\+|⌘|\bAlt\s+[A-Z]\b/;
+        const scan = (w, t) => { if (t && CHORD.test(t)) out.dehint.push(w + ': ' + String(t).slice(0, 60)); };
+        for (const k of Object.keys(CHALLENGES)) { const c = CHALLENGES[k]; scan(k + '.prompt', c.prompt);
+          if (typeof c.checks === 'function') { const ls = c.checks.toString().match(/label:\s*'([^']*)'|label:\s*"([^"]*)"/g) || [];
+            for (const L of ls) scan(k + '.checklist', L); } }
+        for (const k of Object.keys(meta)) scan(k + '.desc', meta[k].desc);
+        return out;
+      });
+      const ierr = [];
+      if (inv.parsMissing.length) ierr.push('HOTKEY_PARS missing: ' + inv.parsMissing.slice(0, 8).join(', '));
+      if (inv.parsMismatch.length) ierr.push('HOTKEY_PARS != CHALLENGES.par: ' + inv.parsMismatch.slice(0, 8).join(', '));
+      if (inv.dehint.length) ierr.push('chord embedded in player copy: ' + inv.dehint.slice(0, 8).join(' | '));
+      if (ierr.length) fails.push({ p: 'drill-invariants', errs: ierr });
+      else console.log('  PASS drill-invariants — HOTKEY_PARS parity + de-hint copy clean');
     } catch (e) { fails.push({ p: 'skin-unlock', errs: ['THREW: ' + String(e).slice(0, 160)] }); }
     await page.close();
   }

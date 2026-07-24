@@ -1980,7 +1980,11 @@ window.hkInitCardFx = function(root){
     }
     if(reduce){ sys.forEach(o=>draw(o,0)); return; }
     (function loop(t){ let alive=false; sys.forEach(o=>{ if(o.cv.isConnected){ alive=true; draw(o,t); } });
-      if(alive) requestAnimationFrame(loop); })(0);
+      if(alive) requestAnimationFrame(loop);
+      // r414-review B3: when the loop ends (all canvases detached), clear the init flag so a
+      // card re-inserted later (e.g. a re-opened modal reusing the node) re-animates instead
+      // of staying frozen (cv._hkfx used to latch permanently).
+      else sys.forEach(o=>{ try{ o.cv._hkfx=0; }catch(e){} }); })(0);
   }catch(e){}
 };
 
