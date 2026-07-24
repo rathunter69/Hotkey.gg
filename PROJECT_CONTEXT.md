@@ -8,7 +8,7 @@ dev/AUDIT.md (newest round at the TOP), and the dev/ design docs._
 - **Depth target:** EVERY drill to the Foundations bar (4-6 beats, randomized sites, aha,
   finish-state beat, full 20-row grid). No chapter-scaled shortcuts.
 - **Mechanics (all four approved):** tiered time medals · bonus objectives · disclosed-error-count
-  audit format · chapter boss drills (mastery-gate the next chapter).
+  audit format · capstone drills (Wolf naming, extends backlog #103 — chapter capstone mastery-gates the next chapter).
 - **Catalog: OPEN SEASON** — depth-pass spec may rename/merge/split/add drills freely; Wolf approves
   every delta at the DEPTH_PASS.md review (spec must carry the plumbing impact map).
 - **Execution: ONE AGENT PER DRILL, catalog order, Foundations first.** Spec doc → Wolf review →
