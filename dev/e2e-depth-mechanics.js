@@ -603,11 +603,20 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       S.active = { r: cell.r, c: cell.c }; S.sel = null; render();
       demoKey({ key: 'ArrowRight', shift: true });
       out.sBlocked = S.active.c === cell.c;
+      // r424 (§4.1 ROUND 2): the corridor board SANCTIONS the two teleports — Ctrl+Home is
+      // beat 3 (return to A1), Ctrl+End is beat 5 (the finish flight). Plain Home and every
+      // Shift variant stay inert (the r423 wall-integrity law holds everywhere else).
+      out.tele = !!(S.maze && S.maze.tele);
       S.active = { r: T.r0, c: T.c0 }; S.sel = null; render();
+      demoKey({ key: 'Home' });
+      out.plainHomeInert = S.active.r === T.r0 && S.active.c === T.c0;
       demoKey({ key: 'Home', ctrl: true });
-      out.homeInert = S.active.r === T.r0 && S.active.c === T.c0;
+      out.homeTele = S.active.r === 1 && S.active.c === 1;
       demoKey({ key: 'End', ctrl: true });
-      out.endInert = S.active.r === T.r0 && S.active.c === T.c0;
+      const u = usedRange();
+      out.endTele = S.active.r === u.r && S.active.c === u.c && u.r === 20 && u.c === 10;
+      demoKey({ key: 'End', ctrl: true, shift: true });
+      out.shiftEndInert = S.active.r === u.r && S.active.c === u.c && !S.sel;
       // the model grab still lands exactly on the block
       S.active = { r: T.r0, c: T.c0 }; S.sel = null; render();
       demoKey({ key: 'ArrowRight', ctrl: true, shift: true });
@@ -635,18 +644,26 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     });
     ok(r.csBlocked, 'Ctrl+Shift+arrow can no longer jump through a maze wall beside the table', r);
     ok(r.sBlocked, 'plain Shift+arrow respects the wall too', r);
-    ok(r.homeInert && r.endInert, 'Ctrl+Home / Ctrl+End wall-teleports are inert on maze boards', r);
+    ok(r.tele && r.plainHomeInert, 'round-2 corridor declares maze.tele; plain Home stays inert (wall integrity)', r);
+    ok(r.homeTele, 'Ctrl+Home teleports home to A1 on the corridor board (beat 3 sanctioned)', r);
+    ok(r.endTele && r.shiftEndInert, 'Ctrl+End flies to the used-range corner (beat 5); Shift variants stay inert', r);
     ok(r.grabExact, 'the model block-grab still lands exactly on the block (data-edge stop)', r);
     ok(r.moved && r.stopNoBump, 'a ctrl-shot that stops AT a wall is not a bump (§6 fairness)', r);
     ok(r.zeroMoveBumps, 'a press the wall swallows (zero movement) still counts one bump', r);
-    const r2 = await run(() => {   // full demo replay through the new maze branch (+ the Ctrl+S closer)
+    const r2 = await run(() => {   // full ROUND-2 replay: corridor flights → grab+copy → Ctrl+Home+paste → Ctrl+End → save
       window.__clearCel(); hideResults();
       window.__forceSeed = 606; loadChallenge('navigation');
       const C = CHALLENGES.navigation;
+      // §4.1: the A1 room ships EMPTY — it is the paste destination
+      const a1Empty = ['A1','B1','C1','A2','B2','C2','A3','B3','C3','A4','B4','C4'].every(k => !S.cells[k]);
       for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
-      return { done };
+      const items = C.checks(S);
+      return { done, a1Empty, pips: (S.touchGot | 0) === S.maze.pips.length,
+               star: !!(items.find(x => x.bonus) || {}).ok, bumps: S.bumpN | 0 };
     });
-    ok(r2.done === true, 'navigation demo still wins under wall-tight shift chords + save closer', r2);
+    ok(r2.done === true, 'navigation round-2 demo wins — corridor flights, teleport home, paste, finish flight, save', r2);
+    ok(r2.a1Empty, 'the A1 room ships EMPTY at build (the paste destination)', r2);
+    ok(r2.pips && r2.star && r2.bumps === 0, 'the scripted line collects every pip and earns the zero-bump ☆', r2);
   }
 
   console.log('M. fill-chord symmetry (r423 round-2 §7)');
@@ -684,7 +701,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   console.log('N. Ctrl+Space / Shift+Space cover the rendered grid (r423 round-2 §8)');
   {
     const r = await run(() => {
-      window.__clearCel(); hideResults(); loadChallenge('colops');   // 9 content rows on the 20-row canvas
+      window.__clearCel(); hideResults(); loadChallenge('rowops');   // r424: colops retired (D17) — rowops carries the column-selection board now
       setDemoSel('B5');
       demoKey({ key: ' ', ctrl: true });
       const sr = selRange();
@@ -707,6 +724,59 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r.vr <= r.rows || (r.fillerSel === (r.vr - r.rows) && r.fillerBottom === 1),
       'the selection reads on down the filler rows to the canvas bottom — the column never looks half-selected', r);
     ok(r.rowSr.c1 === 1 && r.rowSr.c2 === 10, 'Shift+Space covers every rendered column (mirror parity)', r.rowSr);
+  }
+
+  console.log('N2. insert-inheritance parity + structure-op latches (r424 — DEPTH_PASS §4.5/D17)');
+  {
+    // Excel default (validated, ROUND1_FEEDBACK §2 rowops): an inserted ROW inherits the
+    // formatting of the row ABOVE it; an inserted COLUMN inherits the column to its LEFT.
+    // Format only — value/formula never travel. Plus the ☆ discipline latches: the Ctrl
+    // chord always counts as full-selection; a ribbon op from a partial selection counts
+    // structN but not structFullN.
+    const r = await run(() => {
+      window.__clearCel(); hideResults(); loadChallenge('rowops');
+      const o = CHALLENGES.rowops._o;
+      const out = { s0: { n: S.structN | 0, f: S.structFullN | 0 } };
+      const insAt = o.predRow0 + 1;
+      const qL = colLetter(o.ni);   // a real quarter column (values + dress) — B could be the empty DRAFT slot
+      // ① whole-row chord insert below the predecessor (a dressed body row: comma + blue)
+      setDemoSel('A' + insAt);
+      demoKey({ key: ' ', shift: true });
+      demoKey({ key: '+', ctrl: true });
+      const above = S.cells[qL + o.predRow0] || {};
+      const inh = S.cells[qL + insAt] || {};
+      out.rowInherit = above.fmtStyle === 'comma' && inh.fmtStyle === 'comma' && inh.fontColor === above.fontColor;
+      out.rowNoContent = (inh.value == null || inh.value === '') && !inh.formula;
+      out.aboveUntouched = typeof above.value === 'number';
+      out.s1 = { n: S.structN | 0, f: S.structFullN | 0 };
+      demoKey({ key: 'z', ctrl: true });   // roll the board back for the column probe
+      // ② whole-column chord insert at a quarter column (left neighbor: bold header + blue body)
+      const ni = o.ni, leftL = colLetter(ni - 1), newL = colLetter(ni);
+      setDemoSel(newL + (o.hr + 1));
+      demoKey({ key: ' ', ctrl: true });
+      demoKey({ key: '+', ctrl: true });
+      const leftHdr = S.cells[leftL + o.hr] || {}, newHdr = S.cells[newL + o.hr] || {};
+      const leftBody = S.cells[leftL + (o.hr + 1)] || {}, newBody = S.cells[newL + (o.hr + 1)] || {};
+      out.colInherit = !!leftHdr.bold === !!newHdr.bold && newHdr.align === leftHdr.align &&
+        (!leftBody.fmtStyle || leftBody.fmtStyle !== 'comma' || (newBody.fmtStyle === 'comma' && newBody.fontColor === leftBody.fontColor));
+      out.colNoContent = (newHdr.value == null || newHdr.value === '') && !newBody.formula && (newBody.value == null || newBody.value === '');
+      out.s2 = { n: S.structN | 0, f: S.structFullN | 0 };
+      demoKey({ key: 'z', ctrl: true });
+      // ③ ribbon op from a PARTIAL selection — structN ticks, structFullN does not
+      setDemoSel(qL + (o.hr + 1));
+      demoKey({ key: 'Alt' }); demoKey({ key: 'h', code: 'KeyH' }); demoKey({ key: 'i', code: 'KeyI' }); demoKey({ key: 'r', code: 'KeyR' });
+      out.s3 = { n: S.structN | 0, f: S.structFullN | 0 };
+      demoKey({ key: 'z', ctrl: true });
+      return out;
+    });
+    ok(r.rowInherit && r.rowNoContent && r.aboveUntouched,
+      'an inserted row arrives wearing the row above\'s dress — format only, no content (Excel default)', r);
+    ok(r.colInherit && r.colNoContent,
+      'an inserted column arrives wearing the left column\'s dress — format only, no content (Excel default)', r);
+    ok(r.s1.n === r.s0.n + 1 && r.s1.f === r.s0.f + 1 && r.s2.n === r.s1.n + 1 && r.s2.f === r.s1.f + 1,
+      'chord structure ops latch structN AND structFullN (full-by-construction)', r);
+    ok(r.s3.n === r.s2.n + 1 && r.s3.f === r.s2.f,
+      'a ribbon structure op from a partial selection latches structN only — the ☆ discipline reads it', r);
   }
 
   console.log('P. selection tint reads on seeded fills (r423 round-2 §4)');

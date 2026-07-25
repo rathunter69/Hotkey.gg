@@ -20,62 +20,72 @@ const REPS = 3;
 const only = process.argv.slice(2);
 
 const ALTS = [
-  { key: 'rowops', name: 'ctrl chords for insert/delete (shift+space rows), dress BEFORE the junk dies, border via Alt H B D', moves: `C => { const o=C._o;
-      const pr=o.predRow0, jr=o.junkRow0, insAt=pr+1;
-      const jr2=jr+(jr>=insAt?1:0);       // the insert shifts the junk down if it sat below
+  /* r424 (rowops absorbs colops, DEPTH_PASS §4.5/D17): both entries rebuilt for the merged
+     structure drill. ALT 1 = chord-ROUTE alt (ribbon walks, partial selections — the ☆ is
+     forfeited but core clears, §1.0(c)); ALT 2 = op-ORDER alt (deletes first, border last). */
+  { key: 'rowops', name: 'RIBBON routes from partial selections (Alt H I/D R·C from a single cell — ☆ forfeited, core clears), comma via ctrl+shift+1', moves: `C => { const o=C._o;
+      const insAt=o.predRow0+1, fyL=colLetter(o.fyC);
+      const jr2=o.junkRow0+(o.junkRow0>=insAt?1:0);
+      const ni2=o.ni-(o.dc<o.ni?1:0);
       return [
-        {sel:'A'+insAt, keys:[{key:' ',shift:true},{key:'=',ctrl:true,shift:true}]},
-        {sel:o.stagedRng, keys:[{key:'c',ctrl:true}]},
+        {sel:'A'+insAt, keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('i'),L('r')]},   // ribbon insert (full row is fine — the partial ops below break the ☆)
+        {sel:'A'+(o.sr0+1)+':'+fyL+(o.sr0+1), keys:[{key:'c',ctrl:true}]},
         {sel:'A'+insAt, keys:[{key:'v',ctrl:true}]},
-        {sel:'B'+insAt, keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-        {sel:'A'+jr2, keys:[{key:' ',shift:true},{key:'-',ctrl:true}]},
-        {sel:'A'+o.totRow0+':B'+o.totRow0, keys:[{key:'Alt'},L('h'),L('b'),L('d')]},   // top-and-bottom route — bb lands the same
-      ]; }` },
-  { key: 'rowops', name: 'border FIRST (it rides the row through the ops), ribbon insert/delete, comma via ctrl+shift+1', moves: `C => { const o=C._o;
-      const pr=o.predRow0, jr=o.junkRow0, insAt=pr+1;
-      const jr2=jr+(jr>=insAt?1:0);
-      const insAt2=insAt-(jr2<insAt?1:0);
-      return [
-        {sel:'A'+o.totRow0+':B'+o.totRow0, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},   // close the schedule before touching a single row
-        {sel:'A'+insAt, keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('i'),L('r')]},
-        {sel:o.stagedRng, keys:[{key:'c',ctrl:true}]},
-        {sel:'A'+insAt, keys:[{key:'v',ctrl:true}]},
+        {sel:'B'+insAt+':'+fyL+insAt, keys:[{key:'!',ctrl:true,shift:true}]},
+        {sel:'B'+insAt+':'+colLetter(o.fyC-1)+insAt, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
         {sel:'A'+jr2, keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('d'),L('r')]},
-        {sel:'B'+insAt2, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+        {sel:'A'+o.totRow0+':'+fyL+o.totRow0, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:colLetter(o.dc)+(o.hr+1), keys:[{key:'Alt'},L('h'),L('d'),L('c')]},        // DRAFT dies from a SINGLE CELL — the ribbon's partial-selection path
+        {sel:colLetter(ni2)+(o.hr+1), keys:[{key:'Alt'},L('h'),L('i'),L('c')]},         // the gap opens from a single cell too
+        {sel:colLetter(o.sc)+o.q0+':'+colLetter(o.sc)+(o.q0+7), keys:[{key:'c',ctrl:true}]},
+        {sel:colLetter(ni2)+o.hr, keys:[{key:'v',ctrl:true}]},
       ]; }` },
-  { key: 'blocksel', name: 'CUT first / COPY last, margin via typed refs, dress via RIBBON variants (Alt H 1/2/K/P) + box before bold', moves: `C => { const O=C._o; return [
-      {sel:O.ebTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT EBITDA first
-      {sel:O.o.ebitda[0],keys:[{key:'v',ctrl:true}]},
-      {sel:O.opTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // CUT Op inc
-      {sel:O.o.opinc[0], keys:[{key:'v',ctrl:true}]},
-      {sel:O.baseTL,     keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]}, // COPY base last
-      {sel:O.o.seg[0],   keys:[{key:'v',ctrl:true}]},
-      {sel:O.o.margin[0],keys:[...T('='+O.marginF),{key:'Enter'}]},                                 // margin via typed ref
-      {sel:O.marginRng,  keys:[{key:'d',ctrl:true}]},
-      {sel:O.marginRng,  keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(2)]},                 // percent + italic via RIBBON (Alt H P, Alt H 2)
-      {sel:O.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('s')]},                                  // outline BEFORE bold (r292: Outside Borders, not All)
-      {sel:O.hdrRng,     keys:[{key:'Alt'},L('h'),D(1)]},                                            // bold header via ribbon (Alt H 1)
-      {sel:O.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},   // top line $ 0-dec
-      {sel:O.restRng,    keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},        // rest commas via Alt H K + trim
-      {sel:O.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'Alt'},L('h'),D(3)]},          // ☆ centre + underline via ribbon (Alt H 3) — before the final core beat
-      {sel:O.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},                                  // final core — win fires here
+  { key: 'rowops', name: 'deletes FIRST (placeholder, then DRAFT), row insert into the contracted block, border LAST', moves: `C => { const o=C._o;
+      const pred1=o.predRow0-(o.junkRow0<=o.predRow0?1:0);   // the early junk delete pulls the predecessor up when it sat above
+      const insAt=pred1+1;
+      const ni2=o.ni-(o.dc<o.ni?1:0);
+      const totR=o.totRow0;                                   // −1 (junk) +1 (insert) nets back to build
+      return [
+        {sel:'A'+o.junkRow0, keys:[{key:' ',shift:true},{key:'-',ctrl:true}]},          // the squatter dies before anything else
+        {sel:colLetter(o.dc)+o.hr, keys:[{key:' ',ctrl:true},{key:'-',ctrl:true}]},     // DRAFT out early — the staged line contracts in lockstep
+        {sel:'A'+insAt, keys:[{key:' ',shift:true},{key:'+',ctrl:true}]},
+        {sel:'A'+o.sr0+':'+colLetter(o.fyC-1)+o.sr0, keys:[{key:'c',ctrl:true}]},       // staged line: −1 junk, +1 insert → build row; one col narrower (DRAFT closed)
+        {sel:'A'+insAt, keys:[{key:'v',ctrl:true}]},
+        {sel:'B'+insAt+':'+colLetter(o.fyC-1)+insAt, keys:[{key:'Alt'},L('h'),L('k')]},
+        {sel:'B'+insAt+':'+colLetter(o.fyC-2)+insAt, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+        {sel:colLetter(ni2)+o.hr, keys:[{key:' ',ctrl:true},{key:'+',ctrl:true}]},
+        {sel:colLetter(o.sc)+o.q0+':'+colLetter(o.sc)+(o.q0+7), keys:[{key:'c',ctrl:true}]},
+        {sel:colLetter(ni2)+o.hr, keys:[{key:'v',ctrl:true}]},
+        {sel:'A'+totR+':'+colLetter(o.fyC)+totR, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},   // the border closes the page LAST
+      ]; }` },
+  { key: 'blocksel', name: 'cuts FIRST (Op inc before EBITDA), base via legacy Alt E S paste, bold via Alt H 1, center via Ctrl+1 A per header, hand-grabbed table + THICK box', moves: `C => { const O=C._o; return [
+      {sel:O.opTL,        keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // Op inc travels first this time
+      {sel:O.o.opinc[0],  keys:[{key:'v',ctrl:true}]},
+      {sel:O.ebTL,        keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},
+      {sel:O.o.ebitda[0], keys:[{key:'v',ctrl:true}]},
+      {sel:O.baseTL,      keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]},   // COPY base last
+      {sel:O.o.seg[0],    keys:[{key:'Alt'},L('e'),L('s'),{key:'Enter'}]},                            // legacy paste dialog, All
+      {sel:O.hdrRng,      keys:[{key:'Alt'},L('h'),D(1)]},                                            // bold via ribbon (Alt H 1)
+      {sel:'A3',          keys:[{key:'1',ctrl:true},L('a')]},                                         // center across, one header at a time (Ctrl+1 → A)
+      {sel:'B3',          keys:[{key:'1',ctrl:true},L('a')]},
+      {sel:'C3',          keys:[{key:'1',ctrl:true},L('a')]},
+      {sel:'D3',          keys:[{key:'1',ctrl:true},L('a')]},
+      {sel:O.revRng,      keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:O.tableRng,    keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                                   // hand-grabbed table (no Ctrl+A), THICK box — the perimeter grades the same
     ]; }` },
-  { key: 'blocksel', name: 'Op inc cut before EBITDA, margin in POINTER MODE, ribbon fill down, dress walked backwards (align → money → bold → box)', moves: `C => { const O=C._o; return [
-      {sel:O.baseTL,     keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]}, // COPY base first (canonical)
-      {sel:O.o.seg[0],   keys:[{key:'v',ctrl:true}]},
-      {sel:O.opTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},        // Op inc FIRST this time
-      {sel:O.o.opinc[0], keys:[{key:'v',ctrl:true}]},
-      {sel:O.ebTL,       keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},
-      {sel:O.o.ebitda[0],keys:[{key:'v',ctrl:true}]},
-      {sel:O.o.margin[0],keys:[{key:'='},{key:'ArrowLeft'},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowLeft'},{key:'ArrowLeft'},{key:'Enter'}]},  // margin via pointer mode (arrows grab the refs)
-      {sel:O.marginRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                           // fill down via ribbon
-      {sel:O.marginRng,  keys:[{key:'%',ctrl:true,shift:true},{key:'i',ctrl:true}]},
-      {sel:O.labelRng,   keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'u',ctrl:true}]},              // ☆ mid-run — never blocks anything
-      {sel:O.figRng,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},                                  // alignment BEFORE the money formats
-      {sel:O.topRowRng,  keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:O.restRng,    keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:O.hdrRng,     keys:[{key:'b',ctrl:true}]},
-      {sel:O.tableRng,   keys:[{key:'Alt'},L('h'),L('b'),L('s')]},                                  // box LAST — win fires here
+  { key: 'blocksel', name: 'dress walked LAST (align → center+bold after the cuts), per-edge border walk Alt H B P/O/L/R — any selection route grades', moves: `C => { const O=C._o; return [
+      {sel:O.baseTL,      keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]},
+      {sel:O.o.seg[0],    keys:[{key:'v',ctrl:true}]},
+      {sel:O.ebTL,        keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},
+      {sel:O.o.ebitda[0], keys:[{key:'v',ctrl:true}]},
+      {sel:O.opTL,        keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'x',ctrl:true}]},
+      {sel:O.o.opinc[0],  keys:[{key:'v',ctrl:true}]},
+      {sel:O.revRng,      keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:O.hdrRng,      keys:[{key:'Alt'},L('h'),L('a'),L('c'),{key:'b',ctrl:true}]},               // center then bold — reversed pair
+      {sel:'A3:D3',       keys:[{key:'Alt'},L('h'),L('b'),L('p')]},                                   // top edge
+      {sel:'A7:D7',       keys:[{key:'Alt'},L('h'),L('b'),L('o')]},                                   // bottom edge
+      {sel:'A3:A7',       keys:[{key:'Alt'},L('h'),L('b'),L('l')]},                                   // left edge
+      {sel:'D3:D7',       keys:[{key:'Alt'},L('h'),L('b'),L('r')]},                                   // right edge — outside border assembled by hand
     ]; }` },
   { key: 'undo', name: 'the mistake walked FIRST, dressing last, italic via alt h 2', moves: `C => { const o=C._o; return [
       {sel:o.wrongRng, keys:[{key:'Delete'},{key:'z',ctrl:true}]},
@@ -90,62 +100,82 @@ const ALTS = [
       {sel:o.landedCol, keys:[{key:'c',ctrl:true}]},
       {sel:o.d2, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('a'),{key:'Enter'}]},
     ]; }` },
-  { key: 'pastes', name: 'transpose + multiply first via ctrl+alt+v, divide via alt h v s, formats then border-clear, deck values last (chord-ROUTE alt)', moves: `C => { const o=C._o; return [
+  /* r424 (pastes ROUND 2, DEPTH_PASS §4.3): chord-ROUTE alt + the §1.0(c) FREEDOM proof —
+     transpose via ctrl+alt+v, the scale conversion ROW BY ROW via the ribbon dialog (slow
+     route: core clears, the one-pass ☆ does not), the costs line typed by hand as minus
+     signs (no paste-special at all — never penalized), unbold via ribbon alt h 1. The op
+     letter is variant-aware (÷1000 board → i Divide, ×100 board → m Multiply). */
+  { key: 'pastes', name: 'ctrl+alt+v transpose, scale row-by-row via alt h v s, costs TYPED negative (Freedom), ribbon unbold (chord-ROUTE alt)', moves: `C => { const o=C._o; const k=o.mode==='div'?'i':'m'; return [
       {sel:o.side, keys:[{key:'c',ctrl:true}]},
       {sel:o.feesRow.split(':')[0], keys:[{key:'v',ctrl:true,alt:true},L('e'),{key:'Enter'}]},
-      {sel:o.helperNeg, keys:[...T('-1'),{key:'Enter'}]},
-      {sel:o.helperNeg, keys:[{key:'c',ctrl:true}]},
-      {sel:o.costRow, keys:[{key:'v',ctrl:true,alt:true},L('m'),{key:'Enter'}]},
-      {sel:o.helperDiv, keys:[...T('1000'),{key:'Enter'}]},
-      {sel:o.helperDiv, keys:[{key:'c',ctrl:true}]},
-      {sel:o.divBlk, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('i'),{key:'Enter'}]},
+      {sel:o.helperScale, keys:[{key:'c',ctrl:true}]},
+      {sel:'B5:E5', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L(k),{key:'Enter'}]},
+      {sel:'B6:E6', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L(k),{key:'Enter'}]},
+      {sel:'B8', keys:[...T('-'+o.costVals[0]),{key:'Enter'}]},
+      {sel:'C8', keys:[...T('-'+o.costVals[1]),{key:'Enter'}]},
+      {sel:'D8', keys:[...T('-'+o.costVals[2]),{key:'Enter'}]},
+      {sel:'E8', keys:[...T('-'+o.costVals[3]),{key:'Enter'}]},
       {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
       {sel:o.sub, keys:[{key:'v',ctrl:true,alt:true},L('t'),{key:'Enter'}]},
-      {sel:o.sub, keys:[{key:'Alt'},L('h'),L('b'),L('n')]},
+      {sel:o.sub, keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
       {sel:o.deck, keys:[{key:'Alt'},L('e'),L('s'),L('v'),{key:'Enter'}]},
     ]; }` },
-  /* r422 (pastes rework, DEPTH_PASS §4.3): op-ORDER alt — formats land on the naked Subtotal
-     FIRST (its live SUM only re-ties later; end-state grading must hold), then the value ops.
-     The 1-cell helper DIVIDE over the four-cell Trading row doubles as the r419 paste-TILING
-     regression: the op path must broadcast the helper once per cell, never double-apply. */
-  { key: 'pastes', name: 'formats FIRST onto the naked Subtotal, helpers batched, divide tiles ×1 across Trading (r419 tiling regression), deck via ctrl+alt+v', moves: `C => { const o=C._o; return [
+  /* r424 (pastes ROUND 2, DEPTH_PASS §4.3): op-ORDER alt — formats land on the undressed
+     Subtotal FIRST (its live SUM only re-ties later; end-state grading must hold), then the
+     sign flip, then the ☆ one-pass scale conversion (single-cell helper broadcast over the
+     TWO-row selection — also the r419 paste-TILING regression: once per cell, never
+     double-applied), transpose second-to-last, deck values last via ctrl+alt+v. */
+  { key: 'pastes', name: 'formats FIRST + ctrl+b unbold, sign flip, ☆ one-pass scale over both rows (r419 tiling regression), transpose late, deck via ctrl+alt+v', moves: `C => { const o=C._o; const k=o.mode==='div'?'i':'m'; return [
       {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
       {sel:o.sub, keys:[{key:'Alt'},L('e'),L('s'),L('t'),{key:'Enter'}]},
-      {sel:o.sub, keys:[{key:'Alt'},L('h'),L('b'),L('n')]},
-      {sel:o.helperDiv, keys:[...T('1000'),{key:'Enter'}]},
-      {sel:o.helperNeg, keys:[...T('-1'),{key:'Enter'}]},
-      {sel:o.helperDiv, keys:[{key:'c',ctrl:true}]},
-      {sel:o.divBlk, keys:[{key:'Alt'},L('e'),L('s'),L('i'),{key:'Enter'}]},
-      {sel:o.helperNeg, keys:[{key:'c',ctrl:true}]},
-      {sel:o.costRow, keys:[{key:'Alt'},L('e'),L('s'),L('m'),{key:'Enter'}]},
+      {sel:o.sub, keys:[{key:'b',ctrl:true}]},
+      {sel:o.helperSign, keys:[{key:'c',ctrl:true}]},
+      {sel:o.costRow, keys:[{key:'v',ctrl:true,alt:true},L('m'),{key:'Enter'}]},
+      {sel:o.helperScale, keys:[{key:'c',ctrl:true}]},
+      {sel:o.scaleRows, keys:[{key:'Alt'},L('e'),L('s'),L(k),{key:'Enter'}]},
       {sel:o.side, keys:[{key:'c',ctrl:true}]},
       {sel:'B4', keys:[{key:'Alt'},L('e'),L('s'),L('e'),{key:'Enter'}]},
       {sel:o.dressed, keys:[{key:'c',ctrl:true}]},
       {sel:o.deck, keys:[{key:'v',ctrl:true,alt:true},L('v'),{key:'Enter'}]},
     ]; }` },
-  { key: 'filldr', name: '2D block FIRST (recalc closes it), ribbon fills, FY column down, then sum + pull', moves: `C => { const o=C._o; return [
-      {sel:o.mix0, keys:[...T('='+o.mixF),{key:'Enter'}]},
-      {sel:o.mixCol, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:o.blk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+  /* r424 (filldr round 2, DEPTH_PASS §4.2): op-ORDER alt — FY column lands BEFORE the EBITDA
+     row (its FY cell then arrives live off the fill-right and recalcs), fills ride the ribbon
+     (Alt H F I D/R), and the ratio block goes the §1.0(c) SLOW way: four row formulas typed
+     UNANCHORED, each filled right on its own. Every core clears; the ☆ census must NOT fire. */
+  { key: 'filldr', name: 'FY before EBITDA (recalc closes the FY cell), ribbon fills, ratio rows typed per-row unanchored — the slow route: cores clear, no ☆', moves: `C => { const o=C._o; const rr=o.rr, p1=o.p1; return [
+      {sel:o.pull0, keys:[...T('='+o.feed0),{key:'Enter'}]},
+      {sel:o.pullRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.costBlk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:o.fy0, keys:[...T('=SUM('+o.fyArg+')'),{key:'Enter'}]},
       {sel:o.fyRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
       {sel:o.sum0, keys:[...T('=SUM('+o.sumArg+')'),{key:'Enter'}]},
-      {sel:o.sumRng, keys:[{key:'r',ctrl:true}]},
-      {sel:o.pull0, keys:[...T('='+o.feed0),{key:'Enter'}]},
-      {sel:o.pullRng, keys:[{key:'r',ctrl:true}]},
+      {sel:o.sumRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.sumRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:'B'+p1, keys:[...T('=B'+(rr+1)+'/B'+rr),{key:'Enter'}]},
+      {sel:'B'+p1+':F'+p1, keys:[{key:'r',ctrl:true}]},
+      {sel:'B'+(p1+1), keys:[...T('=B'+(rr+2)+'/B'+rr),{key:'Enter'}]},
+      {sel:'B'+(p1+1)+':F'+(p1+1), keys:[{key:'r',ctrl:true}]},
+      {sel:'B'+(p1+2), keys:[...T('=B'+(rr+3)+'/B'+rr),{key:'Enter'}]},
+      {sel:'B'+(p1+2)+':F'+(p1+2), keys:[{key:'r',ctrl:true}]},
+      {sel:'B'+(p1+3), keys:[...T('=B'+o.er+'/B'+rr),{key:'Enter'}]},
+      {sel:'B'+(p1+3)+':F'+(p1+3), keys:[{key:'r',ctrl:true}]},
     ]; }` },
-  { key: 'filldr', name: 'AutoSum route (alt+=) for both totals, ☆ via ribbon bold (alt h 1) + top border, canonical order', moves: `C => { const o=C._o; return [
+  /* r424: chord-ROUTE alt — AutoSum (alt+=) for both totals, ribbon bold (Alt H 1) on the
+     EBITDA dress, and the ratio block the ☆ way (one anchored seed, ctrl+d then ctrl+r) —
+     the mastery route wins on a different chord set, canonical beat order. */
+  { key: 'filldr', name: 'AutoSum route (alt+=) for both totals, ribbon bold (alt h 1) + top border, ratio block via the one-anchored-formula ☆ move', moves: `C => { const o=C._o; return [
       {sel:o.pull0, keys:[...T('='+o.feed0),{key:'Enter'}]},
       {sel:o.pullRng, keys:[{key:'r',ctrl:true}]},
-      {sel:o.fy0, keys:[{key:'=',alt:true},{key:'Enter'}]},
-      {sel:o.fyRng, keys:[{key:'d',ctrl:true}]},
+      {sel:o.costBlk, keys:[{key:'r',ctrl:true}]},
       {sel:o.sum0, keys:[{key:'=',alt:true},{key:'Enter'}]},
       {sel:o.sumRng, keys:[{key:'r',ctrl:true}]},
       {sel:o.sumRng, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.fy0, keys:[{key:'=',alt:true},{key:'Enter'}]},
+      {sel:o.fyRng, keys:[{key:'d',ctrl:true}]},
       {sel:o.mix0, keys:[...T('='+o.mixF),{key:'Enter'}]},
-      {sel:o.blkRow, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:o.blk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.mixCol, keys:[{key:'d',ctrl:true}]},
+      {sel:o.ratioBlk, keys:[{key:'r',ctrl:true}]},
     ]; }` },
   { key: 'foot', name: 'typed SUMs (no alt+=), columns before rows', moves: `C => [
       {sel:'B6', keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
@@ -159,14 +189,8 @@ const ALTS = [
       {sel:o.mR, keys:[{key:'Alt'},L('h'),D(0)]},
       {sel:o.evR, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
     ]; }` },
-  { key: 'colops', name: 'insert the quarter BEFORE deleting DRAFT', moves: `C => { const o=C._o;
-      const dc2 = o.dc + (o.ni<=o.dc ? 1 : 0);
-      return [
-        {sel:colLetter(o.ni)+(o.hr+1), keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('i'),L('c')]},
-        {sel:colLetter(o.ni)+o.hr, keys:[...T(o.mq),{key:'Enter'}]},
-        {sel:colLetter(o.ni)+o.hr, keys:[{key:'b',ctrl:true}]},
-        {sel:colLetter(dc2)+(o.hr+1), keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('d'),L('c')]},
-      ]; }` },
+  /* r424 (D17): the colops entry is gone with the drill — its column-op alternates live on
+     inside the two rowops entries above (ribbon vs chord routes, insert-vs-delete order). */
   { key: 'anchor', name: 'dollars typed by hand — no F4 at all', moves: `C => { const o=C._o; return [
       {sel:o.tl, keys:[...T('=$B'+o.r0+'*C$'+o.hr),{key:'Enter'}]},
       {sel:o.col, keys:[{key:'d',ctrl:true}]},
@@ -722,24 +746,36 @@ const ALTS = [
       {sel:'B2:'+R.LC+'2', keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
       {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
     ]; }` },
-  { key: 'navigation', name: 'thread the maze the SLOW way — single-arrow steps (not Ctrl+arrow), collecting every pip, then grab → weave → drop', moves: `C => {
-      // r402 maze: the alternate route is single-cell arrow-stepping the corridor instead of the
-      // canonical Ctrl+arrow shooting. Same win (pips collected + model grabbed + pasted).
-      const M=C._maze, cl=colLetter, T=M.table, D=M.paste, p1=M.p1, p2=M.p2;
+  { key: 'navigation', name: 'ROUND-2 corridor the SLOW way — single-arrow steps both directions (no ctrl-shots, no Ctrl+Home), slow shift-span grab, walk home, paste, Ctrl+End', moves: `C => {
+      // r424 (§4.1 round 2): the corridor is bidirectional — the slow route steps every cell,
+      // grabs the block with plain Shift+arrows, WALKS back to the A1 room instead of the
+      // Ctrl+Home teleport, pastes, then flies Ctrl+End (the finish beat's only route — a
+      // teleport by design; the §1.7 R2(a) coordinates-are-the-game exemption).
+      const M=C._maze, cl=colLetter, T=M.table, p1=M.p1;
       const sk=(a,b)=>{ const dr=b[0]-a[0], dc=b[1]-a[1]; return dr===1?{key:'ArrowDown'}:dr===-1?{key:'ArrowUp'}:dc===1?{key:'ArrowRight'}:{key:'ArrowLeft'}; };
-      const nav1=[]; for(let i=1;i<p1.length;i++) nav1.push(sk(p1[i-1],p1[i]));   // walk to the model, one cell at a time (collects pips)
-      const nav2=[]; for(let i=1;i<p2.length;i++) nav2.push(sk(p2[i-1],p2[i]));   // walk to the drop zone
-      const corner=cl(T.c0)+T.r0, full=corner+':'+cl(T.c0+T.w-1)+(T.r0+T.h-1);
+      const nav1=[]; for(let i=1;i<p1.length;i++) nav1.push(sk(p1[i-1],p1[i]));   // step to the block, one cell at a time (collects pips) — lands bottom-left
+      const BL=[T.r0+T.h-1,T.c0], TR=[T.r0,T.c0+T.w-1];
+      const g=[]; for(let i=0;i<T.w-1;i++) g.push({key:'ArrowRight',shift:true});
+      for(let i=0;i<T.h-1;i++) g.push({key:'ArrowUp',shift:true});
+      g.push({key:'c',ctrl:true});                                               // slow span from the landing corner + copy (active ends top-right)
+      const back=[];                                                             // walk from the top-right corner back to A1: rejoin BL, then reverse p1, then up the room edge
+      for(let i=0;i<T.h-1;i++) back.push({key:'ArrowDown'});
+      for(let i=0;i<T.w-1;i++) back.push({key:'ArrowLeft'});
+      for(let i=p1.length-1;i>0;i--) back.push(sk(p1[i],p1[i-1]));
+      for(let r=p1[0][0];r>1;r--) back.push({key:'ArrowUp'});
       return [
-        {sel:cl(p1[0][1])+p1[0][0], keys:nav1},                                                          // slow single-step thread to the model room
-        {sel:corner, keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]},   // grab the block + copy
-        {sel:cl(p2[0][1])+p2[0][0], keys:nav2},                                                          // slow single-step weave to the drop zone
-        {sel:cl(D.c0)+D.r0, keys:[{key:'v',ctrl:true}]}                                                  // paste
+        {sel:cl(p1[0][1])+p1[0][0], keys:nav1},
+        {sel:cl(BL[1])+BL[0], keys:g},
+        {sel:cl(TR[1])+TR[0], keys:back},
+        {sel:'A1', keys:[{key:'v',ctrl:true}]},
+        {sel:'A1', keys:[{key:'End',ctrl:true}]}                                 // finish flight; the harness presses the universal Ctrl+S closer
       ]; }` },
-  { key: 'navigation', name: 'ctrl-shot thread + SLOW GRAB — the model spanned with plain shift+arrows (no ctrl+shift jumps)', moves: `C => {
-      // r422 (§1.8): second route — canonical corridor shooting, but the block-grab is plain
-      // Shift+arrow spans (2 right, 3 down), one cell at a time. Same end state, different chords.
-      const M=C._maze, cl=colLetter, T=M.table, D=M.paste, p1=M.p1, p2=M.p2, RN=20, CN=10;
+  { key: 'navigation', name: 'ROUND-2 ctrl-shot flights + TL grab (span DOWN then RIGHT) + Wolf sketch order: paste → SAVE → finish flight (win fires on the flight)', moves: `C => {
+      // r424 (§1.8): second route — canonical corridor flights, but the grab anchors at the
+      // TOP-LEFT corner (single steps up the label column, then ctrl+shift down/right), and the
+      // closer follows Wolf's §4.1 sketch order: Ctrl+S BEFORE the bottom-right flight — the
+      // post:true finish beat means the save takes and the win fires on the flight.
+      const M=C._maze, cl=colLetter, T=M.table, p1=M.p1, RN=20, CN=10;
       const ek=(r,c,nr,nc)=>{ const a=r*100+c,b=nr*100+nc; return a<b?(r+':'+c+'|'+nr+':'+nc):(nr+':'+nc+'|'+r+':'+c); };
       const can=(r,c,nr,nc)=> nr>=1&&nr<=RN&&nc>=1&&nc<=CN&&M.pass.has(ek(r,c,nr,nc));
       const shoot=(r,c,dr,dc)=>{ let cr=r,cc=c; while(can(cr,cc,cr+dr,cc+dc)){cr+=dr;cc+=dc;} return [cr,cc]; };
@@ -753,13 +789,12 @@ const ALTS = [
           if(sh[0]===end[0]&&sh[1]===end[1]){ steps.push({sel:cl(c)+r, keys:[dK(dr,dc)]}); }
           else { for(let k=i;k<j;k++){ const [rr,cc]=path[k]; steps.push({sel:cl(cc)+rr, keys:[sK(dr,dc)]}); } }
           i=j; } };
-      walk(p1);                                                                                          // ctrl-shot thread to the model room (collects pips)
-      const g=[]; for(let i=0;i<T.w-1;i++) g.push({key:'ArrowRight',shift:true});
-      for(let i=0;i<T.h-1;i++) g.push({key:'ArrowDown',shift:true});
-      g.push({key:'c',ctrl:true});
-      steps.push({sel:cl(T.c0)+T.r0, keys:g});                                                           // slow grab + copy (active ends at the far corner, where p2 starts)
-      walk(p2);                                                                                          // ctrl-shot weave to the drop zone
-      steps.push({sel:cl(D.c0)+D.r0, keys:[{key:'v',ctrl:true}]});
+      walk(p1);                                                                  // flight chain to the block (collects pips) — lands bottom-left
+      const up=[]; for(let i=0;i<T.h-1;i++) up.push({key:'ArrowUp'});            // single-step up the label column to the top-left corner
+      up.push({key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'c',ctrl:true});
+      steps.push({sel:cl(T.c0)+(T.r0+T.h-1), keys:up});
+      steps.push({sel:cl(T.c0)+T.r0+':'+cl(T.c0+T.w-1)+(T.r0+T.h-1), keys:[{key:'Home',ctrl:true},{key:'v',ctrl:true}]});
+      steps.push({sel:'A1', keys:[{key:'s',ctrl:true},{key:'End',ctrl:true}]});  // SAVE first, then the finish flight — the win fires on the flight
       return steps; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
