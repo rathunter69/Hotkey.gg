@@ -1,5 +1,149 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r424 H6b-1r2 — pastes ROUND 2 (DEPTH_PASS.md §4.3 round-2 page + ROUND1_FEEDBACK.md)
+- **BEATS (§4.3 lines shipped verbatim, outcome-vague per §1.0(b)):** transpose the fees —
+  the NEW Q labels beside the vertical feed say which quarter is which → Convert the
+  Trading, Advisory AND Subtotal rows (both feeds now arrive in the wrong units; the live
+  Subtotal re-ties as they convert; typed values also pass — §1.0(c)) → Make the Costs line
+  negative (typed minus signs pass — Freedom, proven by an ALT) → Paste the formats from
+  the Total row onto the Subtotal, then UNBOLD it (round-2 change: the carried §1.0(f) top
+  border STAYS — bold is what tells a subtotal from the Total; the r422 clear-the-border
+  line is dead) → paste the totals into the deck row, now board-labeled "Deck (values
+  only)" → engine-appended Ctrl+S closer (saveClose:true, verified appending checks/guide/
+  targets/demo at runtime — depth-mechanics §I runs on this drill). The off-verb-list
+  'Convert'/'Make' openers ship verbatim from the §4.3 page (§0 literal-label rule; the
+  closed-verb lint is warn-only).
+- **NEW ☆ (§1.0(d) mystery slot):** ONE paste-special arithmetic pass converts BOTH
+  inconsistent rows — copy the yellow helper once, one two-row selection (B5:E6), one op.
+  The old color-the-fees-blue formatting ☆ is DEAD. Latched off the NEW engine
+  `S.pasteOpLog` (doPaste op branch now records rect + op + single-cell broadcast factor
+  per pass — history-based grading, no route-forcing of core checks). Negative control
+  verified: row-by-row passes clear core, ☆ stays unearned; label hidden as "☆ ?" until
+  earned; demo performs the one-pass mid-run so replays cover it.
+- **BOARD (§1.0(f) conventions):** both helper cells POPULATED (scale factor + −1) and
+  dressed light yellow + all borders + blue figure — the input convention, visible as
+  tools; Total row ships bt:true + the r423 distinct grey token (depth-mechanics §P still
+  asserts the veil over it at seed 21); Subtotal ships undressed (the formats target) and
+  READS WRONG until the feeds convert — the board states its own problem.
+- **RANDOM (new axis + kept axes):** NEW scale-conversion variant — 'div' ($000s board,
+  feeds in raw $, helper 1000, alt e s i) vs 'mul' (whole-$ board, feeds in $00s, helper
+  100, alt e s m); title, row units, helper value AND the beat-2 unit word co-vary. Kept:
+  feed site {G,H} (Q-label column + values column, gutter moat intact), deck row {11,12},
+  value pools, year jitter. Same-seed determinism re-verified.
+- **PAR:** 49/49 → 34/32 (5-seed sweep: median 32 keys, 0% drift; populated helpers took
+  the typing out, the unbold came in; par 34s = 1.06 s/key, absorbing the two-row-selection
+  drag). HOTKEY_PARS mirrored; drills.js?v=281→282 everywhere; drill pages + sitemap +
+  refmap regenerated.
+- **GENERATOR:** build-drill-pages chord extraction now UNIONS a second fixed-seed build so
+  variant-dependent routes keep BOTH chords in refmap (ALT>E>S>I and ALT>E>S>M both map to
+  pastes again); regeneration verified byte-stable twice (CI drift guard safe).
+- **ALTS (§1.8, both rewritten):** (1) chord-route + FREEDOM proof — ctrl+alt+v transpose,
+  scale row-by-row via alt h v s, costs TYPED as negatives (no paste-special), ribbon
+  unbold alt h 1; (2) op-order — formats FIRST + ctrl+b, sign flip, ☆ one-pass over both
+  rows (doubles as the r419 tiling regression), transpose late, deck via ctrl+alt+v. Both
+  variant-aware (op letter follows o.mode). 2/2 PASS.
+- **TESTS:** replay pastes 3/3 + both variants ×3 forced seeds (dedicated verify script:
+  helpers/Q-labels/co-varying labels/☆ latch + negative control/mystery display/ring-hold/
+  determinism — ALL GREEN) · full-catalog replay ALL GREEN · guided PASS (railed,
+  contained, solvable; ring-hold asserted on THIS drill: latched through the open
+  paste-special dialog, advances only when the transpose grades — r423 B3 contract) ·
+  depth-mechanics 97/97 · smoke 7 pages + invariants clean · static invariants clean
+  (C9 pastes 6+1) · fit-sweep 78 clean · par-sweep FLAGGED 0. Screenshots on file
+  (fresh both variants / mid / win; win passes the sendable-page read — dressed Subtotal,
+  signed costs, dead deck values).
+
+## r424 — H6b-1r2: filldr ROUND 2 per Wolf's playtest (DEPTH_PASS §4.2, ROUND1_FEEDBACK filldr)
+- **BEATS (outcome-vague, §1.0(b)):** 6 core + mystery ☆ + the engine-appended Ctrl+S closer.
+  Labels verbatim from the round-2 page (Wolf's sketch voice): Reference the feed onto the
+  build's top row · Fill the cost lines across all four quarters · Build EBITDA (costs out,
+  D&A added back) · **Format the EBITDA row — bold + top border, now MANDATORY and placed
+  format-as-you-go directly after the row exists (§1.0(a))** · Total to Fiscal Year, every
+  line · Build the ratio rows through **"EBITDA margin %"** (the §4.2 rename; new 4th ratio
+  row). All route prescription stripped from labels — start cells / fill directions /
+  formula shapes live only in guide/req/demo. §0 note: beat 4's page line leads with
+  "Format" (outside the §1.7 closed list); the page wins per §0, code comment in checks().
+- **BOARD:** D&A now POSITIVE (an add-back — COGS/Opex carry it embedded; the SUM to EBITDA
+  reads costs-negative, add-back-positive). Costs hold FLAT at the Q1 run-rate — the board
+  says so on its moat row — so beat 2's fill across produces TRUE data and the ratio block
+  stays informative (margins move with revenue). Ratio block retitled "Ratios — % of
+  revenue", four labeled rows ending "EBITDA margin %". Feed quarters now swing ±~15%
+  around a per-seed base so EBITDA is positive every seed; all currency figures integers.
+- **MORE FILL REPS (Wolf):** five distinct fills on the canonical line — reference filled
+  right (references translate) · 3-row cost block filled right (values + blue dress carry) ·
+  EBITDA SUM filled right through FY · FY column filled down (the EBITDA FY cell recalcs
+  live off beat 3's fill — no format clobber on the dressed row) · the 4×5 ratio block from
+  ONE anchored seed, down then right.
+- **☆ (MYSTERY SLOT, §1.0(d)):** "Fill the cost ratios from one anchored formula — down
+  once, right once." Graded by **formula census + fill latches**: census = all 15 cost-ratio
+  cells hold translates of one seed (own-column numerator over the $-locked Revenue row,
+  case-normalized); latches = NEW S.fillOps telemetry (fillFrom records {dir, rect}, capped,
+  same family as pasteN/insRowN) must show a fill DOWN from the seed row covering the three
+  cost rows and a fill RIGHT from column B through FY, both inside the block. §1.0(c)
+  verified three ways live: scripted ☆ route wins with star; four typed unanchored row
+  formulas + per-row fill right wins WITHOUT star; a fully TYPED board (values only,
+  percent-entry) wins without star. The old formatting-☆ (bold the EBITDA row) is dead —
+  promoted to core beat 4 per Wolf.
+- **FREEDOM FIX (§1.0(c)):** round-1 checks required `c.formula` on the pull/FY/EBITDA/%
+  beats — every core ok now grades END-STATE VALUES in tolerance (0.5 on integer currency,
+  6e-4 on ratios so a value typed off the 1-decimal percent display lands).
+- **AHA:** relocated to the ☆ moment per the page — "One $ pass, fifteen cells — anchors
+  are where the speed lives."
+- **PAR:** sweep median 44 keys ×5 seeds (round-1 42 + closer + cost fill, minus the old
+  narrower block) — parKeys 42→44, par 42→44 (house 1.00 s/key held), HOTKEY_PARS.filldr
+  mirrored, drift 0%. Clocks derive std: pass 1:06 · pro 0:50 · legendary 0:44.
+- **ALTS (§1.8, both rewritten):** (1) op-ORDER — FY column BEFORE the EBITDA row (its FY
+  cell closes by recalc), ribbon fills (Alt H F I D/R), ratio rows typed per-row unanchored
+  = the sanctioned slow route (cores clear, ☆ census must not fire); (2) chord-ROUTE —
+  AutoSum (alt+=) both totals, ribbon bold (Alt H 1) + Alt H B P dress, ratio block the ☆
+  way on ctrl+d/ctrl+r. Both 3/3 seeds, plus guided replay.
+- **ENGINE (shared, small):** fillFrom now latches S.fillOps (direction + rect, all three
+  fill branches, 240-op cap) — display/telemetry only, no grading change outside the filldr
+  ☆; smartFill inherits the latch by delegation. B2 (Ctrl+Shift+D parity) landed in r423 —
+  Macabacus-profile smart fills verified as an alt route, not a core dependency.
+- GATE (all green, worktree port 8813): demo-replay filldr 3/3 + full catalog · guided
+  filldr railed/contained/solvable · alt-paths 2/2 · par-sweep FLAGGED 0 (44/44, 0% drift) ·
+  depth-mechanics 97/97 · smoke 7 pages + HOTKEY_PARS parity + de-hint · fit-sweep clean ·
+  static invariants clean (C9 filldr 7-length tri + one ☆ + saveClose declared) ·
+  cache-bump guard clean (drills.js ?v 281→282 all pages); drill pages + sitemap
+  regenerated (filldr par/prompt/aha copy).
+
+## r424 H6b-1r2 — navigation ROUND 2: corridor redesign (DEPTH_PASS.md §4.1, playtest r1)
+- **BOARD:** the recursive-backtracker maze is DEAD (Wolf: "idiosyncratic in a bad way…
+  single-arrow maneuvering isn't the lesson"). New generator: one WINDING CORRIDOR of
+  6 legs (template A) or 8 legs with a north kink (template B), carved through a solid
+  slate wall field (new `fill-wall` style token, same family as the r405 wall borders).
+  Every leg is exactly ONE Ctrl+arrow flight — build() SELF-VERIFIES per seed with the
+  same flight replica move() uses (leg-by-leg exact landing + geometry-moat adjacency
+  scan; bad draw redraws deterministically, fallback params valid by construction).
+  Pips sit at the leg-end corners so collection rides the flow. The A1 room (3×4, the
+  block's exact footprint) ships EMPTY — it is the paste destination. PgUp/PgDn
+  elevators left out per the §4.1 future note.
+- **BEATS (Wolf's sketch, outcome-vague §1.0(b)):** navigate + collect pips (0/N counter)
+  → select and copy the whole block → return to A1 and paste (Ctrl+Home sanctioned via
+  new `maze.tele` flag — teleports still never collect pips) → Save your work
+  (engine-appended saveClose) → finish at the bottom-right of the active area (Ctrl+End).
+  The finish beat carries new `post:true` — the sanctioned §1.0(e) exception: the Ctrl+S
+  gate tolerates a post-save beat, so on the sketch order (paste → save → flight) the win
+  fires ON THE FLIGHT; flight-then-save also grades (§1.0(c) freedom). ☆ mystery slot =
+  zero wall bumps, riding the r423 fairness latch (a flight stopping AT a wall never bumps).
+- **RANDOM:** table site {r0 14–16 × c0 7–8} + exit row {2–4} + leg template/params +
+  model content pools (3 line-label sets, all values rnd()). Model subtotal keeps its
+  §1.0(f) TOP border.
+- **ENGINE (3 smalls):** Home/End maze guards became conditional on `maze.tele` (plain +
+  Shift variants stay inert — r423 wall integrity holds); Ctrl+S finished-work gate
+  gains `||x.post`; `fill-wall` CSS token (light/dark).
+- **PAR:** 35/45 → 16/14 (two 5-seed sweeps: medians 13/15 across templates → parKeys 14,
+  drift ±7% unflagged; par 16 ≈ 1.14 s/key — reading-dominated short drill). HOTKEY_PARS
+  mirrored; drills.js?v=281→282 everywhere; drill pages + refmap regenerated (CTRL+HOME
+  now practices → navigation).
+- **TESTS:** replay navigation 3/3 + full catalog ALL GREEN · depth-mechanics 101/101
+  (test L rewritten: tele teleports asserted, plain-Home/Shift-variants inert, A1-empty,
+  pips-complete + zero-bump ☆ on the scripted line) · guided PASS (navigation stays
+  free/cursor-graded — checks still reference S.active) · smoke 7 pages + invariants
+  clean (C9 navigation 5+1) · fit-sweep 78 clean · alt-paths: BOTH navigation entries
+  rewritten for the corridor (slow single-step thread + walk-home with no teleports;
+  ctrl-flight thread + TL grab + Wolf's save-before-flight order) — ALL PASS ×3 seeds.
+
 ## r422 H6b-1 — pastes depth-pass rework (DEPTH_PASS.md §4.3, wave 1)
 - **BEATS:** 5 core + ☆, chained on one fee schedule: transpose the Fees feed → divide
   Trading into $000s → multiply Costs by −1 → paste FORMATS from the Total row onto the
@@ -5914,3 +6058,110 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   (fresh/mid/win; win passes the sendable-page read — dressed EBITDA rule, % block filled).
   Cache: drills.js ?v 280→281 across all 97 pages; drill pages + sitemap + refmap regenerated
   (refmap: CTRL+B / ALT>H>B>P representative drill now filldr, first-in-order rule).
+
+## r424 — H6b-1r2: blocksel round 2 (DEPTH_PASS §4.4, playtest r1)
+- **BEATS (§4.4 round-2 lines verbatim, outcome-vague §1.0(b)):** 6 core — copy the base ·
+  bold + center the headers (never merge) · right-align the figures · cut EBITDA ("the feed is
+  in the same segment order as the summary" — Wolf's explicitness ask, now in the label) · cut
+  Op inc ("same segment order, same motion") · outside border around the entire table — + the
+  engine-appended save closer. DROPPED per the page: the comma/dollar money beat and the whole
+  margin-column build (margins live in filldr/margin). No start cell / motion / chord in any
+  label; routes live in guide/req/demo. Format-as-you-go (§1.0(a)): each dress beat directly
+  follows the beat that landed its cells.
+- **B6 ROOT CAUSE (reproduced live, then fixed):** NOT the guided target and NOT the taught cut
+  range — the board. Round 1 parked both cut feeds in the SAME rows (G and I, one empty column
+  apart); Ctrl+Shift+→ from the EBITDA feed top edge-jumped the H moat onto the Op inc feed
+  (Excel-correct), so the block-grab the drill teaches one beat earlier selected G10:I13 — BOTH
+  metric columns — and the cut-paste blanked Op inc a column over. Fix: every feed island now
+  owns its own ROW BAND (S1 2-7 · S2 9-14 · S3 16-20), plus SWEEP-PROOF SIDES — any island with
+  another island below it sits on the I/J pair so its values column is the sheet edge (the →
+  can't open the tall down-sweep a G/H island would); only the bottom band shuffles sides.
+  Verified 12 seeds: the block-grab from the EBITDA feed can reach no other island's data, and
+  Ctrl+Shift+↓ from each feed top selects exactly that feed's single data column. Cut-paste
+  carries no column widths (doPaste cut branch never touches colW — §4.4 engine note verified).
+- **SEGMENT-ORDER CUE (board):** each cut feed carries a dim italic-gray segment-name column
+  beside its values — the pairing is visible, and the beat copy + guide + prompt all say the
+  feeds run in summary order.
+- **Ctrl+A BEAT:** the border close teaches whole-table region select — row 2 and column E ship
+  empty BY DESIGN as the region moat, so Ctrl+A from inside the table selects exactly A3:D7
+  (verified). Any selection route still grades (hand-grab + thick box, per-edge walk — both in
+  ALTS).
+- **☆ (NEW, mystery §1.0(d)) — the formatting ☆ is dead:** "Move both misfiled columns by cut —
+  one motion each, the old spots emptied themselves, nothing retyped." Grades off the NEW
+  S.cutMoves engine latch (doPaste cut branch records shape + lift point + landing per cut-paste;
+  additive, nothing else reads it). Verified: demo route earns it; retype+delete clears all six
+  cores and wins WITHOUT it (§1.0(c)); renders as "☆ ?" pre-earn.
+- **PAR:** demo median 25 keys (5 seeds, 0% drift) — parKeys 47→25, par 41s→26s (×1.04 s/key:
+  house band + the island travel setDemoSel elides), HOTKEY_PARS.blocksel mirrored. Clocks
+  derive std: pass 0:39 · pro 0:30 · legendary 0:26 (verified on the start strip).
+- **ALTS (§1.8, both rewritten — old entries referenced dead margin/money fields):** (1) cuts
+  FIRST (Op inc before EBITDA), base via legacy Alt E S paste, bold via Alt H 1, center via
+  Ctrl+1 A per header, hand-grabbed table + THICK box (order + chord-route variant); (2) dress
+  walked LAST after the cuts, center→bold reversed, outside border assembled by hand with
+  Alt H B P/O/L/R (no Ctrl+A). Both 3 seeds green.
+- **META:** drills.js desc rewritten (margin note gone, segment order + box-it-whole in);
+  prompt/aha rebuilt (aha = the §4.4 line verbatim; no ☆ spoiler in the prompt per the mystery
+  law). Randomization: base band {S1,S2} × cut-feed arrangement × bottom-band side + segment
+  pool + value ranges.
+- GATE (all green, own port): demo-replay blocksel 3/3 + full catalog ALL GREEN · guided railed/
+  contained/solvable · alt-paths 2/2 · depth-mechanics 97/97 · par-sweep FLAGGED 0 (26/25/25) ·
+  fit-sweep 78 clean · smoke 7 pages + invariants clean · static invariants clean (C9 blocksel
+  tri-length 7 + one ☆) · 12-point round-2 harness (B6 geometry ×12 seeds, region select, ☆
+  earn/withhold, save gating, mystery render) 12/12. Screenshots on file (fresh/mid/win; win
+  passes the sendable-page read — boxed table, uniform right-aligned body, feeds emptied).
+  Cache: drills.js ?v 281→282 across all pages; drill pages + sitemap + refmap regenerated
+  (refmap: CTRL+I → undo, CTRL+SHIFT+% → dress — blocksel no longer teaches them; CTRL+X stays).
+
+## r424 — H6b-1r2: rowops ROUND 2 — absorbs colops (DEPTH_PASS §4.5 + §3 D17, playtest round 1)
+- **THE MERGE (Wolf, ROUND1_FEEDBACK §2):** two thin structure drills taught one lesson — colops
+  RETIRED, rowops rebuilt as the one fulsome structure drill: row insert+paste → format-as-you-go
+  dress → PLACEHOLDER delete → TOP border on the Total row → DRAFT column delete → quarter column
+  insert+paste. 6 core beats + hidden ☆ + engine-appended Ctrl+S closer (saveClose:true kept from
+  r423; win fires on the save — verified by replay). Checks grade END STATE by content scan
+  (headers/labels re-located every pass), so any op order clears (§1.0(c)).
+- **ENGINE — INSERT INHERITANCE (the §4.5 lesson, VERIFIED DIVERGENT and fixed):** real Excel's
+  default: an inserted ROW inherits the formatting of the row ABOVE, an inserted COLUMN the column
+  to its LEFT (Insert Options can flip it; we teach the default). The engine only shifted cells —
+  inserted bands arrived bare. shiftCellsRows/shiftCellsCols now dress the inserted band from the
+  neighbor (format only — fill/font/number-format/alignment; borders excluded: Excel re-derives
+  shared edges and a cloned top-rule under a Total would lie; content never travels). Parity
+  asserts live in e2e-depth-mechanics §N2. Column-width inheritance (r407) already matched.
+- **ENGINE — LATCHES:** S.insColN/S.delColN (column twins of the r198 row latches, both routes) +
+  S.structN/S.structFullN — the ☆ selection-discipline latch: chord ops are full-by-construction;
+  ribbon ops record whether the selection was a full row/column at op time.
+- **☆ (§1.0(d) mystery slot):** every structure op fired from a full-row/full-column selection
+  (Ctrl+Space / Shift+Space then Ctrl+±). Ribbon-from-partial still clears core, slower. The old
+  undo-the-delete ☆ retired (undo keeps its own drill). Old formatting close (bottom border) dead —
+  §1.0(f): the Total row grades a TOP border and no bottom rule.
+- **BOARD:** placeholder now CLEARLY extraneous — grey italic, "PLACEHOLDER — remove", NO values
+  in any live column (the FY26E-data awkwardness dies; the Total is honest all run). DRAFT column
+  header grey italic, body empty. Staged line mirrors the schedule's column layout (DRAFT gap
+  included) with its own FY SUM so one whole-row paste always lands square and refs translate;
+  staged quarter is a pre-dressed 8-cell column (header + six values + total SUM) parked BELOW the
+  Total row band at side {H,J} so row ops shift it whole and the column ops walk it left/right in
+  lockstep. 20-row board, ~19 rows carrying content (§1.3 density).
+- **RANDOM (§1.2 — union of both retired pages' axes):** 6 lines from an 8-label pool (shuffled) ·
+  missing-line index (1–4) · placeholder slot · missing quarter {Q2,Q3} (always interior — the
+  insert lands inside the FY ranges so they expand, Excel parity) · DRAFT slot {0–3} · staged-block
+  side {H,J} · all values rnd(). Same-seed determinism: replay ×3 green.
+- **D17 PLUMBING (same commit):** drills.js groups/meta/HOTKEY_PARS drop colops (catalog 82→81
+  live; menuOrder stays the source of truth — smoke drill-count reads 81); meta rowops → name/tab
+  'Structure', desc rewritten (de-hint clean); marketing "82 banker-grade drills" → 81 (index ×3,
+  About ×2); HK_TRACKS derive from groups (verified — no per-key list to touch); campaign c1 keys
+  never listed colops; dev/migrate-certificates.sql fluency array updated + NEW supabase migration
+  20260725000000_retire_colops.sql re-declares issue_certificate without colops (else the fluency
+  cert goes uncompletable — r359 drift rule, same PR); drill pages + sitemap + refmap regenerated
+  (colops.html deleted, 81 pages, colops chords now map to rowops); leaderboard board orphaned by
+  design — every surface derives from menuOrder (lb.js/nav.js verified), historical colops runs
+  stay in the DB, nothing 404s (smoke: leaderboard/stats/profile zero page errors); e2e-alt-paths
+  colops entry removed, rowops entries rebuilt ×2; e2e-depth-mechanics section N re-pointed at
+  rowops. seed-field.sql colops rows kept (historical seed runs). Cache: drills.js ?v 281→282
+  across all 96 pages.
+- **PAR:** fresh measure (merged scope) — sweep median 29 keys ×5 seeds (save included), parKeys
+  29, par 30s (~1.05 s/key), HOTKEY_PARS mirrored, drift 0%. Leaner than the two retired drills
+  summed (34+16) because the staged quarter pastes in instead of being typed — honest, swept.
+- GATE (all green): demo-replay rowops 3/3 + FULL catalog 81/81 · guided rowops railed/contained/
+  solvable · alt-paths 2/2 (ribbon-partial route ☆-less by design; deletes-first order) ·
+  depth-mechanics 101/101 (incl. new §N2 inheritance parity + latch asserts) · par-sweep FLAGGED 0
+  · fit-sweep ALL CLEAN · smoke 7 pages + drill-count(81) + PARS parity clean · static invariants
+  clean (C9 rowops tri-length 7 + one ☆ + saveClose declared).

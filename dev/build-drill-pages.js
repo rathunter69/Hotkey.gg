@@ -67,11 +67,14 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
       // semantic chord extraction from the demo script — what this drill actually trains.
       // bare Alt starts a ribbon walk collecting the plain letters/digits after it;
       // ctrl/alt chords and F-keys tally as themselves; typed =FORMULAS( name their functions.
+      // r424: extraction UNIONS a SECOND seeded build — drills whose demo route co-varies
+      // with a board variant (pastes' ÷1000 Divide vs ×100 Multiply, DEPTH_PASS §4.3) keep
+      // BOTH variants' chords in refmap/page chips. Page copy (req/guide) stays the FIRST
+      // build's; both seeds are fixed, so regeneration stays byte-stable for the CI diff.
       const chords = [], fns = new Set(); const seen = new Set();
       const AR = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' };
       const put = c => { if (c && !seen.has(c)) { seen.add(c); chords.push(c); } };
-      try {
-        const mv = typeof C.demo === 'function' ? C.demo.call(C) : C.demo;
+      const extract = (mv) => {
         let walk = null, typing = '';
         const flushTyping = () => {
           (typing.match(/[A-Za-z]{2,}(?=\()/g) || []).forEach(f => fns.add(f.toUpperCase()));
@@ -96,6 +99,15 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
         }));
         if (walk !== null && walk.includes('>')) put(walk);
         flushTyping();
+      };
+      try { extract(typeof C.demo === 'function' ? C.demo.call(C) : C.demo); } catch (e) {}
+      try {   // second fixed-seed build — union the other variant's chords (see note above)
+        if (typeof mulberry32 === 'function' && typeof C.build === 'function' && typeof C.demo === 'function') {
+          _rand = mulberry32(424251);
+          C.build.call(C);
+          extract(C.demo.call(C));
+          _rand = mulberry32(424242); C.build.call(C);   // restore the page-copy instance
+        }
       } catch (e) {}
       drills[k] = {
         key: k, group: g.name,
