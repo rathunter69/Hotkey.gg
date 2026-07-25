@@ -6875,3 +6875,72 @@ randomization axis, and its opening beat was untriggerable by three of the four 
   `155 passed, 0 failed` · smoke `ALL 7 PAGES CLEAN + skin-unlock` (drill-count 77, PARS parity,
   de-hint clean) · guided gate `ALL 1 PASS (1 railed)` — sumif railed, contained, solvable.
   Screenshots (fresh · mid · win) taken; the win state passes the sendable-page test.
+## r435 — H6b-5: cagr depth pass — "Compound it, three times" (DEPTH_PASS §4.26 + §1.0/-R2/-R3)
+- **THE FINDING THAT DROVE THE REWORK.** The shipped drill was three abstract Begin/End/Years stubs
+  scattered on an otherwise empty sheet (par 55 / parKeys 57, three typed formulas and a bold). The
+  MECHANIC was fine — the `^` key, the same root three times, then a read — but there was nothing at
+  stake: no artifact, no labels a beat could reference (§1.3 / §1.7 R2 — "Deal A" is not a board
+  label), and three columns of numbers that exist only so a formula can be typed over them. That is
+  the r431 `undo` defect exactly: a mechanic with nothing at stake teaches nothing. Fixed by moving
+  the drill onto the segment revenue build `growth` was retired from (§1.0-R3(s)).
+- **THE BOARD, AND WHY IT IS THE RIGHT ONE.** Three segments × five fiscal years, their annual growth
+  rates printed below, and two computed columns at the right. The page also prints the SIMPLE AVERAGE
+  of each segment's four annual rates, live off the cells below it and glossed in a memo line — and
+  the figures are DESIGNED so the highest-average segment is never the highest-CAGR segment. That is
+  what gives the compound form a motive: the average of the annual rates is not the growth rate, it
+  always overstates (AM–GM), and it overstates most where the line swung hardest. Nothing of growth's
+  YoY-BUILD beat came across — versionup teaches that construct verbatim on the same five-year
+  operating build, so the rates here ship live and pre-formatted as page the player READS.
+- **HOW THE FIGURES ARE MADE (designed, not sampled).** A segment's four rates are the multipliers
+  g·x, g/x, g·y, g/y, whose product is g⁴ exactly — so the CAGR is the target on the nose while the
+  arithmetic mean overshoots it by g·((x−1)²/x + (y−1)²/y)/4. Inverting that gives x and y from a
+  target DRAG, so the winner is handed a small drag and one loser a drag big enough to take the top
+  of the Avg. rate column away from it. Everything is then re-derived from the ROUNDED revenues the
+  board prints and the orderings re-asserted against those, so what the checks grade is what the
+  player can see. **400-seed sweep:** trap holds 400/400, min CAGR gap 1.35pp, min avg gap 0.86pp,
+  every segment's four rates distinct at one decimal, rates inside [−25.6%, +46.0%], density ≥73%,
+  no #### on any seed, four site anchors and the winning row both uniform.
+- **☆ RE-CUT (§1.0(d) + §1.0-R2(i)).** The §4.26 page's bonus was "percent-format all three CAGR
+  cells in one pass" — a FORMATTING task, outlawed outright, and with a percent-format beat in the
+  core list it would have fallen out of doing the exercise. Replaced with the hidden efficiency the
+  board affords: seed BOTH computed formulas on the first segment row, grab the two-column block,
+  ONE fill drops all six. Read off the r424 S.fillOps latch, so Ctrl+D and Alt H F I D both earn it.
+- **NEGATIVE CONTROL (the skippability proof), 11 seeds each:** demo/star route 34 keys, 5/5 cores,
+  ☆ EARNED (flat). All six formulas typed cell by cell bottom-up with no fill anywhere — 91 keys,
+  5/5 cores, ☆ DARK (flat, registered as ALT 2). Chord-route alt (ribbon fill, ^0.25 root, three
+  explicit (1+r) factors, Alt H P + Alt H 0, Alt H 2, Alt H 1) — 57 keys, 5/5 cores, ☆ earned.
+  **Reported honestly:** the NEAR miss — filling the two columns one at a time — also clears 5/5
+  with the star dark at 35 keys, so the ☆'s MARGINAL price is one keystroke; its real price is paid
+  only by a player who never fills. That is the same shape margin's and percent's stars carry.
+- **THE MISCONCEPTION BEAT, PROBED NOT REASONED:** a route that builds everything correctly and then
+  bolds the highest-AVERAGE segment leaves "Bold the highest CAGR" dark and the run unwon on 11/11
+  seeds. The wrong answer is on the board, two columns left, and it grades.
+- **ROUTE ENUMERATION (§1.0-R3(p)), verified live:** percent clears from Ctrl+1 P (one decimal
+  outright), Alt H P and Ctrl+Shift+% (zero, stepped with Alt H 0) and a typed "8.3%"; italic from
+  Ctrl+I, Alt H 2 and four separate passes; bold from Ctrl+B and Alt H 1; fill from Ctrl+D and
+  Alt H F I D. Every value beat grades the END STATE, so six hand-typed figures clear identically.
+  **Engine fact corrected by probing:** the ribbon's italic is **Alt H 2**; Alt H 3 is UNDERLINE.
+  The first draft's guide line and chord-route alt both said 3 — the alt failed the gate with the
+  italic beat dark, which is precisely the untriggerable-beat class §1.0-R3(p) exists to catch.
+- **META:** drills.js desc named the retired board ("three scattered blocks") and spelled the answer
+  out as a formula; rewritten to the reworked board. Key immutable — PBs, boards, runs untouched.
+- **PAR:** re-swept from scratch, 5-seed sweep median 34 keys incl. the engine-appended Ctrl+S, flat
+  at 34 over an 11-seed re-measure (the site jitter moves the board, never the keystroke count).
+  parKeys 57→34, par 55→36 (≈1.06 s/key, the house band), mirrored in HOTKEY_PARS. Clocks derive
+  (§1.4): pass 54s · pro 41.4s · legendary 36s.
+- **GATE (all green, own port 8831):** static invariants clean (C9 cagr tri-length 6 + one ☆ +
+  saveClose; C11 aphorisms clean; C12 ≥2 alts across 22 reworked drills) · demo-replay ALL GREEN ·
+  alt-paths ALL 95 PASS · par-sweep FLAGGED 0 (drift 0%) · fit-sweep ALL CLEAN (73) ·
+  depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · guided gate ALL 80 PASS ·
+  grid-height invariants hold · border render clean. The stale cagr alt entry drove the retired
+  three-stub board and is replaced by the §1.8 pair.
+
+### Integration note (r435) — resolving dev/e2e-alt-paths.js conflicts
+Twice now a naive UNION of both sides has resurrected a stale entry the build agent had
+deliberately DELETED (percent+bridge in r434, cagr in r435). Each time alt-paths went red on
+the merged tree and green on every individual worktree — because each agent was green
+precisely by virtue of the deletion the union undid.
+
+The rule, for every future batch: **for the drill an agent reworked, ITS side of the file is
+authoritative — additions and deletions both. For every other drill, HEAD wins.** Never union
+the file wholesale. A stale entry drives a retired board shape and either throws or fails.

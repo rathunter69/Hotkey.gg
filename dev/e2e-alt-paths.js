@@ -1215,14 +1215,24 @@ const ALTS = [
       steps.push({sel:o.C[0]+o.usdR0+':'+o.C[0]+o.usdTot, keys:[{key:'Alt'},L('h'),L('b'),L('l')]});          // column and header row left outside it
       steps.push({sel:o.C[4]+o.usdR0+':'+o.C[4]+o.usdTot, keys:[{key:'Alt'},L('h'),L('b'),L('r')]});
       return steps; }` },
-  { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
-      const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
-      const steps=C._sites.slice().reverse().flatMap(s=>[
-        {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'),{key:'Enter'}]},
-        {sel:s.col+s.ans, keys:[{key:'%',ctrl:true,shift:true}]},
-      ]);
-      steps.push({sel:w.col+w.ans, keys:[{key:'Alt'},L('h'),D(1)]});
-      return steps; }` },
+  { key: 'cagr', name: 'chord-ROUTE: estimate column seeded BEFORE the CAGR it reads (recalcs behind it), root written ^0.25, forward compound as three (1+r) factors, ribbon block fill alt h f i d, percent alt h p + alt h 0, italic alt h 2, bold alt h 1 — the ☆ still fires', moves: `C => { const o=C._o; const CL=j=>colLetter(o.c0+1+j); const w=o.seg[o.win];
+      const f=o.cagrL+o.r1;
+      return [
+        {sel:o.fyTop,   keys:[...T('='+CL(4)+o.r1+'*(1+'+f+')*(1+'+f+')*(1+'+f+')'),{key:'Enter'}]},   // commits reading an EMPTY CAGR cell — the estimate reads flat until the root lands
+        {sel:o.cagrTop, keys:[...T('=('+CL(4)+o.r1+'/'+CL(0)+o.r1+')^0.25-1'),{key:'Enter'}]},
+        {sel:o.blk,     keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                                // the ribbon's fill down — same latch, same star
+        {sel:o.fyRngH,  keys:[{key:'Alt'},L('h'),D(2)]},
+        {sel:o.cagrRng, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},                      // percent at ZERO, stepped to one
+        {sel:w.cagrK,   keys:[{key:'Alt'},L('h'),D(1)]},
+      ]; }` },
+  { key: 'cagr', name: 'NEGATIVE CONTROL: both columns dressed while empty, winner bolded before its number exists, all six formulas typed bottom-up with no fill anywhere, percent via ctrl+shift+% then alt h 0 — all five cores clear, ☆ dark', moves: `C => { const o=C._o; const CL=j=>colLetter(o.c0+1+j); const w=o.seg[o.win]; const st=[];
+      st.push({sel:o.cagrRng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});          // dress before the work — end-state grading must hold
+      st.push({sel:o.fyRngH,  keys:[{key:'i',ctrl:true}]});
+      st.push({sel:w.cagrK,   keys:[{key:'b',ctrl:true}]});
+      for(let i=2;i>=0;i--){ const rr=o.r1+i;
+        st.push({sel:o.fyL+rr,   keys:[...T('='+CL(4)+rr+'*(1+'+o.cagrL+rr+')^3'),{key:'Enter'}]});
+        st.push({sel:o.cagrL+rr, keys:[...T('=('+CL(4)+rr+'/'+CL(0)+rr+')^(1/4)-1'),{key:'Enter'}]}); }
+      return st; }` },
   { key: 'wacc', name: 'debt side first — at-Kd before the beta chain', moves: `C => [
       {sel:'B13', keys:[...T('=B9*(1-B6)'),{key:'Enter'}]},
       {sel:'B10', keys:[...T('=B4/(1+(1-B6)*B5)'),{key:'Enter'}]},

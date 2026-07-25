@@ -8285,56 +8285,306 @@ const CHALLENGES = {
     }
   },
   cagr:{
-    name:'CAGR', label:'Compound it, three times', par:55, parKeys:57,
-    aha:'CAGR = (end ÷ start)^(1÷years) − 1 — the ^ key does the compounding.',
-    prompt:'Three CAGR checks in different spots on the page — they move every run. The formula is the same each time: (End ÷ Begin) ^ (1 ÷ Years) − 1, formatted as a percent. Then read the output: bold the deal with the highest CAGR. Computing the number is half the job; identifying the winner is the rest.',
-    req(){ return this._sites.map(s=>'<em>'+s.col+s.ans+'</em> \u00b7 =('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1 \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then ')+' \u00b7 then <em>ctrl+b</em> the HIGHEST of the three'; },
-    guide(){ const g=this._sites.map((s,i)=>['block one','block two','block three'][i]+' \u2014 at <b>'+s.col+s.ans+'</b> type <kbd>=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1</kbd> <kbd>\u21b5</kbd> \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>');
-      g.push('now READ them \u2014 the highest CAGR wins the page: back to that cell \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>'); return g; },
-    targets(){ const w=this._sites.reduce((a,s)=>s.exp>a.exp?s:a,this._sites[0]); return [...this._sites.map(s=>s.col+s.ans), w.col+w.ans]; },
-    demo(){ const steps=this._sites.flatMap(s=>[
-      {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'), Kb.enter]},
-      {sel:s.col+s.ans, keys:[Kb.pct]},
-    ]);
-      const w=this._sites.reduce((a,s)=>s.exp>a.exp?s:a,this._sites[0]);
-      steps.push({sel:w.col+w.ans, keys:[Kb.bold]});
-      return steps; },
+    /* r435 (DEPTH_PASS §4.26 + the §1.0 / §1.0-R2 / §1.0-R3 law on top; §1.0-R3 wins on
+       conflict): the depth-pass rework of "Compound it, three times" — and the drill that
+       ABSORBS the board `growth` was retired from (§1.0-R3(s): growth's YoY construct is
+       taught verbatim by versionup on the same five-year operating build, margin owns the
+       growth-ratio column, and no legal ☆ existed on its board).
+
+       WHAT WAS WRONG WITH THE OLD PAGE, and why absorbing the revenue build fixes it. The
+       shipped drill was three abstract Begin / End / Years stubs scattered on an empty sheet.
+       The MECHANIC was sound — the ^ key, the same formula three times, then a read — but
+       there was nothing at stake: no page, no story, and three columns of numbers that exist
+       only so a formula can be typed over them. That is the exact defect that folded `undo`
+       into `editfix` in r431 (a mechanic with nothing at stake teaches nothing). On growth's
+       revenue build there IS something at stake, because the board can now carry the
+       misconception this formula exists to kill: the page shows four DIFFERENT annual growth
+       rates per segment and their SIMPLE AVERAGE, and the average is not the CAGR. By AM–GM
+       it never can be — the average always overstates, and it overstates most where the line
+       swung hardest. The board is built so the segment with the HIGHEST average rate is NEVER
+       the segment with the highest CAGR, so the final read beat ("Bold the highest CAGR") has
+       a wrong answer sitting two columns to its left, in bigger type. That is what makes the
+       compound form worth typing.
+
+       STRUCTURAL DEVIATIONS from the §4.26 page, named here per §0 (a build agent makes the
+       call and records it rather than improvising silently):
+
+       (1) THE BOARD. The page says "Now: three scattered CAGR blocks that move every run …
+           Random: as-is (blocks move)". Replaced with one segment revenue build — three
+           segments across five fiscal years, their annual growth rates below, and the two
+           computed columns at the right. Reasons, in order of force:
+             · §1.3 LABELED TARGETS + §2.1b banker's-workbook finish. Three free-floating
+               Begin/End/Years stubs are a drill contrivance; "Deal A" is not a board label a
+               beat can reference (§1.7 R2/R4). A segment build labels every graded target on
+               the page and is the artifact an associate actually opens.
+             · THE MISCONCEPTION. Nothing about the old board could show that the average of
+               the annual rates is not the CAGR — it never displayed an annual rate. That
+               lesson is the whole reason the compound form exists, and it needs a multi-year
+               line to be visible at all.
+             · The page's own randomization survives IN KIND, not in form: "the blocks move"
+               becomes a corner-jitter site + which segment carries which growth SHAPE (§1.2(d)),
+               so the winner is a different row and a different name every run.
+           What did NOT come across from growth: its YoY-build beat. versionup already teaches
+           that construct verbatim ("=C4/B4-1, select C5:F5, ctrl+r") on the same five-year
+           operating build, so the growth rates here ship LIVE and pre-formatted — they are
+           the page the player READS, not work the player repeats.
+       (2) ☆ RE-CUT (binding). The page's bonus is "Percent-format all three CAGR cells to one
+           decimal in one pass". §1.0(d) outlaws formatting bonuses outright, and §1.0-R2(i)
+           outlaws it twice over — with a percent-format beat already in the core list, the
+           "one pass" version falls out of doing the exercise. Replaced with the hidden
+           efficiency this board affords: seed BOTH computed formulas on the first segment row,
+           grab the two-column block, and ONE fill drops six formulas at once. Read off the
+           r424 S.fillOps latch (mechanic used, never geometry inferred), so Ctrl+D and the
+           ribbon's Alt H F I D both earn it. MEASURED negative control (dev/e2e-alt-paths.js
+           ALT 2): six formulas hand-typed cell by cell, no fill anywhere — 5/5 cores clear,
+           ☆ dark, 91 keys against the demo's 34 (11 seeds, flat). The nearer miss is measured
+           too: filling the two columns one at a time also clears 5/5 with the star dark, at 35
+           keys — so the star's MARGINAL price is one keystroke and its real price is paid by the
+           player who never fills at all. That is the same shape margin's and percent's stars
+           carry, and it is reported rather than dressed up.
+       (3) The page's final beat is kept in place and in force ("final beat stays 'Bold the deal
+           with the highest CAGR — read your own output'"), with two edits: "deal" becomes
+           "segment" because that is what the board labels, and the tail is cut — "read your
+           own output" is a lesson about method, and §1.0-R3(n) allows a tail that says WHAT or
+           WHERE, never WHY. It is also the §1.6 finish-state beat, exactly as the page says.
+       (4) FOUR CORE BEATS BECOME FIVE. The page lists one beat and a bonus; §1.1 wants 4–6
+           cores. The two added are not padding: the FY+3 column is the compound form pointed
+           FORWARDS (the drill's own name — take the rate and compound it three times), and it
+           is deliberately a number that appears NOWHERE on the board, so it cannot be cleared
+           by copying a figure the way an "implied last year" check could. Its dress beat is
+           italics, which is #4 on Wolf's §1.0-R3(o) frequency ranking and the house convention
+           for a projected column.
+       (5) NO cueCell() (§1.0-R2(h) / §1.0-R3(q)) and NO helper/assumption cells (§1.0(f) /
+           §1.0-R2(l)). Every graded target is a labeled column or one labeled cell that the
+           green outline expresses exactly — there is no insert point and no empty paste
+           destination for a red cue to point at. Nothing on this page is converted or scaled,
+           so a yellow input block would be furniture with no input in it: the only hardcodes
+           are the reported actuals, which wear the blue-ink convention instead. No graded
+           target spills either — the two memo lines are the only spillers and they are
+           ungraded, with empty neighbours to spill into (r107).
+       (6) §1.0-R2(g) ADAPTIVE LABELS: the fiscal years, the segment names and which segment
+           wins all move per seed, so every beat names THIS seed's column and THIS seed's
+           winner is computed at grade time rather than baked into the copy.
+
+       ENGINE (probed live on this board, not reasoned about — §1.0-R3(p): enumerate the
+       routes BEFORE writing the predicate):
+         · PERCENT disagrees about decimals across its routes. Ctrl+1 → P lands percent at ONE
+           decimal in a single move; Alt H P and Ctrl+Shift+% both land it at ZERO and need
+           Alt H 0 to step up; typing "8.3%" into the cell lands one decimal from the r95 entry
+           parser. All four clear beat 2, which reads the END STATE (percent, one decimal).
+         · ITALIC has two routes, Ctrl+I and **Alt H 2**, both through toggleAllOrNone('it');
+           beat 4 reads the `it` flag on the header and the three figures, so either clears, and
+           so does four separate passes. The ribbon key is worth writing down: the Home flyout's
+           Font group is ['1','2','3', …] = Bold / Italic / Underline (RIBBON_GROUPS), so
+           **Alt H 3 is UNDERLINE, not italic**. This build's first draft taught H 3 in the guide
+           and drove it in the chord-route alt; the alt failed the gate with the italic beat dark
+           and nothing visibly wrong on the board — the untriggerable-beat class §1.0-R3(p) is
+           about, caught only because the route was probed instead of reasoned.
+         · BOLD is Ctrl+B or Alt H 1, same toggle.
+         · FILL is Ctrl+D or Alt H F I D; both write the same cells and both stamp S.fillOps.
+         · The `^` operator and AVERAGE() are both live in evalFormula (pow_ / the aggregate
+           switch), so the seeded Avg. rate column and the player's compound formulas evaluate
+           the same way.
+         · loadChallenge does NOT recalculate, so every seeded live cell (the growth rates, the
+           Avg. rate column) ships with its value written alongside its formula. */
+    name:'CAGR', label:'Compound it, three times', par:36, parKeys:34, saveClose:true,   /* r435: par re-swept from scratch on the reworked board (the old board was par 55 / parKeys 57 for three typed stubs) — dev/e2e-par-sweep.js cagr, 5-seed median 34 keys incl. the engine-appended Ctrl+S, and flat at 34 over an 11-seed re-measure: the site jitter moves the board but never the keystroke count, and both formulas are fixed length because the period count is always four. par 36 ≈ 1.06 s/key, the house band. Measured against it: the same board with all six formulas hand-typed and no fill anywhere runs 91 keys (dev/e2e-alt-paths.js ALT 2, the ☆'s negative control), which is the cost the clock is there to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 54 · pro 41.4 · legendary 36. */
+    aha:'the average of the annual rates is not the growth rate — only the compounded rate lands back on the last year.',
+    /* §1.5: the aha's MOMENT is the last beat. The Avg. rate column and the CAGR column sit
+       side by side and rank the segments DIFFERENTLY, so the player either reads the right
+       column or watches the beat stay dark. */
+    prompt:'The segment pack is in and the IC wants one number per segment: the rate that actually compounded over the five years. The annual rates are printed below the build — they swing, and the simple average of them is already on the page. Compound each segment’s own growth rate, carry it three more years to the estimate column, and call the segment that grew fastest. The pack has been quoting those averages; the compound rates are the ask. The page anchors somewhere new every run.',
+    req(){ const o=this._o; const CL=j=>colLetter(o.c0+1+j); return '<em>'+o.cagrTop+'</em> =('+CL(4)+o.r1+'/'+CL(0)+o.r1+')^(1/4)-1 · <em>'+o.fyTop+'</em> =' + CL(4)+o.r1+'*(1+'+o.cagrL+o.r1+')^3 · select <em>'+o.blk+'</em> <em>ctrl+d</em> · <em>'+o.cagrRng+'</em> <em>ctrl+1 p</em> · <em>'+o.fyRngH+'</em> <em>ctrl+i</em> · <em>ctrl+b</em> the highest · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every format line names ALL its routes, since they all grade (§1.0-R3(p)). */
+    guide(){ const o=this._o; const CL=j=>colLetter(o.c0+1+j); return [
+      'the <b>CAGR</b> column starts at '+o.cagrTop+' · <kbd>=</kbd><kbd>(</kbd> then the <b>'+o.yN+'</b> revenue <kbd>/</kbd> the <b>'+o.y1+'</b> revenue <kbd>)</kbd> <kbd>^</kbd><kbd>(</kbd><kbd>1</kbd><kbd>/</kbd><kbd>4</kbd><kbd>)</kbd><kbd>-</kbd><kbd>1</kbd> <kbd>↵</kbd> — four growth periods across five years, so the root is a quarter',
+      'select '+o.cagrRng+' · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>p</kbd> lands percent at one decimal in a single move (<kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> and <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> land it at zero — <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> steps it to one)',
+      'the <b>'+o.yE+'</b> column starts at '+o.fyTop+' · <kbd>=</kbd> the <b>'+o.yN+'</b> revenue <kbd>*</kbd><kbd>(</kbd><kbd>1</kbd><kbd>+</kbd> the CAGR cell beside it <kbd>)</kbd><kbd>^</kbd><kbd>3</kbd> <kbd>↵</kbd> — the same rate, compounded three years the other way',
+      'select the '+o.yE+' column with its header ('+o.fyRngH+') · <kbd>ctrl</kbd>+<kbd>i</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>2</kbd> is the ribbon’s same toggle — <kbd>3</kbd> beside it is underline)',
+      'read the <b>CAGR</b> column you just built, not the <b>Avg. rate</b> column beside it — they do not rank the segments the same way · land on the winner and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle)',
+      '☆ the discovery: put BOTH formulas on the first segment’s row first, then select the whole two-column block '+o.blk+' and one <kbd>ctrl</kbd>+<kbd>d</kbd> drops all six at once (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the ribbon’s same fill). Typing all six out clears every beat too, it just costs about sixty extra keys',
+    ]; },
+    /* rings: ①② the CAGR column · ③ the estimate column · ④ that column plus its header ·
+       ⑤ the winning segment's CAGR cell · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.cagrRng, o.cagrRng, o.fyRng, o.fyRngH, o.seg[o.win].cagrK, null]; },
+    demo(){ const o=this._o; const CL=j=>colLetter(o.c0+1+j); return [
+      {sel:o.cagrTop, keys:[...T('=('+CL(4)+o.r1+'/'+CL(0)+o.r1+')^(1/4)-1'), Kb.enter]},
+      {sel:o.fyTop,   keys:[...T('='+CL(4)+o.r1+'*(1+'+o.cagrL+o.r1+')^3'), Kb.enter]},
+      /* §2.2: the demo performs the bonus — both seeds land first and ONE fill carries the
+         whole block, which is exactly the ☆ move; its state latches at the win. */
+      {sel:o.blk,     keys:[Kb.fillD]},
+      {sel:o.cagrRng, keys:[{key:'1',ctrl:true}, L('P')]},   /* §1.0(a): each dress rides directly behind the column it dresses */
+      {sel:o.fyRngH,  keys:[{key:'i',ctrl:true}]},
+      {sel:o.seg[o.win].cagrK, keys:[Kb.bold]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 growth screen (three deals)',txt:true,bold:true};
-      const pool=[{c:2,r:3},{c:7,r:3},{c:4,r:9},{c:9,r:8},{c:5,r:4}];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const picked=pool.slice(0,3).sort((a,b)=>(a.r-b.r)||(a.c-b.c));
-      this._sites=[];
-      picked.forEach((p,t)=>{
-        const col=colLetter(p.c), lab=colLetter(p.c-1);
-        cells[col+(p.r-1)]={...blankCell(),value:'Deal '+'ABC'[t],txt:true,bold:true};
-        const yrs=rnd(3,7), beg=rnd(50,300)*10, g=(100+rnd(4,20))/100;
-        const end=Math.round(beg*Math.pow(g,yrs));
-        cells[col+p.r]={...blankCell(),value:beg,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[col+(p.r+1)]={...blankCell(),value:end,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[col+(p.r+2)]={...blankCell(),value:yrs,fontColor:'blue',decimals:0};
-        cells[col+(p.r+3)]={...blankCell()};
-        cells[lab+p.r]={...blankCell(),value:'Begin',txt:true};
-        cells[lab+(p.r+1)]={...blankCell(),value:'End',txt:true};
-        cells[lab+(p.r+2)]={...blankCell(),value:'Years',txt:true};
-        cells[lab+(p.r+3)]={...blankCell(),value:'CAGR',txt:true,bold:true};
-        this._sites.push({col:col, r0:p.r, ans:p.r+3, exp:Math.pow(end/beg,1/yrs)-1});
+      /* §1.2 randomization — four independent axes: (a) SITE, the page anchors at column A or B
+         with its header row one or two rows under the title (corner jitter, the sanctioned
+         substitute for a site pool on a board that fills nine of ten columns, §1.2); (b) the
+         segment-name pool is Fisher-Yates shuffled and sampled; (c) every figure through rnd()
+         — base revenue, the target compound rate and the swing of every annual rate; and
+         (d) WHICH SEGMENT CARRIES WHICH GROWTH SHAPE, which is the §4.26 page's "the blocks
+         move" read onto one board: the winner and the average-trap segment land on different
+         rows under different names every seed, so the answer can never be replayed from
+         position. The fiscal years shift too, which is what makes the §1.0-R2(g) labels worth
+         reading. */
+      const NAMES=['Aviation','Marine','Logistics','Terminals','Chemicals','Packaging','Wholesale','Specialty','Industrial','Aftermarket'];
+      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      const c0=rnd(1,2), hr=rnd(2,3), y0=rnd(24,26);
+      const L0=colLetter(c0), CL=j=>colLetter(c0+1+j), yr=j=>'FY'+(y0+j);
+      const avgC=c0+6, cagrC=c0+7, fyC=c0+8;
+      const avgL=colLetter(avgC), cagrL=colLetter(cagrC), fyL=colLetter(fyC);
+      const r1=hr+1, gHdr=hr+5, g1=hr+6;
+      /* ---- THE FIGURES, and the one thing this board must guarantee ----
+         A segment's four annual rates are built as the multipliers g·x, g/x, g·y, g/y, whose
+         product is g^4 EXACTLY — so the compound rate is the c we asked for, on the nose,
+         while their arithmetic mean overshoots it by g·((x−1)²/x + (y−1)²/y)/4, which is the
+         drag we asked for. Inverting that gives x and y from a target drag, so the board is
+         DESIGNED rather than sampled: the highest-CAGR segment is handed a small drag and one
+         loser is handed a drag big enough to take the top of the Avg. rate column away from it.
+         Every figure is then re-derived from the ROUNDED revenues the board actually prints,
+         and the orderings are re-asserted against those, so what the checks grade is what the
+         player can see. */
+      const draw=(rMax,rMin)=>{
+        const cLo=rnd(30,55)/1000, cMid=cLo+rnd(14,26)/1000, cHi=cMid+rnd(14,26)/1000;
+        const dHi=rnd(2,7)/1000;                                   // the winner's own drag — small, never zero (four rates must still differ)
+        const dTrap=(cHi-cMid)+dHi+rnd(9,20)/1000;                 // enough to lift the middle segment's AVERAGE above the winner's
+        const dLo=rnd(2, Math.max(3, Math.floor(((cHi-cLo)+dHi-0.009)*1000)))/1000;
+        const out=[];
+        for(const sp of [{c:cHi,d:dHi},{c:cMid,d:dTrap},{c:cLo,d:dLo}]){
+          const g=1+sp.c, k=4*sp.d/g, t=rnd(58,82)/100;            // t splits the drag unevenly between x and y, so no two rates repeat
+          const sol=u=>{ const b=2+u; return (b+Math.sqrt(b*b-4))/2; };
+          const x=sol(k*t), y=sol(k*(1-t));
+          const rt=[g*x-1, g/x-1, g*y-1, g/y-1];
+          if(rt.some(v=>v>rMax||v<rMin)) return null;              // a swing no reported segment would print
+          for(let i=3;i>0;i--){ const j=rnd(0,i); [rt[i],rt[j]]=[rt[j],rt[i]]; }
+          const rev=[rnd(80,170)*10];
+          for(let j=0;j<4;j++) rev.push(Math.round(rev[j]*(1+rt[j])));
+          if(rev.some(v=>v<150||v>60000)) return null;
+          const act=[0,1,2,3].map(j=>rev[j+1]/rev[j]-1);
+          if(new Set(act.map(v=>Math.round(v*1000))).size!==4) return null;   // four DIFFERENT rates on screen at one decimal
+          out.push({rev:rev, act:act, avg:act.reduce((a,b)=>a+b,0)/4, cagr:Math.pow(rev[4]/rev[0],1/4)-1});
+        }
+        const cg=out.map(s=>s.cagr), av=out.map(s=>s.avg);
+        const gap=z=>{ const q=z.slice().sort((a,b)=>a-b); return Math.min(q[1]-q[0],q[2]-q[1]); };
+        if(gap(cg)<0.012 || gap(av)<0.008) return null;            // both columns readable at one decimal, no ambiguous winner
+        if(cg.indexOf(Math.max(...cg))===av.indexOf(Math.max(...av))) return null;   // THE POINT: the two columns must disagree
+        for(let i=2;i>0;i--){ const j=rnd(0,i); [out[i],out[j]]=[out[j],out[i]]; }   // axis (d): which row carries which shape
+        return out;
+      };
+      /* three passes with a widening swing cap. The first clears roughly half of all draws
+         (a 400-seed sweep never left it), so exhausting 200 of them is already vanishing; the
+         second widens the cap and the third drops it entirely, so build() can never spin and
+         never returns null. */
+      let segs=null;
+      for(let a=0;a<200 && !segs;a++) segs=draw(0.46,-0.27);
+      for(let a=0;a<200 && !segs;a++) segs=draw(0.80,-0.45);
+      for(let a=0;a<200 && !segs;a++) segs=draw(Infinity,-Infinity);
+      const names=pick(NAMES,3);
+      cells[L0+'1']={...blankCell(),value:codename()+' — segment revenue build ($mm)',txt:true,bold:true};
+      /* §1.3 labeled targets: every graded cell sits on a named segment row under a named
+         column header, and both computed column headers ship BOLD like the rest of the header
+         row — the columns were added to the pack, the figures under them were not. */
+      cells[L0+hr]={...blankCell(),value:'Segment',txt:true,bold:true};
+      for(let j=0;j<5;j++) cells[CL(j)+hr]={...blankCell(),value:yr(j),txt:true,bold:true,align:'r'};
+      cells[avgL+hr]={...blankCell(),value:'Avg. rate',txt:true,bold:true,align:'r'};
+      cells[cagrL+hr]={...blankCell(),value:'CAGR',txt:true,bold:true,align:'r'};
+      cells[fyL+hr]={...blankCell(),value:yr(7)+'E',txt:true,bold:true,align:'r'};
+      cells[L0+gHdr]={...blankCell(),value:'Annual growth',txt:true,bold:true};
+      for(let j=1;j<5;j++) cells[CL(j)+gHdr]={...blankCell(),value:yr(j),txt:true,bold:true,align:'r'};
+      segs.forEach((s,i)=>{
+        const rr=r1+i, gr=g1+i;
+        cells[L0+rr]={...blankCell(),value:names[i],txt:true};
+        for(let j=0;j<5;j++) cells[CL(j)+rr]={...blankCell(),value:s.rev[j],fmtStyle:'comma',decimals:0,fontColor:'blue'};   // blue = reported figures, the house convention
+        /* the trap, and the reason it is fair: the average is LIVE off the four rates printed
+           below it and the memo line says in words what it is. Nothing is hidden — the player
+           is asked for the CAGR by name, and only a player who reads the wrong column gets the
+           winner wrong. */
+        cells[avgL+rr]={...blankCell(),formula:'=AVERAGE('+CL(1)+gr+':'+CL(4)+gr+')',value:s.avg,fmtStyle:'percent',decimals:1};
+        /* decimals 2 with NO number style: an unformatted quotient would render its full
+           general string (0.0831194...) and show ##### in the column before the player could
+           format it. The number style itself is still the player's work. */
+        cells[cagrL+rr]={...blankCell(),decimals:2};
+        /* the estimate column ships EMPTY but comma-formatted — the number style is not this
+           drill's work, and the ITALIC that marks it as an estimate is (beat 4). */
+        cells[fyL+rr]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[L0+gr]={...blankCell(),value:names[i],txt:true};
+        for(let j=1;j<5;j++) cells[CL(j)+gr]={...blankCell(),formula:'='+CL(j)+rr+'/'+CL(j-1)+rr+'-1',value:s.act[j-1],fmtStyle:'percent',decimals:1};
       });
-      const s0=this._sites[0];
-      return {ROWS:13, cells, active:{r:s0.ans, c:s0.col.charCodeAt(0)-64}, sel:null, colW:{1:58}};
+      /* §1.3 density + a real desk artifact: the page glosses its own memo column and names its
+         source. Story, never graded — both lines sit below every checked rect and spill only
+         into empty neighbours (r107). */
+      cells[L0+(gHdr+5)]={...blankCell(),value:'Memo: Avg. rate is the simple average of the four annual growth rates',txt:true,it:true,fontColor:'gray'};
+      cells[L0+(gHdr+6)]={...blankCell(),value:'Source: segment reporting pack — '+yr(0)+'–'+yr(4)+' reported',txt:true,it:true,fontColor:'gray'};
+      const cg=segs.map(s=>s.cagr);
+      this._o={ c0:c0, hr:hr, y0:y0, r1:r1, gHdr:gHdr, g1:g1, L0:L0,
+        avgL:avgL, cagrL:cagrL, fyL:fyL, avgC:avgC, cagrC:cagrC, fyC:fyC,
+        y1:yr(0), yN:yr(4), yE:yr(7)+'E',
+        win: cg.indexOf(Math.max.apply(null,cg)),
+        seg: segs.map((s,i)=>({ name:names[i], row:r1+i, gRow:g1+i, cagr:s.cagr, avg:s.avg,
+          fy: s.rev[4]*Math.pow(1+s.cagr,3),
+          cagrK: cagrL+(r1+i), fyK: fyL+(r1+i) })),
+        cagrTop: cagrL+r1, fyTop: fyL+r1,
+        cagrRng: cagrL+r1+':'+cagrL+(r1+2),
+        fyRng:   fyL+r1+':'+fyL+(r1+2),
+        fyRngH:  fyL+hr+':'+fyL+(r1+2),
+        blk:     cagrL+r1+':'+fyL+(r1+2) };
+      /* widths sized for the WIDEST thing each column ever holds (an explicitly sized column
+         does not auto-grow, r432): 'Annual growth' in the label column, a bracketed five-figure
+         comma value and a '-24.3%' rate in the year columns, 'Avg. rate' over its own header,
+         and the estimate column's four-figure comma. No graded cell's text spills (§1.0-R3(q)). */
+      const colW={}; colW[c0]=132; for(let j=0;j<5;j++) colW[c0+1+j]=76;
+      colW[avgC]=96; colW[cagrC]=84; colW[fyC]=84;
+      return {ROWS:gHdr+7, cells, active:{r:r1,c:cagrC}, sel:null, colW:colW};
     },
     checks(S){
-      const out=this._sites.map((s,i)=>({
-        label:'compound the Deal '+'ABC'[i]+' CAGR at '+s.col+s.ans+' \u2014 live, percent',
-        ok:(()=>{ const c=S.cells[s.col+s.ans];
-          return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-s.exp)<1e-4&&c.fmtStyle==='percent'); })()
-      }));
-      const w=this._sites.reduce((a,s)=>s.exp>a.exp?s:a,this._sites[0]);
-      const wi='ABC'[this._sites.indexOf(w)];
-      out.push({label:'call the winner \u2014 bold Deal '+wi+' (highest CAGR), and only it',
-        ok: this._sites.every(s=>{ const c=S.cells[s.col+s.ans]||{}; return s===w? !!c.bold : !c.bold; })});
-      return out;
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      const num=k=>{ const v=cel(k).value; return typeof v==='number'?v:NaN; };
+      /* §1.0(c) FREEDOM + §1.0-R3(p) END-STATE GRADING: nothing here reads a formula. A player
+         who works the roots out on a calculator and types six numbers clears exactly like one
+         who seeds and fills, and the clock prices the difference (91 keys vs 34 — measured).
+         Tolerances are half a display step, so the number the player can SEE is always inside
+         them: the CAGR column prints at one decimal of a percent (5e-4 in raw units) and the
+         estimate column prints whole. The estimate's tolerance also absorbs deriving it from a
+         CAGR the player rounded to what the screen showed, which moves it by ~0.15%. */
+      const cagrOk=s=>{ const v=num(s.cagrK); return isFinite(v) && Math.abs(v-s.cagr)<=5e-4; };
+      const fyOk=s=>{ const v=num(s.fyK); return isFinite(v) && Math.abs(v-s.fy)<=Math.max(3, s.fy*0.002); };
+      const allCagr=o.seg.every(cagrOk), allFy=o.seg.every(fyOk);
+      /* §1.0-R3(p) on the format: three chords put percent on this column and they disagree
+         about decimals — Ctrl+1 P lands one outright, Alt H P and Ctrl+Shift+% land zero and
+         need Alt H 0 to step up, and a typed "8.3%" lands one from the entry parser. The beat
+         reads the END STATE (percent, one decimal), so every one of them clears. */
+      const pctOk=o.seg.every(s=>{ const c=cel(s.cagrK); return c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      /* the estimate column reads italic when its HEADER and all three figures do — Ctrl+I over
+         the four-cell grab, Alt H 3, or four separate passes all land the same end state. */
+      const italOk=!!cel(o.fyL+o.hr).it && o.seg.every(s=>!!cel(s.fyK).it);
+      /* the read beat: the winner's CAGR cell bold and the other two not. Its wrong answer is
+         the top of the Avg. rate column, which by construction is a different segment. */
+      const boldOk=o.seg.every((s,i)=> i===o.win ? !!cel(s.cagrK).bold : !cel(s.cagrK).bold);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — ONE fill whose
+         rectangle starts on the first segment's row and covers BOTH computed columns and all
+         three segments: seed two formulas, grab the block, one chord. Read off the r424
+         S.fillOps latch (mechanic used, never geometry inferred), so Ctrl+D and Alt H F I D
+         both earn it. Filling the two columns separately — the obvious route — clears all five
+         cores and forfeits the star, and so does typing every formula out (both are registered
+         alts), which is what keeps it a choice instead of a by-product (§2.2: it can never
+         block the win). The values must be right too: a fill over two empty seeds is not it. */
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='down' && f.r1===o.r1 && f.r2>=o.r1+2 &&
+        f.c1<=o.cagrC && f.c2>=o.fyC);
+      /* DEPTH_PASS §4.26's beat kept last and in force, with the two build/dress pairs the page
+         left to the build agent in front of it (deviation 4). Labels are INSTRUCTIONS
+         (§1.0-R3(n)): the clause after the dash says WHAT, never why, and they name THIS seed's
+         columns (§1.0-R2(g)). */
+      return [
+        {label:'Build the CAGR column — the compound rate over the five years', ok: allCagr},
+        {label:'Percent-format the CAGR column — one decimal', ok: pctOk},
+        {label:'Build the '+o.yE+' column — three more years at each segment’s own CAGR', ok: allFy},
+        {label:'Italicize the '+o.yE+' column — header and figures', ok: italOk},
+        {label:'Bold the highest CAGR — that cell only', ok: boldOk},
+        {label:'Fill both computed columns in one pass', ok: allCagr && allFy && onePass, bonus:true},
+      ];
     }
   },
   balance:{
