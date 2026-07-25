@@ -13122,6 +13122,10 @@ function syncMarks(){
 }
 function runGotoSpecial(crit){
   S.markCrit=crit; S.markN=(S.markN||0)+1;
+  /* r425 (DEPTH_PASS §4.19 ☆): log WHICH crit each Go To Special ran with — housestyle's
+     mystery ☆ latches the 'const' ritual off real op history (grading/telemetry only, the
+     pasteOpLog/cutMoves family; nothing engine-side reads it back). */
+  (S.gotoSpecials=S.gotoSpecials||[]).push(crit);
   syncMarks();
   const n=(S.marks||[]).length;
   showToast(n ? n+' cells marked \u2014 \u21b5 walks them \u00b7 esc clears' : 'nothing matched');
