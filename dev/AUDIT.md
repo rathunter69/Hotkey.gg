@@ -6693,3 +6693,68 @@ off from both._
 - **PAR:** sweep median 19 keys ×5 seeds (save included, flat across seeds — only the fill rect
   moves with depth); parKeys 14→19, par 17→21s (~1.10 s/key, the top of the house band: this drill
   charges for a READ before a hand moves). Clocks derive: pass 0:32 · pro 0:24 · legendary 0:21.
+## r434 — H6b-5: bridge depth-pass rework — "Point-mode formulas" (DEPTH_PASS §4.27 + §1.0/-R2/-R3, D10)
+_The catalog's thinnest drill: par 10 / 6 keys, TWO checks (one pointed multiplication, one fill),
+on a board whose "Memo: growth" row nothing ever read. Retire-or-rework was the first question
+(§1.0-R3(s)); it reworks, because no other drill carries its lesson._
+- **NOT RETIRED, and why.** `filldr` teaches the fill (every cost line rides the SAME revenue row,
+  so nothing depends on the cell the fill just wrote), `margin` teaches the ratio family off static
+  input columns, `foot` teaches AutoSum. None of them contains a RECURSIVE line. Here FY26 revenue
+  reads the FY25 revenue the fill itself produced one column earlier — the shape every operating
+  model, roll-forward and debt schedule is built from, and the first place in the catalog a player
+  meets it. And point mode has no other home: margin can be SOLVED by pointing but grades the end
+  state, so nothing there ever rewards it.
+- **BOARD.** A five-year operating build: a three-row yellow assumption block (D&A % of revenue ·
+  Revenue growth · EBITDA margin — §1.0(f)/§1.0-R2(l), stacked, individually named, populated,
+  all-bordered), the two lines the player builds (Revenue — year one only, typed and BLACK;
+  EBITDA — empty), and D&A + EBIT below, shipped LIVE and pre-dressed. Driver ORDER is
+  load-bearing: growth sits one row above margin so the revenue climb (↑↑ to its growth) and the
+  EBITDA climb (↑↑ to its margin) are the same two hops from their own anchors.
+- **BEATS (6 core + ☆ + the engine-appended Ctrl+S closer; tri-length 7, C9-registered).** Color the
+  FY24 revenue blue → Build the FY25 revenue (prior year × one plus growth) → Fill the revenue line
+  across to FY28 → Build the FY24 EBITDA (revenue × margin) → Fill the EBITDA line across all five
+  years → Bold the EBITDA line and add a top border above it. Labels name THIS seed's fiscal years
+  (§1.0-R2(g)); the clause after the dash says WHAT, never why (§1.0-R3(n)).
+- **DEVIATIONS from the §4.27 page, all deliberate and commented at the drill.** (1) BEAT ORDER —
+  revenue verse first: on the page's order the player fills EBITDA across an empty revenue line and
+  the beat grades FALSE with the work correctly done, which is §1.0-R3(p)'s untriggerable-beat
+  defect with a delay. (2) ☆ RE-CUT — the page's "Total the five EBITDA years" is extra WORK, not a
+  hidden efficiency move (§1.0(d)) and not a skippable decision (§1.0-R2(i)). (3) ONE NEW CORE BEAT
+  (blue the hardcode) — the page measures ~24 keys and the chapter bar after the closer is 30–40s;
+  font colour is what §1.0-R3(o) ranks, and marking the input before building on it is the desk's
+  own order, not §1.0(a) dress-at-the-end. (3b) D&A + EBIT rows added, ungraded: §1.3 wants ≥60% of
+  the 14-row board carrying purpose and the page's four rows sat at half that. They are the
+  CONSEQUENCE — 0 on arrival, lighting up column by column behind the fills, which is where §1.5's
+  aha lands. (4) No cueCell(): every target is a labeled row × labeled year the green outline
+  expresses exactly. (5) Adaptive labels per §1.0-R2(g).
+- **☆ RECIPE (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): POINT MODE.** The
+  one thing the finished sheet cannot show — a pointed `=B6*(1+C4)` and a typed one are identical
+  bytes once committed. NEW ENGINE LATCH `S.pointLog` (r434): `editPointed` rides one edit (false at
+  startEdit, true the moment startPointerFromArrow/movePointer grabs a reference) and both commit
+  paths stamp the cell they wrote. Same family as fillOps (r424) / grabLog (r427) / fmtOps (r429) /
+  multiEnter (r433): mechanic recorded, never inferred. Additive only — no behaviour change, and no
+  core check anywhere may require it (§1.0(c)).
+- **NEGATIVE CONTROL (the §1.0-R2(i) skippability proof), 4 seeds × 2 slow routes:** every reference
+  TYPED OUT → win, cores 6/6, pointLog 0, ☆ dark; and the slowest legal route — no formulas at all,
+  every revenue and EBITDA year hand-typed off the board — → win, cores 6/6, pointLog 0, ☆ dark. The
+  pointed route: win, 6/6, pointLog 2, ☆ EARNED. Both slow routes are registered as alt paths.
+- **ROUTE ENUMERATION (§1.0-R3(p)), verified not reasoned:** blue clears from Alt H F C → Blue AND
+  Alt H J → Input (both set fontColor 'blue'); the top border clears from Alt H B P (bt), Alt H B A
+  (ball) and Alt H B S / B T on the one-row line (perimeter top edge = bt on every cell), with or
+  without the row label in the selection; both fills clear from ctrl+r and Alt H F I R; and every
+  value beat grades the END STATE, so typed figures clear identically. EBITDA grades against what
+  the PAGE holds (this column's revenue × this column's margin), so one upstream mistake darkens one
+  beat instead of two.
+- **META (D10):** drills.js name 'Bridge'→'Point Mode', label 'Build the profit bridge'→'Point-mode
+  formulas', tab 'Bridge'→'Point', desc rewritten — the old meta named neither the lesson nor the
+  board. Key immutable: PBs, boards and runs history untouched.
+- **PAR:** re-swept post-rework, 5-seed median 31 keys incl. the appended Ctrl+S (flat across seeds —
+  the site pool moves the board, never the keystroke count). parKeys 31, par 10→33 (≈1.06 s/key, the
+  house band), mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 49.5s · pro 37.9s · legendary 33s.
+- **GATE (all green, own port 8823):** static invariants clean (C9 bridge tri-length 7 + one ☆ +
+  saveClose; C11 aphorisms clean; C12 ≥2 alts) · demo-replay bridge WIN 3/3 then ALL GREEN ·
+  alt-paths ALL 92 PASS · par-sweep FLAGGED 0 (drift 0%) · fit-sweep ALL CLEAN (73) ·
+  depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · guided gate bridge
+  railed/contained/solvable · formula pack 102/102 and parity matrix 177/177 re-run for the engine
+  latch. The stale two-check bridge alt entry ("typed refs … geometry-derived") died with the board
+  it drove and is replaced by the §1.8 pair.

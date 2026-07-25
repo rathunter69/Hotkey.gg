@@ -6279,56 +6279,235 @@ const CHALLENGES = {
     }
   },
   bridge:{
-    name:'Point Mode', label:'Point-mode formulas', par:10, parKeys:6,
-    aha:'Point mode grabs refs with the arrow keys — the fastest formula is one you never typed.',
-    prompt:'Build profit = revenue × margin: start the formula, point at each reference with the arrow keys, and fill it across five years. Point mode is the fastest way to enter a formula, and the fill confirms the references were relative.',
-    req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs revenue \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs margin \u00b7 <em>\u21b5</em> \u00b7 select '+o.rng+' \u00b7 <em>ctrl+r</em>'; },
+    /* r434 (DEPTH_PASS §4.27 + the §1.0 / §1.0-R2 / §1.0-R3 law on top; §1.0-R3 wins on
+       conflict): the depth-pass rework of the catalog's thinnest drill. It shipped at
+       par 10 / 6 keys with TWO checks — one pointed multiplication and one fill — on a board
+       whose "Memo: growth" row was decoration nothing ever read. The §4.27 page's fix is the
+       one this build ships: the memo row becomes a DRIVER, and the drill grows a second verse
+       — a revenue line that rolls itself forward off the growth rates before the EBITDA line
+       prices off the margins. Two pointed formulas, two fills, the input convention on the one
+       hardcode, the total's rule, and the engine-appended Ctrl+S closer (§1.0(e)).
+
+       WHY THIS DRILL IS NOT RETIRED under §1.0-R3(s) (the question the depth pass asks first,
+       and the reason `undo` and `copyover` are gone): its lesson is not carried anywhere else.
+         · `filldr` teaches the FILL — one formula stamped across a block. Every cost line
+           there rides the SAME revenue row, so nothing depends on the cell the fill just wrote.
+         · `margin` teaches the RATIO family — three quotients off static input columns.
+         · `foot` teaches AutoSum in two directions.
+       None of them contains a RECURSIVE line: here FY26 revenue reads the FY25 revenue the
+       fill itself produced one column earlier, which is the shape every operating model, every
+       roll-forward and every debt schedule is built out of, and it is the first place in the
+       catalog a player meets it. And point mode — the arrows grabbing references while the
+       formula is live — has no other home: `margin` may be solved by pointing but grades the
+       end state, so nothing there ever rewards it. That is exactly what this drill's ☆ does.
+
+       STRUCTURAL DEVIATIONS from the §4.27 page, named here per §0 (a build agent makes the
+       call and records it rather than improvising silently):
+
+       (1) BEAT ORDER — the revenue build runs FIRST, the EBITDA build second; the page has it
+           the other way round. Binding reason, §1.0-R3(p): on the page's order the player fills
+           EBITDA across a revenue line whose years 2–5 are still empty, so the beat grades
+           FALSE with the work correctly done and only lights minutes later when the revenue
+           verse lands. Round 3's whole finding is that "the failure mode to fear is an
+           UNTRIGGERABLE beat, which is indistinguishable from a broken drill" — a beat that
+           goes dark AFTER a correct action is the same defect with a delay. Built in dependency
+           order, every beat lights the moment its action completes. Nothing else moves: the
+           page's five beats all survive, in the page's words.
+       (2) ☆ RE-CUT. The page's bonus is "Total the five EBITDA years in the FY cell — one live
+           SUM". That is extra WORK, not a hidden efficiency move, so §1.0(d) rules it out
+           (bonuses are mastery/efficiency discoveries) and §1.0-R2(i) rules it out twice (a ☆
+           must be a distinct, SKIPPABLE decision, not another chore). The re-cut ☆ is the
+           drill's own name promoted into the mystery slot: build both formulas by POINTING
+           instead of typing the references out. It is the §1.0-R2(i) family verbatim ("reward
+           for good habits of using the previously taught hotkeys that save time"), it is
+           invisible in the end state — a pointed =B6*(1+C4) and a typed one are the same bytes
+           — and it is genuinely skippable, because typing every reference clears all six core
+           beats and forfeits only the star (proved by the SLOW-ROUTE alt in dev/e2e-alt-paths.js,
+           which types every reference and lands 6/6 cores with the ☆ dark).
+           The FY-total idea is dropped rather than promoted: a five-year forecast page has no
+           business summing five years of revenue, and `foot` owns AutoSum.
+       (3) ONE NEW CORE BEAT the page does not list — "Color the FY24 revenue blue". The page's
+           beats are four formula moves plus one dress, which measures at ~24 keys; the chapter
+           bar after the §1.0(e) closer is 30–40s. The beat added is the one §1.0-R3(o) ranks
+           highest and the board actually needs: the sheet ships with a single typed figure on
+           it, and marking a hardcode blue before you build on top of it is the most-performed
+           formatting act on a real desk. It leads rather than trails, which is NOT the §1.0(a)
+           violation it looks like: (a) outlaws dress BATCHED AT THE END, and marking the input
+           before building on it is the desk's own order.
+       (3b) TWO ROWS THE PAGE GREW that no beat grades — D&A and EBIT, live off a third driver
+           row. §1.3 wants ≥60% of the 14-row board carrying content or scripted purpose and the
+           §4.27 page (four rows and a memo) sits at half of that. They are not filler, they are
+           the CONSEQUENCE: both read 0 on arrival because the lines above them are empty, and
+           they light up column by column behind the player's fills, which is where §1.5's aha
+           actually lands. Nothing on this board goes unread — which was §4.27's own complaint
+           about the version it replaces.
+       (4) NO cueCell() (§1.0-R2(h) / §1.0-R3(q)): every graded target is a labeled row crossed
+           with a labeled year column, which the green outline expresses exactly — there is no
+           insert point and no empty paste destination for a red cue to point at. No graded
+           target spills either; the only spilling cells (title, source memo) are ungraded.
+       (5) §1.0-R2(g) ADAPTIVE LABELS: the first fiscal year moves per seed, so every beat names
+           THIS seed's year (FY24 / FY25 / FY28) instead of making the player map "year one"
+           onto the header row.
+
+       ENGINE (verified, not assumed — §1.0-R3(p), enumerate the routes before writing the
+       predicate):
+         · BLUE: Alt H F C → the r343 font-colour drop-down → Blue is swatch 4 → ↵; and Alt H J →
+           the r237 cell-styles gallery → "Input". Both land fontColor==='blue', which is what
+           beat 1 reads. (Paste-formats from any blue cell lands it too, and also clears.)
+         · TOP BORDER: Alt H B P sets bt on every selected cell; Alt H B A sets ball; Alt H B S /
+           B T on a ONE-ROW selection run r1===r2, so the perimeter's top edge is bt on every
+           cell of the line. Beat 6 accepts bt OR ball, so all four clear, with or without the
+           row label in the selection (§1.0-R3(p)'s label-plus-figures widening).
+         · FILL: ctrl+r and Alt H F I R both write the same cells; both beats grade the values,
+           so a typed line clears identically (§1.0(c)).
+         · POINT MODE: r257. While a formula is live an arrow appends a fresh reference after
+           `=` or an operator (startPointerFromArrow) and RE-POINTS the trailing one otherwise
+           (movePointer) — so ↑↑ walks one reference two rows up rather than writing two. The ☆
+           reads the r434 S.pointLog latch stamped at commit. */
+    name:'Point Mode', label:'Point-mode formulas', par:33, parKeys:31, saveClose:true,   /* r434: par re-swept post-rework — dev/e2e-par-sweep.js bridge, 5-seed median 31 keys incl. the engine-appended Ctrl+S (flat across seeds: the site pool moves the board, never the keystroke count). par 33 ≈ 1.06 s/key, the house band. Mirrored in HOTKEY_PARS. Clocks fall out (§1.4) at pass 49.5s · pro 37.9s · legendary 33s. */
+    aha:'while a formula is live the arrow keys grab references instead of moving — the fastest formula is one you never typed.',
+    prompt:'The operating plan is agreed and the build page is empty: one year of revenue is on the sheet, and the yellow rows above it — growth, margin, D&amp;A — are the plan’s assumptions. Roll revenue out to the last year off the growth line, price EBITDA off the margin line, mark the one figure that was typed rather than calculated, and rule the EBITDA line so the page can go out. D&amp;A and EBIT below are already wired and read zero; they come alive as you build. The board anchors somewhere new every run.',
+    req(){ const o=this._o; return '<em>'+o.rev1+'</em> <em>alt h f c</em> → Blue · <em>'+o.rev2+'</em> <em>=</em> <em>←</em> <em>*(1+</em> <em>↑↑</em> <em>)</em> <em>↵</em> · select '+o.revRng+' <em>ctrl+r</em> · <em>'+o.eb1+'</em> <em>=</em> <em>↑</em> <em>*</em> <em>↑↑</em> <em>↵</em> · select '+o.ebRng+' <em>ctrl+r</em> · <em>ctrl+b</em> · <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every line names BOTH routes where two exist (§1.0-R3(p)). */
     guide(){ const o=this._o; return [
-      'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
-      '<kbd>\u2191</kbd> \u2014 one hop to margin \u00b7 <kbd>\u21b5</kbd>',
-      'select '+o.rng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 five years from one pointed formula',
+      'the <b>'+o.y1+'</b> revenue at '+o.rev1+' is the only figure anyone typed on this page: <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> opens the font-colour drop-down · <kbd>→</kbd> ×4 to Blue · <kbd>↵</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> → <b>Input</b> is the cell-styles route to the same blue)',
+      'the <b>Revenue</b> line at <b>'+o.y2+'</b> ('+o.rev2+'): <kbd>=</kbd> then <kbd>←</kbd> — the arrow lands on last year’s revenue instead of moving the cursor · <kbd>*</kbd><kbd>(</kbd><kbd>1</kbd><kbd>+</kbd> · <kbd>↑</kbd><kbd>↑</kbd> climbs the same reference up to this year’s growth rate · <kbd>)</kbd> <kbd>↵</kbd>',
+      'select the Revenue line from '+o.y2+' to '+o.yN+' ('+o.revRng+') · <kbd>ctrl</kbd>+<kbd>r</kbd> — each year reads the year to its left, so the line grows itself (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the ribbon’s same fill)',
+      'the <b>EBITDA</b> line at <b>'+o.y1+'</b> ('+o.eb1+'): <kbd>=</kbd> <kbd>↑</kbd> grabs the revenue directly above · <kbd>*</kbd> · <kbd>↑</kbd><kbd>↑</kbd> climbs past revenue to the margin · <kbd>↵</kbd>',
+      'select the EBITDA line across all five years ('+o.ebRng+') · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'still on '+o.ebRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> lays the top border (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> is out<b>S</b>ide borders — on a single line its top edge is the same rule; <kbd>a</kbd> is ALL borders)',
+      '☆ the discovery: never type a reference. While the formula is live the arrows POINT — <kbd>←</kbd> takes last year, <kbd>↑</kbd> takes the row above, and a second <kbd>↑</kbd> moves that same reference one more row instead of adding another. Typing '+o.rev1+' and the rest out by hand clears every beat too, it just costs the keys',
     ]; },
-    targets(){ const o=this._o; return [o.f, o.rng]; },
+    /* rings: ① the typed revenue figure · ② the first year to build · ③ the revenue line ·
+       ④ the first EBITDA year · ⑤⑥ the EBITDA line · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.rev1, o.rev2, o.revRng, o.eb1, o.ebRng, o.ebRng, null]; },
     demo(){ const o=this._o; return [
-      {sel:o.f, keys:[{key:'='}, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
-      {sel:o.rng, keys:[Kb.fillR]},
-    ]; },
+      /* §2.2: the demo performs the bonus — both formulas are built by pointing, which is the
+         ☆ itself, so the replay covers the latch as well as the beats. */
+      {sel:o.rev1, keys:[Kb.alt,L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+      {sel:o.rev2, keys:[{key:'='},{key:'ArrowLeft'},{key:'*'},{key:'('},{key:'1'},{key:'+'},{key:'ArrowUp'},{key:'ArrowUp'},{key:')'},Kb.enter]},
+      {sel:o.revRng, keys:[Kb.fillR]},
+      {sel:o.eb1, keys:[{key:'='},{key:'ArrowUp'},{key:'*'},{key:'ArrowUp'},{key:'ArrowUp'},Kb.enter]},
+      {sel:o.ebRng, keys:[Kb.fillR]},
+      {sel:o.ebRng, keys:[Kb.bold]},   /* §1.0(a) format-as-you-go: the rule rides directly behind the line it closes */
+      {sel:o.ebRng, keys:[Kb.alt,L('h'),L('b'),L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      // r187: the block MOVES per seed (\u00a72.1 \u2014 sites randomize, not just values);
-      // point-mode keystrokes are identical from any anchor, so par is untouched.
-      const [c0,hr]=[[2,1],[3,2],[2,3],[4,2]][rnd(0,3)];
-      const lc=colLetter(c0-1);
-      cells['A1']={...blankCell(),value:codename()+' \u2014 profit build ($mm)',txt:true,bold:true};
-      cells[lc+(hr+1)]={...blankCell(),value:'Revenue',txt:true};
-      cells[lc+(hr+2)]={...blankCell(),value:'EBITDA margin',txt:true};
-      cells[lc+(hr+3)]={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      cells[lc+(hr+5)]={...blankCell(),value:'Memo: growth',txt:true};
-      this._exp=[];
-      let rev=rnd(40,90)*10;
+      /* §1.2 randomization — three independent axes: (a) the page anchors on a 4-spot site pool
+         (column and header row both move, so no two seeds share a rect), (c) every figure
+         through rnd() — base revenue, four growth rates, five margins, and (d) the fiscal years
+         themselves shift, which is what makes the §1.0-R2(g) labels worth reading. §4.27's
+         third axis lands in the board itself: the revenue line ships with year one only. */
+      const [c0,hr]=[[1,2],[2,3],[3,2],[4,3]][rnd(0,3)];
+      const L0=colLetter(c0), y0=rnd(24,26);
+      const yr=j=>'FY'+(y0+j), CL=j=>colLetter(c0+1+j);
+      /* the page, top to bottom: the three-row assumption block, the two lines the player
+         builds, then the two lines those feed. The DRIVER ORDER is load-bearing — growth sits
+         one row above the margin so the Revenue line's climb (↑↑ to its own growth rate) and
+         the EBITDA line's climb (↑↑ to its own margin) are the same two hops from their
+         anchors, and the drill teaches one motion rather than two. */
+      const daRow=hr+1, gRow=hr+2, mRow=hr+3, revRow=hr+4, ebRow=hr+5, daOut=hr+6, ebitRow=hr+7;
+      cells[L0+'1']={...blankCell(),value:codename()+' — five-year operating build ($mm)',txt:true,bold:true};
+      cells[L0+hr]={...blankCell(),value:'Line item',txt:true,bold:true};
+      for(let j=0;j<5;j++) cells[CL(j)+hr]={...blankCell(),value:yr(j),txt:true,bold:true,align:'r'};
+      /* §1.3 labeled targets: every graded cell sits on a named row under a named year. */
+      cells[L0+daRow]={...blankCell(),value:'D&A % of revenue',txt:true};
+      cells[L0+gRow]={...blankCell(),value:'Revenue growth',txt:true};
+      cells[L0+mRow]={...blankCell(),value:'EBITDA margin',txt:true};
+      cells[L0+revRow]={...blankCell(),value:'Revenue',txt:true};
+      cells[L0+ebRow]={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells[L0+daOut]={...blankCell(),value:'D&A',txt:true};
+      cells[L0+ebitRow]={...blankCell(),value:'EBIT',txt:true,bold:true};
+      const g=[0], m=[], rev=[rnd(28,46)*100], da=rnd(30,65)/1000;
+      for(let j=1;j<5;j++) g.push(rnd(25,125)/1000);          // 2.5% – 12.5%, exact at one decimal
+      for(let j=0;j<5;j++) m.push(rnd(160,320)/1000);         // 16.0% – 32.0%, exact at one decimal
+      for(let j=1;j<5;j++) rev.push(rev[j-1]*(1+g[j]));
       for(let j=0;j<5;j++){
-        const m=rnd(18,34)/100, L2=colLetter(c0+j);
-        cells[L2+hr]={...blankCell(),value:'FY'+(24+j),txt:true,bold:true,align:'r'};
-        cells[L2+(hr+1)]={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[L2+(hr+2)]={...blankCell(),value:m,fontColor:'blue',fmtStyle:'percent',decimals:1};
-        cells[L2+(hr+3)]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        if(j<4) cells[colLetter(c0+1+j)+(hr+5)]={...blankCell(),value:rnd(3,9)/100,fmtStyle:'percent',decimals:1};
-        this._exp.push({rev:rev, m:m});
-        rev=Math.round(rev*(1+rnd(3,9)/100));
+        /* §1.0(f) + §1.0-R2(l) INPUT CONVENTION: the three driver rows are the assumption block —
+           light yellow, all borders, blue figures, POPULATED, vertically stacked, and each row
+           carries its own name on the sheet ("Revenue growth", "EBITDA margin") rather than a
+           bare "Helper" tag (r430: naming the assumption tells the player what it drives;
+           "Helper" tells them nothing). The growth row has no first-year cell — there is no
+           prior year to grow from. */
+        if(j>0) cells[CL(j)+gRow]={...blankCell(),value:g[j],fmtStyle:'percent',decimals:1,fontColor:'blue',fill:'yellow',ball:true};
+        cells[CL(j)+mRow]={...blankCell(),value:m[j],fmtStyle:'percent',decimals:1,fontColor:'blue',fill:'yellow',ball:true};
+        cells[CL(j)+daRow]={...blankCell(),value:da,fmtStyle:'percent',decimals:1,fontColor:'blue',fill:'yellow',ball:true};
+        /* the two build rows ship EMPTY but pre-formatted — the number style is not this
+           drill's work, and an unformatted result would render its general string. */
+        cells[CL(j)+revRow]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[CL(j)+ebRow]={...blankCell(),fmtStyle:'comma',decimals:0};
+        /* THE PAGE UNDERNEATH (§1.3 density · §1.5 the aha's moment): D&A and EBIT ship LIVE and
+           already dressed. They are not decoration and not a beat — they are the consequence.
+           Every one of them reads 0 on arrival because the lines above them are empty, and they
+           fill in behind the player's fills: the moment the revenue verse lands, four columns of
+           EBIT nobody touched come alive. §4.27's complaint about the old board was a memo row
+           nothing ever read; nothing on this one goes unread. */
+        const da0=j===0 ? -Math.round(rev[0]*da) : 0;   // loadChallenge does not recalc, so the ARRIVAL frame is seeded truthfully: only FY1 has a revenue to depreciate off
+        cells[CL(j)+daOut]={...blankCell(),formula:'=-'+CL(j)+revRow+'*'+CL(j)+daRow,value:da0,fmtStyle:'comma',decimals:0};
+        cells[CL(j)+ebitRow]={...blankCell(),formula:'='+CL(j)+ebRow+'+'+CL(j)+daOut,value:da0,fmtStyle:'comma',decimals:0,bold:true,bt:true};
       }
-      this._o={c0:c0, hr:hr, f:colLetter(c0)+(hr+3), rng:colLetter(c0)+(hr+3)+':'+colLetter(c0+4)+(hr+3)};
-      const cw={}; cw[c0-1]=118;
-      return {ROWS:Math.max(7,hr+6), cells, active:{r:hr+3,c:c0}, sel:null, colW:cw};
+      /* the ONE typed figure on the page, and it arrives BLACK — beat 1 marks it as a hardcode
+         before anything is built on top of it (§1.0-R3(o): font colour is the ranked move). */
+      cells[CL(0)+revRow].value=rev[0];
+      cells[L0+(ebitRow+2)]={...blankCell(),value:'Source: '+yr(0)+' actuals — growth, margin and D&A per the operating plan',txt:true,it:true,fontColor:'gray'};
+      this._exp={rev:rev, m:m, da:da};
+      this._o={ c0:c0, hr:hr, daRow:daRow, gRow:gRow, mRow:mRow, revRow:revRow, ebRow:ebRow,
+        daOut:daOut, ebitRow:ebitRow,
+        y1:yr(0), y2:yr(1), yN:yr(4),
+        rev1:CL(0)+revRow, rev2:CL(1)+revRow, eb1:CL(0)+ebRow,
+        revRng:CL(1)+revRow+':'+CL(4)+revRow, ebRng:CL(0)+ebRow+':'+CL(4)+ebRow,
+        revC:[0,1,2,3,4].map(j=>CL(j)+revRow), mC:[0,1,2,3,4].map(j=>CL(j)+mRow),
+        ebC:[0,1,2,3,4].map(j=>CL(j)+ebRow) };
+      const colW={}; colW[c0]=136; for(let j=0;j<5;j++) colW[c0+1+j]=80;   // 'D&A % of revenue' fits the label column; five-figure comma values and their bracketed negatives fit 80px — no #### at load or at the win
+      return {ROWS:ebitRow+3, cells, active:{r:revRow,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const o=this._o;
-      const okCol=j=>{ const L2=colLetter(o.c0+j), c=S.cells[L2+(o.hr+3)]; if(!c||!c.formula) return false;
-        const f=String(c.formula).toUpperCase().replace(/[\s$]/g,'');
-        const refs=f.includes(L2+(o.hr+1))&&f.includes(L2+(o.hr+2));
-        return refs && typeof c.value==='number' && Math.abs(c.value-this._exp[j].rev*this._exp[j].m)<0.5; };
+      const o=this._o, E=this._exp;
+      const cel=k=>S.cells[k]||{};
+      const num=k=>{ const v=cel(k).value; return typeof v==='number'?v:NaN; };
+      /* §1.0(c) FREEDOM + §1.0-R3(p) END-STATE GRADING: nothing here reads a formula. A player
+         who computes the chain on a calculator and types five numbers clears exactly like one
+         who points and fills, and the clock prices the difference.
+         Revenue tolerance: the line is graded against the exact compounded chain, but the board
+         shows whole numbers, so a typed year is up to half a unit off and that error compounds
+         forward — max(3, 0.3%) covers four years of it and still sits an order of magnitude
+         inside the gap a wrong growth rate would open. */
+      const revOk=j=>{ const want=E.rev[j], v=num(o.revC[j]);
+        return isFinite(v) && Math.abs(v-want)<=Math.max(3, want*0.003); };
+      /* EBITDA is graded against what the PAGE now holds — this column's revenue times this
+         column's margin — not against the build's own arithmetic. A line that is internally
+         consistent with the revenue above it is correct EBITDA work; if the revenue itself is
+         wrong, its own beat says so rather than blacking out two beats for one mistake. */
+      const ebOk=j=>{ const r=num(o.revC[j]), mv=num(o.mC[j]), v=num(o.ebC[j]);
+        if(!isFinite(r)||!isFinite(mv)||!isFinite(v)) return false;
+        const want=r*mv; return Math.abs(v-want)<=Math.max(1, Math.abs(want)*0.002); };
+      const revAll=[1,2,3,4].every(revOk), ebAll=[0,1,2,3,4].every(ebOk);
+      /* every route to a top border clears: Alt H B P sets bt, Alt H B A sets ball, and outside
+         borders (Alt H B S / B T) on a one-row selection set bt on every cell of the line —
+         with or without the row label inside the selection. */
+      const dressOk=o.ebC.every(k=>{ const c=cel(k); return !!c.bold && !!(c.bt||c.ball); });
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — POINT MODE, the
+         one thing this drill is named for and the one thing the finished sheet cannot show: a
+         pointed formula and a typed one are byte-identical once committed. Read off the r434
+         S.pointLog latch (mechanic used, never inferred), so both build lines must have been
+         entered with the arrows grabbing their references. Typing every reference out clears all
+         six core beats and forfeits only the star, which is what keeps it a choice. */
+      const pl=S.pointLog||[];
+      const pointedIn=list=>pl.some(p=>list.indexOf(p.k)>=0);
+      const starOk=revAll && ebAll && pointedIn(o.revC.slice(1)) && pointedIn(o.ebC);
+      /* DEPTH_PASS §4.27 beats, in dependency order (deviation 1 above), with the labels naming
+         THIS seed's fiscal years (§1.0-R2(g)). Labels are instructions: the clause after the
+         dash says WHAT, never why (§1.0-R3(n)). */
       return [
-        {label:'build EBITDA at '+o.f+' \u2014 a live revenue \u00d7 margin formula reading its own column', ok: okCol(0)},
-        {label:'fill it across all five years \u2014 relative refs walked with the fill', ok: [1,2,3,4].every(okCol)},
+        {label:'Color the '+o.y1+' revenue blue', ok: cel(o.rev1).fontColor==='blue'},
+        {label:'Build the '+o.y2+' revenue — the prior year times one plus growth', ok: revOk(1)},
+        {label:'Fill the revenue line across to '+o.yN, ok: revAll},
+        {label:'Build the '+o.y1+' EBITDA — revenue times the margin', ok: ebOk(0)},
+        {label:'Fill the EBITDA line across all five years', ok: ebAll},
+        {label:'Bold the EBITDA line and add a top border above it', ok: dressOk},
+        {label:'Build both lines by pointing at the references', ok: starOk, bonus:true},
       ];
     }
   },
@@ -9925,6 +10104,18 @@ let editing=false, editBuf='';
 // editPointer  = the currently-pointed-at cell (null when not in pointer mode)
 // editPointerStart = index in editBuf where the current reference begins (so arrows can rewrite it)
 let editAnchor=null, editPointer=null, editPointerStart=-1, editPointerBase=null;
+/* r434 (DEPTH_PASS §1.0(d)/§1.0-R2(i), the bridge ☆): POINT-MODE PROVENANCE. `editPointed`
+   rides one edit — set false when an edit opens, true the moment an arrow grabs or moves a
+   reference — and the commit stamps the cell it wrote on S.pointLog. Same latch family as
+   S.fillOps (r424) / S.grabLog (r427) / S.fmtOps (r429) / S.multiEnter (r433): the MECHANIC
+   is recorded, never inferred from the end state, because a pointed `=B6*(1+C4)` and a typed
+   one are byte-identical once committed. bridge's ☆ reads it to tell the arrow route from the
+   typed route; nothing core may ever require it (§1.0(c) — typing every reference clears
+   every core beat of every drill, and always will). */
+let editPointed=false;
+function hkPointStamp(r,c){ if(typeof S==='undefined' || !S) return;
+  try{ (S.pointLog=S.pointLog||[]).push({k:ck(r,c), r:r, c:c});
+    if(S.pointLog.length>240) S.pointLog.shift(); }catch(e){} }
 let editMode='enter', editCaret=0;   // Excel distinction: F2 = Edit mode (arrows move the CARET); typing = Enter mode (arrows commit)
 // Last char of editBuf is one of these → arrows enter pointer mode (insert new reference).
 // = + - * / ^ ( , — Excel's standard operator/separator boundaries.
@@ -13201,6 +13392,7 @@ function startEdit(initial, mode){
   editCaret = initial.length;
   editAnchor={r:S.active.r, c:S.active.c};
   editPointer=null; editPointerStart=-1;
+  editPointed=false;                                         // r434: fresh edit, no pointer grab yet
   render();
 }
 function cancelEdit(){
@@ -13246,7 +13438,8 @@ function commitEdit(dr,dc){
     pushUndo();
     const cell=ensure(S.active.r,S.active.c);
     if(buf[0]==='='){ cell.formula=buf; let v; try{ v=evalFormula(buf); }catch(_){ v=NaN; }
-      cell.value=(typeof v==='number')?(isFinite(v)?v:0):(v!=null?v:0); cell.txt=false; }   /* r296: text results commit as text (mirrors recalc's r257 rule) — the text pack & the & operator need it */
+      cell.value=(typeof v==='number')?(isFinite(v)?v:0):(v!=null?v:0); cell.txt=false;
+      if(editPointed) hkPointStamp(S.active.r,S.active.c); }   /* r296: text results commit as text (mirrors recalc's r257 rule) — the text pack & the & operator need it · r434: point-mode provenance */
     else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null;
       /* r418 H3-A (AUDIT §A #4): Excel auto-scales BARE numeric entry into an already
          percent-formatted cell — typing 8 must read 8%, not 800%. Only this branch:
@@ -13258,6 +13451,7 @@ function commitEdit(dr,dc){
     else if(/^\([\d,]+\.?\d*\)$/.test(buf)){ cell.formula=null; cell.value=-parseFloat(buf.replace(/[(),]/g,'')); cell.txt=false; }
     else { cell.formula=null; cell.value=buf; cell.txt=true; }
   }
+  editPointed=false;   // r434: the provenance flag never outlives the edit that set it
   const __walk = (__wasMarked && dc===0 && dr!==0) ? dr : 0;
   if((dr||dc) && !__walk && !__asStay){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
   commitAction();
@@ -13303,6 +13497,7 @@ function commitEditAll(){
         const f=(rr!==ar||cc!==ac) ? translateFormula(buf, rr-ar, cc-ac) : buf;
         cell.formula=f; let v; try{ v=evalFormula(f); }catch(_){ v=NaN; }
         cell.value=(typeof v==='number')?(isFinite(v)?v:0):(v!=null?v:0); cell.txt=false;
+        if(editPointed) hkPointStamp(rr,cc);   // r434: a pointed formula committed into the whole selection carries its provenance to every cell
       } else if(/^-?\d*\.?\d+$/.test(buf)){ cell.formula=null; cell.value=parseFloat(buf); cell.txt=false; }
       else { cell.formula=null; cell.value=buf; cell.txt=true; }
     });
@@ -13316,6 +13511,7 @@ function commitEditAll(){
   if(typeof S!=='undefined' && S){ try{ const rr=selRange();
     (S.multiEnter=S.multiEnter||[]).push({r1:rr.r1, c1:rr.c1, r2:rr.r2, c2:rr.c2});
     if(S.multiEnter.length>240) S.multiEnter.shift(); }catch(e){} }
+  editPointed=false;   // r434: the provenance flag never outlives the edit that set it
   commitAction();
 }
 // Pointer helpers: arrow keys during formula edit drop or move a cell reference into editBuf.
@@ -13330,6 +13526,7 @@ function startPointerFromArrow(dr, dc){
   editPointerBase = null;                                    // single-ref pointer
   editBuf += ck(r, c);
   editCaret = editBuf.length;
+  editPointed = true;                                        // r434: point-mode provenance (see the editPointed latch note)
   return true;
 }
 /* r257 (Wolf): Excel's Point mode — in Enter mode, an arrow while editing a FORMULA
@@ -13361,6 +13558,7 @@ function movePointer(dr, dc, extend){
   if(r===editPointer.r && c===editPointer.c) return false;
   editPointer = {r, c};
   writePointerRef();
+  editPointed = true;                                        // r434: point-mode provenance (see the editPointed latch note)
   return true;
 }
 

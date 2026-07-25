@@ -259,20 +259,6 @@ const ALTS = [
   { key: 'lookup2', name: 'header-inclusive ranges (consistent off-by-one)', moves: `C => [
       {sel:'G4', keys:[...T('=INDEX(B1:D6,MATCH(G2,A1:A6,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
     ]` },
-  { key: 'bridge', name: 'typed refs (no pointing) + ribbon fill right, geometry-derived', moves: `C => { const o=C._o;
-      const L2=colLetter(o.c0);
-      return [
-        {sel:o.f, keys:[...T('='+L2+(o.hr+1)+'*'+L2+(o.hr+2)),{key:'Enter'}]},
-        {sel:o.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      ]; }` },
-  /* r432 (autofit ROUND 3, DEPTH_PASS §4.14): both entries rebuilt for the reworked print-page
-     board. ALT 1 = op-ORDER alt, and the ☆-skippability proof: the whole drill run BACKWARDS
-     (totals first, dressed immediately, then the widths right-to-left, labels last) with every
-     line total TYPED as an addition chain instead of one filled SUM — the §1.0(c) freedom
-     route. All five cores clear; the ☆ must stay dark, since no fill ever runs. ALT 2 =
-     chord-ROUTE alt (range autosum for the totals, whole-column ctrl+space selections, ribbon
-     bold, and the Total column sized by a TYPED width instead of an autofit — the r430 rule
-     that any route to a readable column clears a readability beat). */
   { key: 'autofit', name: 'run BACKWARDS — totals first as typed addition chains, dress next, then widths right-to-left with the labels last (no fill, so no star)', moves: `C => { const o=C._o;
       const steps=[];
       for(let r=o.r0;r<=o.tr;r++)
@@ -1122,6 +1108,34 @@ const ALTS = [
         steps.push({sel:b.PC+(b.r0+i), keys:[...T('='+b.VC+(b.r0+i)+'/'+b.VC+'$'+b.r0),{key:'Enter'}]}); });   // bottom-up, row lock only
       [o.A,o.B].forEach(b=>steps.push({sel:b.rng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]}));
       return steps; }` },
+  /* r434 (bridge ROUND 1 depth pass, DEPTH_PASS §4.27). ALT 1 is the chord-ROUTE alt AND the
+     §1.0-R2(i) SKIPPABILITY PROOF for the re-cut ☆: every reference is TYPED OUT, so not one
+     arrow ever points, blue comes from the cell-styles gallery instead of the font-colour
+     drop-down, both fills walk the Home ribbon, bold is Alt H 1 and the rule is Alt H B S
+     (outside borders on a one-row selection — its top edge IS the top border). All six cores
+     clear; S.pointLog stays empty and the star stays dark. ALT 2 is the op-ORDER alt: the
+     EBITDA line is BOLDED AND RULED WHILE EMPTY, then built and filled across a revenue line
+     that does not exist yet (every year reads 0), and only then does the revenue verse land and
+     recalc light it — the §1.0-R3(p) end-state proof — with the hardcode marked blue last. Both
+     formulas are pointed there, so the ☆ still fires from a completely different order. */
+  { key: 'bridge', name: 'chord-ROUTE: every reference TYPED (no pointing — ☆ forfeited), blue via the alt h j cell-styles gallery, both fills via alt h f i r, bold alt h 1, rule via alt h b s', moves: `C => { const o=C._o; const CL=j=>colLetter(o.c0+1+j); return [
+      {sel:o.rev1,   keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}]},          // cell styles → Input, the other route to blue
+      {sel:o.rev2,   keys:[...T('='+CL(0)+o.revRow+'*(1+'+CL(1)+o.gRow+')'),{key:'Enter'}]},      // typed refs — the arrows never grab anything
+      {sel:o.revRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.eb1,    keys:[...T('='+CL(0)+o.mRow+'*'+CL(0)+o.revRow),{key:'Enter'}]},             // margin × revenue — operand order is free
+      {sel:o.ebRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.ebRng,  keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.ebRng,  keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+    ]; }` },
+  { key: 'bridge', name: 'op-ORDER: EBITDA line ruled while EMPTY, built and filled before revenue exists (reads 0 until the revenue verse recalcs it), hardcode marked blue LAST — ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.ebRng, keys:[{key:'b',ctrl:true}]},
+      {sel:o.ebRng, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.eb1,   keys:[{key:'='},{key:'ArrowUp'},{key:'*'},{key:'ArrowUp'},{key:'ArrowUp'},{key:'Enter'}]},
+      {sel:o.ebRng, keys:[{key:'r',ctrl:true}]},                                                  // five EBITDA years, every one of them zero
+      {sel:o.rev2,  keys:[{key:'='},{key:'ArrowLeft'},{key:'*'},{key:'('},{key:'1'},{key:'+'},{key:'ArrowUp'},{key:'ArrowUp'},{key:')'},{key:'Enter'}]},
+      {sel:o.revRng,keys:[{key:'r',ctrl:true}]},                                                  // the revenue line lands and the EBITDA line comes alive behind it
+      {sel:o.rev1,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+    ]; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
       const steps=C._sites.slice().reverse().flatMap(s=>[
