@@ -2320,78 +2320,214 @@ const CHALLENGES = {
     }
   },
   gauntlet:{
-    name:'Gauntlet', label:'Make it model-ready', par:63, parKeys:66,
-    aha:'Model-ready is one rhythm: bold, comma, border, blue inputs — and the totals in accounting format (Alt H A N).',
-    prompt:'Format both blocks of a raw sources & uses (the two-sided table of where deal money comes from and where it goes): inputs in blue, SUM each total, bold with a top border on both totals, commas at 0 decimals down both money columns, and autofit so nothing clips. Every formatting operation you know, both sides of the page, no mouse.',
-    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h f c blue font \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b p</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
-    guide(){ const R=this._R; return [
-      'both input stacks in blue font: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 Blue <kbd>\u21b5</kbd> \u00b7 then the same on '+R.useIn,
-      'totals with autosum: '+R.srcTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd> \u00b7 then '+R.useTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd>',
-      'dress both totals: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-      'commas, 0 decimals, both money bodies: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> \u00d72',
-      'the two totals in accounting format: <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> \u2014 $ aligned, the S&U convention',
-      'autofit both: <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 no #### leaves the desk',
+    /* r433 H6b-5 ★ CAPSTONE c2 (DEPTH_PASS §4.20 + §2.4, built to §1.0 / §1.0-R2 / §1.0-R3):
+       the Formatting capstone. Every other drill in the chapter now ships depth-passed —
+       typeset (weight + ink), decimals (decimal discipline), center (alignment + center-across),
+       autofit (widths), ruleoff / ruleaudit (border grammar), combo (the raw-paste cleanup),
+       housestyle (the ritual, in order). This is where those run as ONE pass over ONE artifact:
+       a sources & uses table straight off the deal model, taken to book standard.
+
+       WHAT MAKES IT THE SUMMIT rather than a ninth variation: the board is TWO-SIDED and both
+       sides are the same shape, so the work is never "do the op" — it is "do the op on a page",
+       and the page's structure is what the ☆ tests (below). It is also the only board in the
+       chapter where the number the player CREATES (the SUM) is the number that blows the column,
+       so the closing autofit is a consequence of their own work, not of the seed.
+
+       STRUCTURAL DEVIATIONS from the §4.20 page, declared here per §0 (the agent makes the call
+       and names it rather than improvising silently):
+
+       (1) ☆ RE-CUT + PROMOTED. The page's bonus was "Center the two side headings across their
+           columns — never merge". That is a FORMATTING task, which §1.0(d) outlaws catalog-wide,
+           and it is not skippable — centering the headings IS the chapter's anti-merge lesson and
+           every player must meet it. So it becomes CORE beat 1 (Center is a closed verb, §1.7),
+           exactly as center's r429 rework promoted its own center-across bonus.
+           The new ☆ is a hidden EFFICIENCY discovery in the §1.0-R2(i) family ("reward for good
+           habits … that save time") and specifically the whole-row selection discipline §1.0(d)
+           names: the two totals sit on the SAME ROW, so one selection across that row lands the
+           bold, the top border and the dollars on BOTH sides at once. The drill's own taught
+           rhythm — finish a side, then the other — clears every core beat and never earns it, so
+           the star is a real decision, not a by-product.
+       (2) SEVEN core beats where the page lists six (the §1.1 band is 4–6). The promotion in (1)
+           adds one; nothing on the page was dropped except beat 6 — see (3). Recorded as a
+           capstone deviation (blocksel r427 precedent): a capstone chains a chapter, and the
+           chapter's six op families are the six beats after the heading beat.
+       (3) The page's beat 6 "Finish at A1 — the page is ready for the book" is DROPPED. §1.6
+           reserves the Finish-at-A1 closer for BUILD drills and says not to use it where a dress
+           beat closes better; here the autofit IS that beat — it is the last thing that changes
+           what the reader sees — and §1.0(e)'s Ctrl+S closer is the true final line.
+       (4) The page's accounting beat survives as beat 6, with the §1.0-R3(p) fix: the old check
+           demanded fmtStyle==='acct', which ONLY Alt H A N produces, so a player who dollar-
+           formatted both totals with Ctrl+Shift+$ or Ctrl+1 C watched a beat stay dark with
+           dollars on the screen — the exact untriggerable-beat class Wolf hit in round 3, living
+           in this drill. Every route that reads as dollars now clears.
+       (5) §1.0-R2(h)/§1.0-R3(q) LOCATION CUES: none seeded. Every graded target here is a labeled
+           row, column or block that a selection outline expresses exactly (the two headings, the
+           two figure stacks, the total row, the two money columns) — there is no insert point and
+           no empty paste destination for a red cue to point at.
+       ENGINE: nothing new. center-across is the r177 `ca` field; the ☆ reads the r425 S.fmtOps
+       bold rect (mechanic used, not geometry inferred). The money columns ship HAND-NARROWED so
+       the #### is a property of the BOARD — under r432 a column with an explicit width never
+       auto-grows on a format op, which is what keeps the closing autofit beat real work. */
+    name:'Gauntlet', label:'Make it model-ready', par:47, parKeys:44, saveClose:true,   /* r433: capstone designation lives in drills.js (meta.capstone + chapters[1].capstone), the modeltour template. par re-swept ×5 seeds post-rework (median 44 keys, the engine-appended save included); par at the house ~1.07 s/key. Mirrored in HOTKEY_PARS; capstone clocks pass=par×2.0 in HOTKEY_CLOCKS. */
+    aha:'model-ready is a sequence you can run cold — inputs, totals, rules, numbers, widths.',
+    prompt:'The sources & uses came off the deal model raw and it goes in the committee book tonight: the two side headings sit in the corner of their blocks, the typed figures are bare black numbers, neither side is totalled, and both money columns are too narrow to read. Run the whole formatting pass over it, both sides, and hand back a page a VP can open. Everything the chapter taught, one artifact, no mouse.',
+    req(){ const o=this._o; return 'headings <em>'+o.hdrS+'</em> + <em>'+o.hdrU+'</em> → <em>ctrl+1</em> <em>a</em> · figures <em>'+o.inS+'</em> + <em>'+o.inU+'</em> → <em>alt h f c</em> blue · <em>ctrl+1</em> <em>n</em> commas · <em>alt+=</em> down each money column through its total · total row <em>'+o.totRng+'</em> → <em>ctrl+b</em> · <em>alt h b p</em> · <em>alt h a n</em> · <em>alt h o i</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords allowed */
+    guide(){ const o=this._o; return [
+      'the two side headings — <b>Sources</b> at '+o.LC+o.hr+' and <b>Uses</b> at '+o.UC+o.hr+': select each one across its own block ('+o.hdrS+', then '+o.hdrU+') · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>a</kbd> — centered ACROSS the columns, no merged cells anywhere (<kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>e</kbd> opens the same dialog)',
+      'the typed figures, both stacks ('+o.inS+' and '+o.inU+') · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 to Blue · <kbd>↵</kbd> — blue ink is how a desk marks a typed number; the line names stay black',
+      'the same two stacks · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>n</kbd> — comma, zero decimals, one move (<kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice reaches the same place)',
+      'select each money column from its first figure THROUGH the empty total cell — '+o.sumS+', then '+o.sumU+' · <kbd>alt</kbd>+<kbd>=</kbd> — AutoSum reads the block and commits the SUM',
+      'the totals take the weight and the line: '+o.totRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — <kbd>p</kbd> is the TOP edge, the one a total takes',
+      'both totals in dollars · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> — Accounting, the $ set off from the figure (<kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>c</kbd> and <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>$</kbd> read as dollars too)',
+      'the commas and the $ pushed both money columns past their own edge: select across them ('+o.fitRng+') · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> — autofit sets each column to its own content (<kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd> and a typed width lands there too)',
+      '☆ the discovery: both totals sit on the SAME row. Grab that row once — <kbd>⇧</kbd>+<kbd>space</kbd>, or select from one total across to the other — and the bold, the border and the dollars land on both sides in a single pass. Dressing side by side clears the drill too; it just costs you the keys',
     ]; },
-    targets(){ const R=this._R; return [R.srcIn, R.srcTot, R.srcTot, R.srcCol, R.srcTot, R.srcCol]; },
-    demo(){ const R=this._R; return [
-      {sel:R.srcIn,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
-      {sel:R.useIn,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
-      {sel:R.srcTot, keys:[Kb.eq, Kb.enter]},
-      {sel:R.useTot, keys:[Kb.eq, Kb.enter]},
-      {sel:R.srcTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('P')]},
-      {sel:R.useTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('P')]},
-      {sel:R.srcCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
-      {sel:R.useCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
-      {sel:R.srcTot, keys:[Kb.alt,L('H'),L('A'),L('N')]},
-      {sel:R.useTot, keys:[Kb.alt,L('H'),L('A'),L('N')]},
-      {sel:R.srcCol, keys:[Kb.alt,L('H'),L('O'),L('I')]},
-      {sel:R.useCol, keys:[Kb.alt,L('H'),L('O'),L('I')]},
-    ]; },
+    /* rings: ① both headings (one beat, two sites — the ring is the rectangle that holds both)
+       ② the two figure stacks · ③ the same · ④ the two total cells · ⑤/⑥ the total row
+       · ⑦ both money columns · ☆ never ringed (r423 §2 mystery slot) */
+    targets(){ const o=this._o; return [o.hdrAll, o.inAll, o.inAll, o.totRng, o.totRng, o.totRng, o.fitRng, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.hdrS, keys:[{key:'1',ctrl:true},L('A')]},
+      {sel:o.hdrU, keys:[{key:'1',ctrl:true},L('A')]},
+      {sel:o.inS,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+      {sel:o.inU,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+      /* §1.0(a) format-as-you-go: the number format rides straight behind the ink, on the same
+         two stacks — Ctrl+1 → N is comma with no decimals in one move (the route combo teaches) */
+      {sel:o.inS,  keys:[{key:'1',ctrl:true},L('N')]},
+      {sel:o.inU,  keys:[{key:'1',ctrl:true},L('N')]},
+      /* AutoSum's RANGE form: the selection runs through the empty total cell, so Alt+= commits
+         the SUM without an editor round-trip */
+      {sel:o.sumS, keys:[Kb.eq]},
+      {sel:o.sumU, keys:[Kb.eq]},
+      /* the ☆ rides here (§2.2 — the demo performs the bonus): ONE selection across the total
+         row takes the weight, the top border and the dollars to both sides at once */
+      {sel:o.totRng, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P'), Kb.alt,L('H'),L('A'),L('N')]},
+      {sel:o.fitRng, keys:[Kb.alt,L('H'),L('O'),L('I')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
-      /* r155 DENSITY: was a 2\u00d75 strip \u2014 now a real two-sided S&U; every op runs
-         on both blocks (multi-site per the doctrine), labels shuffle per run. */
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Sources & uses (format it before it ships)',txt:true,bold:true};
-      const r0=3+rnd(0,1);
-      const srcLbl=['Senior debt','Mezzanine','Sponsor equity','Rollover'];
-      const useLbl=['Purchase equity','Refi existing debt','Fees & OID','Min. cash to BS'];
-      for(let a=srcLbl.length-1;a>0;a--){ const j=rnd(0,a); [srcLbl[a],srcLbl[j]]=[srcLbl[j],srcLbl[a]]; }
-      for(let a=useLbl.length-1;a>0;a--){ const j=rnd(0,a); [useLbl[a],useLbl[j]]=[useLbl[j],useLbl[a]]; }
-      cells['A'+r0]={...blankCell(),value:'Sources',txt:true,bold:true};
-      cells['D'+r0]={...blankCell(),value:'Uses',txt:true,bold:true};
-      for(let i=0;i<4;i++){ const r=r0+1+i;
-        cells['A'+r]={...blankCell(),value:srcLbl[i],txt:true};
-        cells['B'+r]={...blankCell(),value:rnd(40,260)*1000000};
-        cells['D'+r]={...blankCell(),value:useLbl[i],txt:true};
-        cells['E'+r]={...blankCell(),value:rnd(40,260)*1000000};
+      /* ---- §1.2 randomization, four independent axes ----
+         (a) SITE: the whole table slides a column right and a row down per seed (corner jitter);
+         (b) CONTENT: both label lists are sampled from deeper pools, seniority order preserved;
+         (c) VALUES: every figure through rnd(), and the USES side is built to the sources total
+             so the two sides balance the way a real sources & uses does — the two finished
+             totals print the same figure, which is the page's own prove-out;
+         (d) WHICH SIDE SQUEEZES HARDER: each money column draws its own too-narrow width.
+         Both sides always carry the SAME number of lines: the two totals share a row, and that
+         shared row is what the ☆ is about. */
+      const c0=rnd(1,2);                         // sources label column — A or B
+      const hr=rnd(3,4);                         // the Sources / Uses heading row
+      const n=rnd(4,5);                          // lines per side
+      const LC=colLetter(c0), MC=colLetter(c0+1), UC=colLetter(c0+3), NC=colLetter(c0+4);
+      const r1=hr+1, rn=hr+n, rt=rn+1;
+      const SRC=['Senior debt','Term loan B','Mezzanine','Sponsor equity','Rollover equity','Seller note','Revolver draw'];
+      const USE=['Purchase equity','Refinance debt','Transaction fees','Financing fees','Minimum cash'];
+      /* sample n labels but KEEP pool order — the pools run senior to junior, and a sources
+         table that lists equity above senior debt reads wrong to anyone who has seen one */
+      const sample=(pool,k)=>{ const idx=pool.map((_,i)=>i);
+        for(let i=idx.length-1;i>0;i--){ const j=rnd(0,i); [idx[i],idx[j]]=[idx[j],idx[i]]; }
+        return idx.slice(0,k).sort((a,b)=>a-b).map(i=>pool[i]); };
+      const srcLbl=sample(SRC,n), useLbl=sample(USE,n);
+      // sources: n figures ($mm), largest first — the capital structure reads top-down
+      const src=[]; for(let i=0;i<n;i++) src.push(rnd(40,260));
+      src.sort((a,b)=>b-a);
+      const T=src.reduce((a,b)=>a+b,0);
+      // uses: the same money, spent — the last line is the plug, so the two sides always balance
+      const SHARE=(n===4)?[[40,44],[22,26],[13,17]]:[[36,40],[20,24],[13,17],[9,12]];
+      const use=[]; let rest=T;
+      for(let i=0;i<n-1;i++){ const v=Math.round(T*rnd(SHARE[i][0],SHARE[i][1])/100); use.push(v); rest-=v; }
+      use.push(rest);
+      cells['A1']={...blankCell(),value:codename()+' — sources & uses ($)',txt:true,bold:true};
+      /* the headings ship LEFT in the corner of their blocks — beat 1 centers them across.
+         They arrive BOLD: weight is not this drill's lesson at the heading (§2.1b). */
+      cells[LC+hr]={...blankCell(),value:'Sources',txt:true,bold:true};
+      cells[UC+hr]={...blankCell(),value:'Uses',txt:true,bold:true};
+      for(let i=0;i<n;i++){ const r=r1+i;
+        cells[LC+r]={...blankCell(),value:srcLbl[i],txt:true};
+        cells[UC+r]={...blankCell(),value:useLbl[i],txt:true};
+        /* raw off the model: General format, black ink, no width — the whole board is the
+           problem statement (formatting IS the lesson here, so it ships undressed) */
+        cells[MC+r]={...blankCell(),value:src[i]*1000000};
+        cells[NC+r]={...blankCell(),value:use[i]*1000000};
       }
-      cells['A'+(r0+5)]={...blankCell(),value:'Total sources',txt:true};
-      cells['D'+(r0+5)]={...blankCell(),value:'Total uses',txt:true};
-      this._R={ srcIn:'B'+(r0+1)+':B'+(r0+4), useIn:'E'+(r0+1)+':E'+(r0+4),
-        srcTot:'B'+(r0+5), useTot:'E'+(r0+5),
-        srcCol:'B'+(r0+1)+':B'+(r0+5), useCol:'E'+(r0+1)+':E'+(r0+5), r0 };
-      return {ROWS:Math.max(10,r0+6), cells, active:{r:r0+1,c:2}, sel:null, colW:{1:118,4:128}};
+      cells[LC+rt]={...blankCell(),value:'Total sources',txt:true};
+      cells[UC+rt]={...blankCell(),value:'Total uses',txt:true};
+      /* §1.3 density + a real desk artifact: the page names where it came from, and the memo
+         states the balance the finished totals prove. Neither is ever a graded target — the
+         checks read the table only, so deleting either one cannot move any ok. */
+      cells[LC+(rt+2)]={...blankCell(),value:'Memo: the two sides balance — both totals land on the same figure',txt:true,it:true,fontColor:'gray'};
+      cells[LC+(rt+3)]={...blankCell(),value:'Source: deal model — draft, pre-committee',txt:true,it:true,fontColor:'gray'};
+      /* HAND-NARROWED money columns (see the ENGINE note at the top): the squeeze is a property
+         of the board, and under r432 an explicitly-sized column never auto-grows when a format
+         lands — so the commas and the $ push these past their edge and STAY there until the
+         player autofits. The label columns are sized to read (they are never graded). */
+      const W=[76,80,84];
+      const cw={}; cw[c0]=136; cw[c0+1]=W[rnd(0,2)]; cw[c0+3]=136; cw[c0+4]=W[rnd(0,2)];
+      this._o={ c0, hr, n, r1, rn, rt, LC, MC, UC, NC, mc:c0+1, nc:c0+4,
+        hdrS:LC+hr+':'+MC+hr, hdrU:UC+hr+':'+NC+hr, hdrAll:LC+hr+':'+NC+hr,
+        inS:MC+r1+':'+MC+rn, inU:NC+r1+':'+NC+rn, inAll:MC+r1+':'+NC+rn,
+        sumS:MC+r1+':'+MC+rt, sumU:NC+r1+':'+NC+rt,
+        totRng:MC+rt+':'+NC+rt, fitRng:MC+r1+':'+NC+rt, total:T*1000000 };
+      return {ROWS:Math.max(14,rt+4), cells, active:{r:hr,c:c0}, sel:null, colW:cw};
     },
     checks(S){
-      const R=this._R, r0=R.r0;
-      let fill=true;
-      for(let i=1;i<=4;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
-        if(!c||c.fontColor!=='blue') fill=false; } }
-      const tS=S.cells['B'+(r0+5)], tU=S.cells['E'+(r0+5)];
-      const sum=!!(tS&&tS.formula&&/^=SUM\(/i.test(tS.formula)) && !!(tU&&tU.formula&&/^=SUM\(/i.test(tU.formula));
-      const tot=!!(tS&&tS.bold&&tS.bt) && !!(tU&&tU.bold&&tU.bt);
-      let cf=true;
-      for(let i=1;i<=4;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
-        if(!c||c.fmtStyle!=='comma'||c.decimals!==0) cf=false; } }
-      const acct=!!(tS&&tS.fmtStyle==='acct')&&!!(tU&&tU.fmtStyle==='acct');
-      const af=!overflowsCol(S,2)&&!overflowsCol(S,5);
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      const fig=[], lbl=[];
+      for(let r=o.r1;r<=o.rn;r++){ fig.push(o.MC+r, o.NC+r); lbl.push(o.LC+r, o.UC+r); }
+      const tS=cel(o.MC+o.rt), tU=cel(o.NC+o.rt);
+      /* §1.0(c) FREEDOM + the §1.0-R3(p) end-state law: every core ok below reads what the PAGE
+         LOOKS LIKE at the win — any selection shape, any chord / ribbon / dialog route, any
+         order. Where Excel offers two routes to the same appearance, both clear. */
+      /* center-across (r177 `ca`): the anchor stores the span it centers over, so a span of 2+
+         is the heading sitting over its own block. There are no merged cells in the engine to
+         ban — the ban is the lesson, not a predicate. */
+      const caOk=(cel(o.LC+o.hr).ca|0)>=2 && (cel(o.UC+o.hr).ca|0)>=2;
+      /* the guard rides in the ok of the beat it protects (§1.1): blue marks a TYPED NUMBER, so
+         a lazy pass that paints the line names blue too has not done the beat */
+      const blueOk=fig.every(k=>cel(k).fontColor==='blue') && lbl.every(k=>cel(k).fontColor!=='blue');
+      const commaOk=fig.every(k=>{ const x=cel(k); return x.fmtStyle==='comma' && (x.decimals|0)===0; });
+      /* "Total" is the closed verb for landing a LIVE sum (§1.7): the cell must compute, not be
+         a typed figure — but any formula that gets there counts (=SUM(), an addition chain, the
+         AutoSum proposal), so no route is privileged */
+      const live=(c,want)=>!!(c.formula && String(c.formula).charAt(0)==='=' && Math.round(Number(c.value)||0)===want);
+      const sumOk=live(tS,o.total) && live(tU,o.total);
+      /* the rule above a total, by every route that draws that edge: Alt H B P (top), Alt H B D
+         (top & bottom), the Cell Styles "Total" swatch (bold + both edges) — and a 1×1 outside
+         border, which the engine stores as `ball` rather than bt (index.html ~13302). A player
+         who boxes the total cell HAS a line above it; §1.0-R3(p) says the beat clears. */
+      const ruled=c=>!!(c.bt||c.ball);
+      const dressOk=!!(tS.bold&&ruled(tS)) && !!(tU.bold&&ruled(tU));
+      /* §1.0-R3(p), the bug this drill shipped: Alt H A N writes 'acct', Ctrl+Shift+$ and
+         Ctrl+1 C write 'currency'. All three put dollars on the page, so all three clear. */
+      const DOLLAR=['acct','currency'];
+      const dollarOk=DOLLAR.includes(tS.fmtStyle) && DOLLAR.includes(tU.fmtStyle);
+      /* the width beat grades the ENGINE widths (S._colW), not the rendered ones — the display
+         pass stretches columns to fill the frame, and a viewport-dependent #### is not a
+         gradeable end state. Autofit lands exactly at the content width; a typed width
+         (Alt H O W) that clears the content lands there too. */
+      const w=S._colW||{};
+      const cols=[o.mc,o.nc];
+      const fitOk=cols.every(c=>(w[c]||0)>=neededWidth(c)-1) && cols.every(c=>!overflowsCol(S,c));
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision · the whole-row selection
+         discipline §1.0(d) names by hand): the two totals share a row, so ONE dress pass across
+         that row lands both sides. Read off the r425 S.fmtOps bold latch (Ctrl+B and Alt H 1
+         both route through toggleAllOrNone, so no chord is privileged): one bold-ON op whose
+         rect spans from the sources money column to the uses money column at the total row.
+         Dressing the two totals separately clears every core beat and simply never writes that
+         rect — the star stays skippable and can never block the win (§2.2). */
+      const onePass=(S.fmtOps||[]).some(f=>f.prop==='bold' && f.on &&
+        f.r1<=o.rt && f.r2>=o.rt && f.c1<=o.mc && f.c2>=o.nc);
       return [
-        {label:'paint the inputs on BOTH stacks blue', ok:fill},
-        {label:'SUM both totals \u2014 one per side', ok:sum},
-        {label:'bold both total rows and add a top border above them', ok:tot},
-        {label:'comma-format both money BODIES, 0 decimals', ok:cf},
-        {label:'cast both totals in accounting format \u2014 the S&U convention', ok:acct},
-        {label:'autofit both sides \u2014 no #### left anywhere', ok:af},
+        {label:'Center each side heading across its own block — never merge', ok: caOk},
+        {label:'Color the typed inputs blue — both sides of the table', ok: blueOk},
+        {label:'Comma-format both money columns — zero decimals', ok: commaOk},
+        {label:'Total both columns — a live SUM under Sources and another under Uses', ok: sumOk},
+        {label:'Bold both totals and add a top border above each', ok: dressOk},
+        {label:'Dollar-format both totals — the sources & uses convention', ok: dollarOk},
+        {label:'Autofit both money columns — no #### left on either side', ok: fitOk},
+        {label:'Dress both totals in one pass — one selection across the total row', ok: dressOk && onePass, bonus:true},
       ];
     }
   },

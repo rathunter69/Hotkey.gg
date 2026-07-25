@@ -6555,3 +6555,63 @@ post-r112/r115/r116; ONE real gap found and fixed this round.
   parity clean · static invariants clean (C9 ruleaudit tri-length 6 + one ☆ + saveClose declared;
   C10 errorCount contract). Screenshots on file (fresh/mid/win; win passes the sendable-page
   read — ruled schedule, boxed positive headline, meter 4/4).
+
+## r433 — H6b-5: gauntlet ★ THE FORMATTING CAPSTONE (DEPTH_PASS §4.20 + §2.4 + §1.0/-R2/-R3)
+_Built last in the chapter (§2.4: a capstone builds after its chapter so it can chain the
+reworked boards) — typeset · decimals · center · autofit · ruleoff · ruleaudit · combo ·
+housestyle all shipped first, and this is where they run as one pass over one artifact._
+- **THE ARTIFACT:** a two-sided sources & uses straight off the deal model — headings parked in
+  the corner of their blocks, figures bare and black, neither side totalled, both money columns
+  hand-narrowed so the page loads on ####. Both sides always carry the same number of lines, so
+  the two totals SHARE A ROW: that shared row is the drill's structural fact and the ☆.
+- **BEATS (7 core + ☆ + the engine-appended Ctrl+S closer; tri-length 8, +1 at runtime):** Center
+  each side heading across its own block — never merge → Color the typed inputs blue — both sides
+  → Comma-format both money columns — zero decimals → Total both columns — a live SUM under
+  Sources and another under Uses → Bold both totals and add a top border above each →
+  Dollar-format both totals — the sources & uses convention → Autofit both money columns — no ####
+  left on either side. §1.0(a) holds throughout: every dress beat sits directly behind the beat
+  that made or touched what it dresses, and the width beat closes because it is the consequence of
+  the number formats.
+- **DEVIATIONS from the §4.20 page (all declared in the drill chunk):** (1) the page's ☆ (center
+  the side headings) is a FORMATTING task — dead under §1.0(d) — and is not skippable, so it is
+  PROMOTED to core beat 1 (center's r429 precedent); (2) SEVEN cores against the §1.1 band of 4–6,
+  recorded as a capstone deviation (blocksel r427 precedent) — the chapter's six op families plus
+  the heading beat; (3) the page's "Finish at A1" closer is dropped — §1.6 reserves it for BUILD
+  drills and the autofit is the dress that closes better here; (4) no §1.0-R3(q) location cue is
+  seeded: every graded target is a labeled row/column/block a selection outline expresses exactly.
+- **☆ RECIPE (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision — the whole-row selection
+  discipline §1.0(d) names by hand):** the two totals sit on the SAME ROW, so ONE selection across
+  that row lands the bold, the top border and the dollars on both sides at once. Graded off the
+  r425 S.fmtOps bold latch (Ctrl+B and Alt H 1 both route through toggleAllOrNone — no chord is
+  privileged). Negative control measured: the drill's own taught rhythm (finish a side, then the
+  other) clears all seven cores at 71 keys with the ☆ dark; the one-pass route wins in 44.
+- **§1.0-R3(p) BUG FIXED IN PLACE — this drill was carrying one.** The old beat 5 demanded
+  `fmtStyle==='acct'`, which ONLY Alt H A N produces: a player who dollar-formatted both totals
+  with Ctrl+Shift+$ or Ctrl+1 C saw dollars on the page and a beat that stayed dark with nothing
+  to fix. Now every route that reads as dollars clears ('acct' or 'currency', any decimals). Same
+  sweep on the rule beat: a 1×1 outside border stores `ball`, not `bt` (index.html ~13302), so a
+  boxed total — which HAS a line above it — clears too.
+- **ENGINE: nothing new.** center-across is the r177 `ca` field; the money columns ship with
+  explicit widths because under r432 an explicitly-sized column never auto-grows on a format op —
+  that is what keeps the closing autofit real work rather than a beat the comma pass completes for
+  free (the same interaction combo's r428 build recorded). The shared width engine
+  (neededWidth/overflowsCol/the render #### test) was READ, not touched.
+- **RANDOMIZATION (4 axes):** corner jitter (the table slides a column right and a row down) ·
+  label pools sampled 4-or-5-of-7 and 4-or-5-of-5 with seniority order preserved · every figure
+  through rnd(), with the USES side built to the sources total so the two sides balance and the
+  finished totals print the same figure (the page's own prove-out, stated in a board memo that is
+  never a graded target) · each money column draws its own too-narrow width.
+- **PLUMBING:** drills.js meta.gauntlet gains `capstone:true` + a rewritten chord-free desc;
+  `HOTKEY_CAMPAIGN.chapters[1].capstone:'gauntlet'` (D8 designation); `HOTKEY_CLOCKS.gauntlet=
+  {pass:94}` (par×2.0, §2.4); HOTKEY_PARS 63→47; C9/C12 REWORKED gains gauntlet; both
+  e2e-alt-paths entries rebuilt (chord-ROUTE: Alt H O E → A, the Cell Styles gallery for blue,
+  Ctrl+Shift+! + decimal walks, typed SUMs, Alt H B D, Ctrl+Shift+$ — ☆ forfeited · op-ORDER:
+  totals first, the whole total row dressed in one pass, headings centered LAST).
+- **PAR:** sweep median 44 keys ×5 seeds (save included, geometry-invariant); parKeys 66→44, par
+  63→47s (~1.07 s/key), mirrored in HOTKEY_PARS. The capstone is still the chapter's longest drill
+  (housestyle 44s, autofit 36s, ruleoff 31s).
+- GATE (all green, own port 8811): static invariants clean (C9 gauntlet tri-length 8 + one ☆ +
+  saveClose; C12 ≥2 alts) · demo-replay ALL GREEN · alt-paths ALL 90 PASS · par-sweep FLAGGED 0
+  (drift 0%) · fit-sweep ALL CLEAN (gauntlet stays on the exempt list — it loads on #### by
+  design) · depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · guided gate
+  gauntlet railed/contained/solvable.

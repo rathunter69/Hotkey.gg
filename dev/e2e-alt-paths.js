@@ -872,20 +872,47 @@ const ALTS = [
       {sel:o.title, keys:[{key:'b',ctrl:true}]},
       {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
-  { key: 'gauntlet', name: 'uses side FIRST, typed SUMs (no alt+=), alt h 1 bold, ctrl+shift+! commas', moves: `C => { const R=C._R, r0=R.r0; return [
-      {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:R.srcIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:R.useTot, keys:[...T('=SUM(E'+(r0+1)+':E'+(r0+4)+')'),{key:'Enter'}]},
-      {sel:R.srcTot, keys:[...T('=SUM(B'+(r0+1)+':B'+(r0+4)+')'),{key:'Enter'}]},
-      {sel:R.useTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:R.srcTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:R.useCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:R.srcCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:R.useTot, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
-      {sel:R.srcTot, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
-      {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-      {sel:R.srcCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-    ]; }` },
+  /* r433 (gauntlet ★ CAPSTONE c2, DEPTH_PASS §4.20): both entries rebuilt for the reworked
+     two-sided board. ALT 1 = chord-ROUTE alt — a different door to every single beat (Format
+     Cells by the ribbon, blue by the Cell Styles gallery, commas by chord + decimal walks,
+     typed SUMs, ribbon bold, the top edge as part of a top-AND-bottom pair, dollars by
+     Ctrl+Shift+$ which writes 'currency' where Alt H A N writes 'acct' — the §1.0-R3(p) proof
+     that both read as dollars — and the widths autofitted one column at a time). Dressing the
+     two totals separately forfeits the ☆; all seven cores clear (§1.0(c)).
+     ALT 2 = op-ORDER alt: the ritual run BACKWARDS — totals first, the whole total row dressed
+     in one pass (the ☆ still lands), then the numbers, then the ink, headings centered LAST.
+     Autofit stays last in both: it is the only beat whose end state depends on every other. */
+  { key: 'gauntlet', name: 'chord-ROUTE: Format Cells by the ribbon door (alt h o e → a), blue via the Cell Styles gallery, ctrl+shift+! + decimal walks, typed SUMs, alt h 1 bold, top-and-bottom rule (alt h b d), dollars via ctrl+shift+$ (currency, not acct) — ☆ forfeited', moves: `C => { const o=C._o;
+      const STYLE_INPUT=[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}];   // gallery: Normal → Input (blue ink)
+      return [
+        {sel:o.hdrS,  keys:[{key:'Alt'},L('h'),L('o'),L('e'),L('a')]},
+        {sel:o.hdrU,  keys:[{key:'Alt'},L('h'),L('o'),L('e'),L('a')]},
+        {sel:o.inU,   keys:STYLE_INPUT.slice()},
+        {sel:o.inS,   keys:STYLE_INPUT.slice()},
+        {sel:o.inU,   keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:o.inS,   keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:o.NC+o.rt, keys:[...T('=SUM('+o.NC+o.r1+':'+o.NC+o.rn+')'),{key:'Enter'}]},
+        {sel:o.MC+o.rt, keys:[...T('=SUM('+o.MC+o.r1+':'+o.MC+o.rn+')'),{key:'Enter'}]},
+        {sel:o.NC+o.rt, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d'),{key:'$',ctrl:true,shift:true}]},
+        {sel:o.MC+o.rt, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d'),{key:'$',ctrl:true,shift:true}]},
+        {sel:o.NC+o.r1+':'+o.NC+o.rt, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+        {sel:o.MC+o.r1+':'+o.MC+o.rt, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+      ]; }` },
+  { key: 'gauntlet', name: 'op-ORDER reversed: totals FIRST, the whole total row dressed in one pass (☆ lands), alt h k + decimal walks, blue after the numbers, headings centered LAST, autofit closes', moves: `C => { const o=C._o;
+      const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
+      return [
+        {sel:o.sumS,  keys:[{key:'=',alt:true,code:'Equal'}]},
+        {sel:o.sumU,  keys:[{key:'=',alt:true,code:'Equal'}]},
+        /* one selection across the total row — bold, top border and dollars land on both sides */
+        {sel:o.totRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p'),{key:'Alt'},L('h'),L('a'),L('n')]},
+        {sel:o.inS,   keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:o.inU,   keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:o.inS,   keys:BLUE.slice()},
+        {sel:o.inU,   keys:BLUE.slice()},
+        {sel:o.hdrU,  keys:[{key:'1',ctrl:true},L('a')]},
+        {sel:o.hdrS,  keys:[{key:'1',ctrl:true},L('a')]},
+        {sel:o.fitRng, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+      ]; }` },
   { key: 'housestyle', name: 'slow-route pass — buried input by eye (no F5, no ☆), ctrl+shift+!/% + decimal walks, typed column width, ribbon bold, masthead LAST', moves: `C => { const R=C._R;
       const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
       return [

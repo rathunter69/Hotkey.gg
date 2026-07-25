@@ -85,7 +85,11 @@ window.HOTKEY_DRILLS = {
     triage:     { name:'Error triage', label:'Error triage \u2014 #REF! #DIV/0! #VALUE!', tab:'Triage', desc:'Three classic breaks \u2014 read the error, rebuild the intent' },
     versionup:  { name:'Roll-forward prep', label:'Replace hardcodes so it rolls forward', tab:'Rollfwd', desc:'Typed answers \u2192 live formulas; v2 must survive new numbers' },
     center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Center, left, right — and a long title centered across the table, never merged' },   /* r429: depth-pass rework — the picker names the outcomes the drill now grades (no chord tokens, C5; length keeps the generated meta description inside the 158-char cut) */
-    gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Model',       desc:'A full model-ready formatting pass' },
+    /* r433 H6b-5 (DEPTH_PASS §2.4/§3 D8): gauntlet DESIGNATED the Formatting capstone —
+       capstone:true drives the picker's ★ CAPSTONE tag + full-color group ring; the gate itself
+       reads HOTKEY_CAMPAIGN.chapters[1].capstone below. desc names the outcomes the reworked
+       drill grades (no chord tokens, C5). */
+    gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Model',       capstone:true, desc:'The Formatting capstone — a raw sources & uses taken to book standard: blue inputs, live totals, ruled and dollared, columns that fit. One clean run opens the next track leg' },
 
     // Values-hygiene pair — both live in Data & Lookups now
     drill:      { name:'Hardcode', label:'Hardcode it',         tab:'Hardcode',    desc:'Break the links before it ships — paste values in place, painted blue' },
@@ -236,7 +240,7 @@ window.HOTKEY_CAMPAIGN = {
      first; the other seven designate as their chapter's capstone build lands. */
   chapters: [
     { id:'c1', name:'Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'], capstone:'modeltour' },
-    { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','combo','gauntlet'] },
+    { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','combo','gauntlet'], capstone:'gauntlet' },   /* r433 (D8): the Formatting capstone designates with its depth-pass build; `dress` retired r432 into housestyle, `combo` takes its chapter slot */
     { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
@@ -326,9 +330,10 @@ window.HOTKEY_CLOCKS = {
      gate itself has no clock at all). pro/leg stay derived (par×1.15 / par×1.0). Keep pass in
      lockstep with HOTKEY_PARS.modeltour: pass = par × 2. */
   modeltour: { pass: 70 },
+  gauntlet:  { pass: 94 },   /* r433: the Formatting capstone — par 47 × 2 (§4.20 "Clocks: capstone pass=par×2.0") */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":63,"margin":40,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":22,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":22,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
