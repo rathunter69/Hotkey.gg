@@ -453,14 +453,22 @@
   /* r292 (Wolf): accounting borders are REAL borders now, not box-shadow insets sitting
      next to the faint gridline (that doubled-line look). border-collapse merges each
      shared edge into a single rule. Coloured brighter than the gridline so they win. */
-  td.bt{border-top:1px solid var(--rule,var(--text))}
-  td.bb{border-bottom:1px solid var(--rule,var(--text))}
-  td.bdbl{border-bottom:3px double var(--rule,var(--text))}   /* r298: Alt H B B — the double rule under a grand total */
+  /* r426 (Wolf P0, round-2 playtest: "borders are not showing on the grid"): the r413
+     `#grid td{border-color:...}` gridline-softening rule is an ID selector (1,0,1) and so
+     BEAT these class rules (0,1,1) on border-COLOR — every applied border was repainted in
+     the faint gridline colour, i.e. invisible. The old comment claiming "applied borders set
+     their own per-edge colors, so they still win" was wrong: the shorthand sets the colour,
+     then the higher-specificity rule overrides it. Fixed by scoping the applied-border rules
+     under #grid so they outrank the softener (and keeping bare `td.*` copies for any cell
+     rendered outside #grid, e.g. preview harnesses). */
+  td.bt,#grid td.bt{border-top:1px solid var(--rule,var(--text))}
+  td.bb,#grid td.bb{border-bottom:1px solid var(--rule,var(--text))}
+  td.bdbl,#grid td.bdbl{border-bottom:3px double var(--rule,var(--text))}   /* r298: Alt H B B — the double rule under a grand total */
   td.it{font-style:italic}
   td.strike{text-decoration:line-through; opacity:.75}
   td.uline{text-decoration:underline; text-underline-offset:2px}
   td.uline.strike{text-decoration:underline line-through}
-  td.ball{border:1px solid var(--rule,var(--text))}
+  td.ball,#grid td.ball{border:1px solid var(--rule,var(--text))}
 
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
      faint at rest, lit in Alt-mode. Mirrors Excel instead of popping a banner. */
