@@ -1798,9 +1798,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=287"></script>
+<script src="drills.js?v=288"></script>
 
-<script src="drills.js?v=287"></script>
+<script src="drills.js?v=288"></script>
 
 
 
@@ -2165,71 +2165,157 @@ const CHALLENGES = {
   },
 
   combo:{
-    name:'Combo', label:'Clean the paste', par:24, parKeys:22,
+    /* r428 H6b-2 (DEPTH_PASS §4.17, built to the §1.0 + §1.0-R2 laws): the depth-pass rework
+       of the cleanup pass.
+       WHAT THE DRILL IS, and how it stays distinct from `pastes`: pastes teaches the CLIPBOARD
+       as an operator (transpose · values · formats · multiply/divide) — every beat there is a
+       Paste Special route. combo never touches the clipboard: the paste ALREADY happened and
+       landed raw, and the lesson is the dress family run over a BLOCK — weight, alignment,
+       number format, font colour, wrap, width — plus the one thing only this drill teaches,
+       that the COMMAS are what make the column too narrow (#### is a width problem, not a
+       number problem). No paste, no copy, no clipboard op anywhere in the solve.
+       Structural deviations from the §4.17 page, declared per §0:
+       (1) the page's ☆ ("Color the pasted inputs blue — the paste arrived black") is a
+           FORMATTING task, which §1.0(d) kills catalog-wide. The blue pass is PROMOTED to a
+           core beat (blue = hardcode is the house convention and belongs in the graded pass),
+           and the ☆ is re-cut as a hidden EFFICIENCY discovery per §1.0(d)/§1.0-R2(i):
+           zero-decimal commas in ONE move through the Format Cells dialog (Ctrl+1 → N, or
+           Alt H O E → N) instead of Alt H K plus two decimal walks — seven keystrokes saved.
+           It passes the (i) test: the taught ribbon route clears the core comma beat and
+           forfeits the star, so the ☆ is a decision, never a by-product (ALT 1 in
+           dev/e2e-alt-paths.js is exactly that run);
+       (2) 6 core beats where the page implies 4 — the blue promotion above, plus the §1.0(a)
+           split that keeps each dress beat next to what it dresses. Inside §1.1's 4–6 band;
+       (3) the figure columns ship HAND-NARROWED in build() (colW) instead of riding the
+           default width, so the #### squeeze is a property of the BOARD, not of the viewport:
+           measured on the r427 board, 822px of grid stretched every column to 82px and the
+           sheet loaded with NO #### at all — the closing autofit beat passed at load, a
+           hollow beat. The widths now also sum past the elastic-fit budget, so the stretch
+           pass cannot quietly widen them back.
+       GRADING (§1.0(c) FREEDOM + the end-state law): every beat grades the END STATE and takes
+       any Excel route to it. Commas by Alt H K + decimal walks, by Ctrl+Shift+!, by the
+       Ctrl+1 dialog, or by typing "12,300,000" straight in; blue by either colour route; the
+       width by autofit (Alt H O I) or by a typed width (Alt H O W) — the check asks only that
+       the column ends at least as wide as what it holds. Only the ☆ reads how it was done, off
+       the r425/r428 S.fmtOps latch. */
+    name:'Combo', label:'Clean the paste', par:27, parKeys:25, saveClose:true,   /* r428: par re-swept ×5 seeds post-rework (median 25 keys, the engine-appended save included), par at the house ~1.08 s/key */
     aha:'Select the whole range, format once — Alt H chords work a block, not a cell.',
-    prompt:'Format a raw pasted comp sheet end to end: bold the title, capitalize and center the headers, format the figures, rein in the notes column that overruns its neighbors, and widen the columns showing ####. Which metrics appear, and where the block sits, changes every run.',
-    req(){ const o=this._o; return '<em>'+o.title+'</em> + headers <em>'+o.hdr+'</em> → <em>ctrl+b</em> · metric headers <em>'+o.mh+'</em> → <em>alt h a r</em> · figures <em>'+o.num+'</em> → <em>alt h k</em> + <em>alt h 9</em> ×2 · notes <em>'+o.notes+'</em> → <em>alt h w</em> · then <em>alt h o i</em> — no #### ships'; },
+    prompt:'The comp sheet came back from the data room and someone pasted it straight onto the page. The title and headers carry no weight, the metric headers hug the wrong side of their columns, the figures are bare black numbers, the notes run clear across the page, and the columns the paste landed in are too narrow for what is in them. Clean it to the house look before it goes in the book — and watch what the commas do to a narrow column.',
+    req(){ const o=this._o; return 'title + header row <em>'+o.hdr+'</em> → <em>ctrl+b</em> · metric headers <em>'+o.mh+'</em> → <em>alt h a r</em> · figures <em>'+o.num+'</em> → <em>alt h k</em> + <em>alt h 9</em> ×2 (or <em>ctrl+1</em> <em>n</em> in one move) · <em>alt h f c</em> → Blue · notes <em>'+o.notes+'</em> → <em>alt h w</em> · <em>alt h o i</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check */
     guide(){ const o=this._o; return [
-      'weight first: '+o.title+' · <kbd>ctrl</kbd>+<kbd>b</kbd> · then the header row '+o.hdr+' · <kbd>ctrl</kbd>+<kbd>b</kbd>',
-      'numbers read right-aligned — headers over them too: '+o.mh+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
-      'figures to commas: '+o.num+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
-      'the notes column wraps instead of spilling: '+o.notes+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd>',
-      'last pass, always: select the number columns · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd>',
+      'weight first: the title cell · <kbd>ctrl</kbd>+<kbd>b</kbd> · then select across the header row '+o.hdr+' · <kbd>ctrl</kbd>+<kbd>b</kbd> again (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the ribbon route to the same bold)',
+      'text lands left, numbers land right — the headers sitting over numbers follow the numbers: select '+o.mh+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
+      'grab the whole figures block '+o.num+' in one selection · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> lays commas with TWO decimals, then <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice walks them off (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>!</kbd> is the chord for the same thing)',
+      'keep the block selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 to Blue · <kbd>↵</kbd> — blue ink is how a desk marks a hardcoded number',
+      'the '+o.noteHdr+' column · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd> — wrapped text stays inside its own column',
+      'the commas you just laid are what pushed the figures past the column edge: select the figure columns '+o.num+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> fits each one to its content (<kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd> and a typed width works too)',
+      '☆ the discovery: <kbd>ctrl</kbd>+<kbd>1</kbd> opens Format Cells — <kbd>n</kbd> is comma with NO decimals, so the whole number format lands in one move. <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> plus two decimal walks reaches the same place; it just costs you seven more keys',
     ]; },
-    targets(){ const o=this._o; return [o.title,o.mh,o.num,o.notes,o.num]; },
+    targets(){ const o=this._o; return ['A1:'+o.lastL+o.hr, o.mh, o.num, o.num, o.notes, o.num, null]; },   /* the mystery ☆ is never ringed (§2.2) */
     demo(){ const o=this._o; return [
-      {sel:o.title, keys:[Kb.bold]},
+      {sel:'A1',    keys:[Kb.bold]},
       {sel:o.hdr,   keys:[Kb.bold]},
       {sel:o.mh,    keys:[Kb.alt,L('H'),L('A'),L('R')]},
-      {sel:o.num,   keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      /* the ☆ rides here (§2.2 — the demo performs it): Ctrl+1 → N is comma, zero decimals,
+         one move. The Alt H K + two Alt H 9 route clears the same beat, star forfeited. */
+      {sel:o.num,   keys:[{key:'1',ctrl:true},L('N')]},
+      /* §1.0(a) format-as-you-go: the blue ink rides straight behind the number format, on the
+         same selection — the figures are hardcodes and never stop being hardcodes */
+      {sel:o.num,   keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
       {sel:o.notes, keys:[Kb.alt,L('H'),L('W')]},
       {sel:o.num,   keys:[Kb.alt,L('H'),L('O'),L('I')]},
-    ]; },
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const METRICS=[['Revenue',800,9800],['EBITDA',120,2400],['Net debt',200,5600],['EV',900,12000],['FCF',80,1900]];
-      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
-      const mets=pick(METRICS, rnd(2,3));
-      const NAMES=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox','Foxglove','Granite Pk'];
-      const NOTES=['flagged for review by deal team','pending QoE adjustments','clean — comp set anchor','stub period, annualize','carve-out, normalize','mgmt case only — haircut it','pre-synergy figures'];
-      const nrows=rnd(4,6);
-      const names=pick(NAMES,nrows), notes=pick(NOTES,nrows);
-      const hr=rnd(2,3);                                       // header row: right under the title, or one blank spacer
-      const r1=hr+1, r2=hr+nrows;
-      const nc=mets.length;                                    // metric col count
-      const notesCol=colLetter(2+nc);                          // last col
-      cells['A1']={...blankCell(),value:codename()+' — comp sheet (raw paste)',txt:true};
-      cells['A'+hr]={...blankCell(),value:'company',txt:true};
-      mets.forEach((mt,i)=>cells[colLetter(2+i)+hr]={...blankCell(),value:mt[0].toLowerCase(),txt:true});
-      cells[notesCol+hr]={...blankCell(),value:'notes',txt:true};
+      const shuf=(pool)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b; };
+      /* ---- §1.2 randomization, four axes ----
+         (b) content pools: metric set (2 or 3 of 5), company names, note text, and the note
+             column's own header word — every graded target names itself on the board (§1.3);
+         (c) value ranges: every figure through rnd(). Ranges are held to EIGHT digits on
+             purpose — at the 76px paste width a raw 8-digit number already overruns the
+             column, so the board loads showing #### and shows it again, wider, the moment
+             the commas land;
+         (a)/(d) geometry: the header row sits tight under the title or one spacer row down,
+             the block runs 5–7 companies, and ONE row (drawn per seed) carries the long note
+             that spills furthest across the page.
+         The note column stays the RIGHTMOST column by construction (the §4.17 "wrap-note
+         position variance" line is served by the metric count moving it between two columns):
+         parked left of the figures its right neighbour is occupied, so the r107 spill logic
+         CLIPS it instead of spilling — the wrap beat's stated outcome would be false on half
+         the seeds. Position variance that breaks the beat is a worse deal than none. */
+      const METRICS=[['Revenue',420,980],['EBITDA',110,290],['Net debt',150,620],['Capex',100,240],['FCF',100,190]];
+      const NAMES=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox','Foxglove','Granite Pk','Halcyon','Ironline'];
+      const NOTES=['pending QoE adjustments','clean — comp set anchor','stub period, annualize','carve-out, normalize','mgmt case only','pre-synergy figures','filed late, restated'];
+      const LONG='flagged by the deal team — figures pending a QoE read and a carve-out normalization';
+      const noteHdr=['Notes','Deal note','Comment'][rnd(0,2)];
+      const mets=shuf(METRICS).slice(0, rnd(2,3));
+      const nrows=rnd(5,7);
+      const names=shuf(NAMES).slice(0,nrows), notes=shuf(NOTES).slice(0,nrows);
+      notes[rnd(0,nrows-1)]=LONG;                              // the worst spiller moves every seed
+      const hr=rnd(2,3), r1=hr+1, r2=hr+nrows;
+      const nc=mets.length;
+      const figCols=[]; for(let i=0;i<nc;i++) figCols.push(2+i);
+      const noteC=2+nc, noteL=colLetter(noteC), lastL=noteL;
+      cells['A1']={...blankCell(),value:codename()+' — comp sheet (raw paste, $)',txt:true};
+      cells['A'+hr]={...blankCell(),value:'Company',txt:true};
+      mets.forEach((mt,i)=>cells[colLetter(2+i)+hr]={...blankCell(),value:mt[0],txt:true});
+      cells[noteL+hr]={...blankCell(),value:noteHdr,txt:true};
       for(let r=r1;r<=r2;r++){
         cells['A'+r]={...blankCell(),value:names[r-r1],txt:true};
-        mets.forEach((mt,i)=>cells[colLetter(2+i)+r]={...blankCell(),value:rnd(mt[1],mt[2])*1000});
-        cells[notesCol+r]={...blankCell(),value:notes[r-r1],txt:true};
+        /* the figures land the way a paste lands them: General format, black ink, left of
+           nothing — no commas, no colour, no width. The whole board is the drill's problem
+           statement (§2.1b inverted: here the formatting IS the lesson, so it ships raw). */
+        mets.forEach((mt,i)=>cells[colLetter(2+i)+r]={...blankCell(),value:rnd(mt[1],mt[2])*100000});
+        cells[noteL+r]={...blankCell(),value:notes[r-r1],txt:true};
       }
-      const o={ title:'A1', hdr:'A'+hr+':'+notesCol+hr,
+      cells['A'+(r2+2)]={...blankCell(),value:'Source: data room export — pasted raw, unformatted',txt:true,it:true,fontColor:'gray'};
+      /* hand-narrowed paste columns (see the deviation note at the top): the label and note
+         columns are sized to their content, the FIGURE columns are the squeeze. Base width
+         sums past the grid's elastic budget so the fit pass leaves these widths alone. */
+      const cw={1:124}; figCols.forEach(c=>cw[c]=76); cw[noteC]=136;
+      this._o={ title:'A1', hdr:'A'+hr+':'+lastL+hr,
         mh:'B'+hr+':'+colLetter(1+nc)+hr,
         num:'B'+r1+':'+colLetter(1+nc)+r2,
-        notes:notesCol+r1+':'+notesCol+r2,
-        hr, r1, r2, nc, notesCol };
-      this._o=o;
-      return {ROWS:Math.max(9,r2+2), cells, active:{r:1,c:1}, sel:null};
+        notes:noteL+r1+':'+noteL+r2,
+        hr, r1, r2, nc, figCols, noteC, noteL, noteHdr, lastL, nrows };
+      return {ROWS:r2+3, cells, active:{r:1,c:1}, sel:null, colW:cw};
     },
     checks(S){
       const o=this._o;
-      const cell=k=>S.cells[k]||{};
-      const hdrCells=['A'].concat(Array.from({length:o.nc},(_,i)=>colLetter(2+i))).concat([o.notesCol]);
-      const hb = hdrCells.every(c=>cell(c+o.hr).bold);
-      const ha = Array.from({length:o.nc},(_,i)=>colLetter(2+i)).every(c=>cell(c+o.hr).align==='r');
-      let cf=true; for(let ci=0;ci<o.nc;ci++) for(let r=o.r1;r<=o.r2;r++){ const x=cell(colLetter(2+ci)+r); if(x.fmtStyle!=='comma'||(x.decimals|0)!==0) cf=false; }
-      let wr=true; for(let r=o.r1;r<=o.r2;r++){ if(!cell(o.notesCol+r).wrap) wr=false; }
-      let af=true; for(let ci=0;ci<o.nc;ci++){ if(overflowsCol(S,2+ci)) af=false; }
+      const cel=k=>S.cells[k]||{};
+      const figs=[]; for(const c of o.figCols) for(let r=o.r1;r<=o.r2;r++) figs.push(colLetter(c)+r);
+      const hdrCells=[1].concat(o.figCols).concat([o.noteC]).map(c=>colLetter(c)+o.hr);
+      /* every ok below reads the sheet's END STATE — no route, no order, no op count (§1.0(c)) */
+      const boldOk = !!cel('A1').bold && hdrCells.every(k=>!!cel(k).bold);
+      const alignOk = o.figCols.every(c=>cel(colLetter(c)+o.hr).align==='r');
+      const commaOk = figs.every(k=>{ const x=cel(k); return x.fmtStyle==='comma' && (x.decimals|0)===0; });
+      const blueOk = figs.every(k=>cel(k).fontColor==='blue');
+      let wrapOk=true; for(let r=o.r1;r<=o.r2;r++){ if(!cel(o.noteL+r).wrap) wrapOk=false; }
+      /* the width beat grades the ENGINE widths (S._colW), not the rendered ones: the display
+         pass stretches columns to fill the frame, and a viewport-dependent #### is not a
+         gradeable end state. A column at least as wide as its own content is the same
+         end state a player reads off the sheet — autofit lands exactly there, and a typed
+         width (Alt H O W) that clears the content lands there too. */
+      const w=S._colW||{};
+      const fitOk = o.figCols.every(c=>(w[c]||0) >= neededWidth(c)-1) && o.figCols.every(c=>!overflowsCol(S,c));
+      /* ☆ (§1.0(d) hidden efficiency, §1.0-R2(i) a real choice): the whole number format in
+         ONE move — the Format Cells dialog's comma-with-no-decimals (Ctrl+1 → N, Alt H O E → N)
+         instead of Alt H K plus two decimal walks. Read off the S.fmtOps latch (r425, extended
+         r428 with the decimal count so the two comma routes are distinguishable): a comma op
+         carrying dec:0 whose rect covers the whole figures block. The taught ribbon route
+         clears the core comma beat and simply never writes a dec:0 op — the star stays
+         skippable and can never block the win (§2.2). */
+      const oneMove=(S.fmtOps||[]).some(f=>f.kind==='comma' && f.dec===0 &&
+        f.r1<=o.r1 && f.r2>=o.r2 && f.c1<=o.figCols[0] && f.c2>=o.figCols[o.figCols.length-1]);
       return [
-        {label:'bold the title and the header row', ok: !!cell('A1').bold && hb},
-        {label:'align the metric headers RIGHT, over their numbers', ok: ha},
-        {label:'comma-format the figures, zero decimals', ok: cf},
-        {label:'wrap the notes', ok: wr},
-        {label:'autofit the number columns', ok: af},
+        {label:'Bold the sheet title and the header row', ok: boldOk},
+        {label:'Right-align the metric headers over their figures', ok: alignOk},
+        {label:'Comma-format the figures — zero decimals', ok: commaOk},
+        {label:'Color the pasted figures blue', ok: blueOk},
+        {label:'Wrap the '+o.noteHdr+' column so no note runs past it', ok: wrapOk},
+        {label:'Autofit the figure columns until no #### is left', ok: fitOk},
+        {label:'Comma-format the figures to zero decimals in ONE move — no decimal walk', ok: commaOk && oneMove, bonus:true},
       ];
     }
   },
@@ -8782,18 +8868,20 @@ const CHALLENGES = {
       for(let r=1;r<=RN;r++)for(let c=1;c<=CN;c++){ if(geo.open.has(K(r,c))) continue;
         cells[colLetter(c)+r]={...blankCell(),fill:'wall'}; }
       /* r430 (Wolf round 3: "there's also no clear place to paste the data … we still need
-         some sort of marker to show where you're pasting"): flag the A1 room's footprint as
+         some sort of marker to show where you're pasting"): mark the A1 room's footprint as
          the paste target. The room ships EMPTY on purpose — that emptiness IS the destination
-         — but an empty corner of a wall-heavy board gives the eye nothing to aim at. These
-         cells stay blank (value stays null, so the paste grades exactly as before); the flag
-         only drives a CSS tint + one 'paste here' label, and render() drops both the instant
-         the cell holds a value, so the marker clears the moment the block lands. */
-      for(let r=room.r0;r<room.r0+room.h;r++) for(let c=room.c0;c<room.c0+room.w;c++){
-        const k=colLetter(c)+r; cells[k]={...(cells[k]||blankCell()), ptgt:true}; }
-      cells[colLetter(room.c0)+room.r0].ptgtL=true;   // the corner carries the word
+         — but an empty corner of a wall-heavy board gives the eye nothing to aim at.
+
+         r432: this is GEOMETRY, not board content. The first cut set a flag on cells[], which
+         meant creating a cell object per room square just to carry a CSS hint — and
+         e2e-depth-mechanics asserts `!S.cells[k]` across A1:C4, i.e. the room ships with no
+         cell objects at all, not merely with empty values. That assertion is right: a purely
+         visual marker must not mutate the board model, or every consumer that reasons about
+         which cells EXIST (used range, Ctrl+End extent, autofit scans) inherits a phantom.
+         So the room rides on _maze and render() paints it positionally. */
       // paste-grading snapshot: the four corners the A1 landing must reproduce
       const snap={tl:ln[0], tr:cells[yrs[1]+t.r0].value, bl:ln[3], br:cells[yrs[1]+(t.r0+3)].value};
-      this._maze={pass:geo.pass, channel:geo.open, pips, table:t, p1:geo.p, exit:D.X, end:{r:RN,c:CN}, snap};
+      this._maze={pass:geo.pass, channel:geo.open, pips, table:t, p1:geo.p, exit:D.X, end:{r:RN,c:CN}, snap, pasteRoom:{r0:room.r0,c0:room.c0,w:room.w,h:room.h}};   /* r432: paste-target footprint — geometry, never cells */
       /* r422 (§2.6): the pips ARE the checkpoint touch-list — mazePip feeds hkTouchLatch on
          pass-through (a ctrl-shot collects mid-flight, which the render-time cursor tick can't
          see), so hkTouchTick stands down on maze boards; the maze draws its own pip glyphs. */
@@ -9790,9 +9878,14 @@ function render(){
          box) but NEVER emitted as classes — so even with correct CSS they could not paint.
          This was the third layer of the same bug: state set, no class, no rule. */
       if(cell.bl)cls.push('bl'); if(cell.br)cls.push('br'); if(cell.thick)cls.push('thick');
-      /* r430: paste-target marker (nav maze). Only while the cell is genuinely empty — the
-         instant the block lands the tint clears, so it reads as a destination, not a style. */
-      if(cell.ptgt && cell.value==null && !cell.formula){ cls.push('ptgt'); if(cell.ptgtL) cls.push('ptgt-l'); }
+      /* r430/r432: paste-target marker (nav maze), painted from _maze geometry so the board
+         model stays untouched. Only while the square is genuinely empty — the instant the
+         block lands the tint clears, so it reads as a destination, not a style. */
+      const __pr = (S.maze && S.maze.pasteRoom);
+      if(__pr && cell.value==null && !cell.formula &&
+         r>=__pr.r0 && r<__pr.r0+__pr.h && c>=__pr.c0 && c<__pr.c0+__pr.w){
+        cls.push('ptgt'); if(r===__pr.r0 && c===__pr.c0) cls.push('ptgt-l');
+      }
       if(cell.align)cls.push('align-'+cell.align);
       if(cell.fontColor)cls.push('fc-'+cell.fontColor);
       const isActive=(r===__dA.r&&c===__dA.c);
@@ -11942,11 +12035,18 @@ function translateFormula(f, dr, dc){
    the whole dollar body comma'd in a single selection; foot's planned block-☆ reads the same
    latch). Wired on every comma route — Alt H K, Ctrl+Shift+!, Ctrl+1 N — so any chord can earn
    a one-pass ☆ (§1.0(c): no route is penalized; only the ☆ reads this). Telemetry only: no
-   core check may ever require it. */
-function hkFmtLatch(kind){
+   core check may ever require it.
+   r428 (DEPTH_PASS §4.17, combo ☆): the optional `extra` bag rides along with the rect —
+   the comma routes now stamp the DECIMAL COUNT they land (dec:2 for the ribbon/chord buttons,
+   dec:0 for the Format Cells dialog), which is what lets combo's ☆ tell "one move to
+   zero-decimal commas" apart from "commas then two decimal walks". Purely additive: existing
+   readers match on kind + rect and never see the new field. */
+function hkFmtLatch(kind, extra){
   if(typeof S==='undefined'||!S) return;
   try{ const r=selRange();
-    (S.fmtOps=S.fmtOps||[]).push({kind:kind, r1:r.r1, c1:r.c1, r2:r.r2, c2:r.c2});
+    const op={kind:kind, r1:r.r1, c1:r.c1, r2:r.r2, c2:r.c2};
+    if(extra) Object.assign(op, extra);
+    (S.fmtOps=S.fmtOps||[]).push(op);
     if(S.fmtOps.length>240) S.fmtOps.shift(); }catch(e){}
 }
 function fillFrom(dir){ // 'down' | 'up' | 'right' | 'left'
@@ -12578,7 +12678,7 @@ function applyRibbon(key){
   if(dialog==='fmt'){
     const apply=(fn)=>{ pushUndo(); eachSel(fn); return exitRibbon(true); };
     if(key==='G') return apply(c=>{ c.fmtStyle='general'; c.decimals=0; c.scale=0; });   // General clears any scale too
-    if(key==='N'){ hkFmtLatch('comma'); return apply(c=>{ c.fmtStyle='comma';   c.decimals=0; }); }   /* r425: one-pass ☆ telemetry */
+    if(key==='N'){ hkFmtLatch('comma',{dec:0}); return apply(c=>{ c.fmtStyle='comma';   c.decimals=0; }); }   /* r425: one-pass ☆ telemetry · r428: dec:0 — the dialog lands zero decimals in ONE move (combo ☆) */
     if(key==='C') return apply(c=>{ c.fmtStyle='currency';c.decimals=0; });
     if(key==='P') return apply(c=>{ c.fmtStyle='percent'; c.decimals=1; });
     if(key==='X') return apply(c=>{ c.fmtStyle='mult';    c.decimals=1; });
@@ -12757,11 +12857,25 @@ function applyRibbon(key){
      autofit drills still grade their own explicit fit (they compare against neededWidth, which
      this reaches but never exceeds). #### remains reachable by hand-narrowing a column, which
      is the case the engine actually wants to teach. */
-  if(RUN[np]){ pushUndo(); if(np==='HK') hkFmtLatch('comma');   /* r425: one-pass ☆ telemetry */
+  if(RUN[np]){ pushUndo(); if(np==='HK') hkFmtLatch('comma',{dec:2});   /* r425: one-pass ☆ telemetry */
     eachSel(RUN[np]);
+    /* r432: only columns that have NEVER been given an explicit width auto-grow. colW is a
+       sparse array, so `undefined` means "still at the default" — a column the build (or the
+       player) deliberately sized is left alone and goes to #### exactly as Excel does. That is
+       the real Excel rule, not a compromise: Excel auto-fits an untouched column and shows ####
+       the moment a width was actually set.
+       This also keeps autofit BEATS honest. The combo depth pass (r428) ships its figure columns
+       hand-narrowed so its closing "autofit until no #### is left" beat is real; under the
+       unconditional r430 grow, the comma pass would have widened them itself and handed the
+       player that beat for free — the agent building it caught the interaction on merge. Wolf's
+       actual #### complaint is fixed by the unscaled-px overflow rule (r430), not by this; this
+       is Excel-parity polish and must not silently complete a drill's work. */
     if(np==='HK'||np==='HP'||np==='HAN'||np==='H0'||np==='H9'){
       const fr=selRange();
-      for(let c=fr.c1;c<=fr.c2;c++){ const need=neededWidth(c); if((colW[c]||COLW_DEFAULT)<need) colW[c]=need; }
+      for(let c=fr.c1;c<=fr.c2;c++){
+        if(colW[c]!==undefined) continue;            // deliberately sized — leave it, #### is correct
+        const need=neededWidth(c); if(COLW_DEFAULT<need) colW[c]=need;
+      }
     }
     return exitRibbon(true); }
   // Alt H I R / Alt H D R — ribbon route to row insert/delete. Unlike the Ctrl chord,
@@ -14173,7 +14287,7 @@ document.addEventListener('keydown',hkRawE=>{
     if(k===']'){ e.preventDefault(); startClock(); logKey('Ctrl+]'); jumpDependent(); checkWin(); return; }
     if(k==='%'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+%'); pushUndo(); eachSel(c=>{c.fmtStyle='percent';c.decimals=0;}); commitAction(); return; }
     if(k==='$'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+$'); pushUndo(); eachSel(c=>{c.fmtStyle='currency';c.decimals=2;}); commitAction(); return; }
-    if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); hkFmtLatch('comma'); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }   /* r425: one-pass ☆ telemetry */
+    if(k==='!'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+!'); pushUndo(); hkFmtLatch('comma',{dec:2}); eachSel(c=>{c.fmtStyle='comma';c.decimals=2;}); commitAction(); return; }   /* r425: one-pass ☆ telemetry */
     /* r302 canon audit: the dead duplicate $/% branches are GONE — the % dup carried
        decimals:1 (canon is 0) and was one reorder away from silently un-canoning percent */
     if(k==='~'){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+~'); pushUndo(); eachSel(c=>{c.fmtStyle=null;c.decimals=0;}); commitAction(); return; }

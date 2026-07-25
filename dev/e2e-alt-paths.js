@@ -757,12 +757,30 @@ const ALTS = [
       {sel:'C7:I7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B8:I8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'combo', name: 'reversed pass — wrap and commas first, ctrl+shift+! + ribbon bold, autofit still last', moves: `C => { const o=C._o; return [
-      {sel:o.notes, keys:[{key:'Alt'},L('h'),L('w')]},
-      {sel:o.num,   keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.hdr,   keys:[{key:'Alt'},L('h'),D(1)]},
+  /* r428 (combo ROUND 2, DEPTH_PASS §4.17): ALT 1 is the chord-ROUTE alt AND the §1.0(c)
+     freedom proof for the re-cut ☆ — the slow comma route (ctrl+shift+! then two decimal
+     walks), blue picked by walking the swatches the other way, and the width TYPED instead of
+     autofitted. Every core beat clears; the ☆ must NOT fire (no dec:0 comma op is ever
+     written). ALT 2 is the op-ORDER alt: the page is dressed back-to-front, and the dialog
+     route still earns the star from a different place in the run. */
+  { key: 'combo', name: 'slow comma route (ctrl+shift+! + two decimal walks — ☆ forfeited), ribbon bold, swatches walked LEFT to blue, width TYPED via alt h o w', moves: `C => { const o=C._o;
+      const left=[]; for(let i=0;i<6;i++) left.push({key:'ArrowLeft'});   // 10 swatches: 6 left of black lands on Blue
+      return [
       {sel:o.title, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.hdr,   keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:o.num,   keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),...left,{key:'Enter'}]},
+      {sel:o.notes, keys:[{key:'Alt'},L('h'),L('w')]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(6),{key:'Enter'}]},   // 16 char units = 117px — clears the widest comma'd figure
+    ]; }` },
+  { key: 'combo', name: 'back-to-front order — wrap first, blue before the number format, dialog commas mid-run, weight late, autofit still last', moves: `C => { const o=C._o; return [
+      {sel:o.notes, keys:[{key:'Alt'},L('h'),L('w')]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('e'),L('n')]},   // Format Cells by the ribbon door — same one-move commas, ☆ still earned
+      {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:o.hdr,   keys:[{key:'b',ctrl:true}]},
+      {sel:o.title, keys:[{key:'b',ctrl:true}]},
       {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
   { key: 'gauntlet', name: 'uses side FIRST, typed SUMs (no alt+=), alt h 1 bold, ctrl+shift+! commas', moves: `C => { const R=C._R, r0=R.r0; return [
