@@ -1,6 +1,6 @@
 # DEPTH_PASS — the catalog rework specification (r420d — playtest round 2 integrated, 2026-07-25)
 
-_The master build document for the depth pass. Binding inputs: Wolf's locked parameters (PROJECT_CONTEXT "WOLF DECISIONS — DEPTH PASS", 2026-07-24), **Wolf review round 1 (2026-07-24: semantic references over cell ranges · vague-verb ban · Full Builds as a separate build pass · per-beat sub-clocks · all eight taste calls resolved)**, **Wolf PLAYTEST round 1 (2026-07-24, wave 1 — dev/ROUND1_FEEDBACK.md: the §1.0 binding rules, the mystery-☆, the Ctrl+S universal closer, the rowops⊕colops merge, and the five ROUND-2 wave-1 spec pages)**, **Wolf PLAYTEST round 2 (2026-07-25 — dev/ROUND2_FEEDBACK.md: the §1.0-R2 rules — adaptive checklist labels · action-location cues · ☆-as-a-choice · the "re-tie" ban · first-drill nudge · labeled helper stack · the outside-border canon check)**, AUDIT_R417 §A/§D/§G, DRILL_DOCTRINE.md, and the three depth-research reports (finance canon · competitive Excel · course design + language standard). Where a beat descends from a research pattern it is tagged inline, e.g. [Origami Ladder]. Former open taste calls are all RESOLVED and collected in the decision log at the end._
+_The master build document for the depth pass. Binding inputs: Wolf's locked parameters (PROJECT_CONTEXT "WOLF DECISIONS — DEPTH PASS", 2026-07-24), **Wolf review round 1 (2026-07-24: semantic references over cell ranges · vague-verb ban · Full Builds as a separate build pass · per-beat sub-clocks · all eight taste calls resolved)**, **Wolf PLAYTEST round 1 (2026-07-24, wave 1 — dev/ROUND1_FEEDBACK.md: the §1.0 binding rules, the mystery-☆, the Ctrl+S universal closer, the rowops⊕colops merge, and the five ROUND-2 wave-1 spec pages)**, **Wolf PLAYTEST round 2 (2026-07-25 — dev/ROUND2_FEEDBACK.md: the §1.0-R2 rules — adaptive checklist labels · action-location cues · ☆-as-a-choice · the "re-tie" ban · first-drill nudge · labeled helper stack · the outside-border canon check)**, **Wolf PLAYTEST round 3 (2026-07-25 — the §1.0-R3 rules: checklist lines are instructions not lessons (CI-enforced) · formatting beats must match real desk frequency · grade the end state so every valid route clears · location cues over selection outlines · the r429–r431 engine changes · merge/retire a drill whose lesson is already carried)**, AUDIT_R417 §A/§D/§G, DRILL_DOCTRINE.md, and the three depth-research reports (finance canon · competitive Excel · course design + language standard). Where a beat descends from a research pattern it is tagged inline, e.g. [Origami Ladder]. Former open taste calls are all RESOLVED and collected in the decision log at the end._
 
 ---
 
@@ -8,7 +8,7 @@ _The master build document for the depth pass. Binding inputs: Wolf's locked par
 
 One agent builds one drill, in catalog order, Foundations first. The agent reads §1 (the anatomy standard — non-negotiable), the §2 mechanics its drill consumes, and its own §4 page; it does NOT need the research reports — every pattern it needs is restated here. The §4 beat lines are the spec: the agent ships those lines as the literal check labels (typo-level deviations only; a structural deviation gets a code comment naming why + a note in the PR). Capstones (§2.4) build after their chapter's other drills so they can chain the reworked boards.
 
-**MODEL-PROOF PROTOCOL (WORKFLOW.md §8, r420c; LIVE PRACTICE as of r420d — Wolf notes sessions may run Opus-tier):** this doc is written to be executed by a LESS-CAPABLE agent than the one that wrote it — every rule carries its rationale inline (the WHY, dated, with owner), every §4 page states exact beats/predicates/randomization, and nothing load-bearing lives only in session memory. A build agent must never have to re-derive design intent: if a page under-specifies something the agent needs, that is a SPEC BUG — stop and escalate to the orchestrator, do not improvise. All future wave agents build to the r420c rules (§1.0 below) PLUS the r420d rules (§1.0-R2 below), which OVERRIDE any older line in this doc where they conflict.
+**MODEL-PROOF PROTOCOL (WORKFLOW.md §8, r420c; LIVE PRACTICE as of r420d — Wolf notes sessions may run Opus-tier):** this doc is written to be executed by a LESS-CAPABLE agent than the one that wrote it — every rule carries its rationale inline (the WHY, dated, with owner), every §4 page states exact beats/predicates/randomization, and nothing load-bearing lives only in session memory. A build agent must never have to re-derive design intent: if a page under-specifies something the agent needs, that is a SPEC BUG — stop and escalate to the orchestrator, do not improvise. All future wave agents build to the r420c rules (§1.0 below) PLUS the r420d rules (§1.0-R2 below) PLUS the r429–r431 rules (§1.0-R3 below), which OVERRIDE any older line in this doc where they conflict. §1.0-R3 is the newest and wins over both; several of its rules are enforced by CI rather than review, so ignoring one ships a red gate.
 
 **Per-drill definition of done** (all nine, in the PR):
 1. `build()` / `checks()` / `guide()` / `req` / `targets()` / `demo()` reworked to this page; beats = the page's lines.
@@ -59,6 +59,39 @@ Source: dev/ROUND2_FEEDBACK.md (Wolf's round-2 playtest of the wave-1 rebuilds).
 
 **(m) OUTSIDE-BORDER CANON (recorded check, 2026-07-25).** Wolf states: outside borders = **Alt H B S** — NOT H B A (H B A = ALL borders). The engine already asserts H B S draws the selection PERIMETER (dev/e2e-audit-parity.js:506, the r302 canon sweep); the engine-UI round is VERIFYING and ALIGNING every drill hint route, reference table, and SEO surface to S=outside / A=all. Any page, guide line, or req teaching H B A for an outside border is wrong — fix on sight and note it in the PR.
 
+### 1.0-R3 PLAYTEST ROUND-3 LAW (r429–r431, Wolf 2026-07-25 — BINDING, same force as §1.0 and §1.0-R2; §1.0-R3 wins over any older line)
+Source: Wolf's round-3 playtest. These are catalog-wide and several are enforced by CI, not by review — a build agent that ignores them ships a red gate.
+
+**(n) CHECKLIST LINES ARE INSTRUCTIONS, NEVER LESSONS.** This is Wolf's third round raising it, and the last: *"ITS JUST THE INSTRUCTIONS OF WHAT YOU HAVE TO DO OR ACCOMPLISH!!! NOT A LESSON!!!"* and, on the fix, *"it should be in the excluded list!"* The operative rule is about the clause AFTER an em-dash: it may say WHAT or WHERE, never WHY.
+  · keep — "Format the margin row — one decimal" (scope) · "Fill the row — filled across all five years" (scope)
+  · cut  — "Bold the header row — headers carry the page" · "Italicize the memos — annotations whisper" (morals)
+Wolf's own examples of the target register: *"Delete the placeholder row"*, *"Add a top border to the totals row"*, *"Delete the DRAFT column"*, *"insert a column before Q3"*.
+ENFORCEMENT: `dev/check-invariants.js` C11 fails the build on a denylist of 31 already-rejected phrasings, scanning player copy only (it strips comments via a stateful walk, so a code comment may quote a cut phrase when recording why it went). When a new one is caught in playtest, ADD IT TO THAT LIST — that is what stops it coming back. WHY the denylist rather than a general "is this a maxim" detector: free-text detection is not reliable enough to gate a build on, and a false positive would block unrelated work.
+
+**(o) FORMATTING BEATS MUST REFLECT REAL DESK FREQUENCY.** Wolf: *"why are we focusing on strikethrough? Feels like how you anchored on the whole comma format hotkey but in reality it's such a seldom used / rare hotkey and you don't seem to understand the priority of what things people actually are changing day to day in excel."*
+  · BANNED as a graded primary beat: **strikethrough**. Two independent reasons — the ribbon shows no strikethrough path (so the drill would grade a move the UI cannot walk), and it is rare on a real desk. Ctrl+5 still WORKS; it is simply never a core beat.
+  · Wolf's stated priority order, use these instead: top borders · bottom borders · bold · italics · font colour (blue = hardcode, green = linked cell, red = needs attention) · comments · thick top/bottom borders · superscript · cell background colour · single borders · indent.
+  · GENERAL RULE behind it: before making an op a beat, ask how often an analyst performs it in a working day. A rare op may appear as flavour or in the ☆, never as a core formatting beat.
+
+**(p) GRADE THE END STATE — EVERY VALID ROUTE CLEARS.** This restates §1.0(c) because round 3 found it violated in shipped code. The bug: a dollar-format beat demanded `fmtStyle==='currency'`, which only Ctrl+Shift+$ produces, while the ribbon's Accounting Number Format (Alt H A N) sets `'acct'`. A player could dollar-format the row, SEE dollars on the board, and watch the beat stay dark with nothing to fix. Wolf: *"checklist isn't being triggered. Again, show cover us no matter how we fix."*
+  · When two Excel routes produce the same visible result, BOTH must clear. Enumerate the routes before writing the predicate.
+  · The failure mode to fear is not a beat that is too easy — it is an UNTRIGGERABLE beat, which is indistinguishable from a broken drill.
+  · Same class, same round: an outside-border beat that accepted only the figures now also accepts label + figures, since dressing a hand-off row with its label is how it is actually done.
+
+**(q) LOCATION CUES OVER SELECTION OUTLINES.** Wolf: *"The red carrot things are great — think this should be a standard instead of using green outlines if we're having the user similarly modify rows and columns that are hard to indicate with the green highlight."* Use the shared `cueCell(text)` helper (index.html) wherever the target is a PLACE the green outline cannot express:
+  · an INSERT point — the slot is *between* two rows/columns, so there is nothing to outline;
+  · a PASTE target — the destination is empty, so an outline reads as "cell", not "land here".
+  Cues are BOARD CONTENT: they ride inserts/deletes like a sticky note, and they are NEVER graded targets, so deleting one can never move a check. Related: no beat may target a cell whose text SPILLS across other columns — Wolf saw a highlight covering A1 while the title spilled onward and read it as "change half the title".
+
+**(r) ENGINE FACTS THAT CHANGED UNDER YOU (r429–r431).** Pages written before r429 may assume the old behaviour:
+  · **All four border edges now render.** `bl` / `br` / `thick` were set by the ops but had no CSS rule AND were never emitted as classes, so left/right/thick borders were invisible — Alt H B S drew only its bottom edge. Fixed and pixel-guarded by `dev/check-borders.js`. Outside borders are now safe to use and to grade.
+  · **Number formats auto-widen their column.** Applying comma/percent/accounting/decimal-step grows a column that is too narrow (grow only, never shrink), as Excel does. So "apply a format, then autofit" is no longer a real beat; #### now arises only from a hand-narrowed or build-seeded narrow column.
+  · **The #### test reasons in UNSCALED px.** It used to compare against the elastic display width, so the fit-scaler manufactured #### on columns that were genuinely wide enough. `overflowsCol()` (which grades autofit beats) matches it. If you grade width, read `neededWidth()` and `overflowsCol()` first.
+  · **A run pauses on window blur.** Leaving the window freezes the clock behind a scrim; the paused span is not billed and resuming costs no mouse flag. Nothing in a drill needs to handle this, but do not write a beat that assumes wall-clock continuity.
+
+**(s) DRILLS MAY BE MERGED OR RETIRED WHEN THE LESSON IS ALREADY CARRIED.** Wolf, on catalog size: *"don't worry about increasing or decreasing catalog size at this point."* Two precedents from r431 — `undo` merged into `editfix` because undo's mechanic was sound but its MOTIVE was missing (the thing it destroyed was a number the player had no stake in; now it destroys the repair they made two beats earlier), and `copyover` retired outright because its lesson was already carried by `filldr` and `pastes`. If a page's drill is redundant or motiveless, say so rather than polishing it. `menuOrder.length` is the single source of truth for the catalog count; the "N banker-grade drills" marketing copy is asserted against it by smoke.
+
+
 ### 1.1 Beats
 - **4–6 core graded beats + exactly 1 bonus beat** (☆). Core beats win the drill; the bonus never blocks the win (§2.2). Fewer than 4 core beats is allowed ONLY for pure-reflex Foundations drills explicitly marked on their §4 page (none currently are).
 - Beats CHAIN where the chapter allows it (doctrine §8.1.4): each action changes what the next operates on. Order-free chore lists are acceptable only in pure-formatting showcases.
@@ -104,7 +137,9 @@ The last WORK beat leaves the artifact sendable: a dress/close motion (bold + ru
 - **R10** Negative space explicit: "Delete the content of the memo cell (keep the cell and its formatting)."
 
 **THE CLOSED VERB LIST** (42 — a check label starts with one of these, nothing else):
-Add · Autofit · Bold · Build · Center · Clear · Collect · Color · Comma-format · Copy · Cut · Delete · Dollar-format · Enter · Fill · Filter · Find · Finish · Fix · Flip · Fold · Group · Indent · Insert · Italicize · Left-align · Move · Paste · Percent-format · Reference · Repoint · Select · Set · Sort · Strike · Total · Trace · Transpose · Unbold · Underline · Undo · Unhide · Unfold · Wrap
+Add · Autofit · Bold · Build · Center · Clear · Collect · Color · Comma-format · Copy · Cut · Delete · Dollar-format · Enter · Fill · Filter · Find · Finish · Fix · Flip · Fold · Group · Indent · Insert · Italicize · Left-align · Move · Paste · Percent-format · Reference · Repoint · Select · Set · Sort · ~~Strike~~ · Total · Trace · Transpose · Unbold · Underline · Undo · Unhide · Unfold · Wrap
+
+**§1.0-R3(o) NOTE on this list:** ~~Strike~~ is struck from the approved verbs — strikethrough is banned as a graded primary beat (no ribbon path; rare on a real desk). It stays readable here only so an older page quoting it can be traced. Prefer the verbs Wolf actually ranked: border/rule, bold, italicize, color (blue = hardcode, green = linked, red = needs attention), fill, indent.
 (Total = land a live SUM; Build = enter a live formula; Reference = point a formula at an existing output, never retype it; Fix/Repoint = repair in place; Wrap = IFERROR or text-wrap by context. Adding a verb requires a doc PR touching this list — Reference added r420b for the never-retype beats.)
 Voice stays doctrine §7 (associate voice, lowercase confidence, em dashes) — the standard governs structure, not warmth. Two registers per research 1: checklist-imperative in beats; scenario-imperative in prompts ("the VP needs the downside case before the 4pm call").
 
@@ -342,14 +377,21 @@ Page grammar: **Now** = current beats/checks + weakness · **Beats** = the new c
 #### 4.6 colops — **RETIRED (D17, playtest round 1 — merged into rowops §4.5)**
 Wolf (2026-07-24): "combine this and the column drill to have a more fulsome drill that teaches you row inserts and deletions and column inserts and deletions." Row and column structure ops + the formatting-inheritance lesson are ONE drill — rowops (§4.5 round 2) carries all of it, including this page's former beats (DRAFT-column delete, quarter insert+paste, header order) and its randomization axes. The colops key leaves menuOrder/groups; PARS/TRACKS/cert arrays update in the same PR; its leaderboard board keeps history but goes unreachable; catalog 82→81 live (87 post-pass); the freed slot stays OPEN for a future add. The old spec is superseded — do not build.
 
-#### 4.7 editfix — "Fix the typos in place" · S
+#### 4.7 editfix — "Repair the schedule" · M — **ROUND 3 (r431 — SHIPPED; ABSORBS undo §4.8)**
+**ROUND-3 REBUILD (Wolf playtest round 3) — supersedes the lines below.** Wolf on the old editfix: *"we're not really testing a lot here … honestly think we just fold this into another drill"*, and on undo: *"I also don't really understand what we're doing here — action log? What's the point of the Q4 total? Why am i deleting a table then deleting another table?"* Undo's mechanic was sound; its MOTIVE was missing, because the thing the bad note destroyed was a number the player had no stake in. MERGED so the block the note names feeds **the total the player repaired two beats earlier** — following the note destroys their own work in plain sight, which is what makes Ctrl+Z matter. Shipped beats: (1) one misspelled label repaired in place — ONE, per Wolf's *"1 in-line text edit to fix a typo but not more"*; (2) a mis-typed FY reference pointing at the wrong row; (3) a stale Total that never grew to cover the last line; (4) follow the sweep note, watch beat 3 collapse, undo it back; (5) clear the block that was actually junk; ☆ undo PAST the repairs then redo forward. DROPPED: the action log, the strikethrough beat (§1.0-R3(o)), the second decorative data block, and the bold-the-title beat (its green target covered A1 while the title spilled across the row — §1.0-R3(q)). Formatting is deliberately absent; it owns its own chapter. par 52 / parKeys 48.
+
+**Superseded round-2 page below (historical):**
+#### 4.7-r2 editfix — "Fix the typos in place" · S
 **Now:** 4 checks (2 typos in-place, drift audit, stretch the short SUM) — chained, randomized, dense pools. Meets bar except the missing bonus (guide/checks align 4v4 — fine).
 **Language pass (1 line) + bonus:**
 - drift check → "Fix the drifted Model cell back to the feed's number — the Model column must equal the Feed column"
 ☆ Strike through the memo line the review closed — retired, not erased (add one memo row to the board)
 **Random:** as-is (19-typo pool, slot shuffle, drift index). **Aha:** lands on the F2 range-stretch re-totaling WITH the audit fix. **Finish:** the stretch beat (the total re-ties = prove-out). **Clocks:** std. **Engine:** none.
 
-#### 4.8 undo — "Undo is a tool" · M
+#### 4.8 undo — **RETIRED (r431, Wolf playtest round 3 — merged into editfix §4.7)**
+Do NOT build this page. The drill key `undo` no longer exists in `menuOrder`; its lesson (undo as the safety net during a repair pass) ships inside §4.7. Wolf: *"maybe this is worth just folding into another drill, or we combine with the typos in place one."* Historical page kept below for provenance only.
+
+#### 4.8-retired undo — "Undo is a tool" · M (historical)
 **Now:** 3 checks, scripted mistake + undo + aimed delete, site pool. Good story; thin at 3 beats, par 10, and the aha (undo rewinds EXACTLY) can carry more.
 **Beats:**
 1. Bold the title and italicize the memo line under it — housekeeping first
@@ -360,7 +402,10 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 ☆ Undo past your bold, then redo everything back — Ctrl+Z has a twin
 **Random:** as-is (4 spot-pool, wrong-block coin flip) + log-cell site rides the blocks. **Aha:** beat 3 — values return EXACTLY. **Finish:** beat 5 (the log line = desk habit: a tick list you can resume). **Clocks:** re-sweep (scope +2 beats). **Engine:** ☆ needs the redo latch — add `S.redoN` beside undoN if absent (3 lines).
 
-#### 4.9 copyover — "Chain the hand-offs" · M
+#### 4.9 copyover — **RETIRED (r431, Wolf playtest round 3 — lesson already carried elsewhere)**
+Do NOT build this page. The drill key `copyover` no longer exists in `menuOrder`. Wolf: *"what are we accomplishing here? … I'm not even sure what you're testing."* Its lesson (relative refs re-point when a formula block travels) is already carried by `filldr` and `pastes`, and its values-only hand-off by `pastes`; nothing was lost by retiring it. Historical page kept below for provenance only.
+
+#### 4.9-retired copyover — "Chain the hand-offs" · M (historical)
 **Now:** 3 destinations (block copy, peeled column, values-only) — the chain is right; checks 3, no dress, fixed sites.
 **Beats:**
 1. Copy the source block into the working area — formulas travel (the working area carries its own board title)
@@ -381,7 +426,8 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 
 ### CH 2 · FORMATTING (10)
 
-#### 4.11 typeset — "Typeset the memo" · S
+#### 4.11 typeset — "Typeset the memo" · S — **ROUND 3 (r430 — SHIPPED)**
+**ROUND-3 DELTA (§1.0-R3(o)):** the "strike the dead line" beat is REPLACED by "Color the discontinued line red" (Alt H F C). Wolf: strikethrough has no ribbon path and is rare on a desk; red font is on his stated priority list by name ("color red for a number that needs special attention") and is what actually happens to a dead line. Ctrl+5 still works but is no longer graded. Par re-swept 14 -> 24 / parKeys 13 -> 22 (the ribbon walk is ten keystrokes where Ctrl+5 was one). Lines below are otherwise current.
 **Now:** 5 checks (bold header, unbold imposter, italic memos, strike dead line, =TODAY stamp), imposter-row randomized. Order-free by design — acceptable for a pure-formatting showcase (§1.1).
 **Semantic pass (2 lines) + bonus:**
 - check 2 → "Unbold the imposter line — it never earned the weight"
@@ -767,7 +813,7 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 **Now:** three cells reading the dead v1 block; find by pattern-break, repoint, confirm continuity. At bar.
 **Language pass + §2.3 dressing (N=3) + bonus:**
 - meter line: "Find and repoint all 3 stale reads (0/3)"
-☆ Strike through the v1 block's header — mark the corpse
+☆ **SUPERSEDED by §1.0-R3(o) — do not build a strikethrough beat.** Replace with a hidden EFFICIENCY move for this drill (strikethrough has no ribbon path and is rare on a desk; and per §1.0(d) a ☆ is never a formatting task at all). Original line, for provenance: "Strike through the v1 block's header".
 **Random/Aha/Finish:** verify axes; existing; continuity confirm closes. **Clocks:** std. **Engine:** meter.
 
 #### 4.50 wirewalk — "Trace the precedents" · M (par 10 — watchlist-adjacent)
@@ -954,7 +1000,7 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 #### 4.74 liqbridge — "Bridge the liquidity — three cases" · S
 **Now:** cash+undrawn → ending liquidity across Base/Downside/Severe, breach read; audit flags "Dress" label (6954).
 **Language pass (the flagged "Dress" label → "Bold the ending row and add a top border above it") + bonus:**
-☆ Strike through the breached case's label — flag it for the call
+☆ **SUPERSEDED by §1.0-R3(o) — do not build a strikethrough beat.** Flag the breached case in RED font instead (Wolf's stated use for red: "a number that needs special attention"), or better, per §1.0(d), replace with a hidden EFFICIENCY move. Original line, for provenance: "Strike through the breached case's label".
 **Random/Aha/Finish:** verify; existing; breach read closes. **Clocks:** std. **Engine:** strike exists.
 
 #### 4.75 wk13 — "Run the 13-week" · S
