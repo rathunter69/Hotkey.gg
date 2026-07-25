@@ -78,7 +78,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=301"></script>
+<script src="nav.js?v=302"></script>
 
 <header class="head"><div class="wrap">
   <div class="crumb"><a href="account.html">&larr; account</a></div>
@@ -110,8 +110,13 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
   root.innerHTML =
     '<div class="row">'+
       '<div class="card plan"><h4>Current plan</h4>'+
-        '<div class="fieldrow"><span class="fk">plan</span><span class="fv">'+(isPro?'<b style="color:var(--warn);font-size:15px">PRO</b> <span class="badge">free during beta</span>':'<b style="font-size:15px">Free</b>')+'</span></div>'+
+        '<div class="fieldrow"><span class="fk">plan</span><span class="fv">'+(isPro?'<b style="color:var(--warn);font-size:15px">PRO</b> <span class="badge">perks free during beta</span>':'<b style="font-size:15px">Free</b>')+'</span></div>'+
         '<div class="fieldrow"><span class="fk">status</span><span class="fv">'+(isPro?'active &mdash; not billed during beta':'the basics, free forever')+'</span></div>'+
+        /* r428 (Wolf): desks are the one carve-out from the beta free-for-all — this row
+           reads "PRO" for every beta player, but create_desk() checks my_pro() server-side
+           and rejects anyone without a real entitlement. Say so rather than let them find
+           out at the RPC. */
+        '<div class="fieldrow"><span class="fk">desks</span><span class="fv">founding a desk needs real PRO <span style="color:var(--faint)">&mdash; joining stays free</span></span></div>'+
         '<div class="fieldrow"><span class="fk">at launch</span><span class="fv">'+(isPro?'founder pricing, locked for life':'upgrade anytime to go PRO')+'</span></div>'+
         '<div class="fieldrow"><span class="fk">renews</span><span class="fv">&mdash;</span></div>'+
         (isPro

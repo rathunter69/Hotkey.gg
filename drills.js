@@ -673,7 +673,12 @@ window.HOTKEY_PRO = {
     ['Pro cosmetics',
      'exclusive card flair + share-card themes + first access to new looks',
      'standard flair'],
+    // r428 (Wolf): the ONE perk the beta does not hand out — the server gate is live
+    // (create_desk raises PRO_REQUIRED unless my_pro()). Joining is deliberately free.
+    ['Found your own desk',
+     'start a desk and captain it — live now, the one PRO perk beta does not give away',
+     'join any desk free'],
   ],
   roadmap: ['Interview mode \u2014 timed assessment + report card', 'Season rewards track'],
-  betaNote: 'Beta: PRO perks are free for everyone. The progression ladder still applies \u2014 the climb is the game \u2014 but at launch PRO opens the full catalog from Level 1. Beta players lock in founder pricing.',
+  betaNote: 'Beta: PRO perks are free for everyone \u2014 with one exception. Founding a desk needs a real PRO entitlement (a paid plan or the .edu trial); JOINING someone else\u2019s desk is free for everyone, always. The progression ladder still applies \u2014 the climb is the game \u2014 but at launch PRO opens the full catalog from Level 1. Beta players lock in founder pricing.',
 };
