@@ -293,61 +293,6 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r.onL === 2 && /found 2 of 3/.test(r.aria), 'segments latch — a re-broken error never un-fills the meter', r);
   }
 
-  console.log('D2. disclosed-error meter on ruleaudit — the first catalog adopter (r425, §2.3 + §4.16)');
-  {
-    // N is FIXED per drill (decision log #6): 4 planted breaks every seed, never per-seed variance
-    const rN = await run(() => {
-      const out = [];
-      for (const seed of [11, 222, 3333]) {
-        window.__forceSeed = seed; loadChallenge('ruleaudit');
-        out.push(CHALLENGES.ruleaudit._R.defects.length);
-      }
-      return out;
-    });
-    ok(String(rN) === '4,4,4', 'exactly 4 breaks planted on every seed (N fixed per drill)', rN);
-    const r = await run(() => {
-      window.__clearCel(); hideResults();
-      window.__forceSeed = 77; loadChallenge('ruleaudit');
-      const C = CHALLENGES.ruleaudit;
-      const N = ((window.HOTKEY_DRILLS.meta.ruleaudit || {}).errorCount) | 0;
-      const seg0 = document.querySelectorAll('#checklist .hk-errmeter .em-seg').length;
-      const on0 = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
-      const moves = C.demo();   // engine-appended Ctrl+S rides at the end (saveClose)
-      // fix the first two planted breaks — the meter must read 2/4
-      for (let i = 0; i < 2; i++) { setDemoSel(moves[i].sel); for (const kk of moves[i].keys) demoKey(kk); }
-      const on2 = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
-      const lab2 = (document.querySelector('#checklist .hk-errmeter .em-lab') || {}).textContent || '';
-      // regress the second fix (undo) — segments LATCH, they never un-fill within a run
-      demoKey({ key: 'z', ctrl: true });
-      const onL = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
-      const foundL = /\((\d)\/4 fixed\)/.exec((C.checks(S)[4] || {}).label || '');
-      demoKey({ key: 'y', ctrl: true });   // redo the fix, then finish the run
-      for (let i = 2; i < moves.length; i++) { setDemoSel(moves[i].sel); for (const kk of moves[i].keys) demoKey(kk); }
-      const items = C.checks(S);
-      return { N, seg0, on0, on2, lab2, onL, foundLive: foundL && foundL[1], done,
-               star: !!(items.find(x => x.bonus) || {}).ok,
-               onWin: document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length };
-    });
-    ok(r.N === 4 && r.seg0 === 4 && r.on0 === 0, 'meta.errorCount=4 renders four empty segments at load', r);
-    ok(r.on2 === 2 && /found 2\/4/.test(r.lab2), 'two repairs fill two segments off the "(k/4 fixed)" counter label', r);
-    ok(r.onL === 2 && r.foundLive === '1', 'an undone repair un-flips the beat (found 1/4) but the meter stays latched at 2', r);
-    ok(r.done === true && r.onWin === 4, 'all four repairs + save win the drill with the meter full', r);
-    ok(r.star === true, 'the exact-repair line earns the surgeon\'s ☆ (zero collateral ink)', r);
-    const r2 = await run(() => {
-      window.__clearCel(); hideResults();
-      window.__forceSeed = 77; loadChallenge('ruleaudit');
-      const C = CHALLENGES.ruleaudit, R = C._R;
-      // collateral ink: bold the margin row (healthy by construction) before the real repairs —
-      // core must still clear (§1.0(c)); the surgeon's ☆ must be withheld
-      setDemoSel('B' + R.mg + ':' + R.LC + R.mg); demoKey({ key: 'b', ctrl: true });
-      const moves = C.demo();
-      for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
-      const items = C.checks(S);
-      return { done, star: !!(items.find(x => x.bonus) || {}).ok };
-    });
-    ok(r2.done === true && r2.star === false, 'collateral formatting still wins the drill but forfeits the ☆ (freedom kept, mastery graded)', r2);
-  }
-
   console.log('E. checkpoint touch-lists (§2.6)');
   {
     const r = await run(() => {
@@ -1016,7 +961,67 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       ok(r.mbH <= 44, 'the mode bar is still ONE row @' + W + 'px', r.mbH);
     }
     await page.setViewportSize({ width: 1280, height: 900 });
-  console.log('Q. capstone gate (r425 — DEPTH_PASS §2.4, modeltour ★ Foundations)');
+  }
+
+  console.log('Z. page errors');
+  ok(errs.length === 0, 'zero page errors across the suite', errs.slice(0, 4));
+
+  console.log('D2. disclosed-error meter on ruleaudit — the first catalog adopter (r425, §2.3 + §4.16)');
+  {
+    // N is FIXED per drill (decision log #6): 4 planted breaks every seed, never per-seed variance
+    const rN = await run(() => {
+      const out = [];
+      for (const seed of [11, 222, 3333]) {
+        window.__forceSeed = seed; loadChallenge('ruleaudit');
+        out.push(CHALLENGES.ruleaudit._R.defects.length);
+      }
+      return out;
+    });
+    ok(String(rN) === '4,4,4', 'exactly 4 breaks planted on every seed (N fixed per drill)', rN);
+    const r = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 77; loadChallenge('ruleaudit');
+      const C = CHALLENGES.ruleaudit;
+      const N = ((window.HOTKEY_DRILLS.meta.ruleaudit || {}).errorCount) | 0;
+      const seg0 = document.querySelectorAll('#checklist .hk-errmeter .em-seg').length;
+      const on0 = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const moves = C.demo();   // engine-appended Ctrl+S rides at the end (saveClose)
+      // fix the first two planted breaks — the meter must read 2/4
+      for (let i = 0; i < 2; i++) { setDemoSel(moves[i].sel); for (const kk of moves[i].keys) demoKey(kk); }
+      const on2 = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const lab2 = (document.querySelector('#checklist .hk-errmeter .em-lab') || {}).textContent || '';
+      // regress the second fix (undo) — segments LATCH, they never un-fill within a run
+      demoKey({ key: 'z', ctrl: true });
+      const onL = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const foundL = /\((\d)\/4 fixed\)/.exec((C.checks(S)[4] || {}).label || '');
+      demoKey({ key: 'y', ctrl: true });   // redo the fix, then finish the run
+      for (let i = 2; i < moves.length; i++) { setDemoSel(moves[i].sel); for (const kk of moves[i].keys) demoKey(kk); }
+      const items = C.checks(S);
+      return { N, seg0, on0, on2, lab2, onL, foundLive: foundL && foundL[1], done,
+               star: !!(items.find(x => x.bonus) || {}).ok,
+               onWin: document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length };
+    });
+    ok(r.N === 4 && r.seg0 === 4 && r.on0 === 0, 'meta.errorCount=4 renders four empty segments at load', r);
+    ok(r.on2 === 2 && /found 2\/4/.test(r.lab2), 'two repairs fill two segments off the "(k/4 fixed)" counter label', r);
+    ok(r.onL === 2 && r.foundLive === '1', 'an undone repair un-flips the beat (found 1/4) but the meter stays latched at 2', r);
+    ok(r.done === true && r.onWin === 4, 'all four repairs + save win the drill with the meter full', r);
+    ok(r.star === true, 'the exact-repair line earns the surgeon\'s ☆ (zero collateral ink)', r);
+    const r2 = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 77; loadChallenge('ruleaudit');
+      const C = CHALLENGES.ruleaudit, R = C._R;
+      // collateral ink: bold the margin row (healthy by construction) before the real repairs —
+      // core must still clear (§1.0(c)); the surgeon's ☆ must be withheld
+      setDemoSel('B' + R.mg + ':' + R.LC + R.mg); demoKey({ key: 'b', ctrl: true });
+      const moves = C.demo();
+      for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+      const items = C.checks(S);
+      return { done, star: !!(items.find(x => x.bonus) || {}).ok };
+    });
+    ok(r2.done === true && r2.star === false, 'collateral formatting still wins the drill but forfeits the ☆ (freedom kept, mastery graded)', r2);
+  }
+
+  console.log('R. capstone gate (r425 — DEPTH_PASS §2.4, modeltour ★ Foundations)');
   {
     const r = await run(() => {
       window.__clearCel(); hideResults();
@@ -1104,10 +1109,8 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       try { localStorage.removeItem('hk_camp_xp'); } catch (e) {} });
   }
 
-  console.log('Z. page errors');
-  ok(errs.length === 0, 'zero page errors across the suite', errs.slice(0, 4));
-
   await browser.close();
   console.log('\nDEPTH-MECHANICS: ' + pass + ' passed, ' + fail + ' failed');
   process.exit(fail ? 1 : 0);
+
 })().catch(e => { console.error('HARNESS ERROR: ' + (e && e.message || e)); process.exit(1); });
