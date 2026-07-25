@@ -259,12 +259,6 @@ const ALTS = [
   { key: 'lookup2', name: 'header-inclusive ranges (consistent off-by-one)', moves: `C => [
       {sel:'G4', keys:[...T('=INDEX(B1:D6,MATCH(G2,A1:A6,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
     ]` },
-  { key: 'percent', name: 'dollars typed by hand, block B first', moves: `C => { const R=C._R; return [
-      {sel:R.pc+R.r0, keys:[...T('='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0),{key:'Enter'}]},
-      {sel:R.pc+R.r0+':'+R.pc+R.rN, keys:[{key:'d',ctrl:true},{key:'%',ctrl:true,shift:true}]},
-      {sel:'C2', keys:[...T('=B2/$B$2'),{key:'Enter'}]},
-      {sel:'C2:C6', keys:[{key:'d',ctrl:true},{key:'%',ctrl:true,shift:true}]},
-    ]; }` },
   { key: 'bridge', name: 'typed refs (no pointing) + ribbon fill right, geometry-derived', moves: `C => { const o=C._o;
       const L2=colLetter(o.c0);
       return [
@@ -1102,6 +1096,31 @@ const ALTS = [
       // every cell typed in its own right, bottom-up and right-to-left, locks spelled out
       for(let i=2;i>=0;i--) for(let j=2;j>=0;j--)
         steps.push({sel:o.PC[j]+(o.r0+i), keys:[...T('='+o.PC[j]+'$'+o.hr+'*$'+o.VC+(o.r0+i)),{key:'Enter'}]});   // price first, volume second — operand order is free
+      return steps; }` },
+  /* r434 (percent ROUND 1 depth pass, DEPTH_PASS §4.24): two blocks, two locked divisors, a
+     1-D fill each. ALT 1 = chord-ROUTE alt AND the §4.24 engine regression the page asks for —
+     the columns are percent-formatted BEFORE anything is entered (so the r418/r419 %-entry fix
+     is exercised: a bare "100" typed into an already-percent cell must land 100.0%, not
+     10,000%), dollar signs typed by hand with no F4 anywhere, fills walked through the ribbon,
+     bold via Alt H 1, and the right-hand block worked first. ALT 2 = op-ORDER alt and the ☆'s
+     NEGATIVE CONTROL — revenue lines bolded first, every percent cell hand-typed bottom-up with
+     a ROW-ONLY lock (B$4, the other end state a fill down survives), no fill anywhere, formats
+     last via Ctrl+Shift+% + Alt H 0. Both clear all six cores; both forfeit the ☆ (ALT 1 fills
+     from the line BELOW revenue, ALT 2 never fills at all). */
+  { key: 'percent', name: 'FORMAT FIRST (alt h p then alt h 0), 100% typed into the percent cell (r419 entry regression), typed $ locks with no F4, ribbon fill from the line below revenue, bold via alt h 1, right-hand block first — ☆ forfeited', moves: `C => { const o=C._o;
+      const blk=b=>[
+        {sel:b.rng, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},                    // percent at ZERO, stepped to one — the ribbon pair
+        {sel:b.top, keys:[...T('100'),{key:'Enter'}]},                                            // the 100% line typed by hand into an already-percent cell
+        {sel:b.PC+(b.r0+1), keys:[...T('='+b.VC+(b.r0+1)+'/$'+b.VC+'$'+b.r0),{key:'Enter'}]},     // locks TYPED, not cycled
+        {sel:b.PC+(b.r0+1)+':'+b.PC+b.rN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},        // ribbon fill down, starting BELOW the revenue line
+        {sel:b.revRng, keys:[{key:'Alt'},L('h'),D(1)]},
+      ];
+      return [...blk(o.B), ...blk(o.A)]; }` },
+  { key: 'percent', name: 'NEGATIVE CONTROL: bolds first, every percent cell hand-typed bottom-up with a row-only lock (B$4), no fill anywhere, percent via ctrl+shift+% then alt h 0 last — every core clears, ☆ dark', moves: `C => { const o=C._o; const steps=[];
+      [o.A,o.B].forEach(b=>steps.push({sel:b.revRng, keys:[{key:'b',ctrl:true}]}));               // dress before the work — end-state grading must hold
+      [o.B,o.A].forEach(b=>{ for(let i=b.n-1;i>=0;i--)
+        steps.push({sel:b.PC+(b.r0+i), keys:[...T('='+b.VC+(b.r0+i)+'/'+b.VC+'$'+b.r0),{key:'Enter'}]}); });   // bottom-up, row lock only
+      [o.A,o.B].forEach(b=>steps.push({sel:b.rng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]}));
       return steps; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);

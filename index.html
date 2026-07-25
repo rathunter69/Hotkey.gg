@@ -3667,57 +3667,241 @@ const CHALLENGES = {
     }
   },
   percent:{
-    name:'% of rev', label:'Common-size both statements', par:17, parKeys:14,
-    aha:'Divide by an anchored base — F4 locks the divisor so fill-right can’t drag it.',
-    prompt:'Common-size — every line as a % of revenue — two statements on one page; the second block moves and changes size between runs. The lesson is the anchor: each block’s divisor is its own revenue line, locked so the fill can’t drag it.',
-    req(){ const R=this._R; return '<em>C2</em> \u00b7 =B2/$B$2 (F4 locks it) \u00b7 fill C2:C6 \u00b7 <em>ctrl+shift+%</em> \u00b7 then: <em>'+R.pc+R.r0+'</em> \u00b7 ='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0+' \u00b7 fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent'; },
-    guide(){ const R=this._R; return [
-      'left block: at C2 \u00b7 <kbd>=</kbd> <kbd>\u2190</kbd> <kbd>/</kbd> <kbd>\u2190</kbd> <kbd>F4</kbd> \u2192 <b>$B$2</b> \u00b7 <kbd>\u21b5</kbd> \u00b7 fill C2:C6 \u00b7 percent',
-      'the second statement landed at '+R.vc+R.r0+':'+R.pc+R.rN+' \u2014 anchor on ITS revenue: <kbd>F4</kbd> \u2192 <b>$'+R.vc+'$'+R.r0+'</b>',
-      'fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent \u00b7 two anchors, two blocks, zero dragged divisors',
+    /* r434 H6b-5 — the depth-pass rework of "Common-size both statements"
+       (DEPTH_PASS §4.24, with the §1.0 / §1.0-R2 / §1.0-R3 law applied on top; §1.0-R3 wins).
+
+       WHAT THIS DRILL OWNS, AND WHAT IT MUST NOT BORROW. Three Formulas I drills lean on
+       anchoring and the split between them is deliberate (recorded here so a later agent
+       can't blur it):
+         · anchor  — NEITHER reference is fully absolute; the mixed anchors ($B4 and C$3) live
+                     in ONE formula and a 2-D fill walks both. That is anchor's whole lesson.
+         · fxconvert — ONE fully absolute scalar driver broadcast over a 2-D block.
+         · percent (here) — ONE fully absolute divisor PER BLOCK, 1-D fill, TWO blocks. The
+                     point is that each statement common-sizes against ITS OWN base, so the
+                     divisor that is right for block A is WRONG in block B: the lock stops the
+                     fill dragging it down its own column, and nothing carries it across the
+                     page. Two revenue lines on one sheet is the whole difficulty.
+       So: no mixed anchors are taught or required here (a row-locked divisor is ACCEPTED —
+       see the predicate note below — but the taught and demoed lock is the full $B$4), no
+       2-D fill, and no single scalar serving the whole page.
+
+       THE DOCTRINE §2.2 ANCHOR-TEXT EXCEPTION APPLIES, scoped. §1.0(c) says every check is
+       gradeable by any route including slow typing; doctrine names anchoring as the standing
+       exception, and the §4.24 page repeats it ("$-locked", "zero dragged divisors"). So the
+       two build beats read the DIVISOR'S LOCK out of the formula text. What they never read
+       is the ROUTE to it — F4 cycling and hand-typed dollar signs land the identical string
+       (ALT 1 types them), operand shape is free, and NO fill is required anywhere: a column
+       of hand-typed anchored formulas clears every core beat (ALT 2 proves it, and that is
+       also the ☆'s negative control). The exception buys formula TEXT, nothing else.
+
+       STRUCTURAL DEVIATIONS from the §4.24 page, declared here per §0:
+
+       (1) ☆ RE-CUT (binding). The page's bonus was "Italicize both % column headers — memo
+           columns whisper". That is a FORMATTING task, which §1.0(d) outlaws outright, and its
+           tail is a moral, which §1.0-R3(n) outlaws separately (the C11 denylist already
+           carries "annotations whisper" from typeset's identical cut). Replaced with the
+           hidden efficiency move this board exists to reward: seed the anchored formula ON THE
+           REVENUE LINE — where it reads 100.0% off the same divisor — and ONE fill carries the
+           whole column to the foot of the statement, both statements. Two discriminators, so
+           it does not fall out of doing the exercise: the fill must be a SINGLE op per column
+           (not a walk down the rows), and it must START on the revenue line (not below a
+           hand-typed 100%). Read off the r424 S.fillOps latch — mechanic used, never geometry
+           inferred, so ctrl+d and the ribbon's Alt H F I D both earn it.
+           MEASURED negative control (dev/e2e-alt-paths.js ALT 2): every percent cell typed by
+           hand, no fill anywhere — all six cores clear, ☆ dark. A second skip route is in ALT
+           1 (the 100% lines typed, each column filled from the line BELOW revenue).
+       (2) The page's beats 2 and 4 bundle "fill it down and percent-format the column". Split:
+           the fill is not a beat at all (it is a ROUTE — §1.0(b) strips route language, and
+           §1.0(c) forbids requiring it), so each block reads BUILD → PERCENT-FORMAT, and the
+           page's beat 5 ("Bold both 100% revenue rows") splits into its two halves so each
+           lands directly behind the block it dresses (§1.0(a) format-as-you-go) and so each
+           beat's guided ring is one exact rect. Six cores, inside the §1.1 band.
+       (3) The page's beat tails that were LESSONS are cut (§1.0-R3(n)): "the reader's anchor
+           line" says WHY. The tails that ship say WHAT ("one decimal", "revenue line included").
+       (4) TWO SEGMENT P&Ls, not "Statement A"/"Statement B". §1.3 wants every graded target
+           carrying a real board label and §2.1b wants a desk artifact; "Statement A" is a
+           drill contrivance and, worse, it gives the two blocks no NAMES for the check labels
+           to reference (§1.7 R2/R4). Named segments also make the labels adaptive per seed
+           (§1.0-R2(g)) — the player reads which block the beat means instead of memorising a
+           position. The page's own randomization survives in kind: both blocks now move
+           (its "block A site from a 3-spot pool" ask) and both depths vary 5–7.
+       (5) NO location cue (§1.0-R2(h)/§1.0-R3(q)) and NO helper cells (§1.0(f)/§1.0-R2(l)):
+           every graded target is a labelled column or a labelled row that the green outline
+           expresses exactly — there is no insert point and no empty paste destination — and
+           nothing on this page is converted or scaled, so a yellow input block would be
+           furniture with no input in it. Column widths are set so no graded cell's text
+           spills across a neighbour (§1.0-R3(q)).
+
+       ENGINE (verified live, not reasoned about — §1.0-R3(p)). Percent has THREE routes and
+       they do NOT agree on decimals: Ctrl+1 → P lands percent at ONE decimal outright, while
+       Alt H P and Ctrl+Shift+% both land it at ZERO and need Alt H 0 to step up. Typing
+       "24.6%" into the cell is a fourth (percent, one decimal, from the r95 entry parser).
+       All four clear the format beats. The r418/r419 %-entry fix is live on this board too:
+       a bare number typed into an already-percent-formatted cell auto-scales (8 → 8%), so
+       formatting the column BEFORE the formulas go in is a safe order — ALT 1 runs that order
+       deliberately as the regression the §4.24 page asks for. */
+    name:'% of rev', label:'Common-size both statements', par:21, parKeys:19, saveClose:true,   /* r434: par re-swept on the reworked board — dev/e2e-par-sweep.js percent, 5-seed median 19 keys incl. the engine-appended Ctrl+S, flat across all five (the demo's key count doesn't move with the depths — only the fill RECT does). par 21 ≈ 1.10 s/key, the top of the house band, and deliberately there: two revenue lines sit on this page and the beat is dark until the divisor lands on the right one, so the drill charges for a READ before a hand moves. Measured against it: the same board fully hand-typed runs 103 keys (dev negative control), which is the cost the clock is meant to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 32 · pro 24 · legendary 21. */
+    aha:'each block divides by its own revenue — lock the divisor and the fill carries it down the block, never across the page.',
+    /* §1.5: the aha's MOMENT is beat 4 — the second block's formula, where the lock has to be
+       re-aimed at THIS statement's revenue instead of the one that already worked. */
+    prompt:'Both segment P&Ls are on one page for the strategy review and neither common-size column has been filled in. Show every line as a percent of that segment’s own revenue, one decimal, and bold each revenue line so the reader can see the base it is read against. There are two revenue lines on this page: the divisor has to be locked to the block it belongs to, or the fill drags it down the column and the numbers come out plausible and wrong. Both blocks land somewhere new every run.',
+    req(){ const o=this._o; return '<em>'+o.A.top+'</em> =' + o.A.VC+o.A.r0+'/$'+o.A.VC+'$'+o.A.r0+' (<em>F4</em>) · <em>'+o.A.rng+'</em> <em>ctrl+d</em> · <em>ctrl+1 p</em> · <em>'+o.A.revRng+'</em> <em>ctrl+b</em> · same three on <em>'+o.B.seg+'</em> off <em>$'+o.B.VC+'$'+o.B.r0+'</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every format line names ALL the routes, since they all grade (§1.0-R3(p)). */
+    guide(){ const o=this._o; const build=b=>
+        'the <b>'+b.seg+'</b> block’s <b>% of revenue</b> column starts at '+b.top+' · type <kbd>=</kbd>, <kbd>←</kbd> onto the revenue figure, <kbd>/</kbd>, <kbd>←</kbd> onto it again, then <kbd>F4</kbd> once to lock it to <b>$'+b.VC+'$'+b.r0+'</b> · <kbd>↵</kbd> — typing the dollar signs yourself lands the same formula, and the row lock is the half that matters to a fill down';
+      const fmt=b=>
+        'select '+b.rng+' · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>p</kbd> lands percent at one decimal in a single move (<kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> and <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> land it at zero — <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> steps it to one)';
+      const bold=b=>
+        'select the revenue line '+b.revRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle; <kbd>shift</kbd>+<kbd>space</kbd> grabs the whole row first if you prefer)';
+      return [ build(o.A), fmt(o.A), bold(o.A), build(o.B), fmt(o.B), bold(o.B),
+      '☆ the discovery: put the formula on the REVENUE line itself — it reads 100.0% off the same locked divisor — then select the column top to bottom and one <kbd>ctrl</kbd>+<kbd>d</kbd> drops the whole statement in a single pass (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the ribbon’s same fill). Typing the 100% by hand and filling the rest clears the drill too, it just costs the extra moves',
     ]; },
-    targets(){ const R=this._R; return ['C2:C6', R.pc+R.r0+':'+R.pc+R.rN]; },
-    demo(){ const R=this._R; return [
-      {sel:'C2', keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
-      {sel:'C2:C6', keys:[Kb.fillD, Kb.pct]},
-      {sel:R.pc+R.r0, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
-      {sel:R.pc+R.r0+':'+R.pc+R.rN, keys:[Kb.fillD, Kb.pct]},
-    ]; },
+    /* rings: ①② the first block's % column · ③ its revenue line · ④⑤ the second block's %
+       column · ⑥ its revenue line · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.A.rng, o.A.rng, o.A.revRng, o.B.rng, o.B.rng, o.B.revRng, null]; },
+    demo(){ const o=this._o; const blk=b=>[
+      /* §2.2: the demo performs the bonus — the seed lands ON the revenue line and ONE fill
+         carries the column, which is exactly the ☆ move; its state latches at the win. */
+      {sel:b.top, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
+      {sel:b.rng, keys:[Kb.fillD]},
+      {sel:b.rng, keys:[{key:'1',ctrl:true}, L('P')]},   /* §1.0(a): the dress rides directly behind the column it dresses */
+      {sel:b.revRng, keys:[Kb.bold]},
+    ]; return [...blk(o.A), ...blk(o.B)]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const names=['Revenue','COGS','Gross profit','SG&A','R&D','EBIT','Other'];
-      const block=(labC,valC,pctC,r0,rows,title)=>{
-        cells[colLetter(labC)+(r0-1)]={...blankCell(),value:title,txt:true,bold:true};
-        const vals=[]; const rev=rnd(80,160)*10;
-        for(let i=0;i<rows;i++){
-          const v=i===0?rev:Math.round(rev*rnd(5,55)/100);
-          vals.push(v);
-          cells[colLetter(labC)+(r0+i)]={...blankCell(),value:names[i],txt:true};
-          cells[colLetter(valC)+(r0+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          cells[colLetter(pctC)+(r0+i)]={...blankCell()};
+      /* §1.2 randomization — four independent axes: (a) BOTH blocks move (the §4.24 "block A
+         site now also from a pool" ask) — the left block anchors at column A or B on header
+         row 2 or 3, and the right block sits 5–6 columns over and 0–3 rows down, 12 sited
+         pairs in all; (b) segment names Fisher-Yates shuffled out of a ten-name pool;
+         (c) every figure through rnd(); (d) each block's DEPTH draws 5–7 independently, so
+         the two columns are different lengths and neither fill range can be replayed from
+         memory. GEOMETRY MOAT: a block is 3 columns wide and the second starts 5–6 columns
+         over, so the two islands always sit 2–3 EMPTY columns apart — their rects are
+         disjoint in the column axis under every draw, and no selection, fill or current-region
+         grab can reach from one statement into the other. */
+      const SEGS=['Hardware','Services','Software','Aviation','Marine','Logistics','Wholesale','Specialty','Consumer','Industrial'];
+      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      const segs=pick(SEGS,2);
+      const c0=rnd(1,2);            // the left block's label column — A or B
+      const gap=rnd(5,6);           // the right block sits 5 or 6 columns over — a 2–3 column moat between the islands
+      const hA=rnd(2,3), hB=hA+rnd(0,3);
+      const mk=(seg,lc,h,n)=>{
+        const LC=colLetter(lc), VC=colLetter(lc+1), PC=colLetter(lc+2), r0=h+1, rN=h+n;
+        /* one coherent mini-P&L per block: revenue, COGS, the gross line, 1–3 opex lines and
+           EBIT. The two computed lines are LIVE formulas (black) and the inputs are blue —
+           doctrine §2.1b, so the board reads like a page a model produced. */
+        const opex = n===5 ? ['SG&A'] : n===6 ? ['S&M','G&A'] : ['S&M','R&D','G&A'];
+        const names=['Revenue','COGS','Gross profit'].concat(opex,['EBIT']);
+        const rev=rnd(60,180)*10;
+        const cogs=Math.round(rev*rnd(42,64)/100/5)*5;
+        const gp=rev-cogs;
+        const oTot=Math.round(gp*rnd(35,68)/100/5)*5;
+        const parts=[]; let left=oTot;
+        for(let i=0;i<opex.length;i++){
+          if(i===opex.length-1) parts.push(left);
+          else { const v=Math.round(oTot/opex.length*rnd(80,120)/100/5)*5; parts.push(v); left-=v; }
         }
-        return vals.map(v=>v/rev);
+        const vals=[rev,cogs,gp].concat(parts,[gp-oTot]);
+        cells[LC+h]={...blankCell(),value:seg,txt:true,bold:true};
+        cells[VC+h]={...blankCell(),value:'FY25',txt:true,bold:true,align:'r'};
+        cells[PC+h]={...blankCell(),value:'% of revenue',txt:true,bold:true,align:'r'};
+        const gpR=r0+2, o1=r0+3, oN=r0+2+opex.length, ebR=rN;
+        for(let i=0;i<n;i++){
+          const r=r0+i, nm=names[i], isCalc=(r===gpR||r===ebR);
+          /* §1.0(f): a computed line earns the rule ABOVE it — never a bottom border under it.
+             The rules run across the label and the figure only: the common-size column was
+             added to this page and never dressed (margin's precedent), which is also why a
+             fill down it cannot wipe a border that was never there. */
+          cells[LC+r]={...blankCell(),value:nm,txt:true,bold:r===ebR,bt:isCalc};
+          cells[VC+r]={...blankCell(),value:vals[i],fmtStyle:'comma',decimals:0,
+            fontColor:isCalc?null:'blue',bold:r===ebR,bt:isCalc};                  // blue = typed input, black = computed (doctrine §2.1b)
+          if(r===gpR) cells[VC+r].formula='='+VC+r0+'-'+VC+(r0+1);
+          if(r===ebR) cells[VC+r].formula='='+VC+gpR+'-SUM('+VC+o1+':'+VC+oN+')';
+          /* the % cells ship EMPTY but carrying decimals 2 and no number style: an unformatted
+             quotient would render its full general string and show ##### in the column before
+             the player could format it. The number STYLE is still the player's work. */
+          cells[PC+r]={...blankCell(),decimals:2};
+        }
+        return {seg:seg, lc:lc, vc:lc+1, pc:lc+2, LC:LC, VC:VC, PC:PC, h:h, r0:r0, rN:rN, n:n,
+          exp:vals.map(v=>v/rev), top:PC+r0, rng:PC+r0+':'+PC+rN, revRng:LC+r0+':'+PC+r0};
       };
-      this._L=block(1,2,3,2,5,'Statement A');
-      const spots=[{c:6,r:2},{c:6,r:5},{c:7,r:3},{c:5,r:8}];
-      const sp=spots[rnd(0,spots.length-1)];
-      const depth=rnd(5,7);
-      const r0=Math.min(sp.r, 14-depth+1);
-      this._Rexp=block(sp.c, sp.c+1, sp.c+2, r0, depth, 'Statement B');
-      this._R={ lc:colLetter(sp.c), vc:colLetter(sp.c+1), pc:colLetter(sp.c+2), r0:r0, rN:r0+depth-1, n:depth };
-      return {ROWS:Math.max(9,this._R.rN+1), cells, active:{r:2,c:3}, sel:null, colW:{1:92,6:92}};
+      const A=mk(segs[0], c0, hA, rnd(5,7));
+      const B=mk(segs[1], c0+gap, hB, rnd(5,7));
+      cells['A1']={...blankCell(),value:codename()+' — segment common-size ($mm)',txt:true,bold:true};
+      /* §1.3 density + a real desk artifact: the page names its source. Story, never graded —
+         the memo rows sit below every checked rect. */
+      const foot=Math.max(A.rN,B.rN)+2;
+      ['Source: segment reporting pack — FY25 actuals',
+       'Memo: figures in $mm, as reported'].forEach((t,i)=>{
+        cells[colLetter(c0)+(foot+i)]={...blankCell(),value:t,txt:true,it:true,fontColor:'gray'}; });
+      /* widths: the label columns hold 'Gross profit' (12 chars) and the % headers hold
+         '% of revenue' — both sized so no graded row's text spills into its neighbour
+         (§1.0-R3(q)); an explicitly sized column does not auto-grow (r432), so these are set
+         for the WIDEST route: '100.0%' under Ctrl+1 P and '1,800' under the comma. */
+      const cw={}; [A,B].forEach(b=>{ cw[b.lc]=124; cw[b.vc]=86; cw[b.pc]=120; });
+      this._o={ A:A, B:B, c0:c0, gap:gap };
+      return {ROWS:Math.max(12,foot+2), cells, active:{r:A.r0,c:A.pc}, sel:null, colW:cw};
     },
     checks(S){
-      const R=this._R;
-      const ok=(col,r0,n,exps,anchor)=>{
-        for(let i=0;i<n;i++){ const c=S.cells[col+(r0+i)];
-          if(!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exps[i])<1e-4&&c.fmtStyle==='percent')) return false;
-          if(!String(c.formula).includes(anchor)) return false; }
-        return true;
-      };
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      const norm=f=>String(f||'').toUpperCase().replace(/\s/g,'');
+      /* THE ANCHOR-TEXT EXCEPTION, scoped to the divisor (doctrine §2.2; the §4.24 page's
+         "$-locked … zero dragged divisors"). A percent cell must hold a live formula whose
+         DIVISOR is this block's own revenue cell with its ROW pinned. Deliberately generous
+         inside that, per §1.0-R3(p) — enumerate the routes, then grade the end state:
+           · $B$4 (what F4's first press and the demo land) and B$4 both clear — the row lock
+             is the half a fill DOWN can drag, so both are correct end states and both survive
+             the fill identically. A bare relative B4 drags and fails: that is the lesson.
+           · the ROUTE to the lock is never read — F4 cycling and typed dollar signs produce
+             the same string, and no fill is required anywhere (a hand-typed column clears).
+           · operand shape is free (=B5/$B$4, =+B5/$B$4, anything evaluating to the same
+             figure), because the VALUE check below is what actually pins the arithmetic.
+           · the REVENUE line itself is exempt from the formula requirement: its own percentage
+             is 100.0% with no divisor to drag, so a typed 100 (which the r418 %-entry fix
+             scales to 1) reads exactly like the filled formula and clears the same. That
+             exemption is also what keeps the ☆ skippable rather than automatic. */
+      const anch=b=>new RegExp('(^|[^A-Z0-9])\\$?'+b.VC+'\\$'+b.r0+'(?![0-9])');
+      const colOk=b=>{ const re=anch(b);
+        for(let i=0;i<b.n;i++){ const c=cel(b.PC+(b.r0+i));
+          if(typeof c.value!=='number' || Math.abs(c.value-b.exp[i])>1e-6) return false;
+          if(i===0) continue;
+          if(!c.formula || !re.test(norm(c.formula))) return false; }
+        return true; };
+      /* §1.0-R3(p) on the format: THREE chords put percent on this column and they disagree
+         about decimals — Ctrl+1 P lands one outright, Alt H P and Ctrl+Shift+% land zero and
+         need Alt H 0 to step up, and a typed "24.6%" lands one from the entry parser. The beat
+         reads the END STATE (percent, one decimal), so every one of them clears. */
+      const fmtOk=b=>{ for(let i=0;i<b.n;i++){ const c=cel(b.PC+(b.r0+i));
+          if(c.fmtStyle!=='percent' || (c.decimals|0)!==1) return false; }
+        return true; };
+      /* the revenue line reads bold when its LABEL and its FIGURE are bold — the whole-row
+         grab (shift+space), the three-cell range and the two-cell drag all land that, and the
+         %-cell is left out of the requirement so the beat can be cleared before or after the
+         column is built (§1.0-R3(p) again: grade what the page looks like). */
+      const boldOk=b=>!!cel(b.LC+b.r0).bold && !!cel(b.VC+b.r0).bold;
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — each statement's
+         whole column from ONE fill that STARTS on the revenue line, both statements. Read off
+         the r424 S.fillOps latch (mechanic used, not geometry inferred), so ctrl+d and the
+         ribbon's Alt H F I D both earn it. Walking the column, or typing the 100% by hand and
+         filling from the line below it, clears all six cores and forfeits the star — which is
+         what makes it a choice instead of a by-product (both routes are registered alts). */
+      const oneFill=b=>(S.fillOps||[]).some(f=>f.dir==='down' && f.c1<=b.pc && f.c2>=b.pc &&
+        f.r1<=b.r0 && f.r2>=b.rN);
+      const aOk=colOk(o.A), bOk=colOk(o.B);
+      /* DEPTH_PASS §4.24 beats, with the page's fill/format bundles split and its two
+         100%-row bolds landed behind their own blocks (§1.0(a)). Labels are INSTRUCTIONS
+         (§1.0-R3(n)): the clause after the dash says WHAT, never why. They name THIS seed's
+         segments (§1.0-R2(g)), so the player reads the page instead of a position. */
       return [
-        {label:'common-size Statement A \u2014 every row anchored on $B$2', ok: ok('C',2,5,this._L,'$B$2')},
-        {label:'common-size Statement B \u2014 anchor on ITS revenue, $'+R.vc+'$'+R.r0, ok: ok(R.pc,R.r0,R.n,this._Rexp,'$'+R.vc+'$'+R.r0)},
+        {label:'Build the '+o.A.seg+' % of revenue column — its own revenue cell locked', ok: aOk},
+        {label:'Percent-format the '+o.A.seg+' % of revenue column — one decimal', ok: fmtOk(o.A)},
+        {label:'Bold the '+o.A.seg+' revenue line', ok: boldOk(o.A)},
+        {label:'Build the '+o.B.seg+' % of revenue column — its own revenue cell locked', ok: bOk},
+        {label:'Percent-format the '+o.B.seg+' % of revenue column — one decimal', ok: fmtOk(o.B)},
+        {label:'Bold the '+o.B.seg+' revenue line', ok: boldOk(o.B)},
+        {label:'Fill each % of revenue column in one pass — revenue line included', ok: aOk&&bOk&&oneFill(o.A)&&oneFill(o.B), bonus:true},
       ];
     }
   },

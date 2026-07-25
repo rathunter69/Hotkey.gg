@@ -6628,3 +6628,68 @@ it if echo ever comes back.
 `echoOn` can never become true, though it is still read in `render()` and the demo button
 handler. That is roughly 90 lines of dead engine. Either restore an entry point or delete the
 feature — not decided here, because removing a feature is Wolf's call, not a cleanup.
+## r434 — H6b-5: percent depth pass — "Common-size both statements" (DEPTH_PASS §4.24 + §1.0/-R2/-R3)
+_Fourth Formulas I drill through the pass, built beside margin and anchor and deliberately fenced
+off from both._
+- **THE ARTIFACT:** two segment P&Ls on one page — revenue, COGS, the gross line, one to three
+  opex lines and EBIT, computed lines live and ruled, inputs blue — each with an empty
+  `% of revenue` column beside it. Two revenue lines on one sheet is the entire difficulty: the
+  divisor that is right for the left block is wrong in the right one.
+- **THE BOUNDARY against the other two anchoring drills** (recorded in the drill chunk so a later
+  agent can't blur it): `anchor` = NEITHER reference fully absolute, mixed anchors ($B4 and C$3)
+  inside ONE formula, 2-D fill. `fxconvert` = ONE absolute scalar broadcast over a 2-D block.
+  `percent` = ONE absolute divisor PER BLOCK, 1-D fill, TWO blocks, the lesson being that each
+  statement common-sizes against ITS OWN base. No mixed anchor is taught or required here and
+  there is no 2-D fill anywhere in the drill.
+- **BEATS (6 core + ☆ + the engine-appended Ctrl+S closer; tri-length 7, +1 at runtime):** Build
+  the <segment> % of revenue column — its own revenue cell locked → Percent-format it — one
+  decimal → Bold that segment's revenue line → the same three on the second segment. §1.0(a)
+  holds: each dress beat sits directly behind the block it dresses, so the page is finished one
+  statement at a time rather than built twice and dressed at the end.
+- **DEVIATIONS from the §4.24 page (all declared in the drill chunk):** (1) the page's ☆
+  ("Italicize both % column headers — memo columns whisper") is a FORMATTING task, dead under
+  §1.0(d), with a moral for a tail, dead again under §1.0-R3(n) — re-cut, below; (2) the page's
+  "fill it down and percent-format" bundles are split, and the FILL is not a beat at all (it is a
+  route, and §1.0(c) forbids requiring one), while the page's single "bold both 100% rows" beat
+  splits into its two halves so each lands format-as-you-go and each ring is one exact rect;
+  (3) two named SEGMENT P&Ls instead of "Statement A"/"Statement B" — §1.3 wants labelled targets
+  and the check labels need names to reference (they interpolate the seed's segments, §1.0-R2(g));
+  (4) no location cue and no helper cells: nothing here is an insert point, an empty paste
+  destination, or a conversion.
+- **☆ RECIPE (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision):** seed the anchored formula
+  ON THE REVENUE LINE — where it reads 100.0% off the same locked divisor — and ONE fill carries
+  the whole statement to its foot; both statements. Two discriminators keep it off the automatic
+  path: a single op per column, and a rect that STARTS on the revenue line rather than below a
+  hand-typed 100%. Graded off the r424 S.fillOps latch, so Ctrl+D and Alt H F I D both earn it.
+  NEGATIVE CONTROL MEASURED (5 seeds each): every percent cell hand-typed, no fill — 6/6 cores,
+  ☆ dark, 103 keys median; the 100% typed and each column filled from the line below — 6/6 cores,
+  ☆ dark, 51 keys. The ☆ route wins in 19.
+- **§1.0-R3(p) — every route to the end state enumerated and PROBED, not reasoned about.** Percent
+  disagrees with itself about decimals: Ctrl+1 → P lands one outright (19 keys), Alt H P lands
+  ZERO and needs Alt H 0 (27), Ctrl+Shift+% lands zero and needs Alt H 0 (23) — all three clear;
+  Alt H P alone correctly leaves the beat dark, because the page then reads 25% where the beat
+  asks for 24.6%, which is a visible difference the player can see and finish. Same sweep on the
+  bold: whole-row (shift+space), the label+figure drag and the ribbon's Alt H 1 all clear, the
+  label cell alone does not. On the divisor, BOTH pinned end states clear — $B$4 (F4's first
+  press, what the demo lands) and B$4 (row-only, the half a fill down can actually drag) — while a
+  bare relative divisor fails, which is the lesson. The revenue line itself is exempt from the
+  formula requirement: its own percentage has no divisor to drag, so a typed 100 reads exactly
+  like the filled formula and clears — which is also what keeps the ☆ skippable.
+- **ENGINE: nothing new, nothing touched.** The §4.24 page's regression ask (r418/r419: a bare
+  number typed into an already-percent cell auto-scales) is now covered by ALT 1, which formats
+  every column BEFORE anything is entered and types "100" into the percent cells. The shared width
+  engine (neededWidth / overflowsCol / the render #### test) was READ, not edited — the % cells
+  ship carrying decimals 2 with no number style so a raw quotient renders "0.25" instead of a
+  general string, the same guard margin uses.
+- **RANDOMIZATION (4 axes):** both blocks move — left block at column A or B on header row 2 or 3,
+  right block 5–6 columns over and 0–3 rows down (12 sited pairs; a block is 3 columns wide, so
+  the islands always sit 2–3 EMPTY columns apart and no selection or fill can reach across) ·
+  segment names Fisher-Yates sampled from a ten-name pool · every figure through rnd(), the P&L
+  built to foot (gross profit and EBIT are live formulas) · each block's DEPTH drawn 5–7
+  independently, so the two fill ranges are different lengths.
+- **PLUMBING:** HOTKEY_PARS.percent 17→21 (drills.js); C9/C12 REWORKED gains 'percent'; the stale
+  single alt-path entry (it read the retired `_R` shape and threw) is replaced by the two above.
+  drills.js meta is unchanged — name/label/tab/desc still describe this board and carry no chord.
+- **PAR:** sweep median 19 keys ×5 seeds (save included, flat across seeds — only the fill rect
+  moves with depth); parKeys 14→19, par 17→21s (~1.10 s/key, the top of the house band: this drill
+  charges for a READ before a hand moves). Clocks derive: pass 0:32 · pro 0:24 · legendary 0:21.
