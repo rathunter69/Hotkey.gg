@@ -355,5 +355,45 @@ try {
   bad('C11 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
+/* ---- C12 (r432, DEPTH_PASS §0 DoD #4): every reworked drill carries ≥2 ALT-PATH entries ----
+   The definition of done requires each depth-passed drill to ship at least two entries in
+   dev/e2e-alt-paths.js — one with a different op ORDER, one with a different chord ROUTE —
+   because that is what proves §1.0(c) Freedom: the beats grade the END STATE, not the route
+   the demo happens to take. Nothing enforced it. e2e-alt-paths runs whatever entries exist and
+   passes happily with zero for a given drill, so a build that simply never added them looked
+   green. That is the quietest possible failure: the drill ships, the gate is clean, and the
+   route-freedom claim is untested — which is exactly how the currency-vs-acct dead beat (§1.0-R3(p))
+   survived into a playtest.
+   With the full-catalog depth pass now running one agent per drill, this is the DoD item most
+   likely to be skipped under time pressure, so it is checked rather than trusted.
+   NOTE: this counts entries, which is mechanical. It cannot judge whether the two routes are
+   genuinely different — that stays a review question. ---- */
+try {
+  const inv = fs.readFileSync('dev/check-invariants.js', 'utf8');
+  const m = /const REWORKED = \[([^\]]*)\]/.exec(inv);
+  const reworked = m ? m[1].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean) : [];
+  const alts = fs.readFileSync('dev/e2e-alt-paths.js', 'utf8');
+  const counts = {};
+  // must match an ALTS ENTRY, not a keystroke object — `{key:'z',ctrl:true}` in a moves
+  // script has the same shape. Entries are the only ones followed by a `name:` field.
+  let mm; const re = /\{\s*key:\s*'([a-z0-9_]+)'\s*,\s*name\s*:/g;
+  while ((mm = re.exec(alts))) counts[mm[1]] = (counts[mm[1]] || 0) + 1;
+  let thin = 0;
+  for (const k of reworked) {
+    const n = counts[k] || 0;
+    if (n < 2) { thin++; bad(`C12: reworked drill '${k}' has ${n} alt-path entr${n === 1 ? 'y' : 'ies'} in dev/e2e-alt-paths.js — the depth-pass DoD requires >=2 (different op order AND different chord route)`); }
+  }
+  // an entry naming a drill that no longer exists is dead weight and hides real coverage gaps
+  const sbA = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sbA);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbA);
+  const live = new Set((sbA.window.HOTKEY_DRILLS || {}).menuOrder || []);
+  for (const k of Object.keys(counts))
+    if (live.size && !live.has(k)) bad(`C12: dev/e2e-alt-paths.js has ${counts[k]} entr${counts[k] === 1 ? 'y' : 'ies'} for '${k}', which is not in menuOrder (retired drill?)`);
+  if (reworked.length && !thin) ok(`e2e-alt-paths: all ${reworked.length} reworked drills carry >=2 alternate routes (DoD #4)`);
+} catch (e) {
+  bad('C12 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');
