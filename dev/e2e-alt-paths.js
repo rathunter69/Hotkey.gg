@@ -778,16 +778,24 @@ const ALTS = [
         const dep=r==='11'?(Lc+'10'):(Lc+'11');
         return {sel:cell, keys:[...T('='+dep+'*'+src),{key:'Enter'}]}; };
       return st.slice().reverse().map(mk); }` },
-  { key: 'sumif', name: 'dress FIRST, foot + mix before the rollup exists, ctrl+1 percent, ribbon fills', moves: `C => [
-      {sel:'D5:E5', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'D5:E5', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'E5', keys:[...T('=SUM(E2:E4)'),{key:'Enter'}]},
-      {sel:'F2', keys:[...T('=E2/$E$5'),{key:'Enter'}]},
-      {sel:'F2:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:'F2:F4', keys:[{key:'1',ctrl:true},L('p')]},
-      {sel:'E2', keys:[...T('=SUMIF($A$2:$A$10,D2,$B$2:$B$10)'),{key:'Enter'}]},
-      {sel:'E2:E4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-    ]` },
+  /* r435: REPLACES the pre-depth-pass sumif alt, which drove the retired fixed-geometry board
+     (hard-coded D5:E5 / E2:E4 / '=SUMIF($A$2:$A$10,D2,$B$2:$B$10)') and could only fail once the
+     board started randomising its anchor, its header row and its segment count. Same character
+     as the entry it replaces — dress FIRST, foot and mix before the rollup exists — rebuilt on
+     C._o, and carrying the SECOND ☆-skip route: two segments are hand-typed and the fill starts
+     on the SECOND row, so no single op covers the column and the star stays dark while all five
+     cores clear. Third distinct border route on the board too (Alt H B D, top and bottom). */
+  { key: 'sumif', name: 'dress FIRST (alt h b d), foot + mix before the rollup exists, ctrl+1 percent, two segments hand-typed and the rollup filled from the SECOND row — cores clear, ☆ dark', moves: `C => { const o=C._o; return [
+      {sel:o.totRng,     keys:[{key:'b',ctrl:true}]},
+      {sel:o.totRng,     keys:[{key:'Alt'},L('h'),L('b'),L('d')]},                                  // top AND bottom — the top edge is what the beat reads
+      {sel:o.LR+o.rT,    keys:[...T('=SUM('+o.LR+o.r1+':'+o.LR+o.rn+')'),{key:'Enter'}]},           // foots an empty block: zero until the rollup lands
+      {sel:o.LP+o.r1,    keys:[...T('='+o.LR+o.r1+'/$'+o.LR+'$'+o.rT),{key:'Enter'}]},
+      {sel:o.pctRng,     keys:[{key:'d',ctrl:true}]},
+      {sel:o.pctRng,     keys:[{key:'1',ctrl:true},L('p')]},
+      {sel:o.LR+o.r1,    keys:[...T('=SUMIF('+o.critR+','+o.LM+o.r1+','+o.sumR+')'),{key:'Enter'}]},
+      {sel:o.LR+(o.r1+1),keys:[...T('=SUMIF('+o.critR+','+o.LM+(o.r1+1)+','+o.sumR+')'),{key:'Enter'}]},
+      {sel:o.LR+(o.r1+1)+':'+o.LR+o.rn, keys:[{key:'d',ctrl:true}]},                                 // starts one row low — no single op covers the column
+    ]; }` },
   { key: 'threestmt', name: 'balance sheet BEFORE the CFS — RE roll and check first, cash spine last', moves: `C => [
       {sel:'C13', keys:[...T('=B13+C2'),{key:'Enter'}]},
       {sel:'C13:D13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
@@ -1126,6 +1134,41 @@ const ALTS = [
       {sel:o.revRng,keys:[{key:'r',ctrl:true}]},                                                  // the revenue line lands and the EBITDA line comes alive behind it
       {sel:o.rev1,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
     ]; }` },
+  /* r435 (sumif depth pass, DEPTH_PASS §4.28). ALT 1 is the chord-ROUTE alt AND an op-ORDER
+     inversion: the whole page is built BACKWARDS — the % column is percent-formatted while it
+     is still empty, then built and ribbon-filled against a Total row that does not exist yet
+     (every share reads a divide-by-nothing until the foot lands), the Total row is dressed
+     before it holds a number, and the rollup itself is written LAST. Every chord differs from
+     the demo's: Alt H P + Alt H 0 for the percent, Alt H F I D for both fills, Alt H 1 for the
+     bold, Alt H B S for the rule (the perimeter of a one-row selection sets its top edge) and
+     Alt+= AutoSum for the foot. The ☆ still fires — it reads the fill MECHANIC off S.fillOps,
+     so the ribbon route earns it exactly like Ctrl+D. This is the §1.0-R3(p) end-state proof:
+     three of the five beats go through a state where they grade FALSE with the work correctly
+     done, and all five light once the last piece lands.
+     ALT 2 is the §1.0-R2(i) SKIPPABILITY PROOF and the drill's MEASURED negative control: every
+     segment's SUMIF hand-typed with FULLY RELATIVE ranges, bottom-up, no fill anywhere, the
+     share column hand-typed per row with an unlocked denominator, percent via Ctrl+Shift+%
+     then Alt H 0. All five cores clear and the star stays dark — measured at 111 keys on a
+     three-segment seed and 141 on a four-segment one, against the demo's flat 61. */
+  { key: 'sumif', name: 'BACKWARDS + ribbon: % column formatted empty, built and filled before the foot exists, total row dressed before it holds a number, rollup written LAST, autosum foot — the ☆ still fires off the ribbon fill', moves: `C => { const o=C._o; return [
+      {sel:o.pctRng,  keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},                  // percent-format an empty column
+      {sel:o.LP+o.r1, keys:[...T('='+o.LR+o.r1+'/$'+o.LR+'$'+o.rT),{key:'Enter'}]},               // denominator points at a Total row that is still blank
+      {sel:o.pctRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                            // ribbon fill down
+      {sel:o.totRng,  keys:[{key:'Alt'},L('h'),D(1)]},                                            // bold via the ribbon
+      {sel:o.totRng,  keys:[{key:'Alt'},L('h'),L('b'),L('s')]},                                   // outside border — its top edge IS the top border
+      {sel:o.LR+o.r1, keys:[...T('=SUMIF('+o.critR+','+o.LM+o.r1+','+o.sumR+')'),{key:'Enter'}]},
+      {sel:o.rollRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                            // the ☆ fill, ribbon route
+      {sel:o.LR+o.rT, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},                      // AutoSum proposes the block from directly under it
+    ]; }` },
+  { key: 'sumif', name: 'NEGATIVE CONTROL: every segment SUMIF hand-typed bottom-up with FULLY RELATIVE ranges, no fill anywhere, shares typed per row off an unlocked denominator, percent via ctrl+shift+% then alt h 0 — all five cores clear, ☆ dark', moves: `C => { const o=C._o; const st=[];
+      const cr=o.LS+o.r1+':'+o.LS+o.rL, sr=o.LA+o.r1+':'+o.LA+o.rL;
+      for(let i=o.nSeg-1;i>=0;i--) st.push({sel:o.LR+(o.r1+i), keys:[...T('=SUMIF('+cr+','+o.LM+(o.r1+i)+','+sr+')'),{key:'Enter'}]});
+      st.push({sel:o.LR+o.rT, keys:[...T('=SUM('+o.LR+o.r1+':'+o.LR+o.rn+')'),{key:'Enter'}]});
+      st.push({sel:o.totRng, keys:[{key:'b',ctrl:true}]});
+      st.push({sel:o.totRng, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      for(let i=o.nSeg-1;i>=0;i--) st.push({sel:o.LP+(o.r1+i), keys:[...T('='+o.LR+(o.r1+i)+'/'+o.LR+o.rT),{key:'Enter'}]});
+      st.push({sel:o.pctRng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      return st; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
       const steps=C._sites.slice().reverse().flatMap(s=>[

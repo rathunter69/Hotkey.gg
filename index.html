@@ -9183,68 +9183,257 @@ const CHALLENGES = {
   },
 
   sumif:{
-    name:'SUMIF', label:'Roll up the segments', par:57, parKeys:59,
+    /* r435 H6b-6 — the depth-pass rework of "Roll up the segments" (DEPTH_PASS §4.28, with
+       the §1.0 / §1.0-R2 / §1.0-R3 law applied on top; §1.0-R3 wins on conflict).
+
+       WHY THIS DRILL IS NOT MERGED INTO `rollup` under §1.0-R3(s). The depth pass asks the
+       retirement question first (it is what killed `copyover` and, this session, `growth`),
+       and the honest answer here is KEEP BOTH — but the reason is narrower than "one has one
+       criterion and the other has two", so it is recorded rather than assumed:
+         · THE SIGNATURE INVERTS. SUMIF is (criteria range, criterion, sum range) — the summed
+           column comes LAST. SUMIFS is (sum range, criteria range, criterion, …) — the summed
+           column comes FIRST. That is the single most-hit trap in the family on a real desk,
+           and it is only teachable by meeting both. A player who has only ever written SUMIFS
+           writes a broken SUMIF on their first try, and vice versa.
+         · THE ANCHORING LESSON IS A DIFFERENT ONE. Here every range is FULLY absolute and the
+           criterion is FULLY relative, filled in ONE dimension. rollup's grid needs MIXED
+           anchors ($F3 walking down only, G$2 walking right only) filled in TWO. Those are
+           different hands, and the mixed-anchor 2-D case already has its own home in `anchor`.
+         · THE BOARD SHAPES DIFFER. list → one summary COLUMN with a foot and a share-of-mix
+           column, versus list → a segment × region GRID. The first is what a rollup tab looks
+           like; the second is what a cross-tab looks like.
+       Where the merge argument DOES bite, and what was done about it: the two boards used to
+       run the identical FOUR-BEAT ARC — one criteria formula, fill, live foot, bold + top
+       border on the total line — in the same words, which is the redundancy that makes them
+       read as one drill at two arities. That arc is what changed here. The recommendation
+       carried out of this build (NOT executed — a rework of `rollup` is out of scope for this
+       page) is in dev/AUDIT.md: rollup's own depth pass should drop the foot-and-dress tail
+       and spend its beats on the two-axis read, so the shared tail stops being shared.
+
+       STRUCTURAL DEVIATIONS from the §4.28 page, declared here per §0 (a build agent makes the
+       call and names it rather than improvising silently). The page is one of the thin ones —
+       "Language pass + bonus", because the drill was judged near the bar — so most of what
+       follows is the §1.0/R2/R3 law landing on a board written before it:
+
+       (1) ☆ RE-CUT (binding). The page's bonus is "Add an outside border around the finished
+           summary block". That is a FORMATTING task, which §1.0(d) outlaws outright ("a ☆
+           rewards a MASTERY MOVE … NEVER a formatting task"), and it also fails §1.0-R2(i),
+           since a player dressing the summary earns it by the nature of doing the exercise.
+           The re-cut ☆ is the move this board exists to reward: ONE fill carries the whole
+           rollup column. Its discriminator is what makes it this drill's star rather than a
+           re-run of margin's: on THIS board a fill only works if the two ledger ranges were
+           locked first — an unlocked fill walks both ranges down the sheet and the numbers
+           come out wrong — so the star is the ANCHORING discovery, delivered as a discovery
+           instead of as a graded formula-text predicate (see (2)). Read off the r424
+           S.fillOps latch (mechanic used, never geometry inferred), so Ctrl+D and the ribbon's
+           Alt H F I D both earn it.
+           MEASURED negative control (dev/e2e-alt-paths.js, the second sumif entry): every
+           segment's SUMIF hand-typed with fully relative ranges, no fill anywhere — all five
+           cores clear and the ☆ stays dark, at 111 keys on a 3-segment seed and 141 on a
+           4-segment one (20-seed probe, median 111) against the demo's flat 61. That spread is
+           the headroom the clock exists to show.
+           HONEST FOOTNOTE, recorded so nobody re-derives it as a defect: because every core
+           beat grades the END STATE (§1.0(c) — and it must), the keystroke-cheapest legal route
+           on this board is typing the four answers straight in, measured at 45 keys. It is
+           cheap in KEYS and expensive in everything else: it needs the player to add up nine to
+           twelve interleaved ledger lines in their head, it leaves a dead summary that no
+           reviewer would accept, and it teaches nothing. margin, foot and percent all carry the
+           same property; the clock is the answer to it, not a tighter predicate.
+       (2) THE ANCHOR-TEXT PREDICATE IS GONE — this is a §1.0-R3(p) bug fix, not a taste call.
+           The shipped beat 1 read `$A$2:$A$10` and `$B$2:$B$10` out of E2's formula text. So a
+           player who wrote three separate correct SUMIFs — right function, right criteria,
+           right numbers on the board — watched the beat stay dark with nothing to fix, which
+           is round 3's exact finding ("the failure mode to fear is … an UNTRIGGERABLE beat,
+           which is indistinguishable from a broken drill"). Anchoring is not this drill's
+           lesson (doctrine's anchor-text exception is scoped to the drills where it IS the
+           lesson: `anchor`, `percent`, `fxconvert`), so every core beat now grades the END
+           STATE and the lock lives in the ☆, which may reward a route because it is a bonus.
+       (3) BEAT ORDER — the dress moved off the end. The shipped order was rollup → foot →
+           % of total → dress the total line, i.e. a formatting beat batched behind unrelated
+           work, which §1.0(a) calls a spec bug. The dress now rides directly behind the foot
+           that creates the line it dresses, and the % column takes the closing pair (build,
+           then its format), so the page's "% beat closes" still holds and §1.6's finish-state
+           beat is the percent dress.
+       (4) FIVE CORES, NOT FOUR. The page's beat 3 bundled the % build and its percent format
+           into one line. Split, on the same principle margin used: the common percent routes
+           (Alt H P, Ctrl+Shift+%) land ZERO decimals and need a second move to reach one, so
+           the format is real separate work rather than a tight pair. Beat 3 keeps its bundle —
+           bold + the row's top border is the §1.1 tight-pair case (one selection, one motion).
+       (5) RANDOMIZATION REBUILT. The shipped board was FIXED at A1/D1 with three fixed segment
+           names — one axis (which rows carry which segment) where §1.2 demands two. It now
+           runs four: (a) the whole artifact anchors at column A or B with the header row at 3
+           or 4; (b) the segment names are Fisher-Yates drawn from a pool of eight and the
+           summary lists them in a DIFFERENT order than the ledger first shows them, so the
+           criteria cannot be answered from position; (c) every amount through rnd(); (d) the
+           segment count (3 or 4) and the ledger depth (9–12 rows) both move, which is what the
+           §1.0-R2(g) adaptive label on beat 2 exists to report.
+       (6) NO location cue is seeded (§1.0-R2(h)/§1.0-R3(q)): there is no insert point and no
+           empty paste destination on this board — every graded target is a labeled column or
+           the labeled Total row, which the green outline expresses exactly. Nothing graded
+           spills either; the only spilling cells (title, the two block sub-labels, the source
+           memo) are ungraded furniture.
+       (7) NO helper/assumption cells (§1.0(f)/§1.0-R2(l)): nothing here is converted or scaled,
+           so a yellow input block would be a labeled box with no input in it. The board's one
+           convention that does apply is §1.0(f)'s: the Total row takes a TOP border.
+
+       AHA MOMENT (§1.5) and FINISH STATE (§1.6). The aha the page keeps — "SUMIF reads the labels
+       for you — one formula rolls up an entire segment" — lands on beat 1's fill: three or four
+       segments come alive off a formula written once, and the criteria cell is the only thing
+       that moved. The last WORK beat is the percent dress (beat 5), which is where the summary
+       becomes sendable — every figure formatted the way its number is quoted — and the engine's
+       Ctrl+S closer follows it (§1.0(e)).
+
+       ENGINE (verified, not assumed): this engine's SUMIF matches on eqLoose EXACT equality
+       only — there is no ">"&threshold criterion path — so the criterion is always a label
+       cell, which is also why every summary label must be seeded from the same pool the ledger
+       draws from. Percent routes: Ctrl+1 → P lands percent at one decimal in a single move;
+       Alt H P and Ctrl+Shift+% land it at zero and Alt H 0 steps to one; all three clear beat 5
+       (§1.0-R3(p): enumerate the routes, then grade the end state). The % cells ship carrying
+       decimals 2 with NO number style, so a raw quotient reads "0.25" rather than the
+       ten-significant-digit general string, which would render ##### in a 96px column before
+       the player could format it. */
+    name:'SUMIF', label:'Roll up the segments', par:64, parKeys:61, saveClose:true,   /* r435: par re-swept on the reworked board — dev/e2e-par-sweep.js sumif, 5-seed median 61 keys incl. the engine-appended Ctrl+S, and FLAT at 61 over a 20-seed probe: the demo's key count is geometry-invariant here, because the ledger always lands on two-digit rows and the summary always on one, and the segment count changes what a fill covers rather than how many keys it costs. par 64 ≈ 1.05 s/key, the house band. Measured against it: the same board with every segment's SUMIF hand-typed and no fill anywhere runs 111 keys at three segments and 141 at four (dev negative control, alt-paths entry 2). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 96 · pro 74 · legendary 64. */
     aha:'SUMIF reads the labels for you — one formula rolls up an entire segment.',
-    prompt:'A raw ledger on the left, a clean summary on the right. Write one SUMIF with anchored ranges and fill it down for the other segments — only the criteria cell moves. Then total the summary with a live SUM, run % of total off an anchored denominator, and bold the total line.',
-    req:'<em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> \u00b7 fill E2:E4 \u2193 \u00b7 <em>E5</em> <em>=SUM(E2:E4)</em> \u00b7 <em>F2</em> <em>=E2/$E$5</em> \u00b7 fill F2:F4 \u2193 + <em>ctrl+shift+%</em> \u00b7 dress D5:E5: <em>ctrl+b</em> + <em>alt h b p</em>',
-    guide:[
-      'the rollup at E2 \u00b7 <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>\u21b5</kbd> \u2014 ranges $-locked, criteria walking',
-      'select E2:E4 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 only D2 walks; that is what the anchors buy you',
-      'foot it at E5 \u00b7 <kbd>=SUM(E2:E4)</kbd> \u2014 the summary must tie to the ledger',
-      'mix at F2 \u00b7 <kbd>=E2/$E$5</kbd> \u2014 anchored denominator \u00b7 fill F2:F4 \u2193 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'format the total: select D5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-    ],
-    targets:['E2:E4','E5','F2:F4','D5:E5'],
-    demo(){ return [
-      {sel:'E2', keys:[...T('=SUMIF($A$2:$A$10,D2,$B$2:$B$10)'), Kb.enter]},
-      {sel:'E2:E4', keys:[Kb.fillD]},
-      {sel:'E5', keys:[...T('=SUM(E2:E4)'), Kb.enter]},
-      {sel:'F2', keys:[...T('=E2/$E$5'), Kb.enter]},
-      {sel:'F2:F4', keys:[Kb.fillD]},
-      {sel:'F2:F4', keys:[Kb.pct]},
-      {sel:'D5:E5', keys:[Kb.bold]},
-      {sel:'D5:E5', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    prompt:'The freight desk sends its revenue as a raw ledger — one line per booking, the segment written out beside each amount — and the deck needs it by segment. A summary block is already framed on the right, its segments listed in its own order with a Total row waiting under them. Roll the ledger up into it, foot the summary, and show each segment as a share of the total.',
+    req(){ const o=this._o; return '<em>'+o.LR+o.r1+'</em> <em>=SUMIF('+o.critR+','+o.LM+o.r1+','+o.sumR+')</em> · select <em>'+o.rollRng+'</em> <em>ctrl+d</em> · <em>'+o.LR+o.rT+'</em> <em>=SUM('+o.LR+o.r1+':'+o.LR+o.rn+')</em> · <em>'+o.totRng+'</em> <em>ctrl+b</em> + <em>alt h b p</em> · <em>'+o.LP+o.r1+'</em> <em>='+o.LR+o.r1+'/$'+o.LR+'$'+o.rT+'</em> · fill <em>'+o.pctRng+'</em> ↓ · <em>ctrl+1 p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that clears its beat (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the rollup starts at '+o.LR+o.r1+' · <kbd>=</kbd>SUMIF(<b>'+o.critR+'</b>,'+o.LM+o.r1+',<b>'+o.sumR+'</b>) <kbd>↵</kbd> — the segment column to match on, then the label to match, then the column to add; pressing <kbd>F4</kbd> on each range stamps its <kbd>$</kbd> locks, and typing the dollar signs by hand lands the identical string. Writing every segment’s SUMIF out one at a time clears this beat too',
+      'the foot at '+o.LR+o.rT+' · <kbd>=</kbd>SUM('+o.LR+o.r1+':'+o.LR+o.rn+') <kbd>↵</kbd> — or <kbd>alt</kbd>+<kbd>=</kbd>, which proposes the same range from directly under the block',
+      'select '+o.totRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd>) · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> for the top border — <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> draws the perimeter of the one-row selection, whose top edge is the same line',
+      'the share column starts at '+o.LP+o.r1+' · <kbd>=</kbd>'+o.LR+o.r1+'<kbd>/</kbd>$'+o.LR+'$'+o.rT+' <kbd>↵</kbd> — the foot is the denominator for every row, so it wants the lock: press <kbd>F4</kbd> on the reference to cycle the dollars on, or type them · fill '+o.pctRng+' <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'select '+o.pctRng+' · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>p</kbd> lands percent at one decimal in a single move (<kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> or <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> land it at zero — <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> steps it to one)',
+      '☆ the discovery: lock BOTH ledger ranges in the first SUMIF, then select '+o.rollRng+' and one <kbd>ctrl</kbd>+<kbd>d</kbd> rolls up every segment — only the criteria cell walks (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the ribbon’s same fill). Leave the ranges unlocked and the fill drags them off the ledger; write each SUMIF out by hand and the drill still clears, it just costs the keys',
     ]; },
+    /* rings: ① the rollup column · ② the foot · ③ the Total row · ④⑤ the % of total column ·
+       ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.rollRng, o.LR+o.rT, o.totRng, o.pctRng, o.pctRng, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.LR+o.r1,  keys:[...T('=SUMIF('+o.critR+','+o.LM+o.r1+','+o.sumR+')'), Kb.enter]},
+      {sel:o.rollRng,  keys:[Kb.fillD]},          /* the ☆ move — one pass over the whole rollup column; its state latches at the win (§2.2) */
+      {sel:o.LR+o.rT,  keys:[...T('=SUM('+o.LR+o.r1+':'+o.LR+o.rn+')'), Kb.enter]},
+      {sel:o.totRng,   keys:[Kb.bold]},           /* §1.0(a): the dress rides directly behind the line it dresses */
+      {sel:o.totRng,   keys:[Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.LP+o.r1,  keys:[...T('='+o.LR+o.r1+'/$'+o.LR+'$'+o.rT), Kb.enter]},
+      {sel:o.pctRng,   keys:[Kb.fillD]},
+      {sel:o.pctRng,   keys:[{key:'1',ctrl:true}, L('P')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Ledger',txt:true,bold:true};
-      cells['D1']={...blankCell(),value:'Segment',txt:true,bold:true};
-      cells['E1']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
-      cells['F1']={...blankCell(),value:'% of total',txt:true,bold:true,align:'r'};
-      const segs=['Freight','Brokerage','Storage'];
-      const sums=[0,0,0];
-      for(let r=2;r<=10;r++){
-        const si=rnd(0,2), amt=rnd(20,140)*5;
-        sums[si]+=amt;
-        cells['A'+r]={...blankCell(),value:segs[si],txt:true};
-        cells['B'+r]={...blankCell(),value:amt,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      }
-      for(let i=0;i<3;i++){
-        cells['D'+(2+i)]={...blankCell(),value:segs[i],txt:true};
-        cells['E'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells['F'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
-      }
-      cells['D5']={...blankCell(),value:'Total',txt:true};
-      cells['E5']={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._sums=sums; this._tot=sums[0]+sums[1]+sums[2];
-      return {ROWS:10, cells, active:{r:2,c:5}, sel:null, colW:{1:110,2:80,4:110,5:80,6:80}};
+      /* §1.2 randomization — four independent axes: (a) the artifact's anchor column and header
+         row, (b) the segment-name pool Fisher-Yates shuffled AND re-shuffled for the summary's
+         own order, (c) every amount through rnd(), (d) the segment count and the ledger depth. */
+      const POOL=['Freight','Brokerage','Storage','Terminals','Drayage','Warehousing','Intermodal','Last mile'];
+      const shuf=(pool)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b; };
+      const c0=rnd(1,2);                    // the page's left edge — column A or B
+      const hr=rnd(3,4);                    // header row (the block sub-labels sit one above it)
+      const nSeg=rnd(3,4);                  // segments on the summary block
+      const nL=rnd(9,12);                   // ledger depth
+      const cSeg=c0, cAmt=c0+1, cSum=c0+3, cRev=c0+4, cPct=c0+5;   // one empty column of moat between the islands
+      const LS=colLetter(cSeg), LA=colLetter(cAmt), LM=colLetter(cSum), LR=colLetter(cRev), LP=colLetter(cPct);
+      const r1=hr+1, rL=hr+nL, rn=r1+nSeg-1, rT=rn+1;
+      const segs=shuf(POOL).slice(0,nSeg);
+      cells[LS+'1']={...blankCell(),value:codename()+' — booking ledger and segment summary ($000s)',txt:true,bold:true};
+      cells[LS+(hr-1)]={...blankCell(),value:'Raw ledger — one line per booking',txt:true,it:true,fontColor:'gray'};
+      cells[LM+(hr-1)]={...blankCell(),value:'Segment summary',txt:true,it:true,fontColor:'gray'};
+      cells[LS+hr]={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells[LA+hr]={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
+      cells[LM+hr]={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells[LR+hr]={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
+      cells[LP+hr]={...blankCell(),value:'% of total',txt:true,bold:true,align:'r'};
+      /* the summary lists the segments in its OWN order — the criteria cell has to be read off
+         the board, never inferred from where the ledger first mentions a segment (§1.2(d)). */
+      const order=shuf(segs.map((_,i)=>i));
+      /* the ledger: every summary segment appears at least twice (no zero row on any seed, so
+         no beat can be cleared by leaving a cell blank), the spare lines drawn at random, the
+         tape shuffled so the segments interleave the way a booking log actually runs.
+         ONE PLACEMENT IS NOT RANDOM, and it is what makes the ☆'s lesson land on EVERY seed
+         instead of most of them: the ledger's opening lines carry, one each, the segments the
+         summary lists BELOW its first row. An unlocked fill walks both ranges down by one row
+         per step, so it drops exactly those opening lines — and each rolled-up segment under
+         the first therefore comes out short of its own entry, on every seed. Measured before
+         this constraint existed, the unlocked fill still landed the right numbers on roughly
+         one seed in fifteen (probe, r435), which would have made the star fire for the wrong
+         reason and taught nothing. */
+      const head=[]; for(let j=1;j<nSeg;j++) head.push(segs[order[j]]);
+      const cnt={}; head.forEach(s=>{ cnt[s]=(cnt[s]||0)+1; });
+      const rest=[];
+      segs.forEach(s=>{ for(let k=(cnt[s]||0);k<2;k++) rest.push(s); });
+      while(head.length+rest.length<nL) rest.push(segs[rnd(0,nSeg-1)]);
+      const rows=head.concat(shuf(rest));
+      const sums=segs.map(()=>0);
+      rows.forEach((s,i)=>{ const r=r1+i, amt=rnd(20,140)*5;
+        sums[segs.indexOf(s)]+=amt;
+        cells[LS+r]={...blankCell(),value:s,txt:true};
+        cells[LA+r]={...blankCell(),value:amt,fontColor:'blue',fmtStyle:'comma',decimals:0};   // blue = typed data, the house convention
+      });
+      const sumOrd=order.map(i=>sums[i]);
+      order.forEach((si,i)=>{ const r=r1+i;
+        cells[LM+r]={...blankCell(),value:segs[si],txt:true};
+        cells[LR+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[LP+r]={...blankCell(),decimals:2};        // no number style yet — the percent format is beat 5
+      });
+      cells[LM+rT]={...blankCell(),value:'Total',txt:true};
+      cells[LR+rT]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[LS+(rL+2)]={...blankCell(),value:'Source: booking system extract — gross revenue, no adjustments',txt:true,it:true,fontColor:'gray'};
+      const tot=sumOrd.reduce((a,b)=>a+b,0);
+      this._o={ hr:hr, r1:r1, rL:rL, rn:rn, rT:rT, nSeg:nSeg, nL:nL,
+        cSeg:cSeg, cAmt:cAmt, cSum:cSum, cRev:cRev, cPct:cPct,
+        LS:LS, LA:LA, LM:LM, LR:LR, LP:LP,
+        sums:sumOrd, tot:tot,
+        critR:'$'+LS+'$'+r1+':$'+LS+'$'+rL,
+        sumR :'$'+LA+'$'+r1+':$'+LA+'$'+rL,
+        rollRng:LR+r1+':'+LR+rn,
+        pctRng :LP+r1+':'+LP+rn,
+        totRng :LM+rT+':'+LR+rT };
+      const colW={}; colW[cSeg]=118; colW[cAmt]=88; colW[c0+2]=34; colW[cSum]=118; colW[cRev]=92; colW[cPct]=96;
+      return {ROWS:rL+2, cells, active:{r:r1,c:cRev}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
-      const anchOk=refs('E2',['SUMIF','$A$2:$A$10','$B$2:$B$10']);
-      const rollOk=[0,1,2].every(i=>{ const val=v('E'+(2+i)); return val!==null&&Math.abs(val-this._sums[i])<0.5; });
-      const totC=S.cells['E5'];
-      const totOk=!!(totC&&totC.formula&&String(totC.formula).toUpperCase().includes('SUM(')&&Math.abs(totC.value-this._tot)<0.5);
-      const pctOk=[0,1,2].every(i=>{ const c=S.cells['F'+(2+i)];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._sums[i]/this._tot)<1e-3&&c.fmtStyle==='percent'); })
-        && refs('F2',['$E$5']);
-      const dressOk=['D5','E5'].every(k=>{ const c=S.cells[k]; return !!(c&&c.bold&&c.bt); });
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      /* §1.0(c) FREEDOM + §1.0-R3(p) END-STATE GRADING: every core ok reads what the page LOOKS
+         like, so a hand-typed SUMIF per segment, a pointed one, or a typed figure all clear the
+         same way and the clock prices the difference. Every amount is a multiple of five by
+         construction, so the 0.5 money tolerance is slack and never a rounding trap; the share
+         tolerance is half a display step at one decimal, so a player who types the 24.6% they
+         can see lands inside it. */
+      const near=(k,want,tol)=>{ const v=cel(k).value; return typeof v==='number' && Math.abs(v-want)<=tol; };
+      const rollOk=o.sums.every((w,i)=>near(o.LR+(o.r1+i), w, 0.5));
+      const totOk=near(o.LR+o.rT, o.tot, 0.5);
+      /* the dress grades the Total row's FIGURE cell, so selecting the label with it (the way
+         a hand-off row actually gets dressed) clears identically to selecting the number alone.
+         Every border route that draws the row's top edge counts: Alt H B P (top), Alt H B D
+         (top & bottom), Alt H B S / B T (the perimeter of a one-row selection sets the top edge)
+         and Alt H B A (all borders, which paints the same edge as ball). */
+      const tc=cel(o.LR+o.rT);
+      const dressOk=!!(tc.bold && (tc.bt||tc.ball));
+      const pctOk=o.sums.every((w,i)=>near(o.LP+(o.r1+i), w/o.tot, 6e-4));
+      const pfmtOk=o.sums.every((_,i)=>{ const c=cel(o.LP+(o.r1+i));
+        return c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): ONE fill carries
+         the whole rollup column. Read off the r424 S.fillOps latch — the MECHANIC is recorded,
+         never inferred from the end state, so Ctrl+D and the ribbon's Alt H F I D both earn it
+         and a column of hand-typed SUMIFs earns nothing. rollOk rides in the predicate because
+         an UNLOCKED fill is the failure this star exists to teach: it drags both ledger ranges
+         down the sheet and the numbers come out wrong, so a fill alone is not the move. Writing
+         each segment's SUMIF out by hand clears all five cores (the alt-paths negative control
+         measures it at 111–141 keys against the demo's 61) and forfeits only the star. */
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='down' && f.r1<=o.r1 && f.r2>=o.rn &&
+        f.c1<=o.cRev && f.c2>=o.cRev);
+      /* DEPTH_PASS §4.28's beats, re-ordered so each dress rides its own work beat (§1.0(a)).
+         Labels are instructions (§1.0-R3(n)): the clause after the dash says WHAT, never why.
+         Beat 2 carries the §1.0-R2(g) adaptive fact — the segment count moves per seed, so the
+         line reports it instead of making the player count the block. */
+      const WORD=['','one','two','three','four','five','six'][o.nSeg]||String(o.nSeg);
       return [
-        {label:'build one SUMIF, ranges $-locked \u2014 only the criteria walks the fill', ok: anchOk&&rollOk},
-        {label:'total the summary with a live SUM', ok: totOk},
-        {label:'run % of total off the anchored denominator, all three segments', ok: pctOk},
-        {label:'bold the total line and add a top border above it', ok: dressOk},
+        {label:'Total each segment’s revenue in the summary block', ok: rollOk},
+        {label:'Total the '+WORD+' segments in the Total row', ok: totOk},
+        {label:'Bold the Total row and add a top border above it', ok: dressOk},
+        {label:'Build the % of total column for every segment', ok: pctOk},
+        {label:'Percent-format the % of total column — one decimal', ok: pfmtOk},
+        {label:'Fill the whole rollup column in one pass', ok: rollOk && onePass, bonus:true},
       ];
     }
   },

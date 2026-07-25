@@ -6758,3 +6758,120 @@ on a board whose "Memo: growth" row nothing ever read. Retire-or-rework was the 
   railed/contained/solvable · formula pack 102/102 and parity matrix 177/177 re-run for the engine
   latch. The stale two-check bridge alt entry ("typed refs … geometry-derived") died with the board
   it drove and is replaced by the §1.8 pair.
+
+## r435 — H6b-6: sumif depth pass — "Roll up the segments" (DEPTH_PASS §4.28 + §1.0/-R2/-R3)
+_A thin §4 page ("Language pass + bonus", the drill was judged near the bar) meeting the full
+§1.0/-R2/-R3 law. The board it described was fixed at A1/D1 with three fixed segment names and one
+randomization axis, and its opening beat was untriggerable by three of the four legal routes._
+- **MERGE VERDICT vs `rollup` (§1.0-R3(s), asked before anything was built): KEEP BOTH — but the
+  pair is closer than it should be, and the fix belongs to rollup, not here.** Against a merge:
+  the SUMIF/SUMIFS ARGUMENT ORDER INVERTS — SUMIF is (criteria range, criterion, sum range) and
+  SUMIFS is (sum range, criteria range, criterion, …) — which is the most-hit trap in the family
+  and is only teachable as a CONTRAST; a player who has only met one writes the other wrong. That
+  is the exact opposite of the growth/versionup and dress/wirewalk cases, where the second drill
+  taught the first's construct VERBATIM: here neither construct is the other's. The anchor
+  topologies differ too (fully-absolute ranges + a fully-relative criterion, filled in ONE
+  dimension, versus a fully-absolute sum range + MIXED criteria filled in TWO — and the mixed-2-D
+  case already has its own home in `anchor`), as do the artifacts (a rollup tab, versus a
+  cross-tab). For a merge: SUMIFS is a strict generalization of SUMIF, both boards live two files
+  apart in the same chapter, and — the real problem — they used to run the IDENTICAL four-beat arc
+  in nearly identical words (one criteria formula → fill → live foot → bold + top border on the
+  total line). That shared TAIL, not the shared function family, is what made them read as one
+  drill at two arities.
+  **RECOMMENDED, NOT EXECUTED (out of scope for this page):** when §4.29 rollup takes its own depth
+  pass, drop its foot-and-dress tail and spend those beats on what only a cross-tab can teach — the
+  two-way tie (row margins, column margins and the corner agreeing) or the mixed-anchor read
+  itself. Its page-spec'd ☆ ("Bold the grid's row and column headers — the axes read") must be
+  re-cut regardless: it is a FORMATTING bonus (§1.0(d)) with a moral for a tail (§1.0-R3(n)),
+  exactly like this drill's was. And if the pair is STILL judged redundant then, the merge that
+  makes sense runs the other way from the obvious one: fold ROLLUP into this board by adding a
+  region column and a second criterion as a late beat, so one drill walks SUMIF → SUMIFS on one
+  ledger and the signature contrast gets taught head-on. Retiring `sumif` would leave the catalog
+  with no SUMIF at all and the inversion trap unaddressed.
+- **BOARD.** A booking ledger (9–12 lines, segment + amount, blue figures) on the left; a segment
+  summary on the right — Segment / Revenue / % of total, with a Total row under it — separated by
+  one empty column of moat. Both islands carry an italic sub-label above their headers, and a
+  source memo closes the page. 3 or 4 segments, drawn from a pool of eight. The summary lists them
+  in its OWN order, never the ledger's, so the criteria cell has to be read off the board.
+- **BEATS (5 core + ☆ + the engine-appended Ctrl+S closer; tri-length 6, C9-registered).** Total
+  each segment's revenue in the summary block → Total the {three|four} segments in the Total row →
+  Bold the Total row and add a top border above it → Build the % of total column for every segment
+  → Percent-format the % of total column — one decimal. Beat 2 reports THIS seed's segment count
+  (§1.0-R2(g)); every clause after a dash says WHAT, never why (§1.0-R3(n)).
+- **§1.0-R3(p) BUG FIX, the reason this is a rework and not a copy-edit.** The shipped beat 1 read
+  `$A$2:$A$10` and `$B$2:$B$10` out of E2's formula TEXT. A player who wrote three separate correct
+  SUMIFs — right function, right criteria, right numbers on the board — watched the beat stay dark
+  with nothing to fix: round 3's untriggerable beat, indistinguishable from a broken drill.
+  Anchoring is not this drill's lesson (doctrine's anchor-text exception is scoped to `anchor`,
+  `percent`, `fxconvert`, where it IS), so every core beat now grades the END STATE and the lock
+  moved into the ☆, which is allowed to reward a route because it is a bonus.
+- **DEVIATIONS from the §4.28 page, all commented at the drill.** (1) ☆ RE-CUT — the page's "Add an
+  outside border around the finished summary block" is a FORMATTING task (§1.0(d)) that a player
+  dressing the summary earns by the nature of doing the exercise (§1.0-R2(i)). (2) The anchor-text
+  predicate above. (3) BEAT ORDER — the dress moved off the end and now rides the foot that creates
+  the line it dresses (§1.0(a) format-as-you-go; a trailing dress beat is a spec bug). (4) FIVE
+  cores, not four: the page bundled the % build with its percent format, and the common percent
+  routes land ZERO decimals and need a second move, so the format is real separate work. Beat 3
+  keeps its bundle — bold + top border is the §1.1 tight pair. (5) RANDOMIZATION rebuilt from one
+  axis to four: anchor column (A or B) + header row (3 or 4); the segment pool shuffled AND
+  re-shuffled for the summary's own order; every amount through rnd(); segment count (3–4) and
+  ledger depth (9–12). (6) No cueCell() — no insert point, no empty paste destination, and nothing
+  graded spills (§1.0-R2(h)/§1.0-R3(q)). (7) No helper cells — nothing on this board is converted
+  or scaled, so a yellow block would be a labeled box with no input in it (§1.0(f)/§1.0-R2(l)).
+- **☆ RECIPE (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): ONE fill carries
+  the whole rollup column.** Read off the r424 `S.fillOps` latch — mechanic recorded, never
+  geometry inferred — so Ctrl+D and the ribbon's Alt H F I D both earn it, and a column of
+  hand-typed SUMIFs earns nothing. What keeps it from being a re-run of margin's one-pass star: the
+  rollup VALUES ride in the predicate, because on this board a fill only works if the ledger ranges
+  were locked first. **build() makes that deterministic rather than lucky:** the ledger's opening
+  lines carry, one each, the segments the summary lists BELOW its first row, so an unlocked fill —
+  which walks both ranges down one row per step — drops exactly those lines and every segment under
+  the first comes out short of its own entry. Measured before that constraint existed, the unlocked
+  fill still landed the right numbers on roughly one seed in fifteen, which would have lit the star
+  for the wrong reason; measured after, it fails on 20 of 20.
+- **NEGATIVE CONTROL, MEASURED (the §1.0-R2(i) skippability proof), 20 seeds × 4 routes:** every
+  segment's SUMIF hand-typed with FULLY RELATIVE ranges, bottom-up, no fill anywhere, shares typed
+  per row off an unlocked denominator → win, cores 5/5, ☆ DARK, 111 keys on a 3-segment seed and
+  141 on a 4-segment one, against the demo's flat 61. Second skip route (registered): two segments
+  hand-typed and the fill started on the SECOND row → win, 5/5, ☆ dark, 93 keys. Third: the
+  ribbon-fill route → win, 5/5, ☆ EARNED at 66 keys, proving the latch is not overfit to Ctrl+D.
+  HONEST FOOTNOTE, recorded so nobody re-derives it as a defect: because every core grades the end
+  state (§1.0(c) — and it must), the keystroke-cheapest LEGAL route is typing the four answers
+  straight in, at 45 keys. It is cheap in keys and expensive in everything else — it needs the
+  player to add up nine to twelve interleaved ledger lines in their head and leaves a dead summary.
+  margin, foot and percent all carry the same property; the clock is the answer to it, not a
+  tighter predicate.
+- **ROUTE ENUMERATION (§1.0-R3(p)) — a 23-case matrix, each route DRIVEN on 4 fresh seeds, not
+  reasoned about.** Beat 3 (dress) lights from Alt H B P, Alt H B D, Alt H B S on the one-row line,
+  Alt H B A and Alt H B T, from Ctrl+B or Alt H 1, and whether or not the row label rides in the
+  selection — and stays DARK on bold-without-border, border-without-bold, and a selection that
+  caught only the label. Beat 5 (percent) lights from Ctrl+1 → P (one decimal in one move), Alt H P
+  + Alt H 0, and Ctrl+Shift+% + Alt H 0, and stays dark on Alt H P alone (zero decimals). Beat 2
+  (the foot) lights from a typed =SUM(), Alt+= AutoSum, a plus chain, and a typed figure. Beat 1
+  lights from one anchored SUMIF plus a fill, from one SUMIF per segment with FULLY RELATIVE ranges,
+  from a QUOTED-TEXT criterion instead of a cell reference, and from typed figures — and stays dark
+  on the unlocked-ranges fill. Beat 4 lights from an anchored denominator plus a fill and from
+  percentages typed off the board. 23/23 as designed. ENGINE NOTE: this engine's SUMIF matches on
+  eqLoose EXACT equality only — there is no `">"&threshold` criterion path — so the criterion is
+  always a label cell.
+- **PAR:** 57/59 → 64/61. 5-seed sweep median 61 keys incl. the appended Ctrl+S, and FLAT at 61 over
+  a 20-seed probe: the demo's key count is geometry-invariant here, because the ledger always lands
+  on two-digit rows and the summary always on one, and the segment count changes what a fill covers
+  rather than how many keys it costs. par 64 ≈ 1.05 s/key, the house band; mirrored in HOTKEY_PARS.
+  Clocks derive (§1.4): pass 1:36 · pro 1:14 · legendary 1:04.
+- **ALTS (§1.8).** The pre-depth-pass sumif entry drove the RETIRED fixed geometry (hard-coded
+  `D5:E5` / `E2:E4` / `=SUMIF($A$2:$A$10,D2,$B$2:$B$10)`) and failed the moment the board started
+  randomising; it is REPLACED by a rebuild of the same character (dress first, foot and mix before
+  the rollup exists) on C._o, now also carrying the second ☆-skip route and a third border route.
+  Two NEW entries beside it: the BACKWARDS + ribbon route (percent-formatted while empty, built and
+  filled against a Total row that does not exist yet, total row dressed before it holds a number,
+  rollup written LAST, AutoSum foot — three beats pass through a state where they grade FALSE with
+  the work correctly done, and all five light when the last piece lands), and the negative control.
+  Three green ×3 seeds.
+- **GATE (all green, own port 8832):** `STATIC INVARIANTS: clean` (C9 sumif tri-length 6 + one ☆ +
+  saveClose · C11 aphorisms clean · C12 all 22 reworked drills ≥2 alts, no stale entries) ·
+  demo-replay `E2E: ALL GREEN` (sumif WIN 3/3) · alt-paths `ALL 96 PASS` · par-sweep `FLAGGED: 0`
+  (sumif 64/61/61, drift 0%, 1.05 s/key) · fit-sweep `ALL CLEAN (73 drills)` · depth-mechanics
+  `155 passed, 0 failed` · smoke `ALL 7 PAGES CLEAN + skin-unlock` (drill-count 77, PARS parity,
+  de-hint clean) · guided gate `ALL 1 PASS (1 railed)` — sumif railed, contained, solvable.
+  Screenshots (fresh · mid · win) taken; the win state passes the sendable-page test.
