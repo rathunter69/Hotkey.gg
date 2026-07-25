@@ -3019,46 +3019,194 @@ const CHALLENGES = {
     }
   },
   margin:{
-    name:'Formula', label:'Margins across the page', par:23, parKeys:21,
-    aha:'Point the divide, Ctrl+D fills it down, Ctrl+Shift+% dresses it — a margin column in three chords.',
-    prompt:'Three comp tables (side-by-side peer comparisons), one skill: EBITDA ÷ revenue — the margin every banker quotes — build it by pointing, fill it down, format it as a percent. The tables land in a different spot every run; the sequence is what you’re learning, not the location.',
-    req(){ return this._sites.map((s,i)=>'<em>'+s.m+s.r0+'</em> \u00b7 ='+s.e+s.r0+'/'+s.v+s.r0+' \u00b7 fill '+s.m+s.r0+':'+s.m+(s.r0+2)+' \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then '); },
-    guide(){ return ['<b>read the formula bar</b> \u00b7 the moment you type <kbd>=</kbd>, a red <b style="color:#e0574d">\u2715</b> and green <b style="color:#3fae4f">\u2713</b> light up \u2014 the cell is LIVE. Arrow keys now <b>point</b> (grab a cell\u2019s reference); tap <kbd>F2</kbd> to flip to <b>edit</b> (arrows move the cursor inside the text), <kbd>F2</kbd> again to point. <kbd>\u21b5</kbd> commits \u00b7 <kbd>esc</kbd> cancels'].concat(this._sites.map((s,i)=>['table one','table two','table three'][i]+' at <b>'+s.m+s.r0+'</b> \u00b7 point <kbd>='+s.e+s.r0+'/'+s.v+s.r0+'</kbd> <kbd>\u21b5</kbd> \u00b7 fill down \u00d72 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>'+(i===0?' \u2014 <kbd>ctrl</kbd>+arrows jump between tables':''))); },
-    targets(){ return this._sites.map(s=>s.m+s.r0+':'+s.m+(s.r0+2)); },
-    demo(){ return this._sites.flatMap(s=>[
-      {sel:s.m+s.r0, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowLeft'},Kb.enter]},
-      {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[Kb.fillD, Kb.pct]},
-    ]); },
+    /* r433 H6b-5 (DEPTH_PASS §4.21 + the §1.0 / §1.0-R2 / §1.0-R3 law on top): the depth-pass
+       rework of "Margins across the page", and the FIRST Formulas I drill through the pass.
+       The §4.21 page keeps its spine — three DIFFERENT ratio asks instead of one skill run three
+       times [Escalating Twin Variants], the margin (EBITDA ÷ revenue), the growth rate
+       (this year ÷ last − 1) and the multiple (EV ÷ EBITDA), each dressed in the format its
+       number is actually quoted in — plus the page's beat 4 (bold the three ratio headers).
+       The engine-appended Ctrl+S closer finishes it (§1.0(e), saveClose:true).
+
+       STRUCTURAL DEVIATIONS from the §4.21 page, called out here per §0 (a build agent makes the
+       call and names it rather than improvising silently):
+
+       (1) ONE PEER PAGE, THREE RATIO COLUMNS — not three scattered 3-row comp tables.
+           The page asks for "comp set A / B / C" as three separate islands with the ask permuted
+           between them. Two reasons that structure had to go, and the second is binding:
+             · ARTIFACT. Three 3-row, 3-column tables with no peer names is a drill contrivance,
+               not a desk artifact (§1.3 labeled targets + §2.1b banker's-workbook finish). A
+               coverage page — peers down, metrics across, ratios computed at the right — is the
+               thing an associate actually opens, and it carries its own labels for every graded
+               target.
+             · THE ☆ (binding). §1.0(d) outlaws formatting bonuses, and §1.0-R2(i) requires the ☆
+               to be a DISTINCT, SKIPPABLE efficiency decision. The page's ☆ ("right-align the
+               three ratio headers") is a formatting task, so it had to be re-cut — and on three
+               3-column islands there is NO efficiency move left to reward: every one-pass
+               selection either spans two islands (wrecking the other table's format) or does not
+               exist. Contiguous ratio columns on one page restore the classic move: seed the
+               three top cells, select the whole three-column block, and ONE fill drops every
+               ratio down the page. That is the §1.0(d) family verbatim ("proper anchoring so one
+               copy-down/copy-right fills a block"), it is genuinely skippable (three separate
+               fill-downs clear every core beat, §1.0(c)), and it is read off the r424 S.fillOps
+               latch — mechanic used, never geometry inferred.
+           What the page's randomization asked for survives in kind, not in form: the
+           "which table gets which ask" permute is now WHICH RATIO COLUMN SITS WHERE (§1.2(d)),
+           so the player reads the headers instead of memorising positions, and the site shuffle
+           becomes an anchor-column + header-row jitter (§1.2(a)).
+       (2) The multiple's FORMAT rides its build line instead of taking its own beat, while the
+           two percent columns each get a dress beat immediately behind their build (§1.0(a)
+           format-as-you-go). Principled, not arbitrary: the multiple format has exactly ONE
+           route (Ctrl+1 → X) and that single move lands the decimal with it, whereas the common
+           percent routes (Alt H P, Ctrl+Shift+%) land ZERO decimals and need a second move — so
+           percent-to-one-decimal is real separate work and "one decimal with an x" is the §1.1
+           tight-pair case. Six core beats either way; this keeps the page's beat 4.
+       (3) The page's beat tails were LESSONS ("— the page reads its own asks"); §1.0-R3(n) allows
+           a tail that says WHAT or WHERE, never WHY, so those are replaced with the scope.
+       (4) NO §1.0-R2(h)/§1.0-R3(q) location cue is seeded: every graded target here is a labeled
+           column or a header cell that the green selection outline expresses exactly — there is
+           no insert point and no empty paste destination for a red cue to point at. No graded
+           target spills either (§1.0-R3(q)): the ratio headers are sized to their columns, and
+           the only spilling cells on the board (title, source memo) are ungraded.
+       (5) NO helper/assumption cells (§1.0(f)/§1.0-R2(l)): nothing on this board is converted or
+           scaled, so a yellow input block would be furniture with no input in it. Every figure a
+           ratio needs is a labeled column on the page.
+
+       ENGINE (verified, not assumed): the multiple format is the r-era `mult` fmtStyle, reachable
+       via Ctrl+1 → X, which sets decimals 1 in the same move; Ctrl+1 → P lands percent at one
+       decimal, and Alt H P / Ctrl+Shift+% land percent at zero, so Alt H 0 finishes those routes
+       — all four clear beat 2 and beat 4 (§1.0-R3(p): enumerate the routes, grade the end state).
+       Ratio cells ship carrying decimals 2 with no number style, so a raw quotient reads "0.24"
+       instead of the 10-significant-digit general string, which would render ##### in a 96px
+       column before the player ever got to format it. */
+    name:'Margins', label:'Margins across the page', par:40, parKeys:38, saveClose:true,   /* r433: par re-swept post-rework — dev/e2e-par-sweep.js margin, 5-seed median 38 keys incl. the engine-appended Ctrl+S (flat across seeds: the pointer walk is permutation-invariant, since the three ratio columns always sit at the same three offsets). par 40 ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. Clocks fall out at pass 1:00 · pro 0:46 · legendary 0:40. */
+    aha:'point the divide, fill it down, dress it — the same three moves price a margin, a growth rate and a multiple.',
+    prompt:'The coverage page came back from the junior with the raw metrics pulled and the three ratio columns left empty — revenue for both years, EBITDA and enterprise value (EV) are all sitting there. Price the peer set: the margin, the growth rate and the EV/EBITDA multiple, each shown the way its number gets quoted. The ratio columns land in a different order every run, so read the headers, not the positions.',
+    req(){ const o=this._o; return '<em>'+o.m.top+'</em> point =EBITDA/revenue · <em>'+o.g.top+'</em> point =FY25/FY24-1 · <em>'+o.x.top+'</em> point =EV/EBITDA · select <em>'+o.blk+'</em> <em>ctrl+d</em> · <em>'+o.m.rng+'</em> + <em>'+o.g.rng+'</em> <em>ctrl+1 p</em> · <em>'+o.x.rng+'</em> <em>ctrl+1 x</em> · <em>'+o.hdrRng+'</em> <em>ctrl+b</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every line names BOTH routes to its format, since both are graded (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the <b>'+o.m.hdr+'</b> column starts at '+o.m.top+' · type <kbd>=</kbd>, then <kbd>←</kbd> onto the <b>EBITDA</b> figure, <kbd>/</kbd>, <kbd>←</kbd> onto the <b>FY25 rev</b> figure, <kbd>↵</kbd> — while the formula is live the arrows POINT instead of moving',
+      'select '+o.m.rng+' · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>p</kbd> lands percent at one decimal in a single move (<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> or <kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> land it at zero — <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> steps it to one)',
+      'the <b>'+o.g.hdr+'</b> column starts at '+o.g.top+' · <kbd>=</kbd>, point at <b>FY25 rev</b>, <kbd>/</kbd>, point at <b>FY24 rev</b>, then type <kbd>-1</kbd> <kbd>↵</kbd> — the ratio is 1.13, the growth is the 13 above it',
+      'select '+o.g.rng+' · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>p</kbd> — same dress as the margin column, same one decimal',
+      'the <b>'+o.x.hdr+'</b> column starts at '+o.x.top+' · <kbd>=</kbd>, point at <b>EV</b>, <kbd>/</kbd>, point at <b>EBITDA</b>, <kbd>↵</kbd> · then <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>x</kbd> — one decimal and the trailing x in one move',
+      'the three ratio headers arrived undressed while the rest of the header row is bold: select '+o.hdrRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle)',
+      '☆ the discovery: put all three formulas on the first peer row FIRST, then select the whole block '+o.blk+' and one <kbd>ctrl</kbd>+<kbd>d</kbd> drops every ratio down the page — three separate fills clear the drill too, they just cost time',
+    ]; },
+    /* rings: ①② the margin column · ③④ the growth column · ⑤ the multiple column ·
+       ⑥ the three ratio headers · ☆ never ringed (r423 §2 mystery slot) */
+    targets(){ const o=this._o; return [o.m.rng, o.m.rng, o.g.rng, o.g.rng, o.x.rng, o.hdrRng, null]; },
+    demo(){ const o=this._o;
+      const pt=(from,to)=>Array.from({length:from-to},()=>({key:'ArrowLeft'}));   // point mode: each ← walks the live reference one column left of the anchor
+      return [
+      {sel:o.m.top, keys:[{key:'='}, ...pt(o.m.col,o.cEbd), {key:'/'}, ...pt(o.m.col,o.cRevC), Kb.enter]},
+      {sel:o.g.top, keys:[{key:'='}, ...pt(o.g.col,o.cRevC), {key:'/'}, ...pt(o.g.col,o.cRevP), ...T('-1'), Kb.enter]},
+      {sel:o.x.top, keys:[{key:'='}, ...pt(o.x.col,o.cEv),  {key:'/'}, ...pt(o.x.col,o.cEbd),  Kb.enter]},
+      /* the ☆ move: three seeds, ONE fill over the whole ratio block — its state latches at the
+         win (r421 §2.2), so it rides here in the middle of the run like any other action */
+      {sel:o.blk,   keys:[Kb.fillD]},
+      {sel:o.m.rng, keys:[{key:'1',ctrl:true}, L('P')]},   /* §1.0(a): each dress rides directly behind the column it dresses */
+      {sel:o.g.rng, keys:[{key:'1',ctrl:true}, L('P')]},
+      {sel:o.x.rng, keys:[{key:'1',ctrl:true}, L('X')]},
+      {sel:o.hdrRng, keys:[Kb.bold]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const slots=[{r:1,c:2},{r:1,c:7},{r:8,c:2},{r:8,c:7}];
-      for(let k=slots.length-1;k>0;k--){ const j=rnd(0,k); [slots[k],slots[j]]=[slots[j],slots[k]]; }
-      this._sites=[];
-      slots.slice(0,3).forEach((sl,t)=>{
-        const V=colLetter(sl.c), E=colLetter(sl.c+1), M=colLetter(sl.c+2);
-        cells[V+sl.r]={...blankCell(),value:'Comp set '+'ABC'[t],txt:true,bold:true};
-        cells[V+(sl.r+1)]={...blankCell(),value:'Rev',txt:true,bold:true,align:'r'};
-        cells[E+(sl.r+1)]={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
-        cells[M+(sl.r+1)]={...blankCell(),value:'Margin',txt:true,bold:true,align:'r'};
-        const exps=[];
-        for(let i=0;i<3;i++){
-          const rev=rnd(40,180)*10, ebd=Math.round(rev*rnd(12,38)/100);
-          cells[V+(sl.r+2+i)]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          cells[E+(sl.r+2+i)]={...blankCell(),value:ebd,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          cells[M+(sl.r+2+i)]={...blankCell()};
-          exps.push(ebd/rev);
-        }
-        this._sites.push({v:V,e:E,m:M,r0:sl.r+2,exps:exps});
-      });
-      const s0=this._sites[0];
-      return {ROWS:12, cells, active:{r:s0.r0, c:s0.m.charCodeAt(0)-64}, sel:null, colW:{1:64}};
+      /* §1.2 randomization — four independent axes: (a) the page anchors at column A or B and
+         its header row moves, (b) the peer-name pool is Fisher-Yates shuffled and sampled,
+         (c) every figure through rnd(), and (d) WHICH of the three ratio columns sits where.
+         (d) is the §4.21 page's "which table gets which ask" permute, read onto one page: the
+         beats name the ratio by its board header, so the player reads the page instead of
+         replaying last run's geometry. */
+      const PEERS=['Falcon Ind.','Atlas Group','Copper Peak','Summit Co.','Ironline','Harbor Tech','Juniper Co.','Beacon Ltd.','Cardinal','Meridian'];
+      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      const c0=rnd(1,2);                       // the page's left edge — column A or B
+      const hr=rnd(2,3);                       // header row (one spacer under the title, or two)
+      const np=rnd(6,7);                       // peers on the page
+      const r1=hr+1, rn=hr+np;
+      const cRevP=c0+1, cRevC=c0+2, cEbd=c0+3, cEv=c0+4;
+      const names=pick(PEERS,np);
+      const L0=colLetter(c0);
+      cells[L0+'1']={...blankCell(),value:codename()+' — peer coverage page ($mm)',txt:true,bold:true};
+      cells[L0+hr]={...blankCell(),value:'Peer',txt:true,bold:true};
+      [['FY24 rev',cRevP],['FY25 rev',cRevC],['EBITDA',cEbd],['EV',cEv]].forEach(([h,c])=>{
+        cells[colLetter(c)+hr]={...blankCell(),value:h,txt:true,bold:true,align:'r'}; });
+      /* the three ratio asks, ORDER PERMUTED per seed (axis d). Each ships its header
+         RIGHT-ALIGNED but UNBOLD — the columns were added to the page and never dressed, which
+         is what makes beat 6 real work on a board that is otherwise pre-dressed (§2.1b). */
+      const kinds=pick([
+        {id:'m', hdr:'Margin %'},
+        {id:'g', hdr:'Growth %'},
+        {id:'x', hdr:'EV/EBITDA'},
+      ],3);
+      kinds.forEach((k,i)=>{ k.col=c0+5+i; k.L=colLetter(k.col); k.exp=[];
+        k.top=k.L+r1; k.rng=k.L+r1+':'+k.L+rn;
+        cells[k.L+hr]={...blankCell(),value:k.hdr,txt:true,align:'r'}; });
+      for(let i=0;i<np;i++){
+        const r=r1+i;
+        /* every figure lands on a round number so a slow-typing player can match it exactly
+           (§1.0(c)) — the RATIOS are the only irrational things on the page, and they grade on
+           a display-width tolerance below. */
+        const revP=rnd(60,180)*10;
+        const revC=Math.round(revP*(1+rnd(3,26)/100)/10)*10;
+        const ebd=Math.round(revC*rnd(14,34)/100/5)*5;
+        const ev=Math.round(ebd*rnd(70,145)/10/5)*5;
+        cells[L0+r]={...blankCell(),value:names[i],txt:true};
+        [[cRevP,revP],[cRevC,revC],[cEbd,ebd],[cEv,ev]].forEach(([c,v])=>{
+          cells[colLetter(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; });   // blue = typed data, the house convention
+        kinds.forEach(k=>{ k.exp.push(k.id==='m' ? ebd/revC : k.id==='g' ? revC/revP-1 : ev/ebd);
+          /* decimals 2 with NO number style: an unformatted quotient would render its full
+             general string (0.1333333333) and show ##### in a 96px column before the player
+             could format it — the number style itself is still the player's work. */
+          cells[k.L+r]={...blankCell(),decimals:2}; });
+      }
+      cells[L0+(rn+2)]={...blankCell(),value:'Source: broker estimates — figures as of the last close',txt:true,it:true,fontColor:'gray'};
+      const by=id=>kinds.find(k=>k.id===id);
+      const cMin=c0+5, cMax=c0+7;
+      this._o={ hr:hr, r1:r1, rn:rn, np:np, c0:c0, cRevP:cRevP, cRevC:cRevC, cEbd:cEbd, cEv:cEv,
+        cMin:cMin, cMax:cMax, m:by('m'), g:by('g'), x:by('x'),
+        hdrRng:colLetter(cMin)+hr+':'+colLetter(cMax)+hr,
+        blk:colLetter(cMin)+r1+':'+colLetter(cMax)+rn };
+      const colW={}; colW[c0]=132; [cRevP,cRevC,cEbd,cEv].forEach(c=>colW[c]=88);
+      for(let c=cMin;c<=cMax;c++) colW[c]=96;   // 'EV/EBITDA' is 9 chars — the header must not clip (td overflow is hidden, r107 spill only reaches EMPTY neighbours)
+      return {ROWS:rn+3, cells, active:{r:r1,c:cMin}, sel:null, colW:colW};
     },
     checks(S){
-      return this._sites.map((s,i)=>({
-        label:'run comp set '+'ABC'[i]+' \u2014 margins live and percent-formatted ('+s.m+s.r0+':'+s.m+(s.r0+2)+')',
-        ok:[0,1,2].every(j=>{ const c=S.cells[s.m+(s.r0+j)];
-          return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-s.exps[j])<1e-4&&c.fmtStyle==='percent'); })
-      }));
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      /* §1.0(c) FREEDOM + §1.0-R3(p) end-state grading: every core ok reads what the page LOOKS
+         like, so a typed figure clears exactly like a pointed-and-filled one and the clock prices
+         the difference. Tolerances are half a display step, so a player who types the number they
+         can see (24.6 percent, 8.5x) lands inside them. */
+      const valOk=(d,tol)=>d.exp.every((want,i)=>{ const v=cel(d.L+(o.r1+i)).value;
+        return typeof v==='number' && Math.abs(v-want)<=tol; });
+      /* both percent routes clear: Ctrl+1 P lands one decimal outright, Alt H P / Ctrl+Shift+%
+         land zero and Alt H 0 steps to one. The multiple has one route (Ctrl+1 X) and it carries
+         its decimal with it. */
+      const fmtOk=(d,style)=>d.exp.every((_,i)=>{ const c=cel(d.L+(o.r1+i));
+        return c.fmtStyle===style && (c.decimals|0)===1; });
+      const mOk=valOk(o.m,6e-4), gOk=valOk(o.g,6e-4), xOk=valOk(o.x,0.051);
+      const hdrOk=[o.m,o.g,o.x].every(d=>!!cel(d.L+o.hr).bold);
+      /* ☆ (§1.0(d) hidden efficiency / §1.0-R2(i) a real decision): ONE fill down whose rectangle
+         covers all three ratio columns at once — seed the three formulas on the first peer row,
+         grab the block, one chord. Read off the r424 S.fillOps latch (mechanic used, not geometry
+         inferred), so ctrl+d and the ribbon fill both earn it. Column-at-a-time filling clears
+         every core beat, which is what keeps the star skippable and off the win condition (§2.2).
+         The values must also be right — a fill over three empty seeds is not the move. */
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='down' && f.r1===o.r1 && f.r2>=o.rn &&
+        f.c1<=o.cMin && f.c2>=o.cMax);
+      /* DEPTH_PASS §4.21 beats, in the page's order, with the §1.0(a) dress beats folded in
+         behind their builds. Labels are instructions (§1.0-R3(n)): the clause after the dash
+         says WHAT, never why. */
+      return [
+        {label:'Build the margin column — EBITDA divided by revenue', ok: mOk},
+        {label:'Percent-format the margin column — one decimal', ok: fmtOk(o.m,'percent')},
+        {label:'Build the growth column — this year divided by last year, less one', ok: gOk},
+        {label:'Percent-format the growth column — one decimal', ok: fmtOk(o.g,'percent')},
+        {label:'Build the multiple column — EV divided by EBITDA, one decimal with an x', ok: xOk && fmtOk(o.x,'mult')},
+        {label:'Bold the three ratio headers', ok: hdrOk},
+        {label:'Fill all three ratio columns in one pass', ok: mOk && gOk && xOk && onePass, bonus:true},
+      ];
     }
   },
   anchor:{

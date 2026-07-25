@@ -658,11 +658,37 @@ const ALTS = [
       {sel:'B7',  keys:[...T('=B5-B6'),{key:'Enter'}]},
       {sel:'B7:D7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'margin', name: 'tables in REVERSE, typed refs (no pointing), ribbon fill down + alt h p', moves: `C => C._sites.slice().reverse().flatMap(s => [
-      {sel:s.m+s.r0, keys:[...T('='+s.e+s.r0+'/'+s.v+s.r0),{key:'Enter'}]},
-      {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('p')]},
-    ]) ` },
+  /* r433 (margin ROUND 1, DEPTH_PASS §4.21): the old three-table entry died with the board it
+     drove; the §1.8 pair replaces it. ALT 1 = chord-ROUTE alt — typed refs instead of pointing,
+     one ribbon fill per column, percent from the Ctrl+Shift+% + Alt H 0 pair instead of the
+     Ctrl+1 dialog, bold from the ribbon: every core clears with the ☆ FORFEITED (three separate
+     fills), which is the §1.0(c) freedom + §1.0-R2(i) skippability proof. ALT 2 = op-ORDER alt —
+     headers bolded first, the columns seeded right-to-left, each seed dressed BEFORE the fill so
+     the formats ride down with it, and one block fill at the end: the ☆ still lands, proving the
+     latch is route-blind. */
+  { key: 'margin', name: 'chord-ROUTE: typed refs (no pointing), ribbon fill down per column (alt h f i d), percent via ctrl+shift+% then alt h 0, bold via alt h 1 — the one-pass ☆ is forfeited', moves: `C => { const o=C._o; const r=o.r1;
+      const seed=(d,f)=>[{sel:d.top, keys:[...T(f),{key:'Enter'}]},
+                         {sel:d.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]}];
+      const pctl=d=>({sel:d.rng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      return [
+        ...seed(o.m, '='+colLetter(o.cEbd)+r+'/'+colLetter(o.cRevC)+r),
+        ...seed(o.g, '='+colLetter(o.cRevC)+r+'/'+colLetter(o.cRevP)+r+'-1'),
+        ...seed(o.x, '='+colLetter(o.cEv)+r+'/'+colLetter(o.cEbd)+r),
+        pctl(o.m), pctl(o.g),
+        {sel:o.x.rng, keys:[{key:'1',ctrl:true},L('X')]},
+        {sel:o.hdrRng, keys:[{key:'Alt'},L('h'),D(1)]},
+      ]; }` },
+  { key: 'margin', name: 'op-ORDER reversed: headers bolded FIRST, multiple then growth then margin seeded, each seed formatted BEFORE the block fill carries its dress down — the ☆ still fires', moves: `C => { const o=C._o; const r=o.r1;
+      return [
+        {sel:o.hdrRng, keys:[{key:'b',ctrl:true}]},
+        {sel:o.x.top, keys:[...T('='+colLetter(o.cEv)+r+'/'+colLetter(o.cEbd)+r),{key:'Enter'}]},
+        {sel:o.x.top, keys:[{key:'1',ctrl:true},L('X')]},
+        {sel:o.g.top, keys:[...T('='+colLetter(o.cRevC)+r+'/'+colLetter(o.cRevP)+r+'-1'),{key:'Enter'}]},
+        {sel:o.g.top, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+        {sel:o.m.top, keys:[...T('='+colLetter(o.cEbd)+r+'/'+colLetter(o.cRevC)+r),{key:'Enter'}]},
+        {sel:o.m.top, keys:[{key:'1',ctrl:true},L('P')]},
+        {sel:o.blk,   keys:[{key:'d',ctrl:true}]},
+      ]; }` },
   { key: 'modeltour', name: 'margins typed as raw VALUES first (no formulas — §1.0(c)), subtotals retyped in place (☆ forfeited), dollar dress after, home last', moves: `C => { const o=C._o, m=C._m, val=C._val, MG=C._marg, mv=[];
       MG.forEach(g=>{ for(let c=2;c<7;c++){ const w=val[g.num][c]/val[3][c];
         mv.push({sel:colLetter(c)+g.r, keys:[...T(w.toFixed(7)),{key:'Enter'}]}); } });
