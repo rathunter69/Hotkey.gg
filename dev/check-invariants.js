@@ -289,5 +289,71 @@ try {
   bad('C10 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
+/* ---- C11: checklist copy is INSTRUCTIONS, never lessons (r430) ----
+   Wolf has rejected this three rounds running, most recently: "Holy fuck dude you still are
+   doing the terrible pithy little quotes on the checklist items. ITS JUST THE INSTRUCTIONS OF
+   WHAT YOU HAVE TO DO OR ACCOMPLISH!!! NOT A LESSON!!!" — and, on the same point, "it should
+   be in the excluded list!". So it is now in the excluded list.
+
+   The rule is about the clause AFTER the em-dash: it may say WHAT or WHERE, never WHY.
+     keep — "Format the margin row — one decimal"        (scope)
+     keep — "Fill the row — filled across all five years" (scope)
+     cut  — "Bold the header row — headers carry the page" (a moral)
+   Free-text detection of "is this a maxim" is not reliable enough to gate a build on, so this
+   is a literal denylist of the phrasings that have actually shipped and been rejected. When a
+   new one gets caught in playtest, add it here — that is what keeps it from coming back. */
+try {
+  // Scan PLAYER COPY only. Developer comments legitimately quote the rejected phrasing when
+  // recording why it was cut (and this very check's rationale would trip itself otherwise), so
+  // block comments and full-line // comments come out first. Full-line only: a bare /\/\// would
+  // also eat https:// inside real copy.
+  // Scan PLAYER COPY only. Developer comments legitimately quote the rejected phrasing when
+  // recording why it was cut (and this check's own rationale would trip itself otherwise).
+  // Stateful line walk rather than a whole-file regex: block comments here run for dozens of
+  // lines, and a lone /\/\*[\s\S]*?\*\// pass mis-spans them — it left continuation lines
+  // behind while swallowing real code, so genuine copy was hidden and comments still flagged.
+  const raw = fs.readFileSync('index.html', 'utf8');
+  const kept = [];
+  let inBlock = false;
+  for (const line of raw.split('\n')) {
+    let s = line;
+    if (inBlock) {
+      const e = s.indexOf('*/');
+      if (e < 0) continue;                 // still inside the comment
+      s = s.slice(e + 2); inBlock = false;
+    }
+    if (s.trim().startsWith('//')) continue;   // full-line only, so https:// in copy survives
+    const b = s.indexOf('/*');
+    if (b >= 0) {
+      const e = s.indexOf('*/', b + 2);
+      if (e < 0) { inBlock = true; s = s.slice(0, b); } else { s = s.slice(0, b) + s.slice(e + 2); }
+    }
+    kept.push(s);
+  }
+  const html = kept.join('\n');
+  const APHORISMS = [
+    'headers carry the page', 'it never earned the weight', 'annotations whisper',
+    'retired, not erased', 'a total earns the line above it', 'a computed line reads apart',
+    'the page carries a masthead', 'blue font marks typed data', 'hardcodes wear blue',
+    'the page signs its date', 'undo has a twin', 'housekeeping first',
+    'extraneous by design', 'totals rule on top', 'the schedule closes the gap',
+    'the memo names it', 'it ships tonight', 'a pointed cell can never drift again',
+    'nothing ships showing ####', 'no text running over the page', 'the model starts live',
+    'Constants lights even the buried one', 'it double-counts the moment anyone totals',
+    'a clean model greets the reader', 'a clean line through the corridor',
+    'the page ties', 'one selection, one chord', 'one helper copy, one selection, one operation',
+    'the feed arrived left-aligned', 'wearing the row above', 'the total contract',
+  ];
+  let n11 = 0;
+  for (const a of APHORISMS) {
+    if (html.toLowerCase().includes(a.toLowerCase())) {
+      n11++; bad(`C11 checklist copy: aphorism is back in index.html — "${a}". Checklist items are instructions, not lessons.`);
+    }
+  }
+  if (!n11) ok(`index.html: checklist copy carries none of the ${APHORISMS.length} rejected aphorisms (instructions, not lessons)`);
+} catch (e) {
+  bad('C11 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');

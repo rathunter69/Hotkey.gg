@@ -78,7 +78,52 @@ const page3x3 = (cls) => `<style>${CSS}</style><body style="margin:0;background:
     console.log(`  ${heavier ? 'ok  ' : 'FAIL'} Alt H B T — thick box differs from thin, ${edge} edge`);
   }
 
-  await browser.close();
-  console.log(fail ? `BORDER RENDER: ${fail} EDGE(S) NOT PAINTING` : 'BORDER RENDER: clean');
+  /* ---- PHASE 2: the REAL render path ----
+     Phase 1 hand-writes the classes onto the markup, so it proves the CSS is right and nothing
+     else. That blind spot hid the third layer of this very bug: render() pushed bt/bb/ball/bdbl
+     as classes but never bl/br/thick, so those flags could not paint no matter how correct the
+     stylesheet was. This phase drives the actual app — set the flags through the engine, then
+     assert the classes reach the DOM. Needs the dev server; skipped (not failed) without it. */
+  const BASE = process.env.BASE || 'http://127.0.0.1:8791';
+  try {
+    const p2 = await (await chromium.launch({ executablePath: process.env.CHROME })).newPage({ viewport: { width: 1280, height: 860 } });
+    // returning user: a fresh profile walks the onboarding funnel and swallows every key
+    await p2.addInitScript(() => { try { localStorage.setItem('hotkey_onboarded','1'); localStorage.setItem('hk_tour_done','1'); } catch(e){} });
+    await p2.goto(`${BASE}/index.html`, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await p2.waitForTimeout(1200);
+    await p2.evaluate(() => { try { dismissLanding(); } catch (e) {} });
+    await p2.waitForTimeout(600);
+    for (let i = 0; i < 5; i++) {
+      if (!await p2.evaluate(() => !!window.__introCardOpen)) break;
+      await p2.keyboard.press('Enter'); await p2.waitForTimeout(350);
+    }
+    await p2.evaluate(() => { try { loadChallenge('filldr'); } catch (e) {} });
+    await p2.waitForTimeout(800);
+
+    // Drive the engine the way a player would: set the flags, re-render, read the DOM back.
+    const seen = await p2.evaluate(() => {
+      const a = S.active;
+      const c = (typeof ensure === 'function') ? ensure(a.r, a.c) : null;
+      if (!c) return null;
+      c.bl = true; c.br = true; c.bt = true; c.bb = true; c.thick = true;
+      render();
+      const td = document.querySelector(`#grid td[data-r="${a.r}"][data-c="${a.c}"]`);
+      return td ? td.className : null;
+    });
+    if (seen === null) {
+      console.log('  ??  real render path — could not reach a cell (skipped)');
+    } else {
+      for (const cls of ['bt', 'bb', 'bl', 'br', 'thick']) {
+        const has = new RegExp(`\\b${cls}\\b`).test(seen);
+        if (!has) fail++;
+        console.log(`  ${has ? 'ok  ' : 'FAIL'} render() emits .${cls} onto the cell`);
+      }
+    }
+    await p2.context().browser().close();
+  } catch (e) {
+    console.log('  ??  real render path skipped (no dev server on ' + BASE + ')');
+  }
+
+  console.log(fail ? `BORDER RENDER: ${fail} FAILURE(S)` : 'BORDER RENDER: clean');
   process.exit(fail ? 1 : 0);
 })();
