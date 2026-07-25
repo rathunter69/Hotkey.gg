@@ -411,12 +411,29 @@ const ALTS = [
       ];
       o.sites.slice().reverse().forEach(s=>steps.push({sel:s.k, keys:[...T(s.f),{key:'Enter'}]}));
       return steps; }` },
-  { key: 'center', name: 'title centered ACROSS first, via alt o e', moves: `C => { const o=C._o; return [
-      {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
-      {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
-      {sel:o.lab, keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
-      {sel:o.tot, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.tot, keys:[{key:'b',ctrl:true}]},
+  /* r429 (center ROUND 3, DEPTH_PASS §4.13): the pre-rework single alt (title-across via Alt O E)
+     is replaced by the §1.8 pair. ALT 1 = chord-ROUTE alt — the whole drill off different keys:
+     space chords take the row/column, bold from the ribbon, the header rule drawn as an OUTSIDE
+     border, the title centered across from the Home ribbon's Format Cells; the one-pass ☆ still
+     lands, proving the ☆ latch is route-blind. ALT 2 = op-ORDER alt — the beats run backwards and
+     the figures are right-aligned in TWO passes, so every core clears with the ☆ FORFEITED
+     (§1.0(c) freedom + the §1.0-R2(i) skippability proof). */
+  { key: 'center', name: 'chord-ROUTE: shift+space/ctrl+space take the header row and the label column, bold via alt h 1, the header rule as an OUTSIDE border (alt h b s), title across from alt h o e → A — the one-pass ☆ still lands', moves: `C => { const o=C._o; return [
+      {sel:'A'+o.hr,  keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('a'),L('c')]},   // whole ROW centered — column A rides along, ungraded
+      {sel:'A'+o.r1,  keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('a'),L('l')]},    // whole COLUMN left — title + notes ride along
+      {sel:o.blk,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},                        // one rectangle over the slumped quarter AND the Total row — the ☆
+      {sel:o.tot,     keys:[{key:'Alt'},L('h'),D(1)]},                                 // ribbon bold
+      {sel:o.hdrFull, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},                        // outside border: on a one-row selection the perimeter IS the rule under the headers
+      {sel:o.titleRng,keys:[{key:'Alt'},L('h'),L('o'),L('e'),L('a')]},                 // Format Cells via the Home ribbon, then center across
+    ]; }` },
+  { key: 'center', name: 'op-ORDER reversed: title across FIRST (ctrl+1 a), header rule as a top-and-bottom pair (alt h b d), bold before the alignment, figures right in TWO passes (☆ forfeited), headers centered last', moves: `C => { const o=C._o; return [
+      {sel:o.titleRng, keys:[{key:'1',ctrl:true},L('a')]},
+      {sel:o.hdrFull,  keys:[{key:'Alt'},L('h'),L('b'),L('d')]},                       // top AND bottom — the bottom edge is what the beat grades
+      {sel:o.tot,      keys:[{key:'b',ctrl:true}]},
+      {sel:o.sqL+o.r1+':'+o.sqL+(o.rt-1), keys:[{key:'Alt'},L('h'),L('a'),L('r')]},    // pass 1: the slumped quarter only
+      {sel:'B'+o.rt+':'+o.lc+o.rt,        keys:[{key:'Alt'},L('h'),L('a'),L('r')]},    // pass 2: the Total row — two ops, no ☆
+      {sel:o.lab,      keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
+      {sel:o.hdr,      keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
     ]; }` },
   { key: 'growth', name: 'bold first, percent via alt h p, CAGR before YoY, algebraic YoY variant', moves: `C => [
       {sel:'B4', keys:[...T('=B2+B3'),{key:'Enter'}]},

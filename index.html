@@ -1798,9 +1798,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=288"></script>
+<script src="drills.js?v=289"></script>
 
-<script src="drills.js?v=288"></script>
+<script src="drills.js?v=289"></script>
 
 
 
@@ -5215,62 +5215,166 @@ const CHALLENGES = {
     }
   },
   center:{
-    name:'Center', label:'Set the alignment', par:18, parKeys:15,
-    aha:'Alt H A R right-aligns numbers, A C centers headers — long titles center ACROSS (Ctrl+1), never merged.',
-    prompt:'Fix the alignment on the pipeline summary. House rule: headers centered over their columns, labels left-aligned, numbers and their totals right-aligned — and the total row is bold. The layout changes every run.',
-    req(){ const o=this._o; return 'quarter headers <em>'+o.hdr+'</em> → <em>alt h a c</em> · deal names <em>'+o.lab+'</em> → <em>alt h a l</em> · total row <em>'+o.tot+'</em> → <em>alt h a r</em> + <em>ctrl+b</em> · title <em>A1:'+o.lc+'1</em> → <em>ctrl+1</em> <em>a</em> — centered ACROSS, never merged'; },
+    /* r429 H6b-4 (DEPTH_PASS §4.13 + the §1.0 / §1.0-R2 law on top): the depth-pass rework of
+       "Set the alignment". The §4.13 page keeps beats 1–3 (headers centered · labels left ·
+       figures and totals right) and adds the bold total row + the rule under the header row;
+       the engine-appended Ctrl+S closer finishes it (§1.0(e), saveClose:true).
+
+       STRUCTURAL DEVIATIONS from the §4.13 page, called here per §0 (a build agent makes the
+       call and names it, rather than improvising silently):
+
+       (1) ☆ RE-CUT — the page's bonus was "Center the title across the table with
+           Center-Across-Selection — never merge". That is a FORMATTING TASK, and §1.0(d)
+           outlaws formatting bonuses catalog-wide ("existing formatting-☆s die as their
+           drill's round-2/wave rework lands"); §1.0-R2(i) adds that a ☆ must be a distinct,
+           SKIPPABLE efficiency decision. Center-across is neither — it is the drill's whole
+           anti-merge lesson and every player must meet it. So it is PROMOTED to core beat 6
+           (Center is a closed verb, §1.7) and becomes the §1.6 finish-state beat: the title
+           spanning its columns is what makes the page sendable.
+           The new ☆ is a hidden EFFICIENCY discovery in the §1.0-R2(i) family ("reward for
+           good habits … that save time"): the seed slumps ONE quarter column AND the Total
+           row, so the obvious route is two right-align passes — but both live inside ONE
+           rectangle (the whole figure block), so one selection and one chord lands both.
+           Same shape as typeset's one-pass italics ☆. Skippable by construction: the beat-3
+           label names the two sites, and two passes clear every core beat (§1.0(c)).
+       (2) The page's beat tails are LESSONS ("— alignment holds through it", "— aligned AND
+           ruled"); the r429 checklist-language rule allows a tail that says WHAT or WHERE,
+           never WHY, so those tails are dropped or replaced with the seed's location.
+       (3) §1.0-R2(g) ADAPTIVE LABEL: which quarter column came in left varies per seed, so
+           beat 3's label names THIS seed's column ("the Q3 column and the Total row sit
+           left") instead of making the player reverse-engineer the board.
+       (4) VERB NOTE: §1.7's closed list carries "Left-align" but not its twin "Right-align" —
+           an omission, not a ban: the shipped catalog already opens reworked labels with it
+           (blocksel, housestyle). Used here, flagged for the doc's next list PR.
+       (5) No §1.0-R2(h) location cue is seeded: every graded target here is a labeled row,
+           column or block that a selection outline expresses exactly (headers, label column,
+           figure block, Total row, title row), and the one per-seed fact a ring cannot carry
+           — which quarter slumped — rides the adaptive label in (3). A red cue would be
+           board furniture with nothing to point at.
+
+       ENGINE: center-across-selection is the r177 `ca` field (Ctrl+1 → A, or Alt H O E → A /
+       Alt O E → A — the same Format Cells dialog by three routes); verified live, not assumed.
+       Alignment telemetry (S.fmtOps kind 'alignL/C/R') landed in r429 for the ☆ — Alt H A L/C/R
+       is the engine's only alignment route, so no chord is privileged. */
+    name:'Center', label:'Set the alignment', par:22, parKeys:20, saveClose:true,
+    aha:'alignment is information — numbers right, labels left, headers centered; and a long title centers ACROSS its columns, never merged.',
+    prompt:'The pipeline summary came back from the deal log with its alignment scrambled: the quarter headers slump left of the columns they head, the deal names float in the middle of the label column, and one quarter — plus the whole total line — reads left like text. Set it to house style, put the weight on the total, rule the header row, and center the title across the table without merging a single cell. The layout changes every run.',
+    req(){ const o=this._o; return 'quarter headers <em>'+o.hdr+'</em> → <em>alt h a c</em> · label column <em>'+o.lab+'</em> → <em>alt h a l</em> · figures <em>'+o.blk+'</em> → <em>alt h a r</em> · total row <em>'+o.tot+'</em> → <em>ctrl+b</em> · header row <em>'+o.hdrFull+'</em> → <em>alt h b o</em> · title <em>'+o.titleRng+'</em> → <em>ctrl+1</em> <em>a</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords allowed */
     guide(){ const o=this._o; return [
-      'quarter headers first: '+o.hdr+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> — centered over their columns',
-      'deal names pinned left: '+o.lab+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd>',
-      'the total row: '+o.tot+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
-      'and a total reads BOLD: selection holds · <kbd>ctrl</kbd>+<kbd>b</kbd>',
-      'the title is stranded in column A — select A1:'+o.lc+'1 · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>a</kbd> — center ACROSS the model, no merged cells ever',
+      'the quarter headers — Q1 through '+o.lastQ+' at '+o.hdr+': select across them · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>c</kbd> — a header sits over the column it names',
+      'the label column — the deal names and the <b>Total</b> line ('+o.lab+') · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>l</kbd>; <kbd>ctrl</kbd>+<kbd>space</kbd> takes the whole column if you would rather',
+      'the <b>'+o.sq+'</b> figures came in left, and so did the <b>Total</b> row — select them · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>; a figure that reads left reads like text',
+      'the <b>Total</b> row carries the weight: select '+o.tot+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle)',
+      'rule the header row: select '+o.hdrFull+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> — the bottom edge, the line that separates headers from data',
+      'the title is stranded in column A — select '+o.titleRng+' · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>a</kbd> — centered ACROSS the columns, no merged cells ever (<kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>e</kbd> opens the same dialog)',
+      '☆ the discovery: the slumped quarter and the Total row sit inside ONE rectangle — grab the whole figure block '+o.blk+' and a single <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd> lands both; two passes clear the drill too, they just cost time',
     ]; },
-    targets(){ const o=this._o; return [o.hdr,o.lab,o.tot,o.tot,'A1:'+o.lc+'1']; },
+    /* rings: ① the quarter headers · ② the label column · ③ the whole figure block (the beat
+       covers two disjoint sites — the ring is the rectangle that holds both) · ④ the Total row
+       · ⑤ the header row incl. its label · ⑥ the title span · ☆ never ringed (r423 §2 mystery) */
+    targets(){ const o=this._o; return [o.hdr, o.lab, o.blk, o.tot, o.hdrFull, o.titleRng, null]; },
     demo(){ const o=this._o; return [
       {sel:o.hdr, keys:[Kb.alt,L('H'),L('A'),L('C')]},
       {sel:o.lab, keys:[Kb.alt,L('H'),L('A'),L('L')]},
-      {sel:o.tot, keys:[Kb.alt,L('H'),L('A'),L('R')]},
+      /* one pass over the whole figure block — beat 3 AND the hidden ☆ in one motion
+         (the ☆ latches at the win, §2.2, so it rides before the last core beats) */
+      {sel:o.blk, keys:[Kb.alt,L('H'),L('A'),L('R')]},
       {sel:o.tot, keys:[Kb.bold]},
-      {sel:'A1:'+o.lc+'1', keys:[{key:'1',ctrl:true},L('A')]},
-    ]; },
+      {sel:o.hdrFull, keys:[Kb.alt,L('H'),L('B'),L('O')]},
+      {sel:o.titleRng, keys:[{key:'1',ctrl:true},L('A')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const NAMES=['Falcon','Atlas','Copper','Summit','Harbor','Juniper'];
+      /* §1.2 randomization — four independent axes: (b) the deal-name pool is Fisher-Yates
+         shuffled and sampled, (c) every figure through rnd(), plus table geometry (header row
+         2 or 3, 3–5 quarters, 4–6 deals), and (d) WHICH quarter column came in left-aligned. */
+      const NAMES=['Falcon','Atlas','Copper','Summit','Harbor','Juniper','Beacon','Cardinal','Meridian'];
       const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
       const nq=rnd(3,5);                                     // Q1..Qn columns
-      const nd=rnd(3,5);                                     // deal rows
+      const nd=rnd(5,7);                                     // deal rows (§1.3 density: the table + its two notes carry ≥60% of the 14-row frame on every seed)
       const names=pick(NAMES,nd);
       const hr=rnd(2,3);                                     // header row (spacer or not)
       const r1=hr+1, rt=hr+nd+1;                             // deals, then the total row
       const LC=colLetter(1+nq);
+      const sqi=rnd(0,nq-1);                                 // §1.2(d): the quarter that came in left
+      const sq='Q'+(sqi+1), sqL=colLetter(2+sqi);
       cells['A1']={...blankCell(),value:codename()+' — pipeline by quarter ($mm)',txt:true,bold:true};
-      cells['A'+hr]={...blankCell(),value:'Deal',txt:true,bold:true};
-      for(let q=0;q<nq;q++) cells[colLetter(2+q)+hr]={...blankCell(),value:'Q'+(q+1),txt:true,bold:true,align:'l'};   // slumped left
+      cells['A'+hr]={...blankCell(),value:'Deal',txt:true,bold:true,align:'l'};
+      for(let q=0;q<nq;q++) cells[colLetter(2+q)+hr]={...blankCell(),value:'Q'+(q+1),txt:true,bold:true,align:'l'};   // slumped left of the columns they head
       const colSums=new Array(nq).fill(0);
       for(let d=0;d<nd;d++){ const r=r1+d;
         cells['A'+r]={...blankCell(),value:names[d],txt:true,align:'c'};                     // floating centered
         for(let q=0;q<nq;q++){ const v=rnd(20,240); colSums[q]+=v;
-          cells[colLetter(2+q)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; }
+          /* the seed's broken column reads LEFT like text — the rest of the body is untouched
+             (align null), so a number renders right by default and beat 3 never forces a
+             player to re-align cells that already read correctly (§1.0(c)) */
+          cells[colLetter(2+q)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,align:(q===sqi?'l':null)}; }
       }
-      cells['A'+rt]={...blankCell(),value:'Total',txt:true,align:'c'};
+      cells['A'+rt]={...blankCell(),value:'Total',txt:true,align:'c',bt:true};
       for(let q=0;q<nq;q++){ const col=colLetter(2+q);
-        cells[col+rt]={...blankCell(),formula:'=SUM('+col+r1+':'+col+(rt-1)+')',value:colSums[q],fmtStyle:'comma',decimals:0,align:'l'}; }   // a total, sitting left
-      const o={ hdr:'B'+hr+':'+LC+hr, lab:'A'+r1+':A'+(rt-1), tot:'A'+rt+':'+LC+rt, hr, r1, rt, nq, lc:LC };
+        /* live SUMs, and the Total row ships wearing its TOP border (§1.0(f): a total earns the
+           line ABOVE it, never a rule underneath) — border grammar is not this drill's lesson,
+           so the board arrives dressed there (§2.1b). It ships LEFT-aligned and UNBOLD: those
+           two are the work. */
+        cells[col+rt]={...blankCell(),formula:'=SUM('+col+r1+':'+col+(rt-1)+')',value:colSums[q],fmtStyle:'comma',decimals:0,align:'l',bt:true}; }
+      /* §1.3 density + a real desk artifact: the page names its own source, and a memo says
+         where the slumped quarter came from (story, never a graded target — the checks read
+         the table only, so deleting either note cannot move any ok). */
+      cells['A'+(rt+2)]={...blankCell(),value:'Source: deal log — figures as of the Friday close',txt:true,it:true,fontColor:'gray'};
+      cells['A'+(rt+3)]={...blankCell(),value:'Memo: the '+sq+' figures came over from the deal log as text',txt:true,it:true,fontColor:'gray'};
+      const o={ hr, r1, rt, nq, lc:LC, sq, sqL, lastQ:'Q'+nq,
+        hdr:'B'+hr+':'+LC+hr,              // the quarter headers
+        hdrFull:'A'+hr+':'+LC+hr,          // the whole header row — the rule spans the table
+        lab:'A'+r1+':A'+rt,                // deal names + the Total label
+        blk:'B'+r1+':'+LC+rt,              // every figure, total row included — the ☆ rectangle
+        tot:'A'+rt+':'+LC+rt,
+        titleRng:'A1:'+LC+'1' };
       this._o=o;
-      return {ROWS:Math.max(10,rt+2), cells, active:{r:1,c:1}, sel:null};
+      return {ROWS:Math.max(14,rt+4), cells, active:{r:1,c:1}, sel:null, colW:{1:150}};
     },
     checks(S){
       const o=this._o;
       const cell=k=>S.cells[k]||{};
       const cols=[]; for(let q=0;q<o.nq;q++) cols.push(colLetter(2+q));
+      const rows=[]; for(let r=o.r1;r<=o.rt;r++) rows.push(r);
+      /* §1.0(c) FREEDOM + the r429 end-state rule: every core ok grades what the page LOOKS
+         like, by any route and in any order. Two consequences, both deliberate:
+           · "reads left" / "reads right" accept the DEFAULT as well as the explicit set — a
+             text cell with no align renders left, a number with no align renders right (the
+             td.txt / numeric CSS defaults), so Clear Formats or an untouched cell grades the
+             same as an Alt H A L pass. Nothing forces a player to re-align what already reads
+             correctly, and that is what keeps the ☆ a real choice rather than a byproduct.
+           · the rule under the headers accepts every border route that draws that edge:
+             Alt H B O (bottom), Alt H B D (top & bottom), Alt H B S / B T (the perimeter of a
+             one-row selection sets bb on every cell), Alt H B B (the double rule) and Alt H B A
+             (all borders, which paints the same edge as `ball`). */
+      const readsLeft =c=>c.align==='l'||c.align==null;
+      const readsRight=c=>c.align==='r'||c.align==null;
+      const ruled     =c=>!!(c.bb||c.bdbl||c.ball);
+      const hdrOk=cols.every(c=>cell(c+o.hr).align==='c');
+      const labOk=rows.every(r=>readsLeft(cell('A'+r)));
+      const figOk=rows.every(r=>cols.every(c=>readsRight(cell(c+r))));
+      const boldOk=cols.every(c=>cell(c+o.rt).bold) && !!cell('A'+o.rt).bold;
+      const ruleOk=ruled(cell('A'+o.hr)) && cols.every(c=>ruled(cell(c+o.hr)));
+      /* center-across (r177 `ca`): the anchor stores the span it centers over, so a span that
+         covers the label column plus every quarter is the title sitting over the table. There
+         are no merged cells in the engine to ban — the ban is the lesson, not a predicate. */
+      const titleOk=(cell('A1').ca|0) >= o.nq+1;
+      /* ☆ (§1.0(d) hidden efficiency / §1.0-R2(i) a real decision): ONE right-align pass whose
+         rectangle covers the whole figure block — the slumped quarter AND the Total row in a
+         single selection. Graded off the r429 alignment telemetry (mechanic used, not geometry
+         inferred), the same family as typeset's one-pass italics ☆. The two-pass route clears
+         every core beat, so the star stays skippable and never blocks the win (§2.2). */
+      const onePass=(S.fmtOps||[]).some(f=>f.kind==='alignR' && f.r1<=o.r1 && f.r2>=o.rt && f.c1<=2 && f.c2>=1+o.nq);
       return [
-        {label:'center the quarter headers over their columns', ok: cols.every(c=>cell(c+o.hr).align==='c')},
-        {label:'pin the deal names LEFT', ok: Array.from({length:o.rt-o.r1},(_,k)=>o.r1+k).every(r=>cell('A'+r).align==='l')},
-        {label:'align the total row RIGHT', ok: cell('A'+o.rt).align==='r' && cols.every(c=>cell(c+o.rt).align==='r')},
-        {label:'bold the total row', ok: cols.every(c=>cell(c+o.rt).bold) && !!cell('A'+o.rt).bold},
-        {label:'center the title ACROSS the model \u2014 center across selection, not merge; merged cells are banned (A1)',
-          ok: (cell('A1').ca|0) >= o.nq+1},
+        {label:'Center the quarter headers over their columns', ok: hdrOk},
+        {label:'Left-align the label column — the deal names and the Total line', ok: labOk},
+        {label:'Right-align the figures — the '+o.sq+' column and the Total row sit left', ok: figOk},
+        {label:'Bold the Total row', ok: boldOk},
+        {label:'Add a bottom border under the header row', ok: ruleOk},
+        {label:'Center the title across the table — never merge', ok: titleOk},
+        {label:'Right-align the whole figure block in one pass', ok: figOk && onePass, bonus:true},   /* r432: the '— one selection, one chord' tail was a lesson, not an instruction; C11 caught it on merge (center was built off a base that predated the lint). */
       ];
     }
   },
@@ -12996,6 +13100,10 @@ function applyRibbon(key){
      is the case the engine actually wants to teach. */
   if(RUN[np]){ pushUndo(); if(np==='HK') hkFmtLatch('comma',{dec:2});   /* r425: one-pass ☆ telemetry */
     else if(np==='H9'||np==='H0'||np==='HP'||np==='HAN') hkFmtLatch('num');
+    /* r429 (center ☆): ALIGNMENT TELEMETRY — same latch family. Alt H A L/C/R is the
+       engine's ONLY alignment route, so one hook covers every route a player has and no
+       chord is privileged (§1.0(c)). Telemetry only: no core check may read it. */
+    if(np==='HAL'||np==='HAC'||np==='HAR') hkFmtLatch('align'+np[2]);
     eachSel(RUN[np]);
     /* r432: only columns that have NEVER been given an explicit width auto-grow. colW is a
        sparse array, so `undefined` means "still at the default" — a column the build (or the
