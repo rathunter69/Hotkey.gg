@@ -295,6 +295,21 @@
   #grid td.fill-wall{background:#38445e !important; color:#56648a}
   html[data-dark="1"] #grid td.fill-wall{background:#2e3950 !important; color:#56648a}
   html[data-dark="1"] .gridwrap td.fill-wall{background:#38445e !important; color:#56648a !important}
+  /* r429 (Wolf round 3): ALT-TAB PAUSE. Leaving the window used to keep the clock running
+     AND drop keyboard focus, so the only way back in was a grid click — which sets
+     mouseUsed and forfeits the clean run (see the mousedown handler). Two punishments for
+     tabbing away. The scrim covers the grid only, so the task panel stays readable. */
+  .hk-pause{position:absolute; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter:blur(2.5px); cursor:pointer}
+  .hk-pause-card{background:var(--surface); border:1px solid var(--accent-dim); border-radius:14px;
+    padding:20px 26px; text-align:center; font-family:var(--mono); box-shadow:0 12px 40px rgba(0,0,0,.34)}
+  .hk-pause-card b{display:block; font-size:15px; color:var(--accent); letter-spacing:.4px; margin-bottom:7px}
+  .hk-pause-card span{display:block; font-size:12px; color:var(--muted); line-height:1.75}
+  .hk-pause-card i{font-style:normal; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:5px; padding:0 6px}
+  .hk-pause-go{margin-top:14px; font-family:var(--mono); font-size:12.5px; font-weight:700;
+    color:var(--on-accent,#0c0d0e); background:var(--accent); border:none; border-radius:9px;
+    padding:10px 22px; cursor:pointer}
   #grid td.mzt{border-top:3px solid #38445e !important}
   #grid td.mzb{border-bottom:3px solid #38445e !important}
   #grid td.mzl{border-left:3px solid #38445e !important}
@@ -468,14 +483,52 @@
      then the higher-specificity rule overrides it. Fixed by scoping the applied-border rules
      under #grid so they outrank the softener (and keeping bare `td.*` copies for any cell
      rendered outside #grid, e.g. preview harnesses). */
-  td.bt,#grid td.bt{border-top:1px solid var(--rule,var(--text))}
-  td.bb,#grid td.bb{border-bottom:1px solid var(--rule,var(--text))}
+  /* r429 (Wolf round 3, THIRD report of "borders still not displaying — top and right"):
+     r426 fixed the COLOUR fight but not the real cause, so the bug survived. Two faults:
+
+     (a) .bl / .br / .thick had NO CSS RULES AT ALL. The ops set them (HBL, HBR, and the
+         Alt H B S / B T outside-box at ~L12750 sets bl+br+thick on the perimeter) but
+         nothing ever painted them. Left/right edges were pure state.
+
+     (b) BORDER-COLLAPSE TIE-BREAK. Base is `th,td{border:1px solid var(--line)}` (L166) and
+         the applied rules were ALSO 1px solid — identical width AND style. CSS 2.1 §17.6.2.1
+         then falls through to position: the cell furthest TOP/LEFT wins the shared edge. So a
+         cell's TOP border always lost to the gridline-coloured BOTTOM of the cell above it,
+         and a LEFT border always lost to the cell on its left. BOTTOM and RIGHT won their
+         edges — which is exactly the asymmetry Wolf kept reporting ("top and right missing":
+         top lost the tie, right had no rule).
+
+     Fix: give every edge a rule, and make applied borders 2px so "wider wins" settles the
+     collapse BEFORE it ever reaches the positional tie-break.
+
+     2px, NOT 1.5px — measured, not guessed. dev/check-borders.js showed 1.5px still losing
+     top+left: Chrome rounds a fractional border-width down to 1px, which restores the exact
+     tie the bump was meant to break. Same trap caught .thick at 2.5px (rounded to 2px, so the
+     thick box rendered identically to the thin one) — hence 3px. Keep these widths integral;
+     a fractional value here silently reintroduces the bug.
+
+     Net effect: Outside Borders — the most common real border op and the one the paste-special
+     drill asks for — finally draws all four sides instead of just the bottom.
+     Guarded by dev/check-borders.js, which pixel-tests every edge. */
+  td.bt,#grid td.bt{border-top:2px solid var(--rule,var(--text))}
+  td.bb,#grid td.bb{border-bottom:2px solid var(--rule,var(--text))}
+  td.bl,#grid td.bl{border-left:2px solid var(--rule,var(--text))}
+  td.br,#grid td.br{border-right:2px solid var(--rule,var(--text))}
   td.bdbl,#grid td.bdbl{border-bottom:3px double var(--rule,var(--text))}   /* r298: Alt H B B — the double rule under a grand total */
   td.it{font-style:italic}
   td.strike{text-decoration:line-through; opacity:.75}
   td.uline{text-decoration:underline; text-underline-offset:2px}
   td.uline.strike{text-decoration:underline line-through}
-  td.ball,#grid td.ball{border:1px solid var(--rule,var(--text))}
+  td.ball,#grid td.ball{border:2px solid var(--rule,var(--text))}
+  /* r429: Alt H B T (thick box) set .thick on the perimeter but nothing rendered it — the
+     thick box was indistinguishable from the thin one. 2.5px keeps it clearly heavier than
+     both the 1px gridline and the 1.5px thin rule. Per-edge so a thick perimeter only
+     thickens the edges that op actually set. */
+  #grid td.thick.bt{border-top-width:3px}
+  #grid td.thick.bb{border-bottom-width:3px}
+  #grid td.thick.bl{border-left-width:3px}
+  #grid td.thick.br{border-right-width:3px}
+  #grid td.thick.ball{border-width:3px}
 
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
      faint at rest, lit in Alt-mode. Mirrors Excel instead of popping a banner. */
@@ -10472,6 +10525,56 @@ function startClock(){ if(running||done||sandboxMode)return; running=true; start
   if(marathon && marathon.active && !marathon.endAt){
     marathon.startAt=started; marathon.endAt=started+marathon.dur*1000; }
   $('timer').classList.add('run'); tickH=setInterval(updateTimer,40); }
+/* ============================================================
+   r429 ALT-TAB PAUSE (Wolf round 3: "the gameplay flow is fucked once you click off the
+   page — have to click into the grid, then the run would be ruined for mouse usage")
+
+   Two separate punishments for leaving the window, both fixed here:
+     1. The clock is `performance.now() - started`, so it kept counting while you were gone —
+        a 20-second Slack check silently destroyed the run.
+     2. Coming back, keyboard focus was on nothing, and the only obvious way back in was
+        clicking the grid — whose mousedown sets mouseUsed=true, forfeiting clean/PB/star.
+   So: freeze on blur, and offer a resume path that NEVER touches the grid.
+
+   Resume is deliberately explicit rather than auto-on-focus — you may alt-tab back to a
+   window you didn't mean to land in, and an auto-resume would start the clock before your
+   hands are back. Any key resumes (the key is swallowed, not played onto the board), or the
+   button — which lives on the scrim, not the grid, so it costs no mouse flag.
+   started is shifted forward by the paused span, so elapsed time excludes the pause; the
+   marathon window is shifted with it so a pause can't eat a session. ============================================================ */
+let paused=false, pausedAt=0;
+function hkPauseShow(on){
+  const gw=document.querySelector('.gridwrap'); if(!gw) return;
+  let el=document.getElementById('hkPause');
+  if(!on){ if(el) el.remove(); return; }
+  if(el) return;
+  gw.style.position=gw.style.position||'relative';
+  el=document.createElement('div'); el.className='hk-pause'; el.id='hkPause';
+  el.innerHTML='<div class="hk-pause-card"><b>Paused</b>'+
+    '<span>You left the window — the clock stopped.<br>Press <i>any key</i> to pick up where you left off.</span>'+
+    '<button class="hk-pause-go" id="hkPauseGo">Resume</button></div>';
+  gw.appendChild(el);
+  // both handlers sit on the scrim, never the grid, so resuming costs no mouse flag
+  el.addEventListener('mousedown', ev=>{ ev.preventDefault(); ev.stopPropagation(); hkResume(); }, true);
+}
+function hkPause(){
+  if(!running || done || paused || sandboxMode) return;
+  paused=true; pausedAt=performance.now();
+  clearInterval(tickH); tickH=null;
+  hkPauseShow(true);
+}
+function hkResume(){
+  if(!paused) return;
+  const gap=performance.now()-pausedAt;
+  started+=gap;                                   // the pause never counts against the run
+  if(marathon && marathon.active && marathon.startAt){ marathon.startAt+=gap; marathon.endAt+=gap; }
+  paused=false; hkPauseShow(false);
+  if(running && !done){ clearInterval(tickH); tickH=setInterval(updateTimer,40); }
+  try{ window.focus(); }catch(e){}
+}
+function hkClearPause(){ paused=false; pausedAt=0; try{ hkPauseShow(false); }catch(e){} }
+window.addEventListener('blur', hkPause);
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) hkPause(); });
 function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); ghostTick(t);
   /* r421 §2.7: the mistakes replay is a 30-SECOND rep — at the cap it ends quietly, full board back */
   if(microRun && running && !done && t>microRun.cap){ microExit('30 seconds — the rep is over · full board reloaded'); return; } }
@@ -10552,6 +10655,7 @@ function ghostTick(t){
   el.textContent=(d>=0?'\u2212':'+')+Math.abs(d).toFixed(2)+' vs pb'+keysBit;
   el.className='ghost '+(d>=0?'ahead':'behind'); }
 function stopClock(){ running=false; clearInterval(tickH); finished=performance.now();
+  try{ hkClearPause(); }catch(e){}   /* r429: a finished run can't sit behind a pause scrim */
   $('timer').classList.remove('run'); }
 
 /* ============================================================
@@ -10864,6 +10968,7 @@ function startMicroRun(targets){
         for(const kk of mv.keys){ demoKey(kk); if(preOk()) break outer; } }
     }finally{ microPrefill=false; window.__hkMute=false; }
     // hand the board over — fresh clock, nothing scored
+    try{ hkClearPause(); }catch(e){}   /* r429 */
     running=false; clearInterval(tickH); started=0; finished=0; done=false;
     mouseUsed=false; guidedUsed=false; keyLog=[]; keyTimes=[]; keyCells=[]; undoStack=[]; redoStack=[];
     S.splits=null; S._dropped=null; S._sndOkN=undefined;
@@ -13461,6 +13566,9 @@ document.addEventListener('keydown',hkRawE=>{
   const k=e.key;
   // let text fields (auth email/handle) receive their own keystrokes
   if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
+  /* r429: paused (alt-tab) — the first key back is the RESUME, swallowed so it never lands
+     on the board. Sits above every grid path so a paused run cannot be played blind. */
+  if(paused){ e.preventDefault(); hkResume(); return; }
   // r311 (Wolf): Edge (and IE-legacy) hijack F4 to the address-bar dropdown / page top.
   // F4 is ALWAYS ours here (anchor cycle while editing; a no-op otherwise) — claim it before
   // any browser default fires, on every path. preventDefault only; the real handlers still run.
@@ -16697,6 +16805,7 @@ function loadChallenge(key, opts){
   try{ hkTouchInit(built); }catch(e){}   // r421 §2.6: checkpoint touch-list declaration (touch:{cells,label})
   try{ hkTiersInit(built); }catch(e){}   // r421 §2.5: tier-ladder declaration (tiers:[{checks,reveal,label}])
   try{ S._pbSplits=hkPbSplitsLoad(scoreKey()); }catch(e){}   // r421 §2.1: the PB run's splits, for in-run deltas + the results table
+  try{ hkClearPause(); }catch(e){}   /* r429 */
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   sandboxMode=false;   // r238: loading any real drill exits the warm-up sandbox (covers the picker escape-hatch)
   editing=false; editBuf=''; editCaret=0; editPointer=null; editPointerStart=-1;   // r106: never inherit a stale edit from the prior drill
@@ -17733,6 +17842,7 @@ function startSandbox(){
   S={ROWS:ROWS_MAX, cells, active:{r:4,c:1}, sel:null, clipboard:null};
   S._ROWS0=S.ROWS;
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
+  try{ hkClearPause(); }catch(e){}   /* r429 */
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
   clearInterval(tickH);
@@ -18203,6 +18313,7 @@ function startOnboardBoard(){
   [120,180,150,240,300,260,410,520,470,610].forEach((v,i)=>{ cells[colLetter(1+i)+7]=sbCell(v,{fmtStyle:'comma',decimals:0, fontColor:'blue'}); });
   S={ROWS:9, cells, active:{r:4,c:1}, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
+  try{ hkClearPause(); }catch(e){}   /* r429 */
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; guided=false; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
   clearInterval(tickH);
