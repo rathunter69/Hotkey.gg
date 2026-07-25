@@ -224,7 +224,7 @@ drill teaches a manipulation muscle, it must ALSO look and behave like a page a 
   is a sequence of *different* muscles: bold headers (Ctrl+B), a **currency top line over comma
   rows** (Ctrl+Shift+$ / Ctrl+Shift+! + Alt H 9 trim to 0-dec — the "$ on the top line, numbers
   below" convention), right-aligned figures (Alt H A R), **centred + underlined** row labels
-  (Alt H A C / Ctrl+U — underline added to the engine r229), a **boxed** table (Alt H B A).
+  (Alt H A C / Ctrl+U — underline added to the engine r229), a **boxed** table (Alt H B **S** — outSide borders; H B A is ALL borders, per DEPTH_PASS §1.0-R2(m)).
 - **Add computed + structural depth.** A memo the player computes off the block (e.g. EBITDA
   margin = EBITDA/Revenue, formatted %, italicised) — a live formula, not a typed number.
   Insert-row / insert-column belong here too where the layout gives room.

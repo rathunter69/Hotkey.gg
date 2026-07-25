@@ -60,20 +60,20 @@ window.HOTKEY_DRILLS = {
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — autofit the columns to their content' },
     rowops:     { name:'Structure', label:'Rebuild the schedule',   tab:'Structure',desc:'Full structural surgery \u2014 insert the missing line and the missing quarter, delete the squatters, and watch every new row and column arrive already dressed' },   /* r424 (D17): absorbed colops \u2014 rows AND columns in one drill */
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Fill down and fill right — one formula, whole block' },
-    blocksel:   { name:'Block Sel.',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
+    blocksel:   { name:'Block Select',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
     editfix:    { name:'Edit',     label:'Fix the typos in place',  tab:'Edit',     desc:'Three typos, three in-place repairs — never retype a cell' },
     undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete big, undo, then delete only what deserved it' },
-    pastes:     { name:'Paste Sp.',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
+    pastes:     { name:'Paste Special',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'3-yr cascade: MIN rations the cash, both tranches roll forward across' },
     cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche roll-forwards, total debt bold with a top border' },
     wk13:       { name:'13-Week Cash', label:'Run the 13-week', tab:'13-Week', desc:'The restructuring staple: a weekly roll-forward, an anchored liquidity cushion, totals on flows only' },
-    liqbridge:  { name:'Liq. Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash + undrawn to ending liquidity, Base / Downside / Severe \u2014 read which cases breach' },
-    covtable:   { name:'Cov. Table',  label:'Run the covenant table', tab:'Covenants', desc:'Net leverage vs a stepping max \u2014 headroom, a real IF flag, MIN pulls the pinch quarter' },
-    txncomps:   { name:'Txn Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the median, and the implied equity' },
-    sourcesuses:{ name:'S&U',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
-    accdil:     { name:'Acc/Dil',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
+    liqbridge:  { name:'Liquidity Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash + undrawn to ending liquidity, Base / Downside / Severe \u2014 read which cases breach' },
+    covtable:   { name:'Covenant Table',  label:'Run the covenant table', tab:'Covenants', desc:'Net leverage vs a stepping max \u2014 headroom, a real IF flag, MIN pulls the pinch quarter' },
+    txncomps:   { name:'Transaction Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the median, and the implied equity' },
+    sourcesuses:{ name:'Sources & Uses',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
+    accdil:     { name:'Accretion/Dilution',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
     dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
-    retbridge:  { name:'Ret. Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
+    retbridge:  { name:'Returns Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
     football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
     copyover:   { name:'Copyover', label:'Chain the hand-offs', tab:'Copy',  desc:'Formulas travel when you copy them \u2014 chain a block, a peeled column, then values-only for the summary' },
 
@@ -133,7 +133,7 @@ window.HOTKEY_DRILLS = {
     hunt:       { name:'Audit',    label:'Hunt the hardcodes',  tab:'Audit',   desc:'Go To Special \u2192 constants \u2014 every number a formula should own lights up' },
     wrapfix:    { name:'IFERROR',  label:'Wrap it or fix it',   tab:'IFERROR', desc:'Wrap the truly missing, fix the merely broken \u2014 never bury errors' },
     signerr:    { name:'Sign Sweep', label:'Flip the signs back', tab:'Signs', desc:'Pasted costs came in positive \u2014 sweep the signs, prove EBIT, margin it' },
-    percent:    { name:'% of rev', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
+    percent:    { name:'% of Revenue', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
     intsched:   { name:'Interest', label:'Run the interest schedule', tab:'Interest', desc:'Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'5-yr roll: linked openings + the accumulated-dep memo' },
     comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the summary \u2014 median, high/low and the LARGE/SMALL trimmed range \u2014 land per share and premium' },
@@ -141,12 +141,12 @@ window.HOTKEY_DRILLS = {
     // Full Builds — plus lookup/lookup2, which live in Data & Lookups
     isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'5-yr IS: anchored drivers, margin row as %, bottom line ruled' },
     bsbuild:    { name:'BS Build',  label:'Balance the balance sheet',  tab:'BS Build',  desc:'3 yrs: SUM both sides, RE roll filled across, the check landing at zero' },
-    nwcsched:   { name:'NWC Sched.',label:'Roll working capital',       tab:'NWC',       desc:'Type the drivers, paint them blue, roll NWC five years' },
+    nwcsched:   { name:'NWC Schedule',label:'Roll working capital',       tab:'NWC',       desc:'Type the drivers, paint them blue, roll NWC five years' },
     threestmt:  { name:'3-Statement',label:'Tie the three statements',  tab:'3-Stmt',    desc:'3 yrs × 3 links, checks at zero, totals formatted to ship' },
     cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'5-yr cash roll-forward + conversion memo as %, the close bold with a top border' },
-    debtsched:  { name:'Debt Sched.',label:'Run the debt schedule',      tab:'Debt',     desc:'Type the rate, paint it blue, run the 5-yr sweep roll-forward' },
+    debtsched:  { name:'Debt Schedule',label:'Run the debt schedule',      tab:'Debt',     desc:'Type the rate, paint it blue, run the 5-yr sweep roll-forward' },
     lookup:     { name:'Lookup',   label:'Look it up',          tab:'Lookup',      desc:'Pull a value out of a table with INDEX/MATCH' },
-    lookup2:    { name:'2-way',    label:'Two-way lookup',      tab:'2-way',       desc:'INDEX with two MATCHes — row and column at once' },
+    lookup2:    { name:'Two-way Lookup',    label:'Two-way lookup',      tab:'2-way',       desc:'INDEX with two MATCHes — row and column at once' },
   },
 };
 

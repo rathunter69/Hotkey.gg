@@ -473,15 +473,28 @@
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
      faint at rest, lit in Alt-mode. Mirrors Excel instead of popping a banner. */
   /* r302 (Wolf): was height:34px + overflow:hidden — long menus (Home) clipped their tail
-     options (Borders et al). The strip now wraps to a second line when a menu needs it. */
-  .ribbon{display:flex; align-items:center; flex-wrap:wrap; gap:4px 7px; min-height:34px; row-gap:2px;
+     options (Borders et al). The strip now wraps to a second line when a menu needs it.
+     r426 (Wolf round-2 R2-B5, "certain sub menus are jarring because the ribbon expands and
+     pushes the grid down"): r302's wrap fixed the clipping by REFLOWING the page — Alt H shoved
+     the sheet 7px down, the sort/go-to-special cards 26px. The strip now floats inside a
+     FIXED-HEIGHT SLOT: the slot holds exactly one strip's worth of layout forever, and a menu
+     that needs a second line grows the ribbon DOWNWARD as an overlay over the sheet. Grid top is
+     now a constant in every ribbon state, and nothing is clipped or scrolled out of reach. */
+  .ribbon-slot{position:relative; flex:0 0 var(--rib-h,34px); height:var(--rib-h,34px); z-index:30}
+  .ribbon-slot > .ribbon{position:absolute; top:0; left:0; right:0}
+  .ribbon-slot > .ribbon.ribbon-open{box-shadow:0 8px 18px rgba(0,0,0,.16)}   /* the overlay reads as a layer above the sheet */
+  .ribbon{display:flex; align-items:center; flex-wrap:wrap; gap:4px 7px; min-height:var(--rib-h,34px); row-gap:2px;
     font-family:var(--mono); font-size:12px; margin:0; border:0; border-bottom:1px solid var(--line);
-    background:var(--surface2); border-radius:0; padding:2px 12px}
+    background:var(--surface2); border-radius:0; padding:2px 12px; box-sizing:border-box}
   .ribbon .rhint{color:var(--faint); font-size:11px}
-  .ribbon.show{background:var(--accent-glow)}   /* r58 flat pass: no shadows, no gradients — a quiet tint is enough */
+  /* r58 flat pass: no shadows, no gradients — a quiet tint is enough. r426: the tint is now
+     LAYERED over an opaque surface (it paints over live grid cells; a translucent-only fill let
+     the sheet read straight through the open menu). */
+  .ribbon.show{background-color:var(--surface2);
+    background-image:linear-gradient(var(--accent-glow),var(--accent-glow))}
   .ribbon .rhint{color:var(--muted); font-size:12px; display:inline-flex; align-items:center}
-  .ribbon .rhint k{display:inline-grid; place-items:center; min-width:18px; height:18px; margin-right:7px;
-    color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:11px; font-weight:600}
+  .ribbon .rhint k{display:inline-grid; place-items:center; min-width:19px; height:19px; margin-right:7px;
+    color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:12px; font-weight:600}
   .ribbon .path{color:var(--on-accent); background:var(--accent); font-weight:700; margin-right:4px; letter-spacing:.2px;
     padding:4px 10px; border-radius:6px}
   .ribbon .rtab, .ribbon .opt{display:inline-flex; align-items:center; gap:7px; color:var(--text);
@@ -489,9 +502,9 @@
   .ribbon .opt{color:var(--text)}                          /* r315 (Wolf): readable at rest, not muted */
   .ribbon .opt.on{color:var(--accent)}
   .ribbon .opt.on k{border-color:var(--accent); color:var(--accent)}
-  .ribbon .rtab k, .ribbon .opt k{display:inline-grid; place-items:center; min-width:19px; height:19px;
+  .ribbon .rtab k, .ribbon .opt k{display:inline-grid; place-items:center; min-width:20px; height:20px;
     color:var(--on-accent); background:var(--accent); border:none; border-radius:4px; padding:0 5px;
-    font-weight:700; font-size:12px}
+    font-weight:700; font-size:12.5px}   /* r426 (Wolf R2-B5): KeyTip badges up a half-step — they are the thing you READ off the strip */
   /* r315 (Wolf): the Alt+H flyout, grouped like Excel's real Home tab — chips over a group
      name, a thin divider between groups, so the eye can find the tool instead of scanning 20
      identical chips. Pure layout; letters/behavior unchanged. */
@@ -499,7 +512,7 @@
     padding:1px 10px; border-left:1px solid var(--line)}
   .ribbon .rgrp:first-of-type{border-left:0; padding-left:2px}
   .ribbon .rgrp-chips{display:inline-flex; gap:5px; flex-wrap:nowrap}
-  .ribbon .rgrp-l{font-size:8.5px; letter-spacing:.7px; text-transform:uppercase; color:var(--faint); font-weight:600}
+  .ribbon .rgrp-l{font-size:10px; letter-spacing:.6px; text-transform:uppercase; color:var(--faint); font-weight:600}   /* r426: was 8.5px (r417 audit "sub-8px text exists") */
   /* r327 (Wolf): ICON-ribbon tiles — icon over name, a KeyTip badge in the corner (Excel-real). */
   .ribbon .rgrp-ico{padding:1px 8px}
   .ribbon .rgrp-ico .rgrp-chips{gap:2px; align-items:flex-start}
@@ -522,22 +535,33 @@
   .ribbon.ribbon-lean .ri-ico{height:17px}
   .ribbon.ribbon-lean .ri-ico svg{width:15px; height:15px}
   .ribbon.ribbon-lean .ri-g{font-size:13px}
-  .ribbon.ribbon-lean .ri-key{position:static; font-size:8px; line-height:1.5; order:2}
+  .ribbon.ribbon-lean .ri-key{position:static; font-size:9.5px; line-height:1.5; order:2}
   .ribbon.ribbon-lean .rgrp-ico{padding:1px 6px}
-  .ribbon.ribbon-open{padding-right:12px}
-  .ribbon.ribbon-open .ri-key{font-size:9px; font-weight:800}
+  /* r426 (Wolf R2-B5): THE OPEN MENU. It is the state you actually read letters off, and it is
+     now an overlay with room to breathe — so it wraps instead of scrolling its tail out of sight
+     (r302's clipped-Borders bug can't come back), and every glyph steps up to a legible size:
+     KeyTip 9→11px, labels 11→12.5px, icons 15→18px, glyphs 13→15px. */
+  .ribbon.ribbon-open{padding-right:12px; flex-wrap:wrap; overflow-x:visible; row-gap:3px}
+  .ribbon.ribbon-open .rgrp-ico .rgrp-chips{flex-wrap:wrap}
+  .ribbon.ribbon-open .ri-key{font-size:11px; font-weight:800; line-height:1.35}
+  .ribbon.ribbon-open .ri-lbl{font-size:12.5px}
+  .ribbon.ribbon-open .ri-g{font-size:15px}
+  .ribbon.ribbon-open .ri-ico{height:20px}
+  .ribbon.ribbon-open .ri-ico svg{width:18px; height:18px}
+  .ribbon.ribbon-open .ri-cmd{padding:2px 4px; gap:4px}
   /* r343: menus without icons use badge+label chips — same family, same 34px row */
   .ribbon.ribbon-lean .ri-cmd.ri-txt{gap:5px}
   .ribbon.ribbon-lean .ri-lbl{font-family:var(--mono); font-size:11px; color:var(--text); white-space:nowrap}
+  .ribbon.ribbon-lean.ribbon-open .ri-lbl{font-size:12.5px}   /* r426: the OPEN menu's option labels — 11px was the r417 audit's sub-legible ribbon type */
   /* r343: anchored color DROPDOWN (Excel-style) under the triggering tile */
   .rdrop{position:fixed; z-index:40; background:var(--surface); border:1px solid var(--line);
     border-radius:10px; box-shadow:0 10px 28px rgba(0,0,0,.25); padding:10px 12px; min-width:190px}
-  .rdrop-cap{font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase;
+  .rdrop-cap{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
     color:var(--faint); margin-bottom:7px}
   .rdrop-sw{display:flex; gap:5px; flex-wrap:wrap; max-width:230px}
-  .rdrop-name{font-family:var(--mono); font-size:11.5px; color:var(--text); margin-top:7px}
-  .rdrop-hint{font-family:var(--mono); font-size:10px; color:var(--faint); margin-top:4px}
-  .rpin{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.08em; color:var(--faint);
+  .rdrop-name{font-family:var(--mono); font-size:12.5px; color:var(--text); margin-top:7px}
+  .rdrop-hint{font-family:var(--mono); font-size:11px; color:var(--faint); margin-top:4px}
+  .rpin{font-family:var(--mono); font-size:10.5px; font-weight:700; letter-spacing:.08em; color:var(--faint);
     margin-left:auto; padding:2px 9px; border:1px solid var(--line); border-radius:99px; cursor:pointer;
     align-self:center; flex:none; transition:.12s}
   .rpin:hover{color:var(--text); border-color:var(--accent-dim)}
@@ -548,8 +572,8 @@
   .ribbon .ri-ico{height:19px; display:flex; align-items:center; justify-content:center; color:var(--text)}
   .ribbon .ri-ico svg{width:18px; height:18px}
   .ribbon .ri-g{font-family:var(--mono); font-size:15px; line-height:1; color:var(--text)}
-  .ribbon .ri-name{font-size:8.5px; line-height:1.1; color:var(--muted); text-align:center; max-width:48px}
-  .ribbon .ri-key{position:absolute; top:1px; right:2px; font-family:var(--mono); font-size:8px; font-weight:700;
+  .ribbon .ri-name{font-size:10px; line-height:1.15; color:var(--muted); text-align:center; max-width:56px}   /* r426: was 8.5px */
+  .ribbon .ri-key{position:absolute; top:1px; right:2px; font-family:var(--mono); font-size:10px; font-weight:700;
     color:var(--on-accent,#0c0d0e); background:var(--accent); border-radius:3px; padding:0 3px; line-height:1.5}
 
   .bar{display:flex; align-items:center; gap:20px; margin-top:16px}
@@ -580,7 +604,7 @@
   .ribbon .fc-swatch, .rdrop .fc-swatch{display:inline-block; width:20px; height:20px; border:2px solid var(--line); border-radius:4px;
     vertical-align:middle; margin:0 1px; transition:.1s; cursor:pointer}
   .ribbon .fc-swatch.on, .rdrop .fc-swatch.on{border-color:var(--accent); outline:2px solid var(--accent-glow); transform:scale(1.18)}
-  .ribbon .fc-name{color:var(--accent); font-family:var(--mono); font-size:11.5px; margin:0 8px 0 4px; min-width:54px}
+  .ribbon .fc-name{color:var(--accent); font-family:var(--mono); font-size:12.5px; margin:0 8px 0 4px; min-width:54px}
   /* AutoFilter (r180): value chips in the ribbon picker + \u25be markers on armed header cells */
   .ribbon .fl-chip{display:inline-block; padding:1px 7px; margin:0 2px; border-radius:4px; border:1px solid var(--line);
     font-family:var(--mono); font-size:12px; vertical-align:middle}
@@ -1246,7 +1270,11 @@
   /* r147: THE DEAL ROOM — the picker is a VDR file tree (Wolf's call). Folder rows
      are numbered, drills are files, the cap strip carries a live breadcrumb, and
      folders fold on \u2190/\u2192 — but everything stays one keystroke away. */
-  #pkGroups{max-width:720px; margin:0 auto; background:color-mix(in srgb, var(--surface) 82%, transparent);
+  /* r425 (Wolf §4c): TIGHTENED — 720px left a canyon of dead space between the drill name
+     and the time/par columns. 624px is measured against the longest filename in the catalog
+     (roll-forward prep → replace_hardcodes_so_it_rolls_forward.xlsx) so nothing truncates,
+     and the eye travels a readable distance from name to clock. */
+  #pkGroups{max-width:624px; margin:0 auto; background:color-mix(in srgb, var(--surface) 82%, transparent);
     border:1px solid var(--line); border-radius:12px; overflow:hidden}
   .vdr-cap{min-height:34px; display:flex; align-items:center; gap:14px; padding:6px 16px;
     background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono);
@@ -1263,6 +1291,15 @@
   .pk-folder .vdr-gname{letter-spacing:.02em}
   .pk-folder .vdr-n{margin-left:auto; color:var(--faint); font-weight:400; font-size:10px}
   .pk-folder.focus{outline:2px solid var(--accent); outline-offset:-1px}
+  /* r425 (Wolf §4c): per-chapter completion. Partial = a quiet n/N counter; complete = a
+     solid accent ✓ seal, so a finished section is unmistakable at a glance. */
+  .pk-prog{font-size:9.5px; font-weight:600; letter-spacing:.06em; color:var(--muted);
+    border:1px solid var(--line); border-radius:5px; padding:1px 6px; background:var(--surface2)}
+  .pk-prog.none{color:var(--faint)}
+  .pk-done{font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--on-accent, #fff); background:var(--accent); border:1px solid var(--accent);
+    border-radius:5px; padding:1px 7px}
+  .pk-folder.done .vdr-gname{color:var(--accent)}
   .pk-advtag{font-size:9px; letter-spacing:.12em; color:var(--accent); border:1px solid var(--accent-dim);
     border-radius:5px; padding:1px 6px; text-transform:uppercase; font-weight:400}
   .pk-byline{display:flex; align-items:center; gap:8px; padding:3.5px 8px 3.5px 14px; border-radius:6px;
@@ -1302,10 +1339,15 @@
   .pk-desc{font-size:11.5px; color:var(--muted); margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .pk-best{font-family:var(--mono); font-size:11px; color:var(--muted); flex:none}
   .pk-best b{color:var(--accent); font-weight:500}
-  .pk-foot{font-family:var(--mono); font-size:11px; color:var(--faint); border-top:1px solid var(--line);
-    padding-top:12px; margin-top:4px; text-align:center}
-  .pk-foot kbd{color:var(--muted); background:var(--surface2); border:1px solid var(--line);
-    border-radius:4px; padding:1px 5px; font-size:10px; margin:0 1px}
+  /* r425 (Wolf §4c): the move/fold/open/close hints were --faint 11px on a blurred backdrop —
+     Wolf couldn't read them. They now sit on their own chip (own surface, own border) at 12.5px
+     in --text, with accent keycaps: the instruction line reads before you need it. */
+  .pk-foot{font-family:var(--mono); font-size:12.5px; color:var(--text); letter-spacing:.02em;
+    margin:10px auto 0; max-width:624px; text-align:center; padding:9px 12px;
+    background:color-mix(in srgb, var(--surface) 92%, transparent);
+    border:1px solid var(--line); border-radius:10px}
+  .pk-foot kbd{color:var(--accent); background:var(--surface2); border:1px solid var(--accent-dim);
+    border-radius:4px; padding:1px 6px; font-size:11.5px; font-weight:700; margin:0 1px}
 
   /* ---- marathon mode ---- */
   body.session .drillbar{display:none}
@@ -1743,7 +1785,10 @@
   <div class="stage">
     <div class="stage-row">
       <div class="stage-main">
-        <div class="ribbon" id="ribbon"></div>
+        <!-- r426 (Wolf round-2 R2-B5): the strip lives in a FIXED-HEIGHT SLOT and floats inside
+             it. An opening menu grows the ribbon DOWNWARD as an overlay over the sheet; the slot
+             never changes size, so the grid can never be pushed down again. -->
+        <div class="ribbon-slot" id="ribbonSlot"><div class="ribbon" id="ribbon"></div></div>
         <!-- r293: rapid-fire runs ON the real sheet below — this strip is just the caller:
              big instruction, the live target ref, keycap hints, streak -->
         <div id="rapidStage">
@@ -7632,13 +7677,13 @@ const CHALLENGES = {
   },
   fxconvert:{
     name:'FX Convert', label:'Convert with one FX rate', par:35, parKeys:34,
-    aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention boxes the driver (Alt H B A) while the output table gets an outline (Alt H B S).',
+    aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention gives the driver ALL borders (Alt H B A) while the finished table gets an OUTSIDE border (Alt H B S — S for outSide; A is all).',
     prompt:'Convert the euro revenue table to dollars. Desk convention: the FX rate lives in one cell — typed blue and boxed — and every converted number reads off it. Build the USD block from a single anchored formula, fill right then down, add commas, and outline the finished table instead of ruling a grid of borders.',
-    req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), box it (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outline <em>A10:F12</em> (<em>alt h b s</em>)'; },
+    req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), all borders (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outside border on <em>A10:F12</em> (<em>alt h b s</em>)'; },
     guide(){ return [
-      'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — a standalone input gets ALL borders; that box says "this cell drives the page"',
+      'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — <em>a</em> is ALL borders, the standalone-input convention; that box says "this cell drives the page"',
       'one formula converts everything: <em>B10</em> · <kbd>=B6*$B$3</kbd> — <kbd>F4</kbd> pins the rate · <kbd>↵</kbd> · select <em>B10:F10</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>B10:F12</em> <kbd>ctrl</kbd>+<kbd>d</kbd> — twelve live conversions off one cell',
-      'format the output: still on <em>B10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · then select <em>A10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — ONE outline around the table; a grid of borders is never the look',
+      'format the output: still on <em>B10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · then select <em>A10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — <em>s</em> for out<em>S</em>ide: ONE border around the table’s perimeter; a grid of borders is never the look',
     ]; },
     targets:['B3','B3','B10:F12','B10:F12','A10:F12'],
     demo(){ return [
@@ -7697,10 +7742,10 @@ const CHALLENGES = {
           if(!l.bl||!rr.br) return false; } return true; })();
       return [
         {label:'type the desk rate '+this._rateStr+' at B3 and blue it — the one hardcode on the page', ok:rateOk},
-        {label:'add an outside border around the rate cell — the standalone-driver convention', ok:boxOk},
+        {label:'give the rate cell all borders — the standalone-driver box', ok:boxOk},
         {label:'convert with ONE formula — B10 =B6*$B$3, anchored, fill right then down (B10:F12)', ok:usdOk},
         {label:'comma-format the USD block', ok:usdOk&&comOk},
-        {label:'outline the finished table A10:F12 — one perimeter, never a grid of borders', ok:outOk},
+        {label:'add an outside border around the finished table A10:F12 — one perimeter, never a grid of borders', ok:outOk},
       ];
     }
   },
@@ -8155,6 +8200,15 @@ function selRange(){
   if(!S.sel) return {r1:S.active.r,c1:S.active.c,r2:S.active.r,c2:S.active.c};
   return {r1:Math.min(S.sel.r,S.active.r),r2:Math.max(S.sel.r,S.active.r),
           c1:Math.min(S.sel.c,S.active.c),c2:Math.max(S.sel.c,S.active.c)};
+}
+/* r426 (Wolf round-2 R2-B2): THE DISPLAYED ACTIVE CELL — Excel's white cell inside a selection.
+   The 2-corner model stores the moving corner in S.active, so with a range live the active cell
+   is the ANCHOR (S.selA when a space-select parked it, else S.sel). The renderer has read it this
+   way since r308; move() and doPaste now share the same accessor so the cursor RESUMES from the
+   cell the ring is drawn on. Never returns a cell outside the sheet. */
+function dispActive(){
+  const a = S.sel ? ((S.selA && S.selA.r>=1) ? S.selA : {r:S.sel.r, c:S.sel.c}) : S.active;
+  return {r:Math.max(1,Math.min(S.ROWS,a.r)), c:Math.max(1,Math.min(COLS,a.c))};
 }
 function eachSel(fn){ const r=selRange(); for(let rr=r.r1;rr<=r.r2;rr++) for(let cc=r.c1;cc<=r.c2;cc++) fn(ensure(rr,cc),rr,cc); }
 
@@ -10698,10 +10752,18 @@ function hideResults(){ resultsChainKeys=null; const m=$('resultsModal'); if(m){
    so the fewer tabs on screen show their FULL names; page pips flip between them. sheetPageView
    holds a preview flip (keyed to the current drill, so it resets the moment you load a new one). */
 let sheetPageView=null;
-function sheetTabPages(keys){
-  /* r391 (Wolf): reverted the r390 one-strip merge — it overflowed badly on a real
-     desktop. Back to the r334 two-page split (halves) with the little page-pip bubbles. */
-  const per = keys.length>6 ? Math.ceil(keys.length/2) : keys.length;
+/* r425 (Wolf §4c "there's room for longer names"): the split is ADAPTIVE now. r334's fixed
+   two pages held while the names were stubs and nobody had a PB chip; a mid-campaign player
+   at 1150 with a ✓-time on every tab already pushed the long chapters (Formulas II p1,
+   Models II p2) off the strip into a horizontal scroll. The page count STARTS at the r334
+   two and only grows when the painted strip genuinely fails to fit one row — measured, per
+   chapter, per viewport — which is what buys the room to spell the short names out while the
+   r302 one-row invariant still holds. Reset on resize so a wider window pages back down. */
+let sheetSplit={};
+function sheetBasePages(keys){ return keys.length>6 ? 2 : 1; }
+function sheetTabPages(keys, gname){
+  const n = Math.max(1, Math.min(4, sheetSplit[gname||'__all'] || sheetBasePages(keys)));
+  const per = Math.ceil(keys.length/n);
   const pages=[]; for(let i=0;i<keys.length;i+=per) pages.push(keys.slice(i,i+per));
   return pages.length?pages:[keys];
 }
@@ -10715,33 +10777,11 @@ function renderSheetTabs(){
   const gs=DRILL_GROUPS.filter(x=>x.keys.some(k=>CHALLENGES[k]));
   const gi=gs.findIndex(x=>x.name===gname);
   // split the chapter into pages; show the page holding the current drill (or a previewed flip)
-  const pages=sheetTabPages(keys);
+  settleSheetSplit(host, keys, gname, {gname, gcol, gs, gi, keys});   // r425: size the split so every page reads in ONE row
+  const pages=sheetTabPages(keys, gname);
   let naturalPage=pages.findIndex(pg=>pg.indexOf(cur)>=0); if(naturalPage<0) naturalPage=0;
   const showPage=(sheetPageView && sheetPageView.cur===cur && sheetPageView.page<pages.length) ? sheetPageView.page : naturalPage;
-  const pageKeys=pages[showPage]||keys;
-  /* r391 (Wolf): the « / » chips are PAGE-aware. When the chapter has another page,
-     the arrow scrolls WITHIN the chapter first ("FORMATTING 2/2 »") and only jumps to
-     the neighbouring chapter once you're on the chapter's first/last page. */
-  let lead='';
-  if(showPage>0){
-    lead='<span class="st-lead" '+(gcol?'style="color:'+gcol+'"':'')+' data-pageto="'+(showPage-1)+'" title="previous page">« '+showPage+'/'+pages.length+' '+escHtml(gname.toUpperCase())+'</span>';
-  } else if(gi>0){ const pv=gs[gi-1]; const pvCol=(window.HOTKEY_GROUP_COLORS||{})[pv.name]||'';
-    lead='<span class="st-lead" '+(pvCol?'style="color:'+pvCol+'"':'')+' title="previous set">« '+escHtml(pv.name.toUpperCase())+'</span>'; }
-  let next='';
-  if(showPage<pages.length-1){
-    next='<span class="st-next" '+(gcol?'style="color:'+gcol+'"':'')+' data-pageto="'+(showPage+1)+'" title="next page">'+(showPage+2)+'/'+pages.length+' '+escHtml(gname.toUpperCase())+' »</span>';
-  } else if(gi>=0 && gi<gs.length-1){ const nx=gs[gi+1]; const nxCol=(window.HOTKEY_GROUP_COLORS||{})[nx.name]||'';
-    next='<span class="st-next" '+(nxCol?'style="color:'+nxCol+'"':'')+' title="next set (alt+pgdn past the last tab)">'+escHtml(nx.name.toUpperCase())+' »</span>'; }
-  const pips = pages.length>1
-    ? '<span class="st-pages" title="this set has '+pages.length+' pages">'+pages.map((_,i)=>
-        '<span class="st-pip'+(i===showPage?' on':'')+'" data-page="'+i+'" title="page '+(i+1)+'">'+(i+1)+'</span>').join('')+'</span>'
-    : '';
-  host.innerHTML = lead + pips + pageKeys.map(k=>{
-    const C=CHALLENGES[k];
-    /* r421 §2.1: the PB chip wears the best clock's icon (★ legendary · ◆ pro · ● pass) */
-    const pb = PB[k]!==undefined ? '<span class="st-pb">'+hkClockIcon(k, PB[k])+PB[k].toFixed(1)+'s</span>' : '';
-    return '<span class="st-tab'+(k===cur?' cur':'')+'" data-key="'+k+'">'+escHtml(C.name||k)+pb+'</span>';
-  }).join('') + next;
+  host.innerHTML = sheetStripHTML(pages, showPage, {gname, gcol, gs, gi, keys});
   host.querySelectorAll('.st-tab').forEach(el=>el.onclick=()=>{ if(!demoPlaying) loadChallenge(el.dataset.key); });
   host.querySelectorAll('.st-pip').forEach(el=>el.onclick=()=>{ if(demoPlaying) return; sheetPageView={cur, page:+el.dataset.page}; renderSheetTabs(); });
   const nxt=host.querySelector('.st-next'); if(nxt) nxt.onclick=()=>{ if(demoPlaying) return;
@@ -10749,6 +10789,85 @@ function renderSheetTabs(){
   const led=host.querySelector('.st-lead'); if(led) led.onclick=()=>{ if(demoPlaying) return;   // r66: left chip walks BACK a set (or a page)
     if(led.dataset.pageto!=null){ sheetPageView={cur, page:+led.dataset.pageto}; renderSheetTabs(); } else stepGroup(-1); };
 }
+/* r425: the whole strip, as HTML. Split out of renderSheetTabs so the fit pass below can paint
+   a CANDIDATE split — chips, pips and all — and measure it for real, instead of guessing how
+   much room the chrome takes. Same markup either way, so what gets measured is what ships. */
+function sheetStripHTML(pages, showPage, ctx){
+  const {gname, gcol, gs, gi} = ctx;
+  /* r391 (Wolf): the « / » chips are PAGE-aware. When the chapter has another page,
+     the arrow scrolls WITHIN the chapter first ("FORMATTING 2/2 »") and only jumps to
+     the neighbouring chapter once you're on the chapter's first/last page. */
+  let lead='';
+  if(showPage>0){
+    lead='<span class="st-lead" '+(gcol?'style="color:'+gcol+'"':'')+' data-pageto="'+(showPage-1)+'" title="previous page">« '+showPage+'/'+pages.length+' '+escHtml(String(gname||'').toUpperCase())+'</span>';
+  } else if(gi>0){ const pv=gs[gi-1]; const pvCol=(window.HOTKEY_GROUP_COLORS||{})[pv.name]||'';
+    lead='<span class="st-lead" '+(pvCol?'style="color:'+pvCol+'"':'')+' title="previous set">« '+escHtml(pv.name.toUpperCase())+'</span>'; }
+  let next='';
+  if(showPage<pages.length-1){
+    next='<span class="st-next" '+(gcol?'style="color:'+gcol+'"':'')+' data-pageto="'+(showPage+1)+'" title="next page">'+(showPage+2)+'/'+pages.length+' '+escHtml(String(gname||'').toUpperCase())+' »</span>';
+  } else if(gi>=0 && gi<gs.length-1){ const nx=gs[gi+1]; const nxCol=(window.HOTKEY_GROUP_COLORS||{})[nx.name]||'';
+    next='<span class="st-next" '+(nxCol?'style="color:'+nxCol+'"':'')+' title="next set (alt+pgdn past the last tab)">'+escHtml(nx.name.toUpperCase())+' »</span>'; }
+  const pips = pages.length>1
+    ? '<span class="st-pages" title="this set has '+pages.length+' pages">'+pages.map((_,i)=>
+        '<span class="st-pip'+(i===showPage?' on':'')+'" data-page="'+i+'" title="page '+(i+1)+'">'+(i+1)+'</span>').join('')+'</span>'
+    : '';
+  const row=(pages[showPage]||[]).map(k=>{
+    const C=CHALLENGES[k]||{};
+    /* r421 §2.1: the PB chip wears the best clock's icon (★ legendary · ◆ pro · ● pass) */
+    const pb = PB[k]!==undefined ? '<span class="st-pb">'+hkClockIcon(k, PB[k])+PB[k].toFixed(1)+'s</span>' : '';
+    return '<span class="st-tab'+(k===cur?' cur':'')+'" data-key="'+k+'">'+escHtml(C.name||k)+pb+'</span>';
+  }).join('');
+  return lead + pips + row + next;
+}
+/* r425: the strip's REAL content width. scrollWidth is useless here — .st-next carries
+   margin-left:auto, so the flex line always reports exactly the padding box until it
+   overflows, and "does this fit?" has to be asked before that point. Sum the laid-out
+   children instead, plus the flex gaps and the host's own padding. */
+function stContentWidth(host){
+  const cs=getComputedStyle(host);
+  const gap=parseFloat(cs.columnGap||cs.gap)||0;
+  let w=parseFloat(cs.paddingLeft||0)+parseFloat(cs.paddingRight||0);
+  const kids=host.children;
+  for(let i=0;i<kids.length;i++) w+=kids[i].getBoundingClientRect().width;
+  return w+gap*Math.max(0, kids.length-1);
+}
+/* r425 (Wolf §4c) — THE ONE-ROW FIT PASS (r302's invariant, enforced by measurement rather
+   than by shortening names). Before painting, try the chapter at 2 pages (r334's split) and
+   grow to 3 or 4 only if a page genuinely can't fit the strip in one row. EVERY page is
+   measured, not just the visible one, so the pip count can't change under the player as they
+   flip pages. Result is cached per chapter × strip width × PB count — the only three things
+   that move it — so the common repaint costs nothing.
+   SAFETY absorbs the few px the .cur tab gains from its bold weight on whichever page the
+   player is actually sitting on. */
+const ST_SAFETY=10;
+let __stFitKey='';
+function settleSheetSplit(host, keys, gname, ctx){
+  const key=gname||'__all';
+  const avail=host.clientWidth;
+  if(!(avail>200)) return;   // strip not laid out (hidden / pre-paint) — nothing to measure
+  const pbN=keys.reduce((n,k)=>n+(PB[k]!==undefined?1:0),0);
+  const sig=key+'|'+avail+'|'+keys.length+'|'+pbN;
+  if(__stFitKey===sig) return;
+  const budget=avail-ST_SAFETY;
+  const save=host.innerHTML;
+  let n=sheetBasePages(keys);
+  for(; n<4; n++){
+    const per=Math.ceil(keys.length/n);
+    const pages=[]; for(let i=0;i<keys.length;i+=per) pages.push(keys.slice(i,i+per));
+    let fits=true;
+    for(let pi=0; pi<pages.length && fits; pi++){
+      host.innerHTML=sheetStripHTML(pages, pi, ctx);
+      if(stContentWidth(host)>budget) fits=false;
+    }
+    if(fits) break;
+  }
+  host.innerHTML=save;
+  sheetSplit[key]=n;
+  __stFitKey=sig;
+}
+/* r425: a resize hands the strip a different budget — drop the cached fit and re-derive it
+   (a wider window pages back down to the r334 two). */
+window.addEventListener('resize', ()=>{ sheetSplit={}; __stFitKey=''; sheetPageView=null; try{ renderSheetTabs(); }catch(e){} });
 // Alt+PgUp/PgDn walks the current group's tabs (Ctrl+Pg is reserved by browsers
 // for THEIR tabs — attempted below, but Alt is the dependable chord).
 function stepGroup(dir){
@@ -11542,7 +11661,18 @@ function resetFlash(){ flashChips=[]; clearTimeout(flashTimer);
   const el=$('keyflash'); if(el){ el.classList.remove('show'); el.innerHTML=''; }
   const kn=$('keyN'); if(kn) kn.textContent='0'; try{ hkComboReset(); }catch(e){} }
 function snapshot(){ return {cells:JSON.parse(JSON.stringify(S.cells)), colW:colW.slice(), ROWS:S.ROWS}; }   /* r95 audit: ROWS was missing — undo after a row insert/delete corrupted the sheet's geometry */
-function restore(s){ S.cells=JSON.parse(JSON.stringify(s.cells)); colW=s.colW.slice(); if(s.ROWS!==undefined) S.ROWS=s.ROWS; }
+function restore(s){ S.cells=JSON.parse(JSON.stringify(s.cells)); colW=s.colW.slice(); if(s.ROWS!==undefined) S.ROWS=s.ROWS;
+  /* r426 (Wolf round-2 R2-B2 case d): an undo that restores GEOMETRY (a row insert/delete) can
+     leave the cursor — or a selection corner — pointing past the sheet's new last row, and every
+     later arrow then computes from an off-sheet cell. Excel keeps the undone range selected; we
+     keep it too, just clamped back inside the sheet. */
+  try{
+    const cl=(p)=>({r:Math.max(1,Math.min(S.ROWS,p.r)), c:Math.max(1,Math.min(COLS,p.c))});
+    if(S.active) S.active=cl(S.active);
+    if(S.sel) S.sel=cl(S.sel);
+    if(S.selA && S.selA.r>=1) S.selA=cl(S.selA);
+  }catch(e){}
+}
 function pushUndo(){ undoStack.push(snapshot()); if(undoStack.length>60) undoStack.shift(); redoStack=[]; }
 /* r193 EXCEL PARITY — Ctrl+B/I/5 on a MIXED selection applies the format to
    EVERY cell; it only removes when the whole selection already has it. A pure
@@ -11916,6 +12046,10 @@ function move(dr,dc,shift,ctrl){
   // can never overshoot the grab), and a shot along empties lands ON the first data cell it can
   // legally reach through open passages.
   if(S.maze){
+    /* r426 (Wolf R2-B2): the maze walks from the DISPLAYED active cell too — a plain arrow after
+       a Ctrl+Shift block-grab collapses to the anchor and steps from there, exactly like the
+       normal engine below. */
+    if(!shift && S.sel){ const __ma=dispActive(); S.active={r:__ma.r,c:__ma.c}; S.selA=null; }
     let cr=S.active.r, cc=S.active.c;
     if(ctrl && shift){
       if(mazePassable(cr,cc,cr+dr,cc+dc) && nonEmpty(cr,cc) && nonEmpty(cr+dr,cc+dc)){
@@ -11933,12 +12067,25 @@ function move(dr,dc,shift,ctrl){
     S.active={r:cr,c:cc};
     render(); checkWin(); return;
   }
-  // Excel parity: when a multi-cell selection is active and you press a plain arrow key
-  // (no Shift, no Ctrl), the selection collapses AND the active cell steps one in that
-  // direction — in a SINGLE press (not two). We just clear the selection here and fall
-  // through to the normal move, which steps from the active cell.
-  if(!shift && !ctrl && S.sel && (S.sel.r !== S.active.r || S.sel.c !== S.active.c)){
-    S.sel = null;
+  /* Excel parity: when a multi-cell selection is active and you press a plain (or Ctrl'd) arrow
+     key, the selection collapses AND the cursor steps one from the ACTIVE CELL — in a single
+     press (not two).
+     r426 (Wolf round-2 R2-B2, "cursor after copy/paste feels un-Excel"): the collapse used to
+     clear S.sel and fall through, which stepped from S.active — the selection's FAR CORNER, not
+     the active cell. Every range whose active cell isn't the far corner diverged:
+       · shift/Ctrl+Shift extends  — anchor A1, S.active at the far end: Excel's ↓ from A1:A3
+         lands A2, ours landed A4.
+       · a landed PASTE            — doPaste selects the footprint with the anchor (top-left)
+         active; ours stepped off the bottom-right, so ↓ after pasting a 3-row block dropped
+         four rows below where Excel puts you.
+       · Shift+Space / Ctrl+Space  — the active cell stays put (S.selA) while S.active flies to
+         column J / the last row; ours then walked off THERE.
+     dispActive() is the one displayed-active accessor the renderer already uses (r308), so
+     the cursor now always resumes from the cell the ring is drawn on. */
+  if(!shift && S.sel){
+    const __ca = dispActive();
+    S.active = {r:__ca.r, c:__ca.c};
+    S.sel = null; S.selA = null;
   }
   let nr,nc;
   if(ctrl){ const j=ctrlJump(S.active.r,S.active.c,dr,dc); nr=j.r; nc=j.c;
@@ -12949,7 +13096,13 @@ document.addEventListener('keydown',hkRawE=>{
      the marks-walk above keep their jobs; cut clipboards complete their move (doPaste). */
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && S && S.clipboard){
     e.preventDefault(); startClock(); logKey('↵');
-    doPaste('all'); clearClipboard(); commitAction(); return;
+    const __pa={r:selRange().r1, c:selRange().c1};   /* r426 (Wolf R2-B2 case c): the destination ANCHOR, captured before the paste re-selects */
+    doPaste('all'); clearClipboard();
+    /* Excel's copy-then-Enter is a one-shot DROP, not a paste-and-select: the ants die, the
+       block lands, and the cursor sits on the destination cell with NO selection ghost behind
+       it. (Ctrl+V keeps the footprint selected — that path is untouched above.) */
+    if(S){ S.sel=null; S.selA=null; S.active={r:Math.max(1,Math.min(S.ROWS,__pa.r)), c:Math.max(1,Math.min(COLS,__pa.c))}; }
+    commitAction(); return;
   }
   // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey){
@@ -13382,8 +13535,12 @@ function openPicker(){ if(demoPlaying) return;
   // r319 (Wolf): open AT the current drill. If its group is collapsed the row is .hidden and the
   // picker fell back to the folder — so expand the current drill's group first, then focus + CENTER
   // the row (other groups keep their fold state).
-  try{ const g=GROUP_OF[cur]; if(g){ let f=JSON.parse(localStorage.getItem('hk_pk_folds')||'[]');
-    if(Array.isArray(f)&&f.includes(g)){ f=f.filter(x=>x!==g); localStorage.setItem('hk_pk_folds', JSON.stringify(f)); } } }catch(e){}
+  /* r425 (Wolf §4c): only rewrite a STORED fold set. With no stored set the default
+     derivation (pkFolds) already expands exactly the current chapter — writing here
+     would freeze that snapshot and the default would stop following the player. */
+  try{ const g=GROUP_OF[cur]; const raw=localStorage.getItem('hk_pk_folds');
+    if(g && raw!=null){ let f=JSON.parse(raw||'[]');
+      if(Array.isArray(f)&&f.includes(g)){ f=f.filter(x=>x!==g); localStorage.setItem('hk_pk_folds', JSON.stringify(f)); } } }catch(e){}
   buildSheetTabs();
   // r146: the r83 stage-top alignment is RETIRED (Wolf: center it) — margin:auto on
   // .pk-card centers overflow-safe; the inline paddingTop was fighting it.
@@ -13395,8 +13552,14 @@ function openPicker(){ if(demoPlaying) return;
   try{ const rr=pkRows()[pkSel]; if(rr&&rr.scrollIntoView) rr.scrollIntoView({block:'center'}); }catch(e){}   // r319: land the current drill mid-view
 }
 function closePicker(){ pickerOpen=false; const p=$('picker'); if(p) p.classList.remove('show'); }
+/* r425 (Wolf R2-B7): HARD STOP at both ends — no wrap. Arrowing down past the last drill
+   used to loop back to the top ("don't have me loop to the top of the drills when I go past
+   full models — just have it hard stop at bottom"); the same clamp mirrors at the top so
+   ↑ on the first folder sits still instead of teleporting to the bottom of the catalog. */
 function movePk(d){ const rows=pkRows(); if(!rows.length) return;
-  pkSel=(pkSel+d+rows.length)%rows.length; highlightPk(); }
+  const n=Math.max(0, Math.min(rows.length-1, pkSel+d));
+  if(n===pkSel){ highlightPk(); return; }   // already at the edge — stay put
+  pkSel=n; highlightPk(); }
 function choosePk(){ const rows=pkRows(); const r=rows[pkSel]; if(!r) return;
   if(r.classList.contains('pk-folder')){ togglePkFold(r.dataset.group); return; }   // r147: \u21b5 on a folder folds it
   closePicker(); loadChallenge(r.dataset.key); }
@@ -15725,14 +15888,38 @@ function vdrFileName(key){
     .replace(/[’']/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
   return (s||key)+'.xlsx';
 }
+/* r425 (Wolf §4c) DEFAULT COLLAPSE STATE — on a picker the player has never folded by hand,
+   the chapter they're CURRENTLY on is the only one expanded; every other folder is collapsed,
+   so the data room opens on "where I am" instead of the whole catalog unrolled. Nothing is
+   written to storage by the default, so it keeps tracking the current chapter as they climb;
+   the first manual fold/unfold persists hk_pk_folds and this derivation steps aside for good. */
+function pkDefaultFolds(names){
+  const here=GROUP_OF[cur];
+  return names.filter(n=>n!==here);
+}
+function pkFolds(names){
+  let raw=null; try{ raw=localStorage.getItem('hk_pk_folds'); }catch(e){}
+  if(raw!=null){ try{ const f=JSON.parse(raw); if(Array.isArray(f)) return f; }catch(e){} }
+  return pkDefaultFolds(names||pkGroupNames());
+}
+function pkGroupNames(){
+  const names=DRILL_GROUPS.filter(g=>g.keys.some(k=>CHALLENGES[k])).map(g=>g.name);
+  if(MENU_ORDER.some(k=>!(k in GROUP_OF))) names.push('More');
+  return names;
+}
+/* r425 (Wolf §4c) SECTION COMPLETION — a chapter is CLEARED when every drill in it has a
+   recorded best (PB[key] set = the board has been solved at least once). Locked/gated files
+   still count against the folder, so "complete" always means the whole folder is done. */
+function pkGroupDone(keys){ return keys.length>0 && keys.every(k=>PB[k]!==undefined); }
+function pkGroupCleared(keys){ return keys.reduce((n,k)=>n+(PB[k]!==undefined?1:0), 0); }
 function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 section blocks; r150: Wolf's rename)
   const host=$('pkGroups'); if(!host) return;
   host.innerHTML='';
-  let folds=[]; try{ folds=JSON.parse(localStorage.getItem('hk_pk_folds')||'[]'); }catch(e){}
   const groups=DRILL_GROUPS.map(g=>({name:g.name, keys:g.keys.filter(k=>CHALLENGES[k])}))
     .filter(g=>g.keys.length);
   const extra=MENU_ORDER.filter(k=>!(k in GROUP_OF));
   if(extra.length) groups.push({name:'More', keys:extra});
+  const folds=pkFolds(groups.map(g=>g.name));
   const cap=document.createElement('div'); cap.className='vdr-cap';
   cap.innerHTML='<span>\u25c6 the data room</span><span class="vdr-crumb" id="vdrCrumb">hotkey.gg \u203a vdr</span>'+
     '<span class="vdr-count">'+MENU_ORDER.length+' files \u00b7 '+groups.length+' folders</span>';
@@ -15742,13 +15929,19 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
     const folded=folds.includes(g.name);
     const gcol=(window.HOTKEY_GROUP_COLORS||{})[g.name]||'var(--muted)';
     const __adv=(window.HOTKEY_PREMIUM&&window.HOTKEY_PREMIUM.groups||[]).includes(g.name);
+    /* r425 (Wolf \u00a74c): the folder wears its own completion. Part-done reads as a live
+       "n/N cleared" counter; a fully cleared chapter swaps it for a solid \u2713 COMPLETE seal
+       so total section completion is legible from the folder row, folded or not. */
+    const __done=pkGroupDone(g.keys), __clr=pkGroupCleared(g.keys);
     const f=document.createElement('div');
-    f.className='pk-folder'+(folded?' folded':'');
+    f.className='pk-folder'+(folded?' folded':'')+(__done?' done':'');
     f.dataset.group=g.name; f.dataset.gi=gi;
     f.innerHTML='<span class="vdr-idx">'+String(gi+1).padStart(2,'0')+'</span>'+
       '<span class="vdr-tri">'+(folded?'\u25b8':'\u25be')+'</span>'+
       '<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+gcol+'"></span>'+
       '<span class="vdr-gname">'+g.name+'/</span>'+
+      (__done?'<span class="pk-done" title="every file in this folder is cleared">\u2713 complete</span>'
+             :'<span class="pk-prog'+(__clr?'':' none')+'" title="'+__clr+' of '+g.keys.length+' files cleared">'+__clr+'/'+g.keys.length+'</span>')+
       (__adv?'<span class="pk-advtag">\u25c6 advanced</span>':'')+
       '<span class="vdr-n">'+g.keys.length+' file'+(g.keys.length===1?'':'s')+(folded?' \u00b7 folded':'')+'</span>';
     const __gated=!groupUnlocked(g.name);   // r158: locked tier reads as locked
@@ -15782,7 +15975,9 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
   host.appendChild(tree);
 }
 function togglePkFold(name){
-  let folds=[]; try{ folds=JSON.parse(localStorage.getItem('hk_pk_folds')||'[]'); }catch(e){}
+  /* r425: seeds off the DERIVED default the first time, so the very first fold keeps the
+     "current chapter open, rest closed" starting point instead of snapping everything open. */
+  let folds=pkFolds();
   folds = folds.includes(name) ? folds.filter(x=>x!==name) : folds.concat([name]);
   try{ localStorage.setItem('hk_pk_folds', JSON.stringify(folds)); }catch(e){}
   buildSheetTabs();

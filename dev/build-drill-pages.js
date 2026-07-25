@@ -140,7 +140,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
     'Alt>E>S>W': 'Paste Special — column widths',
     'Alt>H>A>C': 'Align center', 'Alt>H>A>L': 'Align left', 'Alt>H>A>R': 'Align right',
     'Alt>H>A>N': 'Align middle (vertical)',
-    'Alt>H>W': 'Wrap text', 'Alt>H>B>K': 'Thick bottom border',
+    'Alt>H>W': 'Wrap text',   /* r426: 'Alt>H>B>K' (thick bottom border) removed — r298 retired the K letter; T is Excel's Thick box */
     'Alt>H>D>R': 'Delete rows', 'Alt>H>D>C': 'Delete columns',
     'Alt>H>I>R': 'Insert rows', 'Alt>H>I>C': 'Insert columns',
     'Alt>H>F>I>S': 'Fill series (Home → Fill → Series)',
@@ -200,12 +200,22 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
     'Alt>H>9': 'Strip decimals \u2014 share counts and headcounts don\u2019t want cents.',
     'Alt>H>H': 'Fill color shades input cells and flags rows for review \u2014 the visual layer of house style.',
     'Alt>H>F>C': 'Font color: blue inputs, black formulas \u2014 the oldest convention in banking models, still enforced.',
-    'Alt>H>B>B': 'Bottom border under headers \u2014 rulings mark structure, not decoration.',
-    'Alt>H>B>T': 'Top border above a total row \u2014 the accounting ruling that says \u201cthis line sums the ones above.\u201d',
-    'Alt>H>B>O': 'Bottom double border closes a finished schedule \u2014 the page\u2019s way of saying done.',
-    'Alt>H>B>A': 'Box a block to set it apart \u2014 the headline number earns a frame.',
+    /* r426 (Wolf round-2 R2-B4 / DEPTH_PASS \u00a71.0-R2(m)): the BORDER LETTERS are canon
+       (r298, MENUS['HB']) \u2014 O bottom \u00b7 P top \u00b7 L left \u00b7 R right \u00b7 N none \u00b7 A ALL \u00b7 S OUTSIDE \u00b7
+       T thick box \u00b7 B double bottom \u00b7 D top & bottom. This table had drifted to the PRE-r298
+       letters (B=bottom, T=top, O=double, K=thick) and taught A \u2014 all borders \u2014 as \u201cbox a
+       block\u201d, which is the OUTSIDE border (S). Wolf: \u201cthe hotkey for outside borders is not
+       h b a, it\u2019s h b s.\u201d Every line below now matches the engine letter-for-letter. */
+    'Alt>H>B>O': 'Bottom border under headers \u2014 rulings mark structure, not decoration.',
+    'Alt>H>B>P': 'Top border above a total row \u2014 the accounting ruling that says \u201cthis line sums the ones above.\u201d',
+    'Alt>H>B>B': 'Double bottom border closes a finished schedule \u2014 the page\u2019s way of saying done.',
+    'Alt>H>B>D': 'Top and bottom border \u2014 the sandwiched ruling a subtotal line wears.',
+    'Alt>H>B>L': 'Left edge only \u2014 the vertical rule that fences a block off from the column beside it.',
+    'Alt>H>B>R': 'Right edge only \u2014 close a block off on the side the next section starts.',
+    'Alt>H>B>A': 'ALL borders \u2014 a line on every edge inside the block; the helper/assumption-cell convention.',
+    'Alt>H>B>S': 'OUTSIDE border (S for outSide) \u2014 ONE frame around the selection\u2019s perimeter, interior clean. The finished-table look; A is the grid of lines, S is the frame.',
     'Alt>H>B>N': 'Clear borders a paste dragged along \u2014 formats travel with copies whether you want them or not.',
-    'Alt>H>B>K': 'The thick box for the number the page exists to produce.',
+    'Alt>H>B>T': 'The thick box for the number the page exists to produce.',
     'Alt>H>A>C': 'Center headers over their columns \u2014 alignment is half of readability.',
     'Alt>H>A>L': 'Left-align labels \u2014 text reads from the left, numbers from the right.',
     'Alt>H>A>R': 'Right-align headers over number columns so they sit flush with their digits.',

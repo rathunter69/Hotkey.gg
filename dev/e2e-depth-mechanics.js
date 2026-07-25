@@ -846,6 +846,123 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r.lad1 && r.lad2, 'hint ladder carries the compact-keyboard note (laptop: ctrl+fn+←/→)', r);
   }
 
+  /* ------------------------------------------------------------------------------------
+     P. APPLIED BORDERS ARE VISIBLE (Wolf round-2 P0 R2-B1 — "borders are not showing on
+     the grid", filldr + pastes). The r413 gridline softener `#grid td{border-color:…}` is an
+     ID selector and out-specifies the class rules, so before r426 every applied border was
+     repainted in the faint gridline colour — present in the DOM, invisible on screen. A DOM
+     class assert can never catch that class of bug, so this reads COMPUTED colour off real
+     cells and demands each applied edge differ from the plain gridline, in BOTH themes.
+     ------------------------------------------------------------------------------------ */
+  console.log('P. applied borders paint a colour the gridline does not (R2-B1 regression guard)');
+  {
+    const probe = () => {
+      window.__clearCel(); hideResults(); loadChallenge('foot');
+      const put = (ref, prop) => { const c = ensure(+ref.slice(1), ref.charCodeAt(0) - 64); c[prop] = true; };
+      put('C4', 'bt'); put('C6', 'bb'); put('E4', 'ball'); put('E6', 'bdbl');
+      render();
+      const cell = ref => { const r = +ref.slice(1), c = ref.charCodeAt(0) - 64;
+        const tr = document.querySelectorAll('#grid tr')[r];   // row 0 is the header row
+        return tr ? tr.querySelectorAll('td')[c - 1] : null; };
+      const cs = ref => { const el = cell(ref); return el ? getComputedStyle(el) : null; };
+      const plain = cs('H10');   // an untouched cell — the pure gridline colour
+      const g = { top: plain.borderTopColor, bottom: plain.borderBottomColor,
+        left: plain.borderLeftColor, right: plain.borderRightColor };
+      const s = { bt: cs('C4'), bb: cs('C6'), ball: cs('E4'), bdbl: cs('E6') };
+      return {
+        dark: document.documentElement.getAttribute('data-dark') === '1',
+        gridline: g.top,
+        bt: { c: s.bt.borderTopColor, w: s.bt.borderTopWidth },
+        bb: { c: s.bb.borderBottomColor, w: s.bb.borderBottomWidth },
+        ballT: { c: s.ball.borderTopColor, w: s.ball.borderTopWidth },
+        ballL: { c: s.ball.borderLeftColor, w: s.ball.borderLeftWidth },
+        ballR: { c: s.ball.borderRightColor, w: s.ball.borderRightWidth },
+        ballB: { c: s.ball.borderBottomColor, w: s.ball.borderBottomWidth },
+        bdbl: { c: s.bdbl.borderBottomColor, w: s.bdbl.borderBottomWidth, st: s.bdbl.borderBottomStyle },
+      };
+    };
+    const transparent = v => !v || /rgba\(\s*0,\s*0,\s*0,\s*0\s*\)|transparent/.test(v);
+    const inked = (edge, gridline) => !!edge && !transparent(edge.c) && edge.c !== gridline && parseFloat(edge.w) > 0;
+    for (const theme of ['light', 'dark']) {
+      if (theme === 'dark') await run(() => { document.documentElement.setAttribute('data-dark', '1'); render(); });
+      const r = await run(probe);
+      const tag = ' (' + theme + ')';
+      ok(!transparent(r.gridline), 'the plain gridline itself is painted' + tag, r.gridline);
+      ok(inked(r.bt, r.gridline), 'Alt H B P — a TOP border paints a colour the gridline does not' + tag, r);
+      ok(inked(r.bb, r.gridline), 'Alt H B O — a BOTTOM border paints a colour the gridline does not' + tag, r);
+      ok(inked(r.ballT, r.gridline) && inked(r.ballB, r.gridline) &&
+         inked(r.ballL, r.gridline) && inked(r.ballR, r.gridline),
+        'Alt H B A / B S — a boxed cell paints all FOUR edges over the gridline' + tag, r);
+      ok(inked(r.bdbl, r.gridline) && r.bdbl.st === 'double',
+        'Alt H B B — the grand-total DOUBLE rule paints double, in ink' + tag, r);
+    }
+    await run(() => { document.documentElement.removeAttribute('data-dark'); render(); });
+  }
+
+  /* ------------------------------------------------------------------------------------
+     Q. THE RIBBON NEVER MOVES THE GRID (Wolf round-2 R2-B5 — "certain sub menus are
+     jarring because the ribbon expands and pushes the grid down"). r302 let .ribbon wrap to a
+     second line, which reflowed the sheet: Alt H shoved it 7px down, the sort / go-to-special
+     cards 26px. r426 floats the strip inside a fixed-height .ribbon-slot so an expansion is an
+     OVERLAY. Assert: grid top is a constant across every ribbon state, every menu option is
+     still rendered (r302's clipped-Borders bug), and the KeyTip type is legible.
+     ------------------------------------------------------------------------------------ */
+  console.log('Q. ribbon expansion is an overlay — the grid never moves (R2-B5)');
+  {
+    for (const W of [1150, 1280, 1440]) {
+      await page.setViewportSize({ width: W, height: 900 });
+      const r = await run(() => {
+        window.__clearCel(); hideResults(); loadChallenge('dress');
+        const gt = () => +document.getElementById('gridwrap').getBoundingClientRect().top.toFixed(1);
+        const ribH = () => +document.querySelector('.ribbon').getBoundingClientRect().height.toFixed(1);
+        const slotH = () => +document.querySelector('.ribbon-slot').getBoundingClientRect().height.toFixed(1);
+        const tops = {}, heights = {};
+        const paths = ['', 'H', 'HB', 'HV', 'HO', 'HOU', 'HA', 'HF', 'HFI', 'HE', 'HI', 'HD', 'M', 'A', 'AS', 'W', 'WV'];
+        mode = 'normal'; path = []; dialog = null; drawRibbon();
+        tops['idle'] = gt(); heights['idle'] = ribH();
+        for (const p of paths) { mode = 'ribbon'; path = p.split(''); dialog = null; drawRibbon();
+          tops['alt ' + (p || 'tabs')] = gt(); heights['alt ' + (p || 'tabs')] = ribH(); }
+        for (const d of ['paste', 'fmt', 'cellstyle', 'colw', 'goto', 'gotospecial', 'sortwarn', 'series']) {
+          mode = 'ribbon'; path = ['H']; dialog = d; try { drawRibbon(); } catch (e) {}
+          tops['dlg ' + d] = gt(); heights['dlg ' + d] = ribH();
+        }
+        // the open Borders menu: every option rendered, nothing scrolled out of reach
+        mode = 'ribbon'; path = ['H', 'B']; dialog = null; drawRibbon();
+        const rb = document.querySelector('.ribbon');
+        const tiles = [...rb.querySelectorAll('.ri-cmd')];
+        const rbr = rb.getBoundingClientRect();
+        const optCount = tiles.length;
+        const inBox = tiles.every(t => { const b = t.getBoundingClientRect();
+          return b.right <= rbr.right + 1 && b.left >= rbr.left - 1 && b.bottom <= rbr.bottom + 1; });
+        const letters = tiles.map(t => (t.querySelector('.ri-key') || {}).textContent).join('');
+        const keyFs = parseFloat(getComputedStyle(rb.querySelector('.ri-key')).fontSize);
+        const lblFs = parseFloat(getComputedStyle(rb.querySelector('.ri-lbl')).fontSize);
+        const xScroll = rb.scrollWidth > rb.clientWidth + 1;
+        // …and the open menu paints over the sheet on an OPAQUE ground
+        const bg = getComputedStyle(rb).backgroundColor;
+        mode = 'ribbon'; path = ['H']; dialog = null; drawRibbon();
+        const openTallerThanSlot = ribH() > slotH();
+        mode = 'normal'; path = []; dialog = null; drawRibbon();
+        return { tops, heights, optCount, letters, keyFs, lblFs, inBox, xScroll, bg, openTallerThanSlot,
+          slot: slotH(), mbH: +document.querySelector('.mode-bar').getBoundingClientRect().height.toFixed(1) };
+      });
+      const uniq = [...new Set(Object.values(r.tops))];
+      ok(uniq.length === 1, 'grid top is IDENTICAL in every ribbon state @' + W + 'px', { uniq, tops: r.tops });
+      ok(r.optCount === 10 && r.letters === 'OPLRNASTBD',
+        'Alt H B still renders all ten border options, canon letters @' + W + 'px', r.letters);
+      ok(r.inBox && !r.xScroll,
+        'every Borders option is inside the painted strip — nothing clipped or scrolled away @' + W + 'px', r);
+      ok(r.keyFs >= 9.5 && r.lblFs >= 12,
+        'ribbon KeyTip + label type is legible (>=9.5 / >=12px) @' + W + 'px', { keyFs: r.keyFs, lblFs: r.lblFs });
+      ok(!/rgba\([^)]*,\s*0(\.\d+)?\)/.test(r.bg) || /rgb\(/.test(r.bg),
+        'the open menu paints on an opaque ground (it overlays live cells) @' + W + 'px', r.bg);
+      ok(r.openTallerThanSlot === true || r.slot >= r.heights['alt H'],
+        'the expansion overflows the slot as an overlay (or already fits it) @' + W + 'px', { slot: r.slot, altH: r.heights['alt H'] });
+      ok(r.mbH <= 44, 'the mode bar is still ONE row @' + W + 'px', r.mbH);
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+  }
+
   console.log('Z. page errors');
   ok(errs.length === 0, 'zero page errors across the suite', errs.slice(0, 4));
 
