@@ -212,12 +212,15 @@ const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
     const T = window.HK_TRACKS || [];
     const all = new Set(T.flatMap(t => t.keys));
     return { n: T.length, sizes: T.map(t => t.keys.length),
+      total: (window.HOTKEY_DRILLS.menuOrder || []).length,
       coversAll: (window.HOTKEY_DRILLS.menuOrder || []).every(k => all.has(k)),
       shareFn: typeof window.hkShareCard === 'function',
       ids: T.map(t => t.id).join(',') };
   });
   ok(f1.n === 3 && f1.ids === 'fluency,formulas,modeling', 'three tracks, stable ids', f1.ids);
-  ok(String(f1.sizes) === '20,32,30', 'track lengths 20/32/30', String(f1.sizes));
+  /* r424: derive from the catalog — hardcoded sizes broke on the colops retirement (D17).
+     Tracks must partition menuOrder exactly; sizes are whatever the catalog says. */
+  ok(f1.sizes.reduce((a,b)=>a+b,0) === f1.total, 'track sizes sum to the catalog', String(f1.sizes)+' vs '+f1.total);
   ok(f1.coversAll, 'every drill belongs to a track');
   ok(f1.shareFn, 'hkShareCard renderer is loaded');
   // r361 FRAMEWORK COHERENCE — every structure that references drills must resolve against
