@@ -9648,76 +9648,327 @@ const CHALLENGES = {
     }
   },
   fxconvert:{
-    name:'FX Convert', label:'Convert with one FX rate', par:35, parKeys:34,
-    aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention gives the driver ALL borders (Alt H B A) while the finished table gets an OUTSIDE border (Alt H B S — S for outSide; A is all).',
-    prompt:'Convert the euro revenue table to dollars. Desk convention: the FX rate lives in one cell — typed blue and boxed — and every converted number reads off it. Build the USD block from a single anchored formula, fill right then down, add commas, and outline the finished table instead of ruling a grid of borders.',
-    req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), all borders (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outside border on <em>A10:F12</em> (<em>alt h b s</em>)'; },
-    guide(){ return [
-      'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — <em>a</em> is ALL borders, the standalone-input convention; that box says "this cell drives the page"',
-      'one formula converts everything: <em>B10</em> · <kbd>=B6*$B$3</kbd> — <kbd>F4</kbd> pins the rate · <kbd>↵</kbd> · select <em>B10:F10</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>B10:F12</em> <kbd>ctrl</kbd>+<kbd>d</kbd> — twelve live conversions off one cell',
-      'format the output: still on <em>B10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · then select <em>A10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — <em>s</em> for out<em>S</em>ide: ONE border around the table’s perimeter; a grid of borders is never the look',
+    /* r435 H6b-5 — the depth-pass rework of "Convert the page — one anchored rate"
+       (DEPTH_PASS §4.30, with the §1.0 / §1.0-R2 / §1.0-R3 law applied on top; §1.0-R3 wins).
+
+       WHAT THIS DRILL OWNS. Four drills in the catalog touch the dollar sign or the unit
+       conversion, and the boundary between them is deliberate — recorded here (as anchor and
+       percent record it in their own headers) so a later agent cannot blur it:
+         · anchor    — NEITHER reference is fully absolute. Mixed anchors ($B4 and C$3) live in
+                       ONE formula and a 2-D fill walks both. Its ☆ (nine cells from one
+                       Ctrl+Enter) only works BECAUSE the anchors are mixed.
+         · percent   — ONE fully absolute divisor PER BLOCK, 1-D fill, TWO blocks. The second
+                       block stays dark until the lock is re-aimed at its own revenue line, so
+                       one divisor cannot serve the page.
+         · fxconvert — (here) ONE fully absolute scalar driver broadcast over a 2-D block. Both
+                       halves of the lock are load-bearing at once: the column lock is what
+                       survives the fill RIGHT and the row lock is what survives the fill DOWN,
+                       so this is the only one of the three where $B$3 — and nothing weaker —
+                       is the correct end state. One cell serves the whole page, which is the
+                       exact opposite of percent's lesson and the reason the two can sit in the
+                       same chapter. Structurally: one driver, one destination block, 2-D.
+         · pastes    — converts units by paste-special MULTIPLY/DIVIDE off a helper cell. That
+                       conversion is DESTRUCTIVE and one-shot: the clipboard acts as an
+                       operator, the figures are overwritten, and nothing links back to the
+                       helper afterwards. fxconvert never overwrites anything — the dollar table
+                       is a SECOND table of live references, and retyping the rate cell moves
+                       every number on the page. Paste-special-multiply would not clear a single
+                       core beat here (there is no live rate reference in the result), and the
+                       anchored reference would not clear pastes' ☆. Different mechanic,
+                       different artifact, opposite relationship to the source data.
+
+       ITS OWN IDENTITY IS THE CONVENTION LAYER as much as the anchoring (§4.30): the rate is a
+       BLUE hardcode (doctrine §2.1b, and Wolf's §1.0-R3(o) priority list puts font colour —
+       blue = hardcode — near the top of what an analyst actually changes) sitting in an
+       ALL-BORDERED driver box, and the converted output is ruled with an OUTSIDE border. Those
+       are three of the five core beats; the anchoring is the other two.
+
+       THE DOCTRINE §2.2 ANCHOR-TEXT EXCEPTION APPLIES, scoped. §1.0(c) says every check is
+       gradeable by any route including slow typing; doctrine names anchoring as the standing
+       exception where anchoring IS the lesson, and §4.30's title says it out loud ("one
+       anchored rate"). So the build beat reads the LOCK out of the formula text. What it never
+       reads is the ROUTE to that lock — F4 cycling and hand-typed dollar signs land the
+       identical string (ALT 2 types every one of them), operand order is free, and NO fill is
+       required anywhere: a hand-typed block clears every core beat, which is also the ☆'s
+       measured negative control. The exception buys formula TEXT, nothing else.
+
+       STRUCTURAL DEVIATIONS from the §4.30 page, declared here per §0:
+
+       (1) ☆ RE-CUT (binding). The page's bonus was "Bold the rate cell — the one number that
+           moves the page". That is a FORMATTING task, which §1.0(d) outlaws outright, and its
+           tail is a moral, which §1.0-R3(n) outlaws separately. The re-cut ☆ is the hidden
+           EFFICIENCY this exact board exists to reward, and it is deliberately cut on a
+           different AXIS from its two neighbours so the three stars cannot be confused:
+           anchor's and percent's stars are about the MECHANIC (one Ctrl+Enter; one fill per
+           column) and are graded off engine latches; this one is about the SCOPE of the
+           broadcast and is graded off the END STATE alone. The dollar table carries a total row
+           and an FY column, and the desk reflex is to SUM them. It never has to be: a scalar
+           multiply is linear, so the euro total times the rate IS the dollar total — take the
+           edges with you in the same fill and nine AutoSum passes disappear. Any route earns
+           it (fill, Ctrl+Enter, copy-paste, even hand-typing), because what is being rewarded
+           is seeing that the edges need no separate work.
+           MEASURED skip routes, both with every core lit and the ☆ dark. (i) The route the
+           guide's own core lines teach — seed, fill the BODY right and down, then Alt+= the FY
+           column and the total line: 49-51 keys (5-seed median 49) against the star route's 33,
+           so the discovery is worth ~a third of the run and costs nothing to miss. (ii) The
+           full slow route, dev/e2e-alt-paths.js ALT 2 — every body cell hand-typed with typed
+           dollar signs and no fill anywhere, then nine AutoSum passes: 153 keys at three
+           segments, 187 at four.
+       (2) The page's beat list is "type the rate blue / box it / convert with one formula /
+           comma / outline". Kept, but the convert beat is ONE line covering the whole block
+           rather than a seed-then-fill pair: the fill is a ROUTE, not an outcome (§1.0(b)),
+           and §1.0(c) forbids requiring it. That is also what keeps this drill structurally
+           distinct from anchor, whose page legitimately splits the corner, the column and the
+           grid because ITS lesson is that the two locks behave differently under the two fills.
+       (3) The FY column and the total row are graded on VALUE ONLY in the core (§1.0-R3(p)):
+           AutoSum and the extended conversion produce the same number, so both must clear. If
+           the core demanded the rate reference there, the AutoSum route — the one the guide
+           actually teaches — would leave a beat dark with nothing visible to fix, which is the
+           untriggerable-beat class that rule exists to stop. The rate reference on those cells
+           is exactly what the ☆ reads.
+       (4) §1.0(f)/§1.0-R2(l) HELPER STANDARD, honoured in part and deviated in part. The rate
+           cell IS an assumption cell, so it ships LIGHT YELLOW with its own adjacent label
+           ("EUR → USD rate", the unit co-varying with the seed) — (f)'s stated WHY is "so the
+           player can see they're there to be used", and the yellow slot says exactly that. It
+           does NOT ship populated or bordered, because the blue figure and the box ARE two of
+           this drill's five beats (§4.30's stated identity); shipping them would delete the
+           drill. (f) governs helpers handed to the player as TOOLS — pastes' multiplier and
+           sign flip; here the driver box is the DELIVERABLE.
+       (5) The page says commas. Kept over dollar-format even though the output is USD: the
+           table is stated in $mm, both tables carry the same money format, and a currency
+           symbol on every cell of a $mm block is not the desk look. §1.0-R3(o)'s complaint was
+           about anchoring a drill ON the comma chord; here it is one dress beat behind the
+           block it dresses (§1.0(a)), and three separate routes land it.
+
+       ENGINE (probed live, not reasoned about — §1.0-R3(p)):
+         · BORDERS. On a 1×1 selection Alt H B S and Alt H B T store the ALL-BORDERS flag
+           (`ball`), not four edges — index.html's HBS/HBT branch special-cases the 1×1 case as
+           the classic box. So the rate-box beat accepts `ball` OR a full per-edge walk
+           (Alt H B P/O/L/R → bt+bb+bl+br), and Alt H B A, B S, B T and the four-edge walk all
+           clear. Alt H B D (top+bottom) correctly does not.
+         · The table's outside border accepts four rects — header-or-figures × with-or-without
+           the label column — since dressing a hand-off table with its headers is how it is
+           actually done (the §1.0-R3(p) label-plus-figures widening), and every border route
+           that draws a perimeter clears (B S, thick B T, the per-edge walk, and B A, whose
+           `ball` carries the perimeter too).
+         · COMMA AT ZERO PLACES has three routes and they disagree about decimals: Ctrl+1 → N
+           lands comma at zero in one move, while Alt H K and Ctrl+Shift+! land comma at TWO
+           and need Alt H 9 twice. The beat reads the end state, so all three clear.
+         · BLUE has two routes: Alt H F C → →×4 (the font-colour gallery, blue at index 4) and
+           Alt H J → → (the cell-styles gallery's "Input"). Both set fontColor 'blue'.
+         · Column widths are set explicitly, so they do not auto-grow (r432); they are sized for
+           the WIDEST route — comma at two places on the biggest total ("5,068.80") — so no
+           route can manufacture ##### mid-run. */
+    name:'FX Convert', label:'Convert the page — one anchored rate', par:35, parKeys:33, saveClose:true,   /* r435: par re-swept on the reworked board — dev/e2e-par-sweep.js fxconvert, 5-seed median 33 keys incl. the engine-appended Ctrl+S (flat across seeds: the segment count moves the fill RECT, never the key count). par 35 ≈ 1.06 s/key, the house band. Measured against it: the same board built the slow way — every body cell hand-typed, both edges AutoSummed — runs 153-187 keys (dev/e2e-alt-paths.js ALT 2), and the taught body-fill-plus-AutoSum route runs 49-51, which is the cost the clock exists to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 53 · pro 40 · legendary 35. */
+    aha:'a rate locked on both halves is one cell the whole page reads — and the multiply is linear, so the totals convert with everything else.',
+    /* §1.5: the aha's MOMENT is beat 3 — the fill crosses and drops down and every figure on
+       the page lands off a single cell that never moved. */
+    prompt:'The revenue pack came in from the European desk and the committee reads dollars. House convention: the rate lives in ONE cell — typed in blue, boxed all round — and every converted number on the page reads that cell, so tomorrow’s rate is a one-cell edit. Build the dollar table off it, comma the figures and box the finished table. The rate, the currency and the table’s spot on the page all change every run.',
+    req(){ const o=this._o; return '<em>'+o.rateCell+'</em> → <em>'+o.rateStr+'</em> · <em>alt h f c</em> → blue · <em>alt h b a</em> · <em>'+o.seed+'</em> <em>='+o.C[0]+o.eurR0+'*'+o.VC+o.rr+'</em> <em>F4</em> · '+o.topRow+' <em>ctrl+r</em> · '+o.block+' <em>ctrl+d</em> · <em>ctrl+1 n</em> · '+o.tableRect+' <em>alt h b s</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every line names ALL the routes that grade (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the driver: <b>'+o.rateCell+'</b> · type <kbd>'+o.rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> then <kbd>→</kbd>×4 to Blue <kbd>↵</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> <kbd>→</kbd> <kbd>↵</kbd> is the cell-styles route to the same ink)',
+      'still on <b>'+o.rateCell+'</b> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — <kbd>a</kbd> is ALL borders. On a single cell <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> draws the same box (a 1×1 perimeter IS the box), and walking the four edges <kbd>b</kbd> <kbd>p</kbd>/<kbd>o</kbd>/<kbd>l</kbd>/<kbd>r</kbd> gets there too',
+      'one formula converts the page: at <b>'+o.seed+'</b> type <kbd>=</kbd>, point or type <kbd>'+o.C[0]+o.eurR0+'</kbd>, <kbd>*</kbd>, then <kbd>'+o.VC+o.rr+'</kbd> and <kbd>F4</kbd> once for <b>$'+o.VC+'$'+o.rr+'</b> — BOTH halves locked, because the fill goes two ways · <kbd>↵</kbd> · select '+o.topRow+' <kbd>ctrl</kbd>+<kbd>r</kbd> · select '+o.block+' <kbd>ctrl</kbd>+<kbd>d</kbd> · then the year column and the total line with <kbd>alt</kbd>+<kbd>=</kbd> (typing the dollar signs yourself lands the same formula; <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd>/<kbd>d</kbd> are the ribbon’s same fills)',
+      'select '+o.block+' · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>n</kbd> lands commas at zero places in one move (<kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> and <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>!</kbd> come in at two — walk them off with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> ×2)',
+      'select '+o.tableRect+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — <kbd>s</kbd> is out<b>S</b>ide borders, the perimeter of what you selected (<kbd>a</kbd> would rule every gridline inside it as well; <kbd>b</kbd> <kbd>t</kbd> is the same perimeter drawn thick)',
+      '☆ the discovery: the year column and the total line never needed an <kbd>alt</kbd>+<kbd>=</kbd> at all — a rate multiply is linear, so the euro total times the rate IS the dollar total. Stretch the same fill over '+o.block+' and the edges come with it; summing them clears the drill too, it just costs nine extra passes',
     ]; },
-    targets:['B3','B3','B10:F12','B10:F12','A10:F12'],
-    demo(){ return [
-      {sel:'B3', keys:[...T(this._rateStr), Kb.enter]},
-      {sel:'B3', keys:[Kb.alt,L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
-      {sel:'B3', keys:[Kb.alt,L('h'),L('b'),L('a')]},
-      {sel:'B10', keys:[...T('=B6*$B$3'), Kb.enter]},
-      {sel:'B10:F10', keys:[Kb.fillR]},
-      {sel:'B10:F12', keys:[Kb.fillD]},
-      {sel:'B10:F12', keys:[Kb.alt,L('h'),L('k')]},
-      {sel:'A10:F12', keys:[Kb.alt,L('h'),L('b'),L('s')]},
-    ]; },
+    /* rings: ①② the rate cell · ③④ the whole dollar block · ⑤ the table rect · ☆ never ringed
+       (§2.2 mystery slot — a ring would spoil the hidden move) */
+    targets(){ const o=this._o; return [o.rateCell, o.rateCell, o.block, o.block, o.tableRect, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.rateCell, keys:[...T(o.rateStr), Kb.enter]},
+      {sel:o.rateCell, keys:[Kb.alt,L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},   /* §1.0(a): the ink rides directly behind the figure it marks */
+      {sel:o.rateCell, keys:[Kb.alt,L('h'),L('b'),L('a')]},
+      /* §2.2: the demo performs the bonus — one seed, and the two fills are stretched over the
+         FY column and the total row as well, which is exactly the ☆ move. Its state latches at
+         the win (the engine appends Ctrl+S). */
+      {sel:o.seed,   keys:[...T('='+o.C[0]+o.eurR0+'*'+o.VC+o.rr), {key:'F4'}, Kb.enter]},
+      {sel:o.topRow, keys:[Kb.fillR]},
+      {sel:o.block,  keys:[Kb.fillD]},
+      {sel:o.block,  keys:[{key:'1',ctrl:true}, L('N')]},
+      {sel:o.tableRect, keys:[Kb.alt,L('h'),L('b'),L('s')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — revenue by segment (€mm → $mm)',txt:true,bold:true};
-      const rate=(105+rnd(0,10))/100;                       // 1.05–1.15 EUR→USD
-      this._rate=rate; this._rateStr=rate.toFixed(2);
-      cells['A3']={...blankCell(),value:'EUR → USD rate',txt:true,bold:true};
-      cells['B3']={...blankCell(),decimals:2};              // the driver — player types, blues, boxes it
-      cells['C3']={...blankCell(),value:'◀ desk rate: '+this._rateStr,txt:true};   // legend spills right, never under the driver
-      cells['A5']={...blankCell(),value:'EUR (€mm)',txt:true,bold:true};
-      ['Q1','Q2','Q3','Q4','FY'].forEach((q,i)=>cells[colLetter(2+i)+'5']={...blankCell(),value:q,txt:true,bold:true,align:'r'});
-      const SEGS=['Software','Services','Hardware'];
-      this._eur=[];
-      SEGS.forEach((n,i)=>{ const r=6+i; cells['A'+r]={...blankCell(),value:n,txt:true};
-        const row=[]; let tot=0;
+      /* §1.2 randomization — four independent axes: (a) SITE — the whole artifact anchors at
+         column A or B and the source header row draws 4 or 5, and the dollar table sits 2 or 3
+         rows under the euro one, so neither the seed cell nor either fill rect can be replayed
+         from memory; (b) the CURRENCY PAIR draws from three, and the rate, its label, the title
+         and the source header all co-vary with it (§1.0-R2(g) — the board always states its own
+         problem); (c) every figure through rnd(), and the segment count draws 3 or 4, which
+         changes the height of both tables and both fill rects; (d) segment names Fisher-Yates
+         out of a nine-name pool.
+         GEOMETRY MOAT: the two tables share their columns but are separated by 2–3 EMPTY rows,
+         so no Ctrl-arrow ride-through and no current-region grab can reach from the dollar
+         table into the euro one; the rate box sits two rows above the source header with the
+         memo line between them, outside every graded rect. */
+      /* `unit` is the source column's stated denomination, spelled the way a pack spells it —
+         a symbol where the currency has one, the ISO code where it does not (the Swiss franc's
+         "Fr." reads as noise beside "mm"). The source header then avoids stuttering "CHF
+         (CHFmm)" by dropping to plain "(mm)" when the unit already carries the code. */
+      const PAIRS=[{src:'EUR',unit:'€mm',lo:105,hi:115},{src:'GBP',unit:'£mm',lo:120,hi:132},{src:'CHF',unit:'CHFmm',lo:106,hi:116}];
+      const P=PAIRS[rnd(0,PAIRS.length-1)];
+      const rate=rnd(P.lo,P.hi)/100, rateStr=rate.toFixed(2);
+      const lc=rnd(1,2), vc=lc+1;
+      const LC=colLetter(lc), VC=colLetter(vc), C=[0,1,2,3,4].map(j=>colLetter(vc+j));
+      const hr=rnd(4,5), rr=hr-2, n=rnd(3,4);
+      const eurR0=hr+1, eurTot=hr+n+1;
+      const ur=eurTot+rnd(2,3), usdR0=ur+1, usdTot=ur+n+1;
+      cells['A1']={...blankCell(),value:codename()+' — revenue by segment ('+P.unit+' → $mm)',txt:true,bold:true};
+      /* the driver slot: §1.0(f)/§1.0-R2(l) input convention — light yellow, individually
+         labelled, and it ships EMPTY because the figure, the ink and the box are the beats
+         (deviation 4 in the header). */
+      cells[LC+rr]={...blankCell(),value:P.src+' → USD rate',txt:true,bold:true};
+      cells[VC+rr]={...blankCell(),fill:'yellow',align:'c'};
+      /* §1.0-R2(h) + §1.0-R3(q) ACTION-LOCATION CUE (shared cueCell primitive): the rate cell is
+         an EMPTY destination and a green outline on an empty cell reads "this cell", not "put
+         the number here" — exactly the class the rule names. It also carries the seed's rate, so
+         the player never has to guess the figure. Board content: no check reads it, and deleting
+         it cannot move any ok. */
+      cells[colLetter(vc+1)+rr]=cueCell('◀ desk rate ' + rateStr + ' — type it here');
+      cells[LC+(hr-1)]={...blankCell(),value:'Memo: the desk rate holds through month-end',txt:true,it:true,fontColor:'gray'};
+      const POOL=['Software','Services','Hardware','Aviation','Marine','Logistics','Wholesale','Specialty','Industrial'];
+      for(let k=POOL.length-1;k>0;k--){ const j=rnd(0,k); [POOL[k],POOL[j]]=[POOL[j],POOL[k]]; }
+      const segs=POOL.slice(0,n);
+      const QH=['Q1','Q2','Q3','Q4','FY'];
+      /* the SOURCE table ships finished and dressed (doctrine §2.1b — blue typed quarters,
+         black live FY sums, a Total line ruled ON TOP per §1.0(f)); the DOLLAR table ships as a
+         labelled, ruled skeleton with nothing in it. eur[i][j] is the grading truth: rows 0..n-1
+         are the segments, row n is the total line; columns 0..3 are the quarters, column 4 FY. */
+      const eur=[];
+      cells[LC+hr]={...blankCell(),value:P.src+' ('+(P.unit.indexOf(P.src)===0?'mm':P.unit)+')',txt:true,bold:true};
+      QH.forEach((q,j)=>cells[C[j]+hr]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
+      for(let i=0;i<n;i++){ const r=eurR0+i, row=[]; let tot=0;
+        cells[LC+r]={...blankCell(),value:segs[i],txt:true};
         for(let j=0;j<4;j++){ const v=rnd(60,240); row.push(v); tot+=v;
-          cells[colLetter(2+j)+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-        cells['F'+r]={...blankCell(),formula:'=SUM(B'+r+':E'+r+')',value:tot,fmtStyle:'comma',decimals:0};
-        row.push(tot); this._eur.push(row); });
-      cells['A9']={...blankCell(),value:'USD ($mm) — × the boxed rate',txt:true,bold:true};
-      SEGS.forEach((n,i)=>{ const r=10+i; cells['A'+r]={...blankCell(),value:n,txt:true};
-        for(let j=0;j<5;j++) cells[colLetter(2+j)+r]={...blankCell(),decimals:0}; });
-      return {ROWS:13, cells, active:{r:3,c:2}, sel:null, colW:{1:150,2:80,3:80,4:80,5:80,6:88}};
+          cells[C[j]+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+        cells[C[4]+r]={...blankCell(),formula:'=SUM('+C[0]+r+':'+C[3]+r+')',value:tot,fmtStyle:'comma',decimals:0};
+        row.push(tot); eur.push(row); }
+      const totRow=[];
+      cells[LC+eurTot]={...blankCell(),value:'Total',txt:true,bold:true,bt:true};
+      for(let j=0;j<5;j++){ let s=0; for(let i=0;i<n;i++) s+=eur[i][j]; totRow.push(s);
+        cells[C[j]+eurTot]={...blankCell(),formula:'=SUM('+C[j]+eurR0+':'+C[j]+(eurTot-1)+')',value:s,fmtStyle:'comma',decimals:0,bold:true,bt:true}; }
+      eur.push(totRow);
+      cells[LC+ur]={...blankCell(),value:'USD ($mm)',txt:true,bold:true};
+      QH.forEach((q,j)=>cells[C[j]+ur]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
+      for(let i=0;i<n;i++){ const r=usdR0+i;
+        cells[LC+r]={...blankCell(),value:segs[i],txt:true};
+        for(let j=0;j<5;j++) cells[C[j]+r]={...blankCell()}; }
+      /* the dollar skeleton ships UNDRESSED below its labels — no rule on its Total line and no
+         bold on its figures. Two reasons, both load-bearing: a fill CARRIES formats in this
+         engine exactly as it does in Excel, so a border drawn on an empty cell the player is
+         about to fill over would be silently wiped (percent's precedent: "a fill down it cannot
+         wipe a border that was never there"); and §1.0(a) puts every dress beat BEHIND the work
+         that creates the cells anyway. The finished euro table above carries the §1.0(f)
+         convention — Total ruled on TOP — so the standard is on the page to read. */
+      cells[LC+usdTot]={...blankCell(),value:'Total',txt:true,bold:true};
+      for(let j=0;j<5;j++) cells[C[j]+usdTot]={...blankCell()};
+      /* §1.3 density + a real desk artifact: the page names its source. Story, never graded —
+         the memo sits below every checked rect. */
+      const foot=usdTot+2;
+      cells[LC+foot]={...blankCell(),value:'Source: European desk pack — FY25 actuals, as reported',txt:true,it:true,fontColor:'gray'};
+      /* widths: explicitly sized, so they never auto-grow (r432) and never go ##### either —
+         sized for the WIDEST route a player can land, comma at TWO places on the largest total
+         (four segments × four quarters × 240 × 1.32 = "5,068.80", 8 chars = 81px). */
+      const cw={}; cw[lc]=132; for(let j=0;j<5;j++) cw[vc+j]=92;
+      this._o={ P:P, rate:rate, rateStr:rateStr, lc:lc, vc:vc, LC:LC, VC:VC, C:C, rr:rr, hr:hr, n:n,
+        eurR0:eurR0, eurTot:eurTot, ur:ur, usdR0:usdR0, usdTot:usdTot, eur:eur, segs:segs,
+        rateCell:VC+rr,
+        seed:C[0]+usdR0,
+        topRow:C[0]+usdR0+':'+C[4]+usdR0,
+        block:C[0]+usdR0+':'+C[4]+usdTot,
+        tableRect:LC+ur+':'+C[4]+usdTot };
+      return {ROWS:Math.max(12,foot), cells, active:{r:rr,c:vc}, sel:null, colW:cw};
     },
     checks(S){
-      const rate=this._rate;
-      const b3=S.cells['B3'];
-      const rateOk=!!(b3 && typeof b3.value==='number' && Math.abs(b3.value-rate)<1e-9 && b3.fontColor==='blue');
-      const boxOk=!!(b3 && b3.ball);
-      // one anchored formula, 2D-filled: every USD cell reads $B$3 and its own EUR cell
-      let usdOk=true, comOk=true;
-      for(let i=0;i<3;i++) for(let j=0;j<5;j++){
-        const L=colLetter(2+j), cell=S.cells[L+(10+i)];
-        if(!cell||!cell.formula){ usdOk=false; comOk=false; continue; }
-        const f=cell.formula.toUpperCase().replace(/\s/g,'');
-        if(f.indexOf('$B$3')<0 || f.indexOf(L+(6+i))<0) usdOk=false;
-        const want=(typeof b3?.value==='number'?b3.value:rate)*this._eur[i][j];
-        if(Math.abs((cell.value||0)-want)>Math.max(1e-2,Math.abs(want)*1e-6)) usdOk=false;
-        if(cell.fmtStyle!=='comma') comOk=false;
-      }
-      // one OUTLINE around A10:F12 — perimeter only, the desk look
-      const outOk=(()=>{ for(let c=1;c<=6;c++){ const t=S.cells[colLetter(c)+'10']||{}, b=S.cells[colLetter(c)+'12']||{};
-          if(!t.bt||!b.bb) return false; }
-        for(let r=10;r<=12;r++){ const l=S.cells['A'+r]||{}, rr=S.cells['F'+r]||{};
-          if(!l.bl||!rr.br) return false; } return true; })();
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      const norm=f=>String(f||'').toUpperCase().replace(/\s/g,'');
+      const rc=cel(o.rateCell);
+      /* the hardcode beat: the seed's figure, in blue. Both blue routes set fontColor 'blue'
+         (Alt H F C → →×4, and Alt H J → for the "Input" cell style), and the figure clears
+         however it was typed. */
+      const rateOk = typeof rc.value==='number' && Math.abs(rc.value-o.rate)<5e-7 && rc.fontColor==='blue';
+      /* the box, every route (§1.0-R3(p), PROBED not reasoned): on a 1×1 selection Alt H B S and
+         Alt H B T store `ball` — the engine special-cases a 1×1 perimeter as the classic box —
+         and Alt H B A stores `ball` directly, so all three land the same flag. Walking the four
+         edges by hand (Alt H B P/O/L/R) leaves bt+bb+bl+br and no ball, so that is accepted as
+         its own end state. Alt H B D (top and bottom only) is not a box and correctly fails. */
+      const boxOk = !!(rc.ball || (rc.bt&&rc.bb&&rc.bl&&rc.br));
+      /* THE ANCHOR-TEXT EXCEPTION, scoped to the driver (doctrine §2.2; §4.30's "one anchored
+         rate"). A converted body cell must hold a live formula that reads the rate cell with
+         BOTH halves locked and reads its OWN source cell. Deliberately exact about the lock and
+         deliberately loose about everything else:
+           · $B$3 and nothing weaker. Unlike percent (1-D fill, so the row lock is the half that
+             matters) and anchor (mixed by design), this block fills in TWO directions: a bare
+             column drags on the fill right and a bare row drags on the fill down, so a partial
+             lock is a wrong end state on this board even where it happens to compute. That is
+             this drill's whole distinction and the reason its ☆ can be scope rather than route.
+           · the ROUTE to the lock is never read — F4 once and four typed characters produce the
+             same string (ALT 2 types every one), and no fill is required anywhere.
+           · operand order and wrappers are free; the source-cell reference may carry any locks.
+           · the VALUE check is what actually pins the arithmetic, so an ingenious equivalent
+             formula clears exactly like the filled one. */
+      const RATE=new RegExp('(^|[^A-Z0-9$])\\$'+o.VC+'\\$'+o.rr+'(?![0-9])');
+      const dst=(i,j)=>o.C[j]+(o.usdR0+i);
+      const want=(i,j)=>o.eur[i][j]*o.rate;
+      const valOk=(i,j)=>{ const c=cel(dst(i,j)); const w=want(i,j);
+        return typeof c.value==='number' && Math.abs(c.value-w)<=Math.max(1e-2,Math.abs(w)*1e-6); };
+      const offRate=(i,j)=>{ const c=cel(dst(i,j)); if(!c.formula) return false; const f=norm(c.formula);
+        return RATE.test(f) && new RegExp('(^|[^A-Z0-9$])\\$?'+o.C[j]+'\\$?'+(o.eurR0+i)+'(?![0-9])').test(f); };
+      /* the CORE grades the twelve-or-sixteen body cells off the rate, and the FY column and the
+         total line on VALUE ALONE (§1.0-R3(p), deviation 3): AutoSum and the stretched fill draw
+         the same number on the board, so both must clear or the guide's own route leaves a beat
+         dark with nothing to fix. */
+      let buildOk=true;
+      for(let i=0;i<=o.n;i++) for(let j=0;j<5;j++){
+        if(!valOk(i,j)) buildOk=false;
+        else if(i<o.n && j<4 && !offRate(i,j)) buildOk=false; }
+      /* comma at zero places, every route: Ctrl+1 → N lands it in one move; Alt H K and
+         Ctrl+Shift+! land comma at TWO and Alt H 9 walks them down. The beat reads the end
+         state, so all three clear. Accounting and currency are NOT accepted — they put a symbol
+         on every line of a $mm table, which is a different look, not a different route. */
+      let comOk=true;
+      for(let i=0;i<=o.n;i++) for(let j=0;j<5;j++){ const c=cel(dst(i,j));
+        if(c.fmtStyle!=='comma' || (c.decimals|0)!==0) comOk=false; }
+      /* the perimeter, every route AND every reasonable rect (§1.0-R3(p)): Alt H B S, the thick
+         box Alt H B T, the per-edge walk (B P/O/L/R) and all-borders (whose `ball` carries the
+         perimeter too) all draw the four edges; and boxing the table WITH its header row and
+         label column reads as "the dollar table is boxed" exactly as boxing the figures does,
+         so both readings pass on both axes. */
+      const boxed=(r1,c1,r2,c2)=>{
+        for(let c=c1;c<=c2;c++){ const t=cel(colLetter(c)+r1), b=cel(colLetter(c)+r2);
+          if(!(t.bt||t.ball)||!(b.bb||b.ball)) return false; }
+        for(let r=r1;r<=r2;r++){ const l=cel(colLetter(c1)+r), rt=cel(colLetter(c2)+r);
+          if(!(l.bl||l.ball)||!(rt.br||rt.ball)) return false; }
+        return true; };
+      const outOk = boxed(o.ur,o.lc,o.usdTot,o.vc+4) || boxed(o.ur,o.vc,o.usdTot,o.vc+4) ||
+                    boxed(o.usdR0,o.lc,o.usdTot,o.vc+4) || boxed(o.usdR0,o.vc,o.usdTot,o.vc+4);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — the FY column
+         and the total line read the rate as well, so the same one formula covers the whole
+         table and not one AutoSum is needed. Graded on the END STATE, not on a latch: this
+         star is about the SCOPE of the broadcast (anchor's and percent's are about the
+         mechanic), so any route that gets the rate onto the edges earns it. The taught route —
+         fill the body, then Alt+= the year column and the total line — clears all five cores
+         and forfeits the star, which is what makes it a choice and not a by-product — measured
+         at 49-51 keys against the star route's 33, with all five cores lit and the star dark.
+         ALT 2 in dev/e2e-alt-paths.js is the full slow control (153-187 keys, same result). */
+      let starOk=buildOk;
+      for(let i=0;i<=o.n;i++) for(let j=0;j<5;j++){ if(i<o.n && j<4) continue;
+        if(!offRate(i,j)) starOk=false; }
+      /* DEPTH_PASS §4.30 beats. Labels are INSTRUCTIONS (§1.0-R3(n)): the clause after the dash
+         says WHAT or WHERE, never why. They name THIS seed's currency and rate (§1.0-R2(g)), so
+         the player reads the page instead of reverse-engineering it. */
       return [
-        {label:'type the desk rate '+this._rateStr+' at B3 and blue it — the one hardcode on the page', ok:rateOk},
-        {label:'give the rate cell all borders — the standalone-driver box', ok:boxOk},
-        {label:'convert with ONE formula — B10 =B6*$B$3, anchored, fill right then down (B10:F12)', ok:usdOk},
-        {label:'comma-format the USD block', ok:usdOk&&comOk},
-        {label:'add an outside border around the finished table A10:F12 — one perimeter, never a grid of borders', ok:outOk},
+        {label:'Enter the desk rate '+o.rateStr+' in the '+o.P.src+' → USD rate cell — in blue', ok: rateOk},
+        {label:'Add all borders around the '+o.P.src+' → USD rate cell', ok: boxOk},
+        {label:'Build the USD table off the rate cell — quarters, FY and the Total line', ok: buildOk},
+        {label:'Comma-format the USD table — zero decimals', ok: comOk},
+        {label:'Add an outside border around the USD table', ok: outOk},
+        {label:'Build the FY column and the Total line off the rate too — one pass covers them', ok: starOk, bonus:true},
       ];
     }
   },

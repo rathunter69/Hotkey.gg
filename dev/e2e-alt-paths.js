@@ -1169,6 +1169,52 @@ const ALTS = [
       for(let i=o.nSeg-1;i>=0;i--) st.push({sel:o.LP+(o.r1+i), keys:[...T('='+o.LR+(o.r1+i)+'/'+o.LR+o.rT),{key:'Enter'}]});
       st.push({sel:o.pctRng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
       return st; }` },
+  /* r435 (fxconvert ROUND 1 depth pass, DEPTH_PASS §4.30): ONE fully absolute scalar driver
+     broadcast over a 2-D block. ALT 1 is the op-ORDER alt AND the chord-ROUTE alt at once — the
+     empty dollar table is comma-formatted BEFORE anything is entered, the driver box is walked
+     edge by edge instead of chorded, blue comes from the cell-styles gallery, both dollar signs
+     are TYPED with no F4 anywhere, the two fills go DOWN-then-RIGHT through the Home ribbon
+     (the demo goes right-then-down with Ctrl chords), the perimeter is a THICK box, and the
+     RATE IS TYPED LAST, so every converted figure reads 0 until it lands and recalc lights the
+     page — the §1.0-R3(p) end-state proof. The ☆ still fires there, which is the point: it is
+     graded on SCOPE (the FY column and the Total line read the rate too), never on a chord.
+     ALT 2 is the ☆'s NEGATIVE CONTROL and the §1.0(c) freedom proof: the rate and its box
+     first, then every body cell hand-typed bottom-up and right-to-left with the dollar signs
+     spelled out and the operands the other way round, no fill anywhere, and the FY column and
+     the Total line summed with nine Alt+= passes — the route the guide actually teaches. All
+     five cores clear; the star stays dark because those nine cells hold SUMs, not the rate.
+     MEASURED: 153 keys at three segments, 187 at four, against the demo's 33 — and the tighter
+     skip route the guide actually teaches (fill the BODY, Alt+= the two edges) runs 49-51 with
+     the same result, which is the star's real headroom. */
+  { key: 'fxconvert', name: 'op-ORDER + chord-ROUTE: empty table comma-formatted FIRST (alt h k then two alt h 9), driver box walked edge by edge, blue via the alt h j cell-styles gallery, typed $ locks with no F4, ribbon fills DOWN then RIGHT, thick perimeter, and the rate typed LAST (every figure reads 0 until recalc) — ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.block,    keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},   // commas on an empty block — end-state grading must hold
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},                                            // the box, one edge at a time …
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('l')]},
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('r')]},                                            // … four edges, no ball flag anywhere
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}]},                   // cell styles → Input, the other route to blue
+      {sel:o.seed,     keys:[...T('='+o.C[0]+o.eurR0+'*$'+o.VC+'$'+o.rr),{key:'Enter'}]},                    // locks typed, not cycled — and the rate cell is still empty
+      {sel:o.C[0]+o.usdR0+':'+o.C[0]+o.usdTot, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},              // down the first column …
+      {sel:o.block,    keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},                                      // … then right across everything, edges included
+      {sel:o.tableRect,keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                                             // thick box — the perimeter grades the same
+      {sel:o.rateCell, keys:[...T(o.rateStr),{key:'Enter'}]},                                                // the rate lands last and the whole page comes alive
+    ]; }` },
+  { key: 'fxconvert', name: 'NEGATIVE CONTROL: rate and box first, every body cell hand-typed bottom-up with typed $ signs and reversed operands, no fill anywhere, FY column and Total line summed with nine alt+= passes, comma via ctrl+shift+! then two alt h 9, per-edge border walk — all five cores clear, ☆ dark', moves: `C => { const o=C._o; const steps=[];
+      steps.push({sel:o.rateCell, keys:[...T(o.rateStr),{key:'Enter'}]});
+      steps.push({sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]});
+      steps.push({sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('a')]});
+      for(let i=o.n-1;i>=0;i--) for(let j=3;j>=0;j--)                                                        // bottom-up, right-to-left, rate first in the product
+        steps.push({sel:o.C[j]+(o.usdR0+i), keys:[...T('=$'+o.VC+'$'+o.rr+'*'+o.C[j]+(o.eurR0+i)),{key:'Enter'}]});
+      for(let i=0;i<o.n;i++)                                                                                 // the FY column, one AutoSum per segment …
+        steps.push({sel:o.C[0]+(o.usdR0+i)+':'+o.C[4]+(o.usdR0+i), keys:[{key:'=',alt:true,code:'Equal'}]});
+      for(let j=0;j<5;j++)                                                                                   // … and the Total line, one per column
+        steps.push({sel:o.C[j]+o.usdR0+':'+o.C[j]+o.usdTot, keys:[{key:'=',alt:true,code:'Equal'}]});
+      steps.push({sel:o.block, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]});
+      steps.push({sel:o.C[0]+o.usdR0+':'+o.C[4]+o.usdR0, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});           // the perimeter walked one edge at a time,
+      steps.push({sel:o.C[0]+o.usdTot+':'+o.C[4]+o.usdTot, keys:[{key:'Alt'},L('h'),L('b'),L('o')]});         // and around the FIGURES only — the label
+      steps.push({sel:o.C[0]+o.usdR0+':'+o.C[0]+o.usdTot, keys:[{key:'Alt'},L('h'),L('b'),L('l')]});          // column and header row left outside it
+      steps.push({sel:o.C[4]+o.usdR0+':'+o.C[4]+o.usdTot, keys:[{key:'Alt'},L('h'),L('b'),L('r')]});
+      return steps; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
       const steps=C._sites.slice().reverse().flatMap(s=>[

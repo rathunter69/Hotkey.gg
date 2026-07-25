@@ -123,7 +123,7 @@ window.HOTKEY_DRILLS = {
     cagr:       { name:'CAGR',     label:'Compound it, three times', tab:'CAGR',   desc:'(End÷Begin)^(1÷yrs)−1 — three scattered blocks' },
     sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'SUMIF rollup + live foot + % of total, summary formatted' },
     rollup:     { name:'SUMIFS',   label:'Sum on two criteria',      tab:'SUMIFS',      desc:'One mixed-anchor SUMIFS fills the segment \u00d7 region grid' },
-    fxconvert:  { name:'FX Convert', label:'Convert the page \u2014 one anchored rate', tab:'FX', desc:'One bordered EUR\u2192USD rate drives a 2D-filled conversion \u2014 anchored driver, outlined output' },
+    fxconvert:  { name:'FX Convert', label:'Convert the page \u2014 one anchored rate', tab:'FX', desc:'One blue, boxed rate drives every converted figure \u2014 a locked driver broadcast across the whole table' },
     cases:      { name:'Sticky switch', label:'Scenario switch with CHOOSE', tab:'Cases', desc:'A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshots each case into the output table' },
     bridge:     { name:'Point Mode', label:'Point-mode formulas', tab:'Point',   desc:'Roll revenue forward off the growth line, then price EBITDA off the margin line' },   /* r434 (DEPTH_PASS D10): the meta said "Build the profit bridge / profit = revenue × margin", which named neither the drill's lesson (point mode — index.html has said so for revisions) nor its board (a five-year driver build). Renamed per the delta table; key is immutable, so PBs, boards and runs history are untouched. */
     foot:       { name:'Foot',     label:'Total it both ways',  tab:'Cross-foot',  desc:'SUM across and down, tie out the corner' },
