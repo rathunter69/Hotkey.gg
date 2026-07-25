@@ -37,7 +37,7 @@ window.HOTKEY_DRILLS = {
   groups: [
     { name: 'Foundations',    keys: ['navigation', 'filldr', 'pastes', 'blocksel', 'rowops', 'editfix', 'modeltour'] },   /* r367: modeltour moved from #2 to capstone — it demands cascades + formatting no fresh player has yet · r424 (D17): colops RETIRED — rowops absorbed it (row AND column structure ops, one drill); the freed slot stays open for a future add */
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'housestyle', 'gauntlet'] },
-    { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert'] },
+    { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert'] },
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
     { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'cases', 'tieout', 'hunt', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
@@ -106,7 +106,6 @@ window.HOTKEY_DRILLS = {
     // Formulas & auditing — spans Formulas I and Formulas II, plus the Models drills
     margin:     { name:'Margins',  label:'Margins across the page', tab:'Margin',  desc:'Three ratio columns on one peer page — the margin, the growth rate and the EV/EBITDA multiple, each in the format it is quoted in' },   /* r433 §4.21: the desc named the retired three-table board */
     anchor:     { name:'Anchors',  label:'Pin the reference',       tab:'Anchors', desc:'Cycle the reference locks — one pinned formula prices the whole grid' },
-    growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'Consolidate, YoY as %, CAGR — a real revenue build' },
     wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
     fcfbuild:   { name:'uFCF',     label:'Build the unlevered FCF', tab:'uFCF',    desc:'EBIT \u2192 less taxes \u2192 NOPAT \u2192 plus D&A, less capex and the NWC build: the row every DCF discounts, filled across five years' },
     dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'Discount factors \u00d7 cash flows build the PV row; the TV reuses the year-5 factor' },
@@ -241,7 +240,7 @@ window.HOTKEY_CAMPAIGN = {
   chapters: [
     { id:'c1', name:'Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'], capstone:'modeltour' },
     { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','combo','gauntlet'], capstone:'gauntlet' },   /* r433 (D8): the Formatting capstone designates with its depth-pass build; `dress` retired r432 into housestyle, `combo` takes its chapter slot */
-    { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
+    { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','bridge','anchor','sumif'] },
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
     { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
@@ -333,7 +332,7 @@ window.HOTKEY_CLOCKS = {
   gauntlet:  { pass: 94 },   /* r433: the Formatting capstone — par 47 × 2 (§4.20 "Clocks: capstone pass=par×2.0") */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"growth":36,"cagr":55,"anchor":22,"bridge":33,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":55,"anchor":22,"bridge":33,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

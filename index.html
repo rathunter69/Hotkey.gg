@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
-<meta name="description" content="Keyboard-only Excel training: 77 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="description" content="Keyboard-only Excel training: 76 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
-<meta property="og:description" content="Keyboard-only Excel training: 77 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:description" content="Keyboard-only Excel training: 76 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
-<meta name="twitter:description" content="Keyboard-only Excel training: 77 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:description" content="Keyboard-only Excel training: 76 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 82 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
@@ -1798,9 +1798,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=290"></script>
+<script src="drills.js?v=291"></script>
 
-<script src="drills.js?v=290"></script>
+<script src="drills.js?v=291"></script>
 
 
 
@@ -6508,72 +6508,6 @@ const CHALLENGES = {
         {label:'Fill the EBITDA line across all five years', ok: ebAll},
         {label:'Bold the EBITDA line and add a top border above it', ok: dressOk},
         {label:'Build both lines by pointing at the references', ok: starOk, bonus:true},
-      ];
-    }
-  },
-  growth:{
-    name:'Growth', label:'Run the growth rates', par:36, parKeys:35,
-    aha:'Growth = this ÷ last − 1 — one formula, filled across every year.',
-    prompt:'A revenue build with two segments, a consolidated line, and five fiscal years. Total the segments, run YoY growth off the total — this year ÷ last year − 1, filled across, formatted as a percent — then compute the 4-year CAGR. Three formulas, each formatted to standard.',
-    req:'<em>B4</em> total <em>=B2+B3</em> fill \u2192 \u00b7 <em>C5</em> YoY <em>=C4/B4-1</em> \u00b7 fill C5:F5 \u2192 + <em>ctrl+shift+%</em> \u00b7 <em>B7</em> CAGR <em>=(F4/B4)^(1/4)-1</em> + <em>ctrl+shift+%</em> \u00b7 dress B4:F4: <em>ctrl+b</em>',
-    guide:[
-      'consolidate at B4 \u00b7 <kbd>=B2+B3</kbd> \u2014 both segments \u00b7 fill right',
-      'YoY at C5 \u00b7 <kbd>=C4/B4-1</kbd> \u2014 this year over last, minus one \u00b7 fill C5:F5 \u2192',
-      'select C5:F5 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 growth reads as percents',
-      'CAGR at B7 \u00b7 <kbd>=(F4/B4)^(1/4)-1</kbd> \u2014 the ^ key earns its place \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'bold the consolidated line: select B4:F4 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
-    ],
-    targets:['B4:F4','C5:F5','B7','B4:F4'],
-    demo(){ return [
-      {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'C5', keys:[...T('=C4/B4-1'), Kb.enter]},
-      {sel:'C5:F5', keys:[Kb.fillR]},
-      {sel:'C5:F5', keys:[Kb.pct]},
-      {sel:'B7', keys:[...T('=(F4/B4)^(1/4)-1'), Kb.enter]},
-      {sel:'B7', keys:[Kb.pct]},
-      {sel:'B4:F4', keys:[Kb.bold]},
-    ]; },
-    build(){
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 revenue build ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const segs=['Products revenue','Services revenue'];
-      cells['A2']={...blankCell(),value:segs[0],txt:true};
-      cells['A3']={...blankCell(),value:segs[1],txt:true};
-      cells['A4']={...blankCell(),value:'Total revenue',txt:true,bold:true};
-      cells['A5']={...blankCell(),value:'YoY growth',txt:true};
-      cells['A7']={...blankCell(),value:'CAGR (4-yr)',txt:true};
-      let a=rnd(40,90)*10, b=rnd(20,60)*10;
-      this._tot=[];
-      for(let i=0;i<5;i++){ const col=colLetter(i+2);
-        cells[col+2]={...blankCell(),value:a,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+3]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0};
-        if(i>0) cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0};
-        this._tot.push(a+b);
-        a=Math.round(a*(1+rnd(2,12)/100)); b=Math.round(b*(1+rnd(2,14)/100)); }
-      cells['B7']={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._yoy=[1,2,3,4].map(i=>this._tot[i]/this._tot[i-1]-1);
-      this._cagr=Math.pow(this._tot[4]/this._tot[0],1/4)-1;
-      return {ROWS:7, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:70,3:70,4:70,5:70,6:70}};
-    },
-    checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
-      const totOk=[0,1,2,3,4].every(i=>{ const val=v(COL[i]+'4'); return val!==null&&Math.abs(val-this._tot[i])<0.5; });
-      const yoyOk=[1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'5'];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._yoy[i-1])<1e-3&&c.fmtStyle==='percent'); });
-      const cagrC=S.cells['B7'];
-      const cagrOk=!!(cagrC&&cagrC.formula&&String(cagrC.formula).includes('^')&&typeof cagrC.value==='number'&&Math.abs(cagrC.value-this._cagr)<1e-3&&cagrC.fmtStyle==='percent');
-      const boldOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'4']; return !!(c&&c.bold); });
-      return [
-        {label:'consolidate the segments live at B4 \u2014 fill across all five years', ok: totOk&&refs('B4',['B2','B3'])},
-        {label:'run YoY growth at C5 \u2014 this year over last, fill C5:F5 and percent it', ok: yoyOk&&refs('C5',['C4','B4'])},
-        {label:'compound the CAGR at B7 \u2014 first and last totals, as a percent', ok: cagrOk&&refs('B7',['F4','B4'])},
-        {label:'bold the consolidated line \u2014 B4:F4 carries the page', ok: boldOk},
       ];
     }
   },

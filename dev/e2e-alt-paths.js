@@ -444,16 +444,6 @@ const ALTS = [
       {sel:o.lab,      keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
       {sel:o.hdr,      keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
     ]; }` },
-  { key: 'growth', name: 'bold first, percent via alt h p, CAGR before YoY, algebraic YoY variant', moves: `C => [
-      {sel:'B4', keys:[...T('=B2+B3'),{key:'Enter'}]},
-      {sel:'B4:F4', keys:[{key:'r',ctrl:true}]},
-      {sel:'B4:F4', keys:[{key:'b',ctrl:true}]},
-      {sel:'B7', keys:[...T('=(F4/B4)^(1/4)-1'),{key:'Enter'}]},
-      {sel:'B7', keys:[{key:'Alt'},L('h'),L('p')]},
-      {sel:'C5', keys:[...T('=(C4-B4)/B4'),{key:'Enter'}]},
-      {sel:'C5:F5', keys:[{key:'r',ctrl:true}]},
-      {sel:'C5:F5', keys:[{key:'Alt'},L('h'),L('p')]},
-    ]` },
   { key: 'revolver', name: 'MAX-outside nest, prove-outs bottom-up, border before bold via ribbon', moves: `C => [
       {sel:'B5', keys:[...T('=MAX(0,MIN(B3,B2-B4))'),{key:'Enter'}]},
       {sel:'B5:E5', keys:[{key:'r',ctrl:true}]},

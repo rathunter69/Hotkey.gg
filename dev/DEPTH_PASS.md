@@ -568,9 +568,30 @@ Do NOT build this page. The drill key `copyover` no longer exists in `menuOrder`
 ☆ Italicize both % column headers — memo columns whisper
 **Random:** block A site NOW ALSO from a 3-spot pool (audit ask) + block B pool (exists) + depth 5–7 (exists). **Aha:** unchanged. **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** r419 %-entry fix matters here (typing a raw number into a pre-%-formatted cell) — add its regression line to this drill's replay.
 
-#### 4.25 growth — "Run the growth rates" · S
+#### 4.25 growth — "Run the growth rates" · S — ⛔ **RETIREMENT RECOMMENDED (r434 depth-pass agent; AWAITING WOLF/ORCHESTRATOR DECISION — NOT EXECUTED)**
+
+> **The depth-pass build agent for this page declined to rework the drill and recommends retiring the `growth` key under §1.0-R3(s), folding its board into `cagr` (§4.26). Nothing below has been executed; the original page is preserved verbatim under this block so the recommendation can be overruled without losing the spec.**
+>
+> **(1) EVERY BEAT ON THIS PAGE IS ALREADY CARRIED, and three of them by drills in this same chapter.**
+> · beat 1 (total the segments, fill across) → `foot` §4.22 (total every row / every column, live SUMs), `balance` (foot both sides, fill right), `bridge` §4.27 beat 6 (total the five EBITDA years).
+> · beats 2–3 (YoY row, `=C4/B4-1`, filled across, percent) → **`versionup` beat 1 is this construct verbatim**, down to the staggered start: its guide reads *"growth row is typed · C5: `=C4/B4-1` · select C5:F5, ctrl+r"* on a five-year operating build. `cases` builds the same row (`C13 =C12/B12-1`, fill C13:F13). `margin` §4.21 beat 2 owns the growth RATIO itself ("Growth %", one of its three ratio columns) and its percent dress.
+> · beat 4 (CAGR) → `cagr` §4.26, which is the whole of that drill, three times per run.
+> · beat 5 (bold + top border a total row) → catalog-universal.
+> · ☆ (percent-format + bold the CAGR cell) → **illegal on arrival**: §1.0(d) outlaws formatting bonuses outright.
+> The doc collides with itself here: §4.21 assigns the growth column to `margin`, this page assigns the growth row to `growth`, and §2.4 lists "YoY growth" as one of the five skills the `qclose` capstone chains. YoY is a chapter-wide MOTIF with three homes, not a drill.
+>
+> **(2) NO LEGAL ☆ EXISTS ON THIS BOARD — measured, not reasoned (§1.0-R3(p) discipline).** Both sanctioned §1.0(d)/§1.0-R2(i) families were probed live against the shipped board:
+> · *one fill covering the block*: seed B4 and B5, select B4:F5, one Ctrl+R — **wins in 34 keys but leaves `#DIV/0!` parked in B5**, because year one has no prior year. The only one-pass move on this board ships a broken artifact (§1.6 sendable finish) to save ONE key against the taught route.
+> · *block-grab discipline* (Ctrl+Shift+→ before the fills, the §1.0-R2(i) exemplar): **37 keys — two MORE than the taught route**, because both derived rows are empty on load so the grab has nothing to ride.
+> · taught route 35 keys; fully hand-typed, no formulas, no fills, 85 keys and still a clean win. Efficiency headroom 2.4× — against 5.4× on `percent` (19 vs 103). There is nothing hidden here worth finding.
+> A drill that cannot carry a legal bonus cannot meet §1.1 / §2.2 / the per-drill DoD. Adding `growth` to `REWORKED` in dev/check-invariants.js today fails four gates (C9 tri-length, C9 one-bonus, C9 saveClose, C12 alt-count).
+>
+> **(3) RECOMMENDED DISPOSITION — MERGE, not a bare delete.** The one asset worth keeping is the BOARD: a real revenue build with two segments, a consolidated line and five fiscal years. `cagr`'s own §4.26 page leaves it as three abstract Begin/End/Years stubs — a calculator exercise whose MECHANIC is sound and whose MOTIVE is missing, which is exactly the `undo`→`editfix` case r431 already ruled on. Fold this board into `cagr`: build the YoY rates across the series, see four different annual rates, then compound the one rate that reproduces the endpoints — *the average of the annual rates is not the CAGR* — and keep `cagr`'s read-the-output winner beat. `cagr` keeps its key (its lesson is the one nothing else in Formulas I carries; `^(1/n)-1` otherwise only recurs as IRR in `lbo`/`dcf`). `growth`'s key leaves `menuOrder`.
+> **Plumbing a retirement touches** (r359 drift rule — all in one PR): drills.js `groups` Formulas I (10→9), `meta.growth`, `HOTKEY_PARS.growth` (36), `HOTKEY_CAMPAIGN.chapters` c3 `keys:['margin','growth','anchor','sumif']` — growth must be swapped out of the milestone list, dev/migrate-certificates.sql's `formulas` array, the one ALT entry at dev/e2e-alt-paths.js:461, drills/growth.html + refmap. `HK_PLACEMENT` does NOT reference growth. LB board orphans with history kept (the colops/copyover precedent).
+> **Baseline is healthy, so this is a pedagogy call and not a bug bailout:** par sweep reads par 36 / parKeys 35 / median 35 / 1.03 s/key, and the drill's alt entry passes.
+
 **Now:** consolidate + YoY% + CAGR, three formula families, prompt rich; near bar.
-**Language pass + bonus; split any bundled check:**
+**Language pass + bonus; split any bundled check (ORIGINAL PAGE — superseded by the block above unless overruled):**
 1. Total the two segments into the consolidated row — live SUMs filled across
 2. Build the YoY row — this year ÷ last year − 1, filled across
 3. Percent-format the YoY row — one decimal
