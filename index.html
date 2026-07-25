@@ -9016,7 +9016,14 @@ function overflowsCol(St,c){
   for(let r=1;r<=St.ROWS;r++){ const cell=St.cells[ck(r,c)]||blankCell();
     if(!isNum(cell)||cell.wrap) continue;
     const t=fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale);
-    if(t.length*CHARPX+12 > ((St._ew||St._colW)?(St._ew||St._colW)[c]:COLW_DEFAULT)) return true; }
+    /* r431: was (St._ew||St._colW) — it preferred the ELASTIC display width, which contradicts
+       both the r55 note at the S._colW assignment ("graders (autofit) read these; r55 wrongly
+       pointed this at __ew") and r430's render fix, which moved the #### test onto the unscaled
+       width. Left as it was, the two disagreed: the board could show a clean column while this
+       still reported overflow, so an autofit beat stayed dark with nothing visible to fix — the
+       same untriggerable-checklist class Wolf hit on the dollar beat. Engine width first. */
+    const w=(St._colW||St._ew);
+    if(t.length*CHARPX+12 > (w?w[c]:COLW_DEFAULT)) return true; }
   return false;
 }
 
