@@ -2055,7 +2055,10 @@ window.hkPlayerCard = function(d, opts){
       const slots = d.medalSlots || 5;
       let mh = '';
       for(let i=0;i<slots;i++){ const m=d.medals[i];
-        mh += (m && window.hkMedalCard) ? window.hkMedalCard(m.glyph, m.rarity, m.name, m.size||30)
+        /* r426 (§4b): m.tip carries name · description · progress when the caller has it;
+           hkMedalCard falls back to name + rarity when it doesn't. Either way the chip
+           gets the INSTANT data-tip tooltip on every surface that deals this card. */
+        mh += (m && window.hkMedalCard) ? window.hkMedalCard(m.glyph, m.rarity, m.name, m.size||30, false, m.tip)
           : '<span class="hk-medc empty" aria-hidden="true"></span>'; }
       h += '<div class="uc-ach">'+mh+'</div>';
     } else if(d.achHtml){ h += '<div class="uc-ach">'+d.achHtml+'</div>'; }
@@ -2369,7 +2372,16 @@ window.hkFoundingFlags = function(){ try{ return JSON.parse(localStorage.getItem
    behind the badge (rare-or-better). No rarity label on the tray — just the
    achievement name (Wolf). rarityPct is an EFFECTIVE-rarity % (hkEffRarity), same
    input hkBadge takes. CSS lives in nav.css (.hk-medc*). */
-window.hkMedalCard = function(glyph, rarityPct, name, size, bare){
+/* r426 (Wolf, ROUND2_FEEDBACK §4b: "achievements hoverable for tooltips on EVERY card,
+   no matter where it's surfaced from"): the medal chip now carries the INSTANT shared
+   tooltip (data-tip, nav.css) instead of a native title= — title has a ~1s OS delay, so
+   on the player card, the leaderboard hero, the profile showcase and the rank-click card
+   the medals effectively had no tooltip at all.
+     `tip` (6th arg, optional) is the full line — name · description · progress. When a
+   caller has none, the chip falls back to name + rarity word, so EVERY existing call site
+   (profile.html, nav.js, lb.js, stats.html, the customizer picker) gains an instant tip
+   with no edit. title= is kept alongside for accessibility / non-hover input. */
+window.hkMedalCard = function(glyph, rarityPct, name, size, bare, tip){
   size = size || 34;
   const meta = window.hkRarityMeta ? window.hkRarityMeta(rarityPct) : { color:'#8a8f98', weight:4, word:'' };
   const rare = meta.weight <= 3;   // rare/epic/legendary/mythic show the rarity dot
@@ -2397,8 +2409,9 @@ window.hkMedalCard = function(glyph, rarityPct, name, size, bare){
       pips = '<span class="hk-medc-pips">'+d+'</span>';
     }
   }
+  const tipTxt = tip || (name ? (String(name)+(meta.word?' · '+String(meta.word).toUpperCase():'')) : '');
   return '<span class="hk-medc'+(bare?' bare':'')+'" style="--rc:'+meta.color+'"'+
-      (name?(' title="'+esc(name)+(meta.word?' — '+meta.word:'')+'"'):'')+'>'+
+      (tipTxt?(' data-tip="'+esc(tipTxt)+'" title="'+esc(tipTxt)+'"'):'')+'>'+
     '<span class="hk-medc-h">'+badge+'</span>'+pips+
     (name?'<b class="hk-medc-nm">'+esc(name)+'</b>':'')+
   '</span>';

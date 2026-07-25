@@ -56,35 +56,35 @@ window.HOTKEY_DRILLS = {
   // ---------------------------------------------------------------
   meta: {
     // Foundations
-    navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'One winding corridor through solid walls — every straightaway is a single shot, every corner one turn. Collect the pips, copy the model data, bring it home to A1, save, and finish at the far corner of the active area' },
+    navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'One long switchback corridor through solid walls — every straightaway is a single shot, every corner one turn. Collect the pips, copy the model data, bring it home to A1, save, and finish at the far corner of the active area — the wall past the model breaks open if you would rather walk there than fly' },   /* r427 (§4.1 round 3): windier serpentine + the carved exit */
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — autofit the columns to their content' },
     rowops:     { name:'Structure', label:'Rebuild the schedule',   tab:'Structure',desc:'Full structural surgery \u2014 insert the missing line and the missing quarter, delete the squatters, and watch every new row and column arrive already dressed' },   /* r424 (D17): absorbed colops \u2014 rows AND columns in one drill */
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Fill down and fill right — one formula, whole block' },
-    blocksel:   { name:'Block Sel.',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
+    blocksel:   { name:'Block Select',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
     editfix:    { name:'Edit',     label:'Fix the typos in place',  tab:'Edit',     desc:'Three typos, three in-place repairs — never retype a cell' },
     undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete big, undo, then delete only what deserved it' },
-    pastes:     { name:'Paste Sp.',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
+    pastes:     { name:'Paste Special',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'3-yr cascade: MIN rations the cash, both tranches roll forward across' },
     cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche roll-forwards, total debt bold with a top border' },
     wk13:       { name:'13-Week Cash', label:'Run the 13-week', tab:'13-Week', desc:'The restructuring staple: a weekly roll-forward, an anchored liquidity cushion, totals on flows only' },
-    liqbridge:  { name:'Liq. Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash + undrawn to ending liquidity, Base / Downside / Severe \u2014 read which cases breach' },
-    covtable:   { name:'Cov. Table',  label:'Run the covenant table', tab:'Covenants', desc:'Net leverage vs a stepping max \u2014 headroom, a real IF flag, MIN pulls the pinch quarter' },
-    txncomps:   { name:'Txn Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the median, and the implied equity' },
-    sourcesuses:{ name:'S&U',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
-    accdil:     { name:'Acc/Dil',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
+    liqbridge:  { name:'Liquidity Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash + undrawn to ending liquidity, Base / Downside / Severe \u2014 read which cases breach' },
+    covtable:   { name:'Covenant Table',  label:'Run the covenant table', tab:'Covenants', desc:'Net leverage vs a stepping max \u2014 headroom, a real IF flag, MIN pulls the pinch quarter' },
+    txncomps:   { name:'Transaction Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the median, and the implied equity' },
+    sourcesuses:{ name:'Sources & Uses',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
+    accdil:     { name:'Accretion/Dilution',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
     dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
-    retbridge:  { name:'Ret. Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
+    retbridge:  { name:'Returns Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
     football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
     copyover:   { name:'Copyover', label:'Chain the hand-offs', tab:'Copy',  desc:'Formulas travel when you copy them \u2014 chain a block, a peeled column, then values-only for the summary' },
 
     // Formatting group — plus triage/versionup, which live in Formulas II now (groups[] above is authoritative)
     housestyle: { name:'House Style', label:'Clean it to standard', tab:'House Style', desc:'A full cleanup pass: title, headers, blue inputs (one buried), commas, %, the totals ruled with a top border' },
     ruleoff:    { name:'Rule Off',  label:'Rule off the schedule', tab:'Rule Off',  desc:'Accounting rulings: line under headers, line above every total, outline the headline' },
-    ruleaudit:  { name:'Ruling Pass', label:'The ruling pass', tab:'Ruling Pass', desc:'The page says done \u2014 the pass disagrees. Find the missing rulings, fix only those' },
+    ruleaudit:  { name:'Ruling Pass', label:'The ruling pass', tab:'Ruling Pass', desc:'The page says done \u2014 the pass disagrees. Exactly 4 ruling breaks hide among the house conventions; find all 4, fix only those', errorCount:4 },   /* r425: \u00a72.3 disclosed-error-count prototype \u2014 errorCount puts the found-k/4 meter on the rail */
     combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Bold, comma, wrap and autofit a pasted table' },
-    typeset:    { name:'Typeset',  label:'Typeset the memo',    tab:'Typeset',     desc:'Bold, unbold, italic memos, strike the dead line, =TODAY() stamp' },
+    typeset:    { name:'Typeset',  label:'Typeset the memo',    tab:'Typeset',     desc:'Bold the header, unbold the imposter, italicize the memos, strike the discontinued line, date the page' },   /* r425: language pass — the picker names outcomes, not the answer formula */
     decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Add and remove decimal places — dollars none, multiples and percents one' },
-    dress:      { name:'Format tab', label:'Full formatting pass', tab:'Format', desc:'Title ruled, inputs blue, percents, commas \u2014 book-ready' },
+    dress:      { name:'Format tab', label:'Full formatting pass', tab:'Format', desc:'Masthead, blue inputs, commas and percents, borders on the lines that matter \u2014 one pass to book-ready' },   /* r425 \u00a74.18 rework: desc matches the 6-beat scope */
     triage:     { name:'Error triage', label:'Error triage \u2014 #REF! #DIV/0! #VALUE!', tab:'Triage', desc:'Three classic breaks \u2014 read the error, rebuild the intent' },
     versionup:  { name:'Roll-forward prep', label:'Replace hardcodes so it rolls forward', tab:'Rollfwd', desc:'Typed answers \u2192 live formulas; v2 must survive new numbers' },
     center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Center, left, right — three alignment passes, house style' },
@@ -115,7 +115,10 @@ window.HOTKEY_DRILLS = {
     debtblock:  { name:'Debt block',label:'Build the debt & interest block',tab:'Debt block',desc:'Two tranches, each rolling on its own anchored rate — senior and sub roll-forwards, both interest lines, then total debt and total interest' },
     dashcover:  { name:'Model cover',label:'Build the model cover',  tab:'Model cover',desc:'The page-one output box: reference the model into the headline metrics, then stamp the cover title clean with UPPER(TRIM())' },
     lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — then IRR over the hold' },
-    modeltour:  { name:'Model Tour', label:'Follow the markers', tab:'Model Tour', desc:'Four subtotals blown to #REF! \u2014 jump to each, rebuild the cascade formula' },
+    /* r425 H6b-2 (DEPTH_PASS \u00a72.4/\u00a73 D7): modeltour DESIGNATED the Foundations capstone \u2014
+       capstone:true drives the picker's \u2605 CAPSTONE tag + full-color group ring; the gate
+       itself reads HOTKEY_CAMPAIGN.chapters[0].capstone below. */
+    modeltour:  { name:'Model Tour', label:'Run the model tour', tab:'Model Tour', capstone:true, desc:'The Foundations capstone \u2014 four subtotals blown to #REF! in a live P&L: rebuild the cascade, land both margin rows, dress the bottom line. One clean run opens the next track leg' },
     revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'MIN/MAX sweep ×4 years, then prove out both balances' },
     cagr:       { name:'CAGR',     label:'Compound it, three times', tab:'CAGR',   desc:'(End÷Begin)^(1÷yrs)−1 — three scattered blocks' },
     sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'SUMIF rollup + live foot + % of total, summary formatted' },
@@ -133,7 +136,7 @@ window.HOTKEY_DRILLS = {
     hunt:       { name:'Audit',    label:'Hunt the hardcodes',  tab:'Audit',   desc:'Go To Special \u2192 constants \u2014 every number a formula should own lights up' },
     wrapfix:    { name:'IFERROR',  label:'Wrap it or fix it',   tab:'IFERROR', desc:'Wrap the truly missing, fix the merely broken \u2014 never bury errors' },
     signerr:    { name:'Sign Sweep', label:'Flip the signs back', tab:'Signs', desc:'Pasted costs came in positive \u2014 sweep the signs, prove EBIT, margin it' },
-    percent:    { name:'% of rev', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
+    percent:    { name:'% of Revenue', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
     intsched:   { name:'Interest', label:'Run the interest schedule', tab:'Interest', desc:'Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'5-yr roll: linked openings + the accumulated-dep memo' },
     comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the summary \u2014 median, high/low and the LARGE/SMALL trimmed range \u2014 land per share and premium' },
@@ -141,12 +144,12 @@ window.HOTKEY_DRILLS = {
     // Full Builds — plus lookup/lookup2, which live in Data & Lookups
     isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'5-yr IS: anchored drivers, margin row as %, bottom line ruled' },
     bsbuild:    { name:'BS Build',  label:'Balance the balance sheet',  tab:'BS Build',  desc:'3 yrs: SUM both sides, RE roll filled across, the check landing at zero' },
-    nwcsched:   { name:'NWC Sched.',label:'Roll working capital',       tab:'NWC',       desc:'Type the drivers, paint them blue, roll NWC five years' },
+    nwcsched:   { name:'NWC Schedule',label:'Roll working capital',       tab:'NWC',       desc:'Type the drivers, paint them blue, roll NWC five years' },
     threestmt:  { name:'3-Statement',label:'Tie the three statements',  tab:'3-Stmt',    desc:'3 yrs × 3 links, checks at zero, totals formatted to ship' },
     cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'5-yr cash roll-forward + conversion memo as %, the close bold with a top border' },
-    debtsched:  { name:'Debt Sched.',label:'Run the debt schedule',      tab:'Debt',     desc:'Type the rate, paint it blue, run the 5-yr sweep roll-forward' },
+    debtsched:  { name:'Debt Schedule',label:'Run the debt schedule',      tab:'Debt',     desc:'Type the rate, paint it blue, run the 5-yr sweep roll-forward' },
     lookup:     { name:'Lookup',   label:'Look it up',          tab:'Lookup',      desc:'Pull a value out of a table with INDEX/MATCH' },
-    lookup2:    { name:'2-way',    label:'Two-way lookup',      tab:'2-way',       desc:'INDEX with two MATCHes — row and column at once' },
+    lookup2:    { name:'Two-way Lookup',    label:'Two-way lookup',      tab:'2-way',       desc:'INDEX with two MATCHes — row and column at once' },
   },
 };
 
@@ -228,8 +231,15 @@ window.HOTKEY_CAMPAIGN = {
      bounties that funnel toward PRO. */
   // r242 \u2014 chapters mirror the v2.1 groups 1:1 (the campaign IS the spine). Escalating XP:
   // the free tiers (c1-c3) hook, the PRO tiers (c5-c8) carry the fat bounties that funnel to PRO.
+  /* r425 DEPTH-PASS \u00a72.4 \u2014 CAPSTONES. A chapter may designate `capstone:'<key>'`: the
+     milestone is then DONE only when its keys clear the pace gate AND the capstone has one
+     CLEAN RUN on record (no mouse, no guided, every core beat \u2014 time irrelevant; unlimited
+     retakes, no cooldown). The shared predicate is hkCapstoneOk below; index.html campState()
+     applies it. Gates the NEXT MILESTONE + its one-time xp ONLY \u2014 certificates untouched,
+     free-play access to drills never blocked (Wolf decision log #4). c1/modeltour is the
+     first; the other seven designate as their chapter's capstone build lands. */
   chapters: [
-    { id:'c1', name:'Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'] },
+    { id:'c1', name:'Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'], capstone:'modeltour' },
     { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','dress','gauntlet'] },
     { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
@@ -239,6 +249,26 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c8', name:'Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
   ],
   finisher: { badge:'\u2b50', name:'Catalog complete', xp:600 },
+};
+
+/* r425 DEPTH-PASS \u00a72.4 \u2014 capstone-gate predicate, SHARED across every surface that decides
+   "is this chapter/milestone done" (index.html campState, nav.js milestone badges, profile.html
+   skin gates) so the definition can never drift between them (the r359 drift lesson).
+     ch         \u2014 a HOTKEY_CAMPAIGN chapter (needs .capstone + .id)
+     pbMap      \u2014 {drillKey: seconds}. PBs only record on CLEAN runs (no mouse, no guided,
+                  every core beat), so PRESENCE of a capstone PB IS the clean-run proof \u2014
+                  time irrelevant per Wolf's \u00a72.4 decision. Clears from before the gate
+                  shipped count too: grandfather #1, an old clean clear stays honored.
+     claimedMap \u2014 hk_camp_xp flags. A milestone whose one-time xp was already claimed stays
+                  shipped forever: grandfather #2, existing players never re-lock (the r158
+                  no-rug-pull law).
+   This gates MILESTONES (and their xp bounties + the gate-bypass coverage path) only \u2014
+   certificate issuance is untouched and drill ACCESS is never blocked by it. */
+window.hkCapstoneOk = function(ch, pbMap, claimedMap){
+  if(!ch || !ch.capstone) return true;
+  if(pbMap && pbMap[ch.capstone]!==undefined) return true;
+  if(claimedMap && claimedMap[ch.id]) return true;
+  return false;
 };
 
 /* ---- TIME BANDS (r256, Wolf) — per-drill speed medals anchored to the (now brutal)
@@ -294,9 +324,15 @@ window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Model
    N-segment meter on the drill rail; the drill's checks() carry the aggregate
    counter label "(k/N)" (or latch per-error ids on S.errGot). N is FIXED per
    drill, never per seed (Wolf, 2026-07-24). ---- */
-window.HOTKEY_CLOCKS = {};
+window.HOTKEY_CLOCKS = {
+  /* r425 §2.4/§1.4: CAPSTONE clock override — pass widens to par×2.0 (the capstone chains a
+     whole chapter; the wider Pass keeps the gate about EXECUTION, not speed — the clean-run
+     gate itself has no clock at all). pro/leg stay derived (par×1.15 / par×1.0). Keep pass in
+     lockstep with HOTKEY_PARS.modeltour: pass = par × 2. */
+  modeltour: { pass: 70 },
+};
 
-window.HOTKEY_PARS = {"navigation":16,"modeltour":53,"blocksel":26,"filldr":44,"pastes":34,"rowops":30,"editfix":39,"undo":10,"copyover":13,"housestyle":47,"ruleoff":29,"ruleaudit":18,"dress":46,"typeset":15,"decimals":18,"center":18,"autofit":15,"combo":24,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":38,"undo":29,"copyover":28,"housestyle":44,"ruleoff":31,"ruleaudit":16,"dress":41,"typeset":14,"decimals":18,"center":18,"autofit":15,"combo":24,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
@@ -304,8 +340,13 @@ window.HOTKEY_PARS = {"navigation":16,"modeltour":53,"blocksel":26,"filldr":44,"
    r376: tier = hand-set rarity floor for the badge RING (themes.js hkEffRarity /
    HK_RARITY): omitted = common (green) · 'r' rare (blue) · 'e' epic (purple) ·
    'l' legendary (orange) · 'm' mythic (red, ornate ring + crest crown) — the
-   rarest class on the wall: Daily Dynasty, Corner Office, Charter, Summit,
-   Bulge Bracket. ---- */
+   rarest class on the wall: Daily Dynasty, Corner Office, Charter,
+   Up for promotion, Elite boutique.
+   r426 (Wolf, ROUND2_FEEDBACK §4a): DISPLAY-NAME batch — ids and test() bodies are
+   FROZEN (earned ids persist in hk_ach_seen / profiles.featured_ach; changing an id
+   silently un-earns a medal). Only `name`/`desc` strings moved. Same round: the par
+   ladder took golf names, dead-feature medals were cut, and the chapter-capstone set
+   landed. ---- */
 /* r362: the daily-challenge pool is SHARED — index launches from it, the leaderboard
    labels today's board from it. One list, no drift. */
 window.HOTKEY_CHALLENGE_POOL=['gauntlet','combo','cascade','threestmt','debtsched','comps','waterfall','sourcesuses','football','retbridge','housestyle','dcfsens','revolver','schedule'];
@@ -319,9 +360,9 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'x_econ',   glyph:'accuracy', tier:'e', name:'Economist',         desc:'10 runs at or under optimal keys',       test:c=>{ const n=(c.runs||[]).filter(r=>r.optimal&&r.keystrokes<=r.optimal).length; return {done:n>=10, prog:Math.min(n,10), goal:10}; } },
   { id:'x_slow',   glyph:'accuracy', name:'Thorough',          desc:'Take over a minute on a single solve',   test:c=>({done:(c.slowWins||0)>=1, prog:Math.min(c.slowWins||0,1), goal:1}) },
   { id:'x_mouse1', glyph:'mouse', name:'Old Habits',         desc:'Ruin a run with the mouse',              test:c=>({done:(c.mouseRuns||0)>=1, prog:Math.min(c.mouseRuns||0,1), goal:1}) },
-  { id:'x_mouse10',glyph:'mouse', name:'The Mouse Is a Lifestyle', desc:'Ruin 10 runs with the mouse',      test:c=>({done:(c.mouseRuns||0)>=10, prog:Math.min(c.mouseRuns||0,10), goal:10}) },
-  { id:'x_night',  glyph:'moon', tier:'r', name:'Night Shift',       desc:'Clean solve between midnight and 4am',   test:c=>({done:!!c.nightWin, prog:c.nightWin?1:0, goal:1}) },
-  { id:'x_dawn',   glyph:'moon', tier:'r', name:'Dawn Patrol',       desc:'Clean solve between 5 and 7am',          test:c=>({done:!!c.dawnWin, prog:c.dawnWin?1:0, goal:1}) },
+  { id:'x_mouse10',glyph:'mouse', name:'Not gonna make it', desc:'Ruin 10 runs with the mouse',      test:c=>({done:(c.mouseRuns||0)>=10, prog:Math.min(c.mouseRuns||0,10), goal:10}) },
+  { id:'x_night',  glyph:'moon', tier:'r', name:'Goblin hours',       desc:'Clean solve between midnight and 4am',   test:c=>({done:!!c.nightWin, prog:c.nightWin?1:0, goal:1}) },
+  { id:'x_dawn',   glyph:'moon', tier:'r', name:'First one in',       desc:'Clean solve between 5 and 7am',          test:c=>({done:!!c.dawnWin, prog:c.dawnWin?1:0, goal:1}) },
   { id:'x_wknd',   glyph:'daily', name:'Weekend Warrior',   desc:'Clean solve on a Saturday or Sunday',    test:c=>({done:!!c.weekendWin, prog:c.weekendWin?1:0, goal:1}) },
   /* r362: daily-challenge podium feats — dailyTop10 is counted by the trainer when a posted
      challenge run lands top-10 on today's global field (one count per day). */
@@ -337,33 +378,31 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'x_run200', glyph:'volume', tier:'e', name:'Volume Business',   desc:'200 recorded runs',                      test:c=>{ const n=(c.runs||[]).length; return {done:n>=200, prog:Math.min(n,200), goal:200}; } },
   { id:'x_found',  glyph:'cert', tier:'r', name:'Foundations Poured', desc:'PB on every Foundations drill',          test:c=>{ const ks=(c.groups['Foundations']||[]); const n=ks.filter(k=>c.pb[k]!==undefined).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
   { id:'x_stack',  glyph:'formula', tier:'r', name:'Full Stack',         desc:'At least one PB in every group',         test:c=>{ const gs=Object.keys(c.groups); const n=gs.filter(g=>(c.groups[g]||[]).some(k=>c.pb[k]!==undefined)).length; return {done:n>=gs.length, prog:n, goal:gs.length}; } },
-  { id:'x_par25',  glyph:'speed', tier:'e', name:'Par Machine',       desc:'Beat par on 25 different drills',        test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=25, prog:Math.min(n,25), goal:25}; } },
+  { id:'x_par25',  glyph:'speed', tier:'e', name:'Albatross',       desc:'Beat par on 25 different drills',        test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=25, prog:Math.min(n,25), goal:25}; } },
   { id:'x_pb40',   glyph:'formula', tier:'e', name:'Collector',          desc:'Hold a PB on 40 different drills',       test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined).length; return {done:n>=40, prog:Math.min(n,40), goal:40}; } },
-  { id:'spd1', glyph:'speed', name:'Under Par',        desc:'Beat par on any drill',                 test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=1, prog:Math.min(n,1), goal:1}; } },
-  { id:'spd2', glyph:'speed', tier:'r', name:'Metronome',        desc:'Beat par on 10 different drills',       test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=10, prog:Math.min(n,10), goal:10}; } },
-  { id:'spd3', glyph:'speed', tier:'l', name:'Untouchable',      desc:'Beat par on EVERY drill',               test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=c.menuOrder.length, prog:n, goal:c.menuOrder.length}; } },
+  { id:'spd1', glyph:'speed', name:'Under par',        desc:'Beat par on any drill',                 test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=1, prog:Math.min(n,1), goal:1}; } },
+  { id:'spd2', glyph:'speed', tier:'r', name:'Eagle',        desc:'Beat par on 10 different drills',       test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=10, prog:Math.min(n,10), goal:10}; } },
+  { id:'spd3', glyph:'speed', tier:'l', name:'Scratch',      desc:'Beat par on EVERY drill',               test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=c.menuOrder.length, prog:n, goal:c.menuOrder.length}; } },
   { id:'vol1', glyph:'volume', name:'Warm Hands',       desc:'100 clean solves',                      test:c=>({done:c.solves>=100, prog:Math.min(c.solves,100), goal:100}) },
   { id:'vol2', glyph:'volume', tier:'e', name:'Grinder',          desc:'500 clean solves',                      test:c=>({done:c.solves>=500, prog:Math.min(c.solves,500), goal:500}) },
   { id:'vol3', glyph:'volume', tier:'l', name:'Ten Thousand Keys',desc:'2,000 clean solves',                    test:c=>({done:c.solves>=2000, prog:Math.min(c.solves,2000), goal:2000}) },
   { id:'str1', glyph:'streak', name:'Business Week',            desc:'7-day streak',                          test:c=>({done:c.streak>=7, prog:Math.min(c.streak,7), goal:7}) },
-  { id:'str2', glyph:'streak', tier:'e', name:'Quarter Close',           desc:'30-day streak',                         test:c=>({done:c.streak>=30, prog:Math.min(c.streak,30), goal:30}) },
-  { id:'str3', glyph:'streak', tier:'l', name:'Institution',      desc:'100-day streak',                        test:c=>({done:c.streak>=100, prog:Math.min(c.streak,100), goal:100}) },
+  { id:'str2', glyph:'streak', tier:'e', name:'Profitable quarter',           desc:'30-day streak',                         test:c=>({done:c.streak>=30, prog:Math.min(c.streak,30), goal:30}) },
+  { id:'str3', glyph:'streak', tier:'l', name:'Institutional',      desc:'100-day streak',                        test:c=>({done:c.streak>=100, prog:Math.min(c.streak,100), goal:100}) },
   { id:'crn1', glyph:'crown', tier:'r', name:'First Blood',      desc:'Hold #1 on any board',                  test:c=>({done:c.crowns>=1, prog:Math.min(c.crowns,1), goal:1}) },
   { id:'crn2', glyph:'crown', tier:'m', name:'Corner Office',          desc:'Hold 5 crowns at once',                 test:c=>({done:c.crowns>=5, prog:Math.min(c.crowns,5), goal:5}) },   /* r376: promoted to mythic */
   { id:'dc1',  glyph:'daily', name:'Day One',          desc:'Run your first Daily Challenge',        test:c=>{ const n=new Set(c.runs.map(r=>r.challenge).filter(ch=>/^(challenge|daily)-/.test(ch||''))).size; return {done:n>=1, prog:Math.min(n,1), goal:1}; } },
   { id:'dc7',  glyph:'daily', tier:'r', name:'Seven Sittings',   desc:'Run the Daily Challenge on 7 different days', test:c=>{ const n=new Set(c.runs.map(r=>r.challenge).filter(ch=>/^(challenge|daily)-/.test(ch||''))).size; return {done:n>=7, prog:Math.min(n,7), goal:7}; } },
   { id:'day1', glyph:'daily', name:'Regular',          desc:'Run 10 daily challenges',               test:c=>{ const n=new Set(c.runs.map(r=>r.challenge).filter(ch=>/^(challenge|daily)-/.test(ch||''))).size; return {done:n>=10, prog:Math.min(n,10), goal:10}; } },   /* r372: distinct days — re-runs of one day don't inflate */
   { id:'day2', glyph:'daily', tier:'e', name:'Fixture',          desc:'Run 50 daily challenges',               test:c=>{ const n=new Set(c.runs.map(r=>r.challenge).filter(ch=>/^(challenge|daily)-/.test(ch||''))).size; return {done:n>=50, prog:Math.min(n,50), goal:50}; } },
-  { id:'gnt1', glyph:'mastery', tier:'r', name:'Gauntlet Runner',  desc:'Post all 5 legs of a weekly gauntlet',  test:c=>{ const wk={}; c.runs.forEach(r=>{ const m=/^wk-(\d{4}-\d{2})-/.exec(r.challenge||''); if(m){ (wk[m[1]]=wk[m[1]]||new Set()).add(r.challenge); } }); const best=Math.max(0,...Object.values(wk).map(s=>s.size)); return {done:best>=5, prog:Math.min(best,5), goal:5}; } },
-  { id:'day3', glyph:'daily', tier:'r', name:'Deal Sprint',      desc:'10 posted runs in a single day',        test:c=>{ const per={}; c.runs.forEach(r=>{ const d=String(r.created_at||'').slice(0,10); if(d) per[d]=(per[d]||0)+1; }); const best=Math.max(0,...Object.values(per)); return {done:best>=10, prog:Math.min(best,10), goal:10}; } },
-  { id:'day4', glyph:'daily', tier:'e', name:'Live Deal',        desc:'25 posted runs in a single day',        test:c=>{ const per={}; c.runs.forEach(r=>{ const d=String(r.created_at||'').slice(0,10); if(d) per[d]=(per[d]||0)+1; }); const best=Math.max(0,...Object.values(per)); return {done:best>=25, prog:Math.min(best,25), goal:25}; } },
+  { id:'day3', glyph:'daily', tier:'r', name:'Fire drill',      desc:'10 posted runs in a single day',        test:c=>{ const per={}; c.runs.forEach(r=>{ const d=String(r.created_at||'').slice(0,10); if(d) per[d]=(per[d]||0)+1; }); const best=Math.max(0,...Object.values(per)); return {done:best>=10, prog:Math.min(best,10), goal:10}; } },
+  { id:'day4', glyph:'daily', tier:'e', name:'Deal sprint',        desc:'25 posted runs in a single day',        test:c=>{ const per={}; c.runs.forEach(r=>{ const d=String(r.created_at||'').slice(0,10); if(d) per[d]=(per[d]||0)+1; }); const best=Math.max(0,...Object.values(per)); return {done:best>=25, prog:Math.min(best,25), goal:25}; } },
   { id:'wkd1', glyph:'daily', tier:'r', name:'Full Weekend',  desc:'Post runs on both Saturday and Sunday of the same weekend', test:c=>{ const wk={}; c.runs.forEach(r=>{ const t=new Date(r.created_at||0); const day=t.getDay(); if(day===0||day===6){ const sat=new Date(t); sat.setDate(t.getDate()-(day===0?1:0)); const key=sat.toISOString().slice(0,10); wk[key]=(wk[key]||0)|(day===6?1:2); } }); const hit=Object.values(wk).some(v=>v===3); return {done:hit, prog:hit?1:0, goal:1}; } },
   { id:'grp1', glyph:'speed', tier:'r', name:'Solid Foundation', desc:'Beat par on every Foundations drill',   test:c=>{ const ks=(c.groups&&c.groups['Foundations'])||[]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
   { id:'grp2', glyph:'crown', tier:'e', name:'Model Citizen',    desc:'Beat par on every Models drill',        test:c=>{ const ks=[...((c.groups&&c.groups['Models I'])||[]),...((c.groups&&c.groups['Models II'])||[])]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
-  { id:'grp3', glyph:'formula',   tier:'e', name:'Formula Desk',    desc:'Beat par on every Formulas drill',      test:c=>{ const ks=[...((c.groups&&c.groups['Formulas I'])||[]),...((c.groups&&c.groups['Formulas II'])||[])]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
-  { id:'grp4', glyph:'mastery', tier:'l', name:'Master Builder',  desc:'Beat par on every Full Builds drill',   test:c=>{ const ks=(c.groups&&c.groups['Full Builds'])||[]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
-  { id:'spd4', glyph:'speed', tier:'r', name:'Half-Par Club',    desc:'Clear any drill in under half its par', test:c=>{ const hit=c.menuOrder.some(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]/2); return {done:hit, prog:hit?1:0, goal:1}; } },
-  { id:'gnt2', glyph:'mastery', tier:'e', name:'Season Ticket',    desc:'Post gauntlet legs in 4 different weeks', test:c=>{ const wks=new Set(); c.runs.forEach(r=>{ const m=/^wk-(\d{4}-\d{2})-/.exec(r.challenge||''); if(m) wks.add(m[1]); }); return {done:wks.size>=4, prog:Math.min(wks.size,4), goal:4}; } },
+  { id:'grp3', glyph:'formula',   tier:'e', name:'Quant',    desc:'Beat par on every Formulas drill',      test:c=>{ const ks=[...((c.groups&&c.groups['Formulas I'])||[]),...((c.groups&&c.groups['Formulas II'])||[])]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
+  { id:'grp4', glyph:'mastery', tier:'l', name:'Master modeler',  desc:'Beat par on every Full Builds drill',   test:c=>{ const ks=(c.groups&&c.groups['Full Builds'])||[]; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:ks.length>0&&n>=ks.length, prog:n, goal:ks.length||1}; } },
+  { id:'spd4', glyph:'speed', tier:'r', name:'Hole in one',    desc:'Clear any drill in under half its par', test:c=>{ const hit=c.menuOrder.some(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]/2); return {done:hit, prog:hit?1:0, goal:1}; } },
   /* r151: DRIP RUNGS — the ladders had deserts (1 crown then 5; 100 solves then
      500; 10 dailies then 50). These fill the gaps so an engaged week always has a
      medal in reach. Fillers are deliberately common-tier: they're cadence, not glory. */
@@ -371,22 +410,35 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'vol1b', glyph:'volume',  tier:'r', name:'Deal Flow', desc:'250 clean solves',                   test:c=>({done:c.solves>=250, prog:Math.min(c.solves,250), goal:250}) },
   { id:'str0',  glyph:'streak',  name:'Back Tomorrow',   desc:'3-day streak',                           test:c=>({done:c.streak>=3, prog:Math.min(c.streak,3), goal:3}) },
   { id:'day0',  glyph:'moon',  name:'Morning Person',  desc:'Run 3 daily challenges',                 test:c=>{ const n=new Set(c.runs.map(r=>r.challenge).filter(ch=>/^(challenge|daily)-/.test(ch||''))).size; return {done:n>=3, prog:Math.min(n,3), goal:3}; } },
-  { id:'par5',  glyph:'speed',  name:'Finding the Line',desc:'Beat par on 5 different drills',         test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=5, prog:Math.min(n,5), goal:5}; } },
+  { id:'par5',  glyph:'speed',  name:'Birdie',          desc:'Beat par on 5 different drills',         test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=5, prog:Math.min(n,5), goal:5}; } },
   { id:'crn3',  glyph:'crown',  tier:'r', name:'Land Grab', desc:'Hold 3 crowns at once',              test:c=>({done:c.crowns>=3, prog:Math.min(c.crowns,3), goal:3}) },
-  { id:'pb20',  glyph:'formula',   name:'Shelf Space',     desc:'Hold a PB on 20 different drills',       test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined).length; return {done:n>=20, prog:Math.min(n,20), goal:20}; } },
-  { id:'att25', glyph:'explorer',   name:'Field Coverage',  desc:'Attempt 25 different drills',            test:c=>({done:c.att>=25, prog:Math.min(c.att,25), goal:25}) },
+  { id:'pb20',  glyph:'formula',   name:'Off the shelf',     desc:'Hold a PB on 20 different drills',       test:c=>{ const n=c.menuOrder.filter(k=>c.pb[k]!==undefined).length; return {done:n>=20, prog:Math.min(n,20), goal:20}; } },
+  { id:'att25', glyph:'explorer',   name:'Sector coverage',  desc:'Attempt 25 different drills',            test:c=>({done:c.att>=25, prog:Math.min(c.att,25), goal:25}) },
   { id:'key25', glyph:'combo', tier:'r', name:'Piano Hands', desc:'25,000 keystrokes in clean runs',  test:c=>({done:(c.keysLifetime||0)>=25000, prog:Math.min(c.keysLifetime||0,25000), goal:25000}) },
   /* r150: the new class — morning sheet, races, freezes, RX pack, house style, plugin-era
      chords. New glyphs (rx/flag/sheet/ice/map/brush/keys) live in themes.js hkBadge. */
-  { id:'rx1',  glyph:'rapid',    tier:'e', name:'The RX Desk',      desc:'Clear revolver, waterfall, cascade and the 13-week', test:c=>{ const ks=['revolver','waterfall','cascade','wk13']; const n=ks.filter(k=>c.pb[k]!==undefined).length; return {done:n>=ks.length, prog:n, goal:ks.length}; } },
+  { id:'rx1',  glyph:'rapid',    tier:'e', name:'Socially awkward',      desc:'Clear revolver, waterfall, cascade and the 13-week', test:c=>{ const ks=['revolver','waterfall','cascade','wk13']; const n=ks.filter(k=>c.pb[k]!==undefined).length; return {done:n>=ks.length, prog:n, goal:ks.length}; } },
   { id:'hse1', glyph:'mastery', tier:'r', name:'House Style',      desc:'Beat par on House Style — the senior’s pass', test:c=>{ const ok=c.pb['housestyle']!==undefined&&c.pars['housestyle']&&c.pb['housestyle']<=c.pars['housestyle']; return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'rce1', glyph:'comeback',  tier:'r', name:'Called Out',       desc:'Win a challenge race',                   test:c=>({done:(c.raceWins||0)>=1, prog:Math.min(c.raceWins||0,1), goal:1}) },
   { id:'rce2', glyph:'comeback',  tier:'e', name:'Undefeated',       desc:'Win 5 challenge races',                  test:c=>({done:(c.raceWins||0)>=5, prog:Math.min(c.raceWins||0,5), goal:5}) },
   /* r364: Clean Sheet / Standing Order are RETIRED — their driver (sheet, then mix) is
-     gone; a feat nobody can progress is sprawl. Earned ids persist harmlessly in hk_ach_seen. */
-  { id:'ice1', glyph:'ice',   tier:'r', name:'Ice in the Veins', desc:'Bank a streak freeze (every 5-day streak earns one)', test:c=>({done:(c.frzBanked||0)>=1, prog:Math.min(c.frzBanked||0,1), goal:1}) },
+     gone; a feat nobody can progress is sprawl. Earned ids persist harmlessly in hk_ach_seen.
+     r426 (Wolf, §4a legacy/removed-feature audit) — VERIFIED against the live wiring, then CUT:
+       · rce1 "Called Out" (win a challenge race) — Wolf: legacy. CUT. NOTE: the race feature
+         itself is LIVE (index.html:10619 mints the ?race= share link, :15842 arms it, :10584
+         grades the win and increments hk_ach_flags.raceWins), so rce2 "Undefeated" survives
+         the audit on mechanics; it stands alone until Wolf says otherwise.
+       · gnt1 "Gauntlet Runner" — Wolf: outdated. CUT.
+       · gnt2 "Season Ticket" — SAME DEAD DRIVER, so it goes with it: both read runs keyed
+         'wk-YYYY-WW-<drill>', which only startWeekly() can produce, and the weekly-gauntlet
+         entry point was retired in r81 (index.html:13288 "button retired"; no #weeklyBtn
+         exists in any page; lb.js:803 "the weekly gauntlet is dropped from the main
+         dashboard entirely"). Unreachable = unearnable.
+     ice1 "Ice in the Veins" is KEPT with rewritten copy: Wolf read the old desc ("bank a
+     streak freeze") as rewarding absence. The DRIVER was never absence — index.html:14951
+     mints a freeze when a streak REACHES five days. The copy now says that out loud. */
+  { id:'ice1', glyph:'ice',   tier:'r', name:'Ice in the Veins', desc:'Run five days straight — the fifth day banks a streak freeze', test:c=>({done:(c.frzBanked||0)>=1, prog:Math.min(c.frzBanked||0,1), goal:1}) },
   { id:'nav2', glyph:'explorer',   tier:'r', name:'Tour Guide',       desc:'Beat par on both navigation drills',     test:c=>{ const ks=['navigation','modeltour']; const n=ks.filter(k=>c.pb[k]!==undefined&&c.pars[k]&&c.pb[k]<=c.pars[k]).length; return {done:n>=ks.length, prog:n, goal:ks.length}; } },
-  { id:'kbd1', glyph:'combo',  tier:'r', name:'Chord Library',    desc:'Use 25 distinct shortcuts in clean runs', test:c=>({done:(c.chordKinds||0)>=25, prog:Math.min(c.chordKinds||0,25), goal:25}) },
+  { id:'kbd1', glyph:'combo',  tier:'r', name:'Multi-channel',    desc:'Use 25 distinct shortcuts in clean runs', test:c=>({done:(c.chordKinds||0)>=25, prog:Math.min(c.chordKinds||0,25), goal:25}) },
   { id:'bld1', glyph:'cert',    tier:'e', name:'Shipped It',       desc:'Beat par on the three-statement capstone', test:c=>{ const ok=c.pb['threestmt']!==undefined&&c.pars['threestmt']&&c.pb['threestmt']<=c.pars['threestmt']; return {done:ok, prog:ok?1:0, goal:1}; } },
   /* ---- r376 (Wolf): THE MYTHIC CLASS — the rarest things on the wall (red ring +
      crest crown). ctx keys: charter (auth created_at before the beta cutoff, same
@@ -394,15 +446,99 @@ window.HOTKEY_ACHIEVEMENTS = [
      tierBestBucket (the packed high-water latch from nav.js persistTierBest),
      deskPeak (latched by lb.js when your own desk grades S+++). ---- */
   { id:'x_charter', glyph:'founder', tier:'m', name:'Charter',        desc:'Account opened during the beta — you were on the desk before the desk was cool', test:c=>({done:!!c.charter, prog:c.charter?1:0, goal:1}) },
-  { id:'x_summit',  glyph:'crown', tier:'m', name:'Summit',         desc:'Hold the top rank tier in its Top Bucket', test:c=>{ const top=(((window.HK_RANK||{}).TIERS)||{length:8}).length-1; const ok=(c.tierBest|0)>=top && (c.tierBestBucket|0)>=top*3+2; return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'x_bulge',   glyph:'mastery', tier:'m', name:'Bulge Bracket',  desc:'Sit on a desk graded S+++ — the top of the guild scale', test:c=>({done:!!c.deskPeak, prog:c.deskPeak?1:0, goal:1}) },
+  { id:'x_summit',  glyph:'crown', tier:'m', name:'Up for promotion',         desc:'Hold the top rank tier in its Top Bucket', test:c=>{ const top=(((window.HK_RANK||{}).TIERS)||{length:8}).length-1; const ok=(c.tierBest|0)>=top && (c.tierBestBucket|0)>=top*3+2; return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'x_bulge',   glyph:'mastery', tier:'m', name:'Elite boutique',  desc:'Sit on a desk graded S+++ — the top of the guild scale', test:c=>({done:!!c.deskPeak, prog:c.deskPeak?1:0, goal:1}) },
   /* r389 (Wolf): the founding-cohort + completionist mythics. foundingClass/foundingPartner
      ride the ctx (themes.js hkFoundingFlags — one count query, cached). Founding Partner
      arms post-beta when PRO purchases are tracked + ordered; until then it's a locked goal. */
-  { id:'x_allach',  glyph:'mastery', tier:'m', name:'The Full Set',         desc:'Earn every other medal on the wall — the complete collection',            test:c=>{ const AC=window.HOTKEY_ACHIEVEMENTS||[]; const others=AC.filter(a=>a.id!=='x_allach'&&a.tier!=='m'); let n=0; others.forEach(a=>{ try{ if(a.test(c).done) n++; }catch(e){} }); return {done:others.length>0&&n>=others.length, prog:n, goal:others.length||1}; } },
+  { id:'x_allach',  glyph:'mastery', tier:'m', name:'Sweaty',         desc:'Earn every other medal on the wall — the complete collection',            test:c=>{ const AC=window.HOTKEY_ACHIEVEMENTS||[]; const others=AC.filter(a=>a.id!=='x_allach'&&a.tier!=='m'); let n=0; others.forEach(a=>{ try{ if(a.test(c).done) n++; }catch(e){} }); return {done:others.length>0&&n>=others.length, prog:n, goal:others.length||1}; } },
   { id:'x_first100',glyph:'founder',  tier:'m', name:'First Analyst Class', desc:'One of the first 100 accounts on hotkey.gg — the founding class',         test:c=>({done:!!c.foundingClass, prog:c.foundingClass?1:0, goal:1}) },
   { id:'x_foundpro',glyph:'crown',    tier:'m', name:'Founding Partner',    desc:'One of the first 100 to go PRO — a permanent founding badge',             test:c=>({done:!!c.foundingPartner, prog:c.foundingPartner?1:0, goal:1}) },
+  /* ---- r426 (Wolf, ROUND2_FEEDBACK §4a): THE CAPSTONE SET — one medal per chapter
+     capstone clear, plus HALF and ALL. Keys + chapter mapping are DEPTH_PASS §2.4's
+     eight (3 designated existing · 5 not built yet).
+     CLEAR STATE: `ctx.pb[key] !== undefined`. That is exactly §2.4's gate predicate —
+     index.html:10151 writes PB only under `if(!mouseUsed && !guidedUsed)`, so a PB entry
+     IS "one clean run, no mouse, no guided, time irrelevant".
+     NOT-YET-SHIPPED TOLERANCE: hkCapstoneDone() returns false for any key absent from
+     ctx.menuOrder, so qclose/cleanroom/redflags/pitchpage/shipit read locked at 0/1 until
+     their drills land — no NaN, no phantom credit, no edit needed here when they ship.
+     The key list DERIVES from HOTKEY_CAMPAIGN once §2.4 wires `chapters[i].capstone`
+     (SSOT); HOTKEY_CAPSTONES below is the fallback until then. ---- */
+  { id:'cap_c1', glyph:'perfect', tier:'r', name:'Toured the model',    desc:'Clear the Foundations capstone — Model Tour, cold',                       test:c=>{ const ok=window.hkCapstoneDone(c,'modeltour'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c2', glyph:'perfect', tier:'r', name:'Model-ready',         desc:'Clear the Formatting capstone — the sheet a VP would open',               test:c=>{ const ok=window.hkCapstoneDone(c,'gauntlet');  return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c3', glyph:'perfect', tier:'r', name:'Books are closed',    desc:'Clear the Formulas I capstone — the quarter, start to finish',            test:c=>{ const ok=window.hkCapstoneDone(c,'qclose');    return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c4', glyph:'perfect', tier:'r', name:'Data room ready',     desc:'Clear the Data & Lookups capstone — dirty export to sendable tape',       test:c=>{ const ok=window.hkCapstoneDone(c,'cleanroom'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c5', glyph:'perfect', tier:'r', name:'Diligence cleared',   desc:'Clear the Formulas II capstone — every red flag found and fixed',         test:c=>{ const ok=window.hkCapstoneDone(c,'redflags');  return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c6', glyph:'perfect', tier:'e', name:'Straight to the VP',  desc:'Clear the Models I capstone — the valuation page, referenced not retyped', test:c=>{ const ok=window.hkCapstoneDone(c,'pitchpage'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c7', glyph:'perfect', tier:'e', name:'Down the waterfall',  desc:'Clear the Models II capstone — three tranches, four years, one pass',      test:c=>{ const ok=window.hkCapstoneDone(c,'cascade');   return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c8', glyph:'perfect', tier:'e', name:'Signed off',          desc:'Clear the Full Builds capstone — the model ships and it balances',        test:c=>{ const ok=window.hkCapstoneDone(c,'shipit');    return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_half',glyph:'mastery', tier:'e', name:'Mid-cap',            desc:'Clear half the chapter capstones',                                        test:c=>{ const KS=window.hkCapstoneKeys(); const n=KS.filter(k=>window.hkCapstoneDone(c,k)).length; const goal=Math.max(1,Math.ceil(KS.length/2)); return {done:n>=goal, prog:Math.min(n,goal), goal}; } },
+  { id:'cap_all', glyph:'mastery', tier:'l', name:'Large cap',          desc:'Clear every chapter capstone — the whole catalog, answered',               test:c=>{ const KS=window.hkCapstoneKeys(); const n=KS.filter(k=>window.hkCapstoneDone(c,k)).length; const goal=KS.length||1; return {done:KS.length>0&&n>=goal, prog:n, goal}; } },
 ];
+
+/* ---- r426: CAPSTONE CLEAR STATE (DEPTH_PASS §2.4) — the eight chapter capstones and
+   the two helpers the capstone medals above read. Kept next to ACHIEVEMENTS because it
+   is achievement-facing only; §2.4's own wiring (meta.capstone / chapters[i].capstone)
+   lands with each chapter's build and this list steps aside the moment it does. ---- */
+window.HOTKEY_CAPSTONES = [
+  { ch:'c1', chapter:'Foundations',    key:'modeltour', title:'Model Tour' },
+  { ch:'c2', chapter:'Formatting',     key:'gauntlet',  title:'Make It Model-Ready' },
+  { ch:'c3', chapter:'Formulas I',     key:'qclose',    title:'Close the Quarter' },
+  { ch:'c4', chapter:'Data & Lookups', key:'cleanroom', title:'The Data-Room Tape' },
+  { ch:'c5', chapter:'Formulas II',    key:'redflags',  title:'The Red-Flag Pass' },
+  { ch:'c6', chapter:'Models I',       key:'pitchpage', title:'The Valuation Page' },
+  { ch:'c7', chapter:'Models II',      key:'cascade',   title:'Run the Full Cascade' },
+  { ch:'c8', chapter:'Full Builds',    key:'shipit',    title:'Ship the Model' },
+];
+/* the live key list — prefers the campaign's own `capstone` fields once §2.4 wires them */
+window.hkCapstoneKeys = function(){
+  try{
+    const chs=(window.HOTKEY_CAMPAIGN&&window.HOTKEY_CAMPAIGN.chapters)||[];
+    const wired=chs.map(x=>x&&x.capstone).filter(Boolean);
+    if(wired.length) return wired;
+  }catch(e){}
+  return (window.HOTKEY_CAPSTONES||[]).map(x=>x.key);
+};
+/* one capstone cleared? PB present == one clean (mouse-free, guide-free) run.
+   A key that isn't in this ctx's catalog is NOT SHIPPED YET -> locked at 0. */
+window.hkCapstoneDone = function(ctx, key){
+  try{
+    if(!ctx || !ctx.pb) return false;
+    const menu=ctx.menuOrder||[];
+    if(menu.length && menu.indexOf(key)<0) return false;
+    return ctx.pb[key]!==undefined;
+  }catch(e){ return false; }
+};
+
+/* ---- r426 (Wolf, §4b): ACHIEVEMENT CATEGORIES — the TYPE axis the stats wall groups by
+   when the all-types / all-rarities chips are both selected ("organize by achievement TYPE
+   then by RARITY … so you can see progression along each category"). Derived from `glyph`
+   so no achievement carries a second hand-maintained field; ord fixes the row order. ---- */
+window.HOTKEY_ACH_CATS = {
+  speed:    { label:'Pace',           ord:1 },
+  perfect:  { label:'Capstones',      ord:2 },
+  mastery:  { label:'Mastery',        ord:3 },
+  formula:  { label:'Collection',     ord:4 },
+  explorer: { label:'Coverage',       ord:5 },
+  volume:   { label:'Volume',         ord:6 },
+  streak:   { label:'Streaks',        ord:7 },
+  ice:      { label:'Streaks',        ord:7 },
+  daily:    { label:'Daily Challenge',ord:8 },
+  moon:     { label:'Odd hours',      ord:9 },
+  crown:    { label:'Standing',       ord:10 },
+  cert:     { label:'Certificates',   ord:11 },
+  combo:    { label:'Keyboard',       ord:12 },
+  rapid:    { label:'Desk packs',     ord:13 },
+  comeback: { label:'Races',          ord:14 },
+  accuracy: { label:'Precision',      ord:15 },
+  mouse:    { label:'Bad habits',     ord:16 },
+  founder:  { label:'Founding',       ord:17 },
+};
+window.hkAchCat = function(a){
+  const m=(window.HOTKEY_ACH_CATS||{})[(a&&a.glyph)||''];
+  return m || { label:'Other', ord:99 };
+};
 
 /* ---- group color identity: one muted hue per skill family. Used as accents only
    (left borders, label tints, badge strokes) — never full fills. ---- */

@@ -856,6 +856,201 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(aj1.tabsUpper, 'tab-strip KeyTips render UPPERCASE');
   ok(aj1.badgesUpper, 'command-tile KeyTip badges render UPPERCASE');
 
+  /* =====================================================================================
+     AK. THE CURSOR AFTER A COPY / A PASTE (Wolf round-2 R2-B2: "re-check the behavior of the
+     cursor when you move with arrow keys after pasting or copying a range of values").
+     Excel truth, one case per assert:
+       (a) after COPY the arrows move FREELY and the marching ants stay on the source;
+       (b) after a multi-cell PASTE the landed block is SELECTED with the ANCHOR active — the
+           next arrow collapses the selection and steps ONE cell from the anchor, never from
+           the range's far corner;
+       (c) copy-then-ENTER is a one-shot drop: cursor on the destination cell, no ghost;
+       (d) Ctrl+Z after a paste leaves the selection sane (in-bounds, anchor still active).
+     Before r426 the collapse stepped off S.active — the far corner — so (b) landed the cursor
+     one row BELOW the pasted block instead of one below its top-left, and the same divergence
+     hit every shift-extend and both space-selects.
+     ===================================================================================== */
+  console.log('AK. cursor after copy / paste (round-2 R2-B2)');
+  await fresh();
+  const ak1 = await run(() => {
+    const at = () => colLetter(S.active.c) + S.active.r;
+    const ants = () => { const m = document.getElementById('marquee'); return !!m && m.style.display !== 'none'; };
+    const out = {};
+    // ---- (a) COPY: arrows roam, ants persist ----
+    setDemoSel('B4:B6'); demoKey({key:'c', ctrl:true});
+    out.copyAnts = ants();
+    demoKey({key:'ArrowDown'});
+    out.afterCopyDown = at(); out.antsAfterMove = ants(); out.copySelCleared = !S.sel;
+    demoKey({key:'ArrowRight'}); demoKey({key:'ArrowRight'});
+    out.afterCopyRoam = at(); out.antsAfterRoam = ants();
+    // ---- (b) PASTE a 1×3 block, then a plain arrow ----
+    setDemoSel('B4:B6'); demoKey({key:'c', ctrl:true});
+    setDemoSel('H4'); demoKey({key:'v', ctrl:true});
+    const pr = selRange();
+    out.pasteRect = 'H' + pr.r1 + ':' + colLetter(pr.c2) + pr.r2;
+    out.pasteSelected = !!S.sel;
+    out.pasteAnchorShown = (() => { const a = document.querySelector('#grid td.active');
+      const tr = [...document.querySelectorAll('#grid tr')].indexOf(a && a.parentElement);
+      return a ? tr : -1; })();
+    demoKey({key:'ArrowDown'});
+    out.afterPasteDown = at(); out.pasteGhost = !!S.sel;
+    // ← from the anchor too (a horizontal step off the same anchor)
+    setDemoSel('H4'); demoKey({key:'v', ctrl:true}); demoKey({key:'ArrowRight'});
+    out.afterPasteRight = at();
+    // Ctrl+arrow collapses off the anchor as well
+    setDemoSel('H4'); demoKey({key:'v', ctrl:true});
+    const ctrlFrom = (S.selA && S.selA.r >= 1 ? S.selA : S.sel);
+    out.pasteAnchor = colLetter(ctrlFrom.c) + ctrlFrom.r;
+    // ---- shift-extend: the anchor is the active cell, an arrow steps from IT ----
+    setDemoSel('D4'); demoKey({key:'ArrowDown', shift:true}); demoKey({key:'ArrowDown', shift:true});
+    out.extRect = (() => { const r = selRange(); return colLetter(r.c1) + r.r1 + ':' + colLetter(r.c2) + r.r2; })();
+    demoKey({key:'ArrowDown'});
+    out.afterExtDown = at();
+    // ---- Shift+Space (whole row): the active cell never left column D ----
+    setDemoSel('D8'); demoKey({key:' ', shift:true});
+    out.rowSel = !!S.sel && selRange().c1 === 1 && selRange().c2 === COLS;
+    demoKey({key:'ArrowDown'});
+    out.afterRowSel = at();
+    // ---- Ctrl+Space (whole column) ----
+    setDemoSel('D8'); demoKey({key:' ', ctrl:true}); demoKey({key:'ArrowRight'});
+    out.afterColSel = at();
+    return out;
+  });
+  ok(ak1.copyAnts && ak1.antsAfterMove && ak1.antsAfterRoam,
+    '(a) copy: the marching ants survive every arrow key', JSON.stringify(ak1));
+  ok(ak1.afterCopyDown === 'B5' && ak1.afterCopyRoam === 'D5' && ak1.copySelCleared,
+    '(a) copy: the first arrow collapses to the ANCHOR and steps one — B4:B6 ↓ → B5', ak1.afterCopyDown);
+  ok(ak1.pasteRect === 'H4:H6' && ak1.pasteSelected,
+    '(b) paste: the landed block is selected (H4:H6)', ak1.pasteRect);
+  ok(ak1.pasteAnchor === 'H4', '(b) paste: the ANCHOR — the displayed active cell — is the top-left', ak1.pasteAnchor);
+  ok(ak1.afterPasteDown === 'H5' && !ak1.pasteGhost,
+    '(b) paste + ↓ steps ONE from the anchor (H5), selection gone — not H7 off the far corner', ak1.afterPasteDown);
+  ok(ak1.afterPasteRight === 'I4', '(b) paste + → steps ONE from the anchor (I4)', ak1.afterPasteRight);
+  ok(ak1.extRect === 'D4:D6' && ak1.afterExtDown === 'D5',
+    'shift-extend + ↓ collapses to the anchor and steps (D4:D6 → D5), not D7', ak1);
+  ok(ak1.rowSel && ak1.afterRowSel === 'D9',
+    'Shift+Space + ↓ steps from the parked active cell (D9), not off column J', ak1.afterRowSel);
+  ok(ak1.afterColSel === 'E8',
+    'Ctrl+Space + → steps from the parked active cell (E8), not off the last row', ak1.afterColSel);
+
+  await fresh();
+  const ak2 = await run(() => {
+    const at = () => colLetter(S.active.c) + S.active.r;
+    // ---- (c) copy-then-ENTER: one-shot drop, cursor on the destination, no ghost ----
+    setDemoSel('B4:B6'); demoKey({key:'c', ctrl:true});
+    setDemoSel('H4'); demoKey({key:'Enter'});
+    const landed = !!(S.cells['H4'] && S.cells['H5'] && S.cells['H6']);
+    const at1 = at(), ghost = !!S.sel;
+    const ants = (() => { const m = document.getElementById('marquee'); return !!m && m.style.display !== 'none'; })();
+    const clip = !!S.clipboard;
+    demoKey({key:'ArrowDown'});
+    const at2 = at();
+    // ---- (d) Ctrl+Z after a paste: cells revert, the selection stays sane ----
+    const before = JSON.stringify(S.cells['J4'] || null);
+    setDemoSel('B4:B6'); demoKey({key:'c', ctrl:true});
+    setDemoSel('J4'); demoKey({key:'v', ctrl:true});
+    demoKey({key:'z', ctrl:true});
+    const reverted = JSON.stringify(S.cells['J4'] || null) === before;
+    const r = selRange();
+    const inBounds = S.active.r >= 1 && S.active.r <= S.ROWS && S.active.c >= 1 && S.active.c <= COLS &&
+      (!S.sel || (S.sel.r >= 1 && S.sel.r <= S.ROWS && S.sel.c >= 1 && S.sel.c <= COLS));
+    const anchor = S.sel ? colLetter((S.selA && S.selA.r >= 1 ? S.selA : S.sel).c) + (S.selA && S.selA.r >= 1 ? S.selA : S.sel).r : at();
+    demoKey({key:'ArrowDown'});
+    const afterUndoDown = at();
+    return { landed, at1, ghost, ants, clip, at2, reverted, rect: colLetter(r.c1)+r.r1+':'+colLetter(r.c2)+r.r2, inBounds, anchor, afterUndoDown };
+  });
+  ok(ak2.landed && ak2.at1 === 'H4' && !ak2.ghost,
+    '(c) copy-then-Enter lands the block and leaves the cursor ON the anchor with no selection ghost', ak2);
+  ok(!ak2.ants && !ak2.clip, '(c) copy-then-Enter consumes the clipboard — the ants die', ak2);
+  ok(ak2.at2 === 'H5', '(c) the next arrow steps one from there (H5)', ak2.at2);
+  ok(ak2.reverted, '(d) Ctrl+Z after a paste reverts the cells', ak2);
+  ok(ak2.inBounds && ak2.rect === 'J4:J6' && ak2.anchor === 'J4',
+    '(d) Ctrl+Z leaves the undone range selected, in-bounds, anchor active', ak2);
+  ok(ak2.afterUndoDown === 'J5', '(d) an arrow after the undo still steps from the anchor', ak2.afterUndoDown);
+
+  await fresh();
+  const ak3 = await run(() => {
+    const at = () => colLetter(S.active.c) + S.active.r;
+    const disp = () => { const a = dispActive(); return colLetter(a.c) + a.r; };
+    // Home collapses off the ANCHOR's row, not the grabbed block's last row
+    setDemoSel('B4'); demoKey({key:'ArrowDown', shift:true, ctrl:true});
+    const grabbed = colLetter(selRange().c1) + selRange().r1 + ':' + colLetter(selRange().c2) + selRange().r2;
+    demoKey({key:'Home'});
+    const afterHome = at();
+    // a parked anchor may never leak into the NEXT selection
+    setDemoSel('D8'); demoKey({key:' ', shift:true});          // Shift+Space parks S.selA at D8
+    const parked = disp();
+    demoKey({key:'Home'});                                      // collapse — the park must die with it
+    setDemoSel('G3'); demoKey({key:'ArrowDown', shift:true});    // a brand-new range, anchor G3
+    const freshAnchor = disp();
+    demoKey({key:'ArrowUp'});
+    const afterFresh = at();
+    return { grabbed, afterHome, parked, freshAnchor, afterFresh };
+  });
+  ok(ak3.afterHome === 'A4', 'Home after a Ctrl+Shift+↓ grab lands in the ANCHOR\'s row (A4), not the block\'s last', ak3);
+  ok(ak3.parked === 'D8', 'Shift+Space parks the active cell where it was (D8)', ak3.parked);
+  ok(ak3.freshAnchor === 'G3' && ak3.afterFresh === 'G2',
+    'a parked anchor never leaks into the next selection (G3:G4 → ↑ → G2)', ak3);
+
+  /* =====================================================================================
+     AL. OUTSIDE-BORDER CANON (Wolf round-2 R2-B4 / DEPTH_PASS §1.0-R2(m)): outside borders
+     are Alt H B **S** (S for outSide); Alt H B **A** is ALL borders. The engine assert lives
+     at 'Alt H B S draws the selection PERIMETER' above; these guard the TEACHING surfaces —
+     the menu table, the drill copy, and the generated reference pages — so no route, hint or
+     checklist line can teach A for an outside border again.
+     ===================================================================================== */
+  console.log('AL. outside-border canon: S = outSide, A = all (round-2 R2-B4)');
+  await fresh();
+  const al1 = await run(() => {
+    const lbl = k => (MENUS['HB'].find(x => x[0] === k) || [])[1];
+    // A = all borders: every interior edge inked, not just the perimeter
+    setDemoSel('C4:E6');
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'b'}); demoKey({key:'a'});
+    const mid = S.cells['D5'] || {};
+    const allInked = !!mid.ball;
+    // S = outside: perimeter only, interior clean
+    setDemoSel('C9:E11');
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'b'}); demoKey({key:'s'});
+    const midS = S.cells['D10'] || {};
+    const perimOnly = !midS.ball && !midS.bt && !midS.bb && !midS.bl && !midS.br &&
+      !!(S.cells['C9'] || {}).bt && !!(S.cells['C9'] || {}).bl &&
+      !!(S.cells['E11'] || {}).bb && !!(S.cells['E11'] || {}).br;
+    // no drill hint / req / checklist line may call H B A an OUTSIDE border
+    const offenders = [];
+    Object.keys(CHALLENGES).forEach(k => {
+      const d = CHALLENGES[k]; if (!d) return;
+      const bits = [];
+      try { if (d.aha) bits.push(String(d.aha)); } catch (e) {}
+      try { if (typeof d.req === 'function') bits.push(String(d.req.call(d))); } catch (e) {}
+      try { if (typeof d.guide === 'function') bits.push(d.guide.call(d).join(' ')); } catch (e) {}
+      bits.forEach(t => {
+        const flat = t.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+        /* Which border WORD does this "h b a" chord claim to be? Our copy names the border
+           just before the chord ("all borders (alt h b a)") or just after it ("alt h b a — a
+           is ALL borders"). Read the nearest one on each side and flag only when the letter A
+           is being sold as the OUTSIDE border. A sentence that legitimately names both chords
+           ("…ALL borders (Alt H B A) while the table gets an OUTSIDE border (Alt H B S)") must
+           not trip it — hence nearest-word, not window-contains. */
+        const WORD = /(all borders|all-borders|outside|outline|perimeter)/g;
+        const rx = /h\s*b\s*a\b/g; let m;
+        while ((m = rx.exec(flat))) {
+          const back = flat.slice(Math.max(0, m.index - 60), m.index);
+          const fwd = flat.slice(m.index, m.index + 70);
+          const bm = back.match(WORD), fm = fwd.match(WORD);
+          const claim = bm ? bm[bm.length - 1] : (fm ? fm[0] : null);
+          if (claim && /outside|outline|perimeter/.test(claim))
+            offenders.push(k + ' [' + claim + ']: …' + (back + fwd).trim() + '…');
+        }
+      });
+    });
+    return { a: lbl('A'), s: lbl('S'), allInked, perimOnly, offenders };
+  });
+  ok(al1.a === 'All' && al1.s === 'Outside', 'MENUS canon: A = All, S = Outside', al1);
+  ok(al1.allInked, 'Alt H B A inks the INTERIOR too — it is ALL borders', al1);
+  ok(al1.perimOnly, 'Alt H B S inks the PERIMETER only — it is the OUTSIDE border', al1);
+  ok(al1.offenders.length === 0,
+    'no drill aha / req / hint teaches H B A as an outside border', al1.offenders.slice(0, 4).join(' | '));
+
   console.log('J. esc discipline');
   await fresh();
   const j1 = await run(() => new Promise(res => {

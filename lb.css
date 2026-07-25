@@ -213,6 +213,27 @@
   .me-card .uc{padding:22px 24px 20px; border-radius:16px}
   .me-card.me-bare{background:transparent; border:0}
   .me-col .uc-ownerbar{padding:0 4px}
+  /* r426 (Wolf §4b): the STANDING BLOCK took the leave-ranked bar's slot under the hero
+     card — rank + bucket in display type, the rating big under it. Reads as the answer
+     to "where do I stand", which is what the bottom of the your-card should say. */
+  .uc-standing{width:min(462px,100%); margin-top:12px; padding:14px 18px 15px;
+    background:var(--surface); border:1px solid var(--line); border-radius:14px; position:relative}
+  .uc-standing .ucs-k{font-family:var(--mono); font-size:9.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--faint); margin-bottom:6px}
+  .uc-standing .ucs-rank{font-family:var(--mono); font-size:24px; line-height:1.15; font-weight:700;
+    color:var(--text); letter-spacing:-.01em}
+  .uc-standing .ucs-rank .ucs-bk{color:var(--muted); font-weight:500}
+  .uc-standing .ucs-rank .ucs-prov{display:inline-block; margin-left:8px; vertical-align:3px;
+    font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--warn); font-weight:700}
+  .uc-standing .ucs-rating{margin-top:9px; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+  .uc-standing .ucs-rating b{font-family:var(--mono); font-size:30px; line-height:1; font-weight:700;
+    color:var(--accent); font-variant-numeric:tabular-nums}
+  .uc-standing .ucs-rating .ucs-rl{font-family:var(--mono); font-size:10.5px; color:var(--faint);
+    line-height:1.5; flex:1; min-width:150px}
+  .uc-standing .ucs-set{position:absolute; top:13px; right:16px; font-family:var(--mono);
+    font-size:10px; color:var(--muted); text-decoration:none; opacity:.8}
+  .uc-standing .ucs-set:hover{color:var(--accent); opacity:1}
+  @media(max-width:520px){ .uc-standing .ucs-rank{font-size:20px} .uc-standing .ucs-rating b{font-size:26px} }
   .tp-row{display:grid; grid-template-columns:26px minmax(0,1fr) auto auto auto; gap:10px; align-items:center;
     font-family:var(--mono); font-size:13px; padding:7px 4px; border-bottom:1px solid var(--line)}   /* r267: tier chip rides its own column — it used to clip mid-ellipsis inside the name. r382: + the .tp-mid stat */
   .tp-row .tp-mid{color:var(--faint); font-size:10.5px; white-space:nowrap; justify-self:end; font-variant-numeric:tabular-nums}
@@ -447,6 +468,8 @@
   .gb-found #gbName{flex:1; min-width:190px}
   .gb-found #gbName{font-size:11.5px; padding:6px 9px}
   .gb-found .tab{font-size:11px}
+  /* r426 (§4e): the PRO upsell that replaces the found-a-desk input for free accounts */
+  .gb-pro-note{color:var(--faint); font-size:11px; flex:1; min-width:180px}
   .gb-or{color:var(--faint)}
   .gb-msg{font-family:var(--mono); font-size:11px}
   .mg-app{display:flex; gap:10px; align-items:center; font-family:var(--mono); font-size:12.5px;

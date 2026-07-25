@@ -57,8 +57,16 @@
   .state a.acc-cta.ghost{color:var(--accent)}   /* r355: the r297 on-accent fix out-specified the ghost variant — 'Log in' rendered white-on-light, invisible */
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
-<link rel="stylesheet" href="nav.css?v=209">
-<script src="drills.js?v=282"></script>
+<link rel="stylesheet" href="nav.css?v=210">
+<script src="drills.js?v=284"></script>
+
+<script src="drills.js?v=284"></script>
+
+
+
+
+
+
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -66,7 +74,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'profile';
 </script>
-<script src="themes.js?v=309"></script>
+<script src="themes.js?v=310"></script>
 <style>
   /* ============================================================
      PROFILE CUSTOMIZER — page-local classes. Loaded AFTER nav.css so the
@@ -255,7 +263,7 @@ window.NAV_ACTIVE = 'profile';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=299"></script>
+<script src="nav.js?v=301"></script>
 
 <header class="head"><div class="wrap"><h1>Profile</h1></div></header>
 
@@ -331,7 +339,11 @@ async function load(){
   try{ const CAMP=window.HOTKEY_CAMPAIGN, PARS=window.HOTKEY_PARS||{};
     if(CAMP){ const pbAll={...localPB}; (mine||[]).forEach(r=>{ const t=r.time_ms/1000; if(pbAll[r.challenge]===undefined||t<pbAll[r.challenge]) pbAll[r.challenge]=t; });
       const cl=k=>pbAll[k]!==undefined && (!PARS[k] || pbAll[k]<=PARS[k]*CAMP.GATE);
-      frameU.chaptersCleared = CAMP.chapters.filter(c=>c.keys.every(cl)).map(c=>c.id); }
+      /* r425 §2.4: chapter-tied skins honor the capstone gate via the shared predicate
+         (hkCapstoneOk, drills.js) — same definition as campState/nav badges, no drift.
+         pbAll includes server runs, so a capstone run posted from any device counts. */
+      let claimedX={}; try{ claimedX=JSON.parse(localStorage.getItem('hk_camp_xp')||'{}'); }catch(e){}
+      frameU.chaptersCleared = CAMP.chapters.filter(c=>c.keys.every(cl) && (!window.hkCapstoneOk || window.hkCapstoneOk(c, pbAll, claimedX))).map(c=>c.id); }
     else frameU.chaptersCleared=[];
   }catch(e){ frameU.chaptersCleared=[]; }
 

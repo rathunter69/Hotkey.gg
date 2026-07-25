@@ -170,7 +170,9 @@ Full report in session transcript. Key structure:
 ## Copy defects (30 ranked)
 - Class A re-hinting in drills.js picker metadata (NOT index.html): pastes label "Alt E S everything" (drills.js:67), anchor label "Pin it with F4" + tab "F4" (drills.js:108), tieout "F9 the suspect leg" (drills.js:133 + stale name index.html:6757).
 - Class B text≠grading: dcf desc wrong math "DF row × PV row" (drills.js:112); wk13 aha says 13 columns, build makes 8 (index.html:5214); foot prompt bans typed SUM but sumishF accepts (3985 vs 4018); bridge "never type a cell address"/"pointed" ungradeable (4266/4312); wirewalk "precedents and dependents" but ok=traceN>=2 (6752); versionup "match v1 exactly" recomputed live (7100/7106); unhide width 12 graded ≥~11 via GLOBAL colW (3149); drill prompt says "the column" → trap (1896); housestyle "trim the decimals" directionless (2159); filterpass cursor rider not graded (3031).
-- Class C banned verbs / non-imperative: ruleoff "box" (2232), dress "Circle"(2485)/"Dress"(2487)/"rule it"(2480, also ok accepts ball), liqbridge "Dress"(6954), grpfold do-nothing guard line (2975), rowops state-line (3621), gauntlet no-verb (2084), blocksel "centred" + bundle (3907), threestmt/balance/bsbuild state-report labels.
+- Class C banned verbs / non-imperative: ruleoff "box" (2232), ~~dress "Circle"(2485)/"Dress"(2487)/"rule it"(2480, also ok accepts ball)~~ ✔ copy died in H4 (r419); r425 H6b-3 rebuilt the drill to the §1.0 standard (closed-verb outcome labels; outline ok accepts ball or perimeter per the §4.18 engine note), liqbridge "Dress"(6954), grpfold do-nothing guard line (2975), rowops state-line (3621), gauntlet no-verb (2084), blocksel "centred" + bundle (3907), threestmt/balance/bsbuild state-report labels.
+
+- Class C banned verbs / non-imperative: ~~ruleoff "box" (2232)~~ ✔ r425 H6b-3: guide/labels rebuilt to §1.0(b) outcome lines, dress "Circle"(2485)/"Dress"(2487)/"rule it"(2480, also ok accepts ball), liqbridge "Dress"(6954), grpfold do-nothing guard line (2975), rowops state-line (3621), gauntlet no-verb (2084), blocksel "centred" + bundle (3907), threestmt/balance/bsbuild state-report labels.
 - Class D jargon: balcheck "Corkscrew" (6520), debtsched "BB" (5358), housestyle "colour" (2091), series 3-op single line (4259), comps triple bundle (4103), ~~pastes route-script labels (3281–3283)~~ ✔ r422 H6b-1: semantic beat labels per DEPTH_PASS §4.3.
 
 ## 15 shallowest drills (rank, drill, line, checks, one-line enrichment)
@@ -192,12 +194,12 @@ Full report in session transcript. Key structure:
 Watchlist: retbridge 6055, football 6103, fcfbuild 4506.
 
 ## Label↔check mismatches (11)
-sort names not bound to sizes (4213, port scrub's _byName); bridge/foot/wirewalk/versionup/unhide/filterpass as above; ~~pastes CHECK2 latch neither enforces nor frees (3269)~~ ✔ r422 H6b-1: pasteOpN latch dropped, CHECK2 grades pure end state; anchor CHECK2 (2586) / dcfsens CHECK3 (6051) "one formula" without fill latch — systemic; tieout CHECK2 f9N>=1 only (6816); dress CHECK1 lenient (2460).
+sort names not bound to sizes (4213, port scrub's _byName); bridge/foot/wirewalk/versionup/unhide/filterpass as above; ~~pastes CHECK2 latch neither enforces nor frees (3269)~~ ✔ r422 H6b-1: pasteOpN latch dropped, CHECK2 grades pure end state; anchor CHECK2 (2586) / dcfsens CHECK3 (6051) "one formula" without fill latch — systemic; tieout CHECK2 f9N>=1 only (6816); ~~dress CHECK1 lenient (2460)~~ ✔ r425 H6b-3: tightened to the exact bold + bottom-rule pair (double-bottom counts; a box alone no longer clears it).
 Clean exemplars: drill CHECK1, scrub, comps, cases, retbridge.
 
 ## Systemic patterns
 1. De-hinting never applied to drills.js picker metadata/tab strip.
-2. Banned-verb border vocab survives where r199/r200 wasn't re-applied (dress/ruleoff/liqbridge) — mechanical pass.
+2. Banned-verb border vocab survives where r199/r200 wasn't re-applied (dress/ruleoff/liqbridge) — mechanical pass (~~ruleoff~~ ✔ r425 H6b-3; dress/liqbridge remain).
 3. HOW-claims engine can't grade = biggest gap class ("pointed", "don't type a single SUM", "from ONE formula") — soften to outcome voice or add latches.
 4. Voice drift: state-descriptions vs imperative, multi-op bundles, random caps, UK spellings ×2.
 5. Depth cliff concentrated in Formulas I + Data & Lookups single-formula tier; §8 proxies (parKeys<10, zero-formula, 1–2 checks, fixed sites) machine-findable.

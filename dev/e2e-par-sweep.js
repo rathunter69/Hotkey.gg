@@ -14,6 +14,8 @@ const REPS = 5;
 // BOTH directions (editfix: 39, 24, 42 on successive gates). Reported as INFO,
 // never FLAGGED — retune only against a 21-seed median (doctrine r172).
 // r187: pool widened to 19 pairs; fresh 21-seed median 32 (range 20-58), declared 32.
+// r425 (depth-pass rework): 21-seed median 35 (range 19-55) with the strike + reference-☆
+// demo + saveClose; declared 35.
 const VARIANCE_OK = new Set(['editfix']);
 
 (async () => {

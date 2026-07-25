@@ -846,10 +846,271 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r.lad1 && r.lad2, 'hint ladder carries the compact-keyboard note (laptop: ctrl+fn+←/→)', r);
   }
 
+  /* ------------------------------------------------------------------------------------
+     P. APPLIED BORDERS ARE VISIBLE (Wolf round-2 P0 R2-B1 — "borders are not showing on
+     the grid", filldr + pastes). The r413 gridline softener `#grid td{border-color:…}` is an
+     ID selector and out-specifies the class rules, so before r426 every applied border was
+     repainted in the faint gridline colour — present in the DOM, invisible on screen. A DOM
+     class assert can never catch that class of bug, so this reads COMPUTED colour off real
+     cells and demands each applied edge differ from the plain gridline, in BOTH themes.
+     ------------------------------------------------------------------------------------ */
+  console.log('P. applied borders paint a colour the gridline does not (R2-B1 regression guard)');
+  {
+    const probe = () => {
+      window.__clearCel(); hideResults(); loadChallenge('foot');
+      const put = (ref, prop) => { const c = ensure(+ref.slice(1), ref.charCodeAt(0) - 64); c[prop] = true; };
+      put('C4', 'bt'); put('C6', 'bb'); put('E4', 'ball'); put('E6', 'bdbl');
+      render();
+      const cell = ref => { const r = +ref.slice(1), c = ref.charCodeAt(0) - 64;
+        const tr = document.querySelectorAll('#grid tr')[r];   // row 0 is the header row
+        return tr ? tr.querySelectorAll('td')[c - 1] : null; };
+      const cs = ref => { const el = cell(ref); return el ? getComputedStyle(el) : null; };
+      const plain = cs('H10');   // an untouched cell — the pure gridline colour
+      const g = { top: plain.borderTopColor, bottom: plain.borderBottomColor,
+        left: plain.borderLeftColor, right: plain.borderRightColor };
+      const s = { bt: cs('C4'), bb: cs('C6'), ball: cs('E4'), bdbl: cs('E6') };
+      return {
+        dark: document.documentElement.getAttribute('data-dark') === '1',
+        gridline: g.top,
+        bt: { c: s.bt.borderTopColor, w: s.bt.borderTopWidth },
+        bb: { c: s.bb.borderBottomColor, w: s.bb.borderBottomWidth },
+        ballT: { c: s.ball.borderTopColor, w: s.ball.borderTopWidth },
+        ballL: { c: s.ball.borderLeftColor, w: s.ball.borderLeftWidth },
+        ballR: { c: s.ball.borderRightColor, w: s.ball.borderRightWidth },
+        ballB: { c: s.ball.borderBottomColor, w: s.ball.borderBottomWidth },
+        bdbl: { c: s.bdbl.borderBottomColor, w: s.bdbl.borderBottomWidth, st: s.bdbl.borderBottomStyle },
+      };
+    };
+    const transparent = v => !v || /rgba\(\s*0,\s*0,\s*0,\s*0\s*\)|transparent/.test(v);
+    const inked = (edge, gridline) => !!edge && !transparent(edge.c) && edge.c !== gridline && parseFloat(edge.w) > 0;
+    for (const theme of ['light', 'dark']) {
+      if (theme === 'dark') await run(() => { document.documentElement.setAttribute('data-dark', '1'); render(); });
+      const r = await run(probe);
+      const tag = ' (' + theme + ')';
+      ok(!transparent(r.gridline), 'the plain gridline itself is painted' + tag, r.gridline);
+      ok(inked(r.bt, r.gridline), 'Alt H B P — a TOP border paints a colour the gridline does not' + tag, r);
+      ok(inked(r.bb, r.gridline), 'Alt H B O — a BOTTOM border paints a colour the gridline does not' + tag, r);
+      ok(inked(r.ballT, r.gridline) && inked(r.ballB, r.gridline) &&
+         inked(r.ballL, r.gridline) && inked(r.ballR, r.gridline),
+        'Alt H B A / B S — a boxed cell paints all FOUR edges over the gridline' + tag, r);
+      ok(inked(r.bdbl, r.gridline) && r.bdbl.st === 'double',
+        'Alt H B B — the grand-total DOUBLE rule paints double, in ink' + tag, r);
+    }
+    await run(() => { document.documentElement.removeAttribute('data-dark'); render(); });
+  }
+
+  /* ------------------------------------------------------------------------------------
+     Q. THE RIBBON NEVER MOVES THE GRID (Wolf round-2 R2-B5 — "certain sub menus are
+     jarring because the ribbon expands and pushes the grid down"). r302 let .ribbon wrap to a
+     second line, which reflowed the sheet: Alt H shoved it 7px down, the sort / go-to-special
+     cards 26px. r426 floats the strip inside a fixed-height .ribbon-slot so an expansion is an
+     OVERLAY. Assert: grid top is a constant across every ribbon state, every menu option is
+     still rendered (r302's clipped-Borders bug), and the KeyTip type is legible.
+     ------------------------------------------------------------------------------------ */
+  console.log('Q. ribbon expansion is an overlay — the grid never moves (R2-B5)');
+  {
+    for (const W of [1150, 1280, 1440]) {
+      await page.setViewportSize({ width: W, height: 900 });
+      const r = await run(() => {
+        window.__clearCel(); hideResults(); loadChallenge('dress');
+        const gt = () => +document.getElementById('gridwrap').getBoundingClientRect().top.toFixed(1);
+        const ribH = () => +document.querySelector('.ribbon').getBoundingClientRect().height.toFixed(1);
+        const slotH = () => +document.querySelector('.ribbon-slot').getBoundingClientRect().height.toFixed(1);
+        const tops = {}, heights = {};
+        const paths = ['', 'H', 'HB', 'HV', 'HO', 'HOU', 'HA', 'HF', 'HFI', 'HE', 'HI', 'HD', 'M', 'A', 'AS', 'W', 'WV'];
+        mode = 'normal'; path = []; dialog = null; drawRibbon();
+        tops['idle'] = gt(); heights['idle'] = ribH();
+        for (const p of paths) { mode = 'ribbon'; path = p.split(''); dialog = null; drawRibbon();
+          tops['alt ' + (p || 'tabs')] = gt(); heights['alt ' + (p || 'tabs')] = ribH(); }
+        for (const d of ['paste', 'fmt', 'cellstyle', 'colw', 'goto', 'gotospecial', 'sortwarn', 'series']) {
+          mode = 'ribbon'; path = ['H']; dialog = d; try { drawRibbon(); } catch (e) {}
+          tops['dlg ' + d] = gt(); heights['dlg ' + d] = ribH();
+        }
+        // the open Borders menu: every option rendered, nothing scrolled out of reach
+        mode = 'ribbon'; path = ['H', 'B']; dialog = null; drawRibbon();
+        const rb = document.querySelector('.ribbon');
+        const tiles = [...rb.querySelectorAll('.ri-cmd')];
+        const rbr = rb.getBoundingClientRect();
+        const optCount = tiles.length;
+        const inBox = tiles.every(t => { const b = t.getBoundingClientRect();
+          return b.right <= rbr.right + 1 && b.left >= rbr.left - 1 && b.bottom <= rbr.bottom + 1; });
+        const letters = tiles.map(t => (t.querySelector('.ri-key') || {}).textContent).join('');
+        const keyFs = parseFloat(getComputedStyle(rb.querySelector('.ri-key')).fontSize);
+        const lblFs = parseFloat(getComputedStyle(rb.querySelector('.ri-lbl')).fontSize);
+        const xScroll = rb.scrollWidth > rb.clientWidth + 1;
+        // …and the open menu paints over the sheet on an OPAQUE ground
+        const bg = getComputedStyle(rb).backgroundColor;
+        mode = 'ribbon'; path = ['H']; dialog = null; drawRibbon();
+        const openTallerThanSlot = ribH() > slotH();
+        mode = 'normal'; path = []; dialog = null; drawRibbon();
+        return { tops, heights, optCount, letters, keyFs, lblFs, inBox, xScroll, bg, openTallerThanSlot,
+          slot: slotH(), mbH: +document.querySelector('.mode-bar').getBoundingClientRect().height.toFixed(1) };
+      });
+      const uniq = [...new Set(Object.values(r.tops))];
+      ok(uniq.length === 1, 'grid top is IDENTICAL in every ribbon state @' + W + 'px', { uniq, tops: r.tops });
+      ok(r.optCount === 10 && r.letters === 'OPLRNASTBD',
+        'Alt H B still renders all ten border options, canon letters @' + W + 'px', r.letters);
+      ok(r.inBox && !r.xScroll,
+        'every Borders option is inside the painted strip — nothing clipped or scrolled away @' + W + 'px', r);
+      ok(r.keyFs >= 9.5 && r.lblFs >= 12,
+        'ribbon KeyTip + label type is legible (>=9.5 / >=12px) @' + W + 'px', { keyFs: r.keyFs, lblFs: r.lblFs });
+      ok(!/rgba\([^)]*,\s*0(\.\d+)?\)/.test(r.bg) || /rgb\(/.test(r.bg),
+        'the open menu paints on an opaque ground (it overlays live cells) @' + W + 'px', r.bg);
+      ok(r.openTallerThanSlot === true || r.slot >= r.heights['alt H'],
+        'the expansion overflows the slot as an overlay (or already fits it) @' + W + 'px', { slot: r.slot, altH: r.heights['alt H'] });
+      ok(r.mbH <= 44, 'the mode bar is still ONE row @' + W + 'px', r.mbH);
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+  }
+
   console.log('Z. page errors');
   ok(errs.length === 0, 'zero page errors across the suite', errs.slice(0, 4));
+
+  console.log('D2. disclosed-error meter on ruleaudit — the first catalog adopter (r425, §2.3 + §4.16)');
+  {
+    // N is FIXED per drill (decision log #6): 4 planted breaks every seed, never per-seed variance
+    const rN = await run(() => {
+      const out = [];
+      for (const seed of [11, 222, 3333]) {
+        window.__forceSeed = seed; loadChallenge('ruleaudit');
+        out.push(CHALLENGES.ruleaudit._R.defects.length);
+      }
+      return out;
+    });
+    ok(String(rN) === '4,4,4', 'exactly 4 breaks planted on every seed (N fixed per drill)', rN);
+    const r = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 77; loadChallenge('ruleaudit');
+      const C = CHALLENGES.ruleaudit;
+      const N = ((window.HOTKEY_DRILLS.meta.ruleaudit || {}).errorCount) | 0;
+      const seg0 = document.querySelectorAll('#checklist .hk-errmeter .em-seg').length;
+      const on0 = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const moves = C.demo();   // engine-appended Ctrl+S rides at the end (saveClose)
+      // fix the first two planted breaks — the meter must read 2/4
+      for (let i = 0; i < 2; i++) { setDemoSel(moves[i].sel); for (const kk of moves[i].keys) demoKey(kk); }
+      const on2 = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const lab2 = (document.querySelector('#checklist .hk-errmeter .em-lab') || {}).textContent || '';
+      // regress the second fix (undo) — segments LATCH, they never un-fill within a run
+      demoKey({ key: 'z', ctrl: true });
+      const onL = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const foundL = /\((\d)\/4 fixed\)/.exec((C.checks(S)[4] || {}).label || '');
+      demoKey({ key: 'y', ctrl: true });   // redo the fix, then finish the run
+      for (let i = 2; i < moves.length; i++) { setDemoSel(moves[i].sel); for (const kk of moves[i].keys) demoKey(kk); }
+      const items = C.checks(S);
+      return { N, seg0, on0, on2, lab2, onL, foundLive: foundL && foundL[1], done,
+               star: !!(items.find(x => x.bonus) || {}).ok,
+               onWin: document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length };
+    });
+    ok(r.N === 4 && r.seg0 === 4 && r.on0 === 0, 'meta.errorCount=4 renders four empty segments at load', r);
+    ok(r.on2 === 2 && /found 2\/4/.test(r.lab2), 'two repairs fill two segments off the "(k/4 fixed)" counter label', r);
+    ok(r.onL === 2 && r.foundLive === '1', 'an undone repair un-flips the beat (found 1/4) but the meter stays latched at 2', r);
+    ok(r.done === true && r.onWin === 4, 'all four repairs + save win the drill with the meter full', r);
+    ok(r.star === true, 'the exact-repair line earns the surgeon\'s ☆ (zero collateral ink)', r);
+    const r2 = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 77; loadChallenge('ruleaudit');
+      const C = CHALLENGES.ruleaudit, R = C._R;
+      // collateral ink: bold the margin row (healthy by construction) before the real repairs —
+      // core must still clear (§1.0(c)); the surgeon's ☆ must be withheld
+      setDemoSel('B' + R.mg + ':' + R.LC + R.mg); demoKey({ key: 'b', ctrl: true });
+      const moves = C.demo();
+      for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+      const items = C.checks(S);
+      return { done, star: !!(items.find(x => x.bonus) || {}).ok };
+    });
+    ok(r2.done === true && r2.star === false, 'collateral formatting still wins the drill but forfeits the ☆ (freedom kept, mastery graded)', r2);
+  }
+
+  console.log('R. capstone gate (r425 — DEPTH_PASS §2.4, modeltour ★ Foundations)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__pbSave = JSON.stringify(PB);
+      try { localStorage.removeItem('hk_camp_xp'); } catch (e) {}
+      for (const k of Object.keys(PB)) delete PB[k];
+      // clocks: capstone pass widens to par×2.0; pro/leg still derive (§2.1 per-field override)
+      const c = hkClocksFor('modeltour'), par = window.HOTKEY_PARS.modeltour;
+      const clocks = { pass: c.pass, pro: +c.pro.toFixed(2), leg: c.leg, par,
+                       ovr: (window.HOTKEY_CLOCKS.modeltour || {}).pass };
+      // FRESH ACCOUNT: all four c1 keys at pace, capstone never run clean → c1 NOT done,
+      // the Formatting milestone stays locked
+      ['navigation', 'blocksel', 'filldr', 'pastes'].forEach(k => PB[k] = 0.1);
+      const s1 = campState();
+      openCampaign();
+      const chip = (document.querySelector('#campaignModal .camp-lockcap') || {}).textContent || '';
+      const capGate = (document.querySelector('#campaignModal .camp-cap .camp-gate') || {}).textContent || '';
+      try { const cm = document.getElementById('campaignModal'); if (cm) cm.remove(); } catch (e) {}
+      // ONE CLEAN RUN ON RECORD (a PB only ever records clean runs) — any speed — ships c1
+      PB.modeltour = 999;
+      const s2 = campState();
+      delete PB.modeltour;
+      // GRANDFATHER: milestone xp already claimed under the pre-capstone rule → stays shipped
+      localStorage.setItem('hk_camp_xp', JSON.stringify({ c1: 1 }));
+      const s3 = campState();
+      localStorage.removeItem('hk_camp_xp');
+      // ACCESS NEVER BLOCKED: with c1 not done, the capstone AND a next-chapter drill still load
+      const s4 = campState();
+      loadChallenge('typeset'); const nextLoads = cur === 'typeset';
+      loadChallenge('modeltour'); const capLoads = cur === 'modeltour';
+      // picker designation: ★ CAPSTONE tag + group-color ring on the modeltour file row
+      buildSheetTabs();
+      const row = document.querySelector('#pkGroups .pk-byline.capstone[data-key="modeltour"]');
+      const tag = row ? row.querySelector('.pk-captag') : null;
+      return { clocks,
+        s1: { n: s1[0].clearedN, done: s1[0].done, cap: s1[0].capOk, c2: s1[1].unlocked },
+        chip, capGate,
+        s2: { done: s2[0].done, c2: s2[1].unlocked },
+        s3: { done: s3[0].done, c2: s3[1].unlocked },
+        s4done: s4[0].done, nextLoads, capLoads,
+        tag: tag ? tag.textContent : null };
+    });
+    ok(r.clocks.pass === r.clocks.par * 2 && r.clocks.ovr === r.clocks.par * 2 &&
+       r.clocks.pro === +(r.clocks.par * 1.15).toFixed(2) && r.clocks.leg === r.clocks.par,
+       'capstone clocks: pass = par×2.0 via HOTKEY_CLOCKS override; pro/leg still derive', r.clocks);
+    ok(r.s1.n === 4 && r.s1.done === false && r.s1.cap === false && r.s1.c2 === false,
+       'fresh account: four keys at pace alone no longer ship c1 — the Formatting milestone stays locked', r.s1);
+    ok(/Foundations capstone/.test(r.chip) && /track leg/.test(r.chip),
+       'locked next-milestone chip reads "clear the Foundations capstone to open this track leg"', r.chip);
+    ok(/one clean run/.test(r.capGate), 'the c1 row carries the capstone line — one clean run, any speed', r.capGate);
+    ok(r.s2.done === true && r.s2.c2 === true,
+       'one clean capstone run on record (999s — time irrelevant) ships c1 and opens Formatting', r.s2);
+    ok(r.s3.done === true && r.s3.c2 === true,
+       'grandfather: an already-claimed c1 milestone (hk_camp_xp) never re-locks without a capstone PB', r.s3);
+    ok(r.s4done === false && r.nextLoads && r.capLoads,
+       'free-play access is never gated: capstone + next-chapter drills load with c1 incomplete', r);
+    ok(/capstone/i.test(r.tag || ''), 'picker file row wears the ★ CAPSTONE tag (full-color group ring)', r.tag);
+    // the live flow: clean capstone win on a keys-at-pace account → card names the leg it opened
+    const r2 = await run(() => {
+      window.__clearCel(); hideResults();
+      for (const k of Object.keys(PB)) delete PB[k];
+      ['navigation', 'blocksel', 'filldr', 'pastes'].forEach(k => PB[k] = 0.1);
+      try { localStorage.removeItem('hk_camp_xp'); } catch (e) {}
+      loadChallenge('modeltour');
+      const C = CHALLENGES.modeltour;
+      for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+      const items = C.checks(S);
+      const html = (document.getElementById('resultsModal') || {}).innerHTML || '';
+      return { done,
+        star: !!(items.find(x => x.bonus) || {}).ok,
+        saveLast: items[items.length - 1].label === 'Save your work',
+        capLine: html.indexOf('★ capstone clear') >= 0 && html.indexOf('Formatting leg') >= 0,
+        bonusFound: html.indexOf('☆ hidden bonus:') >= 0 && html.indexOf('— found') >= 0,
+        c1done: campState()[0].done, c2open: campState()[1].unlocked };
+    });
+    ok(r2.done === true && r2.saveLast, 'modeltour demo wins through the engine-appended save closer', r2);
+    ok(r2.star && r2.bonusFound, 'the scripted copy-heal earns the mystery ☆ (S.pasteLog latch)', r2);
+    ok(r2.capLine, 'capstone results card names the chapter it opened: "the Formatting leg of the track is open"', r2);
+    ok(r2.c1done && r2.c2open, 'the clean win itself ships c1 through the same campState the modal reads', r2);
+    // restore the profile the earlier sections built up
+    for (let i = 0; i < 4; i++) { await page.waitForTimeout(250); await run(() => window.__clearCel()); }
+    await run(() => { window.__clearCel(); hideResults();
+      for (const k of Object.keys(PB)) delete PB[k];
+      try { Object.assign(PB, JSON.parse(window.__pbSave || '{}')); } catch (e) {}
+      try { localStorage.removeItem('hk_camp_xp'); } catch (e) {} });
+  }
 
   await browser.close();
   console.log('\nDEPTH-MECHANICS: ' + pass + ' passed, ' + fail + ' failed');
   process.exit(fail ? 1 : 0);
+
 })().catch(e => { console.error('HARNESS ERROR: ' + (e && e.message || e)); process.exit(1); });
