@@ -204,15 +204,21 @@ const ALTS = [
     ]; }` },
   /* r424 (D17): the colops entry is gone with the drill — its column-op alternates live on
      inside the two rowops entries above (ribbon vs chord routes, insert-vs-delete order). */
-  { key: 'anchor', name: 'dollars typed by hand — no F4 at all', moves: `C => { const o=C._o; return [
-      {sel:o.tl, keys:[...T('=$B'+o.r0+'*C$'+o.hr),{key:'Enter'}]},
-      {sel:o.col, keys:[{key:'d',ctrl:true}]},
-      {sel:o.grid, keys:[{key:'r',ctrl:true}]},
+  /* r433: both legacy anchor entries rebuilt onto the §4.23 board (the old ones drove _o.tl /
+     _o.col, which the depth pass replaced, and stopped before the format/border/save beats). */
+  { key: 'anchor', name: 'fill RIGHT first then DOWN (reversed fill order), dollars via ctrl+1 → C, ALL borders as the box', moves: `C => { const o=C._o; return [
+      {sel:o.corner, keys:[...T('=$'+o.VC+o.r0+'*'+o.PC[0]+'$'+o.hr),{key:'Enter'}]},
+      {sel:o.PC[0]+o.r0+':'+o.PC[2]+o.r0, keys:[{key:'r',ctrl:true}]},   // the seed ROW first…
+      {sel:o.grid, keys:[{key:'d',ctrl:true}]},                          // …then the whole grid down
+      {sel:o.grid, keys:[{key:'1',ctrl:true},L('c')]},                   // Format Cells → Currency, zero places
+      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('b'),L('a')]},             // ALL borders — carries the perimeter the beat asks for
     ]; }` },
-  { key: 'anchor', name: 'pointer mode + F4 (arrows grab the refs)', moves: `C => { const o=C._o; return [
-      {sel:o.tl, keys:[{key:'='},{key:'ArrowLeft'},{key:'F4'},{key:'F4'},{key:'F4'},{key:'*'},{key:'ArrowUp'},{key:'F4'},{key:'F4'},{key:'Enter'}]},
-      {sel:o.col, keys:[{key:'d',ctrl:true}]},
+  { key: 'anchor', name: 'POINT MODE + F4 — arrows grab both refs, F4 cycles the locks, ribbon dollars, outside box', moves: `C => { const o=C._o; return [
+      {sel:o.corner, keys:[{key:'='},{key:'ArrowLeft'},{key:'F4'},{key:'F4'},{key:'F4'},{key:'*'},{key:'ArrowUp'},{key:'F4'},{key:'F4'},{key:'Enter'}]},
+      {sel:o.col0, keys:[{key:'d',ctrl:true}]},
       {sel:o.grid, keys:[{key:'r',ctrl:true}]},
+      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
+      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
     ]; }` },
   { key: 'sort', name: 'foot and dress BEFORE sorting, single-column sort resolved via the WARNING (e expand)', moves: `C => { const o=C._o;
       const m=o.range.match(/([A-J])(\\d+):([A-J])(\\d+)/);
@@ -1024,6 +1030,31 @@ const ALTS = [
       steps.push({sel:cl(BL[1])+BL[0], keys:grab});
       steps.push({sel:cl(T.c0)+T.r0+':'+cl(T.c0+T.w-1)+(T.r0+T.h-1), keys:[{key:'Home',ctrl:true},{key:'v',ctrl:true}]});
       stepAll(bfs([1,1],[RN,CN]));                                               // A1 → the exit gap → J20, entirely on foot
+      return steps; }` },
+  /* r433 (anchor ROUND 1 depth pass, DEPTH_PASS §4.23): the drill grades formula TEXT under the
+     doctrine §2.2 anchor-text exception, so these two alts are the proof that the exception buys
+     the LOCKS and nothing else. ALT 1 = chord-ROUTE alt: every dollar sign TYPED (no F4 anywhere),
+     both fills walked through the Home ribbon, dollars via Ctrl+Shift+$ + two decimal steps, the
+     box as a THICK perimeter. ALT 2 = op-ORDER alt: border and format land on the EMPTY grid
+     first and the nine formulas are hand-typed with no fill at all. Both forfeit the ☆ (only the
+     Ctrl+Enter one-entry commit earns it); every core beat clears. */
+  { key: 'anchor', name: 'TYPED dollar signs end to end (no F4), ribbon fills Alt H F I D / F I R, dollars via ctrl+shift+$ then two Alt H 9 steps, THICK box — ☆ forfeited', moves: `C => { const o=C._o; return [
+      {sel:o.corner, keys:[...T('=$'+o.VC+o.r0+'*'+o.PC[0]+'$'+o.hr),{key:'Enter'}]},   // the locks typed by hand — same string F4 would have cycled to
+      {sel:o.col0,   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                    // the ribbon's fill DOWN, not ctrl+d
+      {sel:o.grid,   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},                    // the ribbon's fill RIGHT, not ctrl+r
+      {sel:o.grid,   keys:[{key:'$',ctrl:true,shift:true}]},                             // currency @2 …
+      {sel:o.grid,   keys:[{key:'Alt'},L('h'),D(9)]},                                    // … walked down to zero places
+      {sel:o.grid,   keys:[{key:'Alt'},L('h'),D(9)]},
+      {sel:o.grid,   keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                           // thick box — the perimeter grades the same as Alt H B S
+    ]; }` },
+  { key: 'anchor', name: 'BOX and DOLLAR the empty grid FIRST, then nine hand-typed anchored formulas — no fill anywhere, whole-table border rect (☆ forfeited)', moves: `C => { const o=C._o;
+      const steps=[
+        {sel:o.grid, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},                           // dress before there is anything to dress — end-state grading must hold
+        {sel:colLetter(o.lc)+o.hr+':'+o.PC[2]+(o.r0+2), keys:[{key:'Alt'},L('h'),L('b'),L('s')]},   // the WHOLE table boxed, label column and header row included
+      ];
+      // every cell typed in its own right, bottom-up and right-to-left, locks spelled out
+      for(let i=2;i>=0;i--) for(let j=2;j>=0;j--)
+        steps.push({sel:o.PC[j]+(o.r0+i), keys:[...T('='+o.PC[j]+'$'+o.hr+'*$'+o.VC+(o.r0+i)),{key:'Enter'}]});   // price first, volume second — operand order is free
       return steps; }` },
   { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);

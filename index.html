@@ -3210,56 +3210,190 @@ const CHALLENGES = {
     }
   },
   anchor:{
-    name:'Anchors', label:'Pin the reference', par:16, parKeys:13,
+    /* r433 H6b-5 — the depth-pass rework of "Pin the reference" (DEPTH_PASS §4.23, with the
+       §1.0 / §1.0-R2 / §1.0-R3 law applied on top; §1.0-R3 wins on conflict).
+
+       THE DOCTRINE §2.2 ANCHOR-TEXT EXCEPTION IS THIS DRILL'S WHOLE POINT. §1.0(c) says every
+       check must be gradeable by any route including slow typing; doctrine names anchoring as
+       the standing exception ("$B4 vs B4" IS the lesson), and the §4.23 page repeats it:
+       "keep grading anchors via formula text". So the grid beats read the LOCKS. What they
+       still never grade is the ROUTE to those locks — F4 cycling and hand-typed dollar signs
+       produce the identical string and both clear (ALT 1 in dev/e2e-alt-paths.js types them),
+       and the fills are not required either: nine hand-typed anchored formulas clear every
+       core beat (ALT 2 proves it). The exception buys formula TEXT, nothing else.
+
+       STRUCTURAL DEVIATIONS from the §4.23 page, declared here per §0 (a build agent makes the
+       call and names it rather than improvising silently):
+
+       (1) ☆ RE-CUT. The page's bonus was "Enter the check — the far corner equals volume×price
+           typed as =[v]*[p] pointing at the blue inputs (a second, independent read)". That is
+           a proof-out — MORE work, not a faster route — and §1.0(d) restricts the ☆ to HIDDEN
+           EFFICIENCY discoveries (mastery moves), with §1.0-R2(i) adding that it must be a
+           distinct, SKIPPABLE decision. A second read of the corner is neither hidden nor
+           efficient, and as a sixth line it also pushed the drill over the §1.1 beat band.
+           The new ☆ is the mastery move this exact board exists to reward: select the nine
+           cells, type the anchored formula ONCE, and Ctrl+Enter commits it into every one —
+           the anchoring pays for itself in a single entry. It is skippable by construction
+           because the taught route (corner → fill down → fill right) clears every core beat,
+           and it is hidden because nothing on the board or in the checklist names it; the
+           label reveals on earn (§2.2 mystery slot). Graded off the r433 S.multiEnter latch.
+       (2) Page beat tails that were LESSONS are cut under §1.0-R3(n) — "the row reference
+           walks" (beat 2) and "the quote block ships" (beat 5) say WHY; the tails that ship
+           say WHAT or WHERE ("a quote at every volume", "every volume at every price").
+       (3) The page calls the grid cells "prices". They are volume × price = a QUOTE, and the
+           board must label what the beats reference (§1.3). Board and beats say "quote grid"
+           and "quote"; the price row and volume column keep their own names.
+       (4) §1.0(f)/§1.0-R2(l) helper-cell standard does not bind: this drill has no scratch or
+           assumption cells: the price row and the volume column are the board's DATA, blue
+           hardcodes per doctrine §2.1b, and the whole lesson is pointing at them in place.
+           There is no total on the board either, so (f)'s top-border law has nothing to dress.
+
+       ENGINE: Ctrl+Enter is the r308 fill-commit (reference.html documents it); the r433 latch
+       above records its rect. F4's cycle is B4 → $B$4 → B$4 → $B4, so three presses land the
+       column lock and two land the row lock — verified live in the demo replay, not assumed. */
+    name:'Anchors', label:'Pin the reference', par:22, parKeys:21, saveClose:true,   /* r433: par re-swept on the reworked board — dev/e2e-par-sweep.js median 21 keys ×5 seeds (the demo's key count is site-invariant, so the median is the exact figure), par 22 ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 33 · pro 25 · legendary 22. */
     aha:'F4 cycles the anchors — $A$1 locks both, A$1 the row, $A1 the column; one formula fills the grid.',
-    prompt:'Fill a 3×3 revenue grid from one formula. Price points run across the top, volumes down the side. A reference has four lock states — pin the volume column with $B, pin the price row with $3, and the fill builds the other eight cells. The same anchoring runs every sensitivity table later.',
-    req(){ const o=this._o; return '<em>'+o.tl+'</em> · =B'+o.r0+' <em>F4 F4 F4</em> → $B'+o.r0+' · * · C'+o.hr+' <em>F4 F4</em> → C$'+o.hr+' · <em>↵</em> · fill '+o.col+' ↓ · fill '+o.grid+' →'; },
+    /* §1.5: the aha's MOMENT is beat 3 — the fill crosses the grid and nine different quotes
+       land, which is only possible because the volume ref held its column and the price ref
+       held its row. */
+    prompt:'The pricing desk wants the tier sheet quoted at all three price points before it goes to the committee. Volumes run down the side, the proposed prices run across the top, and every cell in the grid is that tier’s volume at that price. One formula does the whole block if its two references are pinned the right way round — the volume must always come from the volume column, the price always from the price row. Dollar the finished grid, box it, and save. The grid lands somewhere new every run.',
+    req(){ const o=this._o; return '<em>'+o.corner+'</em> · <em>='+o.VC+o.r0+'</em> <em>F4</em>×3 → <em>$'+o.VC+o.r0+'</em> · <em>*</em> · <em>'+o.PC[0]+o.hr+'</em> <em>F4</em>×2 → <em>'+o.PC[0]+'$'+o.hr+'</em> · <em>↵</em> · '+o.col0+' <em>ctrl+d</em> · '+o.grid+' <em>ctrl+r</em> · <em>alt h a n</em> · <em>alt h b s</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check,
+       chords allowed. Every line names BOTH routes to its lock where two exist (§1.0-R3(p)). */
     guide(){ const o=this._o; return [
-      'at '+o.tl+' · type <kbd>=B'+o.r0+'</kbd> then <kbd>F4</kbd> ×3 — watch it cycle to <b>$B'+o.r0+'</b>: column pinned, row free',
-      '<kbd>*</kbd> · type <kbd>C'+o.hr+'</kbd> then <kbd>F4</kbd> ×2 — <b>C$'+o.hr+'</b>: row pinned, column free · <kbd>↵</kbd>',
-      'select '+o.col+' · <kbd>ctrl</kbd>+<kbd>d</kbd> · select '+o.grid+' · <kbd>ctrl</kbd>+<kbd>r</kbd> — nine prices from one formula',
+      'at <b>'+o.corner+'</b> — the first tier at the first price: type <kbd>=</kbd> then <kbd>'+o.VC+o.r0+'</kbd> and press <kbd>F4</kbd> ×3 to cycle it to <b>$'+o.VC+o.r0+'</b> (column pinned, row free) · <kbd>*</kbd> · type <kbd>'+o.PC[0]+o.hr+'</kbd> and <kbd>F4</kbd> ×2 for <b>'+o.PC[0]+'$'+o.hr+'</b> (row pinned, column free) · <kbd>↵</kbd> — typing the dollar signs yourself lands the same formula',
+      'select '+o.col0+' · <kbd>ctrl</kbd>+<kbd>d</kbd> — the volume reference walks down to each tier because only its column is pinned (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the ribbon’s same fill)',
+      'select '+o.grid+' · <kbd>ctrl</kbd>+<kbd>r</kbd> — the price reference walks across to each column because only its row is pinned (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> fills right too)',
+      'still on '+o.grid+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> is Accounting Number Format at zero places · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>c</kbd> lands dollars at zero too · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> comes in at two places, so walk them off with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> ×2',
+      'select '+o.grid+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — <kbd>s</kbd> is out<b>S</b>ide borders, the perimeter of what you selected (<kbd>a</kbd> is ALL borders, every gridline inside it as well)',
+      '☆ the discovery: select the nine cells FIRST, type the anchored formula once, and <kbd>ctrl</kbd>+<kbd>↵</kbd> commits it into every cell at once — the references translate per cell exactly as a fill would. Corner-then-two-fills clears the drill too, it just costs the extra passes',
     ]; },
-    targets(){ const o=this._o; return [o.tl, o.grid]; },
+    /* rings: ① the corner · ② the first price column · ③④⑤ the whole grid · ☆ never ringed
+       (§2.2 mystery slot — a ring would spoil the hidden move) */
+    targets(){ const o=this._o; return [o.corner, o.col0, o.grid, o.grid, o.grid, null]; },
     demo(){ const o=this._o; return [
-      {sel:o.tl, keys:[...T('=B'+o.r0), {key:'F4'},{key:'F4'},{key:'F4'}, {key:'*'}, ...T('C'+o.hr), {key:'F4'},{key:'F4'}, Kb.enter]},
-      {sel:o.col, keys:[Kb.fillD]},
-      {sel:o.grid, keys:[Kb.fillR]},
-    ]; },
+      /* §2.2: the demo performs the bonus. Here the ☆ move IS the build — one anchored formula
+         typed into the whole selection and committed with Ctrl+Enter — so beats 1–3 land
+         together off a single entry. Its state latches at the win (the engine appends Ctrl+S). */
+      {sel:o.grid, keys:[...T('='+o.VC+o.r0), {key:'F4'},{key:'F4'},{key:'F4'}, {key:'*'}, ...T(o.PC[0]+o.hr), {key:'F4'},{key:'F4'}, {key:'Enter',ctrl:true}]},
+      {sel:o.grid, keys:[Kb.alt,L('h'),L('a'),L('n')]},   /* §1.0(a) format-as-you-go: the dress rides directly behind the block it dresses */
+      {sel:o.grid, keys:[Kb.alt,L('h'),L('b'),L('s')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — revenue grid (price × volume)',txt:true,bold:true};
-      const hr=3, r0=4;
-      cells['A'+hr]={...blankCell(),value:'Price →',txt:true,align:'r'};
-      cells['A'+(r0+3)]={...blankCell(),value:'Volume ↓ col B',txt:true};
-      const base=rnd(20,45);
-      this._px=[]; this._vol=[];
-      for(let j=0;j<3;j++){ const p=base+j*rnd(2,5);
-        this._px.push(p);
-        cells[colLetter(3+j)+hr]={...blankCell(),value:p,fontColor:'blue',fmtStyle:'currency',decimals:2,align:'r'}; }
-      const pool=['Standard','Plus','Enterprise','Starter','Custom'];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      for(let i=0;i<3;i++){ const v=rnd(12,90)*10;
-        this._vol.push(v);
-        cells['A'+(r0+i)]={...blankCell(),value:pool[i],txt:true};
-        cells['B'+(r0+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-      this._o={ hr:hr, r0:r0, tl:'C'+r0, col:'C'+r0+':C'+(r0+2), grid:'C'+r0+':E'+(r0+2) };
-      return {ROWS:9, cells, active:{r:r0,c:3}, sel:null, colW:{1:110}};
+      /* §1.2 randomization — three independent axes: (a) the block site from a 4-spot pool
+         (label column A or C × header row 3 or 5 — the §4.23 "move the grid per seed" ask;
+         the four rects are disjoint in at least one axis), (b) a Fisher-Yates tier-name pool,
+         (c) every price and volume through rnd().
+         INTEGER GUARANTEE (§1.0(c)): volumes are multiples of 10 and prices are multiples of
+         0.5, so volume × price is always a whole number — a player who works the arithmetic
+         out and TYPES a figure clears the same tolerance a filled formula does. */
+      const SPOTS=[{lc:1,hr:3},{lc:3,hr:3},{lc:1,hr:5},{lc:3,hr:5}];
+      const sp=SPOTS[rnd(0,SPOTS.length-1)];
+      const lc=sp.lc, hr=sp.hr, vc=lc+1, pc=lc+2, r0=hr+1;
+      const LC=colLetter(lc), VC=colLetter(vc), PC=[0,1,2].map(j=>colLetter(pc+j));
+      cells['A1']={...blankCell(),value:codename()+' — quote grid ($)',txt:true,bold:true};
+      cells[LC+(hr-1)]={...blankCell(),value:'Proposed price per unit →',txt:true,it:true};
+      cells[LC+hr]={...blankCell(),value:'Tier',txt:true,bold:true};
+      cells[VC+hr]={...blankCell(),value:'Volume',txt:true,bold:true,align:'r'};
+      const px=[]; let p=rnd(40,60)/2;
+      for(let j=0;j<3;j++){ px.push(p);
+        cells[PC[j]+hr]={...blankCell(),value:p,fontColor:'blue',fmtStyle:'currency',decimals:2,align:'r'};
+        p+=rnd(2,6)/2; }
+      const POOL=['Standard','Plus','Enterprise','Starter','Custom','Premier'];
+      for(let k=POOL.length-1;k>0;k--){ const j=rnd(0,k); [POOL[k],POOL[j]]=[POOL[j],POOL[k]]; }
+      const vol=[];
+      for(let i=0;i<3;i++){ const v=rnd(8,60)*10; vol.push(v);
+        cells[LC+(r0+i)]={...blankCell(),value:POOL[i],txt:true};
+        cells[VC+(r0+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      /* §1.0-R2(h) + §1.0-R3(q) ACTION-LOCATION CUE (shared cueCell primitive): the grid's
+         top-left is an EMPTY destination, and a green outline on an empty cell reads "this
+         cell", not "start here" — exactly the class the rule names. The cue sits one clear
+         column right of the grid so a current-region grab can never swallow it, it is board
+         content (checks read the grid only, so deleting it cannot move any ok), and it is
+         never a graded target. */
+      cells[colLetter(pc+4)+r0]=cueCell('◀◀ start here');
+      /* §1.3 density + a real desk artifact: the page names its source and its terms. Story,
+         never graded — the memo lines sit outside every checked rect. */
+      ['Source: pricing desk — volumes off the Q3 order book',
+       'Terms: each quote is that tier’s volume at that column’s price',
+       'Memo: prices hold through month-end'].forEach((t,i)=>{
+        cells[LC+(r0+4+i)]={...blankCell(),value:t,txt:true,it:true,fontColor:'gray'}; });
+      /* widths: the label column carries the tier names; the three price columns are sized for
+         the widest dollar route a player can land ("$21,600.00" at Ctrl+Shift+$, 98px), so no
+         route puts ##### on the board — an explicitly sized column does not auto-grow (r432). */
+      const cw={}; cw[lc]=150; for(let j=0;j<3;j++) cw[pc+j]=100;
+      this._o={ lc:lc, hr:hr, vc:vc, pc:pc, r0:r0, LC:LC, VC:VC, PC:PC, px:px, vol:vol,
+        corner:PC[0]+r0,
+        col0:PC[0]+r0+':'+PC[0]+(r0+2),
+        grid:PC[0]+r0+':'+PC[2]+(r0+2) };
+      return {ROWS:Math.max(11, r0+7), cells, active:{r:r0,c:pc}, sel:null, colW:cw};
     },
     checks(S){
       const o=this._o;
+      const cel=k=>S.cells[k]||{};
       const norm=f=>String(f||'').toUpperCase().replace(/\s/g,'');
-      const first=S.cells[o.tl]||{};
-      const pinOk=/\$B\d+\*[C-E]\$\d+/.test(norm(first.formula))||/[C-E]\$\d+\*\$B\d+/.test(norm(first.formula));
-      let gridOk=true;
-      for(let i=0;i<3;i++) for(let j=0;j<3;j++){
-        const cc=S.cells[colLetter(3+j)+(o.r0+i)];
-        const exp=this._vol[i]*this._px[j];
-        if(!cc||!cc.formula||typeof cc.value!=='number'||Math.abs(cc.value-exp)>0.5){ gridOk=false; }
-        else { const nf=norm(cc.formula); if(!(nf.includes('$B')&&nf.includes('$'+o.hr))) gridOk=false; }
-      }
+      /* THE ANCHOR-TEXT EXCEPTION, scoped (doctrine §2.2, restated on the §4.23 page): a grid
+         cell must hold a live formula whose VOLUME reference has its COLUMN pinned and whose
+         PRICE reference has its ROW pinned. Deliberately generous inside that:
+           · either lock may ALSO carry the other half ($B$5 in row 5, $C$3) — a hand-typed
+             cell is a legitimate slow-route end state, and the per-cell VALUE check is what
+             stops an all-absolute block: nine identical formulas carry the locks and the
+             wrong numbers, so they fail;
+           · operand order is free (=$B5*C$3 and =C$3*$B5 both read), as is any wrapper that
+             evaluates to the same figure;
+           · the ROUTE to the locks is never read — F4 cycling and typed dollar signs land the
+             same string, and no fill is required (§1.0(c)). */
+      const cellOk=(i,j)=>{
+        const c=cel(o.PC[j]+(o.r0+i));
+        if(!c.formula || typeof c.value!=='number') return false;
+        if(Math.abs(c.value - o.vol[i]*o.px[j]) > 0.5) return false;
+        const f=norm(c.formula);
+        return new RegExp('\\$'+o.VC+'\\$?'+(o.r0+i)+'(?![0-9])').test(f) &&
+               new RegExp('(^|[^A-Z0-9])\\$?'+o.PC[j]+'\\$'+o.hr+'(?![0-9])').test(f);
+      };
+      const cornerOk=cellOk(0,0);
+      const colOk=cellOk(1,0)&&cellOk(2,0);                       // the corner is beat 1's — the two lines stay independently falsifiable
+      let restOk=true;
+      for(let i=0;i<3;i++) for(let j=1;j<3;j++) if(!cellOk(i,j)) restOk=false;
+      const gridAll=cornerOk&&colOk&&restOk;
+      /* §1.0-R3(p) ENUMERATE THE ROUTES BEFORE WRITING THE PREDICATE. Three chords put dollars
+         at zero places on this grid and all three clear: Alt H A N (the ribbon's Accounting
+         Number Format, fmtStyle 'acct'), Ctrl+1 → C (fmtStyle 'currency'), and Ctrl+Shift+$
+         walked down two places with Alt H 9 (also 'currency'). Comma is the one number style
+         left out — it drops the dollar sign, and this beat is the dollar. */
+      const isUSD=f=>f==='currency'||f==='acct';
+      let usdOk=true;
+      for(let i=0;i<3;i++) for(let j=0;j<3;j++){ const c=cel(o.PC[j]+(o.r0+i));
+        if(!isUSD(c.fmtStyle) || (c.decimals|0)!==0) usdOk=false; }
+      /* the box, same rule: every route that draws the four edges clears — Alt H B S, the thick
+         box Alt H B T, per-edge walks (B P/O/L/R), and all-borders (ball carries the perimeter).
+         And boxing the WHOLE table — header row, tiers and volumes included — reads as "the
+         quote block is boxed" exactly as boxing the nine figures does, so both rects pass (the
+         §1.0-R3(p) label-plus-figures widening). */
+      const boxed=(r1,c1,r2,c2)=>{
+        for(let c=c1;c<=c2;c++){ const t=cel(colLetter(c)+r1), b=cel(colLetter(c)+r2);
+          if(!(t.bt||t.ball)||!(b.bb||b.ball)) return false; }
+        for(let r=r1;r<=r2;r++){ const l=cel(colLetter(c1)+r), rr=cel(colLetter(c2)+r);
+          if(!(l.bl||l.ball)||!(rr.br||rr.ball)) return false; }
+        return true; };
+      const boxOk=boxed(o.r0,o.pc,o.r0+2,o.pc+2) || boxed(o.hr,o.lc,o.r0+2,o.pc+2);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — the whole grid
+         from ONE entry: the nine cells selected, the anchored formula typed once, Ctrl+Enter
+         committing it into every one with the references translating per cell. Read off the
+         r433 S.multiEnter latch (mechanic used, not geometry inferred). The taught corner →
+         fill-down → fill-right route clears all five cores and forfeits the star, which is
+         what keeps it a choice rather than a byproduct of doing the exercise. */
+      const oneEntry=(S.multiEnter||[]).some(m=>m.r1<=o.r0 && m.r2>=o.r0+2 && m.c1<=o.pc && m.c2>=o.pc+2);
+      /* DEPTH_PASS §4.23 beats — the page's lines, with the §1.0-R3(n) lesson-tails cut and
+         the page's "prices" read as what the cells actually hold (deviation 3 above). */
       return [
-        {label:'pin the driver formula both ways — $B locks the volume, $'+o.hr+' locks the price row', ok: pinOk},
-        {label:'fill the grid — all nine cells live, every price × volume right', ok: gridOk},
+        {label:'Build the grid’s first quote — the volume column locked, the price row locked', ok: cornerOk},
+        {label:'Fill the first price column down — a quote at every volume', ok: colOk},
+        {label:'Fill the grid across — every volume at every price', ok: restOk},
+        {label:'Dollar-format the grid — zero decimals', ok: usdOk},
+        {label:'Add an outside border around the grid', ok: boxOk},
+        {label:'Build the whole grid from one entry — all nine cells at once', ok: gridAll&&oneEntry, bonus:true},
       ];
     }
   },
@@ -12681,6 +12815,15 @@ function commitEditAll(){
       else { cell.formula=null; cell.value=buf; cell.txt=true; }
     });
   }
+  /* r433 (DEPTH_PASS §4.23 anchor ☆): FILL-COMMIT TELEMETRY — Ctrl+Enter records the rect it
+     wrote into on S.multiEnter, the same latch family as S.fillOps / S.fmtOps / S.grabLog
+     (mechanic used, not geometry inferred). anchor's ☆ reads it to tell "select the grid, type
+     the anchored formula once, commit into all nine" apart from the taught corner→fill-down→
+     fill-right route, which clears every core beat and simply forfeits the star (§1.0(c)).
+     Telemetry only: no core check may ever require it. */
+  if(typeof S!=='undefined' && S){ try{ const rr=selRange();
+    (S.multiEnter=S.multiEnter||[]).push({r1:rr.r1, c1:rr.c1, r2:rr.r2, c2:rr.c2});
+    if(S.multiEnter.length>240) S.multiEnter.shift(); }catch(e){} }
   commitAction();
 }
 // Pointer helpers: arrow keys during formula edit drop or move a cell reference into editBuf.
