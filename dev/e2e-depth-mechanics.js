@@ -176,7 +176,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   const type = async (sel, ch) => run(o => { setDemoSel(o.sel); demoKey({ key: o.ch }); demoKey({ key: 'Enter' }); }, { sel, ch });
 
   console.log('A. split capture on real drills (§2.1 + §2.8 runtime invariant)');
-  for (const key of ['foot', 'undo', 'pastes', 'margin']) {
+  for (const key of ['foot', 'editfix', 'pastes', 'margin']) {
     const r = await run((k) => {
       window.__clearCel();
       loadChallenge(k);

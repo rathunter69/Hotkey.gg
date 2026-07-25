@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
-<meta name="description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="description" content="Keyboard-only Excel training: 79 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
-<meta property="og:description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:description" content="Keyboard-only Excel training: 79 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
-<meta name="twitter:description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:description" content="Keyboard-only Excel training: 79 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 82 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
@@ -1798,9 +1798,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=286"></script>
+<script src="drills.js?v=287"></script>
 
-<script src="drills.js?v=286"></script>
+<script src="drills.js?v=287"></script>
 
 
 
@@ -3974,244 +3974,197 @@ const CHALLENGES = {
     }
   },
   editfix:{
-    /* r425 H6b-2 — depth-pass rework (DEPTH_PASS §4.7 + §1.0 playtest law applied on top).
-       Beats: 2 typo repairs → drift audit (the §4.7 literal language-pass line) → strike the
-       review memo (format-as-you-go §1.0(a): the strike directly follows the fix that closed
-       the review item) → stretch the short total (finish prove-out §1.6 — the aha moment) →
-       engine-appended Ctrl+S closer (§1.0(e), saveClose:true).
-       ☆ JUDGMENT CALL (WORKFLOW §8 — structural deviation, documented): the §4.7 page
-       (pre-playtest) made the memo strike the ☆ — a FORMATTING bonus, which §1.0(d) has since
-       outlawed ("existing formatting-☆s die as their drill's wave rework lands"; §1.0 wins on
-       conflict per the §4 intro). So the strike is PROMOTED to core beat 4 (Strike is a closed
-       verb; the memo row the page asked for is added to the board), and the hidden ☆ becomes
-       the drill's true mastery move: REPAIR THE DRIFT BY REFERENCE (= the feed cell) — pointed
-       at the source, the Model cell can never drift again. Typing the number still clears core
-       (§1.0(c) freedom); the demo takes the reference route so replay covers the ☆ (§2.2).
-       r419 autocorrect stance: the propose-card fires only on a malformed formula commit (the
-       stretch beat's F2 surgery can trigger it on a typo) — Enter accepts and commits the
-       repaired buffer; every check grades pure end state, so the card can only help, never
-       break a beat. No check reads it. Error sentinels: n/a (no error-valued formulas). */
-    name:'Edit', label:'Fix the typos in place', par:38, parKeys:35, saveClose:true,   /* r425: 21-seed demo median 35 keys (range 19-55 — the known-variance typo pool, doctrine r172); par 38 ≈ median ×1.09 s/key, the +save re-measure §1.0(e) calls for */
-    aha:'F2 edits inside the cell — fix the typo, don’t retype the whole thing.',
-    prompt:'The review left four notes on this schedule: two labels are misspelled, one Model cell drifted off the feed it must tie to, and the Model total reads a line short. Repair everything in place — surgical fixes, never retype a working cell. Once the drift is fixed, strike through the review memo: closed items stay legible, they don’t get erased. Save when the schedule ties.',
-    req(){ const o=this._o; return '<em>'+o.s1.cell+'</em>/<em>'+o.s2.cell+'</em> · F2 · fix the word · audit <em>'+o.driftCell+'</em> against <em>'+o.feedCell+'</em> · <em>ctrl+5</em> the memo · stretch <em>'+o.totCell+'</em> to <em>'+o.wantRng+'</em> · <em>ctrl+s</em>'; },
+    /* r431 — MERGED DRILL (Wolf round 3). "Fix the typos in place" and "Undo is a tool" are
+       one drill now, at Wolf's own suggestion ("maybe this is worth just folding into another
+       drill, or we combine with the typos in place one").
+
+       WHY EACH WAS BROKEN ALONE:
+       · editfix "we're not really testing a lot here" — two typo repairs that were the same
+         motion twice, plus a drift fix Wolf found unintuitive ("not intuitive to have the one
+         fix be on the model and making feed just equal model") and a decorative second data
+         block that no beat ever touched ("a whole section of data on the top right we're not
+         using").
+       · undo "I also don't really understand what we're doing here — action log? What's the
+         point of the Q4 total? Why am i deleting a table then deleting another table?" The
+         mechanic was sound; the MOTIVE was missing. The Q4 total was a number the player had
+         no stake in, so watching it die taught nothing.
+
+       WHAT THE MERGE FIXES: the block you are told to clear feeds the total you JUST REPAIRED
+       two beats earlier. Following the bad note destroys your own work, in plain sight — so
+       Ctrl+Z stops being a party trick and becomes the thing that saves the repair. That is
+       the drill: a repair pass, with undo as the safety net you actually need.
+
+       BEATS (Wolf's asked-for variety — "fix a few typos, fix one mis-typed cell reference or
+       link, audit a total formula, maybe it's stale"):
+         1 misspelled label, repaired in place (F2 surgery — one, not two: "1 in-line text
+           edit to fix a typo but not more")
+         2 a mis-typed FY formula pointing at the wrong row
+         3 a stale total that never grew to cover the last line
+         4 follow the sweep note, watch beat 3 collapse, undo it back
+         5 clear the block that was actually junk
+         ☆ undo PAST the repairs, then redo forward — the stack runs both ways
+       Formatting is deliberately absent: this is a repair drill and formatting owns its own
+       chapter. That also retires undo's old bold-the-title beat, whose green target covered A1
+       while the title spilled across the row — Wolf: "it doesn't look right because I'm only
+       seeing that I have to change half of the top title". No beat targets a spilling cell now.
+       Strikethrough is gone with the old memo beat (r430 rationale: no ribbon path, and rare). */
+    name:'Repair', label:'Repair the schedule', par:52, parKeys:48, saveClose:true,
+    aha:'F2 edits inside the cell — and Ctrl+Z is what saves you when the note is wrong.',
+    prompt:'A review came back on the headcount schedule: one team name is misspelled, one FY formula is pointing at the wrong row, and the Total never grew to cover the last line. Repair all three. Then there is the sweep note at the top — do what it says, and watch what happens to the total you just fixed.',
+    req(){ const o=this._o; return 'F2 the misspelled label at <em>'+o.typoCell+'</em> · repoint <em>'+o.badFyCell+'</em> at its own row · stretch the Total at <em>'+o.totCell+'</em> · clear <em>'+o.wrongName+'</em> ('+o.wrongRng+') → <em>ctrl+z</em> → clear <em>'+o.rightName+'</em> ('+o.rightRng+')'; },
     guide(){ const o=this._o; return [
-      'first typo “'+o.s1.bad+'” at '+o.s1.cell+' — <kbd>F2</kbd> · arrow to the mistake · fix · <kbd>↵</kbd>; only the wrong letters change',
-      'second typo “'+o.s2.bad+'” at '+o.s2.cell+' — same surgery: <kbd>F2</kbd> · fix in place · <kbd>↵</kbd>',
-      'the audit: the Model column must TIE to the Feed — one of the two Model cells drifted. Fix '+o.driftCell+' back to '+o.feedCell+'’s number — <kbd>F2</kbd>, surgery, not a retype',
-      'on the memo at '+o.memoCell+' · <kbd>ctrl</kbd>+<kbd>5</kbd> strikes it through',
-      'the short total: '+o.totCell+' reads =SUM('+o.shortRng+') — one row short. <kbd>F2</kbd> · stretch the tail to '+o.wantRng+' · <kbd>↵</kbd> — watch it re-total WITH your audit fix',
-      '☆ the mastery route for the drift: don’t type the number — <kbd>=</kbd> point at '+o.feedCell+' <kbd>↵</kbd>; a referenced cell can never drift again',
+      'the misspelled team “'+o.bad+'” at '+o.typoCell+' — <kbd>F2</kbd> · arrow to the mistake · fix it · <kbd>↵</kbd>; only the wrong letters change, you never retype the cell',
+      o.badFyCell+' sums the wrong row — it reads '+o.badFyShows+' instead of its own line. <kbd>F2</kbd> · repoint it at '+o.wantFyRng+' · <kbd>↵</kbd>',
+      'the Total at '+o.totCell+' reads '+o.totShows+' — one line short, it never grew when the last team was added. <kbd>F2</kbd> · stretch the tail to '+o.wantTotRng+' · <kbd>↵</kbd>',
+      'now the note: it names <b>'+o.wrongName+'</b> — select '+o.wrongRng+' · <kbd>delete</kbd> · watch the Q3 column and the Total you just repaired go to nothing. <kbd>ctrl</kbd>+<kbd>z</kbd> brings every value back exactly',
+      'the junk was <b>'+o.rightName+'</b> all along ('+o.rightRng+') — nothing points at it: select it · <kbd>delete</kbd> · the schedule holds this time',
+      '☆ keep <kbd>ctrl</kbd>+<kbd>z</kbd> going — past the clear, past your three repairs — then <kbd>ctrl</kbd>+<kbd>y</kbd> walks every one of them forward again: the stack runs both ways, nothing is lost',
     ]; },
-    targets(){ const o=this._o; return [o.s1.cell, o.s2.cell, o.driftCell, o.memoCell, o.totCell, o.driftCell]; },
+    targets(){ const o=this._o; return [o.typoCell, o.badFyCell, o.totCell, o.wrongRng, o.rightRng, null]; },
     demo(){ const o=this._o;
-      const surgery=s=>{
-        let p=0; while(p<s.bad.length && p<s.good.length && s.bad[p]===s.good[p]) p++;
-        const del=s.bad.length-p, keys=[{key:'F2'}];
-        for(let i=0;i<del;i++) keys.push({key:'Backspace'});
-        keys.push(...T(s.good.slice(p)), Kb.enter);
-        return {sel:s.cell, keys};
-      };
+      // F2 surgery on the label: keep the shared prefix, backspace the tail, retype it
+      let p=0; while(p<o.bad.length && p<o.good.length && o.bad[p]===o.good[p]) p++;
+      const del=o.bad.length-p, typoKeys=[{key:'F2'}];
+      for(let i=0;i<del;i++) typoKeys.push({key:'Backspace'});
+      typoKeys.push(...T(o.good.slice(p)), Kb.enter);
       return [
-        surgery(o.s1),
-        surgery(o.s2),
-        // the drift repaired by REFERENCE — one motion lands core beat 3 AND the hidden ☆
-        // (☆ state set before the final core beat, per the r421 §2.2 authoring rule)
-        {sel:o.driftCell, keys:[...T('='+o.feedCell), Kb.enter]},
-        {sel:o.memoCell, keys:[{key:'5',ctrl:true}]},
-        {sel:o.totCell, keys:[{key:'F2'},{key:'Backspace'},{key:'Backspace'},...T(o.tailFix), Kb.enter]},
+        {sel:o.typoCell, keys:typoKeys},
+        {sel:o.badFyCell, keys:[...T('=SUM('+o.wantFyRng+')'), Kb.enter]},
+        {sel:o.totCell,   keys:[...T('=SUM('+o.wantTotRng+')'), Kb.enter]},
+        {sel:o.wrongRng,  keys:[{key:'Delete'}]},                    // the scripted mistake — the repaired total dies
+        {sel:o.wrongRng,  keys:[{key:'z',ctrl:true}]},               // one undo: the whole clear rewinds
+        /* the ☆ rides BEFORE the last core beat (§2.2 authoring rule — its state latches at the
+           win): three more undos walk PAST the repairs, three redos walk them all forward */
+        {sel:o.totCell,   keys:[{key:'z',ctrl:true},{key:'z',ctrl:true},{key:'z',ctrl:true}]},
+        {sel:o.totCell,   keys:[{key:'y',ctrl:true},{key:'y',ctrl:true},{key:'y',ctrl:true}]},
+        {sel:o.rightRng,  keys:[{key:'Delete'}]},                    // aim, then fire
       ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — schedule review',txt:true,bold:true};
-      const TYPOS=[['Reveune','Revenue'],['Grwoth','Growth'],['Recievables','Receivables'],['Depriciation','Depreciation'],['Intrest','Interest'],['Payabels','Payables'],['Inventroy','Inventory'],['Divdends','Dividends'],['Ammortization','Amortization'],['Goodwil','Goodwill'],['Acrued','Accrued'],['Defered','Deferred'],['Recuring','Recurring'],['Workng capital','Working capital'],['Sevrance','Severance'],['Colateral','Collateral'],['Contigency','Contingency'],['Impariment','Impairment'],['Maintenence','Maintenance']];
-      const CLEAN=['EBITDA','Capex','Cash','Taxes','SG&A','Margin','Debt','Equity','COGS','Fees'];
-      for(let k=TYPOS.length-1;k>0;k--){ const j=rnd(0,k); [TYPOS[k],TYPOS[j]]=[TYPOS[j],TYPOS[k]]; }
+      const TYPOS=[['Enginering','Engineering'],['Markting','Marketing'],['Oprations','Operations'],
+                   ['Complaince','Compliance'],['Reserach','Research'],['Aquisitions','Acquisitions']];
+      const CLEAN=['Sales','Support','Finance','Legal','Trading','Coverage'];
+      const [bad,good]=TYPOS[rnd(0,TYPOS.length-1)];
       for(let k=CLEAN.length-1;k>0;k--){ const j=rnd(0,k); [CLEAN[k],CLEAN[j]]=[CLEAN[j],CLEAN[k]]; }
-      const slots=[];
-      for(const c of [1,5]) for(let r=2;r<=8;r++) slots.push({c,r});
-      for(let k=slots.length-1;k>0;k--){ const j=rnd(0,k); [slots[k],slots[j]]=[slots[j],slots[k]]; }
-      const sites=[];
-      slots.forEach((sl,i)=>{
-        const key=colLetter(sl.c)+sl.r;
-        if(i<2){ const [bad,good]=TYPOS[i];
-          cells[key]={...blankCell(),value:bad,txt:true};
-          cells[colLetter(sl.c+1)+sl.r]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          sites.push({cell:key, bad:bad, good:good});
-        } else if(i<11){ cells[key]={...blankCell(),value:CLEAN[i-2]||'Other',txt:true};
-          cells[colLetter(sl.c+1)+sl.r]={...blankCell(),value:rnd(10,90)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      });
-      sites.sort((a,b)=>(a.cell<b.cell?-1:1));
-      // the audit block: Model must tie to Feed; one Model hardcode drifted. §1.3 labeled
-      // targets: the Feed / Model column headers + the Model total row label carry every
-      // semantic reference the check labels use.
-      cells['A10']={...blankCell(),value:'Tie-out: model vs feed',txt:true,bold:true};
-      cells['B10']={...blankCell(),value:'Feed',txt:true,bold:true,align:'r'};
-      cells['C10']={...blankCell(),value:'Model',txt:true,bold:true,align:'r'};
-      const LN=['Headcount','Day rate'];
-      const feed=[rnd(40,240), rnd(400,900)];
-      const driftIdx=rnd(0,1);
-      const modelVals=[];
-      for(let i=0;i<2;i++){ const r=11+i;
-        cells['A'+r]={...blankCell(),value:LN[i],txt:true};
-        cells['B'+r]={...blankCell(),value:feed[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        const mv=(i===driftIdx)? Math.round(feed[i]*(1+(rnd(0,1)?1:-1)*rnd(6,18)/100)) : feed[i];
-        cells['C'+r]={...blankCell(),value:mv,fmtStyle:'comma',decimals:0};
-        modelVals.push(mv);
+      const typoRow=5+rnd(0,2);                       // which of the three team rows is misspelled
+      const names=[]; let ci=0;
+      for(let r=5;r<=7;r++) names.push(r===typoRow?bad:CLEAN[ci++]);
+
+      cells['A1']={...blankCell(),value:codename()+' — headcount schedule',txt:true,bold:true};
+      cells['A4']={...blankCell(),value:'Team',txt:true,bold:true};
+      ['Q1','Q2','Q3'].forEach((q,j)=>{ cells[colLetter(2+j)+'4']={...blankCell(),value:q,txt:true,bold:true,align:'r'}; });
+      cells['E4']={...blankCell(),value:'FY',txt:true,bold:true,align:'r'};
+
+      /* SCRATCH A / SCRATCH B — two look-alike blocks. A is LIVE: the Q3 column reads straight
+         out of it, so clearing A guts the schedule. B is genuinely dead. The memo names A.
+         Note 2 flags that one of them is load-bearing without saying which — the formulas in
+         the Q3 column are the trail, which is the audit the beat is really teaching. */
+      const aTop=11, bTop=16;
+      const aVals=[], bVals=[];
+      cells['A'+(aTop-1)]={...blankCell(),value:'SCRATCH A',txt:true,bold:true};
+      cells['A'+(bTop-1)]={...blankCell(),value:'SCRATCH B',txt:true,bold:true};
+      for(let i=0;i<3;i++) for(let j=0;j<2;j++){
+        const av=rnd(2,18), bv=rnd(2,18);
+        cells[colLetter(2+j)+(aTop+i)]={...blankCell(),value:av,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[colLetter(2+j)+(bTop+i)]={...blankCell(),value:bv,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        if(j===0) aVals.push(av); if(j===0) bVals.push(bv);
+        if(j===1){ aVals.push(av); bVals.push(bv); }
       }
-      // the Model total wears a TOP border — totals earn the line ABOVE them (§1.0(f))
-      cells['A13']={...blankCell(),value:'Model total',txt:true,bold:true};
-      cells['C13']={...blankCell(),formula:'=SUM(C11:C11)',value:modelVals[0],fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      // the review memo (§4.7: one memo row added) — the open item the drift fix closes;
-      // pre-dressed italic (memos whisper — the strike is the lesson here, not the italic)
-      const MEMOS=['Memo: one Model line reads off its feed — review open',
-        'Memo: Model vs Feed mismatch flagged — review open',
-        'Memo: tie-out breaks against the feed — review open'];
-      const memoText=MEMOS[rnd(0,2)];
-      cells['A15']={...blankCell(),value:memoText,txt:true,it:true};
-      this._o={ s1:sites[0], s2:sites[1], feed:feed,
-        driftCell:'C'+(11+driftIdx), feedCell:'B'+(11+driftIdx), feedVal:feed[driftIdx],
-        feedRe:new RegExp('\\$?B\\$?'+(11+driftIdx)+'(?!\\d)'),
-        memoCell:'A15', memoText:memoText,
-        totCell:'C13', shortRng:'C11:C11', wantRng:'C11:C12', tailFix:'2)' };
-      return {ROWS:16, cells, active:{r:2,c:1}, sel:null, colW:{1:118,2:80,3:80,5:118,6:80}};
-    },
-    checks(S){
-      const o=this._o;
-      const cel=k=>S.cells[k]||{};
-      const tieOk=[0,1].every(i=>{ const c=cel('C'+(11+i)); return typeof c.value==='number' && Math.abs(c.value-o.feed[i])<0.5; });
-      const memo=cel(o.memoCell);
-      const t=cel(o.totCell);
-      const f=(t.formula?String(t.formula).toUpperCase().replace(/\s/g,''):'');
-      // any live route counts (§1.0(c)): the stretched range, or an addition naming both lines
-      const totOk=(f.includes('C11:C12')||(f.includes('C11')&&f.includes('C12'))) && Math.abs((t.value||0)-(o.feed[0]+o.feed[1]))<0.5;
-      const dc=cel(o.driftCell);
-      const refOk=!!(dc.formula && o.feedRe.test(String(dc.formula))) && tieOk;
-      return [
-        {label:'Fix the misspelled “'+o.s1.bad+'” label — the schedule should read “'+o.s1.good+'”', ok: String(cel(o.s1.cell).value)===o.s1.good},
-        {label:'Fix the misspelled “'+o.s2.bad+'” label — the schedule should read “'+o.s2.good+'”', ok: String(cel(o.s2.cell).value)===o.s2.good},
-        {label:'Fix the drifted Model cell back to the feed’s number — the Model column must equal the Feed column', ok: tieOk},
-        {label:'Strike through the memo line the review closed', ok: !!memo.strike && String(memo.value||'')===o.memoText},
-        {label:'Fix the short Model total — every Model line must count', ok: totOk},
-        {label:'Reference the repaired Model cell straight at its feed', ok: refOk, bonus:true},
-      ];
-    }
-  },
-  undo:{
-    /* r425 H6b-2 (DEPTH_PASS §4.8 depth-pass rework): "Undo is a tool" — the scripted-mistake
-       drill grown to the round-2 anatomy standard (§1.0 law on top of the §4.8 page): 5 core
-       beats + the hidden redo-☆ + the engine-appended Ctrl+S closer. The board now SHOWS the
-       whole story (§1.3 labeled targets, seeded in build()): the memo note names the block to
-       clear, a LIVE "Q4 total" visibly feeds off the live block — clearing it zeroes Q4, the
-       beat-3 aha made physical — a second note flags the reversal, and a labeled 1-row action
-       log closes the run (the §4.8 desk habit: a tick list you can resume).
-       §0 judgment notes (where the spec under-specifies, called here, not improvised silently):
-       · beat 1 keeps the §4.8 "housekeeping first" order — it deliberately front-runs §1.0(a)
-         format-as-you-go because the bold/italic must sit UNDER the clears on the undo stack
-         for the ☆ ("undo past your bold") to exist at all; the page's order is load-bearing.
-       · the ☆ label drops the page's literal "Ctrl+Z has a twin" tail — chords are banned in
-         checklist text (§1.7 R7 + the smoke de-hint scan); the twin's name lives in guide[5].
-       · beat 3 grades the OUTCOME only (§1.0(c)): every value back after the block was seen
-         cleared — retyping all six figures clears core too, just slower; no S.undoN gate. */
-    name:'Undo', label:'Undo is a tool', par:29, parKeys:26, saveClose:true,   /* r425: par re-swept — demo measures 26 keys flat across seeds (fixed-length log signature); par 29 ≈ 1.12 s/key, the top of the house band: two cross-sheet block hops + the note-read the demo's setDemoSel elides. Mirrored in HOTKEY_PARS. */
-    aha:'undo rewinds exactly — every cleared value returns as it was, and the Q4 total re-ties to the cent.',
-    prompt:'A sweep note says to clear a scratch block — but that block quietly feeds the Q4 total, and the junk was the other one all along. Walk the mistake: clear the block the note names, watch the Q4 total die, and undo until every value is back exactly as it was. Then clear the real junk, sign the action log, and save your work. Undo is a tool, not an apology.',
-    req(){ const o=this._o; return '<em>ctrl+b</em> the title · <em>ctrl+i</em> the memo · clear <em>'+o.wrongName+'</em> ('+o.wrongRng+') — the note says so · <em>ctrl+z</em> until every value is back · clear <em>'+o.rightName+'</em> ('+o.rightRng+') · type <em>cleared per note</em> in the log · <em>ctrl+s</em>'; },
-    guide(){ const o=this._o; return [
-      '<kbd>ctrl</kbd>+<kbd>b</kbd> the title · <kbd>ctrl</kbd>+<kbd>i</kbd> the memo line under it',
-      'the note names <b>'+o.wrongName+'</b>: select the block ('+o.wrongRng+') · <kbd>delete</kbd> — and watch the Q4 total die with it',
-      '<kbd>ctrl</kbd>+<kbd>z</kbd> until every value is back — the Q4 total re-ties EXACTLY; undo replays your steps in reverse, newest first',
-      'the junk was <b>'+o.rightName+'</b> all along ('+o.rightRng+'): select it · <kbd>delete</kbd> — aim, then fire; Q4 holds this time',
-      'sign the log: type <b>cleared per note</b> in the yellow log cell · <kbd>↵</kbd> — a desk leaves a trail',
-      '☆ the discovery: <kbd>ctrl</kbd>+<kbd>z</kbd> deeper — PAST your bold — then <kbd>ctrl</kbd>+<kbd>y</kbd> walks every step forward again: the rewind runs both ways',
-    ]; },
-    targets(){ const o=this._o; return ['A1:A2', o.wrongRng, o.wrongRng, o.rightRng, o.logCell, null]; },   /* r423 §2: the mystery ☆ is never targeted — the null slot keeps the tri-length */
-    demo(){ const o=this._o; return [
-      {sel:'A1', keys:[Kb.bold]},
-      {sel:o.memo, keys:[{key:'i',ctrl:true}]},
-      {sel:o.wrongRng, keys:[{key:'Delete'}]},                       // the scripted mistake — Q4 zeroes
-      {sel:o.wrongRng, keys:[{key:'z',ctrl:true}]},                  // one undo: the whole clear rewinds, Q4 re-ties
-      /* the ☆ rides BEFORE the last core beats (§2.2 authoring rule — its state latches at
-         the win): two more undos walk PAST the bold (title goes plain), two redos walk it
-         all forward again — the stack runs both ways, nothing lost */
-      {sel:o.wrongRng, keys:[{key:'z',ctrl:true},{key:'z',ctrl:true}]},
-      {sel:'A1', keys:[{key:'y',ctrl:true},{key:'y',ctrl:true}]},
-      {sel:o.rightRng, keys:[{key:'Delete'}]},                       // aim, then fire
-      {sel:o.logCell, keys:[...T('cleared per note'), Kb.enter]},    // the engine appends the Ctrl+S closer
-    ]; },
-    build(){
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — working tab ($mm)',txt:true};
-      /* §4.8 Random, as-is: 4-spot site pool + the wrong-block coin flip; the Q4/log strip
-         rides the blocks (its rows derive from the lower block). Values through rnd(). */
-      const spots=[[2,4],[6,4],[2,9],[6,9]];
-      for(let k=spots.length-1;k>0;k--){ const j=rnd(0,k); [spots[k],spots[j]]=[spots[j],spots[k]]; }
-      const NAMES=['SCRATCH A','SCRATCH B'];
-      const mk=(sp,name)=>{
-        const [c0,r0]=sp; const vals=[];
-        cells[colLetter(c0)+r0]={...blankCell(),value:name,txt:true,bold:true};
-        for(let j=0;j<2;j++) for(let i=1;i<=3;i++){ const v=rnd(10,99)*10; vals.push(v);
-          cells[colLetter(c0+j)+(r0+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }   // §2.1b: dressed on arrival — formatting isn't this drill's lesson
-        return {c0, r0, vals, rng:colLetter(c0)+(r0+1)+':'+colLetter(c0+1)+(r0+3)};
-      };
-      const A=mk(spots[0],NAMES[0]), B=mk(spots[1],NAMES[1]);
-      const wrongIsA=rnd(0,1)===0;   // the scripted mistake randomizes per seed
-      const W=wrongIsA?A:B, R=wrongIsA?B:A;
-      const wrongName=wrongIsA?NAMES[0]:NAMES[1], rightName=wrongIsA?NAMES[1]:NAMES[0];
-      cells['A2']={...blankCell(),value:'Memo: clear the '+wrongName+' scratch block — desk sweep',txt:true};
-      /* the Q4 tie strip — UNDER the blocks so its site rides the pool. The live SUM points
-         at the block the memo names: following the note kills a real output in plain sight
-         (the beat-3 moment). Note 2 flags the reversal WITHOUT naming the junk block — the
-         SUM's own formula is the trail. The total wears its §1.0(f) TOP border from build(). */
-      const bot=Math.max(A.r0,B.r0)+3;
-      const qr=bot+2, nr=qr+1, lr=nr+1;
-      cells['A'+qr]={...blankCell(),value:'Q4 total',txt:true,bold:true};
-      cells['B'+qr]={...blankCell(),formula:'=SUM('+W.rng+')',value:W.vals.reduce((s,v)=>s+v,0),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      cells['A'+nr]={...blankCell(),value:'Note 2: the live block feeds Q4 — the junk is the other one',txt:true,it:true};
-      cells['A'+lr]={...blankCell(),value:'Action log',txt:true,bold:true};
-      /* §0 judgment: the log cell wears the §1.0(f) input dress (yellow + all borders) so it
-         reads as a field to fill — but ships EMPTY by design: it is a signature line, not a
-         computation helper, so the "ships populated" half of (f) does not apply. */
-      cells['B'+lr]={...blankCell(),fill:'yellow',ball:true};
-      this._o={ memo:'A2', wrongName:wrongName, wrongRng:W.rng,
-        rightName:rightName, rightRng:R.rng,
-        wrongCells:[], rightCells:[], wrongVals:W.vals,
-        q4Cell:'B'+qr, logCell:'B'+lr,
-        /* drill-side additive latches (§1.0(d) — the sanctioned "add your own latch" route):
-           reset per build(), advanced inside checks() — the grader runs on every committed
-           action (commitAction → checkWin), so state transitions are always observed. */
-        fmtEver:false, everCleared:false, deepUndo:false, lastUndoN:0 };
-      for(let j=0;j<2;j++) for(let i=1;i<=3;i++){
-        this._o.wrongCells.push(colLetter(W.c0+j)+(W.r0+i));
-        this._o.rightCells.push(colLetter(R.c0+j)+(R.r0+i)); }
-      return {ROWS:Math.max(13,lr+1), cells, active:{r:1,c:1}, sel:null, colW:{1:150}};
+      // the three team rows: Q1/Q2 typed, Q3 LIVE off SCRATCH A, FY summing the row
+      const q12=[];
+      for(let r=5;r<=7;r++){
+        cells['A'+r]={...blankCell(),value:names[r-5],txt:true};
+        const a=rnd(6,40), b=rnd(6,40); q12.push([a,b]);
+        cells['B'+r]={...blankCell(),value:a,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells['C'+r]={...blankCell(),value:b,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        const src='B'+(aTop+(r-5));
+        cells['D'+r]={...blankCell(),formula:'='+src,value:aVals[(r-5)*2],fmtStyle:'comma',decimals:0};
+      }
+      /* the MIS-TYPED reference (beat 2): one FY cell sums a different team's row. Never the
+         first row — a formula that points UP at a row above itself is the tell a desk reads. */
+      const badRow=6+rnd(0,1);
+      const wrongTarget=badRow===6?5:6;
+      for(let r=5;r<=7;r++){
+        const src = (r===badRow) ? ('B'+wrongTarget+':D'+wrongTarget) : ('B'+r+':D'+r);
+        const rr  = (r===badRow) ? wrongTarget : r;
+        cells['E'+r]={...blankCell(),formula:'=SUM('+src+')',
+          value:q12[rr-5][0]+q12[rr-5][1]+aVals[(rr-5)*2],fmtStyle:'comma',decimals:0};
+      }
+      /* the STALE total (beat 3): =SUM(E5:E6) — it never grew when the third team was added.
+         Wears its §1.0(f) TOP border from build(); formatting is not this drill's lesson. */
+      cells['A8']={...blankCell(),value:'Total',txt:true,bold:true};
+      ['B','C'].forEach((L,j)=>{ cells[L+'8']={...blankCell(),formula:'=SUM('+L+'5:'+L+'7)',
+        value:q12.reduce((s,v)=>s+v[j],0),fmtStyle:'comma',decimals:0,bold:true,bt:true}; });
+      cells['D8']={...blankCell(),formula:'=SUM(D5:D7)',
+        value:aVals[0]+aVals[2]+aVals[4],fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      cells['E8']={...blankCell(),formula:'=SUM(E5:E6)',value:0,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+
+      const wrongIsA=true;   // the note always names the LIVE block — that is the whole lesson
+      cells['A2']={...blankCell(),value:'Memo: SCRATCH A is stale — clear it (desk sweep)',txt:true,it:true};
+      cells['A'+(bTop+3)]={...blankCell(),value:'Note 2: one scratch block still feeds the schedule — check before you clear',txt:true,it:true};
+
+      const aRng='B'+aTop+':C'+(aTop+2), bRng='B'+bTop+':C'+(bTop+2);
+      this._o={
+        bad, good, typoCell:'A'+typoRow,
+        badFyCell:'E'+badRow, badFyShows:'=SUM(B'+wrongTarget+':D'+wrongTarget+')',
+        wantFyRng:'B'+badRow+':D'+badRow,
+        totCell:'E8', totShows:'=SUM(E5:E6)', wantTotRng:'E5:E7',
+        wrongName:'SCRATCH A', wrongRng:aRng, rightName:'SCRATCH B', rightRng:bRng,
+        aCells:[], bCells:[], aVals,
+        q12, badRow, aTop, bTop,
+        /* drill-side additive latches (§1.0(d)) — reset per build(), advanced inside checks();
+           the grader runs on every committed action, so transitions are always observed. */
+        everCleared:false, deepUndo:false, lastUndoN:0, repairsEver:false };
+      for(let i=0;i<3;i++) for(let j=0;j<2;j++){
+        this._o.aCells.push(colLetter(2+j)+(aTop+i));
+        this._o.bCells.push(colLetter(2+j)+(bTop+i)); }
+      return {ROWS:bTop+4, cells, active:{r:5,c:1}, sel:null, colW:{1:150,2:74,3:74,4:74,5:82}};
     },
     checks(S){
       const o=this._o;
       const cel=k=>S.cells[k]||{};
       const empty=v=>v===undefined||v===null||v==='';
-      const fmtOk=!!cel('A1').bold && !!cel(o.memo).it;
-      if(fmtOk) o.fmtEver=true;
-      if(o.wrongCells.every(k=>empty(cel(k).value))) o.everCleared=true;   // beat-2 latch: the clear sticks even after the undo restores the block
-      const liveBack=o.wrongCells.every((k,i)=>cel(k).value===o.wrongVals[i]);
-      /* ☆ latch — "undo past your bold": fires only when an UNDO (S.undoN advanced on this
-         very grade) is what took the title's bold away after the housekeeping had landed.
-         A manual Ctrl+B toggle-off moves no undoN, so it can never latch. */
+      const F=k=>{ const c=cel(k); return c.formula?String(c.formula).toUpperCase().replace(/\s/g,''):''; };
+
+      const typoOk=String(cel(o.typoCell).value||'')===o.good;
+
+      /* §1.0(c) FREEDOM on both formula beats: any live route that lands the right number off
+         the right row counts — the stretched range, or an addition naming each cell. What is
+         graded is that the formula is LIVE and reads its OWN row; a typed number does not
+         clear, because "make it a formula again" IS the lesson. */
+      const rowSum=r=>o.q12[r-5][0]+o.q12[r-5][1]+o.aVals[(r-5)*2];
+      const fyF=F(o.badFyCell), fyC=cel(o.badFyCell);
+      const fyOk=!!fyC.formula && Math.abs((fyC.value||0)-rowSum(o.badRow))<0.5 &&
+        (fyF.includes('B'+o.badRow+':D'+o.badRow) ||
+         (fyF.includes('B'+o.badRow)&&fyF.includes('C'+o.badRow)&&fyF.includes('D'+o.badRow)));
+
+      const wantTot=[5,6,7].reduce((s,r)=>s+rowSum(r),0);
+      const tF=F(o.totCell), tC=cel(o.totCell);
+      const totOk=!!tC.formula && (tF.includes('E5:E7')||(tF.includes('E5')&&tF.includes('E6')&&tF.includes('E7')));
+      const repairsOk=typoOk&&fyOk&&totOk;
+      if(repairsOk) o.repairsEver=true;
+
+      // beat 4: the clear STICKS as a latch, so the undo that restores it cannot un-flip it
+      if(o.aCells.every(k=>empty(cel(k).value))) o.everCleared=true;
+      const aBack=o.aCells.every((k,i)=>cel(k).value===o.aVals[i]);
+      const undoOk=o.everCleared && aBack;
+
+      const junkOk=o.bCells.every(k=>empty(cel(k).value));
+
+      /* ☆ latch — "undo past your repairs": fires only when an UNDO (S.undoN advanced on this
+         very grade) is what took a landed repair back off the board. Retyping the old value by
+         hand moves no undoN, so it can never latch. */
       const un=(S.undoN||0);
-      if(o.fmtEver && !cel('A1').bold && un>o.lastUndoN) o.deepUndo=true;
+      if(o.repairsEver && !repairsOk && un>o.lastUndoN) o.deepUndo=true;
       o.lastUndoN=un;
-      const lv=cel(o.logCell).value;
-      const logOk=String(lv==null?'':lv).trim().replace(/\s+/g,' ').toLowerCase()==='cleared per note';
-      /* DEPTH_PASS §4.8 beats — the labels are the page's lines (outcome-vague per §1.0(b);
-         every graded term is a board label: the memo line, the SCRATCH names, Q4 total, the
-         Action log). The save closer appends engine-side (saveClose:true — never hand-written). */
+
       return [
-        {label:'Bold the title and italicize the memo line under it', ok: fmtOk},
-        {label:'Clear the '+o.wrongName+' block — the note says so', ok: o.everCleared},
-        {label:'Undo until every cleared value is back — the block fed Q4', ok: o.everCleared && liveBack},
-        {label:'Clear the real junk — the '+o.rightName+' block', ok: o.rightCells.every(k=>empty(cel(k).value))},
-        {label:'Enter "cleared per note" in the action-log cell', ok: logOk},
-        {label:'Undo past your bold, then redo everything back', ok: o.deepUndo && (S.redoN||0)>=1, bonus:true},
+        {label:'Fix the misspelled “'+o.bad+'” team name — it should read “'+o.good+'”', ok: typoOk},
+        {label:'Repoint the FY formula at '+o.badFyCell+' — it sums row '+(o.badRow===6?5:6)+' instead of its own', ok: fyOk},
+        {label:'Stretch the Total to cover all three teams', ok: totOk && Math.abs((tC.value||0)-wantTot)<0.5},
+        {label:'Clear SCRATCH A as the note says, then undo it — it feeds the Q3 column', ok: undoOk},
+        {label:'Clear SCRATCH B — the block nothing points at', ok: junkOk},
+        {label:'Undo past your repairs, then redo everything forward', ok: o.deepUndo && (S.redoN||0)>=1, bonus:true},
       ];
     }
   },
@@ -4906,139 +4859,6 @@ const CHALLENGES = {
         {label:'Build the EBITDA margin for every segment — EBITDA over revenue', ok: margOk},
         {label:'Add an outside border around the entire table', ok: boxed},
         {label:'Select each block to the end of its data in one press — no arrowing down the column', ok: starOk, bonus:true},
-      ];
-    }
-  },
-  copyover:{
-    /* r425 H6b-2 (DEPTH_PASS §4.9, platform standard §1.0): full depth-pass rework.
-       5 outcome-vague core beats + the resolved destructive ☆ (Wolf decision log #2: the
-       source-delete STAYS the bonus — the aha made physical) + the engine-appended save closer.
-       ☆ LABEL DEVIATION (documented judgment call, WORKFLOW.md §8): the §4.9 page's ☆ line says
-       "the working copy breaks" — but beats 1–2 grade RELATIVE wiring (formulas travel, refs
-       re-point), so every landed copy is self-contained and SURVIVES the source's deletion; and
-       since checks re-grade live (no latching), a working copy that broke would un-flip beat 1
-       and block the win. The ☆ keeps the destructive delete + the "values survive" lesson with
-       a truthful label instead. */
-    name:'Copyover', label:'Chain the hand-offs', par:28, parKeys:25, saveClose:true,   /* r423 §1: Ctrl+S closer (engine-appended final beat) · r425: sweep-measured 25 keys ×5 seeds, par retuned at the house ~1.1 s/key */
-    aha:'relative refs travel with a copy and re-point on landing — a values-only row carries nothing, and outlives everything.',
-    prompt:'One sub-build feeds three desks tonight. Land the full block in the working area with its wiring live; peel the flagged metric into the sensitivity strip; hand the deck its summary as dead numbers — then dress the hand-off so it ships. Watch what each paste reads FROM: the chain has more than one source.',
-    req(){ const o=this._o; return 'select <em>'+o.src+'</em> · <em>ctrl+c</em> · <em>'+o.d1+'</em> → <em>ctrl+v</em> · <em>'+o.landedCol+'</em> · <em>ctrl+c</em> · <em>'+o.d2+'</em> → <em>ctrl+v</em> · <em>'+o.srcTot+'</em> · <em>ctrl+c</em> · <em>'+o.d3+'</em> → <em>alt e s v ↵</em> · blue <em>alt h f c</em> · box <em>'+o.deckRect+'</em> <em>alt h b s</em> · <em>ctrl+s</em>'; },
-    guide(){ const o=this._o; return [
-      'the block travels whole: select the Sub-build '+o.src+' · <kbd>ctrl</kbd>+<kbd>c</kbd> · at '+o.d1+' · <kbd>ctrl</kbd>+<kbd>v</kbd> — labels, dress and live SUMs ride along',
-      'peel OFF THE COPY: select the landed '+o.peelName+' figures '+o.landedCol+' · <kbd>ctrl</kbd>+<kbd>c</kbd> · at '+o.d2+' · <kbd>ctrl</kbd>+<kbd>v</kbd> — the SUM re-points to the cells above it',
-      'the deck takes the ORIGINAL total row, dead: select '+o.srcTot+' · <kbd>ctrl</kbd>+<kbd>c</kbd> · at '+o.d3+' · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd> — values, zero wiring',
-      'the landed numbers are hardcodes now: select '+o.deckRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 to Blue · <kbd>↵</kbd> — pasted data wears blue',
-      'box the hand-off: select the deck strip '+o.deckRect+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — an outside border and it ships',
-      '☆ prove the chain: select the whole Sub-build '+o.srcAll+' · <kbd>del</kbd> — the deck row holds, and the copies keep computing on their own wiring',
-    ]; },
-    targets(){ const o=this._o; return [o.wRng, o.stripRng, o.deckRng, o.deckRng, o.deckRect, o.srcAll]; },
-    demo(){ const o=this._o; return [
-      {sel:o.src, keys:[Kb.copy]},
-      {sel:o.d1, keys:[Kb.paste]},
-      {sel:o.landedCol, keys:[Kb.copy]},
-      {sel:o.d2, keys:[Kb.paste]},
-      {sel:o.srcTot, keys:[Kb.copy]},
-      {sel:o.d3, keys:[Kb.alt, L('e'), L('s'), L('v'), Kb.enter]},
-      {sel:o.deckRng, keys:[Kb.alt, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
-      {sel:o.deckRect, keys:[Kb.alt, L('h'), L('b'), L('s')]},
-      /* the ☆ rides after the last work beat but BEFORE the engine-appended save (§2.2
-         authoring rule) — the win latches the bonus state on the closing Ctrl+S */
-      {sel:o.srcAll, keys:[{key:'Delete'}]},
-    ]; },
-    build(){
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — segment sub-build (the hand-offs chain)',txt:true,bold:true};
-      /* SOURCE — a labeled mini-table (§1.3 labeled targets): 3 segments × 2 metrics + a live
-         SUM Total row. The Total wears a TOP border per the §1.0(f) convention. */
-      const POOL=['Retail','Wholesale','Online','Export','Services','Licensing','Digital','Advisory'];
-      for(let k=POOL.length-1;k>0;k--){ const j=rnd(0,k); [POOL[k],POOL[j]]=[POOL[j],POOL[k]]; }
-      const segs=POOL.slice(0,3);
-      const rev=segs.map(()=>rnd(180,880)*10);
-      const eb=rev.map(v=>Math.round(v*rnd(18,34)/100/10)*10);
-      const totR=rev.reduce((s,v)=>s+v,0), totE=eb.reduce((s,v)=>s+v,0);
-      cells['A2']={...blankCell(),value:'Sub-build — source ↓',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Segment',txt:true,bold:true};
-      cells['B3']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
-      cells['C3']={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
-      segs.forEach((sg,i)=>{ const r=4+i;
-        cells['A'+r]={...blankCell(),value:sg,txt:true};
-        cells['B'+r]={...blankCell(),value:rev[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells['C'+r]={...blankCell(),value:eb[i],fmtStyle:'comma',decimals:0,fontColor:'blue'}; });
-      cells['A7']={...blankCell(),value:'Total',txt:true,bold:true};
-      cells['B7']={...blankCell(),formula:'=SUM(B4:B6)',value:totR,fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      cells['C7']={...blankCell(),formula:'=SUM(C4:C6)',value:totE,fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      /* RANDOM (§4.9): axis a — the working area anchors from a 3-spot pool (disjoint rects,
-         ≥1-col/row moats vs the source, deck and strip); axis d — which metric column peels
-         into the sensitivity strip; plus the standing content pools + rnd() values. The
-         strip's anchor CO-VARIES with the working spot so the moats hold on every seed. */
-      const wp=[[5,3],[8,3],[5,10]][rnd(0,2)];   // [col,row] of the landed block's header cell
-      const wc=wp[0], wr=wp[1];
-      cells[colLetter(wc)+(wr-1)]={...blankCell(),value:'Working area ↓',txt:true,bold:true};
-      const peel=rnd(0,1), peelName=peel?'EBITDA':'Revenue';
-      const sc=(wc===8)?5:9, sr=(wc===8)?10:3;   // strip anchor dodges the working spot
-      cells[colLetter(sc)+(sr-1)]={...blankCell(),value:'Sensitivity — '+peelName+' ↓',txt:true,bold:true};
-      for(let i=0;i<4;i++) cells[colLetter(sc)+(sr+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
-      /* DECK strip — pre-labeled headers so the landed values read labeled (§1.3); the values
-         cells ship comma-formatted (a values-only paste carries numbers, not formats). */
-      cells['A9']={...blankCell(),value:'Deck — values only ↓',txt:true,bold:true};
-      cells['B10']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
-      cells['C10']={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
-      cells['A11']={...blankCell(),value:'Total',txt:true,bold:true};
-      cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['C11']={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._o={ segs:segs, rev:rev, eb:eb, totR:totR, totE:totE, peel:peel, peelName:peelName,
-        wc:wc, wr:wr, sc:sc, sr:sr,
-        src:'A3:C7', srcAll:'A2:C7', srcTot:'B7:C7',
-        d1:colLetter(wc)+wr, wRng:colLetter(wc)+wr+':'+colLetter(wc+2)+(wr+4),
-        landedCol:colLetter(wc+1+peel)+(wr+1)+':'+colLetter(wc+1+peel)+(wr+4),
-        d2:colLetter(sc)+sr, stripRng:colLetter(sc)+sr+':'+colLetter(sc)+(sr+3),
-        d3:'B11', deckRng:'B11:C11', deckRect:'B10:C11' };
-      return {ROWS:(wr===10)?15:12, cells, active:{r:3,c:1}, sel:null,
-        colW:{1:118,2:84,3:84,4:34,5:118,6:84,7:84,8:118,9:96,10:84}};
-    },
-    checks(S){
-      const o=this._o;
-      const cel=k=>S.cells[k]||{};
-      const isEmpty=k=>{ const c=S.cells[k]; return !c || ((c.value===undefined||c.value===null||c.value==='') && !c.formula); };
-      const num=(k,want)=>{ const c=cel(k); return typeof c.value==='number' && Math.abs(c.value-want)<0.5; };
-      // 1) the working block — the scan tolerates a header-less grab landing one row off
-      //    (§1.0(c): the outcome is a landed, labeled, LIVE block — not one exact paste)
-      const blockFrom=b=>{ if(String((cel(colLetter(o.wc)+b)).value)!==o.segs[0]) return false;
-        for(let i=0;i<3;i++){ if(String((cel(colLetter(o.wc)+(b+i))).value)!==o.segs[i]) return false;
-          if(!num(colLetter(o.wc+1)+(b+i),o.rev[i])) return false;
-          if(!num(colLetter(o.wc+2)+(b+i),o.eb[i])) return false; }
-        const tb=cel(colLetter(o.wc+1)+(b+3)), te=cel(colLetter(o.wc+2)+(b+3));
-        return !!(tb.formula && sumishF(tb.formula) && Math.abs((tb.value||0)-o.totR)<0.5 &&
-                  te.formula && sumishF(te.formula) && Math.abs((te.value||0)-o.totE)<0.5); };
-      const workOk=[o.wr+1,o.wr,o.wr+2].some(blockFrom);
-      // 2) the sensitivity strip — the peeled metric's three figures + a LIVE total that
-      //    re-pointed to the cells above it (typed values + a typed SUM clear it too)
-      const pv=o.peel?o.eb:o.rev, pt=o.peel?o.totE:o.totR;
-      const stripFrom=b=>{ for(let i=0;i<3;i++){ if(!num(colLetter(o.sc)+(b+i),pv[i])) return false; }
-        const t=cel(colLetter(o.sc)+(b+3));
-        return !!(t.formula && sumishF(t.formula) && Math.abs((t.value||0)-pt)<0.5); };
-      const stripOk=[o.sr,o.sr+1].some(stripFrom);
-      // 3) the deck row — both totals as DEAD numbers (any source: a values-only paste off the
-      //    landed copy is byte-identical to one off the original — §1.0(c) freedom)
-      const deckOk=num('B11',o.totR) && num('C11',o.totE) && !cel('B11').formula && !cel('C11').formula;
-      const blueOk=deckOk && cel('B11').fontColor==='blue' && cel('C11').fontColor==='blue';
-      // 5) an outside border around the deck strip — the headered 2×2 is the ask; a box around
-      //    the values row alone (with or without the Total label riding) also reads shipped
-      const rectBox=(r1,c1,r2,c2)=>{ for(let c=c1;c<=c2;c++){ if(!(cel(colLetter(c)+r1)).bt || !(cel(colLetter(c)+r2)).bb) return false; }
-        for(let r=r1;r<=r2;r++){ if(!(cel(colLetter(c1)+r)).bl || !(cel(colLetter(c2)+r)).br) return false; } return true; };
-      const boxOk=rectBox(10,2,11,3) || rectBox(10,1,11,3) || rectBox(11,2,11,3) || rectBox(11,1,11,3);
-      // ☆ — the source table GONE (contents cleared; the dress may stay — R10) while the dead
-      //    deck row still holds. A cut-move that emptied the source earns it too: same end
-      //    state, same lesson (values survive their source).
-      let srcGone=true;
-      for(let r=2;r<=7;r++) for(let c=1;c<=3;c++){ if(!isEmpty(colLetter(c)+r)) srcGone=false; }
-      return [
-        {label:'Copy the source block into the working area', ok: workOk},
-        {label:'Copy the landed '+o.peelName+' column into the sensitivity strip — refs re-point', ok: stripOk},
-        {label:'Paste the summary row into the deck strip as values only', ok: deckOk},
-        {label:'Color the values-only row blue', ok: blueOk},
-        {label:'Add an outside border around the deck strip', ok: boxOk},
-        {label:'Delete the source block — the values-only row holds, the copies keep computing', ok: srcGone && deckOk, bonus:true},
       ];
     }
   },

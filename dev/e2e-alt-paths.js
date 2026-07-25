@@ -103,55 +103,6 @@ const ALTS = [
       {sel:'A3:A7',       keys:[{key:'Alt'},L('h'),L('b'),L('l')]},                                   // left edge
       {sel:'E3:E7',       keys:[{key:'Alt'},L('h'),L('b'),L('r')]},                                   // right edge — outside border assembled by hand
     ]; }` },
-  { key: 'undo', name: 'junk FIRST, values RETYPED back (no undo at all — Freedom), ribbon bold/italic LAST — cores clear, no ☆', moves: `C => { const o=C._o;
-      const steps=[
-        {sel:o.rightRng, keys:[{key:'Delete'}]},
-        {sel:o.wrongRng, keys:[{key:'Delete'}]},
-      ];
-      o.wrongCells.forEach((k,i)=>steps.push({sel:k, keys:[...T(String(o.wrongVals[i])),{key:'Enter'}]}));
-      steps.push({sel:'A1', keys:[{key:'Alt'},L('h'),D(1)]});
-      steps.push({sel:o.memo, keys:[{key:'Alt'},L('h'),D(2)]});
-      steps.push({sel:o.logCell, keys:[...T('cleared per note'),{key:'Enter'}]});
-      return steps; }` },
-  /* r425 (undo ROUND 2): chord-ROUTE alt — clears via the ribbon clear menu (alt h e c,
-     contents only), the ☆ walked on the OTHER redo chord (ctrl+shift+z, not ctrl+y), the
-     log signed through an F2 edit. Same beat order as the demo, different keys throughout. */
-  { key: 'undo', name: 'ribbon clears (alt h e c), deep undo + ctrl+shift+z redo (the ☆ on the other chord), F2 log entry', moves: `C => { const o=C._o; return [
-      {sel:'A1', keys:[{key:'b',ctrl:true}]},
-      {sel:o.memo, keys:[{key:'i',ctrl:true}]},
-      {sel:o.wrongRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]},
-      {sel:o.wrongRng, keys:[{key:'z',ctrl:true},{key:'z',ctrl:true},{key:'z',ctrl:true}]},
-      {sel:'A1', keys:[{key:'z',ctrl:true,shift:true},{key:'z',ctrl:true,shift:true}]},
-      {sel:o.rightRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]},
-      {sel:o.logCell, keys:[{key:'F2'},...T('cleared per note'),{key:'Enter'}]},
-    ]; }` },
-  { key: 'copyover', name: 'deck hand-off FIRST (ctrl+alt+v values), dress rides, block after, peel off the ORIGINAL column', moves: `C => { const o=C._o;
-      const srcCol=(o.peel?'C':'B')+'4:'+(o.peel?'C':'B')+'7';
-      return [
-        {sel:o.srcTot, keys:[{key:'c',ctrl:true}]},
-        {sel:o.d3, keys:[{key:'v',ctrl:true,alt:true},L('v'),{key:'Enter'}]},
-        {sel:o.deckRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-        {sel:o.deckRect, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
-        {sel:o.src, keys:[{key:'c',ctrl:true}]},
-        {sel:o.d1, keys:[{key:'v',ctrl:true}]},
-        {sel:srcCol, keys:[{key:'c',ctrl:true}]},
-        {sel:o.d2, keys:[{key:'v',ctrl:true}]},
-      ]; }` },
-  /* r425: chord-ROUTE alt — values land via the Alt H V S dialog instead of Alt E S V /
-     ctrl+alt+v, and the ☆ source delete fires MID-RUN, before the dress beats: the
-     destructive bonus may NEVER un-flip a core beat (the live re-grade safety this
-     drill's rework documents in its ☆ deviation comment). */
-  { key: 'copyover', name: 'H V S dialog values, ☆ source delete MID-RUN (destructive-bonus safety), box via preselected range', moves: `C => { const o=C._o; return [
-      {sel:o.src, keys:[{key:'c',ctrl:true}]},
-      {sel:o.d1, keys:[{key:'v',ctrl:true}]},
-      {sel:o.landedCol, keys:[{key:'c',ctrl:true}]},
-      {sel:o.d2, keys:[{key:'v',ctrl:true}]},
-      {sel:o.srcTot, keys:[{key:'c',ctrl:true}]},
-      {sel:o.d3, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
-      {sel:o.srcAll, keys:[{key:'Delete'}]},
-      {sel:o.deckRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:o.deckRect, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
-    ]; }` },
   { key: 'pastes', name: 'ctrl+alt+v transpose, right-align + THICK box on the deck row, scale row-by-row via alt h v s, costs TYPED negative (Freedom), ribbon unbold (chord-ROUTE alt)', moves: `C => { const o=C._o; const k=o.mode==='div'?'i':'m'; return [
       {sel:o.side, keys:[{key:'c',ctrl:true}]},
       {sel:o.feesRow.split(':')[0], keys:[{key:'v',ctrl:true,alt:true},L('e'),{key:'Enter'}]},
@@ -290,29 +241,32 @@ const ALTS = [
       {sel:o.uRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]},
       {sel:o.a1+':'+o.a2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
     ]; }` },
-  { key: 'editfix', name: 'range stretched FIRST, drift typed as a number (no ☆), memo mid-run, typos last in reverse', moves: `C => { const o=C._o;
+  /* r431 (merged drill): FREEDOM route — the junk cleared FIRST, SCRATCH A restored by RETYPING
+     every value instead of undoing, and both formula repairs written as explicit additions
+     rather than SUM ranges. Every core beat still clears (§1.0(c) grades the end state), and
+     the ☆ must NOT light: no undo ever ran, so the deepUndo latch cannot fire. */
+  { key: 'editfix', name: 'junk FIRST, SCRATCH A retyped back (no undo at all — Freedom), additions not SUMs — cores clear, no star', moves: `C => { const o=C._o;
       const steps=[
-        {sel:o.totCell, keys:[{key:'F2'},{key:'Backspace'},{key:'Backspace'},...T(o.tailFix),{key:'Enter'}]},
-        {sel:o.driftCell, keys:[...T(String(o.feedVal)),{key:'Enter'}]},
-        {sel:o.memoCell, keys:[{key:'5',ctrl:true}]},
+        {sel:o.rightRng, keys:[{key:'Delete'}]},
+        {sel:o.wrongRng, keys:[{key:'Delete'}]},
       ];
-      [o.s2,o.s1].forEach(s2=>{
-        let p=0; while(p<s2.bad.length && p<s2.good.length && s2.bad[p]===s2.good[p]) p++;
-        const keys=[{key:'F2'}];
-        for(let i=0;i<s2.bad.length-p;i++) keys.push({key:'Backspace'});
-        keys.push(...T(s2.good.slice(p)),{key:'Enter'});
-        steps.push({sel:s2.cell, keys});
-      });
+      o.aCells.forEach((k,i)=>steps.push({sel:k, keys:[...T(String(o.aVals[i])),{key:'Enter'}]}));
+      steps.push({sel:o.typoCell,  keys:[...T(o.good),{key:'Enter'}]});
+      steps.push({sel:o.badFyCell, keys:[...T('=B'+o.badRow+'+C'+o.badRow+'+D'+o.badRow),{key:'Enter'}]});
+      steps.push({sel:o.totCell,   keys:[...T('=E5+E6+E7'),{key:'Enter'}]});
       return steps; }` },
-  /* r425 (editfix rework): chord-ROUTE alt — a ZERO-F2 run. Typos and the total fixed by full
-     retype (slow but legal — §1.0(c) freedom re-affirmed), the strike via the ctrl+1 K Font-tab
-     route, the drift repaired by reference (the ☆ route inside an otherwise slow run). */
-  { key: 'editfix', name: 'zero-F2 run — full retypes + ctrl+1 K strike + drift by reference (☆ route)', moves: `C => { const o=C._o; return [
-      {sel:o.s1.cell, keys:[...T(o.s1.good),{key:'Enter'}]},
-      {sel:o.s2.cell, keys:[...T(o.s2.good),{key:'Enter'}]},
-      {sel:o.driftCell, keys:[...T('='+o.feedCell),{key:'Enter'}]},
-      {sel:o.memoCell, keys:[{key:'1',ctrl:true},L('k')]},
-      {sel:o.totCell, keys:[...T('=SUM(C11:C12)'),{key:'Enter'}]},
+  /* r431: chord-ROUTE alt — the clear walked through the ribbon clear menu (alt h e c,
+     contents only) instead of Delete, and the ☆ taken on the OTHER redo chord
+     (ctrl+shift+z, not ctrl+y). Same beats, different keys throughout. */
+  { key: 'editfix', name: 'ribbon clear (alt h e c), deep undo + ctrl+shift+z redo (the star on the other chord)', moves: `C => { const o=C._o; return [
+      {sel:o.typoCell,  keys:[...T(o.good),{key:'Enter'}]},
+      {sel:o.badFyCell, keys:[...T('=SUM(B'+o.badRow+':D'+o.badRow+')'),{key:'Enter'}]},
+      {sel:o.totCell,   keys:[...T('=SUM(E5:E7)'),{key:'Enter'}]},
+      {sel:o.wrongRng,  keys:[{key:'Alt'},L('h'),L('e'),L('c')]},
+      {sel:o.wrongRng,  keys:[{key:'z',ctrl:true}]},
+      {sel:o.totCell,   keys:[{key:'z',ctrl:true},{key:'z',ctrl:true},{key:'z',ctrl:true}]},
+      {sel:o.totCell,   keys:[{key:'z',ctrl:true,shift:true},{key:'z',ctrl:true,shift:true},{key:'z',ctrl:true,shift:true}]},
+      {sel:o.rightRng,  keys:[{key:'Delete'}]},
     ]; }` },
   { key: 'drill', name: 'values paste via the H V S dialog route', moves: `C => [
       {sel:'B3:B8', keys:[{key:'c',ctrl:true}]},
@@ -375,18 +329,23 @@ const ALTS = [
         {sel:'A3', keys:[{key:'Alt'},L('a'),L('t')]},
         {sel:'C3', keys:pk},
       ]; }` },
-  { key: 'typeset', name: 'RIBBON routes — bold/unbold via Alt H 1, italics line-by-line via Alt H 2 (☆ forfeited, core clears), strike via ctrl+1 K', moves: `C => { const o=C._o; return [
+  /* r431: the strike route is gone with r430's strike->red-font beat. Red is applied CELL BY
+     CELL here (the demo does the whole range in one pass), so the per-cell path still grades. */
+  { key: 'typeset', name: 'RIBBON routes — bold/unbold via Alt H 1, italics line-by-line via Alt H 2 (☆ forfeited, core clears), red applied cell by cell', moves: `C => { const o=C._o;
+      const RED=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
+      return [
       {sel:'A2:D2', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:o.wbRng, keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'A'+o.m0, keys:[{key:'Alt'},L('h'),D(2)]},
       {sel:'A'+(o.m0+1), keys:[{key:'Alt'},L('h'),D(2)]},
       {sel:'A'+(o.m0+2), keys:[{key:'Alt'},L('h'),D(2)]},
-      {sel:o.deadRng, keys:[{key:'1',ctrl:true},L('k')]},
+      {sel:'A'+o.deadR, keys:RED}, {sel:'B'+o.deadR, keys:RED},
+      {sel:'C'+o.deadR, keys:RED}, {sel:'D'+o.deadR, keys:RED},
       {sel:o.stamp, keys:[...T('=TODAY()'),{key:'Enter'}]},
     ]; }` },
-  { key: 'typeset', name: 'reverse order — signed FIRST, strike, one-pass memos, unbold, header bold LAST', moves: `C => { const o=C._o; return [
+  { key: 'typeset', name: 'reverse order — signed FIRST, red flag, one-pass memos, unbold, header bold LAST', moves: `C => { const o=C._o; return [
       {sel:o.stamp, keys:[...T('=TODAY()'),{key:'Enter'}]},
-      {sel:o.deadRng, keys:[{key:'5',ctrl:true}]},
+      {sel:o.deadRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       {sel:o.memoRng, keys:[{key:'i',ctrl:true}]},
       {sel:o.wbRng, keys:[{key:'b',ctrl:true}]},
       {sel:'A2:D2', keys:[{key:'b',ctrl:true}]},
