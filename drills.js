@@ -18,7 +18,7 @@
 /* r336 (Wolf): the STANDARDIZED placement series — the same five boards for everyone entering
    ranked, one from each band of the arc (move → format → formula → data → model), so a first
    rank is placed off one yardstick whether you're early in the catalog or deep into it. */
-window.HK_PLACEMENT = { KEYS: ['navigation','dress','margin','sort','opmodel'] };
+window.HK_PLACEMENT = { KEYS: ['navigation','combo','margin','sort','opmodel'] };
 
 window.HOTKEY_DRILLS = {
 
@@ -31,15 +31,15 @@ window.HOTKEY_DRILLS = {
   // Foundations → Formatting → Formulas I (all FREE) → Data & Lookups (level bridge) →
   // Formulas II / Models I / Models II / Full Builds (PRO).
   // r249 — the 6 folded legacy drills (saves, ribbon, polish, format, blue, transpose) were
-  // deleted outright, their value covered by survivors (copyover, housestyle, dress, decimals,
+  // deleted outright, their value covered by survivors (housestyle, decimals,
   // the Alt-H drills, pastes). Catalog is 82 grouped drills (Formulas I & II carry 11 each);
   // menuOrder.length is the source of truth — do not hardcode the total elsewhere.
   groups: [
     { name: 'Foundations',    keys: ['navigation', 'filldr', 'pastes', 'blocksel', 'rowops', 'editfix', 'modeltour'] },   /* r367: modeltour moved from #2 to capstone — it demands cascades + formatting no fresh player has yet · r424 (D17): colops RETIRED — rowops absorbed it (row AND column structure ops, one drill); the freed slot stays open for a future add */
-    { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'dress', 'housestyle', 'gauntlet'] },
-    { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases'] },
+    { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'housestyle', 'gauntlet'] },
+    { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert'] },
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
-    { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'tieout', 'hunt', 'signerr', 'versionup', 'balance'] },
+    { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'cases', 'tieout', 'hunt', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
     { name: 'Models II',      keys: ['schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'cascade', 'debtsched'] },
     { name: 'Full Builds',    keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt', 'opmodel', 'dcfbuild', 'lbobuild', 'debtblock', 'dashcover'] },
@@ -57,7 +57,7 @@ window.HOTKEY_DRILLS = {
   meta: {
     // Foundations
     navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'One long switchback corridor through solid walls — every straightaway is a single shot, every corner one turn. Collect the pips, copy the model data, bring it home to A1, save, and finish at the far corner of the active area — the wall past the model breaks open if you would rather walk there than fly' },   /* r427 (§4.1 round 3): windier serpentine + the carved exit */
-    autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — autofit the columns to their content' },
+    autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'A print page nobody can read — fit the labels to their content, hold the quarter block to one width, and find out what your own totals do to a narrow column' },   /* r432 (§4.14): reworked to the single print-page board */
     rowops:     { name:'Structure', label:'Rebuild the schedule',   tab:'Structure',desc:'Full structural surgery \u2014 insert the missing line and the missing quarter, delete the squatters, and watch every new row and column arrive already dressed' },   /* r424 (D17): absorbed colops \u2014 rows AND columns in one drill */
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Fill down and fill right — one formula, whole block' },
     blocksel:   { name:'Block Select',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
@@ -81,8 +81,7 @@ window.HOTKEY_DRILLS = {
     ruleaudit:  { name:'Ruling Pass', label:'The ruling pass', tab:'Ruling Pass', desc:'The page says done \u2014 the pass disagrees. Exactly 4 ruling breaks hide among the house conventions; find all 4, fix only those', errorCount:4 },   /* r425: \u00a72.3 disclosed-error-count prototype \u2014 errorCount puts the found-k/4 meter on the rail */
     combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Dress a raw pasted comp sheet — weight, alignment, commas, blue ink, wrap and width' },
     typeset:    { name:'Typeset',  label:'Typeset the memo',    tab:'Typeset',     desc:'Bold the header, unbold the imposter, italicize the memos, flag the discontinued line in red, date the page' },   /* r425: language pass — the picker names outcomes, not the answer formula */
-    decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Take a comps page to the house decimal standard, and find the cell somebody hand-formatted' },
-    dress:      { name:'Format tab', label:'Full formatting pass', tab:'Format', desc:'Masthead, blue inputs, commas and percents, borders on the lines that matter \u2014 one pass to book-ready' },   /* r425 \u00a74.18 rework: desc matches the 6-beat scope */
+    decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Take a comps page to the house decimal standard, and find the cell somebody hand-formatted' },   /* r425 \u00a74.18 rework: desc matches the 6-beat scope */
     triage:     { name:'Error triage', label:'Error triage \u2014 #REF! #DIV/0! #VALUE!', tab:'Triage', desc:'Three classic breaks \u2014 read the error, rebuild the intent' },
     versionup:  { name:'Roll-forward prep', label:'Replace hardcodes so it rolls forward', tab:'Rollfwd', desc:'Typed answers \u2192 live formulas; v2 must survive new numbers' },
     center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Center, left, right — and a long title centered across the table, never merged' },   /* r429: depth-pass rework — the picker names the outcomes the drill now grades (no chord tokens, C5; length keeps the generated meta description inside the 158-char cut) */
@@ -129,7 +128,6 @@ window.HOTKEY_DRILLS = {
     audit:      { name:'Review Pass', label:'Review pass \u2014 find what\u2019s broken', tab:'Audit', desc:'Three planted breaks in a real P&L \u2014 find them all' },
     balcheck:   { name:'Make It Tie', label:'Make it tie \u2014 hunt the break', tab:'Make It Tie', desc:'The check row was pasted over \u2014 resurrect it, run both breaks down' },
     stalelink:  { name:'Stale Links',label:'Re-point the stale links', tab:'Stale', desc:'Assumptions moved to v2 \u2014 three cells still read the dead block' },
-    wirewalk:   { name:'Trace',    label:'Trace the precedents',       tab:'Trace',   desc:'Trace to the source and ride back \u2014 fix it upstream' },
     tieout:     { name:'Tie-out',  label:'Collapse the suspect leg',   tab:'Tie-out', desc:'Trace into the wiring, collapse a suspect leg to its dead value \u2014 find the stale link, repoint it' },
     hunt:       { name:'Audit',    label:'Hunt the hardcodes',  tab:'Audit',   desc:'Go To Special \u2192 constants \u2014 every number a formula should own lights up' },
     wrapfix:    { name:'IFERROR',  label:'Wrap it or fix it',   tab:'IFERROR', desc:'Wrap the truly missing, fix the merely broken \u2014 never bury errors' },
@@ -238,7 +236,7 @@ window.HOTKEY_CAMPAIGN = {
      first; the other seven designate as their chapter's capstone build lands. */
   chapters: [
     { id:'c1', name:'Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'], capstone:'modeltour' },
-    { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','dress','gauntlet'] },
+    { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','combo','gauntlet'] },
     { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
@@ -330,7 +328,7 @@ window.HOTKEY_CLOCKS = {
   modeltour: { pass: 70 },
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"dress":41,"typeset":24,"decimals":25,"center":22,"autofit":15,"combo":27,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

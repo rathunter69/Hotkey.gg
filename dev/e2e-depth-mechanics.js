@@ -912,7 +912,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     for (const W of [1150, 1280, 1440]) {
       await page.setViewportSize({ width: W, height: 900 });
       const r = await run(() => {
-        window.__clearCel(); hideResults(); loadChallenge('dress');
+        window.__clearCel(); hideResults(); loadChallenge('housestyle');   /* r432: `dress` retired into housestyle; this test only needs a loaded board */
         const gt = () => +document.getElementById('gridwrap').getBoundingClientRect().top.toFixed(1);
         const ribH = () => +document.querySelector('.ribbon').getBoundingClientRect().height.toFixed(1);
         const slotH = () => +document.querySelector('.ribbon-slot').getBoundingClientRect().height.toFixed(1);

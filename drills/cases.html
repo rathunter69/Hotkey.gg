@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=289"></script>
+<script src="drills.js?v=290"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,14 +93,14 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Scenario switch with CHOOSE","description":"A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshots each case into the output table","url":"https://www.hotkey.gg/drills/cases.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT94S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Scenario switch with CHOOSE","item":"https://www.hotkey.gg/drills/cases.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Scenario switch with CHOOSE","description":"A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshots each case into the output table","url":"https://www.hotkey.gg/drills/cases.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas II","teaches":"A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT94S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Scenario switch with CHOOSE","item":"https://www.hotkey.gg/drills/cases.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
 <script src="nav.js?v=302"></script>
 <div class="wrap">
-  <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / formulas i</div>
-  <div class="eyebrow">◆ Formulas I · drill · Spreadsheet Formulas &amp; Data track</div>
+  <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / formulas ii</div>
+  <div class="eyebrow">◆ Formulas II · drill · Spreadsheet Formulas &amp; Data track</div>
   <h1>Scenario switch with CHOOSE</h1>
   <div class="aha">A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.</div>
   <div class="sub">Build a scenario switch the way a real model does it. A driver block reads one cell — the switch — and CHOOSE pulls the active case’s name and growth rate into it, so the model runs off the driver instead of nested IFs. A capture cell reads the locked-year revenue only while its case is live, and otherwise references itself to hold the last value — so the summary shows all three cases side by side.</div>
@@ -118,17 +118,17 @@
   <div class="section-title">The optimal line</div>
   <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">driver: <em>B8</em> =CHOOSE($B$3,B5,C5,D5) · <em>B9</em> =CHOOSE($B$3,B6,C6,D6) · model: <em>C12</em> =B12*(1+$B$9) F4-anchored, fill <em>C12:F12</em> → · <em>C13</em> =C12/B12-1 fill <em>C13:F13</em> → · capture: <em>C18</em> =IF($B$3=C$17,$E$12,C18) fill <em>C18:E18</em> → · flip <em>B3</em> → 1 · 2 · 3 · then revise <em>B6</em> → 10.0% and re-flip <em>B3</em> → 1</div></div>
 
-  <div class="section-title">More Formulas I drills</div>
+  <div class="section-title">More Formulas II drills</div>
   <div class="rel">
-    <a href="drills/margin.html"><div class="rn">Margins across the page</div><div class="rd">EBITDA ÷ revenue, three comp tables — pointed, filled, %</div></a>
-    <a href="drills/foot.html"><div class="rn">Total it both ways</div><div class="rd">SUM across and down, tie out the corner</div></a>
-    <a href="drills/anchor.html"><div class="rn">Pin the reference</div><div class="rd">Cycle the reference locks — one pinned formula prices the whole grid</div></a>
-    <a href="drills/percent.html"><div class="rn">Common-size both statements</div><div class="rd">Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift</div></a>
+    <a href="drills/audit.html"><div class="rn">Review pass — find what’s broken</div><div class="rd">Three planted breaks in a real P&amp;L — find them all</div></a>
+    <a href="drills/triage.html"><div class="rn">Error triage — #REF! #DIV/0! #VALUE!</div><div class="rd">Three classic breaks — read the error, rebuild the intent</div></a>
+    <a href="drills/wrapfix.html"><div class="rn">Wrap it or fix it</div><div class="rd">Wrap the truly missing, fix the merely broken — never bury errors</div></a>
+    <a href="drills/balcheck.html"><div class="rn">Make it tie — hunt the break</div><div class="rd">The check row was pasted over — resurrect it, run both breaks down</div></a>
   </div>
   <div class="cta-row" style="margin-top:26px">
-    <a class="cta" href="drills/fxconvert.html">← FX Convert</a>
-    
-    <a class="cta" href="drills/index.html">all 79 drills</a>
+    <a class="cta" href="drills/stalelink.html">← Stale Links</a>
+    <a class="cta" href="drills/tieout.html">Tie-out →</a>
+    <a class="cta" href="drills/index.html">all 77 drills</a>
   </div>
   <div class="fine">
     Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.

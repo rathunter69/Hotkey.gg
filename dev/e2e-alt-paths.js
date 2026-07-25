@@ -245,10 +245,33 @@ const ALTS = [
         {sel:o.f, keys:[...T('='+L2+(o.hr+1)+'*'+L2+(o.hr+2)),{key:'Enter'}]},
         {sel:o.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       ]; }` },
-  { key: 'autofit', name: 'uniform width FIRST, then content-fit; both via ribbon', moves: `C => { const o=C._o; return [
-      {sel:o.uRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]},
-      {sel:o.a1+':'+o.a2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-    ]; }` },
+  /* r432 (autofit ROUND 3, DEPTH_PASS §4.14): both entries rebuilt for the reworked print-page
+     board. ALT 1 = op-ORDER alt, and the ☆-skippability proof: the whole drill run BACKWARDS
+     (totals first, dressed immediately, then the widths right-to-left, labels last) with every
+     line total TYPED as an addition chain instead of one filled SUM — the §1.0(c) freedom
+     route. All five cores clear; the ☆ must stay dark, since no fill ever runs. ALT 2 =
+     chord-ROUTE alt (range autosum for the totals, whole-column ctrl+space selections, ribbon
+     bold, and the Total column sized by a TYPED width instead of an autofit — the r430 rule
+     that any route to a readable column clears a readability beat). */
+  { key: 'autofit', name: 'run BACKWARDS — totals first as typed addition chains, dress next, then widths right-to-left with the labels last (no fill, so no star)', moves: `C => { const o=C._o;
+      const steps=[];
+      for(let r=o.r0;r<=o.tr;r++)
+        steps.push({sel:o.tcL+r, keys:[...T('='+o.qL[0]+r+'+'+o.qL[1]+r+'+'+o.qL[2]+r+'+'+o.qL[3]+r),{key:'Enter'}]});
+      steps.push({sel:o.lc1L+o.tr+':'+o.tcL+o.tr, keys:[{key:'Alt'},L('h'),D(1)]});                    // ribbon bold, before any column is sized
+      steps.push({sel:o.lc1L+o.tr+':'+o.tcL+o.tr, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      steps.push({sel:o.tcL+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
+      steps.push({sel:o.qL[0]+o.hr+':'+o.qL[3]+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]});
+      steps.push({sel:o.lc1L+o.hr+':'+o.lc2L+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});          // the labels come last this time
+      return steps; }` },
+  { key: 'autofit', name: 'autosum totals (alt+= per line), whole-column ctrl+space selections, Total column sized by a TYPED width not a fit, ribbon bold', moves: `C => { const o=C._o;
+      const steps=[];
+      for(let r=o.r0;r<=o.tr;r++)   // Excel's RANGE autosum: select the line THROUGH its empty total cell, alt+= commits it
+        steps.push({sel:o.qL[0]+r+':'+o.tcL+r, keys:[{key:'=',alt:true,code:'Equal'}]});
+      steps.push({sel:o.lc1L+o.hr+':'+o.lc2L+o.hr, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('o'),L('i')]});
+      steps.push({sel:o.qL[0]+o.hr+':'+o.qL[3]+o.hr, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]});
+      steps.push({sel:o.tcL+o.hr, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(6),{key:'Enter'}]});   // width 16 = 117px — wider than the grand total needs, and it reads the same
+      steps.push({sel:o.lc1L+o.tr+':'+o.tcL+o.tr, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
+      return steps; }` },
   /* r431 (merged drill): FREEDOM route — the junk cleared FIRST, SCRATCH A restored by RETYPING
      every value instead of undoing, and both formula repairs written as explicit additions
      rather than SUM ranges. Every core beat still clears (§1.0(c) grades the end state), and
@@ -281,26 +304,6 @@ const ALTS = [
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
     ]` },
-  { key: 'dress', name: 'op-ORDER bottom-up: outline FIRST, ☆ one-pass comma via ctrl+shift+!, masthead LAST with a double-bottom rule (tightened CHECK1 accepts bdbl)', moves: `C => { const R=C._R; return [
-      {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
-      {sel:R.mRowRange, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
-      {sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:R.fRange, keys:[{key:'!',ctrl:true,shift:true}]},
-      {sel:R.costRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:R.segRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('b')]},
-    ]; }` },
-  { key: 'dress', name: 'chord-ROUTE: ribbon bold (alt h 1), ctrl+1 dialog comma/percent, all-borders outline (alt h b a) — commas row-by-row, ☆ forfeited, core clears', moves: `C => { const R=C._R;
-      const steps=[
-        {sel:'A1', keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('o')]},
-        {sel:R.segRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-        {sel:R.costRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      ];
-      for(let r=R.segR0;r<=R.tRow;r++) steps.push({sel:'B'+r+':E'+r, keys:[{key:'1',ctrl:true},L('n')]});   // the slow way — every row its own pass; no fmtOps rect covers the body
-      steps.push({sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
-      steps.push({sel:R.mRowRange, keys:[{key:'1',ctrl:true},L('p')]});
-      steps.push({sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('a')]});
-      return steps; }` },
   { key: 'scrub', name: 'junk deleted TOP-DOWN (shift math) + typed SUM', moves: `C => { const o=C._o;
       const rows=o.junkRows.slice().sort((a,b)=>a-b);
       const steps=rows.map((r,i)=>({sel:'A'+(r-i), keys:[{key:'Alt'},L('h'),L('d'),L('r')]}));
@@ -1031,11 +1034,6 @@ const ALTS = [
       {sel:'C4:G6', keys:[{key:'r',ctrl:true}]},
     ]` },
   // --- T-D audit pack (r173) ---
-  { key: 'wirewalk', name: 'hop up, fix, then ride the dependents back down', moves: `C => { const o=C._o;
-      const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
-      for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
-      keys.push(...T(String(o.good)),{key:'Enter'});
-      return [{sel:o.deck, keys:keys}, {sel:o.bad, keys:[{key:']',ctrl:true},{key:']',ctrl:true},{key:'Home',ctrl:true}]}]; }` },
   { key: 'wrapfix', name: 'fix the range FIRST, wrap second — F2 edit for the fix', moves: `C => { const o=C._o;
       // F2 into the broken MATCH range: caret at end; walk back over ',0))' then fix B->A twice
       return [

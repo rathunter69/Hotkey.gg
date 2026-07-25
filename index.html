@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
-<meta name="description" content="Keyboard-only Excel training: 79 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="description" content="Keyboard-only Excel training: 77 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
-<meta property="og:description" content="Keyboard-only Excel training: 79 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:description" content="Keyboard-only Excel training: 77 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
-<meta name="twitter:description" content="Keyboard-only Excel training: 79 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:description" content="Keyboard-only Excel training: 77 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 82 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
@@ -1798,9 +1798,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=289"></script>
+<script src="drills.js?v=290"></script>
 
-<script src="drills.js?v=289"></script>
+<script src="drills.js?v=290"></script>
 
 
 
@@ -3018,131 +3018,6 @@ const CHALLENGES = {
       ];
     }
   },
-  dress:{
-    /* r425 (H6b-3, DEPTH_PASS §4.18 + §1.0 on top): depth-pass rework. The pre-playtest 9-beat
-       chore list compresses to 6 core beats + the hidden efficiency ☆ + the engine-appended
-       Ctrl+S closer (§1.0(e)). JUDGMENT CALLS (documented per WORKFLOW.md §8):
-       · CUT from grading — gray header shade, superscript footnote, source italic: §1.1 caps
-         core at 6 and the spec's fix-list beats (title pair, outline, EBITDA rule) + the
-         blue/comma/percent signature outrank them. The header band ships BOLD from build()
-         (the analyst typed it) and the source line ships pre-italicized (the cite convention
-         stays VISIBLE on the board; win state stays sendable) — the footnote ¹ is gone.
-       · The spec page's "☆ Italicize the source line" is a formatting ☆ — dead under §1.0(d)
-         (§1.0 wins on conflict, DEPTH_PASS §4 header). New hidden efficiency ☆: the one-pass
-         comma discipline, graded off the r425 S.fmtOps latch (see checks()).
-       · CHECK1 tightened per the spec's fix list: bold + a BOTTOM rule exactly (double-bottom
-         counts — it IS a bottom rule; a box alone no longer clears it).
-       · "Circle the output" (copy died in H4) ships as the semantic outline beat; its ok
-         accepts perimeter flags OR per-cell all-borders per the §4.18 engine note. */
-    name:'Format tab', label:'Full formatting pass', par:41, parKeys:40, saveClose:true,   /* r425: par re-swept post-rework — sweep median 40 keys ×5 seeds (9 beats → 6 + ☆ + closer), par 41 ≈ house ~1.03 s/key; mirrored in HOTKEY_PARS */
-    aha:'a number format is a block property, and typed and computed cells change register together.',
-    prompt:'The analysis is finished and the numbers tie — the page just doesn’t read yet. Take it to book standard: a masthead up top, the input convention in blue, real number formats on the body, and rules on the two lines a reader actually takes away — the EBITDA line and the margin row underneath it. Every item grades the look, not the route; the clock prices the difference.',
-    req(){ const R=this._R; return '<em>A1</em> <em>ctrl+b</em> + <em>alt h b o</em> · blue '+R.segRange+' + '+R.costRange+' <em>alt h f c</em> · commas '+R.fRange+' <em>alt h k</em> · EBITDA row <em>ctrl+b</em> + <em>alt h b p</em> · margins '+R.mRowRange+' <em>ctrl+shift+%</em> +1 dec · outline <em>A'+R.mRow+':E'+R.mRow+'</em> <em>alt h b s</em> · <em>ctrl+s</em>'; },
-    /* §1.0(b): check labels are OUTCOME lines — the route lives HERE, per line, chords allowed. */
-    guide(){ const R=this._R; return [
-      'the masthead first — on <em>A1</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>o</kbd> — bold, with the rule underneath',
-      'blue = typed, black = computed: select the segment revenues <em>'+R.segRange+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 Blue · <kbd>↵</kbd> · then the Costs line <em>'+R.costRange+'</em> the same way — the Revenue and EBITDA lines stay black, they’re wired',
-      'commas on the whole build — select <em>'+R.fRange+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> — thousands separators land on typed and computed alike; negatives flip to (parens)',
-      'the total earns its line — select <em>A'+R.tRow+':E'+R.tRow+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — bold, ruled on TOP, never underneath',
-      'the margins — select <em>'+R.mRowRange+'</em> · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> — percent, one decimal',
-      'the output ships boxed — select <em>A'+R.mRow+':E'+R.mRow+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — one perimeter around the row the MD reads',
-      '☆ the discovery: the comma pass is ONE selection — the whole dollar body <em>'+R.fRange+'</em>, one chord; a number format doesn’t care whether a cell is typed or wired',
-    ]; },
-    targets(){ const R=this._R; return ['A1', R.hardBox, R.fRange, 'A'+R.tRow+':E'+R.tRow, R.mRowRange, 'A'+R.mRow+':E'+R.mRow, R.fRange]; },
-    demo(){ const R=this._R;
-      return [
-        {sel:'A1', keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('o')]},
-        {sel:R.segRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
-        {sel:R.costRange, keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
-        {sel:R.fRange, keys:[{key:'Alt'}, L('h'), L('k')]},   /* ONE pass over the whole body — the ☆ latch fires here (§2.2: demo performs the bonus) */
-        {sel:'A'+R.tRow+':E'+R.tRow, keys:[Kb.bold, {key:'Alt'}, L('h'), L('b'), L('p')]},
-        {sel:R.mRowRange, keys:[Kb.pct, {key:'Alt'}, L('h'), D(0)]},
-        {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'}, L('h'), L('b'), L('s')]},   /* the finish-state beat — the engine appends the Ctrl+S closer */
-      ]; },
-    build(){
-      const cells={};
-      /* r425 randomization (§1.2, ≥2 axes): (a) SITE JITTER d∈{0,1} slides the whole table down
-         a row (plus nSeg 3–4 moving every row below the segments); (b) CONTENT POOLS — segment
-         names Fisher-Yates-drawn from a 6-name pool + codename() + year base; (c) VALUES all
-         through rnd(). Single-island board — no inter-island moats to prove. */
-      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
-      const d=rnd(0,1), hr=3+d;
-      cells['A1']={...blankCell(),value:codename()+' — Segment margins ($000s)',txt:true};   // ships UNDRESSED — beat 1 is the masthead
-      const y0=24+rnd(0,1);
-      cells['A'+hr]={...blankCell(),value:'Item',txt:true,bold:true};   // header band ships BOLD from build() — the shade beat died in the r425 compress (header note)
-      for(let c=2;c<=5;c++) cells[colLetter(c)+hr]={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true,align:'r'};
-      const nSeg=3+rnd(0,1);
-      const segs=shuffle(['Freight','Brokerage','Warehousing','Intermodal','Last-mile','Dedicated']).slice(0,nSeg);
-      const segR0=hr+1, segR1=hr+nSeg;
-      for(let i2=0;i2<nSeg;i2++){ const rr=segR0+i2; cells['A'+rr]={...blankCell(),value:segs[i2]+' revenue',txt:true};
-        for(let c=2;c<=5;c++) cells[colLetter(c)+rr]={...blankCell(),value:rnd(80,400)*5}; }
-      const revRow=segR1+1;   // Revenue subtotal — the denominator, spelled out so the margin is legible
-      cells['A'+revRow]={...blankCell(),value:'Revenue',txt:true,bold:true};
-      for(let c=2;c<=5;c++){ const L2=colLetter(c);
-        let tot=0; for(let rr=segR0;rr<=segR1;rr++) tot+=cells[L2+rr].value;
-        cells[L2+revRow]={...blankCell(),formula:'=SUM('+L2+segR0+':'+L2+segR1+')',value:tot}; }
-      const cRow=revRow+1; cells['A'+cRow]={...blankCell(),value:'Costs',txt:true};   // hardcoded input, sized off revenue so the margin lands realistic
-      for(let c=2;c<=5;c++){ const L2=colLetter(c); const rev=cells[L2+revRow].value; const cp=rnd(58,80)/100;
-        cells[L2+cRow]={...blankCell(),value:-Math.round(rev*cp/5)*5}; }
-      const tRow=cRow+1, mRow=cRow+2;
-      cells['A'+tRow]={...blankCell(),value:'EBITDA',txt:true,bold:true};   // Revenue less costs — the figures B:E are the player's bold+rule beat
-      for(let c=2;c<=5;c++){ const L2=colLetter(c);
-        cells[L2+tRow]={...blankCell(),formula:'='+L2+revRow+'+'+L2+cRow,value:cells[L2+revRow].value+cells[L2+cRow].value}; }
-      cells['A'+mRow]={...blankCell(),value:'EBITDA margin',txt:true};
-      for(let c=2;c<=5;c++){ const L2=colLetter(c);
-        cells[L2+mRow]={...blankCell(),formula:'='+L2+tRow+'/'+L2+revRow,value:cells[L2+tRow].value/cells[L2+revRow].value, decimals:4}; }   // EBITDA / Revenue — clear numerator and denominator
-      const srcRow=mRow+2;
-      cells['A'+srcRow]={...blankCell(),value:'Source: company filings, figures unaudited',txt:true,it:true};   // ships PRE-italicized — the cite convention stays visible; grading it died in the r425 compress
-      this._R={ segR0:segR0, segR1:segR1, revRow:revRow, costRow:cRow, tRow:tRow, mRow:mRow, srcRow:srcRow,
-                segRange:'B'+segR0+':E'+segR1, costRange:'B'+cRow+':E'+cRow, mRowRange:'B'+mRow+':E'+mRow,
-                fRange:'B'+segR0+':E'+tRow, hardBox:'B'+segR0+':E'+cRow };
-      // columns wide enough for comma@2 with 4-digit paren negatives — "(6,400.00)" — no mid-drill resizing
-      return {ROWS:srcRow, cells, active:{r:1,c:1}, sel:null, colW:{1:170,2:106,3:106,4:106,5:106}};
-    },
-    checks(S){
-      const R=this._R;
-      const cel=k=>S.cells[k]||{};
-      /* CHECK1 tightened (§4.18 fix list): the EXACT pair the label names — bold + a bottom
-         rule. Alt H B B's double-bottom is still a bottom rule and grades; a box alone
-         (ball, no bottom flag) no longer does. */
-      const a1=cel('A1');
-      const titleOk=!!(a1.bold&&(a1.bb||a1.bdbl));
-      // blue on the typed hardcodes only — segment revenues + the Costs line; Revenue & EBITDA are computed, stay black
-      let blueOk=true;
-      for(let c=2;c<=5;c++){ const L2=colLetter(c);
-        for(let rr=R.segR0;rr<=R.segR1;rr++){ if(cel(L2+rr).fontColor!=='blue') blueOk=false; }
-        if(cel(L2+R.costRow).fontColor!=='blue') blueOk=false; }
-      // comma on every dollar figure — segment revenues, Revenue subtotal, Costs, EBITDA (any decimals; §1.0(c) any route)
-      let comOk=true;
-      for(let c=2;c<=5;c++){ const L2=colLetter(c);
-        for(let rr=R.segR0;rr<=R.tRow;rr++){ if(cel(L2+rr).fmtStyle!=='comma') comOk=false; } }
-      const ebOk=(()=>{ for(let c=1;c<=5;c++){ const x=cel(colLetter(c)+R.tRow); if(!x.bold||!x.bt) return false; } return true; })();
-      let pctOk=true;
-      for(let c=2;c<=5;c++){ const m=cel(colLetter(c)+R.mRow); if(m.fmtStyle!=='percent'||m.decimals!==1) pctOk=false; }
-      /* outline — §4.18 engine note (Freedom Doctrine): perimeter flags (Alt H B S / a
-         per-edge border walk) OR the all-borders route (Alt H B A paints ball per cell —
-         a gridded row still wears the full perimeter). */
-      const edge=(x,f)=>!!(x[f]||x.ball);
-      const circleOk=(()=>{ if(!edge(cel('A'+R.mRow),'bl')||!edge(cel('E'+R.mRow),'br')) return false;
-        for(let c2=1;c2<=5;c2++){ const x=cel(colLetter(c2)+R.mRow); if(!edge(x,'bt')||!edge(x,'bb')) return false; } return true; })();
-      /* ☆ recipe (§1.0(d) mystery slot) — ONE-PASS number-format discipline: S.fmtOps (the
-         r425 comma latch — Alt H K, Ctrl+Shift+!, Ctrl+1 N all record their selection rect)
-         must show a single comma application whose selection covered the ENTIRE dollar body
-         (superset fine — a whole-column sweep counts). Row-by-row commas clear the core beat
-         identically (§1.0(c)); only the one-selection pass reveals the star. */
-      const starOk=comOk && (S.fmtOps||[]).some(op=>op.kind==='comma' && op.r1<=R.segR0 && op.r2>=R.tRow && op.c1<=2 && op.c2>=5);
-      return [
-        {label:'Bold the title and add a bottom border under it', ok:titleOk},
-        {label:'Color the hardcoded inputs blue — the typed figures, never the computed lines', ok:blueOk},
-        {label:'Comma-format the dollar figures — the computed lines take them too', ok:comOk},
-        {label:'Bold the EBITDA line and add a top border above it', ok:ebOk},
-        {label:'Percent-format the EBITDA margin row — one decimal', ok:pctOk},
-        {label:'Add an outside border around the EBITDA margin row', ok:circleOk},
-        {label:'Comma-format the whole dollar body in one pass', ok:starOk, bonus:true},
-      ];
-    }
-  },
-
   margin:{
     name:'Formula', label:'Margins across the page', par:23, parKeys:21,
     aha:'Point the divide, Ctrl+D fills it down, Ctrl+Shift+% dresses it — a margin column in three chords.',
@@ -4390,48 +4265,203 @@ const CHALLENGES = {
     }
   },
   autofit:{
-    name:'Autofit', label:'Fix the squeezed columns', par:15, parKeys:12,
-    aha:'Alt H O I autofits to content; a print block wants ONE width — set it with Alt H O W.',
-    prompt:'Two width problems, two different fixes. The label block is squeezed to #### — autofit it to its contents. The four data columns are uneven widths, and autofit would keep them uneven — select across them and set one uniform width of 12. Autofit is for content; a uniform width is for print.',
-    req(){ const o=this._o; return 'select <em>'+o.a1+':'+o.a2+'</em> \u00b7 <em>alt h o i</em> \u2014 fit to content \u00b7 then <em>'+o.uRng+'</em> \u00b7 <em>alt h o w</em> \u2192 <em>12</em> <em>\u21b5</em> \u2014 ONE width across the print block'; },
+    /* r432 H6b-3 (DEPTH_PASS §4.14 + the §1.0 / §1.0-R2 law + the r429–r431 round-3 rules):
+       the depth-pass rework. The old board was two unrelated corner blocks and two beats; this
+       one is a single print page whose beats CHAIN (§1.1): fit the labels → one width across
+       the quarter block → total the quarters → the totals you just made overflow → dress the
+       Total row → save. The aha lands on beat 4, exactly where the §4.14 page relocates it.
+
+       ---- the r430/r431 width-engine reality this board is designed around ----
+       (a) render()'s #### test now reasons in UNSCALED px (colW), and overflowsCol() prefers
+           S._colW, so the two finally agree: what the player SEES is what grades. Every width
+           predicate below reads S._colW.
+       (b) number-format ops AUTO-GROW a column to fit their new content (grow only). So
+           "comma-format it, then autofit" is dead as a beat — #### can now only come from a
+           column that was HAND-NARROWED or seeded narrow. Both planted defects here are seeded
+           widths: the two label columns at 44/40px, and the four quarter columns at a rotating
+           ragged [46,118,62,96]. The Total column ships at 52px and EMPTY — its #### is
+           manufactured by the player's own SUMs in beat 3, which is the point of beat 4.
+       (c) the r333 elastic scaler leaves this drill alone (__noShrink is detected off the
+           overflowsCol/#### tokens in checks()), so the SOLVED sheet has to fit the frame
+           unscaled. It does: 163 + 94 + 4×89 + 94 + thin gutters ≈ 780px against ~822px of
+           grid. That budget is why the title in the label column is SHORT (a long masthead
+           autofits that column to the 220px neededWidth clamp and pushes the sheet past the
+           frame) and why the value pools are pinned — see the magnitude note in build().
+
+       ---- structural deviations from the §4.14 page (§0: make the call, name it) ----
+       (1) ☆ RE-CUT. The page's bonus ("set the title bold and autofit the label column") is a
+           FORMATTING task, which §1.0(d) outlaws catalog-wide. Replaced with the §1.0(d)
+           exemplar move this board actually contains: ONE anchored SUM filled down the whole
+           Total column instead of a formula typed on every line. Skippable and never automatic
+           (§1.0-R2(i)) — typing them out clears every core beat, and ALT 1 in
+           dev/e2e-alt-paths.js is exactly that run, 163 keys against the demo's 33 — which is
+           also the size of the discovery. Graded off the existing S.fillOps latch.
+           CONSIDERED AND REJECTED: "one autofit selection fits every squeezed column in a
+           single pass." It reads well but it fights this board three ways. It can only work
+           AFTER the totals exist (an empty Total column has nothing to fit), so it forces an
+           order inversion — and r365's standard-start opens the cursor on demo[0].sel, which
+           would then park the player in the Total column while checklist line 1 points at the
+           labels, half-spoiling a bonus that is supposed to be hidden. Worse, a pass wide
+           enough to cover the Total column also covers the quarter block, so running it after
+           beat 2 silently UN-TICKS beat 2 (autofit ≠ a uniform 12). A bonus that can retract a
+           completed core beat is a trap, not a discovery.
+       (2) The page's Random line ("label-block site {A1,F1} + data-block row rnd") describes
+           the retired two-block board. Its axes carry over onto the single schedule: block
+           anchor column {A,B} — which IS the page's "which column the SUM lands in" axis, since
+           the Total column rides the anchor to G or H — header row {3,4}, the ragged-width
+           rotation (which quarter columns load showing #### varies), and the label/coverage
+           pools plus every figure through rnd().
+       (3) No cueCell() on this board. The r430 cue primitive is for targets a green outline
+           cannot express (an insert point between two rows, an empty paste destination); every
+           graded target here is a labeled COLUMN block — Business line, Coverage, Q1–Q4, Total
+           — which an outline says perfectly and a header names (§1.3). A red note parked in a
+           graded column would also poison that column's own neededWidth, which is the very
+           thing being measured.
+       (4) Beat 2 is the one width beat graded to an EXACT px, because it is specifically about
+           ONE width across a print block (the r430 rule's own carve-out). Beats 1 and 4 grade
+           READABILITY, so autofit (Alt H O I) and a wide-enough typed width (Alt H O W) both
+           clear — ALT 2 in dev/e2e-alt-paths.js is the typed-width run. */
+    name:'Autofit', label:'Fix the squeezed columns', par:36, parKeys:33, saveClose:true,   /* r432: par re-swept ×5 seeds post-rework — median 33 keys, flat across seeds (save incl.; the demo's key count doesn't move with the axes). par 36 ≈ 1.09 s/key, the top of the house band: two of the six beats are a READ — which columns are ragged, and where the #### the totals just made is — before a hand moves. Mirrored in HOTKEY_PARS. */
+    aha:'#### is a width problem, not a number problem — the figure is fine, the column is too narrow.',
+    prompt:'The regional revenue page prints in the morning and nothing on it reads: the two label columns are squeezed so the business lines are cut off, the four quarter columns are four different widths, and the Total column is empty. Total the quarters, size the page so every figure reads, and give the quarter block one width across for the print. Dress the Total row once the grand figure lands, then save it down.',
+    req(){ const o=this._o; return 'labels <em>'+o.lc1L+':'+o.lc2L+'</em> · <em>alt h o i</em> · quarters <em>'+o.qL[0]+':'+o.qL[3]+'</em> · <em>alt h o w</em> → <em>12</em> <em>↵</em> · <em>=SUM()</em> down <em>'+o.tcL+'</em> · <em>alt h o i</em> · row '+o.tr+' <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels state the OUTCOME; the ROUTE lives here, one line per check,
+       chords allowed and expected (§1.9 hint ladder). */
     guide(){ const o=this._o; return [
-      'the squeezed labels: on '+o.a1+' \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 content decides',
-      'the ragged data block at '+o.uRng+' \u2014 autofit would keep it UNEVEN. Select across it \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd> \u00b7 type <kbd>12</kbd> <kbd>\u21b5</kbd> \u2014 one width, clean edge, print-ready',
+      'the <b>Business line</b> and <b>Coverage</b> columns are cut off mid-word — land in <b>Business line</b> · <kbd>⇧</kbd>+<kbd>→</kbd> takes <b>Coverage</b> with it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> sizes each one to its own longest entry',
+      '<b>Q1</b> through <b>Q4</b> are four different widths — autofit would leave them four different widths. Select across the four headers · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd> · type <kbd>12</kbd> <kbd>↵</kbd>',
+      'the <b>Total</b> column is empty: at the top of it type <kbd>=SUM(</kbd> over that line’s four quarters <kbd>↵</kbd> · select on down to the <b>Total revenue</b> row · <kbd>ctrl</kbd>+<kbd>d</kbd> carries it the rest of the way',
+      'your own totals arrived as <b>####</b> — four quarters wide, in a column sized for nothing: <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> on the <b>Total</b> column (a typed width, <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd>, reads the same if you make it wide enough)',
+      'the <b>Total revenue</b> row: select across it · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> puts the rule ABOVE the row, never under it',
+      '☆ the discovery: write the total ONCE at the top of the <b>Total</b> column, then select the whole column down to <b>Total revenue</b> and <kbd>ctrl</kbd>+<kbd>d</kbd> — one formula, ten live cells, each one pointing at its own line. Typing a formula on every line clears the drill, it just costs you about a hundred and thirty keystrokes',
     ]; },
-    targets(){ const o=this._o; return [o.a1+':'+o.a2, o.uRng]; },
+    targets(){ const o=this._o; return [
+      o.lc1L+o.hr+':'+o.lc2L+o.tr,
+      o.qL[0]+o.hr+':'+o.qL[3]+o.hr,
+      o.tcL+o.r0+':'+o.tcL+o.tr,
+      o.tcL+o.r0+':'+o.tcL+o.tr,
+      o.lc1L+o.tr+':'+o.tcL+o.tr,
+      null,
+    ]; },   /* r423 §2: the mystery ☆ is never ringed — the null slot keeps the tri-length */
+    /* the demo runs the beats IN CHECKLIST ORDER on purpose: r365's standard-start opens the
+       cursor on demo[0].sel, so the drill has to open where checklist line 1 points. */
     demo(){ const o=this._o; return [
-      {sel:o.a1, keys:[{key:'ArrowRight',shift:true}, Kb.alt, {key:'h'}, {key:'o'}, {key:'i'}]},
-      {sel:o.uRng, keys:[Kb.alt, {key:'h'}, {key:'o'}, {key:'w'}, {key:'1'}, {key:'2'}, Kb.enter]},
-    ]; },
+      {sel:o.lc1L+o.hr+':'+o.lc2L+o.hr, keys:[Kb.alt, L('h'), L('o'), L('i')]},
+      {sel:o.qL[0]+o.hr+':'+o.qL[3]+o.hr, keys:[Kb.alt, L('h'), L('o'), L('w'), D(1), D(2), Kb.enter]},
+      {sel:o.tcL+o.r0, keys:[...T('=SUM('+o.qL[0]+o.r0+':'+o.qL[3]+o.r0+')'), Kb.enter]},
+      {sel:o.tcL+o.r0+':'+o.tcL+o.tr, keys:[Kb.fillD]},                                                  // one fill lands nine line totals AND the grand — the ☆ (§2.2: the demo performs the bonus)
+      {sel:o.tcL+o.hr, keys:[Kb.alt, L('h'), L('o'), L('i')]},                                           // the consequence beat: the figures the fill just made overflow
+      {sel:o.lc1L+o.tr+':'+o.tcL+o.tr, keys:[Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},                  // §1.0(a): the dress rides directly behind the figure it dresses
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const LBLS=['Consolidated revenue','Adjusted EBITDA build','Working capital detail','Precedent transactions'];
-      const CO=['Northwind Industrial','Cascade Materials','Ironline Logistics','Halcyon Health'];
-      this._rot=rnd(0,3);
-      // block A: squeezed label pair (autofit is RIGHT here)
-      const aSpots=[[1,1],[1,6]]; const A=aSpots[rnd(0,1)];
-      cells[colLetter(A[0])+A[1]]={...blankCell(),value:LBLS[rnd(0,3)],txt:true,bold:true};
-      cells[colLetter(A[0]+1)+A[1]]={...blankCell(),value:'FY202'+rnd(4,8)+'E',txt:true,bold:true};
-      for(let i=1;i<=3;i++){ cells[colLetter(A[0])+(A[1]+i)]={...blankCell(),value:CO[(i-1+this._rot)%4],txt:true};
-        cells[colLetter(A[0]+1)+(A[1]+i)]={...blankCell(),value:rnd(100,999)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      // block B: 4 ragged data columns (uniform width is RIGHT here)
-      const u0=5, uR=rnd(2,4);
-      ['Q1','Q2','Q3','Q4'].forEach((q,i)=>cells[colLetter(u0+i)+uR]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
-      for(let i=0;i<4;i++) for(let j=1;j<=3;j++)
-        cells[colLetter(u0+i)+(uR+j)]={...blankCell(),value:rnd(10,99)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-      const colw={}; [A[0],A[0]+1].forEach(c=>colw[c]=44);
-      const rag=[44,118,62,96]; for(let i=0;i<4;i++) colw[u0+i]=rag[(i+this._rot)%4];
-      this._o={ a1:colLetter(A[0])+A[1], a2:colLetter(A[0]+1)+A[1], ac:[A[0],A[0]+1],
-        uRng:colLetter(u0)+uR+':'+colLetter(u0+3)+uR, uc:[u0,u0+1,u0+2,u0+3] };
-      return {ROWS:10, cells, active:{r:A[1],c:A[0]}, sel:null, colW:colw};
+      /* ---- axes (§1.2 wants ≥2; four here) ----
+         1. block anchor column c0 ∈ {A,B} — site jitter that also moves the Total column
+            between G and H (the §4.14 "which column the SUM lands in" axis);
+         2. header row hr ∈ {3,4} — corner jitter down;
+         3. ragged-width rotation — WHICH quarter columns load showing #### changes per seed;
+         4. content pools (business lines, coverage names, codename) + every figure via rnd(). */
+      const c0=1+rnd(0,1);
+      const hr=3+rnd(0,1);
+      const lc1=c0, lc2=c0+1, qc=[c0+2,c0+3,c0+4,c0+5], tc=c0+6;
+      const L1=colLetter(lc1), L2=colLetter(lc2), qL=qc.map(colLetter), tcL=colLetter(tc);
+      const r0=hr+1, rN=hr+9, tr=hr+10;   // nine business lines, then the Total row
+      /* MAGNITUDES ARE LOAD-BEARING — do not widen the pool without redoing this arithmetic.
+         Quarter figures 55,000–111,000 across 9 lines keep every COLUMN total ≤ 999,000: seven
+         characters, 72px, so the print block genuinely fits inside its uniform width of 12
+         (89px) and beat 2 never fights beat 4. The GRAND total (≥1,980,000 — nine characters,
+         89px) sits in the Total column, which is sized on its own, and always exceeds the 78px
+         a default-width column gives you: that is what keeps beat 4 real even for a player who
+         autofits that column early, before the figures exist. */
+      const LINES=['Advisory','Equity research','Prime brokerage','Rates trading','Credit sales',
+        'Wealth advisory','Asset servicing','Public finance','Structured credit','Securitization',
+        'Municipal desk','Private capital'];
+      const COV=['Kavanagh','Okonkwo','Delacroix','Whitfield','Ferrante','Nakamura',
+        'Baptiste','Lindqvist','Oyelaran','Marchetti','Havlicek','Sandoval'];
+      for(let k=LINES.length-1;k>0;k--){ const j=rnd(0,k); [LINES[k],LINES[j]]=[LINES[j],LINES[k]]; }
+      for(let k=COV.length-1;k>0;k--){ const j=rnd(0,k); [COV[k],COV[j]]=[COV[j],COV[k]]; }
+      /* title + units note, both short and both in the label column on purpose: neededWidth()
+         reads the WHOLE column, so a long masthead here would autofit the label column to the
+         220px clamp and push the solved sheet past the frame (see the header note (c)). */
+      cells[L1+'1']={...blankCell(),value:codename(),txt:true,bold:true};
+      cells[L1+'2']={...blankCell(),value:'US$ in thousands',txt:true,it:true,fontColor:'gray'};
+      // header row — every graded target names itself on the board (§1.3 labeled targets)
+      cells[L1+hr]={...blankCell(),value:'Business line',txt:true,bold:true};
+      cells[L2+hr]={...blankCell(),value:'Coverage',txt:true,bold:true};
+      qL.forEach((Lc,i)=>cells[Lc+hr]={...blankCell(),value:'Q'+(i+1),txt:true,bold:true,align:'r'});
+      cells[tcL+hr]={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
+      /* the nine lines: typed figures wear blue (the house colour code), and the Total column
+         ships EMPTY but already comma-formatted — the column is set up, the figures are the
+         work. Pre-formatting it also fixes the width arithmetic above: the totals arrive with
+         their thousands separators, so the overflow is deterministic every seed. */
+      const vals=[], rows=[];
+      for(let i=0;i<9;i++){ const r=r0+i;
+        cells[L1+r]={...blankCell(),value:LINES[i],txt:true};
+        cells[L2+r]={...blankCell(),value:COV[i],txt:true};
+        const row=[];
+        qL.forEach(Lc=>{ const v=rnd(55,111)*1000; row.push(v);
+          cells[Lc+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; });
+        vals.push(row);
+        cells[tcL+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+        rows.push({r:r, sum:row.reduce((s,v)=>s+v,0)});
+      }
+      /* the Total row ships LIVE across the quarters and UNDRESSED — no bold, no rule: beat 5
+         is the dress, and §1.0(f) puts that rule ABOVE the row, never underneath it */
+      cells[L1+tr]={...blankCell(),value:'Total revenue',txt:true};
+      qL.forEach((Lc,j)=>{ const colSum=vals.reduce((s,row)=>s+row[j],0);
+        cells[Lc+tr]={...blankCell(),formula:'=SUM('+Lc+r0+':'+Lc+rN+')',value:colSum,fmtStyle:'comma',decimals:0}; });
+      cells[tcL+tr]={...blankCell(),fmtStyle:'comma',decimals:0};
+      rows.push({r:tr, sum:vals.reduce((s,row)=>s+row.reduce((x,v)=>x+v,0),0)});
+      /* ---- THE PLANTED DEFECTS, all of them seeded WIDTHS (header note (b)) ----
+         the label pair hand-narrowed to 44/40px, so both label columns clip mid-word;
+         the quarter block ragged and rotated per seed — 46 and 62 cannot hold a six-figure
+         number, 96 and 118 can, which is exactly the "autofit would leave them uneven" read;
+         the Total column at 52px is empty on arrival and only breaks once the player fills it.
+         Unused gutters ship thin so the solved sheet still fits the frame unscaled. */
+      const colw={}; for(let c=1;c<=10;c++) colw[c]=24;
+      colw[lc1]=44; colw[lc2]=40;
+      const RAG=[46,118,62,96], rot=rnd(0,3);
+      qc.forEach((c,i)=>colw[c]=RAG[(i+rot)%4]);
+      colw[tc]=52;
+      this._o={ c0, hr, r0, rN, tr, lc1, lc2, qc, tc,
+        lc1L:L1, lc2L:L2, qL:qL, tcL:tcL, rows:rows, vals:vals, lines:LINES.slice(0,9) };
+      return {ROWS:tr+1, cells, active:{r:hr,c:lc1}, sel:null, colW:colw};
     },
     checks(S){
-      const w=S._colW||{};
-      const fit=c=>(w[c]||0)>=neededWidth(c)-1;
-      const uW=Math.round(12*7)+5;
+      const o=this._o, w=S._colW||{};
+      const cel=k=>S.cells[k]||{};
+      /* §1.0(c) FREEDOM — every core beat grades the END STATE, never the route:
+         · the READABILITY beats (1 and 4) take an autofit OR any typed width that clears the
+           content, measured against the engine's own neededWidth() / overflowsCol();
+         · the total beat takes =SUM, an addition chain or autosum, filled or typed row by row;
+         · the dress beat takes any selection shape and any border route. */
+      const fitsCol=c=>(w[c]||0)>=neededWidth(c)-1;
+      const UW=Math.round(12*7)+5;   // Excel width 12 in px — applyColWidth's own conversion
+      const lblOk=[o.lc1,o.lc2].every(fitsCol);
+      const uniOk=o.qc.every(c=>(w[c]||0)===UW);
+      const totalsIn=o.rows.every(x=>{ const c=cel(o.tcL+x.r);
+        return !!(c.formula && sumishF(c.formula) && typeof c.value==='number' && Math.abs(c.value-x.sum)<0.5); });
+      /* beat 4 is GATED on the totals being in: an empty column overflows nothing, so without
+         the gate the beat would tick itself the moment the drill loaded */
+      const totFitOk=totalsIn && !overflowsCol(S,o.tc);
+      const trCells=[o.lc1L+o.tr].concat(o.qL.map(x=>x+o.tr), [o.tcL+o.tr]);
+      const dressOk=totalsIn && trCells.every(k=>{ const c=cel(k);
+        return !!c.bold && !!c.bt && !c.bb && !c.bdbl; });
+      /* ☆ recipe (§1.0(d) hidden efficiency, §1.0-R2(i) skippable): ONE anchored SUM, filled
+         DOWN the Total column, instead of a formula typed on every line — the fill has to cover
+         the whole run of business lines in a single op. Read off the r424 S.fillOps latch (the
+         mechanic, recorded at the fill; never geometry-inferred). Typing them out line by line
+         clears every core beat (§1.0(c)) — ALT 1 in dev/e2e-alt-paths.js is that run, and the
+         163 keys it spends against the demo's 33 are the size of the discovery. */
+      const starOk=totalsIn && (S.fillOps||[]).some(f=>f.dir==='down'
+        && f.c1<=o.tc && f.c2>=o.tc && f.r1<=o.r0+1 && f.r2>=o.rN);
       return [
-        {label:'fit the squeezed label pair to its CONTENT \u2014 autofit', ok: this._o.ac.every(fit)},
-        {label:'set the four data columns to ONE width of 12: uniform beats autofit for print', ok: this._o.uc.every(c=>(w[c]||0)===uW)},
+        {label:'Autofit the squeezed label columns — Business line and Coverage', ok: lblOk},
+        {label:'Set the four quarter columns to one width of 12', ok: uniOk},
+        {label:'Total the four quarters in the Total column — every business line and the Total row', ok: totalsIn},
+        {label:'Autofit the Total column — the totals are landing as ####', ok: totFitOk},
+        {label:'Bold the Total revenue row and add a top border above it', ok: dressOk},
+        {label:'Fill the Total column from one formula — a single pass down the column', ok: starOk, bonus:true},
       ];
     }
   },
@@ -7909,64 +7939,6 @@ const CHALLENGES = {
   /* r153: THE RX PACK, tranche two (STRATEGY 3.2) \u2014 the liquidity bridge and the
      covenant table. With wk13 these make "The RX desk" a real section: the three
      pages every restructuring deck actually opens with. */
-  wirewalk:{
-    name:'Trace', label:'Walk the wire', par:10, parKeys:6,
-    aha:'Ctrl+[ jumps to a formula’s source, Ctrl+] back — a wrong number is a trail, not a mystery.',
-    prompt:'The deck figure is wrong, and the VP’s note says which input to blame — three links upstream. Do not hunt by eye: trace precedents to jump to a formula’s first input, hop by hop, until you’re standing on the source. Fix it there, and ride the wire back down through the dependents while everything reprices. Auditors call it tracing; the desk calls it Tuesday.',
-    req(){ const o=this._o; return 'on <em>'+o.deck+'</em> · <em>ctrl+[</em> to the subtotal · <em>ctrl+[</em> again to the source block · fix <em>'+o.badLbl+'</em> to <em>'+o.good+'</em> · <em>ctrl+]</em> ×2 rides back down'; },
-    guide(){ const o=this._o; return [
-      'start on the summary figure '+o.deck+' · <kbd>ctrl</kbd>+<kbd>[</kbd> — you land on the subtotal it reads',
-      '<kbd>ctrl</kbd>+<kbd>[</kbd> again — now you’re at the top of the source block; the note says '+o.badLbl+' should read '+o.good,
-      'arrow to it, type <kbd>'+o.good+'</kbd> <kbd>↵</kbd> — the subtotal and the summary reprice on the spot',
-      '<kbd>ctrl</kbd>+<kbd>]</kbd> <kbd>ctrl</kbd>+<kbd>]</kbd> — ride the wire back down and watch the summary figure land right',
-    ]; },
-    targets(){ const o=this._o; return [o.bad, o.mid, o.deck]; },
-    demo(){ const o=this._o;
-      const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
-      for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
-      keys.push(...T(String(o.good)), Kb.enter, {key:'ArrowUp'}, {key:']',ctrl:true}, {key:']',ctrl:true});
-      return [{sel:o.deck, keys:keys}];
-    },
-    build(){
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — deck tie-out (one number is wrong upstream)',txt:true,bold:true};
-      const r0=rnd(4,7);
-      const pool=['Payroll','Rent','Software','T&E','Legal','Marketing'];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const labels=pool.slice(0,3);
-      const vals=[];
-      cells['A'+(r0-1)]={...blankCell(),value:'Opex detail ($000s)',txt:true,bold:true};
-      for(let i=0;i<3;i++){ const v=rnd(20,90)*10; vals.push(v);
-        cells['A'+(r0+i)]={...blankCell(),value:labels[i],txt:true};
-        cells['B'+(r0+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-      const bi=rnd(0,2), good=vals[bi];
-      const bad=good+(rnd(0,1)?1:-1)*rnd(1,9)*100;
-      cells['B'+(r0+bi)].value=bad;
-      const up=rnd(5,15)/100;
-      const sumBad=vals.reduce((a,b)=>a+b,0)-good+bad;
-      const sumGood=vals.reduce((a,b)=>a+b,0);
-      cells['D'+(r0+1)]={...blankCell(),value:'Opex subtotal',txt:true};
-      cells['E'+(r0+1)]={...blankCell(),formula:'=SUM(B'+r0+':B'+(r0+2)+')',value:sumBad,fmtStyle:'comma',decimals:0};
-      cells['G2']={...blankCell(),value:'Deck figure',txt:true,bold:true};
-      cells['H2']={...blankCell(),formula:'=E'+(r0+1)+'*(1+H3)',value:sumBad*(1+up),fmtStyle:'comma',decimals:0,bold:true};
-      cells['G3']={...blankCell(),value:'Uplift',txt:true};
-      cells['H3']={...blankCell(),value:up,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      cells['G5']={...blankCell(),value:'Note: '+labels[bi]+' should read '+good,txt:true,fontColor:'red'};
-      this._o={ deck:'H2', mid:'E'+(r0+1), bad:'B'+(r0+bi), bi:bi, badLbl:labels[bi],
-        good:good, sumGood:sumGood, deckGood:sumGood*(1+up) };
-      return {ROWS:Math.max(11,r0+4), cells, active:{r:2,c:8}, sel:null, colW:{1:104,4:104,7:210}};
-    },
-    checks(S){
-      const o=this._o;
-      const bad=S.cells[o.bad]||{};
-      const num=k=>{ const c=S.cells[k]; return (c&&typeof c.value==='number')?c.value:NaN; };
-      return [
-        {label:'fix it at the SOURCE — '+o.bad+' back to '+o.good, ok: bad.value===o.good},
-        {label:'let the wire reprice — subtotal and deck figure land right', ok: Math.abs(num(o.mid)-o.sumGood)<0.5 && Math.abs(num(o.deck)-o.deckGood)<0.5},
-        {label:'walk the wire — at least two trace jumps through the chain, no eye-hunting', ok: (S.traceN||0)>=2},
-      ];
-    }
-  },
   tieout:{
     name:'Tie-out', label:'Collapse the suspect leg', par:30, parKeys:8,
     aha:'F9 evaluates a formula IN the editor — the dead number tells you which link is stale; Esc keeps the formula live.',
@@ -10202,6 +10174,19 @@ function render(){
            reasons in UNSCALED px, exactly as the r400 zoom note says the overflow math should
            ("it reasons in pre-zoom px"). Hand-narrowing a column still yields ####, which is
            the case the engine actually wants to teach. */
+        /* r432 KNOWN ARTIFACT, recorded deliberately (found by the autofit build agent).
+           This is the MIRROR of the bug r430 fixed. __ew = colW + __per on a WIDE viewport, so
+           a column can display 30-45px wider than colW and still print #### here, because we
+           test against colW alone. The r430 bug was the same mismatch in the shrink direction.
+           The symmetric rule is max(colW, __ew) — NOT min, which the report suggested: min
+           re-selects the scaled-down width in the shrink case and reinstates the phantom ####
+           Wolf reported. But max is NOT a safe drive-by change: autofit, combo, gauntlet and
+           unhide all seed deliberately narrow columns so their "clear the ####" beats are real,
+           and on a wide viewport max() would let those columns display wide enough to suppress
+           the #### entirely — turning a graded beat into an unreachable one, which is the worse
+           failure (§1.0-R3(p)). Current behaviour errs toward showing #### when there is room:
+           cosmetic, self-correcting (the player widens, it clears), and it never strands a beat.
+           Fix it as a deliberate width-engine pass with those four drills re-swept, not here. */
         const ownW=colW[c]||COLW_DEFAULT;
         if(tw>ownW){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(__ew[c]/8))); }
       }
