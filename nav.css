@@ -59,9 +59,31 @@ body{padding-top:14px}
 .topnav-rank{font-size:9.5px; padding:5px 11px; cursor:pointer; align-items:center; margin-right:4px;
   transition:transform .12s, box-shadow .12s}
 .topnav-rank:hover{transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.3)}
-/* r423 (Wolf): the pill names rank AND bucket — "VP · top". The bucket rides quieter
-   than the tier name so the one-row nav holds. */
+/* r423 (Wolf): the pill names rank AND bucket. The bucket rides quieter than the tier
+   name so the one-row nav holds.
+   r426 (Wolf, §4d): the bucket is SPELLED OUT — "VP · top bucket". "mid" is banned.
+   Both forms ship in the markup (nav.js pillHtml) and this picks one by width.
+   MEASURED, not guessed (longest tier name "Second-Year Analyst", leaderboard.html):
+     pill width — full words 315px · single word 267px · the old r423 "· mid" 247px
+     width  1600..1320   1280   1240   1200   1160   1120   1080..900   860   820
+     full     fits        +18    +38    +58    +93   +133     fits      +67  +107
+     single   fits       fits   fits    +10    +45    +85     fits      +19   +59
+     r423     fits       fits   fits   fits    +24    +64     fits      fits  +38
+   Two things fall out. (1) The full words only clear at >=1320px, so that is the
+   breakpoint — not 1120. (2) 1120–1219 and <=860 are ALREADY over-full at r423's
+   pill: nav.css:30 turns the tool-link text labels on at 1120px, which is what eats
+   the row. Those bands are pre-existing and out of this change's scope — but the
+   single word is 20px wider than "mid", so in the worst of them the bucket text drops
+   out entirely and the emblem's division pips carry the bucket instead. The pill then
+   comes out SMALLER than the r423 baseline there, never larger. */
 .topnav-rank .pill-bk{font-style:normal; opacity:.72; letter-spacing:.02em; white-space:nowrap}
+.topnav-rank .pill-bk .bk-one{display:none}
+@media (max-width:1319px){
+  .topnav-rank .pill-bk .bk-full{display:none}
+  .topnav-rank .pill-bk .bk-one{display:inline}
+}
+@media (min-width:1120px) and (max-width:1219px){ .topnav-rank .pill-bk{display:none} }
+@media (max-width:900px){ .topnav-rank .pill-bk{display:none} }
 @media (max-width:760px){ .topnav-rank{display:none !important} }
 
 /* ---------- AUTH SLOT + USER MENU DROPDOWN ---------- */

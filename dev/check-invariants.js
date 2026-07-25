@@ -202,7 +202,7 @@ try {
    STATIC counts asserted here stay the hand-written tri-length; C9 asserts the declaration is
    present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
-  const REWORKED = ['navigation','blocksel','filldr','pastes','rowops'];   // r422 H6b-1 wave 1
+  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'dress', 'copyover', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'undo', 'modeltour'];   // r422 H6b-1 wave 1
   const idx = fs.readFileSync('index.html', 'utf8');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);
@@ -251,6 +251,42 @@ try {
   }
 } catch (e) {
   bad('C9 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C10 (r425, DEPTH_PASS §2.3 + §2.8): disclosed-error-count contract. Every drills.js
+   meta entry declaring `errorCount: N` puts the N-segment meter on the drill rail — the meter
+   fills by parsing an aggregate "(k/N)" counter label out of the live checklist (index.html
+   hkErrMeterHtml). A drill that declares N but ships no such label renders a permanently
+   empty meter; a label whose N disagrees with meta lies to the player about the count
+   (N is FIXED per drill — Wolf, 2026-07-24). Static proxy: the drill's checks() source must
+   contain the '/N' counter fragment. ---- */
+try {
+  const sb10 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sb10);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb10);
+  const meta10 = (sb10.window.HOTKEY_DRILLS || {}).meta || {};
+  const idx10 = fs.readFileSync('index.html', 'utf8');
+  const s10 = idx10.indexOf('const CHALLENGES = {');
+  const e10 = idx10.indexOf('STATE + ENGINE', s10);
+  const body10 = idx10.slice(s10, e10);
+  const parts10 = body10.split(/\n  ([a-z][a-z0-9_]*):\s*\{/);
+  const chunks10 = {};
+  for (let i = 1; i < parts10.length; i += 2) chunks10[parts10[i]] = parts10[i + 1] || '';
+  let n10 = 0;
+  for (const k of Object.keys(meta10)) {
+    if (meta10[k].errorCount == null) continue;
+    n10++;
+    const N = meta10[k].errorCount;
+    if (!Number.isInteger(N) || N < 2) bad(`C10: meta.${k}.errorCount=${N} — must be a fixed integer ≥2 (§2.3)`);
+    const chunk = chunks10[k];
+    if (!chunk) { bad(`C10: meta.${k} declares errorCount but '${k}' is not in CHALLENGES`); continue; }
+    const ci = chunk.indexOf('checks(');
+    if (ci < 0 || chunk.slice(ci).indexOf('/' + N) < 0)
+      bad(`C10: ${k} declares errorCount=${N} but checks() carries no "(k/${N})" counter label — the rail meter would never fill`);
+  }
+  if (fail === 0 || n10) ok(`drills.js: ${n10} errorCount drill(s) — counter labels match their declared N (§2.3)`);
+} catch (e) {
+  bad('C10 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }

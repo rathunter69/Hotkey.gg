@@ -168,7 +168,15 @@
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
 <link rel="stylesheet" href="nav.css?v=209">
+<script src="drills.js?v=283"></script>
+
 <script src="drills.js?v=282"></script>
+
+
+
+
+
+
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -180,7 +188,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=299"></script>
+<script src="nav.js?v=300"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -306,6 +314,18 @@ async function load(){
 
       <div class="card acc-grow" id="desk"><h4>Your desk</h4>
         <div id="deskBody"><div class="msg">loading&hellip;</div></div>
+      </div>
+    </div>
+
+    <!-- r426 (Wolf, ROUND2_FEEDBACK §4b): RANKED lives here now. The leaderboard's
+         your-card bottom slot became the rank+rating standing block, so the leave-ranked
+         action needed a permanent home rather than disappearing with the button it rode
+         on. Entering ranked stays where it belongs (the leaderboard's unlock card); this
+         card owns the STATUS + the exit. -->
+    <div class="acc-row">
+      <div class="card acc-grow" id="ranked"><h4>Ranked</h4>
+        <div id="rankedBody"><div class="msg">loading&hellip;</div></div>
+        <div class="msg" id="rankedMsg"></div>
       </div>
     </div>
 
@@ -462,6 +482,7 @@ async function load(){
     if(m.includes('DESK_NOT_FOUND'))    return 'That invite code isn\u2019t valid.';
     if(m.includes('DESK_FULL'))         return 'That desk is full (200).';
     if(m.includes('DESK_RATE_LIMIT'))   return 'One desk per day \u2014 try again tomorrow.';
+    if(m.includes('PRO_REQUIRED'))      return 'Starting a desk is a PRO feature \u2014 joining one is free.';   /* r426 \u00a7 4e */
     if(m.includes('NOT_CAPTAIN'))       return 'Only the staffer can do that.';   // r138: product word is STAFFER (schema role stays captain)
     if(m.includes('ASSIGN_CAP'))        return 'Three live assignments max — clear one first.';
     if(m.includes('duplicate key'))     return 'A desk with that name already exists.';
@@ -576,16 +597,30 @@ async function load(){
         el.innerHTML = `<div style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.7">Desks need a full account \u2014 set an email &amp; password in the Profile card above and your progress comes with you.</div>`;
         return;
       }
-      el.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      /* r426 (Wolf, ROUND2_FEEDBACK \u00a74e): DESK CREATION IS A PRO FEATURE, locked to free
+         accounts. The UI gate is the courtesy; the RPC gate is the guard (see
+         supabase/migrations/20260725100000_desk_create_pro.sql \u2014 create_desk raises
+         PRO_REQUIRED unless my_pro()). JOINING a desk stays free for everyone: the paywall
+         is on founding a desk, not on being on one. */
+      const __proDesk = window.hkDeskCreatePro ? await window.hkDeskCreatePro() : false;
+      const createRow = __proDesk
+        ? `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <input id="deskName" maxlength="40" placeholder="desk name \u2014 e.g. Wharton UG Finance" style="flex:1;min-width:200px">
           <label style="font-size:11px;display:flex;align-items:center;gap:5px;color:var(--muted)"><input type="checkbox" id="deskPriv"> private</label>
-          <button class="btn" id="deskCreate" style="margin:0">Start a desk</button></div>
-        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+          <button class="btn" id="deskCreate" style="margin:0">Start a desk</button></div>`
+        : `<div id="deskProGate" style="border:1px solid var(--accent-dim);border-radius:10px;padding:12px 14px;background:var(--surface2)">
+          <div style="font-family:var(--mono);font-size:12.5px;color:var(--text)"><b style="color:var(--warn)">\u25c6 PRO</b> \u2014 starting a desk</div>
+          <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.7">Founding a desk \u2014 your own hall, roster, quests and boards \u2014 comes with PRO. Joining one is free: use an invite code below, or apply to a public desk.</div>
+          <button class="btn" id="deskProBtn" style="margin:10px 0 0">See what comes with PRO</button></div>`;
+      el.innerHTML = createRow+
+        `<div style="display:flex;gap:8px;margin-top:10px;align-items:center">
           <input id="deskCode" maxlength="12" placeholder="have an invite code?" style="width:180px">
           <button class="btn ghost" id="deskJoin" style="margin:0">Join</button></div>
         <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px">No code? <a href="desks.html" style="color:var(--accent)">Browse the guild board</a> and apply to a public desk.</div>
         <div class="msg" id="deskMsg"></div>`;
-      document.getElementById('deskCreate').onclick=async()=>{
+      { const pg=document.getElementById('deskProBtn');
+        if(pg) pg.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Starting a desk'); }; }
+      if(document.getElementById('deskCreate')) document.getElementById('deskCreate').onclick=async()=>{
         const n=document.getElementById('deskName').value.trim();
         if(n.length<3){ say('deskMsg','Give the desk a real name (3+ characters).',true); return; }
         if(window.hkNameOk && !window.hkNameOk(n)){ say('deskMsg','That name won\u2019t fly \u2014 pick something you\u2019d put on a resume.',true); return; }
@@ -601,6 +636,33 @@ async function load(){
     }
   }
   renderDesk();
+  /* ---- r426 (Wolf, ROUND2_FEEDBACK §4b): RANKED status + the relocated LEAVE control.
+     The leaderboard's your-card bottom slot is now the rank+rating standing block, so the
+     leave-ranked action lives here. Entering ranked keeps its home on the leaderboard
+     (the unlock card explains the ladder first) — this card links there rather than
+     duplicating the flow. Leaving is a GLOBAL act: nav.js hkLeaveRanked writes the
+     explicit '0' the r358 hydrate rules refuse to resurrect and pushes to the account. ---- */
+  function renderRanked(){
+    const el=document.getElementById('rankedBody'); if(!el) return;
+    const on = window.hkIsRanked ? window.hkIsRanked() : false;
+    if(on){
+      el.innerHTML = `<div class="rowline"><span class="k">status</span><b style="color:var(--accent)">in ranked</b></div>
+        <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.7">Your rank, bucket and rating show on the leaderboard and your player card. Leaving hides them everywhere and stops your times counting toward a tier — your runs, PBs and boards are untouched, and you can re-enter any time.</div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><a class="btn" style="margin:0" href="leaderboard.html">Your standing &rarr;</a><button class="btn ghost" id="rankedLeave" style="margin:0;margin-left:auto">Leave ranked</button></div>`;
+      const lv=document.getElementById('rankedLeave'); let armed=false;
+      if(lv) lv.onclick=()=>{
+        if(!armed){ armed=true; lv.classList.add('danger'); lv.textContent='Really leave? click again';
+          say('rankedMsg','Leaving pulls you off the ladder on every device signed into this account.', true);
+          setTimeout(()=>{ armed=false; lv.classList.remove('danger'); lv.textContent='Leave ranked'; say('rankedMsg',''); }, 3500); return; }
+        try{ window.hkLeaveRanked && window.hkLeaveRanked(); }catch(e){}
+        say('rankedMsg','You’ve left ranked.'); renderRanked(); };
+    } else {
+      el.innerHTML = `<div class="rowline"><span class="k">status</span><span style="color:var(--muted)">not in ranked</span></div>
+        <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.7">You&rsquo;re off the ladder — no tier, no bucket, no rating. Ranked opens from the leaderboard, which walks you through placements first.</div>
+        <div style="margin-top:14px"><a class="btn" style="margin:0" href="leaderboard.html">Open the leaderboard &rarr;</a></div>`;
+    }
+  }
+  renderRanked();
   // r122 SCHOOL TAG (v1.5): derived server-side from the auth email — the domain IS
   // the verification. r252 (T-Q School Flair Phase 1): the derived tag now seeds a
   // full colored-monogram picker (curated ~100 + "Other"). The .edu match only

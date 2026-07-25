@@ -107,6 +107,38 @@
   .ach-pick .rr{font-family:var(--mono); font-size:7px; letter-spacing:.09em; font-weight:700;
     padding:0 4px; border-radius:6px; border:1px solid currentColor; opacity:.92; margin-top:1px}
   .ach-hint{font-family:var(--mono); font-size:11px; color:var(--muted); margin:2px 0 8px}
+  /* r426 (Wolf §4b): the BY-TYPE wall — one labeled section per achievement category,
+     cells running common → mythic inside it so the ladder reads left to right. */
+  .ach-cat{margin:0 0 6px}
+  .ach-cat-h{display:flex; align-items:baseline; gap:10px; font-family:var(--mono); font-size:10.5px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:14px 0 2px;
+    padding-bottom:5px; border-bottom:1px solid var(--line)}
+  .ach-cat-h span{margin-left:auto; color:var(--faint); letter-spacing:.06em}
+  .ach-cat-g{margin:8px 0 4px}
+  /* r426 (Wolf §4b): CERTIFICATION PATHS — the checklist that fills the gap under the
+     streak/card area. Complete paths wear the accent + congrats line; incomplete ones
+     name the next drill and link into it. */
+  .certpaths{display:grid; grid-template-columns:1fr; gap:8px; margin-bottom:6px}
+  .cp{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 16px 13px}
+  .cp-h{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; font-family:var(--mono)}
+  .cp-tick{width:16px; height:16px; flex:none; border-radius:50%; border:1px solid var(--line);
+    display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:var(--faint);
+    align-self:center}
+  .cp-nm{font-size:13px; color:var(--text); font-weight:700}
+  .cp-cert{font-size:11px; color:var(--faint)}
+  .cp-ct{margin-left:auto; font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .cp-bar{height:8px; background:var(--surface2); border-radius:99px; overflow:hidden; margin-top:9px}
+  .cp-bar i{display:block; height:100%; background:var(--accent); border-radius:99px}
+  .cp-msg{font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:8px}
+  .cp-msg b{color:var(--text)}
+  .cp-go{color:var(--accent); text-decoration:none; margin-left:6px}
+  .cp-go:hover{text-decoration:underline}
+  .cp-done{border-color:var(--accent-dim); background:linear-gradient(135deg, var(--accent-glow), transparent 60%), var(--surface)}
+  .cp-done .cp-tick{border-color:var(--accent); color:var(--accent)}
+  .cp-done .cp-nm, .cp-done .cp-ct{color:var(--accent)}
+  .cp-win{color:var(--accent); font-weight:700}
+  .cp-allwin{font-family:var(--mono); font-size:12.5px; color:var(--accent); background:var(--accent-glow);
+    border:1px solid var(--accent-dim); border-radius:10px; padding:12px 16px; margin:2px 0 6px}
   .section-title{font-family:var(--mono); font-size:13px; color:var(--muted); text-transform:uppercase;
     letter-spacing:1.5px; margin:26px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line)}
   .drow{display:grid; grid-template-columns:1fr 92px 92px 110px; gap:14px; align-items:center;
@@ -158,7 +190,15 @@
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
 <link rel="stylesheet" href="nav.css?v=209">
+<script src="drills.js?v=283"></script>
+
 <script src="drills.js?v=282"></script>
+
+
+
+
+
+
 <script>
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -170,7 +210,7 @@ window.NAV_ACTIVE = 'stats';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=299"></script>
+<script src="nav.js?v=300"></script>
 
 <header class="head">
   <div class="wrap">
@@ -271,8 +311,9 @@ async function load(){
     // r423 (Wolf): cache + pill carry the BUCKET too (rank AND bucket, nav.js pillHtml grammar)
     try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:tier.name,c:tier.cls,b:tier.bucket,exp:Date.now()+6e5}));
       const rp=document.getElementById('navRankPill');
-      if(rp){ const bk = tier.bucket==='Top Bucket'?'top' : tier.bucket==='Middle Bucket'?'mid' : tier.bucket==='Bottom Bucket'?'bottom' : '';
-        rp.innerHTML=(window.rankEmblem?window.rankEmblem(tier.name,20,tier.bucket):'')+'<span>'+tier.name+(bk?' <em class="pill-bk">· '+bk+'</em>':'')+'</span>';
+      /* r426: delegate to nav.js hkRankPillHtml — one pill grammar, spelled-out buckets
+         ("top bucket" / "middle bucket" / "bottom bucket"; never "mid"). */
+      if(rp && window.hkRankPillHtml){ rp.innerHTML=window.hkRankPillHtml(tier.name, tier.bucket);
         rp.className='pc-tier '+tier.cls+' topnav-rank'; rp.style.display='inline-flex'; } }catch(e){}
     let mySes=[]; try{ const se=await sb.from('sessions').select('user_id,mode').eq('user_id', me.id); mySes=se.data||[]; }catch(e){}
     const plBoards = window.HK_RANK.boardCounts ? window.HK_RANK.boardCounts(all, me.id, D.menuOrder) : st;
@@ -286,7 +327,9 @@ async function load(){
     const medals=(function(){ try{
       const AC=window.HOTKEY_ACHIEVEMENTS; if(!AC || !feat.length) return [];
       const byId={}; AC.forEach(a=>byId[a.id]=a);
+      /* r426 (Wolf \u00a74b): instant hover tip on every medal chip \u2014 name \u00b7 desc \u00b7 state. */
       return feat.map(id=>byId[id]).filter(Boolean).slice(0,5).map(a=>({glyph:a.glyph,name:a.name,size:30,
+        tip:a.name+' \u2014 '+a.desc+' \u2713 EARNED',
         rarity:window.hkEffRarity?window.hkEffRarity(a.tier):undefined})); }catch(e){ return []; } })();
     let tagBits='';
     try{ if(myProf && myProf.show_school && myProf.school_tag){
@@ -346,6 +389,55 @@ async function load(){
     html += `<div class="hero${tcHtml?'':' solo'}">` + tcHtml + cardsHtml + `</div>`;
   }
 
+  /* ---- r426 (Wolf, ROUND2_FEEDBACK §4b): CERTIFICATION PATHS — "fill the gap under the
+     streak card with a certification-paths checklist; completed paths get a visual reward
+     (color/congrats), incomplete ones a 'go get going' cue."
+     Moved UP from below Analytics (it used to close the page, where nobody read it) and
+     rebuilt from a bare progress bar into a three-track checklist. Same data contract as
+     before: r371 law — a track leg counts only on a POSTED run (mine[]), never a
+     local-only clear, because that is what issue_certificate() verifies server-side.
+     A complete track wears the congrats state; an incomplete one names the next drill to
+     run and links straight into it. ---- */
+  if(window.HK_TRACKS && window.HK_TRACKS.length){
+    const trk = window.HK_TRACKS.map(t=>{
+      const ks=t.keys||[];
+      const done=ks.filter(k=> mine.some(r=>r.challenge===k));
+      const left=ks.filter(k=> !mine.some(r=>r.challenge===k));
+      return { t, ks, n:done.length, left, pct: ks.length?Math.round(100*done.length/ks.length):0,
+               full: !!(ks.length && done.length>=ks.length) };
+    });
+    const fullN = trk.filter(x=>x.full).length;
+    html += `<h3 class="section-title">Certification paths <span style="color:var(--faint)">${fullN} / ${trk.length} complete</span></h3>`;
+    html += `<div class="certpaths">`;
+    trk.forEach(x=>{
+      const nextK = x.left[0];
+      const nextL = nextK ? (D.labelOf[nextK]||nextK) : '';
+      html += `<div class="cp${x.full?' cp-done':''}">`+
+        `<div class="cp-h"><span class="cp-tick">${x.full?'✓':''}</span>`+
+          `<span class="cp-nm">${esc(x.t.name)}</span>`+
+          `<span class="cp-cert">→ “${esc(x.t.cert)}”</span>`+
+          `<span class="cp-ct">${x.n} / ${x.ks.length}</span></div>`+
+        `<div class="cp-bar"><i style="width:${x.pct}%"></i></div>`+
+        (x.full
+          ? `<div class="cp-msg cp-win">🎉 Path complete — claim the certificate in the trainer</div>`
+          : `<div class="cp-msg">${x.ks.length-x.n} drill${x.ks.length-x.n===1?'':'s'} to go`+
+            (nextK?` · next up <b>${esc(nextL)}</b>`:'')+
+            (nextK?` <a class="cp-go" href="index.html?drill=${encodeURIComponent(nextK)}">run it →</a>`:'')+
+            `</div>`)+
+        `</div>`;
+    });
+    html += `</div>`;
+    if(fullN>0 && fullN===trk.length){
+      html += `<div class="cp-allwin">🏆 <b>All three paths certified.</b> Every drill in the catalog has a posted, keyboard-only clear against your name.</div>`;
+    }
+  }
+
+  /* ---- r426 (Wolf, ROUND2_FEEDBACK §4b): "put the ANALYTICS ABOVE the achievement
+     overview". The wall is built here (it needs `mine`/`all`/`localPB`, which are in
+     scope from here on) but BANKED into achHtml and appended AFTER the pace chart,
+     Lifetime and Analytics sections. Build order and print order are now separate
+     things — don't re-inline this into `html`. ---- */
+  let achHtml='';
   // ================= r135/r138: ACHIEVEMENTS — prominent, tipped, rarity-tiered =================
   // Earned medals are clickable — pick up to 3 to SHOWCASE on your player card.
   // r138: instant data-tip overlays (name · what it is · global rarity), computed
@@ -444,10 +536,35 @@ async function load(){
           (r.done?'':'<i>'+Math.min(99,Math.round(100*(r.prog||0)/(r.goal||1)))+'%</i>')+
           esc(a.name)+rlabel+'</span>';
         // earned float to the top, then rarest-first, then catalog order
-        cells.push({ html:cellHtml, sort:(r.done?0:1000)+rm.weight*100+ord });
+        cells.push({ html:cellHtml, sort:(r.done?0:1000)+rm.weight*100+ord,
+          cat:(window.hkAchCat?window.hkAchCat(a):{label:'Other',ord:99}), rw:rm.weight, ord, done:!!r.done });
       });
       cells.sort((x,y)=>x.sort-y.sort);
       const grid=cells.map(c=>c.html).join('');
+      /* ---- r426 (Wolf, ROUND2_FEEDBACK §4b): "with all-types/all-rarities chips selected,
+         organize by achievement TYPE then by RARITY — rows laid out so you can see
+         progression along each category."
+         Two renderings of the SAME cells, swapped in place (never both in the DOM):
+           · CATEGORY view — used when both chips read "all", i.e. nothing is filtered.
+             Sections come from drills.js HOTKEY_ACH_CATS (glyph -> category, so no
+             achievement carries a second hand-kept field); inside a section, cells run
+             COMMON -> MYTHIC (rm.weight descends 4..0), then catalog order, so each row
+             reads as that category's ladder.
+           · FLAT view — the r293 earned-first / rarest-first wall, used the moment any
+             chip narrows the set (a filtered category view would strand empty headers).
+         ---- */
+      const __byCat={};
+      cells.forEach(c=>{ const k=c.cat.label;
+        (__byCat[k]=__byCat[k]||{ord:c.cat.ord, items:[]}).items.push(c); });
+      const catGrid=Object.keys(__byCat)
+        .sort((a2,b2)=>(__byCat[a2].ord-__byCat[b2].ord)||a2.localeCompare(b2))
+        .map(k=>{ const g=__byCat[k];
+          const items=g.items.slice().sort((x,y)=>(y.rw-x.rw)||(x.ord-y.ord));
+          const gotN=items.filter(i=>i.done).length;
+          return '<div class="ach-cat"><div class="ach-cat-h">'+esc(k)+
+            '<span>'+gotN+' / '+items.length+'</span></div>'+
+            '<div class="ach-grid ach-cat-g">'+items.map(i=>i.html).join('')+'</div></div>'; }).join('');
+      window.__achFlat=grid; window.__achCats=catGrid;
       /* r393 (Wolf #91): a rarity-tier chip row beside the state chips, mirroring the profile
          medal picker. Each chip is tinted its rarity color (same HK_RARITY map the rings wear);
          only tiers that actually appear on the wall get a chip. State + rarity filters compose. */
@@ -459,7 +576,7 @@ async function load(){
          wall; chips still open all/in-progress/locked. New users with nothing earned fall
          back to "all" so the wall never looks empty on first visit. */
       const __defF = earnedN>0 ? 'earned' : 'all';
-      html += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span>'+
+      achHtml += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span>'+
         '<span class="ach-filters">'+
           '<button class="ach-f'+(__defF==='all'?' on':'')+'" data-f="all">all</button>'+
           '<button class="ach-f'+(__defF==='earned'?' on':'')+'" data-f="earned">earned</button>'+
@@ -468,11 +585,15 @@ async function load(){
           '<span class="ach-fdiv"></span>'+
           '<button class="ach-rf on" data-r="all">any rarity</button>'+__rarChips+
         '</span></h3>'+
-        '<div class="ach-hint">medals sort rarest-first \u00b7 pick which to <b style="color:var(--warn)">\u2605 showcase</b> on your player card from <a href="profile.html#showcase" style="color:var(--accent)">your profile \u2197</a>'+(me?'':' \u00b7 sign in to show them on the boards')+
+        '<div class="ach-hint">all + any rarity groups the wall BY TYPE, common \u2192 mythic within each \u00b7 any other chip flattens it, earned and rarest first \u00b7 pick which to <b style="color:var(--warn)">\u2605 showcase</b> on your player card from <a href="profile.html#showcase" style="color:var(--accent)">your profile \u2197</a>'+(me?'':' \u00b7 sign in to show them on the boards')+
         /* r376: legend rides the shared HK_RARITY map \u2014 same colors the badge rings wear */
         (function(){ const RC=window.HK_RARITY||{};
           return '<br>color = rarity: <b style="color:'+RC.c+'">COMMON</b> \u00b7 <b style="color:'+RC.r+'">RARE</b> (\u226425% of players) \u00b7 <b style="color:'+RC.e+'">EPIC</b> (\u226410%) \u00b7 <b style="color:'+RC.l+'">LEGENDARY</b> (\u22643%) \u00b7 <b style="color:'+RC.m+'">MYTHIC</b> (the rarest handful)</div>'; })()+
-        '<div class="ach-grid"'+(__defF==='earned'?' data-f="earned"':'')+'>'+grid+'</div>';
+        /* r426 (§4b): #achHost swaps between the CATEGORY and FLAT renderings (achView()
+           below). all/all -> categories; any narrowing chip -> the flat filtered wall. */
+        '<div id="achHost">'+(__defF==='all'
+          ? catGrid
+          : '<div class="ach-grid" data-f="'+__defF+'">'+grid+'</div>')+'</div>';
     }
   }catch(e){}
 
@@ -624,22 +745,9 @@ async function load(){
       html += `</div>`;
     }
   }
-  /* r367: the three certificate tracks get a progress module here — before this, the
-     track story lived only inside the trainer's tracks modal */
-  if(window.HK_TRACKS && window.HK_TRACKS.length){
-    html += `<h3 class="section-title">Certificate tracks</h3><div class="grid" style="grid-template-columns:1fr;margin-bottom:6px">`;
-    window.HK_TRACKS.forEach(t=>{
-      const ks=t.keys||[];
-      const done=ks.filter(k=> mine.some(r=>r.challenge===k)).length;   /* r371: certificates verify POSTED runs — local-only clears no longer overpromise here */
-      const pct=ks.length?Math.round(100*done/ks.length):0;
-      const full=ks.length&&done>=ks.length;
-      html += `<div class="stat"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-family:var(--mono)">`+
-        `<span style="font-size:12.5px;color:var(--text)"><b>${esc(t.name)}</b> <span style="color:var(--faint);font-size:11px">→ “${esc(t.cert)}”</span></span>`+
-        `<span style="font-size:12px;color:${full?'var(--accent)':'var(--muted)'}">${done} / ${ks.length}${full?' · complete — claim the certificate in the trainer':''}</span></div>`+
-        `<div style="height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:8px"><span style="display:block;height:100%;width:${pct}%;background:var(--accent);border-radius:99px"></span></div></div>`;
-    });
-    html += `</div>`;
-  }
+  /* r426 (Wolf §4b): the achievement wall PRINTS here — under pace + Lifetime +
+     Analytics, above the per-drill wall. Built ~250 lines up into achHtml. */
+  html += achHtml;
   /* r393 (Wolf): the Per-drill wall used to print EVERY drill in the catalog as a flat
      ~80-row strip — the single biggest source of dead length on the page. It's now behind
      a chapter picker: one group at a time, defaulting to where you've been most active.
@@ -753,14 +861,24 @@ async function load(){
       rb.textContent=open?'show fewer':'show '+rb.dataset.n+' more'; }; }
   // r156: the analytics PRO tag opens the shared offer sheet
   document.querySelectorAll('.proTag').forEach(t=>t.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Deep analytics'); });
-  // r267: achievements wall filters — chips set data-f on the grid; CSS does the hiding
+  /* r267 state chips + r393 rarity chips, r426 rewritten: both now go through achView(),
+     which picks the RENDERING (category vs flat) and then applies the filter attributes
+     the CSS hides on. all + any rarity = the by-type wall (Wolf §4b); anything narrower
+     = the flat earned/rarest-first wall, because a filtered category view strands headers. */
+  function achView(){
+    const host=document.getElementById('achHost'); if(!host) return;
+    const fb=document.querySelector('.ach-f.on'), rb=document.querySelector('.ach-rf.on');
+    const f=fb?fb.dataset.f:'all', r=rb?rb.dataset.r:'all';
+    if(f==='all' && r==='all'){ host.innerHTML=window.__achCats||''; return; }
+    host.innerHTML='<div class="ach-grid">'+(window.__achFlat||'')+'</div>';
+    const g=host.querySelector('.ach-grid'); if(!g) return;
+    if(f!=='all') g.setAttribute('data-f', f);
+    if(r!=='all') g.setAttribute('data-r', r);
+  }
   document.querySelectorAll('.ach-f').forEach(b=>b.onclick=(ev)=>{ ev.stopPropagation();
-    document.querySelectorAll('.ach-f').forEach(x=>x.classList.toggle('on', x===b));
-    const g=document.querySelector('.ach-grid'); if(g){ if(b.dataset.f==='all') g.removeAttribute('data-f'); else g.setAttribute('data-f', b.dataset.f); } });
-  // r393 (Wolf #91): rarity-tier chips — set data-r on the grid; composes with the state data-f
+    document.querySelectorAll('.ach-f').forEach(x=>x.classList.toggle('on', x===b)); achView(); });
   document.querySelectorAll('.ach-rf').forEach(b=>b.onclick=(ev)=>{ ev.stopPropagation();
-    document.querySelectorAll('.ach-rf').forEach(x=>x.classList.toggle('on', x===b));
-    const g=document.querySelector('.ach-grid'); if(g){ if(b.dataset.r==='all') g.removeAttribute('data-r'); else g.setAttribute('data-r', b.dataset.r); } });
+    document.querySelectorAll('.ach-rf').forEach(x=>x.classList.toggle('on', x===b)); achView(); });
   // r387 (Wolf): the achievements WALL stays here as analytics (full grid, rarity,
   // progress) but SHOWCASE PICKING moved to the Profile page — this wall is display-only.
   // r423 (Wolf): the featured (.feat) tray markers no longer render here at all — what's

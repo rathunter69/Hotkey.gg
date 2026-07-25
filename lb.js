@@ -678,7 +678,10 @@ function heroHtml(){
     const AC=window.HOTKEY_ACHIEVEMENTS, picks=(window.__featOf||{})[meId];
     if(!AC||!picks||!picks.length) return [];
     const byId={}; AC.forEach(a=>byId[a.id]=a);
+    /* r426 (Wolf \u00a74b): every medal chip carries name \u00b7 description \u00b7 state as an
+       instant hover tip \u2014 showcase picks are by definition earned. */
     return picks.map(id=>byId[id]).filter(Boolean).slice(0,5).map(a=>({glyph:a.glyph,name:a.name,size:30,
+      tip:a.name+' \u2014 '+a.desc+' \u2713 EARNED',
       rarity:window.hkEffRarity?window.hkEffRarity(a.tier):undefined})); }catch(e){ return []; } })();
   // school + desk chips ride high on the card, honoring the customizer's show toggles
   let __tagBits='';
@@ -698,8 +701,27 @@ function heroHtml(){
     medals:__medals, medalSlots:5, boards:[],
     tagsHtml:__tagBits, flair:__fv, owner:true
   },{scale:'full'}) : '';
+  /* r426 (Wolf, ROUND2_FEEDBACK §4b): "hide the leave-ranked button at the bottom — fill
+     that space with big text of your current rank and current rating." The slim ownerbar
+     is replaced by the STANDING BLOCK: tier + bucket in display type, the live rating
+     under it (rating = average placement across your boards ×100, LOWER is better — the
+     same number the tier roster rows speak, lb.js:881).
+     The capability is NOT stranded: leaving ranked moved to account.html's Ranked card
+     (the "ranked settings" link below points straight at it). Wolf's standing rule —
+     never remove the only path to a capability. */
+  const __ratingTxt = (avg===null||avg===undefined||!isFinite(avg))
+    ? '—' : (avg*100).toFixed(1);
+  const __bucketTxt = t.bucket ? (' · '+t.bucket.toLowerCase()) : '';
+  const standing =
+    '<div class="uc-standing">'+
+      '<div class="ucs-k">your standing</div>'+
+      '<div class="ucs-rank">'+esc(t.name)+'<span class="ucs-bk">'+esc(__bucketTxt)+'</span>'+
+        (t.provisional?'<span class="ucs-prov">provisional</span>':'')+'</div>'+
+      '<div class="ucs-rating"><b>'+__ratingTxt+'</b><span class="ucs-rl">rating · average placement across your boards, lower is better</span></div>'+
+      '<a class="ucs-set" href="account.html#ranked">ranked settings ↗</a>'+
+    '</div>';
   return '<div class="panel me me-col"><div class="me-card'+(__fv?' me-bare':'')+'">'+heroCard+'</div>'+
-    '<div class="uc-ownerbar"><a id="leaveRanked">leave ranked</a></div></div>';
+    standing+'</div>';
 }
 
 function rankedInfographic(){
@@ -948,6 +970,7 @@ function deskErrMsg(e){ const m=String((e&&e.message)||e||'');
   if(m.includes('DESK_NOT_FOUND'))    return 'that invite code isn\u2019t valid.';
   if(m.includes('DESK_FULL'))         return 'that desk is full (200).';
   if(m.includes('DESK_RATE_LIMIT'))   return 'one desk per day \u2014 try again tomorrow.';
+  if(m.includes('PRO_REQUIRED'))      return 'starting a desk is a PRO feature \u2014 joining one is free.';   /* r426 \u00a7 4e */
   if(m.includes('DESK_PRIVATE'))      return 'that desk is invite-only.';
   if(m.includes('DESK_NOT_RECRUITING')) return 'that desk closed its roster \u2014 invite codes still work.';
   if(m.includes('APPLY_RATE_LIMIT'))  return 'five open applications max \u2014 withdraw one first.';
@@ -1111,6 +1134,23 @@ function wireGuild(){
     if(!armed){ armed=true; sp.textContent='withdraw application?'; setTimeout(()=>{armed=false; sp.textContent='applied \u00b7 pending \u2713';},2600); return; }
     try{ await sb.rpc('withdraw_application',{p_team:sp.dataset.team});
       if(DATA) delete DATA.myApps[sp.dataset.team]; renderAll(); }catch(e){} }; });
+  /* r426 (Wolf, ROUND2_FEEDBACK §4e): DESK CREATION IS PRO. The guild board renders its
+     markup synchronously, so the found-a-desk line is swapped for the upsell once
+     hkDeskCreatePro() answers. Joining by invite code and applying stay free — the paywall
+     is on FOUNDING a desk. The RPC is the real guard (create_desk raises PRO_REQUIRED);
+     this is the courtesy so nobody types a name into a dead button. */
+  (async()=>{
+    try{
+      const found=document.querySelector('.gb-found'); if(!found) return;
+      const pro = window.hkDeskCreatePro ? await window.hkDeskCreatePro() : false;
+      if(pro) return;
+      found.innerHTML='<span class="gb-found-l"><b style="color:var(--warn)">◆ PRO</b> — founding a desk</span>'+
+        '<span class="gb-pro-note">your own hall, roster, quests and boards. joining one is free.</span>'+
+        '<button class="tab" id="gbProUp">what comes with PRO</button>';
+      const up=document.getElementById('gbProUp');
+      if(up) up.onclick=()=>{ if(window.hkProSheet) window.hkProSheet('Starting a desk'); };
+    }catch(e){}
+  })();
   const cr=document.getElementById('gbCreate');
   if(cr) cr.onclick=async()=>{
     const n=(document.getElementById('gbName').value||'').trim();
@@ -1505,7 +1545,11 @@ function renderAll(){
   document.querySelectorAll('.ros-bk').forEach(b=>b.onclick=()=>{ rosterBucket=b.dataset.bucket||null; renderAll(); });
   const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
   const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
-  const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ try{ localStorage.setItem('hk_ranked','0'); }catch(e){} try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} load(); };
+  /* r426 (Wolf §4b): #leaveRanked no longer renders on this page — the standing block took
+     its slot and account.html's Ranked card owns the action. The binding stays (guarded, a
+     no-op when the node is absent) so a deep link or a future surface that re-mounts the
+     control keeps working; window.hkLeaveRanked is the shared implementation. */
+  const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ window.hkLeaveRanked(); load(); };
   try{ window.scrollTo(0, __sy); }catch(e){}
 }
 function wire(){

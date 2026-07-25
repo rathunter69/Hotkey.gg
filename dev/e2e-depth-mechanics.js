@@ -293,6 +293,61 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r.onL === 2 && /found 2 of 3/.test(r.aria), 'segments latch — a re-broken error never un-fills the meter', r);
   }
 
+  console.log('D2. disclosed-error meter on ruleaudit — the first catalog adopter (r425, §2.3 + §4.16)');
+  {
+    // N is FIXED per drill (decision log #6): 4 planted breaks every seed, never per-seed variance
+    const rN = await run(() => {
+      const out = [];
+      for (const seed of [11, 222, 3333]) {
+        window.__forceSeed = seed; loadChallenge('ruleaudit');
+        out.push(CHALLENGES.ruleaudit._R.defects.length);
+      }
+      return out;
+    });
+    ok(String(rN) === '4,4,4', 'exactly 4 breaks planted on every seed (N fixed per drill)', rN);
+    const r = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 77; loadChallenge('ruleaudit');
+      const C = CHALLENGES.ruleaudit;
+      const N = ((window.HOTKEY_DRILLS.meta.ruleaudit || {}).errorCount) | 0;
+      const seg0 = document.querySelectorAll('#checklist .hk-errmeter .em-seg').length;
+      const on0 = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const moves = C.demo();   // engine-appended Ctrl+S rides at the end (saveClose)
+      // fix the first two planted breaks — the meter must read 2/4
+      for (let i = 0; i < 2; i++) { setDemoSel(moves[i].sel); for (const kk of moves[i].keys) demoKey(kk); }
+      const on2 = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const lab2 = (document.querySelector('#checklist .hk-errmeter .em-lab') || {}).textContent || '';
+      // regress the second fix (undo) — segments LATCH, they never un-fill within a run
+      demoKey({ key: 'z', ctrl: true });
+      const onL = document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length;
+      const foundL = /\((\d)\/4 fixed\)/.exec((C.checks(S)[4] || {}).label || '');
+      demoKey({ key: 'y', ctrl: true });   // redo the fix, then finish the run
+      for (let i = 2; i < moves.length; i++) { setDemoSel(moves[i].sel); for (const kk of moves[i].keys) demoKey(kk); }
+      const items = C.checks(S);
+      return { N, seg0, on0, on2, lab2, onL, foundLive: foundL && foundL[1], done,
+               star: !!(items.find(x => x.bonus) || {}).ok,
+               onWin: document.querySelectorAll('#checklist .hk-errmeter .em-seg.on').length };
+    });
+    ok(r.N === 4 && r.seg0 === 4 && r.on0 === 0, 'meta.errorCount=4 renders four empty segments at load', r);
+    ok(r.on2 === 2 && /found 2\/4/.test(r.lab2), 'two repairs fill two segments off the "(k/4 fixed)" counter label', r);
+    ok(r.onL === 2 && r.foundLive === '1', 'an undone repair un-flips the beat (found 1/4) but the meter stays latched at 2', r);
+    ok(r.done === true && r.onWin === 4, 'all four repairs + save win the drill with the meter full', r);
+    ok(r.star === true, 'the exact-repair line earns the surgeon\'s ☆ (zero collateral ink)', r);
+    const r2 = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__forceSeed = 77; loadChallenge('ruleaudit');
+      const C = CHALLENGES.ruleaudit, R = C._R;
+      // collateral ink: bold the margin row (healthy by construction) before the real repairs —
+      // core must still clear (§1.0(c)); the surgeon's ☆ must be withheld
+      setDemoSel('B' + R.mg + ':' + R.LC + R.mg); demoKey({ key: 'b', ctrl: true });
+      const moves = C.demo();
+      for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+      const items = C.checks(S);
+      return { done, star: !!(items.find(x => x.bonus) || {}).ok };
+    });
+    ok(r2.done === true && r2.star === false, 'collateral formatting still wins the drill but forfeits the ☆ (freedom kept, mastery graded)', r2);
+  }
+
   console.log('E. checkpoint touch-lists (§2.6)');
   {
     const r = await run(() => {
@@ -961,6 +1016,92 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       ok(r.mbH <= 44, 'the mode bar is still ONE row @' + W + 'px', r.mbH);
     }
     await page.setViewportSize({ width: 1280, height: 900 });
+  console.log('Q. capstone gate (r425 — DEPTH_PASS §2.4, modeltour ★ Foundations)');
+  {
+    const r = await run(() => {
+      window.__clearCel(); hideResults();
+      window.__pbSave = JSON.stringify(PB);
+      try { localStorage.removeItem('hk_camp_xp'); } catch (e) {}
+      for (const k of Object.keys(PB)) delete PB[k];
+      // clocks: capstone pass widens to par×2.0; pro/leg still derive (§2.1 per-field override)
+      const c = hkClocksFor('modeltour'), par = window.HOTKEY_PARS.modeltour;
+      const clocks = { pass: c.pass, pro: +c.pro.toFixed(2), leg: c.leg, par,
+                       ovr: (window.HOTKEY_CLOCKS.modeltour || {}).pass };
+      // FRESH ACCOUNT: all four c1 keys at pace, capstone never run clean → c1 NOT done,
+      // the Formatting milestone stays locked
+      ['navigation', 'blocksel', 'filldr', 'pastes'].forEach(k => PB[k] = 0.1);
+      const s1 = campState();
+      openCampaign();
+      const chip = (document.querySelector('#campaignModal .camp-lockcap') || {}).textContent || '';
+      const capGate = (document.querySelector('#campaignModal .camp-cap .camp-gate') || {}).textContent || '';
+      try { const cm = document.getElementById('campaignModal'); if (cm) cm.remove(); } catch (e) {}
+      // ONE CLEAN RUN ON RECORD (a PB only ever records clean runs) — any speed — ships c1
+      PB.modeltour = 999;
+      const s2 = campState();
+      delete PB.modeltour;
+      // GRANDFATHER: milestone xp already claimed under the pre-capstone rule → stays shipped
+      localStorage.setItem('hk_camp_xp', JSON.stringify({ c1: 1 }));
+      const s3 = campState();
+      localStorage.removeItem('hk_camp_xp');
+      // ACCESS NEVER BLOCKED: with c1 not done, the capstone AND a next-chapter drill still load
+      const s4 = campState();
+      loadChallenge('typeset'); const nextLoads = cur === 'typeset';
+      loadChallenge('modeltour'); const capLoads = cur === 'modeltour';
+      // picker designation: ★ CAPSTONE tag + group-color ring on the modeltour file row
+      buildSheetTabs();
+      const row = document.querySelector('#pkGroups .pk-byline.capstone[data-key="modeltour"]');
+      const tag = row ? row.querySelector('.pk-captag') : null;
+      return { clocks,
+        s1: { n: s1[0].clearedN, done: s1[0].done, cap: s1[0].capOk, c2: s1[1].unlocked },
+        chip, capGate,
+        s2: { done: s2[0].done, c2: s2[1].unlocked },
+        s3: { done: s3[0].done, c2: s3[1].unlocked },
+        s4done: s4[0].done, nextLoads, capLoads,
+        tag: tag ? tag.textContent : null };
+    });
+    ok(r.clocks.pass === r.clocks.par * 2 && r.clocks.ovr === r.clocks.par * 2 &&
+       r.clocks.pro === +(r.clocks.par * 1.15).toFixed(2) && r.clocks.leg === r.clocks.par,
+       'capstone clocks: pass = par×2.0 via HOTKEY_CLOCKS override; pro/leg still derive', r.clocks);
+    ok(r.s1.n === 4 && r.s1.done === false && r.s1.cap === false && r.s1.c2 === false,
+       'fresh account: four keys at pace alone no longer ship c1 — the Formatting milestone stays locked', r.s1);
+    ok(/Foundations capstone/.test(r.chip) && /track leg/.test(r.chip),
+       'locked next-milestone chip reads "clear the Foundations capstone to open this track leg"', r.chip);
+    ok(/one clean run/.test(r.capGate), 'the c1 row carries the capstone line — one clean run, any speed', r.capGate);
+    ok(r.s2.done === true && r.s2.c2 === true,
+       'one clean capstone run on record (999s — time irrelevant) ships c1 and opens Formatting', r.s2);
+    ok(r.s3.done === true && r.s3.c2 === true,
+       'grandfather: an already-claimed c1 milestone (hk_camp_xp) never re-locks without a capstone PB', r.s3);
+    ok(r.s4done === false && r.nextLoads && r.capLoads,
+       'free-play access is never gated: capstone + next-chapter drills load with c1 incomplete', r);
+    ok(/capstone/i.test(r.tag || ''), 'picker file row wears the ★ CAPSTONE tag (full-color group ring)', r.tag);
+    // the live flow: clean capstone win on a keys-at-pace account → card names the leg it opened
+    const r2 = await run(() => {
+      window.__clearCel(); hideResults();
+      for (const k of Object.keys(PB)) delete PB[k];
+      ['navigation', 'blocksel', 'filldr', 'pastes'].forEach(k => PB[k] = 0.1);
+      try { localStorage.removeItem('hk_camp_xp'); } catch (e) {}
+      loadChallenge('modeltour');
+      const C = CHALLENGES.modeltour;
+      for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+      const items = C.checks(S);
+      const html = (document.getElementById('resultsModal') || {}).innerHTML || '';
+      return { done,
+        star: !!(items.find(x => x.bonus) || {}).ok,
+        saveLast: items[items.length - 1].label === 'Save your work',
+        capLine: html.indexOf('★ capstone clear') >= 0 && html.indexOf('Formatting leg') >= 0,
+        bonusFound: html.indexOf('☆ hidden bonus:') >= 0 && html.indexOf('— found') >= 0,
+        c1done: campState()[0].done, c2open: campState()[1].unlocked };
+    });
+    ok(r2.done === true && r2.saveLast, 'modeltour demo wins through the engine-appended save closer', r2);
+    ok(r2.star && r2.bonusFound, 'the scripted copy-heal earns the mystery ☆ (S.pasteLog latch)', r2);
+    ok(r2.capLine, 'capstone results card names the chapter it opened: "the Formatting leg of the track is open"', r2);
+    ok(r2.c1done && r2.c2open, 'the clean win itself ships c1 through the same campState the modal reads', r2);
+    // restore the profile the earlier sections built up
+    for (let i = 0; i < 4; i++) { await page.waitForTimeout(250); await run(() => window.__clearCel()); }
+    await run(() => { window.__clearCel(); hideResults();
+      for (const k of Object.keys(PB)) delete PB[k];
+      try { Object.assign(PB, JSON.parse(window.__pbSave || '{}')); } catch (e) {}
+      try { localStorage.removeItem('hk_camp_xp'); } catch (e) {} });
   }
 
   console.log('Z. page errors');

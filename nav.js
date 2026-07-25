@@ -354,14 +354,24 @@
   }
 
   // Rank pill: fetch standing once per session (10-min cache shared with index.html via sessionStorage)
-  /* r423 (Wolf): the pill names rank AND bucket — "VP · top". Short bucket words keep the
-     one-row nav; the emblem's division pips carry the same bucket visually. */
-  function bkShort(b){ return b==='Top Bucket'?'top' : b==='Middle Bucket'?'mid' : b==='Bottom Bucket'?'bottom' : ''; }
+  /* r423 (Wolf): the pill names rank AND bucket — "VP · top bucket".
+     r426 (Wolf, ROUND2_FEEDBACK §4d): the bucket is spelled OUT — "top bucket" /
+     "middle bucket" / "bottom bucket". "mid" is BANNED: it read as an abbreviation of
+     nothing and lost the comp-review grammar the buckets exist to speak.
+     ONE-ROW NAV: both forms ship in the markup and nav.css picks between them by
+     viewport — the full words at >=1120px, the single word ("top"/"middle"/"bottom",
+     still never "mid") below that, where the nav has to fit auth + level + pill on one
+     line. CSS-only switching means no resize listener and no layout thrash. */
+  function bkWords(b){ return b==='Top Bucket'?'top bucket' : b==='Middle Bucket'?'middle bucket' : b==='Bottom Bucket'?'bottom bucket' : ''; }
+  function bkOne(b){ return b==='Top Bucket'?'top' : b==='Middle Bucket'?'middle' : b==='Bottom Bucket'?'bottom' : ''; }
   function pillHtml(name, bucket){
-    const bk=bkShort(bucket);
+    const full=bkWords(bucket), one=bkOne(bucket);
     return (window.rankEmblem?window.rankEmblem(name,20,bucket):'')+
-      '<span>'+name+(bk?' <em class="pill-bk">· '+bk+'</em>':'')+'</span>';
+      '<span>'+name+(full?' <em class="pill-bk">· <span class="bk-full">'+full+'</span><span class="bk-one">'+one+'</span></em>':'')+'</span>';
   }
+  /* r426: SSOT — stats.html write-through used to carry its own copy of this grammar
+     (and it still said "mid"). One pill renderer now; every surface calls it. */
+  window.hkRankPillHtml = pillHtml;
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
     /* r406/r407 (Wolf): the owner account sees the WHOLE site — ranked on + every gateway/
@@ -659,7 +669,11 @@
         // so nav badges use a shipped par table snapshot:
         const PARS=window.HOTKEY_PARS||{};
         const cleared=k=>PBl[k]!==undefined && (!PARS[k] || PBl[k]<=PARS[k]*CAMP.GATE);
-        const chs=CAMP.chapters.map(c=>({...c, done:c.keys.every(cleared)}));
+        /* r425 §2.4: milestone badges honor the capstone gate through the SAME shared
+           predicate campState uses (hkCapstoneOk, drills.js) — a PB is the clean-run proof,
+           an already-claimed milestone (hk_camp_xp) stays shipped (grandfather, no rug-pulls) */
+        let claimedX={}; try{ claimedX=JSON.parse(localStorage.getItem('hk_camp_xp')||'{}'); }catch(e){}
+        const chs=CAMP.chapters.map(c=>({...c, done:c.keys.every(cleared) && (!window.hkCapstoneOk || window.hkCapstoneOk(c, PBl, claimedX))}));
         const earned=chs.filter(c=>c.done);
         const allDone=earned.length===chs.length;
         /* r382 (Wolf: with the 96px crest the card is a TITLE CARD, not a dashboard):
@@ -766,9 +780,11 @@
             if(shown.length){
               out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+shown.map(e=>
                 /* r150: the % is only honest at field scale \u2014 below that, speak in tier words */
-                '<span data-tip="'+e.a.name+' \u2014 '+e.a.desc+(function(){ const w=window.hkRarityTier?window.hkRarityTier(e.gp):null;
+                /* r426 (\u00a74b): escaped, and the earned state says so \u2014 same tip grammar
+                   as the stats wall so a medal reads identically wherever it's surfaced. */
+                '<span data-tip="'+__tipEsc(e.a.name+' \u2014 '+e.a.desc+' \u2713 EARNED'+(function(){ const w=window.hkRarityTier?window.hkRarityTier(e.gp):null;
                   if(__fieldN>=20 && e.gp!==undefined) return ' \u00b7 '+e.gp+'% of players have this'+(w?' ('+w+')':'');
-                  return w?' \u00b7 '+w:''; })()+'" style="display:inline-flex">'+
+                  return w?' \u00b7 '+w:''; })())+'" style="display:inline-flex">'+
                 (window.hkMedalCard?window.hkMedalCard(e.a.glyph,e.gp,e.a.name,38)
                   :(window.hkBadge?window.hkBadge(e.a.glyph,true,46,null,e.gp)+e.a.name:''))+
                 '</span>').join('')+'</div>';
@@ -841,7 +857,9 @@
       if(meF && meF.featured_ach!=null) picks=String(meF.featured_ach).split(',').filter(Boolean);
       if(!picks.length){ try{ picks=JSON.parse(localStorage.getItem('hk_feat_ach')||'[]'); }catch(e){} }
       const byId={}; AC.forEach(a=>byId[a.id]=a);
+      /* r426 (Wolf \u00a74b): instant hover tip on every medal chip \u2014 name \u00b7 desc \u00b7 state. */
       return picks.map(id=>byId[id]).filter(Boolean).slice(0,5).map(a=>({glyph:a.glyph,name:a.name,size:30,
+        tip:a.name+' \u2014 '+a.desc+' \u2713 EARNED',
         rarity:window.hkEffRarity?window.hkEffRarity(a.tier):undefined})); }catch(e){ return []; } })();
     const __promo=(tier.nextName && !tier.provisional && typeof tier.promote==='number') ? ' · '+tier.promote+'% to '+tier.nextName : (tier.provisional?' · placement':'');
     /* r389 (Wolf): school + desk chips ride high on the card, matching the profile
@@ -1285,6 +1303,60 @@
   }
 })();
 
+
+/* ---- r426 (Wolf, ROUND2_FEEDBACK §4b): LEAVE RANKED, one implementation ----
+   The leaderboard's your-card bottom slot became the rank+rating standing block, so the
+   action moved to account.html's Ranked card. It lives in shared chrome (nav.js) rather
+   than on either page: leaving ranked is a GLOBAL act — it writes the explicit '0' the
+   r358 hydrate rules refuse to resurrect from the server, then pushes so every device
+   agrees. Any surface that wants the control calls this; nothing re-implements it. */
+window.hkLeaveRanked = function(){
+  try{ localStorage.setItem('hk_ranked','0'); }catch(e){}
+  try{ sessionStorage.removeItem('hk_rank3'); }catch(e){}   // the pill must demote immediately
+  try{ window.hkStatePush && window.hkStatePush(); }catch(e){}
+  return true;
+};
+window.hkIsRanked = function(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } };
+/* r426: attribute-safe escape for the shared data-tip tooltips built in this file */
+function __tipEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---- r426 (Wolf, ROUND2_FEEDBACK §4e): DESK CREATION IS A PRO FEATURE ----
+   "Desk CREATION must be a PRO feature, locked to free users. Needs a server-side guard
+   (RPC/RLS), not just UI hiding."
+   Server guard: supabase/migrations/20260725100000_desk_create_pro.sql — create_desk()
+   raises PRO_REQUIRED unless my_pro(). This helper is the COURTESY layer so a free player
+   meets the upsell instead of a red RPC error; it is never the security boundary.
+
+   HOW my_pro() INTERACTS WITH THE BETA WINDOW — the finding, written down because it is
+   NOT obvious and it decides whether this ships:
+     · my_pro() is ENTITLEMENT-ONLY (migrations 20260717400000 + 20260717500000): an
+       unexpired entitlements.pro row (paid or the 7-day .edu trial), OR membership in a
+       desk holding an active desk_pro_grant within its seat cap. It has NO knowledge of
+       HOTKEY_PRO.beta.
+     · HOTKEY_PRO.beta=true (drills.js) is a CLIENT-ONLY flag, and only the trainer honors
+       it — index.html isPro() is `BETA_MODE || _pro`. Nothing server-side reads it.
+     · So this gate does NOT inherit the beta free-for-all. During beta a player with no
+       paid entitlement and no .edu trial is blocked from CREATING a desk — which is
+       exactly Wolf's stated requirement, but it IS a live behavior change for beta users
+       against HOTKEY_PRO.betaNote ("PRO perks are free for everyone"). The migration is
+       therefore written and committed but NOT applied to prod; it needs Wolf's go.
+     · Corollary worth knowing: the desk-grant branch of my_pro() can never authorize a
+       create — you must already be ON a desk to inherit a desk grant, and create_desk
+       raises ALREADY_ON_DESK in that case. In practice the gate reduces to "own paid
+       entitlement or unexpired .edu trial".
+   Set HK_DESK_CREATE_PRO=false to disable the client gate (the RPC still governs). ---- */
+window.HK_DESK_CREATE_PRO = true;
+window.hkDeskCreatePro = (function(){
+  let cached=null;
+  return async function(){
+    if(!window.HK_DESK_CREATE_PRO) return true;
+    if(cached!==null) return cached;
+    let pro=false;
+    try{ if(window.sb){ const {data}=await window.sb.rpc('my_pro_status');
+      const s=(data&&data[0])||null; pro=!!(s&&s.pro); } }catch(e){ pro=false; }
+    cached=pro; return pro;
+  };
+})();
 
 /* ---- r77: celebration engine (shared by every page) ---- */
 /* ============================================================
