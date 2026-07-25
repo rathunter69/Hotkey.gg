@@ -3656,7 +3656,8 @@ const CHALLENGES = {
            hundreds, multiply by 100"), computed per variant in build() as o.convLabel; the
            ROUTE stays the player's (helper · paste-special · typing, §1.0(c));
        (3) §1.0-R2(l) HELPER STACK — the two helpers are VERTICALLY STACKED and INDIVIDUALLY
-           LABELED ("Helper — 1000s"/"Helper — 100s" and "Helper — sign flip") in column A
+           LABELED in column A — r430 renamed these to state the CONVERSION ("÷1,000 — raw $ to
+           thousands" / "×100 — hundreds to whole $", "Sign flip (×−1)") rather than the factor
            beside them, light yellow + all borders (border rendering fixed r426);
        (4) NEW beat — the fees feed arrives LEFT-ALIGNED (source and landing row both), so the
            right-align beat is real work; placed directly after the transpose (§1.0(a));
@@ -3675,9 +3676,9 @@ const CHALLENGES = {
       'TRANSPOSE the feed into a row: select <em>'+o.side+'</em> (the vertical fee list) · <kbd>ctrl</kbd>+<kbd>c</kbd> · click <em>B4</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>e</kbd> Transpose · <kbd>↵</kbd> — each fee lands under the quarter its Q label names',
       'right-align the fee row <em>'+o.feesRow+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
       (o.mode==='div'
-        ? 'RESCALE with the clipboard: copy the yellow <em>Helper — 1000s</em> at <em>'+o.helperScale+'</em> · select the Trading line · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>i</kbd> Divide · <kbd>↵</kbd> · same for Advisory — the Subtotal recalculates on its own'
-        : 'RESCALE with the clipboard: copy the yellow <em>Helper — 100s</em> at <em>'+o.helperScale+'</em> · select the Trading line · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>m</kbd> Multiply · <kbd>↵</kbd> · same for Advisory — the Subtotal recalculates on its own'),
-      'FLIP the sign: copy the yellow <em>Helper — sign flip</em> at <em>'+o.helperSign+'</em> (−1) · select the Costs line · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>m</kbd> Multiply · <kbd>↵</kbd> — typing the minus signs works too, just slower',
+        ? 'RESCALE with the clipboard: copy the yellow <em>\u00f71,000</em> helper at <em>'+o.helperScale+'</em> · select the Trading line · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>i</kbd> Divide · <kbd>↵</kbd> · same for Advisory — the Subtotal recalculates on its own'
+        : 'RESCALE with the clipboard: copy the yellow <em>\u00d7100</em> helper at <em>'+o.helperScale+'</em> · select the Trading line · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>m</kbd> Multiply · <kbd>↵</kbd> · same for Advisory — the Subtotal recalculates on its own'),
+      'FLIP the sign: copy the yellow <em>Sign flip</em> helper at <em>'+o.helperSign+'</em> (−1) · select the Costs line · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> · <kbd>m</kbd> Multiply · <kbd>↵</kbd> — typing the minus signs works too, just slower',
       'CLONE the look: copy the dressed Total row <em>'+o.dressed+'</em> · select the Subtotal row <em>'+o.sub+'</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>t</kbd> Formats <kbd>↵</kbd> — fill, commas and the top border all travel · then <kbd>ctrl</kbd>+<kbd>b</kbd>: a subtotal never outdresses the Total',
       'FREEZE for the hand-off: copy <em>'+o.dressed+'</em> · select the deck row <em>'+o.deck+'</em> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> Values <kbd>↵</kbd>, none of the wiring',
       'BOX the hand-off: keep <em>'+o.deck+'</em> selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — <kbd>s</kbd> is Outside Borders, the perimeter of what you selected (<kbd>a</kbd> is ALL borders, every gridline inside it too)',
@@ -3733,19 +3734,19 @@ const CHALLENGES = {
            row, so the right-align beat behind it is real work on every route (and the landing
            row ships left too, so a typed-in route reads left-aligned exactly the same). */
         cells[fv+(4+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,align:'l'}; }
-      cells['A4']={...blankCell(),value:mode==='div'?'Fees ($000s)':'Fees ($)',txt:true};
+      cells['A4']={...blankCell(),value:mode==='div'?'Fees (in thousands)':'Fees (whole $)',txt:true};
       for(let j=0;j<4;j++) cells[colLetter(2+j)+'4']={...blankCell(),fmtStyle:'comma',decimals:0,align:'l'};
-      cells['A5']={...blankCell(),value:mode==='div'?'Trading (raw $)':'Trading ($00s)',txt:true};
+      cells['A5']={...blankCell(),value:mode==='div'?'Trading (raw $)':'Trading (in hundreds)',txt:true};   /* r430 (Wolf round 3, "make sure whatever operation we're using actually matches how currency conversions would work"): the arithmetic was already right — hundreds->dollars IS x100 — but the board said "($00s)" beside "($)", which is unreadable at a glance. Spelling the unit out makes the DIRECTION derivable from the sheet instead of only from the instruction. */
       const tradingFeed=[]; for(let j=0;j<4;j++){ const v=rnd(40,300)*(mode==='div'?5000:5); tradingFeed.push(v);
         cells[colLetter(2+j)+'5']={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      cells['A6']={...blankCell(),value:mode==='div'?'Advisory (raw $)':'Advisory ($00s)',txt:true};
+      cells['A6']={...blankCell(),value:mode==='div'?'Advisory (raw $)':'Advisory (in hundreds)',txt:true};
       const advFeed=[]; for(let j=0;j<4;j++){ const v=rnd(40,200)*(mode==='div'?5000:5); advFeed.push(v);
         cells[colLetter(2+j)+'6']={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
       /* the Subtotal row: a live SUM, deliberately undressed (the formats-paste target) —
          and it READS WRONG until the feeds convert and the fees land: the board states its
          own problem. Seed the LIVE initial value (no recalc runs at load): fees still
          blank, both feeds still in the wrong units. */
-      cells['A7']={...blankCell(),value:mode==='div'?'Subtotal ($000s)':'Subtotal ($)',txt:true};
+      cells['A7']={...blankCell(),value:mode==='div'?'Subtotal (in thousands)':'Subtotal (whole $)',txt:true};
       for(let j=0;j<4;j++){ const col=colLetter(2+j);
         cells[col+'7']={...blankCell(),formula:'=SUM('+col+'4:'+col+'6)',value:tradingFeed[j]+advFeed[j]}; }
       cells['A8']={...blankCell(),value:'Costs (entered +)',txt:true};
@@ -3766,15 +3767,15 @@ const CHALLENGES = {
       cells['A'+dr]={...blankCell(),value:'Deck (values only)',txt:true};
       /* §1.0(f) INPUT CONVENTION + §1.0-R2(l) HELPER STACK (r427, Wolf round 2): both helpers
          POPULATED, VERTICALLY STACKED, and INDIVIDUALLY LABELED in the column beside them —
-         "Helper — 1000s"/"Helper — 100s" (the scale factor, unit word co-varying with the
-         seed) over "Helper — sign flip" (the −1). Light yellow + all borders + blue figure,
+         the conversion in words (r430: "÷1,000 — raw $ to thousands" / "×100 — hundreds to
+         whole $", co-varying with the seed) over "Sign flip (×−1)". Light yellow + all borders + blue figure,
          the input convention, so they read as tools instead of two mystery yellow squares
          (Wolf round 1: invisible as tools · round 2: unlabeled). The labels are board content,
          never graded targets. */
-      const scaleLbl='Helper — '+(mode==='div'?'1000s':'100s');
+      const scaleLbl=(mode==='div'?'\u00f71,000 \u2014 raw $ to thousands':'\u00d7100 \u2014 hundreds to whole $');   /* r430: was 'Helper \u2014 1000s'. The factor alone never said which way to run it. */
       cells['A'+hr]={...blankCell(),value:scaleLbl,txt:true};
       cells['B'+hr]={...blankCell(),value:scale,fontColor:'blue',fill:'yellow',ball:true,align:'c'};
-      cells['A'+(hr+1)]={...blankCell(),value:'Helper — sign flip',txt:true};
+      cells['A'+(hr+1)]={...blankCell(),value:'Sign flip (\u00d7\u22121)',txt:true};
       cells['B'+(hr+1)]={...blankCell(),value:-1,fontColor:'blue',fill:'yellow',ball:true,align:'c'};
       /* §1.0-R2(g) ADAPTIVE LABEL — the convert beat states THIS seed's conversion in words,
          computed here from the variant. Precise about the SEED FACT (which lines, which unit,
@@ -3819,10 +3820,19 @@ const CHALLENGES = {
          Alt H B S draws the PERIMETER of the selection. On a one-row range that is top+bottom
          on every cell plus a left edge on B and a right edge on E; the all-borders route
          (ball) carries the perimeter too, so it grades as well (§1.0(c)). */
+      /* r430 (Wolf round 3: "the last step to add an outside border it has you adding an
+         outside border to only the values — we should also have it be OK to include the
+         'Deck (values only)' cell with an outside border"). Boxing the label WITH its figures
+         is how a real hand-off row gets dressed, so both reads pass: the perimeter over the
+         values (B:E) or over label + values (A:E). Anything narrower or wider still fails. */
       const boxOk=(function(){
-        for(const cl of COLS){ const c=cel(cl+o.dr); if(!((c.bt||c.ball)&&(c.bb||c.ball))) return false; }
-        const L=cel('B'+o.dr), R=cel('E'+o.dr);
-        return !!((L.bl||L.ball) && (R.br||R.ball));
+        for(const start of ['B','A']){
+          const span = start==='A' ? ['A'].concat(COLS) : COLS;
+          if(!span.every(cl=>{ const c=cel(cl+o.dr); return (c.bt||c.ball)&&(c.bb||c.ball); })) continue;
+          const L=cel(start+o.dr), R=cel('E'+o.dr);
+          if((L.bl||L.ball) && (R.br||R.ball)) return true;
+        }
+        return false;
       })();
       /* ☆ (§1.0(d) hidden efficiency — NEW this round; the blue-the-row formatting ☆ died):
          BOTH inconsistent lines converted by ONE paste-special arithmetic pass — the copied
@@ -4574,7 +4584,7 @@ const CHALLENGES = {
          (3) EXACTLY ONE margin row, labeled "EBITDA margin %" (Wolf: delete the duplicate). The
              second one died with the round-2 rename; the C10 invariant now pins it at one.
          §1.0-R2(l) HELPER STACK: the two assumptions are vertically stacked, individually labeled
-         ("Helper — COGS %" / "Helper — Opex %"), light yellow + all borders, and ship POPULATED,
+         (r430: "COGS % of revenue" / "Opex % of revenue"), light yellow + all borders, and ship POPULATED,
          under an "Assumptions" block title — never graded targets, just the inputs the seeded
          formulas already point at.
          Random axes kept per the page (Wolf: none forced): site jitter {B2,B3} + rnd() values
@@ -4595,9 +4605,9 @@ const CHALLENGES = {
       // ---- §1.0(f)+§1.0-R2(l) helper stack: labeled, vertically stacked, light yellow + all borders, populated
       const cogsP=rnd(7,9)/20, opexP=rnd(3,5)/20;   // multiples of 0.05 — the integer guarantee
       cells['H'+hr]={...blankCell(),value:'Assumptions',txt:true,bold:true};
-      cells['H'+fr]={...blankCell(),value:'Helper — COGS %',txt:true};
+      cells['H'+fr]={...blankCell(),value:'COGS % of revenue',txt:true};   /* r430 (Wolf round 3): was 'Helper — COGS %'. 'Helper' names the cell's ROLE IN THE DRILL, which tells you nothing about the model; naming the assumption itself makes it obvious the cost line is a % OF the revenue row, i.e. that you are dragging a formula across. */
       cells['I'+fr]={...blankCell(),value:cogsP,fmtStyle:'percent',decimals:0,fontColor:'blue',fill:'yellow',ball:true,align:'c'};
-      cells['H'+dr]={...blankCell(),value:'Helper — Opex %',txt:true};
+      cells['H'+dr]={...blankCell(),value:'Opex % of revenue',txt:true};
       cells['I'+dr]={...blankCell(),value:opexP,fmtStyle:'percent',decimals:0,fontColor:'blue',fill:'yellow',ball:true,align:'c'};
       // ---- the build block: Revenue, the three cost lines (Q1 SEEDED LIVE), EBITDA
       cells['A'+rr]={...blankCell(),value:'Revenue',txt:true,bold:true};
@@ -8689,7 +8699,17 @@ const CHALLENGES = {
         if(!cell || typeof cell.value!=='number' || Math.abs(cell.value-want)>6e-4) return false; } return true; };
       const gpmOk=mval(MG[0]), ebmOk=mval(MG[1]);
       let curOk=true;
-      for(let c=2;c<2+NC;c++){ const x=S.cells[colLetter(c)+15]||{}; if(x.fmtStyle!=='currency') curOk=false; }
+      /* r430 (Wolf round 3: "fixed / rebuilt the refs but checklist isn't being triggered.
+         Again, show cover us no matter how we fix"). This demanded fmtStyle==='currency',
+         which ONLY Ctrl+Shift+$ (and the Format Cells 'C' route) produce. The ribbon's
+         Accounting Number Format — Alt H A N, the dollar path a desk actually walks and the
+         one the ribbon advertises — sets 'acct', so that player dollar-formatted the row,
+         saw dollars on the board, and watched the beat stay dark with nothing to fix. Both
+         ARE dollar formats in Excel (Currency vs Accounting differ in symbol alignment and
+         negative styling, not in being money), so both clear it — §1.0(c): grade the END
+         STATE, never the route. */
+      const isDollarFmt=f=>f==='currency'||f==='acct';
+      for(let c=2;c<2+NC;c++){ const x=S.cells[colLetter(c)+15]||{}; if(!isDollarFmt(x.fmtStyle)) curOk=false; }
       let pctOk=true;
       MG.forEach(g=>{ for(let c=2;c<2+NC;c++){ const x=S.cells[colLetter(c)+g.r]||{}; if(x.fmtStyle!=='percent'||(x.decimals|0)!==1) pctOk=false; } });
       /* ☆ recipe (§1.0(d) mystery slot — hidden EFFICIENCY, never formatting): every #REF!
@@ -10000,7 +10020,19 @@ function render(){
       else if(isNum(cell)&&!cell.wrap){
         const fz=cell.fsz?cell.fsz/13.5:1;   // r235: a resized number takes proportionally more/less width
         const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale).length*CHARPX*fz+12;
-        if(tw>__ew[c]){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(__ew[c]/8))); }
+        /* r430 (Wolf round 3: "why is everything spilling into ######## values just by having
+           it in the right format"). This compared against __ew — the ELASTIC display width —
+           so the fit-scaler manufactured the ####. Measured case: colW 92, neededWidth 85 (the
+           column is genuinely wide enough), but the scaler renders it at ew 80 to keep ten
+           columns on screen, and 80 < 80.8 needed => ####. The player is then told to widen a
+           column that was never too narrow, and no amount of Alt H O I fixes it.
+           #### must mean "this column is too narrow", which is a property of the column the
+           player set — not of how the sheet was squeezed to fit the viewport. So the test now
+           reasons in UNSCALED px, exactly as the r400 zoom note says the overflow math should
+           ("it reasons in pre-zoom px"). Hand-narrowing a column still yields ####, which is
+           the case the engine actually wants to teach. */
+        const ownW=colW[c]||COLW_DEFAULT;
+        if(tw>ownW){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(__ew[c]/8))); }
       }
       // r180: AutoFilter \u25be on every armed header cell (filled/bright when that column excludes values)
       if(S.filter && r===S.filter.hr && c>=S.filter.c1 && c<=S.filter.c2 && !(editing&&isActive)){
@@ -12871,8 +12903,28 @@ function applyRibbon(key){
     'HAL':c=>c.align='l', 'HAC':c=>c.align='c', 'HAR':c=>c.align='r',
     'HAN':c=>{c.fmtStyle='acct';c.decimals=0;},   // r233: Accounting Number Format — Excel's real Alt H A N keytip (ribbon path, not Ctrl+1)
   };
+  /* r430 (Wolf round 3): "Dollar formatting defaults to spilling horizontally — can we just
+     have dollar auto format be the dollar cycle normal to excel … why is everything spilling
+     into ######## values just by having it in the right format."
+
+     Applying $ / % / comma widens the rendered text, and a column that was sized for General
+     then goes to ####. Excel does NOT leave you there: a column whose width you have never set
+     by hand auto-grows to fit what you just formatted. We were doing the Excel-inaccurate half
+     — showing #### and making the player go widen it — which turned every format beat into a
+     stray Alt H O I, or worse an Alt H 9 guess at decimals they cannot even see.
+
+     So: after a format op, GROW any column the selection touched to fit its new content. Grow
+     only, never shrink — a column the player deliberately widened keeps its width, and the
+     autofit drills still grade their own explicit fit (they compare against neededWidth, which
+     this reaches but never exceeds). #### remains reachable by hand-narrowing a column, which
+     is the case the engine actually wants to teach. */
   if(RUN[np]){ pushUndo(); if(np==='HK') hkFmtLatch('comma');   /* r425: one-pass ☆ telemetry */
-    eachSel(RUN[np]); return exitRibbon(true); }
+    eachSel(RUN[np]);
+    if(np==='HK'||np==='HP'||np==='HAN'||np==='H0'||np==='H9'){
+      const fr=selRange();
+      for(let c=fr.c1;c<=fr.c2;c++){ const need=neededWidth(c); if((colW[c]||COLW_DEFAULT)<need) colW[c]=need; }
+    }
+    return exitRibbon(true); }
   // Alt H I R / Alt H D R — ribbon route to row insert/delete. Unlike the Ctrl chord,
   // Excel's ribbon path works on PARTIAL selections (inserts/deletes the touched rows).
   if(np==='HIR'||np==='HDR'||np==='HIC'||np==='HDC'){
