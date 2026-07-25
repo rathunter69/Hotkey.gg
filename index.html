@@ -1798,9 +1798,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=285"></script>
+<script src="drills.js?v=286"></script>
 
-<script src="drills.js?v=285"></script>
+<script src="drills.js?v=286"></script>
 
 
 
@@ -3872,16 +3872,16 @@ const CHALLENGES = {
        (3) the stamp cell wears the §1.0(f) input dress (light yellow + all borders) so
            the graded target stays visibly labeled at either site (§1.3) — it ships
            EMPTY, not populated: the live date IS the work, not a seeded helper. */
-    name:'Typeset', label:'Typeset the memo', par:14, parKeys:13, saveClose:true,   /* r425: par re-swept ×5 seeds post-rework (median 13 keys, save incl.), par 14 ≈ house ~1.08 s/key */
-    aha:'Ctrl+B bolds, Ctrl+I italicizes, Ctrl+5 strikes through — and =TODAY() dates the page.',
-    prompt:'The coverage memo goes out tonight and the typography is flat: the header row carries no weight, one body line is bold it never earned, the margin notes read like data, and a discontinued item still sits in the list like it’s live. Set the type so the page reads at a glance — then sign it with a live date and save it down.',
+    name:'Typeset', label:'Typeset the memo', par:24, parKeys:22, saveClose:true,   /* r430: re-swept after the strikethrough beat became a red-font beat — Ctrl+5 was one keystroke, the Alt H F C ribbon walk is ten, so measured median went 13 -> 22 keys (dev/e2e-par-sweep.js typeset). par at the ~1.08 s/key house rate. */
+    aha:'Ctrl+B bolds, Ctrl+I italicizes, Alt H F C colors the flag red — and =TODAY() dates the page.',
+    prompt:'The coverage memo goes out tonight and the typography is flat: the header row carries no weight, one body line is bold it never earned, the margin notes read like data, and a discontinued item still sits in the list like it’s live, unflagged. Set the type so the page reads at a glance — then sign it with a live date and save it down.',
     req(){ const o=this._o; return 'bold <em>A2:D2</em> · UNbold row <em>'+o.wb+'</em> · <em>ctrl+i</em> the memos <em>'+o.memoRng+'</em> · <em>ctrl+5</em> the dead line <em>'+o.deadRng+'</em> · <em>=TODAY()</em> at <em>'+o.stamp+'</em> · <em>ctrl+s</em>'; },
     /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, per line, chords allowed */
     guide(){ const o=this._o; return [
       'the header row (Item · Owner · Status · $k) — select across it · <kbd>ctrl</kbd>+<kbd>b</kbd>',
       'one body line is bold for no reason — it’s row '+o.wb+': select across it · <kbd>ctrl</kbd>+<kbd>b</kbd> toggles it OFF — unbolding is a skill',
       'the three Memo: lines · <kbd>ctrl</kbd>+<kbd>i</kbd>',
-      'the line marked (discontinued) — select across it · <kbd>ctrl</kbd>+<kbd>5</kbd> — struck, not deleted; the history stays legible (<kbd>ctrl</kbd>+<kbd>1</kbd>, <kbd>k</kbd> works too)',
+      'the line marked (discontinued) — select across it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · red — flagged, not deleted; the history stays on the page',
       'the yellow box beside “Last updated:” — type <kbd>=TODAY()</kbd> <kbd>↵</kbd> — the page says when it was true',
       '☆ the discovery: one selection covers all three memo lines — grab the block, one <kbd>ctrl</kbd>+<kbd>i</kbd>; line-by-line works too, it just costs time',
     ]; },
@@ -3890,7 +3890,10 @@ const CHALLENGES = {
       {sel:'A2:D2', keys:[Kb.bold]},
       {sel:o.wbRng, keys:[Kb.bold]},
       {sel:o.memoRng, keys:[{key:'i',ctrl:true}]},   /* one pass over all three memo lines — the demo performs the ☆ (§2.2) */
-      {sel:o.deadRng, keys:[{key:'5',ctrl:true}]},
+      /* r430: was Ctrl+5 (strikethrough). The graded beat is red font now, so the demo walks
+         the ribbon route the UI actually shows: Alt H F C, then 5 rights to Red (index 5 of
+         FONT_SWATCHES), Enter. */
+      {sel:o.deadRng, keys:[Kb.alt,{key:'h'},{key:'f'},{key:'c'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
       {sel:o.stamp, keys:[...T('=TODAY()'), Kb.enter]},
     ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
@@ -3942,7 +3945,16 @@ const CHALLENGES = {
       const hdrOk=['A','B','C','D'].every(L2=>!!cel(L2+'2').bold);
       const unOk=['A','B','C','D'].every(L2=>!cel(L2+o.wb).bold);
       const memoOk=[0,1,2].every(j=>!!cel('A'+(o.m0+j)).it);
-      const strikeOk=['A','B','C','D'].every(L2=>!!cel(L2+o.deadR).strike);
+      /* r430 (Wolf round 3): this graded a STRIKETHROUGH. Two problems, both his:
+         "we don't have the icon or hotkey on the ribbon" — Ctrl+5 works but the ribbon shows
+         no strikethrough path, so the drill taught a move the UI cannot walk; and "in real
+         life this is relatively rare vs. the tons of other formatting things … why are we
+         focusing on strikethrough?" — the same misjudged-priority trap as anchoring on the
+         comma format. Red font is on his list by name ("color red for a number that needs
+         special attention"), is what a desk actually does to a dead line, and has a real
+         ribbon route (Alt H F C). Ctrl+5 still WORKS — it is real Excel — it is just no
+         longer a graded primary beat. */
+      const deadOk=['A','B','C','D'].every(L2=>cel(L2+o.deadR).fontColor==='red');
       const st=cel(o.stamp);
       const stampOk=!!(st.formula && /TODAY/i.test(String(st.formula)));
       /* ☆ recipe (§1.0(d) hidden efficiency): all three memo lines italicized by ONE
@@ -3955,7 +3967,7 @@ const CHALLENGES = {
         {label:'Bold the header row', ok: hdrOk},
         {label:'Unbold the imposter line', ok: unOk},
         {label:'Italicize the memo lines', ok: memoOk},
-        {label:'Strike through the discontinued line', ok: strikeOk},
+        {label:'Color the discontinued line red', ok: deadOk},
         {label:'Enter =TODAY() in the date cell', ok: stampOk},
         {label:'Italicize all three memo lines in one pass', ok: starOk, bonus:true},
       ];
