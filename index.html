@@ -480,7 +480,7 @@
      FIXED-HEIGHT SLOT: the slot holds exactly one strip's worth of layout forever, and a menu
      that needs a second line grows the ribbon DOWNWARD as an overlay over the sheet. Grid top is
      now a constant in every ribbon state, and nothing is clipped or scrolled out of reach. */
-  .ribbon-slot{position:relative; flex:0 0 var(--rib-h,34px); height:var(--rib-h,34px); z-index:30}
+  .ribbon-slot{position:relative; flex:0 0 var(--rib-h,34px); height:var(--rib-h,34px); z-index:12}   /* above the sheet's own layers (td 2-6, marquee 6) so the expansion overlays the grid; BELOW the mode-bar popovers (25) and the floating dialogs (30) so they still land on top */
   .ribbon-slot > .ribbon{position:absolute; top:0; left:0; right:0}
   .ribbon-slot > .ribbon.ribbon-open{box-shadow:0 8px 18px rgba(0,0,0,.16)}   /* the overlay reads as a layer above the sheet */
   .ribbon{display:flex; align-items:center; flex-wrap:wrap; gap:4px 7px; min-height:var(--rib-h,34px); row-gap:2px;
@@ -17155,6 +17155,59 @@ async function hydratePBFromServer(){
    never touched Excel are thrown off "off rip"). One question on first entry;
    "basically none" gets a 5-card primer teaching the raw vocabulary BEFORE the
    product tour, plus guided mode for the first 3 solves. ---- */
+/* r425 (Wolf R2-B6 — reported TWICE: "onboarding arrow keys still dead") — ONE keyboard
+   driver for both first-run cards, replacing the two ad-hoc handlers r292 and r313 grew
+   independently. What was actually dead:
+     · only ↑/↓ were bound. ←/→ — the first thing a keyboard-first player reaches for on a
+       stacked two-up choice — did nothing, and the trainer's global guard swallowed them
+       silently (preventDefault + return), so the card looked frozen.
+     · Tab moved the BROWSER's focus ring but not the green .focused state, then Enter (which
+       this handler intercepts) confirmed the ringed-elsewhere card. Two different "selected"
+       markers on screen, and the wrong one won.
+   The driver below owns every key that can mean move or choose, and keeps real DOM focus
+   glued to the highlighted card so the two can never disagree again. It arms on BOTH the
+   document (capture, ahead of the trainer's global handler) and on the card itself, so the
+   card still answers even if something upstream ever eats the capture pass.
+   Esc is deliberately inert: these two questions gate the tour and have no safe default. */
+function hkCardPicker(m, btns, sel, onPick){
+  if(!btns.length) return ()=>{};
+  /* r425: .ob-key.primary paints the SAME accent block as .ob-key.focused. On the experience
+     card the first option shipped as .primary, so pressing ↓ left a green card sitting where
+     you started and put only a thin ring on the card you moved to — the arrows worked and
+     still read as dead. The recommendation styling now travels WITH the selection: exactly
+     one accent block on screen, and it is always the thing ↵ will confirm. */
+  const prim=btns.map(b=>b.classList.contains('primary'));
+  const paint=()=>{
+    btns.forEach((b,i)=>{ b.classList.toggle('focused', i===sel);
+      b.classList.toggle('primary', prim[i] && i===sel);
+      b.setAttribute('aria-checked', i===sel?'true':'false'); b.tabIndex = (i===sel?0:-1); });
+    try{ const b=btns[sel]; if(b && document.activeElement!==b) b.focus({preventScroll:true}); }catch(e){}
+  };
+  const move=d=>{ sel=(sel+d+btns.length)%btns.length; paint(); };
+  const cleanup=()=>{ document.removeEventListener('keydown', keys, true); m.removeEventListener('keydown', keys, true); };
+  const done=v=>{ cleanup(); onPick(v); };
+  const keys=(e)=>{
+    if(e.__hkCard) return; e.__hkCard=1;            // armed twice on purpose — only act once
+    const k=e.key, stop=()=>{ e.preventDefault(); e.stopImmediatePropagation(); };
+    if(k==='ArrowDown'||k==='ArrowRight'){ stop(); move(1); return; }
+    if(k==='ArrowUp'  ||k==='ArrowLeft' ){ stop(); move(-1); return; }
+    if(k==='Tab'){ stop(); move(e.shiftKey?-1:1); return; }        // focus stays inside the card
+    if(k==='Home'){ stop(); sel=0; paint(); return; }
+    if(k==='End'){ stop(); sel=btns.length-1; paint(); return; }
+    if(k==='Enter'||k===' '||k==='Spacebar'){ stop(); done(sel); return; }
+    if(k==='Escape'){ stop(); return; }             // no default answer — the card holds
+    const n=parseInt(k,10);
+    if(n>=1 && n<=btns.length){ stop(); done(n-1); }   // r280/r313: the number keys still pick
+  };
+  try{ const opts=m.querySelector('.ob-opts'); if(opts) opts.setAttribute('role','radiogroup'); }catch(e){}
+  btns.forEach((b,i)=>{ b.setAttribute('role','radio');
+    b.onclick=()=>done(i);                          // r280/r313: click still picks
+    b.onmouseenter=()=>{ sel=i; paint(); }; });
+  paint();
+  document.addEventListener('keydown', keys, true);
+  m.addEventListener('keydown', keys, true);
+  return cleanup;
+}
 /* r280 (Wolf): keyboard pick up front — the right overlay loads without hunting
    for a toggle. Detection preselects; the pick overrides it everywhere (keycaps,
    the mac popup, the reference default). */
@@ -17166,60 +17219,43 @@ function showKeyboard(after){
     /* r322 (Wolf): a big keyboard mark up top — this is the "hands on the keyboard" moment */
     '<svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 10px;color:var(--accent)"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg>'+
     '<div class="ob-title">first — what keyboard are you on?</div>'+
-    '<div class="ob-body" style="font-size:12.5px"><b style="color:var(--accent)">Hands on the keyboard from here — no mouse needed.</b> Use <b>↑↓</b> to choose and <b>↵</b> to confirm. Keycaps render for your machine; same drills either way.</div>'+
+    '<div class="ob-body" style="font-size:12.5px"><b style="color:var(--accent)">Hands on the keyboard from here — no mouse needed.</b> Use <b>↑↓</b> (or <b>←→</b>) to choose and <b>↵</b> to confirm. Keycaps render for your machine; same drills either way.</div>'+
     '<div class="ob-opts" style="flex-direction:column;gap:8px;align-items:stretch">'+
       '<button class="ob-key" data-kb="win" style="text-align:left"><b>⊞ Windows</b> — Ctrl chords, Alt ribbon walks'+(macGuess?'':' <span style="color:var(--faint);font-size:10px">(detected)</span>')+' <kbd class="ob-kbd">1</kbd></button>'+
       '<button class="ob-key" data-kb="mac" style="text-align:left"><b>⌘ Mac</b> — ⌘ chords, ⌥ ribbon walks (KeyTips)'+(macGuess?' <span style="color:var(--faint);font-size:10px">(detected)</span>':'')+' <kbd class="ob-kbd">2</kbd></button>'+
     '</div></div>';
   m.classList.add('show'); window.__introCardOpen=true;
-  // r292: arrow-key + Enter navigation, defaulting to the detected platform
+  // r292 → r425: arrows / Tab / Enter / 1-2 / click, one driver, defaulting to the detected platform
   const btns=[...m.querySelectorAll('[data-kb]')];
-  let sel=macGuess?1:0;
-  const paint=()=>btns.forEach((b,i)=>b.classList.toggle('focused', i===sel));
-  paint();
-  const keys=(e)=>{
-    if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); e.stopImmediatePropagation(); sel=sel?0:1; paint(); return; }
-    if(e.key==='Enter'){ e.preventDefault(); e.stopImmediatePropagation(); pick(sel===1); return; }
-    if(e.key==='1'||e.key==='2'){ e.preventDefault(); e.stopImmediatePropagation(); pick(e.key==='2'); }
-  };
-  const pick=(mac)=>{
+  hkCardPicker(m, btns, macGuess?1:0, (i)=>{
+    const mac = btns[i].dataset.kb==='mac';
     try{ hkSetPlatform(mac); }catch(e){}
     try{ ev('kb_pick',{mac:mac?1:0}); }catch(e){}
-    m.classList.remove('show'); window.__introCardOpen=false; document.removeEventListener('keydown', keys, true);
-    after(); };
-  btns.forEach((b,i)=>{ b.onclick=()=>pick(b.dataset.kb==='mac'); b.onmouseenter=()=>{ sel=i; paint(); }; });
-  document.addEventListener('keydown', keys, true);
+    m.classList.remove('show'); window.__introCardOpen=false;
+    after();
+  });
 }
 function showComfort(after){
   let m=$('comfortCard');
   if(!m){ m=document.createElement('div'); m.id='comfortCard'; m.className='onboard-modal'; document.body.appendChild(m); }
   m.innerHTML='<div class="ob-card" style="max-width:470px">'+
     '<div class="ob-title">quick one \u2014 how much Excel have you done?</div>'+
-    '<div class="ob-body" style="font-size:12.5px">No wrong answer \u2014 this just sets how much hand-holding you get. You can always press <b>F1</b> for guided mode.</div>'+
+    '<div class="ob-body" style="font-size:12.5px">No wrong answer \u2014 this just sets how much hand-holding you get. <b>\u2191\u2193</b> to choose, <b>\u21b5</b> to confirm. You can always press <b>F1</b> for guided mode.</div>'+
     '<div class="ob-opts" style="flex-direction:column;gap:8px;align-items:stretch">'+
       '<button class="ob-key primary" data-xlv="0" style="text-align:left"><b>Basically none</b> \u2014 teach me from zero <kbd class="ob-kbd">1</kbd></button>'+
       '<button class="ob-key" data-xlv="1" style="text-align:left"><b>I get around</b> \u2014 classes, an internship <kbd class="ob-kbd">2</kbd></button>'+
       '<button class="ob-key" data-xlv="2" style="text-align:left"><b>I live in it</b> \u2014 just show me the drills <kbd class="ob-kbd">3</kbd></button>'+
     '</div></div>';
   m.classList.add('show'); window.__introCardOpen=true;
-  // r313 (Wolf): the experience card had NO arrow/Enter nav (digits only) — you couldn't
-  // drive it with the keyboard we're teaching. Now it matches the keyboard card exactly.
+  // r313 → r425: same driver as the keyboard card — arrows, Tab, Enter, 1-3, click, hover.
   const btns=[...m.querySelectorAll('[data-xlv]')];
-  let sel=0;
-  const paint=()=>btns.forEach((b,i)=>b.classList.toggle('focused', i===sel));
-  paint();
-  const keys=(e)=>{
-    if(e.key==='ArrowDown'){ e.preventDefault(); e.stopImmediatePropagation(); sel=(sel+1)%3; paint(); return; }
-    if(e.key==='ArrowUp'){ e.preventDefault(); e.stopImmediatePropagation(); sel=(sel+2)%3; paint(); return; }
-    if(e.key==='Enter'){ e.preventDefault(); e.stopImmediatePropagation(); pick(sel); return; }
-    if(e.key>='1'&&e.key<='3'){ e.preventDefault(); e.stopImmediatePropagation(); pick(+e.key-1); }
-  };
-  const pick=(v)=>{ try{ localStorage.setItem('hk_xlv', String(v)); }catch(e){}
+  hkCardPicker(m, btns, 0, (i)=>{
+    const v=+btns[i].dataset.xlv;
+    try{ localStorage.setItem('hk_xlv', String(v)); }catch(e){}
     try{ ev('comfort',{v:v}); }catch(e){}
-    m.classList.remove('show'); window.__introCardOpen=false; document.removeEventListener('keydown', keys, true);
-    after(); };   // r303: the primer is folded INTO the tour now (buildTourPlan gates the fundamentals by xlv) — no separate modal
-  btns.forEach((b,i)=>{ b.onclick=()=>pick(+b.dataset.xlv); b.onmouseenter=()=>{ sel=i; paint(); }; });
-  document.addEventListener('keydown', keys, true);
+    m.classList.remove('show'); window.__introCardOpen=false;
+    after();   // r303: the primer is folded INTO the tour now (buildTourPlan gates the fundamentals by xlv) — no separate modal
+  });
 }
 /* r303: PRIMER + showPrimer DELETED — the five cards live on as the tour's novice beats. */
 /* r303 ONBOARDING V3 (Wolf) — the primer is FOLDED into the spotlight tour: one dim+highlight
