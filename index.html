@@ -5532,48 +5532,220 @@ const CHALLENGES = {
     }
   },
   foot:{
-    name:'Foot', label:'Foot the table both ways', par:11, parKeys:8,
-    aha:'Alt+= proposes the SUM it sees — total the rows, the columns, and the corner.',
-    prompt:'Total a segment × quarter block in every direction: total each row, total each column, and land the grand total where they meet. AutoSum reads the block and proposes each SUM for you — faster than typing it out. The corner total must tie to both edges.',
-    req:'<em>F2</em> · <em>alt+=</em> <em>↵</em> · fill F2:F5 ↓ · <em>B6</em> · <em>alt+=</em> <em>↵</em> · fill B6:E6 → · <em>F6</em> grand · <em>alt+=</em> <em>↵</em>',
-    guide:[
-      'row totals: F2 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:E2) — it read the row · <kbd>↵</kbd> · select F2:F5 · <kbd>ctrl</kbd>+<kbd>d</kbd>',
-      'column totals: B6 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:B5) · <kbd>↵</kbd> · select B6:E6 · <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'the corner: F6 · <kbd>alt</kbd>+<kbd>=</kbd> — it sums the row totals above, and that must agree with the column edge',
-    ],
-    targets:['F2:F5','B6:E6','F6'],
-    demo(){ return [
-      {sel:'F2', keys:[Kb.eq, Kb.enter]},
-      {sel:'F2:F5', keys:[Kb.fillD]},
-      {sel:'B6', keys:[Kb.eq, Kb.enter]},
-      {sel:'B6:E6', keys:[Kb.fillR]},
-      {sel:'F6', keys:[Kb.eq, Kb.enter]},
+    /* r433 H6b (DEPTH_PASS §4.22, "Total it both ways", tagged audit-shallow #9) — the depth-pass
+       rework, built to §1.0 + §1.0-R2 + §1.0-R3 on top of the page.
+
+       WAS: 3 checks (rows · columns · corner) on a FIXED 4×4 block at B2, par 11 / parKeys 8 —
+       the thinnest drill in Formulas I. The prompt claimed "never type a SUM" while sumishF
+       happily accepted one (AUDIT §D: text ≠ grading). Nothing was dressed, nothing was proven,
+       and the board never moved.
+
+       NOW: the §4.22 beat list — row totals · column totals · the corner that has to agree with
+       both edges · the dress · the tie check that proves it — on a board that shuffles site,
+       block SIZE (segments × quarters), segment names and every figure, closed by the §1.0(e)
+       Ctrl+S beat the engine appends.
+
+       STRUCTURAL DEVIATIONS from the §4.22 page, declared here per §0 (the agent makes the call
+       and names it rather than improvising silently):
+
+       (1) ☆ RE-CUT. The page's bonus is "Comma-format the entire block — zero decimals, one
+           pass". That is a FORMATTING task, and §1.0(d) outlaws formatting ☆s catalog-wide
+           ("existing formatting-☆s die as their drill's round-2/wave rework lands"); it is also
+           dead on this board, which ships comma-formatted because number dress is not this
+           drill's lesson (§2.1b, pre-dressed win state). The index.html r425 comment that
+           anticipated "foot's planned block-☆" off the fmtOps latch predates that ruling and is
+           superseded here.
+           The re-cut ☆ is the cross-foot mastery move and nothing else: run EACH edge fill
+           THROUGH the corner. Fill the Total column down from its first cell to the Total row
+           and the corner inherits the translated row-SUM; fill the Total row right from its
+           first cell to the Total column and the corner inherits the translated column-SUM.
+           Either way NINE totals land from TWO seeds and TWO fills — and the corner, which
+           almost every player totals by hand as a third act, falls out of the fills for free.
+           §1.0-R2(i) test: a player who AutoSums the corner on its own (the obvious route, and
+           the one the old drill taught) clears every core beat and never sees the star, so it is
+           a distinct, skippable decision — and it is exactly Wolf's framing, "reward for good
+           habits of using the previously taught hotkeys that save time" (Ctrl+D / Ctrl+R come
+           from filldr). Graded off the r424 S.fillOps telemetry, so ribbon fills (Alt H F I D/R)
+           earn it too — the ☆ is chord-agnostic (§1.0(c)).
+
+       (2) THE PAGE'S BEAT 4 SPLITS IN TWO. "Bold the Total row and column and add a top border
+           above the row" carries three actions across two verbs; §1.7 R1 turns an "and" into two
+           lines and §1.1's tight-pair exception covers one motion, not three. It ships as
+           "Bold the Total row and the Total column" + "Add a top border above the Total row",
+           which takes the drill to 6 core beats — inside the §1.1 4–6 band.
+
+       (3) BEAT TAILS. The page's tails are kept only where they say WHAT (beat 3's "it must
+           agree with both edges" is an acceptance condition, §1.7 R5); nothing after an em-dash
+           states a WHY (§1.0-R3(n), C11-enforced).
+
+       (4) GRADING (§1.0(c) FREEDOM + §1.0-R3(p) grade-the-end-state). Beats 1–3 grade the VALUE
+           in tolerance: a typed number, =SUM(), =B4+C4+D4, a pointed formula and AutoSum all
+           clear, and the prompt drops the page's retired "never type a SUM" claim exactly as
+           §4.22's Language note asks. The ONE place liveness is required is the tie check
+           (beat 6), and only as "a formula carrying at least two cell references": a hardcoded
+           zero is not a check, it is the thing this drill teaches you to distrust — the same
+           class as anchor grading anchors through formula text, where the mechanic IS the
+           lesson. Every real cross-check shape clears it, including the one that never touches
+           the corner (=SUM(total column) − SUM(total row)), so no route is privileged.
+           The top-border beat accepts bt OR ball, because Alt H B P, Alt H B D and Alt H B S/T
+           on a one-row selection all draw that edge, as does Alt H B A.
+
+       (5) NO §1.0-R2(h) LOCATION CUE is seeded. Every graded target here is a labeled row or
+           column the green outline expresses exactly — the Total column under its "Total"
+           header, the Total row beside its "Total" label, the corner where they cross, and the
+           check cell on the board's "Tie check" line. There is no insert point and no paste
+           destination, which is what §1.0-R3(q) reserves cues for; a red carat here would be
+           furniture with nothing to point at.
+
+       (6) NO HELPER STACK (§1.0(f)/§1.0-R2(l)). The drill has no assumptions — every figure on
+           the board is a reported segment number. Nothing to park in a yellow cell.
+
+       DISTINCTNESS (checked against the near neighbours before building): `balance` foots two
+       DIFFERENT populations down two columns and subtracts them; there is no horizontal total
+       and no corner. `sumif`/`rollup` BUILD a summary out of a raw list by matching criteria —
+       the lesson there is the criteria formula and its anchors. Here the grid is already whole:
+       the lesson is that one population summed two ways must land on the same number, and that
+       the corner is where you find out.
+
+       ENGINE: none. Alt+= single-cell form proposes vertically first, then horizontally (the
+       r192 adaptive proposal), which is why the row totals read left and the column totals read
+       up with no extra keys. Fill copies FORMAT as well as formula (Excel parity), so a player
+       who dresses before filling will see the corner lose its bold — visible, and repairable by
+       re-dressing; the checks grade the end state, so any order that ends dressed clears. */
+    name:'Foot', label:'Total it both ways', par:29, parKeys:27, saveClose:true,   /* r433 §4.22 depth pass: par re-swept from scratch (was par 11 / parKeys 8 on the old 3-check board). Sweep median 27 keys × 5 seeds (the count is geometry-independent — two AutoSum seeds, two fills, three dress passes, the tie check and the engine's Ctrl+S closer), par ≈ 1.07 s/key: a touch over the house 1.00 because setDemoSel elides five real range grabs the player has to make by hand. Mirrored in HOTKEY_PARS. */
+    aha:'one population, two directions — the corner is where the down-total and the across-total have to meet.',
+    prompt:'The segment pack came back from reporting with every total stripped out and the flash goes to the desk in an hour. Total each segment line across the quarters, total each quarter down its column, and land the grand total where the two edges cross. Then prove it: the tie check under the block reads zero only when the corner agrees with the column it sits under. Type the SUMs out if you like — the clock prices the difference.',
+    req(){ const o=this._o; return '<em>'+o.rowSeed+'</em> <em>alt+=</em> <em>↵</em> · fill '+o.colRng+' <em>ctrl+d</em> · <em>'+o.colSeed+'</em> <em>alt+=</em> <em>↵</em> · fill '+o.rowRng+' <em>ctrl+r</em> · '+o.rowRng+' + '+o.colRng+' <em>ctrl+b</em> · '+o.rowRng+' <em>alt h b p</em> · <em>'+o.chk+'</em> <em>='+o.corner+'-SUM('+o.colBody+')</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords allowed */
+    guide(){ const o=this._o; return [
+      'the row totals — at '+o.rowSeed+' press <kbd>alt</kbd>+<kbd>=</kbd>: nothing numeric sits above it, so AutoSum reads the quarters to its LEFT and proposes the SUM · <kbd>↵</kbd> · select '+o.colBody+' · <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'the column totals — at '+o.colSeed+' press <kbd>alt</kbd>+<kbd>=</kbd>: this time it reads the segment figures ABOVE · <kbd>↵</kbd> · select '+o.rowBody+' · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'the corner at '+o.corner+' · <kbd>alt</kbd>+<kbd>=</kbd> takes the row totals stacked above it; taking the quarter totals to its left lands the same number, and the two readings are what you are checking',
+      'the weight goes on the totals: select the Total row '+o.rowRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> · then the Total column '+o.colRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle)',
+      'rule it: select '+o.rowRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — the border sits on TOP of a total line, never underneath',
+      'the tie check at '+o.chk+' · <kbd>='+o.corner+'-SUM('+o.colBody+')</kbd> <kbd>↵</kbd> — the corner against the column of row totals it sits under; a zero says both edges reached the same number',
+      '☆ the discovery: run each fill THROUGH the corner — '+o.colRng+' <kbd>ctrl</kbd>+<kbd>d</kbd> and '+o.rowRng+' <kbd>ctrl</kbd>+<kbd>r</kbd>. Nine totals off two SUMs, the corner included; totalling the corner on its own clears the drill too, it just costs keys',
     ]; },
+    /* rings: ① the Total column · ② the quarter totals in the Total row · ③ the corner ·
+       ④ the rectangle that holds BOTH total lines (the beat covers an L, a ring is a rect) ·
+       ⑤ the Total row · ⑥ the check cell · ☆ never ringed (r423 §2 mystery slot) */
+    targets(){ const o=this._o; return [o.colBody, o.rowBody, o.corner, o.blk, o.rowRng, o.chk, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.rowSeed, keys:[Kb.eq, Kb.enter]},
+      {sel:o.colRng,  keys:[Kb.fillD]},                    /* ☆ move #1 — the fill runs THROUGH the corner (latches at the win, §2.2) */
+      {sel:o.colSeed, keys:[Kb.eq, Kb.enter]},
+      {sel:o.rowRng,  keys:[Kb.fillR]},                    /* ☆ move #2 — and the corner takes the column reading */
+      {sel:o.colRng,  keys:[Kb.bold]},                     /* §1.0(a) format-as-you-go: the dress rides directly behind the totals it dresses */
+      {sel:o.rowRng,  keys:[Kb.bold]},
+      {sel:o.rowRng,  keys:[Kb.alt,L('h'),L('b'),L('p')]},
+      {sel:o.chk,     keys:[...T('='+o.corner+'-SUM('+o.colBody+')'), Kb.enter]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — segment × quarter ($mm)',txt:true,bold:true};
-      const segs=['Industrial','Consumer','Services','Energy'];
-      ['Q1','Q2','Q3','Q4'].forEach((q,j)=>cells[colLetter(2+j)+1]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
-      cells['F1']={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
-      this._g=0;
-      for(let i=0;i<4;i++){ cells['A'+(2+i)]={...blankCell(),value:segs[i],txt:true};
-        for(let j=0;j<4;j++){ const v=rnd(10,90)*10; this._g+=v;
-          cells[colLetter(2+j)+(2+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-        cells['F'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0}; }
-      cells['A6']={...blankCell(),value:'Total',txt:true,bold:true};
-      for(let j=0;j<4;j++) cells[colLetter(2+j)+6]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      cells['F6']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      return {ROWS:8, cells, active:{r:2,c:6}, sel:null, colW:{1:104}};
+      /* §1.2 randomization — four independent axes: (a) SITE, a 3-spot pool that moves the block
+         in both axes (the audit's "the block never moves" finding); (b) the segment-name pool is
+         Fisher-Yates shuffled and sampled; (c) every figure through rnd(); (d) BLOCK SIZE —
+         3–5 segments × 3–4 quarters, so the ranges the player selects change shape run to run. */
+      const SEGS=['Industrial','Consumer','Services','Energy','Healthcare','Aviation','Logistics','Specialty'];
+      const pick=(pool,k)=>{ const b=pool.slice(); for(let i=b.length-1;i>0;i--){ const j=rnd(0,i); [b[i],b[j]]=[b[j],b[i]]; } return b.slice(0,k); };
+      const n=rnd(3,5), q=rnd(3,4);
+      const spots=[{hr:2,c0:1},{hr:3,c0:1},{hr:3,c0:2}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const hr=sp.hr, c0=sp.c0;
+      const r1=hr+1, rn=hr+n, rt=rn+1, rc=rt+2;            // rt+1 stays EMPTY — the check line reads as its own prove-out row
+      const cq1=c0+1, cT=c0+q+1;
+      const LC=colLetter(c0), CQ1=colLetter(cq1), CT=colLetter(cT), CQL=colLetter(cT-1);
+      cells[LC+'1']={...blankCell(),value:codename()+' — segment × quarter ($mm)',txt:true,bold:true};
+      cells[LC+hr]={...blankCell(),value:'Segment',txt:true,bold:true};
+      for(let j=0;j<q;j++) cells[colLetter(cq1+j)+hr]={...blankCell(),value:'Q'+(j+1),txt:true,bold:true,align:'r'};
+      cells[CT+hr]={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
+      /* §1.3 labeled targets: every graded site carries a visible board label — the "Total"
+         column header, the "Total" row label, and the "Tie check" line — so the semantic
+         references in the beats always resolve. */
+      const segs=pick(SEGS,n), rowSum=[], colSum=new Array(q).fill(0);
+      for(let i=0;i<n;i++){
+        cells[LC+(r1+i)]={...blankCell(),value:segs[i],txt:true};
+        let rs=0;
+        for(let j=0;j<q;j++){ const v=rnd(12,88)*10; rs+=v; colSum[j]+=v;
+          cells[colLetter(cq1+j)+(r1+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }   // reported figures — typed data wears blue
+        rowSum.push(rs);
+        cells[CT+(r1+i)]={...blankCell(),fmtStyle:'comma',decimals:0};       // the row total — empty, already wearing its number format
+      }
+      /* the Total line ships LABELLED but UNDRESSED — unbold, unruled: beats 4 and 5 are the
+         work (§1.0(a) puts them directly behind the totals they dress, never batched at the end) */
+      cells[LC+rt]={...blankCell(),value:'Total',txt:true,bold:true};
+      for(let j=0;j<q;j++) cells[colLetter(cq1+j)+rt]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[CT+rt]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[LC+rc]={...blankCell(),value:'Tie check',txt:true};
+      cells[CT+rc]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* §1.3 density + a real desk artifact: the page names its own source and its basis, which
+         is what a segment tape actually carries. Story only — the checks read the table, so
+         deleting either note can never move an ok. Two lines rather than one because the
+         3-segment seeds otherwise sit under the §1.3 60% density floor on the 14-row frame. */
+      cells[LC+(rc+2)]={...blankCell(),value:'Source: segment reporting pack — figures as of the quarter close',txt:true,it:true,fontColor:'gray'};
+      cells[LC+(rc+3)]={...blankCell(),value:'Basis: as-reported, no restatements in the period',txt:true,it:true,fontColor:'gray'};
+      const grand=rowSum.reduce((a,b)=>a+b,0);
+      this._o={ n, q, hr, r1, rn, rt, rc, c0, cq1, cT, LC, CQ1, CT,
+        rowSum, colSum, grand,
+        rowSeed:CT+r1,                       // where the row-total SUM is seeded
+        colSeed:CQ1+rt,                      // where the column-total SUM is seeded
+        colBody:CT+r1+':'+CT+rn,             // the row totals, segment lines only
+        colRng :CT+r1+':'+CT+rt,             // …and the same column carried THROUGH the corner (the ☆ fill)
+        rowBody:CQ1+rt+':'+CQL+rt,           // the quarter totals, no corner
+        rowRng :CQ1+rt+':'+CT+rt,            // …and the same row carried THROUGH the corner (the ☆ fill)
+        blk    :CQ1+r1+':'+CT+rt,            // the whole figure block — the ring for the L-shaped bold beat
+        corner :CT+rt, chk:CT+rc };
+      const colW={}; colW[c0]=150; for(let j=0;j<q;j++) colW[cq1+j]=80; colW[cT]=92;
+      return {ROWS:Math.max(12,rc+3), cells, active:{r:r1,c:cT}, sel:null, colW};
     },
     checks(S){
-      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:NaN; };
-      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&sumishF(c.formula)); };
-      const rowOk=r=>live('F'+r)&&Math.abs(val('F'+r)-(val('B'+r)+val('C'+r)+val('D'+r)+val('E'+r)))<1e-6;
-      const colOk=cc=>{ const L2=colLetter(cc); return live(L2+'6')&&Math.abs(val(L2+'6')-(val(L2+'2')+val(L2+'3')+val(L2+'4')+val(L2+'5')))<1e-6; };
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      /* §1.0(c) FREEDOM + §1.0-R3(p) END STATE: the totals grade the VALUE, in tolerance, so a
+         typed figure clears exactly like AutoSum, =SUM(), a pointed formula or a chain of plus
+         signs. Every figure on this board is a whole number by construction (rnd()×10), so the
+         0.5 tolerance is slack, never a rounding trap. */
+      const near=(k,want)=>{ const v=cel(k).value; return typeof v==='number' && Math.abs(v-want)<0.5; };
+      const rowOk=o.rowSum.every((w,i)=>near(o.CT+(o.r1+i), w));
+      const colOk=o.colSum.every((w,j)=>near(colLetter(o.cq1+j)+o.rt, w));
+      const cornerOk=near(o.corner, o.grand);
+      /* the dress grades the FIGURE cells of both total lines (the corner belongs to both). The
+         "Total" label cells ship bold already — border grammar and label weight are not this
+         drill's lesson — so selecting just the numbers and selecting the whole line both clear. */
+      const totRow=[]; for(let j=0;j<o.q;j++) totRow.push(colLetter(o.cq1+j)+o.rt); totRow.push(o.corner);
+      const totCol=[]; for(let i=0;i<o.n;i++) totCol.push(o.CT+(o.r1+i)); totCol.push(o.corner);
+      const boldOk=totRow.every(k=>cel(k).bold) && totCol.every(k=>cel(k).bold);
+      /* every border route that draws the top edge of the Total row clears: Alt H B P (top),
+         Alt H B D (top & bottom), Alt H B S / B T (the perimeter of a one-row selection sets the
+         top edge on every cell) and Alt H B A (all borders, which paints the same edge as ball) */
+      const ruleOk=totRow.every(k=>{ const c=cel(k); return !!(c.bt||c.ball); });
+      /* the prove-out (§1.6). A live formula carrying at least two cell references and reading
+         zero: "=0" is not a check, and the corner being right is what makes the zero mean
+         anything, so the beat chains onto beat 3. Any real cross-check shape clears —
+         corner−SUM(column), corner−SUM(row), SUM(column)−SUM(row), a chain of minus signs. */
+      const ck=cel(o.chk);
+      const refs=new Set(String(ck.formula||'').toUpperCase().match(/\$?[A-J]\$?\d{1,2}/g)||[]);
+      const checkOk=!!ck.formula && refs.size>=2 && typeof ck.value==='number' && Math.abs(ck.value)<0.5 && cornerOk;
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision): BOTH edge fills run
+         THROUGH the corner, so the grand total is never totalled as a third act. Read off the
+         r424 S.fillOps latch (mechanic used, not geometry inferred) — Ctrl+D/Ctrl+R and the
+         ribbon fills Alt H F I D/R all log, so the star is chord-agnostic. Stopping either fill
+         short of the corner and AutoSumming it clears every core beat (§1.0(c)) and forfeits
+         only the star. */
+      const ops=S.fillOps||[];
+      const downThrough =ops.some(f=>f.dir==='down'  && f.c1<=o.cT && f.c2>=o.cT && f.r1<=o.r1 && f.r2>=o.rt);
+      const rightThrough=ops.some(f=>f.dir==='right' && f.r1<=o.rt && f.r2>=o.rt && f.c1<=o.cq1 && f.c2>=o.cT);
+      const starOk=rowOk && colOk && cornerOk && downThrough && rightThrough;
+      /* §1.0-R2(g) ADAPTIVE LABELS: block size varies per seed, so beat 2 names THIS seed's last
+         quarter instead of making the player count the columns. */
       return [
-        {label:'total every row down column F — live SUMs, not typed numbers', ok: [2,3,4,5].every(rowOk)},
-        {label:'total every column across row 6 — live SUMs', ok: [2,3,4,5].every(c=>colOk(c))},
-        {label:'tie the corner — F6 must agree with BOTH edges', ok: live('F6')&&Math.abs(val('F6')-this._g)<1e-6},
+        {label:'Total every segment line across the quarters — the Total column', ok: rowOk},
+        {label:'Total every quarter down its column — Q1 through Q'+o.q+', in the Total row', ok: colOk},
+        {label:'Total the corner — it must agree with both edges', ok: cornerOk},
+        {label:'Bold the Total row and the Total column', ok: boldOk},
+        {label:'Add a top border above the Total row', ok: ruleOk},
+        {label:'Enter the tie check — the corner minus the Total column reads zero', ok: checkOk},
+        {label:'Fill both total lines through the corner — one fill each', ok: starOk, bonus:true},
       ];
     }
   },

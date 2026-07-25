@@ -6615,3 +6615,16 @@ housestyle all shipped first, and this is where they run as one pass over one ar
   (drift 0%) · fit-sweep ALL CLEAN (gauntlet stays on the exempt list — it loads on #### by
   design) · depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · guided gate
   gauntlet railed/contained/solvable.
+
+## r433 — orphaned harness + unreachable feature (found during the depth-pass campaign)
+`dev/e2e-echo.js` was **deleted**. It drove `#echoBtn`, which r401 removed from the markup
+when the 'learn' button was retired; the harness has therefore timed out on every run since,
+and nothing noticed because `.github/workflows/gate.yml` does not run it. An always-red test
+outside CI is worse than no test — it trains everyone to ignore a failure. Git history keeps
+it if echo ever comes back.
+
+**Still open, needs a product call:** the echo FEATURE itself is now unreachable code.
+`echoStart()` is called only from the dead `#echoBtn` listener (index.html ~16970), so
+`echoOn` can never become true, though it is still read in `render()` and the demo button
+handler. That is roughly 90 lines of dead engine. Either restore an entry point or delete the
+feature — not decided here, because removing a feature is Wolf's call, not a cleanup.

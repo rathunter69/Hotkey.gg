@@ -440,26 +440,30 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   console.log('H. medal clocks (§2.1 display layer)');
   {
     const r = await run(() => {
-      window.__clearCel(); hideResults(); loadChallenge('foot');   // par 11
-      const c = hkClocksFor('foot');
+      /* r433: was foot (par 11) — foot's depth-pass rework re-swept its par, and a clock test
+         that hardcodes one drill's seconds re-breaks every time that drill is reworked. Moved
+         to sort, a par-10 drill outside the depth-pass wave; the arithmetic is what is under
+         test, not which drill supplies the par. */
+      window.__clearCel(); hideResults(); loadChallenge('sort');   // par 10
+      const c = hkClocksFor('sort');
       const ready = (document.getElementById('result') || {}).innerHTML || '';
-      const beat = hkClockBeat('foot', 12);   // between pro (12.65) and legendary (11)
-      window.HOTKEY_CLOCKS.foot = { pass: 100 };
-      const c2 = hkClocksFor('foot');
-      delete window.HOTKEY_CLOCKS.foot;
+      const beat = hkClockBeat('sort', 11);   // between pro (11.5) and legendary (10)
+      window.HOTKEY_CLOCKS.sort = { pass: 100 };
+      const c2 = hkClocksFor('sort');
+      delete window.HOTKEY_CLOCKS.sort;
       return {
         pass: c.pass, pro: +c.pro.toFixed(2), leg: c.leg,
-        strip: /pass 0:17/.test(ready) && /pro 0:13/.test(ready) && /legendary 0:11/.test(ready),
+        strip: /pass 0:15/.test(ready) && /pro 0:12/.test(ready) && /legendary 0:10/.test(ready),   // hkClockFmt rounds: 11.5 → 0:12
         beatN: beat && beat.beat && beat.beat.n, nextN: beat && beat.next && beat.next.n,
         oPass: c2.pass, oLeg: c2.leg,
       };
     });
-    ok(r.pass === 16.5 && r.pro === 12.65 && r.leg === 11, 'clocks derive pass=par×1.5 · pro=par×1.15 · legendary=par×1.0', r);
+    ok(r.pass === 15 && r.pro === 11.5 && r.leg === 10, 'clocks derive pass=par×1.5 · pro=par×1.15 · legendary=par×1.0', r);
     ok(r.strip, 'drill-start line carries the three-clock strip', r);
     ok(r.beatN === 'Pro' && r.nextN === 'Legendary', 'clock naming: the one you beat + the next one up', r);
-    ok(r.oPass === 100 && r.oLeg === 11, 'HOTKEY_CLOCKS override wins per field, the rest still derive', r);
+    ok(r.oPass === 100 && r.oLeg === 10, 'HOTKEY_CLOCKS override wins per field, the rest still derive', r);
     const r2 = await run(() => {
-      const C = CHALLENGES.foot;
+      const C = CHALLENGES.sort;
       for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
       const m = document.getElementById('resultsModal');
       const row = m ? m.querySelector('.rm-clock') : null;
@@ -512,7 +516,9 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r2.coresDone && r2.preDone === false, 'all cores complete — the win gates on the save beat', r2);
     ok(r2.done === true && r2.splitsLen === r2.checksLen, 'Ctrl+S fires the win; the save beat carries a split slot', r2);
     const r3 = await run(() => {   // non-saveClose drills keep the restart behavior, still swallowed
-      window.__clearCel(); hideResults(); loadChallenge('foot');
+      /* r433: was foot, which became saveClose:true in its depth-pass rework — this probe needs a
+         drill that has NOT been reworked yet. sort is one. */
+      window.__clearCel(); hideResults(); loadChallenge('sort');
       setDemoSel('C5'); demoKey({ key: '7' }); demoKey({ key: 'Enter' });
       const hadWork = keyLog.length > 0;
       const ev = new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true, bubbles: true });

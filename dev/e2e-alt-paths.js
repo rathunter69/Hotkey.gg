@@ -182,13 +182,33 @@ const ALTS = [
       {sel:o.mixCol, keys:[{key:'d',ctrl:true}]},
       {sel:o.ratioBlk, keys:[{key:'r',ctrl:true}]},
     ]; }` },
-  { key: 'foot', name: 'typed SUMs (no alt+=), columns before rows', moves: `C => [
-      {sel:'B6', keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
-      {sel:'B6:E6', keys:[{key:'r',ctrl:true}]},
-      {sel:'F2', keys:[...T('=SUM(B2:E2)'),{key:'Enter'}]},
-      {sel:'F2:F5', keys:[{key:'d',ctrl:true}]},
-      {sel:'F6', keys:[...T('=SUM(F2:F5)'),{key:'Enter'}]},
-    ]` },
+  /* r433 (foot DEPTH_PASS §4.22): the old single entry drove the retired fixed 4×4 board at B2.
+     Two entries now, per §1.8 / DoD #4 — ALT 1 is a different chord ROUTE (ribbon fills, ribbon
+     bold, ALL-borders instead of a top border, dialog percent-free) that still runs BOTH fills
+     through the corner, so the re-cut ☆ must FIRE on a chord set the demo never presses; ALT 2 is
+     a different op ORDER and the §1.0(c) FREEDOM proof — dress first, columns before rows, every
+     total TYPED (the row totals as bare numbers, no formula anywhere in the block), the corner
+     AutoSummed on its own and the tie check written against the ROW edge instead of the column.
+     Every core clears; the ☆ must NOT fire, because neither fill reaches the corner. */
+  { key: 'foot', name: 'RIBBON route with both fills carried through the corner (☆ still fires off Alt H F I D/R), ribbon bold, ALL borders on the total row, check written corner-minus-row', moves: `C => { const o=C._o; return [
+      {sel:o.rowSeed, keys:[{key:'Alt'},L('m'),L('u'),L('s'),{key:'Enter'}]},        // Alt M U S — the other AutoSum ribbon route
+      {sel:o.colRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},               // ribbon fill DOWN, through the corner
+      {sel:o.colSeed, keys:[{key:'Alt'},L('h'),L('u'),L('s'),{key:'Enter'}]},
+      {sel:o.rowRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},               // ribbon fill RIGHT, through the corner
+      {sel:o.rowRng,  keys:[{key:'Alt'},L('h'),D(1)]},                               // ribbon bold (Alt H 1) — the same toggle by another route
+      {sel:o.colRng,  keys:[{key:'Alt'},L('h'),D(1)]},                               // mixed selection (the corner is already bold) → Excel bolds ALL
+      {sel:o.rowRng,  keys:[{key:'Alt'},L('h'),L('b'),L('a')]},                      // ALL borders draws the top edge too (§1.0-R3(p))
+      {sel:o.chk,     keys:[...T('='+o.corner+'-SUM('+o.rowBody+')'),{key:'Enter'}]},// the corner against the ROW edge — the other legitimate cross-check
+    ]; }` },
+  { key: 'foot', name: 'SLOW + REVERSED: dress first, columns before rows, every total TYPED as a bare number (no formula in the block), corner AutoSummed alone — cores clear, ☆ forfeited', moves: `C => { const o=C._o; const cl=colLetter; return [
+      {sel:o.rowRng, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},                       // the rule lands before a single total exists — end-state grading must hold
+      {sel:o.rowRng, keys:[{key:'b',ctrl:true}]},
+      {sel:o.colRng, keys:[{key:'b',ctrl:true}]},
+      ...o.colSum.map((w,j)=>({sel:cl(o.cq1+j)+o.rt, keys:[...T(String(w)),{key:'Enter'}]})),
+      ...o.rowSum.map((w,i)=>({sel:o.CT+(o.r1+i),   keys:[...T(String(w)),{key:'Enter'}]})),
+      {sel:o.corner, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},          // the corner totalled as a third act — the move the ☆ is hidden behind
+      {sel:o.chk,    keys:[...T('='+o.corner+'-'+o.CT+o.r1+(o.rowSum.slice(1).map((_,i)=>'-'+o.CT+(o.r1+1+i)).join(''))),{key:'Enter'}]},
+    ]; }` },
   /* r432: rebuilt onto the round-3 board (the old entry drove the retired 3-column comps page).
      Still the "reverse order" route, now with every dollar column taken SEPARATELY (☆ forfeited)
      and the read line ruled with ALL borders — which draws a top edge, so the dress beat grades
