@@ -968,6 +968,30 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     '(d) Ctrl+Z leaves the undone range selected, in-bounds, anchor active', ak2);
   ok(ak2.afterUndoDown === 'J5', '(d) an arrow after the undo still steps from the anchor', ak2.afterUndoDown);
 
+  await fresh();
+  const ak3 = await run(() => {
+    const at = () => colLetter(S.active.c) + S.active.r;
+    const disp = () => { const a = dispActive(); return colLetter(a.c) + a.r; };
+    // Home collapses off the ANCHOR's row, not the grabbed block's last row
+    setDemoSel('B4'); demoKey({key:'ArrowDown', shift:true, ctrl:true});
+    const grabbed = colLetter(selRange().c1) + selRange().r1 + ':' + colLetter(selRange().c2) + selRange().r2;
+    demoKey({key:'Home'});
+    const afterHome = at();
+    // a parked anchor may never leak into the NEXT selection
+    setDemoSel('D8'); demoKey({key:' ', shift:true});          // Shift+Space parks S.selA at D8
+    const parked = disp();
+    demoKey({key:'Home'});                                      // collapse — the park must die with it
+    setDemoSel('G3'); demoKey({key:'ArrowDown', shift:true});    // a brand-new range, anchor G3
+    const freshAnchor = disp();
+    demoKey({key:'ArrowUp'});
+    const afterFresh = at();
+    return { grabbed, afterHome, parked, freshAnchor, afterFresh };
+  });
+  ok(ak3.afterHome === 'A4', 'Home after a Ctrl+Shift+↓ grab lands in the ANCHOR\'s row (A4), not the block\'s last', ak3);
+  ok(ak3.parked === 'D8', 'Shift+Space parks the active cell where it was (D8)', ak3.parked);
+  ok(ak3.freshAnchor === 'G3' && ak3.afterFresh === 'G2',
+    'a parked anchor never leaks into the next selection (G3:G4 → ↑ → G2)', ak3);
+
   /* =====================================================================================
      AL. OUTSIDE-BORDER CANON (Wolf round-2 R2-B4 / DEPTH_PASS §1.0-R2(m)): outside borders
      are Alt H B **S** (S for outSide); Alt H B **A** is ALL borders. The engine assert lives

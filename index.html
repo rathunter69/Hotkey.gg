@@ -8207,7 +8207,17 @@ function selRange(){
    way since r308; move() and doPaste now share the same accessor so the cursor RESUMES from the
    cell the ring is drawn on. Never returns a cell outside the sheet. */
 function dispActive(){
-  const a = S.sel ? ((S.selA && S.selA.r>=1) ? S.selA : {r:S.sel.r, c:S.sel.c}) : S.active;
+  let a = S.active;
+  if(S.sel){
+    a = {r:S.sel.r, c:S.sel.c};
+    /* a parked anchor (Shift+Space / Ctrl+Space / Ctrl+A) only counts while it is INSIDE the
+       live selection — otherwise it is a leftover from a selection that has since been
+       replaced, and honouring it would teleport the cursor somewhere off the block. */
+    if(S.selA && S.selA.r>=1){
+      const rg=selRange();
+      if(S.selA.r>=rg.r1 && S.selA.r<=rg.r2 && S.selA.c>=rg.c1 && S.selA.c<=rg.c2) a={r:S.selA.r, c:S.selA.c};
+    }
+  }
   return {r:Math.max(1,Math.min(S.ROWS,a.r)), c:Math.max(1,Math.min(COLS,a.c))};
 }
 function eachSel(fn){ const r=selRange(); for(let rr=r.r1;rr<=r.r2;rr++) for(let cc=r.c1;cc<=r.c2;cc++) fn(ensure(rr,cc),rr,cc); }
@@ -12014,6 +12024,9 @@ function doPaste(kind, op){
   }
   pendingFlash={r1:r0,c1:c0,r2:r0+tileH-1,c2:c0+tileW-1};
   S.sel={r:r0,c:c0}; S.active={r:r0+tileH-1,c:c0+tileW-1}; S.selA=null;   // r174: Excel selects what it pasted (the full tiled footprint); top-left displays active (r308)
+  /* r426 (Wolf R2-B2): that top-left is the real ACTIVE CELL, not just what the ring is drawn on —
+     move()/Home now resume from dispActive(), so the arrow after a paste steps one cell from HERE
+     (Excel), never from the bottom-right corner this 2-corner model parks in S.active. */
   S.pasteN=(S.pasteN||0)+1;   // r265: structural drills grade "content was PASTED in", not retyped
   // r106: clipboard PERSISTS across pastes (Excel parity — Ctrl+V keeps it; Esc/new copy clears).
   // Nulling here broke the 'one copy, two pastes' contract copyover + pastes both teach.
@@ -13130,7 +13143,12 @@ document.addEventListener('keydown',hkRawE=>{
     startClock();
     const ctrl = e.ctrlKey||e.metaKey;
     logKey(ctrl ? (e.shiftKey?'Ctrl+Shift+Home':'Ctrl+Home') : (e.shiftKey?'Shift+Home':'Home'));
-    if(e.shiftKey){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; } else S.sel = null;
+    /* r426 (Wolf R2-B2): Home collapses to the DISPLAYED active cell first — with a range live
+       it used to read the far corner's ROW, so Home after a Ctrl+Shift+↓ grab landed in column A
+       of the block's LAST row instead of the anchor's. S.selA is cleared on every collapse and on
+       every fresh shift-extend, so a stale space-select anchor can't leak into the next range. */
+    if(!e.shiftKey && S.sel){ const __ha=dispActive(); S.active={r:__ha.r, c:__ha.c}; }
+    if(e.shiftKey){ if(!S.sel){ S.sel={r:S.active.r,c:S.active.c}; S.selA=null; } } else { S.sel=null; S.selA=null; }
     let __hd = ctrl ? {r:1, c:1} : {r:S.active.r, c:1};
     if(!e.shiftKey){ const cl=railClamp(__hd.r,__hd.c); if(cl) __hd=cl; }   /* r350: the rails hold on Home/Ctrl+Home too — arrows-only was an open gate */
     S.active = __hd;
@@ -13142,7 +13160,7 @@ document.addEventListener('keydown',hkRawE=>{
     startClock();
     logKey(e.shiftKey?'Ctrl+Shift+End':'Ctrl+End');
     const u = usedRange();
-    if(e.shiftKey){ if(!S.sel) S.sel={r:S.active.r,c:S.active.c}; } else S.sel = null;
+    if(e.shiftKey){ if(!S.sel){ S.sel={r:S.active.r,c:S.active.c}; S.selA=null; } } else { S.sel=null; S.selA=null; }   /* r426: same anchor hygiene as Home/move (Ctrl+End's own target is absolute) */
     let __ed = {r:u.r, c:u.c};
     if(!e.shiftKey){ const cl=railClamp(__ed.r,__ed.c); if(cl) __ed=cl; }   /* r350 */
     S.active = __ed;
@@ -14839,8 +14857,8 @@ function D(n){ return {key:String(n), code:'Digit'+n}; }
 function T(str){ return [...str].map(ch=>({key:ch})); }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function setDemoSel(str){ const r=resolveRange(str); if(!r) return;
-  if(r.r1===r.r2&&r.c1===r.c2){ S.active={r:r.r1,c:r.c1}; S.sel=null; }
-  else { S.sel={r:r.r1,c:r.c1}; S.active={r:r.r2,c:r.c2}; }
+  if(r.r1===r.r2&&r.c1===r.c2){ S.active={r:r.r1,c:r.c1}; S.sel=null; S.selA=null; }
+  else { S.sel={r:r.r1,c:r.c1}; S.active={r:r.r2,c:r.c2}; S.selA=null; }   /* r426: a scripted selection carries no parked anchor — the top-left IS the active cell */
   render(); }
 function demoKey(spec){ document.dispatchEvent(new KeyboardEvent('keydown',{
   key:spec.key, code:spec.code||'', ctrlKey:!!spec.ctrl, shiftKey:!!spec.shift, altKey:!!spec.alt,
