@@ -189,10 +189,18 @@ const ALTS = [
       {sel:'F2:F5', keys:[{key:'d',ctrl:true}]},
       {sel:'F6', keys:[...T('=SUM(F2:F5)'),{key:'Enter'}]},
     ]` },
-  { key: 'decimals', name: 'columns walked in reverse order', moves: `C => { const o=C._o; return [
-      {sel:o.pR, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
-      {sel:o.mR, keys:[{key:'Alt'},L('h'),D(0)]},
-      {sel:o.evR, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+  /* r432: rebuilt onto the round-3 board (the old entry drove the retired 3-column comps page).
+     Still the "reverse order" route, now with every dollar column taken SEPARATELY (☆ forfeited)
+     and the read line ruled with ALL borders — which draws a top edge, so the dress beat grades
+     the same as the Alt H B P route. */
+  { key: 'decimals', name: 'columns walked in reverse order, dollar columns one at a time (☆ forfeited), ragged cell reset via Ctrl+1, read line ruled with ALL borders', moves: `C => { const o=C._o; return [
+      {sel:'F'+o.r0+':F'+o.rN, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+      {sel:'E'+o.r0+':E'+o.rN, keys:[{key:'Alt'},L('h'),D(0)]},
+      {sel:'D'+o.r0+':D'+o.rN, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+      {sel:'C'+o.r0+':C'+o.rN, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+      {sel:'B'+o.r0+':B'+o.rN, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+      {sel:o.defCell, keys:[{key:'1',ctrl:true}, L(o.defKind==='mult'?'x':'n')]},
+      {sel:'A'+o.medR+':F'+o.medR, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('a')]},
     ]; }` },
   /* r424 (D17): the colops entry is gone with the drill — its column-op alternates live on
      inside the two rowops entries above (ribbon vs chord routes, insert-vs-delete order). */
@@ -349,6 +357,35 @@ const ALTS = [
       {sel:o.memoRng, keys:[{key:'i',ctrl:true}]},
       {sel:o.wbRng, keys:[{key:'b',ctrl:true}]},
       {sel:'A2:D2', keys:[{key:'b',ctrl:true}]},
+    ]; }` },
+  /* r432 (decimals ROUND 3, DEPTH_PASS §4.12). ALT 1 = chord-ROUTE alt: every column takes an
+     ABSOLUTE format instead of the demo's relative Alt H 9/H 0 walk (Ctrl+1 → N sets comma at
+     zero places, Ctrl+1 → X sets the multiple at one, Ctrl+Shift+% + Alt H 0 sets the margin),
+     bold comes off the ribbon and the read line takes a top-AND-bottom rule. Two things this
+     proves: the dollar beat accepts any money style at zero places, and an absolute pass over a
+     whole column sweeps the planted four-decimal cell with it — beat 4 clears without ever being
+     hunted. Three separate dollar selections, so the one-rectangle ☆ is forfeited and the drill
+     still wins. ALT 2 = op-ORDER alt: read line dressed FIRST, dollars LAST, and the dollar pass
+     is a full-COLUMN Ctrl+Space grab — which still lands inside the ☆'s rect test, so the star
+     fires from a selection route the demo never uses. The ragged cell is then walked down with
+     relative Alt H 9 steps (the other legal repair). */
+  { key: 'decimals', name: 'ABSOLUTE formats per column (Ctrl+1 N / Ctrl+1 X / Ctrl+Shift+% + Alt H 0), ribbon bold, top+bottom rule — ☆ forfeited, the outlier is swept by the column pass', moves: `C => { const o=C._o; return [
+      {sel:'B'+o.r0+':B'+o.rN, keys:[{key:'1',ctrl:true},L('n')]},
+      {sel:'C'+o.r0+':C'+o.rN, keys:[{key:'1',ctrl:true},L('n')]},
+      {sel:'D'+o.r0+':D'+o.rN, keys:[{key:'1',ctrl:true},L('n')]},
+      {sel:'E'+o.r0+':E'+o.rN, keys:[{key:'1',ctrl:true},L('x')]},
+      {sel:'F'+o.r0+':F'+o.rN, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
+      {sel:'A'+o.medR+':F'+o.medR, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d')]},
+    ]; }` },
+  { key: 'decimals', name: 'read line dressed FIRST (outside-border route), margin then multiple, dollars LAST from a full-column Ctrl+Space grab (☆ still fires), ragged cell walked down with Alt H 9', moves: `C => { const o=C._o;
+      const steps=(o.defKind==='mult')?4:2; const walk=[];
+      for(let i=0;i<steps;i++) walk.push({key:'Alt'},L('h'),D(9));
+      return [
+      {sel:'A'+o.medR+':F'+o.medR, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]},
+      {sel:'F'+o.r0+':F'+o.rN, keys:[{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:'E'+o.r0+':E'+o.rN, keys:[{key:'Alt'},L('h'),D(0)]},
+      {sel:'B'+o.r0+':D'+o.r0, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.defCell, keys:walk},
     ]; }` },
   { key: 'unhide', name: 'width fixed FIRST, ribbon unhide route, grouped while still hidden', moves: `C => { const o=C._o; return [
       {sel:'B2', keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]},
