@@ -438,3 +438,78 @@ gate run from a worktree silently tested whichever agent owned 8791. It cost thi
 in r438. Note the two suites that do NOT use `URL`: **`e2e-smoke`, `check-borders` and `check-pause`
 take `BASE`** (an origin, no path), and **`e2e-lb` takes `URL` but wants `leaderboard.html`, not
 `index.html`**. Getting either wrong produces a confusing red that is not yours.
+
+## Agent dispatch: three defects fixed in r438, all found by agents reporting back
+
+**1 · Worktrees branch from a STALE base.** Both r438 agents found themselves ~35 commits
+behind, on a tree where `DEPTH_PASS_CAMPAIGN.md`, `MODELING_STANDARDS.md` and §1.0-R3 did not
+exist. Both reset themselves and said so. **Every brief must now open with a STEP 0:**
+
+```bash
+git fetch origin claude/platform-audit-framework-1hf2v7
+git reset --hard origin/claude/platform-audit-framework-1hf2v7
+```
+
+with an instruction to confirm both handover docs exist and the catalog count is right **before
+starting**. An agent that silently works on a stale base builds to superseded rules.
+
+**2 · The harnesses read THREE different env vars.** Getting this wrong makes a gate run
+meaningless in either direction:
+
+| var | suites |
+|---|---|
+| `URL` (full path to `index.html`) | most suites |
+| `URL` **pointing at `leaderboard.html`** | `e2e-lb` |
+| `BASE` (origin only, no path) | `e2e-smoke`, `check-borders`, `check-pause` |
+
+`e2e-audit-onboard` had **no override at all** and hard-coded `:8791`, so a worktree gate run
+silently tested whoever owned that port. Fixed in r438 (`HK_URL` — named to avoid shadowing
+Node's global `URL` class; both agents added an override independently and the duplicate
+declarations collided at merge). `PORT=` is read by NOTHING — setting it and believing the suite
+followed is the mistake wearing a different hat.
+
+**3 · Widen the coupling grep — `._o` is not the only handle.** `e2e-audit-parity` §V drove
+`rollup` by hard-coded **board CONTENT** (literal ranges `A3:A11`/`B3:B11`/`C3:C11` and the
+seeded labels `"Retail"`/`"EMEA"`) while never touching `._o`, so the standing grep missed it
+entirely. §S did the same to `filterpass`. The sweep is now three greps:
+
+```bash
+git grep -n "CHALLENGES\.<key>\._o" dev/
+git grep -n "loadChallenge('<key>')" dev/
+git grep -n "'<key>'" dev/
+```
+
+Running total: **six** harness sections found reaching into a reworked drill's internals
+(parity §S/§U/§V/§X/§Y, mac-input §F). Treat it as certain, not possible.
+
+## Merging e2e-alt-paths.js is now mechanical — use the tool (r438)
+
+Union-merging that file has broken the tree **three times**: a reworking agent DELETES its
+drill's stale entries and a union quietly resurrects them, so every worktree is green and the
+merged tree is red. `dev/merge-altpaths.py` applies the rule instead of doing it by hand:
+
+```bash
+python3 dev/merge-altpaths.py dev/e2e-alt-paths.js theirs:rollup,filterpass
+```
+
+For each named key THEIRS wins outright (additions and deletions); everything else, including
+interstitial comments, follows OURS. It prints what it kept per hunk and the resulting per-key
+entry counts so a C12 violation shows up before the commit rather than in CI.
+
+## The fit-sweep flake: what it is NOT (r438)
+
+Campaign open item #4, narrowed. `dev/fit-flake-hunt.js` ran the full catalog at 15 seeds per
+drill — **71 drills × 15, both the load scan and the post-solve scan, zero overflows.** With the
+gate's own 3-seed run also clean on the same tree, seed-dependent board content is effectively
+ruled out as the cause.
+
+**The remaining hypothesis, and the reason neither harness would ever catch it:** both the gate
+and the hunt load a drill and immediately re-load the SAME drill for each rep. Neither ever
+varies which drill ran *before*. If the `#####` comes from state a previous board leaves behind
+— a column width, a scale factor, a `_colW` that outlives `loadChallenge` — no amount of seed
+depth reproduces it. **Next attempt: interleave, don't repeat** — loop reps on the OUTSIDE and
+the catalog on the inside, so every drill is preceded by a different drill each pass.
+
+Two earlier runs of the hunt must be discarded, not cited: they were pointed at port 8853, which
+belonged to another agent's worktree (see the port hazard above). The numbers quoted here are
+from the run against the integrated tree.
