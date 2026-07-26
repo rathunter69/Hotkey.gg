@@ -7251,7 +7251,31 @@ the family: recon keeps INDEX/MATCH as an INSTRUMENT and never as the subject._
   and page regeneration is out of scope for this pass. **Recommended to the integrator at
   regeneration time:** desc → "Reconcile two systems — presence, amounts, and a check that reads
   zero". HOTKEY_PARS.recon is the only drills.js edit.
-- **GATE (own port 8852).** See the commit body for the last line of each.
+- **ROUTE PROBE (§1.0-R3(p) — enumerate by WALKING, not by reading):** every paste route earns the
+  ☆ and clears every core — Ctrl+V, the ribbon's values-paste **Alt H V V**, the legacy Alt E S
+  dialog, and the Ctrl+Alt+V chord, 6/6 each. Two SEPARATE pastes (name, then amount) clear all
+  five cores and earn nothing — "one pass" is the move. A CUT of the blotter row earns nothing and
+  correctly fails the cores as well, because it takes the line off the system of record and the
+  presence column has nothing left to count. FREEDOM proof, walked: all five cores clear 6/6 with
+  NO formula on the board except the check cell (deal typed, repair typed, presence typed as 1s,
+  differences typed as zeros over a genuinely repaired board), ☆ dark.
+- **HINT BUG CAUGHT BY WALKING IT:** the first draft of guide[5] taught `Alt H V` as the ribbon
+  paste. The engine has no such path — `Alt H V V` is values-paste and `Alt H V S` opens the
+  dialog. Fixed before ship; it is the same class as the routes DEPTH_PASS_CAMPAIGN §1 lists,
+  caught on the hint side rather than the predicate side.
+- **BOARD BUG CAUGHT BY SCREENSHOT, not by a gate:** at anchor column B the cue sat in the
+  second-to-last column and its text clipped at the right-hand grid edge — `e2e-fit-sweep` cannot
+  see it, because the sweep only scans NUMERIC cells. Column widths are now budgeted to 870px on
+  both anchor choices (the grid's real width at 1440), so the fit scaler runs at 1.0 and the cue's
+  spill has pixels to live in. Worth adding to the campaign's standing checklist: **a cue is board
+  copy and no gate reads it — look at it.**
+- **GATE (all green, own port 8852):** static invariants **clean** (C9 recon tri-length 6 + one ☆ +
+  saveClose · C11 aphorisms clean · C12 ≥2 alts across 27 reworked drills) · demo-replay
+  **E2E: ALL GREEN** (full catalog; recon WIN 3/3) · alt-paths **ALL 101 PASS** · par-sweep
+  **FLAGGED: 0** (recon 92/88/88, drift 0%, 1.05 s/key) · fit-sweep **ALL CLEAN (72 drills)** ·
+  depth-mechanics **155 passed, 0 failed** · smoke **ALL 7 PAGES CLEAN + skin-unlock** (drill-count
+  76, HOTKEY_PARS parity + de-hint clean). No `drills.js?v=` bump — drills.js content changed
+  (HOTKEY_PARS only) and the version is the integrator's call at batch time.
 
 ## r436 — H6b-6: sort depth pass — "Sort the table" (DEPTH_PASS §4.33 + §1.0/-R2/-R3)
 - **RETIREMENT TESTED FIRST, AND REJECTED — with the reasoning, since the campaign has now
