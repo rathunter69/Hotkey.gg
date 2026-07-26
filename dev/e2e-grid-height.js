@@ -130,6 +130,47 @@ const measure = () => {
     bad(`catalog uniformity: cell heights spread ${hs.join('/')}px across drills (>2px) — e.g. ${worst.map(k => k + '@' + seen[k].cellH).join(' · ')}`);
   } else console.log(`  ok  cell heights agree within 2px across the catalog (${hs.join('/')}px)`);
 
+  /* 6. THE FRAME SURVIVES ROW OPS (r438, Wolf: "just want to make sure we're accounting for and
+     being adaptive for drills that add or subtract rows — in my mind would just push the rows
+     down but not the actual viewport/grid area").
+     That IS the design (r101: `S._ROWS0` is the loaded frame size, "row ops shift cells, never
+     this frame"), but nothing asserted it, and the r438 move to __VR = max(S.ROWS, __ROW_CAP)
+     makes the frame depend on S.ROWS — so if any future row op ever mutates S.ROWS, the grid
+     would visibly resize UNDER the player mid-drill. Insert and delete both, and require the
+     painted row count, the cell height and the grid height to be unchanged. */
+  console.log('\nF. inserting or deleting rows shifts cells, never the frame (r101 · §1.3)');
+  for (const [drill, label, steps] of [
+    ['rowops', 'insert 3 rows', [['5', 'ins'], ['6', 'ins'], ['7', 'ins']]],
+    ['rowops', 'delete 3 rows', [['5', 'del'], ['6', 'del'], ['7', 'del']]],
+    ['scrub',  'delete 3 rows', [['4', 'del'], ['5', 'del'], ['6', 'del']]],
+  ]) {
+    const r = await page.evaluate(async ([k, ops]) => {
+      document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove());
+      loadChallenge(k);
+      await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+      await new Promise(res => setTimeout(res, 120));
+      const grab = () => { const td = document.querySelector('#grid td'); return {
+        sRows: S.ROWS, painted: document.querySelectorAll('#grid tbody tr').length,
+        cellH: td ? Math.round(td.getBoundingClientRect().height) : 0,
+        gridH: (document.getElementById('grid') || {}).offsetHeight || 0 }; };
+      const before = grab();
+      for (const [row, op] of ops) {
+        setDemoSel('A' + row);
+        demoKey({ key: ' ', shift: true });                                   // whole row
+        demoKey(op === 'ins' ? { key: '+', ctrl: true } : { key: '-', ctrl: true });
+      }
+      await new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res)));
+      await new Promise(res => setTimeout(res, 120));
+      return { before, after: grab() };
+    }, [drill, steps]);
+    const b = r.before, a = r.after;
+    const tag = `${drill} ${label}`;
+    if (b.painted !== a.painted) bad(`${tag}: painted rows changed ${b.painted} -> ${a.painted} — the frame resized under the player`);
+    else if (Math.abs(b.cellH - a.cellH) > 1) bad(`${tag}: cell height changed ${b.cellH} -> ${a.cellH}px`);
+    else if (Math.abs(b.gridH - a.gridH) > 2) bad(`${tag}: grid height changed ${b.gridH} -> ${a.gridH}px`);
+    else console.log(`  ok  ${tag}: frame held (rows ${a.painted}, cellH ${a.cellH}px, gridH ${a.gridH}px)`);
+  }
+
   await browser.close();
   if (fail) { console.error(`\nGRID-HEIGHT: ${fail} failure(s)`); process.exit(1); }
   console.log('GRID-HEIGHT: ALL INVARIANTS HOLD');
