@@ -1,5 +1,175 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r439 H6b-11 — stalelink + signerr + versionup: three named failure modes (DEPTH_PASS §4.49 + §4.53 + §4.54)
+_Three Formulas II boards that each teach a failure mode a reviewer looks for — the stale link,
+the sign flip, the buried hardcode. All three were the thin profile that retired five drills this
+campaign (4/3/5 checks on 14/10/13-row boards), so all three got the §1.0-R3(s) diagnostic before
+anything was built; all three survived, one of them only after its first ☆ candidate MEASURED
+NEGATIVE. Everything below is dispatched-key counts through the live engine on the real boards,
+medians over 5 seeds, every selection and navigation keyed._
+
+### THE RETIREMENT DIAGNOSTIC, BOTH PARTS, MEASURED
+
+**`stalelink` — KEEP, after fixing the BOARD rather than the predicate.**
+- **Part 1, on the SHIPPED board:** fastest legal **22** keys (F2 into each stale ref, Home, one
+  caret step, Delete, retype the column letter) · slow-but-sane **34** (each stale formula retyped
+  in full) · absolute ceiling **182** (every cell of all three lines retyped). The honest same-work
+  ratio is **1.55×** — above the ~1.3× line that retired `grpfold`, below the shipped band.
+- **Part 2 — and this is what nearly retired it.** Strip chord-vs-ribbon (§1.0(c) forces both to
+  clear) and formatting (§1.0(d) forbids it) and what survived on the shipped board was **12 keys
+  of F2-caret-surgery versus retyping** — which the engine does not even log (caret keys `return`
+  before `logKey`), so it cannot be latched. The one mastery-shaped candidate was **MEASURED AND
+  FAILED**: restoring each break by copying a healthy year in the same line came in at **91 keys
+  against 34** for retyping, because the extra hop per break costs more than the nine characters it
+  saves. That is the `growth` failure, caught on a candidate instead of on a shipped board.
+- **Fixed at the BOARD** (the `series`/`unhide` precedent): the page grew the work that carries a
+  legal star — a contribution block the player builds. Measured in isolation on the final board:
+  **29 keys** seeded once and carried in ONE fill against **118** typed year by year, **4.07×**.
+- **On the FINAL board:** star route **173** keys against **321** for the negative control
+  (repoints retyped in full, block typed year by year) = **1.86×**.
+
+**`signerr` — KEEP.**
+- **Part 1, on the SHIPPED board:** fastest legal **40** · slow-but-sane **84**. **2.1×**, inside
+  the shipped band (lookup2 2.2×, lookup 3.0×).
+- **Part 2:** what survives the two strips is 38 keys of carrying-versus-typing on the derived line
+  plus the paste-special arithmetic pass — neither a chord alternative nor a format. Legal headroom
+  exists.
+- **The §3 discriminator, PROBED not argued.** The dangerous neighbour is `fxconvert`, whose ☆ is
+  already "Convert every inconsistent row in ONE Paste Special pass" and which carries a
+  make-the-costs-negative beat of its own. Walked on the rebuilt board: the fxconvert-fluent move —
+  copy the −1 helper, select the whole cost block, Alt E S M — turns the three planted cells AND
+  breaks the eleven correct ones, and the meter reads **0/3**. Fluency in fxconvert produces a
+  WRONG first attempt here. That is the sumif/rollup shape, not the grpfold shape.
+- **On the FINAL board:** star route **113** against **320** for the negative control = **2.83×**.
+
+**`versionup` — KEEP, and the overlap with `hunt` is now measured.**
+- **Part 1, on the SHIPPED board:** fastest legal **118** · slow-but-sane **255**. **2.2×**.
+- **Part 2:** two survivors, and the second was measured IN ISOLATION per the r438 `series` rule —
+  the same run with Ctrl+H replaced by retyping the tag lines came in at **186 against 118**, i.e.
+  **68 keys on a half worth 7 keys to do right**. On the final board that half measures **7 against
+  134** — **19×**, the widest star scope in the batch, and unowned (refmap maps CTRL+H here).
+
+### THE `hunt` / `versionup` OVERLAP — measured, and it rebuilt a board
+The campaign §3 discriminator asks whether fluency in one produces a CORRECT first attempt at the
+other. On the OLD versionup board the answer was **yes**: `hunt` marks typed-over cells with
+F5 → Special → Constants and relinks them to formulas, and the old versionup asked for exactly that
+four rows at a time. The two drills differed only in scale, which is the containment shape that
+retired `grpfold`.
+The fix is the one `dev/MODELING_STANDARDS.md` §1 points at — versionup's crime is not a typed
+CELL, it is **a typed NUMBER INSIDE A LIVE FORMULA**. On the rebuilt board every derived cell is a
+formula, so `syncMarks()`'s `const` criterion (`has && !cell.formula && !cell.txt`) **cannot see any
+of them**: the ritual lights the assumptions panel and the two typed input lines and says nothing at
+all about the buried rates. A hunt-fluent player's first attempt returns a page that looks clean.
+That is an INVERTING contrast — the sumif/rollup answer — and it is now structural rather than
+argued. **`hunt` was NOT touched**; it is being reworked in parallel.
+
+### `stalelink` — "Re-point the stale links" (§4.49)
+- **BOARD.** A reforecast tab whose assumptions were re-issued as v2 with the superseded v1 figures
+  parked beside them; three build cells, one per driven line and each in a different year, still
+  read the dead column. Nothing errors. The export stripped the ink off the build, so the
+  provenance colours are the player's to apply. **20 rows, 15 carrying content — 75%.**
+  Four randomization axes: a 3-spot site pool · four parallel label sets · every figure through
+  rnd() including how far the dead driver sits from the live one (25–40%, far enough that the
+  poisoned year always breaks the line's trend) · which year each line reads dead, drawn without
+  replacement so the three breaks never stack in one column.
+- **BEATS (5 core + the engine save closer + one ☆; tri-length 6, C9-registered):** the §2.3 meter
+  (N=3, `errorCount:3` in drills.js) → colour the three linked lines green → clear the superseded
+  figures → build the contribution block → bold + top border. ☆ = one fill carries both lines.
+- **GREEN-FOR-LINK, the convention `dev/MODELING_STANDARDS.md` §1 says the catalog under-uses.**
+  `lookup` (r436) is the only other board grading it. This one grades it **against a leave-alone
+  guard** — the typed units stay blue and the two lines computed on this sheet stay black — so the
+  beat tests whether the player knows WHICH cells are links, not merely how to reach the swatch.
+  Green is APPLIED, never seeded, so the ink can never short-circuit the pattern-break diagnosis
+  the §4.49 page names as this drill's identity.
+- **A FREE BEAT WAS CUT.** The old check 4, "tie contribution to the v2 assumptions in every year",
+  read a contribution row the BOARD shipped as a live formula: it became true the instant checks
+  1–3 did, for zero player action. §1.1 forbids a do-nothing line.
+- **THE COUNTER TRACKS REPOINTED READS, not repaired values** — the cost and royalty cells of the
+  revenue-poisoned year are wrong on load as a CASCADE, and a counter that waited for them would
+  sit at 0/3 after a correct repair. The value guard lives in `ok`.
+- **PAR:** re-swept from scratch. 5-seed median **61** keys including the engine-appended Ctrl+S,
+  flat. parKeys 27→61, par 28→**64** (1.05 s/key, the house band), mirrored in HOTKEY_PARS.
+  Clocks derive (§1.4): pass 96 · pro 73.6 · legendary 64.
+
+### `signerr` — "Flip the signs back" (§4.53)
+- **BOARD.** A five-year operating page with three cost lines, a live Total costs line, EBIT and a
+  margin line to build. **One whole plan YEAR came in from a positive-convention deck** — all three
+  of its cost cells read positive, its Total costs reads positive with them, nothing else is wrong.
+  A labelled populated sign-flip helper sits under the table (§1.0(f)/§1.0-R2(l)) and the basis memo
+  states the convention (the §2 board rule). **20 rows, 13 carrying content — 65%.**
+- **TWO FREE BEATS WERE CUT, and the replacement is the drill's new spine.** The old check 2,
+  "prove EBIT TRUE", read a live `=SUM` the board already shipped. The replacement is what
+  `dev/MODELING_STANDARDS.md` §2 actually implies: **a page pasted from the positive-convention
+  deck arrives with a positive-convention SUBTOTAL too.** EBIT ships as an explicit subtraction
+  chain — right for the deck it came from, and wrong by MORE once the costs go negative. Flipping
+  the figures and re-laying the subtotal are one lesson with two hands.
+- **THE THREE BREAKS NOW SHARE A YEAR** rather than being scattered across rows 5–7. Measured
+  reason: scattered single cells leave nothing for a one-pass move to cover, and three separate
+  retypes came in only ~4 keys above three separate paste passes — no legal star. A pasted column
+  is also the honest story for how a year arrives in the wrong convention. The hunt survives
+  intact: WHICH year is the §1.2(d) axis.
+- **THE FIGURES WERE RESCALED AT THE BOARD**, not the predicate: at the original 4-digit scale the
+  ☆'s own scope measured **8 keys against 15**, inside the `series` warning zone. At $000s plan
+  scale ($12–45mm of revenue, which is what such a page really carries) it is **8 against 18**,
+  2.25× — the same band as the halves `series` shipped (13/23 and 15/22).
+- **THE COUNTER READS THE WHOLE COST BLOCK**, not just the three planted cells, so the
+  fxconvert-fluent block sweep cannot drive the meter to 3/3 while the line stays dark. Probed:
+  it reads **0/3**.
+- **PAR:** 5-seed median **33** keys including the closer. parKeys 20→33, par 22→**35**
+  (1.06 s/key), mirrored in HOTKEY_PARS. Clocks derive: pass 52.5 · pro 40.25 · legendary 35.
+
+### `versionup` — "Replace hardcodes so it rolls forward" (§4.54)
+- **BOARD.** A five-year operating build that computes correctly and cannot be rolled forward: the
+  growth rate and two cost rates are typed INSIDE the formulas, while the assumptions panel above
+  carries the v2 rates, populated and labelled, read by nothing. Repointing MOVES THE NUMBERS, so
+  the proof that the page rolls forward is native rather than asserted. **20 rows, 15 carrying
+  content — 75%.** Four axes, including which of the three cost lines is a straight typed input
+  (so the two line-naming beats are §1.0-R2(g) adaptive rather than memorisable).
+- **BEATS:** repoint the revenue roll-forward at the growth input → repoint both ratio lines at
+  their rate inputs → colour the three inputs blue → set the version tags to v2 → bold + top
+  border. ☆ = every tag renamed in one pass.
+- **THE ANCHOR IS ENFORCED WITHOUT EVER GRADING ANCHOR TEXT** (the #3/#8 bug class): an unanchored
+  panel reference walks off the panel as the row fills and the later years come out visibly wrong,
+  so the VALUE check does the work. Probed as the TRAP route — the beats correctly stay dark.
+- **ENGINE:** `doFindReplace()` gains **`S.frLog`** — one entry per landed pass with the terms, the
+  swept rect and the occurrence count. Same telemetry family as S.fillOps (r424) / S.grabLog (r427)
+  / S.fmtOps (r429) / S.multiEnter (r433) / S.sortLog (r436) / S.foldN (r437) / S.seriesLog (r438).
+  Read by this drill's ☆ only; no core check may require it (§1.0(c)).
+- **PAR:** 5-seed median **46** keys including the closer. parKeys 32→46, par 33→**48**
+  (1.04 s/key), mirrored in HOTKEY_PARS. Clocks derive: pass 72 · pro 55.2 · legendary 48.
+
+### §1.0-R3(p) ROUTES WALKED (16 of them), not reasoned about
+CLEARING: repointing by retype, by F2 caret surgery, by copying a healthy year of the same line,
+and by filling a line from a healthy left edge · green by Alt H F C → Green **and** Alt H J → Link ·
+blue by Alt H F C → Blue **and** Alt H J → Input · clearing by Delete **and** Alt H E C · the
+top border by Alt H B P, Alt H B D and Alt H B S · sign flips by the helper's multiply pass, by a
+retyped minus and by the accounting form `(1,240)` · the multiply through both doors (Alt E S M and
+Alt H V S → M) · EBIT as `=SUM(…)` and as an addition chain · percent by Ctrl+1 P (one decimal
+outright) and by Alt H P + Alt H 0 · every drill fully reversed in op order (alt-paths entry 1).
+Correctly DARK: **filling a stalelink line from a STALE left edge** (it broadcasts the dead
+reference — the trap `filldr` fluency walks into) · **the fxconvert-fluent whole-block sign sweep**
+(0/3) · **an unanchored panel reference filled right** in versionup · the ☆ in all three negative
+controls.
+
+### ALT-PATHS — three entries DELETED, six added (integrators: do not resurrect)
+Deleted, all three driving retired geometry that no longer exists:
+`signerr` "margin row laid BEFORE the flips (recalc re-ties), flips reversed, alt h p" ·
+`stalelink` "stale refs re-pointed in REVERSE, operands swapped (units x price)" ·
+`versionup` "rows resurrected in REVERSE — margin first, growth last, ribbon fills".
+Added, two per drill: ALT 1 is the chord-ROUTE + op-ORDER alt and still EARNS the ☆; ALT 2 is the
+MEASURED negative control clearing every core with the ☆ DARK.
+
+### COUPLING SWEEP — clean, and recorded so nobody re-runs it
+`git grep -n "CHALLENGES\.(stalelink|signerr|versionup)\._o" dev/` → **no hits**.
+`git grep -n "loadChallenge\('(stalelink|signerr|versionup)'\)" dev/` → **no hits**.
+`git grep -n "'(stalelink|signerr|versionup)'" dev/` → only `dev/e2e-alt-paths.js` (replaced),
+`dev/migrate-certificates.sql` (the formulas track list — all three stay), `dev/seed-field.sql`
+(historical leaderboard rows, C13-exempt) and this file. No parity / mac-input / depth-mechanics
+section reaches into any of the three — the first batch this campaign where the standing three-grep
+came back empty. `refmap.js` keeps **CTRL+H → versionup**: the rework keeps find-and-replace as
+that drill's chord and promotes it from a core beat to the ☆.
+
+
 ## r438 H6b-10 — series + drill: the last two Data & Lookups boards (DEPTH_PASS §4.43 + §4.42)
 _The chapter closes at 9 of 9. Both drills were the two thinnest boards left in the catalog
 (par 14 / 2 checks and par 18 / 2 checks), which is the profile that retired five drills this
