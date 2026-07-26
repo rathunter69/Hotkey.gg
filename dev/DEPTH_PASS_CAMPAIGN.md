@@ -288,3 +288,85 @@ choices worth knowing before you edit it:
 
 Negative control run before shipping — planting `['dress']` in `e2e-lb.js` fires exactly one
 C13 failure; removing it goes clean. A guard that has never been seen to fire is not a guard.
+
+## The ☆-headroom spread is now a calibrated instrument (r437)
+
+The `grpfold` → `unhide` merge was decided on measured numbers, and enough drills have now been
+swept that the spread (slowest legal route ÷ fastest legal route, every selection and navigation
+keyed) reads as a scale rather than a hunch:
+
+| board | spread | outcome |
+|---|---|---|
+| `percent` | 5.4× | shipped |
+| `fxconvert` | 5.7× | shipped |
+| `lookup` | 3.0× | shipped |
+| `lookup2` | 2.2× | shipped |
+| `growth` | 2.4× | **retired** (its canonical route measured *worse* than the slow one) |
+| `unhide` | 1.26× | merged host — and see below |
+| `grpfold` | 1.21× | **retired into `unhide`** |
+
+**The number alone is not the verdict — read what the spread is MADE of.** Every one of
+`unhide`'s 8 keys of spread is chord-vs-ribbon or formatting: `Ctrl+Shift+9` vs `Alt H O U O`,
+autofit vs the width dialog, `Alt H B P` vs the Format Cells walk. §1.0(c) forces all of those
+to CLEAR and §1.0(d) forbids a formatting ☆, so **the standalone `unhide` board carried no legal
+☆ at all** — the §4.37 page's own proposal ("italicize the memo") was dead on arrival.
+`grpfold`'s only legal ☆ existed solely because that board had three groups. Merging is what
+gives the survivor a star to own: collapse the whole outline in ONE hide-detail pass.
+
+So the diagnostic is two-part, and the second part does the work:
+1. Is there spread at all? Below ~1.3× is a warning, not a verdict.
+2. **Is any of that spread something a ☆ is ALLOWED to reward?** Strip out chord-vs-ribbon
+   (forced to clear) and formatting (forbidden). If nothing survives, the board cannot carry a
+   legal star, and a drill with no legal star is a motif, not a lesson.
+
+## Retirement: agents hand over, the integrator executes (r437)
+
+The `grpfold` agent produced the full plumbing list and deliberately did NOT execute it, which
+is the right split — the retiring drill's agent cannot see the other agents' in-flight edits to
+`drills.js` and `index.html`. Executed at integration: group key list · `meta` · `HOTKEY_PARS` ·
+the `CHALLENGES.grpfold` block · its one alt-path entry · `dev/migrate-certificates.sql` ·
+`drills/grpfold.html` · sitemap · `refmap.js` (regenerated — `ALT+SHIFT+→` and `ALT>A>H` now map
+to `unhide`, which is correct, they are its beats now) · marketing count 76→75 across
+`index.html` ×3 and `About.html` ×2 · **and `grpfold` added to C13's `RETIRED` list**, which
+then verified the whole sweep in one run. Catalog: **75**.
+
+Verified NOT needed, and worth recording so nobody re-checks: `HOTKEY_CAMPAIGN` (c4 keys are
+sort/recon/lookup/lookup2) · `HK_TRACKS` (derives from `groups`) · milestone lists (chapter ids
+only) · `e2e-depth-mechanics` (no section drives it) · `e2e-fit-sweep` (exempt list names
+`unhide`, not `grpfold`) · `supabase/migrations/*.sql` (applied history — leave alone) ·
+`dev/seed-field.sql` (historical leaderboard rows, and C13 exempts it for that reason).
+
+**A deletion heuristic bit me here and is worth the warning:** "delete from the entry line to
+the next line matching `^\s{0,4}\},?$`" removed 1013 lines of `dev/e2e-alt-paths.js` instead of
+10, because the moves template literals contain lines that match. Caught immediately by
+re-requiring the file, but the lesson is: when deleting a block, print the first/last/next line
+you are about to remove and assert the NEXT line is the start of the following entry — do not
+trust an indent regex against a file full of embedded code.
+
+## Never point a suite at a port you did not start (r437)
+
+Every agent worktree runs its own `python3 -m http.server` on its own port, and those servers
+**outlive the agent**. Port 8853 was still bound by the `grpfold`/`unhide` worktree when I ran
+the integration gate with `URL=http://127.0.0.1:8853/index.html` — so the gate tested the
+AGENT'S TREE, not the integrated one. It came back green on a tree that did not have the
+retirement in it. The tell was `e2e-lb` reporting `missing:grpfold`: the served `drills.js`
+still had the drill my working copy had just deleted.
+
+Two rules:
+
+1. **Run the gate on the default port and let the harnesses use their own defaults.** They
+   already agree on 8791; the `URL` override exists for parallel worktrees, and the integrator
+   is not one.
+2. **`URL` is per-suite, not global.** `e2e-lb` targets `leaderboard.html`, not `index.html` —
+   a blanket `URL=…/index.html` across a loop hangs it on `waitForFunction`. That failure looks
+   exactly like a real regression and cost a full diagnostic pass.
+
+Confirm before trusting a gate run:
+
+```bash
+curl -s http://127.0.0.1:8791/drills.js | grep -c '<a key you just deleted>'   # expect 0
+for p in $(pgrep -f http.server); do echo "$p $(readlink /proc/$p/cwd)"; done  # expect the repo root
+```
+
+`PORT=` is ignored by these harnesses — only `URL=` is read. Setting `PORT` and believing it
+redirected the suite is the same mistake wearing a different hat.

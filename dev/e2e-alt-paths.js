@@ -459,16 +459,6 @@ const ALTS = [
       for(let r=o.rL;r>=o.r1;r--)
         st.push({sel:o.LFL+r, keys:[...T('=COUNTIF('+o.LFN+o.r1+':'+o.LFN+o.rL+','+o.LTN+r+')'),{key:'Enter'}]});
       return st; }` },
-  { key: 'grpfold', name: 'quarters in REVERSE + one reopened and refolded (alt a j proof)', moves: `C => { const o=C._o;
-      const steps=[];
-      o.blocks.slice().reverse().forEach(b=>{
-        steps.push({sel:'A'+b.r1+':A'+b.r2, keys:[{key:'ArrowRight',alt:true,shift:true}]});
-        steps.push({sel:'A'+b.r1, keys:[{key:'Alt'},L('a'),L('h')]});
-      });
-      const b0=o.blocks[0];
-      steps.push({sel:'A'+b0.sub, keys:[{key:'Alt'},L('a'),L('j')]});   // reopen from the summary row
-      steps.push({sel:'A'+b0.r1, keys:[{key:'Alt'},L('a'),L('h')]});    // fold it back
-      return steps; }` },
   { key: 'filterpass', name: 'answer typed FIRST, armed via ribbon (alt a t) from A3, chips swept right-to-left', moves: `C => { const o=C._o;
       const pk=[{key:'ArrowDown',alt:true}];
       for(let i=0;i<o.chips.length-1;i++) pk.push({key:'ArrowRight'});
