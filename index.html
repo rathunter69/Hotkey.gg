@@ -2114,56 +2114,239 @@ function stepFsz(cur,dir){ let i=FSZ_LADDER.indexOf(cur==null?FSZ_BASE:cur); if(
 
 const CHALLENGES = {
   drill:{
-    name:'Hardcode', label:'Hardcode it', par:18, parKeys:15,
-    aha:'Alt E S V pastes values only — the number stays, the live link dies. (Ctrl+Alt+V lands the same dialog.)',
-    prompt:'Every number on this page is a live link into the model — break the links before it ships. Select the output column B3:B8, copy it, and paste-special values back onto itself, then color the hardcoded cells blue. Aim at that column only, not the whole page — the margin memo below must stay live.',
-    req:'on <em>B3</em> \u00b7 <em>ctrl+shift+\u2193</em> grabs B3:B8 \u00b7 <em>ctrl+c</em> \u00b7 <em>alt e s v \u21b5</em> values onto themselves \u00b7 then <em>alt h f c</em> \u2192 \u00d74 <em>\u21b5</em> \u2014 the dead numbers wear blue',
-    guide:[
-      'on B3 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> \u2014 the whole output column in one chord',
-      'copy <kbd>ctrl</kbd>+<kbd>c</kbd> \u00b7 then <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>\u21b5</kbd> \u2014 values land right back on top; the links are gone',
-      'still selected \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd> \u2014 blue means hardcode; the page tells on itself',
-    ],
-    targets:['B3:B8','B3:B8'],
-    demo(){ return [
-      {sel:'B3:B8', keys:[Kb.copy]},
-      {sel:'B3:B8', keys:[Kb.alt,L('E'),L('S'),L('V'),Kb.enter]},
-      {sel:'B3:B8', keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+    /* r438 H6b (DEPTH_PASS §4.42, "Hardcode it", tagged audit-shallow #7) — the depth-pass
+       rework, built to §1.0 + §1.0-R2 + §1.0-R3 on top of the page (§1.0-R3 wins).
+
+       WAS: 2 checks (values-onto-self plus a memo guard, then a blue font pass) on a fixed
+       B3:B8 site — par 18 / parKeys 15. The mechanic was right and the MOTIVE was missing: the
+       drill severed a link and then never showed you why severing it mattered.
+
+       RETIREMENT/MERGE TESTED FIRST (§1.0-R3(s) + the DEPTH_PASS_CAMPAIGN §2 two-part ☆-headroom
+       diagnostic), and REJECTED. Measured on the SHIPPED board through the live engine, 5 seeds
+       per route, every selection and navigation keyed:
+         PART 1 — IS THERE SPREAD? fastest legal 14 keys (Ctrl+Alt+V → V) · taught route 16 (Alt
+           E S V) · ribbon values-paste 15 · the same run with the grab walked down by plain
+           Shift+arrow 20 · and 33 for the slowest legal route, every figure retyped by hand with
+           no clipboard anywhere. 33 ÷ 14 = 2.36×, above the ~1.3× line that retired `grpfold`
+           and above retired `growth`'s 2.4× only by a hair — so part 1 alone is not the verdict.
+         PART 2 — IS ANY OF IT ☆-LEGAL? Strip chord-vs-ribbon: Alt E S V vs Alt H V V vs
+           Ctrl+Alt+V spans 2 keys and §1.0(c) forces all three to clear. Strip formatting: the
+           blue pass is a format and §1.0(d) forbids a formatting star outright. What SURVIVES is
+           17 keys — the clipboard against retyping — plus 4 more on the block grab. Legal
+           headroom exists, so the board can carry a legal star and the drill is a lesson, not a
+           motif. KEEP.
+       THE §3 DISCRIMINATOR, and the honest answer. The neighbour is `pastes` (Foundations),
+       whose beat 6 is a values-paste into a hand-off row. Fluency there produces a CORRECT first
+       attempt here — this is containment, not contrast, and containment is what retired
+       `grpfold`. Three things make it one-way rather than a subset:
+         · `pastes` teaches the paste-special MENU — which of transpose/values/formats/multiply
+           you reach for. Every beat there is a different KIND. Nothing here turns on the kind.
+         · The self-paste. `pastes` always lands somewhere else; the flatten lands on its own
+           source, which is the move that has no analogue anywhere in the catalog.
+         · The DELETE that proves it, which is this drill's whole motive and exists in no other
+           drill. `stalelink` repoints dead references, `hunt` finds hardcodes and relinks them
+           to formulas — both run the opposite direction. Nothing else in the catalog MAKES a
+           hardcode on purpose and then kills the source to show the number survived.
+       DEPTH_PASS_CAMPAIGN §3's own ruling on this class is the scrub-vs-rowops one: an overlap
+       of exactly ONE OP, on a different subject, is spaced practice. That is this.
+
+       THE BOARD. A send-out snapshot page wired into the model behind it. Seven metric lines;
+       a Draft working column and a Final column, BOTH live off the same feed; an empty As-sent
+       archive column beside Final; the feed block itself off to the right behind a moat; and a
+       live check line two rows under the block. The Draft column is not a decoy — it is the
+       CONTROL. Flatten Final, kill the feed, and the two columns that were identical a minute
+       ago say different things: that is the lesson, on the board, out loud.
+
+       STRUCTURAL DEVIATIONS from the §4.42 page, declared here per §0:
+       (1) ☆ RE-CUT (binding). The page's bonus — "Paste the flattened column into the deck strip
+           as values — the second hand-off" — is extra WORK, not a hidden efficiency, so §1.0(d)
+           rules it out and §1.0-R2(i) rules it out twice (a ☆ is a distinct, skippable DECISION,
+           never another chore). The hand-off is PROMOTED to a core beat, and the star becomes
+           the thing that hand-off makes possible: the copied column BROADCAST across Final and
+           As-sent together, one paste doing both. That is the r418 tiling contract — "when the
+           selection is an exact multiple of the copied block in BOTH dimensions, the paste
+           repeats the block across the whole selection" — and no drill in the catalog grades it.
+           It is deliberately NOT the same decision as `recon`'s star (carry a row with the
+           clipboard instead of retyping it, a 1×2 clip into a 1×2 hole) or `lookup2`'s (anchor
+           once so one read serves three cards): here the clip is 7×1 and the destination is
+           7×2, and the discovery is that the paste REPEATS.
+       (2) THE PAGE'S BEAT 4 IS CUT — "Add an outside border around the send-out block". That is
+           `pastes` beat 7 and `lookup`'s close, both on values hand-offs, and
+           DEPTH_PASS_CAMPAIGN §3 says to cut a shared tail rather than repeat it. §1.6 offers a
+           PROVE-OUT as the alternative to a dress close and this board has the better one
+           already: the delete IS the finish state, exactly as `recon` closes on a zero.
+       (3) FOUR CORE BEATS, the §1.1 floor, and no formatting beat except the blue — which is
+           not a dress but the house convention for what the drill just made (§1.0-R3(o) ranks
+           font colour high, and blue-for-hardcode is the one place it is load-bearing).
+       (4) cueCell IS used (§1.0-R2(h)/§1.0-R3(q)): the As-sent column is an EMPTY paste
+           destination, the exact case the primitive exists for. It sits one row above the header
+           so no downward grab can reach it, it is never read by checks(), and deleting it can
+           never move an ok.
+       (5) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing is converted or scaled.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about:
+         · no check reads a paste KIND or a formula's text. "Flattened" is formula===null with
+           the right number, so Alt E S V, Alt H V V, Ctrl+Alt+V → V, the Ctrl+V of an
+           already-dead column, and typing all seven figures by hand all clear identically.
+         · the guards fold into beat 1's ok (§1.1, no do-nothing lines): the Draft column still
+           holds formulas and the check line still holds its formula. Both are labelled on the
+           board and named in the prompt and the guide, so the over-broad paste that breaks them
+           is visible, not mysterious — and Ctrl+Z is one key.
+         · beat 4 grades the feed EMPTY and the send-out figures STILL RIGHT, so it can only fire
+           on a board that was flattened first. Deleting the feed before flattening destroys the
+           only copy of the numbers and leaves beats 1 and 3 unreachable until Ctrl+Z — that is
+           deliberate, it is what the drill is about, and the guide says so. It is the same
+           known-and-accepted class as `sort`'s total-before-the-last-sort.
+         · the ☆ never gates a core: two separate pastes clear all four beats and leave it dark,
+           measured. */
+    name:'Hardcode', label:'Hardcode it', par:22, parKeys:21, saveClose:true,   /* r438 §4.42 depth pass: par re-swept from scratch (was par 18 / parKeys 15 on the old 2-check board). See the sweep note in dev/AUDIT.md r438; par ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. */
+    aha:'the delete is the proof — a flattened number outlives the model it came from, a live link does not.',
+    /* §1.5: the aha's MOMENT is beat 4 — the feed dies and the two columns that were identical
+       a minute ago stop agreeing. */
+    prompt:'The snapshot goes out tonight and every figure on it is still a live link into the model. Break the links in the Final column, mark what you just hardcoded, put the same figures in the As-sent archive, and then delete the model feed to prove the page can travel without it. The Draft working column and the check line under the block stay wired — aim only at what ships.',
+    req(){ const o=this._o; return '<em>'+o.finTop+'</em> <em>ctrl+⇧+↓</em> · <em>ctrl+c</em> · <em>⇧+→</em> takes the As-sent column too · <em>alt e s v ↵</em> · <em>alt h f c</em> → ×4 <em>↵</em> · <em>'+o.feedRng+'</em> <em>del</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'put the cursor on '+o.finTop+' and take the Final figures in one press: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> · <kbd>ctrl</kbd>+<kbd>c</kbd> · <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> <kbd>v</kbd> <kbd>↵</kbd> lands the numbers back on top of themselves with no formulas behind them. <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>v</kbd> and <kbd>alt</kbd> <kbd>h</kbd> <kbd>v</kbd> <kbd>v</kbd> reach the same place. Do NOT take the whole column with <kbd>ctrl</kbd>+<kbd>space</kbd> — the check line at '+o.chkCell+' is inside it and it is meant to stay live',
+      'still selected · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> then <kbd>→</kbd>×4 <kbd>↵</kbd> for the blue swatch — blue is what a desk uses to say "this number was typed, not calculated"',
+      'the archive column '+o.sentRng+' takes the same figures with no formulas behind them either. The red note above it is board furniture, not a target — delete it or leave it',
+      'now kill the feed: '+o.feedRng+' · <kbd>del</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>e</kbd> <kbd>c</kbd> clears the same way). The Final and As-sent figures do not move; the Draft column drops to zero, because it is still asking a block that is no longer there. If you do this BEFORE the flatten you delete the only copy of the numbers — <kbd>ctrl</kbd>+<kbd>z</kbd>',
+      '☆ the discovery: the clipboard REPEATS. Copy the Final figures, then stretch the selection one column right with <kbd>⇧</kbd>+<kbd>→</kbd> before you paste — a seven-cell clip over a seven-by-two selection lands in both columns at once, so the flatten and the hand-off cost one paste instead of two. Doing them separately finishes the drill exactly the same way',
     ]; },
+    /* rings: ① the Final column · ② the same column, now dead · ③ the As-sent column · ④ the
+       feed block · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.finRng, o.finRng, o.sentRng, o.feedRng, null]; },
+    /* the demo BUILDS its own selections — Ctrl+Shift+↓ off the top of each column — rather than
+       being handed them by setDemoSel, so parKeys measures what a player really pays. setDemoSel
+       only ever parks the cursor on the anchor cell of the next beat. */
+    demo(){ const o=this._o; const CSD={key:'ArrowDown',ctrl:true,shift:true}; return [
+      /* ☆ — the copy broadcast across Final AND As-sent in one paste (the r418 tiling contract);
+         performed mid-run so replays cover it (§2.2) */
+      {sel:o.finTop,  keys:[CSD,Kb.copy,{key:'ArrowRight',shift:true},Kb.alt,L('e'),L('s'),L('v'),Kb.enter]},
+      /* §1.0(a) format-as-you-go: the blue rides directly behind the paste that made the
+         hardcodes it marks */
+      {sel:o.finTop,  keys:[CSD,Kb.alt,L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
+      {sel:o.ML+o.r1, keys:[CSD,{key:'Delete'}]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 send-out snapshot ($mm)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Metric',txt:true,bold:true};
-      cells['B2']={...blankCell(),value:'Value',txt:true,bold:true,align:'r'};
-      cells['D2']={...blankCell(),value:'Model feed',txt:true,bold:true};
-      const rev=rnd(80,140)*10;
-      const gp=Math.round(rev*rnd(35,55)/100), ebitda=Math.round(gp*rnd(55,75)/100);
-      const ebit=Math.round(ebitda*rnd(70,85)/100), ni=Math.round(ebit*rnd(60,75)/100);
-      const fcf=Math.round(ni*rnd(70,110)/100);
-      const rows=[['Revenue',rev],['Gross profit',gp],['EBITDA',ebitda],['EBIT',ebit],['Net income',ni],['Free cash flow',fcf]];
+      /* §1.2 randomization — four independent axes: (a) SITE, header row 3/4 crossed with anchor
+         column A/B; (b) CONTENT, a seven-line window sliding over a ten-line canonical cascade,
+         plus the codename; (c) VALUES, every figure through rnd(); (d) WHICH-LAYOUT, the Draft
+         working column parked LEFT of the send-out pair or RIGHT of it — the §4.42 page's
+         "which column is Final vs Draft" axis, kept in the only form the ☆ allows, since the
+         tiled paste needs Final and As-sent adjacent. The metric window SLIDES rather than
+         shuffling, so the cascade always reads top-down the way a snapshot does. */
+      const METRICS=['Revenue','Gross profit','EBITDA','EBIT','Net income','Free cash flow',
+                     'Capex','Net debt','Net working capital','Order backlog'];
+      const NR=7;
+      const hr=rnd(0,1)?3:4, c0=rnd(0,1)?1:2, r1=hr+1;
+      const draftLeft=!!rnd(0,1);
+      const cD = draftLeft ? c0+1 : c0+3;              // Draft (working, stays live)
+      const cF = draftLeft ? c0+2 : c0+1;              // Final (flattens)
+      const cS = cF+1;                                 // As sent (the archive — must sit beside Final)
+      const cFeed = c0+5;                              // the model feed, behind a one-column moat
+      const AL=colLetter(c0), DL=colLetter(cD), FL=colLetter(cF), SL=colLetter(cS), ML=colLetter(cFeed);
+      const w0=rnd(0,METRICS.length-NR); const rows=METRICS.slice(w0,w0+NR);
+      cells[AL+'1']={...blankCell(),value:codename()+' — send-out snapshot ($mm)',txt:true,bold:true};
+      /* §1.0-R3(q) CUE: the As-sent column is an EMPTY destination, which a green outline reads
+         as "cell", not "land here". Board furniture only — never a graded target, and it sits
+         ABOVE the header row so no downward grab can ride into it. */
+      cells[SL+(hr-1)]={...cueCell('paste values here ▼'),align:'c'};
+      cells[AL+hr]={...blankCell(),value:'Metric',txt:true,bold:true};
+      cells[DL+hr]={...blankCell(),value:'Draft (live)',txt:true,bold:true,align:'r'};
+      cells[FL+hr]={...blankCell(),value:'Final',txt:true,bold:true,align:'r'};
+      cells[SL+hr]={...blankCell(),value:'As sent',txt:true,bold:true,align:'r'};
+      cells[ML+hr]={...blankCell(),value:'Model feed',txt:true,bold:true,align:'r'};
       this._exp={};
-      rows.forEach(([n,v],i)=>{ const r=3+i;
-        cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['E'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells['B'+r]={...blankCell(),formula:'=E'+r,value:v,fmtStyle:'comma',decimals:0};
-        this._exp['B'+r]=v;
-      });
-      // r187 DECOY: a live margin memo below the block \u2014 an over-broad column
-      // paste (ctrl+space) would flatten it; the honest B3:B8 selection leaves it alone
-      cells['A10']={...blankCell(),value:'Memo: EBITDA margin (stays live)',txt:true};
-      cells['B10']={...blankCell(),formula:'=E5/E3',value:ebitda/rev,fmtStyle:'percent',decimals:1};
-      return {ROWS:10, cells, active:{r:3,c:2}, sel:null, colW:{1:150,2:80,5:80}};
+      const feed=[];
+      for(let i=0;i<NR;i++){ const r=r1+i;
+        const v=rnd(24,180)*5;
+        feed.push(v);
+        cells[AL+r]={...blankCell(),value:rows[i],txt:true};
+        /* the feed is the model's own output — typed figures, so blue by the house convention
+           (doctrine §2.1b); the two live columns read it and carry no colour of their own */
+        cells[ML+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[DL+r]={...blankCell(),formula:'='+ML+r,value:v,fmtStyle:'comma',decimals:0};
+        cells[FL+r]={...blankCell(),formula:'='+ML+r,value:v,fmtStyle:'comma',decimals:0};
+        cells[SL+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+        this._exp[r]=v;
+      }
+      /* THE CHECK LINE, two rows under the block and INSIDE the Final column — a live SUM that
+         must survive the flatten. It is the r187 over-broad-paste decoy made meaningful: Ctrl+
+         Space takes the whole column and kills it, the honest grab does not. It is also the
+         quiet proof of the drill's own argument — once Final is hardcoded, this total keeps
+         reading the same number after the feed dies. One blank row above it, so a Ctrl+arrow
+         grab down the Final column stops at the block edge and never swallows it. */
+      const chkR=r1+NR+1;
+      cells[AL+chkR]={...blankCell(),value:'Check: send-out total (stays live)',txt:true};
+      cells[FL+chkR]={...blankCell(),formula:'=SUM('+FL+r1+':'+FL+(r1+NR-1)+')',
+        value:feed.reduce((a,b)=>a+b,0),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      /* §1.3 density + a real desk artifact: the page says where it came from, what it is in,
+         and what is about to happen to it. Story only — checks() reads the block, so deleting
+         any of these can never move an ok. */
+      cells[AL+(chkR+2)]={...blankCell(),value:'Source: operating model v4 — this tab is wired straight into it',txt:true,it:true,fontColor:'gray'};
+      cells[AL+(chkR+3)]={...blankCell(),value:'Basis: $ in millions, figures as of the last model run',txt:true,it:true,fontColor:'gray'};
+      cells[AL+(chkR+4)]={...blankCell(),value:'Status: goes out tonight — it must read the same on a machine without the model',txt:true,it:true,fontColor:'gray'};
+      this._o={ hr, r1, NR, chkR, AL, DL, FL, SL, ML, cD, cF, cS, cFeed, draftLeft,
+        finTop : FL+r1,
+        finRng : FL+r1+':'+FL+(r1+NR-1),
+        sentRng: SL+r1+':'+SL+(r1+NR-1),
+        bothRng: FL+r1+':'+SL+(r1+NR-1),
+        feedRng: ML+r1+':'+ML+(r1+NR-1),
+        chkCell: FL+chkR };
+      /* widths budgeted to ~600px so the fit scaler runs at 1.0 and no figure column can
+         manufacture a #### (the r430 overflow rule reasons in unscaled px) */
+      const colW={}; if(c0>1) colW[c0-1]=22;
+      colW[c0]=196; colW[cD]=92; colW[cF]=92; colW[cS]=92; colW[c0+4]=22; colW[cFeed]=92;
+      // opens on the first Final figure — where the taught one-press grab starts (the r365
+      // standard open reads demo()[0], which would move it here from anywhere else anyway)
+      return {ROWS:20, cells, active:{r:r1,c:cF}, sel:null, colW};
     },
     checks(S){
-      const dead=Object.keys(this._exp).every(k=>{ const c=S.cells[k];
-        return !!(c&&c.formula===null&&Number(c.value)===this._exp[k]); });
-      const blue=Object.keys(this._exp).every(k=>{ const c=S.cells[k]; return !!(c&&c.fontColor==='blue'); });
+      const o=this._o, cel=k=>S.cells[k]||{};
+      const rowsR=[]; for(let i=0;i<o.NR;i++) rowsR.push(o.r1+i);
+      const dead=(cl)=>rowsR.every(r=>{ const c=cel(cl+r);
+        return c.formula==null && typeof c.value==='number' && Math.abs(c.value-this._exp[r])<0.5; });
+      /* BEAT 1 — the Final column holds its numbers with nothing behind them, and the two things
+         the board labels "live" still are. The guards fold in here (§1.1): the whole-column
+         paste that takes the check line with it fails this beat, and the board says why. */
+      const draftLive=rowsR.every(r=>!!cel(o.DL+r).formula);
+      const chkLive=!!cel(o.chkCell).formula;
+      const flatOk=dead(o.FL) && draftLive && chkLive;
+      /* BEAT 2 — blue on the seven figures the flatten just made (§1.0(a), §1.0-R3(o)). */
+      const blueOk=rowsR.every(r=>cel(o.FL+r).fontColor==='blue');
+      /* BEAT 3 — the archive column carries the same figures, also with nothing behind them.
+         A formulas-paste lands translated references and the wrong numbers, so it cannot clear
+         this by accident; typing the seven figures can, and should (§1.0(c)). */
+      const sentOk=dead(o.SL);
+      /* BEAT 4 — the prove-out finish (§1.6): the feed is gone and the send-out figures have not
+         moved. Nested on 1 and 3 by construction, which is the point — this beat is what makes
+         them mean something, and it cannot fire on a board that was gutted before it was
+         flattened. Cleared cells and a structurally emptied block both read as empty. */
+      const feedGone=rowsR.every(r=>{ const c=cel(o.ML+r); return c.value==null && c.formula==null; });
+      const heldOk=feedGone && dead(o.FL) && dead(o.SL);
+      /* ☆ (mystery, §1.0(d) hidden efficiency + §1.0-R2(i) a real, skippable decision) — ONE
+         paste covering BOTH columns: a 7×1 clip stretched over a 7×2 selection, which the r418
+         tiling path repeats. Read off the r425 S.pasteLog latch, which records the landed rect,
+         the tile dims and the SOURCE shape — the mechanic, never geometry inferred from the end
+         state — so every values route earns it (Alt E S V · Alt H V V · Ctrl+Alt+V) and so does
+         a plain Ctrl+V of an already-dead column, because the latch reads the SHAPE of the pass
+         and not its kind. Two separate pastes leave it dark; so does typing (nothing lands in
+         pasteLog at all). dev/e2e-alt-paths.js ALT 2 is the measured negative control. */
+      const onePass=(S.pasteLog||[]).some(p=>p.sw===1 && p.w>=2 && p.h>=o.NR
+        && p.c0<=o.cF && p.c0+p.w-1>=o.cS && p.r0<=o.r1 && p.r0+p.h-1>=o.r1+o.NR-1);
+      const starOk=flatOk && sentOk && onePass;
       return [
-        {label:'break the links in B3:B8 \u2014 values only, and the margin memo at B10 keeps its wire', ok: dead && !!(S.cells['B10']&&S.cells['B10'].formula)},
-        {label:'blue-font the now-hardcoded numbers in B3:B8 \u2014 blue marks dead values', ok: blue},
+        {label:'Break the links in the Final column — values only, the check line stays live', ok: flatOk},
+        {label:'Color the flattened figures blue', ok: blueOk},
+        {label:'Fill the As-sent column with the send-out figures — numbers, no formulas', ok: sentOk},
+        {label:'Delete the model feed — the send-out figures hold', ok: heldOk},
+        {label:'Flatten the column and fill the hand-off in one paste', ok: starOk, bonus:true},
       ];
     }
   },
-
   combo:{
     /* r428 H6b-2 (DEPTH_PASS §4.17, built to the §1.0 + §1.0-R2 laws): the depth-pass rework
        of the cleanup pass.
@@ -7555,14 +7738,14 @@ const CHALLENGES = {
          · THE FIRST VERSION OF THAT RUN MEASURED NEGATIVE. With five short line numbers, typing
            them cost 7 keys and extending them cost 11 — the star route WORSE than the route it
            was meant to beat, which is precisely the finding `growth` was retired on. Fixed by
-           the board, not by the predicate: the table now carries SEVEN plan years and EIGHT
+           the board, not by the predicate: the table now carries SEVEN plan years and NINE
            lines, and the Ref column is numbered in hundreds (or fifties), the way an exhibit
            schedule actually is. Re-measured, both runs now favour the star — see the ☆ note.
 
        THE BOARD. A seven-year long-range plan page that came back from the data room with its
        frame stripped: every figure survived, the year header stops after two columns, the Ref
-       column stops after two numbers, and the seven component lines sit flush against their
-       heading. Ref · Line · seven year columns; the heading row is a live SUM of its seven
+       column stops after two numbers, and the eight component lines sit flush against their
+       heading. Ref · Line · seven year columns; the heading row is a live SUM of its eight
        components, so every figure on the page is read by something.
 
        STRUCTURAL DEVIATIONS from the §4.43 page, declared here per §0:
@@ -7603,7 +7786,7 @@ const CHALLENGES = {
          · every core reads the finished board. The years and the Ref numbers grade as VALUES, so
            Series, typing and any mixture of the two all clear; the dress grades bold plus
            reads-right (align 'r' OR unset, so a Clear-Formats-and-retype route clears exactly as
-           it does in `center`); the indent grades indent>=1 on the seven components and 0 on the
+           it does in `center`); the indent grades indent>=1 on the eight components and 0 on the
            heading, with Alt H 5 the visible repair for a sweep that took the heading in too.
          · the header run ships align:'l' on EVERY cell, blanks included, so the cells Series
            writes into keep that alignment and the right-align beat is real work on every route.
@@ -7617,7 +7800,7 @@ const CHALLENGES = {
            Excel's own Series dialog does, and the guide names the selection that works.
          · the ☆ never gates a core, and its two moves are latched SEPARATELY, so extending one
            run and typing the other earns nothing (probed, 0/5). */
-    name:'Years', label:'Serve the year table', par:41, parKeys:39, saveClose:true,   /* r438 §4.43 depth pass: par re-swept from scratch (was par 14 / parKeys 11 on the old 2-check board). See the sweep note in dev/AUDIT.md r438; par ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. */
+    name:'Years', label:'Serve the year table', par:44, parKeys:42, saveClose:true,   /* r438 §4.43 depth pass: par re-swept from scratch (was par 14 / parKeys 11 on the old 2-check board). See the sweep note in dev/AUDIT.md r438; par ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. */
     aha:'fill right copies what you hand it — a series reads the step off the seeds and keeps going.',
     /* §1.5: the aha's MOMENT is beat 1 — the year run, where the Ctrl+R reflex writes the same
        year seven times and the run that reads its seeds writes the other five. */
@@ -7629,40 +7812,48 @@ const CHALLENGES = {
       'take the whole year run '+o.hdrRun+' — the two seeds AND the five blanks after them — then <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> <kbd>↵</kbd>. Two seeds tell it the step and it writes the rest. <kbd>ctrl</kbd>+<kbd>r</kbd> is the trap: fill right COPIES, so it hands you '+o.y0+' seven times. And <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> stops on the second seed, which leaves the pass nothing to write — walk the selection out with <kbd>⇧</kbd>+<kbd>→</kbd>. Typing the five years works too, it only costs the keys',
       'the run is still selected — <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>, the engine’s only alignment route. The header arrived hugging the left of its cells; the figures under it read right',
       'the same move down the Ref column: select '+o.refRun+', from the first number to the last line · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> <kbd>↵</kbd>. The seeds are '+o.ref0+' and '+(o.ref0*2)+', so the step is '+o.ref0+' — a single seed on its own would step by 1',
-      'select the seven component labels '+o.compRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>6</kbd> steps them in one level (<kbd>alt</kbd> <kbd>h</kbd> <kbd>5</kbd> steps back out, which is the fix if you sweep the heading in with them). The '+o.head+' line stays flush; it is the line they sit under',
+      'select the eight component labels '+o.compRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>6</kbd> steps them in one level (<kbd>alt</kbd> <kbd>h</kbd> <kbd>5</kbd> steps back out, which is the fix if you sweep the heading in with them). The '+o.head+' line stays flush; it is the line they sit under',
       '☆ the discovery: BOTH runs extended from their seeds, neither one typed out. Typing the five years and the five line numbers finishes the drill exactly the same way and forfeits the star — the clock is the only thing that tells you what it cost',
     ]; },
-    /* rings: ① the year run · ② the same run, now dressed · ③ the Ref run · ④ the seven component
+    /* rings: ① the year run · ② the same run, now dressed · ③ the Ref run · ④ the eight component
        labels · ☆ never ringed (§2.2 mystery slot) */
     targets(){ const o=this._o; return [o.hdrRun, o.hdrRun, o.refRun, o.compRng, null]; },
-    demo(){ const o=this._o; return [
-      {sel:o.hdrRun,  keys:[Kb.alt,L('h'),L('f'),L('i'),L('s'),Kb.enter]},   /* ☆ move #1 — the header run extended off its two seeds */
-      {sel:o.hdrRun,  keys:[Kb.bold]},                                       /* §1.0(a) format-as-you-go: the dress rides directly behind the run it dresses */
-      {sel:o.hdrRun,  keys:[Kb.alt,L('h'),L('a'),L('r')]},
-      {sel:o.refRun,  keys:[Kb.alt,L('h'),L('f'),L('i'),L('s'),Kb.enter]},   /* ☆ move #2 — the same engine, down a column, on a step that is not 1 */
-      {sel:o.compRng, keys:[Kb.alt,L('h'),D(6)]},
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel — Ctrl+Shift+arrow cannot serve here (it rides nonEmpty() and stops on the
+       second seed), so the walk IS the route, and parKeys measures what a player really pays
+       for it. setDemoSel only ever parks the cursor on the anchor cell of the next beat. */
+    demo(){ const o=this._o;
+      const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      const Dn=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowDown',shift:true}); return a; };
+      return [
+      /* ☆ move #1 — the header run extended off its two seeds; the dress rides directly behind
+         the run it dresses on the SAME live selection (§1.0(a) format-as-you-go) */
+      {sel:o.yc[0]+o.hr,   keys:[...R(o.NY-1),Kb.alt,L('h'),L('f'),L('i'),L('s'),Kb.enter,Kb.bold,Kb.alt,L('h'),L('a'),L('r')]},
+      /* ☆ move #2 — the same engine, down a column, on a step that is not 1 */
+      {sel:o.RL+o.r1,      keys:[...Dn(o.NC),Kb.alt,L('h'),L('f'),L('i'),L('s'),Kb.enter]},
+      {sel:o.LL+(o.r1+1),  keys:[...Dn(o.NC-1),Kb.alt,L('h'),D(6)]},
     ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
       const shuf=(a)=>{ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=rnd(0,i); [b[i],b[j]]=[b[j],b[i]]; } return b; };
       /* §1.2 randomization — four independent axes: (a) SITE, a 4-spot pool moving the table in
-         both axes; (b) CONTENT, the block drawn from four and its seven components Fisher-Yates
+         both axes; (b) CONTENT, the block drawn from four and its eight components Fisher-Yates
          shuffled, plus the codename; (c) VALUES, every figure through rnd(); (d) WHICH-STEP, the
          Ref column's step drawn from {50,100} and the first plan year from a six-year window —
          so neither run's answer repeats and the Ref step has to be read off the board rather
-         than remembered. Geometry is deliberately constant across seeds (seven years, eight
+         than remembered. Geometry is deliberately constant across seeds (seven years, nine
          lines, three-digit Ref numbers from the third line on) so the keystroke count does not
          move with the draw. */
       const BLOCKS=[
-        {h:'Revenue',         c:['Product','Services','Licensing','Support','Hardware','Training','Other']},
-        {h:'Operating costs', c:['Compensation','Occupancy','Technology','Prof. fees','Travel','Marketing','Insurance']},
-        {h:'Capital spend',   c:['Maintenance','Growth','Systems','Facilities','Fleet','Fit-out','Software']},
-        {h:'Fee revenue',     c:['Advisory','Financing','Restructuring','Markets','Research','Custody','Other']},
+        {h:'Revenue',         c:['Product','Services','Licensing','Support','Hardware','Training','Royalties','Other']},
+        {h:'Operating costs', c:['Compensation','Occupancy','Technology','Prof. fees','Travel','Marketing','Insurance','Recruiting']},
+        {h:'Capital spend',   c:['Maintenance','Growth','Systems','Facilities','Fleet','Fit-out','Software','Security']},
+        {h:'Fee revenue',     c:['Advisory','Financing','Restructuring','Markets','Research','Custody','Lending','Other']},
       ];
       const spots=[{hr:3,c0:1},{hr:4,c0:2},{hr:3,c0:2},{hr:4,c0:1}];
       const sp=spots[rnd(0,spots.length-1)];
       const hr=sp.hr, cRef=sp.c0, cLab=sp.c0+1, cY=sp.c0+2, r1=hr+1;
-      const NY=7, NC=7;                                   // seven plan years · seven component lines
+      const NY=7, NC=8;                                   // seven plan years · eight component lines
       const blk=BLOCKS[rnd(0,BLOCKS.length-1)];
       const comps=shuf(blk.c);
       const y0=rnd(2024,2029);
@@ -7684,7 +7875,7 @@ const CHALLENGES = {
       for(let i=0;i<NC;i++){ const base=rnd(10,60)*10; const row=[];
         for(let j=0;j<NY;j++) row.push(Math.round(base*(100+j*rnd(4,13))/100/5)*5);
         figs.push(row); }
-      /* the heading line is a LIVE SUM of its seven components, every year — so nothing on this
+      /* the heading line is a LIVE SUM of its eight components, every year — so nothing on this
          board is decoration, and the rows the indent beat sets are the rows it reads. */
       cells[RL+r1]={...blankCell(),value:ref0,decimals:0};
       cells[LL+r1]={...blankCell(),value:blk.h,txt:true,bold:true};
@@ -7703,7 +7894,8 @@ const CHALLENGES = {
          what a plan tab actually carries. Story only — checks() reads the table, so deleting
          either note can never move an ok. */
       cells[LL+(r1+NC+2)]={...blankCell(),value:'Source: plan pack v4 — figures as filed, frame stripped by the export',txt:true,it:true,fontColor:'gray'};
-      cells[LL+(r1+NC+3)]={...blankCell(),value:'Basis: fiscal years, $ in millions',txt:true,it:true,fontColor:'gray'};
+      cells[LL+(r1+NC+3)]={...blankCell(),value:'Basis: fiscal years, $ in millions, components sum to the heading',txt:true,it:true,fontColor:'gray'};
+      cells[LL+(r1+NC+4)]={...blankCell(),value:'Prepared: FP&A — reissue with the frame before it goes in the pack',txt:true,it:true,fontColor:'gray'};
       this._o={ hr, cRef, cLab, cY, r1, RL, LL, yc, y0, ref0, NY, NC, head:blk.h,
         hdrRun : yc[0]+hr+':'+yc[NY-1]+hr,
         refRun : RL+r1+':'+RL+(r1+NC),
@@ -7715,7 +7907,7 @@ const CHALLENGES = {
       colW[cRef]=58; colW[cLab]=168; for(let j=0;j<NY;j++) colW[cY+j]=84;
       // opens on the first seed year — the head of the run the drill starts with (the r365
       // standard open reads demo()[0], which would move it here from anywhere else anyway)
-      return {ROWS:Math.max(15,r1+NC+4), cells, active:{r:hr,c:cY}, sel:null, colW};
+      return {ROWS:20, cells, active:{r:hr,c:cY}, sel:null, colW};
     },
     checks(S){
       const o=this._o, cel=k=>S.cells[k]||{};
@@ -7730,7 +7922,7 @@ const CHALLENGES = {
       const dressOK=yearsOK && o.yc.every(cl=>{ const c=cel(cl+o.hr); return !!c.bold && readsRight(c); });
       /* BEAT 3 — the Ref column steps the way its two seeds do, all the way to the last line. */
       let refOK=true; for(let i=0;i<=o.NC;i++) if(cel(o.RL+(o.r1+i)).value!==o.ref0*(i+1)) refOK=false;
-      /* BEAT 4 — the seven components sit under the heading, and the heading stays flush. The
+      /* BEAT 4 — the eight components sit under the heading, and the heading stays flush. The
          leave-it-alone guard is folded into this ok rather than shipped as a do-nothing line
          (§1.1). Any indent level >=1 clears — Alt H 6 pressed twice is still "under it". */
       let indentOK=(cel(o.LL+o.r1).indent|0)===0;
@@ -7752,7 +7944,7 @@ const CHALLENGES = {
         {label:'Fill the year header — seven fiscal years across the plan columns', ok: yearsOK},
         {label:'Bold the year run and right-align it over the figures', ok: dressOK},
         {label:'Fill the Ref column — the line numbers step by '+o.ref0, ok: refOK},
-        {label:'Indent the seven component lines under '+o.head, ok: indentOK},
+        {label:'Indent the eight component lines under '+o.head, ok: indentOK},
         {label:'Fill both runs from their seeds — neither one typed out', ok: starOK, bonus:true},
       ];
     }

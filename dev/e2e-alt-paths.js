@@ -276,10 +276,29 @@ const ALTS = [
         {sel:o.totRow, keys:[{key:'Alt'},L('h'),D(1)]},
         {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('d')]},
       ]; }` },
-  { key: 'series', name: 'dress first, series last', moves: `C => { const o=C._o; return [
-      {sel:o.range, keys:[{key:'b',ctrl:true}]},
-      {sel:o.range, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.range, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+  /* r438 (series DEPTH PASS, DEPTH_PASS §4.43). The r169 entry that lived here — "dress first,
+     series last" — drove `o.range`, a five-cell header on a board with no Ref column, no
+     component lines and no indent beat. DELETED, not adapted: o.range no longer exists on any
+     seed. Do not resurrect it. ALT 1 = chord-ROUTE alt (ribbon bold instead of Ctrl+B, both
+     Series selections stretched one cell past the run, the indent taken in two passes, and the
+     dress applied BEFORE the run is filled — the ☆ still fires). ALT 2 = op-ORDER alt AND the
+     measured NEGATIVE CONTROL for the ☆: every value typed, nothing extended, all four cores
+     clear and the star must stay DARK (65 keys against the star route's 42). */
+  { key: 'series', name: 'chord-ROUTE: dress BEFORE the fill (ribbon bold Alt H 1), both Series runs selected one cell past the end, indent taken in two passes — the ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.hdrRun,  keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:o.hdrRun,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+      {sel:o.RL+o.r1+':'+o.RL+(o.r1+o.NC), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+      {sel:o.LL+(o.r1+1)+':'+o.LL+(o.r1+3), keys:[{key:'Alt'},L('h'),D(6)]},
+      {sel:o.LL+(o.r1+4)+':'+o.LL+(o.r1+o.NC), keys:[{key:'Alt'},L('h'),D(6)]},
+    ]; }` },
+  { key: 'series', name: 'NEGATIVE CONTROL / op-ORDER: indent first, every year and every line number TYPED, nothing extended — all four cores clear and the \u2606 must stay DARK', moves: `C => { const o=C._o;
+      const yk=[]; for(let j=2;j<o.NY;j++){ yk.push(...T(String(o.y0+j))); yk.push(j===o.NY-1?{key:'Enter'}:{key:'Tab'}); }
+      const rk=[]; for(let i=2;i<=o.NC;i++){ rk.push(...T(String(o.ref0*(i+1)))); rk.push({key:'Enter'}); }
+      return [
+      {sel:o.compRng, keys:[{key:'Alt'},L('h'),D(6)]},
+      {sel:o.RL+(o.r1+2), keys:rk},
+      {sel:o.yc[2]+o.hr, keys:yk},
+      {sel:o.hdrRun, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('a'),L('r')]},
     ]; }` },
   // --- T-A tranche 2 additions (r170) ---
   /* r436 (lookup DEPTH PASS, DEPTH_PASS §4.38). The r170 entry that lived here — a single
@@ -396,11 +415,28 @@ const ALTS = [
       {sel:o.totCell,   keys:[{key:'z',ctrl:true,shift:true},{key:'z',ctrl:true,shift:true},{key:'z',ctrl:true,shift:true}]},
       {sel:o.rightRng,  keys:[{key:'Delete'}]},
     ]; }` },
-  { key: 'drill', name: 'values paste via the H V S dialog route', moves: `C => [
-      {sel:'B3:B8', keys:[{key:'c',ctrl:true}]},
-      {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
-      {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-    ]` },
+  /* r438 (drill DEPTH PASS, DEPTH_PASS §4.42). The r169 entry that lived here — "values paste
+     via the H V S dialog route" — drove the hard-coded B3:B8 site of the RETIRED board, which
+     no seed produces now (the block anchors at A or B, the header row is 3 or 4, and the Draft
+     working column can sit on either side of the send-out pair). DELETED, not adapted. Do not
+     resurrect it. ALT 1 = chord-ROUTE alt: the tiled paste through the Ctrl+Alt+V dialog rather
+     than Alt E S V, the feed cleared with Alt H E C rather than Del, and the blue pass moved
+     ahead of the archive — the ☆ still fires. ALT 2 = op-ORDER alt AND the measured NEGATIVE
+     CONTROL for the ☆: the archive served by its OWN second paste through the legacy Alt H V S
+     dialog, so nothing is ever broadcast; all four cores clear and the star must stay DARK
+     (31 keys against the star route's 21). */
+  { key: 'drill', name: 'chord-ROUTE: the tiled values-paste through the Ctrl+Alt+V dialog, blue BEFORE the feed dies, feed cleared with Alt H E C instead of Del \u2014 the \u2606 still fires', moves: `C => { const o=C._o; return [
+      {sel:o.finTop,  keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true},{key:'ArrowRight',shift:true},{key:'v',ctrl:true,alt:true},L('v'),{key:'Enter'}]},
+      {sel:o.finRng,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:o.feedRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]},
+    ]; }` },
+  { key: 'drill', name: 'NEGATIVE CONTROL / op-ORDER: the archive served by its own SECOND paste (legacy Alt H V S dialog), archive before the flatten, blue last \u2014 all four cores clear and the \u2606 must stay DARK', moves: `C => { const o=C._o; return [
+      {sel:o.finTop,  keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]},
+      {sel:o.sentRng, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
+      {sel:o.finRng,  keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
+      {sel:o.feedRng, keys:[{key:'Delete'}]},
+      {sel:o.finRng,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+    ]; }` },
   /* r436 (scrub ROUND 3, DEPTH_PASS §4.34): both entries rebuilt for the reworked drill — the
      old single entry drove the RETIRED board (o.range / o.foot no longer exist, the duplicate
      record and the dress beat did not exist, and it never touched the ☆) and was DELETED, not
