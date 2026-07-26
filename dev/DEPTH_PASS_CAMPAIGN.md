@@ -31,6 +31,26 @@ filldr+pastes) · `growth`→cagr absorbed its board · `grpfold`→unhide (r437
 (r439, the strongest of the campaign — measured three ways). `cases` moved chapters rather than
 retiring.
 
+### Where the next session picks up (written r441, PR #243 open)
+
+The six passed chapters are shipped and green. **The engine work that had to precede Models is
+done** — the 20-row standard (r440) and the width-engine pass (r441) were both explicitly gated
+in front of the Models dispatch, and both are in. Nothing engine-side is now blocking.
+
+Two decisions are Wolf's and neither is made:
+
+1. **`redflags` §4.56** — Formulas II's designated capstone, an unbuilt ADD. The chapter is
+   complete at ten boards without it; building it is a scope call, not an omission. §6 has no
+   entry for it because it is not a defect.
+2. **Models I dispatch scope** — ten drills, and §5 above is the mandatory briefing. Do not
+   dispatch without `dev/MODELING_STANDARDS.md` in the agent brief and `ROWS=20` as the stated
+   default.
+
+Standing debt that does NOT block Models: §6.6 (the frame overrun), the §1.3 density retrofit
+(11 drills in passed chapters), `lbobuild`'s 25 rows, the fit-sweep flake, and the alt-paths
+long-run Escape wedge. All are recorded here or in §6 with their measurements; none needs
+re-deriving.
+
 ---
 
 ## 1 · The bug class this campaign exists to kill
@@ -293,6 +313,21 @@ fragment, never raise the cap. Two consequences for dispatch briefs:
    intermittent — capture the drill key next time it fires.
 5. **Consider a `C13` lint** asserting every reworked drill's ☆ is proved skippable — today
    that proof lives only in agent reports and commit messages.
+6. **The `__noShrink` drills overrun the sheet frame** (surfaced by the r441 pass, but
+   PRE-EXISTING — measured against a detached HEAD worktree served on a second port, so it is not
+   an r441 regression). A drill that grades a width verdict opts out of the elastic shrink, so its
+   sheet renders at natural width — and several are wider than the box. At 1440×900 **at load**:
+   `combo` 911px into an 880px box, `gauntlet` 923px. r333's carve-out says these "may run a touch
+   wide"; 31–43px is a horizontal scroll, which is the drill-to-drill frame inconsistency r333
+   existed to kill. **The fix is board-side, not engine-side**, and `autofit` already shows the
+   form: its build comment budgets the solved sheet at ~780px against ~822px of grid and pins its
+   value pools to hold it there. Give `combo` / `gauntlet` / `unhide` / `housestyle` the same
+   budget. Reuse the r441 probe shape — grid `scrollWidth` vs gridwrap `clientWidth`, at load AND
+   solved, across 1024 / 1180 / 1440.
+   Related and already accepted: `housestyle` joined `__noShrink` in r441 (it grades `clipsCol`
+   now). Unchanged at 1180/1440; at 1024 its solved sheet scrolls where it used to scale. Taken
+   knowingly — the alternative is the shrink re-clipping the label the player just fixed, which
+   leaves a green beat looking unfixed.
 
 ---
 
