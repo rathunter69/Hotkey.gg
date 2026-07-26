@@ -12427,7 +12427,10 @@ const CHALLENGES = {
       /* BEAT 5 — the revision and the refresh (§1.6 prove-out): the revised case's assumption
          carries its new number AND its snapshot has caught up with it. The seeded check line is
          reading zero at exactly this point, in one visible place. */
-      const mutApplied = near(rd(o.mutCell), o.mutG);
+      /* tighter than near(): the label states the revised rate to one decimal, so the check has
+         to hold to that. near()'s 0.01 floor is sized for $mm figures and would accept anything
+         within a whole percentage point of a small revision (a 0%% target would swallow -1%%). */
+      const mutApplied = Math.abs(rd(o.mutCell)-o.mutG)<=5e-4;
       const refreshOK = mutApplied && snapOK[o.mutIdx-1];
       /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — the DRIVER BLOCK
          built from ONE anchored CHOOSE filled down its three rows, instead of three formulas
