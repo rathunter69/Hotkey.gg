@@ -758,7 +758,7 @@ strictly more general and its aha is true), because the one-way case already liv
 Note also that `vlookup` (§4.39/D2), the middle term this doc leans on to justify keeping both,
 DOES NOT EXIST YET.
 
-#### 4.40 lookup2 — "Two-way lookup" · M (audit shallow #3)
+#### 4.40 lookup2 — "Two-way lookup" · M (audit shallow #3) — **ROUND 3 (r437 — SHIPPED, built to the ⚠️ BINDING CONSTRAINT above; the board is a SQUARE 5×5 tape read by three cards, the ☆ is an anchored COPY travelling in both axes, and the page's formatting-☆ / comma beat / outside border are replaced — deviations declared in the drill's header comment and dev/AUDIT.md r437)**
 **Now:** 2 checks (two MATCHes present, value right); one query, small block.
 **Beats (deal-screen story per audit):**
 1. Build the screen's first read — INDEX with two MATCHes, company × metric

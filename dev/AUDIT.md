@@ -1,5 +1,73 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r437 H6b-8 — lookup2: "Two-way lookup" (DEPTH_PASS §4.40 + the ⚠️ BINDING CONSTRAINT above it)
+_Built to the constraint block r436 wrote out of the `lookup` pass: the two drills shipped as the
+SAME board, and INDEX has no inversion to hide behind, so distinctness had to come from the board
+SITUATION. `lookup` = ONE FIELD / MANY KEYS; `lookup2` = ONE KEY / AN INTERSECTION, and it must not
+grow a filled column of answers._
+- **THE BOARD.** A SQUARE 5×5 reporting tape — five bank segments down, a rolling five-quarter
+  window across, both axes moving every seed — read by three cards that each name one row label
+  and one column label: a flash card beside the tape, and two board-pack cards below it three
+  columns apart. Nothing is fillable: a fill down writes into blank rows, and a fill right from
+  p.4 would overwrite p.9's own labels. The only thing that travels between the sites is a COPY,
+  and it moves DOWN AND ACROSS at once — which is the part `lookup`'s one-direction fill cannot
+  teach. Different pool (bank segments, not codenamed peers), different axis type (a rolling
+  quarter window, not a metric list), different dress, different close.
+- **THE SQUARE TAPE IS LOAD-BEARING.** The page's beat 3 ships a pre-built read with its two
+  MATCHes in each other's seats. On a non-square block that throws #N/A and reads as a broken
+  cell; on a square block it returns the TRANSPOSE — a real, plausible number off the wrong
+  intersection, which is the two-way bug a desk actually ships. build() draws the two indices so
+  they can never coincide, and every one of the 25 figures is distinct, so no read is right by
+  accident.
+- **BEATS (5 core + 1 ☆ + the engine's Ctrl+S closer; tri-length 6, C9-registered):** Enter the
+  missing quarter header on the tape (the refresh dropped it — the aha made physical: the read
+  matches on the LABEL, so a correct formula still returns #N/A until it is there) → Build the
+  flash card read → Fix the p.4 read (adaptive label names what it currently returns) → Build the
+  p.9 read → Add a top border to both board-pack cards (§1.6 finish state).
+- **PAGE DEVIATIONS, declared in-code (§0):** (a) the ☆ RE-CUT — the page's "bold the queried
+  company's row" is a FORMATTING task, dead under §1.0(d), and auto-earned under §1.0-R2(i);
+  (b) "comma-format the three reads" dropped under §1.0-R3(o) (the reads ship comma/0dp as
+  furniture) and replaced by the top border, first on Wolf's ranked list; (c) the outside border
+  around the panel dropped DELIBERATELY as a shared tail with `lookup` (campaign §3); (d) a beat
+  the page does not have — the missing header; (e) no tier reveal, no helper cells (nothing is
+  converted or scaled here); (f) one cueCell — the missing header is an empty cell in a row of
+  headers, exactly the case a green outline cannot express.
+- **☆ RECIPE (§1.0(d) hidden EFFICIENCY · §1.0-R2(i) a real, skippable decision):** lock all three
+  ranges once and the one read serves all three cards. Graded off the r425 `S.pasteLog` latch
+  (mechanic used, never geometry inferred), so Ctrl+V, the ribbon's Alt H V S → All, the legacy
+  Alt E S → All and a CHAINED copy (flash → p.4 → p.9) all earn it, and three hand-typed reads
+  earn nothing. The failure it teaches is visible on the board: a copy that travels down AND
+  across breaks a read anchored only on its rows — the exact habit `lookup`'s fill installs —
+  PROBED, both cores 3 and 4 go dark and the numbers come back wrong out loud.
+- **§1.0-R3(p) END-STATE GRADING, routes PROBED not read.** The old checks counted `MATCH(`
+  occurrences in the formula TEXT — the untriggerable-beat class exactly. Every core now reads the
+  board. Probed green: INDEX with two MATCHes · INDEX with hand-counted offsets and no MATCH at
+  all (63 keys) · VLOOKUP with a MATCH column index (163) · a pointed read built with arrows + F4
+  (66) · all three figures typed as bare numbers (24) · F2 surgery on p.4 · the header typed in
+  lower case. Border routes all clear: Alt H B P / B D / B S / B T / B A, one sweep across the
+  block, per card, or over the whole 3-row block. Probed correctly DARK: Alt H V V (paste VALUES
+  writes the flash card's number into p.4 — wrong tool, and the board says so), the unlocked copy,
+  the row-only-anchored copy. Deleting the cue cell moves nothing.
+- **PAR:** 48/49 → 80/76. 21-seed probe: median 76, range 76–78, and the only mover is whether the
+  tape's last body row is two digits (hr=5 lengthens two of the three typed ranges by a character
+  each) — zero variance inside a header row. par 80 ≈ 1.05 s/key. HOTKEY_PARS mirrored; clocks
+  derive (pass 120 · pro 92 · legendary 80). **MEASURED negative control:** three hand-typed
+  UNLOCKED reads, no copy anywhere, header entered last, each card bordered on its own — 167 keys
+  (median of 5) with all five cores GREEN and the ☆ DARK. 2.2× the star route.
+- **ALTS (§1.8 / C12).** The pre-existing r169 entry ("header-inclusive ranges") was **DELETED** —
+  it was hard-wired to the retired G4 / B1:D6 board. Two new entries: (1) chord-ROUTE — the three
+  ranges typed BARE and locked with F4 instead of typed dollars, ALL borders drawn FIRST and one
+  card at a time, pack cards served p.9-before-p.4 (71–73 keys, ☆ still fires); (2) NEGATIVE
+  CONTROL / op-ORDER, above. **Also fixed while writing them:** a template-literal `\$` escape in
+  the new `moves` sources silently collapsed `/\$/g` to `/$/g`, so the un-anchoring replace did
+  nothing and the "unlocked" control was secretly running locked ranges. Both entries now use
+  `/[$]/g`. Worth knowing for every future alt that manipulates `$` inside a moves template.
+- **GATE (port 8851):** check-invariants clean · e2e-demo-replay ALL GREEN (lookup2 WIN 3/3) ·
+  e2e-alt-paths ALL 101 PASS · e2e-par-sweep lookup2 0% drift, FLAGGED 0 · e2e-fit-sweep ALL CLEAN
+  (72 drills) · e2e-depth-mechanics 155/0 · e2e-smoke ALL 7 PAGES CLEAN (count 76).
+- **NOT DONE, deliberately:** drills/*.html, refmap.js and the drills.js?v= bump are left to the
+  integrator per the dispatch; the width-engine findings in campaign §6 were not touched.
+
 ## r425 H6b-2 — modeltour: the FOUNDATIONS CAPSTONE (DEPTH_PASS.md §4.10 + §2.4 + §1.0 overlay)
 _The first capstone build — the wiring template the other seven chapters inherit._
 - **BEAT CHAIN (§2.4 c1 row: ctrl-arrow flight · formula rebuild · fill right · format · close;
