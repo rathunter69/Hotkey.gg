@@ -90,16 +90,19 @@ change what this drill is for. The board also aggregates segments, so MODELING_S
   in everything else — it needs the player to cross-tabulate nine to twelve interleaved bookings in
   their head and leaves a dead block. `margin`, `foot`, `percent` and `sumif` all carry the same
   property; the clock is the answer to it, not a tighter predicate.
-- **ROUTE ENUMERATION (§1.0-R3(p)) — 12 routes, each DRIVEN on 4–5 fresh seeds, not reasoned about.**
+- **ROUTE ENUMERATION (§1.0-R3(p)) — 13 routes, each DRIVEN on 4–5 fresh seeds, not reasoned about.**
   Clearing: the taught route (76 keys); right-then-down fills (76); ribbon fills Alt H F I D/R with
   the Alt H B A border (84); hand-typed relative SUMIFS, no fill (245–350); typed FIGURES for every
-  cross (52–63); the per-edge/thick box Alt H B T (76); the figures-ONLY box, no header row or label
+  cross (52–63); the THICK box Alt H B T (76); the figures-ONLY box, no header row or label
   column — the label-plus-figures widening (76); quoted-TEXT criteria (502–739); a typed `=SUM` for
-  the ledger total instead of AutoSum, with the check subtraction written the other way round (86).
+  the ledger total instead of AutoSum, with the check subtraction written the other way round (86); and
+  the check built entirely in POINT MODE — `=`, arrow up to the cross-tab total, `-`, then arrows
+  across and down to the ledger total — which writes the identical formula string and reads zero on
+  5/5 seeds, so the guide's claim that pointing works is walked rather than asserted.
   Correctly NOT clearing: the unlocked fill (cores `100000`); fully-absolute criteria (`000000`);
   and **a typed `0` in the check cell (cores `111100`)** — the prove-out wants a live formula
   carrying ≥2 references, because a typed zero is a plug, which MODELING_STANDARDS §1 forbids
-  exactly where a formula belongs. 12/12 as designed.
+  exactly where a formula belongs. 13/13 as designed.
 - **ONE ORDERING IS NOT FREE, and it is engine behaviour rather than a fussy predicate** (recorded so
   the next agent does not re-derive it): a fill copies its SOURCE CELL'S FORMATTING along with the
   formula, so boxing the block first and then filling through it propagates the corner's edges

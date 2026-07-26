@@ -624,11 +624,20 @@ Do NOT build this page. The drill key `copyover` no longer exists in `menuOrder`
 ☆ Add an outside border around the finished summary block
 **Random/Aha/Finish:** verify axes; existing aha; % beat closes. **Clocks:** std. **Engine:** none.
 
-#### 4.29 rollup — "Sum on two criteria" · S
+#### 4.29 rollup — "Sum on two criteria" · S — **ROUND 3 (r438 — SHIPPED; the ☆ and the "Finish" line below are both REPLACED, deviations declared in the drill's header comment and dev/AUDIT.md r438)**
 **Now:** one mixed-anchor SUMIFS fills the segment × region grid; par 65. Near bar.
 **Language pass + bonus:**
 ☆ Bold the grid's row and column headers — the axes read
 **Random:** verify grid site jitter + segment/region pools. **Aha:** existing. **Finish:** add if missing: "Add a top border above the grid's total row" — if no total row exists, ADD one (Total the grid's columns across the bottom — live SUMs) and make it beat 5. **Clocks:** std. **Engine:** none.
+
+**⚠️ WHAT SHIPPED INSTEAD (r438) — read this before touching the page above.**
+1. **The ☆ above is illegal.** "Bold the grid's row and column headers" is a FORMATTING task, which §1.0(d) forbids outright, and its tail is a moral, which §1.0-R3(n) forbids separately. r435 flagged it for re-cutting in advance. SHIPPED ☆: **one mixed-anchor SUMIFS covers every cross** (down fill + right fill, either order), graded off `S.fillOps`. Headroom MEASURED: 76 keys taught vs 245–480 hand-written (median 337) — 4.4×.
+2. **The "Finish" line is DECLINED, and this is the page's real defect.** It asks for a total row of live SUMs across the grid's columns. **§4.22 `foot` already ships exactly that**, beat for beat — row margins, column margins, the corner agreeing, bold + top border, and a tie check — and even its ☆ ("Fill both total lines through the corner") is the star a margined cross-tab would want. Adding margins here rebuilds `foot` inside Formulas I. The same objection kills r435's "two-way tie" suggestion. SHIPPED instead: r435's OTHER option, the mixed-anchor read, closed with a grand total over the whole 2-D block **reconciled back to the source ledger** — a COMPLETENESS check (did the cross-tab catch every booking?), which `foot`'s internal cross-foot is not.
+3. **"Near bar" was wrong.** The shipped beat 1 read `$C$3:$C$11`/`$F3`/`G$2` out of formula TEXT, so four separate correct SUMIFS left it dark — the campaign's untriggerable-beat class, its eighth instance. Every core now grades the END STATE.
+4. **"Verify grid site jitter + segment/region pools" — there were none.** The board was FIXED at A1/F2/G2 with hard-coded `'Retail'`/`'Instl'` and `'Americas'`/`'EMEA'`; only the amounts moved. Rebuilt to five axes, including a grid SHAPE that moves (3–4 segments × 2–3 regions).
+5. **Par was not "std":** 65/68 → 80/76, re-swept from scratch.
+**SHIPPED BEATS (5 core + ☆):** Total the ledger's revenue column · Build the cross-tab — every segment at every region · Add an outside border around the cross-tab · Total the whole cross-tab in the total cell · Enter the reconciliation check — the cross-tab total less the ledger total reads zero. ☆ Fill the whole cross-tab from one formula.
+**MERGE VERDICT vs §4.28 `sumif`: KEEP BOTH, now MEASURED** — the SUMIF-fluent generalisation `=SUMIFS(critR,crit,critR2,crit2,sumR)` throws `sumifs-args` and the SUMIFS-fluent `=SUMIF(sumR,critR,crit)` throws `sumif-args`; neither commits, so fluency in either produces a first attempt in the other that does not compute.
 
 #### 4.30 fxconvert — "Convert the page — one anchored rate" · S
 **Now:** anchored EUR→USD driver + 2D fill + commas + outline; 5 checks; guide 3v5 misalignment; ZERO ALTS (both audit findings).
