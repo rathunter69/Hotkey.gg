@@ -222,3 +222,37 @@ report which conventions their board follows and where they deliberately simplif
    intermittent — capture the drill key next time it fires.
 5. **Consider a `C13` lint** asserting every reworked drill's ☆ is proved skippable — today
    that proof lives only in agent reports and commit messages.
+
+---
+
+## Agent-ops hazard found the hard way (r437)
+
+**Never run a repo-wide `sed`/`grep -rl` from the repo root while agent worktrees are live.**
+The worktrees sit under `.claude/worktrees/` — gitignored, so `git status` says nothing, but a
+root-anchored `grep -rl … | xargs sed -i` walks straight into them. Bumping `drills.js?v=291`
+→ `292` matched **644** files instead of the 28 in the repo; six worktrees were rewritten
+underneath running agents. Reverted with no damage, but only because it was noticed
+immediately.
+
+The safe forms:
+
+```bash
+git grep -l 'drills\.js?v=291' | xargs sed -i 's/…/…/g'     # git grep never leaves the index
+grep -rl … --exclude-dir=.claude .                          # or exclude explicitly
+```
+
+Check `grep -rl … | wc -l` against the number the cache guard reports **before** piping to
+`sed`. A count that does not match the guard's "N files agree" is the tell.
+
+## Parity is coupled to drill internals — check it on every rework (r437)
+
+`dev/e2e-audit-parity.js` reaches into `CHALLENGES.<key>._o` for two of its sections, so a
+depth pass that renames a private geometry field breaks an ENGINE suite that has nothing to do
+with the drill. The `sort` rework renamed `_o.range`/`_o.sc` → `_o.rng6`/`_o.rng7`/`_o.SC` and
+section X crashed on `undefined.match`. Fixed by a `window.sortGeo()` adapter that accepts
+either shape rather than by re-pinning the new names — the same de-coupling applied to
+`e2e-depth-mechanics` earlier in the campaign. The `unhide` agent hit the identical class
+independently on section U in the same round, which makes it a pattern, not an incident.
+
+**Standing check, added to the gate list:** after any rework, `git grep -n "CHALLENGES\.<key>\._o"
+dev/` and repoint anything outside the drill's own tests through an adapter.

@@ -427,8 +427,24 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 
   console.log('X. sort warning (r192)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('sort'); });
+  // r437: these two blocks test the SORT ENGINE (the r192 warning card, Alt+= range detection),
+  // not the sort drill — but they read the drill's private _o field names directly, so the
+  // depth-pass rework renamed `range`/`sc` out from under them and the suite crashed on
+  // undefined.match. Same coupling class as the depth-mechanics fix: go through sortGeo(),
+  // which accepts either shape, so a board rework can change geometry without breaking CI.
+  await run(() => {
+    window.sortGeo = () => {
+      const o = CHALLENGES.sort._o;
+      return {
+        range6: o.range || o.rng6,           // the table as it arrives (late-deal row empty)
+        range7: o.range || o.rng7 || o.rng6, // …one row taller, incl. the late-deal slot
+        sc    : o.sc    || o.SC,             // the size (sort-key) column letter
+        foot  : o.foot,
+      };
+    };
+  });
   const x1 = await run(() => {
-    const o = CHALLENGES.sort._o, m = o.range.match(/([A-J])(\d+):([A-J])(\d+)/);
+    const o = sortGeo(), m = o.range6.match(/([A-J])(\d+):([A-J])(\d+)/);
     const r1 = +m[2], r2 = +m[4], scN = o.sc.charCodeAt(0) - 64;
     const pairs = []; for (let rr = r1; rr <= r2; rr++) pairs.push([S.cells[m[1]+rr].value, S.cells[o.sc+rr].value]);
     S.sel = { r: r1, c: scN }; S.active = { r: r2, c: scN }; render();
@@ -450,15 +466,18 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   console.log('Y. Alt+= flow (r192)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('sort'); });
   const y1 = await run(() => {
-    const o = CHALLENGES.sort._o, m = o.range.match(/([A-J])(\d+):([A-J])(\d+)/);
+    // range7, not range6: the foot sits directly under the LATE-DEAL row, so the Alt+= probe
+    // must select through it for `r2 + 1` to land on the total. That slot is legitimately
+    // empty at load, hence the guarded sum.
+    const o = sortGeo(), m = o.range7.match(/([A-J])(\d+):([A-J])(\d+)/);
     const r1 = +m[2], r2 = +m[4], scN = o.sc.charCodeAt(0) - 64;
-    let want = 0; for (let rr = r1; rr <= r2; rr++) want += S.cells[o.sc+rr].value;
+    let want = 0; for (let rr = r1; rr <= r2; rr++) want += (S.cells[o.sc+rr] || {}).value || 0;
     S.sel = { r: r1, c: scN }; S.active = { r: r2 + 1, c: scN }; render();
     demoKey({key:'=', alt:true});
     const f = S.cells[o.foot];
     const rangeForm = !!(f && f.formula && Math.abs(f.value - want) < 0.5) && !editing && !!S.sel;
     loadChallenge('sort');
-    const o2 = CHALLENGES.sort._o, fr = +o2.foot.match(/\d+/)[0], fc = o2.foot[0].charCodeAt(0) - 64;
+    const o2 = sortGeo(), fr = +o2.foot.match(/\d+/)[0], fc = o2.foot[0].charCodeAt(0) - 64;
     S.active = { r: fr, c: fc }; S.sel = null; render();
     demoKey({key:'=', alt:true}); demoKey({key:'Enter'});
     const stays = S.active.r === fr && S.active.c === fc;
