@@ -2339,11 +2339,11 @@ const CHALLENGES = {
         && p.c0<=o.cF && p.c0+p.w-1>=o.cS && p.r0<=o.r1 && p.r0+p.h-1>=o.r1+o.NR-1);
       const starOk=flatOk && sentOk && onePass;
       return [
-        {label:'Break the links in the Final column — values only, the check line stays live', ok: flatOk},
+        {label:'Set the Final column to values — the check line stays live', ok: flatOk},
         {label:'Color the flattened figures blue', ok: blueOk},
         {label:'Fill the As-sent column with the send-out figures — numbers, no formulas', ok: sentOk},
         {label:'Delete the model feed — the send-out figures hold', ok: heldOk},
-        {label:'Flatten the column and fill the hand-off in one paste', ok: starOk, bonus:true},
+        {label:'Paste the figures over both columns in one pass', ok: starOk, bonus:true},
       ];
     }
   },

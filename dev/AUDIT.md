@@ -140,8 +140,8 @@ legal headroom in the star's own scope (28 vs 45, 1.61×). Worth adding to the c
   reads Net debt above Revenue) plus the codename · every figure through rnd() · **the Draft working
   column parked LEFT of the send-out pair or RIGHT of it** — the page's "which column is Final vs
   Draft" axis in the only form the ☆ allows, since the tiled paste needs Final and As-sent adjacent.
-- **BEATS (4 core + the engine save closer + one ☆; tri-length 5, C9-registered):** break the links
-  in the Final column, values only → colour the flattened figures blue (§1.0(a), the dress rides
+- **BEATS (4 core + the engine save closer + one ☆; tri-length 5, C9-registered):** set the Final
+  column to values → colour the flattened figures blue (§1.0(a), the dress rides
   directly behind the paste that made the hardcodes it marks) → fill the As-sent column with the
   same figures → **delete the model feed and the send-out figures hold** (§1.6 PROVE-OUT finish, and
   §1.5's aha lands here).
