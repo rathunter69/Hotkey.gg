@@ -280,19 +280,9 @@ fragment, never raise the cap. Two consequences for dispatch briefs:
 
 ## 6 · Pipeline suggestions (not yet actioned — orchestrator's call)
 
-1. **A deliberate width-engine pass.** Three independent findings have converged and are
-   deliberately unfixed because each fix risks a worse failure:
-   - the `####` test reasons in unscaled px, so on a WIDE viewport a column can display wider
-     than `colW` and still print `####` (the mirror of the bug r430 fixed). The symmetric rule
-     is `max(colW, __ew)` — **not** the `min` first reported, which reinstates the phantom.
-     Blocked because `max` would let a wide viewport suppress `####` on the four drills that
-     seed narrow columns (`autofit`, `combo`, `gauntlet`, `unhide`), turning graded beats
-     unreachable.
-   - `neededWidth()` pads `len*CHARPX+16` and measures **every** cell including text;
-     `overflowsCol()` and the render test pad `+12` and measure **numeric** cells only. So an
-     autofit column carries 4px of slack over the overflow threshold, and a long text label can
-     drive `neededWidth` to its 220px clamp on a column `overflowsCol` is happy with at 78.
-   Do it as one pass with those four drills re-swept, not piecemeal.
+1. ~~**A deliberate width-engine pass.**~~ **DONE — r441.** See "The width engine, unified
+   (r441)" below. The `max(colW, __ew)` rule was the wrong fix and is not what shipped; the
+   answer was to stop the elastic fit from resizing a column whose verdict would change.
 2. **Decide the fate of the echo feature.** `echoStart()` is called only from a listener whose
    button r401 deleted, so `echoOn` can never become true, though it is still read in `render()`
    and the demo handler — ~90 lines of dead engine. Restore an entry point or delete it.
@@ -630,3 +620,89 @@ invisible where it sits and survives the fill where it is needed.
 fill does to the FORMAT of the cells below the head, not only at their values. And take the win
 screenshot before declaring the star done — doctrine §8.1.5's sendable-page test is what caught
 this one.
+
+## The width engine, unified (r441) — the pass §6.1 was holding
+
+Wolf dispatched the deliberate pass before Models. The two findings §6 recorded turned out to be
+symptoms of one thing: **five places in the engine each answered "is this column too narrow for
+what's in it?" in their own way**, and the answers had drifted apart on every axis that matters.
+
+| | render `####` | render spill | `overflowsCol()` | `neededWidth()` | `housestyle` builder |
+|---|---|---|---|---|---|
+| glyph | 8.6 mono | **6.9 proportional** | 8.6 mono | 8.6 mono **for text too** | 8.6 mono for text |
+| pad | +12 | **+20** | +12 | **+16** | +16 |
+| scope | numbers | text | numbers | **every cell** | labels |
+| `cell.fsz` | applied | n/a | **ignored** | ignored | n/a |
+| unset column | `COLW_DEFAULT` | `COLW_DEFAULT` | **`undefined`** | n/a | n/a |
+
+Every disagreement in that table is a §1.0-R3 stranding generator, and two were live:
+
+- **The 4px band.** A fit beat graded `colW >= neededWidth(c)-1`, but `neededWidth` is autofit's
+  TARGET and sits 4px past the overflow threshold. Type a width in that band (`Alt H O W` takes
+  Excel units, ~7px each, so half a unit lands in it) and every `####` clears while the line stays
+  dark. Measured on `combo`: the board is clean at 81px, the beat wanted 85.
+- **The 21px band, and it was much worse.** `neededWidth` measured LABELS with the mono NUMBER
+  metric — 8.6px/glyph where render paints 6.9 — so it demanded ~25% more width than any label
+  actually needs. `housestyle`'s label column reads perfectly at 124px; its beat wanted 145. This
+  is also why long labels drove columns to the 220px clamp: the clamp was catching an
+  over-estimate, not a long label.
+- **`overflowsCol` compared against `undefined`** on any column still at default width (`colW` is
+  sparse), so it answered "fits" for every such column while render printed `####` in it. The
+  grader and the board contradicted each other outright.
+
+**What shipped.** One definition each, and nothing outside them may re-derive a metric:
+`cellNumPx` / `cellTxtPx` (how wide content RENDERS) → `overflowsCol()` (numbers don't fit ⇒ the
+board prints `####`) and `clipsCol()` (a label is cut off ⇒ the board shows it amputated) →
+`neededWidth()` (what autofit SETS: the wider of the two, plus one named slack constant).
+`TXTPX`, `PAD_NUM`, `PAD_TXT`, `FIT_SLACK` live beside `CHARPX`.
+
+**The r432 artifact: the obvious fix was the wrong fix.** §6 proposed `max(colW, __ew)` and
+correctly blocked it — on a wide viewport that lets the elastic bonus suppress the `####` on the
+four drills that seed narrow columns on purpose, turning graded beats unreachable (§1.0-R3(p),
+the worse failure). The answer was one level up, in the elastic fit itself:
+
+> **THE FREEZE — in a drill that GRADES a width verdict, a column currently failing one does not
+> get the elastic bonus, and the spare is redistributed across the columns that have nothing to
+> say.**
+
+So `__ew[c] === colW[c]` wherever the `####` test can fire, the two can no longer disagree, and
+r333's constant frame still fills. A clipped label's empty spill run freezes with it — growing
+those would make the label legible on screen while the unscaled verdict still called it cut off.
+The `####` comparison itself is untouched, exactly as r430 wrote it.
+
+**The scope clause is measured, not assumed, and it is the part worth copying.** The freeze was
+written catalog-wide first and censused at 2560px across 74 drills × 3 builds before being
+narrowed. The numeric half cost nothing — every drill outside the graded five loads with zero
+overflowing columns — but the CLIP half caught **30 ungraded drills**, boards whose long label
+simply reads better when a big monitor hands the column 40 spare px. Freezing those buys nothing
+(no beat reads the verdict) and costs a legible label, so the freeze now keys off the same
+`__noShrink` detection: **one flag, meaning "this drill's failing columns render at natural width,
+both directions."** Re-censused after: 36 of 36 failing columns frozen inside the five, **0 frozen
+across the other 69.** Verdict honesty is the point; where no verdict is graded there is nothing
+to keep honest.
+
+**SHRINK is deliberately left alone,** and the argument is worth keeping: shrinking can only make
+a column look *tighter* than its verdict, so it can never pre-clear a beat, and grading is
+unscaled so a player's fix always registers. Only the four `__noShrink` drills opt out, for the
+separate cosmetic reason r333 records.
+
+**Grading follows the board (Wolf's ruling).** Fit beats grade the visible end state and nothing
+else: `!overflowsCol()` for figures, `!clipsCol()` for labels. The `>= neededWidth-1` conjunct is
+gone from all four drills — it graded "you reached autofit's target", which is a route dressed as
+an end state. Autofit stays the taught route in the prompt; both bands above close.
+
+**The re-sweep, and what to reuse.** `autofit` · `combo` · `gauntlet` · `housestyle` · `unhide`,
+each at 1180 / 1440 / 2560px, asserting: no phantom (a cell printing `####` with painted room to
+spare), no suppression (a failing column the elastic hides), render and predicate agreeing on the
+`####` count, every width beat DARK at load, and every width beat GREEN both from the minimum
+honest width and from autofit. **The minimum honest width is the assertion that matters** — it is
+the exact px at which the board looks right, and it is precisely what the old code stranded.
+
+**Probe hazard, second sighting.** The first run reported `unhide` red on render-vs-predicate at
+every viewport, with the gap CHANGING per viewport (1 / 4 / 5 cells) — which is the tell, since a
+real disagreement there is viewport-independent. Hidden rows paint nothing, so the DOM cannot show
+their `####`; the probe was counting them. **Grading still counts hidden rows** (unchanged from
+before, and `unhide`'s beat 1 is to unhide anyway) — the fix was in the probe. Second time this
+campaign a probe defect read as an engine defect (see the r440 `hotkey_onboarded` note): when a
+probe's numbers move with something that cannot affect the thing being measured, suspect the
+probe first.

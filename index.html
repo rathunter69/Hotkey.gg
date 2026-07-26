@@ -2045,6 +2045,17 @@ let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
 const ROWS_MAX = 14, COLS = 10;           // A..J — density pass r36: more sheet, real-zoom feel
 const COLW_DEFAULT = 78;                   // px; autofit widens beyond this
 const CHARPX = 8.6;                        // approx mono char width at 14px
+/* r441 WIDTH ENGINE — the five constants the overflow math is built from, in ONE place.
+   Before this they were literals repeated across render(), neededWidth() and overflowsCol(),
+   and they had DRIFTED: the render measured a label at 6.9px/glyph + 20 while neededWidth
+   measured the same label at 8.6px/glyph + 16 (the mono number metric), so autofit's target
+   ran ~25% wide on text and drove long-label columns to the 220px clamp. Numbers are mono
+   (CHARPX); labels are proportional Arial (TXTPX). See the width-verdict helpers by
+   neededWidth() — nothing outside them may re-derive these. */
+const TXTPX = 6.9;                         // approx proportional label glyph at 13.5px
+const PAD_NUM = 12;                        // chrome a rendered NUMBER needs past its glyphs
+const PAD_TXT = 20;                        // chrome a rendered LABEL needs past its glyphs
+const FIT_SLACK = 4;                       // autofit lands this far past the overflow threshold, so Alt H O I always clears the #### it was reached for
 
 let _rand = Math.random;   // rebindable so the daily challenge can build a SEEDED instance
 const rnd = (a,b)=>Math.floor(_rand()*(b-a+1))+a;
@@ -2477,11 +2488,15 @@ const CHALLENGES = {
       let wrapOk=true; for(let r=o.r1;r<=o.r2;r++){ if(!cel(o.noteL+r).wrap) wrapOk=false; }
       /* the width beat grades the ENGINE widths (S._colW), not the rendered ones: the display
          pass stretches columns to fill the frame, and a viewport-dependent #### is not a
-         gradeable end state. A column at least as wide as its own content is the same
-         end state a player reads off the sheet — autofit lands exactly there, and a typed
-         width (Alt H O W) that clears the content lands there too. */
-      const w=S._colW||{};
-      const fitOk = o.figCols.every(c=>(w[c]||0) >= neededWidth(c)-1) && o.figCols.every(c=>!overflowsCol(S,c));
+         gradeable end state.
+         r441 (Wolf's ruling): it grades the VISIBLE end state and nothing else — no #### left in
+         the figure columns. It used to also demand colW >= neededWidth(c)-1, i.e. "you reached
+         autofit's own target". Those two are not the same width: autofit's target carries 4px of
+         slack past the overflow threshold, so a player who typed a width (Alt H O W) that cleared
+         every #### could land inside that band, read a perfect board, and watch this line stay
+         dark with nothing to fix — §1.0-R3 exactly. Autofit is still the taught route in the
+         prompt; the board is what gets graded. */
+      const fitOk = o.figCols.every(c=>!overflowsCol(S,c));
       /* ☆ (§1.0(d) hidden efficiency, §1.0-R2(i) a real choice): the whole number format in
          ONE move — the Format Cells dialog's comma-with-no-decimals (Ctrl+1 → N, Alt H O E → N)
          instead of Alt H K plus two decimal walks. Read off the S.fmtOps latch (r425, extended
@@ -2688,11 +2703,13 @@ const CHALLENGES = {
       const dollarOk=DOLLAR.includes(tS.fmtStyle) && DOLLAR.includes(tU.fmtStyle);
       /* the width beat grades the ENGINE widths (S._colW), not the rendered ones — the display
          pass stretches columns to fill the frame, and a viewport-dependent #### is not a
-         gradeable end state. Autofit lands exactly at the content width; a typed width
-         (Alt H O W) that clears the content lands there too. */
-      const w=S._colW||{};
+         gradeable end state.
+         r441 (Wolf's ruling): the VISIBLE end state is the whole beat — no #### left in the two
+         money columns. The old second half ("colW >= neededWidth-1") demanded autofit's own
+         target, which sits 4px past the overflow threshold, so a typed width that cleared every
+         hash could still leave this line dark on a board with nothing wrong on it. */
       const cols=[o.mc,o.nc];
-      const fitOk=cols.every(c=>(w[c]||0)>=neededWidth(c)-1) && cols.every(c=>!overflowsCol(S,c));
+      const fitOk=cols.every(c=>!overflowsCol(S,c));
       /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision · the whole-row selection
          discipline §1.0(d) names by hand): the two totals share a row, so ONE dress pass across
          that row lands both sides. Read off the r425 S.fmtOps bold latch (Ctrl+B and Alt H 1
@@ -2809,10 +2826,13 @@ const CHALLENGES = {
         cells[col+gm]={...blankCell(),formula:'='+col+gp+'/'+col+rev, value:(rv+cg)/rv, decimals:4};   // r176: raw-but-short until the player casts %
         cells[col+em]={...blankCell(),formula:'='+col+eb+'/'+col+rev, value:ebV/rv, decimals:4};
       }
-      const lbls=['Revenue','COGS','Gross profit','Gross margin %'].concat(oxNames,['EBITDA','EBITDA margin %']);
-      const lblNeed=Math.min(Math.ceil(Math.max.apply(null,lbls.map(s=>s.length))*CHARPX+16),220);   // the engine's own autofit math (neededWidth) — beat 6 grades the END STATE: any route to a readable column clears
+      /* r441: the hand-inlined autofit math that used to live here is GONE. It measured the
+         labels with the MONO number metric (8.6px/glyph + 16) while render paints them with the
+         proportional label metric (6.9px/glyph + 20), so it demanded ~25% more width than the
+         longest line name actually needs — a 20px band in which the column reads perfectly and
+         beat 6 stays dark. Beat 6 now asks clipsCol(), the same predicate the render clips from. */
       const inputs=['B','C','D','E','F'].map(c=>c+rev); inputs.push(buried);
-      this._R={ d, hr, rev, cogs, gp, gm, ox1, ox2, ox3, eb, em, buried, lblNeed, inputs,
+      this._R={ d, hr, rev, cogs, gp, gm, ox1, ox2, ox3, eb, em, buried, inputs,
         fxAll:[cogs,gp,gm,ox1,ox2,ox3,eb,em], dollarRows:[rev,cogs,gp,ox1,ox2,ox3,eb],
         hdrRng:'B'+hr+':F'+hr, revRng:'B'+rev+':F'+rev,
         body1:'B'+rev+':F'+gp, body2:'B'+ox1+':F'+eb,
@@ -2835,7 +2855,11 @@ const CHALLENGES = {
       const comOk = R.dollarRows.every(r=>COL.every(c=>{ const x=cel(c+r); return x.fmtStyle==='comma'&&(x.decimals|0)===0; }));
       const pctOk = [R.gm,R.em].every(r=>COL.every(c=>{ const x=cel(c+r); return x.fmtStyle==='percent'&&(x.decimals|0)===1; }));
       const btOk = [R.gp,R.eb].every(r=>COL.every(c=>!!cel(c+r).bt));
-      const wOk = ((S._colW||{})[1]||0) >= R.lblNeed-1;
+      /* r441: "wide enough to read" IS the end state — column A shows its longest line name in
+         full. Column B is occupied, so these labels cannot spill; clipping is what the player
+         sees and clipsCol() is what render clips from. Autofit clears it, so does any typed
+         width that stops the amputation. */
+      const wOk = !clipsCol(S,1);
       /* ☆ recipe (§1.0(d) hidden efficiency — replaces the page's dead formatting ☆, see the
          header note): the Go To Special → Constants ritual ran (S.gotoSpecials telemetry,
          r425) AND the blue pass is complete — one F5 pass finds all six typed numbers at
@@ -6109,7 +6133,12 @@ const CHALLENGES = {
        (4) Beat 2 is the one width beat graded to an EXACT px, because it is specifically about
            ONE width across a print block (the r430 rule's own carve-out). Beats 1 and 4 grade
            READABILITY, so autofit (Alt H O I) and a wide-enough typed width (Alt H O W) both
-           clear — ALT 2 in dev/e2e-alt-paths.js is the typed-width run. */
+           clear — ALT 2 in dev/e2e-alt-paths.js is the typed-width run.
+           r441: beat 1 asks clipsCol() and beat 4 asks overflowsCol(), which is what makes that
+           sentence literally true. Until then beat 1 demanded neededWidth, and neededWidth sized
+           LABELS with the mono NUMBER metric — so the typed-width run only ever passed because it
+           types a generous width. Any player who typed a width that merely stopped the
+           amputation read a clean board against a dark line. */
     name:'Autofit', label:'Fix the squeezed columns', par:36, parKeys:33, saveClose:true,   /* r432: par re-swept ×5 seeds post-rework — median 33 keys, flat across seeds (save incl.; the demo's key count doesn't move with the axes). par 36 ≈ 1.09 s/key, the top of the house band: two of the six beats are a READ — which columns are ragged, and where the #### the totals just made is — before a hand moves. Mirrored in HOTKEY_PARS. */
     aha:'#### is a width problem, not a number problem — the figure is fine, the column is too narrow.',
     prompt:'The regional revenue page prints in the morning and nothing on it reads: the two label columns are squeezed so the business lines are cut off, the four quarter columns are four different widths, and the Total column is empty. Total the quarters, size the page so every figure reads, and give the quarter block one width across for the print. Dress the Total row once the grand figure lands, then save it down.',
@@ -6221,12 +6250,17 @@ const CHALLENGES = {
       const cel=k=>S.cells[k]||{};
       /* §1.0(c) FREEDOM — every core beat grades the END STATE, never the route:
          · the READABILITY beats (1 and 4) take an autofit OR any typed width that clears the
-           content, measured against the engine's own neededWidth() / overflowsCol();
+           content, measured with the engine's own render-side predicates;
          · the total beat takes =SUM, an addition chain or autosum, filled or typed row by row;
-         · the dress beat takes any selection shape and any border route. */
-      const fitsCol=c=>(w[c]||0)>=neededWidth(c)-1;
+         · the dress beat takes any selection shape and any border route.
+         r441 (Wolf's ruling): beat 1 asks clipsCol() — the label columns show their names in
+         full — instead of "colW >= neededWidth-1". The old form measured LABELS with the mono
+         NUMBER metric, so on this board it demanded ~25% more width than the longest business
+         line actually needs; every width in that band read perfectly and graded dark. Both label
+         columns have an occupied right neighbour, so nothing here can spill and clipping is
+         exactly what the player sees. */
       const UW=Math.round(12*7)+5;   // Excel width 12 in px — applyColWidth's own conversion
-      const lblOk=[o.lc1,o.lc2].every(fitsCol);
+      const lblOk=[o.lc1,o.lc2].every(c=>!clipsCol(S,c));
       const uniOk=o.qc.every(c=>(w[c]||0)===UW);
       const totalsIn=o.rows.every(x=>{ const c=cel(o.tcL+x.r);
         return !!(c.formula && sumishF(c.formula) && typeof c.value==='number' && Math.abs(c.value-x.sum)<0.5); });
@@ -14681,29 +14715,89 @@ function dispText(cell){
 }
 function isNum(cell){ return typeof cell.value==='number'; }
 
+/* ============================================================================
+   r441 WIDTH VERDICTS — one definition each, read by everything.
+
+   The engine used to answer "is this column too narrow for what's in it?" in five
+   places with four different formulas: render()'s #### test, render()'s text-spill
+   test, overflowsCol(), neededWidth(), and a hand-inlined copy in housestyle's
+   builder. They disagreed on the glyph metric (8.6 mono vs 6.9 proportional), the
+   pad (+12 vs +16 vs +20), the SCOPE (numbers only vs every cell including text),
+   the font-size factor (render applied cell.fsz, the grader ignored it) and the
+   default (render fell back to COLW_DEFAULT on an unset column, the grader compared
+   against `undefined` and so reported "fits" for every column at default width).
+
+   Every one of those disagreements is a §1.0-R3 stranding generator: the board shows
+   one thing and the checklist grades another. So:
+
+     · cellNumPx / cellTxtPx — how wide the content actually RENDERS, unscaled px
+     · overflowsCol()       — numbers don't fit ⇒ the board prints ####
+     · clipsCol()           — a label is cut off ⇒ the board shows it amputated
+     · neededWidth()        — what autofit SETS: the widest of the two, plus slack
+
+   All four reason in UNSCALED px (the r430 rule, and r400's zoom note): #### means
+   "the column you set is too narrow", never "the viewport squeezed the sheet".
+   render()'s elastic fit is what keeps that honest — see the freeze there.
+   ============================================================================ */
+function cellNumPx(cell){
+  if(!isNum(cell)||cell.wrap) return 0;
+  const fz=cell.fsz?cell.fsz/13.5:1;   // r235: a resized number takes proportionally more/less width
+  return fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale).length*CHARPX*fz+PAD_NUM;
+}
+function cellTxtPx(cell){
+  if(!cell||cell.wrap||typeof cell.value!=='string'||cell.value==='') return 0;
+  return cell.value.length*TXTPX+PAD_TXT;
+}
+function colWOf(St,c){ const w=(St&&(St._colW||St._ew))||null; return (w&&w[c])||COLW_DEFAULT; }
+function colNumPx(St,c){
+  let px=0; const cells=St.cells||{};
+  for(let r=1;r<=St.ROWS;r++) px=Math.max(px, cellNumPx(cells[ck(r,c)]||blankCell()));
+  return px;
+}
+function overflowsCol(St,c){
+  /* r431: was (St._ew||St._colW) — it preferred the ELASTIC display width, which contradicts
+     both the r55 note at the S._colW assignment ("graders (autofit) read these; r55 wrongly
+     pointed this at __ew") and r430's render fix, which moved the #### test onto the unscaled
+     width. Left as it was, the two disagreed: the board could show a clean column while this
+     still reported overflow, so an autofit beat stayed dark with nothing visible to fix — the
+     same untriggerable-checklist class Wolf hit on the dollar beat. Engine width first. */
+  return colNumPx(St,c) > colWOf(St,c);
+}
+/* A LABEL is never ####'d — Excel clips text and so do we (render's r107 spill rule). So the
+   visible failure for a text column is AMPUTATION, and this is its predicate: a label is cut
+   off when it outruns its own column AND the empty neighbours it may spill across. This
+   mirrors render()'s spill loop exactly, including "stop at the first occupied cell". */
+function clipsCol(St,c){
+  const cells=St.cells||{};
+  for(let r=1;r<=St.ROWS;r++){
+    const cell=cells[ck(r,c)];
+    const est=cellTxtPx(cell);
+    if(!est) continue;
+    let room=colWOf(St,c);
+    /* the three text branches render() has, in its own order — a predicate that granted spill
+       to a cell render() does not spill would call an amputated label legible: */
+    if((cell.ca|0)>1){                                   // r177 centre-across: the text owns its stored span
+      for(let k=1;k<cell.ca && c+k<=COLS;k++) room+=colWOf(St,c+k);
+    } else if(cell.txt){                                 // r107 spill: empty right neighbours only, stop at the first occupied cell
+      for(let cc=c+1;cc<=COLS;cc++){
+        const n=cells[ck(r,cc)];
+        if(n && n.value!==null && n.value!=='') break;
+        room+=colWOf(St,cc);
+      }
+    }                                                    // a string cell without txt does not spill at all
+    if(est>room) return true;
+  }
+  return false;
+}
 function neededWidth(c){
   let w=COLW_DEFAULT;
   for(let r=1;r<=S.ROWS;r++){ const cell=get(r,c); if(cell.wrap) continue;
-    const t=dispText(cell); w=Math.max(w, t.length*CHARPX+16); }
+    w=Math.max(w, cellNumPx(cell)+FIT_SLACK, cellTxtPx(cell)+FIT_SLACK); }
   /* r176 CLAMP: a long title in the column used to autofit it to 300px+ and
      blow the fixed 10-col grid apart (Wolf's report). Real Excel scrolls; our
      drill grid doesn't — 220px fits every house number format comfortably
      while keeping ten columns on screen. */
   return Math.min(Math.ceil(w), 220);
-}
-function overflowsCol(St,c){
-  for(let r=1;r<=St.ROWS;r++){ const cell=St.cells[ck(r,c)]||blankCell();
-    if(!isNum(cell)||cell.wrap) continue;
-    const t=fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale);
-    /* r431: was (St._ew||St._colW) — it preferred the ELASTIC display width, which contradicts
-       both the r55 note at the S._colW assignment ("graders (autofit) read these; r55 wrongly
-       pointed this at __ew") and r430's render fix, which moved the #### test onto the unscaled
-       width. Left as it was, the two disagreed: the board could show a clean column while this
-       still reported overflow, so an autofit beat stayed dark with nothing visible to fix — the
-       same untriggerable-checklist class Wolf hit on the dollar beat. Engine width first. */
-    const w=(St._colW||St._ew);
-    if(t.length*CHARPX+12 > (w?w[c]:COLW_DEFAULT)) return true; }
-  return false;
 }
 
 /* ---- formula (only =SUM needed) ---- */
@@ -15368,12 +15462,58 @@ function render(){
   //   natural width (may run a touch wide) — detected by their overflowsCol/#### grading.
   const __noShrink=(function(){ const C=CHALLENGES[cur]; if(!C||!C.checks) return false;
     if(C._noShrink!==undefined) return C._noShrink;
-    try{ C._noShrink=/overflowsCol|####/.test(String(C.checks)); }catch(e){ C._noShrink=false; }
+    try{ C._noShrink=/overflowsCol|clipsCol|####/.test(String(C.checks)); }catch(e){ C._noShrink=false; }
     return C._noShrink; })();
+  S._colW = colW;   /* r441: hoisted above the elastic block — the freeze below asks the width
+                       verdicts what they currently say, and they read S._colW. (Assigned again
+                       after the row math for anyone reading it in source order.) */
+  /* r441 THE FREEZE — the fix for the r432 artifact, and the reason the width verdicts can stay
+     honest without giving up r333's constant frame.
+
+     The grow branch used to hand every column the same bonus. On a wide viewport that bonus is
+     30–45px, so a column seeded deliberately narrow displayed 30–45px wider than the width the
+     player actually set — while #### kept printing, because the #### test reasons in unscaled px.
+     The board showed a roomy cell full of hashes: the exact mirror of the bug r430 fixed, and
+     r432 recorded it as a known artifact because the obvious fix (test against max(colW, __ew))
+     would let a wide monitor SUPPRESS the #### on combo, gauntlet, autofit and unhide, turning
+     four graded beats unreachable — the worse failure under §1.0-R3(p).
+
+     Both halves go away if the elastic simply never resizes a column whose verdict would change:
+     a column that currently fails a width verdict keeps its own width, and the spare goes to the
+     columns that have nothing to say. The frame still fills (the bonus is redistributed, not
+     dropped), #### still means "too narrow", and what the player sees is what the grader grades.
+     A clipped label's empty spill run freezes with it — growing those would make the label
+     legible on screen while the unscaled verdict still called it cut off.
+
+     SCOPED TO THE DRILLS THAT GRADE A WIDTH VERDICT — the same __noShrink set, so one flag now
+     means "this drill's failing columns render at their natural width, both directions." It was
+     written catalog-wide first and MEASURED at 2560px before being narrowed: across 74 drills ×
+     3 builds, the numeric half bit only the 5 graded drills (every other drill loads with zero
+     overflowing columns), but the CLIP half caught 30 ungraded drills — boards whose long label
+     simply reads better when a big monitor hands the column 40 spare px. Freezing those buys
+     nothing, since nothing grades them, and costs a legible label. Verdict honesty is the point;
+     where no verdict is graded there is nothing to keep honest.
+
+     SHRINK is deliberately left alone. Shrinking can only make a column look TIGHTER than the
+     verdict, so it can never pre-clear a beat and never strands a player: grading is unscaled, so
+     the fix still registers. The graded drills opt out of shrink entirely for the separate
+     cosmetic reason r333 records. */
+  const __frz={};
+  for(let c=1;__noShrink && c<=COLS;c++){
+    if(!(overflowsCol(S,c)||clipsCol(S,c))) continue;
+    __frz[c]=1;
+    for(let cc=c+1;cc<=COLS;cc++){                       // the spill run a clipped label reaches into
+      let used=false;
+      for(let r=1;r<=S.ROWS;r++){ const n=(S.cells||{})[ck(r,cc)]; if(n && n.value!==null && n.value!==''){ used=true; break; } }
+      if(used) break;
+      __frz[cc]=1;
+    }
+  }
   const __ew={};
   if(__availW>__base){
-    const __per=Math.floor((__availW-__base)/COLS);
-    for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72)+__per;
+    let __free=0; for(let c=1;c<=COLS;c++) if(!__frz[c]) __free++;
+    const __per=__free ? Math.floor((__availW-__base)/__free) : 0;
+    for(let c=1;c<=COLS;c++) __ew[c]=(colW[c]||72)+(__frz[c]?0:__per);
   } else if(__base>__availW && __availW>0 && !__noShrink){
     const __scale=__availW/__base;
     for(let c=1;c<=COLS;c++) __ew[c]=Math.max(40, Math.round((colW[c]||72)*__scale));
@@ -15574,7 +15714,7 @@ function render(){
       else if(cell.txt && !cell.wrap && typeof cell.value==='string'){
         // r107: EXCEL PARITY — long text SPILLS across empty right neighbors, clipping
         // at the first occupied cell (titles/labels stop getting amputated mid-word).
-        const est=cell.value.length*6.9+20;   // label font ~13.5px Arial, avg glyph ~6.9px
+        const est=cellTxtPx(cell);   // r441: the ONE label metric — clipsCol() grades off this same call
         if(est>__ew[c]){
           let spillW=__ew[c], cc=c+1, coveredW=__ew[c];   // coveredW snaps to WHOLE cells the text reaches
           while(cc<=COLS){ const n=get(r,cc); if(n && n.value!==null && n.value!=='') break; spillW+=__ew[cc]; if(coveredW<est) coveredW+=__ew[cc]; cc++; }
@@ -15588,8 +15728,7 @@ function render(){
         }
       }
       else if(isNum(cell)&&!cell.wrap){
-        const fz=cell.fsz?cell.fsz/13.5:1;   // r235: a resized number takes proportionally more/less width
-        const tw=fmtNum(cell.value,cell.fmtStyle,cell.decimals,cell.scale).length*CHARPX*fz+12;
+        const tw=cellNumPx(cell);   // r441: the ONE number metric — overflowsCol() grades off this same call
         /* r430 (Wolf round 3: "why is everything spilling into ######## values just by having
            it in the right format"). This compared against __ew — the ELASTIC display width —
            so the fit-scaler manufactured the ####. Measured case: colW 92, neededWidth 85 (the
@@ -15601,19 +15740,14 @@ function render(){
            reasons in UNSCALED px, exactly as the r400 zoom note says the overflow math should
            ("it reasons in pre-zoom px"). Hand-narrowing a column still yields ####, which is
            the case the engine actually wants to teach. */
-        /* r432 KNOWN ARTIFACT, recorded deliberately (found by the autofit build agent).
-           This is the MIRROR of the bug r430 fixed. __ew = colW + __per on a WIDE viewport, so
-           a column can display 30-45px wider than colW and still print #### here, because we
-           test against colW alone. The r430 bug was the same mismatch in the shrink direction.
-           The symmetric rule is max(colW, __ew) — NOT min, which the report suggested: min
-           re-selects the scaled-down width in the shrink case and reinstates the phantom ####
-           Wolf reported. But max is NOT a safe drive-by change: autofit, combo, gauntlet and
-           unhide all seed deliberately narrow columns so their "clear the ####" beats are real,
-           and on a wide viewport max() would let those columns display wide enough to suppress
-           the #### entirely — turning a graded beat into an unreachable one, which is the worse
-           failure (§1.0-R3(p)). Current behaviour errs toward showing #### when there is room:
-           cosmetic, self-correcting (the player widens, it clears), and it never strands a beat.
-           Fix it as a deliberate width-engine pass with those four drills re-swept, not here. */
+        /* r432's KNOWN ARTIFACT — a column displaying 30-45px wider than colW on a wide
+           viewport and printing #### anyway — is FIXED in r441, and not here: the answer was
+           never to change this comparison. max(colW, __ew) would have let a wide monitor
+           suppress the #### on the four drills that seed narrow columns on purpose (§1.0-R3(p),
+           a graded beat turned unreachable), and min() reinstates the phantom r430 fixed. The
+           fix is the elastic FREEZE at the top of render(): a column that currently fails a
+           width verdict is never grown, so __ew[c] === colW[c] wherever this test can fire and
+           the two can no longer disagree. This line stays exactly as r430 wrote it. */
         const ownW=colW[c]||COLW_DEFAULT;
         if(tw>ownW){ cls.push('over'); txt='#'.repeat(Math.max(3,Math.floor(__ew[c]/8))); }
       }

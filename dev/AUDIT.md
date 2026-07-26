@@ -8976,3 +8976,125 @@ the §2 ☆-headroom diagnostic was run on the SHIPPED board and passed._
   155/155 · fit-sweep ALL CLEAN (72) · par-sweep FLAGGED 0 (drift 0%) · borders clean · pause clean ·
   cache-bump guard clean (no ?v= bump: drills.js content changed, its version is the integrator's call
   at batch time).
+
+## r441 — THE WIDTH-ENGINE PASS (campaign §6.1, dispatched by Wolf before Models)
+
+The pass DEPTH_PASS_CAMPAIGN §6 was holding open, run as one deliberate change with the width
+drills re-swept. The two findings §6 recorded turned out to be symptoms of one thing: **five
+places in the engine each answered "is this column too narrow for what's in it?" in their own
+way**, and the answers had drifted apart on every axis that matters.
+
+| | render `####` | render spill | `overflowsCol()` | `neededWidth()` | `housestyle` builder |
+|---|---|---|---|---|---|
+| glyph | 8.6 mono | **6.9 proportional** | 8.6 mono | 8.6 mono **for text too** | 8.6 mono for text |
+| pad | +12 | **+20** | +12 | **+16** | +16 |
+| scope | numbers | text | numbers | **every cell** | labels |
+| `cell.fsz` | applied | n/a | **ignored** | ignored | n/a |
+| unset column | `COLW_DEFAULT` | `COLW_DEFAULT` | **`undefined`** | n/a | n/a |
+
+Every disagreement in that table is a §1.0-R3 stranding generator — the board shows one thing and
+the checklist grades another. Three were live:
+
+- **THE 4px BAND.** A fit beat graded `colW >= neededWidth(c)-1`, but `neededWidth` is autofit's
+  TARGET and sits 4px past the overflow threshold. `Alt H O W` takes Excel units (~7px each), so
+  half a unit lands inside it: every `####` clears, the line stays dark, nothing on the board to
+  fix. Measured on `combo` — clean at 81px, the beat wanted 85.
+- **THE 21px BAND, far worse.** `neededWidth` measured LABELS with the mono NUMBER metric (8.6px
+  where render paints 6.9), so it demanded ~25% more width than any label needs. `housestyle`'s
+  label column reads perfectly at 124px; its beat wanted 145. This is also why long labels drove
+  columns to the 220px clamp — the clamp was catching an over-estimate, not a long label.
+- **`overflowsCol` COMPARED AGAINST `undefined`.** `colW` is sparse, so on any column still at
+  default width the grader evaluated `t > undefined` → false → "fits", while render fell back to
+  `COLW_DEFAULT` and printed `####` in that same column. The two contradicted each other outright.
+
+### What shipped
+
+One definition each, and nothing outside them may re-derive a metric: `cellNumPx` / `cellTxtPx`
+(how wide content RENDERS) → `overflowsCol()` (numbers don't fit ⇒ the board prints `####`) and
+`clipsCol()` (a label is cut off ⇒ the board shows it amputated) → `neededWidth()` (what autofit
+SETS: the wider of the two, plus one named slack). `TXTPX` / `PAD_NUM` / `PAD_TXT` / `FIT_SLACK`
+live beside `CHARPX`. `clipsCol()` mirrors render's three text branches in render's own order —
+centre-across owns its stored span, a `txt` cell spills across empty right neighbours and stops at
+the first occupied cell, and a string cell without `txt` does not spill at all. A predicate that
+granted spill where render does not would call an amputated label legible.
+
+### The r432 artifact: the obvious fix was the wrong fix
+
+§6 proposed `max(colW, __ew)` for the wide-viewport phantom and correctly blocked it — on a wide
+viewport that lets the elastic bonus SUPPRESS the `####` on the drills that seed narrow columns on
+purpose, turning graded beats unreachable (§1.0-R3(p), the worse failure). The answer was one
+level up, in the elastic fit itself:
+
+> **THE FREEZE — in a drill that GRADES a width verdict, a column currently failing one does not
+> get the elastic bonus, and the spare is redistributed across the columns that have nothing to
+> say.**
+
+So `__ew[c] === colW[c]` wherever the `####` test can fire, the two can no longer disagree, and
+r333's constant frame still fills. The `####` comparison itself is untouched, exactly as r430
+wrote it.
+
+**The scope clause is measured, not assumed.** The freeze was written catalog-wide first and
+censused at 2560px across 74 drills × 3 builds before being narrowed. The numeric half cost
+nothing — every drill outside the graded five loads with zero overflowing columns — but the CLIP
+half caught **30 ungraded drills**, boards whose long label simply reads better when a big monitor
+hands the column 40 spare px. Freezing those buys nothing and costs a legible label, so the freeze
+keys off the same `__noShrink` detection: one flag, "this drill's failing columns render at
+natural width, both directions." Re-censused after: **36 of 36 failing columns frozen inside the
+five, 0 frozen across the other 69.**
+
+**SHRINK is deliberately left alone**, and the argument is worth keeping: shrinking can only make
+a column look TIGHTER than its verdict, so it can never pre-clear a beat, and grading is unscaled
+so a player's fix always registers. Only the graded drills opt out, for the cosmetic reason r333
+records.
+
+### Grading follows the board (Wolf's ruling)
+
+Put to Wolf as the one decision the engine could not make for itself; he took the visible end
+state. Fit beats now grade that and nothing else — `!overflowsCol()` for figures, `!clipsCol()`
+for labels. The `>= neededWidth-1` conjunct is gone from all four drills that carried it
+(`combo`, `gauntlet`, `housestyle`, `autofit`): it graded "you reached autofit's target", which is
+a route wearing an end state's clothes. Autofit stays the taught route in the prompt. Both bands
+above close. `housestyle` also loses the hand-inlined copy of the autofit math in its builder
+(`lblNeed`) — the copy that had drifted furthest.
+
+### The re-sweep
+
+`autofit` · `combo` · `gauntlet` · `housestyle` · `unhide`, each at 1180 / 1440 / 2560px,
+asserting: no phantom (a cell printing `####` with painted room to spare), no suppression (a
+failing column the elastic hides), render and predicate agreeing on the `####` count, every width
+beat DARK at load, and every width beat GREEN both from the minimum honest width and from autofit.
+**ALL CLEAN.** The minimum-honest-width leg is the one that matters — it is the exact px at which
+the board looks right, and it is precisely what the old code stranded.
+
+### Recorded, not fixed here
+
+- **The `__noShrink` drills overrun their frame**, and it is PRE-EXISTING — measured on HEAD as
+  well as after, by serving a detached HEAD worktree beside the working tree. At 1440×900 at LOAD:
+  `combo` 911 vs an 880 box, `gauntlet` 923 vs 880. r333's carve-out says they "may run a touch
+  wide"; 31–43px is more than a touch. Tracked as its own task, with the fix on the board side
+  (`autofit` already budgets its solved sheet at ~780px against ~822px of grid and pins its value
+  pools to hold it there — that budget is the model the other four need).
+- **NEW, and accepted deliberately:** `housestyle` grades a width verdict now, so the
+  `__noShrink` detection catches it and it stops shrinking. At 1180 and 1440 nothing changes
+  (sheet 860 vs an 870 box). At 1024 its SOLVED sheet runs 807 vs a 714 box — a horizontal scroll
+  after the player widens column A, where before it scaled to fit. Taken knowingly: the
+  alternative is the shrink re-clipping the label the player just fixed, on every viewport, which
+  leaves a green beat looking unfixed.
+
+### Probe hazard, second sighting
+
+The first re-sweep reported `unhide` red on render-vs-predicate at every viewport, with the gap
+CHANGING per viewport (1 / 4 / 5 cells) — which is the tell, since a real disagreement there is
+viewport-independent. Hidden rows paint nothing, so the DOM cannot show their `####`; the probe
+was counting them. Grading still counts hidden rows (unchanged from before, and `unhide`'s beat 1
+is to unhide anyway) — the fix was in the probe. Second time this campaign a probe defect read as
+an engine defect, after r440's `hotkey_onboarded` omission. **When a probe's numbers move with
+something that cannot affect the thing being measured, suspect the probe first.**
+
+### Gate
+
+Static guards clean (cache-bump · secrets · SSOT invariants) · smoke ALL 7 PAGES CLEAN +
+skin-unlock (drill-count 74) · lb 36/36 · parity ALL 177 PASS · onboard 35/35 · width re-sweep
+clean (5 drills × 3 viewports) · freeze census clean (36/36 in, 0/69 out). Alt-paths, mac-input,
+rapid-fire, guided, formulas, grid-height, fit-sweep and the full demo replay were still running
+locally at commit time and are enforced on CI for this push.
