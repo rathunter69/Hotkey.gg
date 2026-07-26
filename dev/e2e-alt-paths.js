@@ -792,21 +792,6 @@ const ALTS = [
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
     ]` },
-  { key: 'cases', name: 'driver built growth-first, model then capture, flip the cases, then the deal-team revision + refresh', moves: `C => { const cap=C._capL, mp=String(Math.round(C._mutG*100)); return [
-      {sel:'B9', keys:[...T('=CHOOSE($B$3,B6,C6,D6)'),{key:'Enter'}]},
-      {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'),{key:'Enter'}]},
-      {sel:'C12', keys:[...T('=B12*(1+$B$9)'),{key:'Enter'}]},
-      {sel:'C12:F12', keys:[{key:'r',ctrl:true}]},
-      {sel:'C13', keys:[...T('=C12/B12-1'),{key:'Enter'}]},
-      {sel:'C13:F13', keys:[{key:'r',ctrl:true}]},
-      {sel:'C18', keys:[...T('=IF($B$3=C$17,$'+cap+'$12,C18)'),{key:'Enter'}]},
-      {sel:'C18:E18', keys:[{key:'r',ctrl:true}]},
-      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('2'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('3'),{key:'Enter'}]},
-      {sel:'B6', keys:[...T(mp+'%'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
-    ]; }` },
   { key: 'cfslink', name: 'rule the close FIRST, memo before the corkscrew, alt h p percent, bold last', moves: `C => [
       {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B6',  keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
@@ -1555,65 +1540,63 @@ const ALTS = [
       {sel:'C4:C6', keys:[{key:'d',ctrl:true}]},
       {sel:'C4:G6', keys:[{key:'r',ctrl:true}]},
     ]` },
-  // --- T-D audit pack (r173) ---
-  { key: 'wrapfix', name: 'fix the range FIRST, wrap second — F2 edit for the fix', moves: `C => { const o=C._o;
-      // F2 into the broken MATCH range: caret at end; walk back over ',0))' then fix B->A twice
+  /* r439 (DEPTH_PASS §4.31 + §4.47 depth pass) — both drills' boards were rebuilt, so their
+     pre-r439 entries are DELETED, not edited: the old `cases` entry drove B8/B9/C12/C13/C18 on a
+     21-row board that no longer exists, and the old `wrapfix` entry drove C._o.q1/q2, fields the
+     rework does not carry. Integrators: do not resurrect either (CAMPAIGN §4 union rule). */
+  { key: 'wrapfix', name: 'chord ROUTE alt — every read RETYPED in full (VLOOKUP, not INDEX/MATCH), ribbon bold and ribbon top border, typed SUM: all six cores clear with the re-cut fill-☆ DARK (the measured negative control, 145 keys against the demo\'s 24)', moves: `C => { const o=C._o;
+      const key=cell=>o.CA+cell.replace(/[A-J]/g,'');
+      const vl=cell=>'=VLOOKUP('+key(cell)+','+o.CA+o.T0+':'+o.CC+o.TN+',3,0)';
       return [
-        {sel:o.q2, keys:[{key:'F2'},
-          ...Array.from({length:8},()=>({key:'ArrowLeft'})),
-          {key:'Backspace'},...T('A'),
-          ...Array.from({length:3},()=>({key:'ArrowRight'})),
-          {key:'Backspace'},...T('A'),
-          {key:'Enter'}]},
-        {sel:o.q1, keys:[...T('=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)'),{key:'Enter'}]},
+        {sel:o.wrapCell, keys:[...T('=IFERROR('+vl(o.wrapCell).slice(1)+',0)'),{key:'Enter'}]},
+        {sel:o.bad[0].cell, keys:[...T(vl(o.bad[0].cell)),{key:'Enter'}]},
+        {sel:o.bad[1].cell, keys:[...T(vl(o.bad[1].cell)),{key:'Enter'}]},
+        {sel:o.totCell, keys:[...T('=SUM('+o.readRng+')'),{key:'Enter'}]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),D(1)]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      ]; }` },
+  { key: 'wrapfix', name: 'op ORDER alt — foot and dress the panel LAST is the only order that works, so this one repairs bottom-up, wraps before it fixes, boxes the total with Alt H B S instead of B P, and takes the ☆ with the ribbon fill Alt H F I D', moves: `C => { const o=C._o;
+      return [
+        {sel:o.wrapCell, keys:[{key:'F2'},...T(',0)'),{key:'Home'},...T('IFERROR('),{key:'Enter'}]},
+        {sel:o.good.cell, keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.totCell, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
+        {sel:o.totRow, keys:[{key:'b',ctrl:true}]},
+      ]; }` },
+  { key: 'cases', name: 'chord ROUTE alt — the driver built with INDEX instead of CHOOSE (the r439 untriggerable-beat probe: identical board, identical behaviour under every switch position) and every fill taken off the ribbon, Alt H F I D / Alt H F I R', moves: `C => { const o=C._o;
+      const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      return [
+        {sel:o.drv0, keys:[...T('=INDEX('+o.CB+o.rCase+':'+o.CD+o.rCase+',$'+o.CB+'$'+o.rSw+')'),{key:'Enter'}]},
+        {sel:o.drv0, keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.rev1, keys:[...T('='+o.CB+o.rRev+'*(1+$'+o.CB+'$'+o.rDrvG+')'),{key:'Enter'}]},
+        {sel:o.rev1, keys:[...R(o.NY-2),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.eb0,  keys:[...T('='+o.CB+o.rRev+'*$'+o.CB+'$'+o.rDrvM),{key:'Enter'}]},
+        {sel:o.eb0,  keys:[...R(o.NY-1),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.cap0, keys:[...T('=IF($'+o.CB+'$'+o.rSw+'='+o.CC+'$'+o.rNum+',$'+o.capL+'$'+o.rEb+','+o.CC+o.rSnap+')'),{key:'Enter'}]},
+        {sel:o.cap0, keys:[...R(2),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.swCell, keys:[...T('1'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('2'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('3'),{key:'Enter'}]},
+        {sel:o.mutCell, keys:[...T(o.mutPct+'%'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T(String(o.mutIdx)),{key:'Enter'}]},
+      ]; }` },
+  { key: 'cases', name: 'op ORDER alt AND the measured negative control — capture built first, then EBITDA, then revenue, then the driver, and the driver TYPED OUT three times so all five cores clear with the ☆ DARK (133 keys against the demo\'s 92)', moves: `C => { const o=C._o;
+      const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      const ch=(r)=>'=CHOOSE($'+o.CB+'$'+o.rSw+','+o.CB+r+','+o.CC+r+','+o.CD+r+')';
+      return [
+        {sel:o.cap0, keys:[...T('=IF($'+o.CB+'$'+o.rSw+'='+o.CC+'$'+o.rNum+',$'+o.capL+'$'+o.rEb+','+o.CC+o.rSnap+')'),{key:'Enter'}]},
+        {sel:o.cap0, keys:[...R(2),{key:'r',ctrl:true}]},
+        {sel:o.eb0,  keys:[...T('='+o.CB+o.rRev+'*$'+o.CB+'$'+o.rDrvM),{key:'Enter'}]},
+        {sel:o.eb0,  keys:[...R(o.NY-1),{key:'r',ctrl:true}]},
+        {sel:o.rev1, keys:[...T('='+o.CB+o.rRev+'*(1+$'+o.CB+'$'+o.rDrvG+')'),{key:'Enter'}]},
+        {sel:o.rev1, keys:[...R(o.NY-2),{key:'r',ctrl:true}]},
+        {sel:o.drv0, keys:[...T(ch(o.rCase)),{key:'Enter'}]},
+        {sel:o.CB+o.rDrvG, keys:[...T(ch(o.rG)),{key:'Enter'}]},
+        {sel:o.CB+o.rDrvM, keys:[...T(ch(o.rM)),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('1'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('2'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('3'),{key:'Enter'}]},
+        {sel:o.mutCell, keys:[...T(o.mutPct+'%'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T(String(o.mutIdx)),{key:'Enter'}]},
       ]; }` },
 ];
-
-(async () => {
-  const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
-  await page.addInitScript(() => { try {
-    localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
-    localStorage.setItem('hk_xlv', '2');
-  } catch (e) {} });
-  const errs = [];
-  page.on('pageerror', e => errs.push(String(e.message).slice(0, 120)));
-  await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r422: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided pattern) */
-  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
-  await page.evaluate(() => { try { _pro = true; } catch (e) {} });
-
-  let fails = 0, ran = 0;
-  for (const alt of ALTS) {
-    if (only.length && !only.includes(alt.key)) continue;
-    ran++;
-    let wins = 0; const notes = [];
-    for (let rep = 0; rep < REPS; rep++) {
-      const r = await page.evaluate(({ key, movesSrc }) => {
-        try {
-          document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove());
-          loadChallenge(key);
-          const C = CHALLENGES[key];
-          const moves = eval('(' + movesSrc + ')')(C);
-          for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
-          /* r423 §1: saveClose drills close on the universal Ctrl+S beat — every alt route
-             ends with the same save keystroke a player would press (the routes themselves
-             stay chord-diverse; the closer is engine-owned and route-independent) */
-          if (!done && C.saveClose) demoKey({ key: 's', ctrl: true });
-          if (done) return { won: true, keys: keyLog.length };
-          const failing = C.checks(S).filter(x => !x.ok).map(x => x.label);
-          return { won: false, failing };
-        } catch (e) { return { won: false, failing: ['THREW: ' + String(e).slice(0, 100)] }; }
-      }, { key: alt.key, movesSrc: alt.moves });
-      if (r.won) wins++;
-      else notes.push((r.failing || []).join(' | ').slice(0, 160));
-    }
-    const ok = wins === REPS;
-    if (!ok) fails++;
-    console.log((ok ? 'PASS ' : 'FAIL ') + alt.key.padEnd(10) + ' · ' + alt.name + (ok ? '' : '\n       stuck on: ' + notes[0]));
-  }
-  console.log('\nALT PATHS: ' + (fails ? fails + ' FAILURE(S) of ' + ran : 'ALL ' + ran + ' PASS'));
-  if (errs.length) { console.log('PAGE ERRORS: ' + errs.slice(0, 3).join(' · ')); fails++; }
-  await browser.close();
-  process.exit(fails ? 1 : 0);
-})();

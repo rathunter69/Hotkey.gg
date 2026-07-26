@@ -11167,54 +11167,305 @@ const CHALLENGES = {
     }
   },
   wrapfix:{
-    name:'IFERROR', label:'Wrap it or fix it', par:70, parKeys:73,
+    /* r439 H6b-11 (DEPTH_PASS §4.47, "Wrap it or fix it") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 on top of the page (§1.0-R3 wins on conflict).
+
+       WAS: 2 checks on a 7-row board (ROWS:14, the copied-default tell), guide 3 v checks 2 v
+       targets 2, no ☆, no saveClose, par 70 — the largest par in the chapter carrying the
+       smallest beat count in it.
+
+       ── CHAPTER-FIT ANSWER, asked before anything was built. `wrapfix` is a FORMULAS II drill
+       and always was: "Wrap" here is the IFERROR wrap, which is exactly how DEPTH_PASS §1.7's
+       closed verb list glosses the verb ("Wrap = IFERROR or text-wrap by context"). Its board is
+       a lookup panel, its ops are INDEX/MATCH and IFERROR, and every check it grades is a
+       formula VALUE. The Formatting neighbours share nothing with it: `typeset` grades bold /
+       italic / font colour, `center` grades alignment and a header rule, `autofit` grades column
+       widths and a #### repair. Zero op overlap, zero subject overlap — there is no chapter move
+       to make. The real adjacency is `lookup` / `lookup2` (Data & Lookups, both passed), and the
+       DEPTH_PASS_CAMPAIGN §3 discriminator answers it: fluency in `lookup` produces a correct
+       first attempt at BUILDING a read, and says nothing at all about WHEN TO WRAP AND WHEN TO
+       REPAIR, which is this drill's whole subject. IFERROR appears in exactly one drill in the
+       catalog — this one — so the lesson is carried nowhere else.
+
+       ── RETIREMENT/MERGE DIAGNOSTIC (§1.0-R3(s) + CAMPAIGN §2, both parts), measured through
+       the live engine on the SHIPPED board, every selection and navigation keyed, 5 seeds:
+         PART 1 — IS THERE SPREAD? fastest legal 61 keys (type the wrap, F2 the repair in place)
+           against 82 for the slowest legal one (arrow-navigated, both formulas retyped in full).
+           1.34× — barely over the ~1.3× line, a warning on its own.
+         PART 2 — IS ANY OF IT ☆-LEGAL? This is the half that decides. Of the 21 keys of spread,
+           ZERO are chord-vs-ribbon: the engine has no ribbon route into formula entry and none
+           into F2, so §1.0(c)'s forced-to-clear class is EMPTY here. ZERO are formatting: the
+           shipped board grades no formatting at all, so §1.0(d)'s forbidden class is empty too.
+           The entire spread survives the strip — edit-in-place against retyping, and direct
+           addressing against arrowing. Legal headroom exists, which is precisely what standalone
+           `unhide` had none of (all 8 of its keys were chord-or-format). KEEP.
+         The rebuilt board widens it deliberately: fastest legal 24 · slowest legal 164
+         (arrow-navigated, every read retyped in full, total typed, ribbon dress) = 6.83×;
+         slow-but-sane (reads retyped, chords used, star skipped) 145 = 6.04×. See the ☆ note
+         for the star's own isolated measurement.
+
+       ── THREE UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD (the CAMPAIGN §1 class, found by
+       WALKING routes, not by reading predicates). All three graded formula TEXT:
+         (1) `$`-ANCHORED RANGES. The repair check demanded the literal 'A3:A7'. A player who
+             writes $A$3:$A$7 — the anchoring habit `anchor` and `fxconvert` exist to teach —
+             saw the RIGHT NUMBER land on the board and the beat stay dark. Probed: board 410,
+             expected 410, check false.
+         (2) A CORRECT VLOOKUP REPAIR. The check demanded 'MATCH('. `=VLOOKUP(E5,A3:B7,2,0)`
+             returns the expected value exactly and the beat stayed dark. This is bug #4 of the
+             campaign table (`lookup`) reappearing in the same subject area.
+         (3) A VLOOKUP INSIDE THE WRAP. The wrap check demanded 'INDEX(' and 'MATCH('.
+             `=IFERROR(VLOOKUP(E2,A3:B7,2,0),0)` reads 0 on the board and the beat stayed dark.
+       All three die here: every core grades the END STATE (§1.0-R3(p)) — the VALUE the panel
+       shows — plus, where liveness is the stated outcome, that the cell is still a formula
+       reading the tape. No check in this drill reads a range, a function name, or an anchor out
+       of formula text.
+
+       THE BOARD. A segment revenue tape (FY25 · FY26 · Δ, eight segments, Δ live) and, under a
+       one-row moat, the board-pack query panel that reads it. Five queries, three of them down,
+       and they are down for three DIFFERENT reasons — one segment was divested and is genuinely
+       gone from the tape (that error is TRUE, and a zero fallback is the right answer), one read
+       searches the FY26 column instead of the segment names, and one read's range stops short of
+       the last two segments. Two healthy reads sit in the panel and must survive. The panel foots
+       to a total, which is the MOTIVE for the zero fallback and the moment the aha lands (§1.5):
+       an unwrapped #N/A poisons the SUM, so the page cannot foot until the true miss is wrapped.
+
+       STRUCTURAL DEVIATIONS from the §4.47 page, declared here per §0:
+       (1) ☆ RE-CUT (binding). The page's bonus is "Trace the fixed read to its source and back —
+           prove the wire". Dead twice over: a trace COSTS keys and saves none, so it is not the
+           "hidden EFFICIENCY discovery" §1.0(d) requires and not the "skippable mastery decision"
+           §1.0-R2(i) requires; and S.traceN is owned by `tieout`, in this same chapter, since
+           `wirewalk` was retired into it. Same class as `stalelink`'s strikethrough ☆ and
+           `series`'s comma ☆. The re-cut ☆ is measured, not asserted — see the ☆ note in checks().
+       (2) THE PAGE'S BEAT 3 IS RE-CUT. "Build the third read fresh — INDEX/MATCH for the panel's
+           new query" is `lookup` §4.38 beat 1 verbatim ("Build the first amount on the screen"),
+           i.e. the shared tail CAMPAIGN §3 says to cut rather than pad around. The third broken
+           read is a REPAIR with a third disease instead — a range that stops short — which keeps
+           the drill's own subject (diagnose, then choose wrap or repair) and gives the ☆ two
+           same-shaped cells to cure in one pass.
+       (3) THE PAGE'S BEAT 4 IS RE-CUT. "Comma-format the three panel answers — zero decimals" is
+           a comma beat, and §1.0-R3(o) is Wolf on exactly this op ("such a seldom used / rare
+           hotkey"); comma is not on his frequency list at all. Replaced with the panel TOTAL —
+           which is not a dress at all but the thing that gives the zero fallback a reason to
+           exist — and the dress that closes it is bold + a TOP border, ranked #1 and #3 on that
+           list and the §1.0(f) convention for a total.
+       (4) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an EXISTING labelled
+           cell in a labelled row — no insert slot, no empty paste target — so the guided ring
+           expresses all five. The one empty graded cell (the panel total) sits beside its own
+           printed label in the same row.
+       (5) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing here is assumed, converted or scaled.
+       (6) §1.3 DENSITY: 19 of 20 rows carry content or scripted purpose at the win state (95%).
+           The old board was ROWS:14 with 7 rows used — the copied-default tell.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about — see
+       the walked-route list in dev/AUDIT.md r439. Every repair grades the VALUE the panel shows,
+       so INDEX/MATCH, VLOOKUP, anchored or unanchored, filled or typed, and a hand-typed number
+       all clear; the wrap grades value-zero plus a live formula still reading the tape, which is
+       the outcome its own label states. */
+    name:'IFERROR', label:'Wrap it or fix it', par:26, parKeys:24, saveClose:true,   /* r439 §4.47 depth pass: par re-swept from scratch (was par 70 / parKeys 73 — the largest par in the chapter carrying its smallest beat count, and almost all of it was the cost of typing two long formulas out). 5-seed median 24 keys including the engine-appended Ctrl+S, flat across seeds (the randomization moves the board, never the count); par ≈ 1.05 s/key, the house band. That lands wrapfix inside the Formulas II band (signerr 22 · triage 27 · balcheck 28 · stalelink 28) instead of 25s clear of its top. Mirrored in HOTKEY_PARS. */
     aha:'IFERROR is a seatbelt, not a blindfold — wrap the truly missing, fix the merely broken.',
-    prompt:'Two lookups read #N/A — and they are not the same problem. One queries a discontinued segment that is genuinely gone: wrap it in IFERROR with a zero fallback. The other has a broken MATCH range that aims at the numbers instead of the names: fix the range, and don’t wrap it. A fallback is for the truly missing; a repair is for the merely broken.',
-    req(){ const o=this._o; return '<em>'+o.q1+'</em> → wrap: <em>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</em> · <em>'+o.q2+'</em> → fix the range: MATCH must read <em>A3:A7</em>, not B3:B7 — and NO iferror here'; },
+    /* §1.5: the aha's MOMENT is the panel total. Until the true miss is wrapped the SUM reads
+       #N/A, so the page cannot foot; the moment it returns zero the total lands. */
+    prompt:'The board pack reads its segment numbers off the tape, and three of the five reads came back #N/A this morning — for three different reasons. One queries a segment that was divested and is genuinely gone from the tape: that error is TRUE, and the pack wants a zero. The other two are merely broken. Get all five reading, foot the panel, and close it. A fallback is for the truly missing; a repair is for the merely broken.',
+    req(){ const o=this._o; return 'wrap <em>'+o.wrapCell+'</em> → <em>=IFERROR(</em>the read<em>,0)</em> · repair <em>'+o.badRng+'</em> from the healthy read above them — select <em>'+o.fillRng+'</em> <em>ctrl+d</em> · <em>'+o.totCell+'</em> <em>alt+=</em> <em>↵</em> · <em>'+o.totRow+'</em> <em>ctrl+b</em> · <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
     guide(){ const o=this._o; return [
-      o.q1+' hunts a segment that no longer exists — that error is TRUE. Wrap it: <kbd>=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)</kbd> <kbd>↵</kbd>',
-      o.q2+' is just broken — its MATCH aims at the NUMBERS column. <kbd>F2</kbd> in, repoint the range to <kbd>A3:A7</kbd>, commit',
-      'the discipline: a fallback for the truly missing, a repair for the merely broken — never the other way around',
+      o.gone+' was divested — it is not on the tape at all, so that read is telling the truth. Wrap what is already in the cell: <kbd>F2</kbd>, put <kbd>=IFERROR(</kbd> in front and <kbd>,0)</kbd> on the end, <kbd>↵</kbd>. Retyping the whole read wrapped works the same, it only costs the keys — and any lookup inside the wrap grades, VLOOKUP included',
+      'the '+o.bad[0].name+' read searches the FY'+o.y2+' column for a segment NAME, so it can never find one. The healthy '+o.good.name+' read directly above it is the same read done right and it is anchored — select it together with the two broken cells and <kbd>ctrl</kbd>+<kbd>d</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the same fill). <kbd>F2</kbd> on each one, or retyping them, clears it just as well',
+      'the '+o.bad[1].name+' read stops at '+o.lastIn+' — it never reaches the bottom of the tape, which is where '+o.bad[1].name+' sits. The same fill cures it; so does stretching its range by hand',
+      'the panel foots: <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd> on '+o.totCell+' (or type <kbd>=SUM(</kbd>'+o.readRng+'<kbd>)</kbd>). Foot it last: a typed SUM over a column that still holds an #N/A returns #N/A, and autosum walked up early stops at the first one and proposes a short range. Both land the moment the true miss returns a zero',
+      'close the panel: select '+o.totRow+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules it on top — a total earns the line above',
+      '☆ the discovery: the two broken reads repaired in ONE pass off the healthy read above them, with the wrapped read left alone. Fill one row too far and the wrap is gone and beat one goes dark — where you stop IS the star. Retyping both clears every core beat and forfeits it',
     ]; },
-    targets(){ const o=this._o; return [o.q1, o.q2]; },
+    /* rings: ① the divested read · ② the healthy read + the two broken ones (the fill run) ·
+       ③ the second broken read · ④ the total cell · ⑤ the total row · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [o.wrapCell, o.fillRng, o.bad[1].cell, o.totCell, o.totRow, null]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the two range grabs instead
+       of eliding them (the r438 `series` rule). setDemoSel only ever parks the cursor on the
+       anchor cell of the next beat. */
     demo(){ const o=this._o; return [
-      {sel:o.q1, keys:[...T('=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)'), Kb.enter]},
-      {sel:o.q2, keys:[...T('=INDEX(B3:B7,MATCH(E5,A3:A7,0))'), Kb.enter]},
-    ]; },
+      /* F2 opens the cell in EDIT mode, so the caret walks the text: the fallback goes on the
+         end, Home parks the caret just after the '=' (the engine's own Excel-parity rule), and
+         the wrap goes on the front. Retyping the read wrapped lands the same cell (alt-path 1). */
+      {sel:o.wrapCell, keys:[{key:'F2'}, ...T(',0)'), {key:'Home'}, ...T('IFERROR('), Kb.enter]},
+      /* the ☆ — one pass off the healthy read, stopping exactly on the second broken row */
+      {sel:o.good.cell, keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true}, Kb.fillD]},
+      {sel:o.totCell,  keys:[Kb.eq, Kb.enter]},
+      {sel:o.CA+o.TR,  keys:[{key:'ArrowRight',shift:true}, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — segment data (two lookups are down)',txt:true,bold:true};
-      const pool=['Consumer','Industrial','Services','Energy','Retail','Healthcare'];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const segs=pool.slice(0,5);
-      cells['A2']={...blankCell(),value:'Segment',txt:true,bold:true};
-      cells['B2']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
-      this._vals=[];
-      for(let i=0;i<5;i++){ const v=rnd(20,90)*10; this._vals.push(v);
-        cells['A'+(3+i)]={...blankCell(),value:segs[i],txt:true};
-        cells['B'+(3+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-      const qi=rnd(0,4);
-      cells['D2']={...blankCell(),value:'Discontinued',txt:true};
-      cells['E2']={...blankCell(),value:'Aerospace',txt:true};
-      cells['D3']={...blankCell(),value:'Revenue',txt:true};
-      cells['E3']={...blankCell(),formula:'=INDEX(B3:B7,MATCH(E2,A3:A7,0))',value:'#N/A',fmtStyle:'comma',decimals:0};
-      cells['D5']={...blankCell(),value:'Segment',txt:true};
-      cells['E5']={...blankCell(),value:segs[qi],txt:true};
-      cells['D6']={...blankCell(),value:'Revenue',txt:true};
-      cells['E6']={...blankCell(),formula:'=INDEX(B3:B7,MATCH(E5,B3:B7,0))',value:'#N/A',fmtStyle:'comma',decimals:0};
-      this._o={ q1:'E3', q2:'E6', exp:this._vals[qi] };
-      return {ROWS:9, cells, active:{r:3,c:5}, sel:null, colW:{1:104,4:104,5:104}};
+      const shuf=a=>{ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=rnd(0,i); [b[i],b[j]]=[b[j],b[i]]; } return b; };
+      /* §1.2 randomization — four independent axes. (a) SITE: the board is a full-grid artifact
+         (19 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the whole tape and panel
+         anchor at column A or column B. (b) CONTENT: a nine-name segment pool Fisher-Yates
+         shuffled, the divested name drawn from it, the five queries drawn from the rest, plus the
+         codename and the fiscal years. (c) VALUES: every figure through rnd(). (d) WHICH-IS-
+         BROKEN: a four-spot panel-layout pool moves the healthy template, the two broken rows and
+         the divested row around the panel, and the two diseases swap between the broken rows.
+         Geometry (eight tape lines, five queries, the fill always two rows) is constant across
+         seeds so the keystroke count never moves with the draw. */
+      const POOL=['Consumer','Industrial','Services','Energy','Retail','Healthcare','Aerospace','Logistics','Materials'];
+      const names=shuf(POOL);
+      const gone=names[0];                       // divested — deliberately NOT seeded into the tape
+      const segs=names.slice(1,9);               // the eight tape lines
+      const c0=rnd(0,1)?1:2;                     // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3);
+      const y1=rnd(2023,2027), y2=y1+1;
+      const HR=3, T0=4, TN=T0+7;                 // tape header row 3, lines 4..11
+      const PT=13, PH=14, P0=15, PN=19, TR=20;   // panel title 13, header 14, queries 15..19, total 20
+      cells[CA+'1']={...blankCell(),value:codename()+' — segment revenue tape ($mm)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: divisional pack, FY'+y2+' close · basis: $ in millions, as reported',txt:true,it:true,fontColor:'gray'};
+      cells[CA+HR]={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells[CB+HR]={...blankCell(),value:'FY'+y1,txt:true,bold:true,align:'r'};
+      cells[CC+HR]={...blankCell(),value:'FY'+y2,txt:true,bold:true,align:'r'};
+      cells[CD+HR]={...blankCell(),value:'Δ',txt:true,bold:true,align:'r'};
+      const rev={};
+      for(let i=0;i<8;i++){ const r=T0+i; const a=rnd(30,95)*10, b=Math.round(a*(100+rnd(-8,22))/100/5)*5;
+        rev[segs[i]]=b;
+        cells[CA+r]={...blankCell(),value:segs[i],txt:true};
+        cells[CB+r]={...blankCell(),value:a,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[CC+r]={...blankCell(),value:b,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        /* the Δ column is LIVE, so every figure on the tape is read by something and the
+           tape is a real page rather than a wall of constants (MODELING_STANDARDS §7). */
+        cells[CD+r]={...blankCell(),formula:'='+CC+r+'-'+CB+r,value:b-a,fmtStyle:'comma',decimals:0};
+      }
+      cells[CA+PT]={...blankCell(),value:'board-pack query panel — three reads came back #N/A',txt:true,it:true,fontColor:'gray'};
+      cells[CA+PH]={...blankCell(),value:'Query',txt:true,bold:true};
+      cells[CB+PH]={...blankCell(),value:'FY'+y2+' revenue',txt:true,bold:true,align:'r'};
+      /* (d) the panel layout pool. 'g' = healthy (the fill template) · 'b' = broken · 'x' = the
+         divested query. The two broken rows are ALWAYS the two directly under a healthy read, so
+         one fill of exactly three rows cures both — and one row further wipes the wrap, which is
+         the decision the ☆ exists to reward. */
+      const LAYOUTS=[
+        ['g','b','b','x','g'],
+        ['x','g','b','b','g'],
+        ['g','x','g','b','b'],
+        ['g','g','b','b','x'],
+      ];
+      const lay=LAYOUTS[rnd(0,LAYOUTS.length-1)];
+      const tapeRng=CA+T0+':'+CA+TN, revRng=CC+T0+':'+CC+TN;
+      const shortEnd=TN-2;                        // the short range stops two lines early
+      const lateSegs=[segs[6],segs[7]];           // the two lines a short range never reaches
+      /* the healthy/wrong-column queries are drawn from the segments a FULL range reaches, so no
+         two panel rows ever ask the same question and the short-range read is the only one whose
+         answer lives past the cut. */
+      const q=shuf(segs.slice(0,6));
+      let qi=0, bi=0;
+      const good={}, bad=[], goodRows=[];
+      let wrapCell=null, tmplRow=null;
+      for(let i=0;i<5;i++){
+        const r=P0+i, kind=lay[i];
+        if(kind==='x'){
+          cells[CA+r]={...blankCell(),value:gone,txt:true,fontColor:'blue'};
+          cells[CB+r]={...blankCell(),formula:'=INDEX($'+CC+'$'+T0+':$'+CC+'$'+TN+',MATCH('+CA+r+',$'+CA+'$'+T0+':$'+CA+'$'+TN+',0))',
+            value:'#N/A',fmtStyle:'comma',decimals:0};
+          wrapCell=CB+r;
+        } else if(kind==='g'){
+          const nm=q[qi++];
+          cells[CA+r]={...blankCell(),value:nm,txt:true,fontColor:'blue'};
+          cells[CB+r]={...blankCell(),formula:'=INDEX($'+CC+'$'+T0+':$'+CC+'$'+TN+',MATCH('+CA+r+',$'+CA+'$'+T0+':$'+CA+'$'+TN+',0))',
+            value:rev[nm],fmtStyle:'comma',decimals:0};
+          goodRows.push(r);
+          /* the template is the healthy read that sits DIRECTLY above the broken pair — every
+             layout in the pool puts one there, which is what makes a single fill cure both. */
+          if(lay[i+1]==='b'){ good.name=nm; good.cell=CB+r; tmplRow=r; }
+        } else {
+          /* the two diseases. The first broken row under the template searches the FY(y2) column
+             for a NAME; the second's range stops short of the tape's last two lines, so its query
+             names one of those two. Which disease sits in which row swaps with the layout draw. */
+          const first = bi===0;
+          const nm = first ? q[qi++] : lateSegs[rnd(0,1)];
+          cells[CA+r]={...blankCell(),value:nm,txt:true,fontColor:'blue'};
+          cells[CB+r]={...blankCell(),
+            formula: first
+              ? '=INDEX($'+CC+'$'+T0+':$'+CC+'$'+TN+',MATCH('+CA+r+',$'+CC+'$'+T0+':$'+CC+'$'+TN+',0))'
+              : '=INDEX($'+CC+'$'+T0+':$'+CC+'$'+shortEnd+',MATCH('+CA+r+',$'+CA+'$'+T0+':$'+CA+'$'+shortEnd+',0))',
+            value:'#N/A',fmtStyle:'comma',decimals:0};
+          bad.push({name:nm, cell:CB+r, row:r, want:rev[nm]});
+          bi++;
+        }
+      }
+      cells[CA+TR]={...blankCell(),value:'Total — queried segments',txt:true,bold:true};
+      cells[CB+TR]={...blankCell(),fmtStyle:'comma',decimals:0};   // the player foots it
+      const colW={}; if(c0>1) colW[c0-1]=22;
+      colW[c0]=204; colW[c0+1]=96; colW[c0+2]=96; colW[c0+3]=88;
+      this._o={ c0, CA, CB, CC, CD, HR, T0, TN, P0, PN, TR, y1, y2, gone, segs, rev,
+        wrapCell, good, bad, tmplRow, goodRows, lastIn:segs[5],
+        badRng: CB+Math.min(bad[0].row,bad[1].row)+':'+CB+Math.max(bad[0].row,bad[1].row),
+        fillRng: CB+tmplRow+':'+CB+(tmplRow+2),
+        readRng: CB+P0+':'+CB+PN,
+        totCell: CB+TR, totRow: CA+TR+':'+CB+TR,
+        tapeRng, revRng };
+      return {ROWS:20, cells, active:{r:P0,c:c0+1}, sel:null, colW};
     },
     checks(S){
-      const o=this._o;
-      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?String(c.formula).toUpperCase().replace(/\s/g,''):''; };
-      const v=k=>{ const c=S.cells[k]; return c?c.value:undefined; };
-      const f1=f(o.q1), f2=f(o.q2);
+      const o=this._o, cel=k=>S.cells[k]||{};
+      const num=(k,want)=>{ const v=cel(k).value; return typeof v==='number' && Math.abs(v-want)<=0.5; };
+      /* END-STATE grading (§1.0-R3(p)). The three untriggerable beats this rework kills all came
+         from reading formula TEXT, so nothing below reads a function name, a range or an anchor.
+         The one structural test is refsTape(): does the formula still point at the tape at all?
+         It scans the formula for cell references and asks whether ANY of them lands inside the
+         tape rect or on the query key beside it — which every real lookup satisfies (INDEX/MATCH,
+         VLOOKUP, LOOKUP, a wrap around the original read) and `=0` does not. */
+      const refsTape=(f,keyR)=>{ if(!f) return false;
+        const re=/\$?([A-J])\$?([0-9]{1,2})/gi; let m;
+        while((m=re.exec(String(f)))){
+          const c=m[1].toUpperCase().charCodeAt(0)-64, r=+m[2];
+          if(c>=o.c0 && c<=o.c0+3 && r>=o.T0 && r<=o.TN) return true;    // anywhere on the tape
+          if(c===o.c0 && r===keyR) return true;                          // the query key beside the read
+        }
+        return false; };
+      /* BEAT 1 — the divested read returns zero and still reads the tape. "Zero, lookup intact"
+         is the OUTCOME the label states, so grading liveness here is grading the end state, the
+         same way `audit` and `versionup` grade "make it a LIVE formula". Any wrap clears:
+         IFERROR round INDEX/MATCH, round a VLOOKUP, or round whatever was already in the cell. */
+      const wr=cel(o.wrapCell), wrapRow=+o.wrapCell.replace(/[A-J]/g,'');
+      const wrapOK = wr.value===0 && !!wr.formula && refsTape(wr.formula, wrapRow);
+      /* BEATS 2 & 3 — the two repairs, graded on the number the panel shows. Every route lands
+         it: the one-pass fill, F2 in place, a full retype, an anchored or unanchored rewrite, a
+         VLOOKUP, or the figure typed straight in (§1.0(c) — the clock prices that, not the check). */
+      const fixOK=i=>num(o.bad[i].cell, o.bad[i].want);
+      /* the tape itself is the leave-alone guard, folded into the repairs' ok rather than shipped
+         as a do-nothing line (§1.1): a "repair" that edits the tape to suit the read is not one. */
+      const tapeIntact=o.segs.every((nm,i)=>num(o.CC+(o.T0+i), o.rev[nm]) && cel(o.CA+(o.T0+i)).value===nm);
+      /* BEAT 4 — the panel foots. Value-graded, so Alt+= and a typed =SUM( both clear; while any
+         read above still carries #N/A the SUM carries it too and this stays dark. */
+      let want=0; for(let r=o.P0;r<=o.PN;r++){ const v=cel(o.CB+r).value; if(typeof v!=='number'){ want=null; break; } want+=v; }
+      const totOK = want!=null && num(o.totCell, want) && !!cel(o.totCell).formula;
+      /* BEAT 5 — the close (§1.6): weight and the rule ABOVE the total (§1.0(f)). Alt H B P, the
+         box Alt H B S / B T, all-borders (ball carries the top edge) and Alt H B D all clear. */
+      const ruled=c=>!!(c.bt||c.ball);
+      const dressOK=[o.CA,o.CB].every(L2=>{ const c=cel(L2+o.TR); return !!c.bold && ruled(c); });
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — BOTH broken reads
+         cured in ONE pass off the healthy read above them, and the wrapped read left standing.
+         Read off the r424 S.fillOps latch (the MECHANIC, never geometry inferred from the end
+         state), so Ctrl+D and the ribbon's Alt H F I D both earn it and two retyped formulas earn
+         nothing. MEASURED, in the star's own scope and isolated from the rest of the drill: the
+         pass costs 3 keys (two Shift+↓ and Ctrl+D) against 84 for retyping the two reads and 85
+         for editing them in place with F2 — 81 keys of legal headroom, 28×. It is a SINGLE-MOVE
+         star, so there is no second half for a negative to hide in (the r438 `series` finding).
+         Every core clears without it: the alt-paths negative control walks that route at 145
+         keys against the demo's 24 with this line DARK. And the stop matters — a fill one
+         row further wipes the wrap and takes beat 1 down with it, which is why the rect is
+         bounded above and below rather than merely covering the two broken rows. */
+      const cb=o.c0+1;
+      const fo=(S.fillOps||[]).some(f=>f.dir==='down' && f.c1<=cb && f.c2>=cb
+        && o.goodRows.indexOf(f.r1)>=0 && f.r1<o.bad[0].row && f.r2>=o.bad[1].row);
+      const live=o.bad.every(b=>!!cel(b.cell).formula);
+      const starOK = wrapOK && fixOK(0) && fixOK(1) && live && fo;
+      /* Labels are INSTRUCTIONS (§1.0-R3(n)): the clause after the dash says WHAT or WHERE, never
+         why. Each carries this seed's fact per §1.0-R2(g) — which segment was divested and which
+         two reads are down move every round, and the player should not have to reverse-engineer
+         them out of the panel — while staying outcome-vague about the route (§1.0(b)). */
       return [
-        {label:'wrap the TRUE miss — IFERROR around the intact lookup, zero fallback ('+o.q1+')',
-          ok: f1.includes('IFERROR(')&&f1.includes('INDEX(')&&f1.includes('MATCH(')&&v(o.q1)===0},
-        {label:'fix the broken range — point MATCH at the names, NO iferror, range intact ('+o.q2+')',
-          ok: f2.includes('MATCH(')&&f2.includes('A3:A7')&&!f2.includes('IFERROR')&&v(o.q2)===o.exp&&this._vals.every((x,i)=>v('B'+(3+i))===x)},
+        {label:'Wrap the '+o.gone+' read — zero, with the lookup intact', ok: wrapOK},
+        {label:'Fix the '+o.bad[0].name+' read — it searches the FY'+o.y2+' column, not the segment names', ok: fixOK(0) && tapeIntact},
+        {label:'Fix the '+o.bad[1].name+' read — its range stops short of the last two segments', ok: fixOK(1) && tapeIntact},
+        {label:'Total the panel reads in the Total line', ok: totOK},
+        {label:'Bold the panel total and add a top border above it', ok: dressOK},
+        {label:'Repair both broken reads in one pass — the wrapped read left standing', ok: starOK, bonus:true},
       ];
     }
   },
@@ -11887,143 +12138,312 @@ const CHALLENGES = {
     }
   },
   cases:{
-    name:'Sticky switch', label:'Scenario switch with CHOOSE', par:94, parKeys:100,
-    aha:'A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.',
-    prompt:'Build a scenario switch the way a real model does it. A driver block reads one cell — the switch — and CHOOSE pulls the active case’s name and growth rate into it, so the model runs off the driver instead of nested IFs. A capture cell reads the locked-year revenue only while its case is live, and otherwise references itself to hold the last value — so the summary shows all three cases side by side.',
-    req(){ const c=this._capL, m=(this._mutG*100).toFixed(1); return 'driver: <em>B8</em> =CHOOSE($B$3,B5,C5,D5) · <em>B9</em> =CHOOSE($B$3,B6,C6,D6) · model: <em>C12</em> =B12*(1+$B$9) F4-anchored, fill <em>C12:F12</em> → · <em>C13</em> =C12/B12-1 fill <em>C13:F13</em> → · capture: <em>C18</em> =IF($B$3=C$17,$'+c+'$12,C18) fill <em>C18:E18</em> → · flip <em>B3</em> → 1 · 2 · 3 · then revise <em>B6</em> → '+m+'% and re-flip <em>B3</em> → 1'; },
-    guide(){ const c=this._capL, m=(this._mutG*100).toFixed(1); return [
-      'the DRIVER — CHOOSE reads the switch: <em>B8</em> · <kbd>=</kbd>CHOOSE($B$3,B5,C5,D5) — the active case NAME · <kbd>↵</kbd> · <em>B9</em> · <kbd>=</kbd>CHOOSE($B$3,B6,C6,D6) — the active GROWTH · <kbd>↵</kbd>',
-      'the model runs off the driver: <em>C12</em> · <kbd>=</kbd>B12*(1+$B$9) — <kbd>F4</kbd> locks the growth cell · <kbd>↵</kbd> · fill <em>C12:F12</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>% growth</em>: <em>C13</em> <kbd>=</kbd>C12/B12-1 · fill',
-      'the sticky capture: <em>C18</em> · <kbd>=</kbd>IF($B$3=C$17,$'+c+'$12,C18) — reads the locked-year revenue only when its case is the switch, else holds ITSELF · fill <em>C18:E18</em> · then flip <em>B3</em> → <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> — each column snapshots its case',
-      'the revision — the twist: the deal team resets Base growth. Retype <em>B6</em> · <kbd>'+m+'%</kbd> · <kbd>↵</kbd> — notice the Base snapshot DOESN’T move (it’s frozen), while the live model jumps. Flip <em>B3</em> → <kbd>1</kbd> to REFRESH Base · Upside & Downside never budge — they were anchored all along',
+    /* r439 H6b-11 (DEPTH_PASS §4.31, "Scenario switch with CHOOSE") — the depth-pass rework,
+       built to §1.0 + §1.0-R2 + §1.0-R3 on top of the page (§1.0-R3 wins on conflict), and to
+       dev/MODELING_STANDARDS.md, which binds here because this board IS a financial model.
+
+       WAS: 6 checks, no ☆, no saveClose, guide 4 v checks 6 v targets 9 — the worst tri-length
+       misalignment in the catalog, with the guided ring landing on the WRONG CELL from step 2 on
+       (the §4.31 page's own finding). Check labels carried the answer formulas verbatim, which is
+       §1.7 R3 exactly backwards: the formula is the solution and belongs in guide/req, never in a
+       check label. And ROWS:21 — over the §1.3 cap of 20, reported by dev/e2e-grid-height.js
+       check E as board work. This rework trims it to a true 20 and check E goes quiet.
+
+       ── RETIREMENT/MERGE DIAGNOSTIC (§1.0-R3(s) + CAMPAIGN §2, both parts), measured through
+       the live engine on the SHIPPED board, every selection and navigation keyed, 5 seeds:
+         PART 1 — IS THERE SPREAD? fastest legal 80 keys (the driver block built as ONE anchored
+           CHOOSE filled down, the model and the capture filled) against 214 for the slowest legal
+           one (every cell typed, no fill anywhere). 2.68× — inside the shipped band.
+         PART 2 — IS ANY OF IT ☆-LEGAL? Strip chord-vs-ribbon: Ctrl+R / Ctrl+D against
+           Alt H F I R / Alt H F I D is ~3 keys per fill and §1.0(c) forces both to clear. Strip
+           formatting: the shipped board grades NO formatting at all, so §1.0(d)'s forbidden class
+           is empty. What survives is 134 keys of fill-against-typing, 20 of them inside the
+           driver block alone, and none of it is either excluded class. KEEP.
+         The rebuilt board measures fastest legal 79 · slowest legal 244 = 3.09×.
+
+       ── TWO UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD (the CAMPAIGN §1 class, found by
+       WALKING routes). Both came from grading formula TEXT for 'CHOOSE(':
+         (1) `=INDEX(B5:D5,$B$3)` — a completely legitimate and arguably better switch driver,
+             identical board, identical behaviour under every switch position. Beats 1 and 5 both
+             stayed dark. Probed.
+         (2) `=IF($B$3=1,B5,IF($B$3=2,C5,D5))` — the nested-IF form. Beats 1 and 5 dark. This one
+             is the worst of the pair, because the drill's own aha ("the model runs off the
+             driver, not nested IFs") is an invitation to try exactly that, and the drill then
+             refused to acknowledge a board that behaved correctly.
+       Both die here. The driver now grades what a driver IS: a live formula whose value equals
+       the ACTIVE case's assumption — and beat 4 forces it to hold for all three switch positions,
+       because a hardcoded or mis-pointed driver produces a wrong snapshot the moment the switch
+       moves (cascade-native, no formula text read anywhere). CHOOSE is taught in guide/req, which
+       is where §1.7 R3 says the solution lives.
+       CORRECTLY REJECTED, and left rejected: `=B12*(1+B$9)` (mixed anchor). Filled right it walks
+       the growth reference off the driver into an empty cell, so the board VISIBLY reads the
+       wrong numbers — a fixable error, not an untriggerable beat.
+
+       THE BOARD (MODELING_STANDARDS §1/§6/§7). A scenario driver page: the switch cell (a blue,
+       boxed, yellow INPUT — colour is provenance, §1), a three-case assumption table in blue,
+       a three-row DRIVER block the switch repositions, a two-line live model (revenue compounding
+       off the driver growth, EBITDA priced off the driver margin), and a case output table whose
+       snapshot row holds each case as it is visited. Units are stated in the title ($mm) and the
+       basis memo names the convention and the simplification. No hardcode lives inside any
+       formula the drill teaches — the growth and margin assumptions are labelled blue cells and
+       the model reads the driver, never the case column (§1's gradeable corollary). The CHECK
+       LINE is seeded LIVE and reads in ONE visible place (§6): active-case snapshot minus the
+       live model's final-year EBITDA, expected zero — so the frozen-snapshot twist is legible on
+       the board rather than in the player's head, and beat 6's refresh is what drives it back to
+       zero. It is board furniture, never a graded target.
+
+       STRUCTURAL DEVIATIONS from the §4.31 page, declared here per §0:
+       (1) ☆ RE-CUT (binding). The page's bonus is "Flip the switch back to case 1 — the model
+           rests on Base". That is tidiness, not efficiency: it costs keys and saves none, so it
+           fails §1.0(d) ("hidden EFFICIENCY discoveries only") and fails §1.0-R2(i) ("a DISTINCT,
+           SKIPPABLE mastery decision"). Worse, on this board it falls out of beat 6 automatically
+           — the refresh IS a flip back — which is the precise failure §1.0-R2(i) was written to
+           stop. The re-cut ☆ is the canonical §1.0(d) move on the board that actually carries it:
+           the driver block built from ONE anchored CHOOSE filled down. Measured — see checks().
+       (2) THE PAGE'S BEATS 2 AND 3 MERGE INTO ONE. "Build the case-name pull" and "Build the
+           growth pull" are the same formula one row apart; with $B$3 anchored and the case
+           columns relative, the second IS the first filled down. Shipping them as two lines would
+           have made the ☆ unearnable by construction (the player would have been instructed to
+           build them separately) and would have spent two of six beats on one verb.
+       (3) THE '% growth' ROW IS CUT. DEPTH_PASS's own §4.26 note records it: `cases` builds
+           `C13 =C12/B12-1` filled across, which is `versionup` beat 1 VERBATIM on the same
+           five-year shape, and `margin` §4.21 owns the growth ratio itself. That is a documented
+           family redundancy, and CAMPAIGN §3 says to cut the shared tail rather than pad round
+           it. Its slot goes to the EBITDA line, which is what makes the page a model rather than
+           a compounding demo and what gives the driver a THIRD row to fill.
+       (4) THE PAGE'S BEAT 6 IS RE-CUT. "Bold the output table's header and add a bottom border
+           under it" is `center`'s beat verbatim ("Add a bottom border under the header row"), the
+           same shared tail; and §1.0(f) is explicit that a total earns the line ABOVE it. The
+           close here is the §1.6 PROVE-OUT instead — the check line reading zero after the
+           revised case is refreshed — which is the finish this artifact actually wants.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an existing labelled
+           cell or a run beside its own printed label. No insert slot, no empty paste target.
+       (6) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): the assumption table IS the input block and it
+           ships populated, blue and labelled; a second yellow stack would duplicate it.
+       (7) §1.3 DENSITY: 20 of 20 rows carry content or scripted purpose at the win state (100%),
+           and the board is a true 20 — check E's note on `cases=21` goes away.
+
+       SIMPLIFICATION DECLARED (MODELING_STANDARDS §7): the model is two lines deep, growth is
+       applied to a single revenue line rather than a segment build, and there is no tax or
+       working-capital layer. The board's basis memo says so in as many words. */
+    name:'Sticky switch', label:'Scenario switch with CHOOSE', par:97, parKeys:92, saveClose:true,   /* r439 §4.31 depth pass: par re-swept from scratch (was par 94 / parKeys 100 on a board that spent two beats on one verb and a third on a row `versionup` already owns). 5-seed median 92 keys including the engine-appended Ctrl+S, flat across seeds (the randomization moves the board and the draw, never the count); par ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. */
+    aha:'a self-referencing IF snapshots each case as you visit it — and freezes it, so a revised assumption moves the live model while the summary holds the old number until you go back.',
+    /* §1.5: the aha's MOMENT is beat 6 — the revision moves the live model and the check line
+       goes off zero while the Base snapshot sits perfectly still, until the switch returns to it. */
+    prompt:'Build the scenario switch the way a real model does it. One cell drives the page: a driver block reads it and repositions every assumption, the model runs off the driver instead of off the case columns, and a capture row snapshots each case as you visit it so the summary shows all three side by side. Then the deal team revises a case after you have already snapshotted it — and the summary will not move until you go back for it.',
+    req(){ const o=this._o; return 'driver <em>'+o.drv0+'</em> <em>=CHOOSE($'+o.CB+'$'+o.rSw+','+o.CB+o.rCase+','+o.CC+o.rCase+','+o.CD+o.rCase+')</em> · fill <em>'+o.drvRng+'</em> ↓ · revenue <em>'+o.rev1+'</em> <em>='+o.CB+o.rRev+'*(1+$'+o.CB+'$'+o.rDrvG+')</em> · fill <em>'+o.revRng+'</em> → · EBITDA <em>'+o.eb0+'</em> <em>='+o.CB+o.rRev+'*$'+o.CB+'$'+o.rDrvM+'</em> · fill <em>'+o.ebRng+'</em> → · capture <em>'+o.cap0+'</em> <em>=IF($'+o.CB+'$'+o.rSw+'='+o.CC+'$'+o.rNum+',$'+o.capL+'$'+o.rEb+','+o.CC+o.rSnap+')</em> · fill <em>'+o.capRng+'</em> → · <em>'+o.swCell+'</em> → 1 · 2 · 3 · then <em>'+o.mutCell+'</em> → '+o.mutPct+'% and <em>'+o.swCell+'</em> → '+o.mutIdx+'</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the DRIVER is one formula, not three. In '+o.drv0+' point CHOOSE at the switch and lock it — <kbd>=</kbd>CHOOSE($'+o.CB+'$'+o.rSw+','+o.CB+o.rCase+','+o.CC+o.rCase+','+o.CD+o.rCase+') <kbd>↵</kbd> (<kbd>F4</kbd> cycles the anchors while you type the reference). The case columns stay relative, so select '+o.drvRng+' and <kbd>ctrl</kbd>+<kbd>d</kbd> walks it down onto the growth row and the margin row for free. Any live formula that repositions off the switch grades — INDEX, a nested IF, whatever you reach for',
+      'the model runs off the DRIVER, never off a case column: '+o.rev1+' <kbd>=</kbd>'+o.CB+o.rRev+'*(1+$'+o.CB+'$'+o.rDrvG+') <kbd>↵</kbd> — the growth reference has to be locked or the fill walks it off into empty cells — then select '+o.revRng+' <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'EBITDA prices off the same block: '+o.eb0+' <kbd>=</kbd>'+o.CB+o.rRev+'*$'+o.CB+'$'+o.rDrvM+' <kbd>↵</kbd>, locked the same way, then '+o.ebRng+' <kbd>ctrl</kbd>+<kbd>r</kbd>. Every year now reprices when the switch moves',
+      'the sticky capture: '+o.cap0+' <kbd>=</kbd>IF($'+o.CB+'$'+o.rSw+'='+o.CC+'$'+o.rNum+',$'+o.capL+'$'+o.rEb+','+o.CC+o.rSnap+') <kbd>↵</kbd> — it reads the '+o.capYr+' EBITDA only while its own case is the live one, and otherwise references ITSELF and holds the last value it saw. Fill '+o.capRng+' <kbd>ctrl</kbd>+<kbd>r</kbd>, then walk '+o.swCell+' through <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> — each column fills as you pass it',
+      'the revision: the deal team resets '+o.mutName+' growth to <kbd>'+o.mutPct+'%</kbd> in '+o.mutCell+'. The live model jumps; the '+o.mutName+' snapshot does not, and the check line goes off zero. Put '+o.swCell+' back to <kbd>'+o.mutIdx+'</kbd> to refresh it — the other two never budge, they were anchored all along',
+      '☆ the discovery: the driver block built from ONE anchored CHOOSE filled down its three rows, instead of three formulas typed out. Typing all three finishes the drill exactly the same way and forfeits the star — the clock is the only thing that tells you what it cost',
     ]; },
-    targets:['B8','B9','C12','C12:F12','C13:F13','C18','C18:E18','B3','B6'],
-    demo(){
-      const c=this._capL, m=(this._mutG*100).toFixed(1).replace(/\.0$/,'');
+    /* rings: ① the driver block · ② the revenue run · ③ the EBITDA run · ④ the capture run ·
+       ⑤ the revised assumption cell · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.drvRng, o.revRng, o.ebRng, o.capRng, o.mutCell, null]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the four range grabs
+       (the r438 `series` rule). setDemoSel only parks the cursor on the next beat's anchor. */
+    demo(){ const o=this._o;
+      const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
       return [
-        {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'), Kb.enter]},
-        {sel:'B9', keys:[...T('=CHOOSE($B$3,B6,C6,D6)'), Kb.enter]},
-        {sel:'C12', keys:[...T('=B12*(1+$B$9)'), Kb.enter]},
-        {sel:'C12:F12', keys:[Kb.fillR]},
-        {sel:'C13', keys:[...T('=C12/B12-1'), Kb.enter]},
-        {sel:'C13:F13', keys:[Kb.fillR]},
-        {sel:'C18', keys:[...T('=IF($B$3=C$17,$'+c+'$12,C18)'), Kb.enter]},
-        {sel:'C18:E18', keys:[Kb.fillR]},
-        {sel:'B3', keys:[...T('1'), Kb.enter], watch:'C18:E18'},
-        {sel:'B3', keys:[...T('2'), Kb.enter], watch:'C18:E18'},
-        {sel:'B3', keys:[...T('3'), Kb.enter], watch:'C18:E18'},
-        {sel:'B6', keys:[...T(m+'%'), Kb.enter], watch:'C18:E18'},   // the deal-team revision — snapshot stays FROZEN
-        {sel:'B3', keys:[...T('1'), Kb.enter], watch:'C18:E18'},      // revisit Base to refresh the frozen snapshot
-      ];
-    },
+      /* the ☆ — one anchored CHOOSE, filled down the three driver rows */
+      {sel:o.drv0, keys:[...T('=CHOOSE($'+o.CB+'$'+o.rSw+','+o.CB+o.rCase+','+o.CC+o.rCase+','+o.CD+o.rCase+')'), Kb.enter]},
+      {sel:o.drv0, keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true}, Kb.fillD]},
+      {sel:o.rev1, keys:[...T('='+o.CB+o.rRev+'*(1+$'+o.CB+'$'+o.rDrvG+')'), Kb.enter]},
+      {sel:o.rev1, keys:[...R(o.NY-2), Kb.fillR]},
+      {sel:o.eb0,  keys:[...T('='+o.CB+o.rRev+'*$'+o.CB+'$'+o.rDrvM+')').slice(0,-1), Kb.enter]},
+      {sel:o.eb0,  keys:[...R(o.NY-1), Kb.fillR]},
+      {sel:o.cap0, keys:[...T('=IF($'+o.CB+'$'+o.rSw+'='+o.CC+'$'+o.rNum+',$'+o.capL+'$'+o.rEb+','+o.CC+o.rSnap+')'), Kb.enter]},
+      {sel:o.cap0, keys:[...R(2), Kb.fillR]},
+      {sel:o.swCell, keys:[...T('1'), Kb.enter], watch:o.capRng},
+      {sel:o.swCell, keys:[...T('2'), Kb.enter], watch:o.capRng},
+      {sel:o.swCell, keys:[...T('3'), Kb.enter], watch:o.capRng},
+      {sel:o.mutCell, keys:[...T(o.mutPct+'%'), Kb.enter], watch:o.capRng},   // the revision — the snapshot stays FROZEN
+      {sel:o.swCell, keys:[...T(String(o.mutIdx)), Kb.enter], watch:o.chkCell},// revisit the revised case to refresh it
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
+      /* §1.2 randomization — four independent axes. (a) SITE: this is a full-grid artifact (20 of
+         20 rows), so per §1.2 the site axis is CORNER JITTER — the whole page anchors at column A
+         or column B, and every reference in the beats, the guide, the req and the demo is derived
+         from that anchor rather than written down. (b) CONTENT: the codename and the fiscal-year
+         window. (c) VALUES: every assumption and the seed revenue through rnd(), with the three
+         cases held strictly ordered (Downside < Base < Upside) so the output table always reads
+         as a fan. (d) WHICH-ONE-MOVES: which forecast year the snapshot locks onto AND which of
+         the three cases the deal team revises — so neither the capture reference nor the closing
+         flip can be played from memory. Geometry is constant across seeds (five plan years, three
+         driver rows, three cases), so the keystroke count never moves with the draw. */
       const co=codename();
-      // format shuffles — cosmetic, keep the solve identical while the board looks fresh each run
-      const revFmt = rnd(0,1) ? 'currency' : 'comma';
-      const revDec = rnd(0,1);
-      const boldRev = rnd(0,1)===1;
-      const hdrBold = rnd(0,1)===1;
-      const shade   = rnd(0,1)===1 ? 'gray' : null;
-      // which forecast year gets locked into the snapshot — reads the label, not muscle memory
-      const capNum = rnd(0,1) ? 6 : 5;            // F (terminal) or E (one before)
-      const capL   = colLetter(capNum);
-      cells['A1']={...blankCell(),value:co+' — scenario model driver ($000s)',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Scenario switch',txt:true,bold:true};
-      cells['B3']={...blankCell(),value:1,fontColor:'blue',ball:true,fill:'yellow',align:'c'};   // the driver input — boxed + highlighted
-      cells['C3']={...blankCell(),value:'◀ 1 = Base · 2 = Upside · 3 = Downside',txt:true};       // legend spills right into empty cells
-      // case assumptions (the "top table")
-      cells['A5']={...blankCell(),value:'Case',txt:true,bold:true,fill:shade};
-      cells['B5']={...blankCell(),value:'Base',txt:true,bold:true,fill:shade};
-      cells['C5']={...blankCell(),value:'Upside',txt:true,bold:true,fill:shade};
-      cells['D5']={...blankCell(),value:'Downside',txt:true,bold:true,fill:shade};
-      cells['A6']={...blankCell(),value:'Growth',txt:true};
-      const gB=rnd(4,7), gU=gB+rnd(3,6), gD=gB-rnd(5,9);
-      this._mutG=(gB+rnd(2,5))/100;   // the deal-team revision to Base growth — forces a refresh
-      cells['B6']={...blankCell(),value:gB/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
-      cells['C6']={...blankCell(),value:gU/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
-      cells['D6']={...blankCell(),value:gD/100,fmtStyle:'percent',decimals:1,fontColor:'blue'};
-      // the DRIVER block — CHOOSE pulls the active case (user builds B8, B9) — boxed + highlighted so it reads as the live selection
-      cells['A8']={...blankCell(),value:'Active case',txt:true,bold:true};
-      cells['B8']={...blankCell(),txt:true,fill:'blue',ball:true};
-      cells['A9']={...blankCell(),value:'Active growth',txt:true,bold:true};
-      cells['B9']={...blankCell(),fmtStyle:'percent',decimals:1,fill:'blue',ball:true};
-      // live model — runs off the driver
-      const y0=24+rnd(0,2);
-      cells['A10']={...blankCell(),value:'live model — runs off the driver',txt:true};
-      cells['A11']={...blankCell(),value:'Item',txt:true,bold:true};
-      for(let c=2;c<=6;c++) cells[colLetter(c)+'11']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:hdrBold,fill:shade};
-      cells['A12']={...blankCell(),value:'Revenue',txt:true,bold:boldRev};
-      cells['B12']={...blankCell(),value:rnd(120,400)*5,fmtStyle:revFmt,decimals:revDec,fontColor:'blue'};
-      for(let c=3;c<=6;c++) cells[colLetter(c)+'12']={...blankCell(),fmtStyle:revFmt,decimals:revDec};   // user builds the model off $B$9
-      cells['A13']={...blankCell(),value:'% growth',txt:true};
-      for(let c=3;c<=6;c++) cells[colLetter(c)+'13']={...blankCell(),fmtStyle:'percent',decimals:1};
-      // case output table — case-name header (readability), scenario # (the IF keys off it), then the sticky capture row
-      cells['A15']={...blankCell(),value:'case output table — snapshot each scenario',txt:true};
-      cells['C16']={...blankCell(),value:'Base',txt:true,bold:true,align:'r'};
-      cells['D16']={...blankCell(),value:'Upside',txt:true,bold:true,align:'r'};
-      cells['E16']={...blankCell(),value:'Downside',txt:true,bold:true,align:'r'};
-      cells['A17']={...blankCell(),value:'scenario #',txt:true};
-      cells['C17']={...blankCell(),value:1,align:'r'}; cells['D17']={...blankCell(),value:2,align:'r'}; cells['E17']={...blankCell(),value:3,align:'r'};
-      cells['A18']={...blankCell(),value:'FY'+(y0+capNum-2)+' Revenue',txt:true,bold:true};
-      for(const L of ['C','D','E']) cells[L+'18']={...blankCell(),fmtStyle:revFmt,decimals:revDec};   // user builds the capture IFs
-      // the deal-team revision memo — the mutation that forces a refresh (text, spills right)
-      cells['A20']={...blankCell(),value:'deal-team revision → reset Base growth (B6) to '+(this._mutG*100).toFixed(1)+'%, then re-flip B3 to 1 to refresh',txt:true,it:true};
-      this._g=[gB/100,gU/100,gD/100];
-      this._capL=capL; this._capNum=capNum;
-      const colW={1:190}; for(let c=2;c<=6;c++) colW[c]=88;   // "Downside" clears the default 78px
-      return {ROWS:21, cells, active:{r:8,c:2}, sel:null, colW};
+      const c0=rnd(0,1)?1:2;                       // (a) corner jitter
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3),
+            CE=colLetter(c0+4), CF=colLetter(c0+5);
+      const NY=5;                                   // five plan years, B..F off the anchor
+      const yc=[]; for(let j=0;j<NY;j++) yc.push(colLetter(c0+1+j));
+      const y0=2025+rnd(0,3);
+      /* row map — a true 20 (§1.3), every row carrying content or scripted purpose */
+      const rSw=3, rCase=5, rG=6, rM=7, rDrv=9, rRev=14, rEb=15,
+            rSnapHdr=17, rNum=18, rSnap=19, rChk=20;
+      const rDrvG=rDrv+1, rDrvM=rDrv+2;
+      cells[CA+'1']={...blankCell(),value:co+' — scenario driver ($mm)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Basis: one switch drives the page · assumptions are inputs (blue), figures calculate · simplified — one revenue line, no tax or working-capital layer',txt:true,it:true,fontColor:'gray'};
+      /* THE SWITCH — the one INPUT the whole page turns on. Blue font (a hardcode typed by a
+         human, MODELING_STANDARDS §1), boxed and yellow (§1.0(f)), and it ships populated. */
+      cells[CA+rSw]={...blankCell(),value:'Scenario switch',txt:true,bold:true};
+      cells[CB+rSw]={...blankCell(),value:1,fontColor:'blue',ball:true,fill:'yellow',align:'c'};
+      cells[CC+rSw]={...blankCell(),value:'◀ 1 = Base · 2 = Upside · 3 = Downside',txt:true};
+      cells[CA+'4']={...blankCell(),value:'case assumptions',txt:true,it:true,fontColor:'gray'};
+      const NAMES=['Base','Upside','Downside'];
+      cells[CA+rCase]={...blankCell(),value:'Case',txt:true,bold:true};
+      [CB,CC,CD].forEach((L2,i)=>cells[L2+rCase]={...blankCell(),value:NAMES[i],txt:true,bold:true,align:'r'});
+      /* (c) strictly ordered cases, so the fan always reads Downside < Base < Upside */
+      const gB=rnd(4,7)/100, gU=gB+rnd(3,6)/100, gD=gB-rnd(5,9)/100;
+      const mB=rnd(22,30)/100, mU=mB+rnd(2,5)/100, mD=mB-rnd(4,8)/100;
+      const G=[gB,gU,gD], M=[mB,mU,mD];
+      cells[CA+rG]={...blankCell(),value:'Revenue growth',txt:true};
+      cells[CA+rM]={...blankCell(),value:'EBITDA margin',txt:true};
+      [CB,CC,CD].forEach((L2,i)=>{
+        cells[L2+rG]={...blankCell(),value:G[i],fmtStyle:'percent',decimals:1,fontColor:'blue',align:'r'};
+        cells[L2+rM]={...blankCell(),value:M[i],fmtStyle:'percent',decimals:1,fontColor:'blue',align:'r'}; });
+      /* THE DRIVER BLOCK — three rows, one anchored formula's worth of work. Boxed and shaded so
+         it reads as the live block the model points at; ships EMPTY, the player builds it. */
+      cells[CA+'8']={...blankCell(),value:'active case — the model reads this block, not the columns above',txt:true,it:true,fontColor:'gray'};
+      cells[CA+rDrv] ={...blankCell(),value:'Active case',txt:true,bold:true};
+      cells[CA+rDrvG]={...blankCell(),value:'Active revenue growth',txt:true,bold:true};
+      cells[CA+rDrvM]={...blankCell(),value:'Active EBITDA margin',txt:true,bold:true};
+      cells[CB+rDrv] ={...blankCell(),txt:true,fill:'blue',ball:true,align:'r'};
+      cells[CB+rDrvG]={...blankCell(),fmtStyle:'percent',decimals:1,fill:'blue',ball:true,align:'r'};
+      cells[CB+rDrvM]={...blankCell(),fmtStyle:'percent',decimals:1,fill:'blue',ball:true,align:'r'};
+      /* THE LIVE MODEL */
+      cells[CA+'12']={...blankCell(),value:'live model — every year reprices when the switch moves',txt:true,it:true,fontColor:'gray'};
+      cells[CA+'13']={...blankCell(),value:'Item ($mm)',txt:true,bold:true};
+      for(let j=0;j<NY;j++) cells[yc[j]+'13']={...blankCell(),value:'FY'+(y0+j),txt:true,bold:true,align:'r'};
+      const rev0=rnd(120,400)*5;
+      cells[CA+rRev]={...blankCell(),value:'Revenue',txt:true};
+      cells[CB+rRev]={...blankCell(),value:rev0,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      for(let j=1;j<NY;j++) cells[yc[j]+rRev]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[CA+rEb]={...blankCell(),value:'EBITDA',txt:true};
+      for(let j=0;j<NY;j++) cells[yc[j]+rEb]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* THE CASE OUTPUT TABLE — case-name header for the reader, scenario # for the IF to key
+         off, then the sticky capture row. (d) which year the snapshot locks onto varies. */
+      const capJ=rnd(0,1)?NY-1:NY-2;                 // the terminal year or the one before it
+      const capL=yc[capJ], capYr='FY'+(y0+capJ);
+      cells[CA+rSnapHdr]={...blankCell(),value:'case output table — one column per case',txt:true,it:true,fontColor:'gray'};
+      [CC,CD,CE].forEach((L2,i)=>cells[L2+rSnapHdr]={...blankCell(),value:NAMES[i],txt:true,bold:true,align:'r'});
+      cells[CA+rNum]={...blankCell(),value:'scenario #',txt:true};
+      [CC,CD,CE].forEach((L2,i)=>cells[L2+rNum]={...blankCell(),value:i+1,align:'r'});
+      cells[CA+rSnap]={...blankCell(),value:capYr+' EBITDA',txt:true,bold:true};
+      [CC,CD,CE].forEach(L2=>cells[L2+rSnap]={...blankCell(),fmtStyle:'comma',decimals:0});
+      /* (d) which case the deal team revises, and to what. The revision always RAISES growth, so
+         the stale snapshot reads visibly LOW against the live model rather than ambiguously. */
+      const mutIdx=rnd(1,3), mutCol=[CB,CC,CD][mutIdx-1];
+      const mutG=G[mutIdx-1]+rnd(2,5)/100;
+      /* THE CHECK LINE (MODELING_STANDARDS §6) — seeded LIVE, reads in ONE visible place, and is
+         expected to read zero. It compares the ACTIVE case's snapshot against the live model's
+         locked-year EBITDA, so a snapshot that has gone stale says so on the board. Furniture,
+         never a graded target: checks() reads the model and the snapshots directly, so deleting
+         this line cannot move any ok. */
+      cells[CA+rChk]={...blankCell(),value:'Check — active snapshot less live '+capYr+' EBITDA',txt:true,it:true};
+      cells[CB+rChk]={...blankCell(),
+        formula:'=INDEX('+CC+rSnap+':'+CE+rSnap+',$'+CB+'$'+rSw+')-'+capL+rEb,
+        value:0,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      const colW={}; if(c0>1) colW[c0-1]=22;
+      colW[c0]=214; for(let j=0;j<NY;j++) colW[c0+1+j]=90;
+      this._o={ c0, CA, CB, CC, CD, CE, CF, yc, NY, y0, rSw, rCase, rG, rM, rDrv, rDrvG, rDrvM,
+        rRev, rEb, rNum, rSnap, rChk, rSnapHdr, G, M, rev0, capJ, capL, capYr, mutIdx, mutCol,
+        mutG, mutName:NAMES[mutIdx-1], mutPct:(mutG*100).toFixed(1).replace(/\.0$/,''),
+        swCell: CB+rSw, mutCell: mutCol+rG,
+        drv0: CB+rDrv, drvRng: CB+rDrv+':'+CB+rDrvM,
+        rev1: yc[1]+rRev, revRng: yc[1]+rRev+':'+yc[NY-1]+rRev,
+        eb0:  yc[0]+rEb,  ebRng:  yc[0]+rEb+':'+yc[NY-1]+rEb,
+        cap0: CC+rSnap,   capRng: CC+rSnap+':'+CE+rSnap,
+        chkCell: CB+rChk, names:NAMES };
+      return {ROWS:20, cells, active:{r:rDrv,c:c0+1}, sel:null, colW};
     },
     checks(S){
-      const capL=this._capL, capNum=this._capNum;
-      const base=S.cells['B12']?S.cells['B12'].value:0;
-      const sw=S.cells['B3'] ? Math.round(S.cells['B3'].value) : 1;
-      // read the CURRENT assumptions off the sheet, so the mutation flows through every check
-      const gcell=k=>(S.cells[k]&&typeof S.cells[k].value==='number')?S.cells[k].value:0;
-      const gCur=[gcell('B6'),gcell('C6'),gcell('D6')];
-      const gi=(sw>=1&&sw<=3)?gCur[sw-1]:gCur[0];
-      const names=['Base','Upside','Downside'];
-      // the CHOOSE driver: active case NAME (B8) + active GROWTH (B9)
-      const b8=S.cells['B8'], b9=S.cells['B9'];
-      const isChoose=c=>!!(c&&c.formula&&/CHOOSE\s*\(/i.test(c.formula)&&/\$B\$3/i.test(c.formula.replace(/\s/g,'')));
-      const driverOk = isChoose(b8) && b8.value===names[sw-1] && isChoose(b9) && Math.abs((b9.value||0)-gi)<1e-9;
-      // the model runs off $B$9 (the active-growth driver cell), compounding by year
-      let modelOk=true, prev=base;
-      for(let c=3;c<=6;c++){
-        const L=colLetter(c), P=colLetter(c-1); const cell=S.cells[L+'12'];
-        if(!cell||!cell.formula){ modelOk=false; prev*=(1+gi); continue; }
-        const f=cell.formula.toUpperCase().replace(/\s/g,'');
-        if(!f.includes('$B$9')||!f.includes(P+'12')) modelOk=false;
-        const want=prev*(1+gi);
-        if(Math.abs((cell.value||0)-want)>Math.max(1e-2,Math.abs(want)*1e-5)) modelOk=false;
-        prev=want;
-      }
-      // % growth under revenue (YoY)
-      let growthOk=true;
-      for(let c=3;c<=6;c++){ const L=colLetter(c); const cell=S.cells[L+'13'];
-        if(!cell||!cell.formula){ growthOk=false; continue; }
-        if(Math.abs((cell.value||0)-gi)>Math.max(1e-4,Math.abs(gi)*1e-4)) growthOk=false;
-      }
-      // sticky capture — self-referencing IF; each snapshot must match its case's CURRENT assumption
-      const capExp=capNum-2;   // compounding steps from the seed year to the locked year
-      const cols=['C','D','E']; let captureOk=true; const snapOk=[false,false,false];
-      cols.forEach((L,i)=>{
-        const cell=S.cells[L+'18'];
-        if(!cell||!cell.formula) { captureOk=false; return; }
-        const f=cell.formula.toUpperCase().replace(/\s/g,'');
-        if(!f.includes('IF(')||!f.includes('$B$3')||!f.includes('$'+capL+'$12')||!f.includes(L+'18')) captureOk=false;
-        const want=base*Math.pow(1+gCur[i],capExp);
-        snapOk[i]= Math.abs((cell.value||0)-want)<=Math.max(1e-2,Math.abs(want)*1e-5);
-      });
-      // the revision + refresh: Base growth reset to the revised number, and the Base snapshot refreshed to match
-      const mutApplied = Math.abs(gcell('B6')-this._mutG)<1e-9;
+      const o=this._o, cel=k=>S.cells[k]||{};
+      const near=(v,want)=>typeof v==='number' && Math.abs(v-want)<=Math.max(0.01,Math.abs(want)*1e-6);
+      /* read the assumptions off the SHEET, so the deal team's revision flows through every
+         predicate instead of being compared against a stale build-time constant. */
+      const rd=k=>{ const v=cel(k).value; return typeof v==='number'?v:0; };
+      const gNow=[rd(o.CB+o.rG), rd(o.CC+o.rG), rd(o.CD+o.rG)];
+      const mNow=[rd(o.CB+o.rM), rd(o.CC+o.rM), rd(o.CD+o.rM)];
+      const rev0=rd(o.CB+o.rRev);
+      const sw=Math.round(rd(o.swCell)), si=(sw>=1&&sw<=3)?sw-1:0;
+      /* BEAT 1 — the DRIVER. Graded as what a driver IS: three LIVE cells whose values are the
+         ACTIVE case's name, growth and margin. No formula text is read, so CHOOSE, INDEX, a
+         nested IF and anything else that repositions off the switch all clear (§1.0-R3(p)) — the
+         two untriggerable beats this rework kills were both here. A hardcode cannot survive it,
+         because beat 4 walks the switch through all three cases and a frozen driver produces two
+         wrong snapshots (cascade-native — nothing has to inspect the formula to catch it). */
+      const dName=cel(o.drv0), dG=cel(o.CB+o.rDrvG), dM=cel(o.CB+o.rDrvM);
+      const driverOK = !!dName.formula && String(dName.value)===o.names[si]
+                    && !!dG.formula && near(dG.value, gNow[si])
+                    && !!dM.formula && near(dM.value, mNow[si]);
+      /* BEAT 2 — revenue compounds off the DRIVER growth, every forecast year. Value-graded, so
+         a pointed formula, a typed one, F4-anchored or $-typed all clear; a formula pointed at a
+         CASE column instead of the driver reads right on Base and wrong the moment beat 4 moves
+         the switch, which is where it gets caught. */
+      let revOK=true, prev=rev0;
+      for(let j=1;j<o.NY;j++){ const c=cel(o.yc[j]+o.rRev); const want=prev*(1+gNow[si]);
+        if(!c.formula || !near(c.value, want)) revOK=false; prev=want; }
+      /* BEAT 3 — EBITDA prices off the DRIVER margin, every forecast year (including the seed
+         year, whose revenue was already on the board). */
+      const revLive=j=>j===0?rev0:(typeof cel(o.yc[j]+o.rRev).value==='number'?cel(o.yc[j]+o.rRev).value:NaN);
+      let ebOK=true;
+      for(let j=0;j<o.NY;j++){ const c=cel(o.yc[j]+o.rEb);
+        if(!c.formula || !near(c.value, revLive(j)*mNow[si])) ebOK=false; }
+      /* BEAT 4 — the sticky capture, walked through all three cases. Each snapshot must equal the
+         locked-year EBITDA that case CURRENTLY implies, which is the compounded revenue times
+         that case's margin — computed here from the sheet's own assumptions, so the revision in
+         beat 5 moves the target for the revised case only. The self-reference is the mechanic and
+         it is graded as an END STATE: a cell that HOLDS its value while its case is not live can
+         only do that by referencing itself, and the walk-through proves it (a straight
+         =IF(...,live,0) collapses two of the three columns to zero the moment the switch moves
+         off them, and a hand-typed number cannot follow beat 5's revision without being retyped —
+         which is the slow route, and §1.0(c) says it may clear). */
+      const capOf=i=>rev0*Math.pow(1+gNow[i], o.capJ)*mNow[i];
+      const cols=[o.CC,o.CD,o.CE];
+      const snapOK=cols.map((L2,i)=>near(cel(L2+o.rSnap).value, capOf(i)));
+      const capLive=cols.every(L2=>!!cel(L2+o.rSnap).formula);
+      const walkOK = driverOK && capLive && snapOK[0] && snapOK[1] && snapOK[2];
+      /* BEAT 5 — the revision and the refresh (§1.6 prove-out): the revised case's assumption
+         carries its new number AND its snapshot has caught up with it. The seeded check line is
+         reading zero at exactly this point, in one visible place. */
+      const mutApplied = near(rd(o.mutCell), o.mutG);
+      const refreshOK = mutApplied && snapOK[o.mutIdx-1];
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — the DRIVER BLOCK
+         built from ONE anchored CHOOSE filled down its three rows, instead of three formulas
+         typed out. This is §1.0(d)'s own canonical example ("proper anchoring so one copy-down
+         fills a block"): the switch reference must be locked and the case columns left relative,
+         or the fill walks off the assumption table and the block reads empty. Read off the r424
+         S.fillOps latch — the MECHANIC, never geometry inferred from the end state — so Ctrl+D
+         and the ribbon's Alt H F I D both earn it and three typed formulas earn nothing.
+         MEASURED in the star's own scope, isolated from the rest of the drill: the fill costs 27
+         keys (one formula, two Shift+↓, Ctrl+D) against 72 for the three typed out — 45 keys of
+         legal headroom, 2.67×. It is a SINGLE-MOVE star, so there is no second half for a
+         negative to hide in (the r438 `series` finding). Every core clears without it: the
+         alt-paths negative control walks that route at 244 keys against the demo's 79 with this
+         line DARK. */
+      const cb=o.c0+1;
+      const oneFill=(S.fillOps||[]).some(f=>f.dir==='down' && f.c1<=cb && f.c2>=cb
+        && f.r1<=o.rDrv && f.r2>=o.rDrvM);
+      const starOK = driverOK && oneFill;
+      /* Labels are INSTRUCTIONS (§1.0-R3(n)): the clause after the dash says WHAT or WHERE, never
+         why, and no label carries a formula — that is §1.7 R3, and it is what the old board got
+         backwards. Beats 4 and 5 carry this seed's facts per §1.0-R2(g): which year the snapshot
+         locks onto and which case the deal team revised both move every round. */
       return [
-        {label:'build the DRIVER via CHOOSE — B8 =CHOOSE($B$3,B5,C5,D5) (active case), B9 =CHOOSE($B$3,B6,C6,D6) (active growth)', ok:driverOk},
-        {label:'run the model off the driver — C12 =B12*(1+$B$9), anchored, fill C12:F12', ok:modelOk},
-        {label:'read the % growth under revenue — C13 =C12/B12-1, fill C13:F13', ok:growthOk},
-        {label:'build the sticky capture — C18 =IF($B$3=C$17,$'+capL+'$12,C18), fill C18:E18', ok:captureOk},
-        {label:'flip 1·2·3 to snapshot each case — Upside & Downside anchor and hold', ok:driverOk && captureOk && snapOk[1] && snapOk[2]},
-        {label:'revise Base growth to '+(this._mutG*100).toFixed(1)+'% and refresh Base — the frozen snapshot only updates when you revisit it', ok:mutApplied && snapOk[0]},
+        {label:'Build the active-case driver — all three assumptions off the switch', ok: driverOK},
+        {label:'Grow the revenue line off the driver — every forecast year', ok: revOK},
+        {label:'Build the EBITDA line off the driver margin — every forecast year', ok: ebOK},
+        {label:'Snapshot all three cases into the output table — '+o.capYr+' EBITDA', ok: walkOK},
+        {label:'Revise '+o.mutName+' growth to '+o.mutPct+'% and refresh its snapshot', ok: refreshOK},
+        {label:'Build the driver block in one pass — one formula, filled down', ok: starOK, bonus:true},
       ];
     }
   },
