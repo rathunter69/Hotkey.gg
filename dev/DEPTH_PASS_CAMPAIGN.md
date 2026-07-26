@@ -15,12 +15,12 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 | Formatting | 9 | 9 | ✅ complete (`dress` retired into `housestyle`; `gauntlet` designated capstone) |
 | Formulas I | 9 | 9 | ✅ complete as of r438 (`growth` retired; `cagr` absorbed its board; `bridge` → "Point-mode formulas"; `rollup` last in) |
 | Data & Lookups | 9 | 9 | ✅ complete as of r438 (`grpfold` retired into `unhide`, so the chapter is 9; `drill` and `series` last in — both tested for retirement and both kept) |
-| Formulas II | 0 | 11 | `wirewalk` retired into `tieout` |
+| Formulas II | 2 | 11 | `wirewalk` retired into `tieout`; `wrapfix` + `cases` in at r439 — both tested for retirement, both kept |
 | Models I | 0 | 10 | ⚠️ read §5 below before dispatching |
 | Models II | 0 | 10 | ⚠️ read §5 below before dispatching |
 | Full Builds | 0 | 10 | ⚠️ read §5 below before dispatching |
 
-Catalog **76** (was 81). `menuOrder.length` is the only source of truth; the
+Catalog **75** (was 81; `grpfold` closed it out at r437). `menuOrder.length` is the only source of truth; the
 "N banker-grade drills" marketing copy in index/About/enterprise is asserted against it by
 `e2e-smoke`, so it moves with every retirement.
 
@@ -37,7 +37,9 @@ who solves the drill correctly by a different legal route watches the line stay 
 nothing on the board to fix. It is indistinguishable from a broken drill and it is the single
 most damaging defect we ship.
 
-**Eight found so far**, every one by *walking a route*, never by reading a predicate:
+**Thirteen found so far**, every one by *walking a route*, never by reading a predicate. Five of
+the thirteen landed in one round (r439), which is the largest single-round yield yet and all five
+were the same root cause the first eight were: **grading formula TEXT**:
 
 | # | drill | the check demanded | the route it locked out |
 |---|---|---|---|
@@ -49,6 +51,11 @@ most damaging defect we ship.
 | 6 | `cagr` (draft) | taught Alt H 3 for italic | Alt H 3 is UNDERLINE (1/2/3 = B/I/U) |
 | 7 | `gauntlet` | `bt` on a 1×1 box | Alt H B S on 1×1 stores `ball`, not `bt` |
 | 8 | `rollup` | `$C$3:$C$11`/`$F3`/`G$2` out of formula TEXT | four separate correct SUMIFS (r438) |
+| 9 | `wrapfix` | literal `A3:A7` out of formula TEXT | `$A$3:$A$7` — the anchoring habit `anchor`/`fxconvert` teach (r439) |
+| 10 | `wrapfix` | `MATCH(` out of formula TEXT | a correct VLOOKUP repair, returning the expected value (r439) |
+| 11 | `wrapfix` | `INDEX(`+`MATCH(` inside the wrap | `=IFERROR(VLOOKUP(…),0)`, reading 0 on the board (r439) |
+| 12 | `cases` | `CHOOSE(` out of formula TEXT | `=INDEX(B5:D5,$B$3)` — identical board under every switch position (r439) |
+| 13 | `cases` | `CHOOSE(` out of formula TEXT | the nested-IF driver — which the drill's own aha invites you to try (r439) |
 
 **The rule that follows:** enumerate every Excel route that produces the visible end state,
 then PROBE each one. Reading the predicate cannot find this class — #1 and #2 were both read
@@ -369,6 +376,8 @@ keyed) reads as a scale rather than a hunch:
 | `growth` | 2.4× | **retired** (its canonical route measured *worse* than the slow one) |
 | `unhide` | 1.26× | merged host — and see below |
 | `grpfold` | 1.21× | **retired into `unhide`** |
+| `wrapfix` (shipped) | 1.34× | **kept** — and the number alone would not have said so; see below |
+| `cases` (shipped) | 2.68× | kept |
 
 **The number alone is not the verdict — read what the spread is MADE of.** Every one of
 `unhide`'s 8 keys of spread is chord-vs-ribbon or formatting: `Ctrl+Shift+9` vs `Alt H O U O`,
@@ -377,6 +386,16 @@ to CLEAR and §1.0(d) forbids a formatting ☆, so **the standalone `unhide` boa
 ☆ at all** — the §4.37 page's own proposal ("italicize the memo") was dead on arrival.
 `grpfold`'s only legal ☆ existed solely because that board had three groups. Merging is what
 gives the survivor a star to own: collapse the whole outline in ONE hide-detail pass.
+
+**`wrapfix` (r439) is the clean opposite case, and it is why part 2 must always be run.** Its
+shipped spread was **1.34×** — barely over the line that retired `grpfold`, and on the number
+alone it reads like a retirement candidate. But of its 21 keys of spread, **zero** were
+chord-vs-ribbon (the engine has no ribbon route into formula entry and none into F2, so §1.0(c)'s
+forced-to-clear class is EMPTY on a formula-repair board) and **zero** were formatting (the board
+graded none). The entire spread survived the strip, so a legal ☆ existed and the drill was kept.
+**Read the composition, not the ratio:** a board whose only ops are formula entry has no
+chord-vs-ribbon component by construction, so a LOW spread there means something different from a
+low spread on a formatting board.
 
 So the diagnostic is two-part, and the second part does the work:
 1. Is there spread at all? Below ~1.3× is a warning, not a verdict.
@@ -559,4 +578,32 @@ report the win-state density figure. Extending a board downward is ADDITIVE — 
 beats or grading — but re-sweep par if the new content changes what the player traverses.
 
 Two boards EXCEED the cap and want trimming, reported by `e2e-grid-height` check E rather than
-failed (board work, not a render regression): **`lbobuild` 25 rows · `cases` 21**.
+failed (board work, not a render regression): **`lbobuild` 25 rows · ~~`cases` 21~~ (fixed at
+r439 — check E now notes `lbobuild` alone)**.
+
+**How `cases` came down from 21 to 20, because "delete a row" is the wrong instinct (r439).** The
+row that had to go could not simply be deleted — every row on that board was load-bearing for a
+beat. It came down by REBUILDING around the cap: the '% growth' row was cut as a documented
+redundancy (DEPTH_PASS's own §4.26 note records that `cases` builds `versionup` beat 1 verbatim),
+the driver block grew from two rows to three so one anchored fill had something worth filling, and
+a live check line took the freed slot. Net −1 row, and the board got denser (95%) and better.
+**A board over the cap is a design signal, not a trim job.**
+
+## A ☆ must not degrade the board (r439, `cases`)
+
+Found by looking at the WIN SCREENSHOT, not at a predicate, and it generalises: **a fill copies
+the SOURCE cell's number format.** `cases`'s star is "build the driver block in one pass" — one
+anchored CHOOSE filled down three rows — but the block's head row holds a case NAME (text) and the
+two rows under it hold percentages. Filling down stripped the percent format off both, so the star
+route left the driver reading `0.14` where the slow typed route read `14.0%`.
+
+**A star that makes the board WORSE than the route it beats is not a star**, even when its key
+count is favourable — the ☆-headroom diagnostic measures keys and would never have caught this.
+Fixed at the board, never at the predicate: the head cell ships percent-formatted too, and a TEXT
+value renders raw regardless (probed — the case name still shows "Base"), so the format is
+invisible where it sits and survives the fill where it is needed.
+
+**Standing check for any ☆ that is a fill over a block of MIXED cell types:** look at what the
+fill does to the FORMAT of the cells below the head, not only at their values. And take the win
+screenshot before declaring the star done — doctrine §8.1.5's sendable-page test is what caught
+this one.
