@@ -529,12 +529,40 @@ const ALTS = [
       {sel:'B'+o.r0+':D'+o.r0, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
       {sel:o.defCell, keys:walk},
     ]; }` },
-  { key: 'unhide', name: 'width fixed FIRST, ribbon unhide route, grouped while still hidden', moves: `C => { const o=C._o; return [
-      {sel:'B2', keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]},
-      {sel:'A'+o.h1+':A'+o.h2, keys:[{key:'ArrowRight',alt:true,shift:true}]},
-      {sel:'A'+(o.h1-1)+':A'+(o.h2+1), keys:[{key:'Alt'},L('h'),L('o'),L('u'),L('o')]},
-      {sel:'A'+(o.h1-1), keys:[{key:'Alt'},L('a'),L('h')]},
-    ]; }` },
+  /* r437 (unhide DEPTH PASS, DEPTH_PASS §4.37 — and the §4.35 grpfold merge). The pre-rework
+     entry ("width fixed FIRST, ribbon unhide route, grouped while still hidden") is DELETED:
+     it drove o.h1/o.h2, a single hidden span that the reworked board no longer has.
+     ALT 1 = chord-ROUTE alt AND the ☆ negative control — every op that has a second route
+     takes it (ribbon unhide gap by gap, autofit instead of the width dialog, Alt H 1 for bold),
+     and the outline is folded ONE GROUP AT A TIME so the star must stay dark while all six
+     cores clear (§1.0(c)). MEASURED 41 keys against the demo's 23.
+     ALT 2 = op-ORDER alt — the page is dressed FIRST, the regions are grouped while their
+     detail is STILL HIDDEN, the whole outline is folded in one pass, and only then is the hide
+     lifted and the column widened. Proves the ☆ latch is order-blind (it still fires) and that
+     beat 1 grades S.hiddenRows, not "did you unhide before you grouped". */
+  { key: 'unhide', name: 'RIBBON routes throughout (Alt H O U O gap by gap, autofit not the width dialog, Alt H 1 bold) and the outline folded ONE GROUP AT A TIME — the ☆ is forfeited, all six cores clear', moves: `C => { const o=C._o;
+      const steps=[];
+      o.regions.filter(b=>b.hidden).forEach(b=>{
+        steps.push({sel:'A'+(b.d1-1)+':A'+(b.d2+1), keys:[{key:'Alt'},L('h'),L('o'),L('u'),L('o')]}); });
+      steps.push({sel:'B'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
+      o.regions.forEach(b=>{
+        steps.push({sel:'A'+b.d1+':A'+b.d2, keys:[{key:'ArrowRight',alt:true,shift:true}]});
+        steps.push({sel:'A'+b.d1, keys:[{key:'Alt'},L('a'),L('h')]}); });
+      steps.push({sel:'A'+o.regions[o.openI].rt, keys:[{key:'Alt'},L('a'),L('j')]});
+      steps.push({sel:'A'+o.consolRow+':B'+o.consolRow, keys:[{key:'Alt'},L('h'),D(1)]});
+      steps.push({sel:'A'+o.consolRow+':B'+o.consolRow, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      return steps; }` },
+  { key: 'unhide', name: 'Consolidated dressed FIRST, regions grouped while the detail is STILL HIDDEN, whole outline folded in one pass, hide lifted and column widened LAST (☆ still fires — the latch is order-blind)', moves: `C => { const o=C._o;
+      const steps=[];
+      steps.push({sel:'A'+o.consolRow+':B'+o.consolRow, keys:[{key:'b',ctrl:true}]});
+      steps.push({sel:'A'+o.consolRow+':B'+o.consolRow, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      o.regions.slice().reverse().forEach(b=>{
+        steps.push({sel:'A'+b.d1+':A'+b.d2, keys:[{key:'ArrowRight',alt:true,shift:true}]}); });
+      steps.push({sel:'A1', keys:[{key:'Alt'},L('a'),L('h')]});   // cursor clear of every group — the !hit branch shuts the whole outline in one pass
+      steps.push({sel:'A'+o.regions[0].d1+':A'+o.regions[2].rt, keys:[{key:'9',ctrl:true,shift:true}]});
+      steps.push({sel:'A'+o.regions[o.openI].rt, keys:[{key:'Alt'},L('a'),L('j')]});
+      steps.push({sel:'B'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]});
+      return steps; }` },
   { key: 'rollup', name: 'feet FIRST (recalc closes them), criteria pairs swapped, ribbon fills', moves: `C => [
       {sel:'G5', keys:[...T('=SUM(G3:G4)'),{key:'Enter'}]},
       {sel:'G5:H5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
