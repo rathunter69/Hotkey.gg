@@ -6,3 +6,8 @@ node_modules/
 package.json
 package-lock.json
 .claude/worktrees/
+
+# r439: local gate transcripts. Written into the repo (not /tmp) so a container
+# restart mid-run does not cost the results — two restarts did exactly that during
+# the r439 retirement verification. Never committed.
+.gate-*.log
