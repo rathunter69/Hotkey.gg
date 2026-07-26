@@ -398,15 +398,37 @@ const ALTS = [
       steps.push({sel:'A'+foot+':C'+foot, keys:[{key:'b',ctrl:true}]});
       steps.push({sel:'A'+foot+':C'+foot, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
       return steps; }` },
-  { key: 'recon', name: 'typo fixed FIRST, diff before flags', moves: `C => { const o=C._o; return [
-      {sel:'E'+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]},
-      {sel:'D10', keys:[...T(o.missName),{key:'Enter'}]},
-      {sel:'E10', keys:[...T(String(o.missAmt)),{key:'Enter'}]},
-      {sel:'F4', keys:[...T('=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))'),{key:'Enter'}]},
-      {sel:'F4:F10', keys:[{key:'d',ctrl:true}]},
-      {sel:'C4', keys:[...T('=COUNTIF($D$4:$D$10,A4)'),{key:'Enter'}]},
-      {sel:'C4:C10', keys:[{key:'d',ctrl:true}]},
-    ]; }` },
+  /* r437 (DEPTH_PASS §4.41): both entries rebuilt for the reworked recon board. The single
+     pre-r437 entry ("typo fixed FIRST, diff before flags") was DELETED — it drove hard-coded
+     C4/D10/E10/F4:F10 against a board that now anchors at column A or B with its header row at
+     3 or 4, so it could not survive the randomization rebuild, and it predated the check cell
+     entirely. ALT 1 = chord-ROUTE alt (VLOOKUP instead of INDEX/MATCH, ribbon fills, the legacy
+     Alt E S paste dialog, a typed addition chain for the check — the ☆ still fires on the other
+     paste chord). ALT 2 = op-ORDER alt AND the MEASURED negative control for the ☆. */
+  { key: 'recon', name: 'chord-ROUTE: VLOOKUP instead of INDEX/MATCH, ribbon fills (alt h f i d), the deal carried by the legacy Alt E S dialog paste, check line as a typed addition chain instead of SUM — every core clears and the ☆ still fires', moves: `C => { const o=C._o;
+      const chain='='+o.LD+o.r1; let s=chain;
+      for(let r=o.r1+1;r<=o.rL;r++) s+='+'+o.LD+r;
+      return [
+        {sel:o.LFL+o.r1, keys:[...T('=COUNTIF('+o.cntR+','+o.LTN+o.r1+')'),{key:'Enter'}]},
+        {sel:o.flagRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.srcRng,   keys:[{key:'c',ctrl:true}]},
+        {sel:o.LFN+o.rL, keys:[{key:'Alt'},L('e'),L('s'),{key:'Enter'}]},
+        {sel:o.LD+o.r1,  keys:[...T('='+o.LFA+o.r1+'-VLOOKUP('+o.LFN+o.r1+',$'+o.LTN+'$'+o.r1+':$'+o.LTA+'$'+o.rL+',2,0)'),{key:'Enter'}]},
+        {sel:o.dRng,     keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.LFA+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]},
+        {sel:o.chk,      keys:[...T(s),{key:'Enter'}]},
+      ]; }` },
+  { key: 'recon', name: 'NEGATIVE CONTROL / op-ORDER: check line written FIRST over an empty column, repair before the carry, the missing deal TYPED, then every difference and every presence count hand-written bottom-up with no fill and no paste anywhere — all five cores clear, ☆ dark (584 keys against the demo’s 92)', moves: `C => { const o=C._o;
+      const st=[];
+      st.push({sel:o.chk, keys:[...T('=SUM('+o.LD+o.r1+':'+o.LD+o.rL+')'),{key:'Enter'}]});
+      st.push({sel:o.LFA+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]});
+      st.push({sel:o.LFN+o.rL, keys:[...T(o.missName),{key:'Enter'}]});
+      st.push({sel:o.LFA+o.rL, keys:[...T(String(o.missAmt)),{key:'Enter'}]});
+      for(let r=o.rL;r>=o.r1;r--)
+        st.push({sel:o.LD+r, keys:[...T('='+o.LFA+r+'-INDEX('+o.LTA+o.r1+':'+o.LTA+o.rL+',MATCH('+o.LFN+r+','+o.LTN+o.r1+':'+o.LTN+o.rL+',0))'),{key:'Enter'}]});
+      for(let r=o.rL;r>=o.r1;r--)
+        st.push({sel:o.LFL+r, keys:[...T('=COUNTIF('+o.LFN+o.r1+':'+o.LFN+o.rL+','+o.LTN+r+')'),{key:'Enter'}]});
+      return st; }` },
   { key: 'grpfold', name: 'quarters in REVERSE + one reopened and refolded (alt a j proof)', moves: `C => { const o=C._o;
       const steps=[];
       o.blocks.slice().reverse().forEach(b=>{

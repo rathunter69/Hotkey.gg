@@ -4176,73 +4176,320 @@ const CHALLENGES = {
     }
   },
   recon:{
-    name:'Recon', label:'Two systems, one truth', par:77, parKeys:81,
-    aha:'COUNTIF checks presence, INDEX/MATCH checks size — drive every difference to zero.',
-    prompt:'The trading system shows seven deals; the finance extract shows six — and one amount they both hold doesn’t agree. Reconcile them: flag presence with COUNTIF, pull the book amount with INDEX/MATCH, bring the missing deal across, and drive the difference column to zeros. Nothing ships while the recon shows a break.',
-    req(){ const o=this._o; return '<em>C4</em> → <em>=COUNTIF($D$4:$D$10,A4)</em> · fill C4:C10 · the 0-flag deal → add it at <em>D10:E10</em> · <em>F4</em> → <em>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</em> · fill F4:F10 · fix the broken amount — every Δ reads 0'; },
+    /* r437 H6b-8 — the depth-pass rework of "Two systems, one truth" (DEPTH_PASS §4.41, with
+       the §1.0 / §1.0-R2 / §1.0-R3 law applied on top; §1.0-R3 wins on conflict).
+
+       ── WHAT THIS DRILL IS, AND WHY IT IS NOT `lookup` WEARING A COSTUME ─────────────────
+       The r436 `lookup` pass reviewed this whole family and recorded its finding on the spot
+       (see the lookup header, point (5)): `recon` shares the MECHANIC with `lookup` — a one-way
+       INDEX/MATCH filled down a column — but not the SUBJECT. That claim only survives if the
+       board is built so it is TRUE, so it is built that way here and the separation is listed
+       rather than asserted:
+         · THE SUBJECT IS A TIE-OUT, NOT A READ. `lookup` finishes on an ANSWER (three numbers on
+           a pitch screen). This one finishes on a ZERO — one visible check cell that reads 0 or
+           the recon is not done (dev/MODELING_STANDARDS.md §6: "checks live in one visible place
+           and read zero/TRUE; a check that must be hunted for is not a check"). The last work
+           beat is a prove-out, which §1.6 names as the alternative to a dress close.
+         · THE LOOKUP IS AN INSTRUMENT INSIDE A SUBTRACTION. The graded column is not the pulled
+           number, it is `finance − book`. The pull is one operand. Nothing on the board asks the
+           player to display a looked-up figure.
+         · THE LESSON IS TWO QUESTIONS, NOT ONE FORMULA. Presence (is the deal there at all) and
+           amount (is it the same number) are different questions with different instruments, and
+           the drill's whole shape is that you have to ask both. `lookup` asks one question three
+           times.
+         · NO BEAT NAMES A FUNCTION, AND NO CHECK READS FORMULA TEXT. Every core ok grades the end
+           state (§1.0(c)/§1.0-R3(p)), so the amount side clears off INDEX/MATCH, off a VLOOKUP,
+           off a hand-typed reference and off arithmetic done in the player's head. A drill whose
+           checks cannot tell which formula you used cannot be a drill ABOUT that formula. (The
+           one liveness requirement is on the CHECK CELL, beat 5 — see the deviation note.)
+         · THE ☆ IS NOT AN ANCHORING DISCOVERY. `lookup`'s and `sumif`'s stars are both "lock the
+           ranges so one fill carries the column". Re-using that here would have made three
+           consecutive drills in one family reward the same move — the taste problem
+           DEPTH_PASS_CAMPAIGN §2 flags. This star is a CLIPBOARD move and it is the drill's own
+           subject: the deal finance never booked already exists, one island over, in the system
+           of record — carry it, do not retype it. Retyping a figure that already exists is
+           exactly how the other break on this board got there.
+
+       ── STRUCTURAL DEVIATIONS FROM THE §4.41 PAGE, declared per §0 ───────────────────────
+       The page is one of the thin ones ("Language pass + bonus" — the drill was judged at bar),
+       so most of what follows is the §1.0/R2/R3 law landing on a board written before it.
+       (a) ☆ RE-CUT (binding, and flagged in advance by the `lookup` agent). The page's bonus is
+           "Color the brought-across deal blue — it was typed, not fed". That is a FORMATTING
+           task, which §1.0(d) outlaws outright ("a ☆ rewards a MASTERY MOVE … NEVER a formatting
+           task"). It ALSO cannot survive as a core beat on this board: the trading figures ship
+           blue (the house input convention), so the star route — carrying the deal across with
+           the clipboard — lands the blue for free, and §1.1 forbids a do-nothing line. The page's
+           instinct was right and the ink is wrong: the interesting fact about the brought-across
+           deal is not its colour, it is that a good analyst never retypes it. That is the ☆.
+       (b) FIVE CORE BEATS, NOT FOUR. The shipped drill had three checks; the page's own sketch
+           is presence → missing deal → Δ → zero. Split out the REPAIR (the fat-fingered amount)
+           as its own beat, because it is separate work found by separate means, and add the
+           CHECK CELL as the finish state. §1.1's 4–6 band, chained end to end: the flags find
+           the gap, the gap has to be filled before the Δ column can compute, the Δ column names
+           the fat finger, the repair drives the last row to zero, and the check cell proves it.
+       (c) NO FORMATTING BEAT AT ALL, and that is deliberate. §1.3 sanctions it ("where the lesson
+           isn't formatting, the board ships pre-dressed"), and the two dress beats this board
+           would naturally carry are both already owned: bold + top border on a total line is
+           `sumif`'s closing pair, and DEPTH_PASS_CAMPAIGN §3 says the cheap fix for a family
+           redundancy is to cut the SHARED TAIL, not to merge the drills. So the Recon check line
+           ships pre-dressed (bold, top border — §1.0(f): a total takes the line above it) and
+           every beat here is reconciliation work.
+       (d) BEAT 5 IS THE ONE PLACE A LIVE FORMULA IS REQUIRED, and it is required on purpose.
+           A check cell holding a typed 0 is not a check — it is the defect the drill exists to
+           teach against (MODELING_STANDARDS §6), and §1.7's own verb gloss is explicit that
+           "Total = land a live SUM". So beat 5 asks for THREE things at once: the two systems
+           genuinely agree, every Δ reads zero, and the check cell is a live aggregation of the Δ
+           column that reads zero. What that buys, verified by probe rather than by reading:
+             · typing 0 into the check cell over an unrepaired board — beat DARK (the systems
+               do not agree);
+             · typing 0 into every Δ cell while the break is still there — beats 3 AND 5 DARK
+               (the Δ column grades against the LIVE difference for its row, which is not zero
+               while the finance figure is wrong);
+             · a fully reconciled board with a typed 0 in the check cell — beat DARK (not live).
+           The ROUTE stays free inside that: =SUM over the column, a typed addition chain
+           G5+G6+…, SUMPRODUCT, anything that references the Δ column and recalculates.
+       (e) RANDOMIZATION REBUILT. The shipped board was FIXED at A1/D1 columns with a fixed
+           seven-row list — one axis (which deal is missing) where §1.2 demands two. It now runs
+           four: (a) the artifact anchors at column A or B with its header row at 3 or 4;
+           (b) the deal names are Fisher-Yates drawn from a pool of twelve AND the finance
+           extract is re-shuffled into its OWN order (guarded against landing back in blotter
+           order), so the two lists never sit line-for-line — which is what makes a lookup the
+           instrument rather than a subtraction of neighbours; (c) every amount through rnd();
+           (d) which deal finance never booked, which deal it fat-fingered, and by how much and
+           in which direction.
+       (f) cueCell() IS USED (§1.0-R2(h)/§1.0-R3(q)). Beat 2's destination is an EMPTY row — the
+           canonical case the cue primitive exists for ("a PASTE target — the destination is
+           empty, so an outline reads as 'cell', not 'land here'"). The cue sits in a spare
+           gutter column beside the landing row, is never a graded target, and nothing in checks()
+           reads it.
+       (g) NO helper/assumption cells (§1.0(f)/§1.0-R2(l)): nothing here is scaled or converted,
+           so a yellow input block would be a labelled box with no input in it.
+
+       ── §1.0-R3(p) GRADE THE END STATE. ROUTES ENUMERATED BY WALKING THEM ────────────────
+       The old checks() probed formula TEXT for 'COUNTIF(' and for 'INDEX(' + 'MATCH(' — the exact
+       untriggerable-beat class round 3 named, and the same bug the r436 pass pulled out of
+       `lookup` and `sumif`. A correct VLOOKUP, or a correctly counted column, left the beat dark
+       with nothing on the board to fix. Every core beat now reads the board:
+         · the presence column — VALUE only, against the count COUNTIF would return for the
+           finance list AS IT CURRENTLY STANDS. So a live COUNTIF, a hand-typed COUNTIF per row,
+           SUMPRODUCT, and typed 1s and a 0 all clear identically — and all four go stale the
+           same way when the missing deal lands, which is honest rather than punitive.
+         · the missing deal — VALUE only (name and amount), anywhere in the finance block, so a
+           paste, a values-paste, typing, and a cut-and-retype all clear.
+         · the Δ column — VALUE only, against the LIVE difference for each row, recomputed from
+           the board every grading pass. INDEX/MATCH, VLOOKUP, a typed cell reference and mental
+           arithmetic all clear; typed zeros over a live break do not, because the true
+           difference on that row is not zero.
+         · the repair — VALUE only: every deal on the blotter appears exactly once in the extract
+           at the blotter's own figure.
+         · the check cell — see deviation (d).
+       Figures are all multiples of five, so the 0.5 tolerance is slack and never a rounding trap.
+
+       ── AHA (§1.5) AND FINISH STATE (§1.6) ───────────────────────────────────────────────
+       The aha lands on beat 4: the Δ column has already answered "is it there", every row reads
+       zero except one, and the single row still showing a number IS the finding — the recon did
+       the diagnosis, the player only has to repair it. The last WORK beat is the check cell
+       (beat 5), a prove-out rather than a dress, and the engine's Ctrl+S closer follows it
+       (§1.0(e), saveClose:true).
+
+       ── ENGINE FACTS VERIFIED, NOT ASSUMED ───────────────────────────────────────────────
+       · COUNTIF and MATCH both match on eqLoose — trimmed, case-insensitive string equality —
+         so checks() normalises names the same way instead of comparing raw values.
+       · MATCH throws the #N/A VALUE on a miss (r418), so a Δ formula filled over the still-empty
+         landing row shows #N/A on the board rather than refusing to commit, and SUM over a range
+         holding #N/A propagates it into the check cell. The break is always visible.
+       · doPaste's tiling path stamps S.pasteLog with {kind, dest rect, source rect} for every
+         landed paste (all/values/formulas), which is what the ☆ latches on — the MECHANIC, never
+         geometry inferred from the end state. A cut lands in S.cutMoves instead and does NOT earn
+         the star, which is correct: cutting the deal out of the system of record is vandalism.
+       · fillFrom() copies the source cell's full format, so the Δ column's comma/0dp furniture
+         survives a fill from its first row. */
+    name:'Recon', label:'Two systems, one truth', par:97, parKeys:92, saveClose:true,
+    aha:'a recon asks two questions, not one — is the deal there, and is it the same number; the check cell answers both at once.',
+    prompt:'Month-end, and the two systems disagree. The trading blotter is the system of record; the finance extract is what actually got booked — one deal never made it across at all, and one that did was booked at the wrong figure. Work the recon: mark which blotter deals finance is carrying, bring the missing one over, price every booked line against the blotter, repair the break, and finish with the Recon check reading zero. Nothing goes out while the recon still shows a difference.',
+    req(){ const o=this._o; return '<em>'+o.LFL+o.r1+'</em> <em>=COUNTIF('+o.cntR+','+o.LTN+o.r1+')</em> · fill <em>'+o.flagRng+'</em> · copy <em>'+o.srcRng+'</em> → paste <em>'+o.LFN+o.rL+'</em> · <em>'+o.LD+o.r1+'</em> <em>=' +o.LFA+o.r1+'-INDEX('+o.amtR+',MATCH('+o.LFN+o.r1+','+o.namR+',0))</em> · fill <em>'+o.dRng+'</em> · retype the odd amount · <em>'+o.chk+'</em> <em>=SUM('+o.LD+o.r1+':'+o.LD+o.rL+')</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that clears its beat (§1.0-R3(p)). */
     guide(){ const o=this._o; return [
-      'presence first: C4 · <kbd>=COUNTIF($D$4:$D$10,A4)</kbd> <kbd>↵</kbd> · select C4:C10 · <kbd>ctrl</kbd>+<kbd>d</kbd> — a 0 means finance never booked it',
-      'bring the missing deal across: type its name at D10, its amount from column B at E10',
-      'now the amounts: F4 · <kbd>=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))</kbd> <kbd>↵</kbd> · fill F4:F10 — INDEX/MATCH pulls the book number',
-      'one row shows a difference — retype its amount in column E from the system of record · every Δ must read 0',
+      'the presence column starts at '+o.LFL+o.r1+' · <kbd>=</kbd>COUNTIF(<b>'+o.cntR+'</b>,'+o.LTN+o.r1+') <kbd>↵</kbd> — how many times this blotter name shows up in the finance list · select '+o.flagRng+' and <kbd>ctrl</kbd>+<kbd>d</kbd>. Locking the finance range is what lets one formula walk the whole blotter (<kbd>F4</kbd> stamps the <kbd>$</kbd>, typed dollars land the same string); reading the two lists by eye and typing the counts clears the beat too, and goes stale the moment the missing deal lands',
+      'exactly one line reads 0 — that is the deal finance never booked. Its name and its amount both go on the empty finance row the red marker points at; the blotter row is the only place either of them exists',
+      'the difference column starts at '+o.LD+o.r1+' · <kbd>=</kbd>'+o.LFA+o.r1+'<kbd>-</kbd>INDEX(<b>'+o.amtR+'</b>,MATCH('+o.LFN+o.r1+',<b>'+o.namR+'</b>,0)) <kbd>↵</kbd> — booked less blotter, where MATCH finds the row this deal sits on and INDEX reads the blotter figure off it · fill '+o.dRng+'. The two lists are in different orders, so the blotter figure has to be looked up rather than taken from alongside: <kbd>=</kbd>'+o.LFA+o.r1+'<kbd>-</kbd>VLOOKUP('+o.LFN+o.r1+',<b>$'+o.LTN+'$'+o.r1+':$'+o.LTA+'$'+o.rL+'</b>,2,0) lands the identical column, and so does pointing at each blotter cell by hand',
+      'every difference reads 0 except one — that row is the fat finger. Retype that finance amount from the blotter (<kbd>F2</kbd> to edit in place, or type straight over the cell); the difference on that row goes to 0 as the sheet recalculates',
+      'the check line at '+o.chk+' · <kbd>=</kbd>SUM('+o.LD+o.r1+':'+o.LD+o.rL+') <kbd>↵</kbd> — or <kbd>alt</kbd>+<kbd>=</kbd> from directly under the column, or add the cells up one at a time. It has to be LIVE: a 0 typed into a check cell is not a check, and it is the thing a reviewer looks for first',
+      '☆ the discovery: the missing deal already exists in full, one island over. Select its name and amount on the blotter (<kbd>shift</kbd>+<kbd>→</kbd> takes the pair), <kbd>ctrl</kbd>+<kbd>c</kbd>, land on the empty finance row and one <kbd>ctrl</kbd>+<kbd>v</kbd> puts both cells down (<kbd>alt</kbd> <kbd>h</kbd> <kbd>v</kbd> and the legacy <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> dialog paste the same). Typing the name and the figure clears the beat and costs the keys — and a retyped figure is how the other break on this board got there',
     ]; },
-    targets(){ const o=this._o; return ['C4:C10','D10:E10','F4:F10']; },
+    /* rings: ① the presence column · ② the landing row · ③ the difference column · ④ the finance
+       amounts · ⑤ the check cell · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.flagRng, o.landRng, o.dRng, o.LFA+o.r1+':'+o.LFA+o.rL, o.chk, null]; },
     demo(){ const o=this._o; return [
-      {sel:'C4', keys:[...T('=COUNTIF($D$4:$D$10,A4)'), Kb.enter]},
-      {sel:'C4:C10', keys:[Kb.fillD]},
-      {sel:'D10', keys:[...T(o.missName), Kb.enter]},
-      {sel:'E10', keys:[...T(String(o.missAmt)), Kb.enter]},
-      {sel:'F4', keys:[...T('=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))'), Kb.enter]},
-      {sel:'F4:F10', keys:[Kb.fillD]},
-      {sel:'E'+o.badRow, keys:[...T(String(o.badTrue)), Kb.enter]},
-    ]; },
+      {sel:o.LFL+o.r1, keys:[...T('=COUNTIF('+o.cntR+','+o.LTN+o.r1+')'), Kb.enter]},
+      {sel:o.flagRng,  keys:[Kb.fillD]},
+      {sel:o.srcRng,   keys:[Kb.copy]},                                                  /* the ☆ move — the deal is carried, never retyped; its state latches at the win (§2.2) */
+      {sel:o.LFN+o.rL, keys:[Kb.paste]},
+      {sel:o.LD+o.r1,  keys:[...T('='+o.LFA+o.r1+'-INDEX('+o.amtR+',MATCH('+o.LFN+o.r1+','+o.namR+',0))'), Kb.enter]},
+      {sel:o.dRng,     keys:[Kb.fillD]},
+      {sel:o.LFA+o.badRow, keys:[...T(String(o.badTrue)), Kb.enter]},
+      {sel:o.chk,      keys:[...T('=SUM('+o.LD+o.r1+':'+o.LD+o.rL+')'), Kb.enter]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — deal recon (trading vs finance)',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Deal (system)',txt:true,bold:true};
-      cells['B3']={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
-      cells['C3']={...blankCell(),value:'In fin?',txt:true,bold:true,align:'r'};
-      cells['D3']={...blankCell(),value:'Deal (finance)',txt:true,bold:true};
-      cells['E3']={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
-      cells['F3']={...blankCell(),value:'Δ vs book',txt:true,bold:true,align:'r'};
-      const pool=['Falcon','Atlas','Copper','Summit','Ridge','Delta','Harbor','Juniper'];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const names=pool.slice(0,7);
-      const amts=names.map(()=>rnd(20,90)*10);
-      names.forEach((n,i)=>{
-        cells['A'+(4+i)]={...blankCell(),value:n,txt:true};
-        cells['B'+(4+i)]={...blankCell(),value:amts[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells['C'+(4+i)]={...blankCell(),decimals:0};
+      /* §1.2 randomization — four independent axes: (a) the artifact's anchor column and header
+         row; (b) the deal pool Fisher-Yates drawn from twelve AND the finance extract shuffled
+         into its own order; (c) every figure through rnd(); (d) which-one-is-broken — the deal
+         finance never booked, the deal it fat-fingered, and the size and direction of the error. */
+      const POOL=['Falcon','Atlas','Copper','Summit','Ridge','Delta','Harbor','Juniper',
+                  'Cobalt','Lantern','Meridian','Northstar'];
+      const shuf=(pool)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b; };
+      const c0=rnd(1,2);                    // the page's left edge — column A or B
+      const hr=rnd(3,4);                    // header row (the block sub-labels sit one above it)
+      const N=rnd(7,9);                     // deals on the blotter
+      const cTN=c0, cTA=c0+1, cFL=c0+2, cFN=c0+4, cFA=c0+5, cD=c0+6, cCue=c0+7;   // one empty column of moat between the islands
+      const LTN=colLetter(cTN), LTA=colLetter(cTA), LFL=colLetter(cFL),
+            LFN=colLetter(cFN), LFA=colLetter(cFA), LD=colLetter(cD);
+      const r1=hr+1, rL=hr+N, rC=rL+1;
+      /* KEY-COUNT INVARIANCE, and why the ranges above are chosen the way they are: r1 is always
+         one digit (4 or 5), rL is always two (10–13), and every amount is four digits, so the
+         demo types the SAME NUMBER OF CHARACTERS on every seed. par is therefore a flat number
+         rather than a geometry lottery — the same property lookup and sumif were built for. */
+      const names=shuf(POOL).slice(0,N);
+      const amts=names.map(()=>rnd(200,980)*5);          // 1,000–4,900 — always four digits
+      const mi=rnd(0,N-1);                               // the deal finance never booked
+      const missName=names[mi], missAmt=amts[mi], mRow=r1+mi;
+      /* the extract carries the OTHER deals in its own order. A booking system does not export in
+         the blotter's sequence, and the drill depends on it: line-for-line lists would make the
+         difference column a subtraction of neighbours and there would be nothing to look up. */
+      let fin=names.map((n,i)=>({n:n,a:amts[i],i:i})).filter((_,i)=>i!==mi);
+      let guard=0;
+      while(guard++<40 && fin.every((f,k)=>k===0 || fin[k-1].i<f.i)) fin=shuf(fin);
+      if(fin.every((f,k)=>k===0 || fin[k-1].i<f.i)){ const t=fin[0]; fin[0]=fin[1]; fin[1]=t; }
+      const bi=rnd(0,N-2);                               // the amount finance fat-fingered
+      const badTrue=fin[bi].a, badName=fin[bi].n;
+      const step=rnd(4,36)*25;                           // 100–900 out, never a rounding-scale error
+      const badWrong=(badTrue-step<1000) ? badTrue+step : (rnd(0,1) ? badTrue+step : badTrue-step);
+      cells[LTN+'1']={...blankCell(),value:codename()+' — deal recon, month-end ($000s)',txt:true,bold:true};
+      cells[LTN+(hr-1)]={...blankCell(),value:'Trading blotter — system of record',txt:true,it:true,fontColor:'gray'};
+      cells[LFN+(hr-1)]={...blankCell(),value:'Finance extract — as booked',txt:true,it:true,fontColor:'gray'};
+      cells[LTN+hr]={...blankCell(),value:'Deal',txt:true,bold:true};
+      cells[LTA+hr]={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
+      cells[LFL+hr]={...blankCell(),value:'In finance',txt:true,bold:true,align:'r'};
+      cells[LFN+hr]={...blankCell(),value:'Deal',txt:true,bold:true};
+      cells[LFA+hr]={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
+      cells[LD+hr]={...blankCell(),value:'Δ vs system',txt:true,bold:true,align:'r'};
+      names.forEach((n,i)=>{ const r=r1+i;
+        cells[LTN+r]={...blankCell(),value:n,txt:true};
+        cells[LTA+r]={...blankCell(),value:amts[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};   // blue = typed data, the house convention
+        cells[LFL+r]={...blankCell(),decimals:0};
       });
-      const mi=rnd(0,6);                                    // the deal finance never booked
-      const present=names.map((n,i)=>({n:n,a:amts[i]})).filter((_,i)=>i!==mi);
-      for(let k=present.length-1;k>0;k--){ const j=rnd(0,k); [present[k],present[j]]=[present[j],present[k]]; }
-      const bi=rnd(0,5);                                    // the amount finance fat-fingered
-      present.forEach((d,i)=>{ const r=4+i;
-        cells['D'+r]={...blankCell(),value:d.n,txt:true};
-        const wrong=(i===bi);
-        cells['E'+r]={...blankCell(),value:wrong? d.a+(rnd(0,1)?1:-1)*rnd(1,9)*10 : d.a,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells['F'+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+      fin.forEach((d,k)=>{ const r=r1+k;
+        cells[LFN+r]={...blankCell(),value:d.n,txt:true};
+        cells[LFA+r]={...blankCell(),value:(k===bi ? badWrong : d.a),fmtStyle:'comma',decimals:0,fontColor:'blue'};
       });
-      cells['F10']={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._names=names; this._amts=amts;
-      this._o={ missName:names[mi], missAmt:amts[mi], badRow:4+bi, badTrue:present[bi].a };
-      return {ROWS:12, cells, active:{r:4,c:3}, sel:null, colW:{1:112,4:112}};
+      for(let r=r1;r<=rL;r++) cells[LD+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* §1.0-R2(h)/§1.0-R3(q): the landing row is EMPTY, which is the case a green outline cannot
+         express. The cue is board furniture in a spare gutter column — never a graded target, and
+         checks() never reads it. */
+      cells[colLetter(cCue)+rL]=cueCell('◀ the missing deal belongs on this row');
+      /* the recon check — one visible place, pre-dressed (§1.0(f): a total takes the line above
+         it). The dress is furniture, not a beat: see deviation (c). */
+      cells[LFN+rC]={...blankCell(),value:'Recon check',txt:true,bold:true};
+      cells[LD+rC]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      cells[LTN+(rL+3)]={...blankCell(),value:'Source: blotter cut at the close; extract pulled the following morning',txt:true,it:true,fontColor:'gray'};
+      this._o={ c0:c0, hr:hr, N:N, r1:r1, rL:rL, rC:rC,
+        cTN:cTN, cTA:cTA, cFL:cFL, cFN:cFN, cFA:cFA, cD:cD,
+        LTN:LTN, LTA:LTA, LFL:LFL, LFN:LFN, LFA:LFA, LD:LD,
+        missName:missName, missAmt:missAmt, mRow:mRow,
+        badName:badName, badTrue:badTrue, badWrong:badWrong, badRow:r1+bi,
+        flagRng:LFL+r1+':'+LFL+rL,
+        dRng:LD+r1+':'+LD+rL,
+        landRng:LFN+rL+':'+LFA+rL,
+        srcRng:LTN+mRow+':'+LTA+mRow,
+        chk:LD+rC,
+        cntR:'$'+LFN+'$'+r1+':$'+LFN+'$'+rL,
+        amtR:'$'+LTA+'$'+r1+':$'+LTA+'$'+rL,
+        namR:'$'+LTN+'$'+r1+':$'+LTN+'$'+rL };
+      const colW={}; colW[cTN]=126; colW[cTA]=92; colW[cFL]=104; colW[c0+3]=30;
+      colW[cFN]=126; colW[cFA]=92; colW[cD]=112; colW[cCue]=34;
+      return {ROWS:rL+3, cells, active:{r:r1,c:cFL}, sel:null, colW:colW};
     },
     checks(S){
       const o=this._o;
-      const f=k=>{ const c=S.cells[k]; return (c&&c.formula)?String(c.formula).toUpperCase():''; };
-      const v=k=>{ const c=S.cells[k]; return c?c.value:undefined; };
-      const flagsOk=[0,1,2,3,4,5,6].every(i=>{ const k='C'+(4+i);
-        return f(k).includes('COUNTIF(') && v(k)===1; });
-      let missOk=false;
-      for(let r=4;r<=10;r++){ if(v('D'+r)===o.missName && v('E'+r)===o.missAmt) missOk=true; }
-      const diffOk=[0,1,2,3,4,5,6].every(i=>{ const k='F'+(4+i);
-        return f(k).includes('INDEX(') && f(k).includes('MATCH(') && typeof v(k)==='number' && Math.abs(v(k))<0.5; });
+      const cel=k=>S.cells[k]||{};
+      /* names are compared the way the ENGINE compares them (eqLoose: trimmed, case-folded), so a
+         retyped name in a different case reconciles here exactly as COUNTIF and MATCH see it. */
+      const nrm=v=>(v==null||v==='')?null:String(v).trim().toLowerCase();
+      const num=k=>{ const v=cel(k).value; return typeof v==='number' ? v : null; };
+      const near=(a,b)=>typeof a==='number' && typeof b==='number' && Math.abs(a-b)<=0.5;
+      /* BOTH SYSTEMS ARE READ LIVE OFF THE BOARD — nothing below compares against a stored answer
+         except the identity of the deal that was missing. That is what makes every beat an
+         END-STATE test (§1.0(c)/§1.0-R3(p)) instead of a route probe. */
+      const book=[];
+      for(let r=o.r1;r<=o.rL;r++){ const n=nrm(cel(o.LTN+r).value); if(n!==null) book.push({r:r,n:n,a:num(o.LTA+r)}); }
+      const fin=[];
+      for(let r=o.r1;r<=o.rL;r++){ const n=nrm(cel(o.LFN+r).value); if(n!==null) fin.push({r:r,n:n,a:num(o.LFA+r)}); }
+      const bookOf=n=>book.find(b=>b.n===n);
+      /* beat 1 — the presence column, graded against the count COUNTIF would return for the
+         finance list AS IT STANDS. Live formula, hand-typed formulas and typed digits all clear. */
+      let presOk=book.length===o.N;
+      if(presOk) for(let r=o.r1;r<=o.rL;r++){
+        const n=nrm(cel(o.LTN+r).value);
+        const want=fin.filter(f=>f.n===n).length;
+        const got=num(o.LFL+r);
+        if(got===null || Math.abs(got-want)>1e-9){ presOk=false; break; }
+      }
+      /* beat 2 — the deal finance never booked is in the extract, at the blotter's own figure */
+      const mn=nrm(o.missName);
+      const landed=fin.find(f=>f.n===mn);
+      const missOk=!!landed && near(landed.a, o.missAmt);
+      /* beat 3 — every difference equals the LIVE difference for its row. This is the beat that
+         makes typed zeros useless: while the fat finger is still on the board the true difference
+         on that row is a few hundred, so a zero there is simply wrong. */
+      let deltaOk=fin.length===o.N;
+      if(deltaOk) for(const f of fin){
+        const b=bookOf(f.n);
+        if(!b || f.a===null || b.a===null || !near(num(o.LD+f.r), f.a-b.a)){ deltaOk=false; break; }
+      }
+      /* beat 4 — the two systems agree: every blotter deal booked exactly once, at its own figure */
+      let tiesOk=fin.length===o.N && book.length===o.N;
+      if(tiesOk) for(const b of book){
+        const hits=fin.filter(f=>f.n===b.n);
+        if(hits.length!==1 || !near(hits[0].a, b.a)){ tiesOk=false; break; }
+      }
+      /* beat 5 — THE CHECK. One visible place, reading zero, and LIVE (deviation (d) above and
+         dev/MODELING_STANDARDS.md §6). "Live" means a formula that references the difference
+         column and therefore recalculates — =SUM over it, a typed addition chain, SUMPRODUCT,
+         anything. A typed 0 is not a check and does not clear this beat; neither does a live
+         formula over a board whose two systems still disagree. */
+      const chk=cel(o.chk);
+      const reads=new RegExp('\\$?'+o.LD+'\\$?[0-9]').test(String(chk.formula||'').toUpperCase());
+      const zeros=fin.length===o.N && fin.every(f=>near(num(o.LD+f.r), 0));
+      const tieOut=tiesOk && zeros && !!chk.formula && reads && near(chk.value, 0);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the deal finance
+         never booked already exists in the system of record — carry it, do not retype it. Read
+         off the r425 S.pasteLog latch (the MECHANIC, never geometry inferred from the end state),
+         so Ctrl+V, Alt H V and the legacy Alt E S dialog all earn it, and typing the name and the
+         figure earns nothing. The paste must land BOTH cells in one pass, and it must come FROM
+         the blotter row — pasting the deal from anywhere else is not carrying it across. missOk
+         rides in the predicate because a paste that lands the wrong pair is not the move. Typing
+         both cells clears beat 2 (the negative control in dev/e2e-alt-paths.js measures that whole
+         route at 584 keys against the demo's 92) and forfeits only the star. */
+      const carried=!!landed && (S.pasteLog||[]).some(p=>
+        p.kind!=='formats' && p.kind!=='colwidths' &&
+        p.r0<=landed.r && p.r0+p.h-1>=landed.r &&
+        p.c0<=o.cFN && p.c0+p.w-1>=o.cFA &&
+        p.sr<=o.mRow && p.sr+p.sh-1>=o.mRow &&
+        p.sc<=o.cTN && p.sc+p.sw-1>=o.cTA);
+      /* DEPTH_PASS §4.41's shape with the deviations declared above. Labels are INSTRUCTIONS
+         (§1.0-R3(n)): the clause after the dash says WHAT or WHERE, never why. Beat 1 carries the
+         §1.0-R2(g) adaptive fact — the blotter's length moves every seed, so the line reports it
+         rather than making the player count the list. */
+      const WORD=['','one','two','three','four','five','six','seven','eight','nine'][o.N]||String(o.N);
       return [
-        {label:'flag presence down C4:C10 — live COUNTIF against the finance list, no zeros left', ok: flagsOk},
-        {label:'bring the missing deal into finance — name AND the book amount (D10:E10)', ok: missOk},
-        {label:'drive every Δ to 0 (F4:F10) — INDEX/MATCH the other system, never retype', ok: diffOk},
+        {label:'Build the In finance column for all '+WORD+' blotter deals', ok: presOk},
+        {label:'Add the missing deal to the finance extract — name and amount', ok: missOk},
+        {label:'Build the Δ vs system column for every line in the extract', ok: deltaOk},
+        {label:'Fix the finance amount that disagrees with the blotter', ok: tiesOk},
+        {label:'Total the Δ vs system column in the Recon check line — it reads 0', ok: tieOut},
+        {label:'Copy the missing deal across — name and amount in one paste', ok: missOk && carried, bonus:true},
       ];
     }
   },
