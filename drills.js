@@ -97,7 +97,7 @@ window.HOTKEY_DRILLS = {
 
     // Data
     sort:       { name:'Sort',     label:'Sort the table',tab:'Sort',       desc:'Sort the table, total it, bold the total' },
-    scrub:      { name:'Scrub',    label:'Clean the export',     tab:'Scrub',      desc:'A system export with a duplicate header, a page-break row, and a stale SUBTOTAL \u2014 delete all three, sort, re-total' },
+    scrub:      { name:'Scrub',    label:'Clean the export',     tab:'Scrub',      desc:'A deal blotter straight out of the system \u2014 the header printed twice, a page break landed mid-list, a page-one SUBTOTAL sits inside the deals and the feed sent one deal twice. Take the four rows out, sort what is left, total it' },   /* r436 (DEPTH_PASS \u00a74.34): desc rewritten for the reworked board \u2014 the duplicate RECORD and the empty Total line are new, and "re-total" described a total that used to ship populated. name/label/tab unchanged: the key and its picker identity are immutable (PBs, boards, the generated drills/scrub.html SEO page) */
     recon:      { name:'Recon',    label:'Two systems, one truth',tab:'Recon',     desc:'COUNTIF for presence, INDEX/MATCH for amounts \u2014 drive \u0394 to zero' },
     grpfold:    { name:'Group',    label:'Fold the detail away', tab:'Group',      desc:'Group the months \u2014 never hide, always group' },
     filterpass: { name:'Filter',   label:'Work the filtered view', tab:'Filter',    desc:'Turn on the filter, open the picker \u2014 the answer reads itself' },

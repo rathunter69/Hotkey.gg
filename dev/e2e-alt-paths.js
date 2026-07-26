@@ -342,12 +342,32 @@ const ALTS = [
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
       {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
     ]` },
-  { key: 'scrub', name: 'junk deleted TOP-DOWN (shift math) + typed SUM', moves: `C => { const o=C._o;
-      const rows=o.junkRows.slice().sort((a,b)=>a-b);
-      const steps=rows.map((r,i)=>({sel:'A'+(r-i), keys:[{key:'Alt'},L('h'),L('d'),L('r')]}));
-      steps.push({sel:o.range, keys:[{key:'Alt'},L('a'),L('s'),L('d')]});
-      steps.push({sel:o.foot, keys:[...T('=SUM(B'+(o.hr+1)+':B'+(o.hr+7)+')'),{key:'Enter'}]});
-      steps.push({sel:o.foot, keys:[{key:'b',ctrl:true}]});
+  /* r436 (scrub ROUND 3, DEPTH_PASS §4.34): both entries rebuilt for the reworked drill — the
+     old single entry drove the RETIRED board (o.range / o.foot no longer exist, the duplicate
+     record and the dress beat did not exist, and it never touched the ☆) and was DELETED, not
+     patched. ALT 1 is the chord-ROUTE alt and the drill's NEGATIVE CONTROL: every structure op
+     on the Home ribbon, the sort through Excel's expand-the-selection warning card, the total
+     TYPED — all five cores clear and the ☆ must stay dark (41 keys against the demo's 20).
+     ALT 2 is the op-ORDER alt and the third delete route: the junk rows and the repeat are
+     CLEARED, not deleted, then one sort re-forms the block, and the total comes off the Home
+     ribbon's autosum (Alt H U S) instead of Alt+= — which must earn the same ☆. */
+  { key: 'scrub', name: 'NEGATIVE CONTROL — ribbon deletes (Alt H D R) from single cells, sort via the expand-selection warning card, SUM typed by hand, bold via Alt H 1 (every core clears, the ☆ must stay dark)', moves: `C => { const o=C._o;
+      const steps=[]; const top=o.hr+1;
+      o.junkRows.slice().sort((a,b)=>b-a).forEach(r=>{ steps.push({sel:'A'+r, keys:[{key:'Alt'},L('h'),L('d'),L('r')]}); });
+      steps.push({sel:'C'+top+':C'+(top+7), keys:[{key:'Alt'},L('a'),L('s'),L('d'),L('e')]});   // single-column sort → Excel's warning card → E expands to the block
+      steps.push({sel:'A'+(top+o.dupRank+1), keys:[{key:'Alt'},L('h'),L('d'),L('r')]});
+      steps.push({sel:'C'+(top+7), keys:[...T('=SUM(C'+top+':C'+(top+6)+')'),{key:'Enter'}]});  // typed, never autosum — this is what the ☆ is measured against
+      steps.push({sel:'A'+(top+7)+':C'+(top+7), keys:[{key:'Alt'},L('h'),D(1)]});
+      steps.push({sel:'A'+(top+7)+':C'+(top+7), keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      return steps; }` },
+  { key: 'scrub', name: 'junk and the repeat CLEARED not deleted, ONE sort re-forms the block, total off the ribbon autosum (alt h u s)', moves: `C => { const o=C._o;
+      const steps=[]; const top=o.hr+1, last=o.hr+11, foot=o.footRow;
+      o.junkRows.forEach(r=>{ steps.push({sel:'A'+r+':C'+r, keys:[{key:'Delete'}]}); });
+      steps.push({sel:'A'+o.dupRows[1]+':C'+o.dupRows[1], keys:[{key:'Delete'}]});
+      steps.push({sel:'A'+top+':C'+last, keys:[{key:'Alt'},L('a'),L('s'),L('d')]});             // one sort: the four emptied rows part company with the deals
+      steps.push({sel:'C'+top+':C'+foot, keys:[{key:'Alt'},L('h'),L('u'),L('s')]});             // the ribbon's autosum — same ☆ as alt+=
+      steps.push({sel:'A'+foot+':C'+foot, keys:[{key:'b',ctrl:true}]});
+      steps.push({sel:'A'+foot+':C'+foot, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
       return steps; }` },
   { key: 'recon', name: 'typo fixed FIRST, diff before flags', moves: `C => { const o=C._o; return [
       {sel:'E'+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]},

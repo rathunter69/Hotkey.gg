@@ -7061,3 +7061,112 @@ untriggerable-beat class outright — and the board had no efficiency headroom a
   saveClose; C11 aphorisms clean; C12 ≥2 alts across 25 reworked drills) · demo-replay ALL GREEN ·
   alt-paths ALL PASS · par-sweep lookup FLAGGED 0 (drift 0%) · fit-sweep ALL CLEAN (72) ·
   depth-mechanics 155/155 · smoke 7 pages + HOTKEY_PARS parity + de-hint clean.
+## r436 — H6b: scrub depth pass — "Clean the export" (DEPTH_PASS §4.34 + §1.0/-R2/-R3)
+- **SPEC NOTE.** The build order cited "§4.32"; §4.32 is `qclose`, the new c3 capstone. §4.34 is the
+  scrub page and is what this builds to. §4.34 is a two-line page ("Now: … Near bar. Language pass +
+  bonus: ☆ Comma-format the size column") written before §1.0 existed, so most of it is superseded by
+  the binding law rather than by judgement — recorded below, item by item.
+- **THE DISTINCTNESS QUESTION, ANSWERED FIRST.** scrub deletes rows; so does `rowops`. scrub asks the
+  player to find what is wrong; so does `editfix`. The verdict is KEEP, and the line is this:
+  · `rowops` is structural surgery on a MODEL that is missing pieces — insert a row, insert a column,
+    paste staged blocks in, watch a new row arrive wearing the dress of the row above it. Its sites
+    are marked in red; nothing is hunted, nothing is judged, and its ☆ is the structure-chord family.
+  · `editfix` is the REPAIR pass — a label, a reference and a range are wrong and are corrected IN
+    PLACE (F2 surgery), with undo as the net when the sweep note turns out to be wrong. Nothing is
+    removed; everything is fixed; its ☆ is the undo/redo stack.
+  · `scrub` is the INTAKE pass on data nobody wrote by hand. Nothing is repaired and nothing is built:
+    rows that were never data — a header the printer repeated, a page break, a SUBTOTAL that was true
+    for page one, a record the feed sent twice — come OUT, and only then can the list be ordered and
+    summed. The lesson is RANGE HYGIENE: what you total may contain no pre-totalled row and no record
+    twice. Neither other drill contains a sort, a duplicate record, or a total whose correctness
+    depends on what was removed first.
+  The mechanical overlap with rowops is ONE op — the row delete — used four times here against once
+  there, in a different chapter, on data instead of a model: spaced practice, not a duplicate drill.
+  The overlap with editfix is narrower than it looks, because scrub deliberately does NOT hunt: the
+  checklist NAMES all four offending rows (§1.0-R3(n) — instructions, not lessons), so the work is
+  removal and production, never diagnosis. §2.4 settles the catalog question independently: the c4
+  capstone (`cleanroom`, "dirty export → sendable table") chains junk-row delete + sort as its first
+  two legs, and scrub is the drill that owns them. **No merge recommended.**
+- **THE EFFICIENCY DIAGNOSTIC (no headroom → no legal ☆ → a motif, not a lesson).** Applied before
+  anything was written, because it is what retired `growth`. The board has real headroom, measured
+  end to end on the reworked drill: the chord route wins in **20 keys**, the all-ribbon/all-typed
+  route in **41**. The headroom is genuine and spread across three ops (row deletes 8 vs 16, the
+  selection, the total 2 vs 13), so a legal ☆ exists — several, in fact.
+- **☆ RE-CUT (§1.0(d) + §1.0-R2(i)).** The page's bonus — "Comma-format the size column — the export
+  arrived raw" — is dead twice over: a ☆ can never be a formatting task (§1.0(d)), and comma format
+  is the exact op Wolf named as over-anchored and rare (§1.0-R3(o)). Replaced by the hidden efficiency
+  this board actually contains: **the total lands from AUTOSUM instead of a typed formula.** It was
+  chosen over the two obvious alternatives on distinctness grounds — the structure-chord family is
+  rowops' star, and the block-grab-before-copy is blocksel's; no drill in the catalog stars autosum,
+  and Alt+= is "a previously taught hotkey that saves time" (Wolf's own framing) by chapter 4.
+- **NEGATIVE CONTROL (the skippability proof), 3 seeds each, all flat:** demo/star route **20 keys**,
+  5/5 cores, ☆ EARNED. Slow route — ribbon deletes (Alt H D R) from single cells, the sort through
+  Excel's expand-the-selection warning card, the SUM TYPED, bold via Alt H 1 — **41 keys, 5/5 cores,
+  ☆ DARK** (registered as ALT 1). The star's own marginal price is honest and reported: typed
+  `=SUM(C5:C11)`↵ is 13 keys where the autosum press is 2. A third route, the total as an ADDITION
+  CHAIN (`=C5+C6+…`), clears 5/5 at 40 keys with the star dark — §1.0(c) freedom on beat 4, proven.
+- **ROUTE ENUMERATION (§1.0-R3(p)) — WALKED, NOT REASONED. This is a deletion drill, so the question
+  "what does the beat mean by delete" was answered by probing:**
+  · Shift+Space → Ctrl+− (chord, full-row guarded) — clears, 20 keys.
+  · Alt H D R from a single cell (the ribbon's partial-selection path) — clears, 41 keys.
+  · Select the row and press Delete (CLEAR CONTENTS, no row removed) — **clears, 18 keys**, and this
+    is the interesting one. A cleared row holds no value, so the descending sort carries it clear of
+    the deals (sortRange puts nulls last ascending; the desc reverse parks the emptied rows ABOVE the
+    block) and the seven deals come out in one unbroken run exactly as a row delete leaves them.
+    Accepted deliberately and registered as ALT 2. Every predicate is a content scan, which is what
+    makes all three routes and any op order land in the same graded state.
+  · Both AUTOSUM routes light the ☆: the range form (select the column through the empty Total cell,
+    one press commits) and the single-cell proposal (Alt+= then ↵, which lands through commitEdit).
+  · Correctly DARK, and reported as decisions rather than bugs: an OUTSIDE box on the Total line
+    (Alt H B S) — it hangs a rule UNDER the total, the one thing §1.0(f) forbids, so the beat stays
+    dark exactly as rowops' and foot's do; and clearing the junk without ever sorting, which leaves
+    the deals in pieces and is simply the beat the player still owes.
+  · **Engine fact confirmed by probing:** the Format Cells dialog (Ctrl+1 / Alt O E) has NO border
+    options, so Alt H B P is the only route to a top-only rule. Nothing to widen.
+- **ENGINE (one additive latch).** `S.autoSumN` — stamped in `autoSum()`'s two direct-commit branches
+  and in `commitEdit()` when an Alt+= / Alt H U S proposal actually commits. Same family as
+  S.fillOps / S.grabLog / S.fmtOps / S.multiEnter: the MECHANIC is recorded because no end-state read
+  can tell a typed `=SUM` from an autosum. A proposal the player escapes never reaches the stamp.
+  Telemetry only — no core check reads it.
+- **THE BOARD.** Three columns (Deal · Sector · Size ($mm)) against the old drill's two, 15 of 16 rows
+  carrying content at build and 11 of 16 at the win. Row integrity is bound across all three columns
+  (the r419 `_byName` pattern widened), so a sizes-only sort can never pass. The Total line prints
+  with its label and an EMPTY figure — which is what the export did, and what motivates beat 4.
+  Randomization, four axes (§1.2): header row jitters 3/4 · name and sector pools Fisher-Yates ·
+  seven distinct sizes through rnd() · which deal the feed duplicated, where the copy sat (never
+  beside its twin — the sort is what brings them together) and which three of eleven slots carry the
+  printer artifacts. The SUBTOTAL's figure is the running sum of the deals ABOVE it, so it is true
+  for page one and poison for the column, which is the whole point of the row.
+- **BEATS (5 core + the engine save closer + one ☆), chained (§1.1):** the three artifacts out (one
+  aggregate beat with a live 0/3 counter — the §2.3 counter-label pattern WITHOUT meta.errorCount,
+  because §2.3's list is audit/repair drills and scrub is neither) → sort largest-first, rows whole →
+  delete the repeat the sort just parked beside its twin → total the size column → bold the Total
+  line and rule it on TOP (§1.0(f); §1.0(a) format-as-you-go, straight after the beat that created
+  it; both ops sit at the top of Wolf's §1.0-R3(o) frequency list). Aha lands on beat 4 (§1.5): the
+  SUM only reads right once the SUBTOTAL and the second copy are gone. Finish-state beat is 5, save
+  closes (§1.6). No cueCell() — every target is an existing labeled row, so the green ring has
+  something to sit on (§1.0-R3(q)).
+- **PAGE ITEMS SUPERSEDED, named per §0:** the ☆ (above); "Random/Aha/Finish: as-is" — all three were
+  rebuilt, the old aha named its chords ("delete junk rows (Ctrl+−), sort (Alt A S), re-total") which
+  §1.7 R7 bans and the drill had no finish-state beat at all; "verify guide 3v5 realignment" — the
+  old drill really did ship 3 guide lines against 5 checks, now 6/6/6; the optional COUNTA suggestion
+  was not taken (a content scan is leaner and route-free).
+- **META:** drills.js desc described a board that no longer exists ("delete all three, sort,
+  re-total" — the total used to ship populated and there was no duplicate record); rewritten.
+  name/label/tab left alone: the key and its picker identity are immutable and the generated
+  drills/scrub.html carries them.
+- **PAR:** re-swept from scratch — 5-seed median **20 keys** including the engine-appended Ctrl+S,
+  with zero variance (the randomization moves the board, never the keystroke count). parKeys 19→20,
+  par held at 21 (1.05 s/key, the house band), already mirrored in HOTKEY_PARS. Clocks derive (§1.4):
+  pass 31.5s · pro 24.2s · legendary 21s.
+- **ALT-PATH ENTRY DELETED (integrators: do not resurrect).** The single shipped `scrub` entry drove
+  the RETIRED board — it reads `o.range` and `o.foot`, which no longer exist, and it never touched the
+  ☆ or the dress beat. It is DELETED, not patched, and replaced by the §1.8 pair (op ORDER + chord
+  ROUTE). Per the r435 integration note: for the drill an agent reworked, its side of
+  dev/e2e-alt-paths.js is authoritative for additions AND deletions.
+- **GATE (all green, own port 8843):** static invariants clean (C9 scrub tri-length 6 + one ☆ +
+  saveClose; C11 aphorisms clean; C12 ≥2 alts across 25 reworked drills) · demo-replay ALL GREEN ·
+  alt-paths ALL 99 PASS · par-sweep FLAGGED 0 (drift 0%) · fit-sweep ALL CLEAN (72) ·
+  depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · guided gate scrub railed,
+  contained, solvable · cache-bump guard clean (no ?v= bump: drills.js content changed, its version
+  is the integrator's call at batch time).

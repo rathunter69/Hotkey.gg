@@ -3906,76 +3906,272 @@ const CHALLENGES = {
     }
   },
   scrub:{
-    name:'Scrub', label:'Clean the export', par:21, parKeys:19,
-    aha:'Exports come dirty — delete junk rows (Ctrl+−), sort (Alt A S), re-total; the data is yours.',
-    prompt:'The deal list exported dirty: a duplicated header row, a "--- PAGE 2 ---" break, and a stale SUBTOTAL row that will double-count the moment anyone totals the column. Delete all three junk rows, sort the real data largest-first, and re-total it. Every export needs this pass.',
-    req(){ const o=this._o; return 'the junk = the second <em>Deal</em> header, <em>--- PAGE 2 ---</em>, and <em>SUBTOTAL</em> — delete each (<em>alt h d r</em>) · select <em>'+o.range+'</em> · <em>alt a s d</em> · foot at <em>'+o.foot+'</em> → <em>alt+=</em> <em>↵</em> · <em>ctrl+b</em>'; },
+    /* r436 H6b (DEPTH_PASS §4.34 + the §1.0 / §1.0-R2 / §1.0-R3 law): the depth-pass rework.
+       The old board was three junk rows, a sort and a bold SUM — 5 flat beats, no bonus, no
+       closer, two columns in a 20×10 grid, and every predicate written against BUILD
+       COORDINATES (o.range / o.foot), which only hold while nothing above them moves.
+
+       WHAT THIS DRILL IS FOR (and how it stays distinct — the distinctness question the
+       depth pass asks of every structural-repair-adjacent drill):
+         · rowops (§4.5) is STRUCTURAL SURGERY on a model that is missing pieces — insert a
+           row, insert a column, paste staged blocks in, and watch a new row arrive wearing
+           the dress of the row above it. Its sites are marked in red; nothing is hunted.
+         · editfix (§4.7) is the REPAIR PASS — a label, a reference and a range are WRONG and
+           are corrected IN PLACE (F2 surgery), with undo as the net when the sweep note turns
+           out to be wrong. Nothing is removed; everything is fixed.
+         · scrub is the INTAKE PASS on data nobody wrote by hand. Nothing here is repaired and
+           nothing is built: rows that were never data — a header the printer repeated, a page
+           break, a SUBTOTAL that was true for page 1, a record the feed sent twice — come OUT,
+           and only then can the list be ordered and summed. The lesson is range hygiene: what
+           you total must contain no pre-totalled rows and no record twice. §2.4 makes the
+           chapter's intent explicit — the c4 capstone (cleanroom, "dirty export → sendable
+           table") chains junk-row delete + sort as its first two legs, and this is the drill
+           that owns them.
+       The mechanical overlap with rowops is one op — the row delete — used four times here
+       against once there, in a different chapter, on data instead of a model. That is spaced
+       practice, not a duplicate drill; the two drills share no other beat, no lesson and no ☆.
+
+       BEATS (5 core + the engine-appended save; they CHAIN, §1.1):
+         1 the three export artifacts out (one aggregate beat with a live counter — the §2.3
+           counter-label pattern WITHOUT meta.errorCount: scrub is not an audit drill and §2.3
+           does not list it, so it gets the counter's feedback and none of the audit framing)
+         2 sort the deals largest-first, rows whole (the r419 row-integrity binding, extended
+           to three columns so a sizes-only sort can never pass)
+         3 delete the deal the feed sent twice — the sort has just parked it beside its twin,
+           which is how a desk finds duplicates
+         4 total the size column — the SUM only reads right once the SUBTOTAL and the second
+           copy are gone, so beats 1 and 3 are load-bearing for it (§1.5: the aha lands HERE)
+         5 bold the Total line and rule it on TOP (§1.0(f)), straight after the beat that
+           created it (§1.0(a) format-as-you-go) — bold + border are Wolf's own top-priority
+           desk ops (§1.0-R3(o)); the old page's "comma-format the size column" ☆ is dead
+           twice over: formatting can never be a ☆ (§1.0(d)) and comma is the exact op Wolf
+           named as over-anchored (§1.0-R3(o)).
+         ☆ the total lands from AUTOSUM instead of a typed formula — see the note in checks().
+
+       §1.0-R3(p) GRADE THE END STATE — the routes were WALKED, not reasoned about (probe run,
+       3 seeds each). A junk row can leave the sheet three ways and ALL THREE clear:
+       Shift+Space→Ctrl+− (the chord, 20 keys), Alt H D R (the ribbon, which works from a
+       partial selection, 41 keys), and selecting the row and pressing Delete — a cleared row
+       holds no value, so the sort carries it clear of the deals (sortRange puts nulls last
+       ascending, so a DESCENDING sort parks the emptied rows above the block) and the seven
+       deals come out in one unbroken run exactly as a row delete leaves them, 18 keys. Every
+       predicate below is a CONTENT SCAN of the live sheet, so all three routes and any op
+       ORDER land in the same graded state. ALT 2 in dev/e2e-alt-paths.js is the clear-contents
+       run start to finish. Also walked and clearing: the total as an addition chain instead of
+       a SUM (40 keys), and autosum by BOTH of its routes — the range form (select through the
+       empty Total cell, Alt+=) and the single-cell proposal (Alt+= then ↵). Walked and
+       correctly DARK: an outside box on the Total line (Alt H B S), which hangs a rule UNDER
+       the total — the one thing §1.0(f) forbids — and clearing the junk without ever sorting,
+       which leaves the deals in pieces and is the beat the player still owes.
+       No cueCell() (§1.0-R2(h) / §1.0-R3(q)): every target here is an existing, labeled row —
+       the junk names itself on the board, the Total line carries its label — so the green
+       ring has something to sit on and a red note would be furniture with nothing to mark. */
+    name:'Scrub', label:'Clean the export', par:21, parKeys:20, saveClose:true,   /* r436: par-swept ×5 seeds post-rework — median 20 keys (no variance: the key count is seed-independent), par at the house 1.05 s/key. The scope grew (a fourth row out, a real dress beat, the save) while the count only moved 19→20, because the chord route replaces the old demo's ribbon walk on every delete */
+    aha:'a SUBTOTAL row is not data — leave it in the range and the column counts itself twice.',
+    prompt:'The deal blotter came out of the system raw: the header printed a second time part-way down, a page-break line landed in the middle of the deals, a SUBTOTAL that was true for page one sits inside the list, and the feed sent one deal twice. The Total line printed with nothing in it. Take the four rows out, sort what is left largest-first, and total it — an export is not a table until the rows that were never data are gone.',
+    req(){ const o=this._o; return 'each junk row → <em>shift+space</em> <em>ctrl+minus</em> (or <em>alt h d r</em>) · select the deals → <em>alt a s d</em> · the repeat deal → <em>shift+space</em> <em>ctrl+minus</em> · size column through the empty Total cell → <em>alt+=</em> · Total line → <em>ctrl+b</em> · <em>alt h b p</em> · <em>ctrl+s</em>'; },
     guide(){ const o=this._o; return [
-      'hunt the junk top to bottom: the duplicate header, the page break, the SUBTOTAL trap — on each row · <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd>',
-      'the data is contiguous now: select '+o.range+' (cursor in the size column) · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> — largest first',
-      're-total it: '+o.foot+' · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd> · <kbd>ctrl</kbd>+<kbd>b</kbd> — a SUBTOTAL row would have poisoned this SUM',
+      'three rows never belonged to the data: the second <b>Deal</b> header, the <b>'+o.pageMark+'</b> line and the <b>SUBTOTAL</b> row. Land anywhere on each · <kbd>shift</kbd>+<kbd>space</kbd> takes the whole row · <kbd>ctrl</kbd>+<kbd>−</kbd> removes it (the ribbon walk <kbd>alt</kbd> <kbd>h</kbd> <kbd>d</kbd> <kbd>r</kbd> does the same job)',
+      'now the list can be ordered: select the deal block across all three columns with the cursor in the <b>Size ($mm)</b> column · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> — the whole row travels with its size',
+      '<b>'+o.dupName+'</b> was exported twice and the sort has just parked the two copies next to each other — take either one: <kbd>shift</kbd>+<kbd>space</kbd> · <kbd>ctrl</kbd>+<kbd>−</kbd>',
+      'the <b>Total</b> line needs a live SUM over the seven deals — type <kbd>=SUM(</kbd> the size range <kbd>)</kbd> <kbd>↵</kbd> in the size cell beside the Total label',
+      'dress it where it stands: the Total label and its figure · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> for the rule above the line',
+      '☆ the total never needed typing: select the size column from the first deal DOWN THROUGH the empty Total cell and press <kbd>alt</kbd>+<kbd>=</kbd> — one press writes the SUM and commits it. Typing <kbd>=SUM(…)</kbd> clears the beat just the same; it costs you about ten keys',
     ]; },
-    targets(){ const o=this._o; return [o.range, o.range, o.foot]; },
+    /* CONTENT SCAN (the rowops _rings() precedent): every ring resolves from the LIVE sheet at
+       render time, never from build coordinates — four row deletes move every row below them,
+       and a ring computed at build sits on the wrong line the moment the first junk row goes.
+       Lives in a helper so targets() stays a bare `return [...]` for the C9 tri-length parser. */
+    _scan(){ const o=this._o;
+      const cel=k=>(S&&S.cells&&S.cells[k])||{};
+      const txt=k=>{ const v=cel(k).value; return (v===undefined||v===null)?'':String(v); };
+      const cap=(S&&S.ROWS)?S.ROWS:20;
+      let hdr=0, tot=0;
+      const junk=[], deals=[], dups=[];
+      for(let r=1;r<=cap;r++){
+        const a=txt('A'+r);
+        if(!hdr && a==='Deal'){ hdr=r; continue; }
+        if(a==='Deal'||a==='SUBTOTAL'||a===o.pageMark||txt('B'+r)==='Sector') junk.push(r);
+        if(/^total$/i.test(a)) { if(!tot) tot=r; continue; }
+        if(o.names.indexOf(a)>=0){ deals.push(r); if(a===o.dupName) dups.push(r); }
+      }
+      const hdrR=hdr||o.hr, totR=tot||o.footRow;
+      const blk = deals.length ? ('A'+deals[0]+':C'+deals[deals.length-1])
+                               : ('A'+(hdrR+1)+':C'+(totR-1));
+      const dupR = dups.length>1 ? dups[1] : (dups.length ? dups[0] : 0);
+      return {hdr:hdrR, tot:totR, blk:blk,
+        junkRing: junk.length ? ('A'+junk[0]+':C'+junk[0]) : blk,
+        dupRing:  dupR ? ('A'+dupR+':C'+dupR) : blk,
+        junk:junk, deals:deals, dups:dups};
+    },
+    /* order: ① the topmost junk row still on the sheet · ② the deal block · ③ the second copy ·
+       ④ the empty Total cell · ⑤ the Total line · ☆ never ringed (bonus rows skip the rails).
+       (Every ring is resolved inside _scan() so this body stays a bare `return [...]` with no
+       bracket ahead of it — the C9 tri-length parser reads the first array literal it finds.) */
+    targets(){ const g=this._scan(); return [
+      g.junkRing,
+      g.blk,
+      g.dupRing,
+      'C'+g.tot,
+      'A'+g.tot+':C'+g.tot,
+      null,
+    ]; },
     demo(){ const o=this._o;
-      const steps=o.junkRows.slice().sort((a,b)=>b-a).map(r=>({sel:'A'+r, keys:[Kb.alt,L('H'),L('D'),L('R')]}));
-      steps.push({sel:o.range, keys:[Kb.alt,L('A'),L('S'),L('D')]});
-      steps.push({sel:o.foot, keys:[Kb.eq, Kb.enter]});
-      steps.push({sel:o.foot, keys:[Kb.bold]});
+      const steps=[];
+      /* ① the three artifacts, BOTTOM-UP so the rows above never shift under the next delete */
+      o.junkRows.slice().sort((a,b)=>b-a).forEach(r=>{
+        steps.push({sel:'A'+r, keys:[{key:' ',shift:true},{key:'-',ctrl:true}]}); });
+      /* ② eight rows left (seven deals + the repeat), now contiguous under the header: sort the
+         whole block with the cursor in the size column — the two copies land side by side */
+      const top=o.hr+1, bot=o.hr+8;
+      steps.push({sel:'A'+top+':C'+bot, keys:[Kb.alt,L('A'),L('S'),L('D')]});
+      /* ③ the repeat: descending, the twin pair sits at ranks o.dupRank and o.dupRank+1 */
+      steps.push({sel:'A'+(top+o.dupRank+1), keys:[{key:' ',shift:true},{key:'-',ctrl:true}]});
+      /* ④ ☆ + the total in one press: the size column from the first deal through the empty
+         Total cell, autosum commits the SUM without opening the editor (r192 range form) */
+      steps.push({sel:'C'+top+':C'+(top+7), keys:[Kb.eq]});
+      /* ⑤ dress the line straight away (§1.0(a)) — bold, then the rule ABOVE it (§1.0(f)) */
+      steps.push({sel:'A'+(top+7)+':C'+(top+7), keys:[Kb.bold]});
+      steps.push({sel:'A'+(top+7)+':C'+(top+7), keys:[Kb.alt,L('H'),L('B'),L('P')]});
       return steps; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — deal list (system export, uncleaned)',txt:true,bold:true};
-      const hr=3;
+      const hr=3+rnd(0,1);                      // §1.2(a) site jitter: the export header prints on row 3 or 4
+      const pageMark='--- PAGE 2 ---';
+      cells['A1']={...blankCell(),value:codename()+' — deal blotter (system export)',txt:true,bold:true};
+      cells['A'+(hr-1)]={...blankCell(),value:'Printed by the deal system — rows below are exactly as exported',txt:true,it:true,fontColor:'gray'};
       cells['A'+hr]={...blankCell(),value:'Deal',txt:true,bold:true};
-      cells['B'+hr]={...blankCell(),value:'Size ($mm)',txt:true,bold:true,align:'r'};
-      const pool=['Falcon','Atlas','Copper','Summit','Ridge','Delta','Harbor','Juniper','Ironline'];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const names=pool.slice(0,7);
+      cells['B'+hr]={...blankCell(),value:'Sector',txt:true,bold:true};
+      cells['C'+hr]={...blankCell(),value:'Size ($mm)',txt:true,bold:true,align:'r'};
+      // ---- §1.2(b) content pools ----
+      const NAMES=['Falcon','Atlas','Copper','Summit','Ridge','Delta','Harbor','Juniper','Ironline','Beacon'];
+      const SECT=['Software','Healthcare','Industrials','Energy','Consumer','Financials','Media','Logistics','Materials'];
+      for(let k=NAMES.length-1;k>0;k--){ const j=rnd(0,k); [NAMES[k],NAMES[j]]=[NAMES[j],NAMES[k]]; }
+      for(let k=SECT.length-1;k>0;k--){ const j=rnd(0,k); [SECT[k],SECT[j]]=[SECT[j],SECT[k]]; }
+      const names=NAMES.slice(0,7), sects=SECT.slice(0,7);
+      // ---- §1.2(c) value ranges: seven DISTINCT sizes, magnitudes that fit the column ----
       const sizes=[]; while(sizes.length<7){ const v=rnd(5,95)*10; if(!sizes.includes(v)) sizes.push(v); }
-      // 10 slots below the header; 3 random ones carry the junk
-      const slots=[0,1,2,3,4,5,6,7,8,9];
+      const deals=names.map((n,i)=>({name:n, sect:sects[i], size:sizes[i]}));
+      // ---- §1.2(d) which-one-is-broken: which deal the feed sent twice, and where the copy sat ----
+      const dupIdx=rnd(0,6), dupName=names[dupIdx];
+      const seq=deals.slice();
+      let ins; do { ins=rnd(0,seq.length); } while(ins===dupIdx||ins===dupIdx+1);   // never beside its twin — the sort is what brings them together
+      seq.splice(ins,0,{...deals[dupIdx]});
+      // ---- the three printer artifacts, dropped into three of the eleven body slots ----
+      const slots=[]; for(let s=1;s<=10;s++) slots.push(s);                          // never slot 0: the block opens on a real deal
       for(let k=slots.length-1;k>0;k--){ const j=rnd(0,k); [slots[k],slots[j]]=[slots[j],slots[k]]; }
       const junkAt=slots.slice(0,3).sort((a,b)=>a-b);
-      const JUNK=[
-        r=>{ cells['A'+r]={...blankCell(),value:'Deal',txt:true};   cells['B'+r]={...blankCell(),value:'Size ($mm)',txt:true}; },
-        r=>{ cells['A'+r]={...blankCell(),value:'--- PAGE 2 ---',txt:true}; },
-        r=>{ cells['A'+r]={...blankCell(),value:'SUBTOTAL',txt:true,bold:true}; cells['B'+r]={...blankCell(),value:rnd(100,400)*10,fmtStyle:'comma',decimals:0}; },
-      ];
-      let di=0, ji=0;
-      for(let s=0;s<10;s++){ const r=hr+1+s;
-        if(junkAt.includes(s)){ JUNK[ji++](r); }
-        else { cells['A'+r]={...blankCell(),value:names[di],txt:true};
-          cells['B'+r]={...blankCell(),value:sizes[di],fmtStyle:'comma',decimals:0,fontColor:'blue'}; di++; }
+      const kinds=['sub','page','hdr'];        // page-one subtotal, then the break, then the repeated header — the order a printer produces
+      const junkRows=[]; let di=0, ji=0, running=0;
+      for(let s=0;s<11;s++){
+        const r=hr+1+s;
+        if(junkAt.includes(s)){
+          const kind=kinds[ji++]; junkRows.push(r);
+          if(kind==='sub'){
+            cells['A'+r]={...blankCell(),value:'SUBTOTAL',txt:true,bold:true};
+            cells['C'+r]={...blankCell(),value:running,fmtStyle:'comma',decimals:0,bold:true};   // true for the rows above it, poison for the column
+          } else if(kind==='page'){
+            cells['A'+r]={...blankCell(),value:pageMark,txt:true,fontColor:'gray'};
+          } else {
+            cells['A'+r]={...blankCell(),value:'Deal',txt:true};
+            cells['B'+r]={...blankCell(),value:'Sector',txt:true};
+            cells['C'+r]={...blankCell(),value:'Size ($mm)',txt:true,align:'r'};
+          }
+        } else {
+          const d=seq[di++]; running+=d.size;
+          cells['A'+r]={...blankCell(),value:d.name,txt:true};
+          cells['B'+r]={...blankCell(),value:d.sect,txt:true};
+          cells['C'+r]={...blankCell(),value:d.size,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        }
       }
-      this._names=names.slice(); this._sizes=sizes.slice();
-      this._byName={}; names.forEach((n,i)=>this._byName[n]=sizes[i]);
-      this._o={ hr:hr, junkRows:junkAt.map(s=>hr+1+s),
-        range:'A'+(hr+1)+':B'+(hr+7), foot:'B'+(hr+8) };
-      return {ROWS:hr+11, cells, active:{r:hr+1,c:2}, sel:null, colW:{1:118}};
+      // ---- the Total line the export printed EMPTY (beat 4 fills it; beat 5 dresses it) ----
+      const footRow=hr+12;
+      cells['A'+footRow]={...blankCell(),value:'Total',txt:true};
+      const sizeOf={}, sectOf={};
+      deals.forEach(d=>{ sizeOf[d.name]=d.size; sectOf[d.name]=d.sect; });
+      const dupRows=[];
+      for(let r=hr+1;r<=hr+11;r++) if(cells['A'+r] && cells['A'+r].value===dupName) dupRows.push(r);
+      this._o={ hr, footRow, pageMark, junkRows, dupName, dupRows,
+        names:names.slice(), sizeOf, sectOf,
+        sizesDesc:sizes.slice().sort((a,b)=>b-a),
+        dupRank:sizes.filter(v=>v>sizeOf[dupName]).length,   // where the twin pair lands once the block is sorted
+        tot:sizes.reduce((a,b)=>a+b,0) };
+      return {ROWS:hr+13, cells, active:{r:hr+1,c:1}, sel:null, colW:{1:124,2:124,3:96}};
     },
     checks(S){
-      const o=this._o, hr=o.hr;
-      let junkGone=true, dealHdrs=0;
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      const txt=k=>{ const v=cel(k).value; return (v===undefined||v===null)?'':String(v); };
+      const cap=S.ROWS||20;
+      /* ---- the scan: nothing reads a build coordinate. Four row deletes (or four cleared
+         rows and a sort) move every row under them, so the graded state is read off the
+         sheet as it stands — §1.0-R3(p), and the reason all three delete routes clear. ---- */
+      let hdr0=0;
+      for(let r=1;r<=cap && !hdr0;r++) if(txt('A'+r)==='Deal') hdr0=r;
+      /* the repeated header is gone when NO row below the first one still carries a header
+         text. Read across all three header cells, so clearing only the A cell of the printed
+         repeat does not tick the beat while the rest of the row is still on the page.
+         hdr0===0 (the player took BOTH headers out) also clears: the export is not printing
+         its header twice any more, which is the whole of what this beat asks. */
+      let hdrOk=true;
+      for(let r=(hdr0||1)+1;r<=cap;r++)
+        if(txt('A'+r)==='Deal'||txt('B'+r)==='Sector'||txt('C'+r)==='Size ($mm)') hdrOk=false;
+      let pageOk=true, subOk=true;
       for(const k in S.cells){ const v=S.cells[k]&&S.cells[k].value;
-        if(v==='--- PAGE 2 ---'||v==='SUBTOTAL') junkGone=false;
-        if(v==='Deal') dealHdrs++; }
-      const want=this._sizes.slice().sort((a,b)=>b-a);
-      let sorted=true;
-      for(let i=0;i<7;i++){ const a=S.cells['A'+(hr+1+i)], b=S.cells['B'+(hr+1+i)];
-        if(!b||b.value!==want[i]) sorted=false;
-        else if(!a||this._byName[a.value]!==b.value) sorted=false; }
-      const f=S.cells[o.foot];
-      const tot=this._sizes.reduce((x,y)=>x+y,0);
-      let pageGone=true, subGone=true;
-      for(const k in S.cells){ const v=S.cells[k]&&S.cells[k].value;
-        if(v==='--- PAGE 2 ---') pageGone=false;
-        if(v==='SUBTOTAL') subGone=false; }
+        if(v===o.pageMark) pageOk=false;
+        if(v==='SUBTOTAL') subOk=false; }
+      const got=(hdrOk?1:0)+(pageOk?1:0)+(subOk?1:0);
+      // the deal rows, wherever they now sit
+      const dealRows=[]; let dupN=0;
+      for(let r=1;r<=cap;r++){ const a=txt('A'+r);
+        if(o.names.indexOf(a)>=0){ dealRows.push({r:r, name:a}); if(a===o.dupName) dupN++; } }
+      const dupOk=dupN===1;
+      /* SORTED: the deal rows read largest-first, sit in an unbroken run (no junk row and no
+         cleared gap between them), and every row still carries its OWN sector and size — the
+         r419 row-integrity binding, widened to three columns so a sizes-only sort cannot pass.
+         Graded with >= so the block counts as sorted while both copies are still in it
+         (beat 3 is a separate beat, and the player may run the two in either order). */
+      let sorted=dealRows.length>=7, last=Infinity;
+      for(let i=0;i<dealRows.length;i++){
+        const d=dealRows[i], c=cel('C'+d.r);
+        if(i>0 && d.r!==dealRows[i-1].r+1) sorted=false;                 // contiguous
+        if(txt('B'+d.r)!==o.sectOf[d.name]) sorted=false;                // the row travelled whole
+        if(typeof c.value!=='number' || c.value!==o.sizeOf[d.name]) sorted=false;
+        if(c.value>last) sorted=false;
+        last=(typeof c.value==='number')?c.value:last;
+      }
+      // the Total line, and the SUM that only reads right on a cleaned range
+      let totR=0;
+      for(let r=1;r<=cap && !totR;r++) if(/^total$/i.test(txt('A'+r))) totR=r;
+      const tl=totR?cel('A'+totR):{}, tc=totR?cel('C'+totR):{};
+      /* §1.0(c) FREEDOM: any LIVE route counts — =SUM over the range, an addition chain naming
+         each deal, or autosum. sumishF() reads both shapes; a typed number never clears,
+         because a live total IS the beat. */
+      const totalOk=!!(tc.formula && sumishF(tc.formula) && Math.abs((tc.value||0)-o.tot)<0.5);
+      /* §1.0(f): a total earns its rule ABOVE. Both cells the line actually carries — the
+         label and the figure — take the bold and the top border; a bottom rule under a total
+         is the house error and never clears. Any selection shape and any border route reaches
+         this state (Alt H B P, the Format Cells border tab, or the ribbon walk). */
+      const dressOk=!!(tl.bold && tc.bold && tl.bt && tc.bt && !tl.bb && !tc.bb && !tl.bdbl && !tc.bdbl);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the total lands
+         from AUTOSUM — select the size column from the first deal down THROUGH the empty Total
+         cell and one press writes and commits the SUM. Read off the r436 S.autoSumN latch (the
+         mechanic, recorded when an Alt+= / Alt H U S proposal actually commits; never
+         geometry-inferred, because a typed =SUM and an autosum leave the same cell behind).
+         SKIPPABLE by construction: typing the formula clears beat 4 exactly the same — the
+         typed =SUM(C5:C11)↵ costs 13 keys where the autosum press costs 2. ALT 1 in
+         dev/e2e-alt-paths.js is the whole slow run, MEASURED at 41 keys against the demo's 20,
+         and it must never light the star. Both autosum routes were walked and both light it:
+         the range form (select the column through the empty Total cell, one press commits) and
+         the single-cell proposal (Alt+= then ↵, which lands through commitEdit). */
+      const starOk=totalOk && (S.autoSumN||0)>=1;
       return [
-        {label:'delete the duplicate header row — two "Deal" headers, only the top one is real', ok: dealHdrs===1},
-        {label:'delete the "--- PAGE 2 ---" print-break row', ok: pageGone},
-        {label:'delete the SUBTOTAL row', ok: subGone},
-        {label:'sort the seven real deals largest-first ('+o.range+')', ok: sorted},
-        {label:'re-total the clean data — live SUM at '+o.foot+', bold', ok: !!(f&&f.formula&&sumishF(f.formula)&&Math.abs((f.value||0)-tot)<0.5&&f.bold)},
+        {label:'Delete the three junk rows — the repeated header, the page-break line and the SUBTOTAL ('+got+'/3)', ok: got===3},
+        {label:'Sort the seven deals largest-first — rows move whole', ok: sorted},
+        {label:'Delete the second '+o.dupName+' row — the export listed it twice', ok: dupOk},
+        {label:'Total the size column on the Total line — a live SUM over the seven deals', ok: totalOk},
+        {label:'Bold the Total line and add a top border above it', ok: dressOk},
+        {label:'Total the size column without typing the formula', ok: starOk, bonus:true},
       ];
     }
   },
@@ -11551,12 +11747,14 @@ function autoSum(){
       if(n){ pushUndo(); const cell=ensure(r2.r2,r2.c1);
         cell.formula='=SUM('+colLetter(r2.c1)+r2.r1+':'+colLetter(r2.c1)+(r2.r2-1)+')';
         try{ cell.value=evalFormula(cell.formula); }catch(_){ cell.value=0; }
+        S.autoSumN=(S.autoSumN||0)+1;   /* r436 (§4.34 scrub ☆): autosum provenance — see the note on the editor-commit twin in commitEdit() */
         commitAction(); return; } }
     if(r2.r1===r2.r2 && r2.c2>r2.c1 && !nonEmpty(r2.r1,r2.c2)){
       let n=0; for(let cc=r2.c1;cc<r2.c2;cc++) if(typeof get(r2.r1,cc).value==='number') n++;
       if(n){ pushUndo(); const cell=ensure(r2.r1,r2.c2);
         cell.formula='=SUM('+colLetter(r2.c1)+r2.r1+':'+colLetter(r2.c2-1)+r2.r1+')';
         try{ cell.value=evalFormula(cell.formula); }catch(_){ cell.value=0; }
+        S.autoSumN=(S.autoSumN||0)+1;   /* r436 (§4.34 scrub ☆): autosum provenance — see the note on the editor-commit twin in commitEdit() */
         commitAction(); return; } }
   }
   window.__autoSumEdit=true;
@@ -14317,6 +14515,13 @@ function commitEdit(dr,dc){
     else { cell.formula=null; cell.value=buf; cell.txt=true; }
   }
   editPointed=false;   // r434: the provenance flag never outlives the edit that set it
+  /* r436 (DEPTH_PASS §4.34, scrub ☆): AUTOSUM PROVENANCE. An Alt+= / Alt H U S proposal that
+     the player actually COMMITS stamps S.autoSumN — the same latch family as S.fillOps /
+     S.grabLog / S.fmtOps / S.multiEnter (the MECHANIC is recorded, never geometry-inferred),
+     because a typed =SUM(…) and an autosum leave an identical cell behind and no end-state
+     read can tell them apart. A proposal the player escapes never reaches here, so it never
+     counts. Telemetry only: no CORE check may ever require it (§1.0(c)). */
+  if(__asStay && buf!=='' && buf[0]==='=' && typeof S!=='undefined' && S) S.autoSumN=(S.autoSumN||0)+1;
   const __walk = (__wasMarked && dc===0 && dr!==0) ? dr : 0;
   if((dr||dc) && !__walk && !__asStay){ S.active={r:Math.min(S.ROWS,Math.max(1,S.active.r+dr)), c:Math.min(COLS,Math.max(1,S.active.c+dc))}; S.sel=null; }
   commitAction();
