@@ -700,13 +700,43 @@ Do NOT build this page. The drill key `copyover` no longer exists in `menuOrder`
 ☆ Set the figures column to one width of 12 — the folded page prints even
 **Random:** which quarter reopens + month-block start row jitter + value pools (exists). **Aha:** upgraded — "group beats hide because folds REOPEN on request — the ⊞ is a promise". **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** unfold latch = group.collapsed===false (state, no new plumbing).
 
-#### 4.36 filterpass — "Work the filtered view" · S
-**Now:** AutoFilter on, picker, read the visible answer, type it; audit: cursor-rider promise ungraded (label↔check).
-**Language pass + fix + bonus:**
-- drop the ungraded cursor-rider promise from the prompt (decided — don't grade it)
-- final beat: "Enter the answer in the answer cell — the largest visible Open deal"
-☆ Filter the Status picker back to All — leave the view the way you found it
-**Random:** verify status/value pools + answer varies. **Aha:** existing. **Finish:** the answer entry. **Clocks:** std. **Engine:** Alt+↓ picker (exists).
+#### 4.36 filterpass — "Work the filtered view" · S — **SHIPPED (r438, depth pass)**
+**RETIREMENT TESTED FIRST (§1.0-R3(s)) AND REJECTED.** Par 13 / parKeys 10 / three checks was the
+thinnest profile left, so the §2 ☆-headroom diagnostic ran before anything was written, on the
+SHIPPED board: taught route **10 keys**, hand-hidden route (Ctrl+9 per non-matching row) **16 keys**,
+both clearing all three cores. Positive headroom — the opposite sign to `growth`, which died at 37
+against 35. Kept also because the chapter's four row-suppression tools are genuinely four tools
+(`sort` MOVES · `scrub` DELETES · `grpfold` FOLDS by position · this one hides BY VALUE), and because
+`sort`'s own r436 survival argument leans on exactly that distinction.
+**The board, not the beats, was what made it thin:** on 175 of 400 sampled seeds (43.8%) the largest
+OPEN deal was ALSO the largest deal on the page, so the filter did no work. build() now always hands
+the largest size on the board to a deal outside the screened sector.
+**Shipped beats** (5 core + save closer + ☆, tri-length 6): arm the AutoFilter across the header row →
+the largest screened-sector deal into the screen block → filter the list to the screened status →
+how many carry it → their combined size (the prove-out, §1.6, standing against the live
+`Total — all deals` SUM that never moved — the aha, §1.5). Labels adaptive per §1.0-R2(g).
+**☆ DEVIATION FROM THIS PAGE, DECLARED PER §0.** The page's "☆ Filter the Status picker back to All"
+is dead twice: §1.0(d) outlaws a ☆ that is hygiene rather than hidden EFFICIENCY, and it is
+STRUCTURALLY IMPOSSIBLE — §2.2 latches the bonus at the win moment, where every core is also graded,
+so restoring the whole view falsifies any filtered-state core in the same instant (the
+untriggerable-beat class). Kept in spirit as the efficiency INSIDE that move: two screens off one
+list, screen one must go before screen two exists, and the toggle retires it in **2 keys** against the
+picker walk-back's **6**. Graded off the new `S.filterClears` provenance latch (toggleFilter, the
+S.autoSumN family). Skippability MEASURED, not asserted: the walk-back run clears 5/5 cores at 30 keys
+with the ☆ dark, registered as ALT 2.
+**No dress beat — deliberate:** the chapter's bold-plus-top-border tail is the redundancy
+DEPTH_PASS_CAMPAIGN §3 says to cut, and formatting a filtered range hits the hidden rows in this
+engine anyway (probed). Board ships pre-dressed.
+**Random:** four axes — header row 3/4 AND table in column A or B · deal/sector/status pools shuffled ·
+sizes distinct through rnd() · which sector, which status, and 3-or-4 deals carrying it.
+**Par:** 13→26 (parKeys 10→25, 5-seed median incl. the appended Ctrl+S; 1.04 s/key).
+**Engine:** Alt+↓ picker (existed) + `S.filterClears` (new, additive, read only by this ☆).
+**Engine facts probed, three of which ruled out obvious beats:** no SUBTOTAL/AGGREGATE (a plain SUM
+counts hidden rows — Excel-true, and the point of the Total line) · Ctrl+B over a filtered range
+formats the hidden rows too, where Excel formats visible cells only · Delete clears them and Copy
+carries them · there is NO Alt A C, so the toggle is the only one-move clear · the picker WRAPS where
+Excel's does not (demo walks rightward only) · the picker scans hidden rows, so a second column's chip
+list is not narrowed by the first column's filter as Excel would narrow it.
 
 #### 4.37 unhide — "Flush the hidden rows" · S/M (audit shallow #12; r419 width fix landed)
 **Now:** 3 checks (unhide across the gap, group+fold the house way, width 12) — solid contrast lesson; fixed hidden span rows 4–7.

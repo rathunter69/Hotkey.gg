@@ -7719,3 +7719,126 @@ the family: recon keeps INDEX/MATCH as an INSTRUMENT and never as the subject._
   retired _o and cannot be repaired into the new one. Per the r435 integration note: this side of
   dev/e2e-alt-paths.js is authoritative for `sort`, additions and deletions both. Do not resurrect
   it in the merge.
+
+## r438 — H6b-9: filterpass depth pass — "Work the filtered view" (DEPTH_PASS §4.36 + §1.0/-R2/-R3)
+_The chapter's fourth and last way of dealing with rows you do not want to look at. Built after
+the §2 ☆-headroom diagnostic was run on the SHIPPED board and passed._
+- **RETIREMENT TESTED FIRST (§1.0-R3(s)), AND REJECTED — with the measured numbers, because this
+  is the profile that retired five drills.** filterpass shipped at par 13 / parKeys 10 with THREE
+  checks and no ☆ at all. The decisive test is the growth one, and it was run before a line was
+  written, walked through the live engine on the OLD board: the taught route (Ctrl+Shift+L, the
+  Status picker, type the answer) clears all three cores in **10 keys**; arming from the ribbon and
+  then hiding every non-Open row by hand with Shift+Space / Ctrl+9 clears **the same three cores in
+  16**. `growth` was retired because its canonical block-grab measured 37 against the taught route's
+  35 — *negative* headroom. This is the opposite sign, and the rebuilt board widens it to 24 against
+  39. Three further findings kept it:
+  **(1) THE LESSON IS NOT ITS CHAPTER-MATES'.** Four drills in Data & Lookups deal with rows you do
+  not want to look at, and they are four different tools: `sort` MOVES rows, `scrub` DELETES them,
+  `grpfold` FOLDS a span you choose BY POSITION, and this one hides them BY VALUE. The first three
+  edit the sheet; a filter is a QUERY over it and the rows come back. The r436 `sort` pass leaned on
+  exactly this line ("filterpass HIDES rows rather than moving them") when it argued its own survival
+  against scrub, so retiring this drill would retro-actively weaken a decision already taken.
+  **(2) THE §3 DISCRIMINATOR SAYS KEEP** — does fluency in one produce a correct first attempt at the
+  other? No: Shift+Alt+→ and Alt A H fold a contiguous block you select, and nothing in them tells a
+  player how to reach "only the Open deals" when the rows are scattered and the criterion is a value.
+  **(3) FREQUENCY (§1.0-R3(o)).** AutoFilter is at the top of the "how often does an analyst do this
+  in a working day" list for anyone working a deal list, well above grouping.
+- **WHAT DID NOT SURVIVE THE PROBE IS THE BOARD, AND IT IS WHY THE DRILL MEASURED THIN.** Sampled
+  over 400 seeds of the shipped build(): on **175 of them (43.8%) the largest OPEN deal was also the
+  largest deal on the page**, so the filter did no work at all and the answer could be read straight
+  off the unfiltered column. The rank of the answer among all nine sizes came out 1st on 175 seeds,
+  2nd on 113, 3rd on 66. A drill whose instrument is decorative on two seeds in five is thin for a
+  reason that is fixable in build(), not by adding beats — the rebuilt build() always hands the single
+  largest size on the board to a deal OUTSIDE the screened sector, so the collision cannot occur.
+- **THE BOARD.** A coverage pipeline extract — Deal · Sector · Size ($M) · Status, 9–10 mandates over
+  a source/basis memo, with a LIVE `Total — all deals` SUM directly beneath the list, and a labelled
+  SCREEN block of three yellow input cells below that. The total sits INSIDE the filter range with
+  its Sector and Status cells empty, so no exclusion list can ever match it: it stays on screen,
+  unmoved, while the rows above it come and go. That is the aha made visible instead of narrated.
+  Four independent randomization axes (§1.2): (a) site shuffle in BOTH axes — the header row jitters
+  3/4 and the table starts in column A or B; (b) deal, sector and status pools Fisher-Yates shuffled;
+  (c) every size distinct, through rnd(); (d) which sector is screen one, which status is screen two,
+  and whether 3 or 4 deals carry it.
+- **BEATS (5 core + the engine save closer + one ☆), chained (§1.1):** arm the AutoFilter across the
+  header row → the largest screened-sector deal into the screen block (screen one) → filter the list
+  to the screened status (screen two, which cannot exist until screen one is retired) → how many deals
+  carry it → their combined size. Beats 3 and 5 both read screen two, and beat 5 is the prove-out
+  (§1.6) that the aha lands on (§1.5): the figure the player produces stands against the all-deals
+  total that never moved. Labels are ADAPTIVE per §1.0-R2(g) — every one names this seed's sector and
+  status concretely rather than making the player reverse-engineer the board.
+- **NO DRESS BEAT — DELIBERATE, AND DECLARED.** `sort`, `scrub`, `sumif` and `rollup` all close on
+  bold + a top border; DEPTH_PASS_CAMPAIGN §3 names that shared TAIL as the chapter's real redundancy
+  and says cutting it is cheaper than merging drills. It is also unbuildable here: Ctrl+B over a range
+  spanning hidden rows formats the hidden rows too (probed), where Excel formats visible cells only,
+  so a "dress what is on screen" beat would grade a state the player cannot see. The board ships
+  pre-dressed (§1.3 / §2.1b).
+- **☆ RE-CUT, AND THE §4.36 DEVIATION DECLARED PER §0.** The page asks for "☆ Filter the Status picker
+  back to All — leave the view the way you found it". Kept in spirit, replaced in mechanism, for two
+  reasons: §1.0(d) outlaws a ☆ that is not a hidden EFFICIENCY discovery and "tidy up after yourself"
+  is hygiene; and it is STRUCTURALLY IMPOSSIBLE as written — §2.2 latches the bonus at the win moment
+  and every core is graded there too, so a ☆ that restores the whole view falsifies any filtered-state
+  core beat in the same instant. That is the untriggerable-beat class, found by walking it. The ☆ is
+  therefore the EFFICIENCY inside the same move: the board needs two screens off one list, screen one
+  must go before screen two exists, and there are two ways to retire it. **MEASURED: the toggle pair
+  costs 2 keys, the picker walk-back costs 6 on a three-value column and grows with the column.**
+  Graded off `S.filterClears`, a new provenance latch stamped in toggleFilter() only when a toggle
+  tears down an exclusion set that was actually excluding something — the S.autoSumN / S.gotoSpecials
+  / S.sortLog / S._chordRect family, read by this ☆ and nothing else. Alt A T lights it too: the move
+  rewarded is discarding the filter in one command, not one particular chord, and the clock still
+  prices the ribbon walk at 31 keys against 24.
+- **ROUTES WALKED, NOT REASONED (§1.0-R3(p)) — 12 routes × 3–4 seeds through the live engine:**
+  taught 24 keys 5/5 ☆ LIT · **picker walk-back 30 keys 5/5 ☆ DARK (the skippability proof, ALT 2)** ·
+  ribbon-throughout 31 keys 5/5 ☆ LIT · op-order (status screen first) 32 keys 5/5 ☆ LIT (ALT 1) ·
+  **hand-hidden throughout with Shift+Space / Ctrl+9, no picker ever opened, 39 keys 5/5 ☆ DARK
+  (ALT 3, and the §1.0(c) freedom proof)** · mixed picker-then-hand-hide 30 keys 5/5 ☆ LIT ·
+  answers as COUNTIF / SUMIF formulas 65 keys 5/5 ☆ dark (a live formula clears every answer beat —
+  the predicate reads the VALUE, so a literal, a formula and a pasted number are one state) ·
+  the freedom floor, never filtering for screen one at all, 14 keys 5/5 ☆ dark.
+  Correctly DARK and reported as decisions rather than bugs: **leaving the sector filter ON while
+  adding the status filter** (beat 3 stays dark — some screened rows are hidden, and the board shows
+  exactly which); **hand-hide residue** (Ctrl+9 hides survive a filter clear, so beat 3 stays dark
+  until Ctrl+Shift+9 puts them back — probed, diagnosable, and recovered in 27 keys); and a **☆ FARM
+  ATTEMPT** — toggling an EMPTY filter six times never stamps the latch.
+- **ENGINE FACTS ESTABLISHED BY PROBING. Three of them RULED OUT beats that looked obvious**, and
+  they are recorded on the drill so the next agent does not re-derive them: there is no SUBTOTAL and
+  no AGGREGATE (`=SUBTOTAL(109,…)` → #NAME?), so a plain SUM counts every hidden row — Excel-true,
+  and the whole point of the Total line; Ctrl+B over a filtered range formats the hidden rows too;
+  Delete clears them and Copy carries them into the paste; there is no Alt A C (Data → Clear), so the
+  toggle is the ONLY one-move route that discards an exclusion set, which is what makes the ☆ a real
+  decision instead of a synonym; the value picker WRAPS (filterIdx is modular) where Excel's list does
+  not, so the demo walks rightward only and the wrap is left undocumented rather than taught; and the
+  picker scans the whole range, hidden rows included, so a second column's chip list is not narrowed
+  by the first column's filter as it would be in Excel.
+- **META:** drills.js desc described the retired board and named the route ("Turn on the filter, open
+  the picker — the answer reads itself"); rewritten to the new one. Key, name, label and tab immutable
+  — PBs, boards and the generated drills/filterpass.html carry them.
+- **PAR:** re-swept from scratch. dev/e2e-par-sweep.js filterpass, 5-seed median **25** keys including
+  the engine-appended Ctrl+S; the walked route is flat at 24 across seeds and the only movement is the
+  digit-length of the three figures the screen block takes. parKeys 10→25, par 13→26 (1.04 s/key, the
+  house band), mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 39s · pro 29.9s · legendary 26s.
+- **PARITY DE-COUPLED AT THE ROOT (the r437 standing check).** `git grep -n "CHALLENGES\.filterpass\._o"
+  dev/` returned one hit outside the drill's own tests: `dev/e2e-audit-parity.js` §S, which tests the
+  ENGINE's AutoFilter (r180) and merely used this board to do it. It read `_o.rows[].st` and hard-coded
+  the header at row 3, columns A–C, three ▾ markers, three chips and the data at B4:B12 — every one of
+  which this rework moves. Fixed the way `sortGeo()` and section U were fixed, by DE-COUPLING rather
+  than re-pinning: §S now derives the header row from the sheet, the span and the status column from
+  the armed `S.filter` itself, and the data rows and chip values by reading the column. No filter drill
+  can reach that file again. 177/177 re-verified.
+- **HARNESS FIX, DECLARED.** `dev/e2e-audit-onboard.js` was the last suite still hard-coding
+  `http://127.0.0.1:8791/index.html` with no override, so a gate run from a worktree silently tested
+  whichever agent owned that port — this pass's first `e2e-smoke` run reported a drill-count failure
+  that turned out to belong to another agent's tree. Given the standard `process.env.URL` override
+  (the r421/r422 pattern) and nothing else.
+- **ALT-PATH ENTRY DELETED (integrators: do not resurrect).** The single shipped `filterpass` entry
+  drove the RETIRED board — it read `o.chips` / `o.ansR` / `o.maxOpen`, none of which exist in the new
+  `_o`, and it touched no ☆ because that board had none. DELETED, not patched, and replaced by the
+  §1.8 pair plus the measured negative control. Per the r435 integration note: this side of
+  dev/e2e-alt-paths.js is authoritative for `filterpass`, additions and deletions both.
+- **GATE (all green, own port 8867):** static invariants clean (C9 filterpass tri-length 6 + one ☆ +
+  saveClose; C11 aphorisms clean; C12 ≥2 alts across 30 reworked drills) · smoke 7 pages + PARS parity
+  + de-hint clean (drill-count 76) · lb 36/36 · demo-replay ALL GREEN · alt-paths ALL 105 PASS ·
+  audit-parity ALL 177 PASS · onboard 35/35 · mac-input 19/19 · rapidfire 14/14 · guided ALL PASS
+  (filterpass railed, contained, solvable) · formulas 102/102 · grid-height clean · depth-mechanics
+  155/155 · fit-sweep ALL CLEAN (72) · par-sweep FLAGGED 0 (drift 0%) · borders clean · pause clean ·
+  cache-bump guard clean (no ?v= bump: drills.js content changed, its version is the integrator's call
+  at batch time).

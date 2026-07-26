@@ -14,7 +14,7 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 | Foundations | 7 | 7 | ✅ complete (`undo` folded into `editfix`, `copyover` retired) |
 | Formatting | 9 | 9 | ✅ complete (`dress` retired into `housestyle`; `gauntlet` designated capstone) |
 | Formulas I | 9 | 9 | ✅ complete as of r438 (`growth` retired; `cagr` absorbed its board; `bridge` → "Point-mode formulas"; `rollup` last in) |
-| Data & Lookups | 5 | 10 | `lookup`, `scrub`, `sort`, `recon`, `lookup2` in |
+| Data & Lookups | 7 | 9 | `lookup`, `scrub`, `sort`, `recon`, `lookup2`, `unhide`, `filterpass` in (`grpfold` retired into `unhide`, so the chapter is 9) — `drill` and `series` remain |
 | Formulas II | 0 | 11 | `wirewalk` retired into `tieout` |
 | Models I | 0 | 10 | ⚠️ read §5 below before dispatching |
 | Models II | 0 | 10 | ⚠️ read §5 below before dispatching |
@@ -85,6 +85,18 @@ key count and the slowest legal route's. Reference spreads from shipped drills:
 | `lookup` | 55 | 163 | 3.0× |
 | `bridge` | 31 | (no-formula route) | — |
 | `growth` (retired) | 34 | 85 | 2.4× **and the star was illegal** |
+| `filterpass` | 24 | 39 | 1.6× (☆ itself: 24 vs 30 on the walk-back control) |
+
+**A limit of the key-count model, found by `filterpass` (r438) — read this before running the
+diagnostic on any READING drill.** A filter, a fold or a freeze saves EYE time, not keystrokes: any
+beat whose end state is "the right number is in the cell" can be cleared for ~4 keys by reading the
+unfiltered board, so the drill's own instrument always measures as pure overhead against that floor.
+On filterpass the floor is 14 keys against the taught 24. That is NOT the growth failure — growth's
+canonical route lost to the slow route on the SAME work — and the diagnostic still answers cleanly,
+because it asks for the cheapest route that clears every core against **the obvious slow route that
+also clears every core** (39 here, hand-hiding row by row). Keep the comparison between routes that
+do the same work; the minimal route that skips optional work is the freedom floor, and it belongs in
+the report, not in the ratio.
 
 **Every ☆ must be proved SKIPPABLE by measurement** — a named slow route that clears every
 core with the star dark, with key counts in the report. Not asserted, measured.
@@ -410,3 +422,19 @@ for p in $(pgrep -f http.server); do echo "$p $(readlink /proc/$p/cwd)"; done  #
 
 `PORT=` is ignored by these harnesses — only `URL=` is read. Setting `PORT` and believing it
 redirected the suite is the same mistake wearing a different hat.
+
+Third instance, r438: `e2e-audit-parity` §S (the r180 AutoFilter matrix) read
+`CHALLENGES.filterpass._o.rows[].st` and hard-coded the header at row 3, columns A–C, three ▾
+markers, three chips and the data at B4:B12. The filterpass pass moves every one of those. Fixed by
+DERIVING the geometry — header row from the sheet, span and status column from the armed `S.filter`
+itself, chip values by reading the column — so no filter drill can reach that file again. Three
+sections in three rounds (X/sort, U/unhide, S/filterpass) makes this the default assumption: **if a
+parity section names a drill, it is coupled to that drill's board until proved otherwise.**
+
+**Harness ports — one more hazard of the same family (r438).** `dev/e2e-audit-onboard.js` was the
+last suite hard-coding `http://127.0.0.1:8791/index.html` with NO `process.env.URL` override, so a
+gate run from a worktree silently tested whichever agent owned 8791. It cost this pass a false
+`e2e-smoke` drill-count failure that belonged to another agent's tree. Given the standard override
+in r438. Note the two suites that do NOT use `URL`: **`e2e-smoke`, `check-borders` and `check-pause`
+take `BASE`** (an origin, no path), and **`e2e-lb` takes `URL` but wants `leaderboard.html`, not
+`index.html`**. Getting either wrong produces a confusing red that is not yours.
