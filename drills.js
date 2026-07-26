@@ -39,7 +39,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'housestyle', 'gauntlet'] },
     { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert'] },
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
-    { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'cases', 'tieout', 'hunt', 'signerr', 'versionup', 'balance'] },
+    { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'cases', 'tieout', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
     { name: 'Models II',      keys: ['schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'cascade', 'debtsched'] },
     { name: 'Full Builds',    keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt', 'opmodel', 'dcfbuild', 'lbobuild', 'debtblock', 'dashcover'] },
@@ -131,7 +131,6 @@ window.HOTKEY_DRILLS = {
     balcheck:   { name:'Make It Tie', label:'Make it tie \u2014 hunt the break', tab:'Make It Tie', desc:'The check row was pasted over \u2014 resurrect it, run both breaks down' },
     stalelink:  { name:'Stale Links',label:'Re-point the stale links', tab:'Stale', desc:'Assumptions moved to v2 \u2014 three cells still read the dead block', errorCount:3 },   /* r439 \u00a74.49 depth pass: \u00a72.3 disclosed-error meter (0/3) */
     tieout:     { name:'Tie-out',  label:'Collapse the suspect leg',   tab:'Tie-out', desc:'Trace into the wiring, collapse a suspect leg to its dead value \u2014 find the stale link, repoint it' },
-    hunt:       { name:'Audit',    label:'Hunt the hardcodes',  tab:'Audit',   desc:'Go To Special \u2192 constants \u2014 every number a formula should own lights up' },
     wrapfix:    { name:'IFERROR',  label:'Wrap it or fix it',   tab:'IFERROR', desc:'Three reads down for three different reasons \u2014 wrap the truly missing, repair the merely broken, then foot the panel' },
     signerr:    { name:'Sign Sweep', label:'Flip the signs back', tab:'Signs', desc:'One plan year came in on the other sign convention \u2014 find it, flip it, re-lay EBIT', errorCount:3 },   /* r439 \u00a74.53 depth pass: \u00a72.3 disclosed-error meter (0/3); desc rewritten for the rebuilt board */
     percent:    { name:'% of Revenue', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
@@ -241,7 +240,7 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','combo','gauntlet'], capstone:'gauntlet' },   /* r433 (D8): the Formatting capstone designates with its depth-pass build; `dress` retired r432 into housestyle, `combo` takes its chapter slot */
     { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','bridge','anchor','sumif'] },
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
-    { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
+    { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','triage','versionup'] },
     { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
     { id:'c7', name:'Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'] },
     { id:'c8', name:'Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
@@ -331,7 +330,7 @@ window.HOTKEY_CLOCKS = {
   gauntlet:  { pass: 94 },   /* r433: the Formatting capstone — par 47 × 2 (§4.20 "Clocks: capstone pass=par×2.0") */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":28,"stalelink":64,"tieout":30,"hunt":45,"signerr":35,"versionup":48,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":28,"stalelink":64,"tieout":30,"signerr":35,"versionup":48,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

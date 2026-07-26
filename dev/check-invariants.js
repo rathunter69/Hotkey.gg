@@ -410,7 +410,7 @@ try {
    would fire on ordinary English words in quotes and on keys a test legitimately invents.
    When a drill is retired, add it here; that is the point of the plumbing checklist. ---- */
 try {
-  const RETIRED = ['dress', 'wirewalk', 'undo', 'copyover', 'growth', 'colops', 'grpfold'];
+  const RETIRED = ['dress', 'wirewalk', 'undo', 'copyover', 'growth', 'colops', 'grpfold', 'hunt'];
   // seed-field.sql is HISTORICAL leaderboard data — retired keys are real past runs and the lb
   // suite is green with them present, so rows there are evidence, not drift.
   const SKIP = new Set(['dev/seed-field.sql', 'dev/check-invariants.js']);

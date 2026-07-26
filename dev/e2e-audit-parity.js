@@ -353,35 +353,59 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(s1.viaRibbon, 'Alt A T is the ribbon route to the same toggle');
 
   console.log('T. Go To Special (r182)');
-  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('hunt'); });
+  /* r439: this section tests the GO TO SPECIAL ENGINE, not a drill — but it drove
+     `loadChallenge('hunt')` and asserted magic counts (13 marks, 8 formulas, first mark at B3)
+     read off that board. `hunt` retired into `audit` in r439, and even before that the counts
+     were a board fact masquerading as an engine fact. It now builds its OWN fixture and derives
+     every expected number from it, so no drill rework can break an engine assertion again. */
+  await run(() => {
+    document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove());
+    loadChallenge('audit');                       // any board; we replace its cells wholesale
+    S.cells = {};
+    S.ROWS = 12;
+    // labels are TEXT constants — the engine's Constants criterion excludes them on purpose
+    ['Alpha','Beta','Gamma','Delta','Epsilon','Zeta'].forEach((n, i) => {
+      S.cells['A' + (3 + i)] = { ...blankCell(), value: n, txt: true };
+    });
+    // 6 numeric constants — the Constants criterion should mark exactly these
+    [110, 120, 130, 140, 150, 160].forEach((v, i) => {
+      S.cells['B' + (3 + i)] = { ...blankCell(), value: v };
+    });
+    // 4 formulas — the Formulas criterion should mark exactly these
+    for (let i = 0; i < 4; i++) {
+      S.cells['C' + (3 + i)] = { ...blankCell(), formula: '=B' + (3 + i) + '*2' };
+    }
+    recalc(); render();
+  });
   const t1 = await run(() => {
-    const o = CHALLENGES.hunt._o;
+    const CONSTS = ['B3','B4','B5','B6','B7','B8'], FORMS = ['C3','C4','C5','C6'];
     demoKey({key:'F5'}); const gotoOpen = mode === 'ribbon' && dialog === 'goto';
     demoKey({key:'s', code:'KeyS'}); demoKey({key:'o', code:'KeyO'});
-    const marked = S.marks.length === 13 && S.markN === 1 && mode === 'normal';   // 5 inputs + 5 growths + 3 crimes
+    const marked = S.marks.length === CONSTS.length && S.markN === 1 && mode === 'normal'
+                   && CONSTS.every(k => S.marks.indexOf(k) >= 0);
     setDemoSel('A1'); demoKey({key:'Enter'});
-    const walksTo = colLetter(S.active.c) + S.active.r;                            // first mark in scan order
+    const walksTo = colLetter(S.active.c) + S.active.r;            // first mark in scan order
     demoKey({key:'Enter', shift:true});
     const wrapsBack = colLetter(S.active.c) + S.active.r === walksTo || S.marks.indexOf(colLetter(S.active.c)+S.active.r) >= 0;
-    const s0 = o.sites[0];
-    setDemoSel(s0.k); for (const ch of s0.f) demoKey({key:ch}); demoKey({key:'Enter'});
-    const unmarked = S.marks.length === 12 && S.marks.indexOf(s0.k) < 0;           // fixing kills the mark
-    const walkedOn = S.marks.indexOf(colLetter(S.active.c) + S.active.r) >= 0;     // commit rode to a survivor
+    const victim = CONSTS[0];
+    setDemoSel(victim); for (const ch of '=1+1') demoKey({key:ch}); demoKey({key:'Enter'});
+    const unmarked = S.marks.length === CONSTS.length - 1 && S.marks.indexOf(victim) < 0;
+    const walkedOn = S.marks.indexOf(colLetter(S.active.c) + S.active.r) >= 0;
     demoKey({key:'Escape'});
     const cleared = !S.marks.length && !S.markCrit;
     demoKey({key:'g', ctrl:true}); const ctrlG = mode === 'ribbon' && dialog === 'goto';
     demoKey({key:'s', code:'KeyS'}); demoKey({key:'f', code:'KeyF'});
-    const formulas = S.marks.length === 8;                                         // 7 surviving calc formulas + 1 fix
+    const formulas = S.marks.length === FORMS.length + 1;          // the 4 seeded + the cell just repaired
     demoKey({key:'Escape'});
-    return { gotoOpen, marked, walksTo, wrapsBack, unmarked, walkedOn, cleared, ctrlG, formulas };
+    return { gotoOpen, marked, walksTo, wrapsBack, unmarked, walkedOn, cleared, ctrlG, formulas, nMarks: S.marks.length };
   });
   ok(t1.gotoOpen, 'F5 opens Go To');
-  ok(t1.marked, 'S\u2192O marks every raw number (and only those)');
+  ok(t1.marked, 'S\u2192O marks every raw number (and only those \u2014 text constants excluded)');
   ok(t1.walksTo === 'B3', 'Enter rides the marked set in scan order', t1.walksTo);
   ok(t1.wrapsBack, 'Shift+Enter walks backward');
   ok(t1.unmarked && t1.walkedOn, 'fixing a marked cell unmarks it and walks on', JSON.stringify(t1));
-  ok(t1.cleared, 'Esc clears the hunt');
-  ok(t1.ctrlG && t1.formulas, 'Ctrl+G route + Formulas criterion');
+  ok(t1.cleared, 'Esc clears the marks');
+  ok(t1.ctrlG && t1.formulas, 'Ctrl+G route + Formulas criterion', JSON.stringify(t1));
 
   console.log('U. manual hide + column width (r185)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('unhide'); });

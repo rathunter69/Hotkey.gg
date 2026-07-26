@@ -656,22 +656,6 @@ const ALTS = [
       mv.push({sel:o.gtCell,  keys:[...T('=SUM('+o.gridRng+')'),{key:'Enter'}]});
       mv.push({sel:o.chkCell, keys:[...T('='+o.gtCell+'-'+o.LA+o.rLT),{key:'Enter'}]});
       return mv; }` },
-  { key: 'hunt', name: 'totals footed FIRST, ctrl+g route, crimes fixed in reverse', moves: `C => { const o=C._o;
-      const steps=[
-        {sel:'B8', keys:[...T('=SUM(B3:B7)'),{key:'Enter'}]},
-        {sel:'B8:D8', keys:[{key:'r',ctrl:true}]},
-        {sel:'B8:D8', keys:[{key:'b',ctrl:true}]},
-        {sel:'A1', keys:[{key:'g',ctrl:true},L('s'),L('o')]},
-      ];
-      o.sites.slice().reverse().forEach(s=>steps.push({sel:s.k, keys:[...T(s.f),{key:'Enter'}]}));
-      return steps; }` },
-  /* r429 (center ROUND 3, DEPTH_PASS §4.13): the pre-rework single alt (title-across via Alt O E)
-     is replaced by the §1.8 pair. ALT 1 = chord-ROUTE alt — the whole drill off different keys:
-     space chords take the row/column, bold from the ribbon, the header rule drawn as an OUTSIDE
-     border, the title centered across from the Home ribbon's Format Cells; the one-pass ☆ still
-     lands, proving the ☆ latch is route-blind. ALT 2 = op-ORDER alt — the beats run backwards and
-     the figures are right-aligned in TWO passes, so every core clears with the ☆ FORFEITED
-     (§1.0(c) freedom + the §1.0-R2(i) skippability proof). */
   { key: 'center', name: 'chord-ROUTE: shift+space/ctrl+space take the header row and the label column, bold via alt h 1, the header rule as an OUTSIDE border (alt h b s), title across from alt h o e → A — the one-pass ☆ still lands', moves: `C => { const o=C._o; return [
       {sel:'A'+o.hr,  keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('a'),L('c')]},   // whole ROW centered — column A rides along, ungraded
       {sel:'A'+o.r1,  keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('a'),L('l')]},    // whole COLUMN left — title + notes ride along

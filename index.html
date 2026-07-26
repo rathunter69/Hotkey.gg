@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
-<meta name="description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="description" content="Keyboard-only Excel training: 74 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
-<meta property="og:description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:description" content="Keyboard-only Excel training: 74 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
-<meta name="twitter:description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:description" content="Keyboard-only Excel training: 74 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 82 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
@@ -1798,9 +1798,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=292"></script>
+<script src="drills.js?v=293"></script>
 
-<script src="drills.js?v=292"></script>
+<script src="drills.js?v=293"></script>
 
 
 
@@ -4963,75 +4963,6 @@ const CHALLENGES = {
         {label:'Enter how many deals are marked '+o.statusX, ok: a2},
         {label:'Enter the '+o.statusX+' total in the screen block', ok: a3},
         {label:'Clear the first screen without walking its picker back', ok: starOk, bonus:true},
-      ];
-    }
-  },
-  hunt:{
-    name:'Audit', label:'Hunt the hardcodes', par:45, parKeys:46,
-    aha:'F5 → Special → Constants lights up every hardcode a formula should own.',
-    prompt:'The opex build looks clean and even foots — but three cells in the calc block are typed-over numbers, stale since the last update. Use Go To Special → Constants to light up every raw number, walk the marks one by one, and relink the three hardcodes to live formulas.',
-    req(){ const o=this._o; return '<em>F5</em> \u2192 <em>s</em> \u2192 <em>o</em> marks the constants \u00b7 \u21b5 walks \u00b7 relink '+o.sites.map(s=>'<em>'+s.k+'</em>').join(', ')+' \u00b7 <em>B8</em> <em>=SUM(B3:B7)</em> fill B8:D8 \u2192 \u00b7 <em>ctrl+b</em>'; },
-    guide(){ const o=this._o; return [
-      'run the ritual: <kbd>F5</kbd> \u00b7 <kbd>s</kbd> \u00b7 <kbd>o</kbd> \u2014 every raw number marks up; blue inputs SHOULD light, the calc block should NOT',
-      '<kbd>\u21b5</kbd> walks the marks \u2014 the three sitting in the calc grid ('+o.sites.map(s=>s.k).join(', ')+') are the crimes: retype each as its formula (prior year \u00d7 (1 + growth)) and the mark dies on commit',
-      'foot it: B8 \u00b7 <kbd>=SUM(B3:B7)</kbd> \u00b7 fill B8:D8 \u2192 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u2014 the corrected totals carry the page',
-    ]; },
-    targets(){ const o=this._o; return ['A1', o.sites[0].k, 'B8', 'B8:D8']; },
-    demo(){ const o=this._o;
-      const steps=[{sel:'B3', keys:[{key:'F5'},L('s'),L('o')]}];
-      o.sites.forEach(s=>steps.push({sel:s.k, keys:[...T(s.f), Kb.enter]}));
-      steps.push({sel:'B8', keys:[...T('=SUM(B3:B7)'), Kb.enter]});
-      steps.push({sel:'B8:D8', keys:[Kb.fillR]});
-      steps.push({sel:'B8:D8', keys:[Kb.bold]});
-      return steps; },
-    build(){
-      const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 opex build (post-intern)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      ['B','C','D'].forEach((cl,i)=>cells[cl+'2']={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'});
-      cells['E2']={...blankCell(),value:'Growth',txt:true,bold:true,align:'r'};
-      const LN=['Compensation','Rent \u0026 occupancy','Technology','T\u0026E','Professional fees'];
-      const vals={};
-      for(let i=0;i<5;i++){ const r=3+i;
-        const b=rnd(20,90)*10, g=rnd(3,9)/100;
-        cells['A'+r]={...blankCell(),value:LN[i],txt:true};
-        cells['B'+r]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells['E'+r]={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1};
-        vals['B'+r]=b; vals['C'+r]=b*(1+g); vals['D'+r]=b*(1+g)*(1+g);
-        cells['C'+r]={...blankCell(),formula:'=B'+r+'*(1+E'+r+')',value:vals['C'+r],fmtStyle:'comma',decimals:0};
-        cells['D'+r]={...blankCell(),formula:'=C'+r+'*(1+E'+r+')',value:vals['D'+r],fmtStyle:'comma',decimals:0};
-      }
-      // the crimes: three calc cells typed over with STALE numbers (drifted, formula gone)
-      const pool=[]; ['C','D'].forEach(cl=>{ for(let r=3;r<=7;r++) pool.push(cl+r); });
-      for(let k2=pool.length-1;k2>0;k2--){ const j=rnd(0,k2); [pool[k2],pool[j]]=[pool[j],pool[k2]]; }
-      const sites=pool.slice(0,3).sort();
-      this._o={sites:[]};
-      sites.forEach(k2=>{ const cl=k2[0], r=+k2.slice(1);
-        const drift=(rnd(0,1)?1:-1)*rnd(4,12)/100;
-        cells[k2]={...blankCell(),value:Math.round(vals[k2]*(1+drift)),fmtStyle:'comma',decimals:0};
-        const f=(cl==='C') ? '=B'+r+'*(1+E'+r+')' : '=C'+r+'*(1+E'+r+')';
-        this._o.sites.push({k:k2, f:f, exp:vals[k2], prev:(cl==='C'?'B':'C')+r, g:'E'+r});
-      });
-      cells['A8']={...blankCell(),value:'Total opex',txt:true,bold:true};
-      ['B','C','D'].forEach(cl=>cells[cl+'8']={...blankCell(),fmtStyle:'comma',decimals:0});
-      this._o.tot={B:0,C:0,D:0};
-      for(let r=3;r<=7;r++){ this._o.tot.B+=vals['B'+r]; this._o.tot.C+=vals['C'+r]; this._o.tot.D+=vals['D'+r]; }
-      return {ROWS:9, cells, active:{r:3,c:2}, sel:null, colW:{1:150,2:76,3:76,4:76,5:70}};
-    },
-    checks(S){
-      const o=this._o;
-      const live=(k,exp,rs)=>{ const c=S.cells[k]; if(!c||!c.formula||typeof c.value!=='number') return false;
-        if(Math.abs(c.value-exp)>0.5) return false;
-        const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const fixed=o.sites.every(s=>live(s.k, s.exp, [s.prev, s.g]));
-      const footed=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8'];
-        return !!(c&&c.formula&&sumishF(c.formula)&&typeof c.value==='number'&&Math.abs(c.value-o.tot[cl])<0.5); });
-      const boldOk=['B','C','D'].every(cl=>{ const c=S.cells[cl+'8']; return !!(c&&c.bold); });
-      return [
-        {label:'run Go To Special \u2192 Constants to mark every hardcoded number', ok:(S.markN||0)>=1},
-        {label:'relink the three hardcodes \u2014 prior year \u00d7 (1 + growth); formulas own the calc block again', ok: fixed},
-        {label:'total the corrected build \u2014 =SUM(B3:B7) at B8, fill B8:D8 across', ok: footed},
-        {label:'bold the total row \u2014 B8:D8 carries the corrected page', ok: boldOk},
       ];
     }
   },
