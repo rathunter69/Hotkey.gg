@@ -7520,46 +7520,240 @@ const CHALLENGES = {
     }
   },
   series:{
-    name:'Years', label:'Stub the year header', par:14, parKeys:11,
-    aha:'Seed two years, then Fill Series (Alt H F I S) writes the rest of the header.',
-    prompt:'Extend and format a year header wherever it starts this run: two seed years are in place — fill the next three with Fill Series, then bold the whole run and right-align it so the years sit over their number columns.',
-    req(){ const o=this._o; return 'select <em>'+o.range+'</em> \u00b7 <em>alt h f i s \u21b5</em> fills the missing years \u00b7 selection holds \u2192 <em>ctrl+b</em> \u00b7 <em>alt h a r</em>'; },
+    /* r438 H6b (DEPTH_PASS §4.43, "Serve the year table", tagged audit-shallow #1) — the depth-
+       pass rework, built to §1.0 + §1.0-R2 + §1.0-R3 on top of the page (§1.0-R3 wins).
+
+       WAS: 2 checks (a five-cell Fill Series run, then bold + right-align) on a board whose only
+       other content was two unlabelled figure rows — par 14 / parKeys 11, the thinnest drill in
+       the catalog. It demonstrated a dialog; it did not teach a table.
+
+       RETIREMENT/MERGE TESTED FIRST (§1.0-R3(s) + the DEPTH_PASS_CAMPAIGN §2 two-part ☆-headroom
+       diagnostic) and REJECTED — but only after the FIRST rebuilt board FAILED the test and had
+       to be re-cut. Everything below is measured through the live engine, every selection and
+       navigation keyed, medians over 5–7 seeds.
+         PART 1, ON THE SHIPPED BOARD — IS THERE SPREAD? fastest legal 15 keys (shift-walk the
+           run · Alt H F I S ↵ · Ctrl+B · Alt H A R) against 25 for the slowest legal one (the
+           three missing years typed and Tab-committed, bold off the ribbon). 1.67×.
+         PART 2 — IS ANY OF IT ☆-LEGAL? This is the half that decides, and it is where `unhide`
+           alone failed. Strip chord-vs-ribbon (Ctrl+B vs Alt H 1 — §1.0(c) forces both to clear)
+           and strip formatting (§1.0(d) forbids it), and what survives is the whole remainder:
+           Fill Series against typing the same values out. Alt H F I S is the engine's ONLY route
+           into fillSeries — there is no chord and no second ribbon path — so it cannot be a
+           chord alternative, and it is not a format. Something legal survives, which is exactly
+           what `unhide`'s standalone board had nothing of. KEEP.
+       THE §3 DISCRIMINATOR, PROBED RATHER THAN ARGUED. The neighbour is `filldr` (Ctrl+R /
+       Ctrl+D). Walked, 5 seeds: select the year run, press Ctrl+R, and the FIRST SEED is written
+       across the whole run — 0/5 wins, the board reading 2026 · 2026 · 2026 · 2026 · 2026. That
+       is the sumif/rollup case (a trap that exists only as a contrast), not the grpfold case (a
+       strict subset), and it is why this drill's aha is re-cut to name it.
+
+       TWO MEASUREMENTS CHANGED THE BOARD, and the second one nearly retired the drill:
+         · On a step-1 run, Series from a SINGLE seed lands the identical years (fillSeries
+           defaults the step to 1) — probed, 5/5 — so the old drill's "reads the step from two
+           seeds" claim was never tested by anything it graded. Hence the second run, down the
+           Ref column, on a step that is not 1.
+         · THE FIRST VERSION OF THAT RUN MEASURED NEGATIVE. With five short line numbers, typing
+           them cost 7 keys and extending them cost 11 — the star route WORSE than the route it
+           was meant to beat, which is precisely the finding `growth` was retired on. Fixed by
+           the board, not by the predicate: the table now carries SEVEN plan years and EIGHT
+           lines, and the Ref column is numbered in hundreds (or fifties), the way an exhibit
+           schedule actually is. Re-measured, both runs now favour the star — see the ☆ note.
+
+       THE BOARD. A seven-year long-range plan page that came back from the data room with its
+       frame stripped: every figure survived, the year header stops after two columns, the Ref
+       column stops after two numbers, and the seven component lines sit flush against their
+       heading. Ref · Line · seven year columns; the heading row is a live SUM of its seven
+       components, so every figure on the page is read by something.
+
+       STRUCTURAL DEVIATIONS from the §4.43 page, declared here per §0:
+       (1) ☆ RE-CUT (binding). The page's bonus is "Comma-format the metric block — zero
+           decimals, one pass". That is a FORMATTING task, dead under §1.0(d), and dead a second
+           time under §1.0-R3(o), which is Wolf on this exact op: "you anchored on the whole
+           comma format hotkey but in reality it's such a seldom used / rare hotkey". The re-cut
+           ☆ is the only thing on this board with measured, legal headroom: BOTH runs extended
+           from their seeds instead of typed out. Read off the new r438 S.seriesLog latch (the
+           MECHANIC, never geometry inferred from the end state).
+       (2) THE PAGE'S BEATS 3-5 ARE CUT — "Total each year · Add a top border above the Total
+           row · Enter the label Total and bold it". Not because they are bad beats: `sort`
+           (r436) closes on "Total the size column — a live SUM under the block" plus "Bold the
+           total row and add a top border above it", and `unhide` (r437) closes on bolding the
+           Consolidated line and ruling it on top. That is the same tail three times in one
+           chapter, and DEPTH_PASS_CAMPAIGN §3 says the cheap fix for a family redundancy is to
+           cut the SHARED TAIL, not to pad around it. This board has no total row at all — the
+           heading line already sums its components and ships that way.
+       (3) THE CLOSE IS AN INDENT, the first graded indent in the catalog. Wolf's §1.0-R3(o)
+           frequency list ranks indent explicitly; Alt H 6 has existed since r232 and no drill
+           has ever graded it. It is also the right §1.6 finish for THIS artifact: a plan page
+           whose components sit flush against their heading is not readable, and setting them
+           under it is what makes the table a table. Every other item on that list is already
+           spoken for in this chapter — top border → sort/unhide/lookup2 · outside border →
+           lookup/pastes · bottom border under a header → `center`, verbatim · column width →
+           unhide · comma → lookup, and see (1).
+       (4) FOUR CORE BEATS, the §1.1 floor. Deliberate: a fifth would have to be either the tail
+           cut in (2) or a second dress, and §1.1's rule against do-nothing lines applies to
+           padding as much as to guards. The leave-the-heading-flush guard is folded into the
+           indent beat's ok rather than shipped as its own line.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)). Both graded destinations are the BLANK TAIL OF A
+           RUN whose seeds are on the board, and the guided ring lands on the whole run, seeds
+           included — which says "extend this" exactly. The cue primitive is for a slot BETWEEN
+           two rows and for an empty paste target; neither exists here.
+       (6) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing here is assumed, converted or scaled.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about:
+         · every core reads the finished board. The years and the Ref numbers grade as VALUES, so
+           Series, typing and any mixture of the two all clear; the dress grades bold plus
+           reads-right (align 'r' OR unset, so a Clear-Formats-and-retype route clears exactly as
+           it does in `center`); the indent grades indent>=1 on the seven components and 0 on the
+           heading, with Alt H 5 the visible repair for a sweep that took the heading in too.
+         · the header run ships align:'l' on EVERY cell, blanks included, so the cells Series
+           writes into keep that alignment and the right-align beat is real work on every route.
+           Without it the filled cells would arrive with no align at all and render right for
+           free — half a graded beat handed over by the engine's default.
+         · KNOWN AND EXCEL-TRUE, found by walking: Ctrl+Shift+arrow off the first seed rides
+           nonEmpty() and stops on the SECOND seed, so a grab-then-Series is a NO-OP — fillSeries
+           has nothing past the seeds to write. Same outcome if the selection starts on the "Ref"
+           or "Line" text header: the seed scan stops at the first non-numeric cell and the pass
+           writes nothing. Both leave the board untouched rather than scrambled, both are what
+           Excel's own Series dialog does, and the guide names the selection that works.
+         · the ☆ never gates a core, and its two moves are latched SEPARATELY, so extending one
+           run and typing the other earns nothing (probed, 0/5). */
+    name:'Years', label:'Serve the year table', par:41, parKeys:39, saveClose:true,   /* r438 §4.43 depth pass: par re-swept from scratch (was par 14 / parKeys 11 on the old 2-check board). See the sweep note in dev/AUDIT.md r438; par ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. */
+    aha:'fill right copies what you hand it — a series reads the step off the seeds and keeps going.',
+    /* §1.5: the aha's MOMENT is beat 1 — the year run, where the Ctrl+R reflex writes the same
+       year seven times and the run that reads its seeds writes the other five. */
+    prompt:'The long-range plan tab came back from the data room with its frame stripped: every figure survived, the year header stops after two columns and the Ref column stops after two numbers. Put the header back across the plan columns and dress it over the figures, carry the line numbers down the way the two seeds set them, and set the components under their heading so the page reads. Fill Right would hand you the first year seven times.',
+    req(){ const o=this._o; return 'select <em>'+o.hdrRun+'</em> · <em>alt h f i s ↵</em> · <em>ctrl+b</em> · <em>alt h a r</em> · select <em>'+o.refRun+'</em> · <em>alt h f i s ↵</em> · select <em>'+o.compRng+'</em> · <em>alt h 6</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
     guide(){ const o=this._o; return [
-      'the seed years start at '+o.a+' this run \u2014 select '+o.range+' with <kbd>shift</kbd>+<kbd>\u2192</kbd>',
-      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> opens Series \u00b7 apply with <kbd>\u21b5</kbd>',
-      'selection is still live \u2014 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 then <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
+      'take the whole year run '+o.hdrRun+' — the two seeds AND the five blanks after them — then <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> <kbd>↵</kbd>. Two seeds tell it the step and it writes the rest. <kbd>ctrl</kbd>+<kbd>r</kbd> is the trap: fill right COPIES, so it hands you '+o.y0+' seven times. And <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> stops on the second seed, which leaves the pass nothing to write — walk the selection out with <kbd>⇧</kbd>+<kbd>→</kbd>. Typing the five years works too, it only costs the keys',
+      'the run is still selected — <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>, the engine’s only alignment route. The header arrived hugging the left of its cells; the figures under it read right',
+      'the same move down the Ref column: select '+o.refRun+', from the first number to the last line · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>s</kbd> <kbd>↵</kbd>. The seeds are '+o.ref0+' and '+(o.ref0*2)+', so the step is '+o.ref0+' — a single seed on its own would step by 1',
+      'select the seven component labels '+o.compRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>6</kbd> steps them in one level (<kbd>alt</kbd> <kbd>h</kbd> <kbd>5</kbd> steps back out, which is the fix if you sweep the heading in with them). The '+o.head+' line stays flush; it is the line they sit under',
+      '☆ the discovery: BOTH runs extended from their seeds, neither one typed out. Typing the five years and the five line numbers finishes the drill exactly the same way and forfeits the star — the clock is the only thing that tells you what it cost',
     ]; },
-    targets(){ const o=this._o; return [o.range]; },
+    /* rings: ① the year run · ② the same run, now dressed · ③ the Ref run · ④ the seven component
+       labels · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.hdrRun, o.hdrRun, o.refRun, o.compRng, null]; },
     demo(){ const o=this._o; return [
-      {sel:o.range, active:o.a, keys:[Kb.alt,L('H'),L('F'),L('I'),L('S'),Kb.enter]},
-      {sel:o.range, keys:[Kb.bold]},
-      {sel:o.range, keys:[Kb.alt,L('H'),L('A'),L('R')]},
-    ]; },
+      {sel:o.hdrRun,  keys:[Kb.alt,L('h'),L('f'),L('i'),L('s'),Kb.enter]},   /* ☆ move #1 — the header run extended off its two seeds */
+      {sel:o.hdrRun,  keys:[Kb.bold]},                                       /* §1.0(a) format-as-you-go: the dress rides directly behind the run it dresses */
+      {sel:o.hdrRun,  keys:[Kb.alt,L('h'),L('a'),L('r')]},
+      {sel:o.refRun,  keys:[Kb.alt,L('h'),L('f'),L('i'),L('s'),Kb.enter]},   /* ☆ move #2 — the same engine, down a column, on a step that is not 1 */
+      {sel:o.compRng, keys:[Kb.alt,L('h'),D(6)]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const spots=[{r:1,c:2},{r:2,c:3},{r:3,c:2},{r:1,c:4},{r:5,c:3}];
+      const shuf=(a)=>{ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=rnd(0,i); [b[i],b[j]]=[b[j],b[i]]; } return b; };
+      /* §1.2 randomization — four independent axes: (a) SITE, a 4-spot pool moving the table in
+         both axes; (b) CONTENT, the block drawn from four and its seven components Fisher-Yates
+         shuffled, plus the codename; (c) VALUES, every figure through rnd(); (d) WHICH-STEP, the
+         Ref column's step drawn from {50,100} and the first plan year from a six-year window —
+         so neither run's answer repeats and the Ref step has to be read off the board rather
+         than remembered. Geometry is deliberately constant across seeds (seven years, eight
+         lines, three-digit Ref numbers from the third line on) so the keystroke count does not
+         move with the draw. */
+      const BLOCKS=[
+        {h:'Revenue',         c:['Product','Services','Licensing','Support','Hardware','Training','Other']},
+        {h:'Operating costs', c:['Compensation','Occupancy','Technology','Prof. fees','Travel','Marketing','Insurance']},
+        {h:'Capital spend',   c:['Maintenance','Growth','Systems','Facilities','Fleet','Fit-out','Software']},
+        {h:'Fee revenue',     c:['Advisory','Financing','Restructuring','Markets','Research','Custody','Other']},
+      ];
+      const spots=[{hr:3,c0:1},{hr:4,c0:2},{hr:3,c0:2},{hr:4,c0:1}];
       const sp=spots[rnd(0,spots.length-1)];
-      const y0=rnd(2021,2026);
-      cells[colLetter(sp.c-1)+(sp.r+1)]={...blankCell(),value:'Revenue',txt:true};
-      cells[colLetter(sp.c-1)+(sp.r+2)]={...blankCell(),value:'EBITDA',txt:true};
-      for(let j=0;j<5;j++){ const rev=rnd(40,160)*10;
-        cells[colLetter(sp.c+j)+(sp.r+1)]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-        cells[colLetter(sp.c+j)+(sp.r+2)]={...blankCell(),value:Math.round(rev*rnd(15,35)/100),fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      cells[colLetter(sp.c)+sp.r]={...blankCell(),value:y0,decimals:0};
-      cells[colLetter(sp.c+1)+sp.r]={...blankCell(),value:y0+1,decimals:0};
-      for(let j=2;j<5;j++) cells[colLetter(sp.c+j)+sp.r]={...blankCell(),decimals:0};
-      this._o={ a:colLetter(sp.c)+sp.r, range:colLetter(sp.c)+sp.r+':'+colLetter(sp.c+4)+sp.r, r:sp.r, c:sp.c, y0:y0 };
-      return {ROWS:Math.max(8,sp.r+4), cells, active:{r:sp.r,c:sp.c}, sel:null, colW:{}};
+      const hr=sp.hr, cRef=sp.c0, cLab=sp.c0+1, cY=sp.c0+2, r1=hr+1;
+      const NY=7, NC=7;                                   // seven plan years · seven component lines
+      const blk=BLOCKS[rnd(0,BLOCKS.length-1)];
+      const comps=shuf(blk.c);
+      const y0=rnd(2024,2029);
+      const ref0=rnd(0,1)?100:50;
+      const RL=colLetter(cRef), LL=colLetter(cLab);
+      const yc=[]; for(let j=0;j<NY;j++) yc.push(colLetter(cY+j));
+      cells[RL+'1']={...blankCell(),value:codename()+' — long-range plan ($mm)',txt:true,bold:true};
+      /* §1.3 labeled targets: the two graded runs sit under visible headers ("Ref", "Line") and
+         the six graded labels are the component names themselves. */
+      cells[RL+hr]={...blankCell(),value:'Ref',txt:true,bold:true};
+      cells[LL+hr]={...blankCell(),value:'Line',txt:true,bold:true};
+      /* THE YEAR RUN. Every cell ships align:'l' — the blanks too. A cell Series writes into
+         already exists, so it keeps that alignment and the right-align beat stays real work on
+         every route; a genuinely absent cell would be created by ensure() with no align and
+         would render RIGHT for free (see the header note). */
+      for(let j=0;j<NY;j++) cells[yc[j]+hr]={...blankCell(),align:'l',decimals:0};
+      cells[yc[0]+hr].value=y0; cells[yc[1]+hr].value=y0+1;
+      const figs=[];
+      for(let i=0;i<NC;i++){ const base=rnd(10,60)*10; const row=[];
+        for(let j=0;j<NY;j++) row.push(Math.round(base*(100+j*rnd(4,13))/100/5)*5);
+        figs.push(row); }
+      /* the heading line is a LIVE SUM of its seven components, every year — so nothing on this
+         board is decoration, and the rows the indent beat sets are the rows it reads. */
+      cells[RL+r1]={...blankCell(),value:ref0,decimals:0};
+      cells[LL+r1]={...blankCell(),value:blk.h,txt:true,bold:true};
+      for(let j=0;j<NY;j++){ const cl=yc[j];
+        cells[cl+r1]={...blankCell(),formula:'=SUM('+cl+(r1+1)+':'+cl+(r1+NC)+')',
+          value:figs.reduce((a,rw)=>a+rw[j],0),fmtStyle:'comma',decimals:0,bold:true}; }
+      for(let i=0;i<NC;i++){ const r=r1+1+i;
+        /* the Ref run's seeds are the FIRST TWO cells of the run — fillSeries reads seeds off
+           the head of the selection and stops at the first non-numeric, so the tail has to be
+           genuinely empty for the pass to have anything to write. */
+        cells[RL+r]= i===0 ? {...blankCell(),value:ref0*2,decimals:0} : {...blankCell(),decimals:0};
+        cells[LL+r]={...blankCell(),value:comps[i],txt:true};
+        for(let j=0;j<NY;j++) cells[yc[j]+r]={...blankCell(),value:figs[i][j],fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      }
+      /* §1.3 density + a real desk artifact: the page names its source and its basis, which is
+         what a plan tab actually carries. Story only — checks() reads the table, so deleting
+         either note can never move an ok. */
+      cells[LL+(r1+NC+2)]={...blankCell(),value:'Source: plan pack v4 — figures as filed, frame stripped by the export',txt:true,it:true,fontColor:'gray'};
+      cells[LL+(r1+NC+3)]={...blankCell(),value:'Basis: fiscal years, $ in millions',txt:true,it:true,fontColor:'gray'};
+      this._o={ hr, cRef, cLab, cY, r1, RL, LL, yc, y0, ref0, NY, NC, head:blk.h,
+        hdrRun : yc[0]+hr+':'+yc[NY-1]+hr,
+        refRun : RL+r1+':'+RL+(r1+NC),
+        compRng: LL+(r1+1)+':'+LL+(r1+NC) };
+      /* widths budgeted to ~836px on both anchor columns (the grid's real width at 1440), so the
+         fit scaler runs at 1.0 and no figure column can manufacture a #### — the r430 overflow
+         rule reasons in unscaled px. When the table anchors at B, column A thins to a gutter. */
+      const colW={}; if(cRef>1) colW[cRef-1]=22;
+      colW[cRef]=58; colW[cLab]=168; for(let j=0;j<NY;j++) colW[cY+j]=84;
+      // opens on the first seed year — the head of the run the drill starts with (the r365
+      // standard open reads demo()[0], which would move it here from anywhere else anyway)
+      return {ROWS:Math.max(15,r1+NC+4), cells, active:{r:hr,c:cY}, sel:null, colW};
     },
     checks(S){
-      const o=this._o;
-      const yearsOK=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r];
-        return !!(c&&c.value===o.y0+j); });
-      const dressOK=[0,1,2,3,4].every(j=>{ const c=S.cells[colLetter(o.c+j)+o.r];
-        return !!(c&&c.bold&&c.align==='r'); });
+      const o=this._o, cel=k=>S.cells[k]||{};
+      /* BEAT 1 — the header run reads seven consecutive fiscal years. VALUES, so Series, typing
+         and any mixture of the two clear it; Ctrl+R does not, because it copies (probed). */
+      const yearsOK=o.yc.every((cl,j)=>cel(cl+o.hr).value===o.y0+j);
+      /* BEAT 2 — the tight-pair dress on that run (§1.1): weight and side, one selection. A
+         number with no align RENDERS right, so "reads right" accepts an unset align exactly as
+         `center` does — nothing forces a player to re-align what already reads correctly. The
+         board ships every cell left, so this is real work on every route. */
+      const readsRight=c=>c.align==='r'||c.align==null;
+      const dressOK=yearsOK && o.yc.every(cl=>{ const c=cel(cl+o.hr); return !!c.bold && readsRight(c); });
+      /* BEAT 3 — the Ref column steps the way its two seeds do, all the way to the last line. */
+      let refOK=true; for(let i=0;i<=o.NC;i++) if(cel(o.RL+(o.r1+i)).value!==o.ref0*(i+1)) refOK=false;
+      /* BEAT 4 — the seven components sit under the heading, and the heading stays flush. The
+         leave-it-alone guard is folded into this ok rather than shipped as a do-nothing line
+         (§1.1). Any indent level >=1 clears — Alt H 6 pressed twice is still "under it". */
+      let indentOK=(cel(o.LL+o.r1).indent|0)===0;
+      for(let i=1;i<=o.NC;i++) if((cel(o.LL+(o.r1+i)).indent|0)<1) indentOK=false;
+      /* ☆ (mystery, §1.0(d) hidden efficiency + §1.0-R2(i) a real, skippable decision) — BOTH
+         runs extended from their seeds rather than typed out. Read off the r438 S.seriesLog
+         latch, which records the PASS and its rect, never the end state, and which Alt H F I S
+         is the engine's only route into. The two moves are latched SEPARATELY, so extending one
+         run and typing the other earns nothing; typing both clears all four cores and forfeits
+         the star (dev/e2e-alt-paths.js ALT 2 is that run, measured). */
+      const sl=S.seriesLog||[];
+      const hdrPass=sl.some(e=>e.r1===o.hr && e.r2===o.hr && e.c1<=o.cY+2 && e.c2>=o.cY+o.NY-1 && e.n>0);
+      const refPass=sl.some(e=>e.c1===o.cRef && e.c2===o.cRef && e.r1<=o.r1+2 && e.r2>=o.r1+o.NC && e.n>0);
+      const starOK=yearsOK && refOK && hdrPass && refPass;
+      /* §1.0-R2(g) ADAPTIVE LABEL: the Ref step and the heading name are seed facts the player
+         would otherwise have to reverse-engineer, so the lines state THIS run's. The ROUTE stays
+         the player's (§1.0(c)) — nothing here names a chord. */
       return [
-        {label:'fill five sequential years across '+o.range+' \u2014 Series extends the two seeds', ok: yearsOK},
-        {label:'bold the year run and right-align it over the numbers', ok: dressOK},
+        {label:'Fill the year header — seven fiscal years across the plan columns', ok: yearsOK},
+        {label:'Bold the year run and right-align it over the figures', ok: dressOK},
+        {label:'Fill the Ref column — the line numbers step by '+o.ref0, ok: refOK},
+        {label:'Indent the seven component lines under '+o.head, ok: indentOK},
+        {label:'Fill both runs from their seeds — neither one typed out', ok: starOK, bonus:true},
       ];
     }
   },
@@ -13236,13 +13430,24 @@ function fillSeries(){
   const step = seedVals.length >= 2 ? (seedVals[1] - seedVals[0]) : 1;
   // Fill from seed end onward
   let nextVal = seedVals[seedVals.length-1] + step;
+  let wrote = 0;
   for(let i=seedVals.length; i<cells.length; i++){
     const p = cells[i];
     const cell = ensure(p.r, p.c);
     cell.value = nextVal;
     cell.formula = null;
     nextVal += step;
+    wrote++;
   }
+  /* r438 (DEPTH_PASS §4.43 ☆): SERIES-PASS LOG — same telemetry family as S.fillOps (r424) /
+     S.grabLog (r427) / S.fmtOps (r429) / S.multiEnter (r433) / S.sortLog (r436) / S.foldN
+     (r437). One entry per pass that ACTUALLY EXTENDED a run, recording the selection rect, the
+     step the two seeds implied and how many cells it wrote. Alt H F I S is the engine's only
+     route to this function, so the latch is route-blind by construction. Telemetry for a BONUS
+     only — no core check may read it (§1.0(c)); a player who types every value out clears the
+     drill and forfeits the star. */
+  if(wrote){ (S.seriesLog=S.seriesLog||[]).push({r1:r.r1, c1:r.c1, r2:r.r2, c2:r.c2, n:wrote, step:step});
+    if(S.seriesLog.length>240) S.seriesLog.shift(); }
 }
 
 /* ============================================================
