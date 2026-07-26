@@ -6620,54 +6620,266 @@ const CHALLENGES = {
     }
   },
   sort:{
-    name:'Sort', label:'Sort the table', par:10, parKeys:7,
-    aha:'Alt A S D sorts the rows in place — the table stays live, nothing is retyped.',
-    prompt:'Sort the six deals by size, largest first, total the column with AutoSum, and bold the total. The table lands somewhere new every run — sort, total, bold, wherever it sits.',
-    req(){ const o=this._o; return 'select <em>'+o.range+'</em> (active in the size column) \u00b7 <em>alt a s d</em> sorts Z\u2192A \u00b7 drop to <em>'+o.foot+'</em> \u00b7 <em>alt+=</em> \u2192 <em>\u21b5</em> \u00b7 <em>ctrl+b</em>'; },
+    /* r436 H6b (DEPTH_PASS §4.33, "Sort the table", tagged audit-shallow #11) — the depth-pass
+       rework, built to §1.0 + §1.0-R2 + §1.0-R3 on top of the page.
+
+       WAS: 3 checks (sort desc with the r419 _byName row-integrity pairing · a live SUM · bold)
+       on a 6-row two-column table, par 10 / parKeys 7 — the thinnest drill left in the catalog.
+       Sound skeleton, no story: the table was sorted once and never touched again, so the drill
+       demonstrated a chord instead of teaching what the chord is FOR.
+
+       NOW: the §4.33 beat list — rank the log · the late deal lands · rank it AGAIN so the
+       newcomer takes its place · total · close the line — on a board that shuffles site, deal
+       pool, every size and the rank the late deal lands in, closed by the §1.0(e) Ctrl+S beat
+       the engine appends.
+
+       RETIREMENT TESTED FIRST, per the §1.0-R3(s) diagnostic, and REJECTED. The honest question
+       for this drill is whether `scrub` already carries it: scrub deletes three junk rows, then
+       sorts largest-first with the same row-integrity grading, then re-totals and bolds — which
+       is beats 1, 4 and 5 here. Three findings kept it:
+         (1) EFFICIENCY HEADROOM EXISTS, so the board can carry a legal ☆ (the growth test).
+             MEASURED, not reasoned (4 seeds × every route, walked through the live engine):
+             the board runs a 29-key median on the taught grab and 36 with every grab walked
+             down by plain Shift+arrow — 7 keys of headroom, all five cores clearing either way
+             and the star dark on the slow run. growth was retired because its canonical grab
+             measured 2 keys WORSE than the route it was meant to reward; this is not that case.
+         (2) THE LESSON IS NOT SCRUB'S. scrub sorts ONCE, at the end of a clean-up; its subject
+             is the junk. Here the table CHANGES after it has been ranked, and the point is that
+             re-running the sort costs four keys and retypes nothing. Nothing else in Chapter 4
+             sorts a table twice. `filterpass` hides rows rather than moving them; `series`
+             extends a header; `lookup`/`lookup2`/`recon` read a table they never reorder.
+         (3) STRUCTURAL. sort is one of the five HK_PLACEMENT keys and one of the four c4
+             campaign-milestone keys, and DEPTH_PASS D16 rules the placement series NO CHANGE.
+       A padded board would still have been the wrong answer; this one is not padded — it is the
+       same board with the thing that makes a sort worth knowing put back on it.
+
+       STRUCTURAL DEVIATIONS from the §4.33 page, declared here per §0:
+
+       (1) ☆ RE-CUT (binding). The page's bonus is "Left-align the deal names — labels read
+           left". That is a FORMATTING task, which §1.0(d) outlaws catalog-wide, and it is not a
+           decision either — it falls straight out of dressing the table, which §1.0-R2(i) kills
+           separately. The re-cut ☆ is Wolf's own worked example of the rule, applied to the
+           only op on this board that has real headroom: grab the figures to the end of the
+           column in ONE press before each sort instead of walking the selection down with
+           Shift+arrow. Read off the r436 S.sortLog provenance latch, stamped at the press from
+           the selection the PLAYER built — never after the warning card's expand rewrites it —
+           so both grab routes earn it: the single-column grab resolved through the card (the
+           taught route, 26–27 keys) and the whole-block right-then-down grab (28). MEASURED
+           negative control, walked through the live engine over 4 seeds: the same board with
+           every grab stepped down by plain Shift+arrow runs 36 keys, clears all five cores, and
+           leaves the star DARK. dev/e2e-alt-paths.js ALT 2 is that run, registered so CI keeps
+           holding it; a third measured skip route is the never-sort-at-all one — every row
+           typed into rank by hand, 74 keys, five cores, no star (§1.0(c) freedom, and the
+           clearest possible statement of what the clock is pricing).
+       (2) BEAT 5 IS ONE LINE, NOT TWO. The page's "Bold the total and add a top border above
+           it" is two verbs; §1.7 R1 splits an "and", but §1.1's tight-pair exception covers a
+           dress that rides ONE selection in one motion, which is exactly this (the same two-cell
+           total row takes both). foot split its equivalent line because it spanned a row AND a
+           column — three actions across two rects. Five cores here, inside the §1.1 4–6 band.
+       (3) BEATS 1 AND 3 ARE NESTED, AND THAT IS DELIBERATE (§1.0-R3(p)). Grading the END STATE
+           means beat 3 (all seven ranked) implies beat 1 (the original six ranked among
+           themselves). A player who enters the late deal FIRST and sorts once produces the
+           identical artifact and must not be penalised for the better route, so both beats fire
+           on that run. Beat 1 owns the acceptance the single-column sort breaks — rows move
+           WHOLE, every name still carrying its own size — and beat 3 owns the ranking of the
+           finished table. The failure the drill actually teaches is clearing 1 and 2 and
+           leaving 3 dark: the log looks done and the newcomer is sitting at the bottom of it.
+       (4) THE LATE DEAL LANDS AT AN INTERIOR RANK, always — its size is drawn strictly between
+           the second-largest and the second-smallest of the six, so the re-sort visibly MOVES
+           it and beat 3 can never be satisfied by an append that happens to belong last.
+       (5) CUE PLACED LEFT, WITH A MOAT (§1.0-R2(h) / §1.0-R3(q)). The late-deal row is an empty
+           destination, which is precisely what the cue primitive is for, but the house right-
+           gutter position is unsafe HERE: a red note anywhere to the right of the table is what
+           Ctrl+→ lands on when a block grab runs along the late-deal row, which would poison
+           the very grab the ☆ rewards (the sort key column is the ACTIVE cell's, so an
+           overshoot sorts the log by a cue). It sits two columns LEFT instead, behind an empty
+           gutter column, which also keeps the warning card's leftward expand off it. It is
+           never read by checks(), so deleting it — or letting the expand carry it — can never
+           move an ok.
+       (6) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing on this board is assumed, converted or
+           scaled. Every figure is a signed deal size.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE). Every core beat reads the finished
+       board, never a route: the ranking grades the ORDER and the name↔size pairing, so
+       Alt A S D, Alt A S A run twice, the warning card's expand, and retyping all seven rows in
+       order by hand all clear (the last one earns no star — sortLog stays empty). The one place
+       liveness is required is the total, and only as sumishF() — a formula naming a range or
+       carrying two references. A hardcoded total is the exact sin this drill exists to argue
+       against: it survives a sort by luck and dies the next time the log changes. The border
+       beat accepts bt OR ball, because Alt H B P, Alt H B D and Alt H B S/T on a one-row
+       selection all draw that edge, as does Alt H B A.
+
+       ENGINE, and the two things ROUTE-WALKING turned up that reading the predicates would not
+       have (five untriggerable beats have been found this campaign, every one by walking):
+         · sortRange() keys off the ACTIVE cell's column and refuses a one-row selection, so the
+           size column is built RIGHTMOST — a right-then-down whole-block grab then lands the key
+           on the figures with no extra keys. The r192 warning card is otherwise unchanged; r436
+           adds only the provenance stamp described above.
+         · THE TAUGHT GRAB IS THE SINGLE-COLUMN ONE (Ctrl+Shift+↓ on the figures, warning card
+           expands) rather than the whole-block one, because it is the only grab that is safe in
+           every order on this geometry. Ctrl+arrow rides nonEmpty(), so a grab that runs DOWN
+           THE DEAL COLUMN sails past the late deal into the "Total" LABEL beneath it (the size
+           column's total cell is empty until beat 4, so the same grab down the figures stops
+           clean). Ctrl+Shift+→ off that over-grabbed last row then rides the empty total row to
+           the sheet edge and the sort keys off a blank column, so it does NOTHING. Both halves
+           are Excel's own behaviour — Ctrl+↓ has always ridden a label column into the total
+           line — and after the blanks fix below the outcome is a no-op, not a scramble: four of
+           the five cores still stand, the newcomer is visibly still at the bottom, and grabbing
+           the figures instead finishes the drill. The hints hand you the safe grab, which is
+           also the cheapest measured route on the board — 26–27 keys against 28 for the
+           whole-block right-then-down grab — and both of them earn the ☆.
+         · BLANKS SORTED TO THE TOP, DESCENDING. Walking the over-grabbed route above exposed a
+           real parity bug in sortRange(): cmp() pushed blanks to the end and rows.reverse() then
+           dragged them to rank 1, contradicting the intent written two lines above it. Fixed at
+           the engine (r436, partition before the reverse) so an over-grabbed empty row stays put
+           instead of jumping the ranking. Boards whose key column is fully populated — every
+           sort this catalog grades, this one and scrub's — are byte-identical before and after.
+         · KNOWN, ACCEPTED, AND EXCEL-TRUE: totalling BEFORE the last sort puts a live SUM inside
+           the contiguous run, so a grab down either column then swallows the total row and sorts
+           it into the ranking. Real Excel does exactly this. The beat order, the prompt and the
+           hints all put the total after the second sort; the damage is loud, undoable, and no
+           beat is left untriggerable by it. */
+    name:'Sort', label:'Sort the table', par:31, parKeys:29, saveClose:true,   /* r436 §4.33 depth pass: par re-swept from scratch (was par 10 / parKeys 7 on the old 3-check board). dev/e2e-par-sweep.js sort, 5-seed median 29 keys incl. the engine-appended Ctrl+S (range 27–29 — the count moves only with the length of the late deal's name, which the pool holds to 4–7 characters). par 31 ≈ 1.07 s/key, inside the house band and deliberately at its middle: setDemoSel elides four real range grabs, and the run carries one READ the clock has to pay for — where the late deal ranks. Measured against it: the same board with every grab stepped down by plain Shift+arrow runs 36 keys and the fully hand-typed ranking runs 74 (dev negative controls, 4 seeds each) — that spread is the cost the clock exists to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 46.5 · pro 35.7 · legendary 31. */
+    aha:'the sort is re-runnable — the log is live, so the late deal takes its rank and not one figure is retyped.',
+    /* §1.5: the aha's MOMENT is beat 3 — the second sort, where a table that was already ranked
+       absorbs a row that arrived after it and re-ranks itself for four keys. */
+    prompt:'The pipeline log went out ranked by size and a seventh deal signed an hour later. Rank the log largest-first, put the late deal on the marked row, and rank it again so the newcomer sits where it belongs. Then total the column and close the line. Nothing here gets retyped — the log is live, and the second ranking costs the same four keys as the first.',
+    req(){ const o=this._o; return '<em>'+o.sizeTop+'</em> <em>ctrl+⇧+↓</em> · <em>alt a s d</em> → <em>e</em> expands and sorts Z→A · <em>'+o.lateCell+'</em> '+o.lateName+' <em>↵</em> · <em>'+o.lateSizeCell+'</em> '+o.lateSize+' <em>↵</em> · grab again · <em>alt a s d</em> <em>e</em> · <em>'+o.foot+'</em> <em>alt+=</em> <em>↵</em> · <em>'+o.totRow+'</em> <em>ctrl+b</em> <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every line names the routes that grade, not just the fastest (§1.0-R3(p)). */
     guide(){ const o=this._o; return [
-      'cursor to '+o.b2+' \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>\u2193</kbd> grabs the size column \u00b7 <kbd>shift</kbd>+<kbd>\u2190</kbd> pulls in the names',
-      'sort largest first \u00b7 <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd>',
-      'drop to '+o.foot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> proposes the SUM \u00b7 <kbd>\u21b5</kbd>',
-      'bold it \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      'rank the log — put the cursor on the first size at '+o.sizeTop+' and run the selection to the end of the figures in ONE press: <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> · <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> · Excel notices the names sitting alongside and asks before it decouples them — <kbd>e</kbd> takes the whole block. The sort keys off the column the CURSOR sits in, and every column in the block travels with it',
+      'the late deal goes on the marked row: '+o.lateCell+' <kbd>'+o.lateName+'</kbd> <kbd>↵</kbd> · '+o.lateSizeCell+' <kbd>'+o.lateSize+'</kbd> <kbd>↵</kbd> — the red note is board furniture, not a target; delete it or leave it',
+      'rank it again — the figures run one row deeper now, so grab them the same way and press <kbd>alt</kbd> <kbd>a</kbd> <kbd>s</kbd> <kbd>d</kbd> <kbd>e</kbd>. Nothing is retyped; the rows carry their own names into their new places',
+      'the total at '+o.foot+' · <kbd>alt</kbd>+<kbd>=</kbd> proposes the SUM of the run above it · <kbd>↵</kbd> — a typed number would be right today and wrong the next time the log moves',
+      'close the line: select the total row '+o.totRow+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> puts the border on TOP of the total',
+      '☆ the discovery: run the selection to the end of the rows in ONE press — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd> — instead of tapping <kbd>⇧</kbd>+<kbd>↓</kbd> down the column, on BOTH sorts. Taking the whole block instead (<kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd> then <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>, which skips the warning card) counts just the same. Walking the block down by hand clears the drill too, it only costs the keys',
     ]; },
-    targets(){ const o=this._o; return [o.range, o.foot, o.foot]; },
-    demo(){ const o=this._o; return [
-      {sel:o.range, active:o.b2, keys:[Kb.alt,L('A'),L('S'),L('D')]},
-      {sel:o.foot, keys:[Kb.eq, Kb.enter]},
-      {sel:o.foot, keys:[Kb.bold]},
-    ]; },
+    /* rings: ① the six-row table · ② the late-deal row · ③ the table one row taller ·
+       ④ the total cell · ⑤ the total row · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.rng6, o.lateRow, o.rng7, o.foot, o.totRow, null]; },
+    demo(){ const o=this._o; const CSD={key:'ArrowDown',ctrl:true,shift:true};
+      return [
+      {sel:o.sizeTop,      keys:[CSD, Kb.alt, L('A'), L('S'), L('D'), L('E')]},   /* ☆ move #1 — the figures grabbed in ONE press; the warning card takes the names along */
+      {sel:o.lateCell,     keys:[...T(o.lateName), Kb.enter]},
+      {sel:o.lateSizeCell, keys:[...T(String(o.lateSize)), Kb.enter]},
+      {sel:o.sizeTop,      keys:[CSD, Kb.alt, L('A'), L('S'), L('D'), L('E')]},   /* ☆ move #2 — one row deeper, same one press */
+      {sel:o.foot,         keys:[Kb.eq, Kb.enter]},
+      {sel:o.totRow,       keys:[Kb.bold]},                                    /* §1.0(a) format-as-you-go: the dress rides directly behind the total it dresses */
+      {sel:o.totRow,       keys:[Kb.alt, L('h'), L('b'), L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const spots=[{r:2,c:1},{r:2,c:5},{r:4,c:3},{r:3,c:7}];
+      /* §1.2 randomization — four independent axes: (a) SITE, a 4-spot pool that moves the
+         table in both axes; (b) the deal-name pool is Fisher-Yates shuffled and sampled 7 of
+         10; (c) every size through rnd(), seven distinct multiples of 20 so no two rows tie and
+         the ranking is total; (d) WHICH DEAL IS LATE — the newcomer is drawn from an INTERIOR
+         rank (never the largest, never the smallest), so where it lands in the re-sort changes
+         run to run and beat 3 can never fall out of an append.
+         GEOMETRY: the table is 2 columns wide and every spot leaves the cue column plus an
+         EMPTY gutter column to its left, so no Ctrl-arrow flight along a table row can reach
+         the cue and the warning card's leftward expand stops at the Deal column. */
+      const NAMES=['Falcon','Atlas','Copper','Summit','Ridge','Delta','Harbor','Juniper','Onyx','Sable'];
+      const shuf=(a)=>{ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=rnd(0,i); [b[i],b[j]]=[b[j],b[i]]; } return b; };
+      const spots=[{hr:3,c0:3},{hr:2,c0:5},{hr:4,c0:4},{hr:2,c0:7}];
       const sp=spots[rnd(0,spots.length-1)];
-      const r0=sp.r, c0=sp.c, NC=colLetter(c0), SC=colLetter(c0+1);
-      cells[NC+(r0-1)]={...blankCell(),value:codename()+' — table ($mm)',txt:true,bold:true};
-      cells[NC+r0]={...blankCell(),value:'Deal',txt:true,bold:true};
-      cells[SC+r0]={...blankCell(),value:'Size',txt:true,bold:true,align:'r'};
-      const names=['Falcon','Atlas','Copper','Summit','Ridge','Delta'];
-      const sizes=[]; while(sizes.length<6){ const v=rnd(5,95)*10; if(!sizes.includes(v)) sizes.push(v); }
-      this._sizes=sizes.slice();
-      this._byName={}; names.forEach((n,i)=>this._byName[n]=sizes[i]);   /* r419: bind name\u2194size so a sizes-only sort can't pass (scrub's row-integrity pattern) */
-      names.forEach((n,i)=>{
-        cells[NC+(r0+1+i)]={...blankCell(),value:n,txt:true};
-        cells[SC+(r0+1+i)]={...blankCell(),value:sizes[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};
-      });
-      cells[SC+(r0+7)]={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._o={ b2:SC+(r0+1), range:NC+(r0+1)+':'+SC+(r0+6), foot:SC+(r0+7), sc:SC, nc:NC, r0:r0 };
-      this._sum=sizes.reduce((a,b)=>a+b,0);
-      return {ROWS:Math.max(10,r0+8), cells, active:{r:r0+1,c:c0+1}, sel:null, colW:{}};
+      const hr=sp.hr, c0=sp.c0, r1=hr+1;
+      const LC=colLetter(c0), SC=colLetter(c0+1), cueC=colLetter(c0-2);
+      // seven distinct sizes, ranked; the late deal takes an interior rank (index 1..5 of 7)
+      const all=[]; while(all.length<7){ const v=rnd(3,47)*20; if(!all.includes(v)) all.push(v); }
+      all.sort((a,b)=>b-a);
+      const lateIdx=rnd(1,5);
+      const lateSize=all[lateIdx];
+      const sixSizes=shuf(all.filter((_,i)=>i!==lateIdx));
+      // the log ARRIVES unranked — reshuffle on the (rare) already-descending draw
+      let guard=0; while(guard++<20 && sixSizes.every((v,i)=>i===0||sixSizes[i-1]>=v)) { const s=shuf(sixSizes); for(let i=0;i<6;i++) sixSizes[i]=s[i]; }
+      const names=shuf(NAMES).slice(0,7);
+      const lateName=names[6];
+      this._byName={}; names.forEach((n,i)=>{ this._byName[n]= i<6 ? sixSizes[i] : lateSize; });
+      this._six=names.slice(0,6);
+      this._total=all.reduce((a,b)=>a+b,0);
+      cells[LC+'1']={...blankCell(),value:codename()+' — pipeline log ($mm)',txt:true,bold:true};
+      cells[LC+hr]={...blankCell(),value:'Deal',txt:true,bold:true};
+      cells[SC+hr]={...blankCell(),value:'Size ($mm)',txt:true,bold:true,align:'r'};
+      /* §1.3 labeled targets: every graded site carries a visible label — the "Deal" and
+         "Size ($mm)" headers over the table, and the "Total" label on the total row. */
+      for(let i=0;i<6;i++){
+        cells[LC+(r1+i)]={...blankCell(),value:names[i],txt:true};
+        cells[SC+(r1+i)]={...blankCell(),value:sixSizes[i],fmtStyle:'comma',decimals:0,fontColor:'blue'};   // signed sizes are typed data — blue (doctrine §2.1b)
+      }
+      // the late-deal slot stays genuinely EMPTY (not even a number format): Ctrl+↓ must stop
+      // at row six before the entry, and the cell has to look like the hole it is
+      cells[cueC+(r1+6)]={...cueCell('late deal ▶▶'),align:'r'};      /* r430 shared cue primitive — §1.0-R2(h) board furniture, never a graded target */
+      /* the total line ships LABELLED but UNDRESSED — beat 5 is the work, and §1.0(a) puts it
+         directly behind the total it dresses rather than batching a dress pass at the end */
+      cells[LC+(r1+7)]={...blankCell(),value:'Total',txt:true};
+      cells[SC+(r1+7)]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* §1.3 density + a real desk artifact: the log names its source and its cut-off, which is
+         what a pipeline tape actually carries. Story only — checks() reads the table, so
+         deleting either note can never move an ok. */
+      cells[LC+(r1+9)]={...blankCell(),value:'Source: origination pipeline log — signed deals only',txt:true,it:true,fontColor:'gray'};
+      cells[LC+(r1+10)]={...blankCell(),value:'Cut-off: close of business, one deal signed after the file went out',txt:true,it:true,fontColor:'gray'};
+      this._o={ hr, c0, r1, LC, SC, cueC, lateName, lateSize,
+        top     : LC+r1,                         // the block's top-left — where a whole-block grab starts
+        sizeTop : SC+r1,                         // the first figure — where the taught one-press grab starts
+        rng6    : LC+r1+':'+SC+(r1+5),           // the table as it arrives
+        rng7    : LC+r1+':'+SC+(r1+6),           // …and one row taller, once the late deal lands
+        lateRow : LC+(r1+6)+':'+SC+(r1+6),
+        lateCell: LC+(r1+6), lateSizeCell: SC+(r1+6),
+        foot    : SC+(r1+7), totLab: LC+(r1+7), totRow: LC+(r1+7)+':'+SC+(r1+7) };
+      const colW={}; colW[c0-2]=148; colW[c0-1]=26; colW[c0]=118; colW[c0+1]=104;
+      // opens on the FIRST FIGURE, which is where the taught one-press grab starts — the r365
+      // standard-start rule would move it here from anywhere else anyway (it reads demo()[0])
+      return {ROWS:Math.max(14,r1+11), cells, active:{r:r1,c:c0+1}, sel:null, colW};
     },
     checks(S){
-      const o=this._o;
-      const vals=[0,1,2,3,4,5].map(i=>{ const c=S.cells[o.sc+(o.r0+1+i)]; return c?c.value:null; });
-      const paired=[0,1,2,3,4,5].every(i=>{ const a=S.cells[o.nc+(o.r0+1+i)], b=S.cells[o.sc+(o.r0+1+i)];
-        return !!(a&&b)&&this._byName[a.value]===b.value; });   /* r419: rows must move WHOLE \u2014 name and size together */
-      const sorted=vals.every(v=>typeof v==='number') && vals.every((v,i)=>i===0||vals[i-1]>=v) && paired;
-      const f=S.cells[o.foot];
+      const o=this._o, cel=k=>S.cells[k]||{};
+      /* read the seven table rows as they STAND — never trust build coordinates for order,
+         which is the whole point of a drill about rows moving */
+      const rows=[]; for(let i=0;i<7;i++) rows.push({ n:cel(o.LC+(o.r1+i)).value, v:cel(o.SC+(o.r1+i)).value });
+      const paired=r=>typeof r.n==='string' && this._byName[r.n]!=null && this._byName[r.n]===r.v;   /* r419 row integrity, extended to 7 rows: a sizes-only sort decouples the names and can't pass */
+      const desc=list=>list.every((x,i)=>i===0||list[i-1].v>=x.v);
+      /* BEAT 1 — the six deals that shipped with the log rank largest-first among themselves,
+         each still carrying its own size. Read over the whole block so it survives the append:
+         a run that enters the late deal first and sorts once clears it, which is correct
+         (§1.0-R3(p) — the artifact is identical and the route is better). */
+      const six=rows.filter(r=>this._six.indexOf(r.n)>=0);
+      const sortedSix = six.length===6 && six.every(paired) && desc(six)
+        && new Set(six.map(r=>r.n)).size===6;
+      /* BEAT 2 — the late deal is ON the board, name and size together, anywhere in the block
+         (it need not still be on the row it was typed into: the second sort moves it). */
+      const late=rows.find(r=>r.n===o.lateName);
+      const appended = !!late && late.v===o.lateSize;
+      /* BEAT 3 — all seven ranked, rows whole. Nested on 1 and 2 by construction; see the
+         header note (3) for why that nesting is the right call and not padding. */
+      const ranked = rows.every(paired) && new Set(rows.map(r=>r.n)).size===7 && desc(rows);
+      /* BEAT 4 — a LIVE total. sumishF accepts =SUM(range), a chain of plus signs, a pointed
+         formula and AutoSum alike; a typed number does not clear, and that is the drill's
+         argument, not a route requirement (§1.0(c): every FORMULA route clears, however slow). */
+      const f=cel(o.foot);
+      const totalOk = !!(f.formula && sumishF(f.formula) && typeof f.value==='number' && Math.abs(f.value-this._total)<0.5);
+      /* BEAT 5 — the tight-pair dress on the total row: the label and the figure both carry the
+         weight and the rule. Every border route that draws the top edge clears (bt or ball). */
+      const dressCells=[o.totLab, o.foot];
+      const dressOk = dressCells.every(k=>{ const c=cel(k); return !!(c.bold && (c.bt||c.ball)); });
+      /* ☆ (mystery, §1.0(d) + §1.0-R2(i)) — EVERY sort in the run rode a block grabbed in one
+         press. Read off the r436 S.sortLog latch, stamped at the press from the selection the
+         player built (so the warning card's expand route earns it too). A player who walks the
+         block down with plain Shift+arrow, or who never sorts at all and types the ranking out
+         by hand, clears all five cores and forfeits the star — dev/e2e-alt-paths.js ALT 2 is
+         that run, measured. */
+      const sl=S.sortLog||[];
+      const starOk = ranked && sl.length>0 && sl.every(s=>s.chord);
+      /* §1.0-R2(g) ADAPTIVE LABEL: the late deal's name and size are seed facts, so beat 2
+         states THIS run's instead of making the player hunt for them (the route stays the
+         player's — type them, or land them any other way). */
       return [
-        {label:'sort the six deals largest-first ('+o.range+')', ok: sorted},
-        {label:'total the size column \u2014 land a live SUM at '+o.foot, ok: !!(f&&f.formula&&String(f.formula).toUpperCase().includes('SUM')&&Math.abs((f.value||0)-this._sum)<0.5)},
-        {label:'bold the total', ok: !!(f&&f.bold)},
+        {label:'Sort the deals largest-first — rows move whole', ok: sortedSix},
+        {label:'Enter the late deal — '+o.lateName+' at '+o.lateSize+', on the marked row', ok: appended},
+        {label:'Sort the table again — the late deal takes its rank', ok: ranked},
+        {label:'Total the size column — a live SUM under the block', ok: totalOk},
+        {label:'Bold the total row and add a top border above it', ok: dressOk},
+        {label:'Select the table to the end of its rows in one press — every sort', ok: starOk, bonus:true},
       ];
     }
   },
@@ -11808,8 +12020,19 @@ function sortRange(dir, keyCol){
     if(typeof va==='number' && typeof vb==='number') return va-vb;
     return String(va).localeCompare(String(vb));
   };
-  rows.sort(cmp);
-  if(dir==='desc') rows.reverse();
+  /* r436 EXCEL PARITY (found by walking a route, not by reading the predicate): BLANKS SORT
+     LAST IN BOTH DIRECTIONS. cmp already pushed null to the end — and then `rows.reverse()`
+     dragged every blank straight back to the TOP on a descending sort, which is the opposite of
+     both Excel and the line of intent two lines above it. It shows the moment a selection runs
+     one row past the data (a Ctrl+↓ that rides a "Total" label under the block is the ordinary
+     way to get there): the empty row was landing at rank 1. Blanks are now partitioned out
+     before the sort and re-appended after the reverse, so an over-grabbed empty row stays put
+     instead of jumping the ranking. No board with a fully-populated key column changes at all. */
+  const blanks=rows.filter(rw=>rw[colOff].value==null);
+  const filled=rows.filter(rw=>rw[colOff].value!=null);
+  filled.sort(cmp);
+  if(dir==='desc') filled.reverse();
+  rows.length=0; rows.push(...filled, ...blanks);
   // Write back
   let i=0;
   for(let rr=r.r1; rr<=r.r2; rr++){
@@ -15007,6 +15230,7 @@ function applyRibbon(key){
   if(dialog==='sortwarn'){
     if(key==='E'||key==='ENTER'){
       const p=sortPend; sortPend=null;
+      if(p.stamp) p.stamp();               // r436: the sort really happens — log the provenance read at the press
       let c1=p.key, c2=p.key;
       const nbr=(cc)=>{ if(cc<1||cc>COLS) return false;
         for(let rr=p.r1;rr<=p.r2;rr++) if(nonEmpty(rr,cc)) return true; return false; };
@@ -15015,7 +15239,7 @@ function applyRibbon(key){
       S.sel={r:p.r1, c:c1}; S.active={r:p.r2, c:c2};   // the expanded block; the key column rides through sortRange's override
       pushUndo(); sortRange(p.dir, p.key); return exitRibbon(true);
     }
-    if(key==='C'){ const p=sortPend; sortPend=null; pushUndo();
+    if(key==='C'){ const p=sortPend; sortPend=null; if(p.stamp) p.stamp(); pushUndo();
       S.sel={r:p.r1,c:p.key}; S.active={r:p.r2,c:p.key};
       sortRange(p.dir); return exitRibbon(true); }
     return;
@@ -15096,14 +15320,27 @@ function applyRibbon(key){
   if(np==='ASA'||np==='ASD'){
     const dir = np==='ASD'?'desc':'asc';
     const r=selRange();
+    /* r436 (DEPTH_PASS §1.0-R2(i), the sort ☆): SORT PROVENANCE latch — the same family as
+       S.fillOps (r424) / S.grabLog (r427) / S.fmtOps (r429) / S.multiEnter (r433) /
+       S.pointLog (r434). The MECHANIC is recorded, never inferred from the end state: a block
+       walked down with plain Shift+arrow and one grabbed with Ctrl+Shift+arrow leave byte-
+       identical boards once sorted. `chord` is read HERE, at the press, from the selection the
+       PLAYER built — never after the warning card's expand rewrites S.sel, so the single-column
+       chord grab + expand route earns the star exactly like the whole-block grab. Nothing core
+       may ever require it (§1.0(c)). */
+    const cr=S._chordRect;
+    const chord=!!(cr && r && cr.r1===r.r1 && cr.c1===r.c1 && cr.r2===r.r2 && cr.c2===r.c2);
+    const stamp=()=>{ (S.sortLog=S.sortLog||[]).push({dir:dir, chord:chord});
+      if(S.sortLog.length>240) S.sortLog.shift(); };
     /* r192 SORT WARNING (Wolf) — Excel's guardrail: a single-column selection
        with data alongside decouples rows silently; Excel asks first. */
     const nbr=(cc)=>{ if(cc<1||cc>COLS) return false;
       for(let rr=r.r1;rr<=r.r2;rr++) if(nonEmpty(rr,cc)) return true; return false; };
     if(r.c1===r.c2 && r.r1!==r.r2 && (nbr(r.c1-1)||nbr(r.c2+1))){
-      sortPend={dir:dir, r1:r.r1, r2:r.r2, key:S.active.c};
+      sortPend={dir:dir, r1:r.r1, r2:r.r2, key:S.active.c, stamp:stamp};
       dialog='sortwarn'; drawRibbon(); return;
     }
+    if(r && r.r1!==r.r2) stamp();          // a one-row selection sorts nothing — never log a no-op
     pushUndo(); sortRange(dir); return exitRibbon(true);
   }
   if(np==='HFID'){ pushUndo(); fillFrom('down');  return exitRibbon(true); }    // mirror of Ctrl+D, available from the Fill submenu

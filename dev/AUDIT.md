@@ -7170,3 +7170,96 @@ untriggerable-beat class outright — and the board had no efficiency headroom a
   depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · guided gate scrub railed,
   contained, solvable · cache-bump guard clean (no ?v= bump: drills.js content changed, its version
   is the integrator's call at batch time).
+## r436 — H6b-6: sort depth pass — "Sort the table" (DEPTH_PASS §4.33 + §1.0/-R2/-R3)
+- **RETIREMENT TESTED FIRST, AND REJECTED — with the reasoning, since the campaign has now
+  retired four drills.** sort was the thinnest drill left (par 10 / parKeys 7, three checks) and it
+  is a near-subset of `scrub`, which deletes junk rows, sorts largest-first with the SAME r419
+  row-integrity grading, then re-totals and bolds — beats 1, 4 and 5 of the §4.33 page. Three
+  findings kept it. **(1) The growth diagnostic passes.** The board HAS efficiency headroom, so it
+  can carry a legal ☆: 29 keys on the taught grab against 36 with every grab stepped down by plain
+  Shift+arrow, all five cores clearing either way. growth was retired because its canonical
+  block-grab measured 2 keys WORSE than the taught route; this is the opposite case. **(2) The
+  lesson is not scrub's.** scrub sorts ONCE, at the end of a clean-up, and its subject is the junk.
+  Here the table CHANGES after it has been ranked and the point is that re-running the sort costs
+  four keys and retypes nothing. Nothing else in Chapter 4 sorts a table twice — filterpass HIDES
+  rows rather than moving them, series extends a header, lookup/lookup2/recon read a table they
+  never reorder. **(3) Structural.** sort is one of the five HK_PLACEMENT keys and one of the four
+  c4 campaign-milestone keys, and DEPTH_PASS D16 rules the placement series NO CHANGE.
+- **THE BOARD.** A signed-deal pipeline log — Deal + Size ($mm), six rows arriving UNRANKED, a blank
+  late-deal slot under them carrying a red cueCell, a labelled Total row directly beneath, and a
+  source/cut-off note pair. Four independent randomization axes (§1.2): 4-spot site pool moving the
+  table in both axes · deal names Fisher-Yates shuffled 7 of 10 · seven distinct sizes through rnd()
+  (multiples of 20, so the ranking is total) · **which deal is late**, drawn from an INTERIOR rank
+  so the newcomer is never already in place and the re-sort always visibly moves it.
+- **☆ RE-CUT (§1.0(d) + §1.0-R2(i)).** The §4.33 page's bonus was "Left-align the deal names" — a
+  FORMATTING task, outlawed outright, and one that falls straight out of dressing the table. Replaced
+  with Wolf's own worked example of the rule applied to the only op here with headroom: grab the
+  figures to the end of the column in ONE press before each sort instead of walking the selection
+  down. Graded off a NEW `S.sortLog` provenance latch (r436, the same family as fillOps / grabLog /
+  fmtOps / multiEnter / pointLog) stamped at the PRESS from the selection the player built — never
+  after the warning card's expand rewrites S.sel, so both grab routes earn it.
+- **NEGATIVE CONTROLS (skippability), 4 seeds × 8 routes walked through the live engine:**
+  taught grab 27–30 keys, 5/5 cores, ☆ LIT · whole-block right-then-down grab 28, 5/5, ☆ LIT ·
+  **slow shift-walk 36 keys, 5/5 cores, ☆ DARK** (registered as ALT 2) · **never sort at all —
+  every row typed into rank by hand, 74 keys, 5/5 cores, ☆ DARK** (the §1.0(c) freedom proof, and
+  the clearest statement of what the clock prices) · ascending-then-descending 28, 5/5, ☆ LIT ·
+  decouple-then-repair 34, 5/5, ☆ LIT.
+- **THE TAUGHT MISTAKE, PROBED:** grabbing the size column alone and answering the r192 warning card
+  with "continue with the current selection" decouples the names from their sizes on 4/4 seeds —
+  every core beat stays dark and the board shows why, since the r419 pairing check is what beat 1
+  grades. Undo + a whole-block sort recovers it in 34 keys.
+- **TWO THINGS ROUTE-WALKING FOUND THAT READING PREDICATES WOULD NOT.**
+  **(a) A REAL ENGINE PARITY BUG.** `sortRange()` sorted BLANKS TO THE TOP on a descending sort:
+  `cmp()` pushed null to the end and `rows.reverse()` then dragged every blank back to rank 1 —
+  the exact opposite of the intent comment two lines above it, and of Excel, which puts blanks last
+  in both directions. It surfaces the moment a selection runs one row past the data. Fixed by
+  partitioning blanks out before the sort and re-appending after the reverse. Boards whose key
+  column is fully populated — every sort this catalog grades, this one and scrub's — are identical
+  before and after, and scrub's alt + demo replay confirm it.
+  **(b) THE TAUGHT GRAB HAD TO MOVE.** Ctrl+arrow rides `nonEmpty()`, so a grab running DOWN THE
+  DEAL COLUMN sails past the late deal into the "Total" LABEL beneath it, and Ctrl+Shift+→ off that
+  row then rides the empty total row to the sheet edge. Both halves are Excel's own behaviour. The
+  first draft taught that grab. It now teaches the single-column Ctrl+Shift+↓ on the FIGURES with
+  the warning card expanding it — the only grab safe in every order on this geometry, the cheapest
+  measured route (26–27 keys), and the one that makes the r192 card part of the lesson instead of an
+  obstacle. After (a), the over-grabbed route degrades to a NO-OP with four of five cores standing
+  rather than to a scramble.
+- **KNOWN, ACCEPTED, EXCEL-TRUE:** totalling BEFORE the last sort puts a live SUM inside the
+  contiguous run, so a grab then swallows the total row and sorts it into the ranking. Real Excel
+  does exactly this; the beat order, prompt and hints all put the total after the second sort, and
+  the damage is loud and undoable. No beat is left untriggerable by it.
+- **BEATS 1 AND 3 ARE NESTED, DELIBERATELY.** Grading the END STATE (§1.0-R3(p)) means beat 3 (all
+  seven ranked) implies beat 1 (the original six ranked among themselves). A player who enters the
+  late deal FIRST and sorts once produces the identical artifact and must not be penalised for the
+  better route — both beats fire on that run, and ALT 1 is exactly it. Beat 1 owns the acceptance
+  the single-column sort breaks (rows move WHOLE); beat 3 owns the ranking of the finished table.
+  The failure the drill teaches is clearing 1 and 2 and leaving 3 dark.
+- **CUE PLACED LEFT, WITH A MOAT — a declared departure from the house right-gutter position.** The
+  late-deal row is an empty destination, which is what the cue primitive is for (§1.0-R3(q)), but a
+  red note anywhere RIGHT of the table is what Ctrl+→ lands on when a grab runs along the late-deal
+  row, which would poison the very grab the ☆ rewards (the sort key is the ACTIVE cell's column, so
+  an overshoot sorts the log by a cue). It sits two columns left behind an empty gutter, which also
+  keeps the warning card's leftward expand off it. checks() never reads it, so deleting it or
+  letting a structure op carry it can never move an ok.
+- **META:** drills.js desc described the retired three-check board ("Sort the table, total it, bold
+  the total") and is rewritten to the reworked one. Key immutable — PBs, boards, runs untouched.
+- **PAR:** re-swept from scratch. dev/e2e-par-sweep.js sort, 5-seed median **29** keys incl. the
+  engine-appended Ctrl+S (range 27–29; the count moves only with the length of the late deal's
+  name, which the pool holds to 4–7 characters). parKeys 7→29, par 10→31 (≈1.07 s/key, the house
+  band), mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 46.5s · pro 35.7s · legendary 31s.
+- **DEPTH-MECHANICS COUPLING, HANDLED AT THE ROOT.** `dev/e2e-depth-mechanics.js` §H hard-coded
+  sort's par-10 clocks (15 / 11.5 / 10 and the strip "0:15 / 0:12 / 0:10") and §I(r3) used sort as
+  its example of a drill WITHOUT saveClose — both moved onto sort in r433 after foot was re-parred,
+  which is the second time this coupling broke. Rather than move them to a third host, both are
+  de-coupled: §H now DERIVES every expected value from `CHALLENGES.sort.par` exactly as
+  hkClocksFor() does (the arithmetic and the rendering are what is under test), and §I(r3) PICKS
+  its host at run time — the first catalog drill that has not declared saveClose — and names no
+  cell either. Neither can break on any future re-sweep or rework. 155/155 re-verified.
+- **GATE (all green, own port 8841):** static invariants clean (C9 sort tri-length 6 + one ☆ +
+  saveClose; C11 aphorisms clean; C12 ≥2 alts across 25 reworked drills) · demo-replay ALL GREEN ·
+  alt-paths ALL 99 PASS · par-sweep FLAGGED 0 (drift 0%) · fit-sweep ALL CLEAN (72) ·
+  depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · guided gate ALL 79 PASS.
+  **The stale `sort` alt entry was DELETED, not edited** — it read o.range / o.foot / o.sc off the
+  retired _o and cannot be repaired into the new one. Per the r435 integration note: this side of
+  dev/e2e-alt-paths.js is authoritative for `sort`, additions and deletions both. Do not resurrect
+  it in the merge.

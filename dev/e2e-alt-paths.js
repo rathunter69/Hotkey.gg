@@ -240,12 +240,41 @@ const ALTS = [
       {sel:o.grid, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
       {sel:o.grid, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
     ]; }` },
-  { key: 'sort', name: 'foot and dress BEFORE sorting, single-column sort resolved via the WARNING (e expand)', moves: `C => { const o=C._o;
-      const m=o.range.match(/([A-J])(\\d+):([A-J])(\\d+)/);
+  /* r436 (sort depth pass, DEPTH_PASS §4.33). The pre-r436 entry ("foot and dress BEFORE
+     sorting, single-column sort resolved via the WARNING") drove the RETIRED 3-check board —
+     it read o.range / o.foot / o.sc off the old _o and there is no way to repair it into the
+     new one, so it was DELETED rather than edited. Both entries below replace it.
+     ALT 1 = different op ORDER + different chord ROUTE, and it KEEPS the ☆: the late deal is
+     entered FIRST so ONE ranking does the whole job, the grab is the WHOLE-BLOCK right-then-down
+     chord pair (the demo takes the single-column grab through the warning card instead — the
+     r436 provenance latch stamps both, because the flag is read at the press and not after the
+     expand rewrites the selection), the total is a hand-typed SUM, and the dress runs
+     ribbon-only (Alt H 1 / Alt H B P).
+     ALT 2 = the MEASURED NEGATIVE CONTROL for the ☆ (§1.0-R2(i) skippability): every grab
+     walked down with plain Shift+arrow, ascending sorts run twice to land descending, the
+     total typed as a chain of plus signs, bold via Alt H 1 and the border via Alt H B D. All
+     five cores must clear and the star must stay DARK. */
+  { key: 'sort', name: 'late deal FIRST so ONE ranking does it, WHOLE-BLOCK right-then-down chord grab instead of the warning card (the ☆ still fires), typed SUM, ribbon dress', moves: `C => { const o=C._o; return [
+      {sel:o.lateCell, keys:[...T(o.lateName),{key:'Enter'}]},
+      {sel:o.lateSizeCell, keys:[...T(String(o.lateSize)),{key:'Enter'}]},
+      {sel:o.top, keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'Alt'},L('a'),L('s'),L('d')]},
+      {sel:o.foot, keys:[...T('=SUM('+o.SC+o.r1+':'+o.SC+(o.r1+6)+')'),{key:'Enter'}]},
+      {sel:o.totRow, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+    ]; }` },
+  { key: 'sort', name: 'NEGATIVE CONTROL for the ☆ — every block walked down with plain shift+arrow, two ASCENDING sorts, plus-chain total, Alt H 1 bold + Alt H B D border (five cores clear, star stays dark)', moves: `C => { const o=C._o;
+      const walk=(n)=>{ const k=[]; for(let i=0;i<n;i++) k.push({key:'ArrowDown',shift:true}); return k; };
       return [
-        {sel:o.foot, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
-        {sel:o.foot, keys:[{key:'b',ctrl:true}]},
-        {sel:o.sc+m[2]+':'+o.sc+m[4], keys:[{key:'Alt'},L('a'),L('s'),L('d'),L('e')]},
+        // grab six rows by hand: right one column, then step down five — the ☆ route refused
+        {sel:o.top, keys:[{key:'ArrowRight',shift:true}, ...walk(5), {key:'Alt'},L('a'),L('s'),L('a')]},
+        {sel:o.top, keys:[{key:'ArrowRight',shift:true}, ...walk(5), {key:'Alt'},L('a'),L('s'),L('d')]},
+        {sel:o.lateCell, keys:[...T(o.lateName),{key:'Enter'}]},
+        {sel:o.lateSizeCell, keys:[...T(String(o.lateSize)),{key:'Enter'}]},
+        {sel:o.top, keys:[{key:'ArrowRight',shift:true}, ...walk(6), {key:'Alt'},L('a'),L('s'),L('a')]},
+        {sel:o.top, keys:[{key:'ArrowRight',shift:true}, ...walk(6), {key:'Alt'},L('a'),L('s'),L('d')]},
+        {sel:o.foot, keys:[...T('='+o.SC+o.r1+'+'+o.SC+(o.r1+1)+'+'+o.SC+(o.r1+2)+'+'+o.SC+(o.r1+3)+'+'+o.SC+(o.r1+4)+'+'+o.SC+(o.r1+5)+'+'+o.SC+(o.r1+6)),{key:'Enter'}]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),D(1)]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('d')]},
       ]; }` },
   { key: 'series', name: 'dress first, series last', moves: `C => { const o=C._o; return [
       {sel:o.range, keys:[{key:'b',ctrl:true}]},

@@ -29,8 +29,8 @@ begin
   if v_uid is null then raise exception 'NOT_SIGNED_IN'; end if;
   if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) then raise exception 'GUEST_ACCOUNT'; end if;
   v_keys := case p_track
-    when 'fluency'  then array['navigation','modeltour','filldr','pastes','blocksel','rowops','editfix','undo','copyover','typeset','decimals','center','autofit','ruleoff','ruleaudit','combo','dress','housestyle','gauntlet']   -- r424 (D17): colops retired — rowops absorbed it; the array moves in the same PR as HK_TRACKS (r359 drift rule)
-    when 'formulas' then array['margin','foot','anchor','percent','cagr','bridge','sumif','rollup','fxconvert','cases','sort','scrub','grpfold','filterpass','unhide','lookup','lookup2','recon','drill','series','audit','triage','wrapfix','balcheck','stalelink','wirewalk','tieout','hunt','signerr','versionup','balance']
+    when 'fluency'  then array['navigation','modeltour','filldr','pastes','blocksel','rowops','editfix','typeset','decimals','center','autofit','ruleoff','ruleaudit','combo','housestyle','gauntlet']   -- r424 (D17): colops retired — rowops absorbed it; the array moves in the same PR as HK_TRACKS (r359 drift rule)
+    when 'formulas' then array['margin','foot','anchor','percent','cagr','bridge','sumif','rollup','fxconvert','cases','sort','scrub','grpfold','filterpass','unhide','lookup','lookup2','recon','drill','series','audit','triage','wrapfix','balcheck','stalelink','tieout','hunt','signerr','versionup','balance']
     when 'modeling' then array['wacc','fcfbuild','dcf','comps','txncomps','football','dcfsens','retbridge','accdil','sourcesuses','schedule','intsched','lbo','revolver','waterfall','covtable','liqbridge','wk13','cascade','debtsched','isbuild','bsbuild','cfslink','nwcsched','threestmt','opmodel','dcfbuild','lbobuild','debtblock','dashcover']
     else null end;
   if v_keys is null then raise exception 'BAD_TRACK'; end if;

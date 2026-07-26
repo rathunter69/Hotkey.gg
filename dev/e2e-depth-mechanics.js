@@ -442,26 +442,35 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     const r = await run(() => {
       /* r433: was foot (par 11) — foot's depth-pass rework re-swept its par, and a clock test
          that hardcodes one drill's seconds re-breaks every time that drill is reworked. Moved
-         to sort, a par-10 drill outside the depth-pass wave; the arithmetic is what is under
-         test, not which drill supplies the par. */
-      window.__clearCel(); hideResults(); loadChallenge('sort');   // par 10
+         to sort, then a par-10 drill outside the depth-pass wave.
+         r436: sort has now been depth-passed too (par 10 → 31), which broke this block for the
+         SECOND time — so the coupling is removed at the root rather than moved to a third
+         host. The block still runs on sort, but every expected value is DERIVED from the par
+         the page actually declares, exactly as hkClocksFor() derives them. What is under test
+         is the arithmetic and the rendering, never one drill's seconds; any future re-sweep of
+         any drill now leaves this block alone. */
+      window.__clearCel(); hideResults(); loadChallenge('sort');
+      const par = CHALLENGES.sort.par;
       const c = hkClocksFor('sort');
       const ready = (document.getElementById('result') || {}).innerHTML || '';
-      const beat = hkClockBeat('sort', 11);   // between pro (11.5) and legendary (10)
+      const beat = hkClockBeat('sort', (par * 1.15 + par) / 2);   // strictly between pro and legendary
       window.HOTKEY_CLOCKS.sort = { pass: 100 };
       const c2 = hkClocksFor('sort');
       delete window.HOTKEY_CLOCKS.sort;
       return {
-        pass: c.pass, pro: +c.pro.toFixed(2), leg: c.leg,
-        strip: /pass 0:15/.test(ready) && /pro 0:12/.test(ready) && /legendary 0:10/.test(ready),   // hkClockFmt rounds: 11.5 → 0:12
+        par, pass: c.pass, pro: +c.pro.toFixed(2), leg: c.leg,
+        wantPass: par * 1.5, wantPro: +(par * 1.15).toFixed(2), wantLeg: par,
+        strip: new RegExp('pass ' + hkClockFmt(par * 1.5)).test(ready)
+            && new RegExp('pro ' + hkClockFmt(par * 1.15)).test(ready)
+            && new RegExp('legendary ' + hkClockFmt(par)).test(ready),
         beatN: beat && beat.beat && beat.beat.n, nextN: beat && beat.next && beat.next.n,
-        oPass: c2.pass, oLeg: c2.leg,
+        oPass: c2.pass, oLeg: c2.leg, wantOLeg: par,
       };
     });
-    ok(r.pass === 15 && r.pro === 11.5 && r.leg === 10, 'clocks derive pass=par×1.5 · pro=par×1.15 · legendary=par×1.0', r);
+    ok(r.pass === r.wantPass && r.pro === r.wantPro && r.leg === r.wantLeg, 'clocks derive pass=par×1.5 · pro=par×1.15 · legendary=par×1.0', r);
     ok(r.strip, 'drill-start line carries the three-clock strip', r);
     ok(r.beatN === 'Pro' && r.nextN === 'Legendary', 'clock naming: the one you beat + the next one up', r);
-    ok(r.oPass === 100 && r.oLeg === 10, 'HOTKEY_CLOCKS override wins per field, the rest still derive', r);
+    ok(r.oPass === 100 && r.oLeg === r.wantOLeg, 'HOTKEY_CLOCKS override wins per field, the rest still derive', r);
     const r2 = await run(() => {
       const C = CHALLENGES.sort;
       for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
@@ -516,15 +525,26 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r2.coresDone && r2.preDone === false, 'all cores complete — the win gates on the save beat', r2);
     ok(r2.done === true && r2.splitsLen === r2.checksLen, 'Ctrl+S fires the win; the save beat carries a split slot', r2);
     const r3 = await run(() => {   // non-saveClose drills keep the restart behavior, still swallowed
-      /* r433: was foot, which became saveClose:true in its depth-pass rework — this probe needs a
-         drill that has NOT been reworked yet. sort is one. */
-      window.__clearCel(); hideResults(); loadChallenge('sort');
-      setDemoSel('C5'); demoKey({ key: '7' }); demoKey({ key: 'Enter' });
+      /* r433: was foot, which became saveClose:true in its depth-pass rework — this probe needs
+         a drill that has NOT been reworked yet. sort was one.
+         r436: sort became saveClose:true in ITS depth-pass rework, so naming a second host by
+         hand would only queue the same breakage for a third time. The probe now PICKS the host
+         at run time — the first catalog drill that has not declared saveClose — and reports
+         which one it used, so it keeps working until the very last drill is depth-passed (at
+         which point the whole non-saveClose contract is dead and this line goes with it). No
+         cell is named either: the key log only has to prove work happened, so a plain arrow off
+         whatever cell the board opens on is enough on any board. */
+      window.__clearCel(); hideResults();
+      const keysAll = Object.keys(CHALLENGES).filter(k => !/^__/.test(k) && CHALLENGES[k] && !CHALLENGES[k].saveClose);
+      if (!keysAll.length) return { skipped: true, hadWork: true, prevented: true, fresh: true, host: '(none left)' };
+      const key = keysAll[0];
+      loadChallenge(key);
+      demoKey({ key: 'ArrowDown' });
       const hadWork = keyLog.length > 0;
       const ev = new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true, bubbles: true });
       document.dispatchEvent(ev);
       const fresh = keyLog.length === 0 && done === false;   // loadChallenge wipes the key log — the board restarted
-      return { hadWork, prevented: ev.defaultPrevented, fresh };
+      return { hadWork, prevented: ev.defaultPrevented, fresh, host: key, hostCount: keysAll.length };
     });
     ok(r3.hadWork && r3.prevented && r3.fresh, 'non-saveClose drill: Ctrl+S still swallowed + restarts (unchanged contract)', r3);
   }

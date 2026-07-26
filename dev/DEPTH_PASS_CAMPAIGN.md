@@ -159,6 +159,16 @@ had no business depending on it:
 - `dev/e2e-echo.js` drove `#echoBtn`, removed from the markup in r401 → **deleted**; it had
   been red on every run since and nothing noticed because `gate.yml` does not run it.
 
+**THE STANDING GATE — run ALL of these after every integration, not a subset.** I ran a
+narrower set for six batches and left `e2e-lb` red in CI without noticing (two of my own
+retirement bugs: the certificates migration still listed `undo`/`copyover`/`dress`, and the
+suite hard-coded the old `HK_PLACEMENT` list after I repointed it). `gate.yml` is the
+authority on what CI runs — diff your gate against it, do not curate from memory:
+`check-invariants` · `e2e-smoke` · **`e2e-lb`** · `e2e-demo-replay` · `e2e-alt-paths` ·
+`e2e-audit-parity` · `e2e-audit-onboard` · `e2e-mac-input` · `e2e-rapidfire` · `e2e-guided` ·
+`e2e-formulas` · `e2e-grid-height` · plus `e2e-depth-mechanics`, `e2e-fit-sweep`,
+`e2e-par-sweep`, `check-borders`, `check-pause`, `check-cache-versions`.
+
 **Retirement plumbing checklist** (miss one and C1/C12 will catch it, but do it up front):
 groups · meta · `HOTKEY_PARS` · `HOTKEY_CAMPAIGN` chapter keys *and* milestone lists ·
 `HK_TRACKS` · `dev/migrate-certificates.sql` · the drill's alt-path entries · `drills/<key>.html` ·
