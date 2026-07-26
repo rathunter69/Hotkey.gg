@@ -140,3 +140,26 @@ is the main checkout.
   project; anything a Fable session would "just know" must be written down where the work is
   specced. This extends §1's "vague prompts produce vague sweeps" and §7's spec-then-execute:
   the spec page IS the intelligence; the executor only has to follow it.
+
+---
+
+## §9 · THE DEPTH-PASS CAMPAIGN (r429+, live) — read before running agents
+Running one-agent-per-drill across the catalog has its own operating notes, and they are NOT
+in DEPTH_PASS.md (which carries the spec and the binding rules). They live in
+**`dev/DEPTH_PASS_CAMPAIGN.md`** — read it before dispatching a batch. It carries:
+  · the sweep's state and every retirement, with the reasoning
+  · **the untriggerable-beat bug class** — seven found, all by probing routes, none by reading
+    predicates — plus the route facts already established so they are not re-derived
+  · the **☆ headroom diagnostic** (no headroom → no legal star → probably a motif, not a lesson)
+  · how to decide merge-vs-keep (the test is: does fluency in one produce a correct first
+    attempt at the other?)
+  · the agent-operations notes that cost real time to learn: worktrees branch from origin/main,
+    commit early or lose it to a restart, four cores is the ceiling, and the alt-paths merge
+    rule (never union — the reworking agent's side is authoritative for deletions too)
+  · open pipeline items the campaign deliberately did NOT fix
+
+**Models I / Models II / Full Builds additionally require `dev/MODELING_STANDARDS.md`.** Those
+30 drills are financial models, not Excel mechanics with a finance skin: colour-as-provenance,
+sign convention, the roll-forward shape, the standard formula forms, circularity handling and
+the error checks a real model carries. A correct keystroke on a wrong model is worse than no
+drill, and a banker judges the model first.
