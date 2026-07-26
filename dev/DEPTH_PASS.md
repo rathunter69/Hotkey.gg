@@ -107,7 +107,11 @@ Minimum TWO independent axes per drill, from:
 Full-grid artifacts (Models II / Full Builds boards that occupy most of 20×10) may substitute (a) with **corner jitter** (±1–2 rows/cols) + (d); their §4 page says which. Same-seed determinism holds (replay ×3 seeds must win).
 
 ### 1.3 Grid usage
-The board is 20 rows × 10 cols (A–J; `__ROW_CAP` 20). Target ≥60% of rows carrying content or scripted purpose at the win state; a drill living in a 6×4 corner of an empty sheet fails the density doctrine. Title row + labeled rows/headers/units per doctrine §2.1; win state per §2.1b (banker's-workbook finish) — where the lesson isn't formatting, the board ships pre-dressed.
+The board is 20 rows × 10 cols (A–J; `__ROW_CAP` 20). Target ≥60% of rows carrying content or scripted purpose at the win state; a drill living in a 6×4 corner of an empty sheet fails the density doctrine.
+
+**20 is floor AND cap, for every chapter — no exemptions (Wolf, r440).** `ROWS=20` is the default a board starts from; anything smaller is a decision that must be justified on its own §4 page, not a `ROWS=14` inherited from the drill it was copied off. The tell that this rule is being broken is a load-state and win-state density that are IDENTICAL — the drill is filling cells inside rows that already exist rather than sizing the board to the lesson, so the empty band at the bottom is on screen the whole run.
+
+The cap binds the Models chapters too: **a Models board is a COMPONENT of a build — a schedule, a corkscrew, a driver block, one statement's linkage — not a whole model.** If a board cannot fit in 20 rows it is scoped too wide, and the fix is to narrow the fragment, never to raise the cap. A board over the cap is a design signal, not a trim job (see `cases`, 21 → 20, which came down by rebuilding and got denser and better for it). Title row + labeled rows/headers/units per doctrine §2.1; win state per §2.1b (banker's-workbook finish) — where the lesson isn't formatting, the board ships pre-dressed.
 
 **Labeled targets (Wolf, review round 1 — load-bearing):** every graded target carries a VISIBLE label on the board — a row label, column header, or block title — so the semantic references §1.7 mandates always resolve. `build()` specs must seed those labels. R4's "never grade against a term the sheet doesn't show" now binds in both directions: no beat term the board doesn't label, and no graded target the board leaves unlabeled. The only exception is the R2(a) class (maze/obstacle boards, where coordinates are the game).
 

@@ -83,9 +83,11 @@
   }
 
   /* ----------------------------------------------------------
-     Grid constants + cell math (A–J × 14)
+     Grid constants + cell math (A–J × 20)
+     r440 (Wolf): was ROWS 14 — the scaffold default that got copied forward into ~33 boards
+     and put them under the §1.3 density target. 20 is the sheet, floor AND cap, every chapter.
   ---------------------------------------------------------- */
-  const GRID = { COLS: 10, ROWS: 14 };
+  const GRID = { COLS: 10, ROWS: 20 };
   const colLetter = c => String.fromCharCode(64 + c);        // 1 → 'A'
   const A1 = (r, c) => colLetter(c) + r;
   function parseA1(ref) {

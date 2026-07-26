@@ -15,18 +15,21 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 | Formatting | 9 | 9 | ✅ complete (`dress` retired into `housestyle`; `gauntlet` designated capstone) |
 | Formulas I | 9 | 9 | ✅ complete as of r438 (`growth` retired; `cagr` absorbed its board; `bridge` → "Point-mode formulas"; `rollup` last in) |
 | Data & Lookups | 9 | 9 | ✅ complete as of r438 (`grpfold` retired into `unhide`, so the chapter is 9; `drill` and `series` last in — both tested for retirement and both kept) |
-| Formulas II | 2 | 11 | `wirewalk` retired into `tieout`; `wrapfix` + `cases` in at r439 — both tested for retirement, both kept |
+| Formulas II | 7 | 10 | `wirewalk` retired into `tieout`, `hunt` retired into `audit` (11 → 10); in at r439: `wrapfix`, `cases`, `audit`, `triage`, `stalelink`, `signerr`, `versionup`. **Remaining: `balcheck`, `tieout`, `balance`** |
 | Models I | 0 | 10 | ⚠️ read §5 below before dispatching |
 | Models II | 0 | 10 | ⚠️ read §5 below before dispatching |
 | Full Builds | 0 | 10 | ⚠️ read §5 below before dispatching |
 
-Catalog **75** (was 81; `grpfold` closed it out at r437). `menuOrder.length` is the only source of truth; the
+**41 of 74 passed.** Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
+at r440, chapter by chapter. `menuOrder.length` is the only source of truth; the
 "N banker-grade drills" marketing copy in index/About/enterprise is asserted against it by
 `e2e-smoke`, so it moves with every retirement.
 
 **Retirements so far** (all under §1.0-R3(s), all with the lesson verified as carried
 elsewhere): `dress`→housestyle · `wirewalk`→tieout · `undo`→editfix · `copyover` (covered by
-filldr+pastes) · `growth`→cagr absorbed its board.
+filldr+pastes) · `growth`→cagr absorbed its board · `grpfold`→unhide (r437) · `hunt`→audit
+(r439, the strongest of the campaign — measured three ways). `cases` moved chapters rather than
+retiring.
 
 ---
 
@@ -256,6 +259,22 @@ conventions that must hold — formatting colour law, sign conventions, roll-for
 the standard formula forms, circularity handling, and the error checks every real model
 carries. Agents on those chapters must be briefed with it explicitly, and must state in their
 report which conventions their board follows and where they deliberately simplified.
+
+**The 20-row board is not negotiable for these chapters either (Wolf, r440).** The question was
+put — do Models boards need a higher cap, since a real three-statement model or LBO does not fit
+in 20 rows — and the answer is no. **A Models board is a COMPONENT of a build**, and the basic
+pieces (a debt schedule, a WC corkscrew, a driver block, one statement's linkage, a discounting
+strip) fit the 20×10 frame comfortably. A board that does not fit is scoped too wide: narrow the
+fragment, never raise the cap. Two consequences for dispatch briefs:
+
+- **`ROWS=20` is the starting default, not `ROWS=14`.** The `ROWS=14` inheritance is the single
+  most common density defect in the catalog (33 of 75 drills under the §1.3 target, almost all of
+  them declaring exactly 14). Brief every Models agent to size the board to the lesson from a
+  20-row start and to report the win-state density figure. Do not let twenty new boards join the
+  retrofit list.
+- **`lbobuild` (25 rows) comes down to 20**, like `cases` did — by rebuilding around the cap, not
+  by deleting rows. It is the standing worked example that a board over the cap is a design
+  signal.
 
 ---
 
@@ -580,6 +599,10 @@ beats or grading — but re-sweep par if the new content changes what the player
 Two boards EXCEED the cap and want trimming, reported by `e2e-grid-height` check E rather than
 failed (board work, not a render regression): **`lbobuild` 25 rows · ~~`cases` 21~~ (fixed at
 r439 — check E now notes `lbobuild` alone)**.
+
+**r440 — the cap is now explicitly floor AND cap for every chapter, Models included (Wolf).**
+`ROWS=20` is the default a board starts from; `ROWS=14` is the defect. See §5 for the Models
+ruling and DEPTH_PASS §1.3 for the binding text.
 
 **How `cases` came down from 21 to 20, because "delete a row" is the wrong instinct (r439).** The
 row that had to go could not simply be deleted — every row on that board was load-bearing for a

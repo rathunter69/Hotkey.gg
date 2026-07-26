@@ -156,6 +156,12 @@ the average-balance form without the machinery to resolve it would teach a broke
 - The board must be a **plausible artifact** — a real page from a real model, with labelled
   rows, stated units, and a source/basis memo. Not an abstract grid of stubs. (This is exactly
   why `cagr` was rebuilt onto a revenue build and `lookup` onto a peer screen.)
+- **The board is 20 rows. It is a COMPONENT of a build, not a whole model (Wolf, r440).** A
+  debt schedule, a working-capital corkscrew, a driver block feeding one statement, the cash
+  link between two statements, a DCF's discounting strip — each of those is a board. A whole
+  three-statement model is not, and a board that will not fit in 20 rows is scoped too wide.
+  Narrow the fragment; do not raise the cap. This is what makes Full Builds a distinct chapter
+  rather than a bigger Models — the pieces are taught here and assembled there.
 - **Grade the model's correctness through VALUES**, not formula text (§1.0-R3(p)) — but the
   conventions above are legitimately gradeable as end state: colour, sign, the presence of a
   top border on a total, a check reading zero, a beginning balance that REFERENCES rather than
