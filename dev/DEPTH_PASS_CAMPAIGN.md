@@ -513,3 +513,37 @@ the catalog on the inside, so every drill is preceded by a different drill each 
 Two earlier runs of the hunt must be discarded, not cited: they were pointed at port 8853, which
 belonged to another agent's worktree (see the port hazard above). The numbers quoted here are
 from the run against the integrated tree.
+
+## §1.3 density against the real 20-row sheet (r438) — measured, with the retrofit list
+
+Once r438 made the sheet a true 20 rows for every drill, the density doctrine became testable
+for the first time. **Measure it at the WIN state, counting content OR SCRIPTED PURPOSE** — a
+load-state count of literal values undercounts twice over (it misses everything the player
+fills, and misses blank cells that are declared targets). Measured the wrong way first, which
+reported 53 of 75 under target; measured properly it is **33 of 75**:
+
+| band | drills |
+|---|---|
+| under 60% | 33 |
+| 60–79% | 33 |
+| 80%+ | 9 |
+
+**The diagnostic tell is `ROWS=14`.** Almost every drill under target declares exactly that — it
+is a default copied forward, not a board sized to a decision. And for most of them the load and
+win counts are IDENTICAL, meaning the drill fills cells inside rows that already exist rather
+than extending the board, so the empty band at the bottom is on screen the whole run.
+
+**Retrofit list — already-passed drills under 60%** (11 of ~32, small enough for one batch):
+
+`navigation` 40% · `gauntlet` 45% · `margin` 45% · `anchor` 45% · `combo` 50% · `ruleoff` 50% ·
+`foot` 50% · `bridge` 50% · `percent` 55% · `pastes` 55% · `cagr` 55%
+
+Everything else under target is in an unpassed chapter and gets fixed when the sweep arrives.
+Worst in the catalog is `series` at **3/20 (15%)**.
+
+**Standing instruction for every remaining depth pass:** author the board to a real 20 rows and
+report the win-state density figure. Extending a board downward is ADDITIVE — it does not touch
+beats or grading — but re-sweep par if the new content changes what the player traverses.
+
+Two boards EXCEED the cap and want trimming, reported by `e2e-grid-height` check E rather than
+failed (board work, not a render regression): **`lbobuild` 25 rows · `cases` 21**.
