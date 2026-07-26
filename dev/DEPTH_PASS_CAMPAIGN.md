@@ -256,3 +256,35 @@ independently on section U in the same round, which makes it a pattern, not an i
 
 **Standing check, added to the gate list:** after any rework, `git grep -n "CHALLENGES\.<key>\._o"
 dev/` and repoint anything outside the drill's own tests through an adapter.
+
+## C13 — retired drills leave references behind, always (r437)
+
+Five drills were retired in this campaign (`dress`, `wirewalk`, `undo`, `copyover`, `growth`)
+and **every one of them left a reference somewhere that is not the drill.** They surfaced one
+at a time, days apart, each as a red suite:
+
+| where | what |
+|---|---|
+| `dev/migrate-certificates.sql` | still granted certificates for five dead keys |
+| `dev/e2e-lb.js` | hard-coded the old `HK_PLACEMENT` list after `dress` → `combo` |
+| `dev/e2e-mac-input.js` | still called `loadChallenge('dress')` to test the Mac display layer |
+| `dev/drillgen.js` | integration doc example built `make('growth')` |
+
+`e2e-lb` **is** in `gate.yml`, so CI was red across several batches before anyone looked. C12
+already covered `e2e-alt-paths.js`; nothing covered anywhere else.
+
+**C13** now sweeps every `dev/*.js` and `dev/*.sql` for a quoted retired key. Deliberate design
+choices worth knowing before you edit it:
+
+- It is a **denylist**, not "any key absent from `menuOrder`". The general form fires on ordinary
+  English words in quotes and on keys a test legitimately invents. **When you retire a drill,
+  add it to `RETIRED`** — that is what makes the plumbing checklist self-enforcing.
+- **Comments are blanked, not skipped.** Retirements are documented in place, and a trailing
+  `/* r432: dress retired, so this loads housestyle */` is a note you want to keep. Block
+  comments are blanked preserving line numbers, then line comments, with `://` guarded so URLs
+  survive.
+- `dev/seed-field.sql` is **exempt**: those rows are historical leaderboard runs on drills that
+  really existed, the lb suite is green with them present, so they are evidence and not drift.
+
+Negative control run before shipping — planting `['dress']` in `e2e-lb.js` fires exactly one
+C13 failure; removing it goes clean. A guard that has never been seen to fire is not a guard.

@@ -395,5 +395,50 @@ try {
   bad('C12 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
+/* ---- C13 (r437): NO HARNESS MAY NAME A RETIRED DRILL ----
+   This campaign retired five drills (dress, wirewalk, undo, copyover, growth) and every single
+   retirement left a reference behind somewhere that is not the drill. They surfaced one at a
+   time, days apart, each as a red suite:
+     · dev/migrate-certificates.sql still granted certificates for undo/copyover/dress/wirewalk/growth
+     · dev/e2e-lb.js hard-coded the old HK_PLACEMENT list after 'dress' was repointed to 'combo'
+     · dev/e2e-mac-input.js still called loadChallenge('dress') to test the Mac display layer
+   C12 already catches this inside e2e-alt-paths.js. Nothing caught it anywhere else, and
+   e2e-lb IS in gate.yml, so CI sat red across several batches before anyone looked.
+
+   So: sweep every harness and SQL file under dev/ for a quoted drill-shaped token that is a
+   KNOWN-RETIRED key. A denylist rather than "any key not in menuOrder" on purpose — the latter
+   would fire on ordinary English words in quotes and on keys a test legitimately invents.
+   When a drill is retired, add it here; that is the point of the plumbing checklist. ---- */
+try {
+  const RETIRED = ['dress', 'wirewalk', 'undo', 'copyover', 'growth', 'colops'];
+  // seed-field.sql is HISTORICAL leaderboard data — retired keys are real past runs and the lb
+  // suite is green with them present, so rows there are evidence, not drift.
+  const SKIP = new Set(['dev/seed-field.sql', 'dev/check-invariants.js']);
+  const files = fs.readdirSync('dev')
+    .filter(f => /\.(js|sql)$/.test(f)).map(f => 'dev/' + f).filter(f => !SKIP.has(f));
+  let n13 = 0;
+  // A COMMENT may name a retired drill — the retirements are documented in place, and a
+  // trailing `/* r432: dress retired, so this loads housestyle */` is exactly the note you
+  // want to keep. So blank comments out rather than skipping whole lines: block comments
+  // first (line numbers preserved), then line comments, guarding `://` so URLs survive.
+  const decomment = src => src
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .split('\n').map(l => l.replace(/(^|[^:])\/\/.*$/, '$1').replace(/(^|[^-])--.*$/, '$1'))
+    .join('\n');
+  for (const f of files) {
+    const src = decomment(fs.readFileSync(f, 'utf8'));
+    src.split('\n').forEach((line, i) => {
+      for (const k of RETIRED)
+        if (new RegExp(`['"\`]${k}['"\`]`).test(line)) {
+          n13++;
+          bad(`C13: ${f}:${i + 1} references retired drill '${k}' — ${line.trim().slice(0, 90)}`);
+        }
+    });
+  }
+  if (!n13) ok(`no dev/ harness or migration names a retired drill (${RETIRED.join(', ')})`);
+} catch (e) {
+  bad('C13 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');

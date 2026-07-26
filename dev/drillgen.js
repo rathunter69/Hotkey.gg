@@ -22,7 +22,7 @@
    Integration contract (index.html)
    ---------------------------------
    For a migrated drill, CHALLENGES[key] keeps its shape but:
-     build()  → const inst = DrillGen.make('growth');        // or make('growth', seed)
+     build()  → const inst = DrillGen.make('cagr');          // or make('cagr', seed)
                 S.inst = inst; apply inst.grid to S.cells;
      checks(S)→ DrillGen.runChecks(S.inst.checks, S)         // or keep bespoke checks
                 (runChecks needs a tiny adapter to the engine's
