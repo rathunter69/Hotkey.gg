@@ -1,5 +1,39 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r426–r427 — RECONCILIATION ENTRY (written r428, 2026-07-26, from the PR #242 record — the source session hit its limit mid-assembly and never wrote these; treat the PR diff as the primary record)
+- **r426 — BORDER P0 (Wolf round-2 playtest, reported twice, R2-B1):** applied cell borders were
+  INVISIBLE site-wide — the r413 gridline-softener `#grid td{border-color:…}` (specificity 1,0,1)
+  outranked the applied-border classes `td.bt/.bb/.bdbl/.ball` (0,1,1) on border-COLOR, so every
+  seeded or player-applied border repainted in the faint gridline colour while grading still
+  passed (checks read state, not pixels). Fixed by scoping each applied-border rule under `#grid`
+  (bare `td.*` copies kept for preview harnesses). Probe: applied rgb(56,53,45) vs gridline
+  0.52-alpha — distinct. Same round: dev/ROUND2_FEEDBACK.md transcribed + dispositioned;
+  DEPTH_PASS → **r420d** (§1.0-R2 laws g–m).
+- **r427 — ENGINE ROUND (per assembly commit):** cursor anchor-collapse post-copy/paste (R2-B2),
+  ribbon sizing + fixed-height overlay submenu slot (R2-B5 — submenus no longer push the grid),
+  outside-border canon S=outside/A=all aligned across 3 teaching surfaces (R2-B4 / §1.0-R2(m)).
+- **r427 — INDEX-UI ROUND (per assembly; UNVERIFIED against the feedback doc):** landed in the
+  assembly but has no per-item record — next session should verify R2-B6 (onboarding arrow keys),
+  R2-B7 (drill-selector hard stop), and ROUND2_FEEDBACK §4c (tab names, selector default-expand,
+  section check marks, selector width, arrow-help legibility) against the live tree.
+- **r427 — ASSEMBLY:** 12 agent commits merged — 9 wave-2/3 drills (ruleoff · dress · copyover ·
+  editfix · ruleaudit · housestyle · typeset · undo · modeltour★, per-drill entries below) +
+  cosmetics (ROUND2_FEEDBACK §4a achievement renames incl. the golf par set) + 2 wave-1 ROUND-3
+  batches (navigation/filldr/pastes + blocksel/rowops to their §1.0-R2 items: adaptive labels,
+  "<<< Insert row above" cues, re-cut ☆s — NO per-drill entries were written; verify against
+  ROUND2_FEEDBACK §2 as the checklist). **Three union-merge casualties rebuilt by hand:**
+  check-invariants.js (base + ruleaudit C10 + modeltour capstone guard + full 14-drill REWORKED
+  list), e2e-depth-mechanics.js (155 checks, was corrupted with dead code parked after
+  process.exit()), e2e-alt-paths.js (89/89, one entry carried a literal SyntaxError). Two lost
+  hunks restored: housestyle's index.html rework + its `S.gotoSpecials` engine telemetry.
+  HOTKEY_PARS resynced from each drill's authoritative CHALLENGES.par; 81 drill pages + sitemap
+  regenerated; versions themes v310 · nav v301 · nav.css v210 · lb v40 · lb.css v22 · drills v284.
+- **Backend riders:** `20260725000000_retire_colops.sql` (D17) + `20260725100000_desk_create_pro.sql`
+  (ROUND2_FEEDBACK §4e — desk CREATION server-gated to PRO; deployed via supabase-deploy on merge).
+- **PROCESS LESSON (now law — WORKFLOW.md §9):** parallel build agents must never append to shared
+  registry files; the union-merge corrupted every shared file the fleet touched. Payload contract
+  + serial orchestrator assembly per §9 from wave 4 on.
+
 ## r425 H6b-2 — modeltour: the FOUNDATIONS CAPSTONE (DEPTH_PASS.md §4.10 + §2.4 + §1.0 overlay)
 _The first capstone build — the wiring template the other seven chapters inherit._
 - **BEAT CHAIN (§2.4 c1 row: ctrl-arrow flight · formula rebuild · fill right · format · close;

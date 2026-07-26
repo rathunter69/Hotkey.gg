@@ -1,6 +1,42 @@
 # PIPELINE — the Fable task queue
 
-## ⚡ STATE OF THE QUEUE (r417, 2026-07-24 — READ FIRST)
+## ⚡ STATE OF THE QUEUE (r428, 2026-07-26 — READ FIRST; supersedes the r417/r420c block below)
+
+**WHERE THE DEPTH PASS STANDS (post PRs #240–#242, all merged to main + live):**
+- **14/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
+  is the single source of truth): **Foundations (c1) COMPLETE 9/9** — navigation · filldr · pastes ·
+  blocksel · rowops(⊕colops) · editfix · undo · copyover · **modeltour★ the FIRST CAPSTONE** (the
+  §2.4 wiring template every later chapter inherits: shared `hkCapstoneOk` predicate in drills.js,
+  HOTKEY_CLOCKS pass=par×2.0, picker ★ CAPTAG, both grandfather rules, access-never-blocked).
+  **Formatting (c2) 5/10** — ruleoff · ruleaudit · dress · housestyle · typeset done.
+- Wave-1 ROUND-3 fixes (adaptive labels · action-location cues · re-cut ☆s per §1.0-R2) + the r426
+  border-visibility P0 + the r427 engine round (R2-B2/B4/B5) + index-UI + cosmetics renames + the
+  desk-create-PRO server guard all landed in #242. **Spec is DEPTH_PASS r420d** (§1.0 + §1.0-R2).
+- **DOCS DEBT cleared r428:** the source session died mid-assembly; AUDIT.md now carries a
+  r426–r427 reconciliation entry (what's verified vs what isn't), this header is current, and the
+  wave process is codified as **WORKFLOW.md §9 (the Opus-5 wave playbook — payload contract,
+  serial assembly; the r427 union-merge incident is the WHY)** + `.claude/workflows/drill-wave.js`.
+
+**THE QUEUE (in order):**
+1. **W4 — FINISH FORMATTING (c2) [auto·M]:** decimals · center · autofit · combo + **gauntlet★
+   (c2 capstone, gate flips on in the same PR)**. One agent per drill per WORKFLOW §9; build to
+   DEPTH_PASS r420d; modeltour is the capstone wiring template. Closes with the post-batch brief.
+2. **WOLF PLAYTEST ROUND 3** — the 14 reworked drills + the platform fixes (borders, ribbon
+   overlay, cursor anchor). Feedback → §1.0-R3 law integration (spec round, highest-tier work)
+   BEFORE wave 5 builds. Also collect: index-UI verification list (AUDIT r426–r427 entry names
+   R2-B6/B7 + §4c as unverified), clock feel, ☆ discovery rate.
+3. **W5–W7 — FORMULAS I (c3) [auto·rolling]:** margin · foot · anchor · percent · growth, then
+   cagr · bridge · sumif · rollup · fxconvert, then cases + **qclose★ (NEW, D1)** + the D10–D15
+   drills.js meta sweep. First NEW-drill build (qclose) carries the full plumbing row (SPINE,
+   TRACKS+migrate-certificates.sql same-PR, PARS, LB auto, SEO page).
+4. **Chapter-by-chapter per DEPTH_PASS §5** — c4 (incl. vlookup NEW + cleanroom★) → **post-c4
+   MID-PASS REVIEW (§5.4 #4: par distribution, clock feel, bonus uptake, gate friction)** →
+   c5 (redflags★) → c6 (pitchpage★) → c7 (cascade★ move) → **H6b-FB (ch 8) SEPARATE PASS,
+   Wolf-gated (§5.4 #5)**.
+**Wolf-pending (unchanged):** fx dial-up render approval · lean ribbon default-ON · About restyle ·
+data-retention policy (G10) · card customizer 2.0 (item 9 below, screenshot-first).
+
+## ⚡ STATE OF THE QUEUE (r417, 2026-07-24 — history; superseded by r428 above)
 _Process standards now live in **dev/WORKFLOW.md** (orchestrator+agent-fleet model, decision
 protocol, definition of done, **NEW §8: post-batch briefs · propagation sweeps · model-proof
 specs**). Findings base: **dev/AUDIT_R417.md** (6-domain platform audit, live-verified). One

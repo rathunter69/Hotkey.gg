@@ -1,8 +1,37 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Refreshed 2026-07-24 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+_Refreshed 2026-07-26 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
 New sessions: the repo IS the handover — read this file, **dev/WORKFLOW.md (the process
-standards — READ FIRST, new r417)**, **dev/PIPELINE.md's ⚡ header (the live queue)**,
-dev/AUDIT.md (newest round at the TOP), and the dev/ design docs._
+standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428)**,
+**dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
+and the dev/ design docs._
+
+## ⚡ NEXT-SESSION HANDOFF (2026-07-26, r428 — 48H AUDIT + THE OPUS-5 WAVE PLAYBOOK)
+
+**WHERE THE PRODUCT STANDS (PRs #240–#242 merged + live; spec = DEPTH_PASS r420d):**
+- **14/81 drills at the depth-pass standard** (C9 ledger in dev/check-invariants.js is truth):
+  **Foundations (c1) COMPLETE 9/9 incl. modeltour★ — the FIRST CAPSTONE and the §2.4 wiring
+  template** (shared `hkCapstoneOk`, pass=par×2.0 clocks, picker CAPTAG, grandfather rules).
+  **Formatting (c2) 5/10** (ruleoff · ruleaudit · dress · housestyle · typeset).
+- Wave-1 round-3 fixes (§1.0-R2: adaptive labels, action cues, re-cut ☆s), the r426 border P0,
+  the r427 engine round (cursor anchor / ribbon overlay / border canon), index-UI, cosmetics
+  renames, and the desk-create-PRO migration are all IN. Two migrations deployed with #242.
+- **The r425–r427 session died mid-assembly** — r428 wrote the reconciliation AUDIT entry
+  (what's verified vs NOT: index-UI items R2-B6/B7 + §4c and the two round-3 drill batches
+  have no per-item record; ROUND2_FEEDBACK §2/§4c is the verification checklist).
+
+**THE QUEUE (dev/PIPELINE.md ⚡ r428):** W4 = decimals · center · autofit · combo + gauntlet★
+(closes c2) → Wolf playtest round 3 → §1.0-R3 integration → c3 in three waves (incl. qclose★,
+the first NEW drill, full plumbing row) → chapter-by-chapter with the post-c4 mid-pass review.
+
+**PROCESS (new, binding):** WORKFLOW.md **§9 THE WAVE PLAYBOOK** — build agents own ONLY their
+drill's CHALLENGES block; every shared-file change (drills.js, invariants, ALTS, depth-mechanics,
+telemetry) ships as a paste-ready PAYLOAD applied serially by the orchestrator (the r427
+union-merge corruption is the WHY). `.claude/workflows/drill-wave.js` encodes the launch.
+Opus 5 is the default build tier (specs are model-proof); escalate only for playtest-law
+integration, engine semantics, and security/money work.
+
+**Wolf-pending (unchanged):** fx dial-up render approval · lean ribbon default-ON · About
+restyle · data-retention policy (G10) · card customizer 2.0 (screenshot-first).
 
 ## WOLF DECISIONS — DEPTH PASS (2026-07-24, r419, binding for H6)
 - **Depth target:** EVERY drill to the Foundations bar (4-6 beats, randomized sites, aha,
