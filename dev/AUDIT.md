@@ -224,13 +224,19 @@ board-content sweep (`B3:B8` · `Model feed` · `Fill Series` · `HFIS`) turned 
 the drills' own alt entries. Nothing needed an adapter this round.
 
 ### GATE (all green, own port 8884, `readlink /proc/<pid>/cwd` confirmed against this worktree)
-`check-invariants` STATIC INVARIANTS: clean (C9 series 5 + drill 5, one ☆ and saveClose each · C11
-aphorisms clean · C12 ≥2 alts across 34 reworked drills) · `e2e-smoke` ALL 7 PAGES CLEAN +
-skin-unlock (count 75) · `e2e-lb` ALL 36 PASS · `e2e-demo-replay` ALL GREEN · `e2e-alt-paths` ALL
-105 PASS · `e2e-audit-parity` ALL 177 PASS · `e2e-audit-onboard` ALL 35 PASS · `e2e-mac-input` ·
-`e2e-rapidfire` · `e2e-guided` · `e2e-formulas` · `e2e-grid-height` · `e2e-depth-mechanics` ·
-`e2e-fit-sweep` · `e2e-par-sweep series drill` FLAGGED 0 (0% drift, 1.05 s/key both) ·
-`check-borders` clean · `check-pause` clean · `check-cache-versions` clean.
+`check-invariants` **STATIC INVARIANTS: clean** (C9 series 5 + drill 5, one ☆ and saveClose each ·
+C11 aphorisms clean · C12 ≥2 alts across 34 reworked drills) · `e2e-smoke` **ALL 7 PAGES CLEAN +
+skin-unlock** (drill-count 75, HOTKEY_PARS parity + de-hint clean) · `e2e-lb` **ALL 36 PASS** ·
+`e2e-demo-replay` **E2E: ALL GREEN** (full catalog; series WIN 3/3, drill WIN 3/3) ·
+`e2e-alt-paths` **ALL 108 PASS** · `e2e-audit-parity` **PARITY MATRIX: ALL 177 PASS** ·
+`e2e-audit-onboard` **ONBOARD AUDIT: ALL 35 PASS** · `e2e-mac-input` **MAC INPUT: ALL 19 PASS** ·
+`e2e-rapidfire` **RAPIDFIRE: ALL 14 PASS** · `e2e-guided` **GUIDED GATE: ALL 78 PASS (73 railed)** ·
+`e2e-formulas` **FORMULA PACK: ALL 102 PASS** · `e2e-grid-height` **ALL INVARIANTS HOLD** (incl. the
+new check E catalog-uniformity and check F frame-survives-row-ops) · `e2e-depth-mechanics`
+**155 passed, 0 failed** · `e2e-fit-sweep` **ALL CLEAN (71 drills)** · `e2e-par-sweep series drill`
+**FLAGGED: 0** (series 44/42/42, drill 22/21/21, 0% drift, 1.05 s/key both) · `check-borders`
+**BORDER RENDER: clean** · `check-pause` **ALT-TAB PAUSE: clean** · `check-cache-versions`
+**CACHE-BUMP GUARD: clean**.
 No `drills.js?v=` bump — drills.js content changed (HOTKEY_PARS + two meta rows) and the version is
 the integrator's call at batch time.
 
