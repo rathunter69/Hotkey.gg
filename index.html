@@ -12159,7 +12159,8 @@ const CHALLENGES = {
            formatting: the shipped board grades NO formatting at all, so §1.0(d)'s forbidden class
            is empty. What survives is 134 keys of fill-against-typing, 20 of them inside the
            driver block alone, and none of it is either excluded class. KEEP.
-         The rebuilt board measures fastest legal 79 · slowest legal 244 = 3.09×.
+         The rebuilt board measures fastest legal 87 (the INDEX driver, filled) · slowest legal
+         250 (every cell typed, no fill anywhere) = 2.87×.
 
        ── TWO UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD (the CAMPAIGN §1 class, found by
        WALKING routes). Both came from grading formula TEXT for 'CHOOSE(':
@@ -12315,7 +12316,15 @@ const CHALLENGES = {
       cells[CA+rDrv] ={...blankCell(),value:'Active case',txt:true,bold:true};
       cells[CA+rDrvG]={...blankCell(),value:'Active revenue growth',txt:true,bold:true};
       cells[CA+rDrvM]={...blankCell(),value:'Active EBITDA margin',txt:true,bold:true};
-      cells[CB+rDrv] ={...blankCell(),txt:true,fill:'blue',ball:true,align:'r'};
+      /* BOARD DETAIL THAT IS LOAD-BEARING, and it was found by looking at the win screenshot
+         rather than at a predicate: a FILL COPIES THE SOURCE CELL'S NUMBER FORMAT, so filling
+         down from a plain head cell strips the percent format off the two rows under it and the
+         ☆ route leaves the driver reading `0.14` where the slow typed route reads `14.0%`. A star
+         that makes the board WORSE than the route it beats is not a star. The head cell therefore
+         ships percent-formatted too — a TEXT value renders raw regardless (probed: the case name
+         still shows "Base"), so the format is invisible here and survives the fill for the two
+         rows that need it. */
+      cells[CB+rDrv] ={...blankCell(),txt:true,fmtStyle:'percent',decimals:1,fill:'blue',ball:true,align:'r'};
       cells[CB+rDrvG]={...blankCell(),fmtStyle:'percent',decimals:1,fill:'blue',ball:true,align:'r'};
       cells[CB+rDrvM]={...blankCell(),fmtStyle:'percent',decimals:1,fill:'blue',ball:true,align:'r'};
       /* THE LIVE MODEL */
@@ -12347,7 +12356,9 @@ const CHALLENGES = {
          locked-year EBITDA, so a snapshot that has gone stale says so on the board. Furniture,
          never a graded target: checks() reads the model and the snapshots directly, so deleting
          this line cannot move any ok. */
-      cells[CA+rChk]={...blankCell(),value:'Check — active snapshot less live '+capYr+' EBITDA',txt:true,it:true};
+      /* the label is kept short on purpose: the check VALUE sits in the next column, so a longer
+         line would be clipped rather than spill (§1.0-R3(q)'s sibling problem). */
+      cells[CA+rChk]={...blankCell(),value:'Check — snapshot less live',txt:true,it:true};
       cells[CB+rChk]={...blankCell(),
         formula:'=INDEX('+CC+rSnap+':'+CE+rSnap+',$'+CB+'$'+rSw+')-'+capL+rEb,
         value:0,fmtStyle:'comma',decimals:0,bold:true,bt:true};
@@ -12423,11 +12434,11 @@ const CHALLENGES = {
          or the fill walks off the assumption table and the block reads empty. Read off the r424
          S.fillOps latch — the MECHANIC, never geometry inferred from the end state — so Ctrl+D
          and the ribbon's Alt H F I D both earn it and three typed formulas earn nothing.
-         MEASURED in the star's own scope, isolated from the rest of the drill: the fill costs 27
-         keys (one formula, two Shift+↓, Ctrl+D) against 72 for the three typed out — 45 keys of
-         legal headroom, 2.67×. It is a SINGLE-MOVE star, so there is no second half for a
+         MEASURED in the star's own scope, isolated from the rest of the drill: the fill costs 25
+         keys (one formula, two Shift+↓, Ctrl+D) against 66 for the three typed out — 41 keys of
+         legal headroom, 2.64×. It is a SINGLE-MOVE star, so there is no second half for a
          negative to hide in (the r438 `series` finding). Every core clears without it: the
-         alt-paths negative control walks that route at 244 keys against the demo's 79 with this
+         alt-paths negative control walks that route at 133 keys against the demo's 92 with this
          line DARK. */
       const cb=o.c0+1;
       const oneFill=(S.fillOps||[]).some(f=>f.dir==='down' && f.c1<=cb && f.c2>=cb
