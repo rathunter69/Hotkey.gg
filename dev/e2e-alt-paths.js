@@ -553,21 +553,22 @@ const ALTS = [
       steps.push({sel:'A'+o.regions[o.openI].rt, keys:[{key:'Alt'},L('a'),L('j')]});
       steps.push({sel:'B'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]});
       return steps; }` },
-  { key: 'rollup', name: 'BACKWARDS + ribbon: block boxed while empty (thick), cross-tab total over an empty grid, check written before it is true, crosses filled LAST via the ribbon, ledger total closes — the ☆ still fires', moves: `C => { const o=C._o; return [
-      {sel:o.blockRng, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                      // boxed before there is anything in it
+  { key: 'rollup', name: 'BACKWARDS + ribbon: cross-tab total over an empty grid, check written before it is true, ledger total before the crosses exist, grid filled LAST right-then-down via the ribbon, thick box closes — the ☆ still fires', moves: `C => { const o=C._o; return [
       {sel:o.gtCell,   keys:[...T('=SUM('+o.gridRng+')'),{key:'Enter'}]},             // totals an empty block: zero until the crosses land
       {sel:o.chkCell,  keys:[...T('='+o.LA+o.rLT+'-'+o.gtCell),{key:'Enter'}]},       // the check, reversed and not yet true
+      {sel:o.LA+o.rLT, keys:[...T('=SUM('+o.LA+o.r1+':'+o.LA+o.rL+')'),{key:'Enter'}]},
       {sel:o.g0,       keys:[...T('=SUMIFS('+o.sumR+','+o.segR+',$'+o.LL+o.g1+','+o.regR+','+o.R0+'$'+o.hr+')'),{key:'Enter'}]},
       {sel:o.R0+o.g1+':'+o.Rn+o.g1, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},  // right FIRST, then down — the other fill order
       {sel:o.gridRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:o.LA+o.rLT, keys:[...T('=SUM('+o.LA+o.r1+':'+o.LA+o.rL+')'),{key:'Enter'}]},
+      {sel:o.blockRng, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                      // the thick box closes the page (a fill would wipe it — see the note above)
     ]; }` },
   /* ALT 2 = the §1.0-R2(i) SKIPPABILITY PROOF, measured. Every cross hand-written with FULLY
      RELATIVE ranges, top-to-bottom, no fill anywhere; a quoted-text criterion is used for the
      first cross to prove that route too, and the block is boxed by figures only (no header row,
      no label column — the §1.0-R3(p) label-plus-figures widening). All FIVE cores clear and the
-     ☆ must stay DARK. Measured over 4 seeds: 245-350 keys (median 350) against the demo's 76 —
-     a 4.6x spread, which is the headroom the clock exists to show. */
+     ☆ must stay DARK. Measured over 9 seeds: 245-480 keys, median 337, against the demo's 76 —
+     a 4.4x spread, which is the headroom the clock exists to show. Verified directly (win, all
+     five cores, ☆ dark on 5/5 seeds), because this harness asserts only that a route WINS. */
   { key: 'rollup', name: 'NEGATIVE CONTROL — every cross hand-typed with fully relative ranges, one quoted-text criterion, no fill anywhere, figures-only box: five cores clear, ☆ DARK', moves: `C => { const o=C._o; const mv=[];
       mv.push({sel:o.LA+o.rLT, keys:[...T('=SUM('+o.LA+o.r1+':'+o.LA+o.rL+')'),{key:'Enter'}]});
       for(let i=0;i<o.nSeg;i++) for(let j=0;j<o.nReg;j++){

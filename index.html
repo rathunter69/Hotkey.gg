@@ -11005,7 +11005,7 @@ const CHALLENGES = {
        it requires a single-column or single-row selection — so it serves beat 1 and cannot be
        used to total the 2-D block in beat 4. Pointer mode moves ONE cell per arrow and ignores
        Ctrl, so there is no Ctrl+Shift+arrow range grab inside a formula on this engine. */
-    name:'SUMIFS', label:'Sum on two criteria', par:80, parKeys:76, saveClose:true,   /* r438: par re-swept from scratch on the reworked board (the pre-rework board was par 65 / parKeys 68 on four checks and no ☆) — dev/e2e-par-sweep.js rollup, 5-seed median 76 keys incl. the engine-appended Ctrl+S. par 80 ≈ 1.05 s/key, the house band. Measured against it: the same board with every cross hand-written and no fill anywhere runs 245-350 keys (dev/e2e-alt-paths.js ALT 2, the negative control), so the ☆'s headroom is 4.6x. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 120 · pro 92 · legendary 80. */
+    name:'SUMIFS', label:'Sum on two criteria', par:80, parKeys:76, saveClose:true,   /* r438: par re-swept from scratch on the reworked board (the pre-rework board was par 65 / parKeys 68 on four checks and no ☆) — dev/e2e-par-sweep.js rollup, 5-seed median 76 keys incl. the engine-appended Ctrl+S. par 80 ≈ 1.05 s/key, the house band. Measured against it: the same board with every cross hand-written and no fill anywhere runs 245-480 keys over 9 seeds (median 337 — dev/e2e-alt-paths.js ALT 2, the negative control), so the ☆'s headroom is 4.4x. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 120 · pro 92 · legendary 80. */
     aha:'SUMIFS takes the sum range FIRST — the reverse of SUMIF — and two mixed anchors fill the whole cross-tab from one formula.',
     prompt:'The desk books revenue one line at a time — segment, region, amount — and the committee wants it as a segment by region cross-tab. A block is already framed beside the ledger, its segments down the side and its regions across the top, both in their own order. Roll the ledger into it, box the finished block, then total the cross-tab and prove it back against the ledger it came from.',
     req(){ const o=this._o; return '<em>'+o.LA+o.r1+':'+o.LA+o.rLT+'</em> <em>alt+=</em> · <em>'+o.g0+'</em> <em>=SUMIFS('+o.sumR+','+o.segR+',$'+o.LL+o.g1+','+o.regR+','+o.R0+'$'+o.hr+')</em> · <em>'+o.colRng+'</em> <em>ctrl+d</em> · <em>'+o.gridRng+'</em> <em>ctrl+r</em> · <em>'+o.blockRng+'</em> <em>alt h b s</em> · <em>'+o.gtCell+'</em> <em>=SUM('+o.gridRng+')</em> · <em>'+o.chkCell+'</em> <em>='+o.gtCell+'-'+o.LA+o.rLT+'</em> · <em>ctrl+s</em>'; },
@@ -11083,9 +11083,9 @@ const CHALLENGES = {
 
       gSeg.forEach((sg,i)=>{ cells[LL+(g1+i)]={...blankCell(),value:sg,txt:true};
         gReg.forEach((_,j)=>{ cells[RC[j]+(g1+i)]={...blankCell(),fmtStyle:'comma',decimals:0}; }); });
-      cells[LL+rGT]={...blankCell(),value:'Cross-tab total ($000s)',txt:true,bold:true};
+      cells[LL+rGT]={...blankCell(),value:'Cross-tab total',txt:true,bold:true};
       cells[RC[0]+rGT]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      cells[LL+rChk]={...blankCell(),value:'Check — cross-tab less ledger',txt:true};
+      cells[LL+rChk]={...blankCell(),value:'Reconciliation check',txt:true};
       cells[RC[0]+rChk]={...blankCell(),fmtStyle:'comma',decimals:0};
       const rMemo=Math.max(rLTx,rChk)+2;
       cells[LS+rMemo]={...blankCell(),value:'Source: booking system extract — gross revenue, $000s, no costs and no adjustments. One sheet, so no cross-sheet links are marked green.',txt:true,it:true,fontColor:'gray'};
@@ -11105,7 +11105,12 @@ const CHALLENGES = {
         blockRng:LL+hr+':'+RC[nReg-1]+gN,
         gtCell :RC[0]+rGT,
         chkCell:RC[0]+rChk };
-      const colW={}; colW[cSeg]=104; colW[cReg]=92; colW[cAmt]=92; colW[c0+3]=30; colW[cLbl]=104;
+      /* cLbl is sized to hold the close block's LABELS OUTRIGHT — 'Cross-tab total' and
+         'Reconciliation check' — because r107 text spill reaches EMPTY neighbours, and both of
+         those labels sit immediately left of a GRADED, initially-empty cell. Left at 104 the
+         label rendered across the very cell the guided ring lands on, which is the §1.0-R3(q)
+         failure Wolf described as "a highlight covering half the title". */
+      const colW={}; colW[cSeg]=104; colW[cReg]=92; colW[cAmt]=92; colW[c0+3]=30; colW[cLbl]=168;
       for(let j=0;j<nReg;j++) colW[cR0+j]=92;
       return {ROWS:rMemo, cells, active:{r:g1,c:cR0}, sel:null, colW:colW};
     },

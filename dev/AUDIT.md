@@ -1,5 +1,159 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r438 H6b-9 — rollup: "Sum on two criteria" (DEPTH_PASS §4.29 + §1.0/-R2/-R3)
+_The last un-passed drill in Formulas I, and the chapter's ninth. The §4.29 page is one of the thin
+ones ("Language pass + bonus", the drill judged near the bar), but two binding inputs landed after
+it was written — r435's recommendation out of the `sumif` pass, and §1.0-R3 — and between them they
+change what this drill is for. The board also aggregates segments, so MODELING_STANDARDS §7 binds._
+- **MERGE VERDICT vs `sumif` (§1.0-R3(s), asked before anything was built): KEEP BOTH — and this
+  time MEASURED, not argued.** The campaign has asserted since r435 that the pair survives because
+  the ARGUMENT SIGNATURE INVERTS. That assertion was never probed; it is now, in the live engine,
+  both directions, and it holds harder than the prose claimed:
+  · SUMIF's model is (criteria range, criterion, sum range) — sum range LAST. Generalised by a
+    SUMIF-fluent player to two criteria: `=SUMIFS(critR1,crit1,critR2,crit2,sumR)` → **THROW:
+    sumifs-args**. Nothing commits; the cell stays empty.
+  · SUMIFS' model is (sum range, criteria range, criterion, …) — sum range FIRST. Written by a
+    SUMIFS-fluent player as the one-criterion form: `=SUMIF(sumR,critR,crit)` → **THROW:
+    sumif-args**. Nothing commits.
+  Fluency in either drill produces a first attempt in the other that DOES NOT COMPUTE. That is the
+  exact inverse of the growth/versionup and lookup/lookup2 findings, where the second drill taught
+  the first's construct verbatim and fluency transferred correctly. The technique generalises and is
+  recorded in dev/DEPTH_PASS_CAMPAIGN.md §3: when a distinctness question is about a FORMULA family,
+  drive the wrong-but-fluent form through `evalFormula` on the other drill's board.
+- **THE r435 RECOMMENDATION, HALF EXECUTED — and the half that was DECLINED is the finding.** r435
+  asked this pass to (a) drop the foot-and-dress tail the two drills shared, and (b) spend those
+  beats on "the two-way tie (row margins, column margins and the corner agreeing) or the
+  mixed-anchor read itself". (a) is done. (b) was walked before it was built, and **option A is
+  already `foot`**: §4.22 as shipped runs "Total every segment line across the quarters — the Total
+  column" · "Total every quarter down its column … in the Total row" · "Total the corner — it must
+  agree with both edges" · "Bold the Total row and the Total column" · "Add a top border above the
+  Total row" · "Enter the tie check — the corner minus the Total column reads zero", and its ☆ is
+  "Fill both total lines through the corner — one fill each". Building margins here would have
+  rebuilt `foot` inside Formulas I — the same redundancy this pass exists to remove, moved one
+  drill to the left. So this drill takes option B, the mixed-anchor read, and closes on the one
+  number a cross-tab needs that `foot` has no place for: a grand total over the whole 2-D block,
+  reconciled back to the SOURCE ledger. That is a COMPLETENESS check (did the cross-tab catch every
+  booking?), not `foot`'s internal cross-foot (do my two margins agree with each other?).
+  **§4.29's "Finish" line is therefore DECLINED as written** ("if no total row exists, ADD one …
+  and make it beat 5"): a total row is the thing that would make this drill `foot`. Declared here
+  and in the drill's header comment per §0.
+- **§1.0-R3(p) BUG FIX — the reason this is a rework and not a copy-edit.** The shipped beat 1 read
+  `$C$3:$C$11`, `$F3` and `G$2` out of G3's formula TEXT. A player who wrote four separate correct
+  SUMIFS — right function, right criteria, right numbers on the board — watched the beat stay dark
+  with nothing to fix. That is the campaign's untriggerable-beat class (**the eighth found**, and
+  like all seven before it, found by walking a route rather than reading the predicate), and it is
+  the same defect r435 fixed in `sumif` two files earlier. Anchoring is not this drill's graded
+  lesson — doctrine's anchor-text exception is scoped to `anchor`, `percent`, `fxconvert` — so every
+  core now grades the END STATE and the locks moved into the ☆, which may reward a route because it
+  is a bonus and never blocks the win.
+- **THE BOARD.** A booking ledger — Segment / Region / Revenue, 9–12 lines, amounts BLUE — beside a
+  cross-tab framed with its segments down the side and its regions across the top, both axes listed
+  in the cross-tab's OWN re-shuffled order so neither criterion can be answered from where the
+  ledger first mentions it. One empty column of moat between the islands. Under the grid, a close
+  block: "Cross-tab total ($000s)" and "Check — cross-tab less ledger". Both total lines wear TOP
+  borders and ship dressed — §1.0(f) is satisfied as FURNITURE (§1.3: where the lesson isn't
+  formatting, the board ships pre-dressed) rather than by spending the bold-and-top-border beat that
+  `sumif` already spends. Italic sub-labels over both islands, a source memo closing the page.
+- **MODELING_STANDARDS.** Colour is PROVENANCE: ledger amounts BLUE (hardcoded inputs), everything
+  the player builds — ledger total, crosses, grand total, check — a formula and BLACK. GREEN is
+  deliberately absent and that is a declared SIMPLIFICATION (§7: say so in a comment and on the
+  board): this engine has one sheet, so there is no cross-sheet link for green to mark, and the
+  source memo says so in as many words. Units stated in the title and on both close-block labels
+  ($000s). Sign convention stated on the board — revenue only, all positive, no costs — per §2.
+  Totals take TOP borders, never a rule underneath (§1). The check lives in one visible place and
+  reads zero (§6). No hardcode sits inside any formula the drill teaches (§1).
+- **BEATS (5 core + ☆ + the engine-appended Ctrl+S closer; tri-length 6, C9-registered).** Total the
+  ledger's revenue column → Build the cross-tab, every segment at every region → Add an outside
+  border around the cross-tab → Total the whole cross-tab in the total cell → Enter the
+  reconciliation check, the cross-tab total less the ledger total reads zero. The dress rides
+  directly behind the block it dresses (§1.0(a)); the prove-out closes (§1.6). Every clause after a
+  dash says WHAT, never why (§1.0-R3(n)).
+- **☆ RECIPE (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): ONE mixed-anchor
+  SUMIFS covers every cross.** Read off the r424 `S.fillOps` latch — mechanic recorded, never
+  geometry inferred — so Ctrl+D/Ctrl+R and the ribbon's Alt H F I D/R all earn it and a block of
+  hand-written SUMIFS earns nothing. The predicate asks for a down fill and a right fill that TOUCH
+  the grid and whose union COVERS it, rather than pinning one order, so **down-then-right and
+  right-then-down both earn it** (walked, 4 seeds each). `gridOk` rides in the predicate because the
+  two anchoring failures are what the star exists to teach, and both were walked rather than
+  assumed: an UNLOCKED fill drags all three ledger ranges off the tape and clears only the ledger
+  total (cores `100000`, ☆ dark, 4/4 seeds); FULLY-ABSOLUTE criteria fill one number into every
+  cross and clear nothing (cores `000000`, ☆ dark, 4/4 seeds). Neither ever landed the right numbers,
+  so no build-time constraint of the kind `sumif` needed was required here.
+- **NEGATIVE CONTROL, MEASURED (the §1.0-R2(i) skippability proof).** Every cross hand-written with
+  FULLY RELATIVE ranges, one quoted-text criterion, no fill anywhere, box drawn on the figures only
+  → **win, 5/5 cores, ☆ DARK on 5/5 seeds, 245–480 keys over 9 seeds (median 337) against the demo's
+  76 — a 4.4× spread.** Registered as ALT 2. Verified with a direct probe as well as through the
+  harness, because `dev/e2e-alt-paths.js` asserts only that a route WINS and would have passed this
+  entry even if the star had fired. HONEST FOOTNOTE, recorded so nobody re-derives it as a defect:
+  because every core grades the end state (§1.0(c) — and it must), the keystroke-cheapest LEGAL
+  route is typing the figures straight in, measured at 52–63 keys. It is cheap in keys and expensive
+  in everything else — it needs the player to cross-tabulate nine to twelve interleaved bookings in
+  their head and leaves a dead block. `margin`, `foot`, `percent` and `sumif` all carry the same
+  property; the clock is the answer to it, not a tighter predicate.
+- **ROUTE ENUMERATION (§1.0-R3(p)) — 12 routes, each DRIVEN on 4–5 fresh seeds, not reasoned about.**
+  Clearing: the taught route (76 keys); right-then-down fills (76); ribbon fills Alt H F I D/R with
+  the Alt H B A border (84); hand-typed relative SUMIFS, no fill (245–350); typed FIGURES for every
+  cross (52–63); the per-edge/thick box Alt H B T (76); the figures-ONLY box, no header row or label
+  column — the label-plus-figures widening (76); quoted-TEXT criteria (502–739); a typed `=SUM` for
+  the ledger total instead of AutoSum, with the check subtraction written the other way round (86).
+  Correctly NOT clearing: the unlocked fill (cores `100000`); fully-absolute criteria (`000000`);
+  and **a typed `0` in the check cell (cores `111100`)** — the prove-out wants a live formula
+  carrying ≥2 references, because a typed zero is a plug, which MODELING_STANDARDS §1 forbids
+  exactly where a formula belongs. 12/12 as designed.
+- **ONE ORDERING IS NOT FREE, and it is engine behaviour rather than a fussy predicate** (recorded so
+  the next agent does not re-derive it): a fill copies its SOURCE CELL'S FORMATTING along with the
+  formula, so boxing the block first and then filling through it propagates the corner's edges
+  across the grid and **wipes the perimeter** — as Excel does. ALT 1 was originally written box-first
+  and failed on the border beat with the box visibly gone; the box now closes that route instead.
+- **DEVIATIONS from the §4.29 page, all commented at the drill.** (1) ☆ RE-CUT — the page's "Bold the
+  grid's row and column headers — the axes read" is a FORMATTING bonus, which §1.0(d) outlaws
+  outright, with a moral for a tail, which §1.0-R3(n) outlaws separately; r435 flagged it for
+  re-cutting in advance. (2) The anchor-text predicate above. (3) The "Finish"/total-row line
+  declined, per the `foot` collision. (4) The shared foot-and-dress tail cut, per r435. (5)
+  RANDOMIZATION rebuilt from effectively ONE axis to five — the shipped board was FIXED at A1/F2/G2
+  with hard-coded `'Retail'`/`'Instl'` and `'Americas'`/`'EMEA'`, and only the amounts moved, where
+  §1.2 demands two INDEPENDENT axes: now anchor column (A or B) + header row (3 or 4); segment names
+  from a pool of eight and region names from a pool of six, Fisher-Yates shuffled AND re-shuffled for
+  the cross-tab's own order; every amount through `rnd()`; **the GRID SHAPE moves — 3–4 segments ×
+  2–3 regions, 6 to 12 crosses**; ledger depth 9–12. (6) No `cueCell()` — no insert point, no empty
+  paste destination, and nothing graded spills (§1.0-R2(h)/§1.0-R3(q)). (7) No helper cells — nothing
+  on this board is converted or scaled, so a yellow block would be a labelled box with no input in it
+  (§1.0(f)/§1.0-R2(l)). (8) No §1.0-R2(g) adaptive label: nothing here is a hidden seed fact the
+  player must reverse-engineer — the grid's shape is plainly visible and both axes are labelled.
+- **TASTE FLAG, carried forward not fixed.** dev/DEPTH_PASS_CAMPAIGN.md §2 notes three consecutive
+  Formulas I drills (`margin`, `percent`, `cagr`) rewarding a fill-shaped star; `sumif` and now
+  `rollup` make five. Alternatives were searched before settling: a Ctrl+Shift+arrow range grab
+  inside the formula is **not available on this engine** (pointer mode moves one cell per arrow and
+  ignores Ctrl); a 2-D block AutoSum is **not available** (AutoSum's range form requires a
+  single-column or single-row selection); Ctrl+Enter multi-commit belongs to `anchor` and the
+  edge-inclusive fill to `fxconvert`. What still distinguishes this star from `anchor`'s, five slots
+  away with the same mixed-anchor hand: in `anchor` the locks are MANDATORY — its cores grade the
+  formula text, so the drill cannot be cleared without them — whereas here the cores grade the end
+  state and a player can clear everything by hand, which is what makes the lock a genuine hidden
+  discovery rather than the price of entry. Recorded as taste, not defect.
+- **PAR:** 65/68 → **80/76**. 5-seed sweep median 76 keys incl. the engine-appended Ctrl+S; par 80 ≈
+  1.05 s/key, the house band. Mirrored in `HOTKEY_PARS`. Clocks derive (§1.4): pass 120 · pro 92 ·
+  legendary 80. The old parKeys 68 was already 12% adrift of a demo that no longer exists.
+- **HIDDEN COUPLING FOUND AND DE-COUPLED — and it widens the standing check.** `dev/e2e-audit-parity.js`
+  §V (SUMIFS + SUMPRODUCT, an ENGINE section) drove `loadChallenge('rollup')` and then hard-coded the
+  drill's **board CONTENT**: the ranges `A3:A11`/`B3:B11`/`C3:C11` and the literal labels
+  `"Retail"`/`"EMEA"` the retired board happened to seed. It never touches `._o`, so the campaign's
+  standing `git grep "CHALLENGES\.<key>\._o" dev/` **misses this class entirely**. Fixed by seeding
+  §V's own nine-row fixture, so no drill rework can reach it again. dev/DEPTH_PASS_CAMPAIGN.md now
+  also asks for `git grep "loadChallenge('<key>')" dev/`, and for each hit outside the drill's own
+  tests, whether the suite needs THAT drill or merely needed *a* board.
+- **ALTS (§1.8).** The pre-depth-pass entry drove the RETIRED fixed geometry (hard-coded `G5`,
+  `G3:H4`, `F5:H5` and the literal `=SUMIFS($C$3:$C$11,$B$3:$B$11,G$2,$A$3:$A$11,$F3)`) and cannot be
+  repaired onto a board that now randomizes its anchor, header row, both label pools and its grid
+  shape. **DELETED, not patched** — integrator, do not resurrect it; the r435 integration rule
+  applies (for the drill an agent reworked, its side of the file is authoritative for DELETIONS as
+  well as additions). Replaced by the §1.8 pair: ALT 1 = the BACKWARDS + ribbon route (grand total
+  written over an empty grid, check written before it is true, ledger total before the crosses
+  exist, grid filled LAST right-then-down off the ribbon, thick box closing — three beats pass
+  through a state where they grade FALSE with the work correctly done, and the ☆ still fires,
+  verified 5/5); ALT 2 = the negative control above. Both green ×3 seeds.
+- **GATE (all green, own port 8871):** see the round's gate block.
+
 ## r437 H6b-8 — lookup2: "Two-way lookup" (DEPTH_PASS §4.40 + the ⚠️ BINDING CONSTRAINT above it)
 _Built to the constraint block r436 wrote out of the `lookup` pass: the two drills shipped as the
 SAME board, and INDEX has no inversion to hide behind, so distinctness had to come from the board

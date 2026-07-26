@@ -13,8 +13,8 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 |---|---|---|---|
 | Foundations | 7 | 7 | ✅ complete (`undo` folded into `editfix`, `copyover` retired) |
 | Formatting | 9 | 9 | ✅ complete (`dress` retired into `housestyle`; `gauntlet` designated capstone) |
-| Formulas I | 10 | 10 | ✅ complete (`growth` retired; `cagr` absorbed its board; `bridge` → "Point-mode formulas") |
-| Data & Lookups | 2 | 10 | `lookup`, `scrub` in; `sort` in flight |
+| Formulas I | 9 | 9 | ✅ complete as of r438 (`growth` retired; `cagr` absorbed its board; `bridge` → "Point-mode formulas"; `rollup` last in) |
+| Data & Lookups | 5 | 10 | `lookup`, `scrub`, `sort`, `recon`, `lookup2` in |
 | Formulas II | 0 | 11 | `wirewalk` retired into `tieout` |
 | Models I | 0 | 10 | ⚠️ read §5 below before dispatching |
 | Models II | 0 | 10 | ⚠️ read §5 below before dispatching |
@@ -37,7 +37,7 @@ who solves the drill correctly by a different legal route watches the line stay 
 nothing on the board to fix. It is indistinguishable from a broken drill and it is the single
 most damaging defect we ship.
 
-**Seven found so far**, every one by *walking a route*, never by reading a predicate:
+**Eight found so far**, every one by *walking a route*, never by reading a predicate:
 
 | # | drill | the check demanded | the route it locked out |
 |---|---|---|---|
@@ -48,6 +48,7 @@ most damaging defect we ship.
 | 5 | `bridge` | beat order (EBITDA before revenue) | correct work graded FALSE until later |
 | 6 | `cagr` (draft) | taught Alt H 3 for italic | Alt H 3 is UNDERLINE (1/2/3 = B/I/U) |
 | 7 | `gauntlet` | `bt` on a 1×1 box | Alt H B S on 1×1 stores `ball`, not `bt` |
+| 8 | `rollup` | `$C$3:$C$11`/`$F3`/`G$2` out of formula TEXT | four separate correct SUMIFS (r438) |
 
 **The rule that follows:** enumerate every Excel route that produces the visible end state,
 then PROBE each one. Reading the predicate cannot find this class — #1 and #2 were both read
@@ -100,9 +101,17 @@ wants rhythm variety, `cagr` is the one to re-cut. Flagged, not fixed — it is 
 The campaign has run this four times. The useful discriminator is **not** "do these look
 similar" — it is **does fluency in one produce a correct first attempt at the other?**
 
-- `sumif` vs `rollup` → **KEEP**. The argument signature *inverts*: `SUMIF(criteria_range,
-  criterion, sum_range)` vs `SUMIFS(sum_range, criteria_range, criterion)`. The summed column
-  moves from last to first — the most-hit trap in the family, and it exists only as a contrast.
+- `sumif` vs `rollup` → **KEEP**, and as of r438 this one is **MEASURED, not argued**. The
+  argument signature *inverts*: `SUMIF(criteria_range, criterion, sum_range)` vs
+  `SUMIFS(sum_range, criteria_range, criterion)`. The summed column moves from last to first —
+  the most-hit trap in the family, and it exists only as a contrast. Probed live, both ways:
+  the SUMIF-fluent generalisation `=SUMIFS(critR1,crit1,critR2,crit2,sumR)` throws
+  `sumifs-args`, and the SUMIFS-fluent `=SUMIF(sumR,critR,crit)` throws `sumif-args`. **Neither
+  commits.** Fluency in either drill produces a first attempt in the other that does not compute
+  — the discriminator this section asks for, answered with a number instead of an assertion.
+  *Reusable technique:* when the distinctness question is about a FORMULA family, drive the
+  wrong-but-fluent form through `evalFormula` on the other drill's board. It takes minutes and
+  settles the argument permanently.
 - `lookup` vs `lookup2` → **ONE LESSON as shipped** (literally the same board). INDEX has *no*
   inversion: the two-way form is the one-way form with one more optional argument. Distinctness
   had to be rebuilt from the **board situation** — `lookup` = one field / many keys;
@@ -131,6 +140,27 @@ naively would have reverted the whole round-3 engine.
 **Tell agents to COMMIT EARLY in the worktree.** A container restart destroyed ~45 minutes of
 uncommitted work from the first `growth` attempt. Commit as soon as the drill builds and the
 fast gates pass, then keep refining.
+
+**A PER-AGENT PORT IS NOT ENOUGH — the gate harnesses read THREE different env vars, and the
+ones you miss silently test ANOTHER AGENT'S TREE (r438).** Giving an agent port 88xx and telling
+it to "pass the URL override" is not sufficient, because the eighteen gate suites split into four
+families and only one of them reads `URL`:
+
+| family | env | suites |
+|---|---|---|
+| index page | `URL=<origin>/index.html` | demo-replay · alt-paths · audit-parity · mac-input · rapidfire · guided · formulas · grid-height · depth-mechanics · fit-sweep · par-sweep · **audit-onboard** (override added r438) |
+| leaderboard | `URL=<origin>/leaderboard.html` | **e2e-lb** — passing it an index URL times out on `waitForFunction` and dies with a raw `TimeoutError`, which reads like a product bug |
+| origin only | `BASE=<origin>` | **e2e-smoke · check-borders · check-pause** — these ignore `URL` entirely |
+| no server | — | check-invariants · check-cache-versions |
+
+The failure is SILENT and convincing: exporting `URL` alone leaves `e2e-smoke` pointed at the
+default `127.0.0.1:8791`, so it happily tests whichever worktree is serving there and reports its
+drill count. In this round that produced `"76 banker-grade drills" != 75 (menuOrder)` against a
+tree the agent had never touched — a red gate with no local cause, which is exactly the kind of
+thing that gets "fixed" by editing marketing copy. **Diagnostic:** before trusting any gate,
+`curl -s <your-origin>/drills.js | grep -o '"<yourdrill>":[0-9]*'` and the same against `:8791`;
+if they differ, the suites reading `BASE` are not testing you. `dev/e2e-audit-onboard.js` had NO
+override at all until r438 and was therefore untestable from a worktree.
 
 **Four cores is the ceiling.** Each agent runs its own Chromium for the gates. 3–4 concurrent
 is the useful maximum; beyond that the gates start timing out on contention (which costs
@@ -256,6 +286,16 @@ independently on section U in the same round, which makes it a pattern, not an i
 
 **Standing check, added to the gate list:** after any rework, `git grep -n "CHALLENGES\.<key>\._o"
 dev/` and repoint anything outside the drill's own tests through an adapter.
+
+**Widen that grep — `._o` is not the only handle (r438).** `rollup`'s pass found
+`dev/e2e-audit-parity.js` §V (SUMIFS + SUMPRODUCT) driving `loadChallenge('rollup')` and then
+hard-coding the drill's **board CONTENT** — the literal ranges `A3:A11`/`B3:B11`/`C3:C11` and the
+seeded labels `"Retail"`/`"EMEA"` — without touching `._o` at all, so the standing grep misses it
+completely. An engine suite that needs a sheet does not need a *drill's* sheet: §V was fixed by
+seeding its OWN nine-row fixture, which decouples it permanently. **Run
+`git grep -n "loadChallenge('<key>')" dev/` as well**, and for every hit outside the drill's own
+tests ask whether the suite actually needs that drill or merely needed *a* board — the second case
+is the common one and the fix is a local fixture, not a re-pin.
 
 ## C13 — retired drills leave references behind, always (r437)
 
