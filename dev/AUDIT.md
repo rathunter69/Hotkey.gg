@@ -1,5 +1,134 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
+_The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three
+had those ☆s re-cut under §1.0(d); one of them (`tieout`) came within a diagnostic of retirement
+for the same defect that retired `hunt`. Every number below is `keyLog` through the live engine
+on the real board, medians over 5 seeds, every selection and navigation KEYED (setDemoSel only
+parks the cursor on an anchor cell)._
+
+### THE HEADLINE: THREE FORMATTING ☆s DIED IN ONE DISPATCH
+
+§1.0(d) is explicit that a ☆ is "NEVER a formatting task", and §1.0-R2(i) adds that it must be a
+distinct, SKIPPABLE decision. All three pages here predate both rules and all three proposed a
+dress:
+
+| drill | the page's ☆ | why it is dead | replacement |
+|---|---|---|---|
+| `balance` §4.55 | "Add a bottom border under the check row" | formatting (§1.0(d)); a bottom border under a total is the exact convention §1.0(f) REVERSES; and it falls out of the dress beat (§1.0-R2(i)) | the fill — all three built lines written once and taken across the years in one pass each |
+| `tieout` §4.51 | "Bold the repaired total" | formatting; falls out of the dress beat | the F9 interrogation — collapse a leg to its dead value and back out with the formula still live |
+| `balcheck` §4.48 | "Add a top border above both Total rows" | formatting; falls out of ordinary dressing | `ruleaudit`'s surgeon's pass carried into formula work — repair the two broken cells, leave every healthy formula byte-for-byte as it shipped |
+
+That is now **five** re-cut formatting ☆s across the campaign (`stalelink`'s strikethrough and
+`series`'s comma format were the first two). **Standing instruction: when a §4 page proposes a ☆,
+check it against §1.0(d) BEFORE building anything — pages written before r429 propose dresses by
+default, and a formatting ☆ is a spec bug, not a taste call.**
+
+### `tieout` — the closest call of the campaign, and why it was KEPT
+
+Two of its four shipped checks graded a KEYPRESS: beat 1 was `S.traceN>=2`, beat 2 was
+`S.f9N>=1`. That is the predicate class `unhide` dropped in r437 and the FIRST of the three
+findings that retired `hunt` in r439. Walked on the shipped board, 5 seeds: a player who spots
+the stale leg by eye, repoints it and lands the tie-out at zero has a **perfect board and two
+dark lines with nothing to fix** — the campaign's #1 bug, shipped in its purest form.
+
+So the §1.0-R3(s) question was put properly, and the answer went the other way from `hunt`:
+
+- **CONTAINMENT (CAMPAIGN §3).** `stalelink` §4.49 run verbatim as a first attempt repoints the
+  leg correctly, so the REPAIR half IS contained. What it does not carry is the INTERROGATION:
+  **F9-collapse appears in exactly one drill in the catalog** — the same "carried nowhere else"
+  finding that kept `wrapfix` (IFERROR) in r439.
+- **AND `wirewalk` §4.50 WAS ALREADY RETIRED INTO THIS DRILL** (r438). Retiring it now drops two
+  lessons, not one.
+- **VERDICT: KEEP** — and move the technique OFF the cores and INTO the ☆, where §1.0(d)
+  sanctions rewarding a mastery move and where skipping it costs the player nothing but the star.
+  The page's own "CHECK2 tighten" survives verbatim as the star's acceptance condition (collapse
+  a leg AND leave the formula live). The Ctrl+[ trace stays taught in req/guide/demo and is never
+  graded — grading navigation is the same keypress class.
+
+**The generalisable rule, and it is new:** a drill whose subject is a TECHNIQUE (F9, Go To
+Special, Ctrl+[) must grade the technique's RESULT on the board, never its keypress — and if the
+technique leaves no trace in the end state, it belongs in the ☆. `hunt` had no such result to
+grade and died; `tieout` does (the repointed leg) and lives.
+
+### FIVE UNTRIGGERABLE BEATS FOUND AND KILLED
+
+All five graded formula TEXT. Every one was found by WALKING a route, never by reading a
+predicate — and every one is now walked as a permanent alt-path entry, so the regression cannot
+come back silently.
+
+| # | drill | the check demanded | the route it locked out |
+|---|---|---|---|
+| 14 | `balance` | `SUM(` in column B's TEXT | an addition chain over the four lines; building the second year first and filling LEFT |
+| 15 | `balance` | the literal `B6` and `B12` | `=$B$6-$B$12` — the anchoring habit `anchor`/`fxconvert` teach — and `=-(B12-B6)` |
+| 16 | `balcheck` | the literal `B8` and `B14` per column | either anchoring, and the negated form |
+| 17 | `balcheck` | the literal range `B4:B7` | an addition chain, a two-range SUM, autosum |
+| 18 | `balcheck` | both `B12` and `C13` in the TEXT | `=SUM(prior equity, NI memo)` — same value, same liveness, arguably tidier |
+
+Campaign total: **18**. The dominant cause has not moved once in the whole campaign — it is
+grading formula text.
+
+### THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS, ON ALL THREE SHIPPED BOARDS
+
+| board | fastest legal | slowest legal | spread | part 2 — what survives stripping |
+|---|---|---|---|---|
+| `balance` | 39 | 96 | 2.46× | ~14 formatting (forbidden), 0 chord-vs-ribbon; **~43 survive** — fill-vs-retype across the year columns, the "one copy-right fills a block" move §1.0(d) names |
+| `tieout` (rebuilt) | 34 | 108 | 3.18× | ~11 chord-vs-ribbon, ~9 formatting; **~54 survive** — the diagnosis itself, plus autosum vs a typed chain |
+| `balcheck` | 27 | 71 | 2.63× | ~6 chord-vs-ribbon, 0 formatting; **~38 survive** — fill-vs-retype on the check row, edit-in-place vs retype on both repairs, and how much of the page you rewrite to fix three cells |
+
+All three KEEP. Isolated ☆ measurements (the §2 rule — measure each half of a multi-move star
+separately): `balance` three fills 9 keys vs 51 to retype the six repeats (**worth 42**);
+`tieout` interrogation 3 keys vs 24 to open and read all eight legs (**worth 21**); `balcheck`
+surgical repair 22 keys vs 39 to re-drive both rows (**worth 17 — and the rare case where the
+fast route and the careful one are the same route**).
+
+### PARS RE-SWEPT FROM SCRATCH
+
+| drill | was | now | why it moved |
+|---|---|---|---|
+| `balance` | par 39 / parKeys 39 | **par 66 / parKeys 62** | a third year, a sixth asset line, a fifth L&E line, a second dress motion, the save closer |
+| `balcheck` | par 28 / parKeys 27 | **par 37 / parKeys 35** | the meter, the ☆, the save closer |
+| `tieout` | par 30 / parKeys **8** | **par 36 / parKeys 34** | the widest par/parKeys gap in the catalog is closed: the demo was handed every selection and paid for no navigation at all. The board also ships unfooted and untied now |
+
+All three at ~1.06 s/key, the house band; mirrored in HOTKEY_PARS. `tieout`'s old parKeys 8 is
+worth recording as a class: **a demo that is handed its selections measures almost nothing.** The
+r438 `series` rule (demos build their own selections with Shift+arrow) is what caught it.
+
+### §1.3 DENSITY — ALL THREE WERE UNDER OR ON THE LINE
+
+| drill | before | after |
+|---|---|---|
+| `tieout` | ROWS:10, 7 rows used — **35%**, the worst in the chapter | 20 rows, 15 used — **75%** |
+| `balcheck` | ROWS:15, 13 used — **65%** | 20 rows, 16 used — **80%** |
+| `balance` | ROWS:14, 12 used — **60%**, exactly on the line | 20 rows, 17 used — **85%** |
+
+Sized to the r440 ruling (20 rows is floor AND cap, every chapter). `balance` is the clean
+illustration of the "identical load and win density" tell from §1.3: its old board filled cells
+inside rows that already existed, so the empty band sat on screen for the whole run.
+
+### PLUMBING
+
+- `drills.js`: `balcheck` gains `errorCount:3` (the §2.3 meter on the rail); all three descs
+  rewritten — each named a retired board. Keys are immutable, so PBs, boards and runs history
+  are untouched.
+- `dev/e2e-alt-paths.js`: `balance` and `balcheck`'s single entries were hard-coded to the
+  retired geometry and are rebuilt off `C._o`; `tieout` gains its first entries ever (it was one
+  of the nine zero-ALT drills §1.8 names). Six entries, all green. Two of them are deliberate
+  NEGATIVE CONTROLS that walk the locked-out formula shapes above.
+- `dev/check-invariants.js`: `REWORKED` grows to 44.
+
+### STILL OPEN AFTER THIS DISPATCH
+
+`redflags` §4.56 — the chapter's designated capstone (delta D4), an inherited one-tab model with
+7 disclosed errors, whose clean run is specified to gate Models I. It is an unbuilt **ADD**, not
+a depth pass, so it is not part of closing the chapter 10/10, and `HOTKEY_CAMPAIGN.chapters[4]`
+still carries no `capstone` field. c3 and c4 also closed without their designated capstones
+(`qclose`, `cleanroom`), so this is the campaign's established shape — but c5's capstone is the
+one the spec ties to a chapter GATE, so it is the orchestrator's call whether Models I opens
+without it.
+
+---
+
 ## r439 H6b-11 — audit + triage: Formulas II opens, and `hunt` is merged away (DEPTH_PASS §4.45 + §4.46 + §2.3)
 _The chapter's first two boards, and the campaign's sixth retirement. All three drills in this
 dispatch — `audit`, `triage`, `hunt` — interrogate a model somebody else built, which is exactly

@@ -729,26 +729,99 @@ const ALTS = [
       [o.hcB,o.hcA].forEach(c=>st.push({sel:CL(c)+o.ebitR, keys:[...T('='+CL(c)+o.totR+'+'+CL(c)+o.costR+'+'+CL(c)+o.daR),{key:'Enter'}]}));
       st.push({sel:o.badK, keys:[...T('=SUM('+CL(o.c0)+o.badRow+':'+o.lastCol+o.badRow+')'),{key:'Enter'}]});
       return st; }` },
-  { key: 'balance', name: 'dress BEFORE the build, L&E footed before assets, alt+= sums + ribbon fills', moves: `C => [
-      {sel:'B14:C14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'B6:C6',   keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B12:C12', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B12',     keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
-      {sel:'B12:C12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B6',      keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
-      {sel:'B6:C6',   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B14',     keys:[...T('=B6-B12'),{key:'Enter'}]},
-      {sel:'B14:C14', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
-  { key: 'balcheck', name: 'culprits fixed FIRST, check row resurrected LAST via ribbon fill', moves: `C => {
-      const sh=C._short, pl=C._plug;
-      const shL=sh[0], plL=pl[0];   // single-letter cols; regex escapes die inside template literals
+  /* r440 §4.55 depth pass — both entries rebuilt for the three-year board (the old pair hard-coded
+     B6/B12/B14 off the retired two-year one). ALT 1 = chord ROUTE + op ORDER: the L&E side footed
+     before the assets, every total landed with autosum's range form instead of a typed SUM, and
+     every fill and every dress walked through the ribbon. The ☆ still latches — a ribbon fill is
+     the same latch as Ctrl+R (§1.0(c)) — which is the point: the star grades the DECISION to fill,
+     never the chord that does it. */
+  { key: 'balance', name: 'L&E footed before assets, autosum range form, every fill and dress by ribbon', moves: `C => { const o=C._o; return [
+      {sel:o.CB+o.l0+':'+o.CB+o.rLE, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.CB+o.rLE+':'+o.CD+o.rLE, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CA+o.rLE+':'+o.CD+o.rLE, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.CA+o.rLE+':'+o.CD+o.rLE, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.CB+o.a0+':'+o.CB+o.rTA, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.CB+o.rTA+':'+o.CD+o.rTA, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CA+o.rTA+':'+o.CD+o.rTA, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.CA+o.rTA+':'+o.CD+o.rTA, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.CB+o.rCK, keys:[...T('='+o.CB+o.rTA+'-'+o.CB+o.rLE),{key:'Enter'}]},
+      {sel:o.CB+o.rCK+':'+o.CD+o.rCK, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CA+o.rCK+':'+o.CD+o.rCK, keys:[{key:'Alt'},L('h'),D(1)]},
+    ]; }` },
+  /* ALT 2 = the MEASURED NEGATIVE CONTROL for the ☆: no fill anywhere. Every year typed on its
+     own, both totals written as $-anchored addition chains rather than SUMs, and the check written
+     the other way round and negated. All five cores clear, the ☆ goes DARK (§1.0(c): the slow route
+     is never penalised, it just costs the keys) — and this is the route that proves the two
+     untriggerable beats recorded in the drill's header comment are dead. */
+  { key: 'balance', name: 'NEGATIVE CONTROL — no fill at all, anchored addition chains, check negated (cores clear, ☆ dark)', moves: `C => { const o=C._o; const st=[];
+      o.cols.forEach(c=>{ let f='='; for(let r=o.a0;r<=o.aN;r++) f+=(r>o.a0?'+':'')+'$'+c+'$'+r;
+        st.push({sel:c+o.rTA, keys:[...T(f),{key:'Enter'}]}); });
+      o.cols.forEach(c=>{ let f='='; for(let r=o.l0;r<=o.lN;r++) f+=(r>o.l0?'+':'')+'$'+c+'$'+r;
+        st.push({sel:c+o.rLE, keys:[...T(f),{key:'Enter'}]}); });
+      st.push({sel:o.CA+o.rTA+':'+o.CD+o.rTA, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      st.push({sel:o.CA+o.rLE+':'+o.CD+o.rLE, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      o.cols.forEach(c=>st.push({sel:c+o.rCK, keys:[...T('=-($'+c+'$'+o.rLE+'-$'+c+'$'+o.rTA+')'),{key:'Enter'}]}));
+      st.push({sel:o.CA+o.rCK+':'+o.CD+o.rCK, keys:[{key:'b',ctrl:true}]});
+      return st; }` },
+  /* r440 §4.48 depth pass — both entries rebuilt for the reworked board (the old one hard-coded
+     rows 4/7/12/13/15 off the retired ROWS:15 one). ALT 1 = op ORDER: both causes repaired BEFORE
+     the check row is rebuilt, so the cascade never fires and the player never reads the instrument
+     — the end state is identical, which is exactly what §1.0-R3(p) promises. Ribbon fill, ribbon
+     bold. The ☆ still latches: repairing surgically is orthogonal to the order you do it in. */
+  { key: 'balcheck', name: 'op ORDER — both causes repaired FIRST, check row rebuilt last, ribbon fill + ribbon bold', moves: `C => { const o=C._o;
+      const shL=o.short[0], plL=o.plug[0];   // single-letter cols; regex escapes die inside template literals
       const prev=String.fromCharCode(plL.charCodeAt(0)-1);
       return [
-        {sel:pl, keys:[...T('='+prev+'12+'+plL+'13'),{key:'Enter'}]},
-        {sel:sh, keys:[...T('=SUM('+shL+'4:'+shL+'7)'),{key:'Enter'}]},
-        {sel:'B15', keys:[...T('=B8-B14'),{key:'Enter'}]},
-        {sel:'B15:E15', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.plug,  keys:[...T('='+prev+o.rEq+'+'+plL+o.rNi),{key:'Enter'}]},
+        {sel:o.short, keys:[...T('=SUM('+shL+o.a0+':'+shL+o.aN+')'),{key:'Enter'}]},
+        {sel:o.CB+o.rCk, keys:[...T('='+o.CB+o.rTA+'-'+o.CB+o.rLE),{key:'Enter'}]},
+        {sel:o.CB+o.rCk+':'+o.CE+o.rCk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.CB+o.rCk+':'+o.CE+o.rCk, keys:[{key:'Alt'},L('h'),D(1)]},
+      ]; }` },
+  /* ALT 2 = chord ROUTE + the three formula shapes the SHIPPED board locked out, all three walked
+     here so the regression cannot come back: the check row written $-anchored and negated and typed
+     year by year with no fill at all; the short Total re-spanned as an addition chain instead of a
+     SUM; the typed-over equity rebuilt as SUM(prior, memo) rather than a reference chain. Every
+     core clears (§1.0-R3(p) grades the number), and the ☆ still latches because no healthy formula
+     was touched — which is the distinction the star is drawn on. */
+  { key: 'balcheck', name: 'the three locked-out formula shapes — anchored negated check typed year by year, addition-chain Total, SUM-form roll', moves: `C => { const o=C._o;
+      const shL=o.short[0], plL=o.plug[0];
+      const prev=String.fromCharCode(plL.charCodeAt(0)-1);
+      const st=[];
+      let chain='='; for(let r=o.a0;r<=o.aN;r++) chain+=(r>o.a0?'+':'')+shL+r;
+      st.push({sel:o.short, keys:[...T(chain),{key:'Enter'}]});
+      st.push({sel:o.plug,  keys:[...T('=SUM('+prev+o.rEq+','+plL+o.rNi+')'),{key:'Enter'}]});
+      o.cols.forEach(c=>st.push({sel:c+o.rCk, keys:[...T('=-($'+c+'$'+o.rLE+'-$'+c+'$'+o.rTA+')'),{key:'Enter'}]}));
+      st.push({sel:o.CB+o.rCk+':'+o.CE+o.rCk, keys:[{key:'b',ctrl:true}]});
+      return st; }` },
+  /* r440 §4.51 depth pass — tieout's FIRST alt-path entries ever (it was one of the nine zero-ALT
+     drills §1.8 names). ALT 1 = op ORDER: the tie-out built BEFORE the leg is repointed, so it
+     shows a live non-zero difference and then walks to zero under the repair — the reading the
+     drill's prompt describes, in the opposite order to the demo. Autosum range form for the total,
+     ribbon dress throughout. The ☆ goes DARK here: no leg is ever opened in the editor. */
+  { key: 'tieout', name: 'op ORDER — tie-out built before the repoint, autosum range form, ribbon dress (☆ dark)', moves: `C => { const o=C._o; return [
+      {sel:o.CB+o.r0+':'+o.CB+o.rTot, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.CA+o.rTot+':'+o.CB+o.rTot, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.CA+o.rTot+':'+o.CB+o.rTot, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.CB+o.rTie, keys:[...T('='+o.CB+o.rTot+'-'+o.CB+o.rDeck),{key:'Enter'}]},
+      {sel:o.bad, keys:[...T(o.fixF),{key:'Enter'}]},
+      {sel:o.CA+o.rTie+':'+o.CB+o.rTie, keys:[{key:'Alt'},L('h'),D(1)]},
+    ]; }` },
+  /* ALT 2 = chord ROUTE + the anchoring the shipped board would have locked out: the block totalled
+     as an addition chain over all eight legs, the leg repointed with an ANCHORED reference, and the
+     tie-out written the other way round and negated. The ☆ DOES latch here — the leg is interrogated
+     with F2/F9/Esc before it is repointed — which proves the star is reachable by a route the demo
+     does not take. */
+  { key: 'tieout', name: 'addition-chain total, F9 interrogation then an ANCHORED repoint, negated tie-out (☆ latches)', moves: `C => { const o=C._o;
+      let chain='='; for(let r=o.r0;r<=o.rN;r++) chain+=(r>o.r0?'+':'')+o.CB+r;
+      const anch='='+o.fixF.slice(1,2)+'$'+o.fixF.slice(2);
+      return [
+        {sel:o.CB+o.rTot, keys:[...T(chain),{key:'Enter'}]},
+        {sel:o.CA+o.rTot+':'+o.CB+o.rTot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.bad, keys:[{key:'F2'},{key:'F9'},{key:'Escape'}]},
+        {sel:o.bad, keys:[...T(anch),{key:'Enter'}]},
+        {sel:o.CB+o.rTie, keys:[...T('=-('+o.CB+o.rDeck+'-'+o.CB+o.rTot+')'),{key:'Enter'}]},
+        {sel:o.CA+o.rTie+':'+o.CB+o.rTie, keys:[{key:'b',ctrl:true}]},
       ]; }` },
   { key: 'bsbuild', name: 'dress FIRST, RE roll before any footing, assets footed LAST, ribbon fills + alt h 1', moves: `C => [
       {sel:'B5:D5',   keys:[{key:'Alt'},L('h'),D(1)]},

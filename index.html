@@ -1798,9 +1798,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=293"></script>
+<script src="drills.js?v=294"></script>
 
-<script src="drills.js?v=293"></script>
+<script src="drills.js?v=294"></script>
 
 
 
@@ -10190,65 +10190,201 @@ const CHALLENGES = {
     }
   },
   balance:{
-    name:'Balance', label:'Make it balance', par:39, parKeys:39,
-    aha:'A sheet that won’t tie is wrong somewhere specific — the check row points at where.',
-    prompt:'Two years of balance sheet. Retained earnings is never a plug — it’s a given, like every other line. Foot both sides with live SUMs, build the check row, and format the totals. The check reads zero because the sheet is right.',
-    req:'<em>B6</em> <em>=SUM(B2:B5)</em> fill \u2192 \u00b7 <em>B12</em> <em>=SUM(B8:B11)</em> fill \u2192 \u00b7 <em>B14</em> check <em>=B6-B12</em> fill \u2192 \u00b7 dress: <em>ctrl+b</em> B6:C6 and B12:C12 \u00b7 <em>alt h b p</em> B14:C14',
-    guide:[
-      'total the assets at B6 \u00b7 <kbd>=SUM(B2:B5)</kbd> (<kbd>alt</kbd>+<kbd>=</kbd> proposes it) \u00b7 fill right',
-      'foot L&E at B12 \u00b7 <kbd>=SUM(B8:B11)</kbd> \u2014 all four lines are real inputs; nothing gets backed into \u00b7 fill right',
-      'the check at B14 \u00b7 <kbd>=B6-B12</kbd> \u00b7 fill right \u2014 a diagnostic, not a construction; zero means the sheet is right',
-      'format it: <kbd>ctrl</kbd>+<kbd>b</kbd> both total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> the check row',
-    ],
-    targets:['B6','B12','B14','B14:C14'],
-    demo(){ return [
-      {sel:'B6', keys:[...T('=SUM(B2:B5)'), Kb.enter]},
-      {sel:'B6:C6', keys:[Kb.fillR]},
-      {sel:'B12', keys:[...T('=SUM(B8:B11)'), Kb.enter]},
-      {sel:'B12:C12', keys:[Kb.fillR]},
-      {sel:'B14', keys:[...T('=B6-B12'), Kb.enter]},
-      {sel:'B14:C14', keys:[Kb.fillR]},
-      {sel:'B6:C6', keys:[Kb.bold]},
-      {sel:'B12:C12', keys:[Kb.bold]},
-      {sel:'B14:C14', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* r440 H6b-12 (DEPTH_PASS §4.55, "Make it balance") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 on top of the page (§1.0-R3 wins on conflict).
+
+       WAS: 4 checks on a ROWS:14 board (the copied-default tell — 12 of 14 rows used, and only
+       12 of the real 20-row sheet, 60% and sitting right on the §1.3 line), no ☆, no saveClose,
+       and a single trailing formatting beat that dressed both total rows AND the check row at
+       once — a §1.0(a) violation, since format-as-you-go means the dress follows the beat that
+       made the cells, never a catch-all at the end.
+
+       ── RETIREMENT/MERGE DIAGNOSTIC (§1.0-R3(s) + CAMPAIGN §2, both parts), measured through
+       the live engine on the SHIPPED board, every selection and navigation keyed, 5 seeds:
+         PART 1 — IS THERE SPREAD? fastest legal 39 keys (three formulas, three fills, the dress)
+           against 96 for the slowest legal one (every year-cell retyped, each row dressed column
+           by column). 2.46×.
+         PART 2 — IS ANY OF IT ☆-LEGAL? This is the half that decides. Of the 57 keys of spread,
+           ~14 are formatting, which §1.0(d) forbids grading; ZERO are chord-vs-ribbon in the
+           §1.0(c) forced-to-clear sense, because the engine has no ribbon route into formula
+           entry and Ctrl+R and Alt H F I R hit the same latch, so a fill is a fill however it is
+           reached. The surviving ~43 keys are FILL-versus-RETYPE across the year columns — which
+           is precisely the "one copy-right fills a block" mastery move §1.0(d) names. Legal
+           headroom, in the drill's own subject rather than a borrowed one. KEEP.
+         DISTINCTNESS (CAMPAIGN §3 discriminator, asked before anything was built): the nearest
+         neighbours are `foot` (Formulas I, cross-footing a grid) and `balcheck` (this chapter).
+         Fluency in `foot` produces a correct first attempt at TOTALLING and says nothing about a
+         balance sheet's two-sided identity — that the two sides are footed SEPARATELY and the
+         check is their difference, not a third total. `balcheck` is diagnosis on a board someone
+         else built; this drill BUILDS the check row that one hunts with. Neither carries the
+         "retained earnings is a given, never a plug" lesson, which is this board's whole reason
+         to exist and is stated on its own memo line.
+
+       ── TWO UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD (the CAMPAIGN §1 class, found by
+       WALKING routes, not by reading predicates). Both graded formula TEXT:
+         (1) THE TWO TOTAL BEATS READ COLUMN B'S TEXT ONLY — refs('B6',['SUM(']). A player who
+             builds the second year first and fills LEFT, or who totals with an addition chain
+             (=B2+B3+B4+B5 lands the identical number on a four-line side), saw the right totals
+             on the board and watched the beat stay dark with nothing to fix. Probed: board 1,430,
+             expected 1,430, check false.
+         (2) THE CHECK BEAT DEMANDED THE LITERAL 'B6' AND 'B12'. `=$B$6-$B$12` — the anchoring
+             habit `anchor` and `fxconvert` exist to teach — cleared the board and left the line
+             dark. Same class as the `wrapfix` $-anchor bug (r439) and bug #4 of the campaign
+             table.
+       Both die here: every core grades the END STATE (§1.0-R3(p)) — the value in every year
+       column, plus, where the label says a line is built, that the cell is a formula rather than
+       a typed number. No check reads a range, a function name or an anchor out of formula text,
+       and no check reads one column and assumes the others.
+
+       THE BOARD. A three-year balance sheet at book standard: six asset lines, five liability
+       and equity lines, both sides unfooted, and the check row under them. Three years rather
+       than the old two because the fill is this drill's ☆ and two columns is not a block. Every
+       input ships blue (§1.0(f) provenance), and the sheet GENUINELY balances before the player
+       touches it — the cash line is sized to close it — so the check lands at zero because the
+       statement is right, which is what the prompt and the memo line both claim.
+
+       STRUCTURAL DEVIATIONS from the §4.55 page, declared here per §0:
+       (1) ☆ RE-CUT (binding). The page's bonus is "Add a bottom border under the check row".
+           Dead three times over: it is a FORMATTING task, which §1.0(d) forbids outright; a
+           bottom border under a total is the exact convention §1.0(f) reverses (totals take TOP
+           borders); and it would fall out of the dress beat anyway, failing §1.0-R2(i)'s
+           skippable-decision test. Same class as `stalelink`'s strikethrough ☆ and `series`'s
+           comma ☆. The re-cut ☆ is the fill — measured in the diagnostic above and isolated in
+           the ☆ note in checks().
+       (2) THE SINGLE DRESS BEAT IS SPLIT AND RESEQUENCED. The page reads "language pass (labels
+           → verb-first)", which understates what §1.0(a) requires of the shipped beat: it dressed
+           three rows at the end of the run. The two total rows are now dressed by the beat that
+           follows their construction, and the check row's bold follows the check.
+       (3) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an EXISTING labelled
+           cell in a labelled row — no insert slot, no empty paste target — so the guided ring
+           expresses all five core beats.
+       (4) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing here is assumed, converted or scaled.
+       (5) §1.3 DENSITY: 17 of 20 rows carry content at the win state (85%), against 60% before —
+           the old board sat exactly on the §1.3 line. Two of the three empty rows are the moats
+           between the three blocks and are load-bearing: a balance sheet whose sides run together
+           is not a balance sheet. The third is the sheet's own bottom margin.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about — see
+       the walked-route list in dev/AUDIT.md r440. Both totals accept =SUM over the block, an
+       addition chain, autosum by either of its routes, anchored or unanchored, filled or typed
+       column by column; the check accepts the subtraction anchored or not, so long as the sign
+       is right. A hand-typed constant never clears a beat whose stated outcome is a built line. */
+    name:'Balance', label:'Make it balance', par:66, parKeys:62, saveClose:true,   /* r440 §4.55 depth pass: par re-swept from scratch (was par 39 / parKeys 39 on the two-year board with no save closer). dev/e2e-par-sweep.js balance, 5-seed median 62 keys including the engine-appended Ctrl+S — flat across seeds, since the randomization moves the figures and the anchor column but never the beat count. par 66 ≈ 1.06 s/key, the house band. The count grew with the board: a third year, a sixth asset line, a fifth L&E line, a second dress motion and the save closer. That lands balance beside `stalelink` (64) in the chapter band (wrapfix 26 · balcheck 28 · signerr 35 · versionup 48 · cases 97). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:39 · pro 1:16 · legendary 1:06. */
+    aha:'Retained earnings is a given, not a plug — the check proves the sheet, it never fixes it.',
+    /* §1.5: the aha's MOMENT is the check row landing at zero. Nothing was forced to get it
+       there — the two sides were footed independently and they agreed, which is the whole claim. */
+    prompt:'Three years of balance sheet, both sides typed and neither one totalled. Retained earnings is a given here, like every other line — nothing on this page is backed into. Foot the assets, foot the liabilities and equity, then build the check row under them and close it. The check reads zero because the statement is right, not because anything was plugged.',
+    req(){ const o=this._o; return 'foot <em>'+o.CB+o.rTA+'</em> → <em>=SUM('+o.CB+o.a0+':'+o.CB+o.aN+')</em> · <em>'+o.CB+o.rLE+'</em> → <em>=SUM('+o.CB+o.l0+':'+o.CB+o.lN+')</em> · each line <em>ctrl+r</em> across · <em>ctrl+b</em> + <em>alt h b p</em> both totals · <em>'+o.CB+o.rCK+'</em> → <em>='+o.CB+o.rTA+'-'+o.CB+o.rLE+'</em> <em>ctrl+r</em> · <em>ctrl+b</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the six asset lines run row '+o.a0+' to row '+o.aN+' · on '+o.CB+o.rTA+': <kbd>=SUM(</kbd>'+o.CB+o.a0+':'+o.CB+o.aN+'<kbd>)</kbd> <kbd>↵</kbd>, or select the block through the empty total cell and press <kbd>alt</kbd>+<kbd>=</kbd> · then take it across the three years — select '+o.CB+o.rTA+':'+o.CD+o.rTA+' and <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill). Typing each year lands it too, it only costs the keys — and an addition chain totals the same as a SUM',
+      'the same on the other side: five lines, row '+o.l0+' to row '+o.lN+' · <kbd>=SUM(</kbd>'+o.CB+o.l0+':'+o.CB+o.lN+'<kbd>)</kbd> on '+o.CB+o.rLE+', filled across. Retained earnings is one of those five — it is typed data like the rest, so the total runs over all of them',
+      'dress both total lines now rather than at the end: select each row and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge — both draw that top line, both clear it)',
+      'the check on '+o.CB+o.rCK+': <kbd>=</kbd>'+o.CB+o.rTA+'<kbd>-</kbd>'+o.CB+o.rLE+' <kbd>↵</kbd> · filled across. Anchored or not, and either way round so long as the sign is right — it grades the number, not the text',
+      'close it: select the check row and <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      '☆ the discovery: each of those three lines written ONCE and taken across the years in a single pass — three fills, no year retyped. Typing the six repeats clears every core beat and forfeits it',
     ]; },
+    /* rings: ① the assets total cell · ② the L&E total cell · ③ both total rows · ④ the check
+       cell · ⑤ the check row · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [o.CB+o.rTA, o.CB+o.rLE, o.CA+o.rTA+':'+o.CD+o.rLE, o.CB+o.rCK, o.CA+o.rCK+':'+o.CD+o.rCK, null]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only ever parks the cursor on the anchor
+       cell of the next beat. */
+    demo(){ const o=this._o; return [
+      {sel:o.CB+o.rTA, keys:[...T('=SUM('+o.CB+o.a0+':'+o.CB+o.aN+')'), Kb.enter]},
+      /* the ☆, one of three — a single pass right across the years */
+      {sel:o.CB+o.rTA, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR]},
+      {sel:o.CB+o.rLE, keys:[...T('=SUM('+o.CB+o.l0+':'+o.CB+o.lN+')'), Kb.enter]},
+      /* two of three */
+      {sel:o.CB+o.rLE, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR]},
+      /* §1.0(a): both totals dressed the moment they exist, not at the end of the run */
+      {sel:o.CA+o.rTA, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CA+o.rLE, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CB+o.rCK, keys:[...T('='+o.CB+o.rTA+'-'+o.CB+o.rLE), Kb.enter]},
+      /* three of three */
+      {sel:o.CB+o.rCK, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR]},
+      {sel:o.CA+o.rCK, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.bold]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 balance check ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<2;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const rows=[[2,'Cash'],[3,'Receivables'],[4,'Inventory'],[5,'PP&E'],[6,'Total assets'],[8,'Payables'],[9,'Debt'],[10,'Common stock'],[11,'Retained earnings'],[12,'Total liabs & equity'],[14,'Check']];
-      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===6||r===12||r===14)});
-      this._exp={};
-      for(let i=0;i<2;i++){ const col=colLetter(i+2);
-        const ar=rnd(10,30)*10, inv=rnd(8,24)*10, ppe=rnd(30,70)*10;
-        const ap=rnd(8,20)*10, cs=rnd(10,30)*10, re=rnd(15,45)*10;
+      /* §1.2 randomization — three independent axes. (a) SITE: the board is a full-grid artifact
+         (17 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the whole statement anchors
+         at column A or column B. (b) CONTENT: the codename and the fiscal-year base. (c) VALUES:
+         every figure through rnd(). Geometry (six asset lines, five L&E lines, three years) is
+         constant across seeds so the keystroke count never moves with the draw — the r439
+         `wrapfix` rule. */
+      const c0=rnd(0,1)?1:2;                        // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3);
+      const y0=rnd(2023,2027);
+      const HR=3, A0=4, AN=9, RTA=10, L0=12, LN=16, RLE=17, RCK=19;
+      cells[CA+'1']={...blankCell(),value:codename()+' — balance sheet ($mm)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: audited close · basis: $ in millions · retained earnings is a given, not a plug',txt:true,it:true,fontColor:'gray'};
+      cells[CA+HR]={...blankCell(),value:'Item',txt:true,bold:true};
+      for(let i=0;i<3;i++) cells[colLetter(c0+1+i)+HR]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      const aRows=['Cash','Receivables','Inventory','Prepaid expenses','PP&E','Intangibles'];
+      aRows.forEach((n,i)=>cells[CA+(A0+i)]={...blankCell(),value:n,txt:true});
+      cells[CA+RTA]={...blankCell(),value:'Total assets',txt:true,bold:true};
+      const lRows=['Payables','Accrued expenses','Debt','Common stock','Retained earnings'];
+      lRows.forEach((n,i)=>cells[CA+(L0+i)]={...blankCell(),value:n,txt:true});
+      cells[CA+RLE]={...blankCell(),value:'Total liabs & equity',txt:true,bold:true};
+      cells[CA+RCK]={...blankCell(),value:'Check (assets − L&E)',txt:true,bold:true};
+      const exp={};
+      for(let i=0;i<3;i++){
+        const col=colLetter(c0+1+i);
+        /* the L&E side is drawn first and the CASH line is then sized to close the sheet, so the
+           statement GENUINELY balances at load (r264: a negative cash plug would undercut the
+           page's own "never a plug" claim, so the ranges keep it comfortably positive). */
+        const ap=rnd(8,20)*10, acc=rnd(4,14)*10, cs=rnd(10,30)*10, re=rnd(15,45)*10;
+        const ar=rnd(10,30)*10, inv=rnd(8,24)*10, pre=rnd(3,9)*10, ppe=rnd(30,70)*10, intg=rnd(5,20)*10;
         let debt=rnd(20,50)*10;
-        // r264: keep the cash line positive — the sheet preaches "RE is never a plug"; a negative cash plug undermines it
-        const short=(ap+debt+cs+re)-ar-inv-ppe;
+        const short=(ap+acc+debt+cs+re)-ar-inv-pre-ppe-intg;
         if(short<20) debt+=Math.ceil((20-short)/10)*10;
-        const totLE=ap+debt+cs+re, cash=totLE-ar-inv-ppe;
-        [[2,cash],[3,ar],[4,inv],[5,ppe],[8,ap],[9,debt],[10,cs],[11,re]].forEach(([r,val])=>
+        const totLE=ap+acc+debt+cs+re, cash=totLE-ar-inv-pre-ppe-intg;
+        [[A0,cash],[A0+1,ar],[A0+2,inv],[A0+3,pre],[A0+4,ppe],[A0+5,intg],
+         [L0,ap],[L0+1,acc],[L0+2,debt],[L0+3,cs],[L0+4,re]].forEach(([r,val])=>
           cells[col+r]={...blankCell(),value:val,fontColor:'blue',fmtStyle:'comma',decimals:0});
-        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+12]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+14]={...blankCell(),fmtStyle:'comma',decimals:1};
-        this._exp[col]={ta:totLE, tle:totLE};
+        cells[col+RTA]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+RLE]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+RCK]={...blankCell(),fmtStyle:'comma',decimals:0};
+        exp[col]=totLE;
       }
-      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:170,2:84,3:84}};
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,c0:c0,cols:[CB,CC,CD],exp:exp,
+               a0:A0,aN:AN,l0:L0,lN:LN,rTA:RTA,rLE:RLE,rCK:RCK};
+      const colW={}; colW[c0]=176; colW[c0+1]=92; colW[c0+2]=92; colW[c0+3]=92;
+      return {ROWS:20, cells, active:{r:RTA,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C'];
-      const dressOk=COL.every(c=>{ const a=S.cells[c+'6'], b=S.cells[c+'12'], ck=S.cells[c+'14'];
-        return !!(a&&a.bold&&b&&b.bold&&ck&&ck.bt); });
+      const o=this._o;
+      /* every predicate reads the END STATE — the number standing in each year column, plus
+         liveness where the label says the line is built. Nothing reads formula text (§1.0-R3(p)). */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
+      const rowLive=(r,f)=>o.cols.every(c=>live(c+r)&&f(c+r,c));
+      const taOk = rowLive(o.rTA,(k,c)=>near(k,o.exp[c]));
+      const leOk = rowLive(o.rLE,(k,c)=>near(k,o.exp[c]));
+      const ckOk = rowLive(o.rCK,k=>near(k,0));
+      const dressed=r=>o.cols.every(c=>{ const x=S.cells[c+r]; return !!(x&&x.bold&&x.bt); });
+      const totDress = dressed(o.rTA) && dressed(o.rLE);
+      const ckBold = o.cols.every(c=>{ const x=S.cells[c+o.rCK]; return !!(x&&x.bold); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision): each of the three
+         built lines written ONCE and taken across the years in a single pass. Read off the r424
+         S.fillOps latch (mechanic used, not geometry inferred) — Ctrl+R and the ribbon fill
+         Alt H F I R both log, so the star is chord-agnostic per §1.0(c). Isolated measurement,
+         5 seeds through the live engine: the three fills cost 9 keys against 51 to type the six
+         repeat cells, so the star is worth 42 keys — the largest single decision on this board.
+         Typing every year clears all five core beats and forfeits only the star. */
+      const ops=S.fillOps||[];
+      const filled=r=>ops.some(f=>f.dir==='right' && f.r1<=r && f.r2>=r && f.c1<=o.c0+1 && f.c2>=o.c0+3);
+      const starOk = taOk && leOk && ckOk && filled(o.rTA) && filled(o.rLE) && filled(o.rCK);
       return [
-        {label:'total assets \u2014 a live SUM over all four lines, both years', ok: COL.every(c=>near(c+'6',this._exp[c].ta))&&refs('B6',['SUM('])},
-        {label:'total L&E with SUM \u2014 RE is a given not a plug, both years', ok: COL.every(c=>near(c+'12',this._exp[c].tle))&&refs('B12',['SUM('])},
-        {label:'run the check row \u2014 assets minus L&E, landing at 0 in both years', ok: COL.every(c=>near(c+'14',0))&&refs('B14',['B6','B12'])},
-        {label:'bold the totals and add a top border above the check row', ok: dressOk},
+        {label:'Total the assets — every asset line, all three years', ok: taOk},
+        {label:'Total liabilities and equity — every line, all three years', ok: leOk},
+        {label:'Bold both total rows and add a top border above each', ok: totDress},
+        {label:'Build the check row — assets minus liabilities and equity, all three years', ok: ckOk},
+        {label:'Bold the check row — all three years', ok: ckBold},
+        {label:'Fill all three built lines across the years — one pass each, no year retyped', ok: starOk, bonus:true},
       ];
     }
   },
@@ -10800,97 +10936,217 @@ const CHALLENGES = {
      failure class: a dead check row hiding breaks (balcheck), links reading a dead
      assumptions block (stalelink), pasted-in positive costs (signerr). */
   balcheck:{
-    name:'Make It Tie', label:'Hunt the balance break', par:28, parKeys:27,
-    aha:'Tie out by halving — check the subtotal, then only the block that fails.',
-    prompt:'A balance sheet that doesn’t balance — and someone pasted zeros over the check row so it looks like it does. Rebuild the check row as a live formula, read which years break, and fix both causes: one Total assets lost its first line, and one Equity cell is a typed number where the roll-forward should be. The check reads zero because the sheet is right, not because it was forced.',
-    req(){ return '<em>B15:E15</em> check \u2192 =B8\u2212B14, filled \u00b7 one <em>Total assets</em> starts a row short \u2014 respan it \u00b7 one <em>Equity</em> cell is typed \u2014 roll-forward it \u00b7 every check reads 0'; },
-    guide:[
-      'the check row is pasted zeros \u00b7 B15: <kbd>=</kbd>B8-B14 <kbd>\u21b5</kbd> \u00b7 select B15:E15, <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 now read which years break',
-      'one Total assets SUM starts at row 5 \u2014 the Cash line fell out of the range \u00b7 retype it over the whole block: <kbd>=</kbd>SUM(\u20264:\u20267) <kbd>\u21b5</kbd>',
-      'one equity cell is a typed number \u00b7 rebuild the roll-forward: <kbd>=</kbd>prior-year equity <kbd>+</kbd> NI memo <kbd>\u21b5</kbd>',
-      'sign-off: the check row reads dead zero in all four years',
-    ],
-    targets:['B15:E15', function(){return this._short;}, function(){return this._plug;}, 'B15:E15'],
-    demo(){
-      const sh=this._short, pl=this._plug;
-      const shL=sh.replace(/\d+/g,''), plL=pl.replace(/\d+/g,'');
+    /* r440 H6b-12 (DEPTH_PASS §4.48 + §2.3, "Make it tie — hunt the break") — the depth-pass
+       rework, built to §1.0 + §1.0-R2 + §1.0-R3 on top of the page (§1.0-R3 wins on conflict).
+       This drill closes Formulas II.
+
+       WAS: 4 checks on a ROWS:15 board (13 rows used — 65% of the real 20-row sheet, under the
+       §1.3 target), no ☆,
+       no saveClose, and — the reason the page called for §2.3 — no disclosed error count, on the
+       one board in the chapter whose whole shape is "three things are wrong, find them".
+
+       ── RETIREMENT/MERGE DIAGNOSTIC (§1.0-R3(s) + CAMPAIGN §2, both parts), measured through
+       the live engine on the SHIPPED board, every selection and navigation keyed, 5 seeds:
+         PART 1 — SPREAD: fastest legal 27 keys against 71 for the slowest legal one (the check
+           row typed four times, both repairs retyped in full rather than edited in place). 2.63×.
+         PART 2 — WHAT SURVIVES THE STRIP: ~6 keys are chord-vs-ribbon, ZERO are formatting (the
+           shipped board graded no formatting at all). The remaining ~38 are fill-versus-retype
+           on the check row and edit-in-place versus retype on the two repairs — and, once the
+           board discloses its count, the SURGICAL question of how much of the page you rewrite
+           to fix three cells. Legal headroom. KEEP.
+         DISTINCTNESS (CAMPAIGN §3 discriminator): `balance` (same chapter, reworked in this same
+         batch) BUILDS a balance sheet's check row on a sheet that already agrees; this one hunts
+         on a sheet that does not, with the check row pasted over so the instrument itself is the
+         first thing to rebuild. Fluency in `balance` produces a correct first attempt at the
+         check row here — that half is contained — and says nothing about either cause. `audit`
+         §4.45 is the chapter's general review pass over a P&L; this is the balance-sheet-specific
+         identity, where the two sides are footed separately and a roll-forward can be typed over
+         without changing a single visible total. Neither carries the cascade: here rebuilding the
+         instrument is what REVEALS which years break.
+
+       ── UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD (the CAMPAIGN §1 class, found by WALKING
+       routes, not by reading predicates). All three graded formula TEXT, and the third is the
+       worst kind — it locked out the repair the drill's own prompt asks for:
+         (1) THE CHECK-ROW BEAT DEMANDED THE LITERAL 'B8' AND 'B14' IN EVERY COLUMN. Anchored
+             (=$B$8-$B$14) or written the other way round and negated, the row read dead zero
+             across all four years and the beat stayed dark.
+         (2) THE TOTAL-ASSETS BEAT DEMANDED THE LITERAL RANGE 'B4:B7'. An addition chain over the
+             four lines, or a SUM written as two ranges, landed the identical number and stayed
+             dark. Probed: board 2,145, expected 2,145, check false.
+         (3) THE EQUITY BEAT DEMANDED BOTH 'B12' AND 'C13' IN THE TEXT. A player who rebuilt the
+             roll-forward as =SUM(prior equity, NI memo) — same value, same liveness, arguably the
+             tidier form — watched it stay dark.
+       All three die here: every core grades the END STATE (§1.0-R3(p)) — the number standing in
+       each year column, plus liveness where the label says the line is built or repointed.
+
+       THE BOARD. A four-year balance sheet that does not agree with itself, carrying exactly
+       three disclosed breaks (§2.3, N=3): the check row was pasted over with zeros so the page
+       LOOKS clean, one year's Total assets starts a row short, and one year's equity is a typed
+       number where the roll-forward belongs. The cascade is native and needs no §2.5 plumbing —
+       rebuilding the check row recalculates the page and the two live breaks surface as non-zero
+       years, which is why the meter beat and the check-row beat are ordered the way they are.
+
+       STRUCTURAL DEVIATIONS from the §4.48 page, declared here per §0:
+       (1) ☆ RE-CUT (binding). The page's bonus is "Add a top border above both Total rows".
+           A FORMATTING task, which §1.0(d) forbids outright, and one that falls out of ordinary
+           dressing, so it also fails §1.0-R2(i)'s skippable-decision test. Same class as
+           `stalelink`'s strikethrough ☆, `balance`'s bottom-border ☆ and `tieout`'s bold-the-
+           total ☆ — all three re-cut in this batch. The replacement is `ruleaudit`'s surgeon's
+           pass (r425) carried into formula work: repair the two broken cells and leave every
+           healthy formula on the page byte-for-byte as it shipped. It is the right star for an
+           audit board — the failure mode a reviewer actually punishes is rewriting a page to fix
+           three cells of it — and it is measured, not asserted; see the ☆ note in checks().
+       (2) THE DRESS BEAT STAYS LAST, against §1.0(a)'s format-as-you-go default. Declared
+           deliberately: the check row cannot be signed off in ink until it reads zero, which
+           cannot happen until both causes are repaired. The page itself orders it this way.
+       (3) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an EXISTING labelled
+           cell in a labelled row.
+       (4) §1.3 DENSITY: 16 of 20 rows carry content at the win state (80%), against 65% before.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about — see
+       the walked-route list in dev/AUDIT.md r440. The check row accepts either anchoring, either
+       sign-correct form, filled or typed year by year; the Total assets repair accepts a re-spanned
+       SUM, an addition chain or autosum; the equity repair accepts a reference chain or a SUM of
+       the two cells. A typed constant never clears a beat whose stated outcome is a live line. */
+    name:'Make It Tie', label:'Hunt the balance break', par:37, parKeys:35, saveClose:true,   /* r440 §4.48 depth pass: par re-swept from scratch (was par 28 / parKeys 27 on the ROWS:15 board with no meter, no ☆ and no save closer). dev/e2e-par-sweep.js balcheck, 5-seed median 35 keys including the engine-appended Ctrl+S — flat across seeds, since the randomization moves which year carries each break but never the beat count. par 37 ≈ 1.06 s/key, the house band. That lands balcheck beside `signerr` (35) in the chapter band (wrapfix 26 · tieout 36 · versionup 48 · balance 66 · cases 97). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 0:56 · pro 0:43 · legendary 0:37. */
+    aha:'Rebuild the instrument before you trust the reading — a check row of pasted zeros hides exactly what it was built to show.',
+    /* §1.5: the aha's MOMENT is beat 2. The moment the check row goes live the page recalculates
+       and the two broken years surface on their own — nothing else on the board had to move. */
+    prompt:'A four-year balance sheet that does not agree with itself, and someone pasted zeros over the check row so it looks like it does. Three things are wrong on this page. Rebuild the check row first — it is the instrument, and it will show you which years break — then run down both causes and close the page.',
+    req(){ const o=this._o; return '<em>'+o.CB+o.rCk+'</em> → <em>='+o.CB+o.rTA+'-'+o.CB+o.rLE+'</em> · <em>ctrl+r</em> across · one <em>Total assets</em> starts a row short — re-span it over '+o.a0+':'+o.aN+' · one <em>Equity</em> cell is typed — roll it forward off the prior year + the NI memo · <em>ctrl+b</em> the check row · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'three breaks, and the meter counts them as they go green — the check row itself is one of the three, so it ticks the moment beat 2 lands',
+      'the check row is pasted zeros, not a formula · on '+o.CB+o.rCk+': <kbd>=</kbd>'+o.CB+o.rTA+'<kbd>-</kbd>'+o.CB+o.rLE+' <kbd>↵</kbd> · select '+o.CB+o.rCk+':'+o.CE+o.rCk+' and <kbd>ctrl</kbd>+<kbd>r</kbd> to take it across · anchored or not, either way round so long as the sign is right. Now read it: the years that are not zero are the years that break',
+      'one Total assets SUM starts at row '+(o.a0+1)+' — the '+o.firstA+' line fell out of its range · re-span it over the whole block, <kbd>F2</kbd> in place or retyped: <kbd>=SUM(</kbd>…'+o.a0+':…'+o.aN+'<kbd>)</kbd>. An addition chain or <kbd>alt</kbd>+<kbd>=</kbd> over the block lands the same number',
+      'one Equity cell is a typed number where the roll-forward belongs · rebuild it off the year before it plus that year’s NI memo — a reference chain or a SUM of the two cells, either clears',
+      'sign it off: select the check row and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle)',
+      '☆ the discovery: repair the two broken cells and NOTHING else — every healthy Total and every healthy roll-forward left exactly as it shipped. Re-driving a whole row across the years to be sure clears every core beat and forfeits it',
+    ]; },
+    /* rings: ① the check row · ② the check row · ③ the short Total · ④ the typed equity cell ·
+       ⑤ the check row · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [o.CB+o.rCk+':'+o.CE+o.rCk, o.CB+o.rCk+':'+o.CE+o.rCk, o.short, o.plug, o.CB+o.rCk+':'+o.CE+o.rCk, null]; },
+    /* the demo BUILDS its own selections rather than being handed them by setDemoSel, so parKeys
+       measures what a player really pays for the range grabs (the r438 `series` rule). */
+    demo(){ const o=this._o;
+      const shL=o.short.replace(/\d+/g,''), plL=o.plug.replace(/\d+/g,'');
       const prev=String.fromCharCode(plL.charCodeAt(0)-1);
       return [
-        {sel:'B15', keys:[...T('=B8-B14'), Kb.enter]},
-        {sel:'B15:E15', keys:[Kb.fillR]},
-        {sel:sh, keys:[...T('=SUM('+shL+'4:'+shL+'7)'), Kb.enter]},
-        {sel:pl, keys:[...T('='+prev+'12+'+plL+'13'), Kb.enter]},
+        {sel:o.CB+o.rCk, keys:[...T('='+o.CB+o.rTA+'-'+o.CB+o.rLE), Kb.enter]},
+        {sel:o.CB+o.rCk, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR]},
+        {sel:o.short, keys:[...T('=SUM('+shL+o.a0+':'+shL+o.aN+')'), Kb.enter]},
+        {sel:o.plug,  keys:[...T('='+prev+o.rEq+'+'+plL+o.rNi), Kb.enter]},
+        {sel:o.CB+o.rCk, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.bold]},
       ];
-    },
+    },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Balance sheet (doesn\u2019t tie \u2014 find why)',txt:true,bold:true};
-      const y0=23+rnd(0,2);
-      cells['A3']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
-      for(let c=2;c<=5;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
-      const aRows=['Cash','Receivables','Inventory','PP&E'];
-      for(let i=0;i<4;i++) cells['A'+(4+i)]={...blankCell(),value:aRows[i],txt:true};
-      cells['A8']={...blankCell(),value:'Total assets',txt:true,bold:true};
-      const lRows=['Payables','Debt','Equity'];
-      for(let i=0;i<3;i++) cells['A'+(10+i)]={...blankCell(),value:lRows[i],txt:true};
-      cells['A13']={...blankCell(),value:'Net income (memo)',txt:true};
-      cells['A14']={...blankCell(),value:'Total L&E',txt:true,bold:true};
-      cells['A15']={...blankCell(),value:'Check (A \u2212 L&E)',txt:true,bold:true};
-      // L&E side first (equity roll-forwards off the NI memo); assets sized so the sheet
-      // GENUINELY tied before the two defects \u2014 the fix restores truth, not cosmetics
+      /* §1.2 randomization — four independent axes. (a) SITE: corner jitter — the statement
+         anchors at column A or column B. (b) CONTENT: the codename and the fiscal-year base.
+         (c) VALUES: every figure through rnd(). (d) WHICH-IS-BROKEN: the short Total and the
+         typed-over equity cell are drawn independently and never land in the same year, so the
+         cascade always surfaces TWO distinct broken years. Geometry (five asset lines, four
+         years) is constant across seeds so the keystroke count never moves with the draw. */
+      const c0=rnd(0,1)?1:2;                        // (a) corner jitter
+      const CA=colLetter(c0), CB=colLetter(c0+1), CE=colLetter(c0+4);
+      const y0=2023+rnd(0,2);
+      const HR=3, A0=4, AN=8, RTA=9, L0=11, LN=13, RNI=14, RLE=15, RCK=17, RNOTE=19;
+      const REQ=L0+2;                               // the Equity line
+      cells[CA+'1']={...blankCell(),value:codename()+' — balance sheet ($000s)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: inherited close file · basis: $ in thousands · the check row below was pasted over',txt:true,it:true,fontColor:'gray'};
+      cells[CA+HR]={...blankCell(),value:'Item',txt:true,bold:true};
+      for(let i=0;i<4;i++) cells[colLetter(c0+1+i)+HR]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      const aRows=['Cash','Receivables','Inventory','PP&E','Intangibles'];
+      aRows.forEach((n,i)=>cells[CA+(A0+i)]={...blankCell(),value:n,txt:true});
+      cells[CA+RTA]={...blankCell(),value:'Total assets',txt:true,bold:true};
+      ['Payables','Debt','Equity'].forEach((n,i)=>cells[CA+(L0+i)]={...blankCell(),value:n,txt:true});
+      cells[CA+RNI]={...blankCell(),value:'Net income (memo)',txt:true};
+      cells[CA+RLE]={...blankCell(),value:'Total L&E',txt:true,bold:true};
+      cells[CA+RCK]={...blankCell(),value:'Check (assets − L&E)',txt:true,bold:true};
+      cells[CA+RNOTE]={...blankCell(),value:'Reviewer: the sheet balanced when it was handed over — three things have happened to it since',txt:true,it:true,fontColor:'gray'};
+      /* the L&E side is drawn first (equity rolls off the NI memo) and the assets are then sized
+         to match, so the sheet GENUINELY tied before the two defects — the repair restores truth
+         rather than cosmetics. */
       const eq0=rnd(120,300)*5;
       const ni=[0, rnd(20,90)*5, rnd(20,90)*5, rnd(20,90)*5];
       const eq=[eq0]; for(let i=1;i<4;i++) eq.push(eq[i-1]+ni[i]);
-      const plugCol=2+rnd(1,3);                       // C..E \u2014 only roll years roll-forward
-      let shortCol=2+rnd(0,3); while(shortCol===plugCol) shortCol=2+rnd(0,3);
-      for(let c=2;c<=5;c++){
-        const Lc=colLetter(c), i=c-2;
+      const plugCol=c0+1+rnd(1,3);                  // (d) only a ROLL year can be typed over
+      let shortCol=c0+1+rnd(0,3); while(shortCol===plugCol) shortCol=c0+1+rnd(0,3);
+      const std={};                                 // the ☆'s snapshot of every HEALTHY formula
+      for(let c=c0+1;c<=c0+4;c++){
+        const Lc=colLetter(c), i=c-(c0+1);
         const pay=rnd(40,160)*5, debt=rnd(80,300)*5;
-        cells[Lc+'10']={...blankCell(),value:pay,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'11']={...blankCell(),value:debt,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        if(c===2) cells[Lc+'12']={...blankCell(),value:eq0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        else if(c===plugCol) cells[Lc+'12']={...blankCell(),value:eq[i]+rnd(3,12)*5,fmtStyle:'comma',decimals:0};   // the stale plug \u2014 a visible wedge off true
-        else cells[Lc+'12']={...blankCell(),formula:'='+colLetter(c-1)+'12+'+Lc+'13',value:eq[i],fmtStyle:'comma',decimals:0};
-        if(c>2) cells[Lc+'13']={...blankCell(),value:ni[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+L0]={...blankCell(),value:pay,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+(L0+1)]={...blankCell(),value:debt,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        if(i===0) cells[Lc+REQ]={...blankCell(),value:eq0,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        else if(c===plugCol) cells[Lc+REQ]={...blankCell(),value:eq[i]+rnd(3,12)*5,fmtStyle:'comma',decimals:0};   // the typed-over roll — a visible wedge off true
+        else cells[Lc+REQ]={...blankCell(),formula:'='+colLetter(c-1)+REQ+'+'+Lc+RNI,value:eq[i],fmtStyle:'comma',decimals:0};
+        if(i>0) cells[Lc+RNI]={...blankCell(),value:ni[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
         const totLE=pay+debt+eq[i];
-        cells[Lc+'14']={...blankCell(),formula:'=SUM('+Lc+'10:'+Lc+'12)',
-          value:(c===plugCol? pay+debt+cells[Lc+'12'].value : totLE),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-        const cash=rnd(10,40)*5, ar=rnd(10,50)*5, inv=rnd(10,50)*5;
-        const ppe=totLE-cash-ar-inv;                  // ranges keep this comfortably positive
-        const av=[cash,ar,inv,ppe];
-        for(let r=4;r<=7;r++) cells[Lc+r]={...blankCell(),value:av[r-4],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[Lc+RLE]={...blankCell(),formula:'=SUM('+Lc+L0+':'+Lc+REQ+')',
+          value:(c===plugCol? pay+debt+cells[Lc+REQ].value : totLE),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        const cash=rnd(10,40)*5, ar=rnd(10,50)*5, inv=rnd(10,50)*5, intg=rnd(5,25)*5;
+        const ppe=totLE-cash-ar-inv-intg;           // the ranges keep this comfortably positive
+        const av=[cash,ar,inv,ppe,intg];
+        for(let r=A0;r<=AN;r++) cells[Lc+r]={...blankCell(),value:av[r-A0],fontColor:'blue',fmtStyle:'comma',decimals:0};
         const short=(c===shortCol);
-        cells[Lc+'8']={...blankCell(),formula:'=SUM('+Lc+(short?'5':'4')+':'+Lc+'7)',
-          value:(short? ar+inv+ppe : totLE),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-        cells[Lc+'15']={...blankCell(),value:0,fmtStyle:'comma',decimals:0};   // the pasted-over zeros
+        cells[Lc+RTA]={...blankCell(),formula:'=SUM('+Lc+(short?A0+1:A0)+':'+Lc+AN+')',
+          value:(short? totLE-cash : totLE),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        cells[Lc+RCK]={...blankCell(),value:0,fmtStyle:'comma',decimals:0};   // the pasted-over zeros
+        /* ☆ snapshot: every formula that shipped HEALTHY. The two defects are excluded by
+           construction — a repair must change them — and the four Total L&E lines are in, so
+           re-driving that row to "be safe" is exactly the move the star declines to reward. */
+        if(!short) std[Lc+RTA]=cells[Lc+RTA].formula;
+        if(i>0 && c!==plugCol) std[Lc+REQ]=cells[Lc+REQ].formula;
+        std[Lc+RLE]=cells[Lc+RLE].formula;
       }
-      this._short=colLetter(shortCol)+'8'; this._plug=colLetter(plugCol)+'12';
-      return {ROWS:15, cells, active:{r:15,c:2}, sel:null, colW:{1:132}};
+      this._o={CA:CA,CB:CB,CE:CE,c0:c0,a0:A0,aN:AN,rTA:RTA,l0:L0,lN:LN,rNi:RNI,rEq:REQ,rLE:RLE,
+               rCk:RCK,short:colLetter(shortCol)+RTA,plug:colLetter(plugCol)+REQ,
+               shortCol:shortCol,plugCol:plugCol,firstA:aRows[0],std:std,
+               cols:[colLetter(c0+1),colLetter(c0+2),colLetter(c0+3),colLetter(c0+4)]};
+      const colW={}; colW[c0]=150; for(let i=1;i<=4;i++) colW[c0+i]=90;
+      return {ROWS:20, cells, active:{r:RCK,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      let liveOk=true, zeroOk=true, totOk=true, eqOk=true;
-      for(let c=2;c<=5;c++){ const Lc=colLetter(c);
-        const ck=S.cells[Lc+'15'];
-        const f=(ck&&ck.formula)?ck.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        const want=(((S.cells[Lc+'8']||{}).value)||0)-(((S.cells[Lc+'14']||{}).value)||0);
-        if(!f || f.indexOf(Lc+'8')<0 || f.indexOf(Lc+'14')<0 || Math.abs(((ck&&ck.value)||0)-want)>1e-6) liveOk=false;
-        if(Math.abs(((ck&&ck.value)||0))>1e-6) zeroOk=false;
-        const t=S.cells[Lc+'8'];
-        let wantT=0; for(let r=4;r<=7;r++){ const x=S.cells[Lc+r]; wantT+=(x&&typeof x.value==='number')?x.value:0; }
-        const ft=(t&&t.formula)?t.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        if(!ft || ft.indexOf(Lc+'4:'+Lc+'7')<0 || Math.abs(((t&&t.value)||0)-wantT)>1e-6) totOk=false;
-        if(c>2){ const P=colLetter(c-1);
-          const e=S.cells[Lc+'12'];
-          const fe=(e&&e.formula)?e.formula.toUpperCase().replace(/[\s$]/g,''):'';
-          const wantE=(((S.cells[P+'12']||{}).value)||0)+(((S.cells[Lc+'13']||{}).value)||0);
-          if(!fe || fe.indexOf(P+'12')<0 || fe.indexOf(Lc+'13')<0 || Math.abs(((e&&e.value)||0)-wantE)>1e-6) eqOk=false;
-        }
-      }
+      const o=this._o;
+      const cell=k=>S.cells[k]||{};
+      const live=k=>{ const c=cell(k); return !!(c.formula&&typeof c.value==='number'); };
+      const num=k=>{ const c=cell(k); return (typeof c.value==='number')?c.value:NaN; };
+      /* ── the three disclosed breaks, each graded on the END STATE (§1.0-R3(p)) ────────────
+         (1) the check row is a live difference in every year · (2) every Total assets covers all
+         five asset lines · (3) every roll year's equity equals the year before it plus that
+         year's NI memo. Nothing reads formula text, so an addition chain, a two-range SUM, a
+         reference chain and a SUM of two cells all clear (the three bugs above). */
+      const ckLive = o.cols.every(c=>live(c+o.rCk) &&
+        Math.abs(num(c+o.rCk)-(num(c+o.rTA)-num(c+o.rLE)))<0.5);
+      const totOk = o.cols.every(c=>{
+        let want=0; for(let r=o.a0;r<=o.aN;r++){ const v=num(c+r); if(!isNaN(v)) want+=v; }
+        return live(c+o.rTA) && Math.abs(num(c+o.rTA)-want)<0.5; });
+      const eqOk = o.cols.slice(1).every((c,i)=>{
+        const prev=o.cols[i];
+        return live(c+o.rEq) && Math.abs(num(c+o.rEq)-(num(prev+o.rEq)+num(c+o.rNi)))<0.5; });
+      const found=(ckLive?1:0)+(totOk?1:0)+(eqOk?1:0);   // feeds the §2.3 meter via the (k/3) label
+      const ckBold = o.cols.every(c=>!!cell(c+o.rCk).bold);
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision): `ruleaudit`'s surgeon's
+         pass (r425) carried from ruling ink into formula work — the two broken cells repaired and
+         every HEALTHY formula left byte-for-byte as it shipped. Snapshot taken in build(). The
+         decision is real and it is the one a reviewer actually cares about: re-driving the Total
+         row across the years with one fill, or retyping all three roll-forwards to be sure, both
+         clear every core beat and forfeit the star. Isolated measurement, 5 seeds through the
+         live engine: the surgical route costs 22 keys for the two repairs against 39 to re-drive
+         both rows, so the star is worth 17 keys AND is the safer habit — the rare case where the
+         fast route and the careful one are the same route. */
+      let clean=true;
+      for(const k in o.std){ const c=cell(k); if(String(c.formula||'')!==o.std[k]){ clean=false; break; } }
+      const starOk = found===3 && clean;
       return [
-        {label:'make the check row LIVE \u2014 =Total assets \u2212 Total L&E, all four years (row 15)', ok:liveOk},
-        {label:'stretch every Total assets over ALL four asset lines \u2014 one range starts a row short (row 8)', ok:totOk},
-        {label:'roll the equity forward \u2014 prior year + NI memo in every roll year; one is a typed plug (row 12)', ok:eqOk},
-        {label:'make it tie \u2014 every check reads dead zero (row 15)', ok:zeroOk&&liveOk},
+        {label:'Find and repair all 3 breaks on the page ('+found+'/3 repaired)', ok: found===3},
+        {label:'Build the check row back — assets minus liabilities and equity, all four years', ok: ckLive},
+        {label:'Fix the Total assets line that starts a row short', ok: totOk},
+        {label:'Repoint the Equity cell that was typed over — prior year plus the NI memo', ok: eqOk},
+        {label:'Bold the check row — all four years', ok: ckBold},
+        {label:'Fix only what broke — every healthy line left exactly as it shipped', ok: starOk, bonus:true},
       ];
     }
   },
@@ -11421,68 +11677,200 @@ const CHALLENGES = {
      covenant table. With wk13 these make "The RX desk" a real section: the three
      pages every restructuring deck actually opens with. */
   tieout:{
-    name:'Tie-out', label:'Collapse the suspect leg', par:30, parKeys:8,
-    aha:'F9 evaluates a formula IN the editor — the dead number tells you which link is stale; Esc keeps the formula live.',
-    prompt:'The deck total and the support block disagree, and nothing is labeled. Trace from the tie-out into the wiring, then interrogate the legs: open one, collapse it to the number it actually pulls, and back out without changing the formula. Two legs read the fresh Q2 feed; one still points at the Q1 column — the dead number gives it away instantly. Repoint the stale leg and the check lands at zero. Auditors call it a tie-out; collapsing a leg to its value is how you run one without printing anything.',
-    req(){ const o=this._o; return 'on <em>'+o.tie+'</em> · <em>ctrl+[</em> ×2 rides into the legs · <em>F2</em> a leg, <em>F9</em> shows its dead value, <em>esc</em> · the stale one reads Q1 — retype <em>'+o.fixF+'</em> ↵ · the check ties to 0'; },
+    /* r440 H6b-12 (DEPTH_PASS §4.51, "Collapse the suspect leg") — the depth-pass rework, built
+       to §1.0 + §1.0-R2 + §1.0-R3 on top of the page (§1.0-R3 wins on conflict).
+
+       WAS: 4 checks on a ROWS:10 board (7 rows used — 35% of the real sheet, the worst density
+       in the chapter), no ☆, no saveClose, no ALTS entry at all (one of the nine zero-ALT drills
+       §1.8 names), parKeys 8 against a par of 30 — the widest par/parKeys gap in the catalog,
+       because the demo was handed its selections and never paid for a single navigation.
+
+       ── THE REASON THIS DRILL ALMOST RETIRED, AND WHY IT DID NOT. Two of the four shipped
+       checks graded a KEYPRESS: beat 1 was `S.traceN>=2` and beat 2 was `S.f9N>=1`. That is
+       exactly the predicate class `unhide` dropped in r437 and the first of the three findings
+       that retired `hunt` in r439 — it breaches §1.0(c) (no core check may require one route)
+       and it manufactures the campaign's #1 bug: a player who diagnoses the stale leg BY EYE,
+       repoints it correctly and lands the tie-out at zero has a perfect board and two dark
+       lines with nothing to fix. Walked and confirmed on the shipped board, 5 seeds: correct
+       end state, beats 1 and 2 dark.
+         So the §1.0-R3(s) question was put properly. CONTAINMENT (CAMPAIGN §3 discriminator):
+         does fluency in a neighbour produce a CORRECT FIRST ATTEMPT here? `stalelink` §4.49 is
+         the closest — three cells reading a dead v1 block, found by pattern-break and repointed.
+         Run verbatim as a first attempt on this board it repoints the leg correctly, so the
+         REPAIR half is contained. What it does NOT carry is the INTERROGATION: F9-collapse
+         appears in exactly ONE drill in the catalog — this one — the same "carried nowhere else"
+         finding that kept `wrapfix` (IFERROR, r439). And `wirewalk` §4.50 was retired INTO this
+         drill in r438, so retiring it now would drop two lessons, not one.
+         VERDICT: KEEP, and move the technique OFF the core beats and INTO the ☆, where
+         §1.0(d) sanctions rewarding a mastery move and where skipping it costs a player nothing
+         but the star. That is the whole shape of this rework.
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, both parts), measured on the REBUILT board through
+       the live engine, every selection and navigation keyed, 5 seeds:
+         PART 1 — SPREAD: fastest legal 34 keys against 108 for the slowest legal one (the total
+           typed as an addition chain over eight lines, the leg retyped in full, the dress walked
+           by ribbon column by column). 3.18×.
+         PART 2 — WHAT THE SPREAD IS MADE OF: ~11 keys are chord-vs-ribbon (§1.0(c) forces those
+           to clear), ~9 are formatting (§1.0(d) forbids grading them). The ~54 that survive the
+           strip are the diagnosis itself — the difference between interrogating the legs and
+           reading eight formulas one at a time — plus autosum against a typed chain. Legal
+           headroom, and it is this drill's own subject.
+
+       THE BOARD. A Q2 board-pack tie-out. A support block of eight segment lines, each pulling
+       one number off the feed table to its right; the block is UNFOOTED at load. The deck figure
+       the pack already printed sits below it, and the tie-out under that. One leg still points at
+       the Q1 column. The feed table is in a DIFFERENT ORDER from the support block (Fisher-Yates,
+       independently of the block), which is what makes the interrogation worth a star: the legs
+       cannot be checked by running an eye down two adjacent columns, because no two rows line up.
+
+       STRUCTURAL DEVIATIONS from the §4.51 page, declared here per §0:
+       (1) THE PAGE'S "CHECK2 ok: f9N>=1 AND the formula restored unchanged after backing out" IS
+           MOVED TO THE ☆, NOT TIGHTENED IN PLACE. Tightening it would have doubled down on the
+           keypress-grading bug above. The page's own acceptance condition survives verbatim —
+           collapse a leg AND leave the formula live — it is simply the star now.
+       (2) ☆ RE-CUT accordingly (the page's was "Bold the repaired total — the tie-out closes"):
+           a FORMATTING task, which §1.0(d) forbids outright, and one that falls straight out of
+           the dress beat, so it also fails §1.0-R2(i)'s skippable-decision test. Same class as
+           `stalelink`'s strikethrough ☆ and `balance`'s bottom-border ☆.
+       (3) THE Ctrl+[ TRACE IS TAUGHT, NEVER GRADED. It stays in `req`, in `guide` and in the
+           demo as a legal route into the legs; grading navigation is the same keypress class,
+           and §1.0(c) protects the player who arrows there instead.
+       (4) THE BOARD GAINS FOUR CORE BEATS OF REAL WORK. With the two keypress beats gone the
+           drill had two graded lines, under the §1.1 minimum of four, so the block now ships
+           unfooted and the tie-out unbuilt: the player constructs the instrument they then read.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an EXISTING labelled
+           cell in a labelled row.
+       (6) §1.3 DENSITY: 15 of 20 rows carry content at the win state (75%), against 35% before.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about — see
+       the walked-route list in dev/AUDIT.md r440. The total accepts =SUM, an addition chain and
+       autosum by either route; the tie-out accepts either anchoring and either sign-correct form;
+       the repoint grades that the leg's VALUE is now its own segment's current-quarter number and
+       that the cell is still live — which is what "repoint" means (§1.7 glosses it "repair in
+       place"), and is the one place this drill differs from `versionup`, whose subject is
+       replacing a hardcode rather than moving a reference. */
+    name:'Tie-out', label:'Collapse the suspect leg', par:36, parKeys:34, saveClose:true,   /* r440 §4.51 depth pass: par re-swept from scratch (was par 30 / parKeys 8 — the demo was handed every selection, so parKeys measured almost nothing). dev/e2e-par-sweep.js tieout, 5-seed median 35 keys including the engine-appended Ctrl+S. par 36 ≈ 1.06 s/key, the house band. The count grew from 8 to 35 because the demo now pays for its own selections, the block ships unfooted and the tie-out unbuilt, and the save closer landed. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 0:54 · pro 0:41 · legendary 0:36. */
+    aha:'F9 collapses a formula to the number it actually pulls — the dead value names the stale leg, and Esc keeps the formula live.',
+    /* §1.5: the aha's MOMENT is the repoint. Eight legs look identical on the board and the feed
+       is in a different order, so the collapse is what turns a hunt into a read. */
+    prompt:'The Q2 board pack printed a segment total, and the support block behind it has never been footed. One of the eight legs still points at the Q1 column — the feed table is in its own order, so nothing lines up by eye. Foot the block, find the stale leg and repoint it, then build the tie-out against the printed figure and close the page. Auditors call this running a tie-out; collapsing a leg to its value is how you run one without printing anything.',
+    req(){ const o=this._o; return 'foot <em>'+o.CB+o.rTot+'</em> → <em>=SUM('+o.CB+o.r0+':'+o.CB+o.rN+')</em> · <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+[</em> rides into a leg · <em>F2</em> then <em>F9</em> shows what it pulls, <em>esc</em> backs out live · repoint the stale one → <em>'+o.fixF+'</em> ↵ · <em>'+o.CB+o.rTie+'</em> → <em>='+o.CB+o.rTot+'-'+o.CB+o.rDeck+'</em> · <em>ctrl+b</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
     guide(){ const o=this._o; return [
-      'start on the tie-out '+o.tie+' — it is not zero · <kbd>ctrl</kbd>+<kbd>[</kbd> lands you on the total it reads',
-      '<kbd>ctrl</kbd>+<kbd>[</kbd> again — into the legs. Each leg pulls one feed cell, and one of them is STALE',
-      'interrogate: <kbd>F2</kbd> opens '+o.bad+' · <kbd>F9</kbd> — the formula collapses to the number it pulls · <kbd>esc</kbd> keeps it live',
-      'that number is the Q1 column — repoint it: type <kbd>'+o.fixF+'</kbd> <kbd>↵</kbd>',
-      'the total repriced and the tie-out reads 0',
+      'the eight segment lines run row '+o.r0+' to row '+o.rN+' · on '+o.CB+o.rTot+': <kbd>=SUM(</kbd>'+o.CB+o.r0+':'+o.CB+o.rN+'<kbd>)</kbd> <kbd>↵</kbd>, or select the block through the empty Total cell and press <kbd>alt</kbd>+<kbd>=</kbd> · an addition chain totals the same, it only costs the keys',
+      'dress it now rather than at the end: <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> both draw that top line too)',
+      'seven legs read the '+o.curH+' column and one still reads '+o.oldH+'. <kbd>ctrl</kbd>+<kbd>[</kbd> rides from a leg to the feed cell it pulls — or open a leg with <kbd>F2</kbd> and press <kbd>F9</kbd> to collapse it to that number, then <kbd>esc</kbd>. The stale one is '+o.badName+' · repoint it: <kbd>'+o.fixF+'</kbd> <kbd>↵</kbd>',
+      'the tie-out on '+o.CB+o.rTie+': <kbd>=</kbd>'+o.CB+o.rTot+'<kbd>-</kbd>'+o.CB+o.rDeck+' <kbd>↵</kbd> · anchored or not, either way round so long as the sign is right — it grades the number, not the text. It reads 0 once the leg is repointed',
+      'close the page: <kbd>ctrl</kbd>+<kbd>b</kbd> on the tie-out line',
+      '☆ the discovery: interrogate a leg in the editor instead of reading formulas one by one — <kbd>F2</kbd> then <kbd>F9</kbd> collapses it to the number it pulls, and <kbd>esc</kbd> backs out with the formula still live. Committing that dead number with <kbd>↵</kbd> hardcodes the cell and forfeits it; finding the leg by eye clears every core beat and forfeits it too',
     ]; },
-    targets(){ const o=this._o; return [o.tie, o.bad, o.bad, o.tie]; },
-    demo(){ const o=this._o;
-      const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
-      for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
-      keys.push({key:'F2'},{key:'F9'},{key:'Escape'});
-      keys.push(...T(o.fixF), Kb.enter);
-      return [{sel:o.tie, keys:keys}];
-    },
+    /* rings: ① the Total cell · ② the Total line · ③ the stale leg · ④ the tie-out cell ·
+       ⑤ the tie-out line · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [o.CB+o.rTot, o.CA+o.rTot+':'+o.CB+o.rTot, o.bad, o.CB+o.rTie, o.CA+o.rTie+':'+o.CB+o.rTie, null]; },
+    /* the demo BUILDS its own selections rather than being handed them by setDemoSel, so parKeys
+       measures what a player really pays for the range grabs and the ride into the wiring instead
+       of eliding them (the r438 `series` rule). */
+    demo(){ const o=this._o; return [
+      {sel:o.CB+o.rTot, keys:[...T('=SUM('+o.CB+o.r0+':'+o.CB+o.rN+')'), Kb.enter]},
+      /* §1.0(a): the total is dressed the moment it exists */
+      {sel:o.CA+o.rTot, keys:[{key:'ArrowRight',shift:true}, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      /* the ☆ — open the suspect leg, collapse it to the number it pulls, back out LIVE (Esc,
+         never Enter: Enter would commit the dead value and hardcode the cell) */
+      {sel:o.bad, keys:[{key:'F2'},{key:'F9'},{key:'Escape'}]},
+      /* the repoint itself — a separate act from the interrogation, and the only graded one */
+      {sel:o.bad, keys:[...T(o.fixF), Kb.enter]},
+      {sel:o.CB+o.rTie, keys:[...T('='+o.CB+o.rTot+'-'+o.CB+o.rDeck), Kb.enter]},
+      {sel:o.CA+o.rTie, keys:[{key:'ArrowRight',shift:true}, Kb.bold]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — the deck and the block disagree (one leg is stale)',txt:true,bold:true};
-      const pool=['Consumer','Industrial','Services','Energy','Retail'];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      const labels=pool.slice(0,3);
-      const r0=4;
-      cells['F3']={...blankCell(),value:'Q1 (old)',txt:true,bold:true,align:'r'};
-      cells['G3']={...blankCell(),value:'Q2 feed',txt:true,bold:true,align:'r'};
-      const q1=[],q2=[];
-      for(let i=0;i<3;i++){ const a=rnd(30,90)*10, b=a+(rnd(0,1)?1:-1)*rnd(2,9)*10;
-        q1.push(a); q2.push(b);
-        cells['E'+(r0+i)]={...blankCell(),value:labels[i],txt:true};
-        cells['F'+(r0+i)]={...blankCell(),value:a,fmtStyle:'comma',decimals:0};
-        cells['G'+(r0+i)]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-      cells['A3']={...blankCell(),value:'Support block ($000s)',txt:true,bold:true};
-      const bi=rnd(0,2);
-      for(let i=0;i<3;i++){
-        cells['A'+(r0+i)]={...blankCell(),value:labels[i],txt:true};
-        const stale=(i===bi);
-        cells['B'+(r0+i)]={...blankCell(),formula:stale?('=F'+(r0+i)):('=G'+(r0+i)), value:stale?q1[i]:q2[i], fmtStyle:'comma',decimals:0};
-      }
-      const totBad=q2.reduce((a,b,i)=>a+(i===bi?q1[i]:b),0), totGood=q2.reduce((a,b)=>a+b,0);
-      cells['A'+(r0+3)]={...blankCell(),value:'Total',txt:true,bold:true};
-      cells['B'+(r0+3)]={...blankCell(),formula:'=SUM(B'+r0+':B'+(r0+2)+')',value:totBad,bold:true,fmtStyle:'comma',decimals:0,bt:true};
-      cells['D1']={...blankCell(),value:'Deck says',txt:true,bold:true};
-      cells['E1']={...blankCell(),value:totGood,fontColor:'blue',fmtStyle:'comma',decimals:0,bold:true};
-      cells['D2']={...blankCell(),value:'Tie-out',txt:true,bold:true};
-      cells['E2']={...blankCell(),formula:'=B'+(r0+3)+'-E1',value:totBad-totGood,bold:true,fmtStyle:'comma',decimals:0};
-      this._o={ tie:'E2', tot:'B'+(r0+3), bad:'B'+(r0+bi), bi:bi, fixF:'=G'+(r0+bi), goodV:q2[bi], totGood:totGood };
-      return {ROWS:10, cells, active:{r:2,c:5}, sel:null, colW:{1:110,4:90,5:96,6:90,7:90}};
+      /* §1.2 randomization — four independent axes. (a) SITE: corner jitter — the whole page
+         anchors at column A or column B. (b) CONTENT: an eleven-name segment pool Fisher-Yates
+         shuffled for the block, then shuffled AGAIN and independently for the feed table, so the
+         two orders never agree. (c) VALUES: every figure through rnd(). (d) WHICH-IS-BROKEN: the
+         stale leg is drawn from the eight. Geometry (eight lines, one stale leg) is constant
+         across seeds so the keystroke count never moves with the draw — the r439 `wrapfix` rule. */
+      const shuf=a=>{ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=rnd(0,i); [b[i],b[j]]=[b[j],b[i]]; } return b; };
+      const POOL=['Consumer','Industrial','Services','Energy','Retail','Healthcare','Aerospace','Logistics','Materials','Chemicals','Media'];
+      const c0=rnd(0,1)?1:2;                        // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1);
+      const CE=colLetter(c0+4), CF=colLetter(c0+5), CG=colLetter(c0+6);
+      const q=rnd(1,3), oldH='Q'+q+' (old)', curH='Q'+(q+1)+' (current)';
+      const R0=4, RN=11, RTOT=12, RDECK=14, RTIE=15, RNOTE=17;
+      const segs=shuf(POOL).slice(0,8);             // (b) the block's order
+      const feed=shuf(segs);                        // (b) the feed's own, independent order
+      cells[CA+'1']={...blankCell(),value:codename()+' — Q'+(q+1)+' board pack tie-out ($000s)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: divisional feed · basis: $ in thousands · the support block behind the printed figure has not been footed',txt:true,it:true,fontColor:'gray'};
+      cells[CA+'3']={...blankCell(),value:'Support block',txt:true,bold:true};
+      cells[CE+'3']={...blankCell(),value:'Feed',txt:true,bold:true};
+      cells[CF+'3']={...blankCell(),value:oldH,txt:true,bold:true,align:'r'};
+      cells[CG+'3']={...blankCell(),value:curH,txt:true,bold:true,align:'r'};
+      const oldV={}, curV={}, feedRow={};
+      feed.forEach((n,i)=>{ const r=R0+i;
+        const a=rnd(30,90)*10, b=a+(rnd(0,1)?1:-1)*rnd(2,9)*10;
+        oldV[n]=a; curV[n]=b; feedRow[n]=r;
+        cells[CE+r]={...blankCell(),value:n,txt:true};
+        cells[CF+r]={...blankCell(),value:a,fmtStyle:'comma',decimals:0};
+        cells[CG+r]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      });
+      const bi=rnd(0,7);                            // (d) which leg is stale
+      const badName=segs[bi];
+      segs.forEach((n,i)=>{ const r=R0+i, stale=(i===bi), fr=feedRow[n];
+        cells[CA+r]={...blankCell(),value:n,txt:true};
+        cells[CB+r]={...blankCell(),formula:'='+(stale?CF:CG)+fr,value:(stale?oldV[n]:curV[n]),fmtStyle:'comma',decimals:0};
+      });
+      cells[CA+RTOT]={...blankCell(),value:'Total',txt:true,bold:true};
+      cells[CB+RTOT]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* the deck figure is the TRUE total — every segment on its current-quarter number — so the
+         tie-out lands at zero exactly when the stale leg has been repointed, and never before. */
+      const truth=segs.reduce((a,n)=>a+curV[n],0);
+      cells[CA+RDECK]={...blankCell(),value:'Deck figure (printed)',txt:true};
+      cells[CB+RDECK]={...blankCell(),value:truth,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[CA+RTIE]={...blankCell(),value:'Tie-out',txt:true,bold:true};
+      cells[CB+RTIE]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[CA+RNOTE]={...blankCell(),value:'Reviewer: the pack was printed off the '+curH+' feed — the block should agree with it line for line',txt:true,it:true,fontColor:'gray'};
+      this._o={CA:CA,CB:CB,CE:CE,CF:CF,CG:CG,c0:c0,r0:R0,rN:RN,rTot:RTOT,rDeck:RDECK,rTie:RTIE,
+               bad:CB+(R0+bi), badName:badName, fixF:'='+CG+feedRow[badName],
+               goodV:curV[badName], oldH:oldH, curH:curH, truth:truth};
+      const colW={}; colW[c0]=150; colW[c0+1]=96; colW[c0+2]=26; colW[c0+3]=26;
+      colW[c0+4]=112; colW[c0+5]=96; colW[c0+6]=110;
+      return {ROWS:20, cells, active:{r:RTOT,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
       const o=this._o;
-      const num=k=>{ const c=S.cells[k]; return (c&&typeof c.value==='number')?c.value:NaN; };
-      const badC=S.cells[o.bad]||{};
-      const fixRef=o.fixF.slice(1).toUpperCase();
-      const fixed = !!badC.formula && new RegExp('(^|[^A-J0-9])'+fixRef+'(?![0-9])').test(String(badC.formula).toUpperCase().replace(/\$/g,'').replace(/^=/,' ')) && Math.abs(num(o.bad)-o.goodV)<0.5;
+      /* every core reads the END STATE — the number standing on the board, plus liveness where
+         the label says the line is built or repointed. Nothing reads formula text, and nothing
+         reads a keypress counter (§1.0-R3(p) + the note above on why the two keypress beats
+         that shipped here had to go). */
+      const cell=k=>S.cells[k]||{};
+      const live=k=>{ const c=cell(k); return !!(c.formula&&typeof c.value==='number'); };
+      const num=k=>{ const c=cell(k); return (typeof c.value==='number')?c.value:NaN; };
+      let blockSum=0; for(let r=o.r0;r<=o.rN;r++){ const v=num(o.CB+r); if(!isNaN(v)) blockSum+=v; }
+      const totOk = live(o.CB+o.rTot) && Math.abs(num(o.CB+o.rTot)-blockSum)<0.5;
+      const totDress = (()=>{ const c=cell(o.CB+o.rTot); return !!(c.bold&&c.bt); })();
+      /* the repoint: the leg's own segment now stands at its CURRENT-quarter number, and the cell
+         is still a reference rather than a typed-over constant — which is what §1.7's gloss of
+         "repoint" ("repair in place") means, and the line between this drill and `versionup`. */
+      const fixOk = live(o.bad) && Math.abs(num(o.bad)-o.goodV)<0.5;
+      const tieOk = live(o.CB+o.rTie) && Math.abs(num(o.CB+o.rTie)-(num(o.CB+o.rTot)-num(o.CB+o.rDeck)))<0.5;
+      const tieBold = !!cell(o.CB+o.rTie).bold;
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision): the page's own
+         acceptance condition, moved off the cores — collapse a leg to its dead value in the
+         editor AND back out with the formula still live. S.f9N latches the collapse (r338); the
+         liveness half is read off the board, so committing the dead number with Enter hardcodes
+         the cell, fails the repoint beat and forfeits the star at the same time. Isolated
+         measurement, 5 seeds through the live engine: the interrogation costs 3 keys against 24
+         to open and read all eight legs one at a time, so the star is worth 21 keys. Finding the
+         stale leg by eye clears all five core beats and forfeits only the star (§1.0(c)). */
+      const starOk = fixOk && (S.f9N||0)>=1;
       return [
-        {label:'trace from the tie-out into the legs — two jumps down the wiring', ok:(S.traceN||0)>=2},
-        {label:'collapse a leg to its dead value in the editor — then back out with the formula still live', ok:(S.f9N||0)>=1},
-        {label:'repoint the stale leg to the Q2 feed ('+o.fixF+')', ok:fixed},
-        {label:'land the tie-out at 0', ok:Math.abs(num(o.tie))<0.5},
+        {label:'Total the support block — all eight segment lines', ok: totOk},
+        {label:'Bold the Total line and add a top border above it', ok: totDress},
+        {label:'Repoint the stale leg to the '+o.curH+' column', ok: fixOk},
+        {label:'Build the tie-out — the support total minus the deck figure', ok: tieOk},
+        {label:'Bold the tie-out line', ok: tieBold},
+        {label:'Collapse a leg to its value in the editor — and back out with the formula still live', ok: starOk, bonus:true},
       ];
     }
   },

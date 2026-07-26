@@ -888,7 +888,7 @@ DOES NOT EXIST YET.
 ☆ Trace the fixed read to its source and back — prove the wire
 **Random:** WHICH query is the true miss vs the broken one (audit ask — positions swap per seed) + healthy leave-alone read added (guard in ok) + segment pools (exist). **Aha:** existing (seatbelt, not blindfold). **Finish:** beat 5. **Clocks:** re-sweep (par 70 recalibrates). **Engine:** r419 #N/A sentinels — the broken states should now be REAL propagating #N/A (replaces any staged text).
 
-#### 4.48 balcheck — "Make it tie — hunt the break" · M
+#### 4.48 balcheck — "Make it tie — hunt the break" · M — **SHIPPED (r440, depth pass; §2.3 adopted with N=3 and the meter wired via `drills.js` errorCount. The page's formatting-☆ is replaced by `ruleaudit`'s surgeon's pass carried into formula work, and the dress beat deliberately stays LAST against §1.0(a) — a check row cannot be signed off in ink until it reads zero. Three untriggerable beats found and killed, all three walked as an alt-path so they cannot come back. Deviations declared in the drill's header comment and dev/AUDIT.md r440.)**
 **Now:** pasted-over check row resurrected + two causes fixed; strong story; adopt disclosure.
 **Rework = §2.3 (N=3: dead check row + 2 causes) [Cascading Bug Hunt — the rebuilt check row REVEALS which years break]:**
 1. Find and repair all 3 problems (0/3) — the meter
@@ -916,7 +916,7 @@ DOES NOT EXIST YET.
 ☆ Color the fixed source blue — it is typed, and it should say so
 **Random:** wire path re-sites per seed + which input is rotten. **Aha:** existing ("don't hunt by eye"). **Finish:** beat 4. **Clocks:** re-sweep (scope up from par 10). **Engine:** §2.6 touch-list; ctrl+[ / ctrl+] latches exist (r173). Fixes the label↔check gap by GRADING the hops.
 
-#### 4.51 tieout — "Collapse the suspect leg" · S
+#### 4.51 tieout — "Collapse the suspect leg" · S — **SHIPPED (r440, depth pass. BINDING NOTE for anyone re-reading this page: the two shipped beats graded KEYPRESSES — `S.traceN>=2` and `S.f9N>=1` — the same predicate class that retired `hunt` in r439 and that `unhide` dropped in r437, and a player who diagnosed by eye had a perfect board with two dark lines. The page's own "CHECK2 tighten" is therefore MOVED TO THE ☆ rather than tightened in place, its acceptance condition intact; the Ctrl+[ trace is taught in req/guide/demo and never graded. The board gains four core beats of real work to clear §1.1's minimum without them. First ALTS entries ever (§1.8). Deviations declared in the drill's header comment and dev/AUDIT.md r440.)**
 **Now:** trace + F9-collapse a leg + repoint the stale link; CHECK2 f9N>=1 only (weak); desc re-hints F9 (D13).
 **Language pass + check tighten + bonus:**
 - CHECK2 ok: f9N>=1 AND the formula restored unchanged after backing out (R10: "collapse the leg, then leave the formula as you found it")
@@ -944,7 +944,7 @@ DOES NOT EXIST YET.
 ☆ Color the four rebuilt rows black — live formulas, no blue
 **Random/Aha/Finish:** verify; existing; the survives-new-numbers proof closes. **Clocks:** std. **Engine:** none.
 
-#### 4.55 balance — "Make it balance" · S
+#### 4.55 balance — "Make it balance" · S — **SHIPPED (r440, depth pass. The page's ☆ — a bottom border under the check row — is dead three times over (a formatting task under §1.0(d); the exact convention §1.0(f) reverses; and it falls out of the dress beat anyway) and is replaced by the fill. The board goes to three years so the fill has a block to cover, and the single trailing dress beat is split and resequenced under §1.0(a). Two untriggerable beats found and killed, both walked as an alt-path. Deviations declared in the drill's header comment and dev/AUDIT.md r440.)**
 **Now:** foot both sides, check row at zero, totals formatted; 2-year BS. At bar; audit flags state-report labels.
 **Language pass (labels → verb-first) + bonus:**
 ☆ Add a bottom border under the check row — the statement closes on zero
