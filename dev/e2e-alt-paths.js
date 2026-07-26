@@ -553,15 +553,33 @@ const ALTS = [
       steps.push({sel:'A'+o.regions[o.openI].rt, keys:[{key:'Alt'},L('a'),L('j')]});
       steps.push({sel:'B'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]});
       return steps; }` },
-  { key: 'rollup', name: 'feet FIRST (recalc closes them), criteria pairs swapped, ribbon fills', moves: `C => [
-      {sel:'G5', keys:[...T('=SUM(G3:G4)'),{key:'Enter'}]},
-      {sel:'G5:H5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'F5:H5', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'F5:H5', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'G3', keys:[...T('=SUMIFS($C$3:$C$11,$B$3:$B$11,G$2,$A$3:$A$11,$F3)'),{key:'Enter'}]},
-      {sel:'G3:H3', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'G3:H4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-    ]` },
+  { key: 'rollup', name: 'BACKWARDS + ribbon: block boxed while empty (thick), cross-tab total over an empty grid, check written before it is true, crosses filled LAST via the ribbon, ledger total closes — the ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.blockRng, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                      // boxed before there is anything in it
+      {sel:o.gtCell,   keys:[...T('=SUM('+o.gridRng+')'),{key:'Enter'}]},             // totals an empty block: zero until the crosses land
+      {sel:o.chkCell,  keys:[...T('='+o.LA+o.rLT+'-'+o.gtCell),{key:'Enter'}]},       // the check, reversed and not yet true
+      {sel:o.g0,       keys:[...T('=SUMIFS('+o.sumR+','+o.segR+',$'+o.LL+o.g1+','+o.regR+','+o.R0+'$'+o.hr+')'),{key:'Enter'}]},
+      {sel:o.R0+o.g1+':'+o.Rn+o.g1, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},  // right FIRST, then down — the other fill order
+      {sel:o.gridRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.LA+o.rLT, keys:[...T('=SUM('+o.LA+o.r1+':'+o.LA+o.rL+')'),{key:'Enter'}]},
+    ]; }` },
+  /* ALT 2 = the §1.0-R2(i) SKIPPABILITY PROOF, measured. Every cross hand-written with FULLY
+     RELATIVE ranges, top-to-bottom, no fill anywhere; a quoted-text criterion is used for the
+     first cross to prove that route too, and the block is boxed by figures only (no header row,
+     no label column — the §1.0-R3(p) label-plus-figures widening). All FIVE cores clear and the
+     ☆ must stay DARK. Measured over 4 seeds: 245-350 keys (median 350) against the demo's 76 —
+     a 4.6x spread, which is the headroom the clock exists to show. */
+  { key: 'rollup', name: 'NEGATIVE CONTROL — every cross hand-typed with fully relative ranges, one quoted-text criterion, no fill anywhere, figures-only box: five cores clear, ☆ DARK', moves: `C => { const o=C._o; const mv=[];
+      mv.push({sel:o.LA+o.rLT, keys:[...T('=SUM('+o.LA+o.r1+':'+o.LA+o.rL+')'),{key:'Enter'}]});
+      for(let i=0;i<o.nSeg;i++) for(let j=0;j<o.nReg;j++){
+        const seg=S.cells[o.LL+(o.g1+i)].value, reg=S.cells[o.RC[j]+o.hr].value;
+        const f=(i===0&&j===0)
+          ? '=SUMIFS('+o.sumR+','+o.segR+',"'+seg+'",'+o.regR+',"'+reg+'")'                       // quoted-text criteria clear too
+          : '=SUMIFS('+o.LA+o.r1+':'+o.LA+o.rL+','+o.LS+o.r1+':'+o.LS+o.rL+','+o.LL+(o.g1+i)+','+o.LG+o.r1+':'+o.LG+o.rL+','+o.RC[j]+o.hr+')';
+        mv.push({sel:o.RC[j]+(o.g1+i), keys:[...T(f),{key:'Enter'}]}); }
+      mv.push({sel:o.gridRng, keys:[{key:'Alt'},L('h'),L('b'),L('s')]});               // figures only — no header row, no label column
+      mv.push({sel:o.gtCell,  keys:[...T('=SUM('+o.gridRng+')'),{key:'Enter'}]});
+      mv.push({sel:o.chkCell, keys:[...T('='+o.gtCell+'-'+o.LA+o.rLT),{key:'Enter'}]});
+      return mv; }` },
   { key: 'hunt', name: 'totals footed FIRST, ctrl+g route, crimes fixed in reverse', moves: `C => { const o=C._o;
       const steps=[
         {sel:'B8', keys:[...T('=SUM(B3:B7)'),{key:'Enter'}]},
