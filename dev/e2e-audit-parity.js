@@ -292,26 +292,57 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 
   console.log('S. AutoFilter (r180)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('filterpass'); });
+  /* r438 — DE-COUPLED FROM THE DRILL'S PRIVATE GEOMETRY (DEPTH_PASS_CAMPAIGN, "Parity is coupled
+     to drill internals"). This section tests the ENGINE's AutoFilter (r180); filterpass is only
+     the board it happens to run on. It used to read CHALLENGES.filterpass._o.rows[].st and
+     hard-code the header at row 3, columns A–C, three ▾ markers, three chips and the data at
+     B4:B12 — so the filterpass depth pass (which jitters the header row, moves the table into
+     column A or B, and carries a fourth column) broke an engine suite that has nothing to do
+     with the drill. Same class as the sortGeo() fix in r437 and the section-U fix in unhide.
+     Everything below now DERIVES from the live sheet: the header row and span come from the
+     armed S.filter itself, the status column is the last column of that span, and the data rows
+     are read off the sheet. Re-boarding any filter drill can no longer reach this file. */
   const s1 = await run(() => {
-    const o = CHALLENGES.filterpass._o;
-    setDemoSel('B3'); demoKey({key:'L', ctrl:true, shift:true});
-    const armed = !!S.filter && S.filter.hr === 3 && S.filter.c1 === 1 && S.filter.c2 === 3;   // header block found from a MIDDLE cell
-    const markers = document.querySelectorAll('.fltbtn').length === 3;
-    setDemoSel('C3'); demoKey({key:'ArrowDown', alt:true});
-    const open = mode === 'ribbon' && dialog === 'filter' && filterVals.length === 3;
-    filterVals.forEach((x, i) => { if (x.v !== 'Open') { filterIdx = i; demoKey({key:' '}); } });
+    // find the header row from the sheet: the first row whose cells match the seeded headers
+    let hr = 0, cD = 0;
+    for (let r = 1; r <= S.ROWS && !hr; r++)
+      for (let c = 1; c <= 10; c++) {
+        const v = S.cells[String.fromCharCode(64 + c) + r];
+        if (v && v.value === 'Deal') { hr = r; cD = c; break; }
+      }
+    const CL = c => String.fromCharCode(64 + c);
+    // arm from a MIDDLE cell of the header block — the span must be found by walking outward
+    setDemoSel(CL(cD + 1) + hr); demoKey({key:'L', ctrl:true, shift:true});
+    const span = S.filter ? (S.filter.c2 - S.filter.c1 + 1) : 0;
+    const armed = !!S.filter && S.filter.hr === hr && S.filter.c1 === cD && span >= 3;
+    const markers = document.querySelectorAll('.fltbtn').length === span;
+    const cSt = S.filter ? S.filter.c2 : 0;                                    // Status: the last armed column
+    // the data rows and the distinct values in the status column, read off the sheet
+    const rows = [];
+    for (let r = hr + 1; r <= S.filter.r2; r++) {
+      const v = S.cells[CL(cSt) + r];
+      if (v && v.value !== null && v.value !== '') rows.push({ r, v: String(v.value) });
+    }
+    const vals = []; rows.forEach(x => { if (vals.indexOf(x.v) < 0) vals.push(x.v); });
+    const keep = vals[0];                                                      // keep the first value, drop the rest
+    setDemoSel(CL(cSt) + hr); demoKey({key:'ArrowDown', alt:true});
+    const open = mode === 'ribbon' && dialog === 'filter' && filterVals.length === vals.length;
+    filterVals.forEach((x, i) => { if (x.v !== keep) { filterIdx = i; demoKey({key:' '}); } });
     demoKey({key:'Enter'});
-    const nonOpen = o.rows.filter(x => x.st !== 'Open').map(x => x.r);
-    const hidOk = nonOpen.every(r => S.hidden.has(r)) && S.hidden.size === nonOpen.length;
-    S.cells['E1'] = { ...blankCell(), formula: '=SUM(B4:B12)' }; recalc();
-    let t = 0; for (let r = 4; r <= 12; r++) t += S.cells['B' + r].value;
-    const sumOk = Math.abs(S.cells['E1'].value - t) < 0.5;                     // SUM sees hidden rows (no SUBTOTAL yet)
+    const shouldHide = rows.filter(x => x.v !== keep).map(x => x.r);
+    const hidOk = shouldHide.every(r => S.hidden.has(r)) && S.hidden.size === shouldHide.length;
+    // SUM over the figures column still counts the hidden rows (no SUBTOTAL in this engine)
+    const cSi = cSt - 1;
+    const r1 = hr + 1, r2 = S.filter.r2;
+    S.cells['J1'] = { ...blankCell(), formula: '=SUM(' + CL(cSi) + r1 + ':' + CL(cSi) + r2 + ')' }; recalc();
+    let t = 0; for (let r = r1; r <= r2; r++) { const c = S.cells[CL(cSi) + r]; if (c && typeof c.value === 'number') t += c.value; }
+    const sumOk = Math.abs(S.cells['J1'].value - t) < 0.5;
     demoKey({key:'L', ctrl:true, shift:true});
     const cleared = !S.filter && S.hidden.size === 0 && document.querySelectorAll('.fltbtn').length === 0;
-    setDemoSel('A3'); demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'t'});
+    setDemoSel(CL(cD) + hr); demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'t'});
     const viaRibbon = !!S.filter && mode === 'normal';
     demoKey({key:'L', ctrl:true, shift:true});
-    return { armed, markers, open, hidOk, sumOk, cleared, viaRibbon };
+    return { armed, markers, open, hidOk, sumOk, cleared, viaRibbon, span, nVals: vals.length };
   });
   ok(s1.armed, 'Ctrl+Shift+L arms across the contiguous header block');
   ok(s1.markers, 'every armed header wears a \u25be');

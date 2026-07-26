@@ -4513,60 +4513,268 @@ const CHALLENGES = {
     }
   },
   filterpass:{
-    name:'Filter', label:'Work the filtered view', par:13, parKeys:10,
-    aha:'Ctrl+Shift+L arms the filter, Alt+↓ opens the picker — hide the noise, the answer reads itself.',
-    prompt:'Find one number in a live deal list: the largest Open deal. Turn on AutoFilter at the header row, open the Status picker, uncheck everything that isn’t Open, and read the answer off the visible rows — then type it where the sheet asks.',
-    req(){ const o=this._o; return '<em>ctrl+shift+L</em> on row 3 arms the \u25be \u00b7 <em>alt+\u2193</em> on Status \u2192 <em>space</em> drops Closed/Dead \u2192 <em>\u21b5</em> \u00b7 type the largest visible Size into <em>B'+o.ansR+'</em>'; },
+    /* r438 H6b-9 — the depth-pass rework of "Work the filtered view" (DEPTH_PASS §4.36, with
+       §1.0 / §1.0-R2 / §1.0-R3 applied on top; §1.0-R3 wins on conflict).
+
+       ── RETIREMENT TESTED FIRST (§1.0-R3(s)), AND REJECTED ──────────────────────────────
+       filterpass shipped at par 13 / parKeys 10 with THREE checks — the profile that retired
+       dress, wirewalk, undo, copyover and growth. The §2 ☆-headroom diagnostic was run on the
+       SHIPPED board before a line was written, and it PASSES: walked through the live engine,
+       the taught route clears all three cores in 10 keys and the hand-hidden route (arm the
+       filter from the ribbon, then Ctrl+9 every non-matching row one at a time) clears the
+       same three in 16. growth died because its canonical route measured WORSE than the slow
+       one; this is the opposite sign. The rebuilt board widens that spread — see PAR below.
+       Three further findings kept it:
+         (1) THE LESSON IS NOT ITS CHAPTER-MATES'. Four drills here deal with rows you do not
+             want to look at, and they are four different tools: `sort` MOVES rows, `scrub`
+             DELETES them, `grpfold` FOLDS a span you pick BY POSITION, and this one hides
+             them BY VALUE. The first three are edits to the sheet; a filter is a QUERY over
+             it, and the rows come back. The r436 `sort` pass leaned on exactly this line
+             ("filterpass HIDES rows rather than moving them") when it argued its own survival
+             against scrub, so retiring this drill would retro-actively weaken a decision the
+             campaign has already taken.
+         (2) THE §3 DISCRIMINATOR SAYS KEEP. Fluency in grpfold does not produce a correct
+             first attempt here: Shift+Alt+→ and Alt A H fold a contiguous block you select,
+             and nothing about them tells a player how to get to "only the Open deals" — the
+             rows are scattered and the criterion is a value, not a range.
+         (3) FREQUENCY. §1.0-R3(o) asks how often an analyst does this in a working day.
+             AutoFilter is at the very top of that list for anyone who works with a deal list,
+             well above grouping.
+       WHAT DID NOT SURVIVE THE PROBE is the shipped BOARD, and it is why the drill measured
+       thin: on 175 of 400 sampled seeds (43.8%) the largest OPEN deal was also the largest
+       deal on the page, so the filter did NO work and the answer could be read straight off
+       the unfiltered column. The rebuilt build() makes that impossible by construction (the
+       single largest size on the board is always handed to a deal OUTSIDE the screened
+       sector), which is the real fix for "the drill is thin".
+
+       ── THE BOARD ───────────────────────────────────────────────────────────────────────
+       A coverage pipeline extract: Deal · Sector · Size ($M) · Status, 9–10 mandates, with a
+       LIVE "Total — all deals" SUM sitting directly under the list and a source/basis memo
+       over it (§1.2). The total is inside the filter range and its Sector/Status cells are
+       empty, so no exclusion list can ever match it — it stays on screen while the rows above
+       it disappear, and the number never moves. That is the drill's aha, made visible rather
+       than narrated (§1.5, and its moment is beat 5).
+       Four independent randomization axes (§1.2): (a) the header row jitters 3/4 AND the table
+       starts in column A or B — site shuffle in both axes; (b) deal, sector and status pools
+       Fisher-Yates shuffled; (c) every size through rnd(), distinct, magnitudes inside the
+       column; (d) WHICH sector is screen one and WHICH status is screen two, plus how many
+       deals carry that status (3 or 4).
+
+       ── ENGINE FACTS ESTABLISHED BY PROBING, NOT BY READING (§1.0-R3(p)) ─────────────────
+       This engine's filter is deliberately a READING tool (see toggleFilter's header comment),
+       and every op was walked rather than assumed. Recorded so the next agent does not
+       re-derive them, and because three of them RULED OUT beats that looked obvious:
+         · There is no SUBTOTAL and no AGGREGATE — `=SUBTOTAL(109,…)` returns #NAME?. A plain
+           SUM over a filtered range counts every hidden row. Excel-true for SUM, and it is the
+           whole point of the Total line on this board.
+         · Ctrl+B over a range that spans hidden rows FORMATS THE HIDDEN ROWS TOO. Real Excel
+           formats visible cells only. So "bold the rows on screen" is not buildable here and
+           is not a beat — it would grade a state the player cannot see.
+         · Delete over a filtered range clears the hidden rows too, and copying a filtered
+           range carries them into the paste. Same reason: no cut/copy/clear beat.
+         · There is no Alt A C (Data → Clear). Alt A offers S / AZ / T / H / J only, so the
+           toggle is the ONLY route that discards an exclusion set in one move — which is what
+           makes the ☆ below a real decision instead of a synonym.
+         · The picker WRAPS (filterIdx is modular), so ← from the first chip lands on the last.
+           Real Excel's list does not wrap; the demo therefore walks RIGHTWARD only, and the
+           wrap is left as an undocumented saving rather than taught as a habit.
+         · The value picker scans the whole filter range, hidden rows included, so a second
+           column's chip list is not narrowed by the first column's filter. Excel narrows it.
+           Nothing here depends on that either way — the drill clears screen one before it
+           opens screen two — but an alt route must not assume Excel's behaviour.
+
+       ── THE ☆, AND THE DEVIATION FROM §4.36 IT REQUIRED (declared per §0) ────────────────
+       §4.36 asks for "☆ Filter the Status picker back to All — leave the view the way you
+       found it". Kept in SPIRIT, re-cut in MECHANISM, for two reasons:
+         · §1.0(d) outlaws a ☆ that is not a hidden EFFICIENCY discovery, and "tidy up after
+           yourself" is hygiene, not efficiency. The page predates §1.0 entirely.
+         · It is STRUCTURALLY IMPOSSIBLE as literally written. §2.2 latches the bonus at the
+           WIN moment and every core is graded there too, so a ☆ that restores the whole view
+           would falsify any filtered-state core beat in the same instant. Walked, confirmed,
+           and it is the untriggerable-beat class the campaign exists to kill.
+       So the ☆ becomes the EFFICIENCY inside the same move: the board needs two screens off
+       one list, screen one has to go before screen two can exist, and there are two ways to
+       retire it — walk its picker back to All chip by chip, or blow every filter away with the
+       toggle and re-arm clean. MEASURED on the live engine: the picker walk-back costs 6 keys
+       on a three-value column and grows with the column; the toggle pair costs 2. It is a
+       DISTINCT, SKIPPABLE decision (§1.0-R2(i)) — a player who reads screen one off the
+       unfiltered column never faces it at all and still clears every core — and it is Wolf's
+       own framing, "reward for good habits of using the previously taught hotkeys that save
+       time". Graded off S.filterClears, a new provenance latch stamped in toggleFilter() when
+       a toggle tears down an exclusion set that was actually excluding something: the same
+       family as S.autoSumN / S.gotoSpecials / S.sortLog / S._chordRect, and read by nothing
+       but this ☆. Alt A T lights it too — the move being rewarded is discarding the filter in
+       one command, not one particular chord, and the clock still prices the ribbon walk.
+
+       ── WHY THERE IS NO DRESS BEAT ──────────────────────────────────────────────────────
+       Deliberate, and declared. `sort`, `scrub`, `sumif` and `rollup` all close on bold + a
+       top border; DEPTH_PASS_CAMPAIGN §3 names that shared TAIL as the chapter's real
+       redundancy and says cutting it is cheaper than merging drills. Formatting is also
+       unbuildable over a filtered list here (see the engine facts above). The board therefore
+       ships pre-dressed (§1.3 / §2.1b) and the finish-state beat is a PROVE-OUT (§1.6): the
+       screened total, standing against the all-deals total that never moved. */
+    name:'Filter', label:'Work the filtered view', par:26, parKeys:25, saveClose:true,   /* r438: par re-swept from scratch post-rework — dev/e2e-par-sweep.js filterpass, 5-seed median 25 keys INCLUDING the engine-appended Ctrl+S. The walked route is flat at 24 across seeds; the only movement is the digit-length of the three figures the screen block takes. parKeys 10→25, par 13→26 (1.04 s/key, the house band), mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 39s · pro 29.9s · legendary 26s. */
+    aha:'a filter hides rows from your eyes, not from your formulas — the total under the list never moved.',
+    prompt:'The coverage pipeline came across as one long list and the VP wants two screens off it before the call: how big the largest mandate in one sector is, and where the deals at one status stand. Arm the filter, work one screen at a time, and put the three figures in the screen block underneath. The Total line under the list counts every deal on the page, whatever the view is showing.',
+    req(){ const o=this._o; return '<em>ctrl+shift+L</em> on the header row arms the ▾ · <em>alt+↓</em> on <em>Sector</em> → keep '+o.sectorA+' → <em>↵</em> · <em>ctrl+shift+L</em> twice clears every filter and re-arms · <em>alt+↓</em> on <em>Status</em> → keep '+o.statusX+' → <em>↵</em> · the three figures into the yellow cells · <em>ctrl+s</em>'; },
     guide(){ const o=this._o; return [
-      'put the cursor anywhere on row 3 (the header) \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> \u2014 \u25be pickers arm across the whole header block',
-      'get to C3 (Status) \u00b7 <kbd>alt</kbd>+<kbd>\u2193</kbd> opens the picker \u00b7 <kbd>\u2190</kbd><kbd>\u2192</kbd> walk the values, <kbd>space</kbd> drops one, <kbd>\u21b5</kbd> applies \u2014 keep only Open',
-      'the data is now all Open \u2014 the largest Size sits in plain sight; type it into B'+o.ansR+' and <kbd>\u21b5</kbd> (ctrl+shift+L again would clear the filter)',
+      'land the cursor anywhere on the header row (row '+o.hr+', the <b>Deal / Sector / Size / Status</b> line) · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> — ▾ pickers arm across the whole header block (the ribbon walk <kbd>alt</kbd> <kbd>a</kbd> <kbd>t</kbd> does the same job)',
+      'get to the <b>Sector</b> header · <kbd>alt</kbd>+<kbd>↓</kbd> opens the picker · <kbd>←</kbd><kbd>→</kbd> walk the values, <kbd>space</kbd> keeps or drops one, <kbd>↵</kbd> applies — keep only <b>'+o.sectorA+'</b>, then read the biggest <b>Size ($M)</b> still on screen and type it into the yellow cell beside <b>Largest '+o.sectorA+' deal</b>',
+      'the '+o.sectorA+' screen has to go before this one can exist — from a header cell, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> twice drops every filter and re-arms clean, or walk the <b>Sector</b> picker back to All. Then <kbd>alt</kbd>+<kbd>↓</kbd> on <b>Status</b> and keep only <b>'+o.statusX+'</b>',
+      'count the deal rows left on screen and type the count into the yellow cell beside <b>'+o.statusX+' deals</b>',
+      'add the <b>Size ($M)</b> figures still on screen and type the result beside <b>'+o.statusX+' total</b> — the <b>Total — all deals</b> line below the list did not move when the rows went, because it never stopped counting them',
+      '☆ the <b>Sector</b> picker did not need walking back: <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>L</kbd> discards every filter on the sheet in one press and a second press re-arms it empty — 2 keys against the 6 the walk-back costs, and it does not grow when a second column is filtered',
     ]; },
-    targets(){ const o=this._o; return ['A3:C3','C3','B'+o.ansR]; },
+    /* order: ① the header block · ② the first answer cell · ③ the Status header the second
+       screen opens from · ④ ⑤ the remaining answer cells · ☆ never ringed (bonus rows skip
+       the rails). The fence is the bounding box of targets + every seeded cell, so the Sector
+       header a player needs for beat 2 is inside it either way (railZoneCompute). */
+    targets(){ const o=this._o; return [
+      o.CD+o.hr+':'+o.CT+o.hr,
+      o.CS+o.ansR1,
+      o.CT+o.hr,
+      o.CS+o.ansR2,
+      o.CS+o.ansR3,
+      null,
+    ]; },
     demo(){ const o=this._o;
-      const pk=[{key:'ArrowDown',alt:true}];
-      o.chips.forEach((v,i)=>{ if(v!=='Open') pk.push({key:' '}); if(i<o.chips.length-1) pk.push({key:'ArrowRight'}); });
-      pk.push(Kb.enter);
+      const pick=(chips,keep)=>{ const pk=[{key:'ArrowDown',alt:true}];
+        chips.forEach((v,i)=>{ if(v!==keep) pk.push({key:' '}); if(i<chips.length-1) pk.push({key:'ArrowRight'}); });
+        pk.push(Kb.enter); return pk; };
       return [
-        {sel:'C3', keys:[{key:'l',ctrl:true,shift:true}]},
-        {sel:'C3', keys:pk},
-        {sel:'B'+o.ansR, keys:[...T(String(o.maxOpen)), Kb.enter]},
+        /* ① arm from a header cell — the block is found by walking out from the cursor */
+        {sel:o.CE+o.hr, keys:[{key:'l',ctrl:true,shift:true}]},
+        /* ② screen one: keep the screened sector, then read the biggest size still showing */
+        {sel:o.CE+o.hr, keys:pick(o.sectChips, o.sectorA)},
+        {sel:o.CS+o.ansR1, keys:[...T(String(o.ans1)), Kb.enter]},
+        /* ☆ + ③ screen one is retired with the toggle, not with the picker: one press discards
+           every exclusion on the sheet (the S.filterClears stamp), a second re-arms it clean.
+           The cursor must sit on a header cell for the re-arm — toggleFilter reads S.active. */
+        {sel:o.CT+o.hr, keys:[{key:'l',ctrl:true,shift:true},{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CT+o.hr, keys:pick(o.statChips, o.statusX)},
+        /* ④ ⑤ the two figures the second screen produces */
+        {sel:o.CS+o.ansR2, keys:[...T(String(o.ans2)), Kb.enter]},
+        {sel:o.CS+o.ansR3, keys:[...T(String(o.ans3)), Kb.enter]},
       ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 live deal list',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Deal',txt:true,bold:true};
-      cells['B3']={...blankCell(),value:'Size ($M)',txt:true,bold:true,align:'r'};
-      cells['C3']={...blankCell(),value:'Status',txt:true,bold:true};
-      const NAMES=['Project Anchor','Project Bengal','Project Comet','Project Dune','Project Ember','Project Falcon','Project Grove','Project Harbor','Project Indigo'];
-      const st=['Open','Open','Open','Open','Closed','Closed','Closed','Dead','Dead'];
-      for(let k2=st.length-1;k2>0;k2--){ const j=rnd(0,k2); [st[k2],st[j]]=[st[j],st[k2]]; }
-      // distinct sizes so "the largest open" is one unambiguous number
-      const sizes=[]; while(sizes.length<9){ const v=rnd(8,96)*5; if(sizes.indexOf(v)<0) sizes.push(v); }
-      const rows=[]; let maxOpen=0;
-      for(let i=0;i<9;i++){ const r=4+i;
-        cells['A'+r]={...blankCell(),value:NAMES[i],txt:true};
-        cells['B'+r]={...blankCell(),value:sizes[i],fmtStyle:'comma',decimals:0};
-        cells['C'+r]={...blankCell(),value:st[i],txt:true};
-        if(st[i]==='Open'&&sizes[i]>maxOpen) maxOpen=sizes[i];
-        rows.push({r, st:st[i]});
-      }
-      const ansR=14;
-      cells['A'+ansR]={...blankCell(),value:'Largest OPEN deal ($M):',txt:true,bold:true};
-      const chips=[]; st.forEach(v=>{ if(chips.indexOf(v)<0) chips.push(v); });
-      this._o={rows, maxOpen, ansR, chips};
-      return {ROWS:16, cells, active:{r:3,c:3}, sel:null, colW:{1:130,2:96,3:96}};
+      // ---- §1.2(a) site shuffle, BOTH axes: the header row jitters and the table starts in A or B
+      const hr=3+rnd(0,1), c0=1+rnd(0,1);
+      const cD=c0, cSe=c0+1, cSi=c0+2, cSt=c0+3;
+      const CD=colLetter(cD), CE=colLetter(cSe), CS=colLetter(cSi), CT=colLetter(cSt);
+      const nD=9+rnd(0,1);
+      // ---- §1.2(b) content pools ----
+      const NAMES=['Falcon','Atlas','Copper','Summit','Ridge','Delta','Harbor','Juniper','Ironline','Beacon','Meridian','Corsair'];
+      const SECT=['Software','Healthcare','Industrials','Energy','Consumer','Financials','Logistics'];
+      const STAT=['Open','On hold','Passed','Signed','Lapsed'];
+      const shuf=a=>{ for(let k=a.length-1;k>0;k--){ const j=rnd(0,k); [a[k],a[j]]=[a[j],a[k]]; } return a; };
+      shuf(NAMES); shuf(SECT); shuf(STAT);
+      // ---- §1.2(d) which-one: the screened sector, the screened status, and how many carry it
+      const sectorA=SECT[0], statusX=STAT[0];
+      const nA=3, nX=3+rnd(0,1);
+      // sectors: three deals in the screened one, the rest spread over three others
+      const sects=[]; for(let i=0;i<nD;i++) sects.push(i<nA ? sectorA : SECT[1+((i-nA)%3)]);
+      // statuses: nX at the screened one, the rest split between the two others. Offset the
+      // start so the two screens are never the same set of rows (the §1.2(d) axis has to bite).
+      const stats=[]; for(let i=0;i<nD;i++) stats.push(i<nX ? statusX : STAT[1+((i-nX)%2)]);
+      stats.unshift(stats.pop());                     // rotate one, so row 1 is not always both
+      // ---- §1.2(c) distinct sizes, magnitudes that fit the column ----
+      const sizes=[]; while(sizes.length<nD){ const v=rnd(6,90)*5; if(sizes.indexOf(v)<0) sizes.push(v); }
+      sizes.sort((a,b)=>b-a);
+      const deals=[]; for(let i=0;i<nD;i++) deals.push({name:NAMES[i], sect:sects[i], stat:stats[i], size:0});
+      /* THE FIX FOR THE SHIPPED BOARD'S REAL DEFECT: the single largest size on the page is
+         always handed to a deal OUTSIDE the screened sector, so the beat-2 answer can never be
+         read off the unfiltered column by taking the biggest number in sight. Measured on the
+         retired board: that collision fired on 43.8% of 400 sampled seeds. */
+      const order=[]; for(let i=0;i<nD;i++) order.push(i); shuf(order);
+      if(deals[order[0]].sect===sectorA){
+        const j=order.findIndex(i=>deals[i].sect!==sectorA);
+        if(j>0){ const t=order[0]; order[0]=order[j]; order[j]=t; } }
+      order.forEach((slot,k)=>{ deals[slot].size=sizes[k]; });
+      // interleave the rows so neither screen is a contiguous run — hand-hiding stays honest work
+      shuf(deals);
+      // ---- the page ----
+      cells[CD+'1']={...blankCell(),value:codename()+' — coverage pipeline',txt:true,bold:true};
+      cells[CD+'2']={...blankCell(),value:'Source: pipeline extract, week 12 · sizes in $M, enterprise value · one row per mandate',txt:true,it:true,fontColor:'gray'};
+      cells[CD+hr]={...blankCell(),value:'Deal',txt:true,bold:true};
+      cells[CE+hr]={...blankCell(),value:'Sector',txt:true,bold:true};
+      cells[CS+hr]={...blankCell(),value:'Size ($M)',txt:true,bold:true,align:'r'};
+      cells[CT+hr]={...blankCell(),value:'Status',txt:true,bold:true};
+      deals.forEach((d,i)=>{ const r=hr+1+i;
+        cells[CD+r]={...blankCell(),value:d.name,txt:true};
+        cells[CE+r]={...blankCell(),value:d.sect,txt:true};
+        cells[CS+r]={...blankCell(),value:d.size,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[CT+r]={...blankCell(),value:d.stat,txt:true};
+      });
+      /* the Total line sits INSIDE the filter range with its Sector and Status cells empty, so
+         no exclusion list can match it and it never hides — it stays on screen, unmoved, while
+         the rows above it come and go. Pre-dressed (§1.3): this drill grades no formatting. */
+      const tR=hr+nD+1;
+      cells[CD+tR]={...blankCell(),value:'Total — all deals',txt:true,bold:true,bt:true};
+      cells[CE+tR]={...blankCell(),bt:true};
+      cells[CS+tR]={...blankCell(),formula:'=SUM('+CS+(hr+1)+':'+CS+(hr+nD)+')',fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      cells[CT+tR]={...blankCell(),bt:true};
+      /* one blank row: it stops toggleFilter's range walk at the Total line, which keeps the
+         answer block below OUT of the filter and un-hideable. Load-bearing, not cosmetic. */
+      const sT=tR+2, ansR1=sT+1, ansR2=sT+2, ansR3=sT+3;
+      cells[CD+sT]={...blankCell(),value:'SCREEN — for the 4pm call',txt:true,bold:true};
+      cells[CD+ansR1]={...blankCell(),value:'Largest '+sectorA+' deal ($M)',txt:true};
+      cells[CD+ansR2]={...blankCell(),value:statusX+' deals',txt:true};
+      cells[CD+ansR3]={...blankCell(),value:statusX+' total ($M)',txt:true};
+      /* the three answer cells wear the §1.0(f)/§1.0-R2(l) INPUT dress — light yellow, all
+         borders — because that is what they are: cells the player types into. Declared
+         deviation: they ship EMPTY rather than populated, since filling them IS the beat. */
+      [ansR1,ansR2,ansR3].forEach(r=>{ cells[CS+r]={...blankCell(),fill:'yellow',ball:true,fmtStyle:'comma',decimals:0}; });
+      const aD=deals.filter(d=>d.sect===sectorA), xD=deals.filter(d=>d.stat===statusX);
+      const chipsOf=f=>{ const seen=[]; deals.forEach(d=>{ const v=f(d); if(seen.indexOf(v)<0) seen.push(v); }); return seen; };
+      this._o={ hr, nD, CD, CE, CS, CT, cD, cSe, cSi, cSt, sectorA, statusX, tR, sT, ansR1, ansR2, ansR3,
+        rows: deals.map((d,i)=>({r:hr+1+i, sect:d.sect, stat:d.stat, size:d.size})),
+        sectChips: chipsOf(d=>d.sect), statChips: chipsOf(d=>d.stat),
+        ans1: Math.max.apply(null, aD.map(d=>d.size)),
+        ans2: xD.length,
+        ans3: xD.reduce((a,d)=>a+d.size,0) };
+      return {ROWS:ansR3, cells, active:{r:hr,c:cSe}, sel:null,
+        colW:{[cD]:132,[cSe]:112,[cSi]:92,[cSt]:92}};
     },
     checks(S){
       const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      const num=k=>{ const v=cel(k).value; return (typeof v==='number')?v:null; };
+      const eq=(v,t)=>v!==null && Math.abs(v-t)<0.5;
+      /* §1.0-R3(p) THROUGHOUT: every ok below reads a state the player can SEE — the ▾ on the
+         header block, which rows are on screen, what is in the three yellow cells. Nothing
+         reads which chord produced it, so the picker, the ribbon walk, hand-hiding with Ctrl+9
+         and any mix of the three all land in the same graded state. The one exception is the
+         ☆, which §1.0(c) explicitly reserves for exactly this. */
       const f=S.filter;
-      const armed=!!(f && f.hr===3 && f.c1<=1 && f.c2>=3);
-      const hidOk=o.rows.every(x=> x.st==='Open' ? !(S.hidden&&S.hidden.has(x.r)) : !!(S.hidden&&S.hidden.has(x.r)) );
-      const a=S.cells['B'+o.ansR];
+      /* armed: the header block carries pickers. Ctrl+Shift+L and Alt A T both route through
+         toggleFilter, which walks out from the cursor across the contiguous header cells, so
+         the span is the same whichever cell it was fired from and whichever route fired it. */
+      const armed=!!(f && f.hr===o.hr && f.c1<=o.cD && f.c2>=o.cSt);
+      const hid=r=>!!(S.hidden && S.hidden.has(r));
+      /* the second screen, graded as an END STATE in both directions: every deal at the
+         screened status is on the page AND no deal at any other status is. Reading it both
+         ways is what forces the first screen to have been retired — leaving the Sector filter
+         on hides some of the screened rows and the beat stays honest about it. */
+      const screenOk=o.rows.every(x=> x.stat===o.statusX ? !hid(x.r) : hid(x.r));
+      const a1=eq(num(o.CS+o.ansR1), o.ans1);
+      const a2=eq(num(o.CS+o.ansR2), o.ans2);
+      const a3=eq(num(o.CS+o.ansR3), o.ans3);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the first screen
+         was discarded with the filter toggle rather than walked back chip by chip. S.filterClears
+         is stamped in toggleFilter() only when the toggle tears down an exclusion set that was
+         actually excluding something, so arming and disarming an empty filter never earns it.
+         Gated on beat 2 so the latch cannot be farmed before any screen exists. MEASURED
+         skippable: ALT 2 in dev/e2e-alt-paths.js walks the Sector picker back to All instead and
+         clears 5/5 cores with this dark. */
+      const starOk=a1 && (S.filterClears||0)>=1;
       return [
-        {label:'arm the AutoFilter across the header row (row 3)', ok: armed},
-        {label:'drop Closed and Dead through the Status picker on C3; only Open rows stay', ok: armed && hidOk},
-        {label:'type the largest OPEN size into B'+o.ansR+' \u2014 read it straight off the filtered view', ok: !!(a && Math.abs((+a.value||0)-o.maxOpen)<0.5)},
+        {label:'Arm the AutoFilter across the header row', ok: armed},
+        {label:'Enter the largest '+o.sectorA+' deal size in the screen block', ok: a1},
+        {label:'Filter the list to the deals marked '+o.statusX, ok: screenOk},
+        {label:'Enter how many deals are marked '+o.statusX, ok: a2},
+        {label:'Enter the '+o.statusX+' total in the screen block', ok: a3},
+        {label:'Clear the first screen without walking its picker back', ok: starOk, bonus:true},
       ];
     }
   },
@@ -16640,7 +16848,16 @@ function setDetail(show){
    grouping. No SUBTOTAL in this engine yet, so SUMs see hidden rows — the
    filter is a READING tool, exactly like a real screen of a deal list. */
 function toggleFilter(){
-  if(S.filter){ S.filter=null; syncHidden(); render(); return; }
+  if(S.filter){
+    /* r438 (DEPTH_PASS §4.36 ☆): PROVENANCE LATCH, the S.autoSumN / S.gotoSpecials / S.sortLog
+       family. Stamped only when the toggle tears down an exclusion set that was ACTUALLY
+       excluding something — arming and disarming an empty filter is not the move being
+       rewarded. No end-state read can tell "cleared with the toggle" from "walked the picker
+       back to All", because both land on the same visible sheet; the mechanic has to be
+       recorded at the press. Read by filterpass's bonus check and by nothing else. */
+    const ex=S.filter.excl||{};
+    if(Object.keys(ex).some(c=>(ex[c]||[]).length)) S.filterClears=(S.filterClears||0)+1;
+    S.filter=null; syncHidden(); render(); return; }
   const hr=S.active.r;
   const ne=c=>{ const x=get(hr,c); return x && x.value!==null && x.value!==''; };
   if(!ne(S.active.c)){ showToast('put the cursor on a header cell first'); return; }

@@ -459,16 +459,55 @@ const ALTS = [
       for(let r=o.rL;r>=o.r1;r--)
         st.push({sel:o.LFL+r, keys:[...T('=COUNTIF('+o.LFN+o.r1+':'+o.LFN+o.rL+','+o.LTN+r+')'),{key:'Enter'}]});
       return st; }` },
-  { key: 'filterpass', name: 'answer typed FIRST, armed via ribbon (alt a t) from A3, chips swept right-to-left', moves: `C => { const o=C._o;
-      const pk=[{key:'ArrowDown',alt:true}];
-      for(let i=0;i<o.chips.length-1;i++) pk.push({key:'ArrowRight'});
-      for(let i=o.chips.length-1;i>=0;i--){ if(o.chips[i]!=='Open') pk.push({key:' '}); if(i>0) pk.push({key:'ArrowLeft'}); }
-      pk.push({key:'Enter'});
+  { key: 'filterpass', name: 'op ORDER: the graded status screen FIRST, its two figures typed, then the sector screen and back again (☆ lit — the toggle retires both screens)', moves: `C => { const o=C._o;
+      const pick=(chips,keep)=>{ const pk=[{key:'ArrowDown',alt:true}];
+        chips.forEach((v,i)=>{ if(v!==keep) pk.push({key:' '}); if(i<chips.length-1) pk.push({key:'ArrowRight'}); });
+        pk.push({key:'Enter'}); return pk; };
       return [
-        {sel:'B'+o.ansR, keys:[...T(String(o.maxOpen)),{key:'Enter'}]},
-        {sel:'A3', keys:[{key:'Alt'},L('a'),L('t')]},
-        {sel:'C3', keys:pk},
+        {sel:o.CT+o.hr, keys:[{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CT+o.hr, keys:pick(o.statChips,o.statusX)},
+        {sel:o.CS+o.ansR2, keys:[...T(String(o.ans2)),{key:'Enter'}]},
+        {sel:o.CS+o.ansR3, keys:[...T(String(o.ans3)),{key:'Enter'}]},
+        {sel:o.CE+o.hr, keys:[{key:'l',ctrl:true,shift:true},{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CE+o.hr, keys:pick(o.sectChips,o.sectorA)},
+        {sel:o.CS+o.ansR1, keys:[...T(String(o.ans1)),{key:'Enter'}]},
+        {sel:o.CT+o.hr, keys:[{key:'l',ctrl:true,shift:true},{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CT+o.hr, keys:pick(o.statChips,o.statusX)},
       ]; }` },
+  /* THE ☆ SKIPPABILITY PROOF, MEASURED (§1.0-R2(i), and the §2 headroom law). Identical work to
+     the demo, except the first screen is walked BACK through its own picker chip by chip instead
+     of being discarded with the toggle. Walked on the live engine: 30 keys against the demo's
+     24, five of five cores GREEN, and S.filterClears never stamps — so the ☆ must stay DARK.
+     If this entry ever earns the star, the latch has started reading something it should not. */
+  { key: 'filterpass', name: 'NEGATIVE CONTROL — the sector picker walked back to All instead of the toggle (30 keys vs 24; every core clears, ☆ MUST stay dark)', moves: `C => { const o=C._o;
+      const pick=(chips,keep)=>{ const pk=[{key:'ArrowDown',alt:true}];
+        chips.forEach((v,i)=>{ if(v!==keep) pk.push({key:' '}); if(i<chips.length-1) pk.push({key:'ArrowRight'}); });
+        pk.push({key:'Enter'}); return pk; };
+      return [
+        {sel:o.CE+o.hr, keys:[{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CE+o.hr, keys:pick(o.sectChips,o.sectorA)},
+        {sel:o.CS+o.ansR1, keys:[...T(String(o.ans1)),{key:'Enter'}]},
+        {sel:o.CE+o.hr, keys:pick(o.sectChips,o.sectorA)},   // every dropped chip switched back on
+        {sel:o.CT+o.hr, keys:pick(o.statChips,o.statusX)},
+        {sel:o.CS+o.ansR2, keys:[...T(String(o.ans2)),{key:'Enter'}]},
+        {sel:o.CS+o.ansR3, keys:[...T(String(o.ans3)),{key:'Enter'}]},
+      ]; }` },
+  /* Different CHORD ROUTE (§1.8): the value picker is never opened. The filter is armed from the
+     ribbon (Alt A T), both screens are built by hand-hiding every non-matching row with
+     Shift+Space / Ctrl+9, and the first screen is put back with Ctrl+Shift+9. 39 keys against
+     the demo's 24 — this is the "obvious slow route" the §2 headroom diagnostic measures against,
+     and it clears all five cores, which is §1.0(c) freedom proved rather than asserted. */
+  { key: 'filterpass', name: 'chord ROUTE — ribbon arm (alt a t) and both screens hand-hidden with shift+space / ctrl+9, no picker ever opened (39 keys, all cores clear, ☆ dark)', moves: `C => { const o=C._o;
+      const steps=[{sel:o.CE+o.hr, keys:[{key:'Alt'},L('a'),L('t')]}];
+      o.rows.filter(x=>x.sect!==o.sectorA).forEach(x=>{
+        steps.push({sel:o.CD+x.r, keys:[{key:' ',shift:true},{key:'9',ctrl:true}]}); });
+      steps.push({sel:o.CS+o.ansR1, keys:[...T(String(o.ans1)),{key:'Enter'}]});
+      steps.push({sel:o.CD+(o.hr+1)+':'+o.CD+(o.hr+o.nD), keys:[{key:'(',ctrl:true,shift:true}]});
+      o.rows.filter(x=>x.stat!==o.statusX).forEach(x=>{
+        steps.push({sel:o.CD+x.r, keys:[{key:' ',shift:true},{key:'9',ctrl:true}]}); });
+      steps.push({sel:o.CS+o.ansR2, keys:[...T(String(o.ans2)),{key:'Enter'}]});
+      steps.push({sel:o.CS+o.ansR3, keys:[...T(String(o.ans3)),{key:'Enter'}]});
+      return steps; }` },
   /* r431: the strike route is gone with r430's strike->red-font beat. Red is applied CELL BY
      CELL here (the demo does the whole range in one pass), so the per-cell path still grades. */
   { key: 'typeset', name: 'RIBBON routes — bold/unbold via Alt H 1, italics line-by-line via Alt H 2 (☆ forfeited, core clears), red applied cell by cell', moves: `C => { const o=C._o;
