@@ -418,7 +418,7 @@ const ALTS = [
         {sel:o.LFA+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]},
         {sel:o.chk,      keys:[...T(s),{key:'Enter'}]},
       ]; }` },
-  { key: 'recon', name: 'NEGATIVE CONTROL / op-ORDER: check line written FIRST over an empty column, repair before the carry, the missing deal TYPED, then every difference and every presence count hand-written bottom-up with no fill and no paste anywhere — all five cores clear, ☆ dark (584 keys against the demo’s 92)', moves: `C => { const o=C._o;
+  { key: 'recon', name: 'NEGATIVE CONTROL / op-ORDER: check line written FIRST over an empty column, repair before the carry, the missing deal TYPED, then every difference and every presence count hand-written bottom-up with no fill and no paste anywhere — all five cores clear, ☆ dark (20-seed median 474 keys against the demo’s flat 88)', moves: `C => { const o=C._o;
       const st=[];
       st.push({sel:o.chk, keys:[...T('=SUM('+o.LD+o.r1+':'+o.LD+o.rL+')'),{key:'Enter'}]});
       st.push({sel:o.LFA+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]});
