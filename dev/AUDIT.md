@@ -7170,6 +7170,89 @@ untriggerable-beat class outright — and the board had no efficiency headroom a
   depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · guided gate scrub railed,
   contained, solvable · cache-bump guard clean (no ?v= bump: drills.js content changed, its version
   is the integrator's call at batch time).
+
+## r437 — H6b-8: recon depth pass — "Two systems, one truth" (DEPTH_PASS §4.41 + §1.0/-R2/-R3)
+_The Data & Lookups tie-out. Built against the binding constraint the r436 `lookup` pass left on
+the family: recon keeps INDEX/MATCH as an INSTRUMENT and never as the subject._
+- **DISTINCTNESS vs `lookup` — what was done to make the claim true, not just asserted.** The
+  lookup header records that recon "shares the MECHANIC but not the SUBJECT". That only survives
+  if the board is built for it, so: the drill finishes on a ZERO, not on an answer (one visible
+  Recon check cell — dev/MODELING_STANDARDS.md §6); the graded column is `finance − book`, so the
+  pull is one OPERAND of a subtraction and never a displayed result; the lesson is TWO questions
+  (is the deal there / is it the same number) with two instruments, where lookup asks one question
+  three times; NO check reads formula text, so INDEX/MATCH, VLOOKUP, a pointed reference and
+  mental arithmetic all clear identically — a drill whose checks cannot tell which formula you
+  used cannot be a drill about that formula; and the ☆ is a CLIPBOARD move, not the anchor-the-
+  ranges-and-fill discovery that `lookup` and `sumif` both already own (three consecutive stars of
+  the same shape in one family is the taste problem DEPTH_PASS_CAMPAIGN §2 flags).
+- **☆ RE-CUT (binding; flagged in advance by the lookup agent).** §4.41's bonus — "Color the
+  brought-across deal blue" — is a FORMATTING task and dies under §1.0(d). It also cannot be
+  promoted to a core beat here: the blotter figures ship blue, so the star route (carrying the
+  deal with the clipboard) lands the blue for free and §1.1 forbids a do-nothing line. The page's
+  instinct was right and the ink was wrong — the interesting fact about the brought-across deal is
+  that a good analyst never RETYPES it. New ☆: **the missing deal carried in ONE paste, name and
+  amount together, sourced from the blotter row**, latched off S.pasteLog (the mechanic, never
+  geometry inferred), so Ctrl+V, Alt H V and the legacy Alt E S dialog all earn it and typing earns
+  nothing. A cut lands in S.cutMoves and correctly earns nothing — cutting the deal out of the
+  system of record is vandalism.
+- **BEATS (5 core + the engine save closer + one ☆), chained (§1.1):** build the In finance column
+  for all N blotter deals → add the missing deal to the extract → build the Δ vs system column for
+  every booked line → fix the finance amount that disagrees with the blotter → total the Δ column
+  into the Recon check line, reading 0. Aha lands on beat 4 (§1.5): the difference column has
+  already done the diagnosis and the one row still showing a number IS the finding. Finish-state
+  beat is 5 — a PROVE-OUT, which §1.6 names as the alternative to a dress close.
+- **NO FORMATTING BEAT, deliberately (§1.3 pre-dressed board).** The two dresses this board would
+  naturally carry — bold + top border on a total line — are `sumif`'s closing pair, and
+  DEPTH_PASS_CAMPAIGN §3 says the cheap fix for a family redundancy is to cut the SHARED TAIL. The
+  Recon check line therefore ships pre-dressed (§1.0(f): a total takes the line above it) and every
+  beat is reconciliation work.
+- **§1.0-R3(p) THE OLD CHECKS WERE THE UNTRIGGERABLE CLASS.** The shipped drill probed formula TEXT
+  for `COUNTIF(` and for `INDEX(`+`MATCH(` — so a correct VLOOKUP, or a correctly counted presence
+  column, left the beat dark with nothing on the board to fix. Every core ok now reads the board,
+  with BOTH systems re-read live each grading pass rather than compared against a stored answer.
+- **THE ONE LIVENESS REQUIREMENT, and why it is not a route overfit.** Beat 5 asks for three things
+  at once: the systems genuinely agree, every Δ reads zero, and the check cell is a LIVE formula
+  referencing the Δ column. §1.7's own verb gloss is explicit ("Total = land a live SUM") and
+  MODELING_STANDARDS §6 is the authority: a check cell holding a typed 0 is not a check, it is the
+  defect the drill exists to teach against. The ROUTE stays free inside it — =SUM, a typed addition
+  chain, SUMPRODUCT, alt+= all clear (the chord-route alt uses the addition chain). MEASURED
+  negative controls, all four by probe, never by reading the predicate:
+  · type 0 into the check cell on a raw board → every beat DARK;
+  · type 0 into every Δ cell AND the check cell, break untouched → every beat DARK (the Δ column
+    grades against the LIVE difference for its row, which is not zero while the figure is wrong);
+  · fully reconciled board, check cell holds a typed `0` → beat 5 DARK;
+  · fully reconciled board, check cell holds `=0` → beat 5 DARK (live, but reads nothing);
+  · genuinely repaired board with honest typed zeros in the Δ column and a live SUM → CLEARS,
+    which is correct under §1.0(c): the data really does tie.
+- **RANDOMIZATION, four axes (§1.2):** anchor column A/B and header row 3/4 · deal pool Fisher-Yates
+  from twelve AND the finance extract re-shuffled into its own order (guarded against landing back
+  in blotter order — line-for-line lists would make the Δ a subtraction of neighbours and there
+  would be nothing to look up) · every figure through rnd() · which deal finance never booked,
+  which it fat-fingered, by how much and in which direction. Geometry is deliberately constrained
+  so key count is seed-invariant: r1 always one digit, rL always two, every amount four.
+- **cueCell() IS used (§1.0-R2(h)/§1.0-R3(q)):** beat 2's destination is an EMPTY row — the exact
+  case the primitive exists for. Gutter column, never a graded target, unread by checks().
+- **PAR:** re-swept from scratch — 20-seed probe **flat at 88 keys** (min 88, max 88) including the
+  engine-appended Ctrl+S. parKeys 81→88, par 77→**92** (1.05 s/key, the house band), mirrored in
+  HOTKEY_PARS. Clocks derive (§1.4): pass 138s · pro 106s · legendary 92s.
+- **☆ HEADROOM, MEASURED (the DEPTH_PASS_CAMPAIGN §2 diagnostic):** star route 88 keys · chord-route
+  alt 99 · slow route 474 (20-seed median, range 414–532) = **5.4×**, comfortably inside the shipped
+  band (percent 5.4× · fxconvert 5.7× · lookup 3.0×). ☆ earned 20/20 on the demo, 20/20 on the
+  chord-route alt, **0/20** on the negative control, which clears all five cores.
+- **ALT-PATH ENTRY DELETED (integrators: do not resurrect).** The single pre-r437 `recon` entry
+  ("typo fixed FIRST, diff before flags") drove hard-coded C4 / D10 / E10 / F4:F10 against a board
+  that now anchors at column A or B with its header row at 3 or 4, and predated the check cell
+  entirely. DELETED, not patched, and replaced by the §1.8 pair. Per the r435 integration note: for
+  the drill an agent reworked, its side of dev/e2e-alt-paths.js is authoritative for additions AND
+  deletions.
+- **META:** drills.js meta left untouched on purpose — its desc ("COUNTIF for presence, INDEX/MATCH
+  for amounts") frames the drill as a formula drill, which is the exact distinctness risk this pass
+  exists to close, but rewriting it strands the generated drills/recon.html and drills/index.html,
+  and page regeneration is out of scope for this pass. **Recommended to the integrator at
+  regeneration time:** desc → "Reconcile two systems — presence, amounts, and a check that reads
+  zero". HOTKEY_PARS.recon is the only drills.js edit.
+- **GATE (own port 8852).** See the commit body for the last line of each.
+
 ## r436 — H6b-6: sort depth pass — "Sort the table" (DEPTH_PASS §4.33 + §1.0/-R2/-R3)
 - **RETIREMENT TESTED FIRST, AND REJECTED — with the reasoning, since the campaign has now
   retired four drills.** sort was the thinnest drill left (par 10 / parKeys 7, three checks) and it

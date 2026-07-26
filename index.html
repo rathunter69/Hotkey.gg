@@ -4388,7 +4388,7 @@ const CHALLENGES = {
       /* §1.0-R2(h)/§1.0-R3(q): the landing row is EMPTY, which is the case a green outline cannot
          express. The cue is board furniture in a spare gutter column — never a graded target, and
          checks() never reads it. */
-      cells[colLetter(cCue)+rL]=cueCell('◀ the missing deal belongs on this row');
+      cells[colLetter(cCue)+rL]=cueCell('◀ missing deal goes here');
       /* the recon check — one visible place, pre-dressed (§1.0(f): a total takes the line above
          it). The dress is furniture, not a beat: see deviation (c). */
       cells[LFN+rC]={...blankCell(),value:'Recon check',txt:true,bold:true};
@@ -4407,8 +4407,15 @@ const CHALLENGES = {
         cntR:'$'+LFN+'$'+r1+':$'+LFN+'$'+rL,
         amtR:'$'+LTA+'$'+r1+':$'+LTA+'$'+rL,
         namR:'$'+LTN+'$'+r1+':$'+LTN+'$'+rL };
-      const colW={}; colW[cTN]=126; colW[cTA]=92; colW[cFL]=104; colW[c0+3]=30;
-      colW[cFN]=126; colW[cFA]=92; colW[cD]=112; colW[cCue]=34;
+      /* WIDTHS ARE BUDGETED, not guessed. The eight set columns plus the two that stay default sum
+         to 870px on BOTH anchor choices, which is what the grid gets on a 1440 viewport — so the
+         fit scaler runs at 1.0 and the cue's spill has real pixels to live in. A 34px gutter and a
+         longer cue clipped the marker at the right-hand grid edge, which the fit sweep cannot catch
+         because it only scans NUMERIC cells; it was found by screenshot. Every figure still clears
+         the #### test with room (the widest, a six-character negative difference, needs 64px in a
+         106px column). */
+      const colW={}; colW[cTN]=116; colW[cTA]=86; colW[cFL]=100; colW[c0+3]=24;
+      colW[cFN]=116; colW[cFA]=86; colW[cD]=106; colW[cCue]=80;
       return {ROWS:rL+3, cells, active:{r:r1,c:cFL}, sel:null, colW:colW};
     },
     checks(S){
