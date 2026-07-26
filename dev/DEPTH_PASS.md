@@ -815,7 +815,7 @@ DOES NOT EXIST YET.
 **Random/Aha/Finish:** verify axes; existing; Δ=0 closes. **Clocks:** std. **Engine:** none.
 **AS SHIPPED (r437):** 5 core beats — presence column → add the missing deal → Δ vs system column → fix the fat-fingered amount → total the Δ column into a Recon check line that reads 0 (the §1.6 prove-out finish; MODELING_STANDARDS §6's "one visible place"). No formatting beat, deliberately: the bold + top-border total-line pair is `sumif`'s closing tail and §3 of the campaign doc says to cut a shared tail rather than repeat it, so the check line ships pre-dressed. Beat 5 is the ONE place a live formula is required, on the §1.7 "Total = land a live SUM" gloss — verified by probe that a typed `0`, an `=0`, and typed zeros down the whole Δ column all leave it DARK. par 77→92, parKeys 81→88 (flat over 20 seeds). Distinctness against `lookup` is protected structurally, not asserted — see the index.html header and the r437 dev/AUDIT.md entry.
 
-#### 4.42 drill — "Hardcode it" · M (audit shallow #7)
+#### 4.42 drill — "Hardcode it" · M (audit shallow #7) — **SHIPPED (r438, depth pass; the ☆ is the r418 TILED paste, the outside border is cut as a `pastes` tail, and the delete is the §1.6 prove-out close — deviations declared in the drill's header comment and dev/AUDIT.md r438)**
 **Now:** 2 checks (values-onto-self + memo guard, blue font); fixed B3:B8 site.
 **Beats [the delete PROVES the paste — chained]:**
 1. Copy the Final column and paste it onto itself as values only — the Draft column keeps its wires (second live column added to the board; over-broad column paste now HITS something)
@@ -825,7 +825,7 @@ DOES NOT EXIST YET.
 ☆ Paste the flattened column into the deck strip as values — the second hand-off
 **Random:** output-column site from 3-spot pool (audit ask) + which column is Final vs Draft + feed values. **Aha:** relocates to beat 3 — "values survive the source's death; links don't". **Finish:** beat 4. **Clocks:** re-sweep. **Engine:** none. Guard: Draft-stays-live folds into beat 1's ok (doctrine no-do-nothing).
 
-#### 4.43 series — "Serve the year table" · L (audit shallow #1)
+#### 4.43 series — "Serve the year table" · L (audit shallow #1) — **SHIPPED (r438, depth pass; the board grows a second Series run on a step that is not 1, the Total-row tail is cut as a `sort`/`unhide` repeat, and the close is the catalog's first graded INDENT — deviations declared in the drill's header comment and dev/AUDIT.md r438)**
 **Now:** 2 checks (fill series, bold+right-align) — the thinnest drill in the catalog.
 **Beats (table-to-serve per audit):**
 1. Fill the year header — Series extends the two seeds across the header row

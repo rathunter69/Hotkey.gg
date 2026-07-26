@@ -14,7 +14,7 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 | Foundations | 7 | 7 | ✅ complete (`undo` folded into `editfix`, `copyover` retired) |
 | Formatting | 9 | 9 | ✅ complete (`dress` retired into `housestyle`; `gauntlet` designated capstone) |
 | Formulas I | 9 | 9 | ✅ complete as of r438 (`growth` retired; `cagr` absorbed its board; `bridge` → "Point-mode formulas"; `rollup` last in) |
-| Data & Lookups | 7 | 9 | `lookup`, `scrub`, `sort`, `recon`, `lookup2`, `unhide`, `filterpass` in (`grpfold` retired into `unhide`, so the chapter is 9) — `drill` and `series` remain |
+| Data & Lookups | 9 | 9 | ✅ complete as of r438 (`grpfold` retired into `unhide`, so the chapter is 9; `drill` and `series` last in — both tested for retirement and both kept) |
 | Formulas II | 0 | 11 | `wirewalk` retired into `tieout` |
 | Models I | 0 | 10 | ⚠️ read §5 below before dispatching |
 | Models II | 0 | 10 | ⚠️ read §5 below before dispatching |
@@ -86,6 +86,8 @@ key count and the slowest legal route's. Reference spreads from shipped drills:
 | `bridge` | 31 | (no-formula route) | — |
 | `growth` (retired) | 34 | 85 | 2.4× **and the star was illegal** |
 | `filterpass` | 24 | 39 | 1.6× (☆ itself: 24 vs 30 on the walk-back control) |
+| `series` (shipped board) | 42 | 115 | 2.7× (☆ itself: 28 vs 45 on the typed control) |
+| `drill` (shipped board) | 16 | 56 | 3.5× (☆ itself: 21 vs 31 on the two-paste control) |
 
 **A limit of the key-count model, found by `filterpass` (r438) — read this before running the
 diagnostic on any READING drill.** A filter, a fold or a freeze saves EYE time, not keystrokes: any
@@ -97,6 +99,17 @@ because it asks for the cheapest route that clears every core against **the obvi
 also clears every core** (39 here, hand-hiding row by row). Keep the comparison between routes that
 do the same work; the minimal route that skips optional work is the freedom floor, and it belongs in
 the report, not in the ratio.
+
+**MEASURE EACH HALF OF A MULTI-MOVE ☆ SEPARATELY — a combined number hides a negative half
+(r438, `series`).** That drill's first rebuilt board carried a two-move star (extend the year
+header, extend the line-number column). Measured together it looked fine. Measured APART, the
+second half was the `growth` failure exactly: typing the three short line numbers cost **7 keys**
+and extending them cost **11** — the star route worse than the route it existed to beat, on a
+board written by an agent who had just read the growth warning. Fixed at the BOARD, never at the
+predicate (seven plan years and nine lines instead of five and five, and the line numbers in
+hundreds the way an exhibit schedule actually is): re-measured, 13 vs 23 on the header run and 15
+vs 22 on the line-number run. **Isolate each move the star requires and measure it against its own
+slow alternative before you build the rest of the board.**
 
 **Every ☆ must be proved SKIPPABLE by measurement** — a named slow route that clears every
 core with the star dark, with key counts in the report. Not asserted, measured.

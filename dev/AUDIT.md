@@ -1,5 +1,245 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r438 H6b-10 — series + drill: the last two Data & Lookups boards (DEPTH_PASS §4.43 + §4.42)
+_The chapter closes at 9 of 9. Both drills were the two thinnest boards left in the catalog
+(par 14 / 2 checks and par 18 / 2 checks), which is the profile that retired five drills this
+campaign, so both got the §1.0-R3(s) diagnostic before anything was built. Both survived, and one
+of them only survived a SECOND round of measurement — see the negative-headroom finding below,
+which is the `growth` failure caught on a board of my own before it shipped._
+
+### THE RETIREMENT DIAGNOSTIC, BOTH PARTS, MEASURED
+Every number below is `keyLog` through the live engine on the real board, medians over 5–7 seeds,
+every selection and navigation KEYED (setDemoSel only ever parks the cursor on an anchor cell).
+
+**`series` — KEEP.**
+- **Part 1, on the SHIPPED board:** fastest legal **15** keys (shift-walk the run · Alt H F I S ↵ ·
+  Ctrl+B · Alt H A R) · slowest legal **25** (the three missing years typed and Tab-committed, bold
+  off the ribbon). Spread **1.67×** — above the ~1.3× line that retired `grpfold` (1.21×) and above
+  merged `unhide` (1.26×), below the shipped band. On its own, a warning.
+- **Part 2 — and this is what decided it.** Strip chord-vs-ribbon: the only such component on the
+  board is Ctrl+B vs Alt H 1, **2 keys**, and §1.0(c) forces both to clear. Strip formatting:
+  §1.0(d) forbids a formatting star outright. What SURVIVES is the entire remainder — Fill Series
+  against typing. **Alt H F I S is the engine's only route into `fillSeries()`**: there is no chord
+  and no second ribbon path, so it cannot be a chord alternative, and it is not a format. Legal
+  headroom exists. That is precisely the test `unhide` alone failed (all 8 of its keys were
+  chord-vs-ribbon or formatting, so its board carried no legal ☆ at all).
+- **The §3 discriminator, PROBED not argued.** The neighbour is `filldr`. Select the year run,
+  press Ctrl+R — the first seed is written across the whole run. **0/5 wins**, the year beat dark,
+  the board reading `2026 · 2026 · 2026 · 2026 · 2026`. A trap that exists only as a contrast
+  (sumif/rollup), not a strict subset (grpfold). The aha is re-cut to name it.
+- **On the FINAL board:** fastest legal **42** · slowest legal **115** = **2.74×**; slow-but-sane
+  (values typed, dress and indent still one pass each) **65** = 1.55×.
+
+**`drill` — KEEP.**
+- **Part 1, on the SHIPPED board:** Ctrl+Alt+V route **14** · ribbon Alt H V V **15** · taught
+  Alt E S V **16** · the same run with the grab walked down by Shift+arrow **20** · slowest legal
+  **33** (every figure retyped, no clipboard anywhere). **2.36×**.
+- **Part 2:** chord-vs-ribbon spans **2 keys** across the three paste routes (all forced to clear);
+  the blue pass is a format and is forbidden. What survives is **17 keys** of clipboard-vs-retyping
+  plus **4** on the block grab. Legal headroom exists.
+- **The §3 discriminator, and the honest answer.** The neighbour is `pastes`, whose beat 6 is a
+  values-paste into a hand-off row, and fluency there produces a CORRECT first attempt here — this
+  is containment, not contrast, which is what retired `grpfold`. Three things make it one-way:
+  `pastes` teaches the paste-special MENU (every beat there is a different KIND; nothing here turns
+  on the kind); the SELF-paste, which lands on its own source and has no analogue in the catalog;
+  and the DELETE that proves it, which exists in no other drill (`stalelink` repoints dead refs and
+  `hunt` relinks hardcodes to formulas — both run the opposite direction). Campaign §3's own ruling
+  on this shape is the scrub-vs-rowops one: an overlap of exactly ONE OP on a different subject is
+  spaced practice.
+- **On the FINAL board:** fastest legal **16** · slowest legal **56** (no clipboard at all, every
+  figure typed, feed cleared with Alt H E C) = **3.5×**.
+
+### THE FINDING THAT CHANGED A BOARD — a negative-headroom ☆, caught before it shipped
+`series`'s first rebuild carried a five-line Ref column numbered 5/10/15/20/25. Measured in
+isolation: **typing those three line numbers cost 7 keys and extending them cost 11.** The star
+route was WORSE than the route it existed to beat — the exact finding `growth` was retired on, on a
+board I had just written. Fixed at the BOARD, never at the predicate: the table now carries seven
+plan years and nine lines, and the Ref column is numbered in hundreds (or fifties), the way an
+exhibit schedule actually is. Re-measured in isolation on the final board: year run **13** extended
+vs **23** typed; Ref run **15** extended vs **22** typed. Both halves now positive, **17 keys** of
+legal headroom in the star's own scope (28 vs 45, 1.61×). Worth adding to the campaign's practice:
+**measure each half of a two-move star separately** — a combined number can hide a negative half.
+
+### `series` — "Serve the year table" (§4.43)
+- **BOARD.** A seven-year long-range plan page that came back from the data room with its frame
+  stripped: every figure survived, the year header stops after two columns, the Ref column stops
+  after two numbers, and the eight component lines sit flush against their heading. Ref · Line ·
+  seven year columns; the heading row is a live SUM of its eight components, so every figure on the
+  page is read by something. **20 rows, 14 carrying content — 70% (§1.3 against the r438 20-row
+  sheet).** Four randomization axes (§1.2): a 4-spot site pool (header row 3/4 × anchor column A/B)
+  · the block drawn from four and its eight components Fisher-Yates shuffled, plus the codename ·
+  every figure through rnd() · **the Ref step drawn from {50,100}** and the first plan year from a
+  six-year window. Geometry is constant across seeds so keystroke count never moves with the draw.
+- **BEATS (4 core + the engine save closer + one ☆; tri-length 5, C9-registered):** fill the year
+  header → bold the run and right-align it over the figures (§1.0(a), the dress rides the same live
+  selection) → fill the Ref column, the step named in the label per §1.0-R2(g) → indent the eight
+  component lines under the heading (§1.6 finish state). **Four is the §1.1 floor and deliberate:**
+  a fifth would have to be a second dress or the tail cut below.
+- **THE PAGE'S BEATS 3-5 ARE CUT** — "Total each year · top border above the Total row · Enter the
+  label Total and bold it". `sort` (r436) closes on a live SUM under the block plus bold + top
+  border; `unhide` (r437) closes on bolding the Consolidated line and ruling it on top. Three times
+  in one chapter is the shared tail campaign §3 says to cut. This board has no total row at all.
+- **THE CLOSE IS AN INDENT — the first graded indent in the catalog.** Wolf's §1.0-R3(o) frequency
+  list ranks indent explicitly; Alt H 6 has existed since r232 and nothing has ever graded it.
+  Every other item on that list is spoken for in this chapter: top border → sort/unhide/lookup2 ·
+  outside border → lookup/pastes · **bottom border under a header → `center`, verbatim** · column
+  width → unhide · comma → lookup, and see the ☆ note. Verified rendering, not just the field:
+  padding-left 7px on the heading against 22px on the components.
+- **☆ RE-CUT (binding).** The page's bonus is "Comma-format the metric block — zero decimals, one
+  pass" — a FORMATTING task, dead under §1.0(d), and dead a second time under §1.0-R3(o), which is
+  Wolf on this exact op ("you anchored on the whole comma format hotkey but in reality it's such a
+  seldom used / rare hotkey"). New ☆: **both runs extended from their seeds, neither typed out.**
+- **A SECOND MEASUREMENT THAT CHANGED THE DESIGN:** on a step-1 run, Series from a SINGLE seed
+  lands the identical years (`fillSeries` defaults step to 1) — probed 5/5 — so the old drill's
+  "reads the step from two seeds" claim was never tested by anything it graded. Hence the second
+  run, on a step that is not 1: with the second seed deleted the Ref beat correctly stays DARK.
+- **ENGINE:** `fillSeries()` gains **`S.seriesLog`** — one entry per pass that ACTUALLY EXTENDED a
+  run, recording the selection rect, the implied step and how many cells it wrote. Same telemetry
+  family as S.fillOps (r424) / S.grabLog (r427) / S.fmtOps (r429) / S.multiEnter (r433) / S.sortLog
+  (r436) / S.foldN (r437). Route-blind by construction (one route exists). Telemetry for a BONUS
+  only — no core check reads it.
+- **§1.0-R3(p) ROUTES WALKED (13 of them), not reasoned about.** CLEARING: Series both runs · every
+  value typed · any mixture · Ctrl+B and Alt H 1 · **Clear-Formats then retype the header** (align
+  goes unset, which RENDERS right, and the predicate accepts it exactly as `center` does) · a
+  Series selection stretched one row/column past the run · Alt H 6 pressed twice · over-indent then
+  Alt H 5 to step the heading back out · the whole run reversed (indent first, Ref before header,
+  dress before the fill). Correctly DARK: **Ctrl+R / Ctrl+D** (they copy) · the Ref run from a
+  single seed · the heading swept into the indent selection · a Series pass whose selection starts
+  on the "Ref"/"Line" TEXT header (the seed scan stops at the first non-numeric and the pass writes
+  nothing) · **Ctrl+Shift+arrow off the first seed** (rides `nonEmpty()` and stops on the SECOND
+  seed, so there is nothing past the seeds to write). The last two are Excel's own behaviour and
+  both leave the board UNTOUCHED rather than scrambled; the guide names the selection that works.
+- **BOARD DETAIL THAT IS LOAD-BEARING:** the year run ships `align:'l'` on ALL SEVEN cells, blanks
+  included. A cell Series writes into already exists, so it keeps that alignment; a genuinely
+  absent cell would be created by `ensure()` with no align and would RENDER RIGHT for free — half a
+  graded beat handed over by the engine's default. Also: one blank row between the block and the
+  memos so no Ctrl+arrow flight rides into them.
+- **NO cueCell (§1.0-R2(h)/§1.0-R3(q)), declared:** both graded destinations are the blank TAIL OF
+  A RUN whose seeds are on the board, and the guided ring lands on the whole run, seeds included —
+  which says "extend this" exactly. The cue primitive is for a slot BETWEEN two rows and for an
+  empty paste target; neither exists here.
+- **META (delta D15):** label `Stub the year header` → **`Serve the year table`**, desc rewritten
+  (it described the retired two-check board). Key and CHALLENGES `name` untouched.
+- **PAR:** re-swept from scratch. 5-seed median **42** keys including the engine-appended Ctrl+S,
+  **flat** (the randomization moves the board and the step, never the count). parKeys 11→42, par
+  14→**44** (1.05 s/key, the house band), mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 66 ·
+  pro 50.6 · legendary 44. **The demo BUILDS its own selections with Shift+arrow** rather than
+  being handed them by setDemoSel — Ctrl+Shift+arrow cannot serve here — so parKeys measures what a
+  player really pays instead of eliding three range grabs.
+
+### `drill` — "Hardcode it" (§4.42)
+- **BOARD.** A send-out snapshot page wired into the model behind it. Seven metric lines; a Draft
+  working column and a Final column, BOTH live off the same feed; an empty As-sent archive column
+  beside Final; the feed block off to the right behind a moat; and a live check line two rows under
+  the block. **The Draft column is not a decoy — it is the CONTROL.** Flatten Final, kill the feed,
+  and the two columns that were identical a minute ago say different things: that is the lesson, on
+  the board, out loud (verified in the win screenshot — Draft reads 0, Final reads 485 in blue, and
+  the check line still reads the same total it did before the feed died). **20 rows, 14 carrying
+  content — 70%.** Four axes (§1.2): header row 3/4 × anchor column A/B · a seven-line window
+  SLIDING over a ten-line canonical cascade (it slides rather than shuffling, so a snapshot never
+  reads Net debt above Revenue) plus the codename · every figure through rnd() · **the Draft working
+  column parked LEFT of the send-out pair or RIGHT of it** — the page's "which column is Final vs
+  Draft" axis in the only form the ☆ allows, since the tiled paste needs Final and As-sent adjacent.
+- **BEATS (4 core + the engine save closer + one ☆; tri-length 5, C9-registered):** break the links
+  in the Final column, values only → colour the flattened figures blue (§1.0(a), the dress rides
+  directly behind the paste that made the hardcodes it marks) → fill the As-sent column with the
+  same figures → **delete the model feed and the send-out figures hold** (§1.6 PROVE-OUT finish, and
+  §1.5's aha lands here).
+- **☆ RE-CUT (binding), and it is a mechanic nothing else grades.** The page's bonus — "Paste the
+  flattened column into the deck strip as values" — is extra WORK, not a hidden efficiency, so
+  §1.0(d) rules it out and §1.0-R2(i) rules it out twice. The hand-off is PROMOTED to a core beat
+  and the star becomes what that hand-off makes possible: **the copied column BROADCAST across
+  Final and As-sent together, one paste doing both.** That is the r418 TILING contract — "when the
+  selection is an exact multiple of the copied block in BOTH dimensions, the paste repeats the
+  block across the whole selection" — and no drill in the catalog grades it. Deliberately NOT the
+  same decision as `recon`'s star (carry a row with the clipboard instead of retyping it: a 1×2
+  clip into a 1×2 hole) or `lookup2`'s (anchor once so one read serves three cards): here the clip
+  is 7×1 and the destination 7×2, and the discovery is that the paste REPEATS.
+  Read off the r425 `S.pasteLog` latch on the SHAPE of the pass (`sw===1 && w>=2`), never its kind,
+  so Alt E S V · Alt H V V · Ctrl+Alt+V → V · the legacy Alt H V S dialog · and a plain Ctrl+V of
+  an already-dead column all earn it — 6/6 each, probed.
+- **THE PAGE'S BEAT 4 IS CUT** — "Add an outside border around the send-out block". That is `pastes`
+  beat 7 and `lookup`'s close, both on values hand-offs; campaign §3 says cut the shared tail. §1.6
+  offers a PROVE-OUT as the alternative to a dress close and this board has the better one already,
+  exactly as `recon` closes on a zero. No formatting beat survives except the blue, which is not a
+  dress but the house convention for what the drill just made.
+- **§1.0-R3(p) ROUTES WALKED (14 of them).** CLEARING: all four values-paste routes, tiled or not ·
+  flatten first then Ctrl+V the dead column tiled over both · every figure typed by hand with no
+  clipboard anywhere (all four cores, star dark, 56 keys — the §1.0(c) freedom proof) · Del and
+  Alt H E C on the feed · the archive served before the flatten · the cue deleted (moves nothing) ·
+  the feed deleted FIRST, then Ctrl+Z, then a clean run. Correctly DARK: a plain Ctrl+V tiled over
+  both while the column is still LIVE (formulas carry, beats 1/3/4 dark and the board shows why) ·
+  **Ctrl+Space whole-column values paste** (it takes the check line with it — beat 1 dark) · the
+  Draft column swept into the flatten · two separate pastes (all four cores clear, star dark).
+- **THE ONE DELIBERATE TRAP, declared.** Beat 4 grades the feed EMPTY *and* the send-out figures
+  STILL RIGHT, so it can only fire on a board that was flattened first. Deleting the feed before
+  flattening destroys the only copy of the numbers and leaves beats 1 and 3 unreachable until
+  Ctrl+Z — which is what the drill is about, is one key to undo, and is named in the guide. Same
+  known-accepted-and-Excel-true class as `sort`'s total-before-the-last-sort. Probed: Del then
+  Ctrl+Z then a clean run wins 6/6.
+- **THE CHECK LINE IS THE r187 DECOY MADE MEANINGFUL.** A live `=SUM()` over the Final block, two
+  rows under it inside the Final column: Ctrl+Space takes the whole column and kills it (beat 1
+  dark), the honest grab does not. One blank row above it so a Ctrl+arrow grab down Final stops at
+  the block edge — the geometry `sort` learned the hard way in r436. It is also the quiet proof of
+  the drill's own argument: once Final is hardcoded, that total keeps reading the same number after
+  the feed dies.
+- **cueCell IS used (§1.0-R3(q)):** the As-sent column is an EMPTY paste destination, exactly the
+  case the primitive exists for. It sits one row ABOVE the header so no downward grab can ride into
+  it, checks() never reads it, and deleting it was probed to move nothing.
+- **META:** desc rewritten (it described the retired two-check board). Key, name and label untouched.
+- **PAR:** re-swept from scratch. 5-seed median **21** keys including the engine-appended Ctrl+S,
+  flat. parKeys 15→21, par 18→**22** (1.05 s/key), mirrored in HOTKEY_PARS. Clocks derive: pass 33
+  · pro 25.3 · legendary 22. The demo builds its own selections (Ctrl+Shift+↓ off the top of each
+  column) rather than being handed them by setDemoSel.
+
+### ALT-PATH ENTRIES — DELETED BY NAME (integrators: do not resurrect)
+Per the r435 integration note, this side of `dev/e2e-alt-paths.js` is authoritative for `series`
+and `drill`, additions AND deletions.
+- **DELETED `series` · "dress first, series last"** (r169). Drove `o.range`, a five-cell header on a
+  board with no Ref column, no component lines and no indent beat. `o.range` exists on no seed now.
+- **DELETED `drill` · "values paste via the H V S dialog route"** (r169). Drove the hard-coded
+  B3:B8 site of the retired board; no seed produces it (the block anchors at A or B, the header row
+  is 3 or 4, and the Draft column can sit on either side of the send-out pair).
+- **ADDED (4, the §1.8 pair per drill):**
+  · `series` ALT 1, chord-ROUTE — ribbon bold Alt H 1, the dress applied BEFORE the run is filled,
+    both Series selections stretched one cell past the run, the indent taken in two passes. 26 keys,
+    ☆ **LIT**.
+  · `series` ALT 2, op-ORDER **and the measured NEGATIVE CONTROL** — indent first, every year and
+    every line number typed, nothing extended. 50 keys, all four cores clear, ☆ **DARK** 0/5.
+  · `drill` ALT 1, chord-ROUTE — the tiled values-paste through the Ctrl+Alt+V dialog instead of
+    Alt E S V, blue before the feed dies, feed cleared with Alt H E C instead of Del. 20 keys,
+    ☆ **LIT**.
+  · `drill` ALT 2, op-ORDER **and the measured NEGATIVE CONTROL** — the archive served by its OWN
+    second paste through the legacy Alt H V S dialog, so nothing is ever broadcast. 25 keys, all
+    four cores clear, ☆ **DARK** 0/5.
+
+### COUPLING SWEEP (the standing check) — CLEAN, and here is the whole of it
+`git grep -n "CHALLENGES\.\(series\|drill\)\._o" dev/` → **no hits**. `git grep -n
+"loadChallenge('\(series\|drill\)')" dev/` → **no hits**. `git grep -n "'series'" dev/` and
+`"'drill'"` → only `dev/e2e-alt-paths.js` (mine to own), the `'formulas'` track array in
+`dev/migrate-certificates.sql` (both keys survive — no edit needed), historical rows in
+`dev/seed-field.sql` (C13-exempt evidence), and **`dev/e2e-depth-mechanics.js:951`, which is a
+false positive: that `'series'` is the name of the ribbon DIALOG, not the drill key.** A
+board-content sweep (`B3:B8` · `Model feed` · `Fill Series` · `HFIS`) turned up nothing outside
+the drills' own alt entries. Nothing needed an adapter this round.
+
+### GATE (all green, own port 8884, `readlink /proc/<pid>/cwd` confirmed against this worktree)
+`check-invariants` STATIC INVARIANTS: clean (C9 series 5 + drill 5, one ☆ and saveClose each · C11
+aphorisms clean · C12 ≥2 alts across 34 reworked drills) · `e2e-smoke` ALL 7 PAGES CLEAN +
+skin-unlock (count 75) · `e2e-lb` ALL 36 PASS · `e2e-demo-replay` ALL GREEN · `e2e-alt-paths` ALL
+105 PASS · `e2e-audit-parity` ALL 177 PASS · `e2e-audit-onboard` ALL 35 PASS · `e2e-mac-input` ·
+`e2e-rapidfire` · `e2e-guided` · `e2e-formulas` · `e2e-grid-height` · `e2e-depth-mechanics` ·
+`e2e-fit-sweep` · `e2e-par-sweep series drill` FLAGGED 0 (0% drift, 1.05 s/key both) ·
+`check-borders` clean · `check-pause` clean · `check-cache-versions` clean.
+No `drills.js?v=` bump — drills.js content changed (HOTKEY_PARS + two meta rows) and the version is
+the integrator's call at batch time.
+
+### NOT DONE, deliberately
+`drills/*.html`, `sitemap.xml` and `refmap.js` are generated and left to the integrator — note that
+`series`'s LABEL changed (D15), so `drills/series.html`, the picker page and `refmap.js` all want a
+regeneration pass. `refmap.js` should gain `ALT>H>6` (indent) and keep `ALT>H>F>I>S` pointed at
+`series`; both are its beats now.
+
 ## r438 H6b-9 — rollup: "Sum on two criteria" (DEPTH_PASS §4.29 + §1.0/-R2/-R3)
 _The last un-passed drill in Formulas I, and the chapter's ninth. The §4.29 page is one of the thin
 ones ("Language pass + bonus", the drill judged near the bar), but two binding inputs landed after
