@@ -10576,170 +10576,523 @@ const CHALLENGES = {
   },
 
   stalelink:{
-    name:'Stale Links', label:'Re-point the stale links', par:28, parKeys:27,
-    aha:'Re-point a stale link (F2, fix the ref) — never retype the number it should read.',
-    prompt:'The assumptions moved to v2, but three cells in the build still read the dead v1 column. The tab computes, nothing errors, and every number is wrong. Find the rows whose pattern breaks, edit the stale references onto the live block, and confirm contribution ties to v2. A silently stale link is worse than a #REF! — at least the #REF! announces itself.',
-    req(){ const R=this._stale; return '<em>'+R.join('</em> \u00b7 <em>')+'</em> still read the v1 column (C) \u2014 re-point each at the LIVE v2 block ($B$4:$B$6) \u00b7 contribution must tie to v2'; },
-    guide:[
-      'read each row for the value that breaks the pattern \u2014 that cell\u2019s formula points at column C (v1, dead)',
-      'revenue row: every year = $B$4 (live price) \u00d7 its units \u00b7 <kbd>F2</kbd> the stale one, walk C onto B <kbd>\u21b5</kbd>',
-      'cost row: $B$5 \u00d7 revenue \u00b7 fix the stale ref the same way',
-      'royalty row: $B$6 \u00d7 revenue \u00b7 fix the last one \u2014 contribution re-ties itself',
-    ],
-    targets:[function(){return this._stale[0];}, function(){return this._stale[1];}, function(){return this._stale[2];}, 'B14:F14'],
-    demo(){
-      const st=this._stale;
-      const mk=(cell)=>{ const Lc=cell.replace(/\d+/g,''), r=cell.replace(/\D+/g,'');
-        const src=r==='11'?'$B$4':(r==='12'?'$B$5':'$B$6');
-        const dep=r==='11'?(Lc+'10'):(Lc+'11');
-        return {sel:cell, keys:[...T('='+src+'*'+dep), Kb.enter]}; };
-      return st.map(mk);
-    },
+    /* r439 H6b (DEPTH_PASS §4.49, "Re-point the stale links") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 (§1.0-R3 wins on conflict) and to dev/MODELING_STANDARDS.md §1.
+
+       WAS: 4 checks on a 14-row board — three stale refs repointed, then a fourth line that
+       graded nothing (see the FREE BEAT finding below). par 28 / parKeys 27, ROWS=14.
+
+       ── RETIREMENT / MERGE TESTED FIRST (§1.0-R3(s) + the CAMPAIGN §2 two-part diagnostic) ──
+       Measured through the live engine on the SHIPPED board, every selection and navigation
+       KEYED, 5 seeds (dev/probe-shipped.js, deleted before commit):
+         PART 1 — IS THERE SPREAD? fastest legal 22 keys (F2 into each stale ref, Home, one
+           caret step, Delete, retype the column letter) · slow-but-sane 34 (each stale formula
+           retyped in full) · the absolute floor-to-ceiling pair is 22 against 182 (every cell of
+           all three lines retyped), but the honest same-work comparison is 34/22 = 1.55×. Above
+           the ~1.3× line that retired grpfold, below the shipped band.
+         PART 2 — IS ANY OF THAT SPREAD ☆-LEGAL? This is the half that decides. Strip
+           chord-vs-ribbon (§1.0(c) forces both to clear) and formatting (§1.0(d) forbids it),
+           and what survived on the SHIPPED board was 12 keys of "F2 caret surgery vs retype" —
+           and the engine does not even log caret keys, so it cannot be latched. The one
+           mastery-shaped candidate was MEASURED AND FAILED: restoring each break by copying a
+           healthy year in the same line came in at 91 keys against 34 for retyping, because the
+           two extra hops per break cost more than the nine characters they save. That is the
+           `growth` failure exactly, caught on a candidate rather than on a shipped board.
+         VERDICT: KEEP, and FIX AT THE BOARD (the `series` r438 precedent, and `unhide`'s), not
+           at the predicate. The standalone repoint carries no legal star, so the board grew the
+           work that does: a contribution block the player builds, where one fill covers both
+           lines. Re-measured on the final board in dev/AUDIT.md.
+       WHY NOT MERGED: the neighbours were probed, not argued. `hunt` relinks typed-over CELLS
+       to formulas — it runs the opposite direction (constant → formula) and its instrument
+       (F5 → Special → Constants) marks nothing here, because every stale read IS a formula.
+       `balcheck` repoints one wrong-year ref as one of three causes; `tieout` collapses a leg
+       with F9 to FIND a stale one. Only here is the whole page silently wrong with nothing
+       erroring, which is the failure mode the drill is named for.
+
+       ── THE FREE BEAT THAT WAS CUT (worth recording) ──────────────────────────────────────
+       The old check 4, "tie contribution to the v2 assumptions in every year", read a
+       contribution row the BOARD already shipped as a live formula. It became true the instant
+       checks 1–3 did, for zero player action — a do-nothing line, which §1.1 forbids. The
+       contribution line is now BUILT by the player, so the same idea grades real work.
+
+       ── THE BOARD (§1.3: a true 20 rows) ─────────────────────────────────────────────────
+       A reforecast tab whose assumptions were re-issued as v2, with the superseded v1 figures
+       still parked in the column beside them. Three build cells — one per driven line, each in
+       a different year — still read the dead v1 figure. Nothing errors and every number in
+       those years is wrong. The export stripped the ink off the build, so the provenance
+       colours are the player's to apply (dev/MODELING_STANDARDS.md §1: font colour encodes
+       PROVENANCE; green-for-link is the convention the catalog under-uses).
+       15 of 20 rows carry content or scripted purpose at the win state — 75%.
+
+       ── STRUCTURAL DEVIATIONS from the §4.49 page, declared here per §0 ───────────────────
+       (1) ☆ RE-CUT — the page already says its strikethrough bonus is superseded by §1.0-R3(o)
+           and asks for "a hidden EFFICIENCY move for this drill". The measurement above says
+           the repoint itself has none, so the star is the contribution block: seeded once in
+           the first plan year and carried across in ONE pass covering both lines. Read off the
+           r424 S.fillOps latch (the MECHANIC, never geometry inferred), so Ctrl+R and the
+           ribbon's Alt H F I R both earn it.
+       (2) THE BOARD GAINS TWO BUILT LINES (contribution + its margin) and the two ink beats.
+           The page's "confirm continuity" line becomes a line the player builds rather than one
+           the board hands over; the ink beats are the §1 provenance law, which is the whole
+           subject of a stale-link drill and which Wolf's §1.0-R3(o) frequency list ranks
+           explicitly ("font colour (blue = hardcode, green = linked cell, red = needs
+           attention)").
+       (3) GREEN IS APPLIED, NOT SEEDED, and the stale cells are NOT identifiable by ink. The
+           board ships the whole build black, so the colour can never short-circuit the
+           pattern-break diagnosis the page names as this drill's identity. `lookup` (r436) is
+           the only other board grading green; this one grades it against a leave-alone guard —
+           the typed units stay blue and the two computed lines stay black — so the beat tests
+           whether the player knows WHICH cells are links, not merely how to reach the swatch.
+
+       ── §1.0-R3(p) GRADE THE END STATE — ROUTES WALKED, NOT REASONED ABOUT ────────────────
+       · the repoint grades formula-mentions-the-live-driver + VALUE, so retyping, F2 caret
+         surgery, point mode, copying a healthy year in the same line, and filling the whole
+         line from a healthy left edge all clear. Filling from a STALE left edge does not —
+         it broadcasts the dead reference, and the board says so loudly.
+       · green: fontColor==='green', reachable by Alt H F C → the Green swatch and by
+         Alt H J → Link (the Cell Styles gallery). Both walked, both clear.
+       · the dead figures: any clearing route (Delete · Alt H E C · Alt H E A) leaves no number.
+       · the block: VALUE + a formula in the cell, so any formula shape clears; the margin's
+         percent dress travels with the fill because fillFrom copies the full format (r407).
+       · the top border: bt OR ball, so Alt H B P, Alt H B D, Alt H B S and Alt H B A all clear.
+       · NO cueCell (§1.0-R2(h)/§1.0-R3(q)) — nothing here is an insert slot or an empty paste
+         target; every graded destination is a labelled row that already exists. */
+    name:'Stale Links', label:'Re-point the stale links', par:64, parKeys:61, saveClose:true,   /* r439 §4.49 depth pass: par re-swept from scratch (was par 28 / parKeys 27 on the old 14-row board; 5-seed median 61 keys incl. the engine-appended Ctrl+S). See dev/AUDIT.md r439; par ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. */
+    aha:'a stale link never announces itself — it computes, it just computes off yesterday, so the page has to be read for the break.',
+    /* §1.5: the aha's MOMENT is beat 1 — the year whose figure sits off the trend is the only
+       thing on the page that says anything is wrong. */
+    prompt:'The assumptions were re-issued as v2 and the old v1 figures are still parked in the column beside them. Three cells in the build — one on each driven line, each in a different year — still read the dead column. The tab computes, nothing errors, and those years are quietly wrong. Read each line for the figure that sits off its trend, put the reference back on the live panel, clear the superseded figures, and build the contribution the deck quotes. A silently stale link is worse than a #REF! — at least the #REF! announces itself.',
+    req(){ const o=this._o; return 'each off-trend cell: <em>F2</em>, walk the reference onto the live panel column <em>'+o.cV+'</em> ↵ · select <em>'+o.linkRng+'</em> · <em>alt h f c</em> → Green ↵ · select <em>'+o.deadRng+'</em> · <em>del</em> · seed <em>'+o.yc[0]+(o.hr+5)+'</em> and <em>'+o.yc[0]+(o.hr+6)+'</em> · select <em>'+o.blockRng+'</em> · <em>ctrl+r</em> · <em>ctrl+b</em> · <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the three drivers sit in column '+o.cV+' (live) with the dead v1 figures beside them in '+o.cD+'. Read each line across: the units grow every year, so '+o.book.l1+', '+o.book.l2+' and '+o.book.l3+' should too — the year that sits off the trend is the one still reading the dead column. <kbd>F2</kbd> opens it, <kbd>home</kbd> then one <kbd>→</kbd> puts the caret on the column letter, <kbd>del</kbd> and type <kbd>'+o.cV+'</kbd> <kbd>↵</kbd>. Retyping the whole formula works, so does copying a healthy year of the same line onto it. Filling the line from its LEFT edge only works when that edge is healthy — from a stale one it broadcasts the dead reference across the line',
+      'select the three driven lines '+o.linkRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd>, two <kbd>←</kbd> to Green, <kbd>↵</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> → Link is the same colour from the styles gallery). Leave the '+o.book.unit+' line blue and the two computed lines black — the ink says where each number came from',
+      'select the three superseded figures '+o.deadRng+' · <kbd>del</kbd> clears them (<kbd>alt</kbd> <kbd>h</kbd> <kbd>e</kbd> <kbd>c</kbd> is the ribbon route). The header stays — the column is labelled for whoever opens this next',
+      'seed the first plan year: '+o.yc[0]+(o.hr+5)+' <kbd>=</kbd>'+o.yc[0]+(o.hr+2)+'−'+o.yc[0]+(o.hr+3)+'−'+o.yc[0]+(o.hr+4)+' <kbd>↵</kbd> and '+o.yc[0]+(o.hr+6)+' <kbd>=</kbd>'+o.yc[0]+(o.hr+5)+'/'+o.yc[0]+(o.hr+2)+' <kbd>↵</kbd>. Typing the other four years out finishes it the same way',
+      'select '+o.contribRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> lays the top border',
+      '☆ the discovery: both seeds go in the FIRST plan year, then one selection over '+o.blockRng+' and one fill carries both lines at once. Two separate fills finish the drill identically and forfeit the star — the clock is the only thing that tells you what it cost',
+    ]; },
+    /* rings: ① the three driven lines · ② the same block, now inked · ③ the dead figures ·
+       ④ the contribution block · ⑤ the contribution line · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.linkRng, o.linkRng, o.deadRng, o.blockRng, o.contribRng, null]; },
+    demo(){ const o=this._o;
+      const mk=(i)=>{ const j=o.stale[i], Lc=o.yc[j];
+        const dep = i===0 ? Lc+(o.hr+1) : Lc+(o.hr+2);
+        return {sel:Lc+(o.hr+2+i), keys:[...T('=$'+o.cV+'$'+(o.pr+1+i)+'*'+dep), Kb.enter]}; };
+      const y=o.yc[0];
+      return [
+        mk(0), mk(1), mk(2),
+        /* the ink rides directly behind the repoint it dresses (§1.0(a) format-as-you-go) */
+        {sel:o.linkRng, keys:[Kb.alt,L('h'),L('f'),L('c'),{key:'ArrowLeft'},{key:'ArrowLeft'},Kb.enter]},
+        {sel:o.deadRng, keys:[{key:'Delete'}]},
+        {sel:y+(o.hr+5), keys:[...T('='+y+(o.hr+2)+'-'+y+(o.hr+3)+'-'+y+(o.hr+4)), Kb.enter]},
+        {sel:y+(o.hr+6), keys:[...T('='+y+(o.hr+5)+'/'+y+(o.hr+2)), Kb.enter]},
+        /* ☆ — ONE fill, both lines */
+        {sel:o.blockRng, keys:[Kb.fillR]},
+        {sel:o.contribRng, keys:[Kb.bold, Kb.alt,L('h'),L('b'),L('p')]},
+      ];
+    },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Reforecast (assumptions v2 landed \u2014 some links still read v1)',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Assumptions',txt:true,bold:true};
-      cells['B3']={...blankCell(),value:'v2 \u00b7 live',txt:true,bold:true};
-      cells['C3']={...blankCell(),value:'v1 \u00b7 dead',txt:true,bold:true};
-      cells['A4']={...blankCell(),value:'Price / unit',txt:true};
-      cells['A5']={...blankCell(),value:'Cost rate',txt:true};
-      cells['A6']={...blankCell(),value:'Royalty',txt:true};
-      const price=rnd(24,60), rate=rnd(30,60)/100, roy=rnd(3,9)/100;
-      const price1=price+(rnd(0,1)?1:-1)*rnd(3,9);
-      const rate1=Math.min(.7,Math.max(.15,rate+(rnd(0,1)?1:-1)*rnd(6,14)/100));
-      const roy1=Math.min(.15,Math.max(.01,roy+(rnd(0,1)?1:-1)*rnd(2,4)/100));
-      cells['B4']={...blankCell(),value:price,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['C4']={...blankCell(),value:price1,fmtStyle:'comma',decimals:0};
-      cells['B5']={...blankCell(),value:rate,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      cells['C5']={...blankCell(),value:rate1,fmtStyle:'percent',decimals:0};
-      cells['B6']={...blankCell(),value:roy,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      cells['C6']={...blankCell(),value:roy1,fmtStyle:'percent',decimals:0};
-      const y0=23+rnd(0,2);
-      cells['A9']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
-      for(let c=2;c<=6;c++) cells[colLetter(c)+'9']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
-      cells['A10']={...blankCell(),value:'Units (k)',txt:true};
-      cells['A11']={...blankCell(),value:'Revenue',txt:true};
-      cells['A12']={...blankCell(),value:'Cost',txt:true};
-      cells['A13']={...blankCell(),value:'Royalty',txt:true};
-      cells['A14']={...blankCell(),value:'Contribution',txt:true,bold:true};
-      // one stale link PER ROW, columns shuffled so the trio never stacks
-      const colsShuf=[2,3,4,5,6].sort(()=>_rand()-.5);
-      const staleCol={11:colsShuf[0], 12:colsShuf[1], 13:colsShuf[2]};
-      this._truth={};
-      for(let c=2;c<=6;c++){
-        const Lc=colLetter(c);
-        const units=rnd(20,120)*5;
-        cells[Lc+'10']={...blankCell(),value:units,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        const revT=price*units, costT=rate*revT, royT=roy*revT;
-        const rev = (staleCol[11]===c) ? price1*units : revT;
-        cells[Lc+'11']={...blankCell(),formula:'='+(staleCol[11]===c?'$C$4':'$B$4')+'*'+Lc+'10',value:rev,fmtStyle:'comma',decimals:0};
-        const cost=(staleCol[12]===c) ? rate1*rev : rate*rev;
-        cells[Lc+'12']={...blankCell(),formula:'='+(staleCol[12]===c?'$C$5':'$B$5')+'*'+Lc+'11',value:cost,fmtStyle:'comma',decimals:0};
-        const royV=(staleCol[13]===c) ? roy1*rev : roy*rev;
-        cells[Lc+'13']={...blankCell(),formula:'='+(staleCol[13]===c?'$C$6':'$B$6')+'*'+Lc+'11',value:royV,fmtStyle:'comma',decimals:0};
-        cells[Lc+'14']={...blankCell(),formula:'='+Lc+'11-'+Lc+'12-'+Lc+'13',value:rev-cost-royV,fmtStyle:'comma',decimals:0,bold:true,bt:true};
-        this._truth[Lc]=revT-costT-royT;
+      const shuf=(a)=>{ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=rnd(0,i); [b[i],b[j]]=[b[j],b[i]]; } return b; };
+      /* §1.2 randomization — four independent axes: (a) SITE, a 3-spot pool moving the page in
+         both axes; (b) CONTENT, four parallel label sets (the driver names, the driven lines and
+         the unit line all move together) plus the codename; (c) VALUES, every figure through
+         rnd(), including how far the dead driver sits from the live one; (d) WHICH-ONE-IS-BROKEN,
+         a different year per line, drawn without replacement so the three breaks never stack in
+         one column. Geometry is constant across seeds (five plan years, three driven lines) so
+         the keystroke count never moves with the draw. */
+      const BOOKS=[
+        {seg:'Licensing',        unit:'Units (k)', l1:'Revenue',     l2:'Cost of sales',   l3:'Royalty',
+         d1:'Price / unit ($)',  d2:'Cost rate',   d3:'Royalty rate'},
+        {seg:'Managed services', unit:'Seats (k)', l1:'Fees',        l2:'Delivery cost',   l3:'Partner share',
+         d1:'Fee / seat ($)',    d2:'Delivery rate', d3:'Partner rate'},
+        {seg:'Advisory',         unit:'Hours (k)', l1:'Fee revenue', l2:'Staff cost',      l3:'Referral fee',
+         d1:'Rate / hour ($)',   d2:'Staff cost rate', d3:'Referral rate'},
+        {seg:'Hardware',         unit:'Units (k)', l1:'Revenue',     l2:'Component cost',  l3:'Warranty accrual',
+         d1:'Price / unit ($)',  d2:'Component rate', d3:'Warranty rate'},
+      ];
+      const bk=BOOKS[rnd(0,BOOKS.length-1)];
+      const spots=[{c0:1,pr:3},{c0:2,pr:3},{c0:1,pr:4}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const c0=sp.c0, pr=sp.pr, hr=pr+5, NY=5;
+      const cL=colLetter(c0), cV=colLetter(c0+1), cD=colLetter(c0+2);
+      const yc=[]; for(let j=0;j<NY;j++) yc.push(colLetter(c0+1+j));
+      const y0=rnd(2025,2030);
+      cells[cL+'1']={...blankCell(),value:codename()+' — '+bk.seg+' reforecast (assumptions re-issued as v2)',txt:true,bold:true};
+      /* THE ASSUMPTIONS PANEL. Live column: the §1.0(f)/§1.0-R2(l) input dress — light yellow,
+         all borders, blue figure, POPULATED and individually labelled. Dead column: grey, no
+         dress, because it is not an input any more — it is the thing being retired. */
+      cells[cL+pr]={...blankCell(),value:'Assumptions',txt:true,bold:true};
+      cells[cV+pr]={...blankCell(),value:'v2 · live',txt:true,bold:true,align:'c'};
+      cells[cD+pr]={...blankCell(),value:'v1 · dead',txt:true,bold:true,align:'c'};
+      const price=rnd(24,60), rate=rnd(28,52)/100, roy=rnd(3,9)/100;
+      /* the dead driver sits 25–40% away from the live one in either direction, which is far
+         enough that the year it poisons ALWAYS breaks the line's trend — the diagnosis is a
+         read, never arithmetic on four significant figures. */
+      const off=()=> (rnd(0,1)? (100+rnd(25,40))/100 : (100-rnd(25,40))/100);
+      const price1=Math.max(6, Math.round(price*off()));
+      const rate1 =Math.max(.10, Math.min(.78, Math.round(rate*off()*1000)/1000));
+      const roy1  =Math.max(.01, Math.min(.20, Math.round(roy *off()*1000)/1000));
+      const dLab=[bk.d1,bk.d2,bk.d3], dLive=[price,rate,roy], dDead=[price1,rate1,roy1];
+      for(let i=0;i<3;i++){ const r=pr+1+i, pct=i>0;
+        cells[cL+r]={...blankCell(),value:dLab[i],txt:true};
+        cells[cV+r]={...blankCell(),value:dLive[i],fontColor:'blue',fill:'yellow',ball:true,align:'c',fmtStyle:pct?'percent':'comma',decimals:pct?1:0};
+        cells[cD+r]={...blankCell(),value:dDead[i],fontColor:'gray',align:'c',fmtStyle:pct?'percent':'comma',decimals:pct?1:0};
       }
-      this._stale=[colLetter(staleCol[11])+'11', colLetter(staleCol[12])+'12', colLetter(staleCol[13])+'13'];
-      return {ROWS:14, cells, active:{r:11,c:2}, sel:null, colW:{1:126}};
+      /* THE BUILD. Units grow every year, so all three driven lines grow every year — which is
+         what makes one poisoned cell readable as a break in the trend (§1.3 labeled targets:
+         every graded line carries its own name in the label column). */
+      cells[cL+hr]={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
+      for(let j=0;j<NY;j++) cells[yc[j]+hr]={...blankCell(),value:'FY'+(y0+j),txt:true,bold:true,align:'r'};
+      const u=[]; let uu=rnd(30,90)*5;
+      for(let j=0;j<NY;j++){ u.push(uu); uu=Math.round(uu*(100+rnd(6,16))/100/5)*5; }
+      cells[cL+(hr+1)]={...blankCell(),value:bk.unit,txt:true};
+      for(let j=0;j<NY;j++) cells[yc[j]+(hr+1)]={...blankCell(),value:u[j],fontColor:'blue',fmtStyle:'comma',decimals:0};
+      [bk.l1,bk.l2,bk.l3].forEach((lab,i)=>{ cells[cL+(hr+2+i)]={...blankCell(),value:lab,txt:true}; });
+      const cols=shuf([0,1,2,3,4]);
+      const stale=[cols[0],cols[1],cols[2]];        // line index → the year it reads the dead panel in
+      const rev=[], cst=[], roq=[];
+      for(let j=0;j<NY;j++){
+        const Lc=yc[j];
+        const rvT=price*u[j], ctT=rate*rvT, ryT=roy*rvT;
+        rev.push(rvT); cst.push(ctT); roq.push(ryT);
+        const src=i=>'$'+(stale[i]===j?cD:cV)+'$'+(pr+1+i);
+        const rvS=(stale[0]===j?price1:price)*u[j];
+        cells[Lc+(hr+2)]={...blankCell(),formula:'='+src(0)+'*'+Lc+(hr+1),value:rvS,fmtStyle:'comma',decimals:0};
+        cells[Lc+(hr+3)]={...blankCell(),formula:'='+src(1)+'*'+Lc+(hr+2),value:(stale[1]===j?rate1:rate)*rvS,fmtStyle:'comma',decimals:0};
+        cells[Lc+(hr+4)]={...blankCell(),formula:'='+src(2)+'*'+Lc+(hr+2),value:(stale[2]===j?roy1:roy)*rvS,fmtStyle:'comma',decimals:0};
+        /* the two built lines ship EMPTY but PRE-DRESSED (§1.3: where the lesson isn't
+           formatting, the board ships dressed) — so the margin's percent travels with the fill
+           and no format beat has to be invented to carry it. */
+        cells[Lc+(hr+5)]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[Lc+(hr+6)]={...blankCell(),fmtStyle:'percent',decimals:1};
+      }
+      cells[cL+(hr+5)]={...blankCell(),value:'Contribution',txt:true};
+      cells[cL+(hr+6)]={...blankCell(),value:'Contribution margin',txt:true};
+      /* §1.3 density + a real desk artifact: the page states its units, its basis and its ink
+         law, which is what a reforecast tab actually carries. Story only — checks() reads the
+         table, so deleting any memo can never move an ok. */
+      cells[cL+(hr+8)]={...blankCell(),value:'Basis: fiscal years, $ in thousands; the build reads the assumptions panel',txt:true,it:true,fontColor:'gray'};
+      cells[cL+(hr+9)]={...blankCell(),value:'Ink: blue typed input · green reads the panel · black computed here',txt:true,it:true,fontColor:'gray'};
+      cells[cL+(hr+10)]={...blankCell(),value:'Source: reforecast pack v2 — v1 stays parked until the page is clean',txt:true,it:true,fontColor:'gray'};
+      this._o={ c0, pr, hr, cL, cV, cD, yc, NY, y0, book:bk, stale, rev, cst, roq,
+        linkRng   : yc[0]+(hr+2)+':'+yc[NY-1]+(hr+4),
+        deadRng   : cD+(pr+1)+':'+cD+(pr+3),
+        contribRng: yc[0]+(hr+5)+':'+yc[NY-1]+(hr+5),
+        blockRng  : yc[0]+(hr+5)+':'+yc[NY-1]+(hr+6) };
+      /* widths budgeted to ~800px at the grid's real width, so the fit scaler runs at 1.0 and no
+         figure column can manufacture a #### (the r430 overflow rule reasons in unscaled px).
+         When the page anchors at B, column A thins to a gutter. */
+      const colW={}; if(c0>1) colW[c0-1]=22;
+      colW[c0]=178; for(let j=0;j<NY;j++) colW[c0+1+j]=88;
+      return {ROWS:20, cells, active:{r:hr+2,c:c0+1}, sel:null, colW};
     },
     checks(S){
-      const rowOk=(r, src, depRow)=>{
-        for(let c=2;c<=6;c++){ const Lc=colLetter(c);
-          const x=S.cells[Lc+r];
-          const f=(x&&x.formula)?x.formula.toUpperCase().replace(/[\s$]/g,''):'';
-          const dep=(S.cells[Lc+depRow]||{}).value||0;
-          const base=(S.cells[src]||{}).value||0;
-          if(!f || f.indexOf(src)<0 || Math.abs(((x&&x.value)||0)-base*dep)>1e-6) return false;
-        }
-        return true;
-      };
-      const revOk=rowOk('11','B4','10'), costOk=rowOk('12','B5','11'), royOk=rowOk('13','B6','11');
-      let tieOk=true;
-      for(let c=2;c<=6;c++){ const Lc=colLetter(c);
-        const x=S.cells[Lc+'14'];
-        const f=(x&&x.formula)?x.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        if(!f || f.indexOf(Lc+'11')<0 || f.indexOf(Lc+'12')<0 || f.indexOf(Lc+'13')<0
-           || Math.abs(((x&&x.value)||0)-this._truth[Lc])>1e-6) tieOk=false;
+      const o=this._o, cel=k=>S.cells[k]||{};
+      const near=(a,b)=>typeof a==='number' && Math.abs(a-b)<=0.5;
+      const nearP=(a,b)=>typeof a==='number' && Math.abs(a-b)<=1e-6;
+      const F=k=>{ const c=cel(k); return c.formula?String(c.formula).toUpperCase().replace(/[\s$]/g,''):''; };
+      /* a REF TOKEN test, not a substring test: 'B4' must not match inside 'B41' or 'AB4'. */
+      const hasRef=(f,key)=>new RegExp('(^|[^A-Z0-9])'+key+'([^0-9]|$)').test(f);
+      const live=i=>(o.cV+(o.pr+1+i)).toUpperCase(), dead=i=>(o.cD+(o.pr+1+i)).toUpperCase();
+      const want=[o.rev,o.cst,o.roq];
+      /* BEAT 1 — the meter. A cell is repaired when its formula MENTIONS the live driver, does
+         not mention the dead one, and computes the figure the live panel implies. Every route
+         that produces that end state clears (§1.0-R3(p)); the value is what stops a player from
+         "fixing" the reference while leaving the year wrong. The twelve healthy cells are the
+         leave-alone guard, folded into this ok rather than shipped as a do-nothing line (§1.1). */
+      const pointsLive=(i,j)=>{ const f=F(o.yc[j]+(o.hr+2+i)); return !!f && hasRef(f,live(i)) && !hasRef(f,dead(i)); };
+      const cellOk=(i,j)=>pointsLive(i,j) && near(cel(o.yc[j]+(o.hr+2+i)).value, want[i][j]);
+      /* the COUNTER tracks the three planted READS being repointed, not the values they
+         produce: the cost and royalty cells of the revenue-poisoned year are wrong on load as
+         a CASCADE, and a counter that waited for them would sit at 0/3 after a correct repair.
+         The value guard lives in ok, where it belongs. */
+      let found=0; for(let i=0;i<3;i++) if(pointsLive(i,o.stale[i])) found++;
+      let allOk=true; for(let i=0;i<3;i++) for(let j=0;j<o.NY;j++) if(!cellOk(i,j)) allOk=false;
+      const meterOk = found===3 && allOk;
+      /* BEAT 2 — the provenance ink (dev/MODELING_STANDARDS.md §1). The three driven lines read
+         the assumptions panel, so they wear green; the typed units stay blue and the two lines
+         computed on this sheet stay black. The leave-alone guards are folded into this ok. */
+      let greenOk=true;
+      for(let i=0;i<3;i++) for(let j=0;j<o.NY;j++) if(cel(o.yc[j]+(o.hr+2+i)).fontColor!=='green') greenOk=false;
+      for(let j=0;j<o.NY;j++){ if(cel(o.yc[j]+(o.hr+1)).fontColor==='green') greenOk=false;
+        if(cel(o.yc[j]+(o.hr+5)).fontColor==='green') greenOk=false;
+        if(cel(o.yc[j]+(o.hr+6)).fontColor==='green') greenOk=false; }
+      /* BEAT 3 — the superseded figures gone, the column header left standing (R10 negative
+         space). Any clearing route qualifies; the header guard is what makes a column DELETE —
+         which would take a plan year with it — fail rather than pass by accident. */
+      const deadOk = [0,1,2].every(i=>typeof cel(o.cD+(o.pr+1+i)).value!=='number')
+                  && typeof cel(o.cD+o.pr).value==='string';
+      /* BEAT 4 — the contribution block. VALUE plus "the cell carries a formula", so every
+         formula shape clears and only a typed constant does not. */
+      let blockOk=true;
+      for(let j=0;j<o.NY;j++){
+        const w=o.rev[j]-o.cst[j]-o.roq[j];
+        const cC=cel(o.yc[j]+(o.hr+5)), cM=cel(o.yc[j]+(o.hr+6));
+        if(!cC.formula || !near(cC.value,w)) blockOk=false;
+        if(!cM.formula || !nearP(cM.value, w/o.rev[j])) blockOk=false;
       }
+      /* BEAT 5 — the §1.6 finish. bt OR ball, so Alt H B P, B D, B S and B A all clear. */
+      const dressOk = o.yc.every(cl=>{ const c=cel(cl+(o.hr+5)); return !!c.bold && !!(c.bt||c.ball); });
+      /* ☆ (§1.0(d) hidden efficiency + §1.0-R2(i) a distinct, skippable decision) — both seeds
+         placed in the FIRST plan year and ONE pass carrying both lines. Read off the r424
+         S.fillOps latch (the MECHANIC, never geometry inferred from the end state), so Ctrl+R
+         and the ribbon's Alt H F I R both earn it; two separate row fills, or ten typed
+         formulas, clear every core with the star dark (dev/e2e-alt-paths.js, entry 2). */
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='right' && f.r1<=o.hr+5 && f.r2>=o.hr+6 && f.c1<=o.c0+1 && f.c2>=o.c0+o.NY);
+      const starOk = blockOk && onePass;
+      /* §1.0-R2(g) ADAPTIVE LABELS: the driven lines are drawn per seed, so the ink beat names
+         THIS seed's three lines instead of making the player reverse-engineer which they are.
+         The ROUTE stays the player's (§1.0(c)) — nothing here names a chord. */
       return [
-        {label:'re-point revenue at the LIVE price \u2014 $B$4 \u00d7 units in every year (row 11)', ok:revOk},
-        {label:'re-point cost at the LIVE rate \u2014 $B$5 \u00d7 revenue in every year (row 12)', ok:costOk},
-        {label:'re-point royalty at the LIVE rate \u2014 $B$6 \u00d7 revenue in every year (row 13)', ok:royOk},
-        {label:'tie contribution to the v2 assumptions in every year (row 14)', ok:tieOk},
+        {label:'Find and repoint all 3 stale reads ('+found+'/3)', ok: meterOk},
+        {label:'Color the '+o.book.l1+', '+o.book.l2+' and '+o.book.l3+' lines green', ok: greenOk},
+        {label:'Clear the superseded v1 figures — the column header stays', ok: deadOk},
+        {label:'Build the contribution block — contribution and its margin, every year', ok: blockOk},
+        {label:'Bold the contribution line and add a top border above it', ok: dressOk},
+        {label:'Fill the contribution block from one corner — one pass covers both lines', ok: starOk, bonus:true},
       ];
     }
   },
 
   signerr:{
-    name:'Sign Sweep', label:'Flip the signs back', par:22, parKeys:20,
-    aha:'Costs are negative or the subtotals lie — sign convention is structure, not style.',
-    prompt:'Three cost cells were pasted in from a positive-convention source — this tab runs costs negative, so EBIT is overstated in three years. Sweep rows 5–7 for costs that lost their sign, flip them back, and confirm the fix: EBIT re-ties, and a margin row finishes the page.',
-    req(){ return 'costs carry their sign \u2014 <em>rows 5-7 all negative</em> \u00b7 EBIT sum-through re-ties every year (row 8) \u00b7 <em>B10:F10</em> margin \u2192 =B8/B4, filled, shown as % (<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>)'; },
-    guide:[
-      'scan rows 5-7 \u2014 three cost cells read POSITIVE \u00b7 retype each with its minus <kbd>\u21b5</kbd> (type-to-replace)',
-      'EBIT sums straight through (=SUM of rev + negative costs) \u2014 it re-ties the moment the signs are right',
-      'margin sign-off \u00b7 B10: <kbd>=</kbd>B8/B4 <kbd>\u21b5</kbd> \u00b7 select B10:F10, <kbd>ctrl</kbd>+<kbd>r</kbd>, then <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-    ],
-    targets:['B5:F7', 'B8:F8', 'B10:F10'],
-    demo(){
-      const moves=this._flips.map(cell=>({sel:cell, keys:[...T(String(-Math.abs(this._mag[cell]))), Kb.enter]}));
-      moves.push({sel:'B10', keys:[...T('=B8/B4'), Kb.enter]});
-      moves.push({sel:'B10:F10', keys:[Kb.fillR, Kb.pct]});
-      return moves;
-    },
+    /* r439 H6b (DEPTH_PASS §4.53, "Flip the signs back") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 (§1.0-R3 wins on conflict) and to dev/MODELING_STANDARDS.md §2,
+       which names this drill as the one that exists to teach the catalog's sign convention.
+
+       WAS: 3 checks on a 10-row board — three scattered positive cost cells flipped, an EBIT
+       line that graded itself (see below), and a margin row. par 22 / parKeys 20, ROWS=10.
+
+       ── RETIREMENT / MERGE TESTED FIRST (§1.0-R3(s) + the CAMPAIGN §2 two-part diagnostic) ──
+       Measured through the live engine on the SHIPPED board, every selection and navigation
+       KEYED, 5 seeds (dev/probe-shipped.js, deleted before commit):
+         PART 1 — fastest legal 40 keys (three flips typed, the margin one formula + a chord
+           grab + Ctrl+R + Ctrl+Shift+%) against 84 for the slow-but-sane route (the same flips,
+           five margin formulas typed out, the ribbon's Alt H P). Spread 2.1× — inside the
+           shipped band (lookup 3.0×, lookup2 2.2×) and well clear of the 1.3× line.
+         PART 2 — IS ANY OF IT ☆-LEGAL? Strip chord-vs-ribbon (Ctrl+R vs Alt H F I R,
+           Ctrl+Shift+% vs Alt H P, Ctrl+B vs Alt H 1 — §1.0(c) forces every one to clear) and
+           strip formatting (§1.0(d) forbids a formatting star outright, which is what kills the
+           page's own "Comma-format the flipped cells" bonus). What survives is 38 keys of
+           carrying-versus-typing on the derived line, and the paste-special arithmetic pass,
+           which is neither a chord alternative nor a format. Legal headroom exists. KEEP.
+       THE §3 DISCRIMINATOR, PROBED RATHER THAN ARGUED. The dangerous neighbour is `fxconvert`,
+       whose ☆ is already "Convert every inconsistent row in ONE Paste Special pass" and which
+       carries a "Make the Costs line negative" beat of its own. Walked: the fxconvert-fluent
+       move here — copy the −1 helper, select the whole cost block, Alt E S M — flips the
+       ELEVEN correct cells positive and leaves the meter at 0/3. Fluency in fxconvert produces
+       a WRONG first attempt here, which is the sumif/rollup shape (a trap that exists only as a
+       contrast), not the grpfold shape (a strict subset). The two boards also differ in kind:
+       fxconvert's wrong lines are named by the board's own labels, and the work is a UNIT
+       conversion; here the wrong figures are unlabelled and finding them IS the drill.
+
+       ── THE TWO FREE BEATS THAT WERE CUT ────────────────────────────────────────────────
+       The old check 2, "prove EBIT TRUE", read a live =SUM the board already shipped: it became
+       true the instant check 1 did, for zero player action. §1.1 forbids a do-nothing line. The
+       replacement is the finding this rework is built on and the one dev/MODELING_STANDARDS.md
+       §2 asks for — **a page pasted from the positive-convention deck arrives with a
+       positive-convention SUBTOTAL too**. The board ships EBIT as an explicit subtraction
+       chain, which was right while the costs were positive and is wrong the moment they are
+       not, so fixing the signs alone makes EBIT worse, not better. Flipping the figures and
+       re-laying the subtotal are one lesson with two hands.
+
+       ── THE BOARD (§1.3: a true 20 rows) ────────────────────────────────────────────────
+       A five-year operating page with three cost lines, a live Total costs line, EBIT, and a
+       margin line to build. One whole plan YEAR came in from a positive-convention deck: all
+       three of its cost cells read positive, so its Total costs reads positive, its EBIT is
+       overstated, and nothing else on the page is wrong. A labelled, populated sign-flip helper
+       sits under the table (§1.0(f) + §1.0-R2(l): light yellow, all borders, blue figure), and
+       the basis memo states the convention (dev/MODELING_STANDARDS.md §2 board rule).
+       13 of 20 rows carry content or scripted purpose at the win state — 65%.
+
+       ── STRUCTURAL DEVIATIONS from the §4.53 page, declared here per §0 ──────────────────
+       (1) ☆ RE-CUT (binding). The page's bonus is "Comma-format the flipped cells — parens show
+           the sign", which §1.0(d) outlaws as a formatting task and §1.0-R3(o) kills a second
+           time (Wolf on this exact op: "you anchored on the whole comma format hotkey but in
+           reality it's such a seldom used / rare hotkey"). The re-cut ☆ is the desk's own sign
+           sweep: the broken year's three cells multiplied by the helper in ONE arithmetic pass.
+           Read off the r424 S.pasteOpLog latch (the MECHANIC and its factor, never geometry
+           inferred), so Alt E S M and Alt H V S → M both earn it.
+       (2) THE THREE BREAKS NOW SHARE A YEAR rather than being scattered across rows 5–7. The
+           page's "rows 5-7 sweep zone stays" line predates §1.0-R2(i): scattered single cells
+           leave nothing for a one-pass move to cover, so the board could carry no legal star at
+           all, and three separate retypes measured only 4 keys against three separate paste
+           passes. A pasted column is also the honest story for how a whole year arrives in the
+           wrong convention. The hunt survives intact — WHICH year is the §1.2(d) axis.
+       (3) THE EBIT BEAT IS NEW (see the free-beat note above) and the margin beat splits into
+           build + dress, so the percent lands directly behind the line it dresses (§1.0(a)).
+
+       ── §1.0-R3(p) GRADE THE END STATE — ROUTES WALKED, NOT REASONED ABOUT ───────────────
+       · the signs grade VALUE only, so the helper pass, retyping "-1,240", typing the
+         accounting form "(1,240)" (the engine's paren branch commits it negative) and F2
+         surgery all clear identically.
+       · EBIT grades VALUE + "the cell carries a formula", so =SUM(…), an addition chain,
+         Alt+= autosum and revenue-plus-Total-costs all clear; only a typed constant does not.
+         Leaving the shipped subtraction chain in place does NOT clear, which is the point.
+       · the margin grades VALUE + a formula, and its dress grades percent + one decimal — so
+         Ctrl+1 P (which lands one decimal outright), Alt H P and Ctrl+Shift+% (which land zero
+         and want one Alt H 0) all reach it, per the campaign's measured route table.
+       · the top border reads bt OR ball, so Alt H B P, B D, B S and B A all clear.
+       · NO cueCell (§1.0-R2(h)/§1.0-R3(q)) — there is no insert slot and no empty paste target
+         here, and marking the broken year in red would hand over the diagnosis, which IS the
+         work. The guided ring for the sign beat lands on the whole cost block, not on the
+         answer. */
+    name:'Sign Sweep', label:'Flip the signs back', par:35, parKeys:33, saveClose:true,   /* r439 §4.53 depth pass: par re-swept from scratch (was par 22 / parKeys 20 on the old 10-row board; 5-seed median 33 keys incl. the engine-appended Ctrl+S — the one-pass sign sweep is what makes the count small). See dev/AUDIT.md r439; par ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. */
+    aha:'a page pasted from the other convention brings its subtotal with it — flipping the figures without re-laying the sum leaves you further from right than you started.',
+    /* §1.5: the aha's MOMENT is beat 2 — EBIT gets WORSE the moment the signs come good, and
+       the only fix is to re-lay it as a line that adds through. */
+    prompt:'One plan year on this page came in from a deck that runs costs positive. This tab runs them negative, so that year’s cost lines, its total and its EBIT are all wrong — and the EBIT line itself was written to subtract, which was right for the deck it came from and is wrong here. Find the year, put its costs back on the house convention, re-lay EBIT as a line that adds straight through, and finish with the margin the page is read for.',
+    req(){ const o=this._o; return 'copy the helper <em>'+o.helper+'</em> · select the broken year’s three cost cells · <em>alt e s</em> → Multiply ↵ · seed <em>'+o.yc[0]+o.rEbit+'</em> <em>=SUM('+o.yc[0]+o.rRev+':'+o.yc[0]+(o.rRev+3)+')</em> · select <em>'+o.ebitRng+'</em> · <em>ctrl+r</em> · <em>ctrl+b</em> · <em>alt h b p</em> · seed <em>'+o.yc[0]+o.rMg+'</em> <em>=</em>EBIT/revenue · <em>ctrl+r</em> · <em>ctrl+1</em> → % · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'read the cost block across: four of the five years carry their costs negative and one does not, and its Total costs line reads positive with them. Copy the <b>'+o.helperLbl+'</b> helper at '+o.helper+' with <kbd>ctrl</kbd>+<kbd>c</kbd>, select that year’s three cost cells, then <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> → <b>Multiply</b> <kbd>↵</kbd>. Retyping each figure with its minus works, so does the accounting form <kbd>(</kbd>1,240<kbd>)</kbd> — the clock is the only difference. Do NOT sweep the whole block: eleven of those cells are already right and the pass would break them',
+      'EBIT was written to subtract, which is the other convention’s shape — once the costs are negative it double-counts them. Seed '+o.yc[0]+o.rEbit+' with <kbd>=SUM(</kbd>'+o.yc[0]+o.rRev+':'+o.yc[0]+(o.rRev+3)+')</kbd> <kbd>\u21b5</kbd> <kbd>↵</kbd> (<kbd>alt</kbd>+<kbd>=</kbd> proposes the same range), select '+o.ebitRng+' and <kbd>ctrl</kbd>+<kbd>r</kbd>. Revenue plus the signed costs is the same number by any route',
+      'the run is still selected — <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> lays the top border',
+      'seed '+o.yc[0]+o.rMg+' with <kbd>=</kbd>'+o.yc[0]+o.rEbit+'/'+o.yc[0]+o.rRev+' <kbd>↵</kbd>, select '+o.mgRng+', <kbd>ctrl</kbd>+<kbd>r</kbd>. Five typed quotients land the same page',
+      'the margin line is still selected — <kbd>ctrl</kbd>+<kbd>1</kbd> then <kbd>p</kbd> lands percent at one decimal in one move; <kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> and <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>%</kbd> land it at zero and want one <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> after',
+      '☆ the discovery: the broken year is three cells in a column, so one copied helper and one arithmetic pass turn all three at once. Retyping the three figures finishes the drill identically and forfeits the star',
+    ]; },
+    /* rings: ① the whole cost block (never the answer) · ② the EBIT line · ③ the same line,
+       now dressed · ④ the margin line · ⑤ the same line · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.costRng, o.ebitRng, o.ebitRng, o.mgRng, o.mgRng, null]; },
+    demo(){ const o=this._o; const y=o.yc[0], bc=o.yc[o.bad];
+      return [
+        /* ☆ — one copied helper, one arithmetic pass over the broken year's three cost cells */
+        {sel:o.helper, keys:[Kb.copy]},
+        {sel:bc+o.rCost1+':'+bc+(o.rCost1+2), keys:[Kb.alt,L('e'),L('s'),L('m'),Kb.enter]},
+        {sel:y+o.rEbit, keys:[...T('=SUM('+y+o.rRev+':'+y+(o.rRev+3)+')'), Kb.enter]},
+        {sel:o.ebitRng, keys:[Kb.fillR, Kb.bold, Kb.alt,L('h'),L('b'),L('p')]},
+        {sel:y+o.rMg, keys:[...T('='+y+o.rEbit+'/'+y+o.rRev), Kb.enter]},
+        {sel:o.mgRng, keys:[Kb.fillR, {key:'1',ctrl:true}, L('p')]},
+      ];
+    },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 P&L (pasted from a positive-convention deck \u2014 fix the signs)',txt:true,bold:true};
-      const y0=23+rnd(0,2);
-      cells['A3']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
-      for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
-      cells['A4']={...blankCell(),value:'Revenue',txt:true};
-      cells['A5']={...blankCell(),value:'COGS',txt:true};
-      cells['A6']={...blankCell(),value:'Opex',txt:true};
-      cells['A7']={...blankCell(),value:'D&A',txt:true};
-      cells['A8']={...blankCell(),value:'EBIT',txt:true,bold:true};
-      cells['A10']={...blankCell(),value:'EBIT margin',txt:true};
-      // three flips, three DIFFERENT columns (never stacked \u2014 each break reads alone)
-      const flipCols=[2,3,4,5,6].sort(()=>_rand()-.5).slice(0,3);
-      const flips=flipCols.map(c=>colLetter(c)+(5+rnd(0,2)));
-      this._flips=flips; this._mag={}; this._truth={};
-      for(let c=2;c<=6;c++){
-        const Lc=colLetter(c);
-        const rev=rnd(200,900)*5;
-        const costs={5:-rnd(80,300)*5, 6:-rnd(40,200)*5, 7:-rnd(10,60)*5};
-        cells[Lc+'4']={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        let disp=rev;
-        for(const r of [5,6,7]){
-          const flipped=flips.includes(Lc+r);
-          const v=flipped ? Math.abs(costs[r]) : costs[r];
-          if(flipped) this._mag[Lc+r]=Math.abs(costs[r]);
-          cells[Lc+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
-          disp+=v;
-        }
-        this._truth[Lc]=rev+costs[5]+costs[6]+costs[7];
-        cells[Lc+'8']={...blankCell(),formula:'=SUM('+Lc+'4:'+Lc+'7)',value:disp,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      /* §1.2 randomization — four independent axes: (a) SITE, a 3-spot pool moving the page in
+         both axes; (b) CONTENT, four parallel cost-line sets plus the codename; (c) VALUES,
+         every figure through rnd(); (d) WHICH-YEAR-IS-BROKEN, the plan year that arrived in the
+         other convention, drawn from all five. Geometry is constant across seeds (five plan
+         years, three cost lines) so the keystroke count never moves with the draw. */
+      const SETS=[
+        {seg:'Operating', c:['COGS','Opex','D&A']},
+        {seg:'Platform',  c:['Cost of revenue','Sales & marketing','Research & development']},
+        {seg:'Services',  c:['Staff cost','Occupancy','Professional fees']},
+        {seg:'Industrial',c:['Materials','Manufacturing overhead','Distribution']},
+      ];
+      const st=SETS[rnd(0,SETS.length-1)];
+      const spots=[{c0:1,hr:3},{c0:2,hr:3},{c0:1,hr:4}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const c0=sp.c0, hr=sp.hr, NY=5;
+      const cL=colLetter(c0);
+      const yc=[]; for(let j=0;j<NY;j++) yc.push(colLetter(c0+1+j));
+      const y0=rnd(2025,2030);
+      const rRev=hr+1, rCost1=hr+2, rTot=hr+5, rEbit=hr+6, rMg=hr+8, rHelp=hr+10;
+      cells[cL+'1']={...blankCell(),value:codename()+' — '+st.seg+' plan (one year arrived on the other sign convention)',txt:true,bold:true};
+      cells[cL+hr]={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
+      for(let j=0;j<NY;j++) cells[yc[j]+hr]={...blankCell(),value:'FY'+(y0+j),txt:true,bold:true,align:'r'};
+      cells[cL+rRev]={...blankCell(),value:'Revenue',txt:true};
+      st.c.forEach((lab,i)=>{ cells[cL+(rCost1+i)]={...blankCell(),value:lab,txt:true}; });
+      cells[cL+rTot]={...blankCell(),value:'Total costs',txt:true};
+      cells[cL+rEbit]={...blankCell(),value:'EBIT',txt:true,bold:true};
+      cells[cL+rMg]={...blankCell(),value:'EBIT margin',txt:true};
+      const bad=rnd(0,NY-1);                                   // §1.2(d): the year that came in positive
+      const rev=[], cost=[];
+      for(let j=0;j<NY;j++){
+        const Lc=yc[j];
+        /* figures sized the way a $000s plan page really is ($12–45mm of revenue). Deliberate,
+           and MEASURED: at the old 4-digit scale the ☆'s own scope was 8 keys against 15 for
+           retyping the three figures — the r438 `series` warning zone. At this scale it is 8
+           against 24. Fixed at the BOARD, never at the predicate. */
+        const rv=rnd(2400,9000)*5;
+        const cs=[-rnd(900,3000)*5, -rnd(500,1900)*5, -rnd(120,600)*5];
+        rev.push(rv); cost.push(cs);
+        cells[Lc+rRev]={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        for(let i=0;i<3;i++) cells[Lc+(rCost1+i)]={...blankCell(),value:(j===bad?Math.abs(cs[i]):cs[i]),fontColor:'blue',fmtStyle:'comma',decimals:0};
+        /* Total costs ships LIVE and ships CORRECT — it is not a beat, it is the payoff: the
+           broken year's total reads positive on load and turns the moment the signs do. */
+        cells[Lc+rTot]={...blankCell(),formula:'=SUM('+Lc+rCost1+':'+Lc+(rCost1+2)+')',
+          value:(j===bad?-1:1)*(cs[0]+cs[1]+cs[2]),fmtStyle:'comma',decimals:0};
+        /* EBIT ships as the OTHER convention's subtraction chain — right for the deck it came
+           from, wrong here, and wrong by MORE once the costs go negative. */
+        cells[Lc+rEbit]={...blankCell(),formula:'='+Lc+rRev+'-'+Lc+rCost1+'-'+Lc+(rCost1+1)+'-'+Lc+(rCost1+2),
+          value:rv - (j===bad?Math.abs(cs[0]):cs[0]) - (j===bad?Math.abs(cs[1]):cs[1]) - (j===bad?Math.abs(cs[2]):cs[2]),
+          fmtStyle:'comma',decimals:0};   /* ships UNBOLD and unruled — the dress is a graded beat, and a beat that is already true on load is not a beat (§1.0-R3(p)) */
+        /* the margin line ships EMPTY and UNFORMATTED — its dress is a graded beat, so it must
+           not arrive already wearing the answer (§1.0-R3(p): a beat that is true on load is not
+           a beat at all). */
+        cells[Lc+rMg]={...blankCell()};
       }
-      return {ROWS:10, cells, active:{r:5,c:2}, sel:null, colW:{1:110}};
+      /* §1.0(f) INPUT CONVENTION + §1.0-R2(l) HELPER STACK: populated, individually labelled in
+         the column beside it, light yellow + all borders + blue figure, so it reads as a tool. */
+      const helperLbl='Sign flip (×−1)';
+      cells[cL+rHelp]={...blankCell(),value:helperLbl,txt:true};
+      cells[colLetter(c0+1)+rHelp]={...blankCell(),value:-1,fontColor:'blue',fill:'yellow',ball:true,align:'c'};
+      /* §1.3 density + the dev/MODELING_STANDARDS.md §2 board rule: the page STATES its sign
+         convention. Story only — checks() reads the table, so deleting a memo moves no ok. */
+      cells[cL+(rHelp+2)]={...blankCell(),value:'Basis: fiscal years, $ in thousands',txt:true,it:true,fontColor:'gray'};
+      cells[cL+(rHelp+3)]={...blankCell(),value:'Convention: costs carry their sign — the page adds straight through to EBIT',txt:true,it:true,fontColor:'gray'};
+      cells[cL+(rHelp+4)]={...blankCell(),value:'Source: figures as received; one plan year came from a positive-convention deck',txt:true,it:true,fontColor:'gray'};
+      this._o={ c0, hr, NY, yc, y0, bad, rev, cost, rRev, rCost1, rTot, rEbit, rMg,
+        set:st, helperLbl, helper:colLetter(c0+1)+rHelp,
+        costRng: yc[0]+rCost1+':'+yc[NY-1]+(rCost1+2),
+        ebitRng: yc[0]+rEbit+':'+yc[NY-1]+rEbit,
+        mgRng  : yc[0]+rMg+':'+yc[NY-1]+rMg };
+      const colW={}; if(c0>1) colW[c0-1]=22;
+      colW[c0]=196; for(let j=0;j<NY;j++) colW[c0+1+j]=88;
+      return {ROWS:20, cells, active:{r:rCost1,c:c0+1}, sel:null, colW};
     },
     checks(S){
-      let signOk=true, ebitOk=true, mgOk=true;
-      for(let c=2;c<=6;c++){ const Lc=colLetter(c);
-        for(const r of [5,6,7]){ const x=S.cells[Lc+r];
-          if(!x || typeof x.value!=='number' || x.value>=0) signOk=false; }
-        const e=S.cells[Lc+'8'];
-        const fe=(e&&e.formula)?e.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        if(!fe || fe.indexOf(Lc+'4:'+Lc+'7')<0 || Math.abs(((e&&e.value)||0)-this._truth[Lc])>1e-6) ebitOk=false;
-        const m=S.cells[Lc+'10'];
-        const fm=(m&&m.formula)?m.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        const rev=(S.cells[Lc+'4']||{}).value||1;
-        if(!fm || fm.indexOf(Lc+'8')<0 || fm.indexOf(Lc+'4')<0 || (m&&m.fmtStyle)!=='percent'
-           || Math.abs(((m&&m.value)||0)-this._truth[Lc]/rev)>1e-6) mgOk=false;
-      }
+      const o=this._o, cel=k=>S.cells[k]||{};
+      const near=(a,b)=>typeof a==='number' && Math.abs(a-b)<=0.5;
+      const nearP=(a,b)=>typeof a==='number' && Math.abs(a-b)<=1e-6;
+      /* BEAT 1 — the meter. VALUE only (§1.0(c)): the helper pass, a retyped minus, the
+         accounting parens and F2 surgery are one end state. `found` counts the three planted
+         cells; the eleven already-correct cells are the leave-alone guard, folded into this ok
+         rather than shipped as a do-nothing line (§1.1), so a whole-block sweep — the
+         fxconvert-fluent first attempt — reads 0/3 instead of quietly passing. */
+      const cellOk=(i,j)=>near(cel(o.yc[j]+(o.rCost1+i)).value, o.cost[j][i]);
+      let wrong=0; for(let j=0;j<o.NY;j++) for(let i=0;i<3;i++) if(!cellOk(i,j)) wrong++;
+      const signOk = wrong===0;
+      /* the COUNTER reads the WHOLE cost block, not just the three planted cells, so the
+         fxconvert-fluent block sweep — which does turn the three but breaks eleven — cannot
+         drive the meter to 3/3 while the line stays dark. Three wrong on load, none at the end. */
+      const found=Math.max(0, 3-wrong);
+      const meterOk = found===3 && signOk;
+      /* BEAT 2 — EBIT re-laid as a line that adds through. VALUE + "the cell carries a
+         formula", so every honest shape clears and the shipped subtraction chain does not. */
+      let ebitOk=true;
+      for(let j=0;j<o.NY;j++){ const c=cel(o.yc[j]+o.rEbit);
+        const w=o.rev[j]+o.cost[j][0]+o.cost[j][1]+o.cost[j][2];
+        if(!c.formula || !near(c.value,w)) ebitOk=false; }
+      /* BEAT 3 — the §1.0(a) dress, directly behind the line it dresses. bt OR ball. */
+      const dressOk = o.yc.every(cl=>{ const c=cel(cl+o.rEbit); return !!c.bold && !!(c.bt||c.ball); });
+      /* BEAT 4 — the margin, VALUE + a formula. */
+      let mgOk=true;
+      for(let j=0;j<o.NY;j++){ const c=cel(o.yc[j]+o.rMg);
+        const w=(o.rev[j]+o.cost[j][0]+o.cost[j][1]+o.cost[j][2])/o.rev[j];
+        if(!c.formula || !nearP(c.value,w)) mgOk=false; }
+      /* BEAT 5 — percent at one decimal, whichever of the three routes got there. */
+      const pctOk = mgOk && o.yc.every(cl=>{ const c=cel(cl+o.rMg); return c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      /* ☆ (§1.0(d) hidden efficiency + §1.0-R2(i) a distinct, skippable decision) — the broken
+         year turned in ONE arithmetic pass off the copied helper. Read off the r424
+         S.pasteOpLog latch, which records the op, the rect and the single-cell factor — the
+         MECHANIC, never geometry inferred — so Alt E S M and Alt H V S → M both earn it, and
+         divide-by-−1 lands the same end state and counts too. Three separate retypes clear
+         every core with the star dark (dev/e2e-alt-paths.js, entry 2). */
+      const bc=o.c0+1+o.bad;
+      const onePass=(S.pasteOpLog||[]).some(p=>p.k===-1 && (p.op==='multiply'||p.op==='divide')
+        && p.r1<=o.rCost1 && p.r2>=o.rCost1+2 && p.c1<=bc && p.c2>=bc);
+      const starOk = meterOk && onePass;
       return [
-        {label:'flip the costs negative \u2014 COGS, Opex and D&A in every year (rows 5-7)', ok:signOk},
-        {label:'prove EBIT TRUE \u2014 the sum-through equals revenue less real costs, every year (row 8)', ok:ebitOk},
-        {label:'run the margin row live and % \u2014 EBIT \u00f7 revenue across all five years (row 10)', ok:mgOk},
+        {label:'Find and flip all 3 wrong-sign costs ('+found+'/3)', ok: meterOk},
+        {label:'Total the EBIT line — revenue and the signed costs, every year', ok: ebitOk},
+        {label:'Bold the EBIT line and add a top border above it', ok: dressOk},
+        {label:'Build the EBIT margin — EBIT against revenue, every year', ok: mgOk},
+        {label:'Percent-format the margin line — one decimal', ok: pctOk},
+        {label:'Flip the broken year in one pass — no figure retyped', ok: starOk, bonus:true},
       ];
     }
   },
@@ -11034,71 +11387,246 @@ const CHALLENGES = {
   },
 
   versionup:{
-    name:'Roll-forward prep', label:'Rebuild the hardcoded rows', par:33, parKeys:32,
-    aha:'A hardcode freezes yesterday — relink it (=), then bulk-rename the version tag (Ctrl+H) so the whole page reads v2.',
-    prompt:'A five-year operating build where someone typed the answers: growth, gross profit, EBITDA, and the margin are all hardcoded — right today, wrong the moment an input moves. Rebuild every derived row as a live formula and fill each across — the page lands on the same numbers, now computed instead of typed.',
-    req(){ return '<em>C5:F5</em> growth \u2192 =C4/B4-1, fill \u00b7 <em>B7:F7</em> GP \u2192 =B4+B6 \u00b7 <em>B9:F9</em> EBITDA \u2192 =B7+B8 \u00b7 <em>B10:F10</em> margin \u2192 =B9/B4 \u00b7 stamp it v2 (<em>ctrl+h</em> v1 \u2192 v2) \u00b7 costs carry their sign \u2014 subtotals are clean sums'; },
-    guide:[
-      'growth row is typed \u00b7 C5: <kbd>=</kbd>C4/B4-1 <kbd>\u21b5</kbd> \u00b7 select C5:F5, <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'gross profit is typed \u00b7 B7: <kbd>=</kbd>B4+B6 <kbd>\u21b5</kbd> \u2014 COGS is negative; adding it IS subtracting \u00b7 fill B7:F7',
-      'EBITDA is typed \u00b7 B9: <kbd>=</kbd>B7+B8 <kbd>\u21b5</kbd> \u00b7 fill B9:F9',
-      'margin is typed \u00b7 B10: <kbd>=</kbd>B9/B4 <kbd>\u21b5</kbd> \u00b7 fill B10:F10 \u2014 values must NOT move',
-      'stamp it v2: <kbd>ctrl</kbd>+<kbd>h</kbd> \u00b7 find <b>v1</b> <kbd>tab</kbd> replace <b>v2</b> <kbd>\u21b5</kbd> \u2014 one pass renames every version tag on the page',
-    ],
-    targets:['C5:F5','B7:F7','B9:F9','B10:F10','A12:A13'],
-    demo(){ return [
-      {sel:'C5', keys:[...T('=C4/B4-1'), Kb.enter]}, {sel:'C5:F5', keys:[Kb.fillR]},
-      {sel:'B7', keys:[...T('=B4+B6'), Kb.enter]},  {sel:'B7:F7', keys:[Kb.fillR]},
-      {sel:'B9', keys:[...T('=B7+B8'), Kb.enter]},  {sel:'B9:F9', keys:[Kb.fillR]},
-      {sel:'B10', keys:[...T('=B9/B4'), Kb.enter]}, {sel:'B10:F10', keys:[Kb.fillR]},
-      {sel:'A1', keys:[{key:'h',ctrl:true,code:'KeyH'}, {key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'}, Kb.enter]},
+    /* r439 H6b (DEPTH_PASS §4.54, "Replace hardcodes so it rolls forward") — the depth-pass
+       rework, built to §1.0 + §1.0-R2 + §1.0-R3 (§1.0-R3 wins on conflict) and, above all, to
+       dev/MODELING_STANDARDS.md §1's corollary, which names this drill as its owner:
+       "NO HARDCODES INSIDE FORMULAS. =B5*1.03 is wrong; the 1.03 belongs in a labelled blue
+       input cell and the formula reads =B5*(1+$B$2)."
+
+       WAS: 4 typed-out rows retyped as live formulas plus the v1→v2 stamp, on a 13-row board.
+       par 33 / parKeys 32, ROWS=13.
+
+       ── THE FINDING THAT REBUILT THE BOARD: `hunt` vs `versionup`, PROBED NOT ARGUED ───────
+       The campaign §3 discriminator asks whether fluency in one produces a CORRECT first
+       attempt at the other. On the OLD board the answer was yes and the overlap was real:
+       `hunt` marks typed-over cells with F5 → Special → Constants and relinks them to formulas;
+       the old versionup asked for exactly that, four rows at a time, so hunt's instrument found
+       hunt's crime here too and the drills differed only in scale.
+       The fix is the one dev/MODELING_STANDARDS.md points at: the crime here is not a typed
+       CELL, it is a typed NUMBER INSIDE A LIVE FORMULA. Every derived cell on this board is a
+       formula, it is black, it computes, and **F5 → Special → Constants cannot see it** — that
+       ritual marks only cells with no formula, so on this board it lights the assumptions
+       panel and the two typed input lines and says nothing at all about the four buried rates.
+       A hunt-fluent player's first attempt returns a page that looks clean. That is an
+       INVERTING contrast (the sumif/rollup shape), not containment (the grpfold shape), and it
+       is measured rather than asserted: run the ritual on this board and every mark it leaves
+       is a cell that is SUPPOSED to be a constant.
+       (Probed and recorded, but NOT acted on: `hunt` is being reworked in parallel by another
+       agent and is not touched here.)
+
+       ── RETIREMENT / MERGE DIAGNOSTIC (§1.0-R3(s) + the CAMPAIGN §2 two-part test) ─────────
+       Measured on the SHIPPED board through the live engine, every selection and navigation
+       KEYED, 5 seeds (dev/probe-shipped.js / probe-shipped2.js, deleted before commit):
+         PART 1 — fastest legal 118 keys against 255 for the slow-but-sane route (every derived
+           cell typed out, both tag lines retyped). Spread 2.2×, inside the shipped band.
+         PART 2 — IS ANY OF IT ☆-LEGAL? Strip chord-vs-ribbon and formatting, and the two things
+           left standing are both real: carrying a row across from one formula instead of five,
+           and the version stamp. The stamp was measured IN ISOLATION, the r438 `series` rule:
+           the same run with Ctrl+H replaced by retyping the tag lines came in at 186 keys
+           against 118 — **68 keys, on a half worth 7 keys to do right**. Strongly positive, and
+           unowned: `versionup` is the only drill in the catalog that reaches find-and-replace
+           (refmap.js maps CTRL+H here). KEEP.
+
+       ── THE BOARD (§1.3: a true 20 rows) ─────────────────────────────────────────────────
+       A five-year operating build that computes correctly and cannot be rolled forward: the
+       growth rate and two cost rates are typed INSIDE the formulas, while the assumptions panel
+       above carries the v2 rates, populated and labelled, read by nothing. Repointing the
+       formulas at the panel MOVES THE NUMBERS — the page lands on the v2 answer — so the proof
+       that the page now rolls forward is native rather than asserted. 15 of 20 rows carry
+       content or scripted purpose at the win state — 75%.
+
+       ── STRUCTURAL DEVIATIONS from the §4.54 page, declared here per §0 ──────────────────
+       (1) THE CRIME CHANGES from typed ROWS to typed NUMBERS INSIDE LIVE FORMULAS, for the
+           hunt-overlap reason above and because that is the corollary the standards doc assigns
+           to this drill by name. The page's flagged line ("match v1 exactly") disappears with
+           it: the values are SUPPOSED to move, and that movement is the beat.
+       (2) ☆ RE-CUT (binding). The page's bonus is "Color the four rebuilt rows black — live
+           formulas, no blue", a formatting task, dead under §1.0(d). The re-cut ☆ is the
+           measured 68-key half above: every version tag renamed in ONE find-and-replace pass.
+           Read off the new S.frLog latch (the MECHANIC and its replacement count, never
+           inferred from the end state), so the beat itself stays route-blind — retyping each
+           tag clears the core and forfeits the star.
+       (3) A PROVENANCE BEAT JOINS (§1.0-R3(o) ranks font colour explicitly): the panel arrives
+           un-inked, and colouring it blue is what makes it read as an input block. Declared
+           deliberately: the board SHIPS in a state that violates the ink law, which is the
+           whole premise of an audit-chapter drill.
+
+       ── §1.0-R3(p) GRADE THE END STATE — ROUTES WALKED, NOT REASONED ABOUT ───────────────
+       · every repoint grades "the formula mentions its panel input" + VALUE. Any shape clears —
+         =B*(1+$g$), =B+B*$g$, point mode, a per-year formula typed five times — and the value
+         is what enforces the ANCHOR without ever grading anchor TEXT: an unanchored reference
+         walks off the panel when the row is filled and the years come out wrong, visibly.
+       · blue: fontColor==='blue', reachable by Alt H F C → the Blue swatch and by
+           Alt H J → Input (the Cell Styles gallery). Both walked, both clear.
+       · the tags grade the page's TEXT — no cell reads v1 and the three tag cells read v2 — so
+         Ctrl+H, retyping each line and F2 surgery all clear.
+       · the top border reads bt OR ball, so Alt H B P, B D, B S and B A all clear.
+       · NO cueCell (§1.0-R2(h)/§1.0-R3(q)): no insert slot, no empty paste target. */
+    name:'Roll-forward prep', label:'Replace hardcodes so it rolls forward', par:48, parKeys:46, saveClose:true,   /* r439 §4.54 depth pass: par re-swept from scratch (was par 33 / parKeys 32 on the old 13-row board; 5-seed median 46 keys incl. the engine-appended Ctrl+S). See dev/AUDIT.md r439; par ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. */
+    aha:'a rate typed inside a formula is invisible to every hardcode hunt there is — it looks like a live cell, and it freezes the page anyway.',
+    /* §1.5: the aha's MOMENT is beat 1 — the revenue line MOVES when it finally reads the panel,
+       which is the first proof that it had been computing off a number nobody could see. */
+    prompt:'This build computes, and it cannot be rolled forward: the growth rate and both cost rates are typed inside the formulas, so the page is frozen on last version’s assumptions. The v2 rates are already sitting in the panel above, labelled and read by nothing. Put every derived line onto the panel, ink the panel as the input block it now is, stamp the page v2 and hand it on. The numbers are supposed to move — that movement is the proof.',
+    req(){ const o=this._o; return 'seed <em>'+o.yc[1]+o.rRev+'</em> <em>='+o.yc[0]+o.rRev+'*(1+$'+o.cV+'$'+(o.pr+1)+')</em> · fill right · same for both rate lines off <em>$'+o.cV+'$'+(o.pr+2)+'</em> / <em>$'+o.cV+'$'+(o.pr+3)+'</em> · select <em>'+o.panelRng+'</em> · <em>alt h j</em> → Input ↵ · <em>ctrl+h</em> v1 <em>tab</em> v2 ↵ · select <em>'+o.ebitRng+'</em> · <em>ctrl+b</em> · <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'open any year of the '+o.lblRev+' line: the growth rate is typed into the formula, so the panel’s '+o.lblG+' cell drives nothing. Seed '+o.yc[1]+o.rRev+' with <kbd>=</kbd>'+o.yc[0]+o.rRev+'<kbd>*(1+</kbd>$'+o.cV+'$'+(o.pr+1)+'<kbd>)</kbd> <kbd>↵</kbd> — <kbd>F4</kbd> on the panel reference locks it — then select '+o.revRng+' and <kbd>ctrl</kbd>+<kbd>r</kbd>. An unlocked reference walks off the panel as it fills and the later years come out wrong',
+      'the '+o.ratioA+' and '+o.ratioB+' lines bury their rates the same way. Seed each line’s first year off its panel cell — locked — and fill across. Costs stay negative here, so the formula carries the minus (<kbd>=-</kbd>'+o.yc[0]+o.rRev+'<kbd>*</kbd>$'+o.cV+'$'+(o.pr+2)+'). Typing all five years by hand lands the same page',
+      'select the panel figures '+o.panelRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> → <b>Input</b> <kbd>↵</kbd> inks them blue (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> then four <kbd>→</kbd> to Blue is the same colour from the swatch row)',
+      '<kbd>ctrl</kbd>+<kbd>h</kbd> · find <b>v1</b> <kbd>tab</kbd> replace <b>v2</b> <kbd>↵</kbd> — with a single cell active it sweeps the whole sheet, so the title and both footnotes move together. Retyping each line works too',
+      'select '+o.ebitRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> lays the top border',
+      '☆ the discovery: every version tag on the page goes in ONE find-and-replace pass. Retyping the three lines finishes the drill identically and forfeits the star — the clock is the only thing that tells you what it cost',
     ]; },
+    /* rings: ① the revenue line · ② the two rate lines · ③ the panel · ④ the tag block ·
+       ⑤ the EBITDA line · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.revRng, o.ratioRng, o.panelRng, o.tagRng, o.ebitRng, null]; },
+    demo(){ const o=this._o; const y0c=o.yc[0], y1c=o.yc[1];
+      const g='$'+o.cV+'$'+(o.pr+1);
+      const mk=(i)=>{ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
+        return [{sel:y0c+r, keys:[...T('=-'+y0c+o.rRev+'*'+ref), Kb.enter]},
+                {sel:o.yc[0]+r+':'+o.yc[o.NY-1]+r, keys:[Kb.fillR]}]; };
+      return [
+        {sel:y1c+o.rRev, keys:[...T('='+y0c+o.rRev+'*(1+'+g+')'), Kb.enter]},
+        {sel:o.revRng, keys:[Kb.fillR]},
+        ...mk(0), ...mk(1),
+        {sel:o.panelRng, keys:[Kb.alt,L('h'),L('j'),{key:'ArrowRight'},Kb.enter]},
+        /* ☆ — one pass renames every version tag on the page */
+        {sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},Kb.enter]},
+        {sel:o.ebitRng, keys:[Kb.bold, Kb.alt,L('h'),L('b'),L('p')]},
+      ];
+    },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Operating build v1 (hardcoded \u2014 fix for v2)',txt:true,bold:true};
-      const y0=23+rnd(0,2);
-      cells['A3']={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
-      for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
-      const rows=[[4,'Revenue',1],[6,'COGS',1],[8,'Opex',1]];
-      cells['A4']={...blankCell(),value:'Revenue',txt:true};
-      cells['A5']={...blankCell(),value:'Growth %',txt:true};
-      cells['A6']={...blankCell(),value:'COGS',txt:true};
-      cells['A7']={...blankCell(),value:'Gross profit',txt:true,bold:true};
-      cells['A8']={...blankCell(),value:'Opex',txt:true};
-      cells['A9']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      cells['A10']={...blankCell(),value:'EBITDA margin',txt:true};
-      for(let c=2;c<=6;c++){ const L2=colLetter(c);
-        cells[L2+'4']={...blankCell(),value:rnd(150,420)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[L2+'6']={...blankCell(),value:-rnd(50,160)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[L2+'8']={...blankCell(),value:-rnd(30,110)*5,fontColor:'blue',fmtStyle:'comma',decimals:0}; }   // r174: costs live negative
-      for(let c=2;c<=6;c++){ const L2=colLetter(c), P=colLetter(c-1);
-        const rev=cells[L2+'4'].value, cogs=cells[L2+'6'].value, opex=cells[L2+'8'].value;
-        if(c>2) cells[L2+'5']={...blankCell(),value:rev/cells[P+'4'].value-1,fmtStyle:'percent',decimals:1};
-        cells[L2+'7']={...blankCell(),value:rev+cogs,fmtStyle:'comma',decimals:0,bold:true};
-        cells[L2+'9']={...blankCell(),value:rev+cogs+opex,fmtStyle:'comma',decimals:0,bold:true};
-        cells[L2+'10']={...blankCell(),value:(rev+cogs+opex)/rev,fmtStyle:'percent',decimals:1}; }
-      cells['A12']={...blankCell(),value:'Tag: v1 — supersede on roll-forward',txt:true,it:true};
-      cells['A13']={...blankCell(),value:'Footnotes cite the v1 basis',txt:true,it:true};
-      return {ROWS:13, cells, active:{r:5,c:3}, sel:null, colW:{1:132}};
+      /* §1.2 randomization — four independent axes: (a) SITE, a 3-spot pool moving the page in
+         both axes; (b) CONTENT, four parallel line-name sets plus the codename; (c) VALUES,
+         every rate and figure through rnd(), the buried rate always a real distance from the
+         panel's so the repoint visibly moves the page; (d) WHICH LINE IS NOT A RATIO — one of
+         the three cost lines is a straight typed input, and which one varies, so the two beats
+         that name lines are §1.0-R2(g) adaptive rather than memorisable. Geometry is constant
+         across seeds (five plan years, three cost lines) so the keystroke count never moves. */
+      const SETS=[
+        {seg:'Operating', rev:'Revenue',     c:['COGS','Opex','D&A']},
+        {seg:'Platform',  rev:'Revenue',     c:['Cost of revenue','Sales & marketing','R&D']},
+        {seg:'Services',  rev:'Fee revenue', c:['Staff cost','Occupancy','Prof. fees']},
+        {seg:'Industrial',rev:'Revenue',     c:['Materials','Overhead','Distribution']},
+      ];
+      const st=SETS[rnd(0,SETS.length-1)];
+      const spots=[{c0:1,pr:3},{c0:2,pr:3},{c0:1,pr:4}];
+      const sp=spots[rnd(0,spots.length-1)];
+      const c0=sp.c0, pr=sp.pr, hr=pr+5, NY=5;
+      const cL=colLetter(c0), cV=colLetter(c0+1);
+      const yc=[]; for(let j=0;j<NY;j++) yc.push(colLetter(c0+1+j));
+      const y0=rnd(2025,2030);
+      const rRev=hr+1, rC1=hr+2, rEb=hr+5, rMg=hr+6;
+      const flat=rnd(0,2);                               // §1.2(d): which cost line is a typed input
+      const ratioIdx=[0,1,2].filter(i=>i!==flat);
+      const ratioRows=ratioIdx.map(i=>rC1+i);
+      /* the v2 assumptions — POPULATED and labelled (§1.0(f)/§1.0-R2(l)), light yellow + all
+         borders, and read by nothing until the player repoints the build at them. They ship
+         with BLACK ink deliberately: the page arrives violating the provenance law, which is
+         what beat 3 repairs. */
+      const g2=rnd(40,95)/1000, g1=Math.max(.005, g2 + (rnd(0,1)?1:-1)*rnd(15,32)/1000);
+      const rA2=rnd(300,470)/1000, rA1=Math.max(.08, rA2 + (rnd(0,1)?1:-1)*rnd(30,70)/1000);
+      const rB2=rnd(130,240)/1000, rB1=Math.max(.04, rB2 + (rnd(0,1)?1:-1)*rnd(20,50)/1000);
+      const rate2=[rA2,rB2], rate1=[rA1,rB1];
+      cells[cL+'1']={...blankCell(),value:codename()+' — '+st.seg+' build v1 (rates typed inside the formulas)',txt:true,bold:true};
+      cells[cL+pr]={...blankCell(),value:'Assumptions — v2',txt:true,bold:true};
+      const pLab=[st.rev+' growth', st.c[ratioIdx[0]]+' % of '+(st.rev==='Fee revenue'?'fees':'revenue'), st.c[ratioIdx[1]]+' % of '+(st.rev==='Fee revenue'?'fees':'revenue')];
+      const pVal=[g2, rA2, rB2];
+      for(let i=0;i<3;i++){ const r=pr+1+i;
+        cells[cL+r]={...blankCell(),value:pLab[i],txt:true};
+        cells[cV+r]={...blankCell(),value:pVal[i],fill:'yellow',ball:true,align:'c',fmtStyle:'percent',decimals:1}; }
+      cells[cL+hr]={...blankCell(),value:'Item ($000s)',txt:true,bold:true};
+      for(let j=0;j<NY;j++) cells[yc[j]+hr]={...blankCell(),value:'FY'+(y0+j),txt:true,bold:true,align:'r'};
+      cells[cL+rRev]={...blankCell(),value:st.rev,txt:true};
+      st.c.forEach((lab,i)=>{ cells[cL+(rC1+i)]={...blankCell(),value:lab,txt:true}; });
+      cells[cL+rEb]={...blankCell(),value:'EBITDA',txt:true};
+      cells[cL+rMg]={...blankCell(),value:'EBITDA margin',txt:true};
+      /* THE CRIME: every derived cell is a live formula with its rate typed INSIDE it. Nothing
+         here is a constant, so the constants ritual marks none of it (see the header note). */
+      const rev1=[], flatVals=[];
+      let v=rnd(150,420)*5;
+      for(let j=0;j<NY;j++){ rev1.push(v); v=v*(1+g1); }
+      for(let j=0;j<NY;j++){ const Lc=yc[j], P=yc[j-1];
+        if(j===0) cells[Lc+rRev]={...blankCell(),value:rev1[0],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        else cells[Lc+rRev]={...blankCell(),formula:'='+P+rRev+'*'+(1+g1),value:rev1[j],fmtStyle:'comma',decimals:0};
+        ratioIdx.forEach((ci,k)=>{ cells[Lc+(rC1+ci)]={...blankCell(),formula:'=-'+Lc+rRev+'*'+rate1[k],value:-rev1[j]*rate1[k],fmtStyle:'comma',decimals:0}; });
+        const fv=-rnd(20,70)*5; flatVals.push(fv);
+        cells[Lc+(rC1+flat)]={...blankCell(),value:fv,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      }
+      /* EBITDA and its margin ship LIVE and correct — they are not beats, they are the payoff:
+         both move the moment the build starts reading the panel. */
+      for(let j=0;j<NY;j++){ const Lc=yc[j];
+        const eb=rev1[j]-rev1[j]*rate1[0]-rev1[j]*rate1[1]+flatVals[j];
+        cells[Lc+rEb]={...blankCell(),formula:'=SUM('+Lc+rRev+':'+Lc+(rC1+2)+')',value:eb,fmtStyle:'comma',decimals:0};
+        cells[Lc+rMg]={...blankCell(),formula:'='+Lc+rEb+'/'+Lc+rRev,value:eb/rev1[j],fmtStyle:'percent',decimals:1}; }
+      /* the version tags — three of them, and the title is one, so a whole-sheet pass is a real
+         pass and not a one-cell edit wearing a chord. §1.3 density + a real desk artifact. */
+      cells[cL+(hr+8)]={...blankCell(),value:'Tag: v1 — supersede on roll-forward',txt:true,it:true,fontColor:'gray'};
+      cells[cL+(hr+9)]={...blankCell(),value:'Footnotes cite the v1 basis',txt:true,it:true,fontColor:'gray'};
+      cells[cL+(hr+10)]={...blankCell(),value:'Basis: fiscal years, $ in thousands; costs carry their sign',txt:true,it:true,fontColor:'gray'};
+      /* how many 'v1' occurrences the board ships (title + both tag lines) — the ☆ latch asks
+         for ONE pass that took them all, so the number is measured off the seeded cells rather
+         than assumed. */
+      let tagN=0; for(const k in cells){ const c=cells[k];
+        if(c && typeof c.value==='string') tagN += c.value.split('v1').length-1; }
+      this._o={ c0, pr, hr, cL, cV, yc, NY, y0, rRev, rC1, rEb, rMg, flat, ratioIdx, ratioRows, tagN,
+        g2, rate2, rev1, flatVals, set:st,
+        lblRev: st.rev, lblG: pLab[0], ratioA: st.c[ratioIdx[0]], ratioB: st.c[ratioIdx[1]],
+        revRng  : yc[1]+rRev+':'+yc[NY-1]+rRev,
+        ratioRng: yc[0]+Math.min(ratioRows[0],ratioRows[1])+':'+yc[NY-1]+Math.max(ratioRows[0],ratioRows[1]),
+        panelRng: cV+(pr+1)+':'+cV+(pr+3),
+        tagRng  : cL+(hr+8)+':'+cL+(hr+9),
+        ebitRng : yc[0]+rEb+':'+yc[NY-1]+rEb };
+      const colW={}; if(c0>1) colW[c0-1]=22;
+      colW[c0]=196; for(let j=0;j<NY;j++) colW[c0+1+j]=88;
+      return {ROWS:20, cells, active:{r:rRev,c:c0+2}, sel:null, colW};
     },
     checks(S){
-      const row=(r,f,refNeed)=>{ let ok=true;
-        for(let c=(r===5?3:2);c<=6;c++){ const L2=colLetter(c);
-          const x=S.cells[L2+r]; const want=f(c,L2);
-          if(!x||!x.formula||!(x.formula.replace(/\$/g,'').toUpperCase().includes(refNeed(L2)))||Math.abs((x.value||0)-want)>1e-6) ok=false; }
-        return ok; };
-      const V=(a)=>S.cells[a]?S.cells[a].value:0;
-      const gOk=row(5,(c,L2)=>V(L2+'4')/V(colLetter(c-1)+'4')-1,(L2)=>L2+'4');
-      const gpOk=row(7,(c,L2)=>V(L2+'4')+V(L2+'6'),(L2)=>L2+'6');
-      const eOk=row(9,(c,L2)=>V(L2+'7')+V(L2+'8'),(L2)=>L2+'8');
-      const mOk=row(10,(c,L2)=>V(L2+'9')/V(L2+'4'),(L2)=>L2+'9');
-      const tagOk=['A12','A13'].every(k=>{ const c=S.cells[k]; return c&&typeof c.value==='string'&&c.value.indexOf('v2')>=0&&c.value.indexOf('v1')<0; });
+      const o=this._o, cel=k=>S.cells[k]||{};
+      const near=(a,b)=>typeof a==='number' && Math.abs(a-b)<=0.5;
+      const F=k=>{ const c=cel(k); return c.formula?String(c.formula).toUpperCase().replace(/[\s$]/g,''):''; };
+      const hasRef=(f,key)=>new RegExp('(^|[^A-Z0-9])'+key+'([^0-9]|$)').test(f);
+      const pRef=i=>(o.cV+(o.pr+1+i)).toUpperCase();
+      /* the v2 answer the page lands on once it reads the panel */
+      const rev2=[]; { let v=o.rev1[0]; for(let j=0;j<o.NY;j++){ rev2.push(v); v=v*(1+o.g2); } }
+      /* BEAT 1 — the revenue roll-forward reads the growth input. Formula MENTIONS the panel
+         cell + VALUE, so every shape clears and only the anchor is enforced — implicitly, by
+         the value a walked reference would produce (§1.0-R3(p): no anchor TEXT is ever read). */
+      let revOk=true;
+      for(let j=1;j<o.NY;j++){ const k=o.yc[j]+o.rRev, f=F(k);
+        if(!f || !hasRef(f,pRef(0)) || !near(cel(k).value, rev2[j])) revOk=false; }
+      /* BEAT 2 — both ratio lines read their own rate input, every year including the first. */
+      let ratOk=true;
+      o.ratioIdx.forEach((ci,i)=>{ for(let j=0;j<o.NY;j++){ const k=o.yc[j]+(o.rC1+ci), f=F(k);
+        if(!f || !hasRef(f,pRef(1+i)) || !near(cel(k).value, -rev2[j]*o.rate2[i])) ratOk=false; } });
+      /* BEAT 3 — the provenance ink (dev/MODELING_STANDARDS.md §1): blue is a typed input. */
+      const blueOk=[0,1,2].every(i=>cel(o.cV+(o.pr+1+i)).fontColor==='blue');
+      /* BEAT 4 — the page's TEXT: no cell reads v1 anywhere, and the tag block reads v2. Any
+         route (Ctrl+H, retyping, F2 surgery) lands the same end state. */
+      let tagOk=true;
+      for(const k in S.cells){ const c=S.cells[k];
+        if(c && typeof c.value==='string' && c.value.indexOf('v1')>=0) tagOk=false; }
+      if(tagOk) tagOk=[o.hr+8,o.hr+9].every(r=>{ const c=cel(o.cL+r); return !!(c&&typeof c.value==='string'&&c.value.indexOf('v2')>=0); });
+      /* BEAT 5 — the §1.6 finish. bt OR ball, so every border route clears. */
+      const dressOk=o.yc.every(cl=>{ const c=cel(cl+o.rEb); return !!c.bold && !!(c.bt||c.ball); });
+      /* ☆ (§1.0(d) hidden efficiency + §1.0-R2(i) a distinct, skippable decision) — every
+         version tag renamed in ONE find-and-replace pass. Read off the r439 S.frLog latch,
+         which records each landed replace and how many occurrences it took, so the MECHANIC is
+         what earns it and the core beat above stays route-blind. Retyping the three lines
+         clears every core with the star dark (dev/e2e-alt-paths.js, entry 2). */
+      const onePass=(S.frLog||[]).some(e=>e.n>=o.tagN);
+      const starOk=tagOk && onePass;
+      /* §1.0-R2(g) ADAPTIVE LABELS: which two lines are ratio-driven is a seed fact, so beat 2
+         names THIS seed's pair instead of making the player reverse-engineer it. */
       return [
-        {label:'make growth a LIVE formula across all four years \u2014 no typed percents (C5:F5)', ok:gOk},
-        {label:'compute gross profit \u2014 revenue plus signed COGS, every year (B7:F7)', ok:gpOk},
-        {label:'compute EBITDA \u2014 gross profit plus signed opex, every year (B9:F9)', ok:eOk},
-        {label:'run the margin live \u2014 EBITDA \u00f7 revenue, rebuilt as a formula in every year (B10:F10)', ok:mOk},
-        {label:'stamp the roll-forward \u2014 bulk-rename v1 \u2192 v2 across the page (A12:A13)', ok:tagOk},
+        {label:'Repoint the '+o.lblRev+' line at the growth input — every plan year', ok: revOk},
+        {label:'Repoint the '+o.ratioA+' and '+o.ratioB+' lines at their rate inputs', ok: ratOk},
+        {label:'Color the three assumption inputs blue', ok: blueOk},
+        {label:'Set the version tags to v2 — no v1 left on the page', ok: tagOk},
+        {label:'Bold the EBITDA line and add a top border above it', ok: dressOk},
+        {label:'Fix every version tag in one pass', ok: starOk, bonus:true},
       ];
     }
   },
@@ -17398,6 +17926,17 @@ function doFindReplace(){
     cell.value = cell.value.split(findBuf).join(repBuf);
   }
   frCount=n;
+  /* r439 (DEPTH_PASS §4.54 ☆): FIND-AND-REPLACE LOG — one entry per landed pass, recording the
+     terms, the rect it swept and how many occurrences it took. Same telemetry family as
+     S.fillOps (r424) / S.grabLog (r427) / S.fmtOps (r429) / S.multiEnter (r433) / S.sortLog
+     (r436) / S.foldN (r437) / S.seriesLog (r438): the MECHANIC is recorded, never inferred from
+     the end state, because a bulk rename and three hand-retyped lines leave an identical sheet
+     behind. Read by versionup's mystery ☆ only — no core check may ever require it (§1.0(c)),
+     and nothing engine-side reads it back. */
+  if(n>0 && typeof S!=='undefined' && S){
+    (S.frLog=S.frLog||[]).push({find:findBuf, rep:repBuf, n:n, r1:r1, c1:c1, r2:r2, c2:c2});
+    if(S.frLog.length>240) S.frLog.shift();
+  }
   if(n>0){ try{ showToast(n+' replaced'); }catch(e){} return exitRibbon(true); }
   try{ showToast('no matches'); }catch(e){}
   return exitRibbon(false);

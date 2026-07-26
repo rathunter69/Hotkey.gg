@@ -999,14 +999,30 @@ const ALTS = [
       {sel:'C7', keys:[...T('=B7-C4'),{key:'Enter'}]},
       {sel:'C7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'signerr', name: 'margin row laid BEFORE the flips (recalc re-ties), flips reversed, alt h p', moves: `C => {
-      const steps=[
-        {sel:'B10', keys:[...T('=B8/B4'),{key:'Enter'}]},
-        {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-        {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('p')]},
-      ];
-      C._flips.slice().reverse().forEach(cell=>steps.push({sel:cell, keys:[...T(String(-Math.abs(C._mag[cell]))),{key:'Enter'}]}));
-      return steps; }` },
+  /* r439: REPLACES the pre-depth-pass signerr alt, which drove the retired 10-row board by
+     hard-coded geometry (B10/B8/B4 and C._flips/C._mag, all gone with the rebuild). ALT 1 is the
+     chord-ROUTE + op-ORDER alt and EARNS the ☆ by the other paste-special door; ALT 2 is the
+     MEASURED negative control — every core clears with the ☆ dark. */
+  { key: 'signerr', name: 'margin and EBIT laid BEFORE the sweep, ribbon fills, the OTHER paste-special door (alt h v s) — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], bc=o.yc[o.bad];
+      return [
+        {sel:y+o.rMg, keys:[...T('='+y+o.rEbit+'/'+y+o.rRev),{key:'Enter'}]},
+        {sel:o.mgRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.mgRng, keys:[{key:'1',ctrl:true},L('p')]},
+        {sel:y+o.rEbit, keys:[...T('='+y+o.rRev+'+'+y+o.rCost1+'+'+y+(o.rCost1+1)+'+'+y+(o.rCost1+2)),{key:'Enter'}]},
+        {sel:o.ebitRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.ebitRng, keys:[{key:'Alt'},L('h'),D(1)]},
+        {sel:o.ebitRng, keys:[{key:'Alt'},L('h'),L('b'),L('d')]},
+        {sel:o.helper, keys:[{key:'c',ctrl:true}]},
+        {sel:bc+o.rCost1+':'+bc+(o.rCost1+2), keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('m'),{key:'Enter'}]},
+      ]; }` },
+  { key: 'signerr', name: 'NEGATIVE CONTROL — the three figures retyped in accounting parens, EBIT and margin typed year by year, alt h p + alt h 0: every core clears, ☆ DARK', moves: `C => { const o=C._o, bc=o.yc[o.bad], mv=[];
+      for(let i=0;i<3;i++) mv.push({sel:bc+(o.rCost1+i), keys:[...T('('+Math.abs(o.cost[o.bad][i])+')'),{key:'Enter'}]});
+      for(let j=0;j<o.NY;j++){ const Y=o.yc[j];
+        mv.push({sel:Y+o.rEbit, keys:[...T('=SUM('+Y+o.rRev+':'+Y+(o.rRev+3)+')'),{key:'Enter'}]});
+        mv.push({sel:Y+o.rMg,   keys:[...T('='+Y+o.rEbit+'/'+Y+o.rRev),{key:'Enter'}]}); }
+      mv.push({sel:o.ebitRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]});
+      mv.push({sel:o.mgRng,   keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]});
+      return mv; }` },
   { key: 'sourcesuses', name: 'check row FIRST, sources before uses, % columns last via ribbon fill down', moves: `C => [
       {sel:'B12', keys:[...T('=B10-B5'),{key:'Enter'}]},
       {sel:'B9',  keys:[...T('=B5-B7-B8'),{key:'Enter'}]},
@@ -1017,12 +1033,33 @@ const ALTS = [
       {sel:'C2',  keys:[...T('=B2/$B$5'),{key:'Enter'}]},
       {sel:'C2:C5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
     ]` },
-  { key: 'stalelink', name: 'stale refs re-pointed in REVERSE, operands swapped (units x price)', moves: `C => { const st=C._stale;
-      const mk=(cell)=>{ const Lc=cell[0], r=cell.slice(1);   // single-letter cols; regex escapes die inside template literals
-        const src=r==='11'?'$B$4':(r==='12'?'$B$5':'$B$6');
-        const dep=r==='11'?(Lc+'10'):(Lc+'11');
-        return {sel:cell, keys:[...T('='+dep+'*'+src),{key:'Enter'}]}; };
-      return st.slice().reverse().map(mk); }` },
+  /* r439: REPLACES the pre-depth-pass stalelink alt, which drove the retired 14-row board by
+     hard-coded geometry ('$B$4'/'$B$5'/'$B$6' at rows 11-13 and C._stale, all gone with the
+     rebuild). ALT 1 is the chord-ROUTE + op-ORDER alt and EARNS the ☆ through the ribbon's fill
+     and the styles gallery; ALT 2 is the MEASURED negative control — every core clears, ☆ dark. */
+  { key: 'stalelink', name: 'reverse order (v1 cleared FIRST, lines re-pointed by copying a healthy year, operands swapped), alt h j Link, alt h e c, ribbon fill, alt h b s — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
+      mv.push({sel:o.deadRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]});
+      for(let i=2;i>=0;i--){ const j=o.stale[i], Lc=o.yc[j], r=o.hr+2+i;
+        const good=o.yc.find(x=>x!==Lc);
+        mv.push({sel:good+r, keys:[{key:'c',ctrl:true}]});
+        mv.push({sel:Lc+r,   keys:[{key:'v',ctrl:true}]}); }
+      mv.push({sel:o.linkRng, keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]});
+      mv.push({sel:y+(o.hr+6), keys:[...T('=('+y+(o.hr+2)+'-'+y+(o.hr+3)+'-'+y+(o.hr+4)+')/'+y+(o.hr+2)),{key:'Enter'}]});
+      mv.push({sel:y+(o.hr+5), keys:[...T('='+y+(o.hr+2)+'-'+y+(o.hr+4)+'-'+y+(o.hr+3)),{key:'Enter'}]});
+      mv.push({sel:o.blockRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]});
+      mv.push({sel:o.contribRng, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]});
+      return mv; }` },
+  { key: 'stalelink', name: 'NEGATIVE CONTROL — every re-point retyped in full and the contribution block typed year by year, no fill anywhere: every core clears, ☆ DARK', moves: `C => { const o=C._o, mv=[];
+      for(let i=0;i<3;i++){ const j=o.stale[i], Lc=o.yc[j];
+        const dep = i===0 ? Lc+(o.hr+1) : Lc+(o.hr+2);
+        mv.push({sel:Lc+(o.hr+2+i), keys:[...T('=$'+o.cV+'$'+(o.pr+1+i)+'*'+dep),{key:'Enter'}]}); }
+      mv.push({sel:o.linkRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowLeft'},{key:'ArrowLeft'},{key:'Enter'}]});
+      mv.push({sel:o.deadRng, keys:[{key:'Delete'}]});
+      for(let j=0;j<o.NY;j++){ const Y=o.yc[j];
+        mv.push({sel:Y+(o.hr+5), keys:[...T('='+Y+(o.hr+2)+'-'+Y+(o.hr+3)+'-'+Y+(o.hr+4)),{key:'Enter'}]});
+        mv.push({sel:Y+(o.hr+6), keys:[...T('='+Y+(o.hr+5)+'/'+Y+(o.hr+2)),{key:'Enter'}]}); }
+      mv.push({sel:o.contribRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      return mv; }` },
   /* r435: REPLACES the pre-depth-pass sumif alt, which drove the retired fixed-geometry board
      (hard-coded D5:E5 / E2:E4 / '=SUMIF($A$2:$A$10,D2,$B$2:$B$10)') and could only fail once the
      board started randomising its anchor, its header row and its segment count. Same character
@@ -1064,17 +1101,31 @@ const ALTS = [
       {sel:R.divCell, keys:[...T('='+R.divNum+'/'+R.divFix),{key:'Enter'}]},
       {sel:R.refCell, keys:[...T('=SUM('+R.refFix+')'),{key:'Enter'}]},
     ]; }` },
-  { key: 'versionup', name: 'rows resurrected in REVERSE — margin first, growth last, ribbon fills', moves: `C => [
-      {sel:'B10', keys:[...T('=B9/B4'),{key:'Enter'}]},
-      {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B9', keys:[...T('=B7+B8'),{key:'Enter'}]},
-      {sel:'B9:F9', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7', keys:[...T('=B4+B6'),{key:'Enter'}]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'C5', keys:[...T('=C4/B4-1'),{key:'Enter'}]},
-      {sel:'C5:F5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'A1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]},
-    ]` },
+  /* r439: REPLACES the pre-depth-pass versionup alt, which drove the retired 13-row board by
+     hard-coded geometry (B7/B9/B10/C5 and the A12:A13 tag pair, all gone with the rebuild).
+     ALT 1 is the chord-ROUTE + op-ORDER alt and EARNS the ☆ with the stamp taken FIRST; ALT 2
+     is the MEASURED negative control — every core clears with the ☆ dark. */
+  { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
+      mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
+      for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
+        mv.push({sel:y+r, keys:[...T('=-'+ref+'*'+y+o.rRev),{key:'Enter'}]});
+        mv.push({sel:o.yc[0]+r+':'+o.yc[o.NY-1]+r, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]}); }
+      mv.push({sel:o.yc[1]+o.rRev, keys:[...T('='+y+o.rRev+'+'+y+o.rRev+'*$'+o.cV+'$'+(o.pr+1)),{key:'Enter'}]});
+      mv.push({sel:o.revRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]});
+      mv.push({sel:o.panelRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]});
+      mv.push({sel:o.ebitRng, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d')]});
+      return mv; }` },
+  { key: 'versionup', name: 'NEGATIVE CONTROL — every plan year typed with no fill anywhere and the three version tags retyped one at a time: every core clears, ☆ DARK', moves: `C => { const o=C._o, mv=[];
+      const g='$'+o.cV+'$'+(o.pr+1);
+      for(let j=1;j<o.NY;j++) mv.push({sel:o.yc[j]+o.rRev, keys:[...T('='+o.yc[j-1]+o.rRev+'*(1+'+g+')'),{key:'Enter'}]});
+      for(let i=0;i<2;i++){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
+        for(let j=0;j<o.NY;j++) mv.push({sel:o.yc[j]+r, keys:[...T('=-'+o.yc[j]+o.rRev+'*'+ref),{key:'Enter'}]}); }
+      mv.push({sel:o.panelRng, keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}]});
+      mv.push({sel:o.cL+'1',        keys:[...T(String(S.cells[o.cL+'1'].value).replace('v1','v2')),{key:'Enter'}]});
+      mv.push({sel:o.cL+(o.hr+8),   keys:[...T('Tag: v2 — supersede on roll-forward'),{key:'Enter'}]});
+      mv.push({sel:o.cL+(o.hr+9),   keys:[...T('Footnotes cite the v2 basis'),{key:'Enter'}]});
+      mv.push({sel:o.ebitRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      return mv; }` },
   { key: 'wk13', name: 'totals + dress FIRST, cushion before the spine, ribbon fills throughout', moves: `C => [
       {sel:'J4', keys:[...T('=SUM(B4:I4)'),{key:'Enter'}]},
       {sel:'J4:J6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
