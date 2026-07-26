@@ -1,5 +1,291 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r439 H6b-11 — audit + triage: Formulas II opens, and `hunt` is merged away (DEPTH_PASS §4.45 + §4.46 + §2.3)
+_The chapter's first two boards, and the campaign's sixth retirement. All three drills in this
+dispatch — `audit`, `triage`, `hunt` — interrogate a model somebody else built, which is exactly
+why they were dispatched together and exactly why one of them does not survive. Every number
+below is `keyLog` through the live engine on the real board, medians over 4-7 seeds, every
+selection and navigation KEYED (setDemoSel only parks the cursor on an anchor cell)._
+
+### THE RETIREMENT DIAGNOSTIC, BOTH PARTS, ON ALL THREE SHIPPED BOARDS
+
+| board | fastest legal | slowest legal | spread | part 2 — what survives stripping |
+|---|---|---|---|---|
+| `audit` | 31 | 44 | **1.42×** | F2-edit vs retype (5) + one-formula-and-fill vs two retypes (8). Legal, but both are owned elsewhere (`editfix`, `filldr`). |
+| `triage` | 26 | 29 | **1.12×** | **nothing.** No chord anywhere on the board, no graded formatting. The whole 3 keys is `=C8/B8-1` against `=(C8-B8)/B8` — typing length, not a technique. |
+| `hunt` | 46 | 85 | **1.85×** | a FILL (24 keys) — which is `filldr`'s lesson. The rest is Ctrl+B vs Alt H 1 ×3 (chord+format, stripped) and typing length. |
+
+**`triage` 1.12× is the lowest number this campaign has measured** — below retired `grpfold`
+(1.21×) and merged `unhide` (1.26×). Part 2 says the shipped board carried **no legal ☆ at all**,
+the standalone-`unhide` finding on a different board. VERDICT: **KEEP, rebuild the board** (the
+`series` precedent — fix headroom at the board, never at the predicate), because the LESSON is
+distinct and the fix is to make one of the three errors PLURAL.
+
+**`hunt`: RETIRE into `audit`.** Four measurements, no argument:
+1. **Containment, PROBED.** hunt's canonical method run VERBATIM as a first attempt on audit's
+   shipped board — `F5 · s · o`, then retype the marked calc-block constant as its formula —
+   cleared audit's hardcode beat **5/5 seeds in 11 keys**. Not a wrong attempt and not even a
+   slower one: the identical move. That is the `grpfold`→`unhide` shape, not the `sumif`/`rollup`
+   contrast. Reinforcing it, audit's shipped PROMPT already instructed hunt's whole ritual
+   ("Use Go To Special → Constants to light up every raw number on the page") — the exact
+   `growth`/`versionup` signature the campaign retired a drill on.
+2. **hunt's own instrument measures NEGATIVE.** 46 keys with the F5 ritual against **43 without
+   it** (negative control: found by eye, all three hardcodes relinked, footed, bolded — three of
+   four cores green, 5/5 seeds). The r438 `filterpass` limit says a FINDING instrument saves eye
+   time rather than keystrokes, so that alone is not the growth failure — except that on hunt's
+   board it does not save eye time either: **F5 marks 13 cells, 10 of them legitimate blue
+   inputs.** The instrument does not narrow the search.
+3. **hunt's beat 1 is an untriggerable-class check.** `ok:(S.markN||0)>=1` grades that a KEY WAS
+   PRESSED — the predicate `unhide` dropped in r437 (`traceN>=1`) — and it breaches §1.0(c)
+   outright: a player who finds the hardcodes by eye watches it stay dark with nothing on the
+   board to fix. Measured above at 43 keys.
+4. **The lesson is already carried three times.** `housestyle`'s shipped ☆ (r425) IS the Go To
+   Special → Constants ritual (`S.gotoSpecials`); `versionup` (§4.54) is four typed answers
+   rebuilt live; audit's beat 3 is the same crime. And §4.45 and §4.52 propose the SAME ☆ line —
+   "Color the … cells black" — dead under §1.0(d) anyway, and dead twice here because a hardcode
+   that has to be HUNTED is black already. That is the whole reason it has to be hunted.
+
+**WHICH KEY SURVIVES: `audit`** — the container, not the contained (three break CLASSES to hunt's
+one), first in the chapter, and §2.3's assignee. hunt's r182 engine is not orphaned: the merged
+board is built so the instrument PAYS and the guide teaches it, graded by OUTCOME, never by
+`markN`. Delta **D11** (rename hunt's colliding tab 'Audit'→'Hardcodes') is mooted.
+
+### THREE UNTRIGGERABLE BEATS FOUND BY WALKING (campaign class #9, #10, #11)
+All three were found by driving a route, never by reading a predicate — the campaign's own rule.
+
+| # | drill | the check demanded | the route it locked out |
+|---|---|---|---|
+| 9 | `audit` | `/B\d+:F\d+\)?$/` out of the SUM's formula TEXT | `=B7+C7+D7+E7+F7` and `=SUM(B7,C7,D7,E7,F7)` — both display the correct total, both stayed DARK (3/3 seeds each) |
+| 10 | `triage` | `/SUM\(B4:B7\)/i` out of formula TEXT | `=B4+B5+B6+B7` — right figure on the board, beat DARK (3/3) |
+| 11 | `hunt` | `(S.markN||0)>=1` — a keypress | every by-eye route; measured 43 keys, three of four cores green, beat DARK forever (5/5) |
+
+Same family as #3 (`sumif`) and #8 (`rollup`): a range grader written against the SPELLING of the
+formula. Every predicate on both rebuilt boards is a VALUE read plus a liveness test.
+
+### THE §3 DISCRIMINATOR BETWEEN THE SURVIVORS — a real inversion, probed
+`audit` (and the retired `hunt`) teach: *a raw NUMBER where a formula belongs is the crime, and
+the cure is to type a formula.* `triage`'s #DIV/0! teaches the opposite and punishes the transfer:
+the error is in the POINTER, and the fluent hardcode-hunter's first move — put a number in the
+empty cell the denominator aims at — makes the error DISAPPEAR while leaving the model wrong.
+Probed on the engine: `=D5/C7` with C7 blank reads `#DIV/0!`; put 250 in C7 and it reads `0.24`
+off a formula still pointing at the wrong cell. **Probed on the shipped board too** (alt-path
+family T4, 4/4 seeds): the share cell's value comes out EXACTLY equal to the wanted value and the
+beat stays DARK, because the leave-untouched guard (§1.1) requires the spacer row to still be
+blank. A first attempt that COMPUTES AND IS WRONG is worse than one that throws, and it exists
+only as a contrast — the `sumif`/`rollup` shape.
+
+### ENGINE FACTS ESTABLISHED (reuse these, don't re-derive)
+- **A seeded `formula:'=SUM(#REF!)'` is a real sentinel.** `recalc()`'s r407 orphan detector sets
+  `value:'#REF!'` and it PROPAGATES: `=B8*2` on such a cell reads `#REF!` too.
+- **A row delete CONTRACTS a range** (Excel parity, `adjustFormulaRows`); only a SINGLE ref that
+  falls in the deleted band becomes `#REF!`. To plant a range-loss, seed the string.
+- **`#VALUE!` cannot be produced by grabbing a text label on this engine** — text coerces to 0
+  (`=A1/B4` → 0, `=SUM(A1:B7)` ignores the label). The §4.46 page's stated cause is therefore
+  UNBUILDABLE. The only routes to `#VALUE!` are a **CHOOSE index past its argument list** and a
+  FIND miss. The board uses the CHOOSE route (a three-case switch whose formula carries two),
+  which is real, common and diagnosable. **Declared deviation from §4.46.**
+- **`#DIV/0!`** comes from division by zero OR by a blank cell. **`#NAME?`** from an unknown
+  function. **`#N/A`** from a MATCH/VLOOKUP miss.
+- **Go To Special marks auto-clear on commit** (`syncMarks`), and — the one that bit a probe —
+  **committing an edit on a cell that WAS marked jumps the cursor to the next surviving mark
+  instead of moving down one row** (`__wasMarked` → `gotoNextMark`, r182). Nothing graded depends
+  on it, but a keyed-navigation script must either park with `setDemoSel` or press Esc first.
+
+### ☆ CANDIDATE MEASURED AND REJECTED — recorded so nobody re-derives it
+The r182 **ENTER-WALK of the marked set** reads like the perfect star for a review drill: the
+marks are a worklist, ↵ walks it, a fixed cell crosses itself off. It cannot beat arrow
+navigation on a 20-row board, because **the blue inputs are constants too** and the walk visits
+every one of them in scan order. Measured on the new audit geometry: 11 marks, so ~9 ↵ presses to
+reach the second crime against 8 arrow keys. Negative headroom — the `growth` shape — killed
+before it shipped. There is no board layout that fixes it while the inputs stay blue.
+
+### `audit` — "Review pass — find what's broken" (§4.45, absorbing §4.52)
+- **BOARD.** A divisional operating review back from the FY-close pack. Six divisions × five
+  fiscal years with a live Total column; Total revenue; operating costs and D&A; an EBIT line and
+  an EBIT margin line built off them; and a live CHECK line two rows under the block reading the
+  Total column against the Total revenue line, expected to read zero (MODELING_STANDARDS §6 — a
+  check in ONE visible place). Colour is provenance (§1): typed figures blue, computed cells
+  black — **which is exactly why the two planted hardcodes are BLACK and comma-formatted like
+  everything around them.** Units and the sign convention stated in row 2; costs seeded negative;
+  both total rows wear a TOP border and never a rule underneath. **20 rows, 17 carrying content
+  or scripted purpose — 85% (§1.3).**
+- **FOUR AXES (§1.2):** geometry jitter (header row 3 or 4 × anchor column A or B — four sites,
+  with the tail rows pinned so the sheet is always exactly 20 and the key count never moves with
+  the draw) · six divisions Fisher-Yates from eight, plus the codename · every figure and the
+  first fiscal year through `rnd()` · which division carries the short Total, which two of the
+  four non-trusted year columns carry the hardcodes, which carries the crossed margin.
+- **BEATS (5 core + the engine save closer + one ☆; tri-length 6, C9-registered), chained:** the
+  k/4 meter → fix the short Total (the CHECK line under the block is what is complaining, and it
+  goes to zero when the beat lands — §1.5, the aha) → fix the two typed-over EBIT cells, with a
+  live k/2 sub-counter → repoint the crossed margin → **Enter OK at the review cell** (§1.6
+  finish state). Labels name THIS seed's facts (§1.0-R2(g)): the division whose Total is short,
+  the fiscal year whose margin crossed. The hardcodes' POSITIONS are deliberately not named —
+  finding them is the drill, and §2.3's disclosed COUNT is the honest way to say so.
+- **☆ = THE CALC BLOCK RE-DRIVEN IN ONE PASS.** The EBIT row and the EBIT margin row are two
+  formulas repeated across five years and **the leftmost year is trusted by construction**, so
+  the whole 2×5 rectangle drives from it in a single fill or paste — three of the four planted
+  breaks repaired by one decision. Read off the r424 `S.fillOps` and r425 `S.pasteLog` latches
+  (the MECHANIC, never geometry-inferred), so `ctrl+r`, `Alt H F I R` and a copy of the trusted
+  column all earn it, and it only latches when the block is actually RIGHT. **Single-move star,
+  measured in isolation: 7 keys with the one-pass re-drive against 33 typing the same three cells
+  (5/5 seeds each way).** Skippable, MEASURED: alt-paths ALT 2 clears all five cores at 46 keys
+  with the ☆ **DARK 5/5**. Deliberately NOT `housestyle`'s F5 star, NOT `scrub`'s autosum, NOT
+  `modeltour`'s heal-from-the-neighbour paste.
+- **SPREAD ON THE FINAL BOARD:** fastest legal **25** (the copy/paste star route) · slowest legal
+  **74** (marks cleared, every fix typed in full, every move arrowed) = **2.96×**.
+- **§1.0-R3(p) ROUTES WALKED (12).** CLEARING: the addition chain, the comma-arg SUM and the
+  anchored `=SUM($B$7:$F$7)` for the short Total (all three were DARK on the shipped predicate) ·
+  the block by `ctrl+r`, by `Alt H F I R` and by a 2×1 copy pasted across · the margin retyped or
+  F2-repointed or landed by the block fill · `'ok'`, `' OK '` and `'Ok'` at the review cell · the
+  whole run reversed. Correctly DARK: the hardcodes replaced by the correct NUMBER (liveness is
+  the lesson — doctrine's anchor-text class) · a fill covering the EBIT row ONLY, which leaves the
+  margin beat dark and the ☆ dark · the review cell left blank.
+- **NO cueCell (§1.0-R2(h)/§1.0-R3(q)), declared:** every graded destination is an existing
+  LABELLED cell, so the green ring has something to sit on; the cue primitive is for a slot
+  BETWEEN two rows and for an empty paste target, and neither exists here.
+- **PAR:** re-swept from scratch. 5-seed median **27** keys including the engine-appended Ctrl+S
+  and the scripted F5 ritual; the only variance is the digit-length of the short-Total row
+  (27 at one digit, 29 at two). parKeys 33→27, par 34→**28** (1.04 s/key), mirrored in
+  HOTKEY_PARS. Clocks derive (§1.4): pass 42 · pro 32.2 · legendary 28. The demo BUILDS the
+  block selection with Shift+arrow rather than being handed it by setDemoSel.
+- **META:** `errorCount:4` added (the §2.3 rail meter); desc rewritten — it described the retired
+  three-break board. Key, name and label untouched.
+
+### `triage` — "Error triage — #REF! #DIV/0! #VALUE!" (§4.46)
+- **BOARD.** A quarterly segment P&L inherited mid-quarter, four quarters wide: three revenue
+  lines over a live Total revenue row; three cost lines over a Total costs row; an EBIT line under
+  both; a share-of-revenue line; and a three-case opex plan block at the foot. **The two blocks
+  are built to the same geometry — three lines then a total, five rows apart — which is what
+  makes the healthy Total revenue row the model for the broken one** (and what makes the ☆'s
+  carry land exactly). Total revenue and EBIT wear TOP borders; **Total costs arrives UNDRESSED**,
+  which is both the seed for the dress beat and the visible tell that the row was rebuilt in a
+  hurry. **20 rows, 17 carrying content or scripted purpose — 85% (§1.3).**
+- **FOUR AXES (§1.2)** — the shipped board had ONE (value ranges), a §1.2 breach: geometry jitter
+  (header row 3 or 4 × anchor column A or B) · three revenue and three cost lines Fisher-Yates
+  from pools of six, plus the codename and the quarter-year · every figure through `rnd()` ·
+  which quarter carries the #DIV/0! and which revenue line the share row measures.
+- **THE THREE ERRORS, AND THE CASCADE.** One `=SUM(#REF!)` per quarter on the Total costs row,
+  which propagates into the EBIT line below it: **EIGHT red cells from ONE cause, against a meter
+  that says THREE errors.** That gap is the drill's own argument and where §1.5's aha lands —
+  count causes, not symptoms. The other two are independent: a #DIV/0! where one quarter's
+  share-of-revenue divides by the BLANK spacer row under the total instead of the total (the
+  classic off-by-one), and a #VALUE! where the opex case read is a three-case switch carrying
+  only two cases.
+- **BEATS (5 core + the engine save closer + one ☆; tri-length 6):** the k/3 meter → fix the
+  #REF! Total costs row with a live k/4 sub-counter → **bold it and rule it on TOP, immediately
+  behind the beat that rebuilt it** (§1.0(a) format-as-you-go; bold and top borders are #1 and #3
+  on Wolf's §1.0-R3(o) frequency list) → repoint the #DIV/0! share → fix the #VALUE! case read,
+  which drives the last red cell black — a §1.6 PROVE-OUT close rather than a dress close,
+  because this board has the better one.
+- **☆ = THE TOTAL COSTS ROW REBUILT IN ONE PASS.** Carry the healthy Total revenue row down onto
+  it (the relative refs translate exactly five rows and land on the cost block), or repair one
+  quarter and fill it across. Read off `S.fillOps` / `S.pasteLog`, so every fill and every paste
+  route earns it. **Single-move star, measured in isolation: 3 keys carrying the row down against
+  49 typing four SUMs (5/5 seeds each way).** Skippable, MEASURED: alt-paths ALT 2 clears all five
+  cores at 84 keys with the ☆ **DARK 5/5**.
+- **SPREAD ON THE FINAL BOARD:** fastest legal **31** · slowest legal **123** (four typed SUMs,
+  ribbon dress, a nested IF case read, every move arrowed) = **3.97×**.
+- **§1.0-R3(p) ROUTES WALKED (14).** CLEARING: the Total costs row by paste-carry, by
+  type-one-and-`ctrl+r`, by four separate typed SUMs and by four addition chains · the dress by
+  `ctrl+b`+`Alt H B P`, by `Alt H 1`+`Alt H B P` and off a `Shift+Space` whole-row grab · the
+  share retyped or F2-repointed · the case read as CHOOSE-with-the-third-case, a nested IF chain,
+  INDEX over the case row and OFFSET off the first case (all four probed on the engine) · the
+  whole run reversed. Correctly DARK: **a number plugged into the blank row the denominator aims
+  at** (the inversion — the value comes out exactly right and the beat holds) · the case read
+  repointed straight at the Downside figure (right number, not a case read) · the Total costs row
+  typed as NUMBERS · `Alt H B S` on the Total costs line, whose one-row perimeter hangs a rule
+  UNDERNEATH — the one thing §1.0(f) forbids.
+- **NO cueCell, declared:** every target is an existing labelled cell carrying a red error value,
+  which is a louder cue than a red note could be.
+- **PAR:** re-swept from scratch. 5-seed median **38** keys including the engine-appended Ctrl+S,
+  and FLAT across seeds (the board is built so the demo types the same characters on every draw).
+  parKeys 25→38, par 27→**40** (1.05 s/key), mirrored in HOTKEY_PARS. Clocks derive: pass 60 ·
+  pro 46 · legendary 40.
+- **META:** `errorCount:3` added; desc rewritten for the real-sentinel board. Key, name and label
+  untouched — the label names the three families and they all survive.
+
+### A TASTE FLAG, NOT A DEFECT
+Both stars are one-pass re-drives (a 2×5 block on `audit`, a 1×4 row on `triage`). They differ in
+shape and in what they are re-driving — a correct block being made uniform against a destroyed row
+being reconstructed from its parallel twin — but they are the same family, and this is the
+campaign's own open item on fill-shaped stars appearing back to back. Every alternative that
+cleared §1.0(d) was already owned: Go To Special → Constants by `housestyle`, autosum by `scrub`,
+heal-from-the-neighbour by `modeltour`, F2 surgery by `editfix`, point mode by `bridge`, F4 by
+`anchor`, Ctrl+Enter by `anchor`, IFERROR by `wrapfix`, the block grab by `blocksel`. Recording it
+rather than stealing one.
+
+### ALT-PATH ENTRIES — DELETED BY NAME (integrators: do not resurrect)
+This side of `dev/e2e-alt-paths.js` is authoritative for `audit` and `triage`, additions AND
+deletions. `hunt`'s entry is left UNTOUCHED — it goes with the retirement, which this agent did
+not execute.
+- **DELETED `audit` · "crimes fixed in REVERSE, full retype instead of F2 surgery"** (r173). Drove
+  `_t1`/`_t2`/`_t3` and the hard-coded rows 10/12/13 of the retired three-break board; no seed
+  produces them.
+- **DELETED `triage` · "errors triaged in REVERSE — #VALUE! first, the #REF! it depends on last"**
+  (r173). Drove `C._R`, a field the rebuilt board no longer has, against three fake text-cell
+  errors at fixed addresses.
+- **ADDED (4, the §1.8 pair per drill):**
+  · `audit` ALT 1, chord ROUTE — addition-chain Total, ribbon fill `Alt H F I R` over the block,
+    anchored margin refs, a padded `' OK '` sign-off. 47 keys, ☆ **LIT**.
+  · `audit` ALT 2, op ORDER **and the MEASURED NEGATIVE CONTROL** — sign-off first, margin second,
+    each EBIT cell typed on its own right-to-left, the short Total last; no fill and no paste
+    anywhere. 46 keys, all five cores clear, ☆ **DARK 5/5**.
+  · `triage` ALT 1, chord ROUTE — one quarter typed then `ctrl+r` across, ribbon bold `Alt H 1`,
+    a nested IF standing in for CHOOSE. 63 keys, ☆ **LIT**.
+  · `triage` ALT 2, op ORDER **and the MEASURED NEGATIVE CONTROL** — case read first, share
+    second, then four quarters typed separately right-to-left; dress off a `Shift+Space` row grab,
+    INDEX case read. 84 keys, all five cores clear, ☆ **DARK 5/5**.
+
+### COUPLING SWEEP (the standing three greps) — CLEAN for both survivors
+`git grep -n "CHALLENGES\.\(audit\|triage\|hunt\)\._o" dev/` → one hit, `dev/e2e-audit-parity.js:358`,
+and it is **`hunt`**, not mine. `git grep -n "loadChallenge('\(audit\|triage\|hunt\)')" dev/` → two
+hits, both **`hunt`** (`e2e-audit-parity.js:356`, `e2e-guided.js:125`). `git grep -n "'\(audit\|triage\)'" dev/`
+→ only `check-invariants.js` REWORKED (mine), my own four alt entries, the `'formulas'` track array
+in `dev/migrate-certificates.sql` (both keys survive — no edit) and historical rows in
+`dev/seed-field.sql` (C13-exempt evidence). A board-content sweep (`Svc cost ratio` · `Divisional
+P&L` · `Quarterly bridge` · `#DIV/0!` · `#VALUE!`) found nothing outside the drills' own entries —
+`dev/e2e-formulas.js` seeds its own fixtures. **Nothing needed an adapter for audit or triage.**
+The two `hunt` couplings are listed in the retirement checklist below and are the reason it is a
+handover rather than a delete.
+
+### RETIREMENT PLUMBING FOR `hunt` — HANDED OVER, NOT EXECUTED (per the dispatch brief)
+`drills.js` `groups` "Formulas II" key list · `drills.js` `meta.hunt` · `drills.js`
+`HOTKEY_PARS.hunt` · `drills.js` `HOTKEY_CAMPAIGN` **c5 `keys:['audit','balance','hunt','versionup']`
+— hunt IS listed here, unlike grpfold; replace it (`triage` is the natural substitute)** ·
+`index.html` `CHALLENGES.hunt` block · `dev/e2e-alt-paths.js` the one `hunt` entry ·
+**`dev/e2e-audit-parity.js` lines 356-358, which `loadChallenge('hunt')` and read
+`CHALLENGES.hunt._o` — this is an ENGINE-parity section (the r182 Go To Special matrix) and it
+needs a LOCAL FIXTURE, not a re-pin, exactly as §V was fixed for `rollup` in r438** ·
+**`dev/e2e-guided.js` lines 104-125, which `loadChallenge('hunt')` for the guided-rail case —
+repoint at `audit`, which now carries the same ritual** · `dev/migrate-certificates.sql` the
+`'formulas'` track array · `drills/hunt.html` · `sitemap.xml` the `drills/hunt.html` `<loc>` ·
+`refmap.js` (regenerate — it maps the F5/Go-To-Special route to hunt; that belongs to `audit` now)
+· the "75 banker-grade drills" marketing count in `index.html` ×3 metas and `About.html` ×2 metas
+(→ 74; `e2e-smoke` asserts it against `menuOrder`) · **and `hunt` added to C13's `RETIRED` list**,
+which then verifies the whole sweep in one run. Catalog would go **75 → 74**, Formulas II 11 → 10.
+Verified NOT needed: `HK_TRACKS` (derives from `groups`) · milestone lists (chapter ids only) ·
+`e2e-depth-mechanics` (no section drives hunt) · `e2e-fit-sweep` (hunt is not on the exempt list) ·
+`dev/seed-field.sql` (historical leaderboard rows; C13 exempts it) · `supabase/migrations/*.sql`
+(applied history — leave alone).
+
+### DELIBERATE SPEC DEVIATIONS (§0 — named)
+1. **§4.46 beat 4's stated cause is unbuildable.** "Fix the #VALUE! — the formula grabbed the
+   label; aim it at the numbers" cannot be built: text coerces to 0 on this engine and never
+   raises #VALUE!. Re-cut to a **CHOOSE index past its argument list** (a three-case switch whose
+   formula carries two), which is the only natural route to that sentinel here, is a real desk
+   error, and keeps the drill's LABEL and its three named families intact.
+2. **Both pages' ☆s are replaced.** §4.45's "Color the two ex-hardcode cells black" and §4.52's
+   "Color the three relinked cells black" are formatting (§1.0(d)) and, on a board where the
+   hardcodes must be hunted, they are already black. §4.46's "Comma-format the three repaired
+   cells" is dead twice — formatting, and comma is the exact op Wolf named as over-anchored
+   (§1.0-R3(o)).
+3. **§4.45's N goes 3 → 4** (one short SUM, TWO hardcodes, one crossed read). The plural hardcode
+   is what the merge buys and what gives the calc block enough broken cells to reward one pass.
+4. **§4.52 `hunt` is retired**, not reworked — the measurement above.
+5. **`audit`'s F5 ritual is taught and paid for but never graded.** §4.45 does not ask for a
+   Go-To-Special beat, and hunt's was the untriggerable class; the board earns the instrument by
+   making the crimes invisible by eye instead.
+
 ## r439 H6b-11 — wrapfix + cases: the first two Formulas II boards (DEPTH_PASS §4.47 + §4.31)
 _Both drills carried the profile that retired five drills this campaign — `wrapfix` at 2 checks
 and `cases` with the catalog's worst tri-length misalignment (guide 4 / checks 6 / targets 9) —

@@ -851,7 +851,7 @@ DOES NOT EXIST YET.
 
 ### CH 5 · FORMULAS II (12)
 
-#### 4.45 audit — "Review pass — find what's broken" · M
+#### 4.45 audit — "Review pass — find what's broken" · M — **SHIPPED (r439, depth pass; ABSORBS `hunt` §4.52 — the merge was decided by measurement, see dev/AUDIT.md r439. N goes 3→4 (the hardcode class is now PLURAL, which is what the merge buys), the page’s formatting-☆ is replaced by a one-pass calc-block re-drive, and the F5 ritual is taught and paid for but never graded — grading a keypress is the untriggerable class. Deviations declared in the drill’s header comment.)**
 **Now:** three planted breaks in a divisional P&L (short Total, stale hardcode, wrong-year read); already the audit format minus the disclosure.
 **Rework = adopt §2.3. N=3; beats:**
 1. Find and fix all 3 planted breaks (0/3 repaired) — the meter line
@@ -862,7 +862,7 @@ DOES NOT EXIST YET.
 ☆ Color the two ex-hardcode cells black — formulas don't wear blue
 **Random:** which division carries each break + break sites + values (verify existing). **Aha:** existing. **Finish:** beat 5. **Clocks:** std. **Engine:** §2.3 meter (errorCount=3).
 
-#### 4.46 triage — "Error triage — #REF! #DIV/0! #VALUE!" · M
+#### 4.46 triage — "Error triage — #REF! #DIV/0! #VALUE!" · M — **SHIPPED (r439, depth pass; replanted on REAL r419 sentinels. BINDING ENGINE FACT for anyone re-reading this page: a formula that grabs a text LABEL cannot raise #VALUE! here — text coerces to 0 — so beat 4’s stated cause is UNBUILDABLE and is re-cut to a CHOOSE index past its argument list, the only natural route to that sentinel on this engine. The page’s comma-format ☆ is replaced. Deviations declared in the drill’s header comment and dev/AUDIT.md r439.)**
 **Now:** three classic breaks, read-and-rebuild; pre-r419 the engine FAKED error display with txt cells (seeds 6391–6397, left-aligned amber).
 **Rework = replant on REAL r419 sentinels + §2.3 (N=3):**
 1. Find and rebuild all 3 errors (0/3) — the meter
@@ -919,7 +919,7 @@ DOES NOT EXIST YET.
 ☆ Bold the repaired total — the tie-out closes
 **Random/Aha/Finish:** verify; existing; repoint closes. **Clocks:** std. **Engine:** F9-collapse latch exists.
 
-#### 4.52 hunt — "Hunt the hardcodes" · S
+#### 4.52 hunt — "Hunt the hardcodes" · S — ⛔ **RETIREMENT RECOMMENDED (r439 depth-pass agent — MEASURED; plumbing HANDED OVER, NOT EXECUTED). Merged into `audit` §4.45.** Containment probed: hunt’s canonical method run verbatim on audit’s board clears audit’s hardcode beat 5/5 on the FIRST attempt in 11 keys. Its own F5 instrument measures NEGATIVE (46 keys with the ritual against 43 without) and marks 13 cells of which 10 are legitimate blue inputs, so it narrows nothing. Its beat 1 (`markN>=1`) grades a KEYPRESS — the class `unhide` dropped in r437 — and breaches §1.0(c). The lesson is already carried by `housestyle`’s ☆ (the same F5 ritual, r425), by `versionup`, and by audit’s own beat 3. Delta D11 is mooted. Full plumbing checklist in dev/AUDIT.md r439.
 **Now:** Go To Special → constants; three typed-overs relinked; par 45. At bar (clean exemplar family).
 **Language pass + §2.3 dressing (N=3) + bonus (D11 tab rename):**
 - meter: "Find and relink all 3 typed-over cells (0/3)"

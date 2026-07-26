@@ -10536,13 +10536,14 @@ const CHALLENGES = {
          zero. It compares the Total COLUMN against the Total revenue line, so the short SUM
          is what it is complaining about — fixing that beat drives it to zero on the board
          (§1.5: the aha lands there), and no beat grades it, so it can never be gamed. */
-      cells[AL+chkR]={...blankCell(),value:'Check — Total column less Total revenue',txt:true};
+      cells[AL+chkR]={...blankCell(),value:'Check — Totals foot',txt:true};   /* kept short deliberately: a longer label SPILLS into the check figure beside it and renders truncated (§1.0-R3(q) — no graded or read-off cell may sit under a spill) */
       cells[CL(c0)+chkR]={...blankCell(),formula:'=SUM('+CL(totC)+r0+':'+CL(totC)+rN+')-'+CL(totC)+totR,
         value:(function(){ let s=0; for(let r=r0;r<=rN;r++) s+=cells[CL(totC)+r].value; let g=0; for(let c=c0;c<=cN;c++) g+=REV[c]; return s-g; })(),
         fmtStyle:'comma',decimals:0};
       cells[AL+signR]={...blankCell(),value:'Reviewed by',txt:true};
       cells[AL+memoR]={...blankCell(),value:'Memo: figures as filed; no restatements this pass',txt:true,it:true};
-      const cw={}; cw[ac]=178; for(let c=c0;c<=totC;c++) cw[c]=78;
+      const cw={}; if(ac>1) cw[ac-1]=22;   // thin margin column when the block anchors at B (the r438 `drill` pattern) — an empty full-width column A reads as a layout mistake
+      cw[ac]=178; for(let c=c0;c<=totC;c++) cw[c]=78;
       this._o={ hr, ac, AL, c0, cN, totC, r0, rN, totR, costR, daR, ebitR, margR, chkR, signR,
         NC, y0, hcA, hcB, crossC, badRow, badName:DIV[badRow-r0],
         lastCol:CL(cN), firstK:CL(c0)+r0, blockTop:CL(c0)+ebitR,
@@ -10693,7 +10694,7 @@ const CHALLENGES = {
     guide(){ const o=this._o; return [
       'three errors, eight red cells: the <b>Total costs</b> row is the cause and the <b>EBIT</b> line under it is only repeating it. Fix causes, and the symptoms clear themselves',
       '<b>=SUM(#REF!)</b> means the range is gone, not wrong — the <b>Total revenue</b> row two blocks up is the same formula over the same shape of block, five rows higher',
-      'a total earns the line ABOVE it, never underneath: select the <b>Total costs</b> line · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
+      'dress the <b>Total costs</b> line the way <b>Total revenue</b> is already dressed: select the line · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> puts the border on TOP (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> would hang one underneath)',
       'the <b>'+o.shareQ+'</b> share reads <b>#DIV/0!</b> because its denominator is the BLANK row under <b>Total revenue</b>, not the total — <kbd>F2</kbd>, step the denominator up one row, <kbd>↵</kbd>. Filling that blank row in would clear the error and leave the model wrong',
       'the switch is on case <b>'+o.switchVal+'</b> and the formula carries two cases, so it reads <b>#VALUE!</b> · <kbd>F2</kbd>, add the third case before the close bracket, <kbd>↵</kbd>',
       'the whole <b>Total costs</b> row is one formula four times over — take the <b>Total revenue</b> row with <kbd>ctrl</kbd>+<kbd>c</kbd> and paste it over the broken row, or repair one quarter and <kbd>ctrl</kbd>+<kbd>r</kbd> across',
@@ -10782,13 +10783,14 @@ const CHALLENGES = {
       for(let i=0;i<3;i++){ const v=rnd(60,180)*5; CASEV.push(v);
         cells[CL(c0+i)+caseValR]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
       const switchVal = 3;
-      cells[AL+switchR]={...blankCell(),value:'Case in use (1 Base · 2 Upside · 3 Downside)',txt:true};
+      cells[AL+switchR]={...blankCell(),value:'Case in use',txt:true};   /* the legend lives in the case HEADER row above (Base · Upside · Downside); spelling it out here spilled across the switch cell and rendered truncated (§1.0-R3(q)) */
       cells[CL(c0)+switchR]={...blankCell(),value:switchVal,fontColor:'blue'};
       cells[AL+selR]={...blankCell(),value:'Opex plan selected',txt:true,bold:true};
       cells[CL(c0)+selR]={...blankCell(),
         formula:'=CHOOSE('+CL(c0)+switchR+','+CL(c0)+caseValR+','+CL(c0+1)+caseValR+')',
         value:'#VALUE!',fmtStyle:'comma',decimals:0,bold:true};
-      const cw={}; cw[ac]=196; for(let c=c0;c<=cN;c++) cw[c]=84;
+      const cw={}; if(ac>1) cw[ac-1]=22;   // thin margin column when the block anchors at B (the r438 `drill` pattern)
+      cw[ac]=196; for(let c=c0;c<=cN;c++) cw[c]=84;
       this._o={ hr, ac, AL, c0, cN, NQ, rev0, rev2, totRevR, cost0, cost2, totCostR, ebitR, shareR,
         caseHdrR, caseValR, switchR, selR, badQ, shareRow, switchVal, CASEV, TREV, TCOST, RV,
         revRng:CL(c0)+totRevR+':'+CL(cN)+totRevR,
