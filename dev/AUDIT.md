@@ -228,6 +228,16 @@ the two doubles as the measured negative control that clears every core with the
 - `cases` ALT 2 — capture first, then EBITDA, then revenue, then the driver, and the driver typed
   out three times. 133 keys against the demo's 92, ☆ DARK. **(negative control)**
 
+### ONE THING HANDED OVER RATHER THAN EXECUTED
+`drills/wrapfix.html` and `drills/cases.html` are GENERATED (dev/build-drill-pages.js) and still
+print the old clocks — "par 70s" and "par 94s" — in their SEO copy. They are in the do-not-edit
+set for a drill agent, and regenerating them also rewrites `sitemap.xml` and `refmap.js`, so this
+is an integrator step, not a drill step: **rerun `CHROME=... node dev/build-drill-pages.js` after
+integration.** Nothing in the gate reads those files (checked: the only `drills/` hits in `dev/`
+are the generator itself and an `e2e-smoke` regex that matches the phrase "banker-grade drills"),
+so this is stale marketing copy, not a red suite — which is exactly why it would otherwise sit
+there unnoticed.
+
 ### COUPLING SWEEP (the r437/r438 three-grep standing check)
 `git grep -n "CHALLENGES\.\(wrapfix\|cases\)\._o" dev/` → **nothing**.
 `git grep -n "loadChallenge('\(wrapfix\|cases\)')" dev/` → **nothing**.
