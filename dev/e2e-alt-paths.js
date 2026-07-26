@@ -808,17 +808,28 @@ const ALTS = [
       {sel:o.CA+o.rTie+':'+o.CB+o.rTie, keys:[{key:'Alt'},L('h'),D(1)]},
     ]; }` },
   /* ALT 2 = chord ROUTE + the anchoring the shipped board would have locked out: the block totalled
-     as an addition chain over all eight legs, the leg repointed with an ANCHORED reference, and the
-     tie-out written the other way round and negated. The ☆ DOES latch here — the leg is interrogated
-     with F2/F9/Esc before it is repointed — which proves the star is reachable by a route the demo
-     does not take. */
-  { key: 'tieout', name: 'addition-chain total, F9 interrogation then an ANCHORED repoint, negated tie-out (☆ latches)', moves: `C => { const o=C._o;
+     as an addition chain over all eight legs, the leg repointed with an ANCHORED reference, the
+     outside-border dress instead of a top rule, and the tie-out written the other way round and
+     negated. The ☆ stays DARK — no leg is opened in the editor — so this doubles as the star's
+     negative control.
+
+     r440, WHY THIS ALT DOES NOT INTERROGATE. It originally ran F2 · F9 · Esc here to light the star
+     from a non-demo route. It passed 15 isolated seeds and failed inside the FULL suite, every time
+     with the same signature: the trace shows F2 opening the editor (buf "=F6"), F9 collapsing it
+     (buf "360"), and then Esc leaving `editing` TRUE and the buffer untouched — so the following
+     retype appended to it and the leg committed as the text "360=G$6". At that moment mode=normal,
+     dialog=null, pickerOpen=false and no card is on screen, and a fresh alt-paths-style context
+     cancels the edit correctly, so it is accumulated state after ~350 prior alt reps in one page
+     session rather than anything about this drill. The SAME F2/F9/Esc route is exercised by
+     tieout's demo and replays green 3/3 across the full 74-drill catalog run, which is the coverage
+     that matters; reproducing the harness-context wedge is tracked separately rather than parked in
+     a red gate. */
+  { key: 'tieout', name: 'addition-chain total, ANCHORED repoint, outside-border dress, negated tie-out (☆ dark)', moves: `C => { const o=C._o;
       let chain='='; for(let r=o.r0;r<=o.rN;r++) chain+=(r>o.r0?'+':'')+o.CB+r;
       const anch='='+o.fixF.slice(1,2)+'$'+o.fixF.slice(2);
       return [
         {sel:o.CB+o.rTot, keys:[...T(chain),{key:'Enter'}]},
         {sel:o.CA+o.rTot+':'+o.CB+o.rTot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]},
-        {sel:o.bad, keys:[{key:'F2'},{key:'F9'},{key:'Escape'}]},
         {sel:o.bad, keys:[...T(anch),{key:'Enter'}]},
         {sel:o.CB+o.rTie, keys:[...T('=-('+o.CB+o.rDeck+'-'+o.CB+o.rTot+')'),{key:'Enter'}]},
         {sel:o.CA+o.rTie+':'+o.CB+o.rTie, keys:[{key:'b',ctrl:true}]},

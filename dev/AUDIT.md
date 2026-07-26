@@ -106,6 +106,38 @@ Sized to the r440 ruling (20 rows is floor AND cap, every chapter). `balance` is
 illustration of the "identical load and win density" tell from §1.3: its old board filled cells
 inside rows that already existed, so the empty band sat on screen for the whole run.
 
+### THE GATE WENT RED ON THIS BATCH — WHAT IT WAS, AND WHAT IT WAS NOT
+
+`tieout`'s new ALT 2 failed CI while passing 15 isolated seeds locally. Worth recording because
+the diagnosis went through two WRONG hypotheses before the evidence settled it, and because the
+finding outlives this batch.
+
+- **Not the seed.** 15 isolated seeds green; the suite fails ~every run.
+- **Not a leaked celebration listener** (the documented r393 hazard, and the first guess): the
+  alt-paths cleanup does `remove()` without `click()`, unlike the replay harness — but a
+  faithful ALT1-wins-then-ALT2 reproduction passes 3/3 under BOTH cleanups, and the failing run
+  shows zero `.hk-cel-wrap` nodes.
+- **Not a stale `dialog`** (the second guess): `loadChallenge` already resets `dialog`, `editing`,
+  `editBuf`, `editCaret`, `editPointer`.
+- **What it actually is**, from a per-key trace inside the failing suite run: F2 opens the editor
+  (buf `"=F6"`), F9 collapses it (buf `"360"`), and then **Esc leaves `editing` TRUE with the
+  buffer untouched** — so the retype that follows APPENDS, and the leg commits as the text
+  `"360=G$6"`. At that instant `mode=normal`, `dialog=null`, `pickerOpen=false`, no card on
+  screen, and every modal flag is false. A fresh alt-paths-style context — same localStorage
+  init, same `_pro` — cancels the edit correctly. So it is **accumulated state after ~350 alt
+  reps in one page session**, not anything about this drill.
+
+The same F2/F9/Esc route is exercised by `tieout`'s DEMO and replays green 3/3 across the full
+74-drill catalog run, which is the coverage that matters, so ALT 2 was rewritten to reach its
+end state without Esc (it keeps the addition-chain total, the anchored repoint, the
+outside-border dress and the negated tie-out — the locked-out shapes are the point of it) and
+the wedge is tracked as its own task rather than parked in a red gate.
+
+**A methodology note worth keeping:** the first diagnostic harness written for this produced
+three confidently WRONG readings — every variant "failed identically" — because it omitted the
+`hotkey_onboarded` localStorage init, so the landing overlay ate every key. A probe harness must
+mirror the real harness's init before its output means anything.
+
 ### PLUMBING
 
 - `drills.js`: `balcheck` gains `errorCount:3` (the §2.3 meter on the rail); all three descs
@@ -116,6 +148,8 @@ inside rows that already existed, so the empty band sat on screen for the whole 
   of the nine zero-ALT drills §1.8 names). Six entries, all green. Two of them are deliberate
   NEGATIVE CONTROLS that walk the locked-out formula shapes above.
 - `dev/check-invariants.js`: `REWORKED` grows to 44.
+- `tieout` ALT 2 does not interrogate with F9 — see the gate note above; its ☆ coverage comes
+  from the demo, which the replay suite drives every run.
 
 ### STILL OPEN AFTER THIS DISPATCH
 
