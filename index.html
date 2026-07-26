@@ -4804,8 +4804,12 @@ const CHALLENGES = {
     ]; },
     demo(){ const o=this._o; const g=o.regions.filter(b=>b.hidden);
       const steps=[];
-      /* ① one pass down the whole detail block clears BOTH gaps (gap-by-gap clears it too) */
-      steps.push({sel:'A'+o.regions[0].d1+':A'+o.regions[2].rt, keys:[{key:'9',ctrl:true,shift:true}]});
+      /* ① one pass from the HEADER row down through the last region total clears BOTH gaps
+         (gap-by-gap clears it too). It starts on the header rather than on the first detail
+         row for a reason beyond taste: the r365 STANDARD OPEN parks the cursor on the demo's
+         first cell, and on a seed where region one is one of the hidden two that cell is a
+         BURIED row — the board would load with the caret somewhere the player cannot see. */
+      steps.push({sel:'A'+o.hr+':A'+o.regions[2].rt, keys:[{key:'9',ctrl:true,shift:true}]});
       /* ② the crushed column, straight after the beat that put the figures back (§1.0(a)) */
       steps.push({sel:'B'+o.hr, keys:[Kb.alt,L('h'),L('o'),L('w'),{key:'1'},{key:'2'},Kb.enter]});
       /* ③ one group per region — the detail rows only, the total row left outside */
@@ -4867,7 +4871,11 @@ const CHALLENGES = {
       /* colW[2] is set DELIBERATELY narrow, so the r432 auto-grow leaves it alone (it only
          grows columns that never had an explicit width) and beat 2 stays the player's work.
          dev/e2e-fit-sweep.js exempts this drill for exactly that reason. */
-      return {ROWS:memoRow, cells, active:{r:hr+1,c:1}, sel:null, colW:{1:172,2:40},
+      /* the cursor opens on the HEADER row, never on hr+1: on a seed where the first region is
+         one of the hidden two, hr+1 is a buried row and the board would load with the caret
+         parked somewhere the player cannot see (caught in the fresh-board screenshot). The
+         demo's first step opens on the same cell, so the r365 STANDARD OPEN agrees with it. */
+      return {ROWS:memoRow, cells, active:{r:hr,c:1}, sel:null, colW:{1:172,2:40},
         hiddenRows:hiddenRows};
     },
     checks(S){
@@ -4906,9 +4914,19 @@ const CHALLENGES = {
          the page, not the order it was reached in. */
       const foldedOk=groupedOk && totalsOk &&
         o.regions.every(b=> b.i===o.openI || !!(grpOf(b)||{}).collapsed);
-      /* BEAT 5 — the reviewer's region is open and honest: grouped, expanded, not hidden. */
+      /* BEAT 5 — the reviewer's region is open on a page that is otherwise folded down. It
+         carries foldedOk deliberately: the line's own clause is "the other two stay folded",
+         so grading it against the whole page is grading exactly what it says, and it cannot
+         light EARLY the way a bare "this group is expanded" test does (that version went green
+         the moment the region was grouped, before anything had been folded at all — caught in
+         the mid-solve screenshot). What it deliberately does NOT do is demand a fold-then-
+         unfold HISTORY: a player who folds the other two and simply leaves this one open
+         reaches the identical page, and §1.0-R3(p)/§1 say the beat grades the page, not the
+         order it was reached in — a beat that stays dark with nothing on the board to fix is
+         the one defect this whole pass exists to kill. In practice the fold-all route is the
+         one the ☆ rewards, so the reopen is where the drill actually lands. */
       const ob=o.regions[o.openI], og=grpOf(ob);
-      const openOk=!!og && !og.collapsed && !hid.has(ob.d1) && !hid.has(ob.d2);
+      const openOk=foldedOk && !!og && !og.collapsed && !hid.has(ob.d1) && !hid.has(ob.d2);
       /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the whole
          outline collapses in ONE hide-detail pass. Read off the r437 S.foldN latch — the
          MECHANIC, never geometry, because three separate folds and one spanning fold leave

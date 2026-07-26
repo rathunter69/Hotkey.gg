@@ -354,16 +354,27 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 
   console.log('U. manual hide + column width (r185)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('unhide'); });
+  /* r437: this section drove the PRE-REWORK unhide board by hard-coded coordinates (rows 4-7
+     hidden, the total at B3, the header at B2) and by `_o.sum`, none of which survived the
+     depth pass (DEPTH_PASS §4.37 + the §4.35 grpfold merge). It is an ENGINE-parity section,
+     not a drill section, so it is repointed at the live board's own `_o` instead of being
+     re-hard-coded — the r185 hide/unhide mechanics and the Alt H O W prompt are what it is
+     actually asserting, and those are unchanged. */
   const u1 = await run(() => {
-    const preHidden = [4,5,6,7].every(r => S.hidden.has(r)) && S.hiddenRows.length === 4;   // board loads with the sins in place
-    const subLive = Math.abs(S.cells['B3'].value - CHALLENGES.unhide._o.sum) < 0.5;        // SUM sees hidden rows
-    setDemoSel('A3:A8'); demoKey({key:'9', ctrl:true, shift:true});
-    const unhid = S.hidden.size === 0 && S.unhideN === 1;
-    setDemoSel('A5:A6'); demoKey({key:'9', ctrl:true});
-    const rehid = S.hidden.has(5) && S.hidden.has(6) && !S.hidden.has(4) && !rowHidden(S.active.r);
-    setDemoSel('A4:A7'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'u'}); demoKey({key:'o'});
+    const o = CHALLENGES.unhide._o;
+    const gaps = o.regions.filter(b => b.hidden);
+    const buried = []; gaps.forEach(b => { for (let r = b.d1; r <= b.d2; r++) buried.push(r); });
+    const preHidden = buried.every(r => S.hidden.has(r)) && S.hiddenRows.length === buried.length;   // board loads with the sins in place
+    const subLive = gaps.every(b => Math.abs(S.cells['B' + b.rt].value - b.sum) < 0.5);              // SUM sees hidden rows
+    const g0 = gaps[0];
+    setDemoSel('A' + (g0.d1 - 1) + ':A' + (g0.d2 + 1)); demoKey({key:'9', ctrl:true, shift:true});
+    const unhid = ![g0.d1, g0.d2].some(r => S.hidden.has(r)) && S.unhideN === 1;
+    setDemoSel('A' + g0.d1 + ':A' + (g0.d1 + 1)); demoKey({key:'9', ctrl:true});
+    const rehid = S.hidden.has(g0.d1) && S.hidden.has(g0.d1 + 1) && !S.hidden.has(g0.d2) && !rowHidden(S.active.r);
+    setDemoSel('A' + o.regions[0].d1 + ':A' + o.regions[2].rt);
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'u'}); demoKey({key:'o'});
     const ribbonUnhide = S.hidden.size === 0;
-    setDemoSel('B2'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'w'});
+    setDemoSel('B' + o.hr); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'w'});
     const dlg = mode === 'ribbon' && dialog === 'colw';
     demoKey({key:'1'}); demoKey({key:'2'}); demoKey({key:'Enter'});
     const applied = colW[2] === Math.round(12*7)+5 && mode === 'normal';

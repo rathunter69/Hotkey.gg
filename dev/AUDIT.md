@@ -7239,6 +7239,130 @@ untriggerable-beat class outright — and the board had no efficiency headroom a
   contained, solvable · cache-bump guard clean (no ?v= bump: drills.js content changed, its version
   is the integrator's call at batch time).
 
+### r437 · `unhide` — depth pass, and the `grpfold` MERGE (DEPTH_PASS §4.37 + §4.35)
+
+- **SPEC-PAGE NUMBERING (say it, per §0):** the dispatch brief numbered these §4.33 and §4.35. In
+  dev/DEPTH_PASS.md as it stands, §4.33 is `sort`, §4.35 is `grpfold` and §4.37 is `unhide`; the
+  page titles the drill "Flush the hidden rows" while drills.js labels it "Unhide the rows". The
+  SPEC PAGE was followed on numbering (this is §4.37 + §4.35) and drills.js on the label — "Unhide"
+  is on the §1.7 closed verb list, "Flush" is not, and the picker identity is immutable.
+- **MERGE VERDICT: `grpfold` RETIRES into `unhide`.** Two tests, both saying merge, both run before
+  anything was built:
+  1. **§3 discriminator** ("does fluency in one produce a correct first attempt at the other?").
+     grpfold's whole beat list — group each block, fold them, reopen one — is a STRICT SUBSET of
+     unhide's, and the SHIPPED unhide guide taught it verbatim: guide line 2 read *"now do it RIGHT:
+     select rows h1:h2 · shift+alt+→ groups them · alt a h folds"*. That is the `growth`/`versionup`
+     pattern the campaign already retired a drill on. The containment is ONE-WAY — unhide's opening
+     move (find the gap, select ACROSS it, unhide) appears nowhere in grpfold — so this is not a
+     sumif/rollup contrast where the argument signature inverts and the trap exists only as a pair.
+     It is one lesson with its first half missing.
+  2. **§2 ☆-HEADROOM DIAGNOSTIC, MEASURED on each board at its own page's scope** (every selection
+     and every navigation keyed, so the counts are what a player actually pays):
+     · `grpfold` ☆ route **52 keys** · slow route **63 keys** → spread **1.21×**
+     · `unhide` fastest legal **31 keys** · slowest legal **39 keys** → spread **1.26×**
+     Both sit BELOW retired `growth`'s 2.4×, and far below the shipped band (percent 5.4× ·
+     fxconvert 5.7× · lookup 3.0×). Decisive detail: every one of unhide's 8 keys of spread is a
+     chord-vs-ribbon or a formatting choice (Ctrl+Shift+9 vs Alt H O U O · autofit vs the width
+     dialog · Alt H B P vs the Format Cells walk). §1.0(c) requires all of those to CLEAR the core
+     beats and §1.0(d) forbids a formatting ☆, so the standalone unhide board carries **no legal ☆
+     at all** — the §4.37 page's own proposal ("italicize the restatement memo line") is formatting,
+     dead on arrival. grpfold's only legal ☆ (collapse the whole outline in one pass) exists solely
+     because that board has THREE groups. The merged board is the only one of the three with both
+     halves — a diagnosis to make AND enough outline to reward driving it as one.
+- **WHICH KEY SURVIVES: `unhide`.** It is the container, not the contained; its meta desc already
+  advertised the merged lesson; and the engine carries plumbing that exists FOR it and would be
+  orphaned by retiring it — hideRows/unhideRows (r185, written "so a drill can teach WHY"), the
+  `hidcut` break line in render() (r299, added because without it this drill was a guessing game),
+  the e2e-audit-parity §U section, the e2e-fit-sweep exemption.
+- **BOARD:** an inherited three-region roll-up (three months of detail under each region total, a
+  Consolidated line under all three). TWO of the three regions arrive with their detail MANUALLY
+  HIDDEN; the third arrives open, so the honest structure sits on the page beside the sin as the
+  reference. Region totals SUM rows that cannot be seen. Randomization, four axes (§1.2): header
+  row jitters 3/4 · region pool (6→3) and month-quarter pool Fisher-Yates · every figure through
+  rnd() · which two regions arrive hidden and which one the reviewer reopens.
+- **BEATS (6 core + the engine save + one ☆), chained (§1.1):** unhide the gaps (adaptive label per
+  §1.0-R2(g): it names THIS seed's jump rows and carries a live k/2 counter, the §2.3 pattern
+  without meta.errorCount) → widen the crushed Amount column, straight after the beat that put the
+  figures back (§1.0(a)) → group each region's detail, totals left outside → fold the detail away →
+  unfold the region the reviewer asked about → bold the Consolidated line and rule it on TOP
+  (§1.0(f), §1.6 finish state). Aha lands on the unfold (§1.5): the ⊞ makes a promise the hidden
+  rows never could.
+- **☆ = collapse the WHOLE OUTLINE in ONE hide-detail pass**, read off the new `S.foldN` latch
+  (§1.0(d) hidden efficiency, §1.0-R2(i) a real skippable decision; latched once earned so the
+  required reopen can never take it back). MEASURED, 3 seeds each: **23 keys** with it · **29**
+  with the folds taken one group at a time, star dark · **37** on ALT 1's full ribbon route, star
+  dark. Both of the ☆'s own routes were walked and both light it: a selection spanning all three
+  groups, and the cursor parked clear of every group (the engine's `!hit` branch) — 20 keys with
+  autofit, the fastest legal run on the board.
+- **§1.0-R3(p) ROUTES WALKED, not reasoned about.** The three ways a row goes invisible here are
+  DIFFERENT end states and are graded apart: a manual hide (`S.hiddenRows`), a collapsed group
+  (`S.rowGroups[].collapsed`), an AutoFilter exclusion (`S.filter`). `S.hidden` is their union and
+  no beat reads it. There is no row-height route to probe — the engine has no per-row height (Alt H
+  O A is a deliberate no-op) and `S.rowGroups` is flat, so there are no outline LEVELS either.
+  CLEARING: chord and ribbon unhide · gap-by-gap and one pass down the table · Alt H O W 12 and Alt
+  H O I (the width beat reads `overflowsCol`, so any width that clears the #### clears it) ·
+  grouping while the detail is STILL hidden and unhiding after · the whole run reversed. Correctly
+  DARK (measured negative controls): Alt H B S on the Consolidated line (perimeters a one-row
+  selection, hanging a rule UNDER the total) · Alt H B D (top AND bottom) · swallowing the region
+  TOTAL row into the group · re-HIDING the detail instead of grouping it · arming AutoFilter instead
+  of an outline · skipping the width · never reopening the reviewer's region.
+- **BOARD DETAIL THAT IS LOAD-BEARING, not decoration:** one blank row between regions.
+  `setDetail(true)` with no group under the cursor expands every collapsed group ADJACENT on EITHER
+  side, so with the blocks butted together a region-total row neighbours two groups and one Alt A J
+  opened both — probed across 8 seeds, the demo lost the fold beat on every seed where the reopened
+  region was not the last one. Also: the cursor opens on the HEADER row and the demo's first step
+  starts there, so the r365 STANDARD OPEN cannot park the caret on a buried row (caught in the
+  fresh-board screenshot).
+- **PAGE ITEMS SUPERSEDED, named per §0:** the §4.37 ☆ ("italicize the restatement memo line") — a
+  formatting ☆, banned by §1.0(d), and measured as carrying no efficiency at all. The §4.37 beat 3
+  ("Trace the Consolidated total", ok = traceN≥1) — DROPPED: `traceN≥1` grades that a key was
+  PRESSED, which is the §1.0-R3(p) untriggerable class this campaign exists to kill; the
+  totals-stay-live requirement it existed to protect is folded into the fold beat's `ok` instead
+  (§1.1, no do-nothing lines). "Group … then fold them" was one page line; §1.1 makes it two beats,
+  which is also what makes the ☆ legible.
+- **ENGINE:** `setDetail()` gains `S.foldN` — a fold-PASS latch in the `S.autoSumN` / `S.colwN` /
+  `S.unhideN` family, counting hide-detail invocations that actually collapsed something.
+  Route-blind by construction (the spanning-selection route and the cursor-parked-clear route both
+  count once). Telemetry for a BONUS only; no core check reads it (§1.0(c)).
+- **META:** drills.js desc named a single hidden span and a width fix; rewritten for the
+  three-region outline rebuild. name/label/tab left alone (immutable key + picker identity,
+  generated drills/unhide.html).
+- **PAR:** re-swept — 5-seed median **23 keys** including the engine-appended Ctrl+S, zero variance
+  (the randomization moves the board, never the keystroke count). parKeys 12→23, par 15→**25**
+  (1.09 s/key, the top of the house band — this is the one drill in the chapter whose first beat is
+  a DIAGNOSIS). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 37.5s · pro 28.75s ·
+  legendary 25s.
+- **ALT-PATH ENTRY DELETED (integrators: do not resurrect).** The single shipped `unhide` entry
+  ("width fixed FIRST, ribbon unhide route, grouped while still hidden") drove `o.h1`/`o.h2` — a
+  single hidden span the reworked board no longer has. DELETED, not patched, and replaced by the
+  §1.8 pair (op ORDER + chord ROUTE). Per the r435 integration note: for the drill an agent
+  reworked, its side of dev/e2e-alt-paths.js is authoritative for additions AND deletions.
+  `grpfold`'s entry is left UNTOUCHED — it goes with the retirement, which this agent did not execute.
+- **HIDDEN TEST COUPLING FOUND AND FIXED:** `dev/e2e-audit-parity.js` §U ("manual hide + column
+  width", r185) drove the pre-rework unhide board by hard-coded coordinates (rows 4-7 hidden, the
+  total at B3, the header at B2) and by `_o.sum`. It threw on the new board. It is an ENGINE-parity
+  section, so it is repointed at the live board's own `_o` rather than re-hard-coded; what it
+  asserts (the r185 hide/unhide mechanics, the Alt H O W prompt) is unchanged. This is the fourth
+  member of the campaign §4 "hidden test couplings" class.
+- **GATE (all green, own port 8853):** static invariants clean (C9 unhide tri-length 7 + one ☆ +
+  saveClose; C11 aphorisms clean; C12 ≥2 alts across 27 reworked drills) · demo-replay ALL GREEN ·
+  alt-paths ALL 101 PASS · par-sweep FLAGGED 0 (drift 0%) · fit-sweep ALL CLEAN (72) ·
+  depth-mechanics 155/155 · smoke 7 pages + PARS parity + de-hint clean · audit-parity ALL 177 PASS ·
+  guided gate ALL 79 PASS · border render clean · no ?v= bump (drills.js content changed; its
+  version is the integrator's call at batch time).
+- **RETIREMENT PLUMBING FOR `grpfold` — HANDED OVER, NOT EXECUTED** (per the dispatch brief).
+  drills.js `groups` "Data & Lookups" key list · drills.js `meta.grpfold` · drills.js
+  `HOTKEY_PARS.grpfold` · index.html `CHALLENGES.grpfold` block · dev/e2e-alt-paths.js the one
+  `grpfold` entry · dev/migrate-certificates.sql the 'formulas' track array · drills/grpfold.html ·
+  sitemap.xml the drills/grpfold.html `<loc>` · refmap.js (regenerate — it maps ALT+SHIFT+→ and
+  ALT>A>H to grpfold; both belong to unhide now) · the "76 banker-grade drills" marketing count in
+  index.html ×3 metas and About.html ×2 metas (→ 75; e2e-smoke asserts it against menuOrder). NOT
+  needed, verified: `HOTKEY_CAMPAIGN` (c4's keys are sort/recon/lookup/lookup2 — grpfold is not
+  listed) · `HK_TRACKS` (derives from `groups`, no per-drill list) · milestone lists (chapter ids
+  only) · `e2e-depth-mechanics` (no section drives grpfold) · `e2e-fit-sweep` EXEMPT (unhide only).
+  The three supabase/migrations/*.sql history files also carry grpfold in their 'formulas' arrays;
+  those are applied migrations and should be left alone.
+
 ## r437 — H6b-8: recon depth pass — "Two systems, one truth" (DEPTH_PASS §4.41 + §1.0/-R2/-R3)
 _The Data & Lookups tie-out. Built against the binding constraint the r436 `lookup` pass left on
 the family: recon keeps INDEX/MATCH as an INSTRUMENT and never as the subject._
