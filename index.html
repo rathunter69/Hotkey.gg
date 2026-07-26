@@ -4285,47 +4285,288 @@ const CHALLENGES = {
     }
   },
   lookup:{
-    name:'Lookup', label:'Look it up', par:32, parKeys:31,
-    aha:'INDEX/MATCH targets headers, not cell positions — reorder the columns and it still lands. That’s why desks drill it over VLOOKUP, which counts columns and breaks the day someone inserts one.',
-    prompt:'Pull a figure out of the table with INDEX/MATCH. The query panel names a company and a metric — return that number into the Answer cell. The metric columns are shuffled every round, so read the headers and aim INDEX at the right column.',
-    req:'<em>INDEX + MATCH</em> · MATCH(G2, A2:A8, 0) finds the company\'s row, then INDEX that metric\'s column · e.g. <em>=INDEX(C2:C8, MATCH(G2,A2:A8,0))</em> — or two-way <em>=INDEX(B2:D8, MATCH(G2,A2:A8,0), MATCH(G3,B1:D1,0))</em>',
-    guide:[
-      'in G4 type <kbd>=INDEX(</kbd> the queried metric\'s column, e.g. C2:C8 <kbd>, MATCH(G2,A2:A8,0))</kbd> — MATCH locates the company row, INDEX pulls from that column',
-      'if the number looks wrong, INDEX is pointed at the wrong column — match it to the Metric named in G3',
-    ],
-    targets:['G4','G4'],
-    demo(){ const col=this._mcol; return [
-      {sel:'G4', keys:[...T('=INDEX('+col+'2:'+col+'8,MATCH(G2,A2:A8,0))'), Kb.enter]},
+    /* r436 H6b-7 — the depth-pass rework of "Look it up" (DEPTH_PASS §4.38; the assignment
+       numbers it §4.36, the page numbering drifted). §1.0 / §1.0-R2 / §1.0-R3 applied on top
+       of the page, §1.0-R3 winning on conflict.
+
+       ── THE DISTINCTNESS QUESTION, ANSWERED BEFORE ANYTHING WAS BUILT ────────────────────
+       This chapter carries THREE INDEX/MATCH drills — `lookup` (one-way), `lookup2` (two-way)
+       and `recon` (INDEX/MATCH inside a reconciliation). §1.0-R3(s) says to ask the merge
+       question first. The honest finding, recorded so nobody has to re-derive it:
+
+       (1) AS SHIPPED, `lookup` AND `lookup2` WERE ONE LESSON AT TWO ARITIES. Not "similar" —
+           the same board. Compare the two build() bodies before this commit: identical metric
+           pool, identical Fisher-Yates shuffle, identical query panel at F1:G4, identical
+           colW map, identical ROWS:6, identical two checks (a formula-text probe and a value
+           probe). The only differences were seven table rows versus five, and one more MATCH.
+       (2) THE SUMIF/SUMIFS DEFENCE DOES NOT APPLY HERE. `sumif` vs `rollup` survived its own
+           review because the ARGUMENT SIGNATURE INVERTS between the two functions — the summed
+           column moves from last to first — so the pair teaches a trap that exists only as a
+           contrast. INDEX has no such inversion: INDEX(array, row_num, [col_num]). The two-way
+           form is the one-way form with one more OPTIONAL argument supplied. Nothing moves,
+           nothing swaps, and a player fluent in one writes the other correctly on the first
+           try. That is the textbook definition of one lesson at two arities.
+       (3) WORSE: `lookup`'s OWN AHA WAS FALSE OF THE FORMULA IT GRADED. It read "INDEX/MATCH
+           targets headers, not cell positions — reorder the columns and it still lands." A
+           one-way INDEX/MATCH does not target the header at all; the player picks the metric
+           COLUMN BY EYE and hardcodes it. On a board that shuffles the metric columns every
+           round, the graded formula was exactly the position-counting formula the aha claimed
+           it wasn't. (Header-reading is the second MATCH — i.e. lookup2's core, and the whole
+           point of the planned `vlookup` drill, §4.39/D2, which does not exist yet: with it
+           absent the "one-way → legacy → two-way trilogy" that DEPTH_PASS line 243 leans on to
+           reject the merge is currently a duo of duplicates.)
+       (4) THE RECOMMENDATION CARRIED OUT OF THIS BUILD (not executed — lookup2 is another
+           agent's page, and DEPTH_PASS explicitly reserves the merge call). Distinctness here
+           has to come from the BOARD SITUATION, not the arity, because the arity cannot carry
+           it. The two desk situations that genuinely differ are:
+             · ONE FIELD, MANY KEYS — a screen that asks the same question of several names.
+               One-way INDEX/MATCH is the RIGHT formula, and the skill is anchoring it so one
+               fill answers every name. That is this drill now.
+             · ONE KEY, AN INTERSECTION — a matrix read where the column is itself a lookup.
+               Two MATCHes are genuinely required and one answer is the whole job. That should
+               stay lookup2's, and lookup2 should NOT grow a filled column of answers, or the
+               boards re-converge and the merge question comes straight back. Flagged to the
+               integrator in dev/AUDIT.md.
+           If the project would rather carry two drills than three: lookup2 absorbs lookup
+           (two-way is strictly more general, and its aha is true), because the one-way case
+           already survives inside `recon`.
+       (5) `recon` IS A DIFFERENT LESSON AND STAYS. It shares the MECHANIC (anchored one-way
+           INDEX/MATCH filled down a column) but not the SUBJECT: recon is a two-system tie-out
+           whose finish state is a zero column, and its INDEX/MATCH is an instrument inside a
+           subtraction, not the thing being taught. The overlap is real but it is the overlap
+           `foot` has with every drill that sums something. Its ☆ (§4.41: colour the brought-
+           across deal blue) is a formatting task and dies under §1.0(d) at its own rework —
+           noted here, not touched.
+       (6) THE SELF-DIAGNOSTIC — "no efficiency headroom → no legal ☆ → probably a motif, not
+           a lesson." Applied honestly, `lookup` PASSES, but only on the reworked board. The
+           old two-check board had literally none: one answer cell, one formula, nothing to
+           fill, nothing to skip; every candidate ☆ on it was either formatting (dead under
+           §1.0(d)) or fell out of the exercise (dead under §1.0-R2(i)), which is precisely why
+           the page's own proposed bonus was "build it again with VLOOKUP" — an ANTI-efficiency
+           bonus that costs more keys than it saves and duplicates §4.39 outright. Giving the
+           screen three names creates the headroom: measured at 55 keys with the star versus
+           163 without (see the parKeys note and the alt-paths negative control).
+
+       ── STRUCTURAL DEVIATIONS FROM THE §4.38 PAGE, declared per §0 ────────────────────────
+       (a) ☆ RE-CUT (binding). The page's ☆ — "Build the first answer again in the compare cell
+           with VLOOKUP" — fails §1.0(d) on its face: a bonus must be a HIDDEN EFFICIENCY, and
+           writing a second formula to compare against the first is the opposite of one. It
+           also pre-empts §4.39 `vlookup`, whose entire concept is that comparison. Replaced by
+           the efficiency this board now has: ONE anchored fill answers the whole screen.
+       (b) BEAT 2 IS "the other two companies", not "a second query whose metric column moved".
+           Cause: the page's beat 2 is a disguised two-way read (a moving metric column is what
+           the second MATCH is FOR), so building it here would have made lookup and lookup2
+           converge rather than diverge — see (4). One field, three names is the shape that
+           makes this drill its own lesson and creates the fill's headroom.
+       (c) BEAT 4 IS A FONT-COLOUR BEAT, NOT COMMA-FORMAT. §1.0-R3(o) is explicit that Wolf
+           regards the comma format as over-anchored ("such a seldom used / rare hotkey") and
+           ranks font colour — blue = hardcode, green = linked cell — as day-to-day work. The
+           answers ship carrying comma/0dp as board furniture so the numbers read, and the
+           graded dress is the convention the board is actually about: the table's figures are
+           typed and already blue, the screen's amounts are pulled and go green.
+       (d) NO §2.5 TIER REVEAL. The page allows this explicitly ("ship tiers visible with parked
+           labels if 2.5 slips — the beats stand either way"). With one field and three names
+           there is no tier-2 region to park: all three answers are the same question.
+       (e) SEVEN-ROW TABLE → 8–10 ROWS + A DECK STRIP + A SOURCE MEMO. §1.3 density: the old
+           board returned ROWS:6 and lived in a corner. The new one carries content on 11–13 of
+           its rows.
+       (f) NO cueCell() (§1.0-R2(h)/§1.0-R3(q)): there is no insert point and no empty paste
+           destination. Every graded target is a labelled panel cell or the named deck-strip
+           read, which the green outline expresses exactly. Nothing graded spills — the title,
+           the two block sub-labels and the source memo are the only spilling cells and none is
+           graded.
+       (g) NO helper/assumption cells (§1.0(f)/§1.0-R2(l)): nothing is converted or scaled here,
+           so a yellow input block would be a labelled box with no input in it. No total row
+           either, so the top-border convention has nothing to attach to.
+
+       ── §1.0-R3(p) GRADE THE END STATE. ROUTES ENUMERATED BY WALKING THEM, NOT BY READING ──
+       The old checks() probed the FORMULA TEXT for 'INDEX(' and 'MATCH(' — the exact bug class
+       round 3 named. A correct VLOOKUP left the beat dark with nothing on the board to fix.
+       Every core beat now reads the END STATE:
+         · the amounts — VALUE only, so =INDEX/MATCH, =VLOOKUP($…,2,0), a pointed formula and a
+           typed number all clear identically. The tolerance is 0.5 against figures that are all
+           multiples of five, so it is slack, never a rounding trap.
+         · green — fontColor==='green', reachable two ways: Alt H J → Link (the Cell Styles
+           gallery) and Alt H F C → the Green swatch. Both walked; both clear.
+         · the deck strip — VALUE only, so repointing the range, retyping the formula, copying
+           the panel's first (locked) answer onto it, and typing the number all clear.
+         · the box — every route that draws the four edges: Alt H B S, the thick box Alt H B T,
+           a per-edge walk (B P / B O / B L / B R), and Alt H B A (ball carries the perimeter).
+           Three RECTS are accepted, because three readings of "the screen panel" are honest:
+           the panel with its Metric header, the company/amount table alone, and the panel taken
+           down through the deck strip.
+       The ☆ is the one place a ROUTE may be graded (§1.0(c) sanctions exactly this), and it
+       reads the r424 S.fillOps latch — the MECHANIC, never geometry inferred — so Ctrl+D and
+       the ribbon's Alt H F I D both earn it.
+
+       ── AHA (§1.5) AND FINISH STATE (§1.6) ───────────────────────────────────────────────
+       The aha lands on beat 2's fill: MATCH hands INDEX a POSITION, and once the table is
+       pinned that one formula answers every name on the screen. The last WORK beat is the
+       outside border (beat 5) — the panel becomes sendable — and the engine's Ctrl+S closer
+       follows it (§1.0(e), saveClose:true).
+
+       ── ENGINE FACTS VERIFIED, NOT ASSUMED ───────────────────────────────────────────────
+       · MATCH is exact-equality over eqLoose and throws #N/A on a miss (r418) — which is what
+         makes the unlocked fill visibly fail rather than quietly return a wrong number.
+       · INDEX with a single-column range takes the row offset from the range's own top, so an
+         unlocked fill that walks BOTH ranges down together stays internally consistent. That is
+         why the failure has to be constructed rather than assumed — see the build() note.
+       · fillFrom() copies the FULL format of the source cell. Bordering the panel BEFORE filling
+         therefore drags the source cell's edges over the bottom row and can wipe its bottom
+         border; the player sees it go and can redraw. Both alt-paths border after the fill. */
+    name:'Lookup', label:'Look it up', par:59, parKeys:55, saveClose:true,   /* r436: par re-swept on the reworked board — dev/e2e-par-sweep.js lookup, 5-seed median 55 keys incl. the engine-appended Ctrl+S, and flat across a 20-seed probe (the demo's key count is geometry-invariant: the table always lands on rows 4–13, so every range in the one typed formula is the same length on every seed). par 59 ≈ 1.07 s/key, the house band, the premium being the READ this board charges for before a hand moves — which of three shuffled columns is the screen's metric. Measured against it: the same board with three hand-typed formulas plus a fourth for the deck strip, no fill anywhere, the long Alt H F C swatch walk and a four-edge border walk runs 163 keys, flat over a 20-seed probe (the negative control, alt-paths entry 2). The chord-route alt — a locked VLOOKUP filled from the ribbon, the swatch walk, the deck strip retyped — sits between them at 78 keys and still earns the star. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 89 · pro 68 · legendary 59. */
+    aha:'MATCH hands INDEX a position, not a value — pin the table and one formula answers every name on the screen.',
+    prompt:'The pitch screen names three companies and one metric, and the peer table it reads from re-orders its metric columns every time the data room refreshes — so the metric has to be read off the header, not counted to. Pull each company’s number onto the screen, mark the pulls the way the house marks a linked cell, repair the deck strip read that came back off the wrong column, and box the panel before it goes out.',
+    req(){ const o=this._o; return '<em>'+o.LPV+o.p0+'</em> <em>=INDEX('+o.idxR+',MATCH('+o.LPL+o.p0+','+o.namR+',0))</em> · select <em>'+o.ansRng+'</em> <em>ctrl+d</em> · <em>alt h j</em> → Link · copy <em>'+o.LPV+o.p0+'</em> → paste <em>'+o.deck+'</em> · <em>'+o.panel+'</em> <em>alt h b s</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that clears its beat (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the screen’s first amount lands at '+o.LPV+o.p0+' · <kbd>=</kbd>INDEX(<b>'+o.mL+o.r1+':'+o.mL+o.rL+'</b>,MATCH('+o.LPL+o.p0+',<b>'+o.LN+o.r1+':'+o.LN+o.rL+'</b>,0)) <kbd>↵</kbd> — MATCH returns the company’s POSITION down the name column, INDEX reads that position out of the '+o.qMetric+' column. A VLOOKUP counted across to the same column clears this beat, and so does typing the figure you can already see; the clock is what prices the difference',
+      'the other two names: lock both ranges in the first formula — <kbd>F4</kbd> on each range stamps its <kbd>$</kbd>, typing the dollars by hand lands the identical string — then select '+o.ansRng+' and <kbd>ctrl</kbd>+<kbd>d</kbd>. Writing each one out separately clears the beat too',
+      'select '+o.ansRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> opens the Cell Styles gallery, <kbd>→</kbd><kbd>→</kbd> to <b>Link</b> <kbd>↵</kbd> — the house green for a cell that points somewhere. <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> walks the font swatches to Green and lands the same colour',
+      'the deck strip read at '+o.deck+' was built off the '+o.wMetric+' column: <kbd>F2</kbd> in and repoint the INDEX range to the '+o.qMetric+' column, or retype it — or, because the ranges are locked and the name reference is not, copy '+o.LPV+o.p0+' and paste it onto '+o.deck+', where it re-points itself at '+o.dName,
+      'select '+o.panel+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — <kbd>s</kbd> is out<b>S</b>ide Borders, the perimeter of what you selected (<kbd>a</kbd> is ALL borders, every gridline inside it too). Walking the four edges one at a time (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> / <kbd>o</kbd> / <kbd>l</kbd> / <kbd>r</kbd>) draws the same box',
+      '☆ the discovery: lock BOTH ranges in the first formula, then select '+o.ansRng+' and one <kbd>ctrl</kbd>+<kbd>d</kbd> answers the whole screen — only the company reference walks (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the ribbon’s same fill). Leave the ranges unlocked and the fill drags them off the top of the table, so the two names up there come back #N/A. Writing all three out by hand clears every core beat, it just costs the keys',
     ]; },
+    /* rings: ① the first answer · ② the two below it · ③ the amount column · ④ the deck strip
+       read · ⑤ the panel · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.LPV+o.p0, o.LPV+o.p1+':'+o.LPV+o.p2, o.ansRng, o.deck, o.panel, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.LPV+o.p0, keys:[...T('=INDEX('+o.idxR+',MATCH('+o.LPL+o.p0+','+o.namR+',0))'), Kb.enter]},
+      {sel:o.ansRng,   keys:[Kb.fillD]},                                              /* the ☆ move — one pass over the whole amount column; its state latches at the win (§2.2) */
+      {sel:o.ansRng,   keys:[Kb.alt, L('h'), L('j'), {key:'ArrowRight'}, {key:'ArrowRight'}, Kb.enter]},   /* §1.0(a): the dress rides directly behind the column it dresses — Cell Styles → Link */
+      {sel:o.LPV+o.p0, keys:[Kb.copy]},                                               /* the locked ranges hold, the name reference walks — the deck strip repairs itself */
+      {sel:o.deck,     keys:[Kb.paste]},
+      {sel:o.panel,    keys:[Kb.alt, L('h'), L('b'), L('s')]},                        /* §1.6 finish state; §1.0-R2(m) S = outside, A = ALL borders */
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const metrics=['Revenue','EBITDA','Net debt'];
-      for(let k=metrics.length-1;k>0;k--){ const j=rnd(0,k); [metrics[k],metrics[j]]=[metrics[j],metrics[k]]; }
-      cells['A1']={...blankCell(),value:'Company',txt:true,bold:true};
-      metrics.forEach((mn,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:mn,txt:true,bold:true});
-      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox','Foxtrot Cap','Gemini Grp'];
+      /* §1.2 randomization — four independent axes: (a) the artifact's anchor column and header
+         row; (b) the company pool Fisher-Yates drawn from twelve AND the metric order shuffled,
+         so which column holds the screen's metric moves every seed; (c) every figure through
+         rnd(); (d) which-one-is-wrong — which metric the screen asks for, which three names it
+         asks about, which name the deck strip carries, and which column its broken read aims at. */
+      const POOL=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox','Foxtrot Cap',
+                  'Gemini Grp','Halcyon','Ironwood','Juniper Ltd','Kestrel Co','Lodestar'];
+      const shuf=(pool)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b; };
+      const c0=rnd(1,2);                    // the page's left edge — column A or B
+      const hr=rnd(3,4);                    // header row (the block sub-labels sit one above it)
+      const nC=rnd(8,10);                   // companies on the peer table
+      const cName=c0, cM=[c0+1,c0+2,c0+3], cPL=c0+5, cPV=c0+6;   // one empty column of moat between the islands
+      const LN=colLetter(cName), LPL=colLetter(cPL), LPV=colLetter(cPV);
+      const r1=hr+1, rL=hr+nC;
+      const metrics=shuf(['Revenue','EBITDA','Net debt']);
+      const names=shuf(POOL).slice(0,nC);
       const data={};
-      names.forEach((nm,r0)=>{ const r=r0+2; cells['A'+r]={...blankCell(),value:nm,txt:true}; data[nm]={};
-        metrics.forEach((mn,i)=>{ const v=rnd(2,90)*10; data[nm][mn]=v; cells[colLetter(i+2)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0}; }); });
-      const qName=names[rnd(0,names.length-1)], qMetric=metrics[rnd(0,metrics.length-1)];
-      cells['F1']={...blankCell(),value:'Query',txt:true,bold:true};
-      cells['F2']={...blankCell(),value:'Company',txt:true}; cells['G2']={...blankCell(),value:qName,txt:true};
-      cells['F3']={...blankCell(),value:'Metric',txt:true};  cells['G3']={...blankCell(),value:qMetric,txt:true};
-      cells['F4']={...blankCell(),value:'Answer',txt:true,bold:true}; cells['G4']={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._mcol=colLetter(metrics.indexOf(qMetric)+2);
-      return {ROWS:6, cells, active:{r:4,c:7}, sel:null, colW:{1:104,2:82,3:82,4:86,6:80,7:98}};
+      names.forEach(nm=>{ data[nm]={}; metrics.forEach(mn=>{ data[nm][mn]=rnd(24,180)*5; }); });
+      const qi=rnd(0,2), qMetric=metrics[qi];
+      const wi=(qi+1+rnd(0,1))%3, wMetric=metrics[wi];      // the column the deck strip's read was built off
+      /* THE SCREEN'S THREE NAMES, AND THE ONE PLACEMENT THAT IS NOT RANDOM. Screen rows two and
+         three carry the table's FIRST TWO companies, deliberately, and it is what makes the ☆'s
+         lesson land on EVERY seed instead of most of them. INDEX over a single column takes its
+         row offset from that column's own top, so an UNLOCKED fill walks the INDEX range and the
+         MATCH range down together and stays internally consistent — the numbers would come out
+         RIGHT and the anchoring discovery would never fire. What an unlocked fill cannot survive
+         is a name that falls off the TOP of the shrinking MATCH range: row two's fill drops table
+         row one, row three's drops table rows one and two, so both come back #N/A on every seed
+         (r418 made a MATCH miss the #N/A value rather than a refusal, so the board says so out
+         loud). WHICH companies sit up there is fully random — only the structural relationship is
+         fixed, exactly as sumif's r435 ledger-head constraint is. */
+      const q=[names[rnd(2,nC-1)], names[0], names[1]];
+      let dName=names[rnd(2,nC-1)]; { let guard=0; while(dName===q[0] && guard++<40) dName=names[rnd(2,nC-1)]; }
+      /* the broken read must LOOK broken: if the two columns happen to agree on this company the
+         beat would ship already green and the repair would be a no-op (§1.1 no do-nothing lines) */
+      if(data[dName][wMetric]===data[dName][qMetric]) data[dName][wMetric]+=5*(rnd(0,1)?1:-1);
+      cells[LN+'1']={...blankCell(),value:codename()+' — peer table and the pitch screen ($mm)',txt:true,bold:true};
+      cells[LN+(hr-1)]={...blankCell(),value:'Peer table — as reported',txt:true,it:true,fontColor:'gray'};
+      cells[LPL+(hr-1)]={...blankCell(),value:'Pitch screen',txt:true,it:true,fontColor:'gray'};
+      cells[LN+hr]={...blankCell(),value:'Company',txt:true,bold:true};
+      metrics.forEach((mn,j)=>{ cells[colLetter(cM[j])+hr]={...blankCell(),value:mn,txt:true,bold:true,align:'r'}; });
+      names.forEach((nm,i)=>{ const r=r1+i;
+        cells[LN+r]={...blankCell(),value:nm,txt:true};
+        metrics.forEach((mn,j)=>{ cells[colLetter(cM[j])+r]={...blankCell(),value:data[nm][mn],fmtStyle:'comma',decimals:0,fontColor:'blue'}; });   // blue = typed data, the house convention
+      });
+      /* the screen panel: its metric named on the board (§1.3 — no beat term the sheet doesn't
+         label), then the three names and their empty amount cells. The amounts ship carrying
+         comma/0dp as FURNITURE, not as a beat (§1.0-R3(o) deviation (c)). */
+      cells[LPL+hr]={...blankCell(),value:'Metric',txt:true,bold:true};
+      cells[LPV+hr]={...blankCell(),value:qMetric,txt:true};
+      cells[LPL+(hr+1)]={...blankCell(),value:'Company',txt:true,bold:true};
+      cells[LPV+(hr+1)]={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
+      q.forEach((nm,i)=>{ cells[LPL+(hr+2+i)]={...blankCell(),value:nm,txt:true};
+        cells[LPV+(hr+2+i)]={...blankCell(),fmtStyle:'comma',decimals:0}; });
+      /* the deck strip — a hand-off line somebody else already built, off the wrong column. It
+         sits BELOW the panel behind a blank row, so it is never in the fill's path: beat 4 stays
+         real work on the fast route as well as the slow one. */
+      const dRow=hr+7;
+      cells[LPL+(hr+6)]={...blankCell(),value:'Deck strip',txt:true,it:true,fontColor:'gray'};
+      cells[LPL+dRow]={...blankCell(),value:dName,txt:true};
+      const wL=colLetter(cM[wi]), mL=colLetter(cM[qi]);
+      cells[LPV+dRow]={...blankCell(),formula:'=INDEX('+wL+r1+':'+wL+rL+',MATCH('+LPL+dRow+','+LN+r1+':'+LN+rL+',0))',
+        value:data[dName][wMetric],fmtStyle:'comma',decimals:0};
+      cells[LN+(rL+2)]={...blankCell(),value:'Source: data room — comparable company file, latest refresh',txt:true,it:true,fontColor:'gray'};
+      this._o={ hr:hr, r1:r1, rL:rL, nC:nC, LN:LN, LPL:LPL, LPV:LPV, cPL:cPL, cPV:cPV,
+        mL:mL, wL:wL, qMetric:qMetric, wMetric:wMetric, q:q, dName:dName,
+        p0:hr+2, p1:hr+3, p2:hr+4, dRow:dRow,
+        idxR:'$'+mL+'$'+r1+':$'+mL+'$'+rL,
+        namR:'$'+LN+'$'+r1+':$'+LN+'$'+rL,
+        ansRng:LPV+(hr+2)+':'+LPV+(hr+4),
+        deck:LPV+dRow,
+        panel:LPL+hr+':'+LPV+(hr+4),
+        exp:q.map(nm=>data[nm][qMetric]), expDeck:data[dName][qMetric] };
+      const colW={}; colW[cName]=132; cM.forEach(c=>colW[c]=92); colW[c0+4]=34; colW[cPL]=132; colW[cPV]=96;
+      return {ROWS:Math.max(rL+2, hr+8), cells, active:{r:hr+2,c:cPV}, sel:null, colW:colW};
     },
     checks(S){
-      const company=S.cells['G2'].value, metric=S.cells['G3'].value;
-      let rowIdx=-1; for(let r=2;r<=8;r++){ if(eqLoose(S.cells['A'+r].value,company)) rowIdx=r; }
-      let mcol=-1; for(let c=2;c<=4;c++){ if(eqLoose(S.cells[colLetter(c)+1].value,metric)) mcol=c; }
-      const expected=(rowIdx>0&&mcol>0)?S.cells[colLetter(mcol)+rowIdx].value:null;
-      const g=S.cells['G4']; const f=(g&&g.formula)?g.formula.toUpperCase().replace(/\s/g,''):'';
-      const usesIM=f.includes('INDEX(')&&f.includes('MATCH(');
-      const valOk=!!(g&&g.formula)&&expected!=null&&Math.abs(g.value-expected)<1e-6;
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      /* §1.0(c) FREEDOM + §1.0-R3(p) END-STATE GRADING. Every core ok reads what the page LOOKS
+         like, so INDEX/MATCH, a VLOOKUP counted across, a pointed formula and a typed figure all
+         clear the same way and the clock prices the difference. THE OLD CHECKS DID NOT: they
+         probed the formula text for 'INDEX(' and 'MATCH(', so a correct VLOOKUP left the beat
+         dark with nothing on the board to fix — round 3's untriggerable-beat class exactly.
+         Every figure is a multiple of five, so the 0.5 tolerance is slack, never a rounding trap. */
+      const near=(k,want)=>{ const v=cel(k).value; return typeof v==='number' && Math.abs(v-want)<=0.5; };
+      const a0Ok=near(o.LPV+o.p0, o.exp[0]);
+      const restOk=near(o.LPV+o.p1, o.exp[1]) && near(o.LPV+o.p2, o.exp[2]);
+      /* green = a linked cell, the house convention the blue table figures are the other half of.
+         Two routes land it and both clear: Alt H J → Link (Cell Styles) and Alt H F C → Green. */
+      const greenOk=[o.p0,o.p1,o.p2].every(r=>cel(o.LPV+r).fontColor==='green');
+      const deckOk=near(o.deck, o.expDeck);
+      /* every route that draws the four edges clears — Alt H B S, the thick box Alt H B T, a
+         per-edge walk (B P / B O / B L / B R), and Alt H B A (ball carries the perimeter). */
+      const boxed=(r1,c1,r2,c2)=>{
+        for(let c=c1;c<=c2;c++){ const t=cel(colLetter(c)+r1), b=cel(colLetter(c)+r2);
+          if(!(t.bt||t.ball)||!(b.bb||b.ball)) return false; }
+        for(let r=r1;r<=r2;r++){ const l=cel(colLetter(c1)+r), rr=cel(colLetter(c2)+r);
+          if(!(l.bl||l.ball)||!(rr.br||rr.ball)) return false; }
+        return true; };
+      /* three honest readings of "the screen panel": with its Metric header, the company/amount
+         table alone, and the panel taken down through the deck strip (§1.0-R3(p) widening). */
+      const boxOk=boxed(o.hr,o.cPL,o.hr+4,o.cPV) || boxed(o.hr+1,o.cPL,o.hr+4,o.cPV) || boxed(o.hr,o.cPL,o.dRow,o.cPV);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): ONE anchored fill
+         answers the whole screen. Read off the r424 S.fillOps latch — the MECHANIC is recorded,
+         never inferred from the end state — so Ctrl+D and the ribbon's Alt H F I D both earn it
+         and three hand-typed formulas earn nothing. The values ride in the predicate because an
+         UNLOCKED fill is the failure this star exists to teach: it walks the MATCH range off the
+         top of the table and the two names up there come back #N/A. The live-formula test is what
+         stops a broken fill patched with two typed numbers from collecting the star; a player who
+         re-types formulas after a broken fill has done more work than locking would have cost.
+         Typing all three out clears every core beat (the alt-paths negative control measures that
+         route at 163 keys against the demo's 55) and forfeits only the star. */
+      const live=[o.p1,o.p2].every(r=>!!cel(o.LPV+r).formula);
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='down' && f.r1<=o.p0 && f.r2>=o.p2 && f.c1<=o.cPV && f.c2>=o.cPV);
+      /* DEPTH_PASS §4.38's beats with the deviations declared above. Labels are INSTRUCTIONS
+         (§1.0-R3(n)): the clause after the dash says WHAT or WHERE, never why. Beat 1 carries the
+         §1.0-R2(g) adaptive fact — which metric this seed asks for moves every round, and the
+         player should not have to reverse-engineer it out of the panel. */
       return [
-        {label:'pull the queried figure with INDEX + MATCH \u2014 no eyeballing, no hardcode', ok: usesIM},
-        {label:'match the answer to the queried company × metric', ok: valOk},
+        {label:'Build the first amount on the screen — '+o.q[0]+'’s '+o.qMetric, ok: a0Ok},
+        {label:'Build the amounts for the other two companies on the screen', ok: restOk},
+        {label:'Color the screen amounts green', ok: greenOk},
+        {label:'Fix the deck strip read — it returns the '+o.wMetric+' column', ok: deckOk},
+        {label:'Add an outside border around the screen panel', ok: boxOk},
+        {label:'Fill the whole amount column in one pass', ok: a0Ok && restOk && live && onePass, bonus:true},
       ];
     }
   },

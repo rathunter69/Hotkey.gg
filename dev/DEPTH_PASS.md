@@ -733,6 +733,31 @@ Do NOT build this page. The drill key `copyover` no longer exists in `menuOrder`
 ☆ Enter the memo — type "index/match — columns can move" in the note cell (verbatim text check; the lesson, written by the player's own hands)
 **Random:** query pools + which column inserts (Region/Owner) + table site jitter. **Aha:** "VLOOKUP counts columns; INDEX/MATCH reads headers — one of them survives Tuesday". **Finish:** beat 5. **Clocks:** fresh measure (~40s expected). **Engine:** VLOOKUP + r419 sentinels (the broken state shows a wrong VALUE, not an error — deliberate; no sentinel needed). **Plumbing:** D2.
 
+#### ⚠️ BINDING CONSTRAINT ON THIS PAGE (r436, from the `lookup` depth pass — READ BEFORE BUILDING)
+As SHIPPED, `lookup` and `lookup2` were **the same board**: identical metric pool, identical
+shuffle, identical query panel at F1:G4, identical `colW`, identical `ROWS:6`, identical
+two-check shape. Seven table rows against five, and one more MATCH. That is one lesson at two
+arities, not two lessons.
+
+The sumif/rollup defence does NOT transfer here. That pair survived because the argument
+signature INVERTS between SUMIF and SUMIFS. INDEX has no inversion — `INDEX(array, row_num,
+[col_num])`: the two-way form is the one-way form with one more optional argument supplied.
+Nothing moves, nothing swaps, and fluency in one produces a correct first attempt at the other.
+
+Worse, `lookup`'s old aha ("INDEX/MATCH targets headers, not cell positions") was FALSE of the
+formula it graded: a one-way INDEX/MATCH targets no header at all — the player picks the column
+by eye and hardcodes the offset. Header-reading IS the second MATCH, i.e. this drill's core.
+
+So distinctness must come from the BOARD SITUATION, not the arity:
+  · `lookup`  (r436, shipped) = ONE FIELD / MANY KEYS. One-way is the right formula; the skill
+    is anchoring so a single fill answers every name.
+  · `lookup2` (this page)     = ONE KEY / AN INTERSECTION. **It must NOT grow a filled column of
+    answers** — the moment it does, the two boards re-converge and the pair is redundant again.
+If only two lookup drills are wanted, the merge runs `lookup2` ABSORBS `lookup` (two-way is
+strictly more general and its aha is true), because the one-way case already lives in `recon`.
+Note also that `vlookup` (§4.39/D2), the middle term this doc leans on to justify keeping both,
+DOES NOT EXIST YET.
+
 #### 4.40 lookup2 — "Two-way lookup" · M (audit shallow #3)
 **Now:** 2 checks (two MATCHes present, value right); one query, small block.
 **Beats (deal-screen story per audit):**

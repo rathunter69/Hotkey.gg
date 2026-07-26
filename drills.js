@@ -147,7 +147,7 @@ window.HOTKEY_DRILLS = {
     threestmt:  { name:'3-Statement',label:'Tie the three statements',  tab:'3-Stmt',    desc:'3 yrs × 3 links, checks at zero, totals formatted to ship' },
     cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'5-yr cash roll-forward + conversion memo as %, the close bold with a top border' },
     debtsched:  { name:'Debt Schedule',label:'Run the debt schedule',      tab:'Debt',     desc:'Type the rate, paint it blue, run the 5-yr sweep roll-forward' },
-    lookup:     { name:'Lookup',   label:'Look it up',          tab:'Lookup',      desc:'Pull a value out of a table with INDEX/MATCH' },
+    lookup:     { name:'Lookup',   label:'Look it up',          tab:'Lookup',      desc:'Read a peer table with INDEX/MATCH \u2014 three pulls onto one pitch screen' },
     lookup2:    { name:'Two-way Lookup',    label:'Two-way lookup',      tab:'2-way',       desc:'INDEX with two MATCHes — row and column at once' },
   },
 };
@@ -332,7 +332,7 @@ window.HOTKEY_CLOCKS = {
   gauntlet:  { pass: 94 },   /* r433: the Formatting capstone — par 47 × 2 (§4.20 "Clocks: capstone pass=par×2.0") */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":59,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

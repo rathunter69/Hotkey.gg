@@ -253,9 +253,41 @@ const ALTS = [
       {sel:o.range, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
     ]; }` },
   // --- T-A tranche 2 additions (r170) ---
-  { key: 'lookup', name: 'the two-way INDEX form (block + double MATCH)', moves: `C => [
-      {sel:'G4', keys:[...T('=INDEX(B2:D8,MATCH(G2,A2:A8,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
-    ]` },
+  /* r436 (lookup DEPTH PASS, DEPTH_PASS §4.38). The r170 entry that lived here — a single
+     two-way INDEX typed into G4 against a 7-row table — drove the RETIRED board and was
+     DELETED, not adapted: G4/A2:A8/B1:D1 no longer exist on any seed. Do not resurrect it.
+     ALT 1 = chord-ROUTE alt: a locked VLOOKUP instead of INDEX/MATCH (the cores read VALUES,
+     never formula text — §1.0-R3(p)), the ribbon's Alt H F I D instead of Ctrl+D, the font
+     swatch walk instead of Cell Styles, the deck strip retyped instead of pasted, the THICK
+     box instead of Alt H B S, and the deck repair before the dress. The ☆ still fires.
+     ALT 2 = op-ORDER alt AND the measured NEGATIVE CONTROL for the ☆. */
+  { key: 'lookup', name: 'chord-ROUTE: locked VLOOKUP instead of INDEX/MATCH, ribbon fill alt h f i d, deck strip retyped BEFORE the dress, font-swatch walk instead of Cell Styles, thick box instead of outside borders — the ☆ still fires', moves: `C => { const o=C._o;
+      const vi=o.mL.charCodeAt(0)-o.LN.charCodeAt(0)+1;
+      const tbl='$'+o.LN+'$'+o.r1+':$'+o.mL+'$'+o.rL;
+      return [
+        {sel:o.LPV+o.p0,  keys:[...T('=VLOOKUP('+o.LPL+o.p0+','+tbl+','+vi+',0)'),{key:'Enter'}]},
+        {sel:o.ansRng,    keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.deck,      keys:[...T('=VLOOKUP('+o.LPL+o.dRow+','+tbl+','+vi+',0)'),{key:'Enter'}]},
+        {sel:o.ansRng,    keys:[{key:'Alt'},L('h'),L('f'),L('c'),
+                                {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},
+                                {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+        {sel:o.panel,     keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
+      ]; }` },
+  { key: 'lookup', name: 'NEGATIVE CONTROL / op-ORDER: deck strip repaired FIRST, then the three screen amounts typed bottom-up as separate formulas with no fill anywhere, font-swatch walk, four per-edge border walks — all five cores clear, ☆ dark (163 keys against the demo’s 55)', moves: `C => { const o=C._o;
+      const F=row=>'=INDEX('+o.mL+o.r1+':'+o.mL+o.rL+',MATCH('+o.LPL+row+','+o.LN+o.r1+':'+o.LN+o.rL+',0))';
+      return [
+        {sel:o.deck,     keys:[...T(F(o.dRow)),{key:'Enter'}]},
+        {sel:o.LPV+o.p2, keys:[...T(F(o.p2)),{key:'Enter'}]},
+        {sel:o.LPV+o.p1, keys:[...T(F(o.p1)),{key:'Enter'}]},
+        {sel:o.LPV+o.p0, keys:[...T(F(o.p0)),{key:'Enter'}]},
+        {sel:o.ansRng,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),
+                               {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},
+                               {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+        {sel:o.LPL+o.hr+':'+o.LPV+o.hr,         keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:o.LPL+(o.hr+4)+':'+o.LPV+(o.hr+4), keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
+        {sel:o.LPL+o.hr+':'+o.LPL+(o.hr+4),     keys:[{key:'Alt'},L('h'),L('b'),L('l')]},
+        {sel:o.LPV+o.hr+':'+o.LPV+(o.hr+4),     keys:[{key:'Alt'},L('h'),L('b'),L('r')]},
+      ]; }` },
   { key: 'lookup2', name: 'header-inclusive ranges (consistent off-by-one)', moves: `C => [
       {sel:'G4', keys:[...T('=INDEX(B1:D6,MATCH(G2,A1:A6,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
     ]` },

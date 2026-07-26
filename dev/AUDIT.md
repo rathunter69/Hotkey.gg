@@ -6944,3 +6944,120 @@ precisely by virtue of the deletion the union undid.
 The rule, for every future batch: **for the drill an agent reworked, ITS side of the file is
 authoritative — additions and deletions both. For every other drill, HEAD wins.** Never union
 the file wholesale. A stale entry drives a retired board shape and either throws or fails.
+
+## r436 — H6b-7: lookup depth pass — "Look it up" (DEPTH_PASS §4.38 + §1.0/-R2/-R3)
+_The thinnest formula drill in the chapter: two checks on a 7-row table, ROWS:6, one answer cell.
+One of those two checks probed the FORMULA TEXT for `INDEX(` and `MATCH(` — round 3's
+untriggerable-beat class outright — and the board had no efficiency headroom at all, so no legal
+☆ existed on it._
+
+- **DISTINCTNESS VERDICT vs `lookup2` and `recon` (§1.0-R3(s), asked before anything was built).**
+  **As shipped, `lookup` and `lookup2` were ONE LESSON AT TWO ARITIES.** Not merely similar — the
+  same board: identical metric pool, identical shuffle, identical query panel at F1:G4, identical
+  colW map, identical `ROWS:6`, identical two-check shape. The differences were seven table rows
+  versus five, and one more MATCH.
+  **The sumif/rollup defence does not transfer.** That pair survived because the ARGUMENT
+  SIGNATURE INVERTS between SUMIF and SUMIFS. INDEX has no inversion: `INDEX(array, row_num,
+  [col_num])` — the two-way form is the one-way form with one more OPTIONAL argument supplied.
+  Nothing moves, nothing swaps, and fluency in one produces a correct first attempt at the other.
+  That is the definition of one lesson at two arities.
+  **Worse, `lookup`'s own aha was FALSE of the formula it graded** — "INDEX/MATCH targets headers,
+  not cell positions" — when a one-way INDEX/MATCH targets no header at all: the player picks the
+  metric column by eye and hardcodes it. On a board that shuffled the metric columns every round,
+  the graded formula was exactly the position-counting formula the aha claimed it wasn't.
+  Header-reading IS the second MATCH, i.e. lookup2's core.
+  **Context the spec assumes but the catalog does not yet have:** DEPTH_PASS rejects the merge on
+  the strength of a "one-way → legacy → two-way trilogy … once D2 lands". `vlookup` (§4.39/D2)
+  does not exist. Until it does, the picker shows lookup and lookup2 adjacent with no middle term.
+  **RECOMMENDED, NOT EXECUTED (lookup2 is another agent's page and the merge call is reserved):**
+  distinctness here has to come from the BOARD SITUATION, because the arity cannot carry it. The
+  two situations that genuinely differ are ONE FIELD / MANY KEYS (a screen asking the same
+  question of several names — one-way INDEX/MATCH is the right formula and the skill is anchoring
+  it so one fill answers every name) and ONE KEY / AN INTERSECTION (a matrix read where the column
+  is itself a lookup — two MATCHes genuinely required, one answer is the whole job). This rework
+  takes the first. **lookup2 must take the second and must NOT grow a filled column of answers**,
+  or the boards re-converge and the merge question returns unchanged. If the project would rather
+  carry two drills than three, the merge runs `lookup2` ABSORBS `lookup` — two-way is strictly
+  more general and its aha is true — because the one-way case already survives inside `recon`.
+  **`recon` is a different lesson and stays.** It shares the MECHANIC (anchored one-way INDEX/MATCH
+  filled down a column) but not the SUBJECT: it is a two-system tie-out whose finish state is a
+  zero column, and its INDEX/MATCH is an instrument inside a subtraction. The overlap is the one
+  `foot` has with every drill that sums something. Noted in passing, not touched: recon's §4.41
+  ☆ ("Color the brought-across deal blue") is a FORMATTING bonus and dies under §1.0(d) at its own
+  rework.
+- **THE SELF-DIAGNOSTIC — "no efficiency headroom → no legal ☆ → probably a motif, not a lesson."**
+  Applied honestly, `lookup` PASSES, but ONLY on the reworked board. The old one had literally no
+  headroom: one answer cell, one formula, nothing to fill, nothing to skip. Every candidate ☆ on it
+  was either formatting (dead under §1.0(d)) or fell out of the exercise (dead under §1.0-R2(i)) —
+  which is exactly why the §4 page's own proposed bonus was "build the first answer again with
+  VLOOKUP", an ANTI-efficiency bonus that costs MORE keys than it saves and duplicates §4.39
+  outright. Giving the screen three names is what created the headroom: 55 keys with the star,
+  163 without.
+- **BOARD.** A peer table (8–10 companies × 3 metrics, blue figures, metric order shuffled) on the
+  left; a pitch screen on the right naming its metric and three companies with empty amount cells;
+  one empty column of moat between them; a deck strip two rows under the panel behind a blank row,
+  carrying a pre-built read someone else aimed at the wrong metric column; an italic source memo
+  closing the page. 11–13 rows carry content (was: 5).
+- **BEATS (5 core + ☆ + the engine-appended Ctrl+S closer; tri-length 6, C9-registered).** Build the
+  first amount on the screen — {company}'s {metric} → Build the amounts for the other two companies
+  on the screen → Color the screen amounts green → Fix the deck strip read — it returns the
+  {metric} column → Add an outside border around the screen panel. Beat 1 reports THIS seed's
+  metric and company (§1.0-R2(g)); every clause after a dash says WHAT, never why (§1.0-R3(n)).
+- **☆ RE-CUT (§1.0(d) + §1.0-R2(i)): one anchored fill answers the whole screen.** Read off the
+  r424 `S.fillOps` latch — the MECHANIC, never geometry inferred — so Ctrl+D and Alt H F I D both
+  earn it and three hand-typed formulas earn nothing. Its DISCRIMINATOR, and the one placement on
+  the board that is not random: INDEX over a single column takes its row offset from that column's
+  own top, so an unlocked fill walks the INDEX range and the MATCH range down TOGETHER and stays
+  internally consistent — the numbers would come out RIGHT and the anchoring discovery would never
+  fire. What an unlocked fill cannot survive is a name falling off the TOP of the shrinking MATCH
+  range, so screen rows two and three deliberately carry the table's first two companies and both
+  come back #N/A on every seed. WHICH companies sit up there is fully random; only the structural
+  relation is fixed (the sumif r435 ledger-head precedent). Verified over 20 seeds: unlocked fill
+  → `["310","#N/A","#N/A"]`, star dark, on every one.
+- **MEASURED NEGATIVE CONTROL (§1.0-R2(i), the ☆ is genuinely skippable).** dev/e2e-alt-paths.js
+  entry 2: deck strip repaired first, the three screen amounts typed bottom-up as separate
+  formulas with no fill anywhere, the long Alt H F C swatch walk, four per-edge border walks —
+  **all five cores clear, the ☆ stays dark, 163 keys** against the demo's 55, flat over 20 seeds.
+  The chord-route alt (a locked VLOOKUP filled from the ribbon) sits between at 78 and DOES earn it.
+- **§1.0-R3(p) ROUTE ENUMERATION, done by WALKING routes rather than reading predicates.** The old
+  beat 1 read the formula text, so a correct VLOOKUP left it dark with nothing on the board to fix.
+  Every core now grades the END STATE: the amounts by VALUE (INDEX/MATCH, VLOOKUP, a pointed
+  formula and a typed number all clear — the alt-path proves the VLOOKUP case live); green from
+  BOTH Alt H J → Link and Alt H F C → Green; the deck strip by VALUE, so repointing the range,
+  retyping, pasting the panel's first locked answer onto it, or typing the figure all clear; the
+  box from Alt H B S, Alt H B T, a four-edge walk and Alt H B A, over any of THREE honest readings
+  of "the screen panel". Tolerance 0.5 against figures that are all multiples of five.
+- **§1.0-R3(o) DEVIATION, declared: the page's comma-format beat is a FONT-COLOUR beat.** Wolf
+  ranks the comma format as over-anchored and font colour (blue = hardcode, green = linked) as
+  day-to-day work. The answers ship carrying comma/0dp as board furniture so the numbers read; the
+  graded dress is the convention the board is about — the table's figures are typed and blue, the
+  screen's amounts are pulled and go green.
+- **OTHER DEVIATIONS.** Page beat 2 ("a second query whose metric column moved") is a disguised
+  two-way read and would have made lookup and lookup2 CONVERGE; replaced by "the other two
+  companies", which is what creates the fill's headroom. No §2.5 tier reveal — the page permits
+  shipping tiers visible, and with one field and three names there is no tier-2 region to park.
+  No cueCell (no insert point, no empty paste destination — every graded target is a labelled panel
+  cell). No helper cells (nothing is converted or scaled) and no total row.
+- **RANDOM (§1.2, four axes).** Anchor column A|B and header row 3|4 · company pool Fisher-Yates
+  from twelve AND the metric order shuffled, so which column holds the screen's metric moves ·
+  every figure through rnd() · which metric the screen asks for, which three names it asks about,
+  which name the deck strip carries, and which column its broken read aims at. A guard bumps the
+  decoy's figure if the two columns happen to agree on that company, so the repair is never a
+  no-op (§1.1).
+- **META:** drills.js desc rewritten to the reworked board ("Read a peer table with INDEX/MATCH —
+  three pulls onto one pitch screen"). Key immutable — PBs, boards, runs untouched.
+- **PAR:** re-swept from scratch. 5-seed sweep median 55 keys incl. the engine-appended Ctrl+S,
+  flat across a 20-seed probe (the table always lands on rows 4–13, so every range in the one typed
+  formula is the same length on every seed). parKeys 31→55, par 32→59 (≈1.07 s/key, the house band;
+  the premium is the READ this board charges before a hand moves — which of three shuffled columns
+  is the screen's metric). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 89s · pro 68s ·
+  legendary 59s.
+- **ALT-PATHS: the stale r170 `lookup` entry was DELETED, not adapted.** It typed a single two-way
+  INDEX into `G4` against `A2:A8`/`B1:D1` — cells that exist on no seed of the reworked board.
+  Replaced by the §1.8 pair (chord ROUTE + op ORDER, the latter doubling as the negative control).
+  **Integrator: do not resurrect it** — the r435 integration rule applies (for the drill an agent
+  reworked, its side of dev/e2e-alt-paths.js is authoritative for additions AND deletions).
+- **GATE (all green, own port 8842):** static invariants clean (C9 lookup tri-length 6 + one ☆ +
+  saveClose; C11 aphorisms clean; C12 ≥2 alts across 25 reworked drills) · demo-replay ALL GREEN ·
+  alt-paths ALL PASS · par-sweep lookup FLAGGED 0 (drift 0%) · fit-sweep ALL CLEAN (72) ·
+  depth-mechanics 155/155 · smoke 7 pages + HOTKEY_PARS parity + de-hint clean.
