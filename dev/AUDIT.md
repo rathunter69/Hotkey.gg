@@ -238,6 +238,18 @@ are the generator itself and an `e2e-smoke` regex that matches the phrase "banke
 so this is stale marketing copy, not a red suite — which is exactly why it would otherwise sit
 there unnoticed.
 
+### A SELF-INFLICTED HARNESS BUG WORTH RECORDING (it is the campaign's own warning, ignored)
+The script that appended the four new ALTS entries anchored on `s.rindex('\n];\n')`, which matched
+the ALTS array's closer and let the rewrite drop **everything after it — the entire IIFE that runs
+the suite.** `node --check` passed (a file with no runner is still valid JS) and
+`node dev/e2e-alt-paths.js` exited **0 having tested nothing**. The gate caught it only because the
+run printed a bare `### e2e-alt-paths` with no result line under it. This is DEPTH_PASS_CAMPAIGN's
+own hazard verbatim — *"when deleting a block, print the first/last/next line you are about to
+remove and assert the NEXT line is the start of the following entry — do not trust an indent regex
+against a file full of embedded code"* — which cost the `grpfold` pass 1013 lines. **Generalisation
+for the next agent: a suite that exits 0 with NO OUTPUT is a red flag, not a pass.** Runner restored
+verbatim from the pre-edit copy; re-run clean.
+
 ### COUPLING SWEEP (the r437/r438 three-grep standing check)
 `git grep -n "CHALLENGES\.\(wrapfix\|cases\)\._o" dev/` → **nothing**.
 `git grep -n "loadChallenge('\(wrapfix\|cases\)')" dev/` → **nothing**.
