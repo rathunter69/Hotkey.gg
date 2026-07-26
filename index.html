@@ -4300,10 +4300,16 @@ const CHALLENGES = {
          holding #N/A propagates it into the check cell. The break is always visible.
        · doPaste's tiling path stamps S.pasteLog with {kind, dest rect, source rect} for every
          landed paste (all/values/formulas), which is what the ☆ latches on — the MECHANIC, never
-         geometry inferred from the end state. A cut lands in S.cutMoves instead and does NOT earn
-         the star, which is correct: cutting the deal out of the system of record is vandalism.
+         geometry inferred from the end state. A cut takes the cut branch, which logs to S.cutMoves
+         instead, so it earns nothing — and on this board it also fails the cores outright (walked,
+         0/6), because cutting the line off the system of record leaves the presence column nothing
+         to count. That is the right answer, not a gap: the blotter is the system of record.
        · fillFrom() copies the source cell's full format, so the Δ column's comma/0dp furniture
-         survives a fill from its first row. */
+         survives a fill from its first row.
+       · A FREEDOM PROOF, walked rather than argued: all five cores clear 6/6 with NO formula on the
+         board except the check cell — the deal typed, the repair typed, the presence column typed
+         as 1s and the difference column typed as zeros over a genuinely repaired board. The ☆ stays
+         dark and the clock prices the difference (§1.0(c)). */
     name:'Recon', label:'Two systems, one truth', par:92, parKeys:88, saveClose:true,   /* r437: par re-swept on the reworked board — dev/e2e-par-sweep.js recon, 5-seed median 88 keys including the engine-appended Ctrl+S, and FLAT at 88 over a 20-seed probe (min 88, max 88): the board is built so the demo types the same characters on every seed — r1 is always one digit, rL always two, every amount four. par 92 ≈ 1.05 s/key, the house band. Measured against it: the same board worked the slow way — the check line written first, the deal typed rather than carried, and every difference and every presence count hand-written with no fill and no paste anywhere — runs a 20-seed median 474 keys (range 414–532; alt-paths entry 2, the negative control), all five cores clearing with the ☆ dark. The chord-route alt (VLOOKUP, ribbon fills, the legacy Alt E S dialog paste, a typed addition chain for the check) sits between them at a 20-seed median 99 and still earns the star on every seed. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 138 · pro 106 · legendary 92. */
     aha:'a recon asks two questions, not one — is the deal there, and is it the same number; the check cell answers both at once.',
     prompt:'Month-end, and the two systems disagree. The trading blotter is the system of record; the finance extract is what actually got booked — one deal never made it across at all, and one that did was booked at the wrong figure. Work the recon: mark which blotter deals finance is carrying, add the missing one, price every booked line against the blotter, repair the break, and finish with the Recon check reading zero. Nothing goes out while the recon still shows a difference.',
@@ -4316,7 +4322,7 @@ const CHALLENGES = {
       'the difference column starts at '+o.LD+o.r1+' · <kbd>=</kbd>'+o.LFA+o.r1+'<kbd>-</kbd>INDEX(<b>'+o.amtR+'</b>,MATCH('+o.LFN+o.r1+',<b>'+o.namR+'</b>,0)) <kbd>↵</kbd> — booked less blotter, where MATCH finds the row this deal sits on and INDEX reads the blotter figure off it · fill '+o.dRng+'. The two lists are in different orders, so the blotter figure has to be looked up rather than taken from alongside: <kbd>=</kbd>'+o.LFA+o.r1+'<kbd>-</kbd>VLOOKUP('+o.LFN+o.r1+',<b>$'+o.LTN+'$'+o.r1+':$'+o.LTA+'$'+o.rL+'</b>,2,0) lands the identical column, and so does pointing at each blotter cell by hand',
       'every difference reads 0 except one — that row is the fat finger. Retype that finance amount from the blotter (<kbd>F2</kbd> to edit in place, or type straight over the cell); the difference on that row goes to 0 as the sheet recalculates',
       'the check line at '+o.chk+' · <kbd>=</kbd>SUM('+o.LD+o.r1+':'+o.LD+o.rL+') <kbd>↵</kbd> — or <kbd>alt</kbd>+<kbd>=</kbd> from directly under the column, or add the cells up one at a time. It has to be LIVE: a 0 typed into a check cell is not a check, and it is the thing a reviewer looks for first',
-      '☆ the discovery: the missing deal already exists in full, one island over. Select its name and amount on the blotter (<kbd>shift</kbd>+<kbd>→</kbd> takes the pair), <kbd>ctrl</kbd>+<kbd>c</kbd>, land on the empty finance row and one <kbd>ctrl</kbd>+<kbd>v</kbd> puts both cells down (<kbd>alt</kbd> <kbd>h</kbd> <kbd>v</kbd> and the legacy <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> dialog paste the same). Typing the name and the figure clears the beat and costs the keys — and a retyped figure is how the other break on this board got there',
+      '☆ the discovery: the missing deal already exists in full, one island over. Select its name and amount on the blotter (<kbd>shift</kbd>+<kbd>→</kbd> takes the pair), <kbd>ctrl</kbd>+<kbd>c</kbd>, land on the empty finance row and one <kbd>ctrl</kbd>+<kbd>v</kbd> puts both cells down (<kbd>alt</kbd> <kbd>h</kbd> <kbd>v</kbd> <kbd>v</kbd> pastes them as values, and the legacy <kbd>alt</kbd> <kbd>e</kbd> <kbd>s</kbd> dialog lands the same pair — all three count). Typing the name and the figure clears the beat and costs the keys — and a retyped figure is how the other break on this board got there',
     ]; },
     /* rings: ① the presence column · ② the landing row · ③ the difference column · ④ the finance
        amounts · ⑤ the check cell · ☆ never ringed (§2.2 mystery slot) */
@@ -4473,7 +4479,12 @@ const CHALLENGES = {
       /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the deal finance
          never booked already exists in the system of record — carry it, do not retype it. Read
          off the r425 S.pasteLog latch (the MECHANIC, never geometry inferred from the end state),
-         so Ctrl+V, Alt H V and the legacy Alt E S dialog all earn it, and typing the name and the
+         so every paste route earns it — Ctrl+V, the ribbon's values-paste Alt H V V, the legacy
+         Alt E S dialog and the Ctrl+Alt+V chord were each WALKED, ☆ 6/6 and all cores 6/6. Two
+         separate pastes (name, then amount) clear every core and earn NOTHING: "one pass" is the
+         move. A CUT of the blotter row earns nothing either, and correctly fails the cores as
+         well — it takes the line off the system of record, and the presence column has nothing
+         left to count. Typing the name and the
          figure earns nothing. The paste must land BOTH cells in one pass, and it must come FROM
          the blotter row — pasting the deal from anywhere else is not carrying it across. missOk
          rides in the predicate because a paste that lands the wrong pair is not the move. Typing
