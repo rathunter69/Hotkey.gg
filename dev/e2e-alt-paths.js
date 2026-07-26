@@ -724,14 +724,27 @@ const ALTS = [
       {sel:'B13', keys:[...T('=B8/B11'),{key:'Enter'}]},
       {sel:'B14', keys:[...T('=B13/B12-1'),{key:'Enter'}]},
     ]` },
-  { key: 'audit', name: 'crimes fixed in REVERSE, full retype instead of F2 surgery', moves: `C => {
-      const c1=C._t1, c2=C._t2, c3=C._t3;
-      const col2=c2[0], col3=c3[0], r1=c1.slice(1);
+  /* r439 (audit, DEPTH_PASS §4.45 + the hunt MERGE): the shipped entry ("crimes fixed in
+     REVERSE, full retype instead of F2 surgery") is DELETED, not patched — it drove _t1/_t2/_t3
+     and the hard-coded rows 10/12/13 of the retired three-break board, and no seed produces
+     them now. Replaced by the §1.8 pair. ALT 1 = chord ROUTE (addition-chain Total, ribbon
+     fill, anchored margin refs, a padded sign-off) and it LIGHTS the ☆; ALT 2 = op ORDER and
+     the MEASURED NEGATIVE CONTROL — every break repaired one cell at a time in reverse, all
+     five cores clear, ☆ DARK 5/5. */
+  { key: 'audit', name: 'chord ROUTE — addition-chain Total, ribbon fill Alt H F I R over the block, anchored margin refs, padded " OK " sign-off (☆ LIT, 47 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
+      const chain=[]; for(let c=o.c0;c<=o.cN;c++) chain.push(CL(c)+o.badRow);
       return [
-        {sel:c3, keys:[...T('='+col3+'10+'+col3+'12'),{key:'Enter'}]},
-        {sel:c2, keys:[...T('='+col2+'10+'+col2+'12'),{key:'Enter'}]},
-        {sel:c1, keys:[...T('=SUM(B'+r1+':F'+r1+')'),{key:'Enter'}]},
+        {sel:o.badK,     keys:[...T('='+chain.join('+')),{key:'Enter'}]},
+        {sel:o.blockTop, keys:[{key:'ArrowDown',shift:true},...Array.from({length:o.NC-1},()=>({key:'ArrowRight',shift:true})),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.margK,    keys:[...T(o.margFix.replace(/([A-J])(\d+)/g,'$$$1$$$2')),{key:'Enter'}]},
+        {sel:o.signK,    keys:[...T(' OK '),{key:'Enter'}]},
       ]; }` },
+  { key: 'audit', name: 'op ORDER + the MEASURED NEGATIVE CONTROL — sign-off first, then the margin, then each EBIT cell typed on its own, the short Total last; no fill and no paste anywhere (all five cores clear, ☆ DARK, 46 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
+      const st=[{sel:o.signK, keys:[...T('OK'),{key:'Enter'}]},
+                {sel:o.margK, keys:[...T(o.margFix),{key:'Enter'}]}];
+      [o.hcB,o.hcA].forEach(c=>st.push({sel:CL(c)+o.ebitR, keys:[...T('='+CL(c)+o.totR+'+'+CL(c)+o.costR+'+'+CL(c)+o.daR),{key:'Enter'}]}));
+      st.push({sel:o.badK, keys:[...T('=SUM('+CL(o.c0)+o.badRow+':'+o.lastCol+o.badRow+')'),{key:'Enter'}]});
+      return st; }` },
   { key: 'balance', name: 'dress BEFORE the build, L&E footed before assets, alt+= sums + ribbon fills', moves: `C => [
       {sel:'B14:C14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B6:C6',   keys:[{key:'Alt'},L('h'),D(1)]},
@@ -1081,15 +1094,6 @@ const ALTS = [
       {sel:'B11:D11', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
     ]` },
-  { key: 'triage', name: 'errors triaged in REVERSE — #VALUE! first, the #REF! it depends on last', moves: `C => { const R=C._R; return [
-      {sel:R.valCell, keys:[...T('='+R.valFix+'/'+R.valBase+'-1'),{key:'Enter'}]},
-      {sel:R.divCell, keys:[...T('='+R.divNum+'/'+R.divFix),{key:'Enter'}]},
-      {sel:R.refCell, keys:[...T('=SUM('+R.refFix+')'),{key:'Enter'}]},
-    ]; }` },
-  /* r439: REPLACES the pre-depth-pass versionup alt, which drove the retired 13-row board by
-     hard-coded geometry (B7/B9/B10/C5 and the A12:A13 tag pair, all gone with the rebuild).
-     ALT 1 is the chord-ROUTE + op-ORDER alt and EARNS the ☆ with the stamp taken FIRST; ALT 2
-     is the MEASURED negative control — every core clears with the ☆ dark. */
   { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
       mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
       for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
@@ -1111,6 +1115,20 @@ const ALTS = [
       mv.push({sel:o.cL+(o.hr+9),   keys:[...T('Footnotes cite the v2 basis'),{key:'Enter'}]});
       mv.push({sel:o.ebitRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
       return mv; }` },
+  { key: 'triage', name: 'chord ROUTE — one quarter typed then ctrl+r across, ribbon bold Alt H 1, nested IF instead of CHOOSE (☆ LIT, 63 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
+      return [
+        {sel:CL(o.c0)+o.totCostR, keys:[...T('=SUM('+CL(o.c0)+o.cost0+':'+CL(o.c0)+o.cost2+')'),{key:'Enter'}]},
+        {sel:CL(o.c0)+o.totCostR, keys:[...Array.from({length:o.NQ-1},()=>({key:'ArrowRight',shift:true})),{key:'r',ctrl:true}]},
+        {sel:o.costLine, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:o.shareK,   keys:[...T(o.shareFix),{key:'Enter'}]},
+        {sel:o.selK,     keys:[...T('=IF('+o.switchK+'=1,'+CL(o.c0)+o.caseValR+',IF('+o.switchK+'=2,'+CL(o.c0+1)+o.caseValR+','+CL(o.c0+2)+o.caseValR+'))'),{key:'Enter'}]},
+      ]; }` },
+  { key: 'triage', name: 'op ORDER + the MEASURED NEGATIVE CONTROL — case read first, share second, then the four quarters typed separately right-to-left; no fill and no paste anywhere, dress off a Shift+Space row grab, INDEX case read (all five cores clear, ☆ DARK, 84 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
+      const st=[{sel:o.selK,   keys:[...T('=INDEX('+CL(o.c0)+o.caseValR+':'+CL(o.c0+2)+o.caseValR+','+o.switchK+')'),{key:'Enter'}]},
+                {sel:o.shareK, keys:[...T(o.shareFix),{key:'Enter'}]}];
+      for(let c=o.cN;c>=o.c0;c--) st.push({sel:CL(c)+o.totCostR, keys:[...T('='+CL(c)+o.cost0+'+'+CL(c)+(o.cost0+1)+'+'+CL(c)+o.cost2),{key:'Enter'}]});
+      st.push({sel:CL(o.c0)+o.totCostR, keys:[{key:' ',shift:true},{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      return st; }` },
   { key: 'wk13', name: 'totals + dress FIRST, cushion before the spine, ribbon fills throughout', moves: `C => [
       {sel:'J4', keys:[...T('=SUM(B4:I4)'),{key:'Enter'}]},
       {sel:'J4:J6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},

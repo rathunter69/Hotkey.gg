@@ -10322,155 +10322,542 @@ const CHALLENGES = {
     }
   },
   audit:{
-    name:'The 4am pass', label:'Find what’s broken', par:34, parKeys:33,
-    aha:'Broken models leave fingerprints — hardcodes in formula rows, refs off by one.',
-    prompt:'Audit a divisional P&L someone else built. Three things are wrong: one division’s five-year Total stops a column short, one EBITDA (operating profit before depreciation and amortization) is a stale hardcode, and one EBITDA reads the wrong year’s opex. Use Go To Special → Constants to light up every raw number on the page, find all three, and rebuild them as live formulas.',
-    req(){ return '<em>scan the Total column</em> \u00b7 one SUM stops at FY4 \u2014 <em>F2</em>, extend it \u00b7 one EBITDA is a typed number \u2014 rebuild it live \u00b7 one EBITDA crosses columns \u2014 repoint it'; },
-    guide:[
-      'read the Total column (G) \u2014 one division\u2019s SUM ends a year early \u00b7 <kbd>F2</kbd>, extend the range to column F, <kbd>\u21b5</kbd>',
-      'read the EBITDA row \u2014 one year is a hardcoded number (nothing in the formula bar) \u00b7 retype it live: <kbd>=</kbd> total rev <kbd>+</kbd> signed opex <kbd>\u21b5</kbd>',
-      'one EBITDA computes but reads the NEIGHBOR column\u2019s opex \u00b7 <kbd>F2</kbd>, repoint the column, <kbd>\u21b5</kbd>',
-    ],
-    targets:[function(){return this._t1;}, function(){return this._t2;}, function(){return this._t3;}],
-    demo(){
-      const c1=this._t1, c2=this._t2, c3=this._t3;
-      const col2=c2[0], col3=c3[0];
+    /* r439 H6b (DEPTH_PASS §4.45 + §2.3 + the §1.0 / §1.0-R2 / §1.0-R3 law): the depth-pass
+       rework — and a MERGE. `hunt` ("Hunt the hardcodes", §4.52) retires into this board; the
+       retirement plumbing is HANDED to the orchestrator, not executed here (the r437 grpfold
+       split — a retiring drill's agent cannot see the other agents' in-flight edits).
+
+       ── WHY ONE DRILL AND NOT TWO (the §1.0-R3(s) question, answered by MEASUREMENT before
+          anything was built; every number is keyLog through the live engine on the shipped
+          boards, medians over 5-7 seeds, every selection and navigation KEYED)
+
+       (1) CAMPAIGN §3 DISCRIMINATOR — "does fluency in one produce a CORRECT first attempt at
+           the other?" PROBED, not argued. `hunt`'s canonical method run VERBATIM as a first
+           attempt on the shipped `audit` board — F5 · s · o, then retype the marked calc-block
+           constant as its formula — cleared audit's hardcode beat 5/5 seeds in 11 keys. Not a
+           wrong attempt and not even a slower one: the identical move. Containment, one-way and
+           total, which is the `grpfold`→`unhide` shape, not the `sumif`/`rollup` contrast.
+           Reinforcing it: the shipped audit PROMPT already instructs hunt's whole ritual
+           ("Use Go To Special → Constants to light up every raw number on the page"). That is
+           the exact `growth`/`versionup` signature the campaign retired a drill on.
+
+       (2) THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS, on each shipped board.
+           · Part 1 — spread. audit fastest legal 31 (one corrected EBITDA + ctrl+r across the
+             row) · slowest legal 44 (every fix retyped, plain arrows) = 1.42×. hunt fastest
+             legal 46 · slowest legal 85 = 1.85×.
+           · Part 2 — WHAT the spread is made of, which is the part that decides. Strip
+             chord-vs-ribbon (§1.0(c) forces those to clear) and formatting (§1.0(d) forbids
+             it): hunt's 39 keys are ~24 of fill-right-vs-three-typed-SUMs, ~9 of ctrl+b vs
+             Alt H 1 ×3, ~6 of typing length. The ONLY survivor is a FILL — which is `filldr`'s
+             lesson, not hunt's. hunt's OWN instrument measures NEGATIVE: 46 keys with the
+             F5 ritual against 43 without it (negative control: found by eye, all three
+             hardcodes relinked, footed and bolded, 5/5 seeds — three of four cores green).
+             Per the r438 `filterpass` limit a finding instrument saves EYE time rather than
+             keystrokes, so that alone is not the `growth` failure — except that on hunt's board
+             the instrument does not save eye time either: F5 marks 13 cells of which 10 are
+             legitimate blue inputs, so it does not narrow the search at all.
+           · And hunt's beat 1 is `ok:(S.markN||0)>=1` — a check that grades a KEY WAS PRESSED.
+             That is the predicate `unhide` dropped in r437 (traceN>=1), it is the untriggerable
+             class this campaign exists to kill, and it VIOLATES §1.0(c) outright: a player who
+             finds the hardcodes by eye watches it stay dark with nothing on the board to fix.
+
+       (3) THE LESSON IS ALREADY CARRIED THREE TIMES. `housestyle`'s shipped ☆ (r425) IS the
+           Go To Special → Constants ritual, graded off S.gotoSpecials. `versionup` (§4.54) is
+           four typed answers rebuilt as live formulas. And this board's beat 3 is the same
+           crime. Both §4 pages even propose the SAME ☆ line — "Color the … cells black" — which
+           is dead under §1.0(d) anyway, and dead twice here because the hardcodes on this board
+           are deliberately BLACK already (that is why they have to be hunted).
+
+       (4) WHICH KEY SURVIVES: `audit`. It is the container, not the contained (three break
+           CLASSES against hunt's one); it is first in Formulas II and the chapter's title
+           drill; §2.3 assigns it the disclosed-error format; and hunt's r182 engine is NOT
+           orphaned, because this board is built so the instrument PAYS and the guide teaches
+           it — graded by OUTCOME, never by markN. Delta D11 (rename hunt's colliding tab
+           'Audit'→'Hardcodes') is mooted by the retirement.
+
+       ── WHAT THE MERGE BUYS THE BOARD. Standalone `audit` had ONE hardcode, so there was
+       nothing for a hunt to be a hunt of and no efficiency in the calc block. This board
+       carries TWO, sitting inside a calc block that is otherwise correct — which is what makes
+       both halves real: a diagnosis worth an instrument, and enough broken cells in one
+       rectangle to reward re-driving it in a single pass.
+
+       BOARD. A divisional operating review that came back from the FY-close pack. Six
+       divisions × five fiscal years with a live Total column; a Total revenue line; operating
+       costs and D&A below it; an EBIT line and an EBIT margin line built off them; and a live
+       CHECK line two rows under the block that reads the Total column against the Total
+       revenue line and is expected to read zero (MODELING_STANDARDS §6 — checks live in one
+       visible place). Colour is provenance (§1 of that file): every typed figure is blue,
+       every computed cell black — which is exactly why the two planted hardcodes are BLACK.
+       They are indistinguishable from the formulas around them by eye; F5 → Special →
+       Constants is the only route that lights them without clicking every cell.
+       Units and the sign convention are stated on the board (row 2); costs are seeded
+       negative; both total rows wear a TOP border and never a rule underneath (§1.0(f)).
+
+       BEATS (5 core + the engine-appended save closer + one ☆; tri-length 6, C9-registered),
+       and they CHAIN: the meter owns the run, the short Total is what the CHECK line is
+       complaining about, the two hardcodes and the crossed margin sit in one rectangle, and
+       the sign-off closes (§1.6 finish state).
+
+       ☆ = THE CALC BLOCK RE-DRIVEN IN ONE PASS. The EBIT row and the EBIT margin row are two
+       formulas repeated across five years; the leftmost year is guaranteed healthy by
+       construction, so the whole 2×5 rectangle can be driven from it in a single fill or a
+       single paste — three of the four planted breaks repaired by one decision. Read off the
+       r424 S.fillOps latch and the r425 S.pasteLog latch (the MECHANIC, never geometry
+       inferred from the end state), so ctrl+r, the ribbon's Alt H F I R and a copy/paste of
+       the trusted column all earn it. SKIPPABLE by construction and MEASURED: repairing the
+       three cells one at a time clears every core with the star DARK (alt-paths ALT 2, the
+       negative control). Deliberately NOT `housestyle`'s F5 star, NOT `scrub`'s autosum and
+       NOT `modeltour`'s heal-from-the-neighbour paste.
+
+       ☆ CANDIDATE MEASURED AND REJECTED, recorded so nobody re-derives it: the r182 ENTER-WALK
+       of the marked set. It reads like the perfect star for this drill — the marks are a
+       worklist, ↵ walks it, a fixed cell crosses itself off — but it cannot beat arrow
+       navigation on a 20-row board, because the blue inputs are constants too and the walk
+       visits every one of them in scan order. Measured on this geometry: 11 marks, so ~9 ↵
+       presses to reach the second crime against 8 arrow keys. Negative headroom, exactly the
+       `growth` shape, killed before it shipped.
+
+       §1.0-R3(p) ROUTES WALKED, not reasoned about — see the notes on each predicate below.
+       No cueCell (§1.0-R2(h)/§1.0-R3(q)), declared: every graded destination is an existing
+       LABELLED cell (a division's Total, the EBIT row, a margin cell, the "Reviewed by" line),
+       so the green ring has something to sit on; the cue primitive is for a slot BETWEEN two
+       rows and for an empty paste target, and neither exists here. */
+    name:'Review Pass', label:'Review pass — find what’s broken', par:28, parKeys:27, saveClose:true,   /* r439: par re-swept from scratch on the merged board — dev/e2e-par-sweep.js audit, 5-seed median 27 keys INCLUDING the engine-appended Ctrl+S and the scripted F5 ritual. The only variance is the digit-length of the short-Total row (27 at one digit, 29 at two). parKeys 33→27, par 34→28 (1.04 s/key, the house band), mirrored in HOTKEY_PARS. Measured against it: the same board with the marks cleared, every fix typed in full and every move arrowed runs 74 keys (the slow-route control), and the one-cell-at-a-time route that forfeits the ☆ runs 46. Clocks derive (§1.4): pass 42 · pro 32.2 · legendary 28. */
+    aha:'a hardcode in a formula row is invisible by eye — it is black, it is comma-formatted, and only Constants lights it.',
+    prompt:'A divisional operating review came back from the FY-close pack with four things wrong in it, and the check line under the block is already saying so. One division’s Total covers four of the five years. Two cells in the EBIT row are typed numbers where formulas should be — they are black and comma-formatted like everything around them, so Go To Special → Constants is how you find them. And one EBIT margin divides by another year’s revenue. Fix all four, then sign the review off.',
+    req(){ const o=this._o; return '<em>F5</em> → <em>s</em> → <em>o</em> lights every typed number · the short Total — <em>F2</em>, extend the range · the EBIT block — one good year, <em>ctrl+r</em> across · the crossed margin — <em>F2</em>, repoint it · <em>'+o.signK+'</em> → OK · <em>ctrl+s</em>'; },
+    guide(){ const o=this._o; return [
+      'the count is the disclosure: four breaks, three kinds. <kbd>F5</kbd> · <kbd>s</kbd> · <kbd>o</kbd> marks every raw number on the page — the blue inputs SHOULD light, and any mark sitting inside the <b>EBIT</b> row is a crime',
+      'the <b>'+o.badName+'</b> Total stops a year early — land on it, <kbd>F2</kbd>, extend the range to the last year column, <kbd>↵</kbd>. The check line under the block goes to zero when it is right',
+      'the <b>EBIT</b> row is one formula repeated across the years — revenue plus the two cost lines. The first year column is sound: fix nothing, just re-drive the block from it',
+      'one <b>EBIT margin</b> cell divides by the NEIGHBOUR year’s revenue · <kbd>F2</kbd>, point the denominator at its own year, <kbd>↵</kbd>',
+      'reviews sign their work: type <kbd>OK</kbd> in the cell beside <b>Reviewed by</b> · <kbd>↵</kbd>',
+      'the whole <b>EBIT</b> block — both rows, all five years — travels from the good year in ONE pass: select it from the first year column and <kbd>ctrl</kbd>+<kbd>r</kbd> (the ribbon’s <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> does the same job)',
+    ]; },
+    targets(){ const o=this._o; return [null, o.badK, o.ebitRng, o.margK, o.signK, o.blockRng]; },
+    /* the demo BUILDS the block selection with Shift+arrow rather than being handed it by
+       setDemoSel, so parKeys measures what a player really pays for the ☆'s grab (the r438
+       series/drill standard); the cursor parks are free, as they are everywhere in the
+       catalog. The F5 ritual is scripted because it is the taught FINDING route even though
+       no beat grades it — par should carry its cost. */
+    demo(){ const o=this._o;
+      const tail=o.lastCol+o.badRow+')';
       return [
-        {sel:c1, keys:[{key:'F2'}, {key:'Backspace'}, {key:'Backspace'}, {key:'Backspace'}, ...T('F'+c1.slice(1)+')'), Kb.enter]},
-        {sel:c2, keys:[...T('='+col2+'10+'+col2+'12'), Kb.enter]},
-        {sel:c3, keys:[{key:'F2'}, ...Array.from({length:9},()=>({key:'Backspace'})), ...T('='+col3+'10+'+col3+'12'), Kb.enter]},
-      ];
-    },
+        {sel:o.firstK, keys:[{key:'F5'},L('s'),L('o')]},
+        {sel:o.badK, keys:[{key:'F2'}, ...Array.from({length:tail.length},()=>({key:'Backspace'})), ...T(tail), Kb.enter]},
+        {sel:o.blockTop, keys:[{key:'ArrowDown',shift:true},
+          ...Array.from({length:o.NC-1},()=>({key:'ArrowRight',shift:true})), Kb.fillR]},
+        {sel:o.margK, keys:[...T(o.margFix), Kb.enter]},
+        {sel:o.signK, keys:[...T('OK'), Kb.enter]},
+      ]; },
     build(){
       const cells={};
-      const co=codename();
-      cells['A1']={...blankCell(),value:co+' \u2014 Divisional P&L ($000s)',txt:true,bold:true};
-      const divs=['Freight','Brokerage','Warehousing','Last-mile','Intermodal','Cold chain'];
-      const y0=22+rnd(0,2);
-      cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
-      for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'FY'+(y0+c-2),txt:true,bold:true};
-      cells['G3']={...blankCell(),value:'Total',txt:true,bold:true};
-      const badDivRow=4+rnd(1,5);   // never the first division — the pattern establishes itself
-      for(let i=0;i<6;i++){
-        const r=4+i;
-        cells['A'+r]={...blankCell(),value:divs[i],txt:true};
-        let rowSum=0;
-        for(let c=2;c<=6;c++){ const v=rnd(40,400)*5; rowSum+=v;
-          cells[colLetter(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-        const short=(r===badDivRow);
-        cells['G'+r]={...blankCell(),formula:'=SUM(B'+r+':'+(short?'E':'F')+r+')',fmtStyle:'comma',decimals:0,bold:true,
-          value: short ? rowSum - cells['F'+r].value : rowSum };
+      /* §1.2 randomization, FOUR independent axes:
+         (a) geometry jitter — header row 3 or 4 × anchor column A or B (four sites; the tail
+             rows stay pinned so the board is always exactly 20 rows and the keystroke count
+             never moves with the draw);
+         (b) content pools — six divisions drawn Fisher-Yates from eight, plus the codename;
+         (c) value ranges — every figure and every fiscal year through rnd();
+         (d) which-one-is-broken — which division carries the short Total, WHICH TWO of the
+             four non-trusted year columns carry the hardcodes, and which of the remaining
+             columns carries the crossed margin. */
+      const hr = 3 + rnd(0,1);                       // header row
+      const ac = 1 + rnd(0,1);                       // anchor column: A or B
+      const AL = colLetter(ac);
+      const NC = 5;                                  // five fiscal years
+      const c0 = ac+1, cN = ac+NC;                   // first / last year column
+      const totC = cN+1;                             // the Total column
+      const CL = c=>colLetter(c);
+      const y0 = 26 + rnd(0,5);
+      const co = codename();
+      const POOL=['Freight','Brokerage','Warehousing','Last-mile','Intermodal','Cold chain','Port drayage','Air charter'];
+      for(let k=POOL.length-1;k>0;k--){ const j=rnd(0,k); [POOL[k],POOL[j]]=[POOL[j],POOL[k]]; }
+      const DIV=POOL.slice(0,6);
+      const r0 = hr+1, rN = r0+5;                    // six division rows
+      const totR = rN+1;                             // Total revenue
+      const costR = totR+2, daR = costR+1, ebitR = daR+1, margR = ebitR+1;
+      const chkR = 18, signR = 19, memoR = 20;
+      cells[AL+'1']={...blankCell(),value:co+' — divisional operating review',txt:true,bold:true};
+      cells[AL+'2']={...blankCell(),value:'$000s · costs shown negative · source: FY-close pack',txt:true,it:true};
+      cells[AL+hr]={...blankCell(),value:'Division',txt:true,bold:true};
+      for(let c=c0;c<=cN;c++) cells[CL(c)+hr]={...blankCell(),value:'FY'+(y0+c-c0),txt:true,bold:true,align:'r'};
+      cells[CL(totC)+hr]={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
+      const badRow = r0+1+rnd(0,4);                  // never the first division: the pattern establishes itself first
+      const V={};                                    // V[r][c] — the honest figures
+      for(let i=0;i<6;i++){ const r=r0+i;
+        cells[AL+r]={...blankCell(),value:DIV[i],txt:true};
+        V[r]={}; let rowSum=0;
+        for(let c=c0;c<=cN;c++){ const v=rnd(40,400)*5; V[r][c]=v; rowSum+=v;
+          cells[CL(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+        const short=(r===badRow);
+        cells[CL(totC)+r]={...blankCell(),
+          formula:'=SUM('+CL(c0)+r+':'+CL(short?cN-1:cN)+r+')',
+          value: short ? rowSum-V[r][cN] : rowSum, fmtStyle:'comma',decimals:0};
       }
-      cells['A10']={...blankCell(),value:'Total revenue',txt:true,bold:true};
-      cells['A12']={...blankCell(),value:'Opex',txt:true};
-      cells['A13']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      const shuffled=[2,3,4,5,6].sort(()=>_rand()-.5);
-      const cHard=shuffled[0], cCross=shuffled[1];
-      for(let c=2;c<=6;c++){
-        const L=colLetter(c);
-        let t=0; for(let r=4;r<=9;r++) t+=cells[L+r].value;
-        cells[L+'10']={...blankCell(),formula:'=SUM('+L+'4:'+L+'9)',value:t,fmtStyle:'comma',decimals:0,bold:true};
-        cells[L+'12']={...blankCell(),value:-rnd(60,240)*5,fmtStyle:'comma',decimals:0,fontColor:'blue'};   // r174: costs live negative
+      cells[AL+totR]={...blankCell(),value:'Total revenue',txt:true,bold:true,bt:true};
+      const REV={};
+      for(let c=c0;c<=cN;c++){ let t=0; for(let r=r0;r<=rN;r++) t+=V[r][c]; REV[c]=t;
+        cells[CL(c)+totR]={...blankCell(),formula:'=SUM('+CL(c)+r0+':'+CL(c)+rN+')',value:t,fmtStyle:'comma',decimals:0,bold:true,bt:true}; }
+      { let g=0; for(let c=c0;c<=cN;c++) g+=REV[c];
+        cells[CL(totC)+totR]={...blankCell(),formula:'=SUM('+CL(c0)+totR+':'+CL(cN)+totR+')',value:g,fmtStyle:'comma',decimals:0,bold:true,bt:true}; }
+      cells[AL+costR]={...blankCell(),value:'Operating costs',txt:true};
+      cells[AL+daR]={...blankCell(),value:'D&A',txt:true};
+      const OPX={}, DA={};
+      for(let c=c0;c<=cN;c++){
+        OPX[c]=-Math.round(REV[c]*(rnd(58,68)/100)/5)*5; DA[c]=-rnd(30,120)*5;
+        cells[CL(c)+costR]={...blankCell(),value:OPX[c],fmtStyle:'comma',decimals:0,fontColor:'blue'};
+        cells[CL(c)+daR]={...blankCell(),value:DA[c],fmtStyle:'comma',decimals:0,fontColor:'blue'};
       }
-      for(let c=2;c<=6;c++){
-        const L=colLetter(c);
-        const rev=cells[L+'10'].value, ox=cells[L+'12'].value;
-        if(c===cHard){
-          cells[L+'13']={...blankCell(),value:rev+ox+rnd(2,9)*5,fmtStyle:'comma',decimals:0};
-        } else if(c===cCross){
-          const N=colLetter(c===6?5:c+1);
-          cells[L+'13']={...blankCell(),formula:'='+L+'10+'+N+'12',value:rev+cells[N+'12'].value,fmtStyle:'comma',decimals:0};
+      /* (d) the crimes. The FIRST year column is trusted by construction — the ☆ is
+         re-driving the calc block from it, and a board where the leftmost column could
+         itself be rotten would make that move a trap rather than a mastery choice. */
+      const pool=[]; for(let c=c0+1;c<=cN;c++) pool.push(c);
+      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
+      const hcA=Math.min(pool[0],pool[1]), hcB=Math.max(pool[0],pool[1]), crossC=pool[2];
+      cells[AL+ebitR]={...blankCell(),value:'EBIT',txt:true,bold:true,bt:true};
+      cells[AL+margR]={...blankCell(),value:'EBIT margin',txt:true};
+      const EBIT={};
+      for(let c=c0;c<=cN;c++){ EBIT[c]=REV[c]+OPX[c]+DA[c];
+        if(c===hcA||c===hcB){
+          /* the crime: a typed number where the formula was, drifted from the truth and
+             wearing the SAME black ink and comma format as the live cells around it */
+          const drift=(rnd(0,1)?1:-1)*rnd(3,9)/100;
+          cells[CL(c)+ebitR]={...blankCell(),value:Math.round(EBIT[c]*(1+drift)/5)*5,fmtStyle:'comma',decimals:0,bold:true,bt:true};
         } else {
-          cells[L+'13']={...blankCell(),formula:'='+L+'10+'+L+'12',value:rev+ox,fmtStyle:'comma',decimals:0};
+          cells[CL(c)+ebitR]={...blankCell(),formula:'='+CL(c)+totR+'+'+CL(c)+costR+'+'+CL(c)+daR,value:EBIT[c],fmtStyle:'comma',decimals:0,bold:true,bt:true};
         }
       }
-      this._t1='G'+badDivRow; this._t2=colLetter(cHard)+'13'; this._t3=colLetter(cCross)+'13';
-      return {ROWS:13, cells, active:{r:4,c:7}, sel:null, colW:{1:118,7:86}};
+      for(let c=c0;c<=cN;c++){
+        const den=(c===crossC)?(c===cN?c-1:c+1):c;   // the crossed read points at a NEIGHBOUR year's revenue
+        const shown=(c===hcA||c===hcB)?cells[CL(c)+ebitR].value:EBIT[c];
+        cells[CL(c)+margR]={...blankCell(),formula:'='+CL(c)+ebitR+'/'+CL(den)+totR,value:shown/REV[den],fmtStyle:'percent',decimals:1};
+      }
+      /* MODELING_STANDARDS §6: the check lives in ONE visible place and is expected to read
+         zero. It compares the Total COLUMN against the Total revenue line, so the short SUM
+         is what it is complaining about — fixing that beat drives it to zero on the board
+         (§1.5: the aha lands there), and no beat grades it, so it can never be gamed. */
+      cells[AL+chkR]={...blankCell(),value:'Check — Total column less Total revenue',txt:true};
+      cells[CL(c0)+chkR]={...blankCell(),formula:'=SUM('+CL(totC)+r0+':'+CL(totC)+rN+')-'+CL(totC)+totR,
+        value:(function(){ let s=0; for(let r=r0;r<=rN;r++) s+=cells[CL(totC)+r].value; let g=0; for(let c=c0;c<=cN;c++) g+=REV[c]; return s-g; })(),
+        fmtStyle:'comma',decimals:0};
+      cells[AL+signR]={...blankCell(),value:'Reviewed by',txt:true};
+      cells[AL+memoR]={...blankCell(),value:'Memo: figures as filed; no restatements this pass',txt:true,it:true};
+      const cw={}; cw[ac]=178; for(let c=c0;c<=totC;c++) cw[c]=78;
+      this._o={ hr, ac, AL, c0, cN, totC, r0, rN, totR, costR, daR, ebitR, margR, chkR, signR,
+        NC, y0, hcA, hcB, crossC, badRow, badName:DIV[badRow-r0],
+        lastCol:CL(cN), firstK:CL(c0)+r0, blockTop:CL(c0)+ebitR,
+        badK:CL(totC)+badRow, signK:CL(c0)+signR,
+        ebitRng:CL(c0)+ebitR+':'+CL(cN)+ebitR,
+        blockRng:CL(c0)+ebitR+':'+CL(cN)+margR,
+        margK:CL(crossC)+margR, margYr:'FY'+(y0+crossC-c0),
+        margFix:'='+CL(crossC)+ebitR+'/'+CL(crossC)+totR,
+        V, REV, OPX, DA, EBIT };
+      return {ROWS:20, cells, active:{r:r0,c:c0}, sel:null, colW:cw};
     },
     checks(S){
-      let totOk=true, liveOk=true, ownOk=true;
-      for(let r=4;r<=9;r++){
-        const g=S.cells['G'+r];
-        let want=0; for(let c=2;c<=6;c++){ const x=S.cells[colLetter(c)+r]; want+=(x&&typeof x.value==='number')?x.value:0; }
-        if(!g||!g.formula||!/B\d+:F\d+\)?$/.test(g.formula.replace(/\$/g,''))||Math.abs((g.value||0)-want)>1e-6) totOk=false;
-      }
-      for(let c=2;c<=6;c++){
-        const L=colLetter(c);
-        const tot=S.cells[L+'10'], eb=S.cells[L+'13'];
-        const ox=S.cells[L+'12']?S.cells[L+'12'].value:0;
-        if(!eb||!eb.formula){ liveOk=false; continue; }
-        const f=eb.formula.toUpperCase().replace(/[\s$]/g,'');
-        // self-consistent: judged against the DISPLAYED total (no recalc engine)
-        if(!f.includes(L+'12') || Math.abs((eb.value||0)-(((tot&&tot.value)||0)+ox))>1e-6) ownOk=false;
-      }
+      const o=this._o, CL=c=>colLetter(c);
+      const cel=k=>S.cells[k]||{};
+      /* §1.0-R3(p) GRADE THE END STATE. Every predicate here is a VALUE read against the
+         honest figure plus a liveness test (sumishF / .formula), never a formula-TEXT match —
+         which is precisely what the shipped board got wrong twice and what the campaign's
+         untriggerable-beat class is made of. WALKED and CLEARING on the shipped predicate's
+         two dead routes: the short Total repaired as =B7+C7+D7+E7+F7 and as
+         =SUM(B7,C7,D7,E7,F7) (both display the right figure; the old /B\d+:F\d+\)?$/ text
+         match left both DARK with nothing on the board to fix). */
+      let want=0; for(let c=o.c0;c<=o.cN;c++) want+=o.V[o.badRow][c];
+      const bad=cel(o.badK);
+      const totOk=!!(bad.formula && sumishF(bad.formula) && typeof bad.value==='number' && Math.abs(bad.value-want)<0.5);
+      /* the two hardcodes: a LIVE cell whose value is the honest EBIT. Any live shape lands it
+         — =SUM over the three cells, the addition chain, the filled/pasted copy of the trusted
+         year — because the test is liveness plus arithmetic, not a spelling. A cell left as a
+         typed number can never clear it, which IS the lesson (doctrine's anchor-text class). */
+      const liveEbit=c=>{ const x=cel(CL(c)+o.ebitR);
+        return !!(x.formula && typeof x.value==='number' && Math.abs(x.value-o.EBIT[c])<0.5); };
+      let hcGot=0; [o.hcA,o.hcB].forEach(c=>{ if(liveEbit(c)) hcGot++; });
+      const ebitOk=hcGot===2;
+      /* the crossed margin: its own year's revenue underneath its own year's EBIT. Graded on
+         the VALUE, so typing the ratio, pointing at it, or re-driving the whole block all
+         clear; the neighbour-year answer is a different number and stays dark. */
+      const mc=cel(o.margK);
+      const margOk=!!(mc.formula && typeof mc.value==='number' &&
+        Math.abs(mc.value-(o.EBIT[o.crossC]/o.REV[o.crossC]))<5e-5);
+      const sc=cel(o.signK);
+      const signOk=String(sc.value==null?'':sc.value).trim().toUpperCase()==='OK';
+      const k=(totOk?1:0)+hcGot+(margOk?1:0);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the EBIT block —
+         both rows, every year — re-driven from the trusted first year in ONE pass. Read off the
+         r424 S.fillOps latch and the r425 S.pasteLog latch (the MECHANIC, never geometry
+         inferred), so ctrl+r, Alt H F I R and a copy of the trusted column onto the rest all
+         earn it. Latched only when the block is actually RIGHT, so a fill that propagates a
+         mistake never lights it. */
+      const covers=(r1,c1,r2,c2)=>r1<=o.ebitR&&r2>=o.margR&&c1<=o.c0+1&&c2>=o.cN;
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='right'&&covers(f.r1,f.c1,f.r2,f.c2)) ||
+                    (S.pasteLog||[]).some(p=>covers(p.r0,p.c0,p.r0+p.h-1,p.c0+p.w-1));
+      const starOk=ebitOk&&margOk&&onePass;
+      /* Labels are INSTRUCTIONS (§1.0-R3(n)) — the clause after the dash says WHAT or WHERE,
+         never why — and they name THIS seed's facts (§1.0-R2(g)): the division whose Total is
+         short and the fiscal year whose margin crossed, so nobody has to reverse-engineer the
+         seed. The positions of the two hardcodes are deliberately NOT named: finding them is
+         the drill, and §2.3's disclosed COUNT is the honest way to say so. */
       return [
-        {label:'extend each division\u2019s Total SUM to cover all five years \u2014 one row stops a year short (column G)', ok:totOk},
-        {label:'make EBITDA a LIVE formula in every year \u2014 one is a stale typed number (row 13)', ok:liveOk},
-        {label:'point every EBITDA at its OWN year\u2019s opex \u2014 one column crossed wires (row 13)', ok:ownOk},
+        {label:'Find and fix all 4 planted breaks ('+k+'/4)', ok:k===4},
+        {label:'Fix the '+o.badName+' Total — its range covers four of the five years', ok:totOk},
+        {label:'Fix the two typed-over cells in the EBIT row — live formulas, not typed numbers ('+hcGot+'/2)', ok:ebitOk},
+        {label:'Repoint the '+o.margYr+' EBIT margin — it divides by another year’s revenue', ok:margOk},
+        {label:'Enter OK at the review cell', ok:signOk},
+        {label:'Re-drive the EBIT block in one pass — both rows, every year, from the good one', ok:starOk, bonus:true},
       ];
     }
   },
 
   triage:{
-    name:'Error triage', label:'Error triage: #REF!, #DIV/0!, #VALUE!', par:27, parKeys:25,
-    aha:'#REF! lost a cell, #DIV/0! lost a base, #VALUE! ate text — each error names its cause.',
-    prompt:'Three classic breaks on one tab: a #REF! where a deleted row took the SUM with it, a #DIV/0! where the denominator points at nothing, and a #VALUE! where a formula grabbed text. Read each error, work out the intent, and rebuild the formula. The error message is the diagnosis.',
-    req(){ const R=this._R; return '<em>'+R.refCell+'</em> #REF! \u2192 rebuild =SUM('+R.refFix+') \u00b7 <em>'+R.divCell+'</em> #DIV/0! \u2192 denominator is '+R.divFix+' \u00b7 <em>'+R.valCell+'</em> #VALUE! \u2192 point at the NUMBER ('+R.valFix+')'; },
-    guide:[
-      'the #REF! total lost its range to a deleted row \u00b7 retype it: <kbd>=</kbd>SUM over the block <kbd>\u21b5</kbd>',
-      'the #DIV/0! cost ratio lost its denominator \u00b7 rebuild it: type <kbd>=</kbd>cost \u00f7 the Q2 revenue \u00b7 <kbd>\u21b5</kbd>',
-      'the #VALUE! growth grabbed the LABEL, not the number \u00b7 rebuild it against the right cells \u00b7 <kbd>\u21b5</kbd>',
-    ],
-    targets:[function(){return this._R.refCell;}, function(){return this._R.divCell;}, function(){return this._R.valCell;}],
-    demo(){ const R=this._R;
+    /* r439 H6b (DEPTH_PASS §4.46 + §2.3 + the §1.0 / §1.0-R2 / §1.0-R3 law): the depth-pass
+       rework. The old board FAKED its three errors — B8/B10/B11 shipped as `value:'#REF!',
+       txt:true`, text cells that no formula could propagate — which is precisely what §4.46
+       says to replant ("errors must be live values that propagate"). Every error on this board
+       is now a REAL r419 sentinel: the cells carry formulas, `recalc()` sets the sentinel, and
+       it travels downstream.
+
+       ── THE RETIREMENT DIAGNOSTIC, BOTH PARTS, MEASURED ON THE SHIPPED BOARD. VERDICT: KEEP,
+          but the board had to be rebuilt rather than dressed, and part 2 is why.
+       · Part 1 — spread. fastest legal 26 keys · slowest legal 29 = 1.12×. That is the lowest
+         number the campaign has measured: below retired `grpfold` (1.21×), below merged
+         `unhide` (1.26×), an order of magnitude below the shipped band.
+       · Part 2 — what the spread is MADE of, which is the part that decides. There is nothing
+         to strip: the shipped board carried no chord anywhere and graded no formatting. The
+         whole 3 keys is the typing length of `=C8/B8-1` against `=(C8-B8)/B8`. That is not a
+         mastery move, so the SHIPPED BOARD CARRIED NO LEGAL ☆ AT ALL — the standalone-`unhide`
+         finding, on a different board. Three independent single-cell repairs at three fixed
+         addresses cannot carry one. The fix is at the BOARD, never at the predicate (the r438
+         `series` precedent): one of the three errors is now PLURAL — a whole subtotal row, four
+         quarters wide — which is what gives the drill a one-pass move to reward.
+       · The shipped board also breached §1.2: ONE randomization axis (value ranges). Every row
+         and every address was fixed across seeds. Four axes now.
+
+       ── WHY IT IS NOT THE SAME DRILL AS `audit` (campaign §3, and here the answer is a genuine
+          INVERSION, probed on the engine rather than argued). `audit` and the retired `hunt`
+          both teach: a raw NUMBER where a formula belongs is the crime, and the cure is to type
+          a formula. This board's #DIV/0! teaches the opposite, and punishes the transfer: the
+          error is in the POINTER, not in a missing value, and the fluent hardcode-hunter's
+          first move — put a number in the empty cell the denominator is aiming at — makes the
+          error DISAPPEAR while leaving the model wrong. Probed live: `=D5/C7` with C7 blank
+          reads #DIV/0!; put 250 in C7 and it reads 0.24, off a formula still pointing at the
+          wrong cell. A first attempt that COMPUTES AND IS WRONG is worse than one that throws,
+          and it exists here only as a contrast with the drills either side of it — the
+          sumif/rollup shape, not the grpfold shape. The predicate carries the guard (§1.1:
+          leave-untouched guards fold into the ok of the action check they protect).
+
+       BOARD. A quarterly segment P&L inherited mid-quarter, four quarters wide. Three revenue
+       lines over a live Total revenue row; three cost lines over a Total costs row; an EBIT
+       line under both; a share-of-revenue line; and a three-case opex plan block at the foot.
+       The two blocks are built to the SAME geometry — three lines then a total, five rows
+       apart — which is what makes the healthy Total revenue row the model for the broken one
+       (MODELING_STANDARDS §7: a plausible artifact, labelled rows, stated units, a basis memo).
+       Colour is provenance: typed figures blue, computed cells black. Costs seeded negative and
+       the convention stated on the board (§2 of that file). Total revenue and EBIT wear TOP
+       borders; Total costs arrives UNDRESSED, which is both the seed for the dress beat and the
+       visible tell that the row was rebuilt in a hurry.
+
+       THE THREE ERRORS, AND THE CASCADE. One `=SUM(#REF!)` per quarter on the Total costs row
+       (the tab lost the rows the range covered — the memo says so), which propagates into the
+       EBIT line below: EIGHT red cells from ONE cause. The meter says THREE errors, and that
+       gap is the drill's own argument — count causes, not symptoms (§1.5, the aha). The other
+       two are independent: a #DIV/0! where one quarter's share-of-revenue divides by the BLANK
+       spacer row under the total instead of the total itself (the classic off-by-one), and a
+       #VALUE! where the opex case read is a three-case switch carrying only two cases.
+
+       BEATS (5 core + the engine-appended save closer + one ☆; tri-length 6, C9-registered).
+       They CHAIN: the meter owns the run, the dress lands immediately behind the row it dresses
+       (§1.0(a) format-as-you-go), and the last work beat drives the final red cell black — a
+       §1.6 PROVE-OUT close rather than a dress close, because this board has the better one.
+
+       ☆ = THE TOTAL COSTS ROW REBUILT IN ONE PASS. Four broken quarters, one move: carry the
+       healthy Total revenue row down onto it (the relative refs translate exactly five rows and
+       land on the cost block — that is what building the two blocks alike buys), or repair one
+       quarter and fill it across. Read off the r424 S.fillOps latch and the r425 S.pasteLog
+       latch (the MECHANIC, never geometry inferred), so ctrl+r, ctrl+d, the ribbon fills and
+       every paste route earn it. SKIPPABLE and MEASURED: four separately typed SUMs clear every
+       core with the star DARK (alt-paths ALT 2, the negative control).
+
+       §1.0-R3(p) — the routes are WALKED, and the predicates below grade VALUES plus liveness,
+       never formula text. The one deliberate exception is the case read, where the SWITCH is
+       the lesson (doctrine's anchor-text class): the formula has to reference the switch cell,
+       and four different shapes were probed and all four clear — CHOOSE with the third case
+       added, a nested IF chain, INDEX over the case row, and OFFSET off the first case.
+       No cueCell (§1.0-R2(h)/§1.0-R3(q)), declared: every target is an existing labelled cell
+       carrying a red error value, which is a louder cue than a red note could be. */
+    name:'Error triage', label:'Error triage — #REF! #DIV/0! #VALUE!', par:40, parKeys:38, saveClose:true,   /* r439: par re-swept from scratch on the real-sentinel board — dev/e2e-par-sweep.js triage, 5-seed median 38 keys INCLUDING the engine-appended Ctrl+S, and FLAT across seeds (the board is built so the demo types the same characters on every draw). parKeys 25→38, par 27→40 (1.05 s/key, the house band), mirrored in HOTKEY_PARS. Measured against it: the same board worked the slow way — four typed SUMs, the ribbon dress, a nested IF case read and every move arrowed — runs 123 keys (alt-paths ALT 2's family, the slow-route control). Clocks derive (§1.4): pass 60 · pro 46 · legendary 40. */
+    aha:'an error names its own disease — #REF! lost its range, #DIV/0! lost its base, #VALUE! lost an argument.',
+    prompt:'A segment tab came across mid-quarter with three errors on it, and more red cells than that — the Total costs row lost the rows its SUM covered, and the EBIT line under it is reading the wreckage. One quarter’s share of revenue divides by the blank row under the total instead of the total. And the opex plan is switched to the third case while the formula only carries two. Read each error, work out what it was meant to say, and rebuild it.',
+    req(){ const o=this._o; return 'the <em>Total costs</em> row → a live SUM over the three cost lines (carry the <em>Total revenue</em> row down, or fill one across) · <em>ctrl+b</em> · <em>alt h b p</em> · the <em>'+o.shareQ+'</em> share → repoint the denominator at <em>Total revenue</em> · the case read → add the third case · <em>ctrl+s</em>'; },
+    guide(){ const o=this._o; return [
+      'three errors, eight red cells: the <b>Total costs</b> row is the cause and the <b>EBIT</b> line under it is only repeating it. Fix causes, and the symptoms clear themselves',
+      '<b>=SUM(#REF!)</b> means the range is gone, not wrong — the <b>Total revenue</b> row two blocks up is the same formula over the same shape of block, five rows higher',
+      'a total earns the line ABOVE it, never underneath: select the <b>Total costs</b> line · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
+      'the <b>'+o.shareQ+'</b> share reads <b>#DIV/0!</b> because its denominator is the BLANK row under <b>Total revenue</b>, not the total — <kbd>F2</kbd>, step the denominator up one row, <kbd>↵</kbd>. Filling that blank row in would clear the error and leave the model wrong',
+      'the switch is on case <b>'+o.switchVal+'</b> and the formula carries two cases, so it reads <b>#VALUE!</b> · <kbd>F2</kbd>, add the third case before the close bracket, <kbd>↵</kbd>',
+      'the whole <b>Total costs</b> row is one formula four times over — take the <b>Total revenue</b> row with <kbd>ctrl</kbd>+<kbd>c</kbd> and paste it over the broken row, or repair one quarter and <kbd>ctrl</kbd>+<kbd>r</kbd> across',
+    ]; },
+    targets(){ const o=this._o; return [null, o.costRng, o.costLine, o.shareK, o.selK, o.costRng]; },
+    demo(){ const o=this._o;
       return [
-        {sel:R.refCell, keys:[...T('=SUM('+R.refFix+')'), Kb.enter]},
-        {sel:R.divCell, keys:[...T('='+R.divNum+'/'+R.divFix), Kb.enter]},
-        {sel:R.valCell, keys:[...T('='+R.valFix+'/'+R.valBase+'-1'), Kb.enter]},
+        {sel:o.revRng, keys:[Kb.copy]},
+        {sel:o.costRng, keys:[Kb.paste]},
+        {sel:o.costLine, keys:[Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+        {sel:o.shareK, keys:[...T(o.shareFix), Kb.enter]},
+        {sel:o.selK, keys:[...T(o.selFix), Kb.enter]},
       ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Quarterly bridge (broken \u2014 fix before send)',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
-      cells['B3']={...blankCell(),value:'Q1',txt:true,bold:true};
-      cells['C3']={...blankCell(),value:'Q2',txt:true,bold:true};
-      const rows=['Product','Services','Licenses','Other'];
-      for(let i2=0;i2<4;i2++){ const r=4+i2;
-        cells['A'+r]={...blankCell(),value:rows[i2],txt:true};
-        cells['B'+r]={...blankCell(),value:rnd(40,300)*5,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells['C'+r]={...blankCell(),value:rnd(40,300)*5,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-      cells['A8']={...blankCell(),value:'Total',txt:true,bold:true};
-      cells['B8']={...blankCell(),value:'#REF!',txt:true};
-      let c8=0; for(let r=4;r<=7;r++) c8+=cells['C'+r].value;
-      cells['C8']={...blankCell(),formula:'=SUM(C4:C7)',value:c8};
-      cells['A10']={...blankCell(),value:'Svc cost ratio (Q2)',txt:true};
-      cells['B10']={...blankCell(),value:'#DIV/0!',txt:true,decimals:2};   // r190: the fixed quotient shows 2dp
-      cells['A11']={...blankCell(),value:'Total growth Q2/Q1',txt:true};
-      cells['B11']={...blankCell(),value:'#VALUE!',txt:true,decimals:2};
-      const svc=cells['C5'].value, svcCost=rnd(20,120)*5;
-      cells['D5']={...blankCell(),value:svcCost,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['D3']={...blankCell(),value:'Cost',txt:true,bold:true};
-      this._R={ refCell:'B8', refFix:'B4:B7',
-                divCell:'B10', divNum:'D5', divFix:'C5',
-                valCell:'B11', valFix:'C8', valBase:'B8' };
-      this._svc=svc; this._svcCost=svcCost;
-      return {ROWS:11, cells, active:{r:8,c:2}, sel:null, colW:{1:150}};
+      /* §1.2 randomization, FOUR independent axes:
+         (a) geometry jitter — header row 3 or 4 × anchor column A or B (four sites; the tail
+             block stays pinned so the sheet is always exactly 20 rows and the demo's key count
+             never moves with the draw);
+         (b) content pools — three revenue lines and three cost lines drawn Fisher-Yates from
+             pools of six, plus the codename and the quarter-year;
+         (c) value ranges — every figure through rnd();
+         (d) which-one-is-broken — WHICH quarter carries the #DIV/0!, WHICH revenue line the
+             share row measures, and which case the opex switch is set to. */
+      const hr = 3 + rnd(0,1);
+      const ac = 1 + rnd(0,1);
+      const AL = colLetter(ac);
+      const NQ = 4;
+      const c0 = ac+1, cN = ac+NQ;
+      const CL = c=>colLetter(c);
+      const co = codename();
+      const qy = 24 + rnd(0,4);
+      const RPOOL=['Subscription','Transaction','Services','Licensing','Advertising','Maintenance'];
+      const CPOOL=['Personnel','Hosting','Marketing','Facilities','Professional fees','Support'];
+      const mix=a=>{ for(let k=a.length-1;k>0;k--){ const j=rnd(0,k); [a[k],a[j]]=[a[j],a[k]]; } return a; };
+      const REVN=mix(RPOOL.slice()).slice(0,3), COSN=mix(CPOOL.slice()).slice(0,3);
+      const rev0 = hr+1, rev2 = rev0+2, totRevR = rev0+3;
+      const cost0 = totRevR+2, cost2 = cost0+2, totCostR = cost0+3;
+      const ebitR = totCostR+1, shareR = ebitR+1;
+      const caseHdrR = 17, caseValR = 18, switchR = 19, selR = 20;
+      cells[AL+'1']={...blankCell(),value:co+' — segment P&L, quarter to date',txt:true,bold:true};
+      cells[AL+'2']={...blankCell(),value:'$000s · costs shown negative · rows deleted from this tab on intake',txt:true,it:true};
+      cells[AL+hr]={...blankCell(),value:'Line',txt:true,bold:true};
+      for(let c=c0;c<=cN;c++) cells[CL(c)+hr]={...blankCell(),value:'Q'+(c-c0+1)+' FY'+qy,txt:true,bold:true,align:'r'};
+      const RV={}, CV={};
+      for(let i=0;i<3;i++){ const r=rev0+i;
+        cells[AL+r]={...blankCell(),value:REVN[i],txt:true}; RV[r]={};
+        for(let c=c0;c<=cN;c++){ const v=rnd(30,240)*5; RV[r][c]=v;
+          cells[CL(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; } }
+      const TREV={};
+      cells[AL+totRevR]={...blankCell(),value:'Total revenue',txt:true,bold:true,bt:true};
+      for(let c=c0;c<=cN;c++){ let t=0; for(let r=rev0;r<=rev2;r++) t+=RV[r][c]; TREV[c]=t;
+        cells[CL(c)+totRevR]={...blankCell(),formula:'=SUM('+CL(c)+rev0+':'+CL(c)+rev2+')',value:t,fmtStyle:'comma',decimals:0,bold:true,bt:true}; }
+      for(let i=0;i<3;i++){ const r=cost0+i;
+        cells[AL+r]={...blankCell(),value:COSN[i],txt:true}; CV[r]={};
+        for(let c=c0;c<=cN;c++){ const v=-rnd(20,150)*5; CV[r][c]=v;
+          cells[CL(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; } }
+      /* THE #REF!: the range the SUM covered was deleted, so Excel leaves =SUM(#REF!) behind.
+         Seeded as a real formula — recalc()'s r407 orphan detector sets the sentinel and it
+         PROPAGATES into the EBIT line below (the cascade). The row ships UNDRESSED. */
+      const TCOST={};
+      cells[AL+totCostR]={...blankCell(),value:'Total costs',txt:true};
+      for(let c=c0;c<=cN;c++){ let t=0; for(let r=cost0;r<=cost2;r++) t+=CV[r][c]; TCOST[c]=t;
+        cells[CL(c)+totCostR]={...blankCell(),formula:'=SUM(#REF!)',value:'#REF!',fmtStyle:'comma',decimals:0}; }
+      cells[AL+ebitR]={...blankCell(),value:'EBIT',txt:true,bold:true,bt:true};
+      for(let c=c0;c<=cN;c++)
+        cells[CL(c)+ebitR]={...blankCell(),formula:'='+CL(c)+totRevR+'+'+CL(c)+totCostR,value:'#REF!',fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      /* THE #DIV/0!: one quarter's share of revenue divides by the BLANK spacer row under
+         Total revenue instead of the total itself. The other three quarters carry the honest
+         formula, so the pattern-break is on the page. */
+      const badQ = c0+rnd(0,NQ-1);
+      const shareRow = rev0+rnd(0,2);
+      cells[AL+shareR]={...blankCell(),value:REVN[shareRow-rev0]+' share of revenue',txt:true};
+      for(let c=c0;c<=cN;c++){ const den=(c===badQ)?(totRevR+1):totRevR;
+        cells[CL(c)+shareR]={...blankCell(),formula:'='+CL(c)+shareRow+'/'+CL(c)+den,
+          value:(c===badQ)?'#DIV/0!':RV[shareRow][c]/TREV[c],fmtStyle:'percent',decimals:1}; }
+      /* THE #VALUE!: a three-case switch whose CHOOSE carries two cases. The engine throws
+         #VALUE! on a CHOOSE index past its argument list (the only route to that sentinel on
+         this engine — a formula that grabs a text label coerces to 0 here, so §4.46's stated
+         cause is not buildable; the deviation is declared in dev/AUDIT.md r439). */
+      const CASEN=['Base','Upside','Downside'];
+      cells[AL+caseHdrR]={...blankCell(),value:'Opex plan — cases',txt:true,bold:true};
+      CASEN.forEach((n,i)=>cells[CL(c0+i)+caseHdrR]={...blankCell(),value:n,txt:true,bold:true,align:'r'});
+      cells[AL+caseValR]={...blankCell(),value:'Opex plan ($000s)',txt:true};
+      const CASEV=[];
+      for(let i=0;i<3;i++){ const v=rnd(60,180)*5; CASEV.push(v);
+        cells[CL(c0+i)+caseValR]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
+      const switchVal = 3;
+      cells[AL+switchR]={...blankCell(),value:'Case in use (1 Base · 2 Upside · 3 Downside)',txt:true};
+      cells[CL(c0)+switchR]={...blankCell(),value:switchVal,fontColor:'blue'};
+      cells[AL+selR]={...blankCell(),value:'Opex plan selected',txt:true,bold:true};
+      cells[CL(c0)+selR]={...blankCell(),
+        formula:'=CHOOSE('+CL(c0)+switchR+','+CL(c0)+caseValR+','+CL(c0+1)+caseValR+')',
+        value:'#VALUE!',fmtStyle:'comma',decimals:0,bold:true};
+      const cw={}; cw[ac]=196; for(let c=c0;c<=cN;c++) cw[c]=84;
+      this._o={ hr, ac, AL, c0, cN, NQ, rev0, rev2, totRevR, cost0, cost2, totCostR, ebitR, shareR,
+        caseHdrR, caseValR, switchR, selR, badQ, shareRow, switchVal, CASEV, TREV, TCOST, RV,
+        revRng:CL(c0)+totRevR+':'+CL(cN)+totRevR,
+        costRng:CL(c0)+totCostR+':'+CL(cN)+totCostR,
+        costLine:AL+totCostR+':'+CL(cN)+totCostR,
+        shareK:CL(badQ)+shareR, shareQ:'Q'+(badQ-c0+1),
+        shareFix:'='+CL(badQ)+shareRow+'/'+CL(badQ)+totRevR,
+        selK:CL(c0)+selR, switchK:CL(c0)+switchR,
+        selFix:'=CHOOSE('+CL(c0)+switchR+','+CL(c0)+caseValR+','+CL(c0+1)+caseValR+','+CL(c0+2)+caseValR+')' };
+      return {ROWS:20, cells, active:{r:totCostR,c:c0}, sel:null, colW:cw};
     },
     checks(S){
-      let b8=0; for(let r=4;r<=7;r++){ const x=S.cells['B'+r]; b8+=(x&&typeof x.value==='number')?x.value:0; }
-      const ref=S.cells['B8'];
-      const refOk=!!(ref&&ref.formula&&/SUM\(B4:B7\)/i.test(ref.formula.replace(/\$/g,''))&&Math.abs((ref.value||0)-b8)<1e-6);
-      const div=S.cells['B10'];
-      const wantDiv=this._svcCost/this._svc;
-      const divOk=!!(div&&div.formula&&/C5/i.test(div.formula)&&isFinite(div.value)&&Math.abs((div.value||0)-wantDiv)<1e-6);
-      const val=S.cells['B11'];
-      let c8=0; for(let r=4;r<=7;r++){ const x=S.cells['C'+r]; c8+=(x&&typeof x.value==='number')?x.value:0; }
-      const wantVal=refOk? c8/b8-1 : null;
-      const valOk=!!(val&&val.formula&&/C8/i.test(val.formula)&&/B8/i.test(val.formula)&&refOk&&isFinite(val.value)&&Math.abs((val.value||0)-wantVal)<1e-4);
+      const o=this._o, CL=c=>colLetter(c);
+      const cel=k=>S.cells[k]||{};
+      /* §1.0-R3(p): every predicate is a VALUE read plus a liveness test. WALKED and CLEARING
+         on the Total costs row: the Total revenue row copied down (relative refs translate five
+         rows onto the cost block), one quarter typed and ctrl+r'd across, four separate typed
+         =SUM()s, four addition chains, and the whole run in reverse order. Correctly DARK: the
+         row left carrying =SUM(#REF!), and a row of typed NUMBERS (sumishF refuses a bare
+         value, which is the lesson). */
+      let costGot=0;
+      for(let c=o.c0;c<=o.cN;c++){ const x=cel(CL(c)+o.totCostR);
+        if(x.formula && !/#REF!/.test(String(x.formula)) && sumishF(x.formula) &&
+           typeof x.value==='number' && Math.abs(x.value-o.TCOST[c])<0.5) costGot++; }
+      const costOk=costGot===o.NQ;
+      /* §1.0(f) a total earns the rule ABOVE it. Both cells the line carries — its label and
+         its figures — take the bold and the top border, which is how a hand-off row is actually
+         dressed (§1.0-R3(p), the r430 label+figures widening). A bottom rule never clears. */
+      const dressCells=[o.AL+o.totCostR]; for(let c=o.c0;c<=o.cN;c++) dressCells.push(CL(c)+o.totCostR);
+      const dressOk=dressCells.every(k=>{ const x=cel(k); return !!x.bold && !!x.bt && !x.bb && !x.bdbl; });
+      /* the #DIV/0!: its own quarter's revenue line over its own quarter's TOTAL revenue.
+         Graded on the value — and the leave-untouched guard that makes the drill's inversion
+         real is folded in here (§1.1): the blank spacer row the denominator was aiming at must
+         still be blank, so plugging a number into it can never clear the beat even though it
+         clears the error off the screen. */
+      const sh=cel(o.shareK);
+      const spacer=cel(CL(o.badQ)+(o.totRevR+1));
+      const spacerEmpty=(spacer.value==null||spacer.value==='')&&!spacer.formula;
+      const shareOk=!!(sh.formula && typeof sh.value==='number' && spacerEmpty &&
+        Math.abs(sh.value-(o.RV[o.shareRow][o.badQ]/o.TREV[o.badQ]))<5e-6);
+      /* the #VALUE!: the case read must still BE a case read — it references the switch cell —
+         and it must land the case the switch is on. That is doctrine's anchor-text exception
+         (the switch IS the lesson); every function shape clears, and four were probed:
+         CHOOSE with the third case added, a nested IF chain, INDEX over the case row, and
+         OFFSET off the first case. A cell repointed straight at the Downside figure is not a
+         case read and correctly stays dark. */
+      const sel=cel(o.selK);
+      const swRe=new RegExp('\\$?'+CL(o.c0)+'\\$?'+o.switchR+'(?![0-9])');
+      const selOk=!!(sel.formula && swRe.test(String(sel.formula).toUpperCase()) &&
+        typeof sel.value==='number' && Math.abs(sel.value-o.CASEV[o.switchVal-1])<0.5);
+      const k=(costOk?1:0)+(shareOk?1:0)+(selOk?1:0);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the four broken
+         quarters rebuilt in ONE pass — the healthy Total revenue row carried down, or one
+         quarter repaired and filled across. Read off the r424 S.fillOps / r425 S.pasteLog
+         latches (the MECHANIC, never geometry inferred), so every fill and every paste route
+         earns it; four separately typed SUMs clear core with the star dark. */
+      const spans=(r1,c1,r2,c2)=>r1<=o.totCostR&&r2>=o.totCostR&&c1<=o.c0+1&&c2>=o.cN;
+      const onePass=(S.fillOps||[]).some(f=>spans(f.r1,f.c1,f.r2,f.c2)) ||
+                    (S.pasteLog||[]).some(p=>spans(p.r0,p.c0,p.r0+p.h-1,p.c0+p.w-1));
+      const starOk=costOk&&onePass;
+      /* Labels are INSTRUCTIONS (§1.0-R3(n)) and name THIS seed's facts (§1.0-R2(g)) — which
+         quarter carries the #DIV/0!, which case the switch is on. */
       return [
-        {label:'rebuild the #REF! total \u2014 =SUM over the Q1 block (B8)', ok:refOk},
-        {label:'fix the #DIV/0! margin \u2014 the denominator is Services revenue, C5 (B10)', ok:divOk},
-        {label:'fix the #VALUE! growth \u2014 totals, not labels: C8 over B8 (B11; fix B8 first)', ok:valOk},
+        {label:'Find and rebuild all 3 errors ('+k+'/3)', ok:k===3},
+        {label:'Fix the #REF! Total costs row — a live SUM over the three cost lines ('+costGot+'/'+o.NQ+')', ok:costOk},
+        {label:'Bold the Total costs line and add a top border above it', ok:dressOk},
+        {label:'Repoint the #DIV/0! '+o.shareQ+' share — its denominator must be Total revenue', ok:shareOk},
+        {label:'Fix the #VALUE! opex plan — the case read must carry all three cases', ok:selOk},
+        {label:'Build the Total costs row in one pass — four quarters, one move', ok:starOk, bonus:true},
       ];
     }
   },
